@@ -1,0 +1,236 @@
+
+<!doctype html>  
+<html lang="en">  
+    <head>
+                <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+        <script src="http://servicemedia-alb2.46teagnrws.us-east-1.elasticbeanstalk.com/socket.io/socket.io.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-backstretch/2.0.4/jquery.backstretch.min.js"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/cerulean/bootstrap.min.css">
+      <style>
+      img {
+    max-width: 100%;
+    max-height: 100%;
+    }
+    html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            /* background-color: rgb(177, 177, 177) */
+        }
+        div.img {
+            width: 100%;
+            height: 100%;
+            max-height: 100%;
+            margin: 0;
+            padding: 0;
+            /* background-image: url('img/IMAG0360.jpg'); */
+            background-size:100% 100%;
+            background-repeat: no-repeat;
+        }
+        div.future {
+          width: 70%;
+            height: 100%;
+            max-height: 100%;
+            margin: 0;
+            padding: 0;
+            /* background-image: url('img/IMAG0360.jpg'); */
+            /* background-size:100% 100%;
+            background-repeat: no-repeat; */
+        }
+        div.users {
+          width: 30%;
+            height: 100%;
+            max-height: 100%;
+            margin: 0;
+            padding: 0;
+            /* background-image: url('img/IMAG0360.jpg'); */
+            /* background-size:100% 100%;
+            background-repeat: no-repeat; */
+        }
+        .bubble {
+        position: relative;
+        /* /* background: #FFFFCC; */
+         background-color: rgba(254, 255, 203, 0.664);
+        /* background opacity: .3; */
+        border: 1px solid #FFCC00;
+          max-width:1000px;
+          padding:10px;
+          color: black;
+          font-family:arial;
+          margin:10 auto;
+          font-size:18px;
+          border-radius:16px;
+          
+      }
+      .bubble:after,
+      .bubble:before {
+        right: 100%;
+        top: 50%;
+        border: solid transparent;
+        content: " ";
+        height: 0;
+        width: 0;
+        position: absolute;
+        pointer-events: none;
+      }
+
+      .bubble:after {
+        border-color: rgba(255, 255, 204, 0);
+        border-right-color: #FFFFCC;
+        border-width: 15px;
+        margin-top: -15px;
+      }
+      .bubble:before {
+        border-color: rgba(255, 204, 0, 0);
+        border-right-color: #FFCC00;
+        border-width: 16px;
+        margin-top: -16px;
+      }
+      </style>
+      </head>
+    <!-- <body onload="amirite()" id="LoginForm"> -->
+      <body>
+        <div id="room_id"></div>
+        <!-- <h1>servicemedia activity</h1> -->
+        
+        <form id="form" id="chat_form">
+            <input id="chat_input" type="text" style="font-size:12pt;height:30px;width:600px;">
+            <input type="submit" value="Send Message">
+        </form>
+        <div class="row">
+          <div class="col-md-9">
+             <div id="future" class="future"></div>
+          </div>
+          <div class="col-md-3">
+              <div id="users" class="users"></div>
+           </div>
+        </div>
+       
+        <!-- <div id="users" class="pull-right font-weight-bold users"></div> -->
+        <!-- <div id="pics" class="img"></div> -->
+            
+
+    </body>
+</html>  
+
+<script>  
+
+var room = getParameterByName("room", window.location.href);
+ $('#room_id').append($('<button><h4><strong>').text("Welcome to scene " + room).append("</strong></h4></button>"));
+var dateString = Date.now().toString();
+var trimmedString = dateString.substring(dateString.length - 4, 4);
+var username;
+var pics = [];
+var picArrayIndex = 0;
+  function backStretchMe(pics) {
+    $.backstretch(pics);
+  }
+
+  function getParameterByName(name, url) {
+    if (!url) {
+      url = window.location.href;
+    }
+    name = name.replace(/[\[\]]/g, "\\$&");
+    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+        results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return '';
+    return decodeURIComponent(results[2].replace(/\+/g, " "));
+}
+ var socket = io.connect('http://servicemedia-alb2.46teagnrws.us-east-1.elasticbeanstalk.com', {
+    query : {
+        uname:"spectator " + trimmedString
+    }
+  });
+
+ socket.on('connect', function(data) {
+
+    socket.emit('join', room, "spectator", "web");
+
+ });
+
+ socket.on('room users', function (data){
+  console.log("messages data : " + data);
+  $('#users').html("");
+  // foreach (user in data) {
+  //   $('#users').prepend($('<button class=\x22btn btn-dark btn-block\x22><h4>').text( user.Value ).append("</h4></button>"));
+  // }
+  // Object.keys(data).forEach(function(key) {
+    var roomUsers = {};
+    roomUsers = JSON.parse(data);
+    // for (var user in data) {
+    //         // console.log("roomUsers key " + key + " uname " + io.sockets.connected[key].uname);
+    //         console.log("roomUsers key " + user + " uname " + data.user);
+    //         // returnObj[key] = io.sockets.connected[key].uname; //socketID : username
+    //         $('#users').prepend($('<button class=\x22btn btn-dark\x22><h4>').text( data.user ).append("</h4></button>"));
+    //         // returnObj[io.sockets.connected[key].uname] = key; //cook up a nice dict for client to use
+    //     // });
+    //   }
+    for (let value of Object.values(roomUsers)) {
+      console.log(value); // John, then 30
+      $('#users').prepend($('<button class=\x22btn btn-md btn-dark\x22 style=\x22margin: 15px 15px 15px 15px;\x22><h4><strong>').text( value ).append("</strong></h4></button><br>"));
+    }
+  // $('#users').prepend(data);
+});
+
+socket.on('getpicframe', function (data){
+  console.log("getting pic frame with picArrayIndex = "+ picArrayIndex);
+    var base64 = _arrayBufferToBase64(data);
+    var imgSrc = "data:image/jpg;base64," + base64;
+    if (picArrayIndex < 10) {
+      if (pics.length < picArrayIndex) {
+        pics.push(imgSrc);
+      } else {
+        pics.splice(picArrayIndex, 1, imgSrc);  
+      }
+      picArrayIndex++;
+    } else {
+      picArrayIndex = 0;
+      pics.splice(picArrayIndex, 1, imgSrc);
+      picArrayIndex++;
+    }
+    // pics.push(imgSrc);
+
+    $.backstretch(pics, {duration: 3000, fade: 1500});
+
+  // <img src="data:image/jpeg;base64,{{data.UserPhoto}}" id="photo-id"/>
+});
+
+socket.on('getaudiochunk', function (data){
+  console.log("messages data : " + data);
+  // var base64 = _arrayBufferToBase64(data);
+  //   var imgSrc = "data:image/jpg;base64," + base64;
+  //   pics.push(imgSrc);
+    // $('#pics').backstretch(pics);
+
+          // $('#pics').prepend('<img src=' + imgSrc + '>')
+          $.backstretch(pics, {duration: 3000, fade: 750});
+
+  // <img src="data:image/jpeg;base64,{{data.UserPhoto}}" id="photo-id"/>
+});
+
+ socket.on('user messages', function(data1, data2) {
+        console.log("messages data : " + data1 + data2)
+          $('#future').prepend($('<div class=\x22row bubble pull-left\x22 style=\x22margin: 15px 15px 15px 15px;\x22>').text( data1 + ": " + data2).append("</div>"));
+          if ($('#future li').length > 555) {
+            $('#future li').last().remove();
+          }
+  });
+
+ $('form').submit(function(e){
+     e.preventDefault();
+     var message = $('#chat_input').val();
+     console.log("tryna send " + message);
+     $('#future').prepend($('<div class=\x22row bubble pull-left\x22 style=\x22margin: 15px 15px 15px 15px;\x22>').text( "you: " +  message).append("</div>"));
+     socket.emit('user message', message); //but not to ourselfs
+ });
+ function _arrayBufferToBase64( buffer ) {
+    var binary = '';
+    var bytes = new Uint8Array( buffer );
+    var len = bytes.byteLength;
+    for (var i = 0; i < len; i++) {
+        binary += String.fromCharCode( bytes[ i ] );
+    }
+    return window.btoa( binary );
+}
+</script>  

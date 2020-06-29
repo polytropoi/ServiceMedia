@@ -1,0 +1,332 @@
+
+.center {
+    float: none;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.windows_yes {
+    height: 32px;
+    width: 32px;
+    background-size: 100% 100%;
+    background-image: url('http://stump.s3.amazonaws.com/windows_yes.png');
+}
+.windows_no {
+    height: 32px;
+    width: 32px;
+    background-size: 100% 100%;
+    background-image: url('http://stump.s3.amazonaws.com/windows_no.png');
+}
+.apple_yes {
+    height: 32px;
+    width: 32px;
+    background-size: 100% 100%;
+    background-image: url('http://stump.s3.amazonaws.com/apple_yes.png');
+}
+.apple_no {
+    height: 32px;
+    width: 32px;
+    background-size: 100% 100%;
+    background-image: url('http://stump.s3.amazonaws.com/apple_no.png');
+}
+.android_yes {
+    height: 32px;
+    width: 32px;
+    background-size: 100% 100%;
+    background-image: url('http://stump.s3.amazonaws.com/android_yes.png');
+}
+.android_no {
+    height: 32px;
+    width: 32px;
+    background-size: 100% 100%;
+    background-image: url('http://stump.s3.amazonaws.com/android_no.png');
+}
+.private_icon {
+    height: 32px;
+    width: 32px;
+    background-size: 100% 100%;
+    background-image: url('http://stump.s3.amazonaws.com/redkey.png');
+}
+.subscriber_icon {
+    height: 32px;
+    width: 32px;
+    background-size: 100% 100%;
+    background-image: url('http://stump.s3.amazonaws.com/blue.png');
+}
+.public_icon {
+    height: 32px;
+    width: 32px;
+    background-size: 100% 100%;
+    background-image: url('http://stump.s3.amazonaws.com/greenkey.png');
+}
+.qrcode {
+    height: 150px;
+    width: 150px;
+    background-size: 100% 100%;
+    /* background-image: url('http://stump.s3.amazonaws.com/greenkey.png'); */
+}
+form .progress {
+    line-height: 15px;
+}
+
+.well {
+    background: rgb(0, 0, 0);
+}
+
+.ccontainer {
+    /*        width: 512px;
+            height: 256px; */
+    overflow: hidden;
+
+
+}
+.ccontainer img {
+    margin: -12% auto;
+
+}
+
+.cccontainer div {
+    overflow: hidden;
+    padding-top: 128px;
+    padding-bottom: 128px;
+
+}
+.cccontainer img {
+    /*margin: -12% auto;*/
+    width: 256px;
+    height:256px;
+
+}
+
+.ccccontainer div {
+    /*width: 128px;*/
+    /*height: 128px;*/
+    overflow: hidden;
+    /*width: 512px;*/
+    /*max-height: 64px;*/
+    padding-top:   64px;
+    padding-bottom: 64px;
+
+}
+.ccccontainer img {
+    margin: -12% auto;
+    width: 128px;
+    /*max-height: 96px;*/
+    /*position: absolute;*/
+    /*clip: rect(128px,512px,384px,0px);*/
+}
+.mapcontainer img {
+    /*margin: -12% auto;*/
+    width: 300px;
+    /*max-height: 96px;*/
+    /*position: absolute;*/
+    /*clip: rect(128px,512px,384px,0px);*/
+}
+.navbar-default {
+    background-color: #333333;
+    border-color: #111111;
+}
+.gridStyle {
+    border: 1px solid rgb(212,212,212);
+    width: 800px;
+    height: 600px;
+}
+.fileUpload {
+    position: relative;
+    overflow: hidden;
+    margin: 10px;
+}
+.fileUpload input.upload {
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin: 0;
+    padding: 0;
+    font-size: 20px;
+    cursor: pointer;
+    opacity: 0;
+    filter: alpha(opacity=0);
+}
+.btn-file {
+    position: relative;
+    overflow: hidden;
+}
+.btn-file input[type=file] {
+    position: absolute;
+    top: 0;
+    right: 0;
+    min-width: 100%;
+    min-height: 100%;
+    font-size: 999px;
+    text-align: right;
+    filter: alpha(opacity=0);
+    opacity: 0;
+    background: red;
+    cursor: inherit;
+    display: block;
+}
+input[readonly] {
+    background-color: white !important;
+    cursor: text !important;
+}
+
+.navbar-text.navbar-active {
+    color: #fff;
+    background-color: #5d6368;
+    padding: 15px;
+    margin: 0;
+    cursor: pointer;
+    border-left: 1px solid rgb(70, 70, 70);
+    border-right: 1px solid rgb(70, 70, 70);
+}
+
+.table-rounded {
+    border: 2px solid white;
+    border-radius: 5px;
+    border-collapse: separate;
+    box-shadow: 2px 2px 4px rgb(80, 80, 80);
+}
+
+.table-cursor tr {
+    cursor: pointer;
+}
+
+.btn-noclick {
+    cursor: default;
+}
+
+.drop-box {
+    background: rgb(248, 248, 248);
+    border: 5px dashed rgb(221, 221, 221);
+    border-image-source: initial;
+    border-image-slice: initial;
+    border-image-width: initial;
+    border-image-outset: initial;
+    border-image-repeat: initial;
+    width: 250px;
+    height: 250px;
+    text-align: center;
+    padding-top: 35px;
+}
+
+.thumbtext {
+    color: rgb(0,0,0);
+}
+
+
+body {
+    font-family: Helvetica, Verdana, Arial, sans-serif;
+    background-color: #333333;
+    color: white;
+    text-align: center;
+    min-height: 720px;
+    padding-top: 50px;
+    margin-top: 0px;
+}
+.ngCellText{
+    color: black;
+}
+
+.well{
+    background-color: rgba(50,50,50,0.9);
+    border-color: #000000;
+    text-align: left;
+}
+
+.logo {
+    height:100px;
+    width:100px;
+}
+
+h2 {color: #ffffff;}
+
+a:link, a:visited {
+    color: #efefef;
+}
+a:active, a:hover {
+    color: #eeeeee;
+}
+
+.navbar-alt .navbar-nav > li > a {
+    color: #eeeeee;
+}
+
+.navbar-default .navbar-nav > li > a {
+    color: #eeeeee;
+}
+
+.navbar-default .navbar-nav > li > a:hover,
+.navbar-default .navbar-nav > li > a:focus {
+    color: #aaaaaa;
+    background-color: transparent;
+}
+
+.ngHeaderText, .nglabel {
+    color: #000000;
+
+}
+.table > tbody > tr.hover > th {
+
+    background-color: #bbbbbb;
+}
+.table > tbody > tr.hover > th {
+
+    background-color: #666666;
+}
+.table-hover tbody tr:hover td, .table-hover tbody tr:hover th {
+    background-color: #aaaaaa;
+}
+
+p.header {
+    font-size: small;
+}
+p.header span {
+    font-weight: bold;
+}
+p.footer {
+    font-size: x-small;
+}
+div.content {
+    left: 0px;
+    top: 0px;
+    width: 100%;
+    height: 100%;
+    margin-bottom: 100px;
+}
+div.missing {
+    margin: auto;
+    position: relative;
+    top: 50%;
+    width: 193px;
+}
+div.missing a {
+    height: 63px;
+    position: relative;
+    top: -31px;
+}
+div.missing img {
+    border-width: 0px;
+}
+div#unityPlayer {
+    cursor: default;
+    height: 720px;
+    width: 1280px;
+
+}
+.hidden { display: none; }
+
+#slides_control > div{
+    height: 300px;
+}
+img{
+    margin:auto;
+    width: 512px;
+}
+
+#slides_control {
+    position:absolute;
+    width: 512px;
+    left:50%;
+    top:20px;
+    margin-left:-300px;
+}

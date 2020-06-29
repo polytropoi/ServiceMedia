@@ -1,0 +1,15 @@
+Fire
+Water
+Earth
+Air
+Magic
+Stinky
+Hot
+Cold
+Dry
+Wet
+Fast
+Slow
+Sneaky
+Annoying
+Double

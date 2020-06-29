@@ -1,0 +1,36 @@
+<html>
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no,user-scalable=no,maximum-scale=1">
+    <title>Examples • Sweeper</title>
+    <script src="https://aframe.io/releases/0.9.1/aframe.min.js"></script>
+    <script src="https://rawgit.com/feiss/aframe-environment-component/master/dist/aframe-environment-component.min.js"></script>
+    <script src="https://cdn.rawgit.com/donmccurdy/aframe-extras/v4.2.0/dist/components/sphere-collider.js"></script>
+    <script src="bundle.js"></script>
+    <script src="components/grab.js"></script>
+    <script src="components/rain-of-entities.js"></script>
+    <script src="components/force-pushable.js"></script>
+  </head>
+  <body>
+    <a-scene environment
+             rain-of-entities="spread: 3"
+             physics="driver: worker; workerFps: 60; workerInterpolate: true; workerInterpBufferSize: 2;">
+      <!-- Player -->
+      <a-entity camera="userHeight: 0.6" look-controls position="0 0.1 0">
+        <a-entity cursor
+                  position="0 0 -0.5"
+                  geometry="primitive: circle; radius: 0.01; segments: 4;"
+                  material="color: #FF4444; shader: flat"></a-entity>
+      </a-entity>
+      <a-entity static-body="shape: sphere; sphereRadius: 0.02;" vive-controls="hand: left" sphere-collider="objects: [dynamic-body];" grab></a-entity>
+      <a-entity static-body="shape: sphere; sphereRadius: 0.02;" vive-controls="hand: right" sphere-collider="objects: [dynamic-body];" grab></a-entity>
+
+      <!-- Terrain -->
+      <a-box width="75" height="0.1" depth="75" static-body visible="false"></a-box>
+
+      <!-- Sweeper -->
+      <a-box width="20" height="1" depth="1" position="0 0.5 25" material="color: red; opacity: 0.5" velocity="0 0 -2" static-body></a-box>
+    </a-scene>
+  </body>
+</html>

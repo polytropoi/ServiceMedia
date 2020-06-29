@@ -1,0 +1,746 @@
+
+<html>
+    <head>
+        <link href="https://transloadit.edgly.net/releases/uppy/v1.4.0/uppy.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/cerulean/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.css">
+    <style>
+    input[type=checkbox] {
+    transform: scale(2);
+    }
+    </style>
+    </head>
+  <body onload="amirite()" id="LoginForm">
+  <div class="well">
+
+    <div id="login">
+
+    <h1 class="form-heading">Login Form</h1>
+    <div class="login-form">
+    <div class="main-div">
+    <div class="panel">
+        <p>Please enter your username and password</p>
+    </div>
+    <form id="authreq">
+            <div class="form-group">
+            <input type="uname" class="form-control" id="uname" placeholder="user name">
+            </div>
+            <div class="form-group">
+            <input type="password" class="form-control" id="upass" placeholder="password">
+            </div>
+            <div pull-right class="forgot">
+            <a href="/#/reset">Forgot password?</a>
+            </div>
+          <button type="submit" class="btn btn-primary">Login</button>
+      </form>
+      </div>
+    </div>
+    </div>
+    <div id="response">
+        <div id="buttons"></div>
+        <button class="btn btn-primary" id="staging">Staging</button>
+        <button class="btn btn-primary" id="archive">Archive</button>
+        <a href="/#/" target="_blank" id="production" class="btn btn-primary">Production</a>
+        <button class="btn btn-primary pull-right" id="logout">Logout</button><br><br>
+        <pre></pre>
+        
+    </div>
+    <div class="row" id="drag-drop-area">
+
+    </div>
+
+    <div class="row m-20 p-20" id="toolbar">
+
+    <button class="btn btn-success pull-right" id="process_selected">Process Selected Files</button>
+    <button class="btn btn-danger pull-right" id="delete_selected">Delete Selected Files</button>
+    </div>
+    <hr>
+    <div class="row" id="staging-area">
+
+    </div>
+    <div class="row" id="archive-area">
+
+    </div>
+    </div>
+    </body>
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
+    <!-- <script src="https://unpkg.com/axios/dist/axios.min.js"></script> -->
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <script src="https://transloadit.edgly.net/releases/uppy/v1.4.0/uppy.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.js"></script>
+    <script>
+    var cookie = Cookies.get();
+    var selected = [];
+    $( "#toolbar" ).hide();
+
+    var amirite = function () {
+        if (cookie != null && cookie._id != null) {
+        console.log("gotsa cookie: " + cookie._id );
+        $.get( "/amirite/" + cookie._id, function( data ) {
+            if (data == 0) {
+            $('#response pre').html( "not logged in" );
+            $("#logout").hide();
+            $("#login").show();
+            $("#drag-drop-area").hide();
+            } else {
+            $('#response pre').html( "logged in as " + data );
+            $("#login").hide();
+            $("#logout").show();
+            $("#drag-drop-area").show();
+            $( "#toolbar" ).show();
+            $( "#delete_selected" ).hide();
+            $( "#process_selected" ).hide();
+            $("#archive").show();
+            $("#staging").show();
+            $("#production").show();
+            // $( "#buttons" ).html( '<a class=\x22btn btn-primary pull-left\x22 href=\x22/#/upics/'+ cookie._id + '\x22 target=\x22_blank\x22>Pictures</a>'+
+            //                     '<a class=\x22btn btn-primary pull-left\x22 href=\x22/#/utext/'+ cookie._id + '\x22 target=\x22_blank\x22>Text</a>'+
+            //                     '<a class=\x22btn btn-primary pull-left\x22 href=\x22/#/uaudios'+ cookie._id + '\x22 target=\x22_blank\x22>Audio</a>'+
+            //                     '<a class=\x22btn btn-primary pull-left\x22 href=\x22/#/uvids/'+ cookie._id + '\x22 target=\x22_blank\x22>Video</a>'+
+            //                     '<a class=\x22btn btn-primary pull-left\x22 href=\x22/#/uassets/'+ cookie._id + '\x22 target=\x22_blank\x22>Assets</a>'+
+            //                     '<a class=\x22btn btn-primary pull-left\x22 href=\x22/#/ugroups/'+ cookie._id + '\x22 target=\x22_blank\x22>Groups</a>' );
+            // }
+            // $( "#buttons" ).html('<a class=\x22btn btn-primary pull-left\x22 href=\x22/#/upics/'+ cookie._id + '\x22 target=\x22_blank\x22>Pictures</a>'+
+
+            //         );
+                }
+            });
+
+        } else {
+            $('#response pre').html( "not logged in" );
+            $("#login").show();
+            $("#logout").hide();
+            $("#archive").hide();
+            $("#staging").hide();
+            $("#production").hide();
+            $("#drag-drop-area").hide();
+        }
+    }
+    $( "#logout" ).click(function() {
+        Cookies.remove('_id');
+        $( "#toolbar" ).hide();
+        location.reload();
+    });
+
+
+    $( "#staging" ).click(function() {
+        $.get( "/staging/" + cookie._id, function( data ) {
+            $( "#archived-area" ).hide();
+            $( "#staging-area" ).show();
+                // console.log("tryna get staging data : " + JSON.stringify(data));
+            $( "#staging-area" ).html( RenderStagedItems(data) );
+        });
+
+    });
+
+    $( "#archive" ).click(function() {
+        $.get( "/archived/" + cookie._id, function( data ) {
+            $( "#staging-area" ).hide();
+            $( "#archive-area" ).show();
+                // console.log("tryna get staging data : " + JSON.stringify(data));
+            $( "#archive-area" ).html( RenderArchivedItems(data) );
+        });
+    });
+
+    $( "#process_selected" ).click(function() {
+        processMe = {};
+        pArr = [];
+        for( var i = 0; i < selected.length; i++){
+            d = {};
+            d.key = selected[i];
+            d.uid = cookie._id;
+            pArr.push(d);
+        }
+        processMe.items = pArr;
+        console.log("tryna process " + JSON.stringify(pArr));
+        $.confirm({
+            title: 'Confirm!',
+            content: 'Are you sure you want to process ' + pArr.length + ' items?',
+            buttons: {
+                confirm: function () {
+                $.ajax({
+                    url: "/process_staging_files",
+                    type: 'POST',
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    data: JSON.stringify({
+                            processMe
+                            // param2: $('#textbox2').val()
+                        }),
+                        success: function( data, textStatus, xhr ){
+                            console.log(data);
+                            processMe = {};
+                            selected = [];
+                            $.get( "/staging/" + cookie._id, function( data ) {
+                                // console.log("tryna get staging data : " + JSON.stringify(data));
+                                $( "#staging-area" ).html( RenderStagedItems(data) );
+                            });
+
+                        },
+                        error: function( xhr, textStatus, errorThrown ){
+                            console.log( xhr.responseText );
+                            processMe = {};
+                            selected = [];
+                            $.get( "/staging/" + cookie._id, function( data ) {
+                                // console.log("tryna get staging data : " + JSON.stringify(data));
+                                $( "#staging-area" ).html( RenderStagedItems(data) );
+                            });
+                        }
+                    });
+                },
+                cancel: function () {
+                    // $.alert('Canceled!');
+                },
+            }
+        });
+    });
+    
+    $( "#delete_selected" ).click(function() {
+        deleteMe = {};
+        dlArr = [];
+        for( var i = 0; i < selected.length; i++){
+            d = {};
+            d.key = selected[i];
+            d.uid = cookie._id;
+            dlArr.push(d);
+        }
+        deleteMe.items = dlArr;
+        console.log("tryna delete " + JSON.stringify(dlArr));
+        $.confirm({
+            title: 'Confirm Multiple Delete!',
+            content: 'Are you sure you want to delete ' + dlArr.length + ' items?',
+            buttons: {
+                confirm: function () {
+                $.ajax({
+                    url: "/staging_delete_array",
+                    type: 'POST',
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    data: JSON.stringify({
+                        deleteMe
+                            // param2: $('#textbox2').val()
+                        }),
+                        success: function( data, textStatus, xhr ){
+                            console.log(data);
+                            $.get( "/staging/" + cookie._id, function( data ) {
+                                // console.log("tryna get staging data : " + JSON.stringify(data));
+                                $( "#staging-area" ).html( RenderStagedItems(data) );
+                            });
+                            deleteMe = {};
+                            selected = [];
+                        },
+                        error: function( xhr, textStatus, errorThrown ){
+                            console.log( xhr.responseText );
+                            $.get( "/staging/" + cookie._id, function( data ) {
+                                // console.log("tryna get staging data : " + JSON.stringify(data));
+                                $( "#staging-area" ).html( RenderStagedItems(data) );
+                            });
+                            deleteMe = {};
+                            selected = [];
+                        }
+                    });
+                },
+                cancel: function () {
+                    // $.alert('Canceled!');
+                },
+            }
+        });
+    });
+
+    $("#authreq").submit(function( event ) {
+    event.preventDefault();
+    var uName = $( "#uname" ).val();
+    var uPass = $( "#upass" ).val();
+    console.log("tryna submit for uName " + uName);
+    var posting = $.ajax({
+    url: "/authreq",
+    type: 'POST',
+      contentType: "application/json; charset=utf-8",
+    dataType: "json",
+    data: JSON.stringify({
+            uname: uName,
+            upass: uPass
+            // param2: $('#textbox2').val()
+          }),
+        success: function( data, textStatus, xhr ){
+            console.log(data);
+            var r = data.replace(/["']/g, ""); //cleanup
+            var resp = r.split('~'); //response is tilde delimited
+            // document.cookie = "_id=" + resp[0]; //user id
+            // setCookie("_id", resp[0], 3);
+            $( "#logout" ).show();
+            $( "#login" ).hide();
+            $( "#drag-drop-area" ).show();
+            $( "#toolbar" ).show();
+            $( "#delete_selected" ).hide();
+            $( "#process_selected" ).hide();
+            Cookies.set('_id', resp[0], { expires: 7 });
+            $('#response pre').html( "logged in as " + resp[1] );
+            cookie = Cookies.get();
+            $("#archive").show();
+            $("#staging").show();
+            $("#production").show();
+        },
+        error: function( xhr, textStatus, errorThrown ){
+            console.log( xhr.responseText );
+            $('#response pre').html( xhr.responseText );
+            Cookies.remove('_id');
+            location.reload();
+            // document.cookie = "expires=Thu, 01 Jan 1970 00:00:00"; //set to expired date to delete?
+            }
+        });
+    });
+
+    $(document).on("click",".delete",function(){ //because the button is dynamic, must do it via .on
+        console.log("delete clicked");
+        // alert(this.id);
+        var nameKey = this.id; //id css selector has the filename
+        $.confirm({
+            title: 'Confirm!',
+            content: 'Are you sure you want to delete ' + (this.id) + '?',
+            buttons: {
+                confirm: function () {
+                    // $.alert('Confirmed!');
+                    $.ajax({
+                    url: "/staging_delete",
+                    type: 'POST',
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    data: JSON.stringify({
+                            key: nameKey,
+                            uid: cookie._id
+                        }),
+                        success: function( data, textStatus, xhr ){
+                            console.log(data);
+                            $.get( "/staging/" + cookie._id, function( data ) {
+                                // console.log("tryna get staging data : " + JSON.stringify(data));
+                                $( "#staging-area" ).html( RenderStagedItems(data) );
+                            });
+                        },
+                        error: function( xhr, textStatus, errorThrown ){
+                            console.log( xhr.responseText );
+                            $.get( "/staging/" + cookie._id, function( data ) {
+                                // console.log("tryna get staging data : " + JSON.stringify(data));
+                                $( "#staging-area" ).html( RenderStagedItems(data) );
+                            });
+                        }
+                    });
+
+                },
+                cancel: function () {
+                    // $.alert('Canceled!');
+                },
+            }
+        });
+    });
+
+    $(document).on("click","input[name='select']",function(){ //because the button is dynamic, must do it via .on
+        var extensions = [];
+        if ( $(this).is(':checked') ) {
+            selected.push(this.id);
+            console.log(selected.length + " selected " + this.id);
+            if (selected.length > 0) {
+                $( "#delete_selected" ).show();
+                $( "#process_selected" ).show();
+            } else {
+                $( "#delete_selected" ).hide();
+                $( "#process_selected" ).hide();
+            }
+                // console.log("same extensions " + AllTheSame(extensions));
+        } else {
+            for( var i = 0; i < selected.length; i++){
+            if ( selected[i] === this.id) {
+                selected.splice(i, 1);
+                }
+            }
+            if (selected.length > 0) {
+                $( "#delete_selected" ).show();
+                $( "#process_selected" ).show();
+            } else {
+                $( "#delete_selected" ).hide();
+                $( "#process_selected" ).hide();
+            }
+            // for(var i = 0; i < selected.length; i++) {
+            //     var re = /(?:\.([^.]+))?$/;
+            //     var ext = re.exec(this.id)[1];
+            //     console.log(ext);
+            //     extensions.push(ext);
+            // }
+            // console.log("same extensions " + AllTheSame(extensions));
+            console.log(selected.length + " selected");
+        }
+        // AllTheSame(selected);
+    });
+    function AllTheSame(data) { //nah, filter serverside
+        var isEqual = true;
+        var re = /(?:\.([^.]+))?$/;
+        var ext = re.exec(this.id)[1];
+        for(x=0;x<data.length - 1;x++){
+            console.log(x);
+            if (data[x] != data[x+1]){
+                isEqual = false;
+            }
+        }
+        // return isEqual;
+        if (isEqual) {
+        $( "#process_selected" ).show();
+        } else {
+            $( "#process_selected" ).hide();
+        }
+    }
+    function ReloadStaging() {
+        console.log("tryna reload staging");
+        $.get( "/staging/" + cookie._id, function( data ) {
+            // console.log("tryna get staging data : " + JSON.stringify(data));
+        $( "#staging-area" ).html( RenderStagedItems(data) );
+        });
+        selected = [];
+    }
+    function NameSplitter(name) {
+        var split = name.split("_");
+
+        // console.log(name + " splitName " + split[0]);
+        var slice = name.slice(split[0].length + 1);
+        // console.log(slice);
+        return slice;
+        
+        // return name.substring(index + 2);   
+        // return splitName[3]; 
+        // index = name.indexOf("_");
+        // // var splitName = name.slice("_", 1);
+
+        // return name.substring(index + 1);   
+        
+    }
+
+    
+    function RenderStagedItems(response) {
+        var arr = response.stagedItems;
+        var html = '';
+        var re = /(?:\.([^.]+))?$/;
+        for(var i = 0; i < arr.length; i++) {
+        
+        // console.log(JSON.stringify(arr[i]));
+        var ext = re.exec(arr[i].name)[1]; //get the extension (TODO use contentType metadata from request header)
+        console.log("extention is " + ext);
+        if (arr[i].url != undefined && ext != undefined) {
+            // console.log("url " + arr[i].url );
+            if (ext == "jpg" || ext == "jpeg" || ext == "png" || ext == "gif") {
+                html = html +
+                '<div class=\x22row\x22><div class=\x22col-md-12\x22>' +
+                    '<div class=\x22panel panel-default\x22>' +
+                        '<div class=\x22panel header\x22>'+
+                        '<div class=\x22form-check pull-right m-10\x22>' +
+                        '<label class=\x22h3 form-check-label\x22 for='+ arr[i].name +'>Select&nbsp&nbsp</label>'+
+                        '<input type=\x22checkbox\x22 name=\x22select\x22 class=\x22form-check-input\x22 id='+arr[i].name+'>' +
+                        '</div>' +
+                        '</div>' +
+                        '<div class=\x22m-10\x22>' +
+                        '<span class=\x22h4\x22>'+ NameSplitter(arr[i].name) +'</span>'+
+                        '</div>' +
+                        '<div class=\x22panel body\x22>' +
+                            '<a href=\x22'+ arr[i].url + '\x22 target=\x22_blank\x22>' +
+                            '<img src='+  arr[i].url + ' class=\x22img-thumbnail\x22></a>' +
+                        '</div>' +
+                        '<div class=\x22panel footer m-10 p-10\x22>'+
+                        '<a href=\x22'+ arr[i].url + '\x22 target=\x22_blank\x22 class=\x22btn btn-success pull-right\x22>Download</a>' +     
+                        '<div class=\x22process btn btn-primary pull-left\x22 id='+arr[i].name+'>Process</div>' +
+                        '<div class=\x22delete btn btn-danger pull-left\x22 id='+arr[i].name+'>Delete</div></div>' +
+                        '<br></div>' +
+                        '</div>' +
+                        '</div>' +
+                    '</div>' +
+                '</div>';
+            } else if (ext == "mp3" || ext == "aif" || ext == "wav" || ext == "ogg") {
+                html = html + '<div class=\x22row\x22><div class=\x22col-md-12\x22>'+
+                    '<div class=\x22panel panel-default\x22>' +
+                            '<div class=\x22panel header\x22>'+
+                        '<div class=\x22form-check pull-right m-10\x22>' +
+                        '<label class=\x22h3 form-check-label\x22 for='+arr[i].name+'>Select&nbsp&nbsp</label>'+
+                        '<input type=\x22checkbox\x22 name=\x22select\x22 class=\x22form-check-input\x22 id='+arr[i].name+'>' +
+                        '</div>' +
+                        '</div>' +
+                        '<div class=\x22m-10\x22>' +
+                        '<span class=\x22h4\x22>'+ NameSplitter(arr[i].name)  +'</span>'+
+                        '</div>' +
+                    '<div class=\x22panel body\x22>' +
+
+                    '<audio controls>' +
+                    '<source src=' + arr[i].url + ' type="audio/ogg">' +
+                    '<source src=' + arr[i].url + ' type="audio/mpeg">' +
+                    '<source src=' + arr[i].url + ' type="audio/wav">' +
+                    'Your browser does not support the audio tag.' +
+                    '</audio>' +
+                    '</div>' +
+                    '<div class=\x22panel footer m-10 p-10\x22>'+
+                        '<a href=\x22'+ arr[i].url + '\x22 target=\x22_blank\x22 class=\x22btn btn-success pull-right\x22>Download</a>' +     
+                    '<div class=\x22process btn btn-primary pull-left\x22 id='+arr[i].name+'>Process</div>' +
+                    '<div class=\x22delete btn btn-danger pull-left\x22 id='+arr[i].name+'>Delete</div></div>' +
+                    '<br></div>' +
+                    '</div>' +
+                    '</div>' +
+                    '</div>';
+            } else if (ext == "mp4" || ext == "mkv") {
+                html = html + '<div class=\x22row\x22><div class=\x22col-md-12\x22>' +
+                    '<div class=\x22panel panel-default pull-left\x22>' +
+                    '<div class=\x22panel header\x22>' +
+                    '<div class=\x22form-check pull-right m-10\x22>' +
+                    '<label class=\x22h3 form-check-label\x22 for='+arr[i].name+'>Select&nbsp&nbsp</label>' +
+                    '<input type=\x22checkbox\x22 name=\x22select\x22 class=\x22form-check-input\x22 id='+arr[i].name+'>' +
+                    '</div>' +
+                    '</div>' +
+                    '<div class=\x22m-10\x22>' +
+                    '<span class=\x22h4\x22>'+ NameSplitter(arr[i].name)  +'</span>'+
+                    '</div>' +
+                    '<div class=\x22panel body\x22>' +
+                    '<video width="720" height="480" controls>' +
+                    '<source src=' + arr[i].url + ' type="video/mp4">' +
+                    '<source src=' + arr[i].url + ' type="video/mkv">' +
+                    'Your browser does not support the video tag.' +
+                    '</video>' +
+                    '</div>' +
+                    '<div class=\x22panel footer m-10 p-10\x22>'+
+                        '<a href=\x22'+ arr[i].url + '\x22 target=\x22_blank\x22 class=\x22btn btn-success pull-right\x22>Download</a>' +     
+                    '<div class=\x22process btn btn-primary pull-right\x22 id='+arr[i].name+'>Process</div>' +
+                    '<div class=\x22delete btn btn-danger pull-left\x22 id='+arr[i].name+'>Delete</div></div>' +
+                    '</div>' +
+                    '</div>' +
+                    '</div>' +
+                    '</div>';
+            }   else  {
+                html = html + '<div class=\x22row\x22><div class=\x22col-md-12\x22>' +
+                    '<div class=\x22panel panel-default pull-left\x22>' +
+                    '<div class=\x22panel header\x22>' +
+                    '<div class=\x22form-check pull-right m-10\x22>' +
+                    '<label class=\x22h3 form-check-label\x22 for='+arr[i].name+'>Select&nbsp&nbsp</label>' +
+                    '<input type=\x22checkbox\x22 name=\x22select\x22 class=\x22form-check-input\x22 id='+arr[i].name+'>' +
+                    '</div>' +
+                    '</div>' +
+                    '<div class=\x22m-10\x22>' +
+                    '<span class=\x22h4\x22>'+ NameSplitter(arr[i].name) +'</span>' +
+                    '</div>' +
+                    '<div class=\x22panel body\x22 style=\x22width: 640px\x22>' +
+                        '<a href=\x22'+ arr[i].url + '\x22 target=\x22_blank\x22>' +
+                        '<img style=\x22width:64px; height:64px\x22 src=https://servicemedia.s3.amazonaws.com/assets/pics/download.png></a>' +
+                    '</div>' +
+                    '<div class=\x22panel footer m-10 p-10\x22>'+
+                    '<a href=\x22'+ arr[i].url + '\x22 target=\x22_blank\x22 class=\x22 btn btn-success pull-right\x22>Download</a>' +    
+                    '<div class=\x22archive btn btn-primary pull-left\x22 id='+arr[i].name+'>Archive</div>' +
+                    '<div class=\x22delete btn btn-danger pull-left\x22 id='+arr[i].name+'>Delete</div></div>' +
+                    '</div>' +
+                    '</div>' +
+                    '</div>' +
+                    '</div>';
+            }
+        }
+
+        };
+        return  html;
+
+    }
+    function RenderArchivedItems(response) {
+        var arr = response.stagedItems;
+        var html = '';
+        var re = /(?:\.([^.]+))?$/;
+        for(var i = 0; i < arr.length; i++) {
+        // console.log(JSON.stringify(arr[i]));
+        var ext = re.exec(arr[i].name)[1]; //get the extension (TODO use contentType metadata from request header)
+        console.log("extention is " + ext);
+        if (arr[i].url != undefined && ext != undefined) {
+            // console.log("url " + arr[i].url );
+            if (ext == "jpg" || ext == "jpeg" || ext == "png" || ext == "gif") {
+                html = html +
+                '<div class=\x22row\x22><div class=\x22col-md-12\x22>' +
+                    '<div class=\x22panel panel-default\x22>' +
+                        '<div class=\x22panel header\x22>'+
+                        '<div class=\x22form-check pull-right m-10\x22>' +
+                        '<label class=\x22h3 form-check-label\x22 for='+ arr[i].name +'>Select&nbsp&nbsp</label>'+
+                        '<input type=\x22checkbox\x22 name=\x22select\x22 class=\x22form-check-input\x22 id='+arr[i].name+'>' +
+                        '</div>' +
+                        '</div>' +
+                        '<div class=\x22m-10\x22>' +
+                        // '<span class=\x22h4\x22>'+ NameSplitter(arr[i].name) +'</span>'+
+                        '</div>' +
+                        '<div class=\x22panel body\x22>' +
+                            '<a class=\x22h4\x22 href=\x22'+ arr[i].url + '\x22 target=\x22_blank\x22>' + NameSplitter(arr[i].name) + '</a>' +
+                        '</div>' +
+                        '<div class=\x22panel footer m-10 p-10\x22>'+
+                        '<a href=\x22'+ arr[i].url + '\x22 target=\x22_blank\x22 class=\x22btn btn-success pull-right\x22>Download</a>' +     
+                        '<div class=\x22staging btn btn-primary pull-left\x22 id='+arr[i].name+'>Back to Staging</div>' +
+                        '<div class=\x22delete btn btn-danger pull-left\x22 id='+arr[i].name+'>Delete</div></div>' +
+                        '<br></div>' +
+                        '</div>' +
+                        '</div>' +
+                    '</div>' +
+                '</div>';
+            } else if (ext == "mp3" || ext == "aif" || ext == "wav" || ext == "ogg") {
+                html = html + '<div class=\x22row\x22><div class=\x22col-md-12\x22>'+
+                    '<div class=\x22panel panel-default\x22>' +
+                            '<div class=\x22panel header\x22>'+
+                        '<div class=\x22form-check pull-right m-10\x22>' +
+                        '<label class=\x22h3 form-check-label\x22 for='+arr[i].name+'>Select&nbsp&nbsp</label>'+
+                        '<input type=\x22checkbox\x22 name=\x22select\x22 class=\x22form-check-input\x22 id='+arr[i].name+'>' +
+                        '</div>' +
+                        '</div>' +
+                        '<div class=\x22m-10\x22>' +
+                        // '<span class=\x22h4\x22>'+ NameSplitter(arr[i].name)  +'</span>'+
+                        '</div>' +
+                    '<div class=\x22panel body\x22>' +
+
+                        '<a class=\x22h4\x22 href=\x22'+ arr[i].url + '\x22 target=\x22_blank\x22>' + NameSplitter(arr[i].name) + '</a>' +
+                    '</div>' +
+                    '<div class=\x22panel footer m-10 p-10\x22>'+
+                        '<a href=\x22'+ arr[i].url + '\x22 target=\x22_blank\x22 class=\x22btn btn-success pull-right\x22>Download</a>' +     
+                        '<div class=\x22staging btn btn-primary pull-left\x22 id='+arr[i].name+'>Back to Staging</div>' +
+                    '<div class=\x22delete btn btn-danger pull-left\x22 id='+arr[i].name+'>Delete</div></div>' +
+                    '<br></div>' +
+                    '</div>' +
+                    '</div>' +
+                    '</div>';
+            } else if (ext == "mp4" || ext == "mkv") {
+                html = html + '<div class=\x22row\x22><div class=\x22col-md-12\x22>' +
+                    '<div class=\x22panel panel-default pull-left\x22>' +
+                    '<div class=\x22panel header\x22>' +
+                    '<div class=\x22form-check pull-right m-10\x22>' +
+                    '<label class=\x22h3 form-check-label\x22 for='+arr[i].name+'>Select&nbsp&nbsp</label>' +
+                    '<input type=\x22checkbox\x22 name=\x22select\x22 class=\x22form-check-input\x22 id='+arr[i].name+'>' +
+                    '</div>' +
+                    '</div>' +
+                    '<div class=\x22m-10\x22>' +
+                    // '<span class=\x22h4\x22>'+ NameSplitter(arr[i].name)  +'</span>'+
+                    '</div>' +
+                    '<div class=\x22panel body\x22>' +
+                        '<a class=\x22h4\x22 href=\x22'+ arr[i].url + '\x22 target=\x22_blank\x22>' + NameSplitter(arr[i].name) + '</a>' +
+                    '</div>' +
+                    '<div class=\x22panel footer m-10 p-10\x22>'+
+                    '<a href=\x22'+ arr[i].url + '\x22 target=\x22_blank\x22 class=\x22btn btn-success pull-right\x22>Download</a>' +     
+                    '<div class=\x22staging btn btn-primary pull-left\x22 id='+arr[i].name+'>Back to Staging</div>' +
+                    '<div class=\x22delete btn btn-danger pull-left\x22 id='+arr[i].name+'>Delete</div></div>' +
+                    '</div>' +
+                    '</div>' +
+                    '</div>' +
+                    '</div>';
+            }   else  {
+                html = html + '<div class=\x22row\x22><div class=\x22col-md-12\x22>' +
+                    '<div class=\x22panel panel-default pull-left\x22>' +
+                    '<div class=\x22panel header\x22>' +
+                    '<div class=\x22form-check pull-right m-10\x22>' +
+                    '<label class=\x22h3 form-check-label\x22 for='+arr[i].name+'>Select&nbsp&nbsp</label>' +
+                    '<input type=\x22checkbox\x22 name=\x22select\x22 class=\x22form-check-input\x22 id='+arr[i].name+'>' +
+                    '</div>' +
+                    '</div>' +
+                    '<div class=\x22m-10\x22>' +
+                    '<span class=\x22h4\x22>'+ arr[i].name +'</span>' +
+                    '</div>' +
+                    '<div class=\x22panel body\x22 style=\x22width: 640px\x22>' +
+                        '<a href=\x22'+ arr[i].url + '\x22 target=\x22_blank\x22>' +
+                        '<img style=\x22width:64px; height:64px\x22 src=https://servicemedia.s3.amazonaws.com/assets/pics/download.png></a>' +
+                    '</div>' +
+                    '<div class=\x22panel footer m-10 p-10\x22>'+
+                    '<a href=\x22'+ arr[i].url + '\x22 target=\x22_blank\x22 class=\x22 btn btn-success pull-right\x22>Download</a>' +    
+                    '<div class=\x22staging btn btn-primary pull-left\x22 id='+arr[i].name+'>Back to Staging</div>' +
+                    '<div class=\x22delete btn btn-danger pull-left\x22 id='+arr[i].name+'>Delete</div></div>' +
+                    '</div>' +
+                    '</div>' +
+                    '</div>' +
+                    '</div>';
+            }
+        }
+
+        };
+        return  html;
+
+    }
+    </script>
+
+    <script>
+    function timestamp() {
+        var d = new Date();
+        var n = d.getTime();
+        return n;
+    }
+    var cookie = Cookies.get();
+    var uppy = Uppy.Core({
+        onBeforeFileAdded: (currentFile, files) => {
+            const modifiedFile = Object.assign(
+            {},
+                currentFile,
+                { name: currentFile.name.replace(" ", "-") //clean spaces
+            })
+
+            uppy.info(modifiedFile);
+            return modifiedFile
+            }
+        })
+        .use(Uppy.Dashboard, {
+          inline: true,
+          target: '#drag-drop-area',
+
+        })
+        .use(Uppy.Webcam, {
+            target: Uppy.Dashboard,
+            modes: [
+                'video-audio',
+                'video-only',
+                'audio-only',
+                'picture'
+            ],
+            mirror: true,
+            facingMode: 'environment',
+        })
+        // .use(Uppy.GoogleDrive, { target: Uppy.Dashboard, serverUrl: 'https://companion.uppy.io' })
+        // .use(Uppy.Dropbox, { target: Uppy.Dashboard, serverUrl: 'https://companion.uppy.io' })
+        // .use(Uppy.Instagram, { target: Uppy.Dashboard, serverUrl: 'https://companion.uppy.io' })
+        // .use(Uppy.Tus, {endpoint: 'http://localhost:1080/files/'})
+        .use(Uppy.AwsS3, {
+        getUploadParameters (file) {
+        // // Send a request to signing endpoint.
+        // if  (file.type == 'application/octet-stream') {
+        //     file.type = 'binary/octet-stream';
+        // }
+        // var contenttype = (file.type == application/octet-stream) ? file.type : binary/octet-stream;
+        // console.log("tryna uplaod a " + file.type + " converted to " + contenttype);
+        return fetch('/stagingputurl/' + cookie._id, {
+        method: 'post',
+      // Send and receive JSON.
+        headers: {
+            accept: 'application/json',
+            'content-type': 'application/json'
+        },
+        body: JSON.stringify({
+            uid: cookie._id,
+            filename: 'staging/' + cookie._id + '/' + timestamp() + '_' + file.name,
+            contentType: file.type
+        })
+        }).then((response) => {
+        // Parse the JSON response.
+
+        return response.json()
+        }).then((data) => {
+            console.log("tryna parse respoonse: " + JSON.stringify(data));
+      // Return an object in the correct shape.
+        return {
+            method: data.method,
+            url: data.url,
+            fields: data.fields,
+            headers: {
+                "Content-Type": file.type
+                }
+            }
+            })
+        }
+        
+    })
+
+
+    uppy.on('complete', (result) => {
+    console.log('Upload complete! We’ve uploaded these files:', result.successful);
+        $.get( "/staging/" + cookie._id, function( data ) {
+            $( "#staging-area" ).html( RenderStagedItems(data) );
+        });
+    })
+    </script>
+
+</html>

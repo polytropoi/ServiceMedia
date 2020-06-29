@@ -1,0 +1,127 @@
+<html>
+    <head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/cerulean/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.css">
+    <script src="https://aframe.io/releases/0.9.2/aframe.min.js"></script>
+    </head>
+  <body onload="amirite()" id="LoginForm">
+  <div class="well">
+    <div id="login">
+
+    <h1 class="form-heading">Login Form</h1>
+    <div class="login-form">
+    <div class="main-div">
+    <div class="panel">
+        <p>Please enter your username and password</p>
+    </div>
+    <form id="authreq">
+            <div class="form-group">
+            <input type="uname" class="form-control" id="uname" placeholder="user name">
+            </div>
+            <div class="form-group">
+            <input type="password" class="form-control" id="upass" placeholder="password">
+            </div>
+            <div pull-right class="forgot">
+            <a href="http://chickenwaffle1.46teagnrws.us-east-1.elasticbeanstalk.com/#/reset">Forgot password?</a>
+            </div>
+          <button type="submit" class="btn btn-primary">Login</button>
+      </form>
+      </div>
+    </div>
+    </div>
+    <div id="response">
+        <div id="buttons"></div>
+
+        <button class="btn btn-primary pull-right" id="logout">Logout</button><br><br>
+        <pre></pre>
+        
+    </div>
+    <div id="aframe">
+            <a-scene embedded>
+                    <a-box position="-1 0.5 -3" rotation="0 45 0" color="#4CC3D9"></a-box>
+                    <a-sphere position="0 1.25 -5" radius="1.25" color="#EF2D5E"></a-sphere>
+                    <a-cylinder position="1 0.75 -3" radius="0.5" height="1.5" color="#FFC65D"></a-cylinder>
+                    <a-plane position="0 0 -4" rotation="-90 0 0" width="4" height="4" color="#7BC8A4"></a-plane>
+                    <a-sky color="#ECECEC"></a-sky>
+                  </a-scene>
+
+
+    </div>
+    </body>
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
+    <!-- <script src="https://unpkg.com/axios/dist/axios.min.js"></script> better json fu than jquery-->
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.js"></script> does prompt for confirmation messages, e.g. are you sure you want to XXX?--> 
+    <script>
+    var hostname = "http://chickenwaffle1.46teagnrws.us-east-1.elasticbeanstalk.com";
+    var cookie = Cookies.get();
+    var selected = [];
+    $( "#toolbar" ).hide();
+    $( "#aframe" ).hide();
+    var amirite = function () {
+        if (cookie != null && cookie._id != null) {
+        console.log("gotsa cookie: " + cookie._id );
+        $.get( hostname + "/amirite/" + cookie._id, function( data ) {
+            if (data == 0) {
+                $('#response pre').html( "not logged in" );
+                $("#logout").hide();
+                $("#login").show();
+            } else {
+                $('#response pre').html( "logged in as " + data );
+                $("#login").hide();
+                $("#logout").show();
+                }
+            });
+        } else {
+            $('#response pre').html( "not logged in" );
+            $("#login").show();
+            $("#logout").hide();
+        }
+    }
+    $( "#logout" ).click(function() {
+        Cookies.remove('_id');
+        $( "#toolbar" ).hide();
+        location.reload();
+    });
+    
+    $("#authreq").submit(function( event ) {
+    event.preventDefault();
+    var uName = $( "#uname" ).val();
+    var uPass = $( "#upass" ).val();
+    console.log("tryna submit for uName " + uName);
+    var posting = $.ajax({
+    url: hostname + "/authreq",
+    type: 'POST',
+      contentType: "application/json; charset=utf-8",
+    dataType: "json",
+    data: JSON.stringify({
+            uname: uName,
+            upass: uPass
+            // param2: $('#textbox2').val()
+          }),
+        success: function( data, textStatus, xhr ){
+            console.log(data);
+            var r = data.replace(/["']/g, ""); //cleanup
+            var resp = r.split('~'); //response is tilde delimited
+            // document.cookie = "_id=" + resp[0]; //user id
+            // setCookie("_id", resp[0], 3);
+            $( "#logout" ).show();
+            $( "#login" ).hide();
+            $( "#aframe" ).show();
+            Cookies.set('_id', resp[0], { expires: 7 });
+            $('#response pre').html( "logged in as " + resp[1] );
+            cookie = Cookies.get();
+           
+        },
+        error: function( xhr, textStatus, errorThrown ){
+            console.log( xhr.responseText );
+            $('#response pre').html( xhr.responseText );
+            Cookies.remove('_id');
+            location.reload();
+            // document.cookie = "expires=Thu, 01 Jan 1970 00:00:00"; //set to expired date to delete?
+            }
+        });
+    });
+    </script>
+</html>

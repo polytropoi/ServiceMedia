@@ -1,0 +1,88 @@
+div.a-orientation-modal {
+    display: none;
+}
+div#controls {
+    width: 240px;
+    height: 240px;
+    background-color: rgba(255, 255, 255, 0.2);
+    position: absolute;
+    right: 70px;
+    bottom: 70px;
+    z-index: 1;
+    touch-action: none;
+}
+div#controlstick {
+    width: 50px;
+    height: 50px;
+    position: relative;
+    left: 100px;
+    top: 100px;
+    border-radius: 50%;
+    background-color: rgba(255, 170, 0, 0.5);
+}
+body {
+    font-family: helvetica, arial, sans-serif;
+    margin: 2em;
+}
+
+h1 {
+    font-size: 1.35em;
+}
+div#text {
+    position: absolute;
+    left: 6px; 
+    top: 6px;
+    padding: 6px;
+    max-width: 300px;
+    background-color: rgba(255, 255, 255, 0.7);
+    z-index: 2;
+}
+#exitbutton {
+    position: absolute;
+    left: 20px;
+    bottom: 20px;
+    padding: 6px;
+    border: 1px solid rgba(255,255,255,0.5);
+    color: rgba(255,255,255,0.8);
+    background-color: rgba(0,0,0,0.2);
+    display: none;
+    z-index: 2;
+}
+/* #overlay.legacy-ar-mode,
+:xr-overlay {
+    user-select: none;
+}
+#overlay.legacy-ar-mode #exitbutton,
+:xr-overlay #exitbutton {
+    display: initial;
+}
+div.a-orientation-modal {
+    display: none;
+} */
+/* div#controls {
+    width: 240px;
+    height: 240px;
+    background-color: rgba(255, 255, 255, 0.2);
+    position: absolute;
+    right: 70px;
+    bottom: 70px;
+    z-index: 1;
+    touch-action: none;
+}
+div#controlstick {
+    width: 50px;
+    height: 50px;
+    position: relative;
+    left: 100px;
+    top: 100px;
+    border-radius: 50%;
+    background-color: rgba(255, 170, 0, 0.5);
+} */
+/* #overlay.legacy-ar-mode,
+:xr-overlay {
+    user-select: none;
+}
+#overlay.legacy-ar-mode #exitbutton,
+:xr-overlay #exitbutton {
+    display: initial;
+} */

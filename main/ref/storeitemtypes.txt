@@ -1,0 +1,5 @@
+Right-Hand Weapon
+Left-Hand Weapon
+Hat
+Shoes
+Gloves

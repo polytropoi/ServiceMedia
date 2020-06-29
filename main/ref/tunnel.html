@@ -1,0 +1,197 @@
+<!-- <script src='https://cdnjs.cloudflarhowler.js'></script> -->
+<script src='aframe/dist/aframe-v1.0.4.js'></script>
+
+<script>
+// HELPERS
+
+// degree/radian conversion constants
+const toDeg = 180 / Math.PI;
+const toRad = Math.PI / 180;
+const halfPI = Math.PI / 2;
+const twoPI = Math.PI * 2;
+
+// Compute angle between two 2D points
+const pointAngle = (x1, y1, x2, y2) => Math.atan2(y2 - y1, x2 - x1);
+	
+// Compute angles between two 3D points (ignores rotation of Z axis)
+// TODO: find a more concise method of calculating this (for future reference)
+const pointAngle3d = (p1, p2) => ({
+	x: pointAngle(p1.z, p1.y, p2.z, p2.y),
+	y: pointAngle(p1.x, p1.z, p2.x, p2.z)
+});
+	
+// Compute path offset given a position along path
+const getPathOffset = pos => {
+	// Adjust the spiral shape of the tunnel
+	const period = 0.04;
+	const amplitude = 12;
+	return {
+		x: Math.sin(pos * period) * amplitude,
+		y: Math.cos(pos * period) * amplitude
+	};
+};
+
+// Creates a function that takes a position along gradient and returns a CSS color string
+// start and end are both objects of format:
+// {
+//   h: 0 - 360
+//   s: 0 - 100
+//   l: 0 - 100
+// }
+//
+// returns function: pos => color
+// pos: int - position along gradient, from 0 to 1 inclusive
+const createGradientSampler = (start, end) => {
+	const components = ['h', 's', 'l'];
+	return pos => {
+		const result = {};
+		components.forEach(c => {
+			const s = start[c];
+			const e = end[c];
+			result[c] = (e - s) * pos + s;
+		});
+		return `hsl(${result.h},${result.s}%,${result.l}%)`;
+	}
+};
+</script>
+
+<script>
+AFRAME.registerComponent('tunnel', {
+	schema: {
+		radius:    { type: 'number', default: 3.8 },
+		ringSpace: { type: 'number', default: 2 },
+		ringBoxes: { type: 'int', default: 12 },
+		startHue:  { type: 'int', default: 0},
+		endHue:    { type: 'int', default: 0}
+	},
+	
+	init: function () {
+		// Distance traveled in the tunnel
+		this.position = 0;
+		// Distance traveled since a ring was moved to front
+		// We don't really need to track this independently, but it's convenient
+		this.lastRemovedPosition = 0;
+		// The ring number out in front
+		this.ringIndex = 0;
+		
+		// speed in m/s
+		this.speed = 5;
+		
+		// Allow increasing speed by clicking/tapping screen
+		window.addEventListener('click', () => {
+			this.speed += 5;
+			if (this.speed > 25) {
+				this.speed = 0;
+			}
+		});
+		
+		// This is super hacky :(
+		// Proper state managment would fix the need to select an element, but for this demo - screw it.
+		this.cameraWrapEl = document.querySelector('.camera-wrap');
+		
+		// Build cache of gradients
+		this.gradLength = 80;
+		const startHue1 = 125;
+		const startHue2 = 0;
+		const endHue1 = 270;
+		const endHue2 = 100;
+		
+		// TODO: create a method to sample directly from a 2D color gradient
+		this.colorSamplers = [];
+		for (let i=0; i<this.gradLength; i++) {
+			const pos = i / this.gradLength;
+			const startHue = (startHue2 - startHue1) * pos + startHue1;
+			const endHue = (endHue2 - endHue1) * pos + endHue1;
+			const startColor = { h: startHue, s: 100, l: 68 };
+			const endColor =   { h: endHue, s: 100, l: 68 };
+			this.colorSamplers.push(createGradientSampler(startColor, endColor));
+		}
+	},
+	
+	// NOTE: This is not an optimized or proper update function, but updates should never happen in this demo.
+	update: function () {
+		if (this.boxes) {
+			this.boxes.forEach(ring => ring.forEach(box => box.remove()));
+		}
+		
+		// 2D array of boxes, grouped by rings sorted by distance from camera
+		this.boxes = [];
+		const rings = 50;
+		this.position = rings * this.data.ringSpace / 2;
+		
+		for (let i=0; i<rings; i++) {
+			this.appendRing(true);
+		}
+	},
+	
+	tick: function(time, timeDelta) {
+		timeDelta = Math.min(timeDelta, 100);
+		const positionDelta = timeDelta / 1000 * this.speed;
+		this.position += positionDelta;
+		const offset = getPathOffset(this.position);
+		this.el.setAttribute('position', {
+			x: -offset.x,
+			y: -offset.y,
+			z: this.position
+		});
+		
+		// Look ahead
+		const positionAhead = this.position + 16;
+		const offsetAhead = getPathOffset(positionAhead);
+		// Must invert y axis before passing to pointAngle3d()
+		const p1 = { x: offset.x, y: offset.y, z: this.position };
+		const p2 = { x: offsetAhead.x, y: offsetAhead.y, z: positionAhead };
+		const angle = pointAngle3d(p1, p2);
+		// Angle will track spiral but will be 90 degrees off on Y axis, so we'll correct it here
+		angle.x = angle.x * toDeg;
+		angle.y = angle.y * toDeg - 90;
+		this.cameraWrapEl.setAttribute('rotation', angle);
+		
+		// For every ring passed, move last ring to front for "infinite" tunnel
+		this.lastRemovedPosition += positionDelta;
+		while (this.lastRemovedPosition >= this.data.ringSpace) {
+			this.lastRemovedPosition -= this.data.ringSpace;
+			this.appendRing();
+		}
+	},
+	
+	// If `isNew` isn't `true`, will recycle first ring
+	appendRing: function(isNew) {
+		const ringPos = this.ringIndex * this.data.ringSpace;
+		const ringOffset = getPathOffset(ringPos);
+		const ring = isNew ? [] : this.boxes.shift();
+		for (let i=0; i<this.data.ringBoxes; i++) {
+			const angleOffset = this.ringIndex * 14;
+			const currentAngle = 360 / this.data.ringBoxes * i + angleOffset;
+			const currentAngleRad = currentAngle * toRad;
+			const x = Math.sin(currentAngleRad) * this.data.radius + ringOffset.x;
+			const y = Math.cos(currentAngleRad) * this.data.radius + ringOffset.y;
+
+			const box = isNew ? document.createElement('a-box') : ring[i];
+			const colorSamplerIndex = Math.abs(this.ringIndex % (this.gradLength * 2 - 1) - this.gradLength + 1);
+			const colorSampler = this.colorSamplers[colorSamplerIndex];
+			const colorPos = Math.abs((currentAngle - angleOffset) / 180 - 1);
+			box.setAttribute('color', colorSampler(colorPos));	
+			box.setAttribute('position', { x, y, z: -ringPos });
+			box.setAttribute('rotation', { x: 45, y: 45, z: -currentAngle });
+			
+			if (isNew) {
+				this.el.appendChild(box);
+				ring.push(box);
+			}
+		}
+		this.boxes.push(ring);
+		this.ringIndex++;
+	}
+});
+</script>
+
+<a-scene>
+	<a-sky color="#000"></a-sky>
+	<a-entity class="camera-wrap">
+		<a-camera position="0 -1 0"></a-camera>
+	</a-entity>
+	<a-light type="point" intensity="1" distance="50" decay="1"></a-light>
+	<a-entity tunnel="startHue: 115; endHue: 240;">
+	</a-entity>
+</a-scene>

@@ -1,0 +1,5 @@
+{ "types" : [
+    {"Wearable": ["Eye Wear", "Hat", "Face", "Back", "Feet", "Neck", "Dresses", "T-Shirts", "Shirts"]}, 
+    {"Consumeable": ["Currency", "Food", "Health", "Ammo", "Mana"]}
+    ]
+}

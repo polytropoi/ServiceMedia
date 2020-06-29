@@ -1,0 +1,1394 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <title>Admin</title>
+
+  <!-- Custom fonts for this template -->
+  <!-- <link href="vendor/font-awesome-4.7.0/css/font-awesome.min.css" rel="stylesheet"> -->
+  <link href="vendor/fontawesome-free/css/all.css" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+
+  <!-- Custom styles for this template -->
+  <link href="css/sb-admin-2.css" rel="stylesheet">
+
+  <!-- Custom styles for this page -->
+  <link href="vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
+
+</head>
+
+<body id="page-top">
+
+  <!-- Page Wrapper -->
+  <div id="wrapper">
+
+    <!-- Sidebar -->
+    <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+
+      <!-- Sidebar - Brand -->
+      <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.html">
+        <div class="sidebar-brand-icon rotate-n-15">
+          <i class="fas fa-laugh-wink"></i>
+        </div>
+        <div class="sidebar-brand-text mx-3">ChickenWaffle Admin<sup>2</sup></div>
+      </a>
+
+      <!-- Divider -->
+      <hr class="sidebar-divider my-0">
+
+      <!-- Nav Item - Dashboard -->
+      <li class="nav-item">
+        <a class="nav-link" href="index.html">
+          <i class="fas fa-fw fa-tachometer-alt"></i>
+          <span>Dashboard</span></a>
+      </li>
+
+      <!-- Divider -->
+      <hr class="sidebar-divider">
+
+      <!-- Heading -->
+      <div class="sidebar-heading">
+        Interface
+      </div>
+
+      <!-- Nav Item - Pages Collapse Menu -->
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
+          <i class="fas fa-fw fa-cog"></i>
+          <span>Apps</span>
+        </a>
+        <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+          <div class="bg-white py-2 collapse-inner rounded">
+            <h6 class="collapse-header">Scores:</h6>
+            <a class="collapse-item" href="view.html?type=scores&appid=5dade6edb761a1071f171fb1">Audio Trip</a>
+            <a class="collapse-item" href="view.html?type=scores&appid=5d6c14e8b5475762125a9b5a">Nitro Derby</a>
+          </div>
+        </div>
+      </li>
+
+      <!-- Nav Item - Utilities Collapse Menu -->
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUtilities" aria-expanded="true" aria-controls="collapseUtilities">
+          <i class="fas fa-fw fa-wrench"></i>
+          <span>Utilities</span>
+        </a>
+        <div id="collapseUtilities" class="collapse" aria-labelledby="headingUtilities" data-parent="#accordionSidebar">
+          <div class="bg-white py-2 collapse-inner rounded">
+            <h6 class="collapse-header">Users:</h6>
+            <a class="collapse-item" href="view.html?type=users">Registered Users</a>
+            <a class="collapse-item" href="view.html?type=users">Guest Users</a>
+          </div>
+          <div class="bg-white py-2 collapse-inner rounded">
+              <h6 class="collapse-header">Store Items:</h6>
+              <a class="collapse-item" href="view.html?type=storeitems&appid=5d6c14e8b5475762125a9b5a">Store Items</a>
+            </div>
+          <div class="bg-white py-2 collapse-inner rounded">
+            <h6 class="collapse-header">Content:</h6>
+            <a class="collapse-item" href="view.html?type=pictures">Pictures</a>
+            <a class="collapse-item" href="view.html?type=scenes">Scenes</a>
+            <!-- <a class="collapse-item" href="utilities-border.html">Guest/AKA</a> -->
+          </div>  
+        </div>
+      </li>
+
+      <!-- Divider -->
+      <hr class="sidebar-divider">
+
+      <!-- Heading -->
+      <div class="sidebar-heading">
+        Addons
+      </div>
+
+      <!-- Nav Item - Pages Collapse Menu -->
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePages" aria-expanded="true" aria-controls="collapsePages">
+          <i class="fas fa-fw fa-folder"></i>
+          <span>Pages</span>
+        </a>
+        <div id="collapsePages" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
+          <div class="bg-white py-2 collapse-inner rounded">
+            <h6 class="collapse-header">Login Screens:</h6>
+            <a class="collapse-item" href="login.html">Login</a>
+            <a class="collapse-item" href="register.html">Register</a>
+            <a class="collapse-item" href="forgot-password.html">Forgot Password</a>
+            <div class="collapse-divider"></div>
+            <h6 class="collapse-header">Other Pages:</h6>
+            <a class="collapse-item" href="404.html">404 Page</a>
+            <a class="collapse-item" href="blank.html">Blank Page</a>
+          </div>
+        </div>
+      </li>
+
+      <!-- Nav Item - Charts -->
+      <li class="nav-item">
+        <a class="nav-link" href="charts.html">
+          <i class="fas fa-fw fa-chart-area"></i>
+          <span>Charts</span></a>
+      </li>
+
+      <!-- Nav Item - Tables -->
+      <li class="nav-item active">
+        <a class="nav-link" href="view.html">
+          <i class="fas fa-fw fa-table"></i>
+          <span>Tables</span></a>
+      </li>
+
+      <!-- Divider -->
+      <hr class="sidebar-divider d-none d-md-block">
+
+      <!-- Sidebar Toggler (Sidebar) -->
+      <div class="text-center d-none d-md-inline">
+        <button class="rounded-circle border-0" id="sidebarToggle"></button>
+      </div>
+
+    </ul>
+    <!-- End of Sidebar -->
+
+    <!-- Content Wrapper -->
+    <div id="content-wrapper" class="d-flex flex-column">
+
+      <!-- Main Content -->
+      <div id="content">
+
+        <!-- Topbar -->
+        <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+
+          <!-- Sidebar Toggle (Topbar) -->
+          <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+            <i class="fa fa-bars"></i>
+          </button>
+
+          <!-- Topbar Search -->
+          <form class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
+            <div class="input-group">
+              <input type="text" class="form-control bg-light border-0 small" placeholder="Search for..." aria-label="Search" aria-describedby="basic-addon2">
+              <div class="input-group-append">
+                <button class="btn btn-primary" type="button">
+                  <i class="fas fa-search fa-sm"></i>
+                </button>
+              </div>
+            </div>
+          </form>
+
+          <!-- Topbar Navbar -->
+          <ul class="navbar-nav ml-auto">
+
+            <!-- Nav Item - Search Dropdown (Visible Only XS) -->
+            <li class="nav-item dropdown no-arrow d-sm-none">
+              <a class="nav-link dropdown-toggle" href="#" id="searchDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="fas fa-search fa-fw"></i>
+              </a>
+              <!-- Dropdown - Messages -->
+              <div class="dropdown-menu dropdown-menu-right p-3 shadow animated--grow-in" aria-labelledby="searchDropdown">
+                <form class="form-inline mr-auto w-100 navbar-search">
+                  <div class="input-group">
+                    <input type="text" class="form-control bg-light border-0 small" placeholder="Search for..." aria-label="Search" aria-describedby="basic-addon2">
+                    <div class="input-group-append">
+                      <button class="btn btn-primary" type="button">
+                        <i class="fas fa-search fa-sm"></i>
+                      </button>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </li>
+
+            <!-- Nav Item - Alerts -->
+            <li class="nav-item dropdown no-arrow mx-1">
+              <a class="nav-link dropdown-toggle" href="#" id="alertsDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="fas fa-bell fa-fw"></i>
+                <!-- Counter - Alerts -->
+                <span class="badge badge-danger badge-counter">3+</span>
+              </a>
+              <!-- Dropdown - Alerts -->
+              <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="alertsDropdown">
+                <h6 class="dropdown-header">
+                  Alerts Center
+                </h6>
+                <a class="dropdown-item d-flex align-items-center" href="#">
+                  <div class="mr-3">
+                    <div class="icon-circle bg-primary">
+                      <i class="fas fa-file-alt text-white"></i>
+                    </div>
+                  </div>
+                  <div>
+                    <div class="small text-gray-500">December 12, 2019</div>
+                    <span class="font-weight-bold">A new monthly report is ready to download!</span>
+                  </div>
+                </a>
+                <a class="dropdown-item d-flex align-items-center" href="#">
+                  <div class="mr-3">
+                    <div class="icon-circle bg-success">
+                      <i class="fas fa-donate text-white"></i>
+                    </div>
+                  </div>
+                  <div>
+                    <div class="small text-gray-500">December 7, 2019</div>
+                    $290.29 has been deposited into your account!
+                  </div>
+                </a>
+                <a class="dropdown-item d-flex align-items-center" href="#">
+                  <div class="mr-3">
+                    <div class="icon-circle bg-warning">
+                      <i class="fas fa-exclamation-triangle text-white"></i>
+                    </div>
+                  </div>
+                  <div>
+                    <div class="small text-gray-500">December 2, 2019</div>
+                    Spending Alert: We've noticed unusually high spending for your account.
+                  </div>
+                </a>
+                <a class="dropdown-item text-center small text-gray-500" href="#">Show All Alerts</a>
+              </div>
+            </li>
+
+            <!-- Nav Item - Messages -->
+            <li class="nav-item dropdown no-arrow mx-1">
+              <a class="nav-link dropdown-toggle" href="#" id="messagesDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="fas fa-envelope fa-fw"></i>
+                <!-- Counter - Messages -->
+                <span class="badge badge-danger badge-counter">7</span>
+              </a>
+              <!-- Dropdown - Messages -->
+              <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="messagesDropdown">
+                <h6 class="dropdown-header">
+                  Message Center
+                </h6>
+                <a class="dropdown-item d-flex align-items-center" href="#">
+                  <div class="dropdown-list-image mr-3">
+                    <img class="rounded-circle" src="https://source.unsplash.com/fn_BT9fwg_E/60x60" alt="">
+                    <div class="status-indicator bg-success"></div>
+                  </div>
+                  <div class="font-weight-bold">
+                    <div class="text-truncate">Hi there! I am wondering if you can help me with a problem I've been having.</div>
+                    <div class="small text-gray-500">Emily Fowler · 58m</div>
+                  </div>
+                </a>
+                <a class="dropdown-item d-flex align-items-center" href="#">
+                  <div class="dropdown-list-image mr-3">
+                    <img class="rounded-circle" src="https://source.unsplash.com/AU4VPcFN4LE/60x60" alt="">
+                    <div class="status-indicator"></div>
+                  </div>
+                  <div>
+                    <div class="text-truncate">I have the photos that you ordered last month, how would you like them sent to you?</div>
+                    <div class="small text-gray-500">Jae Chun · 1d</div>
+                  </div>
+                </a>
+                <a class="dropdown-item d-flex align-items-center" href="#">
+                  <div class="dropdown-list-image mr-3">
+                    <img class="rounded-circle" src="https://source.unsplash.com/CS2uCrpNzJY/60x60" alt="">
+                    <div class="status-indicator bg-warning"></div>
+                  </div>
+                  <div>
+                    <div class="text-truncate">Last month's report looks great, I am very happy with the progress so far, keep up the good work!</div>
+                    <div class="small text-gray-500">Morgan Alvarez · 2d</div>
+                  </div>
+                </a>
+                <a class="dropdown-item d-flex align-items-center" href="#">
+                  <div class="dropdown-list-image mr-3">
+                    <img class="rounded-circle" src="https://source.unsplash.com/Mv9hjnEUHR4/60x60" alt="">
+                    <div class="status-indicator bg-success"></div>
+                  </div>
+                  <div>
+                    <div class="text-truncate">Am I a good boy? The reason I ask is because someone told me that people say this to all dogs, even if they aren't good...</div>
+                    <div class="small text-gray-500">Chicken the Dog · 2w</div>
+                  </div>
+                </a>
+                <a class="dropdown-item text-center small text-gray-500" href="#">Read More Messages</a>
+              </div>
+            </li>
+
+            <div class="topbar-divider d-none d-sm-block"></div>
+
+            <!-- Nav Item - User Information -->
+            <li class="nav-item dropdown no-arrow">
+              <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <span id="userNameLabel" class="mr-2 d-none d-lg-inline text-gray-600 small">User Name</span>
+                <img class="img-profile rounded-circle" src="https://source.unsplash.com/QAB-WJcbgJk/60x60">
+              </a>
+              <!-- Dropdown - User Information -->
+              <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
+                <a id="profileLink" class="dropdown-item" href="#">
+                  <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
+                  Profile
+                </a>
+                <a class="dropdown-item" href="#">
+                  <i class="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>
+                  Settings
+                </a>
+                <a class="dropdown-item" href="#">
+                  <i class="fas fa-list fa-sm fa-fw mr-2 text-gray-400"></i>
+                  Activity Log
+                </a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
+                  <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+                  Logout
+                </a>
+              </div>
+            </li>
+
+          </ul>
+
+        </nav>
+        <!-- End of Topbar -->
+
+        <!-- Page Heading -->
+        <div class="container-fluid">        
+          <h1 id="pageTitle" class="h3 mb-2 text-gray-800">Page Title</h1>
+        </div>
+
+        <!-- Begin Page Content -->
+         <!-- top page -->
+         <div id="topPage" class="container-fluid">     
+         <div class="row">
+      
+            <!-- Earnings (Monthly) Card Example -->
+            <div class="col-xl-3 col-md-6 mb-4">
+              <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                  <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                      <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Earnings (Monthly)</div>
+                      <div class="h5 mb-0 font-weight-bold text-gray-800">$40,000</div>
+                    </div>
+                    <div class="col-auto">
+                      <i class="fas fa-calendar fa-2x text-gray-300"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Earnings (Monthly) Card Example -->
+            <div class="col-xl-3 col-md-6 mb-4">
+              <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                  <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                      <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Earnings (Annual)</div>
+                      <div class="h5 mb-0 font-weight-bold text-gray-800">$215,000</div>
+                    </div>
+                    <div class="col-auto">
+                      <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Earnings (Monthly) Card Example -->
+            <div class="col-xl-3 col-md-6 mb-4">
+              <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                  <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                      <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Tasks</div>
+                      <div class="row no-gutters align-items-center">
+                        <div class="col-auto">
+                          <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">50%</div>
+                        </div>
+                        <div class="col">
+                          <div class="progress progress-sm mr-2">
+                            <div class="progress-bar bg-info" role="progressbar" style="width: 50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-auto">
+                      <i class="fas fa-clipboard-list fa-2x text-gray-300"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Pending Requests Card Example -->
+            <div class="col-xl-3 col-md-6 mb-4">
+              <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                  <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                      <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Pending Requests</div>
+                      <div class="h5 mb-0 font-weight-bold text-gray-800">18</div>
+                    </div>
+                    <div class="col-auto">
+                      <i class="fas fa-comments fa-2x text-gray-300"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Content Row -->
+
+          <div class="row">
+
+            <!-- Area Chart -->
+            <div class="col-xl-8 col-lg-7">
+              <div class="card shadow mb-4">
+                <!-- Card Header - Dropdown -->
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                  <h6 class="m-0 font-weight-bold text-primary">Earnings Overview</h6>
+                  <div class="dropdown no-arrow">
+                    <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
+                      <div class="dropdown-header">Dropdown Header:</div>
+                      <a class="dropdown-item" href="#">Action</a>
+                      <a class="dropdown-item" href="#">Another action</a>
+                      <div class="dropdown-divider"></div>
+                      <a class="dropdown-item" href="#">Something else here</a>
+                    </div>
+                  </div>
+                </div>
+                <!-- Card Body -->
+                <div class="card-body">
+                  <div class="chart-area">
+                    <canvas id="myAreaChart"></canvas>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Pie Chart -->
+            <div class="col-xl-4 col-lg-5">
+              <div class="card shadow mb-4">
+                <!-- Card Header - Dropdown -->
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                  <h6 class="m-0 font-weight-bold text-primary">Revenue Sources</h6>
+                  <div class="dropdown no-arrow">
+                    <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
+                      <div class="dropdown-header">Dropdown Header:</div>
+                      <a class="dropdown-item" href="#">Action</a>
+                      <a class="dropdown-item" href="#">Another action</a>
+                      <div class="dropdown-divider"></div>
+                      <a class="dropdown-item" href="#">Something else here</a>
+                    </div>
+                  </div>
+                </div>
+                <!-- Card Body -->
+                <div class="card-body">
+                  <div class="chart-pie pt-4 pb-2">
+                    <canvas id="myPieChart"></canvas>
+                  </div>
+                  <div class="mt-4 text-center small">
+                    <span class="mr-2">
+                      <i class="fas fa-circle text-primary"></i> Direct
+                    </span>
+                    <span class="mr-2">
+                      <i class="fas fa-circle text-success"></i> Social
+                    </span>
+                    <span class="mr-2">
+                      <i class="fas fa-circle text-info"></i> Referral
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>  
+        <!-- /.container-fluid -->
+            <!-- Cards -->
+        <div id="cards" style="display:none;" class="container-fluid">
+          <div id="cardrow" class="row">
+                
+          </div>
+        </div>
+        <!-- /.container-fluid -->
+        <div id="tables" style="display:none;" class="container-fluid">
+            <!-- Tables -->
+          <div id="table1" class="card shadow mb-4" style="display:none;"> 
+            <div class="card-header py-3">
+              <h6 id="table1Title" class="m-0 font-weight-bold text-primary">Table 1 Title</h6>
+            </div>
+            <div class="card-body">
+              <div id="table1Data" class="table-responsive">
+              <!-- populated in showData function below... -->
+              </div>
+            </div>
+          </div>
+          <div id="table2" class="card shadow mb-4" style="display:none;">
+            <div class="card-header py-3">
+              <h6 id="table2Title" class="m-0 font-weight-bold text-primary">Table 2 Title</h6>
+            </div>
+            <div class="card-body">
+              <div id="table2Data" class="table-responsive">
+              <!-- populated in showData function below... -->
+              </div>
+            </div>
+          </div>          
+          <div id="table3" class="card shadow mb-4" style="display:none;">
+            <div class="card-header py-3">
+              <h6 id="table3Title" class="m-0 font-weight-bold text-primary">Table 3 Title</h6>
+            </div>
+            <div class="card-body">
+              <div id="table3Data" class="table-responsive">
+              <!-- populated in showData function below... -->
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- /.container-fluid -->
+
+      </div>
+      <!-- End of Main Content -->
+
+      <!-- Footer -->
+      <footer class="sticky-footer bg-white">
+        <div class="container my-auto">
+          <div class="copyright text-center my-auto">
+            <span>Copyright &copy; servicemedia.net 2019</span>
+          </div>
+        </div>
+      </footer>
+      <!-- End of Footer -->
+
+    </div>
+    <!-- End of Content Wrapper -->
+
+  </div>
+  <!-- End of Page Wrapper -->
+
+  <!-- Scroll to Top Button-->
+  <a class="scroll-to-top rounded" href="#page-top">
+    <i class="fas fa-angle-up"></i>
+  </a>
+
+  <!-- Logout Modal-->
+  <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
+          <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span>
+          </button>
+        </div>
+        <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+          <a class="btn btn-primary" href="#" onclick="logout()">Logout</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap core JavaScript-->
+  <script src="vendor/jquery/jquery.min.js"></script>
+  <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Core plugin JavaScript-->
+  <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+  <script src="src/util/axios.js"></script>
+  <script src="vendor/jscookie/js.cookie.min.js"></script>
+  <script src="https://transloadit.edgly.net/releases/uppy/v1.4.0/uppy.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.js"></script>
+  <!-- Custom scripts for all pages-->
+  <script src="js/sb-admin-2.min.js"></script>
+
+  <!-- Page level plugins -->
+  <script src="vendor/datatables/jquery.dataTables.min.js"></script>
+  <script src="vendor/datatables/dataTables.bootstrap4.min.js"></script>
+  <script src="vendor/chart.js/Chart.min.js"></script>
+  
+  <!-- Page level custom scripts -->
+  <script src="js/demo/datatables-demo.js"></script>
+  
+  <!-- Page level custom scripts -->
+  <script src="js/demo/chart-area-demo.js"></script>
+  <script src="js/demo/chart-pie-demo.js"></script>
+  
+  <!-- inline page functions -->
+  <script>
+  // 1. amirite checks auth
+  // 2. bigSwitch does "routing" and calls "controller" functions
+  // 3. these functions fetch json and generate html
+  // 4. dom elements are found by id and updated with new stuff 
+
+  var cookie = Cookies.get();
+  var type = getParameterByName("type", window.location.href);
+  var appid = getParameterByName("appid", window.location.href);
+  var uid = getParameterByName("uid", window.location.href);
+  var objectid = getParameterByName("oid", window.location.href);
+  var userid = "";
+  var username = "";
+  amirite();
+  function amirite () {
+    if (cookie != null && cookie._id != null) {
+    console.log("gotsa cookie: " + cookie._id );
+    $.get( "/amirite/" + cookie._id, function( data ) {
+        console.log("amirite : " + JSON.stringify(data));
+        if (data == 0) {
+            window.location.href = './login.html';
+        } else {
+          console.log("welcome " + data);
+          var userNameLabel = document.getElementById('userNameLabel');
+          username = data.split("~")[0];
+          userNameLabel.innerText = username;
+          userid = data.split("~")[1];
+          var profileLink = document.getElementById('profileLink');
+          profileLink.href = 'view.html?type=profile';
+          bigSwitch();
+        }
+    });
+    } else {
+        window.location.href = './login.html';
+    }
+  }
+  function bigSwitch() { //light up proper elements and get the stuff
+    if (type == null) {
+      $("#topPage").show();
+    } else {
+      $("#topPage").hide();
+    }
+    switch (type) { //type is first level param for each route
+      case "app": //uses :appid param
+        $("#cards").show();
+      break;
+      case "apps": //if authlevel > 0
+      //
+      break;
+      case "users": //gets everything atm
+        $("#tables").show();
+        $("#table1").show();
+        $("#table1Title").html("Registered Users");
+        $("#pageTitle").html("All Registered Users");
+        getUsers();
+      break;
+      case "scores": //uses :appid param
+        $("#tables").show();
+        $("#table1").show();
+        $("#table1Title").html("High Scores - Total");
+        $("#table2").show();
+        $("#table2Title").html("High Scores - Top");
+        $("#pageTitle").html("Scores");
+        getTotalScores();
+      break;
+      case "profile": //uses cookied uid
+        $("#cards").show();
+        $("#tables").show();
+        $("#table1").show();
+        $("#table1Title").html("Purchases");
+        $("#table2").show();
+        $("#table2Title").html("Activities");
+        $("#table3").show();
+        $("#table3Title").html("Scores");
+        $("#pageTitle").html("User Profile - " + username);
+        getProfile();
+      break;
+      case "pictures": //gets everything atm
+        $("#tables").show();
+        $("#table1").show();
+        $("#table1Title").html("Pictures");
+        $("#pageTitle").html("All Pictures");
+        getPictures();
+      break;
+      case "storeitems": //gets everything atm
+        $("#tables").show();
+        $("#table1").show();
+        $("#table1Title").html("Store Items");
+        $("#pageTitle").html("All Store Items");
+        getStoreitems();
+      break;
+        case "scenes": //uses cookied uid, all apps
+        $("#tables").show();
+        $("#table1").show();
+        $("#table1Title").html("Scenes");
+        $("#pageTitle").html("Scenes by " + username);
+        getScenes();
+      break;
+    }
+  }
+  function keyValues (response) { //utility function
+    var kvString = "";
+    for (var value in response) {
+      kvString += "<p>" + value + " : " + response[value] + "</p>";
+    }
+    return kvString;
+  }
+  function updatePicture(item) {
+
+  }
+  function deleteItem(type, itemid) {
+    switch (type) {
+      case "picture":
+        break;
+    }
+    $.confirm({
+      title: 'Confirm Delete!',
+      content: 'Are you sure you want to delete ' + (itemid) + '?',
+      buttons: {
+          confirm: function () {
+              $.ajax({
+              url: "/staging_delete",
+              type: 'POST',
+              contentType: "application/json; charset=utf-8",
+              dataType: "json",
+              data: JSON.stringify({
+                      key: nameKey,
+                      uid: cookie._id
+                  }),
+                  success: function( data, textStatus, xhr ){
+                      console.log(data);
+                      $.get( "/staging/" + cookie._id, function( data ) {
+                          // console.log("tryna get staging data : " + JSON.stringify(data));
+                          $( "#staging-area" ).html( RenderStagedItems(data) );
+                      });
+                  },
+                  error: function( xhr, textStatus, errorThrown ){
+                      console.log( xhr.responseText );
+                      $.get( "/staging/" + cookie._id, function( data ) {
+                          // console.log("tryna get staging data : " + JSON.stringify(data));
+                          $( "#staging-area" ).html( RenderStagedItems(data) );
+                      });
+                  }
+              });
+            },
+            cancel: function () {
+                // $.alert('Canceled!');
+            },
+        }
+    });
+  }
+  function showPicture(item_id) {
+    let config = { headers: {
+          appid: appid,
+        }
+      }
+      axios.get('/userpic/' + item_id, config)
+      .then(function (response) {
+      $("#cards").show();
+      var card = "<div class=\x22col-lg-12\x22>" +
+          "<div class=\x22card shadow mb-4\x22>" +
+            "<div class=\x22card-header py-3 d-flex flex-row align-items-center justify-content-between\x22>" +
+              "<h6 class=\x22m-0 font-weight-bold text-primary\x22>Picture Details</h6>" +
+              "<div class=\x22dropdown no-arrow\x22>" +
+                "<a class=\x22dropdown-toggle\x22 href=\x22#\x22 role=\x22button\x22 id=\x22dropdownMenuLink\x22 data-toggle=\x22dropdown\x22 aria-haspopup=\x22true\x22 aria-expanded=\x22false\x22>" +
+                "<i class=\x22fas fa-ellipsis-v fa-sm fa-fw text-gray-400\x22></i>" +
+                "</a>" +
+                "<div class=\x22dropdown-menu dropdown-menu-right shadow animated--fade-in\x22 aria-labelledby=\x22dropdownMenuLink\x22>" +
+                  "<div class=\x22dropdown-header\x22>Dropdown Header:</div>" +
+                  "<a class=\x22dropdown-item\x22 href=\x22#\x22>Edit</a>" +
+                  "<a class=\x22dropdown-item\x22 href=\x22#\x22>Another action</a>" +
+                  "<div class=\x22dropdown-divider\x22></div>" +
+                  "<a class=\x22dropdown-item\x22 href=\x22#\x22>Something else here</a>" +
+                "</div>" +
+              "</div>" +
+            "</div>" +
+            "<div class=\x22card-body\x22>" +
+                "<div class=\x22media\x22>" +
+                "<img class=\x22rounded img-fluid mr-3\x22 src=\x22" + response.data.URLhalf+ "\x22>" +
+                "<div class=\x22media-body\x22>" +
+                "<h5 class=\x22mt-0\x22>Media heading</h5>" +
+                keyValues(response.data)
+                "</div>" +
+                "</div>" +
+            "</div>" +
+        "</div>" +
+        "</div>";
+        $("#cardrow").html(card);
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
+  }
+  function getPictures() {
+    let config = { headers: {
+          appid: appid,
+        }
+      }
+      axios.get('/userpics/' + userid, config)
+      .then(function (response) {
+        console.log(JSON.stringify(response));
+        // var jsonResponse = response.data;
+        var arr = response.data;
+        var tableHead = "<table id=\x22dataTable1\x22 class=\x22display table table-striped table-bordered\x22 style=\x22width:100%\x22>" +
+              "<thead>"+
+              "<tr>"+
+              "<th></th>"+
+              "<th>Name</th>"+
+              "<th>Date</th>"+
+              "<th>Tags</th>"+
+              "<th>Status</th>"+
+          "</tr>"+
+          "</thead>"+
+          "<tbody>";
+          var tableBody = "";
+          for(var i = 0; i < arr.length; i++) {
+            var detailsPicLink = "<a href=\x22#page-top\x22 onclick=\x22showPicture('" + arr[i]._id + "')\x22><img class=\x22rounded\x22 src=\x22" + arr[i].URLthumb + "\x22></a>"
+            var detailsLink = "<a href=\x22#page-top\x22 onclick=\x22showPicture('" + arr[i]._id + "')\x22>" + arr[i].title + "</a>";
+              tableBody = tableBody +
+              "<tr>" +
+              "<td>" + detailsPicLink + "</td>" +
+              "<td>" + detailsLink + "</td>" +
+              "<td>" + convertTimestamp(arr[i].otimestamp) + "</td>" +
+              "<td>" + arr[i].tags + "</td>" +
+              "<td>" + arr[i].item_status + "</td>" +
+              "</tr>";
+          }
+          var tableFoot =  "</tbody>"
+          "<tfoot>"
+              "<tr>"
+              "<th></th>"+
+              "<th>Name</th>"+
+              "<th>Date</th>"+
+              "<th>Tags</th>"+
+              "<th>Status</th>"+
+              "</tr>" +
+          "</tfoot>" +
+          "</table>";
+          var resultElement = document.getElementById('table1Data');
+          resultElement.innerHTML = tableHead + tableBody + tableFoot;
+          $('#dataTable1').DataTable(
+            {"order": [[ 1, "desc" ]]}
+          );
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
+  }
+  function updateStoreitem(item) {
+
+  }
+  function showStoreitem(item_id) {
+    let config = { headers: {
+          appid: appid,
+        }
+      }
+      axios.get('/get_storeitem/' + item_id, config)
+      .then(function (response) {
+      $("#cards").show();
+      var card = "<div class=\x22col-lg-12\x22>" +
+          "<div class=\x22card shadow mb-4\x22>" +
+            "<div class=\x22card-header py-3 d-flex flex-row align-items-center justify-content-between\x22>" +
+              "<h6 class=\x22m-0 font-weight-bold text-primary\x22>Details</h6>" +
+              "<div class=\x22dropdown no-arrow\x22>" +
+                "<a class=\x22dropdown-toggle\x22 href=\x22#\x22 role=\x22button\x22 id=\x22dropdownMenuLink\x22 data-toggle=\x22dropdown\x22 aria-haspopup=\x22true\x22 aria-expanded=\x22false\x22>" +
+                "<i class=\x22fas fa-ellipsis-v fa-sm fa-fw text-gray-400\x22></i>" +
+                "</a>" +
+                "<div class=\x22dropdown-menu dropdown-menu-right shadow animated--fade-in\x22 aria-labelledby=\x22dropdownMenuLink\x22>" +
+                  "<div class=\x22dropdown-header\x22>Dropdown Header:</div>" +
+                  "<a class=\x22dropdown-item\x22 href=\x22#\x22>Edit</a>" +
+                  "<a class=\x22dropdown-item\x22 href=\x22#\x22>Another action</a>" +
+                  "<div class=\x22dropdown-divider\x22></div>" +
+                  "<a class=\x22dropdown-item\x22 href=\x22#\x22>Something else here</a>" +
+                "</div>" +
+              "</div>" +
+            "</div>" +
+            "<div class=\x22card-body\x22>" +
+                keyValues(response.data)
+            "</div>" +
+        "</div>" +
+        "</div>";
+        $("#cardrow").html(card);
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
+  }
+  function getStoreitems() {
+    let config = { headers: {
+          appid: appid,
+        }
+      }
+      axios.get('/get_storeitems/' + appid, config)
+      .then(function (response) {
+        console.log(JSON.stringify(response));
+        var jsonResponse = response.data;
+        var arr = jsonResponse.storeitems;
+        var tableHead = "<table id=\x22dataTable1\x22 class=\x22display table table-striped table-bordered\x22 style=\x22width:100%\x22>" +
+            "<thead>"+
+            "<tr>"+
+            "<th>Name</th>"+
+            "<th>Type</th>"+
+            "<th>AppID</th>"+
+            "<th>Price</th>"+
+            "<th>Max Per User</th>"+
+            "<th>Max Total</th>"+
+            "<th>Total Used</th>"+
+
+        "</tr>"+
+        "</thead>"+
+        "<tbody>";
+        var tableBody = "";
+        for(var i = 0; i < arr.length; i++) {
+            var editButton = "<button type=\x22button\x22 class=\x22btn btn-link\x22 onclick=\x22showStoreitem('" + arr[i]._id + "')\x22>" + arr[i].name + "</a>";
+            tableBody = tableBody +
+            "<tr>" +
+            "<td>" + editButton + "</td>" +
+            "<td>" + arr[i].type + "</td>" +
+            "<td>" + arr[i].appID + "</td>" +
+            "<td>" + "$ " + (arr[i].price * .01).toFixed(2)+ "</td>" +
+            "<td>" + arr[i].maxPerUser + "</td>" +
+            "<td>" + arr[i].maxTotal + "</td>" +
+            "<td>" + arr[i].totalUsed + "</td>" +
+            "</tr>";
+        }
+        var tableFoot =  "</tbody>"
+        "<tfoot>"
+            "<tr>"
+            "<th>Name</th>"+
+            "<th>Type</th>"+
+            "<th>AppID</th>"+
+            "<th>Price</th>"+
+            "<th>Max Per User</th>"+
+            "<th>Max Total</th>"+
+            "<th>Total Used</th>"+
+            "</tr>" +
+        "</tfoot>" +
+        "</table>";
+        var resultElement = document.getElementById('table1Data');
+        resultElement.innerHTML = tableHead + tableBody + tableFoot;
+        $('#dataTable1').DataTable(
+          {"order": [[ 1, "desc" ]]}
+        );
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
+  }
+  function getUsers() {
+    let config = { headers: {
+          appid: appid,
+        }
+      }
+      axios.get('/allusers/', config)
+      .then(function (response) {
+        // console.log(JSON.stringify(response));
+        // var jsonResponse = response.data;
+        var arr = response.data;
+        var tableHead = "<table id=\x22dataTable1\x22 class=\x22display table table-striped table-bordered\x22 style=\x22width:100%\x22>" +
+            "<thead>"+
+            "<tr>"+
+            "<th>User Name</th>"+
+            "<th>Type</th>"+
+            "<th>Status</th>"+
+            "<th>Email</th>"+
+            "<th>Original AppID</th>"+
+            "<th>Create Date</th>"+
+        "</tr>"+
+        "</thead>"+
+        "<tbody>";
+        var tableBody = "";
+        for(var i = 0; i < arr.length; i++) {
+            tableBody = tableBody +
+            "<tr>" +
+            "<td>" + arr[i].userName + "</td>" +
+            "<td>" + arr[i].type + "</td>" +
+            "<td>" + arr[i].status + "</td>" +
+            "<td>" + arr[i].email + "</td>" +
+            "<td>" + arr[i].oappid + "</td>" +
+            "<td>" + convertTimestamp(arr[i].createDate) + "</td>" +
+            "</tr>";
+        }
+        var tableFoot =  "</tbody>"
+        "<tfoot>"
+            "<tr>"
+            "<th>User Name</th>"+ 
+            "<th>Type</th>"+
+            "<th>Status</th>"+
+            "<th>Email</th>"+
+            "<th>Original AppID</th>"+
+            "<th>Create Date</th>"+
+            "</tr>" +
+        "</tfoot>" +
+        "</table>";
+        var resultElement = document.getElementById('table1Data');
+        resultElement.innerHTML = tableHead + tableBody + tableFoot;
+        $('#dataTable1').DataTable(
+          {"order": [[ 1, "desc" ]]}
+        );
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
+  }
+  function getScenes() {
+    let config = { headers: {
+          appid: appid,
+        }
+      }
+      axios.get('/uscenes/' + userid, config)
+      .then(function (response) {
+        console.log(JSON.stringify(response));
+        // var jsonResponse = response.data;
+            //  var jsonResponse = response.data;
+      var arr = response.data;
+        var tableHead = "<table id=\x22dataTable1\x22 class=\x22display table table-striped table-bordered\x22 style=\x22width:100%\x22>" +
+            "<thead>"+
+            "<tr>"+
+            "<th>Scene Title</th>"+
+            "<th>Scene Key</th>"+
+            "<th>App Name</th>"+
+            "<th>Public</th>"+
+            "<th>Last Update</th>"+
+            "<th>Platform</th>"+
+        "</tr>"+
+        "</thead>"+
+        "<tbody>";
+        var tableBody = "";
+        for(var i = 0; i < arr.length; i++) {
+            var android = arr[i].sceneAndroidOK ? 
+            "<a href=\x22#\x22 class=\x22btn btn-success btn-circle \x22><i class=\x22fab fa-android\x22></i></a>" :
+            "<a href=\x22#\x22 class=\x22btn btn-danger btn-circle \x22><i class=\x22fab fa-android \x22></i></a>";
+            var ios = arr[i].sceneIosOK ? 
+            "<a href=\x22#\x22 class=\x22btn btn-success btn-circle \x22><i class=\x22fab fa-apple \x22></i></a>" :
+            "<a href=\x22#\x22 class=\x22btn btn-danger btn-circle \x22><i class=\x22fab fa-apple\x22></i></a>";
+            var windows = arr[i].sceneWindowsOK ? 
+            "<a href=\x22#\x22 class=\x22btn btn-success btn-circle \x22><i class=\x22fab fa-windows\x22></i></a>" :
+            "<a href=\x22#\x22 class=\x22btn btn-danger btn-circle \x22><i class=\x22fab fa-windows\x22></i></a>";
+            tableBody = tableBody +
+            "<tr>" +
+            "<td>" + arr[i].sceneTitle + "</td>" +
+            "<td>" + arr[i].short_id + "</td>" +
+            "<td>" + arr[i].sceneAppName + "</td>" +
+            "<td>" + arr[i].sceneShareWithPublic + "</td>" +
+            "<td>" + arr[i].sceneLastUpdate + "</td>" +
+            "<td>" + android + ios + windows + "</td>" +
+
+            "</tr>";
+        }
+        var tableFoot =  "</tbody>"
+        "<tfoot>"
+            "<tr>"
+            "<th>Scene Title</th>"+
+            "<th>Scene Key</th>"+
+            "<th>App Name</th>"+
+            "<th>Public</th>"+
+            "<th>Last Update</th>"+
+            "<th>Platform</th>"+
+            "</tr>" +
+        "</tfoot>" +
+        "</table>";
+        var resultElement = document.getElementById('table1Data');
+        resultElement.innerHTML = tableHead + tableBody + tableFoot;
+        $('#dataTable1').DataTable(
+          {"order": [[ 1, "desc" ]]}
+        );
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
+  }
+  function getProfile() {
+      let config = { headers: {
+          appid: appid,
+        }
+      }
+      console.log(userid);
+      axios.get('/profile/' + userid, config)
+      .then(function (response) {
+      console.log(JSON.stringify(response));
+      showProfilePurchases(response);  //populate datatables
+      showProfileActivity(response);
+      showProfileScores(response);
+      //construct a card..
+      var card = "<div class=\x22col-lg-12\x22>" +
+        "<div class=\x22card shadow mb-4\x22>" +
+          "<div class=\x22card-header py-3 d-flex flex-row align-items-center justify-content-between\x22>" +
+            "<h6 class=\x22m-0 font-weight-bold text-primary\x22>Details</h6>" +
+            "<div class=\x22dropdown no-arrow\x22>" +
+              "<a class=\x22dropdown-toggle\x22 href=\x22#\x22 role=\x22button\x22 id=\x22dropdownMenuLink\x22 data-toggle=\x22dropdown\x22 aria-haspopup=\x22true\x22 aria-expanded=\x22false\x22>" +
+               "<i class=\x22fas fa-ellipsis-v fa-sm fa-fw text-gray-400\x22></i>" +
+              "</a>" +
+              "<div class=\x22dropdown-menu dropdown-menu-right shadow animated--fade-in\x22 aria-labelledby=\x22dropdownMenuLink\x22>" +
+                "<div class=\x22dropdown-header\x22>Dropdown Header:</div>" +
+                "<a class=\x22dropdown-item\x22 href=\x22#\x22>Edit</a>" +
+                "<a class=\x22dropdown-item\x22 href=\x22#\x22>Another action</a>" +
+                "<div class=\x22dropdown-divider\x22></div>" +
+                "<a class=\x22dropdown-item\x22 href=\x22#\x22>Something else here</a>" +
+              "</div>" +
+            "</div>" +
+          "</div>" +
+          "<div class=\x22card-body\x22>" +
+            "<ul class=\x22list-inline\x22>" +
+            "<li class=\x22list-inline-item\x22>| userName : <strong>"+ response.data.userName +"</strong></li>" +
+            "<li class=\x22list-inline-item\x22>| userType : <strong>"+ response.data.type +"</strong></li>" +
+            "<li class=\x22list-inline-item\x22>| status : <strong>"+ response.data.status +"</strong></li>" +
+            "<li class=\x22list-inline-item\x22>| email : <strong>"+ response.data.email +"</strong></li>" +
+            "<li class=\x22list-inline-item\x22>| created : <strong>"+ convertTimestamp(response.data.createDate) +"</strong></li>" +
+            "<li class=\x22list-inline-item\x22>| @ IP : <strong>"+ response.data.createIP +"</strong></li>" +
+            "</ul>" +
+          
+          "</div>" +
+      "</div>" +
+      "</div>";
+      $("#cardrow").html(card);
+      })
+    .catch(function (error) {
+      console.log(error);
+    });
+  }
+  function showProfilePurchases(response) {
+    var jsonResponse = response.data;
+    var arr = jsonResponse.purchases;
+    var tableHead = "<table id=\x22dataTable1\x22 class=\x22display table table-striped table-bordered\x22 style=\x22width:100%\x22>" +
+            "<thead>"+
+            "<tr>"+
+            "<th>Name</th>"+
+            "<th>Price</th>"+
+            "<th>Purchase Date</th>"+
+        "</tr>"+
+    "</thead>"+
+    "<tbody>";
+    var tableBody = "";
+    for(var i = 0; i < arr.length; i++) {
+        tableBody = tableBody +
+        "<tr>" +
+        "<td>" + arr[i].itemName + "</td>" +
+        "<td>" + "$ " + (arr[i].itemPrice * .01).toFixed(2)+ "</td>" +
+        "<td>" + convertTimestamp(arr[i].purchaseTimestamp) + "</td>" +
+        "</tr>";
+    }
+    var tableFoot =  "</tbody>"
+    "<tfoot>"
+        "<tr>"
+            "<th>Name</th>"+
+            "<th>Price</th>"+
+            "<th>Purchase Date</th>"+
+        "</tr>" +
+    "</tfoot>" +
+    "</table>";
+    var resultElement = document.getElementById('table1Data');
+    resultElement.innerHTML = tableHead + tableBody + tableFoot;
+    $('#dataTable1').DataTable(
+      {"order": [[ 1, "desc" ]]}
+    );
+  }
+  function showProfileActivity(response) {
+    var jsonResponse = response.data;
+    var arr = jsonResponse.activity;
+    var tableHead = "<table id=\x22dataTable2\x22 class=\x22display table table-striped table-bordered\x22 style=\x22width:100%\x22>" +
+            "<thead>"+
+            "<tr>"+
+            "<th>Activity</th>"+
+            "<th>Status</th>"+
+            "<th>Date</th>"+
+        "</tr>"+
+    "</thead>"+
+    "<tbody>";
+    var tableBody = "";
+    for(var i = 0; i < arr.length; i++) {
+        tableBody = tableBody +
+        "<tr>" +
+        "<td>" + arr[i].activityType + "</td>" +
+        "<td>" + arr[i].activityStatus + "</td>" +
+        "<td>" + convertTimestamp(arr[i].activityTimestamp) + "</td>" +
+        "</tr>";
+    }
+    var tableFoot =  "</tbody>"
+    "<tfoot>"
+        "<tr>"
+            "<th>Activity</th>"+
+            "<th>Status</th>"+
+            "<th>Date</th>"+
+        "</tr>" +
+    "</tfoot>" +
+    "</table>";
+    var resultElement = document.getElementById('table2Data');
+    resultElement.innerHTML = tableHead + tableBody + tableFoot;
+    $('#dataTable2').DataTable(
+      {"order": [[ 1, "desc" ]]}
+    );
+  }
+  function showProfileScores(response) {
+    var jsonResponse = response.data;
+    var arr = jsonResponse.scores;
+    var tableHead = "<table id=\x22dataTable3\x22 class=\x22display table table-striped table-bordered\x22 style=\x22width:100%\x22>" +
+            "<thead>"+
+            "<tr>"+
+            "<th>App</th>"+
+            "<th>Scene</th>"+
+            "<th>Type</th>"+
+            "<th>Score</th>"+
+            "<th>Date</th>"+
+        "</tr>"+
+    "</thead>"+
+    "<tbody>";
+    var tableBody = "";
+    for(var i = 0; i < arr.length; i++) {
+        tableBody = tableBody +
+        "<tr>" +
+        "<td>" + arr[i].appName + "</td>" +
+        "<td>" + arr[i].sceneTitle + "</td>" +
+        "<td>" + arr[i].scoreType + "</td>" +
+        "<td>" + arr[i].scoreInt + "</td>" +
+        "<td>" + convertTimestamp(arr[i].scoreTimestamp) + "</td>" +
+        "</tr>";
+    }
+    var tableFoot =  "</tbody>"
+    "<tfoot>"
+        "<tr>"
+            "<th>App</th>"+
+            "<th>Scene</th>"+
+            "<th>Score</th>"+
+            "<th>Date</th>"+
+        "</tr>" +
+    "</tfoot>" +
+    "</table>";
+    var resultElement = document.getElementById('table3Data');
+    resultElement.innerHTML = tableHead + tableBody + tableFoot;
+    $('#dataTable3').DataTable(
+      {"order": [[ 1, "desc" ]]}
+    );
+  }
+  function getTotalScores() {
+      var resultElement = document.getElementById('table1Data');
+      resultElement.innerHTML = '';
+      let config = { headers: {
+          appid: appid,
+        }
+      }
+      axios.get('/totalscores_aka/' + appid, config)
+      .then(function (response) {
+      // console.log(JSON.stringify(response));
+      resultElement.innerHTML = showTotalScores(response);
+      $('#dataTable1').DataTable(
+        {"order": [[ 1, "desc" ]]}
+      );
+       
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
+  } 
+  function showTotalScores(response) {
+      var jsonResponse = response.data;
+      var arr = jsonResponse.totalscores;
+      var tableHead = "<table id=\x22dataTable1\x22 class=\x22display table table-striped table-bordered\x22 style=\x22width:100%\x22>" +
+              "<thead>"+
+              "<tr>"+
+              "<th>Name</th>"+
+              "<th>Total</th>"+
+              "<th>Rank</th>"+
+          "</tr>"+
+      "</thead>"+
+      "<tbody>";
+      var tableBody = "";
+      for(var i = 0; i < arr.length; i++) {
+          tableBody = tableBody +
+          "<tr>" +
+          "<td>" + arr[i].scoreName + "</td>" +
+          "<td>" + arr[i].scoreTotal + "</td>" +
+          "<td>" + arr[i].rank + "</td>" +
+          "</tr>";
+      }
+      var tableFoot =  "</tbody>"
+      "<tfoot>"
+          "<tr>"
+              "<th>Name</th>" +
+              "<th>Total</th>" +
+              "<th>Rank</th>" +
+          "</tr>" +
+      "</tfoot>" +
+      "</table>";
+      getTopScores(); //call next one
+      return tableHead + tableBody + tableFoot;
+  }
+  function getTopScores() {
+    var resultElement = document.getElementById('table2Data');
+    resultElement.innerHTML = '';
+    let config = { headers: { //this route requires app id in header!
+        appid: appid,
+      }
+    }
+    axios.get('/topscores/' + appid, config)
+    .then(function (response) {
+    // console.log(JSON.stringify(response));
+    resultElement.innerHTML = showTopScores(response);
+    $('#dataTable2').DataTable(
+        {"order": [ 1, "desc" ]}
+      );
+    })
+    .catch(function (error) {
+      console.log(error);
+      // resultElement.innerHTML = showError(error);
+      // datahtml = showError(error);
+    });
+  } 
+  function showTopScores(response) {
+      var jsonResponse = response.data;
+      var arr = jsonResponse.scores;
+      var tableHead = "<table id=\x22dataTable2\x22 class=\x22display table table-striped table-bordered\x22 style=\x22width:100%\x22>"+
+              "<thead>"+
+              "<tr>"+
+              "<th>Name</th>"+
+              "<th>Score</th>"+
+              "<th>Type</th>"+
+              "<th>Scene</th>"+
+              "<th>Difficulty</th>"+
+              "<th>Date</th>"+
+          "</tr>"+
+      "</thead>"+
+      "<tbody>";
+      var tableBody = "";
+      for(var i = 0; i < arr.length; i++) {
+          tableBody = tableBody +
+          "<tr>" +
+          "<td>" + arr[i].aka + "</td>" +
+          "<td>" + arr[i].scoreInt + "</td>" +
+          "<td>" + arr[i].scoreType + "</td>" +
+          "<td>" + arr[i].sceneTitle + "</td>" +
+          "<td>" + arr[i].difficulty + "</td>" +
+          "<td>" + convertTimestamp(arr[i].scoreTimestamp) + "</td>" +
+          "</tr>";
+      }
+      var tableFoot =  "</tbody>"
+      "<tfoot>"
+          "<tr>"
+              "<th>Name</th>"+
+              "<th>Score</th>"+
+              "<th>Type</th>"+
+              "<th>Scene</th>"+
+              "<th>Difficulty</th>"+
+              "<th>Date</th>"+
+          "</tr>" +
+      "</tfoot>" +
+      "</table>";
+      return tableHead + tableBody + tableFoot;
+  }
+  function logout() {
+    Cookies.remove('_id');
+    location.reload();
+  } 
+  function convertTimestamp(unixtimestamp){
+    var months_arr = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    var date = new Date(unixtimestamp*1000);
+    var year = date.getFullYear();
+    var month = months_arr[date.getMonth()];
+    var day = date.getDate();
+    var hours = date.getHours();
+    var minutes = "0" + date.getMinutes();
+    var seconds = "0" + date.getSeconds();
+    var convdataTime = month+' '+day+' '+year+' '+hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2);
+    return convdataTime;
+}
+  function getParameterByName(name, url) { //to get querystring params
+    if (!url) {
+      url = window.location.href;
+    }
+    name = name.replace(/[\[\]]/g, "\\$&");
+    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+        results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return '';
+    return decodeURIComponent(results[2].replace(/\+/g, " "));
+  }
+  </script>
+
+</body>
+
+</html>

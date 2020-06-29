@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="en">
+<!--TABLE OF CONTENTS
+Scripts
+
+Render Layer Parameters
+
+Camera
+
+Lights & sky
+
+Move Possitions
+
+Environment
+  -Flag Logos
+  -Rover
+  -Logo
+  -Rocks
+  -Coming Soon
+  -Ground
+
+Information Panels
+  -Page 1 - 4
+
+Picture Gallery
+
+Annotations
+  -Annotation Spheres
+  -Annotation Box
+-->
+  <html>
+  <!--Scripts-->
+  <head>
+    <script src="https://cdn.jsdelivr.net/gh/aframevr/aframe@333873f3279c8d49881577662e16e51baa480ea3/dist/aframe-master.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.0.1/dist/aframe-extras.min.js"></script>
+    <script src="https://unpkg.com/aframe-event-set-component@3.0.3/dist/aframe-event-set-component.min.js"></script>
+    <script src="https://unpkg.com/aframe-render-order-component@1.1.0/dist/aframe-render-order-component.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/webvr-polyfill@latest/build/webvr-polyfill.js"></script>
+    <script>
+    if( /Android|webOS|iPhone|iPod|iPad|BlackBerry/i.test(navigator.userAgent)){
+      document.write('<script type="text/javascript" src="joystick.js"><\/script>');
+    }
+    </script>
+
+    <style>
+    @media screen and (max-width: 900px) {
+
+    .a-enter-vr-button {
+      visibility: hidden; !important
+     }
+    }
+    </style>
+  </head>
+
+    <body>
+    <!--Render Layering Parameters-->
+      <a-scene
+      id="theScene"
+      environment="preset: forest"
+      render-order="text, background, navigation, notes"
+      renderer="gammaOutput: true;"
+      vr-mode-ui="enabled: true"
+      joystick
+      >
+
+    <!--Camera-->
+    <a-entity
+    id="camera"
+    camera
+    wasd-controls
+    look-controls
+    position="0 1.6 2.3"
+    rotation="0 -4 0"
+    cursor="rayOrigin: mouse">
+        <a-entity
+        animation__click="property: scale; startEvents: click; easing: easeInCubic; dur: 150; from: 0.03 0.03 0.03; to: 0.015 0.015 0.015"
+        animation__fusing="property: scale; startEvents: fusing; easing: easeInCubic; dur: 1500; from: 0.015 0.015 0.015; to: 0.03 0.03 0.03"
+        animation__mouseleave="property: scale; startEvents: mouseleave; easing: easeInCubic; dur: 500; to: 0.015 0.015 0.015"
+        cursor="fuse: true;"
+        material="color: white; shader: flat"
+        position="0 0 -1"
+        geometry="primitive: ring"
+        scale="0.015 0.015 0.015">
+        </a-entity>
+  </a-entity>
+
+
+    <!--Lights & sky-->
+      <a-entity
+      light="type: point;
+             castShadow: true;
+             intensity:0.7;
+             color:#ff6600"
+      position="-3.8 9 5"
+      intensity="0.7">
+      </a-entity>
+
+      <a-entity
+      light="type: point;
+             castShadow: false;
+             intensity:0.5;
+             color:#fff"
+      position=".5 0 3.8"
+      intensity="0.5">
+      </a-entity>
+
+      <a-entity
+      light="type:ambient;
+             color:#ffce9d;
+             intensity:0.7">
+      </a-entity>
+
+      <a-sky
+      color="#c7672e"> <!--Screengrab the color of the horizon line and set that color here for a smooth ground/sky transition-->
+      </a-sky>
+
+    <!--Environment-->
+    <!--Firefox-->
+      <a-image
+      redner-order="notes"
+      id="firefox"
+      position="-0 -1 1"
+      scale="0.65 .20 0.65"
+      opacity="0.6"
+      animation="property: position; to: 0 1.35 1;
+                 loop: false;
+                 dur: 3000;
+                 autoplay: true;
+                 easing: easeOutExpo;
+                 delay: 2000;
+                 loop: 1;
+                 dir: alternate"
+
+      src="images\firefox-large-01.png">
+
+      </a-image>
+
+    <!--Move Positions-->
+    <a-entity
+    position="-2.3 0 0.7"
+    rotation="0 70 0"
+    scale="1 1 1"
+    id="picture-pos"
+    event-set__enter="_event: click; _target: #camera; position:-2.3 1.6 0.7">
+      <a-image
+      position="0 0.7 0"
+      rotation="0 0 0"
+      scale="0.5 0.5 0.5"
+      opacity="0.3"
+      src="images/move-01.png">
+      </a-image>
+
+      <a-image
+      position="0 0.1 0"
+      rotation="90 0 180"
+      scale="0.7 0.7 0.7"
+      opacity="0.3"
+      src="images/feet-01.png">
+      </a-image>
+    </a-entity>
+
+    <a-entity
+    position="1.83 0 -0.6"
+    rotation="0 -25 0"
+    scale="0.8 0.8 0.8"
+    id="rover-pos"
+    event-set__enter="_event: click; _target: #camera; position: 1.83 1.6 -0.6; rotation: 0 0 0">
+      <a-image
+      position="0 0.7 0"
+      rotation="0 0 0"
+      scale="0.5 0.5 0.5"
+      opacity="0.3"
+      src="images/move-01.png">
+      </a-image>
+
+      <a-image
+      position="0 0.1 0"
+      rotation="90 0 180"
+      scale="0.7 0.7 0.7"
+      opacity="0.3"
+      src="images/feet-01.png">
+      </a-image>
+    </a-entity>
+
+    <a-entity
+    position="0 0 2"
+    rotation="0 0 0"
+    scale="0.8 0.8 0.8"
+    id="start-pos"
+    event-set__enter="_event: click; _target: #camera; position:0 1.6 2">
+      <a-image
+      position="0 0.7 0"
+      rotation="0 0 0"
+      scale="0.5 0.5 0.5"
+      opacity="0.3"
+      src="images/move-01.png">
+      </a-image>
+
+      <a-image
+      position="0 0.1 0"
+      rotation="90 0 180"
+      scale="0.8 0.8 0.8"
+      opacity="0.3"
+      src="images/feet-01.png">
+      </a-image>
+    </a-entity>
+
+    <!--flag logo Links-->
+      <a-entity
+      id="logos-1"
+      position="-0.1 -0.15 -0.6"
+      rotation="0 0 0"
+      scale="0.8 0.8 0.8">
+       <a-gltf-model
+       position="-1 0 0"
+       scale="1 1 1"
+       rotation="0 5.9 -1"
+       shadow="receive: true"
+       src="models/flag2.glb"
+       >
+         <a-image
+         scale="0.5 0.35"
+         position="0.37 .76 0.01"
+         src="images/centertec.png"
+         event-set__enter="_event: mouseenter; _target: #ct-link; position:-0.03 0 .01"
+         event-set__timeout="_event: mouseleave; _target: #ct-link; position:-0.03 -10 .01;">
+           <a-plane
+           id="ct-link"
+           color="#fff"
+           position="-0.03 -10 .01"
+           scale="1.2 1 1">
+             <a-text
+             font="fonts/raleway/Raleway-Light.json"
+             shader="msdf"
+             scale=".4 .6 .6"
+             color="#000"
+             value="Leave VR and
+             go to flat website?"
+             position="0 .1 0.01"
+             align="center">
+             </a-text>
+             <a-image
+             src="images/yes-no-01.png"
+             link="href: https://centertec.com; title: Centertec"
+             position="0 -0.2 0.01"
+             scale=".2 .3 .3">
+             </a-image>
+           </a-plane>
+        </a-image>
+       </a-gltf-model>
+
+       <a-gltf-model
+       position="-.1 0 0.05"
+       scale="1 1.2 1"
+       rotation="0 0 1"
+       shadow="receive: true"
+       src="models/flag2.glb">
+         <a-image
+         scale="0.55 0.35"
+         position="0.37 .76 0.01"
+         src="images/Chickenwaffle-2.png"
+         event-set__enter="_event: mouseenter; _target: #cw-link; position:0 0 .01"
+         event-set__timeout="_event: mouseleave; _target: #cw-link; position:-0.03 -10 .01;">
+           <a-plane
+           id="cw-link"
+           color="#fff"
+           position="-0.15 -10 .01"
+           scale="1.2 1 1">
+             <a-text
+             font="fonts/raleway/Raleway-Light.json"
+             shader="msdf"
+             scale=".4 .6 .6"
+             color="#000"
+             value="Leave VR and
+             go to flat website?"
+             position="0 .1 0.01"
+             align="center">
+             </a-text>
+             <a-image
+             src="images/yes-no-01.png"
+             link="href: http://www.chickenwaffle.com; title: Chickenwaffle"
+             position="0 -0.2 0.01"
+             scale=".2 .3 .3">
+             </a-image>
+           </a-plane>
+         </a-image>
+       </a-gltf-model>
+
+       <a-gltf-model
+       position="0.75 0 0"
+       scale="1 1 1"
+       rotation="0 -7.9 -2"
+       shadow="receive: true"
+       src="models/flag2.glb">
+         <a-image
+         scale="0.48 0.48"
+         position="0.37 .76 0.01"
+         src="images/SpaceFoundation.png"
+         event-set__enter="_event: mouseenter; _target: #sf-link; position:0 0 .01"
+         event-set__timeout="_event: mouseleave; _target: #sf-link; position:-0.03 -10 .01">
+           <a-plane
+           id="sf-link"
+           color="#fff"
+           position="-0.15 -10 .01"
+           scale="1.2 0.8 1.1">
+             <a-text
+             font="fonts/raleway/Raleway-Light.json"
+             shader="msdf"
+             scale=".4 .6 .6"
+             color="#000"
+             value="Leave VR and
+             go to flat website?"
+             position="0 .1 0.01"
+             align="center">
+             </a-text>
+             <a-image
+             src="images/yes-no-01.png"
+             link="href: https://www.spacefoundation.org ; title: Space Foundation"
+             position="0 -0.2 0.01"
+             scale=".2 .3 .3">
+             </a-image>
+           </a-plane>
+         </a-image>
+
+       </a-gltf-model>
+
+       <a-text
+       font="fonts/raleway/Raleway-Black.json"
+       shader="msdf"
+       value="Developed By"
+       color="#fff"
+       opacity=".3"
+       position="-0.55 0.2 0.6"
+       scale="1 1 1"
+       rotation="-60 0 0">
+       </a-text>
+       </a-entity>
+
+  <!--Flag Logo Links 2-->
+       <a-entity
+       id="logos-2"
+       position="3 -0.1 0.5"
+       rotation="0 -63 0"
+       scale="0.8 0.8 0.8">
+
+       <a-gltf-model
+       position="-0.5 0 0"
+       scale="1 1 1"
+       rotation="0 4 1"
+       shadow="receive: true"
+       src="models/flag2.glb">
+         <a-image
+         scale="0.35 0.35"
+         position="0.37 .76 0.01"
+         src="images/nasa.png"
+         event-set__enter="_event: mouseenter; _target: #ns-link; position:0 0 .01"
+         event-set__timeout="_event: mouseleave; _target: #ns-link; position:-0.03 -10 .01;">
+           <a-plane
+           id="ns-link"
+           color="#fff"
+           position="-0.15 -10 .01"
+           scale="1.5 1.1 1.1">
+             <a-text
+             font="fonts/raleway/Raleway-Light.json"
+             shader="msdf"
+             scale=".4 .6 .6"
+             color="#000"
+             value="Leave VR and
+             go to flat website?"
+             position="0 .1 0.01"
+             align="center">
+             </a-text>
+             <a-image
+             src="images/yes-no-01.png"
+             link="href: https://www.nasa.gov ; title: NASA"
+             position="0 -0.2 0.01"
+             scale=".17 .3 .3">
+             </a-image>
+           </a-plane>
+         </a-image>
+       </a-gltf-model>
+
+       <a-gltf-model
+       position="0.5 0 0"
+       scale="1 1 1"
+       rotation="0 -6 -2"
+       shadow="receive: true"
+       src="models/flag2.glb">
+         <a-image
+         scale="0.55 0.30"
+         position="0.37 .76 0.01"
+         src="images/JPL_logo.png"
+         event-set__enter="_event: mouseenter; _target: #jp-link; position:0 0 .01"
+         event-set__timeout="_event: mouseleave; _target: #jp-link; position:-0.03 -10 .01;">
+           <a-plane
+           id="jp-link"
+           color="#fff"
+           position="-0.15 -10 .01"
+           scale="1.1 1.1 1.1">
+             <a-text
+             font="fonts/raleway/Raleway-Light.json"
+             shader="msdf"
+             scale=".4 .6 .6"
+             color="#000"
+             value="Leave VR and
+             go to flat website?"
+             position="0 .1 0.01"
+             align="center">
+             </a-text>
+             <a-image
+             src="images/yes-no-01.png"
+             link="href: https://jpl.nasa.gov ; title: JPL"
+             position="0 -0.2 0.01"
+             scale=".2 .3 .3">
+             </a-image>
+           </a-plane>
+         </a-image>
+
+       </a-gltf-model>
+
+       <a-text
+       font="fonts/raleway/Raleway-Black.json"
+       shader="msdf"
+       value="Partnered With"
+       color="#fff"
+       opacity=".3"
+       position="-0.49 0.2 0.7"
+       scale="1 1 1"
+       rotation="-60 0 0"></a-text>
+       </a-entity>
+
+    <!--Rover-->
+      <a-gltf-model
+      id="rover"
+      render-order="background"
+      shadow="receive: true"
+      animation-mixer="loop: pingpong"
+      position="3 0 -4.5"
+      scale="1 1 1"
+      rotation="0 0 0"
+      src="models/rover_static.glb">
+      </a-gltf-model>
+
+    <!--Logo-->
+      <a-gltf-model
+      render-order="background"
+      position="-3 1.5 -6.4"
+      scale="4 4 4"
+      rotation="0 30 0"
+      src="models/MXR_logo.glb">
+      </a-gltf-model>
+
+    <!--Rocks-->
+      <a-gltf-model
+      render-order="background"
+      shadow="receive: true"
+      position="1.2 0 -2.7"
+      scale="1.3 1.3 1.3"
+      rotation="0 -30 0"
+      src="models/mars_rock.glb">
+      </a-gltf-model>
+
+    <!--Coming Soon-->
+      <a-gltf-model
+      render-order="background"
+      shadow="receive: true"
+      position="-0.9 0 -5.2"
+      scale="1.3 1.3 1.3"
+      rotation="0 30 0"
+      src="models/coming_soon.glb">
+      </a-gltf-model>
+
+    <!--Ground-->
+      <a-cylinder
+      color="#d39367"
+      shadow="receive: true"
+      roughness="1"
+      position="0 -.05 0"
+      scale="50 .1 50"
+      rotation="0 0 0">
+      </a-cylinder>
+
+
+    <!--Information Pannels-->
+    <!--Page 1-->
+      <a-entity id="text_p1"
+      position="6.9 2.3 -1.9"
+      scale="0.3 0.3 0.3"
+      rotation="0 -50 0">
+        <a-plane
+        opacity="0.3"
+        position="0 0 -0.1"
+        scale="13.5 7"
+        rotation="0 0 0"
+        src="images/backplanes-02.png">
+        </a-plane>
+
+      <!--Text-->
+        <a-entity
+        position="-4 1.5 0"
+        scale="1.9 1.9 1.9"
+        >
+
+        <!--Title-->
+          <a-text
+          alpha-test="5"
+          font="fonts/poppins/Poppins-Bold.json"
+          align="left"
+          value="Meet Curiosity"
+          shader="msdf"
+          position="0 0 0"
+          scale="2 2 2">
+          </a-text>
+
+        <!--Verbiage-->
+          <a-text
+          alpha-test="5"
+          font="fonts/raleway/Raleway-Bold.json"
+          align="left"
+          value="This nuclear powered Mars rover launched from Cape Canaveral on Nov 26, 2011. Curiosity survived the journey through space and the intense, fully automatic landing, being lowered to the planet’s surface by sky-crane. The rover landed inside the Gale Crater on August 6, 2012 and has been exploring ever since!"
+          shader="msdf"
+          position=".05 -1.2 0"
+          scale="1 1 1">
+          </a-text>
+        </a-entity>
+
+      <!--Info Navigation-->
+        <a-entity
+        position="-5.2 0 0"
+        render-order="navigation"
+        >
+          <a-image
+          opacity="0.3"
+          position="0 2 0"
+          scale="1 0.7"
+          rotation="0 0 180"
+          src="images/arrow.png">
+          </a-image>
+
+          <a-image
+          event-set__enter="_event: click; _target: #text_p1; position:0 -10 0"
+          event-set__click="_event: click; _target: #text_p2; position:6.9 2.3 -1.9"
+          position="0 -2 0"
+          scale="1 0.7"
+          src="images/arrow.png">
+          </a-image>
+        </a-entity>
+      </a-entity>
+
+    <!--Page 2-->
+      <a-entity id="text_p2"
+      position="6.9 -10 -1.9"
+      scale="0.3 0.3 0.3"
+      rotation="0 -50 0">
+      <!--Backplane-->
+        <a-plane
+        opacity="0.3"
+        position="0 0 -0.1"
+        scale="13.5 7"
+        rotation="0 0 0"
+        src="images/backplanes-02.png">
+        </a-plane>
+
+      <!--Text-->
+        <a-entity
+        position="-4 1.5 0"
+        scale="1.9 1.9 1.9"
+        >
+
+        <!--Title-->
+          <a-text
+          alpha-test="5"
+          font="fonts/poppins/Poppins-Bold.json"
+          align="left"
+          value="Meet Curiosity"
+          shader="msdf"
+          position="0 0 0"
+          scale="2 2 2">
+          </a-text>
+
+        <!--Verbiage-->
+          <a-text
+          alpha-test="5"
+          font="fonts/raleway/Raleway-Bold.json"
+          align="left"
+          value="Designed to live and work on the red planet, Curiosity can withstand extreme temperatures (up to -130°C to +70C) wind storms and can travel vast distances, surviving millions of kilometers from the humans who built it on Earth."
+          shader="msdf"
+          position=".05 -1.2 0"
+          scale="1 1 1">
+          </a-text>
+        </a-entity>
+
+      <!--Info Navigation-->
+        <a-entity
+        position="-5.2 0 0"
+        render-order="navigation"
+        >
+          <a-image
+          event-set__back="_event: click; _target: #text_p2; position:0 -10 0"
+          event-set__forward="_event: click; _target: #text_p1; position:6.9 2.3 -1.9"
+          position="0 2 0"
+          scale="1 0.7"
+          rotation="0 0 180"
+          src="images/arrow.png">
+          </a-image>
+
+          <a-image
+          event-set__enter="_event: click; _target: #text_p2; position:0 -10 0"
+          event-set__click="_event: click; _target: #text_p3; position:6.9 2.3 -1.9"
+          position="0 -2 0"
+          scale="1 0.7"
+          src="images/arrow.png">
+          </a-image>
+        </a-entity>
+      </a-entity>
+
+    <!--Page 3-->
+      <a-entity id="text_p3"
+      position="6.9 -10 -1.9"
+      scale="0.3 0.3 0.3"
+      rotation="0 -50 0">
+
+      <!--Backplane-->
+        <a-plane
+        opacity="0.3"
+        position="0 0 -0.1"
+        scale="13.5 7"
+        rotation="0 0 0"
+        src="images/backplanes-02.png">
+        </a-plane>
+
+      <!--Text-->
+        <a-entity
+        position="-4 1.5 0"
+        scale="1.9 1.9 1.9"
+        >
+
+        <!--Title-->
+          <a-text
+          alpha-test="5"
+          font="fonts/poppins/Poppins-Bold.json"
+          align="left"
+          value="Meet Curiosity"
+          shader="msdf"
+          position="0 0 0"
+          scale="2 2 2">
+          </a-text>
+
+        <!--Verbiage-->
+          <a-text
+          alpha-test="5"
+          font="fonts/raleway/Raleway-Bold.json"
+          align="left"
+          value="Armed with a suite of scientific instruments, Curiosity's mission includes: the study of climate and geology on Mars, determining what role water has played in the planets history, and help determine if Mars could ever have supported life."
+          shader="msdf"
+          position=".05 -1.2 0"
+          scale="1 1 1">
+          </a-text>
+        </a-entity>
+
+      <!--Info Navigation-->
+        <a-entity
+        position="-5.2 0 0"
+        render-order="navigation"
+        >
+          <a-image
+          event-set__forward="_event: click; _target: #text_p3; position:0 -10 0"
+          event-set__back="_event: click; _target: #text_p2; position:6.9 2.3 -1.9"
+          position="0 2 0"
+          scale="1 0.7"
+          rotation="0 0 180"
+          src="images/arrow.png">
+          </a-image>
+
+          <a-image
+          event-set__enter="_event: click; _target: #text_p3; position:0 -10 0"
+          event-set__click="_event: click; _target: #text_p4; position:6.9 2.3 -1.9"
+          position="0 -2 0"
+          scale="1 0.7"
+          src="images/arrow.png">
+          </a-image>
+        </a-entity>
+      </a-entity>
+
+    <!--Page 4-->
+      <a-entity id="text_p4"
+      position="6.9 -10 -1.9"
+      scale="0.3 0.3 0.3"
+      rotation="0 -50 0">
+
+      <!--Backplane-->
+        <a-plane
+        opacity="0.3"
+        position="0 0 -0.1"
+        scale="13.5 7"
+        rotation="0 0 0"
+        src="images/backplanes-02.png">
+        </a-plane>
+
+      <!--Text-->
+        <a-entity
+        position="-4 1.5 0"
+        scale="1.9 1.9 1.9">
+
+        <!--Title-->
+          <a-text
+          alpha-test="5"
+          font="fonts/poppins/Poppins-Bold.json"
+          align="left"
+          value="Meet Curiosity"
+          shader="msdf"
+          position="0 0 0"
+          scale="2 2 2">
+          </a-text>
+
+        <!--Verbiage-->
+          <a-text
+          alpha-test="5"
+          font="fonts/raleway/Raleway-Bold.json"
+          align="left"
+          value="Curiosity will serve as the template for the Mars 2020 rover that is expected to launch with a different series of instruments and mission when is launches Summer of 2020."
+          shader="msdf"
+          position=".05 -1.2 0"
+          scale="1 1 1">
+          </a-text>
+        </a-entity>
+
+      <!--Info Navigation-->
+        <a-entity
+        position="-5.2 0 0"
+        render-order="navigation">
+          <a-image
+          event-set__forward="_event: click; _target: #text_p4; position:0 -10 0"
+          event-set__back="_event: click; _target: #text_p3; position: 6.9 2.3 -1.9"
+          position="0 2 0"
+          scale="1 0.7"
+          rotation="0 0 180"
+          src="images/arrow.png">
+          </a-image>
+
+          <a-image
+          opacity="0.3"
+          position="0 -2 0"
+          scale="1 0.7"
+          src="images/arrow.png">
+          </a-image>
+        </a-entity>
+      </a-entity>
+
+    <!--Picture Gallery-->
+      <a-entity
+      id="pictures"
+      render order="arrow"
+      position="-4.2 2.5 0"
+      rotation="0 70 0">
+
+      <!--Backplane-->
+        <a-plane
+        opacity=".3"
+        position="0 -.35 0"
+        scale="3.1 2.8"
+        src="images/backplanes-01.png">
+        </a-plane>
+
+      <!--Image Frame-->
+        <a-plane
+        id="picture"
+        scale="2.8 1.8 1"
+        position="0 0 .01"
+        src="images/curiosity_1.jpg"><!--Remove "_muted" to play video sound FROM ALL-->
+        </a-plane>
+
+      <!--Images-->
+        <a-entity position="0 -1.3 .01" scale="0.96 1 1">
+          <a-plane
+          event-set__="_event: click; _target: #picture; src: images/curiosity_1.jpg"
+          position="-1 0 0"
+          scale=".9 .6 1"
+          src="images/curiosity_1.jpg">
+          </a-plane>
+
+          <a-plane
+          event-set__="_event: click; _target: #picture; src: images/curiosity_2.jpg"
+          position="0 0 0"
+          scale=".9 .6 1"
+          src="images/curiosity_2.jpg"></a-plane><!--Remove "_muted" to play video sound FROM ALL-->
+
+          <a-plane
+          event-set__="_event: click; _target: #picture; src: images/curiosity_3.jpg"
+          position="1 0 0"
+          scale=".9 .6 1"
+          src="images/curiosity_3.jpg">
+          </a-plane>
+        </a-entity>
+      </a-entity>
+
+    <!--Annotations-->
+    <!--Annotation Spheres-->
+      <a-entity
+      position="3 0 -4.5">
+
+    <!--Spheres-->
+      <!--MastCam-->
+        <a-sphere
+        render-order="notes"
+        position="-0.6 2 0.9"
+        scale=".1 .1 .1"
+        opacity=".5"
+        event-set__show="_event: mouseenter; _target: #a-box; visible:true"
+        event-set__show-image="_event: mouseenter; _target: #a-image; src: images/mastcam.png"
+        event-set__show-title="_event: mouseenter; _target: #a-title; value:MastCam"
+        event-set__show-content="_event: mouseenter; _target: #a-content; value:Two cameras that are located on the mast.
+
+- True-color image at 1600x1200 pixels
+- Up to 10fps at 1280x720
+- 8gigs flash memory
+- Focus from 2 meters to infinity">
+        </a-sphere>
+
+      <!--Wheels-->
+        <a-sphere
+        render-order="notes"
+        position="-1.2 .3 1.4"
+        scale=".1 .1 .1"
+        opacity=".5"
+        event-set__show="_event: mouseenter; _target: #a-box; visible:true"
+        event-set__show-image="_event: mouseenter; _target: #a-image; src: images/wheels.png"
+        event-set__show-title="_event: mouseenter; _target: #a-title; value:Metal Wheels"
+        event-set__show-content="_event: mouseenter; _target: #a-content; value:There are holes in Curiosity wheels. There have always been holes -- the rover landed with twelve holes deliberately machined in each wheel to aid in rover navigation.">
+        </a-sphere>
+
+      <!--APXS-->
+        <a-sphere
+        render-order="notes"
+        position="0.3 1.9 2.2"
+        scale=".1 .1 .1"
+        opacity=".5"
+        event-set__show="_event: mouseenter; _target: #a-box; visible:true"
+        event-set__show-image="_event: mouseenter; _target: #a-image; src: images/apxs.png"
+        event-set__show-title="_event: mouseenter; _target: #a-title; value:APXS"
+        event-set__show-content="_event: mouseenter; _target: #a-content; value:Alpha Particle X-Ray Spectrometer: emmits two kinds of radiation used to measure different chemical elements present within rocks.
+
+- Located at end of robotic arm
+- Uses X-Rays and Alpha particles
+- Works in both day and night">
+        </a-sphere>
+      </a-entity>
+
+    <!--annotation box-->
+      <a-entity
+      id="a-box"
+      position=" 2 3.3 -4.4"
+      rotation="0 -15 0"
+      visible="false">
+
+        <a-plane
+        render-order="notes"
+        opacity=".5"
+        scale="3 1.75"
+        src="images/backplanes-01.png">
+        </a-plane>
+
+      <!--Ttle-->
+        <a-text
+        alpha-test="5"
+        id="a-title"
+        font="fonts/raleway/Raleway-Bold.json"
+        color="#fff"
+        value="MastCam"
+        shader="msdf"
+        position="-1.25 .4 0">
+        </a-text>
+
+      <!--Text-->
+        <a-text
+        alpha-test="5"
+        id="a-content"
+        font="fonts/raleway/Raleway-Bold.json"
+        color="#fff"
+        value="Two cameras that are located on the mast.
+
+- True-color image at 1600x1200 pixels
+- Up to 10fps at 1280x720
+- 8gigs flash memory
+- Focus from 2 meters to infinity"
+        shader="msdf"
+        position="-1.23 -.22 0.1"
+        scale="0.5 0.5">
+        </a-text>
+
+      <!--Image-->
+        <a-plane
+        id="a-image"
+        position="2.45"
+        scale="1.75 1.75"
+        src="images/Fmastcam.png">
+        </a-plane>
+
+
+      </a-entity>
+
+      </a-scene>
+    </body>
+  </html>
+</html>

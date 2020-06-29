@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+    <title>Video Mask Maker </title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no,user-scalable=no,maximum-scale=1">
+    
+    <script src="https://aframe.io/releases/1.0.4/aframe.min.js"></script>
+    
+    <!-- <script src="https://npmcdn.com/aframe-animation-component@3.0.1"></script> -->
+    
+    <script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
+    
+    <script src="a-webcam.js"></script>
+    <script src="vid-material.js"></script>
+    
+    <!-- <link href="css/vid-style.css" rel="stylesheet" type="text/css"> -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- <link rel='stylesheet' type='text/css' media='screen' href='css/webcam-demo.css'> -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.debug.js" integrity="sha384-NaWTHo/8YCBYJ59830LTz/P4aQZK1sS0SneOgAvhsIl3zBu8r9RevNg5lHCHAuQ/" crossorigin="anonymous"></script>
+    <script src="//code.jquery.com/jquery-3.3.1.min.js"></script>  
+  
+  </head>
+  
+  <body>
+    <div style="width: 1024px; height: 1024px">
+    <a-scene embedded screenshot="width: 1024; height: 1024" keyboard-shortcuts antialias='true' fog="type: exponential; color: #000; density: .15">
+        <a-camera rotation="0 0 0" position="0 0 1.5"></a-camera>
+      <!-- ASSETS -->
+      <a-assets>
+        <video id="element" src width="1024" height="1024" autoplay="true" webkit-playsinline crossorigin="anonymous"> </video>
+        
+        <a-asset-item id="maskquad" crossorigin="anonymous" src="https://servicemedia.s3.amazonaws.com/assets/models/maskstretch_quad1.glb"></a-asset-item>
+      </a-assets>
+  
+      <a-video id="screen-1"  
+                      material="src:#element; shader: standard;"
+                      gltf-model="#maskquad"
+                      a-webcam
+                      position="0 0 -100" 
+                      rotation="0 0 0"
+                      width="4" height="4">
+      </a-video>
+      
+      
+      <a-entity  a-webcam vid-material="url: "  gltf-model="#maskquad" position="0 0 0" rotation="0 0 180" width='10' height='10'></a-entity>
+     
+    </a-scene>
+</div>
+    <div id="errorMsg" class="col-12 col-md-6 alert-danger d-none">
+        Fail to start camera, please allow permision to access camera. <br/>
+        If you are browsing through social media built in browsers, you would need to open the page in Sarafi (iPhone)/ Chrome (Android)
+        <button id="closeError" class="btn btn-primary ml-3">OK</button>
+    </div>
+    <!-- <div class="md-modal md-effect-12">
+        <div id="app-panel" class="app-panel md-content row p-0 m-0">      -->
+
+            <div id="cameraControls" class="cameraControls">
+                <a href="#" id="exit-app" title="Exit App" class="d-none"><i class="material-icons">exit_to_app</i></a>
+                <a href="#" id="take-photo" title="Take Photo"><i class="material-icons">camera_alt</i></a>
+                <!-- <a href="#" id="download-photo" download="selfie.png" target="_blank" title="Save Photo" class="d-none"><i class="material-icons">file_download</i></a>   -->
+                <a href="#" id="make-pdf" target="_blank" title="Save Photo" class="d-none"><i class="material-icons">file_download</i></a>  
+                <a href="#" id="resume-camera"  title="Resume Camera" class="d-none"><i class="material-icons">camera_front</i></a>
+            </div>
+        <!-- </div>        -->
+        <div id="pdfcontainer"><img id="pdf" src="" height=100% width=auto></div> 
+    </div>
+    <script>
+//      function saveImageToPdf(idOfHtmlElement)
+// {
+//    var fbcanvas = document.getElementById(idOfHtmlElement);
+//    html2canvas($(fbcanvas),
+//         {
+
+//             onrendered: function (canvas) {
+
+//                 var width = canvas.width;
+//                 var height = canvas.height;
+//                 var millimeters = {};
+//                 millimeters.width = Math.floor(width * 0.264583);
+//                 millimeters.height = Math.floor(height * 0.264583);
+
+//                 var imgData = canvas.toDataURL(
+//                     'image/png');
+//                 var doc = new jsPDF("p", "mm", "a4");
+//                 doc.deletePage(1);
+//                 doc.addPage(millimeters.width, millimeters.height);
+//                 doc.addImage(imgData, 'PNG', 0, 0);
+//                 doc.save('WebSiteScreen.pdf');
+//             }
+//         });
+// } 
+     $("#take-photo").click(function () {
+        console.log("tryna take photo!")
+        // document.querySelector('a-scene').components.screenshot.capture('perspective');
+        let thePicture = document.querySelector('a-scene').components.screenshot.getCanvas('perspective');
+        const pdf = new jsPDF({
+            orientation: 'portait',
+            unit: 'in', 
+            format: [612, 612]
+        });
+        // // // const pdf = new jsPDF();
+        // const imgProps= pdf.getImageProperties(thePicture);
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = pdf.internal.pageSize.getHeight();
+        // const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+        // pdf.addImage(thePicture, 'PNG', 0, 0, pdfWidth, pdfHeight);
+
+        // var pdf = new jsPDF("l", "mm", "a4", "portrait");
+        var imgData = thePicture.toDataURL('image/png', 1.0);
+        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+        // // due to lack of documentation; try setting w/h based on unit
+        // pdf.addImage(imgData, 'JPEG', 10, 10, 180, 150);  // 180x150 mm @ (10,10)m
+        pdf.save('download.pdf');
+        // var width = thePicture.width;
+        //         var height = thePicture.height;
+        //         console.log(width + " X " + height)
+        //         var millimeters = {};
+        //         millimeters.width = Math.floor(width * 0.264583);
+        //         millimeters.height = Math.floor(height * 0.264583);
+
+        //         var imgData = thePicture.toDataURL(
+        //             'image/png');
+        //         var doc = new jsPDF("p", "mm", "a4");
+        //         doc.deletePage(1);
+        //         doc.addPage(millimeters.width, millimeters.height);
+        //         doc.addImage(imgData, 'PNG', 0, 0);
+        //         doc.save('WebSiteScreen.pdf');
+
+        });
+        
+      var a_scene = document.querySelector('a-scene');
+          
+      if (a_scene.hasLoaded) {
+        run();
+      } 
+      else {
+          a_scene.addEventListener('loaded', run);
+      }
+      
+      var scene, renderer;
+      
+      function run() {
+        //do stuff after load..
+      }
+
+//       const webcamElement = document.getElementById('webcam');
+
+//         const canvasElement = document.getElementById('canvas');
+
+//         const snapSoundElement = document.getElementById('snapSound');
+
+//         const webcam = new Webcam(webcamElement, 'user', canvasElement, snapSoundElement);
+//         let thePicture = null;
+
+//         $("#webcam-switch").change(function () {
+//             if(this.checked){
+//                 $('.md-modal').addClass('md-show');
+//                 webcam.start()
+//                     .then(result =>{
+//                     cameraStarted();
+//                     console.log("webcam started");
+//                     })
+//                     .catch(err => {
+//                         displayError();
+//                     });
+//             }
+//             else {        
+//                 cameraStopped();
+//                 webcam.stop();
+//                 console.log("webcam stopped");
+//             }        
+//         });
+
+//         $('#cameraFlip').click(function() {
+//             webcam.flip();
+//             webcam.start();  
+//         });
+
+//         $('#closeError').click(function() {
+//             $("#webcam-switch").prop('checked', false).change();
+//         });
+
+//         function displayError(err = ''){
+//             if(err!=''){
+//                 $("#errorMsg").html(err);
+//             }
+//             $("#errorMsg").removeClass("d-none");
+//         }
+
+//         function cameraStarted(){
+//             $("#errorMsg").addClass("d-none");
+//             $('.flash').hide();
+//             $("#webcam-caption").html("on");
+//             $("#webcam-control").removeClass("webcam-off");
+//             $("#webcam-control").addClass("webcam-on");
+//             $(".webcam-container").removeClass("d-none");
+//             if( webcam.webcamList.length > 1){
+//                 $("#cameraFlip").removeClass('d-none');
+//             }
+//             $("#wpfront-scroll-top-container").addClass("d-none");
+//             window.scrollTo(0, 0); 
+//             $('body').css('overflow-y','hidden');
+//         }
+
+//         function cameraStopped(){
+//             $("#errorMsg").addClass("d-none");
+//             $("#wpfront-scroll-top-container").removeClass("d-none");
+//             $("#webcam-control").removeClass("webcam-on");
+//             $("#webcam-control").addClass("webcam-off");
+//             $("#cameraFlip").addClass('d-none');
+//             $(".webcam-container").addClass("d-none");
+//             $("#webcam-caption").html("Click to Start Camera");
+//             $('.md-modal').removeClass('md-show');
+//         }
+
+//         $("#make-pdf").click(function () {
+//             console.log("download pic " + thePicture);
+//             // let image = document.getElementById("pdf");
+//             // image.src = thePicture;
+//             // image.id = "pdf";
+//             // console.log("img " + image);
+//             // pdfFromHTML();
+//             const pdf = new jsPDF({
+//                 orientation: 'landscape',
+//             });
+//             const imgProps= pdf.getImageProperties(thePicture);
+//                 const pdfWidth = pdf.internal.pageSize.getWidth();
+//                 const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+//                 pdf.addImage(thePicture, 'PNG', 0, 0, pdfWidth, pdfHeight);
+//                 pdf.save('download.pdf');
+//         }); 
+        // $("#take-photo").click(function () {
+        //     console.log("tryna take photo!")
+        //     beforeTakePhoto();
+        //     let picture = webcam.snap();
+        //     thePicture = picture;
+        //     console.log("this piciture " + picture);
+        //     // document.querySelector('#download-photo').href = picture;
+        //     // pdfFromHTML();
+        //     afterTakePhoto();
+        // });
+
+
+//         function beforeTakePhoto(){
+//             $('.flash')
+//                 .show() 
+//                 .animate({opacity: 0.3}, 500) 
+//                 .fadeOut(500)
+//                 .css({'opacity': 0.7});
+//             window.scrollTo(0, 0); 
+//             $('#webcam-control').addClass('d-none');
+//     $('#cameraControls').addClass('d-none');
+// }
+
+// function afterTakePhoto(){
+//     webcam.stop();
+//     $('#canvas').removeClass('d-none');
+//     $('#take-photo').addClass('d-none');
+//     $('#exit-app').removeClass('d-none');
+//     $('#download-photo').removeClass('d-none');
+//     $('#make-pdf').removeClass('d-none');
+//     $('#resume-camera').removeClass('d-none');
+//     $('#cameraControls').removeClass('d-none');
+// }
+
+// function removeCapture(){
+//     $('#canvas').addClass('d-none');
+//     $('#webcam-control').removeClass('d-none');
+//     $('#cameraControls').removeClass('d-none');
+//     $('#take-photo').removeClass('d-none');
+//     $('#make-pdf').addClass('d-none');
+//     $('#exit-app').addClass('d-none');
+//     $('#download-photo').addClass('d-none');
+//     $('#resume-camera').addClass('d-none');
+// }
+
+// $("#resume-camera").click(function () {
+//     webcam.stream()
+//         .then(facingMode =>{
+//             removeCapture();
+//         });
+// });
+
+// $("#exit-app").click(function () {
+//     removeCapture();
+//     $("#webcam-switch").prop("checked", false).change();
+// });
+    </script>
+  </body>
+</html>
