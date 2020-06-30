@@ -1,0 +1,13 @@
+.idea
+.env
+.ebextensions
+conf
+marmelade.js
+node_modules
+bu
+font
+bower_components
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml
