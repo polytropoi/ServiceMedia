@@ -1,5 +1,4 @@
 .idea
-.env
 .ebextensions
 conf
 marmelade.js

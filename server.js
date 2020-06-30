@@ -12933,7 +12933,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                         "<meta property='og:description' content='" + sceneResponse.sceneDescription + "' /> " +
                         "<title>" + sceneResponse.sceneTitle + "</title>" +
                         "<meta name='description' content='" + sceneResponse.sceneDescription + "'/>" +
-                        "<meta name=\x22monetization\x22 content=\x22$ilp.uphold.com/EMJQj4qKRxdF\x22>" +
+                        "<meta name=\x22monetization\x22 content=\x22"+process.env.COIL_PAYMENT_POINTER+"\x22>" +
                         "<meta name=\x22mobile-web-app-capable\x22 content=\x22yes\x22>" +
                         "<meta name=\x22apple-mobile-web-app-capable\x22 content=\x22yes\x22>" +
                             "<style>\n" +
@@ -13032,7 +13032,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                             "<meta property='og:description' content='" + sceneResponse.sceneDescription + "' /> " +
                             "<title>" + sceneResponse.sceneTitle + "</title>" +
                             "<meta name='description' content='" + sceneResponse.sceneDescription + "'/>" +
-                            "<meta name=\x22monetization\x22 content=\x22$ilp.uphold.com/EMJQj4qKRxdF\x22>" +
+                            "<meta name=\x22monetization\x22 content=\x22"+process.env.COIL_PAYMENT_POINTER+"\x22>" +
                             "<meta name=\x22mobile-web-app-capable\x22 content=\x22yes\x22>" +
                             "<meta name=\x22apple-mobile-web-app-capable\x22 content=\x22yes\x22>" +
                                 "<script src=\x22/dash/src/util/face/jeelizFaceFilter.js\x22></script>\n" +
@@ -13176,7 +13176,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                 "<meta property='og:description' content='" + sceneResponse.sceneDescription + "' /> \n" +
                                 "<title>" + sceneResponse.sceneTitle + "</title>\n" +
                                 "<meta name='description' content='" + sceneResponse.sceneDescription + "'/>\n" +
-                                "<meta name=\x22monetization\x22 content=\x22$ilp.uphold.com/EMJQj4qKRxdF\x22>\n" +
+                                "<meta name=\x22monetization\x22 content=\x22"+process.env.COIL_PAYMENT_POINTER+"\x22>" +
                                 "<meta name=\x22mobile-web-app-capable\x22 content=\x22yes\x22>\n" +
                                 "<meta name=\x22apple-mobile-web-app-capable\x22 content=\x22yes\x22>\n" +    
                                 // "<script src=\x22/three/three.js\x22></script>\n" +
@@ -13475,7 +13475,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                         "<meta property='og:description' content='" + sceneResponse.sceneDescription + "' /> " +
                         "<title>" + sceneResponse.sceneTitle + "</title>" +
                         "<meta name='description' content='" + sceneResponse.sceneDescription + "'/>" +
-                        "<meta name=\x22monetization\x22 content=\x22$ilp.uphold.com/EMJQj4qKRxdF\x22>" +
+                        "<meta name=\x22monetization\x22 content=\x22"+process.env.COIL_PAYMENT_POINTER+"\x22>" +
                         "<meta name=\x22mobile-web-app-capable\x22 content=\x22yes\x22>" +
                         "<meta name=\x22apple-mobile-web-app-capable\x22 content=\x22yes\x22>" +
                         "<link href=\x22../dash/vendor/fontawesome-free/css/all.css\x22 rel=\x22stylesheet\x22 type=\x22text/css\x22>" +
