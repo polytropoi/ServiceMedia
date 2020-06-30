@@ -11337,9 +11337,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
     let pictureGroupsEntity = "";
     let loadPictureGroups = "";
     let availableScenesInclude = "";
-    let googleAnalytics = "<!-- Global site tag (gtag.js) - Google Analytics --><script async src=\x22https://www.googletagmanager.com/gtag/js?id=UA-163893846-1\x22></script>"+
-        "<script>window.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());gtag('config', 'UA-163893846-1');"+
-        "</script>";
+    let googleAnalytics = "";
     let sceneData = "";
 
     db.scenes.findOne({"short_id": reqstring}, function (err, sceneData) { 
