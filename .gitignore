@@ -10,3 +10,4 @@ bower_components
 .elasticbeanstalk/*
 !.elasticbeanstalk/*.cfg.yml
 !.elasticbeanstalk/*.global.yml
+package-lock.json
