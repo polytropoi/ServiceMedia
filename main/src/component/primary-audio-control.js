@@ -43,9 +43,10 @@ var getJSON = function(url, callback) { //netradio details
         AFRAME.registerComponent('primary-audio-control', { //register for streaming
             schema: {
                 color: {default: 'red'},
-                url: {default: ''},
+                oggurl: {default: ''},
+                mp3url: {default: ''},
                 title: {default: ''},
-        attachedToTarget: {default: false},
+        targetattach: {default: false},
         autoplay: {default: false}
             },
             
@@ -196,7 +197,7 @@ var getJSON = function(url, callback) { //netradio details
         color: {default: 'red'},
         url: {default: ''},
         title: {default: ''},
-        attachedToTarget: {default: false},
+        targetattach: {default: false},
         autoplay: {default: false}
         },
 
@@ -235,13 +236,15 @@ var getJSON = function(url, callback) { //netradio details
             primaryAudioHowl.fade(0, 1, 1000);
             primaryAudioHowl.pos(this.el.object3D.position.x, this.el.object3D.position.y, this.el.object3D.position.z);
 
-            el.addEventListener('attachToTarget', function (event) {
-                console.log("hey gotsa attach to target message" + event.detail.targetEntity);
-                let audioElPosition = event.detail.targetEntity.getAttribute('position');
-                console.log("position of audioElement: " + JSON.stringify(audioElPosition));
-                primaryAudioHowl.pos(audioElPosition.x, audioElPosition.y, audioElPosition.z);
-                primaryAudioParent.setAttribute('position', audioElPosition);
-            });
+            if (data.targetattach) {
+                el.addEventListener('targetattach', function (event) {
+                    console.log("hey gotsa attach to target message" + event.detail.targetEntity);
+                    let audioElPosition = event.detail.targetEntity.getAttribute('position');
+                    console.log("position of audioElement: " + JSON.stringify(audioElPosition));
+                    primaryAudioHowl.pos(audioElPosition.x, audioElPosition.y, audioElPosition.z);
+                    primaryAudioParent.setAttribute('position', audioElPosition);
+                });
+            }
             // primaryAudioHowl.pos(audioElPosition.x, audioElPosition.y, audioElPosition.z);
             if (data.autoplay) {    
                 primaryAudioHowl.play();

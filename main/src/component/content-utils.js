@@ -98,16 +98,44 @@ AFRAME.registerComponent('play-on-vrdisplayactivate-or-enter-vr', { //play video
 AFRAME.registerComponent('main-text-control', {
     schema: {
         mainTextString: {default: ''},
-        mode: {default: "split"}
+        mode: {default: ""}
       },
       init: function () {
+        let textArray = [];
         let index = 0;  
         let nextButton = document.getElementById("nextMainText");
         let previousButton = document.getElementById("previousMainText");
         let mainTextHeader = document.getElementById("mainTextHeader");
-        if (this.data.mainTextString != undefined) {       
-            let textArray = this.data.mainTextString.split("~"); //TODO scroll and autopaginate
+        if (this.data.mainTextString != undefined) {
             
+            if (this.data.mode == "Paged" && this.data.mainTextString.length > 400) { //pagination!
+              // console.log(this.data.mainTextString);
+              let indexes = [];  //array for split indexes;
+              let lastIndex = 0;
+              let wordSplit = this.data.mainTextString.split(" ");
+              for (let i = 0; i < this.data.mainTextString.length - 1; i++) {
+                if (i == 400 + lastIndex) {
+                  lastIndex = this.data.mainTextString.indexOf(' ', i); //get closest space to char count
+                  indexes.push(lastIndex);
+                }
+              }
+              for (let s = 0; s < indexes.length; s++) {
+                if (s == 0) {
+                  textArray.push(this.data.mainTextString.substring(0, indexes[s]));
+                  
+                } else {
+                let chunk = this.data.mainTextString.substring(indexes[s], indexes[s+1]);
+                console.log("tryna push chunck: " + chunk);
+                textArray.push(chunk);
+                }
+              }
+            // }
+
+            } else { //if mode == "split"
+              textArray = this.data.mainTextString.split("~"); //TODO scroll
+            }      
+            
+            // console.log(JSON.stringify(textArray));
 
             
             this.textArray = textArray;
@@ -473,7 +501,7 @@ AFRAME.registerComponent('available-scenes-control', {
     init: function () {
       
       scenesArray = this.data.jsonData.availableScenes; 
-      console.log(JSON.stringify(scenesArray));
+      // console.log(JSON.stringify(scenesArray));
       let availableScenePicEl = document.getElementById("availableScenePic");
       let nextButton = document.getElementById("availableScenesNextButton");
       let previousButton = document.getElementById("availableScenesPreviousButton");
@@ -856,7 +884,7 @@ AFRAME.registerComponent('mod-model', {
         if (primaryAudioControlParams.targetattach) { //set by sceneAttachPrimaryAudioToTarget or something like that...
           document.getElementById("primaryAudioParent").setAttribute("visible", false);
           // document.getElementById("primaryAudioParent").setAttribute("position", theEl.position);
-          primaryAudio.emit('attachToTarget', {targetEntity: this.el}, true);
+          primaryAudio.emit('targetattach', {targetEntity: this.el}, true);
           primaryAudioHowl.pos(this.el.object3D.position.x, this.el.object3D.position.y, this.el.object3D.position.z);
           
           this.el.addEventListener('mousedown', function () {

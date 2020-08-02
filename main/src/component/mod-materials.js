@@ -35,6 +35,37 @@ AFRAME.registerComponent('mod-materials', {
       }
     }
   });
+  AFRAME.registerComponent('weblink-materials', {
+    schema: {
+      // url: {default: ''},
+      index: {default: ''}
+      },
+      init: function () {
+        let data = this.data;
+        if (data.index != null) {
+        this.el.addEventListener('model-loaded', () => {
+          // Grab the mesh / scene.
+          const obj = this.el.getObject3D('mesh');
+          const ref = document.querySelector("#wlimage"+data.index);
+          console.log("tryna set texture..." + ref.src);
+  
+          var texture = new THREE.TextureLoader().load(ref.src);
+          texture.encoding = THREE.sRGBEncoding; 
+          // UVs use the convention that (0, 0) corresponds to the upper left corner of a texture.
+          texture.flipY = false; 
+          // immediately use the texture for material creation
+          var material = new THREE.MeshBasicMaterial( { map: texture } ); 
+          // Go over the submeshes and modify materials we want.
+          obj.traverse(node => {
+          //   if (node.name.indexOf('ship') !== -1) {
+              // node.material.color.set('red');
+              node.material = material;
+            //   }
+            });
+          });
+        }
+      }
+    });
   AFRAME.registerComponent('vid-materials', {
     schema: {
       url: {default: ''},

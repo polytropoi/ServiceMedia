@@ -1,4 +1,4 @@
-// copyright servicemedia.net 2020 
+// copyright servicemedia.net 2020 all rights reserved
 
     // 1. amirite checks authentication and pops some UI
     // 2. bigSwitch does "routing" and calls "controller" functions
@@ -17,7 +17,6 @@
     var username = "";
     var auth = "";
     var apps = {};
-    var googleMapKey = "MyGoogleMapKey";
     amirite();
     function amirite () {
         if (cookie != null && cookie._id != null) {
@@ -354,6 +353,9 @@
         }
         return kvString;
     }
+    function round2(value) {
+        return Number(Math.round(value+'e'+2)+'e-'+2);
+    }   
     function returnHtmlEmbed() {
         let foo = "foo";
         let embeddedHTML = "<div class=\x22screen dark main\x22>" +                
@@ -1931,7 +1933,7 @@
                         console.log('More or less ' + crd.accuracy + ' meters.');
                         let mapLink = "<a target=\x22_blank\x22 href=\x22http://maps.google.com?q=" + crd.latitude + "," + crd.longitude + "\x22>" +
                         "<img class=\x22img-thumbnail\x22 style=\x22width: 300px;\x22 src=\x22https://maps.googleapis.com/maps/api/staticmap?center=" + crd.latitude +
-                        "," + crd.longitude + "&zoom=15&size=600x400&maptype=roadmap&key="+googleMapKey+"&markers=color:blue%7Clabel:%7C" + crd.latitude + "," + crd.longitude + "\x22>" + 
+                        "," + crd.longitude + "&zoom=15&size=600x400&maptype=roadmap&key=AIzaSyCBlNNHgDBmv-vusmuvG3ylf0XjGoMkkCo&markers=color:blue%7Clabel:%7C" + crd.latitude + "," + crd.longitude + "\x22>" + 
                         "</a>";
                         $("#mapElement").html(mapLink);
                     };
@@ -2032,7 +2034,7 @@
             if (type == "geographic") {
                 mapLink = "<a target=\x22_blank\x22 href=\x22http://maps.google.com?q=" + response.data.latitude + "," + response.data.longitude + "\x22>" +
                 "<img class=\x22img-thumbnail\x22 style=\x22width: 300px;\x22 src=\x22https://maps.googleapis.com/maps/api/staticmap?center=" + response.data.latitude +
-                "," + response.data.longitude + "&zoom=15&size=600x400&maptype=roadmap&key="+googleMapKey+"&markers=color:blue%7Clabel:%7C" + response.data.latitude + "," + response.data.longitude + "\x22>" + 
+                "," + response.data.longitude + "&zoom=15&size=600x400&maptype=roadmap&key=AIzaSyCBlNNHgDBmv-vusmuvG3ylf0XjGoMkkCo&markers=color:blue%7Clabel:%7C" + response.data.latitude + "," + response.data.longitude + "\x22>" + 
                 "</a>";
             }
             var card = "<div class=\x22col-lg-12\x22>" +
@@ -2278,7 +2280,7 @@
                     }
                     if (arr[i].type.toLowerCase() == "geographic") {
                         locationMap = "<a target=\x22_blank\x22 href=\x22http://maps.google.com?q=" + arr[i].latitude + "," + arr[i].longitude + "\x22>" +
-                        "<img class=\x22img-thumbnail\x22 style=\x22width: 300px;\x22 src=\x22https://maps.googleapis.com/maps/api/staticmap?center=" + arr[i].latitude + "," + arr[i].longitude + "&zoom=15&size=600x300&maptype=roadmap&key="+googleMapKey+"&markers=color:blue%7Clabel:" + (i + 1) + "%7C" + location.latitude + "," + location.longitude + "\x22>" + 
+                        "<img class=\x22img-thumbnail\x22 style=\x22width: 300px;\x22 src=\x22https://maps.googleapis.com/maps/api/staticmap?center=" + arr[i].latitude + "," + arr[i].longitude + "&zoom=15&size=600x300&maptype=roadmap&key=AIzaSyCBlNNHgDBmv-vusmuvG3ylf0XjGoMkkCo&markers=color:blue%7Clabel:" + (i + 1) + "%7C" + location.latitude + "," + location.longitude + "\x22>" + 
                         "</a>";
                         location = "lat: " + arr[i].latitude + "<br>lon: " + arr[i].longitude;
                     } else {
@@ -2894,15 +2896,15 @@
                         selectButton = "<td><button type=\x22button\x22 class=\x22btn btn-primary btn-sm\x22 onclick=\x22selectItem('" + parent + "','audio','" + itemid + "','" + arr[i]._id + "')\x22>Select</button></td>";
                         hideIndex = 4;
                     }  
-                    if (mode == "paudio") {
+                    if (mode == "paudio") { //select primary audio
                         selectButton = "<td><button type=\x22button\x22 class=\x22btn btn-primary btn-sm\x22 onclick=\x22selectItem('" + parent + "','paudio','" + itemid + "','" + arr[i]._id + "')\x22>Select</button></td>";
                         hideIndex = 4;
                     }  
-                    if (mode == "aaudio") {
+                    if (mode == "aaudio") {//select ambient audio
                         selectButton = "<td><button type=\x22button\x22 class=\x22btn btn-primary btn-sm\x22 onclick=\x22selectItem('" + parent + "','aaudio','" + itemid + "','" + arr[i]._id + "')\x22>Select</button></td>";
                         hideIndex = 4;
                     }  
-                    if (mode == "taudio") {
+                    if (mode == "taudio") {//select trigger audio
                         selectButton = "<td><button type=\x22button\x22 class=\x22btn btn-primary btn-sm\x22 onclick=\x22selectItem('" + parent + "','taudio','" + itemid + "','" + arr[i]._id + "')\x22>Select</button></td>";
                         hideIndex = 4;
                     }  
@@ -3973,6 +3975,7 @@
                     "<th>Name</th>"+
                     "<th>Date</th>"+
                     "<th>HiddenDate</th>"+
+                    "<th>Type</th>"+
                     "<th>Tags</th>"+
                     "<th>Status</th>"+
                 "</tr>"+
@@ -3981,6 +3984,7 @@
                 var tableBody = "";
                 var selectButton = "";
                 let hideIndex  = 3;
+                
                 for(var i = 0; i < arr.length; i++) {
                     let title = "";
                     if (arr[i].title != null && arr[i].title != undefined && arr[i].title.length > 0) {
@@ -4014,6 +4018,7 @@
                     "<td>" + detailsLink + "</td>" +
                     "<td>" + convertTimestamp(timestamp) + "</td>" +
                     "<td>" + timestamp + "</td>" +
+                    "<td>" + arr[i].orientation + "</td>" +
                     "<td>" + arr[i].tags + "</td>" +
                     "<td>" + isPublic + "</td>" +
                     "</tr>";
@@ -4026,6 +4031,7 @@
                     "<th>Name</th>"+
                     "<th>Date</th>"+
                     "<th>HiddenDate</th>"+
+                    "<th>Type</th>"+
                     "<th>Tags</th>"+
                     "<th>Status</th>"+
                     "</tr>" +
@@ -4301,11 +4307,12 @@
             // var jsonResponse = response.data;
             var selectHeader = "";
             var arr = response.data;
-         
+            let hideIndex = 2;
             if (mode == "select") {
                 selectFor = parent;
                 selectHeader = "<th>Select</th>";
                 $("#pageTitle").html("Select Model for " + parent + " " + itemid);
+                hideIndex = 3;
             }
             var tableHead = "<table id=\x22dataTable1\x22 class=\x22display table table-striped table-bordered\x22 style=\x22width:100%\x22>" +
                 "<thead>"+
@@ -4357,7 +4364,7 @@
                 "<td>" + convertTimestamp(timestamp) + "</td>" +
                 "<td>" + timestamp + "</td>" +
                 "<td>" + arr[i].item_type + "</td>" +
-                "<td>" + filesize/10000 + " mb</td>" +
+                "<td>" + round2(filesize/1000000) + " mb</td>" +
                 "<td>" + arr[i].tags + "</td>" +
                 "<td>" + arr[i].username + "</td>" +
                 "</tr>";
@@ -4380,11 +4387,11 @@
             var resultElement = document.getElementById('table1Data');
             resultElement.innerHTML = tableHead + tableBody + tableFoot;
             $('#dataTable1').DataTable(
-                {"order": [[ 2, "desc" ]],
+                {"order": [[ hideIndex, "desc" ]],
                 'columnDefs': [
-                    { 'orderData':[2], 'targets': [1] },
+                    { 'orderData':[hideIndex], 'targets': [2] },
                     {
-                        'targets': [2],
+                        'targets': [hideIndex],
                         'visible': false,
                         'searchable': false
                     },
@@ -5881,10 +5888,10 @@ function showGroup() {
                     hasItem = true;
                     let mapSrc = "";
                     if (arr[i].type.toLowerCase() == "geographic") {
-                        mapSrc = "https://maps.googleapis.com/maps/api/staticmap?center=" + arr[i].latitude + "," + arr[i].longitude + "&zoom=15&size=600x300&maptype=roadmap&key="+googleMapKey+"&markers=color:blue%7Clabel:" + (i + 1) + "%7C" + arr[i].latitude + "," + arr[i].longitude;
+                        mapSrc = "https://maps.googleapis.com/maps/api/staticmap?center=" + arr[i].latitude + "," + arr[i].longitude + "&zoom=15&size=600x300&maptype=roadmap&key=AIzaSyCBlNNHgDBmv-vusmuvG3ylf0XjGoMkkCo&markers=color:blue%7Clabel:" + (i + 1) + "%7C" + arr[i].latitude + "," + arr[i].longitude;
                         detailsPicLink = "<a target=\x22_blank\x22 href=\x22http://maps.google.com?q=" + arr[i].latitude + "," + arr[i].longitude + "\x22>" +
                         "<img class=\x22img-thumbnail\x22 style=\x22width: 300px;\x22 src=\x22https://maps.googleapis.com/maps/api/staticmap?center=" + arr[i].latitude + "," + arr[i].longitude + 
-                        "&zoom=15&size=600x300&maptype=roadmap&key="+googleMapKey+"&markers=color:blue%7Clabel:" + (i + 1) + "%7C" + arr[i].latitude + "," + arr[i].longitude + "\x22>" + 
+                        "&zoom=15&size=600x300&maptype=roadmap&key=AIzaSyCBlNNHgDBmv-vusmuvG3ylf0XjGoMkkCo&markers=color:blue%7Clabel:" + (i + 1) + "%7C" + arr[i].latitude + "," + arr[i].longitude + "\x22>" + 
                         "</a>";
                         location = "latitude: " + arr[i].latitude + "<br>latitude: " + arr[i].longitude;
                     } else {
@@ -8058,6 +8065,8 @@ function showGroup() {
             let sceneModelz = (response.data.sceneModelz != undefined && response.data.sceneModelz != null) ? response.data.sceneModelz : ""; //munged on server for request
             let sceneModels = (response.data.sceneModels != undefined && response.data.sceneModels != null) ? response.data.sceneModels : ""; //IDs only, add/remove to update
             let sceneLocationGroups = (response.data.sceneLocationGroups != undefined && response.data.sceneLocationGroups != null) ? response.data.sceneLocationGroups : "";
+            let sceneWebLinks = (response.data.sceneWebLinks != undefined && response.data.sceneWebLinks != null) ? response.data.sceneWebLinks : []; 
+            let weblinx = (response.data.weblinx != undefined && response.data.weblinx != null) ? response.data.weblinx : []; 
             let picGroupButtons = "";
             let vidGroupButtons = "";
             let objGroupButtons = "";
@@ -8136,6 +8145,45 @@ function showGroup() {
                         "<a role=\x22button\x22 class=\x22badge badge-xs badge-info float-left\x22 href=\x22index.html?type=picture&iid="+pictures[i]._id+"\x22>^</a>" +
                         "<button type=\x22button\x22 class=\x22remScenePic badge badge-xs badge-danger float-right\x22 id=\x22" + pictures[i]._id + "\x22>X</button>" +
                         "<br><br><br><span class=\x22badge badge-pill badge-light float-left\x22>"+orientation+"</span>" +
+                        "</div>" +
+                    "</div>";
+                    }
+                }                
+            let sceneWeblinkPics = "";    
+                if (weblinx != null && weblinx != undefined && weblinx.length > 0 ) {
+                // console.log("tryna fetch pics " + JSON.stringify(response.data.pictures));
+                // if (sceneResponse.sceneWebLinks != null && sceneResponse.sceneWebLinks.length > 0) {
+                //     let weblinx = [];
+                //     for (var i = 0; i < sceneResponse.sceneWebLinks.length; i++) {
+
+                //         db.weblinks.findOne({'_id': ObjectID(sceneResponse.sceneWebLinks[i])}, function (err, weblink) {
+                //             if (err || !weblink) {
+                //                 console.log("can't find weblink");
+                //             } else {
+                //                 let link = {};
+                //                 var urlThumb = s3.getSignedUrl('getObject', {Bucket: 'servicemedia.web', Key: sceneResponse.sceneWebLinks[i] +"/"+ sceneResponse.sceneWebLinks[i] + ".thumb.jpg", Expires: 6000});
+                //                 var urlHalf = s3.getSignedUrl('getObject', {Bucket: 'servicemedia.web', Key: sceneResponse.sceneWebLinks[i] +"/"+ sceneResponse.sceneWebLinks[i] + ".half.jpg", Expires: 6000});
+                //                 var urlStandard = s3.getSignedUrl('getObject', {Bucket: 'servicemedia.web', Key: sceneResponse.sceneWebLinks[i] +"/"+ sceneResponse.sceneWebLinks[i] + ".standard.jpg", Expires: 6000});
+                //                 link.urlThumb = urlThumb;
+                //                 link.urlHalf = urlHalf;
+                //                 link.urlStandard = urlStandard;
+                //                 link.link_url;
+                //                 weblinx.push(link);
+                //             }
+                //         });
+                //     }
+                //     sceneResponse.weblinx = weblinx;
+                // }
+                for (let i = 0; i < weblinx.length; i++) {
+                    console.log(JSON.stringify(weblinx[i]));
+                    sceneWeblinkPics = sceneWeblinkPics +
+                    "<div class=\x22card\x22 style=\x22width:128px;\x22>" +
+                        "<img class=\x22card-img-top\x22 src=\x22" + weblinx[i].urlHalf + "\x22 alt=\x22Card image cap\x22>" +
+                        "<div class=\x22card-img-overlay\x22>" +
+                        // "<a role=\x22button\x22 class=\x22badge badge-xs badge-info float-left\x22 href=\x22"+weblinx[i].link_url+"\x22>^</a>" +
+                        "<button type=\x22button\x22 class=\x22refWeblink badge badge-xs badge-info float-left\x22 id=\x22" + weblinx[i]._id + "\x22>^</button>" +
+                        "<button type=\x22button\x22 class=\x22remWeblink badge badge-xs badge-danger float-right\x22 id=\x22" + weblinx[i]._id + "\x22>X</button>" +
+                        "<br><br><br><span class=\x22badge badge-pill badge-light float-left\x22><a href=\x22"+weblinx[i].link_url+"\x22>"+weblinx[i].link_title+"</a></span>" +
                         "</div>" +
                     "</div>";
                     }
@@ -8243,7 +8291,7 @@ function showGroup() {
                     if (sceneLocations[i].type != undefined && sceneLocations[i].type.toLowerCase() == "geographic") {
                         locationMap = "<a target=\x22_blank\x22 href=\x22http://maps.google.com?q=" + sceneLocations[i].latitude + "," + sceneLocations[i].longitude + "\x22>" +
                         "<img class=\x22img-thumbnail\x22 style=\x22width: 300px;\x22 src=\x22https://maps.googleapis.com/maps/api/staticmap?center=" + sceneLocations[i].latitude + "," + sceneLocations[i].longitude + 
-                        "&zoom=15&size=600x300&maptype=roadmap&key="+googleMapKey+"&markers=color:blue%7Clabel:" + (i + 1) + "%7C" + sceneLocations[i].latitude + "," + sceneLocations[i].longitude + "\x22>" + 
+                        "&zoom=15&size=600x300&maptype=roadmap&key=AIzaSyCBlNNHgDBmv-vusmuvG3ylf0XjGoMkkCo&markers=color:blue%7Clabel:" + (i + 1) + "%7C" + sceneLocations[i].latitude + "," + sceneLocations[i].longitude + "\x22>" + 
                         "</a>" + 
                         "<br><br><button type=\x22button\x22 class=\x22remSceneLocation btn btn-xs btn-danger float-left\x22 id=\x22" + i + "\x22>Remove</button>";
 
@@ -9315,7 +9363,7 @@ function showGroup() {
                             "<div class=\x22form-row\x22>" +
                                 "<div class=\x22col form-group col-md-5\x22>" +
                                     "<label for=\x22webLinkTitle\x22>Title</label>" + 
-                                    "<input type=\x22text\x22 class=\x22form-control\x22 id=\webLinkTitle\x22 placeholder=\x22Web Link Title\x22 >" +
+                                    "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22webLinkTitle\x22 placeholder=\x22Web Link Title\x22 >" +
                                 "</div>" +
                                 "<div class=\x22col form-group col-md-5\x22>" +
                                     "<label for=\x22webLinkURL\x22>URL</label>" + 
@@ -9323,10 +9371,13 @@ function showGroup() {
                                     
                                 "</div>" +
                                 "<div class=\x22col form-group col-md-1\x22>" +
-                                    "<div class=\x22scrapeWeblink float-right\x22><button class=\x22btn btn-sm btn-info\x22>Scrape</button></div>" +
+                                    // "<div class=\x22scrapeWeblink float-right\x22><button class=\x22btn btn-sm btn-info\x22>Scrape</button></div>" +
                                     "<div class=\x22scrapeWeblink float-right\x22><button class=\x22btn btn-sm btn-primary\x22>Add</button></div>" +
                                 "</div>" +
                             "</div>" + 
+                            "<div class=\x22form-row\x22>" +
+                                sceneWeblinkPics +
+                            "</div>" +
                             "<hr/>" +
                 "</div>" +
                             "<button id=\x22colorsSectionButton\x22 class=\x22btn btn-sm btn-primary btn-circle btn-light float-left\x22><i class=\x22fas fa-plus-circle\x22></i> </button>" +
@@ -9369,11 +9420,11 @@ function showGroup() {
                             "<div class=\x22form-row\x22>" +
                                
                                 "<div class=\x22col form-group col-md-2\x22>" +
-                                    "<div class=\x22\x22><label for=\x22sceneUseDynamicSky\x22>Use Dynamic Sky</label><br>" +
+                                    "<div class=\x22\x22><label for=\x22sceneUseDynamicSky\x22>Dynamic Sky</label><br>" +
                                     "<input class=\x22\x22 type=\x22checkbox\x22  id=\x22sceneUseDynamicSky\x22 data-toggle=\x22toggle\x22 data-size=\x22sm\x22 data-on=\x22<i class='fas fa-check'></i>\x22 data-off=\x22<i class='fas fa-times'></i>\x22 data-onstyle=\x22success\x22 data-offstyle=\x22danger\x22></div>" +
                                 "</div>" +  
                                 "<div class=\x22col form-group col-md-2\x22>" +
-                                    "<div class=\x22\x22><label for=\x22sceneUseDynamicShadows\x22>Use Dynamic Shadows</label><br>" +
+                                    "<div class=\x22\x22><label for=\x22sceneUseDynamicShadows\x22>Dynamic Shadows</label><br>" +
                                     "<input class=\x22\x22 type=\x22checkbox\x22  id=\x22sceneUseDynamicShadows\x22 data-toggle=\x22toggle\x22 data-size=\x22sm\x22 data-on=\x22<i class='fas fa-check'></i>\x22 data-off=\x22<i class='fas fa-times'></i>\x22 data-onstyle=\x22success\x22 data-offstyle=\x22danger\x22></div>" +
                                 "</div>" +  
                                 "<div class=\x22col form-group col-md-2\x22>" +
@@ -9453,14 +9504,18 @@ function showGroup() {
                                 "</div>" + 
                             "</div>" +
                             "<div class=\x22form-row\x22>" +   
+                            "<div class=\x22col form-group col-md-1\x22>" +
+                                    "<div class=\x22\x22><label for=\x22sceneUseDynCubeMap\x22>CubeMap Relections</label><br>" +
+                                    "<input class=\x22\x22 type=\x22checkbox\x22  id=\x22sceneUseDynCubeMap\x22 data-toggle=\x22toggle\x22 data-size=\x22sm\x22 data-on=\x22<i class='fas fa-check'></i>\x22 data-off=\x22<i class='fas fa-times'></i>\x22 data-onstyle=\x22success\x22 data-offstyle=\x22danger\x22></div>" +
+                                "</div>" + 
                                 "<div class=\x22col form-group col-md-2\x22>" +
                                     "<div class=\x22\x22><label for=\x22sceneUseSceneFog\x22>Scene Fog</label><br>" +
                                     "<input class=\x22\x22 type=\x22checkbox\x22  id=\x22sceneUseSceneFog\x22 data-toggle=\x22toggle\x22 data-size=\x22sm\x22 data-on=\x22<i class='fas fa-check'></i>\x22 data-off=\x22<i class='fas fa-times'></i>\x22 data-onstyle=\x22success\x22 data-offstyle=\x22danger\x22></div>" +
                                 "</div>" +  
-                                "<div class=\x22col form-group col-md-2\x22>" +
-                                    "<div class=\x22\x22><label for=\x22sceneUseGlobalFog\x22>Global Fog</label><br>" +
-                                    "<input class=\x22\x22 type=\x22checkbox\x22  id=\x22sceneUseGlobalFog\x22 data-toggle=\x22toggle\x22 data-size=\x22sm\x22 data-on=\x22<i class='fas fa-check'></i>\x22 data-off=\x22<i class='fas fa-times'></i>\x22 data-onstyle=\x22success\x22 data-offstyle=\x22danger\x22></div>" +
-                                "</div>" +  
+                                // "<div class=\x22col form-group col-md-2\x22>" +
+                                //     "<div class=\x22\x22><label for=\x22sceneUseGlobalFog\x22>Global Fog</label><br>" +
+                                //     "<input class=\x22\x22 type=\x22checkbox\x22  id=\x22sceneUseGlobalFog\x22 data-toggle=\x22toggle\x22 data-size=\x22sm\x22 data-on=\x22<i class='fas fa-check'></i>\x22 data-off=\x22<i class='fas fa-times'></i>\x22 data-onstyle=\x22success\x22 data-offstyle=\x22danger\x22></div>" +
+                                // "</div>" +  
                                 "<div class=\x22col form-group col-md-2\x22>" +
                                     "<div class=\x22\x22><label for=\x22sceneUseVolumetricFog\x22>Volumetric Fog</label><br>" +
                                     "<input class=\x22\x22 type=\x22checkbox\x22  id=\x22sceneUseVolumetricFog\x22 data-toggle=\x22toggle\x22 data-size=\x22sm\x22 data-on=\x22<i class='fas fa-check'></i>\x22 data-off=\x22<i class='fas fa-times'></i>\x22 data-onstyle=\x22success\x22 data-offstyle=\x22danger\x22></div>" +
@@ -9476,10 +9531,10 @@ function showGroup() {
                             "</div>" +
                             "<hr/>" +
             "</div>" +
-                            "<button id=\x22environmentSectionButton\x22 class=\x22btn btn-sm btn-primary btn-circle btn-light float-left\x22><i class=\x22fas fa-plus-circle\x22></i> </button>" +
-                            "<h4>Environment</h4>" +
+                            "<button id=\x22groundSectionButton\x22 class=\x22btn btn-sm btn-primary btn-circle btn-light float-left\x22><i class=\x22fas fa-plus-circle\x22></i> </button>" +
+                            "<h4>Ground</h4>" +
                             "<hr/>" +  
-            "<div style=\x22display:none;\x22 id=\x22environmentSection\x22>" +
+            "<div style=\x22display:none;\x22 id=\x22groundSection\x22>" +
                             "<div class=\x22form-row\x22>" +  
 
                                 // "<div class=\x22col form-group col-md-2\x22>" +
@@ -9497,10 +9552,9 @@ function showGroup() {
                                     "<select class=\x22form-control\x22 id=\x22sceneMapType\x22 >" +
                                     "<option value=\x22\x22 disabled selected>Select:</option>" +
                                     "<option>none</option>" +
-                                    "<option>Water 1 (easy)</option>" +
-                                    "<option>Water 2 (medium)</option>" +
-                                    "<option>Ocean Water (medium)</option>" +
-                                    "<option>Fancy Water (heavy)</option>" +
+                                    "<option>Streets</option>" +
+                                    "<option>Satellite</option>" +
+                                    "<option>Terrain</option>" +
                                     "</select>" +
                                 "</div>" +  
                                 "<div class=\x22col form-group col-md-1\x22>" +
@@ -9651,38 +9705,44 @@ function showGroup() {
                                     "<option>osiris</option>" +
                                     "</select>" +
                                 "</div>" +
-                                "<div class=\x22col form-group col-md-1\x22>" +
-                                    "<div class=\x22\x22><label for=\x22sceneUseDynCubeMap\x22>Dynamic CubeMap</label><br>" +
-                                    "<input class=\x22\x22 type=\x22checkbox\x22  id=\x22sceneUseDynCubeMap\x22 data-toggle=\x22toggle\x22 data-size=\x22sm\x22 data-on=\x22<i class='fas fa-check'></i>\x22 data-off=\x22<i class='fas fa-times'></i>\x22 data-onstyle=\x22success\x22 data-offstyle=\x22danger\x22></div>" +
-                                "</div>" + 
+                                // "<div class=\x22col form-group col-md-1\x22>" +
+                                //     "<div class=\x22\x22><label for=\x22sceneUseDynCubeMap\x22>Dynamic CubeMap</label><br>" +
+                                //     "<input class=\x22\x22 type=\x22checkbox\x22  id=\x22sceneUseDynCubeMap\x22 data-toggle=\x22toggle\x22 data-size=\x22sm\x22 data-on=\x22<i class='fas fa-check'></i>\x22 data-off=\x22<i class='fas fa-times'></i>\x22 data-onstyle=\x22success\x22 data-offstyle=\x22danger\x22></div>" +
+                                // "</div>" + 
                             "</div>" +  
                             "<hr/>" +
             "</div>" +
-                            "<button id=\x22objectSectionButton\x22 class=\x22btn btn-sm btn-primary btn-circle btn-light float-left\x22><i class=\x22fas fa-plus-circle\x22></i> </button>" +
+            "<button id=\x22objectSectionButton\x22 class=\x22btn btn-sm btn-primary btn-circle btn-light float-left\x22><i class=\x22fas fa-plus-circle\x22></i> </button>" +
                             "<h4>Objects</h4>" +
                             "<hr/>" +  
             "<div style=\x22display:none;\x22 id=\x22objectSection\x22>" +
                             "<div class=\x22form-row\x22>" +
-                                "<div class=\x22col form-group col-md-3\x22>" +
-                                "Objects: " + objButtons +     
+                                "<div class=\x22col form-group col-md-4\x22>" +
+                                objButtons +     
                                 "</div>" + 
-                                "<div class=\x22col form-group col-md-3\x22>" +
-                                sceneObjs +   
+                                "<div class=\x22col form-group col-md-2\x22>" +
+                                    "<label for=\x22sceneScatterObjects\x22>Scatter Objects</label><br>" +
+                                    "<input class=\x22\x22 type=\x22checkbox\x22  id=\x22sceneScatterObjects\x22 data-toggle=\x22toggle\x22 data-size=\x22sm\x22 data-on=\x22<i class='fas fa-check'></i>\x22 data-off=\x22<i class='fas fa-times'></i>\x22 data-onstyle=\x22success\x22 data-offstyle=\x22danger\x22>" +
+                                
                                 "</div>" +
-                                "<div class=\x22col form-group col-md-3\x22>" +
-                                sceneObjGroups +   
-                                "</div>" +
-                                "<div class=\x22col form-group col-md-3\x22>" +
-                                    "<div class=\x22\x22><label for=\x22sceneScatterObjects\x22>Scatter Objects</label><br>" +
-                                    "<input class=\x22\x22 type=\x22checkbox\x22  id=\x22sceneScatterObjects\x22 data-toggle=\x22toggle\x22 data-size=\x22sm\x22 data-on=\x22<i class='fas fa-check'></i>\x22 data-off=\x22<i class='fas fa-times'></i>\x22 data-onstyle=\x22success\x22 data-offstyle=\x22danger\x22></div>" +
-                                "</div>" + 
+                                "<div class=\x22col form-group col-md-1\x22>" +
+                                   
+                                        // "<div class=\x22col form-group col-md-6\x22>" +
+                                        "<label for=\x22sceneScatterOffset\x22>Scatter Offset</label>" +
+                                        "<input type=\x22text\x22 class=\x22form-control\x22 aria-describedby=\x22sceneScatterOffset\x22 id=\x22sceneScatterOffset\x22 value=\x22" + response.data.sceneScatterOffset + "\x22>" +
+                                    // "</div>" + 
+                                
+                                    "</div>" + 
+                                    "<div class=\x22col form-group col-md-5\x22>" +
+                                    sceneObjs +   
+                                    // "</div>" +
+                                    // "<div class=\x22col form-group col-md-3\x22>" +
+                                    sceneObjGroups +      
+
+                                    "</div>" + 
                             "</div>" +
                             
                             "<div class=\x22form-row\x22>" +
-                                // "<div class=\x22col form-group col-md-1\x22>" +
-                                //     "<div class=\x22\x22><label for=\x22sceneScatterObjects\x22>Scatter Objects</label><br>" +
-                                //     "<input class=\x22\x22 type=\x22checkbox\x22  id=\x22sceneScatterObjects\x22 data-toggle=\x22toggle\x22 data-size=\x22sm\x22 data-on=\x22<i class='fas fa-check'></i>\x22 data-off=\x22<i class='fas fa-times'></i>\x22 data-onstyle=\x22success\x22 data-offstyle=\x22danger\x22></div>" +
-                                // "</div>" + 
                                 "<div class=\x22col form-group col-md-11\x22> " +
                                 "<label for=\x22scatterMeshLayerBtns\x22> Object Layers </label>" + //alignement
                                 "<br><div id=\x22scatterMeshLayerBtns\x22 class=\x22btn-group btn-group-toggle flex-wrap\x22 data-toggle=\x22buttons\x22>" +
@@ -9728,30 +9788,47 @@ function showGroup() {
                                 "</div>" +
                                 // "</div>" +
                             "</div>" +
-                            // "<br></br>"+
+
+                                // "<div class=\x22form-row\x22>" +
+                                //     "<div class=\x22col form-group col-md-6\x22>" +
+                                //         "<label for=\x22sceneScatterOffset\x22>Scatter Offset</label>" +
+                                //         "<input type=\x22text\x22 class=\x22form-control\x22 aria-describedby=\x22sceneScatterOffset\x22 id=\x22sceneScatterOffset\x22 value=\x22" + response.data.sceneScatterOffset + "\x22>" +
+                                //     "</div>" + 
+                                // "</div>" +
+                            "</div>" +
+                            "<hr/>" +
+                        "</div>" +
+                            "<button id=\x22modelSectionButton\x22 class=\x22btn btn-sm btn-primary btn-circle btn-light float-left\x22><i class=\x22fas fa-plus-circle\x22></i> </button>" +
+                            "<h4>Models</h4>" +
+                            "<hr/>" +  
+            "<div style=\x22display:none;\x22 id=\x22modelSection\x22>" +
+                            
                             "<div class=\x22form-row\x22>" +
-                                "<div class=\x22col form-group col-md-6\x22>" +
-                                "Models: " + modelButtons +     
+                                "<div class=\x22col form-group col-md-4\x22>" +
+                                modelButtons +     
                                 "</div>" + 
-                                "<div class=\x22col form-group col-md-6\x22>" +
+
+                                "<div class=\x22col form-group col-md-2\x22>" +
+                                   "<label for=\x22sceneScatterMeshes\x22>Scatter Models</label><br>" +
+                                        "<input class=\x22\x22 type=\x22checkbox\x22  id=\x22sceneScatterMeshes\x22 data-toggle=\x22toggle\x22 data-size=\x22sm\x22 data-on=\x22<i class='fas fa-check'></i>\x22 data-off=\x22<i class='fas fa-times'></i>\x22 data-onstyle=\x22success\x22 data-offstyle=\x22danger\x22>" +  
+                                    // "</div>" + 
+                                    // // "<div class=\x22float-left\x22>"
+                                    // "<label for=\x22sceneScatterOffset\x22>Scatter Offset</label>" +
+                                    // "<input type=\x22text\x22 class=\x22form-control\x22 aria-describedby=\x22sceneScatterOffset\x22 id=\x22sceneScatterOffset\x22 value=\x22" + response.data.sceneScatterOffset + "\x22>" +
+                                    // "</div>" + 
+                                "</div>" + 
+
+                                "<div class=\x22col form-group col-md-1\x22>" +
+                                    "<label for=\x22sceneScatterOffset\x22>Scatter Offset</label>" +
+                                    "<input type=\x22text\x22 class=\x22form-control\x22 aria-describedby=\x22sceneScatterOffset\x22 id=\x22sceneScatterOffset\x22 value=\x22" + response.data.sceneScatterOffset + "\x22>" +
+                                "</div>" + 
+                                "<div class=\x22col form-group col-md-5\x22>" +
                                 sceneMdls +
                                 "</div>" +
-                                // "<div class=\x22col form-group col-md-1\x22>" +
-                                   
-                                // "</div>" +
-                                // "<div class=\x22col form-group col-md-3\x22>" +
-                                //     "<div class=\x22float-right\x22><label for=\x22sceneScatterMeshes\x22>Scatter Models</label><br>" +
-                                //     "<input class=\x22\x22 type=\x22checkbox\x22  id=\x22sceneScatterMeshes\x22 data-toggle=\x22toggle\x22 data-size=\x22sm\x22 data-on=\x22<i class='fas fa-check'></i>\x22 data-off=\x22<i class='fas fa-times'></i>\x22 data-onstyle=\x22success\x22 data-offstyle=\x22danger\x22></div>" +  
-                                // "</div>" +
-                                    // "<div class=\x22\x22><label for=\x22sceneScatterMeshes\x22>Scatter Models</label><br>" +
-                                    // "<input class=\x22\x22 type=\x22checkbox\x22  id=\x22sceneScatterMeshes\x22 data-toggle=\x22toggle\x22 data-size=\x22sm\x22 data-on=\x22<i class='fas fa-check'></i>\x22 data-off=\x22<i class='fas fa-times'></i>\x22 data-onstyle=\x22success\x22 data-offstyle=\x22danger\x22></div>" +  
-                                
                             "</div>" +
+
                             "<div class=\x22form-row\x22>" +
-                                // "<div class=\x22col form-group col-md-1\x22>" +
-                                //     "<div class=\x22\x22><label for=\x22sceneScatterMeshes\x22>Scatter Meshes</label><br>" +
-                                //     "<input class=\x22\x22 type=\x22checkbox\x22  id=\x22sceneScatterMeshes\x22 data-toggle=\x22toggle\x22 data-size=\x22sm\x22 data-on=\x22<i class='fas fa-check'></i>\x22 data-off=\x22<i class='fas fa-times'></i>\x22 data-onstyle=\x22success\x22 data-offstyle=\x22danger\x22></div>" +
-                                // "</div>" +  
+
                                 "<div class=\x22col form-group col-md-12\x22> " +
                                     "<label for=\x22scatterMeshLayerBtns\x22> Model Layers </label><br>" + 
                                     "<div id=\x22scatterMeshLayerBtns\x22 class=\x22btn-group btn-group-toggle flex-wrap\x22 data-toggle=\x22buttons\x22>" +
@@ -9794,26 +9871,17 @@ function showGroup() {
                                         "<label class=\x22btn btn-light\x22>" +
                                             "<input type=\x22checkbox\x22 name=\x22sceneMeshLayers\x22 value=\x22flower3\x22 id=\x22sceneScatterMeshLayers.flower3\x22 autocomplete=\x22off\x22> Flowers 3 " +
                                         "</label>" +
-                                        "</div>" +
                                     "</div>" +
                                 "</div>" +
-                                "<div class=\x22form-row\x22>" +
-                                "<div class=\x22col form-group col-md-6\x22>" +
-                                    "<div class=\x22float-right\x22><label for=\x22sceneScatterMeshes\x22>Scatter Models</label><br>" +
-                                    "<input class=\x22\x22 type=\x22checkbox\x22  id=\x22sceneScatterMeshes\x22 data-toggle=\x22toggle\x22 data-size=\x22sm\x22 data-on=\x22<i class='fas fa-check'></i>\x22 data-off=\x22<i class='fas fa-times'></i>\x22 data-onstyle=\x22success\x22 data-offstyle=\x22danger\x22></div>" +  
-                                "</div>" + 
-                                "<div class=\x22col form-group col-md-6\x22>" +
-                                    "<label for=\x22sceneScatterOffset\x22>Scatter Offset</label>" +
-                                    "<input type=\x22text\x22 class=\x22form-control\x22 aria-describedby=\x22sceneScatterOffset\x22 id=\x22sceneScatterOffset\x22 value=\x22" + response.data.sceneScatterOffset + "\x22>" +
-                                "</div>" + 
+                            "</div>" +
+
                                 
-                            "</div>" +
-                            "</div>" +
-                            "<hr/>" +
+                            // "</div>" + 
+                            "<hr>" +
                 "</div>" +
-                            "<button id=\x22locationsSectionButton\x22 class=\x22btn btn-sm btn-primary btn-circle btn-light float-left\x22><i class=\x22fas fa-plus-circle\x22></i> </button>" +
+                "<button id=\x22locationsSectionButton\x22 class=\x22btn btn-sm btn-primary btn-circle btn-light float-left\x22><i class=\x22fas fa-plus-circle\x22></i> </button>" +
                             "<h4>Locations</h4>" +
-                            "<hr/>" +  
+                            "</hr>" +  
                 "<div style=\x22display:none;\x22 id=\x22locationsSection\x22>" +
                             "<div class=\x22form-row\x22>" +  
                                 // "<div class=\x22col form-group col-md-3\x22>" +
@@ -9827,7 +9895,7 @@ function showGroup() {
                             //     sceneLocs +
                             //     "</div>" + 
                             
-                            "<hr>" +
+                            "</hr>" +
                             "</div>" +
                             extraButtons + 
                         "</form><br><br>" +
@@ -9895,7 +9963,7 @@ function showGroup() {
                 $("#sceneAmbientPatch2").val(response.data.sceneAmbientPatch2);
                 $("#sceneTriggerPatch1").val(response.data.sceneTriggerPatch1);
                 $("#sceneTriggerPatch2").val(response.data.sceneTriggerPatch2);
-                $("#sceneWebXREnvironment").val(response.data.sceneWebXREnvironment);
+                $("#sceneWebXREnvironment").val(response.data.sceneWebXREnvironment);  //aframe enviro component
 
                 // sceneFont : req.body.sceneFont,
                 // sceneFontFillColor : req.body.sceneFontFillColor,
@@ -10031,10 +10099,10 @@ function showGroup() {
                 if (response.data.sceneUseSceneFog) {
                     $('#sceneUseSceneFog').bootstrapToggle('on');
                 }
-                $('#sceneUseGlobalFog').bootstrapToggle();
-                if (response.data.sceneUseGlobalFog) {
-                    $('#sceneUseGlobalFog').bootstrapToggle('on');
-                }
+                // $('#sceneUseGlobalFog').bootstrapToggle();
+                // if (response.data.sceneUseGlobalFog) {
+                //     $('#sceneUseGlobalFog').bootstrapToggle('on');
+                // }
                 $('#sceneUseVolumetricFog').bootstrapToggle();
                 if (response.data.sceneUseVolumetricFog) {
                     $('#sceneUseVolumetricFog').bootstrapToggle('on');
@@ -10226,7 +10294,7 @@ function showGroup() {
                     .then(function() { //populate models from db
                         if (sceneModelz != null && sceneModelz != undefined && sceneModelz.length > 0) {
 
-                            console.log(JSON.stringify(sceneModelz));
+                            // console.log(JSON.stringify(sceneModelz));
                             for (let h = 0; h < sceneLocations.length; h++) {
                                 const y = document.getElementById("modelSelect_" + sceneLocations[h].timestamp);
                                 for (let j = 0; j < sceneModelz.length; j++) {
@@ -10239,7 +10307,7 @@ function showGroup() {
                                         option.selected = true;
                                     } 
                                     y.add(option);
-                                }
+                                    }
                                 }
                             }
                         }
@@ -10321,52 +10389,31 @@ function showGroup() {
                         });
                     }); 
                     $(document).on('click', '.scrapeWeblink', function(e) {
+                        e.preventDefault();  
                         var stump = {};
-                        stump.link_orig_title = $scope.webling.weblinkTitle;
-                        stump.link_orig_user = $routeParams.user_id;
-                        stump.orig_date = Date.now();
-                        stump.link_url = $scope.webling.weblinkURL;
-                        var link = {};
-                        link.link_title =  $scope.webling.weblinkTitle;
-                        link.link_url = $scope.webling.weblinkURL;
-                        console.log("tryna add scene weblink" + stump.link_url);
+                        let title = document.getElementById("webLinkTitle").value;
+                        let link = document.getElementById("webLinkURL").value;
+                        stump.link_title = title;
+                        stump.link_url = link;
+                        stump.sceneID = response.data._id;
+                        console.log("tryna add scene weblink" + stump.sceneID);
                         axios.post('/weblink/', stump)
-                                    .then(function (response) {
-                                        console.log(response);
-                                        if (response.data.includes("updated")) {
-                                            // window.location.reload();
-                                            $("#topSuccess").html("Scene Updated!");
-                                            $("#topSuccess").show();
-                                        } else if (response.data.includes("created")) {
-                                            window.location.reload();
-                                        } else {
-                                            $("#topAlert").html(response.data);
-                                            $("#topAlert").show();
-                                        }
-                                    })                      
-                                    .catch(function (error) {
-                                        console.log(error);
-                                    });
-                        // axios.post('/weblink/',  stump).success(function(response){
-                        //     console.log("submit response:  " + response);
-                        //     if (response == "noauth") {
-                        //         $scope.headermessage = "You must be logged in to do that!"
-                        //     } else {
-                        //         if (response._id != null && response._id != undefined )
-                        //             link.link_id = response._id;
-                        //         link.urlThumb = response.urlThumb;
-                        //         link.urlHalf = response.urlHalf;
-                        //         link.urlStandard = response.urlStandard;
-                
-                        //         $scope.sceneWebLinks.push(link);
-                        //         $scope.scene.sceneWebLinks = $scope.sceneWebLinks;
-                
-                        //         //scene ref will use the returned ID, for the reference link in weblinks collection
-                
-                        //         console.log(response);
-                
-                        //     }
-                        // });
+                            .then(function (response) {
+                                console.log(response);
+                                if (response.data != "ok") {
+                                    $("#topAlert").html(response.data);
+                                    $("#topAlert").show();
+                                } else {
+                                    $("#topSuccess").html(response.data);
+                                    $("#topSuccess").show();
+                                    window.location.reload();
+                                }
+                            })                      
+                            .catch(function (error) {
+                                console.log(error);
+                                $("#topAlert").html(error);
+                                $("#topAlert").show();
+                        });
 
                     });
                     $(document).on('click','#optionsSectionButton',function(e){
@@ -10409,14 +10456,18 @@ function showGroup() {
                         e.preventDefault();  
                         $("#skySection").toggle();
                     }); 
-                    $(document).on('click','#environmentSectionButton',function(e){
+                    $(document).on('click','#groundSectionButton',function(e){
                         e.preventDefault();  
-                        $("#environmentSection").toggle();
+                        $("#groundSection").toggle();
                     }); 
                     $(document).on('click','#objectSectionButton',function(e){
                         e.preventDefault();  
                         $("#objectSection").toggle();
                     }); 
+                    $(document).on('click','#modelSectionButton',function(e){
+                        e.preventDefault();  
+                        $("#modelSection").toggle();
+                    });
                     $(document).on('click','#locationsSectionButton',function(e){
                         e.preventDefault();  
                         $("#locationsSection").toggle();
@@ -10432,7 +10483,7 @@ function showGroup() {
                         $("#linksSection").toggle();
                         $("#colorsSection").toggle();
                         $("#skySection").toggle();
-                        $("#environmentSection").toggle();
+                        $("#groundSection").toggle();
                         $("#objectSection").toggle();
                         $("#locationsSection").toggle();
                     }); 
@@ -10484,6 +10535,55 @@ function showGroup() {
                     //     const id = "#" + this.id;
                     //     $(id).parent().parent().hide();
                     // });  
+                    $(document).on('click','.refWeblink',function(e){
+                        e.preventDefault();  
+                        console.log("tryna refresh weblink " + this.id);
+                        for( var i = 0; i < sceneWebLinks.length; i++){ 
+                            if ( sceneWebLinks[i] === this.id) {
+                                console.log('gotsa match to refreshWeblink ' + this.id);
+
+                                var stump = {};
+                                // let title = document.getElementById("webLinkTitle").value;
+                                // let link = document.getElementById("webLinkURL").value;
+                                // stump.link_title = title;
+                                // stump.link_url = link;
+                                stump.sceneID = response.data._id;
+                                console.log("tryna add scene weblink" + stump.sceneID);
+                                axios.post('/update_weblink/', stump)
+                                .then(function (response) {
+                                    console.log(response);
+                                    if (response.data != "ok") {
+                                        $("#topAlert").html(response.data);
+                                        $("#topAlert").show();
+                                        // window.location.href=sceneWebLinks.link_url;
+                                        // window.open(sceneWebLinks.link_url, '_blank');
+                                    } else {
+                                        $("#topSuccess").html(response.data);
+                                        $("#topSuccess").show();
+                                        // window.location.reload();
+                                    }
+                                })                      
+                                .catch(function (error) {
+                                    console.log(error);
+                                    $("#topAlert").html(error);
+                                    $("#topAlert").show();
+                                });
+                            }
+                        }
+                    }); 
+                    $(document).on('click','.remWeblink',function(e){
+                        e.preventDefault();  
+                        console.log("tryna remove weblink " + this.id);
+                        for( var i = 0; i < sceneWebLinks.length; i++){ 
+                            if ( sceneWebLinks[i] === this.id) {
+                                console.log('gotsa match to remWeblink ' + this.id);
+                                sceneWebLinks.splice(i, 1); 
+                                
+                            }
+                        }
+                        const id = "#" + this.id;
+                        $(id).parent().parent().hide(); //not grandparent!
+                    }); 
                     $(document).on('click','.remSceneModel',function(e){
                         e.preventDefault();  
                         console.log("tryna remove sceneModel " + this.id);
@@ -10854,6 +10954,7 @@ function showGroup() {
                         let sceneText = document.getElementById("sceneText").value;
                         let scenePrimaryAudioTitle = document.getElementById("scenePrimaryAudioTitle").value;
                         let scenePrimaryAudioStreamURL = document.getElementById("scenePrimaryAudioStreamURL").value;
+                    
                         // let scenePrimaryAudioID = scenePrimaryAudioID;
                         let sceneBPM = document.getElementById("sceneBPM").value;
                         let scenePrimaryVolume = document.getElementById("scenePrimaryVolume").value;
@@ -10907,7 +11008,7 @@ function showGroup() {
                         let sceneUseDynamicShadows = document.getElementById("sceneUseDynamicShadows").checked;
                         let sceneUseSkybox = document.getElementById("sceneAmbientSynth2ModulateByDistanceTarget").checked;
                         let sceneUseSceneFog = document.getElementById("sceneUseSceneFog").checked;
-                        let sceneUseGlobalFog = document.getElementById("sceneUseGlobalFog").checked;
+                        // let sceneUseGlobalFog = document.getElementById("sceneUseGlobalFog").checked;
                         let sceneUseVolumetricFog = document.getElementById("sceneUseVolumetricFog").checked;
                         let sceneUseSunShafts = document.getElementById("sceneUseSunShafts").checked;
                         let sceneUseUWFX = document.getElementById("sceneUseUWFX").checked;
@@ -11058,6 +11159,7 @@ function showGroup() {
                             sceneAndroidOK: sceneAndroidOK,
                             sceneWindowsOK: sceneWindowsOK,
                             sceneRestrictToLocation: sceneRestrictToLocation,
+                            sceneWebLinks: sceneWebLinks,
                             sceneFlyable: sceneFlyable,
                             sceneFaceTracking: sceneFaceTracking,
                             sceneHPlanesToggle: sceneHPlanesToggle,
@@ -11082,7 +11184,7 @@ function showGroup() {
                             sceneUseDynamicShadows: sceneUseDynamicShadows,
                             sceneUseSkybox: sceneUseSkybox,
                             sceneUseSceneFog: sceneUseSceneFog,
-                            sceneUseGlobalFog: sceneUseGlobalFog,
+                            // sceneUseGlobalFog: sceneUseGlobalFog,
                             sceneUseVolumetricFog: sceneUseVolumetricFog,
                             sceneUseSunShafts: sceneUseSunShafts,
                             // sceneUseUWFX: sceneUseUWFX,
@@ -11259,12 +11361,13 @@ function showGroup() {
         // var jsonResponse = response.data;
         //  var jsonResponse = response.data;
         var arr = response.data;
+        console.log(JSON.stringify(arr[0]));
         var tableHead = "<table id=\x22dataTable1\x22 class=\x22table table-striped table-bordered\x22 style=\x22width:100%\x22>" +
             "<thead>"+
             "<tr>"+
             "<th>Scene Title</th>"+
             "<th>Scene Key</th>"+
-            "<th>App Name</th>"+
+            "<th>Stickyness</th>"+
             "<th>Public</th>"+
             "<th>Last Update</th>"+
             "<th>Platform</th>"+
@@ -11287,11 +11390,10 @@ function showGroup() {
             // "<td><button class=\x22btn btn-sm\x22 onclick=\x22getScene('" + arr[i]._id + "')\x22><i class=\x22far fa-edit\x22></i></button><a onclick=\x22getScene('" + arr[i]._id + "')\x22 href=\x22#\x22>" + arr[i].sceneTitle + "</a></td>" +
             "<td><a class=\x22btn btn-sm\x22 href=\x22index.html?type=scene&iid=" + arr[i]._id + "\x22><i class=\x22far fa-edit\x22></i></button><a href=\x22index.html?type=scene&iid=" + arr[i]._id + "\x22>" + arr[i].sceneTitle + "</a></td>" +
             "<td><a href=\x22/webxr/" + arr[i].short_id + "\x22 target=\x22_blank\x22>" + arr[i].short_id + "</a></td>" +
-            "<td>" + arr[i].sceneDomain + "</td>" +
+            "<td>" + arr[i].sceneStickyness + "</td>" +
             "<td>" + arr[i].sceneShareWithPublic + "</td>" +
             "<td>" + arr[i].sceneLastUpdate + "</td>" +
             "<td>" + android + ios + windows + "</td>" +
-
             "</tr>";
         }
         var tableFoot =  "</tbody>" +
@@ -11299,7 +11401,7 @@ function showGroup() {
             "<tr>" +
             "<th>Scene Title</th>"+
             "<th>Scene Key</th>"+
-            "<th>App Name</th>"+
+            "<th>Stickyness</th>"+
             "<th>Public</th>"+
             "<th>Last Update</th>"+
             "<th>Platform</th>"+
