@@ -164,7 +164,7 @@ var socketUsers = {};
 var allUsers = [];
 var io = require('socket.io')(server);
 var mongoAdapter = require('socket.io-adapter-mongo');
-io.adapter(mongoAdapter( 'mongodb://sessionmaster:nawman@aws-us-east-1-portal.8.dblayer.com:15103,aws-us-east-1-portal.7.dblayer.com:15103/sessions' ));
+io.adapter(mongoAdapter( '' ));
 // io.set('origins', 'servicemedia.net');
 io.set('transports', ['websocket']);
 // io.use(function(socket, next){
