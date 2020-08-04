@@ -21,7 +21,6 @@ var express = require("express")
     , MongoDBStore = require('connect-mongodb-session')(session) //theShit
     , async = require('async')
     , bcrypt = require('bcrypt-nodejs')
-    , marmelade = require('./marmelade') //jwt secret
     , shortid = require('shortid')
     , QRCode = require('qrcode')
     , transloadit = require('node-transloadit')
@@ -382,7 +381,7 @@ function requiredAuthentication(req, res, next) {
         if (req.headers['x-access-token'] != null) {  //check using json web token
             var token = req.headers['x-access-token'];
             console.log("req.headers.token: " + token);
-            jwt.verify(token, marmelade.secret, function (err, payload) {
+            jwt.verify(token, process.env.JWT_SECRET, function (err, payload) {
                     console.log(JSON.stringify(payload));
                     if (payload) {
                         // user.findById(payload.userId).then(
@@ -1037,7 +1036,7 @@ app.post("/authreq", function (req, res) {
                                     if (match) {
                                        
                                         req.session.user = authUser[authUserIndex];
-                                        var token=jwt.sign({userId:authUser[authUserIndex]._id},marmelade.secret);
+                                        var token=jwt.sign({userId:authUser[authUserIndex]._id},process.env.JWT_SECRET);
                                         res.cookie('_id', req.session.user._id.toString(), { maxAge: 36000 });
                                         var authString = req.session.user.authLevel != null ? req.session.user.authLevel : "noauth";
                                         var authResp = req.session.user._id.toString() + "~" + username + "~" + authString + "~" + token;
