@@ -9,14 +9,14 @@
   <meta name="description" content="">
   <meta name="author" content="">
 
-  <title>SB Admin 2 - Login</title>
+  <title>ServiceMedia Login</title>
 
   <!-- Custom fonts for this template-->
   <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
   <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
 
   <!-- Custom styles for this template-->
-  <link href="css/sb-admin-2.min.css" rel="stylesheet">
+  <link href="css/sb-admin-2.css" rel="stylesheet">
 
 </head>
 
@@ -37,9 +37,9 @@
               <div class="col-lg-6">
                 <div class="p-5">
                   <div class="text-center">
-                    <h1 class="h4 text-gray-900 mb-4">Welcome Back!</h1>
+                    <h1 class="h4 text-gray-900 mb-4">Welcome!</h1>
                   </div>
-                  <form class="user">
+                  <form id="theForm" class="user">
                     <div class="form-group">
                       <input type="email" class="form-control form-control-user" id="uname" aria-describedby="emailHelp" placeholder="Enter Username or Email Address...">
                     </div>
@@ -65,11 +65,11 @@
                   </form>
                   <hr>
                   <div class="text-center">
-                    <a class="small" href="/#/reset">Forgot Password?</a>
+                    <a class="small" href="/main/resetpw.html">Forgot Password?</a>
                   </div>
-                  <div class="text-center">
+                  <!-- <div class="text-center">
                     <a class="small" href="/#/register">Create an Account!</a>
-                  </div>
+                  </div> -->
                 </div>
               </div>
             </div>
@@ -100,33 +100,26 @@
         contentType: "application/json; charset=utf-8",
       dataType: "json",
       data: JSON.stringify({
-              uname: uName,
-              upass: uPass
-              // param2: $('#textbox2').val()
-            }),
-          success: function( data, textStatus, xhr ){
-              console.log(data);
-              var r = data.replace(/["']/g, ""); //cleanup
-              var resp = r.split('~'); //response is tilde delimited
-              // document.cookie = "_id=" + resp[0]; //user id
-              // setCookie("_id", resp[0], 3);
-              // $( "#logout" ).show();
-              // $( "#login" ).hide();
-              // $( "#aframe" ).show();
-              Cookies.set('_id', resp[0], { expires: 7 });
-              $('#response pre').html( "logged in as " + resp[1] );
-              cookie = Cookies.get();
-              location.href = "./index.html";
-            
-          },
-          error: function( xhr, textStatus, errorThrown ){
-              console.log( xhr.responseText );
-              $('#response pre').html( xhr.responseText );
-              Cookies.remove('_id');
-              location.reload();
-              // document.cookie = "expires=Thu, 01 Jan 1970 00:00:00"; //set to expired date to delete?
-              }
-          });
+            uname: uName,
+            upass: uPass
+            // param2: $('#textbox2').val()
+          }),
+        success: function( data, textStatus, xhr ){
+            console.log(data);
+            var r = data.replace(/["']/g, ""); //cleanup
+            var resp = r.split('~'); //response is tilde delimited
+            Cookies.set('_id', resp[0], { expires: 7 });
+            $('#response pre').html( "logged in as " + resp[1] );
+            window.localStorage.setItem("smToken", resp[3]);
+            cookie = Cookies.get();
+            location.href = "./index.html";  
+        },
+        error: function( xhr, textStatus, errorThrown ){
+          console.log( xhr.responseText );
+          $('#theForm').html( 'Sorry, something went wrong: \n' + xhr.responseText);
+          Cookies.remove('_id');
+          }
+        });
       }
   </script>
 </body>

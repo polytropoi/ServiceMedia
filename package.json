@@ -6,7 +6,7 @@
   "dependencies": {
     "async": "^2.6.1",
     "aws-sdk": "^2.303.0",
-    "axios": "^0.19.2",
+    "axios": "^0.26.0",
     "bcrypt-nodejs": "0.0.3",
     "body-parser": "^1.18.3",
     "bson-objectid": "^1.2.3",
@@ -24,10 +24,6 @@
     "method-override": "^2.3.10",
     "mongojs": "^3.1.0",
     "morgan": "^1.9.1",
-    "multer": "^1.3.1",
-    "multer-autoreap": "^0.1.3",
-    "music-metadata": "^2.6.1",
-    "ng-file-upload": "^12.2.13",
     "node-internet-radio": "^0.1.6",
     "node-transloadit": "^0.0.2",
     "prompt": "^0.2.14",
@@ -36,22 +32,11 @@
     "require-text": "0.0.1",
     "serve-favicon": "^2.5.0",
     "shortid": "^2.2.13",
-    "socket.io": "^2.1.1",
+    "socket.io": "^2.3.0",
+    "socket.io-adapter-mongo": "^2.0.5",
     "ssi": "^0.3.0",
     "stripe": "^4.25.0",
     "stylus": "^0.32.1",
     "validator": "^3.43.0"
-  },
-  "devDependencies": {},
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://polytropoi@bitbucket.org/polytropoi/servmed_web.git"
-  },
-  "author": "",
-  "license": "ISC",
-  "homepage": "https://bitbucket.org/polytropoi/servmed_web#readme"
+  }
 }

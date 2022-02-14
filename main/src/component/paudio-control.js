@@ -28,7 +28,7 @@ if (primaryAudio.URLogg != null) {
                 console.log("loaded!");
             } 
         });
-    AFRAME.registerComponent('primary-audio-control', {
+    AFRAME.registerComponent('pprimary-audio-control', {
         schema: {
         color: {default: 'red'}
         },

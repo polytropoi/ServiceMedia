@@ -8,7 +8,7 @@ const COMPONENT_SUFFIX = '-controls',
     MAX_DELTA = 0.2, // ms
     EPS = 10e-6;
 
-module.exports = AFRAME.registerComponent('movement-controls', {
+AFRAME.registerComponent('movement-controls', {
 
   /*******************************************************************
    * Schema

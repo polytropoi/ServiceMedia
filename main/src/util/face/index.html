@@ -24,11 +24,25 @@
     <script src="./demo_gltf.js"></script>
 
 
-    <link rel="stylesheet" href="styleFullScreen.css" type="text/css" />
+    <!-- <link rel="stylesheet" href="styleFullScreen.css" type="text/css" /> -->
   </head>
   
-  <body onload="main()" style='color: white'>
+  <body onload="main()" style='color: black'>
     <canvas width="600" height="600" id='jeeFaceFilterCanvas'></canvas>
+    <form method="post" enctype="multipart/form-data">
+      <div>
+        <label for="image_uploads">Select Local Image(PNG, JPG)</label>
+        <input type="file" id="local_image" name="local_image" accept=".jpg, .jpeg, .png">
+      </div>
+      <!-- <div class="preview">
+        <p>No files currently selected for upload</p>
+      </div>
+      <div>
+        <button>Submit</button>
+      </div> -->
+    </form>
+   
+
   </body>
 </html>
  

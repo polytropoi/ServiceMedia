@@ -1,67 +1,22 @@
 "use strict";
 
-// SETTINGS of this demo:
 const SETTINGS = {
   gltfModelURL: 'pndmask1.glb',
   cubeMapURL: 'Bridge2/',
-  offsetYZ: [-.5,0], // offset of the model in 3D along vertical and depth axis
-  scale: 1.5 // width in 3D of the GLTF model
+  offsetYZ: [-.35,.25], // offset of the model in 3D along vertical and depth axis
+  scale: 1.15 // width in 3D of the GLTF model
 };
 
 let THREECAMERA = null;
 
-// const USERCROP = {
-//   faceCutDims: [0,0],
-//   potFaceCutTexture: null,
-//   hueTexture: null,
-// };
-// const SHPS = { //shaderprograms
-//   cropUserFace: null,
-//   copy: null
-// };
+var input = null;
 
-
-
-// function create_textures(){
-//   const create_emptyTexture = function(w, h){
-//     const tex = GL.createTexture();
-//     GL.bindTexture(GL.TEXTURE_2D, tex);
-//     GL.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, w, h, 0, GL.RGBA, GL.UNSIGNED_BYTE, null);
-//     return tex;
-//   };
-
-//   const create_emptyLinearTexture = function(w, h){
-//     const tex = create_emptyTexture(w,h);
-//     GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.LINEAR);
-//     GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR);
-//     return tex;
-//   };
-
-//   // create the artpainting and userCrop hue textures:
-//   const create_hueTexture = function(){
-//     return create_emptyLinearTexture(SETTINGS.hueTextureSizePx, SETTINGS.hueTextureSizePx);
-//   };
-//   ARTPAINTING.hueTexture = create_hueTexture();
-//   USERCROP.hueTexture=create_hueTexture();
-
-//   // create the userCrop textures:
-//   const faceAspectRatio = SETTINGS.artPaintingMaskScale[1] / SETTINGS.artPaintingMaskScale[0];
-//   USERCROP.faceCutDims[0] = SETTINGS.faceRenderSizePx;
-//   USERCROP.faceCutDims[1] = Math.round(SETTINGS.faceRenderSizePx * faceAspectRatio);
-  
-//   USERCROP.potFaceCutTexture = create_emptyTexture(SETTINGS.faceRenderSizePx, SETTINGS.faceRenderSizePx);
-//   GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.LINEAR);
-//   GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR_MIPMAP_NEAREST);
-// } //end create_textures()
-
-
-
+  var threeStuffs = null;
 
 // build the 3D. called once when Jeeliz Face Filter is OK
 function init_threeScene(spec){
-  const threeStuffs = THREE.JeelizHelper.init(spec, null);
-
-//   // CREATE THE ENVMAP:
+  threeStuffs = THREE.JeelizHelper.init(spec, null);
+//   // CREATE THE ENVMA:P
 //   const path = SETTINGS.cubeMapURL;
 //   const format = '.jpg';
   const envMap = new THREE.CubeTextureLoader().load( [
@@ -82,6 +37,7 @@ function init_threeScene(spec){
 //   scene.add( directionalLight );
   // IMPORT THE GLTF MODEL:
   // from https://threejs.org/examples/#webgl_loader_gltf
+
   const gltfLoader = new THREE.GLTFLoader();
   gltfLoader.load( SETTINGS.gltfModelURL, function ( gltf ) {
     gltf.scene.traverse( function ( child ) {
@@ -126,12 +82,35 @@ function init_threeScene(spec){
         // node.material = threeStuffs.videoMaterial;
     });
     directionalLight.target = threeStuffs.faceObject;
+    input = document.querySelector('input');
+    input.addEventListener('change', updateImageDisplay);
 
   } ); //end gltfLoader.load callback
   
   //CREATE THE CAMERA
   THREECAMERA = THREE.JeelizHelper.create_camera();
+
 } //end init_threeScene()
+
+function updateImageDisplay() {
+  const currentFiles = input.files;
+  // const image = document.
+  if (currentFiles.length > 0) {
+  // const image = document.createElement('img');
+  // image.src = URL.createObjectURL(currentFiles[0]);
+  var texture = new THREE.TextureLoader().load(URL.createObjectURL(currentFiles[0]));
+  texture.encoding = THREE.sRGBEncoding; 
+  // UVs use the convention that (0, 0) corresponds to the upper left corner of a texture.
+  texture.flipY = true; 
+  // immediately use the texture for material creation
+  var material = new THREE.MeshBasicMaterial( { map: texture } ); 
+  // Go over the submeshes and modify materials we want.
+  threeStuffs.faceObject.traverse(node => {
+      node.material = material;
+      // node.material = threeStuffs.videoMaterial;
+    });
+  } 
+}
 
 //entry point, launched by body.onload():
 function main(){

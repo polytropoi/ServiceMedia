@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+    <title>Video Mask Maker </title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no,user-scalable=no,maximum-scale=1">
+    
+    <script src="../../../ref/aframe/dist/aframe-v1.0.4.min.js"></script>
+    
+    <!-- <script src="https://npmcdn.com/aframe-animation-component@3.0.1"></script> -->
+    
+    <script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
+    
+    <script src="a-webcam.js"></script>
+    <script src="vid-material.js"></script>
+    
+    <link href="../../../css/vid-style.css" rel="stylesheet" type="text/css">
+  
+  </head>
+  
+  <body>
+  
+    <a-scene keyboard-shortcuts antialias='true' fog="type: exponential; color: #000; density: .15">
+        <a-camera rotation="0 0 0" position="0 0 2"></a-camera>
+      <!-- ASSETS -->
+      <a-assets>
+        <video id="element" src width="1024" height="1024" autoplay="true" webkit-playsinline crossorigin="anonymous"> </video>
+        
+        <a-asset-item id="maskquad" crossorigin="anonymous" src="https://servicemedia.s3.amazonaws.com/assets/models/maskstretch_quad1.glb"></a-asset-item>
+      </a-assets>
+  
+      <a-video id="screen-1" 
+                      material="src:#element; shader: standard;"
+                      gltf-model="#maskquad"
+                      a-webcam
+                      position="0 0 -100" 
+                      rotation="0 0 0"
+                      width="4" height="4">
+      </a-video>
+      
+      
+      <a-entity  a-webcam vid-material="url: "  gltf-model="#maskquad" position="0 0 0" rotation="0 0 180" width='10' height='10'></a-entity>
+     
+    </a-scene>
+  
+    <script>
+     
+      var a_scene = document.querySelector('a-scene');
+          
+      if (a_scene.hasLoaded) {
+        run();
+      } 
+      else {
+          a_scene.addEventListener('loaded', run);
+      }
+      
+      var scene, renderer;
+      
+      function run() {
+        //do stuff after load..
+      }
+    </script>
+  </body>
+</html>

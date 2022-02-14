@@ -1,5 +1,4 @@
-// copyright servicemedia.net 2020 all rights reserved
-
+// copyright servicemedia.net 2022 all rights reserved
     // 1. amirite checks authentication and pops some UI
     // 2. bigSwitch does "routing" and calls "controller" functions
     // 3. controller functions fetch json and generate html
@@ -20,11 +19,12 @@
     amirite();
     function amirite () {
         if (cookie != null && cookie._id != null) {
-        // console.log("gotsa cookie: " + cookie._id );
+        console.log("gotsa cookie: " + cookie._id );
         $.get( "/ami-rite/" + cookie._id, function( data ) {
-            // console.log("amirite : " + JSON.stringify(data.domains));
+            // console.log("amirite : " + JSON.stringify(data.apps));
             if (data == 0) {
                 window.location.href = './login.html';
+                // console.log("data equals zero?");
             } else {
             var userNameLabel = document.getElementById('userNameLabel');
             username = data.userName;
@@ -34,7 +34,8 @@
             domains = data.domains;
             userNameLabel.innerText = username;
             let html = "";
-            if (apps != null && apps != undefined && apps.length > 0) {
+            if (apps != null && apps != undefined && apps.length > 0) { 
+                $("#adminPanel").show();
                 $("#appNav").show();
                 html = "<hr class=\x22sidebar-divider\x22><div class=\x22sidebar-heading\x22>Apps</div>";
                 for (let i = 0; i < apps.length; i++) {
@@ -67,17 +68,20 @@
                     "</li>" ;
                     }
                 }
-                // console.log(html);
-                $("#appNav").html(html);
-            }
-            // userid = data.split("~")[1];
-            var profileLink = document.getElementById('profileLink');
-            profileLink.href = 'index.html?type=profile';
-            bigSwitch();
-            }
-        });
+                    // console.log(html);
+                    $("#appNav").html(html);
+                } else {
+                    $("#adminPanel").hide();
+                }
+                // userid = data.split("~")[1];
+                var profileLink = document.getElementById('profileLink');
+                profileLink.href = 'index.html?type=profile';
+                bigSwitch();
+                }
+            });
         } else {
             window.location.href = './login.html';
+            // console.log("cookies are null?" + cookie._id);
         }
     }
     function bigSwitch() { //light up proper elements and get the stuff
@@ -103,7 +107,7 @@
             $("#cards").show();
         break;
         case "apps": //if authlevel > 0
-            ("#tables").show();
+            $("#tables").show();
             $("#table1").show();
             $("#table1Title").html("All Apps");
             $("#pageTitle").html("All Apps");
@@ -116,7 +120,12 @@
             $("#pageTitle").html("All Domains");
             getDomains();
         break;
-        case "users": //gets everything atm
+        case "user": //domain admin only
+            $("#cards").show();
+            $("#pageTitle").html("User Details");
+            showUser();
+        break;
+        case "users": //domain admin only
             $("#tables").show();
             $("#table1").show();
             $("#table1Title").html("Registered Users");
@@ -157,11 +166,13 @@
             $("#cards").show();
             $("#tables").show();
             $("#table1").show();
-            $("#table1Title").html("Purchases");
+            $("#table1Title").html("Inventory");
             $("#table2").show();
             $("#table2Title").html("Activities");
             $("#table3").show();
             $("#table3Title").html("Scores");
+            $("#table4").show();
+            $("#table4Title").html("Purchases");
             $("#pageTitle").html("User Profile - " + username);
             getProfile();
         break;
@@ -174,6 +185,17 @@
             $("#staging-area").show();
             $("#pageTitle").html("Staging Area");
             getStaging();
+        break;
+        case "action": 
+            $("#pageTitle").html("Action");
+            showAction(itemid);
+        break;
+        case "actions": //gets everything atm
+            $("#tables").show();
+            $("#table1").show();
+            $("#table1Title").html("Actions");
+            $("#pageTitle").html("All Actions");
+            getActions();
         break;
         case "text": 
             $("#pageTitle").html("Text");
@@ -246,13 +268,20 @@
             $("#pageTitle").html("All Locations");
             getLocations();
         break;
-        case "storeitems": //uses :appid pasram
+        case "storeitems": //uses :appid param
             $("#tables").show();
             $("#table1").show();
             $("#table1Title").html("Store Items");
             $("#pageTitle").html("Store Items");
             getStoreItems();
         break;
+        // case "storeitemss": //gets them all
+        //     $("#tables").show();
+        //     $("#table1").show();
+        //     $("#table1Title").html("Store Items");
+        //     $("#pageTitle").html("Store Items");
+        //     getStoreItems();
+        // break;
         case "objex": 
             $("#tables").show();
             $("#table1").show();
@@ -306,6 +335,11 @@
             $("#table1Title").html("Activities");
             // $("#pageTitle").html("Activities by " + username);
             getActivities(appid);
+        break;
+        case "actions":
+            $("#table1Title").html("Actions");
+            // $("#pageTitle").html("Activities by " + username);
+            getActions();
         break;
         case "importstoreitems": //tmp utility
             $("#pageTitle").html("tryna import store items...");
@@ -451,9 +485,9 @@
         let envs = ["default","contact","egypt","checkerboard","forest","goaland","yavapai","goldmine","arches","threetowers","poison","tron","japan","dream","volcano","starry","osiris"];
             environment = envs[Math.floor(Math.random()*envs.length)]; //random if not set via qs param
         }
-        let links = "<a-assets><img id=\x22thumbMountains\x22 crossOrigin=\x22anonymous\x22 src=\x22https://realitymangler.com/YnHTO2MHP/5c33e4ada0a53d08d90f3e43.standard.ss_ynhto2mhp_1546904729.jpg\x22>"+
-        "</a-assets>"+
-        "<a-link href=\x22https://servicemedia.net/webxr/pVBHeiaCI\x22 position=\x223.5 1.5 -1.0\x22 image=\x22#thumbMountains\x22></a-link>";
+        // let links = "<a-assets><img id=\x22thumbMountains\x22 crossOrigin=\x22anonymous\x22 src=\x22https://realitymangler.com/YnHTO2MHP/5c33e4ada0a53d08d90f3e43.standard.ss_ynhto2mhp_1546904729.jpg\x22>"+
+        // "</a-assets>"+
+        // "<a-link href=\x22https://servicemedia.net/webxr/pVBHeiaCI\x22 position=\x223.5 1.5 -1.0\x22 image=\x22#thumbMountains\x22></a-link>";
         // console.log("tryna set aframe scene with links " + links);
         let height = window.innerHeight - 100;
         let aframe = "<div class=\x22row\x22>" +
@@ -461,14 +495,14 @@
             "<a-scene loading-screen=\x22dotsColor: white; backgroundColor: black\x22 embedded environment=\x22preset: "+environment+"\x22>" +
             "<a-entity id=\x22mouseCursor\x22 cursor=\x22rayOrigin: mouse\x22 raycaster=\x22objects: .activeObjexRay\x22></a-entity>"+
             "<a-entity id=\x22cameraRig\x22 position=\x220 0 0\x22>"+
-            "<a-entity id=\x22head\x22 camera wasd-controls look-controls touch-controls position=\x220 1.6 0\x22></a-entity>"+
+            "<a-entity id=\x22head\x22 camera wasd-controls look-controls touch-controls position=\x220 1.6 0\x22 disable-magicwindow device-orientation-permission-ui=\x22enabled: false\x22></a-entity>"+
             "<a-entity oculus-touch-controls=\x22hand: right\x22 laser-controls=\x22hand: left;\x22 handModelStyle: lowPoly; color: #ffcccc\x22 raycaster=\x22objects: .activeObjexRay;\x22></a-entity>" +
             "<a-entity oculus-touch-controls=\x22hand: left\x22 id=\x22right-hand\x22 hand-controls=\x22hand: right; handModelStyle: lowPoly; color: #ffcccc\x22 aabb-collider=\x22objects: .activeObjexGrab;\x22 grab></a-entity>"+
                 "</a-entity>"+
                 "<a-assets>" +
                     "<a-asset-item id=\x22cityModel\x22 crossorigin=\x22anonymous\x22response-type=\x22arraybuffer\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/test_gltf.glb\x22></a-asset-item>" +
-                    "<a-asset-item id=\x22rover\x22 crossorigin=\x22anonymous\x22 response-type=\x22arraybuffer\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/rover_static.glb\x22></a-asset-item>" +
-                    "<a-asset-item id=\x22mech1\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/astronaut.glb\x22></a-asset-item>" +
+                    // "<a-asset-item id=\x22rover\x22 crossorigin=\x22anonymous\x22 response-type=\x22arraybuffer\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/rover_static.glb\x22></a-asset-item>" +
+                    // "<a-asset-item id=\x22mech1\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/astronaut.glb\x22></a-asset-item>" +
                 "</a-assets>" +
                 "<a-entity position=\x22-10 -0.5 -60\x22 gltf-model=\x22#cityModel\x22></a-entity>" +
                 "<a-entity position=\x22-6 0 -8\x22 gltf-model=\x22#rover\x22 animation-mixer=\x22clip: idle\x22></a-entity>" +
@@ -476,7 +510,7 @@
                 " animation-mixer=\x22clip: idle\x22 animation__yoyo=\x22property: position; dir: alternate; dur: 10000; easing: easeInSine; loop: true; to: 2 1 -4\x22></a-entity>" +
                 "<a-sphere scene-info class=\x22\x22 id=\x22sphere\x22 position=\x220 1.25 -5\x22 radius=\x221.25\x22 material=\x22shader: noise\x22" +
                 "</a-sphere>" +
-                "<a-link class=\x22activeObjexRay\x22 title=\x22portal\x22 look-at=\x22#head\x22 href=\x22../webxr/pVBHeiaCI\x22 position=\x22-5 0 0\x22 image=\x22#thumbMountains\x22></a-link>" +
+                // "<a-link class=\x22activeObjexRay\x22 title=\x22portal\x22 look-at=\x22#head\x22 href=\x22../webxr/pVBHeiaCI\x22 position=\x22-5 0 0\x22 image=\x22#thumbMountains\x22></a-link>" +
                 "<a-light type=\x22point\x22 color=\x22blue\x22 position=\x22-0 1.25 0\x22></a-light>" +
                 "<a-text id=\x22mainText\x22 value=\x22Welcome "+username+"!\x22 align=\x22center\x22 color=\x22#FFF\x22 visible=\x22false\x22 position=\x22-0 2 -0\x22"+
                 "geometry=\x22primitive: plane; width: 4\x22 material=\x22color: #333\x22>" +
@@ -589,10 +623,10 @@
             environment = response.data.sceneWebXREnvironment;
             console.log("environment: " + environment);
         }
-        assets = assets + "<img id=\x22thumbMountains\x22 crossorigin=\x22anonymous\x22 src=\x22https://realitymangler.com/assets/547389e8cac0642460000004.half.DoorsMedieval0134_L.jpg\x22>";
+        // assets = assets + "<img id=\x22thumbMountains\x22 crossorigin=\x22anonymous\x22 src=\x22https://realitymangler.com/assets/547389e8cac0642460000004.half.DoorsMedieval0134_L.jpg\x22>";
         let aframe = "<div class=\x22row\x22>" +
         "<div style=\x22width:100%; height:"+height+"px;\x22>" +
-            "<a-scene loading-screen=\x22dotsColor: white; backgroundColor: black\x22 embedded environment=\x22preset: "+environment+"\x22>" +
+            "<a-scene loading-screen=\x22dotsColor: white; backgroundColor: black\x22 disable-magicwindow device-orientation-permission-ui=\x22enabled: false\x22 embedded environment=\x22preset: "+environment+"\x22>" +
                 "<a-entity id=\x22mouseCursor\x22 cursor=\x22rayOrigin: mouse\x22 raycaster=\x22objects: .activeObjexRay\x22></a-entity>"+
                 "<a-entity id=\x22cameraRig\x22 position=\x220 0 0\x22>"+
                 
@@ -611,7 +645,7 @@
                 "</a-entity>"+
                 "<a-entity mixin=\x22grabmix\x22 class=\x22activeObjexGrab activeObjexRay\x22 primary-audio-control id=\x22sphere\x22 geometry=\x22primitive: sphere; radius: .25\x22 material=\x22shader: noise\x22 position=\x220 1.6 -1\x22" +
                 "</a-entity>" +
-                "<a-link class=\x22activeObjexRay\x22 title=\x22portal\x22 look-at=\x22#head\x22 href=\x22index.html\x22 position=\x22-15 0 0\x22 image=\x22#thumbMountains\x22></a-link>" +
+                // "<a-link class=\x22activeObjexRay\x22 title=\x22portal\x22 look-at=\x22#head\x22 href=\x22index.html\x22 position=\x22-15 0 0\x22 image=\x22#thumbMountains\x22></a-link>" +
                 "<a-sky color=\x22#ECECEC\x22></a-sky>" +
 
             "</a-scene>" +
@@ -935,6 +969,7 @@
         var html = "<div class=\x22row\x22>";
         var re = /(?:\.([^.]+))?$/;
         let glbIndex = 0;
+        let usdzIndex = 0;
         for(var i = 0; i < arr.length; i++) {
         // console.log(JSON.stringify(arr[i]));
         var ext = re.exec(arr[i].name)[1].toLowerCase(); //get the extension (TODO use contentType metadata from request header)
@@ -959,7 +994,7 @@
                         "<br>" + convertTimestamp(dateSplitter(arr[i].name)) +
                     "</div>" +
                 "</div>";
-            } else if (ext == "mp3" || ext == "aif" || ext == "wav" || ext == "ogg") {
+            } else if (ext.toLowerCase() == "mp3" || ext.toLowerCase() == "aif" || ext.toLowerCase() == "wav" || ext.toLowerCase() == "ogg") {
             html = html + 
                 "<div class=\x22card\x22 style=\x22width:320px;\x22>" +
                     "<div class=\x22card-header\x22>"+
@@ -980,7 +1015,7 @@
                         "<br>" + convertTimestamp(dateSplitter(arr[i].name)) +
                     "</div>" +
                 "</div>";
-            } else if (ext == "mp4" || ext == "mkv" || ext == "MP4" || ext == "MKV" || ext == "webm" || ext == "WEBM") {
+            } else if (ext.toLowerCase() == "mp4" || ext.toLowerCase() == "mkv" || ext.toLowerCase() == "webm" || ext.toLowerCase() == "mov") {
             html = html + 
             "<div class=\x22card\x22 style=\x22width:320px;\x22>" +
                 "<div class=\x22card-header\x22>"+
@@ -991,7 +1026,7 @@
                 "</div>" +
                 "</div>" +
                 "<div class=\x22card-body\x22>" +
-                    "<video width='320' height='240' controls>" +
+                    "<video width='320' height='240' preload='none' controls>" +
                     "<source src=" + arr[i].url + " type='video/mp4'>" +
                     "<source src=" + arr[i].url + " type='video/mkv'>" +
                     "Your browser does not support the video tag." +
@@ -1018,7 +1053,45 @@
                         "<br>" + convertTimestamp(dateSplitter(arr[i].name)) +
                     "</div>" +
                 "</div>";
-            }   else  {
+            }  else if (ext == "usdz") {
+                usdzIndex++;
+                usdzObj = arr[i];
+                html = html + 
+                "<div class=\x22card\x22 style=\x22width:320px;\x22>" +
+                    "<div class=\x22card-header\x22>"+
+                    "<span class=\x22float-left\x22><i class=\x22fas fa-cubes fa-3x\x22 style=\x22color:red;\x22></i></span>"+
+                    "<div style=\x22margin: 5px\x22 class=\x22float-right custom-control custom-checkbox\x22>" +
+                        "<input name=\x22select\x22 type=\x22checkbox\x22 class=\x22custom-control-input\x22 id="+arr[i].name+">" +
+                        "<label class=\x22custom-control-label\x22 for=\x22"+arr[i].name+"\x22>Select</label>" +
+                    "</div>" +
+                    "</div>" +
+                    "<div class=\x22card-body\x22 style=\x22width:300px; height:200;\x22>" + //embedded
+                        // "<a class=\x22btn btn-md btn-danger\x22 href=\x22"+arr[i].url+"\x22>Preview USDZ (iOS only)</a><br><br>"+
+                        "<button class=\x22btn btn-md btn-danger\x22 onclick=previewUSDZ(\x22"+arr[i].url+"\x22)>Preview USDZ (iOS only)</button><br><br>"+
+                        "<strong>" + nameSplitter(arr[i].name) +"</strong>" + 
+                        "<br>" + convertTimestamp(dateSplitter(arr[i].name)) +
+                    "</div>" +
+                "</div>";
+            }  else if (ext == "reality") {
+                usdzIndex++;
+                usdzObj = arr[i];
+                html = html + 
+                "<div class=\x22card\x22 style=\x22width:320px;\x22>" +
+                    "<div class=\x22card-header\x22>"+
+                    "<span class=\x22float-left\x22><i class=\x22fas fa-cubes fa-3x\x22 style=\x22color:orange;\x22></i></span>"+
+                    "<div style=\x22margin: 5px\x22 class=\x22float-right custom-control custom-checkbox\x22>" +
+                        "<input name=\x22select\x22 type=\x22checkbox\x22 class=\x22custom-control-input\x22 id="+arr[i].name+">" +
+                        "<label class=\x22custom-control-label\x22 for=\x22"+arr[i].name+"\x22>Select</label>" +
+                    "</div>" +
+                    "</div>" +
+                    "<div class=\x22card-body\x22 style=\x22width:300px; height:200;\x22>" + //embedded
+                        // "<a class=\x22btn btn-md btn-danger\x22 href=\x22"+arr[i].url+"\x22>Preview USDZ (iOS only)</a><br><br>"+
+                        "<button class=\x22btn btn-md btn-warning\x22 onclick=previewUSDZ(\x22"+arr[i].url+"\x22)>Preview .Reality (iOS only)</button><br><br>"+
+                        "<strong>" + nameSplitter(arr[i].name) +"</strong>" + 
+                        "<br>" + convertTimestamp(dateSplitter(arr[i].name)) +
+                    "</div>" +
+                "</div>";
+            }  else  {
             html = html + //it's a whatever file?!?!?
             "<div class=\x22card\x22 style=\x22width:320px;\x22>" +
                 "<div class=\x22card-header\x22>"+
@@ -1062,7 +1135,24 @@
         // console.log(html);
         return  html + "</div>";
     }
+    function previewUSDZ(usdzSrc) {
+        console.log("tryna load a usdz " + usdzSrc);
+        // check for AR support
+	    const a = document.createElement('a'),
+            supportsAR = a.relList.supports('ar') ? true : false;
 
+        // if the host device supports AR Quick Look...
+        if ( supportsAR ) {
+            const anchor = document.createElement('a');
+            anchor.setAttribute('rel', 'ar');
+            anchor.appendChild(document.createElement('img'));
+            anchor.setAttribute('href', usdzSrc);
+            anchor.click();
+        } else {
+            console.log("unsupported environment");
+        }
+
+    }
     function previewGLTF(objectString) {
         console.log(objectString);
         let jsonObj = objectString;
@@ -1071,7 +1161,7 @@
         let camera = "<a-entity id='cameraRig' position='0 6 6'>"+  
         "<a-entity camera touch-controls wasd-controls='fly: true;' look-controls position='0 0 0'></a-entity>"+
         "</a-entity>";
-        let aframeScene = "<div style='width: 100%; height: 1000px;'>"+jsonObj.name+"<a-scene embedded environment='preset: default;'>" +
+        let aframeScene = "<div style='width: 100%; height: 1000px;'>"+jsonObj.name+"<a-scene disable-magicwindow device-orientation-permission-ui=\x22enabled: false\x22 embedded environment='preset: default;'>" +
             // "<a-entity camera look-controls orbit-controls='target: 0 1 -5; minDistance: 0.5; maxDistance: 100; initialPosition: 0 0 0'></a-entity>"+
             camera +
             "<a-assets>" +
@@ -1218,6 +1308,7 @@
             }
     }
     function selectItem(sourcetype, itemtype, sourceID, itemID) { //select and add a reference to an external object, e.g. a picture to store item
+
         console.log("tryna select " + itemtype + " for " + sourcetype);
         let headers = { headers: {
                 appid: appid,
@@ -1233,7 +1324,8 @@
                 .then(function (response) {
                     console.log(response);
                     if (response.data.includes("updated")) {
-                        window.history.back();
+                        // window.history.back();
+                        window.location = "index.html?type=scene&iid="+sourceID;
                     } else {
                         $("#topAlert").html(response.data);
                         $("#topAlert").show();
@@ -1254,7 +1346,8 @@
                 .then(function (response) {
                     console.log(response);
                     if (response.data.includes("updated")) {
-                        window.history.back();
+                        // window.history.back();
+                        window.location = "index.html?type=scene&iid="+sourceID;
                     } else {
                         $("#topAlert").html(response.data);
                         $("#topAlert").show();
@@ -1275,7 +1368,8 @@
                 .then(function (response) {
                     console.log(response);
                     if (response.data.includes("updated")) {
-                        window.history.back();
+                        // window.history.back();
+                        window.location = "index.html?type=scene&iid="+sourceID;
                     } else {
                         $("#topAlert").html(response.data);
                         $("#topAlert").show();
@@ -1297,7 +1391,8 @@
                 .then(function (response) {
                     console.log(response);
                     if (response.data.includes("updated")) {
-                        window.history.back();
+                        // window.history.back();
+                        window.location = "index.html?type=scene&iid="+sourceID;
                     } else {
                         $("#topAlert").html(response.data);
                         $("#topAlert").show();
@@ -1318,7 +1413,9 @@
                 .then(function (response) {
                     console.log(response);
                     if (response.data.includes("updated")) {
-                        window.history.back();
+                        // window.history.back();
+                        // console.log(document.referrer);
+                        window.location = "index.html?type=scene&iid="+sourceID;
                     } else {
                         $("#topAlert").html(response.data);
                         $("#topAlert").show();
@@ -1339,7 +1436,30 @@
                 .then(function (response) {
                     console.log(response);
                     if (response.data.includes("updated")) {
-                        window.history.back();
+                        // window.history.back();
+                        window.location = "index.html?type=scene&iid="+sourceID;
+                    } else {
+                        $("#topAlert").html(response.data);
+                        $("#topAlert").show();
+                    }
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+            }
+        }
+        if (sourcetype == "scene") {
+            if (itemtype == "text") {
+                let data = { 
+                    scene_id : sourceID,
+                    text_id: itemID
+                };
+                axios.post('/add_scene_text_item', data, headers)
+                .then(function (response) {
+                    console.log(response);
+                    if (response.data.includes("updated")) {
+                        // window.history.back();
+                        window.location = "index.html?type=scene&iid="+sourceID;
                     } else {
                         $("#topAlert").html(response.data);
                         $("#topAlert").show();
@@ -1361,7 +1481,77 @@
                 .then(function (response) {
                     console.log(response);
                     if (response.data.includes("updated")) {
-                        window.history.back();
+                        // window.history.back();
+                        window.location = "index.html?type=scene&iid="+sourceID;
+                    } else {
+                        $("#topAlert").html(response.data);
+                        $("#topAlert").show();
+                    }
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+            }
+        }
+        if (sourcetype == "scene") {
+            if (itemtype == "paudiogroup") {
+                let data = { 
+                    scene_id : sourceID,
+                    group_id: itemID,
+                    grouptype: 'paudio'
+                };
+                axios.post('/add_scene_group', data, headers)
+                .then(function (response) {
+                    console.log(response);
+                    if (response.data.includes("updated")) {
+                        // window.history.back();
+                        window.location = "index.html?type=scene&iid="+sourceID;
+                    } else {
+                        $("#topAlert").html(response.data);
+                        $("#topAlert").show();
+                    }
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+            }
+        }
+        if (sourcetype == "scene") {
+            if (itemtype == "aaudiogroup") {
+                let data = { 
+                    scene_id : sourceID,
+                    group_id: itemID,
+                    grouptype: 'aaudio'
+                };
+                axios.post('/add_scene_group', data, headers)
+                .then(function (response) {
+                    console.log(response);
+                    if (response.data.includes("updated")) {
+                        // window.history.back();
+                        window.location = "index.html?type=scene&iid="+sourceID;
+                    } else {
+                        $("#topAlert").html(response.data);
+                        $("#topAlert").show();
+                    }
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+            }
+        }
+        if (sourcetype == "scene") {
+            if (itemtype == "taudiogroup") {
+                let data = { 
+                    scene_id : sourceID,
+                    group_id: itemID,
+                    grouptype: 'taudio'
+                };
+                axios.post('/add_scene_group', data, headers)
+                .then(function (response) {
+                    console.log(response);
+                    if (response.data.includes("updated")) {
+                        // window.history.back();
+                        window.location = "index.html?type=scene&iid="+sourceID;
                     } else {
                         $("#topAlert").html(response.data);
                         $("#topAlert").show();
@@ -1382,7 +1572,8 @@
                 .then(function (response) {
                     console.log(response);
                     if (response.data.includes("updated")) {
-                        window.history.back();
+                        // window.history.back();
+                        window.location = "index.html?type=scene&iid="+sourceID;
                     } else {
                         $("#topAlert").html(response.data);
                         $("#topAlert").show();
@@ -1405,7 +1596,8 @@
                 .then(function (response) {
                     console.log(response);
                     if (response.data.includes("updated")) {
-                        window.history.back();
+                        // window.history.back();
+                        window.location = "index.html?type=scene&iid="+sourceID;
                     } else {
                         $("#topAlert").html(response.data);
                         $("#topAlert").show();
@@ -1428,7 +1620,8 @@
                 .then(function (response) {
                     console.log(response);
                     if (response.data.includes("updated")) {
-                        window.history.back();
+                        // window.history.back();
+                        window.location = "index.html?type=scene&iid="+sourceID;
                     } else {
                         $("#topAlert").html(response.data);
                         $("#topAlert").show();
@@ -1450,7 +1643,8 @@
                 .then(function (response) {
                     console.log(response);
                     if (response.data.includes("updated")) {
-                        window.history.back();
+                        // window.history.back();
+                        window.location = "index.html?type=scene&iid="+sourceID;
                     } else {
                         $("#topAlert").html(response.data);
                         $("#topAlert").show();
@@ -1469,6 +1663,28 @@
                     grouptype: 'video'
                 };
                 axios.post('/add_scene_group', data, headers)
+                .then(function (response) {
+                    console.log(response);
+                    if (response.data.includes("updated")) {
+                        // window.history.back();
+                        window.location = "index.html?type=scene&iid="+sourceID;
+                    } else {
+                        $("#topAlert").html(response.data);
+                        $("#topAlert").show();
+                    }
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+            }
+        }
+        if (sourcetype == "storeitem") {
+            if (itemtype == "object") {
+                let data = { 
+                    storeitem_id : sourceID,
+                    obj_id: itemID
+                };
+                axios.post('/add_storeitem_obj', data, headers)
                 .then(function (response) {
                     console.log(response);
                     if (response.data.includes("updated")) {
@@ -1504,13 +1720,13 @@
                 });
             }
         }
-        if (sourcetype == "app") {
-            if (itemtype == "picture") {
+        if (sourcetype == "storeitem") {
+            if (itemtype == "scenegroup") {
                 let data = { 
-                    app_id : sourceID,
-                    pic_id: itemID
+                    storeitem_id : sourceID,
+                    group_id: itemID
                 };
-                axios.post('/add_app_pic', data, headers)
+                axios.post('/add_storeitem_scenegroup', data, headers)
                 .then(function (response) {
                     console.log(response);
                     if (response.data.includes("updated")) {
@@ -1569,6 +1785,98 @@
                 });
             }
         }
+        if (sourcetype == "object") {
+            if (itemtype == "model") {
+                let data = { 
+                    object_id : sourceID,
+                    model_id: itemID
+                };
+                
+                axios.post('/add_object_model', data, headers)
+                .then(function (response) {
+                    console.log(response);
+                    if (response.data.includes("updated")) {
+                        // window.history.back();
+                        window.location = "index.html?type=object&iid="+sourceID;
+                    } else {
+                        $("#topAlert").html(response.data);
+                        $("#topAlert").show();
+                    }
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+            }
+        }
+        if (sourcetype == "object") {
+            if (itemtype == "action") {
+                let data = { 
+                    object_id : sourceID,
+                    action_id: itemID
+                };
+
+                axios.post('/add_obj_action', data, headers) //add_object_action deprecated, push to array now
+                .then(function (response) {
+                    console.log(response);
+                    if (response.data.includes("updated")) {
+                        // window.history.back();
+                        window.location = "index.html?type=object&iid="+sourceID;
+                    } else {
+                        $("#topAlert").html(response.data);
+                        $("#topAlert").show();
+                    }
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+            }
+        }
+        if (sourcetype == "action") { //hrm, maybe not..
+            if (itemtype == "object") {
+                let data = { 
+                    action_id : sourceID,
+                    object_id: itemID
+                };
+
+                axios.post('/add_action_object', data, headers) //add_object_action deprecated, push to array now
+                .then(function (response) {
+                    console.log(response);
+                    if (response.data.includes("updated")) {
+                        // window.history.back();
+                        window.location = "index.html?type=action&iid="+sourceID;
+                    } else {
+                        $("#topAlert").html(response.data);
+                        $("#topAlert").show();
+                    }
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+            }
+        }
+        if (sourcetype == "action") {
+            if (itemtype == "model") {
+                let data = { 
+                    action_id : sourceID,
+                    model_id: itemID
+                };
+
+                axios.post('/add_action_model', data, headers) //add_object_action deprecated, push to array now
+                .then(function (response) {
+                    console.log(response);
+                    if (response.data.includes("updated")) {
+                        // window.history.back();
+                        window.location = "index.html?type=action&iid="+sourceID;
+                    } else {
+                        $("#topAlert").html(response.data);
+                        $("#topAlert").show();
+                    }
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+            }
+        }
         if (sourcetype == "domain") {
             if (itemtype == "picture") {
                 let data = { 
@@ -1580,6 +1888,27 @@
                     console.log(response);
                     if (response.data.includes("updated")) {
                         window.history.back();
+                    } else {
+                        $("#topAlert").html(response.data);
+                        $("#topAlert").show();
+                    }
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+            }
+        }
+        if (sourcetype == "group") {
+            if (itemtype == "video") {
+                let data = { 
+                    group_id : sourceID,
+                    item_id: itemID
+                };
+                axios.post('/add_group_item', data, headers)
+                .then(function (response) {
+                    console.log(response);
+                    if (response.data.includes("updated")) {
+                            window.location.href = "index.html?type=group&iid=" + sourceID;
                     } else {
                         $("#topAlert").html(response.data);
                         $("#topAlert").show();
@@ -1622,6 +1951,70 @@
                     console.log(response);
                     if (response.data.includes("updated")) {
                             window.location.href = "index.html?type=group&iid=" + sourceID;
+                    } else {
+                        $("#topAlert").html(response.data);
+                        $("#topAlert").show();
+                    }
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+            }
+        }        
+        if (sourcetype == "group") {
+            if (itemtype == "scene") {
+                let data = { 
+                    group_id : sourceID,
+                    item_id: itemID
+                };
+                console.log("grpu scene data " + data);
+                axios.post('/add_group_item', data, headers)
+                .then(function (response) {
+                    console.log(response);
+                    if (response.data.includes("updated")) {
+                            window.location.href = "index.html?type=group&iid=" + sourceID;
+                    } else {
+                        $("#topAlert").html(response.data);
+                        $("#topAlert").show();
+                    }
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+            }
+        }
+        if (sourcetype == "app") {
+            if (itemtype == "admin") {
+                let data = { 
+                    app_id : sourceID,
+                    user_id: itemID
+                };
+                axios.post('/add_app_admin', data, headers)
+                .then(function (response) {
+                    console.log(response);
+                    if (response.data.includes("updated")) {
+                            window.location.href = "index.html?type=app&iid=" + sourceID;
+                    } else {
+                        $("#topAlert").html(response.data);
+                        $("#topAlert").show();
+                    }
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+            }
+        }
+        if (sourcetype == "app") {
+            if (itemtype == "picture") {
+                let data = { 
+                    app_id : sourceID,
+                    pic_id: itemID
+                };
+                axios.post('/add_app_pic', data, headers)
+                .then(function (response) {
+                    console.log(response);
+                    if (response.data.includes("updated")) {
+                        window.history.back();
                     } else {
                         $("#topAlert").html(response.data);
                         $("#topAlert").show();
@@ -1757,6 +2150,27 @@
                     console.log(response);
                     if (response.data.includes("updated")) {
                         window.location.reload();
+                    } else {
+                        $("#topAlert").html(response.data);
+                        $("#topAlert").show();
+                    }
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+            }
+        }
+        if (sourcetype == "app") {
+            if (itemtype == "admin") {
+                let data = { 
+                    app_id : sourceID,
+                    user_id: itemID
+                };
+                axios.post('/remove_app_admin', data, headers)
+                .then(function (response) {
+                    console.log(response);
+                    if (response.data.includes("updated")) {
+                            window.location.href = "index.html?type=app&iid=" + sourceID;
                     } else {
                         $("#topAlert").html(response.data);
                         $("#topAlert").show();
@@ -2406,9 +2820,11 @@
             console.log(error);
             });
     }
-    function returnTimeKeys(timekeys) { //helper function for showAudio view below
+    function ReturnTimeKeys(timekeys) { //helper function for showAudio view below //reuse for video?
         if (timekeys != null && timekeys.length > 0) {
-            var tableHead = "Audio Events: <table id=\x22timekeyTable\x22 class=\x22display table table-striped table-bordered\x22 style=\x22width:100%\x22>" +
+            timekeys.sort((a, b) => parseFloat(a.keystarttime) - parseFloat(b.keystarttime));
+            
+            var tableHead = "Timed Events: <table id=\x22timekeyTable\x22 class=\x22display table table-striped table-bordered\x22 style=\x22width:100%\x22>" +
             "<thead>"+
             "<tr>"+
             "<th>Start Time (secs)</th>"+
@@ -2430,8 +2846,17 @@
                 "<td><input type=\x22text\x22 class=\x22tk_start form-control\x22 id=\x22tk_start_" + i + "\x22 value=\x22" + timekeys[i].keystarttime + "\x22></td>" +
                 "<td><input type=\x22text\x22 class=\x22tk_duration form-control\x22 id=\x22tk_duration_" + i + "\x22 value=\x22" + timekeys[i].keyduration + "\x22></td>" +
                 "<td>" + 
-                "<select id=\x22tk_type_"+ i +"\x22 class=\x22tk_type form-control\x22 id=\x22audioEventType\x22 >" +
+                "<select id=\x22tk_type_"+ i +"\x22 class=\x22tk_type form-control\x22 id=\x22timedEventType\x22 >" +
                     "<option value=\x22\x22 disabled selected>Select:</option>" +
+                    "<option>Beat</option>" +
+                    "<option>Next</option>" +
+                    "<option>Previous</option>" +
+                    "<option>Color Lerp</option>" +
+                    "<option>Color Tweak</option>" +
+                    "<option>Player Snap</option>" +
+                    "<option>Player Lerp</option>" +
+                    "<option>Target Snap</option>" +
+                    "<option>Target Lerp</option>" +
                     "<option>Play Anim</option>" +
                     "<option>Pause</option>" +
                     "<option>Delay</option>" +
@@ -2454,7 +2879,7 @@
             timeKeysHtml = tableHead + tableBody + tableFoot;
             return timeKeysHtml;
         } else {
-            return "No Audio Events";
+            return "No Events";
         }
     }
     function showAudio (item_id) {
@@ -2475,16 +2900,22 @@
             if (response.data.lastUpdateTimestamp != null) {
                 date = response.data.lastUpdateTimestamp;
             }
+            
             let tagsHtml = "";
             let tags = [];
             let timeKeysHtml = "";
             let timekeys = [];
             let currentTime = 0;
             let duration = 0;
+            let cid =  (response.data.cid != undefined && response.data.cid != 'undefined') ? response.data.cid  : ""; 
+            let ipfsLink = "";
+            if (cid != "") {
+                ipfsLink = " | <a href=\x22https://ipfs.io/ipfs/"+cid+"\x22>IPFS CID: "+cid+"</a>";
+            }
             var card = "<div class=\x22col-lg-12\x22>" +
                 "<div class=\x22card shadow mb-4\x22>" +
                 "<div class=\x22card-header py-3 d-flex flex-row align-items-center justify-content-between\x22>" +
-                "<h6 class=\x22m-0 font-weight-bold text-primary\x22>Audio Details - Title: "+ response.data.title + " | _id: " +response.data._id+ "</h6>" +
+                "<h6 class=\x22m-0 font-weight-bold text-primary\x22>Audio Details - Title: "+ response.data.title + " | _id: " +response.data._id + ipfsLink + "</h6> <button type=\x22button\x22 class=\x22btn btn-sm btn-danger float-right\x22 id=\x22ipfsUP\x22>Update IPFS</button>"+
                 "</div>" +
                 "<div class=\x22card-body\x22>" +
                     "<form id=\x22updateAudioForm\x22>" +
@@ -2576,9 +3007,9 @@
                                 "<label for=\x22modifications\x22>Modifications</label>" + 
                                 "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22modifications\x22 value=\x22" + response.data.modifications + "\x22 >" +
                             "</div>" +
-                            "<div class=\x22col form-group col-md-12\x22>" + 
-                                "<button class=\x22float-right btn btn-md btn-success previewModel\x22>Preview Model</button>" +
-                            "</div>" +     
+                            // "<div class=\x22col form-group col-md-12\x22>" + 
+                            //     "<button class=\x22float-right btn btn-md btn-success previewModel\x22>Preview Model</button>" +
+                            // "</div>" +     
                         "</div>" +    
                         "<div class=\x22form-row\x22>" +
                             "<div class=\x22col form-group col-md-4\x22>" +
@@ -2602,7 +3033,9 @@
                             "<div class=\x22col form-group col-md-12\x22>" + //wavesurfer
                                 "<div id=\x22waveform\x22></div>" +
                                 "<div id=\x22currentTime\x22>Current Time</div>" +
-                                "<button id=\x22newAudioEvent\x22 type=\x22button\x22 class=\x22btn btn-sm btn-success float-right\x22>New Event</button>" +
+                                "<label for=\x22peakThreshold\x22>Peak Threshold</label><input type=\x22number\x22 step=\x220.001\x22 style=\x22width: 5em\x22 class=\x22form-control float-right\x22 id=\x22peakThreshold\x22 placeholder=\x22.3\x22 value=\x22.3\x22 max=\x221\x22>" +
+                                "<button id=\x22peakSniffer\x22 type=\x22button\x22 class=\x22btn btn-sm btn-primary float-right\x22>Detect Peak Data</button><br><br>" +
+                               "<button id=\x22newAudioEvent\x22 type=\x22button\x22 class=\x22btn btn-sm btn-success float-right\x22>New Event</button>" +
                                 "<button data-action=\x22play\x22 id=\x22playAudio\x22 class=\x22btn btn-info btn-sm float-left\x22>Play/Pause</button>" +
                             "</div>" +
                             "<div id=\x22audioEvents\x22 class=\x22col form-group col-md-12\x22></div>" + //audioEvents
@@ -2614,6 +3047,7 @@
                     "</div>" +
                 "</div>" +
                 "</div>" +
+                "<pre>"+ keyValues(response.data) +"</pre>";
                 "</div>";
                 $("#cardrow").html(card);
                 $("#isPublic").bootstrapToggle();
@@ -2641,23 +3075,47 @@
                     }
                     $("#tagDisplay").html(tagsHtml);
                 };
-                $(function() { //shorthand document.ready function
+                $(function() { 
                     if (response.data.timekeys != undefined && response.data.timekeys != null) {
                         timekeys = response.data.timekeys;
                     } 
-                    // console.log(returnTimeKeys(timekeys));
-                    $("#audioEvents").html(returnTimeKeys(timekeys));
+                    console.log(response.data.URLmp3);
+                    $("#audioEvents").html(ReturnTimeKeys(timekeys)); //populate saved timekeys
+                    let xhr = { cache: 'default', mode: 'cors', method: 'GET', credentials: 'same-origin', redirect: 'follow', referrer: 'client', headers: [ { key: 'Authorization', value: 'my-token' } ]};
                     var wavesurfer = WaveSurfer.create({
                         container: '#waveform',
                         waveColor: 'violet',
                         progressColor: 'purple',
+                        xhr: xhr
                         // plugins: [
                         //     window.WaveSurfer.timeline.create({
                         //         container: "#wave-timeline"
                         //     })
                         //   ]
                     });
+                    // let peaks = [];
                     wavesurfer.load(response.data.URLmp3);
+                    wavesurfer.on('ready', function () {
+                        // let duration = wavesurfer.getDuration();
+                        // duration = Math.round(duration * 10);
+                        // console.log("splitting into : " + duration);
+                        // let peaks = wavesurfer.backend.getPeaks(duration);
+                        // let peaksData = [];
+                        // console.log("peaks : " + JSON.stringify(peaks));
+                        // for (let i = 0; i < peaks.length; i++) {
+                        //     if (i % 2 === 0) { //each peak is 2 entries, min and max
+                        //         let peak = {};
+                        //         peak.time = (i * .05).toFixed(1); //each peak is .1 and takes 2 entries in array
+                        //         peak.total = (peaks[i] - peaks[i+1]).toFixed(3); //second val is negative, so subtracting it adds to total?
+                        //         // console.log(peaks[i] + " and " + peaks[i+1] + " : " + JSON.stringify(peak));
+                        //         if (peak.total > .15) {
+                        //             peaksData.push(peak);
+                        //         }
+                        //     }
+                        // }
+                        // console.log("peaks : " + JSON.stringify(peaksData));
+                    });
+                    
                     wavesurfer.on('audioprocess', function () {
                         currentTime = wavesurfer.getCurrentTime();
                         // console.log(cTime);
@@ -2668,6 +3126,43 @@
                             $("#tk_type_" + i).val(timekeys[i].keytype).change();
                         }
                     }
+                    
+                    $(document).on('click', '#peakSniffer', function() {
+                        let threshold = document.getElementById('peakThreshold').value;
+                        if (threshold > .9) {
+                            threshold = .9;
+                        }
+                        if (threshold < .05) {
+                            threshold = .05;
+                        }
+                        let duration = wavesurfer.getDuration();
+                        duration = Math.round(duration * 10);
+                        console.log("splitting into : " + duration + " threshold is " + threshold);
+                        let peaks = wavesurfer.backend.getPeaks(duration);
+                        let peaksData = [];
+                        console.log("peaks : " + JSON.stringify(peaks));
+                        for (let i = 0; i < peaks.length; i++) {
+                            if (i % 2 === 0) { //each peak is 2 entries, min and max
+                                let peak = {};
+                                peak.keystarttime = (i * .05).toFixed(1); //each peak is .1 and takes 2 entries in array
+                                peak.keydata = (peaks[i] - peaks[i+1]).toFixed(3); //second val is negative, so subtracting it adds to total?
+                                peak.keyduration = threshold; //not exactly but whatevs
+                                peak.keytype = "Beat";
+                                // console.log(peaks[i] + " and " + peaks[i+1] + " : " + JSON.stringify(peak));
+                                if (peak.keydata > parseFloat(threshold)) {
+                                    peaksData.push(peak);
+                                }
+                            }
+                        }
+                        console.log("peaks : " + JSON.stringify(peaksData));
+                        $("#audioEvents").empty();
+                        $("#audioEvents").html(ReturnTimeKeys(peaksData));
+                        for (let i = 0; i < peaksData.length; i++) {
+                            $("#tk_type_" + i).val(peaksData[i].keytype).change();
+                        }
+                        timekeys = peaksData;
+
+                    });
                     $(document).on('change', '.tk_start', function() {
                         console.log(this.id + " value " + this.value);
                         for (let i = 0; i < timekeys.length; i++) {
@@ -2696,7 +3191,7 @@
                         
                         for (let i = 0; i < timekeys.length; i++) {
                             if (this.id == "tk_type_" + i) {
-                                console.log(this.id + " value " + this.value);
+                                // console.log(this.id + " value " + this.value);
                                 timekeys[i].keytype = this.value;
                             }
                         }
@@ -2764,7 +3259,7 @@
                             }
                         timekeys.push(newTimeKey);
                         $("#audioEvents").empty();
-                        $("#audioEvents").html(returnTimeKeys(timekeys));
+                        $("#audioEvents").html(ReturnTimeKeys(timekeys));
                         for (let i = 0; i < timekeys.length; i++) {
                             $("#tk_type_" + i).val(timekeys[i].keytype).change();
                         }
@@ -2780,12 +3275,51 @@
                             }
                         }
                         $("#audioEvents").empty();
-                        $("#audioEvents").html(returnTimeKeys(timekeys));
+                        $("#audioEvents").html(ReturnTimeKeys(timekeys));
                         for (let i = 0; i < timekeys.length; i++) {
                             $("#tk_type_" + i).val(timekeys[i].keytype).change();
                         }
                     });
-                    
+                    $(document).on('click', '#ipfsUP', function (e) {
+                        e.preventDefault(); 
+                        // let sourceImage = document.getElementById('sky').getAttribute("src");
+                        // this.el.addEventListener('loaded', () => {
+                          console.log("tryna upload to ipfs " + item_id);
+                          $.confirm({
+                            title: 'Confirm!',
+                            content: '<color=red>Are you sure you want to upload this to the Interplantary File System, FOREVER?!?!?</color>',
+                            buttons: {
+                                confirm: function () {
+                                    $("#topAlert").html("Attempting to import file to Interplanetary File System, please standby..." );
+                                            $("#topAlert").show();
+                                $.ajax({
+                                    url: "/ipfs_up",
+                                    type: 'POST',
+                                    contentType: "application/json; charset=utf-8",
+                                    dataType: "json",
+                                    data: JSON.stringify({
+                                            id: item_id,
+                                            type: 'audio'
+                                        }),
+                                        success: function( data, textStatus, xhr ){
+                                            console.log(data);
+                                            $("#topSuccess").html("The operation was successful: ipfs://"+ data);
+                                            $("#topSuccess").show();
+                                        },
+                                        error: function( xhr, textStatus, errorThrown ){
+                                            console.log( xhr.responseText );
+                                            $("#topAlert").html(xhr.responseText );
+                                            $("#topAlert").show();
+    
+                                        }
+                                    });
+                                },
+                                cancel: function () {
+                                    // $.alert('Canceled!');
+                                },
+                            }
+                        });
+                    });
                     $('#updateAudioForm').on('submit', function(e) { //use submit action for form validation to work
                         e.preventDefault();  
                         let title = document.getElementById("audioTitle").value;
@@ -2964,6 +3498,804 @@
             $("#newButton").html(newButton);
             $("#newButton").show();
     }
+
+    function getJsonTemplate(template) {
+        console.log("template req for " + template);
+        try {
+            if (template == 'Question/Answer') {
+                let json = {
+                    "question": 'question text here',
+                    "answers_correct": [
+                      { "value": 100, "item": "correct" },
+                      { "value": 200, "item": "more correct" },
+                      { "value": 300, "item": "most correct" },
+                    ],
+                    "answers_incorrect": [
+                        { "value": -100, "item": "incorrect" },
+                        { "value": -200, "item": "more incorrect" },
+                        { "value": -300, "item": "most incorrect" },
+                      ],
+                    "responses_correct": [
+                        { "value": 100, "item": "Bravo!" },
+                        { "value": 200, "item": "Excellent" },
+                        { "value": 300, "item": "Fantastic" },
+                    ],
+                    "responses_incorrect": [
+                        { "value": -100, "item": "Sad!" },
+                        { "value": -200, "item": "Dismal" },
+                        { "value": -300, "item": "Nadir" },
+                    ],
+
+                  };
+                  console.log("jsonTemplate is " + JSON.stringify(json));
+                  return JSON.stringify(json, undefined, 4);
+            } else if (template == 'Question/Multichoice') {
+                let json = {
+                    "question": 'question text here',
+                    "question_choices": [
+                        { "name": "A", "correctness": 0, "value": 100, "description": "option A description" },
+                        { "name": "B", "correctness": 0, "value": 200, "description": "option B description" },
+                        { "name": "C", "correctness": 1, "value": 300, "description": "option C description" },
+                        { "name": "D", "correctness": 2, "value": 400, "description": "option D description" },
+                    ],
+                    "answers_correct": [
+                      { "value": 100, "item": "correct" },
+                      { "value": 200, "item": "more correct" },
+                      { "value": 300, "item": "most correct" },
+                    ],
+                    "responses_correct": [
+                        { "value": 100, "item": "Bravo!" },
+                        { "value": 200, "item": "Excellent" },
+                        { "value": 300, "item": "Fantastic" },
+                    ],
+                    "responses_incorrect": [
+                        { "value": 100, "item": "Sad!" },
+                        { "value": 200, "item": "Dismal" },
+                        { "value": 300, "item": "Nadir" },
+                    ],
+
+                  };
+                  console.log("jsonTemplate is " + JSON.stringify(json));
+                  return JSON.stringify(json, undefined, 4);
+            }   
+
+        } catch (ex) {
+            alert('Wrong JSON Format: ' + ex);
+        }
+    }
+    function getActions() {
+        let config = { headers: {
+            appid: appid,
+            }
+        }
+        axios.get('/actions/' + userid, config)
+        .then(function (response) {
+            // console.log(JSON.stringify(response));
+            // var jsonResponse = response.data;
+            var selectHeader = "";
+            var arr = response.data;
+         
+            if (mode == "select") {
+                selectFor = parent;
+                selectHeader = "<th>Select</th>";
+                $("#pageTitle").html("Select Action for " + parent + " " + itemid);
+            }
+            var tableHead = "<table id=\x22dataTable1\x22 class=\x22display table table-striped table-bordered\x22 style=\x22width:100%\x22>" +
+                "<thead>"+
+                "<tr>"+
+                selectHeader +
+                    // "<th></th>"+
+                "<th>Name</th>"+
+                "<th>Date</th>"+
+                "<th>HiddenDate</th>"+
+                "<th>Tags</th>"+
+                "<th>Status</th>"+
+            "</tr>"+
+            "</thead>"+
+            "<tbody>";
+            var tableBody = "";
+            var selectButton = "";
+            for(var i = 0; i < arr.length; i++) {
+               
+                if (mode == "select") {
+                    selectButton = "<td><button type=\x22button\x22 class=\x22btn btn-primary\x22 onclick=\x22selectItem('" + parent + "','action','" + itemid + "','" + arr[i]._id + "')\x22>Select Action Item</button></td>"
+                }  
+                let timestamp = 0;
+                if (arr[i].lastUpdateTimestamp != null) {
+                    timestamp = arr[i].lastUpdateTimestamp;
+                    console.log("updated timeStamp " + timestamp);
+                } else if (arr[i].otimestamp != null) {
+                    timestamp = arr[i].otimestamp;
+                }
+                let isPublic = false;
+                if (arr[i].isPublic != null) {
+                    isPublic = arr[i].isPublic;
+                }
+                // var detailsPicLink = "<a href=\x22#page-top\x22 onclick=\x22showPicture('" + arr[i]._id + "')\x22><img class=\x22rounded\x22 src=\x22" + arr[i].URLthumb + "\x22></a>"
+                var detailsLink = "<a href=\x22index.html?type=action&iid=" + arr[i]._id + "\x22>" + arr[i].actionName + "</a>";
+
+                tableBody = tableBody +
+                "<tr>" +
+                    selectButton +
+                // "<td>" + detailsLink + "</td>" +
+                "<td>" + detailsLink + "</td>" +
+                "<td>" + convertTimestamp(timestamp) + "</td>" +
+                "<td>" + timestamp + "</td>" +
+                "<td>" + arr[i].tags + "</td>" +
+                "<td>" + isPublic + "</td>" +
+                "</tr>";
+                }
+                var tableFoot =  "</tbody>" +
+                "<tfoot>" +
+                "<tr>" +
+                selectHeader +
+                // "<th></th>"+
+                "<th>Name</th>"+
+                "<th>Date</th>"+
+                "<th>HiddenDate</th>"+
+                "<th>Tags</th>"+
+                "<th>Status</th>"+
+                "</tr>" +
+            "</tfoot>" +
+            "</table>";
+            var resultElement = document.getElementById('table1Data');
+            resultElement.innerHTML = tableHead + tableBody + tableFoot;
+
+            $('#dataTable1').DataTable(
+                {"order": [[ 2, "desc" ]],
+                'columnDefs': [
+                    { 'orderData':[1], 'targets': [1] },
+                    {
+                        'targets': [2],
+                        'visible': false,
+                        'searchable': false
+                    },
+                ]}
+            );
+        })
+        .catch(function (error) {
+        console.log(error);
+        });
+        let newButton = "<button class=\x22btn btn-info  float-right\x22 onclick=\x22newAction()\x22>Create New Action</button>";
+        $("#newButton").html(newButton);
+        $("#newButton").show();
+    }
+    function newAction() {
+        $("#cards").show();
+        var card = "<div class=\x22col-lg-12\x22>" +
+            "<div class=\x22card shadow mb-4\x22>" +
+                "<div class=\x22card-header py-3 d-flex flex-row align-items-center justify-content-between\x22>" +
+                "<h6 class=\x22m-0 font-weight-bold text-primary\x22>Create New Action</h6>" +
+                "</div>" +
+                "<div class=\x22card-body\x22>" +
+                "<form id=\x22newActionForm\x22>" +
+                "<button type=\x22submit\x22 id=\x22sumbitButton\x22 class=\x22btn btn-primary float-right\x22>Create</button>" + 
+                    "<div class=\x22form-row\x22>" +
+                    
+                        "<div class=\x22col form-group col-md-3\x22>" + 
+                            "<label for=\x22actionName\x22>Action Name</label>" + 
+                            "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22actionName\x22 required>" +
+                        "</div>" +
+                        "<div class=\x22col form-group col-md-3\x22>" +
+                        "<label for=\x22fontSelect\x22>Action Type</label>" + //FontSelect
+                        "<select class=\x22form-control\x22 id=\x22actionTypeSelect\x22 required>" +
+                            "<option value=\x22\x22 disabled selected>Select:</option>" +
+                        
+                            "<option>Pickup</option>" +
+                            "<option>Drop</option>" +
+                            "<option>Collect</option>" +
+                            "<option>Combine</option>" +
+                            "<option>Ask</option>" +
+                            "<option>Answer</option>" +
+                            "<option>Play</option>" +
+                            "<option>Use</option>" +
+                            "<option>Equip</option>" +
+                            "<option>Read</option>" +
+                            "<option>Listen/Watch</option>" +
+                            "<option>Create</option>" +
+                            "<option>Destroy</option>" +
+                            "<option>Quest</option>" +
+                            "<option>Achievement</option>" +
+                            "<option>Test</option>" +
+                            "<option>Visit World Location</option>" +
+                            "<option>Visit Geo Location</option>" +
+                        "</select>" +
+                    "</div>" +
+                    "</div>" +
+                "</div>" +
+                "</form>" +
+            "</div>";
+        $("#cardrow").html(card);
+
+        $(function() { //shorthand document.ready function
+            $('#newActionForm').on('submit', function(e) { 
+                e.preventDefault();  
+                // let objname = document.getElementById("objname").value;
+                let actionName = document.getElementById("actionName").value;
+                let actionType = document.getElementById("actionTypeSelect").value;
+                // let objdesc = document.getElementById("objdesc").value;
+                let data = {
+                    actionName: actionName,
+                    actionType: actionType
+                }
+                $.confirm({
+                    title: 'Confirm Action Create',
+                    content: 'Are you sure you want to create an new action?',
+                    buttons: {
+                    confirm: function () {
+                        axios.post(/newaction/, data)
+                            .then(function (response) {
+                                console.log(response);
+                                if (response.data.includes("created")) {
+                                    window.location.reload();
+                                    // $("#topSuccess").html("New Text Created!");
+                                    // $("#topSuccess").show();
+                                    window.location.href = "index.html?type=actions";
+                                } else {
+                                    $("#topAlert").html(response.data);
+                                    $("#topAlert").show();
+                                }
+                            })                      
+                            .catch(function (error) {
+                                console.log(error);
+                            });
+                        },
+                        cancel: function () {
+                            $("#topAlert").html("Update cancelled");
+                            $("#topAlert").show();
+                        },
+                    }
+                });
+                console.log("tryna submit");
+ 
+            });
+        });
+    }
+    function showAction(item_id) {
+        let config = { headers: {
+            appid: appid,
+            }
+        }
+        tagsHtml = "";
+        tags = [];
+        axios.get('/action/' + item_id, config)
+        .then(function (response) {
+        let user = response.data.userID;
+        let date = response.data.otimestamp;
+        let actionMdl = "";
+        let actionObj = "";
+
+        if (response.data.lastUpdateUserName != null) {
+            user = response.data.lastUpdateUserName;
+        }
+        if (response.data.lastUpdateTimestamp != null) {
+            date = response.data.lastUpdateTimestamp;
+        }
+        if (response.data.modelID != null) {
+            actionMdl = "<div class=\x22btn btn-secondary btn-sm\x22><a style=\x22color:white;\x22 target=\x22_blank\x22 role=\x22button\x22" +
+            "href=\x22index.html?type=model&iid="+ response.data.modelID +"\x22>" +
+            "model :&nbsp;<strong> " + response.data.modelName + "</strong>&nbsp;</a><button type=\x22button\x22 class=\x22remObjectMdl badge badge-xs badge-danger float-right\x22 id=\x22"+ response.data.modelID +"\x22>X</button></div>";
+        }
+        if (response.data.objectID != null) {
+            actionObj = "<div class=\x22btn btn-secondary btn-sm\x22><a style=\x22color:white;\x22 target=\x22_blank\x22 role=\x22button\x22" +
+            "href=\x22index.html?type=object&iid="+ response.data.objectID +"\x22>" +
+            "model :&nbsp;<strong> " + response.data.objectName + "</strong>&nbsp;</a><button type=\x22button\x22 class=\x22remObjectMdl badge badge-xs badge-danger float-right\x22 id=\x22"+ response.data.objectID +"\x22>X</button></div>";
+        }
+        $("#cards").show();
+        // let textTitle = response.data.title;
+        // let textstring = response.data.textstring != undefined ? response.data.textstring : ""; 
+        // console.log("textstring : " + textstring);
+        
+        var card = "<div class=\x22col-lg-12\x22>" +
+        "<div class=\x22card shadow mb-4\x22>" +
+            "<div class=\x22card-header py-3 d-flex flex-row align-items-center justify-content-between\x22>" +
+            "<h6 class=\x22m-0 font-weight-bold text-primary\x22>Action Details - Name: "+ response.data.title + " | _id: " +response.data._id+ "</h6>" +
+            "</div>" +
+            "<div class=\x22card-body\x22>" +
+
+            "<form id=\x22updateActionForm\x22>" +
+                "<div class=\x22float-right\x22><button type=\x22submit\x22 id=\x22submitButton\x22 class=\x22btn btn-primary float-right\x22>Update</button></div>" + 
+                "<div class=\x22form-row\x22>" +
+                    "<div class=\x22col form-group col-md-3\x22>" + 
+                        "<label for=\x22textTitle\x22>Title</label>" + 
+                        "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22actionName\x22 value=\x22" + response.data.actionName + "\x22 >" +
+                    "</div>" +
+
+                    "<div class=\x22col form-group col-md-2\x22>" +
+                        "<label for=\x22textType\x22>Type</label>" +
+                        "<select class=\x22form-control\x22 id=\x22actionTypeSelect\x22 >" +
+                        "<option value=\x22\x22 disabled selected>Select:</option>" +
+                       
+                        "</select>" +
+                    "</div>" +
+
+                    "<div class=\x22col form-group col-md-2\x22>" +
+                        "<label for=\x22textType\x22>Result</label>" +
+                        "<select class=\x22form-control\x22 id=\x22actionResultSelect\x22 >" +
+                        "<option value=\x22\x22 disabled selected>Select:</option>" +
+                        
+                        
+                        "</select>" +
+                    "</div>" +
+                    "<div class=\x22col form-group col-md-2\x22>" +
+                        "<label for=\x22fontSelect\x22>Target</label>" + 
+                        "<select class=\x22form-control\x22 id=\x22resultTargetSelect\x22 >" +
+                        "<option value=\x22\x22 disabled selected>Select:</option>" +
+                       
+                        "</select>" +
+                    "</div>" +                    
+                    "<div class=\x22col form-group col-md-2\x22>" +
+                        "<label for=\x22fontSelect\x22>Source Object Mod</label>" + 
+                        "<select class=\x22form-control\x22 id=\x22sourceObjectModSelect\x22 >" +
+                        "<option value=\x22\x22 disabled selected>Select:</option>" +
+                        "</select>" +
+                "</div>" +
+                "</div>" +
+               
+                "<div class=\x22form-row\x22>" +
+                    
+
+                    "<div class=\x22col form-group col-md-3\x22>" + 
+                        "<label for=\x22textDesc\x22>Description</label>" + 
+                        "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22actionDesc\x22 value=\x22" + response.data.actionDesc + "\x22 >" +
+                    "</div>" +
+                    "<div class=\x22col form-group col-md-2\x22>" +
+                        "<label for=\x22actionTags\x22>Tags</label><br>" + //Tags
+                        "<div class=\x22input-group\x22>" +
+                        "<div class=\x22input-group-prepend\x22>" +
+                        "<button class=\x22btn input-group-text\x22 id=\x22addTagButton\x22>+</button>" +
+                    "</div>" +
+                        "<input id=\x22addTagInput\x22 type=\x22text\x22 class=\x22form-control\x22 placeholder=\x22Add Tag\x22 aria-label=\x22Input group example\x22 aria-describedby=\x22addTagInput\x22>" +
+                    "</div>" +
+                    "<div class=\x22form-row\x22 id=\x22tagDisplay\x22>" +
+                        tagsHtml +
+                    "</div>" +    
+                    "</div>" + 
+                    // "<div class=\x22col form-group col-md-1\x22>" +
+                    //   //spacer
+                    // "</div>" +
+                    "<div class=\x22col form-group col-md-3\x22>" +
+                        "<a class=\x22btn btn-primary\x22 href=\x22index.html?type=models&mode=select&parent=action&iid="+response.data._id+"\x22><i class=\x22fas fa-hand-pointer\x22></i>Select Model</a>" +
+                        actionMdl +
+                    "</div>" +
+                    "<div class=\x22col form-group col-md-3\x22>" +
+                        "<a class=\x22btn btn-info\x22 href=\x22index.html?type=objects&mode=select&parent=action&iid="+response.data._id+"\x22><i class=\x22fas fa-hand-pointer\x22></i>Select Object</a>" +
+                        actionObj +
+                    "</div>" +
+                    // "<div class=\x22col form-group col-md-3\x22>" +
+                    //     "<a class=\x22btn btn-info\x22 href=\x22index.html?type=objects&mode=select&parent=action&iid="+response.data._id+"\x22><i class=\x22fas fa-hand-pointer\x22></i>Select Object</a>" +
+                    //     actionObj +
+                    // "</div>" +
+                    // "<div class=\x22col form-group col-md-2\x22>" + 
+                    //     "<label for=\x22\x22>Last Update</label>" + 
+                    //     "<p>" + convertTimestamp(date) + "</p>" +
+                    // "</div>" +
+                    // "<div class=\x22col form-group col-md-2\x22>" + 
+                    //     "<label for=\x22\x22>By User</label>" + 
+                    //     "<p>" + user + "</p>" +
+                    // "</div>" +
+                "</div>" +
+                // "<div class=\x22form-row\x22>" +
+
+                //     "<div class=\x22col form-group col-md-12\x22>" +
+                //     // "<pre id=\x22json-display\x22></pre>" +
+                //         "<label for=\x22textstring\x22>Text</label>" + //sceneText
+                //         "<textarea rows=\x2232\x22 cols=\x22600\x22 class=\x22form-control\x22 id=\x22textstring\x22 placeholder=\x22Enter main text here - delimit sequence breaks with '~'\x22 value=\x22" + response.data.textstring + "\x22></textarea>" +
+                //     "</div>" +
+                // "</div>" +
+                "<div class=\x22form-row\x22>" +
+                        "<div class=\x22col form-group col-md-2\x22>" +
+                        "<label for=\x22objSubcategorySelect\x22>Mod Property</label>" + //subcat
+                        "<select class=\x22form-control\x22 id=\x22actionPropertySelect\x22 >" +
+                        "<option value=\x22\x22 disabled selected>Select:</option>" +
+                        //popped below...    
+                        "</select>" +
+                    "</div>" +
+                    "<div class=\x22col form-group col-md-2 inanimateAttributes\x22>" +
+                        "<label for=\x22objSubcategorySelect\x22>Mod Attribute</label>" + //subcat
+                        "<select class=\x22form-control\x22 id=\x22actionAttributeSelect\x22 >" +
+                        "<option value=\x22\x22 disabled selected>Select:</option>" +
+                        //popped below...    
+                        "</select>" +
+                    "</div>" +
+                    "<div class=\x22col form-group col-md-2 inanimateAttributes\x22>" +
+                        "<label for=\x22objSubcategorySelect\x22>Operator</label>" + //subcat
+                        "<select class=\x22form-control\x22 id=\x22actionOperatorSelect\x22 >" +
+                        "<option value=\x22\x22 disabled selected>Select:</option>" +
+                        //popped below...    
+                        "</select>" +
+                    "</div>" +
+                    "<div class=\x22col form-group col-md-2 inanimateAttributes\x22>" +
+                        "<label for=\x22objSubcategorySelect\x22>Affect</label>" + //subcat
+                        "<select class=\x22form-control\x22 id=\x22actionAffectSelect\x22 >" +
+                        "<option value=\x22\x22 disabled selected>Select:</option>" +
+                        //popped below...    
+                        "</select>" +
+                    "</div>" +
+                    "<div class=\x22col form-group col-md-2 inanimateAttributes\x22>" +
+                        "<label for=\x22objSubcategorySelect\x22>Effectiveness</label>" + //subcat
+                        "<select class=\x22form-control\x22 id=\x22actionEffectivenessSelect\x22 >" +
+                        "<option value=\x22\x22 disabled selected>Select:</option>" +
+                        //popped below...    
+                        "</select>" +
+                    "</div>" +
+                  
+                "</div>" +
+                "<div class=\x22form-row\x22>" +
+                    "<div class=\x22col form-group col-md-2\x22>" +
+                        "<label for=\x22orderChaos\x22>Hit Points</label>" + 
+                        "<input type=\x22number\x22 class=\x22form-control\x22 aria-describedby=\x22orderChaos\x22 step=\x220.01\x22 min=\x22-100\x22 max=\x22100\x22 id=\x22hitpoints\x22 value=\x22" + response.data.hitpoints + "\x22 >" +
+                        "<small id=\x22typeHelp\x22 class=\x22form-text text-muted\x22>+/- 100</small>" +
+                    "</div>" +
+                    "<div class=\x22col form-group col-md-2\x22>" +
+                        "<label for=\x22experiencePoints\x22>Experience Points (xp)</label>" + 
+                        "<input type=\x22number\x22 class=\x22form-control\x22 aria-describedby=\x22orderChaos\x22 step=\x220.01\x22 min=\x22-100\x22 max=\x22100\x22 id=\x22xpoints\x22 value=\x22" + response.data.xpoints + "\x22 >" +
+                        "<small id=\x22typeHelp\x22 class=\x22form-text text-muted\x22>+/- 100</small>" +
+                    "</div>" +
+                    "<div class=\x22col form-group col-md-2\x22>" +
+                        "<label for=\x22experiencePoints\x22>Karma Points</label>" + 
+                        "<input type=\x22number\x22 class=\x22form-control\x22 aria-describedby=\x22orderChaos\x22 step=\x220.01\x22 min=\x22-100\x22 max=\x22100\x22 id=\x22karma\x22 value=\x22" + response.data.karma + "\x22 >" +
+                        "<small id=\x22typeHelp\x22 class=\x22form-text text-muted\x22>+/- 100</small>" +
+                    "</div>" +
+                    "<div class=\x22col form-group col-md-2\x22>" +
+                        "<label for=\x22orderChaos\x22>Mana Points</label>" + 
+                        "<input type=\x22number\x22 class=\x22form-control\x22 aria-describedby=\x22orderChaos\x22 step=\x220.01\x22 min=\x22-100\x22 max=\x22100\x22 id=\x22mana\x22 value=\x22" + response.data.mana + "\x22 >" +
+                        "<small id=\x22typeHelp\x22 class=\x22form-text text-muted\x22>+/- 100</small>" +
+                    "</div>" +
+                    "<div class=\x22col form-group col-md-2\x22>" +
+                        "<label for=\x22orderChaos\x22>Difficulty</label>" + 
+                        "<input type=\x22number\x22 class=\x22form-control\x22 aria-describedby=\x22orderChaos\x22 step=\x220.01\x22 min=\x220\x22 max=\x221\x22 id=\x22difficulty\x22 value=\x22" + response.data.difficulty + "\x22 >" +
+                        "<small id=\x22typeHelp\x22 class=\x22form-text text-muted\x22>0 - 1</small>" +
+                    "</div>" +
+                    "<div class=\x22col form-group col-md-2\x22>" +
+                        "<label for=\x22orderChaos\x22>Chaos/Order</label>" + 
+                        "<input type=\x22number\x22 class=\x22form-control\x22 aria-describedby=\x22chaosOrder\x22 step=\x220.01\x22 min=\x220\x22 max=\x221\x22 id=\x22chaosOrder\x22 value=\x22" + response.data.chaosOrder + "\x22 >" +
+                        "<small id=\x22typeHelp\x22 class=\x22form-text text-muted\x22>0 - 1</small>" +
+                    "</div>" +
+                    "<div class=\x22col form-group col-md-2\x22>" +
+                        "<label for=\x22goodBad\x22>Alignment (Good/Neutral/Evil)</label>" + 
+                        "<input type=\x22number\x22 class=\x22form-control\x22 aria-describedby=\x22goodBad\x22 step=\x220.01\x22 min=\x220\x22 max=\x221\x22 id=\x22alignment\x22 value=\x22" + response.data.alignment + "\x22 >" +
+                        "<small id=\x22typeHelp\x22 class=\x22form-text text-muted\x22>0 - 1</small>" +
+                    "</div>" +
+                    "<div class=\x22col form-group col-md-2\x22>" +
+                        "<label for=\x22goodBad\x22>Extroverted/Introverted</label>" + 
+                        "<input type=\x22number\x22 class=\x22form-control\x22 aria-describedby=\x22extraIntro\x22 step=\x220.01\x22 min=\x220\x22 max=\x221\x22 id=\x22extraIntro\x22 value=\x22" + response.data.e_i + "\x22 >" +
+                        "<small id=\x22typeHelp\x22 class=\x22form-text text-muted\x22>0 - 1</small>" +
+                    "</div>" +
+                    "<div class=\x22col form-group col-md-2\x22>" +
+                        "<label for=\x22goodBad\x22>Judging/Perceiving</label>" + 
+                        "<input type=\x22number\x22 class=\x22form-control\x22 aria-describedby=\x22judgingPerceiving\x22 step=\x220.01\x22 min=\x220\x22 max=\x221\x22 id=\x22judgingPerceiving\x22 value=\x22" + response.data.j_p + "\x22 >" +
+                        "<small id=\x22typeHelp\x22 class=\x22form-text text-muted\x22>0 - 1</small>" +
+                    "</div>" +
+                    "<div class=\x22col form-group col-md-2\x22>" +
+                        "<label for=\x22goodBad\x22>Sensation/Intuition</label>" + 
+                        "<input type=\x22number\x22 class=\x22form-control\x22 aria-describedby=\x22sensationIntuition\x22 step=\x220.01\x22 min=\x220\x22 max=\x221\x22 id=\x22sensationIntuition\x22 value=\x22" + response.data.s_n + "\x22 >" +
+                        "<small id=\x22typeHelp\x22 class=\x22form-text text-muted\x22>0 - 1</small>" +
+                    "</div>" +
+                    // "</div>" +
+                    "<div class=\x22col form-group col-md-2\x22>" +
+                        "<label for=\x22goodBad\x22>Thinking/Feeling</label>" + 
+                        "<input type=\x22number\x22 class=\x22form-control\x22 aria-describedby=\x22thinkingFeeling\x22 step=\x220.01\x22 min=\x220\x22 max=\x221\x22 id=\x22thinkingFeeling\x22 value=\x22" + response.data.t_f + "\x22 >" +
+                        "<small id=\x22typeHelp\x22 class=\x22form-text text-muted\x22>0 - 1</small>" +
+                    "</div>" +
+
+                    // "<div class=\x22col form-group col-md-2\x22>" +
+                    //     "<label for=\x22goodBad\x22>Openness</label>" + 
+                    //     "<input type=\x22number\x22 class=\x22form-control\x22 aria-describedby=\x22judgingPerceiving\x22 step=\x220.01\x22 min=\x220\x22 max=\x221\x22 id=\x22judgingPerceiving\x22 value=\x22" + response.data.judgingPerceiving + "\x22 >" +
+                    //     "<small id=\x22typeHelp\x22 class=\x22form-text text-muted\x22>0 - 1</small>" +
+                    // "</div>" +
+                    "<div class=\x22col form-group col-md-2\x22>" +
+                        "<label for=\x22goodBad\x22>Integrity</label>" + 
+                        "<input type=\x22number\x22 class=\x22form-control\x22 aria-describedby=\x22judgingPerceiving\x22 step=\x220.01\x22 min=\x220\x22 max=\x221\x22 id=\x22integrity\x22 value=\x22" + response.data.integrity + "\x22 >" +
+                        "<small id=\x22typeHelp\x22 class=\x22form-text text-muted\x22>0 - 1</small>" +
+                    "</div>" +
+                    "<div class=\x22col form-group col-md-2\x22>" +
+                        "<label for=\x22goodBad\x22>Protectiveness</label>" + 
+                        "<input type=\x22number\x22 class=\x22form-control\x22 aria-describedby=\x22judgingPerceiving\x22 step=\x220.01\x22 min=\x220\x22 max=\x221\x22 id=\x22protectiveness\x22 value=\x22" + response.data.protectiveness + "\x22 >" +
+                        "<small id=\x22typeHelp\x22 class=\x22form-text text-muted\x22>0 - 1</small>" +
+                    "</div>" +
+                    "<div class=\x22col form-group col-md-2\x22>" +
+                        "<label for=\x22goodBad\x22>Generosity</label>" + 
+                        "<input type=\x22number\x22 class=\x22form-control\x22 aria-describedby=\x22judgingPerceiving\x22 step=\x220.01\x22 min=\x220\x22 max=\x221\x22 id=\x22generosity\x22 value=\x22" + response.data.generosity + "\x22 >" +
+                        "<small id=\x22typeHelp\x22 class=\x22form-text text-muted\x22>0 - 1</small>" +
+                    "</div>" +
+                    "<div class=\x22col form-group col-md-2\x22>" +
+                        "<label for=\x22goodBad\x22>Agreeableness</label>" + 
+                        "<input type=\x22number\x22 class=\x22form-control\x22 aria-describedby=\x22judgingPerceiving\x22 step=\x220.01\x22 min=\x220\x22 max=\x221\x22 id=\x22agreeableness\x22 value=\x22" + response.data.agreeableness + "\x22 >" +
+                        "<small id=\x22typeHelp\x22 class=\x22form-text text-muted\x22>0 - 1</small>" +
+                    "</div>" +
+                    "<div class=\x22col form-group col-md-2\x22>" +
+                        "<label for=\x22goodBad\x22>Discipline</label>" + 
+                        "<input type=\x22number\x22 class=\x22form-control\x22 aria-describedby=\x22judgingPerceiving\x22 step=\x220.01\x22 min=\x220\x22 max=\x221\x22 id=\x22discipline\x22 value=\x22" + response.data.discipline + "\x22 >" +
+                        "<small id=\x22typeHelp\x22 class=\x22form-text text-muted\x22>0 - 1</small>" +
+                    "</div>" +
+                    "<div class=\x22col form-group col-md-2\x22>" +
+                        "<label for=\x22goodBad\x22>Openness</label>" + 
+                        "<input type=\x22number\x22 class=\x22form-control\x22 aria-describedby=\x22judgingPerceiving\x22 step=\x220.01\x22 min=\x220\x22 max=\x221\x22 id=\x22openness\x22 value=\x22" + response.data.openness + "\x22 >" +
+                        "<small id=\x22typeHelp\x22 class=\x22form-text text-muted\x22>0 - 1</small>" +
+                    "</div>" +
+                    "<div class=\x22col form-group col-md-2\x22>" +
+                        "<label for=\x22goodBad\x22>Confidence</label>" + 
+                        "<input type=\x22number\x22 class=\x22form-control\x22 aria-describedby=\x22caution\x22 step=\x220.01\x22 min=\x220\x22 max=\x221\x22 id=\x22confidence\x22 value=\x22" + response.data.confidence + "\x22 >" +
+                        "<small id=\x22typeHelp\x22 class=\x22form-text text-muted\x22>0 - 1</small>" +
+                    "</div>" +
+                    "</div>" +
+                "</div>" +
+                "</div>" +
+                // "<div class=\x22form-row\x22>" +
+                // html +
+            "</form>" +
+            "</div>" +
+            "</div>" +
+                // "<h5 class=\x22mt-0\x22></h5><br><br>" +
+                keyValues(response.data) +
+                
+                // "</div>" +
+                "</div>" +
+            "</div>" +
+        "</div>" +
+        "</div>";
+        $("#cardrow").html(card);
+        $(function() { 
+            axios.get('/main/ref/types.json') //init the dropdowns
+            .then(function (typesResponse) {
+                types = typesResponse.data.types;
+                typesData = typesResponse.data; 
+                for (let i = 0; i < typesData.actiontype.length; i++) {//populate dropdown options
+                    var x = document.getElementById("actionTypeSelect");
+                    var option = document.createElement("option");
+                    option.text = typesData.actiontype[i];
+                    if (response.data.actionType != undefined && response.data.actionType.toLowerCase() === typesData.actiontype[i].toLowerCase()) {
+                        // console.log("objpersonality is " + typesData.properties[i]);
+                        option.selected = true;
+                    }
+                    x.add(option);
+                }                
+                for (let i = 0; i < typesData.actionresult.length; i++) {//populate dropdown options
+                    var x = document.getElementById("actionResultSelect");
+                    var option = document.createElement("option");
+                    option.text = typesData.actionresult[i];
+                    if (response.data.actionResult != undefined && response.data.actionResult.toLowerCase() === typesData.actionresult[i].toLowerCase()) {
+                        // console.log("objpersonality is " + typesData.properties[i]);
+                        option.selected = true;
+                    }
+                    x.add(option);
+                } 
+
+                for (let i = 0; i < typesData.resulttarget.length; i++) {//populate dropdown options
+                    var x = document.getElementById("resultTargetSelect");
+                    var option = document.createElement("option");
+                    option.text = typesData.resulttarget[i];
+                    if (response.data.resultTarget != undefined && response.data.resultTarget.toLowerCase() === typesData.resulttarget[i].toLowerCase()) {
+                        // console.log("objpersonality is " + typesData.properties[i]);
+                        option.selected = true;
+                    }
+                    x.add(option);
+                }
+
+                for (let i = 0; i < typesData.sourceobjectmod.length; i++) {//populate dropdown options
+                    var x = document.getElementById("sourceObjectModSelect");
+                    var option = document.createElement("option");
+                    option.text = typesData.sourceobjectmod[i];
+                    if (response.data.sourceObjectMod != undefined && response.data.sourceObjectMod.toLowerCase() === typesData.sourceobjectmod[i].toLowerCase()) {
+                        // console.log("objpersonality is " + typesData.properties[i]);
+                        option.selected = true;
+                    }
+                    x.add(option);
+                }
+                
+                for (let i = 0; i < typesData.properties.length; i++) {//populate dropdown options
+                    var x = document.getElementById("actionPropertySelect");
+                    var option = document.createElement("option");
+                    option.text = typesData.properties[i];
+                    if (response.data.property != undefined && response.data.property.toLowerCase() === typesData.properties[i].toLowerCase()) {
+                        // console.log("objpersonality is " + typesData.properties[i]);
+                        option.selected = true;
+                    }
+                    x.add(option);
+                }
+                for (let i = 0; i < typesData.attributes.length; i++) {//populate dropdown options
+                    var x = document.getElementById("actionAttributeSelect");
+                    var option = document.createElement("option");
+                    option.text = typesData.attributes[i];
+                    if (response.data.attribute != undefined && response.data.attribute.toLowerCase() === typesData.attributes[i].toLowerCase()) {
+                        // console.log("objpersonality is " + typesData.attributes[i]);
+                        option.selected = true;
+                    }
+                    x.add(option);
+                }
+                for (let i = 0; i < typesData.operator.length; i++) {//populate dropdown options
+                    var x = document.getElementById("actionOperatorSelect");
+                    var option = document.createElement("option");
+                    option.text = typesData.operator[i];
+                    if (response.data.operator != undefined && response.data.operator.toLowerCase() === typesData.operator[i].toLowerCase()) {
+                        // console.log("objpersonality is " + typesData.distribution[i]);
+                        option.selected = true;
+                    }
+                    x.add(option);
+                }
+                for (let i = 0; i < typesData.affect.length; i++) {//populate dropdown options
+                    var x = document.getElementById("actionAffectSelect");
+                    var option = document.createElement("option");
+                    option.text = typesData.affect[i];
+                    if (response.data.affect != undefined && response.data.affect.toLowerCase() === typesData.affect[i].toLowerCase()) {
+                        // console.log("objpersonality is " + typesData.distribution[i]);
+                        option.selected = true;
+                    }
+                    x.add(option);
+                }
+                for (let i = 0; i < typesData.effectiveness.length; i++) {//populate dropdown options
+                    var x = document.getElementById("actionEffectivenessSelect");
+                    var option = document.createElement("option");
+                    option.text = typesData.effectiveness[i];
+                    if (response.data.effectiveness != undefined && response.data.effectiveness.toLowerCase() === typesData.effectiveness[i].toLowerCase()) {
+                        // console.log("objper is " + typesData.effectiveness[i]);
+                        option.selected = true;
+                    }
+                    x.add(option);
+                }
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+        });
+                
+        $("#actionTypeSelect").val(response.data.actionType);
+      
+        if (response.data.tags != null && response.data.tags.length > 0) {
+            tags = response.data.tags;
+            for (let i = 0; i < tags.length; i++) {
+                tagsHtml = tagsHtml + 
+                "<div class=\x22btn btn-light\x22>" +   
+                    "<button id=\x22"+tags[i]+"\x22 type=\x22button\x22 class=\x22remTagButton badge badge-sm badge-danger float-right\x22>X</button>" +
+                    "<span class=\x22badge badge-pill badge-light float-left badge-sm\x22>\x22"+tags[i]+"\x22</span>" +
+                "</div>";
+            }
+            $("#tagDisplay").html(tagsHtml);
+        };
+        $(function() { //shorthand document.ready function
+
+            $(document).on('click','#addTagButton',function(e){
+                e.preventDefault();  
+                let newTag = document.getElementById("addTagInput").value;
+                console.log("tryna add tag " + newTag);
+                if (newTag.length > 2) {
+                let html = "";
+                tags.push(newTag);
+                for (let i = 0; i < tags.length; i++) {
+                    html = html + 
+                    "<div class=\x22btn btn-light\x22>" +   
+                        "<button id=\x22"+tags[i]+"\x22 type=\x22button\x22 class=\x22remTagButton badge badge-sm badge-danger float-right\x22>X</button>" +
+                        "<span class=\x22badge badge-pill badge-light float-left badge-sm\x22>\x22"+tags[i]+"\x22</span>" +
+                    "</div>";
+                }
+                $("#tagDisplay").empty();
+                $("#tagDisplay").html(html);
+                }
+            }); 
+            $(document).on('click','.remTagButton',function(e){
+                e.preventDefault();  
+                console.log("tryna remove tag " + this.id);
+                let html = "";
+                for( var i = 0; i < tags.length; i++){ 
+                    if ( tags[i] === this.id) {
+                        tags.splice(i, 1); 
+                        }
+                    }
+                for (let i = 0; i < tags.length; i++) {
+                    html = html + 
+                    "<div class=\x22btn btn-light\x22>" +   
+                        "<button id=\x22"+tags[i]+"\x22 type=\x22button\x22 class=\x22x22remTagButton badge badge-sm badge-danger float-right\x22>X</button>" +
+                        "<span class=\x22badge badge-pill badge-light float-left badge-sm\x22>\x22"+tags[i]+"\x22</span>" +
+                    "</div>";
+                }
+                $("#tagDisplay").empty();
+                $("#tagDisplay").html(html);
+            });
+            $('#updateActionForm').on('submit', function(e) { //use submit action for form validation to work
+                e.preventDefault();  
+                let actionName = document.getElementById("actionName").value;
+                let actionType = document.getElementById("actionTypeSelect").value;
+                let actionResult = document.getElementById("actionResultSelect").value;
+                let resultTarget = document.getElementById("resultTargetSelect").value;
+                let sourceObjectMod = document.getElementById("sourceObjectModSelect").value;
+                let actionDesc = document.getElementById("actionDesc").value;
+                // let status = $("#isPublic").prop("checked");
+                let attribute = document.getElementById("actionAttributeSelect").value;
+                let property = document.getElementById("actionPropertySelect").value;
+                let operator = document.getElementById("actionOperatorSelect").value;
+                let affect = document.getElementById("actionAffectSelect").value;
+                let effectiveness = document.getElementById("actionEffectivenessSelect").value;
+                let xpoints = document.getElementById("xpoints").value;
+                let karma = document.getElementById("karma").value;
+                let hitpoints = document.getElementById("hitpoints").value;
+                let mana = document.getElementById("mana").value;
+                let difficulty = document.getElementById("difficulty").value;
+                let orderChaos = document.getElementById("chaosOrder").value;
+                let alignment = document.getElementById("alignment").value;
+
+                let e_i = document.getElementById("extraIntro").value;
+
+                let j_p = document.getElementById("judgingPerceiving").value;
+
+                let s_n = document.getElementById("sensationIntuition").value;
+
+                let t_f = document.getElementById("thinkingFeeling").value;
+
+                let integrity = document.getElementById("integrity").value;
+
+                let protectiveness = document.getElementById("protectiveness").value;
+
+                let generosity = document.getElementById("generosity").value;
+
+                let agreeableness = document.getElementById("agreeableness").value;
+
+                let discipline = document.getElementById("discipline").value;
+
+                let openness = document.getElementById("openness").value;
+
+                let confidence = document.getElementById("confidence").value;
+
+                console.log("tryna submit");
+                let data = {
+                    _id: response.data._id,
+                    actionName: actionName,
+                    tags: tags,
+                    // type: type,
+                    actionType: actionType,
+                    actionResult: actionResult,
+                    resultTarget: resultTarget,
+                    sourceObjectMod: sourceObjectMod,
+                    property: property,
+                    attribute: attribute,
+                    operator: operator,
+                    affect: affect,
+                    // effectiveness: effectiveness,
+                    xpoints: xpoints,
+                    karma: karma,
+                    hitpoints: hitpoints,
+                    mana: mana,
+                    difficulty: difficulty,
+                    orderChaos: orderChaos,
+                    alignment: alignment,
+                    effectiveness: effectiveness,
+                    e_i: e_i,
+                    j_p: j_p,
+                    s_n: s_n,
+                    t_f: t_f,
+                    integrity: integrity,
+                    protectiveness: protectiveness,
+                    generosity: generosity,
+                    agreeableness: agreeableness,
+                    discipline: discipline,
+                    openness: openness,
+                    confidence: confidence,
+                    actionDesc: actionDesc,
+
+                }
+                axios.post('/update_action/', data)
+                    .then(function (response) {
+                        console.log(response);
+                        if (response.data.includes("updated")) {
+                            $("#topSuccess").html(response.data);
+                            $("#topSuccess").show();
+                            
+                        } else {
+                            $("#topAlert").html(response);
+                            $("#topAlert").show();
+                        }
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+                });
+            });
+        })
+        .catch(function (error) {
+        console.log(error);
+        });
+    } 
+
     function showText(item_id) {
         let config = { headers: {
             appid: appid,
@@ -2985,6 +4317,7 @@
         // let textTitle = response.data.title;
         // let textstring = response.data.textstring != undefined ? response.data.textstring : ""; 
         // console.log("textstring : " + textstring);
+        
         var card = "<div class=\x22col-lg-12\x22>" +
         "<div class=\x22card shadow mb-4\x22>" +
             "<div class=\x22card-header py-3 d-flex flex-row align-items-center justify-content-between\x22>" +
@@ -3007,11 +4340,20 @@
                         "<label for=\x22textDesc\x22>Description</label>" + 
                         "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22textDesc\x22 value=\x22" + response.data.desc + "\x22 >" +
                     "</div>" +
-                    "<div class=\x22col form-group col-md-2\x22>" +
+                    "<div class=\x22col form-group col-md-3\x22>" +
                         "<label for=\x22textType\x22>Type</label>" +
                         "<select class=\x22form-control\x22 id=\x22textType\x22 >" +
                         "<option value=\x22\x22 disabled selected>Select:</option>" +
-                        "<option>Code</option>" +
+                        "<option>Default</option>" +
+                        "<option>Full HTML Page</option>" +
+                        "<option>Question/Answer</option>" +
+                        "<option>Question/Multichoice</option>" +
+                        "<option>Blog Post</option>" +
+                        "<option>Documentation Page</option>" +
+                        "<option>Javascript</option>" +
+                        
+                        "<option>C#</option>" +
+                        "<option>Shader</option>" +
                         "<option>Quote</option>" +
                         "<option>Excerpt</option>" +
                         "<option>Message</option>" +
@@ -3071,9 +4413,11 @@
                     "</div>" +
                 "</div>" +
                 "<div class=\x22form-row\x22>" +
-                    "<div class=\x22col form-group col-md-9\x22>" +
-                        "<label for=\x22textstring\x22>Scene Text</label>" + //sceneText
-                        "<textarea rows=\x228\x22 cols=\x22400\x22 class=\x22form-control\x22 id=\x22textstring\x22 placeholder=\x22Enter main text here - delimit sequence breaks with '~'\x22 value=\x22" + response.data.textstring + "\x22></textarea>" +
+
+                    "<div class=\x22col form-group col-md-12\x22>" +
+                    // "<pre id=\x22json-display\x22></pre>" +
+                        "<label for=\x22textstring\x22>Text</label>" + //sceneText
+                        "<textarea rows=\x2232\x22 cols=\x22600\x22 class=\x22form-control\x22 id=\x22textstring\x22 placeholder=\x22Enter main text here - delimit sequence breaks with '~'\x22 value=\x22" + response.data.textstring + "\x22></textarea>" +
                     "</div>" +
                 "</div>" +
                 "<div class=\x22form-row\x22>" +
@@ -3158,8 +4502,6 @@
                             "<option value=\x22\x22 disabled selected>Select:</option>" +
                             "<option>scifi</option>" +
                             "<option>parchment</option>" +
-                            "<option>ARKit</option>" +
-                            "<option>Geographic</option>" +
                         "</select>" +
                     "</div>" +
                 "</div>" +
@@ -3201,6 +4543,103 @@
         "</div>" +
         "</div>";
         $("#cardrow").html(card);
+        let isJson = false;
+        var editor = null;
+        let textArea = document.getElementById("textstring");
+        let $itemTypeSelect = $( '#textType' );
+                $itemTypeSelect.on( 'change', function() { //when type dropdown is changed, update subtypes
+                    console.log(this.value);
+                // if (!isJson) {
+                    
+                    if (this.value == 'Question/Answer') {
+                        // let tpl = getJsonTemplate('Question/Answer');
+                        // textArea.value = tpl;
+                        if (!editor) {
+                            editor = CodeMirror.fromTextArea(textArea, {
+                                mode: {
+                                    name: "javascript",
+                                    json: true
+                                },
+                                lineNumbers: true,
+                                styleActiveLine: true,
+                                matchBrackets: true
+                            });
+                            if (document.getElementById("textstring").value == "") {
+                                editor.setValue(getJsonTemplate('Question/Answer'));
+                            }
+                        }
+                        // editor.setOption("theme", 'darcula');
+                        // editor.load(getJsonTemplate('Question/Answer'));
+                        // document.getElementById("textstring").remove();
+                        isJson = true;
+                    }
+                    if (this.value == 'Question/Multichoice') {
+                        // document.getElementById('textstring').value = getJsonTemplate('Question/Answer');    
+                        if (!editor) {
+                            editor = CodeMirror.fromTextArea(textArea, {
+                                mode: {
+                                    name: "javascript",
+                                    json: true
+                                },
+                                lineNumbers: true,
+                                styleActiveLine: true,
+                                matchBrackets: true
+                            });
+                            if (document.getElementById("textstring").value == "") {
+                                editor.setValue(getJsonTemplate('Question/Multichoice'));
+                            }
+                        }
+                        // editor.setOption("theme", "neo.css");
+                        // editor.load(getJsonTemplate('Question/Multichoice'));
+                        // document.getElementById("textstring").remove();
+                        isJson = true;
+                    }
+                    if (this.value == 'Javascript') {
+                        // document.getElementById('textstring').value = getJsonTemplate('Question/Answer');    
+                        if (!editor) {
+                            editor = CodeMirror.fromTextArea(textArea, {
+                                mode: {
+                                    name: "javascript",
+                                    json: true
+                                },
+                                lineNumbers: true,
+                                styleActiveLine: true,
+                                matchBrackets: true
+                            });
+                            if (document.getElementById("textstring").value == "") {
+                                editor.setValue("boilerplate here");
+                            }
+                        }
+                        // editor.setOption("theme", "neo.css");
+                        // editor.load(getJsonTemplate('Question/Multichoice'));
+                        // document.getElementById("textstring").remove();
+                        isJson = true;
+                    }
+                    if (this.value == 'Full HTML Page') {
+                        // document.getElementById('textstring').value = getJsonTemplate('Question/Answer');    
+                        if (!editor) {
+                            editor = CodeMirror.fromTextArea(textArea, {
+                                mode: {
+                                    name: "javascript",
+                                    json: true
+                                },
+                                lineNumbers: true,
+                                styleActiveLine: true,
+                                matchBrackets: true
+                            });
+                            if (document.getElementById("textstring").value == "") {
+                                editor.setValue("boilerplate here");
+                            }
+                        }
+                        // editor.setOption("theme", "neo.css");
+                        // editor.load(getJsonTemplate('Question/Multichoice'));
+                        // document.getElementById("textstring").remove();
+                        isJson = true;
+                    }
+                // } else {
+                //     console.log("can't change once set to a json type!");
+                // }      
+            });    
         let textAlignment = response.data.alignment;
         let textMode = response.data.mode;
         console.log(JSON.stringify(response.data));
@@ -3212,16 +4651,76 @@
             let selection = document.getElementById(textMode); //radio
             $(selection).closest('.btn').button('toggle');
         }
-        document.getElementById("textstring").value = response.data.textstring;
+        let theString = response.data.textstring != undefined ? response.data.textstring : "";
+        document.getElementById("textstring").value = theString;
+        // document.getElementById("json")
         document.getElementById("fontFillColor").value = response.data.fillColor;
         document.getElementById("fontGlowColor").value = response.data.glowColor;
         document.getElementById("fontOutlineColor").value = response.data.outlineColor;
         document.getElementById("textBackgroundColor").value = response.data.textBackgroundColor;
         document.getElementById("textBackground").value = response.data.textBackground;
+        
         $('#textType').find('option').each(function(i,e){
             // console.log($(e).val());
             if($(e).val() === response.data.type){
                 $('#textType').prop('selectedIndex',i);
+                if ($(e).val() == 'Question/Answer') {
+                    if (!editor) {
+                        editor = CodeMirror.fromTextArea(textArea, {
+                            mode: {
+                                name: "javascript",
+                                json: true
+                            },
+                            lineNumbers: true,
+                            styleActiveLine: true,
+                            matchBrackets: true
+                        });
+                        if (document.getElementById("textstring").value == "") {
+                            editor.setValue(getJsonTemplate('Question/Answer'));
+                        }
+                        let theme = "darcula";
+                        // editor.setOption('theme', theme);
+                        isJson = true;
+                    }
+                }
+                if ($(e).val() == 'Question/Multichoice') {
+                    if (!editor) {
+                        editor = CodeMirror.fromTextArea(textArea, {
+                            mode: {
+                                name: "javascript",
+                                json: true
+                            },
+                            lineNumbers: true,
+                            styleActiveLine: true,
+                            matchBrackets: true
+                        });
+                        if (document.getElementById("textstring").value == "") {
+                            editor.setValue(getJsonTemplate('Question/Multichoice'));
+                        }
+                        // editor.setOption('theme', 'darkula');
+                        // editor.load(response.data.textstring);
+                        // document.getElementById("textstring").remove();
+                        isJson = true;
+                    }
+                }
+                if ($(e).val() == 'Javascript') {
+                    if (!editor) {
+                        editor = CodeMirror.fromTextArea(textArea, {
+                            mode: {
+                                name: "javascript",
+                                json: true
+                            },
+                            lineNumbers: true,
+                            styleActiveLine: true,
+                            matchBrackets: true
+                        });
+                        if (document.getElementById("textstring").value == "") {
+                            editor.setValue("boilerplace javascript here..");
+                        }
+
+                        isJson = true;
+                    }
+                }
             }
         });        
         $('#fontSelect').find('option').each(function(i,e){
@@ -3319,6 +4818,12 @@
                 e.preventDefault();  
                 let title = document.getElementById("textTitle").value;
                 let textstring = document.getElementById("textstring").value;
+                // if (isJson) {
+                //     textstring = JSON.parse(document.getElementById("json-display").innerHTML);
+                // } else {
+                //    textstring = document.getElementById("textstring").value;
+                // }
+                
                 // let scaleByDistance = document.getElementById("scaleByDistance");
                 let desc = document.getElementById("textDesc").value;
                 // let status = $("#isPublic").prop("checked");
@@ -3485,7 +4990,7 @@
             for(var i = 0; i < arr.length; i++) {
                
                 if (mode == "select") {
-                    selectButton = "<td><button type=\x22button\x22 class=\x22btn btn-primary\x22 onclick=\x22selectItem('" + parent + "','picture','" + itemid + "','" + arr[i]._id + "')\x22>Select Picture</button></td>"
+                    selectButton = "<td><button type=\x22button\x22 class=\x22btn btn-primary\x22 onclick=\x22selectItem('" + parent + "','text','" + itemid + "','" + arr[i]._id + "')\x22>Select Text Item</button></td>"
                 }  
                 let timestamp = 0;
                 if (arr[i].lastUpdateTimestamp != null) {
@@ -3546,7 +5051,8 @@
         let newButton = "<button class=\x22btn btn-info  float-right\x22 onclick=\x22newText()\x22>Create New Text</button>";
         $("#newButton").html(newButton);
         $("#newButton").show();
-}
+    }
+
     function updatePicture(item) {
 
     }
@@ -3559,14 +5065,28 @@
         tags = [];
         axios.get('/userpic/' + item_id, config)
         .then(function (response) {
-        let user = response.data.userID;
+        let ouser = response.data.userID;
         let date = response.data.otimestamp;
+        let user = null;
         if (response.data.lastUpdateUserName != null) {
             user = response.data.lastUpdateUserName;
         }
         if (response.data.lastUpdateTimestamp != null) {
             date = response.data.lastUpdateTimestamp;
         }
+        let sourceTitle = (response.data.sourceTitle != undefined && response.data.sourceTitle != 'undefined') ? response.data.sourceTitle : "";
+        let sourceLink = (response.data.sourceLink != undefined && response.data.sourceLink != 'undefined') ? response.data.sourceLink : "";
+        let authorName = (response.data.authorName != undefined && response.data.authorName != 'undefined') ? response.data.authorName : "";
+        let authorLink = (response.data.authorLink != undefined && response.data.authorLink != 'undefined') ? response.data.authorLink : ""; 
+        let mods = (response.data.mods != undefined && response.data.mods != 'undefined') ? response.data.mods : "";
+        let linkURL = (response.data.linkURL != undefined & response.data.linkURL != 'undefined') ? response.data.linkURL : "";
+        let sourceText = (response.data.sourceText != undefined && response.data.sourceText != 'undefined') ? response.data.sourceText : "";
+        let captionUpper = (response.data.captionUpper != undefined && response.data.captionUpper != 'undefined') ? response.data.captionUpper : ""; 
+        let captionLower = (response.data.captionLower != undefined && response.data.captionLower != 'undefined') ? response.data.captionLower  : ""; 
+        let description = (response.data.description != undefined && response.data.description != 'undefined') ? response.data.description  : ""; 
+        let nft = (response.data.nft != undefined && response.data.nft != 'undefined') ? response.data.nft  : ""; 
+        // let authorLink = response.data.authorLink != undefined ? response.data.authorLink : ""; 
+
         $("#cards").show();
 
         var card = "<div class=\x22col-lg-12\x22>" +
@@ -3583,9 +5103,13 @@
             "<form id=\x22updatePictureForm\x22>" +
                 "<div class=\x22float-right\x22><button type=\x22submit\x22 id=\x22submitButton\x22 class=\x22btn btn-primary float-right\x22>Update</button></div>" + 
                 "<div class=\x22form-row\x22>" +
-                    "<div class=\x22col form-group col-md-4\x22>" + 
+                    "<div class=\x22col form-group col-md-3\x22>" + 
                         "<label for=\x22vidTitle\x22>Title</label>" + 
                         "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22picTitle\x22 value=\x22" + response.data.title + "\x22 >" +
+                    "</div>" +
+                    "<div class=\x22col form-group col-md-2\x22>" + 
+                        "<label for=\x22sceneTitle\x22>Owner</label>" + 
+                        "<p>" + ouser + "</p>" +
                     "</div>" +
                     "<div class=\x22col form-group col-md-2\x22>" + 
                         "<label for=\x22sceneTitle\x22>Last Update</label>" + 
@@ -3602,7 +5126,7 @@
                 "</div>" +     
                 "<div class=\x22form-row\x22>" +
                     "<div class=\x22col form-group col-md-3\x22>" +
-                        "<label for=\x22storeItemStatus\x22>Orientation</label>" +
+                        "<label for=\x22orientation\x22>Orientation</label>" +
                         "<select class=\x22form-control\x22 id=\x22orientation\x22 >" +
                         "<option value=\x22\x22 disabled selected>Select:</option>" +
                         "<option>Landscape</option>" +
@@ -3612,15 +5136,16 @@
                         "<option>Equirectangular</option>" +
                         "<option>Heightmap</option>" +
                         "<option>Cubemap</option>" +
+                        "<option>Tileable</option>" +
                         "</select>" +
                     "</div>" +
-                    "<div class=\x22col form-group col-md-3\x22>" +
+                    "<div class=\x22col form-group col-md-2\x22>" +
                         "<label for=\x22siName\x22>Upper Caption</label>" +
-                        "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22captionUpper\x22 placeholder=\x22Enter Upper Caption\x22 value=\x22" + response.data.captionUpper + "\x22 >" +
+                        "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22captionUpper\x22 placeholder=\x22Enter Upper Caption\x22 value=\x22" + captionUpper + "\x22 >" +
                     "</div>" +
-                    "<div class=\x22col form-group col-md-3\x22>" +
+                    "<div class=\x22col form-group col-md-2\x22>" +
                     "<label for=\x22siName\x22>Lower Caption</label>" +
-                    "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22captionLower\x22 placeholder=\x22Enter Lower Caption\x22 value=\x22" + response.data.captionLower + "\x22 >" +
+                    "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22captionLower\x22 placeholder=\x22Enter Lower Caption\x22 value=\x22" + captionLower + "\x22 >" +
                     "</div>" +
                     "<div class=\x22col form-group col-md-4\x22>" +
                         "<label for=\x22sceneTags\x22>Tags</label><br>" + //Tags
@@ -3630,11 +5155,17 @@
                     "</div>" +
                         "<input id=\x22addTagInput\x22 type=\x22text\x22 class=\x22form-control\x22 placeholder=\x22Add Tag\x22 aria-label=\x22Input group example\x22 aria-describedby=\x22addTagInput\x22>" +
                     "</div>" +
+                // "</div>" +    
+
                     "<div class=\x22form-row\x22 id=\x22tagDisplay\x22>" +
                         tagsHtml +
                     "</div>" +    
                     "</div>" + 
-         
+
+                    "<div class=\x22col form-group col-md-6\x22>" +
+                        "<label for=\x22desc\x22>Description</label>" +
+                        "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22description\x22 placeholder=\x22Description\x22 value=\x22" + description + "\x22 >" +
+                    "</div>" +
 
                     "<div class=\x22col form-group col-md-2\x22>" +
                         "<label for=\x22linkType\x22>Link Type</label>" +
@@ -3645,23 +5176,74 @@
                         "<option>Web</option>" +
                         "<option>Scene</option>" +
                         "<option>Comment</option>" +
+                        "<option>NFT</option>" +
                         "<option>Share</option>" +
                         "</select>" +
                     "</div>" +
                     "<div class=\x22col form-group col-md-3\x22>" +
                         "<label for=\x22siName\x22>Link URL</label>" +
-                        "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22linkURL\x22 placeholder=\x22Link URL\x22 value=\x22" + response.data.linkURL + "\x22 >" +
+                        "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22linkURL\x22 placeholder=\x22Link URL\x22 value=\x22" + linkURL + "\x22 >" +
+                    "</div>" +
+                    "<div class=\x22col form-group col-md-2\x22>" + 
+                        "<label for=\x22sourceTitle\x22>Source Title</label>" + 
+                        "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22sourceTitle\x22 placeholder=\x22Title of original work\x22 value=\x22" + sourceTitle + "\x22 >" +
+                    "</div>" +
+                    "<div class=\x22col form-group col-md-2\x22>" + 
+                        "<label for=\x22sourceLink\x22>Source Link</label>" + 
+                        "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22sourceLink\x22 placeholder=\x22Link to original source\x22 value=\x22" + sourceLink + "\x22 >" +
+                    "</div>" +
+                    "<div class=\x22col form-group col-md-2\x22>" + 
+                        "<label for=\x22authorName\x22>Author </label>" + 
+                        "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22authorName\x22 placeholder=\x22Name of original creator\x22 value=\x22" + authorName + "\x22 >" +
+                    "</div>" +
+                    "<div class=\x22col form-group col-md-2\x22>" + 
+                        "<label for=\x22authorLink\x22>Author Link</label>" + 
+                        "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22authorLink\x22 placeholder=\x22Link to original creator\x22 value=\x22" + authorLink + "\x22 >" +
                     "</div>" +
                     "<div class=\x22col form-group col-md-2\x22>" +
-                        //spacer
+                                "<label for=\x22license\x22>License</label>" +
+                                "<select class=\x22form-control\x22 id=\x22license\x22 >" +
+                                "<option value=\x22\x22 disabled selected>Select:</option>" +
+                                "<option>Unknown</option>" +
+                                "<option>By Owner</option>" +
+                                "<option>CC Attribution</option>" +
+                                "<option>CC Attribution-ShareAlike</option>" +
+                                "<option>CC Attribution-NoDerivs</option>" +
+                                "<option>Attribution-NonCommercial</option>" +
+                                "<option>Attribution-NonCommercial-ShareAlike</option>" +
+                                "<option>Attribution-NonCommercial-NoDerivs</option>" +
+                                "<option>GPL</option>" +
+                                "<option>MIT</option>" +
+                                "<option>Public Domain</option>" +
+                                "</select>" +
+                            "</div>" +
+                    "<div class=\x22col form-group col-md-3\x22>" +
+                        "<label for=\x22source\x22>Modifications </label>" +
+                        "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22mods\x22 placeholder=\x22Modifications to original\x22 value=\x22" + mods + "\x22 >" +
                     "</div>" +
+                    "<div class=\x22col form-group col-md-3\x22>" +
+                        "<label for=\x22source\x22>Source Text</label>" +
+                        "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22sourceText\x22 placeholder=\x22Full Text of Source(s)\x22 value=\x22" + sourceText + "\x22 >" +
+                    "</div>" +
+                    "<div class=\x22col form-group col-md-3\x22>" +
+                        "<label for=\x22source\x22>NFT</label>" +
+                        "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22nft\x22 placeholder=\x22NFT string\x22 value=\x22" + nft + "\x22 >" +
+                    "</div>" +
+                    // "<div class=\x22col form-group col-md-3\x22>" +
+                    //     "<label for=\x22source\x22>Source </label>" +
+                    //     "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22Source\x22 placeholder=\x22Source Text\x22 value=\x22" + response.data.sourceText + "\x22 >" +
+                    // "</div>" +
                     "<div class=\x22col form-group col-md-2\x22>" +
                         "<div class=\x22\x22><label for=\x22hasAlpha\x22>Has Alpha</label><br>" + //alpha
                             "<input type=\x22checkbox\x22  id=\x22hasAlpha\x22 data-toggle=\x22toggle\x22 data-size=\x22sm\x22 data-on=\x22<i class='fas fa-check'></i>\x22 data-off=\x22<i class='fas fa-times'></i>\x22 data-onstyle=\x22success\x22 data-offstyle=\x22danger\x22></div>" +
                         "</div>" + 
                     "<div class=\x22col form-group col-md-2\x22>" +
-                        "<div class=\x22\x22><label for=\x22Public\x22>Share with Public</label><br>" + //public
+                        "<div class=\x22\x22><label for=\x22isPublic\x22>Share with Public</label><br>" + //public
                         "<input type=\x22checkbox\x22  id=\x22isPublic\x22 data-toggle=\x22toggle\x22 data-size=\x22sm\x22 data-on=\x22<i class='fas fa-check'></i>\x22 data-off=\x22<i class='fas fa-times'></i>\x22 data-onstyle=\x22success\x22 data-offstyle=\x22danger\x22></div>" +
+                    "</div>" + 
+                    "<div class=\x22col form-group col-md-2\x22>" +
+                        "<div class=\x22\x22><label for=\x22useTarget\x22>Use Image Target</label><br>" + //public
+                        "<input type=\x22checkbox\x22  id=\x22useTarget\x22 data-toggle=\x22toggle\x22 data-size=\x22sm\x22 data-on=\x22<i class='fas fa-check'></i>\x22 data-off=\x22<i class='fas fa-times'></i>\x22 data-onstyle=\x22success\x22 data-offstyle=\x22danger\x22></div>" +
                     "</div>" + 
 
                     "<div class=\x22col form-group col-md-12\x22>" + 
@@ -3672,10 +5254,17 @@
                 // "<div class=\x22form-row\x22>" +
                 // html +
             "</form>" +
+            "<div id=\x22imageTargetContainer\x22></div>" +
+            "<div id=\x22progress\x22 class=\x22float-right\x22></div></br></br>" +
             "<button type=\x22button\x22 class=\x22btn btn-sm btn-danger float-left\x22 onclick=\x22deleteItem('picture','" + item_id + "')\x22>Delete Picture</button>" +
+            "<button type=\x22button\x22 class=\x22btn btn-sm btn-light float-right\x22 id=\x22createImageTargetButton\x22>Generate Image Target</button>" +
+            "<div id=\x22cubemapLinks\x22></div>" +
             "<button type=\x22button\x22 class=\x22btn btn-sm btn-info float-right\x22 style=\x22display:none;\x22 id=\x22createCubemapButton\x22>Generate CubeMap</button>" +
             "</div>" +
+
             "</div>" +
+            "<div id=\x22imageTargetContainer\x22></div>" +
+            "<div id=\x22progress\x22></div>" +
                 "<h5 class=\x22mt-0\x22>Picture Details</h5><br><br>" +
                 keyValues(response.data) +
                 
@@ -3697,6 +5286,13 @@
                 $('#linkType').prop('selectedIndex',i);
             }
         });
+        $('#license').find('option').each(function(i,e){
+            console.log($(e).val());
+            if($(e).val() === response.data.license){
+                
+                $('#license').prop('selectedIndex',i);
+            }
+        });
         $("#hasAlpha").bootstrapToggle();
         if (response.data.hasAlphaChannel == true) {
             $('#hasAlpha').bootstrapToggle('on');
@@ -3704,6 +5300,10 @@
         $("#isPublic").bootstrapToggle();
         if (response.data.isPublic == true) {
             $('#isPublic').bootstrapToggle('on');
+        } 
+        $("#useTarget").bootstrapToggle();
+        if (response.data.useTarget == true) {
+            $('#useTarget').bootstrapToggle('on');
         } 
         if (response.data.tags != null && response.data.tags.length > 0) {
             tags = response.data.tags;
@@ -3717,10 +5317,64 @@
             $("#tagDisplay").html(tagsHtml);
         };
         if (response.data.orientation != undefined && response.data.orientation.toLowerCase() === 'equirectangular') {
-            // console.log(orientation.toLowerCase());
+            if (response.data.cubeMapAsset != null && response.data.cubeMapAsset != undefined) {
+                console.log("cubemaps: " + JSON.stringify(response.data.cubeMapAsset));
+                let cmLinks = "";
+                for (let c = 0; c < response.data.cubeMapAsset.length; c++) {
+                    cmLinks = cmLinks + "<a class=\x22float-right\x22 href=\x22"+response.data.cubeMapAsset[c]+"\x22>Cubemap "+c+"</a><br>";
+                }
+                document.getElementById('cubemapLinks').innerHTML = cmLinks;
+            }
+            
             $('#createCubemapButton').show();
         } 
         $(function() { 
+            
+            $(document).on('click', '#createImageTargetButton', function (e) {
+                e.preventDefault(); 
+                compiler = new MINDAR.IMAGE.Compiler(); //really better to declare here?
+                console.log("tryna create image target " + response.data.URLoriginal);
+                convertUrlToImageData(response.data.URLoriginal)
+                  .then(function(d) {
+                    // console.log(d);
+                    let image = dataURItoBlob(d);
+                    var file = new File([image], "tmp.jpg");
+                    const images = [];
+                    images.push(file); //compiler wants an array
+                    return compileFiles(images);
+                       
+                  })
+                  .then(function (data){
+                      console.log("posting image target...");
+                      let body = {};
+                      axios.post('/imagetarget_puturl/' + userid + "/" + response.data._id, body)
+                      .then(function (response) { //response has signed URL to put to s3
+                          console.log(response);
+                          const xhr = new XMLHttpRequest();
+                          xhr.open('PUT', response.data.url);
+                          xhr.setRequestHeader("Content-Type", "application/octet-stream");
+                          // xhr.setRequestHeader("Content-Encoding", "base64");
+                          xhr.setRequestHeader("Access-Control-Allow-Origin","*");
+                          xhr.onreadystatechange = () => {
+                          if(xhr.readyState === 4) {
+                              if(xhr.status === 200) {
+                              console.log('File Ready to n upload. xhr.status: ' + xhr.status + 'xhrstatustext:' +xhr.statusText);
+                              } else {
+                              console.log('Could not upload file.');
+                              }
+                            }
+                        };
+                        var blob = new Blob([data]);
+                        xhr.send(data);
+                        })
+                        .then(function (){
+                            console.log("finished!");
+                        })
+                        .catch(function (err) {
+                            console.log(err);
+                        });
+                    });
+            });
             $(document).on('click', '#createCubemapButton', function (e) {
                 e.preventDefault(); 
                 // let sourceImage = document.getElementById('sky').getAttribute("src");
@@ -3728,7 +5382,7 @@
                   console.log("tryna convert envmap " + response.data.URLoriginal);
                   loadImage(response.data.URLoriginal, 'Anonymous')
                   .then(function(i) {
-                    var cs = equirectToCubemapFaces(i, 1024);
+                    var cs = equirectToCubemapFaces(i, 512);
                     let mapNumber = 0;
                     cs.forEach(function(c) {
                         mapNumber++;
@@ -3755,8 +5409,8 @@
                             // xhr.setRequestHeader("Content-Encoding", "base64");
                             xhr.setRequestHeader("Access-Control-Allow-Origin","*");
                             xhr.onreadystatechange = () => {
-                            if(xhr.readyState === 4){
-                                if(xhr.status === 200){
+                            if(xhr.readyState === 4) {
+                                if(xhr.status === 200) {
                                 console.log('File Ready to n upload. xhr.status: ' + xhr.status + 'xhrstatustext:' +xhr.statusText);
                                 } else {
                                 console.log('Could not upload file.');
@@ -3775,7 +5429,6 @@
                   })
                   .then(function (){
                       console.log("done");
-                      
                   });
             });
             $(document).on('click','#addTagButton',function(e){
@@ -3815,21 +5468,32 @@
                 $("#tagDisplay").empty();
                 $("#tagDisplay").html(html);
             });
-            $('#updatePictureForm').on('submit', function(e) { //use submit action for form validation to work
+            $('#updatePictureForm').on('submit', function(e) { 
                 e.preventDefault();  
                 let title = document.getElementById("picTitle").value;
                 let orientation = document.getElementById("orientation").value;
+                let license = document.getElementById("license").value;
                 // let hasAlpha = document.getElementById("hasAlpha").value;
                 let hasAlpha = $("#hasAlpha").prop("checked");
+                let useTarget = $("#useTarget").prop("checked");
                 let captionUpper = document.getElementById("captionUpper").value;
                 let captionLower = document.getElementById("captionLower").value;
                 let linkType = document.getElementById("linkType").value;
                 let linkURL = document.getElementById("linkURL").value;
+                let sourceTitle = document.getElementById("sourceTitle").value;
+                let sourceLink = document.getElementById("sourceLink").value;
+                let authorName = document.getElementById("authorName").value;
+                let authorLink = document.getElementById("authorLink").value;
+                let sourceText = document.getElementById("sourceText").value;
+                let mods = document.getElementById("mods").value;
+                let nft = document.getElementById("nft").value;
+                let description = document.getElementById("description").value;
                 let status = $("#isPublic").prop("checked");
-                console.log("isPublic " + status);
+
+                console.log("description: " + description);
                 let item_status = (status == true) ? "private" : "public";
                 let hasAlphaChannel = (hasAlpha == true) ? true : false;
-                console.log("tryna submit");
+                // console.log("tryna submit");
                 let data = {
                     _id: response.data._id,
                     title: title,
@@ -3838,10 +5502,21 @@
                     // item_status: item_status,
                     hasAlphaChannel: hasAlphaChannel,
                     isPublic : status,
+                    useTarget : useTarget,
                     captionUpper: captionUpper,
                     captionLower: captionLower,
                     linkType: linkType,
-                    linkURL: linkURL
+                    linkURL: linkURL,
+                    sourceText: sourceText,
+                    sourceTitle: sourceTitle,
+                    sourceLink: sourceLink,
+                    authorName: authorName,
+                    authorLink: authorLink,
+                    description: description,
+                    mods: mods,
+                    license: license,
+                    nft: nft
+                    // sourceAut
                 }
                 axios.post('/update_pic/' + item_id, data)
                     .then(function (response) {
@@ -3851,7 +5526,7 @@
                             $("#topSuccess").show();
                             
                         } else {
-                            $("#topAlert").html(response);
+                            $("#topAlert").html(response.data);
                             $("#topAlert").show();
                         }
                     })
@@ -3865,6 +5540,173 @@
         console.log(error);
         });
     } 
+    ///////////// mindar image target cooking
+    const getBlobFromUrl = (myImageUrl) => {
+        return new Promise((resolve, reject) => {
+            let request = new XMLHttpRequest();
+            request.open('GET', myImageUrl, true);
+            request.responseType = 'blob';
+            request.onload = () => {
+                resolve(request.response);
+            };
+            request.onerror = reject;
+            request.send();
+        })
+    }
+    
+    const getDataFromBlob = (myBlob) => {
+        return new Promise((resolve, reject) => {
+            let reader = new FileReader();
+            reader.onload = () => {
+                resolve(reader.result);
+            };
+            reader.onerror = reject;
+            reader.readAsDataURL(myBlob);
+        })
+    }
+    
+    const convertUrlToImageData = async (myImageUrl) => {
+        try {
+            let myBlob = await getBlobFromUrl(myImageUrl);
+            console.log(myBlob)
+            let myImageData = await getDataFromBlob(myBlob);
+            console.log(myImageData)
+            return myImageData;
+        } catch (err) {
+            console.log(err);
+            return null;
+        }
+    }
+    
+    let compiler = null;
+    const returnBlob = async (url) => {
+        await fetch(url).then(r => r.blob());
+    }
+    const download = (buffer) => {
+      var blob = new Blob([buffer]);
+      var aLink = window.document.createElement('a');
+      const timestamp = Date.now();
+      aLink.download = timestamp + '.mind';
+      aLink.href = window.URL.createObjectURL(blob);
+      aLink.click();
+      window.URL.revokeObjectURL(aLink.href);
+    }
+
+    const showData = (data) => {
+      console.log("data", data);
+      for (let i = 0; i < data.trackingImageList.length; i++) {
+        const image = data.trackingImageList[i];
+          const points = data.trackingData[i].points.map((p) => {
+          return {x: Math.round(p.x), y: Math.round(p.y)};
+        });
+        showImage(image, points);
+      }
+
+      for (let i = 0; i < data.imageList.length; i++) {
+        const image = data.imageList[i];
+        const kpmPoints = [...data.matchingData[i].maximaPoints, ...data.matchingData[i].minimaPoints];
+        const points2 = [];
+        for (let j = 0; j < kpmPoints.length; j++) {
+          points2.push({x: Math.round(kpmPoints[j].x), y: Math.round(kpmPoints[j].y)});
+        }
+        showImage(image, points2);
+      }
+    }
+
+
+    const showImage = (targetImage, points) => {
+      const container = document.getElementById("imageTargetContainer");
+      const canvas = document.createElement('canvas');
+      container.appendChild(canvas);
+      canvas.width  = targetImage.width;
+      canvas.height = targetImage.height;
+      canvas.style.width = canvas.width;
+      const ctx = canvas.getContext('2d');
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const data = new Uint32Array(imageData.data.buffer);
+
+      const alpha = (0xff << 24);
+      for (let c = 0; c < targetImage.width; c++) {
+        for (let r = 0; r < targetImage.height; r++) {
+          const pix = targetImage.data[r * targetImage.width + c];
+          data[r * canvas.width + c] = alpha | (pix << 16) | (pix << 8) | pix;
+        }
+      }
+
+      var pix = (0xff << 24) | (0x00 << 16) | (0xff << 8) | 0x00; // green
+      for (let i=0; i < points.length; ++i) {
+        const x = points[i].x;
+        const y = points[i].y;
+        const offset = (x + y * canvas.width);
+        data[offset] = pix;
+        //for (var size = 1; size <= 3; size++) {
+        for (var size = 1; size <= 6; size++) {
+          data[offset-size] = pix;
+          data[offset+size] = pix;
+          data[offset-size*canvas.width] = pix;
+          data[offset+size*canvas.width] = pix;
+        }
+      }
+      ctx.putImageData(imageData, 0, 0);
+    }
+
+    const loadTrackingImage = async (file) => {
+      const img = new Image();
+
+      return new Promise((resolve, reject) => {
+        let img = new Image()
+        img.onload = () => resolve(img);
+        img.onerror = reject;
+        img.src = URL.createObjectURL(file);
+        //img.src = src
+      })
+    }
+
+    const compileFiles = async (files) => {
+      const images = [];
+      for (let i = 0; i < files.length; i++) {
+        images.push(await loadTrackingImage(files[i]));
+      }
+      let _start = new Date().getTime();
+      const dataList = await compiler.compileImageTargets(images, (progress) => {
+          console.log('progress: ' + progress.toFixed(2) + "%");
+        document.getElementById("progress").innerHTML = 'progress: ' + progress.toFixed(2) + "%";
+      });
+      console.log('exec time compile: ', new Date().getTime() - _start);
+      for (let i = 0; i < dataList.length; i++) {
+        showData(dataList[i]);
+      }
+      const exportedBuffer = await compiler.exportData();
+      return exportedBuffer;    
+    }
+
+    const loadMindFile = async (file) => {
+      var reader = new FileReader();
+      reader.onload = function() {
+        const dataList = compiler.importData(this.result);
+        for (let i = 0; i < dataList.length; i++) {
+          showData(dataList[i]);
+        }
+      }
+      reader.readAsArrayBuffer(file);
+    }
+
+        // document.addEventListener('DOMContentLoaded', function(event) {
+        // const myDropzone = new Dropzone("#dropzone", { url: "#", autoProcessQueue: false, addRemoveLinks: true });
+        // myDropzone.on("addedfile", function(file) {});
+
+        // document.getElementById("startButton").addEventListener("click", function() {
+        //     const files = myDropzone.files;
+        //     if (files.length === 0) return;
+        //     const ext = files[0].name.split('.').pop();
+        //     if (ext === 'mind') {
+        //     loadMindFile(files[0]); 
+        //     } else {
+        //     compileFiles(files);
+        //     }
+        // });
+        // });
+    ///////////// end mindar image target cooking
     function newPicture() {
         $("#cards").show();
         var card = "<div class=\x22col-lg-12\x22>" +
@@ -4071,11 +5913,17 @@
             preview = {};
             preview.name = response.data.filename;
             preview.url = response.data.url;
+            let cid =  (response.data.cid != undefined && response.data.cid != 'undefined') ? response.data.cid  : ""; 
+            let ipfsLink = "";
+            if (cid != "") {
+                ipfsLink = " | <a href=\x22https://ipfs.io/ipfs/"+cid+"\x22>IPFS CID: "+cid+"</a>";
+            }
             // console.log(response);
             var card = "<div class=\x22col-lg-12\x22>" +
                 "<div class=\x22card shadow mb-4\x22>" +
                     "<div class=\x22card-header py-3 d-flex flex-row align-items-center justify-content-between\x22>" +
-                    "<h6 class=\x22m-0 font-weight-bold text-primary\x22>Model Details</h6>" +
+                    "<h6 class=\x22m-0 font-weight-bold text-primary\x22>Title: "+ response.data.title + " | _id: " +response.data._id + ipfsLink + "</h6> <button type=\x22button\x22 class=\x22btn btn-sm btn-danger float-right\x22 id=\x22ipfsUP\x22>Update IPFS</button>"+
+
                     "</div>" +
                     "<div class=\x22card-body\x22>" +
                     "<form id=\x22updateModelForm\x22>" +
@@ -4136,6 +5984,7 @@
                                 "<label for=\x22authorLink\x22>Author Link</label>" + 
                                 "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22authorLink\x22 value=\x22" + response.data.authorLink + "\x22 >" +
                             "</div>" +
+
                             // "<div class=\x22col form-group col-md-2\x22>" + 
                             //     "<label for=\x22license\x22>License</label>" + 
                             //     "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22modelName\x22 value=\x22" + response.data.license + "\x22 >" +
@@ -4160,6 +6009,10 @@
                             "<div class=\x22col form-group col-md-2\x22>" + 
                                 "<label for=\x22modifications\x22>Modifications</label>" + 
                                 "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22modifications\x22 value=\x22" + response.data.modifications + "\x22 >" +
+                            "</div>" +
+                            "<div class=\x22col form-group col-md-8\x22>" +
+                                "<label for=\x22source\x22>Source Text</label>" +
+                                "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22sourceText\x22 placeholder=\x22Source Text\x22 value=\x22" + response.data.sourceText + "\x22 >" +
                             "</div>" +
                             "<div class=\x22col form-group col-md-12\x22>" + 
                                 "<button class=\x22float-right btn btn-md btn-success previewModel\x22>Preview Model</button>" +
@@ -4248,6 +6101,46 @@
                         console.log("gotsa click on preview buttooon" + JSON.stringify(preview));
                         previewGLTF(preview);
                     }); 
+                    $(document).on('click', '#ipfsUP', function (e) {
+                        e.preventDefault(); 
+                        // let sourceImage = document.getElementById('sky').getAttribute("src");
+                        // this.el.addEventListener('loaded', () => {
+                          console.log("tryna upload to ipfs " + item_id);
+                          $.confirm({
+                            title: 'Confirm!',
+                            content: '<color=red>Are you sure you want to upload this to the Interplantary File System, FOREVER?!?!?</color>',
+                            buttons: {
+                                confirm: function () {
+                                    $("#topAlert").html("Attempting to import file to Interplanetary File System, please standby..." );
+                                            $("#topAlert").show();
+                                $.ajax({
+                                    url: "/ipfs_up",
+                                    type: 'POST',
+                                    contentType: "application/json; charset=utf-8",
+                                    dataType: "json",
+                                    data: JSON.stringify({
+                                            id: item_id,
+                                            type: 'model'
+                                        }),
+                                        success: function( data, textStatus, xhr ){
+                                            console.log(data);
+                                            $("#topSuccess").html("The operation was successful: ipfs://"+ data);
+                                            $("#topSuccess").show();
+                                        },
+                                        error: function( xhr, textStatus, errorThrown ){
+                                            console.log( xhr.responseText );
+                                            $("#topAlert").html(xhr.responseText );
+                                            $("#topAlert").show();
+    
+                                        }
+                                    });
+                                },
+                                cancel: function () {
+                                    // $.alert('Canceled!');
+                                },
+                            }
+                        });
+                    });
                     $('#updateModelForm').on('submit', function(e) { //use submit action for form validation to work
                         e.preventDefault();  
                         let name = document.getElementById("modelName").value;
@@ -4257,6 +6150,7 @@
                         let authorLink = document.getElementById("authorLink").value;
                         let license = document.getElementById("license").value;
                         let modifications = document.getElementById("modifications").value;
+                        let sourceText = document.getElementById("sourceText").value;
                         let status = $("#isPublic").prop("checked");
                         console.log("isPublic " + status);
                         // let item_status = (status == true) ? "private" : "public";
@@ -4272,17 +6166,18 @@
                             authorLink: authorLink,
                             license: license,
                             modifications: modifications,
+                            sourceText: sourceText,
                             isPublic : status
                         }
                         axios.post('/update_model/' + item_id, data)
                             .then(function (response) {
-                                console.log(response);
+                                console.log(response.data);
                                 if (response.data.includes("updated")) {
                                     $("#topSuccess").html(response.data);
                                     $("#topSuccess").show();
                                     
                                 } else {
-                                    $("#topAlert").html(response);
+                                    $("#topAlert").html(response.data);
                                     $("#topAlert").show();
                                 }
                             })
@@ -4414,12 +6309,45 @@
         axios.get('/uservid/' + item_id, config)
         .then(function (response) {
         $("#cards").show();
-        tagsHtml = "";
-        tags = [];
+        // tagsHtml = "";
+        // tags = [];
+        let user = response.data.userID;
+        let date = response.data.otimestamp;
+        if (response.data.lastUpdateUserName != null) {
+            user = response.data.lastUpdateUserName;
+        }
+        if (response.data.lastUpdateTimestamp != null) {
+            date = response.data.lastUpdateTimestamp;
+        }
+        let tagsHtml = "";
+        let tags = [];
+        let timeKeysHtml = "";
+        let timekeys = [];
+        let currentTime = 0;
+        let duration = 0;
+
+        let sourceTitle = (response.data.sourceTitle != undefined && response.data.sourceTitle != 'undefined') ? response.data.sourceTitle : "";
+        let sourceLink = (response.data.sourceLink != undefined && response.data.sourceLink != 'undefined') ? response.data.sourceLink : "";
+        let authorName = (response.data.authorName != undefined && response.data.authorName != 'undefined') ? response.data.authorName : "";
+        let authorLink = (response.data.authorLink != undefined && response.data.authorLink != 'undefined') ? response.data.authorLink : ""; 
+        let mods = (response.data.mods != undefined && response.data.mods != 'undefined') ? response.data.mods : "";
+        let linkURL = (response.data.linkURL != undefined & response.data.linkURL != 'undefined') ? response.data.linkURL : "";
+        let sourceText = (response.data.sourceText != undefined && response.data.sourceText != 'undefined') ? response.data.sourceText : "";
+        let captionUpper = (response.data.captionUpper != undefined && response.data.captionUpper != 'undefined') ? response.data.captionUpper : ""; 
+        let captionLower = (response.data.captionLower != undefined && response.data.captionLower != 'undefined') ? response.data.captionLower  : ""; 
+        let description = (response.data.description != undefined && response.data.description != 'undefined') ? response.data.description  : ""; 
+        let nft = (response.data.nft != undefined && response.data.nft != 'undefined') ? response.data.nft  : ""; 
+        let cid =  (response.data.cid != undefined && response.data.cid != 'undefined') ? response.data.cid  : ""; 
+        // let ipfsData =  (response.data.ipfsData != undefined && response.data.ipfsData != 'undefined') ? response.data.ipfsData  : ""; a
+        // console.log("ipfsData : " + response.data.ipfsData.cid.toString());
+        let ipfsLink = "";
+        if (cid != "") {
+            ipfsLink = " | <a href=\x22https://ipfs.io/ipfs/"+cid+"\x22>IPFS CID: "+cid+"</a>";
+        }
         var card = "<div class=\x22col-lg-12\x22>" +
             "<div class=\x22card shadow mb-4\x22>" +
                 "<div class=\x22card-header py-3 d-flex flex-row align-items-center justify-content-between\x22>" +
-                "<h6 class=\x22m-0 font-weight-bold text-primary\x22>Video Details</h6>" +
+                "<h6 class=\x22m-0 font-weight-bold text-primary\x22>Title: "+ response.data.title + " | _id: " +response.data._id + ipfsLink + "</h6> <button type=\x22button\x22 class=\x22btn btn-sm btn-danger float-right\x22 id=\x22ipfsUP\x22>Update IPFS</button>"+
                 "</div>" +
                 "<div class=\x22card-body\x22>" +
                     // "<div class=\x22media\x22>" +
@@ -4478,6 +6406,75 @@
                         "<div class=\x22col form-group col-md-1\x22>" +
                           //spacer
                         "</div>" +
+                        /////////////////////
+                        "<div class=\x22col form-group col-md-6\x22>" +
+                        "<label for=\x22desc\x22>Description</label>" +
+                        "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22description\x22 placeholder=\x22Description\x22 value=\x22" + description + "\x22 >" +
+                    "</div>" +
+
+                    "<div class=\x22col form-group col-md-2\x22>" +
+                        "<label for=\x22linkType\x22>Link Type</label>" +
+                        "<select class=\x22form-control\x22 id=\x22linkType\x22 >" +
+                        "<option value=\x22\x22 disabled selected>Select:</option>" +
+                        "<option>None</option>" +
+
+                        "<option>Web</option>" +
+                        "<option>Scene</option>" +
+                        "<option>Comment</option>" +
+                        "<option>NFT</option>" +
+                        "<option>Share</option>" +
+                        "</select>" +
+                    "</div>" +
+                    "<div class=\x22col form-group col-md-3\x22>" +
+                        "<label for=\x22siName\x22>Link URL</label>" +
+                        "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22linkURL\x22 placeholder=\x22Link URL\x22 value=\x22" + linkURL + "\x22 >" +
+                    "</div>" +
+                    "<div class=\x22col form-group col-md-2\x22>" + 
+                        "<label for=\x22sourceTitle\x22>Source Title</label>" + 
+                        "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22sourceTitle\x22 placeholder=\x22Title of original work\x22 value=\x22" + sourceTitle + "\x22 >" +
+                    "</div>" +
+                    "<div class=\x22col form-group col-md-2\x22>" + 
+                        "<label for=\x22sourceLink\x22>Source Link</label>" + 
+                        "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22sourceLink\x22 placeholder=\x22Link to original source\x22 value=\x22" + sourceLink + "\x22 >" +
+                    "</div>" +
+                    "<div class=\x22col form-group col-md-2\x22>" + 
+                        "<label for=\x22authorName\x22>Author </label>" + 
+                        "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22authorName\x22 placeholder=\x22Name of original creator\x22 value=\x22" + authorName + "\x22 >" +
+                    "</div>" +
+                    "<div class=\x22col form-group col-md-2\x22>" + 
+                        "<label for=\x22authorLink\x22>Author Link</label>" + 
+                        "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22authorLink\x22 placeholder=\x22Link to original creator\x22 value=\x22" + authorLink + "\x22 >" +
+                    "</div>" +
+                    "<div class=\x22col form-group col-md-2\x22>" +
+                                "<label for=\x22license\x22>License</label>" +
+                                "<select class=\x22form-control\x22 id=\x22license\x22 >" +
+                                "<option value=\x22\x22 disabled selected>Select:</option>" +
+                                "<option>Unknown</option>" +
+                                "<option>By Owner</option>" +
+                                "<option>CC Attribution</option>" +
+                                "<option>CC Attribution-ShareAlike</option>" +
+                                "<option>CC Attribution-NoDerivs</option>" +
+                                "<option>Attribution-NonCommercial</option>" +
+                                "<option>Attribution-NonCommercial-ShareAlike</option>" +
+                                "<option>Attribution-NonCommercial-NoDerivs</option>" +
+                                "<option>GPL</option>" +
+                                "<option>MIT</option>" +
+                                "<option>Public Domain</option>" +
+                                "</select>" +
+                            "</div>" +
+                    "<div class=\x22col form-group col-md-3\x22>" +
+                        "<label for=\x22source\x22>Modifications </label>" +
+                        "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22mods\x22 placeholder=\x22Modifications to original\x22 value=\x22" + mods + "\x22 >" +
+                    "</div>" +
+                    "<div class=\x22col form-group col-md-3\x22>" +
+                        "<label for=\x22source\x22>Source Text</label>" +
+                        "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22sourceText\x22 placeholder=\x22Full Text of Source(s)\x22 value=\x22" + sourceText + "\x22 >" +
+                    "</div>" +
+                    "<div class=\x22col form-group col-md-3\x22>" +
+                        "<label for=\x22source\x22>NFT</label>" +
+                        "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22nft\x22 placeholder=\x22NFT string\x22 value=\x22" + nft + "\x22 >" +
+                    "</div>" +
+                    ////////
                         "<div class=\x22col form-group col-md-2\x22>" +
                             "<div class=\x22\x22><label for=\x22hasAlpha\x22>Has Alpha</label><br>" + //alpha
                             "<input type=\x22checkbox\x22  id=\x22hasAlpha\x22 data-toggle=\x22toggle\x22 data-size=\x22sm\x22 data-on=\x22<i class='fas fa-check'></i>\x22 data-off=\x22<i class='fas fa-times'></i>\x22 data-onstyle=\x22success\x22 data-offstyle=\x22danger\x22></div>" +
@@ -4487,20 +6484,32 @@
                             "<input type=\x22checkbox\x22  id=\x22isPublic\x22 data-toggle=\x22toggle\x22 data-size=\x22sm\x22 data-on=\x22<i class='fas fa-check'></i>\x22 data-off=\x22<i class='fas fa-times'></i>\x22 data-onstyle=\x22success\x22 data-offstyle=\x22danger\x22></div>" +
                         "</div>" + 
                         "<div class=\x22col form-group col-md-8\x22>" + 
-                            "<div class=\x22embed-responsive embed-responsive-16by9\x22><video class=\x22embed-responsive-item\x22 controls>" +
+                            "<div class=\x22embed-responsive embed-responsive-16by9\x22><video id=\x22selectedVideo\x22 crossorigin=\x22anonymous\x22 class=\x22embed-responsive-item\x22 controls>" +
+                                // "<source src=/hls/" + response.data._id + " type='application/x-mpegURL'>" +
                                 "<source src=" + response.data.URLvid + " type='video/mp4'>" +
                                 "<source src=" + response.data.URLvid + " type='video/mkv'>" +
+                                "<source src=" + response.data.URLvid + " type='video/quicktime'>" +
                                 "Your browser does not support the video tag." +
                             "</video></div>" +
                         "</div>" +       
                     "</div>" +
                     // "<div class=\x22form-row\x22>" +
                     // html +
+                    
+
+                    "<button id=\x22newVideoEvent\x22 type=\x22button\x22 class=\x22btn btn-sm btn-primary float-left\x22>New Event</button><br><br>" +
+                    
+                    "<div id=\x22videoEvents\x22 class=\x22col form-group col-md-12\x22></div>" + //audioEvents
                 "</form>" +
+          
+                "<button type=\x22button\x22 class=\x22btn btn-sm btn-info float-right\x22 id=\x22grabVideoFrame\x22>Grab Video Frame</button><br><br><br>" +
+                "<a type=\x22button\x22 href=\x22/stream/video/?vid="+response.data._id+"\x22 target=\x22_blank\x22 class=\x22btn btn-sm btn-success float-right\x22>Test HLS Stream</a><br><br><br>" +
+                
+                "<button type=\x22button\x22 class=\x22btn btn-sm btn-warning float-right\x22 id=\x22encodeHLS\x22>Encode to HLS</button>" +
                 "<button type=\x22button\x22 class=\x22btn btn-sm btn-danger float-left\x22 onclick=\x22deleteItem('video','" + item_id + "')\x22>Delete Video</button>" +
                 "</div>" +
                 "</div>" +
-                    "<h5 class=\x22mt-0\x22>Picture Details</h5><br><br>" +
+                    "<h5 class=\x22mt-0\x22>Video Details</h5><br><br>" +
                     keyValues(response.data) +
                     
                     "</div>" +
@@ -4508,6 +6517,7 @@
                 "</div>" +
             "</div>" +
             "</div>";
+
             $("#cardrow").html(card);
             $('#orientation').find('option').each(function(i,e){
                 console.log($(e).val());
@@ -4534,7 +6544,203 @@
                 }
                 $("#tagDisplay").html(tagsHtml);
             };
-            $(function() { //shorthand document.ready function
+            $(function() { 
+                
+                if (response.data.timekeys != undefined && response.data.timekeys != null) {
+                    timekeys = response.data.timekeys;
+                    $("#videoEvents").html(ReturnTimeKeys(timekeys));
+                } 
+                if (timekeys != undefined) {
+                    for (let i = 0; i < timekeys.length; i++) { //init the dropdowns in timekey table
+                        $("#tk_type_" + i).val(timekeys[i].keytype).change();
+                    }
+                }
+                $(document).on('change', '.tk_start', function() {
+                    console.log(this.id + " value " + this.value);
+                    for (let i = 0; i < timekeys.length; i++) {
+                        if (this.id == "tk_start_" + i) {
+                            if (!isNaN(this.value)) {
+                                timekeys[i].keystarttime = Number(this.value);
+                            } else {
+                                console.log("must be a number!");
+                            }
+                        }
+                    }
+                });
+                $(document).on('change', '.tk_duration', function() {
+                    console.log(this.id + " value " + this.value);
+                    for (let i = 0; i < timekeys.length; i++) {
+                        if (this.id == "tk_duration_" + i) {
+                            if (!isNaN(this.value)) {
+                                timekeys[i].keyduration = Number(this.value);
+                            } else {
+                                console.log("must be a number!");
+                            }
+                        }
+                    }
+                });
+                $(document).on('change', '.tk_type', function() {
+                    
+                    for (let i = 0; i < timekeys.length; i++) {
+                        if (this.id == "tk_type_" + i) {
+                            console.log(this.id + " value " + this.value);
+                            timekeys[i].keytype = this.value;
+                        }
+                    }
+                });
+                $(document).on('change', '.tk_data', function() {
+                    console.log(this.id + " value " + this.value);
+                    for (let i = 0; i < timekeys.length; i++) {
+                        if (this.id == "tk_data_" + i) {
+                            timekeys[i].keydata = this.value;
+                        }
+                    }
+                });
+                $(document).on('click','#newVideoEvent',function(e){
+                    e.preventDefault();  
+                    console.log("tryna set a video timekey");
+                    let vid = document.getElementById('selectedVideo');
+                    let currentVidTime = 0;
+                    if (vid != null && !vid.paused) {
+                        currentVidTime = vid.currentTime;
+                        console.log("vid current time is " + currentTime);
+                    }
+                    let newTimeKey = {
+                        keytype: "",
+                        keystarttime: currentVidTime.toFixed(2),
+                        keyduration: 5,
+                        keydata: ""
+                        }
+                    timekeys.push(newTimeKey);
+                    $("#videoEvents").empty();
+                    $("#videoEvents").html(ReturnTimeKeys(timekeys));
+                    for (let i = 0; i < timekeys.length; i++) {
+                        $("#tk_type_" + i).val(timekeys[i].keytype).change();
+                    }
+
+                }); 
+                $(document).on('click','.remTimeKey',function(e) {
+                    e.preventDefault();  
+                    console.log("tryna remove timekey " + this.id);
+                    let html = "";
+                    for( var i = 0; i < timekeys.length; i++){ 
+                        if ( "tk_rm_" + i === this.id) {
+                            timekeys.splice(i, 1); 
+                        }
+                    }
+                    $("#videoEvents").empty();
+                    $("#videoEvents").html(ReturnTimeKeys(timekeys));
+                    for (let i = 0; i < timekeys.length; i++) {
+                        $("#tk_type_" + i).val(timekeys[i].keytype).change();
+                    }
+                });
+                $(document).on('click', '#grabVideoFrame', function (e) {
+                    e.preventDefault(); 
+                    // let sourceImage = document.getElementById('sky').getAttribute("src");
+                    // this.el.addEventListener('loaded', () => {
+                    console.log("tryna grab video frame " + item_id);
+                    let videoEl = document.getElementById("selectedVideo");
+                    // videoEl.onloadedmetadata = function() {
+                    //     if ('function' === typeof secs) {
+                    //       secs = secs(this.duration);
+                    //     }
+                    //     this.currentTime = Math.min(Math.max(0, (secs < 0 ? this.duration : 0) + secs), this.duration);
+                    //   };
+                    //   videoEl.onseeked = function(e) {
+                        var canvas = document.createElement('canvas');
+                        canvas.height = videoEl.videoHeight;
+                        canvas.width = videoEl.videoWidth;
+                        var ctx = canvas.getContext('2d');
+                        ctx.drawImage(videoEl, 0, 0, canvas.width, canvas.height);
+                        // var img = new Image();
+                        // img.crossOrigin = 'anonymous';
+                        // img.src = canvas.toDataURL();
+                        console.log(canvas.toDataURL('image/jpeg', .9));
+                        // callback.call(me, img, this.currentTime, e);
+                    //   };
+                    //   videoEl.onerror = function(e) {
+                        // callback.call(me, undefined, undefined, e);
+                    //   };
+                    
+
+                     
+                });
+                $(document).on('click', '#ipfsUP', function (e) {
+                    e.preventDefault(); 
+                    // let sourceImage = document.getElementById('sky').getAttribute("src");
+                    // this.el.addEventListener('loaded', () => {
+                      console.log("tryna upload to ipfs " + item_id);
+                      $.confirm({
+                        title: 'Confirm!',
+                        content: '<color=red>Are you sure you want to upload this to the Interplantary File System, FOREVER?!?!?</color>',
+                        buttons: {
+                            confirm: function () {
+                                $("#topAlert").html("Attempting to import file to Interplanetary File System, please standby..." );
+                                        $("#topAlert").show();
+                            $.ajax({
+                                url: "/ipfs_up",
+                                type: 'POST',
+                                contentType: "application/json; charset=utf-8",
+                                dataType: "json",
+                                data: JSON.stringify({
+                                        id: item_id,
+                                        type: 'video'
+                                    }),
+                                    success: function( data, textStatus, xhr ){
+                                        console.log(data);
+                                        $("#topSuccess").html("The operation was successful: ipfs://"+ data);
+                                        $("#topSuccess").show();
+                                    },
+                                    error: function( xhr, textStatus, errorThrown ){
+                                        console.log( xhr.responseText );
+                                        $("#topAlert").html(xhr.responseText );
+                                        $("#topAlert").show();
+
+                                    }
+                                });
+                            },
+                            cancel: function () {
+                                // $.alert('Canceled!');
+                            },
+                        }
+                    });
+                });
+                $(document).on('click', '#encodeHLS', function (e) {
+                    e.preventDefault(); 
+                    // let sourceImage = document.getElementById('sky').getAttribute("src");
+                    // this.el.addEventListener('loaded', () => {
+                      console.log("tryna convert envmap " + item_id);
+                      $.confirm({
+                        title: 'Confirm!',
+                        content: 'Are you sure you want to encode video ' + item_id + ' to HLS?',
+                        buttons: {
+                            confirm: function () {
+                            $.ajax({
+                                url: "/process_video_hls",
+                                type: 'POST',
+                                contentType: "application/json; charset=utf-8",
+                                dataType: "json",
+                                data: JSON.stringify({
+                                        id: item_id
+                                    }),
+                                    success: function( data, textStatus, xhr ){
+                                        console.log(data);
+                                    $("#topSuccess").html("The operation was successful! " + data);
+                                    $("#topSuccess").show();
+        
+                                    },
+                                    error: function( xhr, textStatus, errorThrown ){
+                                        console.log( xhr.responseText );
+
+                                    }
+                                });
+                            },
+                            cancel: function () {
+                                // $.alert('Canceled!');
+                            },
+                        }
+                    });
+                });
                 $(document).on('click','#addTagButton',function(e){
                     e.preventDefault();  
                     let newTag = document.getElementById("addTagInput").value;
@@ -4580,6 +6786,17 @@
                     let hasAlpha = $("#hasAlpha").prop("checked");
                     let captionUpper = document.getElementById("captionUpper").value;
                     let captionLower = document.getElementById("captionLower").value;
+                    let linkType = document.getElementById("linkType").value;
+                    let linkURL = document.getElementById("linkURL").value;
+                    let authorName = document.getElementById("authorName").value;
+                    let authorLink = document.getElementById("authorName").value;
+                    let sourceText = document.getElementById("sourceText").value;
+                    let sourceTitle = document.getElementById("sourceTitle").value;
+                    let description = document.getElementById("description").value;
+                    let mods = document.getElementById("mods").value;
+                    let license = document.getElementById("authorName").value;
+                    let nft = document.getElementById("authorName").value;
+                    
                     let status = $("#isPublic").prop("checked");
                     console.log("isPublic " + status);
                     let item_status = (status == true) ? "private" : "public";
@@ -4589,12 +6806,28 @@
                         _id: response.data._id,
                         title: title,
                         tags: tags,
+                        timekeys: timekeys,
                         orientation: orientation,
                         // item_status: item_status,
+                        // hasAlphaChannel: hasAlphaChannel,
+                        // isPublic : status,
+                        // captionUpper: captionUpper,
+                        // captionLower: captionLower
                         hasAlphaChannel: hasAlphaChannel,
                         isPublic : status,
                         captionUpper: captionUpper,
-                        captionLower: captionLower
+                        captionLower: captionLower,
+                        linkType: linkType,
+                        linkURL: linkURL,
+                        sourceText: sourceText,
+                        sourceTitle: sourceTitle,
+                        sourceLink: sourceLink,
+                        authorName: authorName,
+                        authorLink: authorLink,
+                        description: description,
+                        mods: mods,
+                        license: license,
+                        nft: nft
                     }
                     axios.post('/update_video/' + item_id, data)
                         .then(function (response) {
@@ -4672,10 +6905,14 @@
                 let detailsPicLink = "<video width='320' height='240' controls>" +
                 "<source src=" + arr[i].URLvid + " type='video/mp4'>" +
                 "<source src=" + arr[i].URLvid + " type='video/mkv'>" +
+                "<source src=" + arr[i].URLvid + " type='video/quicktime'>" +
                 "Your browser does not support the video tag." +
                 "</video>";
                 // var detailsPicLink = "<a href=\x22#page-top\x22 onclick=\x22showVideo('" + arr[i]._id + "')\x22><img class=\x22rounded\x22 src=\x22" + arr[i].URLthumb + "\x22></a>"
-                var detailsLink = "<a href=\x22#page-top\x22 onclick=\x22showVideo('" + arr[i]._id + "')\x22>" + vname + "</a>";
+                // var detailsLink = "<a href=\x22#page-top\x22 onclick=\x22showVideo('" + arr[i]._id + "')\x22>" + vname + "</a>";
+                var detailsLink = "<a href=\x22index.html?type=svideo&iid="+arr[i]._id+"\x22>" + vname + "</a>";
+                
+    
                 tableBody = tableBody +
                 "<tr>" +
                     selectButton +
@@ -4795,24 +7032,44 @@
     return header + csv
     }
     function showStoreItem(response) {
-        // console.log("tryna show store item with response : " + response);
+        console.log("tryna show store item with response : " + JSON.stringify(response));
             let isEmpty = $.isEmptyObject(response); //reuse the form to create new vs update existing record
             console.log("isEmpty " + isEmpty);
             $("#cards").show();
             let itemPics = "<div class=\x22row\x22>";
             if (!isEmpty && response.data.storeItemPictures != null && response.data.storeItemPictures != undefined && response.data.storeItemPictures.length > 0 ) {
-            for (let i = 0; i < response.data.storeItemPictures.length; i++) {
-                itemPics = itemPics +
-                "<div class=\x22card\x22 style=\x22width:256px;\x22>" +
-                    "<img class=\x22card-img-top\x22 src=\x22" + response.data.storeItemPictures[i].urlHalf + "\x22 alt=\x22Card image cap\x22>" +
-                    "<div class=\x22card-img-overlay\x22>" +
-                    "<button type=\x22button\x22 class=\x22btn btn-sm btn-danger float-right\x22 onclick=\x22removeItem('storeitem','picture','" + response.data._id + "','" + response.data.storeItemPictures[i]._id + "')\x22>Remove</button>" +
-                    "</div>" +
-                "</div>";
-            }
+                for (let i = 0; i < response.data.storeItemPictures.length; i++) {
+                    itemPics = itemPics +
+                    "<div class=\x22card\x22 style=\x22width:256px;\x22>" +
+                        "<img class=\x22card-img-top\x22 src=\x22" + response.data.storeItemPictures[i].urlHalf + "\x22 alt=\x22Card image cap\x22>" +
+                        "<div class=\x22card-img-overlay\x22>" +
+                        "<button type=\x22button\x22 class=\x22btn btn-sm btn-danger float-right\x22 onclick=\x22removeItem('storeitem','picture','" + response.data._id + "','" + response.data.storeItemPictures[i]._id + "')\x22>Remove</button>" +
+                        "</div>" +
+                    "</div>";
+                }
             itemPics = itemPics +  "</div>";
             }
-            let itemName = !isEmpty ? response.data.itemName : "";  //ternarys are OK if not nested.  really. 
+            let itemAccessGroups = "<div>";
+            if (!isEmpty && response.data.storeItemAccessGroups != null && response.data.storeItemAccessGroups != undefined && response.data.storeItemAccessGroups.length > 0 ) {
+                for (let i = 0; i < response.data.storeItemAccessGroups.length; i++) {
+                    itemAccessGroups = itemAccessGroups +
+                    "<div class=\x22card float-right\x22 style=\x22width:256px;\x22>" +
+                        // "<img class=\x22card-img-top\x22 src=\x22" + response.data.storeItemAccessGroups[i].urlHalf + "\x22 alt=\x22Card image cap\x22>" +
+                        // "<div class=\x22card-img-overlay\x22>" +
+                        "<span>"+response.data.storeItemAccessGroups[i].type + " Group Access</span>" +
+                        "<span>Group Name: <strong>"+response.data.storeItemAccessGroups[i].name+"</strong></span>" +
+                        // "<span>Item Count: "+response.data.storeItemAccessGroups[i].scene_items.length+"</span>" +
+                        "<button type=\x22button\x22 class=\x22btn btn-sm btn-danger\x22 onclick=\x22ree-moveItem('storeitem','scenegroup','" + response.data._id + "','" + response.data.storeItemAccessGroups[i]._id + "')\x22>Remove Group</button>" +
+                        "<a class=\x22btn btn-sm btn-info\x22 href=\x22index.html?type=group&iid=" + response.data.storeItemAccessGroups[i]._id + "\x22>Edit Group</a></button>" +
+                        // "<h6 class=\x22pull left m-0 font-weight-bold text-primary\x22><a href=\x22index.html?type=group&iid=" + arr[i]._id + "\x22>" + arr[i].name + "</a></h6>" +
+                        "</div>" +
+                    "</div>";
+                }
+                itemAccessGroups = itemAccessGroups +  "</div>";
+            }
+            let itemName = !isEmpty ? response.data.itemName : "";
+            let objectID = !isEmpty ? response.data.objectID : "";
+            let objectName = !isEmpty ? response.data.objectName : ""; 
             let itemDisplayName = !isEmpty ? response.data.itemDisplayName : "";
             let itemAltName = !isEmpty ? response.data.itemAltName : "";
             let itemPrice = !isEmpty ? response.data.itemPrice : "";
@@ -4827,13 +7084,21 @@
             let _id = isEmpty ? "none" : response.data._id;
             let keyVals = isEmpty ? "none" : keyValues(response.data.jsonAttributes);
             let subTypeOptions = [];
+            
             // if response.data.itemType 
 
             // console.log("csv: " + response);
+            let storeitemObj = "";
+            if (objectID != null) {
+                storeitemObj = "<div class=\x22btn btn-secondary btn-sm float-right\x22><a style=\x22color:white;\x22 target=\x22_blank\x22 role=\x22button\x22" +
+                "href=\x22index.html?type=object&iid="+ objectID +"\x22>" +
+                "model :&nbsp;<strong> " + objectName + "</strong>&nbsp;</a><button type=\x22button\x22 class=\x22remObjectMdl badge badge-xs badge-danger float-right\x22 id=\x22"+ objectID +"\x22>X</button></div>";
+            }
             if (!isEmpty) {
                 
-                extraButtons = "<a href=\x22#\x22 id=\x22deleteButton\x22 class=\x22btn btn-danger btn-sm float-left\x22 onclick=\x22deleteItem('storeitem','" + response.data._id + "')\x22>Delete Store Item</a>" +
-                "<a class=\x22btn btn-primary btn-sm float-right\x22 href=\x22index.html?appid=" + appid + "&type=pictures&mode=select&parent=storeitem&iid=" + response.data._id + "\x22>Add Store Pic</a>";
+                extraButtons = "<a href=\x22#\x22 id=\x22deleteButton\x22 class=\x22btn btn-danger btn-sm float-left\x22 onclick=\x22dee-leteItem('storeitem','" + response.data._id + "')\x22>Delete Store Item</a>" + //don't do it unless no purchases!
+                "<a class=\x22btn btn-primary btn-sm float-right\x22 href=\x22index.html?appid=" + appid + "&type=pictures&mode=select&parent=storeitem&iid=" + response.data._id + "\x22>Add Store Pic</a>"+
+                "<a class=\x22btn btn-info btn-sm float-right\x22 href=\x22index.html?appid=" + appid + "&type=groups&mode=scenegroup&parent=storeitem&iid=" + response.data._id + "\x22>Add Scene Group Access</a>";
             } else {
 
             }
@@ -4895,57 +7160,40 @@
 
                     "</div>" +
                     "<div class=\x22form-row\x22>" +
+                    // "<div class=\x22col form-group col-md-3\x22>" +
+                    //     "<label for=\x22storeItemTypeSelect\x22>Item Type</label>" +
+                    //     "<select class=\x22form-control\x22 id=\x22storeItemTypeSelect\x22 required>" +
+                    //     "</select>" + //populated via types below
+                    // "</div>" +
+                    // "<div class=\x22col form-group col-md-3\x22>" +
+                    //     "<label for=\x22storeItemSubTypeSelect\x22>Item SubType</label>" +
+                    //     "<select class=\x22form-control\x22 id=\x22storeItemSubTypeSelect\x22 required>" +
+                    //     "</select>" + //populated below
+                    // "</div>" +
+                    // "<div class=\x22col form-group col-md-3\x22>" +
+                    //     "<label for=\x22storeItemAttributesSelect1\x22>Select Item Attributes</label>" +
+                    //     "<select class=\x22form-control\x22 id=\x22storeItemAttributesSelect1\x22 >" +
+                    //     "<option value=\x22\x22 disabled selected>Select:</option>" +
+                    //     "<option>Fire</option>" +
+                    //     "<option>Water</option>" +
+                    //     "<option>Earth</option>" +
+                    //     "<option>Air</option>" +
+                    //     "<option>Magic</option>" +
+                    //     "<option>Stinky</option>" +
+                    //     "<option>Hot</option>" +
+                    //     "<option>Cold</option>" +
+                    //     "<option>Dry</option>" +
+                    //     "<option>Wet</option>" +
+                    //     "<option>Fast</option>" +
+                    //     "<option>Slow</option>" +
+                    //     "<option>Sneaky</option>" +
+                    //     "<option>Annoying</option>" +
+                    //     "<option>Double</option>" +
+                    //     "</select>" +
+                    // "</div>" +
                     "<div class=\x22col form-group col-md-3\x22>" +
-                        "<label for=\x22storeItemTypeSelect\x22>Item Type</label>" +
-                        "<select class=\x22form-control\x22 id=\x22storeItemTypeSelect\x22 required>" +
-                        "</select>" + //populated via types below
-                    "</div>" +
-                    "<div class=\x22col form-group col-md-3\x22>" +
-                        "<label for=\x22storeItemSubTypeSelect\x22>Item SubType</label>" +
-                        "<select class=\x22form-control\x22 id=\x22storeItemSubTypeSelect\x22 required>" +
-                        "</select>" + //populated below
-                    "</div>" +
-                    "<div class=\x22col form-group col-md-3\x22>" +
-                        "<label for=\x22storeItemAttributesSelect1\x22>Select Item Attributes</label>" +
-                        "<select class=\x22form-control\x22 id=\x22storeItemAttributesSelect1\x22 >" +
-                        "<option value=\x22\x22 disabled selected>Select:</option>" +
-                        "<option>Fire</option>" +
-                        "<option>Water</option>" +
-                        "<option>Earth</option>" +
-                        "<option>Air</option>" +
-                        "<option>Magic</option>" +
-                        "<option>Stinky</option>" +
-                        "<option>Hot</option>" +
-                        "<option>Cold</option>" +
-                        "<option>Dry</option>" +
-                        "<option>Wet</option>" +
-                        "<option>Fast</option>" +
-                        "<option>Slow</option>" +
-                        "<option>Sneaky</option>" +
-                        "<option>Annoying</option>" +
-                        "<option>Double</option>" +
-                        "</select>" +
-                    "</div>" +
-                    "<div class=\x22col form-group col-md-3\x22>" +
-                        "<label for=\x22storeItemAttributesSelect2\x22>Select Item Attributes</label>" +
-                        "<select class=\x22form-control\x22 id=\x22storeItemAttributesSelect2\x22 >" +
-                        "<option value=\x22\x22 disabled selected>Select:</option>" +
-                        "<option>Fire</option>" +
-                        "<option>Water</option>" +
-                        "<option>Earth</option>" +
-                        "<option>Air</option>" +
-                        "<option>Magic</option>" +
-                        "<option>Stinky</option>" +
-                        "<option>Hot</option>" +
-                        "<option>Cold</option>" +
-                        "<option>Dry</option>" +
-                        "<option>Wet</option>" +
-                        "<option>Fast</option>" +
-                        "<option>Slow</option>" +
-                        "<option>Sneaky</option>" +
-                        "<option>Annoying</option>" +
-                        "<option>Double</option>" +
-                        "</select>" +
+                        "<a class=\x22btn btn-info\x22 href=\x22index.html?type=objects&mode=select&parent=storeitem&iid="+response.data._id+"\x22><i class=\x22fas fa-hand-pointer\x22></i> Select Object</a>" +
+                        storeitemObj +
                     "</div>" +
                     "</div>" +
                     "<div class=\x22form-row\x22>" +
@@ -4961,6 +7209,7 @@
                     extraButtons + 
                     "</form><br><br>" +
                     itemPics + 
+                    itemAccessGroups +
                     "<pre>" + keyVals + "</pre>"
                 "</div>" +                            
             "</div>" +
@@ -4977,21 +7226,22 @@
             let typesArray = [];
             let emptyType = "";
             let currentSubTypeArray = [];
+            // let typesResponse = {};
             $(function() { //get types/subtypes and populate dropdownz
-            axios.get('/dashboard/test1/ref/types.json')
+            axios.get('/main/ref/types.json')
             .then(function (typesResponse) {
                 types = typesResponse.data.types;
                 for (let i = 0; i < types.length; i++) {
-                let tstring = Object.keys(types[i])[0];
-                let tarray = types[i][Object.keys(types[i])[0]]; //the value of the key / value pair is an array of strings
-                typesArray.push(tstring); 
-                // console.log("tstring " + tstring + " itemtype " + response.data.itemType);
+                    let tstring = Object.keys(types[i])[0];
+                    let tarray = types[i][Object.keys(types[i])[0]]; //the value of the key / value pair is an array of strings
+                    typesArray.push(tstring); 
+                    console.log("tstring " + tstring + " itemtype " + response.data.itemType);
                 if (!isEmpty) {
                     if (tstring === response.data.itemType) {
                     console.log("tstring " + tstring + " itemtype " + response.data.itemType);
                     currentSubTypeArray = tarray;
                     console.log(tarray);
-                    }
+                        }
                     } 
                 }
                 if (isEmpty) {
@@ -5019,6 +7269,12 @@
                     // console.log($(e).val() + " vs " + response.data.itemSubType);
                     if($(e).val() === response.data.itemSubType){
                         $('#storeItemSubTypeSelect').prop('selectedIndex',i); //select subtype to match record (!)
+                    }
+                }); 
+                $('#storeItemTypeSelect').find('option').each(function(i,e){
+                    // console.log($(e).val() + " vs " + response.data.itemSubType);
+                    if($(e).val() === response.data.itemType){
+                        $('#storeItemTypeSelect').prop('selectedIndex',i); //select subtype to match record (!)
                     }
                 }); 
                 }
@@ -5145,14 +7401,22 @@
     }
     function getStoreItems() {
     appid = getParameterByName("appid", window.location.href);
-    $("#pageTitle").html("Store Items for " + appName(appid));
+    let path = '/get_storeitems/' + appid;
     let config = { headers: {
             appid: appid,
         }
     }
+    $("#pageTitle").html("Store Items for " + appName(appid));
+    if (appid == null) {
+        path = '/get_storeitems_all/'
+        config = {};
+        $("#pageTitle").html("All Store Items");
+    }
+
+
     var selectFor = "none";
     console.log("getting storeitems for " + appid);
-    axios.get('/get_storeitems/' + appid, config)
+    axios.get(path, config)
     .then(function (response) {
         // console.log(JSON.stringify(response));
         var jsonResponse = response.data;
@@ -5509,22 +7773,21 @@
         }
         $("#pageTitle").html(currentApp.appname);
         var card1 = "<div class=\x22col-xl-3 col-md-6 mb-4\x22>" +
-            "<div class=\x22card shadow mb-4 \x22>" +
-                "<div class=\x22card-header py-3 d-flex flex-row align-items-center justify-content-between\x22>" +
-                "<h6 class=\x22m-0 font-weight-bold text-primary\x22>Admin </h6>" +
-                "</div>" +
-                "<div class=\x22card-body\x22>" +
-                "<ul class=\x22list-group list-group-flush\x22>" +
-                    "<li class=\x22list-group-item\x22><a class=\x22collapse-item\x22 href=\x22index.html?type=users&appid="+ appid +"\x22><i class=\x22fas fa-th-list\x22></i><span> Users</span></a></li>" +
-                    "<li class=\x22list-group-item\x22><a class=\x22collapse-item\x22 href=\x22index.html?type=apchs&appid="+ appid +"\x22><i class=\x22fas fa-th-list\x22></i><span> Purchases</span></li>" +
-                    "<li class=\x22list-group-item\x22><a class=\x22collapse-item\x22 href=\x22index.html?type=scores&appid="+ appid +"\x22><i class=\x22fas fa-th-list\x22></i><span> Scores</span></li>" +
-                    "<li class=\x22list-group-item\x22><a class=\x22collapse-item\x22 href=\x22index.html?type=scores&appid="+ appid +"\x22><i class=\x22fas fa-th-list\x22></i><span> Achievements</span></li>" +
-                "</ul>" +
-                "</div>" +
-            "</div>" +
-            "</div>";
-            var card2 = "<div class=\x22col-xl-3 col-md-6 mb-4\x22>" +
-            "<div class=\x22card shadow mb-4 \x22>" +
+            // "<div class=\x22card shadow mb-4 \x22>" +
+            //     "<div class=\x22card-header py-3 d-flex flex-row align-items-center justify-content-between\x22>" +
+            //     "<h6 class=\x22m-0 font-weight-bold text-primary\x22>Admin </h6>" +
+            //     "</div>" +
+            //     "<div class=\x22card-body\x22>" +
+            //     "<ul class=\x22list-group list-group-flush\x22>" +
+            //         "<li class=\x22list-group-item\x22><a class=\x22collapse-item\x22 href=\x22index.html?type=users&appid="+ appid +"\x22><i class=\x22fas fa-th-list\x22></i><span> Users</span></a></li>" +
+            //         "<li class=\x22list-group-item\x22><a class=\x22collapse-item\x22 href=\x22index.html?type=apchs&appid="+ appid +"\x22><i class=\x22fas fa-th-list\x22></i><span> Purchases</span></li>" +
+            //         "<li class=\x22list-group-item\x22><a class=\x22collapse-item\x22 href=\x22index.html?type=scores&appid="+ appid +"\x22><i class=\x22fas fa-th-list\x22></i><span> Scores</span></li>" +
+            //         "<li class=\x22list-group-item\x22><a class=\x22collapse-item\x22 href=\x22index.html?type=scores&appid="+ appid +"\x22><i class=\x22fas fa-th-list\x22></i><span> Achievements</span></li>" +
+            //     "</ul>" +
+            //     "</div>" +
+            // "</div>" +
+            // "</div>";
+                "<div class=\x22card shadow mb-4 \x22>" +
                 "<div class=\x22card-header py-3 d-flex flex-row align-items-center justify-content-between\x22>" +
                 "<h6 class=\x22m-0 font-weight-bold text-primary\x22>Content </h6>" +
                 "</div>" +
@@ -5538,6 +7801,35 @@
                 "</div>" +
             "</div>" +
             "</div>";
+            var card2 = "<div class=\x22col-xl-3 col-md-6 mb-4\x22>" +
+                "<div class=\x22card shadow mb-4 \x22>" +
+                "<div class=\x22card-header py-3 d-flex flex-row align-items-center justify-content-between\x22>" +
+                "<h6 class=\x22m-0 font-weight-bold text-primary\x22>Admin </h6>" +
+                "</div>" +
+                "<div class=\x22card-body\x22>" +
+                "<ul class=\x22list-group list-group-flush\x22>" +
+                    "<li class=\x22list-group-item\x22><a class=\x22collapse-item\x22 href=\x22index.html?type=users&appid="+ appid +"\x22><i class=\x22fas fa-th-list\x22></i><span> Users</span></a></li>" +
+                    "<li class=\x22list-group-item\x22><a class=\x22collapse-item\x22 href=\x22index.html?type=apchs&appid="+ appid +"\x22><i class=\x22fas fa-th-list\x22></i><span> Purchases</span></li>" +
+                    "<li class=\x22list-group-item\x22><a class=\x22collapse-item\x22 href=\x22index.html?type=scores&appid="+ appid +"\x22><i class=\x22fas fa-th-list\x22></i><span> Scores</span></li>" +
+                    "<li class=\x22list-group-item\x22><a class=\x22collapse-item\x22 href=\x22index.html?type=scores&appid="+ appid +"\x22><i class=\x22fas fa-th-list\x22></i><span> Achievements</span></li>" +
+                "</ul>" +
+                "</div>" +
+            "</div>" +
+            "</div>";
+            // "<div class=\x22card shadow mb-4 \x22>" +
+            //     "<div class=\x22card-header py-3 d-flex flex-row align-items-center justify-content-between\x22>" +
+            //     "<h6 class=\x22m-0 font-weight-bold text-primary\x22>Content </h6>" +
+            //     "</div>" +
+            //     "<div class=\x22card-body\x22>" +
+            //     "<ul class=\x22list-group list-group-flush\x22>" +
+            //         "<li class=\x22list-group-item\x22><a class=\x22collapse-item\x22 href=\x22index.html?type=ascenes&appid="+ appid +"\x22><i class=\x22fas fa-th-list\x22></i><span> Scenes</span></li>" +
+            //         "<li class=\x22list-group-item\x22><a class=\x22collapse-item\x22 href=\x22index.html?type=storeitems&appid="+ appid +"\x22><i class=\x22fas fa-th-list\x22></i><span> Store Items</span></li>" +
+            //         "<li class=\x22list-group-item\x22><a class=\x22collapse-item\x22 href=\x22index.html?type=acts&appid="+ appid +"\x22><i class=\x22fas fa-th-list\x22></i><span> Activities</span></li>" +
+            //         "<li class=\x22list-group-item\x22><a class=\x22collapse-item\x22 href=\x22index.html?type=attr&appid="+ appid +"\x22><i class=\x22fas fa-th-list\x22></i><span> Attributes</span></li>" +
+            //     "</ul>" +
+            //     "</div>" +
+            // "</div>" +
+            // "</div>";
             $("#cardrow").html(card1 + card2);
     }
     function getApp(appid) {
@@ -5549,7 +7841,7 @@
         if (appid != 'new') {
             axios.get('/app/' + appid, config)
             .then(function (response) {
-                console.log(response);
+                // console.log(response);
                 showApp(response);
             }) //end of main fetch
             .catch(function (error) {
@@ -5561,12 +7853,22 @@
             showApp(response.data); //send empty to make a new one
         }
     }  
-    function showApp(response) {
+    function showApp(response) { //this (early) one reuses the form for new and update cases, thus the isEmpty business - very annoying.
             let isEmpty = $.isEmptyObject(response);
-            console.log("isEmpty " + isEmpty);
+            // console.log("isEmpty " + isEmpty);
             $("#cards").show();
             let domains = [];
             let submitButtonRoute = "";
+            console.log("app response: "+ JSON.stringify(response));
+            let admins = "";
+            if (!isEmpty) {
+                for (let a = 0; a < response.data.appAdmins.length; a++) {
+                // forEach (admin in response.data.appAdmins) {    
+                    admins = admins + "<button class=\x22btn-light\x22><a href=\x22index.html?appid=" + response.data._id + "&type=user&iid=" + response.data.appAdmins[a].userID + "\x22>"+response.data.appAdmins[a].userName+" </a>"+
+                    "<a href=\x22#\x22 class=\x22btn btn-xs btn-danger\x22 onclick=\x22removeItem('app','admin','" + response.data._id + "','" + response.data.appAdmins[a].userID + "')\x22>Remove</a></button>";
+
+                }
+            }
             axios.get('/alldomains/') //need updated list of valid domains for selection
             .then(function (dresp) { 
                 domains = dresp.data;
@@ -5592,7 +7894,8 @@
                 submitButtonRoute = !isEmpty ? "/updateapp/" + response.data._id : "/createapp/";
                 if (!isEmpty) {
                     extraButtons = "<a href=\x22#\x22 id=\x22deleteButton\x22 class=\x22btn btn-danger btn-sm float-left\x22 onclick=\x22deleteItem('holditasecondtherechief','" + response.data._id + "')\x22>Delete App</a>" +
-                        "<a class=\x22btn btn-primary btn-sm float-right\x22 href=\x22index.html?appid=" + response.data._id + "&type=pictures&mode=select&parent=app&iid=" + response.data._id + "\x22>Add App Pic</a>";
+                        "<a class=\x22btn btn-primary btn-sm float-right\x22 href=\x22index.html?appid=" + response.data._id + "&type=pictures&mode=select&parent=app&iid=" + response.data._id + "\x22>Add App Pic</a>" +
+                        "<a class=\x22btn btn-dark btn-sm float-right\x22 href=\x22index.html?appid=" + response.data._id + "&type=users&mode=selectadmin&parent=app&iid=" + response.data._id + "\x22>Add App Administrator</a>";
                 } else {
 
                 }
@@ -5627,9 +7930,17 @@
                                         //pop'd dynamically below
                                     "</select>" +
                                 "</div>" +
+                            //     "<div class=\x22col form-group\x22>" +
+                            //     "<label for=\x22siName\x22>Add Admin UserID</label>" +
+                            //     "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22appName\x22 placeholder=\x22Enter Admin User ID\x22 value=\x22" + adminUID + "\x22 required>" +
+                            // "</div>" +
                             "</div>" +
                         extraButtons + 
+
                         "</form><br><br>" +
+                        "<div class=\x22float-right\x22>App Admins:<br>"+
+                        admins + 
+                        "</div>"
                         itemPics + 
                         // keyValues(response.data) +
                     "</div>" +                            
@@ -5654,6 +7965,7 @@
                     $('#updateAppForm').on('submit', function(e) { //use submit action for form validation to work
                         e.preventDefault();  
                         let appPictureIDs = !isEmpty ? response.data.appPictureIDs : [];
+                        let appAdminIDs = !isEmpty ? response.data.appAdminIDs : [];
                         let appName = document.getElementById("appName").value;
                         let appStatus = document.getElementById("appStatusSelect").value;
                         let appDomain = document.getElementById("appDomainSelect").value;
@@ -5662,7 +7974,8 @@
                             appname : appName,
                             appStatus: appStatus,
                             appdomain: appDomain,
-                            appPictureIDs: appPictureIDs
+                            appPictureIDs: appPictureIDs,
+                            appAdminIDs: appAdminIDs
                         };
                         if (!isEmpty) {
                             data._id = response.data._id
@@ -5726,11 +8039,13 @@
                     "<option value=\x22\x22 disabled selected>Select:</option>" +
                     "<option>Location</option>" +
                     "<option>Audio</option>" +
+                    "<option>Pictures</option>" +
                     "<option>Video</option>" +
                     "<option>Text</option>" +
                     "<option>People</option>" +
                     "<option>Objects</option>" +
-                    "<option>Pictures</option>" +
+                    "<option>Scenes</option>" +
+
                     "</select>" +
                 "</div>" +
                 "<div id=\x22mapElement\x22 style=\x22display:none;\x22 class=\x22col form-group col-md-5\x22>" +
@@ -5776,7 +8091,7 @@ function showGroup() {
     axios.get('/usergroup/' + groupID)
     .then(function (response) {
         console.log(JSON.stringify(response.data));
-        $("#pageTitle").html(response.data.type + " group by " + username);
+        $("#pageTitle").html(response.data.type + " Group " +response.data.name +" by " + username);
         // var arr = response.data;
         // var html = "<div class=\x22row\x22>";
         let html = "";
@@ -5789,17 +8104,20 @@ function showGroup() {
         let objtype = "<span class=\x22float-left\x22><i class=\x22fas fa-cubes fa-3x\x22 style=\x22color:#d43027;\x22></i></span>";
         let peopletype = "<span class=\x22float-left\x22><i class=\x22fas fa-user-friends fa-3x\x22 style=\x22color:#48a0d2;\x22></i></span>";
         let vidtype = "<span class=\x22float-left\x22><i class=\x22fas fa-file-video fa-3x\x22 style=\x22color:#ff5e41;\x22></i></span>";
+        let scenetype = "<span class=\x22float-left\x22><i class=\x22fas fa-file-cube fa-3x\x22 style=\x22color:black;\x22></i></span>";
         let addButton = '';
         let arr = [];
         let groupArr = [];
-        if (response.data.type.toLowerCase() == "picture") {
+        console.log("groupData: " + JSON.stringify(response.data));
+        if (response.data.type.toLowerCase().includes("picture")) {
             grouptype = pictype;
             responseArr = response.data.image_items;
             refArr = [];
             arr = [];
             idArr = response.data.items;
-            groupArr = response.data.groupData;
+            groupArr = response.data.groupdata;
             if (groupArr != null) { //if there's a groupdata array
+                console.log("gotsa pic group data array");
                 groupArr = groupArr.sort(function(a, b){ //sort groupdata by index #
                     return a.itemIndex > b.itemIndex;
                 });
@@ -5809,7 +8127,9 @@ function showGroup() {
                 idArr.sort(function(a, b){ //match order
                     return refArr.indexOf(a) - refArr.indexOf(b);
                 });
+                arr = responseArr;
             } else { //otherwise sort by index #'s added to request by server in the item Array
+                console.log("tryna sort by item indexes");
                 for (let n = 0; n < responseArr.length; n++) { //copy out a reference array with proper order, using server assigned indexes
                     refArr.push(responseArr[n]._id);
                 }
@@ -5823,7 +8143,7 @@ function showGroup() {
                 let hasItem = false;
                 for (let i = 0; i < arr.length; i++) {
                     if (idArr[h] == arr[i]._id) {
-                    // console.log(idArr[h] + " " + arr[i]._id);    
+                    console.log(idArr[h] + " " + arr[i]._id);    
                     hasItem = true;
                     html = html + 
                         "<div class=\x22card ml-1 mr-1 mt-1 mb-1\x22 style=\x22width:256px;\x22>" +
@@ -6121,6 +8441,67 @@ function showGroup() {
             }
             addButton = "<a class=\x22btn btn-sm btn-primary float-right\x22 href=\x22index.html?type=objects&mode=select&parent=group&iid=" + response.data._id + "\x22\x22>Add Item</a>";
         }
+        if (response.data.type.toLowerCase() == "scenes") {
+            grouptype = scenetype;
+            responseArr = response.data.scene_items;
+            refArr = [];
+            arr = [];
+            idArr = response.data.items;
+            groupArr = response.data.groupData;
+            if (groupArr != null) { //if there's a groupdata array
+                groupArr = groupArr.sort(function(a, b){ //sort groupdata by index #
+                    return a.itemIndex > b.itemIndex;
+                });
+                for (let n = 0; n < groupArr.length; n++) { //copy out a reference array with proper order
+                    refArr.push(groupArr[n]._id);
+                }
+                idArr.sort(function(a, b){ //match order
+                    return refArr.indexOf(a) - refArr.indexOf(b);
+                });
+            } else { //otherwise sort by index #'s added to request by server in the item Array
+                for (let n = 0; n < responseArr.length; n++) { //copy out a reference array with proper order, using server assigned indexes
+                    refArr.push(responseArr[n]._id);
+                }
+                arr = responseArr;
+                idArr.sort(function(a, b){ //match order
+                    return refArr.indexOf(a) - refArr.indexOf(b);
+                });
+            }
+            for (let h = 0; h < idArr.length; h++) {
+                // console.log(idArr[h]);
+                let hasItem = false;
+                for (let i = 0; i < arr.length; i++) {
+                    if (idArr[h] == arr[i]._id) {
+                    // console.log(idArr[h] + " " + JSON.stringify(arr[i]));    
+                    hasItem = true;
+                    html = html + 
+                        "<div class=\x22card ml-1 mr-1 mt-1 mb-1\x22 style=\x22width:256px;\x22>" +
+                            "<img class=\x22card-img-top\x22 src=\x22" + arr[i].urlThumb + "\x22 alt=\x22Card image cap\x22>" +
+                            "<div class=\x22card-body\x22>" +
+                                "<div class=\x22 float-left\x22>Scene Title: <strong>" + arr[i].sceneTitle + "</strong></div><br><br>" +
+                                    "<label for=\x22itemIndex\x22>Item Index</label>" + //sceneTitle
+                                    "<input type=\x22text\x22 size=\x224\x22  class=\x22float-right\x22 id=\x22itemIndex\x22 value=\x22" + arr[i].itemIndex + "\x22>" +
+                                    "<br><a href=\x22#\x22 class=\x22btn btn-xs btn-danger\x22 onclick=\x22removeItem('group','item','" + response.data._id + "','" + arr[i]._id + "')\x22>Remove</a>" +
+                                    "<a href=\x22index.html?type=scene&iid="+ arr[i]._id +"\x22 class=\x22float-right btn btn-xs btn-info\x22>Edit</a>" +
+                            "</div>" +
+                        "</div>";
+                    break;
+                    }
+                }
+                if (!hasItem) {  //show orphaned elements so they can be removed //TODO clean up references when parents are deleted
+                html = html + 
+                    "<div class=\x22card ml-1 mr-1 mt-1 mb-1\x22 style=\x22width:256px;\x22>" +
+                        "<div class=\x22card-body\x22>" +
+                            "<div class=\x22 float-left\x22>not found</div>" +
+                                "<label for=\x22itemIndex\x22>Item Index</label>" + //sceneTitle
+                                "<input type=\x22text\x22 size=\x224\x22  class=\x22float-right\x22 id=\x22itemIndex\x22 value=\x22not found\x22>" +
+                                "<br><a href=\x22#\x22 class=\x22btn btn-xs btn-danger\x22 onclick=\x22removeItem('group','item','" + response.data._id + "','" + idArr[h] + "')\x22>Remove</a>" +
+                        "</div>" +
+                    "</div>";        
+                }
+            }
+            addButton = "<a class=\x22btn btn-sm btn-primary float-right\x22 href=\x22index.html?type=scenes&mode=select&parent=group&iid=" + response.data._id + "\x22\x22>Add Item</a>";
+        }
         // let timestamp = 
         let modtype = response.data.type.toLowerCase();
         if (modtype == "location") {
@@ -6260,6 +8641,7 @@ function showGroup() {
         axios.get('/usergroups/' + userid)
         .then(function (response) {
             var arr = response.data;
+            console.log(JSON.stringify(arr));
             let select = false;
             let select_grouptype = "";
             if (mode == "picgroup") {
@@ -6272,10 +8654,25 @@ function showGroup() {
                 $("#table1Title").html("Groups");
                 $("#pageTitle").html("Select Primary Audio Group for Scene " + itemid); //= route param iid
             }
+            if (mode == "aaudiogroup") { //primary audio group - todo ambient and trigger
+                select = true;
+                $("#table1Title").html("Groups");
+                $("#pageTitle").html("Select Ambient Audio Group for Scene " + itemid); //= route param iid
+            }
+            if (mode == "taudiogroup") { //primary audio group - todo ambient and trigger
+                select = true;
+                $("#table1Title").html("Groups");
+                $("#pageTitle").html("Select Trigger Audio Group for Scene " + itemid); //= route param iid
+            }
             if (mode == "objgroup") {
                 select = true;
                 $("#table1Title").html("Groups");
                 $("#pageTitle").html("Select Object Group for Scene " + itemid);
+            }
+            if (mode == "scenegroup") {
+                select = true;
+                $("#table1Title").html("Groups");
+                $("#pageTitle").html("Select Scene Group" + itemid);
             }
             arr.sort(function(a, b) { //sort groupdata by index #
                 // console.log("a.type vs b.type " + a.type + " " + b.type);
@@ -6291,17 +8688,25 @@ function showGroup() {
             let pictype =  "<span class=\x22float-left\x22><i class=\x22fas fa-image fa-2x\x22 style=\x22color:#412dcf;\x22></i></span>";
             let loctype = "<span class=\x22float-left\x22><i class=\x22fas fa-globe fa-2x\x22 style=\x22color:#7d9e35;\x22></i></span>";
             let audiotype = "<span class=\x22float-left\x22><i class=\x22fas fa-file-audio fa-2x\x22 style=\x22color:#cf43b8;\x22></i></span>";
+            let paudiotype = "<span class=\x22float-left\x22><i class=\x22fas fa-file-audio fa-2x\x22 style=\x22color:#cf43b8;\x22></i></span>";
+            let aaudiotype = "<span class=\x22float-left\x22><i class=\x22fas fa-file-audio fa-2x\x22 style=\x22color:#cf43b8;\x22></i></span>";
+            let taudiotype = "<span class=\x22float-left\x22><i class=\x22fas fa-file-audio fa-2x\x22 style=\x22color:#cf43b8;\x22></i></span>";
             let texttype = "<span class=\x22float-left\x22><i class=\x22fas fa-file-alt fa-2x\x22 style=\x22color:#c0bd41;\x22></i></span>";
             let objtype = "<span class=\x22float-left\x22><i class=\x22fas fa-cubes fa-2x\x22 style=\x22color:#d43027;\x22></i></span>";
+            let scenetype = "<span class=\x22float-left\x22><i class=\x22fas fa-cube fa-2x\x22 style=\x22color:black;\x22></i></span>";
             let peopletype = "<span class=\x22float-left\x22><i class=\x22fas fa-user-friends fa-2x\x22 style=\x22color:#48a0d2;\x22></i></span>";
             let vidtype = "<span class=\x22float-left\x22><i class=\x22fas fa-file-video fa-2x\x22 style=\x22color:#ff5e41;\x22></i></span>";
             let picTypeHtml = "<div class=\x22col-md-12\x22><div><h4>Picture Groups</h4></div><hr>";
             let locTypeHtml = "<div class=\x22col-md-12\x22><span><h4>Location Groups</h4><hr>";
             let audioTypeHtml = "<div class=\x22 col-md-12\x22><span><h4>Audio Groups</h4><hr>";
+            let paudioTypeHtml = "<div class=\x22 col-md-12\x22><span><h4>Audio Groups</h4><hr>";
+            let taudioTypeHtml = "<div class=\x22 col-md-12\x22><span><h4>Audio Groups</h4><hr>";
+            let aaudioTypeHtml = "<div class=\x22 col-md-12\x22><span><h4>Audio Groups</h4><hr>";
             let textTypeHtml = "<div class=\x22 col-md-12\x22><span><h4>Text Groups</h4><hr>";
             let vidTypeHtml = "<div class=\x22 col-md-12\x22><span><h4>Video Groups</h4><hr>";
             let peopleTypeHtml = "<div class=\x22col-md-12\x22><span><h4>People Groups</h4><hr>";
             let objTypeHtml = "<div class=\x22col-md-12\x22><span><h4>Object Groups</h4><hr>";
+            let sceneTypeHtml = "<div class=\x22col-md-12\x22><span><h4>Scene Groups</h4><hr>";
             for(var i = 0; i < arr.length; i++) {
             //  console.log(arr[i].type);
                 let count = 0;
@@ -6310,8 +8715,11 @@ function showGroup() {
                     count = arr[i].items.length;
                     }
                 }
+                // if (!select) {
+                //     // let selectButton = "";
+                // } else {
                 if (!select || (select && (mode == "picgroup"))) {
-                    if (arr[i].type.toLowerCase() == "picture") {
+                    if (arr[i].type != null && arr[i].type.toLowerCase().includes("picture")) {
                         grouptype = pictype;
                         let selectButton = "";
                         if (mode == "picgroup") {
@@ -6330,6 +8738,8 @@ function showGroup() {
                             vidTypeHtml = "";
                             peopleTypeHtml = "";
                             objTypeHtml = "";
+                            sceneTypeHtml = "";
+                            scenetype = "";
                         }
                         picTypeHtml = picTypeHtml +
                         "<div class=\x22float-left card ml-1 mr-1 mt-1 mb-1\x22 style=\x22width:250px;\x22>" +
@@ -6346,7 +8756,7 @@ function showGroup() {
                     }
                 }
                 if (!select || (select && (mode == "locgroup"))) {
-                    if (arr[i].type.toLowerCase() == "location") {
+                    if (arr[i].type != null && arr[i].type.toLowerCase() == "location") {
                         grouptype = loctype;
                         locTypeHtml = locTypeHtml +
                         "<div class=\x22float-left card ml-1 mr-1 mt-1 mb-1\x22 style=\x22width:250px;\x22>" +
@@ -6362,7 +8772,8 @@ function showGroup() {
                     }
                 }
                 if (!select || (select && (mode == "audiogroup"))) {
-                    if (arr[i].type.toLowerCase() == "audio") {
+                    // console.log("cehckin for audiogroup");
+                    if (arr[i].type != null && arr[i].type.toLowerCase() == "audio") {
                         grouptype = audiotype;
                         audioTypeHtml = audioTypeHtml +
                         "<div class=\x22float-left card ml-1 mr-1 mt-1 mb-1\x22 style=\x22width:250px;\x22>" +
@@ -6378,27 +8789,130 @@ function showGroup() {
                     }
                 }
                 if (!select || (select && (mode == "paudiogroup"))) { //TODO trigger and ambient?
-                    if (arr[i].type.toLowerCase() == "audio") {
-                        grouptype = audiotype;
+
+                    if (arr[i].type != null && arr[i].type.toLowerCase() == "audio") {
+                        // console.log("cehckin for paudiogroup" + JSON.stringify(arr[i]));
+                        grouptype = paudiotype;
                         let selectButton = "";
                         if (mode == "paudiogroup") {
                             selectButton = "<button type=\x22button\x22 class=\x22btn btn-primary btn-sm float-right\x22 onclick=\x22selectItem('" + parent + "','paudiogroup','" + itemid + "','" + arr[i]._id + "')\x22>Select</button>";
                             pictype = "";
                             loctype = "";
-                            // audiotype = "";
+                            audiotype = "";
+                            // paudiotype = "";
+                            aaudiotype = "";
+                            taudiotype = "";
                             texttype = "";
                             objtype = "";
                             peopletype = "";
                             vidtype = "";
                             picTypeHtml = "";
                             locTypeHtml = "";
-                            // audioTypeHtml = "";
+                            audioTypeHtml = "";
+                            // paudioTypeHtml = "";
+                            taudioTypeHtml = "";
+                            aaudioTypeHtml = "";
                             textTypeHtml = "";
                             vidTypeHtml = "";
                             peopleTypeHtml = "";
                             objTypeHtml = "";
+                            sceneTypeHtml = "";
+                            scenetype = "";
                         }
-                        audioTypeHtml = audioTypeHtml +
+                        paudioTypeHtml = paudioTypeHtml +
+                        "<div class=\x22float-left card ml-1 mr-1 mt-1 mb-1\x22 style=\x22width:250px;\x22>" +
+                            "<div class=\x22float-left card-header py-3 d-flex flex-row align-items-center justify-content-between\x22>" +
+                                grouptype +
+
+                                // "<h6 class=\x22pull left m-0 font-weight-bold text-primary\x22><a onclick=\x22showGroup('" + arr[i]._id + "')\x22 href=\x22#\x22>" + arr[i].name + "</a></h6>" +
+                                "<h6 class=\x22pull left m-0 font-weight-bold text-primary\x22><a href=\x22index.html?type=group&iid=" + arr[i]._id + "\x22>" + arr[i].name + "</a></h6>" +
+                                "</div>" +
+                                "<div class=\x22card-body\x22>" +
+                                "<strong>" + count + "</strong> " + arr[i].type.toLowerCase() + " items " + selectButton + "</div>" +
+                            "</div>" +
+                        "</div>";
+                    }
+                }
+                if (!select || (select && (mode == "aaudiogroup"))) { //TODO trigger and ambient?
+                    
+                    if (arr[i].type != null && arr[i].type.toLowerCase() == "audio") {
+                        // console.log("cehckin for aaudiogroup");
+                        grouptype = aaudiotype;
+                        let selectButton = "";
+                        if (mode == "aaudiogroup") {
+                            selectButton = "<button type=\x22button\x22 class=\x22btn btn-primary btn-sm float-right\x22 onclick=\x22selectItem('" + parent + "','aaudiogroup','" + itemid + "','" + arr[i]._id + "')\x22>Select</button>";
+                            pictype = "";
+                            loctype = "";
+                            audiotype = "";
+                            paudiotype = "";
+                            // aaudiotype = "";
+                            taudiotype = "";
+                            texttype = "";
+                            objtype = "";
+                            peopletype = "";
+                            vidtype = "";
+                            picTypeHtml = "";
+                            locTypeHtml = "";
+                            audioTypeHtml = "";
+
+                            paudioTypeHtml = "";
+                            taudioTypeHtml = "";
+                            // aaudioTypeHtml = "";
+                            textTypeHtml = "";
+                            vidTypeHtml = "";
+                            peopleTypeHtml = "";
+                            objTypeHtml = "";
+                            sceneTypeHtml = "";
+                            scenetype = "";
+                        }
+                        aaudioTypeHtml = aaudioTypeHtml +
+                        "<div class=\x22float-left card ml-1 mr-1 mt-1 mb-1\x22 style=\x22width:250px;\x22>" +
+                            "<div class=\x22float-left card-header py-3 d-flex flex-row align-items-center justify-content-between\x22>" +
+                                grouptype +
+
+                                // "<h6 class=\x22pull left m-0 font-weight-bold text-primary\x22><a onclick=\x22showGroup('" + arr[i]._id + "')\x22 href=\x22#\x22>" + arr[i].name + "</a></h6>" +
+                                "<h6 class=\x22pull left m-0 font-weight-bold text-primary\x22><a href=\x22index.html?type=group&iid=" + arr[i]._id + "\x22>" + arr[i].name + "</a></h6>" +
+                                "</div>" +
+                                "<div class=\x22card-body\x22>" +
+                                "<strong>" + count + "</strong> " + arr[i].type.toLowerCase() + " items " + selectButton + "</div>" +
+                            "</div>" +
+                        "</div>";
+                    }
+                }
+                if (!select || (select && (mode == "taudiogroup"))) { //TODO trigger and ambient?
+                    
+                    if (arr[i].type != null && arr[i].type.toLowerCase() == "audio") {
+                        // console.log("cehckin for taudiogroup");
+                        grouptype = taudiotype;
+                        let selectButton = "";
+                        if (mode == "taudiogroup") {
+                            selectButton = "<button type=\x22button\x22 class=\x22btn btn-primary btn-sm float-right\x22 onclick=\x22selectItem('" + parent + "','taudiogroup','" + itemid + "','" + arr[i]._id + "')\x22>Select</button>";
+                            pictype = "";
+                            loctype = "";
+                            audiotype = "";
+                            paudiotype = "";
+                            aaudiotype = "";
+                            // taudiotype = "";
+                            
+                            texttype = "";
+                            objtype = "";
+                            peopletype = "";
+                            vidtype = "";
+                            picTypeHtml = "";
+                            locTypeHtml = "";
+                            audioTypeHtml = "";
+
+                            paudioTypeHtml = "";
+                            aaudioTypeHtml = "";
+                            // taudioTypeHtml = "";
+                            textTypeHtml = "";
+                            vidTypeHtml = "";
+                            peopleTypeHtml = "";
+                            objTypeHtml = "";
+                            sceneTypeHtml = "";
+                            scenetype = "";
+                        }
+                        taudioTypeHtml = taudioTypeHtml +
                         "<div class=\x22float-left card ml-1 mr-1 mt-1 mb-1\x22 style=\x22width:250px;\x22>" +
                             "<div class=\x22float-left card-header py-3 d-flex flex-row align-items-center justify-content-between\x22>" +
                                 grouptype +
@@ -6413,7 +8927,7 @@ function showGroup() {
                     }
                 }
                 if (!select || (select && (mode == "textgroup"))) {
-                    if (arr[i].type.toLowerCase() == "text") {
+                    if (arr[i].type != null && arr[i].type.toLowerCase() == "text") {
                         grouptype = texttype;
                         textTypeHtml = textTypeHtml +
                         "<div class=\x22float-left card ml-1 mr-1 mt-1 mb-1\x22 style=\x22width:250px;\x22>" +
@@ -6429,7 +8943,7 @@ function showGroup() {
                     }
                 }
                 if (!select || (select && (mode == "vidgroup"))) {
-                    if (arr[i].type.toLowerCase() == "video") {
+                    if (arr[i].type != null && arr[i].type.toLowerCase() == "video") {
                         grouptype = vidtype;
                         let selectButton = "";
                         if (mode == "vidgroup") {
@@ -6437,6 +8951,9 @@ function showGroup() {
                             pictype = "";
                             loctype = "";
                             audiotype = "";
+                            paudiotype = "";
+                            aaudiotype = "";
+                            taudiotype = "";
                             texttype = "";
                             objtype = "";
                             peopletype = "";
@@ -6444,10 +8961,15 @@ function showGroup() {
                             picTypeHtml = "";
                             locTypeHtml = "";
                             audioTypeHtml = "";
+                            paudioTypeHtml = "";
+                            taudioTypeHtml = "";
+                            aaudioTypeHtml = "";
                             textTypeHtml = "";
                             // vidTypeHtml = "";
                             peopleTypeHtml = "";
                             objTypeHtml = "";
+                            sceneTypeHtml = "";
+                            scenetype = "";
                         }
                         vidTypeHtml = vidTypeHtml +
                         "<div class=\x22float-left card ml-1 mr-1 mt-1 mb-1\x22 style=\x22width:250px;\x22>" +
@@ -6462,7 +8984,7 @@ function showGroup() {
                         "</div>";
                     }
                 }
-                if (arr[i].type.toLowerCase() == "people") {
+                if (arr[i].type != null && arr[i].type.toLowerCase() == "people") {
                     if (!select || (select && (mode == "peoplegroup"))) {
                         grouptype = peopletype;
                         peopleTypeHtml = peopleTypeHtml +
@@ -6479,7 +9001,7 @@ function showGroup() {
                     }
                 }
                 if (!select || (select && (mode == "objgroup"))) {
-                    if (arr[i].type.toLowerCase() == "objects") {
+                    if (arr[i].type != null && arr[i].type.toLowerCase() == "objects") {
                         grouptype = objtype;
                         
                         let selectButton = "";
@@ -6488,8 +9010,11 @@ function showGroup() {
                             pictype = "";
                             loctype = "";
                             audiotype = "";
+                            paudiotype = "";
+                            aaudiotype = "";
+                            taudiotype = "";
                             texttype = "";
-                            // objtype = "";
+                            
                             peopletype = "";
                             vidtype = "";
                             picTypeHtml = "";
@@ -6498,7 +9023,11 @@ function showGroup() {
                             textTypeHtml = "";
                             vidTypeHtml = "";
                             peopleTypeHtml = "";
-                            // objTypeHtml = "";
+                            paudioTypeHtml = "";
+                            taudioTypeHtml = "";
+                            aaudioTypeHtml = "";
+                            sceneTypeHtml = "";
+                            scenetype = "";
                         }
                         objTypeHtml = objTypeHtml +
                         "<div class=\x22float-left card ml-1 mr-1 mt-1 mb-1\x22 style=\x22width:250px;\x22>" +
@@ -6512,7 +9041,49 @@ function showGroup() {
                             "</div>" +
                         "</div>";
                     }
-
+                } 
+                if (!select || (select && (mode == "scenegroup"))) {
+                    if (arr[i].type != null && arr[i].type.toLowerCase() == "scenes") {
+                        grouptype = scenetype;
+                        
+                        let selectButton = "";
+                        if (mode == "scenegroup") {
+                            selectButton = "<button type=\x22button\x22 class=\x22btn btn-primary btn-sm float-right\x22 onclick=\x22selectItem('" + parent + "','scenegroup','" + itemid + "','" + arr[i]._id + "')\x22>Select</button>";
+                            pictype = "";
+                            loctype = "";
+                            audiotype = "";
+                            paudiotype = "";
+                            aaudiotype = "";
+                            taudiotype = "";
+                            texttype = "";
+                            objtype = "";
+                            // scenetype = "";
+                            peopletype = "";
+                            vidtype = "";
+                            picTypeHtml = "";
+                            locTypeHtml = "";
+                            audioTypeHtml = "";
+                            textTypeHtml = "";
+                            vidTypeHtml = "";
+                            peopleTypeHtml = "";
+                            paudioTypeHtml = "";
+                            taudioTypeHtml = "";
+                            aaudioTypeHtml = "";
+                            objTypeHtml = "";
+                        }
+                        sceneTypeHtml = sceneTypeHtml +
+                        "<div class=\x22float-left card ml-1 mr-1 mt-1 mb-1\x22 style=\x22width:250px;\x22>" +
+                            "<div class=\x22float-left card-header py-3 d-flex flex-row align-items-center justify-content-between\x22>" +
+                                grouptype +
+                                // "<h6 class=\x22pull left m-0 font-weight-bold text-primary\x22><a onclick=\x22showGroup('" + arr[i]._id + "')\x22 href=\x22#\x22>" + arr[i].name + "</a></h6>" +
+                                "<h6 class=\x22pull left m-0 font-weight-bold text-primary\x22><a href=\x22index.html?type=group&iid=" + arr[i]._id + "\x22>" + arr[i].name + "</a></h6>" +
+                                "</div>" +
+                                "<div class=\x22card-body\x22>" +
+                                "<strong>" + count + "</strong> " + arr[i].type.toLowerCase() + " items " + selectButton + "</div>" +
+                            "</div>" +
+                        "</div>";
+                        }
+                    } 
                 }
                 let newButton = "<button class=\x22btn btn-info  float-right\x22 onclick=\x22newGroup()\x22>Create New Group</button>";
                 $("#newButton").html(newButton);
@@ -6530,24 +9101,36 @@ function showGroup() {
                             "<div class=\x22col col-md-6\x22>" +
                             audioTypeHtml +
                             "</div>"+
-                        "</div>"+
-                        "<div class=\x22row\x22>" +
+                            "<div class=\x22col col-md-6\x22>" +
+                            paudioTypeHtml +
+                            "</div>"+
+                            "<div class=\x22col col-md-6\x22>" +
+                            aaudioTypeHtml +
+                            "</div>"+
+                            "<div class=\x22col col-md-6\x22>" +
+                            taudioTypeHtml +
+                            "</div>"+
+                            "</div>"+
+                            "<div class=\x22row\x22>" +
                             "<div class=\x22col col-md-6\x22>" +
                             textTypeHtml +
                             "</div>"+
                             "<div class=\x22col col-md-6\x22>" +
                             vidTypeHtml +
                             "</div>"+
-                        "</div>"+
-                        "<div class=\x22row\x22>" +
+                            "</div>"+
+                            "<div class=\x22row\x22>" +
                             "<div class=\x22col col-md-6\x22>" +
                             peopleTypeHtml +
                             "</div>"+
                             "<div class=\x22col col-md-6\x22>" +
                             objTypeHtml +
                             "</div>"+
-                        "</div>"+
-                        "<div class=\x22row\x22>" +
+                            "<div class=\x22col col-md-6\x22>" +
+                            sceneTypeHtml +
+                            "</div>"+
+                            "</div>"+
+                            "<div class=\x22row\x22>" +
                             "<div class=\x22col col-md-12\x22>" +
                             picTypeHtml +
                             "</div>" +
@@ -6560,19 +9143,27 @@ function showGroup() {
                 // $("#cardrow").html(locTypeHtml + "<hr>");
                 $("#cardrow1").html(locTypeHtml + "<hr>");
 
+                
                 $("#cardrow2").html(audioTypeHtml + "<hr>");
+                if (mode == "paudiogroup")
+                $("#cardrow2").html(paudioTypeHtml + "<hr>");
+                if (mode == "aaudiogroup")
+                $("#cardrow2").html(aaudioTypeHtml + "<hr>");
+                if (mode == "taudiogroup")
+                $("#cardrow2").html(taudioTypeHtml + "<hr>");
 
                 $("#cardrow3").html(textTypeHtml + "<hr>");
 
                 $("#cardrow4").html(vidTypeHtml + "<hr>");
 
                 $("#cardrow5").html(objTypeHtml + "<hr>");
+                $("#cardrow8").html(sceneTypeHtml + "<hr>");
 
                 $("#cardrow6").html(peopleTypeHtml + "<hr>");
 
                 $("#cardrow7").html(picTypeHtml + "<hr>");
                 // $("#cardrow").html("<hr>" + card + locTypeHtml + "</div>" + audioTypeHtml + "</div>" + textTypeHtml + "</div>" + vidTypeHtml + "</div>" + peopleTypeHtml + "</div>" + objTypeHtml + "</div>" + picTypeHtml + "</div></div></div>");
-            }
+            // }
         })                      
         .catch(function (error) {
             console.log(error);
@@ -6581,6 +9172,7 @@ function showGroup() {
 
     function getApps() {
         var arr = apps; //no need to fetch, apps come down with amirite response if admin
+
         var tableHead = "<table id=\x22dataTable1\x22 class=\x22display table table-striped table-bordered\x22 style=\x22width:100%\x22>" +
             "<thead>"+
             "<tr>"+
@@ -6624,6 +9216,142 @@ function showGroup() {
             {"order": [[ 1, "desc" ]]}
         );
     }
+    function showUser() {
+        let config = { headers: {
+        appid: appid,
+        }
+        }
+        tagsHtml = "";
+        tags = [];
+        axios.get('/user_details/' + itemid, config)
+        .then(function (response) {
+        // let ouser = response.data.userID;
+        // let date = response.data.otimestamp;
+        // let user = null;
+        // if (response.data.lastUpdateUserName != null) {
+        //     user = response.data.lastUpdateUserName;
+        // }
+        // if (response.data.lastUpdateTimestamp != null) {
+        //     date = response.data.lastUpdateTimestamp;
+        // }
+        $("#cards").show();
+   
+        var card = "<div class=\x22col-lg-12\x22>" +
+        "<div class=\x22card shadow mb-4\x22>" +
+            "<div class=\x22card-header py-3 d-flex flex-row align-items-center justify-content-between\x22>" +
+            "<h6 class=\x22m-0 font-weight-bold text-primary\x22>User Details - : "+ response.data.userName + " | _id: " +response.data._id+ "</h6>" +
+            "</div>" +
+            "<div class=\x22card-body\x22>" +
+            "<form id=\x22updateUserForm\x22>" +
+            "<div class=\x22float-right\x22><button type=\x22submit\x22 id=\x22submitButton\x22 class=\x22btn btn-primary float-right\x22>Update</button></div>" + 
+            "<div class=\x22form-row\x22>" +
+              
+                "<div class=\x22col form-group col-md-3\x22>" +
+                        "<label for=\x22groupTypeSelect\x22>User Status</label>" +
+                        "<select class=\x22form-control\x22 id=\x22userStatus\x22 required>" +
+                        "<option value=\x22\x22 disabled selected>Select:</option>" +
+                        "<option>Validated</option>" +
+                        "<option>Invalid</option>" +
+                        "<option>Banned</option>" +
+                        "<option>Demo</option>" +
+                    "</select>" +
+                "</div>" +
+                "<div class=\x22col form-group col-md-3\x22>" +
+                        "<label for=\x22groupTypeSelect\x22>Payment Status</label>" +
+                        "<select class=\x22form-control\x22 id=\x22paymentStatus\x22 required>" +
+                        "<option value=\x22\x22 disabled selected>Select:</option>" +
+                        "<option>Ok</option>" +
+                        "<option>Nope</option>" +
+                        "<option>Maybe</option>" +
+                        "<option>Sponsored</option>" +
+                    "</select>" +
+                "</div>" +
+                "<div class=\x22col form-group col-md-3\x22>" +
+                        "<label for=\x22type\x22>Type</label>" +
+                        "<select class=\x22form-control\x22 id=\x22userType\x22 required>" +
+                        "<option value=\x22\x22 disabled selected>Select:</option>" +
+                        "<option>Webuser</option>" +
+                        "<option>Robot</option>" +
+                        "<option>Imaginary</option>" +
+                        "<option>Sponsored</option>" +
+                    "</select>" +
+                "</div>" +
+                "<div class=\x22col form-group col-md-3\x22>" +
+                        "<label for=\x22authLevel\x22>Auth Level</label>" +
+                        "<select class=\x22form-control\x22 id=\x22authLevel\x22 required>" +
+                        "<option value=\x22\x22 disabled selected>Select:</option>" +
+                        "<option>Negatory</option>" +
+                        "<option>Zero</option>" +
+                        "<option>One</option>" +
+                        "<option>Admin</option>" +
+                        "<option>Domain Admin</option>" +
+                        "<option>Jesus H. Christ</option>" +
+                        "<option>Sponsored</option>" +
+                    "</select>" +
+                "</div>" +
+            "</form>" +
+            "</div>" +
+            "</div>" +
+            "</div>" +
+                "<h5 class=\x22mt-0\x22>User Data</h5><br><br>" +
+                keyValues(response.data) +
+                
+                "</div>" +
+                "</div>" +
+            "</div>" +
+        "</div>" +
+        "</div>";
+
+        const capitalize = (s) => {
+            if (typeof s !== 'string') return ''
+            return s.charAt(0).toUpperCase() + s.slice(1)
+          }
+        $("#cardrow").html(card);
+
+        $(function() { 
+            $("#authLevel").val(capitalize(response.data.authLevel));
+            $("#paymentStatus").val(capitalize(response.data.paymentStatus));
+            $("#userType").val(capitalize(response.data.type));
+            $("#userStatus").val(capitalize(response.data.status));
+
+            $('#updateUserForm').on('submit', function(e) { 
+
+                e.preventDefault(); 
+                let authLevel = document.getElementById("authLevel").value.toLowerCase();
+                let paymentStatus = document.getElementById("paymentStatus").value.toLowerCase();
+                let userType = document.getElementById("userType").value.toLowerCase();
+                let userStatus = document.getElementById("userStatus").value.toLowerCase();
+
+                console.log("tryna submit");
+                let data = {
+                    _id: response.data._id,
+                    authLevel: authLevel,
+                    status: userStatus,
+                    paymentStatus: paymentStatus,
+                    type: userType
+                }
+                axios.post('/update_user/', data)
+                    .then(function (response) {
+                        console.log(response);
+                        if (response.data.includes("updated")) {
+                            $("#topSuccess").html(response.data);
+                            $("#topSuccess").show();
+                            
+                        } else {
+                            $("#topAlert").html(response.data);
+                            $("#topAlert").show();
+                        }
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+                });
+            });
+        })
+        .catch(function (error) {
+        console.log(error);
+        });
+    } 
         
     function getAllUsers() {
     let config = { headers: {
@@ -6634,39 +9362,53 @@ function showGroup() {
         .then(function (response) {
         // console.log(JSON.stringify(response));
         // var jsonResponse = response.data;
+
         var arr = response.data;
+        let selectHeader = "";
+        if (mode == "selectadmin") {
+            selectHeader = "<th>Select</th>";
+        }  
         var tableHead = "<table id=\x22dataTable1\x22 class=\x22display table table-striped table-bordered\x22 style=\x22width:100%\x22>" +
             "<thead>"+
             "<tr>"+
+            selectHeader +
             "<th>User Name</th>"+
             "<th>Type</th>"+
             "<th>Status</th>"+
             "<th>Email</th>"+
-            "<th>Original AppID</th>"+
+            "<th>Auth Level</th>"+
             "<th>Create Date</th>"+
         "</tr>"+
         "</thead>"+
         "<tbody>";
         var tableBody = "";
         for(var i = 0; i < arr.length; i++) {
+        let selectButton = "";
+        if (mode == "selectadmin") {
+            selectButton = "<td><button type=\x22button\x22 class=\x22btn btn-primary\x22 onclick=\x22selectItem('" + parent + "','admin','" + itemid + "','" + arr[i]._id + "')\x22>Select Admin</button></td>";
+            hideIndex  = 4;
+            $("#pageTitle").html("Select Admin for " + parent + " " + itemid);
+        }  
             tableBody = tableBody +
             "<tr>" +
-            "<td>" + arr[i].userName + "</td>" +
+            selectButton +
+            "<td><a href=\x22index.html?type=user&iid=" + arr[i]._id + "\x22>" + arr[i].userName + "</a></td>"+ 
             "<td>" + arr[i].type + "</td>" +
             "<td>" + arr[i].status + "</td>" +
             "<td>" + arr[i].email + "</td>" +
-            "<td>" + arr[i].oappid + "</td>" +
+            "<td>" + arr[i].authLevel + "</td>" +
             "<td>" + convertTimestamp(arr[i].createDate) + "</td>" +
             "</tr>";
         }
         var tableFoot =  "</tbody>" +
             "<tfoot>" +
             "<tr>" +
+            selectHeader + 
             "<th>User Name</th>"+ 
             "<th>Type</th>"+
             "<th>Status</th>"+
             "<th>Email</th>"+
-            "<th>Original AppID</th>"+
+            "<th>Auth Level</th>"+
             "<th>Create Date</th>"+
             "</tr>" +
         "</tfoot>" +
@@ -6719,41 +9461,35 @@ function showGroup() {
         });
     }
     function returnObjectTypes(selectedType) {
-        console.log("tryna select type " + selectedType);
         let types = "";
         const typesArray = [
         "none",
+        "player",
+        "character",
+        "poi",
+        "target",
+        "follow spline",
+        "follow ambient",
         "placeholder",
         "callout",
-        "target",
-        "track face",
-        "player spawn",
-        "character spawn",
-        "waypoint",
-        "poi",
-        "gltf",
-        "car",
         "hotspot",
-        "callouthotspot",
-        "gatehotspot",
-        "spawnhotspot",
-        "videohotspot",
-        "youtubehotspot",
-        "picturehotspot",
-        "audiohotspot",
-        "availablescenes",
         "nextscene",
         "previousscene",
+        "key",
         "audio",
-        "picture",
+        "audiogroup",
+        "picture fixed",
+        "picture billboard",
+        "picturegroup",
         "video",
+        // "video billboard",
         "youtube",
+        // "youtube billboard",
         "text",
         "textbook",
         "picturebook",
         "link",
         "mailbox",
-        "character",
         "pickup",
         "drop",
         "collectible",
@@ -6764,7 +9500,15 @@ function showGroup() {
         "equip - hit",
         "equip - teleport",
         "equip - consume",
-        "callout",
+        "callouthotspot",
+        "gatehotspot",
+        "spawnhotspot",
+        "videohotspot",
+        "youtubehotspot",
+        "picturehotspot",
+        "audiohotspot",
+        "availablescenes",
+        "track face",
         "lerp",
         "slerp",
         "gate",
@@ -7144,7 +9888,11 @@ function showGroup() {
         let tagsHtml = "";
         let tags = [];
         let textID = "";
-        let gltfSelect = "";
+        // let gltfSelect = "";
+        let objMdl = "";
+        let objAction = "";
+
+        let objSceneGroup = "";
         if (response.data.textitemID != undefined) {
             textID = response.data.textitemID;
         }
@@ -7169,9 +9917,60 @@ function showGroup() {
             audiogrID = response.data.audiogroupID;
         }
 
+        let objectType = response.data.objtype != undefined ? response.data.objtype : "";
+        let objectCategory = response.data.objcat != undefined ? response.data.objcat : "";
+        let objectSubcategory = response.data.objsubcat != undefined ? response.data.objsubcat : "";
+        let objectClass = response.data.objclass != undefined ? response.data.objclass : "";
+
+        let modelName = response.data.modelName != undefined ? response.data.modelName : "";
+        let actionName = response.data.actionName != undefined ? response.data.actionName : "";
+
+        let modelID = response.data.modelID != undefined ? response.data.modelID : "";
+        let actionID = response.data.actionID != undefined ? response.data.actionID : "";
+        let modelIDs = response.data.modelIDs != undefined ? response.data.modelIDs : "";
+        let actionIDs = response.data.actionIDs != undefined ? response.data.actionIDs : "";
+        let actions = response.data.actions != undefined ? response.data.actions : [];
+
+        let level = response.data.level != undefined ? response.data.level : ""
+        let hitpoints = response.data.hitpoints != undefined ? response.data.hitpoints : "";
+        let xpoints = response.data.xpoints != undefined ? response.data.xpoints : "";
+        let mana = response.data.mana != undefined ? response.data.mana : "";
+        let armorclass = response.data.armorclass != undefined ? response.data.armorclass : "";
+        let age = response.data.age != undefined ? response.data.age : "";
+        let species = response.data.species != undefined ? response.data.species : "";
+        let alignment = response.data.alignment != undefined ? response.data.alignment : "";
+        let personality = response.data.personality != undefined ? response.data.personality : "";
+        
+        // let hitpoints = response.data.hitpoints != undefined ? response.data.hitpoints : "";
+        // let armorclass = response.data.armorclass != undefined ? response.data.armorclass : "";
+
+        let strength = response.data.strength != undefined ? response.data.strength : "";
+        let dexterity = response.data.dexterity != undefined ? response.data.dexterity : "";
+        let constitution = response.data.constitution != undefined ? response.data.constitution : "";
+        let intelligence = response.data.intelligence != undefined ? response.data.intelligence : "";
+        let wisdom = response.data.wisdom != undefined ? response.data.wisdom : "";
+        let charisma = response.data.charisma != undefined ? response.data.charisma : "";
+        let integrity = response.data.integrity != undefined ? response.data.integrity : "";
+
+        let quality = response.data.quality  != undefined ? response.data.quality : "";
+        let rarity = response.data.rarity  != undefined ? response.data.rarity : "";
+        let purity = response.data.purity  != undefined ? response.data.purity : "";
+        let distribution = response.data.distribution  != undefined ? response.data.distribution : "";
+
+        let scale = response.data.quality  != undefined ? response.data.quality : "";
+        let weight = response.data.weight  != undefined ? response.data.weight : "";
+        let properties = response.data.properties  != undefined ? response.data.properties : "";
+        let attributes = response.data.attributes  != undefined ? response.data.attributes : "";
+
+        let operator = response.data.operator  != undefined ? response.data.operator : "";
+        let affect = response.data.affect  != undefined ? response.data.affect : "";
+        let effectiveness = response.data.effectiveness  != undefined ? response.data.effectiveness : "";
+
         let assetName = response.data.assetname != undefined ? response.data.assetname : "";
         let assetID = response.data.assetID != undefined ? response.data.assetID : "";
         let label = response.data.labeltext != undefined ? response.data.labeltext : "";
+        let callout = response.data.callouttext != undefined ? response.data.callouttext : "";
+        let prompt = response.data.prompttext != undefined ? response.data.prompttext : "";
         let title = response.data.title != undefined ? response.data.title : "";
         let sNotes = response.data.synthNotes != undefined ? response.data.synthNotes : "";
         let sDuration = response.data.synthDuration != undefined ? response.data.synthDuration : "";
@@ -7181,8 +9980,15 @@ function showGroup() {
         let desc = response.data.description != undefined ? response.data.description : "";
         let event_data = response.data.eventdata != undefined ? response.data.eventdata : "";
         let maxperscene = response.data.maxPerScene != undefined ? response.data.maxPerScene : "";
+        let maxperuser = response.data.maxPerUser != undefined ? response.data.maxPerUser : "";
+        let maxtotal = response.data.maxTotal != undefined ? response.data.maxTotal : "";
         let objscale = response.data.objScale != undefined ? response.data.objScale : "";
         let speedfactor = response.data.speedFactor != undefined ? response.data.speedFactor : "";
+        let sceneGroupID = response.data.sceneGroupID != undefined ? response.data.sceneGroupID : "";
+        let sceneGroupName = response.data.sceneGroupName != undefined ? response.data.sceneGroupName : "";
+        let objAppName = response.data.objAppName != undefined ? response.data.objAppName : "";
+        let objDomain = response.data.objDomain != undefined ? response.data.objDomain : "";
+        
         let itemPics = "<div class=\x22row\x22>";
         if (response.data.objectPictures != undefined && response.data.objectPictures != null && response.data.objectPictures.length > 0 ) {
         for (let i = 0; i < response.data.objectPictures.length; i++) {
@@ -7196,6 +10002,36 @@ function showGroup() {
             }
         itemPics = itemPics +  "</div>";
         }
+        console.log("actions: " + JSON.stringify(actionIDs));
+        if (modelID != null && modelID != "") {
+            objMdl = "<div visible=\x22false\x22 class=\x22btn btn-primary btn-sm\x22><a style=\x22color:white;\x22 target=\x22_blank\x22 role=\x22button\x22" +
+            "href=\x22index.html?type=model&iid="+ modelID +"\x22>" +
+            "model :&nbsp;<strong> " + modelName + "</strong>&nbsp;</a><button type=\x22button\x22 class=\x22remObjectMdl badge badge-xs badge-danger float-right\x22 id=\x22"+ modelID +"\x22>X</button></div>";
+        } 
+        // if (actionID != null && actionID != "") {
+        //     objAction = "<div class=\x22btn btn-success btn-sm\x22><a style=\x22color:white;\x22 target=\x22_blank\x22 role=\x22button\x22" +
+        //     "href=\x22index.html?type=action&iid="+ actionID +"\x22>" +
+        //     "action :&nbsp;<strong> " + actionName + "</strong>&nbsp;</a><button type=\x22button\x22 class=\x22remObjectAction badge badge-xs badge-danger float-right\x22 id=\x22"+ actionID +"\x22>X</button></div>";
+        // }
+        if (actionIDs != null && actionIDs.length > 0) {
+            for (let i = 0; i < actionIDs.length; i++) {
+                for (a = 0; a < actions.length; a++) {
+                    // console.log("actions " + a + " " + JSON.stringify(actions[a]));
+                    if (actionIDs[i] == actions[a]._id) {
+                        objAction = objAction + "<div class=\x22btn btn-success btn-sm "+actions[a]._id+"\x22><a style=\x22color:white;\x22 target=\x22_blank\x22 role=\x22button\x22" +
+                        "href=\x22index.html?type=action&iid="+ actions[a]._id +"\x22>" +
+                        "action :&nbsp;<strong> " + actions[a].actionName + "</strong>&nbsp;</a><button type=\x22button\x22 class=\x22remObjectAction badge badge-xs badge-danger float-right\x22 id=\x22"+ actions[a]._id +"\x22>X</button></div>";
+                    }
+                }
+            }
+        }
+        if (sceneGroupID != null && sceneGroupID != "") {
+            objSceneGroup = "<div class=\x22btn btn-secondary btn-sm float-right\x22><a style=\x22color:white;\x22 target=\x22_blank\x22 role=\x22button\x22" +
+            "href=\x22index.html?type=group&iid="+ sceneGroupID +"\x22>" +
+            "action :&nbsp;<strong> " + sceneGroupName + "</strong>&nbsp;</a><button type=\x22button\x22 class=\x22remObjectMdl badge badge-xs badge-danger float-right\x22 id=\x22"+ sceneGroupID +"\x22>X</button></div>";
+        } 
+
+
         $("#pageTitle").html("Object Details");
         extraButtons = "<a href=\x22#\x22 id=\x22deleteButton\x22 class=\x22btn btn-danger btn-sm float-left\x22 onclick=\x22deleteItem('object','" + response.data._id + "')\x22>Delete Object</a>" +
         "<a class=\x22btn btn-primary btn-sm float-right\x22 href=\x22index.html?type=pictures&mode=select&parent=object&iid=" + response.data._id + "\x22>Add Object Pic</a>";
@@ -7210,93 +10046,208 @@ function showGroup() {
                     // "<button class=\x22btn btn-sm btn-primary btn-circle btn-light float-left\x22 data-toggle=x22collapse\x22 data-target=\x22#OptionsSection\x22><i class=\x22fas fa-plus-circle\x22></i> </button>" +
                     // "<h4>Options</h4>" +
                     // "<hr/>" +
+                    
                     "<div class=\x22form-row\x22>" +
-                        "<div class=\x22col form-group col-md-3\x22>" + 
-                            "<label for=\x22objname\x22>Object Name</label>" + //name
+                        "<div class=\x22col form-group col-md-2\x22>" + 
+                            "<label for=\x22objname\x22>Name</label>" + //name
                             "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22objname\x22 placeholder=\x22Object Name\x22 value=\x22" + response.data.name + "\x22 required>" +
                         "</div>" +
-                        "<div class=\x22col form-group col-md-3\x22>" + 
-                            "<label for=\x22objtitle\x22>Object Title</label>" + 
+                        "<div class=\x22col form-group col-md-2\x22>" + 
+                            "<label for=\x22objtitle\x22>Title</label>" + 
                             "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22objtitle\x22 placeholder=\x22Object Title\x22 value=\x22" + title + "\x22 >" +
                         "</div>" +
-                        "<div class=\x22col form-group col-md-3\x22>" +
-                            "<label for=\x22objtype\x22>Object Type</label>" + //type
-                            "<select class=\x22form-control\x22 id=\x22objtype\x22 required>" +
+                        "<div class=\x22col form-group col-md-2\x22>" +
+                            "<label for=\x22objTypeSelect\x22>Type</label>" + //type
+                            "<select class=\x22form-control\x22 id=\x22objTypeSelect\x22 required>" +
                             "<option value=\x22\x22 disabled selected>Select:</option>" +
-                                "<option>hotspot</option>" +
-                                "<option>callouthotspot</option>" +
-                                "<option>gatehotspot</option>" +
-                                "<option>spawnhotspot</option>" +
-                                "<option>videohotspot</option>" +
-                                "<option>youtubehotspot</option>" +
-                                "<option>picturehotspot</option>" +
-                                "<option>audiohotspot</option>" +
-                                "<option>key</option>" +
-                                "<option>audio</option>" +
-                                "<option>picture</option>" +
-                                "<option>video</option>" +
-                                "<option>youtube</option>" +
-                                "<option>text</option>" +
-                                "<option>textbook</option>" +
-                                "<option>picturebook</option>" +
-                                "<option>link</option>" +
-                                "<option>mailbox</option>" +
-                                "<option>character</option>" +
-                                "<option>pickup</option>" +
-                                "<option>drop</option>" +
-                                "<option>collectible</option>" +
-                                "<option>media</option>" +
-                                "<option>equip - beam</option>" +
-                                "<option>equip - shoot</option>" +
-                                "<option>equip - throw</option>" +
-                                "<option>equip - hit</option>" +
-                                "<option>equip - teleport</option>" +
-                                "<option>equip - consume</option>" +
-                                "<option>callout</option>" +
-                                "<option>lerp</option>" +
-                                "<option>slerp</option>" +
-                                "<option>gate</option>" +
-                                "<option>spawntrigger</option>" +
-                                "<option>light</option>" +
-                                "<option>particlesystem</option>" +
-                                "<option>spawn</option>" +
-                                "<option>flyer</option>" +
-                                "<option>walker</option>" +
-                                "</select>" +
-                        "</div>" +
-
-                    "</div>" +
-                    "<div class=\x22form-row\x22>" +    
-                        "<div class=\x22col form-group col-md-3\x22>" + 
-                            "<label for=\x22assetname\x22>Asset Name</label>" + 
-                            "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22assetname\x22 placeholder=\x22Asset Name\x22 value=\x22" + assetName + "\x22 >" +
-                        "</div>" +
-                        "<div class=\x22col form-group col-md-3\x22>" + 
-                            "<label for=\x22assetID\x22>Asset ID</label>" + 
-                            "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22assetID\x22 placeholder=\x22Asset ID\x22 value=\x22" + assetID + "\x22 >" +
-                        "</div>" +
-                        "<div class=\x22col form-group col-md-3\x22 id=\x22gltfObjects\x22>" +
-                            "<label for=\x22\x22>GLTF Assets: </label>" + 
-                                "<select class=\x22form-control\x22 id=\x22gltfSelect\x22 >" +
-                                "<option value=\x22\x22 disabled selected>Select : </option>" +
-                                    gltfSelect +
-                                "</select>" +
-                        "</div>" +
-                        "<div class=\x22col form-group col-md-3\x22>" +
-                        "<label for=\x22assettype\x22>Asset Type</label>" +
-                        "<select class=\x22form-control\x22 id=\x22assettype\x22 >" +
-                            "<option value=\x22\x22 disabled selected>Select:</option>" +
-                            "<option>Unity</option>" +
-                            "<option>.OBJ</option>" +
-                            "<option>.GLB</option>" +
-                            "<option>Primitive Cube</option>" +
-                            "<option>Primative Sphere</option>" +
-                            "<option>Primative Capsule</option>" +
+                            //popped below...
                             "</select>" +
                         "</div>" +
+                        "<div class=\x22col form-group col-md-2\x22>" +
+                            "<label for=\x22objCategorySelect\x22>Category</label>" + //cat
+                            "<select class=\x22form-control\x22 id=\x22objCategorySelect\x22 >" +
+                            "<option value=\x22\x22 disabled selected>Select:</option>" +
+                            //popped below...
+                            "</select>" +
                         "</div>" +
-                        "<div class=\x22form-row\x22>" + 
-                        "<div class=\x22col form-group col-md-3\x22>" +
+                        "<div class=\x22col form-group col-md-2\x22>" +
+                            "<label for=\x22objSubcategorySelect\x22>Subcategory</label>" + //subcat
+                            "<select class=\x22form-control\x22 id=\x22objSubcategorySelect\x22 >" +
+                            "<option value=\x22\x22 disabled selected>Select:</option>" +
+                            //popped below...    
+                            "</select>" +
+                        "</div>" +
+                        "<div class=\x22col form-group col-md-2\x22>" +
+                            "<label for=\x22objClassSelect\x22>Class</label>" + //subcat
+                            "<select class=\x22form-control\x22 id=\x22objClassSelect\x22 >" +
+                            "<option value=\x22\x22 disabled selected>Select:</option>" +
+                            //popped below...    
+                            "</select>" +
+                        "</div>" +
+                    "</div>" +
+                    "<div class=\x22form-row\x22>" +
+
+                        "<div class=\x22col form-group col-md-1\x22>" + 
+                            "<label for=\x22maxPerScene\x22>Hitpoints</label>" + 
+                            "<input type=\x22number\x22 class=\x22form-control\x22 id=\x22hitpoints\x22 placeholder=\x221\x22 value=\x22" + hitpoints + "\x22 >" +
+                        "</div>" +
+                        "<div class=\x22col form-group col-md-1\x22>" + 
+                            "<label for=\x22maxPerScene\x22>Armorclass</label>" + 
+                            "<input type=\x22number\x22 class=\x22form-control\x22 id=\x22armorclass\x22 placeholder=\x221\x22 value=\x22" + armorclass + "\x22 >" +
+                        "</div>" +
+                        "<div class=\x22col form-group col-md-1\x22>" + 
+                            "<label for=\x22maxPerScene\x22>Level</label>" + 
+                            "<input type=\x22number\x22 class=\x22form-control\x22 id=\x22level\x22 placeholder=\x221\x22 value=\x22" + level + "\x22 >" +
+                        "</div>" +
+                        "<div class=\x22col form-group col-md-1 magical\x22>" + 
+                            "<label for=\x22maxPerScene\x22>Mana</label>" + 
+                            "<input type=\x22number\x22 class=\x22form-control\x22 id=\x22mana\x22 placeholder=\x221\x22 value=\x22" + mana + "\x22 >" +
+                        "</div>" +
+
+                        "<div class=\x22col form-group col-md-1\x22>" + 
+                            "<label for=\x22maxPerScene\x22>XP</label>" + 
+                            "<input type=\x22number\x22 class=\x22form-control\x22 id=\x22xpoints\x22 placeholder=\x221\x22 value=\x22" + xpoints + "\x22 >" +
+                        "</div>" +
+
+
+
+                        "<div class=\x22col form-group col-md-1 characterAttributes\x22>" + 
+                            "<label for=\x22maxPerScene\x22>Strength</label>" + 
+                            "<input type=\x22number\x22 class=\x22form-control\x22 id=\x22strength\x22 placeholder=\x221\x22 value=\x22" + strength + "\x22 >" +
+                        "</div>" +
+                        "<div class=\x22col form-group col-md-1 characterAttributes\x22>" + 
+                            "<label for=\x22maxPerScene\x22>Dexterity</label>" + 
+                            "<input type=\x22number\x22 class=\x22form-control\x22 id=\x22dexterity\x22 placeholder=\x221\x22 value=\x22" + dexterity + "\x22 >" +
+                        "</div>" +
+                        "<div class=\x22col form-group col-md-1 characterAttributes\x22>" + 
+                            "<label for=\x22maxPerScene\x22>Constitution</label>" + 
+                            "<input type=\x22number\x22 class=\x22form-control\x22 id=\x22constitution\x22 placeholder=\x221\x22 value=\x22" + constitution + "\x22 >" +
+                        "</div>" +
+                        "<div class=\x22col form-group col-md-1 characterAttributes\x22>" + 
+                            "<label for=\x22maxPerScene\x22>Intelligence</label>" + 
+                            "<input type=\x22number\x22 class=\x22form-control\x22 id=\x22intelligence\x22 placeholder=\x221\x22 value=\x22" + intelligence + "\x22 >" +
+                        "</div>" +
+                            "<div class=\x22col form-group col-md-1 characterAttributes\x22>" + 
+                            "<label for=\x22maxPerScene\x22>Wisdom</label>" + 
+                            "<input type=\x22number\x22 class=\x22form-control\x22 id=\x22wisdom\x22 placeholder=\x221\x22 value=\x22" + wisdom + "\x22 >" +
+                        "</div>" +
+                        "<div class=\x22col form-group col-md-1 characterAttributes\x22>" + 
+                            "<label for=\x22maxPerScene\x22>Charisma</label>" + 
+                            "<input type=\x22number\x22 class=\x22form-control\x22 id=\x22charisma\x22 placeholder=\x221\x22 value=\x22" + charisma + "\x22 >" +
+                        "</div>" +
+                        "<div class=\x22col form-group col-md-1 characterAttributes\x22>" + 
+                            "<label for=\x22maxPerScene\x22>Integrity</label>" + 
+                            "<input type=\x22number\x22 class=\x22form-control\x22 id=\x22integrity\x22 placeholder=\x221\x22 value=\x22" + integrity + "\x22 >" +
+                        "</div>" +
+                       
+                        
+                        "<div class=\x22col form-group col-md-2 characterAttributes\x22>" +
+                            "<label for=\x22objSubcategorySelect\x22>Age</label>" + //subcat
+                            "<select class=\x22form-control\x22 id=\x22objAgeSelect\x22 >" +
+                            "<option value=\x22\x22 disabled selected>Select:</option>" +
+                            //popped below...    
+                            "</select>" +
+                        "</div>" +
+                        "<div class=\x22col form-group col-md-2 characterAttributes\x22>" +
+                            "<label for=\x22objSubcategorySelect\x22>Species</label>" + //subcat
+                            "<select class=\x22form-control\x22 id=\x22objSpeciesSelect\x22 >" +
+                            "<option value=\x22\x22 disabled selected>Select:</option>" +
+                            //popped below...    
+                            "</select>" +
+                        "</div>" +
+                        "<div class=\x22col form-group col-md-2 characterAttributes\x22>" +
+                            "<label for=\x22objSubcategorySelect\x22>Alignment</label>" + //subcat
+                            "<select class=\x22form-control\x22 id=\x22objAlignmentSelect\x22 >" +
+                            "<option value=\x22\x22 disabled selected>Select:</option>" +
+                            //popped below...    
+                            "</select>" +
+                        "</div>" +                        
+                        "<div class=\x22col form-group col-md-2 characterAttributes\x22>" +
+                            "<label for=\x22objSubcategorySelect\x22>Personality</label>" + //subcat
+                            "<select class=\x22form-control\x22 id=\x22objPersonalitySelect\x22 >" +
+                            "<option value=\x22\x22 disabled selected>Select:</option>" +
+                            //popped below...    
+                            "</select>" +
+                        "</div>" +
+                        "<div class=\x22col form-group col-md-2 inanimateAttributes\x22>" +
+                            "<label for=\x22objSubcategorySelect\x22>Quality</label>" + //subcat
+                            "<select class=\x22form-control\x22 id=\x22objQualitySelect\x22 >" +
+                            "<option value=\x22\x22 disabled selected>Select:</option>" +
+                            //popped below...    
+                            "</select>" +
+                        "</div>" +
+                        "<div class=\x22col form-group col-md-2 inanimateAttributes\x22>" +
+                            "<label for=\x22objSubcategorySelect\x22>Rarity</label>" + //subcat
+                            "<select class=\x22form-control\x22 id=\x22objRaritySelect\x22 >" +
+                            "<option value=\x22\x22 disabled selected>Select:</option>" +
+                            //popped below...    
+                            "</select>" +
+                        "</div>" +
+                        "<div class=\x22col form-group col-md-2 inanimateAttributes\x22>" +
+                            "<label for=\x22objSubcategorySelect\x22>Purity</label>" + //subcat
+                            "<select class=\x22form-control\x22 id=\x22objPuritySelect\x22 >" +
+                            "<option value=\x22\x22 disabled selected>Select:</option>" +
+                            //popped below...    
+                            "</select>" +
+                        "</div>" +
+                        "<div class=\x22col form-group col-md-2 inanimateAttributes\x22>" +
+                            "<label for=\x22objSubcategorySelect\x22>Distribution</label>" + //subcat
+                            "<select class=\x22form-control\x22 id=\x22objDistributionSelect\x22 >" +
+                            "<option value=\x22\x22 disabled selected>Select:</option>" +
+                            //popped below...    
+                            "</select>" +
+                        "</div>" +
+                        "<div class=\x22col form-group col-md-2 inanimateAttributes\x22>" +
+                            "<label for=\x22objSubcategorySelect\x22>Scale</label>" + //subcat
+                            "<select class=\x22form-control\x22 id=\x22objScaleSelect\x22 >" +
+                            "<option value=\x22\x22 disabled selected>Select:</option>" +
+                            //popped below...    
+                            "</select>" +
+                        "</div>" +
+                        "<div class=\x22col form-group col-md-2 inanimateAttributes\x22>" +
+                            "<label for=\x22objSubcategorySelect\x22>Weight</label>" + //subcat
+                            "<select class=\x22form-control\x22 id=\x22objWeightSelect\x22 >" +
+                            "<option value=\x22\x22 disabled selected>Select:</option>" +
+                            //popped below...    
+                            "</select>" +
+                        "</div>" +
+                        "<div class=\x22col form-group col-md-2\x22>" +
+                            "<label for=\x22objSubcategorySelect\x22>Mod Property</label>" + //subcat
+                            "<select class=\x22form-control\x22 id=\x22objPropertySelect\x22 >" +
+                            "<option value=\x22\x22 disabled selected>Select:</option>" +
+                            //popped below...    
+                            "</select>" +
+                        "</div>" +
+                        "<div class=\x22col form-group col-md-2 inanimateAttributes\x22>" +
+                            "<label for=\x22objSubcategorySelect\x22>Mod Attribute</label>" + //subcat
+                            "<select class=\x22form-control\x22 id=\x22objAttributeSelect\x22 >" +
+                            "<option value=\x22\x22 disabled selected>Select:</option>" +
+                            //popped below...    
+                            "</select>" +
+                        "</div>" +
+                        "<div class=\x22col form-group col-md-2 inanimateAttributes\x22>" +
+                            "<label for=\x22objSubcategorySelect\x22>Operator</label>" + //subcat
+                            "<select class=\x22form-control\x22 id=\x22objOperatorSelect\x22 >" +
+                            "<option value=\x22\x22 disabled selected>Select:</option>" +
+                            //popped below...    
+                            "</select>" +
+                        "</div>" +
+                        "<div class=\x22col form-group col-md-2 inanimateAttributes\x22>" +
+                            "<label for=\x22objSubcategorySelect\x22>Affect</label>" + //subcat
+                            "<select class=\x22form-control\x22 id=\x22objAffectSelect\x22 >" +
+                            "<option value=\x22\x22 disabled selected>Select:</option>" +
+                            //popped below...    
+                            "</select>" +
+                        "</div>" +
+                        "<div class=\x22col form-group col-md-2 inanimateAttributes\x22>" +
+                            "<label for=\x22objSubcategorySelect\x22>Effectiveness</label>" + //subcat
+                            "<select class=\x22form-control\x22 id=\x22objEffectivenessSelect\x22 >" +
+                            "<option value=\x22\x22 disabled selected>Select:</option>" +
+                            //popped below...    
+                            "</select>" +
+                        "</div>" +
+                      
+                        "<div class=\x22col form-group col-md-2\x22>" +
                             "<label for=\x22interaction\x22>Interaction</label>" +
                             "<select class=\x22form-control\x22 id=\x22interaction\x22 >" +
                                 "<option value=\x22\x22 disabled selected>Select:</option>" +
@@ -7307,11 +10258,15 @@ function showGroup() {
                                 "<option>none</option>" +
                             "</select>" +
                         "</div>" +
-                        "<div class=\x22col form-group col-md-3\x22>" +
+                        "<div class=\x22col form-group col-md-2\x22>" +
                             "<label for=\x22eventtype\x22>Event Type</label>" +
                             "<select class=\x22form-control\x22 id=\x22eventtype\x22 >" +
                                 "<option value=\x22\x22 disabled selected>Select:</option>" +
                                 "<option>none</option>" +
+                                "<option>do action</option>" +
+                                "<option>action prompt</option>" +
+                                "<option>start dialog</option>" +
+                                "<option>start animation</option>" +
                                 "<option>scene link (shortcode/title)</option>" +
                                 "<option>web link (url)</option>" +
                                 "<option>teleport (vector3)</option>" +
@@ -7326,64 +10281,98 @@ function showGroup() {
                                 "<option>damage<option>" +
                             "</select>" +
                         "</div>" +
-                        "<div class=\x22col form-group col-md-3\x22>" +
+                        "<div class=\x22col form-group col-md-4\x22>" +
                             "<label for=\x22eventdata\x22>Event Data</label>" +
                             "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22eventdata\x22 placeholder=\x22Enter Event Data\x22 value=\x22" + event_data + "\x22 >" +
                         "</div>" +
+                       
+                    "</div>" +
+                    "<div class=\x22form-row\x22>" +    
+                       
+                        "<div class=\x22col form-group col-md-6\x22 id=\x22gltfObjects\x22>" +
+                            "<a class=\x22btn btn-info\x22 href=\x22index.html?type=models&mode=select&parent=object&iid="+response.data._id+"\x22><i class=\x22fas fa-hand-pointer\x22></i> Select Model(s)</a>" +
+                            objMdl +
                         "</div>" +
-                        "<div class=\x22form-row\x22>" +
-                        "<div class=\x22col form-group col-md-3\x22>" +
-                            "<label for=\x22labeltext\x22>Label / Callout</label>" +
-                            "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22labeltext\x22 placeholder=\x22Enter Label/Callout\x22 value=\x22" + label + "\x22 >" +
+                 
+                        "<div class=\x22col form-group col-md-6\x22 id=\x22actions\x22>" +
+                            "<a class=\x22btn btn-secondary\x22 href=\x22index.html?type=actions&mode=select&parent=object&iid="+response.data._id+"\x22><i class=\x22fas fa-hand-pointer\x22></i> Select Action(s)</a>" +
+                            objAction +
                         "</div>" +
-                        "<div class=\x22col form-group col-md-3\x22>" +
-                            "<label for=\x22highlight\x22>Highlight Options</label>" +
-                            "<select class=\x22form-control\x22 id=\x22highlight\x22 >" +
-                            "<option value=\x22\x22 disabled selected>Select:</option>" +
-                            "<option>glow</option>" +
-                            "<option>showchildren</option>" +
-                            "<option>emit</option>" +
-                            "<option>none</option>" +
-                            "</select>" +
-                        "</div>" +
-                        "<div class=\x22col form-group col-md-3\x22>" +
-                            "<label for=\x22callout\x22>Callout Options</label>" +
-                            "<select class=\x22form-control\x22 id=\x22callout\x22 >" +
-                            "<option value=\x22\x22 disabled selected>Select:</option>" +
-                            "<option>fixed</option>" +
-                            "<option>flying</option>" +
-                            "<option>thought bubble</option>" +
-                            "<option>speech bubble</option>" +
-                            "<option>none</option>" +
-                            "</select>" +
-                        "</div>" +
-                        "</div>" +
-                        "<div class=\x22form-row\x22>" +
+                        
+                    "</div>" +
+                    "<div class=\x22form-row\x22>" + 
+
+                    "</div>" +
+                    "<div class=\x22form-row\x22>" +
                         "<div class=\x22col form-group col-md-1\x22>" + 
-                                "<label for=\x22maxPerScene\x22>Max / Scene</label>" + 
-                                "<input type=\x22number\x22 class=\x22form-control\x22 id=\x22maxPerScene\x22 placeholder=\x221\x22 value=\x22" + maxperscene + "\x22 >" +
+                            "<label for=\x22maxPerScene\x22>Max / Scene</label>" + 
+                            "<input type=\x22number\x22 class=\x22form-control\x22 id=\x22maxPerScene\x22 placeholder=\x221\x22 value=\x22" + maxperscene + "\x22 >" +
+                        "</div>" +
+                        "<div class=\x22col form-group col-md-1\x22>" + 
+                            "<label for=\x22maxPerScene\x22>Max / User</label>" + 
+                            "<input type=\x22number\x22 class=\x22form-control\x22 id=\x22maxPerUser\x22 placeholder=\x221\x22 value=\x22" + maxperuser + "\x22 >" +
+                        "</div>" +
+                        "<div class=\x22col form-group col-md-1\x22>" + 
+                            "<label for=\x22maxPerScene\x22>Max Total</label>" + 
+                            "<input type=\x22number\x22 class=\x22form-control\x22 id=\x22maxTotal\x22 placeholder=\x221\x22 value=\x22" + maxtotal + "\x22 >" +
+                        "</div>" +
+                        "<div class=\x22col form-group col-md-1\x22>" + 
+                            "<label for=\x22speedFactor\x22>Speed Factor</label>" + 
+                            "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22speedFactor\x22 placeholder=\x221\x22 value=\x22" + speedfactor + "\x22 >" +
+                        "</div>" +
+                        "<div class=\x22col form-group col-md-1\x22>" + 
+                            "<label for=\x22objScale\x22>Scale Factor</label>" + 
+                            "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22objScale\x22 placeholder=\x221\x22 value=\x22" + objscale + "\x22 >" +
+                        "</div>" +
+                        "<div class=\x22col form-group col-md-1\x22>" + 
+                            "<label for=\x22intval\x22>Int Value(s)</label>" + 
+                            "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22intval\x22 placeholder=\x221\x22 value=\x22" + ival + "\x22 >" +
+                        "</div>" +
+                        "<div class=\x22col form-group col-md-1\x22>" + 
+                            "<label for=\x22floatval\x22>Float Value(s)</label>" + 
+                            "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22floatval\x22 placeholder=\x221\x22 value=\x22" + fval + "\x22 >" +
+                        "</div>" +
+                        "<div class=\x22col form-group col-md-3\x22>" + 
+                            "<label for=\x22stringval\x22>String Value</label>" + 
+                            "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22stringval\x22 placeholder=\x221\x22 value=\x22" + sval + "\x22 >" +
+                        "</div>" +
+                    "</div>" + 
+                        "<div class=\x22form-row\x22>" +
+                            "<div class=\x22col form-group col-md-3\x22>" +
+                                "<label for=\x22labeltext\x22>Label</label>" +
+                                "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22labeltext\x22 placeholder=\x22Enter Label\x22 value=\x22" + label + "\x22 >" +
                             "</div>" +
-                            "<div class=\x22col form-group col-md-1\x22>" + 
-                                "<label for=\x22speedFactor\x22>Speed Factor</label>" + 
-                                "<input type=\x22number\x22 class=\x22form-control\x22 id=\x22speedFactor\x22 placeholder=\x221\x22 value=\x22" + speedfactor + "\x22 >" +
+                            "<div class=\x22col form-group col-md-3\x22>" +
+                                "<label for=\x22labeltext\x22>Callout</label>" +
+                                "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22callouttext\x22 placeholder=\x22Enter Callout\x22 value=\x22" + callout + "\x22 >" +
                             "</div>" +
-                            "<div class=\x22col form-group col-md-1\x22>" + 
-                                "<label for=\x22objScale\x22>Scale Factor</label>" + 
-                                "<input type=\x22number\x22 class=\x22form-control\x22 id=\x22objScale\x22 placeholder=\x221\x22 value=\x22" + objscale + "\x22 >" +
+                            "<div class=\x22col form-group col-md-3\x22>" +
+                                "<label for=\x22labeltext\x22>Prompt</label>" +
+                                "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22prompttext\x22 placeholder=\x22Enter Prompt\x22 value=\x22" + prompt + "\x22 >" +
                             "</div>" +
-                            "<div class=\x22col form-group col-md-1\x22>" + 
-                                "<label for=\x22intval\x22>Int Value(s)</label>" + 
-                                "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22intval\x22 placeholder=\x221\x22 value=\x22" + ival + "\x22 >" +
+                            "<div class=\x22col form-group col-md-1\x22>" +
+                                "<label for=\x22highlight\x22>Highlight Options</label>" +
+                                "<select class=\x22form-control\x22 id=\x22highlight\x22 >" +
+                                "<option value=\x22\x22 disabled selected>Select:</option>" +
+                                "<option>glow</option>" +
+                                "<option>showchildren</option>" +
+                                "<option>emit</option>" +
+                                "<option>none</option>" +
+                                "</select>" +
                             "</div>" +
-                            "<div class=\x22col form-group col-md-1\x22>" + 
-                                "<label for=\x22floatval\x22>Float Value(s)</label>" + 
-                                "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22floatval\x22 placeholder=\x221\x22 value=\x22" + fval + "\x22 >" +
+                            "<div class=\x22col form-group col-md-1\x22>" +
+                                "<label for=\x22callout\x22>Callout Options</label>" +
+                                "<select class=\x22form-control\x22 id=\x22callout\x22 >" +
+                                "<option value=\x22\x22 disabled selected>Select:</option>" +
+                                "<option>fixed</option>" +
+                                "<option>flying</option>" +
+                                "<option>thought bubble</option>" +
+                                "<option>speech bubble</option>" +
+                                "<option>none</option>" +
+                                "</select>" +
                             "</div>" +
-                            "<div class=\x22col form-group col-md-3\x22>" + 
-                                "<label for=\x22stringval\x22>String Value</label>" + 
-                                "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22stringval\x22 placeholder=\x221\x22 value=\x22" + sval + "\x22 >" +
-                            "</div>" +
-                        "</div>" + 
+                        "</div>" +
+
                         "<div class=\x22form-row\x22>" +    
                         "<div class=\x22col form-group col-md-4\x22>" +
                             "<label for=\x22description\x22>Object Description</label>" + //desc
@@ -7443,6 +10432,13 @@ function showGroup() {
                         "</div>" +
  
                         "<div class=\x22form-row\x22>" +
+                            "<div class=\x22col form-group col-md-2\x22>" +
+                                "<label for=\x22objNamedcolorSelect\x22>Named Color</label>" + //subcat
+                                "<select class=\x22form-control\x22 id=\x22objNamedcolorSelect\x22 >" +
+                                "<option value=\x22\x22 disabled selected>Select:</option>" +
+                                //popped below...    
+                                "</select>" +
+                            "</div>" +
                             "<div class=\x22col form-group col-md-2\x22> " +
                                 "<label for=\x22highlightColor\x22>Highlight Color</label>" + //sceneText
                                 "<input id=\x22highlightColor\x22 class=\x22form-control\x22 type=\x22color\x22>" +
@@ -7483,6 +10479,26 @@ function showGroup() {
                             "</div>" +
                         "</div>" +
                         "<div class=\x22form-row\x22>" +
+                            "<div class=\x22col form-group col-md-2 \x22>" +
+                                "<label for=\x22objPhysicsSelect\x22>Physics</label>" + //subcat
+                                "<select class=\x22form-control\x22 id=\x22objPhysicsSelect\x22 >" +
+                                "<option value=\x22\x22 disabled selected>Select:</option>" +
+                                //popped below...    
+                                "</select>" +
+                            "</div>" +
+                            "<div class=\x22col form-group col-md-2\x22>" +
+                                "<label for=\x22collidertype\x22>Collider Type</label>" +
+                                "<select class=\x22form-control\x22 id=\x22collidertype\x22 >" +
+                                "<option value=\x22\x22 disabled selected>Select:</option>" +
+                                "<option>none</option>" +
+                                "<option>box</option>" +
+                                "<option>cylinder</option>" +
+                                "<option>capsule</option>" +
+                                "<option>sphere</option>" +
+                                "<option>hull</option>" +
+                                "<option>mesh</option>" +
+                                "</select>" +
+                            "</div>" +
                             "<div class=\x22col form-group col-md-1\x22>" + 
                                 "<label for=\x22colliderScale\x22>Collider Scale</label>" + 
                                 "<input type=\x22number\x22 class=\x22form-control\x22 id=\x22colliderScale\x22 placeholder=\x221\x22 value=\x22" + response.data.colliderScale + "\x22 >" +
@@ -7491,42 +10507,31 @@ function showGroup() {
                                 "<label for=\x22triggerScale\x22>Trigger Scale</label>" + 
                                 "<input type=\x22number\x22 class=\x22form-control\x22 id=\x22triggerScale\x22 placeholder=\x221\x22 value=\x22" + response.data.triggerScale + "\x22 >" +
                             "</div>" +
-                            "<div class=\x22col form-group col-md-2\x22>" +
-                                "<label for=\x22collidertype\x22>Collider Type</label>" +
-                                "<select class=\x22form-control\x22 id=\x22collidertype\x22 >" +
-                                "<option value=\x22\x22 disabled selected>Select:</option>" +
-                                "<option>none</option>" +
-                                "<option>mesh</option>" +
-                                "<option>sphere</option>" +
-                                "<option>cube</option>" +
-                                "<option>capsule</option>" +
-                                "</select>" +
-                            "</div>" +
                             "<div class=\x22col form-group col-md-1\x22>" + 
                                 "<label for=\x22xoffset\x22>Collider Offset X</label>" + 
-                                "<input type=\x22number\x22 class=\x22form-control\x22 id=\x22xoffset\x22 placeholder=\x220\x22 value=\x22" + response.data.xoffset + "\x22 >" +
+                                "<input type=\x22number\x22 step=\x220.001\x22 class=\x22form-control\x22 id=\x22xoffset\x22 placeholder=\x220\x22 value=\x22" + response.data.xoffset + "\x22 >" +
                             "</div>" +
                             "<div class=\x22col form-group col-md-1\x22>" + 
                                 "<label for=\x22yoffset\x22>Collider Offset Y</label>" + 
-                                "<input type=\x22number\x22 class=\x22form-control\x22 id=\x22yoffset\x22 placeholder=\x220\x22 value=\x22" + response.data.yoffset + "\x22 >" +
+                                "<input type=\x22number\x22 step=\x220.001\x22 class=\x22form-control\x22 id=\x22yoffset\x22 placeholder=\x220\x22 value=\x22" + response.data.yoffset + "\x22 >" +
                             "</div>" +
                             "<div class=\x22col form-group col-md-1\x22>" + 
                                 "<label for=\x22zoffset\x22>Collider Offset Z</label>" + 
-                                "<input type=\x22number\x22 class=\x22form-control\x22 id=\x22zoffset\x22 placeholder=\x220\x22 value=\x22" + response.data.zoffset + "\x22 >" +
+                                "<input type=\x22number\x22 step=\x220.001\x22 class=\x22form-control\x22 id=\x22zoffset\x22 placeholder=\x220\x22 value=\x22" + response.data.zoffset + "\x22 >" +
                             "</div>" +
                         "</div>" +
                         "<div class=\x22form-row\x22>" +
                             "<div class=\x22col form-group col-md-1\x22>" + 
                                 "<label for=\x22eulerx\x22>X Rotation</label>" + 
-                                "<input type=\x22number\x22 class=\x22form-control\x22 id=\x22eulerx\x22 placeholder=\x221\x22 value=\x22" + response.data.eulerx + "\x22 >" +
+                                "<input type=\x22number\x22 class=\x22form-control\x22 id=\x22eulerx\x22 placeholder=\x220\x22 value=\x22" + response.data.eulerx + "\x22 >" +
                             "</div>" +
                             "<div class=\x22col form-group col-md-1\x22>" + 
                                 "<label for=\x22eulery\x22>Y Rotation</label>" + 
-                                "<input type=\x22number\x22 class=\x22form-control\x22 id=\x22eulery\x22 placeholder=\x221\x22 value=\x22" + response.data.eulery + "\x22 >" +
+                                "<input type=\x22number\x22 class=\x22form-control\x22 id=\x22eulery\x22 placeholder=\x220\x22 value=\x22" + response.data.eulery + "\x22 >" +
                             "</div>" +
                             "<div class=\x22col form-group col-md-1\x22>" + 
                                 "<label for=\x22eulerz\x22>Z Rotation</label>" + 
-                                "<input type=\x22number\x22 class=\x22form-control\x22 id=\x22eulerz\x22 placeholder=\x221\x22 value=\x22" + response.data.eulerz + "\x22 >" +
+                                "<input type=\x22number\x22 class=\x22form-control\x22 id=\x22eulerz\x22 placeholder=\x220\x22 value=\x22" + response.data.eulerz + "\x22 >" +
                             "</div>" +
                             "<div class=\x22col form-group col-md-1\x22>" + 
                                 "<label for=\x22rotationSpeed\x22>Rotation Speed</label>" + 
@@ -7556,6 +10561,44 @@ function showGroup() {
                                 "<input type=\x22checkbox\x22  id=\x22snapToGround\x22 data-toggle=\x22toggle\x22 data-size=\x22sm\x22 data-on=\x22<i class='fas fa-check'></i>\x22 data-off=\x22<i class='fas fa-times'></i>\x22 data-onstyle=\x22success\x22 data-offstyle=\x22danger\x22></div>" +
                             "</div>" +
                         "</div>" +
+                        "<div class=\x22form-row\x22>" +
+                            "<div class=\x22col form-group col-md-1\x22>" + 
+                                "<label for=\x22assetname\x22>Asset Name</label>" + 
+                                "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22assetname\x22 placeholder=\x22Asset Name\x22 value=\x22" + assetName + "\x22 >" +
+                            "</div>" +
+                            "<div class=\x22col form-group col-md-1\x22>" + 
+                                "<label for=\x22assetID\x22>Asset ID</label>" + 
+                                "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22assetID\x22 placeholder=\x22Asset ID\x22 value=\x22" + assetID + "\x22 >" +
+                            "</div>" +
+                            "<div class=\x22col form-group col-md-1\x22>" +
+                            "<label for=\x22assettype\x22>Asset Type</label>" +
+                            "<select class=\x22form-control\x22 id=\x22assettype\x22 >" +
+                                "<option value=\x22\x22 disabled selected>Select:</option>" +
+                                "<option>Unity</option>" +
+                                "<option>.OBJ</option>" +
+                                "<option>.GLB</option>" +
+                                "<option>Primitive Cube</option>" +
+                                "<option>Primative Sphere</option>" +
+                                "<option>Primative Capsule</option>" +
+                                "</select>" +
+                            "</div>" +
+                            "<div class=\x22col form-group col-md-2\x22>" + 
+                                "<label for=\x22objAppNameSelect\x22>For Domain</label>" + //parent app - ugh, most only have sceneDomain, need to clean this and select only by appID
+                                "<select class=\x22form-control\x22 id=\x22objDomainSelect\x22>" +
+                                "<option>\x22Unrestricted\x22</option>"+
+                                "</select>" +
+                            "</div>" +
+                            "<div class=\x22col form-group col-md-2\x22>" + 
+                                "<label for=\x22objAppNameSelect\x22>For App</label>" + //parent app - ugh, most only have sceneDomain, need to clean this and select only by appID
+                                "<select class=\x22form-control\x22 id=\x22objAppNameSelect\x22>" +
+                                "<option>\x22Unrestricted\x22</option>"+
+                                "</select>" +
+                            "</div>" +
+                            "<div class=\x22col form-group col-md-3\x22 id=\x22sceneGroup\x22>" +
+                                "<a class=\x22btn btn-dark\x22 href=\x22index.html?type=groups&mode=scenegroup&parent=storeitem&iid="+response.data._id+"\x22><i class=\x22fas fa-hand-pointer\x22></i>For Scene Group</a>" +
+                                objSceneGroup +
+                            "</div>" +
+                        "</div>" +
                         extraButtons +
                     "</form><br><br>" +
                     itemPics +
@@ -7566,8 +10609,10 @@ function showGroup() {
             $("#cards").show();
             // $("#cardrow").html(itemPics);
             $("#cardrow").html(card);
-            $("#gltfSelect").val(response.data.gltfAssetName);
-            $("#objtype").val(response.data.objtype);
+            // $("#gltfSelect").val(response.data.gltfAssetName);
+            $("#objTypeSelect").val(response.data.objtype);
+            $("#objCategorySelect").val(response.data.objcat);
+            $("#objSubcategorySelect").val(response.data.objsubcat);
             $("#assettype").val(response.data.assettype);
             $("#eventtype").val(response.data.eventtype);
             $("#interaction").val(response.data.interaction);
@@ -7618,46 +10663,473 @@ function showGroup() {
                 }
                 $("#tagDisplay").html(tagsHtml);
             };
+            if (apps != undefined && apps != null) {
+                for (let i = 0; i < apps.length; i++) {
+                    // console.log("app # " + i + " : " + JSON.stringify(apps[i]));
+                    var x = document.getElementById("objAppNameSelect");//populate dropdown options (jquery method no workie!?)
+                    var option = document.createElement("option");  
+                    option.text = apps[i].appname;
+                    if (objAppName == apps[i].appname) {
+                        console.log("appname match! " + sceneAppName);
+                        option.selected = true;
+                        objDomain = apps[i].appdomain;
+                    } 
+                    x.add(option);
+                }
+
+            }
+            let types = [];
+            let categories = [];
+            let subcategories = [];
+            let classes = [];
+            let typesArray = [];
+            let categoriesArray = [];
+            let subcategoriesArray = [];
+            let classesArray = [];
+            let typesData = {};
             $(function() { 
-                axios.get('/gltf/' + userid)
-                .then(function (response) {
-                    console.log("gltfs " + response);
-                    const x = document.getElementById("gltfSelect");
-                    for (let i = 0; i < response.data.gltfItems.length; i++) {
-                        let nameSplit = response.data.gltfItems[i].name.split("_");
-                        let name = nameSplit[1];
-                        // let name = response.data.gltfItems[i].name;
-                        var option = document.createElement("option"); 
-                        // gltfSelect = gltfSelect + "<option>" + name + "</option>";
-                        option.text = name;
-                        if (name == "sceneAssetBundleName") {
-                            // console.log("tryna select option for AssetBundleName " + name);
-                            option.selected = true;
-                        } 
-                        console.log(response.data.gltfItems[i]);
-                        x.add(option);
+                var divsToHide = document.getElementsByClassName("characterAttributes, inanimateAttributes"); 
+                for(var x = 0; x < divsToHide.length; x++) {
+                    divsToHide[x].style.display = "none"; 
+                }
+                axios.get('/main/ref/types.json') //init the dropdowns
+                    .then(function (typesResponse) {
+                        types = typesResponse.data.types;
+                        typesData = typesResponse.data; 
+                        console.log("Types " + JSON.stringify(types));
+                        categories = typesResponse.data.categories;
+                        subcategories = typesResponse.data.subcategories;
+                        for (let i = 0; i < types.length; i++) {
+                            let tstring = Object.keys(types[i])[0]; 
+                            let tarray = types[i][Object.keys(types[i])[0]]; //the value of the key / value pair is an array of strings, this one is for the categories below
+                            typesArray.push(tstring); //used to populate the types dropdown
+                            // console.log("tstring " + tstring + " tarray " + JSON.stringify(tarray));
+                            if (tstring.toLowerCase() === objectType.toLowerCase()) { //based on type, set category options
+                                // console.log("tstring " + tstring + " objtype " + objectType);
+                                categoriesArray = tarray;
+                                // console.log("Categories Array: " + JSON.stringify(categoriesArray));
+                                for (let j = 0; j < categories.length; j++) {
+                                    let cstring = Object.keys(categories[j])[0];
+                                    let carray = categories[j][Object.keys(categories[j])[0]]; //for subcategories
+                                    if (cstring.toLowerCase() === objectCategory.toLowerCase()) { //based on category, set subcategory options
+                                        // categoriesArray.push(cstring);  
+                                        subcategoriesArray = carray;
+                                        for (let h = 0; h < subcategories.length; h++) {
+                                            let lstring = Object.keys(subcategories[h])[0];
+                                            let larray = subcategories[h][Object.keys(subcategories[h])[0]]; //for classes
+                                            if (lstring.toLowerCase() === objectSubcategory.toLowerCase()) { 
+                                                // subcategoriesArray.push(lstring);  
+                                                classesArray = larray;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                         }
-                    }) //end of main fetch
+                    })
+                    .then(function () {
+                        for (let i = 0; i < typesArray.length; i++) {//populate dropdown options
+                            var x = document.getElementById("objTypeSelect");
+                            var option = document.createElement("option");
+                            option.text = typesArray[i];
+                            if (objectType.toLowerCase() === typesArray[i].toLowerCase()) {
+                                console.log("objtype is " + typesArray[i]);
+                                if (typesArray[i].toLowerCase() == "pickup") {
+                                    var divsToShow = document.getElementsByClassName("characterAttributes"); 
+                                    var divsToHide = document.getElementsByClassName("inanimateAttributes"); 
+                                    for(var d = 0; d < divsToShow.length; d++){
+                                        divsToShow[d].style.display = "none";
+                                    }
+                                    for(var e = 0; e < divsToHide.length; e++){
+                                        divsToHide[e].style.display = "none"; 
+                                    }
+                                } else if (typesArray[i] == "Character") {
+                                    var divsToShow = document.getElementsByClassName("characterAttributes"); 
+                                    var divsToHide = document.getElementsByClassName("inanimateAttributes"); 
+                                    for(var d = 0; d < divsToShow.length; d++){
+                                        divsToShow[d].style.display = "block";
+                                    }
+                                    for(var e = 0; e < divsToHide.length; e++){
+                                        divsToHide[e].style.display = "none"; 
+                                    }
+                                } else {
+                                    var divsToHide = document.getElementsByClassName("characterAttributes"); 
+                                    var divsToShow = document.getElementsByClassName("inanimateAttributes"); 
+                                    for(var d = 0; d < divsToShow.length; d++){
+                                        divsToShow[d].style.display = "block";
+                                    }
+                                    for(var e = 0; e < divsToHide.length; e++){
+                                        divsToHide[e].style.display = "none"; 
+                                    }
+                                }
+                                option.selected = true;
+                            }
+                            x.add(option);
+                        }
+                        console.log("categories " + JSON.stringify(categoriesArray));
+                        for (let i = 0; i < categoriesArray.length; i++) {//populate dropdown options
+                            var x = document.getElementById("objCategorySelect");
+                            var option = document.createElement("option");
+                            option.text = categoriesArray[i];
+                            if (objectCategory.toLowerCase() === categoriesArray[i].toLowerCase()) {
+                                console.log("objcat is " + categoriesArray[i]);
+                                option.selected = true;
+                            }
+                            x.add(option);
+                        }
+                        for (let i = 0; i < subcategoriesArray.length; i++) {//populate dropdown options
+                            var x = document.getElementById("objSubcategorySelect");
+                            var option = document.createElement("option");
+                            option.text = subcategoriesArray[i];
+                            if (objectSubcategory.toLowerCase() === subcategoriesArray[i].toLowerCase()) {
+                                console.log("objsubcat is " + subcategoriesArray[i]);
+                                option.selected = true;
+                            }
+                            x.add(option);
+                        }
+                        for (let i = 0; i < classesArray.length; i++) {//populate dropdown options
+                            var x = document.getElementById("objClassSelect");
+                            var option = document.createElement("option");
+                            option.text = classesArray[i];
+                            if (objectClass.toLowerCase() === classesArray[i].toLowerCase()) {
+                                console.log("objclass is " + classesArray[i]);
+                                option.selected = true;
+                            }
+                            x.add(option);
+                        }
+                        for (let i = 0; i < typesData.age.length; i++) {//populate dropdown options
+                            var x = document.getElementById("objAgeSelect");
+                            var option = document.createElement("option");
+                            option.text = typesData.age[i];
+                            if (response.data.age != undefined && response.data.age.toLowerCase() === typesData.age[i].toLowerCase()) {
+                                console.log("objage is " + typesData.age[i]);
+                                option.selected = true;
+                            }
+                            x.add(option);
+                        }
+                        for (let i = 0; i < typesData.species.length; i++) {//populate dropdown options
+                            var x = document.getElementById("objSpeciesSelect");
+                            var option = document.createElement("option");
+                            option.text = typesData.species[i];
+                            if (response.data.species != undefined && response.data.species.toLowerCase() === typesData.species[i].toLowerCase()) {
+                                console.log("objspecies is " + typesData.species[i]);
+                                option.selected = true;
+                            }
+                            x.add(option);
+                        }
+                        for (let i = 0; i < typesData.alignment.length; i++) {//populate dropdown options
+                            var x = document.getElementById("objAlignmentSelect");
+                            var option = document.createElement("option");
+                            option.text = typesData.alignment[i];
+                            if (response.data.alignment != undefined && response.data.alignment.toLowerCase() === typesData.alignment[i].toLowerCase()) {
+                                console.log("objage is " + typesData.alignment[i]);
+                                option.selected = true;
+                            }
+                            x.add(option);
+                        }
+                        for (let i = 0; i < typesData.personality.length; i++) {//populate dropdown options
+                            var x = document.getElementById("objPersonalitySelect");
+                            var option = document.createElement("option");
+                            option.text = typesData.personality[i];
+                            if (response.data.personality != undefined && response.data.personality.toLowerCase() === typesData.personality[i].toLowerCase()) {
+                                console.log("objpersonality is " + typesData.personality[i]);
+                                option.selected = true;
+                            }
+                            x.add(option);
+                        }
+                        for (let i = 0; i < typesData.quality.length; i++) {//populate dropdown options
+                            var x = document.getElementById("objQualitySelect");
+                            var option = document.createElement("option");
+                            option.text = typesData.quality[i];
+                            if (response.data.quality != undefined && response.data.quality.toLowerCase() === typesData.quality[i].toLowerCase()) {
+                                console.log("objpersonality is " + typesData.quality[i]);
+                                option.selected = true;
+                            }
+                            x.add(option);
+                        }
+                        for (let i = 0; i < typesData.rarity.length; i++) {//populate dropdown options
+                            var x = document.getElementById("objRaritySelect");
+                            var option = document.createElement("option");
+                            option.text = typesData.rarity[i];
+                            if (response.data.rarity != undefined && response.data.rarity.toLowerCase() === typesData.rarity[i].toLowerCase()) {
+                                console.log("objpersonality is " + typesData.rarity[i]);
+                                option.selected = true;
+                            }
+                            x.add(option);
+                        }
+                        for (let i = 0; i < typesData.purity.length; i++) {//populate dropdown options
+                            var x = document.getElementById("objPuritySelect");
+                            var option = document.createElement("option");
+                            option.text = typesData.purity[i];
+                            if (response.data.purity != undefined && response.data.purity.toLowerCase() === typesData.purity[i].toLowerCase()) {
+                                console.log("objpersonality is " + typesData.purity[i]);
+                                option.selected = true;
+                            }
+                            x.add(option);
+                        }
+                        for (let i = 0; i < typesData.distribution.length; i++) {//populate dropdown options
+                            var x = document.getElementById("objDistributionSelect");
+                            var option = document.createElement("option");
+                            option.text = typesData.distribution[i];
+                            if (response.data.distribution != undefined && response.data.distribution.toLowerCase() === typesData.distribution[i].toLowerCase()) {
+                                console.log("objpersonality is " + typesData.distribution[i]);
+                                option.selected = true;
+                            }
+                            x.add(option);
+                        }
+                        for (let i = 0; i < typesData.scale.length; i++) {//populate dropdown options
+                            var x = document.getElementById("objScaleSelect");
+                            var option = document.createElement("option");
+                            option.text = typesData.scale[i];
+                            if (response.data.scale != undefined && response.data.scale.toLowerCase() === typesData.scale[i].toLowerCase()) {
+                                // console.log("objpersonality is " + typesData.distribution[i]);
+                                option.selected = true;
+                            }
+                            x.add(option);
+                        }
+                        for (let i = 0; i < typesData.weight.length; i++) {//populate dropdown options
+                            var x = document.getElementById("objWeightSelect");
+                            var option = document.createElement("option");
+                            option.text = typesData.weight[i];
+                            if (response.data.distribution != undefined && response.data.weight.toLowerCase() === typesData.weight[i].toLowerCase()) {
+                                // console.log("objpersonality is " + typesData.distribution[i]);
+                                option.selected = true;
+                            }
+                            x.add(option);
+                        }
+                        for (let i = 0; i < typesData.properties.length; i++) {//populate dropdown options
+                            var x = document.getElementById("objPropertySelect");
+                            var option = document.createElement("option");
+                            option.text = typesData.properties[i];
+                            if (response.data.property != undefined && response.data.property.toLowerCase() === typesData.properties[i].toLowerCase()) {
+                                // console.log("objpersonality is " + typesData.properties[i]);
+                                option.selected = true;
+                            }
+                            x.add(option);
+                        }
+                        for (let i = 0; i < typesData.attributes.length; i++) {//populate dropdown options
+                            var x = document.getElementById("objAttributeSelect");
+                            var option = document.createElement("option");
+                            option.text = typesData.attributes[i];
+                            if (response.data.attribute != undefined && response.data.attribute.toLowerCase() === typesData.attributes[i].toLowerCase()) {
+                                // console.log("objpersonality is " + typesData.attributes[i]);
+                                option.selected = true;
+                            }
+                            x.add(option);
+                        }
+                        for (let i = 0; i < typesData.operator.length; i++) {//populate dropdown options
+                            var x = document.getElementById("objOperatorSelect");
+                            var option = document.createElement("option");
+                            option.text = typesData.operator[i];
+                            if (response.data.operator != undefined && response.data.operator.toLowerCase() === typesData.operator[i].toLowerCase()) {
+                                // console.log("objpersonality is " + typesData.distribution[i]);
+                                option.selected = true;
+                            }
+                            x.add(option);
+                        }
+                        for (let i = 0; i < typesData.affect.length; i++) {//populate dropdown options
+                            var x = document.getElementById("objAffectSelect");
+                            var option = document.createElement("option");
+                            option.text = typesData.affect[i];
+                            if (response.data.affect != undefined && response.data.affect.toLowerCase() === typesData.affect[i].toLowerCase()) {
+                                // console.log("objpersonality is " + typesData.distribution[i]);
+                                option.selected = true;
+                            }
+                            x.add(option);
+                        }
+                        for (let i = 0; i < typesData.effectiveness.length; i++) {//populate dropdown options
+                            var x = document.getElementById("objEffectivenessSelect");
+                            var option = document.createElement("option");
+                            option.text = typesData.effectiveness[i];
+                            if (response.data.effectiveness != undefined && response.data.effectiveness.toLowerCase() === typesData.effectiveness[i].toLowerCase()) {
+                                // console.log("objper is " + typesData.effectiveness[i]);
+                                option.selected = true;
+                            }
+                            x.add(option);
+                        }
+                        for (let i = 0; i < typesData.physics.length; i++) {//populate dropdown options
+                            var x = document.getElementById("objPhysicsSelect");
+                            var option = document.createElement("option");
+                            option.text = typesData.physics[i];
+                            if (response.data.physics != undefined && response.data.physics.toLowerCase() === typesData.physics[i].toLowerCase()) {
+                                // console.log("objper is " + typesData.effectiveness[i]);
+                                option.selected = true;
+                            }
+                            x.add(option);
+                        }
+                    })
                     .catch(function (error) {
                         console.log(error);
+                    });
                 });
 
+                let $objTypeSelect = $( '#objTypeSelect' );
+                let $objCategorySelect = $( '#objCategorySelect' );
+                let $objSubcategorySelect = $( '#objSubcategorySelect' );
+                $objTypeSelect.on( 'change', function() { //when type dropdown is changed, update subtypes
+                    var divsToHide = document.getElementsByClassName("characterAttributes"); 
+                    for(var d = 0; d < divsToHide.length; d++){
+                        divsToHide[d].style.display = "none"; // depending on what you're doing
+                    }
+                    for (let i = 0; i < types.length; i++) {
+                        let tstring = Object.keys(types[i])[0];
+                        let tarray = types[i][Object.keys(types[i])[0]];
+                        if (tstring === document.getElementById("objTypeSelect").value) {
+                            if (tstring.toLowerCase() == "pickup" || tstring.toLowerCase() == "drop" ) {
+                                var divsToShow = document.getElementsByClassName("characterAttributes"); 
+                                var divsToHide = document.getElementsByClassName("inanimateAttributes"); 
+                                for(var d = 0; d < divsToShow.length; d++){
+                                    divsToShow[d].style.display = "none";
+                                }
+                                for(var e = 0; e < divsToHide.length; e++){
+                                    divsToHide[e].style.display = "none"; 
+                                }
+                            } else if (tstring.toLowerCase() == "character") {
+                                var divsToShow = document.getElementsByClassName("characterAttributes"); 
+                                var divsToHide = document.getElementsByClassName("inanimateAttributes"); 
+                                for(var d = 0; d < divsToShow.length; d++){
+                                    divsToShow[d].style.display = "block";
+                                }
+                                for(var e = 0; e < divsToHide.length; e++){
+                                    divsToHide[e].style.display = "none"; 
+                                }
+                            } else {
+                                var divsToHide = document.getElementsByClassName("characterAttributes"); 
+                                var divsToShow = document.getElementsByClassName("inanimateAttributes"); 
+                                for(var d = 0; d < divsToShow.length; d++){
+                                    divsToShow[d].style.display = "block";
+                                }
+                                for(var e = 0; e < divsToHide.length; e++){
+                                    divsToHide[e].style.display = "none"; 
+                                }
+                            }
+
+
+                            categoriesArray = tarray;
+                            // console.log("category value: " +categoriesArray[0]);
+                            if (categoriesArray[0].toLowerCase() == "none") {
+                                subcategoriesArray = [];
+                                classesArray = [];
+                            } else {
+                                for (let j = 0; j < categories.length; j++) {
+                                let cstring = Object.keys(categories[j])[0];
+                                let carray = categories[j][Object.keys(categories[j])[0]]; //for subcategories
+                                if (cstring.toLowerCase() === categoriesArray[0].toLowerCase()) { //based on category, set subcategory options
+                                    
+                                    console.log("selected cat " + cstring);
+                                    subcategoriesArray = carray;
+
+                                    for (let h = 0; h < subcategories.length; h++) {
+                                        let lstring = Object.keys(subcategories[h])[0];
+                                        let larray = subcategories[h][Object.keys(subcategories[h])[0]]; //for classes
+                                        if (lstring.toLowerCase() === subcategoriesArray[0].toLowerCase()) { 
+                                                // subcategoriesArray.push(lstring); 
+                                                classesArray = larray;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    document.getElementById("objCategorySelect").options.length = 0;
+                    document.getElementById("objSubcategorySelect").options.length = 0;
+                    document.getElementById("objClassSelect").options.length = 0;
+                    for (let i = 0; i < categoriesArray.length; i++) {//populate dropdown options
+                        var x = document.getElementById("objCategorySelect");
+                        var option = document.createElement("option");
+                        option.text = categoriesArray[i];
+                        x.add(option);
+                    }
+                    for (let i = 0; i < subcategoriesArray.length; i++) {//populate dropdown options
+                        var x = document.getElementById("objSubcategorySelect");
+                        var option = document.createElement("option");
+                        option.text = subcategoriesArray[i];
+                        x.add(option);
+                    }
+                    for (let i = 0; i < classesArray.length; i++) {//populate dropdown options
+                        var x = document.getElementById("objClassSelect");
+                        var option = document.createElement("option");
+                        option.text = classesArray[i];
+                        x.add(option);
+                    }
+                });
+
+                $objCategorySelect.on( 'change', function() { //when category dropdown is changed, update subcategory
+                    console.log("selected cat " + document.getElementById("objCategorySelect").value);
+                    for (let j = 0; j < categories.length; j++) {
+                        let cstring = Object.keys(categories[j])[0];
+                        let carray = categories[j][Object.keys(categories[j])[0]]; //for subcategories
+                        // console.log("checking cat " + cstring);
+                        // if (cstring.toLowerCase() === subcategoriesArray[0].toLowerCase()) { //based on category, set subcategory options   
+                        if (cstring.toLowerCase() === document.getElementById("objCategorySelect").value.toLowerCase()) { //based on category, set subcategory options   
+                            console.log("match cat " + cstring);
+                            subcategoriesArray = carray;
+                            for (let h = 0; h < subcategories.length; h++) {
+                                let lstring = Object.keys(subcategories[h])[0];
+                                let larray = subcategories[h][Object.keys(subcategories[h])[0]]; //for classes
+                                if (lstring.toLowerCase() === subcategoriesArray[0].toLowerCase()) { //pick the first one for childrenz
+                                    // subcategoriesArray.push(lstring);  
+                                    classesArray = larray;
+                                }
+                            }
+                        }
+                    }
+                    document.getElementById("objSubcategorySelect").options.length = 0;
+                    document.getElementById("objClassSelect").options.length = 0;
+                    for (let i = 0; i < subcategoriesArray.length; i++) {//populate dropdown options
+                        var x = document.getElementById("objSubcategorySelect");
+                        var option = document.createElement("option");
+                        option.text = subcategoriesArray[i];
+                        x.add(option);
+                    }
+                    for (let i = 0; i < classesArray.length; i++) {//populate dropdown options
+                        var x = document.getElementById("objClassSelect");
+                        var option = document.createElement("option");
+                        option.text = classesArray[i];
+                        x.add(option);
+                    }
+                });
+
+                $objSubcategorySelect.on( 'change', function() { //when subcat dropdown is changed, update class
+                    console.log("selected cat " + document.getElementById("objSubcategorySelect").value);
+                    for (let j = 0; j < subcategories.length; j++) {
+                        let cstring = Object.keys(subcategories[j])[0];
+                        let carray = subcategories[j][Object.keys(subcategories[j])[0]]; //for subcategories
+                        // console.log("checking cat " + cstring);
+                        // if (cstring.toLowerCase() === subcategoriesArray[0].toLowerCase()) { //based on category, set subcategory options   
+                        if (cstring.toLowerCase() === document.getElementById("objSubcategorySelect").value.toLowerCase()) { //based on subcategory, set class options   
+                            console.log("match class " + cstring);
+                            classesArray = carray;
+                        }
+                    }
+                    // document.getElementById("objSubcategorySelect").options.length = 0;
+                    document.getElementById("objClassSelect").options.length = 0;
+                    
+                    for (let i = 0; i < classesArray.length; i++) {//populate dropdown options
+                        var x = document.getElementById("objClassSelect");
+                        var option = document.createElement("option");
+                        option.text = classesArray[i];
+                        x.add(option);
+                    }
+                });
+                                              
                 $(document).on('click','#addTagButton',function(e){
                     e.preventDefault();  
                     let newTag = document.getElementById("addTagInput").value;
                     console.log("tryna add tag " + newTag);
                     if (newTag.length > 2) {
-                    let html = "";
-                    tags.push(newTag);
-                    for (let i = 0; i < tags.length; i++) {
-                        html = html + 
-                        "<div class=\x22btn btn-light\x22>" +   
-                            "<button id=\x22"+tags[i]+"\x22 type=\x22button\x22 class=\x22remTagButton badge badge-sm badge-danger float-right\x22>X</button>" +
-                            "<span class=\x22badge badge-pill badge-light float-left badge-sm\x22>\x22"+tags[i]+"\x22</span>" +
-                        "</div>";
-                    }
-                    $("#tagDisplay").empty();
-                    $("#tagDisplay").html(html);
+                        let html = "";
+                        tags.push(newTag);
+                        for (let i = 0; i < tags.length; i++) {
+                            html = html + 
+                            "<div class=\x22btn btn-light\x22>" +   
+                                "<button id=\x22"+tags[i]+"\x22 type=\x22button\x22 class=\x22remTagButton badge badge-sm badge-danger float-right\x22>X</button>" +
+                                "<span class=\x22badge badge-pill badge-light float-left badge-sm\x22>\x22"+tags[i]+"\x22</span>" +
+                            "</div>";
+                        }
+                        $("#tagDisplay").empty();
+                        $("#tagDisplay").html(html);
                     }
                 }); 
                 $(document).on('click','.remTagButton',function(e){
@@ -7679,23 +11151,79 @@ function showGroup() {
                     $("#tagDisplay").empty();
                     $("#tagDisplay").html(html);
                 });
+                $(document).on('click','.remObjectAction',function(e){
+                    e.preventDefault();  
+                    console.log("tryna remove action " + this.id);
+                    let html = "";
+                    for( var i = 0; i < actionIDs.length; i++) {
+                        if ( actionIDs[i] === this.id) {
+                                actionIDs.splice(i, 1); 
+                                document.getElementById(this.id).style.display = "none";
+                            }
+                        console.log("actionIDs " + actionIDs);    
+                        }
+                    $("#actionButtons").empty();
+                    $("#actionButtons").html(html);
+                });
+            // });
                 $('#updateObjectForm').on('submit', function(e) { 
                     e.preventDefault();  
+                    
                     let name = document.getElementById("objname").value;
                     let title = document.getElementById("objtitle").value;
-                    let objtype = document.getElementById("objtype").value;
+                    let objtype = document.getElementById("objTypeSelect").value;
+                    let objcat = document.getElementById("objCategorySelect").value;
+                    let objsubcat = document.getElementById("objSubcategorySelect").value;
+                    let objclass = document.getElementById("objClassSelect").value;
                     let description = document.getElementById("description").value;
                     let interaction = document.getElementById("interaction").value;
                     let eventtype = document.getElementById("eventtype").value;
                     let eventdata = document.getElementById("eventdata").value;
+                    let level = document.getElementById("level").value;                    
+                    let hitpoints = document.getElementById("hitpoints").value;
+                    let xpoints = document.getElementById("xpoints").value;
+                    let mana = document.getElementById("mana").value;
+                    let armorclass = document.getElementById("armorclass").value;
+                    let strength = document.getElementById("strength").value;
+                    let dexterity = document.getElementById("dexterity").value;
+                    let constitution = document.getElementById("constitution").value;
+                    let intelligence = document.getElementById("intelligence").value;
+                    let wisdom = document.getElementById("wisdom").value;
+                    let charisma = document.getElementById("charisma").value;
+                    let integrity = document.getElementById("integrity").value;
+                    
+
+                    let age = document.getElementById("objAgeSelect").value;
+                    let species = document.getElementById("objSpeciesSelect").value;
+                    let alignment = document.getElementById("objAlignmentSelect").value;
+                    let personality = document.getElementById("objPersonalitySelect").value;
+
+
+                    let quality = document.getElementById("objQualitySelect").value;
+                    let distribution = document.getElementById("objDistributionSelect").value;
+                    let rarity = document.getElementById("objRaritySelect").value;
+                    let purity = document.getElementById("objPuritySelect").value;
+                    let scale = document.getElementById("objScaleSelect").value;
+                    let weight = document.getElementById("objWeightSelect").value;             
+                    let operator = document.getElementById("objOperatorSelect").value;
+                    let property = document.getElementById("objPropertySelect").value;
+                    let attribute = document.getElementById("objAttributeSelect").value;
+                    let affect = document.getElementById("objAffectSelect").value;
+                    let effectiveness = document.getElementById("objEffectivenessSelect").value;
+                    let physics = document.getElementById("objPhysicsSelect").value;
+
                     let collidertype = document.getElementById("collidertype").value;
                     let highlight = document.getElementById("highlight").value;
-                    let callout = document.getElementById("callout").value;
+                    let callouttext = document.getElementById("callouttext").value;
+                    let labeltext = document.getElementById("labeltext").value;
+                    let prompttext = document.getElementById("prompttext").value;
                     let intval = document.getElementById("intval").value;
                     let floatval = document.getElementById("floatval").value;
                     let stringval = document.getElementById("stringval").value;
                     let assetname = document.getElementById("assetname").value;
                     let assettype = document.getElementById("assettype").value;
+                    // let modelID = document.getElementById("modelID").value;
+                    // let modelName = document.getElementById("modelName").value;
                     let randomColor = $("#randomColorToggle").prop("checked");
                     let randomRotation = $("#randomRot").prop("checked");
                     let snapToGround = $("#snapToGround").prop("checked");
@@ -7713,6 +11241,8 @@ function showGroup() {
                     let rotationSpeed = document.getElementById("rotationSpeed").value;
                     let objScale = document.getElementById("objScale").value;
                     let maxPerScene = document.getElementById("maxPerScene").value;
+                    let maxPerUser = document.getElementById("maxPerUser").value;
+                    let maxTotal = document.getElementById("maxTotal").value;
                     let speedFactor = document.getElementById("speedFactor").value;
                     let colliderScale = document.getElementById("colliderScale").value;
                     let triggerScale = document.getElementById("triggerScale").value;
@@ -7720,7 +11250,7 @@ function showGroup() {
                     let eulerx = document.getElementById("eulerx").value;
                     let eulery = document.getElementById("eulery").value;
                     let eulerz = document.getElementById("eulerz").value;
-                    let labeltext = document.getElementById("labeltext").value;
+
                     let synthPatch1 = document.getElementById("synthPatchSelect").value;
                     let synthNotes = document.getElementById("synthNotes").value;                
                     let synthDuration = document.getElementById("synthDuration").value;
@@ -7730,25 +11260,70 @@ function showGroup() {
                     let textgroupID = document.getElementById("textgroupID").value;
                     let picturegroupID = document.getElementById("picturegroupID").value;
                     let audiogroupID = document.getElementById("audiogroupID").value;
+                    let restrictToApp = document.getElementById("objAppNameSelect").value;
+                    let restrictToDomain = document.getElementById("objDomainSelect").value;
+                    let namedColor = document.getElementById("objNamedcolorSelect").value;
+                    // let restrictToSceneGroup = document.getElementById("objSceneGroup").value;
 
                     let data = {
+                        actionIDs: actionIDs,
                         name: name,
                         description: description,
                         objtype: objtype,
+                        objcat: objcat,
+                        objsubcat: objsubcat,
+                        objclass: objclass,
+                        level: level,
+                        hitpoints: hitpoints,
+                        armorclass: armorclass,
+                        xpoints: xpoints,
+                        mana: mana,
+                        strength: strength,
+                        dexterity: dexterity,
+                        constitution: constitution,
+                        intelligence: intelligence,
+                        wisdom: wisdom,
+                        charisma: charisma,
+                        integrity: integrity,
+                        age: age,
+                        species: species,
+                        alignment: alignment,
+                        personality: personality,
+                        quality: quality,
+                        distribution: distribution,
+                        rarity: rarity,
+                        purity: purity,
+                        scale: scale,
+                        weight: weight,
+                        property: property,
+                        attribute: attribute,
+                        operator: operator,
+                        affect: affect,
+                        effectiveness: effectiveness,
+                        physics: physics,
+                        namedColor: namedColor,
+                        restrictToApp: restrictToApp,
+                        restrictToDomain: restrictToDomain,
+                        //restrictToSceneGroup: restrictToSceneGroup, //nope this is saved separately
+
                         interaction: interaction != null ? interaction : "none",
                         eventtype: eventtype != null ? eventtype : "none",
                         eventdata: eventdata,
                         collidertype: collidertype != null ? collidertype : "none",
                         highlight: highlight != null ? highlight : "none",
-                        callout: callout != null ? callout : "none",
+                        callouttext: callouttext,
+                        labeltext: labeltext,
+                        prompttext: prompttext,
                         tags: tags,
                         title: title,
-                        // price: price != null ? price : 0,
+                        
                         intval: intval != null ? intval : 0,
                         floatval: floatval != null ? floatval : 0,
                         stringval: stringval != null ? stringval : "",
                         assetname: assetname,
                         assettype: assettype,
+                        modelID: modelID,
+                        modelName: modelName,
                         audioEmit: audioEmit != null ? audioEmit : false,
                         audioScale: audioScale != null ? audioScale : false,
                         randomColor: randomColor != null ? randomColor : false,
@@ -7757,26 +11332,27 @@ function showGroup() {
                         color2: color2,
                         snapToGround: snapToGround  != null ? snapToGround : false,
                         randomRotation: randomRotation != null ? randomRotation : false,
-        //                objectScale: objectScale ? objectScale : 0,
+
                         xoffset: xoffset != null ? xoffset : 0,
                         yoffset: yoffset != null ? yoffset : 0,
                         zoffset: zoffset != null ? zoffset : 0,
                         rotationAxis: rotationAxis != null ? rotationAxis : 0,
                         rotationSpeed: rotationSpeed != null ? rotationSpeed : 0,
-                        objScale: objScale != null ? objScale : 0,
-                        maxPerScene: maxPerScene != null ? maxPerScene : 10,
+                        objScale: objScale != null ? objScale : "0",
+                        maxPerScene: maxPerScene != null ? maxPerScene : 1,
+                        maxPerUser: maxPerUser != null ? maxPerUser : 0,
+                        maxTotal: maxTotal != null ? maxTotal : 0,
                         speedFactor: speedFactor != null ? speedFactor : 3,
                         colliderScale: colliderScale != null ? colliderScale : 1,
                         triggerScale: triggerScale != null ? triggerScale : 1,
                         yPosFudge: yPosFudge != null ? yPosFudge : 0,
-                        // yRotFudge: yRotFudge != null ? yRotFudge : 0,
-                        eulerx: eulerx != null ? eulerx : "0",
-                        eulery: eulery != null ? eulery : "0",
-                        eulerz: eulerz != null ? eulerz : "0",
-                        labeltext: labeltext,
+                       
+                        eulerx: eulerx != null ? eulerx : 0,
+                        eulery: eulery != null ? eulery : 0,
+                        eulerz: eulerz != null ? eulerz : 0,
+                        
                         scatter: scatter != null ? scatter : false,
-                        // showcallout: showcallout != null ? showcallout : false,
-                        // buyable: buyable != null ? buyable : false,
+
                         userspawnable: userspawnable != null ? userspawnable : false,
                         textitemID: textitemID != null ? textitemID : "",
                         pictureitemID: pictureitemID  != null ? pictureitemID : "",
@@ -7819,9 +11395,9 @@ function showGroup() {
                             },
                         }
                     });
-            });
-        });
-    }
+                });
+            }
+        
 
     function getObject(objid) {
         let config = { headers: {
@@ -7886,7 +11462,7 @@ function showGroup() {
                 }
                 $.confirm({
                     title: 'Confirm Object Create',
-                    content: 'Are you sure you want to create an new Object?',
+                    content: 'Are you sure you want to create a new Object?',
                     buttons: {
                     confirm: function () {
                         axios.post(/newobj/, data)
@@ -7929,7 +11505,7 @@ function showGroup() {
             // console.log(JSON.stringify(arr));
             var selectHeader = "";
             var arr = response.data;
-        
+            var hideIndex = 3;
             if (mode == "select") {
                 selectFor = parent;
                 selectHeader = "<th>Select</th>";
@@ -7943,6 +11519,7 @@ function showGroup() {
                 "<th>Object Name</th>"+
                 "<th>Object Type</th>"+
                 "<th>Last Update</th>"+
+                "<th>Hidden Date</th>"+
             "</tr>"+
             "</thead>"+
             "<tbody>";
@@ -7951,6 +11528,7 @@ function showGroup() {
                 let ts = 0;
                 if (mode == "select") {
                     selectButton = "<td><button type=\x22button\x22 class=\x22btn btn-primary\x22 onclick=\x22selectItem('" + parent + "','object','" + itemid + "','" + arr[i]._id + "')\x22>Select</button></td>";
+                    var hideIndex = 4;
                 } 
                 if (arr[i].createdTimestamp != undefined && arr[i].createdTimestamp != null) {
                     ts = arr[i].createdTimestamp;
@@ -7964,6 +11542,7 @@ function showGroup() {
                 "<td><a class=\x22btn btn-sm text-primary\x22 href=\x22index.html?type=object&iid="+arr[i]._id+"\x22><i class=\x22far fa-edit\x22></i><strong> " + arr[i].name + "</strong></a></td>" +
                 "<td>" + arr[i].objtype + "</td>" +
                 "<td>" + convertTimestamp(ts) + "</td>" +
+                "<th>"+ ts +"</th>"+
                 "</tr>";
             }
             var tableFoot =  "</tbody>" +
@@ -7973,6 +11552,7 @@ function showGroup() {
                 "<th>Name</th>"+
                 "<th>Type</th>"+
                 "<th>Last Update</th>"+
+                "<th>Hidden Date</th>"+
                 "</tr>" +
             "</tfoot>" +
             "</table>";
@@ -7981,8 +11561,19 @@ function showGroup() {
             let newButton = "<button class=\x22btn btn-info float-right\x22 onclick=\x22newObject()\x22>Create New Object</button>";
             $("#newButton").html(newButton);
             $("#newButton").show();
+            // $('#dataTable1').DataTable(
+            //     {"order": [[ 2, "desc" ]]}
+            // );
             $('#dataTable1').DataTable(
-                {"order": [[ 2, "desc" ]]}
+                {"order": [[ hideIndex, "desc" ]],
+                'columnDefs': [
+                    { 'orderData':[hideIndex], 'targets': [1] },
+                    {
+                        'targets': [hideIndex],
+                        'visible': false,
+                        'searchable': false
+                    },
+                ]}
             );
         })
         .catch(function (error) {
@@ -7996,17 +11587,22 @@ function showGroup() {
             let domains = [];
             let submitButtonRoute = "";
             let short_id = response.data.short_id;
+            let sceneAltURL = response.data.sceneAltURL != undefined ? response.data.sceneAltURL : "";
             let sceneTitle = response.data.sceneTitle != undefined ? response.data.sceneTitle : "";  //ternarys are OK if not nested.  really. 
             let sceneAppName = response.data.sceneAppName != undefined ? response.data.sceneAppName : "";
             let sceneDomain = response.data.sceneDomain != undefined ? response.data.sceneDomain : ""; 
+            let sceneDebugMode = response.data.sceneDebugMode != undefined ? response.data.sceneDebugMode : ""
             let sceneKeynote = response.data.sceneKeynote != undefined ? response.data.sceneKeynote : ""; 
             let sceneDescription = response.data.sceneDescription != undefined ? response.data.sceneDescription : ""; 
             let sceneNextScene = response.data.sceneNextScene != undefined ? response.data.sceneNextScene : "";
             let scenePreviousScene = response.data.scenePreviousScene != undefined ? response.data.scenePreviousScene : ""; 
+            let sceneSource = response.data.sceneSource != undefined ? response.data.sceneSource : ""; 
             let sceneStickyness = response.data.sceneStickyness != undefined ? response.data.sceneStickyness : ""; 
             let sceneLocationRange = response.data.sceneLocationRange != undefined ? response.data.sceneLocationRange : ""; 
-
+            let scenePlayer = response.data.scenePlayer != undefined ? response.data.scenePlayer : {};
             let sceneText = response.data.sceneText != undefined ? response.data.sceneText : ""; 
+            let sceneGreeting = response.data.sceneGreeting != undefined ? response.data.sceneGreeting : ""; 
+            let sceneQuest = response.data.sceneQuest != undefined ? response.data.sceneQuest : ""; 
             let sceneFontFillColor = response.data.sceneFontFillColor != undefined ? response.data.sceneFontFillColor : ""; 
             let sceneFontOutlineColor = response.data.sceneFontOutlineColor != undefined ? response.data.sceneFontOutlineColor : ""; 
             let sceneFontGlowColor = response.data.sceneFontGlowColor != undefined ? response.data.sceneFontGlowColor : ""; 
@@ -8018,6 +11614,7 @@ function showGroup() {
             let sceneAmbientAudioStreamURL = response.data.sceneAmbientAudioStreamURL != undefined ? response.data.sceneAmbientAudioStreamURL : ""; 
             let sceneTriggerVolume = response.data.sceneTriggerVolume != undefined ? response.data.sceneTriggerVolume : 0; 
             let sceneWeatherAudioVolume = response.data.sceneWeatherAudioVolume != undefined ? response.data.sceneWeatherAudioVolume : 0; 
+            let sceneMediaAudioVolume = response.data.sceneMediaAudioVolume != undefined ? response.data.sceneMediaAudioVolume : 0; 
             let sceneTriggerAudioStreamURL = response.data.sceneTriggerAudioStreamURL != undefined ? response.data.sceneTriggerAudioStreamURL : ""; 
             let sceneAmbientVolume = response.data.sceneAmbientVolume != undefined ? response.data.sceneAmbientVolume : 0; 
             let sceneMasterAudioVolume = response.data.sceneMasterAudioVolume != undefined ? response.data.sceneMasterAudioVolume : 0; 
@@ -8029,6 +11626,11 @@ function showGroup() {
             let sceneTriggerSynth2Volume = response.data.sceneTriggerSynth2Volume != undefined ? response.data.sceneTriggerSynth2Volume : 0; 
             let scenePrimaryAudioID = response.data.scenePrimaryAudioID != undefined ? response.data.scenePrimaryAudioID : "";
             let sceneAmbientAudioID = response.data.sceneAmbientAudioID != undefined ? response.data.sceneAmbientAudioID : "";
+            let sceneTriggerAudioID = response.data.sceneTriggerAudioID != undefined ? response.data.sceneTriggerAudioID : "";
+            let scenePrimaryAudioGroups = response.data.scenePrimaryAudioGroups != undefined ? response.data.scenePrimaryAudioGroups : "";
+            let sceneAmbientAudioGroups = response.data.sceneAmbientAudioGroups != undefined ? response.data.sceneAmbientAudioGroups : "";
+            let sceneTriggerAudioGroups = response.data.sceneTriggerAudioGroups != undefined ? response.data.sceneTriggerAudioGroups : "";
+            let sceneVideoGroups = response.data.sceneVideoGroups != undefined ? response.data.sceneVideoGroups : "";
             let sceneBPM = response.data.sceneBPM != undefined ? response.data.sceneBPM : ""; 
             let sceneStaticObj = response.data.sceneStaticObj != undefined ? response.data.sceneStaticObj : ""; 
             let scenePrimaryTextMode = response.data.scenePrimaryTextMode != undefined ? response.data.scenePrimaryTextMode : "Normal";
@@ -8044,20 +11646,30 @@ function showGroup() {
             let sceneWindFactor = response.data.sceneWindFactor != undefined ? response.data.sceneWindFactor : 0; 
             let sceneLightningFactor = response.data.sceneLightningFactor != undefined ? response.data.sceneLightningFactor : 0; 
             let sceneGlobalFogDensity = response.data.sceneGlobalFogDensity != undefined ? response.data.sceneGlobalFogDensity : 0; 
-            let sceneMapZoom = response.data.sceneMapZoom != undefined ? response.data.sceneMapZoom : 0; 
+            let sceneMapZoom = response.data.sceneMapZoom != undefined ? response.data.sceneMapZoom : 17; 
             let sceneAssetBundleName = response.data.sceneEnvironment != undefined ? response.data.sceneEnvironment.name : ""; //hrm... maybe should flatten this obj
             let sceneWaterLevel = response.data.sceneWater != undefined ? response.data.sceneWater.level : 0;
-            let sceneHeightmap = response.data.sceneHeightmap != undefined ? response.data.sceneHeightmap : "";
+            let sceneGroundLevel = response.data.sceneGroundLevel != undefined ? response.data.sceneGroundLevel : 0;
+            let sceneHeightmap = response.data.sceneHeightmap != undefined ? response.data.sceneHeightmap : {};
+            let sceneScatterOffset = response.data.sceneScatterOffset != null ? response.data.sceneScatterOffset : "";
             let sceneColor1 = response.data.sceneColor1 != undefined ? response.data.sceneColor1 : ""; 
             let sceneColor2 = response.data.sceneColor2 != undefined ? response.data.sceneColor2 : ""; 
             let sceneColor3 = response.data.sceneColor3 != undefined ? response.data.sceneColor3 : ""; 
-            let sceneHighlightColor = response.data.sceneHighlightColor != undefined ? response.data.sceneHighlightColor : ""; 
-            let sceneYouTubeIDs = (response.data.sceneYouTubeIDs != undefined && response.data.sceneYouTubeIDs != null) ? response.data.sceneYouTubeIDs : "";
+            let sceneColor4 = response.data.sceneColor4 != undefined ? response.data.sceneColor4 : ""; 
+            let sceneColor1Alt = response.data.sceneColor1Alt != undefined ? response.data.sceneColor1Alt : ""; 
+            let sceneColor2Alt = response.data.sceneColor2Alt != undefined ? response.data.sceneColor2Alt : ""; 
+            let sceneColor3Alt = response.data.sceneColor3Alt != undefined ? response.data.sceneColor3Alt : ""; 
+            let sceneColor4Alt = response.data.sceneColor4Alt != undefined ? response.data.sceneColor4Alt : ""; 
+            let sceneYouTubeIDs = (response.data.sceneYouTubeIDs != undefined && response.data.sceneYouTubeIDs != null) ? response.data.sceneYouTubeIDs : new Array();
+            // let scenePictureGroups = ""; 
             let scenePictureGroups = (response.data.scenePictureGroups != undefined && response.data.scenePictureGroups != null) ? response.data.scenePictureGroups : ""; 
             let scenePictures = (response.data.scenePictures != undefined && response.data.scenePictures != null) ? response.data.scenePictures : ""; //ids
             let scenePostcards = (response.data.scenePostcards != undefined && response.data.scenePostcards != null) ? response.data.scenePostcards : ""; //ids
             let sceneVideos = (response.data.sceneVideos != undefined && response.data.sceneVideos != null) ? response.data.sceneVideos : ""; //ids
+            let sceneTextItems = (response.data.sceneTextItems != undefined && response.data.sceneTextItems != null) ? response.data.sceneTextItems : ""; //ids
+            let textItems = (response.data.textItems != undefined && response.data.textItems != null) ? response.data.textItems : ""; //ids
             let pictures = (response.data.pictures != undefined && response.data.pictures != null) ? response.data.pictures : ""; 
+            let sceneObjects = (response.data.sceneObjects != undefined && response.data.sceneObjects != null) ? response.data.sceneObjects : ""; //munged on server for request
             let sceneObjex = (response.data.sceneObjex != undefined && response.data.sceneObjex != null) ? response.data.sceneObjex : ""; //munged on server for request
             let sceneTargetObject = (response.data.sceneTargetObject != undefined && response.data.sceneTargetObject != null) ? response.data.sceneTargetObject : "";
             let sceneLocations = (response.data.sceneLocations != undefined && response.data.sceneLocations != null) ? response.data.sceneLocations : "";
@@ -8086,7 +11698,14 @@ function showGroup() {
             //     .catch(function (error) {
             //         console.log(error);
             // });
+            // console.log("SCENE GREETING IS " + sceneGreeting);
+            sceneYouTubeIDs = [].concat(sceneYouTubeIDs); //force to array "type"
+            let heightmapName = "";
+            if (response.data.sceneHeightmap != null && response.data.sceneHeightmap.name != undefined) {
+                heightmapName = response.data.sceneHeightmap.name;
+            }
             if (response.data.scenePictureGroups != null) {
+                // response.data.scenePictureGroups = [];
                 for (let i =0; i < response.data.scenePictureGroups.length; i++) {
                     for (let j = 0; j < response.data.sceneGroups.length; j++) {
                         if (response.data.sceneGroups[j].type == "picture" && response.data.scenePictureGroups[i] == response.data.sceneGroups[j]._id) {
@@ -8099,20 +11718,22 @@ function showGroup() {
                     }
                 }
             }
-            if (response.data.sceneVideoGroups != null) {
+            if (response.data.sceneVideoGroups != null && response.data.sceneGroups && response.data.sceneVideoGroups.length > 0) {
+                console.log("gotsa sceneVideoGroup " + response.data.sceneVideoGroups[0] )
                 for (let i =0; i < response.data.sceneVideoGroups.length; i++) {
                     for (let j = 0; j < response.data.sceneGroups.length; j++) {
-                        if (response.data.sceneGroups[j].type == "video" && response.data.sceneVideoGroups[i] == response.data.sceneGroups[j]._id) {
+                        // console.log("checking against group ID" + response.data.sceneGroups[j]._id);
+                        if (response.data.sceneGroups[j].type.toLowerCase() == "video" && response.data.sceneVideoGroups[i].toString() == response.data.sceneGroups[j]._id.toString()) {
                             // picGroups.push(response.data.sceneGroups[j]);
+                            console.log("checking against group ID" + response.data.sceneGroups[j]._id);
                             vidGroupButtons = vidGroupButtons + "<div class=\x22btn btn-dark btn-sm float-right\x22><a style=\x22color:white;\x22 target=\x22_blank\x22 role=\x22button\x22" +
                             "href=\x22index.html?type=group&iid="+response.data.sceneGroups[j]._id+"\x22>" +
                             "vid group:<strong> " +response.data.sceneGroups[j].name + 
-                            "&nbsp;</strong></a><button type=\x22button\x22 class=\x22remVidGroup badge badge-xs badge-danger float-right\x22 id=\x22"+response.data.scenePictureGroups[i] +"\x22>X</button></div>";
+                            "&nbsp;</strong></a><button type=\x22button\x22 class=\x22remVidGroup badge badge-xs badge-danger float-right\x22 id=\x22"+response.data.sceneVideoGroups[i] +"\x22>X</button></div>";
                         }
                     }
                 }
             }
-
             let scenePcards = "";
                 if (response.data.postcards != null && response.data.postcards != undefined && response.data.postcards.length > 0 ) {
                 // console.log("tryna fetch postcards " + JSON.stringify(response.data.postcards));
@@ -8148,7 +11769,26 @@ function showGroup() {
                         "</div>" +
                     "</div>";
                     }
-                }                
+                }    
+            // let sceneTextItems = "";
+            let text_items = "";
+            if (textItems != null && textItems != undefined && textItems.length > 0 ) {
+            // console.log("tryna fetch pics " + JSON.stringify(response.data.pictures));
+            for (let i = 0; i < textItems.length; i++) {
+                let orientation = "scene pic";
+                if (textItems[i].orientation != undefined) {
+                    orientation = textItems[i].orientation;
+                }
+                // console.log("textItem " + JSON.stringify(textItems[i]));
+                text_items = text_items +
+                // "<div class=\x22card\x22 style=\x22width:200px;\x22>" +
+                    "<div class=\x22btn btn-dark btn-sm float-right\x22><span>"+textItems[i].type +"</span><br><a style=\x22color:white;\x22 target=\x22_blank\x22 role=\x22button\x22" +
+                    "href=\x22index.html?type=text&iid="+textItems[i]._id+"\x22>" +
+                    "<strong> " +textItems[i].title + 
+                    "&nbsp;</strong></a><button type=\x22button\x22 class=\x22remTextItem badge badge-xs badge-danger float-right\x22 id=\x22"+textItems[i]._id+"\x22>X</button></div>";
+                // "</div>";
+                }
+            }    
             let sceneWeblinkPics = "";    
                 if (weblinx != null && weblinx != undefined && weblinx.length > 0 ) {
                 // console.log("tryna fetch pics " + JSON.stringify(response.data.pictures));
@@ -8175,7 +11815,7 @@ function showGroup() {
                 //     sceneResponse.weblinx = weblinx;
                 // }
                 for (let i = 0; i < weblinx.length; i++) {
-                    console.log(JSON.stringify(weblinx[i]));
+                    // console.log(JSON.stringify(weblinx[i]));
                     sceneWeblinkPics = sceneWeblinkPics +
                     "<div class=\x22card\x22 style=\x22width:128px;\x22>" +
                         "<img class=\x22card-img-top\x22 src=\x22" + weblinx[i].urlHalf + "\x22 alt=\x22Card image cap\x22>" +
@@ -8190,7 +11830,7 @@ function showGroup() {
                 }
             let sceneLocs = "";    
                 if (sceneLocations != null && sceneLocations != undefined && sceneLocations.length > 0 ) {
-                // console.log("sceneKLocattionz " + JSON.stringify(sceneLocations));
+                console.log("sceneKLocattionz " + JSON.stringify(sceneLocations));
                 for (let i = 0; i < sceneLocations.length; i++) {
                     let locationMap = "";
                     let location = "";
@@ -8201,7 +11841,7 @@ function showGroup() {
                         name = sceneLocations[i].timestamp;
                     }
                     if (name == null ||name == undefined) {
-                        name = sceneLocations[i].label;
+                        name = "";
                     }
                     let locationID = "";
                     // if (sceneLocations[i]._id != null && sceneLocations[i]._id != undefined) {
@@ -8221,13 +11861,23 @@ function showGroup() {
                     //     }
                         
                     // }
+                    // let eX = sceneLocations[i].eulerx != undefined ? sceneLocations[i].eulerx : 0;
+                    // let eY = sceneLocations[i].eulery != undefined ? sceneLocations[i].eulery : 0;
+                    // let eZ = sceneLocations[i].eulerz != undefined ? sceneLocations[i].eulerz : 0;
+                    let eX = sceneLocations[i].eulerx;
+                    let eY = sceneLocations[i].eulery;
+                    let eZ = sceneLocations[i].eulerz;
+                    // eX = parseFloat(eX) != null ? parseFloat(eX) : 0; //hrm...
+                    // eY = parseFloat(eY) != null ? parseFloat(eY) : 0;
+                    // eX = parseFloat(eZ) != null ? parseFloat(eZ) : 0;
+                    // console.log("rotations " + eX + " " + eY + " " + eZ);
                     let rotations = ""+                        
                     "<label for=\x22eulerx_" + locationID + "\x22>Rotation X</label>" + 
-                    "<input type=\x22number\x22 class=\x22form-control locationObjectRotX\x22 id=\x22eulerx_" + locationID + "\x22 placeholder=\x220\x22 value=\x22" + sceneLocations[i].eulerx + "\x22 >" +
+                    "<input type=\x22number\x22 step=\x220.01\x22 class=\x22form-control locationObjectRotX\x22 id=\x22eulerx_" + locationID + "\x22 placeholder=\x220\x22 value=\x22" + eX + "\x22 >" +
                     "<label for=\x22eulery_" + locationID + "\x22>Rotation Y</label>" + 
-                    "<input type=\x22number\x22 class=\x22form-control locationObjectRotY\x22 id=\x22eulery_" + locationID + "\x22 placeholder=\x220\x22 value=\x22" + sceneLocations[i].eulery + "\x22 >" +
+                    "<input type=\x22number\x22 step=\x220.01\x22 class=\x22form-control locationObjectRotY\x22 id=\x22eulery_" + locationID + "\x22 placeholder=\x220\x22 value=\x22" + eY + "\x22 >" +
                     "<label for=\x22eulerz_" + locationID + "\x22>Rotation Z</label>" + 
-                    "<input type=\x22number\x22 class=\x22form-control locationObjectRotZ\x22 id=\x22eulerz_" + locationID + "\x22 placeholder=\x220\x22 value=\x22" + sceneLocations[i].eulerz + "\x22 >";
+                    "<input type=\x22number\x22 step=\x220.01\x22 class=\x22form-control locationObjectRotZ\x22 id=\x22eulerz_" + locationID + "\x22 placeholder=\x220\x22 value=\x22" + eZ + "\x22 >";
                
                     locationFormElements = ""+
                     "<div class=\x22row\x22>" + 
@@ -8246,7 +11896,7 @@ function showGroup() {
                         // "</div>" +
                         "<div class=\x22col form-group col-md-4\x22>" +
                             "<label for=\x22label_" + locationID + "\x22>Label</label>" + 
-                            "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22label_" + locationID + "\x22 placeholder=\x220\x22 value=\x22" + label + "\x22 >" +
+                            "<input type=\x22text\x22 class=\x22form-control locationLabel\x22 id=\x22label_" + locationID + "\x22 placeholder=\x220\x22 value=\x22" + label + "\x22 >" +
                             "<label for=\x22eventData_" + locationID + "\x22>Event Data</label>" + 
                             "<input type=\x22text\x22 class=\x22form-control locationEventData\x22 id=\x22eventData_" + locationID + "\x22 placeholder=\x220\x22 value=\x22" + sceneLocations[i].eventData + "\x22 >" +
                             "<label for=\x22markerObjectScale_" + locationID + "\x22>Object Scale</label>" + 
@@ -8261,27 +11911,30 @@ function showGroup() {
                             // "<br><button type=\x22button\x22 class=\x22selectLocationObject btn btn-sm btn-success float-right\x22 id=\x22locobjtype_" + locationID + "\x22>Select Location Object</button>" +
                             // "<div id=\x22locationObjects_" + locationID + "\x22></div>"
                         // "</div>" +
-                        "<div class=\x22col form-group col-md-3\x22>" + 
+                        "<div class=\x22col form-group col-md-4\x22>" + 
 
-                            "<label for=\x22objtype_" + locationID + "\x22>Object Type</label>" + //type
+                            "<label for=\x22objtype_" + locationID + "\x22>Location Type</label>" + //type
                             "<select class=\x22locationObjectTypeSelect form-control\x22 id=\x22locobjtypeselect_" + locationID + "\x22>" +
                             "<option value=\x22\x22 disabled selected>Select:</option>" +
                             returnObjectTypes(sceneLocations[i].markerType) +
                             "</select>" +
                             // "<div id=\x22locationObjects_" + locationID + "\x22></div>"
+                            "<label for=\x22locationDescription_" + locationID + "\x22>Description</label>" + 
+                            "<input type=\x22text\x22 class=\x22form-control locationDescription\x22 id=\x22locationDescription_" + locationID + "\x22 value=\x22" + sceneLocations[i].description + "\x22 >" +
                         "</div>" +
-                        "<div class=\x22col form-group col-md-3\x22 id=\x22locationObjects_" + locationID + "\x22>" +
+                        "<div class=\x22col form-group col-md-4\x22 id=\x22locationObjects_" + locationID + "\x22>" +
+                       
                         "</div>" +
-                        "<div class=\x22col form-group col-md-6\x22 id=\x22modelObjects_" + locationID + "\x22>" +
+                        "<div class=\x22col form-group col-md-6\x22 id=\x22selectLocationModel_" + locationID + "\x22>" +
                             "<label for=\x22\x22>Location Model: </label>" + 
                             "<select class=\x22form-control modelSelector\x22 id=\x22modelSelect_"+locationID+"\x22>" +
                             "<option value=\x22\x22 disabled selected>Select : </option>" +
                             "<option value=\x22none\x22> none</option>" +
                             "</select>" +
                         "</div>" +
-                        "<div class=\x22col form-group col-md-6\x22 id=\x22gltfObjects_" + locationID + "\x22>" +
-                            "<label for=\x22\x22>Location GLTF: </label>" + 
-                            "<select class=\x22form-control gltfSelector\x22 id=\x22gltfSelect_"+locationID+"\x22>" +
+                        "<div class=\x22col form-group col-md-6\x22 id=\x22selectLocationObject_" + locationID + "\x22>" +
+                            "<label for=\x22\x22>Location Object: </label>" + 
+                            "<select class=\x22form-control objectSelector\x22 id=\x22objectSelect_"+locationID+"\x22>" +
                             "<option value=\x22\x22 disabled selected>Select : </option>" +
                             "<option value=\x22none\x22> none</option>" +
                             "</select>" +
@@ -8337,8 +11990,8 @@ function showGroup() {
                             zpos =  100 - (parseInt(sceneLocations[i].z) / scaleFactor);
                             }
     
-                            console.log("pos " + xpos + " " + zpos);
-                            console.log(xMag + " " + zMag + " " + scaleInt + " " + scaleString + " " + scaleFactor);
+                            // console.log("pos " + xpos + " " + zpos);
+                            // console.log(xMag + " " + zMag + " " + scaleInt + " " + scaleString + " " + scaleFactor);
                         //     const scaleInt = Math.max(Math.abs(sceneLocations[i].x), Math.abs(sceneLocations[i].z)); //largest mag of x and z
                         //     const scaleString = String(scaleInt).charAt(0); //take first number
                         //     const scaleFactor = Number(scaleString) * 100; //use as scale factor
@@ -8397,7 +12050,8 @@ function showGroup() {
                             "<line x1=\x220\x22 y1=\x22200\x22 x2=\x22200\x22 y2=\x22200\x22 style=\x22stroke:rgb(0,0,0);stroke-width:.5\x22 />" + 
                             "<circle cx=\x22"+xpos+"\x22 cy=\x22"+zpos+"\x22 r=\x225\x22 stroke=\x22black\x22 stroke-width=\x221\x22 fill=\x22red\x22 />" +
                             "</svg></div>" +
-                            "<br><button type=\x22button\x22 class=\x22remSceneLocation btn btn-xs btn-danger float-left\x22 id=\x22" + i + "\x22>Remove</button>";;
+                            "<br><button type=\x22button\x22 class=\x22remSceneLocation btn btn-xs btn-danger float-left\x22 id=\x22" + i + "\x22>Remove</button>"+
+                            "<button type=\x22button\x22 class=\x22copySceneLocation btn btn-xs btn-info float-right\x22 id=\x22" + i + "\x22>Copy</button>";
                         }
                     }
                     let id = "";
@@ -8438,7 +12092,7 @@ function showGroup() {
                     sceneVids = sceneVids +
                     "<div class=\x22card\x22 style=\x22width:256px;\x22>" +
                         "<div class=\x22embed-responsive embed-responsive-16by9\x22>" +
-                            "<iframe class=\x22embed-responsive-item\x22 src=\x22" + response.data.sceneVideoItems[i].vUrl +"\x22 allowfullscreen></iframe>" +
+                            "<video controls=\x22true\x22 class=\x22embed-responsive-item\x22 src=\x22" + response.data.sceneVideoItems[i].vUrl +"\x22 allowfullscreen></video>" +
                         "</div>" +
                         "<div><a role=\x22button\x22 class=\x22badge badge-xs badge-info float-left\x22 href=\x22index.html?type=svideo&iid="+response.data.sceneVideoItems[i]._id+"\x22>^</a>" +
                         "<button type=\x22button\x22 class=\x22remSceneVid badge badge-xs badge-danger float-right\x22 id=\x22"+response.data.sceneVideoItems[i]._id +"\x22>X</button></div>" +
@@ -8447,7 +12101,7 @@ function showGroup() {
                 }
             let sceneMdls = "";    
                 if (sceneModelz != null && sceneModelz != undefined && sceneModelz.length > 0 ) {
-                console.log("sceneMdls " + JSON.stringify(sceneModelz));
+                // console.log("sceneMdls " + JSON.stringify(sceneModelz));
                 for (let i = 0; i < sceneModelz.length; i++) {
                     sceneMdls = sceneMdls + "<div class=\x22btn btn-secondary btn-sm float-right\x22><a style=\x22color:white;\x22 target=\x22_blank\x22 role=\x22button\x22" +
                     "href=\x22index.html?type=model&iid="+ sceneModelz[i]._id +"\x22>" +
@@ -8481,11 +12135,16 @@ function showGroup() {
                 for (let i = 0; i < sceneYouTubeIDs.length; i++) {
                     youTubes = youTubes +
                     "<div class=\x22card\x22 style=\x22width:256px;\x22>" +
-                        "<div class=\x22embed-responsive embed-responsive-16by9\x22>" +
-                        "<iframe class=\x22embed-responsive-item\x22 src=\x22https://www.youtube.com/embed/" + sceneYouTubeIDs[i] +"\x22 allowfullscreen></iframe>" +
-                        "</div>" +
-                        "<div><a role=\x22button\x22 class=\x22badge badge-xs badge-info float-left\x22 href=\x22https://www.youtube.com/watch?v="+response.data.sceneYouTubeIDs[i]+"\x22>^</a>" +
-                        "<button type=\x22button\x22 class=\x22remYouTube badge badge-xs badge-danger float-right\x22 id=\x22"+response.data.sceneYouTubeIDs[i] +"\x22>X</button></div>" +
+                        // "<div class=\x22embed-responsive embed-responsive-16by9\x22>" +
+                        // "<iframe class=\x22embed-responsive-item\x22 src=\x22https://www.youtube.com/embed/" + sceneYouTubeIDs[i] +"\x22 allowfullscreen></iframe>" +
+                        // "</div>" +
+                        // "<div><a role=\x22button\x22 class=\x22badge badge-xs badge-info float-left\x22 href=\x22https://www.youtube.com/watch?v="+response.data.sceneYouTubeIDs[i]+"\x22>^</a>" +
+                        // "<button type=\x22button\x22 class=\x22remYouTube badge badge-xs badge-danger float-right\x22 id=\x22"+response.data.sceneYouTubeIDs[i] +"\x22>X</button></div>" +
+                        // "<div class=\x22youtube-container\x22>" +   
+                        "<iframe width=\x22240\x22 height=\x22180\x22 src=\x22https://www.youtube.com/embed/"+sceneYouTubeIDs[i]+"\x22 frameborder=\x220\x22 allow=\x22accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture\x22 allowfullscreen></iframe>" +
+                        "<button id=\x22"+sceneYouTubeIDs[i]+"\x22 type=\x22button\x22 class=\x22remYouTube badge badge-sm badge-danger float-right\x22>X</button>" +
+                        "<span class=\x22badge badge-pill badge-light float-right badge-sm\x22>ID: "+sceneYouTubeIDs[i]+"</span>" +
+                    // "</div>";
                     "</div>";
                     }
                     // youTubes = youTubes + "</div>";
@@ -8493,15 +12152,55 @@ function showGroup() {
             let primaryAudio = {};
             let ambientAudio = {};
             let triggerAudio = {};
-            for (var a in response.data.audio) {
+            let primaryAudioGroupButtons = "";
+            let primaryAudioSingleButton = "";
+            let ambientAudioGroupButtons = "";
+            let ambientAudioSingleButton = "";
+            let triggerAudioGroupButtons = "";
+            let triggerAudioSingleButton = "";
+            //primary audio
+            if (scenePrimaryAudioGroups != null && scenePrimaryAudioGroups.length > 0) {
+                for (i = 0; i < scenePrimaryAudioGroups.length; i++) {
+                    primaryAudioGroupButtons = primaryAudioGroupButtons +                                         
+                    "<a href=\x22index.html?type=group&iid="+ scenePrimaryAudioGroups[i] +"\x22 class=\x22badge badge-pill badge-dark float-left\x22>" + scenePrimaryAudioGroups[i] + "</a>";
+                }
+                primaryAudio = scenePrimaryAudioGroups;
+            } else {
+                for (var a in response.data.audio) {
                 if (response.data.audio[a]._id === scenePrimaryAudioID) {
                     primaryAudio = response.data.audio[a];
+                    primaryAudioSingleButton = "<a href=\x22index.html?type=saudio&iid="+ primaryAudio._id +"\x22 class=\x22badge badge-pill badge-dark float-left\x22>" + primaryAudio.title + "</a>";
+                    }
                 }
-                if (response.data.audio[a]._id === response.data.sceneAmbientAudioID) {
+            }
+                //ambient audio
+            if (response.data.sceneAmbientAudioGroups != null && sceneAmbientAudioGroups.length > 0) {
+                for (i = 0; i < sceneAmbientAudioGroups.length; i++) {
+                    ambientAudioGroupButtons = ambientAudioGroupButtons +                                         
+                    "<a href=\x22index.html?type=group&iid="+ sceneAmbientAudioGroups[i] +"\x22 class=\x22badge badge-pill badge-dark float-left\x22>" + sceneAmbientAudioGroups[i] + "</a>";
+                }
+                ambientAudio = sceneAmbientAudioGroups;
+            } else {
+            for (var a in response.data.audio) {
+                if (response.data.audio[a]._id === sceneAmbientAudioID) {
                     ambientAudio = response.data.audio[a];
+                    ambientAudioSingleButton = "<a href=\x22index.html?type=saudio&iid="+ ambientAudio._id +"\x22 class=\x22badge badge-pill badge-dark float-left\x22>" + ambientAudio.title + "</a>";
+                    }
                 }
-                if (response.data.audio[a]._id === response.data.sceneTriggerAudioID) {
+            }
+            //trigger audio
+            if (response.data.sceneTriggerAudioGroups != null && sceneTriggerAudioGroups.length > 0) {
+                for (i = 0; i < response.data.sceneTriggerAudioGroups.length; i++) {
+                    triggerAudioGroupButtons = triggerAudioGroupButtons +                                         
+                    "<a href=\x22index.html?type=group&iid="+ sceneTriggerAudioGroups[i] +"\x22 class=\x22badge badge-pill badge-dark float-left\x22>" + sceneTriggerAudioGroups[i] + "</a>";
+                }
+                triggerAudio = sceneTriggerAudioGroups;
+            } else {
+            for (var a in response.data.audio) {
+                if (response.data.audio[a]._id === sceneTriggerAudioID) {
                     triggerAudio = response.data.audio[a];
+                    triggerAudioSingleButton = "<a href=\x22index.html?type=saudio&iid="+ triggerAudio._id +"\x22 class=\x22badge badge-pill badge-dark float-left\x22>" + triggerAudio.title + "</a>";
+                    }
                 }
             }
             // for (var a in response.data.audio) {
@@ -8522,33 +12221,48 @@ function showGroup() {
                     for (let i = 0; i < sceneTags.length; i++) {
                         sceneTagsHtml = sceneTagsHtml + 
                         "<div class=\x22btn btn-light\x22>" +   
-                            "<button id=\x22"+sceneTags[i]+"\x22 type=\x22button\x22 class=\x22badge badge-sm badge-danger float-right\x22>X</button>" +
+                            "<button id=\x22"+sceneTags[i]+"\x22 type=\x22button\x22 class=\x22remTagButton badge badge-sm badge-danger float-right\x22>X</button>" +
                             "<span class=\x22badge badge-pill badge-light float-left badge-sm\x22>\x22"+sceneTags[i]+"\x22</span>" +
                         "</div>";
                     }
                 };
-                console.log("tags : " + JSON.stringify(response.data.sceneTags));
 
-
+                console.log("weblinks : " + JSON.stringify(response.data.sceneWebLinks));
                 // let sceneType = !isEmpty ? response.data.sceneType : "";
                 let extraButtons = "";
-                    if (primaryAudio.URLpng == null) {primaryAudio.URLpng = "ref/none_selected.png"}
-                    if (ambientAudio.URLpng == null) {ambientAudio.URLpng = "ref/none_selected.png"}
-                    if (triggerAudio.URLpng == null) {triggerAudio.URLpng = "ref/none_selected.png"}
+                    
+                    if (primaryAudio.URLpng == null) {
+                        primaryAudio.URLpng = "ref/none_selected.png";
+                    }
+                    if (primaryAudioGroupButtons.length > 0) {
+                        primaryAudio.URLpng = "ref/groups_selected.png";
+                    }
+                    if (ambientAudio.URLpng == null) {
+                        ambientAudio.URLpng = "ref/none_selected.png";
+                    }
+                    if (ambientAudioGroupButtons.length > 0) {
+                        ambientAudio.URLpng = "ref/groups_selected.png";
+                    }
+                    if (triggerAudio.URLpng == null) {
+                        triggerAudio.URLpng = "ref/none_selected.png";
+                    }
+                    if (triggerAudioGroupButtons.length > 0) {
+                        triggerAudio.URLpng = "ref/groups_selected.png";
+                    }
                     picButtons = "<label for=\x22scenePicButtons\x22>Scene Pictures </label><div id=\x22scenePicButtons\x22 style=\x22margin: 0px 10px;\x22  class=\x22btn-group float-right\22 role=\x22group\x22 aria-label=\x22button group\x22>" +
                     "<a class=\x22btn btn-primary\x22 href=\x22index.html?type=bulkup\x22><i class=\x22fas fa-file-upload\x22></i> Upload </a>" +
                     "<a class=\x22btn btn-info\x22 href=\x22index.html?type=pictures&mode=select&parent=scene&iid="+response.data._id+"\x22><i class=\x22fas fa-hand-pointer\x22></i> Select </a>" +
                     "<a class=\x22btn btn-success\x22 href=\x22index.html?type=groups&mode=picgroup&parent=scene&iid="+response.data._id+"\x22><i class=\x22fas fa-hand-pointer\x22></i> Group </a>" +
-                    "<button class=\x22btn btn-danger\x22 onclick=\x22ClearScenePictures()\x22><i class=\x22fas fa-broom\x22></i> Clear </button></div>";
+                    "<button class=\x22btn btn-danger clearScenePictures\x22><i class=\x22fas fa-broom\x22></i> Clear </button></div>";
                     postcardButtons = "<label for=\x22scenePostcardButtons\x22>Postcards </label><div id=\x22scenePostcardButtons\x22 style=\x22margin: 0px 10px;\x22  class=\x22btn-group float-right\22 role=\x22group\x22 aria-label=\x22button group\x22>" +
                     "<a class=\x22btn btn-primary\x22 href=\x22index.html?type=bulkup\x22><i class=\x22fas fa-file-upload\x22></i> Upload </a>" +
                     "<a class=\x22btn btn-info\x22 href=\x22index.html?type=pictures&mode=postselect&parent=scene&iid="+response.data._id+"\x22><i class=\x22fas fa-hand-pointer\x22></i> Select </a>" +
-                    "<button class=\x22btn btn-danger\x22 onclick=\x22ClearScenePostcards()\x22><i class=\x22fas fa-broom\x22></i> Clear </button></div>";
+                    "<button class=\x22btn btn-danger clearScenePostcards\x22><i class=\x22fas fa-broom\x22></i> Clear </button></div>";
                     vidButtons = " <div style=\x22margin: 0px 10px;\x22  class=\x22btn-group float-right\22 role=\x22group\x22 aria-label=\x22button group\x22>" +
                     "<a class=\x22btn btn-primary\x22 href=\x22index.html?type=bulkup\x22><i class=\x22fas fa-file-upload\x22></i> Upload </a>" +
                     "<a class=\x22btn btn-info\x22 href=\x22index.html?type=video&mode=select&parent=scene&iid="+response.data._id+"\x22><i class=\x22fas fa-hand-pointer\x22></i> Select </a>" +
                     "<a class=\x22btn btn-success\x22 href=\x22index.html?type=groups&mode=vidgroup&parent=scene&iid="+response.data._id+"\x22><i class=\x22fas fa-hand-pointer\x22></i> Group </a>" +
-                    "<button class=\x22btn btn-danger\x22 onclick=\x22ClearScenePostcards()\x22><i class=\x22fas fa-broom\x22></i> Clear </button></div>";
+                    "<button class=\x22btn btn-danger clearSceneVids\x22><i class=\x22fas fa-broom\x22></i> Clear </button></div>";
                     primaryAudioButtons = " <div style=\x22margin: 0px 10px;\x22  class=\x22btn-group float-right\22 role=\x22group\x22 aria-label=\x22button group\x22>" +
                     "<a class=\x22btn btn-primary btn-sm\x22 href=\x22index.html?type=bulkup\x22><i class=\x22fas fa-file-upload\x22></i> Upload </a>" +
                     "<a class=\x22btn btn-info btn-sm\x22 href=\x22index.html?type=audio&mode=paudio&parent=scene&iid="+response.data._id+"\x22><i class=\x22fas fa-hand-pointer\x22></i> Select </a>" +
@@ -8558,12 +12272,12 @@ function showGroup() {
                     "<a class=\x22btn btn-primary btn-sm\x22 href=\x22index.html?type=bulkup\x22><i class=\x22fas fa-file-upload\x22></i> Upload </a>" +
                     "<a class=\x22btn btn-info btn-sm\x22 href=\x22index.html?type=audio&mode=aaudio&parent=scene&iid="+response.data._id+"\x22><i class=\x22fas fa-hand-pointer\x22></i> Select </a>" +
                     "<a class=\x22btn btn-success btn-sm\x22 href=\x22index.html?type=groups&mode=aaudiogroup&parent=scene&iid="+response.data._id+"\x22><i class=\x22fas fa-hand-pointer\x22></i> Group </a>" +
-                    "<button class=\x22btn btn-danger btn-sm\x22 onclick=\x22ClearScenePostcards()\x22><i class=\x22fas fa-broom\x22></i> Clear </button></div>";
+                    "<button class=\x22btn btn-danger btn-sm clearSceneAmbientAudio\x22><i class=\x22fas fa-broom\x22></i> Clear </button></div>";
                     triggerAudioButtons = " <div style=\x22margin: 0px 10px;\x22  class=\x22btn-group float-right\22 role=\x22group\x22 aria-label=\x22button group\x22>" +
                     "<a class=\x22btn btn-primary btn-sm\x22 href=\x22index.html?type=bulkup\x22><i class=\x22fas fa-file-upload\x22></i> Upload </a>" +
                     "<a class=\x22btn btn-info btn-sm\x22 href=\x22index.html?type=audio&mode=taudio&parent=scene&iid="+response.data._id+"\x22><i class=\x22fas fa-hand-pointer\x22></i> Select </a>" +
                     "<a class=\x22btn btn-success btn-sm\x22 href=\x22index.html?type=groups&mode=taudiogroup&parent=scene&iid="+response.data._id+"\x22><i class=\x22fas fa-hand-pointer\x22></i> Group </a>" +
-                    "<button class=\x22btn btn-danger btn-sm\x22 onclick=\x22ClearScenePostcards()\x22><i class=\x22fas fa-broom\x22></i> Clear </button></div>";
+                    "<button class=\x22btn btn-danger btn-sm clearSceneTriggerAudio\x22><i class=\x22fas fa-broom\x22></i> Clear </button></div>";
                     modelButtons = " <div style=\x22margin: 0px 10px;\x22  class=\x22btn-group float-right\22 role=\x22group\x22 aria-label=\x22button group\x22>" +
                     "<a class=\x22btn btn-primary\x22 href=\x22index.html?type=models\x22><i class=\x22fas fa-file-upload\x22></i> New </a>" +
                     "<a class=\x22btn btn-info\x22 href=\x22index.html?type=models&mode=select&parent=scene&iid="+response.data._id+"\x22><i class=\x22fas fa-hand-pointer\x22></i> Select </a>" +
@@ -8578,111 +12292,161 @@ function showGroup() {
                     "<a class=\x22btn btn-primary\x22 href=\x22index.html?type=locations\x22><i class=\x22fas fa-file-upload\x22></i> New </a>" +
                     "<a class=\x22btn btn-info\x22 href=\x22index.html?type=locations&mode=select&parent=scene&iid="+response.data._id+"\x22><i class=\x22fas fa-hand-pointer\x22></i> Select </a>" +
                     "<a class=\x22btn btn-success\x22 href=\x22index.html?type=groups&mode=locgroup&parent=scene&iid="+response.data._id+"\x22><i class=\x22fas fa-hand-pointer\x22></i> Group </a>" +
-                    "<button class=\x22btn btn-danger\x22 onclick=\x22ClearScenePostcards()\x22><i class=\x22fas fa-broom\x22></i> Clear </button></div>";
+                    "<button class=\x22btn btn-danger\x22 onclick=\x22ClearSceneLocations()\x22><i class=\x22fas fa-broom\x22></i> Clear </button></div>";
                     textButtons = " <div style=\x22margin: 0px 10px;\x22  class=\x22btn-group float-right\22 role=\x22group\x22 aria-label=\x22button group\x22>" +
                     "<a class=\x22btn btn-primary\x22 href=\x22index.html?type=texts\x22><i class=\x22fas fa-file-upload\x22></i> New </a>" +
                     "<a class=\x22btn btn-info\x22 href=\x22index.html?type=texts&mode=select&parent=scene&iid="+response.data._id+"\x22><i class=\x22fas fa-hand-pointer\x22></i> Select </a>" +
                     "<a class=\x22btn btn-success\x22 href=\x22index.html?type=groups&mode=textgroup&parent=scene&iid="+response.data._id+"\x22><i class=\x22fas fa-hand-pointer\x22></i> Group </a>" +
-                    "<button class=\x22btn btn-danger\x22 onclick=\x22ClearScenePostcards()\x22><i class=\x22fas fa-broom\x22></i> Clear </button></div>";
-                    extraButtons = "<a href=\x22#\x22 id=\x22deleteButton\x22 class=\x22btn btn-danger btn-sm float-left\x22 onclick=\x22deleteItem('holditasecondtherechief','" + response.data._id + "')\x22>Delete Scene</a>";
+                    "<button class=\x22btn btn-danger clearSceneTextItems\x22><i class=\x22fas fa-broom\x22></i> Clear </button></div>";
+                    extraButtons = "<a href=\x22#\x22 id=\x22deleteButton\x22 class=\x22btn btn-danger btn-sm float-right\x22 onclick=\x22deleteItem('holditasecondtherechief','" + response.data._id + "')\x22>Delete Scene</a>";
                     // "<a class=\x22btn btn-primary btn-sm float-right\x22 href=\x22index.html?appid=" + response.data._id + "&type=pictures&mode=select&parent=app&iid=" + response.data._id + "\x22>Add App Pic</a>";
 
                 var card = "<div class=\x22col-lg-12\x22>" +
                     "<div class=\x22card shadow mb-4\x22>" +
                     "<div class=\x22card-header py-3 d-flex flex-row align-items-center justify-content-between\x22>" +
-                        "<h6 class=\x22m-0 font-weight-bold text-primary\x22>Scene Details - "+ sceneTitle +" | _id: "+ response.data._id +" | short id: <a target=\x22_blank\x22 href=\x22../webxr/"+ response.data.short_id +"\x22>"+ response.data.short_id +"</a></h6>" +
+                        "<h6 class=\x22m-0 font-weight-bold text-primary\x22>Scene Details - "+ sceneTitle +" | _id: "+ response.data._id +
+                        " | <a target=\x22_blank\x22 href=\x22../webxr/"+ response.data.short_id +"\x22>WebXR Link</a>" +
+                        " | <a target=\x22_blank\x22 href=\x22servicemedia://scene?"+ response.data.short_id +"\x22>App Link</a></h6>" +
                         // "<a class=\x22btn btn-xs\x22 href=\x22../webxr/"+response.data.short_id +">WebXR</a>"+
                         "<button id=\x22showHideAll\x22 class=\x22btn btn-sm btn-light float-right\x22><i class=\x22fas fa-plus-circle\x22></i> show/hide all</button>" +
                         "</div>" +
                     "<div class=\x22card-body\x22>" +
                         "<form id=\x22updateSceneForm\x22>" +
                             // "submitbutton route " +submitButtonRoute + 
-                            "<button type=\x22submit\x22 id=\x22sumbitButton\x22 class=\x22btn btn-primary float-right\x22>Update</button>" + //Create vs Update
+                            "<button type=\x22submit\x22 id=\x22sceneSubmitButton\x22 class=\x22btn btn-primary float-right clickable\x22>Update</button>" + //Create vs Update
                             "<button id=\x22optionsSectionButton\x22 class=\x22btn btn-sm btn-primary btn-circle btn-light float-left\x22><i class=\x22fas fa-plus-circle\x22></i> </button>" +
                             "<h4>Options</h4>" +
                             "<hr/>" +
             //
                     "<div style=\x22display:none;\x22 id=\x22optionsSection\x22>" +
-                            "<div class=\x22form-row\x22>" +
-                                "<div class=\x22col form-group col-md-3\x22>" + 
-                                    "<label for=\x22sceneTitle\x22>Scene Title</label>" + //sceneTitle
-                                    "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22sceneTitle\x22 placeholder=\x22Scene Title Name\x22 value=\x22" + sceneTitle + "\x22 required>" +
+                        "<div class=\x22form-row\x22>" +
+                            "<div class=\x22col form-group col-md-2\x22>" + 
+                                "<label for=\x22sceneTitle\x22>Scene Title</label>" + //sceneTitle
+                                "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22sceneTitle\x22 placeholder=\x22Scene Title Name\x22 value=\x22" + sceneTitle + "\x22 required>" +
+                            "</div>" +
+                            "<div class=\x22col form-group col-md-2\x22>" + 
+                                "<label for=\x22sceneAppNameSelect\x22>Parent App</label>" + //parent app - ugh, most only have sceneDomain, need to clean this and select only by appID
+                                "<select class=\x22form-control\x22 id=\x22sceneAppNameSelect\x22>" +
+                                "<option>\x22None\x22</option>"+
+                                "</select>" +
+                            "</div>" +
+                            "<div class=\x22col form-group col-md-2\x22>" +
+                                "<label for=\x22sceneKeynote\x22>Scene Keynote</label>" + 
+                                "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22sceneKeynote\x22 placeholder=\x22Scene Keynote\x22 value=\x22" + sceneKeynote + "\x22 >" +
+                            "</div>" +
+                            "<div class=\x22col form-group col-md-3\x22>" +
+                                "<label for=\x22sceneDescription\x22>Scene Description</label>" + //sceneDescription
+                                "<textarea class=\x22form-control\x22 id=\x22sceneDescription\x22 placeholder=\x22Give a full description of the scene\x22>" + sceneDescription + "</textarea>" +
+                            "</div>" +
+                            "<div class=\x22col form-group col-md-2\x22>" +
+                                "<label for=\x22sceneCategorySelect\x22>Category</label>" + //sceneType
+                                "<select class=\x22form-control\x22 id=\x22sceneCategorySelect\x22>" +
+                                    "<option value=\x22\x22 disabled selected>Select:</option>" +
+                                    "<option>None</option>" +
+                                    "<option>Games</option>" +
+                                    "<option>Education</option>" +
+                                    "<option>NFT-Showcase</option>" +
+                                    "<option>WebXR</option>" +
+                                    "<option>Entertainment</option>" +
+                                    "<option>Experiments</option>" +
+                                    "<option>Enterprise</option>" +
+                                    "<option>Shopping</option>" +
+                                    "<option>Health/Wellness</option>" +
+                                    "<option>Real Estate</option>" +
+                                    "<option>Virtual Tourism</option>" +
+                                    // "<option>OpenXR</option>" +
+                                
+                                "</select>" +
+                            "</div>" +
+                            "<div class=\x22col form-group col-md-1\x22>" +
+                                "<label for=\x22sceneStickyness\x22>Stickyness</label>" + //sceneNext
+                                "<input type=\x22number\x22 class=\x22form-control\x22 id=\x22sceneStickyness\x22 placeholder=\x2210\x22 value=\x22" + sceneStickyness + "\x22 >" +
+                            "</div>" +
+
+                            "<div class=\x22col form-group col-md-2\x22>" +
+                                "<label for=\x22sceneTypeSelect\x22>App Scene Type</label>" + //sceneType
+                                "<select class=\x22form-control\x22 id=\x22sceneTypeSelect\x22>" +
+                                    "<option value=\x22\x22 disabled selected>Select:</option>" +
+                                    "<option>Default</option>" +
+                                    "<option>Virtual</option>" +
+                                    "<option>ARKit</option>" +
+                                    "<option>Oculus</option>" +
+                                    "<option>OpenXR</option>" +
+                                    
+                                "</select>" +
+                            "</div>" +
+                            "<div class=\x22col form-group col-md-2\x22>" +
+                            "<label for=\x22sceneWebTypeSelect\x22>Web Scene Type</label>" + //sceneType
+                            "<select class=\x22form-control\x22 id=\x22sceneWebTypeSelect\x22>" +
+                                    "<option value=\x22\x22 disabled selected>Select:</option>" +
+                                    "<option>Default</option>" +
+                                    "<option>AFrame</option>" +
+                                    "<option>Model Viewer</option>" +
+                                    "<option>Mapbox</option>" +
+                                    "<option>Threebox</option>" +
+                                    "<option>ThreeJS</option>" +
+                                    "<option>BabylonJS</option>" +
+                                    "<option>HTML from Text Item</option>" +
+                                    "<option>AR Barcode Tracking</option>" +
+                                    "<option>AR Image Tracking</option>" +
+                                    "<option>AR Location Tracking</option>" +
+                                    "<option>AR Marker Tracking</option>" +
+                                    "<option>Mirage Marker</option>" +
+                                    "<option>Camera Background</option>" +
+                                    "<option>Text Adventure</option>" +
+                                "</select>" +
+                            "</div>" +
+                            "<div class=\x22col form-group col-md-2\x22>" +
+                                "<label for=\x22sceneSource\x22>Source/Creator</label>" + //sceneNext
+                                "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22sceneSource\x22 value=\x22" + sceneSource + "\x22 >" +
+                            "</div>" +
+
+  
+                            "<div class=\x22col form-group col-md-1\x22>" +
+                                "<div class=\x22\x22><label for=\x22sceneIosOK\x22>iOS Enabled</label><br>" + 
+                                "<input class=\x22float-right\x22 type=\x22checkbox\x22  id=\x22sceneIosOK\x22 data-toggle=\x22toggle\x22 data-size=\x22sm\x22 data-on=\x22<i class='fas fa-check'></i>\x22 data-off=\x22<i class='fas fa-times'></i>\x22 data-onstyle=\x22success\x22 data-offstyle=\x22danger\x22></div>" +
+                            
                                 "</div>" +
-                                "<div class=\x22col form-group col-md-3\x22>" + 
-                                    "<label for=\x22sceneAppNameSelect\x22>Parent App</label>" + //parent app - ugh, most only have sceneDomain, need to clean this and select only by appID
-                                    "<select class=\x22form-control\x22 id=\x22sceneAppNameSelect\x22>" +
-                                    "</select>" +
-                                "</div>" +
-                                "<div class=\x22col form-group col-md-3\x22>" +
-                                    "<label for=\x22sceneKeynote\x22>Scene Keynote</label>" + 
-                                    "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22sceneKeynote\x22 placeholder=\x22Scene Keynote\x22 value=\x22" + sceneKeynote + "\x22 >" +
-                                "</div>" +
-                                "<div class=\x22col form-group col-md-1\x22>" +
-                                    "<label for=\x22sceneStickyness\x22>Stickyness</label>" + //sceneNext
-                                    "<input type=\x22number\x22 class=\x22form-control\x22 id=\x22sceneStickyness\x22 placeholder=\x2210\x22 value=\x22" + sceneStickyness + "\x22 >" +
-                                "</div>" +
-                                "<div class=\x22col form-group col-md-3\x22>" +
-                                    "<label for=\x22sceneDescription\x22>Scene Description</label>" + //sceneDescription
-                                    "<textarea class=\x22form-control\x22 id=\x22sceneDescription\x22 placeholder=\x22Give a full description of the scene\x22>" + sceneDescription + "</textarea>" +
-                                "</div>" +
-                                "<div class=\x22col form-group col-md-2\x22>" +
-                                    "<label for=\x22sceneTypeSelect\x22>Scene Type</label>" + //sceneType
-                                    "<select class=\x22form-control\x22 id=\x22sceneTypeSelect\x22 required>" +
-                                        "<option value=\x22\x22 disabled selected>Select:</option>" +
-                                        "<option>AFrame</option>" +
-                                        "<option>ThreeJS</option>" +
-                                        "<option>BabylonJS</option>" +
-                                        "<option>Virtual</option>" +
-                                        "<option>Augmented</option>" +
-                                        "<option>ARKit</option>" +
-                                        "<option>Geographic</option>" +
-                                    "</select>" +
-                                "</div>" +
-                                "<div class=\x22col form-group col-md-1\x22>" +
-                                "<label for=\x22scenePreviousScene\x22>Previous Scene</label>" + //scenePrevious
+                            "<div class=\x22col form-group col-md-1\x22>" +
+                                "<div class=\x22\x22><label for=\x22sceneAndroidOK\x22>Android Enabled</label><br>" + 
+                                "<input class=\x22float-right\x22 type=\x22checkbox\x22  id=\x22sceneAndroidOK\x22 data-toggle=\x22toggle\x22 data-size=\x22sm\x22 data-on=\x22<i class='fas fa-check'></i>\x22 data-off=\x22<i class='fas fa-times'></i>\x22 data-onstyle=\x22success\x22 data-offstyle=\x22danger\x22></div>" +
+                            "</div>" +
+                            "<div class=\x22col form-group col-md-1\x22>" +
+                                "<div class=\x22\x22><label for=\x22sceneWindowsOK\x22>Windows Enabled</label><br>" + 
+                                "<input class=\x22float-right\x22 type=\x22checkbox\x22  id=\x22sceneWindowsOK\x22 data-toggle=\x22toggle\x22 data-size=\x22sm\x22 data-on=\x22<i class='fas fa-check'></i>\x22 data-off=\x22<i class='fas fa-times'></i>\x22 data-onstyle=\x22success\x22 data-offstyle=\x22danger\x22></div>" +
+                            "</div>" +
+                            "<div class=\x22col form-group col-md-1\x22>" +
+                                "<label for=\x22scenePreviousScene\x22>Prev Scene</label>" + //scenePrevious
                                 "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22scenePreviousScene\x22 placeholder=\x22Previous Scene\x22 value=\x22" + scenePreviousScene + "\x22 >" +
                             "</div>" +
                             "<div class=\x22col form-group col-md-1\x22>" +
                                 "<label for=\x22sceneNextScene\x22>Next Scene</label>" + //sceneNext
                                 "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22sceneNextScene\x22 placeholder=\x22Next Scene\x22 value=\x22" + sceneNextScene + "\x22 >" +
                             "</div>" +
-                                "<div class=\x22col form-group col-md-1\x22>" +
-                                    "<div class=\x22\x22><label for=\x22sceneIosOK\x22>iOS Enabled</label><br>" + 
-                                    "<input class=\x22float-right\x22 type=\x22checkbox\x22  id=\x22sceneIosOK\x22 data-toggle=\x22toggle\x22 data-size=\x22sm\x22 data-on=\x22<i class='fas fa-check'></i>\x22 data-off=\x22<i class='fas fa-times'></i>\x22 data-onstyle=\x22success\x22 data-offstyle=\x22danger\x22></div>" +
-                                "</div>" +
-                                "<div class=\x22col form-group col-md-1\x22>" +
-                                    "<div class=\x22\x22><label for=\x22sceneAndroidOK\x22>Android Enabled</label><br>" + 
-                                    "<input class=\x22float-right\x22 type=\x22checkbox\x22  id=\x22sceneAndroidOK\x22 data-toggle=\x22toggle\x22 data-size=\x22sm\x22 data-on=\x22<i class='fas fa-check'></i>\x22 data-off=\x22<i class='fas fa-times'></i>\x22 data-onstyle=\x22success\x22 data-offstyle=\x22danger\x22></div>" +
-                                "</div>" +
-                                "<div class=\x22col form-group col-md-1\x22>" +
-                                    "<div class=\x22\x22><label for=\x22sceneWindowsOK\x22>Windows Enabled</label><br>" + 
-                                    "<input class=\x22float-right\x22 type=\x22checkbox\x22  id=\x22sceneWindowsOK\x22 data-toggle=\x22toggle\x22 data-size=\x22sm\x22 data-on=\x22<i class='fas fa-check'></i>\x22 data-off=\x22<i class='fas fa-times'></i>\x22 data-onstyle=\x22success\x22 data-offstyle=\x22danger\x22></div>" +
-                                "</div>" +
-
-                                "<div class=\x22col form-group col-md-6\x22>" +
-                                    "<label for=\x22sceneLinks\x22>Scene Links</label><br>" + //SceneLinks 
-                                    "<div class=\x22input-group\x22>" +
-                                        "<div class=\x22input-group-prepend\x22>" +
-                                        "<a href=\x22#\x22 class=\x22btn input-group-text\x22 id=\x22addSceneLinkButton\x22>+</a>" +
-                                        "</div>" +
-                                        "<input id=\x22addSceneLinkInput\x22 type=\x22text\x22 class=\x22form-control\x22 placeholder=\x22Add Scene Code or Title\x22 aria-label=\x22Input group example\x22 aria-describedby=\x22x22addSceneLinks\x22>" +
-                                        "<div class=\x22float-right\x22 id=\x22sceneLinkDisplay\x22>" +
-                                           
-                                        "</div>" +
+                            "<div class=\x22col form-group col-md-6\x22>" +
+                                "<label for=\x22sceneLinks\x22>Scene Links</label><br>" + //SceneLinks 
+                                "<div class=\x22input-group\x22>" +
+                                    "<div class=\x22input-group-prepend\x22>" +
+                                    "<a href=\x22#\x22 class=\x22btn input-group-text\x22 id=\x22addSceneLinkButton\x22>+</a>" +
+                                    "</div>" +
+                                    "<input id=\x22addSceneLinkInput\x22 type=\x22text\x22 class=\x22form-control\x22 placeholder=\x22Add Scene Code or Title\x22 aria-label=\x22Input group example\x22 aria-describedby=\x22x22addSceneLinks\x22>" +
+                                    "<div class=\x22float-right\x22 id=\x22sceneLinkDisplay\x22>" +
+                                        
                                     "</div>" +
                                 "</div>" +
-                                "<div class=\x22col form-group col-md-6\x22>" +
-                                    "<label for=\x22sceneTags\x22>Tags</label><br>" + //Tags
-                                    "<div class=\x22input-group\x22>" +
-                                        "<div class=\x22input-group-prepend\x22>" +
-                                        "<button class=\x22btn input-group-text\x22 id=\x22addTagButton\x22>+</button>" +
-                                        "</div>" +
-                                        "<input id=\x22addTagInput\x22 type=\x22text\x22 class=\x22form-control\x22 placeholder=\x22Add Tag\x22 aria-label=\x22Input group example\x22 aria-describedby=\x22addTagInput\x22>" +
-                                        "<div id=\x22tagDisplay\x22>" +
-                                        sceneTagsHtml +
-                                        "</div>" +
+                            "</div>" +
+                            "<div class=\x22col form-group col-md-6\x22>" +
+                                "<label for=\x22sceneTags\x22>Tags</label><br>" + //Tags
+                                "<div class=\x22input-group\x22>" +
+                                    "<div class=\x22input-group-prepend\x22>" +
+                                    "<button class=\x22btn input-group-text\x22 id=\x22addTagButton\x22>+</button>" +
+                                    "</div>" +
+                                    "<input id=\x22addTagInput\x22 type=\x22text\x22 class=\x22form-control\x22 placeholder=\x22Add Tag\x22 aria-label=\x22Input group example\x22 aria-describedby=\x22addTagInput\x22>" +
+                                    "<div id=\x22tagDisplay\x22>" +
+                                    sceneTagsHtml +
                                     "</div>" +
                                 "</div>" +
+                            "</div>" +
                             "</div>" +
                             "<div class=\x22form-row\x22>" +
                                 "<div class=\x22col form-group col-md-8\x22>" +
@@ -8698,23 +12462,27 @@ function showGroup() {
                             "</div>" +
                             "<div class=\x22form-row\x22>" +    
                                 "<div class=\x22col form-group col-md-1\x22>" +
-                                    "<div class=\x22\x22><label for=\x22scenePublicToggle\x22>Available to Public</label><br>" + //Public/Private
+                                    "<div class=\x22\x22><label for=\x22scenePublicToggle\x22>Share with Public</label><br>" + //Public/Private
                                     "<input class=\x22float-right\x22 type=\x22checkbox\x22  id=\x22scenePublicToggle\x22 data-toggle=\x22toggle\x22 data-size=\x22sm\x22 data-on=\x22<i class='fas fa-check'></i>\x22 data-off=\x22<i class='fas fa-times'></i>\x22 data-onstyle=\x22success\x22 data-offstyle=\x22danger\x22></div>" +
                                 "</div>" +
                                 "<div class=\x22col form-group col-md-1\x22>" +
-                                    "<div class=\x22\x22><label for=\x22sceneSubscriberToggle\x22>Subscription Only</label><br>" + //Sub/Not
+                                    "<div class=\x22\x22><label for=\x22sceneSubscriberToggle\x22>Share with Subscribers</label><br>" + //Sub/Not
                                     "<input type=\x22checkbox\x22  id=\x22sceneSubscriberToggle\x22 data-toggle=\x22toggle\x22 data-size=\x22sm\x22 data-on=\x22<i class='fas fa-check'></i>\x22 data-off=\x22<i class='fas fa-times'></i>\x22 data-onstyle=\x22success\x22 data-offstyle=\x22danger\x22></div>" +
                                 "</div>" +
                                 "<div class=\x22col form-group col-md-1\x22>" +
-                                    "<div class=\x22\x22><label for=\x22sceneRestrictToLocation\x22>Restrict to Location</label><br>" + //geofencing
-                                    "<input type=\x22checkbox\x22  id=\x22sceneRestrictToLocation\x22 data-toggle=\x22toggle\x22 data-size=\x22sm\x22 data-on=\x22<i class='fas fa-check'></i>\x22 data-off=\x22<i class='fas fa-times'></i>\x22 data-onstyle=\x22success\x22 data-offstyle=\x22danger\x22></div>" +
+                                    "<div class=\x22\x22><label for=\x22sceneLocationTracking\x22>Track Location</label><br>" + //geofencing
+                                    "<input type=\x22checkbox\x22  id=\x22sceneLocationTracking\x22 data-toggle=\x22toggle\x22 data-size=\x22sm\x22 data-on=\x22<i class='fas fa-check'></i>\x22 data-off=\x22<i class='fas fa-times'></i>\x22 data-onstyle=\x22success\x22 data-offstyle=\x22danger\x22></div>" +
                                 "</div>" +
                                 "<div class=\x22col form-group col-md-1\x22>" +
-                                    "<label for=\x22sceneLocationRange\x22>Location Range</label>" + //sceneNext
-                                    "<input type=\x22number\x22 class=\x22form-control\x22 id=\x22sceneLocationRange\x22 placeholder=\x2210\x22 value=\x22" + sceneLocationRange + "\x22 >" +
+                                    "<div class=\x22\x22><label for=\x22sceneShowAds\x22>Show Ads</label><br>" + //show ads
+                                    "<input type=\x22checkbox\x22  id=\x22sceneShowAds\x22 data-toggle=\x22toggle\x22 data-size=\x22sm\x22 data-on=\x22<i class='fas fa-check'></i>\x22 data-off=\x22<i class='fas fa-times'></i>\x22 data-onstyle=\x22success\x22 data-offstyle=\x22danger\x22></div>" +
                                 "</div>" +
+                                // "<div class=\x22col form-group col-md-1\x22>" +
+                                //     "<label for=\x22sceneLocationRange\x22>Location Range</label>" + 
+                                //     "<input type=\x22number\x22 step=\x220.01\x22 class=\x22form-control\x22 id=\x22sceneLocationRange\x22 placeholder=\x2210\x22 value=\x22" + sceneLocationRange + "\x22 >" +
+                                // "</div>" +
                                 "<div class=\x22col form-group\x22> " +
-                                "<label for=\x22networkingBtns\x22> Networking </label>" + //alignement
+                                "<label for=\x22networkingBtns\x22> Networking </label>" + 
                                 "<br><div id=\x22networkingBtns\x22 class=\x22btn-group btn-group-toggle flex-wrap\x22 data-toggle=\x22buttons\x22>" +
                                     "<label class=\x22btn btn-secondary active\x22>" +
                                         "<input type=\x22radio\x22 name=\x22sceneNetworking\x22 value=\x22None\x22 id=\x22None\x22 autocomplete=\x22off\x22 checked> None " +
@@ -8731,34 +12499,42 @@ function showGroup() {
                                 "</div>" +
                             "</div>" +
                                 "<div class=\x22col form-group col-md-2\x22>" +
-                                    "<button class=\x22btn btn-sm btn-info generateLandingPage float-right\x22><i class=\x22fas fa-cog\x22 id=\x22generateLandingPage\x22></i> Generate Landing </button><br><br>" +
-                                    "<button class=\x22btn btn-sm btn-info generateWebXRPage float-right\x22><i class=\x22fas fa-cog\x22 id=\x22generateWebXRPage\x22></i> Generate WebXR </button>" +
+                                    "<label for=\x22sceneAltURL\x22>Scene Alternate URL</label>" + 
+                                    "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22sceneAltURL\x22 placeholder=\x22Scene Alternate URL\x22 value=\x22" + sceneAltURL + "\x22 >" +
+                                    // "<button class=\x22btn btn-sm btn-info generateLandingPage float-right\x22><i class=\x22fas fa-cog\x22 id=\x22generateLandingPage\x22></i> Generate Landing </button><br><br>" +
+                                    // "<button class=\x22btn btn-sm btn-info generateWebXRPage float-right\x22><i class=\x22fas fa-cog\x22 id=\x22generateWebXRPage\x22></i> Generate WebXR </button>" +
                                 "</div>" +
-                                "<div class=\x22col form-group col-md-2\x22>" +
-                                    // "<a class=\x22btn btn-sm btn-primary float-right\x22 target=\x22_blank\x22 href=\x22http://"+sceneDomain+"/"+short_id+"/index.html\x22><i class=\x22far fa-file-alt\x22></i> Landing </a><br><br>" +
-                                    "<a class=\x22btn btn-sm btn-primary float-right\x22 target=\x22_blank\x22 href=\x22http://"+sceneDomain+"/"+short_id+"/webxr.html\x22><i class=\x22far fa-file-alt\x22></i> Static WebXR </a><br><br>" +
-                                    // "<a class=\x22btn btn-sm btn-primary float-right\x22 target=\x22_blank\x22 href=\x22index.html?type=webxr&iid="+short_id+"\x22><i class=\x22far fa-file-alt\x22></i> Dynamic WebXR </a>" +
-                                    "<a class=\x22btn btn-sm btn-primary float-right\x22 target=\x22_blank\x22 target=\x22_blank\x22 href=\x22../webxr/"+ response.data.short_id +"\x22><i class=\x22far fa-file-alt\x22></i> Dynamic WebXR </a>" +
+                                // "<div class=\x22col form-group col-md-2\x22>" +
+                                //     // "<a class=\x22btn btn-sm btn-primary float-right\x22 target=\x22_blank\x22 href=\x22http://"+sceneDomain+"/"+short_id+"/index.html\x22><i class=\x22far fa-file-alt\x22></i> Landing </a><br><br>" +
+                                //     "<a class=\x22btn btn-sm btn-primary float-right\x22 target=\x22_blank\x22 href=\x22http://"+sceneDomain+"/"+short_id+"/webxr.html\x22><i class=\x22far fa-file-alt\x22></i> Static WebXR </a><br><br>" +
+                                //     // "<a class=\x22btn btn-sm btn-primary float-right\x22 target=\x22_blank\x22 href=\x22index.html?type=webxr&iid="+short_id+"\x22><i class=\x22far fa-file-alt\x22></i> Dynamic WebXR </a>" +
+                                //     "<a class=\x22btn btn-sm btn-primary float-right\x22 target=\x22_blank\x22 target=\x22_blank\x22 href=\x22../webxr/"+ response.data.short_id +"\x22><i class=\x22far fa-file-alt\x22></i> Dynamic WebXR </a>" +
 
+                                // "</div>" +
+
+                                "<div class=\x22col form-group col-md-2\x22>" +
+                                    "<label for=\x22sceneDebugMode\x22>Scene Debug Mode</label>" + 
+                                    "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22sceneDebugMode\x22 placeholder=\x22Scene Debug Mode\x22 value=\x22" + sceneDebugMode + "\x22 >" +
                                 "</div>" +
                                 "<div class=\x22col form-group col-md-2\x22>" +
-                                    "<a class=\x22btn btn-sm btn-dark float-right\x22 target=\x22_blank\x22 href=\x22/qcode/"+sceneDomain+"/"+short_id+"\x22><i class=\x22far fa-file-alt\x22></i> Landing QRCode</a><br><br>" +
-                                    "<a class=\x22btn btn-sm btn-dark float-right\x22 target=\x22_blank\x22 href=\x22/qrcode/"+short_id+"\x22><i class=\x22far fa-file-alt\x22></i> WebXR QRCode</a>" +
+                                    "<a class=\x22btn btn-sm btn-dark float-right\x22 target=\x22_blank\x22 href=\x22/qrcode/"+sceneAltURL+"\x22><i class=\x22far fa-file-alt\x22></i> Alternate URL QRCode</a><br><br>" +
+                                    "<a class=\x22btn btn-sm btn-dark float-right\x22 target=\x22_blank\x22 href=\x22/qrcode/"+short_id+"\x22><i class=\x22far fa-file-alt\x22></i> ServiceMedia URL QRCode</a>" +
                                 "</div>" +
                             "</div>" +
                             "<hr/>" +
-                "</div>" +
+                        "</div>" +
                     
                             "<button id=\x22cameraSectionButton\x22 class=\x22btn btn-sm btn-primary btn-circle btn-light float-left\x22><i class=\x22fas fa-plus-circle\x22></i> </button>" +
                             "<h4>Camera</h4>" +
                             "<hr/>" +
-                "<div style=\x22display:none;\x22 id=\x22cameraSection\x22>" +
+                        "<div style=\x22display:none;\x22 id=\x22cameraSection\x22>" +
                             "<div id=\x22cameraSection\x22 class=\x22form-row\x22>" +
                                 "<div class=\x22col form-group col-md-3\x22>" +
                                 "<label for=\x22sceneCameraMode\x22>Camera Mode</label>" +
                                     "<select class=\x22form-control\x22 id=\x22sceneCameraMode\x22 >" +
                                     "<option value=\x22\x22 disabled selected>Select:</option>" +
                                     "<option>First Person</option>" +
+                                    "<option>Orbit</option>" +
                                     "<option>Third Person</option>" +
                                     "<option>Follow Path</option>" +
                                     "<option>Fixed</option>" +
@@ -8810,8 +12586,23 @@ function showGroup() {
                                     "<div class=\x22\x22><label for=\x22sceneCameraOrientToPath\x22>Orient Camera to Path</label><br>" +
                                     "<input class=\x22\x22 type=\x22checkbox\x22  id=\x22sceneCameraOrientToPath\x22 data-toggle=\x22toggle\x22 data-size=\x22sm\x22 data-on=\x22<i class='fas fa-check'></i>\x22 data-off=\x22<i class='fas fa-times'></i>\x22 data-onstyle=\x22success\x22 data-offstyle=\x22danger\x22></div>" +
                                 "</div>" +  
+                                    "<div class=\x22col form-group col-md-2\x22>" +
+                                    "<div class=\x22\x22><label for=\x22sceneCameraDepthOfField\x22>Depth of Field</label><br>" +
+                                    "<input class=\x22\x22 type=\x22checkbox\x22  id=\x22sceneCameraDepthOfField\x22 data-toggle=\x22toggle\x22 data-size=\x22sm\x22 data-on=\x22<i class='fas fa-check'></i>\x22 data-off=\x22<i class='fas fa-times'></i>\x22 data-onstyle=\x22success\x22 data-offstyle=\x22danger\x22></div>" +
+                                "</div>" +  
 
                             "</div>" + 
+                            "<div class=\x22form-row\x22>" +
+                                "<div class=\x22col form-group col-md-2\x22>" +
+                                    "<div class=\x22\x22><label for=\x22scenePlayerHeight\x22>Player Height</label><br>" +
+                                    "<input class=\x22form-control\x22  type=\x22number\x22 step=\x220.01\x22 id=\x22scenePlayerHeight\x22 placeholder=\x222\x22 value=\x22" + scenePlayer.playerHeight + "\x22></div>" +
+                                "</div>" +  
+                                "<div class=\x22col form-group col-md-2\x22>" +
+                                    "<div class=\x22\x22><label for=\x22scenePlayerSpeed\x22>Player Speed</label><br>" +
+                                    "<input class=\x22form-control\x22 type=\x22number\x22 step=\x220.01\x22 id=\x22scenePlayerSpeed\x22 placeholder=\x226\x22 value=\x22" + scenePlayer.playerSpeed + "\x22></div>" +
+                                "</div>" + 
+                            "</div>" + 
+
                             "<hr/>" +
                 "</div>" +                            
                             "<button id=\x22picturesSectionButton\x22 class=\x22btn btn-sm btn-primary btn-circle btn-light float-left\x22><i class=\x22fas fa-plus-circle\x22></i> </button>" +
@@ -8837,27 +12628,28 @@ function showGroup() {
                             "<h4>Video</h4>" +
                             "<hr/>" +
                 "<div style=\x22display:none;\x22 id=\x22videoSection\x22>" +
-
-                                "<div class=\x22col form-group\x22>" +
-                                vidButtons +
-                                vidGroupButtons +
-                                "</div>" + 
-                                "<div class=\x22col form-group\x22>" +
-                                "</div>" +     
-                                "<div class=\x22col form-group\x22>" +
-                                    "<label for=\x22sceneTags\x22>YouTube Videos</label><br>" + //Tags
-                                    "<div class=\x22input-group\x22>" +
-                                        "<div class=\x22input-group-prepend\x22>" +
-                                        "<a href=\x22#\x22 class=\x22btn input-group-text\x22 id=\x22addYouTubeButton\x22>+</a>" +
-                                        "</div>" +
-                                        "<input id=\x22addYouTubeInput\x22 type=\x22text\x22 class=\x22form-control\x22 placeholder=\x22Add YouTube ID or URL\x22 aria-label=\x22Input group example\x22 aria-describedby=\x22x22addYouTubeInput\x22>" +
-                                        "<div id=\x22ytDisplay\x22>" +
-                                        "</div>" +
+                            "<div class=\x22col form-group\x22>" +
+                            vidButtons +
+                            vidGroupButtons +
+                            "</div>" + 
+                            "<div class=\x22col form-group\x22>" +
+                            "</div>" +     
+                            "<div class=\x22col form-group\x22>" +
+                                "<label for=\x22sceneTags\x22>YouTube Videos</label><br>" + //Tags
+                                "<div class=\x22input-group\x22>" +
+                                    "<div class=\x22input-group-prepend\x22>" +
+                                    "<a href=\x22#\x22 class=\x22btn input-group-text\x22 id=\x22addYouTubeButton\x22>+</a>" +
                                     "</div>" +
-                                "</div>" + 
+                                    "<input id=\x22addYouTubeInput\x22 type=\x22text\x22 class=\x22form-control\x22 placeholder=\x22Add YouTube ID or URL\x22 aria-label=\x22Input group example\x22 aria-describedby=\x22x22addYouTubeInput\x22>" +
+                                    // "<div id=\x22ytDisplay\x22>" +
+                                    // "</div>" +
+                                "</div>" +
+                            "</div>" + 
                             "<div class=\x22form-row\x22>" +
                                 sceneVids +
                                 youTubes +
+                                "<div id=\x22ytDisplay\x22>" +
+                                "</div>" +
                             "</div>" +    
                             "<hr/>" +
                 "</div>" +
@@ -8870,7 +12662,16 @@ function showGroup() {
                                 "<div class=\x22col form-group\x22>" +
                                 "</div>" +     
                                 textButtons +
+                                text_items +
                             "<br><div class=\x22form-row\x22>" +
+                                "<div class=\x22col form-group col-md-9\x22>" +
+                                    "<label for=\x22greetingText\x22>Greeting Text</label>" + //sceneGreeting
+                                    "<textarea class=\x22form-control\x22 id=\x22sceneGreeting\x22 placeholder=\x22Enter greeting text here\x22 value=\x22" + sceneGreeting + "\x22></textarea>" +
+                                "</div>" +       
+                                "<div class=\x22col form-group col-md-9\x22>" +
+                                    "<label for=\x22questText\x22>Quest Text</label>" + //sceneQuest
+                                    "<textarea class=\x22form-control\x22 id=\x22sceneQuest\x22 placeholder=\x22Enter quest text here\x22 value=\x22" + sceneQuest + "\x22></textarea>" +
+                                "</div>" +                            
                                 "<div class=\x22col form-group col-md-9\x22>" +
                                     "<label for=\x22sceneText\x22>Scene Text</label>" + //sceneText
                                     "<textarea class=\x22form-control\x22 id=\x22sceneText\x22 placeholder=\x22Enter main text here - delimit sequence breaks with '~'\x22 value=\x22" + sceneText + "\x22></textarea>" +
@@ -8981,6 +12782,10 @@ function showGroup() {
                                 "<div class=\x22col form-group col-md-2\x22>" +
                                     "<div class=\x22\x22><label for=\x22sceneTextAudioSync\x22>Sync to Audio</label><br>" +
                                     "<input class=\x22\x22 type=\x22checkbox\x22  id=\x22sceneTextAudioSync\x22 data-toggle=\x22toggle\x22 data-size=\x22sm\x22 data-on=\x22<i class='fas fa-check'></i>\x22 data-off=\x22<i class='fas fa-times'></i>\x22 data-onstyle=\x22success\x22 data-offstyle=\x22danger\x22></div>" +
+                                "</div>" +  
+                                "<div class=\x22col form-group col-md-2\x22>" +
+                                    "<div class=\x22\x22><label for=\x22sceneTextUseModals\x22>Use Modals</label><br>" +
+                                    "<input class=\x22\x22 type=\x22checkbox\x22  id=\x22sceneTextUseModals\x22 data-toggle=\x22toggle\x22 data-size=\x22sm\x22 data-on=\x22<i class='fas fa-check'></i>\x22 data-off=\x22<i class='fas fa-times'></i>\x22 data-onstyle=\x22success\x22 data-offstyle=\x22danger\x22></div>" +
                                 "</div>" +    
                             "</div>" +    
                             "<hr/>" +
@@ -8994,7 +12799,7 @@ function showGroup() {
                                 "<div class=\x22card\x22 style=\x22height:205px; width:175px;\x22>" +
                                     "<div class=\x22card-body\x22>" +
                                         "<label for=\x22sceneMasterAudioVolume\x22>Master Scene Volume</label>" + 
-                                        "<input type=\x22text\x22 class=\x22knob\x22 data-width=125 data-min=-80 data-max=20 data-angleOffset=-125 data-angleArc=250 data-fgColor=\x22#3544b1\x22 data-rotation=\x22clockwise\x22 value=\x220\x22 id=\x22sceneMasterAudioVolume\x22 value=\x22" + sceneMasterAudioVolume + "\x22 >" +
+                                        "<input type=\x22text\x22 class=\x22knob\x22 data-width=125 data-min=-80 data-max=20 data-angleOffset=-125 data-angleArc=250 data-fgColor=\x22#3544b1\x22 data-rotation=\x22clockwise\x22 value=\x22" + sceneMasterAudioVolume + "\x22 id=\x22sceneMasterAudioVolume\x22 value=\x22" + sceneMasterAudioVolume + "\x22 >" +
                                         // "<small for=\x22sceneMasterAudioVolume\x22 id=\x22typeHelp\x22 class=\x22form-text text-muted\x22>-80 to +20 db</small>" +
                                     "</div>" +
                                 "</div>" +
@@ -9021,7 +12826,7 @@ function showGroup() {
                                 "<div class=\x22card\x22 style=\x22height:205px; width:175px;\x22>" +
                                 "<div class=\x22card-body\x22>" +
                                     "<label for=\x22sceneTriggerVolume\x22>Trigger Audio Volume</label>" + 
-                                    "<input type=\x22text\x22 class=\x22knob\x22 data-width=125 data-min=-80 data-max=20 data-angleOffset=-125 data-angleArc=250 data-fgColor=\x22#3544b1\x22 data-rotation=\x22clockwise\x22 value=\x22"+sceneTriggerVolume+"\x22 id=\x22sceneTriggerVolume\x22 value=\x22" + scenePrimaryVolume + "\x22 >" +
+                                    "<input type=\x22text\x22 class=\x22knob\x22 data-width=125 data-min=-80 data-max=20 data-angleOffset=-125 data-angleArc=250 data-fgColor=\x22#3544b1\x22 data-rotation=\x22clockwise\x22 value=\x22"+sceneTriggerVolume+"\x22 id=\x22sceneTriggerVolume\x22 value=\x22" + sceneTriggerVolume + "\x22 >" +
                                     // "<small id=\x22typeHelp\x22 class=\x22form-text text-muted\x22>-80 to +20 db</small>" +
                                 "</div>" +
                                 "</div>" +
@@ -9030,7 +12835,7 @@ function showGroup() {
                                 "<div class=\x22card\x22 style=\x22height:205px; width:175px;\x22>" +
                                 "<div class=\x22card-body\x22>" +  
                                     "<label for=\x22sceneWeatherAudioVolume\x22>Weather Audio Volume</label>" + 
-                                    "<input type=\x22text\x22 class=\x22knob\x22 data-width=125 data-min=-80 data-max=20 data-angleOffset=-125 data-angleArc=250 data-fgColor=\x22#3544b1\x22 data-rotation=\x22clockwise\x22 value=\x220\x22 id=\x22sceneWeatherAudioVolume\x22 value=\x22" + scenePrimaryVolume + "\x22 >" +
+                                    "<input type=\x22text\x22 class=\x22knob\x22 data-width=125 data-min=-80 data-max=20 data-angleOffset=-125 data-angleArc=250 data-fgColor=\x22#3544b1\x22 data-rotation=\x22clockwise\x22 value=\x22" + sceneWeatherAudioVolume + "\x22 id=\x22sceneWeatherAudioVolume\x22 value=\x22" + sceneWeatherAudioVolume + "\x22 >" +
                                     // "<small id=\x22typeHelp\x22 class=\x22form-text text-muted\x22>-80 to +20 db</small>" +
                                 "</div>" +
                                 "</div>" +  
@@ -9039,7 +12844,7 @@ function showGroup() {
                                 "<div class=\x22card\x22 style=\x22height:205px; width:175px;\x22>" +
                                 "<div class=\x22card-body\x22>" +  
                                     "<label for=\x22sceneMediaAudioVolume\x22>Media Audio Volume</label>" + 
-                                    "<input type=\x22text\x22 class=\x22knob\x22 data-width=125 data-min=-80 data-max=20 data-angleOffset=-125 data-angleArc=250 data-fgColor=\x22#3544b1\x22 data-rotation=\x22clockwise\x22 value=\x220\x22 id=\x22sceneMediaAudioVolume\x22 value=\x22" + scenePrimaryVolume + "\x22 >" +
+                                    "<input type=\x22text\x22 class=\x22knob\x22 data-width=125 data-min=-80 data-max=20 data-angleOffset=-125 data-angleArc=250 data-fgColor=\x22#3544b1\x22 data-rotation=\x22clockwise\x22 value=\x22" + sceneMediaAudioVolume + "\x22 id=\x22sceneMediaAudioVolume\x22 value=\x22" + sceneMediaAudioVolume + "\x22 >" +
                                 "</div>" + 
                                 "</div>" +  
                             "</div>" +  
@@ -9052,7 +12857,9 @@ function showGroup() {
                                     "</div>" +
                                     "<img class=\x22card-img-top\x22 src=\x22" + primaryAudio.URLpng + "\x22 alt=\x22Card image cap\x22>" +
                                     "<div class=\x22card-img-overlay\x22>" +
-                                        "<br><br><a href=\x22index.html?type=saudio&iid="+ primaryAudio._id +"\x22 class=\x22badge badge-pill badge-dark float-left\x22>" + primaryAudio.title + "</a>" +
+                                        "<br><br>"+
+                                        primaryAudioSingleButton +
+                                        primaryAudioGroupButtons +
                                     "</div>" +
                                     "<ul class=\x22list-group list-group-flush\x22>"+
                                         "<li class=\x22list-group-item\x22>"+
@@ -9076,7 +12883,9 @@ function showGroup() {
                                     "</div>" +
                                     "<img class=\x22card-img-top\x22 src=\x22" + ambientAudio.URLpng + "\x22 alt=\x22Card image cap\x22>" +
                                     "<div class=\x22card-img-overlay\x22>" +
-                                        "<br><br><a href=\x22index.html?type=saudio&iid="+ ambientAudio._id +"\x22  class=\x22badge badge-pill badge-dark float-left\x22>" + ambientAudio.title + "</a>" +
+                                        "<br><br>" +//<a href=\x22index.html?type=saudio&iid="+ ambientAudio._id +"\x22  class=\x22badge badge-pill badge-dark float-left\x22>" + ambientAudio.title + "</a>" +
+                                        ambientAudioSingleButton +
+                                        ambientAudioGroupButtons +
                                     "</div>" +
                                     "<ul class=\x22list-group list-group-flush\x22>"+
                                         "<li class=\x22list-group-item\x22>"+
@@ -9096,7 +12905,9 @@ function showGroup() {
                                     "</div>" +
                                     "<img class=\x22card-img-top\x22 src=\x22" + triggerAudio.URLpng + "\x22 alt=\x22Card image cap\x22>" +
                                     "<div class=\x22card-img-overlay\x22>" +
-                                        "<br><br><a href=\x22index.html?type=saudio&iid="+ triggerAudio._id +"\x22  class=\x22badge badge-pill badge-dark float-left\x22>" + triggerAudio.title + "</a>" +
+                                        "<br><br>" + //<a href=\x22index.html?type=saudio&iid="+ triggerAudio._id +"\x22  class=\x22badge badge-pill badge-dark float-left\x22>" + triggerAudio.title + "</a>" +
+                                        triggerAudioSingleButton +
+                                        triggerAudioGroupButtons +
                                     "</div>" +
                                     "<ul class=\x22list-group list-group-flush\x22>" +
                                         "<li class=\x22list-group-item\x22>" +
@@ -9147,7 +12958,7 @@ function showGroup() {
                                     "<div class=\x22card\x22 style=\x22height:205px; width:175px;\x22>" +
                                     "<div class=\x22card-body\x22>" +  
                                         "<label for=\x22scenePrimarySynth1Volume\x22>Primary Synth 1 Volume</label>" + 
-                                        "<input type=\x22text\x22 class=\x22knob\x22 data-width=125 data-min=-80 data-max=20 data-angleOffset=-125 data-angleArc=250 data-fgColor=\x22#3544b1\x22 data-rotation=\x22clockwise\x22 value=\x220\x22 id=\x22scenePrimarySynth1Volume\x22 value=\x22" + scenePrimarySynth1Volume + "\x22 >" +
+                                        "<input type=\x22text\x22 class=\x22knob\x22 data-width=125 data-min=-80 data-max=20 data-angleOffset=-125 data-angleArc=250 data-fgColor=\x22#3544b1\x22 data-rotation=\x22clockwise\x22 value=\x22" + scenePrimarySynth1Volume + "\x22 id=\x22scenePrimarySynth1Volume\x22 value=\x22" + scenePrimarySynth1Volume + "\x22 >" +
                                         "</div>" +
                                         "</div>" +  
                                 "</div>" +
@@ -9155,7 +12966,7 @@ function showGroup() {
                                     "<div class=\x22card\x22 style=\x22height:205px; width:175px;\x22>" +
                                     "<div class=\x22card-body\x22>" +  
                                         "<label for=\x22scenePrimarySynth2Volume\x22>Primary Synth 2 Volume</label>" + 
-                                        "<input type=\x22text\x22 class=\x22knob\x22 data-width=125 data-min=-80 data-max=20 data-angleOffset=-125 data-angleArc=250 data-fgColor=\x22#3544b1\x22 data-rotation=\x22clockwise\x22 value=\x220\x22 id=\x22scenePrimarySynth2Volume\x22 value=\x22" + scenePrimarySynth2Volume + "\x22 >" +
+                                        "<input type=\x22text\x22 class=\x22knob\x22 data-width=125 data-min=-80 data-max=20 data-angleOffset=-125 data-angleArc=250 data-fgColor=\x22#3544b1\x22 data-rotation=\x22clockwise\x22 value=\x22" + scenePrimarySynth2Volume + "\x22 id=\x22scenePrimarySynth2Volume\x22 value=\x22" + scenePrimarySynth2Volume + "\x22 >" +
                                         "</div>" +
                                         "</div>" +  
                                 "</div>" +
@@ -9163,15 +12974,15 @@ function showGroup() {
                                     "<div class=\x22card\x22 style=\x22height:205px; width:175px;\x22>" +
                                     "<div class=\x22card-body\x22>" +  
                                         "<label for=\x22sceneAmbientSynth1Volume\x22>Ambient Synth 1 Volume</label>" + 
-                                        "<input type=\x22text\x22 class=\x22knob\x22 data-width=125 data-min=-80 data-max=20 data-angleOffset=-125 data-angleArc=250 data-fgColor=\x22#3544b1\x22 data-rotation=\x22clockwise\x22 value=\x220\x22 id=\x22sceneAmbientSynth1Volume\x22 value=\x22" + sceneAmbientSynth1Volume + "\x22 >" +
+                                        "<input type=\x22text\x22 class=\x22knob\x22 data-width=125 data-min=-80 data-max=20 data-angleOffset=-125 data-angleArc=250 data-fgColor=\x22#3544b1\x22 data-rotation=\x22clockwise\x22 value=\x22" + sceneAmbientSynth1Volume + "\x22 id=\x22sceneAmbientSynth1Volume\x22 value=\x22" + sceneAmbientSynth1Volume + "\x22 >" +
                                         "</div>" +
                                         "</div>" +  
                                 "</div>" +
                                 "<div class=\x22col form-group col-md-2\x22>" +
                                 "<div class=\x22card\x22 style=\x22height:205px; width:175px;\x22>" +
                                     "<div class=\x22card-body\x22>" +  
-                                        "<label for=\x22sceneAmbientSynth1Volume\x22>Ambient Synth 2 Volume</label>" + 
-                                        "<input type=\x22text\x22 class=\x22knob\x22 data-width=125 data-min=-80 data-max=20 data-angleOffset=-125 data-angleArc=250 data-fgColor=\x22#3544b1\x22 data-rotation=\x22clockwise\x22 value=\x220\x22 id=\x22sceneAmbientSynth2Volume\x22 value=\x22" + sceneAmbientSynth2Volume + "\x22 >" +
+                                        "<label for=\x22sceneAmbientSynth2Volume\x22>Ambient Synth 2 Volume</label>" + 
+                                        "<input type=\x22text\x22 class=\x22knob\x22 data-width=125 data-min=-80 data-max=20 data-angleOffset=-125 data-angleArc=250 data-fgColor=\x22#3544b1\x22 data-rotation=\x22clockwise\x22 value=\x22"+ sceneAmbientSynth2Volume +"\x22 id=\x22sceneAmbientSynth2Volume\x22 value=\x22" + sceneAmbientSynth2Volume + "\x22 >" +
                                         "</div>" +
                                         "</div>" +  
                                 "</div>" +
@@ -9179,7 +12990,7 @@ function showGroup() {
                                     "<div class=\x22card\x22 style=\x22height:205px; width:175px;\x22>" +
                                     "<div class=\x22card-body\x22>" +  
                                         "<label for=\x22sceneTriggerSynth1Volume\x22>Trigger Synth 1 Volume</label>" + 
-                                        "<input type=\x22text\x22 class=\x22knob\x22 data-width=125 data-min=-80 data-max=20 data-angleOffset=-125 data-angleArc=250 data-fgColor=\x22#3544b1\x22 data-rotation=\x22clockwise\x22 value=\x220\x22 id=\x22sceneTriggerSynth1Volume\x22 value=\x22" + sceneTriggerSynth1Volume + "\x22 >" +
+                                        "<input type=\x22text\x22 class=\x22knob\x22 data-width=125 data-min=-80 data-max=20 data-angleOffset=-125 data-angleArc=250 data-fgColor=\x22#3544b1\x22 data-rotation=\x22clockwise\x22 value=\x22"+ sceneTriggerSynth1Volume +"\x22 id=\x22sceneTriggerSynth1Volume\x22 value=\x22" + sceneTriggerSynth1Volume + "\x22 >" +
                                         "</div>" +
                                         "</div>" +  
                                 "</div>" +
@@ -9187,7 +12998,7 @@ function showGroup() {
                                 "<div class=\x22card\x22 style=\x22height:205px; width:175px;\x22>" +
                                     "<div class=\x22card-body\x22>" +  
                                         "<label for=\x22sceneTriggerSynth2Volume\x22>Trigger Synth 2 Volume</label>" + 
-                                        "<input type=\x22text\x22 class=\x22knob\x22 data-width=125 data-min=-80 data-max=20 data-angleOffset=-125 data-angleArc=250 data-fgColor=\x22#3544b1\x22 data-rotation=\x22clockwise\x22 value=\x220\x22 id=\x22sceneTriggerSynth2Volume\x22 value=\x22" + sceneTriggerSynth2Volume + "\x22 >" +
+                                        "<input type=\x22text\x22 class=\x22knob\x22 data-width=125 data-min=-80 data-max=20 data-angleOffset=-125 data-angleArc=250 data-fgColor=\x22#3544b1\x22 data-rotation=\x22clockwise\x22 value=\x22" + sceneTriggerSynth2Volume + "\x22 id=\x22sceneTriggerSynth2Volume\x22 value=\x22" + sceneTriggerSynth2Volume + "\x22 >" +
                                         "</div>" +
                                         "</div>" +  
                                 "</div>" + 
@@ -9266,7 +13077,7 @@ function showGroup() {
                                 "</div>" + 
                                 "<div class=\x22col form-group col-md-1\x22>" +
                                     "<label for=\x22sceneAmbientSequence1Transpose\x22>Transpose</label>" +
-                                    "<input type=\x22number\x22 class=\x22form-control\x22 aria-describedby=\x22sceneAmbientPatch2\x22 id=\x22sceneAmbientSequence1Transpose\x22 value=\x22" + sceneAmbientSequence1Transpose + "\x22>" +
+                                    "<input type=\x22number\x22 class=\x22form-control\x22 aria-describedby=\x22sceneAmbientSequence1Transpose\x22 id=\x22sceneAmbientSequence1Transpose\x22 value=\x22" + sceneAmbientSequence1Transpose + "\x22>" +
                                 "</div>" + 
                                 "<div class=\x22col form-group col-md-2\x22>" +
                                     "<div class=\x22\x22><label for=\x22sceneAmbientSynth1ModulateByDistanceTarget\x22>Target Distance Mod</label><br>" + 
@@ -9297,7 +13108,7 @@ function showGroup() {
                                 "</div>" + 
                                 "<div class=\x22col form-group col-md-1\x22>" +
                                     "<label for=\x22sceneAmbientSequence2Transpose\x22>Transpose</label>" +
-                                    "<input type=\x22number\x22 class=\x22form-control\x22 aria-describedby=\x22beatsPerMinute\x22 id=\x22sceneAmbientSequence2Transpose\x22 value=\x22" + sceneAmbientSequence2Transpose + "\x22>" +
+                                    "<input type=\x22number\x22 class=\x22form-control\x22 aria-describedby=\x22sceneAmbientSequence2Transpose\x22 id=\x22sceneAmbientSequence2Transpose\x22 value=\x22" + sceneAmbientSequence2Transpose + "\x22>" +
                                 "</div>" + 
                                 "<div class=\x22col form-group col-md-2\x22>" +
                                     "<div class=\x22\x22><label for=\x22sceneAmbientSynth2ModulateByDistanceTarget\x22>Target Distance Mod</label><br>" + 
@@ -9395,12 +13206,8 @@ function showGroup() {
                                 "</div>" +  
      
                                 "<div class=\x22col form-group col-md-2\x22> " +
-                                    "<label for=\x22sceneHighlightColor\x22>Highlight Color</label>" + 
-                                    "<input id=\x22sceneHighlightColor\x22 class=\x22form-control\x22 type=\x22color\x22>" +
-                                "</div>" +
-                                "<div class=\x22col form-group col-md-2\x22> " +
-                                    "<label for=\x22sceneColor1\x22>Scene Color 1</label>" + 
-                                    "<input id=\x22sceneColor1\x22 class=\x22form-control\x22 type=\x22color\x22>" +
+                                "<label for=\x22sceneColor1\x22>Scene Color 1</label>" + 
+                                "<input id=\x22sceneColor1\x22 class=\x22form-control\x22 type=\x22color\x22>" +
                                 "</div>" +
                                 "<div class=\x22col form-group col-md-2\x22> " +
                                     "<label for=\x22sceneColor2\x22>Scene Color 2</label>" + 
@@ -9409,6 +13216,34 @@ function showGroup() {
                                 "<div class=\x22col form-group col-md-2\x22> " +
                                     "<label for=\x22sceneColor3\x22>Scene Color 3</label>" + 
                                     "<input id=\x22sceneColor3\x22 class=\x22form-control\x22 type=\x22color\x22>" +
+                                "</div>" +
+                                "<div class=\x22col form-group col-md-2\x22> " +
+                                    "<label for=\x22sceneColor4\x22>Scene Color 4</label>" + 
+                                    "<input id=\x22sceneColor4\x22 class=\x22form-control\x22 type=\x22color\x22>" +
+                                "</div>" +
+                            "</div>" +
+                            "<div class=\x22form-row\x22>" +
+                                "<div class=\x22col form-group col-md-2\x22> " +
+                                   
+                                "</div>" +
+                                "<div class=\x22col form-group col-md-2\x22> " +
+                                  
+                                "</div>" +
+                                "<div class=\x22col form-group col-md-2\x22> " +
+                                    "<label for=\x22sceneColor1Alt\x22>Scene Color 1 Alt</label>" + 
+                                    "<input id=\x22sceneColor1Alt\x22 class=\x22form-control\x22 type=\x22color\x22>" +
+                                "</div>" +
+                                "<div class=\x22col form-group col-md-2\x22> " +
+                                    "<label for=\x22sceneColor2Alt\x22>Scene Color 2 Alt</label>" + 
+                                    "<input id=\x22sceneColor2Alt\x22 class=\x22form-control\x22 type=\x22color\x22>" +
+                                "</div>" +
+                                "<div class=\x22col form-group col-md-2\x22> " +
+                                    "<label for=\x22sceneColor3Alt\x22>Scene Color 3 Alt</label>" + 
+                                    "<input id=\x22sceneColor3Alt\x22 class=\x22form-control\x22 type=\x22color\x22>" +
+                                "</div>" +
+                                "<div class=\x22col form-group col-md-2\x22> " +
+                                    "<label for=\x22sceneColor4Alt\x22>Scene Color 4 Alt</label>" + 
+                                    "<input id=\x22sceneColor4Alt\x22 class=\x22form-control\x22 type=\x22color\x22>" +
                                 "</div>" +
                             "</div>" +
                             "<hr/>" +
@@ -9442,8 +13277,12 @@ function showGroup() {
                                     "<option value=\x22\x22 disabled selected>Select:</option>" +
                                     "<option>None</option>" +
                                     "<option>Dust</option>" +
+                                    "<option>Rain</option>" +
+                                    "<option>Snow</option>" +
                                     "<option>Smoke</option>" +
-                                    "<option>Lights</option>" +
+                                    "<option>Fog</option>" +
+                                    "<option>Clouds</option>" +
+                                    "<option>Stars</option>" +
                                     "</select>" +
                                 "</div>" +
                             "</div>" +
@@ -9496,11 +13335,11 @@ function showGroup() {
                                 "</div>" +
                                 "<div class=\x22col form-group col-md-1\x22>" +
                                     "<label for=\x22sceneWindFactor\x22>Wind X</label>" +
-                                    "<input type=\x22number\x22 class=\x22form-control\x22 aria-describedby=\x22beatsPerMinute\x22 id=\x22sceneWindFactor\x22 value=\x22" + sceneWindFactor + "\x22>" +
+                                    "<input type=\x22number\x22 step=\x220.01\x22class=\x22form-control\x22 aria-describedby=\x22beatsPerMinute\x22 id=\x22sceneWindFactor\x22 value=\x22" + sceneWindFactor + "\x22>" +
                                 "</div>" + 
                                 "<div class=\x22col form-group col-md-1\x22>" +
                                     "<label for=\x22sceneLightningFactor\x22>Lightning X</label>" +
-                                    "<input type=\x22number\x22 class=\x22form-control\x22 aria-describedby=\x22beatsPerMinute\x22 id=\x22sceneLightningFactor\x22 value=\x22" + sceneLightningFactor + "\x22>" +
+                                    "<input type=\x22number\x22 step=\x220.01\x22 class=\x22form-control\x22 aria-describedby=\x22beatsPerMinute\x22 id=\x22sceneLightningFactor\x22 value=\x22" + sceneLightningFactor + "\x22>" +
                                 "</div>" + 
                             "</div>" +
                             "<div class=\x22form-row\x22>" +   
@@ -9526,13 +13365,13 @@ function showGroup() {
                                 "</div>" +  
                                 "<div class=\x22col form-group col-md-1\x22>" +
                                     "<label for=\x22sceneGlobalFogDensity\x22>Fog Density</label>" +
-                                    "<input type=\x22number\x22 step=\x220.001\x22 class=\x22form-control\x22 aria-describedby=\x22beatsPerMinute\x22 id=\sceneGlobalFogDensity\x22 value=\x22" + sceneGlobalFogDensity + "\x22>" +
+                                    "<input type=\x22number\x22 step=\x220.001\x22 class=\x22form-control\x22 aria-describedby=\x22sceneGlobalFogDensity\x22 id=\x22sceneGlobalFogDensity\x22 value=\x22" + sceneGlobalFogDensity + "\x22>" +
                                 "</div>" + 
                             "</div>" +
                             "<hr/>" +
             "</div>" +
                             "<button id=\x22groundSectionButton\x22 class=\x22btn btn-sm btn-primary btn-circle btn-light float-left\x22><i class=\x22fas fa-plus-circle\x22></i> </button>" +
-                            "<h4>Ground</h4>" +
+                            "<h4>Environment</h4>" +
                             "<hr/>" +  
             "<div style=\x22display:none;\x22 id=\x22groundSection\x22>" +
                             "<div class=\x22form-row\x22>" +  
@@ -9574,11 +13413,33 @@ function showGroup() {
                                     "<select class=\x22form-control\x22 id=\x22sceneHeightmapSelect\x22 >" +
                                     "<option value=\x22\x22 disabled selected>Select:</option>" +
                                     "<option>none</option>" +
+                                    "<option>random</option>" +
+                                    "<option>loweasy</option>" +
+                                    "<option>easyhills1</option>" +
+                                    "<option>easyhills2</option>" +
+                                    "<option>strangehills1</option>" +
+                                    "<option>strangehills2</option>" +
+                                    "<option>atoll1</option>" +
+                                    "<option>bigisland1</option>" +
+                                    "<option>lowisland2</option>" +
+                                    "<option>monument1</option>" +
+                                    "<option>Islands10061</option>" +
+                                    "<option>Islands10062</option>" +
+                                    "<option>Islands10063</option>" +
+                                    "<option>Islands10064</option>" +
+                                    "<option>island1</option>" +
+                                    "<option>island3</option>" +
+                                    "<option>island4</option>" +
+                                    "<option>hm3</option>" +
+                                    "<option>hm4</option>" +
+                                    "<option>hm5</option>" +
+                                    "<option>beach1</option>" +
+                                    "<option>plaza1</option>" +
                                     "</select>" +
                                 "</div>" +  
                                 "<div class=\x22col form-group col-md-2\x22>" +
-                                    "<label for=\x22sceneHeightmap\x22>Heightmap </label>" +
-                                    "<input type=\text\x22 class=\x22form-control\x22 aria-describedby=\x22sceneHeightmap\x22 id=\x22sceneHeightmap\x22 value=\x22" + sceneHeightmap + "\x22>" +
+                                    "<label for=\x22sceneHeightmapName\x22>Heightmap </label>" +
+                                    "<input type=\text\x22 class=\x22form-control\x22 aria-describedby=\x22sceneHeightmap\x22 id=\x22sceneHeightmapName\x22 value=\x22" + sceneHeightmap.name + "\x22>" +
                                 "</div>" + 
                             "</div>" +  
                             "<div class=\x22form-row\x22>" +  
@@ -9604,21 +13465,26 @@ function showGroup() {
                                     "<div class=\x22\x22><label for=\x22sceneUseFloorPlane\x22>Use Floorplane</label><br>" +
                                     "<input class=\x22\x22 type=\x22checkbox\x22  id=\x22sceneUseFloorPlane\x22 data-toggle=\x22toggle\x22 data-size=\x22sm\x22 data-on=\x22<i class='fas fa-check'></i>\x22 data-off=\x22<i class='fas fa-times'></i>\x22 data-onstyle=\x22success\x22 data-offstyle=\x22danger\x22></div>" +
                                 "</div>" + 
-                                "<div class=\x22col form-group col-md-2\x22>" +
-                                    "<div class=\x22\x22><label for=\x22sceneRenderFloorPlane\x22>Render Floorplane</label><br>" +
-                                    "<input class=\x22\x22 type=\x22checkbox\x22  id=\x22sceneRenderFloorPlane\x22 data-toggle=\x22toggle\x22 data-size=\x22sm\x22 data-on=\x22<i class='fas fa-check'></i>\x22 data-off=\x22<i class='fas fa-times'></i>\x22 data-onstyle=\x22success\x22 data-offstyle=\x22danger\x22></div>" +
-                                "</div>" +
+                                // "<div class=\x22col form-group col-md-2\x22>" +
+                                //     "<div class=\x22\x22><label for=\x22sceneRenderFloorPlane\x22>Render Floorplane</label><br>" +
+                                //     "<input class=\x22\x22 type=\x22checkbox\x22  id=\x22sceneRenderFloorPlane\x22 data-toggle=\x22toggle\x22 data-size=\x22sm\x22 data-on=\x22<i class='fas fa-check'></i>\x22 data-off=\x22<i class='fas fa-times'></i>\x22 data-onstyle=\x22success\x22 data-offstyle=\x22danger\x22></div>" +
+                                // "</div>" +
                                 "<div class=\x22col form-group col-md-2\x22>" +
                                     "<label for=\x22sceneFloorplaneTexture\x22>Floorplane Texture</label>" +
                                     "<select class=\x22form-control\x22 id=\x22sceneFloorplaneTexture\x22 >" +
                                     "<option value=\x22\x22 disabled selected>Select:</option>" +
                                     "<option>none</option>" +
-                                    // "<option>Water 1 (easy)</option>" +
-                                    // "<option>Water 2 (medium)</option>" +
-                                    // "<option>Ocean Water (medium)</option>" +
-                                    // "<option>Fancy Water (heavy)</option>" +
+                                    "<option>Flat</option>" +
+                                    "<option>Grid</option>" +
+                                    "<option>Concrete</option>" +
+                                    "<option>Dirt</option>" +
+
                                     "</select>" +
                                 "</div>" +  
+                                "<div class=\x22col form-group col-md-1\x22>" +
+                                    "<label for=\x22sceneGroundLevel\x22>Ground Level</label>" +
+                                    "<input type=\x22number\x22 step=\x220.01\x22 class=\x22form-control\x22 aria-describedby=\x22sceneGroundLevel\x22 id=\x22sceneGroundLevel\x22 value=\x22" + sceneGroundLevel + "\x22>" +
+                                "</div>" + 
                                 // "<div class=\x22col form-group col-md-1\x22>" +
                                 //     "<div class=\x22\x22><label for=\x22sceneUseUWFX\x22>Use UWFX</label><br>" +
                                 //     "<input class=\x22\x22 type=\x22checkbox\x22  id=\x22sceneUseUWFX\x22 data-toggle=\x22toggle\x22 data-size=\x22sm\x22 data-on=\x22<i class='fas fa-check'></i>\x22 data-off=\x22<i class='fas fa-times'></i>\x22 data-onstyle=\x22success\x22 data-offstyle=\x22danger\x22></div>" +
@@ -9642,24 +13508,24 @@ function showGroup() {
                             "</div>" +                 
 
                             "<div class=\x22form-row\x22>" +  
-                                "<div class=\x22col form-group col-md-1\x22>" +
-                                    "<div class=\x22\x22><label for=\x22sceneUseStaticObj\x22>Use Static Obj</label><br>" +
-                                    "<input class=\x22\x22 type=\x22checkbox\x22  id=\x22sceneUseStaticObj\x22 data-toggle=\x22toggle\x22 data-size=\x22sm\x22 data-on=\x22<i class='fas fa-check'></i>\x22 data-off=\x22<i class='fas fa-times'></i>\x22 data-onstyle=\x22success\x22 data-offstyle=\x22danger\x22></div>" +
-                                "</div>" +  
-                                "<div class=\x22col form-group col-md-2\x22>" +
-                                    "<label for=\x22sceneStaticObjURL\x22>Obj URL</label>" +
-                                    "<select class=\x22form-control\x22 id=\x22sceneStaticObjURL\x22 >" +
-                                    "<option value=\x22\x22 disabled selected>Select:</option>" +
-                                    "<option>none</option>" +
-                                    "</select>" +
-                                "</div>" +  
-                                "<div class=\x22col form-group col-md-2\x22>" +
-                                    "<label for=\x22sceneSelectObj\x22>Select Obj </label>" +
-                                    "<input type=\text\x22 class=\x22form-control\x22 aria-describedby=\x22sceneSelectObj\x22 id=\x22sceneSelectObj\x22 value=\x22" + sceneStaticObj + "\x22>" +
-                                "</div>" + 
-                                "<div class=\x22col form-group col-md-1\x22>" +
-                                //spacer
-                                "</div>" + 
+                                    // "<div class=\x22col form-group col-md-1\x22>" +
+                                    //     "<div class=\x22\x22><label for=\x22sceneUseStaticObj\x22>Use Static Obj</label><br>" +
+                                    //     "<input class=\x22\x22 type=\x22checkbox\x22  id=\x22sceneUseStaticObj\x22 data-toggle=\x22toggle\x22 data-size=\x22sm\x22 data-on=\x22<i class='fas fa-check'></i>\x22 data-off=\x22<i class='fas fa-times'></i>\x22 data-onstyle=\x22success\x22 data-offstyle=\x22danger\x22></div>" +
+                                    // "</div>" +  
+                                    // "<div class=\x22col form-group col-md-2\x22>" +
+                                    //     "<label for=\x22sceneStaticObjURL\x22>Obj URL</label>" +
+                                    //     "<select class=\x22form-control\x22 id=\x22sceneStaticObjURL\x22 >" +
+                                    //     "<option value=\x22\x22 disabled selected>Select:</option>" +
+                                    //     "<option>none</option>" +
+                                    //     "</select>" +
+                                    // "</div>" +  
+                                    // "<div class=\x22col form-group col-md-2\x22>" +
+                                    //     "<label for=\x22sceneSelectObj\x22>Select Obj </label>" +
+                                    //     "<input type=\text\x22 class=\x22form-control\x22 aria-describedby=\x22sceneSelectObj\x22 id=\x22sceneSelectObj\x22 value=\x22" + sceneStaticObj + "\x22>" +
+                                    // "</div>" + 
+                                    // "<div class=\x22col form-group col-md-1\x22>" +
+                                    // //spacer
+                                    // "</div>" + 
                                 "<div class=\x22col form-group col-md-1\x22>" +
                                     "<div class=\x22\x22><label for=\x22sceneUseUWFX\x22>Use UWFX</label><br>" +
                                     "<input class=\x22\x22 type=\x22checkbox\x22  id=\x22sceneUseUWFX\x22 data-toggle=\x22toggle\x22 data-size=\x22sm\x22 data-on=\x22<i class='fas fa-check'></i>\x22 data-off=\x22<i class='fas fa-times'></i>\x22 data-onstyle=\x22success\x22 data-offstyle=\x22danger\x22></div>" +
@@ -9677,10 +13543,13 @@ function showGroup() {
                                 "</div>" +  
                                 "<div class=\x22col form-group col-md-1\x22>" +
                                     "<label for=\x22sceneWaterLevel\x22>Water Level</label>" +
-                                    "<input type=\x22number\x22 class=\x22form-control\x22 aria-describedby=\x22sceneWaterLevel\x22 id=\x22sceneWaterLevel\x22 value=\x22" + sceneWaterLevel + "\x22>" +
+                                    "<input type=\x22number\x22 step=\x220.01\x22 class=\x22form-control\x22 aria-describedby=\x22sceneWaterLevel\x22 id=\x22sceneWaterLevel\x22 value=\x22" + sceneWaterLevel + "\x22>" +
                                 "</div>" + 
-                            "</div>" +  
-                            "<div class=\x22form-row\x22>" +  
+                                "<div class=\x22col form-group col-md-1\x22>" +
+                                //spacer
+                                "</div>" + 
+                            // "</div>" +  
+                            // "<div class=\x22form-row\x22>" +  
                                 "<div class=\x22col form-group col-md-3\x22>" +
                                     "<label for=\x22sceneWebXREnvironment\x22>WebXR Environment</label>" +
                                     "<select class=\x22form-control\x22 id=\x22sceneWebXREnvironment\x22 >" +
@@ -9729,7 +13598,7 @@ function showGroup() {
                                    
                                         // "<div class=\x22col form-group col-md-6\x22>" +
                                         "<label for=\x22sceneScatterOffset\x22>Scatter Offset</label>" +
-                                        "<input type=\x22text\x22 class=\x22form-control\x22 aria-describedby=\x22sceneScatterOffset\x22 id=\x22sceneScatterOffset\x22 value=\x22" + response.data.sceneScatterOffset + "\x22>" +
+                                        "<input type=\x22text\x22 class=\x22form-control\x22 aria-describedby=\x22sceneScatterOffset\x22 id=\x22sceneScatterOffset\x22 value=\x22" + sceneScatterOffset + "\x22>" +
                                     // "</div>" + 
                                 
                                     "</div>" + 
@@ -9744,7 +13613,7 @@ function showGroup() {
                             
                             "<div class=\x22form-row\x22>" +
                                 "<div class=\x22col form-group col-md-11\x22> " +
-                                "<label for=\x22scatterMeshLayerBtns\x22> Object Layers </label>" + //alignement
+                                "<label for=\x22scatterMeshLayerBtns\x22>Scatter Object Layers </label>" + //alignement
                                 "<br><div id=\x22scatterMeshLayerBtns\x22 class=\x22btn-group btn-group-toggle flex-wrap\x22 data-toggle=\x22buttons\x22>" +
                                     "<label class=\x22btn btn-light \x22>" +
                                     "<input type=\x22checkbox\x22 name=\x22sceneMeshLayers\x22 value=\x22picobj\x22 id=\x22sceneScatterObjectLayers.picobj\x22 autocomplete=\x22off\x22> Pictures " +
@@ -9777,13 +13646,16 @@ function showGroup() {
                                         "<input type=\x22checkbox\x22 name=\x22sceneMeshLayers\x22 value=\x22drops\x22 id=\x22sceneScatterObjectLayers.drops\x22 autocomplete=\x22off\x22> Drops " +
                                     "</label>" +
                                     "<label class=\x22btn btn-light\x22>" +
-                                        "<input type=\x22checkbox\x22 name=\x22sceneMeshLayers\x22 value=\x22players\x22 id=\x22sceneScatterObjectLayers.players\x22 autocomplete=\x22off\x22> Player Locs " +
+                                        "<input type=\x22checkbox\x22 name=\x22sceneMeshLayers\x22 value=\x22players\x22 id=\x22sceneScatterObjectLayers.players\x22 autocomplete=\x22off\x22> Players " +
                                     "</label>" +
                                     "<label class=\x22btn btn-light\x22>" +
-                                        "<input type=\x22checkbox\x22 name=\x22sceneMeshLayers\x22 value=\x22characters\x22 id=\x22sceneScatterObjectLayers.characters\x22 autocomplete=\x22off\x22> Character Locs " +
+                                        "<input type=\x22checkbox\x22 name=\x22sceneMeshLayers\x22 value=\x22characters\x22 id=\x22sceneScatterObjectLayers.characters\x22 autocomplete=\x22off\x22> Characters " +
                                     "</label>" +
-                                        "<label class=\x22btn btn-light\x22>" +
-                                        "<input type=\x22checkbox\x22 name=\x22sceneMeshLayers\x22 value=\x22waypoints\x22 id=\x22sceneScatterObjectLayers.waypoints\x22 autocomplete=\x22off\x22> Waypoint Locs " +
+                                    "<label class=\x22btn btn-light\x22>" +
+                                        "<input type=\x22checkbox\x22 name=\x22sceneMeshLayers\x22 value=\x22waypoints\x22 id=\x22sceneScatterObjectLayers.waypoints\x22 autocomplete=\x22off\x22> Waypoints " +
+                                    "</label>" +
+                                    "<label class=\x22btn btn-light\x22>" +
+                                        "<input type=\x22checkbox\x22 name=\x22sceneMeshLayers\x22 value=\x22equipment\x22 id=\x22sceneScatterObjectLayers.equipment\x22 autocomplete=\x22off\x22> Equipment " +
                                     "</label>" +
                                 "</div>" +
                                 // "</div>" +
@@ -9819,8 +13691,8 @@ function showGroup() {
                                 "</div>" + 
 
                                 "<div class=\x22col form-group col-md-1\x22>" +
-                                    "<label for=\x22sceneScatterOffset\x22>Scatter Offset</label>" +
-                                    "<input type=\x22text\x22 class=\x22form-control\x22 aria-describedby=\x22sceneScatterOffset\x22 id=\x22sceneScatterOffset\x22 value=\x22" + response.data.sceneScatterOffset + "\x22>" +
+                                    // "<label for=\x22sceneScatterOffset\x22>Scatter Offset</label>" +
+                                    // "<input type=\x22text\x22 class=\x22form-control\x22 aria-describedby=\x22sceneScatterOffset\x22 id=\x22sceneScatterOffset\x22 value=\x22" + response.data.sceneScatterOffset + "\x22>" +
                                 "</div>" + 
                                 "<div class=\x22col form-group col-md-5\x22>" +
                                 sceneMdls +
@@ -9830,47 +13702,60 @@ function showGroup() {
                             "<div class=\x22form-row\x22>" +
 
                                 "<div class=\x22col form-group col-md-12\x22> " +
-                                    "<label for=\x22scatterMeshLayerBtns\x22> Model Layers </label><br>" + 
+                                    "<label for=\x22scatterMeshLayerBtns\x22>Scatter Model Layers </label><br>" + 
                                     "<div id=\x22scatterMeshLayerBtns\x22 class=\x22btn-group btn-group-toggle flex-wrap\x22 data-toggle=\x22buttons\x22>" +
                                         "<label class=\x22btn btn-light \x22>" +
-                                            "<input type=\x22checkbox\x22 name=\x22sceneMeshLayers\x22 value=\x22crystal\x22 id=\x22sceneScatterMeshLayers.crystal\x22 autocomplete=\x22off\x22> Crystal " +
+                                            "<input type=\x22checkbox\x22 name=\x22sceneMeshLayers\x22 value=\x22crystal\x22 id=\x22sceneScatterMeshLayers.grass1\x22 autocomplete=\x22off\x22> Grass1 " +
+                                        "</label>" +
+                                        "<label class=\x22btn btn-light \x22>" +
+                                            "<input type=\x22checkbox\x22 name=\x22sceneMeshLayers\x22 value=\x22crystal\x22 id=\x22sceneScatterMeshLayers.grass2\x22 autocomplete=\x22off\x22> Grass2 " +
+                                        "</label>" +
+                                            "<label class=\x22btn btn-light \x22>" +
+                                            "<input type=\x22checkbox\x22 name=\x22sceneMeshLayers\x22 value=\x22crystal\x22 id=\x22sceneScatterMeshLayers.grass3\x22 autocomplete=\x22off\x22> Grass3 " +
                                         "</label>" +
                                         "<label class=\x22btn btn-light\x22>" +
-                                            "<input type=\x22checkbox\x22 name=\x22sceneMeshLayers\x22 value=\x22conifer\x22 id=\x22sceneScatterMeshLayers.conifer\x22 autocomplete=\x22off\x22> Conifers " +
+                                            "<input type=\x22checkbox\x22 name=\x22sceneMeshLayers\x22 value=\x22flower1\x22 id=\x22sceneScatterMeshLayers.flower1\x22 autocomplete=\x22off\x22> Flowers1 " +
                                         "</label>" +
                                         "<label class=\x22btn btn-light\x22>" +
-                                            "<input type=\x22checkbox\x22 name=\x22sceneMeshLayers\x22 value=\x22rock\x22 id=\x22sceneScatterMeshLayers.rock\x22 autocomplete=\x22off\x22> Rocks " +
+                                            "<input type=\x22checkbox\x22 name=\x22sceneMeshLayers\x22 value=\x22flower2\x22 id=\x22sceneScatterMeshLayers.flower2\x22 autocomplete=\x22off\x22> Flowers2 " +
                                         "</label>" +
                                         "<label class=\x22btn btn-light\x22>" +
-                                            "<input type=\x22checkbox\x22 name=\x22sceneMeshLayers\x22 value=\x22tree2\x22 id=\x22sceneScatterMeshLayers.tree2\x22 autocomplete=\x22off\x22> Oaks " +
+                                            "<input type=\x22checkbox\x22 name=\x22sceneMeshLayers\x22 value=\x22flower3\x22 id=\x22sceneScatterMeshLayers.flower3\x22 autocomplete=\x22off\x22> Flowers3 " +
                                         "</label>" +
                                         "<label class=\x22btn btn-light\x22>" +
-                                            "<input type=\x22checkbox\x22 name=\x22sceneMeshLayers\x22 value=\x22redflower\x22 id=\x22sceneScatterMeshLayers.redflower\x22 autocomplete=\x22off\x22> Red Flowers " +
+                                            "<input type=\x22checkbox\x22 name=\x22sceneMeshLayers\x22 value=\x22conifer\x22 id=\x22sceneScatterMeshLayers.conifer1\x22 autocomplete=\x22off\x22> Conifers1 " +
+                                        "</label>" +
+                                            "<label class=\x22btn btn-light\x22>" +
+                                            "<input type=\x22checkbox\x22 name=\x22sceneMeshLayers\x22 value=\x22conifer\x22 id=\x22sceneScatterMeshLayers.conifer2\x22 autocomplete=\x22off\x22> Conifers2 " +
                                         "</label>" +
                                         "<label class=\x22btn btn-light\x22>" +
-                                            "<input type=\x22checkbox\x22 name=\x22sceneMeshLayers\x22 value=\x22fern\x22 id=\x22sceneScatterMeshLayers.fern\x22 autocomplete=\x22off\x22> Ferns " +
+                                            "<input type=\x22checkbox\x22 name=\x22sceneMeshLayers\x22 value=\x22conifer\x22 id=\x22sceneScatterMeshLayers.deciduous1\x22 autocomplete=\x22off\x22> Deciduous1 " +
                                         "</label>" +
                                         "<label class=\x22btn btn-light\x22>" +
-                                            "<input type=\x22checkbox\x22 name=\x22sceneMeshLayers\x22 value=\x22grass1\x22 id=\x22sceneScatterMeshLayers.grass1\x22 autocomplete=\x22off\x22> Grass " +
+                                            "<input type=\x22checkbox\x22 name=\x22sceneMeshLayers\x22 value=\x22conifer\x22 id=\x22sceneScatterMeshLayers.deciduous2\x22 autocomplete=\x22off\x22> Deciduous2 " +
                                         "</label>" +
                                         "<label class=\x22btn btn-light\x22>" +
-                                            "<input type=\x22checkbox\x22 name=\x22sceneMeshLayers\x22 value=\x22bush\x22 id=\x22sceneScatterMeshLayers.bush\x22 autocomplete=\x22off\x22> Bushes " +
+                                            "<input type=\x22checkbox\x22 name=\x22sceneMeshLayers\x22 value=\x22conifer\x22 id=\x22sceneScatterMeshLayers.tropical1\x22 autocomplete=\x22off\x22> Tropical1 " +
                                         "</label>" +
                                         "<label class=\x22btn btn-light\x22>" +
-                                            "<input type=\x22checkbox\x22 name=\x22sceneMeshLayers\x22 value=\x22rock2\x22 id=\x22sceneScatterMeshLayers.rock2\x22 autocomplete=\x22off\x22> Moar Rocks " +
+                                            "<input type=\x22checkbox\x22 name=\x22sceneMeshLayers\x22 value=\x22conifer\x22 id=\x22sceneScatterMeshLayers.tropical2\x22 autocomplete=\x22off\x22> Tropical2 " +
                                         "</label>" +
                                         "<label class=\x22btn btn-light\x22>" +
-                                            "<input type=\x22checkbox\x22 name=\x22sceneMeshLayers\x22 value=\x22palm1\x22 id=\x22sceneScatterMeshLayers.palm1\x22 autocomplete=\x22off\x22> Palms " +
+                                            "<input type=\x22checkbox\x22 name=\x22sceneMeshLayers\x22 value=\x22fern\x22 id=\x22sceneScatterMeshLayers.fern1\x22 autocomplete=\x22off\x22> Ferns " +
                                         "</label>" +
                                         "<label class=\x22btn btn-light\x22>" +
-                                            "<input type=\x22checkbox\x22 name=\x22sceneMeshLayers\x22 value=\x22flower1\x22 id=\x22sceneScatterMeshLayers.flower1\x22 autocomplete=\x22off\x22> Flowers 1 " +
+                                            "<input type=\x22checkbox\x22 name=\x22sceneMeshLayers\x22 value=\x22bush\x22 id=\x22sceneScatterMeshLayers.bush1\x22 autocomplete=\x22off\x22> Bushes " +
                                         "</label>" +
                                         "<label class=\x22btn btn-light\x22>" +
-                                            "<input type=\x22checkbox\x22 name=\x22sceneMeshLayers\x22 value=\x22flower2\x22 id=\x22sceneScatterMeshLayers.flower2\x22 autocomplete=\x22off\x22> Flowers 2 " +
+                                            "<input type=\x22checkbox\x22 name=\x22sceneMeshLayers\x22 value=\x22rock\x22 id=\x22sceneScatterMeshLayers.rock1\x22 autocomplete=\x22off\x22> Rocks1 " +
                                         "</label>" +
                                         "<label class=\x22btn btn-light\x22>" +
-                                            "<input type=\x22checkbox\x22 name=\x22sceneMeshLayers\x22 value=\x22flower3\x22 id=\x22sceneScatterMeshLayers.flower3\x22 autocomplete=\x22off\x22> Flowers 3 " +
+                                            "<input type=\x22checkbox\x22 name=\x22sceneMeshLayers\x22 value=\x22rock2\x22 id=\x22sceneScatterMeshLayers.rock2\x22 autocomplete=\x22off\x22> Rocks2 " +
                                         "</label>" +
+                                        "<label class=\x22btn btn-light \x22>" +
+                                            "<input type=\x22checkbox\x22 name=\x22sceneMeshLayers\x22 value=\x22crystal\x22 id=\x22sceneScatterMeshLayers.crystal1\x22 autocomplete=\x22off\x22> Crystal " +
+                                        "</label>" +
+                                        
                                     "</div>" +
                                 "</div>" +
                             "</div>" +
@@ -9893,6 +13778,34 @@ function showGroup() {
                                 sceneLocs +
                             // "<div class=\x22form-row\x22>" +    
                             //     sceneLocs +
+                                "</div>" + 
+                            
+                            "<hr>" +
+                            // "</div>" +
+                //             extraButtons + 
+                //         "</form><br><br>" +
+                        // "</div>" +
+                    // "</div>" +                            
+                // "</div>" +
+                // "</div>" +
+                "<button id=\x22eventsSectionButton\x22 class=\x22btn btn-sm btn-primary btn-circle btn-light float-left\x22><i class=\x22fas fa-plus-circle\x22></i> </button>" +
+                            "<h4>Events</h4>" +
+                            "</hr>" +  
+                "<div style=\x22display:none;\x22 id=\x22eventsSection\x22>" +
+                            "<div class=\x22form-row\x22>" +  
+                                // "<div class=\x22col form-group col-md-3\x22>" +
+                                // locationButtons +    
+                                // sceneLocs +
+                                // "timekeys here" +
+                                "<div id=\x22sceneTimedEvents\x22 class=\x22col form-group col-md-12\x22></div>" +
+                                
+                                
+                            "</div>" + 
+                                // "<div class=\x22col form-group col-md-12\x22>" +
+                                // locationButtons + 
+                                // sceneLocs +
+                            // "<div class=\x22form-row\x22>" +    
+                            //     sceneLocs +
                             //     "</div>" + 
                             
                             "</hr>" +
@@ -9907,49 +13820,88 @@ function showGroup() {
                 // $("#cardrow").html(itemPics);
                 $("#cardrow").html(card);
                 //making sure both the app name and domain are set, some old records don't have name///
-                if (sceneAppName == null || sceneAppName == undefined || sceneAppName == "") { 
-                    if (sceneDomain != null && sceneDomain != undefined) {
-                        for (let i = 0; i < apps.length; i++) {
-                            if (sceneDomain == apps[i].appdomain) {
-                                sceneAppName = apps[i].appname; //might catch it more than once, but whatever
+                        if (sceneAppName == null || sceneAppName == undefined || sceneAppName == "") { 
+                            if (sceneDomain != null && sceneDomain != undefined) {
+                                if (apps != undefined && apps != null) {
+                                    for (let i = 0; i < apps.length; i++) {
+                                        if (sceneDomain == apps[i].appdomain) {
+                                            sceneAppName = apps[i].appname; //might catch it more than once, but whatever
+                                        }
+                                    }
+                                }
+                            }
+                        } else {
+                            sceneAppName = response.data.sceneAppName;
+                            if (sceneDomain == null || sceneDomain == undefined) {
+                                if (apps != undefined && apps != null) {
+                                    for (let i = 0; i < apps.length; i++) {
+                                        if (response.data.sceneAppName == apps[i].appname) {
+                                            sceneDomain = apps[i].appdomain;
+                                        }
+                                    }
+                                }
                             }
                         }
-                    }
-                } else {
-                    sceneAppName = response.data.sceneAppName;
-                    if (sceneDomain == null || sceneDomain == undefined) {
+                    if (apps != undefined && apps != null) {
                         for (let i = 0; i < apps.length; i++) {
-                            if (response.data.sceneAppName == apps[i].appname) {
+                            // console.log("app # " + i + " : " + JSON.stringify(apps[i]));
+                            var x = document.getElementById("sceneAppNameSelect");//populate dropdown options (jquery method no workie!?)
+                            var option = document.createElement("option");  
+                            option.text = apps[i].appname;
+                            if (sceneAppName == apps[i].appname) {
+                                console.log("appname match! " + sceneAppName);
+                                option.selected = true;
                                 sceneDomain = apps[i].appdomain;
-                            }
+                            } 
+                            x.add(option);
                         }
                     }
-                }
-                for (let i = 0; i < apps.length; i++) {
-                    // console.log("app # " + i + " : " + JSON.stringify(apps[i]));
-                    var x = document.getElementById("sceneAppNameSelect");//populate dropdown options (jquery method no workie!?)
-                    var option = document.createElement("option");  
-                    option.text = apps[i].appname;
-                    if (sceneAppName == apps[i].appname) {
-                        console.log("appname match! " + sceneAppName);
-                        option.selected = true;
-                        sceneDomain = apps[i].appdomain;
-                    } 
-                    x.add(option);
-                }
+                $("#sceneMasterAudioVolume").knob({ //this is only to init, I think...
+                }).val(0).trigger('change');
+                $("#scenePrimaryVolume").knob({
+                }).val(0).trigger('change');
+                $("#sceneAmbientVolume").knob({
+                }).val(0).trigger('change');
+                $("#sceneTriggerVolume").knob({
+                }).val(0).trigger('change');
+                $("#sceneWeatherAudioVolume").knob({
+                }).val(0).trigger('change');
+                $("#sceneMediaAudioVolume").knob({
+                }).val(0).trigger('change');
+                $("#scenePrimarySynth1Volume").knob({
+                }).val(0).trigger('change');
+                $("#scenePrimarySynth2Volume").knob({
+                }).val(0).trigger('change');
+                $("#sceneAmbientSynth1Volume").knob({
+                }).val(0).trigger('change');
+                $("#sceneAmbientSynth2Volume").knob({
+                }).val(0).trigger('change');
+                $("#sceneTriggerSynth1Volume").knob({
+                }).val(0).trigger('change');
+                $("#sceneTriggerSynth2Volume").knob({
+                }).val(0).trigger('change');
                 $("#sceneColor1").val(sceneColor1);
                 $("#sceneColor2").val(sceneColor2);
                 $("#sceneColor3").val(sceneColor3);
+                $("#sceneColor4").val(sceneColor4);
+                $("#sceneColor1Alt").val(sceneColor1Alt);
+                $("#sceneColor2Alt").val(sceneColor2Alt);
+                $("#sceneColor3Alt").val(sceneColor3Alt);
+                $("#sceneColor4Alt").val(sceneColor4Alt);
                 $("#sceneFontFillColor").val(sceneFontFillColor);
                 $("#sceneFontOutlineColor").val(sceneFontOutlineColor);
                 $("#sceneFontGlowColor").val(sceneFontGlowColor);
                 $("#sceneTextBackgroundColor").val(sceneTextBackgroundColor);
 
                 $("#sceneText").val(sceneText);
-                $("#sceneHighlightColor").val(sceneHighlightColor);
+                $("#sceneGreeting").val(sceneGreeting);
+                $("#sceneQuest").val(sceneQuest);
+                
                 // $("#sceneAppNameSelect").val(); //then pop the values if not new
                 $("#sceneFontSelect").val(response.data.sceneFont);
+                $("#sceneCategorySelect").val(response.data.sceneCategory);
                 $("#sceneTypeSelect").val(response.data.sceneType);
+                $("#sceneWebTypeSelect").val(response.data.sceneWebType);
                 $("#sceneCameraPath").val(response.data.sceneCameraPath);
                 $("#sceneCameraMode").val(response.data.sceneCameraMode);
                 $("#sceneWater").val(response.data.sceneWater != null ? response.data.sceneWater.name : "");
@@ -9957,14 +13909,21 @@ function showGroup() {
                 $("#sceneTimeSpeed").val(response.data.sceneTimeSpeed != null ? response.data.sceneTimeSpeed.name : "");
                 $("#sceneWeather").val(response.data.sceneWeather != null ? response.data.sceneWeather.name : "");
                 $("#sceneClouds").val(response.data.sceneClouds != null ? response.data.sceneClouds.name : "");
+                $("#sceneSkyParticles").val(response.data.sceneSkyParticles != null ? response.data.sceneSkyParticles : "None");
                 $("#scenePrimaryPatch1").val(response.data.scenePrimaryPatch1);
                 $("#scenePrimaryPatch2").val(response.data.scenePrimaryPatch2);
                 $("#sceneAmbientPatch1").val(response.data.sceneAmbientPatch1);
                 $("#sceneAmbientPatch2").val(response.data.sceneAmbientPatch2);
                 $("#sceneTriggerPatch1").val(response.data.sceneTriggerPatch1);
                 $("#sceneTriggerPatch2").val(response.data.sceneTriggerPatch2);
+                $("#sceneAmbientSequence1Transpose").val(response.data.sceneAmbientSequence1Transpose);
+                $("#sceneAmbientSequence2Transpose").val(response.data.sceneAmbientSequence2Transpose);
+                $("#sceneTriggerSequence1Transpose").val(response.data.sceneTriggerSequence1Transpose);
+                $("#sceneTriggerSequence2Transpose").val(response.data.sceneTriggerSequence2Transpose);
                 $("#sceneWebXREnvironment").val(response.data.sceneWebXREnvironment);  //aframe enviro component
-
+                $("#sceneFloorplaneTexture").val(response.data.sceneFloorplaneTexture);
+                $("#sceneHeightmapSelect").val(heightmapName);
+                // $("#sceneScatterOffset").val(response.data.sceneScatterOffset);
                 // sceneFont : req.body.sceneFont,
                 // sceneFontFillColor : req.body.sceneFontFillColor,
                 // sceneFontOutlineColor : req.body.sceneFontOutlineColor,
@@ -9999,9 +13958,13 @@ function showGroup() {
                 if (response.data.sceneShareWithSubscribers) {
                 $('#sceneSubscriberToggle').bootstrapToggle('on');
                 }
-                $('#sceneRestrictToLocation').bootstrapToggle();
-                if (response.data.sceneRestrictToLocation) {
-                $('#sceneRestrictToLocation').bootstrapToggle('on');
+                $('#sceneLocationTracking').bootstrapToggle();
+                if (response.data.sceneLocationTracking) {
+                $('#sceneLocationTracking').bootstrapToggle('on');
+                }
+                $('#sceneShowAds').bootstrapToggle();
+                if (response.data.sceneShowAds) {
+                $('#sceneShowAds').bootstrapToggle('on');
                 }
                 $('#sceneFlyable').bootstrapToggle();
                 if (response.data.sceneFlyable) {
@@ -10030,6 +13993,10 @@ function showGroup() {
                 $('#sceneCameraOrientToPath').bootstrapToggle();
                 if (response.data.sceneCameraOrientToPath) {
                 $('#sceneCameraOrientToPath').bootstrapToggle('on');
+                }
+                $('#sceneCameraDepthOfField').bootstrapToggle();
+                if (response.data.sceneCameraDepthOfField) {
+                $('#sceneCameraDepthOfField').bootstrapToggle('on');
                 }
                 $('#sceneRandomizeColors').bootstrapToggle();
                 if (response.data.sceneRandomizeColors) {
@@ -10139,10 +14106,14 @@ function showGroup() {
                 if (response.data.sceneUseFloorPlane) {
                     $('#sceneUseFloorPlane').bootstrapToggle('on');
                 }
-                $('#sceneRenderFloorPlane').bootstrapToggle();
-                if (response.data.sceneRenderFloorPlane) {
-                    $('#sceneRenderFloorPlane').bootstrapToggle('on');
-                }
+                // $('#sceneUseFloorPlane').bootstrapToggle();
+                // if (response.data.sceneFloorplanTexture) {
+                //     $('#sceneUseFloorPlane').bootstrapToggle('on');
+                // }
+                // $('#sceneRenderFloorPlane').bootstrapToggle();
+                // if (response.data.sceneRenderFloorPlane) {
+                //     $('#sceneRenderFloorPlane').bootstrapToggle('on');
+                // }
                 $('#sceneScatterMeshes').bootstrapToggle();
                 if (response.data.sceneScatterMeshes) {
                     $('#sceneScatterMeshes').bootstrapToggle('on');
@@ -10164,44 +14135,17 @@ function showGroup() {
                     $(selection).closest('.btn').button('toggle');
                 }
                 if (response.data.sceneScatterMeshLayers != undefined) {
-                    if (response.data.sceneScatterMeshLayers.crystal) {
-                        let selection = document.getElementById('sceneScatterMeshLayers.crystal');
-                        $(selection).closest('.btn').button('toggle');
-                    }
-                    if (response.data.sceneScatterMeshLayers.conifer) {
-                        let selection = document.getElementById('sceneScatterMeshLayers.conifer');
-                        $(selection).closest('.btn').button('toggle');
-                    }
-                    if (response.data.sceneScatterMeshLayers.rock) {
-                        let selection = document.getElementById('sceneScatterMeshLayers.rock');
-                        $(selection).closest('.btn').button('toggle');
-                    }
-                    if (response.data.sceneScatterMeshLayers.tree2) {
-                        let selection = document.getElementById('sceneScatterMeshLayers.tree2');
-                        $(selection).closest('.btn').button('toggle');
-                    }
-                    if (response.data.sceneScatterMeshLayers.redflower) {
-                        let selection = document.getElementById('sceneScatterMeshLayers.redflower');
-                        $(selection).closest('.btn').button('toggle');
-                    }
-                    if (response.data.sceneScatterMeshLayers.fern) {
-                        let selection = document.getElementById('sceneScatterMeshLayers.fern');
-                        $(selection).closest('.btn').button('toggle');
-                    }
+
                     if (response.data.sceneScatterMeshLayers.grass1) {
                         let selection = document.getElementById('sceneScatterMeshLayers.grass1');
                         $(selection).closest('.btn').button('toggle');
                     }
-                    if (response.data.sceneScatterMeshLayers.bush) {
-                        let selection = document.getElementById('sceneScatterMeshLayers.bush');
+                    if (response.data.sceneScatterMeshLayers.grass2) {
+                        let selection = document.getElementById('sceneScatterMeshLayers.grass2');
                         $(selection).closest('.btn').button('toggle');
                     }
-                    if (response.data.sceneScatterMeshLayers.rock2) {
-                        let selection = document.getElementById('sceneScatterMeshLayers.rock2');
-                        $(selection).closest('.btn').button('toggle');
-                    }
-                    if (response.data.sceneScatterMeshLayers.palm1) {
-                        let selection = document.getElementById('sceneScatterMeshLayers.palm1');
+                    if (response.data.sceneScatterMeshLayers.grass3) {
+                        let selection = document.getElementById('sceneScatterMeshLayers.grass3');
                         $(selection).closest('.btn').button('toggle');
                     }
                     if (response.data.sceneScatterMeshLayers.flower1) {
@@ -10214,6 +14158,50 @@ function showGroup() {
                     }                
                     if (response.data.sceneScatterMeshLayers.flower3) {
                         let selection = document.getElementById('sceneScatterMeshLayers.flower3');
+                        $(selection).closest('.btn').button('toggle');
+                    }
+                    if (response.data.sceneScatterMeshLayers.conifer1) {
+                        let selection = document.getElementById('sceneScatterMeshLayers.conifer1');
+                        $(selection).closest('.btn').button('toggle');
+                    }
+                    if (response.data.sceneScatterMeshLayers.conifer2) {
+                        let selection = document.getElementById('sceneScatterMeshLayers.conifer2');
+                        $(selection).closest('.btn').button('toggle');
+                    }
+                    if (response.data.sceneScatterMeshLayers.deciduous1) {
+                        let selection = document.getElementById('sceneScatterMeshLayers.deciduous1');
+                        $(selection).closest('.btn').button('toggle');
+                    }
+                    if (response.data.sceneScatterMeshLayers.deciduous2) {
+                        let selection = document.getElementById('sceneScatterMeshLayers.deciduous2');
+                        $(selection).closest('.btn').button('toggle');
+                    }
+                    if (response.data.sceneScatterMeshLayers.tropical1) {
+                        let selection = document.getElementById('sceneScatterMeshLayers.tropical1');
+                        $(selection).closest('.btn').button('toggle');
+                    }
+                    if (response.data.sceneScatterMeshLayers.tropical2) {
+                        let selection = document.getElementById('sceneScatterMeshLayers.tropical2');
+                        $(selection).closest('.btn').button('toggle');
+                    }
+                    if (response.data.sceneScatterMeshLayers.fern) {
+                        let selection = document.getElementById('sceneScatterMeshLayers.fern');
+                        $(selection).closest('.btn').button('toggle');
+                    }
+                    if (response.data.sceneScatterMeshLayers.bush) {
+                        let selection = document.getElementById('sceneScatterMeshLayers.bush');
+                        $(selection).closest('.btn').button('toggle');
+                    }
+                    if (response.data.sceneScatterMeshLayers.rock1) {
+                        let selection = document.getElementById('sceneScatterMeshLayers.rock1');
+                        $(selection).closest('.btn').button('toggle');
+                    }                    
+                    if (response.data.sceneScatterMeshLayers.rock2) {
+                        let selection = document.getElementById('sceneScatterMeshLayers.rock2');
+                        $(selection).closest('.btn').button('toggle');
+                    }
+                    if (response.data.sceneScatterMeshLayers.crystal) {
+                        let selection = document.getElementById('sceneScatterMeshLayers.crystal');
                         $(selection).closest('.btn').button('toggle');
                     }
                 }
@@ -10270,28 +14258,15 @@ function showGroup() {
                         let selection = document.getElementById('sceneScatterObjectLayers.waypoints');
                         $(selection).closest('.btn').button('toggle');
                     }
+                    if (response.data.sceneScatterObjectLayers.equipment) {
+                        let selection = document.getElementById('sceneScatterObjectLayers.equipment');
+                        $(selection).closest('.btn').button('toggle');
+                    }
                 }
 
                 ////////////////////////////////////////////////
-                $(function() { // document.ready  //populate the gltf dropdown
-                axios.get('/gltf/' + userid) //populate gltfs (old way)
-                .then(function (response) {
-                    // console.log("gltfs " + JSON.stringify(response));
-                    for (let l = 0; l < sceneLocations.length; l++) {
-                        const x = document.getElementById("gltfSelect_" + sceneLocations[l].timestamp);
-                        for (let i = 0; i < response.data.gltfItems.length; i++) {
-                            var option = document.createElement("option"); 
-                            option.text = response.data.gltfItems[i].name;
-                            if (response.data.gltfItems[i].name == sceneLocations[l].gltf) {
-                                console.log("gotsa match for location gltf: " + sceneLocations[l].gltf);
-                                // console.log("tryna select option for AssetBundleName " + name);
-                                option.selected = true;
-                            } 
-                            x.add(option);
-                            }
-                        }
-                    })//end of main fetch
-                    .then(function() { //populate models from db
+                $(function() { 
+                
                         if (sceneModelz != null && sceneModelz != undefined && sceneModelz.length > 0) {
 
                             // console.log(JSON.stringify(sceneModelz));
@@ -10311,15 +14286,38 @@ function showGroup() {
                                 }
                             }
                         }
-                    })
-                    .catch(function (error) {
-                        console.log(error);
-                    });
+                    // })
+                    // .then(function() { //populate objex from db
+                        if (sceneObjex != null && sceneObjex != undefined && sceneObjex.length > 0) {
+
+                            // console.log(JSON.stringify(sceneObjex));
+                            for (let k = 0; k < sceneLocations.length; k++) {
+                                const z = document.getElementById("objectSelect_" + sceneLocations[k].timestamp);
+                                for (let l = 0; l < sceneObjex.length; l++) {
+                                    // console.log(sceneModelz[j].name);
+                                    if (sceneObjex[l]._id != undefined) {
+                                        console.log(sceneObjex[l]._id + " vs " + sceneLocations[k].objectID);
+                                        
+                                        var option = document.createElement("option"); 
+                                        option.text = sceneObjex[l].name;
+                                        option.value = sceneObjex[l]._id;
+                                    
+                                    if (sceneObjex[l]._id == sceneLocations[k].objectID) {
+                                        option.selected = true;
+                                    } 
+                                    z.add(option);
+                                    }
+                                }
+                            }
+                        }
+  
+                    //asset bundle crap
+                    /*
                     axios.get('/get_userassets/' + userid)
                     .then(function (response) {
                         let resp = JSON.stringify(response);
                         let json = JSON.parse(resp);
-                        // console.log("assets: " + JSON.stringify(json));
+                        console.log("assets: " + JSON.stringify(json));
                         let nameArray = new Array();
                         json.data.forEach(element => {
                             if (element.scenes_ios != undefined) {
@@ -10347,10 +14345,46 @@ function showGroup() {
                     .catch(function (error) {
                         console.log(error);
                     });
+                    */
+  
+                    $(document).on('click','.clearScenePostcards',function(e) {
+                        e.preventDefault();  
+                        console.log("tryna rem scenePrimaryAudio");
+                        scenePostcards = [];
+                    });  
+                    $(document).on('click','.clearSceneTextItems',function(e) {
+                        e.preventDefault();  
+                        console.log("tryna rem sceneTextItmes");
+                        sceneTextItems = [];
+                    });  
+                    $(document).on('click','.clearSceneVids',function(e) {
+                        e.preventDefault();  
+                        console.log("tryna clearSceneVids");
+                        sceneVideoItems = [];
+                        sceneYouTubeIDs = [];
+                        sceneVideos = [];
+                        sceneVideoGroups = [];
+                    });  
                     $(document).on('click','.clearScenePrimaryAudio',function(e) {
                         e.preventDefault();  
                         console.log("tryna rem scenePrimaryAudio");
                         scenePrimaryAudioID = "";
+                        scenePrimaryAudioGroups = "";
+                        scenePrimaryAudioStreamURL = "";
+                    });  
+                    $(document).on('click','.clearSceneAmbientAudio',function(e) {
+                        e.preventDefault();  
+                        console.log("tryna rem clearSceneAmbientAudio");
+                        sceneAmbientAudioID = "";
+                        sceneAmbientAudioGroups = "";
+                        sceneAmbientAudioStreamURL = "";
+                    });  
+                    $(document).on('click','.clearSceneTriggerAudio',function(e) {
+                        e.preventDefault();  
+                        console.log("tryna rem clearSceneTriggerAudio");
+                        sceneTriggerAudioID = "";
+                        sceneTriggerAudioGroups = "";
+                        sceneTriggerAudioStreamURL = "";
                     });                     
                     $(document).on('click','.generateLandingPage',function(e) {
                         e.preventDefault();  
@@ -10472,6 +14506,10 @@ function showGroup() {
                         e.preventDefault();  
                         $("#locationsSection").toggle();
                     });
+                    $(document).on('click','#eventsSectionButton',function(e){
+                        e.preventDefault();  
+                        $("#eventsSection").toggle();
+                    });
                     $(document).on('click','#showHideAll',function(e){
                         $("#optionsSection").toggle();
                         $("#cameraSection").toggle();
@@ -10486,8 +14524,27 @@ function showGroup() {
                         $("#groundSection").toggle();
                         $("#objectSection").toggle();
                         $("#locationsSection").toggle();
+                        $("#eventsSection").toggle();
                     }); 
+                    $(document).on('click', '#addYouTubeButton', function(e){
+                        e.preventDefault();
+                        let newYTID = document.getElementById("addYouTubeInput").value;
+                        console.log("tryna add new YTID: " + newYTID);
 
+                        
+                        sceneYouTubeIDs.push(newYTID);
+                        let html = "";
+                        for (let i = 0; i < sceneYouTubeIDs.length; i++) {
+                            html = html + 
+                            "<div class=\x22youtube-container\x22>" +   
+                                "<iframe width=\x22240\x22 height=\x22180\x22 src=\x22https://www.youtube.com/embed/"+sceneYouTubeIDs[i]+"\x22 frameborder=\x220\x22 allow=\x22accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture\x22 allowfullscreen></iframe>" +
+                                "<button id=\x22"+sceneYouTubeIDs[i]+"\x22 type=\x22button\x22 class=\x22remYouTube badge badge-sm badge-danger float-right\x22>X</button>" +
+                                "<span class=\x22badge badge-pill badge-light float-right badge-sm\x22>ID: "+sceneYouTubeIDs[i]+"</span>" +
+                            "</div>";
+                        }
+                        $("#ytDisplay").empty();
+                        $("#ytDisplay").html(html);
+                    });
                     $(document).on('click','#addTagButton',function(e){
                         e.preventDefault();  
                         let newTag = document.getElementById("addTagInput").value;
@@ -10516,7 +14573,7 @@ function showGroup() {
                         for (let i = 0; i < sceneTags.length; i++) {
                             html = html + 
                             "<div class=\x22btn btn-light\x22>" +   
-                                "<button id=\x22"+sceneTags[i]+"\x22 type=\x22button\x22 class=\x22badge badge-sm badge-danger float-right\x22>X</button>" +
+                                "<button id=\x22"+sceneTags[i]+"\x22 type=\x22button\x22 class=\x22remTagButton badge badge-sm badge-danger float-right\x22>X</button>" +
                                 "<span class=\x22badge badge-pill badge-light float-left badge-sm\x22>\x22"+sceneTags[i]+"\x22</span>" +
                             "</div>";
                         }
@@ -10595,6 +14652,17 @@ function showGroup() {
                         const id = "#" + this.id;
                         $(id).parent().hide(); //not grandparent!
                     }); 
+                    $(document).on('click','.remSceneObject',function(e){
+                        e.preventDefault();  
+                        console.log("tryna remove sceneObject " + this.id);
+                        for( var i = 0; i < sceneObjects.length; i++){ 
+                            if ( sceneObjects[i] === this.id) {
+                                sceneObjects.splice(i, 1); 
+                            }
+                        }
+                        const id = "#" + this.id;
+                        $(id).parent().hide(); //not grandparent!
+                    }); 
                     $(document).on('click','.remScenePic',function(e){
                         e.preventDefault();  
                         console.log("tryna remove scenePic " + this.id);
@@ -10644,6 +14712,27 @@ function showGroup() {
                         const id = "#" + this.id;
                         $(id).parent().parent().hide();
                     }); 
+                    $(document).on('click','.copySceneLocation',function(e){
+                        e.preventDefault();  
+                        console.log("tryna copy sceneLocations " + this.id);
+                        let copyLoc = {};
+                        copyLoc.type = sceneLocations[this.id].type;
+                        copyLoc.name = "copy of " + sceneLocations[this.id].name;
+                        copyLoc.markerType = sceneLocations[this.id].markerType;
+                        copyLoc.x = sceneLocations[this.id].x;
+                        copyLoc.y = sceneLocations[this.id].y;
+                        copyLoc.z = sceneLocations[this.id].z;
+                        copyLoc.eventData = "";
+                        copyLoc.index = "";
+                        copyLoc.tags = [];
+                        copyLoc.description = "";
+                        copyLoc.timestamp = Math.floor(Date.now()/1000);
+                        // let copySceneLocations = sceneLocations.slice();
+                        sceneLocations.push(copyLoc);
+                        console.log(JSON.stringify(sceneLocations));
+                        // }
+                        // $(this).hide();
+                    }); 
                     $(document).on('click','.remYouTube',function(e){
                         e.preventDefault();  
                         console.log("tryna remove youtube " + this.id);
@@ -10659,10 +14748,22 @@ function showGroup() {
                         e.preventDefault();  
                         console.log("tryna remove pictureGroup " + this.id);
                         for( var i = 0; i < scenePictureGroups.length; i++){ 
-                            if ( scenePictureGroups[i] === this.id) {
+                            // if ( scenePictureGroups[i] === this.id) {
                                 scenePictureGroups.splice(i, 1); 
-                            }
+                            // }
                         }
+                        const id = "#" + this.id;
+                        $(id).parent().hide();
+                    });  
+                    $(document).on('click','.clearPicGroups',function(e){
+                        e.preventDefault();  
+                        console.log("tryna remove pictureGroup " + this.id);
+                        // for( var i = 0; i < scenePictureGroups.length; i++){ 
+                        //     // if ( scenePictureGroups[i] === this.id) {
+                        //         scenePictureGroups.splice(i, 1); 
+                        //     // }
+                        // }
+                        scenePictureGroups = [];
                         const id = "#" + this.id;
                         $(id).parent().hide();
                     });  
@@ -10712,6 +14813,10 @@ function showGroup() {
                     if (response.data.sceneTextAudioSync) {
                         $('#sceneTextAudioSync').bootstrapToggle('on');
                     }
+                    $('#sceneTextUseModals').bootstrapToggle();
+                    if (response.data.sceneTextUseModals) {
+                        $('#sceneTextUseModals').bootstrapToggle('on');
+                    }
                     $('#scenePrimaryTextRotate').bootstrapToggle(); //billboard
                     if (response.data.scenePrimaryTextRotate) {
                         $('#scenePrimaryTextRotate').bootstrapToggle('on');
@@ -10745,30 +14850,7 @@ function showGroup() {
                     if (response.data.scenePrimaryAudioTriggerEvents) {
                         $('#scenePrimaryAudioTriggerEvents').bootstrapToggle('on');
                     }
-                    $("#sceneMasterAudioVolume").knob({
-                    }).val(0).trigger('change');
-                    $("#scenePrimaryVolume").knob({
-                    }).val(0).trigger('change');
-                    $("#sceneAmbientVolume").knob({
-                    }).val(0).trigger('change');
-                    $("#sceneTriggerVolume").knob({
-                    }).val(0).trigger('change');
-                    $("#sceneWeatherAudioVolume").knob({
-                    }).val(0).trigger('change');
-                    $("#sceneMediaAudioVolume").knob({
-                    }).val(0).trigger('change');
-                    $("#scenePrimarySynth1Volume").knob({
-                    }).val(0).trigger('change');
-                    $("#scenePrimarySynth2Volume").knob({
-                    }).val(0).trigger('change');
-                    $("#sceneAmbientSynth1Volume").knob({
-                    }).val(0).trigger('change');
-                    $("#sceneAmbientSynth2Volume").knob({
-                    }).val(0).trigger('change');
-                    $("#sceneTriggerSynth1Volume").knob({
-                    }).val(0).trigger('change');
-                    $("#sceneTriggerSynth2Volume").knob({
-                    }).val(0).trigger('change');
+
 
                     //prompt to import an object and attach to this location
                     $(document).on('change', '.locationObjectTypeSelect', function() {
@@ -10782,8 +14864,15 @@ function showGroup() {
                                 if (_id == sceneLocations[s].timestamp) {
                                     sceneLocations[s].markerType = this.value;
                                     console.log("markertype set " + sceneLocations[s].markerType);
+
                                 }
                             }
+                            // if (sceneLocations[s].markerType.includes("picture")) {
+                            //     for (let i = 0; i < pictures.length; i++) {
+                            //         if (pictures[i]._id
+                            //     }
+                            // }
+
                             // if (this.value != "gltf") {
                                 for (let s = 0; s < sceneObjex.length; s++) {  
                                     console.log(this.value +" vs "+ sceneObjex[s].objtype); 
@@ -10811,6 +14900,27 @@ function showGroup() {
                             } 
                         }
                     });
+                    // $(document).on('change', '#sceneSkyParticlesSelect', function() {
+                    //     // console.log("sceneSkyParticlesSelect change : "+ this.value);
+                    //     for (let i = 0; i < apps.length; i++) {
+                    //         if (this.value == apps[i].appname) {
+                    //             console.log("appname match! " + this.value);  
+                    //             sceneDomain = apps[i].appdomain;
+                    //             sceneAppName = this.value;
+                    //         } 
+                    //     }
+                    // });
+                    // $(document).on('change', '.modelSelector', function() {
+                    //     for (let s = 0; s < sceneLocations.length; s++) {   
+                    //         let locid = this.id.split("_")[1];
+                    //         if (locid == sceneLocations[s].timestamp || this.id == sceneLocations[s].timestamp)   {
+                    //             sceneLocations[s].model = $(this).find('option:selected').text();
+                    //             sceneLocations[s].modelID = this.value;
+
+                    //             console.log("location gltf set " + $(this).find('option:selected').text());
+                    //         }
+                    //     }
+                    // });
                     $(document).on('change', '.modelSelector', function() {
                         for (let s = 0; s < sceneLocations.length; s++) {   
                             let locid = this.id.split("_")[1];
@@ -10819,6 +14929,20 @@ function showGroup() {
                                 sceneLocations[s].modelID = this.value;
 
                                 console.log("location gltf set " + $(this).find('option:selected').text());
+                                if (sceneLocations[s].model == null || sceneLocations[s].model == undefined) {
+                                    sceneLocations[s].model = 'none';
+                                }
+                            }
+                        }
+                    });
+                    $(document).on('change', '.objectSelector', function() {
+                        for (let s = 0; s < sceneLocations.length; s++) {   
+                            let locid = this.id.split("_")[1];
+                            if (locid == sceneLocations[s].timestamp || this.id == sceneLocations[s].timestamp) {
+                                sceneLocations[s].objectName = $(this).find('option:selected').text();
+                                sceneLocations[s].objectID = this.value;
+
+                                console.log("location obj set " + $(this).find('option:selected').text());
                             }
                         }
                     });
@@ -10854,7 +14978,7 @@ function showGroup() {
                             let locid = this.id.split("_")[1];
                             if (locid== sceneLocations[s].timestamp || this.id == sceneLocations[s].timestamp) {
                                 sceneLocations[s].elevation = this.value;
-                                console.log("locationObjectGeoElevation set " + sceneLocations[s].elevation);
+                                // console.log("locationObjectGeoElevation set " + sceneLocations[s].elevation);
                             }
                         }
                     });
@@ -10863,7 +14987,7 @@ function showGroup() {
                             let locid = this.id.split("_")[1];
                             if (locid== sceneLocations[s].timestamp || this.id == sceneLocations[s].timestamp) {
                                 sceneLocations[s].latitude = this.value;
-                                console.log("locationObjLatitude set " + sceneLocations[s].latitude);
+                                // console.log("locationObjLatitude set " + sceneLocations[s].latitude);
                             }
                         }
                     });
@@ -10872,7 +14996,7 @@ function showGroup() {
                             let locid = this.id.split("_")[1];
                             if (locid== sceneLocations[s].timestamp || this.id == sceneLocations[s].timestamp) {
                                 sceneLocations[s].longitude = this.value;
-                                console.log("locationObjLongitude set " + sceneLocations[s].latitude);
+                                // console.log("locationObjLongitude set " + sceneLocations[s].latitude);
                             }
                         }
                     });
@@ -10881,11 +15005,12 @@ function showGroup() {
                             let locid = this.id.split("_")[1];
                             if (locid == sceneLocations[s].timestamp || this.id == sceneLocations[s].timestamp) {
                                 sceneLocations[s].z = this.value;
-                                console.log("location x set " + sceneLocations[s].z);
+                                // console.log("location x set " + sceneLocations[s].z);
                             }
                         }
                     });
                     $(document).on('change', '.locationObjectRotX', function() {
+                        // console.log("eulerx changed to " + this.value);
                         for (let s = 0; s < sceneLocations.length; s++) {   
                             let locid = this.id.split("_")[1];
                             if (locid == sceneLocations[s].timestamp || this.id == sceneLocations[s].timestamp) {
@@ -10899,11 +15024,12 @@ function showGroup() {
                             let locid = this.id.split("_")[1];
                             if (locid == sceneLocations[s].timestamp || this.id == sceneLocations[s].timestamp) {
                                 sceneLocations[s].eulery = this.value;
-                                console.log("rotation y set " + sceneLocations[s].eulery);
+                                // console.log("rotation y set " + sceneLocations[s].eulery);
                             }
                         }
                     });
                     $(document).on('change', '.locationObjectRotZ', function() {
+                        // console.log("eulerz changed to " + this.value);
                         for (let s = 0; s < sceneLocations.length; s++) {   
                             let locid = this.id.split("_")[1];
                             if (locid == sceneLocations[s].timestamp || this.id == sceneLocations[s].timestamp) {
@@ -10922,6 +15048,17 @@ function showGroup() {
                             }
                         }
                     });
+                    $(document).on('change', '.locationLabel', function() {
+
+                        for (let s = 0; s < sceneLocations.length; s++) {   
+                            let locid = this.id.split("_")[1];
+                            if (locid == sceneLocations[s].timestamp || this.id == sceneLocations[s].timestamp) {
+                                sceneLocations[s].label = this.value;
+                                sceneLocations[s].name = this.value; //uhg
+                                console.log("lable set " + JSON.stringify(sceneLocations[s]));
+                            }
+                        }
+                    });
                     $(document).on('change', '.locationEventData', function() {
 
                         for (let s = 0; s < sceneLocations.length; s++) {   
@@ -10932,25 +15069,139 @@ function showGroup() {
                             }
                         }
                     });
+                    $(document).on('change', '.locationDescription', function() {
+
+                        for (let s = 0; s < sceneLocations.length; s++) {   
+                            let locid = this.id.split("_")[1];
+                            if (locid == sceneLocations[s].timestamp || this.id == sceneLocations[s].timestamp) {
+                                sceneLocations[s].description = this.value;
+                                console.log("locationDescription set " + JSON.stringify(sceneLocations[s]));
+                            }
+                        }
+                    });
+                    //// SCENE TIMEKEYS
+                    let timekeys = null;
+                    if (response.data.sceneTimedEvents != null) {    
+                        timekeys = response.data.sceneTimedEvents.timekeys;     
+                    }
+                    if (timekeys != null) {
+                        $("#sceneTimedEvents").html(ReturnTimeKeys(timekeys));
+                        for (let i = 0; i < timekeys.length; i++) { //init the dropdowns in timekey table
+                            console.log("tryna set timed event type " + timekeys[i].keytype);
+                            $("#tk_type_" + i).val(timekeys[i].keytype).change();
+                        }
+                    } else {
+                        $("#sceneTimedEvents").html("no timed events found");
+                    }
+                    
+                    
+                    // if (timekeys != undefined) {
+
+                    // }
+                    $(document).on('change', '.tk_start', function() {
+                        console.log(this.id + " value " + this.value);
+                        for (let i = 0; i < timekeys.length; i++) {
+                            if (this.id == "tk_start_" + i) {
+                                if (!isNaN(this.value)) {
+                                    timekeys[i].keystarttime = Number(this.value);
+                                } else {
+                                    console.log("must be a number!");
+                                }
+                            }
+                        }
+                    });
+                    $(document).on('change', '.tk_duration', function() {
+                        console.log(this.id + " value " + this.value);
+                        for (let i = 0; i < timekeys.length; i++) {
+                            if (this.id == "tk_duration_" + i) {
+                                if (!isNaN(this.value)) {
+                                    timekeys[i].keyduration = Number(this.value);
+                                } else {
+                                    console.log("must be a number!");
+                                }
+                            }
+                        }
+                    });
+                    $(document).on('change', '.tk_type', function() {
+                        
+                        for (let i = 0; i < timekeys.length; i++) {
+                            if (this.id == "tk_type_" + i) {
+                                console.log(this.id + " value " + this.value);
+                                timekeys[i].keytype = this.value;
+                            }
+                        }
+                    });
+                    $(document).on('change', '.tk_data', function() {
+                        console.log(this.id + " value " + this.value);
+                        for (let i = 0; i < timekeys.length; i++) {
+                            if (this.id == "tk_data_" + i) {
+                                timekeys[i].keydata = this.value;
+                            }
+                        }
+                    });
+                    $(document).on('click','#newTimedEvent',function(e){
+                        e.preventDefault();  
+                        console.log("tryna set a scene timekey");
+                        let newTimeKey = {
+                            keytype: "",
+                            keystarttime: currentVidTime.toFixed(2),
+                            keyduration: 5,
+                            keydata: ""
+                            }
+                        timekeys.push(newTimeKey);
+                        $("#sceneTimedEvents").empty();
+                        $("#sceneTimedEvents").html(ReturnTimeKeys(timekeys));
+                        for (let i = 0; i < timekeys.length; i++) {
+                            $("#tk_type_" + i).val(timekeys[i].keytype).change();
+                        }
+    
+                    }); 
+                    $(document).on('click','.remTimeKey',function(e) {
+                        e.preventDefault();  
+                        console.log("tryna remove timekey " + this.id);
+                        let html = "";
+                        for( var i = 0; i < timekeys.length; i++){ 
+                            if ( "tk_rm_" + i === this.id) {
+                                timekeys.splice(i, 1); 
+                            }
+                        }
+                        $("#sceneTimedEvents").empty();
+                        $("#sceneTimedEvents").html(ReturnTimeKeys(timekeys));
+                        for (let i = 0; i < timekeys.length; i++) {
+                            $("#tk_type_" + i).val(timekeys[i].keytype).change();
+                        }
+                    });
+
                     $('#updateSceneForm').on('submit', function(e) { //reuse same names as above, for convenience
                         e.preventDefault();  
+
                         let sceneTitle = document.getElementById("sceneTitle").value;
+                        let sceneGreeting = document.getElementById("sceneGreeting").value;
+                        let sceneQuest = document.getElementById("sceneQuest").value;
                         // let sceneAppName = document.getElementById("sceneAppNameSelect").value;
                         // let sceneDomain = document.getElementById("sceneAppNameSelect").value;
                         // let appName = document.getElementById("sceneAppNameSelect").value;
                         // let scenePictureGroups
+                        let sceneCategory = document.getElementById("sceneCategorySelect").value;
+                        // console.log("sceneCategory is " + sceneCategory);
                         let sceneType = document.getElementById("sceneTypeSelect").value;
+                        
+                        let sceneWebType = document.getElementById("sceneWebTypeSelect").value;
+
+
                         let sceneCameraPath = document.getElementById("sceneCameraPath").value;
                         let sceneCameraMode = document.getElementById("sceneCameraMode").value;
 
                         let sceneShareWithPublic = document.getElementById("scenePublicToggle").checked;
                         let sceneShareWithSubscribers = document.getElementById("sceneSubscriberToggle").checked;
-
+                        let sceneDebugMode = document.getElementById("sceneDebugMode").value;
+                        let sceneAltURL = document.getElementById("sceneAltURL").value;
                         let sceneKeynote = document.getElementById("sceneKeynote").value;
                         let sceneDescription = document.getElementById("sceneDescription").value;
                         let sceneNextScene = document.getElementById("sceneNextScene").value;
                         let scenePreviousScene = document.getElementById("scenePreviousScene").value;
                         let sceneStickyness = document.getElementById("sceneStickyness").value;
+                        let sceneSource = document.getElementById("sceneSource").value;
                         let sceneText = document.getElementById("sceneText").value;
                         let scenePrimaryAudioTitle = document.getElementById("scenePrimaryAudioTitle").value;
                         let scenePrimaryAudioStreamURL = document.getElementById("scenePrimaryAudioStreamURL").value;
@@ -10968,22 +15219,29 @@ function showGroup() {
                         let sceneTriggerSynth1Volume = document.getElementById("sceneTriggerSynth1Volume").value;
                         let sceneTriggerSynth2Volume = document.getElementById("sceneTriggerSynth2Volume").value;
                         let sceneAmbientSynth1Volume = document.getElementById("sceneAmbientSynth1Volume").value;
+                        
                         let sceneAmbientSynth2Volume = document.getElementById("sceneAmbientSynth2Volume").value;
+                        let sceneAmbientSequence1Transpose = document.getElementById("sceneAmbientSequence1Transpose").value;
+                        let sceneAmbientSequence2Transpose = document.getElementById("sceneAmbientSequence2Transpose").value;
                         let sceneAmbientAudioStreamURL = document.getElementById("sceneAmbientAudioStreamURL").value;
                         let sceneTriggerAudioStreamURL = document.getElementById("sceneTriggerAudioStreamURL").value;
                         let scenePrimaryTextFontSize = document.getElementById("scenePrimaryTextFontSize").value;
-                      
+                        let sceneMapZoom = document.getElementById("sceneMapZoom").value;
                         let sceneColor1 = document.getElementById("sceneColor1").value;
                         let sceneColor2 = document.getElementById("sceneColor2").value;
                         let sceneColor3 = document.getElementById("sceneColor3").value;
-                        let sceneHighlightColor = document.getElementById("sceneHighlightColor").value;
+                        let sceneColor4 = document.getElementById("sceneColor4").value;
+                        let sceneColor1Alt = document.getElementById("sceneColor1Alt").value;
+                        let sceneColor2Alt = document.getElementById("sceneColor2Alt").value;
+                        let sceneColor3Alt = document.getElementById("sceneColor3Alt").value;
+                        let sceneColor4Alt = document.getElementById("sceneColor4Alt").value;
                         let sceneWindFactor = document.getElementById("sceneWindFactor").value;
                         let sceneLightningFactor = document.getElementById("sceneLightningFactor").value;
                         let sceneIosOK = document.getElementById("sceneIosOK").checked;
                         let sceneAndroidOK = document.getElementById("sceneAndroidOK").checked;
                         let sceneWindowsOK = document.getElementById("sceneWindowsOK").checked;
-                        let sceneRestrictToLocation = document.getElementById("sceneRestrictToLocation").checked;
-                        
+                        let sceneLocationTracking = document.getElementById("sceneLocationTracking").checked;
+                        let sceneShowAds = document.getElementById("sceneShowAds").checked;
                         let sceneFlyable = document.getElementById("sceneFlyable").checked;
                         let sceneFaceTracking = document.getElementById("sceneFaceTracking").checked;
                         let sceneHPlanesToggle = document.getElementById("sceneHPlanesToggle").checked;
@@ -10991,6 +15249,7 @@ function showGroup() {
                         let sceneCameraLookAtNext = document.getElementById("sceneCameraLookAtNext").checked;
                         let scenePrimaryAudioSync = document.getElementById("scenePrimaryAudioSync").checked;
                         let sceneCameraOrientToPath = document.getElementById("sceneCameraOrientToPath").checked;
+                        let sceneCameraDepthOfField = document.getElementById("sceneCameraDepthOfField").checked;
                         let sceneRandomizeColors = document.getElementById("sceneRandomizeColors").checked;
                         let sceneTweakColors = document.getElementById("sceneTweakColors").checked;
                         let sceneColorizeSky = document.getElementById("sceneColorizeSky").checked;
@@ -11006,25 +15265,29 @@ function showGroup() {
                         let sceneAmbientSynth2ModulateByDistanceTarget = document.getElementById("sceneAmbientSynth2ModulateByDistanceTarget").checked;
                         let sceneUseDynamicSky = document.getElementById("sceneUseDynamicSky").checked;
                         let sceneUseDynamicShadows = document.getElementById("sceneUseDynamicShadows").checked;
-                        let sceneUseSkybox = document.getElementById("sceneAmbientSynth2ModulateByDistanceTarget").checked;
+                        let sceneUseSkybox = document.getElementById("sceneUseSkybox").checked;
                         let sceneUseSceneFog = document.getElementById("sceneUseSceneFog").checked;
+                        let sceneGlobalFogDensity = document.getElementById("sceneGlobalFogDensity").value;
                         // let sceneUseGlobalFog = document.getElementById("sceneUseGlobalFog").checked;
                         let sceneUseVolumetricFog = document.getElementById("sceneUseVolumetricFog").checked;
                         let sceneUseSunShafts = document.getElementById("sceneUseSunShafts").checked;
                         let sceneUseUWFX = document.getElementById("sceneUseUWFX").checked;
                         let sceneUseDynCubeMap = document.getElementById("sceneUseDynCubeMap").checked;
                         let sceneUseMap = document.getElementById("sceneUseMap").checked;
+   
                         let sceneUseEnvironment = document.getElementById("sceneUseEnvironment").checked;
                         let sceneUseHeightmap = document.getElementById("sceneUseHeightmap").checked;
-                        let sceneUseStaticObj = document.getElementById("sceneUseStaticObj").checked;
+                        // let sceneUseStaticObj = document.getElementById("sceneUseStaticObj").checked;
                         let sceneUseFloorPlane = document.getElementById("sceneUseFloorPlane").checked;
-                        let sceneRenderFloorPlane = document.getElementById("sceneRenderFloorPlane").checked;
+                        // let sceneRenderFloorPlane = document.getElementById("sceneRenderFloorPlane").checked;
                         let sceneScatterMeshes = document.getElementById("sceneScatterMeshes").checked;
                         let sceneScatterObjects = document.getElementById("sceneScatterObjects").checked;
-
+                        let sceneScatterOffset = document.getElementById("sceneScatterOffset").value;
+                        // console.log("sceneAmbientSynth1Volume " + sceneAmbientSynth1Volume);
                         let sceneUseThreeDeeText = document.getElementById("sceneUseThreeDeeText").checked;
                         let sceneTextLoop = document.getElementById("sceneTextLoop").checked;
                         let sceneTextAudioSync = document.getElementById("sceneTextAudioSync").checked;
+                        let sceneTextUseModals = document.getElementById("sceneTextUseModals").checked;
                         let scenePrimaryTextRotate = document.getElementById("scenePrimaryTextRotate").checked;
                         let scenePrimaryTextScaleByDistance = document.getElementById("scenePrimaryTextScaleByDistance").checked;
                         // let sceneDistanceScaling = document.getElementById("sceneDistanceScaling").checked;
@@ -11038,12 +15301,25 @@ function showGroup() {
                         // let scenePrimaryTextMode = document.getElementById(response.data.scenePrimaryTextMode); 
                         // let sceneCameraPath = document.getElementById(response.data.sceneCameraPath); 
                         // let sceneCameraMode = document.getElementById(response.data.sceneCameraMode); 
+                        scenePlayer.playerHeight = document.getElementById("scenePlayerHeight").value;
+                        scenePlayer.playerSpeed = document.getElementById("scenePlayerSpeed").value;
+                        if (scenePlayer.playerHeight == "" || scenePlayer.playerHeight == null || scenePlayer.playerHeight == undefined) {
+                            scenePlayer.playerHeight = 2;
+                        }
+                        if (scenePlayer.playerSpeed == "" || scenePlayer.playerSpeed == null || scenePlayer.playerSpeed == undefined) {
+                            scenePlayer.playerSpeed = 6;
+                        }
+                        let sceneFloorplaneTexture = document.getElementById("sceneFloorplaneTexture").value;
+                        let sceneHeightmap = {};
+                        sceneHeightmap.name = document.getElementById("sceneHeightmapSelect").value;
                         let sceneWaterName = document.getElementById("sceneWater").value; 
                         let sceneWaterLevel = document.getElementById("sceneWaterLevel").value;
+                        let sceneGroundLevel = document.getElementById("sceneGroundLevel").value;
                         let sceneWeatherName = document.getElementById("sceneWeather").value;
                         let sceneCloudsName = document.getElementById("sceneClouds").value; 
                         let sceneTimeName = document.getElementById("sceneTime").value;
-                        let sceneTimeSpeedName = document.getElementById("sceneTimeSpeed").value
+                        let sceneTimeSpeedName = document.getElementById("sceneTimeSpeed").value;
+                        let sceneSkyParticles = document.getElementById("sceneSkyParticles").value;
                         let sceneAssetBundleName = document.getElementById("sceneAssetBundleName").value; 
                         let sceneAssetBundleNameSelect = document.getElementById("sceneAssetBundleNameSelect").value; 
 
@@ -11076,20 +15352,25 @@ function showGroup() {
                         sceneTimeSpeed.name = sceneTimeSpeedName;
                         // let sceneTargetEvent = {};
                         // let sceneTargetObject = {};
-                        let scenePlayer = {};
-                        sceneScatterMeshLayers.crystal = document.getElementById('sceneScatterMeshLayers.crystal').checked;
-                        sceneScatterMeshLayers.conifer = document.getElementById('sceneScatterMeshLayers.conifer').checked;
-                        sceneScatterMeshLayers.rock = document.getElementById('sceneScatterMeshLayers.rock').checked;
-                        sceneScatterMeshLayers.tree2 = document.getElementById('sceneScatterMeshLayers.tree2').checked;
-                        sceneScatterMeshLayers.redflower = document.getElementById('sceneScatterMeshLayers.redflower').checked;
-                        sceneScatterMeshLayers.fern = document.getElementById('sceneScatterMeshLayers.fern').checked;
+                        
                         sceneScatterMeshLayers.grass1 = document.getElementById('sceneScatterMeshLayers.grass1').checked;
-                        sceneScatterMeshLayers.bush = document.getElementById('sceneScatterMeshLayers.bush').checked;
-                        sceneScatterMeshLayers.rock2 = document.getElementById('sceneScatterMeshLayers.rock2').checked;
-                        sceneScatterMeshLayers.palm1 = document.getElementById('sceneScatterMeshLayers.palm1').checked;
+                        sceneScatterMeshLayers.grass2 = document.getElementById('sceneScatterMeshLayers.grass2').checked;
+                        sceneScatterMeshLayers.grass3 = document.getElementById('sceneScatterMeshLayers.grass3').checked;
                         sceneScatterMeshLayers.flower1 = document.getElementById('sceneScatterMeshLayers.flower1').checked;
                         sceneScatterMeshLayers.flower2 = document.getElementById('sceneScatterMeshLayers.flower2').checked;
                         sceneScatterMeshLayers.flower3 = document.getElementById('sceneScatterMeshLayers.flower3').checked;
+                        sceneScatterMeshLayers.conifer1 = document.getElementById('sceneScatterMeshLayers.conifer1').checked;
+                        sceneScatterMeshLayers.conifer2 = document.getElementById('sceneScatterMeshLayers.conifer2').checked;
+                        sceneScatterMeshLayers.deciduous1 = document.getElementById('sceneScatterMeshLayers.deciduous1').checked;
+                        sceneScatterMeshLayers.deciduous2 = document.getElementById('sceneScatterMeshLayers.deciduous2').checked;
+                        sceneScatterMeshLayers.tropical1 = document.getElementById('sceneScatterMeshLayers.tropical1').checked;
+                        sceneScatterMeshLayers.tropical2 = document.getElementById('sceneScatterMeshLayers.tropical2').checked;
+                        sceneScatterMeshLayers.fern1 = document.getElementById('sceneScatterMeshLayers.fern1').checked;
+                        sceneScatterMeshLayers.bush1 = document.getElementById('sceneScatterMeshLayers.bush1').checked;
+                        sceneScatterMeshLayers.rock1 = document.getElementById('sceneScatterMeshLayers.rock1').checked;
+                        sceneScatterMeshLayers.rock2 = document.getElementById('sceneScatterMeshLayers.rock2').checked;
+                        sceneScatterMeshLayers.crystal1 = document.getElementById('sceneScatterMeshLayers.crystal1').checked;
+
 
                         sceneScatterObjectLayers.picobj = document.getElementById('sceneScatterObjectLayers.picobj').checked;
                         sceneScatterObjectLayers.linkobj = document.getElementById('sceneScatterObjectLayers.linkobj').checked;
@@ -11104,35 +15385,52 @@ function showGroup() {
                         sceneScatterObjectLayers.players = document.getElementById('sceneScatterObjectLayers.players').checked;
                         sceneScatterObjectLayers.characters = document.getElementById('sceneScatterObjectLayers.characters').checked;
                         sceneScatterObjectLayers.waypoints = document.getElementById('sceneScatterObjectLayers.waypoints').checked;
+                        sceneScatterObjectLayers.equipment = document.getElementById('sceneScatterObjectLayers.equipment').checked;
 
                         ///////////////////////////
                         //////////////////////////
-                        
+                        // alert("sceneScatterOFfset " + sceneScatterOffset);
                         let data = {
                             _id : response.data._id,
                             pictures: pictures,
                             sceneTitle : sceneTitle,
+                            sceneGreeting : sceneGreeting,
+                            sceneQuest : sceneQuest,
                             sceneAppName: sceneAppName,
                             sceneDomain: sceneDomain,
                             sceneKeynote: sceneKeynote,
+                            sceneDebugMode : sceneDebugMode,
+                            sceneAltURL: sceneAltURL,
+                            sceneTags: sceneTags,
                             sceneDescription: sceneDescription,
                             sceneNextScene: sceneNextScene,
                             scenePreviousScene: scenePreviousScene,
+                            sceneWebType: sceneWebType,
                             sceneType: sceneType,
+                            sceneCategory: sceneCategory,
                             sceneShareWithPublic: sceneShareWithPublic,
                             sceneShareWithSubscribers: sceneShareWithSubscribers,
                             sceneStickyness: sceneStickyness,
+                            sceneSource: sceneSource,
                             sceneText: sceneText,
                             scenePictures: scenePictures,
                             scenePictureGroups: scenePictureGroups,
                             sceneVideos: sceneVideos,
+                            sceneYouTubeIDs: sceneYouTubeIDs,
                             sceneModels: sceneModels,
+                            sceneObjects: sceneObjects,
                             scenePostcards: scenePostcards,
                             scenePrimaryAudioTitle: scenePrimaryAudioTitle,
                             scenePrimaryAudioStreamURL: scenePrimaryAudioStreamURL,
                             scenePrimaryAudioID: scenePrimaryAudioID,
                             sceneAmbientAudioID: sceneAmbientAudioID,
+                            sceneTriggerAudioID: sceneTriggerAudioID,
+                            scenePrimaryAudioGroups: scenePrimaryAudioGroups,
+                            sceneAmbientAudioGroups: sceneAmbientAudioGroups,
+                            sceneTriggerAudioGroups: sceneTriggerAudioGroups,
+                            sceneVideoGroups: sceneVideoGroups,
                             // sceneTriggerAudioID: sceneTriggerAudioID,
+                            scenePlayer: scenePlayer, //this is an obj
                             sceneBPM: sceneBPM,
                             scenePrimaryVolume: scenePrimaryVolume,
                             sceneAmbientAudioStreamURL: sceneAmbientAudioStreamURL,
@@ -11152,14 +15450,20 @@ function showGroup() {
                             sceneColor1: sceneColor1,
                             sceneColor2: sceneColor2,
                             sceneColor3: sceneColor3,
-                            sceneHighlightColor: sceneHighlightColor,
+                            sceneColor4: sceneColor4,
+                            sceneColor1Alt: sceneColor1Alt,
+                            sceneColor2Alt: sceneColor2Alt,
+                            sceneColor3Alt: sceneColor3Alt,
+                            sceneColor4Alt: sceneColor4Alt,
                             sceneWindFactor: sceneWindFactor,
                             sceneLightningFactor: sceneLightningFactor,
                             sceneIosOK: sceneIosOK,
                             sceneAndroidOK: sceneAndroidOK,
                             sceneWindowsOK: sceneWindowsOK,
-                            sceneRestrictToLocation: sceneRestrictToLocation,
+                            sceneLocationTracking: sceneLocationTracking,
+                            sceneShowAds: sceneShowAds,
                             sceneWebLinks: sceneWebLinks,
+                            sceneCameraMode: sceneCameraMode,
                             sceneFlyable: sceneFlyable,
                             sceneFaceTracking: sceneFaceTracking,
                             sceneHPlanesToggle: sceneHPlanesToggle,
@@ -11167,6 +15471,7 @@ function showGroup() {
                             sceneCameraLookAtNext: sceneCameraLookAtNext,
                             scenePrimaryAudioSync: scenePrimaryAudioSync,
                             sceneCameraOrientToPath: sceneCameraOrientToPath,
+                            sceneCameraDepthOfField: sceneCameraDepthOfField,
                             sceneRandomizeColors: sceneRandomizeColors,
                             sceneTweakColors: sceneTweakColors,
                             sceneColorizeSky: sceneColorizeSky,
@@ -11176,6 +15481,10 @@ function showGroup() {
                             sceneGenerateTriggerSequence2: sceneGenerateTriggerSequence2,
                             sceneGenerateAmbientSequences: sceneGenerateAmbientSequences,
                             sceneGenerateAmbientSequence2: sceneGenerateAmbientSequence2,
+                            sceneAmbientSequence1Transpose:  sceneAmbientSequence1Transpose,
+                            sceneAmbientSequence2Transpose: sceneAmbientSequence2Transpose,
+                            sceneTriggerSequence1Transpose:  sceneTriggerSequence1Transpose,
+                            sceneTriggerSequence2Transpose: sceneTriggerSequence2Transpose,
                             sceneAmbientSynth1ModulateByDistance: sceneAmbientSynth1ModulateByDistance,
                             sceneAmbientSynth1ModulateByDistanceTarget: sceneAmbientSynth1ModulateByDistanceTarget,
                             sceneAmbientSynth2ModulateByDistance: sceneAmbientSynth2ModulateByDistance,
@@ -11184,24 +15493,32 @@ function showGroup() {
                             sceneUseDynamicShadows: sceneUseDynamicShadows,
                             sceneUseSkybox: sceneUseSkybox,
                             sceneUseSceneFog: sceneUseSceneFog,
+                            sceneGlobalFogDensity: sceneGlobalFogDensity,
                             // sceneUseGlobalFog: sceneUseGlobalFog,
                             sceneUseVolumetricFog: sceneUseVolumetricFog,
                             sceneUseSunShafts: sceneUseSunShafts,
                             // sceneUseUWFX: sceneUseUWFX,
                             sceneUseDynCubeMap: sceneUseDynCubeMap,
                             sceneUseMap: sceneUseMap,
+                            sceneMapZoom: sceneMapZoom,
                             sceneUseEnvironment: sceneUseEnvironment,
                             sceneUseHeightmap: sceneUseHeightmap,
-                            sceneUseStaticObj: sceneUseStaticObj,
+                            sceneHeightmap: sceneHeightmap,
+                            // sceneUseStaticObj: sceneUseStaticObj,
                             sceneUseFloorPlane: sceneUseFloorPlane,
-                            sceneRenderFloorPlane: sceneRenderFloorPlane,
+                            sceneFloorplaneTexture: sceneFloorplaneTexture,
+                            // sceneRenderFloorPlane: sceneRenderFloorPlane,
                             sceneScatterMeshes: sceneScatterMeshes,
                             sceneScatterObjects: sceneScatterObjects,
                             sceneUseThreeDeeText: sceneUseThreeDeeText,
                             sceneTextLoop: sceneTextLoop,
+                            sceneTextUseModals: sceneTextUseModals,
                             sceneTextAudioSync: sceneTextAudioSync,
                             scenePrimaryTextRotate: scenePrimaryTextRotate,
                             scenePrimaryTextScaleByDistance: scenePrimaryTextScaleByDistance,
+                            
+                            sceneTextItems: sceneTextItems,
+
                             // sceneDistanceScaling: sceneDistanceScaling,
                             sceneLoopPrimaryAudio: sceneLoopPrimaryAudio,
                             sceneAutoplayPrimaryAudio: sceneAutoplayPrimaryAudio,
@@ -11214,11 +15531,14 @@ function showGroup() {
                             scenePrimaryTextMode: scenePrimaryTextMode,
                             sceneScatterMeshLayers: sceneScatterMeshLayers,
                             sceneScatterObjectLayers: sceneScatterObjectLayers,
+                            sceneScatterOffset: sceneScatterOffset,
                             sceneWater: sceneWater,
+                            sceneGroundLevel: sceneGroundLevel,
                             sceneWeather: sceneWeather,
                             sceneTime: sceneTime,
                             sceneTimeSpeed: sceneTimeSpeed,
                             sceneClouds: sceneClouds,
+                            sceneSkyParticles: sceneSkyParticles,
                             sceneEnvironment: sceneEnvironment,
                             scenePrimaryPatch1: scenePrimaryPatch1,
                             scenePrimaryPatch2: scenePrimaryPatch2,
@@ -11313,8 +15633,8 @@ function showGroup() {
                     title: title
                 }
                 $.confirm({
-                    title: 'Confirm Text Create',
-                    content: 'Are you sure you want to create an new scene?',
+                    title: 'Confirm Scene Create',
+                    content: 'Are you sure you want to create a new scene?',
                     buttons: {
                     confirm: function () {
                         axios.post(/newscene/, data)
@@ -11388,7 +15708,9 @@ function showGroup() {
             tableBody = tableBody +
             "<tr>" +
             // "<td><button class=\x22btn btn-sm\x22 onclick=\x22getScene('" + arr[i]._id + "')\x22><i class=\x22far fa-edit\x22></i></button><a onclick=\x22getScene('" + arr[i]._id + "')\x22 href=\x22#\x22>" + arr[i].sceneTitle + "</a></td>" +
-            "<td><a class=\x22btn btn-sm\x22 href=\x22index.html?type=scene&iid=" + arr[i]._id + "\x22><i class=\x22far fa-edit\x22></i></button><a href=\x22index.html?type=scene&iid=" + arr[i]._id + "\x22>" + arr[i].sceneTitle + "</a></td>" +
+            // "<td><a class=\x22btn btn-sm\x22 href=\x22index.html?type=scene&iid=" + arr[i]._id + "\x22><i class=\x22far fa-edit\x22></i></button><a href=\x22index.html?type=scene&iid=" + arr[i]._id + "\x22>" + arr[i].sceneTitle + "</a>"+
+            "<td><a href=\x22index.html?type=scene&iid=" + arr[i]._id + "\x22>" + arr[i].sceneTitle + "</a>"+
+            "<button class=\x22btn btn-sm\x22 onclick=\x22CloneScene('" + arr[i]._id + "', '" + arr[i].short_id + "')\x22><i class=\x22far fa-clone\x22></i></button></td>" +
             "<td><a href=\x22/webxr/" + arr[i].short_id + "\x22 target=\x22_blank\x22>" + arr[i].short_id + "</a></td>" +
             "<td>" + arr[i].sceneStickyness + "</td>" +
             "<td>" + arr[i].sceneShareWithPublic + "</td>" +
@@ -11419,7 +15741,45 @@ function showGroup() {
         });
 
     }
+    function CloneScene(sceneID, shortID) {
+        console.log("sceneID is" + sceneID);
+        // alert(this.id);
+        var nameKey = this.id; //id css selector has the filename
+        $.confirm({
+            title: 'Confirm!',
+            content: 'Are you sure you want to clone scene ' + shortID + '?',
+            buttons: {
+                confirm: function () {
+                    $.ajax({
+                    url: "/clone_scene",
+                    type: 'POST',
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    data: JSON.stringify({
+                            sceneID: sceneID,
+                            userID: cookie._id
+                        }),
+                        success: function( data, textStatus, xhr ){
+                            console.log(data);
+                            window.location.reload();
+                            // $("#topSuccess").html("Scene Cloned!");
+                            // $("#topSuccess").show();
 
+                        },
+                        error: function( xhr, textStatus, errorThrown ){
+                            console.log( xhr.responseText );
+                            $("#topAlert").html("Error: " +xhr.responseText);
+                            $("#topAlert").show();
+                        }
+                    });
+                },
+                cancel: function () {
+                    $("#topAlert").html("Clone cancelled");
+                    $("#topAlert").show();
+                },
+            }
+        });
+    }
     function getScenes() {
     let config = { headers: {
                 appid: appid,
@@ -11427,13 +15787,23 @@ function showGroup() {
         }
         axios.get('/uscenes/' + userid, config)
         .then(function (response) {
-        // console.log(JSON.stringify(response));
+        console.log(JSON.stringify(response.data));
         // var jsonResponse = response.data;
         //  var jsonResponse = response.data;
         var arr = response.data;
+        var selectHeader = "";
+        var arr = response.data;
+        var hideIndex = 3;
+        if (mode == "select") {
+            selectFor = parent;
+            selectHeader = "<th>Select</th>";
+            $("#pageTitle").html("Select Object for " + parent + " " + itemid);
+        }
+        var selectButton = "";
         var tableHead = "<table id=\x22dataTable1\x22 class=\x22display table table-striped table-bordered\x22 style=\x22width:100%\x22>" +
             "<thead>"+
             "<tr>"+
+            selectHeader +
             "<th>Scene Title</th>"+
             "<th>Scene Key</th>"+
             "<th>App Name</th>"+
@@ -11444,7 +15814,12 @@ function showGroup() {
         "</thead>"+
         "<tbody>";
         var tableBody = "";
+
         for(var i = 0; i < arr.length; i++) {
+            if (mode == "select") {
+                selectButton = "<td><button type=\x22button\x22 class=\x22btn btn-primary\x22 onclick=\x22selectItem('" + parent + "','scene','" + itemid + "','" + arr[i]._id + "')\x22>Select</button></td>";
+                var hideIndex = 4;
+            } 
             var android = arr[i].sceneAndroidOK ? 
             "<a href=\x22#\x22 class=\x22btn btn-success btn-circle \x22><i class=\x22fab fa-android\x22></i></a>" :
             "<a href=\x22#\x22 class=\x22btn btn-danger btn-circle \x22><i class=\x22fab fa-android \x22></i></a>";
@@ -11456,8 +15831,10 @@ function showGroup() {
             "<a href=\x22#\x22 class=\x22btn btn-danger btn-circle \x22><i class=\x22fab fa-windows\x22></i></a>";
             tableBody = tableBody +
             "<tr>" +
+            selectButton +
             // "<td><button class=\x22btn btn-sm\x22 onclick=\x22getScene('" + arr[i]._id + "')\x22><i class=\x22far fa-edit\x22></i></button><a onclick=\x22getScene('" + arr[i]._id + "')\x22 href=\x22#\x22>" + arr[i].sceneTitle + "</a></td>" +
-            "<td><a class=\x22btn btn-sm\x22 href=\x22index.html?type=scene&iid=" + arr[i]._id + "\x22><i class=\x22far fa-edit\x22></i></button><a href=\x22index.html?type=scene&iid=" + arr[i]._id + "\x22>" + arr[i].sceneTitle + "</a></td>" +
+            "<td><a href=\x22index.html?type=scene&iid=" + arr[i]._id + "\x22>" + arr[i].sceneTitle + "</a>"+
+            "<button class=\x22btn btn-sm\x22 onclick=\x22CloneScene('" + arr[i]._id + "', '" + arr[i].short_id + "')\x22><i class=\x22far fa-clone\x22></i></button></td>" +
             "<td><a href=\x22/webxr/" + arr[i].short_id + "\x22>" + arr[i].short_id + "</a></td>" +
             "<td>" + arr[i].sceneDomain + "</td>" +
             "<td>" + arr[i].sceneShareWithPublic + "</td>" +
@@ -11493,14 +15870,16 @@ function showGroup() {
     function getProfile() {
         let config = { headers: {
             appid: appid,
-        }
+            }
         }
         console.log(userid);
         axios.get('/profile/' + userid, config)
         .then(function (response) {
-            console.log(JSON.stringify(response));
-            showProfilePurchases(response);  //populate datatables
+            // console.log(JSON.stringify(response.data.activity));
+            showProfileInventory(response);
             showProfileActivity(response);
+            showProfilePurchases(response);  //populate datatables
+            
             showProfileScores(response);
             //construct a card..
             let card = "<div class=\x22col-lg-12\x22>" +
@@ -11542,7 +15921,7 @@ function showGroup() {
     function showProfilePurchases(response) {
     var jsonResponse = response.data;
     var arr = jsonResponse.purchases;
-    var tableHead = "<table id=\x22dataTable1\x22 class=\x22display table table-striped table-bordered\x22 style=\x22width:100%\x22>" +
+    var tableHead = "<table id=\x22dataTable4\x22 class=\x22display table table-striped table-bordered\x22 style=\x22width:100%\x22>" +
         "<thead>"+
         "<tr>"+
             "<th>Name</th>"+
@@ -11569,48 +15948,94 @@ function showGroup() {
         "</tr>" +
     "</tfoot>" +
     "</table>";
-    var resultElement = document.getElementById('table1Data');
+    var resultElement = document.getElementById('table4Data');
     resultElement.innerHTML = tableHead + tableBody + tableFoot;
-    $('#dataTable1').DataTable(
+    $('#dataTable4').DataTable(
         {"order": [[ 1, "desc" ]]}
     );
     }
+
     function showProfileActivity(response) {
-    var jsonResponse = response.data;
-    var arr = jsonResponse.activity;
-    var tableHead = "<table id=\x22dataTable2\x22 class=\x22display table table-striped table-bordered\x22 style=\x22width:100%\x22>" +
-            "<thead>"+
-            "<tr>"+
-            "<th>Activity</th>"+
-            "<th>Status</th>"+
-            "<th>Date</th>"+
-        "</tr>"+
-    "</thead>"+
-    "<tbody>";
-    var tableBody = "";
-    for(var i = 0; i < arr.length; i++) {
-        tableBody = tableBody +
-        "<tr>" +
-        "<td>" + arr[i].activityType + "</td>" +
-        "<td>" + arr[i].activityStatus + "</td>" +
-        "<td>" + convertTimestamp(arr[i].activityTimestamp) + "</td>" +
-        "</tr>";
-    }
-    var tableFoot =  "</tbody>" +
-            "<tfoot>" +
+        var jsonResponse = response.data;
+        var arr = jsonResponse.activity[0].actionItems;
+        var tableHead = "<table id=\x22dataTable2\x22 class=\x22display table table-striped table-bordered\x22 style=\x22width:100%\x22>" +
+                "<thead>"+
+                "<tr>"+
+                "<th>Activity</th>"+
+                "<th>Type</th>"+
+                "<th>Result</th>"+
+                "<th>Date</th>"+
+            "</tr>"+
+        "</thead>"+
+        "<tbody>";
+        var tableBody = "";
+        for(var i = 0; i < arr.length; i++) {
+            tableBody = tableBody +
             "<tr>" +
-            "<th>Activity</th>"+
-            "<th>Status</th>"+
-            "<th>Date</th>"+
-        "</tr>" +
-    "</tfoot>" +
-    "</table>";
-    var resultElement = document.getElementById('table2Data');
-    resultElement.innerHTML = tableHead + tableBody + tableFoot;
-    $('#dataTable2').DataTable(
-        {"order": [[ 1, "desc" ]]}
-    );
+            "<td>" + arr[i].actionName + "</td>" +
+            "<td>" + arr[i].actionType + "</td>" +
+            "<td>" + arr[i].actionResult + "</td>" +
+
+            "<td>" + convertTimestamp(arr[i].timestamp) + "</td>" +
+            "</tr>";
+        }
+        var tableFoot =  "</tbody>" +
+                "<tfoot>" +
+                "<tr>" +
+                "<th>Activity</th>"+
+                "<th>Type</th>"+
+                "<th>Result</th>"+
+                "<th>Date</th>"+
+            "</tr>" +
+        "</tfoot>" +
+        "</table>";
+        var resultElement = document.getElementById('table2Data');
+        resultElement.innerHTML = tableHead + tableBody + tableFoot;
+        $('#dataTable2').DataTable(
+            {"order": [[ 3, "asc" ]]}
+        );
     }
+
+    function showProfileInventory(response) {
+        var jsonResponse = response.data;
+        var arr = jsonResponse.inventory[0].inventoryItems;
+        var tableHead = "<table id=\x22dataTable1\x22 class=\x22display table table-striped table-bordered\x22 style=\x22width:100%\x22>" +
+                "<thead>"+
+                "<tr>"+
+                "<th>Object</th>"+
+                "<th>Type</th>"+
+                "<th>Category</th>"+
+                "<th>Date</th>"+
+            "</tr>"+
+        "</thead>"+
+        "<tbody>";
+        var tableBody = "";
+        for(var i = 0; i < arr.length; i++) {
+            tableBody = tableBody +
+            "<tr>" +
+            "<td>" + arr[i].objectName + "</td>" +
+            "<td>" + arr[i].objectType + "</td>" +
+            "<td>" + arr[i].objectCategory + "</td>" +
+            "<td>" + convertTimestamp(arr[i].timestamp) + "</td>" +
+            "</tr>";
+        }
+        var tableFoot =  "</tbody>" +
+                "<tfoot>" +
+                "<tr>" +
+                "<th>Object</th>"+
+                "<th>Type</th>"+
+                "<th>Category</th>"+
+                "<th>Date</th>"+
+            "</tr>" +
+        "</tfoot>" +
+        "</table>";
+        var resultElement = document.getElementById('table1Data');
+        resultElement.innerHTML = tableHead + tableBody + tableFoot;
+        $('#dataTable1').DataTable(
+            {"order": [[ 3, "asc" ]]}
+        );
+        }
+
     function showProfileScores(response) {
     var jsonResponse = response.data;
     var arr = jsonResponse.scores;
@@ -11917,6 +16342,7 @@ function showGroup() {
                 d = {};
                 d.key = selected[i].replace(/,\s+/g, '').toLowerCase();
                 d.uid = cookie._id;
+            
                 pArr.push(d);
             }
             processMe.items = pArr;
