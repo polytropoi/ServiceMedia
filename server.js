@@ -24,14 +24,14 @@ var express = require("express")
     , bcrypt = require('bcrypt-nodejs')
     , shortid = require('shortid')
     , QRCode = require('qrcode')
-    , transloadit = require('node-transloadit')
+    // , transloadit = require('node-transloadit')
     , internetradio = require('node-internet-radio')
     , requireText = require('require-text')
 
 
     app = express();
     require('dotenv').config();
-    
+
     // app.use(helmet.contentSecurityPolicy());
     app.use(helmet.dnsPrefetchControl());
     app.use(helmet.expectCt());
@@ -57,7 +57,7 @@ var express = require("express")
 
 
 // var transloadClient = new transloadit('d19741da29ba4adb8961e20f87f547f0','e75f79441df3ff89a0de731949f5c5bf8b46c46d');
-var transloadClient = new transloadit(process.env.TRANSLOADIT_KEY, process.env.TRANSLOADIT_SECRET);
+// var transloadClient = new transloadit(process.env.TRANSLOADIT_KEY, process.env.TRANSLOADIT_SECRET);
 var stripe = require("stripe")(process.env.STRIPE_KEY);
 
 
@@ -85,37 +85,39 @@ var corsOptions = function (origin) {
 
 var oneDay = 86400000;
 
-    app.use (function (req, res, next) {
-        var schema = (req.headers['x-forwarded-proto'] || '').toLowerCase();
-        if (schema === 'https') {
-            next();
-        } else {    
+    // app.use (function (req, res, next) {
+    //     var schema = (req.headers['x-forwarded-proto'] || '').toLowerCase();
+    //     if (schema === 'https') {
+    //         next();
+    //     } else {    
             
-        //    console.log ("non ssl request = " + req.headers.host + " tryna redirect");
+    //     //    console.log ("non ssl request = " + req.headers.host + " tryna redirect");
 
-            if (req.headers.host != "localhost:3000" && req.headers.host != "192.168.1.198:3000") { //TODO Enviromental Varz
-                let goodURL = 'https://' + req.get('host') + req.originalUrl;
-                console.log("tryna redirect to " + goodURL);
-                res.redirect(goodURL);
-                // var htmltext = "<html xmlns='http://www.w3.org/1999/xhtml'>" +
-                //     "<head></head><body> " +
-                //     "you must use https to access this site: <a href='https://servicemedia.net'>https://servicemedia.net</a>" +
-                //     "</body>";
-                // res.end(htmltext);
-            } else {
-                next();
-            }
-        }
-    });
+    //         if (req.headers.host != "localhost:3000" && req.headers.host != "192.168.1.198:3000") { //TODO Enviromental Varz
+    //             let goodURL = 'https://' + req.get('host') + req.originalUrl;
+    //             console.log("tryna redirect to " + goodURL);
+    //             res.redirect(goodURL);
+    //             // var htmltext = "<html xmlns='http://www.w3.org/1999/xhtml'>" +
+    //             //     "<head></head><body> " +
+    //             //     "you must use https to access this site: <a href='https://servicemedia.net'>https://servicemedia.net</a>" +
+    //             //     "</body>";
+    //             // res.end(htmltext);
+    //         } else {
+    //             next();
+    //         }
+    //     }
+    // });
 
 var databaseUrl = process.env.MONGO_URL; //servicemedia connstring
+var databaseUrl =  "asterion:menatar@aws-us-east-1-portal.8.dblayer.com:15103,aws-us-east-1-portal.7.dblayer.com:15103/servicemedia?retryWrites=false";
 
 var collections = ["acl", "auth_req", "domains", "apps", "assets", "assetsbundles", "models", "users", "inventories", "audio_items", "text_items", "audio_item_keys", "image_items", "video_items",
     "obj_items", "paths", "keys", "scores", "attributes", "achievements", "activity", "actions", "purchases", "storeitems", "scenes", "groups", "weblinks", "locations", "iap"];
 
 var db = mongojs(databaseUrl, collections);
 var store = new MongoDBStore({ //store session cookies in a separate db with different user, so nice
-    uri: process.env.MONGO_SESSIONS_URL,
+    // uri: process.env.MONGO_SESSIONS_URL,
+    uri: "mongodb://sessionmaster:nawman@aws-us-east-1-portal.8.dblayer.com:15103,aws-us-east-1-portal.7.dblayer.com:15103/sessions?retryWrites=false",
     collection: 'sessions'
   });
 
