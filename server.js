@@ -56,8 +56,6 @@ var express = require("express")
     //   );
 
 
-// var transloadClient = new transloadit('d19741da29ba4adb8961e20f87f547f0','e75f79441df3ff89a0de731949f5c5bf8b46c46d');
-// var transloadClient = new transloadit(process.env.TRANSLOADIT_KEY, process.env.TRANSLOADIT_SECRET);
 var stripe = require("stripe")(process.env.STRIPE_KEY);
 
 
@@ -109,15 +107,15 @@ var oneDay = 86400000;
     });
 
 var databaseUrl = process.env.MONGO_URL; //servicemedia connstring
-var databaseUrl =  "asterion:menatar@aws-us-east-1-portal.8.dblayer.com:15103,aws-us-east-1-portal.7.dblayer.com:15103/servicemedia?retryWrites=false";
+// var databaseUrl =  "asterion:menatar@aws-us-east-1-portal.8.dblayer.com:15103,aws-us-east-1-portal.7.dblayer.com:15103/servicemedia?retryWrites=false";
 
 var collections = ["acl", "auth_req", "domains", "apps", "assets", "assetsbundles", "models", "users", "inventories", "audio_items", "text_items", "audio_item_keys", "image_items", "video_items",
     "obj_items", "paths", "keys", "scores", "attributes", "achievements", "activity", "actions", "purchases", "storeitems", "scenes", "groups", "weblinks", "locations", "iap"];
 
 var db = mongojs(databaseUrl, collections);
 var store = new MongoDBStore({ //store session cookies in a separate db with different user, so nice
-    // uri: process.env.MONGO_SESSIONS_URL,
-    uri: "mongodb://sessionmaster:nawman@aws-us-east-1-portal.8.dblayer.com:15103,aws-us-east-1-portal.7.dblayer.com:15103/sessions?retryWrites=false",
+    uri: process.env.MONGO_SESSIONS_URL,
+    // uri: "mongodb://sessionmaster:nawman@aws-us-east-1-portal.8.dblayer.com:15103,aws-us-east-1-portal.7.dblayer.com:15103/sessions?retryWrites=false",
     collection: 'sessions'
   });
 
@@ -3662,27 +3660,27 @@ app.post('/process_staging_files', requiredAuthentication, function (req, res) {
                                 //         callback(null);
                                 //     }
                                 // });
-                                console.log("tryna USE_TRANSLOADIT ?" + process.env.USE_TRANSLOADIT); //OLD WAY used transloadit
-                                if (process.env.USE_TRANSLOADIT == true) {
-                                    var encodePictureUrlParams = {
-                                        steps: {
-                                            ':orig': {
-                                                robot: '/http/import',
-                                                url : tUrl
-                                            }
-                                        },
-                                        'template_id': 'f9e7db371a1a4fd29022cc959305a671',
-                                        'fields' : { image_item_id : iID,
-                                            user_id : item.uid
-                                        }
-                                    };
-                                    transloadClient.send(encodePictureUrlParams, function(ok) {
-                                    console.log('transloadit Success: ' + encodePictureUrlParams); //if it makes it to transloadit, copy original too
-                                    }, function(err) {
-                                        console.log('transloadit Error: ' + JSON.stringify(err));
-                                        callback(err);
-                                    });
-                                } else { //NEW WAY uses GrabAndSqueeze
+                                // console.log("tryna USE_TRANSLOADIT ?" + process.env.USE_TRANSLOADIT); //OLD WAY used transloadit
+                                // if (process.env.USE_TRANSLOADIT == true) {
+                                //     var encodePictureUrlParams = {
+                                //         steps: {
+                                //             ':orig': {
+                                //                 robot: '/http/import',
+                                //                 url : tUrl
+                                //             }
+                                //         },
+                                //         'template_id': 'f9e7db371a1a4fd29022cc959305a671',
+                                //         'fields' : { image_item_id : iID,
+                                //             user_id : item.uid
+                                //         }
+                                //     };
+                                //     transloadClient.send(encodePictureUrlParams, function(ok) {
+                                //     console.log('transloadit Success: ' + encodePictureUrlParams); //if it makes it to transloadit, copy original too
+                                //     }, function(err) {
+                                //         console.log('transloadit Error: ' + JSON.stringify(err));
+                                //         callback(err);
+                                //     });
+                                // } else { //NEW WAY uses GrabAndSqueeze
                                     console.log("userid = " + req.session.user._id);
                                     var token=jwt.sign({userId:req.session.user._id},process.env.JWT_SECRET);
                                     const options = {
@@ -3767,7 +3765,7 @@ app.post('/process_staging_files', requiredAuthentication, function (req, res) {
                                       
                                     //   req.write(data)
                                     //   req.end()
-                                }
+                                // }
                             } else if (groupType == ".mp3" || groupType == ".wav" || groupType == ".aif" || groupType == ".aiff" || groupType == ".ogg" || 
                                 groupType == ".MP3" || groupType == ".WAV" || groupType == ".AIFF" || groupType == ".AIFF" || groupType == ".OGG"  ) { 
                                 // console.log("tryna USE_TRANSLOADIT for audio?" + process.env.USE_TRANSLOADIT);
