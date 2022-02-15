@@ -2,6 +2,7 @@
 
 var express = require("express")
     , http = require("http")
+    
     , jwt = require("jsonwebtoken")
     , axios = require("axios")
     , path = require("path")
@@ -26,10 +27,11 @@ var express = require("express")
     , transloadit = require('node-transloadit')
     , internetradio = require('node-internet-radio')
     , requireText = require('require-text')
-    , dotenv = require('dotenv')
+
 
     app = express();
-
+    require('dotenv').config();
+    
     // app.use(helmet.contentSecurityPolicy());
     app.use(helmet.dnsPrefetchControl());
     app.use(helmet.expectCt());
@@ -52,7 +54,7 @@ var express = require("express")
     //       },
     //     })
     //   );
-    require('dotenv').config();
+
 
 // var transloadClient = new transloadit('d19741da29ba4adb8961e20f87f547f0','e75f79441df3ff89a0de731949f5c5bf8b46c46d');
 var transloadClient = new transloadit(process.env.TRANSLOADIT_KEY, process.env.TRANSLOADIT_SECRET);
