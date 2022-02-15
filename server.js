@@ -85,28 +85,28 @@ var corsOptions = function (origin) {
 
 var oneDay = 86400000;
 
-    // app.use (function (req, res, next) {
-    //     var schema = (req.headers['x-forwarded-proto'] || '').toLowerCase();
-    //     if (schema === 'https') {
-    //         next();
-    //     } else {    
+    app.use (function (req, res, next) {
+        var schema = (req.headers['x-forwarded-proto'] || '').toLowerCase();
+        if (schema === 'https') {
+            next();
+        } else {    
             
-    //     //    console.log ("non ssl request = " + req.headers.host + " tryna redirect");
+        //    console.log ("non ssl request = " + req.headers.host + " tryna redirect");
 
-    //         if (req.headers.host != "localhost:3000" && req.headers.host != "192.168.1.198:3000") { //TODO Enviromental Varz
-    //             let goodURL = 'https://' + req.get('host') + req.originalUrl;
-    //             console.log("tryna redirect to " + goodURL);
-    //             res.redirect(goodURL);
-    //             // var htmltext = "<html xmlns='http://www.w3.org/1999/xhtml'>" +
-    //             //     "<head></head><body> " +
-    //             //     "you must use https to access this site: <a href='https://servicemedia.net'>https://servicemedia.net</a>" +
-    //             //     "</body>";
-    //             // res.end(htmltext);
-    //         } else {
-    //             next();
-    //         }
-    //     }
-    // });
+            if (req.headers.host != "localhost:3000" && req.headers.host != "192.168.1.198:3000") { //TODO Enviromental Varz
+                let goodURL = 'https://' + req.get('host') + req.originalUrl;
+                console.log("tryna redirect to " + goodURL);
+                res.redirect(goodURL);
+                // var htmltext = "<html xmlns='http://www.w3.org/1999/xhtml'>" +
+                //     "<head></head><body> " +
+                //     "you must use https to access this site: <a href='https://servicemedia.net'>https://servicemedia.net</a>" +
+                //     "</body>";
+                // res.end(htmltext);
+            } else {
+                next();
+            }
+        }
+    });
 
 var databaseUrl = process.env.MONGO_URL; //servicemedia connstring
 var databaseUrl =  "asterion:menatar@aws-us-east-1-portal.8.dblayer.com:15103,aws-us-east-1-portal.7.dblayer.com:15103/servicemedia?retryWrites=false";
