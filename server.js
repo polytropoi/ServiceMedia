@@ -30,7 +30,7 @@ var express = require("express")
 
 
     app = express();
-    // require('dotenv').config();
+    require('dotenv').config();
 
     // app.use(helmet.contentSecurityPolicy());
     app.use(helmet.dnsPrefetchControl());
