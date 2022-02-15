@@ -26,7 +26,7 @@ var express = require("express")
     , QRCode = require('qrcode')
     // , transloadit = require('node-transloadit')
     , internetradio = require('node-internet-radio')
-    , requireText = require('require-text')
+    , requireText = require('require-text');
 
 
     app = express();
