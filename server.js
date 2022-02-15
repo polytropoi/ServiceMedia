@@ -26,6 +26,7 @@ var express = require("express")
     , transloadit = require('node-transloadit')
     , internetradio = require('node-internet-radio')
     , requireText = require('require-text')
+    , dotenv = require('dotenv')
 
     app = express();
 
