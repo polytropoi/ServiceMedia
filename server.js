@@ -286,7 +286,8 @@ io.on("connection", socket => {
   });
 });
 */
-
+/////// toggle below for strr
+/*
 ///this one gets users through handshake
 // var socketUsers = {};
 // var allUsers = [];
@@ -2565,10 +2566,173 @@ app.post('/update_profile/:_id', requiredAuthentication, function (req, res) { /
 });
 
 app.post('/drop/', requiredAuthentication, function (req, res) { 
-    res.send("nope");
+    let timestamp = Math.round(Date.now() / 1000);
+    let i_id = ObjectID(req.body.inventoryID);
+    async.waterfall([
+                  
+        function (callback) { //check scene
+            db.scenes.findOne({"short_id": req.body.inScene}, function (err, scene) {
+                if (err || !scene) {
+                    console.log("no scene for drop!");
+                    callback(err);
+                } else {
+                    console.log("gotsa scene for drop");
+                    callback(null, scene);
+                }
+            });
+        },        
+        function (scene, callback) { //scene inventory 
+            if (scene.sceneInventoryID != undefined && scene.sceneInventoryID != null) { //maybe needs a toggle instead of more tagsoup? 
+                let s_id = ObjectID(scene.sceneInventoryID);
+                // let o_id = ObjectID(req.body.inventoryObj.objectID);
+                db.inventories.findOne({"_id": s_id}, function (err, inventory) {//check for scene inventory record
+                    if (err || !inventory) {
+                        console.log("no scene inventory?2");
+                        callback(err);
+                    } else {
+                        console.log('gotsa inventory' + inventory._id );
+                        callback(null, inventory, scene);
+                    }
+                });
+            } else {
+
+            }
+        },        
+        function (scene, inventory, callback) { //check object
+            
+            let o_id = ObjectID(req.body.inventoryObj.objectID);
+            db.obj_items.findOne({"_id": o_id}, function (err, obj) { //get obj to check maxperscene
+                if (err || !obj) {
+                    console.log("no object found for drop");
+                    callback(err);
+                    // res.send("no object found");
+                } else {
+                    // console.log("checking maxperscene " + obj.maxPerScene + " in " + inventory.inventoryItems.length);
+                    console.log("checking maxperscene " + obj.maxPerScene);
+                    // let iCount = 0;
+                    callback(null, obj, scene.sceneInventoryID, inventory);
+                }
+            });
+        },        
+        function (inventory, sceneInventoryID, obj, callback) { //count similar objects in scene inventory
+            if ( inventory.inventoryItems != undefined && inventory.inventoryItems.length > 0) { 
+                console.log("scene inventory items " + inventory.inventoryItems.length);
+                for (let i = 0; i < inventory.inventoryItems.length + 1; i++) { //count scene inventory items like this obj
+                    if (inventory.inventoryItems[i].objectID == obj._id) {
+                        iCount++;
+                        console.log("gotsa invnetory match with the obj " + iCount);
+                        if (i == (inventory.inventoryItems.length - 1)) { //loop is over, carry on... 
+                            if (iCount > obj.maxPerScene) {
+                                console.log("max per scene reached!");
+                                callback("max");
+                                
+                            } else {
+                                callback(null, sceneInventoryID)
+                            }
+                        }
+                    }
+                } 
+            } else {
+                callback(null, sceneInventoryID)
+            }
+        },        
+        function (sceneInventoryID, callback) {
+            let s_id = ObjectID(sceneInventoryID);
+            db.inventories.updateOne({ "_id": s_id }, { $push: { inventoryItems: req.body.inventoryObj }}, {upsert: false}, function (err, saved) { //add to scene inventory
+                if (err || !saved) {
+                    console.log("problemo with inventory rm " + err);
+                    // res.send("inventory update error " + err);
+                    // res.send("error saving to scene inventory");
+                    callback(err);
+                } else {
+                    console.log("added to scene inventory...");
+                    callback(null);
+                }
+            });
+        },        
+        function (callback) {
+            db.inventories.findOne({"_id": i_id}, function (err, inventory) { //check for player inventory record
+                if (err || !inventory) {
+                    console.log("error getting user inventory: " + err);
+                    callback(err);
+                    // res.send("user inventory not found!");
+                } else {
+                    console.log("ploayer inventory found with count " + inventory.inventoryItems.length);
+                    db.inventories.updateOne({ "_id": i_id }, { $pull: { inventoryItems: req.body.inventoryObj }}, {upsert: false}, function (err, saved) { //remove from player inventory
+                        if (err || !saved) {
+                            console.log("problemo with inventory rm " + err);
+                            // res.send("inventory update error " + err);
+                            callback(err);
+                        } else {
+                            console.log("ok rem'd obj from player inventorie " + saved._id);
+                            callback(null);
+                        }
+                    });
+                }
+            });
+        },        
+        function (callback) {
+            if (req.body.action != undefined) {
+                // console.log(JSON.stringify(req.body.action));
+                var u_id = ObjectID(req.session.user._id);
+                if (req.session.user._id != req.body.userData.userID) {
+                    db.users.findOne({"_id": u_id}, function (err, user) {  
+                        if (err || !user) {
+                            console.log("error getting user: " + err);
+                            // res.send("bad user4");
+                            callback(err);
+                        } else {
+                            if (req.session.user.activitiesID != undefined) { //add drop action to user activity
+                                var a_id = ObjectID(req.session.user.activitiesID);
+                                console.log("gotsa activities id " + req.session.activitiesID);
+                                let actionItem = {};
+                                actionItem.userID = req.body.userData._id;
+                                actionItem.actionID = req.body.action._id;
+                                actionItem.actionType = req.body.action.actionType;
+                                actionItem.actionResult = req.body.action.actionResult;
+                                actionItem.inScene = req.body.action.inScene;
+                                
+                                actionItem.actionName = req.body.action.actionName;
+                                // actionItem.objectID = req.body.object_item._id;
+                                // actionItem.objectName = req.body.object_item.name;
+                                actionItem.timestamp = timestamp;
+                                actionItem.fromScene = req.body.fromScene;
+                                db.activities.updateOne({ _id: a_id }, { $push: { actionItems: actionItem }}, {upsert: false}, function (err, saved) {
+                                    if (err || !saved) {
+                                        // res.send('profcblemo ' + err);
+                                        callback(err);
+                                    } else {
+                                        console.log("ok saved to acttivieeisD");
+                                        callback(null);
+                                        // res.send('updated' + JSON.stringify(saved));
+                                    }
+                                });
+                            } 
+                        }
+                    });
+                } else {
+                    // res.send("bad user");
+                    callback("bad user");
+                }
+            } else {
+                // res.send("no action");
+                callback("no action");
+            }
+        }
+    ],
+    function (err, result) { // #last function, close async
+        if (err) {
+            res.send(err);
+        } else {
+            res.send('updated');
+            // console.log("returning inventory " + profileResponse);
+        }
+      
+    }
+);
 });
 
-// app.post('/drop/', requiredAuthentication, function (req, res) { // should be async, just happened that way.. ref as How Not To Do It
+// app.post('/drop_uh_no/', requiredAuthentication, function (req, res) { // should be async, just happened that way.. ref as How Not To Do It
 //     console.log("dropping in scene " + req.body.inScene);
 //     let timestamp = Math.round(Date.now() / 1000);
 //     let i_id = ObjectID(req.body.inventoryID);
@@ -2600,17 +2764,13 @@ app.post('/drop/', requiredAuthentication, function (req, res) {
 //                                     if (inventory.inventoryItems[i].objectID == obj._id) {
 //                                         iCount++;
 //                                         console.log("gotsa invnetory match with the obj " + iCount);
-//                                         if (i == (inventory.inventoryItems.length - 1)) { //loop is over, carry on... (ugh...)
+//                                         if (i == (inventory.inventoryItems.length - 1)) { //loop is over, carry on... stupid!
 //                                             if (iCount > obj.maxPerScene) {
 //                                                 console.log("max per scene reached!");
 //                                                 res.send("max per scene reached, no drop");
                                                 
 //                                             } else { //omg, gotta do max total as well... hrm...
-//                                                 //             }
-//                                                 //     }
-//                                                 // }
-
-//                                                 // }
+                                               
 //                                                 console.log("scene inventory item count " + iCount + " vs maxPerscene " + obj.maxPerScene );
 //                                                 //check max per scene on object and # in scene inventory 
 //                                                 db.inventories.updateOne({ "_id": s_id }, { $push: { inventoryItems: req.body.inventoryObj }}, {upsert: false}, function (err, saved) { //add to scene inventory
@@ -15787,7 +15947,7 @@ app.get('/webxr/:_id', traffic, function (req, res) { //TODO lock down w/ checkA
                 },   
                 function (callback) { //models are simpler, fewer properties`
                     if (sceneModelLocations.length > 0) {
-                        console.log("gotsome models " + JSON.stringify(sceneModelLocations));
+                        // console.log("gotsome models " + JSON.stringify(sceneModelLocations));
 
                         async.each (sceneModelLocations, function (locMdl, callbackz) { //loop tru w/ async
                             var scale = 1;
