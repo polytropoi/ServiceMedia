@@ -286,7 +286,7 @@ io.on("connection", socket => {
   });
 });
 */
-/*
+
 ///this one gets users through handshake
 // var socketUsers = {};
 // var allUsers = [];
@@ -15636,7 +15636,7 @@ app.get('/webxr/:_id', traffic, function (req, res) { //TODO lock down w/ checkA
                     let objex = [];
                     let actionModels = [];
                     // if (sceneObjectLocations.length > 0) {  // objex have more properties, but are parsed/assigned by components (mod_objex, mod_object) after page load
-                        console.log("sceneObjectLocations " + JSON.stringify(sceneObjectLocations));
+                        // console.log("sceneObjectLocations " + JSON.stringify(sceneObjectLocations));
                             let objectIDs = []; //to prevent dupes in objex response below
                         async.each (sceneObjectLocations, function (locObj, callbackz) {
                             
