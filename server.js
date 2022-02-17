@@ -164,9 +164,9 @@ const { json } = require("body-parser");
 
 const { lookupService, resolveNaptr, resolveCname } = require("dns");
 // aws.config.loadFromPath('main/conf/aws_conf.json');
-aws.config = new aws.Config({
-    accessKeyId: process.env.AWSKEY, secretAccessKey: process.env.AWSSECRET, region: process.env.AWSREGION
-  });
+// aws.config.load({accessKeyId: process.env.AWSKEY, secretAccessKey: process.env.AWSSECRET, region: process.env.AWSREGION});
+
+aws.config = new aws.Config({accessKeyId: process.env.AWSKEY, secretAccessKey: process.env.AWSSECRET, region: process.env.AWSREGION});
 var ses = new aws.SES({apiVersion : '2010-12-01'});
 var s3 = new aws.S3();
 

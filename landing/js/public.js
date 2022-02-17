@@ -41,9 +41,10 @@ var html = "<div class=\x22row\x22>";
     //   }
       html = html + '<div class=\x22my-2 col-md-3\x22>' + 
       '<div class=\x22bg-dark card\x22>' +
-          '<a class=\x22text-light\x22 href=\x22https://servicemedia.net/qrcode/' +  arr[i].sceneKey + '\x22>QR Code</a>' +      
+          // '<a class=\x22text-light\x22 href=\x22https://servicemedia.net/qrcode/' +  arr[i].sceneKey + '\x22>QR Code</a>' +      
+          '<a class=\x22text-light\x22 href=\x22http://'+location.host+'/qrcode/' +  arr[i].sceneKey + '\x22>QR Code</a>' +      
       // // '<div style=\x22background-image: url(' + arr[i].scenePostcardHalf + ');background-repeat: no-repeat; width: 100%;height: 100%;\x22>' +
-          '<a href=\x22https://servicemedia.net/webxr/'+ arr[i].sceneKey + '\x22 target=\x22_blank\x22>' +
+          '<a href=\x22http://'+location.host+'/webxr/'+ arr[i].sceneKey + '\x22 target=\x22_blank\x22>' +
           '<img src='+ arr[i].scenePostcardHalf + ' style=\x22background-color: #000;\x22 class=\x22img-thumbnail\x22></a>' +
         //    audioHtml +
            // "</div>" +
