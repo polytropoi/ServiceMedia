@@ -69,8 +69,10 @@ var adminEmail = "polytropoi@gmail.com";
 var domainAdminEmail = "polytropoi@gmail.com";
 // var domainAdminEmail = "chickenwafflevr@gmail.com";
 
-var whitelist = ['unityapp', 'https://servicemedia.s3.amazonaws.com/', 'http://localhost:3000', 'https://servicemedia.net', 'strr.us.s3.amazonaws.com', 'mvmv.us.s3.amazonaws.com', 'http://strr.us', 'https://strr.us', 'https://strr.us/socket.io', 'http://valuebring.com', 'http://elnoise.com', 
-'philosophersgarden.com', 'http://elnoise.com', 'http://eloquentnoise.com', 'http://thefamilyshare.com', 'http://little-red-schoolhouse.com', 'http://visiblecity.net', 'http://philosophersgarden.net', 'http://visiblecity.net', 'https://realitymangler.com', 'https://chickenwaffle.dashboid.com', 'dashboid.com', 'http://mvmv.us', 'http://nilch.com', 'https://servicemedia.net', 'http://kork.us', 'http://spacetimerailroad.com'];
+var whitelist = ['unityapp', 'https://servicemedia.s3.amazonaws.com/', 'http://localhost:3000', 'https://servicemedia.net', 'strr.us.s3.amazonaws.com', 'mvmv.us.s3.amazonaws.com', 'http://strr.us', 'https://strr.us',
+ 'https://strr.us/socket.io', 'http://valuebring.com', 'http://elnoise.com', 'philosophersgarden.com', 'http://elnoise.com', 'http://eloquentnoise.com', 'http://thefamilyshare.com', 'http://little-red-schoolhouse.com', 
+ 'http://visiblecity.net', 'http://philosophersgarden.net', 'http://visiblecity.net', 'https://realitymangler.com', 'https://chickenwaffle.dashboid.com', 'dashboid.com', 'https://mvmv.us', 'http://mvmv.us', 
+ 'http://nilch.com', 'https://servicemedia.net', 'http://kork.us', 'http://spacetimerailroad.com'];
 
 var corsOptions = function (origin) {
 //    console.log("checking vs whitelist:" + origin);
