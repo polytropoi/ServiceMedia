@@ -163,7 +163,10 @@ var aws = require('aws-sdk');
 const { json } = require("body-parser");
 
 const { lookupService, resolveNaptr, resolveCname } = require("dns");
-aws.config.loadFromPath('main/conf/aws_conf.json');
+// aws.config.loadFromPath('main/conf/aws_conf.json');
+aws.config = new aws.Config({
+    accessKeyId: process.env.AWSKEY, secretAccessKey: process.env.AWSSECRET, region: process.env.AWSREGION
+  });
 var ses = new aws.SES({apiVersion : '2010-12-01'});
 var s3 = new aws.S3();
 
@@ -667,7 +670,7 @@ function traffic (req, res, next) {
            console.log("traffic logging error : " + err);
             next();
         } else {
-            console.log("XXXX updated traffic log " + req.body);
+            // console.log("XXXX updated traffic log " + req.body);
             next();
         }
     });
