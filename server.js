@@ -15395,9 +15395,7 @@ app.get('/webxr/:_id', traffic, function (req, res) { //TODO lock down w/ checkA
                                     "<a-entity hide-in-ar-mode id=\x22mouseCursor\x22 cursor=\x22rayOrigin: mouse\x22 raycaster=\x22objects: .activeObjexRay\x22></a-entity>"+
                                     // "<a-entity id=\x22player\x22 get_pos_rot networked=\x22template:#avatar-template;attachTemplateToLocal:false;\x22 "+spawnInCircle+" camera "+wasd+" look-controls=\x22hmdEnabled: false\x22 position=\x220 1.6 0\x22>" +     
                                     // "<a-entity id=\x22viewportPlaceholder\x22 position=\x220 0 -1\x22></entity>"+   
-                                    "<a-entity id=\x22player\x22 get_pos_rot camera "+wasd+" look-controls=\x22hmdEnabled: false;\x22 position=\x22"+playerPosition+"\x22>" + 
-                                    // "<a-entity id=\x22viewportPlaceholder\x22 position=\x220 0 5\x22></entity>"+    
-                                    // "<a-entity id=\x22viewportPlaceholder\x22 position=\x220 0 -1\x22></entity>"+
+                                    "<a-entity id=\x22player\x22 get_pos_rot camera "+wasd+" look-controls=\x22hmdEnabled: false;\x22 position=\x22"+playerPosition+"\x22>"+
                                         "<a-entity id=\x22equipPlaceholder\x22 geometry=\x22primitive: plane; height: 0.01; width: .01\x22 position=\x220 -.5 -.5\x22"+
                                         "material=\x22opacity: 0\x22></a-entity>"+
                                         "<a-entity id=\x22viewportPlaceholder\x22 geometry=\x22primitive: plane; height: 0.01; width: .01\x22 position=\x220 0 -1\x22"+
@@ -17580,7 +17578,7 @@ app.get('/webxr/:_id', traffic, function (req, res) { //TODO lock down w/ checkA
                     if (sceneResponse.sceneWebType == undefined || sceneResponse.sceneWebType.toLowerCase() == "default" || sceneResponse.sceneWebType.toLowerCase() == "aframe") { 
                         // webxrFeatures = "webxr=\x22optionalFeatures: hit-test, local-floor\x22"; //otherwise hit-test breaks everythign!
                         webxrFeatures = "webxr=\x22optionalFeatures: hit-test, local-floor, dom-overlay; overlayElement:#canvasOverlay;\x22"; //otherwise hit-test breaks everythign!
-                        arHitTest = "ar-hit-test=\x22mode: "+arMode+"\x22";
+                        // arHitTest = "ar-hit-test=\x22mode: "+arMode+"\x22";
                         arShadowPlane = "<a-plane show-in-ar-mode visible=\x22false\x22 height=\x22200\x22 width=\x22200\x22 rotation=\x22-90 0 0\x22 repeat=\x22200 200\x22 shadow=\x22receive:true\x22 ar-shadows=\x22opacity: 0.3\x22 static-body=\x22shape: none\x22 shape__main=\x22shape: box; halfExtents: 100 100 0.125; offset: 0 0 -0.125\x22>" +
                             "</a-plane>";
                         
@@ -18497,7 +18495,7 @@ app.get('/webxr/:_id', traffic, function (req, res) { //TODO lock down w/ checkA
                         // "<script src=\x22https://github.com/aframevr/aframe/blob/master/dist/aframe-master.js\x22></script>" +
                         // https://github.com/aframevr/aframe/blob/master/dist/aframe-master.js
                         // "<script src=\x22../main/ref/aframe/dist/aframe-v1.2.0.min.js\x22></script>" +
-                        "<script src=\x22//aframe.io/releases/1.2.0/aframe.min.js\x22></script>" +
+                        "<script src=\x22//aframe.io/releases/1.3.0/aframe.min.js\x22></script>" +
                         
                         physicsScripts +
                         // "<script src=\x22https://cdn.jsdelivr.net/gh/aframevr/aframe@02f028bf319915bd5de1ef8b033495fe80b6729b/dist/aframe-master.min.js\x22></script>" +

@@ -1931,8 +1931,9 @@ AFRAME.registerComponent('mod_objex', {
       // data.object_item = this.data.objectData;
       // data.userData = userData;
       data.action = action,
+      inventoryObj.location = this.el.getAttribute("position");
       data.inventoryObj = inventoryObj;
-      data.location = this.el.getAttribute("position");
+      // data.location = this.el.getAttribute("position");
       
       // if (data.inventoryObj.actions != undefined && data.inventoryObj.actions.length > 0) {
       //   for (let i = 0; i < data.inventoryObj.actions.length; i++) {
