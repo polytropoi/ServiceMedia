@@ -1862,6 +1862,18 @@ AFRAME.registerComponent('model-callout', {
       this.el.components.material.material.depthTest = false;
     }
 });
+AFRAME.registerComponent('mod_inventory', {
+  schema: {
+    
+      jsonInventoryData: {default: ''}
+    },
+    init: function () {
+      let theData = this.el.getAttribute('data-inventory');
+      this.data.jsonInventoryData = JSON.parse(atob(theData));
+
+      console.log("scene inventory: " + JSON.stringify(this.data.jsonInventoryData));
+    }
+  });
 
 AFRAME.registerComponent('mod_objex', {
   schema: {
@@ -2010,7 +2022,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
     applyForceToNewObject: {default: false}
   },
   init: function () {
-    console.log("mod_object data " + JSON.stringify(this.data.objectData.modelURL));
+    // console.log("mod_object data " + JSON.stringify(this.data.objectData.modelURL));
     this.moEl = this.el;
     this.isActivated = false; //to prevent dupes..
     this.calloutEntity = null;
@@ -2084,7 +2096,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
    
     if (this.data.objectData.actions != undefined && this.data.objectData.actions.length > 0) {
       for (let a = 0; a < this.data.objectData.actions.length; a++) {
-          console.log("action: " + JSON.stringify(this.data.objectData.actions[a].actionType));
+          // console.log("action: " + JSON.stringify(this.data.objectData.actions[a].actionType));
 
         if (this.data.objectData.actions[a].actionType.toLowerCase() == "pickup") {
           this.hasPickupAction = true;
@@ -2146,9 +2158,9 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
         }
     });
 
-    this.el.addEventListener('body-loaded', () => {  
+    this.el.addEventListener('body-loaded', () => {  //body-loaded event = physics ready on obj
       that.el.setAttribute('ammo-shape', {type: that.data.objectData.collidertype.toLowerCase()});
-      console.log("ammo shape is " + JSON.stringify(that.el.getAttribute('ammo-shape')));
+      // console.log("ammo shape is " + JSON.stringify(that.el.getAttribute('ammo-shape')));
       if (that.data.applyForceToNewObject) {
         that.applyForce();
       }

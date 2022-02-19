@@ -10585,7 +10585,7 @@ app.get('/uscene/:user_id/:scene_id',  requiredAuthentication, uscene, function 
                 if (sceneResponse.sceneObjects != null) {
                     async.each (sceneResponse.sceneObjects, function (objID, callbackz) { //nested async-ery!
                         var oo_id = ObjectID(objID);
-                        console.log("4573 tryna get sceneObject: " + objID);
+                        // console.log("4573 tryna get sceneObject: " + objID);
                         db.obj_items.findOne({"_id": oo_id}, function (err, obj_item) {
                             if (err || !obj_item) {
                                 console.log("error getting obj items: " + err);
@@ -14698,6 +14698,7 @@ app.get('/webxr/:_id', traffic, function (req, res) { //TODO lock down w/ checkA
     let locationData = "";
     let modelData = "";
     let objectData = "";
+    let inventoryData = "";
     let arImageTargets = [];
     db.scenes.findOne({"short_id": reqstring}, function (err, sceneData) { 
             if (err || !sceneData) {
@@ -15639,7 +15640,10 @@ app.get('/webxr/:_id', traffic, function (req, res) { //TODO lock down w/ checkA
                                 console.log("inventory "+sceneData.sceneInventoryID+" not found!");
                                 callback();
                             } else {
-                                console.log("sceene inventory : " + JSON.stringify(inventory));
+                                // console.log("sceene inventory : " + JSON.stringify(inventory));
+                               
+                                var buff = Buffer.from(JSON.stringify(inventory)).toString("base64");
+                                inventoryData = "<a-entity mod_inventory id=\x22sceneInventory\x22 data-inventory='"+buff+"'></a-entity>";
                                 callback();
                             }
                         });
@@ -15654,13 +15658,13 @@ app.get('/webxr/:_id', traffic, function (req, res) { //TODO lock down w/ checkA
                     if (sceneResponse.sceneModels != null) {
                         async.each (sceneResponse.sceneModels, function (objID, callbackz) { //nested async-ery!
                             var oo_id = ObjectID(objID);
-                            console.log("13904 tryna get sceneObject: " + objID);
+                            // console.log("13904 tryna get sceneObject: " + objID);
                             db.models.findOne({"_id": oo_id}, function (err, model) {
                                 if (err || !model) {
-                                    console.log("error getting model: " + err);
+                                    console.log("error getting model: " + objID); //todo - report? 
                                     callbackz();
                                 } else {
-                                    // console.log("got user model:" + JSON.stringify(model));
+                                    console.log("got user model:" + model._id);
                                     let url = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + model.userID + "/gltf/" + model.filename, Expires: 6000});
                                     model.url = url;
                                     modelz.push(model);
@@ -17677,7 +17681,7 @@ app.get('/webxr/:_id', traffic, function (req, res) { //TODO lock down w/ checkA
                             locationScripts +
                             locationData +
                             modelData;
-                           
+                            // inventoryData;
                             } else {
                                 dialogButton = "";
                                 socketScripts = "";
@@ -18773,6 +18777,7 @@ app.get('/webxr/:_id', traffic, function (req, res) { //TODO lock down w/ checkA
                         "</a-entity>" + //end dialog
                         modelData +
                         objectData +
+                        inventoryData +
                         // "<a-entity id=\x22navmesh\x22 geometry=\x22primitive: plane; height: 30; width: 30; buffer: true;\x22 rotation=\x22-90 0 0\x22 nav-mesh></a-entity>"+
                         "</a-scene>\n"+
                         "</div>\n"+
@@ -19268,13 +19273,13 @@ app.get('/scene/:_id/:platform/:version', function (req, res) { //called from ap
                 if (sceneResponse.sceneModels != null) {
                     async.each (sceneResponse.sceneModels, function (objID, callbackz) { //nested async-ery!
                         var oo_id = ObjectID(objID);
-                        console.log("13904 tryna get sceneObject: " + objID);
+                        // console.log("13904 tryna get scenemodel: " + objID);
                         db.models.findOne({"_id": oo_id}, function (err, model) {
                             if (err || !model) {
                                 console.log("error getting model: " + err);
                                 callbackz();
                             } else {
-                                // console.log("got user model:" + JSON.stringify(model));
+                                console.log("gotsa model:" + model._id);
                                 let url = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + model.userID + "/gltf/" + model.filename, Expires: 6000});
                                 model.url = url;
                                 modelz.push(model);
