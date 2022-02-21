@@ -14792,7 +14792,7 @@ app.get('/webxr/:_id', traffic, function (req, res) { //TODO lock down w/ checkA
                         if (sceneData.sceneTags[i] == "show ethereum") {
                             ethereumButton = "<div class=\x22ethereum_button\x22 id=\x22ethereumButton\x22 style=\x22margin: 10px 10px;\x22><i class=\x22fab fa-ethereum fa-2x\x22></i></div>";
                         }
-                        if (sceneData.sceneTags[i] == "use synth") {
+                        if (sceneData.sceneTags[i].includes("synth")) {
                             synthScripts = "<script src=\x22../main/src/synth/Tone.js\x22></script><script src=\x22../main/js/synth.js\x22></script>";
                         }
                     }
@@ -15359,12 +15359,14 @@ app.get('/webxr/:_id', traffic, function (req, res) { //TODO lock down w/ checkA
                                 } else {
                                     movementControls = "movement-controls=\x22constrainToNavMesh: true; control: keyboard, gamepad, touch; fly: false;\x22"; 
                                     wasd = "";
+                                    extrasScript = "<script src=\x22..//main/vendor/aframe/aframe-extras_20210520.js\x22></script>";
                                     // joystickScript = "";
                                 }
                                 if (physicsScripts.length > 0) {
                                     movementControls = "movement-controls=\x22control: keyboard, gamepad, touch; fly: false;\x22";
                                     wasd = "";
                                     physicsMod = "geometry=\x22primitive: cylinder; height: 2; radius: 0.5;\x22 ammo-body=\x22type: kinematic;\x22 ammo-shape=\x22type: capsule\x22";
+                                    extrasScript = "<script src=\x22..//main/vendor/aframe/aframe-extras_20210520.js\x22></script>";
                                     // joystickScript = "";
 
                                 }
@@ -18569,7 +18571,7 @@ app.get('/webxr/:_id', traffic, function (req, res) { //TODO lock down w/ checkA
                         "<script src=\x22../main/ref/aframe/dist/aframe-layout-component.min.js\x22></script>" +  
                        
                         "<script src=\x22../main/ref/aframe/dist/aframe-randomizer-components.min.js\x22></script>" +
-                        "<script src=\x22../main/ref/aframe/dist/aframe-environment-component.js\x22></script>" +
+                        "<script src=\x22../main/ref/aframe/dist/aframe_environment_component.min.js\x22></script>" +
                        
                         joystickScript +
                         "<script src=\x22../main/src/component/aframe-makewaves-shader.js\x22></script>"+

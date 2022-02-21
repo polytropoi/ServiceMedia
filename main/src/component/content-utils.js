@@ -2092,6 +2092,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
     }
     if (this.data.objectData.synthNotes != undefined && this.data.objectData.synthNotes != null && this.data.objectData.synthNotes.length > 0) {
       this.el.setAttribute("mod_synth", "init");
+      this.hasSynth = true;
 
     }
    
