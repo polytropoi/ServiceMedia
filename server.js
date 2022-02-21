@@ -14652,7 +14652,7 @@ app.get('/webxr/:_id', traffic, function (req, res) { //TODO lock down w/ checkA
     let isGuest = true;
     let socketScripts = "";
     let navmeshScripts = "";
-    let hasSynth = true;
+    let hasSynth = false;
     let hasPrimaryAudio = false;
     let hasPrimaryAudioStream = false;
     let hasAmbientAudio = false;
@@ -14693,6 +14693,7 @@ app.get('/webxr/:_id', traffic, function (req, res) { //TODO lock down w/ checkA
     let instancingEntity = "";
     let meshUtilsScript = "<script type=\x22module\x22 src=\x22../main/src/component/mesh-utils.js\x22 defer=\x22defer\x22></script>";
     let physicsScripts = "";
+    let extrasScript = ""; //aframe-extras lib for physics and navmesh
     // let debugMode = false;
     let surfaceScatterScript = "";
     let locationData = "";
@@ -14790,6 +14791,9 @@ app.get('/webxr/:_id', traffic, function (req, res) { //TODO lock down w/ checkA
                         }
                         if (sceneData.sceneTags[i] == "show ethereum") {
                             ethereumButton = "<div class=\x22ethereum_button\x22 id=\x22ethereumButton\x22 style=\x22margin: 10px 10px;\x22><i class=\x22fab fa-ethereum fa-2x\x22></i></div>";
+                        }
+                        if (sceneData.sceneTags[i] == "use synth") {
+                            synthScripts = "<script src=\x22../main/src/synth/Tone.js\x22></script><script src=\x22../main/js/synth.js\x22></script>";
                         }
                     }
                 }
@@ -15368,6 +15372,7 @@ app.get('/webxr/:_id', traffic, function (req, res) { //TODO lock down w/ checkA
                                     movementControls = "movement-controls=\x22constrainToNavMesh: true; control: keyboard, gamepad, touch; fly: false;\x22";
                                     wasd = "";
                                     physicsMod = "geometry=\x22primitive: cylinder; height: 2; radius: 0.5;\x22 ammo-body=\x22type: kinematic;\x22 ammo-shape=\x22type: capsule\x22";
+                                    extrasScript = "<script src=\x22..//main/vendor/aframe/aframe-extras_20210520.js\x22></script>";
                                     // joystickScript = "";
                                 }
                                 // let settings = {};
@@ -17590,6 +17595,7 @@ app.get('/webxr/:_id', traffic, function (req, res) { //TODO lock down w/ checkA
                     settings.sceneTimedEvents = sceneResponse.sceneTimedEvents; //could be big!?
                     settings.skyboxIDs = skyboxIDs;
                     settings.skyboxID = skyboxID;
+                    settings.useSynth = hasSynth;
                     var sbuff = Buffer.from(JSON.stringify(settings)).toString("base64");
                     settingsData = "<div id=\x22settingsDataElement\x22 data-settings=\x22"+sbuff+"\x22></div>";
 
@@ -18547,9 +18553,10 @@ app.get('/webxr/:_id', traffic, function (req, res) { //TODO lock down w/ checkA
                         // "<script src=\x22https://github.com/aframevr/aframe/blob/master/dist/aframe-master.js\x22></script>" +
                         // https://github.com/aframevr/aframe/blob/master/dist/aframe-master.js
                         // "<script src=\x22../main/ref/aframe/dist/aframe-v1.2.0.min.js\x22></script>" +
-                        "<script src=\x22//aframe.io/releases/1.3.0/aframe.min.js\x22></script>" +
+                        "<script src=\x22//aframe.io/releases/1.2.0/aframe.min.js\x22></script>" +
                         
                         physicsScripts +
+                        extrasScript +
                         // "<script src=\x22https://cdn.jsdelivr.net/gh/aframevr/aframe@02f028bf319915bd5de1ef8b033495fe80b6729b/dist/aframe-master.min.js\x22></script>" +
                        
                         
@@ -18593,7 +18600,7 @@ app.get('/webxr/:_id', traffic, function (req, res) { //TODO lock down w/ checkA
                         // "<script src=\x22//cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js\x22></script>" +
                         // "<script src=\x22../main/vendor/aframe/aframe-extras.controls.js\x22></script>"+  
                         // "<script src=\x22../main/vendor/aframe/aframe-extras-pathfinding_20210520.js\x22></script>"+  
-                        "<script src=\x22..//main/vendor/aframe/aframe-extras_20210520.js\x22></script>"+  
+                        // "<script src=\x22..//main/vendor/aframe/aframe-extras_20210520.js\x22></script>"+  
                         
                         
                         // "<script src=\x22../main/vendor/trackedlibs/grab.js\x22></script>"+  

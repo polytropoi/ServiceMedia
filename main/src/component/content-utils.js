@@ -2043,6 +2043,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
     this.dropAction = null;
     this.equipAction = null;
     this.synth = null;
+    this.hasSynth = false;
     this.mod_physics = "";
   
     if (this.data.objectData.modelURL != undefined) {
@@ -2089,7 +2090,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
       });
       
     }
-    if (this.data.objectData.synthNotes != undefined && this.data.objectData.synthNotes != null) {
+    if (this.data.objectData.synthNotes != undefined && this.data.objectData.synthNotes != null && this.data.objectData.synthNotes.length > 0) {
       this.el.setAttribute("mod_synth", "init");
 
     }
@@ -2283,7 +2284,9 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
       // }
       // let synthCtrl = this.el.components.mod_synth;
       // if (synthCtrl != null) {
-        this.el.components.mod_synth.trigger(distance);
+        if (this.hasSynth) {
+          this.el.components.mod_synth.trigger(distance);
+        }
       // } else {
       //   console.log("no synth");
       // }
@@ -2293,7 +2296,9 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
    
     console.log("hasPickupAction " + this.hasPickupAction + " for " + this.el.id);
     if (!this.isActivated) { 
-      this.el.components.mod_synth.highTrigger();
+      if (this.hasSynth) {
+        this.el.components.mod_synth.highTrigger();
+      }
       this.isActivated = true;
       if (this.data.objectData.objtype.toLowerCase() == "pickup"  || this.hasPickupAction) {
       

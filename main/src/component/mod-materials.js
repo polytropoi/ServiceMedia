@@ -549,6 +549,7 @@ AFRAME.registerComponent('mod-materials', {
               console.log("tryna bind vid material to mesh");
 
               this.playmaterial.map.needsUpdate = true;   
+              this.playmaterial.needsUpdate = true;
               // if (this.screenMesh.material == null) {
                 
               // }
@@ -622,7 +623,9 @@ AFRAME.registerComponent('mod-materials', {
       this.el.addEventListener("raycaster-intersected-cleared", () => {
           // console.log("intersection cleared");
           // if (this.video != undefined) {
+          thiz.raycaster = null;
           this.raycaster = null;
+          mouseOverObject = null;
           // }
       });
       this.el.addEventListener('click', function (event) {
@@ -774,6 +777,7 @@ AFRAME.registerComponent('mod-materials', {
               this.durationtimeformat = fancyTimeFormat(this.video.duration)
             }
           if (!this.video.paused && this.slider_handle != null) {
+            this.playmaterial.map.needsUpdate = true;  
             currentTime = this.video.currentTime.toFixed(2);
             this.percent = this.video.currentTime / this.video.duration;
             // console.log(this.percent);
