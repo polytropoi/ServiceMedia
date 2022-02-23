@@ -820,14 +820,15 @@ function geoip(json){
       range: {default: .1},
       doBuildings: {default: false},
       doTerrain: {default: false},
-      zoomLevel: {default: 19}
+      zoomLevel: {default: 19},
+      mbid: {default: ""}
       },
     init: function () {
       mode = 'mapbox';
       window.sceneType = mode;
       InitSceneHooks();
       UpdateLocationInfo();
-      mapboxgl.accessToken = mapbox_config.accessToken;
+      mapboxgl.accessToken = this.data.mbid;
       // console.log("tryna mapbox with toik,e mn " + mapbox_config.accessToken);
       gpsElements = document.querySelectorAll(".geopoi,.geo");
       let latitude = gpsElements[0].getAttribute(geoEntity.toString()).latitude;
@@ -888,7 +889,7 @@ function geoip(json){
           'type': 'raster-dem',
           'url': 'mapbox://mapbox.mapbox-terrain-dem-v1',
           'tileSize': 512,
-          'maxzoom': 18
+          'maxzoom': 20
           });
           if (this.doTerrain) {
             // add the DEM source as a terrain layer with exaggerated height

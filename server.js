@@ -12369,7 +12369,7 @@ app.post('/update_scene/:_id', requiredAuthentication, function (req, res) {
             console.log("error getting scene: " + err);
         } else {
 
-            let inventoryID = scene.sceneInventoryID; //easier to jack in here, than ?
+            let inventoryID = scene.sceneInventoryID; //easier to jack in here, than ? make a temp batch route? 
             if (inventoryID == null) {
                 let inventories = {};
                 let inventoryItems = [];
@@ -15287,7 +15287,7 @@ app.get('/webxr/:_id', traffic, function (req, res) { //TODO lock down w/ checkA
                                 // "<div class=\x22next_button\x22 style=\x22float: left; margin: 10px 10px;\x22 onclick=\x22ShowHideDialogPanel('default')\x22><i class=\x22fas fa-step-forward fa-2x\x22></i></div>" +
                                 "<div class=\x22next_button\x22 style=\x22float: left; margin: 10px 10px;\x22 onclick=\x22NextButton()\x22><i class=\x22fas fa-step-forward fa-2x\x22></i></div></div>";
                                 geoScripts = "<script async src=\x22https://get.geojs.io/v1/ip/geo.js\x22></script><script src=\x22/main/js/geolocator.js\x22></script>" +
-                                "<script src=\x22/main/conf/mapbox_config.js\x22></script>" +
+                                // "<script src=\x22/main/conf/mapbox_config.js\x22></script>" +
                                 // "<script src=\x22https://api.mapbox.com/mapbox-gl-js/v2.2.0/mapbox-gl.js\x22></script>"+
                                 // "<link href=\x22https://api.mapbox.com/mapbox-gl-js/v2.2.0/mapbox-gl.css\x22 rel=\x22stylesheet\x22/>"+
                                 "<script src=\x22https://api.mapbox.com/mapbox-gl-js/v2.3.1/mapbox-gl.js\x22></script>"+
@@ -15316,7 +15316,7 @@ app.get('/webxr/:_id', traffic, function (req, res) { //TODO lock down w/ checkA
                                 if (sceneData.sceneTags!= null && sceneData.sceneTags.includes("terrain")) {
                                     doTerrain = true;
                                 }
-                                locationEntity = "<a-entity id=\x22youAreHere\x22 location_init_mapbox=\x22zoomLevel: "+sceneData.sceneMapZoom+"; doBuildings: "+doBuildings+";doTerrain: "+doTerrain+";\x22 position=\x220 2 -5\x22>"+
+                                locationEntity = "<a-entity id=\x22youAreHere\x22 location_init_mapbox=\x22zoomLevel: "+sceneData.sceneMapZoom+"; doBuildings: "+doBuildings+"; doTerrain: "+doTerrain+"; mbid: "+process.env.MAPBOX_KEY+";\x22 position=\x220 2 -5\x22>"+
                                     // "<a-entity class=\x22gltf\x22 gltf-model=\x22#globe\x22 class=\x22envMap activeObjexRay\x22 position=\x220 -1.5 0\x22>"+
                                     // "</a-entity>"+
                                 "</a-entity>";
