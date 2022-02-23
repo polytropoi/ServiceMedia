@@ -12,6 +12,8 @@ let initialized = false;
 let gpsElements = null;
 
 let data_location_
+let doBuildings = false;
+let doTerrain = false;
 
 
 AFRAME.registerComponent('location_init_ar', { 
@@ -874,9 +876,11 @@ function geoip(json){
         //   requestAnimationFrame(animate);
         //   stats.update();
         // }
-        this.doBuildings = this.data.doBuildings;
-        this.doTerrain = this.data.doTerrain;
-        console.log("do builtings " + this.doBuildings);
+        doBuildings = this.data.doBuildings;
+        doTerrain = this.data.doTerrain;
+
+        let that = this;
+        console.log("do builtings " + doBuildings + " do terrain " + doTerrain);
         map.on('load', function () {
           // map.addControl(
           //   new MapboxDirections({
@@ -884,18 +888,19 @@ function geoip(json){
           //   }),
           //   'top-right'
           //   );
+          if (doTerrain) {
+            map.addSource('mapbox-dem', {
+            'type': 'raster-dem',
+            'url': 'mapbox://mapbox.mapbox-terrain-dem-v1',
+            'tileSize': 512,
+            'maxzoom': 20
+            });
 
-          map.addSource('mapbox-dem', {
-          'type': 'raster-dem',
-          'url': 'mapbox://mapbox.mapbox-terrain-dem-v1',
-          'tileSize': 512,
-          'maxzoom': 20
-          });
-          if (this.doTerrain) {
-            // add the DEM source as a terrain layer with exaggerated height
-            
+              // add the DEM source as a terrain layer with exaggerated height
+              
+            // }
+            map.setTerrain({ 'source': 'mapbox-dem', 'exaggeration': 1.25 });
           }
-          map.setTerrain({ 'source': 'mapbox-dem', 'exaggeration': 1.25 });
           // add a sky layer that will show when the map is highly pitched
           map.addLayer({
             'id': 'sky',
@@ -906,6 +911,7 @@ function geoip(json){
             'sky-atmosphere-sun-intensity': 15
             }
           });
+
           // map.addLayer({
           //   id: 'custom_layer',
           //   type: 'custom',
@@ -950,7 +956,7 @@ function geoip(json){
         map.touchPitch.enable();
         map.touchZoomRotate.enable({ around: 'center' });
         map.scrollZoom.enable({ around: 'center' });
-        if (this.doBuildings == true) {
+        if (doBuildings) {
           console.log("tryna do buildingz");
           map.addLayer({
             'id': '3d-buildings',
@@ -982,7 +988,7 @@ function geoip(json){
               15.05,
               ['get', 'min_height']
               ],
-              'fill-extrusion-opacity': 0.5
+              'fill-extrusion-opacity': 0.6
               } 
             },
             labelLayerId

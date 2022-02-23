@@ -472,6 +472,7 @@ function GoToLocation(locationKey) {
    }
 }
 function GoToNext() {
+   console.log("tryna gotonext");
 // if (currentLocationIndex > 0) {
    if (sceneLocations != null && sceneLocations.locationMods != undefined && sceneLocations.locationMods != null  && sceneLocations.locationMods.length > 0) {
       if (currentLocationIndex < sceneLocations.locationMods.length - 1) {
