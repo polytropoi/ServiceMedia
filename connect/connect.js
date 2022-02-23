@@ -472,39 +472,69 @@ function GoToLocation(locationKey) {
    }
 }
 function GoToNext() {
-   console.log("tryna gotonext");
+   console.log("tryna gotonext " + window.sceneType);
 // if (currentLocationIndex > 0) {
-   if (sceneLocations != null && sceneLocations.locationMods != undefined && sceneLocations.locationMods != null  && sceneLocations.locationMods.length > 0) {
-      if (currentLocationIndex < sceneLocations.locationMods.length - 1) {
+   if (window.sceneType == "mapbox") {
+      
+      var locbuttons = document.getElementsByClassName("locbutton");
+      if (currentLocationIndex < locbuttons.length - 1) {
          currentLocationIndex++;
+         if (currentLocationIndex == 0) {
+            currentLocationIndex = 1
+         }
       } else {
-         currentLocationIndex = 0;
-         // GoToLocation(phID);
+         currentLocationIndex = 1; //zero index is user location, so skip it
       }
-   // if (sceneLocations.locationMods[currentLocationIndex].markerType.toLowerCase() == 'poi') {
-      GoToLocation(sceneLocations.locationMods[currentLocationIndex].phID);
-   // }
-   }
-   if (skyboxEl != null) {
-      skyboxEl.components.skybox_dynamic.nextSkybox();
+      let lbData = locbuttons[currentLocationIndex].id;
+      FlyToMapPosition(lbData.split("_")[0],lbData.split("_")[1], false);
+    
+   } else {
+      if (sceneLocations != null && sceneLocations.locationMods != undefined && sceneLocations.locationMods != null  && sceneLocations.locationMods.length > 0) {
+         if (currentLocationIndex < sceneLocations.locationMods.length - 1) {
+            currentLocationIndex++;
+         } else {
+            currentLocationIndex = 0;
+            
+         }
+      // if (sceneLocations.locationMods[currentLocationIndex].markerType.toLowerCase() == 'poi') {
+         GoToLocation(sceneLocations.locationMods[currentLocationIndex].phID);
+      // }
+      }
+      if (skyboxEl != null) {
+         skyboxEl.components.skybox_dynamic.nextSkybox();
+      }
    }
 }
 function GoToPrevious() {
-   if (sceneLocations != null && sceneLocations.locationMods != undefined && sceneLocations.locationMods != null && sceneLocations.locationMods.length > 0) {
+
+   if (window.sceneType == "mapbox") {
+      
+      var locbuttons = document.getElementsByClassName("locbutton");
       if (currentLocationIndex > 0) {
          currentLocationIndex--;
-         // GoToLocation(sceneLocations.locationMods[currentLocationIndex].phID);
+         if (currentLocationIndex == 0) {
+            currentLocationIndex = locbuttons.length - 1;
+         }
       } else {
-         currentLocationIndex = sceneLocations.locationMods.length - 1;
-         // console.log("poi loc error" + JSON.stringify(sceneLocations.locationMods[currentLocationIndex]));
-         // GoToLocation(sceneLocations.locationMods[currentLocationIndex].phID);
+         currentLocationIndex = locbuttons.length - 1;
       }
-      // if (sceneLocations.locationMods[currentLocationIndex].markerType == 'poi') {
-         GoToLocation(sceneLocations.locationMods[currentLocationIndex].phID);
-      // }
-   }
-   if (skyboxEl != null) {
-      skyboxEl.components.skybox_dynamic.previousSkybox();
+      let lbData = locbuttons[currentLocationIndex].id;
+      FlyToMapPosition(lbData.split("_")[0],lbData.split("_")[1], false);
+    
+   } else {
+      if (sceneLocations != null && sceneLocations.locationMods != undefined && sceneLocations.locationMods != null && sceneLocations.locationMods.length > 0) {
+         if (currentLocationIndex > 0) {
+            currentLocationIndex--;
+         } else {
+            currentLocationIndex = sceneLocations.locationMods.length - 1;
+         }
+        
+            GoToLocation(sceneLocations.locationMods[currentLocationIndex].phID);
+         // }
+      }
+      if (skyboxEl != null) {
+         skyboxEl.components.skybox_dynamic.previousSkybox();
+      }
    }
 }
 
