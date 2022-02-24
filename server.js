@@ -11608,7 +11608,10 @@ app.get('/publicscenes', function (req, res) { //deprecated, see available scene
                                     scenePostcardHalf: urlHalf,
                                     scenePostcardQuarter: urlQuarter
                                 };
-                                availableScenesResponse.availableScenes.push(availableScene);
+                                if (availableScene.sceneDomain != "xrswim.com") { //hrm...
+                                    availableScenesResponse.availableScenes.push(availableScene);
+                                }
+                                
                             }
     //                        console.log("publicScene: " + publicScene);
     //                        availableScenesResponse.availableScenes.push(availableScene);
@@ -16986,7 +16989,7 @@ app.get('/webxr/:_id', traffic, function (req, res) { //TODO lock down w/ checkA
                         let iosIcon = "<span class=\x22apple_no\x22>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>";
                         let androidIcon = "<span class=\x22android_no\x22>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>";
                         let windowsIcon = "<span class=\x22windows_no\x22>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>";
-                        let getAppLink = "<span class=\x22smallfont\x22><a class=\x22btn\x22 href=\x22https://servicemedia.net/builds\x22 target=\x22_blank\x22>Get the app</a></span>&nbsp;";
+                        let getAppLink = "<span class=\x22smallfont\x22><a class=\x22btn\x22 href=\x22https://servicemedia.net/landing/builds\x22 target=\x22_blank\x22>Get the app</a></span>&nbsp;";
 
                         let connectLink = "<span class=\x22smallfont\x22><a class=\x22btn\x22 href=\x22https://strr.us/connect/?scene="+sceneResponse.short_id+"\x22 target=\x22_blank\x22>Connect</a></span>&nbsp;";
                         let loginLink = "<span class=\x22smallfont\x22><a class=\x22btn\x22 href=\x22https://servicemedia.net/main/login.html\x22 target=\x22_blank\x22>Login</a></span>";
