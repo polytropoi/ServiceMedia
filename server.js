@@ -15336,7 +15336,7 @@ app.get('/webxr/:_id', traffic, function (req, res) { //TODO lock down w/ checkA
                                 "<div id=\x22button_left_2\x22 class=\x22button_left_2\x22 onclick=\x22ZoomOut()\x22 class=\x22tooltip\x22><i class=\x22fas fa-search-minus fa-2x\x22></i><span class=\x22tooltiptext\x22></span></div>"+
                                 "<div id=\x22button_left_3\x22 class=\x22button_left_3\x22 onclick=\x22ZoomIn()\x22 class=\x22tooltip\x22><i class=\x22fas fa-search-plus fa-2x\x22></i><span class=\x22tooltiptext\x22></span></div>" +
                                 "<div id=\x22button_left_4\x22 class=\x22button_left_4\x22 onclick=\x22RotateCamera(0)\x22 class=\x22tooltip\x22><i class=\x22fas fa-sync-alt fa-2x\x22></i><span class=\x22tooltiptext\x22></span></div>"+
-                                "<div id=\x22location_button\x22 class=\x22location_button\x22 style=\x22float: right; margin: 10px 10px;\x22 onclick=\x22ShowHideGeoPanel()\x22><i class=\x22fas fa-globe fa-2x\x22></i></div>";
+                                "<div id=\x22loc_button\x22 class=\x22dialog_button\x22 style=\x22float: left; margin: 10px 10px; width: 50px; height: 50px\x22 onclick=\x22ShowHideGeoPanel()\x22><i class=\x22fas fa-globe fa-2x\x22></i></div>";
                                 // "<div class=\x22location_buttons_left\x22 onclick=\x22ShareLocation()\x22 class=\x22tooltip\x22><i class=\x22fas fa-map-marked-alt fa-2x\x22></i><span class=\x22tooltiptext\x22>Share Location</span></div>";
                                 mapStyleSelector = "<div id=\x22button_left_5\x22 class=\x22button_left_5\x22>" +
                                     "<select id=\x22mapStyle\x22>" +

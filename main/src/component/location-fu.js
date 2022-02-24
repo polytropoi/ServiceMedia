@@ -72,7 +72,7 @@ function UpdateGeoPanel(nwString) {
     
 
     let d = document.querySelector('.geopanel');
-    d.style.visibility = "visible";
+    // d.style.visibility = "visible";
     // d.createElement('button')
     // d.setAttribute("style",locstyle);
     var p = d.querySelector('span');
@@ -84,19 +84,24 @@ function UpdateGeoPanel(nwString) {
 
 function ShowHideGeoPanel () {
   showGeoPanel = !showGeoPanel;
+  console.log("tryna showhidegeopanle " + showGeoPanel);
   if (showGeoPanel) { 
     if (initialized) {
       UpdateLocationInfo();
     }
     // 
   //  SwitchMapStyle();
+    
     let d = document.querySelector('.geopanel');
     d.style.visibility = "visible";
     d.style.display = "block";
+    // showGeoPanel = false;
     // UpdateLocationInfo();
   } else {
     let d = document.querySelector('.geopanel');
-    // d.style.visibility = "hidden";
+    d.style.visibility = "hidden";
+    d.style.display = "none";
+    // showGeoPanel = true;
   }
 }
 
@@ -178,7 +183,7 @@ function geoip(json){
 
 
   function UpdateLocationInfo() {
-    ShowHideGeoPanel();
+    // ShowHideGeoPanel();
 
     gpsElements = document.querySelectorAll(".poi,.geo");
     console.log("MODE IS " + mode + " gpsElements : " + gpsElements.length);
@@ -779,7 +784,7 @@ function geoip(json){
   function FlyToMapPosition (lng, lat, rotate) {
     // console.log("tryna fly to " + lng + lat);
     // cancelAnimationFrame();
-    ShowHideGeoPanel();
+    // ShowHideGeoPanel();
     let coordinates = [lng, lat];
     if (theMap) {
       // console.log("gotsa map!");
@@ -850,6 +855,7 @@ function geoip(json){
 
 
         });
+        map.scrollZoom.disable();
         theMap = map;
 
         // window.tb = new Threebox(
@@ -950,12 +956,12 @@ function geoip(json){
         //   deceleration: 1500,
         //   });
         map.dragPan.disable();
-        // map.scrollZoom.disable();
+        map.scrollZoom.disable();
         map['doubleClickZoom'].disable();
         map['dragRotate'].enable();
         map.touchPitch.enable();
         map.touchZoomRotate.enable({ around: 'center' });
-        map.scrollZoom.enable({ around: 'center' });
+        // map.scrollZoom.enable({ around: 'center' });
         if (doBuildings) {
           console.log("tryna do buildingz");
           map.addLayer({

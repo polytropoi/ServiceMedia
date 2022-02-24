@@ -1871,7 +1871,7 @@ AFRAME.registerComponent('mod_inventory', {
       let theData = this.el.getAttribute('data-inventory');
       this.data.jsonInventoryData = JSON.parse(atob(theData));
 
-      console.log("scene inventory: " + JSON.stringify(this.data.jsonInventoryData));
+      // console.log("scene inventory: " + JSON.stringify(this.data.jsonInventoryData));
       let objexEl = document.getElementById('sceneObjects');    
       objexEl.components.mod_objex.addInventoryObjects(this.data.jsonInventoryData);
     }
@@ -1915,7 +1915,7 @@ AFRAME.registerComponent('mod_objex', {
       let that = this;
     },
     addInventoryObjects: function(objex) {
-
+      console.log(JSON.stringify(objex));
     },
     returnObjectData: function(objectID) {
       console.log('tryna return object data for ' +objectID);

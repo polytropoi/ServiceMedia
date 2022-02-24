@@ -109,12 +109,12 @@ body {
     color: white;
 } */
 .location_button {
-    z-index: 10;
+    z-index: 100;
     position: absolute;
     /* display: inline-block; */
-    bottom: 150px;
-    right: 25px;
-    color: white;
+    top: 5px;
+    right: 10px;
+    color: rgb(0, 225, 255);
 }
 .button_left_1 {
     z-index: 10;
