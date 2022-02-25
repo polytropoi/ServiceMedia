@@ -1,0 +1,50 @@
+<html xmlns='http://www.w3.org/1999/xhtml'>
+    <head> 
+    <link href=\x22css/sb-admin-2.css\x22 rel=\x22stylesheet\x22>
+    <style>
+    body {background-color: #272727;}
+    h1   {color: white;}
+    a   {color: powderblue;}
+    p    {color: white; font-family: sans-serif; margin: auto; font-size: 200%;}
+    </style>
+    </head>
+
+
+    
+    <body>
+        <div style="width: 600px">
+        <p id="main"></p>
+        <!-- <div id="map"></div> -->
+        </div>
+       <script>
+        let mapdiv = document.getElementById('map');
+        let main = document.getElementById('main');
+        function getParameterByName(name, url) {
+            if (!url) {
+                url = window.location.href;
+            }
+            name = name.replace(/[\[\]]/g, "\\$&");
+            var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+                results = regex.exec(url);
+            if (!results) return null;
+            if (!results[2]) return '';
+            return decodeURIComponent(results[2].replace(/\+/g, " "));
+        }
+        const params = getParameterByName('ld');
+        console.log("params : " + params);
+        let data = JSON.parse(atob(params));
+        console.log(data);  
+
+        if (data.distance != null && data.distance != undefined) {
+            main.innerHTML = "Sorry, access to this resource is restricted to a <a href='http://maps.google.com?q=" + data.lat + "," + data.lng + "'>specific geographic location.</a><br><br>"+
+            "You must be within <span style='color:lightgreen;'>" + data.range + "</span> miles of the location; your distance was <span style='color:pink;'>" + data.distance.toFixed(2) + "</span> miles";
+        } else {
+            main.innerHTML = "Sorry, access to this resource is restricted to a <a href='http://maps.google.com?q=" + data.lat + "," + data.lng + "'>specific geographic location.</a><br><br>"+
+            "You must be within <span style='color:lightgreen;'>" + data.range + "</span> miles of the location.  Your position could not be established; please enable location services on your device.";
+        }
+        </script>
+
+    </body>
+
+</html>
+
