@@ -1862,7 +1862,7 @@ AFRAME.registerComponent('model-callout', {
       this.el.components.material.material.depthTest = false;
     }
 });
-AFRAME.registerComponent('mod_inventory', {
+AFRAME.registerComponent('mod_scene_inventory', {
   schema: {
     
       jsonInventoryData: {default: ''}
@@ -1873,7 +1873,7 @@ AFRAME.registerComponent('mod_inventory', {
 
       // console.log("scene inventory: " + JSON.stringify(this.data.jsonInventoryData));
       let objexEl = document.getElementById('sceneObjects');    
-      objexEl.components.mod_objex.addInventoryObjects(this.data.jsonInventoryData);
+      objexEl.components.mod_objex.addSceneInventoryObjects(this.data.jsonInventoryData);
     }
   });
 
@@ -1914,8 +1914,19 @@ AFRAME.registerComponent('mod_objex', {
       }
       let that = this;
     },
-    addInventoryObjects: function(objex) {
+    addSceneInventoryObjects: function(objex) { //
+      let oIDs = [];
       console.log(JSON.stringify(objex));
+      for (let i = 0; i < objex.inventoryItems.length; i++) {
+        if (this.returnObjectData(objex.inventoryItems[i].objectID) == null) { //if we don't already have this object data, need to fetch it
+          if (!oIDs.includes(objex.inventoryItems[i].objectID)) {
+            oIDs.push(objex.inventoryItems[i].objectID);
+            console.log("gotsa oID from scene inventory that needs fetching!");
+          }
+        }
+
+      }
+      console.log("need to fetch to pop scene inventory: " + oIDs);
     },
     returnObjectData: function(objectID) {
       console.log('tryna return object data for ' +objectID);
@@ -1939,16 +1950,17 @@ AFRAME.registerComponent('mod_objex', {
     },
   
     dropInventoryObject: function (inventoryID, action, inventoryObj) {
-
       let data = {};
-
       data.inScene = room;
       data.inventoryID = inventoryID;
       data.userData = userData;
       // data.object_item = this.data.objectData;
       // data.userData = userData;
-      data.action = action,
-      inventoryObj.location = this.el.getAttribute("position");
+      data.action = action;
+      let loc = new THREE.Vector3();
+      this.viewportHolder = document.getElementById('viewportPlaceholder');
+      this.viewportHolder.object3D.getWorldPosition( loc );
+      inventoryObj.location = {"x": parseFloat(loc.x.toFixed(3)), "y": parseFloat(loc.y.toFixed(3)), "z": parseFloat(loc.z.toFixed(3))}; //truncate long floating point values, close enough
       data.inventoryObj = inventoryObj;
       // data.location = this.el.getAttribute("position");
       
@@ -1961,7 +1973,6 @@ AFRAME.registerComponent('mod_objex', {
       // }
       if (action.actionType.toLowerCase() == "drop") {
        Drop(data);
-
       }
     },
     equipObject: function (objectID) {

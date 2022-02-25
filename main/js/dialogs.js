@@ -920,10 +920,10 @@ function DropInventoryItem(objectID) {
   let objexEl = document.getElementById('sceneObjects');
   if (objexEl != null) {
     objectData = objexEl.components.mod_objex.returnObjectData(objectID);
-    console.log("chekin objectData: " + JSON.stringify(objectData));
+    // console.log("chekin objectData: " + JSON.stringify(objectData));
     if (objectData.actions != undefined && objectData.actions.length > 0) {
       for (let i = 0; i < objectData.actions.length; i++) {
-        console.log("ACTION " + JSON.stringify(objectData.actions[i]));
+        // console.log("ACTION " + JSON.stringify(objectData.actions[i]));
         if (objectData.actions[i].actionType.toLowerCase().includes("drop")) {
           action = objectData.actions[i];
           console.log(JSON.stringify(action));
@@ -1002,7 +1002,7 @@ function ShowInventoryItem(objectID) {
       xhr.send();
       xhr.onload = function () {
         // do something to response
-        console.log("fetched obj resp: " +this.responseText);
+        // console.log("fetched obj resp: " +this.responseText);
         objectData = JSON.parse(this.responseText);
         console.log("object data " + objectData);
         let response = "<button class=\x22addButton\x22 style=\x22float: right; padding: 10px; margin: 5px\x22 onclick=\x22EquipInventoryItem('"+objectData._id+"')\x22>Equip Item</button>"+

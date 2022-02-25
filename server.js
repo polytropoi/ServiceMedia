@@ -15653,7 +15653,7 @@ app.get('/webxr/:_id', traffic, function (req, res) { //TODO lock down w/ checkA
                                 // console.log("sceene inventory : " + JSON.stringify(inventory));
                                
                                 var buff = Buffer.from(JSON.stringify(inventory)).toString("base64");
-                                inventoryData = "<a-entity mod_inventory id=\x22sceneInventory\x22 data-inventory='"+buff+"'></a-entity>";
+                                inventoryData = "<a-entity mod_scene_inventory id=\x22sceneInventory\x22 data-inventory='"+buff+"'></a-entity>";
                                 callback();
                             }
                         });
