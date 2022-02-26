@@ -1903,7 +1903,6 @@ AFRAME.registerComponent('mod_objex', {
              
               console.log("location/object match " + this.data.jsonLocationsData[i].objectID + " modelID " + this.data.jsonObjectData[k].modelID);
               let objEl = document.createElement("a-entity");
-              
               objEl.setAttribute("mod_object", {'locationData': this.data.jsonLocationsData[i], 'objectData': this.data.jsonObjectData[k]});
               objEl.id = "obj" + this.data.jsonLocationsData[i].objectID + "_" + this.data.jsonLocationsData[i].timestamp;
               sceneEl.appendChild(objEl);
@@ -1917,6 +1916,7 @@ AFRAME.registerComponent('mod_objex', {
     addSceneInventoryObjects: function(objex) { //
       let oIDs = [];
       console.log(JSON.stringify(objex));
+      //wait, need to cache the locations where to place the fetched objs... :|
       for (let i = 0; i < objex.inventoryItems.length; i++) {
         if (this.returnObjectData(objex.inventoryItems[i].objectID) == null) { //if we don't already have this object data, need to fetch it
           if (!oIDs.includes(objex.inventoryItems[i].objectID)) {
@@ -1927,6 +1927,25 @@ AFRAME.registerComponent('mod_objex', {
 
       }
       console.log("need to fetch to pop scene inventory: " + oIDs);
+      if (oIDs.length > 0) {
+        let data = {};
+        data.oIDs = oIDs;
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", '/scene_inventory_objex/', true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.send(JSON.stringify(data));
+        xhr.onload = function () {
+          // do something to response
+          // console.log("fetched obj resp: " +this.responseText);
+          let objectDatas = JSON.parse(this.responseText);
+          if (objectData.length > 0) {
+            for (let i = 0; i < objectDatas.length; i++) {
+              this.addFetchedObject(objectDatas[i]); //add to scene object collection, so don't have to fetch again
+            }
+          }
+        }
+
+      }
     },
     returnObjectData: function(objectID) {
       console.log('tryna return object data for ' +objectID);
@@ -1946,7 +1965,8 @@ AFRAME.registerComponent('mod_objex', {
     
     },
     addFetchedObject (obj) {
-      this.data.jsonObjectData.push(obj);
+      console.log("tryna add fetched obj " + obj._id)
+      this.data.jsonObjectData.push(obj); 
     },
   
     dropInventoryObject: function (inventoryID, action, inventoryObj) {

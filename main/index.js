@@ -4660,9 +4660,9 @@
         document.getElementById("textBackgroundColor").value = response.data.textBackgroundColor;
         document.getElementById("textBackground").value = response.data.textBackground;
         
-        $('#textType').find('option').each(function(i,e){
+        $('#textType').find('option').each(function(i,e) {
             // console.log($(e).val());
-            if($(e).val() === response.data.type){
+            if($(e).val() === response.data.type) {
                 $('#textType').prop('selectedIndex',i);
                 if ($(e).val() == 'Question/Answer') {
                     if (!editor) {

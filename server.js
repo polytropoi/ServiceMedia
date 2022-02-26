@@ -7413,7 +7413,23 @@ app.get('/uservid/:p_id', requiredAuthentication, function(req, res) {
         }
     });
 });
+app.post('/scene_inventory_objex', requiredAuthentication, function(req, res) {
+    console.log("tryna get scene inventory objex" + JSON.stringify(req.body));
+    response = {};
+    if (req.body.oIDs != undefined && req.body.oIDs.length > 0) {
+        async.each (req.body.oIDs, function (oID, callbackz) { 
+            //fetch obj and jack in the model url
+            callbackz();
+        }, function(err) {
+            if (err) {
 
+            } else {
+
+            }
+        });
+    }
+
+});
 
 app.get('/userobj/:p_id', requiredAuthentication, function(req, res) {
 
