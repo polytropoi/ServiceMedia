@@ -2322,7 +2322,9 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
       // let synthCtrl = this.el.components.mod_synth;
       // if (synthCtrl != null) {
         if (this.hasSynth) {
-          this.el.components.mod_synth.trigger(distance);
+          if (this.el.components.mod_synth != null) {
+            this.el.components.mod_synth.trigger(distance);
+          }
         }
       // } else {
       //   console.log("no synth");
