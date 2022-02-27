@@ -1919,7 +1919,7 @@ AFRAME.registerComponent('mod_objex', {
       //wait, need to cache the locations where to place the fetched objs... :|
       for (let i = 0; i < objex.inventoryItems.length; i++) {
         if (this.returnObjectData(objex.inventoryItems[i].objectID) == null) { //if we don't already have this object data, need to fetch it
-          if (!oIDs.includes(objex.inventoryItems[i].objectID)) {
+          if (!oIDs.includes(objex.inventoryItems[i].objectID)) { //prevent duplicates
             oIDs.push(objex.inventoryItems[i].objectID);
             console.log("gotsa oID from scene inventory that needs fetching!");
           }
@@ -1936,11 +1936,12 @@ AFRAME.registerComponent('mod_objex', {
         xhr.send(JSON.stringify(data));
         xhr.onload = function () {
           // do something to response
-          // console.log("fetched obj resp: " +this.responseText);
-          let objectDatas = JSON.parse(this.responseText);
-          if (objectData.length > 0) {
-            for (let i = 0; i < objectDatas.length; i++) {
-              this.addFetchedObject(objectDatas[i]); //add to scene object collection, so don't have to fetch again
+          console.log("fetched obj resp: " +this.responseText);
+          let response = JSON.parse(this.responseText);
+          if (response.objex.length > 0) {
+            for (let i = 0; i < response.objex; i++) {
+              this.addFetchedObject(response.objex[i]); //add to scene object collection, so don't have to fetch again
+              //use locs and instantiate!
             }
           }
         }

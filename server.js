@@ -7415,16 +7415,46 @@ app.get('/uservid/:p_id', requiredAuthentication, function(req, res) {
 });
 app.post('/scene_inventory_objex', requiredAuthentication, function(req, res) {
     console.log("tryna get scene inventory objex" + JSON.stringify(req.body));
-    response = {};
+    let response = {};
+    let objex = [];
+    response.objex = objex;
     if (req.body.oIDs != undefined && req.body.oIDs.length > 0) {
         async.each (req.body.oIDs, function (oID, callbackz) { 
-            //fetch obj and jack in the model url
-            callbackz();
+            //fetch obj and jack in the model url'
+            let objID = ObjectID(oID);
+            db.obj_items.findOne({_id: objID}, function (err, obj_item) {
+                if (err || !obj_item) {
+                    callbackz(err);
+                } else {
+                    // console.log("tryna get inventory modelID " + obj_item.modelID);
+                    let mid = obj_item.modelID;
+                    if (mid != null) {
+                        // console.log("tryna get inventory modelID2 " + oid);
+                        let m_id = ObjectID(mid);
+                        db.models.findOne({"_id": m_id}, function (err, model) {
+                        if (err || !model) {
+                            console.log("error getting model: " + err);
+                            callbackz(err);
+                            } else {
+                                console.log("got objj model:" + JSON.stringify(model));
+                                let url = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + model.userID + "/gltf/" + model.filename, Expires: 6000});
+                                obj_item.modelURL = url;
+                                response.objex.push(obj_item);
+                                callbackz(null);
+                            }
+                    });
+
+                    } else {
+                        response.objex.push(obj_item);
+                        callbackz(null);
+                    }        
+                }
+            });
         }, function(err) {
             if (err) {
-
+                res.send("problem getting inventory " + err);
             } else {
-
+                res.send(response);
             }
         });
     }
@@ -14481,8 +14511,8 @@ app.post('/netradiodetails', function (req, res) {
 
 
 
-
-app.get('/webxr/:_id', traffic, function (req, res) { //TODO lock down w/ checkAppID, requiredAuthentication
+// app.get('/webxr/:_id', traffic, function (req, res) { //TODO lock down w/ checkAppID, requiredAuthentication - rem'd traffic, maybe later
+app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, requiredAuthentication
     var reqstring = entities.decodeHTML(req.params._id);
     console.log("webxr scene req " + reqstring);
     if (reqstring != undefined && reqstring != 'undefined' && req.params._id != null) {
