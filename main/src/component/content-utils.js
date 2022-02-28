@@ -1924,7 +1924,6 @@ AFRAME.registerComponent('mod_objex', {
             console.log("gotsa oID from scene inventory that needs fetching!");
           }
         }
-
       }
       console.log("need to fetch to pop scene inventory: " + oIDs);
       if (oIDs.length > 0) {
@@ -1942,10 +1941,22 @@ AFRAME.registerComponent('mod_objex', {
             for (let i = 0; i < response.objex; i++) {
               this.addFetchedObject(response.objex[i]); //add to scene object collection, so don't have to fetch again
               //use locs and instantiate!
+              if (i == response.objex.length - 1) {
+                this.loadSceneInventoryObjects(objex);
+              }
             }
           }
         }
-
+      }
+    },
+    loadSceneInventoryObjects: function (objex) {
+      for (let i = 0; i < objex.inventoryItems.length; i++) { 
+        for (let j = 0; j < this.data.jsonObjectData.length; j++) {
+          console.log("inventory : "+ objectobject.inventoryItems[i].objectID+ " vs objex._id " + this.data.jsonObjectData._id);
+          if (object.inventoryItems[i].objectID == this.data.jsonObjectData._id) {
+            console.log("gotsa match for scene inventory at location " + object.inventoryItems[i].location);   
+          }
+        }
       }
     },
     returnObjectData: function(objectID) {
@@ -1963,13 +1974,15 @@ AFRAME.registerComponent('mod_objex', {
         }
       }
       return objek;
-    
     },
     addFetchedObject (obj) {
       console.log("tryna add fetched obj " + obj._id)
       this.data.jsonObjectData.push(obj); 
     },
-  
+    // addSceneInventoryObject (obj) {
+    //   console.log("tryna add fetched obj " + obj._id)
+    //   this.data.jsonObjectData.push(obj); 
+    // },
     dropInventoryObject: function (inventoryID, action, inventoryObj) {
       let data = {};
       data.inScene = room;
@@ -2303,13 +2316,8 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
         
       }
     })
-    
-
   },
 
-  // tick: function () {
-
-  // },
   rayhit: function (hitID, distance, hitpoint) {
     // if (this.hitID != hitID) {
     //   this.hitID = hitID;

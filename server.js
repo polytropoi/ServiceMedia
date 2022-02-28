@@ -7413,7 +7413,8 @@ app.get('/uservid/:p_id', requiredAuthentication, function(req, res) {
         }
     });
 });
-app.post('/scene_inventory_objex', requiredAuthentication, function(req, res) {
+// app.post('/scene_inventory_objex', requiredAuthentication, function(req, res) {
+app.post('/scene_inventory_objex', function(req, res) {
     console.log("tryna get scene inventory objex" + JSON.stringify(req.body));
     let response = {};
     let objex = [];

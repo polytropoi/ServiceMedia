@@ -14736,7 +14736,7 @@ function showGroup() {
                     $(document).on('click','.remYouTube',function(e){
                         e.preventDefault();  
                         console.log("tryna remove youtube " + this.id);
-                        for( var i = 0; i < sceneYouTubeIDs.length; i++){ 
+                        for( var i = 0; i < sceneYouTubeIDs.length; i++) { 
                             if ( sceneYouTubeIDs[i] === this.id) {
                                 sceneYouTubeIDs.splice(i, 1); 
                             }
