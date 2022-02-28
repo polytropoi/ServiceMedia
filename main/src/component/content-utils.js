@@ -1888,9 +1888,10 @@ AFRAME.registerComponent('mod_objex', {
     init: function () {
       let theData = this.el.getAttribute('data-objex');
       let theLocData = this.el.getAttribute('data-objex-locations');
-      
-      this.data.jsonObjectData = JSON.parse(atob(theData));
-      this.data.jsonLocationsData = JSON.parse(atob(theLocData));
+      this.sceneInventoryItems = null; //loaded after init, called from mod_inventory component
+
+      this.data.jsonObjectData = JSON.parse(atob(theData)); //object items with model references
+      this.data.jsonLocationsData = JSON.parse(atob(theLocData)); //scene locations with object references
       // console.log("objxe datas" + JSON.stringify(this.data.jsonObjectData));
       // console.log("objxe location datas" + JSON.stringify(this.data.jsonLocationsData));
       console.log(this.data.jsonLocationsData.length + " locations for " + this.data.jsonObjectData.length);
@@ -1915,6 +1916,9 @@ AFRAME.registerComponent('mod_objex', {
     },
     addSceneInventoryObjects: function(objex) { //
       let oIDs = [];
+      if (objex.inventoryItems != undefined && objex.inventoryItems.length > 0) {
+        this.sceneInventoryItems = objex.inventoryItems;
+      }
       console.log(JSON.stringify(objex));
       //wait, need to cache the locations where to place the fetched objs... :|
       for (let i = 0; i < objex.inventoryItems.length; i++) {
@@ -1926,35 +1930,29 @@ AFRAME.registerComponent('mod_objex', {
         }
       }
       console.log("need to fetch to pop scene inventory: " + oIDs);
-      if (oIDs.length > 0) {
-        let data = {};
-        data.oIDs = oIDs;
-        var xhr = new XMLHttpRequest();
-        xhr.open("POST", '/scene_inventory_objex/', true);
-        xhr.setRequestHeader('Content-Type', 'application/json');
-        xhr.send(JSON.stringify(data));
-        xhr.onload = function () {
-          // do something to response
-          console.log("fetched obj resp: " +this.responseText);
-          let response = JSON.parse(this.responseText);
-          if (response.objex.length > 0) {
-            for (let i = 0; i < response.objex; i++) {
-              this.addFetchedObject(response.objex[i]); //add to scene object collection, so don't have to fetch again
-              //use locs and instantiate!
-              if (i == response.objex.length - 1) {
-                this.loadSceneInventoryObjects(objex);
-              }
-            }
-          }
-        }
-      }
+      SceneInventoryLoad(oIDs); //do fetch in external function, below, bc ajax response can't get to component scope if it's here
+    
     },
-    loadSceneInventoryObjects: function (objex) {
-      for (let i = 0; i < objex.inventoryItems.length; i++) { 
+    loadSceneInventoryObjects: function () { //coming back from upstream call after updating jsonObjectData with missing sceneInventoryItems
+      console.log("tryna loadSceneInventoryObjects");
+      for (let i = 0; i < this.sceneInventoryItems.length; i++) { 
         for (let j = 0; j < this.data.jsonObjectData.length; j++) {
-          console.log("inventory : "+ objectobject.inventoryItems[i].objectID+ " vs objex._id " + this.data.jsonObjectData._id);
-          if (object.inventoryItems[i].objectID == this.data.jsonObjectData._id) {
-            console.log("gotsa match for scene inventory at location " + object.inventoryItems[i].location);   
+          console.log("inventory : "+ this.sceneInventoryItems[i].objectID+ " vs objex._id " + this.data.jsonObjectData[j]._id);
+          if (this.sceneInventoryItems[i].objectID == this.data.jsonObjectData[j]._id) {
+            console.log("gotsa match for scene inventory at location " + JSON.stringify(this.sceneInventoryItems[i].location)); //here location data is a vector3
+            let timestamp = Date.now();
+            if (this.sceneInventoryItems[i].location != undefined) {
+            let locationData  = {};
+            locationData.x = this.sceneInventoryItems[i].location.x;
+            locationData.y = this.sceneInventoryItems[i].location.y;
+            locationData.z = this.sceneInventoryItems[i].location.z; //how mod_object wants the data
+            let objEl = document.createElement("a-entity");
+            objEl.setAttribute("mod_object", {'locationData': locationData, 'objectData': this.data.jsonObjectData[j]});
+            objEl.id = "obj" + this.data.jsonObjectData[j]._id + "_" + timestamp;
+            sceneEl.appendChild(objEl);
+            } else {
+              console.log("well shoot, that one don't have a location " + JSON.stringify(this.sceneInventoryItems[i]));
+            }
           }
         }
       }
@@ -2065,6 +2063,35 @@ AFRAME.registerComponent('mod_objex', {
     }
 });
 
+function SceneInventoryLoad(oIDs) { //fetch scene inventory objects, i.e. stuff dropped by users
+  if (oIDs.length > 0) {
+    let objexEl = document.getElementById('sceneObjects');    
+    // objexEl.components.mod_objex.dropObject(data.inventoryObj.objectID);
+    let data = {};
+    data.oIDs = oIDs;
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", '/scene_inventory_objex/', true);
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.send(JSON.stringify(data));
+    xhr.onload = function () {
+      // do something to response
+      console.log("fetched obj resp: " +this.responseText);
+      let response = JSON.parse(this.responseText);
+      console.log("gotsome objex: " + response.objex.length);
+      if (response.objex.length > 0) {
+
+        for (let i = 0; i < response.objex.length; i++) {
+          objexEl.components.mod_objex.addFetchedObject(response.objex[i]); //add to scene object collection, so don't have to fetch again
+          //use locs and instantiate!
+          // console.log(i + " vs " + response.objex.length - 1);
+          if (i == response.objex.length - 1) {
+            objexEl.components.mod_objex.loadSceneInventoryObjects(response.objex); //ok load em up
+          }
+        }
+      }
+    }
+  }
+}
 AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component above
   schema: {
     locationData: {default: ''},
@@ -2345,7 +2372,11 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
     console.log("hasPickupAction " + this.hasPickupAction + " for " + this.el.id);
     if (!this.isActivated) { 
       if (this.hasSynth) {
-        this.el.components.mod_synth.highTrigger();
+        if (this.el.components.mod_synth != null) {
+          this.el.components.mod_synth.highTrigger();
+        } else {
+          console.log("object has synth but it's not enabled in scene config (add use synth tag)");
+        }
       }
       this.isActivated = true;
       if (this.data.objectData.objtype.toLowerCase() == "pickup"  || this.hasPickupAction) {

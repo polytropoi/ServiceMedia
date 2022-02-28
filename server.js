@@ -2656,7 +2656,7 @@ app.post('/drop/', requiredAuthentication, function (req, res) {
                     
                 } else {
                     console.log("inventory: " + JSON.stringify(inventory));
-                    db.inventories.updateOne({'_id': s_id }, { $push: { inventoryItems: i_obj }}, {upsert: false}, function (err, saved) { //add to scene inventory
+                    db.inventories.update({'_id': s_id }, { $push: { inventoryItems: i_obj }}, {upsert: false}, function (err, saved) { //add to scene inventory
                         if (err || !saved) {
                             console.log("problemo with inventory rm " + err);
                             // res.send("inventory update error " + err);
@@ -2673,7 +2673,7 @@ app.post('/drop/', requiredAuthentication, function (req, res) {
             } else {
                 callback("no drop");
             }
-            // db.inventories.updateOne({_id: s_id }, { $push: { inventoryItems: i_obj }}, {upsert: false}, function (err, saved) { //add to scene inventory
+            // db.inventories.update({_id: s_id }, { $push: { inventoryItems: i_obj }}, {upsert: false}, function (err, saved) { //add to scene inventory
             //     if (err || !saved) {
             //         console.log("problemo with inventory rm " + err);
             //         // res.send("inventory update error " + err);
@@ -2693,7 +2693,7 @@ app.post('/drop/', requiredAuthentication, function (req, res) {
                     // res.send("user inventory not found!");
                 } else {
                     console.log("ploayer inventory found with count " + inventory.inventoryItems.length);
-                    db.inventories.updateOne({ "_id": i_id }, { $pull: { inventoryItems: {objectID: req.body.inventoryObj.objectID, timestamp: req.body.inventoryObj.timestamp} }}, function (err, saved) { //remove from player inventory
+                    db.inventories.update({ "_id": i_id }, { $pull: { inventoryItems: {objectID: req.body.inventoryObj.objectID, timestamp: req.body.inventoryObj.timestamp} }}, function (err, saved) { //remove from player inventory
                         if (err || !saved) {
                             console.log("problemo with inventory rm " + err);
                             // res.send("inventory update error " + err);
@@ -2732,7 +2732,7 @@ app.post('/drop/', requiredAuthentication, function (req, res) {
                                 // actionItem.objectName = req.body.object_item.name;
                                 actionItem.timestamp = timestamp;
                                 actionItem.fromScene = req.body.fromScene;
-                                db.activities.updateOne({ _id: a_id }, { $push: { actionItems: actionItem }}, {upsert: false}, function (err, saved) {
+                                db.activities.update({ _id: a_id }, { $push: { actionItems: actionItem }}, {upsert: false}, function (err, saved) {
                                     if (err || !saved) {
                                         // res.send('profcblemo ' + err);
                                         callback(err);
@@ -2808,7 +2808,7 @@ app.post('/drop/', requiredAuthentication, function (req, res) {
                                                
 //                                                 console.log("scene inventory item count " + iCount + " vs maxPerscene " + obj.maxPerScene );
 //                                                 //check max per scene on object and # in scene inventory 
-//                                                 db.inventories.updateOne({ "_id": s_id }, { $push: { inventoryItems: req.body.inventoryObj }}, {upsert: false}, function (err, saved) { //add to scene inventory
+//                                                 db.inventories.update({ "_id": s_id }, { $push: { inventoryItems: req.body.inventoryObj }}, {upsert: false}, function (err, saved) { //add to scene inventory
 //                                                 if (err || !saved) {
 //                                                     console.log("problemo with inventory rm " + err);
 //                                                     // res.send("inventory update error " + err);
@@ -2820,7 +2820,7 @@ app.post('/drop/', requiredAuthentication, function (req, res) {
 //                                                             res.send("user inventory not found!");
 //                                                         } else {
 //                                                             console.log("inventory found with count " + inventory.inventoryItems.length);
-//                                                             db.inventories.updateOne({ "_id": i_id }, { $pull: { inventoryItems: req.body.inventoryObj }}, {upsert: false}, function (err, saved) { //remove from player inventory
+//                                                             db.inventories.update({ "_id": i_id }, { $pull: { inventoryItems: req.body.inventoryObj }}, {upsert: false}, function (err, saved) { //remove from player inventory
 //                                                                 if (err || !saved) {
 //                                                                     console.log("problemo with inventory rm " + err);
 //                                                                     res.send("inventory update error " + err);
@@ -2851,7 +2851,7 @@ app.post('/drop/', requiredAuthentication, function (req, res) {
 //                                                                                         // actionItem.objectName = req.body.object_item.name;
 //                                                                                         actionItem.timestamp = timestamp;
 //                                                                                         actionItem.fromScene = req.body.fromScene;
-//                                                                                         db.activities.updateOne({ _id: a_id }, { $push: { actionItems: actionItem }}, {upsert: false}, function (err, saved) {
+//                                                                                         db.activities.update({ _id: a_id }, { $push: { actionItems: actionItem }}, {upsert: false}, function (err, saved) {
 //                                                                                             if (err || !saved) {
 //                                                                                                 res.send('profcblemo ' + err);
 //                                                                                             } else {
@@ -2987,7 +2987,7 @@ app.post('/action/', requiredAuthentication, function (req, res) {
                             callback(err);
                         } else {
                             console.log("activities list found with count " + activities.actionItems.length);
-                            db.activities.updateOne({ _id: a_id }, { $push: { actionItems: actionItem }}, {upsert: false}, function (err, saved) {
+                            db.activities.update({ "_id": a_id }, { $push: { actionItems: actionItem }}, {upsert: false}, function (err, saved) {
                                 if (err || !saved) {
                                     console.log("problemo with actitiers add " + err);
                                     // res.send('profcblemo ' + err);
@@ -3012,7 +3012,7 @@ app.post('/action/', requiredAuthentication, function (req, res) {
                             callback(err);
                         } else {
                             console.log("new activities record " + saved._id);
-                            db.users.updateOne({"_id": u_id}, {$set: {activitiesID: saved._id}}, function (err, updated) {
+                            db.users.update({"_id": u_id}, {$set: {activitiesID: saved._id}}, function (err, updated) {
                                 if (err || !updated) {
                                     console.log("problemo2 with activity7 add " + err);
                                     // res.send('profcblemo2 ' + err);
@@ -3038,7 +3038,7 @@ app.post('/action/', requiredAuthentication, function (req, res) {
                                 callback(err);
                             } else {
                                 console.log("inventory found with count " + inventory.inventoryItems.length);
-                                db.inventories.updateOne({ _id: i_id }, { $push: { inventoryItems: inventoryItem }}, {upsert: false}, function (err, saved) {
+                                db.inventories.update({"_id": i_id }, { $push: { inventoryItems: inventoryItem }}, {upsert: false}, function (err, saved) {
                                     if (err || !saved) {
                                         console.log("problemo with inventory add " + err);
                                         callback(err);
@@ -3060,7 +3060,7 @@ app.post('/action/', requiredAuthentication, function (req, res) {
                             callback(err);
                         } else {
                             console.log("making new inventories record " + saved._id);
-                            db.users.updateOne({"_id": u_id}, {$set: {inventoryID: saved._id}}, function (err, updated) {
+                            db.users.update({"_id": u_id}, {$set: {inventoryID: saved._id}}, function (err, updated) {
                                 if (err || !updated) {
                                     console.log("problemo2 with inventory add " + err);
                                     callback(err);
@@ -7414,7 +7414,7 @@ app.get('/uservid/:p_id', requiredAuthentication, function(req, res) {
     });
 });
 // app.post('/scene_inventory_objex', requiredAuthentication, function(req, res) {
-app.post('/scene_inventory_objex', function(req, res) {
+app.post('/scene_inventory_objex_old', function(req, res) {
     console.log("tryna get scene inventory objex" + JSON.stringify(req.body));
     let response = {};
     let objex = [];
@@ -7437,13 +7437,13 @@ app.post('/scene_inventory_objex', function(req, res) {
                             console.log("error getting model: " + err);
                             callbackz(err);
                             } else {
-                                console.log("got objj model:" + JSON.stringify(model));
+                                console.log("got objj model:" + model._id);
                                 let url = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + model.userID + "/gltf/" + model.filename, Expires: 6000});
                                 obj_item.modelURL = url;
                                 response.objex.push(obj_item);
                                 callbackz(null);
                             }
-                    });
+                        });
 
                     } else {
                         response.objex.push(obj_item);
@@ -7459,11 +7459,119 @@ app.post('/scene_inventory_objex', function(req, res) {
             }
         });
     }
+});
 
+app.post('/scene_inventory_objex/', function(req, res) {
+    console.log('tryna return userobj : ' + req.params.p_id);
+    const iids = req.body.oIDs.map(item => {
+        return ObjectID(item);
+    });
+    let response = {};
+    let objex = [];
+    response.objex = objex;
+    db.obj_items.find({"_id": {$in: iids}}, function(err, obj_items) {
+        if (err || !obj_items) {
+            console.log("error getting picture items: " + err);
+        } else {
+            async.each (obj_items, function (obj_item, callbackz) {
+                async.waterfall([
+                    function(callback) {
+                        console.log("starting..");
+                        if (obj_item.objectPictureIDs != null && obj_item.objectPictureIDs != undefined && obj_item.objectPictureIDs.length > 0) {
+                        // oids = domain.domainPictureIDs.map(ObjectID()); //convert to mongo object ids for searching
+                            const oids = obj_item.objectPictureIDs.map(item => {
+                                return ObjectID(item);
+                            });
+                            db.image_items.find({_id: {$in: oids }}, function (err, pic_items) {
+                                if (err || !pic_items) {
+                                    console.log("error getting picture items: " + err);
+                                    // res.send("error: " + err);
+                                    callback(err);
+                                } else {
+                                    objectPictures = [];
+                                    pic_items.forEach(function(picture_item) {                
+                                        var imageItem = {};
+                                        var urlThumb = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + ".thumb." + picture_item.filename, Expires: 6000});
+                                        var urlHalf = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + ".half." + picture_item.filename, Expires: 6000});
+                                        // var urlStandard = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + ".standard." + picture_item.filename, Expires: 6000});
+                                        imageItem.urlThumb = urlThumb;
+                                        imageItem.urlHalf = urlHalf;
+                                        // imageItem.urlStandard = urlStandard;
+                                        imageItem._id = picture_item._id;
+                                        imageItem.filename = picture_item.filename;
+                                        objectPictures.push(imageItem);
+                                        obj_item.objectPictures = objectPictures;
+                                    });
+                                    callback(null);
+                                }
+                            });
+                        
+                        } else {
+                            console.log('no pics');
+                            callback(null);
+                        }
+                    },
+                    function(callback) {
+                        // console.log(JSON.stringify(obj_item));
+                        if (obj_item.actionIDs != undefined && obj_item.actionIDs.length > 0) {
+                            const aids = obj_item.actionIDs.map(item => {
+                                return ObjectID(item);
+                            });
+                            db.actions.find({_id: {$in: aids }}, function (err, actions) {
+                                if (err || !actions) {
+                                    callback(err);
+                                } else {
+                                    obj_item.actions = actions;
+                                    // console.log(JSON.stringify(obj_item.actions));
+                                    callback(null);
+                                }
+                            });
+                        } else {
+                            callback(null);
+                        }
+                    }, 
+                    function (callback) {
+                        console.log("tryna get modelID " + obj_item.modelID);
+                        let oid = obj_item.modelID;
+                        if (oid != null) {
+                            console.log("tryna get modelID2 " + oid);
+                            let oo_id = ObjectID(oid);
+                            db.models.findOne({"_id": oo_id}, function (err, model) {
+                            if (err || !model) {
+                                console.log("error getting model: " + err);
+                                callback(err);
+                                } else {
+                                    console.log("got objj model:" + JSON.stringify(model));
+                                    let url = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + model.userID + "/gltf/" + model.filename, Expires: 6000});
+                                    obj_item.modelURL = url;
+                                    callback(null);
+                                }
+                        });
+                        } else {
+                            callback(null);
+                        }                                                     
+                    }
+                ],
+
+                function(err, result) { // #last function, close async.waterfall
+                        // console.log("waterfall done: " + JSON.stringify(obj_item));
+                        // res.json(obj_item);
+                        response.objex.push(obj_item);
+                        callbackz(null); //callback for async.each
+                    }
+                );
+            }, function(err) { //async.each close
+                if (err) {
+                    res.send("problem getting inventory " + err);
+                } else {
+                    res.send(response);
+                }
+            });
+        }
+    });
 });
 
 app.get('/userobj/:p_id', requiredAuthentication, function(req, res) {
-
     console.log('tryna return userobj : ' + req.params.p_id);
     var pID = req.params.p_id;
     var o_id = ObjectID(pID);
@@ -7471,11 +7579,8 @@ app.get('/userobj/:p_id', requiredAuthentication, function(req, res) {
     db.obj_items.findOne({"_id": o_id}, function(err, obj_item) {
         if (err || !obj_item) {
             console.log("error getting picture items: " + err);
-
         } else {
-           
             async.waterfall([
-
                 function(callback) {
                     console.log("starting..");
                     if (obj_item.objectPictureIDs != null && obj_item.objectPictureIDs != undefined && obj_item.objectPictureIDs.length > 0) {
@@ -7548,40 +7653,17 @@ app.get('/userobj/:p_id', requiredAuthentication, function(req, res) {
                                 callback(null);
                             }
                     });
-
                     } else {
                         callback(null);
                     }                                                     
                 }
             ],
 
-        function(err, result) { // #last function, close async
-           
-                // console.log("waterfall done: " + JSON.stringify(obj_item));
-                res.json(obj_item);
-            }
-        );
-
-            // if (obj_item.childObjectIDs != null && obj_item.childObjectIDs.length > 0) {
-            //     //console.log("tryna find childObjectIDs: " + JSON.stringify(obj_item.childObjectIDs));
-            //     var childIDs = obj_item.childObjectIDs.map(convertStringToObjectID); //convert child IDs array to objIDs
-            //     db.obj_items.find({_id : {$in : childIDs}}, function(err, obj_items) {
-            //         if (err || !obj_items) {
-            //             console.log("error getting childObject items: " + err);
-            //             res.send("error getting child objects");
-            //         } else {
-            //             childObjects = obj_items;
-            //             console.log("childObjects: " + JSON.stringify(childObjects));
-            //             obj_item.childObjects = childObjects;
-            //             res.json(obj_item);
-            //             console.log("returning obj_item with childObjects");
-            //         }
-            //     });
-
-            // } else {
-            //     res.json(obj_item);
-            //     console.log("returning obj_item");
-            // }
+            function(err, result) { // #last function, close async
+                    // console.log("waterfall done: " + JSON.stringify(obj_item));
+                    res.json(obj_item);
+                }
+            );
         }
     });
 });
@@ -17588,7 +17670,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                 // let path4 = s3.getSignedUrl('getObject', {Bucket: 'archive1', Key: "staging/"+picture_item.userID+"/cubemaps/"+picture_item._id+"_ny.jpg", Expires: 6000});  
                                 // let path5 = s3.getSignedUrl('getObject', {Bucket: 'archive1', Key: "staging/"+picture_item.userID+"/cubemaps/"+picture_item._id+"_pz.jpg", Expires: 6000});  
                                 // let path6 = s3.getSignedUrl('getObject', {Bucket: 'archive1', Key: "staging/"+picture_item.userID+"/cubemaps/"+picture_item._id+"_nz.jpg", Expires: 6000});  
-                                console.log("testpath to cubemap " + path3);                                  
+                                // console.log("testpath to cubemap " + path3);                                  
                                 // theKey = 'users/' + picture_item.userID + '/' + picture_item.filename;
                                 // skyboxUrl = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: theKey, Expires: 6000});
                                 if (sceneResponse.sceneWebType == "ThreeJS") {
