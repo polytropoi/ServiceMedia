@@ -2570,6 +2570,130 @@ app.post('/update_profile/:_id', requiredAuthentication, function (req, res) { /
     });
 });
 
+// app.post('/drop_uh_no/', requiredAuthentication, function (req, res) { // should be async, just happened that way.. ref as How Not To Do It
+//     console.log("dropping in scene " + req.body.inScene);
+//     let timestamp = Math.round(Date.now() / 1000);
+//     let i_id = ObjectID(req.body.inventoryID);
+//     // let s_id = ObjectID(req.body.inScene);
+//     db.scenes.findOne({"short_id": req.body.inScene}, function (err, scene) {
+//         if (err || !scene) {
+//             console.log("no scene for drop!");
+//             res.send("scene not found - no drop");
+//         } else {
+//             console.log("scenetags : " + scene.sceneTags + " sceneInvventoryID " + scene.sceneInventoryID  + " objID " + req.body.inventoryObj.objectID);
+//             // if (scene.sceneInventoryID != undefined && scene.sceneInventoryID != null && !scene.sceneTags.includes('no drop')) { //maybe needs a toggle instead of more tagsoup? 
+//             if (scene.sceneInventoryID != undefined && scene.sceneInventoryID != null) { //maybe needs a toggle instead of more tagsoup? 
+//                 let s_id = ObjectID(scene.sceneInventoryID);
+//                 let o_id = ObjectID(req.body.inventoryObj.objectID);
+//                 db.inventories.findOne({"_id": s_id}, function (err, inventory) {//check for scene inventory record
+//                     if (err || !inventory) {
+//                         console.log("no scene inventory?2");
+//                         res.send("no scene inventory");
+//                     } else {
+//                         db.obj_items.findOne({"_id": o_id}, function (err, obj) { //get obj to check maxperscene
+//                             if (err || !obj) {
+//                                 console.log("no object found for drop");
+//                                 res.send("no object found");
+//                             } else {
+//                                 console.log("checking maxperscene " + obj.maxPerScene + " in " + inventory.inventoryItems.length);
+//                                 let iCount = 0;
+                                
+//                                 for (let i = 0; i < inventory.inventoryItems.length + 1; i++) { //count scene inventory items like this obj, plus one to force the loop - what?!? uh, no
+//                                     if (inventory.inventoryItems[i].objectID == obj._id) {
+//                                         iCount++;
+//                                         console.log("gotsa invnetory match with the obj " + iCount);
+//                                         if (i == (inventory.inventoryItems.length - 1)) { //loop is over, carry on... stupid!
+//                                             if (iCount > obj.maxPerScene) {
+//                                                 console.log("max per scene reached!");
+//                                                 res.send("max per scene reached, no drop");
+                                                
+//                                             } else { //omg, gotta do max total as well... hrm...
+                                               
+//                                                 console.log("scene inventory item count " + iCount + " vs maxPerscene " + obj.maxPerScene );
+//                                                 //check max per scene on object and # in scene inventory 
+//                                                 db.inventories.update({ "_id": s_id }, { $push: { inventoryItems: req.body.inventoryObj }}, {upsert: false}, function (err, saved) { //add to scene inventory
+//                                                 if (err || !saved) {
+//                                                     console.log("problemo with inventory rm " + err);
+//                                                     // res.send("inventory update error " + err);
+//                                                     res.send("error saving to scene inventory");
+//                                                 } else {
+//                                                     db.inventories.findOne({"_id": i_id}, function (err, inventory) { //check for player inventory record
+//                                                         if (err || !inventory) {
+//                                                             console.log("error getting user inventory: " + err);
+//                                                             res.send("user inventory not found!");
+//                                                         } else {
+//                                                             console.log("inventory found with count " + inventory.inventoryItems.length);
+//                                                             db.inventories.update({ "_id": i_id }, { $pull: { inventoryItems: req.body.inventoryObj }}, {upsert: false}, function (err, saved) { //remove from player inventory
+//                                                                 if (err || !saved) {
+//                                                                     console.log("problemo with inventory rm " + err);
+//                                                                     res.send("inventory update error " + err);
+//                                                                 } else {
+//                                                                     console.log("ok rem'd obj from inventorie");
+//                                                                     // res.send("updated");
+//                                                                     if (req.body.action != undefined) {
+//                                                                         // console.log(JSON.stringify(req.body.action));
+//                                                                         var u_id = ObjectID(req.session.user._id);
+//                                                                         if (req.session.user._id != req.body.userData.userID) {
+//                                                                             db.users.findOne({"_id": u_id}, function (err, user) {  
+//                                                                                 if (err || !user) {
+//                                                                                     console.log("error getting user: " + err);
+//                                                                                     res.send("bad user4");
+//                                                                                 } else {
+//                                                                                     if (req.session.user.activitiesID != undefined) { //add drop action to user activity
+//                                                                                         var a_id = ObjectID(req.session.user.activitiesID);
+//                                                                                         console.log("gotsa activities id " + req.session.activitiesID);
+//                                                                                         let actionItem = {};
+//                                                                                         actionItem.userID = req.body.userData._id;
+//                                                                                         actionItem.actionID = req.body.action._id;
+//                                                                                         actionItem.actionType = req.body.action.actionType;
+//                                                                                         actionItem.actionResult = req.body.action.actionResult;
+//                                                                                         actionItem.inScene = req.body.action.inScene;
+                                                                                        
+//                                                                                         actionItem.actionName = req.body.action.actionName;
+//                                                                                         // actionItem.objectID = req.body.object_item._id;
+//                                                                                         // actionItem.objectName = req.body.object_item.name;
+//                                                                                         actionItem.timestamp = timestamp;
+//                                                                                         actionItem.fromScene = req.body.fromScene;
+//                                                                                         db.activities.update({ _id: a_id }, { $push: { actionItems: actionItem }}, {upsert: false}, function (err, saved) {
+//                                                                                             if (err || !saved) {
+//                                                                                                 res.send('profcblemo ' + err);
+//                                                                                             } else {
+//                                                                                                 console.log("ok saved to acttivieeisD");
+//                                                                                                 res.send('updated' + JSON.stringify(saved));
+//                                                                                             }
+//                                                                                         });
+//                                                                                     } 
+//                                                                                 }
+//                                                                             });
+//                                                                         } else {
+//                                                                             res.send("bad user");
+//                                                                         }
+//                                                                     } else {
+//                                                                         res.send("no action");
+//                                                                     }
+//                                                                 }
+//                                                             });
+//                                                         }
+//                                                     });
+//                                                 }
+//                                             });
+//                                         }
+//                                     }
+//                                 }
+//                             }
+//                             }
+//                         });// db.obj_item close
+//                     }
+//                 });
+
+//             } else {
+//                 console.log("scene says no drop");
+//                 res.send("no drop");
+//             }
+//         }
+//     });
+// });
+
 app.post('/drop/', requiredAuthentication, function (req, res) { 
     let timestamp = Math.round(Date.now() / 1000);
     let i_id = ObjectID(req.body.inventoryID); //player inventory
@@ -2767,137 +2891,15 @@ app.post('/drop/', requiredAuthentication, function (req, res) {
 );
 });
 
-// app.post('/drop_uh_no/', requiredAuthentication, function (req, res) { // should be async, just happened that way.. ref as How Not To Do It
-//     console.log("dropping in scene " + req.body.inScene);
-//     let timestamp = Math.round(Date.now() / 1000);
-//     let i_id = ObjectID(req.body.inventoryID);
-//     // let s_id = ObjectID(req.body.inScene);
-//     db.scenes.findOne({"short_id": req.body.inScene}, function (err, scene) {
-//         if (err || !scene) {
-//             console.log("no scene for drop!");
-//             res.send("scene not found - no drop");
-//         } else {
-//             console.log("scenetags : " + scene.sceneTags + " sceneInvventoryID " + scene.sceneInventoryID  + " objID " + req.body.inventoryObj.objectID);
-//             // if (scene.sceneInventoryID != undefined && scene.sceneInventoryID != null && !scene.sceneTags.includes('no drop')) { //maybe needs a toggle instead of more tagsoup? 
-//             if (scene.sceneInventoryID != undefined && scene.sceneInventoryID != null) { //maybe needs a toggle instead of more tagsoup? 
-//                 let s_id = ObjectID(scene.sceneInventoryID);
-//                 let o_id = ObjectID(req.body.inventoryObj.objectID);
-//                 db.inventories.findOne({"_id": s_id}, function (err, inventory) {//check for scene inventory record
-//                     if (err || !inventory) {
-//                         console.log("no scene inventory?2");
-//                         res.send("no scene inventory");
-//                     } else {
-//                         db.obj_items.findOne({"_id": o_id}, function (err, obj) { //get obj to check maxperscene
-//                             if (err || !obj) {
-//                                 console.log("no object found for drop");
-//                                 res.send("no object found");
-//                             } else {
-//                                 console.log("checking maxperscene " + obj.maxPerScene + " in " + inventory.inventoryItems.length);
-//                                 let iCount = 0;
-                                
-//                                 for (let i = 0; i < inventory.inventoryItems.length + 1; i++) { //count scene inventory items like this obj, plus one to force the loop - what?!? uh, no
-//                                     if (inventory.inventoryItems[i].objectID == obj._id) {
-//                                         iCount++;
-//                                         console.log("gotsa invnetory match with the obj " + iCount);
-//                                         if (i == (inventory.inventoryItems.length - 1)) { //loop is over, carry on... stupid!
-//                                             if (iCount > obj.maxPerScene) {
-//                                                 console.log("max per scene reached!");
-//                                                 res.send("max per scene reached, no drop");
-                                                
-//                                             } else { //omg, gotta do max total as well... hrm...
-                                               
-//                                                 console.log("scene inventory item count " + iCount + " vs maxPerscene " + obj.maxPerScene );
-//                                                 //check max per scene on object and # in scene inventory 
-//                                                 db.inventories.update({ "_id": s_id }, { $push: { inventoryItems: req.body.inventoryObj }}, {upsert: false}, function (err, saved) { //add to scene inventory
-//                                                 if (err || !saved) {
-//                                                     console.log("problemo with inventory rm " + err);
-//                                                     // res.send("inventory update error " + err);
-//                                                     res.send("error saving to scene inventory");
-//                                                 } else {
-//                                                     db.inventories.findOne({"_id": i_id}, function (err, inventory) { //check for player inventory record
-//                                                         if (err || !inventory) {
-//                                                             console.log("error getting user inventory: " + err);
-//                                                             res.send("user inventory not found!");
-//                                                         } else {
-//                                                             console.log("inventory found with count " + inventory.inventoryItems.length);
-//                                                             db.inventories.update({ "_id": i_id }, { $pull: { inventoryItems: req.body.inventoryObj }}, {upsert: false}, function (err, saved) { //remove from player inventory
-//                                                                 if (err || !saved) {
-//                                                                     console.log("problemo with inventory rm " + err);
-//                                                                     res.send("inventory update error " + err);
-//                                                                 } else {
-//                                                                     console.log("ok rem'd obj from inventorie");
-//                                                                     // res.send("updated");
-//                                                                     if (req.body.action != undefined) {
-//                                                                         // console.log(JSON.stringify(req.body.action));
-//                                                                         var u_id = ObjectID(req.session.user._id);
-//                                                                         if (req.session.user._id != req.body.userData.userID) {
-//                                                                             db.users.findOne({"_id": u_id}, function (err, user) {  
-//                                                                                 if (err || !user) {
-//                                                                                     console.log("error getting user: " + err);
-//                                                                                     res.send("bad user4");
-//                                                                                 } else {
-//                                                                                     if (req.session.user.activitiesID != undefined) { //add drop action to user activity
-//                                                                                         var a_id = ObjectID(req.session.user.activitiesID);
-//                                                                                         console.log("gotsa activities id " + req.session.activitiesID);
-//                                                                                         let actionItem = {};
-//                                                                                         actionItem.userID = req.body.userData._id;
-//                                                                                         actionItem.actionID = req.body.action._id;
-//                                                                                         actionItem.actionType = req.body.action.actionType;
-//                                                                                         actionItem.actionResult = req.body.action.actionResult;
-//                                                                                         actionItem.inScene = req.body.action.inScene;
-                                                                                        
-//                                                                                         actionItem.actionName = req.body.action.actionName;
-//                                                                                         // actionItem.objectID = req.body.object_item._id;
-//                                                                                         // actionItem.objectName = req.body.object_item.name;
-//                                                                                         actionItem.timestamp = timestamp;
-//                                                                                         actionItem.fromScene = req.body.fromScene;
-//                                                                                         db.activities.update({ _id: a_id }, { $push: { actionItems: actionItem }}, {upsert: false}, function (err, saved) {
-//                                                                                             if (err || !saved) {
-//                                                                                                 res.send('profcblemo ' + err);
-//                                                                                             } else {
-//                                                                                                 console.log("ok saved to acttivieeisD");
-//                                                                                                 res.send('updated' + JSON.stringify(saved));
-//                                                                                             }
-//                                                                                         });
-//                                                                                     } 
-//                                                                                 }
-//                                                                             });
-//                                                                         } else {
-//                                                                             res.send("bad user");
-//                                                                         }
-//                                                                     } else {
-//                                                                         res.send("no action");
-//                                                                     }
-//                                                                 }
-//                                                             });
-//                                                         }
-//                                                     });
-//                                                 }
-//                                             });
-//                                         }
-//                                     }
-//                                 }
-//                             }
-//                             }
-//                         });// db.obj_item close
-//                     }
-//                 });
 
-//             } else {
-//                 console.log("scene says no drop");
-//                 res.send("no drop");
-//             }
-//         }
-//     });
-// });
-
-app.post('/action/', requiredAuthentication, function (req, res) { 
+app.post('/pickup/', requiredAuthentication, function (req, res) { 
     let timestamp = Math.round(Date.now() / 1000);
     // console.log("pickup userid " + req.session.user._id + " data: " + JSON.stringify(req.body));
         let inventoryItem = {};
         let actionItem = {};
         
         var u_id = ObjectID(req.session.user._id);
+        // let user = null;
         async.waterfall([
             function (callback) {
                 // var u_id = ObjectID(req.session.user._id);
@@ -2907,6 +2909,7 @@ app.post('/action/', requiredAuthentication, function (req, res) {
                             console.log("error getting user: " + err);
                             callback("baduserdatazz~!");
                         } else {
+                            // user = user;
                             console.log("gotsa userr match for pickup");
                             if (req.body.action == undefined) { //for "Drop" and "Pickup" object types, action is assumed
                                 actionItem.actionID = null;
@@ -2977,7 +2980,38 @@ app.post('/action/', requiredAuthentication, function (req, res) {
                     }
                 }
             },
-            function (user, callback) {
+            function (user, callback) { //check and remove if it came from the scene's inventory, instead of the scene itself
+                if (req.body.fromSceneInventory != undefined && req.body.fromSceneInventory != null) { 
+                    console.log("tryna lookup scene inventory " + req.body.fromSceneInventory);
+                    let s_id = ObjectID(req.body.fromSceneInventory);
+                   
+                    db.inventories.findOne({'_id': s_id },function (err, inventory){  
+                        if (err || !inventory) {
+                             callback("no scene inventory");
+                            
+                        } else {
+                            console.log("scene inventory: " + JSON.stringify(inventory));
+                            
+                            db.inventories.update({'_id': s_id }, { $pull: { inventoryItems: {objectID: req.body.object_item._id, timestamp: req.body.timestamp} }}, function (err, saved) { //remove from scene inventory
+                                if (err || !saved) {
+                                    console.log("problemo with inventory rm " + err);
+                                    // res.send("inventory update error " + err);
+                                    // res.send("error saving to scene inventory");
+                                    callback(err);
+                                } else {
+                                    console.log("removed fromk scene inventory..." + req.body.object_item._id);
+                                    callback(null, user);
+                                }
+                            });
+                        }
+        
+                        });
+                    // callback(null, user);
+                } else {
+                    callback(null, user);
+                }
+            },
+            function (user, callback) { //log activity
                 if (user.activitiesID != undefined && user.activitiesID != null) {
                     console.log("updati9ng acvitiiies record" + user.activitiesID);
                     var a_id = ObjectID(user.activitiesID);
@@ -3000,7 +3034,7 @@ app.post('/action/', requiredAuthentication, function (req, res) {
                             });
                         }
                     });
-                } else { //new activitiesID
+                } else { //new activitiesID if needed
                     let activities = {};
                     let actionItems = [];
                     actionItems.push(actionItem);
@@ -3027,7 +3061,7 @@ app.post('/action/', requiredAuthentication, function (req, res) {
                         });   
                 }
             },
-            function (user, callback) {
+            function (user, callback) { //add to player inventory
                 if (req.body.action.actionResult.toLowerCase() == "inventory") {
                     if (user.inventoryID != undefined && user.inventoryID != null) {
                         console.log("updating inventory record " + user.inventoryID);
@@ -3049,7 +3083,7 @@ app.post('/action/', requiredAuthentication, function (req, res) {
                                 });
                             }
                         });
-                    } else { //new inventory 
+                    } else { //new inventory if needed 
                         let inventories = {};
                         let inventoryItems = [];
                         inventoryItems.push(inventoryItem);
@@ -15780,7 +15814,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                 callback();
                             } else {
                                 // console.log("sceene inventory : " + JSON.stringify(inventory));
-                               
+                                
                                 var buff = Buffer.from(JSON.stringify(inventory)).toString("base64");
                                 inventoryData = "<a-entity mod_scene_inventory id=\x22sceneInventory\x22 data-inventory='"+buff+"'></a-entity>";
                                 callback();

@@ -1888,7 +1888,8 @@ AFRAME.registerComponent('mod_objex', {
     init: function () {
       let theData = this.el.getAttribute('data-objex');
       let theLocData = this.el.getAttribute('data-objex-locations');
-      this.sceneInventoryItems = null; //loaded after init, called from mod_inventory component
+      this.sceneInventoryItems = null; //might be loaded after init, called from mod_inventory component, if not part of the scene
+      this.fromSceneInventory = null;
 
       this.data.jsonObjectData = JSON.parse(atob(theData)); //object items with model references
       this.data.jsonLocationsData = JSON.parse(atob(theLocData)); //scene locations with object references
@@ -1916,6 +1917,7 @@ AFRAME.registerComponent('mod_objex', {
     },
     addSceneInventoryObjects: function(objex) { //
       let oIDs = [];
+      this.fromSceneInventory = objex._id //top level of inventory object, items are array property
       if (objex.inventoryItems != undefined && objex.inventoryItems.length > 0) {
         this.sceneInventoryItems = objex.inventoryItems;
       }
@@ -1934,20 +1936,20 @@ AFRAME.registerComponent('mod_objex', {
     
     },
     loadSceneInventoryObjects: function () { //coming back from upstream call after updating jsonObjectData with missing sceneInventoryItems
-      console.log("tryna loadSceneInventoryObjects");
+      console.log("tryna loadSceneInventoryObjects fromSceneInventory " + this.fromSceneInventory);
       for (let i = 0; i < this.sceneInventoryItems.length; i++) { 
         for (let j = 0; j < this.data.jsonObjectData.length; j++) {
           console.log("inventory : "+ this.sceneInventoryItems[i].objectID+ " vs objex._id " + this.data.jsonObjectData[j]._id);
           if (this.sceneInventoryItems[i].objectID == this.data.jsonObjectData[j]._id) {
             console.log("gotsa match for scene inventory at location " + JSON.stringify(this.sceneInventoryItems[i].location)); //here location data is a vector3
-            let timestamp = Date.now();
+            let timestamp = this.sceneInventoryItems[i].timestamp;
             if (this.sceneInventoryItems[i].location != undefined) {
             let locationData  = {};
             locationData.x = this.sceneInventoryItems[i].location.x;
             locationData.y = this.sceneInventoryItems[i].location.y;
             locationData.z = this.sceneInventoryItems[i].location.z; //how mod_object wants the data
             let objEl = document.createElement("a-entity");
-            objEl.setAttribute("mod_object", {'locationData': locationData, 'objectData': this.data.jsonObjectData[j]});
+            objEl.setAttribute("mod_object", {'locationData': locationData, 'objectData': this.data.jsonObjectData[j], 'inventoryData': this.sceneInventoryItems[i], 'fromSceneInventory': this.fromSceneInventory, 'timestamp': timestamp});
             objEl.id = "obj" + this.data.jsonObjectData[j]._id + "_" + timestamp;
             sceneEl.appendChild(objEl);
             } else {
@@ -2096,6 +2098,8 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
   schema: {
     locationData: {default: ''},
     objectData: {default: ''},
+    fromSceneInventory: {default: null},
+    timestamp: {default: null},
     applyForceToNewObject: {default: false}
   },
   init: function () {
@@ -2122,6 +2126,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
     this.synth = null;
     this.hasSynth = false;
     this.mod_physics = "";
+    // this.sceneInventoryID = null;
   
     if (this.data.objectData.modelURL != undefined) {
       this.el.setAttribute("gltf-model", this.data.objectData.modelURL); //set as an a-asset in server response
@@ -2382,14 +2387,15 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
       if (this.data.objectData.objtype.toLowerCase() == "pickup"  || this.hasPickupAction) {
       
         let data = {};
-
+        data.fromSceneInventory = this.data.fromSceneInventory;
+        data.timestamp = this.data.timestamp;
         data.fromScene = room;
         data.object_item = this.data.objectData;
         data.userData = userData;
         data.action = this.pickupAction;
         console.log("pickupaction " + JSON.stringify(data.action));
 
-        Action(data, this.el.id);
+        Pickup(data, this.el.id);
 
       }
     } else {
@@ -2479,12 +2485,12 @@ function Drop (data) {
        
   };
 }
-function Action (data, id) {
+function Pickup (data, id) {
   console.log("tryna act on " + id);
   let objEl = document.getElementById(id);
   if (objEl != null) {
     var xhr = new XMLHttpRequest();
-    xhr.open("POST", '/action/', true);
+    xhr.open("POST", '/pickup/', true);
     xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.send(JSON.stringify(data));
     xhr.onload = function () {
