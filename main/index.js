@@ -11831,6 +11831,7 @@ function showGroup() {
             let sceneLocs = "";    
                 if (sceneLocations != null && sceneLocations != undefined && sceneLocations.length > 0 ) {
                 console.log("sceneKLocattionz " + JSON.stringify(sceneLocations));
+                sceneLocations.reverse();
                 for (let i = 0; i < sceneLocations.length; i++) {
                     let locationMap = "";
                     let location = "";
@@ -11872,15 +11873,15 @@ function showGroup() {
                     // eX = parseFloat(eZ) != null ? parseFloat(eZ) : 0;
                     // console.log("rotations " + eX + " " + eY + " " + eZ);
                     let rotations = ""+                        
-                    "<label for=\x22eulerx_" + locationID + "\x22>Rotation X</label>" + 
+                    "<div class=\x22col form-group col-md-1\x22><label for=\x22eulerx_" + locationID + "\x22>X Rot</label>" + 
                     "<input type=\x22number\x22 step=\x220.01\x22 class=\x22form-control locationObjectRotX\x22 id=\x22eulerx_" + locationID + "\x22 placeholder=\x220\x22 value=\x22" + eX + "\x22 >" +
-                    "<label for=\x22eulery_" + locationID + "\x22>Rotation Y</label>" + 
+                    "<label for=\x22eulery_" + locationID + "\x22>Y Rot</label>" + 
                     "<input type=\x22number\x22 step=\x220.01\x22 class=\x22form-control locationObjectRotY\x22 id=\x22eulery_" + locationID + "\x22 placeholder=\x220\x22 value=\x22" + eY + "\x22 >" +
-                    "<label for=\x22eulerz_" + locationID + "\x22>Rotation Z</label>" + 
-                    "<input type=\x22number\x22 step=\x220.01\x22 class=\x22form-control locationObjectRotZ\x22 id=\x22eulerz_" + locationID + "\x22 placeholder=\x220\x22 value=\x22" + eZ + "\x22 >";
+                    "<label for=\x22eulerz_" + locationID + "\x22>Z Rot</label>" + 
+                    "<input type=\x22number\x22 step=\x220.01\x22 class=\x22form-control locationObjectRotZ\x22 id=\x22eulerz_" + locationID + "\x22 placeholder=\x220\x22 value=\x22" + eZ + "\x22 ></div>";
                
                     locationFormElements = ""+
-                    "<div class=\x22row\x22>" + 
+                    // "<div class=\x22row\x22>" + 
                     
                         // "<div class=\x22col form-group col-md-1\x22>" + 
                         //     "<label for=\x22eulerx_" + locationID + "\x22>Rotation X</label>" + 
@@ -11894,14 +11895,17 @@ function showGroup() {
                         //     "<label for=\x22eulerz_" + locationID + "\x22>Rotation Z</label>" + 
                         //     "<input type=\x22number\x22 class=\x22form-control\x22 id=\x22eulerz_" + locationID + "\x22 placeholder=\x220\x22 value=\x22" + sceneLocations[i].eulerz + "\x22 >" +
                         // "</div>" +
-                        "<div class=\x22col form-group col-md-4\x22>" +
+                        "<div class=\x22col form-group col-md-3\x22>" +
                             "<label for=\x22label_" + locationID + "\x22>Label</label>" + 
                             "<input type=\x22text\x22 class=\x22form-control locationLabel\x22 id=\x22label_" + locationID + "\x22 placeholder=\x220\x22 value=\x22" + label + "\x22 >" +
-                            "<label for=\x22eventData_" + locationID + "\x22>Event Data</label>" + 
-                            "<input type=\x22text\x22 class=\x22form-control locationEventData\x22 id=\x22eventData_" + locationID + "\x22 placeholder=\x220\x22 value=\x22" + sceneLocations[i].eventData + "\x22 >" +
-                            "<label for=\x22markerObjectScale_" + locationID + "\x22>Object Scale</label>" + 
-                            "<input type=\x22number\x22 step=\x220.001\x22 class=\x22form-control locationObjectScale\x22 id=\x22scale_" + locationID + "\x22 placeholder=\x220\x22 value=\x22" + sceneLocations[i].markerObjScale + "\x22 >" +
-                            
+                            // "<label for=\x22eventData_" + locationID + "\x22>Event Data</label>" + 
+                            // "<input type=\x22text\x22 class=\x22form-control locationEventData\x22 id=\x22eventData_" + locationID + "\x22 placeholder=\x220\x22 value=\x22" + sceneLocations[i].eventData + "\x22 >" +
+                            "<label for=\x22locationDescription_" + locationID + "\x22>Description</label>" + 
+                            "<input type=\x22text\x22 class=\x22form-control locationDescription\x22 id=\x22locationDescription_" + locationID + "\x22 value=\x22" + sceneLocations[i].description + "\x22 >" +
+                            // "<label for=\x22markerObjectScale_" + locationID + "\x22>Object Scale</label>" + 
+                            // "<input type=\x22number\x22 step=\x220.001\x22 class=\x22form-control locationObjectScale\x22 id=\x22scale_" + locationID + "\x22 placeholder=\x220\x22 value=\x22" + sceneLocations[i].markerObjScale + "\x22 >" +
+                            "<br><button type=\x22button\x22 class=\x22copySceneLocation btn btn-xs btn-info float-left\x22 id=\x22" + i + "\x22>Clone</button>"+
+                            "<button type=\x22button\x22 class=\x22remSceneLocation btn btn-xs btn-danger float-right\x22 id=\x22" + i + "\x22>Remove</button>"+
                         "</div>" +
 
                             // "<select style=\x22display: none;\x22 class=\x22locationObjectSelect form-control\x22 id=\x22locobjselect_" + locationID + "\x22>" +
@@ -11911,7 +11915,7 @@ function showGroup() {
                             // "<br><button type=\x22button\x22 class=\x22selectLocationObject btn btn-sm btn-success float-right\x22 id=\x22locobjtype_" + locationID + "\x22>Select Location Object</button>" +
                             // "<div id=\x22locationObjects_" + locationID + "\x22></div>"
                         // "</div>" +
-                        "<div class=\x22col form-group col-md-4\x22>" + 
+                        "<div class=\x22col form-group col-md-2\x22>" + 
 
                             "<label for=\x22objtype_" + locationID + "\x22>Location Type</label>" + //type
                             "<select class=\x22locationObjectTypeSelect form-control\x22 id=\x22locobjtypeselect_" + locationID + "\x22>" +
@@ -11919,54 +11923,69 @@ function showGroup() {
                             returnObjectTypes(sceneLocations[i].markerType) +
                             "</select>" +
                             // "<div id=\x22locationObjects_" + locationID + "\x22></div>"
-                            "<label for=\x22locationDescription_" + locationID + "\x22>Description</label>" + 
-                            "<input type=\x22text\x22 class=\x22form-control locationDescription\x22 id=\x22locationDescription_" + locationID + "\x22 value=\x22" + sceneLocations[i].description + "\x22 >" +
-                        "</div>" +
-                        "<div class=\x22col form-group col-md-4\x22 id=\x22locationObjects_" + locationID + "\x22>" +
-                       
-                        "</div>" +
-                        "<div class=\x22col form-group col-md-6\x22 id=\x22selectLocationModel_" + locationID + "\x22>" +
-                            "<label for=\x22\x22>Location Model: </label>" + 
-                            "<select class=\x22form-control modelSelector\x22 id=\x22modelSelect_"+locationID+"\x22>" +
-                            "<option value=\x22\x22 disabled selected>Select : </option>" +
-                            "<option value=\x22none\x22> none</option>" +
-                            "</select>" +
-                        "</div>" +
-                        "<div class=\x22col form-group col-md-6\x22 id=\x22selectLocationObject_" + locationID + "\x22>" +
-                            "<label for=\x22\x22>Location Object: </label>" + 
-                            "<select class=\x22form-control objectSelector\x22 id=\x22objectSelect_"+locationID+"\x22>" +
-                            "<option value=\x22\x22 disabled selected>Select : </option>" +
-                            "<option value=\x22none\x22> none</option>" +
-                            "</select>" +
-                        "</div>" +
+                            
+                            // "<label for=\x22locationDescription_" + locationID + "\x22>Description</label>" + 
+                            // "<input type=\x22text\x22 class=\x22form-control locationDescription\x22 id=\x22locationDescription_" + locationID + "\x22 value=\x22" + sceneLocations[i].description + "\x22 >" +
 
-                    "</div>";
+                            "<label for=\x22eventData_" + locationID + "\x22>Event Data</label>" + 
+                            "<input type=\x22text\x22 class=\x22form-control locationEventData\x22 id=\x22eventData_" + locationID + "\x22 placeholder=\x220\x22 value=\x22" + sceneLocations[i].eventData + "\x22 >" +
+
+                            // "<br><button type=\x22button\x22 class=\x22remSceneLocation btn btn-xs btn-danger float-left\x22 id=\x22" + i + "\x22>Remove</button>"+
+                            // "<button type=\x22button\x22 class=\x22copySceneLocation btn btn-xs btn-info float-right\x22 id=\x22" + i + "\x22>Clone</button>"+
+                        "</div>" +
+                        // "<div class=\x22col form-group col-md-3\x22 id=\x22locationObjects_" + locationID + "\x22>" +
+                       
+                        // "</div>" +
+                        "<div class=\x22col form-group col-md-2\x22>"+
+                            "<div id=\x22selectLocationModel_" + locationID + "\x22>" +
+                                "<label for=\x22\x22>Location Model: </label>" + 
+                                "<select class=\x22form-control modelSelector\x22 id=\x22modelSelect_"+locationID+"\x22>" +
+                                "<option value=\x22\x22 disabled selected>Select : </option>" +
+                                "<option value=\x22none\x22> none</option>" +
+                                "</select>" +
+                            "</div>" +
+                            "<div id=\x22selectLocationObject_" + locationID + "\x22>" +
+                                "<label for=\x22\x22>Location Object: </label>" + 
+                                "<select class=\x22form-control objectSelector\x22 id=\x22objectSelect_"+locationID+"\x22>" +
+                                "<option value=\x22\x22 disabled selected>Select : </option>" +
+                                "<option value=\x22none\x22> none</option>" +
+                                "</select>" +
+                            "</div>" +
+                            "<label for=\x22markerObjectScale_" + locationID + "\x22>Object Scale</label>" + 
+                            "<input type=\x22number\x22 step=\x220.001\x22 class=\x22form-control locationObjectScale\x22 id=\x22scale_" + locationID + "\x22 placeholder=\x220\x22 value=\x22" + sceneLocations[i].markerObjScale + "\x22 >" +
+                        "</div>";
+                        // "<div class=\x22col form-group col-md-3\x22>"+
+                        //     // "<button type=\x22button\x22 class=\x22remSceneLocation btn btn-xs btn-danger float-left\x22 id=\x22" + i + "\x22>Remove</button>"+
+                        //     // "<button type=\x22button\x22 class=\x22copySceneLocation btn btn-xs btn-info float-right\x22 id=\x22" + i + "\x22>Copy</button>"+
+                        // "</div>" +
+
+                    // "</div>";
                     if (sceneLocations[i].type != undefined && sceneLocations[i].type.toLowerCase() == "geographic") {
                         locationMap = "<a target=\x22_blank\x22 href=\x22http://maps.google.com?q=" + sceneLocations[i].latitude + "," + sceneLocations[i].longitude + "\x22>" +
                         "<img class=\x22img-thumbnail\x22 style=\x22width: 300px;\x22 src=\x22https://maps.googleapis.com/maps/api/staticmap?center=" + sceneLocations[i].latitude + "," + sceneLocations[i].longitude + 
                         "&zoom=15&size=600x300&maptype=roadmap&key=AIzaSyCBlNNHgDBmv-vusmuvG3ylf0XjGoMkkCo&markers=color:blue%7Clabel:" + (i + 1) + "%7C" + sceneLocations[i].latitude + "," + sceneLocations[i].longitude + "\x22>" + 
-                        "</a>" + 
-                        "<br><br><button type=\x22button\x22 class=\x22remSceneLocation btn btn-xs btn-danger float-left\x22 id=\x22" + i + "\x22>Remove</button>";
+                        "</a>"; 
+                        // "<br><br><button type=\x22button\x22 class=\x22remSceneLocation btn btn-xs btn-danger float-left\x22 id=\x22" + i + "\x22>Remove</button>";
 
                         // location = "latitude: " + sceneLocations[i].latitude + "<br>longitude: " + sceneLocations[i].longitude;
-                        location = "<label for=\x22latitude_" + locationID + "\x22>Latitude:</label>" + 
+                        location = "<div class=\x22col form-group col-md-1\x22><label for=\x22latitude_" + locationID + "\x22>Latitude:</label>" + 
                         "<input type=\x22text\x22 class=\x22form-control locationObjLatitude\x22 id=\x22latitude_" + locationID + "\x22 placeholder=\x220\x22 value=\x22" + sceneLocations[i].latitude + "\x22 >" +
                         "<label for=\x22longitude_" + locationID + "\x22>Longitude:</label>" + 
                         "<input type=\x22text\x22 class=\x22form-control locationObjLongitude\x22 id=\x22longitude_" + locationID + "\x22 placeholder=\x220\x22 value=\x22" + sceneLocations[i].longitude + "\x22 >"+
                         "<label for=\x22elevation_" + locationID + "\x22>Elevation:</label>" + 
-                        "<input type=\x22text\x22 class=\x22form-control locationObjGeoElevation\x22 id=\x22elevation_" + locationID + "\x22 placeholder=\x220\x22 value=\x22" + sceneLocations[i].elevation + "\x22 >";
+                        "<input type=\x22text\x22 class=\x22form-control locationObjGeoElevation\x22 id=\x22elevation_" + locationID + "\x22 placeholder=\x220\x22 value=\x22" + sceneLocations[i].elevation + "\x22 ></div>";
 
                     } else {
 
                         // location = "x: " + sceneLocations[i].x + "<br>y: " + sceneLocations[i].y + "<br>z: " + sceneLocations[i].z; 
-                        location = "<label for=\x22xposition_" + locationID + "\x22>X Position:</label>" + 
+                        location = "<div class=\x22col form-group col-md-1\x22><label for=\x22xposition_" + locationID + "\x22>X Pos</label>" + 
                         "<input type=\x22text\x22 class=\x22form-control locationObjectX\x22 id=\x22xpos_" + locationID + "\x22 placeholder=\x220\x22 value=\x22" + sceneLocations[i].x + "\x22 >" +
-                        "<label for=\x22yposition_" + locationID + "\x22>Y Position:</label>" + 
+                        "<label for=\x22yposition_" + locationID + "\x22>Y Pos</label>" + 
                         "<input type=\x22text\x22 class=\x22form-control locationObjectY\x22 id=\x22ypos_" + locationID + "\x22 placeholder=\x220\x22 value=\x22" + sceneLocations[i].y + "\x22 >" +
-                        "<label for=\x22zposition_" + locationID + "\x22>Z Position:</label>" + 
-                        "<input type=\x22text\x22 class=\x22form-control locationObjectZ\x22 id=\x22zpos_" + locationID + "\x22 placeholder=\x220\x22 value=\x22" + sceneLocations[i].z + "\x22 >";
+                        "<label for=\x22zposition_" + locationID + "\x22>Z Pos</label>" + 
+                        "<input type=\x22text\x22 class=\x22form-control locationObjectZ\x22 id=\x22zpos_" + locationID + "\x22 placeholder=\x220\x22 value=\x22" + sceneLocations[i].z + "\x22 ></div>";
 
-                        if (sceneLocations[i].x != undefined && sceneLocations[i].z != undefined) { //svg map values 
+                        if (sceneLocations[i].x != undefined && sceneLocations[i].z != undefined) { //svg map values //hrm...
                             let scaleString = "";
                             let scaleFactor = 100;
                             let scaleInt = 0;
@@ -12004,7 +12023,7 @@ function showGroup() {
                         // console.log("positiosn " + xpos + " " + zpos);
                         //     console.log("scaleInt " + scaleInt + " scaleString " + scaleString + " scaleFactor " + scaleFactor);    
                         
-                        locationMap = "<div class=\x22\x22 style=\x22margin: 0 auto; \x22><svg height=\x22200\x22 width=\x22200\x22>" +
+                        locationMap = "<div class=\x22col form-group col-md-2\x22 style=\x22margin: 0 auto; \x22><svg height=\x22200\x22 width=\x22200\x22>" +
                         "<text style=\x22fill:blue;\x22 x=\x220\x22 y=\x22200\x22 class=\x22small\x22>scale "+scaleText+"</text>"+
                             "<line x1=\x220\x22 y1=\x220\x22 x2=\x220\x22 y2=\x22200\x22 style=\x22stroke:rgb(0,0,0);stroke-width:.5\x22 />" + 
                             "<line x1=\x2210\x22 y1=\x220\x22 x2=\x2210\x22 y2=\x22200\x22 style=\x22stroke:rgb(0,0,0);stroke-width:.5\x22 />" + 
@@ -12049,9 +12068,9 @@ function showGroup() {
                             "<line x1=\x220\x22 y1=\x22190\x22 x2=\x22200\x22 y2=\x22190\x22 style=\x22stroke:rgb(0,0,0);stroke-width:.5\x22 />" + 
                             "<line x1=\x220\x22 y1=\x22200\x22 x2=\x22200\x22 y2=\x22200\x22 style=\x22stroke:rgb(0,0,0);stroke-width:.5\x22 />" + 
                             "<circle cx=\x22"+xpos+"\x22 cy=\x22"+zpos+"\x22 r=\x225\x22 stroke=\x22black\x22 stroke-width=\x221\x22 fill=\x22red\x22 />" +
-                            "</svg></div>" +
-                            "<br><button type=\x22button\x22 class=\x22remSceneLocation btn btn-xs btn-danger float-left\x22 id=\x22" + i + "\x22>Remove</button>"+
-                            "<button type=\x22button\x22 class=\x22copySceneLocation btn btn-xs btn-info float-right\x22 id=\x22" + i + "\x22>Copy</button>";
+                            "</svg></div>";
+                            // "<br><button type=\x22button\x22 class=\x22remSceneLocation btn btn-xs btn-danger float-left\x22 id=\x22" + i + "\x22>Remove</button>"+
+                            // "<button type=\x22button\x22 class=\x22copySceneLocation btn btn-xs btn-info float-right\x22 id=\x22" + i + "\x22>Copy</button>";
                         }
                     }
                     let id = "";
@@ -12064,23 +12083,13 @@ function showGroup() {
                     }
                     sceneLocs = sceneLocs +
                     "<br><hr><div class=\x22form-row\x22>" +   
+                    
 
-                        "<div class=\x22col form-group col-md-2\x22>" + 
-                        locationMap +
-                        "</div>" +
-                        "<div class=\x22col form-group col-md-1\x22>" + 
-                        //spacer
-                        "</div>" +
-                        "<div class=\x22col form-group col-md-1\x22>" + 
-                        location +
-                        "</div>" +
-                        "<div class=\x22col form-group col-md-1\x22>" + 
-                        rotations + 
-                        "</div>" + 
-                        "<div class=\x22col form-group col-md-6\x22>" + 
                         locationFormElements +
-                        "</div>" +
-                        
+                        location +
+                        rotations + 
+                        locationMap +
+
                     "</div>";
                     }
                 }    
@@ -14266,7 +14275,7 @@ function showGroup() {
 
                 ////////////////////////////////////////////////
                 $(function() { 
-                
+                    let reloadOnSubmit = false;
                         if (sceneModelz != null && sceneModelz != undefined && sceneModelz.length > 0) {
 
                             // console.log(JSON.stringify(sceneModelz));
@@ -14700,9 +14709,11 @@ function showGroup() {
                         }
                         const id = "#" + this.id;
                         $(id).parent().parent().hide();
+                        document.getElementById('updateSceneForm').submit();
                     }); 
                     $(document).on('click','.remSceneLocation',function(e){
                         e.preventDefault();  
+                        
                         console.log("tryna remove sceneLocations " + this.id);
                         // for( var i = 0; i < sceneLocations.length; i++){ 
                         //     if ( sceneLocations[i] === this.id) {
@@ -14711,6 +14722,9 @@ function showGroup() {
                         // }
                         const id = "#" + this.id;
                         $(id).parent().parent().hide();
+                        reloadOnSubmit = true;
+                        document.getElementById('sceneSubmitButton').click();
+                       
                     }); 
                     $(document).on('click','.copySceneLocation',function(e){
                         e.preventDefault();  
@@ -14730,8 +14744,9 @@ function showGroup() {
                         // let copySceneLocations = sceneLocations.slice();
                         sceneLocations.push(copyLoc);
                         console.log(JSON.stringify(sceneLocations));
-                        // }
-                        // $(this).hide();
+                        reloadOnSubmit = true;
+                        document.getElementById('sceneSubmitButton').click();
+                        
                     }); 
                     $(document).on('click','.remYouTube',function(e){
                         e.preventDefault();  
@@ -15562,7 +15577,9 @@ function showGroup() {
                                 axios.post('/update_scene/' + response.data._id, data)
                                     .then(function (response) {
                                         console.log(response);
-                                        if (response.data.includes("updated")) {
+                                        if (reloadOnSubmit) {
+                                            window.location.reload();
+                                        } else if (response.data.includes("updated")) {
                                             // window.location.reload();
                                             $("#topSuccess").html("Scene Updated!");
                                             $("#topSuccess").show();

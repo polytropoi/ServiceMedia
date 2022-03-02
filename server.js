@@ -15246,7 +15246,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                 if (sceneResponse.sceneLocations[i].markerType == "car") {
                                     carLocation = sceneResponse.sceneLocations[i].x + " " + sceneResponse.sceneLocations[i].y + " " + zFix;
                                 }
-                                if (sceneResponse.sceneLocations[i].markerType == "picture") {
+                                if (sceneResponse.sceneLocations[i].markerType != undefined && sceneResponse.sceneLocations[i].markerType.toLowerCase().includes('picture')) {
                                     pictureLocation = sceneResponse.sceneLocations[i].x + " " + sceneResponse.sceneLocations[i].y + " " + zFix;
                                 }
                                 if (sceneResponse.sceneLocations[i].markerType == "picturegroup") {
@@ -15295,7 +15295,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                     pictureLocation.rot = eulerx + " " + eulery + " " + eulerz;
                                     pictureLocation.type = sceneResponse.sceneLocations[i].markerType;
                                     pictureLocation.data = sceneResponse.sceneLocations[i].eventData; //should be the pic _id
-                                    console.log("pictureLocation: " + pictureLocation);
+                                    console.log("pictureLocation: " + JSON.stringify(pictureLocation));
                                     locationPictures.push(pictureLocation);
                                 }
 
@@ -15827,7 +15827,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                 },
                 function (callback) {
                     var modelz = [];
-                   console.log("sceneModels : " + JSON.stringify(sceneResponse.sceneModels));
+                //    console.log("sceneModels : " + JSON.stringify(sceneResponse.sceneModels));
                     if (sceneResponse.sceneModels != null) {
                         async.each (sceneResponse.sceneModels, function (objID, callbackz) { //nested async-ery!
                             var oo_id = ObjectID(objID);
@@ -15837,7 +15837,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                     console.log("error getting model: " + objID); //todo - report? 
                                     callbackz();
                                 } else {
-                                    console.log("got user model:" + model._id);
+                                    // console.log("got user model:" + model._id);
                                     let url = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + model.userID + "/gltf/" + model.filename, Expires: 6000});
                                     model.url = url;
                                     modelz.push(model);
@@ -17530,10 +17530,12 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                         let actionCall = "";
                                         let link = "";
                                         let lookat = " look-at=\x22#player\x22 ";
+                                        let picItemsPlaced = [];
                                         for (let p = 0; p < locationPictures.length; p++) {
-                                            // console.log(picture_item._id + " vs locationPIcture: " + JSON.stringify(locationPictures[p]));
-                                            if (picture_item._id.toString() == locationPictures[p].data) {
+                                            console.log(locationPictures.length + " total piclocs " + picture_item._id + " vs locationPIcture: " + JSON.stringify(locationPictures[p]));
+                                            if (!picItemsPlaced.includes(picture_item._id.toString())) { //just random now, but should test for data property match if present
                                                 // useImageLayout = false;
+                                                picItemsPlaced.push(picture_item._id); 
                                                 position = locationPictures[p].loc;
                                                 rotation = locationPictures[p].rot;
                                                 if (locationPictures[p].type.includes("fixed")) {
@@ -17545,7 +17547,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                             }
                                         }
                                         // console.log("picture_item.linkType: " + picture_item.linkType);
-                                        console.log("picture_item.orientation: " + picture_item.orientation);
+                                        // console.log("picture_item.orientation: " + picture_item.orientation);
                                         if (picture_item.linkType != undefined && picture_item.linkType.toLowerCase() != "none") {
                                             if (picture_item.linkType == "NFT") { //never mind, these are old image target fu
                                                 // nftIDs = picture_item._id; //only one for now..
@@ -18734,9 +18736,9 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                         "<script src=\x22../main/js/hls.min.js\x22></script>" + //v 1.0.6 
                         
                         // "<script src=\x22../main/ref/aframe/dist/networked-aframe.min.js\x22></script>" + 
-                        "<script src=\x22../main/ref/aframe/dist/aframe-layout-component.min.js\x22></script>" +  
+                        // "<script src=\x22../main/ref/aframe/dist/aframe-layout-component.min.js\x22></script>" +  
                        
-                        "<script src=\x22../main/ref/aframe/dist/aframe-randomizer-components.min.js\x22></script>" +
+                        // "<script src=\x22../main/ref/aframe/dist/aframe-randomizer-components.min.js\x22></script>" +
                         "<script src=\x22../main/ref/aframe/dist/aframe_environment_component.min.js\x22></script>" +
                        
                         joystickScript +
