@@ -115,7 +115,8 @@ $(function() {
       console.log("skyboxIDS: " + JSON.stringify(settings.skyboxIDs));
       skyboxEl = document.createElement('a-entity');
       sceneEl = document.querySelector('a-scene');
-      skyboxEl.setAttribute('skybox_dynamic', {enabled: true, id: settings.skyboxID});
+      skyboxEl.setAttribute('skybox_dynamic', {enabled: true, id: settings.skyboxIDs[0]});
+      skyboxEl.id = 'skybox_dynamic';
       sceneEl.appendChild(skyboxEl);
    }
    if (settings.skyboxID == "") {
@@ -1057,7 +1058,7 @@ socket.on('user joined', function(data) {
 });
 
 socket.on('room users', function (data) {
- console.log("room users data : " + data);
+//  console.log("room users data : " + data);
  $('#users').html("");
 
    roomUsers = JSON.parse(data);

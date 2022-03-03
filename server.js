@@ -7307,29 +7307,32 @@ app.get('/userpic/:p_id', requiredAuthentication, function(req, res) {
                     // console.log("urlTarget " + urlTarget);
                     if (picture_item.orientation != null && picture_item.orientation != undefined && picture_item.orientation.toLowerCase() == "equirectangular") {
                         //return cubemaps?  
-                        let cubeMapAsset = [];
-                        let cmParams = {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: "users/"+picture_item.userID+"/cubemaps/"+picture_item._id+"_px.jpg"};
-                        s3.headObject(cmParams, function(err, data) { //some old pix aren't saved with .original. in filename, check for that
-                        if (err) { 
-                            console.log("no cubemaps have been generated for this item");
-                            res.json(picture_item);
-                        } else {
-                            let path1 = s3.getSignedUrl('getObject', {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: "users/"+picture_item.userID+"/cubemaps/"+picture_item._id+"_px.jpg", Expires: 6000});  
-                            let path2 = s3.getSignedUrl('getObject', {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: "users/"+picture_item.userID+"/cubemaps/"+picture_item._id+"_nx.jpg", Expires: 6000});  
-                            let path3 = s3.getSignedUrl('getObject', {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: "users/"+picture_item.userID+"/cubemaps/"+picture_item._id+"_py.jpg", Expires: 6000});  
-                            let path4 = s3.getSignedUrl('getObject', {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: "users/"+picture_item.userID+"/cubemaps/"+picture_item._id+"_ny.jpg", Expires: 6000});  
-                            let path5 = s3.getSignedUrl('getObject', {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: "users/"+picture_item.userID+"/cubemaps/"+picture_item._id+"_pz.jpg", Expires: 6000});  
-                            let path6 = s3.getSignedUrl('getObject', {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: "users/"+picture_item.userID+"/cubemaps/"+picture_item._id+"_nz.jpg", Expires: 6000});                                    
-                            cubeMapAsset.push(path1);
-                            cubeMapAsset.push(path2);
-                            cubeMapAsset.push(path3);
-                            cubeMapAsset.push(path4);
-                            cubeMapAsset.push(path5);
-                            cubeMapAsset.push(path6);
-                            picture_item.cubeMapAsset = cubeMapAsset;
-                            res.json(picture_item);
-                            }
-                        });
+                        res.json(picture_item);
+
+                        // let cubeMapAsset = [];
+                        // let cmParams = {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: "users/"+picture_item.userID+"/cubemaps/"+picture_item._id+"_px.jpg"};
+                        // s3.headObject(cmParams, function(err, data) { //some old pix aren't saved with .original. in filename, check for that
+                        // if (err) { 
+                        //     console.log("no cubemaps have been generated for this item");
+                        //     res.json(picture_item);
+                        // } else {
+
+                        //     let path1 = s3.getSignedUrl('getObject', {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: "users/"+picture_item.userID+"/cubemaps/"+picture_item._id+"_px.jpg", Expires: 6000});  
+                        //     let path2 = s3.getSignedUrl('getObject', {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: "users/"+picture_item.userID+"/cubemaps/"+picture_item._id+"_nx.jpg", Expires: 6000});  
+                        //     let path3 = s3.getSignedUrl('getObject', {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: "users/"+picture_item.userID+"/cubemaps/"+picture_item._id+"_py.jpg", Expires: 6000});  
+                        //     let path4 = s3.getSignedUrl('getObject', {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: "users/"+picture_item.userID+"/cubemaps/"+picture_item._id+"_ny.jpg", Expires: 6000});  
+                        //     let path5 = s3.getSignedUrl('getObject', {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: "users/"+picture_item.userID+"/cubemaps/"+picture_item._id+"_pz.jpg", Expires: 6000});  
+                        //     let path6 = s3.getSignedUrl('getObject', {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: "users/"+picture_item.userID+"/cubemaps/"+picture_item._id+"_nz.jpg", Expires: 6000});                                    
+                        //     cubeMapAsset.push(path1);
+                        //     cubeMapAsset.push(path2);
+                        //     cubeMapAsset.push(path3);
+                        //     cubeMapAsset.push(path4);
+                        //     cubeMapAsset.push(path5);
+                        //     cubeMapAsset.push(path6);
+                        //     picture_item.cubeMapAsset = cubeMapAsset;
+                        //     res.json(picture_item);
+                        //     }
+                        // });
                     } else {
                         res.json(picture_item);
                     }
@@ -14773,7 +14776,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
     let calloutEntities = "";
     let carLocation = "";
     let cameraEnvMap = "";
-    let cubeMapAsset = "";
+    // let cubeMapAsset = ""; //deprecated, all at runtime now..
     let contentUtils = "<script src=\x22../main/src/component/content-utils.js\x22 defer=\x22defer\x22></script>"; 
     let videosphereAsset = "";
     let mainTextEntity = "";
@@ -14859,8 +14862,9 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
     let instancingEntity = "";
     let meshUtilsScript = "<script type=\x22module\x22 src=\x22../main/src/component/mesh-utils.js\x22 defer=\x22defer\x22></script>";
     let physicsScripts = "";
-    let extrasScript = ""; //aframe-extras lib for physics and navmesh
+    let extrasScript = "<script src=\x22../main/vendor/aframe/animation-mixer.js\x22></script>"; //swapped with full aframe-extras lib (that includes animation-mixer) for physics and navmesh if needed
     // let debugMode = false;
+    let aframeScriptVersion = "<script src=\x22https://aframe.io/releases/1.3.0/aframe.min.js\x22></script>";
     let surfaceScatterScript = "";
     let locationData = "";
     let modelData = "";
@@ -14961,6 +14965,10 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                         if (sceneData.sceneTags[i].includes("synth")) {
                             synthScripts = "<script src=\x22../main/src/synth/Tone.js\x22></script><script src=\x22../main/js/synth.js\x22></script>";
                         }
+                        if (sceneData.sceneTags[i].toLowerCase().includes("aframe 1.2")) {
+                            aframeScriptVersion = "<script src=\x22https://aframe.io/releases/1.2.0/aframe.min.js\x22></script>";
+                        }
+
                     }
                 }
                 //TODO use sceneNetworkSettings or whatever
@@ -15330,10 +15338,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                             "</a-entity>";
 
                         } else if (sceneData.sceneWebType == 'AR Image Tracking') { //not really, set below...
-                            // ARScript = "<script src=\x22/main/ref/aframe/dist/aframe-ar-nft.js\x22></script>";
-                                // <script src="https://aframe.io/releases/1.2.0/aframe.min.js\x22></script>" +
-                            // <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js"></script>
-                            // <script src="https://cdnjs.cloudflare.com/ajax/libs/stats.js/16/Stats.min.js"></script>
+                            
                            
                             ARScript = "<script src=\x22./main/src/util/mindar/mindar-image.js\x22></script> <script src=\x22./main/src/util/mindar/mindar-image-aframe.js\x22></script>";
                             ARSceneArg = "mindar-image=\x22imageTargetSrc: "+arImageTargets[0]+";\x22 embedded color-space=\x22sRGB\x22"+
@@ -17492,7 +17497,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                                 skyboxID = picID;
                                                 version = ".original.";
                                                 fogSettings = "";
-                                                // skyboxIDs.push(picID);
+                                                skyboxIDs.push(picID);
                                                 // convertEquirectToCubemap = "<script src=\x22../main/ref/aframe/dist/equirect-to-cubemap.js\x22></script>";
                                             }
                                         }
@@ -17631,7 +17636,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
 
                 function (callback) {
                     var oo_id = null;
-                    console.log("skybox ids beez " + JSON.stringify(skyboxIDs));
+                    console.log("skybox ids beez " + JSON.stringify(skyboxIDs) + " vs single skyboxID " + skyboxID);
                     if (skyboxIDs.length > 0) {
                         // skyboxID = skyboxIDs[Math.floor(Math.random() * skyboxIDs.length)];
                         // oo_id =  ObjectID(skyboxID);
@@ -17658,8 +17663,12 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                     Key: theKey
                                 };
                                 s3.headObject(params, function(err, data) { //some old skyboxen aren't saved with .original. in filename, check for that
+                                    
                                     if (err) {
                                     //   console.log("din't find skybox: " + err, err.stack);
+                                            theKey = 'users/' + picture_item.userID + '/pictures/originals/' + picture_item.filename;
+                                            skyboxUrl = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: theKey, Expires: 6000});
+                                            skyboxAsset = "<img id=\x22sky\x22 crossorigin=\x22anonymous\x22 src='" + skyboxUrl + "'>";
                                         if (sceneResponse.sceneUseSkybox) {
                                             theKey = 'users/' + picture_item.userID + '/pictures/originals/' + picture_item.filename;
                                             skyboxUrl = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: theKey, Expires: 6000});
@@ -17668,79 +17677,78 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                             // let envMap = sceneResponse.sceneUseDynCubeMap ? "convert-to-envmap" : "";
                                             skySettings = "<a-sky crossorigin=\x22anonymous\x22 hide-in-ar-mode src=#sky></a-sky>";
                                             // aframeEnvironment = "";
-                                            hemiLight = "<a-light type=\x22hemisphere\x22 color=\x22" + sceneResponse.sceneColor1 + "\x22 groundColor=\x22" + sceneResponse.sceneColor2 + "\x22 intensity=\x22.5\x22 position\x220 0 0\x22>"+
+                                            hemiLight = "<a-light type=\x22hemisphere\x22 color=\x22" + sceneResponse.sceneColor1 + "\x22 groundColor=\x22" + sceneResponse.sceneColor2 + "\x22 intensity=\x221\x22 position\x220 0 0\x22>"+
                                             "</a-light>";
                                         }
                                         callback(null);
                                     } else {
                                         //console.log("found skybox at " + theKey);
+                                        skyboxUrl = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: theKey, Expires: 6000});
+                                        skyboxAsset = "<img id=\x22sky\x22 crossorigin=\x22\anonymous\x22 src='" + skyboxUrl + "'>";
+
                                         if (sceneResponse.sceneUseSkybox) {
-                                            skyboxUrl = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: theKey, Expires: 6000});
-                                            skyboxAsset = "<img id=\x22sky\x22 crossorigin=\x22\anonymous\x22 src='" + skyboxUrl + "'>";
-                                        
+                                            // skyboxUrl = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: theKey, Expires: 6000});
+                                            // skyboxAsset = "<img id=\x22sky\x22 crossorigin=\x22\anonymous\x22 src='" + skyboxUrl + "'>";
                                             // let envMap = sceneResponse.sceneUseDynCubeMap ? "convert-to-envmap" : "";
                                             // skySettings = "<a-sky hide-in-ar-mode "+envMap+" src=#sky></a-sky>";
                                             skySettings = "<a-sky crossorigin=\x22anonymous\x22 id=\x22skybox\x22 hide-in-ar-mode src=#sky></a-sky>";
                                             // if (sceneResponse.sceneUseSkybox) { //turn off env component entirely if 
                                             //     aframeEnvironment = "";
                                             // } else {
-
                                             // }
-                                            hemiLight = "<a-light type=\x22hemisphere\x22 color=\x22" + sceneResponse.sceneColor1 + "\x22 groundColor=\x22" + sceneResponse.sceneColor2 + "\x22 intensity=\x22.75\x22 position\x220 0 0\x22>"+
+                                            hemiLight = "<a-light type=\x22hemisphere\x22 color=\x22" + sceneResponse.sceneColor1 + "\x22 groundColor=\x22" + sceneResponse.sceneColor2 + "\x22 intensity=\x221\x22 position\x220 0 0\x22>"+
                                             "</a-light>";
                                         }
                                         callback(null);
                                     }
                                 });
+                                /* //deprecaated, now all dynamic
+                                        if (sceneResponse.sceneUseDynCubeMap) {
+                                            let path1 = s3.getSignedUrl('getObject', {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: "users/"+picture_item.userID+"/cubemaps/"+picture_item._id+"_px.jpg", Expires: 6000});  
+                                            let path2 = s3.getSignedUrl('getObject', {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: "users/"+picture_item.userID+"/cubemaps/"+picture_item._id+"_nx.jpg", Expires: 6000});  
+                                            let path3 = s3.getSignedUrl('getObject', {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: "users/"+picture_item.userID+"/cubemaps/"+picture_item._id+"_py.jpg", Expires: 6000});  
+                                            let path4 = s3.getSignedUrl('getObject', {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: "users/"+picture_item.userID+"/cubemaps/"+picture_item._id+"_ny.jpg", Expires: 6000});  
+                                            let path5 = s3.getSignedUrl('getObject', {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: "users/"+picture_item.userID+"/cubemaps/"+picture_item._id+"_pz.jpg", Expires: 6000});  
+                                            let path6 = s3.getSignedUrl('getObject', {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: "users/"+picture_item.userID+"/cubemaps/"+picture_item._id+"_nz.jpg", Expires: 6000});      
+                                        // let path1 = s3.getSignedUrl('getObject', {Bucket: 'archive1', Key: "staging/"+picture_item.userID+"/cubemaps/"+picture_item._id+"_px.jpg", Expires: 6000});  
+                                        // let path2 = s3.getSignedUrl('getObject', {Bucket: 'archive1', Key: "staging/"+picture_item.userID+"/cubemaps/"+picture_item._id+"_nx.jpg", Expires: 6000});  
+                                        // let path3 = s3.getSignedUrl('getObject', {Bucket: 'archive1', Key: "staging/"+picture_item.userID+"/cubemaps/"+picture_item._id+"_py.jpg", Expires: 6000});  
+                                        // let path4 = s3.getSignedUrl('getObject', {Bucket: 'archive1', Key: "staging/"+picture_item.userID+"/cubemaps/"+picture_item._id+"_ny.jpg", Expires: 6000});  
+                                        // let path5 = s3.getSignedUrl('getObject', {Bucket: 'archive1', Key: "staging/"+picture_item.userID+"/cubemaps/"+picture_item._id+"_pz.jpg", Expires: 6000});  
+                                        // let path6 = s3.getSignedUrl('getObject', {Bucket: 'archive1', Key: "staging/"+picture_item.userID+"/cubemaps/"+picture_item._id+"_nz.jpg", Expires: 6000});  
+                                        // console.log("testpath to cubemap " + path3);                                  
+                                        // theKey = 'users/' + picture_item.userID + '/' + picture_item.filename;
+                                        // skyboxUrl = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: theKey, Expires: 6000});
+                                        if (sceneResponse.sceneWebType == "ThreeJS") {
+                                            cubeMapAsset = []; //no AFrame for this, ThreeJS only
+                                            cubeMapAsset.push(path1);
+                                            cubeMapAsset.push(path2);
+                                            cubeMapAsset.push(path3);
+                                            cubeMapAsset.push(path4);
+                                            cubeMapAsset.push(path5);
+                                            cubeMapAsset.push(path6);
+                                            
+                                            // console.log("cubeMapAsset " + JSON.stringify(cubeMapAsset));
+                                        } else if (sceneResponse.sceneWebType == "BabylonJS") {
+                                            cubeMapAsset = []; //no AFrame for this, ThreeJS only
+        
+                                            cubeMapAsset.push(path1);
+                                            cubeMapAsset.push(path2);
+                                            cubeMapAsset.push(path3);
+                                            cubeMapAsset.push(path4);
+                                            cubeMapAsset.push(path5);
+                                            cubeMapAsset.push(path6);
 
-                                if (sceneResponse.sceneUseDynCubeMap) {
-                                    let path1 = s3.getSignedUrl('getObject', {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: "users/"+picture_item.userID+"/cubemaps/"+picture_item._id+"_px.jpg", Expires: 6000});  
-                                    let path2 = s3.getSignedUrl('getObject', {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: "users/"+picture_item.userID+"/cubemaps/"+picture_item._id+"_nx.jpg", Expires: 6000});  
-                                    let path3 = s3.getSignedUrl('getObject', {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: "users/"+picture_item.userID+"/cubemaps/"+picture_item._id+"_py.jpg", Expires: 6000});  
-                                    let path4 = s3.getSignedUrl('getObject', {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: "users/"+picture_item.userID+"/cubemaps/"+picture_item._id+"_ny.jpg", Expires: 6000});  
-                                    let path5 = s3.getSignedUrl('getObject', {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: "users/"+picture_item.userID+"/cubemaps/"+picture_item._id+"_pz.jpg", Expires: 6000});  
-                                    let path6 = s3.getSignedUrl('getObject', {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: "users/"+picture_item.userID+"/cubemaps/"+picture_item._id+"_nz.jpg", Expires: 6000});      
-                                // let path1 = s3.getSignedUrl('getObject', {Bucket: 'archive1', Key: "staging/"+picture_item.userID+"/cubemaps/"+picture_item._id+"_px.jpg", Expires: 6000});  
-                                // let path2 = s3.getSignedUrl('getObject', {Bucket: 'archive1', Key: "staging/"+picture_item.userID+"/cubemaps/"+picture_item._id+"_nx.jpg", Expires: 6000});  
-                                // let path3 = s3.getSignedUrl('getObject', {Bucket: 'archive1', Key: "staging/"+picture_item.userID+"/cubemaps/"+picture_item._id+"_py.jpg", Expires: 6000});  
-                                // let path4 = s3.getSignedUrl('getObject', {Bucket: 'archive1', Key: "staging/"+picture_item.userID+"/cubemaps/"+picture_item._id+"_ny.jpg", Expires: 6000});  
-                                // let path5 = s3.getSignedUrl('getObject', {Bucket: 'archive1', Key: "staging/"+picture_item.userID+"/cubemaps/"+picture_item._id+"_pz.jpg", Expires: 6000});  
-                                // let path6 = s3.getSignedUrl('getObject', {Bucket: 'archive1', Key: "staging/"+picture_item.userID+"/cubemaps/"+picture_item._id+"_nz.jpg", Expires: 6000});  
-                                // console.log("testpath to cubemap " + path3);                                  
-                                // theKey = 'users/' + picture_item.userID + '/' + picture_item.filename;
-                                // skyboxUrl = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: theKey, Expires: 6000});
-                                if (sceneResponse.sceneWebType == "ThreeJS") {
-                                    cubeMapAsset = []; //no AFrame for this, ThreeJS only
-                                    cubeMapAsset.push(path1);
-                                    cubeMapAsset.push(path2);
-                                    cubeMapAsset.push(path3);
-                                    cubeMapAsset.push(path4);
-                                    cubeMapAsset.push(path5);
-                                    cubeMapAsset.push(path6);
-                                    
-                                    // console.log("cubeMapAsset " + JSON.stringify(cubeMapAsset));
-                                } else if (sceneResponse.sceneWebType == "BabylonJS") {
-                                    cubeMapAsset = []; //no AFrame for this, ThreeJS only
-  
-                                    cubeMapAsset.push(path1);
-                                    cubeMapAsset.push(path2);
-                                    cubeMapAsset.push(path3);
-                                    cubeMapAsset.push(path4);
-                                    cubeMapAsset.push(path5);
-                                    cubeMapAsset.push(path6);
+                                        } else {
+                                            cubeMapAsset = "<a-cubemap id=\x22envMap\x22><img id=\x22envMap_1\x22 crossorigin=\x22anonymous\x22 src=\x22"+path1+"\x22>"+
+                                            "<img id=\x22envMap_2\x22 crossorigin=\x22anonymous\x22 src=\x22"+path2+"\x22><img id=\x22envMap_3\x22 crossorigin=\x22anonymous\x22 src=\x22"+path3+"\x22>"+
+                                            "<img id=\x22envMap_4\x22 crossorigin=\x22anonymous\x22 src=\x22"+path4+"\x22><img id=\x22envMap_5\x22 crossorigin=\x22anonymous\x22 src=\x22"+path5+"\x22>"+
+                                            "<img id=\x22envMap_6\x22 crossorigin=\x22anonymous\x22  src=\x22"+path6+"\x22></a-cubemap>";
+                                            // console.log("cubemapAsset: " + cubeMapAsset);
+                                            }
+                                */
 
-                                } else {
-                                    cubeMapAsset = "<a-cubemap id=\x22envMap\x22><img id=\x22envMap_1\x22 crossorigin=\x22anonymous\x22 src=\x22"+path1+"\x22>"+
-                                    "<img id=\x22envMap_2\x22 crossorigin=\x22anonymous\x22 src=\x22"+path2+"\x22><img id=\x22envMap_3\x22 crossorigin=\x22anonymous\x22 src=\x22"+path3+"\x22>"+
-                                    "<img id=\x22envMap_4\x22 crossorigin=\x22anonymous\x22 src=\x22"+path4+"\x22><img id=\x22envMap_5\x22 crossorigin=\x22anonymous\x22 src=\x22"+path5+"\x22>"+
-                                    "<img id=\x22envMap_6\x22 crossorigin=\x22anonymous\x22  src=\x22"+path6+"\x22></a-cubemap>";
-                                    // console.log("cubemapAsset: " + cubeMapAsset);
-                                    }
-                                }
-                                // cubeMapAsset = "<a-cubemap id=\x22envMap\x22><img id=\x22envMap_1\x22 crossorigin=\x22anonymous\x22 src=\x22/staging/"+picture_item.userID+"/cubemaps/"+picture_item._id+"_1.jpg\x22>"+
-                                // "<img id=\x22envMap_2\x22 crossorigin=\x22anonymous\x22 src=\x22https://archive1.s3.amazonaws.com/staging/"+picture_item.userID+"/cubemaps/"+picture_item._id+"_2.jpg\x22><img id=\x22envMap_3\x22 crossorigin=\x22anonymous\x22 src=\x22https://archive1.s3.amazonaws.com/staging/"+picture_item.userID+"/cubemaps/"+picture_item._id+"_3.jpg\x22>"+
-                                // "<img id=\x22envMap_4\x22 crossorigin=\x22anonymous\x22 src=\x22https://archive1.s3.amazonaws.com/staging/"+picture_item.userID+"/cubemaps/"+picture_item._id+"_4.jpg\x22><img id=\x22envMap_5\x22 crossorigin=\x22anonymous\x22 src=\x22https://archive1.s3.amazonaws.com/staging/"+picture_item.userID+"/cubemaps/"+picture_item._id+"_5.jpg\x22>"+
-                                // "<img id=\x22envMap_6\x22 crossorigin=\x22anonymous\x22  src=\x22https://archive1.s3.amazonaws.com/staging/"+picture_item.userID+"/cubemaps/"+picture_item._id+"_6.jpg\x22></a-cubemap>";
+                               
                                 
                             }
                         });
@@ -17765,6 +17773,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                     settings.sceneTimedEvents = sceneResponse.sceneTimedEvents; //could be big!?
                     settings.skyboxIDs = skyboxIDs;
                     settings.skyboxID = skyboxID;
+                    settings.skyboxURL = skyboxUrl;
                     settings.useSynth = hasSynth;
                     var sbuff = Buffer.from(JSON.stringify(settings)).toString("base64");
                     settingsData = "<div id=\x22settingsDataElement\x22 data-settings=\x22"+sbuff+"\x22></div>";
@@ -18557,7 +18566,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                         "<meta name=\x22apple-mobile-web-app-capable\x22 content=\x22yes\x22>" +                        
                         "<link href=\x22../main/vendor/fontawesome-free/css/all.css\x22 rel=\x22stylesheet\x22 type=\x22text/css\x22>" +
                         "<link href=\x22/css/webxr.css\x22 rel=\x22stylesheet\x22 type=\x22text/css\x22>" + 
-                        "<script src=\x22https://aframe.io/releases/1.2.0/aframe.min.js\x22></script>"+
+                        aframeScriptVersion + 
                         extraScripts + 
                         "<script src=\x22https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js\x22></script>"+
                         "<script src=\x22https://cdnjs.cloudflare.com/ajax/libs/stats.js/16/Stats.min.js\x22></script>"+
@@ -18716,15 +18725,9 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                         
                         "<script src=\x22../main/ref/aframe/dist/socket.io.slim.js\x22></script>" +
                         "<script src=\x22/connect/connect.js\x22 defer=\x22defer\x22></script>" +
-                        // "<script src=\x22https://cdnjs.cloudflare.com/ajax/libs/hls.js/0.5.14/hls.js\x22 integrity=\x22sha512-Uxb1LSW1XkMpEWsi4HguYGAHbXnNP5h0On1bBlSOZmEe42ajm2TCVy6khtfr5jFfjlToaG/mrN6R5zslmOCnAg==\x22 crossorigin=\x22anonymous\x22 referrerpolicy=\x22no-referrer\x22></script>"+
-                        // "<script src=\x22../main/js/hls.min.js\x22></script>" + //v 1.0.6 
-
-                        // "<script src=\x22../main/ref/aframe/dist/aframe-v1.0.4.min.js\x22></script>" +
-                        // "<script src=\x22https://github.com/aframevr/aframe/blob/master/dist/aframe-master.js\x22></script>" +
-                        // https://github.com/aframevr/aframe/blob/master/dist/aframe-master.js
-                        // "<script src=\x22../main/ref/aframe/dist/aframe-v1.2.0.min.js\x22></script>" +
-                        "<script src=\x22//aframe.io/releases/1.2.0/aframe.min.js\x22></script>" +
-                        
+                
+                        // "<script src=\x22//aframe.io/releases/1.3.0/aframe.min.js\x22></script>" +
+                        aframeScriptVersion +
                         physicsScripts +
                         extrasScript +
                         // "<script src=\x22https://cdn.jsdelivr.net/gh/aframevr/aframe@02f028bf319915bd5de1ef8b033495fe80b6729b/dist/aframe-master.min.js\x22></script>" +

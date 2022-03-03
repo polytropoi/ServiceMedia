@@ -2750,7 +2750,6 @@ AFRAME.registerComponent('mod_model', {
       this.el.addEventListener('beatme', e => console.log("beat"));
       this.isInitialized = false; //to prevent model-loaded from retriggering when childrens are added to this parent
 
-
       this.el.addEventListener('model-loaded', () => {
       if (!this.isInitialized) {
         // this.oScale = oScale;
@@ -2795,6 +2794,7 @@ AFRAME.registerComponent('mod_model', {
             //   }
             // }
           }
+        let dynSkybox = document.getElementById('')
           for (let e = 0; e < eventData.length; e++) {
             if (eventData[e].toLowerCase().includes("refract")){
               console.log("tryna set refraction");
@@ -2831,6 +2831,7 @@ AFRAME.registerComponent('mod_model', {
             for (i = 0; i < clips.length; i++) { //get reference to all anims
               hasAnims = true;
               console.log("model has animation: " + clips[i].name);
+              
               if (clips[i].name.includes("mouthopen")) {
                 moIndex = i;
                 mouthClips.push(clips[i]);
@@ -2839,6 +2840,7 @@ AFRAME.registerComponent('mod_model', {
               //   moIndex = i;
               // }
               if (clips[i].name.toLowerCase().includes("mixamo.com_armature_0")) {
+                console.log("gotsa mixamo idle anim");
                 idleIndex = i;
                 idleClips.push(clips[i]);
               }
@@ -2858,25 +2860,29 @@ AFRAME.registerComponent('mod_model', {
                 danceIndex = i;
                 danceClips.push(clips[i]);
               }
+              if (i == clips.length - 1) {
+                  if (hasAnims) {
+                    console.log("model has anims " + this.data.eventData + " idelIndex " + idleIndex);
+                  if (this.data.eventData.includes("loop_all_anims")) {
+                    theEl.setAttribute('animation-mixer', {
+                      "loop": "repeat",
+                    });
+                  }
+                  if (this.data.eventData.includes("loop_dance_anims")) {
+                    theEl.setAttribute('animation-mixer', {
+                      "loop": "repeat",
+                    });
+                  }
+                  if (idleIndex != -1) {
+                    theEl.setAttribute('animation-mixer', {
+                      "clip": clips[idleIndex].name,
+                      "loop": "repeat",
+                    });
+                  }
+                }
+              }
             }
-            if (hasAnims) {
-              if (this.data.eventData.includes("loop_all_anims")) {
-                theEl.setAttribute('animation-mixer', {
-                  "loop": "repeat",
-                });
-              }
-              if (this.data.eventData.includes("loop_dance_anims")) {
-                theEl.setAttribute('animation-mixer', {
-                  "loop": "repeat",
-                });
-              }
-              if (idleIndex != -1) {
-                theEl.setAttribute('animation-mixer', {
-                  "clip": clips[idleIndex].name,
-                  "loop": "repeat",
-                });
-              }
-            }
+
           }
           obj.traverse(node => { //spin through object heirarchy to sniff for special names, e.g. "eye"
             this.nodeName = node.name;
@@ -3659,7 +3665,7 @@ AFRAME.registerComponent('video_transport', { //alt for testing perf
     },
 });
 
-AFRAME.registerComponent('skybox-env-map', {
+AFRAME.registerComponent('skybox-env-map-nope', {
   schema: {
     enabled: {default: false},
     path: {default: ''},
@@ -3681,7 +3687,7 @@ AFRAME.registerComponent('skybox-env-map', {
         this.envmapEl = document.querySelector("#envmap_" + i);
         if (this.envmapEl) {
         this.path = this.envmapEl.getAttribute("src");
-        // console.log("envMap path " + this.path);
+        console.log("envMap path " + this.path);
         this.textureArray.push(this.path);
         }
       }
@@ -3716,6 +3722,79 @@ AFRAME.registerComponent('skybox-env-map', {
   }
 });
 
+AFRAME.registerComponent('skybox-env-map', {
+  schema: {
+    enabled: {default: false},
+    path: {default: ''},
+    extension: {default: 'jpg'},
+    format: {default: 'RGBFormat'},
+    enableBackground: {default: false}
+  },
+
+  init: function () {
+  this.isInitialized = false;
+  this.el.addEventListener('model-loaded', () => {
+    if (!this.isInitialized) { //do it once, not every time a child is loaded.
+      this.isInitialized = true;
+      let url = document.querySelector("#sky").src;
+      this.texture = null;
+      console.log("gotsa sky ref " + url);
+      let dynSkyEl = document.getElementById('skybox_dynamic');
+      if (dynSkyEl != null) {
+        // console.log("gotsa sky ref " + url);
+        this.texture = dynSkyEl.components.skybox_dynamic.returnEnvMap();
+        console.log("gotsa sky ref " + this.texture);
+      } else {
+        // this.texture = new THREE.TextureLoader().load(url);
+      }
+
+      if (this.texture != null) {
+              this.texture.encoding = THREE.sRGBEncoding;
+              this.texture.mapping = THREE.EquirectangularReflectionMapping;
+              this.texture.minFilter = this.texture.magFilter = THREE.LinearFilter;
+              // this.el.sceneEl.object3D.background = this.texture;
+              // this.texture = this.texture;
+              this.applyEnvMap();
+      }
+      // if (this.skyEl != null) {
+      //   // this.skyEl.remove();
+      //   this.skyEl.setAttribute('visible', false);
+      //   }
+      }
+    });
+  },
+
+  applyEnvMap: function () {
+    console.log("tryna applyEnvMap");
+    const envMap = this.texture;  
+    let envMapObjex = document.getElementsByClassName('envMap');
+    console.log("envMap elements " + envMapObjex.length);
+    if (envMapObjex != null) {
+      this.mesh = null;
+      for (let i = 0; i < envMapObjex.length; i++) {
+        // console.log("envMap element " + i + " " + envMapObjex.id);
+        this.mesh = envMapObjex[i].getObject3D('mesh');
+
+      if (this.mesh != null) {
+        this.mesh.traverse(function (node) {
+
+        if (node.material && 'envMap' in node.material) {
+        // if (node.material) {
+          console.log("tryna set envmap on " + node.material.name);
+            node.material.envMap = envMap;
+            node.material.envMap.intensity = 1;
+            node.material.needsUpdate = true;
+            }
+          });
+        }
+      }
+    }
+  },
+  returnEnvMap () {
+    return this.texture;
+  }
+});
+
 AFRAME.registerComponent('skybox_dynamic', {
   schema: {
     enabled: {default: false},
@@ -3727,29 +3806,36 @@ AFRAME.registerComponent('skybox_dynamic', {
   },
 
   init: function () {
+    this.skyboxIndex = 0;
+    this.skyEl = document.getElementById('skybox');
     this.skyboxData = null;
+    this.texture = null;
     let picGroupMangler = document.getElementById("pictureGroupsData");
+
     if (picGroupMangler != null && picGroupMangler != undefined) {
       this.skyboxData = picGroupMangler.components.picture_groups_control.returnSkyboxData(this.data.id);
       // console.log(JSON.stringify(this.skyboxData));
+    } else {
+      this.singleSkybox(); //maybe tryna do this before models are loaded, is the problem..
     }
-    this.skyboxIndex = 0;
-    this.skyEl = document.getElementById('skybox');
-    // if (this.skyboxData != null && this.skyboxData != undefined) {
-    //   let skyEl = document.getElementById('skybox');
-    //   skyEl.setAttribute('visible', false);
 
-    //   console.log(this.skyboxData.images[this.skyboxIndex].url);
-    //   this.texture = new THREE.TextureLoader().load(this.skyboxData.images[this.skyboxIndex].url);
-    //   this.texture.encoding = THREE.sRGBEncoding;
-    //   this.texture.mapping = THREE.EquirectangularReflectionMapping;
-    //   this.texture.minFilter = this.texture.magFilter = THREE.LinearFilter;
-    //   // this.texture = this.texture;
-    //   this.el.sceneEl.object3D.background = this.texture;
+  },
+  singleSkybox: function () {
 
-    //   this.applyEnvMap();
-    //   skyEl.remove();
-    // }
+    // const ref = document.getElementById("sky");
+    console.log("skyboxURL : " + settings.skyboxURL);
+
+   this.texture = new THREE.TextureLoader().load(settings.skyboxURL);
+    this.texture.encoding = THREE.sRGBEncoding;
+    this.texture.mapping = THREE.EquirectangularReflectionMapping;
+    this.texture.minFilter = this.texture.magFilter = THREE.LinearFilter;
+    this.el.sceneEl.object3D.background = this.texture;
+    // this.texture = this.texture;
+    // this.applyEnvMap();
+    if (this.skyEl != null) {
+      // this.skyEl.remove();
+      this.skyEl.setAttribute('visible', false);
+      }
   },
   nextSkybox: function () {
     if (this.skyboxData != null && this.skyboxData != undefined) {
@@ -3801,19 +3887,22 @@ AFRAME.registerComponent('skybox_dynamic', {
     }
   },
   applyEnvMap: function () {
-
-    const envMap = this.texture;
+    console.log("tryna applyEnvMap");
+    const envMap = this.texture;  
     let envMapObjex = document.getElementsByClassName('envMap');
+    console.log("envMap elements " + envMapObjex.length);
     if (envMapObjex != null) {
       this.mesh = null;
       for (let i = 0; i < envMapObjex.length; i++) {
+        // console.log("envMap element " + i + " " + envMapObjex.id);
         this.mesh = envMapObjex[i].getObject3D('mesh');
 
       if (this.mesh != null) {
         this.mesh.traverse(function (node) {
+
         if (node.material && 'envMap' in node.material) {
         // if (node.material) {
-          // console.log("tryna set envmap on " + node.material.name);
+          console.log("tryna set envmap on " + node.material.name);
             node.material.envMap = envMap;
             node.material.envMap.intensity = 1;
             node.material.needsUpdate = true;
