@@ -3733,6 +3733,7 @@ AFRAME.registerComponent('skybox-env-map', {
 
   init: function () {
   this.isInitialized = false;
+  let that = this;
   this.el.addEventListener('model-loaded', () => {
     if (!this.isInitialized) { //do it once, not every time a child is loaded.
       this.isInitialized = true;
@@ -3743,32 +3744,41 @@ AFRAME.registerComponent('skybox-env-map', {
       if (dynSkyEl != null) {
         // console.log("gotsa sky ref " + url);
         this.texture = dynSkyEl.components.skybox_dynamic.returnEnvMap();
-        console.log("gotsa sky ref " + this.texture);
-      } else {
-        // this.texture = new THREE.TextureLoader().load(url);
+        // console.log("gotsa sky ref " + this.texture);
+      } 
+      if (this.texture == null)
+        this.texture = new THREE.TextureLoader().load(url);
       }
 
       if (this.texture != null) {
-              this.texture.encoding = THREE.sRGBEncoding;
-              this.texture.mapping = THREE.EquirectangularReflectionMapping;
-              this.texture.minFilter = this.texture.magFilter = THREE.LinearFilter;
-              // this.el.sceneEl.object3D.background = this.texture;
-              // this.texture = this.texture;
-              this.applyEnvMap();
+        this.texture.encoding = THREE.sRGBEncoding;
+        this.texture.mapping = THREE.EquirectangularReflectionMapping;
+        this.texture.minFilter = this.texture.magFilter = THREE.LinearFilter;
+
+        this.applyEnvMap();
+           
+      } else {
+          setTimeout(function () {
+            this.texture.encoding = THREE.sRGBEncoding;
+            this.texture.mapping = THREE.EquirectangularReflectionMapping;
+            this.texture.minFilter = this.texture.magFilter = THREE.LinearFilter;
+
+            that.applyEnvMap();
+          }, 3000);
       }
       // if (this.skyEl != null) {
       //   // this.skyEl.remove();
       //   this.skyEl.setAttribute('visible', false);
       //   }
-      }
+      // }
     });
   },
 
   applyEnvMap: function () {
-    console.log("tryna applyEnvMap");
+    // console.log("tryna applyEnvMap");
     const envMap = this.texture;  
     let envMapObjex = document.getElementsByClassName('envMap');
-    console.log("envMap elements " + envMapObjex.length);
+    // console.log("envMap elements " + envMapObjex.length);
     if (envMapObjex != null) {
       this.mesh = null;
       for (let i = 0; i < envMapObjex.length; i++) {
@@ -3780,10 +3790,10 @@ AFRAME.registerComponent('skybox-env-map', {
 
         if (node.material && 'envMap' in node.material) {
         // if (node.material) {
-          console.log("tryna set envmap on " + node.material.name);
-            node.material.envMap = envMap;
-            node.material.envMap.intensity = 1;
-            node.material.needsUpdate = true;
+          // console.log("tryna set envmap on " + node.material.name);
+              node.material.envMap = envMap;
+              node.material.envMap.intensity = 1;
+              node.material.needsUpdate = true;
             }
           });
         }
