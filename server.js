@@ -17993,8 +17993,9 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                 /******* Add the create scene function ******/
                                 "var createScene = function () {\n" +
                                     uwfx_scene +
-                                    "let eqTexture = new BABYLON.CubeTexture('', scene, undefined, undefined, "+JSON.stringify( cubeMapAsset)+");" +
-                                    "scene.environmentTexture = eqTexture;\n"+
+
+                                    // "let eqTexture = new BABYLON.CubeTexture('', scene, undefined, undefined, "+JSON.stringify( cubeMapAsset)+");" + //deprecated
+                                    // "scene.environmentTexture = eqTexture;\n"+
                                     // "scene.environmentTexture.coordinatesMode = BABYLON.Texture.SKYBOX_MODE;\n"+
                                     "scene.createDefaultSkybox(scene.environmentTexture);\n"+
                                     "var hlight = new BABYLON.DirectionalLight(\x22dLight\x22, new BABYLON.Vector3(-1, 1, 0), scene);\n" +
@@ -18084,7 +18085,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                             "let THREECAMERA = null;"+
                             "function init_threeScene(spec){"+
                             "const threeStuffs = THREE.JeelizHelper.init(spec, null);"+
-                            "const envMap = new THREE.CubeTextureLoader().load(\n" + JSON.stringify(cubeMapAsset) + ");\n" + //1d array
+                                    // "const envMap = new THREE.CubeTextureLoader().load(\n" + JSON.stringify(cubeMapAsset) + ");\n" + //1d array //DEPRECATED
                             "var directionalLight = new THREE.DirectionalLight( 0xffffff, 5 );\n" +
                             "const gltfLoader = new THREE.GLTFLoader();\n" +
                             "gltfLoader.load( SETTINGS.gltfModelURL, function ( gltf ) {\n" +
@@ -18253,8 +18254,8 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                     "camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.25, 20 );\n"+
                                     "camera.position.set( - 1.8, 0.6, 2.7 );\n"+
                                     "scene = new THREE.Scene();\n"+
-                                    "const envMap = new THREE.CubeTextureLoader().load(\n" + JSON.stringify(cubeMapAsset) + ");\n" + //1d array
-                                    "scene.background = envMap;\n"+
+                                            // "const envMap = new THREE.CubeTextureLoader().load(\n" + JSON.stringify(cubeMapAsset) + ");\n" + //1d array //DEPRECATED
+                                            // "scene.background = envMap;\n"+
                                     // "var directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );\n" +
                                     // "scene.add(directionalLight);\n"+
                                     // "var ambientLight = new THREE.AmbientLight( 0x404040 );\n"+ // soft white light
@@ -18901,7 +18902,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                         
                         grabMix +
                         skyboxAsset +
-                        cubeMapAsset +
+                        // cubeMapAsset +
                         navmeshAsset +
                                     // targetAssets +  //TODO
                                     // launcherAssets +
