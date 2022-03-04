@@ -15065,7 +15065,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                         ////LOCATION FU
                         if (sceneResponse.sceneLocations != null && sceneResponse.sceneLocations.length > 0) {
                             
-                            if (sceneResponse.sceneWebType == "AR Location Tracking") {
+                            if (sceneResponse.sceneWebType == "AR Location Tracking") { //NOOPE
                                 geoEntity = 'gps-entity-place'; //default = 'geo-location'
                             }
                             for (var i = 0; i < sceneResponse.sceneLocations.length; i++) {
@@ -15092,6 +15092,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                                 locationButton = "<div style=\x22float: right; margin: 10px 10px;\x22 onclick=\x22ShowHideGeoPanel()\x22><i class=\x22fas fa-globe fa-2x\x22></i></div>";
                                             }
                                         } if (sceneResponse.sceneWebType == "Model Viewer") { 
+                                            // console.log("sceneResponse.sceneLocations[i].eventData : " + sceneResponse.sceneLocations[i].eventData);
                                             if (sceneResponse.sceneLocations[i].eventData.toLowerCase().includes("restrict")) {
                                             geoScripts = "<script async src=\x22https://get.geojs.io/v1/ip/geo.js\x22></script><script src=\x22/main/js/geolocator.js\x22></script>";
                                             locationScripts = "<script src=\x22../main/src/component/location-fu-noaframe.js\x22></script>";
@@ -17856,22 +17857,22 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                         }
                         if (sceneResponse.sceneTags != null && sceneResponse.sceneTags.includes('show dialog')) {
                             dialogButton = dialogButton +  //set with the actual button above?
-                            "<div id=\x22sceneGreeting\x22 style=\x22z-index: -20;\x22>"+sceneGreeting+"</div>"+
-                            "<div id=\x22sceneQuest\x22 style=\x22z-index: -20;\x22>"+sceneQuest+"</div>"+
+                            "<div id=\x22sceneGreeting\x22 style=\x22z-index: -20;\x22>"+sceneGreeting+"</div>" +
+                            "<div id=\x22sceneQuest\x22 style=\x22z-index: -20;\x22>"+sceneQuest+"</div>" +
                             "<div id=\x22theModal\x22 class=\x22modal\x22><div id=\x22modalContent\x22 class=\x22modal-content\x22></div></div>";
                             extraScripts = "<script src=\x22/main/vendor/jquery/jquery.min.js\x22></script>" +
-                            "<script src=\x22../main/js/dialogs.js\x22></script>"+
+                            "<script src=\x22../main/js/dialogs.js\x22></script>" +
                             "<script src=\x22/connect/connect.js\x22 defer=\x22defer\x22></script>" +
                             geoScripts +
                             locationScripts +
                             locationData +
                             modelData;
                             // inventoryData;
-                            } else {
-                                dialogButton = "";
-                                socketScripts = "";
-                            }
-                            htmltext = "<!DOCTYPE html>\n" +
+                        } else {
+                            dialogButton = "";
+                            socketScripts = "";
+                        }
+                        htmltext = "<!DOCTYPE html>\n" +
                             "<head> " +
                             "<html lang=\x22en\x22 xml:lang=\x22en\x22 xmlns= \x22http://www.w3.org/1999/xhtml\x22>"+
                             "<meta charset=\x22UTF-8\x22>"+
@@ -17935,10 +17936,74 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                             // "<script>InitSceneHooks(\x22Model Viewer\x22)</script>";
                             "</html>";
                             console.log("Tryna do a model viewer");
-                    } else if (sceneResponse.sceneWebType == "HTML from Text Item") {
-                        htmltext = sceneTextItemData.textstring;
-                        console.log("Tryna send html from text itme");
-                    } else if (sceneData.sceneWebType == "BabylonJS") {
+                        } else if (sceneResponse.sceneWebType == "HTML from Text Item") {
+
+                            htmltext = sceneTextItemData.textstring;
+                            console.log("Tryna send html from text itme");
+
+                        } else if (sceneResponse.sceneWebType == "AR Location Tracking") {
+
+                            
+                            "<head> " +
+                            "<html lang=\x22en\x22 xml:lang=\x22en\x22 xmlns= \x22http://www.w3.org/1999/xhtml\x22>"+
+                            "<meta charset=\x22UTF-8\x22>"+
+                            "<meta name=\x22google\x22 content=\x22notranslate\x22>" +
+                            "<meta http-equiv=\x22Content-Language\x22 content=\x22en\x22></meta>" +
+                            googleAnalytics +
+                            
+                            "<link rel=\x22icon\x22 href=\x22data:,\x22></link>"+
+                            "<meta charset='utf-8'/>" +
+                            "<meta name='viewport' content='width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0, shrink-to-fit=no'/>" +
+                            "<meta property='og:url' content='" + rootHost + "/webxr/" + sceneResponse.short_id + "' /> " +
+                            "<meta property='og:type' content='website' /> " +
+                            // "<meta property='og:image' content='" + postcard1 + "' /> " +
+                            "<meta property='og:image' content='http://" + postcard1 + "' /> " +
+                            "<meta property='og:image:height' content='1024' /> " +
+                            "<meta property='og:image:width' content='1024' /> " +
+                            "<meta property='og:title' content='" + sceneResponse.sceneTitle + "' /> " +
+                            "<meta property='og:description' content='" + sceneResponse.sceneDescription + "' /> " +
+                            "<meta property='name' content='modelviewer' /> " +
+                            "<title>" + sceneResponse.sceneTitle + "</title>" +
+                            "<meta name='description' content='" + sceneResponse.sceneDescription + "'/>" +
+                            // "<meta name=\x22monetization\x22 content=\x22"+process.env.COIL_PAYMENT_POINTER+"\x22>" +
+                            "<meta name=\x22mobile-web-app-capable\x22 content=\x22yes\x22>" +
+                            "<meta name=\x22apple-mobile-web-app-capable\x22 content=\x22yes\x22>" +
+                            
+                            "<link href=\x22../main/vendor/fontawesome-free/css/all.css\x22 rel=\x22stylesheet\x22 type=\x22text/css\x22>" +
+                            "<link href=\x22/css/webxr.css\x22 rel=\x22stylesheet\x22 type=\x22text/css\x22>" + 
+
+                            extraScripts + 
+
+                            // primaryAudioScript +
+                            "</head>\n" +
+                            "<body style=\x22background-color: black;\x22>\n" +
+                            "<div class=\x22avatarName\x22 id="+avatarName+"></div>"+
+                            "<div id=\x22token\x22 data-token=\x22"+token+"\x22></div>\n"+
+                            // "<model-viewer class=\x22full-screen-model-viewer\x22 src=\x22"+gltfModel+"\x22"+ 
+                            "<model-viewer autoplay shadow-intensity=\x221\x22 camera-controls camera-target=\220m 0m 0m\x22 src=\x22"+gltfModel+"\x22"+ 
+                            // "<model-viewer autoplay shadow-intensity=\x221\x22 camera-controls src=\x22"+gltfModel+"\x22"+ 
+                            // " ar ar-placement=\x22floor\x22 ar-modes=\x22webxr scene-viewer quick-look\x22 alt=\x22Viewer for single 3D Model\x22"+ //rem'd autoscale
+                            " ar ar-placement=\x22"+planeDetectMode+"\x22 ar-modes=\x22webxr scene-viewer quick-look\x22 ar-scale=\x22"+arScaleMode+"\x22 alt=\x22Viewer for single 3D Model\x22"+ 
+                            // "skybox-image=\x22"+skyboxUrl+"\x22"+
+                            sky +
+                            "ios-src=\x22"+usdzModel+"\x22>"+
+                            "<button slot=\x22ar-button\x22 style=\x22background-color: red; color: white; font-size: 36px; border-radius: 4px; border: 1px; position: absolute; bottom: 16px; right: 16px; z-index: 100;\x22>"+
+                            "AR"+
+                            "</button>"+
+                            "</model-viewer>" +
+                            audioSliders +
+                            canvasOverlay +
+                            dialogButton +
+                            attributionsTextEntity +
+                      
+                            "<div class=\x22smallfont\x22><span id=\x22users\x22></span></div>"+ 
+                            "</body>\n" +
+                            socketScripts +
+                            // "<script>InitSceneHooks(\x22Model Viewer\x22)</script>";
+                            "</html>";
+                            console.log("Tryna do a model viewer");
+                            
+                        } else if (sceneData.sceneWebType == "BabylonJS") {
                         let uwfx_shader = requireText('./babylon/uwfx_shader.txt', require);
                         let uwfx_scene = requireText('./babylon/uwfx_scene.txt', require);
                         let uwfx_assets = requireText('./babylon/uwfx_assets.txt', require);

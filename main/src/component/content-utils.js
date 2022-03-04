@@ -3792,7 +3792,7 @@ AFRAME.registerComponent('skybox-env-map', {
         // if (node.material) {
           // console.log("tryna set envmap on " + node.material.name);
               node.material.envMap = envMap;
-              node.material.envMap.intensity = 1;
+              node.material.envMap.intensity = .75;
               node.material.needsUpdate = true;
             }
           });

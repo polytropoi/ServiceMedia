@@ -21,7 +21,7 @@ window.onload = function () {
    
     
     restrictLocData = JSON.parse(atob(restrictToLocationData.getAttribute("data-location")));
-    console.log(JSON.stringify(restrictLocData));
+    console.log("reastricti location datas: " + JSON.stringify(restrictLocData));
     mode = "nomap";
     UpdateLocationInfo();
   }
