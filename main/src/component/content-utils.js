@@ -2561,7 +2561,7 @@ AFRAME.registerComponent('mod_dialog', { //only one of these
   this.meshObj = null;
   this.panelString = "";
   this.el.addEventListener('model-loaded', () => {  
-
+    this.viewportHolder = document.getElementById('viewportPlaceholder'); 
     this.viewportHolder.object3D.getWorldPosition( this.cameraPosition );
     this.el.setAttribute('position', this.cameraPosition);
     // console.log("TRYNA SET POSITIONF RO MOD_DIALGO " + JSON.stringify(this.cameraPosition));

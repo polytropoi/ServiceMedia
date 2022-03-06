@@ -14974,9 +14974,11 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                 //TODO use sceneNetworkSettings or whatever
                 // socketScripts = "<script src=\x22/connect/connect.js\x22 defer=\x22defer\x22></script>" +
                 // "<script src=\x22/main/vendor/jquery/jquery.min.js\x22></script>" +
-                socketScripts = "<script src=\x22https://strr.us/socket.io/socket.io.js\x22></script>" +
+                socketScripts = "<script src=\x22https://strr.us/socket.io/socket.io.js\x22></script>";
                 // "<script src=\x22/main/vendor/jscookie/js.cookie.min.js\x22></script>" +
-                "<script src=\x22/main/js/jquery.backstretch.min.js\x22></script>"; 
+                    
+                // TODO - backstretch include var!
+                // "<script src=\x22/main/js/jquery.backstretch.min.js\x22></script>"; 
                 if (avatarName == undefined || avatarName == null || avatarName == "guest") { //cook up a guest name if not logged in
                     array1 = [];
                     array2 = [];
@@ -15066,17 +15068,18 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                         if (sceneResponse.sceneLocations != null && sceneResponse.sceneLocations.length > 0) {
                             
                             if (sceneResponse.sceneWebType == "AR Location Tracking") { //NOOPE
-                                geoEntity = 'gps-entity-place'; //default = 'geo-location'
+                                // geoEntity = 'gps-entity-place'; //default = 'geo-location'
+                                geoEntity = "gps-position";
                             }
                             for (var i = 0; i < sceneResponse.sceneLocations.length; i++) {
                                 // console.log("sceneLocationTracking is " +sceneResponse.sceneLocationTracking && );
                                 // console.log("sceneLocraitons are a thing and sceneLocationTracking is " +sceneResponse.sceneLocationTracking + " " + sceneResponse.sceneLocations[i].type);
-                                if ((sceneResponse.sceneLocationTracking != null && sceneResponse.sceneLocationTracking == true) || sceneResponse.sceneWebType == "AR Location Tracking") {
+                                if ((sceneResponse.sceneLocationTracking != null && sceneResponse.sceneLocationTracking == true) || sceneResponse.sceneWebType == "AR Location Tracking") {  
 
-                                    if (sceneResponse.sceneLocations[i].type.toLowerCase() == "geographic") {
+                                    if (sceneResponse.sceneLocations[i].type.toLowerCase() == "geographic") { //just to set scripts and restrict to location
                                         // console.log("gotsa geo-location " + JSON.stringify(sceneResponse.sceneLocations[i]));
-                                            geoScripts = "<script async src=\x22https://get.geojs.io/v1/ip/geo.js\x22></script><script src=\x22/main/js/geolocator.js\x22></script>";
-                                            locationScripts = "<script src=\x22../main/src/component/location-fu.js\x22></script>";
+                                            // geoScripts = "<script async src=\x22https://get.geojs.io/v1/ip/geo.js\x22></script><script src=\x22/main/js/geolocator.js\x22></script>";
+                                            // locationScripts = "<script src=\x22../main/src/component/location-fu.js\x22></script>";
                                         if (sceneResponse.sceneWebType == "AR Location Tracking") {
                                             if (sceneResponse.sceneLocations[i].eventData != null && sceneResponse.sceneLocations[i].eventData.length > 4 && sceneResponse.sceneLocations[i].eventData.toLowerCase().includes("restrict")) {
                                                 locationEntity = "<a-entity id=\x22youAreHere\x22 location_restrict_ar position=\x220 2 -5\x22>"+
@@ -15091,6 +15094,10 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                                 "</a-entity>"; 
                                                 locationButton = "<div style=\x22float: right; margin: 10px 10px;\x22 onclick=\x22ShowHideGeoPanel()\x22><i class=\x22fas fa-globe fa-2x\x22></i></div>";
                                             }
+                                            geoScripts = "<script async src=\x22https://get.geojs.io/v1/ip/geo.js\x22></script><script src=\x22/main/js/geolocator.js\x22></script>";
+                                            locationScripts = "<script src=\x22../main/src/component/location-fu.js\x22></script>";
+                                            var buff = Buffer.from(JSON.stringify(sceneResponse.sceneLocations[i])).toString("base64");
+                                            locationData = "<div id=\x22restrictToLocation\x22 data-location='"+buff+"'></div>";
                                         } if (sceneResponse.sceneWebType == "Model Viewer") { 
                                             // console.log("sceneResponse.sceneLocations[i].eventData : " + sceneResponse.sceneLocations[i].eventData);
                                             if (sceneResponse.sceneLocations[i].eventData.toLowerCase().includes("restrict")) {
@@ -15123,17 +15130,22 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                         // }
                                     }
                                 }
-                                if (sceneResponse.sceneLocations[i].type != undefined && sceneResponse.sceneLocations[i].type.toLowerCase() == "geographic") {
+                                if (sceneResponse.sceneLocations[i].type != undefined && sceneResponse.sceneLocations[i].type.toLowerCase() == "geographic") { //set actual locs below
                                     
                                     if (sceneResponse.sceneLocations[i].markerType == "poi") {
                                         poiIndex++;
-                                        if (sceneResponse.sceneWebType != "Mapbox") {
+                                        if (sceneResponse.sceneWebType == "AR Location Tracking") {
+                                            //TODO jack in models / objs here?
+                                            geoEntities = geoEntities + "<a-entity look-at=\x22#player\x22 shadow=\x22cast:true; receive:true\x22 "+geoEntity+"=\x22latitude: "+sceneResponse.sceneLocations[i].latitude+
+                                            "; longitude: "+sceneResponse.sceneLocations[i].longitude+";\x22 "+skyboxEnvMap+" class=\x22gltf poi envMap\x22 gltf-model=\x22#poimarker\x22><a-entity scale=\x22.5 .5 .5\x22 position=\x22-.1 .5 0.1\x22 text-geometry=\x22value: "+poiIndex+"\x22></a-entity></a-entity>";
+                                        
+                                        } else if (sceneResponse.sceneWebType != "Mapbox") {
                                             geoEntities = geoEntities + "<a-entity look-at=\x22#player\x22 shadow=\x22cast:true; receive:true\x22 "+geoEntity+"=\x22latitude: "+sceneResponse.sceneLocations[i].latitude+
                                             "; longitude: "+sceneResponse.sceneLocations[i].longitude+";\x22 "+skyboxEnvMap+" class=\x22gltf poi envMap\x22 gltf-model=\x22#poimarker\x22><a-entity scale=\x22.5 .5 .5\x22 position=\x22-.1 .5 0.1\x22 text-geometry=\x22value: "+poiIndex+"\x22></a-entity></a-entity>";
                                             // console.log(geoEntities);
                                         } else {
                                             //for mapbox just using aframe to pass data
-                                            geoEntities = geoEntities + "<a-entity class=\x22geo    poi\x22 "+geoEntity+"=\x22latitude: "+sceneResponse.sceneLocations[i].latitude+ 
+                                            geoEntities = geoEntities + "<a-entity class=\x22geo poi\x22 "+geoEntity+"=\x22latitude: "+sceneResponse.sceneLocations[i].latitude+ 
                                             "; longitude: "+sceneResponse.sceneLocations[i].longitude+"; _id: "+sceneResponse.sceneLocations[i]._id+"\x22></a-entity>";
                                             // console.log("mapbox geoEntities: " + geoEntities);
                                         }
@@ -15358,16 +15370,31 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                         } else if (sceneData.sceneWebType == 'AR Location Tracking') {
                             // ARScript = "<script src=\x22/main/js/geolocator.js\x22></script><script src=\x22/main/ref/aframe/dist/aframe-ar.js\x22></script>";
                             geoScripts = "<script async src=\x22https://get.geojs.io/v1/ip/geo.js\x22></script><script src=\x22/main/js/geolocator.js\x22></script>";
-                            ARScript = "<script src=\x22/main/ref/aframe/dist/aframe-ar.js\x22></script>";
+                            // ARScript = "<script src=\x22/main/ref/aframe/dist/aframe-ar.js\x22></script>";
+                            ARScript = "<script src=\x22https://raw.githack.com/MediaComem/LBAR.js/main/dist/lbar-v0.2.min.js\x22></script>";
+
                             locationScripts = "<script src=\x22../main/src/component/location-fu.js\x22></script>";
                             // locationScripts = "<script>window.onload = () => { navigator.geolocation.getCurrentPosition((position) => {"+ //put this where?
                             // "document.querySelector('a-text').setAttribute('"+geoEntity+"', `latitude: ${position.coords.latitude}; longitude: ${position.coords.longitude};`)});}</script>";
-                            ARSceneArg = "vr-mode-ui=\x22enabled: false\x22 arjs=\x22sourceType: webcam; debugUIEnabled: false;\x22";
+                            ARSceneArg = "gps-position webxr=\x22referenceSpaceType: unbounded; requiredFeatures: unbounded;\x22 vr-mode-ui=\x22enabled: false\x22 arjs=\x22sourceType: webcam; debugUIEnabled: false;\x22";
                             // ARMarker =  "<a-text location-init-click id=\x22locationStatus\x22 value=\x22Tap globe icon to \ninit geolocation\x22 look-at=\x22[gps-camera]\x22 position=\x22-5 1 5\x22 scale=\x223 3 3\x22></a-text>";
                             // camera = "<a-camera listen-from-camera gps-camera rotation-reader><a-entity id=\x22mouseCursor\x22 cursor=\x22rayOrigin: mouse\x22 raycaster=\x22objects: .activeObjexRay\x22></a-entity>"+
-                            camera = "<a-camera id=\x22player\x22 look-controls-enabled=\x22false\x22 arjs-look-controls=\x22smoothingFactor: 0.1\x22 listen-from-camera gps-camera rotation-reader><a-entity id=\x22mouseCursor\x22 cursor=\x22rayOrigin: mouse\x22 raycaster=\x22objects: .activeObjexRay\x22></a-entity>"+
+                                    // camera = "<a-camera id=\x22player\x22 look-controls-enabled=\x22false\x22 arjs-look-controls=\x22smoothingFactor: 0.1\x22 listen-from-camera gps-camera rotation-reader><a-entity id=\x22mouseCursor\x22 cursor=\x22rayOrigin: mouse\x22 raycaster=\x22objects: .activeObjexRay\x22></a-entity>"+
+                            
+                                    // "</a-camera>";
+                            camera = "<a-camera id=\x22player\x22 look-controls-enabled=\x22false\x22 pitch-roll-look-controls listen-from-camera gps-camera rotation-reader><a-entity id=\x22mouseCursor\x22 cursor=\x22rayOrigin: mouse\x22 raycaster=\x22objects: .activeObjexRay\x22></a-entity>"+
                             // "<a-entity id=\x22player\x22 networked=\x22template:#avatar-template;attachTemplateToLocal:false;\x22 spawn-in-circle=\x22radius:3;\x22>" + //ENABLE LATER
+                                        // "<a-entity id=\x22player\x22 get_pos_rot camera "+wasd+" look-controls=\x22hmdEnabled: false;\x22 position=\x22"+playerPosition+"\x22>"+
+                                        "<a-entity id=\x22equipPlaceholder\x22 geometry=\x22primitive: plane; height: 0.01; width: .01\x22 position=\x220 -.5 -.5\x22"+
+                                        "material=\x22opacity: 0\x22></a-entity>"+
+                                        "<a-entity id=\x22viewportPlaceholder\x22 geometry=\x22primitive: plane; height: 0.01; width: .01\x22 position=\x220 0 -1\x22"+
+                                        "material=\x22opacity: 0\x22></a-entity>"+
+                                        "<a-entity id=\x22viewportPlaceholder3\x22 geometry=\x22primitive: plane; height: 0.01; width: .01\x22 position=\x220 0 -3\x22"+
+                                        "material=\x22opacity: 0\x22></a-entity>"+
+                                        // "</a-entity>"+    
                                     "</a-camera>";
+
+                                    
                             locationEntity = "<a-entity id=\x22youAreHere\x22 location_init_ar position=\x220 2 -5\x22>"+
                                 "<a-entity class=\x22gltf\x22 gltf-model=\x22#globe\x22 class=\x22envMap activeObjexRay\x22 position=\x220 -1.5 0\x22>"+
                                 "</a-entity>"+
@@ -16584,13 +16611,13 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                         // "SetPrimaryAudioEventsData("+JSON.stringify(JSON.stringify(primaryAudioObject))+");\n"+
                                         "usdzDataEntity.setAttribute(\x22usdz\x22, \x22usdzData\x22, \x22"+usdzFiles+"\x22);\n"+ 
                                         "});";
-                                        camera = "<a-entity id=\x22cameraRig\x22 initializer=\x22usdz: "+usdzFiles+"\x22 position=\x22"+playerPosition+"\x22>"+ //rewrite camera entity to add usdz on init // really?
-                                        "<a-entity hide-in-ar-mode id=\x22mouseCursor\x22 cursor=\x22rayOrigin: mouse\x22 raycaster=\x22objects: .activeObjexRay\x22></a-entity>"+
-                                        "<a-entity id=\x22player\x22 get_pos_rot camera "+wasd+" look-controls=\x22hmdEnabled: false\x22 position=\x220 1.6 0\x22>"+
-                                        "</a-entity>"+
-                                        "<a-entity networked=\x22template:#hand-template\x22 teleport-controls=\x22cameraRig: #cameraRig; button: grip;\x22 oculus-touch-controls=\x22hand: left\x22 laser-controls=\x22hand: left;\x22 handModelStyle: lowPoly; color: #ffcccc\x22 raycaster=\x22objects: .activeObjexRay;\x22></a-entity>" +
-                                        "<a-entity networked=\x22template:#hand-template\x22 oculus-touch-controls=\x22hand: right\x22 id=\x22right-hand\x22 hand-controls=\x22hand: right; handModelStyle: lowPoly; color: #ffcccc\x22 aabb-collider=\x22objects: .activeObjexGrab;\x22 grab></a-entity>"+
-                                        "</a-entity>";
+                                                // camera = "<a-entity id=\x22cameraRig\x22 initializer=\x22usdz: "+usdzFiles+"\x22 position=\x22"+playerPosition+"\x22>"+ //rewrite camera entity to add usdz on init // really?
+                                                // "<a-entity hide-in-ar-mode id=\x22mouseCursor\x22 cursor=\x22rayOrigin: mouse\x22 raycaster=\x22objects: .activeObjexRay\x22></a-entity>"+
+                                                // "<a-entity id=\x22player\x22 get_pos_rot camera "+wasd+" look-controls=\x22hmdEnabled: false\x22 position=\x220 1.6 0\x22>"+
+                                                // "</a-entity>"+
+                                                // "<a-entity networked=\x22template:#hand-template\x22 teleport-controls=\x22cameraRig: #cameraRig; button: grip;\x22 oculus-touch-controls=\x22hand: left\x22 laser-controls=\x22hand: left;\x22 handModelStyle: lowPoly; color: #ffcccc\x22 raycaster=\x22objects: .activeObjexRay;\x22></a-entity>" +
+                                                // "<a-entity networked=\x22template:#hand-template\x22 oculus-touch-controls=\x22hand: right\x22 id=\x22right-hand\x22 hand-controls=\x22hand: right; handModelStyle: lowPoly; color: #ffcccc\x22 aabb-collider=\x22objects: .activeObjexGrab;\x22 grab></a-entity>"+
+                                                // "</a-entity>";
                                         usdzModel = modelURL;
                                         // console.log(loadUSDZ);
                                         callbackz();
@@ -17941,8 +17968,8 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                             htmltext = sceneTextItemData.textstring;
                             console.log("Tryna send html from text itme");
 
-                        } else if (sceneResponse.sceneWebType == "AR Location Tracking") {
-
+                        } else if (sceneResponse.sceneWebType == "AR Location Tracking No") { //No, reuse the aframe html section below and pass in mods
+                            htmltext = "<!DOCTYPE html>\n" +
                             
                             "<head> " +
                             "<html lang=\x22en\x22 xml:lang=\x22en\x22 xmlns= \x22http://www.w3.org/1999/xhtml\x22>"+
@@ -17972,7 +17999,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                             "<link href=\x22../main/vendor/fontawesome-free/css/all.css\x22 rel=\x22stylesheet\x22 type=\x22text/css\x22>" +
                             "<link href=\x22/css/webxr.css\x22 rel=\x22stylesheet\x22 type=\x22text/css\x22>" + 
 
-                            extraScripts + 
+                            // extrasScripts + 
 
                             // primaryAudioScript +
                             "</head>\n" +
@@ -17980,17 +18007,18 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                             "<div class=\x22avatarName\x22 id="+avatarName+"></div>"+
                             "<div id=\x22token\x22 data-token=\x22"+token+"\x22></div>\n"+
                             // "<model-viewer class=\x22full-screen-model-viewer\x22 src=\x22"+gltfModel+"\x22"+ 
-                            "<model-viewer autoplay shadow-intensity=\x221\x22 camera-controls camera-target=\220m 0m 0m\x22 src=\x22"+gltfModel+"\x22"+ 
+                            // "<model-viewer autoplay shadow-intensity=\x221\x22 camera-controls camera-target=\220m 0m 0m\x22 src=\x22"+gltfModel+"\x22"+ 
                             // "<model-viewer autoplay shadow-intensity=\x221\x22 camera-controls src=\x22"+gltfModel+"\x22"+ 
                             // " ar ar-placement=\x22floor\x22 ar-modes=\x22webxr scene-viewer quick-look\x22 alt=\x22Viewer for single 3D Model\x22"+ //rem'd autoscale
-                            " ar ar-placement=\x22"+planeDetectMode+"\x22 ar-modes=\x22webxr scene-viewer quick-look\x22 ar-scale=\x22"+arScaleMode+"\x22 alt=\x22Viewer for single 3D Model\x22"+ 
+                            // " ar ar-placement=\x22"+planeDetectMode+"\x22 ar-modes=\x22webxr scene-viewer quick-look\x22 ar-scale=\x22"+arScaleMode+"\x22 alt=\x22Viewer for single 3D Model\x22"+ 
                             // "skybox-image=\x22"+skyboxUrl+"\x22"+
-                            sky +
-                            "ios-src=\x22"+usdzModel+"\x22>"+
-                            "<button slot=\x22ar-button\x22 style=\x22background-color: red; color: white; font-size: 36px; border-radius: 4px; border: 1px; position: absolute; bottom: 16px; right: 16px; z-index: 100;\x22>"+
-                            "AR"+
-                            "</button>"+
-                            "</model-viewer>" +
+                            // sky +
+                            // "ios-src=\x22"+usdzModel+"\x22>"+
+                            // "<button slot=\x22ar-button\x22 style=\x22background-color: red; color: white; font-size: 36px; border-radius: 4px; border: 1px; position: absolute; bottom: 16px; right: 16px; z-index: 100;\x22>"+
+                            // "AR"+
+                            // "</button>"+
+                            // "</model-viewer>" +
+                            "<a-scene  gps-position=\x22minAccuracy: 100; minDistance: 2; cam3DoF: true\x22></a-scene>" +
                             audioSliders +
                             canvasOverlay +
                             dialogButton +
@@ -18001,7 +18029,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                             socketScripts +
                             // "<script>InitSceneHooks(\x22Model Viewer\x22)</script>";
                             "</html>";
-                            console.log("Tryna do a model viewer");
+                            console.log("Tryna do a location tracker!");
                             
                         } else if (sceneData.sceneWebType == "BabylonJS") {
                         let uwfx_shader = requireText('./babylon/uwfx_shader.txt', require);
@@ -18650,35 +18678,21 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                         "<div class=\x22ar-container\x22>"+
                         "<a-scene mindar-image=\x22imageTargetSrc: "+arImageTargets[0]+";\x22 embedded color-space=\x22sRGB\x22"+
 
-                        // "<a-scene mindar-image=\x22imageTargetSrc: https://servicemedia.s3.amazonaws.com/users/5150540ab038969c24000008/pictures/targets/6185599f5b7b7950e4548144.mind;\x22 embedded color-space=\x22sRGB\x22"+
-                        " renderer=\x22colorManagement: true, physicallyCorrectLights\x22 vr-mode-ui=\x22enabled: false\x22 device-orientation-permission-ui=\x22enabled: false\x22>"+
-                        gltfsAssets +    
-                        "<a-entity mindar-image-target=\x22targetIndex: 0\x22>" +
-                            "<a-gltf-model rotation=\x2290 0 0\x22 position=\x220 0 0.1\x22 scale=\x220.25 0.25 0.25\x22 src=\x22#gltfasset2\x22>"+
-                        "</a-entity>"+
-                        "<a-camera position=\x220 0 0\x22 look-controls=\x22enabled: false\x22></a-camera>"
-                            "</a-scene>"+
+                            // "<a-scene mindar-image=\x22imageTargetSrc: https://servicemedia.s3.amazonaws.com/users/5150540ab038969c24000008/pictures/targets/6185599f5b7b7950e4548144.mind;\x22 embedded color-space=\x22sRGB\x22"+
+                            " renderer=\x22colorManagement: true, physicallyCorrectLights\x22 vr-mode-ui=\x22enabled: false\x22 device-orientation-permission-ui=\x22enabled: false\x22>"+
+                            gltfsAssets +    
+                            "<a-entity mindar-image-target=\x22targetIndex: 0\x22>" +
+                                "<a-gltf-model rotation=\x2290 0 0\x22 position=\x220 0 0.1\x22 scale=\x220.25 0.25 0.25\x22 src=\x22#gltfasset2\x22>"+
+                            "</a-entity>"+
+                            "<a-camera position=\x220 0 0\x22 look-controls=\x22enabled: false\x22></a-camera>"
+                        "</a-scene>"+
                         "</div>"+    
-                        // "<model-viewer class=\x22full-screen-model-viewer\x22 src=\x22"+gltfModel+"\x22"+ 
-                        // "<model-viewer autoplay shadow-intensity=\x221\x22 camera-controls camera-target=\220m 0m 0m\x22 src=\x22"+gltfModel+"\x22"+ 
-                        // " ar ar-placement=\x22floor\x22 ar-modes=\x22webxr scene-viewer quick-look\x22 alt=\x22Viewer for single 3D Model\x22"+ //rem'd autoscale
-                        // " ar ar-placement=\x22"+planeDetectMode+"\x22 ar-modes=\x22webxr scene-viewer quick-look\x22 ar-scale=\x22"+arScaleMode+"\x22 alt=\x22Viewer for single 3D Model\x22"+ 
-                        // "skybox-image=\x22"+skyboxUrl+"\x22"+
-                        // sky +
-                        // "ios-src=\x22"+usdzModel+"\x22>"+
-                        // "<button slot=\x22ar-button\x22 style=\x22background-color: red; color: white; font-size: 36px; border-radius: 4px; border: 1px; position: absolute; bottom: 16px; right: 16px; z-index: 100;\x22>"+
-                        // "AR"+
-                        // "</button>"+
-                        // "</model-viewer>" +
+                        
                         audioSliders +
                         canvasOverlay +
                         dialogButton +
                         attributionsTextEntity +
-                        // "<div id=\x22sceneGreeting\x22 style=\x22z-index: -20;\x22>"+sceneGreeting+"</div>"+
-                        // "<div id=\x22sceneQuest\x22 style=\x22z-index: -20;\x22>"+sceneQuest+"</div>"+
-                        // "<div id=\x22theModal\x22 class=\x22modal\x22><div id=\x22modalContent\x22 class=\x22modal-content\x22></div></div>"+
-                        // canvasOverlay = "<div id=\x22canvasOverlay\x22 class=\x22canvas-overlay\x22><button id=\x22sceneTitleButton\x22 type=\x22button\x22 class=\x22collapsible\x22>"+sceneResponse.sceneTitle+"</button>" +
-                        // adSquareOverlay +
+                       
                         "<div class=\x22smallfont\x22><span id=\x22users\x22></span></div>"+ 
                         "</body>\n" +
                         socketScripts +
@@ -18744,6 +18758,13 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                         if (sceneResponse.sceneWebType == 'Mapbox') {
                             aScene = "<a-scene loading-screen=\x22dotsColor: white; backgroundColor: black\x22 vr-mode-ui=\x22enabled: false\x22 disable-magicwindow device-orientation-permission-ui=\x22enabled: false\x22>";
                             mainDiv = "<div id=\x22map\x22 class=\x22map\x22 style=\x22width:100%; height:100%\x22>"; //closed at end
+                  
+                        }
+                        if (sceneResponse.sceneWebType == 'AR Location Tracking') {
+                            console.log("AR Location Tracking mdoe...");
+                            aScene = "<a-scene gps-position webxr=\x22referenceSpaceType: unbounded; requiredFeatures: unbounded;\x22 loading-screen=\x22dotsColor: white; backgroundColor: black\x22 vr-mode-ui=\x22enabled: false\x22 disable-magicwindow device-orientation-permission-ui=\x22enabled: false\x22>";
+                            // <a-scene gps-position webxr="referenceSpaceType: unbounded; requiredFeatures: unbounded;"></a-scene>
+                           
                   
                         } //else { //default AFRAME with trimmings
                         // let token = jwt.sign({
@@ -18951,15 +18972,19 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                         videosphereAsset +
                         // videoAsset + 
                         imageAssets +
+
                         // "<img id=\x22explosion\x22 src=\x22https://realitymangler.com/assets/textures/explosion.png\x22 crossorigin=\x22anonymous\x22>"+ 
-                        "<img id=\x22water\x22 src=\x22https://realitymangler.com/assets/textures/water2c.jpg\x22 crossorigin=\x22anonymous\x22>"+
-                        "<img id=\x22water1\x22 src=\x22https://realitymangler.com/assets/textures/watertile3.png\x22 crossorigin=\x22anonymous\x22>"+
-                        "<img id=\x22heightmap\x22 src=\x22https://realitymangler.com/assets/heightmaps/hm4.png\x22 crossorigin=\x22anonymous\x22>"+
-                        "<img id=\x22lowestTexture\x22 src=\x22https://realitymangler.com/assets/textures/dirttile1.jpg\x22 crossorigin=\x22anonymous\x22>"+
-                        "<img id=\x22lowTexture\x22 src=\x22https://realitymangler.com/assets/textures/sandtile1.jpg\x22 crossorigin=\x22anonymous\x22>"+
-                        "<img id=\x22mediumTexture\x22 src=\x22https://realitymangler.com/assets/textures/grasstile2.jpg\x22 crossorigin=\x22anonymous\x22>"+
-                        "<img id=\x22highTexture\x22 src=\x22https://realitymangler.com/assets/textures/grasstile2.jpg\x22 crossorigin=\x22anonymous\x22>"+
-                        "<img id=\x22highestTexture\x22 src=\x22https://realitymangler.com/assets/textures/mossrocktile2.jpg\x22 crossorigin=\x22anonymous\x22>"+
+
+                        // USED FOR TERRAIN, REM FOR NOW...
+                                // "<img id=\x22water\x22 src=\x22https://realitymangler.com/assets/textures/water2c.jpg\x22 crossorigin=\x22anonymous\x22>"+
+                                // "<img id=\x22water1\x22 src=\x22https://realitymangler.com/assets/textures/watertile3.png\x22 crossorigin=\x22anonymous\x22>"+
+                                // "<img id=\x22heightmap\x22 src=\x22https://realitymangler.com/assets/heightmaps/hm4.png\x22 crossorigin=\x22anonymous\x22>"+
+                                // "<img id=\x22lowestTexture\x22 src=\x22https://realitymangler.com/assets/textures/dirttile1.jpg\x22 crossorigin=\x22anonymous\x22>"+
+                                // "<img id=\x22lowTexture\x22 src=\x22https://realitymangler.com/assets/textures/sandtile1.jpg\x22 crossorigin=\x22anonymous\x22>"+
+                                // "<img id=\x22mediumTexture\x22 src=\x22https://realitymangler.com/assets/textures/grasstile2.jpg\x22 crossorigin=\x22anonymous\x22>"+
+                                // "<img id=\x22highTexture\x22 src=\x22https://realitymangler.com/assets/textures/grasstile2.jpg\x22 crossorigin=\x22anonymous\x22>"+
+                                // "<img id=\x22highestTexture\x22 src=\x22https://realitymangler.com/assets/textures/mossrocktile2.jpg\x22 crossorigin=\x22anonymous\x22>"+
+
                         // "<audio id=\x22song\x22 crossorigin " + loopable + " autoload src=\x22\n"+ mp3url + "\x22></audio>\n"+
                         weblinkAssets +
                         gltfsAssets +
@@ -19025,7 +19050,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                         objectData +
                         inventoryData +
                         // "<a-entity id=\x22navmesh\x22 geometry=\x22primitive: plane; height: 30; width: 30; buffer: true;\x22 rotation=\x22-90 0 0\x22 nav-mesh></a-entity>"+
-                        "</a-scene>\n"+
+                        "</a-scene>\n"+ //CLOSE AFRAME SCENE
                         "</div>\n"+
                         "<style>\n"+
                         "a{ color:#fff;\n"+
