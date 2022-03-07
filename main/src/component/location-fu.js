@@ -22,7 +22,7 @@ AFRAME.registerComponent('location_init_ar', {
     gpsThings: {default: ''}
     },
   init: function () {
-    geoEntity = 'gps-entity-place';
+    geoEntity = 'gps-position';
     
     UpdateLocationInfo();
   }
@@ -204,7 +204,7 @@ function geoip(json){
           currentLocation = [location.coords.longitude, location.coords.latitude]; //to match the order and form of the mapbox coords
           for (var i = 0; i < gpsElements.length; i++) {
             if (gpsElements[i].classList.contains('poi')) {
-            // console.log("element has poi class: " + gpsElements[i].classList.contains('poi'));
+            console.log("element has poi class: " + gpsElements[i].id + " " + geoEntity);
             let lat = gpsElements[i].getAttribute(geoEntity.toString()).latitude;
             let lng = gpsElements[i].getAttribute(geoEntity.toString()).longitude;
             console.log("tryna get distance to " + lat + " " + lng);
