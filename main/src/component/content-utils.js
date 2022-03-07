@@ -3839,7 +3839,7 @@ AFRAME.registerComponent('skybox_dynamic', {
     this.texture.encoding = THREE.sRGBEncoding;
     this.texture.mapping = THREE.EquirectangularReflectionMapping;
     this.texture.minFilter = this.texture.magFilter = THREE.LinearFilter;
-    this.el.sceneEl.object3D.background = this.texture;
+    // this.el.sceneEl.object3D.background = this.texture;
     // this.texture = this.texture;
     // this.applyEnvMap();
     if (this.skyEl != null) {

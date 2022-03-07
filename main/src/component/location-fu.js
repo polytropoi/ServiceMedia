@@ -266,7 +266,9 @@ function geoip(json){
               "&zoom=17&size=2048x2048&maptype=hybrid&key=AIzaSyCBlNNHgDBmv-vusmuvG3ylf0XjGoMkkCo&markers=color:red%7Clabel:"+index+"%7C" + gpsThing.latitude + "," + gpsThing.longitude;
               // gps.data.push(gpsThing);
               let gpsPanel = document.createElement("a-entity");
-              gpsElements[i].appendChild(gpsPanel);
+              var sceneEl = document.querySelector('a-scene');
+              sceneEl.appendChild(gpsPanel);
+              // gpsElements[i].appendChild(gpsPanel);
               gpsPanel.setAttribute('poi-map-materials', 'jsonData', JSON.stringify(gpsThing));
               //                   let pos = gpsElements[i].getAttribute('position').x + " " + (gpsElements[i].getAttribute('position').y + 3) + " " + gpsElements[i].getAttribute('position').z;
               // gpsPanel.setAttribute('position', pos);
