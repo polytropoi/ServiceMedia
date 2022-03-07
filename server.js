@@ -15382,9 +15382,10 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                     // camera = "<a-camera id=\x22player\x22 look-controls-enabled=\x22false\x22 arjs-look-controls=\x22smoothingFactor: 0.1\x22 listen-from-camera gps-camera rotation-reader><a-entity id=\x22mouseCursor\x22 cursor=\x22rayOrigin: mouse\x22 raycaster=\x22objects: .activeObjexRay\x22></a-entity>"+
                             
                                     // "</a-camera>";
+                            /*    nope
                             camera = "<a-camera id=\x22player\x22 look-controls-enabled=\x22false\x22 pitch-roll-look-controls listen-from-camera rotation-reader><a-entity id=\x22mouseCursor\x22 cursor=\x22rayOrigin: mouse\x22 raycaster=\x22objects: .activeObjexRay\x22></a-entity>"+
-                            // "<a-entity id=\x22player\x22 networked=\x22template:#avatar-template;attachTemplateToLocal:false;\x22 spawn-in-circle=\x22radius:3;\x22>" + //ENABLE LATER
-                                        // "<a-entity id=\x22player\x22 get_pos_rot camera "+wasd+" look-controls=\x22hmdEnabled: false;\x22 position=\x22"+playerPosition+"\x22>"+
+                                            // "<a-entity id=\x22player\x22 networked=\x22template:#avatar-template;attachTemplateToLocal:false;\x22 spawn-in-circle=\x22radius:3;\x22>" + //ENABLE LATER
+                                            // "<a-entity id=\x22player\x22 get_pos_rot camera "+wasd+" look-controls=\x22hmdEnabled: false;\x22 position=\x22"+playerPosition+"\x22>"+
                                         "<a-entity id=\x22equipPlaceholder\x22 geometry=\x22primitive: plane; height: 0.01; width: .01\x22 position=\x220 -.5 -.5\x22"+
                                         "material=\x22opacity: 0\x22></a-entity>"+
                                         "<a-entity id=\x22viewportPlaceholder\x22 geometry=\x22primitive: plane; height: 0.01; width: .01\x22 position=\x220 0 -1\x22"+
@@ -15393,7 +15394,8 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                         "material=\x22opacity: 0\x22></a-entity>"+
                                         // "</a-entity>"+    
                                     "</a-camera>";
-
+                            */
+                            camera = "<a-entity position=\x220 0 0\x22 camera pitch-roll-look-controls></a-entity>";
                                     
                             locationEntity = "<a-entity id=\x22youAreHere\x22 location_init_ar position=\x220 2 -5\x22>"+
                                 "<a-entity class=\x22gltf\x22 gltf-model=\x22#globe\x22 class=\x22envMap activeObjexRay\x22 position=\x220 -1.5 0\x22>"+

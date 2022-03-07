@@ -111,17 +111,17 @@ $(function() {
    //    timeKeysData = settings.sceneTimedEvents;
    //    console.log('cloud timekeysdata' + JSON.stringify(timeKeysData));
    // }
-   if (settings.skyboxIDs != null) {
-      console.log("skyboxIDS: " + JSON.stringify(settings.skyboxIDs));
-      skyboxEl = document.createElement('a-entity');
-      sceneEl = document.querySelector('a-scene');
-      skyboxEl.setAttribute('skybox_dynamic', {enabled: true, id: settings.skyboxIDs[0]});
-      skyboxEl.id = 'skybox_dynamic';
-      sceneEl.appendChild(skyboxEl);
-   }
-   if (settings.skyboxID == "") {
-      skyboxEl.components.skybox_dynamic.nextSkybox();
-   }
+   // if (settings.skyboxIDs != null) {
+   //    console.log("skyboxIDS: " + JSON.stringify(settings.skyboxIDs));
+   //    skyboxEl = document.createElement('a-entity');
+   //    sceneEl = document.querySelector('a-scene');
+   //    skyboxEl.setAttribute('skybox_dynamic', {enabled: true, id: settings.skyboxIDs[0], sceneType});
+   //    skyboxEl.id = 'skybox_dynamic';
+   //    sceneEl.appendChild(skyboxEl);
+   // }
+   // if (settings.skyboxID == "") {
+   //    skyboxEl.components.skybox_dynamic.nextSkybox();
+   // }
    if (localStorage.getItem(room + "_timeKeys") != null) { //use local ve3rsion if saved
       timeKeysData = JSON.parse(localStorage.getItem(room + "_timeKeys"));
       console.log('local timeKeysData' + JSON.stringify(timeKeysData));
@@ -146,7 +146,17 @@ $(function() {
       player.setAttribute("player_mover", "init");
       EmitSelfPosition();
    }  
-   
+   if (settings.skyboxIDs != null) {
+      console.log("skyboxIDS: " + JSON.stringify(settings.skyboxIDs));
+      skyboxEl = document.createElement('a-entity');
+      sceneEl = document.querySelector('a-scene');
+      skyboxEl.setAttribute('skybox_dynamic', {enabled: true, id: settings.skyboxIDs[0]});
+      skyboxEl.id = 'skybox_dynamic';
+      sceneEl.appendChild(skyboxEl);
+   }
+   if (settings.skyboxID == "") {
+      skyboxEl.components.skybox_dynamic.nextSkybox();
+   }
    // window.playerPosition = {x: 0, y: 0, z: 0}; 
    
 });
