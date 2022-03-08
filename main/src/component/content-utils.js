@@ -3827,7 +3827,7 @@ AFRAME.registerComponent('skybox_dynamic', {
       this.skyboxData = picGroupMangler.components.picture_groups_control.returnSkyboxData(this.data.id);
       // console.log(JSON.stringify(this.skyboxData));
     } else {
-      this.singleSkybox(); //maybe tryna do this before models are loaded, is the problem..
+      // this.singleSkybox(); //maybe tryna do this before models are loaded, is the problem..
     }
 
   },

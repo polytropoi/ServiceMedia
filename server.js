@@ -85,31 +85,31 @@ var corsOptions = function (origin) {
 
 var oneDay = 86400000;
 
-    app.use (function (req, res, next) {
-        var schema = (req.headers['x-forwarded-proto'] || '').toLowerCase();
-        if (schema === 'https') {
-            next();
-        } else {    
-            
-        //    console.log ("non ssl request = " + req.headers.host + " tryna redirect");
+app.use (function (req, res, next) {
+    var schema = (req.headers['x-forwarded-proto'] || '').toLowerCase();
+    if (schema === 'https') {
+        next();
+    } else {    
+        
 
-            if (req.headers.host != "localhost:3000" && req.headers.host != "192.168.1.198:3000") { //TODO Enviromental Varz
-                let goodURL = 'https://' + req.get('host') + req.originalUrl;
-                console.log("tryna redirect to " + goodURL);
-                res.redirect(goodURL);
-                // var htmltext = "<html xmlns='http://www.w3.org/1999/xhtml'>" +
-                //     "<head></head><body> " +
-                //     "you must use https to access this site: <a href='https://servicemedia.net'>https://servicemedia.net</a>" +
-                //     "</body>";
-                // res.end(htmltext);
-            } else {
-                next();
-            }
+    //    console.log ("non ssl request = " + req.headers.host + " tryna redirect");
+
+        if (req.headers.host != "localhost:3000") { //TODO Enviromental Varz
+            // let goodURL = 'https://' + req.get('host') + req.originalUrl;
+            // console.log("tryna redirect to " + goodURL);
+            // res.redirect(goodURL);
+            var htmltext = "<html xmlns='http://www.w3.org/1999/xhtml'>" +
+                "<head></head><body> " +
+                "<h4>you must use https to access this site: <a href='https://servicemedia.net'>https://servicemedia.net</a></h4>" +
+                "</body>";
+            res.end(htmltext);
+        } else {
+            next();
         }
-    });
+    }
+});
 
 var databaseUrl = process.env.MONGO_URL; //servicemedia connstring
-// var databaseUrl =  "asterion:menatar@aws-us-east-1-portal.8.dblayer.com:15103,aws-us-east-1-portal.7.dblayer.com:15103/servicemedia?retryWrites=false";
 
 var collections = ["acl", "auth_req", "domains", "apps", "assets", "assetsbundles", "models", "users", "inventories", "audio_items", "text_items", "audio_item_keys", "image_items", "video_items",
     "obj_items", "paths", "keys", "scores", "attributes", "achievements", "activity", "actions", "purchases", "storeitems", "scenes", "groups", "weblinks", "locations", "iap"];
@@ -117,7 +117,7 @@ var collections = ["acl", "auth_req", "domains", "apps", "assets", "assetsbundle
 var db = mongojs(databaseUrl, collections);
 var store = new MongoDBStore({ //store session cookies in a separate db with different user, so nice
     uri: process.env.MONGO_SESSIONS_URL,
-    // uri: "mongodb://sessionmaster:nawman@aws-us-east-1-portal.8.dblayer.com:15103,aws-us-east-1-portal.7.dblayer.com:15103/sessions?retryWrites=false",
+    
     collection: 'sessions'
   });
 
@@ -157,35 +157,35 @@ var store = new MongoDBStore({ //store session cookies in a separate db with dif
     app.use(bodyParser.urlencoded({ extended: false }));
     // app.use(autoReap);
 
-var maxItems = 1000;
-const { CloudSearch } = require("aws-sdk");
-//var upload = multer({ dest: 'uploads/' });
+    var maxItems = 1000;
+    const { CloudSearch } = require("aws-sdk");
+    //var upload = multer({ dest: 'uploads/' });
 
-var aws = require('aws-sdk');
-const { json } = require("body-parser");
+    var aws = require('aws-sdk');
+    const { json } = require("body-parser");
 
-const { lookupService, resolveNaptr, resolveCname } = require("dns");
-// aws.config.loadFromPath('main/conf/aws_conf.json');
-// aws.config.load({accessKeyId: process.env.AWSKEY, secretAccessKey: process.env.AWSSECRET, region: process.env.AWSREGION});
+    const { lookupService, resolveNaptr, resolveCname } = require("dns");
+    // aws.config.loadFromPath('main/conf/aws_conf.json');
+    // aws.config.load({accessKeyId: process.env.AWSKEY, secretAccessKey: process.env.AWSSECRET, region: process.env.AWSREGION});
 
-aws.config = new aws.Config({accessKeyId: process.env.AWSKEY, secretAccessKey: process.env.AWSSECRET, region: process.env.AWSREGION});
-var ses = new aws.SES({apiVersion : '2010-12-01'});
-var s3 = new aws.S3();
+    aws.config = new aws.Config({accessKeyId: process.env.AWSKEY, secretAccessKey: process.env.AWSSECRET, region: process.env.AWSREGION});
+    var ses = new aws.SES({apiVersion : '2010-12-01'});
+    var s3 = new aws.S3();
 
- 
-// var storage = multer.diskStorage({
-//     destination: './uploads/',
-//     filename: function (req, file, cb) {
-//         cb(null, Date.now() + file.originalname);
-//     }
-// });
+    
+    // var storage = multer.diskStorage({
+    //     destination: './uploads/',
+    //     filename: function (req, file, cb) {
+    //         cb(null, Date.now() + file.originalname);
+    //     }
+    // });
 
-// var upload = multer({ storage: storage });
+    // var upload = multer({ storage: storage });
 
-var appAuth = "noauth";
+    var appAuth = "noauth";
 
-let docClient = new aws.DynamoDB.DocumentClient();
-let trafficTable = "traffic_1";
+    let docClient = new aws.DynamoDB.DocumentClient();
+    let trafficTable = "traffic_1";
 
 
 
@@ -15395,7 +15395,14 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                         // "</a-entity>"+    
                                     "</a-camera>";
                             */
-                            camera = "<a-entity position=\x220 0 0\x22 camera pitch-roll-look-controls></a-entity>";
+                            camera = "<a-entity id=\x22player\x22 position=\x220 0 0\x22 camera pitch-roll-look-controls>"+ 
+                                "<a-entity id=\x22equipPlaceholder\x22 geometry=\x22primitive: plane; height: 0.01; width: .01\x22 position=\x220 -.5 -.5\x22"+
+                                "material=\x22opacity: 0\x22></a-entity>"+
+                                "<a-entity id=\x22viewportPlaceholder\x22 geometry=\x22primitive: plane; height: 0.01; width: .01\x22 position=\x220 0 -1\x22"+
+                                "material=\x22opacity: 0\x22></a-entity>"+
+                                "<a-entity id=\x22viewportPlaceholder3\x22 geometry=\x22primitive: plane; height: 0.01; width: .01\x22 position=\x220 0 -3\x22"+
+                                "material=\x22opacity: 0\x22></a-entity>"+
+                            "</a-entity>";
                                     
                             locationEntity = "<a-entity id=\x22youAreHere\x22 location_init_ar position=\x220 2 -5\x22>"+
                                 "<a-entity class=\x22gltf\x22 gltf-model=\x22#globe\x22 class=\x22envMap activeObjexRay\x22 position=\x220 -1.5 0\x22>"+

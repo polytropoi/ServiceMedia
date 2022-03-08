@@ -153,10 +153,12 @@ $(function() {
       skyboxEl.setAttribute('skybox_dynamic', {enabled: true, id: settings.skyboxIDs[0]});
       skyboxEl.id = 'skybox_dynamic';
       sceneEl.appendChild(skyboxEl);
+      
    }
    if (settings.skyboxID == "") {
-      skyboxEl.components.skybox_dynamic.nextSkybox();
+      // skyboxEl.components.skybox_dynamic.nextSkybox();
    }
+
    // window.playerPosition = {x: 0, y: 0, z: 0}; 
    
 });
