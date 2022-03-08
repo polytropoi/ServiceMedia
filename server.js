@@ -60,14 +60,10 @@ var stripe = require("stripe")(process.env.STRIPE_KEY);
 
 
 var rootHost = process.env.ROOT_HOST
-var appName = "ServiceMedia";
 var topName = process.env.ROOT_NAME;
 var requirePayment = true; //if subscription is required to login, true for servicemedia
-
-var adminEmail = "polytropoi@gmail.com";
-
-var domainAdminEmail = "polytropoi@gmail.com";
-// var domainAdminEmail = "chickenwafflevr@gmail.com";
+var adminEmail = process.env.ADMIN_EMAIL;
+var domainAdminEmail = process.env.DOMAIN_ADMIN_EMAIL;
 
 var whitelist = ['unityapp', 'https://servicemedia.s3.amazonaws.com/', 'http://localhost:3000', 'https://servicemedia.net', 'strr.us.s3.amazonaws.com', 'mvmv.us.s3.amazonaws.com', 'http://strr.us', 'https://strr.us',
  'https://strr.us/socket.io', 'http://valuebring.com', 'http://elnoise.com', 'philosophersgarden.com', 'http://elnoise.com', 'http://eloquentnoise.com', 'http://thefamilyshare.com', 'http://little-red-schoolhouse.com', 
@@ -90,10 +86,7 @@ app.use (function (req, res, next) {
     if (schema === 'https') {
         next();
     } else {    
-        
-
     //    console.log ("non ssl request = " + req.headers.host + " tryna redirect");
-
         if (req.headers.host != "localhost:3000") { //TODO Enviromental Varz
             // let goodURL = 'https://' + req.get('host') + req.originalUrl;
             // console.log("tryna redirect to " + goodURL);
@@ -117,7 +110,6 @@ var collections = ["acl", "auth_req", "domains", "apps", "assets", "assetsbundle
 var db = mongojs(databaseUrl, collections);
 var store = new MongoDBStore({ //store session cookies in a separate db with different user, so nice
     uri: process.env.MONGO_SESSIONS_URL,
-    
     collection: 'sessions'
   });
 
@@ -143,7 +135,7 @@ var store = new MongoDBStore({ //store session cookies in a separate db with dif
 
     app.use(methodOverride());
 //    var sessionStore = new session.MemoryStore();
-    var expiryDate = new Date(Date.now() + 60 * 60 * 1000) // 2 hour
+    var expiryDate = new Date(Date.now() + 60 * 60 * 1000); // 2 hour
     app.use(session({
         resave: true,
         saveUninitialized: true,
@@ -166,34 +158,18 @@ var store = new MongoDBStore({ //store session cookies in a separate db with dif
 
     const { lookupService, resolveNaptr, resolveCname } = require("dns");
     // aws.config.loadFromPath('main/conf/aws_conf.json');
-    // aws.config.load({accessKeyId: process.env.AWSKEY, secretAccessKey: process.env.AWSSECRET, region: process.env.AWSREGION});
 
     aws.config = new aws.Config({accessKeyId: process.env.AWSKEY, secretAccessKey: process.env.AWSSECRET, region: process.env.AWSREGION});
     var ses = new aws.SES({apiVersion : '2010-12-01'});
     var s3 = new aws.S3();
-
-    
-    // var storage = multer.diskStorage({
-    //     destination: './uploads/',
-    //     filename: function (req, file, cb) {
-    //         cb(null, Date.now() + file.originalname);
-    //     }
-    // });
-
-    // var upload = multer({ storage: storage });
-
     var appAuth = "noauth";
-
     let docClient = new aws.DynamoDB.DocumentClient();
     let trafficTable = "traffic_1";
 
-
-
-
-var server = http.createServer(app);
-server.timeout = 240000;
-server.keepAliveTimeout = 24000;
-server.listen(process.env.PORT || 3000, function(){
+    var server = http.createServer(app);
+    server.timeout = 240000;
+    server.keepAliveTimeout = 24000;
+    server.listen(process.env.PORT || 3000, function() {
     console.log("Express server listening on port 3000");
 });
 
