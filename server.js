@@ -101,8 +101,8 @@ app.use (function (req, res, next) {
             var htmltext = "<html xmlns='http://www.w3.org/1999/xhtml'>" +
                 "<head></head><body> " +
                 "<h4>you must use https to access this site: <a href='https://servicemedia.net'>https://servicemedia.net</a></h4>" +
-                "</body>";
-            res.end(htmltext);
+                "</body></html>";
+            res.send(htmltext);
         } else {
             next();
         }
