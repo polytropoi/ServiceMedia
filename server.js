@@ -14634,7 +14634,7 @@ app.post('/netradiodetails', function (req, res) {
 // app.get('/webxr/:_id', traffic, function (req, res) { //TODO lock down w/ checkAppID, requiredAuthentication - rem'd traffic, maybe later
 app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, requiredAuthentication
     var reqstring = entities.decodeHTML(req.params._id);
-    console.log("webxr scene req " + reqstring);
+    console.log("webxr scene req " + req.headers.referrer);
     if (reqstring != undefined && reqstring != 'undefined' && req.params._id != null) {
     // let authString = checkAuthentication(req);
     // console.log("referrer: " + req.header.referrer);
@@ -17448,11 +17448,13 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                             if (image.orientation != null && image.orientation != undefined && image.orientation.toLowerCase() == "equirectangular") { 
                                                 skyboxIDs.push(image._id);
                                                 image.url = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + image.userID + "/pictures/originals/" + image._id + ".original." + image.filename, Expires: 6000});
+                                                cbimage();
                                             } else {
                                                 image.url = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + image.userID + "/pictures/" + image._id + ".standard." + image.filename, Expires: 6000}); //i.e. 1024
+                                                cbimage();
                                             }
                                             
-                                            cbimage();
+                                            
                                         }, 
                                         function (err) {
                                             if (err) {
@@ -19112,18 +19114,18 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                         // "<script src=\x22https://code.jquery.com/jquery-3.2.1.slim.min.js\x22 integrity=\x22sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN\x22 crossorigin=\x22anonymous\x22></script>" +
                         // // "<script src=\x22https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js\x22 integrity=\x22sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q\x22 crossorigin=\x22anonymous\x22></script>" +
                         // "<script src=\x22https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js\x22 integrity=\x22sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl\x22 crossorigin=\x22anonymous\x22></script>" +
-                        "<script>\n"+
+                  "<script>\n"+
                             // "var avatarName = \x22" + avatarName + "\x22;\n" +
                             // "let globalStateObject = {};"
-                            "function ready(f){/in/.test(document.readyState)?setTimeout('ready('+f+')',9):f()}\n"+
+                           "function ready(f){/in/.test(document.readyState)?setTimeout('ready('+f+')',9):f()}\n"+
                             
-                            loadAttributions +
-                            loadAvailableScenes +
+                               loadAttributions +
+                               loadAvailableScenes +
                             // loadPictureGroups +
                             
                            
                         
-                        "</script>\n"+
+                       "</script>\n"+
                         sceneManglerButtons +
                         // "<div class=\x22mediaButton\x22 onclick=\x22SceneManglerModal('Media')\x22><i class=\x22fas fa-headphones fa-2x\x22></i></div>"+
                         // "<div class=\x22toolsButton\x22 onclick=\x22SceneManglerModal('Tools')\x22><i class=\x22fas fa-tools fa-2x\x22></i></div>"+

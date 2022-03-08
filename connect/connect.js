@@ -750,7 +750,11 @@ function tcheck () {
       
       if (data == '0') {
          // console.log("guest token");
-         socket.connect(socketHost);
+         if (socket != undefined) {
+            if (!socket.connected) {
+               socket.connect(socketHost);
+            }
+         }
       } else {
          // let user = JSON.parse(data);
         
@@ -760,7 +764,12 @@ function tcheck () {
                // userid = data._id;
                avatarName = data.userName;
                userData = data;
-               socket.connect(socketHost);
+               if (socket != undefined) {
+                  if (!socket.connected) {
+                     socket.connect(socketHost);
+                  }
+               }
+               //socket.connect(socketHost);
             // }
          }
       }
