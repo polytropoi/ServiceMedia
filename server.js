@@ -14610,8 +14610,8 @@ app.post('/netradiodetails', function (req, res) {
 // app.get('/webxr/:_id', traffic, function (req, res) { //TODO lock down w/ checkAppID, requiredAuthentication - rem'd traffic, maybe later
 app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, requiredAuthentication
     var reqstring = entities.decodeHTML(req.params._id);
-    console.log("webxr scene req " + req.headers.referrer);
-    if (reqstring != undefined && reqstring != 'undefined' && req.params._id != null) {
+    console.log("webxr scene req " + reqstring);
+    if (reqstring != undefined && reqstring != 'undefined' && reqstring != null) {
     // let authString = checkAuthentication(req);
     // console.log("referrer: " + req.header.referrer);
 
@@ -14900,7 +14900,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                             // physicsScripts = "<script src=\x22http://kripken.github.io/ammo.js/builds/ammo.wasm.js\x22></script>"+
                             // "<script src=\x22../main/ref/aframe/dist/aframe-physics-system.js\x22></script>";
                             physicsScripts =  "<script src=\x22https://mixedreality.mozilla.org/ammo.js/builds/ammo.wasm.js\x22></script>"+
-                            "<script src=\x22//cdn.jsdelivr.net/gh/n5ro/aframe-physics-system@v4.0.1/dist/aframe-physics-system.min.js\x22></script>";
+                            "<script src=\x22../main/vendor/aframe/aframe-physics-system.min.js\x22></script>";
                                                         // "<script src=\x22//cdn.jsdelivr.net/gh/n5ro/aframe-physics-system@v4.0.1/dist/aframe-physics-system.min.js\x22></script>";
 
                                 
@@ -18963,8 +18963,8 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                         // "<img id=\x22explosion\x22 src=\x22https://realitymangler.com/assets/textures/explosion.png\x22 crossorigin=\x22anonymous\x22>"+ 
 
                         // USED FOR TERRAIN, REM FOR NOW...
-                                // "<img id=\x22water\x22 src=\x22https://realitymangler.com/assets/textures/water2c.jpg\x22 crossorigin=\x22anonymous\x22>"+
-                                // "<img id=\x22water1\x22 src=\x22https://realitymangler.com/assets/textures/watertile3.png\x22 crossorigin=\x22anonymous\x22>"+
+                                "<img id=\x22water\x22 src=\x22https://realitymangler.com/assets/textures/water2c.jpg\x22 crossorigin=\x22anonymous\x22>"+
+                                "<img id=\x22water1\x22 src=\x22https://realitymangler.com/assets/textures/watertile3.png\x22 crossorigin=\x22anonymous\x22>"+
                                 // "<img id=\x22heightmap\x22 src=\x22https://realitymangler.com/assets/heightmaps/hm4.png\x22 crossorigin=\x22anonymous\x22>"+
                                 // "<img id=\x22lowestTexture\x22 src=\x22https://realitymangler.com/assets/textures/dirttile1.jpg\x22 crossorigin=\x22anonymous\x22>"+
                                 // "<img id=\x22lowTexture\x22 src=\x22https://realitymangler.com/assets/textures/sandtile1.jpg\x22 crossorigin=\x22anonymous\x22>"+

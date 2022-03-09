@@ -6,7 +6,7 @@ AFRAME.registerShader('makewaves', {
     uMap: {type: 'map', is: 'uniform'}
     // scale: {type: 'float', is: 'uniform', default: 10.0}
   },
-
+  
   vertexShader: `
 #define SCALE 10.0
 

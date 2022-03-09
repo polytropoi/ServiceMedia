@@ -2077,9 +2077,9 @@ function SceneInventoryLoad(oIDs) { //fetch scene inventory objects, i.e. stuff 
     xhr.send(JSON.stringify(data));
     xhr.onload = function () {
       // do something to response
-      console.log("fetched obj resp: " +this.responseText);
+      // console.log("fetched obj resp: " +this.responseText);
       let response = JSON.parse(this.responseText);
-      console.log("gotsome objex: " + response.objex.length);
+      // console.log("gotsome objex: " + response.objex.length);
       if (response.objex.length > 0) {
 
         for (let i = 0; i < response.objex.length; i++) {
@@ -3792,7 +3792,7 @@ AFRAME.registerComponent('skybox-env-map', {
         // if (node.material) {
           // console.log("tryna set envmap on " + node.material.name);
               node.material.envMap = envMap;
-              node.material.envMap.intensity = .75;
+              node.material.envMap.intensity = .5;
               node.material.needsUpdate = true;
             }
           });
