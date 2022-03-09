@@ -700,9 +700,9 @@ AFRAME.registerComponent('mod-materials', {
               if (this.pauseButtonMesh != null) {
               this.pauseButtonMesh.visible = false;
               }
-              // if (this.pauseButtonMesh != null) {
+              if (this.playButtonMesh != null) {
               this.playButtonMesh.visible = true;
-              // }
+              }
               // break;
 
             } else if (this.mouseOverObject.includes("rewind")) {
@@ -714,10 +714,10 @@ AFRAME.registerComponent('mod-materials', {
               if (this.pauseButtonMesh != null) {
               this.pauseButtonMesh.visible = false;
               }
-              // if (this.pauseButtonMesh != null) {
+              if (this.playButtonMesh != null) {
               this.playButtonMesh.visible = true;
 
-              // }
+              }
               // break;
             }
         // this.raycaster = null;
