@@ -1050,7 +1050,7 @@ function SceneManglerModal(mode) {
     }
     let tabs ="<div class=\x22tab\x22>" +
     "<button class=\x22tablinks\x22 onclick=\x22TabMangler(event, 'Welcome')\x22>Welcome</button>"+
-    "<button class=\x22tablinks\x22 onclick=\x22TabMangler(event, 'Quests')\x22>Quests</button>"+
+    // "<button class=\x22tablinks\x22 onclick=\x22TabMangler(event, 'Quests')\x22>Quests</button>"+
     "<button class=\x22tablinks\x22 onclick=\x22TabMangler(event, 'Inventory')\x22>Inventory</button>"+
     "<button class=\x22tablinks\x22 onclick=\x22TabMangler(event, 'Messages')\x22>Messages</button>"+
 
@@ -1068,7 +1068,7 @@ function SceneManglerModal(mode) {
     let toolsDisplay = "";
     let eventsDisplay = "";
     
-    if (mode == "Welcome") {
+    if (mode == "Welcome") { //add quest here
         welcomeDisplay = "style=\x22display: block;\x22";
     }
     if (mode == "Quests") {
@@ -1096,16 +1096,12 @@ function SceneManglerModal(mode) {
     tabs+
     "<div "+welcomeDisplay+" id=\x22Welcome\x22 class=\x22modalMain tabcontent\x22>" +
       "<div><p>" + greeting + "</p></div>"+
-    "</div>"+    
-    "<div "+questsDisplay+" id=\x22Quests\x22 class=\x22modalMain tabcontent\x22>"+
-      // "<form id=\x22form\x22 id=\x22chat_form\x22>"+
-      // "<h3>Quests</h3>"+
       "<div><p>" + quest + "</p></div>"+
-    "</div>"+
+    "</div>"+    
+    // "<div "+questsDisplay+" id=\x22Quests\x22 class=\x22modalMain tabcontent\x22>"+
+    //   "<div><p>" + quest + "</p></div>"+
+    // "</div>"+
     "<div "+inventoryDisplay+" id=\x22Inventory\x22 class=\x22modalMain tabcontent\x22>"+
-      
-      // "<form id=\x22form\x22 id=\x22chat_form\x22>"+
-      // "<h3>Quests</h3>"+
       "<div id=\x22inventory_display\x22><p>"+inventory+"</p></div>"+
     "</div>"+
     "<div "+messagesDisplay+" id=\x22Messages\x22 class=\x22modalMain tabcontent\x22>"+

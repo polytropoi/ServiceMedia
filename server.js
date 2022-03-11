@@ -15561,18 +15561,31 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                     extrasScript = "<script src=\x22..//main/vendor/aframe/aframe-extras_20210520.js\x22></script>";
                                     // joystickScript = "";
                                 }
-                                // let settings = {};
-                                // settings.sceneColor1 = sceneResponse.sceneColor1;
-                                // settings.sceneColor2 = sceneResponse.sceneColor2;
-                                // settings.sceneColor3 = sceneResponse.sceneColor3;
-                                // settings.sceneColor4 = sceneResponse.sceneColor4;
-                                // settings.volumePrimary = sceneResponse.scenePrimaryVolume;
-                                // settings.volumeAmbient = sceneResponse.sceneAmbientVolume;
-                                // settings.volumeTrigger = sceneResponse.sceneTriggerVolume; 
-                                // settings.sceneTimedEvents = sceneResponse.sceneTimedEvents; //could be big!?
-                                // settings.skyboxIDs = skyboxIDs;
-                                // var buff = Buffer.from(JSON.stringify(settings)).toString("base64");
-                                // settingsData = "<div id=\x22settingsDataElement\x22 data-settings=\x22"+buff+"\x22></div>";
+                                //alt 
+                                    // if (!useNavmesh) {
+                                    //     // wasd = "wasd-controls=\x22fly: false; acceleration: 35\x22";
+                                    //     // movementControls = "movement-controls=\x22control: keyboard, gamepad, \x22";
+                                    // } else {
+                                    //     movementControls = "movement-controls=\x22constrainToNavMesh: true; control: keyboard, gamepad, touch; fly: false;\x22"; 
+                                    //     wasd = "";
+                                    //     extrasScript = "<script src=\x22../main/vendor/aframe/movement-controls.js\x22></script>";
+                                    //     // joystickScript = "";
+                                    // }
+                                    // if (physicsScripts.length > 0) {
+                                    //     movementControls = "movement-controls=\x22control: keyboard, gamepad, touch; fly: false;\x22";
+                                    //     // wasd = "";
+                                    //     physicsMod = "geometry=\x22primitive: cylinder; height: 2; radius: 0.5;\x22 ammo-body=\x22type: kinematic;\x22 ammo-shape=\x22type: capsule\x22";
+                                    //     extrasScript = "<script src=\x22../main/vendor/aframe/movement-controls.js\x22></script>";
+                                    //     // joystickScript = "";
+
+                                    // }
+                                    // if (physicsScripts.length > 0 && useNavmesh) {
+                                    //     movementControls = "movement-controls=\x22constrainToNavMesh: true; control: keyboard, gamepad, touch; fly: false;\x22";
+                                    //     wasd = "";
+                                    //     physicsMod = "geometry=\x22primitive: cylinder; height: 2; radius: 0.5;\x22 ammo-body=\x22type: kinematic;\x22 ammo-shape=\x22type: capsule\x22";
+                                    //     extrasScript = "<script src=\x22../main/vendor/aframe/movement-controls.js\x22></script>";
+                                    //     // joystickScript = "";
+                                    // }
                                 
 
                                 transportButtons = "<div class=\x22transport_buttons\x22><div class=\x22sslidecontainer\x22><input type=\x22range\x22 min=\x221\x22 max=\x22100\x22 value=\x221\x22 class=\x22sslider\x22 id=\x22mainTransportSlider\x22>"+

@@ -304,7 +304,7 @@ margin-top: 58px!important;
     border-radius: 16px;
     padding: .5em;
     color: #FFF;
-    background: rgba(0, 0, 0, 0.75);
+    /* background: rgba(0, 0, 0, 0.75); */
     font-family: Source Sans Pro, Helvetica Neue, Helvetica, Arial, sans-serif;
     /* overflow-y:auto; */
     /* overflow:auto; */
@@ -736,6 +736,7 @@ background-color: #000000;
         height: 100%;
         overflow-y: initial !important;
         /* overflow: auto; Enable scroll if needed */
+        /* opacity: 0; */
         background-color: rgb(0,0,0); /* Fallback color */
         background-color: rgba(0,0,0,0); /* Black w/ opacity */
     }
@@ -743,6 +744,7 @@ background-color: #000000;
     /* Modal Content/Box */
     .modal-content {
         background-color: #1b1b1bdc;
+        /* opacity: 0; */
         /* margin: 10% 10% 5% 5%;   */
         margin-top: 60px;
         margin-right: auto;
