@@ -15048,6 +15048,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                 geoEntity = "gps-position";
                             }
                             for (var i = 0; i < sceneResponse.sceneLocations.length; i++) {
+                                console.log("gotsa location markter with type " + sceneResponse.sceneLocations[i].markerType);
                                 // console.log("sceneLocationTracking is " +sceneResponse.sceneLocationTracking && );
                                 // console.log("sceneLocraitons are a thing and sceneLocationTracking is " +sceneResponse.sceneLocationTracking + " " + sceneResponse.sceneLocations[i].type);
                                 if ((sceneResponse.sceneLocationTracking != null && sceneResponse.sceneLocationTracking == true) || sceneResponse.sceneWebType == "AR Location Tracking") {  
@@ -15284,6 +15285,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                     locationLights.push(lightLocation);
                                 }
                                 if (sceneResponse.sceneLocations[i].markerType != undefined && sceneResponse.sceneLocations[i].markerType.includes("picture")) { 
+                                    
                                     let pictureLocation = {};
                                     pictureLocation.loc = sceneResponse.sceneLocations[i].x + " " + sceneResponse.sceneLocations[i].y + " " + zFix;
                                     let eulerx = sceneResponse.sceneLocations[i].eulerx != null ? sceneResponse.sceneLocations[i].eulerx : 0;
@@ -17505,17 +17507,21 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                 },
                 function (callback) {
                     // var postcards = [];
-                    //console.log("sceneResponse.scenePictures: " + JSON.stringify(sceneResponse.scenePictures));
+                    // console.log("sceneResponse.scenePictures: " + JSON.stringify(sceneResponse.scenePictures));
                     if (sceneResponse.scenePictures != null && sceneResponse.scenePictures.length > 0) {
                         var index = 0;
+                        // let picItemsPlaced = [];
+                        let picLocationsPlaced = [];
+                        let picIndex = 0;
                         async.each(sceneResponse.scenePictures, function (picID, callbackz) { //nested async-ery!
+                                
                                 var oo_id = ObjectID(picID);
                                 db.image_items.findOne({"_id": oo_id}, function (err, picture_item) {
                                     if (err || !picture_item) {
                                         console.log("error getting scenePictures " + picID + err);
                                         callbackz();
                                     } else {
-                                        // console.log("gotsa picture_item " + JSON.stringify(picture_item));
+                                        console.log("gotsa picture_item " + JSON.stringify(picture_item));
                                         
                                         var version = ".standard.";
                                         if (picture_item.orientation != undefined) {
@@ -17563,22 +17569,21 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                         let actionCall = "";
                                         let link = "";
                                         let lookat = " look-at=\x22#player\x22 ";
-                                        let picItemsPlaced = [];
-                                        for (let p = 0; p < locationPictures.length; p++) {
-                                            console.log(locationPictures.length + " total piclocs " + picture_item._id + " vs locationPIcture: " + JSON.stringify(locationPictures[p]));
-                                            if (!picItemsPlaced.includes(picture_item._id.toString())) { //just random now, but should test for data property match if present
-                                                // useImageLayout = false;
-                                                picItemsPlaced.push(picture_item._id); 
-                                                position = locationPictures[p].loc;
-                                                rotation = locationPictures[p].rot;
-                                                if (locationPictures[p].type.includes("fixed")) {
-                                                    console.log("tryna lookat nuh-in");
-                                                    lookat = "";
-                                                }
-                                                break;
-                                                // console.log("!!! gotsa match for picture location!" + locationPictures[p].data);
+                                        console.log("picLocations taken: " + picLocationsPlaced);
+                                         
+                                        if (picIndex < locationPictures.length) {
+                                            position = locationPictures[picIndex].loc;
+                                            rotation = locationPictures[picIndex].rot;
+                                            if (locationPictures[picIndex].type.includes("fixed")) {
+                                                console.log("fixed pic @ " + locationPictures[picIndex].loc);
+                                                lookat = "";
                                             }
-                                        }
+                                            picIndex++;
+                                        } 
+                                        // else {
+                                        //     callbackz('no locations available for pic');
+                                        // }
+                                        
                                         // console.log("picture_item.linkType: " + picture_item.linkType);
                                         // console.log("picture_item.orientation: " + picture_item.orientation);
                                         if (picture_item.linkType != undefined && picture_item.linkType.toLowerCase() != "none") {
@@ -17600,7 +17605,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                                 link = "basic-link=\x22href: "+picture_item.linkURL+";\x22 class=\x22activeObjexGrab activeObjexRay\x22";
                                             }
                                         }
-                                        if (picture_item.useTarget != undefined && picture_item.useTarget != "") {
+                                        if (picture_item.useTarget != undefined && picture_item.useTarget != "") { //used by mindar
                                             console.log("GOTSA urlTarget " + picture_item.urlTarget);
                                             const targetURL = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + picture_item.userID + "/pictures/targets/" + picture_item._id + ".mind", Expires: 6000});
                                             arImageTargets.push(targetURL);
@@ -17616,9 +17621,9 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                             imageEntities = imageEntities + "<a-entity "+link+""+lookat+" geometry=\x22primitive: plane; height: 10; width: 10\x22 material=\x22shader: flat; transparent: true; src: #smimage" + index + "; alphaTest: 0.5;\x22"+
                                             " position=\x22"+position+"\x22 rotation=\x22"+rotation+"\x22 visible='true'>"+caption+"</a-entity>";
                                         } else {
-                                            if (picture_item.linkType != undefined && picture_item.orientation != "equirectangular" && picture_item.orientation != "Equirectangular") {
-                                                
-
+                                            // if (picture_item.linkType != undefined && picture_item.orientation != "equirectangular" && picture_item.orientation != "Equirectangular") {
+                                            if (picture_item.orientation != "equirectangular" && picture_item.orientation != "Equirectangular") {  //what if linkType is undefined?
+ 
                                                 // position = 
 
                                                 // let randomX = Math.Random() * (max - min) + min;
@@ -18721,7 +18726,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                             sceneManglerButtons = "";
                         }
                         if (locationPictures.length == 0) { //in no pic locations, use circle layout
-                            imageEntities = "<a-entity id=\x22imageEntitiesParent\x22 position='0 3.5 0' rotation=\x2290 0 33\x22 layout=\x22type: circle; radius: 20\x22>"+imageEntities+"</a-entity>\n";
+                            // imageEntities = "<a-entity id=\x22imageEntitiesParent\x22 position='0 3.5 0' rotation=\x2290 0 33\x22 layout=\x22type: circle; radius: 20\x22>"+imageEntities+"</a-entity>\n";
                         }
                         if (sceneResponse.sceneUseDynCubeMap) {
                             skyboxEnvMap = "skybox-env-map";   

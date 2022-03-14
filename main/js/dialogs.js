@@ -357,6 +357,7 @@ function ReturnLocationMarkerTypeSelect (selected) {
     const typesArray = [
         "placeholder",
         "poi",
+        "picture",
         "mailbox"];
     for (let i = 0; i < typesArray.length; i++) {
         if (typesArray[i] == selected) {
