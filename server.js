@@ -17549,11 +17549,21 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                         let x = Math.random() * (max - min) + min;
                                         // let y = Math.random() * (max.y - min.y) + min.y;
                                         let z = Math.random() * (max - min) + min;
-                                        if (z >= -1 && z <= 1) {
-                                            z = -5;
+                                        if (z >= -15 && z <= 15) {
+                                            if (z < 0) {
+                                                z = -20;
+                                            } else {
+                                                z = 20;
+                                            }
+                                           
                                         }
-                                        if (x >= -1 && z <= 1) {
-                                            x = -5;
+                                        if (x >= -15 && z <= 15) {
+                                            if (x < 0) {
+                                                x = -20;
+                                            } else {
+                                                x = 20;
+                                            }
+                                            
                                         }
                                         index++;
                                         let position = x + " " + 2 + " " + z;
@@ -17570,7 +17580,26 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                         let link = "";
                                         let lookat = " look-at=\x22#player\x22 ";
                                         console.log("picLocations taken: " + picLocationsPlaced);
-                                         
+                                            // for (let p = 0; p < locationPictures.length; p++) {
+
+                                            //     // console.log(p + " of  " + locationPictures.length + " total piclocs " + picture_item._id + " vs locationPIcture: " + JSON.stringify(locationPictures[p]));
+                                            //     if (!picLocationsPlaced.includes(locationPictures[p].loc)) { //if this location hasn't been used
+                                            //         // useImageLayout = false;
+                                            //         // picItemsPlaced.push(picture_item._id); 
+                                            //         picLocationsPlaced.push(locationPictures[p].loc);
+                                            //         position = locationPictures[p].loc;
+                                            //         rotation = locationPictures[p].rot;
+                                            //         if (locationPictures[p].type.includes("fixed")) {
+                                            //             console.log("fixed pic @ " + locationPictures[p].loc);
+                                            //             lookat = "";
+                                            //         }
+                                            //         console.log("updated picloc " + JSON.stringify(locationPictures[p]));
+                                            //         // break;
+                                            //         // console.log("!!! gotsa match for picture location!" + locationPictures[p].data);
+                                            //     } else {
+                                            //         // console.log("no pic locs available");
+                                            //     }
+                                            // }
                                         if (picIndex < locationPictures.length) {
                                             position = locationPictures[picIndex].loc;
                                             rotation = locationPictures[picIndex].rot;
