@@ -46,6 +46,18 @@
 //     this.hasLoadedNavMesh = true;
 //   }
 // });
+function DetectiOS() {
+  return [
+    'iPad Simulator',
+    'iPhone Simulator',
+    'iPod Simulator',
+    'iPad',
+    'iPhone',
+    'iPod'
+  ].includes(navigator.platform)
+  // iPad on iOS 13 detection
+  || (navigator.userAgent.includes("Mac") && "ontouchend" in document)
+} 
 
 class Joystick
 {
@@ -160,14 +172,25 @@ AFRAME.registerComponent('screen-controls',
 {
     init: function () 
     {
+        let isIOS = DetectiOS();
+        let isMobile = AFRAME.utils.device.isMobile();
+        console.log("tryna init screen controls with"  + isMobile + " isMobile and is ios " + isIOS);
         // let d = document.createElement("DIV");
         // d.setAttribute("id","joystickEl");
         // const style = "position: absolute; left: 0; right: 0; bottom:10px; margin-left: auto; margin-right: auto; width: 89px; height: 89px; opacity:0.5;z-index:100;";
         // d.setAttribute("style",style);
         // document.querySelector("body").appendChild(d)
-        this.component = document.getElementById("player").components["extended-wasd-controls"];
-        this.joystick1 = new Joystick("joystickEl", 64, 8);
-        console.log("controls initialized");
+        this.component = null;
+        if (isMobile || isIOS) {
+            this.component = document.getElementById("player").components["extended-wasd-controls"];
+            this.joystick1 = new Joystick("joystickEl", 64, 8);
+            this.component.setJoystickInput();
+            console.log("controls initialized : JOYSTICK" );
+        } else {
+            console.log("controls initialized : KEYBOID" );
+        }
+        // this.joystick1 = new Joystick("joystickEl", 64, 8);
+       
         // this.component.setJoystickInput();
       },
 

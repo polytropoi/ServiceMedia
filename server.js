@@ -19146,7 +19146,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                         // "</div>" +
 
                         "<div class=\x22JoystickRegionUI\x22 style=\x22z-index: 100\x22>" +
-                        "<div class=\x22JoystickButtonUI\x22 style=\x22width: 128px; opacity:0.80;\x22>" +
+                        "<div class=\x22JoystickButtonUI\x22 style=\x22width: 128px; opacity:0.50;\x22>" +
                             "<img src=\x22/css/joystick-base.png\x22/>" +
                             "<div id=\x22joystickEl\x22 style=\x22position: absolute; left:32px; top:32px;\x22>" +
                             "<img src=\x22/css/joystick-red.png\x22/>" +

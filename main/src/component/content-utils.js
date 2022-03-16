@@ -154,7 +154,9 @@ AFRAME.registerComponent('initializer', { //adjust for device settings, and call
   init: function () {
     var sceneEl = document.querySelector('a-scene');
     let type = this.data.sceneType;
-    console.log("scene TYpe is " + type);
+    // let ios = this.detectIOS();
+    // console.log("scene TYpe is " + type + " is IOS " + ios);
+
     // let iOS = iOS();
     // if (!AFRAME.utils.device.isMobile() && !AFRAME.utils.device.checkHeadsetConnected()) {
     //   if (!AFRAME.utils.device.isMobile()) {
@@ -171,7 +173,7 @@ AFRAME.registerComponent('initializer', { //adjust for device settings, and call
       PrimaryAudioInit();
       
       // sceneEl.setAttribute('render-canvas');
-      if (AFRAME.utils.device.isMobile() || this.detectIOS()) {
+      if (AFRAME.utils.device.isMobile()) {
         let vrButton = document.querySelector(".a-enter-vr-button");
         if (vrButton != null) {
           vrButton.style.display = 'none'; //to hell with cardboard/gearvr/daydream
