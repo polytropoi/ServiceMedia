@@ -160,14 +160,15 @@ AFRAME.registerComponent('screen-controls',
 {
     init: function () 
     {
-        let d = document.createElement("DIV");
-        d.setAttribute("id","joystickEl");
-        const style = "position: absolute; left: 0; right: 0; bottom:10px; margin-left: auto; margin-right: auto; width: 89px; height: 89px; opacity:0.5;z-index:100;";
-        d.setAttribute("style",style);
-        document.querySelector("body").appendChild(d)
+        // let d = document.createElement("DIV");
+        // d.setAttribute("id","joystickEl");
+        // const style = "position: absolute; left: 0; right: 0; bottom:10px; margin-left: auto; margin-right: auto; width: 89px; height: 89px; opacity:0.5;z-index:100;";
+        // d.setAttribute("style",style);
+        // document.querySelector("body").appendChild(d)
         this.component = document.getElementById("player").components["extended-wasd-controls"];
         this.joystick1 = new Joystick("joystickEl", 64, 8);
         console.log("controls initialized");
+        // this.component.setJoystickInput();
       },
 
       tick: function(time, deltaTime)
@@ -300,6 +301,7 @@ AFRAME.registerComponent('extended-wasd-controls', {
 		this.el.object3D.rotation.order = 'YXZ';
 	},
 	setJoystickInput: function () {
+        console.log("setting ewasd controller input to JOYSTICK!");
         this.data.inputType = "joystick";
     },
 	tick: function (time, timeDelta) 

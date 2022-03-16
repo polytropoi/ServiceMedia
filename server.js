@@ -18806,7 +18806,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                         //     surfaceScatterScript = 
                         // }
                         
-                        let aScene = "<a-scene "+sceneBackground+" "+physicsInsert+" "+pool_target+" "+pool_launcher+" disable-magicwindow device-orientation-permission-ui=\x22enabled: false\x22 " +
+                        let aScene = "<a-scene "+sceneBackground+" "+physicsInsert+" "+pool_target+" "+pool_launcher+" screen-controls disable-magicwindow device-orientation-permission-ui=\x22enabled: false\x22 " +
                         // let aScene = "<a-scene "+sceneBackground+" device-orientation-permission-ui " +
                         // webxrFeatures + " shadow=\x22type: pcfsoft\x22 loading-screen=\x22dotsColor: white; backgroundColor: black; enabled: false\x22 "+joystick+" embedded " + aframeRenderSettings + " " + fogSettings + " "+networkedscene+" "+ARSceneArg+" listen-for-vr-mode>";
                         webxrFeatures + " shadow=\x22type: pcfsoft\x22 loading-screen=\x22dotsColor: white; backgroundColor: black; enabled: false\x22 embedded " + aframeRenderSettings + " " + fogSettings + " "+networkedscene+" "+ARSceneArg+" listen-for-vr-mode>";
@@ -19134,7 +19134,26 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                         "<div class=\x22backmask\x22 style=\x22position: fixed; left: 0; top: 0; z-index: -5; overflow: hidden\x22></div>"+ //to hide lower elements
                         "<div class=\x22render_panel\x22 style=\x22position: fixed; left: 0; top: 0; z-index: -50; overflow: hidden margin: auto\x22 id=\x22renderPanel\x22></div>"+
                         "<div class=\x22augpanel\x22><p></p></div>\n"+
-                        "<div id=\x22player\x22></div>\n"+
+                        // "<div id=\x22player\x22></div>\n"+ //"wtf?"
+                        
+                        // "<div class=\x22JoystickRegionUI\x22 style=\x22bottom: 10px; left: 10px; z-index: 1000\x22>" +
+                        // "<div class=\x22JoystickButtonUI\x22 style=\x22width: 128px; opacity:0.80;\x22>" +
+                        //     "<img src=\x22/css/joystick-base.png\x22/>" +
+                        //     "<div id=\x22joystickEl\x22 style=\x22position: absolute; left:32px; top:32px;\x22>" +
+                        //     "<img src=\x22/css/joystick-red.png\x22/>" +
+                        //     "</div>" +
+                        //     "</div>" +
+                        // "</div>" +
+
+                        "<div class=\x22JoystickRegionUI\x22 style=\x22z-index: 100\x22>" +
+                        "<div class=\x22JoystickButtonUI\x22 style=\x22width: 128px; opacity:0.80;\x22>" +
+                            "<img src=\x22/css/joystick-base.png\x22/>" +
+                            "<div id=\x22joystickEl\x22 style=\x22position: absolute; left:32px; top:32px;\x22>" +
+                            "<img src=\x22/css/joystick-red.png\x22/>" +
+                            "</div>" +
+                            "</div>" +
+                        "</div>" +
+
                         screenOverlay + //socket picture
                         canvasOverlay + //drop down side panel
                         audioSliders +
@@ -19167,7 +19186,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                             // "let globalStateObject = {};"
                            "function ready(f){/in/.test(document.readyState)?setTimeout('ready('+f+')',9):f()}\n"+
                             
-                               loadAttributions +
+                            //    loadAttributions +
                                loadAvailableScenes +
                             // loadPictureGroups +
                             
