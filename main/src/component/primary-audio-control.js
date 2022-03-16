@@ -448,14 +448,14 @@ AFRAME.registerComponent('primary_audio_player', {  //setup and controls for the
                     primaryAudioHowl.play();
                     this.el.emit('primaryAudioToggle', {isPlaying : true}, true);
                     this.isPlaying = true;
-                    el.setAttribute('material', 'color', 'green');
+                    this.el.setAttribute('material', 'color', 'green');
                     PauseIntervals(false);
                 } else {    
                     console.log("tryna pause");
                     primaryAudioHowl.pause();
                     this.el.emit('primaryAudioToggle', {isPlaying : false}, true);
                     this.isPlaying = false;
-                    el.setAttribute('material', 'color', 'red');
+                    this.el.setAttribute('material', 'color', 'red');
                     PauseIntervals(true);
                 
                 }

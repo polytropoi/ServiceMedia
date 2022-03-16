@@ -14830,6 +14830,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
     let navmeshEntity = "";
     let showTransport = false;
     let useNavmesh = false;
+    let useSimpleNavmesh = false;
     let showDialog = false;
     let showSceneManglerButtons = false;
     let ethereumButton = "";
@@ -14934,6 +14935,10 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                         if (sceneData.sceneTags[i] == "use navmesh") {
                             console.log("GOTS USENAVMESH TAG: " + sceneData.sceneTags[i]);
                             useNavmesh = true;
+                        }
+                        if (sceneData.sceneTags[i] == "use simple navmesh") {
+                            console.log("GOTS SimpleNavmesh TAG: " + sceneData.sceneTags[i]);
+                            useSimpleNavmesh = true;
                         }
                         if (sceneData.sceneTags[i] == "show ethereum") {
                             ethereumButton = "<div class=\x22ethereum_button\x22 id=\x22ethereumButton\x22 style=\x22margin: 10px 10px;\x22><i class=\x22fab fa-ethereum fa-2x\x22></i></div>";
@@ -15536,23 +15541,29 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                             
                             } else { //"sceneWebType == "Default or AFrame"
                                 let movementControls = ""; //aframe extras, can constrain to navmesh 
-                                wasd = "wasd-controls=\x22fly: false; acceleration: 35\x22";
-                                joystickScript = "<script src=\x22../main/vendor/aframe/joystick.js\x22></script>";
+                                wasd = "extended-wasd-controls=\x22flyEnabled: false; moveSpeed: 5; inputType: keyboard\x22";
+                                // joystickScript = "<script src=\x22../main/vendor/aframe/joystick.js\x22></script>";
                                 let physicsMod = "";
-                                if (!useNavmesh) {
+                                if (!useNavmesh && !useSimpleNavmesh) { //simplenavmesh uses raycast, no pathfinding but constraint works!
                                     // wasd = "wasd-controls=\x22fly: false; acceleration: 35\x22";
                                     // movementControls = "movement-controls=\x22control: keyboard, gamepad, \x22";
                                 } else {
-                                    movementControls = "movement-controls=\x22constrainToNavMesh: true; control: keyboard, gamepad, touch; fly: false;\x22"; 
-                                    wasd = "";
-                                    extrasScript = "<script src=\x22..//main/vendor/aframe/aframe-extras_20210520.js\x22></script>";
+                                    if (useSimpleNavmesh) {
+                                        //simple navmesh can use 
+                                        wasd = "extended-wasd-controls=\x22fly: false; moveSpeed: 5; inputType: keyboard\x22 simple-navmesh-constraint=\x22navmesh:#navmesh-el;fall:0.5;height:0;\x22";
+                                       
+                                    } else {
+                                        movementControls = "movement-controls=\x22constrainToNavMesh: true; control: keyboard, gamepad, touch; fly: false;\x22"; 
+                                        wasd = "";
+                                        extrasScript = "<script src=\x22..//main/vendor/aframe/aframe-extras_20210520.js\x22></script>";
+                                    }
                                     // joystickScript = "";
                                 }
                                 if (physicsScripts.length > 0) {
-                                    movementControls = "movement-controls=\x22control: keyboard, gamepad, touch; fly: false;\x22";
-                                    wasd = "";
+                                    // movementControls = "movement-controls=\x22control: keyboard, gamepad, touch; fly: false;\x22";
+                                    // wasd = "";
                                     physicsMod = "geometry=\x22primitive: cylinder; height: 2; radius: 0.5;\x22 ammo-body=\x22type: kinematic;\x22 ammo-shape=\x22type: capsule\x22";
-                                    extrasScript = "<script src=\x22..//main/vendor/aframe/aframe-extras_20210520.js\x22></script>";
+                                    // extrasScript = "<script src=\x22..//main/vendor/aframe/aframe-extras_20210520.js\x22></script>";
                                     // joystickScript = "";
 
                                 }
@@ -15605,7 +15616,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                    // renderPanel = "<a-entity visible=\x22false\x22 render_canvas id=\x22renderCanvas\x22 look-at=\x22#player\x22 geometry=\x22primitive: plane; width:1; height:1;\x22 scale=\x221 1 1\x22 position=\x220 3.5 -.25\x22 material=\x22shader: html; transparent: true; width:1024; height:1024; fps: 10; target: #renderPanel;\x22></a-entity>\n";
                                 }
                                 if (sceneResponse.sceneFlyable) {
-                                    wasd = "wasd-controls=\x22fly: true; acceleration: 45;\x22";
+                                    wasd = "extended-wasd-controls=\x22flyEnabled: true; moveSpeed: 4; inputType: keyboard\x22";
                                 }
                                 // if (useNavmesh) {
                                 //     // "wasd-controls=\x22fly: false; acceleration: 35\x22";
@@ -15625,14 +15636,14 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                 //AFRAME CAMERA
                                 camera = "<a-entity id=\x22cameraRig\x22 "+movementControls+" initializer "+
                                 // camera = "<a-entity id=\x22cameraRig\x22 "+movementControls+" initializer position=\x22"+playerPosition+"\x22 "+
-                                " "+ physicsMod +">"+
+                                // " "+ physicsMod +">"+
                                 // camera = "<a-entity id=\x22cameraRig\x22 "+movementControls+" initializer position=\x22"+playerPosition+"\x22 material=\x22color: green; wireframe: true;\x22"+
                                 // " geometry=\x22primitive: cylinder; height: 2; radius: 0.8;\x22 ammo-body=\x22type: kinematic;\x22 ammo-shape=\x22type: cylinder\x22>"+
                                 // camera = "<a-entity id=\x22cameraRig\x22 "+movementControls+" initializer position=\x22"+playerPosition+"\x22 material=\x22color: green; wireframe: true;\x22 geometry=\x22primitive: cylinder; height: 2; radius: 0.8;\x22 ammo-body=\x22type: kinematic;\x22 ammo-shape=\x22type: cylinder\x22>"+
                                     "<a-entity hide-in-ar-mode id=\x22mouseCursor\x22 cursor=\x22rayOrigin: mouse\x22 raycaster=\x22objects: .activeObjexRay\x22></a-entity>"+
                                     // "<a-entity id=\x22player\x22 get_pos_rot networked=\x22template:#avatar-template;attachTemplateToLocal:false;\x22 "+spawnInCircle+" camera "+wasd+" look-controls=\x22hmdEnabled: false\x22 position=\x220 1.6 0\x22>" +     
                                     // "<a-entity id=\x22viewportPlaceholder\x22 position=\x220 0 -1\x22></entity>"+   
-                                    "<a-entity id=\x22player\x22 get_pos_rot camera "+wasd+" look-controls=\x22hmdEnabled: false;\x22 position=\x22"+playerPosition+"\x22>"+
+                                    "<a-entity id=\x22player\x22 look-controls get_pos_rot camera "+wasd+" "+ physicsMod +" position=\x22"+playerPosition+"\x22>"+
                                         "<a-entity id=\x22equipPlaceholder\x22 geometry=\x22primitive: plane; height: 0.01; width: .01\x22 position=\x220 -.5 -.5\x22"+
                                         "material=\x22opacity: 0\x22></a-entity>"+
                                         "<a-entity id=\x22viewportPlaceholder\x22 geometry=\x22primitive: plane; height: 0.01; width: .01\x22 position=\x220 0 -1\x22"+
@@ -16309,19 +16320,23 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                             arMode = "spawn";
                                         }
                                         if (locMdl.eventData.toLowerCase().includes("navmesh")) {
-                                            // console.log("GOTSA NAVMESH!!");
-                                            // navmesh = "nav-mesh";
-                                            navmeshAsset = "<a-asset-item id=\x22" + m_assetID + "\x22 src=\x22"+ modelURL +"\x22></a-asset-item>";
-                                            // navmeshEntity = "<a-entity nav_mesh scale=\x22"+scale+" "+scale+" "+scale+"\x22> gltf-model=\x22#" + m_assetID + "\x22</a-entity>";
-                                            // navmeshEntity = "<a-entity id=\x22nav_mesh\x22 nav_mesh=\x22show: false;\x22 gltf-model=\x22#" + m_assetID + "\x22></a-entity>";
-                                            // if (locMdl.eventData.toLowerCase().includes("show")) {
-                                            //     navmeshEntity = "<a-entity id=\x22nav_mesh\x22 nav_mesh=\x22show: true;\x22 gltf-model=\x22#" + m_assetID + "\x22></a-entity>";
-                                            // }
-                                            navmeshEntity = "<a-entity id=\x22nav-mesh\x22 nav-mesh visible=\x22false\x22 gltf-model=\x22#" + m_assetID + "\x22></a-entity>";
-                                            if (locMdl.eventData.toLowerCase().includes("show")) {
-                                                navmeshEntity = "<a-entity id=\x22nav-mesh\x22 nav-mesh gltf-model=\x22#" + m_assetID + "\x22></a-entity>";
+                                            if (locMdl.eventData.toLowerCase().includes("simple navmesh")) {
+                                                navmeshAsset = "<a-asset-item id=\x22" + m_assetID + "\x22 src=\x22"+ modelURL +"\x22></a-asset-item>";
+                                                navmeshEntity = "<a-entity id=\x22navmesh-el\x22 visible=\x22false\x22 gltf-model=\x22#" + m_assetID + "\x22></a-entity>";
+                                            } else {
+                                                navmeshAsset = "<a-asset-item id=\x22" + m_assetID + "\x22 src=\x22"+ modelURL +"\x22></a-asset-item>";
+                                                // navmeshEntity = "<a-entity nav_mesh scale=\x22"+scale+" "+scale+" "+scale+"\x22> gltf-model=\x22#" + m_assetID + "\x22</a-entity>";
+                                                // navmeshEntity = "<a-entity id=\x22nav_mesh\x22 nav_mesh=\x22show: false;\x22 gltf-model=\x22#" + m_assetID + "\x22></a-entity>";
+                                                // if (locMdl.eventData.toLowerCase().includes("show")) {
+                                                //     navmeshEntity = "<a-entity id=\x22nav_mesh\x22 nav_mesh=\x22show: true;\x22 gltf-model=\x22#" + m_assetID + "\x22></a-entity>";
+                                                // }
+                                                navmeshEntity = "<a-entity id=\x22nav-mesh\x22 nav-mesh visible=\x22false\x22 gltf-model=\x22#" + m_assetID + "\x22></a-entity>";
+                                                if (locMdl.eventData.toLowerCase().includes("show")) {
+                                                    navmeshEntity = "<a-entity id=\x22nav-mesh\x22 nav-mesh gltf-model=\x22#" + m_assetID + "\x22></a-entity>";
+                                                }
                                             }
                                         }
+                                        
                                         rightRot = !rightRot;
                                         if (rightRot == true) {
                                             rotVal = -360;
@@ -18737,12 +18752,21 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                     } else { //AFrame response below
                         let joystick = "joystick=\x22useNavmesh: false\x22";
                         if (useNavmesh) {
-                            navmeshScripts = "<script src=\x22../three/pathfinding/three-pathfinding.umd.js\x22></script><script src=\x22../main/js/navigation.js\x22></script>";
+                            navmeshScripts = "<script src=\x22../three/pathfinding/three-pathfinding.umd.js\x22></script>";
                             // "<script src=\x22../main/vendor/aframe/movement-controls.js\x22></script>";
                             // navmeshScripts = "<script type=\x22module\x22 src=\x22../main/js/navigation.js\x22></script>";
                             // navmarsh = "<a-entity nav-mesh normal-material visible=\x22false\x22 gltf-model=\x22#castle_navmesh\x22></a-entity>"+
                             //                 "<a-entity position=\x220 0 0\x22 scale=\x223 3 3\x22 "+skyboxEnvMap+" gltf-model=\x22#castle\x22></a-entity>";
                             joystick = "joystick=\x22useNavmesh: true\x22";
+                            
+                        }
+                        if (useSimpleNavmesh) {
+                            // navmeshScripts = "</script><script src=\x22../main/js/navigation.js\x22></script>";
+                            // "<script src=\x22../main/vendor/aframe/movement-controls.js\x22></script>";
+                            // navmeshScripts = "<script type=\x22module\x22 src=\x22../main/js/navigation.js\x22></script>";
+                            // navmarsh = "<a-entity nav-mesh normal-material visible=\x22false\x22 gltf-model=\x22#castle_navmesh\x22></a-entity>"+
+                            //                 "<a-entity position=\x220 0 0\x22 scale=\x223 3 3\x22 "+skyboxEnvMap+" gltf-model=\x22#castle\x22></a-entity>";
+                            // joystick = "joystick=\x22useNavmesh: true\x22";
                             
                         }
                         if (!showTransport) {
@@ -18784,7 +18808,8 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                         
                         let aScene = "<a-scene "+sceneBackground+" "+physicsInsert+" "+pool_target+" "+pool_launcher+" disable-magicwindow device-orientation-permission-ui=\x22enabled: false\x22 " +
                         // let aScene = "<a-scene "+sceneBackground+" device-orientation-permission-ui " +
-                        webxrFeatures + " shadow=\x22type: pcfsoft\x22 loading-screen=\x22dotsColor: white; backgroundColor: black; enabled: false\x22 "+joystick+" embedded " + aframeRenderSettings + " " + fogSettings + " "+networkedscene+" "+ARSceneArg+" listen-for-vr-mode>";
+                        // webxrFeatures + " shadow=\x22type: pcfsoft\x22 loading-screen=\x22dotsColor: white; backgroundColor: black; enabled: false\x22 "+joystick+" embedded " + aframeRenderSettings + " " + fogSettings + " "+networkedscene+" "+ARSceneArg+" listen-for-vr-mode>";
+                        webxrFeatures + " shadow=\x22type: pcfsoft\x22 loading-screen=\x22dotsColor: white; backgroundColor: black; enabled: false\x22 embedded " + aframeRenderSettings + " " + fogSettings + " "+networkedscene+" "+ARSceneArg+" listen-for-vr-mode>";
                         // webxrFeatures + " shadow=\x22type: pcfsoft\x22 loading-screen=\x22dotsColor: white; backgroundColor: black\x22 joystick embedded " + aframeRenderSettings + " " + 
                         // fogSettings + " "+networkedscene+" "+ARSceneArg+">";
 
@@ -18858,7 +18883,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                         "<script src=\x22../main/vendor/howler/src/howler.core.js\x22></script>"+
                         "<script src=\x22../main/vendor/howler/src/howler.spatial.js\x22></script>"+
                         "<script src=\x22../main/js/hls.min.js\x22></script>" + //v 1.0.6 
-                        
+                        "<script src=\x22../main/js/navigation.js\x22></script>" + //includes navmesh components (simple and not), and extended-wasd-controls
                         // "<script src=\x22../main/ref/aframe/dist/networked-aframe.min.js\x22></script>" + 
                         // "<script src=\x22../main/ref/aframe/dist/aframe-layout-component.min.js\x22></script>" +  
                        

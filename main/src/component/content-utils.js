@@ -155,21 +155,29 @@ AFRAME.registerComponent('initializer', { //adjust for device settings, and call
       window.sceneType = type;
       // InitSceneHooks(type);
       PrimaryAudioInit();
+     
       // sceneEl.setAttribute('render-canvas');
       if (AFRAME.utils.device.isMobile()) {
         let vrButton = document.querySelector(".a-enter-vr-button");
         if (vrButton != null) {
           vrButton.style.display = 'none'; //to hell with cardboard/gearvr/daydream
         }
+        sceneEl.setAttribute('screen-controls', 'enabled', true); 
+        this.ewasd = document.getElementById("player").components["extended-wasd-controls"];
+        if (this.ewasd != null) {
+          this.ewasd.setJoystickInput();
+        }
       }
       let envEl = document.getElementById('enviroEl');
       if (envEl != null) {
         envEl.setAttribute('enviro_mods', 'enabled', true); //wait till env is init'd to put the mods
       }
+     
    });
    if (this.data.usdz != '') {
      ShowARButton(this.data.usdz);
    }
+
   }
 }); //end register
 
@@ -726,7 +734,7 @@ AFRAME.registerComponent('toggle-main-text', {
           this.texture = new THREE.CubeTextureLoader().load(this.textureArray);
           this.texture.format = THREE[data.format];
           this.material.envMap = this.texture;        
-          this.material.envMap.intensity = 1;
+          this.material.envMap.intensity = .5;
           this.material.needsUpdate = true;
         }
         obj.traverse(node => {
@@ -1005,7 +1013,7 @@ AFRAME.registerComponent('toggle-attributions-text', {
 
         this.material = new THREE.MeshStandardMaterial( { color: 'blue' } ); 
         this.material.envMap = this.texture;
-        this.material.envMap.intensity = 1;
+        this.material.envMap.intensity = .5;
         this.material.needsUpdate = true;
         obj.traverse(node => {
           node.material = this.material;
@@ -1082,7 +1090,7 @@ AFRAME.registerComponent('available-scenes-control', {
 
       let uiMaterial = new THREE.MeshStandardMaterial( { color: 'gold' } ); 
       uiMaterial.envMap = this.texture;        
-      uiMaterial.envMap.intensity = 1;
+      uiMaterial.envMap.intensity = .5;
       uiMaterial.needsUpdate = true;
 
       availableScenesIndex = 0;  
@@ -1266,7 +1274,7 @@ AFRAME.registerComponent('toggle-available-scenes', {
         this.texture.format = THREE[data.format];
 
         this.material.envMap = this.texture;        
-        this.material.envMap.intensity = 1;
+        this.material.envMap.intensity = .5;
         this.material.needsUpdate = true;
         // this.material = this.material;
 
@@ -1798,7 +1806,7 @@ AFRAME.registerComponent('model-callout', {
           this.texture = new THREE.CubeTextureLoader().load(this.textureArray);
           // this.texture.format = THREE[data.format];
           this.material.envMap = this.texture;        
-          this.material.envMap.intensity = 1;
+          this.material.envMap.intensity = .5;
           this.material.needsUpdate = true;
           // index = 0;
           avatarObj.traverse(node => {
@@ -3712,7 +3720,7 @@ AFRAME.registerComponent('skybox-env-map-nope', {
       // if (node.material) {
         // console.log("tryna set envmap on " + node.material.name);
         node.material.envMap = envMap;
-        node.material.envMap.intensity = 1;
+        node.material.envMap.intensity = .5;
         node.material.needsUpdate = true;
       }
     });
@@ -3918,7 +3926,7 @@ AFRAME.registerComponent('skybox_dynamic', {
         // if (node.material) {
           console.log("tryna set envmap on " + node.material.name);
             node.material.envMap = envMap;
-            node.material.envMap.intensity = 1;
+            node.material.envMap.intensity = .5;
             node.material.needsUpdate = true;
             }
           });
