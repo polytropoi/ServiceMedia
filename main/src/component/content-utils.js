@@ -163,9 +163,9 @@ AFRAME.registerComponent('initializer', { //adjust for device settings, and call
           vrButton.style.display = 'none'; //to hell with cardboard/gearvr/daydream
         }
         sceneEl.setAttribute('screen-controls', 'enabled', true); 
-        this.ewasd = document.getElementById("player").components["extended-wasd-controls"];
-        if (this.ewasd != null) {
-          this.ewasd.setJoystickInput();
+        let ewasd = document.getElementById("player").components["extended-wasd-controls"];
+        if (ewasd != null) {
+          ewasd.setJoystickInput();
         }
       }
       let envEl = document.getElementById('enviroEl');

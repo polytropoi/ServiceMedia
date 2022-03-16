@@ -162,8 +162,8 @@ AFRAME.registerComponent('screen-controls',
     {
         let d = document.createElement("DIV");
         d.setAttribute("id","joystickEl");
-        const style = "position: absolute; left: 0; right: 0; bottom:10px; margin-left: auto; margin-right: auto; width: 89px; height: 89px; opacity:0.5;z-index:20;";
-        d.setAttribute("style",style)
+        const style = "position: absolute; left: 0; right: 0; bottom:10px; margin-left: auto; margin-right: auto; width: 89px; height: 89px; opacity:0.5;z-index:100;";
+        d.setAttribute("style",style);
         document.querySelector("body").appendChild(d)
         this.component = document.getElementById("player").components["extended-wasd-controls"];
         this.joystick1 = new Joystick("joystickEl", 64, 8);
@@ -330,8 +330,7 @@ AFRAME.registerComponent('extended-wasd-controls', {
 		}
 		else
 		{
-			if (this.data.inputType == "keyboard")
-			{
+			if (this.data.inputType == "keyboard") {
 				// need to reset rotatePercent values
 				//   when querying which keys are currently pressed
 				this.rotatePercent.set(0,0);
@@ -349,9 +348,8 @@ AFRAME.registerComponent('extended-wasd-controls', {
 				// center on horizon
 				if (this.isKeyPressed(this.data.lookUpKey) && this.isKeyPressed(this.data.lookDownKey))
 					this.lookAngle *= 0.90;
-			}
-			else // other, e.g. "joystick"
-			{
+			} else { // other, e.g. "joystick"
+			
 				// assume this.rotatePercent values have been set/reset elsewhere (outside of this function)
 			}
 
