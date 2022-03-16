@@ -130,6 +130,18 @@ function AudioAnalyzer() {
   window.requestAnimationFrame(AudioAnalyzer);   
 };
 
+// function iOS() {
+//   return [
+//     'iPad Simulator',
+//     'iPhone Simulator',
+//     'iPod Simulator',
+//     'iPad',
+//     'iPhone',
+//     'iPod'
+//   ].includes(navigator.platform)
+//   // iPad on iOS 13 detection
+//   || (navigator.userAgent.includes("Mac") && "ontouchend" in document)
+// }
 
 
 AFRAME.registerComponent('initializer', { //adjust for device settings, and callbackn to connect.js
@@ -143,6 +155,7 @@ AFRAME.registerComponent('initializer', { //adjust for device settings, and call
     var sceneEl = document.querySelector('a-scene');
     let type = this.data.sceneType;
     console.log("scene TYpe is " + type);
+    // let iOS = iOS();
     // if (!AFRAME.utils.device.isMobile() && !AFRAME.utils.device.checkHeadsetConnected()) {
     //   if (!AFRAME.utils.device.isMobile()) {
     //   sceneEl.setAttribute("vr-mode-ui", "enabled", "true");
@@ -150,14 +163,15 @@ AFRAME.registerComponent('initializer', { //adjust for device settings, and call
     // if (iOS) {
     //   document.querySelector('.a-enter-vr').style.display = 'none';
     // }
-    sceneEl.addEventListener('loaded', function () { //for sure?
+    // sceneEl.addEventListener('loaded', function () { //for sure?
+
       console.log("AFRAME Init");
       window.sceneType = type;
       // InitSceneHooks(type);
       PrimaryAudioInit();
-     
+      
       // sceneEl.setAttribute('render-canvas');
-      if (AFRAME.utils.device.isMobile()) {
+      if (AFRAME.utils.device.isMobile() || this.detectIOS()) {
         let vrButton = document.querySelector(".a-enter-vr-button");
         if (vrButton != null) {
           vrButton.style.display = 'none'; //to hell with cardboard/gearvr/daydream
@@ -173,11 +187,23 @@ AFRAME.registerComponent('initializer', { //adjust for device settings, and call
         envEl.setAttribute('enviro_mods', 'enabled', true); //wait till env is init'd to put the mods
       }
      
-   });
+  //  });
    if (this.data.usdz != '') {
      ShowARButton(this.data.usdz);
    }
 
+  },
+  detectIOS: function() {
+    return [
+      'iPad Simulator',
+      'iPhone Simulator',
+      'iPod Simulator',
+      'iPad',
+      'iPhone',
+      'iPod'
+    ].includes(navigator.platform)
+    // iPad on iOS 13 detection
+    || (navigator.userAgent.includes("Mac") && "ontouchend" in document);
   }
 }); //end register
 
