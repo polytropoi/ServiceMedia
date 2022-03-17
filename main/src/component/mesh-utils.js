@@ -972,7 +972,7 @@ AFRAME.registerComponent('local_marker', {
           storedVars = locItem;
         }
         localStorage.setItem(that.phID, JSON.stringify(storedVars));
-        console.log("phID: " + that.phID + JSON.stringify(localStorage.getItem(that.phID)));
+        // console.log("phID: " + that.phID + JSON.stringify(localStorage.getItem(that.phID)));
         // AddLocalMarkers();
         // console.log('get model ' + this.el.getAttribute('gltf-model'));
         if (that.isSelected && that.selectedAxis != null && !that.selectedAxis.includes('handle')) {

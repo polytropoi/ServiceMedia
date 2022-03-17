@@ -18806,7 +18806,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                         //     surfaceScatterScript = 
                         // }
                         
-                        let aScene = "<a-scene "+sceneBackground+" "+physicsInsert+" "+pool_target+" "+pool_launcher+" screen-controls disable-magicwindow device-orientation-permission-ui=\x22enabled: false\x22 " +
+                        let aScene = "<a-scene "+sceneBackground+" "+physicsInsert+" "+pool_target+" "+pool_launcher+" screen-controls disable-magicwindow vr-mode-ui device-orientation-permission-ui=\x22enabled: false\x22 " +
                         // let aScene = "<a-scene "+sceneBackground+" device-orientation-permission-ui " +
                         // webxrFeatures + " shadow=\x22type: pcfsoft\x22 loading-screen=\x22dotsColor: white; backgroundColor: black; enabled: false\x22 "+joystick+" embedded " + aframeRenderSettings + " " + fogSettings + " "+networkedscene+" "+ARSceneArg+" listen-for-vr-mode>";
                         webxrFeatures + " shadow=\x22type: pcfsoft\x22 loading-screen=\x22dotsColor: white; backgroundColor: black; enabled: false\x22 embedded " + aframeRenderSettings + " " + fogSettings + " "+networkedscene+" "+ARSceneArg+" listen-for-vr-mode>";
@@ -19145,7 +19145,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                         //     "</div>" +
                         // "</div>" +
 
-                        "<div class=\x22JoystickRegionUI\x22 style=\x22z-index: 100\x22>" +
+                        "<div id=\x22joystickContainer\x22 class=\x22JoystickRegionUI\x22 style=\x22z-index: 100\x22>" +
                         "<div class=\x22JoystickButtonUI\x22 style=\x22width: 128px; opacity:0.50;\x22>" +
                             "<img src=\x22/css/joystick-base.png\x22/>" +
                             "<div id=\x22joystickEl\x22 style=\x22position: absolute; left:32px; top:32px;\x22>" +

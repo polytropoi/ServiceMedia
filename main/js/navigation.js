@@ -174,7 +174,10 @@ AFRAME.registerComponent('screen-controls',
     {
         let isIOS = DetectiOS();
         let isMobile = AFRAME.utils.device.isMobile();
-        console.log("tryna init screen controls with"  + isMobile + " isMobile and is ios " + isIOS);
+        // let headsetConnected = AFRAME.utils.device.checkHeadsetConnected();
+        // let isMacOS = (navigator.appVersion.indexOf('Mac') != -1);
+        // console.log("tryna init screen controls with isMobile "  + isMobile + " and isMacOS " + isMacOS + " headsetConnected " + headsetConnected);
+
         // let d = document.createElement("DIV");
         // d.setAttribute("id","joystickEl");
         // const style = "position: absolute; left: 0; right: 0; bottom:10px; margin-left: auto; margin-right: auto; width: 89px; height: 89px; opacity:0.5;z-index:100;";
@@ -187,8 +190,24 @@ AFRAME.registerComponent('screen-controls',
             this.component.setJoystickInput();
             console.log("controls initialized : JOYSTICK" );
         } else {
+            let js = document.getElementById('joystickContainer');
+            if (js != null) {
+                js.style.display = 'none';
+            }
             console.log("controls initialized : KEYBOID" );
+            
         }
+        // if (!headsetConnected || isMacOS) {
+        //     let vrButton = document.querySelector(".a-enter-vr");
+        //     if (vrButton != null) {
+        //         console.log("found VRBUTTON");
+        //       vrButton.style.display = 'none'; //to hell with cardboard/gearvr/daydream
+        //       vrButton.style.visible = 'false';
+        //     } else {
+        //         console.log("din't found VRBUTTON");
+        //     }
+        // }
+        
         // this.joystick1 = new Joystick("joystickEl", 64, 8);
        
         // this.component.setJoystickInput();
