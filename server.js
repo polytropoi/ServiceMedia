@@ -18815,7 +18815,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                         //     surfaceScatterScript = 
                         // }
                         
-                        let aScene = "<a-scene "+sceneBackground+" "+physicsInsert+" "+pool_target+" "+pool_launcher+" ar-cursor raycaster=\x22objects: .activeObjexRay\x22 screen-controls disable-magicwindow vr-mode-ui keyboard-shortcuts=\x22enterVR: false\x22 device-orientation-permission-ui=\x22enabled: false\x22 " +
+                        let aScene = "<a-scene "+sceneBackground+" "+physicsInsert+" "+pool_target+" "+pool_launcher+" ar-cursor raycaster=\x22objects: .activeObjexRay\x22 ar-hit-test=\x22target:.activeObjexRay; type:footprint; footprintDepth:0.2;\x22 screen-controls disable-magicwindow vr-mode-ui keyboard-shortcuts=\x22enterVR: false\x22 device-orientation-permission-ui=\x22enabled: false\x22 " +
                         // let aScene = "<a-scene "+sceneBackground+" device-orientation-permission-ui " +
                         // webxrFeatures + " shadow=\x22type: pcfsoft\x22 loading-screen=\x22dotsColor: white; backgroundColor: black; enabled: false\x22 "+joystick+" embedded " + aframeRenderSettings + " " + fogSettings + " "+networkedscene+" "+ARSceneArg+" listen-for-vr-mode>";
                         webxrFeatures + " shadow=\x22type: pcfsoft\x22 loading-screen=\x22dotsColor: white; backgroundColor: black; enabled: false\x22 embedded " + aframeRenderSettings + " " + fogSettings + " "+networkedscene+" "+ARSceneArg+" listen-for-vr-mode>";
