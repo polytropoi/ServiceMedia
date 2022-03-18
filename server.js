@@ -15527,7 +15527,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                 "<div id=\x22button_left_4\x22 class=\x22button_left_4\x22 onclick=\x22RotateCamera(0)\x22 class=\x22tooltip\x22><i class=\x22fas fa-sync-alt fa-2x\x22></i><span class=\x22tooltiptext\x22></span></div>"+
                                 "<div id=\x22loc_button\x22 class=\x22dialog_button\x22 style=\x22float: left; margin: 10px 10px; width: 50px; height: 50px\x22 onclick=\x22ShowHideGeoPanel()\x22><i class=\x22fas fa-globe fa-2x\x22></i></div>";
                                 // "<div class=\x22location_buttons_left\x22 onclick=\x22ShareLocation()\x22 class=\x22tooltip\x22><i class=\x22fas fa-map-marked-alt fa-2x\x22></i><span class=\x22tooltiptext\x22>Share Location</span></div>";
-                                mapStyleSelector = "<div id=\x22button_left_5\x22 class=\x22button_left_5\x22>" +
+                                mapStyleSelector = "<div id=\x22button_left_5\x22 class=\x22button_left_5\x22>" +   
                                     "<select id=\x22mapStyle\x22>" +
                                         "<option value=\x22\x22 selected>Select Map Style:</option>" +
                                             "<option>Satellite</option>" +
@@ -15559,7 +15559,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                 } else {
                                     if (useSimpleNavmesh) {
                                         //simple navmesh can use 
-                                        wasd = "extended-wasd-controls=\x22fly: false; moveSpeed: 5; inputType: keyboard\x22 simple-navmesh-constraint=\x22navmesh:#navmesh-el;fall:0.5;height:0;\x22";
+                                        wasd = "extended-wasd-controls=\x22fly: false; moveSpeed: 5; inputType: keyboard\x22 simple-navmesh-constraint=\x22navmesh:#navmesh-el;fall:10; height:.1;\x22";
                                        
                                     } else {
                                         movementControls = "movement-controls=\x22constrainToNavMesh: true; control: keyboard, gamepad, touch; fly: false;\x22"; 
