@@ -15541,7 +15541,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
 
                                             
                             } else { //"sceneWebType == "Default or AFrame"
-                                joystickContainer = "<div id=\x22joystickContainer\x22 class=\x22JoystickRegionUI\x22 style=\x22z-index: 100; visibility: hidden\x22>" + 
+                                joystickContainer = "<div id=\x22joystickContainer\x22 class=\x22JoystickRegionUI\x22 style=\x22z-index: 100; visibility: hidden\x22>" + //initialized in navigation / content-utils
                                 "<div class=\x22JoystickButtonUI\x22 style=\x22width: 128px; opacity:0.50;\x22>" +
                                     "<img src=\x22/css/joystick-base.png\x22/>" +
                                     "<div id=\x22joystickEl\x22 style=\x22position: absolute; left:32px; top:32px;\x22>" +
@@ -15649,7 +15649,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                 // camera = "<a-entity id=\x22cameraRig\x22 "+movementControls+" initializer position=\x22"+playerPosition+"\x22 material=\x22color: green; wireframe: true;\x22"+
                                 // " geometry=\x22primitive: cylinder; height: 2; radius: 0.8;\x22 ammo-body=\x22type: kinematic;\x22 ammo-shape=\x22type: cylinder\x22>"+
                                 // camera = "<a-entity id=\x22cameraRig\x22 "+movementControls+" initializer position=\x22"+playerPosition+"\x22 material=\x22color: green; wireframe: true;\x22 geometry=\x22primitive: cylinder; height: 2; radius: 0.8;\x22 ammo-body=\x22type: kinematic;\x22 ammo-shape=\x22type: cylinder\x22>"+
-                                    "<a-entity hide-in-ar-mode id=\x22mouseCursor\x22 cursor=\x22rayOrigin: mouse\x22 raycaster=\x22objects: .activeObjexRay\x22></a-entity>"+
+                                    "<a-entity hide-in-ar-mode id=\x22mouseCursor\x22 cursor=\x22rayOrigin: mouse\x22 ar-cursor raycaster=\x22objects: .activeObjexRay\x22></a-entity>"+
                                     // "<a-entity id=\x22player\x22 get_pos_rot networked=\x22template:#avatar-template;attachTemplateToLocal:false;\x22 "+spawnInCircle+" camera "+wasd+" look-controls=\x22hmdEnabled: false\x22 position=\x220 1.6 0\x22>" +     
                                     // "<a-entity id=\x22viewportPlaceholder\x22 position=\x220 0 -1\x22></entity>"+   
                                     "<a-entity id=\x22player\x22 look-controls get_pos_rot camera "+wasd+" "+ physicsMod +" position=\x22"+playerPosition+"\x22>"+
