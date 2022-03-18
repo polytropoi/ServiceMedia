@@ -185,6 +185,8 @@ AFRAME.registerComponent('screen-controls',
         // document.querySelector("body").appendChild(d)
         this.component = null;
         if (isMobile || isIOS) {
+            let jsContainer = document.getElementById('joystickContainer');
+            jsContainer.style.visibility = 'visible';
             this.component = document.getElementById("player").components["extended-wasd-controls"];
             this.joystick1 = new Joystick("joystickEl", 64, 8);
             this.component.setJoystickInput();

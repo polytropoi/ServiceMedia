@@ -14847,6 +14847,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
     let modelData = "";
     let objectData = "";
     let inventoryData = "";
+    let joystickContainer  = "";
     let arImageTargets = [];
     db.scenes.findOne({"short_id": reqstring}, function (err, sceneData) { 
             if (err || !sceneData) {
@@ -15236,15 +15237,15 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                         // youtubeContent = "<iframe width=\x22240\x22 height=\x22180\x22 src=\x22https://www.youtube.com/embed/"+sceneResponse.sceneYouTubeIDs[i]+
                                         // // "\x22 frameborder=\x2210\x22 allow=\x22accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture\x22 allowfullscreen></iframe>";
                                         // "\x22 frameborder=\x2210\x22 allow=\x22autoplay; picture-in-picture\x22 allowfullscreen></iframe>";
-                                        if (youtubes.length > 0) {
-                                            containers = containers + "<div class=\x22youtube\x22 id=\x22"+sceneResponse.sceneLocations[i].eventData+"\x22 data-location-id=\x22"+sceneResponse.sceneLocations[i].id+"\x22 data-attribute=\x22"+youtubes[0].toString()+"\x22></div>"; 
-                                            // youtubes.splice(0, 1);
-                                        }
+                                    if (youtubes.length > 0) {
+                                        containers = containers + "<div class=\x22youtube\x22 id=\x22"+sceneResponse.sceneLocations[i].eventData+"\x22 data-location-id=\x22"+sceneResponse.sceneLocations[i].id+"\x22 data-attribute=\x22"+youtubes[0].toString()+"\x22></div>"; 
+                                        // youtubes.splice(0, 1);
+                                    }
                                         // }
-                                    // }
-                                    // if (sceneResponse.sceneLocations[i].eventData != null && sceneResponse.sceneLocations[i].eventData.length > 4) {
-                                    //    console.log("tryna set youtube ID" + sceneResponse.sceneLocations[i].eventData );
-                                    // }
+                                        // }
+                                        // if (sceneResponse.sceneLocations[i].eventData != null && sceneResponse.sceneLocations[i].eventData.length > 4) {
+                                        //    console.log("tryna set youtube ID" + sceneResponse.sceneLocations[i].eventData );
+                                        // }
                                 }
                                 if (sceneResponse.sceneLocations[i].markerType == "car") {
                                     carLocation = sceneResponse.sceneLocations[i].x + " " + sceneResponse.sceneLocations[i].y + " " + zFix;
@@ -15540,6 +15541,14 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
 
                                             
                             } else { //"sceneWebType == "Default or AFrame"
+                                joystickContainer = "<div id=\x22joystickContainer\x22 class=\x22JoystickRegionUI\x22 style=\x22z-index: 100; visibility: hidden\x22>" + 
+                                "<div class=\x22JoystickButtonUI\x22 style=\x22width: 128px; opacity:0.50;\x22>" +
+                                    "<img src=\x22/css/joystick-base.png\x22/>" +
+                                    "<div id=\x22joystickEl\x22 style=\x22position: absolute; left:32px; top:32px;\x22>" +
+                                    "<img src=\x22/css/joystick-red.png\x22/>" +
+                                    "</div>" +
+                                    "</div>" +
+                                "</div>";
                                 let movementControls = ""; //aframe extras, can constrain to navmesh 
                                 wasd = "extended-wasd-controls=\x22flyEnabled: false; moveSpeed: 5; inputType: keyboard\x22";
                                 // joystickScript = "<script src=\x22../main/vendor/aframe/joystick.js\x22></script>";
@@ -18711,7 +18720,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                         "<link href=\x22/css/webxr.css\x22 rel=\x22stylesheet\x22 type=\x22text/css\x22>" + 
                         aframeScriptVersion + 
                         extraScripts + 
-                        "<script src=\x22https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js\x22></script>"+
+                        // "<script src=\x22https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js\x22></script>"+
                         "<script src=\x22https://cdnjs.cloudflare.com/ajax/libs/stats.js/16/Stats.min.js\x22></script>"+
 
 
@@ -18817,13 +18826,14 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                         if (sceneResponse.sceneWebType == 'Mapbox') {
                             aScene = "<a-scene loading-screen=\x22dotsColor: white; backgroundColor: black\x22 vr-mode-ui=\x22enabled: false\x22 keyboard-shortcuts=\x22enterVR: false\x22 disable-magicwindow device-orientation-permission-ui=\x22enabled: false\x22>";
                             mainDiv = "<div id=\x22map\x22 class=\x22map\x22 style=\x22width:100%; height:100%\x22>"; //closed at end
+                            joystickContainer = "";
                   
                         }
                         if (sceneResponse.sceneWebType == 'AR Location Tracking') {
                             console.log("AR Location Tracking mdoe...");
                             aScene = "<a-scene gps-position webxr=\x22referenceSpaceType: unbounded; requiredFeatures: unbounded;\x22 keyboard-shortcuts=\x22enterVR: false\x22 loading-screen=\x22dotsColor: white; backgroundColor: black\x22 vr-mode-ui=\x22enabled: false\x22 disable-magicwindow device-orientation-permission-ui=\x22enabled: false\x22>";
                             // <a-scene gps-position webxr="referenceSpaceType: unbounded; requiredFeatures: unbounded;"></a-scene>
-                           
+                            joystickContainer = "";
                   
                         } //else { //default AFRAME with trimmings
                         // let token = jwt.sign({
@@ -19144,15 +19154,8 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                         //     "</div>" +
                         //     "</div>" +
                         // "</div>" +
-
-                        "<div id=\x22joystickContainer\x22 class=\x22JoystickRegionUI\x22 style=\x22z-index: 100\x22>" +
-                        "<div class=\x22JoystickButtonUI\x22 style=\x22width: 128px; opacity:0.50;\x22>" +
-                            "<img src=\x22/css/joystick-base.png\x22/>" +
-                            "<div id=\x22joystickEl\x22 style=\x22position: absolute; left:32px; top:32px;\x22>" +
-                            "<img src=\x22/css/joystick-red.png\x22/>" +
-                            "</div>" +
-                            "</div>" +
-                        "</div>" +
+                        joystickContainer +
+                        
 
                         screenOverlay + //socket picture
                         canvasOverlay + //drop down side panel

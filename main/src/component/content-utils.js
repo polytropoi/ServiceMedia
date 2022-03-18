@@ -180,12 +180,16 @@ AFRAME.registerComponent('initializer', { //adjust for device settings, and call
       window.sceneType = type;
       // InitSceneHooks(type);
       PrimaryAudioInit();
-      
+      let js = document.getElementById('joystickContainer');
       // sceneEl.setAttribute('render-canvas');
       if (window.mobileAndTabletCheck() || isMobile || isIOS) {
         let vrButton = document.querySelector(".a-enter-vr-button");
         if (vrButton != null) {
           vrButton.style.display = 'none'; //to hell with cardboard/gearvr/daydream
+        }
+        if (js != null) {
+          console.log("hiding joystick");
+          js.style.visibility = 'visible'; //light up joystick if mobile
         }
         // sceneEl.setAttribute('screen-controls', 'enabled', true); 
         let ewasd = document.getElementById("player").components["extended-wasd-controls"];
@@ -193,9 +197,9 @@ AFRAME.registerComponent('initializer', { //adjust for device settings, and call
           ewasd.setJoystickInput(); // might do this in screen-controls component too, but np
         }
       } else {
-        let js = document.getElementById('joystickContainer');
+        // let js = document.getElementById('joystickContainer');
         if (js != null) {
-          console.log("hiding joystick");
+          console.log("hiding joystick"); //really hide if not mobile
           js.style.display = 'none';
         }
       }
