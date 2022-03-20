@@ -624,7 +624,11 @@ function AddLocalMarkers() {// new or modded markers not saved to cloud
                   locationMods.push(theItemObject);
                
                }
-
+               let nextbuttonEl = document.getElementById('nextButton');
+               let prevbuttonEl = document.getElementById('previousButton');
+               nextbuttonEl.style.visibility = "visible";
+               prevbuttonEl.style.visibility = "visible";
+               
                
             } else if (theKey.toString().includes("~cloudmarker~")) { //a cloudmarker, if modded by user, becomes a defacto "local" marker, unless/until admin saves to cloud
                let keySplit = theKey.split("~"); //room is zero, timestamp is 2
@@ -637,6 +641,10 @@ function AddLocalMarkers() {// new or modded markers not saved to cloud
                //    return true;
                // }}
                locationMods.push(cItem);
+               let nextbuttonEl = document.getElementById('nextButton');
+               let prevbuttonEl = document.getElementById('previousButton');
+               nextbuttonEl.style.visibility = "visible";
+               prevbuttonEl.style.visibility = "visible";
             } else if (theKey.toString().includes('color')) {
                // console.log("gots color " + theKey + " item " + theItem);
             }
@@ -819,6 +827,13 @@ if (sceneEl != null) {
                      this.data.youtubePosition.z = this.data.jsonData[i].z;
                      // console.log("YOTUBE POSOTION: " +JSON.stringify(this.data.youtubePosition));
                   }
+                  if (this.data.jsonData[i].markerType.toLowerCase().includes("poi") || this.data.jsonData[i].markerType.toLowerCase().includes("placeholder")) {
+                     let nextbuttonEl = document.getElementById('nextButton');
+                     let prevbuttonEl = document.getElementById('previousButton');
+                     nextbuttonEl.style.visibility = "visible";
+                     prevbuttonEl.style.visibility = "visible";
+
+                  }
                }
             }
             // sceneLocations.locations.push(this.data.jsonData);
@@ -905,7 +920,7 @@ $(document).on("click",".picbutton",function(){
    let picbuttonID = this.id;
    console.log("picbutton clicked from " + picbuttonID);
    // $(".screen-overlay").backstretch("Destroy", true);
-   $(".screen-overlay").css('visibility','visible');
+   $(".screen-overlay").css('visibility',"visible");
    $(".screen-overlay").backstretch(pics, {duration: 1000, fade: 250});
 });
 
@@ -1557,7 +1572,7 @@ function InitSceneHooks(type) {
 
 function ShowARButton (usdzURL) { //for iOS only
 
-   // $(".enter-ar").css('visibility','visible');
+   // $(".enter-ar").css('visibility',"visible");
    // "<div id=\x22arButton\x22 class=\x22ar-button-div\x22><button class=\x22a-enter-ar-button\x22></button></div>";
     //should only be true on recent ios devices
     console.log("tryna ShowARButton for " + usdzURL);

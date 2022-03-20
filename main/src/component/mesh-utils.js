@@ -1295,7 +1295,7 @@ AFRAME.registerComponent('cloud_marker', {
       that.isSelected = true;
       // that.hitPosition = evt.detail.intersection.point;
 
-      // console.log("tryna mousedouwn" + this.mouseDownPos);
+      console.log("tryna mousedouwn" + this.mouseDownPos);
       let name = evt.detail.intersection.object.name;
       // console.log(name);
       // if (name == "x_handle") {

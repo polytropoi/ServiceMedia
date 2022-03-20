@@ -1,3 +1,5 @@
+if (location.hostname !== 'localhost' && window.location.protocol === 'http:') window.location.protocol = 'https:';
+
 function getScenes() {
     console.log("tryna getScenes()");
 	var resultElement = document.getElementById('scenesInner');

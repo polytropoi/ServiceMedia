@@ -46,6 +46,8 @@
 //     this.hasLoadedNavMesh = true;
 //   }
 // });
+if (location.hostname !== 'localhost' && window.location.protocol === 'http:') window.location.protocol = 'https:';
+
 function DetectiOS() {
   return [
     'iPad Simulator',

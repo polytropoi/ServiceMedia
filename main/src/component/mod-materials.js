@@ -1304,7 +1304,7 @@ AFRAME.registerComponent('mod-materials', {
                   triggerAudioController.components.trigger_audio_control.playAudio();
                 }
               });
-              playButton.addEventListener('mousedown', function () {
+              playButton.addEventListener('click', function () {
                 console.log("playButton!");
               });
 

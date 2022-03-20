@@ -399,10 +399,12 @@ AFRAME.registerComponent('primary_audio_player', {  //setup and controls for the
                     intensity: 1.0,
                     color: 'yellow'
                 }, true);
+
                 el.addEventListener('beat', function (e) {
                     console.log("beat volume " + volume);
                 }, false);
-                el.addEventListener('mousedown', function () {  
+
+                el.addEventListener('click', function () {  
 
                     if (!primaryAudioHowl.playing()) {
                         el.setAttribute('light', {
@@ -639,7 +641,7 @@ AFRAME.registerComponent('primary_audio_player', {  //setup and controls for the
                 color: 'yellow'
             }, true);
         
-            el.addEventListener('mousedown', function () {
+            el.addEventListener('click', function () {
                 PlayButton();
             });
             

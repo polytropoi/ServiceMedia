@@ -522,7 +522,7 @@ AFRAME.registerComponent('basic-link', {
     // href: {default: ''},
   },
   init: function() {
-    this.el.addEventListener('mousedown', (e)=> { //TODO turn off if parent is freaking invisible!!!!
+    this.el.addEventListener('click', (e)=> { //TODO turn off if parent is freaking invisible!!!!
       // e.stopPropagation();
       // e.preventDefault();
       console.log("basic link click for href " + this.data.href);
@@ -568,7 +568,7 @@ AFRAME.registerComponent('basic-scene-link', {
     // href: {default: ''},
   },
   init: function() {
-    this.el.addEventListener('mousedown', (e)=> { // turn off if parent is freaking invisible!!!!
+    this.el.addEventListener('click', (e)=> { // turn off if parent is freaking invisible!!!!
       console.log("basic scene link click for scene href " + this.data.href);
       if (this.data.href != undefined && this.data.href.length > 5) {
       //  window.location = this.data.href;
@@ -724,7 +724,7 @@ AFRAME.registerComponent('main-text-control', {
                 });
               });  
 
-                nextButton.addEventListener('mousedown', function () {
+                nextButton.addEventListener('click', function () {
                     if (textArray.length > index + 1) {
                         index++;
                     } else {
@@ -743,7 +743,7 @@ AFRAME.registerComponent('main-text-control', {
                     });
                 });
 
-                previousButton.addEventListener('mousedown', function () {
+                previousButton.addEventListener('click', function () {
                   if (index > 0) {
                       index--;
                   } else {
@@ -807,7 +807,7 @@ AFRAME.registerComponent('toggle-main-text', {
         //   node.material = material;
         // });
 
-        this.el.addEventListener('mousedown', function () {
+        this.el.addEventListener('click', function () {
          
 
           if (!document.querySelector("#mainTextPanel").getAttribute('visible')){
@@ -941,7 +941,7 @@ AFRAME.registerComponent('attributions-text-control', {
               });
             });  
           }
-          previousButton.addEventListener('mousedown', function () {
+          previousButton.addEventListener('click', function () {
             console.log("tryna show previous from index" + attributionsIndex);
             if (attributionsIndex > 0) {
                   attributionsIndex--;
@@ -991,7 +991,7 @@ AFRAME.registerComponent('attributions-text-control', {
                 value: "Mods: " + tArray[attributionsIndex].modifications
               });
           });          
-          nextButton.addEventListener('mousedown', function () {
+          nextButton.addEventListener('click', function () {
             console.log("tryna show next from index" + attributionsIndex);
             if (tArray.length > attributionsIndex + 1) {
                   attributionsIndex++;
@@ -1081,7 +1081,7 @@ AFRAME.registerComponent('toggle-attributions-text', {
 
       let sourceEl = document.getElementById("attributionsSourceText");
       let authorEl = document.getElementById("attributionsAuthorText");
-      this.el.addEventListener('mousedown', function () {
+      this.el.addEventListener('click', function () {
         if (!document.querySelector("#attributionsTextPanel").getAttribute('visible')){
           document.querySelector("#attributionsTextPanel").setAttribute('visible', true);
           if (attributionsArray[attributionsIndex] != undefined) {
@@ -1230,7 +1230,7 @@ AFRAME.registerComponent('available-scenes-control', {
           availableScenePicEl.setAttribute('basic-scene-link', {href: sceneHref});   
         });
 
-      nextButton.addEventListener('mousedown', function () {
+      nextButton.addEventListener('click', function () {
 
         console.log("tryna show next from index" + availableScenesIndex);
         if (scenesArray.length > availableScenesIndex + 1) {
@@ -1264,7 +1264,7 @@ AFRAME.registerComponent('available-scenes-control', {
           node.material = uiMaterial;
           });
         });
-      previousButton.addEventListener('mousedown', function () {
+      previousButton.addEventListener('click', function () {
         console.log("tryna show next from index" + availableScenesIndex);
         if (availableScenesIndex > 0) {
           availableScenesIndex--;
@@ -1345,7 +1345,7 @@ AFRAME.registerComponent('toggle-available-scenes', {
 
       // this.el.setAttribute("skybox-env-map");
       let scenesPanelEl = document.getElementById("availableScenesPanel");
-      this.el.addEventListener('mousedown', function () {
+      this.el.addEventListener('click', function () {
         console.log("scenePanel visible " + scenesPanelEl.getAttribute('visible'));
         if (!scenesPanelEl.getAttribute('visible')){
           
@@ -1911,7 +1911,7 @@ AFRAME.registerComponent('model-callout', {
           // console.log("tryna mouseexit");
           calloutEntity.setAttribute('visible', false);
       });
-      this.el.addEventListener('mousedown', function () {
+      this.el.addEventListener('click', function () {
         console.log("clicked avatar ID " + this.id);
         AvatarClicked(this.id);
       })
@@ -2397,7 +2397,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
       
     });
 
-    this.el.addEventListener('mousedown', function (e) {
+    this.el.addEventListener('click', function (e) {
       console.log("mousedown on object type: " + that.data.objectData.objtype + " action " + that.pickupAction);
       this.dialogEl = document.getElementById('mod_dialog');
       
@@ -2638,7 +2638,7 @@ AFRAME.registerComponent('mod_dialog', { //only one of these
         node.visible = false;
       }
     });
-    this.el.addEventListener('mousedown', (evt) => {
+    this.el.addEventListener('click', (evt) => {
       let name = evt.detail.intersection.object.name;
       // console.log(name);
       if (name.includes('yesbutton')) {
@@ -3499,7 +3499,7 @@ AFRAME.registerComponent('mod_model', {
           primaryAudio.emit('targetattach', {targetEntity: this.el}, true);
           primaryAudioHowl.pos(this.el.object3D.position.x, this.el.object3D.position.y, this.el.object3D.position.z);
           
-          this.el.addEventListener('mousedown', function () {
+          this.el.addEventListener('click', function () {
 
             this.bubble = sceneEl.querySelector('.bubble');
             if (this.bubble) {
@@ -4226,7 +4226,7 @@ AFRAME.registerComponent('picture_groups_control', {
         );
       });
         
-        nextButton.addEventListener('mousedown', function () {
+        nextButton.addEventListener('click', function () {
           // let picGroupArray = this.data.jsonData;
           let picGroup = picGroupArray[0];
           console.log("tryna show next from index" + picGroupIndex + " of " + picGroup.images.length);
@@ -4246,7 +4246,7 @@ AFRAME.registerComponent('picture_groups_control', {
             node.material = material;
           });
         });
-        previousButton.addEventListener('mousedown', function () {
+        previousButton.addEventListener('click', function () {
           // let picGroupArray = this.data.jsonData;
           let picGroup = picGroupArray[0];
           console.log("tryna show next from index" + picGroupIndex + " of " + picGroup.images.length);
@@ -4295,7 +4295,7 @@ AFRAME.registerComponent('toggle-picture-group', {
   },
     init: function () {
     
-      this.el.addEventListener('mousedown', function () {
+      this.el.addEventListener('click', function () {
         console.log("tryna toggle pictureGroupPanel " + document.querySelector("#pictureGroupPanel").getAttribute('visible'));
         if (!document.querySelector("#pictureGroupPanel").getAttribute('visible')){
           document.querySelector("#pictureGroupPanel").setAttribute('visible', true);
