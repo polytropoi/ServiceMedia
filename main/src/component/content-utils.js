@@ -3121,7 +3121,7 @@ AFRAME.registerComponent('mod_model', {
               // }
             
             } else if((this.meshChildren[i].name.toString().includes("hvid") || this.meshChildren[i].name.toString() == "hvid") && hvids.length > 0) {
-              console.log("video data " + JSON.stringify(hvids[hvidsIndex]));
+              // console.log("video data " + JSON.stringify(hvids[hvidsIndex]));
               this.mesh = this.meshChildren[i]; //mesh, not object3d type
               
               this.child = this.el.object3D.getObjectByName(this.meshChildren[i].name, true); //object3d
@@ -3142,7 +3142,7 @@ AFRAME.registerComponent('mod_model', {
                   hvidsIndex++;
               // }
             }  else if((this.meshChildren[i].name.toString().includes("svid") || this.meshChildren[i].name.toString() == "svid") && svids.length > 0) {
-                console.log("video data " + JSON.stringify(svids[svidsIndex]));
+                // console.log("video data " + JSON.stringify(svids[svidsIndex]));
                 this.mesh = this.meshChildren[i]; //mesh, not object3d type
                 
                 this.child = this.el.object3D.getObjectByName(this.meshChildren[i].name, true); //object3d

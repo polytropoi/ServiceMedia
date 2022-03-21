@@ -106,7 +106,7 @@ $(function() {
    let theSettingsData = settingsEl.getAttribute('data-settings');
             // console.log("RAW LOCATIOND DATA " + theData);
    settings = JSON.parse(atob(theSettingsData)); 
-   console.log("settingsData " + JSON.stringify(settings));
+   // console.log("settingsData " + JSON.stringify(settings));
    // if (settings.sceneTimedEvents != undefined && settings.sceneTimedEvents != null) {
    //    timeKeysData = settings.sceneTimedEvents;
    //    console.log('cloud timekeysdata' + JSON.stringify(timeKeysData));
@@ -124,7 +124,7 @@ $(function() {
    // }
    if (localStorage.getItem(room + "_timeKeys") != null) { //use local ve3rsion if saved
       timeKeysData = JSON.parse(localStorage.getItem(room + "_timeKeys"));
-      console.log('local timeKeysData' + JSON.stringify(timeKeysData));
+      // console.log('local timeKeysData' + JSON.stringify(timeKeysData));
       timedEventsListenerMode = timeKeysData.listenTo;
    } else if (settings.sceneTimedEvents != undefined && settings.sceneTimedEvents != null) {
       timeKeysData = settings.sceneTimedEvents;
