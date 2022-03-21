@@ -616,7 +616,7 @@ AFRAME.registerComponent('mod-materials', {
           mouseOverObject = null;
           // }
       });
-      this.el.addEventListener('click', function (event) {
+      this.el.addEventListener('click', (event) =>  {
         
         this.video = video;
         
