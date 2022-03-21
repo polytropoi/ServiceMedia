@@ -575,189 +575,193 @@ AFRAME.registerComponent('mod-materials', {
               });
               this.player_status_update("loading");
               this.video.addEventListener( 'canplay', this.player_status_update("ready"), false); //next step when kinda loaded
-          let thiz = this; //? localscope, but not updated like this
-          thiz.duration = this.duration;
+          // let thiz = this; //? localscope, but not updated like this
+          // thiz.duration = this.duration;
           this.raycaster = null;
           this.intersection = null;
           this.hitpoint = null;
 
-      this.el.addEventListener('raycaster-intersected', e =>{  
-        if (this.video != undefined) {
-          this.raycaster = e.detail.el;
-          thiz.raycaster = this.raycaster;
-          this.intersection = this.raycaster.components.raycaster.getIntersection(this.el);
-          hitpoint = this.intersection.point;
-          
-          // console.log('ray hit', this.intersection.point, this.intersection.object.name);
-        if (!this.intersection.object.name.includes("screen") &&
-            !this.intersection.object.name.includes("background") &&
-            !this.intersection.object.name.includes("fastforward") &&
-            !this.intersection.object.name.includes("rewind") &&
-            !this.intersection.object.name.includes("previous") &&
-            !this.intersection.object.name.includes("next") &&
-            !this.intersection.object.name.includes("handle") &&
-            !this.intersection.object.name.includes("play") &&
-            !this.intersection.object.name.includes("pause")) {
-            this.raycaster = null;
-            mouseOverObject = null;
+        this.el.addEventListener('raycaster-intersected', (e) => {  
+          if (this.video != undefined) {
+            this.raycaster = e.detail.el;
+            // thiz.raycaster = this.raycaster;
+            this.intersection = this.raycaster.components.raycaster.getIntersection(this.el);
+            hitpoint = this.intersection.point;
+            
+            // console.log('ray hit', this.intersection.point, this.intersection.object.name);
+          if (!this.intersection.object.name.includes("screen") &&
+              !this.intersection.object.name.includes("background") &&
+              !this.intersection.object.name.includes("fastforward") &&
+              !this.intersection.object.name.includes("rewind") &&
+              !this.intersection.object.name.includes("previous") &&
+              !this.intersection.object.name.includes("next") &&
+              !this.intersection.object.name.includes("handle") &&
+              !this.intersection.object.name.includes("play") &&
+              !this.intersection.object.name.includes("pause")) {
+              this.raycaster = null;
+              this.mouseOverObject = null;
 
+          } else {
+              this.mouseOverObject = this.intersection.object.name;      
+              // this.hitpoint = intersection.point;   
+              console.log('ray hit', this.intersection.point, this.intersection.object.name, this.mouseOverObject );
+          }
         } else {
-            mouseOverObject = this.intersection.object.name;      
-            // this.hitpoint = intersection.point;   
-            console.log('ray hit', this.intersection.point, this.intersection.object.name, mouseOverObject );
+          // console.log("this.video is undefined!");
         }
-      }
       });
       this.el.addEventListener("raycaster-intersected-cleared", () => {
-          // console.log("intersection cleared");
+          console.log("intersection cleared");
           // if (this.video != undefined) {
-          thiz.raycaster = null;
+          // thiz.raycaster = null;
           this.raycaster = null;
-          mouseOverObject = null;
+          this.mouseOverObject = null;
           // }
       });
-      this.el.addEventListener('click', (event) =>  {
+      this.el.addEventListener('click', () =>  {
         
         this.video = video;
-        
-        this.mouseOverObject = mouseOverObject;
-        this.hitpoint = hitpoint;
+        console.log(this.mouseOverObject + " raycaster "+ this.raycaster);
+        // this.mouseOverObject = mouseOverObject;
+        // this.hitpoint = hitpoint;
         // thiz.slider_handle = this.slider_handle;
         if (this.video != undefined) {
-        thiz.nStart = new THREE.Vector3();
-        thiz.nEnd = new THREE.Vector3();
-        if (thiz.slider_begin != undefined) {
-          thiz.slider_begin.getWorldPosition( thiz.nStart );
-          thiz.slider_end.getWorldPosition( thiz.nEnd );
-        }
-        thiz.video = this.video;
-        // console.log(this.mouseOverObject + " raycaster "+ thiz.raycaster);
-        if (thiz.raycaster != null) {
-            console.log(this.mouseOverObject);
-
-        if (this.mouseOverObject.includes("play") || this.mouseOverObject.includes("screen")) {
-          if (thiz.video.paused) {
-            console.log("tryna play!");
-            playVideo(thiz.video);
-            
-            // this.isPlaying = true;
-            if (this.pauseButtonMesh != null) {
-            this.pauseButtonMesh.visible = true;
-            this.playButtonMesh.visible = false;
+            this.nStart = new THREE.Vector3();
+            this.nEnd = new THREE.Vector3();
+            if (this.slider_begin != undefined) {
+              this.slider_begin.getWorldPosition( this.nStart );
+              this.slider_end.getWorldPosition( this.nEnd );
             }
+            // thiz.video = this.video;
             
-            thiz.player_status_update("playing");
-            // this.play_button.material = this.greenmat;
-            // break;
-          } else {
-            if (!thiz.video.paused) {
-            console.log("tryna pauyse!");
-            
-            pauseVideo(thiz.video);
-            // this.isPlaying = false;
-            if (this.pauseButtonMesh != null) {
-            this.pauseButtonMesh.visible = false; 
-            this.playButtonMesh.visible = true;   
-            }
-            thiz.player_status_update("paused");
-            // this.play_button.material = this.redmat;
-            
-            // break;
-            }
-          }
-          // break;
-        } else if (this.mouseOverObject.includes("slider_background")) {
+            if (this.raycaster != null) {
+                console.log(this.mouseOverObject);
 
-                // this.slider_begin.position.y/this.slider_end.position.y 
-                let nStart = new THREE.Vector3();
-                let nEnd = new THREE.Vector3();
-                thiz.slider_begin.getWorldPosition( nStart );
-                thiz.slider_end.getWorldPosition( nEnd );
-                console.log("background hit at " + JSON.stringify(this.hitpoint));
-                let range = nEnd.x.toFixed(2) - nStart.x.toFixed(2);
-                let correctedStartValue = this.hitpoint.x.toFixed(2) - nEnd.x.toFixed(2);
-                let percentage = (((correctedStartValue * 100) / range) + 100).toFixed(2); 
-                let time = (percentage * (this.video.duration / 100)).toFixed(2);
-                // let touchPosition = (((intersects[i].point.y.toFixed(2) - this.slider_begin.position.y.toFixed(2)) * 100) / (this.slider_end.position.y.toFixed(2) - this.slider_begin.position.y.toFixed(2)));
-                console.log("bg touch % " + percentage +  " touchPosition " + + JSON.stringify(this.hitpoint) + " vs start " +  JSON.stringify(nStart) + " vs end " +  JSON.stringify(nEnd));
-                // this.slider_handle.position.x = intersects[i].point.x; 
-                // this.slider_handle.position.z =  nStart.z;
-                // this.slider_handle.position.z =  nStart.y; 
-                thiz.slider_handle.position.lerpVectors(thiz.slider_begin.position, thiz.slider_end.position, percentage * .01);
-                this.video.currentTime = time;
-                
-                // break;
-            
-            } else if (this.mouseOverObject.includes("handle")) {
-                console.log("handle");
-            
-            } else if (this.mouseOverObject.includes("fastforward")) {
-              console.log("ffwd");
-              pauseVideo(this.video);
-              if (this.video.currentTime + 10 < this.video.duration) {
-                this.video.currentTime = this.video.currentTime + 10;
-              }
-              if (this.pauseButtonMesh != null) {
-              this.pauseButtonMesh.visible = false;
-              }
-              if (this.playButtonMesh != null) {
-              this.playButtonMesh.visible = true;
-              }
-              // break;
-
-            } else if (this.mouseOverObject.includes("rewind")) {
-              console.log("rewind");
-              pauseVideo(this.video);
-              if (this.video.currentTime - 10 > 0) {
-                this.video.currentTime = this.video.currentTime - 10;
-              }
-              if (this.pauseButtonMesh != null) {
-              this.pauseButtonMesh.visible = false;
-              }
-              if (this.playButtonMesh != null) {
-              this.playButtonMesh.visible = true;
-
-              }
-              // break;
-            }
-        // this.raycaster = null;
-        }
-      }
-      });
-    },
-    player_status_update (state) {
-      this.playerState = state;
-      
-        if (this.play_button != null) {
-            if (state == "loading") {
-              this.play_button.material = this.yellowmat;
-              // if (this.transportPlayButton != null) {
-              //     this.transportPlayButton.style.color = 'yellow';
+              if (this.mouseOverObject.includes("play") || this.mouseOverObject.includes("screen")) {
+                if (this.video.paused) {
+                  console.log("tryna play!");
+                  playVideo(this.video);
                   
-              // }
-              // this.screen.material = this.loadingMaterial;
-             
-            } else if (state == "ready") {
-                this.play_button.material = this.bluemat;
-              //   if (this.transportPlayButton != null) {
-              //     this.transportPlayButton.style.color = 'blue';
-              // }
-              // this.screen.material = this.readyMaterial;
-            } else if (state == "playing") {
-                this.play_button.material = this.greenmat;
-              //   if (this.transportPlayButton != null) {
-              //     this.transportPlayButton.style.color = 'lightgreen';
-              // }
-              // this.screen.material = this.playingMaterial;
-            } else if (state == "paused") {
-                this.play_button.material = this.redmat;
-              //   if (this.transportPlayButton != null) {
-              //     this.transportPlayButton.style.color = 'red';
-              // }
-              // this.screen.material = this.pausedMaterial;
+                  // this.isPlaying = true;
+                  if (this.pauseButtonMesh != null) {
+                  this.pauseButtonMesh.visible = true;
+                  this.playButtonMesh.visible = false;
+                  }
+                  
+                  this.player_status_update("playing");
+                  // this.play_button.material = this.greenmat;
+                  // break;
+                } else {
+                  if (!this.video.paused) {
+                  console.log("tryna pauyse!");
+                  
+                  pauseVideo(this.video);
+                  // this.isPlaying = false;
+                  if (this.pauseButtonMesh != null) {
+                  this.pauseButtonMesh.visible = false; 
+                  this.playButtonMesh.visible = true;   
+                  }
+                  this.player_status_update("paused");
+                  // this.play_button.material = this.redmat;
+                  
+                  // break;
+                }
+              }
+              // break;
+            } else if (this.mouseOverObject.includes("slider_background")) {
+
+                    // this.slider_begin.position.y/this.slider_end.position.y 
+                    let nStart = new THREE.Vector3();
+                    let nEnd = new THREE.Vector3();
+                    this.slider_begin.getWorldPosition( nStart );
+                    this.slider_end.getWorldPosition( nEnd );
+                    console.log("background hit at " + JSON.stringify(this.hitpoint));
+                    let range = nEnd.x.toFixed(2) - nStart.x.toFixed(2);
+                    let correctedStartValue = this.hitpoint.x.toFixed(2) - nEnd.x.toFixed(2);
+                    let percentage = (((correctedStartValue * 100) / range) + 100).toFixed(2); 
+                    let time = (percentage * (this.video.duration / 100)).toFixed(2);
+                    // let touchPosition = (((intersects[i].point.y.toFixed(2) - this.slider_begin.position.y.toFixed(2)) * 100) / (this.slider_end.position.y.toFixed(2) - this.slider_begin.position.y.toFixed(2)));
+                    console.log("bg touch % " + percentage +  " touchPosition " + + JSON.stringify(this.hitpoint) + " vs start " +  JSON.stringify(nStart) + " vs end " +  JSON.stringify(nEnd));
+                    // this.slider_handle.position.x = intersects[i].point.x; 
+                    // this.slider_handle.position.z =  nStart.z;
+                    // this.slider_handle.position.z =  nStart.y; 
+                    this.slider_handle.position.lerpVectors(this.slider_begin.position, this.slider_end.position, percentage * .01);
+                    this.video.currentTime = time;
+                    
+                    // break;
+                
+                } else if (this.mouseOverObject.includes("handle")) {
+                    console.log("handle");
+                
+                } else if (this.mouseOverObject.includes("fastforward")) {
+                  console.log("ffwd");
+                  pauseVideo(this.video);
+                  if (this.video.currentTime + 10 < this.video.duration) {
+                    this.video.currentTime = this.video.currentTime + 10;
+                  }
+                  if (this.pauseButtonMesh != null) {
+                  this.pauseButtonMesh.visible = false;
+                  }
+                  if (this.playButtonMesh != null) {
+                  this.playButtonMesh.visible = true;
+                  }
+                  // break;
+
+                } else if (this.mouseOverObject.includes("rewind")) {
+                  console.log("rewind");
+                  pauseVideo(this.video);
+                  if (this.video.currentTime - 10 > 0) {
+                    this.video.currentTime = this.video.currentTime - 10;
+                  }
+                  if (this.pauseButtonMesh != null) {
+                  this.pauseButtonMesh.visible = false;
+                  }
+                  if (this.playButtonMesh != null) {
+                  this.playButtonMesh.visible = true;
+
+                  }
+                  // break;
+                }
+            // this.raycaster = null;
             }
-        }
-    },
+          } else {
+            console.log("this.video is undefined!");
+          }
+          });
+        },
+        player_status_update (state) {
+          this.playerState = state;
+          
+            if (this.play_button != null) {
+                if (state == "loading") {
+                  this.play_button.material = this.yellowmat;
+                  // if (this.transportPlayButton != null) {
+                  //     this.transportPlayButton.style.color = 'yellow';
+                      
+                  // }
+                  // this.screen.material = this.loadingMaterial;
+                
+                } else if (state == "ready") {
+                    this.play_button.material = this.bluemat;
+                  //   if (this.transportPlayButton != null) {
+                  //     this.transportPlayButton.style.color = 'blue';
+                  // }
+                  // this.screen.material = this.readyMaterial;
+                } else if (state == "playing") {
+                    this.play_button.material = this.greenmat;
+                  //   if (this.transportPlayButton != null) {
+                  //     this.transportPlayButton.style.color = 'lightgreen';
+                  // }
+                  // this.screen.material = this.playingMaterial;
+                } else if (state == "paused") {
+                    this.play_button.material = this.redmat;
+                  //   if (this.transportPlayButton != null) {
+                  //     this.transportPlayButton.style.color = 'red';
+                  // }
+                  // this.screen.material = this.pausedMaterial;
+                }
+            }
+        },
         tick: function () {
 
           if (this.video != undefined) {
