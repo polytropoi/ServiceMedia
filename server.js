@@ -14817,7 +14817,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
     // let metamaskScript = "";
     let sceneData = "";
     let nftIDs = "";
-    let sceneBackground = "";
+    let sceneBackground = " background ";
     let skyboxEnvMap = "";
     let geoEntities = "";
     let geoEntity = 'geo-location'; //may be set to "gps-entity-place" for arjs locationing
@@ -15380,11 +15380,11 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                     "</a-camera>";
                             */
                             camera = "<a-entity id=\x22player\x22 position=\x220 0 0\x22 camera pitch-roll-look-controls>"+ 
-                                "<a-entity id=\x22equipPlaceholder\x22 geometry=\x22primitive: plane; height: 0.01; width: .01\x22 position=\x220 -.5 -.5\x22"+
+                                "<a-entity class=\x22hiddenPlaceholders\x22 id=\x22equipPlaceholder\x22 geometry=\x22primitive: plane; height: 0.01; width: .01\x22 position=\x220 -.5 -.5\x22"+ //these seemed to need actual geometry to get a worldspace loc
                                 "material=\x22opacity: 0\x22></a-entity>"+
-                                "<a-entity id=\x22viewportPlaceholder\x22 geometry=\x22primitive: plane; height: 0.01; width: .01\x22 position=\x220 0 -1\x22"+
+                                "<a-entity class=\x22hiddenPlaceholders\x22 id=\x22viewportPlaceholder\x22 geometry=\x22primitive: plane; height: 0.01; width: .01\x22 position=\x220 0 -1\x22"+
                                 "material=\x22opacity: 0\x22></a-entity>"+
-                                "<a-entity id=\x22viewportPlaceholder3\x22 geometry=\x22primitive: plane; height: 0.01; width: .01\x22 position=\x220 0 -3\x22"+
+                                "<a-entity class=\x22hiddenPlaceholders\x22 id=\x22viewportPlaceholder3\x22 geometry=\x22primitive: plane; height: 0.01; width: .01\x22 position=\x220 0 -3\x22"+
                                 "material=\x22opacity: 0\x22></a-entity>"+
                             "</a-entity>";
                                     

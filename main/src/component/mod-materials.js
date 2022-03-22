@@ -603,7 +603,7 @@ AFRAME.registerComponent('mod-materials', {
 
           } else {
               this.mouseOverObject = this.intersection.object.name;      
-              // this.hitpoint = intersection.point;   
+              this.hitpoint = this.intersection.point;   
               console.log('ray hit', this.intersection.point, this.intersection.object.name, this.mouseOverObject );
           }
         } else {
@@ -620,7 +620,7 @@ AFRAME.registerComponent('mod-materials', {
       });
       this.el.addEventListener('click', () =>  {
         
-        this.video = video;
+        // this.video = video;
         console.log(this.mouseOverObject + " raycaster "+ this.raycaster);
         // this.mouseOverObject = mouseOverObject;
         // this.hitpoint = hitpoint;
