@@ -584,10 +584,9 @@ AFRAME.registerComponent('mod-materials', {
         this.el.addEventListener('raycaster-intersected', (e) => {  
           if (this.video != undefined) {
             this.raycaster = e.detail.el;
-            // thiz.raycaster = this.raycaster;
             this.intersection = this.raycaster.components.raycaster.getIntersection(this.el);
-            hitpoint = this.intersection.point;
-            
+            this.hitpoint = this.intersection.point;
+            this.mouseOverObject = this.intersection.object.name;      
             // console.log('ray hit', this.intersection.point, this.intersection.object.name);
           if (!this.intersection.object.name.includes("screen") &&
               !this.intersection.object.name.includes("background") &&
@@ -598,12 +597,12 @@ AFRAME.registerComponent('mod-materials', {
               !this.intersection.object.name.includes("handle") &&
               !this.intersection.object.name.includes("play") &&
               !this.intersection.object.name.includes("pause")) {
-              this.raycaster = null;
-              this.mouseOverObject = null;
+              // this.raycaster = null;
+              // this.mouseOverObject = null;
 
           } else {
-              this.mouseOverObject = this.intersection.object.name;      
-              this.hitpoint = this.intersection.point;   
+              // this.mouseOverObject = this.intersection.object.name;      
+              // this.hitpoint = this.intersection.point;   
               console.log('ray hit', this.intersection.point, this.intersection.object.name, this.mouseOverObject );
           }
         } else {
