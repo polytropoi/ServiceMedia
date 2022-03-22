@@ -15330,8 +15330,8 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                             // "<a-entity id=\x22player\x22 get_pos_rot networked=\x22template:#avatar-template;attachTemplateToLocal:false;\x22 "+spawnInCircle+" camera "+wasd+" look-controls=\x22hmdEnabled: false\x22 position=\x220 1.6 0\x22>" +     
                             "<a-entity id=\x22player\x22 get_pos_rot=\x22init: true;\x22 camera "+wasd+" look-controls=\x22hmdEnabled: false\x22 position=\x220 1.6 0\x22>" +     
                             "</a-entity>"+
-                            "<a-entity networked=\x22template:#hand-template\x22 blink-controls oculus-touch-controls=\x22hand: left\x22 laser-controls=\x22hand: left;\x22 handModelStyle: lowPoly; color: #ffcccc\x22 raycaster=\x22objects: .activeObjexRay;\x22></a-entity>" +
-                            "<a-entity networked=\x22template:#hand-template\x22 oculus-touch-controls=\x22hand: right\x22 id=\x22right-hand\x22 hand-controls=\x22hand: right; handModelStyle: lowPoly; color: #ffcccc\x22 aabb-collider=\x22objects: .activeObjexGrab;\x22 grab></a-entity>"+
+                            // "<a-entity networked=\x22template:#hand-template\x22 "+blink_controls+" oculus-touch-controls=\x22hand: left\x22 laser-controls=\x22hand: left;\x22 handModelStyle: lowPoly; color: #ffcccc\x22 raycaster=\x22objects: .activeObjexRay;\x22></a-entity>" +
+                            // "<a-entity networked=\x22template:#hand-template\x22 oculus-touch-controls=\x22hand: right\x22 id=\x22right-hand\x22 hand-controls=\x22hand: right; handModelStyle: lowPoly; color: #ffcccc\x22 aabb-collider=\x22objects: .activeObjexGrab;\x22 grab></a-entity>"+
                             "</a-entity>";
 
                         } else if (sceneData.sceneWebType == 'AR Image Tracking') { //not really, set below...
@@ -15643,6 +15643,11 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                 }
                                 // camera = "<a-entity id=\x22cameraRig\x22 position=\x220 0 0\x22>"+ //controls: gamepad, keyboard, trackpad; 
                                 //AFRAME CAMERA
+                                let blinkMod = "blink-controls=\x22cameraRig: #cameraRig\x22";
+                                if (useSimpleNavmesh) {
+                                    blinkMod = "blink-controls=\x22cameraRig: #cameraRig; collisionEntities: #navmesh-el;\x22"; //only one navmesh for now
+                                }
+                                
                                 camera = "<a-entity id=\x22cameraRig\x22 "+movementControls+" initializer "+
                                 // camera = "<a-entity id=\x22cameraRig\x22 "+movementControls+" initializer position=\x22"+playerPosition+"\x22 "+
                                 // " "+ physicsMod +">"+    
@@ -15664,7 +15669,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                     // "<a-entity networked=\x22template:#hand-template\x22 oculus-touch-controls=\x22hand: right\x22 id=\x22right-hand\x22 hand-controls=\x22hand: right; handModelStyle: lowPoly; color: #ffcccc\x22 raycaster=\x22objects: .activeObjexRay;\x22 aabb-collider=\x22objects: .activeObjexGrab;\x22 grab></a-entity>"+
                                     // "<a-entity id=\x22left-hand\x22 teleport-controls=\x22cameraRig: #cameraRig; button: grip;\x22 laser-controls=\x22hand: left;\x22 handModelStyle: lowPoly; color: #ffcccc\x22 raycaster=\x22objects: .activeObjexRay;\x22 aabb-collider=\x22objects: .activeObjexGrab;\x22 grab></a-entity>" +
                                     // "<a-entity id=\x22right-hand\x22 teleport-controls=\x22cameraRig: #cameraRig; button: grip;\x22 laser-controls=\x22hand: right;\x22 handModelStyle: lowPoly; color: #ffcccc\x22 raycaster=\x22objects: .activeObjexRay;\x22 aabb-collider=\x22objects: .activeObjexGrab;\x22 grab></a-entity>"+
-                                    "<a-entity id=\x22left-hand\x22 oculus-touch-controls=\x22hand: left\x22 blink-controls=\x22cameraRig: #cameraRig\x22 handModelStyle: lowPoly; color: #ffcccc\x22></a-entity>" +
+                                    "<a-entity id=\x22left-hand\x22 oculus-touch-controls=\x22hand: left\x22 "+blinkMod+" handModelStyle: lowPoly; color: #ffcccc\x22></a-entity>" +
                                     "<a-entity id=\x22right-hand\x22 oculus-touch-controls=\x22hand: right\x22 laser-controls=\x22hand: right;\x22 handModelStyle: lowPoly; color: #ffcccc\x22 raycaster=\x22objects: .activeObjexRay;\x22 aabb-collider=\x22objects: .activeObjexGrab;\x22 grab></a-entity>"+
                                     "</a-entity></a-entity>";
                             }
