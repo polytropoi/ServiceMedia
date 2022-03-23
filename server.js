@@ -15654,7 +15654,8 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                 // camera = "<a-entity id=\x22cameraRig\x22 "+movementControls+" initializer position=\x22"+playerPosition+"\x22 material=\x22color: green; wireframe: true;\x22"+
                                 // " geometry=\x22primitive: cylinder; height: 2; radius: 0.8;\x22 ammo-body=\x22type: kinematic;\x22 ammo-shape=\x22type: cylinder\x22>"+
                                 // camera = "<a-entity id=\x22cameraRig\x22 "+movementControls+" initializer position=\x22"+playerPosition+"\x22 material=\x22color: green; wireframe: true;\x22 geometry=\x22primitive: cylinder; height: 2; radius: 0.8;\x22 ammo-body=\x22type: kinematic;\x22 ammo-shape=\x22type: cylinder\x22>"+
-                                    "hide-in-ar-mode id=\x22mouseCursor\x22 cursor=\x22rayOrigin: mouse\x22 raycaster=\x22objects: .activeObjexRay\x22>"+
+                                   // "hide-in-ar-mode id=\x22mouseCursor\x22 cursor=\x22rayOrigin: mouse\x22 raycaster=\x22objects: .activeObjexRay\x22>"+ //hide what?
+                                    " id=\x22mouseCursor\x22 cursor=\x22rayOrigin: mouse\x22 raycaster=\x22objects: .activeObjexRay\x22>"+
                                     // "<a-entity id=\x22player\x22 get_pos_rot networked=\x22template:#avatar-template;attachTemplateToLocal:false;\x22 "+spawnInCircle+" camera "+wasd+" look-controls=\x22hmdEnabled: false\x22 position=\x220 1.6 0\x22>" +     
                                     // "<a-entity id=\x22viewportPlaceholder\x22 position=\x220 0 -1\x22></entity>"+   
                                     "<a-entity id=\x22player\x22 look-controls get_pos_rot camera "+wasd+" "+ physicsMod +" position=\x22"+playerPosition+"\x22>"+
@@ -18825,7 +18826,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                         let aScene = "<a-scene "+sceneBackground+" "+physicsInsert+" "+pool_target+" "+pool_launcher+" ar-cursor raycaster=\x22objects: .activeObjexRay\x22 ar-hit-test=\x22target:.activeObjexRay; type:footprint; footprintDepth:0.2;\x22 screen-controls disable-magicwindow vr-mode-ui keyboard-shortcuts=\x22enterVR: false\x22 device-orientation-permission-ui=\x22enabled: false\x22 " +
                         // let aScene = "<a-scene "+sceneBackground+" device-orientation-permission-ui " +
                         // webxrFeatures + " shadow=\x22type: pcfsoft\x22 loading-screen=\x22dotsColor: white; backgroundColor: black; enabled: false\x22 "+joystick+" embedded " + aframeRenderSettings + " " + fogSettings + " "+networkedscene+" "+ARSceneArg+" listen-for-vr-mode>";
-                        webxrFeatures + " shadow=\x22type: pcfsoft\x22 loading-screen=\x22dotsColor: white; backgroundColor: black; enabled: false\x22 embedded " + aframeRenderSettings + " " + fogSettings + " "+networkedscene+" "+ARSceneArg+" listen-for-vr-mode>";
+                        webxrFeatures + "gesture-detector shadow=\x22type: pcfsoft\x22 loading-screen=\x22dotsColor: white; backgroundColor: black; enabled: false\x22 embedded " + aframeRenderSettings + " " + fogSettings + " "+networkedscene+" "+ARSceneArg+" listen-for-vr-mode>";
                         // webxrFeatures + " shadow=\x22type: pcfsoft\x22 loading-screen=\x22dotsColor: white; backgroundColor: black\x22 joystick embedded " + aframeRenderSettings + " " + 
                         // fogSettings + " "+networkedscene+" "+ARSceneArg+">";
 
@@ -18995,7 +18996,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                         skySettings +
                         "<a-assets timeout=\x225000\x22>" +
                         // "<a-assets>" +
-                        "<canvas id=\x22render_canvas\x22></canvas>"+
+                        // "<canvas id=\x22render_canvas\x22></canvas>"+
                         playerAvatarTemplate +
                         handsTemplate + 
                         // "<img id=\x22landscapeMask\x22 crossorigin='anonymous' src=\x22https://realitymangler.com/assets/landscapeMask.png\x22>"+
@@ -19111,8 +19112,8 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                         "<a-entity id=\x22createAvatars\x22 create_avatars></a-entity>"+
                         audioVizEntity +
                         instancingEntity +
-                        "<a-entity show-in-ar-mode visible=\x22false\x22 id=\x22reticleEntity\x22 gltf-model=\x22#reticle2\x22 scale=\x220.8 0.8 0.8\x22 "+arHitTest+"></a-entity>\n"+
-                        arShadowPlane +
+                        // "<a-entity show-in-ar-mode visible=\x22false\x22 id=\x22reticleEntity\x22 gltf-model=\x22#reticle2\x22 scale=\x220.8 0.8 0.8\x22 "+arHitTest+"></a-entity>\n"+
+                        // arShadowPlane +
                         hemiLight +
                         shadowLight +
                         // navmarsh +

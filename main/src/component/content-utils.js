@@ -3401,6 +3401,7 @@ AFRAME.registerComponent('mod_model', {
         this.position = null;
         // let hasBubble = false;
         // let theEl = this.element;
+        this.el.setAttribute('gesture-handler'); //ar mode only?
         var sceneEl = document.querySelector('a-scene');
         let hasCallout = false;
         let calloutOn = false;
@@ -3619,7 +3620,7 @@ AFRAME.registerComponent('mod_model', {
 
         // });
       }
-      document.querySelector('a-scene').addEventListener('primaryAudioToggle', function () {
+      document.querySelector('a-scene').addEventListener('primaryAudioToggle', function () {  //things to trigger on this model if primary audio is playing
         // console.log("primaryAudioToggle!");
         if (primaryAudioHowl.playing()) {
 
