@@ -3401,7 +3401,7 @@ AFRAME.registerComponent('mod_model', {
         this.position = null;
         // let hasBubble = false;
         // let theEl = this.element;
-        this.el.setAttribute('gesture-handler'); //ar mode only?
+        this.el.setAttribute('gesture-handler-add'); //ar mode only?
         var sceneEl = document.querySelector('a-scene');
         let hasCallout = false;
         let calloutOn = false;

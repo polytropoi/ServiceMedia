@@ -3,7 +3,6 @@
       //   init
       // });
 
-
       AFRAME.registerComponent('usdz', { //catch the usdz links if in iOS and there's one or more in the scene
         schema: {
           initialized: {default: ''},
@@ -46,7 +45,7 @@
             // this.wasVisible = this.el.getAttribute('visible');
 
             if (this.el.sceneEl.is('ar-mode')) {
-              
+
                 // this.el.setAttribute('visible', true);
                 // webxrFeatures = "webxr=\x22requiredFeatures: hit-test, local-floor;\x22"; //otherwise hit-test breaks everythign!
                 // arHitTest = "ar-hit-test=\x22mode: "+arMode+"\x22";
@@ -252,6 +251,9 @@
 /* global AFRAME, THREE */ 
 //pinch scale/swipe rotate for ar modelz
   // from https://github.com/fcor/arjs-gestures/blob/master/dist/gestures.js
+
+
+
 AFRAME.registerComponent("gesture-handler", {
   schema: {
     enabled: { default: true },
@@ -261,6 +263,7 @@ AFRAME.registerComponent("gesture-handler", {
   },
 
   init: function () {
+
     this.handleScale = this.handleScale.bind(this);
     this.handleRotation = this.handleRotation.bind(this);
 
@@ -318,6 +321,22 @@ AFRAME.registerComponent("gesture-handler", {
   },
 });
 
+AFRAME.registerComponent("gesture-handler-add", { //add component to grab spin pinch if in ar mode
+  schema: {
+    
+  },
+  
+  init: function () {
+    this.el.sceneEl.addEventListener('enter-vr', (ev) => {
+     
+      if (this.el.sceneEl.is('ar-mode')) {
+          
+          document.querySelector('a-scene').components.gesture-detector.register(this.el.id);
+      } 
+    });
+   
+  }
+});
 // Component that detects and emits events for touch gestures
 
 AFRAME.registerComponent("gesture-detector", {
@@ -326,12 +345,14 @@ AFRAME.registerComponent("gesture-detector", {
   },
 
   init: function() {
-    this.targetElement =
-      this.data.element && document.querySelector(this.data.element);
+  },
+  register: function(id) {
+    this.targetElement = document.getElementById(id);
+    this.targetElement.setAttribute('gesture-handler', {enabled: true});
+    // if (!this.targetElement) {
+    //   // this.targetElement = this.el;
 
-    if (!this.targetElement) {
-      this.targetElement = this.el;
-    }
+    // }
 
     this.internalState = {
       previousState: null

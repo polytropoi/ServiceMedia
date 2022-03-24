@@ -126,3 +126,29 @@ AFRAME.registerComponent('mod_synth', {
        // Do something on every scene tick or frame.
      }
  });
+
+ AFRAME.registerComponent('generate_synth_triggers', {
+    schema: {
+      width: {
+        type: 'string', 
+        default: '4' // C4 default note
+      },
+      height: {
+        type: 'string',
+        default: '4' // quarter note default time
+      },
+      depth: {
+        type: 'string',
+        default: '4' // quarter note default time
+      },
+      shape: {
+        type: 'string',
+        default: 'cube' // quarter note default time
+      }
+    },
+    init: function () {
+      
+    }
+  });
+ 
+  

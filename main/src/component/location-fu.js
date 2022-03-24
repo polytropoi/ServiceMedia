@@ -659,7 +659,8 @@ function geoip(json){
         for (let m = 0; m < sceneLocations.locations.length; m++) {
           if (gpsElements[i].getAttribute(geoEntity.toString())._id == sceneLocations.locations[m]._id) {//match the id to get the sceneLcoation data
             // console.log("gotsa match " + sceneLocations.locations[m].eventData);
-            label = sceneLocations.locations[m].label != undefined ? sceneLocations.locations[m].label : sceneLocations.locations[m].name;
+            // label = sceneLocations.locations[m].label != undefined ? sceneLocations.locations[m].label : sceneLocations.locations[m].name; //whatever
+            label = sceneLocations.locations[m].name;
             if (sceneLocations.locations[m].markerType == "poi" ) {
               isPoi = true;
             }
