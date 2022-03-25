@@ -14769,6 +14769,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
     let locationEntity = "";
     let locationButton = "";
     let mapButtons = "";
+    let mapStyleSelector = "";
     let dialogButton = "";
     let transportButtons = "";
     let sceneManglerButtons = "";
@@ -15526,7 +15527,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                 //     });
                                 // </script>;
                                 // mapHeadingAndPitch = 
-                                mapZoomers = "<div id=\x22button_left_1\x22 style=\x22float: left; margin: 10px 10px;\x22 class=\x22\x22 onclick=\x22ToggleDragPan()\x22><i class=\x22fas fa-level-down-alt fa-2x\x22></i></div>"+
+                                mapButtons = "<div id=\x22button_left_1\x22 style=\x22float: left; margin: 10px 10px;\x22 class=\x22\x22 onclick=\x22ToggleDragPan()\x22><i class=\x22fas fa-level-down-alt fa-2x\x22></i></div>"+
                                 "<div id=\x22button_left_2\x22 class=\x22\x22 style=\x22float: left; margin: 10px 10px;\x22 onclick=\x22ZoomOut()\x22 class=\x22tooltip\x22><i class=\x22fas fa-search-minus  fa-2x\x22></i><span class=\x22tooltiptext\x22></span></div>"+
                                 "<div id=\x22button_left_3\x22 class=\x22\x22 style=\x22float: left; margin: 10px 10px;\x22 onclick=\x22ZoomIn()\x22 class=\x22tooltip\x22><i class=\x22fas fa-search-plus fa-2x\x22></i><span class=\x22tooltiptext\x22></span></div>" +
                                 "<div id=\x22button_left_4\x22 class=\x22\x22 style=\x22float: left; margin: 10px 10px;\x22 onclick=\x22RotateCamera(0)\x22 class=\x22tooltip\x22><i class=\x22fas fa-sync-alt fa-2x\x22></i><span class=\x22tooltiptext\x22></span></div>";
@@ -15541,11 +15542,12 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                             "<option>Light</option>" +
                                     "</select>" +
                                 "</div>";
-                                mapButtons = mapZoomers + mapStyleSelector;// + "<div class=\x22location_button\x22 style=\x22float: right; margin: 10px 10px;\x22 onclick=\x22ShowHideGeoPanel()\x22><i class=\x22fas fa-globe fa-2x\x22></i></div>";
+                                // mapButtons = mapZoomers + mapStyleSelector;// + "<div class=\x22location_button\x22 style=\x22float: right; margin: 10px 10px;\x22 onclick=\x22ShowHideGeoPanel()\x22><i class=\x22fas fa-globe fa-2x\x22></i></div>";
                                 
 
                                             
                             } else { //"sceneWebType == "Default or AFrame"
+                                
                                 joystickContainer = "<div id=\x22joystickContainer\x22 class=\x22JoystickRegionUI\x22 style=\x22z-index: 100; visibility: hidden\x22>" + //initialized in navigation / content-utils
                                 "<div class=\x22JoystickButtonUI\x22 style=\x22width: 128px; opacity:0.50;\x22>" +
                                     "<img src=\x22/css/joystick-base.png\x22/>" +
@@ -17338,7 +17340,10 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                         "<div style=\x22float:right; margin: 5px 10px 5px; 0px;\x22 onclick=\x22SceneManglerModal('Locations')\x22><i class=\x22fas fa-globe \x22></i></div>"+
                         "<div style=\x22float:right; margin: 5px 10px 5px; 0;\x22 onclick=\x22SceneManglerModal('Tools')\x22><i class=\x22fas fa-tools \x22></i></div>"+
                         "<div style=\x22float:right;margin: 5px 10px 5px; 0px;\x22 onclick=\x22SceneManglerModal('Messages')\x22><i class=\x22fas fa-comments \x22></i></div></div>"+
-                        "<div style=\x22float:right;margin: 5px 10px 5px; 0px;\x22 onclick=\x22SceneManglerModal('Quests')\x22><i class=\x22fas fa-question-circle \x22></i></div></div>"+
+                        "<div style=\x22float:right;margin: 5px 10px 5px; 0px;\x22 onclick=\x22SceneManglerModal('Quests')\x22><i class=\x22fas fa-question-circle \x22></i></div>"+
+                        mapStyleSelector +
+                        "</div>"+
+                        // mapStyleSelector +
                         "<div>"+
                         mapButtons +
                         // "<div style=\x22float: right; margin: 5px 10px 5px; 0px;\x22 onclick=\x22ShowHideDialogPanel('default')\x22><i class=\x22fas fa-info-circle \x22></i></div></div>"+
