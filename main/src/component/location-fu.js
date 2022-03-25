@@ -657,7 +657,7 @@ function geoip(json){
 
       if (sceneLocations != undefined && sceneLocations.locations != undefined) {
         for (let m = 0; m < sceneLocations.locations.length; m++) {
-          if (gpsElements[i].getAttribute(geoEntity.toString())._id == sceneLocations.locations[m]._id) {//match the id to get the sceneLcoation data
+          if (gpsElements[i].getAttribute(geoEntity.toString())._id == sceneLocations.locations[m].timestamp) {//match the timestamp to get the sceneLcoation data
             // console.log("gotsa match " + sceneLocations.locations[m].eventData);
             // label = sceneLocations.locations[m].label != undefined ? sceneLocations.locations[m].label : sceneLocations.locations[m].name; //whatever
             label = sceneLocations.locations[m].name;
@@ -1021,13 +1021,13 @@ function geoip(json){
           let eventData = null;
           if (sceneLocations.locations != undefined) {
             for (let m = 0; m < sceneLocations.locations.length; m++) {
-              if (gpsElements[i].getAttribute(geoEntity.toString())._id == sceneLocations.locations[m]._id) {//match the id to get the sceneLcoation data
+              if (gpsElements[i].getAttribute(geoEntity.toString())._id == sceneLocations.locations[m].timestamp) {//match the id to get the sceneLcoation data
                 let modelUrl = 'https://servicemedia.s3.amazonaws.com/assets/models/avatar1c.glb';
                 if (sceneLocations.locations[m].modelID != null) {
                   // console.log("Looking for model id: " + sceneLocations.locations[m].modelID);   
 
                   let locationModel = document.getElementById(sceneLocations.locations[m].modelID.toString());               
-                  console.log("Looking for model id: " + locationModel.getAttribute('src'));
+                  console.log("Looking for model : " + locationModel.getAttribute('src'));
                   modelUrl = locationModel.getAttribute('src');
                 }
                 if (sceneLocations.locations[m].markerObjScale != null && sceneLocations.locations[m].markerObjScale != undefined) {
@@ -1056,6 +1056,7 @@ function geoip(json){
                       anchor: 'bottom'
                     }
                     tb.loadObj(options, function (model) {
+                      // if (model != undefined && model != null) {
                       let theModel = model.setCoords([sceneLocations.locations[m].longitude, sceneLocations.locations[m].latitude]);
 
                       // theModel.addEventListener('ObjectMouseOver', onObjectMouseOver, false);
@@ -1066,7 +1067,8 @@ function geoip(json){
                       // modelEntity.setObject3D("Object3D", model);
                       // modelEntity.classList.add("activeObjexRay");
                       // gpsElements[i].appendChild(gpsPanel);
-                    })
+                      // }
+                    });
                   },
                   render: function (gl, matrix) {
                   tb.update();

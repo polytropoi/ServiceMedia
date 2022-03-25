@@ -14768,6 +14768,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
     let networkingEntity = "";
     let locationEntity = "";
     let locationButton = "";
+    let mapButtons = "";
     let dialogButton = "";
     let transportButtons = "";
     let sceneManglerButtons = "";
@@ -15114,29 +15115,29 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                     }
                                 }
                                 if (sceneResponse.sceneLocations[i].type != undefined && sceneResponse.sceneLocations[i].type.toLowerCase() == "geographic") { //set actual locs below
-                                    
+                                    // let id = sceneResponse.sceneLocations[i]._id != undefined ? 
                                     if (sceneResponse.sceneLocations[i].markerType == "poi") {
                                         poiIndex++;
                                         if (sceneResponse.sceneWebType == "AR Location Tracking") {
                                             //TODO jack in models / objs here?
                                             geoEntities = geoEntities + "<a-entity look-at=\x22#player\x22 shadow=\x22cast:true; receive:true\x22 "+geoEntity+"=\x22latitude: "+sceneResponse.sceneLocations[i].latitude+
-                                            "; longitude: "+sceneResponse.sceneLocations[i].longitude+";\x22 "+skyboxEnvMap+" class=\x22gltf poi envMap\x22 gltf-model=\x22#poimarker\x22><a-entity scale=\x22.5 .5 .5\x22 position=\x22-.1 .5 0.1\x22 text-geometry=\x22value: "+poiIndex+"\x22></a-entity></a-entity>";
+                                            "; longitude: "+sceneResponse.sceneLocations[i].longitude+";  _id: "+sceneResponse.sceneLocations[i].timestamp+"\x22 "+skyboxEnvMap+" class=\x22gltf poi envMap\x22 gltf-model=\x22#poimarker\x22><a-entity scale=\x22.5 .5 .5\x22 position=\x22-.1 .5 0.1\x22 text-geometry=\x22value: "+poiIndex+"\x22></a-entity></a-entity>";
                                         
                                         } else if (sceneResponse.sceneWebType != "Mapbox") {
                                             geoEntities = geoEntities + "<a-entity look-at=\x22#player\x22 shadow=\x22cast:true; receive:true\x22 "+geoEntity+"=\x22latitude: "+sceneResponse.sceneLocations[i].latitude+
-                                            "; longitude: "+sceneResponse.sceneLocations[i].longitude+";\x22 "+skyboxEnvMap+" class=\x22gltf poi envMap\x22 gltf-model=\x22#poimarker\x22><a-entity scale=\x22.5 .5 .5\x22 position=\x22-.1 .5 0.1\x22 text-geometry=\x22value: "+poiIndex+"\x22></a-entity></a-entity>";
+                                            "; longitude: "+sceneResponse.sceneLocations[i].longitude+";  _id: "+sceneResponse.sceneLocations[i].timestamp+"\x22 "+skyboxEnvMap+" class=\x22gltf poi envMap\x22 gltf-model=\x22#poimarker\x22><a-entity scale=\x22.5 .5 .5\x22 position=\x22-.1 .5 0.1\x22 text-geometry=\x22value: "+poiIndex+"\x22></a-entity></a-entity>";
                                             // console.log(geoEntities);
                                         } else {
                                             //for mapbox just using aframe to pass data
                                             geoEntities = geoEntities + "<a-entity class=\x22geo poi\x22 "+geoEntity+"=\x22latitude: "+sceneResponse.sceneLocations[i].latitude+ 
-                                            "; longitude: "+sceneResponse.sceneLocations[i].longitude+"; _id: "+sceneResponse.sceneLocations[i]._id+"\x22></a-entity>";
+                                            "; longitude: "+sceneResponse.sceneLocations[i].longitude+"; _id: "+sceneResponse.sceneLocations[i].timestamp+"\x22></a-entity>";
                                             // console.log("mapbox geoEntities: " + geoEntities);
                                         }
                                     } else {
                                         if (sceneResponse.sceneLocations[i].modelID != null) {
                                             console.log("gotsa modelID at a geographic location " + sceneResponse.sceneLocations[i].modelID );
                                             geoEntities = geoEntities + "<a-entity class=\x22geo\x22 "+geoEntity+"=\x22latitude: "+sceneResponse.sceneLocations[i].latitude+ 
-                                            "; longitude: "+sceneResponse.sceneLocations[i].longitude+"; _id: "+sceneResponse.sceneLocations[i]._id+"\x22></a-entity>";
+                                            "; longitude: "+sceneResponse.sceneLocations[i].longitude+"; _id: "+sceneResponse.sceneLocations[i].timestamp+"\x22></a-entity>";
                                         } else {
                                             console.log("modelID is null at this location"); 
                                         }
@@ -15470,6 +15471,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                             } else if (sceneData.sceneWebType == 'Mapbox') {
                                 // ARScript = "<script src=\x22/main/js/geolocator.js\x22></script><script src=\x22/main/ref/aframe/dist/aframe-ar.js\x22></script>";
                                 dialogButton = "<div class=\x22dialog_button\x22 style=\x22float: left; margin: 10px 10px; width: 50px; height: 50px\x22 onclick=\x22SceneManglerModal('Welcome')\x22><i class=\x22fas fa-info-circle fa-2x\x22></i></div>";
+                                locationButton = "<div id=\x22loc_button\x22 class=\x22dialog_button\x22 style=\x22float: left; margin: 10px 10px; width: 50px; height: 50px\x22 onclick=\x22ShowHideGeoPanel()\x22><i class=\x22fas fa-globe fa-2x\x22></i></div>";
                                 if (!sceneData.sceneTextUseModals) {
                                     //renderPanel = "<a-entity visible=\x22false\x22 render_canvas id=\x22renderCanvas\x22 look-at=\x22#player\x22 geometry=\x22primitive: plane; width:1; height:1;\x22 scale=\x221 1 1\x22 position=\x220 3.5 -.25\x22 material=\x22shader: html; transparent: true; width:1024; height:1024; fps: 10; target: #renderPanel;\x22></a-entity>\n";
                                 }
@@ -15482,8 +15484,11 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                 // "<script src=\x22/main/conf/mapbox_config.js\x22></script>" +
                                 // "<script src=\x22https://api.mapbox.com/mapbox-gl-js/v2.2.0/mapbox-gl.js\x22></script>"+
                                 // "<link href=\x22https://api.mapbox.com/mapbox-gl-js/v2.2.0/mapbox-gl.css\x22 rel=\x22stylesheet\x22/>"+
-                                "<script src=\x22https://api.mapbox.com/mapbox-gl-js/v2.3.1/mapbox-gl.js\x22></script>"+
-                                "<link href=\x22https://api.mapbox.com/mapbox-gl-js/v2.3.1/mapbox-gl.css\x22 rel=\x22stylesheet\x22/>"+
+                                // "<script src=\x22https://api.mapbox.com/mapbox-gl-js/v2.3.1/mapbox-gl.js\x22></script>"+
+                                // "<link href=\x22https://api.mapbox.com/mapbox-gl-js/v2.3.1/mapbox-gl.css\x22 rel=\x22stylesheet\x22/>"+
+                                "<script src=\x22https://api.mapbox.com/mapbox-gl-js/v2.7.0/mapbox-gl.js\x22></script>"+
+                                "<link href=\x22https://api.mapbox.com/mapbox-gl-js/v2.7.0/mapbox-gl.css\x22 rel=\x22stylesheet\x22/>"+
+
                                 // "<script src=\x22https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-directions/v4.1.0/mapbox-gl-directions.js\x22></script>"+
                                 // "<link rel=\x22stylesheet\x22 href=\x22https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-directions/v4.1.0/mapbox-gl-directions.css\x22 type=\x22text/css\x22/>";
                                 "<script src=\x22/main/src/util/threebox.js\x22></script>"+
@@ -15521,13 +15526,13 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                 //     });
                                 // </script>;
                                 // mapHeadingAndPitch = 
-                                mapZoomers = "<div id=\x22button_left_1\x22 class=\x22button_left_1\x22 onclick=\x22ToggleDragPan()\x22><i class=\x22fas fa-level-down-alt fa-2x\x22></i></div>"+
-                                "<div id=\x22button_left_2\x22 class=\x22button_left_2\x22 onclick=\x22ZoomOut()\x22 class=\x22tooltip\x22><i class=\x22fas fa-search-minus fa-2x\x22></i><span class=\x22tooltiptext\x22></span></div>"+
-                                "<div id=\x22button_left_3\x22 class=\x22button_left_3\x22 onclick=\x22ZoomIn()\x22 class=\x22tooltip\x22><i class=\x22fas fa-search-plus fa-2x\x22></i><span class=\x22tooltiptext\x22></span></div>" +
-                                "<div id=\x22button_left_4\x22 class=\x22button_left_4\x22 onclick=\x22RotateCamera(0)\x22 class=\x22tooltip\x22><i class=\x22fas fa-sync-alt fa-2x\x22></i><span class=\x22tooltiptext\x22></span></div>"+
-                                "<div id=\x22loc_button\x22 class=\x22dialog_button\x22 style=\x22float: left; margin: 10px 10px; width: 50px; height: 50px\x22 onclick=\x22ShowHideGeoPanel()\x22><i class=\x22fas fa-globe fa-2x\x22></i></div>";
+                                mapZoomers = "<div id=\x22button_left_1\x22 style=\x22float: left; margin: 10px 10px;\x22 class=\x22\x22 onclick=\x22ToggleDragPan()\x22><i class=\x22fas fa-level-down-alt fa-2x\x22></i></div>"+
+                                "<div id=\x22button_left_2\x22 class=\x22\x22 style=\x22float: left; margin: 10px 10px;\x22 onclick=\x22ZoomOut()\x22 class=\x22tooltip\x22><i class=\x22fas fa-search-minus  fa-2x\x22></i><span class=\x22tooltiptext\x22></span></div>"+
+                                "<div id=\x22button_left_3\x22 class=\x22\x22 style=\x22float: left; margin: 10px 10px;\x22 onclick=\x22ZoomIn()\x22 class=\x22tooltip\x22><i class=\x22fas fa-search-plus fa-2x\x22></i><span class=\x22tooltiptext\x22></span></div>" +
+                                "<div id=\x22button_left_4\x22 class=\x22\x22 style=\x22float: left; margin: 10px 10px;\x22 onclick=\x22RotateCamera(0)\x22 class=\x22tooltip\x22><i class=\x22fas fa-sync-alt fa-2x\x22></i><span class=\x22tooltiptext\x22></span></div>";
+                                
                                 // "<div class=\x22location_buttons_left\x22 onclick=\x22ShareLocation()\x22 class=\x22tooltip\x22><i class=\x22fas fa-map-marked-alt fa-2x\x22></i><span class=\x22tooltiptext\x22>Share Location</span></div>";
-                                mapStyleSelector = "<div id=\x22button_left_5\x22 class=\x22button_left_5\x22>" +   
+                                mapStyleSelector = "<div id=\x22button_left_5\x22 class=\x22\x22>" +   
                                     "<select id=\x22mapStyle\x22>" +
                                         "<option value=\x22\x22 selected>Select Map Style:</option>" +
                                             "<option>Satellite</option>" +
@@ -15536,7 +15541,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                             "<option>Light</option>" +
                                     "</select>" +
                                 "</div>";
-                                locationButton = mapStyleSelector + mapZoomers;// + "<div class=\x22location_button\x22 style=\x22float: right; margin: 10px 10px;\x22 onclick=\x22ShowHideGeoPanel()\x22><i class=\x22fas fa-globe fa-2x\x22></i></div>";
+                                mapButtons = mapZoomers + mapStyleSelector;// + "<div class=\x22location_button\x22 style=\x22float: right; margin: 10px 10px;\x22 onclick=\x22ShowHideGeoPanel()\x22><i class=\x22fas fa-globe fa-2x\x22></i></div>";
                                 
 
                                             
@@ -17334,6 +17339,8 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                         "<div style=\x22float:right; margin: 5px 10px 5px; 0;\x22 onclick=\x22SceneManglerModal('Tools')\x22><i class=\x22fas fa-tools \x22></i></div>"+
                         "<div style=\x22float:right;margin: 5px 10px 5px; 0px;\x22 onclick=\x22SceneManglerModal('Messages')\x22><i class=\x22fas fa-comments \x22></i></div></div>"+
                         "<div style=\x22float:right;margin: 5px 10px 5px; 0px;\x22 onclick=\x22SceneManglerModal('Quests')\x22><i class=\x22fas fa-question-circle \x22></i></div></div>"+
+                        "<div>"+
+                        mapButtons +
                         // "<div style=\x22float: right; margin: 5px 10px 5px; 0px;\x22 onclick=\x22ShowHideDialogPanel('default')\x22><i class=\x22fas fa-info-circle \x22></i></div></div>"+
                         "</div></div>";
 
