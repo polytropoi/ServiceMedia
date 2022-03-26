@@ -15469,7 +15469,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                 // "<div visible=\x22false\x22 class=\x22pause_button\x22 style=\x22float: left; margin: 10px 10px;\x22 onclick=\x22PauseButton()\x22><i class=\x22fas fa-pause-circle fa-2x\x22></i></div>" +
                                 // "<div class=\x22next_button\x22 style=\x22float: left; margin: 10px 10px;\x22 onclick=\x22ShowHideDialogPanel('default')\x22><i class=\x22fas fa-step-forward fa-2x\x22></i></div>" +
                                 "<div class=\x22next_button\x22 style=\x22float: left; margin: 10px 10px;\x22 onclick=\x22NextButton()\x22><i class=\x22fas fa-step-forward fa-2x\x22></i></div></div>";
-                            } else if (sceneData.sceneWebType == 'Mapbox') {
+                            } else if (sceneData.sceneWebType == 'Mapbox') { 
                                 // ARScript = "<script src=\x22/main/js/geolocator.js\x22></script><script src=\x22/main/ref/aframe/dist/aframe-ar.js\x22></script>";
                                 dialogButton = "<div class=\x22dialog_button\x22 style=\x22float: left; margin: 10px 10px; width: 50px; height: 50px\x22 onclick=\x22SceneManglerModal('Welcome')\x22><i class=\x22fas fa-info-circle fa-2x\x22></i></div>";
                                 locationButton = "<div id=\x22loc_button\x22 class=\x22dialog_button\x22 style=\x22float: left; margin: 10px 10px; width: 50px; height: 50px\x22 onclick=\x22ShowHideGeoPanel()\x22><i class=\x22fas fa-globe fa-2x\x22></i></div>";
@@ -15482,28 +15482,24 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                 // "<div class=\x22next_button\x22 style=\x22float: left; margin: 10px 10px;\x22 onclick=\x22ShowHideDialogPanel('default')\x22><i class=\x22fas fa-step-forward fa-2x\x22></i></div>" +
                                 "<div class=\x22next_button\x22 style=\x22float: left; margin: 10px 10px;\x22 onclick=\x22NextButton()\x22><i class=\x22fas fa-step-forward fa-2x\x22></i></div></div>";
                                 geoScripts = "<script async src=\x22https://get.geojs.io/v1/ip/geo.js\x22></script><script src=\x22/main/js/geolocator.js\x22></script>" +
-                                // "<script src=\x22/main/conf/mapbox_config.js\x22></script>" +
-                                // "<script src=\x22https://api.mapbox.com/mapbox-gl-js/v2.2.0/mapbox-gl.js\x22></script>"+
-                                // "<link href=\x22https://api.mapbox.com/mapbox-gl-js/v2.2.0/mapbox-gl.css\x22 rel=\x22stylesheet\x22/>"+
-                                // "<script src=\x22https://api.mapbox.com/mapbox-gl-js/v2.3.1/mapbox-gl.js\x22></script>"+
-                                // "<link href=\x22https://api.mapbox.com/mapbox-gl-js/v2.3.1/mapbox-gl.css\x22 rel=\x22stylesheet\x22/>"+
+                             
                                 "<script src=\x22https://api.mapbox.com/mapbox-gl-js/v2.7.0/mapbox-gl.js\x22></script>"+
-                                "<link href=\x22https://api.mapbox.com/mapbox-gl-js/v2.7.0/mapbox-gl.css\x22 rel=\x22stylesheet\x22/>"+
+                                "<link href=\x22https://api.mapbox.com/mapbox-gl-js/v2.7.0/mapbox-gl.css\x22 rel=\x22stylesheet\x22/>";
 
                                 // "<script src=\x22https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-directions/v4.1.0/mapbox-gl-directions.js\x22></script>"+
                                 // "<link rel=\x22stylesheet\x22 href=\x22https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-directions/v4.1.0/mapbox-gl-directions.css\x22 type=\x22text/css\x22/>";
-                                "<script src=\x22/main/src/util/threebox.js\x22></script>"+
-                                "<link href=\x22/css/threebox.css\x22 rel=\x22stylesheet\x22/>";
+                                // "<script src=\x22/main/src/util/threebox.js\x22></script>"+
+                                // "<link href=\x22/css/threebox.css\x22 rel=\x22stylesheet\x22/>";
                                 // "<script src=\x22https://unpkg.com/three@0.106.2/examples/js/loaders/GLTFLoader.js\x22></script>";
 
                                 // ARScript = "<script src=\x22/main/ref/aframe/dist/aframe-ar.js\x22></script>";
                                 locationScripts = "<script src=\x22../main/src/component/location-fu.js\x22></script>";
                                 // locationScripts = "<script>window.onload = () => { navigator.geolocation.getCurrentPosition((position) => {"+ //put this where?
                                 // "document.querySelector('a-text').setAttribute('"+geoEntity+"', `latitude: ${position.coords.latitude}; longitude: ${position.coords.longitude};`)});}</script>";
-                                ARSceneArg = "vr-mode-ui=\x22enabled: false\x22 arjs=\x22sourceType: webcam; debugUIEnabled: false;\x22";
+                                // ARSceneArg = "vr-mode-ui=\x22enabled: false\x22 arjs=\x22sourceType: webcam; debugUIEnabled: false;\x22";
                                 // ARMarker =  "<a-text location-init-click id=\x22locationStatus\x22 value=\x22Tap globe icon to \ninit geolocation\x22 look-at=\x22[gps-camera]\x22 position=\x22-5 1 5\x22 scale=\x223 3 3\x22></a-text>";
                                 // camera = "<a-camera listen-from-camera gps-camera rotation-reader><a-entity id=\x22mouseCursor\x22 cursor=\x22rayOrigin: mouse\x22 raycaster=\x22objects: .activeObjexRay\x22></a-entity>"+
-                                camera = "<a-camera id=\x22player\x22 look-controls-enabled=\x22false\x22 arjs-look-controls=\x22smoothingFactor: 0.1\x22 listen-from-camera gps-camera rotation-reader><a-entity id=\x22mouseCursor\x22 cursor=\x22rayOrigin: mouse\x22 raycaster=\x22objects: .activeObjexRay\x22></a-entity>"+
+                                camera = "<a-camera id=\x22player\x22 look-controls-enabled=\x22false\x22 listen-from-camera gps-camera rotation-reader><a-entity id=\x22mouseCursor\x22 cursor=\x22rayOrigin: mouse\x22 raycaster=\x22objects: .activeObjexRay\x22></a-entity>"+
                                 // "<a-entity id=\x22player\x22 networked=\x22template:#avatar-template;attachTemplateToLocal:false;\x22 spawn-in-circle=\x22radius:3;\x22>" + //ENABLE LATER
                                         "</a-camera>";
                                 let doBuildings = false;
@@ -18110,106 +18106,106 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                             console.log("Tryna do a location tracker!");
                             
                         } else if (sceneData.sceneWebType == "BabylonJS") {
-                        let uwfx_shader = requireText('./babylon/uwfx_shader.txt', require);
-                        let uwfx_scene = requireText('./babylon/uwfx_scene.txt', require);
-                        let uwfx_assets = requireText('./babylon/uwfx_assets.txt', require);
-                       
-                        console.log("skyboxUrl" + skyboxUrl);
-                        htmltext = "<!DOCTYPE html>\n" +
-                        "<head> " +
-                        // googleAdSense +
-                        googleAnalytics +
+                            let uwfx_shader = requireText('./babylon/uwfx_shader.txt', require);
+                            let uwfx_scene = requireText('./babylon/uwfx_scene.txt', require);
+                            let uwfx_assets = requireText('./babylon/uwfx_assets.txt', require);
+                        
+                            console.log("skyboxUrl" + skyboxUrl);
+                            htmltext = "<!DOCTYPE html>\n" +
+                            "<head> " +
+                            // googleAdSense +
+                            googleAnalytics +
 
-                        "<link rel=\x22icon\x22 href=\x22data:,\x22></link>"+
-                        "<meta charset='utf-8'/>" +
-                        "<meta name='viewport' content='width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0, shrink-to-fit=no'/>" +
-                        "<meta property='og:url' content='" + rootHost + "/webxr/" + sceneResponse.short_id + "' /> " +
-                        "<meta property='og:type' content='website' /> " +
-                        // "<meta property='og:image' content='" + postcard1 + "' /> " +
-                        "<meta property='og:image' content='http://" + postcard1 + "' /> " +
-                        "<meta property='og:image:height' content='1024' /> " +
-                        "<meta property='og:image:width' content='1024' /> " +
-                        "<meta property='og:title' content='" + sceneResponse.sceneTitle + "' /> " +
-                        "<meta property='og:description' content='" + sceneResponse.sceneDescription + "' /> " +
-                        "<title>" + sceneResponse.sceneTitle + "</title>" +
-                        "<meta name='description' content='" + sceneResponse.sceneDescription + "'/>" +
-                        // "<meta name=\x22monetization\x22 content=\x22"+process.env.COIL_PAYMENT_POINTER+"\x22>" +
-                        "<meta name=\x22mobile-web-app-capable\x22 content=\x22yes\x22>" +
-                        "<meta name=\x22apple-mobile-web-app-capable\x22 content=\x22yes\x22>" +
-                            "<style>\n" +
-                                "html, body {\n" +
-                                    "overflow: hidden;\n" +
-                                    "width: 100%;\n" +
-                                    "height: 100%;\n" +
-                                    "margin: 0;\n" +
-                                    "padding: 0;\n" +
-                                "}\n" +
-                                "#renderCanvas {\n" +
-                                    "width: 100%;\n" +
-                                    "height: 100%;\n" +
-                                    "touch-action: none;\n" +
-                                "}\n" +
-                            "</style>\n" +
-                            "<script src=\x22/babylon/babylon.js\x22></script>\n" + //babylon main script
-                            "<script src=\x22/babylon/babylonjs.loaders.js\x22></script>\n" + //i.e. gltf loader
-                            "<script src=\x22https://code.jquery.com/pep/0.4.3/pep.js\x22></script>\n" + //don't know!
-                        "</head>\n" +
-                        "<body>\n" +
-                            "<canvas id=\x22renderCanvas\x22 touch-action=\x22none\x22></canvas>\n" + 
-                            "<script>\n" +
-                                "var canvas = document.getElementById(\x22renderCanvas\x22);\n" + // Get the canvas element
-                                "var engine = new BABYLON.Engine(canvas, true);\n" + // Generate the BABYLON 3D engine
-                                "var cubetex = null;"+
-                                uwfx_shader +
-                                /******* Add the create scene function ******/
-                                "var createScene = function () {\n" +
-                                    uwfx_scene +
+                            "<link rel=\x22icon\x22 href=\x22data:,\x22></link>"+
+                            "<meta charset='utf-8'/>" +
+                            "<meta name='viewport' content='width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0, shrink-to-fit=no'/>" +
+                            "<meta property='og:url' content='" + rootHost + "/webxr/" + sceneResponse.short_id + "' /> " +
+                            "<meta property='og:type' content='website' /> " +
+                            // "<meta property='og:image' content='" + postcard1 + "' /> " +
+                            "<meta property='og:image' content='http://" + postcard1 + "' /> " +
+                            "<meta property='og:image:height' content='1024' /> " +
+                            "<meta property='og:image:width' content='1024' /> " +
+                            "<meta property='og:title' content='" + sceneResponse.sceneTitle + "' /> " +
+                            "<meta property='og:description' content='" + sceneResponse.sceneDescription + "' /> " +
+                            "<title>" + sceneResponse.sceneTitle + "</title>" +
+                            "<meta name='description' content='" + sceneResponse.sceneDescription + "'/>" +
+                            // "<meta name=\x22monetization\x22 content=\x22"+process.env.COIL_PAYMENT_POINTER+"\x22>" +
+                            "<meta name=\x22mobile-web-app-capable\x22 content=\x22yes\x22>" +
+                            "<meta name=\x22apple-mobile-web-app-capable\x22 content=\x22yes\x22>" +
+                                "<style>\n" +
+                                    "html, body {\n" +
+                                        "overflow: hidden;\n" +
+                                        "width: 100%;\n" +
+                                        "height: 100%;\n" +
+                                        "margin: 0;\n" +
+                                        "padding: 0;\n" +
+                                    "}\n" +
+                                    "#renderCanvas {\n" +
+                                        "width: 100%;\n" +
+                                        "height: 100%;\n" +
+                                        "touch-action: none;\n" +
+                                    "}\n" +
+                                "</style>\n" +
+                                "<script src=\x22/babylon/babylon.js\x22></script>\n" + //babylon main script
+                                "<script src=\x22/babylon/babylonjs.loaders.js\x22></script>\n" + //i.e. gltf loader
+                                "<script src=\x22https://code.jquery.com/pep/0.4.3/pep.js\x22></script>\n" + //don't know!
+                            "</head>\n" +
+                            "<body>\n" +
+                                "<canvas id=\x22renderCanvas\x22 touch-action=\x22none\x22></canvas>\n" + 
+                                "<script>\n" +
+                                    "var canvas = document.getElementById(\x22renderCanvas\x22);\n" + // Get the canvas element
+                                    "var engine = new BABYLON.Engine(canvas, true);\n" + // Generate the BABYLON 3D engine
+                                    "var cubetex = null;"+
+                                    uwfx_shader +
+                                    /******* Add the create scene function ******/
+                                    "var createScene = function () {\n" +
+                                        uwfx_scene +
 
-                                    // "let eqTexture = new BABYLON.CubeTexture('', scene, undefined, undefined, "+JSON.stringify( cubeMapAsset)+");" + //deprecated
-                                    // "scene.environmentTexture = eqTexture;\n"+
-                                    // "scene.environmentTexture.coordinatesMode = BABYLON.Texture.SKYBOX_MODE;\n"+
-                                    "scene.createDefaultSkybox(scene.environmentTexture);\n"+
-                                    "var hlight = new BABYLON.DirectionalLight(\x22dLight\x22, new BABYLON.Vector3(-1, 1, 0), scene);\n" +
-                                    "hlight.diffuse = new BABYLON.Color3(.5, 0, 0);\n" +
-                                    "hlight.specular = new BABYLON.Color3(0, .6, 0);\n" +
-                                    "var sphere = BABYLON.MeshBuilder.CreateSphere(\x22sphere\x22, {diameter:3}, scene);\n" +
+                                        // "let eqTexture = new BABYLON.CubeTexture('', scene, undefined, undefined, "+JSON.stringify( cubeMapAsset)+");" + //deprecated
+                                        // "scene.environmentTexture = eqTexture;\n"+
+                                        // "scene.environmentTexture.coordinatesMode = BABYLON.Texture.SKYBOX_MODE;\n"+
+                                        "scene.createDefaultSkybox(scene.environmentTexture);\n"+
+                                        "var hlight = new BABYLON.DirectionalLight(\x22dLight\x22, new BABYLON.Vector3(-1, 1, 0), scene);\n" +
+                                        "hlight.diffuse = new BABYLON.Color3(.5, 0, 0);\n" +
+                                        "hlight.specular = new BABYLON.Color3(0, .6, 0);\n" +
+                                        "var sphere = BABYLON.MeshBuilder.CreateSphere(\x22sphere\x22, {diameter:3}, scene);\n" +
 
-                                    "var glass = new BABYLON.PBRMaterial('glass', scene);\n"+
-                                    // "glass.reflectionTexture.coordinatesMode = BABYLON.Texture.SKYBOX_MODE;\n" +
-                                    "glass.diffuseColor = new BABYLON.Color3(0, 0, 0);\n" +
-                                    "glass.specularColor = new BABYLON.Color3(0, 0, 0);\n" +
-                                    // "glass.reflectionTexture = eqTexture;\n"+
-                                    // "glass.refractionTexture = eqTexture;\n"+
-                                    // "glass.linkRefractionWithTransparency = true;\n"+
-                                    // "glass.indexOfRefraction = 0.52;\n"+
-                                    // "glass.alpha = 0;\n"+
-                                    // "glass.microSurface = 1;\n"+
-                                    // "glass.reflectivityColor = new BABYLON.Color3(0.2, 0.2, 0.2);\n"+
-                                    // "glass.albedoColor = new BABYLON.Color3(0.85, 0.85, 0.85);\n"+
-                                    "sphere.material = glass;\n"+
-                                    "sphere.position.x = 3;\n" +
-                                    "sphere.position.y = 3;\n" +
-                                    uwfx_assets +
-                                    gltfsAssets +
-                                    "return scene;\n" +
-                                "};\n" +
-                                /******* End of the create scene function ******/
-                                "var scene = createScene(); //Call the createScene function\n" +
-                                // Register a render loop to repeatedly render the scene
-                                "engine.runRenderLoop(function () {\n" +
-                                "scene.render();\n" +
-                                "});\n" +
+                                        "var glass = new BABYLON.PBRMaterial('glass', scene);\n"+
+                                        // "glass.reflectionTexture.coordinatesMode = BABYLON.Texture.SKYBOX_MODE;\n" +
+                                        "glass.diffuseColor = new BABYLON.Color3(0, 0, 0);\n" +
+                                        "glass.specularColor = new BABYLON.Color3(0, 0, 0);\n" +
+                                        // "glass.reflectionTexture = eqTexture;\n"+
+                                        // "glass.refractionTexture = eqTexture;\n"+
+                                        // "glass.linkRefractionWithTransparency = true;\n"+
+                                        // "glass.indexOfRefraction = 0.52;\n"+
+                                        // "glass.alpha = 0;\n"+
+                                        // "glass.microSurface = 1;\n"+
+                                        // "glass.reflectivityColor = new BABYLON.Color3(0.2, 0.2, 0.2);\n"+
+                                        // "glass.albedoColor = new BABYLON.Color3(0.85, 0.85, 0.85);\n"+
+                                        "sphere.material = glass;\n" +
+                                        "sphere.position.x = 3;\n" +
+                                        "sphere.position.y = 3;\n" +
+                                        uwfx_assets +
+                                        gltfsAssets +
+                                        "return scene;\n" +
+                                    "};\n" +
+                                    /******* End of the create scene function ******/
+                                    "var scene = createScene(); //Call the createScene function\n" +
+                                    // Register a render loop to repeatedly render the scene
+                                    "engine.runRenderLoop(function () {\n" +
+                                    "scene.render();\n" +
+                                    "});\n" +
 
-                                // Watch for browser/canvas resize events
-                                "window.addEventListener(\x22resize\x22, function () {\n" +
-                                "engine.resize();\n" +
-                                "});\n" +
-                            "</script>\n" +
-                        "</body>\n" +
-                        "</html>";
-                    } else if (sceneData.sceneWebType == "ThreeJS") {
+                                    // Watch for browser/canvas resize events
+                                    "window.addEventListener(\x22resize\x22, function () {\n" +
+                                    "engine.resize();\n" +
+                                    "});\n" +
+                                "</script>\n" +
+                            "</body>\n" +
+                            "</html>";
+                        } else if (sceneData.sceneWebType == "ThreeJS") {
                         //THREEJS ONLY FOR FACETRACKING // uses https://github.com/jeeliz/jeelizFaceFilter
-                        if (sceneResponse.sceneFaceTracking) {
+                            if (sceneResponse.sceneFaceTracking) {
                             // console.log("gltfsAssets: "+ gltfsAssets);
                             let offx = 0;
                             let offy = 0;
@@ -18338,7 +18334,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                             "<canvas width=\x22600\x22 height=\x22600\x22 id='jeeFaceFilterCanvas'></canvas>" +
                             "</body>" +
                             "</html>";
-                        } else {
+                        } else { //not face tracking threejs below
                                 sceneAssets = "\n"+
                                 "loader.load(\n"+ //icons and gui stuff for inclusion in threejs below
                                 "\x22https://servicemedia.s3.amazonaws.com/assets/models/panel5b.glb\x22,"+ //landscape panel
@@ -18665,7 +18661,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                             // callback(null);
                         // } 
                     } else if (sceneResponse.sceneWebType == "AR Image Tracking") { //aframe plus mindar
-// dialogButton = "";
+                        // dialogButton = "";
                         let extraScripts = "";
                         let sky = "environment-image=\x22neutral\x22";
                         if (skyboxUrl != null) {
@@ -18777,6 +18773,173 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                         // "<script>InitSceneHooks(\x22Model Viewer\x22)</script>";
                         "</html>";
                         console.log("Tryna do a AR Image Tracking scene");
+
+                    } else if (sceneResponse.sceneWebType == 'Mapboxx') { //rem'd aframe version below - maybe later?
+                           
+                            mainDiv = "<div id=\x22map\x22 class=\x22map\x22 style=\x22width:100%; height:100%\x22>"; //closed at end
+                            joystickContainer = "";
+                            let uid = "0000000000000";
+                        if (req.session.user) {
+                            uid = req.session.user._id;
+                        }
+                        var token=jwt.sign({userId:uid,shortID:sceneResponse.short_id},process.env.JWT_SECRET, { expiresIn: '1h' });  
+                        let modal = "<div id=\x22theModal\x22 class=\x22modal\x22><div id=\x22modalContent\x22 class=\x22modal-content\x22></div></div>";
+                        htmltext = "<html xmlns='http://www.w3.org/1999/xhtml'>" +
+                        "<head> " +
+                        googleAnalytics +
+
+                        // googleAdSense +
+                        "<link rel=\x22icon\x22 href=\x22data:,\x22></link>"+
+                        "<meta charset='utf-8'/>" +
+                        "<meta name='viewport' content='width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0, shrink-to-fit=no'/>" +
+                        "<meta property='og:url' content='" + rootHost + "/webxr/" + sceneResponse.short_id + "' /> " +
+                        "<meta property='og:type' content='website' /> " +
+                        // "<meta property='og:image' content='" + postcard1 + "' /> " +
+                        "<meta property='og:image' content='http://" + postcard1 + "' /> " +
+                        "<meta property='og:image:height' content='1024' /> " +
+                        "<meta property='og:image:width' content='1024' /> " +
+                        "<meta property='og:title' content='" + sceneResponse.sceneTitle + "' /> " +
+                        "<meta property='og:description' content='" + sceneResponse.sceneDescription + "' /> " +
+                        "<title>" + sceneResponse.sceneTitle + "</title>" +
+                        "<meta name='description' content='" + sceneResponse.sceneDescription + "'/>" +
+                        // "<meta name=\x22monetization\x22 content=\x22$ilp.uphold.com/EMJQj4qKRxdF\x22>" +
+                        "<meta name=\x22mobile-web-app-capable\x22 content=\x22yes\x22>" +
+                        "<meta name=\x22apple-mobile-web-app-capable\x22 content=\x22yes\x22>" +
+                        // "<meta name=\x22token\x22 content=\x22"+token+"\x22>"+
+                        "<link href=\x22../main/vendor/fontawesome-free/css/all.css\x22 rel=\x22stylesheet\x22 type=\x22text/css\x22>" +
+                        "<link href=\x22/css/webxr.css\x22 rel=\x22stylesheet\x22 type=\x22text/css\x22>" +
+                        
+                        "<script src=\x22/main/vendor/jquery/jquery.min.js\x22></script>" +
+                        
+                        // "<script src=\x22../main/ref/aframe/dist/socket.io.slim.js\x22></script>" +
+                        // "<script src=\x22/connect/connect.js\x22 defer=\x22defer\x22></script>" +
+                
+
+                        "<script src=\x22../main/vendor/howler/src/howler.core.js\x22></script>"+
+                        "<script src=\x22../main/vendor/howler/src/howler.spatial.js\x22></script>"+
+                        // "<script src=\x22../main/js/hls.min.js\x22></script>" + //v 1.0.6 
+                        // "<script src=\x22../main/js/navigation.js\x22></script>" + //includes navmesh components (simple and not), and extended-wasd-controls
+
+                        primaryAudioScript +
+                        ambientAudioScript +
+                        triggerAudioScript +
+                        "</head>" +
+                        "<body bgcolor='black'>" +
+                        
+                        modal +
+                        
+                        // "<div id=\x22"+mainDivID+"\x22 class=\x22"mainDivClass"\x22 style=\x22width:100%; height:100%\x22>"+
+                        mainDiv + //main Div wrapper, different for map
+
+                        "<div class=\x22primaryAudioParams\x22 "+primaryAudioParams+" id="+streamPrimaryAudio+ "_" +oggurl+"></div>"+  //TODO Fix!  concatting the id is stupid, use data-attributes
+                        "<div class=\x22ambientAudioParams\x22 id="+ambientUrl+"></div>"+
+                        "<div class=\x22triggerAudioParams\x22 id="+triggerUrl+"></div>"+
+                        settingsData +
+                        // "<div class=\x22attributionParams\x22 id="+JSON.stringify(attributions)+"></div>"+
+                        "<div class=\x22avatarName\x22 id="+avatarName+"></div>"+
+                        primaryAudioControl +
+                        ambientAudioControl +
+                        triggerAudioControl +
+                        // "<script> function screenCap() {console.log(\x22tryna screenCap()\x22); document.querySelector('a-scene').components.screenshot.capture('perspective')};"+    
+                        // "</script>"+
+                        containers +
+                        locationScripts +
+                        geoScripts +
+                        "<script src=\x22../main/js/dialogs.js\x22></script>"+
+                        geoEntities +
+                        // videoEntity +
+                        // youtubeEntity +
+                        // mainTextEntity +
+                        // attributionsTextEntity +
+                        // availableScenesEntity +
+                        // pictureGroupsEntity +
+                        pictureGroupsData +
+                        // videoGroupsEntity +
+                        // navmeshEntity +
+                        // networkingEntity +
+                        // locationEntity +
+                        // primaryAudioEntity +
+                        // ambientAudioEntity + 
+                        // triggerAudioEntity +
+                        // lightEntities +
+                        // placeholderEntities +
+                        loadLocations +
+                        // "<a-entity id=\x22createAvatars\x22 create_avatars></a-entity>"+
+                        audioVizEntity +
+                        instancingEntity +
+                        // "<a-entity show-in-ar-mode visible=\x22false\x22 id=\x22reticleEntity\x22 gltf-model=\x22#reticle2\x22 scale=\x220.8 0.8 0.8\x22 "+arHitTest+"></a-entity>\n"+
+                        // arShadowPlane +
+                        hemiLight +
+                        shadowLight +
+                        // navmarsh +
+                        loadAudioEvents +
+                        
+                        modelData +
+                        objectData +
+                        inventoryData +
+                        // "<a-entity id=\x22navmesh\x22 geometry=\x22primitive: plane; height: 30; width: 30; buffer: true;\x22 rotation=\x22-90 0 0\x22 nav-mesh></a-entity>"+
+                        
+                        "</div>\n"+ //close maindiv
+                        "<style>\n"+
+                        "a{ color:#fff;\n"+
+                        "text-decoration:none;\n"+
+                        "}\n"+
+                        ".footer {\n"+
+                        "position: fixed;\n"+
+                        "left: 0;\n"+
+                        "bottom: 0;\n"+
+                        "width: 100%;\n"+
+                        "background-color: black;\n"+
+                        "color: white;\n"+
+                        // "text-align: left;\n"+
+                        "font-family: \x22Trebuchet MS\x22, Helvetica, sans-serif\n"+
+                        "}\n"+
+                        "</style>\n"+
+                        // "<div class=\x22renderPanel\x22 id=\x22renderPanel\x22></div>\n"+
+                        sceneTextItemData +
+                        "<div id=\x22geopanel\x22 class=\x22geopanel\x22><span></span></div>\n"+
+                        // "<div id=\x22sceneGreeting\x22 style=\x22z-index: -20;\x22>"+sceneGreeting+"</div>"+
+                        // "<div id=\x22sceneQuest\x22 style=\x22z-index: -20;\x22>"+sceneQuest+"</div>"+
+                        "<div class=\x22backmask\x22 style=\x22position: fixed; left: 0; top: 0; z-index: -5; overflow: hidden\x22></div>"+ //to hide lower elements
+                       
+                        
+
+                        screenOverlay + //socket picture
+                        canvasOverlay + //drop down side panel
+                        audioSliders +
+                        mapOverlay + //
+                        adSquareOverlay +
+                        "<div class=\x22next-button\x22 id=\x22nextButton\x22 style=\x22visibility: hidden\x22 onclick=\x22GoToNext()\x22><i class=\x22fas fa-arrow-circle-right fa-2x\x22></i></div>"+
+                        "<div class=\x22previous-button\x22 id=\x22previousButton\x22 style=\x22visibility: hidden\x22 onclick=\x22GoToPrevious()\x22><i class=\x22fas fa-arrow-circle-left fa-2x\x22></i></div>"+
+                        "<a href=\x22''\x22 target=\x22_blank\x22 class=\x22ar-buttoon\x22>AR</a>" +
+                        
+                        "<div id=\x22token\x22 data-token=\x22"+token+"\x22>\n"+
+                        
+                        // "<div style=\x22float: left; margin: 10px 10px;\x22 onclick=\x22screenCap()\x22><i class=\x22fas fa-camera  fa-2x\x22></i></div>\n"+ 
+                        locationButton+
+                        dialogButton+
+                        ethereumButton+ 
+                        transportButtons+ 
+                        
+                        // socketScripts +
+                      
+                    //     "<script>\n"+
+                    //         // "var avatarName = \x22" + avatarName + "\x22;\n" +
+                    //         // "let globalStateObject = {};"
+                    //        "function ready(f){/in/.test(document.readyState)?setTimeout('ready('+f+')',9):f()}\n"+
+                            
+                    //         //    loadAttributions +
+                    //            loadAvailableScenes +
+                    //         // loadPictureGroups +
+                            
+                           
+                        
+                    //    "</script>\n"+
+                    //     sceneManglerButtons +
+                       
+                       
+                        "</body>" +
+                    "</html>";
                     
                     } else { //AFrame response below
                         let joystick = "joystick=\x22useNavmesh: false\x22";
@@ -18843,11 +19006,11 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                         // fogSettings + " "+networkedscene+" "+ARSceneArg+">";
 
                         let mainDiv = "<div style=\x22width:100%; height:100%\x22>";
-                        if (sceneResponse.sceneWebType == 'Mapbox') {
+
+                        if (sceneResponse.sceneWebType == 'Mapbox') { //no, non-aframe version above - maybe later?
                             aScene = "<a-scene loading-screen=\x22dotsColor: white; backgroundColor: black\x22 vr-mode-ui=\x22enabled: false\x22 keyboard-shortcuts=\x22enterVR: false\x22 disable-magicwindow device-orientation-permission-ui=\x22enabled: false\x22>";
                             mainDiv = "<div id=\x22map\x22 class=\x22map\x22 style=\x22width:100%; height:100%\x22>"; //closed at end
                             joystickContainer = "";
-                  
                         }
                         if (sceneResponse.sceneWebType == 'AR Location Tracking') {
                             console.log("AR Location Tracking mdoe...");

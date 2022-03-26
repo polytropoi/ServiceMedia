@@ -822,7 +822,7 @@ function geoip(json){
   //   console.log("mouseover " + e);
   // }
 
-  AFRAME.registerComponent('location_init_mapbox', {
+  AFRAME.registerComponent('location_init_mapbox_nope', { //nope, do this in noaframe for now... //nope, just rem threebox, as below
     schema: {
       latitude: {default: 0},
       longitude: {default: 0},
@@ -1154,6 +1154,329 @@ function geoip(json){
         //     map.fire('flyend');
         //   }
         // });
+        map.on('flystart', function(){
+          flying = true;
+        });
+        map.on('flyend', function(){
+          flying = false;
+        });
+        map.on('click', function(e) {
+          if (rotator != null) {
+            cancelAnimationFrame(rotator); //stop rotation on click if needed
+            // rotateOn = false;
+          }
+        });
+        let mapStyle = document.getElementById('mapStyle');
+        console.log(mapStyle)
+        if (mapStyle != null) {
+          console.log(mapStyle.value);
+
+        // map['touchZoomRotate'].enable();
+        
+        mapStyle.addEventListener('change', (event) => {
+          MapStyleSelectChange(event.target.value);
+        });
+
+          // mapStyle.addEventListener("change", MapStyleSelectChange(mapStyle.value));
+        }
+        // UpdateMarkers();
+      }); //map load end
+
+      // UpdateGeoPanel(currentLocString);
+
+      
+      }
+  });
+
+
+  AFRAME.registerComponent('location_init_mapbox', { //ok, no threebox...
+    schema: {
+      latitude: {default: 0},
+      longitude: {default: 0},
+      restrict: {default: false},
+      range: {default: .1},
+      doBuildings: {default: false},
+      doTerrain: {default: false},
+      zoomLevel: {default: 19},
+      mbid: {default: ""}
+      },
+    init: function () {
+      mode = 'mapbox';
+      window.sceneType = mode;
+      InitSceneHooks();
+      UpdateLocationInfo();
+      mapboxgl.accessToken = this.data.mbid;
+      // console.log("tryna mapbox with toik,e mn " + mapbox_config.accessToken);
+      gpsElements = document.querySelectorAll(".geopoi,.geo");
+      let latitude = gpsElements[0].getAttribute(geoEntity.toString()).latitude;
+      let longitude = gpsElements[0].getAttribute(geoEntity.toString()).longitude;
+      // console.log("lat " )
+      var map = new mapboxgl.Map({
+        // style: 'mapbox://styles/mapbox/light-v10',
+        style: 'mapbox://styles/mapbox-map-design/ckhqrf2tz0dt119ny6azh975y',
+        // style: 'mapbox://styles/polytropoi/ckke5tnp40mrt17ohfhkxy29q',
+        
+        container: 'map',
+        zoom: this.data.zoomLevel,
+        center: [longitude, latitude],
+        pitch: 75,
+        bearing: 90,
+        antialias: true
+
+
+        });
+        map.scrollZoom.disable();
+        theMap = map;
+
+       
+        // window.tb = new Threebox(
+        //   map,
+        //   map.getCanvas().getContext('webgl'),
+        //   {
+        //     defaultLights: true,
+
+        //   }
+        // );
+
+        doBuildings = this.data.doBuildings;
+        doTerrain = this.data.doTerrain;
+
+        let that = this;
+        console.log("do builtings " + doBuildings + " do terrain " + doTerrain);
+        map.on('load', function () {
+          // map.addControl(
+          //   new MapboxDirections({
+          //   accessToken: mapboxgl.accessToken
+          //   }),
+          //   'top-right'
+          //   );
+          if (doTerrain) {
+            map.addSource('mapbox-dem', {
+            'type': 'raster-dem',
+            'url': 'mapbox://mapbox.mapbox-terrain-dem-v1',
+            'tileSize': 512,
+            'maxzoom': 20
+            });
+
+              // add the DEM source as a terrain layer with exaggerated height
+              
+            // }
+            map.setTerrain({ 'source': 'mapbox-dem', 'exaggeration': 1.25 });
+          }
+          // add a sky layer that will show when the map is highly pitched
+          map.addLayer({
+            'id': 'sky',
+            'type': 'sky',
+            'paint': {
+            'sky-type': 'atmosphere',
+            'sky-atmosphere-sun': [0.0, 0.0],
+            'sky-atmosphere-sun-intensity': 15
+            }
+          });
+
+     
+        var layers = map.getStyle().layers;
+        var labelLayerId;
+        for (var i = 0; i < layers.length; i++) {
+          if (layers[i].type === 'symbol' && layers[i].layout['text-field']) {
+           labelLayerId = layers[i].id;
+          break;
+          }
+        }
+        // map.dragPan.enable({
+        //   linearity: 0.3,
+        //   // easing: bezier(0, 0, 0.3, 1),
+        //   maxSpeed: 300,
+        //   deceleration: 1500,
+        //   });
+        map.dragPan.disable();
+        map.scrollZoom.disable();
+        map['doubleClickZoom'].disable();
+        map['dragRotate'].enable();
+        map.touchPitch.enable();
+        map.touchZoomRotate.enable({ around: 'center' });
+        // map.scrollZoom.enable({ around: 'center' });
+        if (doBuildings) {
+          console.log("tryna do buildingz");
+          map.addLayer({
+            'id': '3d-buildings',
+            'source': 'composite',
+            'source-layer': 'building',
+            'filter': ['==', 'extrude', 'true'],
+            'type': 'fill-extrusion',
+            'minzoom': 15,
+            'paint': {
+              'fill-extrusion-color': '#aaa',
+              
+              // use an 'interpolate' expression to add a smooth transition effect to the
+              // buildings as the user zooms in
+              'fill-extrusion-height': [
+              'interpolate',
+              ['linear'],
+              ['zoom'],
+              15,
+              0,
+              15.05,
+              ['get', 'height']
+              ],
+              'fill-extrusion-base': [
+              'interpolate',
+              ['linear'],
+              ['zoom'],
+              15,
+              0,
+              15.05,
+              ['get', 'min_height']
+              ],
+              'fill-extrusion-opacity': 0.6
+              } 
+            },
+            labelLayerId
+          );
+        }
+        let currentLocString = "<button class=\x22locbutton\x22 id=\x22"+currentLocation[0]+"_"+currentLocation[1]+"\x22>You are here</button><br><br>";
+        // console.log(currentLocString);
+        let index = 0; 
+        for (let i = 0; i < gpsElements.length; i++) {
+          
+          console.log("gpsElements: " + gpsElements.length);
+          index++; 
+            // create a HTML element for each feature
+          // var el = document.createElement('div');
+          // el.className = 'marker';
+          let lat = gpsElements[i].getAttribute(geoEntity.toString()).latitude;
+          let lng = gpsElements[i].getAttribute(geoEntity.toString()).longitude;
+          // let eventdata = "";
+          let label = "";
+          let scale = 10;
+          let eventData = null;
+          if (sceneLocations.locations != undefined) {
+            for (let m = 0; m < sceneLocations.locations.length; m++) {
+              if (gpsElements[i].getAttribute(geoEntity.toString())._id == sceneLocations.locations[m].timestamp) {//match the id to get the sceneLcoation data
+                let modelUrl = 'https://servicemedia.s3.amazonaws.com/assets/models/avatar1c.glb';
+                if (sceneLocations.locations[m].modelID != null) {
+                  // console.log("Looking for model id: " + sceneLocations.locations[m].modelID);   
+
+                  let locationModel = document.getElementById(sceneLocations.locations[m].modelID.toString());               
+                  console.log("Looking for model : " + locationModel.getAttribute('src'));
+                  modelUrl = locationModel.getAttribute('src');
+                }
+                if (sceneLocations.locations[m].markerObjScale != null && sceneLocations.locations[m].markerObjScale != undefined) {
+                  scale = parseFloat(sceneLocations.locations[m].markerObjScale);
+                  console.log("parsing scale " + scale);
+                }
+
+                if (sceneLocations.locations[m].eventData != null && sceneLocations.locations[m].eventData != undefined) {
+                  eventData = sceneLocations.locations[m].eventData;
+                }
+                label = sceneLocations.locations[m].label != undefined ? sceneLocations.locations[m].label : sceneLocations.locations[m].name; // to do : event data
+                
+                
+                /*
+                map.addLayer({
+                  id: 'custom_layer'+index.toString(),
+                  type: 'custom',
+                  renderingMode: '3d',
+                  onAdd: function (map, mbxContext) {
+                    var options = {
+                      obj: modelUrl,
+                      type: 'gltf',
+                      scale: scale,
+                      units: 'meters',
+                      rotation: { x: 90, y: 180, z: 0}, //default rotation
+                      anchor: 'bottom'
+                    }
+                    tb.loadObj(options, function (model) {
+                      // if (model != undefined && model != null) {
+                      let theModel = model.setCoords([sceneLocations.locations[m].longitude, sceneLocations.locations[m].latitude]);
+
+                      // theModel.addEventListener('ObjectMouseOver', onObjectMouseOver, false);
+                      let obj = null;
+                      tb.add(theModel);
+                      // let modelEntity = document.createElement("a-entity");
+                      // modelEntity.setAttribute("mod-model");
+                      // modelEntity.setObject3D("Object3D", model);
+                      // modelEntity.classList.add("activeObjexRay");
+                      // gpsElements[i].appendChild(gpsPanel);
+                      // }
+                    });
+                  },
+                  render: function (gl, matrix) {
+                  tb.update();
+                  }
+                });
+                */
+              // });
+              }
+            }
+          }
+          if (gpsElements[i].classList.contains('poi')) { //only show poi markers in list
+            var distance = DistanceBetweenTwoCoordinates(currentLocation[1], currentLocation[0], lat, lng);
+            // console.log("distance " + distance);
+            // if (distance > mostDistant) {
+            //   mostDistant = distance;
+            // }
+            // let latlngString = gpsElements[i].getAttribute(geoEntity.toString()).longitude+"_"+gpsElements[i].getAttribute(geoEntity.toString()).latitude;
+            let indexMinusOne = i > 0 ? i - 1 : gpsElements.length - 1;
+            let indexPlusOne = i < gpsElements.length - 1 ? i + 1 : 0;
+           
+            let latlngStringPrevious = gpsElements[indexMinusOne].getAttribute(geoEntity.toString()).longitude+"_"+gpsElements[indexMinusOne].getAttribute(geoEntity.toString()).latitude;
+            let latlngStringNext = gpsElements[indexPlusOne].getAttribute(geoEntity.toString()).longitude+"_"+gpsElements[indexPlusOne].getAttribute(geoEntity.toString()).latitude;
+
+            currentLocString = currentLocString + "\n<button class=\x22locbutton\x22 id=\x22"+gpsElements[i].getAttribute(geoEntity.toString()).longitude+"_"+gpsElements[i].getAttribute(geoEntity.toString()).latitude+"\x22>" + label + " "+distance.toFixed(2)+ " miles</button><br>";
+            // console.log("gpsElements index " + i + " " + currentLocString);
+            let href = "";
+            if (eventData != null && eventData != "" && eventData.toString().includes("link")) {
+              console.log("gotsa link " +eventData);
+              let splitchar = null;
+              if (eventData.toString().includes("=")) {
+                splitchar = "=";
+              }
+              if (eventData.toString().includes("~")) {
+                splitchar = "~";
+              }
+              if (splitchar != null) {
+                let split = eventData.toString().split(splitchar);
+                href = split[1].trim();
+                
+              }
+            }
+            if (gpsElements[i].classList.contains("poi")) {
+              var popup = new mapboxgl.Popup( {className: "mode1-popup"})
+              .setHTML('<h4>' + label + 
+              '<br>distance: '+distance.toFixed(2)+' miles</h4>'+
+              '<div id=\x22'+gpsElements[indexPlusOne].getAttribute(geoEntity.toString()).longitude+'_'+gpsElements[indexPlusOne].getAttribute(geoEntity.toString()).latitude+'\x22'+
+              'class=\x22locbutton tooltip\x22 onclick=\x22PopupNextPreviousButtons(\x27'+latlngStringNext+'\x27)\x22><i style=\x22margin-left: 10px; margin-right: 10px;\x22class=\x22fas fa-arrow-circle-right fa-2x\x22></i><span class=\x22tooltiptext\x22>Next Location</span></div>'+
+              
+              // '<div id=\x22'+gpsElements[indexMinusOne].getAttribute(geoEntity.toString()).longitude+'_'+gpsElements[indexMinusOne].getAttribute(geoEntity.toString()).latitude+'\x22 class=\x22locbutton tooltip\x22><i  style=\x22margin-left: 10px; margin-right: 10px;\x22 class=\x22fas fa-arrow-circle-left fa-2x\x22></i><span class=\x22tooltiptext\x22>Previous Location</span></div>'+
+              // // id=\x22'+gpsElements[i].getAttribute(geoEntity.toString()).longitude+'_'+gpsElements[i].getAttribute(geoEntity.toString()).latitude+'\x22 
+              // '<div id=\x22'+gpsElements[i].getAttribute(geoEntity.toString()).longitude+'_'+gpsElements[i].getAttribute(geoEntity.toString()).latitude+'\x22 class=\x22locbutton tooltip\x22><i style=\x22margin-left: 10px; margin-right: 10px;\x22class=\x22fas fa-bullseye fa-2x\x22></i><span class=\x22tooltiptext\x22>Center</span></div>'+
+              '<div onclick=\x22PopupLinkButtons(\x27'+href+'\x27)\x22 class=\x22locbutton tooltip\x22><i style=\x22 margin-left: 10px; margin-right: 10px;\x22class=\x22fas fa-link fa-2x\x22></i><span class=\x22tooltiptext\x22>Link</span></div>'+
+              // '<div class=\x22tooltip\x22><i style=\x22margin-left: 10px; margin-right: 10px;\x22class=\x22fas fa-envelope fa-2x\x22></i><span class=\x22tooltiptext\x22>Messages</span></div>'+
+              // '<div class=\x22tooltip\x22><i style=\x22margin-left: 10px; margin-right: 10px;\x22class=\x22fas fa-camera fa-2x\x22></i><span class=\x22tooltiptext\x22>Pictures</span></div>'+
+              // '<div class=\x22tooltip\x22><i style=\x22margin-left: 10px; margin-right: 10px;\x22 class=\x22fas fa-walking fa-2x\x22></i><span class=\x22tooltiptext\x22>Directions</span></div>'+
+              // '<div id=\x22'+gpsElements[indexPlusOne].getAttribute(geoEntity.toString()).longitude+'_'+gpsElements[indexPlusOne].getAttribute(geoEntity.toString()).latitude+'\x22'+
+              // 'class=\x22locbutton tooltip\x22><i  style=\x22margin-left: 10px; margin-right: 10px;\x22class=\x22fas fa-arrow-circle-right fa-2x\x22></i><span class=\x22tooltiptext\x22>Next Location</span></div>'
+              '<div id=\x22'+gpsElements[indexMinusOne].getAttribute(geoEntity.toString()).longitude+'_'+gpsElements[indexMinusOne].getAttribute(geoEntity.toString()).latitude+
+              '\x22 class=\x22locbutton tooltip\x22 onclick=\x22PopupNextPreviousButtons(\x27'+latlngStringPrevious+'\x27)\x22><i style=\x22margin-left: 10px; margin-right: 10px;\x22 class=\x22fas fa-arrow-circle-left fa-2x\x22></i><span class=\x22tooltiptext\x22>Previous Location</span></div>')
+              .addTo(theMap);
+
+
+            let marker = new mapboxgl
+              .Marker()
+                .setLngLat([gpsElements[i].getAttribute(geoEntity.toString()).longitude, gpsElements[i].getAttribute(geoEntity.toString()).latitude])
+                .addTo(map)
+                .setPopup(popup);
+              popup.remove();  
+            }
+          // HideMarkers();
+        }
+      }
+
+        
+        UpdateGeoPanel(currentLocString);
+        initialized = true;
+
         map.on('flystart', function(){
           flying = true;
         });
