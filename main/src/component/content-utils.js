@@ -2074,22 +2074,25 @@ AFRAME.registerComponent('mod_objex', {
        Drop(data);
       }
     },
-    equipObject: function (objectID) {
+    equipInventoryObject: function (objectID) {
       console.log("tryna set model to " + objectID);  
       this.objectData = this.returnObjectData(objectID);
       this.dropPos = new THREE.Vector3();
       this.objEl = document.createElement("a-entity");
-      this.equipHolder = document.getElementById("viewportPlaceholder");
-      this.equipHolder.object3D.getWorldPosition( this.dropPos );
+      this.equipHolder = document.getElementById("equipPlaceholder");
+      // this.equipHolder.object3D.getWorldPosition( this.dropPos );
       this.locData = {};
-      this.locData.x = this.dropPos.x;
-      this.locData.y = this.dropPos.y;
-      this.locData.z = this.dropPos.z;
+      // this.locData.x = this.dropPos.x;
+      // this.locData.y = this.dropPos.y;
+      // this.locData.z = this.dropPos.z;
+      this.locData.x = 0;
+      this.locData.y = 0;
+      this.locData.z = 0;
       this.locData.timestamp = Date.now();
-      this.objEl.setAttribute("mod_object", {'locationData': this.locData, 'objectData': this.objectData});
+      this.objEl.setAttribute("mod_object", {'locationData': this.locData, 'objectData': this.objectData, 'equipped': true});
       this.objEl.id = "obj" + this.objectData._id + "_" + this.locData.timestamp;
 
-      sceneEl.appendChild(this.equipHolder);
+      this.equipHolder.appendChild(this.objEl);
       // this.el.setAttribute('gltf-model', '#' + modelID.toString());
     },
     dropObject: function (objectID) {
@@ -2163,6 +2166,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
   schema: {
     locationData: {default: ''},
     objectData: {default: ''},
+    equipped: {default: false},
     fromSceneInventory: {default: null},
     timestamp: {default: null},
     applyForceToNewObject: {default: false}
@@ -2191,6 +2195,14 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
     this.synth = null;
     this.hasSynth = false;
     this.mod_physics = "";
+    this.pushForward = false;
+    this.lookVector = new THREE.Vector3( 0, 0, - 1 );
+    let cameraEl = document.querySelector('a-entity[camera]')
+    if (!cameraEl) {
+        cameraEl = document.querySelector('a-camera');
+    }
+    this.camera = cameraEl.components.camera.camera;
+   
     // this.sceneInventoryID = null;
   
     if (this.data.objectData.modelURL != undefined) {
@@ -2294,7 +2306,12 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
      
       if (that.data.objectData.physics != undefined && that.data.objectData.physics != null && that.data.objectData.physics.toLowerCase() != "none") {
         //  setTimeout(function(){  
-          that.el.setAttribute('ammo-body', {type: that.data.objectData.physics.toLowerCase()});
+          if (this.data.equipped) {
+            that.el.setAttribute('ammo-body', {type: 'kinematic', linearDamping: .1, angularDamping: .1});
+          } else {
+            that.el.setAttribute('ammo-body', {type: that.data.objectData.physics.toLowerCase(), linearDamping: .1, angularDamping: .1});
+          }
+          
         // if (that.data.objectData.physics.toLowerCase() == "static") {
         //  that.el.setAttribute('mod_physics', {body: 'static', shape: 'mesh'});
         // } else if (that.data.objectData.physics.toLowerCase() == "dynamic") {
@@ -2510,14 +2527,32 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
   applyForce: function () {
     
     // let obj = this.el
-    const force = new Ammo.btVector3(0, -3, 0);
-    let position = this.el.getAttribute('position');
-    console.log("tryna apply force at position " + JSON.stringify(position));
-    // const pos = new Ammo.btVector3(this.el.object3D.position.x, this.el.object3D.position.y, this.el.object3D.position.z);
-    const pos = new Ammo.btVector3(position.x, position.y, position.z);
-    this.el.body.applyForce(force, pos);
-    Ammo.destroy(force);
-    Ammo.destroy(pos);
+    // const force = new Ammo.btVector3(0, -3, 0);
+    // let position = this.el.getAttribute('position');
+    // console.log("tryna apply force at position " + JSON.stringify(position));
+    // // const pos = new Ammo.btVector3(this.el.object3D.position.x, this.el.object3D.position.y, this.el.object3D.position.z);
+    // const pos = new Ammo.btVector3(position.x - 1, position.y, position.z);
+    // this.el.body.applyForce(force, pos);
+    // Ammo.destroy(force);
+    // Ammo.destroy(pos);
+    //where camera is looking
+    this.pushForward = true;
+    setTimeout(() => {
+      this.pushForward = false;
+    }, 100);
+  },
+  tick: function () {
+
+    if (this.pushForward) {
+      
+      // this.lookVector.applyQuaternion(this.camera.quaternion);
+      this.camera.getWorldDirection( this.lookVector );
+      console.log("tryna pushForward@! " + JSON.stringify(this.lookVector));
+      // const velocity = new Ammo.btVector3(2, 1, 0);
+      const velocity = new Ammo.btVector3(this.lookVector.x * 10, this.lookVector.y * 10, this.lookVector.z * 10);
+      this.el.body.setLinearVelocity(velocity);
+      Ammo.destroy(velocity);
+    }
   }
  
 });
@@ -2527,6 +2562,7 @@ function getRandomIntInclusive(min, max) {
   max = Math.floor(max);
   return Math.floor(Math.random() * (max - min + 1) + min); //The maximum is inclusive and the minimum is inclusive
 }
+
 
 function Drop (data) {
   var xhr = new XMLHttpRequest();
@@ -2546,8 +2582,6 @@ function Drop (data) {
         this.dialogEl.components.mod_dialog.confirmResponse("You can't drop that here.");
       }
     }  
-
-       
   };
 }
 function Pickup (data, id) {

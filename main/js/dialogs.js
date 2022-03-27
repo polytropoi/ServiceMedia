@@ -959,7 +959,7 @@ function EquipInventoryItem (objectID) {
           for (let i = 0; i < userInventory.inventoryItems.length; i++) {
             if (userInventory.inventoryItems[i].objectID == objectID) {
               // inventoryObj = userInventory[i];
-              objexEl.components.mod_objex.equipObject(objectID);
+              objexEl.components.mod_objex.equipInventoryObject(objectID);
               ShowHideDialogPanel();
               break;
             }
