@@ -2075,7 +2075,7 @@ AFRAME.registerComponent('mod_objex', {
       }
     },
     equipInventoryObject: function (objectID) {
-      console.log("tryna set model to " + objectID);  
+      console.log("tryna equip model " + objectID + " equipped " + this.data.equipped );  
       this.objectData = this.returnObjectData(objectID);
       this.dropPos = new THREE.Vector3();
       this.objEl = document.createElement("a-entity");
@@ -2197,12 +2197,22 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
     this.mod_physics = "";
     this.pushForward = false;
     this.lookVector = new THREE.Vector3( 0, 0, - 1 );
-    let cameraEl = document.querySelector('a-entity[camera]')
+    this.camera = null;
+    let cameraEl = document.querySelector('a-entity[camera]');
     if (!cameraEl) {
         cameraEl = document.querySelector('a-camera');
     }
-    this.camera = cameraEl.components.camera.camera;
-   
+    if (!cameraEl) {
+      camaraEl = document.getElementById('player');
+    } 
+    if (cameraEl) {
+      let theCamComponent = cameraEl.components.camera;
+      if (theCamComponent != null) {
+        this.camera = theCamComponent.camera;
+      }
+      // this.camera = cameraEl.components.camera.camera;
+    }
+    
     // this.sceneInventoryID = null;
   
     if (this.data.objectData.modelURL != undefined) {
@@ -2298,9 +2308,12 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
       scale.y = that.data.locationData.markerObjScale != undefined ? that.data.locationData.markerObjScale : 1;
       scale.z = that.data.locationData.markerObjScale != undefined ? that.data.locationData.markerObjScale : 1;
       }
+
       console.log("setting object position to " + JSON.stringify(pos));
-      that.el.setAttribute("position", pos);
-      that.el.setAttribute("rotation", rot);
+      if (!this.data.equipped) {
+        that.el.setAttribute("position", pos);
+        that.el.setAttribute("rotation", rot);
+      }
       that.el.setAttribute("scale", scale);
 
      
@@ -2353,83 +2366,91 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
 
     });
 
-    this.el.addEventListener('mouseenter', function (evt) {
-      if (posRotReader != null) {
-        this.playerPosRot = posRotReader.returnPosRot(); 
-        window.playerPosition = this.playerPosRot.pos; 
-      } else {
-        posRotReader = document.getElementById("player").components.get_pos_rot; 
-        this.playerPosRot = posRotReader.returnPosRot(); 
-        window.playerPosition = this.playerPosRot.pos; 
-      }
-      // console.log(window.playerPosition);
-      if (!that.isSelected) {
-        // document.getElementById("player").component.get_pos_rot.returnPosRot();
-        this.clientX = evt.clientX;
-        this.clientY = evt.clientY;
-        // console.log("tryna mouseover placeholder");
-        // that.calloutToggle = !that.calloutToggle;
+    this.el.addEventListener('mouseenter', (evt) => {
+      if (!this.data.equipped) {
+        if (posRotReader != null) {
+          this.playerPosRot = posRotReader.returnPosRot(); 
+          window.playerPosition = this.playerPosRot.pos; 
+        } else {
+          posRotReader = document.getElementById("player").components.get_pos_rot; 
+          this.playerPosRot = posRotReader.returnPosRot(); 
+          window.playerPosition = this.playerPosRot.pos; 
+        }
+        // console.log(window.playerPosition);
+        if (!that.isSelected) {
+          // document.getElementById("player").component.get_pos_rot.returnPosRot();
+          this.clientX = evt.clientX;
+          this.clientY = evt.clientY;
+          // console.log("tryna mouseover placeholder");
+          // that.calloutToggle = !that.calloutToggle;
 
-        this.pos = evt.detail.intersection.point; //hitpoint on model
-        let name = evt.detail.intersection.object.name;
-        that.hitPosition = this.pos;
-        if (player != null)
-        that.distance = window.playerPosition.distanceTo(that.hitpoint);
-        // console.log("distance  " + that.distance);
-        that.rayhit(evt.detail.intersection.object.name, that.distance, evt.detail.intersection.point);
+          this.pos = evt.detail.intersection.point; //hitpoint on model
+          let name = evt.detail.intersection.object.name;
+          that.hitPosition = this.pos;
+          if (player != null)
+          that.distance = window.playerPosition.distanceTo(that.hitpoint);
+          // console.log("distance  " + that.distance);
+          that.rayhit(evt.detail.intersection.object.name, that.distance, evt.detail.intersection.point);
 
-          that.selectedAxis = name;
+            that.selectedAxis = name;
 
-          let elPos = that.el.getAttribute('position');
-        if (that.calloutEntity != null && that.distance < 20) {
-          that.calloutEntity.setAttribute('visible', false);
-          console.log("trna scale to distance :" + that.distance);
-          that.calloutEntity.setAttribute("position", this.pos);
-          that.calloutEntity.setAttribute('visible', true);
-          that.calloutEntity.setAttribute('scale', {x: that.distance * .20, y: that.distance * .20, z: that.distance * .20} );
-          let theLabel = that.data.objectData.labeltext;
-          let calloutString = theLabel;
-          if (that.calloutLabelSplit.length > 0) {
-            if (that.calloutLabelIndex < that.calloutLabelSplit.length - 1) {
-              that.calloutLabelIndex++;
-            } else {
-              that.calloutLabelIndex = 0;
+            let elPos = that.el.getAttribute('position');
+          if (that.calloutEntity != null && that.distance < 20) {
+            that.calloutEntity.setAttribute('visible', false);
+            console.log("trna scale to distance :" + that.distance);
+            that.calloutEntity.setAttribute("position", this.pos);
+            that.calloutEntity.setAttribute('visible', true);
+            that.calloutEntity.setAttribute('scale', {x: that.distance * .20, y: that.distance * .20, z: that.distance * .20} );
+            let theLabel = that.data.objectData.labeltext;
+            let calloutString = theLabel;
+            if (that.calloutLabelSplit.length > 0) {
+              if (that.calloutLabelIndex < that.calloutLabelSplit.length - 1) {
+                that.calloutLabelIndex++;
+              } else {
+                that.calloutLabelIndex = 0;
+              }
+              calloutString = that.calloutLabelSplit[that.calloutLabelIndex];
             }
-            calloutString = that.calloutLabelSplit[that.calloutLabelIndex];
+            // if (that.calloutToggle) { //show pos every other time
+            //   // calloutString = "x : " + elPos.x.toFixed(2) + "\n" +"y : " + elPos.y.toFixed(2) + "\n" +"z : " + elPos.z.toFixed(2);
+            //   calloutString = that.data.description != '' ? that.data.description : theLabel;
+            // }
+            that.calloutText.setAttribute("value", calloutString);
           }
-          // if (that.calloutToggle) { //show pos every other time
-          //   // calloutString = "x : " + elPos.x.toFixed(2) + "\n" +"y : " + elPos.y.toFixed(2) + "\n" +"z : " + elPos.z.toFixed(2);
-          //   calloutString = that.data.description != '' ? that.data.description : theLabel;
-          // }
-          that.calloutText.setAttribute("value", calloutString);
+        }
+        // that.applyForce();  //
+      }
+    });
+    
+    this.el.addEventListener('mouseleave', () => { 
+      // console.log("tryna mouseexit");
+      if (!this.data.equipped) {
+        if (that.calloutEntity != null) {
+          that.calloutEntity.setAttribute('visible', false);
         }
       }
-      // that.applyForce();  //
-    });
-    this.el.addEventListener('mouseleave', function (evt) {
-      // console.log("tryna mouseexit");
-      if (that.calloutEntity != null) {
-        that.calloutEntity.setAttribute('visible', false);
-      }
-      
     });
 
-    this.el.addEventListener('click', function (e) {
-      console.log("mousedown on object type: " + that.data.objectData.objtype + " action " + that.pickupAction);
-      this.dialogEl = document.getElementById('mod_dialog');
-      
-      if (that.data.objectData.objtype.toLowerCase() == "pickup" || that.hasPickupAction) {
-        // that.el.setAttribute('visible', false);
-        if (that.data.objectData.prompttext != undefined && that.data.objectData.prompttext != null && that.data.objectData.prompttext != "") {
-          if (that.data.objectData.prompttext.includes('~')) {
-            that.promptSplit = that.data.objectData.prompttext.split('~'); 
-          }
-          // this.el.components.mod_synth.medTrigger();
-          that.dialogEl.components.mod_dialog.showPanel(that.promptSplit[Math.floor(Math.random()*that.promptSplit.length)], that.el.id );
-        }
+    this.el.addEventListener('click', () => { 
+      console.log("mousedown on object type: " + that.data.objectData.objtype + " action " + that.pickupAction + " equipped " + this.data.equipped);
+      if (!this.data.equipped) {
+        this.dialogEl = document.getElementById('mod_dialog');
         
+        if (that.data.objectData.objtype.toLowerCase() == "pickup" || that.hasPickupAction) {
+          // that.el.setAttribute('visible', false);
+          if (that.data.objectData.prompttext != undefined && that.data.objectData.prompttext != null && that.data.objectData.prompttext != "") {
+            if (that.data.objectData.prompttext.includes('~')) {
+              that.promptSplit = that.data.objectData.prompttext.split('~'); 
+            }
+            // this.el.components.mod_synth.medTrigger();
+            that.dialogEl.components.mod_dialog.showPanel(that.promptSplit[Math.floor(Math.random()*that.promptSplit.length)], that.el.id );
+          }
+          
+        }
+      } else {
+        DropInventoryItem(this.data.objectData._id); //just drop for now...throw/shoot/swing next!
       }
-    })
+    });
   },
 
   rayhit: function (hitID, distance, hitpoint) {
@@ -2543,7 +2564,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
   },
   tick: function () {
 
-    if (this.pushForward) {
+    if (this.pushForward && this.camera != null) {
       
       // this.lookVector.applyQuaternion(this.camera.quaternion);
       this.camera.getWorldDirection( this.lookVector );

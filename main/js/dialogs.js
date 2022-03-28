@@ -932,7 +932,7 @@ function DropInventoryItem(objectID) {
             if (userInventory.inventoryItems[i].objectID == objectID) {
               // inventoryObj = userInventory[i];
               objexEl.components.mod_objex.dropInventoryObject(userInventory._id, action, userInventory.inventoryItems[i]);
-              ShowHideDialogPanel();
+              // ShowHideDialogPanel();
               break;
             }
           }
@@ -982,9 +982,10 @@ function ShowInventoryItem(objectID) {
       // console.log("found object " + objectData);
       console.log("object data " + JSON.stringify(objectData));
       let response = "<button class=\x22addButton\x22 style=\x22float: right; padding: 10px; margin: 5px\x22 onclick=\x22ConsumeInventoryItem('"+objectData._id+"')\x22>Consume Item</button>"+
-      "<button class=\x22addButton\x22 style=\x22float: right; padding: 10px; margin: 5px\x22 onclick=\x22EquipInventoryItem('"+objectData._id+"')\x22>Equip Item</button>"+
+     
       "<button class=\x22uploadButton\x22 style=\x22float: right; padding: 10px; margin: 5px\x22 onclick=\x22InspectInventoryItem('"+objectData._id+"')\x22>Inspect Item</button>"+
       "<button class=\x22saveButton\x22 style=\x22float: right; padding: 10px; margin: 5px\x22 onclick=\x22DropInventoryItem('"+objectData._id+"')\x22>Drop Item</button>"+
+      "<button class=\x22reallySaveButton\x22 style=\x22float: right; padding: 10px; margin: 5px\x22 onclick=\x22EquipInventoryItem('"+objectData._id+"')\x22>Equip Item</button>"+
       "Inventory Item: <hr><div class=\x22row\x22>"+
       "<div class=\x22twocolumn\x22><div style=\x22padding: 5px; margin: 5px\x22>Name: "+objectData.name+"</div><div style=\x22padding: 5px; margin: 5px\x22>Title: "+objectData.title+" </div>"+
       "<div style=\x22padding: 5px; margin: 5px\x22>Type: "+objectData.objtype+"</div><div style=\x22padding: 5px; margin: 5px\x22>Category: "+objectData.objcat+" </div>"+
@@ -1006,9 +1007,11 @@ function ShowInventoryItem(objectID) {
         // console.log("fetched obj resp: " +this.responseText);
         objectData = JSON.parse(this.responseText);
         console.log("object data " + objectData);
-        let response = "<button class=\x22addButton\x22 style=\x22float: right; padding: 10px; margin: 5px\x22 onclick=\x22EquipInventoryItem('"+objectData._id+"')\x22>Equip Item</button>"+
-        "<button class=\x22uploadButton\x22 style=\x22float: right; padding: 10px; margin: 5px\x22 onclick=\x22ConsumeInventoryItem('"+objectData._id+"')\x22>Consume Item</button>"+
+        let response = "<button class=\x22addButton\x22 style=\x22float: right; padding: 10px; margin: 5px\x22 onclick=\x22ConsumeInventoryItem('"+objectData._id+"')\x22>Consume Item</button>"+
+         "<button class=\x22uploadButton\x22 style=\x22float: right; padding: 10px; margin: 5px\x22 onclick=\x22ConsumeInventoryItem('"+objectData._id+"')\x22>Consume Item</button>"+
         "<button class=\x22saveButton\x22 style=\x22float: right; padding: 10px; margin: 5px\x22 onclick=\x22DropInventoryItem('"+objectData._id+"')\x22>Drop Item</button>"+
+        "<button class=\x22reallySaveButton\x22 style=\x22float: right; padding: 10px; margin: 5px\x22 onclick=\x22EquipInventoryItem('"+objectData._id+"')\x22>Equip Item</button>"+
+       
         "Inventory Item: <hr><div class=\x22row\x22>"+
         "<div class=\x22twocolumn\x22><div style=\x22padding: 10px; margin: 5px\x22>Name: "+objectData.name+"</div><div style=\x22padding: 5px; margin: 5px\x22>Title: "+objectData.title+" </div>"+
         "</div>"+
@@ -1021,7 +1024,6 @@ function ShowInventoryItem(objectID) {
           objectData = objexEl.components.mod_objex.addFetchedObject(objectData); //add to scene object collection, so don't have to fetch again
         }
       }
-
     }
   // }
  
