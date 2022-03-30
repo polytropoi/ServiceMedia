@@ -2010,9 +2010,15 @@ AFRAME.registerComponent('mod_objex', {
             let timestamp = this.sceneInventoryItems[i].timestamp;
             if (this.sceneInventoryItems[i].location != undefined) {
             let locationData  = {};
+
             locationData.x = this.sceneInventoryItems[i].location.x;
             locationData.y = this.sceneInventoryItems[i].location.y;
             locationData.z = this.sceneInventoryItems[i].location.z; //how mod_object wants the data
+            if (locationData.x == 0 && locationData.y == 0 && locationData.z == 0) {
+              locationData.x = Math.floor(Math.random() * 50);
+              locationData.y = 20;
+              locationData.z = Math.floor(Math.random() * 50);
+            }
             let objEl = document.createElement("a-entity");
             objEl.setAttribute("mod_object", {'locationData': locationData, 'objectData': this.data.jsonObjectData[j], 'inventoryData': this.sceneInventoryItems[i], 'fromSceneInventory': this.fromSceneInventory, 'timestamp': timestamp});
             objEl.id = "obj" + this.data.jsonObjectData[j]._id + "_" + timestamp;
@@ -2448,7 +2454,11 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
           
         }
       } else {
+        this.el.object3D.visible = false;
         DropInventoryItem(this.data.objectData._id); //just drop for now...throw/shoot/swing next!
+        setTimeout(() => {
+          this.el.object3D.visible = true;
+        }, 3000);
       }
     });
   },
@@ -2602,7 +2612,12 @@ function Drop (data) {
       if (this.dialogEl != null) {
         this.dialogEl.components.mod_dialog.confirmResponse("You can't drop that here.");
       }
-    }  
+    } else if (this.responseText.toLowerCase().includes('maxxed')) {
+      this.dialogEl = document.getElementById('mod_dialog');
+      if (this.dialogEl != null) {
+        this.dialogEl.components.mod_dialog.confirmResponse("You can't drop any more of those here.");
+      }
+    } 
   };
 }
 function Pickup (data, id) {
@@ -2757,6 +2772,7 @@ AFRAME.registerComponent('mod_dialog', { //only one of these
   confirmResponse: function (response) {  
     console.log("tryna confirmResponse " + response);
     this.panelString = response;
+    this.el.setAttribute("visible", true);
     this.dialogText.setAttribute('value', this.panelString);  
     if (this.meshObj != null) {
       this.meshObj.traverse(node => {
@@ -3592,9 +3608,9 @@ AFRAME.registerComponent('mod_model', {
         } else {
           console.log("no primary audio found!");
         }
-        this.el.addEventListener('mouseenter', function (evt) {
+        this.el.addEventListener('mouseenter', (evt) =>  {
           
-          if (hasCallout && !eventData[textIndex].toLowerCase().includes("undefined")) {
+          if (evt.detail.intersection != null && hasCallout && !eventData[textIndex].toLowerCase().includes("undefined")) {
             // this.bubble = theEl.querySelector('.bubble');
             // this.bubbleText = theEl.querySelector('.bubbleText');
             calloutOn = true;

@@ -478,6 +478,17 @@ overflow: hidden;
 transition: max-height 0.2s ease-out;
 background-color: #000000;
 }
+.btnInventory {
+  transition-duration: 0.4s;
+  background-color: #300031; /* Green */
+  color: white;
+  border-radius: 8px;
+  border-width: 0px;
+  font-size: 14px;
+  font-weight: bold;
+  padding: 8px 8px;
+  margin: 4px;
+}
 .btn {
     transition-duration: 0.4s;
     background-color: #004177; /* Green */
@@ -1124,9 +1135,11 @@ background-color: #000000;
       font-family: Arial, Helvetica, sans-serif;
       /* border-collapse: collapse; */
       border-radius: 4px;
-      width: 97%;
+      width: 96%;
       text-align: left;
       background-color: #3f3f3fcb;
+      margin: 10px;
+      padding: 10px;
     }
     #locations {
         font-family: Arial, Helvetica, sans-serif;

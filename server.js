@@ -2674,6 +2674,7 @@ app.post('/drop/', requiredAuthentication, function (req, res) {
     let timestamp = Math.round(Date.now() / 1000);
     let i_id = ObjectID(req.body.inventoryID); //player inventory
     let sceneInventoryID = null; //scene inventory
+    let sceneInventory = null;
     async.waterfall([
                   
         function (callback) { //check scene
@@ -2699,14 +2700,15 @@ app.post('/drop/', requiredAuthentication, function (req, res) {
                         callback(err);
                     } else {
                         console.log('gotsa inventory' + inventory._id );
-                        callback(null, inventory);
+                        sceneInventory = inventory;
+                        callback(null);
                     }
                 });
             } else {
                 callback("no scene inventory");
             }
         },        
-        function (inventory, callback) { //check object
+        function (callback) { //check object
             // let sceneInventoryID = scene.sceneInventoryID;
             let o_id = ObjectID(req.body.inventoryObj.objectID);
             db.obj_items.findOne({"_id": o_id}, function (err, obj) { //get obj to check maxperscene
@@ -2715,37 +2717,71 @@ app.post('/drop/', requiredAuthentication, function (req, res) {
                     callback(err);
                     // res.send("no object found");
                 } else {
-                    // console.log("checking maxperscene " + obj.maxPerScene + " in " + inventory.inventoryItems.length);
-                    console.log("checking maxperscene " + obj.maxPerScene);
+                    console.log("checking maxperscene " + obj.maxPerScene + " in " + sceneInventory.inventoryItems.length);
+                    // console.log("checking maxperscene " + obj.maxPerScene);
                     // let iCount = 0;
-                    callback(null, obj, inventory);
+                    callback(null, obj);
                 }
             });
         },        
-        function (inventory, obj, callback) { //count similar objects in scene inventory
+        function (obj, callback) { //count similar objects in scene inventory
             let iCount = 0;
-            if ( inventory.inventoryItems != undefined && inventory.inventoryItems.length > 0) { 
-                console.log("scene inventory items " + inventory.inventoryItems.length);
-                for (let i = 0; i < inventory.inventoryItems.length; i++) { //count scene inventory items like this obj
-                    if (inventory.inventoryItems[i].objectID == obj._id) {
+            if ( sceneInventory.inventoryItems != undefined && sceneInventory.inventoryItems.length > 0) { 
+                console.log("scene inventory items " + sceneInventory.inventoryItems.length);
+                async.each (sceneInventory.inventoryItems, function (i_item, callbackz) {
+                    if (i_item.objectID == obj._id) {
                         iCount++;
                         console.log("gotsa invnetory match with the obj " + iCount);
-                        if (i == (inventory.inventoryItems.length - 1)) { //loop is over, carry on... 
-                            if (iCount > obj.maxPerScene) {
-                                console.log("max per scene reached!");
-                                callback("max");
+                        // if (i == (inventory.inventoryItems.length - 1)) { //loop is over, carry on... 
+                            if (iCount >= obj.maxPerScene) {
+                                // console.log("max per scene reached!");
+                                callbackz('maxxed');
                                 
                             } else {
-                                callback(null);
+                                // callback(null);
+                                callbackz();
                             }
-                        }
+                        // }
+                    } else {
+                        callbackz();
                     }
-                } 
+                    
+                }, function(err) {
+                    if (err) {
+                        console.log('A scene inventory item failed to process : ' + err);
+                        //res.send("error: " + err);
+                        callback(err);
+                    } else {
+                        console.log('OK to add to scene inventory');
+                        // pcallbackz();
+
+                        // console.log("app response " + JSON.stringify(app));
+                        // res.json(app);
+                        callback(null);
+                    }
+                });
+
+                // for (let i = 0; i < inventory.inventoryItems.length; i++) { //count scene inventory items like this obj
+                //     if (inventory.inventoryItems[i].objectID == obj._id) {
+                //         iCount++;
+                //         console.log("gotsa invnetory match with the obj " + iCount);
+                //         if (i == (inventory.inventoryItems.length - 1)) { //loop is over, carry on... 
+                //             if (iCount > obj.maxPerScene) {
+                //                 console.log("max per scene reached!");
+                //                 callback("max");
+                                
+                //             } else {
+                //                 callback(null);
+                //             }
+                //         }
+                //     }
+                // } 
             } else {
-                callback(null)
+                callback(null);
             }
         },        
         function (callback) {
+            
             if (sceneInventoryID != null) {
             console.log("trynna lookup scene invnetory " + sceneInventoryID);
             let s_id = ObjectID(sceneInventoryID);
@@ -2755,7 +2791,7 @@ app.post('/drop/', requiredAuthentication, function (req, res) {
                      callback("no drop");
                     
                 } else {
-                    console.log("inventory: " + JSON.stringify(inventory));
+                    // console.log("inventory: " + JSON.stringify(inventory));
                     db.inventories.update({'_id': s_id }, { $push: { inventoryItems: i_obj }}, {upsert: false}, function (err, saved) { //add to scene inventory
                         if (err || !saved) {
                             console.log("problemo with inventory rm " + err);
