@@ -891,52 +891,56 @@ function GetUserInventory () {
   // data.fromScene = room;
   // data.userData = userData;
   let inventoryDisplayEl = document.getElementById('inventory_display');
-  console.log("getuserprofile " + userData._id);
-  let response = "<button class=\x22uploadButton \x22 style=\x22float: right;\x22 onclick=\x22DequipInventoryItem()\x22>Dequip</button>Items in player inventory:<br><hr>";
-  var xhr = new XMLHttpRequest();
-  xhr.open("get", '/inventory/' + userData._id, true);
-  xhr.setRequestHeader('Content-Type', 'application/json');
-  xhr.send();
-  xhr.onload = function () {
-    // do something to response
-    // console.log("inventory resp: " +this.responseText);
-    let inventoryObjs = JSON.parse(this.responseText);
-    // console.log("inventory: " +inventoryObj.inventoryItems[0].objectName);
-    userInventory = inventoryObjs;
-    if (inventoryObjs != undefined) {
-      let uniqueItems = [];
-      // let itemNames = {}
-      let itemCounts = {};
-      let itemNames = {};
+  if (!userData.isGuest) {
+    console.log("getuserprofile " + userData._id);
+    let response = "<button class=\x22uploadButton \x22 style=\x22float: right;\x22 onclick=\x22DequipInventoryItem()\x22>Dequip</button>Items in player inventory:<br><hr>";
+    var xhr = new XMLHttpRequest();
+    xhr.open("get", '/inventory/' + userData._id, true);
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.send();
+    xhr.onload = function () {
+      // do something to response
+      // console.log("inventory resp: " +this.responseText);
+      let inventoryObjs = JSON.parse(this.responseText);
+      // console.log("inventory: " +inventoryObj.inventoryItems[0].objectName);
+      userInventory = inventoryObjs;
+      if (inventoryObjs != undefined) {
+        let uniqueItems = [];
+        // let itemNames = {}
+        let itemCounts = {};
+        let itemNames = {};
 
-      for (let i = 0; i < inventoryObjs.inventoryItems.length; i++) {
-        if (!uniqueItems.includes(inventoryObjs.inventoryItems[i].objectID)) {
-          uniqueItems.push(inventoryObjs.inventoryItems[i].objectID);
-          itemCounts[inventoryObjs.inventoryItems[i].objectID] = 1;
-          itemNames[inventoryObjs.inventoryItems[i].objectID] = inventoryObjs.inventoryItems[i].objectName;
-        } else {
-          itemCounts[inventoryObjs.inventoryItems[i].objectID] = itemCounts[inventoryObjs.inventoryItems[i].objectID] + 1;
-        }
-        if ( i == inventoryObjs.inventoryItems.length - 1 ) {
-          console.log("uniques : " + JSON.stringify(uniqueItems) + " counts : " + JSON.stringify(itemCounts) + " names : " + JSON.stringify(itemNames));
-          for (let u = 0; u < uniqueItems.length; u++) {
-            let buttonNameString = itemNames[uniqueItems[u]] + " (" + itemCounts[uniqueItems[u]]+ ")";
-            console.log("buttonNameStirng: " + buttonNameString);
-            response = response + "<button class=\x22btnInventory\x22 onclick=\x22ShowInventoryItem('"+uniqueItems[u]+"')\x22>"+buttonNameString+"</button>";
-            inventoryDisplayEl.innerHTML = response;
+        for (let i = 0; i < inventoryObjs.inventoryItems.length; i++) {
+          if (!uniqueItems.includes(inventoryObjs.inventoryItems[i].objectID)) {
+            uniqueItems.push(inventoryObjs.inventoryItems[i].objectID);
+            itemCounts[inventoryObjs.inventoryItems[i].objectID] = 1;
+            itemNames[inventoryObjs.inventoryItems[i].objectID] = inventoryObjs.inventoryItems[i].objectName;
+          } else {
+            itemCounts[inventoryObjs.inventoryItems[i].objectID] = itemCounts[inventoryObjs.inventoryItems[i].objectID] + 1;
           }
-          
-        }
+          if ( i == inventoryObjs.inventoryItems.length - 1 ) {
+            console.log("uniques : " + JSON.stringify(uniqueItems) + " counts : " + JSON.stringify(itemCounts) + " names : " + JSON.stringify(itemNames));
+            for (let u = 0; u < uniqueItems.length; u++) {
+              let buttonNameString = itemNames[uniqueItems[u]] + " (" + itemCounts[uniqueItems[u]]+ ")";
+              console.log("buttonNameStirng: " + buttonNameString);
+              response = response + "<button class=\x22btnInventory\x22 onclick=\x22ShowInventoryItem('"+uniqueItems[u]+"')\x22>"+buttonNameString+"</button>";
+              inventoryDisplayEl.innerHTML = response;
+            }
+            
+          }
 
-        
-        // response = response + "<a href=\x22\x22>"+inventoryObjs.inventoryItems[i].objectTitle + "</p>";
-        // response = response +"<button class=\x22btn\x22 style=\x22padding: 5px; margin: 5px\x22 onclick=\x22ShowInventoryItem('"+inventoryObjs.inventoryItems[i].objectID+"')\x22>"+inventoryObjs.inventoryItems[i].objectName + "</button>";
-        // console.log(response);
+          
+          // response = response + "<a href=\x22\x22>"+inventoryObjs.inventoryItems[i].objectTitle + "</p>";
+          // response = response +"<button class=\x22btn\x22 style=\x22padding: 5px; margin: 5px\x22 onclick=\x22ShowInventoryItem('"+inventoryObjs.inventoryItems[i].objectID+"')\x22>"+inventoryObjs.inventoryItems[i].objectName + "</button>";
+          // console.log(response);
+        }
       }
-    }
-    // console.log("user inventory response " + response);
-    
-  };
+      // console.log("user inventory response " + response);
+      
+    };
+  } else {
+    inventoryDisplayEl.innerHTML = "You must be <a href=\x22../main/login.html\x22>logged in</a> to access your inventory";
+  }
 }
 
 function DropInventoryItem(objectID) {
@@ -1066,8 +1070,9 @@ function ShowInventoryItem(objectID) {
 function SceneManglerModal(mode) {
 
 
-
-    let userName = userData.userName;
+    console.log(JSON.stringify(userData));
+    // let userName = userData.userName;
+    // if (userName != null)
     let greeting = document.getElementById('sceneGreeting').innerHTML;
     let quest = document.getElementById('sceneQuest').innerHTML;
     let inventory = "";
@@ -1102,6 +1107,10 @@ function SceneManglerModal(mode) {
     let locationsDisplay = "";
     let toolsDisplay = "";
     let eventsDisplay = "";
+
+    if (userData.isGuest) {
+
+    }
     
     if (mode == "Welcome") { //add quest here
         welcomeDisplay = "style=\x22display: block;\x22";

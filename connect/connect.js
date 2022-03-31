@@ -106,22 +106,7 @@ $(function() {
    let theSettingsData = settingsEl.getAttribute('data-settings');
             // console.log("RAW LOCATIOND DATA " + theData);
    settings = JSON.parse(atob(theSettingsData)); 
-   // console.log("settingsData " + JSON.stringify(settings));
-   // if (settings.sceneTimedEvents != undefined && settings.sceneTimedEvents != null) {
-   //    timeKeysData = settings.sceneTimedEvents;
-   //    console.log('cloud timekeysdata' + JSON.stringify(timeKeysData));
-   // }
-   // if (settings.skyboxIDs != null) {
-   //    console.log("skyboxIDS: " + JSON.stringify(settings.skyboxIDs));
-   //    skyboxEl = document.createElement('a-entity');
-   //    sceneEl = document.querySelector('a-scene');
-   //    skyboxEl.setAttribute('skybox_dynamic', {enabled: true, id: settings.skyboxIDs[0], sceneType});
-   //    skyboxEl.id = 'skybox_dynamic';
-   //    sceneEl.appendChild(skyboxEl);
-   // }
-   // if (settings.skyboxID == "") {
-   //    skyboxEl.components.skybox_dynamic.nextSkybox();
-   // }
+   
    if (localStorage.getItem(room + "_timeKeys") != null) { //use local ve3rsion if saved
       timeKeysData = JSON.parse(localStorage.getItem(room + "_timeKeys"));
       // console.log('local timeKeysData' + JSON.stringify(timeKeysData));
@@ -756,13 +741,15 @@ function tcheck () {
    $.get( "/ami-rite-token/" + token, function( data ) {
       // console.log("amirite : " + JSON.stringify(data));
       
-      if (data == '0') {
+      if (data == '0' || data == '1' || data == '3' || data == '1' || data == '4' || data == '5') {//all auth fails
          // console.log("guest token");
          if (socket != undefined) {
             if (!socket.connected) {
                socket.connect(socketHost);
             }
          }
+         userData.isGuest = true;
+         // userData = data;
       } else {
          // let user = JSON.parse(data);
         

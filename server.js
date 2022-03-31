@@ -1012,13 +1012,13 @@ app.get("/ami-rite-token/:token", function (req, res) {
                     } else {
                         req.session.error = 'Access denied!';
                         console.log("token authentication failed! headers: " + JSON.stringify(req.headers));
-                        res.send('noauth');
+                        res.send('4');
                     }
                 }
             } else {
                 req.session.error = 'Access denied!';
                 console.log("token authentication failed! headers: " + JSON.stringify(req.headers));
-                res.send('noauth');
+                res.send('5');
             }
     });
 });
