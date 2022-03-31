@@ -2097,7 +2097,7 @@ AFRAME.registerComponent('mod_objex', {
       this.locData.timestamp = Date.now();
       this.objEl.setAttribute("mod_object", {'locationData': this.locData, 'objectData': this.objectData, 'equipped': true});
       this.objEl.id = "obj" + this.objectData._id + "_" + this.locData.timestamp;
-
+      this.objEl.classList.add('equipped');
       this.equipHolder.appendChild(this.objEl);
       // this.el.setAttribute('gltf-model', '#' + modelID.toString());
     },
@@ -2140,8 +2140,8 @@ AFRAME.registerComponent('mod_objex', {
 });
 
 function SceneInventoryLoad(oIDs) { //fetch scene inventory objects, i.e. stuff dropped by users
+  let objexEl = document.getElementById('sceneObjects');    
   if (oIDs.length > 0) {
-    let objexEl = document.getElementById('sceneObjects');    
     // objexEl.components.mod_objex.dropObject(data.inventoryObj.objectID);
     let data = {};
     data.oIDs = oIDs;
@@ -2161,11 +2161,15 @@ function SceneInventoryLoad(oIDs) { //fetch scene inventory objects, i.e. stuff 
           //use locs and instantiate!
           // console.log(i + " vs " + response.objex.length - 1);
           if (i == response.objex.length - 1) {
-            objexEl.components.mod_objex.loadSceneInventoryObjects(response.objex); //ok load em up
+            objexEl.components.mod_objex.loadSceneInventoryObjects(); //ok load em up
           }
         }
+      } else {
+        objexEl.components.mod_objex.loadSceneInventoryObjects(); //ok load em up
       }
     }
+  } else {
+    objexEl.components.mod_objex.loadSceneInventoryObjects(); //ok load em up
   }
 }
 AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component above
@@ -2487,7 +2491,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
 
   activated: function () {
    
-    console.log("hasPickupAction " + this.hasPickupAction + " for " + this.el.id);
+    console.log("this.isActivated " + this.isActivated + " + hasPickupAction " + this.hasPickupAction + " for " + this.el.id);
     if (!this.isActivated) { 
       if (this.hasSynth) {
         if (this.el.components.mod_synth != null) {

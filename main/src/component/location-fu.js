@@ -1295,6 +1295,16 @@ function geoip(json){
         map['dragRotate'].enable();
         map.touchPitch.enable();
         map.touchZoomRotate.enable({ around: 'center' });
+
+        map.on('mousemove', (e) => {
+          // document.getElementById('info').innerHTML =
+          // // `e.point` is the x, y coordinates of the `mousemove` event
+          // // relative to the top-left corner of the map.
+          // JSON.stringify(e.point) +
+          // '<br />' +
+          // `e.lngLat` is the longitude, latitude geographical position of the event.
+          console.log(JSON.stringify(e.lngLat.wrap()));
+          });
         // map.scrollZoom.enable({ around: 'center' });
         if (doBuildings) {
           console.log("tryna do buildingz");
@@ -1370,8 +1380,23 @@ function geoip(json){
                   eventData = sceneLocations.locations[m].eventData;
                 }
                 label = sceneLocations.locations[m].label != undefined ? sceneLocations.locations[m].label : sceneLocations.locations[m].name; // to do : event data
-                
-                
+                      //maybe this inside the map.addLayer below...
+                            // let modelEntity = document.createElement("a-entity");
+                            //     modelEntity.setAttribute('gltf-model', modelUrl);
+                                
+                            //     sceneEl.appendChild(modelEntity);
+                            //     const convertedLocation = mapboxgl.MercatorCoordinate.fromLngLat({
+                            //       lng: sceneLocations.locations[m].longitude,
+                            //       lat: sceneLocations.locations[m].latitude,
+                            //       });
+                            //     console.log("tryna set model " + modelUrl + " at " + JSON.stringify(convertedLocation));
+                            //     modelEntity.setAttribute('position', convertedLocation);
+
+
+                    // modelEntity.setAttribute('scale', 100, 100, 100);
+
+                    // gpsElements[i].appendChild(gpsPanel);
+
                 /*
                 map.addLayer({
                   id: 'custom_layer'+index.toString(),
@@ -1406,7 +1431,6 @@ function geoip(json){
                   }
                 });
                 */
-              // });
               }
             }
           }

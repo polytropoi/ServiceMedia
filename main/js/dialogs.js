@@ -966,6 +966,14 @@ function DropInventoryItem(objectID) {
     }
   }
 }
+function DequipInventoryItem () {
+  console.log("tryna dequip");
+
+  document.querySelectorAll('.equipped').forEach(function(el) {
+    el.parentNode.removeChild(el);
+  });
+  ShowHideDialogPanel();
+}
 
 function EquipInventoryItem (objectID) {
   console.log("tryna equip " + objectID);
@@ -1004,7 +1012,7 @@ function ShowInventoryItem(objectID) {
 
     if (objectData != null) {
       // console.log("found object " + objectData);
-      console.log("object data " + JSON.stringify(objectData));
+      // console.log("object data " + JSON.stringify(objectData));
       let response = "<button class=\x22addButton\x22 style=\x22float: right; padding: 10px; margin: 5px\x22 onclick=\x22ConsumeInventoryItem('"+objectData._id+"')\x22>Consume Item</button>"+
      
       "<button class=\x22uploadButton\x22 style=\x22float: right; padding: 10px; margin: 5px\x22 onclick=\x22InspectInventoryItem('"+objectData._id+"')\x22>Inspect Item</button>"+
