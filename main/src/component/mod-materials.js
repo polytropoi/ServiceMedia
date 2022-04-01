@@ -183,16 +183,16 @@ AFRAME.registerComponent('mod-materials', {
             console.log("tryna set video texture: " + video1.src);
             
             var texture = new THREE.VideoTexture( video1 );
-            texture.minFilter = THREE.LinearFilter;
-            texture.magFilter = THREE.LinearFilter;
-            if (video1.src.includes(".webm") || video1.src.includes(".mov")) { 
-              texture.format = THREE.RGBAFormat; //this needs to be a separate property
-              console.log("tryna set ALPHA VIDEO TEXTURE");
+                texture.minFilter = THREE.LinearFilter;
+                texture.magFilter = THREE.LinearFilter;
+                // if (video1.src.includes(".webm") || video1.src.includes(".mov")) { 
+                //   texture.format = THREE.RGBAFormat; //this needs to be a separate property
+                //   console.log("tryna set ALPHA VIDEO TEXTURE");
 
-            } else {
-              // texture.format = THREE.RGBFormat;
-              texture.format = THREE.RGBFormat;
-            }
+                // } else {
+                //   // texture.format = THREE.RGBFormat;
+                //   texture.format = THREE.RGBFormat;
+                // }
             
             texture.flipY = this.data.flipY; 
             // immediately use the texture for material creation
@@ -508,16 +508,16 @@ AFRAME.registerComponent('mod-materials', {
               if (timedEventsListenerMode == null) {
                 timedEventsListenerMode = "Primary Video";
               }
-              if (this.video.src.includes(".webm") || this.video.src.includes(".mov")) { 
-                this.vidtexture.format = THREE.RGBAFormat; 
-                console.log("tryna set ALPHA VIDEO TEXTURE");
-              } else {
-                this.vidtexture.format = THREE.RGBFormat;
-              }
+              // if (this.video.src.includes(".webm") || this.video.src.includes(".mov")) { 
+              //   this.vidtexture.format = THREE.RGBAFormat; 
+              //   console.log("tryna set ALPHA VIDEO TEXTURE");
+              // } else {
+              //   this.vidtexture.format = THREE.RGBFormat;
+              // }
               this.vidtexture.flipY = this.data.flipY; 
               this.vidtexture.minFilter = THREE.NearestFilter;
               this.vidtexture.magFilter = THREE.NearestFilter;
-              this.playmaterial = new THREE.MeshLambertMaterial( { map: this.vidtexture } ); 
+              this.playmaterial = new THREE.MeshBasicMaterial( { map: this.vidtexture } ); 
               
               // this.playmaterial = material;
                 // this.meshnode = null;

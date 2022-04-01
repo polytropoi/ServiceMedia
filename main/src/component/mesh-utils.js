@@ -2,7 +2,7 @@ import {MeshSurfaceSampler} from '/three/examples/jsm/math/MeshSurfaceSampler.js
 
 /* global AFRAME, THREE */
 
-AFRAME.registerComponent('instanced_meshes', { //scattered randomly, not on surface
+AFRAME.registerComponent('instanced_meshes_sphere', { //scattered randomly in sphere, not on surface
   schema: {
 
     _id: {default: ''},
