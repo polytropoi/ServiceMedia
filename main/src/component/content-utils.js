@@ -3880,35 +3880,40 @@ AFRAME.registerComponent('skybox-env-map', {
   this.el.addEventListener('model-loaded', () => {
     if (!this.isInitialized) { //do it once, not every time a child is loaded.
       this.isInitialized = true;
-      let url = document.querySelector("#sky").src;
-      this.texture = null;
-      console.log("gotsa sky ref " + url);
-      let dynSkyEl = document.getElementById('skybox_dynamic');
-      if (dynSkyEl != null) {
-        // console.log("gotsa sky ref " + url);
-        this.texture = dynSkyEl.components.skybox_dynamic.returnEnvMap();
-        // console.log("gotsa sky ref " + this.texture);
-      } 
-      if (this.texture == null)
-        this.texture = new THREE.TextureLoader().load(url);
+      let skyEl = document.querySelector("#sky");
+      if (skyEl != null) {
+        let url = skyEl.src;
+        this.texture = null;
+        console.log("gotsa sky ref " + url);
+        let dynSkyEl = document.getElementById('skybox_dynamic');
+        if (dynSkyEl != null) {
+          // console.log("gotsa sky ref " + url);
+          this.texture = dynSkyEl.components.skybox_dynamic.returnEnvMap();
+          // console.log("gotsa sky ref " + this.texture);
+        } 
+        if (this.texture == null) {
+          this.texture = new THREE.TextureLoader().load(url);
+        }
+
+        if (this.texture != null) {
+          this.texture.encoding = THREE.sRGBEncoding;
+          this.texture.mapping = THREE.EquirectangularReflectionMapping;
+          this.texture.minFilter = this.texture.magFilter = THREE.LinearFilter;
+
+          this.applyEnvMap();
+            
+        } else {
+            setTimeout(function () {
+              this.texture.encoding = THREE.sRGBEncoding;
+              this.texture.mapping = THREE.EquirectangularReflectionMapping;
+              this.texture.minFilter = this.texture.magFilter = THREE.LinearFilter;
+
+              that.applyEnvMap();
+            }, 3000);
+        }
       }
-
-      if (this.texture != null) {
-        this.texture.encoding = THREE.sRGBEncoding;
-        this.texture.mapping = THREE.EquirectangularReflectionMapping;
-        this.texture.minFilter = this.texture.magFilter = THREE.LinearFilter;
-
-        this.applyEnvMap();
-           
-      } else {
-          setTimeout(function () {
-            this.texture.encoding = THREE.sRGBEncoding;
-            this.texture.mapping = THREE.EquirectangularReflectionMapping;
-            this.texture.minFilter = this.texture.magFilter = THREE.LinearFilter;
-
-            that.applyEnvMap();
-          }, 3000);
-      }
+    }
+      
       // if (this.skyEl != null) {
       //   // this.skyEl.remove();
       //   this.skyEl.setAttribute('visible', false);
