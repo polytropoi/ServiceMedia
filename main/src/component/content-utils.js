@@ -2002,29 +2002,31 @@ AFRAME.registerComponent('mod_objex', {
     },
     loadSceneInventoryObjects: function () { //coming back from upstream call after updating jsonObjectData with missing sceneInventoryItems
       console.log("tryna loadSceneInventoryObjects fromSceneInventory " + this.fromSceneInventory);
-      for (let i = 0; i < this.sceneInventoryItems.length; i++) { 
-        for (let j = 0; j < this.data.jsonObjectData.length; j++) {
-          console.log("inventory : "+ this.sceneInventoryItems[i].objectID+ " vs objex._id " + this.data.jsonObjectData[j]._id);
-          if (this.sceneInventoryItems[i].objectID == this.data.jsonObjectData[j]._id) {
-            console.log("gotsa match for scene inventory at location " + JSON.stringify(this.sceneInventoryItems[i].location)); //here location data is a vector3
-            let timestamp = this.sceneInventoryItems[i].timestamp;
-            if (this.sceneInventoryItems[i].location != undefined) {
-            let locationData  = {};
+      if (this.sceneInventoryItems != null) {
+        for (let i = 0; i < this.sceneInventoryItems.length; i++) { 
+          for (let j = 0; j < this.data.jsonObjectData.length; j++) {
+            console.log("inventory : "+ this.sceneInventoryItems[i].objectID+ " vs objex._id " + this.data.jsonObjectData[j]._id);
+            if (this.sceneInventoryItems[i].objectID == this.data.jsonObjectData[j]._id) {
+              console.log("gotsa match for scene inventory at location " + JSON.stringify(this.sceneInventoryItems[i].location)); //here location data is a vector3
+              let timestamp = this.sceneInventoryItems[i].timestamp;
+              if (this.sceneInventoryItems[i].location != undefined) {
+              let locationData  = {};
 
-            locationData.x = this.sceneInventoryItems[i].location.x;
-            locationData.y = this.sceneInventoryItems[i].location.y;
-            locationData.z = this.sceneInventoryItems[i].location.z; //how mod_object wants the data
-            if (locationData.x == 0 && locationData.y == 0 && locationData.z == 0) {
-              locationData.x = Math.floor(Math.random() * 50);
-              locationData.y = 20;
-              locationData.z = Math.floor(Math.random() * 50);
-            }
-            let objEl = document.createElement("a-entity");
-            objEl.setAttribute("mod_object", {'locationData': locationData, 'objectData': this.data.jsonObjectData[j], 'inventoryData': this.sceneInventoryItems[i], 'fromSceneInventory': this.fromSceneInventory, 'timestamp': timestamp});
-            objEl.id = "obj" + this.data.jsonObjectData[j]._id + "_" + timestamp;
-            sceneEl.appendChild(objEl);
-            } else {
-              console.log("well shoot, that one don't have a location " + JSON.stringify(this.sceneInventoryItems[i]));
+              locationData.x = this.sceneInventoryItems[i].location.x;
+              locationData.y = this.sceneInventoryItems[i].location.y;
+              locationData.z = this.sceneInventoryItems[i].location.z; //how mod_object wants the data
+              if (locationData.x == 0 && locationData.y == 0 && locationData.z == 0) {
+                locationData.x = Math.floor(Math.random() * 50);
+                locationData.y = 20;
+                locationData.z = Math.floor(Math.random() * 50);
+              }
+              let objEl = document.createElement("a-entity");
+              objEl.setAttribute("mod_object", {'locationData': locationData, 'objectData': this.data.jsonObjectData[j], 'inventoryData': this.sceneInventoryItems[i], 'fromSceneInventory': this.fromSceneInventory, 'timestamp': timestamp});
+              objEl.id = "obj" + this.data.jsonObjectData[j]._id + "_" + timestamp;
+              sceneEl.appendChild(objEl);
+              } else {
+                console.log("well shoot, that one don't have a location " + JSON.stringify(this.sceneInventoryItems[i]));
+              }
             }
           }
         }
