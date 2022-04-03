@@ -384,8 +384,8 @@ AFRAME.registerComponent('mod-materials', {
           this.fancyTimeString = "";
         
           this.mesh.traverse(node => {
-            // if (node instanceof THREE.Mesh) {
-              if (node.name.toLowerCase().includes("screen")) {
+            // if (node instanceof THREE.Mesh) 
+              if ((node.name.toLowerCase().includes("screen") || node.name.toLowerCase().includes("hvid")) && node.material) {
                 this.screenMesh = node; 
 
                 console.log("gotsa screen mesh");
@@ -541,8 +541,11 @@ AFRAME.registerComponent('mod-materials', {
               // if (this.screenMesh.material == null) {
                 
               // }
-              this.screenMesh.material = this.playmaterial;
-              this.isInitialized = true;
+              if (this.screenMesh != null) {
+                this.screenMesh.material = this.playmaterial;
+                this.isInitialized = true;
+              }
+
               if (this.pauseButtonMesh != null) {
                 this.pauseButtonMesh.visible = false;
               }
@@ -587,8 +590,9 @@ AFRAME.registerComponent('mod-materials', {
             this.intersection = this.raycaster.components.raycaster.getIntersection(this.el);
             this.hitpoint = this.intersection.point;
             this.mouseOverObject = this.intersection.object.name;      
-            // console.log('ray hit', this.intersection.point, this.intersection.object.name);
-          if (!this.intersection.object.name.includes("screen") &&
+            console.log('ray hit', this.intersection.point, this.intersection.object.name);
+          if (!this.intersection.object.name.includes("hvid") &&
+              !this.intersection.object.name.includes("screen") &&
               !this.intersection.object.name.includes("background") &&
               !this.intersection.object.name.includes("fastforward") &&
               !this.intersection.object.name.includes("rewind") &&
@@ -636,7 +640,7 @@ AFRAME.registerComponent('mod-materials', {
             if (this.raycaster != null) {
                 console.log(this.mouseOverObject);
 
-              if (this.mouseOverObject.includes("play") || this.mouseOverObject.includes("screen")) {
+              if (this.mouseOverObject.includes("play") || this.mouseOverObject.includes("screen") || this.mouseOverObject.includes("hvid")) {
                 if (this.video.paused) {
                   console.log("tryna play!");
                   playVideo(this.video);

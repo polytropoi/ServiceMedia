@@ -2334,7 +2334,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
           if (this.data.equipped) {
             that.el.setAttribute('ammo-body', {type: 'kinematic', linearDamping: .1, angularDamping: .1});
           } else {
-            that.el.setAttribute('ammo-body', {type: that.data.objectData.physics.toLowerCase(), linearDamping: .1, angularDamping: .1});
+            that.el.setAttribute('ammo-body', {type: that.data.objectData.physics.toLowerCase(), emitCollisionEvents: true, linearDamping: .1, angularDamping: .1});
           }
           
         // if (that.data.objectData.physics.toLowerCase() == "static") {
@@ -2355,8 +2355,16 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
       if (that.data.applyForceToNewObject) {
         that.applyForce();
       }
+      
     });
 
+    this.el.addEventListener("collidestart", (e) => {
+      console.log("object has collided with body #" + e.detail.targetEl.id);
+      e.detail.targetEl; // Other entity, which playerEl touched.
+      that.distance = window.playerPosition.distanceTo(that.el.getAttribute('position'));
+      // console.log("distance  " + that.distance);
+      that.rayhit( e.detail.targetEl.id, that.distance, that.el.getAttribute('position'));
+    });
 
     this.el.addEventListener('raycaster-intersected', e =>{  
         this.raycaster = e.detail.el;

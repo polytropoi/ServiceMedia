@@ -1460,7 +1460,7 @@ AFRAME.registerComponent('mod_physics', {
     // this.el.setAttribute('ammo-body', {type: this.data.body});
 
     this.el.addEventListener('model-loaded', () => {
-      this.el.setAttribute('ammo-body', {type: this.data.body});
+      this.el.setAttribute('ammo-body', {type: this.data.body, emitCollisionEvents: true});
       // console.log("ammo body is " + JSON.stringify(this.el.getAttribute('ammo-body')));
       // this.loadShape();
     });
