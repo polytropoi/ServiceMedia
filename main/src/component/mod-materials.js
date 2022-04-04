@@ -336,6 +336,7 @@ AFRAME.registerComponent('mod-materials', {
         // let video = document.getElementById(this.data.id);
         // this.video = null;
         this.video = document.getElementById(this.data.id);
+        this.vidtexture = new THREE.VideoTexture( this.video );
         // primaryVideo = video;
         let m3u8 = '/hls/'+this.data.id;
         if (Hls.isSupported()) {
@@ -347,8 +348,8 @@ AFRAME.registerComponent('mod-materials', {
         } else {
           console.log("hls.js not supported (ios?), goiing native!");
           this.video.src = m3u8;
-          
         }
+
         // this.hls.on(Hls.Events.MANIFEST_PARSED,function() {}
         // pauseVideo(this.video);
         this.el.classList.add("video_embed");
@@ -494,8 +495,8 @@ AFRAME.registerComponent('mod-materials', {
               color: "white",
             });
           }
-          var texture = new THREE.VideoTexture( this.video );
-          this.vidtexture = texture;
+          // var texture = new THREE.VideoTexture( this.video );
+          // this.vidtexture = texture;
         //   this.videoControl();
 
         //   // setTimeout(this.videoControl(), 1000);
@@ -515,6 +516,7 @@ AFRAME.registerComponent('mod-materials', {
               // } else {
               //   this.vidtexture.format = THREE.RGBFormat;
               // }
+              // this.vidtexture = new THREE.VideoTexture( this.video );
               this.vidtexture.flipY = this.data.flipY; 
               this.vidtexture.minFilter = THREE.NearestFilter;
               this.vidtexture.magFilter = THREE.NearestFilter;
