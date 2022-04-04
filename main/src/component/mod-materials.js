@@ -657,7 +657,7 @@ AFRAME.registerComponent('mod-materials', {
                   // this.play_button.material = this.greenmat;
                   // break;
                 } else {
-                  // if (!this.video.paused) {
+                  if (this.video.readyState > 2) {
                   console.log("tryna pauyse!");
                   
                   pauseVideo(this.video);
@@ -670,7 +670,7 @@ AFRAME.registerComponent('mod-materials', {
                   // this.play_button.material = this.redmat;
                   
                   // break;
-                // }
+                }
               }
               // break;
             } else if (this.mouseOverObject.includes("slider_background")) {
