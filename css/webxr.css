@@ -184,7 +184,7 @@ body {
 
 }
 .bottomcenter-joystick {
-  position: absolute; left: 0; right: 0; bottom:30px; margin-left: auto; margin-right: auto; width: 64px; height: 64px; color:white; opacity:0.75;z-index:100;
+  position: absolute; left: 0; right: 0; bottom:0px; margin-left: auto; margin-right: auto; width: 64px; height: 64px; color:white; opacity:0.75;z-index:100;
 
 }
 
@@ -1203,7 +1203,7 @@ background-color: #000000;
  {
 
    border: 0px solid yellow;
-    position: absolute; left: 0; right: 0; bottom:32px; margin-left: auto; margin-right: auto; width: 128px; height: 128px; color:white; z-index:100;
+    position: absolute; left: 0; right: 0; bottom:8px; margin-left: auto; margin-right: auto; width: 128px; height: 128px; color:white; z-index:100;
    /* position: absolute;  */
     /* display: flex;
     flex-direction: column;
