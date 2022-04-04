@@ -320,6 +320,7 @@ AFRAME.registerComponent('mod-materials', {
       },
       init: function () {
         console.log("video id is : " + this.data.id);
+        this.video = null;
         /// ------------- cubemaap fu
         this.textureArray = [];
         this.el.classList.add("activeObjexRay");
@@ -628,7 +629,7 @@ AFRAME.registerComponent('mod-materials', {
         // this.mouseOverObject = mouseOverObject;
         // this.hitpoint = hitpoint;
         // thiz.slider_handle = this.slider_handle;
-        if (this.video != undefined) {
+        if (this.video != undefined && this.video != null) {
             this.nStart = new THREE.Vector3();
             this.nEnd = new THREE.Vector3();
             if (this.slider_begin != undefined) {
