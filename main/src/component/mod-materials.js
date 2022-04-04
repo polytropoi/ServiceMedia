@@ -267,7 +267,7 @@ AFRAME.registerComponent('mod-materials', {
       console.log("tryna await video...");
       try {
         await video.play();
-        console.log("video should be playin!");
+        console.log("video should be playing...anytimenow");
       } catch(err) {
         console.log("video error: " + err);
       }
@@ -333,24 +333,24 @@ AFRAME.registerComponent('mod-materials', {
         }
         this.cmTexture = new THREE.CubeTextureLoader().load(this.textureArray);
         this.cmTexture.format = THREE.RGBFormat;
-        let video = document.getElementById(this.data.id);
+        // let video = document.getElementById(this.data.id);
         // this.video = null;
-        this.video = video;
-        primaryVideo = video;
+        this.video = document.getElementById(this.data.id);
+        // primaryVideo = video;
         let m3u8 = '/hls/'+this.data.id;
         if (Hls.isSupported()) {
           console.log("hls supported!");
           var hls = new Hls();
           this.hls = hls;
           this.hls.loadSource(m3u8);
-          this.hls.attachMedia(video);
+          this.hls.attachMedia(this.video);
         } else {
           console.log("hls.js not supported (ios?), goiing native!");
-          video.src = m3u8;
+          this.video.src = m3u8;
           
         }
         // this.hls.on(Hls.Events.MANIFEST_PARSED,function() {}
-        pauseVideo(this.video);
+        // pauseVideo(this.video);
         this.el.classList.add("video_embed");
 
           console.log("tryna setup video");
@@ -643,7 +643,7 @@ AFRAME.registerComponent('mod-materials', {
 
               if (this.mouseOverObject.includes("play") || this.mouseOverObject.includes("screen") || this.mouseOverObject.includes("hvid")) {
                 console.log(this.mouseOverObject + "video paused " + this.video.paused + "video readyState " + this.video.readyState);
-                if (this.video.paused && this.video.readyState > 2) {
+                if (this.video.paused) {
                   console.log("tryna play!");
                   playVideo(this.video);
                   
