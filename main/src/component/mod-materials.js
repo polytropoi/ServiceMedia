@@ -642,7 +642,7 @@ AFRAME.registerComponent('mod-materials', {
                 console.log(this.mouseOverObject);
 
               if (this.mouseOverObject.includes("play") || this.mouseOverObject.includes("screen") || this.mouseOverObject.includes("hvid")) {
-                if (this.video.paused) {
+                if (this.video.paused && this.video.readyState > 2) {
                   console.log("tryna play!");
                   playVideo(this.video);
                   
