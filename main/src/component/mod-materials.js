@@ -350,7 +350,7 @@ AFRAME.registerComponent('mod-materials', {
           
         }
         // this.hls.on(Hls.Events.MANIFEST_PARSED,function() {}
-
+        pauseVideo(this.video);
         this.el.classList.add("video_embed");
 
           console.log("tryna setup video");
