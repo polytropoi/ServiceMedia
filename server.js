@@ -20929,6 +20929,7 @@ app.post('/update_obj/:_id', requiredAuthentication, function (req, res) {
                     picturegroupID: req.body.picturegroupID != null ? req.body.picturegroupID : "",
                     audiogroupID: req.body.audiogroupID != null ? req.body.audiogroupID : "",
                     synthPatch1: req.body.synthPatch1 != null ? req.body.synthPatch1 : "",
+                    tonejsPatch1: req.body.tonejsPatch1 != null ? req.body.tonejsPatch1 : "",
                     synthNotes: req.body.synthNotes != null ? req.body.synthNotes : "",
                     synthDuration: req.body.synthDuration != null ? req.body.synthDuration : "",
                     lastUpdateTimestamp: timestamp,

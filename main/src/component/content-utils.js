@@ -2271,7 +2271,8 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
       });
       
     }
-    if (this.data.objectData.synthNotes != undefined && this.data.objectData.synthNotes != null && this.data.objectData.synthNotes.length > 0) {
+    // if (this.data.objectData.synthNotes != undefined && this.data.objectData.synthNotes != null && this.data.objectData.synthNotes.length > 0) {
+    if (this.data.objectData.tonejsPatch1 != undefined && this.data.objectData.tonejsPatch1 != null) {  
       this.el.setAttribute("mod_synth", "init");
       this.hasSynth = true;
 
@@ -2359,7 +2360,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
     });
 
     this.el.addEventListener("collidestart", (e) => {
-      console.log("object has collided with body #" + e.detail.targetEl.id);
+      // console.log("object has collided with body #" + e.detail.targetEl.id);
       e.detail.targetEl; // Other entity, which playerEl touched.
       that.distance = window.playerPosition.distanceTo(that.el.getAttribute('position'));
       // console.log("distance  " + that.distance);
@@ -2397,7 +2398,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
           window.playerPosition = this.playerPosRot.pos; 
         }
         // console.log(window.playerPosition);
-        if (!that.isSelected) {
+        if (!that.isSelected && evt.detail.intersection != null) {
           // document.getElementById("player").component.get_pos_rot.returnPosRot();
           this.clientX = evt.clientX;
           this.clientY = evt.clientY;
@@ -2477,12 +2478,12 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
     });
   },
 
-  rayhit: function (hitID, distance, hitpoint) {
+  rayhit: function (hitID, distance, hitpoint) { //also called on collisionstart event
     // if (this.hitID != hitID) {
     //   this.hitID = hitID;
       // console.log("new hit " + hitID + " " + distance + " " + JSON.stringify(hitpoint));
       // distance = window.playerPosition.distanceTo(hitpoint);
-      console.log("new hit " + hitID + " distance: " + distance + " " + JSON.stringify(hitpoint));
+      // console.log("new hit " + hitID + " distance: " + distance + " " + JSON.stringify(hitpoint));
       // var triggerAudioController = document.getElementById("triggerAudio");
       // if (triggerAudioController != null) {
       //   triggerAudioController.components.trigger_audio_control.playAudioAtPosition(hitpoint, distance);
@@ -2490,8 +2491,14 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
       // let synthCtrl = this.el.components.mod_synth;
       // if (synthCtrl != null) {
         if (this.hasSynth) {
-          if (this.el.components.mod_synth != null) {
-            this.el.components.mod_synth.trigger(distance);
+          if (this.el.components.mod_synth != null && this.data.objectData.tonejsPatch1 != undefined && this.data.objectData.tonejsPatch1 != null) {
+            // this.el.components.mod_synth.trigger(distance);
+            if (this.data.objectData.tonejsPatch1 == "Metal") {
+              this.el.components.mod_synth.metalHitDistance(distance);
+            } else if (this.data.objectData.tonejsPatch1 == "AM Synth") {
+              this.el.components.mod_synth.amHitDistance(distance);
+            }
+           
           }
         }
       // } else {

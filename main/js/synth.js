@@ -10,6 +10,8 @@ const synth = new Tone.Synth({
 }).toMaster();
 // let triggerVolume = new Volume(-12).toDestination();
 
+
+
 const vol = new Tone.Volume().toDestination();
 const feedbackDelay = new Tone.FeedbackDelay("4n", .85).toDestination();
 const reverb = new Tone.Reverb().toDestination();
@@ -18,6 +20,7 @@ var phaser = new Tone.Phaser({
 	"octaves" : 5,
 	"baseFrequency" : 1000
 }).toDestination();
+
 const psynth = new Tone.PolySynth().connect(reverb).connect(vol);
 // set the attributes across all the voices using 'set'
 psynth.set({ detune: -1200 });
@@ -64,13 +67,23 @@ const amSynth = new Tone.AMSynth({
 }).connect(vol);
 // synth.triggerAttackRelease("C4", "4n");
 
+const bell = new Tone.MetalSynth({
+  harmonicity: 12,
+  resonance: 800,
+  modulationIndex: 20,
+  envelope: {
+    decay: 0.4,
+  },
+  volume: -15
+}).connect(vol);
+
 function getRandomInt(min, max) {
     min = Math.ceil(min);
     max = Math.floor(max);
     return Math.floor(Math.random() * (max - min) + min); //The maximum is exclusive and the minimum is inclusive
   }
 
-AFRAME.registerComponent('mod_synth', {
+AFRAME.registerComponent('mod_synth', { 
     // dependencies: ['raycaster'],  // for oculus go laser controls
      schema: {
          // Describe the property of the component.
@@ -93,10 +106,10 @@ AFRAME.registerComponent('mod_synth', {
     //    this.el.addEventListener('fusing', this.trigger.bind(this))
      },
    
-     trigger: function (distance) {
+     amHitDistance: function (distance) {
         this.distance = distance;
         vol.volume.value = distance * -2;
-         console.log("tryna trigger synth note distance " + distance );
+         console.log("tryna trigger am synth note distance " + distance );
 
          amSynth.triggerAttackRelease(getRandomInt(48,72), 1)
     //    psynth.triggerAttackRelease([getRandomInt(36,64),getRandomInt(64,88),getRandomInt(88,256)], 1)
@@ -115,6 +128,14 @@ AFRAME.registerComponent('mod_synth', {
     //     //the order of the notes passed in depends on the pattern
     //   }, ["C2", "D4", "E5", "A6"], "upDown");
       amSynth.triggerAttackRelease("C4", 1)
+    },
+
+    metalHitDistance: function (distance) {
+      this.distance = distance;
+      vol.volume.value = distance * -2;
+      //  console.log("tryna trigger synth note distance " + distance );
+
+       bell.triggerAttackRelease(getRandomInt(0,88), 1);
     },
      
    

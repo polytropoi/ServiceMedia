@@ -10414,11 +10414,23 @@ function showGroup() {
                             "</div>" +
                         "</div>" +
                         "<div class=\x22form-row\x22>" +    
-                            "<div class=\x22col form-group col-md-3\x22>" +
-                                "<label for=\x22synthPatchSelect\x22>Synth Patch</label>" +
+                            "<div class=\x22col form-group col-md-2\x22>" +
+                                "<label for=\x22synthPatchSelect\x22>Audio Helm Patch (Unity)</label>" +
                                 "<select class=\x22form-control\x22 id=\x22synthPatchSelect\x22>" +
                                 "<option value=\x22\x22 disabled selected>Select:</option>" +
                                 returnPatches() +
+                                "</select>" +
+                            "</div>" +
+                            "<div class=\x22col form-group col-md-2\x22>" +
+                                "<label for=\x22tonejsPatchSelect\x22>Tonejs Patch (WebXR)</label>" +
+                                "<select class=\x22form-control\x22 id=\x22tonejsPatchSelect\x22>" +
+                                "<option value=\x22\x22 disabled selected>Select:</option>" +
+                                "<option>Metal</option>" +
+                                "<option>AM Synth</option>" +
+                                "<option>Kick</option>" +
+                                "<option>Conga</option>" +
+                                "<option>Piano</option>" +
+                                "<option>none</option>" +
                                 "</select>" +
                             "</div>" +
                             "<div class=\x22col form-group col-md-1\x22>" + 
@@ -10618,6 +10630,7 @@ function showGroup() {
             $("#interaction").val(response.data.interaction);
             $("#highlight").val(response.data.highlight);
             $("#synthPatchSelect").val(response.data.synthPatch1);
+            $("#tonejsPatchSelect").val(response.data.tonejsPatch1);
             $("#collidertype").val(response.data.collidertype);
             $("#rotationaxis").val(response.data.rotationAxis);
             $("#callout").val(response.data.callout);
@@ -11252,6 +11265,8 @@ function showGroup() {
                     let eulerz = document.getElementById("eulerz").value;
 
                     let synthPatch1 = document.getElementById("synthPatchSelect").value;
+                    
+                    let tonejsPatch1 = document.getElementById("tonejsPatchSelect").value;
                     let synthNotes = document.getElementById("synthNotes").value;                
                     let synthDuration = document.getElementById("synthDuration").value;
                     let textitemID = document.getElementById("textitemID").value;
@@ -11361,6 +11376,7 @@ function showGroup() {
                         picturegroupID: picturegroupID != null ? picturegroupID : "",
                         audiogroupID: audiogroupID != null ? audiogroupID : "",
                         synthPatch1: synthPatch1 != null ? synthPatch1 : "",
+                        tonejsPatch1: tonejsPatch1 != null ? tonejsPatch1 : "",
                         synthNotes: synthNotes != null ? synthNotes : "",
                         synthDuration: synthDuration != null ? synthDuration : ""
                         // _id : response.data._id
