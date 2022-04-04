@@ -505,7 +505,7 @@ AFRAME.registerComponent('mod-materials', {
           console.log("videoControl init");
           // playVideo(this.video);
           //apple needs a click
-            if (!this.isInitialized) {
+            // if (!this.isInitialized) {
               if (timedEventsListenerMode == null) {
                 timedEventsListenerMode = "Primary Video";
               }
@@ -560,7 +560,7 @@ AFRAME.registerComponent('mod-materials', {
               // }
                 // },500);
               // }
-            } //else {
+            // } //else {
               this.redmat = new THREE.MeshStandardMaterial({
                 color: "red"    // red (can also use a CSS color string here)
                 // flatShading: true,
@@ -639,9 +639,10 @@ AFRAME.registerComponent('mod-materials', {
             // thiz.video = this.video;
             
             if (this.raycaster != null) {
-                console.log(this.mouseOverObject);
+                
 
               if (this.mouseOverObject.includes("play") || this.mouseOverObject.includes("screen") || this.mouseOverObject.includes("hvid")) {
+                console.log(this.mouseOverObject + "video paused " + this.video.paused + "video readyState " + this.video.readyState);
                 if (this.video.paused && this.video.readyState > 2) {
                   console.log("tryna play!");
                   playVideo(this.video);
@@ -656,7 +657,7 @@ AFRAME.registerComponent('mod-materials', {
                   // this.play_button.material = this.greenmat;
                   // break;
                 } else {
-                  if (!this.video.paused) {
+                  // if (!this.video.paused) {
                   console.log("tryna pauyse!");
                   
                   pauseVideo(this.video);
@@ -669,7 +670,7 @@ AFRAME.registerComponent('mod-materials', {
                   // this.play_button.material = this.redmat;
                   
                   // break;
-                }
+                // }
               }
               // break;
             } else if (this.mouseOverObject.includes("slider_background")) {
