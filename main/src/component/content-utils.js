@@ -25,7 +25,7 @@ function PrimaryAudioInit() {
   }
   let avz = document.getElementById("audiovizzler");
   if (avz != null) {
-    vidz = document.getElementsByTagName("video");
+    vidz = document.getElementsByTagName("video"); //vidz declared in content-utils?
     if (vidz != null && vidz.length > 0) { //either video or audio, not both...?
       videoEl = vidz[0];
       console.log("videoEl " + videoEl.src);
@@ -2115,14 +2115,14 @@ AFRAME.registerComponent('mod_objex', {
       this.locData.y = this.dropPos.y;
       this.locData.z = this.dropPos.z;
       this.locData.timestamp = Date.now();
-      this.objEl.setAttribute("mod_object", {'locationData': this.locData, 'objectData': this.objectData, 'applyForceToNewObject': true});
+      this.objEl.setAttribute("mod_object", {'locationData': this.locData, 'objectData': this.objectData});
       this.objEl.id = "obj" + this.objectData._id + "_" + this.locData.timestamp;
       sceneEl.appendChild(this.objEl);
       // this.objEl.components.mod_object.applyForce();
 
       // this.el.setAttribute('gltf-model', '#' + modelID.toString());
     },
-    throwObject: function (objectID) {
+    throwObject: function (objectID, downtime) {
       console.log("tryna set model to " + objectID);  
       this.objectData = this.returnObjectData(objectID);
       this.dropPos = new THREE.Vector3();
@@ -2134,7 +2134,7 @@ AFRAME.registerComponent('mod_objex', {
       this.locData.y = this.dropPos.y;
       this.locData.z = this.dropPos.z;
       this.locData.timestamp = Date.now();
-      this.objEl.setAttribute("mod_object", {'locationData': this.locData, 'objectData': this.objectData});
+      this.objEl.setAttribute("mod_object", {'locationData': this.locData, 'objectData': this.objectData, 'applyForceToNewObject': true, 'forceFactor': downtime});
       this.objEl.id = "obj" + this.objectData._id + "_" + this.locData.timestamp;
       sceneEl.appendChild(this.objEl);
       // this.el.setAttribute('gltf-model', '#' + modelID.toString());
@@ -2181,7 +2181,8 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
     equipped: {default: false},
     fromSceneInventory: {default: null},
     timestamp: {default: null},
-    applyForceToNewObject: {default: false}
+    applyForceToNewObject: {default: false},
+    forceFactor: {default: 1}
   },
   init: function () {
     // console.log("mod_object data " + JSON.stringify(this.data.objectData.modelURL));
@@ -2195,15 +2196,18 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
     this.hitPosition = null;
     this.mouseDownPos = new THREE.Vector2();
     this.mousePos = new THREE.Vector2();
+    this.mouseDownStarttime = 0;
     this.distance = 0;
     this.calloutLabelSplit = [];
     this.calloutLabelIndex = 0;
     this.promptSplit = [];
     this.promptIndex = 0;
     this.dialogEl = document.getElementById('mod_dialog');
+    this.objexEl = document.getElementById('sceneObjects');    
     this.pickupAction = null;
     this.dropAction = null;
     this.equipAction = null;
+    this.throwAction = null;
     this.synth = null;
     this.hasSynth = false;
     this.mod_physics = "";
@@ -2235,6 +2239,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
    
 
     this.hasPickupAction = false;
+    this.hasThrowAction = false;
 
     if (this.data.objectData.callouttext != undefined && this.data.objectData.callouttext != null && this.data.objectData.callouttext.length > 0) {
       if (this.data.objectData.callouttext.includes('~')) {
@@ -2291,14 +2296,18 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
           this.hasDropAction = true;
           this.dropAction = this.data.objectData.actions[a];
         }
+        if (this.data.objectData.actions[a].actionType.toLowerCase() == "throw") {
+          this.hasThrowAction = true;
+          this.throwAction = this.data.objectData.actions[a];
+        }
         if (this.data.objectData.actions[a].actionType.toLowerCase() == "equip") {
           this.hasEquipAction = true;
         }
         if (this.data.objectData.actions[a].actionType.toLowerCase() == "return") {
-          this.hasDropAction = true;
+          // this.hasDropAction = true;
         }
         if (this.data.objectData.actions[a].actionType.toLowerCase() == "use") {
-          this.hasDropAction = true;
+          // this.hasDropAction = true;
         }
       }
     }
@@ -2451,30 +2460,52 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
         }
       }
     });
+    this.el.addEventListener('mousedown', () => {
+      if (this.data.equipped) {
+        this.mouseDownStarttime = (Date.now() / 1000);
+        this.el.setAttribute('visible', false);
+      }
+    });
+    this.el.addEventListener('mouseup', () => {
+     
+      this.el.setAttribute('visible', true);
+    });
 
     this.el.addEventListener('click', () => { 
-      console.log("mousedown on object type: " + that.data.objectData.objtype + " action " + that.pickupAction + " equipped " + this.data.equipped);
+      let downtime = (Date.now() / 1000) - this.mouseDownStarttime;
+      console.log("mousedown time "+ downtime+ "  on object type: " + this.data.objectData.objtype + " action " + JSON.stringify(this.throwAction) + " equipped " + this.data.equipped);
       if (!this.data.equipped) {
         this.dialogEl = document.getElementById('mod_dialog');
         
-        if (that.data.objectData.objtype.toLowerCase() == "pickup" || that.hasPickupAction) {
-          // that.el.setAttribute('visible', false);
-          if (that.data.objectData.prompttext != undefined && that.data.objectData.prompttext != null && that.data.objectData.prompttext != "") {
-            if (that.data.objectData.prompttext.includes('~')) {
-              that.promptSplit = that.data.objectData.prompttext.split('~'); 
+        if (this.data.objectData.objtype.toLowerCase() == "pickup" || this.hasPickupAction) {
+          // this.el.setAttribute('visible', false);
+          if (this.data.objectData.prompttext != undefined && this.data.objectData.prompttext != null && this.data.objectData.prompttext != "") {
+            if (this.data.objectData.prompttext.includes('~')) {
+              this.promptSplit = this.data.objectData.prompttext.split('~'); 
             }
             // this.el.components.mod_synth.medTrigger();
-            that.dialogEl.components.mod_dialog.showPanel(that.promptSplit[Math.floor(Math.random()*that.promptSplit.length)], that.el.id );
+            this.dialogEl.components.mod_dialog.showPanel(this.promptSplit[Math.floor(Math.random()*this.promptSplit.length)], this.el.id );
           }
           
         }
       } else {
-        this.el.object3D.visible = false;
-        DropInventoryItem(this.data.objectData._id); //just drop for now...throw/shoot/swing next!
-        setTimeout(() => {
-          this.el.object3D.visible = true;
-        }, 3000);
+        if (this.hasThrowAction) {
+          console.log("throw action " + JSON.stringify(this.throwAction));
+          if (this.throwAction.sourceObjectMod.toLowerCase() == "persist") { //transfer to scene inventory
+            this.el.object3D.visible = false;
+            DropInventoryItem(this.data.objectData._id); //just drop for now...throw/shoot/swing next!
+            setTimeout(() => {
+              this.el.object3D.visible = true;
+            }, 3000);
+          } else if (this.throwAction.sourceObjectMod.toLowerCase() == "remove") {
+           
+            this.objexEl.components.mod_objex.throwObject(this.data.objectData._id, downtime);
+          }
+        }
       }
+      // setTimeout(() => {
+        // this.el.setAttribute('visible', true);
+      // }, 1000);
     });
   },
 
@@ -2601,7 +2632,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
       this.camera.getWorldDirection( this.lookVector );
       console.log("tryna pushForward@! " + JSON.stringify(this.lookVector));
       // const velocity = new Ammo.btVector3(2, 1, 0);
-      const velocity = new Ammo.btVector3(this.lookVector.x * 10, this.lookVector.y * 10, this.lookVector.z * 10);
+      const velocity = new Ammo.btVector3(this.lookVector.x * 10 * this.data.forceFactor, this.lookVector.y * 10 * this.data.forceFactor, this.lookVector.z * 10 * this.data.forceFactor);
       this.el.body.setLinearVelocity(velocity);
       Ammo.destroy(velocity);
     }
@@ -2614,6 +2645,7 @@ function getRandomIntInclusive(min, max) {
   max = Math.floor(max);
   return Math.floor(Math.random() * (max - min + 1) + min); //The maximum is inclusive and the minimum is inclusive
 }
+
 
 
 function Drop (data) {
@@ -2808,7 +2840,7 @@ AFRAME.registerComponent('mod_dialog', { //only one of these
         }
       });
     }
-    WaitAndHideDialogPanel(3000);
+    WaitAndHideDialogPanel(2000);
       // setTimeout(function () {
       //   this.el.components.mod_dialog.hidePanel();
       // }, 3000);
@@ -2828,16 +2860,17 @@ AFRAME.registerComponent('mod_dialog', { //only one of these
         }
       });
     }
-    WaitAndHideDialogPanel(3000);
+    WaitAndHideDialogPanel(2000);
   }
 });
 function WaitAndHideDialogPanel (time) {
   let dialog = document.getElementById("mod_dialog");
   let panel = document.getElementById("mod_dialog_panel");
-  setTimeout(() =>{ dialog.setAttribute("visible", false);
-  panel.classList.remove('activeObjexRay');
-  }, time);
-
+  // if (dialog.getAttribute("visibility") == visible) {
+    setTimeout(() =>{ dialog.setAttribute("visible", false);
+    panel.classList.remove('activeObjexRay');
+    }, time);
+  // }
 }
 
 AFRAME.registerComponent('mod_model', {
