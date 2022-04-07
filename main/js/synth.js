@@ -116,10 +116,10 @@ AFRAME.registerComponent('mod_synth', {
     //    amSynth.triggerAttackRelease("C2", 1)
      },
      medTrigger: function () {
-        amSynth.triggerAttackRelease("C3", .5)
+        amSynth.triggerAttackRelease("C3", .5);
      },
      highTrigger: function () {
-        amSynth.triggerAttackRelease("C4", .5)
+        amSynth.triggerAttackRelease("C4", .5);
      },
      triggerDistanceRolloff: function () {
         console.log("tryna trigger synth note");

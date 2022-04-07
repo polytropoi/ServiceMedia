@@ -2197,6 +2197,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
     this.mouseDownPos = new THREE.Vector2();
     this.mousePos = new THREE.Vector2();
     this.mouseDownStarttime = 0;
+    this.mouseDowntime = 0;
     this.distance = 0;
     this.calloutLabelSplit = [];
     this.calloutLabelIndex = 0;
@@ -2335,6 +2336,8 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
       if (!this.data.equipped) {
         that.el.setAttribute("position", pos);
         that.el.setAttribute("rotation", rot);
+      } else {
+        this.el.setAttribute('material', {opacity: 0.25, transparent: true});
       }
       that.el.setAttribute("scale", scale);
 
@@ -2343,6 +2346,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
         //  setTimeout(function(){  
           if (this.data.equipped) {
             that.el.setAttribute('ammo-body', {type: 'kinematic', linearDamping: .1, angularDamping: .1});
+
           } else {
             that.el.setAttribute('ammo-body', {type: that.data.objectData.physics.toLowerCase(), emitCollisionEvents: true, linearDamping: .1, angularDamping: .1});
           }
@@ -2363,13 +2367,18 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
       that.el.setAttribute('ammo-shape', {type: that.data.objectData.collidertype.toLowerCase()});
       // console.log("ammo shape is " + JSON.stringify(that.el.getAttribute('ammo-shape')));
       if (that.data.applyForceToNewObject) {
+
         that.applyForce();
       }
       
     });
 
     this.el.addEventListener("collidestart", (e) => {
-      // console.log("object has collided with body #" + e.detail.targetEl.id);
+      // console.log("object has collided with object with classlist :" + e.detail.targetEl.classList);
+      // let modelComponent = e.detail.targetEl.components.mod_model
+      if (e.detail.targetEl.classList.contains('target')) {
+        console.log("object has collided with target #" + e.detail.targetEl.id);
+      }
       e.detail.targetEl; // Other entity, which playerEl touched.
       that.distance = window.playerPosition.distanceTo(that.el.getAttribute('position'));
       // console.log("distance  " + that.distance);
@@ -2467,13 +2476,13 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
       }
     });
     this.el.addEventListener('mouseup', () => {
-     
+      this.mouseDowntime = (Date.now() / 1000) - this.mouseDownStarttime;
       this.el.setAttribute('visible', true);
     });
 
     this.el.addEventListener('click', () => { 
-      let downtime = (Date.now() / 1000) - this.mouseDownStarttime;
-      console.log("mousedown time "+ downtime+ "  on object type: " + this.data.objectData.objtype + " action " + JSON.stringify(this.throwAction) + " equipped " + this.data.equipped);
+      // let downtime = (Date.now() / 1000) - this.mouseDownStarttime;
+      console.log("mousedown time "+ this.mouseDowntime + "  on object type: " + this.data.objectData.objtype + " action " + JSON.stringify(this.throwAction) + " equipped " + this.data.equipped);
       if (!this.data.equipped) {
         this.dialogEl = document.getElementById('mod_dialog');
         
@@ -2485,6 +2494,8 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
             }
             // this.el.components.mod_synth.medTrigger();
             this.dialogEl.components.mod_dialog.showPanel(this.promptSplit[Math.floor(Math.random()*this.promptSplit.length)], this.el.id );
+          } else {
+            this.dialogEl.components.mod_dialog.showPanel("pick up this object?", this.el.id );
           }
           
         }
@@ -2498,8 +2509,10 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
               this.el.object3D.visible = true;
             }, 3000);
           } else if (this.throwAction.sourceObjectMod.toLowerCase() == "remove") {
-           
-            this.objexEl.components.mod_objex.throwObject(this.data.objectData._id, downtime);
+            if (this.mouseDowntime <= 0) {
+              this.mouseDowntime = 1;
+            }
+            this.objexEl.components.mod_objex.throwObject(this.data.objectData._id, this.mouseDowntime);
           }
         }
       }
@@ -2919,6 +2932,9 @@ AFRAME.registerComponent('mod_model', {
       this.start = Date.now();
       console.log("oScale of model::: " + oScale);
       this.tick = AFRAME.utils.throttleTick(this.tick, 50, this);
+
+      this.hasTrigger = false;
+      this.triggerObject = null;
       
       if (this.data.shader != '') {
         // setShader(this.data.shader);
@@ -2984,7 +3000,7 @@ AFRAME.registerComponent('mod_model', {
             //   }
             // }
           }
-        let dynSkybox = document.getElementById('')
+        // let dynSkybox = document.getElementById('')
           for (let e = 0; e < eventData.length; e++) {
             if (eventData[e].toLowerCase().includes("refract")){
               console.log("tryna set refraction");
@@ -3076,6 +3092,12 @@ AFRAME.registerComponent('mod_model', {
           }
           obj.traverse(node => { //spin through object heirarchy to sniff for special names, e.g. "eye"
             this.nodeName = node.name;
+            if (this.nodeName.includes("trigger")) { //must be set in the data and as a name on the model
+              if (node instanceof THREE.Mesh) {
+              this.meshChildren.push(node);
+              console.log("gotsa trigger!");
+              }
+            }
             if (this.nodeName.includes("navmesh")) { //must be set in the data and as a name on the model
               if (node instanceof THREE.Mesh) {
               this.meshChildren.push(node);
@@ -3182,13 +3204,22 @@ AFRAME.registerComponent('mod_model', {
             }
           }
           for (i = 0; i < this.meshChildren.length; i++) { //apply mods to the special things
-            // console.log("meshChild " + this.meshChildren[i].name);
+            console.log("gotsa trigger !! meshChild " + this.meshChildren[i].name);
+            if (this.meshChildren[i].name.includes("trigger")) { 
+              this.child = this.el.object3D.getObjectByName(this.meshChildren[i].name, true);
+              this.child.visible = false;
+              let triggerEl = document.createElement('a-entity');
+              triggerEl.setObject3D("mesh", this.child.clone());
+              triggerEl.setAttribute('mod_physics', {body: 'kinematic', shape: 'mesh'});
+              triggerEl.classList.add('trigger');
+              this.el.appendChild(triggerEl);
+            }
             if (this.meshChildren[i].name.includes("navmesh")) {
               console.log("gotsa navmesh too!");
               // let child = this.meshChildren[i].clone();
               this.child = this.el.object3D.getObjectByName(this.meshChildren[i].name, true);
-              this.child.visible = false; //just hide named navmesh, they're loaded externally...
-
+              this.child.visible = false; //just hide named navmesh, they're loaded externally... 
+           
               // console.log(child);
               // if (child != null && child != undefined) { 
                 //
@@ -3774,12 +3805,17 @@ AFRAME.registerComponent('mod_model', {
           // theEl.addEventListener('animation-finished', function () { //clunky but whatever - this is the "recommended way" ?!?
           //   theEl.removeAttribute('animation-mixer');
           // });
-        }
-        }
-      });      
-    }
+          }
+          }
+        });      
+      }
     });
   }, 
+  returnProperties: function () {
+
+
+
+  },
   beat: function (volume) {
     // console.log("tryna beat " + this.el.id + " " + volume);
     if (this.data.eventData.toLowerCase().includes("beat")) {
