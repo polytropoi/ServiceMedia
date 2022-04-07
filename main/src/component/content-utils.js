@@ -2469,16 +2469,31 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
         }
       }
     });
-    this.el.addEventListener('mousedown', () => {
-      if (this.data.equipped) {
-        this.mouseDownStarttime = (Date.now() / 1000);
-        this.el.setAttribute('visible', false);
+   
+   
+      if (AFRAME.utils.device.isMobile()) {
+        this.el.addEventListener('touchstart', () => {
+          if (this.data.equipped) {
+            this.mouseDownStarttime = (Date.now() / 1000);
+            this.el.setAttribute('visible', false);
+          }
+        });
+        this.el.addEventListener('touchend', () => {
+          this.mouseDowntime = (Date.now() / 1000) - this.mouseDownStarttime;
+          this.el.setAttribute('visible', true);
+        });
+      } else {   
+        this.el.addEventListener('mousedown', () => {
+          if (this.data.equipped) {
+            this.mouseDownStarttime = (Date.now() / 1000);
+            this.el.setAttribute('visible', false);
+          }
+        });
+        this.el.addEventListener('mouseup', () => {
+          this.mouseDowntime = (Date.now() / 1000) - this.mouseDownStarttime;
+          this.el.setAttribute('visible', true);
+        });
       }
-    });
-    this.el.addEventListener('mouseup', () => {
-      this.mouseDowntime = (Date.now() / 1000) - this.mouseDownStarttime;
-      this.el.setAttribute('visible', true);
-    });
 
     this.el.addEventListener('click', () => { 
       // let downtime = (Date.now() / 1000) - this.mouseDownStarttime;
@@ -2645,7 +2660,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
       this.camera.getWorldDirection( this.lookVector );
       console.log("tryna pushForward@! " + JSON.stringify(this.lookVector));
       // const velocity = new Ammo.btVector3(2, 1, 0);
-      const velocity = new Ammo.btVector3(this.lookVector.x * 10 * this.data.forceFactor, this.lookVector.y * 10 * this.data.forceFactor, this.lookVector.z * 10 * this.data.forceFactor);
+      const velocity = new Ammo.btVector3(this.lookVector.x * 10 * this.data.forceFactor, (this.lookVector.y + 1) * 10 * this.data.forceFactor, this.lookVector.z * 10 * this.data.forceFactor);
       this.el.body.setLinearVelocity(velocity);
       Ammo.destroy(velocity);
     }

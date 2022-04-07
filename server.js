@@ -14879,7 +14879,8 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
     let physicsScripts = "";
     let extrasScript = "<script src=\x22../main/vendor/aframe/animation-mixer.js\x22></script>"; //swapped with full aframe-extras lib (that includes animation-mixer) for physics and navmesh if needed
     // let debugMode = false;
-    let aframeScriptVersion = "<script src=\x22https://aframe.io/releases/1.3.0/aframe.min.js\x22></script>";
+    // let aframeScriptVersion = "<script src=\x22https://aframe.io/releases/1.3.0/aframe.min.js\x22></script>";
+    let aframeScriptVersion = "<script src=\x22https://cdn.jsdelivr.net/gh/aframevr/aframe@0d23f9b21c33ab6821046ce95835492cb84996c5/dist/aframe-master.min.js\x22></script>";
     let surfaceScatterScript = "";
     let locationData = "";
     let modelData = "";
@@ -17954,7 +17955,8 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                         // webxrFeatures = "webxr=\x22optionalFeatures: hit-test, local-floor\x22"; //otherwise hit-test breaks everythign!
                         webxrFeatures = "webxr=\x22optionalFeatures: hit-test, local-floor, dom-overlay; overlayElement:#canvasOverlay;\x22"; //otherwise hit-test breaks everythign!
                         // arHitTest = "ar-hit-test=\x22mode: "+arMode+"\x22";
-                        arShadowPlane = "<a-plane show-in-ar-mode visible=\x22false\x22 height=\x22200\x22 width=\x22200\x22 rotation=\x22-90 0 0\x22 repeat=\x22200 200\x22 shadow=\x22receive:true\x22 ar-shadows=\x22opacity: 0.3\x22 static-body=\x22shape: none\x22 shape__main=\x22shape: box; halfExtents: 100 100 0.125; offset: 0 0 -0.125\x22>" +
+                        // arShadowPlane = "<a-plane show-in-ar-mode id="shadow-plane" material="shader:shadow" shadow="cast:false;" visible=\x22false\x22 height=\x2210\x22 width=\x2210\x22 rotation=\x22-90 0 0\x22 shadow=\x22receive:true\x22 ar-shadows=\x22opacity: 0.3\x22 static-body=\x22shape: none\x22 shape__main=\x22shape: box; halfExtents: 100 100 0.125; offset: 0 0 -0.125\x22>" +
+                        arShadowPlane = "<a-plane show-in-ar-mode id=\x22shadow-plane\x22 material=\x22shader:shadow\x22 shadow=\x22cast:false;\x22 follow-shadow=\x22.activeObjexRay\x22 visible=\x22false\x22 height=\x2210\x22 width=\x2210\x22 rotation=\x22-90 0 0\x22>" +
                             "</a-plane>";
                         
                         // }
@@ -18904,7 +18906,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                         audioVizEntity +
                         instancingEntity +
                         // "<a-entity show-in-ar-mode visible=\x22false\x22 id=\x22reticleEntity\x22 gltf-model=\x22#reticle2\x22 scale=\x220.8 0.8 0.8\x22 "+arHitTest+"></a-entity>\n"+
-                        // arShadowPlane +
+                        arShadowPlane +
                         hemiLight +
                         shadowLight +
                         // navmarsh +
@@ -19034,7 +19036,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                         //     surfaceScatterScript = 
                         // }
                         
-                        let aScene = "<a-scene "+sceneBackground+" "+physicsInsert+" "+pool_target+" "+pool_launcher+" gesture-detector ar-hit-test=\x22target:.activeObjexRay; type:footprint; footprintDepth:0.2;\x22 ar-cursor raycaster=\x22objects: .activeObjexRay\x22 screen-controls disable-magicwindow vr-mode-ui keyboard-shortcuts=\x22enterVR: false\x22 device-orientation-permission-ui=\x22enabled: false\x22 " +
+                        let aScene = "<a-scene "+sceneBackground+" "+physicsInsert+" "+pool_target+" "+pool_launcher+" gesture-detector webxr reflection=\x22directionalLight:#real-light\x22 ar-hit-test=\x22target:.activeObjexRay; type:footprint; footprintDepth:0.2;\x22 ar-cursor raycaster=\x22objects: .activeObjexRay\x22 screen-controls disable-magicwindow vr-mode-ui keyboard-shortcuts=\x22enterVR: false\x22 device-orientation-permission-ui=\x22enabled: false\x22 " +
                         // let aScene = "<a-scene "+sceneBackground+" device-orientation-permission-ui " +
                         // webxrFeatures + " shadow=\x22type: pcfsoft\x22 loading-screen=\x22dotsColor: white; backgroundColor: black; enabled: false\x22 "+joystick+" embedded " + aframeRenderSettings + " " + fogSettings + " "+networkedscene+" "+ARSceneArg+" listen-for-vr-mode>";
                         webxrFeatures + " shadow=\x22type: pcfsoft\x22 loading-screen=\x22dotsColor: white; backgroundColor: black; enabled: false\x22 embedded " + aframeRenderSettings + " " + fogSettings + " "+networkedscene+" "+ARSceneArg+" listen-for-vr-mode>";
@@ -19318,13 +19320,14 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                         ambientAudioEntity + 
                         triggerAudioEntity +
                         lightEntities +
+                        "<a-light visible=\x22false\x22 show-in-ar-mode id=\x22real-light\x22 type=\x22directional\x22 position=\x221 1 1\x22 intensity=\x220.5\x22></a-light>" +
                         placeholderEntities +
                         loadLocations +
                         "<a-entity id=\x22createAvatars\x22 create_avatars></a-entity>"+
                         audioVizEntity +
                         instancingEntity +
                         // "<a-entity show-in-ar-mode visible=\x22false\x22 id=\x22reticleEntity\x22 gltf-model=\x22#reticle2\x22 scale=\x220.8 0.8 0.8\x22 "+arHitTest+"></a-entity>\n"+
-                        // arShadowPlane +
+                        arShadowPlane +
                         hemiLight +
                         shadowLight +
                         // navmarsh +
