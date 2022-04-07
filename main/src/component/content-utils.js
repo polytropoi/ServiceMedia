@@ -524,7 +524,7 @@ AFRAME.registerComponent('basic-link', {
   init: function() {
     this.el.addEventListener('click', (e)=> { //TODO turn off if parent is freaking invisible!!!!
       // e.stopPropagation();
-      // e.preventDefault();
+      e.preventDefault();
       console.log("basic link click for href " + this.data.href);
       // clearTimeout(this.downTimer);
       // this.data.downTimer = setInterval(() => {
@@ -549,6 +549,7 @@ AFRAME.registerComponent('basic-link', {
       this.data.isDown = true;
     });
     this.el.addEventListener('mouseup', (e)=> {
+      e.preventDefault();
       // console.log("tryna clear timeout");
       // window.clearInterval(this.data.downTimer);
       if (this.data.isDown) {
@@ -556,6 +557,7 @@ AFRAME.registerComponent('basic-link', {
       }
     });
     this.el.addEventListener('mouseleave', (e)=> {
+      e.preventDefault();
       // console.log("tryna clear timeout");
       // window.clearInterval(this.data.downTimer);
       this.data.isDown = false;
@@ -2337,6 +2339,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
         that.el.setAttribute("position", pos);
         that.el.setAttribute("rotation", rot);
       } else {
+        
         this.el.setAttribute('material', {opacity: 0.25, transparent: true});
       }
       that.el.setAttribute("scale", scale);
@@ -2374,6 +2377,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
     });
 
     this.el.addEventListener("collidestart", (e) => {
+      e.preventDefault();
       // console.log("object has collided with object with classlist :" + e.detail.targetEl.classList);
       // let modelComponent = e.detail.targetEl.components.mod_model
       if (e.detail.targetEl.classList.contains('target')) {
@@ -2406,6 +2410,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
     });
 
     this.el.addEventListener('mouseenter', (evt) => {
+      evt.preventDefault();
       if (!this.data.equipped) {
         if (posRotReader != null) {
           this.playerPosRot = posRotReader.returnPosRot(); 
@@ -2461,7 +2466,8 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
       }
     });
     
-    this.el.addEventListener('mouseleave', () => { 
+    this.el.addEventListener('mouseleave', (e) => { 
+      e.preventDefault();
       // console.log("tryna mouseexit");
       if (!this.data.equipped) {
         if (that.calloutEntity != null) {
@@ -2472,30 +2478,39 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
    
    
       if (AFRAME.utils.device.isMobile()) {
-        this.el.addEventListener('touchstart', () => {
+        this.el.addEventListener('touchstart', (e) => {
+          e.preventDefault();
+          console.log("touchstart");
           if (this.data.equipped) {
             this.mouseDownStarttime = (Date.now() / 1000);
             this.el.setAttribute('visible', false);
           }
         });
-        this.el.addEventListener('touchend', () => {
+        this.el.addEventListener('touchend', (e) => {
+          e.preventDefault();
+          console.log("touchend");
           this.mouseDowntime = (Date.now() / 1000) - this.mouseDownStarttime;
           this.el.setAttribute('visible', true);
         });
       } else {   
-        this.el.addEventListener('mousedown', () => {
+        this.el.addEventListener('mousedown', (e) => {
+          e.preventDefault();
+          console.log("mousestart");
           if (this.data.equipped) {
             this.mouseDownStarttime = (Date.now() / 1000);
             this.el.setAttribute('visible', false);
           }
         });
-        this.el.addEventListener('mouseup', () => {
+        this.el.addEventListener('mouseup', (e) => {
+          e.preventDefault();
+          console.log("moouseend");
           this.mouseDowntime = (Date.now() / 1000) - this.mouseDownStarttime;
           this.el.setAttribute('visible', true);
         });
       }
 
-    this.el.addEventListener('click', () => { 
+    this.el.addEventListener('click', (e) => { 
+      e.preventDefault();
       // let downtime = (Date.now() / 1000) - this.mouseDownStarttime;
       console.log("mousedown time "+ this.mouseDowntime + "  on object type: " + this.data.objectData.objtype + " action " + JSON.stringify(this.throwAction) + " equipped " + this.data.equipped);
       if (!this.data.equipped) {

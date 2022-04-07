@@ -336,15 +336,32 @@ AFRAME.registerComponent('mod-materials', {
         // let video = document.getElementById(this.data.id);
         // this.video = null;
         this.video = document.getElementById(this.data.id);
-        this.vidtexture = new THREE.VideoTexture( this.video );
+
         // primaryVideo = video;
         let m3u8 = '/hls/'+this.data.id;
         if (Hls.isSupported()) {
-          console.log("hls supported!");
-          var hls = new Hls();
-          this.hls = hls;
-          this.hls.loadSource(m3u8);
-          this.hls.attachMedia(this.video);
+          // console.log("hls supported!");
+          // var hls = new Hls();
+          // this.hls = hls;
+          // this.hls.loadSource(m3u8);
+          // this.hls.attachMedia(this.video);
+          // if (Hls.isSupported()) {
+            // var video = document.getElementById('video');
+            var hls = new Hls();
+            hls.attachMedia(this.video);
+            
+            // bind them together
+            // hls.attachMedia(video);
+            hls.on(Hls.Events.MEDIA_ATTACHED, function () {
+              console.log('video and hls.js are now bound together !');
+              hls.loadSource(m3u8);
+              hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
+                console.log(
+                  'manifest loaded, found ' + data.levels.length + ' quality level'
+                );
+              });
+            });
+          // }
         } else {
           console.log("hls.js not supported (ios?), goiing native!");
           this.video.src = m3u8;
@@ -517,6 +534,7 @@ AFRAME.registerComponent('mod-materials', {
               //   this.vidtexture.format = THREE.RGBFormat;
               // }
               // this.vidtexture = new THREE.VideoTexture( this.video );
+              this.vidtexture = new THREE.VideoTexture( this.video );
               this.vidtexture.flipY = this.data.flipY; 
               this.vidtexture.minFilter = THREE.NearestFilter;
               this.vidtexture.magFilter = THREE.NearestFilter;
@@ -624,8 +642,8 @@ AFRAME.registerComponent('mod-materials', {
           this.mouseOverObject = null;
           // }
       });
-      this.el.addEventListener('click', () =>  {
-        
+      this.el.addEventListener('click', (e) =>  {
+        e.preventDefault();
         // this.video = video;
         console.log(this.mouseOverObject + " raycaster "+ this.raycaster);
         // this.mouseOverObject = mouseOverObject;

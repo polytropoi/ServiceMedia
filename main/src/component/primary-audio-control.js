@@ -180,8 +180,9 @@ AFRAME.registerComponent('primary_audio_player', {  //setup and controls for the
             });
 
             this.el.addEventListener('click', function (event) {
+                event.preventDefault();
                 // thiz.hitpoint = this.hitpoint;
-                console.log(thiz.mouseOverObject + " raycaster "+ thiz.raycaster);
+                console.log("click on paudio with " + thiz.mouseOverObject + " raycaster "+ thiz.raycaster);
                 if (thiz.raycaster != null) {
                     // console.log(thiz.mouseOverObject);
 

@@ -207,7 +207,7 @@ class Joystick
 
 		    // if this is a touch event, make sure it is the right one
 		    if (event.changedTouches && self.touchId != event.changedTouches[0].identifier) return;
-
+        event.preventDefault();
 		    // transition the joystick position back to center
 		    stick.style.transition = '.2s';
 		    stick.style.transform = `translate3d(0px, 0px, 0px)`;

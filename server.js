@@ -7359,57 +7359,62 @@ app.get('/userpic/:p_id', requiredAuthentication, function(req, res) {
 });
 app.get('/hls/:_id', function(req, res) {
     var pID = req.params._id;
-    var o_id = ObjectID(pID);
-    db.video_items.findOne({"_id": o_id}, function(err, video_item) {
-        if (err || !video_item) {
-            console.log("error getting hls video item: " + err);
-            res.send("error getting hls video item: " + err);
-        } else {
-            let chkParams = {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: 'users/' + video_item.userID + '/video/' + video_item._id + '/hls/output.m3u8'};
-            s3.getObject(chkParams, function(err, manifest) { 
-            if (err) { 
-                res.send("no hls manifest found");
+    console.log("hls pid " + req.params._id);
+    if (ObjectID.isValid(pID)) {
+        var o_id = ObjectID(pID);
+        db.video_items.findOne({"_id": o_id}, function(err, video_item) {
+            if (err || !video_item) {
+                console.log("error getting hls video item: " + err);
+                res.send("error getting hls video item: " + err);
             } else {
-                // console.log("gotsa m3u8: " + manifest.Body.toString());
-                var params = {
-                    Bucket: process.env.S3_ROOT_BUCKET_NAME,
-                    Prefix: 'users/' + video_item.userID + '/video/' + video_item._id + '/hls/'
-                }
-                s3.listObjects(params, function(err, data) {
-                    if (err) {
-                        console.log(err);
-                        res.send("error: " + err);
+                let chkParams = {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: 'users/' + video_item.userID + '/video/' + video_item._id + '/hls/output.m3u8'};
+                s3.getObject(chkParams, function(err, manifest) { 
+                if (err) { 
+                    res.send("no hls manifest found");
+                } else {
+                    // console.log("gotsa m3u8: " + manifest.Body.toString());
+                    var params = {
+                        Bucket: process.env.S3_ROOT_BUCKET_NAME,
+                        Prefix: 'users/' + video_item.userID + '/video/' + video_item._id + '/hls/'
                     }
-                    if (data.Contents.length == 0) {
-                        // console.log("no content found");
-                        res.send("no content found");
-                    } else {
-                        var manifestString = manifest.Body.toString();                                   
-                        async.each (data.Contents, function (s3Object, callbackz) { //takes a shake so async, and respond when it's done
-                            if (getExtension(s3Object.Key) == ".ts") { //swap out .ts files (e.g 001.ts) for signed urls
-                                // console.log("filename " + path.basename(s3Object.Key)); 
-                                let url = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: s3Object.Key, Expires: 36000});
-                                // console.log("url " + url);
-                                manifestString = manifestString.replace(path.basename(s3Object.Key), url);
-                            }
-                            callbackz();
-                        }, function(err) {
-                            if (err) {
-                                // console.log('hls mangler failed to process');
-                                res.send("error! " + err);
-                            } else {
-                                // console.log('All files have been processed successfully');
-                                res.setHeader('content-type', 'application/x-mpegURL');
-                                res.send(manifestString);
+                    s3.listObjects(params, function(err, data) {
+                        if (err) {
+                            console.log(err);
+                            res.send("error: " + err);
+                        }
+                        if (data.Contents.length == 0) {
+                            // console.log("no content found");
+                            res.send("no content found");
+                        } else {
+                            var manifestString = manifest.Body.toString();                                   
+                            async.each (data.Contents, function (s3Object, callbackz) { //takes a shake so async, and respond when it's done
+                                if (getExtension(s3Object.Key) == ".ts") { //swap out .ts files (e.g 001.ts) for signed urls
+                                    // console.log("filename " + path.basename(s3Object.Key)); 
+                                    let url = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: s3Object.Key, Expires: 36000});
+                                    // console.log("url " + url);
+                                    manifestString = manifestString.replace(path.basename(s3Object.Key), url);
+                                }
+                                callbackz();
+                            }, function(err) {
+                                if (err) {
+                                    // console.log('hls mangler failed to process');
+                                    res.send("error! " + err);
+                                } else {
+                                    // console.log('All files have been processed successfully');
+                                    res.setHeader('content-type', 'application/x-mpegURL');
+                                    res.send(manifestString);
+                                }
+                            });
+                            
                             }
                         });
-                        
-                        }
-                    });
-                }
-            });
-        }
-    });
+                    }
+                });
+            }
+        });
+    } else {
+        res.send("error in id " + pid);
+    }
 });
 
 app.get('/uservid/:p_id', requiredAuthentication, function(req, res) {
