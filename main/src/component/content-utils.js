@@ -17,6 +17,9 @@ var primaryAudioMangler = null;
 let youtubeTime = 0;
 let youtubeDuration = 0;
 
+
+
+
 function PrimaryAudioInit() {
   console.log("PRIMARY AUDIO INIT()");
   primaryAudioEl = document.querySelector('#primaryAudio');
@@ -2477,37 +2480,37 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
     });
    
    
-      if (AFRAME.utils.device.isMobile()) {
-        this.el.addEventListener('touchstart', (e) => {
-          e.preventDefault();
-          console.log("touchstart");
-          if (this.data.equipped) {
-            this.mouseDownStarttime = (Date.now() / 1000);
-            this.el.setAttribute('visible', false);
-          }
-        });
-        this.el.addEventListener('touchend', (e) => {
-          e.preventDefault();
-          console.log("touchend");
-          this.mouseDowntime = (Date.now() / 1000) - this.mouseDownStarttime;
-          this.el.setAttribute('visible', true);
-        });
-      } else {   
-        this.el.addEventListener('mousedown', (e) => {
-          e.preventDefault();
-          console.log("mousestart");
-          if (this.data.equipped) {
-            this.mouseDownStarttime = (Date.now() / 1000);
-            this.el.setAttribute('visible', false);
-          }
-        });
-        this.el.addEventListener('mouseup', (e) => {
-          e.preventDefault();
-          console.log("moouseend");
-          this.mouseDowntime = (Date.now() / 1000) - this.mouseDownStarttime;
-          this.el.setAttribute('visible', true);
-        });
-      }
+      // if (AFRAME.utils.device.isMobile()) {
+      //   this.el.addEventListener('touchstart', (e) => {
+      //     e.preventDefault();
+      //     console.log("touchstart");
+      //     if (this.data.equipped) {
+      //       this.mouseDownStarttime = (Date.now() / 1000);
+      //       this.el.setAttribute('visible', false);
+      //     }
+      //   });
+      //   this.el.addEventListener('touchend', (e) => {
+      //     e.preventDefault();
+      //     console.log("touchend");
+      //     this.mouseDowntime = (Date.now() / 1000) - this.mouseDownStarttime;
+      //     this.el.setAttribute('visible', true);
+      //   });
+      // } else {   
+      //   this.el.addEventListener('mousedown', (e) => {
+      //     e.preventDefault();
+      //     console.log("mousestart");
+      //     if (this.data.equipped) {
+      //       this.mouseDownStarttime = (Date.now() / 1000);
+      //       this.el.setAttribute('visible', false);
+      //     }
+      //   });
+      //   this.el.addEventListener('mouseup', (e) => {
+      //     e.preventDefault();
+      //     console.log("moouseend");
+      //     this.mouseDowntime = (Date.now() / 1000) - this.mouseDownStarttime;
+      //     this.el.setAttribute('visible', true);
+      //   });
+      // }
 
     this.el.addEventListener('click', (e) => { 
       e.preventDefault();
@@ -2662,6 +2665,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
     // Ammo.destroy(force);
     // Ammo.destroy(pos);
     //where camera is looking
+
     this.pushForward = true;
     setTimeout(() => {
       this.pushForward = false;
@@ -2672,10 +2676,13 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
     if (this.pushForward && this.camera != null) {
       
       // this.lookVector.applyQuaternion(this.camera.quaternion);
+      if (mouseDowntime != 0) {
+        this.data.forceFactor = mouseDowntime;
+      }
       this.camera.getWorldDirection( this.lookVector );
-      console.log("tryna pushForward@! " + JSON.stringify(this.lookVector));
+      console.log("tryna pushForward@! " + this.data.forceFactor);
       // const velocity = new Ammo.btVector3(2, 1, 0);
-      const velocity = new Ammo.btVector3(this.lookVector.x * 10 * this.data.forceFactor, (this.lookVector.y + 1) * 10 * this.data.forceFactor, this.lookVector.z * 10 * this.data.forceFactor);
+      const velocity = new Ammo.btVector3(this.lookVector.x * 10 * this.data.forceFactor, (this.lookVector.y + .5) * 10 * this.data.forceFactor, this.lookVector.z * 10 * this.data.forceFactor);
       this.el.body.setLinearVelocity(velocity);
       Ammo.destroy(velocity);
     }
@@ -2688,6 +2695,41 @@ function getRandomIntInclusive(min, max) {
   max = Math.floor(max);
   return Math.floor(Math.random() * (max - min + 1) + min); //The maximum is inclusive and the minimum is inclusive
 }
+
+
+
+
+// if (AFRAME.utils.device.isMobile()) {
+//   this.el.addEventListener('touchstart', (e) => {
+//     e.preventDefault();
+//     console.log("touchstart");
+//     if (this.data.equipped) {
+//       this.mouseDownStarttime = (Date.now() / 1000);
+//       this.el.setAttribute('visible', false);
+//     }
+//   });
+//   this.el.addEventListener('touchend', (e) => {
+//     e.preventDefault();
+//     console.log("touchend");
+//     this.mouseDowntime = (Date.now() / 1000) - this.mouseDownStarttime;
+//     this.el.setAttribute('visible', true);
+//   });
+// } else {   
+//   this.el.addEventListener('mousedown', (e) => {
+//     e.preventDefault();
+//     console.log("mousestart");
+//     if (this.data.equipped) {
+//       this.mouseDownStarttime = (Date.now() / 1000);
+//       this.el.setAttribute('visible', false);
+//     }
+//   });
+//   this.el.addEventListener('mouseup', (e) => {
+//     e.preventDefault();
+//     console.log("moouseend");
+//     this.mouseDowntime = (Date.now() / 1000) - this.mouseDownStarttime;
+//     this.el.setAttribute('visible', true);
+//   });
+// }
 
 
 

@@ -55,7 +55,8 @@ let pauseLoops = false;
 // let vidz = null;
 // let videoEl = null;
 
-
+let mouseDownStarttime = 0;
+let mouseDowntime = 0;
 
 // var navMaersh = null;
 var token = document.getElementById("token").getAttribute("data-token"); 
@@ -64,6 +65,27 @@ var localtoken = localStorage.getItem("smToken");
 let socketHost = "https://strr.us";
 
 
+$('a-entity').each(function() {  //external way of getting click duration for physics
+
+   // var timeout,
+   //     longtouch;
+ 
+   $(this).bind('mousedown', function() {
+     mouseDownStarttime = Date.now() / 1000;
+   });
+   $(this).bind('mouseup', function() {
+     mouseDowntime = (Date.now() / 1000) - mouseDownStarttime;
+     console.log(" mouseDowntime " +mouseDowntime);
+   });
+   $(this).bind('touchstart', function() {
+      mouseDownStarttime = Date.now() / 1000;
+    });
+    $(this).bind('touchend', function() {
+      mouseDowntime = (Date.now() / 1000) - mouseDownStarttime;
+      console.log(" touchDowntime " +mouseDowntime);
+    });
+ 
+ });
 
 $(function() { 
    player = document.getElementById("player");
