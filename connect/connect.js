@@ -84,6 +84,9 @@ $('a-entity').each(function() {  //external way of getting click duration for ph
       mouseDowntime = (Date.now() / 1000) - mouseDownStarttime;
       console.log(" touchDowntime " +mouseDowntime);
     });
+    $(this).bind('beforexrselect', e => {
+      e.preventDefault();
+    });
  
  });
 
