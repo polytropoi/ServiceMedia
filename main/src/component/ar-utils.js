@@ -166,11 +166,11 @@
           this.refSpace = null;
           console.log("arMode is " + this.data.mode);
           let data = this.data;
-          this.el.sceneEl.renderer.xr.addEventListener('sessionend', (ev) => {
-            this.viewerSpace = null;
-            this.refSpace = null;
-            this.xrHitTestSource = null;
-          });
+          // this.el.sceneEl.renderer.xr.addEventListener('sessionend', (ev) => {
+          //   this.viewerSpace = null;
+          //   this.refSpace = null;
+          //   this.xrHitTestSource = null;
+          // });
           this.el.sceneEl.renderer.xr.addEventListener('sessionstart', (ev) => {
             let session = this.el.sceneEl.renderer.xr.getSession();
             // AugPanel("scanning for surfaces..");  
@@ -186,7 +186,7 @@
                 let position = element.getAttribute('position');
                 // AugPanel("selecting Hit Test Position " + positon);
                 // document.querySelector('.target').setAttribute('position', position);
-                var targets = document.querySelector('.spawn');
+                var targets = document.querySelectorAll('.spawn');
 
                 
                 // if (data.mode == 'spawn') {
@@ -196,7 +196,7 @@
                   var clone = targets[index].cloneNode(true);
                   clone.setAttribute('position', position);
                   sceneEl.appendChild(clone);
-                  }
+                }
                 // }
 
                 // if (data.mode == 'position') {
@@ -223,17 +223,17 @@
               });
     
               // if (this.el.sceneEl.is('ar-mode')) {
-                session.requestReferenceSpace('viewer').then((space) => {
-                  this.viewerSpace = space;
-                  session.requestHitTestSource({space: this.viewerSpace})
-                      .then((hitTestSource) => {
-                        this.xrHitTestSource = hitTestSource;
-                      });
-                });
+                // session.requestReferenceSpace('viewer').then((space) => {
+                //   this.viewerSpace = space;
+                //   session.requestHitTestSource({space: this.viewerSpace})
+                //       .then((hitTestSource) => {
+                //         this.xrHitTestSource = hitTestSource;
+                //       });
+                // });
 
-                session.requestReferenceSpace('local-floor').then((space) => {
-                  this.refSpace = space;
-                });
+                // session.requestReferenceSpace('local-floor').then((space) => {
+                //   this.refSpace = space;
+                // });
             }
             // }
           });
@@ -241,26 +241,26 @@
 
         },
         tick: function () {
-          if (this.el.sceneEl.is('ar-mode')) {
-            if (!this.viewerSpace) return;
+          // if (this.el.sceneEl.is('ar-mode')) {
+          //   if (!this.viewerSpace) return;
   
-            let frame = this.el.sceneEl.frame;
-            let xrViewerPose = frame.getViewerPose(this.refSpace);
+          //   let frame = this.el.sceneEl.frame;
+          //   let xrViewerPose = frame.getViewerPose(this.refSpace);
   
-            if (this.xrHitTestSource && xrViewerPose) {
-              let hitTestResults = frame.getHitTestResults(this.xrHitTestSource);
-              if (hitTestResults.length > 0) {
-                let pose = hitTestResults[0].getPose(this.refSpace);
+          //   if (this.xrHitTestSource && xrViewerPose) {
+          //     let hitTestResults = frame.getHitTestResults(this.xrHitTestSource);
+          //     if (hitTestResults.length > 0) {
+          //       let pose = hitTestResults[0].getPose(this.refSpace);
   
-                let inputMat = new THREE.Matrix4();
-                inputMat.fromArray(pose.transform.matrix);
+          //       let inputMat = new THREE.Matrix4();
+          //       inputMat.fromArray(pose.transform.matrix);
   
-                let position = new THREE.Vector3();
-                position.setFromMatrixPosition(inputMat);
-                this.el.setAttribute('position', position);
-              }
-            }
-          }
+          //       let position = new THREE.Vector3();
+          //       position.setFromMatrixPosition(inputMat);
+          //       this.el.setAttribute('position', position);
+          //     }
+          //   }
+          // }
         }
       }); 
 
