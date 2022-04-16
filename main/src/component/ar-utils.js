@@ -149,7 +149,7 @@
         // }
       });
 
-      AFRAME.registerComponent('ar-hit-testr', {
+      AFRAME.registerComponent('ar-hit-test-spawn', {
         schema: {
           mode: {default: 'position'},
         },
@@ -175,29 +175,32 @@
             let element = this.el;
             // var el = this.el;
             var sceneEl = document.querySelector('a-scene');
-            // if (this.el.sceneEl.is('ar-mode')) {
+            
+            if (this.el.sceneEl.is('ar-mode')) {
+
               session.addEventListener('select', function () {
                 console.log("tryna select!");
                 let position = element.getAttribute('position');
                 // AugPanel("selecting Hit Test Position " + positon);
                 // document.querySelector('.target').setAttribute('position', position);
-                var target = document.querySelector('.target');
+                var target = document.querySelector('.spawn');
+
                 
-                if (data.mode == 'spawn') {
+                // if (data.mode == 'spawn') {
                 if (target != undefined) {
-                  console.log("tryna clone the target");
+                  console.log("tryna clone mahself");
                   var clone = target.cloneNode(true);
                   clone.setAttribute('position', position);
                   sceneEl.appendChild(clone);
                   }
-                }
+                // }
 
-                if (data.mode == 'position') {
-                if (target != undefined) {
-                  console.log("tryna reposition target");
-                    target.setAttribute('position', position);
-                  }
-                }
+                // if (data.mode == 'position') {
+                // if (target != undefined) {
+                //   console.log("tryna reposition target");
+                //     target.setAttribute('position', position);
+                //   }
+                // }
                 // var entity = document.createElement('a-entity');
                 // sceneEl.appendChild(entity);          
                 // clone.visible = true;
@@ -215,7 +218,7 @@
                 // });
               });
     
-              if (this.el.sceneEl.is('ar-mode')) {
+              // if (this.el.sceneEl.is('ar-mode')) {
                 session.requestReferenceSpace('viewer').then((space) => {
                   this.viewerSpace = space;
                   session.requestHitTestSource({space: this.viewerSpace})
@@ -227,7 +230,7 @@
                 session.requestReferenceSpace('local-floor').then((space) => {
                   this.refSpace = space;
                 });
-              }
+            }
             // }
           });
           // }

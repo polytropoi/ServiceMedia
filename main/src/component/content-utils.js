@@ -3081,6 +3081,9 @@ AFRAME.registerComponent('mod_model', {
             }
 
           }
+          if (this.data.eventData.toLowerCase().includes("spawn")) {
+            this.el.classList.add("spawn");
+          }
           if (this.data.eventData.toLowerCase().includes("transparent")) {
             console.log("tryna set transparent");
             // this.el.setAttribute('material', {transparent: true, opacity: 0});
