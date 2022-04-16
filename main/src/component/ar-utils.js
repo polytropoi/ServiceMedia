@@ -151,8 +151,48 @@
       function getRandomInt(max) {
         return Math.floor(Math.random() * max);
       }
+      AFRAME.registerComponent('ar-hit-test-spawn0', {
+        schema: {
+          mode: {default: 'position'},
+        },
+        init: function () { 
+          var target = document.querySelector('.spawn');
+
+          sceneEl.addEventListener('enter-vr', (e) => {
+            if (this.is('ar-mode')) {
+              message.textContent = '';
+              this.addEventListener('ar-hit-test-start', (e) => {
+                // message.innerHTML = `Scanning environment, finding surface.`
+                Debug.Log("Scanning environment, finding surface.");
+              }, { once: true });
+              this.addEventListener('ar-hit-test-achieved', (e) => {
+                // message.innerHTML = `Select the location to place the furniture. By tapping on the screen or selecting with your controller.`
+                Debug.Log("Select the location to place the furniture. By tapping on the screen or selecting with your controller.");
+               
+              }, { once: true });
+              this.addEventListener('ar-hit-test-select', function () {
+                Debug.Log("tryna place object");
+                if (target != undefined && target != null) {
+                  let position = this.el.getAttribute('position');
+                  // const index = getRandomInt(targets.length);
+                  console.log("tryna clone a target at position " + position);
+                  var obj = target.getObject3D('mesh');
       
-      AFRAME.registerComponent('ar-hit-test-spawn', {
+                  // var clone = targets[index].cloneNode(true);
+                  let clone = document.createElement('a-entity');
+                  clone.setObject3D('mesh', obj.clone()); 
+                  clone.setAttribute('position', position);
+                  clone.classList.add("activeObjexRay");
+                  sceneEl.appendChild(clone);
+                }
+              }, { once: false });
+            }
+          });
+
+        }
+      });
+
+      AFRAME.registerComponent('ar-hit-test-spawnx', {
         schema: {
           mode: {default: 'position'},
         },
@@ -166,11 +206,11 @@
           this.refSpace = null;
           console.log("arMode is " + this.data.mode);
           let data = this.data;
-          // this.el.sceneEl.renderer.xr.addEventListener('sessionend', (ev) => {
-          //   this.viewerSpace = null;
-          //   this.refSpace = null;
-          //   this.xrHitTestSource = null;
-          // });
+          this.el.sceneEl.renderer.xr.addEventListener('sessionend', (ev) => {
+            this.viewerSpace = null;
+            this.refSpace = null;
+            this.xrHitTestSource = null;
+          });
           this.el.sceneEl.renderer.xr.addEventListener('sessionstart', (ev) => {
             let session = this.el.sceneEl.renderer.xr.getSession();
             // AugPanel("scanning for surfaces..");  
@@ -197,8 +237,9 @@
 
                   // var clone = targets[index].cloneNode(true);
                   let clone = document.createElement('a-entity');
-                  clone.setObject3D('mesh', obj); 
+                  clone.setObject3D('mesh', obj.clone()); 
                   clone.setAttribute('position', position);
+                  clone.classList.add("activeObjexRay");
                   sceneEl.appendChild(clone);
                 }
                 // }
