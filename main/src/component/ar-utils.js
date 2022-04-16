@@ -191,9 +191,13 @@
                 
                 // if (data.mode == 'spawn') {
                 if (targets != undefined && targets != null) {
-                  console.log("tryna clone a target");
                   const index = getRandomInt(targets.length);
-                  var clone = targets[index].cloneNode(true);
+                  console.log("tryna clone a target with index " + index);
+                  var obj = targets[index].getObject3D('mesh');
+
+                  // var clone = targets[index].cloneNode(true);
+                  let clone = document.createElement('a-entity');
+                  clone.setObject3D('mesh', obj); 
                   clone.setAttribute('position', position);
                   sceneEl.appendChild(clone);
                 }
@@ -222,18 +226,18 @@
                 // });
               });
     
-              // if (this.el.sceneEl.is('ar-mode')) {
-                // session.requestReferenceSpace('viewer').then((space) => {
-                //   this.viewerSpace = space;
-                //   session.requestHitTestSource({space: this.viewerSpace})
-                //       .then((hitTestSource) => {
-                //         this.xrHitTestSource = hitTestSource;
-                //       });
-                // });
-
-                // session.requestReferenceSpace('local-floor').then((space) => {
-                //   this.refSpace = space;
-                // });
+              if (this.el.sceneEl.is('ar-mode')) {
+                session.requestReferenceSpace('viewer').then((space) => {
+                  this.viewerSpace = space;
+                  session.requestHitTestSource({space: this.viewerSpace})
+                      .then((hitTestSource) => {
+                        this.xrHitTestSource = hitTestSource;
+                      });
+                });
+              }
+              session.requestReferenceSpace('local-floor').then((space) => {
+                  this.refSpace = space;
+              });
             }
             // }
           });
@@ -241,26 +245,26 @@
 
         },
         tick: function () {
-          // if (this.el.sceneEl.is('ar-mode')) {
-          //   if (!this.viewerSpace) return;
+          if (this.el.sceneEl.is('ar-mode')) {
+            if (!this.viewerSpace) return;
   
-          //   let frame = this.el.sceneEl.frame;
-          //   let xrViewerPose = frame.getViewerPose(this.refSpace);
+            let frame = this.el.sceneEl.frame;
+            let xrViewerPose = frame.getViewerPose(this.refSpace);
   
-          //   if (this.xrHitTestSource && xrViewerPose) {
-          //     let hitTestResults = frame.getHitTestResults(this.xrHitTestSource);
-          //     if (hitTestResults.length > 0) {
-          //       let pose = hitTestResults[0].getPose(this.refSpace);
+            if (this.xrHitTestSource && xrViewerPose) {
+              let hitTestResults = frame.getHitTestResults(this.xrHitTestSource);
+              if (hitTestResults.length > 0) {
+                let pose = hitTestResults[0].getPose(this.refSpace);
   
-          //       let inputMat = new THREE.Matrix4();
-          //       inputMat.fromArray(pose.transform.matrix);
+                let inputMat = new THREE.Matrix4();
+                inputMat.fromArray(pose.transform.matrix);
   
-          //       let position = new THREE.Vector3();
-          //       position.setFromMatrixPosition(inputMat);
-          //       this.el.setAttribute('position', position);
-          //     }
-          //   }
-          // }
+                let position = new THREE.Vector3();
+                position.setFromMatrixPosition(inputMat);
+                this.el.setAttribute('position', position);
+              }
+            }
+          }
         }
       }); 
 
