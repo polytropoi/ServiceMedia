@@ -148,7 +148,10 @@
           }
         // }
       });
-
+      function getRandomInt(max) {
+        return Math.floor(Math.random() * max);
+      }
+      
       AFRAME.registerComponent('ar-hit-test-spawn', {
         schema: {
           mode: {default: 'position'},
@@ -183,13 +186,14 @@
                 let position = element.getAttribute('position');
                 // AugPanel("selecting Hit Test Position " + positon);
                 // document.querySelector('.target').setAttribute('position', position);
-                var target = document.querySelector('.spawn');
+                var targets = document.querySelector('.spawn');
 
                 
                 // if (data.mode == 'spawn') {
-                if (target != undefined) {
-                  console.log("tryna clone mahself");
-                  var clone = target.cloneNode(true);
+                if (targets != undefined && targets != null) {
+                  console.log("tryna clone a target");
+                  const index = getRandomInt(targets.length);
+                  var clone = targets[index].cloneNode(true);
                   clone.setAttribute('position', position);
                   sceneEl.appendChild(clone);
                   }
