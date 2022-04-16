@@ -18911,7 +18911,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                         // "<a-entity id=\x22createAvatars\x22 create_avatars></a-entity>"+
                         audioVizEntity +
                         instancingEntity +
-                        "<a-entity show-in-ar-mode visible=\x22false\x22 id=\x22reticleEntity\x22 gltf-model=\x22#reticle2\x22 scale=\x220.8 0.8 0.8\x22 "+arHitTest+"></a-entity>\n"+ //for ar spawning...
+                        // "<a-entity show-in-ar-mode visible=\x22false\x22 id=\x22reticleEntity\x22 gltf-model=\x22#reticle2\x22 scale=\x220.8 0.8 0.8\x22 "+arHitTest+"></a-entity>\n"+ //for ar spawning...
                         arShadowPlane +
                         hemiLight +
                         shadowLight +
@@ -19333,7 +19333,8 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                         "<a-entity id=\x22createAvatars\x22 create_avatars></a-entity>"+
                         audioVizEntity +
                         instancingEntity +
-                        // "<a-entity show-in-ar-mode visible=\x22false\x22 id=\x22reticleEntity\x22 gltf-model=\x22#reticle2\x22 scale=\x220.8 0.8 0.8\x22 "+arHitTest+"></a-entity>\n"+
+                        "<a-entity show-in-ar-mode visible=\x22false\x22 id=\x22reticleEntity\x22 gltf-model=\x22#reticle2\x22 scale=\x220.8 0.8 0.8\x22 "+arHitTest+"></a-entity>\n"+ //for ar spawning...
+                        
                         arShadowPlane +
                         hemiLight +
                         shadowLight +
