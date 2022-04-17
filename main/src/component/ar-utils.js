@@ -156,10 +156,11 @@
           mode: {default: 'position'},
         },
         init: function () { 
-          var target = document.querySelector('.spawn');
-
+         
           sceneEl.addEventListener('enter-vr', (e) => {
             if (this.el.sceneEl.is('ar-mode')) {
+              var target = document.querySelector('.spawn');
+
               // message.textContent = '';
               this.el.addEventListener('ar-hit-test-start', (e) => {
                 // message.innerHTML = `Scanning environment, finding surface.`
