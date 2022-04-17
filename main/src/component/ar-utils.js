@@ -161,16 +161,16 @@
           sceneEl.addEventListener('enter-vr', (e) => {
             if (this.el.sceneEl.is('ar-mode')) {
               // message.textContent = '';
-              this.addEventListener('ar-hit-test-start', (e) => {
+              this.el.addEventListener('ar-hit-test-start', (e) => {
                 // message.innerHTML = `Scanning environment, finding surface.`
                 Debug.Log("Scanning environment, finding surface.");
               }, { once: true });
-              this.addEventListener('ar-hit-test-achieved', (e) => {
+              this.el.addEventListener('ar-hit-test-achieved', (e) => {
                 // message.innerHTML = `Select the location to place the furniture. By tapping on the screen or selecting with your controller.`
                 Debug.Log("Select the location to place the furniture. By tapping on the screen or selecting with your controller.");
                
               }, { once: true });
-              this.addEventListener('ar-hit-test-select', function () {
+              this.el.addEventListener('ar-hit-test-select', function () {
                 Debug.Log("tryna place object");
                 if (target != undefined && target != null) {
                   let position = this.el.getAttribute('position');
