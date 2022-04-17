@@ -159,7 +159,7 @@
           var target = document.querySelector('.spawn');
 
           sceneEl.addEventListener('enter-vr', (e) => {
-            if (this.is('ar-mode')) {
+            if (this.el.sceneEl.is('ar-mode')) {
               message.textContent = '';
               this.addEventListener('ar-hit-test-start', (e) => {
                 // message.innerHTML = `Scanning environment, finding surface.`
