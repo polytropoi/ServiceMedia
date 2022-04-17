@@ -151,7 +151,7 @@
       function getRandomInt(max) {
         return Math.floor(Math.random() * max);
       }
-      AFRAME.registerComponent('ar-hit-test-spawn', {
+      AFRAME.registerComponent('ar-hit-test-spawnNO', {
         schema: {
           mode: {default: 'position'},
         },
@@ -193,7 +193,7 @@
         }
       });
 
-      AFRAME.registerComponent('ar-hit-test-spawnx', {
+      AFRAME.registerComponent('ar-hit-test-spawn', {
         schema: {
           mode: {default: 'position'},
         },
