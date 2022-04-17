@@ -160,7 +160,7 @@
 
           sceneEl.addEventListener('enter-vr', (e) => {
             if (this.el.sceneEl.is('ar-mode')) {
-              message.textContent = '';
+              // message.textContent = '';
               this.addEventListener('ar-hit-test-start', (e) => {
                 // message.innerHTML = `Scanning environment, finding surface.`
                 Debug.Log("Scanning environment, finding surface.");
