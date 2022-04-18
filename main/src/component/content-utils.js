@@ -2139,7 +2139,7 @@ AFRAME.registerComponent('mod_objex', {
       this.locData.y = this.dropPos.y;
       this.locData.z = this.dropPos.z;
       this.locData.timestamp = Date.now();
-      this.objEl.setAttribute("mod_object", {'locationData': this.locData, 'objectData': this.objectData, 'applyForceToNewObject': true, 'forceFactor': downtime});
+      this.objEl.setAttribute("mod_object", {'locationData': this.locData, 'objectData': this.objectData, 'applyForceToNewObject': true, 'forceFactor': downtime, 'removeAfter': "5"});
       this.objEl.id = "obj" + this.objectData._id + "_" + this.locData.timestamp;
       sceneEl.appendChild(this.objEl);
       // this.el.setAttribute('gltf-model', '#' + modelID.toString());
@@ -2187,7 +2187,8 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
     fromSceneInventory: {default: null},
     timestamp: {default: null},
     applyForceToNewObject: {default: false},
-    forceFactor: {default: 1}
+    forceFactor: {default: 1},
+    removeAfter: {default: ""}
   },
   init: function () {
     // console.log("mod_object data " + JSON.stringify(this.data.objectData.modelURL));
@@ -2316,6 +2317,11 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
           // this.hasDropAction = true;
         }
       }
+    }
+    if (this.data.removeAfter != "") {
+      setTimeout( () => { 
+        this.el.parentNode.removeChild(this.el);
+      }, 5000);
     }
 
     let that = this;
@@ -2545,7 +2551,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
             if (this.mouseDowntime <= 0) {
               this.mouseDowntime = 1;
             }
-            this.objexEl.components.mod_objex.throwObject(this.data.objectData._id, this.mouseDowntime);
+            this.objexEl.components.mod_objex.throwObject(this.data.objectData._id, this.mouseDowntime, "5");
           }
         }
       }
