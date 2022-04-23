@@ -978,6 +978,34 @@ function DequipInventoryItem () {
   });
   ShowHideDialogPanel();
 }
+function EquipDefaultItem (objectID) {
+  console.log("tryna equip " + objectID);
+  let action = null;
+  let objexEl = document.getElementById('sceneObjects');
+  if (objexEl != null) {
+    objectData = objexEl.components.mod_objex.returnObjectData(objectID);
+    objexEl.components.mod_objex.equipInventoryObject(objectID);
+    // console.log("chekin objectData: " + JSON.stringify(objectData));
+    // if (objectData.actions != undefined && objectData.actions.length > 0) {
+    //   for (let i = 0; i < objectData.actions.length; i++) {
+    //     console.log("ACTION " + JSON.stringify(objectData.actions[i]));
+    //     if (objectData.actions[i].actionType.toLowerCase().includes("equip")) {
+    //       action = objectData.actions[i];
+    //       // console.log(JSON.stringify(action));
+    //       for (let i = 0; i < userInventory.inventoryItems.length; i++) {
+    //         if (userInventory.inventoryItems[i].objectID == objectID) {
+    //           // inventoryObj = userInventory[i];
+    //           objexEl.components.mod_objex.equipInventoryObject(objectID);
+    //           ShowHideDialogPanel();
+    //           break;
+    //         }
+    //       }
+    //     break;
+    //     } 
+    //   }
+    // }
+  }
+}
 
 function EquipInventoryItem (objectID) {
   console.log("tryna equip " + objectID);

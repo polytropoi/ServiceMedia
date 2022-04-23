@@ -1449,23 +1449,53 @@ AFRAME.registerComponent('cloud_marker', {
 AFRAME.registerComponent('mod_physics', {
   schema: {
     model: {default: ''},
+    isTrigger: {default: false},
     body: {type: 'string', default: 'dynamic'},  // dynamic: A freely-moving object
     shape: {type: 'string', default: 'mesh'},  // hull: Wraps a model in a convex hull, like a shrink-wrap
   },
   init() {
+    console.log("tryna load ashape with trigger " + this.data.isTrigger);
     this.el.addEventListener('body-loaded', () => {  
       this.el.setAttribute('ammo-shape', {type: this.data.shape});
+
+      // this.el.body.setCollisionF
       // console.log("ammo shape is " + JSON.stringify(this.el.getAttribute('ammo-shape')));
     });
     // this.el.setAttribute('ammo-body', {type: this.data.body});
-
+    if (this.data.isTrigger) {
+      console.log("TRIGGER LOADED");
+      // this.el.setObject3D("mesh", null); 
+      // this.el.setAttribute('gltf-model', '#poi1');
+      this.el.setAttribute('ammo-body', {type: this.data.body, emitCollisionEvents: true});
+    } 
     this.el.addEventListener('model-loaded', () => {
       this.el.setAttribute('ammo-body', {type: this.data.body, emitCollisionEvents: true});
-      // console.log("ammo body is " + JSON.stringify(this.el.getAttribute('ammo-body')));
+      
+      // this.el.setAttribute('collision-filter', {collisionForces: false});
+      console.log("ammo body is " + JSON.stringify(this.el.getAttribute('ammo-body')));
       // this.loadShape();
     });
     
-  } 
+
+
+    this.el.addEventListener("collidestart", (e) => {
+      e.preventDefault();
+      console.log("mod_physics collisoin with object with :" + this.el.id + " " + e.detail.targetEl.classList);
+      if (this.data.isTrigger) {
+        console.log("TRIGGER COLLIDEWD");
+      }
+      // let modelComponent = e.detail.targetEl.components.mod_model
+        // if (e.detail.targetEl.classList.contains('target')) {
+        //   console.log("object has collided with target #" + e.detail.targetEl.id);
+        // }
+        // e.detail.targetEl; // Other entity, which playerEl touched.
+        // that.distance = window.playerPosition.distanceTo(that.el.getAttribute('position'));
+        // // console.log("distance  " + that.distance);
+        // that.rayhit( e.detail.targetEl.id, that.distance, that.el.getAttribute('position'));
+    });
+
+  }
+
   // loadShape: function () {
   //   this.el.addEventListener('body-loaded', () => {  
   //       this.el.setAttribute('ammo-shape', {type: this.data.shape});

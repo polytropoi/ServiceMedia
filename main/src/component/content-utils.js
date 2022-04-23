@@ -1972,14 +1972,24 @@ AFRAME.registerComponent('mod_objex', {
             // console.log("location/object match " + this.data.jsonLocationsData[i].objectID);
             
             if (this.data.jsonObjectData[k].modelID != undefined && this.data.jsonObjectData[k].modelID != null) {
-             
-              console.log("location/object match " + this.data.jsonLocationsData[i].objectID + " modelID " + this.data.jsonObjectData[k].modelID);
-              let objEl = document.createElement("a-entity");
-              objEl.setAttribute("mod_object", {'locationData': this.data.jsonLocationsData[i], 'objectData': this.data.jsonObjectData[k]});
-              objEl.id = "obj" + this.data.jsonLocationsData[i].objectID + "_" + this.data.jsonLocationsData[i].timestamp;
-              sceneEl.appendChild(objEl);
-              
-            }
+            //  console.log ("JSONOBJECTDATA" + this.data.jsonObjectData[k].eventData);
+              if (this.data.jsonLocationsData[i].eventData != undefined && this.data.jsonLocationsData[i].eventData.toLowerCase().includes("equip")) {
+                
+                EquipDefaultItem(this.data.jsonLocationsData[i].objectID);
+                
+                // console.log("tryna equip with location/object match " + this.data.jsonLocationsData[i].objectID + " modelID " + this.data.jsonObjectData[k].modelID);
+                // let objEl = document.createElement("a-entity");
+                // objEl.setAttribute("mod_object", {'locationData': this.data.jsonLocationsData[i], 'objectData': this.data.jsonObjectData[k], 'equipped': true});
+                // objEl.id = "obj" + this.data.jsonLocationsData[i].objectID + "_" + this.data.jsonLocationsData[i].timestamp;
+                // sceneEl.appendChild(objEl);
+              } else {
+                console.log("location/object match " + this.data.jsonLocationsData[i].objectID + " modelID " + this.data.jsonObjectData[k].modelID);
+                let objEl = document.createElement("a-entity");
+                objEl.setAttribute("mod_object", {'locationData': this.data.jsonLocationsData[i], 'objectData': this.data.jsonObjectData[k]});
+                objEl.id = "obj" + this.data.jsonLocationsData[i].objectID + "_" + this.data.jsonLocationsData[i].timestamp;
+                sceneEl.appendChild(objEl);
+              }
+            } 
           }
         }
       }
@@ -2387,7 +2397,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
 
     this.el.addEventListener("collidestart", (e) => {
       e.preventDefault();
-      // console.log("object has collided with object with classlist :" + e.detail.targetEl.classList);
+      console.log("object has collided with object with classlist :" + e.detail.targetEl.classList);
       // let modelComponent = e.detail.targetEl.components.mod_model
       if (e.detail.targetEl.classList.contains('target')) {
         console.log("object has collided with target #" + e.detail.targetEl.id);
@@ -3285,15 +3295,25 @@ AFRAME.registerComponent('mod_model', {
             }
           }
           for (i = 0; i < this.meshChildren.length; i++) { //apply mods to the special things
-            console.log("gotsa trigger !! meshChild " + this.meshChildren[i].name);
+            console.log("gotsa special !! meshChild " + this.meshChildren[i].name);
             if (this.meshChildren[i].name.includes("trigger")) { 
+
               this.child = this.el.object3D.getObjectByName(this.meshChildren[i].name, true);
               this.child.visible = false;
-              let triggerEl = document.createElement('a-entity');
+              let triggerEl = document.createElement('a-box');
+              // var targetPos = new THREE.Vector3();
+              // this.child.getWorldPosition(targetPos);
+              // let child = this.child.clone();
+              // child.position(targetPos);
               triggerEl.setObject3D("mesh", this.child.clone());
-              triggerEl.setAttribute('mod_physics', {body: 'kinematic', shape: 'mesh'});
-              triggerEl.classList.add('trigger');
+
+              // triggerEl.setAttribute('geometry', {primitive: 'box', width: 1});
+              // triggerEl.setAttribute('position', targetPos);
+              triggerEl.setAttribute('mod_physics', {body: 'static', shape: 'box', isTrigger: true});
+              // triggerEl.classList.add('activeObjexRay');
+              
               this.el.appendChild(triggerEl);
+              triggerEl.classList.add('trigger');
             }
             if (this.meshChildren[i].name.includes("navmesh")) {
               console.log("gotsa navmesh too!");
