@@ -1456,52 +1456,65 @@ AFRAME.registerComponent('mod_physics', {
   init() {
     console.log("tryna load ashape with trigger " + this.data.isTrigger);
     this.el.addEventListener('body-loaded', () => {  
-      this.el.setAttribute('ammo-shape', {type: this.data.shape});
 
+      if (this.data.isTrigger) {
+        console.log("TRIGGER LOADED");
+        this.el.setAttribute('ammo-shape', {type: "sphere"});
+      } else {
+        this.el.setAttribute('ammo-shape', {type: this.data.shape});
+      }
       // this.el.body.setCollisionF
       // console.log("ammo shape is " + JSON.stringify(this.el.getAttribute('ammo-shape')));
     });
     // this.el.setAttribute('ammo-body', {type: this.data.body});
-    if (this.data.isTrigger) {
-      console.log("TRIGGER LOADED");
-      // this.el.setObject3D("mesh", null); 
-      // this.el.setAttribute('gltf-model', '#poi1');
-      this.el.setAttribute('ammo-body', {type: this.data.body, emitCollisionEvents: true});
-    } 
+    // if (this.data.isTrigger) {
+    //   console.log("TRIGGER LOADED");
+    //   // this.el.setObject3D("mesh", null); 
+    //   // this.el.setAttribute('gltf-model', '#poi1');
+     
+    // } 
+
+
     this.el.addEventListener('model-loaded', () => {
-      this.el.setAttribute('ammo-body', {type: this.data.body, emitCollisionEvents: true});
-      
-      // this.el.setAttribute('collision-filter', {collisionForces: false});
-      console.log("ammo body is " + JSON.stringify(this.el.getAttribute('ammo-body')));
-      // this.loadShape();
+      if (this.data.isTrigger) {
+        this.el.setAttribute('ammo-body', {type: "kinematic", emitCollisionEvents: true});
+      } else {
+        this.el.setAttribute('ammo-body', {type: this.data.body, emitCollisionEvents: true});
+        
+        // this.el.setAttribute('collision-filter', {collisionForces: false});
+        console.log("ammo body is " + JSON.stringify(this.el.getAttribute('ammo-body')));
+        // this.loadShape();
+      }
     });
     
 
 
     this.el.addEventListener("collidestart", (e) => {
       e.preventDefault();
-      console.log("mod_physics collisoin with object with :" + this.el.id + " " + e.detail.targetEl.classList);
+      // console.log("mod_physics collisoin with object with :" + this.el.id + " " + e.detail.targetEl.classList);
       if (this.data.isTrigger) {
-        console.log("TRIGGER COLLIDEWD");
+        console.log("TRIGGER COLLIDED "  + this.el.id + " " + e.detail.targetEl.classList);
+        // e.detail.body.disableCollision = true;
+        this.disableCollisionTemp(); //must turn it off or it blocks, no true "trigger" mode afaik (unlike cannonjs!)
       }
-      // let modelComponent = e.detail.targetEl.components.mod_model
-        // if (e.detail.targetEl.classList.contains('target')) {
-        //   console.log("object has collided with target #" + e.detail.targetEl.id);
-        // }
-        // e.detail.targetEl; // Other entity, which playerEl touched.
-        // that.distance = window.playerPosition.distanceTo(that.el.getAttribute('position'));
-        // // console.log("distance  " + that.distance);
-        // that.rayhit( e.detail.targetEl.id, that.distance, that.el.getAttribute('position'));
     });
-
-  }
 
   // loadShape: function () {
   //   this.el.addEventListener('body-loaded', () => {  
   //       this.el.setAttribute('ammo-shape', {type: this.data.shape});
   //       console.log("ammo shape is " + JSON.stringify(this.el.getAttribute('ammo-shape')));
   //     });
-  // }
+  
+  },
+  disableCollisionTemp: function () { //bc ammo don't have no triggerz wtf!
+    this.el.setAttribute('ammo-body', {disableCollision: true});
+    setTimeout( () => {
+      this.el.setAttribute('ammo-body', {disableCollision: false}); 
+      console.log("trigger cooldown done") }, 3000);
+  },
+  enableCollision: function () {
+    
+  }
 });
 
 // AFRAME.registerComponent('punch', {

@@ -2395,18 +2395,18 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
       
     });
 
-    this.el.addEventListener("collidestart", (e) => {
-      e.preventDefault();
-      console.log("object has collided with object with classlist :" + e.detail.targetEl.classList);
-      // let modelComponent = e.detail.targetEl.components.mod_model
-      if (e.detail.targetEl.classList.contains('target')) {
-        console.log("object has collided with target #" + e.detail.targetEl.id);
-      }
-      e.detail.targetEl; // Other entity, which playerEl touched.
-      that.distance = window.playerPosition.distanceTo(that.el.getAttribute('position'));
-      // console.log("distance  " + that.distance);
-      that.rayhit( e.detail.targetEl.id, that.distance, that.el.getAttribute('position'));
-    });
+    // this.el.addEventListener("collidestart", (e) => {
+    //   e.preventDefault();
+    //   // console.log("object has collided with object with classlist :" + e.detail.targetEl.classList);
+    //   // let modelComponent = e.detail.targetEl.components.mod_model
+    //   if (e.detail.targetEl.classList.contains('trigger')) {
+    //     console.log("object has collided with trigger #" + e.detail.targetEl.id);
+    //   }
+    //   e.detail.targetEl; // Other entity, which playerEl touched.
+    //   that.distance = window.playerPosition.distanceTo(that.el.getAttribute('position'));
+    //   // console.log("distance  " + that.distance);
+    //   that.rayhit( e.detail.targetEl.id, that.distance, that.el.getAttribute('position'));
+    // });
 
     this.el.addEventListener('raycaster-intersected', e =>{  
         this.raycaster = e.detail.el;
@@ -3100,19 +3100,16 @@ AFRAME.registerComponent('mod_model', {
           if (this.data.eventData.toLowerCase().includes("spawn")) {
             this.el.classList.add("spawn");
           }
+          if (this.data.eventData.toLowerCase().includes("trigger")) { //for external trigger object, disabled the embedded trigger 
+            this.el.classList.add("trigger");
+            this.el.setAttribute('mod_physics', {isTrigger: true});
+            // obj.visible = false;
+          }
           if (this.data.eventData.toLowerCase().includes("transparent")) {
             console.log("tryna set transparent");
-            // this.el.setAttribute('material', {transparent: true, opacity: 0});
-            // this.tmat = new THREE.MeshStandardMaterial({
-            //   color: 'white',
-            //   transparent: true,
-            //   alphaTest: 0,
-            //   opacity: 0
-            // });
-            // obj.material = this.tmat;
+
             obj.visible = false;
-            // obj.material.transparent = true;
-            // obj.material.opacity = 0;
+         
           }
 
           let worldPos = null;
@@ -3297,23 +3294,23 @@ AFRAME.registerComponent('mod_model', {
           for (i = 0; i < this.meshChildren.length; i++) { //apply mods to the special things
             console.log("gotsa special !! meshChild " + this.meshChildren[i].name);
             if (this.meshChildren[i].name.includes("trigger")) { 
-
-              this.child = this.el.object3D.getObjectByName(this.meshChildren[i].name, true);
-              this.child.visible = false;
-              let triggerEl = document.createElement('a-box');
-              // var targetPos = new THREE.Vector3();
-              // this.child.getWorldPosition(targetPos);
-              // let child = this.child.clone();
-              // child.position(targetPos);
-              triggerEl.setObject3D("mesh", this.child.clone());
-
-              // triggerEl.setAttribute('geometry', {primitive: 'box', width: 1});
-              // triggerEl.setAttribute('position', targetPos);
-              triggerEl.setAttribute('mod_physics', {body: 'static', shape: 'box', isTrigger: true});
-              // triggerEl.classList.add('activeObjexRay');
               
-              this.el.appendChild(triggerEl);
-              triggerEl.classList.add('trigger');
+              let child = this.el.object3D.getObjectByName(this.meshChildren[i].name, true);
+              child.visible = false;
+              // let triggerEl = document.createElement('a-entity');
+              // // var targetPos = new THREE.Vector3();
+              // // this.child.getWorldPosition(targetPos);
+              // // let child = this.child.clone();
+              // // child.position(targetPos);
+              // triggerEl.setObject3D("mesh", this.child.clone());
+
+              // // triggerEl.setAttribute('geometry', {primitive: 'box', width: 1});
+              // // triggerEl.setAttribute('position', targetPos);
+              // triggerEl.setAttribute('mod_physics', {isTrigger: true});
+              // // triggerEl.classList.add('activeObjexRay');
+              
+              // this.el.appendChild(triggerEl);
+              // triggerEl.classList.add('trigger');
             }
             if (this.meshChildren[i].name.includes("navmesh")) {
               console.log("gotsa navmesh too!");

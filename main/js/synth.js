@@ -109,7 +109,7 @@ AFRAME.registerComponent('mod_synth', {
      amHitDistance: function (distance) {
         this.distance = distance;
         vol.volume.value = distance * -2;
-         console.log("tryna trigger am synth note distance " + distance );
+        //  console.log("tryna trigger am synth note distance " + distance );
 
          amSynth.triggerAttackRelease(getRandomInt(48,72), 1)
     //    psynth.triggerAttackRelease([getRandomInt(36,64),getRandomInt(64,88),getRandomInt(88,256)], 1)
@@ -122,7 +122,7 @@ AFRAME.registerComponent('mod_synth', {
         amSynth.triggerAttackRelease("C4", .5);
      },
      triggerDistanceRolloff: function () {
-        console.log("tryna trigger synth note");
+        // console.log("tryna trigger synth note");
     //   psynth.triggerAttackRelease(["C4", "E4", "A4"], 1)
     // var pattern = new Tone.Pattern(function(time, note){
     //     //the order of the notes passed in depends on the pattern
