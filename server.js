@@ -19155,6 +19155,9 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                         "<script src=\x22../main/vendor/aframe/aframe-particle-system-component.min.js\x22></script>"+
                         // "<script src=\x22../main/vendor/trackedlibs/aabb-collider.js\x22></script>"+
                         "<script src=\x22../main/src/shaders/noise.js\x22></script>"+
+                        "<script src=\x22../main/src/component/aframe-spe-particles-component.js\x22></script>"+
+                        "<script src=\x22../main/src/component/aframe-spritesheet-animation.js\x22></script>"+
+
                         // "<script src=\x22../main/vendor/aframe/animation-mixer.js\x22></script>"+
                         // "<script src=\x22//cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js\x22></script>" +
                         // "<script src=\x22../main/vendor/aframe/aframe-extras.controls.js\x22></script>"+  
@@ -19276,6 +19279,8 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                         // "<img id=\x22explosion\x22 src=\x22https://realitymangler.com/assets/textures/explosion.png\x22 crossorigin=\x22anonymous\x22>"+ 
 
                         // USED FOR TERRAIN, REM FOR NOW...
+                        "<img id=\x22fireballSheet\x22 src=\x22../main/images/particles/fireball-up.png\x22></img>"+
+                        "<img id=\x22fireball\x22 src=\x22../main/images/particles/fireball.png\x22></img>"+
                                 "<img id=\x22water\x22 src=\x22https://realitymangler.com/assets/textures/water2c.jpg\x22 crossorigin=\x22anonymous\x22>"+
                                 "<img id=\x22water1\x22 src=\x22https://realitymangler.com/assets/textures/watertile3.png\x22 crossorigin=\x22anonymous\x22>"+
                                 // "<img id=\x22heightmap\x22 src=\x22https://realitymangler.com/assets/heightmaps/hm4.png\x22 crossorigin=\x22anonymous\x22>"+

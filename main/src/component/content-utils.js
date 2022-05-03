@@ -3111,6 +3111,18 @@ AFRAME.registerComponent('mod_model', {
             obj.visible = false;
          
           }
+          if (this.data.eventData.toLowerCase().includes("particle")) {
+            console.log("tryna spawn a particle!");
+
+            this.el.setAttribute('mod_particles', {type: 'fireball'});
+         
+          }
+          if (this.data.eventData.toLowerCase().includes("fireworks")) {
+            console.log("tryna spawn fireworks!");
+
+            this.el.setAttribute('spawner', {type: 'fireball'});
+         
+          }
 
           let worldPos = null;
           let hasAnims = false;
