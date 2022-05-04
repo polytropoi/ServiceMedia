@@ -41,7 +41,7 @@ if (sceneEl != null && document.querySelector('a-scene') != null) {
           });
         closeButton.addEventListener('mouseover', function () {
           if (triggerAudioController != null) {
-            triggerAudioController.components.trigger_audio_control.playAudio();
+            // triggerAudioController.components.trigger_audio_control.playAudio();
           }
         });
         closeButton.addEventListener('mousedown', function () {
@@ -86,9 +86,9 @@ if (sceneEl != null && document.querySelector('a-scene') != null) {
             });
           noButton.addEventListener('mouseover', function () {
 
-            if (triggerAudioController != null) {
-              triggerAudioController.components.trigger_audio_control.playAudio();
-            }
+            // if (triggerAudioController != null) {
+            //   triggerAudioController.components.trigger_audio_control.playAudio();
+            // }
           });
           noButton.addEventListener('mousedown', function () {
             ShowHideDialogPanel();

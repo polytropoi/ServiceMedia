@@ -1055,9 +1055,11 @@ AFRAME.registerComponent('local_marker', {
       // console.log("new hit " + hitID + " " + distance + " " + JSON.stringify(hitpoint));
       // distance = window.playerPosition.distanceTo(hitpoint);
       console.log("new hit " + hitID + " " + distance + " " + JSON.stringify(hitpoint));
-      var triggerAudioController = document.getElementById("triggerAudio");
-      if (triggerAudioController != null) {
-        triggerAudioController.components.trigger_audio_control.playAudioAtPosition(hitpoint, distance);
+      if (this.data.eventData.toLowerCase().includes("audiotrigger")) {
+        var triggerAudioController = document.getElementById("triggerAudio");
+        if (triggerAudioController != null) {
+          triggerAudioController.components.trigger_audio_control.playAudioAtPosition(hitpoint, distance);
+        }
       }
     }
 
@@ -1435,12 +1437,13 @@ AFRAME.registerComponent('cloud_marker', {
       // console.log("new hit " + hitID + " " + distance + " " + JSON.stringify(hitpoint));
       distance = window.playerPosition.distanceTo(hitpoint);
       console.log("new hit " + hitID + " " + distance + " " + JSON.stringify(hitpoint));
-      var triggerAudioController = document.getElementById("triggerAudio");
-      if (triggerAudioController != null) {
-        triggerAudioController.components.trigger_audio_control.playAudioAtPosition(hitpoint, distance);
+      if (this.data.eventData.toLowerCase().includes("audiotrigger")) {
+        var triggerAudioController = document.getElementById("triggerAudio");
+        if (triggerAudioController != null) {
+          triggerAudioController.components.trigger_audio_control.playAudioAtPosition(hitpoint, distance);
+        }
       }
     }
-  // }
 
 });
 
@@ -1496,6 +1499,10 @@ AFRAME.registerComponent('mod_physics', {
         console.log("TRIGGER COLLIDED "  + this.el.id + " " + e.detail.targetEl.classList);
         // e.detail.body.disableCollision = true;
         this.disableCollisionTemp(); //must turn it off or it blocks, no true "trigger" mode afaik (unlike cannonjs!)
+        var triggerAudioController = document.getElementById("triggerAudio");
+        if (triggerAudioController != null) {
+          triggerAudioController.components.trigger_audio_control.playAudio();
+        }
       }
     });
 

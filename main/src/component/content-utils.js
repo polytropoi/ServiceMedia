@@ -3461,14 +3461,17 @@ AFRAME.registerComponent('mod_model', {
                 });
                 // this.el.setAttribute("position", this.data.pos);
                 childEnt.addEventListener('mouseenter', function (evt) {
-                  var triggerAudioController = document.getElementById("triggerAudio");
-                  if (triggerAudioController != null) {
-                    triggerAudioController.components.trigger_audio_control.playAudio();
+                  if (this.data.eventData.toLowerCase().includes("audiotrigger")) {
+                    var triggerAudioController = document.getElementById("triggerAudio");
+                    if (triggerAudioController != null) {
+                      triggerAudioController.components.trigger_audio_control.playAudio();
+                    }
+                  }
                     calloutEntity.setAttribute('visible', true);
                     let pos = evt.detail.intersection.point; //hitpoint on model
                     console.log("mousing a pic agt " + JSON.stringify(pos) + " title " + spics[spicsIndex].title);
                     calloutEntity.setAttribute("position", pos);
-                  }
+                  // }
                 });
                 childEnt.addEventListener('mouseleave', function (evt) {
                   // console.log("tryna mouseexit");
@@ -3538,14 +3541,17 @@ AFRAME.registerComponent('mod_model', {
                 });
                 // this.el.setAttribute("position", this.data.pos);
                 childEnt.addEventListener('mouseenter', function (evt) {
-                  var triggerAudioController = document.getElementById("triggerAudio");
-                  if (triggerAudioController != null) {
-                    triggerAudioController.components.trigger_audio_control.playAudio();
+                  if (this.data.eventData.toLowerCase().includes("audiotrigger")) {
+                    var triggerAudioController = document.getElementById("triggerAudio");
+                    if (triggerAudioController != null) {
+                      triggerAudioController.components.trigger_audio_control.playAudio();
+                    }
+                  }
                     calloutEntity.setAttribute('visible', true);
                     let pos = evt.detail.intersection.point; //hitpoint on model
                     console.log("mousing a pic agt " + JSON.stringify(pos) + " title " + hpics[hpicsIndex].title);
                     calloutEntity.setAttribute("position", pos);
-                  }
+                  // }
                 });
                 childEnt.addEventListener('mouseleave', function (evt) {
                   // console.log("tryna mouseexit");
@@ -3615,14 +3621,17 @@ AFRAME.registerComponent('mod_model', {
                 });
 
                 childEnt.addEventListener('mouseenter', function (evt) {
-                  var triggerAudioController = document.getElementById("triggerAudio");
-                  if (triggerAudioController != null) {
-                    triggerAudioController.components.trigger_audio_control.playAudio();
+                  if (this.data.eventData.toLowerCase().includes("audiotrigger")) {
+                    var triggerAudioController = document.getElementById("triggerAudio");
+                    if (triggerAudioController != null) {
+                      triggerAudioController.components.trigger_audio_control.playAudio();
+                    }
+                  }
                     calloutEntity.setAttribute('visible', true);
                     let pos = evt.detail.intersection.point; //hitpoint on model
                     console.log("mousing a pic agt " + JSON.stringify(pos) + " title " + vpics[vpicsIndex].title);
                     calloutEntity.setAttribute("position", pos);
-                  }
+                  // }
                 });
                 childEnt.addEventListener('mouseleave', function (evt) {
                   // console.log("tryna mouseexit");
@@ -3862,12 +3871,12 @@ AFRAME.registerComponent('mod_model', {
               textIndex = 0;
             }
           }
-
-          var triggerAudioController = document.getElementById("triggerAudio");
-          if (triggerAudioController != null) {
-            triggerAudioController.components.trigger_audio_control.playAudio();
+          if (this.data.eventData.toLowerCase().includes("audiotrigger")) {
+            var triggerAudioController = document.getElementById("triggerAudio");
+            if (triggerAudioController != null) {
+              triggerAudioController.components.trigger_audio_control.playAudio();
+            }
           }
-
 
         });
         // this.el.addEventListener('mouseleave', function (evt) {
@@ -3904,18 +3913,18 @@ AFRAME.registerComponent('mod_model', {
             // });
           }
         } else {
-          console.log("primaryAudioToggle not playing");
-          if (idleIndex != -1) { 
-          theEl.setAttribute('animation-mixer', {
-            "clip": clips[idleIndex].name,
-            "loop": "repeat"
-            // "repetitions": 10,
-            // "timeScale": 2
-          });
-          // theEl.addEventListener('animation-finished', function () { //clunky but whatever - this is the "recommended way" ?!?
-          //   theEl.removeAttribute('animation-mixer');
-          // });
-          }
+            console.log("primaryAudioToggle not playing");
+            if (idleIndex != -1) { 
+            theEl.setAttribute('animation-mixer', {
+              "clip": clips[idleIndex].name,
+              "loop": "repeat"
+              // "repetitions": 10,
+              // "timeScale": 2
+            });
+            // theEl.addEventListener('animation-finished', function () { //clunky but whatever - this is the "recommended way" ?!?
+            //   theEl.removeAttribute('animation-mixer');
+            // });
+            }
           }
         });      
       }

@@ -40,9 +40,9 @@ var sceneEl = document.querySelector('a-scene');
 
           });
         closeButton.addEventListener('mouseover', function () {
-          if (triggerAudioController != null) {
-            triggerAudioController.components.trigger_audio_control.playAudio();
-          }
+          // if (triggerAudioController != null) {
+          //   triggerAudioController.components.trigger_audio_control.playAudio();
+          // }
         });
         closeButton.addEventListener('mousedown', function () {
           ShowHideDialogPanel();
@@ -86,9 +86,9 @@ var sceneEl = document.querySelector('a-scene');
             });
           noButton.addEventListener('mouseover', function () {
 
-            if (triggerAudioController != null) {
-              triggerAudioController.components.trigger_audio_control.playAudio();
-            }
+            // if (triggerAudioController != null) {
+            //   triggerAudioController.components.trigger_audio_control.playAudio();
+            // }
           });
           noButton.addEventListener('mousedown', function () {
             ShowHideDialogPanel();
