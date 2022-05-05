@@ -14834,6 +14834,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
     let audioGroupsData = "";
     let videoGroupsEntity = "";
     let videoElements = "";
+    let hlsScript = "";
     // let loadPictureGroups = "";
     let availableScenesInclude = "";
     let restrictToLocation = false;
@@ -14883,6 +14884,8 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
     let meshUtilsScript = "<script type=\x22module\x22 src=\x22../main/src/component/mesh-utils.js\x22 defer=\x22defer\x22></script>";
     let physicsScripts = "";
     let extrasScript = "<script src=\x22../main/vendor/aframe/animation-mixer.js\x22></script>"; //swapped with full aframe-extras lib (that includes animation-mixer) for physics and navmesh if needed
+    
+    enviromentScript = ""; //for aframe env component
     // let debugMode = false;
     // let aframeScriptVersion = "<script src=\x22https://aframe.io/releases/1.3.0/aframe.min.js\x22></script>";
     let aframeScriptVersion = "<script src=\x22https://cdn.jsdelivr.net/gh/aframevr/aframe@0d23f9b21c33ab6821046ce95835492cb84996c5/dist/aframe-master.min.js\x22></script>";
@@ -14893,6 +14896,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
     let inventoryData = "";
     let joystickContainer  = "";
     let arImageTargets = [];
+
     db.scenes.findOne({"short_id": reqstring}, function (err, sceneData) { 
             if (err || !sceneData) {
                 console.log("1 error getting scene data: " + err);
@@ -15238,6 +15242,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                     textLocation = sceneResponse.sceneLocations[i].x + " " + sceneResponse.sceneLocations[i].y + " " + zFix; //TODO - these must all be arrays, like sceneModelLocations above!
                                 }
                                 if (sceneResponse.sceneLocations[i].markerType == "video") {
+                                    hlsScript = "<script src=\x22../main/js/hls.min.js\x22></script>";//v 1.0.6 
                                     videoLocation = sceneResponse.sceneLocations[i].x + " " + sceneResponse.sceneLocations[i].y + " " + zFix;
                                     if (sceneResponse.sceneLocations[i].eulerx != undefined && sceneResponse.sceneLocations[i].eulerx != undefined && sceneResponse.sceneLocations[i].eulerx != undefined) {
                                         videoRotation = sceneResponse.sceneLocations[i].eulerx + " " + sceneResponse.sceneLocations[i].eulery + " " + sceneResponse.sceneLocations[i].eulerz;
@@ -15725,6 +15730,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                 webxrEnv = sceneResponse.sceneWebXREnvironment;
                                 // console.log("environment: " + environment);
                                 // environment = " environment=\x22preset: "+webxrEnv+"\x22 ";
+                                enviromentScript = "<script src=\x22../main/ref/aframe/dist/aframe_environment_component.min.js\x22></script>";
                                 let ground = "";
                                 let skycolor = "";
                                 let groundcolor = "";
@@ -17244,6 +17250,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                     // videoGroupsEntity = "<a-entity video_groups_control id=\x22videoGroupsControl\x22 data-video-groups='"+JSON.stringify(requestedVideoGroups)+"'></a-entity>"; //to be picked up by aframe, but data is in data-attribute
                                     var buff = Buffer.from(JSON.stringify(requestedVideoGroups)).toString("base64");
                                     videoGroupsEntity = "<a-entity video_groups_data id=\x22videoGroupsData\x22 data-video-groups='"+buff+"'></a-entity>"; 
+                                    hlsScript = "<script src=\x22../main/js/hls.min.js\x22></script>"; //v 1.0.6 
                                     callback(null);
                                 }
                             });
@@ -19121,16 +19128,19 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
 
                         "<script src=\x22../main/vendor/howler/src/howler.core.js\x22></script>"+
                         "<script src=\x22../main/vendor/howler/src/howler.spatial.js\x22></script>"+
-                        "<script src=\x22../main/js/hls.min.js\x22></script>" + //v 1.0.6 
+                        hlsScript +
+                        
                         "<script src=\x22../main/js/navigation.js\x22></script>" + //includes navmesh components (simple and not), and extended-wasd-controls
                         // "<script src=\x22../main/ref/aframe/dist/networked-aframe.min.js\x22></script>" + 
                         // "<script src=\x22../main/ref/aframe/dist/aframe-layout-component.min.js\x22></script>" +  
                         "<script src=\x22../main/vendor/aframe/aframe-blink-controls.min.js\x22></script>" +  
                        
                         // "<script src=\x22../main/ref/aframe/dist/aframe-randomizer-components.min.js\x22></script>" +
-                        "<script src=\x22../main/ref/aframe/dist/aframe_environment_component.min.js\x22></script>" +
+                        enviromentScript +
+                        // "<script src=\x22../main/ref/aframe/dist/aframe_environment_component.min.js\x22></script>" +
                        
                         joystickScript +
+
                         "<script src=\x22../main/src/component/aframe-makewaves-shader.js\x22></script>"+
                         // "<script src=\x22../main/src/shaders/terrain.js\x22></script>"+
                        
