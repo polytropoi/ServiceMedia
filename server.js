@@ -6144,7 +6144,18 @@ app.get('/uservids/:u_id', requiredAuthentication, function(req, res) {
         }
     });
 });
+app.post('/return_audiogroups/', function(req, res) {
+    console.log('tryna return usergroups for: ' + JSON.stringify(req.body));
 
+    // db.groups.find({userID: req.params.u_id}).sort({otimestamp: -1}).toArray( function(err, group_items) {
+    //     if (err || !group_items) {
+    //         console.log("error getting usergroups items: " + err);
+    //     } else {
+    //         res.json(group_items);
+    //         console.log("returning usergroups for " + req.params.u_id);
+    //     }
+    // });
+});
 
 app.get('/usergroups/:u_id', requiredAuthentication, function(req, res) {
     console.log('tryna return usergroups for: ' + req.params.u_id);
@@ -7413,7 +7424,7 @@ app.get('/hls/:_id', function(req, res) {
             }
         });
     } else {
-        res.send("error in id " + pid);
+        res.send("error in id " + pID);
     }
 });
 
@@ -14757,15 +14768,16 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
     let scenePreviousScene = "";
     let synthScripts = "";
     let streamPrimaryAudio = false;
+    let audioControl = "<script src=\x22../main/src/component/audio_control.js\x22></script>";
     let primaryAudioScript = "";
     let primaryAudioParams = "";
-    let primaryAudioControl = "";
+    // let primaryAudioControl = "";
     let primaryAudioEntity = "";
     let ambientAudioEntity = "";
     let ambientAudioScript = "";
-    let ambientAudioControl = "";
+    // let ambientAudioControl = "";
     let triggerAudioScript = "";
-    let triggerAudioControl = "";
+    // let triggerAudioControl = "";
     let triggerAudioEntity = "";
     let pAudioWaveform = "";
     let primaryAudioLoop = false;
@@ -15887,6 +15899,23 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
 
                     // });
                 },
+                // function (callback) {
+                //     console.log("trigger audio group: " + JSON.stringify(sceneResponse.sceneTriggerAudioGroups));
+                //     if (sceneResponse.sceneTriggerAudioGroups != null && sceneResponse.sceneTriggerAudioGroups.length > 0) {
+                //         vgID = sceneResponse.sceneVideoGroups[0];
+                //         let oo_id = ObjectID(vgID);
+
+                //         db.groups.find({"_id": oo_id}, function (err, groups) {
+                //             if (err || !groups) {
+                //                 callback();
+                //             } else {
+                //             // console.log("gotsa group: "+ JSON.stringify(groups));
+                //             async.each(groups, function (groupID, callbackz) { 
+
+                //     }
+                    
+                // },
+
                 function (callback) {
                     if (locationLights.length > 0) {
                         for (let i = 0; i < locationLights.length; i++) {
@@ -16871,6 +16900,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                     // }
                 },
                 function (callback) { //fethc audio items
+                    
                     db.audio_items.find({_id: {$in: requestedAudioItems }}, function (err, audio_items) {
                         if (err || !audio_items) {
                             console.log("error getting audio items: " + err);
@@ -16919,7 +16949,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                     callback(null);
                 },
                 function (callback) {
-
+                    
                     if (sceneResponse.scenePrimaryAudioID != null && sceneResponse.scenePrimaryAudioID.length > 4) {
                         hasPrimaryAudio = true;
                     }
@@ -16996,7 +17026,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                     "src: [\x22"+oggurl+"\x22,\x22"+mp3url+"\x22], "+html5+" ctx: true, volume: 0," + loopable +
                                 "});" +
                             "primaryAudioHowl.load();</script>";
-                            primaryAudioControl = "<script src=\x22../main/src/component/primary-audio-control.js\x22></script>";
+                            // primaryAudioControl = "<script src=\x22../main/src/component/primary-audio-control.js\x22></script>";
                             primaryAudioEntity = "<a-entity id=\x22primaryAudioParent\x22 look-at=\x22#player\x22 position=\x22"+audioLocation+"\x22>"+ //parent
                            
                             
@@ -17036,7 +17066,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                 "src: \x22"+sceneResponse.scenePrimaryAudioStreamURL+"\x22, html5: true, volume: 0, format: ['mp3', 'aac']" +
                             "});" +
                         "</script>";
-                        primaryAudioControl = "<script src=\x22../main/src/component/primary-audio-control.js\x22></script>";
+                        // primaryAudioControl = "<script src=\x22../main/src/component/primary-audio-control.js\x22></script>";
                         primaryAudioEntity = "<a-entity id=\x22primaryAudioParent\x22 look-at=\x22#player\x22 position=\x22"+audioLocation+"\x22>"+ //parent
                         "<a-entity id=\x22primaryAudioText\x22 geometry=\x22primitive: plane; width: 1; height: .30\x22 position=\x220 0 2.5\x22 material=\x22color: grey; transparent: true; opacity: 0.0\x22"+
                         "text=\x22value:Click to play;\x22></a-entity>"+
@@ -17065,7 +17095,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                 "src: [\x22"+triggerOggUrl+"\x22,\x22"+triggerMp3Url+"\x22], volume: 1, loop: false" + 
                             "});" +
                         "triggerAudioHowl.load();</script>";
-                        triggerAudioControl = "<script src=\x22../main/src/component/trigger-audio-control.js\x22></script>";
+                        // triggerAudioControl = "<script src=\x22../main/src/component/trigger-audio-control.js\x22></script>";
                         triggerAudioEntity = "<a-entity id=\x22triggerAudio\x22 trigger_audio_control=\x22oggurl: "+triggerOggUrl+"; mp3url: "+triggerMp3Url+"; volume: "+sceneTriggerVolume+";\x22"+
                         "</a-entity>";
                     }
@@ -17927,6 +17957,13 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                     settings.skyboxID = skyboxID;
                     settings.skyboxURL = skyboxUrl;
                     settings.useSynth = hasSynth;
+                    let audioGroups = {};
+                    audioGroups.triggerGroups = sceneResponse.sceneTriggerAudioGroups;
+                    audioGroups.ambientGroups = sceneResponse.sceneAmbientAudioGroups;
+                    audioGroups.primaryGroups = sceneResponse.scenePrimaryAudioGroups;
+                    settings.audioGroups = audioGroups; 
+                    // settings.sceneAmbientAudioGroups = sceneResponse.sceneAmbientAudioGroups;
+                    // settings.scenePrimaryAudioGroups = sceneResponse.scenePrimaryAudioGroups;
                     var sbuff = Buffer.from(JSON.stringify(settings)).toString("base64");
                     settingsData = "<div id=\x22settingsDataElement\x22 data-settings=\x22"+sbuff+"\x22></div>";
 
@@ -18888,9 +18925,10 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                         settingsData +
                         // "<div class=\x22attributionParams\x22 id="+JSON.stringify(attributions)+"></div>"+
                         "<div class=\x22avatarName\x22 id="+avatarName+"></div>"+
-                        primaryAudioControl +
-                        ambientAudioControl +
-                        triggerAudioControl +
+                        // primaryAudioControl +
+                        // ambientAudioControl +
+                        // triggerAudioControl +
+                        audioControl +
                         // "<script> function screenCap() {console.log(\x22tryna screenCap()\x22); document.querySelector('a-scene').components.screenshot.capture('perspective')};"+    
                         // "</script>"+
                         containers +
@@ -19200,9 +19238,10 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                         settingsData +
                         // "<div class=\x22attributionParams\x22 id="+JSON.stringify(attributions)+"></div>"+
                         "<div class=\x22avatarName\x22 id="+avatarName+"></div>"+
-                        primaryAudioControl +
-                        ambientAudioControl +
-                        triggerAudioControl +
+                        // primaryAudioControl +
+                        // ambientAudioControl +
+                        // triggerAudioControl +
+                        audioControl +
                         // "<script> function screenCap() {console.log(\x22tryna screenCap()\x22); document.querySelector('a-scene').components.screenshot.capture('perspective')};"+    
                         // "</script>"+
                         containers +
@@ -19358,6 +19397,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                         // navmarsh +
                         loadAudioEvents +
                         "<a-entity id=\x22youtube_element\x22 youtube_element_aframe=\x22init: ''\x22></a-entity>"+
+                        "<a-entity id=\x22audioGroupsEl\x22 audio_groups_control=\x22init: ''\x22></a-entity>"+
 
                         "<a-entity id=\x22mod_dialog\x22 visible=\x22false\x22 look-at=\x22#player\x22 mod_dialog=\x22mode: 'confirm'\x22>"+
                             "<a-text id=\x22mod_dialog_text\x22 align=\x22left\x22 wrap-count=\x2230\x22 width=\x22.8\x22 position=\x22-.35 .15 .05\x22 value=\x22Are you sure you want to pick up the extra spicy meatball?\n\nThis could bring very strongbad wrongness for you!\x22></a-text>"+
