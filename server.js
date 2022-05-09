@@ -6145,9 +6145,10 @@ app.get('/uservids/:u_id', requiredAuthentication, function(req, res) {
     });
 });
 app.post('/return_audiogroups/', function(req, res) {
-    console.log('tryna return usergroups for: ' + JSON.stringify(req.body));
+    console.log('tryna return audiogroups: ' + JSON.stringify(req.body));
     let response = req.body;
-let triggerItems = {};
+    let groupItems = [];
+    let audio_IDs = [];
     async.waterfall([
 
         function(callback){ 
@@ -6159,50 +6160,189 @@ let triggerItems = {};
                         callback(err);
                     } else {
                         // res.json(group_items);
-                        console.log("returning audiogroup " + JSON.stringify(group_items));
-
-                        callback(null, group_items)
+                        // console.log("returning audiogroup " + JSON.stringify(group_items.groupdata));
+                        let groupdata = group_items[0].groupdata;
+                        groupItems.push.apply(groupItems, groupdata); //concat arrays
+                        response.triggerGroupItems = group_items;
+                        
+                        callback(null);
                     }
                 });
             } else {
-                callback("error: no trigger groups");
-            }
-
-           
-        },
-
-        function(audio_items, callback) { //add the signed URLs to the obj array
-            triggerItems = audio_items;
-            if (audio_items != null) {
-                for (var i = 0; i < audio_items.length; i++) {
-                    var item_string_filename = JSON.stringify(audio_items[i].filename);
-                    console.log("item_string_filename: " + item_string_filename);
-                    // var item_string_filename = JSON.stringify(audio_items[i].filename);
-                    // item_string_filename = item_string_filename.replace(/\"/g, "");
-                    // var item_string_filename_ext = getExtension(item_string_filename);
-                    // var expiration = new Date();
-                    // expiration.setMinutes(expiration.getMinutes() + 1000);
-                    // var baseName = path.basename(item_string_filename, (item_string_filename_ext));
-                    // console.log(baseName);
-                    // var mp3Name = baseName + '.mp3';
-                    // var oggName = baseName + '.ogg';
-                    // var pngName = baseName + '.png';
-                    // var urlMp3 = knoxClient.signedUrl(audio_items[i]._id + "." + mp3Name, expiration);
-                    // var urlOgg = knoxClient.signedUrl(audio_items[i]._id + "." + oggName, expiration);
-                    // var urlPng = knoxClient.signedUrl(audio_items[i]._id + "." + pngName, expiration);
-                    // audio_items[i].URLmp3 = urlMp3; //jack in teh signed urls into the object array
-                    // audio_items[i].URLogg = urlOgg;
-                    // audio_items[i].URLpng = urlPng;
-
-                }
-                console.log('tryna send ' + audio_items.length + 'audio_items ');
                 callback(null);
             }
-        }],
+        },
+        function(callback){ 
+            if (req.body.ambientGroups != null && req.body.ambientGroups.length > 0) {
+                const group_ids = req.body.ambientGroups.map(item => { return ObjectID(item); });
+                db.groups.find({_id: {$in: group_ids}}, function(err, group_items) {
+                    if (err || !group_items) {
+                        console.log("error getting audiogroup items: " + err);
+                        callback(err);
+                    } else {
+                        // res.json(group_items);
+                        // console.log("returning audiogroup " + JSON.stringify(group_items.groupdata));
+                        response.ambientGroupItems = group_items;
+                        let groupdata = group_items[0].groupdata;
+                        groupItems.push.apply(groupItems, groupdata); //concat arrays
+                        callback(null);
+                    }
+                });
+            } else {
+                callback(null);
+            }
+        },
+        function(callback){ 
+            if (req.body.primaryGroups != null && req.body.primaryGroups.length > 0) {
+                const group_ids = req.body.primaryGroups.map(item => { return ObjectID(item); });
+                db.groups.find({_id: {$in: group_ids}}, function(err, group_items) {
+                    if (err || !group_items) {
+                        console.log("error getting audiogroup items: " + err);
+                        callback(err);
+                    } else {
+                        // res.json(group_items);
+                        // console.log("returning audiogroup " + JSON.stringify(group_items));
+                        response.primaryGroupItems = group_items;
+                        let groupdata = group_items[0].groupdata;
+                        groupItems.push.apply(groupItems, groupdata); //concat arrays
+                        callback(null);
+                    }
+                });
+            } else {
+                callback(null);
+            }
+        },
+        function (callback) {
+            // console.log("auido groupitems: " +JSON.stringify(groupItems));
+            if (groupItems.length > 0) {
+                async.each (groupItems, function (item, callbackz) { //takes a shake so async, and respond when it's done
+                    audio_IDs.push(item.itemID);
+                    // console.log("item: " + JSON.stringify(item));
+                    callbackz();
+                }, function(err) {
+                    if (err) {
+                        res.send("error! " + err);
+                    } else {
+                        callback(null);
+                    }
+                });
+            } else {
+                callback("no group items");
+            }
+        },
+        function (callback) {
+            // console.log("audio IDs: " + audio_IDs);
+            const audio_ids = audio_IDs.map(item => { return ObjectID(item); });
+            db.audio_items.find({'_id': { $in: audio_ids}}).toArray(function (err, audio_items) {
+                if (err || !audio_items) {
+                    console.log("error getting audio items: " + err);
+                    callback(err);
+                } else {
+                    console.log("audio_group_items: "+ JSON.stringify(audio_items));
+                    callback(null);
+                }
+            });
+        }
+        
+
+        // function(callback) { //add the signed URLs to the obj array
+
+        //     if (groupItems.length > 0) {
+               
+        //         async.each (groupItems, function (item, callbackz) { //takes a shake so async, and respond when it's done
+        //             let audioItem = item.
+        //             callbackz();
+        //         }, function(err) {
+        //             if (err) {
+        //                 // console.log('hls mangler failed to process');
+        //                 res.send("error! " + err);
+        //             } else {
+
+        //                 callback();
+        //             }
+        //         });
+
+                // for (var i = 0; i < response.primaryGroupItems.groupData.length; i++) {
+                //     var item_string_filename = JSON.stringify(audio_items[i].filename);
+                //     console.log("item_string_filename: " + item_string_filename);
+                //     // var item_string_filename = JSON.stringify(audio_items[i].filename);
+                //     // item_string_filename = item_string_filename.replace(/\"/g, "");
+                //     // var item_string_filename_ext = getExtension(item_string_filename);
+                //     // var expiration = new Date();
+                //     // expiration.setMinutes(expiration.getMinutes() + 1000);
+                //     // var baseName = path.basename(item_string_filename, (item_string_filename_ext));
+                //     // console.log(baseName);
+                //     // var mp3Name = baseName + '.mp3';
+                //     // var oggName = baseName + '.ogg';
+                //     // var pngName = baseName + '.png';
+                //     // var urlMp3 = knoxClient.signedUrl(audio_items[i]._id + "." + mp3Name, expiration);
+                //     // var urlOgg = knoxClient.signedUrl(audio_items[i]._id + "." + oggName, expiration);
+                //     // var urlPng = knoxClient.signedUrl(audio_items[i]._id + "." + pngName, expiration);
+                //     // audio_items[i].URLmp3 = urlMp3; //jack in teh signed urls into the object array
+                //     // audio_items[i].URLogg = urlOgg;
+                //     // audio_items[i].URLpng = urlPng;
+
+                // }
+                // console.log('tryna send ' + audio_items.length + 'audio_items ');
+                // callback(null);
+            // }
+        // },
+//         function (callback) {
+//             db.audio_items.find({'_id': { $in: group.items}}).toArray(function (err, audio_items) {
+//                 if (err || !audio_items) {
+//                     console.log("error getting audio items: " + err);
+//                 } else {
+//                     var currentIndex = 0;
+//                     for (var i = 0; i < audio_items.length; i++) {
+//                         if (group.groupdata) {
+//                             var obj = group.groupdata.filter(function (obj) { //get index value from groupdata array
+//                                 return obj.itemID === audio_items[i]._id.toString();
+//                             })[0];
+//                             if (obj != undefined && obj.itemIndex) {
+//                                 audio_items[i].itemIndex = obj.itemIndex;
+//                             } else {
+//                                 audio_items[i].itemIndex = i;
+//                             }
+//                         }
+//                         if (audio_items[i].clipDuration = {}) {
+//                             audio_items[i].clipDuration = "";
+//                         }
+//                         var item_string_filename = JSON.stringify(audio_items[i].filename);
+//                         item_string_filename = item_string_filename.replace(/\"/g, "");
+//                         var item_string_filename_ext = getExtension(item_string_filename);
+//                         var expiration = new Date();
+//                         expiration.setMinutes(expiration.getMinutes() + 30);
+//                         var baseName = path.basename(item_string_filename, (item_string_filename_ext));
+//                         console.log("tryna jack in " + baseName + " to a group of " + group.type);
+//                         var mp3Name = baseName + '.mp3';
+//                         var oggName = baseName + '.ogg';
+//                         var pngName = baseName + '.png';
+//                         var urlMp3 = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + audio_items[i].userID + "/audio/" + audio_items[i]._id + "." + mp3Name, Expires: 60000});
+//                         var urlOgg = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + audio_items[i].userID + "/audio/" + audio_items[i]._id + "." + oggName, Expires: 60000});
+//                         var urlPng = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + audio_items[i].userID + "/audio/" + audio_items[i]._id + "." + pngName, Expires: 60000});
+
+//                         audio_items[i].URLmp3 = urlMp3; //jack in teh signed urls into the object array
+//                         audio_items[i].URLogg = urlOgg;
+//                         audio_items[i].URLpng = urlPng;
+//                         currentIndex++;
+//                     }
+//                     audio_items.sort(function(a, b) {
+//                         return a.itemIndex - b.itemIndex;
+//                     });
+//                 }
+// //                            audio_items.sort(function(a, b) {
+// //                                return a.itemIndex - b.itemIndex;
+// //                            });
+//                 group.audio_items = audio_items;
+//                 res.json(group);
+//                 console.log("returning group_item : " + group);
+//             });
+//         }
+    ],
 
     function(err, result) { // #last function, close async
-        res.json(triggerItems);
-        console.log("waterfall done: " + result);
+        res.json("groupItems: " + groupItems);
+        console.log("audio_groups waterfall done: " + result);
     }
 );
 
@@ -17692,7 +17832,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                         console.log("error getting scenePictures " + picID + err);
                                         callbackz();
                                     } else {
-                                        console.log("gotsa picture_item " + JSON.stringify(picture_item));
+                                        // console.log("gotsa picture_item " + JSON.stringify(picture_item));
                                         
                                         var version = ".standard.";
                                         if (picture_item.orientation != undefined) {
