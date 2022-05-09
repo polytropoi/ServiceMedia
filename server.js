@@ -6146,15 +6146,66 @@ app.get('/uservids/:u_id', requiredAuthentication, function(req, res) {
 });
 app.post('/return_audiogroups/', function(req, res) {
     console.log('tryna return usergroups for: ' + JSON.stringify(req.body));
+    let response = req.body;
+let triggerItems = {};
+    async.waterfall([
 
-    // db.groups.find({userID: req.params.u_id}).sort({otimestamp: -1}).toArray( function(err, group_items) {
-    //     if (err || !group_items) {
-    //         console.log("error getting usergroups items: " + err);
-    //     } else {
-    //         res.json(group_items);
-    //         console.log("returning usergroups for " + req.params.u_id);
-    //     }
-    // });
+        function(callback){ 
+            if (req.body.triggerGroups != null && req.body.triggerGroups.length > 0) {
+                const group_ids = req.body.triggerGroups.map(item => { return ObjectID(item); });
+                db.groups.find({_id: {$in: group_ids}}, function(err, group_items) {
+                    if (err || !group_items) {
+                        console.log("error getting audiogroup items: " + err);
+                        callback(err);
+                    } else {
+                        // res.json(group_items);
+                        console.log("returning audiogroup " + JSON.stringify(group_items));
+
+                        callback(null, group_items)
+                    }
+                });
+            } else {
+                callback("error: no trigger groups");
+            }
+
+           
+        },
+
+        function(audio_items, callback) { //add the signed URLs to the obj array
+            triggerItems = audio_items;
+            if (audio_items != null) {
+                for (var i = 0; i < audio_items.length; i++) {
+                    var item_string_filename = JSON.stringify(audio_items[i].filename);
+                    console.log("item_string_filename: " + item_string_filename);
+                    // var item_string_filename = JSON.stringify(audio_items[i].filename);
+                    // item_string_filename = item_string_filename.replace(/\"/g, "");
+                    // var item_string_filename_ext = getExtension(item_string_filename);
+                    // var expiration = new Date();
+                    // expiration.setMinutes(expiration.getMinutes() + 1000);
+                    // var baseName = path.basename(item_string_filename, (item_string_filename_ext));
+                    // console.log(baseName);
+                    // var mp3Name = baseName + '.mp3';
+                    // var oggName = baseName + '.ogg';
+                    // var pngName = baseName + '.png';
+                    // var urlMp3 = knoxClient.signedUrl(audio_items[i]._id + "." + mp3Name, expiration);
+                    // var urlOgg = knoxClient.signedUrl(audio_items[i]._id + "." + oggName, expiration);
+                    // var urlPng = knoxClient.signedUrl(audio_items[i]._id + "." + pngName, expiration);
+                    // audio_items[i].URLmp3 = urlMp3; //jack in teh signed urls into the object array
+                    // audio_items[i].URLogg = urlOgg;
+                    // audio_items[i].URLpng = urlPng;
+
+                }
+                console.log('tryna send ' + audio_items.length + 'audio_items ');
+                callback(null);
+            }
+        }],
+
+    function(err, result) { // #last function, close async
+        res.json(triggerItems);
+        console.log("waterfall done: " + result);
+    }
+);
+
 });
 
 app.get('/usergroups/:u_id', requiredAuthentication, function(req, res) {
@@ -17957,6 +18008,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                     settings.skyboxID = skyboxID;
                     settings.skyboxURL = skyboxUrl;
                     settings.useSynth = hasSynth;
+
                     let audioGroups = {};
                     audioGroups.triggerGroups = sceneResponse.sceneTriggerAudioGroups;
                     audioGroups.ambientGroups = sceneResponse.sceneAmbientAudioGroups;
@@ -19397,7 +19449,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                         // navmarsh +
                         loadAudioEvents +
                         "<a-entity id=\x22youtube_element\x22 youtube_element_aframe=\x22init: ''\x22></a-entity>"+
-                        "<a-entity id=\x22audioGroupsEl\x22 audio_groups_control=\x22init: ''\x22></a-entity>"+
+                        // "<a-entity id=\x22audioGroupsEl\x22 audio_groups_control=\x22init: ''\x22></a-entity>"+
 
                         "<a-entity id=\x22mod_dialog\x22 visible=\x22false\x22 look-at=\x22#player\x22 mod_dialog=\x22mode: 'confirm'\x22>"+
                             "<a-text id=\x22mod_dialog_text\x22 align=\x22left\x22 wrap-count=\x2230\x22 width=\x22.8\x22 position=\x22-.35 .15 .05\x22 value=\x22Are you sure you want to pick up the extra spicy meatball?\n\nThis could bring very strongbad wrongness for you!\x22></a-text>"+

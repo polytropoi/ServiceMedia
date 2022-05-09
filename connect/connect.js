@@ -131,7 +131,7 @@ $(function() {
    let theSettingsData = settingsEl.getAttribute('data-settings');
             // console.log("RAW LOCATIOND DATA " + theData);
    settings = JSON.parse(atob(theSettingsData)); 
-   let audioGroupsEl = null;
+   // let audioGroupsEl = null;
    if (localStorage.getItem(room + "_timeKeys") != null) { //use local ve3rsion if saved
       timeKeysData = JSON.parse(localStorage.getItem(room + "_timeKeys"));
       // console.log('local timeKeysData' + JSON.stringify(timeKeysData));
@@ -168,9 +168,19 @@ $(function() {
    if (settings.skyboxID == "") {
       // skyboxEl.components.skybox_dynamic.nextSkybox();
    }
-   if (settings.audioGroups != null) {
-      audioGroupsEl = document.getElementById('audioGroupsEl');
-      audioGroupsEl.components.audio_groups_control.LoadAudioGroups(settings.audioGroups);
+   if (settings.audioGroups.triggerGroups.length > 0 || settings.audioGroups.ambientGroups.length > 0 || settings.audioGroups.primaryGroups.length > 0) {
+      // audioGroupsEl = document.getElementById('audioGroupsEl');
+
+      // if (audioGroupsEl != null) {
+      //    let audioGroupsController = audioGroupsEl.components.audio_groups_control;
+      //    if (audioGroupsController != null) {
+      //       audioGroupsController.LoadAudioGroups(settings.audioGroups);
+      //    }
+      // }
+      // audioGroupsEl.components.audio_groups_control.LoadAudioGroups(settings.audioGroups);
+      let audioGroupsEl = document.createElement('a-entity');
+      audioGroupsEl.setAttribute("audio_groups_control", {init: ''});
+      sceneEl.appendChild(audioGroupsEl);
    }
 
    // window.playerPosition = {x: 0, y: 0, z: 0}; 

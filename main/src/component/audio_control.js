@@ -1427,15 +1427,24 @@ AFRAME.registerComponent('trigger_audio_control', { //trigger audio on designate
     // }
 }); //end register
     
-AFRAME.registerComponent('audio_groups_control', { //trigger audio on designated activeObjex
+AFRAME.registerComponent('audio_groups_control', { //element and component are added if settings data (in connect.js) includes audio groups
     schema: {
-    init: {default: false},
+    init: {default: ''},
     // volume: {default: -40},
     // title: {default: ''}
+    audioGroups: {default: ''},
+    triggerGroups: {default: ''},
+    ambientGroups: {default: ''},
+    primaryGroups: {default: ''}
     },
     
     init: function () {
-    
+        console.log("settings.audiogroups: " + JSON.stringify(settings.audioGroups));
+        this.data.triggerGroups = settings.audioGroups.triggerGroups;
+        this.data.ambientGroups = settings.audioGroups.ambientGroups;
+        this.data.triggerGroups = settings.audioGroups.primaryGroups;
+        this.LoadAudioGroups(settings.audioGroups);
+
     },
 
     LoadAudioGroups: function (groupArray) {
@@ -1448,7 +1457,7 @@ AFRAME.registerComponent('audio_groups_control', { //trigger audio on designated
             dataType: "json",
             data: JSON.stringify(groupArray),
                 success: function( data, textStatus, xhr ){
-                    console.log(data);
+                    console.log("audiogroups data: " + data);
                   
                    
                 },
