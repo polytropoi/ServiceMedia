@@ -2578,9 +2578,9 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
       // distance = window.playerPosition.distanceTo(hitpoint);
       // console.log("new hit " + hitID + " distance: " + distance + " " + JSON.stringify(hitpoint));
       // var triggerAudioController = document.getElementById("triggerAudio");
-      // if (triggerAudioController != null) {
-      //   triggerAudioController.components.trigger_audio_control.playAudioAtPosition(hitpoint, distance);
-      // }
+      if (triggerAudioController != null) {
+        triggerAudioController.components.trigger_audio_control.playAudioAtPosition(hitpoint, distance);
+      }
       // let synthCtrl = this.el.components.mod_synth;
       // if (synthCtrl != null) {
         if (this.hasSynth) {

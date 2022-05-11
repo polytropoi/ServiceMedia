@@ -1365,10 +1365,14 @@ AFRAME.registerComponent('trigger_audio_control', { //trigger audio on designate
     schema: {
     url: {default: ''},
     volume: {default: -40},
+    init: {default: ''}
     // title: {default: ''}
     },
     
     init: function () {
+
+        this.audioGroupsEl = document.getElementById('audioGroupsEl');
+        this.audioGroupsController = null;
         // this.cam = document.querySelector("[camera]"); 
         // this.camPosition = "";
         // this.distance = "";
@@ -1390,6 +1394,14 @@ AFRAME.registerComponent('trigger_audio_control', { //trigger audio on designate
         //         color: 'purple'
         //     }, true);
     },
+    randomTriggerAudio: function () {
+        if (this.audioGroupsEl != null) {
+            let audioItem = this.audioGroupsEl.components.audio_group_control.returnAudioItem();
+            triggerAudioHowl.src = audioItem.mp3url;
+            triggerAudioHowl.play();
+        }
+
+    },
     modVolume: function(newVolume) { //from slider in canvasOverlay
         console.log("tryna mod trigger Volume to " + newVolume);
        
@@ -1399,16 +1411,45 @@ AFRAME.registerComponent('trigger_audio_control', { //trigger audio on designate
         triggerAudioHowl.volume(normalizedVolume);
     },
     playAudio: function() {
+        this.audioGroupsEl = document.getElementById('audioGroupsEl');
+        if (this.audioGroupsEl != null) {
+            this.audioGroupsController = this.audioGroupsEl.components.audio_groups_control;
+            let audioItem = this.audioGroupsController.returnRandomTriggerAudioID();
+            triggerAudioHowl.src = audioItem.mp3url;
+            // triggerAudioHowl.play();
+        }
         console.log("tryna play trigger audio");
         // triggerPosition = this.el.object3D.position;
         // triggerAudioHowl.pos(triggerPosition);
         // triggerAudioHowl.fade(0, 1, 5000);
         triggerAudioHowl.play();
+
     },
     playAudioAtPosition: function(pos, distance) {
+        console.log("tryna play trigger raudio..");
+        // this.modVolume(1);
+        this.audioGroupsEl = document.getElementById('audioGroupsEl');
+        if (this.audioGroupsEl != null) {
+            this.audioGroupsController = this.audioGroupsEl.components.audio_groups_control;
+            let audioID = this.audioGroupsController.returnRandomTriggerAudioID();
+            let audioItem = this.audioGroupsController.returnAudioItem(audioID);
+            if (audioItem != null) {
+            console.log("tryna set trigger to src " + audioItem.URLogg);
+            triggerAudioHowl = null;
+            triggerAudioHowl = new Howl({
+                src: [audioItem.URLogg, audioItem.URLmp3],
+                format: ["ogg", "mp3"]
+            });
+            // triggerAudioHowl.format = ["ogg", "mp3"];
+            // triggerAudioHowl.src = [audioItem.URLogg, audioItem.URLmp3];
+            triggerAudioHowl.load();
+            // triggerAudioHowl.play();
+            }
+        }
+
         triggerAudioHowl.pos(pos.x, pos.y, pos.z);
         const clamp = (num, a, b) => Math.max(Math.min(num, Math.max(a, b)), Math.min(a, b));
-        const rate = clamp(Math.random(), .25, 1.25);
+        const rate = clamp(Math.random(), .75, 1.25);
         triggerAudioHowl.rate(rate + .1);
         // console.log("tryna play at hitpoint " + pos);
         triggerAudioHowl.play();
@@ -1432,13 +1473,14 @@ AFRAME.registerComponent('audio_groups_control', { //element and component are a
     init: {default: ''},
     // volume: {default: -40},
     // title: {default: ''}
-    audioGroups: {default: ''},
-    triggerGroups: {default: ''},
-    ambientGroups: {default: ''},
-    primaryGroups: {default: ''}
+    audioGroupsData: {default: ''},
+    // triggerGroups: {default: ''},
+    // ambientGroups: {default: ''},
+    // primaryGroups: {default: ''}
     },
     
     init: function () {
+        this.data.audioGroupsData = null;
         console.log("settings.audiogroups: " + JSON.stringify(settings.audioGroups));
         this.data.triggerGroups = settings.audioGroups.triggerGroups;
         this.data.ambientGroups = settings.audioGroups.ambientGroups;
@@ -1447,30 +1489,83 @@ AFRAME.registerComponent('audio_groups_control', { //element and component are a
 
     },
 
+    SetAudioGroupsData: function (data) {
+        console.log(JSON.stringify(data));
+        this.data.audioGroupsData = data;
+        
+    },
+
     LoadAudioGroups: function (groupArray) {
 
-        console.log("tryna fetch audioGroups: " +JSON.stringify(groupArray));
-        var posting = $.ajax({
-            url: "/return_audiogroups",
-            type: 'POST',
-              contentType: "application/json; charset=utf-8",
-            dataType: "json",
-            data: JSON.stringify(groupArray),
-                success: function( data, textStatus, xhr ){
-                    console.log("audiogroups data: " + data);
-                  
-                   
-                },
-                error: function( xhr, textStatus, errorThrown ){
+        // console.log("tryna fetch audioGroups: " +JSON.stringify(groupArray));
+        // var posting = $.ajax({
+        //     url: "/return_audiogroups",
+        //     type: 'POST',
+        //       contentType: "application/json; charset=utf-8",
+        //     dataType: "json",
+        //     data: JSON.stringify(groupArray),
+        //         success: function( data, textStatus, xhr ){
+        //             console.log("audiogroups data: " + JSON.stringify(data));
+        //             this.audioGroupsData = data;
+                    
 
-                    // document.cookie = "expires=Thu, 01 Jan 1970 00:00:00"; //set to expired date to delete?
-                    }
-                });
+        //         },
+        //         error: function( xhr, textStatus, errorThrown ){
+        //             console.log("error! " + errorThrown);
+        //             // document.cookie = "expires=Thu, 01 Jan 1970 00:00:00"; //set to expired date to delete?
+        //             }
+        //         });
+        FetchAudioGroupsData(groupArray);
+
     },
+
     ambientGroups: function () {
 
     },
     primaryGroups: function () {
 
+    },
+    returnAudioItem: function (id) {
+        let index = -1;
+        for (var i = 0; i < this.data.audioGroupsData.audioItems.length; i++){
+            if (id == this.data.audioGroupsData.audioItems[i]._id) {
+                index = i;
+                break;
+            }
+        }
+        return this.data.audioGroupsData.audioItems[index];
+    },
+    returnRandomTriggerAudioID: function () {
+        // console.log(JSON.stringify(this.data.audioGroupsData));
+        let triggerGroup = this.data.audioGroupsData.triggerGroupItems[0];
+        return triggerGroup.items[Math.floor(Math.random()*triggerGroup.items.length)]; //pick a random entry from trigger ids
+    },
+    returnTriggerTag: function() {
+
     }
 });
+
+function FetchAudioGroupsData(groupArray) {
+    console.log("tryna fetch audioGroups: " +JSON.stringify(groupArray));
+    var posting = $.ajax({
+        url: "/return_audiogroups",
+        type: 'POST',
+          contentType: "application/json; charset=utf-8",
+        dataType: "json",
+        data: JSON.stringify(groupArray),
+            success: function( data, textStatus, xhr ){
+                console.log("audiogroups data: " + JSON.stringify(data));
+                // return  JSON.stringify(data);
+                let audioGroupsControllerEl = document.getElementById('audioGroupsEl');
+                let audioGroupsController = audioGroupsControllerEl.components.audio_groups_control;
+                audioGroupsController.SetAudioGroupsData(data);
+
+            },
+            error: function( xhr, textStatus, errorThrown ){
+                console.log("error! " + errorThrown);
+                // return null;
+                // document.cookie = "expires=Thu, 01 Jan 1970 00:00:00"; //set to expired date to delete?
+                }
+            });
+
+}

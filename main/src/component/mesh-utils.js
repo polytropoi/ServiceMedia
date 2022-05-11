@@ -1438,9 +1438,17 @@ AFRAME.registerComponent('cloud_marker', {
       distance = window.playerPosition.distanceTo(hitpoint);
       console.log("new hit " + hitID + " " + distance + " " + JSON.stringify(hitpoint));
       if (this.data.eventData.toLowerCase().includes("audiotrigger")) {
-        var triggerAudioController = document.getElementById("triggerAudio");
-        if (triggerAudioController != null) {
-          triggerAudioController.components.trigger_audio_control.playAudioAtPosition(hitpoint, distance);
+        console.log("gotsa audio trigger hit");
+        var triggerAudioControllerEl = document.getElementById("triggerAudio");
+        
+        if (triggerAudioControllerEl != null) {
+          console.log("gotsa audio trigger controller el");
+          let triggerAudioController = triggerAudioControllerEl.components.trigger_audio_control;
+          if (triggerAudioController  != null) {
+            console.log("gotsa audio trigger controller");
+            triggerAudioController.playAudioAtPosition(hitpoint, distance);
+          }
+         
         }
       }
     }

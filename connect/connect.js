@@ -179,6 +179,7 @@ $(function() {
       // }
       // audioGroupsEl.components.audio_groups_control.LoadAudioGroups(settings.audioGroups);
       let audioGroupsEl = document.createElement('a-entity');
+      audioGroupsEl.setAttribute("id","audioGroupsEl");
       audioGroupsEl.setAttribute("audio_groups_control", {init: ''});
       sceneEl.appendChild(audioGroupsEl);
    }

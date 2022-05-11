@@ -6238,10 +6238,53 @@ app.post('/return_audiogroups/', function(req, res) {
                     console.log("error getting audio items: " + err);
                     callback(err);
                 } else {
-                    console.log("audio_group_items: "+ JSON.stringify(audio_items));
-                    callback(null);
+                    
+                    callback(null, audio_items);
                 }
             });
+        },
+        function (audio_items, callback) {
+            // console.log("audio_group_itemss: "+ JSON.stringify(audio_items));
+            // callback(null);
+            if (audio_items.length > 0) {
+                let audioItems = [];
+                async.each (audio_items, function (item, callbackz) { //takes a shake so async, and respond when it's done
+                    // audio_IDs.push(item.itemID);
+                    // let audioItem = {};
+                    // audioItem.title = item.title;
+                    // audioItem.file
+                    var item_string_filename = JSON.stringify(item.filename);
+                    item_string_filename = item_string_filename.replace(/\"/g, "");
+                    var item_string_filename_ext = getExtension(item_string_filename);
+                    var expiration = new Date();
+                    expiration.setMinutes(expiration.getMinutes() + 30);
+                    var baseName = path.basename(item_string_filename, (item_string_filename_ext));
+                    // console.log("tryna jack in " + baseName + " to a group of " + group.type);
+                    var mp3Name = baseName + '.mp3';
+                    var oggName = baseName + '.ogg';
+                    var pngName = baseName + '.png';
+                    var urlMp3 = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + item.userID + "/audio/" + item._id + "." + mp3Name, Expires: 60000});
+                    var urlOgg = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + item.userID + "/audio/" + item._id + "." + oggName, Expires: 60000});
+                    var urlPng = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + item.userID + "/audio/" + item._id + "." + pngName, Expires: 60000});
+
+                    item.URLmp3 = urlMp3; //jack in teh signed urls into the object array
+                    item.URLogg = urlOgg;
+                    item.URLpng = urlPng;
+                    audioItems.push(item);
+                    callbackz();
+                }, function(err) {
+                    if (err) {
+                        res.send("error! " + err);
+                    } else {
+                        // console.log("audio items: " + JSON.stringify(audioItems));
+                        response.audioItems = audioItems;
+                        callback(null);
+                    }
+                });
+            } else {
+                callback("no audio items");
+                
+            }
         }
         
 
@@ -6341,7 +6384,7 @@ app.post('/return_audiogroups/', function(req, res) {
     ],
 
     function(err, result) { // #last function, close async
-        res.json("groupItems: " + groupItems);
+        res.json(response);
         console.log("audio_groups waterfall done: " + result);
     }
 );
@@ -15052,7 +15095,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
     let ambientMp3Url = "";
     let triggerOggUrl = "";
     let triggerMp3Url = "";
-    let hasTriggerAudio = false;
+    let hasTriggerAudio = true;
     // let wasd = "wasd-controls=\x22fly: false; acceleration: 35; constrainToNavMesh: true;\x22";
     let wasd = "";
     //TODO use process env for google analytics
@@ -17281,14 +17324,18 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                         "</a-entity></a-entity>";
                     }
                     if (hasTriggerAudio) {
+                        // triggerAudioEntity = "<a-entity id=\x22triggerAudio\x22 trigger_audio_control=\x22oggurl: "+triggerOggUrl+"; mp3url: "+triggerMp3Url+"; volume: "+sceneTriggerVolume+";\x22"+
+                        // "</a-entity>";
+                        triggerAudioEntity = "<a-entity id=\x22triggerAudio\x22 trigger_audio_control=\x22init: yes\x22"+
+                        "</a-entity>";
                         triggerAudioScript = "<script>" +      
                         "let triggerAudioHowl = new Howl({" + //inject howler for non-streaming
                                 "src: [\x22"+triggerOggUrl+"\x22,\x22"+triggerMp3Url+"\x22], volume: 1, loop: false" + 
                             "});" +
                         "triggerAudioHowl.load();</script>";
                         // triggerAudioControl = "<script src=\x22../main/src/component/trigger-audio-control.js\x22></script>";
-                        triggerAudioEntity = "<a-entity id=\x22triggerAudio\x22 trigger_audio_control=\x22oggurl: "+triggerOggUrl+"; mp3url: "+triggerMp3Url+"; volume: "+sceneTriggerVolume+";\x22"+
-                        "</a-entity>";
+                        // triggerAudioEntity = "<a-entity id=\x22triggerAudio\x22 trigger_audio_control=\x22oggurl: "+triggerOggUrl+"; mp3url: "+triggerMp3Url+"; volume: "+sceneTriggerVolume+";\x22"+
+                        // "</a-entity>";
                     }
                     
                     // if (mp3url == null || mp3url == undefined || mp3url.length < 10) {
@@ -18154,6 +18201,15 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                     audioGroups.ambientGroups = sceneResponse.sceneAmbientAudioGroups;
                     audioGroups.primaryGroups = sceneResponse.scenePrimaryAudioGroups;
                     settings.audioGroups = audioGroups; 
+                    if (sceneResponse.triggerAudioGroups != null && sceneResponse.triggerAudioGroups.length > 0) {
+                        hasTriggerAudio = true;
+                    }
+                    if (sceneResponse.ambientAudioGroups != null && sceneResponse.ambientAudioGroups.length > 0) {
+                        hasAmbientAudio = true;
+                    }
+                    if (sceneResponse.primayAudioGroups != null && sceneResponse.primayAudioGroups.length > 0) {
+                        hasPrimaryAudio = true;
+                    }
                     // settings.sceneAmbientAudioGroups = sceneResponse.sceneAmbientAudioGroups;
                     // settings.scenePrimaryAudioGroups = sceneResponse.scenePrimaryAudioGroups;
                     var sbuff = Buffer.from(JSON.stringify(settings)).toString("base64");
@@ -19522,8 +19578,8 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                         // USED FOR TERRAIN, REM FOR NOW...
                         "<img id=\x22fireballSheet\x22 src=\x22../main/images/particles/fireball-up.png\x22></img>"+
                         "<img id=\x22fireball\x22 src=\x22../main/images/particles/fireball.png\x22></img>"+
-                                "<img id=\x22water\x22 src=\x22https://realitymangler.com/assets/textures/water2c.jpg\x22 crossorigin=\x22anonymous\x22>"+
-                                "<img id=\x22water1\x22 src=\x22https://realitymangler.com/assets/textures/watertile3.png\x22 crossorigin=\x22anonymous\x22>"+
+                                "<img id=\x22water\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/pics/water2c.jpeg\x22 crossorigin=\x22anonymous\x22>"+
+                                "<img id=\x22water1\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/pics/watertile3.png\x22 crossorigin=\x22anonymous\x22>"+
                                 // "<img id=\x22heightmap\x22 src=\x22https://realitymangler.com/assets/heightmaps/hm4.png\x22 crossorigin=\x22anonymous\x22>"+
                                 // "<img id=\x22lowestTexture\x22 src=\x22https://realitymangler.com/assets/textures/dirttile1.jpg\x22 crossorigin=\x22anonymous\x22>"+
                                 // "<img id=\x22lowTexture\x22 src=\x22https://realitymangler.com/assets/textures/sandtile1.jpg\x22 crossorigin=\x22anonymous\x22>"+
