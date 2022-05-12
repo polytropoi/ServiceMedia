@@ -5081,6 +5081,7 @@
         let mods = (response.data.mods != undefined && response.data.mods != 'undefined') ? response.data.mods : "";
         let linkURL = (response.data.linkURL != undefined & response.data.linkURL != 'undefined') ? response.data.linkURL : "";
         let sourceText = (response.data.sourceText != undefined && response.data.sourceText != 'undefined') ? response.data.sourceText : "";
+        let imageData = (response.data.imageData != undefined && response.data.imageData != 'undefined') ? response.data.imageData : ""; 
         let captionUpper = (response.data.captionUpper != undefined && response.data.captionUpper != 'undefined') ? response.data.captionUpper : ""; 
         let captionLower = (response.data.captionLower != undefined && response.data.captionLower != 'undefined') ? response.data.captionLower  : ""; 
         let description = (response.data.description != undefined && response.data.description != 'undefined') ? response.data.description  : ""; 
@@ -5137,7 +5138,12 @@
                         "<option>Heightmap</option>" +
                         "<option>Cubemap</option>" +
                         "<option>Tileable</option>" +
+                        "<option>Spritesheet</option>" +
                         "</select>" +
+                    "</div>" +
+                    "<div class=\x22col form-group col-md-2\x22>" +
+                        "<label for=\x22siName\x22>Image Data</label>" +
+                        "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22imageData\x22 placeholder=\x22Enter Image Data\x22 value=\x22" + imageData + "\x22 >" +
                     "</div>" +
                     "<div class=\x22col form-group col-md-2\x22>" +
                         "<label for=\x22siName\x22>Upper Caption</label>" +
@@ -5476,6 +5482,7 @@
                 // let hasAlpha = document.getElementById("hasAlpha").value;
                 let hasAlpha = $("#hasAlpha").prop("checked");
                 let useTarget = $("#useTarget").prop("checked");
+                let imageData = document.getElementById("imageData").value;
                 let captionUpper = document.getElementById("captionUpper").value;
                 let captionLower = document.getElementById("captionLower").value;
                 let linkType = document.getElementById("linkType").value;
@@ -5503,6 +5510,7 @@
                     hasAlphaChannel: hasAlphaChannel,
                     isPublic : status,
                     useTarget : useTarget,
+                    imageData: imageData,
                     captionUpper: captionUpper,
                     captionLower: captionLower,
                     linkType: linkType,

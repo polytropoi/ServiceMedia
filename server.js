@@ -21019,6 +21019,7 @@ app.post('/update_pic/:_id', requiredAuthentication, function (req, res) {
                     useTarget : req.body.useTarget,
                     orientation: req.body.orientation,
                     hasAlphaChannel: req.body.hasAlphaChannel,
+                    imageData: req.body.imageData,
                     captionUpper: req.body.captionUpper,
                     captionLower: req.body.captionLower,
                     mods: req.body.mods,
