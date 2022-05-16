@@ -13311,9 +13311,14 @@ function showGroup() {
                                     "<option>None</option>" +
                                     "<option>Dust</option>" +
                                     "<option>Rain</option>" +
+                                    "<option>Rain/Fog</option>" +                                    
+                                    "<option>Rain/Fog/Add</option>" +
+                                    "<option>Explosions</option>" +
+                                    "<option>Fireworks</option>" +
                                     "<option>Snow</option>" +
                                     "<option>Smoke</option>" +
                                     "<option>Fog</option>" +
+                                    "<option>Fog/Add</option>" +
                                     "<option>Clouds</option>" +
                                     "<option>Stars</option>" +
                                     "</select>" +

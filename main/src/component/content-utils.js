@@ -176,6 +176,10 @@ AFRAME.registerComponent('initializer', { //adjust for device settings, and call
     // if (iOS) {
     //   document.querySelector('.a-enter-vr').style.display = 'none';
     // }
+    // var fogColor = new THREE.Color(0xffffff);
+    // sceneEl.background = fogColor; // Setting fogColor as the background color also
+    // sceneEl.fog = new THREE.Fog(fogColor, 0.25, 4);
+
     sceneEl.addEventListener('loaded', function () { //for sure?
       console.log("aframe init with isMobile "  + isMobile + " isIOS " + isIOS + " isMacOS " + isMacOS + " headsetConnected " + headsetConnected);
 
@@ -2232,6 +2236,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
     this.lookVector = new THREE.Vector3( 0, 0, - 1 );
     this.camera = null;
     let cameraEl = document.querySelector('a-entity[camera]');
+    this.triggerAudioController = document.getElementById("triggerAudio");
     if (!cameraEl) {
         cameraEl = document.querySelector('a-camera');
     }
@@ -2578,8 +2583,8 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
       // distance = window.playerPosition.distanceTo(hitpoint);
       // console.log("new hit " + hitID + " distance: " + distance + " " + JSON.stringify(hitpoint));
       // var triggerAudioController = document.getElementById("triggerAudio");
-      if (triggerAudioController != null) {
-        triggerAudioController.components.trigger_audio_control.playAudioAtPosition(hitpoint, distance);
+      if (this.triggerAudioController != null) {
+        this.triggerAudioController.components.trigger_audio_control.playAudioAtPosition(hitpoint, distance);
       }
       // let synthCtrl = this.el.components.mod_synth;
       // if (synthCtrl != null) {
@@ -3020,7 +3025,7 @@ AFRAME.registerComponent('mod_model', {
       this.start = Date.now();
       console.log("oScale of model::: " + oScale);
       this.tick = AFRAME.utils.throttleTick(this.tick, 50, this);
-
+      this.triggerAudioController = document.getElementById("triggerAudio");
       this.hasTrigger = false;
       this.triggerObject = null;
       
@@ -3120,7 +3125,7 @@ AFRAME.registerComponent('mod_model', {
           if (this.data.eventData.toLowerCase().includes("fireworks")) {
             console.log("tryna spawn fireworks!");
 
-            this.el.setAttribute('spawner', {type: 'fireball'});
+            this.el.setAttribute('fireworks_spawner', {type: 'fireball'});
          
           }
 
@@ -3462,9 +3467,9 @@ AFRAME.registerComponent('mod_model', {
                 // this.el.setAttribute("position", this.data.pos);
                 childEnt.addEventListener('mouseenter', function (evt) {
                   if (this.data.eventData.toLowerCase().includes("audiotrigger")) {
-                    var triggerAudioController = document.getElementById("triggerAudio");
-                    if (triggerAudioController != null) {
-                      triggerAudioController.components.trigger_audio_control.playAudio();
+                    // var triggerAudioController = document.getElementById("triggerAudio");
+                    if (this.triggerAudioController != null) {
+                      this.triggerAudioController.components.trigger_audio_control.playAudio();
                     }
                   }
                     calloutEntity.setAttribute('visible', true);
@@ -3542,9 +3547,9 @@ AFRAME.registerComponent('mod_model', {
                 // this.el.setAttribute("position", this.data.pos);
                 childEnt.addEventListener('mouseenter', function (evt) {
                   if (this.data.eventData.toLowerCase().includes("audiotrigger")) {
-                    var triggerAudioController = document.getElementById("triggerAudio");
-                    if (triggerAudioController != null) {
-                      triggerAudioController.components.trigger_audio_control.playAudio();
+                    // var triggerAudioController = document.getElementById("triggerAudio");
+                    if (this.triggerAudioController != null) {
+                      this.triggerAudioController.components.trigger_audio_control.playAudio();
                     }
                   }
                     calloutEntity.setAttribute('visible', true);
@@ -3620,11 +3625,11 @@ AFRAME.registerComponent('mod_model', {
                   value: vpics[vpicsIndex].title
                 });
 
-                childEnt.addEventListener('mouseenter', function (evt) {
+                childEnt.addEventListener('mouseenter', (evt) => {
                   if (this.data.eventData.toLowerCase().includes("audiotrigger")) {
-                    var triggerAudioController = document.getElementById("triggerAudio");
-                    if (triggerAudioController != null) {
-                      triggerAudioController.components.trigger_audio_control.playAudio();
+                    // this.triggerAudioController = document.getElementById("triggerAudio");
+                    if (this.triggerAudioController != null) {
+                      this.triggerAudioController.components.trigger_audio_control.playAudio();
                     }
                   }
                     calloutEntity.setAttribute('visible', true);
@@ -3872,9 +3877,9 @@ AFRAME.registerComponent('mod_model', {
             }
           }
           if (this.data.eventData.toLowerCase().includes("audiotrigger")) {
-            var triggerAudioController = document.getElementById("triggerAudio");
-            if (triggerAudioController != null) {
-              triggerAudioController.components.trigger_audio_control.playAudio();
+
+            if (this.triggerAudioController != null) {
+              this.triggerAudioController.components.trigger_audio_control.playAudio();
             }
           }
 
