@@ -10474,8 +10474,21 @@ function showGroup() {
                                 "<input id=\x22color2\x22 class=\x22form-control\x22 type=\x22color\x22>" +
                             "</div>" +
                             "<div class=\x22col form-group col-md-2\x22>" +
-                                "<label for=\x22tonejsPatchSelect\x22>Particle System</label>" +
-                                "<select class=\x22form-control\x22 id=\x22tonejsPatchSelect\x22>" +
+                                "<label for=\x22particlesSelect\x22>Particle System</label>" +
+                                "<select class=\x22form-control\x22 id=\x22particlesSelect\x22>" +
+                                "<option value=\x22\x22 disabled selected>Select:</option>" +
+                                "<option>Fire</option>" +
+                                "<option>Candle</option>" +
+                                "<option>Smoke</option>" +
+                                "<option>Smoke/Add</option>" +
+                                "<option>Rings</option>" +
+                                "<option>Portal</option>" +
+
+                                "</select>" +
+                            "</div>" +
+                            "<div class=\x22col form-group col-md-2\x22>" +
+                                "<label for=\x22lightSelect\x22>Lighting</label>" +
+                                "<select class=\x22form-control\x22 id=\x22lightSelect\x22>" +
                                 "<option value=\x22\x22 disabled selected>Select:</option>" +
                                 "<option>Fire</option>" +
                                 "<option>Candle</option>" +
@@ -10572,7 +10585,7 @@ function showGroup() {
                             "</div>" +
                             "<div class=\x22col form-group col-md-1\x22>" + 
                                 "<label for=\x22yPosFudge\x22>Y Axis Fudge</label>" + 
-                                "<input type=\x22number\x22 class=\x22form-control\x22 id=\x22yPosFudge\x22 placeholder=\x221\x22 value=\x22" + response.data.yPosFudge + "\x22 >" +
+                                "<input type=\x22number\x22 step=\x220.001\x22 class=\x22form-control\x22 id=\x22yPosFudge\x22 placeholder=\x220\x22 value=\x22" + response.data.yPosFudge + "\x22 >" +
                             "</div>" +
                             "<div class=\x22col form-group col-md-2\x22>" +
                                 "<label for=\x22rotationaxis\x22>Rotation Axis</label>" +
@@ -10652,6 +10665,8 @@ function showGroup() {
             $("#highlight").val(response.data.highlight);
             $("#synthPatchSelect").val(response.data.synthPatch1);
             $("#tonejsPatchSelect").val(response.data.tonejsPatch1);
+            $("#particlesSelect").val(response.data.particles);
+            $("#lightSelect").val(response.data.light);
             $("#collidertype").val(response.data.collidertype);
             $("#rotationaxis").val(response.data.rotationAxis);
             $("#callout").val(response.data.callout);
@@ -11288,6 +11303,8 @@ function showGroup() {
                     let synthPatch1 = document.getElementById("synthPatchSelect").value;
                     
                     let tonejsPatch1 = document.getElementById("tonejsPatchSelect").value;
+                    let particles = document.getElementById("particlesSelect").value;
+                    let light = document.getElementById("lightSelect").value;
                     let synthNotes = document.getElementById("synthNotes").value;                
                     let synthDuration = document.getElementById("synthDuration").value;
                     let textitemID = document.getElementById("textitemID").value;
@@ -11398,6 +11415,8 @@ function showGroup() {
                         audiogroupID: audiogroupID != null ? audiogroupID : "",
                         synthPatch1: synthPatch1 != null ? synthPatch1 : "",
                         tonejsPatch1: tonejsPatch1 != null ? tonejsPatch1 : "",
+                        particles: particles != null ? particles : "",
+                        light: light != null ? light : "",
                         synthNotes: synthNotes != null ? synthNotes : "",
                         synthDuration: synthDuration != null ? synthDuration : ""
                         // _id : response.data._id

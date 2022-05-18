@@ -1757,16 +1757,24 @@ AFRAME.registerComponent('particle_spawner',
     type: {default: 'fireworks'},
     shape: {default: 'sphere'},
     size: {default: 10},
+    lifetime: {type: 'number', default: 0},
+    yoffset: {type: 'number', default: 0}
   },
 	init: function()
 	{
-    console.log("tyrna init particles!!!");
+    // console.log("tyrna init particles!!!");
 	},
-  spawnParticles: function (location) {
+  spawnParticles: function (location, type, lifetime) {
+    
+    console.log("mod_particles data: " + JSON.stringify(location));
     this.particle = document.createElement("a-entity");
-    this.particle.setAttribute("mod_particles", "");
+    this.particle.setAttribute("mod_particles", {'type': type, 'lifetime': lifetime});
+    
     this.particle.setAttribute("position", location);
-    this.particle.setAttribute("lifetime")
+ 
+    // this.particle.setAttribute("type", type);
+    // this.particle.setAttribute("lifetime", lifetime);
+  
     this.el.sceneEl.appendChild(this.particle);
   }
 
@@ -1774,16 +1782,62 @@ AFRAME.registerComponent('particle_spawner',
 
 AFRAME.registerComponent('mod_particles', {
   schema: {
-    target: {type: 'selector', default: '#camera-rig'},
+    parent: {type: 'selector', default: '#camera-rig'},
     location: {type: 'string', default: null},
-    type: {type: 'string', default: 'sparkler'}
+    type: {type: 'string', default: 'sparkler'},
+    lifetime: {type: 'number', default: 0},
+    scale: {type: 'number', default: 1}
+
   },
   init: function() {
     // let particleAttributes = {};
-    this.el.setAttribute('sprite-particles', {texture: '#smoke1', color: 'lightblue', blend: 'additive', textureFrame: '6 5', textureLoop: '1', spawnRate: '1', lifeTime: '3', scale: '10'});
+    console.log("mod_particles data: " + JSON.stringify(this.data));
+    if (this.data.type.toLowerCase() =="candle") {
+      // this.el.setAttribute('scale', '.25 .25 .25');
+      this.el.setAttribute('sprite-particles', {texture: '#candle1', color: 'yellow', textureFrame: '8 8', textureLoop: '4', spawnRate: '1', lifeTime: '1', scale: '2'});
+      this.el.setAttribute('light', {type: 'point', castShadow: 'true', color: 'yellow', intensity: .5, distance: 10, decay: 5});
+     
+
+            // initial animation
+            // setAnimation(min, max)
+
+            // function setAnimation(min, max) {
+                // generates a random number between the set min and max
+                // let intensity = Math.floor(Math.random() * (max - min + 1)) + min;
+
+            // }
+            this.lightAnimation();
+            this.el.addEventListener('animationcomplete', () => {
+                this.lightAnimation();
+            });
+
+    }
+    if (this.data.type.toLowerCase() =="smoke") {
+      this.el.setAttribute('sprite-particles', {texture: '#smoke1', color: 'lightblue', textureFrame: '6 5', textureLoop: '1', spawnRate: '1', lifeTime: '3', scale: '10'});
+    }
+    if (this.data.type.toLowerCase() =="smoke/add") {
+      this.el.setAttribute('sprite-particles', {texture: '#smoke1', color: 'lightblue', blending: 'additive', textureFrame: '6 5', textureLoop: '1', spawnRate: '1', lifeTime: '3', scale: '10'});
+    }
+    if (this.data.type.toLowerCase() =="smoke/add") {
+      this.el.setAttribute('sprite-particles', {texture: '#smoke1', color: 'lightblue', blending: 'additive', textureFrame: '6 5', textureLoop: '1', spawnRate: '1', lifeTime: '3', scale: '10'});
+    }
     // this.el.setAttribute('sprite-particles', 'texture', '#smoke1');
     // this.el.setAttribute('sprite-particles', 'color', 'blue');
    
+  },
+  lightAnimation: function (){
+    this.intensityMin = .5;
+    this.intensityMax = .75;
+    let duration = Math.random() * 600;
+    let intensity = Math.random();
+    if (intensity < .4) {
+      intensity = .5;
+    }
+    // console.log("inteisity is " + intensity + " dur " + duration);
+    let animation = "property: light.intensity; from: 0.5; to: "+intensity+"; dur: "+duration+"; dir: alternate;";
+    // console.log(intensity);
+    // updating the animation component with the .setAttribute function
+    this.el.setAttribute('animation', animation)
   }
 
 });

@@ -9,7 +9,7 @@
         {"Consumable": ["Fungible", "Food", "Drink", "Energy", "Ammo", "Waste"]},
         {"Weapon": ["Melee", "Ranged", "Magical"]},
         {"Tool": ["Inspect", "Separate", "Combine", "Transform", "InfoTech", "Kit"]},
-        {"Artifact": ["Artistic", "Informational", "Entertainment", "Magical"]},
+        {"Artifact": ["Functional", "Artistic", "Informational", "Entertainment", "Magical"]},
         {"Vehicle": ["Ground", "Air", "Marine", "Space"]},
         {"Environment": ["Public", "Private", "Natural"]},
         {"Raw Material": ["Mineral", "Elemental", "Biological"]}
@@ -58,6 +58,8 @@
         {"InfoTech": ["Wireless", "Wired", "Computer", "Phone", "Signal"]},
         {"Kit": ["Bundles", "Containers", "Essentials", "Specialty"]},
 
+
+        {"Functional": ["Lighting", "Furniture", "Signage"]},
         {"Artistic": ["Music", "Design", "Art", "Writing", "Photography"]},
         {"Informational": ["Journalism", "Marketing", "Educational", "Scientific", "Digital"]},
         {"Entertainment": ["Gaming", "Sports", "Gambling", "Naughty"]},
@@ -219,6 +221,8 @@
         {"Signal": ["Smoke", "Drum", "Light", "Flag", "Other"]},
         
 
+        {"Lighting": ["Lamp", "Torch", "Candle", "Spotlight"]},
+        {"Furniture": ["Chair", "Desk", "Bed", "Couch"]},
         {"Journalism": ["Magazine", "Journal", "Newspaper", "Blog", "Accounting"]},
         {"Educational": ["Diploma", "Achievement Token", "Grant", "Scholarship", "Catalog", "Dictionary", "Map"]},
         {"Scientific": ["Prize", "Experiment", "Data"]},

@@ -2257,6 +2257,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
     this.camera = null;
     let cameraEl = document.querySelector('a-entity[camera]');
     this.triggerAudioController = document.getElementById("triggerAudio");
+    this.isTriggered = false;
     if (!cameraEl) {
         cameraEl = document.querySelector('a-camera');
     }
@@ -2485,8 +2486,8 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
           this.pos = evt.detail.intersection.point; //hitpoint on model
           let name = evt.detail.intersection.object.name;
           this.hitPosition = this.pos;
-          if (player != null)
-          this.distance = window.playerPosition.distanceTo(this.hitpoint);
+          // if (player != null && window.playerPosition != undefined) {
+          this.distance = window.playerPosition.distanceTo(this.hitPosition);
           // console.log("distance  " + this.distance);
           this.rayhit(evt.detail.intersection.object.name, this.distance, evt.detail.intersection.point);
 
@@ -2519,6 +2520,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
 
           }
         }
+        
         // this.applyForce();  //
       }
     });
@@ -2590,11 +2592,23 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
           console.log("select action " + JSON.stringify(this.selectAction));
 
           if (this.selectAction.actionResult.toLowerCase() == "trigger fx") {
-            let particleSpawner = document.getElementById('particleSpawner');
-            if (particleSpawner != null) {
-              particleSpawner.components.particle_spawner.spawnParticles(this.el.getAttribute('position'));
+            if (!this.isTriggered) {
+              this.isTriggered = true;
+              let particleSpawner = document.getElementById('particleSpawner');
+              if (particleSpawner != null) {
+                this.loc = this.el.getAttribute('position');
+                if (this.data.objectData.yPosFudge != null && this.data.objectData.yPosFudge != "") {
+                  var worldPosition = new THREE.Vector3();
+                  this.el.object3D.getWorldPosition(worldPosition);
+                  console.log("this.loc.y " + worldPosition + " plus" + this.data.objectData.yPosFudge);
+                  worldPosition.y += this.data.objectData.yPosFudge;
+                }
+                particleSpawner.components.particle_spawner.spawnParticles(worldPosition, this.data.objectData.particles, 5);
+              }
+            } else {
+              console.log("already triggered - make it a toggle!");
             }
-          } 
+          }
         }
       } else {
         if (this.hasThrowAction) {
