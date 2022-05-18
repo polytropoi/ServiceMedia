@@ -561,6 +561,9 @@
         "Unknown"
     ],
     "actiontype" : [
+        "Highlight",
+        "Select",
+        "Collide",
         "Pickup",
         "Drop",
         "Collect",
@@ -595,6 +598,8 @@
     ],
     "actionresult" : [
         "None",
+        "Trigger Fx",
+        "Trigger Audio",
         "Inventory",
         "Consume",
         "Pay",
@@ -615,6 +620,8 @@
     "sourceobjectmod" : [
       "No change",
       "Remove",
+      "Add Model",
+      "Add Object",
       "Replace Model",
       "Replace Object",
       "Physics Drop",

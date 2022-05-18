@@ -1623,7 +1623,7 @@ AFRAME.registerComponent('mod_physics', {
 // }
 
 
-AFRAME.registerComponent('mod_particles', {
+AFRAME.registerComponent('mod_particles_no', {
   schema: {
     type: {default: 'fireworks'},
     shape: {default: 'sphere'},
@@ -1756,17 +1756,35 @@ AFRAME.registerComponent('particle_spawner',
   schema: {
     type: {default: 'fireworks'},
     shape: {default: 'sphere'},
-    size: {default: 10} 
-   
+    size: {default: 10},
   },
 	init: function()
 	{
     console.log("tyrna init particles!!!");
+	},
+  spawnParticles: function (location) {
     this.particle = document.createElement("a-entity");
     this.particle.setAttribute("mod_particles", "");
-    this.particle.setAttribute("position", {"x":0, "y":5, "z":0} );
+    this.particle.setAttribute("position", location);
+    this.particle.setAttribute("lifetime")
     this.el.sceneEl.appendChild(this.particle);
-	},
+  }
+
+});
+
+AFRAME.registerComponent('mod_particles', {
+  schema: {
+    target: {type: 'selector', default: '#camera-rig'},
+    location: {type: 'string', default: null},
+    type: {type: 'string', default: 'sparkler'}
+  },
+  init: function() {
+    // let particleAttributes = {};
+    this.el.setAttribute('sprite-particles', {texture: '#smoke1', color: 'lightblue', blend: 'additive', textureFrame: '6 5', textureLoop: '1', spawnRate: '1', lifeTime: '3', scale: '10'});
+    // this.el.setAttribute('sprite-particles', 'texture', '#smoke1');
+    // this.el.setAttribute('sprite-particles', 'color', 'blue');
+   
+  }
 
 });
 
@@ -2030,3 +2048,4 @@ AFRAME.registerComponent('emit-when-near', {
     }
   }
 });
+

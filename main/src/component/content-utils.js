@@ -2122,6 +2122,23 @@ AFRAME.registerComponent('mod_objex', {
       this.equipHolder.appendChild(this.objEl);
       // this.el.setAttribute('gltf-model', '#' + modelID.toString());
     },
+    selectObject: function (objectID) { //hrm...
+      console.log("tryna select object " + objectID);  
+      this.objectData = this.returnObjectData(objectID);
+      this.dropPos = new THREE.Vector3();
+      this.objEl = document.createElement("a-entity");
+      this.locData = {};
+      this.locData.x = this.dropPos.x;
+      this.locData.y = this.dropPos.y;
+      this.locData.z = this.dropPos.z;
+      this.locData.timestamp = Date.now();
+      this.objEl.setAttribute("mod_object", {'locationData': this.locData, 'objectData': this.objectData});
+      this.objEl.id = "obj" + this.objectData._id + "_" + this.locData.timestamp;
+      sceneEl.appendChild(this.objEl);
+      // this.objEl.components.mod_object.applyForce();
+
+      // this.el.setAttribute('gltf-model', '#' + modelID.toString());
+    },
     dropObject: function (objectID) {
       console.log("tryna set model to " + objectID);  
       this.objectData = this.returnObjectData(objectID);
@@ -2229,6 +2246,9 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
     this.dropAction = null;
     this.equipAction = null;
     this.throwAction = null;
+    this.selectAction = null;
+    this.highlightAction = null;
+    this.collideAction = null;
     this.synth = null;
     this.hasSynth = false;
     this.mod_physics = "";
@@ -2307,12 +2327,22 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
    
     if (this.data.objectData.actions != undefined && this.data.objectData.actions.length > 0) {
       for (let a = 0; a < this.data.objectData.actions.length; a++) {
-          // console.log("action: " + JSON.stringify(this.data.objectData.actions[a].actionType));
-
+          console.log("action: " + JSON.stringify(this.data.objectData.actions[a].actionType));
+        if (this.data.objectData.actions[a].actionType.toLowerCase() == "select") {
+          this.hasSelectAction = true;
+          this.selectAction = this.data.objectData.actions[a];
+        }
+        if (this.data.objectData.actions[a].actionType.toLowerCase() == "highlight") {
+          this.hasHighlightAction = true;
+          this.highlightAction = this.data.objectData.actions[a];
+        }
+        if (this.data.objectData.actions[a].actionType.toLowerCase() == "collide") {
+          this.hasCollideAction = true;
+          this.collideAction = this.data.objectData.actions[a];
+        }
         if (this.data.objectData.actions[a].actionType.toLowerCase() == "pickup") {
           this.hasPickupAction = true;
           this.pickupAction = this.data.objectData.actions[a];
-          // console.log("pickup action: " + JSON.stringify(this.pickupAction));
         }
         if (this.data.objectData.actions[a].actionType.toLowerCase() == "drop") {
           this.hasDropAction = true;
@@ -2445,7 +2475,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
           window.playerPosition = this.playerPosRot.pos; 
         }
         // console.log(window.playerPosition);
-        if (!that.isSelected && evt.detail.intersection != null) {
+        if (!this.isSelected && evt.detail.intersection != null) {
           // document.getElementById("player").component.get_pos_rot.returnPosRot();
           this.clientX = evt.clientX;
           this.clientY = evt.clientY;
@@ -2454,39 +2484,42 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
 
           this.pos = evt.detail.intersection.point; //hitpoint on model
           let name = evt.detail.intersection.object.name;
-          that.hitPosition = this.pos;
+          this.hitPosition = this.pos;
           if (player != null)
-          that.distance = window.playerPosition.distanceTo(that.hitpoint);
-          // console.log("distance  " + that.distance);
-          that.rayhit(evt.detail.intersection.object.name, that.distance, evt.detail.intersection.point);
+          this.distance = window.playerPosition.distanceTo(this.hitpoint);
+          // console.log("distance  " + this.distance);
+          this.rayhit(evt.detail.intersection.object.name, this.distance, evt.detail.intersection.point);
 
-            that.selectedAxis = name;
+            this.selectedAxis = name;
 
-            let elPos = that.el.getAttribute('position');
-          if (that.calloutEntity != null && that.distance < 20) {
-            that.calloutEntity.setAttribute('visible', false);
-            console.log("trna scale to distance :" + that.distance);
-            that.calloutEntity.setAttribute("position", this.pos);
-            that.calloutEntity.setAttribute('visible', true);
-            that.calloutEntity.setAttribute('scale', {x: that.distance * .20, y: that.distance * .20, z: that.distance * .20} );
-            let theLabel = that.data.objectData.labeltext;
+            let elPos = this.el.getAttribute('position');
+          if (this.calloutEntity != null && this.distance < 20) {
+            this.calloutEntity.setAttribute('visible', false);
+            console.log("trna scale to distance :" + this.distance);
+            this.calloutEntity.setAttribute("position", this.pos);
+            this.calloutEntity.setAttribute('visible', true);
+            this.calloutEntity.setAttribute('scale', {x: this.distance * .20, y: this.distance * .20, z: this.distance * .20} );
+            let theLabel = this.data.objectData.labeltext;
             let calloutString = theLabel;
-            if (that.calloutLabelSplit.length > 0) {
-              if (that.calloutLabelIndex < that.calloutLabelSplit.length - 1) {
-                that.calloutLabelIndex++;
+            if (this.calloutLabelSplit.length > 0) {
+              if (this.calloutLabelIndex < this.calloutLabelSplit.length - 1) {
+                this.calloutLabelIndex++;
               } else {
-                that.calloutLabelIndex = 0;
+                this.calloutLabelIndex = 0;
               }
-              calloutString = that.calloutLabelSplit[that.calloutLabelIndex];
+              calloutString = this.calloutLabelSplit[this.calloutLabelIndex];
             }
-            // if (that.calloutToggle) { //show pos every other time
+            // if (this.calloutToggle) { //show pos every other time
             //   // calloutString = "x : " + elPos.x.toFixed(2) + "\n" +"y : " + elPos.y.toFixed(2) + "\n" +"z : " + elPos.z.toFixed(2);
-            //   calloutString = that.data.description != '' ? that.data.description : theLabel;
+            //   calloutString = this.data.description != '' ? this.data.description : theLabel;
             // }
-            that.calloutText.setAttribute("value", calloutString);
+            this.calloutText.setAttribute("value", calloutString);
+          }
+          if (this.hasHighlightAction) {
+
           }
         }
-        // that.applyForce();  //
+        // this.applyForce();  //
       }
     });
     
@@ -2494,8 +2527,8 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
       e.preventDefault();
       // console.log("tryna mouseexit");
       if (!this.data.equipped) {
-        if (that.calloutEntity != null) {
-          that.calloutEntity.setAttribute('visible', false);
+        if (this.calloutEntity != null) {
+          this.calloutEntity.setAttribute('visible', false);
         }
       }
     });
@@ -2553,6 +2586,16 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
           }
           
         }
+        if (this.selectAction) {
+          console.log("select action " + JSON.stringify(this.selectAction));
+
+          if (this.selectAction.actionResult.toLowerCase() == "trigger fx") {
+            let particleSpawner = document.getElementById('particleSpawner');
+            if (particleSpawner != null) {
+              particleSpawner.components.particle_spawner.spawnParticles(this.el.getAttribute('position'));
+            }
+          } 
+        }
       } else {
         if (this.hasThrowAction) {
           console.log("throw action " + JSON.stringify(this.throwAction));
@@ -2568,7 +2611,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
             }
             this.objexEl.components.mod_objex.throwObject(this.data.objectData._id, this.mouseDowntime, "5");
           }
-        }
+        }        
       }
       // setTimeout(() => {
         // this.el.setAttribute('visible', true);

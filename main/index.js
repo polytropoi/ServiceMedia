@@ -3680,7 +3680,9 @@
                         "<label for=\x22fontSelect\x22>Action Type</label>" + //FontSelect
                         "<select class=\x22form-control\x22 id=\x22actionTypeSelect\x22 required>" +
                             "<option value=\x22\x22 disabled selected>Select:</option>" +
-                        
+                            "<option>Highlight</option>" +
+                            "<option>Select</option>" +
+                            "<option>Collide</option>" +
                             "<option>Pickup</option>" +
                             "<option>Drop</option>" +
                             "<option>Collect</option>" +
@@ -10463,13 +10465,24 @@ function showGroup() {
                                 "<label for=\x22highlightColor\x22>Highlight Color</label>" + //sceneText
                                 "<input id=\x22highlightColor\x22 class=\x22form-control\x22 type=\x22color\x22>" +
                             "</div>" +
-                            "<div class=\x22col form-group col-md-2\x22> " +
+                            "<div class=\x22col form-group col-md-1\x22> " +
                                 "<label for=\x22color1\x22>Color #1</label>" + //sceneText
                                 "<input id=\x22color1\x22 class=\x22form-control\x22 type=\x22color\x22>" +
                             "</div>" +
-                            "<div class=\x22col form-group col-md-2\x22> " +
+                            "<div class=\x22col form-group col-md-1\x22> " +
                                 "<label for=\x22color2\x22>Color #2</label>" + //sceneText
                                 "<input id=\x22color2\x22 class=\x22form-control\x22 type=\x22color\x22>" +
+                            "</div>" +
+                            "<div class=\x22col form-group col-md-2\x22>" +
+                                "<label for=\x22tonejsPatchSelect\x22>Particle System</label>" +
+                                "<select class=\x22form-control\x22 id=\x22tonejsPatchSelect\x22>" +
+                                "<option value=\x22\x22 disabled selected>Select:</option>" +
+                                "<option>Fire</option>" +
+                                "<option>Candle</option>" +
+                                "<option>Rings</option>" +
+                                "<option>Portal</option>" +
+
+                                "</select>" +
                             "</div>" +
                         "</div>" +
                         "<div class=\x22form-row\x22>" +
