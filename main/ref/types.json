@@ -565,6 +565,7 @@
         "Unknown"
     ],
     "actiontype" : [
+        "OnLoad",
         "Highlight",
         "Select",
         "Collide",

@@ -2247,6 +2247,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
     this.equipAction = null;
     this.throwAction = null;
     this.selectAction = null;
+    this.loadAction = null;
     this.highlightAction = null;
     this.collideAction = null;
     this.synth = null;
@@ -2329,6 +2330,10 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
     if (this.data.objectData.actions != undefined && this.data.objectData.actions.length > 0) {
       for (let a = 0; a < this.data.objectData.actions.length; a++) {
           console.log("action: " + JSON.stringify(this.data.objectData.actions[a].actionType));
+        if (this.data.objectData.actions[a].actionType.toLowerCase() == "onload") {
+          // this.hasSelectAction = true;
+          this.loadAction = this.data.objectData.actions[a];
+        }
         if (this.data.objectData.actions[a].actionType.toLowerCase() == "select") {
           this.hasSelectAction = true;
           this.selectAction = this.data.objectData.actions[a];
@@ -2364,7 +2369,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
         }
       }
     }
-    if (this.data.removeAfter != "") {
+    if (this.data.removeAfter != "") { //cleanup if timeout set
       setTimeout( () => { 
         this.el.parentNode.removeChild(this.el);
       }, 5000);
@@ -2417,8 +2422,25 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
         //     that.el.setAttribute('ammo-body', {type: 'dynamic'});
         //     // that.el.setAttribute('ammo-shape', 'box');
         //     }
-          // }, 3000);
+          // }, 3000);  
+      }
+      if (this.loadAction != null) {
+        if (this.loadAction.actionResult.toLowerCase() == "trigger fx") {
+        
+            let particleSpawner = document.getElementById('particleSpawner');
+            if (particleSpawner != null) {
+              var worldPosition = new THREE.Vector3();
+              this.el.object3D.getWorldPosition(worldPosition);
+              if (this.data.objectData.yPosFudge != null && this.data.objectData.yPosFudge != "") {
+                worldPosition.y += this.data.objectData.yPosFudge;
+              }
+              console.log("triggering fx at " + worldPosition + " plus" + this.data.objectData.yPosFudge);
+              particleSpawner.components.particle_spawner.spawnParticles(worldPosition, this.data.objectData.particles, 5, this.el.id, this.data.objectData.yPosFudge);
+            }
+
         }
+      }
+
     });
 
     this.el.addEventListener('body-loaded', () => {  //body-loaded event = physics ready on obj
@@ -2571,7 +2593,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
     this.el.addEventListener('click', (e) => { 
       e.preventDefault();
       // let downtime = (Date.now() / 1000) - this.mouseDownStarttime;
-      console.log("mousedown time "+ this.mouseDowntime + "  on object type: " + this.data.objectData.objtype + " action " + JSON.stringify(this.throwAction) + " equipped " + this.data.equipped);
+      console.log("mousedown time "+ this.mouseDowntime + "  on object type: " + this.data.objectData.objtype + " actions " + JSON.stringify(this.data.objectData.actions) + " equipped " + this.data.equipped);
       if (!this.data.equipped) {
         this.dialogEl = document.getElementById('mod_dialog');
         
@@ -2590,7 +2612,6 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
         }
         if (this.selectAction) {
           console.log("select action " + JSON.stringify(this.selectAction));
-
           if (this.selectAction.actionResult.toLowerCase() == "trigger fx") {
             if (!this.isTriggered) {
               this.isTriggered = true;
@@ -2603,14 +2624,14 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
                   console.log("this.loc.y " + worldPosition + " plus" + this.data.objectData.yPosFudge);
                   worldPosition.y += this.data.objectData.yPosFudge;
                 }
-                particleSpawner.components.particle_spawner.spawnParticles(worldPosition, this.data.objectData.particles, 5);
+                particleSpawner.components.particle_spawner.spawnParticles(worldPosition, this.data.objectData.particles, 5, this.el.id, this.data.objectData.yPosFudge);
               }
             } else {
               console.log("already triggered - make it a toggle!");
             }
           }
         }
-      } else {
+      } else { //if equipped
         if (this.hasThrowAction) {
           console.log("throw action " + JSON.stringify(this.throwAction));
           if (this.throwAction.sourceObjectMod.toLowerCase() == "persist") { //transfer to scene inventory
@@ -2625,7 +2646,28 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
             }
             this.objexEl.components.mod_objex.throwObject(this.data.objectData._id, this.mouseDowntime, "5");
           }
-        }        
+        } 
+        if (this.selectAction) {
+          console.log("select action " + JSON.stringify(this.selectAction));
+          if (this.selectAction.actionResult.toLowerCase() == "trigger fx") { //e.g. light a torch
+            if (!this.isTriggered) {
+              this.isTriggered = true;
+              let particleSpawner = document.getElementById('particleSpawner');
+              if (particleSpawner != null) {
+                this.loc = this.el.getAttribute('position');
+                if (this.data.objectData.yPosFudge != null && this.data.objectData.yPosFudge != "") {
+                  var worldPosition = new THREE.Vector3();
+                  this.el.object3D.getWorldPosition(worldPosition);
+                  console.log("this.loc.y " + worldPosition + " plus" + this.data.objectData.yPosFudge);
+                  worldPosition.y += this.data.objectData.yPosFudge;
+                }
+                particleSpawner.components.particle_spawner.spawnParticles(worldPosition, this.data.objectData.particles, 5, this.el.id, this.data.objectData.yPosFudge);
+              }
+            } else {
+              console.log("already triggered - make it a toggle!");
+            }
+          }
+        }       
       }
       // setTimeout(() => {
         // this.el.setAttribute('visible', true);

@@ -1532,224 +1532,6 @@ AFRAME.registerComponent('mod_physics', {
   }
 });
 
-// AFRAME.registerComponent('punch', {
-//   schema: {
-//     yOffset: {type: 'number', default: '0'}, 
-//     zOffset: {type: 'number', default: '-1'},
-//   },
-//   update() {
-//     const punchAnimation = () => {
-//       this.el.removeAttribute('animation')
-//       this.el.setAttribute('animation', `property: position; dur: 125; from: 0 ${this.data.yOffset} ${this.data.zOffset}; to: 0 ${this.data.yOffset} -3; dir: alternate; loop: 2; easing: easeInOutQuad`)
-//     }
-//     this.el.sceneEl.onclick = punchAnimation
-//     const handleKeyDown = (e) => {
-//       if (e.key === ' ') {  // space bar punches on desktop
-//         punchAnimation()
-//       }
-//     }
-//     window.addEventListener('keydown', handleKeyDown)
-//   },
-// }
-
-// AFRAME.registerComponent("dragndrop", {
-//   init: function() {
-//     console.log("dragndropp!");
-//     this.dist = null
-//     this.dir = new THREE.Vector3()
-//     this.mouse = new THREE.Vector2();
-//     this.scene = this.el.sceneEl
-//     this.camera = this.scene.camera;
-//     this.raycaster = null;
-//     this.vplaceholder = document.getElementById('viewportPlaceholder');
-//     this.el.addEventListener('raycaster-intersected', evt => {
-//       this.raycaster = evt.detail.el;
-//       console.log(this.raycaster.direction);
-//     });
-//     this.el.addEventListener('raycaster-intersected-cleared', evt => {
-//       this.raycaster = null;
-//     });
-
-//     this.el.addEventListener("mousedown", e =>{
-//       // update the base distance between the cursor to the object
-//       this.dist = this.el.object3D.position.clone()
-//         .sub(this.vplaceholder.object3D.position).length();
-
-//       this.dir.copy(this.raycaster.direction);
-
-//       this.el.addState("being-dragged")
-//     })
-    
-//     let that = this;
-//     document.addEventListener("mousemove", (event) =>{
-//       // update the direction from raycaster coponent
-//       // let raycaster = this.el.sceneEl.querySelector('[raycaster]');
-//       // this.cursor = document.getElementById('mouseCursor');
-//       // this.raycaster = this.cursor.components.raycaster;
-//       // if (this.raycaster != null) {
-//       //   this.dir.copy(this.raycaster.direction);
-//       // }
-//       	this.mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-// 	      this.mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
-//         console.log(this.mouse);
-    
-//     })
-
-//     this.el.addEventListener("click", e=> {
-//       // complete the drag when click completed
-//       this.el.removeState("being-dragged")
-//     })
-
-//   },
-//   tick: function() {
-//     // only move it when certain state is meet
-//     if (this.el.is('being-dragged')) {
-//       var target = this.camera.object3D.position.clone()
-//         .add(this.dir.multiplyScalar(this.dist))
-
-//       this.el.object3D.copy(target)
-//     }
-//   }
-// });
-
-// function onMouseMove( event ) {
-
-// 	// calculate mouse position in normalized device coordinates
-// 	// (-1 to +1) for both components
-
-// 	mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-// 	mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
-
-// }
-
-
-AFRAME.registerComponent('mod_particles_no', {
-  schema: {
-    type: {default: 'fireworks'},
-    shape: {default: 'sphere'},
-    size: {default: 10} 
-   
-  },
-  init: function() {
-    console.log('tryna init particle!');
-    this.elapsedTime = 0;
-    // this.position = this.el.getAttribute('position');
-    // this.particleEl = document.createElement('a-entity');
-    // this.particleEl.setAttribute('position', this.position);
-    // this.particleOptions = {};
-    // this.particleOptions.texture = 'main/images/particles/sparkle.png'
-    // this.particleEl.setAttribute('spe-particles', {
-    // texture: 'main/images/particles/sparkle.png',
-    // color: 'yellow, red, cyan, black', 
-    // distribution: 'sphere', 
-    // randomizeVelocity: true,
-    // radius: 0.01,
-    // particleCount: 800, 
-    // velocity: 1,
-    // velocitySpread: 0.5, 
-    // drag: 1,
-    // maxAge: 2,
-    // blending: 'additive',
-    // activeMultiplier: 1000, 
-    // size: '1, 1, 1, 0'});
-    this.particleEl = document.createElement("a-entity");
-    this.particleEl.setAttribute("spe-particles", "");
-    this.duration = 12;
-    this.particleEl.setAttribute("spe-particles", "texture", "#sparkle1");
-    this.particleEl.setAttribute("spe-particles", "blending", "additive");
-    this.particleEl.setAttribute("spe-particles", "distribution", "sphere");
-    this.particleEl.setAttribute("spe-particles", "radius", 1);
-
-    // particles both shrink and fade during last moments
-    this.particleEl.setAttribute("spe-particles", "opacity", [1, 1, 1, 0]);
-    // this.particleEl.setAttribute("spe-particles", "size", [1, 1, 1, 0]);
-
-    let particleCount = Math.floor( randomUniform(100, 999) );
-    console.log("particle count: " + particleCount); 
-    this.particleEl.setAttribute("spe-particles", "particleCount", particleCount);
-
-    // // change of particle burst vs. particle stream
-    // if ( Math.random() < 0.80 )
-    //   this.particleEl.setAttribute("spe-particles", "activeMultiplier", particleCount);
-    // else
-    //   this.particleEl.setAttribute("spe-particles", "activeMultiplier", particleCount/128);
-
-    // note: when distribution = 'sphere', only first component of velocity vectors are used
-    let baseVelocity = randomUniform(1, 2);
-    this.particleEl.setAttribute("spe-particles", "velocity", {"x":baseVelocity, "y":0, "z":0});
-    this.particleEl.setAttribute("spe-particles", "velocitySpread", {"x":0.5, "y":0, "z":0});
-    this.particleEl.setAttribute("spe-particles", "drag", 1.00);
-    this.particleEl.setAttribute("spe-particles", "randomizeVelocity", true);
-
-    // add a bit of gravity
-    this.particleEl.setAttribute("spe-particles", "accelerationDistribution", "box");
-    this.particleEl.setAttribute("spe-particles", "acceleration", {"x":0, "y":-0.2, "z":0});
-    this.particleEl.setAttribute("spe-particles", "accelerationSpread", {"x":0, "y":0.2, "z":0});
-
-    // how long will particles last?
-        this.burstDuration = randomUniform(1.0, 3.0);
-        this.particleEl.setAttribute("spe-particles", "maxAge", this.duration);
-        this.particleEl.setAttribute("spe-particles", "maxAgeSpread", this.duration/4);
-        // duration = maximum amount of time to emit particles;
-        //        	  should be less than smallest max age to prevent second burst
-    this.particleEl.setAttribute("spe-particles", "duration", 5);
-
-    // default: steady color
-        // let colorArray = ["white", this.data.color, this.data.color, this.data.color];
-        // // random chance of color shifting
-        // if ( Math.random() < 0.25 )
-        // {
-        //   let color2 = this.data.color;
-        //   // make sure second color is different from first
-        //   while (color2 == this.data.color)
-        //   {
-        //     color2 = this.randomColor();
-        //   }
-        //   colorArray = ["white", this.data.color, color2, color2];
-        // }
-        //     this.particleEl.setAttribute("spe-particles", "color", colorArray);
-
-        // disable burst effect for now;
-        //   will be enabled (in tick method) after reaching max height
-    this.particleEl.setAttribute("spe-particles", "enabled", true);
-
-      // this.el.sceneEl.appendChild(this.particleEl);
-      
-
-      
-  },
-	tick: function(time, deltaTime) {
-    this.elapsedTime += deltaTime/1000;
-    // console.log(this.elapsedTime);
-		// firework has reached max height, start burst effect
-		if (this.elapsedTime > 100)
-		{
-      
-			// this.burstStart = true;
-			// this.particleBurst.setAttribute("spe-particles", "enabled", true);
-      // console.log("spe particles should be particling!~!!");
-			// this.el.removeChild( this.particleTrail );
-
-			// this.burstSound.components.sound.playSound();
-		}
-  }
-  
-
-
-  // particleOptions.color = 'yellow, red, cyan, black';
-  // particleOptions.distribution = 'sphere'; 
-  // particleOptions.randomize-velocity = true;
-  // particleOptions.radius = 0.01;
-  // particleOptions.particle-count = 800; 
-  // particleOptions.velocity = 1;
-  // particleOptions.velocity-spread = 0.5; 
-  // particleOptions.drag = 1;
-  // particleOptions.max-age = 2;
-  // particleOptions.blending = additive;
-  // particleOptions.active-multiplier = 1000; 
-  // particleOptions.size = '1, 1, 1, 0';
-});
-
 
 AFRAME.registerComponent('particle_spawner', 
 {
@@ -1764,53 +1546,97 @@ AFRAME.registerComponent('particle_spawner',
 	{
     // console.log("tyrna init particles!!!");
 	},
-  spawnParticles: function (location, type, lifetime) {
+  spawnParticles: function (location, type, lifetime, parentID, yFudge) {
     
-    console.log("mod_particles data: " + JSON.stringify(location));
+    // console.log("mod_particles data: " + JSON.stringify(location));
     this.particle = document.createElement("a-entity");
-    this.particle.setAttribute("mod_particles", {'type': type, 'lifetime': lifetime});
+    this.particle.setAttribute("mod_particles", {'type': type, 'lifetime': lifetime, 'parentID': parentID, 'yFudge': yFudge});
     
-    this.particle.setAttribute("position", location);
+
  
     // this.particle.setAttribute("type", type);
     // this.particle.setAttribute("lifetime", lifetime);
-  
-    this.el.sceneEl.appendChild(this.particle);
+    if (parentID != null) { 
+
+      let pparent = document.getElementById(parentID);
+      let obj = pparent.object3D;
+   
+      let box = new THREE.Box3().setFromObject(obj); //bounding box for position
+      let center = new THREE.Vector3();
+      box.getCenter(center);
+      let pos =  obj.worldToLocal(center);
+      console.log("premod pos " + JSON.stringify(pos));
+      if (yFudge != null) {
+        let newPos = {};
+        newPos.x = pos.x;
+        newPos.y = pos.y + parseFloat(yFudge);
+        newPos.z = pos.z;
+        console.log("tryna mod "+JSON.stringify(newPos)+" yfudge " + yFudge);
+        this.particle.setAttribute("position", newPos);
+      } else {
+        this.particle.setAttribute("position", pos);
+      }
+
+      var worldPosition = new THREE.Vector3();
+        obj.getWorldPosition(worldPosition);
+     
+       //get centerpoint of geometry, in localspace
+       //set position as local to 
+
+      pparent.appendChild(this.particle);
+
+    } else {
+      this.particle.setAttribute("position", location);
+      this.el.sceneEl.appendChild(this.particle);
+    }
+    
   }
 
 });
 
 AFRAME.registerComponent('mod_particles', {
   schema: {
-    parent: {type: 'selector', default: '#camera-rig'},
+    parentID: {type: 'string', default: null},
     location: {type: 'string', default: null},
     type: {type: 'string', default: 'sparkler'},
     lifetime: {type: 'number', default: 0},
-    scale: {type: 'number', default: 1}
+    scale: {type: 'number', default: 1},
+    yFudge: {type: 'number', default: 0}
 
   },
   init: function() {
     // let particleAttributes = {};
     console.log("mod_particles data: " + JSON.stringify(this.data));
+    this.position = new THREE.Vector3();
+    this.el.object3D.getWorldPosition(this.position);
+   
+    if (this.data.parentID != null) {
+      // if (this.data.yFudge != 0) {
+      //   this.position.y += this.data.yFudge;
+      //   console.log("tryna add some yfudge " + this.data.yFudge); 
+      //   this.el.setAttribute("position", this.position);
+      // }
+
+
+    }
     if (this.data.type.toLowerCase() =="candle") {
       // this.el.setAttribute('scale', '.25 .25 .25');
       this.el.setAttribute('sprite-particles', {texture: '#candle1', color: 'yellow', textureFrame: '8 8', textureLoop: '4', spawnRate: '1', lifeTime: '1', scale: '2'});
       this.el.setAttribute('light', {type: 'point', castShadow: 'true', color: 'yellow', intensity: .5, distance: 10, decay: 5});
-     
-
-            // initial animation
-            // setAnimation(min, max)
-
-            // function setAnimation(min, max) {
-                // generates a random number between the set min and max
-                // let intensity = Math.floor(Math.random() * (max - min + 1)) + min;
-
-            // }
-            this.lightAnimation();
-            this.el.addEventListener('animationcomplete', () => {
-                this.lightAnimation();
-            });
-
+      this.lightAnimation(.5, .75);
+      this.el.addEventListener('animationcomplete', () => {
+          this.lightAnimation(.5, .75);
+      });
+    }
+        
+    if (this.data.type.toLowerCase() =="fire") {
+      // this.el.setAttribute('scale', '.25 .25 .25');
+      this.el.setAttribute('sprite-particles', {texture: '#fireanim1', color: 'yellow', blending: 'additive', textureFrame: '6 6', textureLoop: '3', spawnRate: '2', lifeTime: '1.1', scale: '12'});
+      this.el.setAttribute('light', {type: 'point', castShadow: 'true', color: 'yellow', intensity: .75, distance: 15, decay: 5});
+      this.lightAnimation(.7, 1);
+      this.el.addEventListener('animationcomplete', () => {
+          this.lightAnimation(.7, 1);
+      });
     }
     if (this.data.type.toLowerCase() =="smoke") {
       this.el.setAttribute('sprite-particles', {texture: '#smoke1', color: 'lightblue', textureFrame: '6 5', textureLoop: '1', spawnRate: '1', lifeTime: '3', scale: '10'});
@@ -1825,12 +1651,12 @@ AFRAME.registerComponent('mod_particles', {
     // this.el.setAttribute('sprite-particles', 'color', 'blue');
    
   },
-  lightAnimation: function (){
-    this.intensityMin = .5;
-    this.intensityMax = .75;
+  lightAnimation: function (min, max){
+    this.intensityMin = min;
+    this.intensityMax = max;
     let duration = Math.random() * 600;
     let intensity = Math.random();
-    if (intensity < .4) {
+    if (intensity < this.intensityMin) {
       intensity = .5;
     }
     // console.log("inteisity is " + intensity + " dur " + duration);
@@ -1854,221 +1680,6 @@ function randomUniform(min, max)
 {
 	return min + (max - min) * Math.random();
 }
-
-// AFRAME.registerComponent('fireworks_spawner', 
-// {
-// 	init: function()
-// 	{
-// 		this.sceneElement = document.querySelector('a-scene');
-// 	},
-
-// 	tick: function(time, deltaTime) // deltaTime: milliseconds
-// 	{
-// 		let deltaSeconds = deltaTime/1000;
-// 		let eventFrequency = 0.75;
-
-// 		if ( Math.random() < eventFrequency * deltaSeconds )
-// 		{
-// 			console.log( "Firework!" );
-// 			let angle = THREE.Math.degToRad(270);
-// 			let angleSpread = THREE.Math.degToRad(90);
-// 			let angleRadians = angle + randomNormal(-angleSpread, angleSpread); 
-// 			let radius = 9;
-// 			let x = radius * Math.cos(angleRadians);
-// 			let y = 0;
-// 			let z = radius * Math.sin(angleRadians);
-
-// 			let firework = document.createElement("a-entity");
-// 			firework.setAttribute("firework", "");
-// 			firework.setAttribute("position", {"x":x, "y":y, "z":z} );
-
-// 			// random flight parameters
-// 			let maxHeight = randomNormal(4, 8);
-// 			firework.setAttribute("firework", "maxHeight", maxHeight );
-// 			let riseTime = randomNormal(2, 3);
-// 			firework.setAttribute("firework", "riseTime", riseTime );
-// 			this.sceneElement.appendChild( firework );
-
-// 			// chance of multi-firework
-// 			// 0.10 = 1/10 double, 1/100 triple, 1/1000 quadruple, etc.
-// 			// 0.20 =  1/5 double,  1/25 triple,  1/125 quadruple, etc.
-// 			while ( Math.random() < 0.15 )
-// 			{
-// 				let fireworkExtra = document.createElement("a-entity");
-// 				fireworkExtra.setAttribute("firework", "");
-// 				// synchronize position, height, time to explosion
-// 				fireworkExtra.setAttribute("position", {"x":x, "y":y, "z":z} );
-// 				fireworkExtra.setAttribute("firework", "maxHeight", maxHeight );
-// 				fireworkExtra.setAttribute("firework", "riseTime", riseTime );
-// 				this.sceneElement.appendChild( fireworkExtra );
-// 			}
-// 		}
-// 	}
-// });
-
-
-// AFRAME.registerComponent('firework', 
-// {
-// 	schema: 
-// 	{
-// 		color:  {type: 'string', default: ""},
-// 		maxHeight: {type: 'number', default: 4.5},
-// 		riseTime: {type: 'number', default: 2.5}	// time to reach maxHeight
-// 	},
-
-// 	randomColor: function()
-// 	{
-// 		let colorList = ["red", "orange", "gold", "green", "cyan", "#0088FF", "violet"];
-// 		let colorIndex = Math.floor( colorList.length * Math.random() );
-// 		return colorList[colorIndex];
-// 	},
-
-// 	init: function()
-// 	{	
-// 		// set random color if none already set
-// 		if ( this.data.color == "" )
-// 			this.data.color = this.randomColor();
-
-// 		// set up movement animation
-// 		let p = this.el.object3D.position;
-// 		this.el.setAttribute("animation__position", "property", "position");
-// 		this.el.setAttribute("animation__position", "from", {"x":p.x, "y":p.y, "z":p.z});
-// 		this.el.setAttribute("animation__position", "to", {"x":p.x, "y":p.y + this.data.maxHeight, "z":p.z});
-// 		this.el.setAttribute("animation__position", "dur", this.data.riseTime * 1000);
-// 		this.el.setAttribute("animation__position", "easing", "easeOutQuad");  // fast at start, then slower
-		
-// 		// trail effect ----------------------------------------------------------
-
-//         this.particleTrail = document.createElement("a-image");
-//         this.particleTrail.setAttribute("position", "0 -0.1 0");
-//         this.particleTrail.setAttribute("width", "0.5");
-//         this.particleTrail.setAttribute("height", "0.5");
-//         this.particleTrail.setAttribute("scale", "1 1 1");
-        
-//         this.particleTrail.setAttribute("src", "#fireballSheet");
-
-//         this.particleTrail.setAttribute("spritesheet-animation", "rows: 1; columns: 8; frameDuration: 0.08; loop: true;");
-
-// 		this.particleTrail.setAttribute("material", "blending: additive; transparent: true; opacity: 1;");
-		
-		
-//         this.particleTrail.setAttribute("animation__fade", "property", "material.opacity");
-// 		this.particleTrail.setAttribute("animation__fade", "from", 1.0);
-// 		this.particleTrail.setAttribute("animation__fade", "to", 0.2);
-// 		this.particleTrail.setAttribute("animation__fade", "dur", this.data.riseTime * 1000);
-// 		this.particleTrail.setAttribute("animation__fade", "easing", "easeOutQuad");  // slow at start, then fast
-		
-
-//         this.particleTrail.setAttribute("animation__shrink", "property", "scale");
-// 		this.particleTrail.setAttribute("animation__shrink", "from", "1 1 1");
-// 		this.particleTrail.setAttribute("animation__shrink", "to", "0.25 0.25 0.25");
-// 		this.particleTrail.setAttribute("animation__shrink", "dur", this.data.riseTime * 1000);
-// 		this.particleTrail.setAttribute("animation__shrink", "easing", "easeOutQuad");  // slow at start, then fast
-
-// 		this.el.appendChild(this.particleTrail);
-
-// 		// burst effect ----------------------------------------------------------
-
-//         this.particleBurst = document.createElement("a-entity");
-//         this.particleBurst.setAttribute("spe-particles", "");
-
-// 		this.particleBurst.setAttribute("spe-particles", "texture", "#sparkle1");
-// 		this.particleBurst.setAttribute("spe-particles", "blending", "additive");
-// 		this.particleBurst.setAttribute("spe-particles", "distribution", "sphere");
-// 		this.particleBurst.setAttribute("spe-particles", "radius", 0.01);
-		
-// 		// particles both shrink and fade during last moments
-// 		this.particleBurst.setAttribute("spe-particles", "opacity", [1, 1, 1, 0]);
-// 		// this.particleBurst.setAttribute("spe-particles", "size", [1, 1, 1, 0]);
-		
-// 		let particleCount = Math.floor( randomUniform(100, 999) );
-// 		this.particleBurst.setAttribute("spe-particles", "particleCount", particleCount);
-
-// 		// change of particle burst vs. particle stream
-// 		if ( Math.random() < 0.80 )
-// 			this.particleBurst.setAttribute("spe-particles", "activeMultiplier", particleCount);
-// 		else
-// 			this.particleBurst.setAttribute("spe-particles", "activeMultiplier", particleCount/128);
-		
-// 		// note: when distribution = 'sphere', only first component of velocity vectors are used
-// 		let baseVelocity = randomUniform(1, 2);
-// 		this.particleBurst.setAttribute("spe-particles", "velocity", {"x":baseVelocity, "y":0, "z":0});
-// 		this.particleBurst.setAttribute("spe-particles", "velocitySpread", {"x":0.5, "y":0, "z":0});
-// 		this.particleBurst.setAttribute("spe-particles", "drag", 1.00);
-// 		this.particleBurst.setAttribute("spe-particles", "randomizeVelocity", true);
-		
-// 		// add a bit of gravity
-// 		this.particleBurst.setAttribute("spe-particles", "accelerationDistribution", "box");
-// 		this.particleBurst.setAttribute("spe-particles", "acceleration", {"x":0, "y":-0.2, "z":0});
-// 		this.particleBurst.setAttribute("spe-particles", "accelerationSpread", {"x":0, "y":0.2, "z":0});
-		
-// 		// how long will particles last?
-//         this.burstDuration = randomUniform(1.0, 3.0);
-//         this.particleBurst.setAttribute("spe-particles", "maxAge", this.burstDuration);
-//         this.particleBurst.setAttribute("spe-particles", "maxAgeSpread", this.burstDuration/4);
-//         // duration = maximum amount of time to emit particles;
-//         //        	  should be less than smallest max age to prevent second burst
-// 		this.particleBurst.setAttribute("spe-particles", "duration", 0.5);
-
-// 		// default: steady color
-// 		let colorArray = ["white", this.data.color, this.data.color, this.data.color];
-// 		// random chance of color shifting
-// 		if ( Math.random() < 0.25 )
-// 		{
-// 			let color2 = this.data.color;
-// 			// make sure second color is different from first
-// 			while (color2 == this.data.color)
-// 			{
-// 				color2 = this.randomColor();
-// 			}
-// 			colorArray = ["white", this.data.color, color2, color2];
-// 		}
-//         this.particleBurst.setAttribute("spe-particles", "color", colorArray);
-
-//         // disable burst effect for now;
-//         //   will be enabled (in tick method) after reaching max height
-// 		this.particleBurst.setAttribute("spe-particles", "enabled", false);
-
-//   		this.el.appendChild(this.particleBurst);
-
-// 		this.elapsedTime = 0;
-// 		this.burstStart = false;
-
-// 		// // audio effects
-// 		// this.launchSound = document.getElementById("launchSound");
-// 		// this.launchSound.components.sound.playSound();
-// 		// if ( this.burstDuration < 1.6 || particleCount < 300 )
-// 		// 	this.burstSound = document.getElementById("burst1Sound");
-// 		// else if ( this.burstDuration < 2.4 )
-// 		// 	this.burstSound = document.getElementById("burst2Sound");
-// 		// else // this.burstDuration < 3.0
-// 		// 	this.burstSound = document.getElementById("burst3Sound");
-// 	},
-	
-// 	tick: function(time, deltaTime)
-// 	{
-// 		this.elapsedTime += deltaTime/1000;
-
-// 		// firework has reached max height, start burst effect
-// 		if (this.elapsedTime > this.data.riseTime && this.burstStart == false)
-// 		{
-// 			this.burstStart = true;
-// 			this.particleBurst.setAttribute("spe-particles", "enabled", true);
-
-// 			this.el.removeChild( this.particleTrail );
-
-// 			// this.burstSound.components.sound.playSound();
-// 		}
-
-// 		// firework finished; remove self from scene
-// 		//  need to take into account particle age variation (1.25 factor)
-// 		if (this.elapsedTime > this.data.riseTime + this.burstDuration * 1.25)
-// 		{
-// 			let element = this.el;
-//       		element.parentNode.removeChild(element);
-// 		}
-// 	}
-// });
 
 
 AFRAME.registerComponent('emit-when-near', {
