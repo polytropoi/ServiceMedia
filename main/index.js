@@ -12516,8 +12516,8 @@ function showGroup() {
                             "</div>" +
                             "<div class=\x22form-row\x22>" +
                                 "<div class=\x22col form-group col-md-8\x22>" +
-                                    "<label for=\x22sceneShareWithUsers\x22>Share with People</label>" + //share with people, todo typeahead...
-                                    "<textarea class=\x22form-control\x22 id=\x22sceneShareWithUsers\x22 placeholder=\x22delimit usernames or emails with comma\x22></textarea>" +
+                                    "<label for=\x22sceneShareWithPeople\x22>Share with People</label>" + //share with people, todo typeahead...
+                                    "<textarea class=\x22form-control\x22 id=\x22sceneShareWithPeople\x22 placeholder=\x22delimit usernames or emails with comma\x22></textarea>" +
                                 "</div>" +
                                 "<div class=\x22col form-group col-md-4\x22>" +
                                     "<label for=\x22sceneShareWithGroups\x22>Share with Group</label>" + //share with group

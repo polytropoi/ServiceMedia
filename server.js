@@ -5461,7 +5461,7 @@ app.post('/invite_scene/:_id', checkAppID, requiredAuthentication, function (req
     console.log("share node: " + req.body._id + " wmail: " + req.body.sceneShareWith);
 
 
-    var subject = "Immersive Scene Postcard : " + req.body.sceneTitle;
+    var subject = "Invitation to Immersive Scene : " + req.body.sceneTitle;
 
     var from = adminEmail;
     var to = [req.body.sceneShareWith];
@@ -5469,13 +5469,13 @@ app.post('/invite_scene/:_id', checkAppID, requiredAuthentication, function (req
     //var reset = "";
     var timestamp = Math.round(Date.now() / 1000);
     var message = "";
-    var servicemedia_link = rootHost + "/#/s/" + req.body.short_id;
-    var wgl_link = "http://mvmv.us/?scene=" + req.body.short_id;
+    var servicemedia_link = rootHost + "/webxr/" + req.body.short_id;
+    // var wgl_link = "https://servicemedia.net/webxr/" + req.body.short_id;
     var mob_link = "http://strr.us/?scene=" + req.body.short_id;
     if (req.body.sceneMessage === "" || req.body.sceneMessage == null) {
-        message = " has shared a Postcard from the Metaverse with you!";
+        message = " has invited you to join them in the metaverse!";
     } else {
-        message = " has shared a Postcard from the Metaverse with you including this message: " +
+        message = " has shared this Postcard from the Metaverse with you including the message: " +
             "<hr><br> " + req.body.sceneMessage +  "<br>"
     }
     var urlHalf = "";
@@ -12569,7 +12569,7 @@ app.post('/clone_scene', requiredAuthentication, function (req,res) {
                     sceneShareWithPublic : false,
                     sceneShareWithSubscribers : scene.sceneShareWithSubscribers != null ? scene.sceneShareWithSubscribers : false,
                     sceneShareWithGroups : scene.sceneShareWithGroups != null ? scene.sceneShareWithGroups : "",
-                    sceneShareWithUsers : scene.sceneShareWithUsers != null ? scene.sceneShareWithUsers : "",
+                    sceneShareWithPeople : scene.sceneShareWithPeople != null ? scene.sceneShareWithPeople : "",
                     sceneEnvironment : scene.sceneEnvironment != null ? scene.sceneEnvironment : {},
                     sceneUseStaticObj : scene.sceneUseStaticObj != null ? scene.sceneUseStaticObj : false,
                     sceneStaticObjUrl : scene.sceneStaticObjUrl != null ? scene.sceneStaticObjUrl : "",
@@ -12849,7 +12849,7 @@ app.post('/update_scene/:_id', requiredAuthentication, function (req, res) {
                 sceneShareWithPublic : req.body.sceneShareWithPublic != null ? req.body.sceneShareWithPublic : false,
                 sceneShareWithSubscribers : req.body.sceneShareWithSubscribers != null ? req.body.sceneShareWithSubscribers : false,
                 sceneShareWithGroups : req.body.sceneShareWithGroups != null ? req.body.sceneShareWithGroups : "",
-                sceneShareWithUsers : req.body.sceneShareWithUsers != null ? req.body.sceneShareWithUsers : "",
+                sceneShareWithPeople : req.body.sceneShareWithPeople != null ? req.body.sceneShareWithPeople : "",
                 sceneEnvironment : req.body.sceneEnvironment != null ? req.body.sceneEnvironment : {},
                 sceneUseStaticObj : req.body.sceneUseStaticObj != null ? req.body.sceneUseStaticObj : false,
                 sceneStaticObjUrl : req.body.sceneStaticObjUrl != null ? req.body.sceneStaticObjUrl : "",
