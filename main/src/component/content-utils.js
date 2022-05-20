@@ -2661,7 +2661,11 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
                   console.log("this.loc.y " + worldPosition + " plus" + this.data.objectData.yPosFudge);
                   worldPosition.y += this.data.objectData.yPosFudge;
                 }
-                particleSpawner.components.particle_spawner.spawnParticles(worldPosition, this.data.objectData.particles, 5, this.el.id, this.data.objectData.yPosFudge);
+                let particle_spawner = particleSpawner.components.particle_spawner;
+                if (particle_spawner != null) {
+                  particleSpawner.components.particle_spawner.spawnParticles(worldPosition, this.data.objectData.particles, 5, this.el.id, this.data.objectData.yPosFudge);
+                }
+                
               }
             } else {
               console.log("already triggered - make it a toggle!");
