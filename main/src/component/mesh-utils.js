@@ -1632,10 +1632,10 @@ AFRAME.registerComponent('mod_particles', {
     if (this.data.type.toLowerCase() =="fire") {
       // this.el.setAttribute('scale', '.25 .25 .25');
       this.el.setAttribute('sprite-particles', {texture: '#fireanim1', color: 'yellow', blending: 'additive', textureFrame: '6 6', textureLoop: '3', spawnRate: '2', lifeTime: '1.1', scale: '12'});
-      this.el.setAttribute('light', {type: 'point', castShadow: 'true', color: 'yellow', intensity: .75, distance: 15, decay: 5});
-      this.lightAnimation(.7, 1);
+      this.el.setAttribute('light', {type: 'point', castShadow: 'true', color: 'yellow', intensity: .75, distance: 15, decay: 8});
+      this.lightAnimation(.7, 1.5);
       this.el.addEventListener('animationcomplete', () => {
-          this.lightAnimation(.7, 1);
+          this.lightAnimation(.7, 1.5);
       });
     }
     if (this.data.type.toLowerCase() =="smoke") {
@@ -1655,10 +1655,10 @@ AFRAME.registerComponent('mod_particles', {
     this.intensityMin = min;
     this.intensityMax = max;
     let duration = Math.random() * 600;
-    let intensity = Math.random();
-    if (intensity < this.intensityMin) {
-      intensity = .5;
-    }
+    let intensity = randomUniform(this.intensityMin, this.intensityMax);
+    // if (intensity < this.intensityMin) {
+    //   intensity = this.intensityMin;
+    // }
     // console.log("inteisity is " + intensity + " dur " + duration);
     let animation = "property: light.intensity; from: 0.5; to: "+intensity+"; dur: "+duration+"; dir: alternate;";
     // console.log(intensity);
