@@ -5402,11 +5402,11 @@ app.post('/resetpw', function (req, res) {
 });
 app.post('/send_invitations', requiredAuthentication, checkAppID, function (req, res) {
 
-    console.log('reset request from: ' + req.body.email);
+    console.log('send request from: ' + req.body.email);
     // ws.send("authorized");
     var subject = topName + "  Invitation"
     var from = adminEmail
-    var to = [req.body.email1];
+    var to = [req.body.email];
     var bcc = [ "polytropoi@gmail.com"];
     //var reset = "";
     var timestamp = Math.round(Date.now() / 1000);
@@ -5457,6 +5457,13 @@ app.post('/send_invitations', requiredAuthentication, checkAppID, function (req,
         res.send("invalid email address");
     }
 });
+
+
+app.post('/send_invite/', requiredAuthentication, function (req, res) {
+    console.log("tryna send invite: " + JSON.stringify(req.body));
+    res.send("sent");
+});
+
 app.post('/invite_scene/:_id', checkAppID, requiredAuthentication, function (req, res) {
     console.log("share node: " + req.body._id + " wmail: " + req.body.sceneShareWith);
 

@@ -14684,6 +14684,44 @@ function showGroup() {
                         $("#locationsSection").toggle();
                         $("#eventsSection").toggle();
                     }); 
+                    $(document).on('click','#sendInvitationButton',function(e){
+                        e.preventDefault();  
+                        console.log("tryna send invitation button to " + sceneShareWithPeople);
+                        $.confirm({
+                            title: 'Confirm Sent Invitation',
+                            content: 'Are you sure you want to an invitation to ' + sceneShareWithPeople,
+                            buttons: {
+                            confirm: function () {
+                                // console.log("data: " + JSON.stringify(data));   
+                                data = {};
+                                data.sceneShareWithPeople = sceneShareWithPeople;
+                                data.sceneShareWithMessage = sceneShareWithMessage;
+                                data.sceneTitle = sceneTitle;
+                                data._id = response.data._id;
+                                axios.post('/send_invite/', data)
+                                    .then(function (response) {
+                                        console.log(response);
+                                       if (response.data.includes("sent")) {
+                                            // window.location.reload();
+                                            $("#topSuccess").html("Invitations Sent!");
+                                            $("#topSuccess").show();
+                                        } else {
+                                            $("#topAlert").html(response.data);
+                                            $("#topAlert").show();
+                                        }
+                                    })                      
+                                    .catch(function (error) {
+                                        console.log(error);
+                                    });
+                                },
+                                cancel: function () {
+                                    $("#topAlert").html("Update cancelled");
+                                    $("#topAlert").show();
+                                },
+                            }
+                        });
+                    });
+
                     $(document).on('click', '#addYouTubeButton', function(e){
                         e.preventDefault();
                         let newYTID = document.getElementById("addYouTubeInput").value;
