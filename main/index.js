@@ -11651,6 +11651,8 @@ function showGroup() {
             let sceneDebugMode = response.data.sceneDebugMode != undefined ? response.data.sceneDebugMode : ""
             let sceneKeynote = response.data.sceneKeynote != undefined ? response.data.sceneKeynote : ""; 
             let sceneDescription = response.data.sceneDescription != undefined ? response.data.sceneDescription : ""; 
+            let sceneShareWithPeople = response.data.sceneShareWithPeople != undefined ? response.data.sceneShareWithPeople : ""; 
+            let sceneShareWithMessage = response.data.sceneShareWithMessage != undefined ? response.data.sceneShareWithMessage : ""; 
             let sceneNextScene = response.data.sceneNextScene != undefined ? response.data.sceneNextScene : "";
             let scenePreviousScene = response.data.scenePreviousScene != undefined ? response.data.scenePreviousScene : ""; 
             let sceneSource = response.data.sceneSource != undefined ? response.data.sceneSource : ""; 
@@ -12514,16 +12516,103 @@ function showGroup() {
                                 "</div>" +
                             "</div>" +
                             "</div>" +
-                            "<div class=\x22form-row\x22>" +
-                                "<div class=\x22col form-group col-md-8\x22>" +
+                            ///sharing below...
+                            // "<div class=\x22form-row\x22>" +
+                            //     "<div class=\x22col form-group col-md-4\x22>" +
+                            //         "<label for=\x22sceneShareWithPeople\x22>Share with People</label>" + //share with people, todo typeahead...
+                            //         "<textarea class=\x22form-control\x22 id=\x22sceneShareWithPeople\x22 placeholder=\x22delimit usernames or emails with comma\x22>" + sceneShareWithPeople + "</textarea>" +
+                            //     "</div>" +
+                            //     "<div class=\x22col form-group col-md-4\x22>" +
+                            //         "<label for=\x22sceneShareMessage\x22>Share with message</label>" + //message to include in sending
+                            //         "<textarea class=\x22form-control\x22 id=\x22sceneShareWithMessage\x22 placeholder=\x22add message to send with invitation\x22>" + sceneShareWithMessage + "</textarea>" +
+                            //     "</div>" +
+                            //     "<div class=\x22col form-group col-md-3\x22>" +
+                            //         "<label for=\x22sceneShareWithGroups\x22>Share with Group</label>" + //share with group
+                            //         "<select class=\x22form-control\x22 id=\x22sceneShareWithGroups\x22 >" +
+                            //             "<option>People Groups Here</option>" +
+                            //             "</select>"+
+                            //     "</div>" +
+                            //     "<div class=\x22col form-group col-md-1\x22>" +
+                            //       "<div id=\x22sendInvitationButton\x22 class=\x22btn btn-info btn-sm\x22>Send Invitation</div>"+
+                            //     "</div>" +
+                            // "</div>" +
+                            // "<div class=\x22form-row\x22>" +    
+                            //     "<div class=\x22col form-group col-md-1\x22>" +
+                            //         "<div class=\x22\x22><label for=\x22scenePublicToggle\x22>Share with Public</label><br>" + //Public/Private
+                            //         "<input class=\x22float-right\x22 type=\x22checkbox\x22  id=\x22scenePublicToggle\x22 data-toggle=\x22toggle\x22 data-size=\x22sm\x22 data-on=\x22<i class='fas fa-check'></i>\x22 data-off=\x22<i class='fas fa-times'></i>\x22 data-onstyle=\x22success\x22 data-offstyle=\x22danger\x22></div>" +
+                            //     "</div>" +
+                            //     "<div class=\x22col form-group col-md-1\x22>" +
+                            //         "<div class=\x22\x22><label for=\x22sceneSubscriberToggle\x22>Share with Subscribers</label><br>" + //Sub/Not
+                            //         "<input type=\x22checkbox\x22  id=\x22sceneSubscriberToggle\x22 data-toggle=\x22toggle\x22 data-size=\x22sm\x22 data-on=\x22<i class='fas fa-check'></i>\x22 data-off=\x22<i class='fas fa-times'></i>\x22 data-onstyle=\x22success\x22 data-offstyle=\x22danger\x22></div>" +
+                            //     "</div>" +
+                            //     "<div class=\x22col form-group col-md-1\x22>" +
+                            //         "<div class=\x22\x22><label for=\x22sceneLocationTracking\x22>Track Location</label><br>" + //geofencing
+                            //         "<input type=\x22checkbox\x22  id=\x22sceneLocationTracking\x22 data-toggle=\x22toggle\x22 data-size=\x22sm\x22 data-on=\x22<i class='fas fa-check'></i>\x22 data-off=\x22<i class='fas fa-times'></i>\x22 data-onstyle=\x22success\x22 data-offstyle=\x22danger\x22></div>" +
+                            //     "</div>" +
+                            //     "<div class=\x22col form-group col-md-1\x22>" +
+                            //         "<div class=\x22\x22><label for=\x22sceneShowAds\x22>Show Ads</label><br>" + //show ads
+                            //         "<input type=\x22checkbox\x22  id=\x22sceneShowAds\x22 data-toggle=\x22toggle\x22 data-size=\x22sm\x22 data-on=\x22<i class='fas fa-check'></i>\x22 data-off=\x22<i class='fas fa-times'></i>\x22 data-onstyle=\x22success\x22 data-offstyle=\x22danger\x22></div>" +
+                            //     "</div>" +
+                            //     // "<div class=\x22col form-group col-md-1\x22>" +
+                            //     //     "<label for=\x22sceneLocationRange\x22>Location Range</label>" + 
+                            //     //     "<input type=\x22number\x22 step=\x220.01\x22 class=\x22form-control\x22 id=\x22sceneLocationRange\x22 placeholder=\x2210\x22 value=\x22" + sceneLocationRange + "\x22 >" +
+                            //     // "</div>" +
+                            //     "<div class=\x22col form-group col-md-1\x22> " +
+                            //         "<label for=\x22networkingBtns\x22> Networking </label>" + 
+                            //         "<br><div id=\x22networkingBtns\x22 class=\x22btn-group btn-group-sm btn-group-toggle flex-wrap\x22 data-toggle=\x22buttons\x22>" +
+                            //             "<label class=\x22btn btn-secondary active\x22>" +
+                            //                 "<input type=\x22radio\x22 name=\x22sceneNetworking\x22 value=\x22None\x22 id=\x22None\x22 autocomplete=\x22off\x22 checked> None " +
+                            //             "</label>" +
+                            //             "<label class=\x22btn btn-secondary\x22>" +
+                            //                 "<input type=\x22radio\x22 name=\x22sceneNetworking\x22 value=\x22SocketIO\x22 id=\x22SocketIO\x22 autocomplete=\x22off\x22> SocketIO " +
+                            //             "</label>" +
+                            //             "<label class=\x22btn btn-secondary\x22>" +
+                            //                 "<input type=\x22radio\x22 name=\x22sceneNetworking\x22 value=\x22WebRTC\x22 id=\x22WebRTC\x22 autocomplete=\x22off\x22> WebRTC " +
+                            //             "</label>" +
+                            //             "<label class=\x22btn btn-secondary\x22>" +
+                            //                 "<input type=\x22radio\x22 name=\x22sceneNetworking\x22 value=\x22AudioChat\x22 id=\x22AudioChat\x22 autocomplete=\x22off\x22> AudioChat " +
+                            //             "</label>" +
+                            //         "</div>" +
+                            //     "</div>" +
+                            //     "<div class=\x22col form-group col-md-2\x22>" +
+                            //         "<label for=\x22sceneAltURL\x22>Scene Alternate URL</label>" + 
+                            //         "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22sceneAltURL\x22 placeholder=\x22Scene Alternate URL\x22 value=\x22" + sceneAltURL + "\x22 >" +
+                                 
+                            //     "</div>" +
+                                
+                            //     "<div class=\x22col form-group col-md-2\x22>" +
+                            //         "<label for=\x22sceneDebugMode\x22>Scene Debug Mode</label>" + 
+                            //         "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22sceneDebugMode\x22 placeholder=\x22Scene Debug Mode\x22 value=\x22" + sceneDebugMode + "\x22 >" +
+                            //     "</div>" +
+                            //     "<div class=\x22col form-group col-md-2\x22>" +
+                            //         "<a class=\x22btn btn-sm btn-dark float-right\x22 target=\x22_blank\x22 href=\x22/qrcode/"+sceneAltURL+"\x22><i class=\x22far fa-file-alt\x22></i> Alternate URL QRCode</a><br><br>" +
+                            //         "<a class=\x22btn btn-sm btn-dark float-right\x22 target=\x22_blank\x22 href=\x22/qrcode/"+short_id+"\x22><i class=\x22far fa-file-alt\x22></i> ServiceMedia URL QRCode</a>" +
+                            //     "</div>" +
+                            // "</div>" +
+                            "<hr/>" +
+                        "</div>" +
+                            "<button id=\x22sharingSectionButton\x22 class=\x22btn btn-sm btn-primary btn-circle btn-light float-left\x22><i class=\x22fas fa-plus-circle\x22></i> </button>" +
+                            "<h4>Sharing</h4>" +
+                            "<hr/>" +            
+                        "<div style=\x22display:none;\x22 id=\x22sharingSection\x22>" +
+                            "<div id=\x22sharingSection\x22 class=\x22form-row\x22>" +
+                            //  "sharing..." +
+                                "<div class=\x22col form-group col-md-4\x22>" +
                                     "<label for=\x22sceneShareWithPeople\x22>Share with People</label>" + //share with people, todo typeahead...
-                                    "<textarea class=\x22form-control\x22 id=\x22sceneShareWithPeople\x22 placeholder=\x22delimit usernames or emails with comma\x22></textarea>" +
+                                    "<textarea class=\x22form-control\x22 id=\x22sceneShareWithPeople\x22 placeholder=\x22delimit usernames or emails with comma\x22>" + sceneShareWithPeople + "</textarea>" +
                                 "</div>" +
                                 "<div class=\x22col form-group col-md-4\x22>" +
+                                    "<label for=\x22sceneShareMessage\x22>Share with message</label>" + //message to include in sending
+                                    "<textarea class=\x22form-control\x22 id=\x22sceneShareWithMessage\x22 placeholder=\x22add message to send with invitation\x22>" + sceneShareWithMessage + "</textarea>" +
+                                "</div>" +
+                                "<div class=\x22col form-group col-md-3\x22>" +
                                     "<label for=\x22sceneShareWithGroups\x22>Share with Group</label>" + //share with group
                                     "<select class=\x22form-control\x22 id=\x22sceneShareWithGroups\x22 >" +
                                         "<option>People Groups Here</option>" +
                                         "</select>"+
+                                "</div>" +
+                                "<div class=\x22col form-group col-md-1\x22>" +
+                                  "<div id=\x22sendInvitationButton\x22 class=\x22btn btn-info btn-sm\x22>Send Invitation</div>"+
                                 "</div>" +
                             "</div>" +
                             "<div class=\x22form-row\x22>" +    
@@ -12547,37 +12636,29 @@ function showGroup() {
                                 //     "<label for=\x22sceneLocationRange\x22>Location Range</label>" + 
                                 //     "<input type=\x22number\x22 step=\x220.01\x22 class=\x22form-control\x22 id=\x22sceneLocationRange\x22 placeholder=\x2210\x22 value=\x22" + sceneLocationRange + "\x22 >" +
                                 // "</div>" +
-                                "<div class=\x22col form-group\x22> " +
-                                "<label for=\x22networkingBtns\x22> Networking </label>" + 
-                                "<br><div id=\x22networkingBtns\x22 class=\x22btn-group btn-group-toggle flex-wrap\x22 data-toggle=\x22buttons\x22>" +
-                                    "<label class=\x22btn btn-secondary active\x22>" +
-                                        "<input type=\x22radio\x22 name=\x22sceneNetworking\x22 value=\x22None\x22 id=\x22None\x22 autocomplete=\x22off\x22 checked> None " +
-                                    "</label>" +
-                                    "<label class=\x22btn btn-secondary\x22>" +
-                                        "<input type=\x22radio\x22 name=\x22sceneNetworking\x22 value=\x22SocketIO\x22 id=\x22SocketIO\x22 autocomplete=\x22off\x22> SocketIO " +
-                                    "</label>" +
-                                    "<label class=\x22btn btn-secondary\x22>" +
-                                        "<input type=\x22radio\x22 name=\x22sceneNetworking\x22 value=\x22WebRTC\x22 id=\x22WebRTC\x22 autocomplete=\x22off\x22> WebRTC " +
-                                    "</label>" +
-                                    "<label class=\x22btn btn-secondary\x22>" +
-                                        "<input type=\x22radio\x22 name=\x22sceneNetworking\x22 value=\x22AudioChat\x22 id=\x22AudioChat\x22 autocomplete=\x22off\x22> AudioChat " +
-                                    "</label>" +
+                                "<div class=\x22col form-group col-md-1\x22> " +
+                                    "<label for=\x22networkingBtns\x22> Networking </label>" + 
+                                    "<br><div id=\x22networkingBtns\x22 class=\x22btn-group btn-group-sm btn-group-toggle flex-wrap\x22 data-toggle=\x22buttons\x22>" +
+                                        "<label class=\x22btn btn-secondary active\x22>" +
+                                            "<input type=\x22radio\x22 name=\x22sceneNetworking\x22 value=\x22None\x22 id=\x22None\x22 autocomplete=\x22off\x22 checked> None " +
+                                        "</label>" +
+                                        "<label class=\x22btn btn-secondary\x22>" +
+                                            "<input type=\x22radio\x22 name=\x22sceneNetworking\x22 value=\x22SocketIO\x22 id=\x22SocketIO\x22 autocomplete=\x22off\x22> SocketIO " +
+                                        "</label>" +
+                                        "<label class=\x22btn btn-secondary\x22>" +
+                                            "<input type=\x22radio\x22 name=\x22sceneNetworking\x22 value=\x22WebRTC\x22 id=\x22WebRTC\x22 autocomplete=\x22off\x22> WebRTC " +
+                                        "</label>" +
+                                        "<label class=\x22btn btn-secondary\x22>" +
+                                            "<input type=\x22radio\x22 name=\x22sceneNetworking\x22 value=\x22AudioChat\x22 id=\x22AudioChat\x22 autocomplete=\x22off\x22> AudioChat " +
+                                        "</label>" +
+                                    "</div>" +
                                 "</div>" +
-                            "</div>" +
                                 "<div class=\x22col form-group col-md-2\x22>" +
                                     "<label for=\x22sceneAltURL\x22>Scene Alternate URL</label>" + 
                                     "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22sceneAltURL\x22 placeholder=\x22Scene Alternate URL\x22 value=\x22" + sceneAltURL + "\x22 >" +
-                                    // "<button class=\x22btn btn-sm btn-info generateLandingPage float-right\x22><i class=\x22fas fa-cog\x22 id=\x22generateLandingPage\x22></i> Generate Landing </button><br><br>" +
-                                    // "<button class=\x22btn btn-sm btn-info generateWebXRPage float-right\x22><i class=\x22fas fa-cog\x22 id=\x22generateWebXRPage\x22></i> Generate WebXR </button>" +
+                                 
                                 "</div>" +
-                                // "<div class=\x22col form-group col-md-2\x22>" +
-                                //     // "<a class=\x22btn btn-sm btn-primary float-right\x22 target=\x22_blank\x22 href=\x22http://"+sceneDomain+"/"+short_id+"/index.html\x22><i class=\x22far fa-file-alt\x22></i> Landing </a><br><br>" +
-                                //     "<a class=\x22btn btn-sm btn-primary float-right\x22 target=\x22_blank\x22 href=\x22http://"+sceneDomain+"/"+short_id+"/webxr.html\x22><i class=\x22far fa-file-alt\x22></i> Static WebXR </a><br><br>" +
-                                //     // "<a class=\x22btn btn-sm btn-primary float-right\x22 target=\x22_blank\x22 href=\x22index.html?type=webxr&iid="+short_id+"\x22><i class=\x22far fa-file-alt\x22></i> Dynamic WebXR </a>" +
-                                //     "<a class=\x22btn btn-sm btn-primary float-right\x22 target=\x22_blank\x22 target=\x22_blank\x22 href=\x22../webxr/"+ response.data.short_id +"\x22><i class=\x22far fa-file-alt\x22></i> Dynamic WebXR </a>" +
-
-                                // "</div>" +
-
+                                
                                 "<div class=\x22col form-group col-md-2\x22>" +
                                     "<label for=\x22sceneDebugMode\x22>Scene Debug Mode</label>" + 
                                     "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22sceneDebugMode\x22 placeholder=\x22Scene Debug Mode\x22 value=\x22" + sceneDebugMode + "\x22 >" +
@@ -12587,9 +12668,9 @@ function showGroup() {
                                     "<a class=\x22btn btn-sm btn-dark float-right\x22 target=\x22_blank\x22 href=\x22/qrcode/"+short_id+"\x22><i class=\x22far fa-file-alt\x22></i> ServiceMedia URL QRCode</a>" +
                                 "</div>" +
                             "</div>" +
-                            "<hr/>" +
-                        "</div>" +
-                    
+
+                        // "</div>" + 
+                    "</div>" + 
                             "<button id=\x22cameraSectionButton\x22 class=\x22btn btn-sm btn-primary btn-circle btn-light float-left\x22><i class=\x22fas fa-plus-circle\x22></i> </button>" +
                             "<h4>Camera</h4>" +
                             "<hr/>" +
@@ -12670,7 +12751,9 @@ function showGroup() {
                             "</div>" + 
 
                             "<hr/>" +
-                "</div>" +                            
+                "</div>" +                
+
+
                             "<button id=\x22picturesSectionButton\x22 class=\x22btn btn-sm btn-primary btn-circle btn-light float-left\x22><i class=\x22fas fa-plus-circle\x22></i> </button>" +
                             "<h4>Pictures</h4>" +
                             "<hr/>" +
@@ -14525,6 +14608,10 @@ function showGroup() {
                         e.preventDefault();  
                         $("#optionsSection").toggle();
                     }); 
+                    $(document).on('click','#sharingSectionButton',function(e){
+                        e.preventDefault();  
+                        $("#sharingSection").toggle();
+                    }); 
                     $(document).on('click','#cameraSectionButton',function(e){
                         e.preventDefault();  
                         $("#cameraSection").toggle();
@@ -15275,6 +15362,7 @@ function showGroup() {
                         let sceneAltURL = document.getElementById("sceneAltURL").value;
                         let sceneKeynote = document.getElementById("sceneKeynote").value;
                         let sceneDescription = document.getElementById("sceneDescription").value;
+                        let sceneShareWithPeople = document.getElementById("sceneShareWithPeople").value;
                         let sceneNextScene = document.getElementById("sceneNextScene").value;
                         let scenePreviousScene = document.getElementById("scenePreviousScene").value;
                         let sceneStickyness = document.getElementById("sceneStickyness").value;
@@ -15487,6 +15575,7 @@ function showGroup() {
                             sceneCategory: sceneCategory,
                             sceneShareWithPublic: sceneShareWithPublic,
                             sceneShareWithSubscribers: sceneShareWithSubscribers,
+                            sceneShareWithPeople: sceneShareWithPeople,
                             sceneStickyness: sceneStickyness,
                             sceneSource: sceneSource,
                             sceneText: sceneText,
