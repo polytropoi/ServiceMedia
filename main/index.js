@@ -11653,6 +11653,9 @@ function showGroup() {
             let sceneDescription = response.data.sceneDescription != undefined ? response.data.sceneDescription : ""; 
             let sceneShareWithPeople = response.data.sceneShareWithPeople != undefined ? response.data.sceneShareWithPeople : ""; 
             let sceneShareWithMessage = response.data.sceneShareWithMessage != undefined ? response.data.sceneShareWithMessage : ""; 
+            let sceneAccessStart = response.data.sceneAccessStart != undefined ? response.data.sceneAccessStart : ""; 
+            let sceneAccessEnd = response.data.sceneAccessEnd != undefined ? response.data.sceneAccessEnd : ""; 
+            let sceneAccessLinkExpire = response.data.sceneAccessLinkExpire != undefined ? response.data.sceneAccessLinkExpire : ""; 
             let sceneNextScene = response.data.sceneNextScene != undefined ? response.data.sceneNextScene : "";
             let scenePreviousScene = response.data.scenePreviousScene != undefined ? response.data.scenePreviousScene : ""; 
             let sceneSource = response.data.sceneSource != undefined ? response.data.sceneSource : ""; 
@@ -12611,8 +12614,37 @@ function showGroup() {
                                         "<option>People Groups Here</option>" +
                                         "</select>"+
                                 "</div>" +
-                                "<div class=\x22col form-group col-md-1\x22>" +
-                                  "<div id=\x22sendInvitationButton\x22 class=\x22btn btn-info btn-sm\x22>Send Invitation</div>"+
+                                // "<div class=\x22col form-group col-md-2\x22>" +
+                                //     "<label for=\x22sceneAccessStart\x22>Start Date/Time</label>" + 
+                                //     "<input type=\x22datetime-local\x22 class=\x22form-control\x22 id=\x22sceneAccessStart\x22 placeholder=\x22\x22 value=\x22" + sceneAccessStart + "\x22 >" +
+                                //     "<label for=\x22sceneAccessEnd\x22>End Date/Time</label>" + 
+                                //     "<input type=\x22datetime-local\x22 class=\x22form-control\x22 id=\x22sceneAccessEnd\x22 placeholder=\x22\x22 value=\x22" + sceneAccessEnd + "\x22 >" +
+                                
+                                // "</div>" +
+                                // "<div class=\x22col form-group col-md-1\x22>" +
+                                //   "<div id=\x22sendInvitationButton\x22 class=\x22btn float-right btn-info btn-sm\x22>Send Invitation</div>"+
+                                // "</div>" +
+                            "</div>" +
+                            "<div class=\x22form-row\x22>" + 
+                                "<div class=\x22col form-group col-md-3\x22>" +
+                                    "<label for=\x22sceneAccessStart\x22>Shared Event Start Date/Time</label>" + 
+                                    "<input type=\x22datetime-local\x22 class=\x22form-control\x22 id=\x22sceneAccessStart\x22 placeholder=\x22\x22 value=\x22" + sceneAccessStart + "\x22 >" +
+                                "</div>" +
+                                "<div class=\x22col form-group col-md-3\x22>" +
+                                    "<label for=\x22sceneAccessEnd\x22>Shared Event End Date/Time</label>" + 
+                                    "<input type=\x22datetime-local\x22 class=\x22form-control\x22 id=\x22sceneAccessEnd\x22 placeholder=\x22\x22 value=\x22" + sceneAccessEnd + "\x22 >" +
+                                "</div>" +
+                                "<div class=\x22col form-group col-md-2\x22>" +
+                                    "<label for=\x22sceneAccessLinkExpire\x22>Access Link Expiration</label>" + 
+                                    "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22sceneAccessLinkExpire\x22 placeholder=\x22Expires in minutes\x22 value=\x22" + sceneAccessLinkExpire + "\x22 >" +
+                                
+                                "</div>" +
+                                "<div class=\x22col form-group col-md-2\x22>" +
+                                    "<div id=\x22sendInvitationButton\x22 class=\x22btn float-right btn-info btn-sm\x22>Send Invitation</div>"+
+                                "</div>" +
+                                // "<div>" +
+                                "<div class=\x22col form-group col-md-2\x22>" +
+                                    "<div id=\x22sendInvitationButton\x22 class=\x22btn float-right btn-warning btn-sm\x22>Send Test</div>"+
                                 "</div>" +
                             "</div>" +
                             "<div class=\x22form-row\x22>" +    
@@ -14693,12 +14725,14 @@ function showGroup() {
                             buttons: {
                             confirm: function () {
                                 // console.log("data: " + JSON.stringify(data));   
+
                                 data = {};
                                 data.sceneShareWithPeople = sceneShareWithPeople;
                                 data.sceneShareWithMessage = sceneShareWithMessage;
                                 data.sceneTitle = sceneTitle;
+                                data.short_id = response.data.short_id;
                                 data._id = response.data._id;
-                                axios.post('/send_invite/', data)
+                                axios.post('/share_scene/', data)
                                     .then(function (response) {
                                         console.log(response);
                                        if (response.data.includes("sent")) {
