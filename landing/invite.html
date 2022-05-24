@@ -1,0 +1,66 @@
+<html xmlns='http://www.w3.org/1999/xhtml'>
+    <head> 
+    <link href=\x22css/sb-admin-2.css\x22 rel=\x22stylesheet\x22>
+    <style>
+    body {background-color: #272727;}
+    h1   {color: white;}
+    a   {color: powderblue;}
+    p    {color: white; font-family: sans-serif; margin: auto; font-size: 200%;}
+    </style>
+    
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+
+
+    
+    <body>
+        <div style="width: 800px">
+        <p id="main"></p>
+        <!-- <div id="map"></div> -->
+        </div>
+
+       <script>
+        let mapdiv = document.getElementById('map');
+        let main = document.getElementById('main');
+        function getParameterByName(name, url) {
+            if (!url) {
+                url = window.location.href;
+            }
+            name = name.replace(/[\[\]]/g, "\\$&");
+            var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+                results = regex.exec(url);
+            if (!results) return null;
+            if (!results[2]) return '';
+            return decodeURIComponent(results[2].replace(/\+/g, " "));
+        }
+        const params = getParameterByName('iv');
+        console.log("params : " + params);
+        // let data = JSON.parse(atob(params));
+        // console.log(data);  
+        axios.get('/invitation_check/' + params)
+                        .then(function (response) {
+                            if (response.data.pin != undefined && response.data.pin.length > 6) {
+                                console.log(JSON.stringify(response))
+                                main.innerHTML = "You are all freaking set, baby! <br>Here's your PIN: " + response.data.pin + "<br><br>" +
+                                "Here's a scannable QR code:" +
+                                "<img style='height: 100%; width: 100%; object-fit: contain' alt='qrcode' src='" + response.data.qrcode + "'/>";
+
+                            } else {
+                                main.innerHTML = "Sorry, that invitation is no longer valid";
+                            }
+                        }) //end of main fetch
+                        .catch(function (error) {
+                            console.log(error);
+                            main.innerHTML = "Sorry, gotsa error: " + error;
+                        });
+        // if (params != null && params.length > 10) {
+        //     main.innerHTML = "hey whatsup!  gotcher invite: " + params;
+        // } else {
+        //     main.innerHTML = "Sorry, I don't even know what that meeeanz!";
+        // }
+        </script>
+
+    </body>
+
+</html>
+

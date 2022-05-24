@@ -14730,6 +14730,49 @@ function showGroup() {
                                 data.sceneShareWithPeople = sceneShareWithPeople;
                                 data.sceneShareWithMessage = sceneShareWithMessage;
                                 data.sceneTitle = sceneTitle;
+                                data.sceneKeynote = sceneKeynote,
+                                data.sceneDescription = sceneDescription,
+                                data.short_id = response.data.short_id;
+                                data._id = response.data._id;
+                                axios.post('/share_scene/', data)
+                                    .then(function (response) {
+                                        console.log(response);
+                                       if (response.data.includes("sent")) {
+                                            // window.location.reload();
+                                            $("#topSuccess").html("Invitations Sent!");
+                                            $("#topSuccess").show();
+                                        } else {
+                                            $("#topAlert").html(response.data);
+                                            $("#topAlert").show();
+                                        }
+                                    })                      
+                                    .catch(function (error) {
+                                        console.log(error);
+                                    });
+                                },
+                                cancel: function () {
+                                    $("#topAlert").html("Update cancelled");
+                                    $("#topAlert").show();
+                                },
+                            }
+                        });
+                    });
+                    $(document).on('click','#sendTestInvitationButton',function(e){
+                        e.preventDefault();  
+                        console.log("tryna send invitation button to " + sceneShareWithPeople);
+                        $.confirm({
+                            title: 'Confirm Sent Invitation',
+                            content: 'Are you sure you want to send a test invitation to yourself?',
+                            buttons: {
+                            confirm: function () {
+                                // console.log("data: " + JSON.stringify(data));   
+
+                                data = {};
+                                data.sceneShareWithPeople = '';
+                                data.sceneShareWithMessage = sceneShareWithMessage;
+                                data.sceneTitle = sceneTitle;
+                                data.sceneKeynote = sceneKeynote,
+                                data.sceneDescription = sceneDescription,
                                 data.short_id = response.data.short_id;
                                 data._id = response.data._id;
                                 axios.post('/share_scene/', data)

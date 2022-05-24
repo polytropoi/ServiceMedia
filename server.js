@@ -5261,8 +5261,8 @@ app.get('/invitation_check/:hzch', function (req, res) {
             res.send("not found");
         } else {
             var timestamp = Math.round(Date.now() / 1000);
-            var pin = Math.random().toString().substr(2,20)
-            if (timestamp < invitation.invitationTimestamp + 36000) { //expires in 10 hour!
+            var pin = Math.random().toString().substr(2,20); //hrm...
+            if (timestamp < invitation.invitationTimestamp + 36000) { //expires in 10 hour! //TODO access window start and end timestamps
                 console.log("timestamp checks out!" + invitation.invitationTimestamp);
 
                 db.invitations.update ( { "invitationHash": req.body.hzch }, { $set: { validated: true, pin : pin} });
@@ -5288,6 +5288,7 @@ app.get('/invitation_check/:hzch', function (req, res) {
         }
     });
 });
+
 
 app.post ('/get_invitations', checkAppID, requiredAuthentication, function (req,res) {// sigh, need to encrypt this...
     var timestamp = Math.round(Date.now() / 1000);
@@ -5575,7 +5576,7 @@ app.post('/send_invite/', requiredAuthentication, function (req, res) {
 app.post('/share_scene/', requiredAuthentication, function (req, res) {
 
     //temp container for objex with peopleID + email
-
+    let theScene = {};
     async.waterfall([
 
         function(callback) {
@@ -5615,7 +5616,7 @@ app.post('/share_scene/', requiredAuthentication, function (req, res) {
             var emailsFinal = [];
             var uid = req.session.user._id.toString();
             console.log("tryna mail to " )
-             async.each (emailSplit, function (email, callbackz) {
+            async.each (emailSplit, function (email, callbackz) {
                 db.people.findOne({ $and: [ {userID: uid}, {email: email.trim()} ]}, function(err, person) {
                     if (err || !person) {
                         console.log("did not find that person : " + err);
@@ -5640,6 +5641,7 @@ app.post('/share_scene/', requiredAuthentication, function (req, res) {
                                     }
                                 });
                     } else {
+                        //TODO update emailCount field? or 'touches'?
                         var pursoner = {};
                         console.log('found person id: ' + person._id);
                         pursoner.personID = person._id;
@@ -5664,58 +5666,100 @@ app.post('/share_scene/', requiredAuthentication, function (req, res) {
             });
 
         },
+        function (eData, callback) {
+            // let emailArray = eData;
+            db.scenes.findOne({short_id: req.body.short_id}, function (err, scene) {
+                if (err || !scene) {
+                    console.log("error getting scene for sharing: " + err);
+                    callback(err);
+                } else {
+                    theScene = scene;
+                    let urlHalf = "";
+                    if (scene.scenePostcards != null && scene.scenePostcards.length > 0) {
+                        var oo_id = ObjectID(scene.scenePostcards[0]); //TODO randomize? or ensure latest?  or use assigned default?
+                        db.image_items.findOne({"_id": oo_id}, function (err, picture_item) {
+                            if (err || !picture_item || picture_item.length == 0) {
+                                console.log("error getting postcard for availablescenes: 2" + err);
+                                callback(null, '', eData)
+                            } else {
+                                var item_string_filename = JSON.stringify(picture_item.filename);
+                                item_string_filename = item_string_filename.replace(/\"/g, "");
+                                var item_string_filename_ext = getExtension(item_string_filename);
+                                var expiration = new Date();
+                                expiration.setMinutes(expiration.getMinutes() + 30);
+                                var baseName = path.basename(item_string_filename, (item_string_filename_ext));
+//                                    console.log(baseName);
+                                // var thumbName = 'thumb.' + baseName + item_string_filename_ext;
+                                var halfName = 'half.' + baseName + item_string_filename_ext;
+                                // var quarterName = 'quarter.' + baseName + item_string_filename_ext;
+                                // var standardName = 'standard.' + baseName + item_string_filename_ext;
+                                var urlHalf = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + "." + halfName, Expires: 6000}); //just send back thumbnail urls for list
+                                // var urlQuarter = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + "." + quarterName, Expires: 6000}); //just send back thumbnail urls for list
+                                callback(null, urlHalf, eData);
+                            }
+                        });
+                    } 
+                }
+            });
+        },
 
-        function(eData, callback) { //spin through validated data, send appropriate mail
+        function(urlHalf, eData, callback) { //spin through validated data, send appropriate mail
             console.log("eDatahs : " +JSON.stringify(eData));
+            
             async.each (eData, function (data, callbackzz) {
-                // console.log("emailsFinal is " + JSON.stringify(emailsFinal));
+                console.log("email data is " + data);
                 //var theUrl = "";
                 // QRCode.toDataURL(req.body.short_id, function (err, url) {
                 //     theUrl = url;
                 //     console.log(theUrl);
                 //   });
                 var subject = "Scene Invitation : " + req.body.sceneTitle;
-                var from = req.session.user.email;
+                // var from = req.session.user.email;
+                var from = adminEmail
                 //var from = "polytropoi@gmail.com";
                 // var to = [req.body.sceneShareWith];
                 var to = [data.email];
-                var personID = data.person_id;
+                // var personID = data.person_id != undefined ? data.person_id : "";
                 var bcc = [];
                 //var reset = "";
                 var timestamp = Math.round(Date.now() / 1000);
                 var message = "";
-                var servicemedia_link = rootHost + "/#/s/" + req.body.short_id;
-                // var wgl_link = "http://mvmv.us/?scene=" + req.body.short_id;
-                var scene_page = req.body.sceneDomain + "/" + req.body.short_id;
+                // var servicemedia_link = rootHost + "/#/s/" + req.body.short_id;
+                // // var wgl_link = "http://mvmv.us/?scene=" + req.body.short_id;
+                // var scene_page = req.body.sceneDomain + "/" + req.body.short_id;
                 var app_link = "servicemedia://scene?" + req.body.short_id;
-                var mob_link = "servicemedia://scene?" + req.body.short_id;
+                // var mob_link = "servicemedia://scene?" + req.body.short_id;
                 if (req.body.sceneMessage === "" || req.body.sceneMessage == null) {
                     message = " has shared an Immersive Scene with you!";
                 } else {
                     message = " has shared an Immersive Scene with you including this message: " +
                         "<hr><br> " + req.body.sceneMessage +  "<br>"
                 }
-                var urlHalf = "";
+                // var urlHalf = "";
                 // if (req.body.postcards[0]) {
                 //     urlHalf = req.body.postcards[0].urlHalf;
                 // }
                 // if (validator.isEmail(to) == true) {
-                    if (req.body.sceneShareWithPublic) {
+                    if (theScene.sceneShareWithPublic) {
 
                         var htmlbody = req.session.user.userName + message + "</h3><hr>" +
-                            "<br> You can access this public scene using the <a href='https://servicemedia.net'>ServiceMedia app</a>" +
-                            "<br> For quick access, launch the app and <strong><a href='https://servicemedia.net/qrcode/" + req.body.short_id + "'>Scan this Access Code!</a></strong>" +
+                            "<br> Click here to access this public scene: <strong><a href='"+ req.protocol + "://" + req.headers.host + "/webxr/" + req.body.short_id+"' target='_blank'>"+ req.protocol + "://" + req.headers.host + "/webxr/" + req.body.short_id+"</a></strong>" +
+                            
                             "<br> <img src=" + urlHalf + "> " +
-                                                        "<br> Scene Title: " + req.body.sceneTitle +
-                            "<br> Scene Key: " + req.body.short_id +
-                            "<br> Scene Type: " + req.body.sceneType +
-                            "<br> Scene Description: " + req.body.sceneDescription +
-                            "<br> <a href= http://" + scene_page + "> Here's the shareable public page for this scene. </a> <br>If you have the iOS app, you may load the scene directly with the <a href= "+ app_link +">Mobile App Link</a>" +
+                            "<br> Scene Title: " + req.body.sceneTitle +
+                            "<br> Scene Short ID: " + req.body.short_id +
+                            "<br> Scene Keynote: " + theScene.sceneKeynote +
+                            "<br> Scene Description: " + theScene.sceneDescription +
+                            "<br> Owner: " + theScene.userName +
+
+                            "<br><br><strong><a href='"+ req.protocol + "://" + req.headers.host + "/qrcode/" + req.body.short_id + "'>Click here to scan Access Code for this scene</a></strong>" +
+
+                            // "<br> <a href= http://" + scene_page + "> Here's the shareable public page for this scene. </a> <br>If you have the iOS app, you may load the scene directly with the <a href= "+ app_link +">Mobile App Link</a>" +
                 //            "r><br> <a href= " + mob_link + "> Mobile App link </a> " +
                             // "<br><a href='https://servicemedia.net/qrcode/" + req.body.short_id + "'>You may also use the app and scan the quick access code here!</a>"
-                            "<br>You may also enter the scene title or keycode on the ServiceMedia app landing page" +
-                            "Click this invitation link to authenticate your access (link expires in 10 hours): <br>" +
-                            req.headers.hostname + "/invitation_check/" + cleanhash +
+                            // "<br>You may also enter the scene title or keycode on the ServiceMedia app landing page" +
+                            // "Click this invitation link to authenticate your access (link expires in 10 hours): <br>" +
+                            // req.headers.hostname + "/invitation_check/" + cleanhash +
                             "<br> For more scenes like this, or to get the latest app, visit <a href='https://servicemedia.net'>ServiceMedia.net!</a> ";
                         ses.sendEmail( {
                                 Source: from,
@@ -5742,6 +5786,7 @@ app.post('/share_scene/', requiredAuthentication, function (req, res) {
                             });
                         callbackzz();
                     } else {
+                        //TODO check user's auth?
                         // if (timestamp < user.resetTimestamp + 3600) { //expires in 1 hour!
                         bcrypt.genSalt(3, function(err, salt) { //level3 easy, not a password itself
                             bcrypt.hash(timestamp.toString(), salt, null, function(err, hash) {
@@ -5757,7 +5802,7 @@ app.post('/share_scene/', requiredAuthentication, function (req, res) {
                                     sentByUserName: req.session.user.userName,
                                     sentByUserID: req.session.user._id.toString(),
                                     sentToEmail: to,
-                                    sentToPersonID: data.personID.toString(),
+                                    sentToPersonID: data.personID,
                                     invitationHash: cleanhash,
                                     invitationTimestamp: timestamp
 
@@ -5783,12 +5828,14 @@ app.post('/share_scene/', requiredAuthentication, function (req, res) {
                                     "<br><strong>This is a private scene, intended only for subscribers or invited guests.</strong><br>" +
                                     // "Click this invitation link to authenticate your access (link expires in 10 hours)" +
                                     // req.headers.host + "/invitation_check/" + cleanhash + "<br>" +
-                                    "<a href='"+ req.protocol + "://" + req.headers.host + "/invitation_check/" + cleanhash + "' target='_blank'>Click this invitation link to authenticate your access</a><br>" +
-                                    // "<br> <img src=" + urlHalf + "> " +
+                                    "Click this invitation link to authenticate your access: <br>" +
+                                    "<strong><a href='"+ req.protocol + "://" + req.headers.host + "/landing/invite.html?iv=" + cleanhash + "' target='_blank'>"+ req.protocol + "://" + req.headers.host + "/landing/invite.html?iv=" + cleanhash + "</a></strong><br>" +
+                                    "<br> <img src=" + urlHalf + "> " +
                                     "<br> Scene Title: " + req.body.sceneTitle +
                                     "<br> Short ID: " + req.body.short_id +
-                                    "<br> Keynote: " + req.body.sceneType +
-                                    "<br> Description: " + req.body.sceneDescription +
+                                    "<br> Keynote: " + theScene.sceneKeynote +
+                                    "<br> Description: " + theScene.sceneDescription +
+                                    "<br> Owner: " + theScene.userName +
                 
                                     "<br> For more info, or to become a subscriber, visit <a href='https://servicemedia.net'>ServiceMedia.net!</a> ";
 
