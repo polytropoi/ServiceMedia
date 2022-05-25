@@ -5252,7 +5252,7 @@ app.post('/resetcheck', function (req, res) {
     });
 });
 
-app.get('/invitation_check/:hzch', function (req, res) {
+app.get('/invitation_check/:hzch', function (req, res) { //called from /landing/invite.html
     let hash = req.params.hzch;
     console.log("invitation check:" + hash);
     db.invitations.findOne({"invitationHash": hash}, function (err, invitation) {
@@ -5265,13 +5265,14 @@ app.get('/invitation_check/:hzch', function (req, res) {
             if (timestamp < invitation.invitationTimestamp + 36000) { //expires in 10 hour! //TODO access window start and end timestamps
                 console.log("timestamp checks out!" + invitation.invitationTimestamp);
 
-                db.invitations.update ( { "invitationHash": req.body.hzch }, { $set: { validated: true, pin : pin} });
+                db.invitations.update ( { "invitationHash": hash }, { $set: { validated: true, pin : pin} });
                 var response = {};
                 response.short_id = invitation.invitedToSceneShortID;
                 response.ok = "yep";
                 response.pin = pin;
-                var codestring = "~" + response.pin;
-                QRCode.toDataURL(codestring, function (err, url) {
+                response.url = req.protocol + "://" + req.headers.host + "/webxr/" + invitation.invitedToSceneShortID + "?p=" + pin;
+                // var codestring = req.protocol + "://" + req.headers.host + "/webxr/" + invitation.invitedToSceneShortID + "?p=" + pin;
+                QRCode.toDataURL(response.url, function (err, url) {
                     // console.log(url);
                     // var imgLink = "<img width=\x22128\x22 height=\x22128\x22 alt=\x22qrcode\x22 src=\x22" + url + "\x22/>"
                     // console.log(response.qrcode);
@@ -5402,7 +5403,8 @@ app.post('/resetpw', function (req, res) {
         res.send("invalid email address");
     }
 });
-app.post('/send_invitations', requiredAuthentication, checkAppID, function (req, res) {
+
+app.post('/send_invitations', requiredAuthentication, checkAppID, function (req, res) { //nope
 
     console.log('send request from: ' + req.body.email);
     // ws.send("authorized");
@@ -5461,15 +5463,15 @@ app.post('/send_invitations', requiredAuthentication, checkAppID, function (req,
 });
 
 
-app.post('/send_invitez/', requiredAuthentication, function (req, res) {
-    console.log("tryna send invite: " + JSON.stringify(req.body));
+app.post('/send_invitez/', requiredAuthentication, function (req, res) { //nope
+    console.log("tryna send invite: " + JSON.stringify(req.body)); 
     res.send("sent");
 });
 
 // app.post('/invite_scene/:_id', checkAppID, requiredAuthentication, function (req, res) {
 //     console.log("share node: " + req.body._id + " wmail: " + req.body.sceneShareWith);
 
-app.post('/send_invite/', requiredAuthentication, function (req, res) {
+app.post('/send_invite/', requiredAuthentication, function (req, res) { //nope
     console.log("tryna send invite : " + JSON.stringify(req.body));
     let addressArray = req.body.sceneShareWithPeople.split(",");
     async.each (addressArray, function (emailAddress, callbackz) { //loop tru w/ async
@@ -5573,7 +5575,7 @@ app.post('/send_invite/', requiredAuthentication, function (req, res) {
 });
 
 
-app.post('/share_scene/', requiredAuthentication, function (req, res) {
+app.post('/share_scene/', requiredAuthentication, function (req, res) { //yep!
 
     //temp container for objex with peopleID + email
     let theScene = {};
@@ -15522,13 +15524,16 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                     }
                 }
                 if (!sceneData.sceneShareWithPublic) { 
+                    accessScene = false;
                     console.log("isGUest: " +isGuest+ " sceneShareWithSubscribers " + sceneData.sceneShareWithSubscribers);
                     if (sceneData.sceneShareWithSubscribers && !isGuest) {
                         console.log("welcome subscriber");
+                        accessScene = true;
                     } else {
                         if (req.session.user != undefined) {
                             if (sceneData.user_id == req.session.user._id) {
                                 console.log("welcome scene owner");
+                                accessScene = true;
                             } else {
                                 console.log("that's private!");
                                 accessScene = false;
@@ -15539,9 +15544,56 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                         }
                     }
                 }
-                if (accessScene) {
+                // if (accessScene) {
                 async.waterfall([ 
+                
+                function (callback) {
+                    let pin = req.query.p;
+                    if (pin != null) {
+                        console.log('gotsa pin : ' + pin);
+                        var timestamp = Math.round(Date.now() / 1000);
+                        var query = {$and: [{pin : pin}, {validated : true}, {accessTimeWindow: {$gt : timestamp}}]}; 
+                        console.log('pin query ' + JSON.stringify(query));
+                        db.invitations.find (query, function (err, invitations) {
+                            // db.invitations.find ({$and: [{sentToEmail : req.body.email}, {validated : true} ]}, function (err, invitations) {
+                            if (err || !invitations || invitations.length < 1) {
+                                console.log("error checking pin " + invitations);
+                                callback(err);
+                                // accessScene = false;
+                            } else {
+                                console.log('invitations' + JSON.stringify(invitations) );
+                                accessScene = true;
+                                console.log("pin checks out!!");
+                                callback(null);
+                            }
+                        });
+                    } else {
+                        callback(null);
+                    }
+                },
+                function (callback) {
+                    if (!accessScene) {
+                    //     let noAccessHTML = "<html xmlns='http://www.w3.org/1999/xhtml'>" +
+                    //     "<head> " +
+                    //     // "<link href=\x22css/sb-admin-2.css\x22 rel=\x22stylesheet\x22>" +
+                    //     "<style>"+
+                    //     "body {background-color: #505050;}"+
+                    //     "h1   {color: white;}"+
+                    //     "a   {color: powderblue;}"+
+                    //     "p    {color: white; font-family: sans-serif; font-size: 150%;}"+
+                    //     "</style>"+
+                    //     "</head> " +
+                    //     "<p>Sorry, access to this resource is restricted.</p><p>If you're a subscriber, you may <a href=\x22/main/login.html\x22>login</a>, or request an invitation by emailing <a href=\x22mailto:"+sceneData.short_id+"@servicemedia.net\x22>"+sceneData.short_id+"@servicemedia.net</a></p>"
+                    //     "<body> " +
+                    //     "</body>" +
 
+                    // "</html>";
+                    // res.send(noAccessHTML);
+                        callback(true);
+                    } else {
+                        callback(null);
+                    }
+                },
                 function (callback) {
                 if (sceneData.sceneTags != null) {        
                     for (let i = 0; i < sceneData.sceneTags.length; i++) { //not ideal, but it's temporary...
@@ -18150,7 +18202,6 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                 }
                             });
                         } else {
-        //                      callback(null);
                             callback();
                         }
                 },
@@ -20156,17 +20207,8 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
 
             function (err, result) { // #last function, close async
                 if (err != null) {
-                    res.send("error!! " + err);
-                } else {
-                    res.send(htmltext).end();
-                    // res.end();
-                    //console.log("webxr gen done: " + result);
-                }
-            }      
-        );
-        } else { //if !accessScene
-            console.log("no scene access");
-            let noAccessHTML = "<html xmlns='http://www.w3.org/1999/xhtml'>" +
+                    if (!accessScene) {
+                        let noAccessHTML = "<html xmlns='http://www.w3.org/1999/xhtml'>" +
                         "<head> " +
                         // "<link href=\x22css/sb-admin-2.css\x22 rel=\x22stylesheet\x22>" +
                         "<style>"+
@@ -20180,9 +20222,37 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                         "<body> " +
                         "</body>" +
 
-                    "</html>";
-            res.send(noAccessHTML);
-        }
+                        "</html>";
+                        res.send(noAccessHTML);
+                    } else {
+                        res.send("error!! " + err);
+                    }
+                } else {
+                    res.send(htmltext).end();
+                    // res.end();
+                    //console.log("webxr gen done: " + result);
+                    }
+                }      
+        );
+        // } else { //if !accessScene
+        //     console.log("no scene access");
+        //     let noAccessHTML = "<html xmlns='http://www.w3.org/1999/xhtml'>" +
+        //                 "<head> " +
+        //                 // "<link href=\x22css/sb-admin-2.css\x22 rel=\x22stylesheet\x22>" +
+        //                 "<style>"+
+        //                 "body {background-color: #505050;}"+
+        //                 "h1   {color: white;}"+
+        //                 "a   {color: powderblue;}"+
+        //                 "p    {color: white; font-family: sans-serif; font-size: 150%;}"+
+        //                 "</style>"+
+        //                 "</head> " +
+        //                 "<p>Sorry, access to this resource is restricted.</p><p>If you're a subscriber, you may <a href=\x22/main/login.html\x22>login</a>, or request an invitation by emailing <a href=\x22mailto:"+sceneData.short_id+"@servicemedia.net\x22>"+sceneData.short_id+"@servicemedia.net</a></p>"
+        //                 "<body> " +
+        //                 "</body>" +
+
+        //             "</html>";
+        //     res.send(noAccessHTML);
+        // }
             // }                
         
         } //intial sceneData request, condition on type

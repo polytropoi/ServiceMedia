@@ -41,8 +41,9 @@
                         .then(function (response) {
                             if (response.data.pin != undefined && response.data.pin.length > 6) {
                                 console.log(JSON.stringify(response))
-                                main.innerHTML = "You are all freaking set, baby! <br>Here's your PIN: " + response.data.pin + "<br><br>" +
-                                "Here's a scannable QR code:" +
+                                main.innerHTML = "You are all freaking set, baby! <br><a href="+ response.data.url + ">Click here to enter scene...</a>"+
+                                "<br><br>Your PIN is: " + response.data.pin + "<br><br>" +
+                                "Scannable QR code:" +
                                 "<img style='height: 100%; width: 100%; object-fit: contain' alt='qrcode' src='" + response.data.qrcode + "'/>";
 
                             } else {
@@ -63,4 +64,19 @@
     </body>
 
 </html>
-
+<!-- 
+let pin = getParameterByName('p');
+if (pin != null) {
+    var timestamp = Math.round(Date.now() / 1000);
+    var query = {$and: [{pin : req.body.pin}, {validated : true}, {accessTimeWindow: {$gt : timestamp}}]};
+    db.invitations.find (query, function (err, invitations) {
+        // db.invitations.find ({$and: [{sentToEmail : req.body.email}, {validated : true} ]}, function (err, invitations) {
+        if (err || !invitations) {
+            console.log("error checking pin " + error);
+            accessScene = false;
+        } else {
+            accessScene = true;
+            console.log("pin checks out!!");
+        }
+    });
+}  -->
