@@ -5254,7 +5254,11 @@ app.post('/resetcheck', function (req, res) {
 
 app.get('/invitation_check/:hzch', function (req, res) { //called from /landing/invite.html
     let hash = req.params.hzch;
-    console.log("invitation check:" + hash);
+    let requestProtocol = 'https';
+    if (req.headers.host.includes("localhost")) {
+        requestProtocol = 'http';
+    }
+    console.log("invitation check:" + hash + " protocol: " + req.procotol );
     db.invitations.findOne({"invitationHash": hash}, function (err, invitation) {
         if (err || !invitation) {
             console.log("did not find invitation: " + err);
@@ -5270,7 +5274,7 @@ app.get('/invitation_check/:hzch', function (req, res) { //called from /landing/
                 response.short_id = invitation.invitedToSceneShortID;
                 response.ok = "yep";
                 response.pin = pin;
-                response.url = req.protocol + "://" + req.headers.host + "/webxr/" + invitation.invitedToSceneShortID + "?p=" + pin;
+                response.url = requestProtocol + "://" + req.headers.host + "/webxr/" + invitation.invitedToSceneShortID + "?p=" + pin;
                 // var codestring = req.protocol + "://" + req.headers.host + "/webxr/" + invitation.invitedToSceneShortID + "?p=" + pin;
                 QRCode.toDataURL(response.url, function (err, url) {
                     // console.log(url);
@@ -5578,6 +5582,11 @@ app.post('/send_invite/', requiredAuthentication, function (req, res) { //nope
 app.post('/share_scene/', requiredAuthentication, function (req, res) { //yep!
 
     //temp container for objex with peopleID + email
+    console.log("tryna share scnee with prootocl " + req.protocol);
+    let requestProtocol = 'https';
+    if (req.headers.host.includes("localhost")) {
+        requestProtocol = 'http';
+    }
     let theScene = {};
     async.waterfall([
 
@@ -5700,7 +5709,9 @@ app.post('/share_scene/', requiredAuthentication, function (req, res) { //yep!
                                 callback(null, urlHalf, eData);
                             }
                         });
-                    } 
+                    } else {
+                        callback(null, '', eData);
+                    }
                 }
             });
         },
@@ -5745,7 +5756,7 @@ app.post('/share_scene/', requiredAuthentication, function (req, res) { //yep!
                     if (theScene.sceneShareWithPublic) {
 
                         var htmlbody = req.session.user.userName + message + "</h3><hr>" +
-                            "<br> Click here to access this public scene: <strong><a href='"+ req.protocol + "://" + req.headers.host + "/webxr/" + req.body.short_id+"' target='_blank'>"+ req.protocol + "://" + req.headers.host + "/webxr/" + req.body.short_id+"</a></strong>" +
+                            "<br> Click here to access this public scene: <strong><a href='"+ requestProtocol + "://" + req.headers.host + "/webxr/" + req.body.short_id+"' target='_blank'>"+ requestProtocol + "://" + req.headers.host + "/webxr/" + req.body.short_id+"</a></strong>" +
                             
                             "<br> <img src=" + urlHalf + "> " +
                             "<br> Scene Title: " + req.body.sceneTitle +
@@ -5754,7 +5765,7 @@ app.post('/share_scene/', requiredAuthentication, function (req, res) { //yep!
                             "<br> Scene Description: " + theScene.sceneDescription +
                             "<br> Owner: " + theScene.userName +
 
-                            "<br><br><strong><a href='"+ req.protocol + "://" + req.headers.host + "/qrcode/" + req.body.short_id + "'>Click here to scan Access Code for this scene</a></strong>" +
+                            "<br><br><strong><a href='"+ requestProtocol + "://" + req.headers.host + "/qrcode/" + req.body.short_id + "'>Click here to scan Access Code for this scene</a></strong>" +
 
                             // "<br> <a href= http://" + scene_page + "> Here's the shareable public page for this scene. </a> <br>If you have the iOS app, you may load the scene directly with the <a href= "+ app_link +">Mobile App Link</a>" +
                 //            "r><br> <a href= " + mob_link + "> Mobile App link </a> " +
@@ -5820,10 +5831,10 @@ app.post('/share_scene/', requiredAuthentication, function (req, res) { //yep!
                                     }
                                 });
                                 if (req.body.sceneMessage === "" || req.body.sceneMessage == null) {
-                                    message = from + " has shared an Immersive Scene with you!";
+                                    message = req.session.user.userName + " has shared an Immersive Scene with you!";
                                     // "<h3>Scene Invitation from " + from + "</h3><hr><br>"
                                 } else {
-                                    message = from + " has shared an Immersive Scene with you with this message: "+
+                                    message = req.session.user.userName + " has shared an Immersive Scene with you with this message: "+
                                         "<hr><br> " + req.body.sceneMessage +  "<br><hr>";
                                 }
                                 var htmlbody = message +
@@ -5831,7 +5842,7 @@ app.post('/share_scene/', requiredAuthentication, function (req, res) { //yep!
                                     // "Click this invitation link to authenticate your access (link expires in 10 hours)" +
                                     // req.headers.host + "/invitation_check/" + cleanhash + "<br>" +
                                     "Click this invitation link to authenticate your access: <br>" +
-                                    "<strong><a href='"+ req.protocol + "://" + req.headers.host + "/landing/invite.html?iv=" + cleanhash + "' target='_blank'>"+ req.protocol + "://" + req.headers.host + "/landing/invite.html?iv=" + cleanhash + "</a></strong><br>" +
+                                    "<strong><a href='"+ requestProtocol + "://" + req.headers.host + "/landing/invite.html?iv=" + cleanhash + "' target='_blank'>"+ requestProtocol + "://" + req.headers.host + "/landing/invite.html?iv=" + cleanhash + "</a></strong><br>" +
                                     "<br> <img src=" + urlHalf + "> " +
                                     "<br> Scene Title: " + req.body.sceneTitle +
                                     "<br> Short ID: " + req.body.short_id +
