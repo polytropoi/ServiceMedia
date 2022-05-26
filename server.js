@@ -5265,7 +5265,7 @@ app.get('/invitation_check/:hzch', function (req, res) { //called from /landing/
             res.send("not found");
         } else {
             var timestamp = Math.round(Date.now() / 1000);
-            var pin = Math.random().toString().substr(2,20); //hrm...
+            var pin = Math.random().toString().substr(2,6); //hrm...
             if (timestamp < invitation.invitationTimestamp + 36000) { //expires in 10 hour! //TODO access window start and end timestamps
                 console.log("timestamp checks out!" + invitation.invitationTimestamp);
 
@@ -5274,6 +5274,7 @@ app.get('/invitation_check/:hzch', function (req, res) { //called from /landing/
                 response.short_id = invitation.invitedToSceneShortID;
                 response.ok = "yep";
                 response.pin = pin;
+                response.to = invitation.sentToEmail;
                 response.url = requestProtocol + "://" + req.headers.host + "/webxr/" + invitation.invitedToSceneShortID + "?p=" + pin;
                 // var codestring = req.protocol + "://" + req.headers.host + "/webxr/" + invitation.invitedToSceneShortID + "?p=" + pin;
                 QRCode.toDataURL(response.url, function (err, url) {
@@ -15572,9 +15573,10 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                 callback(err);
                                 // accessScene = false;
                             } else {
-                                console.log('invitations' + JSON.stringify(invitations) );
+                                // console.log('invitations' + JSON.stringify(invitations) );
                                 accessScene = true;
                                 console.log("pin checks out!!");
+                                db.invitations.update ( { pin: pin }, { $set: { pin : ''} }); //burn after reading once!
                                 callback(null);
                             }
                         });
@@ -15584,25 +15586,9 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                 },
                 function (callback) {
                     if (!accessScene) {
-                    //     let noAccessHTML = "<html xmlns='http://www.w3.org/1999/xhtml'>" +
-                    //     "<head> " +
-                    //     // "<link href=\x22css/sb-admin-2.css\x22 rel=\x22stylesheet\x22>" +
-                    //     "<style>"+
-                    //     "body {background-color: #505050;}"+
-                    //     "h1   {color: white;}"+
-                    //     "a   {color: powderblue;}"+
-                    //     "p    {color: white; font-family: sans-serif; font-size: 150%;}"+
-                    //     "</style>"+
-                    //     "</head> " +
-                    //     "<p>Sorry, access to this resource is restricted.</p><p>If you're a subscriber, you may <a href=\x22/main/login.html\x22>login</a>, or request an invitation by emailing <a href=\x22mailto:"+sceneData.short_id+"@servicemedia.net\x22>"+sceneData.short_id+"@servicemedia.net</a></p>"
-                    //     "<body> " +
-                    //     "</body>" +
-
-                    // "</html>";
-                    // res.send(noAccessHTML);
-                        callback(true);
+                        callback(true); //error is true, bail to the end!
                     } else {
-                        callback(null);
+                        callback(null); //elsewise go wid it now...
                     }
                 },
                 function (callback) {
