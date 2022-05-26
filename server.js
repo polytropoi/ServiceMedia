@@ -5269,7 +5269,7 @@ app.get('/invitation_check/:hzch', function (req, res) { //called from /landing/
             if (timestamp < invitation.invitationTimestamp + 36000) { //expires in 10 hour! //TODO access window start and end timestamps
                 console.log("timestamp checks out!" + invitation.invitationTimestamp);
 
-                db.invitations.update ( { "invitationHash": hash }, { $set: { validated: true, pin : pin} });
+                db.invitations.update ( { "invitationHash": hash }, { $set: { validated: true, pin : pin, pinTimeout: timestamp + 3600} }); 
                 var response = {};
                 response.short_id = invitation.invitedToSceneShortID;
                 response.ok = "yep";
@@ -15564,10 +15564,11 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                     if (pin != null) {
                         console.log('gotsa pin : ' + pin);
                         var timestamp = Math.round(Date.now() / 1000);
-                        var query = {$and: [{pin : pin}, {validated : true}, {accessTimeWindow: {$gt : timestamp}}]}; 
+                        var query = {$and: [{pin : pin}, {validated : true}, {accessTimeWindow: {$gt : timestamp}}, {pinTimeout: {$gt: timestamp}}]}; 
                         console.log('pin query ' + JSON.stringify(query));
                         db.invitations.findOne (query, function (err, invitation) {
                             // db.invitations.find ({$and: [{sentToEmail : req.body.email}, {validated : true} ]}, function (err, invitations) {
+                                console.log("invitation : " + JSON.stringify(invitation));
                             if (err || !invitation) {
                                 console.log("error checking pin " + invitation);
                                 callback(err);
@@ -15577,7 +15578,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                 accessScene = true;
                                 avatarName = invitation.sentToEmail.toString().split('@')[0];
                                 console.log("pin checks out!!");
-                                db.invitations.update ( { pin: pin }, { $set: { pin : ''} }); //burn after reading once!
+                                // db.invitations.update ( { pin: pin }, { $set: { pinTimeout : ''} }); //burn after reading once! //nm, just sniff the timestamp
                                 callback(null);
                             }
                         });
