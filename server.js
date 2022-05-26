@@ -15566,15 +15566,16 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                         var timestamp = Math.round(Date.now() / 1000);
                         var query = {$and: [{pin : pin}, {validated : true}, {accessTimeWindow: {$gt : timestamp}}]}; 
                         console.log('pin query ' + JSON.stringify(query));
-                        db.invitations.find (query, function (err, invitations) {
+                        db.invitations.findOne (query, function (err, invitation) {
                             // db.invitations.find ({$and: [{sentToEmail : req.body.email}, {validated : true} ]}, function (err, invitations) {
-                            if (err || !invitations || invitations.length < 1) {
-                                console.log("error checking pin " + invitations);
+                            if (err || !invitation) {
+                                console.log("error checking pin " + invitation);
                                 callback(err);
                                 // accessScene = false;
                             } else {
                                 // console.log('invitations' + JSON.stringify(invitations) );
                                 accessScene = true;
+                                avatarName = invitation.sentToEmail.toString().split('@')[0];
                                 console.log("pin checks out!!");
                                 db.invitations.update ( { pin: pin }, { $set: { pin : ''} }); //burn after reading once!
                                 callback(null);
