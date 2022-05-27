@@ -5492,11 +5492,11 @@ app.post('/send_invite/', requiredAuthentication, function (req, res) { //nope
         var servicemedia_link = rootHost + "/webxr/" + req.body.short_id;
         // var wgl_link = "https://servicemedia.net/webxr/" + req.body.short_id;
         var mob_link = "http://strr.us/?scene=" + req.body.short_id;
-        if (req.body.sceneMessage === "" || req.body.sceneMessage == null) {
+        if (req.body.sceneShareWithMessage === "" || req.body.sceneShareWithMessage == null) {
             message = " has invited you to join them in the metaverse!";
         } else {
             message = " has shared this Postcard from the Metaverse with you including the message: " +
-                "<hr><br> " + req.body.sceneMessage +  "<br>"
+                "<hr><br> " + req.body.sceneShareWithMessage +  "<br>"
         }
         var urlHalf = "";
 
@@ -5543,7 +5543,7 @@ app.post('/send_invite/', requiredAuthentication, function (req, res) { //nope
                     }
                     },
                     Source: from, /* required */
-                    ReplyToAddresses: [adminEmail],
+                    ReplyToAddresses: [from],
                 };
                 // Create the promise and SES service object
                 var sendPromise = new aws.SES({apiVersion: '2010-12-01'}).sendEmail(params).promise();
@@ -5728,8 +5728,8 @@ app.post('/share_scene/', requiredAuthentication, function (req, res) { //yep!
                 //     console.log(theUrl);
                 //   });
                 var subject = "Scene Invitation : " + req.body.sceneTitle;
-                // var from = req.session.user.email;
-                var from = adminEmail
+                var from = req.session.user.email;
+                // var from = adminEmail
                 //var from = "polytropoi@gmail.com";
                 // var to = [req.body.sceneShareWith];
                 var to = [data.email];
@@ -5743,11 +5743,11 @@ app.post('/share_scene/', requiredAuthentication, function (req, res) { //yep!
                 // var scene_page = req.body.sceneDomain + "/" + req.body.short_id;
                 var app_link = "servicemedia://scene?" + req.body.short_id;
                 // var mob_link = "servicemedia://scene?" + req.body.short_id;
-                if (req.body.sceneMessage === "" || req.body.sceneMessage == null) {
+                if (req.body.sceneShareWithMessage === "" || req.body.sceneShareWithMessage == null) {
                     message = " has shared an Immersive Scene with you!";
                 } else {
                     message = " has shared an Immersive Scene with you including this message: " +
-                        "<hr><br> " + req.body.sceneMessage +  "<br>"
+                        "<hr><br> " + req.body.sceneShareWithMessage +  "<br>"
                 }
                 // var urlHalf = "";
                 // if (req.body.postcards[0]) {
@@ -5831,12 +5831,12 @@ app.post('/share_scene/', requiredAuthentication, function (req, res) { //yep!
 
                                     }
                                 });
-                                if (req.body.sceneMessage === "" || req.body.sceneMessage == null) {
+                                if (req.body.sceneShareWithMessage === "" || req.body.sceneShareWithMessage == null) {
                                     message = req.session.user.userName + " has shared an Immersive Scene with you!";
                                     // "<h3>Scene Invitation from " + from + "</h3><hr><br>"
                                 } else {
                                     message = req.session.user.userName + " has shared an Immersive Scene with you with this message: "+
-                                        "<hr><br> " + req.body.sceneMessage +  "<br><hr>";
+                                        "<hr><br> " + req.body.sceneShareWithMessage +  "<br><hr>";
                                 }
                                 var htmlbody = message +
                                     "<br><strong>This is a private scene, intended only for subscribers or invited guests.</strong><br>" +
@@ -13221,6 +13221,7 @@ app.post('/update_scene/:_id', requiredAuthentication, function (req, res) {
                 sceneShareWithSubscribers : req.body.sceneShareWithSubscribers != null ? req.body.sceneShareWithSubscribers : false,
                 sceneShareWithGroups : req.body.sceneShareWithGroups != null ? req.body.sceneShareWithGroups : "",
                 sceneShareWithPeople : req.body.sceneShareWithPeople != null ? req.body.sceneShareWithPeople : "",
+                sceneShareWithMessage : req.body.sceneShareWithMessage != null ? req.body.sceneShareWithMessage : "",
                 sceneEnvironment : req.body.sceneEnvironment != null ? req.body.sceneEnvironment : {},
                 sceneUseStaticObj : req.body.sceneUseStaticObj != null ? req.body.sceneUseStaticObj : false,
                 sceneStaticObjUrl : req.body.sceneStaticObjUrl != null ? req.body.sceneStaticObjUrl : "",

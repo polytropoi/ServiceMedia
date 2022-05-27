@@ -15478,6 +15478,7 @@ function showGroup() {
                         let sceneKeynote = document.getElementById("sceneKeynote").value;
                         let sceneDescription = document.getElementById("sceneDescription").value;
                         let sceneShareWithPeople = document.getElementById("sceneShareWithPeople").value;
+                        let sceneShareWithMessage = document.getElementById("sceneShareWithMessage").value;
                         let sceneNextScene = document.getElementById("sceneNextScene").value;
                         let scenePreviousScene = document.getElementById("scenePreviousScene").value;
                         let sceneStickyness = document.getElementById("sceneStickyness").value;
@@ -15690,7 +15691,8 @@ function showGroup() {
                             sceneCategory: sceneCategory,
                             sceneShareWithPublic: sceneShareWithPublic,
                             sceneShareWithSubscribers: sceneShareWithSubscribers,
-                            sceneShareWithPeople: sceneShareWithPeople,
+                            sceneShareWithPeople: sceneShareWithPeople, //should be an array
+                            sceneShareWithMessage: sceneShareWithMessage,
                             sceneStickyness: sceneStickyness,
                             sceneSource: sceneSource,
                             sceneText: sceneText,
