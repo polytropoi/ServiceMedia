@@ -12627,17 +12627,29 @@ function showGroup() {
                             "</div>" +
                             "<div class=\x22form-row\x22>" + 
                                 "<div class=\x22col form-group col-md-3\x22>" +
-                                    "<label for=\x22sceneAccessStart\x22>Shared Event Start Date/Time</label>" + 
+                                    "<label for=\x22sceneAccessStart\x22>Event Start Date/Time</label>" + 
                                     "<input type=\x22datetime-local\x22 class=\x22form-control\x22 id=\x22sceneAccessStart\x22 placeholder=\x22\x22 value=\x22" + sceneAccessStart + "\x22 >" +
                                 "</div>" +
                                 "<div class=\x22col form-group col-md-3\x22>" +
-                                    "<label for=\x22sceneAccessEnd\x22>Shared Event End Date/Time</label>" + 
+                                    "<label for=\x22sceneAccessEnd\x22>Event End Date/Time</label>" + 
                                     "<input type=\x22datetime-local\x22 class=\x22form-control\x22 id=\x22sceneAccessEnd\x22 placeholder=\x22\x22 value=\x22" + sceneAccessEnd + "\x22 >" +
                                 "</div>" +
                                 "<div class=\x22col form-group col-md-2\x22>" +
-                                    "<label for=\x22sceneAccessLinkExpire\x22>Access Link Expiration</label>" + 
-                                    "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22sceneAccessLinkExpire\x22 placeholder=\x22Expires in minutes\x22 value=\x22" + sceneAccessLinkExpire + "\x22 >" +
-                                
+                                    // "<label for=\x22sceneAccessLinkExpire\x22>Access Link Expiration</label>" + 
+                                    // "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22sceneAccessLinkExpire\x22 placeholder=\x22Expires in minutes\x22 value=\x22" + sceneAccessLinkExpire + "\x22 >" +
+                                    
+                                    "<label for=\x22sceneAccessLinkExpireSelect\x22>Access Link Expiration</label>" + //sceneType
+                                    "<select class=\x22form-control\x22 id=\x22sceneAccessLinkExpireSelect\x22>" +
+                                        "<option value=\x22\x22 disabled selected>Select:</option>" +
+                                        "<option>Single Use</option>" +
+                                        "<option>1 Hour</option>" +
+                                        "<option>1 Day</option>" +
+                                        "<option>1 Week</option>" +
+                                        "<option>1 Month</option>" +
+                                        "<option>Event End</option>" +
+                                        "<option>Never</option>" +
+                                        
+                                    "</select>" +
                                 "</div>" +
                                 "<div class=\x22col form-group col-md-2\x22>" +
                                     "<div id=\x22sendInvitationButton\x22 class=\x22btn float-right btn-info btn-sm\x22>Send Invitation</div>"+
@@ -15179,6 +15191,38 @@ function showGroup() {
                             } 
                         }
                     });
+                    // $(document).on('change', '#sceneAccessLinkExpire', function() {
+                    //     // console.log("sceneAppNameSelect change : "+ this.value);
+                    //     for (let i = 0; i < apps.length; i++) {
+                    //         if (this.value == apps[i].appname) {
+                    //             console.log("appname match! " + this.value);  
+                    //             sceneDomain = apps[i].appdomain;
+                    //             sceneAppName = this.value;
+                    //         } 
+                    //     }
+                    // });
+
+                    $(document).on('change', '#sceneAccessStart', function() {
+                    //     // let val = this.value;
+                        
+                    //    let val = document.getElementById('sceneAccessStart').value;
+                        let datetime = new Date(this.value);
+                        let utc = new Date();
+                        let ms = utc.getTime(datetime);
+                        console.log("starttime: " + ms);
+                        sceneAccessStart = ms;
+                    });
+                    $(document).on('change', '#sceneAccessEnd', function() {
+                    //     // let val = this.value;
+                        
+                    //    let val = document.getElementById('sceneAccessStart').value;
+                       let datetime = new Date(this.value);
+                        let utc = new Date();
+                        let ms = utc.getTime(datetime);
+                       console.log("end time: " + ms);
+                       sceneAccessEnd = ms;
+                    });
+
                     // $(document).on('change', '#sceneSkyParticlesSelect', function() {
                     //     // console.log("sceneSkyParticlesSelect change : "+ this.value);
                     //     for (let i = 0; i < apps.length; i++) {
@@ -15479,6 +15523,9 @@ function showGroup() {
                         let sceneDescription = document.getElementById("sceneDescription").value;
                         let sceneShareWithPeople = document.getElementById("sceneShareWithPeople").value;
                         let sceneShareWithMessage = document.getElementById("sceneShareWithMessage").value;
+                        let sceneAccessStart = document.getElementById("sceneAccessStart").value;
+                        let sceneAccessEnd = document.getElementById("sceneAccessEnd").value;
+                        let sceneAccessLinkExpire = document.getElementById("sceneAccessLinkExpireSelect").value;
                         let sceneNextScene = document.getElementById("sceneNextScene").value;
                         let scenePreviousScene = document.getElementById("scenePreviousScene").value;
                         let sceneStickyness = document.getElementById("sceneStickyness").value;
@@ -15693,6 +15740,9 @@ function showGroup() {
                             sceneShareWithSubscribers: sceneShareWithSubscribers,
                             sceneShareWithPeople: sceneShareWithPeople, //should be an array
                             sceneShareWithMessage: sceneShareWithMessage,
+                            sceneAccessStart: sceneAccessStart,
+                            sceneAccessEnd: sceneAccessEnd,
+                            sceneAccessLinkExpire: sceneAccessLinkExpire,
                             sceneStickyness: sceneStickyness,
                             sceneSource: sceneSource,
                             sceneText: sceneText,

@@ -5832,10 +5832,10 @@ app.post('/share_scene/', requiredAuthentication, function (req, res) { //yep!
                                     }
                                 });
                                 if (req.body.sceneShareWithMessage === "" || req.body.sceneShareWithMessage == null) {
-                                    message = req.session.user.userName + " has shared an Immersive Scene with you!";
+                                    message = req.session.user.userName + " has shared an Immersive Scene!";
                                     // "<h3>Scene Invitation from " + from + "</h3><hr><br>"
                                 } else {
-                                    message = req.session.user.userName + " has shared an Immersive Scene with you with this message: "+
+                                    message = req.session.user.userName + " has shared an Immersive Scene with this message: "+
                                         "<hr><br> " + req.body.sceneShareWithMessage +  "<br><hr>";
                                 }
                                 var htmlbody = message +
@@ -12941,6 +12941,8 @@ app.post('/clone_scene', requiredAuthentication, function (req,res) {
                     sceneShareWithSubscribers : scene.sceneShareWithSubscribers != null ? scene.sceneShareWithSubscribers : false,
                     sceneShareWithGroups : scene.sceneShareWithGroups != null ? scene.sceneShareWithGroups : "",
                     sceneShareWithPeople : scene.sceneShareWithPeople != null ? scene.sceneShareWithPeople : "",
+                    sceneAccessStart : scene.sceneAccessStart != null ? scene.sceneAccessStart : "",
+                    sceneAccessEnd : scene.sceneAccessEnd != null ? scene.sceneAccessEnd : "",
                     sceneEnvironment : scene.sceneEnvironment != null ? scene.sceneEnvironment : {},
                     sceneUseStaticObj : scene.sceneUseStaticObj != null ? scene.sceneUseStaticObj : false,
                     sceneStaticObjUrl : scene.sceneStaticObjUrl != null ? scene.sceneStaticObjUrl : "",
@@ -13221,6 +13223,9 @@ app.post('/update_scene/:_id', requiredAuthentication, function (req, res) {
                 sceneShareWithSubscribers : req.body.sceneShareWithSubscribers != null ? req.body.sceneShareWithSubscribers : false,
                 sceneShareWithGroups : req.body.sceneShareWithGroups != null ? req.body.sceneShareWithGroups : "",
                 sceneShareWithPeople : req.body.sceneShareWithPeople != null ? req.body.sceneShareWithPeople : "",
+                sceneAccessStart : req.body.sceneAccessStart != null ? req.body.sceneAccessStart : "",
+                sceneAccessEnd : req.body.sceneAccessEnd != null ? req.body.sceneAccessEnd : "",
+                sceneAccessLinkExpire : req.body.sceneAccessLinkExpire != null ? req.body.sceneAccessLinkExpire : "",
                 sceneShareWithMessage : req.body.sceneShareWithMessage != null ? req.body.sceneShareWithMessage : "",
                 sceneEnvironment : req.body.sceneEnvironment != null ? req.body.sceneEnvironment : {},
                 sceneUseStaticObj : req.body.sceneUseStaticObj != null ? req.body.sceneUseStaticObj : false,
