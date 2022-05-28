@@ -5589,6 +5589,7 @@ app.post('/share_scene/', requiredAuthentication, function (req, res) { //yep!
         requestProtocol = 'http';
     }
     let theScene = {};
+    let ts = Date.now();
     async.waterfall([
 
         function(callback) {
@@ -5631,11 +5632,16 @@ app.post('/share_scene/', requiredAuthentication, function (req, res) { //yep!
             async.each (emailSplit, function (email, callbackz) {
                 db.people.findOne({ $and: [ {userID: uid}, {email: email.trim()} ]}, function(err, person) {
                     if (err || !person) {
+                        
                         console.log("did not find that person : " + err);
                         var person = {};
                         person.userID = req.session.user._id.toString();
-                        person.dateCreated = Date.now();
+                        person.dateCreated = ts
                         person.email = email.trim();
+                        person.activities = [];
+                        let action = {};
+                        action.wasSentEmail = ts + "_" + uid;
+                        person.activities.push(action);
                         console.log("fixing to save new person " + JSON.stringify(person));
                         db.people.save(person, function (err, saved) {
                             if ( err || !saved ) {
@@ -5654,15 +5660,26 @@ app.post('/share_scene/', requiredAuthentication, function (req, res) { //yep!
                                 });
                     } else {
                         //TODO update emailCount field? or 'touches'?
+                        if (person.activities == undefined) {
+                            person.activities = [];
+                        }
+                        let action = {};
+                        action.wasSentEmail = ts + "_" + uid;
+                        person.activities.push(action);
+
+                        db.people.update( { "_id": person._id }, { $set: {
+                            lastUpdate : ts,
+                            activities : person.activities
+                        }});
                         var pursoner = {};
                         console.log('found person id: ' + person._id);
                         pursoner.personID = person._id;
                         pursoner.email = email.trim();
                         emailsFinal.push(pursoner);
                         callbackz();
-                        }
+                    }
 
-                        });
+                    });
 
             }, function(err) {
                
@@ -5812,13 +5829,18 @@ app.post('/share_scene/', requiredAuthentication, function (req, res) { //yep!
                                     invitedToSceneTitle: req.body.sceneTitle,
                                     invitedToSceneID: req.body._id,
                                     invitedToSceneShortID: req.body.short_id,
-                                    accessTimeWindow: timestamp + 86400, //one day
+                                    accessTimeWindow: timestamp + 86400, //one day //will deprecate...
+                                    sceneAccessStart : req.body.sceneAccessStart,
+                                    sceneAccessEnd: req.body.sceneAccessEnd,
+                                    sceneAccessLinkExpire: req.body.sceneAccessLinkExpire,
+                                    
                                     sentByUserName: req.session.user.userName,
                                     sentByUserID: req.session.user._id.toString(),
                                     sentToEmail: to,
                                     sentToPersonID: data.personID,
                                     invitationHash: cleanhash,
-                                    invitationTimestamp: timestamp
+                                    invitationTimestamp: timestamp,
+
 
                                 }
                                 db.invitations.save(invitation, function (err, saved) {
@@ -5836,20 +5858,32 @@ app.post('/share_scene/', requiredAuthentication, function (req, res) { //yep!
                                     // "<h3>Scene Invitation from " + from + "</h3><hr><br>"
                                 } else {
                                     message = req.session.user.userName + " has shared an Immersive Scene with this message: "+
-                                        "<hr><br> " + req.body.sceneShareWithMessage +  "<br><hr>";
+                                        "<hr>" + req.body.sceneShareWithMessage +  "<br><hr>";
+                                }
+                                if (req.body.sceneAccessStart != undefined) {
+                                    let datetimeString = new Date(req.body.sceneAccessStart).toString();
+                                    message += "<br><strong>Event start: " + datetimeString + ".</strong><br>";
+                                    console.log(message);
+                                }
+                                if (req.body.sceneAccessEnd != undefined) {
+                                    let datetimeString = new Date(req.body.sceneAccessEnd).toString();
+                                    message += "<strong>Event end: " + datetimeString + ".</strong><br>";
                                 }
                                 var htmlbody = message +
-                                    "<br><strong>This is a private scene, intended only for subscribers or invited guests.</strong><br>" +
-                                    // "Click this invitation link to authenticate your access (link expires in 10 hours)" +
-                                    // req.headers.host + "/invitation_check/" + cleanhash + "<br>" +
-                                    "Click this invitation link to authenticate your access: <br>" +
-                                    "<strong><a href='"+ requestProtocol + "://" + req.headers.host + "/landing/invite.html?iv=" + cleanhash + "' target='_blank'>"+ requestProtocol + "://" + req.headers.host + "/landing/invite.html?iv=" + cleanhash + "</a></strong><br>" +
-                                    "<br> <img src=" + urlHalf + "> " +
                                     "<br> Scene Title: " + req.body.sceneTitle +
                                     "<br> Short ID: " + req.body.short_id +
                                     "<br> Keynote: " + theScene.sceneKeynote +
                                     "<br> Description: " + theScene.sceneDescription +
                                     "<br> Owner: " + theScene.userName +
+                                    "<br><strong>This is a private scene, intended only for subscribers or invited guests.</strong><br>" +
+                                    // "Click this invitation link to authenticate your access (link expires in 10 hours)" +
+                                    // req.headers.host + "/invitation_check/" + cleanhash + "<br>" +
+                                    // "Click this invitation link to authenticate your access: <br>" +
+                                    "<a href='"+ requestProtocol + "://" + req.headers.host + "/landing/invite.html?iv=" + cleanhash + "' target='_blank'>" +
+                                    "<button style='font-family: Arial, Helvetica, sans-serif;  font-size: 18px; background-color: blue; color: white; border-radius: 8px; margin: 10px; padding: 10px;'>"+
+                                    "Click here to authenticate your access!</a></button><br>" +
+                                    "<br> <img src=" + urlHalf + "> " +
+ 
                 
                                     "<br> For more info, or to become a subscriber, visit <a href='https://servicemedia.net'>ServiceMedia.net!</a> ";
 

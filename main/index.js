@@ -11655,6 +11655,8 @@ function showGroup() {
             let sceneShareWithMessage = response.data.sceneShareWithMessage != undefined ? response.data.sceneShareWithMessage : ""; 
             let sceneAccessStart = response.data.sceneAccessStart != undefined ? response.data.sceneAccessStart : ""; 
             let sceneAccessEnd = response.data.sceneAccessEnd != undefined ? response.data.sceneAccessEnd : ""; 
+            let sceneAccessStartDateTime = null;
+            let sceneAccessEndDateTime = null;
             let sceneAccessLinkExpire = response.data.sceneAccessLinkExpire != undefined ? response.data.sceneAccessLinkExpire : ""; 
             let sceneNextScene = response.data.sceneNextScene != undefined ? response.data.sceneNextScene : "";
             let scenePreviousScene = response.data.scenePreviousScene != undefined ? response.data.scenePreviousScene : ""; 
@@ -11853,29 +11855,7 @@ function showGroup() {
             }    
             let sceneWeblinkPics = "";    
                 if (weblinx != null && weblinx != undefined && weblinx.length > 0 ) {
-                // console.log("tryna fetch pics " + JSON.stringify(response.data.pictures));
-                // if (sceneResponse.sceneWebLinks != null && sceneResponse.sceneWebLinks.length > 0) {
-                //     let weblinx = [];
-                //     for (var i = 0; i < sceneResponse.sceneWebLinks.length; i++) {
-
-                //         db.weblinks.findOne({'_id': ObjectID(sceneResponse.sceneWebLinks[i])}, function (err, weblink) {
-                //             if (err || !weblink) {
-                //                 console.log("can't find weblink");
-                //             } else {
-                //                 let link = {};
-                //                 var urlThumb = s3.getSignedUrl('getObject', {Bucket: 'servicemedia.web', Key: sceneResponse.sceneWebLinks[i] +"/"+ sceneResponse.sceneWebLinks[i] + ".thumb.jpg", Expires: 6000});
-                //                 var urlHalf = s3.getSignedUrl('getObject', {Bucket: 'servicemedia.web', Key: sceneResponse.sceneWebLinks[i] +"/"+ sceneResponse.sceneWebLinks[i] + ".half.jpg", Expires: 6000});
-                //                 var urlStandard = s3.getSignedUrl('getObject', {Bucket: 'servicemedia.web', Key: sceneResponse.sceneWebLinks[i] +"/"+ sceneResponse.sceneWebLinks[i] + ".standard.jpg", Expires: 6000});
-                //                 link.urlThumb = urlThumb;
-                //                 link.urlHalf = urlHalf;
-                //                 link.urlStandard = urlStandard;
-                //                 link.link_url;
-                //                 weblinx.push(link);
-                //             }
-                //         });
-                //     }
-                //     sceneResponse.weblinx = weblinx;
-                // }
+     
                 for (let i = 0; i < weblinx.length; i++) {
                     // console.log(JSON.stringify(weblinx[i]));
                     sceneWeblinkPics = sceneWeblinkPics +
@@ -12229,6 +12209,7 @@ function showGroup() {
             let ambientAudioSingleButton = "";
             let triggerAudioGroupButtons = "";
             let triggerAudioSingleButton = "";
+
             //primary audio
             if (scenePrimaryAudioGroups != null && scenePrimaryAudioGroups.length > 0) {
                 for (i = 0; i < scenePrimaryAudioGroups.length; i++) {
@@ -12274,17 +12255,20 @@ function showGroup() {
                     }
                 }
             }
-            // for (var a in response.data.audio) {
-            //     if (response.data.audio[a]._id === response.data.sceneAmbientAudioID) {
-            //         ambientAudio = response.data.audio[a];
-            //     }
-            // }
-            // for (var a in response.data.audio) {
-            //     if (response.data.audio[a]._id === response.data.sceneTriggerAudioID) {
-            //         triggerAudio = response.data.audio[a];
-            //     }
-            // }
-                // if (!isEmpty && sceneTags)
+
+            if (sceneAccessStart != null && sceneAccessStart != "") { //comes in as ms from epoch
+                sceneAccessStartDateTime = new Date(sceneAccessStart).toISOString().substring(0, 19);
+                // console.log("sceneAccessStartDateTime: " + new Date(sceneAccessStart).toISOString());
+                $("#sceneAccessStart").val(sceneAccessStartDateTime);
+            }
+            if (sceneAccessEnd != null && sceneAccessEnd != "") { //ms from epoch
+                sceneAccessEndDateTime = new Date(sceneAccessEnd).toISOString().substring(0, 19); //trim the zulu bizness
+                // console.log("sceneAccessEndDateTime: " + sceneAccessEndDateTime);
+                $("#sceneAccessEnd").val(sceneAccessEndDateTime);
+            }
+
+
+
                 let sceneTagsHtml = "";
                 let sceneTags = [];
                 if (response.data.sceneTags != null && response.data.sceneTags.length > 0) {
@@ -12628,11 +12612,11 @@ function showGroup() {
                             "<div class=\x22form-row\x22>" + 
                                 "<div class=\x22col form-group col-md-3\x22>" +
                                     "<label for=\x22sceneAccessStart\x22>Event Start Date/Time</label>" + 
-                                    "<input type=\x22datetime-local\x22 class=\x22form-control\x22 id=\x22sceneAccessStart\x22 placeholder=\x22\x22 value=\x22" + sceneAccessStart + "\x22 >" +
+                                    "<input type=\x22datetime-local\x22 class=\x22form-control\x22 id=\x22sceneAccessStart\x22 placeholder=\x22\x22 value=\x22" + sceneAccessStartDateTime + "\x22 >" +
                                 "</div>" +
                                 "<div class=\x22col form-group col-md-3\x22>" +
                                     "<label for=\x22sceneAccessEnd\x22>Event End Date/Time</label>" + 
-                                    "<input type=\x22datetime-local\x22 class=\x22form-control\x22 id=\x22sceneAccessEnd\x22 placeholder=\x22\x22 value=\x22" + sceneAccessEnd + "\x22 >" +
+                                    "<input type=\x22datetime-local\x22 class=\x22form-control\x22 id=\x22sceneAccessEnd\x22 placeholder=\x22\x22 value=\x22" + sceneAccessEndDateTime + "\x22 >" +
                                 "</div>" +
                                 "<div class=\x22col form-group col-md-2\x22>" +
                                     // "<label for=\x22sceneAccessLinkExpire\x22>Access Link Expiration</label>" + 
@@ -14100,6 +14084,7 @@ function showGroup() {
                 $("#sceneCategorySelect").val(response.data.sceneCategory);
                 $("#sceneTypeSelect").val(response.data.sceneType);
                 $("#sceneWebTypeSelect").val(response.data.sceneWebType);
+                $("#sceneAccessLinkExpireSelect").val(response.data.sceneAccessLinkExpire);
                 $("#sceneCameraPath").val(response.data.sceneCameraPath);
                 $("#sceneCameraMode").val(response.data.sceneCameraMode);
                 $("#sceneWater").val(response.data.sceneWater != null ? response.data.sceneWater.name : "");
@@ -14742,9 +14727,12 @@ function showGroup() {
                                 data.sceneShareWithPeople = sceneShareWithPeople;
                                 data.sceneShareWithMessage = sceneShareWithMessage;
                                 data.sceneTitle = sceneTitle;
-                                data.sceneKeynote = sceneKeynote,
-                                data.sceneDescription = sceneDescription,
+                                data.sceneKeynote = sceneKeynote;
+                                data.sceneDescription = sceneDescription;
                                 data.short_id = response.data.short_id;
+                                data.sceneAccessStart = sceneAccessStart;
+                                data.sceneAccessEnd = sceneAccessEnd;
+                                data.sceneAccessLinkExpire = sceneAccessLinkExpire;
                                 data._id = response.data._id;
                                 axios.post('/share_scene/', data)
                                     .then(function (response) {
@@ -15523,8 +15511,8 @@ function showGroup() {
                         let sceneDescription = document.getElementById("sceneDescription").value;
                         let sceneShareWithPeople = document.getElementById("sceneShareWithPeople").value;
                         let sceneShareWithMessage = document.getElementById("sceneShareWithMessage").value;
-                        let sceneAccessStart = document.getElementById("sceneAccessStart").value;
-                        let sceneAccessEnd = document.getElementById("sceneAccessEnd").value;
+                        // let sceneAccessStart = document.getElementById("sceneAccessStart").value;
+                        // let sceneAccessEnd = document.getElementById("sceneAccessEnd").value;
                         let sceneAccessLinkExpire = document.getElementById("sceneAccessLinkExpireSelect").value;
                         let sceneNextScene = document.getElementById("sceneNextScene").value;
                         let scenePreviousScene = document.getElementById("scenePreviousScene").value;
