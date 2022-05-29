@@ -5267,7 +5267,7 @@ app.get('/invitation_check/:hzch', function (req, res) { //called from /landing/
             var timestamp = Math.round(Date.now() / 1000);
             var pin = Math.random().toString().substr(2,6); //hrm...
             if (timestamp < invitation.invitationTimestamp + 36000) { //expires in 10 hour! //TODO access window start and end timestamps
-                console.log("timestamp checks out!" + invitation.invitationTimestamp);
+                console.log("timestamp checks out!" + JSON.stringify(invitation));
 
                 db.invitations.update ( { "invitationHash": hash }, { $set: { validated: true, pin : pin, pinTimeout: timestamp + 3600} }); 
                 var response = {};
@@ -5275,6 +5275,8 @@ app.get('/invitation_check/:hzch', function (req, res) { //called from /landing/
                 response.ok = "yep";
                 response.pin = pin;
                 response.to = invitation.sentToEmail;
+                response.timestampStart = invitation.sceneAccessStart;
+                response.timestampEnd = invitation.sceneAccessEnd;
                 response.url = requestProtocol + "://" + req.headers.host + "/webxr/" + invitation.invitedToSceneShortID + "?p=" + pin;
                 // var codestring = req.protocol + "://" + req.headers.host + "/webxr/" + invitation.invitedToSceneShortID + "?p=" + pin;
                 QRCode.toDataURL(response.url, function (err, url) {
@@ -5861,13 +5863,13 @@ app.post('/share_scene/', requiredAuthentication, function (req, res) { //yep!
                                         "<hr>" + req.body.sceneShareWithMessage +  "<br><hr>";
                                 }
                                 if (req.body.sceneAccessStart != undefined) {
-                                    let datetimeString = new Date(req.body.sceneAccessStart).toString();
-                                    message += "<br><strong>Event start: " + datetimeString + ".</strong><br>";
+                                    let datetimeString = new Date(req.body.sceneAccessStart);
+                                    message += "<br><strong>Event start: " + datetimeString.toLocaleString([], { hour12: true}) + "</strong><br>";
                                     console.log(message);
                                 }
                                 if (req.body.sceneAccessEnd != undefined) {
-                                    let datetimeString = new Date(req.body.sceneAccessEnd).toString();
-                                    message += "<strong>Event end: " + datetimeString + ".</strong><br>";
+                                    let datetimeString = new Date(req.body.sceneAccessEnd);
+                                    message += "<strong>Event end: " + datetimeString.toLocaleString([], { hour12: true})  + "</strong><br>";
                                 }
                                 var htmlbody = message +
                                     "<br> Scene Title: " + req.body.sceneTitle +

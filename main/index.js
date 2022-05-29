@@ -11637,6 +11637,17 @@ function showGroup() {
             console.log(error);
         });    
     }
+
+    function timestampToDatetimeInputString(timestamp) { //for event datetime stuff in scene edit below, to feed datetime-local inputs
+        const date = new Date((timestamp + _getTimeZoneOffsetInMs()));
+        // slice(0, 19) includes seconds
+        return date.toISOString().slice(0, 19);
+      }
+      
+      function _getTimeZoneOffsetInMs() {
+        return new Date().getTimezoneOffset() * -60 * 1000;
+      }
+
     function showScene(response) {
             // console.log("locations " + JSON.stringify(response.data.sceneLocations));
             $("#pageTitle").html("Scene " + response.data.sceneTitle + " details");
@@ -11747,6 +11758,7 @@ function showGroup() {
             let vidGroupButtons = "";
             let objGroupButtons = "";
             let gltfSelect = "";
+            let zone = new Date().toLocaleTimeString('en-us',{timeZoneName:'short'}).split(' ')[2];
 
             // console.log(sceneModelz);
             // axios.get('/gltf/' + userid)
@@ -12257,13 +12269,17 @@ function showGroup() {
             }
 
             if (sceneAccessStart != null && sceneAccessStart != "") { //comes in as ms from epoch
-                sceneAccessStartDateTime = new Date(sceneAccessStart).toISOString().substring(0, 19);
-                // console.log("sceneAccessStartDateTime: " + new Date(sceneAccessStart).toISOString());
+                // sceneAccessStartDateTime = new Date(sceneAccessStart).toISOString();
+                // sceneAccessStartDateTime = sceneAccessStartDateTime.slice(0, 19);
+                sceneAccessStartDateTime = timestampToDatetimeInputString(sceneAccessStart);
+                console.log("ts" + sceneAccessStart+ "sceneAccessStartDateTime: " + sceneAccessStartDateTime);
                 $("#sceneAccessStart").val(sceneAccessStartDateTime);
             }
             if (sceneAccessEnd != null && sceneAccessEnd != "") { //ms from epoch
-                sceneAccessEndDateTime = new Date(sceneAccessEnd).toISOString().substring(0, 19); //trim the zulu bizness
-                // console.log("sceneAccessEndDateTime: " + sceneAccessEndDateTime);
+                // sceneAccessEndDateTime = new Date(sceneAccessEnd).toISOString(); //trim the zulu bizness
+                // sceneAccessEndDateTime = sceneAccessEndDateTime.slice(0, 19);
+                sceneAccessEndDateTime = timestampToDatetimeInputString(sceneAccessEnd);
+                console.log("sceneAccessEndDateTime: " + sceneAccessEndDateTime);
                 $("#sceneAccessEnd").val(sceneAccessEndDateTime);
             }
 
@@ -12611,11 +12627,11 @@ function showGroup() {
                             "</div>" +
                             "<div class=\x22form-row\x22>" + 
                                 "<div class=\x22col form-group col-md-3\x22>" +
-                                    "<label for=\x22sceneAccessStart\x22>Event Start Date/Time</label>" + 
+                                    "<label for=\x22sceneAccessStart\x22>Event Start Local Date/Time "+zone+"</label>" + 
                                     "<input type=\x22datetime-local\x22 class=\x22form-control\x22 id=\x22sceneAccessStart\x22 placeholder=\x22\x22 value=\x22" + sceneAccessStartDateTime + "\x22 >" +
                                 "</div>" +
                                 "<div class=\x22col form-group col-md-3\x22>" +
-                                    "<label for=\x22sceneAccessEnd\x22>Event End Date/Time</label>" + 
+                                    "<label for=\x22sceneAccessEnd\x22>Event End Local Date/Time "+zone+"</label>" + 
                                     "<input type=\x22datetime-local\x22 class=\x22form-control\x22 id=\x22sceneAccessEnd\x22 placeholder=\x22\x22 value=\x22" + sceneAccessEndDateTime + "\x22 >" +
                                 "</div>" +
                                 "<div class=\x22col form-group col-md-2\x22>" +
@@ -15195,18 +15211,22 @@ function showGroup() {
                         
                     //    let val = document.getElementById('sceneAccessStart').value;
                         let datetime = new Date(this.value);
-                        let utc = new Date();
-                        let ms = utc.getTime(datetime);
-                        console.log("starttime: " + ms);
+                        // let utc = new Date();
+                        // let ms = utc.getTime(datetime);
+                        // console.log("starttime: " + utc);
+                        // sceneAccessStart = ms;
+                        let ms = Date.parse(this.value);
+                        console.log("start time: " + ms);
                         sceneAccessStart = ms;
                     });
                     $(document).on('change', '#sceneAccessEnd', function() {
                     //     // let val = this.value;
                         
                     //    let val = document.getElementById('sceneAccessStart').value;
-                       let datetime = new Date(this.value);
-                        let utc = new Date();
-                        let ms = utc.getTime(datetime);
+                    //    let datetime = new Date(this.value);
+                    //     let utc = new Date();
+                    //     let ms = utc.getTime(datetime);
+                        let ms = Date.parse(this.value);
                        console.log("end time: " + ms);
                        sceneAccessEnd = ms;
                     });
