@@ -11638,15 +11638,69 @@ function showGroup() {
         });    
     }
 
+///time util functions///
     function timestampToDatetimeInputString(timestamp) { //for event datetime stuff in scene edit below, to feed datetime-local inputs
         const date = new Date((timestamp + _getTimeZoneOffsetInMs()));
         // slice(0, 19) includes seconds
         return date.toISOString().slice(0, 19);
-      }
+    }
       
-      function _getTimeZoneOffsetInMs() {
+    function _getTimeZoneOffsetInMs() {
         return new Date().getTimezoneOffset() * -60 * 1000;
-      }
+    }
+    
+    function padTo2Digits(num) {
+        return num.toString().padStart(2, '0');
+    }
+
+    function convertMsToHM(milliseconds) {
+        let seconds = Math.floor(milliseconds / 1000);
+        let minutes = Math.floor(seconds / 60);
+        let hours = Math.floor(minutes / 60);
+        seconds = seconds % 60;
+        // if seconds are greater than 30, round minutes up (optional)
+        minutes = seconds >= 30 ? minutes + 1 : minutes;
+        minutes = minutes % 60;
+        // If you don't want to roll hours over, e.g. 24 to 00
+        // comment (or remove) the line below
+        // commenting next line gets you `24:00:00` instead of `00:00:00`
+        // or `36:15:31` instead of `12:15:31`, etc.
+        // hours = hours % 24;
+      
+        return `${padTo2Digits(hours)}:${padTo2Digits(minutes)}`;
+    }
+
+    function countdownTimer(timestampStart) {
+        // var countDownDate = new Date(datetimeString).getTime();
+        var countDownDate = timestampStart;
+        // Update the count down every 1 second
+        var x = setInterval(function() {
+
+            // Get today's date and time
+            var now = new Date().getTime();
+
+            // Find the distance between now and the count down date
+            var distance = countDownDate - now;
+
+            // Time calculations for days, hours, minutes and seconds
+            var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            // Display the result in the element with id="demo"
+            document.getElementById("sceneEventCountdown").innerHTML = "Event start countdown: " +days + "d " + hours + "h "
+            + minutes + "m " + seconds + "s ";
+
+            // If the count down is finished, write some text
+            if (distance < 0) {
+                clearInterval(x);
+                document.getElementById("sceneEventCountdown").innerHTML = "EXPIRED";
+            }
+        }, 1000);
+    }
+
+    //big scene view below!
 
     function showScene(response) {
             // console.log("locations " + JSON.stringify(response.data.sceneLocations));
@@ -11668,6 +11722,8 @@ function showGroup() {
             let sceneAccessEnd = response.data.sceneAccessEnd != undefined ? response.data.sceneAccessEnd : ""; 
             let sceneAccessStartDateTime = null;
             let sceneAccessEndDateTime = null;
+            let sceneEventDuration = null;
+            let sceneEventCountdown = null;
             let sceneAccessLinkExpire = response.data.sceneAccessLinkExpire != undefined ? response.data.sceneAccessLinkExpire : ""; 
             let sceneNextScene = response.data.sceneNextScene != undefined ? response.data.sceneNextScene : "";
             let scenePreviousScene = response.data.scenePreviousScene != undefined ? response.data.scenePreviousScene : ""; 
@@ -12269,18 +12325,29 @@ function showGroup() {
             }
 
             if (sceneAccessStart != null && sceneAccessStart != "") { //comes in as ms from epoch
-                // sceneAccessStartDateTime = new Date(sceneAccessStart).toISOString();
-                // sceneAccessStartDateTime = sceneAccessStartDateTime.slice(0, 19);
+               
                 sceneAccessStartDateTime = timestampToDatetimeInputString(sceneAccessStart);
-                console.log("ts" + sceneAccessStart+ "sceneAccessStartDateTime: " + sceneAccessStartDateTime);
+                console.log("timestamp " + sceneAccessStart+ " sceneAccessStartDateTime: " + sceneAccessStartDateTime);
                 $("#sceneAccessStart").val(sceneAccessStartDateTime);
+                sceneEventCountdown = "<div id=\x22sceneEventCountdown\x22></div>";
+                countdownTimer(sceneAccessStart);
             }
             if (sceneAccessEnd != null && sceneAccessEnd != "") { //ms from epoch
                 // sceneAccessEndDateTime = new Date(sceneAccessEnd).toISOString(); //trim the zulu bizness
                 // sceneAccessEndDateTime = sceneAccessEndDateTime.slice(0, 19);
                 sceneAccessEndDateTime = timestampToDatetimeInputString(sceneAccessEnd);
-                console.log("sceneAccessEndDateTime: " + sceneAccessEndDateTime);
+                console.log("timestamp " + sceneAccessEnd+ " sceneAccessEndDateTime: " + sceneAccessEndDateTime);
                 $("#sceneAccessEnd").val(sceneAccessEndDateTime);
+            }
+            if (sceneAccessStart != null && sceneAccessStart != "" && sceneAccessEnd != null && sceneAccessEnd != "") {
+                let ms = sceneAccessEnd - sceneAccessStart;
+                // let s = ms / 1000;
+                // let m = s / 60;
+                // let h = m / 60;
+                // console.log('duration is ' + h + ":" + m + ":" + s);
+                sceneEventDuration = "<div>Event duration: " + convertMsToHM(ms) + "</div>";
+
+                console.log(convertMsToHM(ms));
             }
 
 
@@ -12652,10 +12719,13 @@ function showGroup() {
                                     "</select>" +
                                 "</div>" +
                                 "<div class=\x22col form-group col-md-2\x22>" +
-                                    "<div id=\x22sendInvitationButton\x22 class=\x22btn float-right btn-info btn-sm\x22>Send Invitation</div>"+
+                                    // "<div id=\x22sendInvitationButton\x22 class=\x22btn float-right btn-info btn-sm\x22>Send Invitation</div>"+
+                                    sceneEventDuration +
+                                    sceneEventCountdown +
                                 "</div>" +
                                 // "<div>" +
                                 "<div class=\x22col form-group col-md-2\x22>" +
+                                    "<div id=\x22sendInvitationButton\x22 class=\x22btn float-right btn-info btn-sm\x22>Send Invitation</div><br>"+
                                     "<div id=\x22sendInvitationButton\x22 class=\x22btn float-right btn-warning btn-sm\x22>Send Test</div>"+
                                 "</div>" +
                             "</div>" +

@@ -36,6 +36,8 @@
         const params = getParameterByName('iv');
         console.log("params : " + params);
         let now = Date.now();
+        let eventCountdownEl = "";
+        let eventDurationEl = "";
         // let data = JSON.parse(atob(params));
         // console.log(data);  
         axios.get('/invitation_check/' + params)
@@ -48,18 +50,23 @@
                 if (response.data.timestampStart != undefined && response.data.timestampStart != null && response.data.timestampStart != "") {
                     let datetimeString = new Date(response.data.timestampStart);
                     datetimes = datetimes + "Event start: " + datetimeString.toLocaleString([], { hour12: true}) + "<small> ("+zone+")</small>.<br>";
+                    eventCountdownEl = "<div id='sceneEventCountdown'></div>";
                     console.log(datetimes);
+                    countdownTimer(response.data.timestampStart);
                 }
                 if (response.data.timestampEnd != undefined && response.data.timestampEnd != null && response.data.timestampEnd != "") {
                     let datetimeString = new Date(response.data.timestampEnd);
                     datetimes = datetimes + "Event end: " + datetimeString.toLocaleString([], { hour12: true})  + "<small> ("+zone+")</small>.<br>";
                     console.log(datetimes);
+                    eventDurationEl = "Event duration: " + convertMsToHM(response.data.timestampEnd - response.data.timestampStart);
                 }
                 if (response.data.pin != undefined && response.data.pin.length > 4) {
                     console.log(datetimes);
                     main.innerHTML = "Hi " + uname + " - you're all set! <br><a href="+ response.data.url + ">Click here to enter scene...</a>"+
                     "<br><br>Your PIN is: " + response.data.pin + "<br><br>" +
                     datetimes +
+                    eventDurationEl +
+                    eventCountdownEl +
                     "<br>Scannable QR code:" +
                     "<img style='height: 100%; width: 100%; object-fit: contain' alt='qrcode' src='" + response.data.qrcode + "'/>";
 
@@ -71,11 +78,55 @@
                 console.log(error);
                 main.innerHTML = "Sorry, gotsa error: " + error;
             });
-        // if (params != null && params.length > 10) {
-        //     main.innerHTML = "hey whatsup!  gotcher invite: " + params;
-        // } else {
-        //     main.innerHTML = "Sorry, I don't even know what that meeeanz!";
-        // }
+            function countdownTimer(timestampStart) {
+                // var countDownDate = new Date(datetimeString).getTime();
+                var countDownDate = timestampStart;
+                // Update the count down every 1 second
+                var x = setInterval(function() {
+
+                // Get today's date and time
+                var now = new Date().getTime();
+
+                // Find the distance between now and the count down date
+                var distance = countDownDate - now;
+
+                // Time calculations for days, hours, minutes and seconds
+                var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                // Display the result in the element with id="demo"
+                document.getElementById("sceneEventCountdown").innerHTML = "Event start countdown: " +days + "d " + hours + "h "
+                + minutes + "m " + seconds + "s ";
+
+                // If the count down is finished, write some text
+                if (distance < 0) {
+                    clearInterval(x);
+                    document.getElementById("sceneEventCountdown").innerHTML = "EXPIRED";
+                }
+                }, 1000);
+            }
+            function padTo2Digits(num) {
+                return num.toString().padStart(2, '0');
+            }
+
+            function convertMsToHM(milliseconds) {
+                let seconds = Math.floor(milliseconds / 1000);
+                let minutes = Math.floor(seconds / 60);
+                let hours = Math.floor(minutes / 60);
+                seconds = seconds % 60;
+                // if seconds are greater than 30, round minutes up (optional)
+                minutes = seconds >= 30 ? minutes + 1 : minutes;
+                minutes = minutes % 60;
+                // If you don't want to roll hours over, e.g. 24 to 00
+                // comment (or remove) the line below
+                // commenting next line gets you `24:00:00` instead of `00:00:00`
+                // or `36:15:31` instead of `12:15:31`, etc.
+                // hours = hours % 24;
+            
+                return `${padTo2Digits(hours)}:${padTo2Digits(minutes)}`;
+            }
         </script>
 
     </body>
