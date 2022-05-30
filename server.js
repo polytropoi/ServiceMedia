@@ -5864,12 +5864,13 @@ app.post('/share_scene/', requiredAuthentication, function (req, res) { //yep!
                                 }
                                 if (req.body.sceneAccessStart != undefined) {
                                     let datetimeString = new Date(req.body.sceneAccessStart);
-                                    message += "<br><strong>Event start: " + datetimeString.toLocaleString([], { hour12: true}) + "</strong><br>";
+                                    // message += "<br><strong>Event start: " + datetimeString.toLocaleString([], { hour12: true}) + "</strong><br>";
+                                    message += "<br><strong>Event start: " + datetimeString.toString() + "</strong><br>";
                                     console.log(message);
                                 }
                                 if (req.body.sceneAccessEnd != undefined) {
                                     let datetimeString = new Date(req.body.sceneAccessEnd);
-                                    message += "<strong>Event end: " + datetimeString.toLocaleString([], { hour12: true})  + "</strong><br>";
+                                    message += "<strong>Event end: " + datetimeString.toString()  + "</strong><br>";
                                 }
                                 var htmlbody = message +
                                     "<br> Scene Title: " + req.body.sceneTitle +
