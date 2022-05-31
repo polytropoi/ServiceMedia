@@ -25,6 +25,14 @@ function PrimaryAudioInit() {
   primaryAudioEl = document.querySelector('#primaryAudio');
   if (primaryAudioEl != null) {
     primaryAudioMangler = document.getElementById("primaryAudio").components.primary_audio_control;
+    console.log("PRIMARY AUDIO INIT() autoplay " + primaryAudioMangler.data.autoplay +  " isplaying " + primaryAudioHowl.playing());
+    if (primaryAudioMangler.data.autoplay) {
+      if (primaryAudioHowl != null) {
+        if (!primaryAudioHowl.playing()) {
+          primaryAudioMangler.playPauseToggle();
+        }
+      }
+    }
   }
   let avz = document.getElementById("audiovizzler");
   if (avz != null) {
@@ -5047,7 +5055,7 @@ AFRAME.registerComponent('youtube_player', {  //setup and controls for the 3d pl
     // if (sceneLocations.locations.length > 0); {
      
     // }
-    this.el.addEventListener('raycaster-intersected', e =>{  
+    this.el.addEventListener('raycaster-intersected', e => {  
         this.raycaster = e.detail.el;
         thiz.raycaster = this.raycaster;
         this.intersection = this.raycaster.components.raycaster.getIntersection(this.el, true);

@@ -596,7 +596,7 @@ AFRAME.registerComponent('primary_audio_player', {  //setup and controls for the
             this.primaryAudioHowl.fade(0, 1, 1000);
             this.primaryAudioHowl.pos(this.el.object3D.position.x, this.el.object3D.position.y, this.el.object3D.position.z);
 
-            if (this.data.targetattach) {
+            if (data.targetattach) {
                 el.addEventListener('targetattach', function (event) {
                     console.log("hey gotsa attach to target message" + event.detail.targetEntity);
                     let audioElPosition = event.detail.targetEntity.getAttribute('position');
@@ -606,7 +606,7 @@ AFRAME.registerComponent('primary_audio_player', {  //setup and controls for the
                 });
             }
             // this.primaryAudioHowl.pos(audioElPosition.x, audioElPosition.y, audioElPosition.z);
-            if (this.data.autoplay) {    
+            if (data.autoplay) {    
                 console.log("PRIMARY AUDIO AUTOPLAY is " + this.data.autoplay );
                 this.primaryAudioHowl.play();
                 el.emit('primaryAudioToggle', {isPlaying : true}, true);

@@ -16381,6 +16381,11 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                     joystickScript = "<script src=\x22../main/vendor/aframe/aframe-orbit-controls.min.js\x22></script>";
                                     wasd = "orbit-controls=\x22target: 0 1.6 -.5; minDistance: .5; maxDistance: 100; initialPosition: 0 1 3; enableDamping: true;\x22";
                                 }
+                                if (sceneResponse.sceneCameraMode == "Fixed") {
+                                    joystickScript = "";
+                                    joystickContainer = "";
+                                    wasd = "";
+                                }
                                 // camera = "<a-entity id=\x22cameraRig\x22 position=\x220 0 0\x22>"+
                                 // "<a-entity id=\x22head\x22 camera "+wasd+" look-controls touch-controls position=\x220 1.6 0\x22></a-entity>"+
                                 

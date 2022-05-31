@@ -1354,42 +1354,39 @@ function SetLastPosition () {
 
 function EmitSelfPosition() {
 
-   console.log("tryna EmitSelfPosition()");
 
-   if (posRotReader != null) {   
-      if (!posRotRunning) {
-         posRotRunning = true;
-         // if (emitInterval == null) { 
-         emitInterval = setInterval(function(){
+   if (!settings.hideAvatars) {   
+      console.log("tryna EmitSelfPosition()");
+      if (posRotReader != null) {   
+         if (!posRotRunning) {
+            posRotRunning = true;
+            // if (emitInterval == null) { 
+            emitInterval = setInterval(function(){
 
-            var posRotObj = posRotReader.returnPosRot();
-            cameraPosition = posRotObj.pos;
-            cameraRotation = posRotObj.rot;
-            // console.log(cameraPosition.x.toString() + " vs " + window.playerPosition.x.toString());
-            // if (JSON.stringify(cameraPosition) != lastPosition && JSON.stringify(cameraRotation) != lastRotation) {
-            if (JSON.stringify(cameraPosition) != lastPosition) {
-                  // console.log('emitting!');
-               // window.playerPosition = cameraPosition;
-               socket.emit("updateplayerposition", room, avatarName, cameraPosition.x, cameraPosition.y, cameraPosition.z, cameraRotation.x, cameraRotation.y, cameraRotation.z, mySocketID, "aframe"); 
-               lastPosition = JSON.stringify(cameraPosition);
-               // lastRotation = JSON.stringify(cameraRotation);                     
-            }
+               var posRotObj = posRotReader.returnPosRot();
+               cameraPosition = posRotObj.pos;
+               cameraRotation = posRotObj.rot;
+               // console.log(cameraPosition.x.toString() + " vs " + window.playerPosition.x.toString());
+               // if (JSON.stringify(cameraPosition) != lastPosition && JSON.stringify(cameraRotation) != lastRotation) {
+               if (JSON.stringify(cameraPosition) != lastPosition) {
+                     // console.log('emitting!');
+                  // window.playerPosition = cameraPosition;
+                  socket.emit("updateplayerposition", room, avatarName, cameraPosition.x, cameraPosition.y, cameraPosition.z, cameraRotation.x, cameraRotation.y, cameraRotation.z, mySocketID, "aframe"); 
+                  lastPosition = JSON.stringify(cameraPosition);
+                  // lastRotation = JSON.stringify(cameraRotation);                     
+               }
 
-         }, 250);
-      // } else {
-      //    clearInterval(emitInterval);
-      //    emitInterval = null;
+            }, 250);
+         // } else {
+         //    clearInterval(emitInterval);
+         //    emitInterval = null;
+         }
+      } else {
+         // console.log("caint fine no player!");
+         posRotReader = document.getElementById("player").components.get_pos_rot; 
+         // EmitSelfPosition();
       }
-   } else {
-      // console.log("caint fine no player!");
-      posRotReader = document.getElementById("player").components.get_pos_rot; 
-      // EmitSelfPosition();
    }
-   // setInterval(function() {
-   //    lastPosition = cameraPosition;
-   //    lastRotation = cameraRotation;
-   // }, 2000); 
-   // }
 }
 function shallowEqual(object1, object2) {
    const keys1 = Object.keys(object1);
@@ -2039,7 +2036,7 @@ function TimedEventListener () {
    if (timekey != NaN) {//not not a number
      if (timedEventsListenerMode != null && timedEventsListenerMode.toLowerCase() == 'primary audio') {
       // if (hasPrimaryAudio) {
-         if (primaryAudioHowl != null && primaryAudioHowl != undefined && primaryAudioHowl.playing()) {
+         if (primaryAudioHowl != null && primaryAudioHowl != undefined && primaryAudioHowl.playing) {
          primaryAudioTime = primaryAudioHowl.seek();
             if (primaryAudioTime < .2) {
                timeKeysIndex = 0; 
