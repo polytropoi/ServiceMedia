@@ -353,8 +353,8 @@ AFRAME.registerComponent('primary_audio_player', {  //setup and controls for the
                     align: "left",
                     value: data.title
                 });
-
-                if (data.autoplay) {
+                console.log("PRIMARY AUDIO AUTOPLAY is " + this.data.autoplay );
+                if (this.data.autoplay) {
                     primaryAudioHowl.play();
                     primaryAudioHowl.volume(normalizedVolume);
                     el.emit('primaryAudioToggle', {isPlaying : true}, true);
@@ -596,7 +596,7 @@ AFRAME.registerComponent('primary_audio_player', {  //setup and controls for the
             this.primaryAudioHowl.fade(0, 1, 1000);
             this.primaryAudioHowl.pos(this.el.object3D.position.x, this.el.object3D.position.y, this.el.object3D.position.z);
 
-            if (data.targetattach) {
+            if (this.data.targetattach) {
                 el.addEventListener('targetattach', function (event) {
                     console.log("hey gotsa attach to target message" + event.detail.targetEntity);
                     let audioElPosition = event.detail.targetEntity.getAttribute('position');
@@ -606,7 +606,8 @@ AFRAME.registerComponent('primary_audio_player', {  //setup and controls for the
                 });
             }
             // this.primaryAudioHowl.pos(audioElPosition.x, audioElPosition.y, audioElPosition.z);
-            if (data.autoplay) {    
+            if (this.data.autoplay) {    
+                console.log("PRIMARY AUDIO AUTOPLAY is " + this.data.autoplay );
                 this.primaryAudioHowl.play();
                 el.emit('primaryAudioToggle', {isPlaying : true}, true);
                 this.primaryAudioHowl.volume(normalizedVolume);

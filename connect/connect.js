@@ -153,8 +153,10 @@ $(function() {
    $('#room_id').append($('<button><h4><strong>').text("Welcome to scene " + room).append("</strong></h4></button>"));
    if (window.sceneType == null || window.sceneType == "Default" || window.sceneType == "Aframe") {
       window.sceneType == "aframe";
-      player.setAttribute("player_mover", "init");
-      EmitSelfPosition();
+      if (settings.hideAvatars) {
+         player.setAttribute("player_mover", "init");
+         EmitSelfPosition();
+      }
    }  
    if (settings.skyboxIDs != null) {
       console.log("skyboxIDS: " + JSON.stringify(settings.skyboxIDs));
@@ -1091,203 +1093,205 @@ function RandomHexColor() {
    return  "#000000".replace(/0/g,function(){return (~~(Math.random()*16)).toString(16);});
 }
 
-var socket = io.connect(socketHost, {
-      query : {
-         token: token,
-         uname: avatarName,
-         color: RandomHexColor(),
-         room: room
-      },
-      url: socketHost + "/socket.io/?EIO=4&transport=polling&t=NNjNltH",
-      autoConnect: false,  //connection is opened if token checks out above
-      reconnection: false
-});      
+// if (settings.hideAvatars) {
+   var socket = io.connect(socketHost, {
+         query : {
+            token: token,
+            uname: avatarName,
+            color: RandomHexColor(),
+            room: room
+         },
+         url: socketHost + "/socket.io/?EIO=4&transport=polling&t=NNjNltH",
+         autoConnect: false,  //connection is opened if token checks out above
+         reconnection: false
+   });      
 
-socket.on('connect', function() {
-  
-   isConnected = true;
-   console.log("tryna join " + avatarName + " socketID " + socket.id);
-   mySocketID = socket.id;
-   socket.emit('join', room, avatarName, "web");
-  
-});
-
-socket.on('user joined', function(data) {
-   console.log(data + 'joined room ' + room);
-   socket.emit('room users', room);
+   socket.on('connect', function() {
    
-   UpdatePlayerAvatars(roomUsers);
-   EmitSelfPosition();
-});
-
-socket.on('room users', function (data) {
-//  console.log("room users data : " + data);
- $('#users').html("");
-
-   roomUsers = JSON.parse(data);
-
-   UpdatePlayerAvatars(roomUsers);
-   let roomUsersString = "";
-   // console.log("room users count = " +roomUsers.length);
-   let usercount = 0;
-      // for (let value of Object.values(roomUsers)) { //key = socket.id, value= username
+      isConnected = true;
+      console.log("tryna join " + avatarName + " socketID " + socket.id);
+      mySocketID = socket.id;
+      socket.emit('join', room, avatarName, "web");
    
-      // console.log(value); 
-      // usercount++;
-      // //   $('#users').prepend($('<button class=\x22btn\x22 style=\x22margin: 5px 5px 5px 5px;\x22><h4><strong>').text( value ).append("</strong></h4></button>"));
-      //    if (value.includes("~")) {
-      //       split = value.split("~"); //color is appended to username
-      //       roomUsersString += "<a href=\x22#\x22 style=\x22color:"+split[1]+"\x22>"+split[0]+"</a>, ";
-      //    } else {
-      //       roomUsersString += value + ", ";
-      //    }   
+   });
+
+   socket.on('user joined', function(data) {
+      console.log(data + 'joined room ' + room);
+      socket.emit('room users', room);
+      
+      UpdatePlayerAvatars(roomUsers);
+      EmitSelfPosition();
+   });
+
+   socket.on('room users', function (data) {
+   //  console.log("room users data : " + data);
+   $('#users').html("");
+
+      roomUsers = JSON.parse(data);
+
+      UpdatePlayerAvatars(roomUsers);
+      let roomUsersString = "";
+      // console.log("room users count = " +roomUsers.length);
+      let usercount = 0;
+         // for (let value of Object.values(roomUsers)) { //key = socket.id, value= username
+      
+         // console.log(value); 
+         // usercount++;
+         // //   $('#users').prepend($('<button class=\x22btn\x22 style=\x22margin: 5px 5px 5px 5px;\x22><h4><strong>').text( value ).append("</strong></h4></button>"));
+         //    if (value.includes("~")) {
+         //       split = value.split("~"); //color is appended to username
+         //       roomUsersString += "<a href=\x22#\x22 style=\x22color:"+split[1]+"\x22>"+split[0]+"</a>, ";
+         //    } else {
+         //       roomUsersString += value + ", ";
+         //    }   
+         // }
+      var keys = Object.keys(roomUsers);
+      for(var i=0; i<keys.length; i++){
+         var key = keys[i];
+         var isMe = "";
+         // console.log(key, roomUsers[key]);
+         if (key === socket.id) {
+            isMe = "*";
+            // console.log("key isMe " + key);
+         }
+         value = roomUsers[key];
+         // console.log("roomUsers key:value: " + key + " " + value); 
+         usercount++;
+      //   $('#users').prepend($('<button class=\x22btn\x22 style=\x22margin: 5px 5px 5px 5px;\x22><h4><strong>').text( value ).append("</strong></h4></button>"));
+         if (value.includes("~")) {
+            split = value.split("~"); //color is appended to username
+            split[0] = split[0].replace("_", " ");
+            roomUsersString += isMe + "<a href=\x22#\x22 class=\x22tooltip\x22 style=\x22color:"+split[1]+"\x22>"+ split[0]+"<span class=\x22tooltiptext\x22>"+split[0]+"</span></a>, ";
+         } else {
+            roomUsersString += value + ", ";
+         }   
+      }
+      roomUsersString = roomUsersString.substring(0, roomUsersString.length - 2); //trim last comma and trailing space
+      roomUsersString = usercount + " users connected: " + roomUsersString;
+      // console.log(roomUsersString);
+      $('#users').html(roomUsersString);
+      stringRoomUsers = roomUsersString;
+      // $('#users_2').html(roomUsersString);
+      EmitSelfPosition();
+   });
+
+   socket.on('getbytes', function (data, metadata) {
+         //TODO split the incoming wad and build array(s) of pics, audio, etc based on metadata
+         console.log("tryna parse some bytes");
+   });
+
+   socket.on('getpicframe', function (data, sid) {
+
+      
+      console.log("getting pic frame from " + sid + " roomUsers " + JSON.stringify(roomUsers));
+      let userName = "";
+      var keys = Object.keys(roomUsers);
+      for(var i=0; i<keys.length; i++){
+         var key = keys[i];
+         console.log(key, roomUsers[key]);
+         if (keys[i] === sid) {
+            console.log(roomUsers[key] + " sent a pic frame!");
+            userName = roomUsers[key];
+         }
+      }   
+      // foreach(var user in roomUsers) {
+      //    if (user.key == socket.id) {
+      //       console.log(user.value + " sent a pic frame!");
+      //    }
+      
       // }
-   var keys = Object.keys(roomUsers);
-   for(var i=0; i<keys.length; i++){
-      var key = keys[i];
-      var isMe = "";
-      // console.log(key, roomUsers[key]);
-      if (key === socket.id) {
-         isMe = "*";
-         // console.log("key isMe " + key);
+      var instance = $('body').data('backstretch');
+      var base64 = _arrayBufferToBase64(data);
+      var imgSrc = "data:image/jpg;base64," + base64;
+      // if (instance === undefined) {
+      //     pics.push(imgSrc);
+      //     // $(".screen-overlay").backstretch(pics, {duration: 1000, fade: 250});
+      //         $(".screen-overlay").backstretch(imgSrc);
+      // } 
+      // $(".screen-overlay").backstretch("destroy", true);
+      // $(".screen-overlay").backstretch(pics);
+      // $(".screen-overlay").backstretch(imgSrc, {fade: 250});
+      // $('#future').prepend($('<span style=\x22margin: 5px 5px 5px 5px;\x22 class=\x22smallfont_lightyellow\x22>').text( "<"+ userName + " <a id="+socket.id+" href=\x22#\x22>sent a pic</a>").append("</span><hr>"));
+      $('#future').prepend($("<span style=\x22margin: 5px 5px 5px 5px;\x22 class=\x22smallfont_lightyellow\x22>-"+ userName + " <button class=\x22btn picbutton\x22 id="+sid+" href=\x22#\x22>sent a pic</button></span><hr>"));
+      UpdateContentBox();
+         if (pics.length < 1) {
+            
+            pics.push(imgSrc);
+            // picsBuffer = pics;
+            // console.log("pushing pic # " + pics.length);
+            if (!instance) {
+                  $(".screen-overlay").backstretch(pics, {duration: 1000, fade: 250});
+            }
+         } 
+
+      if (picArrayIndex < 20) {
+      if (pics < picArrayIndex) {
+         pics.push(imgSrc);
+         // $(".screen-overlay").backstretch(imgSrc);
+      } else {
+         pics.splice(picArrayIndex, 1, imgSrc);  
       }
-      value = roomUsers[key];
-      // console.log("roomUsers key:value: " + key + " " + value); 
-      usercount++;
-    //   $('#users').prepend($('<button class=\x22btn\x22 style=\x22margin: 5px 5px 5px 5px;\x22><h4><strong>').text( value ).append("</strong></h4></button>"));
-       if (value.includes("~")) {
-          split = value.split("~"); //color is appended to username
-          split[0] = split[0].replace("_", " ");
-          roomUsersString += isMe + "<a href=\x22#\x22 class=\x22tooltip\x22 style=\x22color:"+split[1]+"\x22>"+ split[0]+"<span class=\x22tooltiptext\x22>"+split[0]+"</span></a>, ";
-       } else {
-          roomUsersString += value + ", ";
-       }   
-   }
-   roomUsersString = roomUsersString.substring(0, roomUsersString.length - 2); //trim last comma and trailing space
-   roomUsersString = usercount + " users connected: " + roomUsersString;
-   // console.log(roomUsersString);
-   $('#users').html(roomUsersString);
-   stringRoomUsers = roomUsersString;
-   // $('#users_2').html(roomUsersString);
-   EmitSelfPosition();
-});
-
-socket.on('getbytes', function (data, metadata) {
-      //TODO split the incoming wad and build array(s) of pics, audio, etc based on metadata
-      console.log("tryna parse some bytes");
-});
-
-socket.on('getpicframe', function (data, sid) {
-
-   
-   console.log("getting pic frame from " + sid + " roomUsers " + JSON.stringify(roomUsers));
-   let userName = "";
-   var keys = Object.keys(roomUsers);
-   for(var i=0; i<keys.length; i++){
-      var key = keys[i];
-      console.log(key, roomUsers[key]);
-      if (keys[i] === sid) {
-         console.log(roomUsers[key] + " sent a pic frame!");
-         userName = roomUsers[key];
+      picArrayIndex++;
+      } else {
+      picArrayIndex = 0;
+      pics.splice(picArrayIndex, 1, imgSrc);
+      picArrayIndex++;
       }
-   }   
-   // foreach(var user in roomUsers) {
-   //    if (user.key == socket.id) {
-   //       console.log(user.value + " sent a pic frame!");
-   //    }
-     
-   // }
-   var instance = $('body').data('backstretch');
-   var base64 = _arrayBufferToBase64(data);
-   var imgSrc = "data:image/jpg;base64," + base64;
-   // if (instance === undefined) {
-   //     pics.push(imgSrc);
-   //     // $(".screen-overlay").backstretch(pics, {duration: 1000, fade: 250});
-   //         $(".screen-overlay").backstretch(imgSrc);
-   // } 
-   // $(".screen-overlay").backstretch("destroy", true);
-   // $(".screen-overlay").backstretch(pics);
-   // $(".screen-overlay").backstretch(imgSrc, {fade: 250});
-   // $('#future').prepend($('<span style=\x22margin: 5px 5px 5px 5px;\x22 class=\x22smallfont_lightyellow\x22>').text( "<"+ userName + " <a id="+socket.id+" href=\x22#\x22>sent a pic</a>").append("</span><hr>"));
-   $('#future').prepend($("<span style=\x22margin: 5px 5px 5px 5px;\x22 class=\x22smallfont_lightyellow\x22>-"+ userName + " <button class=\x22btn picbutton\x22 id="+sid+" href=\x22#\x22>sent a pic</button></span><hr>"));
-   UpdateContentBox();
-       if (pics.length < 1) {
-           
-           pics.push(imgSrc);
-           // picsBuffer = pics;
-           // console.log("pushing pic # " + pics.length);
-           if (!instance) {
-               $(".screen-overlay").backstretch(pics, {duration: 1000, fade: 250});
-           }
-       } 
 
-   if (picArrayIndex < 20) {
-     if (pics < picArrayIndex) {
-       pics.push(imgSrc);
-       // $(".screen-overlay").backstretch(imgSrc);
-     } else {
-       pics.splice(picArrayIndex, 1, imgSrc);  
-     }
-     picArrayIndex++;
-   } else {
-     picArrayIndex = 0;
-     pics.splice(picArrayIndex, 1, imgSrc);
-     picArrayIndex++;
-   }
+   });
 
-});
+   socket.on('getaudiochunk', function (data){
+      console.log("messages data : " + data);
 
-socket.on('getaudiochunk', function (data){
-   console.log("messages data : " + data);
+   });
 
-});
+   socket.on('user messages', function(data1, data2) {
+         console.log("messages data : " + data1 + data2);
+         // $('#future').prepend($('<div class=\x22row bubble pull-left\x22 style=\x22margin: 5px 5px 5px 5px;\x22><span class=\x22smallfont_yellow\x22>').text( data1 + ": " + data2).append("</span></div>"));
+         // $('#future').prepend($('<span style=\x22margin: 5px 5px 5px 5px;\x22 class=\x22smallfont_lightyellow\x22>').text( "<"+ data1 + ": " + data2).append("</span>"));
+         $('#future').prepend("<div class=\x22messageBubbleIn\x22 style=\x22float: left;\x22>"+ data1 + ": " + data2 + "</div><br><br><br>");
+         if ($('#future li').length > 555) {
+            $('#future li').last().remove();
+         }
+         // UpdateContentBox();
+   });
 
-socket.on('user messages', function(data1, data2) {
-      console.log("messages data : " + data1 + data2);
-      // $('#future').prepend($('<div class=\x22row bubble pull-left\x22 style=\x22margin: 5px 5px 5px 5px;\x22><span class=\x22smallfont_yellow\x22>').text( data1 + ": " + data2).append("</span></div>"));
-      // $('#future').prepend($('<span style=\x22margin: 5px 5px 5px 5px;\x22 class=\x22smallfont_lightyellow\x22>').text( "<"+ data1 + ": " + data2).append("</span>"));
-      $('#future').prepend("<div class=\x22messageBubbleIn\x22 style=\x22float: left;\x22>"+ data1 + ": " + data2 + "</div><br><br><br>");
-      if ($('#future li').length > 555) {
-         $('#future li').last().remove();
-      }
-      // UpdateContentBox();
- });
-
- socket.on('playerposition', function(uname, posX, posY, posZ, rotX, rotY, rotZ, socketID, source) {
-   // console.log("player position data : " + uname + "x " + posX + " y " + posY + " z " + posZ + " rx " + rotX + " ry " + rotY + " rz " + rotZ + " sid " + socketID + " from " + source);
-   let pAvatar = document.getElementById(socketID);
-   // console.log("pAvatar is " + JSON.stringify(pAvatar));
-   // pAvatar.setAttribute('lerp', {'position': posObj, 'rotation': rotObj});
-   if (pAvatar != null) { //TODO Interpolation!
-      if (source == "unity") {
-         posZ = posZ * -1;
-      }
-      const posObj = {};
-      posObj.x = posX;
-      posObj.y = posY;
-      posObj.z = posZ;
-      const rotObj = {};
-      rotObj.x = rotX;
-      rotObj.y = rotY;
-      rotObj.z = rotZ;
+   socket.on('playerposition', function(uname, posX, posY, posZ, rotX, rotY, rotZ, socketID, source) {
+      // console.log("player position data : " + uname + "x " + posX + " y " + posY + " z " + posZ + " rx " + rotX + " ry " + rotY + " rz " + rotZ + " sid " + socketID + " from " + source);
+      let pAvatar = document.getElementById(socketID);
+      // console.log("pAvatar is " + JSON.stringify(pAvatar));
       // pAvatar.setAttribute('lerp', {'position': posObj, 'rotation': rotObj});
-      // const posRotObj = {position: posX + "," + posY + "," + posZ, rotation: rotX + "," + rotY + "," + rotZ};
-            const posRotObj = {}
-            posRotObj.position = posObj;
-            posRotObj.rotation = rotObj;
-            var mover = pAvatar.components.mover; //much easier
-            // MoveElement(socketID, posRotObj);
-            // const event = new CustomEvent('update_pos_rot', {detail: posRotObj}, false);
-            // console.log("tryna dispatchEvent " + event);
-            // pAvatar.dispatchEvent(event);
-            mover.move(socketID, posObj, rotObj);
-      // pAvatar.setAttribute('position', posX + " " + posY + " " + posZ);
-      // pAvatar.setAttribute('rotation', rotX + " " + rotY + " " + rotZ);
-   } else {
-      UpdatePlayerAvatars();
-   }
-   EmitSelfPosition();
-});
+      if (pAvatar != null) { //TODO Interpolation!
+         if (source == "unity") {
+            posZ = posZ * -1;
+         }
+         const posObj = {};
+         posObj.x = posX;
+         posObj.y = posY;
+         posObj.z = posZ;
+         const rotObj = {};
+         rotObj.x = rotX;
+         rotObj.y = rotY;
+         rotObj.z = rotZ;
+         // pAvatar.setAttribute('lerp', {'position': posObj, 'rotation': rotObj});
+         // const posRotObj = {position: posX + "," + posY + "," + posZ, rotation: rotX + "," + rotY + "," + rotZ};
+               const posRotObj = {}
+               posRotObj.position = posObj;
+               posRotObj.rotation = rotObj;
+               var mover = pAvatar.components.mover; //much easier
+               // MoveElement(socketID, posRotObj);
+               // const event = new CustomEvent('update_pos_rot', {detail: posRotObj}, false);
+               // console.log("tryna dispatchEvent " + event);
+               // pAvatar.dispatchEvent(event);
+               mover.move(socketID, posObj, rotObj);
+         // pAvatar.setAttribute('position', posX + " " + posY + " " + posZ);
+         // pAvatar.setAttribute('rotation', rotX + " " + rotY + " " + rotZ);
+      } else {
+         UpdatePlayerAvatars();
+      }
+      EmitSelfPosition();
+   });
+// } //end if settings.hideAvatars
 function MoveElement(id,posRotObj) { //jesjus wweeeeped
    var element = document.getElementById(id);
    var iteration = 0;
@@ -1504,7 +1508,7 @@ AFRAME.registerComponent('create_avatars', {
 }
 function UpdatePlayerAvatars(roomUsers) { //aframe only, need to flex.. //no, just make this a component function, to avoid creating a-entities outside of aframe
    // console.log("tryna UpdatePlayerAvatars" + window.sceneType);
-   if (sceneEl != null && window.sceneType == "aframe") {
+   if (sceneEl != null && window.sceneType == "aframe" && !settings.hideAvatars) {
       var keys = Object.keys(roomUsers);
       var alreadyCreated = ""; //temp string to prevent doubles
       for(var i=0; i<keys.length; i++) { //create new avatars as needed

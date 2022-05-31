@@ -18658,6 +18658,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
 
                 function (callback) {
                     let settings = {};  //TODO move this lower down? 
+                    settings.hideAvatars = false;
                     settings.sceneColor1 = sceneResponse.sceneColor1;
                     settings.sceneColor2 = sceneResponse.sceneColor2;
                     settings.sceneColor3 = sceneResponse.sceneColor3;
@@ -18674,12 +18675,16 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                     settings.skyboxID = skyboxID;
                     settings.skyboxURL = skyboxUrl;
                     settings.useSynth = hasSynth;
-
+                    
                     let audioGroups = {};
                     audioGroups.triggerGroups = sceneResponse.sceneTriggerAudioGroups;
                     audioGroups.ambientGroups = sceneResponse.sceneAmbientAudioGroups;
                     audioGroups.primaryGroups = sceneResponse.scenePrimaryAudioGroups;
                     settings.audioGroups = audioGroups; 
+                    if (sceneResponse.sceneTags != null && sceneResponse.sceneTags.includes("hide avatars")) {
+                        settings.hideAvatars = true;
+                    }
+                    
                     if (sceneResponse.triggerAudioGroups != null && sceneResponse.triggerAudioGroups.length > 0) {
                         hasTriggerAudio = true;
                     }
@@ -19792,6 +19797,12 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                         if (sceneResponse.sceneUseDynCubeMap) {
                             skyboxEnvMap = "skybox-env-map";   
                         }
+                        if (sceneResponse.sceneTags != null && sceneResponse.sceneTags.includes("hide overlay")) {
+                            canvasOverlay = "";
+                        }   
+                        // if (sceneResponse.sceneTags != null && sceneResponse.sceneTags.includes("no socket")) {
+                        //     socketScripts = "";
+                        // }   
                         let sceneGreeting = sceneResponse.sceneDescription;
                         if (sceneResponse.sceneGreeting != null && sceneResponse.sceneGreeting != undefined && sceneResponse.sceneGreeting != "") {
                             sceneGreeting = sceneResponse.sceneGreeting;
