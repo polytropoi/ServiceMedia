@@ -355,9 +355,9 @@ AFRAME.registerComponent('primary_audio_player', {  //setup and controls for the
                 });
                 console.log("PRIMARY AUDIO AUTOPLAY is " + this.data.autoplay );
                 if (this.data.autoplay) {
-                    primaryAudioHowl.play();
-                    primaryAudioHowl.volume(normalizedVolume);
-                    el.emit('primaryAudioToggle', {isPlaying : true}, true);
+                    // primaryAudioHowl.play();
+                    // primaryAudioHowl.volume(normalizedVolume);
+                    // el.emit('primaryAudioToggle', {isPlaying : true}, true);
 
 
                 }
@@ -607,10 +607,10 @@ AFRAME.registerComponent('primary_audio_player', {  //setup and controls for the
             }
             // this.primaryAudioHowl.pos(audioElPosition.x, audioElPosition.y, audioElPosition.z);
             if (data.autoplay) {    
-                console.log("PRIMARY AUDIO AUTOPLAY is " + this.data.autoplay );
-                this.primaryAudioHowl.play();
-                el.emit('primaryAudioToggle', {isPlaying : true}, true);
-                this.primaryAudioHowl.volume(normalizedVolume);
+                // console.log("PRIMARY AUDIO AUTOPLAY is " + this.data.autoplay );
+                // this.primaryAudioHowl.play();
+                // el.emit('primaryAudioToggle', {isPlaying : true}, true);
+                // this.primaryAudioHowl.volume(normalizedVolume);
             }
             // this.primaryAudioHowl.onplay(()=> {
             //     this.primaryAudioHowl.volume(normalizedVolume);

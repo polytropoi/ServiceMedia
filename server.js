@@ -17746,7 +17746,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                 "});" +
                             "primaryAudioHowl.load();</script>";
                             // primaryAudioControl = "<script src=\x22../main/src/component/primary-audio-control.js\x22></script>";
-                            primaryAudioEntity = "<a-entity id=\x22primaryAudioParent\x22 look-at=\x22#player\x22 position=\x22"+audioLocation+"\x22>"+ //parent
+                            primaryAudioEntity = "<a-entity audio-play-on-window-click id=\x22primaryAudioParent\x22 look-at=\x22#player\x22 position=\x22"+audioLocation+"\x22>"+ //parent
                            
                             
                             "<a-entity gltf-model=\x22#backpanel_horiz1\x22 position=\x220 -1.25 0\x22 material=\x22color: black; transparent: true;\x22></a-entity>" +

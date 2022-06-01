@@ -26,13 +26,13 @@ function PrimaryAudioInit() {
   if (primaryAudioEl != null) {
     primaryAudioMangler = document.getElementById("primaryAudio").components.primary_audio_control;
     console.log("PRIMARY AUDIO INIT() autoplay " + primaryAudioMangler.data.autoplay +  " isplaying " + primaryAudioHowl.playing());
-    if (primaryAudioMangler.data.autoplay) {
-      if (primaryAudioHowl != null) {
-        if (!primaryAudioHowl.playing()) {
-          primaryAudioMangler.playPauseToggle();
-        }
-      }
-    }
+    // if (primaryAudioMangler.data.autoplay) {
+    //   if (primaryAudioHowl != null) {
+    //     if (!primaryAudioHowl.playing()) {
+    //       primaryAudioMangler.playPauseToggle();
+    //     }
+    //   }
+    // }
   }
   let avz = document.getElementById("audiovizzler");
   if (avz != null) {
@@ -603,7 +603,7 @@ AFRAME.registerComponent('basic-scene-link', {
             // a.target="_blank";
             // a.href=this.data.href;
             // a.click();
-          }
+        }
       }
     })
   }
@@ -612,8 +612,10 @@ AFRAME.registerComponent('basic-scene-link', {
 AFRAME.registerComponent('play-on-window-click', { //play videosphere
   init: function () {
     this.onClick = this.onClick.bind(this);
+    this.initialized = false;
   },
   play: function () {
+    
     window.addEventListener('click', this.onClick);
   },
   pause: function () {
@@ -621,10 +623,44 @@ AFRAME.registerComponent('play-on-window-click', { //play videosphere
   },
   onClick: function (evt) {
     var video = this.el.components.material.material.map.image;
-    if (!video) { return; }
-    video.play();
+    if (video != null) { 
+      video.play();
+    }
   }
 });
+AFRAME.registerComponent('audio-play-on-window-click', { //play videosphere
+  init: function () {
+    this.onClick = this.onClick.bind(this);
+    this.initialized = false;
+  },
+  play: function () {
+    
+    window.addEventListener('click', this.onClick);
+  },
+  pause: function () {
+    window.removeEventListener('click', this.onClick);
+  },
+  onClick: () => {
+    if (!this.initialized) {
+      console.log("tryna autoplay primary audio");
+      let audioEl = document.getElementById("primaryAudio");
+      if (audioEl != null) {
+      var primaryAudioMangler = audioEl.components.primary_audio_control;
+      if (primaryAudioMangler != null) {
+          if (primaryAudioMangler.data.autoplay) {
+     
+                primaryAudioMangler.playPauseToggle();
+                this.initialized = true;
+     
+          }
+        }
+      }
+    }
+  }
+});
+
+
+  
 
 AFRAME.registerComponent('play-on-vrdisplayactivate-or-enter-vr', { //play videosphere in vr mode
   init: function () {
