@@ -26,13 +26,13 @@ function PrimaryAudioInit() {
   if (primaryAudioEl != null) {
     primaryAudioMangler = document.getElementById("primaryAudio").components.primary_audio_control;
     console.log("PRIMARY AUDIO INIT() autoplay " + primaryAudioMangler.data.autoplay +  " isplaying " + primaryAudioHowl.playing());
-    // if (primaryAudioMangler.data.autoplay) {
-    //   if (primaryAudioHowl != null) {
-    //     if (!primaryAudioHowl.playing()) {
-    //       primaryAudioMangler.playPauseToggle();
-    //     }
-    //   }
-    // }
+    if (primaryAudioMangler.data.autoplay) {
+      if (primaryAudioHowl != null) {
+        if (!primaryAudioHowl.playing()) {
+          primaryAudioMangler.playPauseToggle();
+        }
+      }
+    }
   }
   let avz = document.getElementById("audiovizzler");
   if (avz != null) {
@@ -648,9 +648,14 @@ AFRAME.registerComponent('audio-play-on-window-click', { //play videosphere
       var primaryAudioMangler = audioEl.components.primary_audio_control;
       if (primaryAudioMangler != null) {
           if (primaryAudioMangler.data.autoplay) {
-     
+            if (primaryAudioHowl != null) {
+              if (!primaryAudioHowl.playing()) {
                 primaryAudioMangler.playPauseToggle();
                 this.initialized = true;
+              }
+            }
+                // primaryAudioMangler.playPauseToggle();
+                
      
           }
         }
