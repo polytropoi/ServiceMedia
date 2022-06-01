@@ -244,11 +244,13 @@ AFRAME.registerComponent('screen-controls',
         this.component = null;
         if (isMobile || isIOS) {
             let jsContainer = document.getElementById('joystickContainer');
-            jsContainer.style.visibility = 'visible';
-            this.component = document.getElementById("player").components["extended-wasd-controls"];
-            this.joystick1 = new Joystick("joystickEl", 64, 8);
-            this.component.setJoystickInput();
-            console.log("controls initialized : JOYSTICK" );
+            if (jsContainer != null) {
+              jsContainer.style.visibility = 'visible';
+              this.component = document.getElementById("player").components["extended-wasd-controls"];
+              this.joystick1 = new Joystick("joystickEl", 64, 8);
+              this.component.setJoystickInput();
+              console.log("controls initialized : JOYSTICK" );
+            }
         } else {
             let js = document.getElementById('joystickContainer');
             if (js != null) {
