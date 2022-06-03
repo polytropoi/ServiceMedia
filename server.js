@@ -5726,17 +5726,27 @@ app.post('/share_scene/', requiredAuthentication, function (req, res) { //yep!
                                 // var standardName = 'standard.' + baseName + item_string_filename_ext;
                                 var urlHalf = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + "." + halfName, Expires: 6000}); //just send back thumbnail urls for list
                                 // var urlQuarter = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + "." + quarterName, Expires: 6000}); //just send back thumbnail urls for list
-                                callback(null, urlHalf, eData);
+                                callback(null, urlHalf, eData, scene);
                             }
                         });
                     } else {
-                        callback(null, '', eData);
+                        callback(null, '', eData, scene);
                     }
                 }
             });
         },
+        function(urlHalf, eData, sceneData, callback) {
+            console.log("scene locations " +JSON.stringify(sceneData.sceneLocations));
+            let geoLinks = "";
+            for (let i = 0; i < sceneData.sceneLocations.length; i++) {
+                if (sceneData.sceneLocations[i].type.toLowerCase() == "geographic") {
+                    geoLinks += "<strong><a href='http://maps.google.com?q=" + sceneData.sceneLocations[i].latitude + "," + sceneData.sceneLocations[i].longitude + "'>Map to location: "+sceneData.sceneLocations[i].name+"</a></strong><br>"
+                }
+            }
+            callback(null, urlHalf, eData, geoLinks);
+        },
 
-        function(urlHalf, eData, callback) { //spin through validated data, send appropriate mail
+        function(urlHalf, eData, geoLinks, callback) { //spin through validated data, send appropriate mail
             console.log("eDatahs : " +JSON.stringify(eData));
             
             async.each (eData, function (data, callbackzz) {
@@ -5765,9 +5775,20 @@ app.post('/share_scene/', requiredAuthentication, function (req, res) { //yep!
                 if (req.body.sceneShareWithMessage === "" || req.body.sceneShareWithMessage == null) {
                     message = " has shared an Immersive Scene with you!";
                 } else {
-                    message = " has shared an Immersive Scene with you including this message: " +
+                    message = " has shared an Immersive Scene with this message: " +
                         "<hr><br> " + req.body.sceneShareWithMessage +  "<br>"
                 }
+                if (req.body.sceneAccessStart != undefined && req.body.sceneAccessStart != null && req.body.sceneAccessStart != "" ) {
+                    let datetimeString = new Date(req.body.sceneAccessStart);
+                    message += "<br><strong>Event start: " + datetimeString.toLocaleString([], { hour12: true}) + "</strong><br>";
+                    // message += "<br><strong>Event start: " + datetimeString.toString() + "</strong><br>";
+                    console.log(message);
+                }
+                if (req.body.sceneAccessEnd != undefined && req.body.sceneAccessEnd != null && req.body.sceneAccessEnd != "") {
+                    let datetimeString = new Date(req.body.sceneAccessEnd);
+                    message += "<strong>Event end: " + datetimeString.toLocaleString([], { hour12: true})  + "</strong><br>";
+                }
+                message += geoLinks;
                 // var urlHalf = "";
                 // if (req.body.postcards[0]) {
                 //     urlHalf = req.body.postcards[0].urlHalf;
@@ -5776,16 +5797,20 @@ app.post('/share_scene/', requiredAuthentication, function (req, res) { //yep!
                     if (theScene.sceneShareWithPublic) {
 
                         var htmlbody = req.session.user.userName + message + "</h3><hr>" +
-                            "<br> Click here to access this public scene: <strong><a href='"+ requestProtocol + "://" + req.headers.host + "/webxr/" + req.body.short_id+"' target='_blank'>"+ requestProtocol + "://" + req.headers.host + "/webxr/" + req.body.short_id+"</a></strong>" +
+                            // "<br> Click here to access this public scene: <strong><a href='"+ requestProtocol + "://" + req.headers.host + "/webxr/" + req.body.short_id+"' target='_blank'>"+ requestProtocol + "://" + req.headers.host + "/webxr/" + req.body.short_id+"</a></strong>" +
                             
-                            "<br> <img src=" + urlHalf + "> " +
+                            "<a href='"+ requestProtocol + "://" + req.headers.host + "/webxr/" + req.body.short_id+"' target='_blank'>" +
+                            "<button style='font-family: Arial, Helvetica, sans-serif;  font-size: 18px; background-color: blue; color: white; border-radius: 8px; margin: 10px; padding: 10px;'>"+
+                            "Click here to access this scene!</a></button><br>" +
+
+                            "<br> <a href='"+ requestProtocol + "://" + req.headers.host + "/webxr/" + req.body.short_id+"' target='_blank'><img src=" + urlHalf + "></a> " +
                             "<br> Scene Title: " + req.body.sceneTitle +
                             "<br> Scene Short ID: " + req.body.short_id +
                             "<br> Scene Keynote: " + theScene.sceneKeynote +
                             "<br> Scene Description: " + theScene.sceneDescription +
                             "<br> Owner: " + theScene.userName +
 
-                            "<br><br><strong><a href='"+ requestProtocol + "://" + req.headers.host + "/qrcode/" + req.body.short_id + "'>Click here to scan Access Code for this scene</a></strong>" +
+                            "<br><br><strong><a href='"+ requestProtocol + "://" + req.headers.host + "/qrcode/" + req.body.short_id + "'>Click here to scan QR Code for this scene</a></strong>" +
 
                             // "<br> <a href= http://" + scene_page + "> Here's the shareable public page for this scene. </a> <br>If you have the iOS app, you may load the scene directly with the <a href= "+ app_link +">Mobile App Link</a>" +
                 //            "r><br> <a href= " + mob_link + "> Mobile App link </a> " +
@@ -5862,16 +5887,17 @@ app.post('/share_scene/', requiredAuthentication, function (req, res) { //yep!
                                     message = req.session.user.userName + " has shared an Immersive Scene with this message: "+
                                         "<hr>" + req.body.sceneShareWithMessage +  "<br><hr>";
                                 }
-                                if (req.body.sceneAccessStart != undefined) {
+                                if (req.body.sceneAccessStart != undefined && req.body.sceneAccessStart != null && req.body.sceneAccessStart != "") {
                                     let datetimeString = new Date(req.body.sceneAccessStart);
                                     message += "<br><strong>Event start: " + datetimeString.toLocaleString([], { hour12: true}) + "</strong><br>";
                                     // message += "<br><strong>Event start: " + datetimeString.toString() + "</strong><br>";
                                     console.log(message);
                                 }
-                                if (req.body.sceneAccessEnd != undefined) {
+                                if (req.body.sceneAccessEnd != undefined && req.body.sceneAccessEnd != null && req.body.sceneAccessEnd != "") {
                                     let datetimeString = new Date(req.body.sceneAccessEnd);
                                     message += "<strong>Event end: " + datetimeString.toLocaleString([], { hour12: true})  + "</strong><br>";
                                 }
+                                message += geoLinks;
                                 var htmlbody = message +
                                     "<br> Scene Title: " + req.body.sceneTitle +
                                     "<br> Short ID: " + req.body.short_id +
@@ -7635,9 +7661,20 @@ app.post('/update_person', checkAppID, requiredAuthentication, function (req, re
     }});
     res.send("updated " + Date.now());
 });
+app.get('/person_details/:p_id', requiredAuthentication, function(req, res) {
+    var o_id = ObjectID(req.params.p_id);
+    console.log('tryna return people for: ' + req.params.p_id);
+    db.people.findOne({_id: o_id}, function(err, person) {
+        if (err || !person) {
+            console.log("error getting person : " + err);
+        } else {
+            res.json(person);
+            console.log("returning people for " + req.params.p_id);
+        }
+    });
+});
 
-
-app.get('/people/:u_id', checkAppID, requiredAuthentication, function(req, res) {
+app.get('/people/:u_id', requiredAuthentication, function(req, res) {
     console.log('tryna return people for: ' + req.params.u_id);
     db.people.find({userID: req.params.u_id}).sort({otimestamp: -1}).limit(maxItems).toArray( function(err, people) {
         if (err || !people) {
@@ -7648,6 +7685,19 @@ app.get('/people/:u_id', checkAppID, requiredAuthentication, function(req, res) 
         }
     });
 });
+
+app.get('/allpeople/', requiredAuthentication, function(req, res) {
+    console.log('tryna return people for: ' + req.params.u_id);
+    db.people.find({}).sort({otimestamp: -1}).toArray( function(err, people) {
+        if (err || !people) {
+            console.log("error getting people : " + err);
+        } else {
+            res.json(people);
+            console.log("returning people for " + req.params.u_id);
+        }
+    });
+});
+
 
 app.get('/person/:p_id', requiredAuthentication, function(req, res) {
     console.log('tryna return usertexts for: ' + req.params.p_id);

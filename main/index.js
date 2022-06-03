@@ -132,12 +132,26 @@
             $("#pageTitle").html("All Registered Users");
             getAllUsers();
         break;
-        case "guests": //gets everything atm
+        case "person": //gets everything atm
             $("#tables").show();
             $("#table1").show();
-            $("#table1Title").html("Guest Users");
-            $("#pageTitle").html("All Guest Users");
-            getAllGuests();
+            $("#table1Title").html("Person");
+            $("#pageTitle").html("Person");
+            showPerson();
+        break;
+        case "mypeople": //gets everything atm
+            $("#tables").show();
+            $("#table1").show();
+            $("#table1Title").html("My People");
+            $("#pageTitle").html("My People");
+            getMyPeople();
+        break;
+        case "people": //gets everything atm
+            $("#tables").show();
+            $("#table1").show();
+            $("#table1Title").html("People");
+            $("#pageTitle").html("All People");
+            getAllPeople();
         break;
         case "appusers": //gets everything atm
             $("#tables").show();
@@ -9227,6 +9241,118 @@ function showGroup() {
             {"order": [[ 1, "desc" ]]}
         );
     }
+
+    function showPerson() {
+        let config = { headers: {
+        appid: appid,
+        }
+        }
+        tagsHtml = "";
+        tags = [];
+        axios.get('/person_details/' + itemid, config)
+        .then(function (response) {
+        // let ouser = response.data.userID;
+        // let date = response.data.otimestamp;
+        // let user = null;
+        // if (response.data.lastUpdateUserName != null) {
+        //     user = response.data.lastUpdateUserName;
+        // }
+        // if (response.data.lastUpdateTimestamp != null) {
+        //     date = response.data.lastUpdateTimestamp;
+        // }
+        $("#cards").show();
+   
+        var card = "<div class=\x22col-lg-12\x22>" +
+        "<div class=\x22card shadow mb-4\x22>" +
+            "<div class=\x22card-header py-3 d-flex flex-row align-items-center justify-content-between\x22>" +
+            "<h6 class=\x22m-0 font-weight-bold text-primary\x22>Person Details - : "+ response.data.email + " | _id: " +response.data._id+ "</h6>" +
+            "</div>" +
+            "<div class=\x22card-body\x22>" +
+            "<form id=\x22updateUserForm\x22>" +
+            "<div class=\x22float-right\x22><button type=\x22submit\x22 id=\x22submitButton\x22 class=\x22btn btn-primary float-right\x22>Update</button></div>" + 
+            "<div class=\x22form-row\x22>" +
+              
+                "<div class=\x22col form-group col-md-3\x22>" +
+                        "<label for=\x22Full Name\x22>Full Name</label>" +
+
+                "</div>" +
+                "<div class=\x22col form-group col-md-3\x22>" +
+                        "<label for=\x22nickname\x22>Nickname</label>" +
+                        
+                "</div>" +
+                "<div class=\x22col form-group col-md-3\x22>" +
+                        "<label for=\x22email\x22>Email</label>" +
+                    
+                       
+                "</div>" +
+                "<div class=\x22col form-group col-md-3\x22>" +
+                        "<label for=\x22tags\x22>tags</label>" +
+                       
+                "</div>" +
+            "</form>" +
+            "</div>" +
+            "</div>" +
+            "</div>" +
+                "<h5 class=\x22mt-0\x22>User Data</h5><br><br>" +
+                keyValues(response.data) +
+                
+                "</div>" +
+                "</div>" +
+            "</div>" +
+        "</div>" +
+        "</div>";
+
+        const capitalize = (s) => {
+            if (typeof s !== 'string') return ''
+            return s.charAt(0).toUpperCase() + s.slice(1)
+          }
+        $("#cardrow").html(card);
+
+        $(function() { 
+            $("#authLevel").val(capitalize(response.data.authLevel));
+            $("#paymentStatus").val(capitalize(response.data.paymentStatus));
+            $("#userType").val(capitalize(response.data.type));
+            $("#userStatus").val(capitalize(response.data.status));
+
+            $('#updateUserForm').on('submit', function(e) { 
+
+                e.preventDefault(); 
+                let authLevel = document.getElementById("authLevel").value.toLowerCase();
+                let paymentStatus = document.getElementById("paymentStatus").value.toLowerCase();
+                let userType = document.getElementById("userType").value.toLowerCase();
+                let userStatus = document.getElementById("userStatus").value.toLowerCase();
+
+                console.log("tryna submit");
+                let data = {
+                    _id: response.data._id,
+                    authLevel: authLevel,
+                    status: userStatus,
+                    paymentStatus: paymentStatus,
+                    type: userType
+                }
+                axios.post('/update_person/', data)
+                    .then(function (response) {
+                        console.log(response);
+                        if (response.data.includes("updated")) {
+                            $("#topSuccess").html(response.data);
+                            $("#topSuccess").show();
+                            
+                        } else {
+                            $("#topAlert").html(response.data);
+                            $("#topAlert").show();
+                        }
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+                });
+            });
+        })
+        .catch(function (error) {
+        console.log(error);
+        });
+    } 
+
     function showUser() {
         let config = { headers: {
         appid: appid,
@@ -9434,6 +9560,87 @@ function showGroup() {
         console.log(error);
     });
     }
+
+    function getAllPeople() {
+        let config = { headers: {
+                // appid: appid,
+            }
+            }
+            axios.get('/allpeople/', config)
+            .then(function (response) {
+            console.log(JSON.stringify(response));
+            // var jsonResponse = response.data;
+        
+            var arr = response.data;
+            let selectHeader = "";
+            if (mode == "selectadmin") {
+                selectHeader = "<th>Select</th>";
+            }  
+            var tableHead = "<table id=\x22dataTable1\x22 class=\x22display table table-striped table-bordered\x22 style=\x22width:100%\x22>" +
+                "<thead>"+
+                "<tr>"+
+                selectHeader +
+                "<th>Email</th>"+
+                "<th>Fullname</th>"+
+                "<th>Nickname</th>"+
+                "<th>Tags</th>"+
+                "<th>Last Activity</th>"+
+                "<th>Create Date</th>"+
+            "</tr>"+
+            "</thead>"+
+            "<tbody>";
+            var tableBody = "";
+            for(var i = 0; i < arr.length; i++) {
+            let lastActivity = "";
+            if (arr[i].activities != undefined && arr[i].activities != null) {
+                // lastActivity = arr[i].activities[0].key + " " +  convertTimestamp(arr[i].activities[0].value); //
+                // lastActivity = arr[i].activities[arr[i].activities.length - 1].key;//
+                for (const [key, value] of Object.entries(arr[i].activities[0])) {
+                    console.log(`${key}: ${value}`);
+                    lastActivity = key;
+                  }
+                  
+            }
+            let selectButton = "";
+            if (mode == "selectadmin") {
+                selectButton = "<td><button type=\x22button\x22 class=\x22btn btn-primary\x22 onclick=\x22selectItem('" + parent + "','admin','" + itemid + "','" + arr[i]._id + "')\x22>Select Admin</button></td>";
+                hideIndex  = 4;
+                $("#pageTitle").html("Select Admin for " + parent + " " + itemid);
+            }  
+                tableBody = tableBody +
+                "<tr>" +
+                selectButton +
+                "<td><a href=\x22index.html?type=person&iid=" + arr[i]._id + "\x22>" + arr[i].email + "</a></td>"+ 
+                "<td>" + arr[i].fullname + "</td>" +
+                "<td>" + arr[i].nickname + "</td>" +
+                "<td>" + arr[i].tags + "</td>" +
+                "<td>" + lastActivity + "</td>" +
+                "<td>" + convertTimestamp(arr[i].dateCreated/1000) + "</td>" +
+                "</tr>";
+            }
+            var tableFoot =  "</tbody>" +
+                "<tfoot>" +
+                "<tr>" +
+                selectHeader + 
+                "<th>User Name</th>"+ 
+                "<th>Type</th>"+
+                "<th>Status</th>"+
+                "<th>Email</th>"+
+                "<th>Auth Level</th>"+
+                "<th>Create Date</th>"+
+                "</tr>" +
+            "</tfoot>" +
+            "</table>";
+            var resultElement = document.getElementById('table1Data');
+            resultElement.innerHTML = tableHead + tableBody + tableFoot;
+            $('#dataTable1').DataTable(
+                {"order": [[ 1, "desc" ]]}
+            );
+        })
+        .catch(function (error) {
+            console.log(error);
+        });
+        }
 
     function getUnityAssets() {
 
