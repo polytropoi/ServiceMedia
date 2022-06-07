@@ -9260,6 +9260,43 @@ function showGroup() {
         // if (response.data.lastUpdateTimestamp != null) {
         //     date = response.data.lastUpdateTimestamp;
         // }
+        let mailCountLast24 = 0;
+        let mailCountLastWeek = 0;
+        let mailCountTotal = 0;
+        let dateRange = "";
+        let activities = "Activity | By/From | Date<br>";
+        var currentDate = new Date();
+        // console.log("The current Date="+currentDate);
+        var sevenDaysAgo = Date.parse(new Date(currentDate.setDate(currentDate.getDate() - 7)));
+        var yesterday = Date.parse(new Date(new Date().getTime() - (24 * 60 * 60 * 1000)));
+        console.log("The One week ago date="+sevenDaysAgo);
+
+        for (let i = 0; i < response.data.activities.length; i++) {
+
+            for (var o in response.data.activities[i]) {
+
+                if (o == "wasSentEmail") {
+                    console.log(response.data.activities[i][o].split("_")[0] + " vs " + sevenDaysAgo);
+                    mailCountTotal++;
+                    if (response.data.activities[i][o].split("_")[0] > sevenDaysAgo) {
+                        mailCountLastWeek++;
+                    }
+                    if (response.data.activities[i][o].split("_")[0] > yesterday) {
+                        mailCountLast24++;
+                    }
+
+                    // let mailDeets = {};
+                    // mailDeets.sentBy = response.data.activities[i][o].split("_")[0];
+                    // mailDeets.sentDate = response.data.activities[i][o].split("_")[1];
+                    // console.log("maildeet" + JSON.stringify(mailDeets));
+                    
+                }
+                //bracket notation on the array element convert
+                activities += o + " | " + response.data.activities[i][o].split("_")[1] + " | " + convertTimestamp(response.data.activities[i][o].split("_")[0]/1000) + "<br>";
+                console.log ("activitiy" + o);
+            }
+           
+        }
         $("#cards").show();
    
         var card = "<div class=\x22col-lg-12\x22>" +
@@ -9274,21 +9311,40 @@ function showGroup() {
               
                 "<div class=\x22col form-group col-md-3\x22>" +
                         "<label for=\x22Full Name\x22>Full Name</label>" +
+                        "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22personFullName\x22 value=\x22" + response.data.name + "\x22 >" +
 
                 "</div>" +
                 "<div class=\x22col form-group col-md-3\x22>" +
                         "<label for=\x22nickname\x22>Nickname</label>" +
+                        "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22personNickname\x22 value=\x22" + response.data.nickname + "\x22 >" +
                         
                 "</div>" +
                 "<div class=\x22col form-group col-md-3\x22>" +
                         "<label for=\x22email\x22>Email</label>" +
-                    
+                        "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22personEmail\x22 value=\x22" + response.data.email + "\x22 required>" +
                        
                 "</div>" +
                 "<div class=\x22col form-group col-md-3\x22>" +
                         "<label for=\x22tags\x22>tags</label>" +
-                       
+                        "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22personTags\x22 value=\x22" + response.data.tags + "\x22 >" +
                 "</div>" +
+            "</div>" +
+            "<div class=\x22col form-group col-md-12\x22>" +              
+                    
+                    "Total Emails: " + mailCountTotal + "" + "<br>" +
+                    "Total Emails in Last Week: " + mailCountLastWeek + "" + "<br>" +
+                    "Total Emails in Last Day: " + mailCountLast24 + "" + "<br>" +
+
+            "</div>" +
+            "<div class=\x22col form-group col-md-12\x22>" +
+
+                    "<label for=\x22tags\x22>activities</label>" +
+                    activities +
+            "</div>" +
+            "<div class=\x22form-row\x22>" +
+                
+            "</div>" +
+
             "</form>" +
             "</div>" +
             "</div>" +
@@ -9634,7 +9690,7 @@ function showGroup() {
             var resultElement = document.getElementById('table1Data');
             resultElement.innerHTML = tableHead + tableBody + tableFoot;
             $('#dataTable1').DataTable(
-                {"order": [[ 1, "desc" ]]}
+                {"order": [[ 5, "desc" ]]}
             );
         })
         .catch(function (error) {
