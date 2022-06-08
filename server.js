@@ -5630,8 +5630,11 @@ app.post('/share_scene/', requiredAuthentication, function (req, res) { //yep!
         function(emailSplit, callback){ //build temp array of objex with email + peopleID
             var emailsFinal = [];
             var uid = req.session.user._id.toString();
-            console.log("tryna mail to " )
+            console.log("tryna mail to " );
+            
             async.each (emailSplit, function (email, callbackz) {
+
+
                 db.people.findOne({ $and: [ {userID: uid}, {email: email.trim()} ]}, function(err, person) {
                     if (err || !person) {
                         
@@ -5680,8 +5683,25 @@ app.post('/share_scene/', requiredAuthentication, function (req, res) { //yep!
                         emailsFinal.push(pursoner);
                         callbackz();
                     }
+                    //callback won't wait on this, but whatever
+                    let uid = ObjectID(req.session.user._id.toString()); 
+                    db.users.findOne({"_id": uid}, function (err, user) {
+                        if (err ||!user) {
+                            console.log("HEY! caint find user " +req.session.user._id);
+                        } else {
+                            if (user.people != undefined) {
+                                if (!user.people.includes(person._id)) {
+                                    
+                                }
+                            } else {
+                                
+                            }
+                                // inventories
+                        }
+                    });
 
                     });
+                
 
             }, function(err) {
                
@@ -5873,11 +5893,9 @@ app.post('/share_scene/', requiredAuthentication, function (req, res) { //yep!
                                 db.invitations.save(invitation, function (err, saved) {
                                     if ( err || !saved ) {
                                         console.log('problem saving invitaiton');
-
                                     } else {
                                         // var item_id = saved._id.toString();
                                         console.log('new invitiation id: ' + saved._id.toString());
-
                                     }
                                 });
                                 if (req.body.sceneShareWithMessage === "" || req.body.sceneShareWithMessage == null) {
