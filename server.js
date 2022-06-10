@@ -5684,18 +5684,18 @@ app.post('/share_scene/', requiredAuthentication, function (req, res) { //yep!
                         callbackz();
                     }
                     //callback won't wait on this, but whatever
-                    let uid = ObjectID(req.session.user._id.toString()); 
-                    db.users.findOne({"_id": uid}, function (err, user) {
+                  
+                    db.users.findOne({"_id": ObjectID(uid)}, function (err, user) {
                         if (err ||!user) {
-                            console.log("HEY! caint find user " +req.session.user._id);
+                            console.log("HEYWTF! caint find user " +req.session.user._id + " ...call the police!");
                         } else {
-                            if (user.people != undefined) {
-                                if (!user.people.includes(person._id)) {
-                                    
-                                }
-                            } else {
-                                
-                            }
+                            db.users.updateOne( { "_id": ObjectID(uid) }, { $addToSet: {people : person._id}}); //addToSet should add array if not present, but prevent dupes (!?)
+                            console.log("tryna add a person " + person._id + " to " + req.session.user._id);
+                            // if (user.people != undefined) {
+                            //     if (!user.people.includes(person._id)) {
+                            //         db.user.updateOne( { "_id": uid }, { $addToSet: {people : person._id}}); //prevent dupes
+                            //     }
+                            // }
                                 // inventories
                         }
                     });
@@ -5796,7 +5796,7 @@ app.post('/share_scene/', requiredAuthentication, function (req, res) { //yep!
                     message = " has shared an Immersive Scene with you!";
                 } else {
                     message = " has shared an Immersive Scene with this message: " +
-                        "<hr><br> " + req.body.sceneShareWithMessage +  "<br>"
+                        "<hr><br> " + req.body.sceneShareWithMessage +  "<br>";
                 }
                 if (req.body.sceneAccessStart != undefined && req.body.sceneAccessStart != null && req.body.sceneAccessStart != "" ) {
                     let datetimeString = new Date(req.body.sceneAccessStart);
@@ -7679,6 +7679,7 @@ app.post('/update_person', checkAppID, requiredAuthentication, function (req, re
     }});
     res.send("updated " + Date.now());
 });
+
 app.get('/person_details/:p_id', requiredAuthentication, function(req, res) {
     var o_id = ObjectID(req.params.p_id);
     console.log('tryna return people for: ' + req.params.p_id);
@@ -7692,9 +7693,9 @@ app.get('/person_details/:p_id', requiredAuthentication, function(req, res) {
     });
 });
 
-app.get('/people/:u_id', requiredAuthentication, function(req, res) {
+app.get('/people/:u_id', requiredAuthentication, function(req, res) { //this is people "created by" user
     console.log('tryna return people for: ' + req.params.u_id);
-    db.people.find({userID: req.params.u_id}).sort({otimestamp: -1}).limit(maxItems).toArray( function(err, people) {
+    db.people.find({userID: req.params.u_id}).sort({otimestamp: -1}).toArray( function(err, people) {
         if (err || !people) {
             console.log("error getting people : " + err);
         } else {
@@ -7704,8 +7705,9 @@ app.get('/people/:u_id', requiredAuthentication, function(req, res) {
     });
 });
 
-app.get('/allpeople/', requiredAuthentication, function(req, res) {
+app.get('/allpeople/', requiredAuthentication, admin, function(req, res) {
     console.log('tryna return people for: ' + req.params.u_id);
+    if (req.session.user.authLevel.toLowerCase().includes("domain")) {
     db.people.find({}).sort({otimestamp: -1}).toArray( function(err, people) {
         if (err || !people) {
             console.log("error getting people : " + err);
@@ -7714,8 +7716,40 @@ app.get('/allpeople/', requiredAuthentication, function(req, res) {
             console.log("returning people for " + req.params.u_id);
         }
     });
+    } else {
+        res.send("no");
+    }
 });
 
+app.get('/mypeople/:u_id', requiredAuthentication,  function(req, res) {
+    console.log('tryna return people for: ' + req.params.u_id);
+    if (req.session.user._id.toString() == req.params.u_id) {
+    
+    let oid = ObjectID(req.params.u_id.toString());
+    // async.waterfall
+    db.users.findOne({"_id" : oid}, function (err, user) {
+        if (err || !user) {
+            console.log("error getting people : " + err);
+            res.send("err findin user for people " + err);
+        } else {
+            if (user.people != undefined && user.people != null) {
+                db.people.find({"_id": {$in: user.people }}).sort({otimestamp: -1}).toArray( function(errr, people) {
+                    if (err || !people) {
+                        console.log("error getting people : " + errr);
+                        res.send("my erroneous people " + errr);
+                    } else {
+                        res.json(people);
+                        console.log("returning people for " + req.params.u_id);
+                    }
+                });
+            }
+        }
+    });
+    } else {
+        console.log("somebody tryna get people without no surfticket!");
+    }
+
+});
 
 app.get('/person/:p_id', requiredAuthentication, function(req, res) {
     console.log('tryna return usertexts for: ' + req.params.p_id);

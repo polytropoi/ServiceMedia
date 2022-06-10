@@ -21,7 +21,7 @@
         if (cookie != null && cookie._id != null) {
         console.log("gotsa cookie: " + cookie._id );
         $.get( "/ami-rite/" + cookie._id, function( data ) {
-            // console.log("amirite : " + JSON.stringify(data.apps));
+            console.log("amirite : " + JSON.stringify(data));
             if (data == 0) {
                 window.location.href = './login.html';
                 // console.log("data equals zero?");
@@ -33,9 +33,12 @@
             apps = data.apps;
             domains = data.domains;
             userNameLabel.innerText = username;
-            let html = "";
+            let html = "";  
+            // if (data.authLevel.includes("domain")) {
+            //     $("#adminPanel").show();
+            // }
             if (apps != null && apps != undefined && apps.length > 0) { 
-                $("#adminPanel").show();
+                // $("#adminPanel").show();
                 $("#appNav").show();
                 html = "<hr class=\x22sidebar-divider\x22><div class=\x22sidebar-heading\x22>Apps</div>";
                 for (let i = 0; i < apps.length; i++) {
@@ -73,9 +76,11 @@
                 } else {
                     $("#adminPanel").hide();
                 }
+                // ShowAdmin
                 // userid = data.split("~")[1];
                 var profileLink = document.getElementById('profileLink');
                 profileLink.href = 'index.html?type=profile';
+                // ShowAdminElements();
                 bigSwitch();
                 }
             });
@@ -359,6 +364,17 @@
             $("#pageTitle").html("tryna import store items...");
             importStoreItems();
         break;
+        }
+    }
+    function ShowAdminElements() {
+        console.log("auth is ??? " + auth.toString() );
+        if (auth != undefined && auth != null && auth.includes("domain")) {
+            // document.getElementById("adminPanel").style.display = 'block';
+            $("#adminPanel").show();
+            // document.getElementById('domainsAdminLink').display = 'inline';
+            // document.getElementById('appsAdminLink').display = 'inline';
+            // document.getElementById('usersAdminLink').display = 'inline';
+            // document.getElementById('peopleAdminLink').display = 'inline';
         }
     }
     function appName(appid) {
@@ -9617,12 +9633,93 @@ function showGroup() {
     });
     }
 
-    function getAllPeople() {
+function getAllPeople() {
+    let config = { headers: {
+            // appid: appid,
+        }
+        }
+        axios.get('/allpeople/', config)
+        .then(function (response) {
+        console.log(JSON.stringify(response));
+        // var jsonResponse = response.data;
+    
+        var arr = response.data;
+        let selectHeader = "";
+        if (mode == "selectadmin") {
+            selectHeader = "<th>Select</th>";
+        }  
+        var tableHead = "<table id=\x22dataTable1\x22 class=\x22display table table-striped table-bordered\x22 style=\x22width:100%\x22>" +
+            "<thead>"+
+            "<tr>"+
+            selectHeader +
+            "<th>Email</th>"+
+            "<th>Fullname</th>"+
+            "<th>Nickname</th>"+
+            "<th>Tags</th>"+
+            "<th>Last Activity</th>"+
+            "<th>Create Date</th>"+
+        "</tr>"+
+        "</thead>"+
+        "<tbody>";
+        var tableBody = "";
+        for(var i = 0; i < arr.length; i++) {
+        let lastActivity = "";
+        if (arr[i].activities != undefined && arr[i].activities != null) {
+            // lastActivity = arr[i].activities[0].key + " " +  convertTimestamp(arr[i].activities[0].value); //
+            // lastActivity = arr[i].activities[arr[i].activities.length - 1].key;//
+            for (const [key, value] of Object.entries(arr[i].activities[0])) {
+                console.log(`${key}: ${value}`);
+                lastActivity = key;
+                }
+                
+        }
+        let selectButton = "";
+        if (mode == "selectadmin") {
+            selectButton = "<td><button type=\x22button\x22 class=\x22btn btn-primary\x22 onclick=\x22selectItem('" + parent + "','admin','" + itemid + "','" + arr[i]._id + "')\x22>Select Admin</button></td>";
+            hideIndex  = 4;
+            $("#pageTitle").html("Select Admin for " + parent + " " + itemid);
+        }  
+            tableBody = tableBody +
+            "<tr>" +
+            selectButton +
+            "<td><a href=\x22index.html?type=person&iid=" + arr[i]._id + "\x22>" + arr[i].email + "</a></td>"+ 
+            "<td>" + arr[i].fullname + "</td>" +
+            "<td>" + arr[i].nickname + "</td>" +
+            "<td>" + arr[i].tags + "</td>" +
+            "<td>" + lastActivity + "</td>" +
+            "<td>" + convertTimestamp(arr[i].dateCreated/1000) + "</td>" +
+            "</tr>";
+        }
+        var tableFoot =  "</tbody>" +
+            "<tfoot>" +
+            "<tr>" +
+            selectHeader + 
+            "<th>User Name</th>"+ 
+            "<th>Type</th>"+
+            "<th>Status</th>"+
+            "<th>Email</th>"+
+            "<th>Auth Level</th>"+
+            "<th>Create Date</th>"+
+            "</tr>" +
+        "</tfoot>" +
+        "</table>";
+        var resultElement = document.getElementById('table1Data');
+        resultElement.innerHTML = tableHead + tableBody + tableFoot;
+        $('#dataTable1').DataTable(
+            {"order": [[ 5, "desc" ]]}
+        );
+    })
+    .catch(function (error) {
+        console.log(error);
+    });
+    }
+    function getMyPeople() {
         let config = { headers: {
                 // appid: appid,
             }
             }
-            axios.get('/allpeople/', config)
+            
+            axios.get('/mypeople/' + userid, config)
             .then(function (response) {
             console.log(JSON.stringify(response));
             // var jsonResponse = response.data;
@@ -9641,21 +9738,24 @@ function showGroup() {
                 "<th>Nickname</th>"+
                 "<th>Tags</th>"+
                 "<th>Last Activity</th>"+
-                "<th>Create Date</th>"+
+                "<th>Last Activity DateTime</th>"+
             "</tr>"+
             "</thead>"+
             "<tbody>";
             var tableBody = "";
             for(var i = 0; i < arr.length; i++) {
             let lastActivity = "";
+            let lastTimestamp = "";
             if (arr[i].activities != undefined && arr[i].activities != null) {
                 // lastActivity = arr[i].activities[0].key + " " +  convertTimestamp(arr[i].activities[0].value); //
                 // lastActivity = arr[i].activities[arr[i].activities.length - 1].key;//
                 for (const [key, value] of Object.entries(arr[i].activities[0])) {
                     console.log(`${key}: ${value}`);
                     lastActivity = key;
-                  }
-                  
+                    console.log("activity timestamp " + value.split("_")[0]); 
+                    lastTimestamp = value.split("_")[0];
+                    }
+                    
             }
             let selectButton = "";
             if (mode == "selectadmin") {
@@ -9671,7 +9771,7 @@ function showGroup() {
                 "<td>" + arr[i].nickname + "</td>" +
                 "<td>" + arr[i].tags + "</td>" +
                 "<td>" + lastActivity + "</td>" +
-                "<td>" + convertTimestamp(arr[i].dateCreated/1000) + "</td>" +
+                "<td>" + convertTimestamp(lastTimestamp/1000) + "</td>" +
                 "</tr>";
             }
             var tableFoot =  "</tbody>" +
@@ -9697,6 +9797,7 @@ function showGroup() {
             console.log(error);
         });
         }
+        
 
     function getUnityAssets() {
 
@@ -16463,7 +16564,7 @@ function showGroup() {
         }
         axios.get('/uscenes/' + userid, config)
         .then(function (response) {
-        console.log(JSON.stringify(response.data));
+        // console.log(JSON.stringify(response.data));
         // var jsonResponse = response.data;
         //  var jsonResponse = response.data;
         var arr = response.data;
@@ -16548,7 +16649,7 @@ function showGroup() {
             appid: appid,
             }
         }
-        console.log(userid);
+        // console.log(userid);
         axios.get('/profile/' + userid, config)
         .then(function (response) {
             // console.log(JSON.stringify(response.data.activity));
