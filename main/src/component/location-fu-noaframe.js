@@ -21,10 +21,22 @@ window.onload = function () {
    
     
     restrictLocData = JSON.parse(atob(restrictToLocationData.getAttribute("data-location")));
-    console.log("reastricti location datas: " + JSON.stringify(restrictLocData));
+    console.log("restrict location datas: " + JSON.stringify(restrictLocData));
     mode = "nomap";
     UpdateLocationInfo();
   }
+  // } else {
+  //   console.log("MISSED GEO EL FIRWST PASSS@!");
+  //   setTimeout(() => {
+  //     restrictToLocationData = document.getElementById("restrictToLocation");
+  //     if (restrictToLocationData != null) {  
+  //       restrictLocData = JSON.parse(atob(restrictToLocationData.getAttribute("data-location")));
+  //       console.log("restrict location datas: " + JSON.stringify(restrictLocData));
+  //       mode = "nomap";
+  //       UpdateLocationInfo();
+  //     }
+  //   }, 10);
+  // }
 }
 
 function UpdateGeoPanel(nwString) {
@@ -217,6 +229,7 @@ function geoip(json){
       data.range = range;
       // data.distance = "error";
       let data64 = btoa(JSON.stringify(data));
+
       window.location.href = "/landing/geo.html?ld=" + data64;
       
     }

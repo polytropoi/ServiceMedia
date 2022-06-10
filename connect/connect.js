@@ -1791,10 +1791,10 @@ function InitTriggerSlider () {
       }
       UpdateTriggerAudioVolume(triggerAudioSlider.value);
       triggerAudioSlider.oninput = function() {
-      volumeTrigger = this.value;
-      UpdateTriggerAudioVolume(this.value);
-      localStorage.setItem(room+"_triggerVolume", this.value);
-   } 
+         volumeTrigger = this.value;
+         UpdateTriggerAudioVolume(this.value);
+         localStorage.setItem(room+"_triggerVolume", this.value);
+      } 
    }
 }
    // function SetLocationData(locationData) {

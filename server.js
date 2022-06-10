@@ -5760,7 +5760,11 @@ app.post('/share_scene/', requiredAuthentication, function (req, res) { //yep!
             let geoLinks = "";
             for (let i = 0; i < sceneData.sceneLocations.length; i++) {
                 if (sceneData.sceneLocations[i].type.toLowerCase() == "geographic") {
-                    geoLinks += "<strong><a href='http://maps.google.com?q=" + sceneData.sceneLocations[i].latitude + "," + sceneData.sceneLocations[i].longitude + "'>Map to location: "+sceneData.sceneLocations[i].name+"</a></strong><br>"
+                    geoLinks += "<strong><a href='http://maps.google.com?q=" + sceneData.sceneLocations[i].latitude + "," + sceneData.sceneLocations[i].longitude + "'>Map to location: "+sceneData.sceneLocations[i].name+"</a></strong><br><br>"+
+                    "<a target=\x22_blank\x22 href=\x22http://maps.google.com?q=" + sceneData.sceneLocations[i].latitude + "," + sceneData.sceneLocations[i].longitude + "\x22>" +
+                        "<img class=\x22img-thumbnail\x22 style=\x22width: 300px;\x22 src=\x22https://maps.googleapis.com/maps/api/staticmap?center=" + sceneData.sceneLocations[i].latitude +
+                        "," + sceneData.sceneLocations[i].longitude + "&zoom=15&size=600x400&maptype=roadmap&key=AIzaSyCBlNNHgDBmv-vusmuvG3ylf0XjGoMkkCo&markers=color:blue%7Clabel:%7C" + sceneData.sceneLocations[i].latitude + "," + sceneData.sceneLocations[i].longitude + "\x22>" + 
+                        "</a>";
                 }
             }
             callback(null, urlHalf, eData, geoLinks);
@@ -5776,7 +5780,7 @@ app.post('/share_scene/', requiredAuthentication, function (req, res) { //yep!
                 //     theUrl = url;
                 //     console.log(theUrl);
                 //   });
-                var subject = "Scene Invitation : " + req.body.sceneTitle;
+                var subject = "Invitation : " + req.body.sceneTitle;
                 var from = req.session.user.email;
                 // var from = adminEmail
                 //var from = "polytropoi@gmail.com";
@@ -7579,21 +7583,7 @@ app.get('/allobjs/:u_id', requiredAuthentication, domainadmin, function(req, res
             // console.log("returning obj_items for " + req.params.u_id);
         }
     });
-    // } else {
 
-    //     db.obj_items.find({_id : }, function(err, obj_items) {
-
-    //         if (err || !obj_items) {
-    //             console.log("error getting obj items: " + err);
-    
-    //         } else {
-    //             console.log("returning userobjs " + obj_items.length);
-    
-    //             res.json(obj_items);
-    //             // console.log("returning obj_items for " + req.params.u_id);
-    //         }
-    //     });
-    // } 
 });
 
 
@@ -7769,6 +7759,7 @@ app.get('/person/:p_id', requiredAuthentication, function(req, res) {
         }
     });
 });
+
 // app.get('/delete_invitations', function (req, res) { 
 //     db.invitations.remove({});
 //     console.log("all invitations have been removed");
@@ -7777,6 +7768,7 @@ app.get('/person/:p_id', requiredAuthentication, function(req, res) {
 //     db.scores.remove({});
 //     console.log("all scores have been removed");
 // });
+
 app.get('/actions/:u_id', requiredAuthentication, function(req, res) {
     console.log('tryna return action_items for: ' + req.params.u_id);
     // if (!req.session.user.authLevel.includes("domain")) {
@@ -15928,7 +15920,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                             locationScripts = "<script src=\x22../main/src/component/location-fu.js\x22></script>";
                                             var buff = Buffer.from(JSON.stringify(sceneResponse.sceneLocations[i])).toString("base64");
                                             locationData = "<div id=\x22restrictToLocation\x22 data-location='"+buff+"'></div>";
-                                        } if (sceneResponse.sceneWebType == "Model Viewer") { 
+                                        } else if (sceneResponse.sceneWebType == "Model Viewer") { 
                                             // console.log("sceneResponse.sceneLocations[i].eventData : " + sceneResponse.sceneLocations[i].eventData);
                                             if (sceneResponse.sceneLocations[i].eventData.toLowerCase().includes("restrict")) {
                                             geoScripts = "<script async src=\x22https://get.geojs.io/v1/ip/geo.js\x22></script><script src=\x22/main/js/geolocator.js\x22></script>";
@@ -15936,7 +15928,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                             var buff = Buffer.from(JSON.stringify(sceneResponse.sceneLocations[i])).toString("base64");
                                             locationData = "<div id=\x22restrictToLocation\x22 data-location='"+buff+"'></div>";
                                             }
-                                        } else { //just location tracking, for any sceneWebType
+                                        } else if (sceneResponse.sceneWebType == "Mapbox") { //just location tracking, for any sceneWebType
                                             if (sceneResponse.sceneLocations[i].eventData != null && sceneResponse.sceneLocations[i].eventData.length > 4 && sceneResponse.sceneLocations[i].eventData.toLowerCase().includes("restrict")) {
                                                 locationEntity = "<a-entity id=\x22youAreHere\x22 location_restrict position=\x220 2 -5\x22>"+
                                                     "<a-entity class=\x22gltf\x22 gltf-model=\x22#globe\x22 class=\x22envMap activeObjexRay\x22 position=\x220 -1.5 0\x22>"+
@@ -15950,6 +15942,14 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                                 "</a-entity>"; 
                                                 locationButton = "<div style=\x22float: right; margin: 10px 10px;\x22 onclick=\x22ShowHideGeoPanel()\x22><i class=\x22fas fa-globe fa-2x\x22></i></div>";
                                             }
+                                        } else {
+                                            console.log("tryna set geo loc " + sceneResponse.sceneLocations[i].eventData);
+                                            if (sceneResponse.sceneLocations[i].eventData.toLowerCase().includes("restrict")) {
+                                                geoScripts = "<script async src=\x22https://get.geojs.io/v1/ip/geo.js\x22></script><script src=\x22/main/js/geolocator.js\x22></script>";
+                                                locationScripts = "<script src=\x22../main/src/component/location-fu-noaframe.js\x22></script>";
+                                                var buff = Buffer.from(JSON.stringify(sceneResponse.sceneLocations[i])).toString("base64");
+                                                locationData = "<div id=\x22restrictToLocation\x22 data-location='"+buff+"'></div>";
+                                                }
                                         }
                                         // if (sceneResponse.sceneLocations[i].markerType == "poi") {
                                         //     poiIndex++;
@@ -16339,6 +16339,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                 // "<script src=\x22https://unpkg.com/three@0.106.2/examples/js/loaders/GLTFLoader.js\x22></script>";
 
                                 // ARScript = "<script src=\x22/main/ref/aframe/dist/aframe-ar.js\x22></script>";
+                                // locationScripts = "<script src=\x22../main/src/component/location-fu.js\x22></script>"; //maybe can use non aframe
                                 locationScripts = "<script src=\x22../main/src/component/location-fu.js\x22></script>";
                                 // locationScripts = "<script>window.onload = () => { navigator.geolocation.getCurrentPosition((position) => {"+ //put this where?
                                 // "document.querySelector('a-text').setAttribute('"+geoEntity+"', `latitude: ${position.coords.latitude}; longitude: ${position.coords.longitude};`)});}</script>";
@@ -20095,6 +20096,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                         // "</script>"+
                         containers +
                         locationScripts +
+                        locationData +
                         geoScripts +
                         "<script src=\x22../main/js/dialogs.js\x22></script>"+
                         
