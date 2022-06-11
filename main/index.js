@@ -12082,10 +12082,11 @@ function getAllPeople() {
             let sceneDescription = response.data.sceneDescription != undefined ? response.data.sceneDescription : ""; 
             let sceneShareWithPeople = response.data.sceneShareWithPeople != undefined ? response.data.sceneShareWithPeople : ""; 
             let sceneShareWithMessage = response.data.sceneShareWithMessage != undefined ? response.data.sceneShareWithMessage : ""; 
-            let sceneAccessStart = response.data.sceneAccessStart != undefined ? response.data.sceneAccessStart : ""; 
-            let sceneAccessEnd = response.data.sceneAccessEnd != undefined ? response.data.sceneAccessEnd : ""; 
-            let sceneAccessStartDateTime = null;
-            let sceneAccessEndDateTime = null;
+            let sceneEventStart = response.data.sceneEventStart != undefined ? response.data.sceneEventStart : ""; 
+            let sceneEventEnd = response.data.sceneEventEnd != undefined ? response.data.sceneEventEnd : "";
+            // let sceneRestrictAccessToEvent = response.data.sceneRestrictAccessToEvent != undefined ? response.data.sceneRestrictAccessToEvent : ""; 
+            let sceneEventStartDateTime = null;
+            let sceneEventEndDateTime = null;
             let sceneEventDuration = null;
             let sceneEventCountdown = null;
             let sceneAccessLinkExpire = response.data.sceneAccessLinkExpire != undefined ? response.data.sceneAccessLinkExpire : ""; 
@@ -12688,23 +12689,23 @@ function getAllPeople() {
                 }
             }
 
-            if (sceneAccessStart != null && sceneAccessStart != "") { //comes in as ms from epoch
+            if (sceneEventStart != null && sceneEventStart != "") { //comes in as ms from epoch
                
-                sceneAccessStartDateTime = timestampToDatetimeInputString(sceneAccessStart);
-                console.log("timestamp " + sceneAccessStart+ " sceneAccessStartDateTime: " + sceneAccessStartDateTime);
-                $("#sceneAccessStart").val(sceneAccessStartDateTime);
+                sceneEventStartDateTime = timestampToDatetimeInputString(sceneEventStart);
+                console.log("timestamp " + sceneEventStart+ " sceneEventStartDateTime: " + sceneEventStartDateTime);
+                $("#sceneEventStart").val(sceneEventStartDateTime);
                 sceneEventCountdown = "<div id=\x22sceneEventCountdown\x22></div>";
-                countdownTimer(sceneAccessStart);
+                countdownTimer(sceneEventStart);
             }
-            if (sceneAccessEnd != null && sceneAccessEnd != "") { //ms from epoch
-                // sceneAccessEndDateTime = new Date(sceneAccessEnd).toISOString(); //trim the zulu bizness
-                // sceneAccessEndDateTime = sceneAccessEndDateTime.slice(0, 19);
-                sceneAccessEndDateTime = timestampToDatetimeInputString(sceneAccessEnd);
-                console.log("timestamp " + sceneAccessEnd+ " sceneAccessEndDateTime: " + sceneAccessEndDateTime);
-                $("#sceneAccessEnd").val(sceneAccessEndDateTime);
+            if (sceneEventEnd != null && sceneEventEnd != "") { //ms from epoch
+                // sceneEventEndDateTime = new Date(sceneEventEnd).toISOString(); //trim the zulu bizness
+                // sceneEventEndDateTime = sceneEventEndDateTime.slice(0, 19);
+                sceneEventEndDateTime = timestampToDatetimeInputString(sceneEventEnd);
+                console.log("timestamp " + sceneEventEnd+ " sceneEventEndDateTime: " + sceneEventEndDateTime);
+                $("#sceneEventEnd").val(sceneEventEndDateTime);
             }
-            if (sceneAccessStart != null && sceneAccessStart != "" && sceneAccessEnd != null && sceneAccessEnd != "") {
-                let ms = sceneAccessEnd - sceneAccessStart;
+            if (sceneEventStart != null && sceneEventStart != "" && sceneEventEnd != null && sceneEventEnd != "") {
+                let ms = sceneEventEnd - sceneEventStart;
                 // let s = ms / 1000;
                 // let m = s / 60;
                 // let h = m / 60;
@@ -12751,6 +12752,11 @@ function getAllPeople() {
                     if (triggerAudioGroupButtons.length > 0) {
                         triggerAudio.URLpng = "ref/groups_selected.png";
                     }
+                    sceneButtons = "<label for=\x22scenePicButtons\x22>Link to Scenes</label><div id=\x22sceneSceneButtons\x22 style=\x22margin: 0px 10px;\x22  class=\x22btn-group float-right\22 role=\x22group\x22 aria-label=\x22button group\x22>" +
+                    "<a class=\x22btn btn-primary\x22 href=\x22index.html?type=newscene\x22><i class=\x22fas fa-file-upload\x22></i> New </a>" +
+                    "<a class=\x22btn btn-info\x22 href=\x22index.html?type=scenes&mode=select&parent=scene&iid="+response.data._id+"\x22><i class=\x22fas fa-hand-pointer\x22></i> Select </a>" +
+                    "<a class=\x22btn btn-success\x22 href=\x22index.html?type=groups&mode=scenegroup&parent=scene&iid="+response.data._id+"\x22><i class=\x22fas fa-hand-pointer\x22></i> Group </a>" +
+                    "<button class=\x22btn btn-danger clearSceneScenes\x22><i class=\x22fas fa-broom\x22></i> Clear </button></div>";
                     picButtons = "<label for=\x22scenePicButtons\x22>Scene Pictures </label><div id=\x22scenePicButtons\x22 style=\x22margin: 0px 10px;\x22  class=\x22btn-group float-right\22 role=\x22group\x22 aria-label=\x22button group\x22>" +
                     "<a class=\x22btn btn-primary\x22 href=\x22index.html?type=bulkup\x22><i class=\x22fas fa-file-upload\x22></i> Upload </a>" +
                     "<a class=\x22btn btn-info\x22 href=\x22index.html?type=pictures&mode=select&parent=scene&iid="+response.data._id+"\x22><i class=\x22fas fa-hand-pointer\x22></i> Select </a>" +
@@ -12926,16 +12932,17 @@ function getAllPeople() {
                                 "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22sceneNextScene\x22 placeholder=\x22Next Scene\x22 value=\x22" + sceneNextScene + "\x22 >" +
                             "</div>" +
                             "<div class=\x22col form-group col-md-6\x22>" +
-                                "<label for=\x22sceneLinks\x22>Scene Links</label><br>" + //SceneLinks 
-                                "<div class=\x22input-group\x22>" +
-                                    "<div class=\x22input-group-prepend\x22>" +
-                                    "<a href=\x22#\x22 class=\x22btn input-group-text\x22 id=\x22addSceneLinkButton\x22>+</a>" +
-                                    "</div>" +
-                                    "<input id=\x22addSceneLinkInput\x22 type=\x22text\x22 class=\x22form-control\x22 placeholder=\x22Add Scene Code or Title\x22 aria-label=\x22Input group example\x22 aria-describedby=\x22x22addSceneLinks\x22>" +
-                                    "<div class=\x22float-right\x22 id=\x22sceneLinkDisplay\x22>" +
+                            sceneButtons +
+                                // "<label for=\x22sceneLinks\x22>Scene Links</label><br>" + //SceneLinks 
+                                // "<div class=\x22input-group\x22>" +
+                                //     "<div class=\x22input-group-prepend\x22>" +
+                                //     "<a href=\x22#\x22 class=\x22btn input-group-text\x22 id=\x22addSceneLinkButton\x22>+</a>" +
+                                //     "</div>" +
+                                //     "<input id=\x22addSceneLinkInput\x22 type=\x22text\x22 class=\x22form-control\x22 placeholder=\x22Add Scene Code or Title\x22 aria-label=\x22Input group example\x22 aria-describedby=\x22x22addSceneLinks\x22>" +
+                                //     "<div class=\x22float-right\x22 id=\x22sceneLinkDisplay\x22>" +
                                         
-                                    "</div>" +
-                                "</div>" +
+                                //     "</div>" +
+                                // "</div>" +
                             "</div>" +
                             "<div class=\x22col form-group col-md-6\x22>" +
                                 "<label for=\x22sceneTags\x22>Tags</label><br>" + //Tags
@@ -13046,10 +13053,10 @@ function getAllPeople() {
                                         "</select>"+
                                 "</div>" +
                                 // "<div class=\x22col form-group col-md-2\x22>" +
-                                //     "<label for=\x22sceneAccessStart\x22>Start Date/Time</label>" + 
-                                //     "<input type=\x22datetime-local\x22 class=\x22form-control\x22 id=\x22sceneAccessStart\x22 placeholder=\x22\x22 value=\x22" + sceneAccessStart + "\x22 >" +
-                                //     "<label for=\x22sceneAccessEnd\x22>End Date/Time</label>" + 
-                                //     "<input type=\x22datetime-local\x22 class=\x22form-control\x22 id=\x22sceneAccessEnd\x22 placeholder=\x22\x22 value=\x22" + sceneAccessEnd + "\x22 >" +
+                                //     "<label for=\x22sceneEventStart\x22>Start Date/Time</label>" + 
+                                //     "<input type=\x22datetime-local\x22 class=\x22form-control\x22 id=\x22sceneEventStart\x22 placeholder=\x22\x22 value=\x22" + sceneEventStart + "\x22 >" +
+                                //     "<label for=\x22sceneEventEnd\x22>End Date/Time</label>" + 
+                                //     "<input type=\x22datetime-local\x22 class=\x22form-control\x22 id=\x22sceneEventEnd\x22 placeholder=\x22\x22 value=\x22" + sceneEventEnd + "\x22 >" +
                                 
                                 // "</div>" +
                                 // "<div class=\x22col form-group col-md-1\x22>" +
@@ -13058,12 +13065,12 @@ function getAllPeople() {
                             "</div>" +
                             "<div class=\x22form-row\x22>" + 
                                 "<div class=\x22col form-group col-md-3\x22>" +
-                                    "<label for=\x22sceneAccessStart\x22>Event Start Local Date/Time "+zone+"</label>" + 
-                                    "<input type=\x22datetime-local\x22 class=\x22form-control\x22 id=\x22sceneAccessStart\x22 placeholder=\x22\x22 value=\x22" + sceneAccessStartDateTime + "\x22 >" +
+                                    "<label for=\x22sceneEventStart\x22>Event Start Local Date/Time "+zone+"</label>" + 
+                                    "<input type=\x22datetime-local\x22 class=\x22form-control\x22 id=\x22sceneEventStart\x22 placeholder=\x22\x22 value=\x22" + sceneEventStartDateTime + "\x22 >" +
                                 "</div>" +
                                 "<div class=\x22col form-group col-md-3\x22>" +
-                                    "<label for=\x22sceneAccessEnd\x22>Event End Local Date/Time "+zone+"</label>" + 
-                                    "<input type=\x22datetime-local\x22 class=\x22form-control\x22 id=\x22sceneAccessEnd\x22 placeholder=\x22\x22 value=\x22" + sceneAccessEndDateTime + "\x22 >" +
+                                    "<label for=\x22sceneEventEnd\x22>Event End Local Date/Time "+zone+"</label>" + 
+                                    "<input type=\x22datetime-local\x22 class=\x22form-control\x22 id=\x22sceneEventEnd\x22 placeholder=\x22\x22 value=\x22" + sceneEventEndDateTime + "\x22 >" +
                                 "</div>" +
                                 "<div class=\x22col form-group col-md-2\x22>" +
                                     // "<label for=\x22sceneAccessLinkExpire\x22>Access Link Expiration</label>" + 
@@ -15180,8 +15187,8 @@ function getAllPeople() {
                                 data.sceneKeynote = sceneKeynote;
                                 data.sceneDescription = sceneDescription;
                                 data.short_id = response.data.short_id;
-                                data.sceneAccessStart = sceneAccessStart;
-                                data.sceneAccessEnd = sceneAccessEnd;
+                                data.sceneEventStart = sceneEventStart;
+                                data.sceneEventEnd = sceneEventEnd;
                                 data.sceneAccessLinkExpire = sceneAccessLinkExpire;
                                 data._id = response.data._id;
                                 axios.post('/share_scene/', data)
@@ -15640,29 +15647,29 @@ function getAllPeople() {
                     //     }
                     // });
 
-                    $(document).on('change', '#sceneAccessStart', function() {
+                    $(document).on('change', '#sceneEventStart', function() {
                     //     // let val = this.value;
                         
-                    //    let val = document.getElementById('sceneAccessStart').value;
+                    //    let val = document.getElementById('sceneEventStart').value;
                         let datetime = new Date(this.value);
                         // let utc = new Date();
                         // let ms = utc.getTime(datetime);
                         // console.log("starttime: " + utc);
-                        // sceneAccessStart = ms;
+                        // sceneEventStart = ms;
                         let ms = Date.parse(this.value);
                         console.log("start time: " + ms);
-                        sceneAccessStart = ms;
+                        sceneEventStart = ms;
                     });
-                    $(document).on('change', '#sceneAccessEnd', function() {
+                    $(document).on('change', '#sceneEventEnd', function() {
                     //     // let val = this.value;
                         
-                    //    let val = document.getElementById('sceneAccessStart').value;
+                    //    let val = document.getElementById('sceneEventStart').value;
                     //    let datetime = new Date(this.value);
                     //     let utc = new Date();
                     //     let ms = utc.getTime(datetime);
                         let ms = Date.parse(this.value);
                        console.log("end time: " + ms);
-                       sceneAccessEnd = ms;
+                       sceneEventEnd = ms;
                     });
 
                     // $(document).on('change', '#sceneSkyParticlesSelect', function() {
@@ -15965,8 +15972,8 @@ function getAllPeople() {
                         let sceneDescription = document.getElementById("sceneDescription").value;
                         let sceneShareWithPeople = document.getElementById("sceneShareWithPeople").value;
                         let sceneShareWithMessage = document.getElementById("sceneShareWithMessage").value;
-                        // let sceneAccessStart = document.getElementById("sceneAccessStart").value;
-                        // let sceneAccessEnd = document.getElementById("sceneAccessEnd").value;
+                        // let sceneEventStart = document.getElementById("sceneEventStart").value;
+                        // let sceneEventEnd = document.getElementById("sceneEventEnd").value;
                         let sceneAccessLinkExpire = document.getElementById("sceneAccessLinkExpireSelect").value;
                         let sceneNextScene = document.getElementById("sceneNextScene").value;
                         let scenePreviousScene = document.getElementById("scenePreviousScene").value;
@@ -16182,8 +16189,8 @@ function getAllPeople() {
                             sceneShareWithSubscribers: sceneShareWithSubscribers,
                             sceneShareWithPeople: sceneShareWithPeople, //should be an array
                             sceneShareWithMessage: sceneShareWithMessage,
-                            sceneAccessStart: sceneAccessStart,
-                            sceneAccessEnd: sceneAccessEnd,
+                            sceneEventStart: sceneEventStart,
+                            sceneEventEnd: sceneEventEnd,
                             sceneAccessLinkExpire: sceneAccessLinkExpire,
                             sceneStickyness: sceneStickyness,
                             sceneSource: sceneSource,

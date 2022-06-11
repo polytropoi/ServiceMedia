@@ -5275,8 +5275,8 @@ app.get('/invitation_check/:hzch', function (req, res) { //called from /landing/
                 response.ok = "yep";
                 response.pin = pin;
                 response.to = invitation.sentToEmail;
-                response.timestampStart = invitation.sceneAccessStart;
-                response.timestampEnd = invitation.sceneAccessEnd;
+                response.timestampStart = invitation.sceneEventStart;
+                response.timestampEnd = invitation.sceneEventEnd;
                 response.url = requestProtocol + "://" + req.headers.host + "/webxr/" + invitation.invitedToSceneShortID + "?p=" + pin;
                 // var codestring = req.protocol + "://" + req.headers.host + "/webxr/" + invitation.invitedToSceneShortID + "?p=" + pin;
                 QRCode.toDataURL(response.url, function (err, url) {
@@ -5726,6 +5726,7 @@ app.post('/share_scene/', requiredAuthentication, function (req, res) { //yep!
                 } else {
                     theScene = scene;
                     let urlHalf = "";
+                   
                     if (scene.scenePostcards != null && scene.scenePostcards.length > 0) {
                         var oo_id = ObjectID(scene.scenePostcards[0]); //TODO randomize? or ensure latest?  or use assigned default?
                         db.image_items.findOne({"_id": oo_id}, function (err, picture_item) {
@@ -5758,19 +5759,38 @@ app.post('/share_scene/', requiredAuthentication, function (req, res) { //yep!
         function(urlHalf, eData, sceneData, callback) {
             console.log("scene locations " +JSON.stringify(sceneData.sceneLocations));
             let geoLinks = "";
+            let eventData = {};
             for (let i = 0; i < sceneData.sceneLocations.length; i++) {
-                if (sceneData.sceneLocations[i].type.toLowerCase() == "geographic") {
+                if (sceneData.sceneLocations[i].type.toLowerCase() == "geographic") { //TODO what if multiple?  this will get last one in array, maybe?
                     geoLinks += "<strong><a href='http://maps.google.com?q=" + sceneData.sceneLocations[i].latitude + "," + sceneData.sceneLocations[i].longitude + "'>Map to location: "+sceneData.sceneLocations[i].name+"</a></strong><br><br>"+
                     "<a target=\x22_blank\x22 href=\x22http://maps.google.com?q=" + sceneData.sceneLocations[i].latitude + "," + sceneData.sceneLocations[i].longitude + "\x22>" +
                         "<img class=\x22img-thumbnail\x22 style=\x22width: 300px;\x22 src=\x22https://maps.googleapis.com/maps/api/staticmap?center=" + sceneData.sceneLocations[i].latitude +
                         "," + sceneData.sceneLocations[i].longitude + "&zoom=15&size=600x400&maptype=roadmap&key=AIzaSyCBlNNHgDBmv-vusmuvG3ylf0XjGoMkkCo&markers=color:blue%7Clabel:%7C" + sceneData.sceneLocations[i].latitude + "," + sceneData.sceneLocations[i].longitude + "\x22>" + 
                         "</a>";
+                    if (sceneData.sceneLocations[i].eventData != undefined && sceneData.sceneLocations[i].eventData.toLowerCase().includes('restrict')) {
+                        eventData.restrictToLocation = true;
+                    }
                 }
             }
-            callback(null, urlHalf, eData, geoLinks);
+            callback(null, urlHalf, eData, sceneData, geoLinks, eventData);
+        },
+        function(urlHalf, eData, sceneData, geoLinks, eventData, callback) {
+            console.log("scene locations " +JSON.stringify(sceneData.sceneTags));
+
+            if ((sceneData.sceneEventStart != undefined && sceneData.sceneEventStart != null) || (sceneData.sceneEventEnd != undefined && sceneEventEnd != null)) {
+                    eventData.eventStart = sceneData.sceneEventStart;
+                    eventData.eventEnd = sceneData.sceneEventEnd;
+            
+                    if (sceneData.sceneTags != undefined && sceneData.sceneTags != null && sceneData.sceneTags.length > 0 && sceneData.sceneTags.toString().toLowerCase().includes("restrict to event")) {
+                        eventData.restrictToEvent = true;
+                    } else {
+                        eventData.restrictToEvent = false;
+                    }
+                }
+            callback(null, urlHalf, eData, geoLinks, eventData);
         },
 
-        function(urlHalf, eData, geoLinks, callback) { //spin through validated data, send appropriate mail
+        function(urlHalf, eData, geoLinks, eventData, callback) { //spin through validated data, send appropriate mail
             console.log("eDatahs : " +JSON.stringify(eData));
             
             async.each (eData, function (data, callbackzz) {
@@ -5791,6 +5811,8 @@ app.post('/share_scene/', requiredAuthentication, function (req, res) { //yep!
                 //var reset = "";
                 var timestamp = Math.round(Date.now() / 1000);
                 var message = "";
+                var restrictToEventMessage = eventData.restrictToEvent ? "<br>Access is restricted to the event time" : "";
+                var restrictToLocationMessage = eventData.restrictToLocation ? "<br>Access is restricted to the event location" : "";
                 // var servicemedia_link = rootHost + "/#/s/" + req.body.short_id;
                 // // var wgl_link = "http://mvmv.us/?scene=" + req.body.short_id;
                 // var scene_page = req.body.sceneDomain + "/" + req.body.short_id;
@@ -5802,14 +5824,15 @@ app.post('/share_scene/', requiredAuthentication, function (req, res) { //yep!
                     message = " has shared an Immersive Scene with this message: " +
                         "<hr><br> " + req.body.sceneShareWithMessage +  "<br>";
                 }
-                if (req.body.sceneAccessStart != undefined && req.body.sceneAccessStart != null && req.body.sceneAccessStart != "" ) {
-                    let datetimeString = new Date(req.body.sceneAccessStart);
+                message += restrictToEventMessage + restrictToLocationMessage;
+                if (req.body.sceneEventStart != undefined && req.body.sceneEventStart != null && req.body.sceneEventStart != "" ) {
+                    let datetimeString = new Date(req.body.sceneEventStart);
                     message += "<br><strong>Event start: " + datetimeString.toLocaleString([], { hour12: true}) + "</strong><br>";
                     // message += "<br><strong>Event start: " + datetimeString.toString() + "</strong><br>";
                     console.log(message);
                 }
-                if (req.body.sceneAccessEnd != undefined && req.body.sceneAccessEnd != null && req.body.sceneAccessEnd != "") {
-                    let datetimeString = new Date(req.body.sceneAccessEnd);
+                if (req.body.sceneEventEnd != undefined && req.body.sceneEventEnd != null && req.body.sceneEventEnd != "") {
+                    let datetimeString = new Date(req.body.sceneEventEnd);
                     message += "<strong>Event end: " + datetimeString.toLocaleString([], { hour12: true})  + "</strong><br>";
                 }
                 message += geoLinks;
@@ -5881,10 +5904,11 @@ app.post('/share_scene/', requiredAuthentication, function (req, res) { //yep!
                                     invitedToSceneID: req.body._id,
                                     invitedToSceneShortID: req.body.short_id,
                                     accessTimeWindow: timestamp + 86400, //one day //will deprecate...
-                                    sceneAccessStart : req.body.sceneAccessStart,
-                                    sceneAccessEnd: req.body.sceneAccessEnd,
+                                    sceneEventStart : req.body.sceneEventStart,
+                                    sceneEventEnd: req.body.sceneEventEnd,
                                     sceneAccessLinkExpire: req.body.sceneAccessLinkExpire,
-                                    
+                                    sceneRestrictToEvent: eventData.restrictToEvent,
+                                    sceneRestrictToLocation: eventData.restrictToLocation,
                                     sentByUserName: req.session.user.userName,
                                     sentByUserID: req.session.user._id.toString(),
                                     sentToEmail: to,
@@ -5909,14 +5933,15 @@ app.post('/share_scene/', requiredAuthentication, function (req, res) { //yep!
                                     message = req.session.user.userName + " has shared an Immersive Scene with this message: "+
                                         "<hr>" + req.body.sceneShareWithMessage +  "<br><hr>";
                                 }
-                                if (req.body.sceneAccessStart != undefined && req.body.sceneAccessStart != null && req.body.sceneAccessStart != "") {
-                                    let datetimeString = new Date(req.body.sceneAccessStart);
+                                message += restrictToEventMessage + restrictToLocationMessage;
+                                if (req.body.sceneEventStart != undefined && req.body.sceneEventStart != null && req.body.sceneEventStart != "") {
+                                    let datetimeString = new Date(req.body.sceneEventStart);
                                     message += "<br><strong>Event start: " + datetimeString.toLocaleString([], { hour12: true}) + "</strong><br>";
                                     // message += "<br><strong>Event start: " + datetimeString.toString() + "</strong><br>";
                                     console.log(message);
                                 }
-                                if (req.body.sceneAccessEnd != undefined && req.body.sceneAccessEnd != null && req.body.sceneAccessEnd != "") {
-                                    let datetimeString = new Date(req.body.sceneAccessEnd);
+                                if (req.body.sceneEventEnd != undefined && req.body.sceneEventEnd != null && req.body.sceneEventEnd != "") {
+                                    let datetimeString = new Date(req.body.sceneEventEnd);
                                     message += "<strong>Event end: " + datetimeString.toLocaleString([], { hour12: true})  + "</strong><br>";
                                 }
                                 message += geoLinks;
@@ -13072,8 +13097,8 @@ app.post('/clone_scene', requiredAuthentication, function (req,res) {
                     sceneShareWithSubscribers : scene.sceneShareWithSubscribers != null ? scene.sceneShareWithSubscribers : false,
                     sceneShareWithGroups : scene.sceneShareWithGroups != null ? scene.sceneShareWithGroups : "",
                     sceneShareWithPeople : scene.sceneShareWithPeople != null ? scene.sceneShareWithPeople : "",
-                    sceneAccessStart : scene.sceneAccessStart != null ? scene.sceneAccessStart : "",
-                    sceneAccessEnd : scene.sceneAccessEnd != null ? scene.sceneAccessEnd : "",
+                    sceneEventStart : scene.sceneEventStart != null ? scene.sceneEventStart : "",
+                    sceneEventEnd : scene.sceneEventEnd != null ? scene.sceneEventEnd : "",
                     sceneEnvironment : scene.sceneEnvironment != null ? scene.sceneEnvironment : {},
                     sceneUseStaticObj : scene.sceneUseStaticObj != null ? scene.sceneUseStaticObj : false,
                     sceneStaticObjUrl : scene.sceneStaticObjUrl != null ? scene.sceneStaticObjUrl : "",
@@ -13354,8 +13379,8 @@ app.post('/update_scene/:_id', requiredAuthentication, function (req, res) {
                 sceneShareWithSubscribers : req.body.sceneShareWithSubscribers != null ? req.body.sceneShareWithSubscribers : false,
                 sceneShareWithGroups : req.body.sceneShareWithGroups != null ? req.body.sceneShareWithGroups : "",
                 sceneShareWithPeople : req.body.sceneShareWithPeople != null ? req.body.sceneShareWithPeople : "",
-                sceneAccessStart : req.body.sceneAccessStart != null ? req.body.sceneAccessStart : "",
-                sceneAccessEnd : req.body.sceneAccessEnd != null ? req.body.sceneAccessEnd : "",
+                sceneEventStart : req.body.sceneEventStart != null ? req.body.sceneEventStart : "",
+                sceneEventEnd : req.body.sceneEventEnd != null ? req.body.sceneEventEnd : "",
                 sceneAccessLinkExpire : req.body.sceneAccessLinkExpire != null ? req.body.sceneAccessLinkExpire : "",
                 sceneShareWithMessage : req.body.sceneShareWithMessage != null ? req.body.sceneShareWithMessage : "",
                 sceneEnvironment : req.body.sceneEnvironment != null ? req.body.sceneEnvironment : {},
@@ -16163,10 +16188,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
 
                         } if (sceneData.sceneWebType == 'Camera Background') {
                             sceneBackground = " background=\x22transparent: true\x22 ";
-                            // ARScript = "<script src=\x22/main/src/webcam.js\x22></script>";
-                            // // camera = "<a-nft type=\x22nft\x22 url=\x22https://realitymangler.com/markers/"+nftIDs+"\x22 smooth=\x22true\x22 smoothCount=\x2210\x22 smoothTolerance=\x22.01\x22 smoothThreshold=\x225\x22>" +
-                            // camera = "<video autoplay=\x22true\x22 id=\x22videoElement\x22></video>";
-                            // "<a-entity camera></a-entity>";
+                            
 
                             ARScript = "<script src=\x22/main/ref/aframe/dist/aframe-ar.js\x22></script>";
                             ARSceneArg = "arjs=\x22sourceType: webcam\x22";   
@@ -16294,7 +16316,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                 "<a-entity cursor raycaster=\x22far: 20; interval: 1000; objects: .activeObjexRay\x22></a-entity>" +
                                 "<a-entity camera initializer=\x22sceneType: 'Mirage Marker'\x22></a-entity>";
 
-                            } else if (sceneData.sceneWebType == 'Text Adventure') {
+                            } else if (sceneData.sceneWebType == 'Text Adventure') { //hemm...
                                 // ARScript = "<script src=\x22/main/js/dialog.js\x22></script>"; //WRONGNESS!  TODO fix this to be a reusable placeholder
                                 // camera = "<a-entity id=\x22player\x22 camera initializer=\x22sceneType: 'Text Adventure'\x22></a-entity>";
                                 ARSceneArg = "vr-mode-ui=\x22enabled: false; arEnabled: false;\x22 disable-magicwindow";
@@ -18802,6 +18824,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                     if (sceneResponse.primayAudioGroups != null && sceneResponse.primayAudioGroups.length > 0) {
                         hasPrimaryAudio = true;
                     }
+
                     // settings.sceneAmbientAudioGroups = sceneResponse.sceneAmbientAudioGroups;
                     // settings.scenePrimaryAudioGroups = sceneResponse.scenePrimaryAudioGroups;
                     var sbuff = Buffer.from(JSON.stringify(settings)).toString("base64");
@@ -20380,7 +20403,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                         "p    {color: white; font-family: sans-serif; font-size: 150%;}"+
                         "</style>"+
                         "</head> " +
-                        "<p>Sorry, access to this resource is restricted.</p><p>If you're a subscriber, you may <a href=\x22/main/login.html\x22>login</a>, or request an invitation by emailing <a href=\x22mailto:"+sceneData.short_id+"@servicemedia.net\x22>"+sceneData.short_id+"@servicemedia.net</a></p>"
+                        "<p>Access to this scene is restricted.</p><p>If you're a subscriber, you may <a href=\x22/main/login.html\x22>login</a>, or click this link to <a href=\x22/main/invitereq.html?rq=/"+sceneData.short_id+"\x22>request an invitation</a></p>" +
                         "<body> " +
                         "</body>" +
 

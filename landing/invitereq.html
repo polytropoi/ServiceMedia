@@ -1,0 +1,86 @@
+<html xmlns='http://www.w3.org/1999/xhtml'>
+    <head> 
+    <link href=\x22css/sb-admin-2.css\x22 rel=\x22stylesheet\x22>
+    <style>
+    body {background-color: #272727;}
+    h1   {color: white;}
+    a   {color: powderblue;}
+    p    {color: white; font-family: sans-serif; margin: auto; font-size: 200%;}
+    </style>
+    
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+
+
+    
+    <body>
+        <div style="width: 800px">
+        <p id="main"></p>
+        <!-- <div id="map"></div> -->
+        </div>
+
+       <script>
+        let mapdiv = document.getElementById('map');
+        let main = document.getElementById('main');
+        function getParameterByName(name, url) {
+            if (!url) {
+                url = window.location.href;
+            }
+            name = name.replace(/[\[\]]/g, "\\$&");
+            var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+                results = regex.exec(url);
+            if (!results) return null;
+            if (!results[2]) return '';
+            return decodeURIComponent(results[2].replace(/\+/g, " "));
+        }
+        const params = getParameterByName('rq');
+        console.log("params : " + params);
+        let now = Date.now();
+        let eventCountdownEl = "";
+        let eventDurationEl = "";
+        // let data = JSON.parse(atob(params));
+        // console.log(data);  
+        axios.post('/invitation_req/' + params)
+            .then(function (response) {
+                // let datetimes = "";
+                // var zone = new Date().toLocaleTimeString('en-us',{timeZoneName:'short'}).split(' ')[2]
+                // // console.log(zone)Intl.DateTimeFormat().resolvedOptions().timeZone
+                // let uname = response.data.to.toString().split('@')[0];
+                // console.log(JSON.stringify(response));
+                // if (response.data.timestampStart != undefined && response.data.timestampStart != null && response.data.timestampStart != "") {
+                //     let datetimeString = new Date(response.data.timestampStart);
+                //     datetimes = datetimes + "Event start: " + datetimeString.toLocaleString([], { hour12: true}) + "<small> ("+zone+")</small>.<br>";
+                //     eventCountdownEl = "<div id='sceneEventCountdown'></div>";
+                //     console.log(datetimes);
+                //     countdownTimer(response.data.timestampStart);
+                // }
+                // if (response.data.timestampEnd != undefined && response.data.timestampEnd != null && response.data.timestampEnd != "") {
+                //     let datetimeString = new Date(response.data.timestampEnd);
+                //     datetimes = datetimes + "Event end: " + datetimeString.toLocaleString([], { hour12: true})  + "<small> ("+zone+")</small>.<br>";
+                //     console.log(datetimes);
+                //     eventDurationEl = "Event duration: " + convertMsToHM(response.data.timestampEnd - response.data.timestampStart);
+                // }
+                // if (response.data.pin != undefined && response.data.pin.length > 4) {
+                //     console.log(datetimes);
+                //     main.innerHTML = "Hi " + uname + " - you're all set! <br><a href="+ response.data.url + ">Click here to enter scene...</a>"+
+                //     "<br><br>Your PIN is: " + response.data.pin + "<br><br>" +
+                //     datetimes +
+                //     eventDurationEl +
+                //     eventCountdownEl +
+                //     "<br>Scannable QR code:" +
+                //     "<img style='height: 100%; width: 100%; object-fit: contain' alt='qrcode' src='" + response.data.qrcode + "'/>";
+
+                // } else {
+                //     main.innerHTML = "Sorry, that invitation is no longer valid";
+                // }
+            }) //end of main fetch
+            .catch(function (error) {
+                console.log(error);
+                main.innerHTML = "Sorry, gotsa error: " + error;
+            });
+            
+        </script>
+
+    </body>
+
+</html>
