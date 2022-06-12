@@ -5592,6 +5592,7 @@ app.post('/share_scene/', requiredAuthentication, function (req, res) { //yep!
     }
     let theScene = {};
     let ts = Date.now();
+    var emailsFinal = [];
     async.waterfall([
 
         function(callback) {
@@ -5628,7 +5629,7 @@ app.post('/share_scene/', requiredAuthentication, function (req, res) { //yep!
         },
 
         function(emailSplit, callback){ //build temp array of objex with email + peopleID
-            var emailsFinal = [];
+            
             var uid = req.session.user._id.toString();
             console.log("tryna mail to " );
             
@@ -5669,34 +5670,40 @@ app.post('/share_scene/', requiredAuthentication, function (req, res) { //yep!
                             person.activities = [];
                         }
                         let action = {};
-                        action.wasSentEmail = ts + "_" + uid;
-                        person.activities.push(action);
+                        if (person.contactStatus != undefined && person.contactStatus.toString().toLowerCase().includes("opt out global")) {
+                            console.log("opt out global for " + email);
+                            action.sendEmailBlockedBlacklist = ts + "_" + uid;
+                            person.activities.push(action);
 
-                        db.people.update( { "_id": person._id }, { $set: {
-                            lastUpdate : ts,
-                            activities : person.activities
-                        }});
-                        var pursoner = {};
-                        console.log('found person id: ' + person._id);
-                        pursoner.personID = person._id;
-                        pursoner.email = email.trim();
-                        emailsFinal.push(pursoner);
-                        callbackz();
+                            db.people.update( { "_id": person._id }, { $set: {
+                                lastUpdate : ts,
+                                activities : person.activities
+                            }});
+                            callbackz(); //do not add to emailsFinal!
+                        } else {    
+                            action.wasSentEmail = ts + "_" + uid;
+                            person.activities.push(action);
+
+                            db.people.update( { "_id": person._id }, { $set: {
+                                lastUpdate : ts,
+                                activities : person.activities
+                            }});
+                            var pursoner = {};
+                            console.log('found person id: ' + person._id);
+                            pursoner.personID = person._id;
+                            pursoner.email = email.trim();
+                            emailsFinal.push(pursoner);
+                            callbackz();
+                        }
                     }
-                    //callback won't wait on this, but whatever
-                  
+                    //callback won't wait on this, but whatever...
                     db.users.findOne({"_id": ObjectID(uid)}, function (err, user) {
                         if (err ||!user) {
                             console.log("HEYWTF! caint find user " +req.session.user._id + " ...call the police!");
                         } else {
                             db.users.updateOne( { "_id": ObjectID(uid) }, { $addToSet: {people : person._id}}); //addToSet should add array if not present, but prevent dupes (!?)
-                            console.log("tryna add a person " + person._id + " to " + req.session.user._id);
-                            // if (user.people != undefined) {
-                            //     if (!user.people.includes(person._id)) {
-                            //         db.user.updateOne( { "_id": uid }, { $addToSet: {people : person._id}}); //prevent dupes
-                            //     }
-                            // }
-                                // inventories
+                            console.log("tryna add a person " + person._id + " to " + req.session.user._id); //TODO add sentMailTo activity to user action inventory
+
                         }
                     });
 
@@ -5718,6 +5725,7 @@ app.post('/share_scene/', requiredAuthentication, function (req, res) { //yep!
 
         },
         function (eData, callback) {
+            if (eData.length > 0) {
             // let emailArray = eData;
             db.scenes.findOne({short_id: req.body.short_id}, function (err, scene) {
                 if (err || !scene) {
@@ -5755,6 +5763,10 @@ app.post('/share_scene/', requiredAuthentication, function (req, res) { //yep!
                     }
                 }
             });
+        } else {
+            callback("no valid email!");
+            res.send("nothing sent - no valid email!");
+        }
         },
         function(urlHalf, eData, sceneData, callback) {
             console.log("scene locations " +JSON.stringify(sceneData.sceneLocations));
@@ -5774,7 +5786,8 @@ app.post('/share_scene/', requiredAuthentication, function (req, res) { //yep!
             }
             callback(null, urlHalf, eData, sceneData, geoLinks, eventData);
         },
-        function(urlHalf, eData, sceneData, geoLinks, eventData, callback) {
+
+        function(urlHalf, eData, sceneData, geoLinks, eventData, callback) { //pull out  event data
             console.log("scene locations " +JSON.stringify(sceneData.sceneTags));
 
             if ((sceneData.sceneEventStart != undefined && sceneData.sceneEventStart != null) || (sceneData.sceneEventEnd != undefined && sceneEventEnd != null)) {
@@ -5790,39 +5803,49 @@ app.post('/share_scene/', requiredAuthentication, function (req, res) { //yep!
             callback(null, urlHalf, eData, geoLinks, eventData);
         },
 
+        // function(urlHalf, eData, geoLinks, eventData, callback) { //lol nm
+        //     //spin through eData and rem bad addresses...
+        //     async.each (eData, function (data, callbax) {
+        //         console.log("email data is " + data);
+        //         callbax();
+            
+        //         }, function(err) {
+                
+        //             if (err) {
+        //                 console.log('A file failed to process');
+        //             } else {
+        //                 console.log('All files have been processed successfully');
+        //                 callback(null, urlHalf, eData, geoLinks, eventData);
+        //             }
+        //         });
+
+        // },
+
         function(urlHalf, eData, geoLinks, eventData, callback) { //spin through validated data, send appropriate mail
             console.log("eDatahs : " +JSON.stringify(eData));
-            
+            // let trimmedMails = [" a ", "b", " c", "d "].map(function(e){return e.trim();}); erp
             async.each (eData, function (data, callbackzz) {
-                console.log("email data is " + data);
-                //var theUrl = "";
-                // QRCode.toDataURL(req.body.short_id, function (err, url) {
-                //     theUrl = url;
-                //     console.log(theUrl);
-                //   });
+                // console.log("email data is " + data);
+          
                 var subject = "Invitation : " + req.body.sceneTitle;
                 var from = req.session.user.email;
-                // var from = adminEmail
-                //var from = "polytropoi@gmail.com";
-                // var to = [req.body.sceneShareWith];
+               
                 var to = [data.email];
-                // var personID = data.person_id != undefined ? data.person_id : "";
+               
                 var bcc = [];
-                //var reset = "";
+                
                 var timestamp = Math.round(Date.now() / 1000);
                 var message = "";
                 var restrictToEventMessage = eventData.restrictToEvent ? "<br>Access is restricted to the event time" : "";
-                var restrictToLocationMessage = eventData.restrictToLocation ? "<br>Access is restricted to the event location" : "";
-                // var servicemedia_link = rootHost + "/#/s/" + req.body.short_id;
-                // // var wgl_link = "http://mvmv.us/?scene=" + req.body.short_id;
-                // var scene_page = req.body.sceneDomain + "/" + req.body.short_id;
+                var restrictToLocationMessage = eventData.restrictToLocation ? "<br>Access is restricted to the event location<br>" : "";
+               
                 var app_link = "servicemedia://scene?" + req.body.short_id;
-                // var mob_link = "servicemedia://scene?" + req.body.short_id;
+               
                 if (req.body.sceneShareWithMessage === "" || req.body.sceneShareWithMessage == null) {
                     message = " has shared an Immersive Scene with you!";
                 } else {
                     message = " has shared an Immersive Scene with this message: " +
-                        "<hr><br> " + req.body.sceneShareWithMessage +  "<br>";
+                        "<hr><br><strong> " + req.body.sceneShareWithMessage +  "</strong><br>";
                 }
                 message += restrictToEventMessage + restrictToLocationMessage;
                 if (req.body.sceneEventStart != undefined && req.body.sceneEventStart != null && req.body.sceneEventStart != "" ) {
@@ -5836,11 +5859,7 @@ app.post('/share_scene/', requiredAuthentication, function (req, res) { //yep!
                     message += "<strong>Event end: " + datetimeString.toLocaleString([], { hour12: true})  + "</strong><br>";
                 }
                 message += geoLinks;
-                // var urlHalf = "";
-                // if (req.body.postcards[0]) {
-                //     urlHalf = req.body.postcards[0].urlHalf;
-                // }
-                // if (validator.isEmail(to) == true) {
+               
                     if (theScene.sceneShareWithPublic) {
 
                         var htmlbody = req.session.user.userName + message + "</h3><hr>" +
@@ -5931,7 +5950,7 @@ app.post('/share_scene/', requiredAuthentication, function (req, res) { //yep!
                                     // "<h3>Scene Invitation from " + from + "</h3><hr><br>"
                                 } else {
                                     message = req.session.user.userName + " has shared an Immersive Scene with this message: "+
-                                        "<hr>" + req.body.sceneShareWithMessage +  "<br><hr>";
+                                        "<hr><strong>" + req.body.sceneShareWithMessage +  "</strong><br><hr>";
                                 }
                                 message += restrictToEventMessage + restrictToLocationMessage;
                                 if (req.body.sceneEventStart != undefined && req.body.sceneEventStart != null && req.body.sceneEventStart != "") {
@@ -5992,9 +6011,10 @@ app.post('/share_scene/', requiredAuthentication, function (req, res) { //yep!
                
                 if (err) {
                     console.log('A file failed to process');
+                    res.send(err);
                 } else {
                     console.log('All files have been processed successfully');
-                    res.send("emails sent");
+                    res.send("Invitations sent: " + JSON.stringify(emailsFinal));
                 }
             });
             callback(null);
@@ -7680,16 +7700,18 @@ app.post('/delete_person/:_id', checkAppID, requiredAuthentication, function (re
     res.send("deleted");
 });
 
-app.post('/update_person', checkAppID, requiredAuthentication, function (req, res) {
+app.post('/update_person', requiredAuthentication, function (req, res) {
 //        var textitem = req.body;
+    console.log("tryna update_person " + JSON.stringify(req.body));
     var o_id = ObjectID(req.body._id);
 //        textitem.userID = req.session.user._id.toString();
     db.people.update( { "_id": o_id }, { $set: {
-
-        tags: req.body.tags,
-        fullname: req.body.fullname,
-        nickname: req.body.nickname,
-        email: req.body.email,
+        accountStatus: req.body.accountStatus,
+        contactStatus: req.body.contactStatus,
+        // tags: req.body.tags,
+        // fullname: req.body.fullname,
+        // nickname: req.body.nickname,
+        // email: req.body.email,
         lastUpdate : Date.now()
     }});
     res.send("updated " + Date.now());

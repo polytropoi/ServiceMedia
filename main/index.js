@@ -9321,13 +9321,13 @@ function showGroup() {
             "<h6 class=\x22m-0 font-weight-bold text-primary\x22>Person Details - : "+ response.data.email + " | _id: " +response.data._id+ "</h6>" +
             "</div>" +
             "<div class=\x22card-body\x22>" +
-            "<form id=\x22updateUserForm\x22>" +
+            "<form id=\x22updatePersonForm\x22>" +
             "<div class=\x22float-right\x22><button type=\x22submit\x22 id=\x22submitButton\x22 class=\x22btn btn-primary float-right\x22>Update</button></div>" + 
             "<div class=\x22form-row\x22>" +
               
                 "<div class=\x22col form-group col-md-3\x22>" +
                         "<label for=\x22Full Name\x22>Full Name</label>" +
-                        "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22personFullName\x22 value=\x22" + response.data.name + "\x22 >" +
+                        "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22personFullName\x22 value=\x22" + response.data.fullname + "\x22 >" +
 
                 "</div>" +
                 "<div class=\x22col form-group col-md-3\x22>" +
@@ -9340,10 +9340,38 @@ function showGroup() {
                         "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22personEmail\x22 value=\x22" + response.data.email + "\x22 required>" +
                        
                 "</div>" +
-                "<div class=\x22col form-group col-md-3\x22>" +
-                        "<label for=\x22tags\x22>tags</label>" +
-                        "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22personTags\x22 value=\x22" + response.data.tags + "\x22 >" +
                 "</div>" +
+            "<div class=\x22form-row\x22>" +
+                // "<div class=\x22col form-group col-md-3\x22>" +
+                //         "<label for=\x22tags\x22>tags</label>" +
+                //         "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22personTags\x22 value=\x22" + response.data.tags + "\x22 >" +
+                // "</div>" +
+                "<div class=\x22col form-group col-md-3\x22>" +
+                        "<label for=\x22status\x22>Account Status</label>" +
+
+                        "<select class=\x22form-control\x22 id=\x22accountStatus\x22 required>" +
+                        "<option value=\x22\x22 disabled selected>Select:</option>" +
+                        "<option>Email Validated</option>" +
+                        "<option>Not Validated</option>" +
+                        "<option>Blacklisted</option>" +
+                        "<option>Demo</option>" +
+                    "</select>" +
+                "</div>" +
+                "<div class=\x22col form-group col-md-3\x22>" +
+                        "<label for=\x22status\x22>Contact Status</label>" +
+
+                        "<select class=\x22form-control\x22 id=\x22contactStatus\x22 required>" +
+                        "<option value=\x22\x22 disabled selected>Select:</option>" +
+                        "<option>Everything</option>" +
+                        "<option>My Favorites Only</option>" +
+                        "<option>Opt Out People</option>" +
+                        "<option>Opt Out Global</option>" +
+                        
+                        "<option>Demo</option>" +
+                    "</select>" +
+                "</div>" +
+                "</div>" +
+
             "</div>" +
             "<div class=\x22col form-group col-md-12\x22>" +              
                     
@@ -9374,33 +9402,26 @@ function showGroup() {
         "</div>" +
         "</div>";
 
-        const capitalize = (s) => {
-            if (typeof s !== 'string') return ''
-            return s.charAt(0).toUpperCase() + s.slice(1)
-          }
+        // const capitalize = (s) => {
+        //     if (typeof s !== 'string') return ''
+        //     return s.charAt(0).toUpperCase() + s.slice(1)
+        //   }
         $("#cardrow").html(card);
 
         $(function() { 
-            $("#authLevel").val(capitalize(response.data.authLevel));
-            $("#paymentStatus").val(capitalize(response.data.paymentStatus));
-            $("#userType").val(capitalize(response.data.type));
-            $("#userStatus").val(capitalize(response.data.status));
+            $("#accountStatus").val(response.data.accountStatus);
+            $("#contactStatus").val(response.data.contactStatus);
 
-            $('#updateUserForm').on('submit', function(e) { 
-
+            
+            $('#updatePersonForm').on('submit', function(e) { 
                 e.preventDefault(); 
-                let authLevel = document.getElementById("authLevel").value.toLowerCase();
-                let paymentStatus = document.getElementById("paymentStatus").value.toLowerCase();
-                let userType = document.getElementById("userType").value.toLowerCase();
-                let userStatus = document.getElementById("userStatus").value.toLowerCase();
-
+                let accountStatus = document.getElementById('accountStatus').value;
+                let contactStatus = document.getElementById('contactStatus').value;
                 console.log("tryna submit");
                 let data = {
                     _id: response.data._id,
-                    authLevel: authLevel,
-                    status: userStatus,
-                    paymentStatus: paymentStatus,
-                    type: userType
+                    accountStatus: accountStatus,
+                    contactStatus: contactStatus
                 }
                 axios.post('/update_person/', data)
                     .then(function (response) {
@@ -15170,12 +15191,12 @@ function getAllPeople() {
                         $("#locationsSection").toggle();
                         $("#eventsSection").toggle();
                     }); 
-                    $(document).on('click','#sendInvitationButton',function(e){
+                    $(document).on('click','#sendInvitationButton',function(e) {
                         e.preventDefault();  
                         console.log("tryna send invitation button to " + sceneShareWithPeople);
                         $.confirm({
                             title: 'Confirm Sent Invitation',
-                            content: 'Are you sure you want to an invitation to ' + sceneShareWithPeople,
+                            content: 'Are you sure you want send to an invitation to ' + sceneShareWithPeople,
                             buttons: {
                             confirm: function () {
                                 // console.log("data: " + JSON.stringify(data));   
@@ -15194,9 +15215,9 @@ function getAllPeople() {
                                 axios.post('/share_scene/', data)
                                     .then(function (response) {
                                         console.log(response);
-                                       if (response.data.includes("sent")) {
+                                       if (response.data.includes("Invitations sent: ")) {
                                             // window.location.reload();
-                                            $("#topSuccess").html("Invitations Sent!");
+                                            $("#topSuccess").html(response.data);
                                             $("#topSuccess").show();
                                         } else {
                                             $("#topAlert").html(response.data);

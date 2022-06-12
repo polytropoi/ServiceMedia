@@ -36,19 +36,19 @@
         console.log(data);  
 
         if (data.distance != null && data.distance != undefined) {
-            main.innerHTML = "Sorry, access to this resource is restricted to a <a href='http://maps.google.com?q=" + data.lat + "," + data.lng + "'>specific geographic location.</a><br><br>"+
+            main.innerHTML = "Access is restricted to a <a href='http://maps.google.com?q=" + data.lat + "," + data.lng + "'>specific location.</a><br><br>"+
             "<a target=\x22_blank\x22 href=\x22http://maps.google.com?q=" + data.lat  + "," + data.lng + "\x22>" +
             "<img class=\x22img-thumbnail\x22 style=\x22width: 400px;\x22 src=\x22https://maps.googleapis.com/maps/api/staticmap?center=" + data.lat  +
             "," + data.lng + "&zoom=15&size=600x400&maptype=roadmap&key=AIzaSyCBlNNHgDBmv-vusmuvG3ylf0XjGoMkkCo&markers=color:blue%7Clabel:%7C" + data.lat  + "," + data.lng + "\x22>" + 
             "</a><br><br>"+
             "You must be within <span style='color:lightgreen;'>" + data.range + "</span> miles of the location; your distance was <span style='color:pink;'>" + data.distance.toFixed(2) + "</span> miles";
         } else {
-            main.innerHTML = "Sorry, access to this resource is restricted to a <a href='http://maps.google.com?q=" + data.lat + "," + data.lng + "'>specific geographic location.</a><br><br>"+
+            main.innerHTML = "Access is restricted to a <a href='http://maps.google.com?q=" + data.lat + "," + data.lng + "'>specific location.</a><br><br>"+
             "<a target=\x22_blank\x22 href=\x22http://maps.google.com?q=" + data.lat  + "," + data.lng + "\x22>" +
             "<img class=\x22img-thumbnail\x22 style=\x22width: 400px;\x22 src=\x22https://maps.googleapis.com/maps/api/staticmap?center=" + data.lat  +
             "," + data.lng + "&zoom=15&size=600x400&maptype=roadmap&key=AIzaSyCBlNNHgDBmv-vusmuvG3ylf0XjGoMkkCo&markers=color:blue%7Clabel:%7C" + data.lat  + "," + data.lng + "\x22>" + 
             "</a><br><br>"+
-            "You must be within <span style='color:lightgreen;'>" + data.range + "</span> miles of the location.  Your position could not be established; please enable location services on your device.";
+            "You must be within <span style='color:lightgreen;'>" + data.range + "</span> miles of the location.  Your position could not be established; please enable location services on your device and try again.";
         }
         </script>
 
