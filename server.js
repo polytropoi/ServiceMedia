@@ -5197,23 +5197,7 @@ app.get('/assets/:_id', checkAppID, requiredAuthentication, usercheck, function 
                     },
                     function (callback) {
                         callback();
-//                        var assetsjson = JSON.stringify(assetsResponse);
-//                        console.log("assetsjson: " + assetsjson);
-//                        s3.putObject({ Bucket: 'mvmv.us', Key: 'assets.json', Body: assetsjson,  ContentType: 'binary', ContentEncoding: 'utf8' }, function (err, data) {
-//                            if (err != null) {
-//
-//                                console.log(err);
-//                                callback();
-//                            } else {
-//
-//                                console.log(data);
-//                                callback(data);
-//                            }
-//
-//                        });
 
-
-                       // });
 
                     }],
                 function (err, result) { // #last function, close async
@@ -5296,7 +5280,60 @@ app.get('/invitation_check/:hzch', function (req, res) { //called from /landing/
         }
     });
 });
+app.post('invitation_req', function (req,res) {
+    if (req.body.shortID != undefined && req.body.shortID.length > 4) {
+        db.scenes.findOne({"short_id": req.body.shortID}, function (err, scene) {
+            if (err ||!scene) {
+                res.send("nope");
+            } else {
+                if (scene.sceneShareWithGroups != undefined && scene.sceneShareWithGroups != null) {
+                    if (scene.sceneShareWithGroups.toString().toLowerCase().includes("disallow all")) {
+                        res.send("nope - invitations disallowed");
+                    } else {
+                        async.waterfall([
 
+                            function(callback) { //is this account in the scene's allowed groups? 
+                                callback(null);
+                            },
+                            function(callback) { //is accountStatus OK?
+                                person = {};
+                                db.people.findOne({"email": req.body.email}, function (err, person) {
+                                    if (err || !person) {
+                                        console.log("didn't find that person's email for invite req");
+                                    } else {
+                                        if (person.accountStatus != undefined && (person.accountStatus.toString().toLowerCase().includes("blacklist") || person.accountStatus.toString().toLowerCase().includes ("banned"))) {
+                                            callback("nope  - that account is blocked");
+                                        } else if (person.contactStatus != undefined && (person.contactStatus.toString().toLowerCase().includes("global opt out"))) {
+                                            callback("nope  - user has opted out");
+                                        } else {
+                                            callback(null);
+                                        }
+                                    }
+                                });
+                            },
+                           
+                            function(callback) { //send mail
+
+                            }
+                        ],
+                        function (err, result) { // #last function, close async
+                            if (err) {
+
+                            } else {
+                                console.log("waterfall done: " + result);
+                            }
+                           
+                            }
+                        );
+                        
+                    }
+                }
+            }
+        })
+    } else {
+        res.send("nope");
+    }
+});
 
 app.post ('/get_invitations', checkAppID, requiredAuthentication, function (req,res) {// sigh, need to encrypt this...
     var timestamp = Math.round(Date.now() / 1000);
@@ -5975,7 +6012,7 @@ app.post('/share_scene/', requiredAuthentication, function (req, res) { //yep!
                                     // req.headers.host + "/invitation_check/" + cleanhash + "<br>" +
                                     // "Click this invitation link to authenticate your access: <br>" +
                                     "<a href='"+ requestProtocol + "://" + req.headers.host + "/landing/invite.html?iv=" + cleanhash + "' target='_blank'>" +
-                                    "<button style='font-family: Arial, Helvetica, sans-serif;  font-size: 18px; background-color: blue; color: white; border-radius: 8px; margin: 10px; padding: 10px;'>"+
+                                    "<button style='font-family: Arial, Helvetica, sans-serif;  font-size: 18px; background-color: blue; color: white; border-radius: 8px; margin: 10px; padding: 10px;'>" +
                                     "Click here to authenticate your access!</a></button><br>" +
                                     "<br> <img src=" + urlHalf + "> " +
  
@@ -20425,7 +20462,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                         "p    {color: white; font-family: sans-serif; font-size: 150%;}"+
                         "</style>"+
                         "</head> " +
-                        "<p>Access to this scene is restricted.</p><p>If you're a subscriber, you may <a href=\x22/main/login.html\x22>login</a>, or click this link to <a href=\x22/main/invitereq.html?rq=/"+sceneData.short_id+"\x22>request an invitation</a></p>" +
+                        "<p>Access to this scene is restricted.</p><p>If you're a subscriber, you may <a href=\x22/main/login.html\x22>login</a>, or click this link to <a href=\x22/landing/invitereq.html?rq="+sceneData.short_id+"\x22>request an invitation</a></p>" +
                         "<body> " +
                         "</body>" +
 

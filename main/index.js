@@ -512,7 +512,7 @@
         if (aframe_enviro != undefined || aframe_enviro != null) {
             environment = aframe_enviro;
         } else {
-        let envs = ["default","contact","egypt","checkerboard","forest","goaland","yavapai","goldmine","arches","threetowers","poison","tron","japan","dream","volcano","starry","osiris"];
+            let envs = ["default","contact","egypt","checkerboard","forest","goaland","yavapai","goldmine","arches","threetowers","poison","tron","japan","dream","volcano","starry","osiris"];
             environment = envs[Math.floor(Math.random()*envs.length)]; //random if not set via qs param
         }
         // let links = "<a-assets><img id=\x22thumbMountains\x22 crossOrigin=\x22anonymous\x22 src=\x22https://realitymangler.com/YnHTO2MHP/5c33e4ada0a53d08d90f3e43.standard.ss_ynhto2mhp_1546904729.jpg\x22>"+
@@ -13063,14 +13063,18 @@ function getAllPeople() {
                                     "<label for=\x22sceneShareWithPeople\x22>Share with People</label>" + //share with people, todo typeahead...
                                     "<textarea class=\x22form-control\x22 id=\x22sceneShareWithPeople\x22 placeholder=\x22delimit usernames or emails with comma\x22>" + sceneShareWithPeople + "</textarea>" +
                                 "</div>" +
-                                "<div class=\x22col form-group col-md-4\x22>" +
+                                "<div class=\x22col form-group col-md-6\x22>" +
                                     "<label for=\x22sceneShareMessage\x22>Share with message</label>" + //message to include in sending
                                     "<textarea class=\x22form-control\x22 id=\x22sceneShareWithMessage\x22 placeholder=\x22add message to send with invitation\x22>" + sceneShareWithMessage + "</textarea>" +
                                 "</div>" +
-                                "<div class=\x22col form-group col-md-3\x22>" +
-                                    "<label for=\x22sceneShareWithGroups\x22>Share with Group</label>" + //share with group
+                                "<div class=\x22col form-group col-md-2\x22>" +
+                                    "<label for=\x22sceneShareWithGroups\x22>Share With</label>" + //share with group
                                     "<select class=\x22form-control\x22 id=\x22sceneShareWithGroups\x22 >" +
-                                        "<option>People Groups Here</option>" +
+                                    "<option value=\x22\x22 disabled selected>Select:</option>" +
+                                        "<option>Disallow All</option>" +
+                                        "<option>Allow All</option>" +
+                                        "<option>My People Only</option>" +
+                                        "<option>Subscribers Only</option>" +
                                         "</select>"+
                                 "</div>" +
                                 // "<div class=\x22col form-group col-md-2\x22>" +
@@ -13085,14 +13089,25 @@ function getAllPeople() {
                                 // "</div>" +
                             "</div>" +
                             "<div class=\x22form-row\x22>" + 
-                                "<div class=\x22col form-group col-md-3\x22>" +
+                                "<div class=\x22col form-group col-md-2\x22>" +
                                     "<label for=\x22sceneEventStart\x22>Event Start Local Date/Time "+zone+"</label>" + 
                                     "<input type=\x22datetime-local\x22 class=\x22form-control\x22 id=\x22sceneEventStart\x22 placeholder=\x22\x22 value=\x22" + sceneEventStartDateTime + "\x22 >" +
                                 "</div>" +
-                                "<div class=\x22col form-group col-md-3\x22>" +
+                                "<div class=\x22col form-group col-md-2\x22>" +
                                     "<label for=\x22sceneEventEnd\x22>Event End Local Date/Time "+zone+"</label>" + 
                                     "<input type=\x22datetime-local\x22 class=\x22form-control\x22 id=\x22sceneEventEnd\x22 placeholder=\x22\x22 value=\x22" + sceneEventEndDateTime + "\x22 >" +
                                 "</div>" +
+                                // "<div class=\x22col form-group col-md-2\x22>" +
+                             
+                                //     "<label for=\x22sceneInvitationsSelect\x22>Invitations</label>" + //sceneType
+                                //     "<select class=\x22form-control\x22 id=\x22sceneInvitationsSelect\x22>" +
+                                //         "<option value=\x22\x22 disabled selected>Select:</option>" +
+                                //         "<option>Disallow All</option>" +
+                                //         "<option>Allow All</option>" +
+                                //         "<option>My People Only</option>" +
+                                //         "<option>Subscribers Only</option>" +
+                                //     "</select>" +
+                                // "</div>" +
                                 "<div class=\x22col form-group col-md-2\x22>" +
                                     // "<label for=\x22sceneAccessLinkExpire\x22>Access Link Expiration</label>" + 
                                     // "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22sceneAccessLinkExpire\x22 placeholder=\x22Expires in minutes\x22 value=\x22" + sceneAccessLinkExpire + "\x22 >" +
@@ -13118,7 +13133,7 @@ function getAllPeople() {
                                 // "<div>" +
                                 "<div class=\x22col form-group col-md-2\x22>" +
                                     "<div id=\x22sendInvitationButton\x22 class=\x22btn float-right btn-info btn-sm\x22>Send Invitation</div><br>"+
-                                    "<div id=\x22sendInvitationButton\x22 class=\x22btn float-right btn-warning btn-sm\x22>Send Test</div>"+
+                                    "<div id=\x22sendInvitationButton\x22 class=\x22btn float-left btn-warning btn-sm\x22>Send Test</div>"+
                                 "</div>" +
                             "</div>" +
                             "<div class=\x22form-row\x22>" +    
@@ -14558,11 +14573,13 @@ function getAllPeople() {
                 $("#sceneQuest").val(sceneQuest);
                 
                 // $("#sceneAppNameSelect").val(); //then pop the values if not new
+
                 $("#sceneFontSelect").val(response.data.sceneFont);
                 $("#sceneCategorySelect").val(response.data.sceneCategory);
                 $("#sceneTypeSelect").val(response.data.sceneType);
                 $("#sceneWebTypeSelect").val(response.data.sceneWebType);
                 $("#sceneAccessLinkExpireSelect").val(response.data.sceneAccessLinkExpire);
+                $("#sceneShareWithGroups").val(response.data.sceneFont);
                 $("#sceneCameraPath").val(response.data.sceneCameraPath);
                 $("#sceneCameraMode").val(response.data.sceneCameraMode);
                 $("#sceneWater").val(response.data.sceneWater != null ? response.data.sceneWater.name : "");

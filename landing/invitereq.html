@@ -4,8 +4,14 @@
     <style>
     body {background-color: #272727;}
     h1   {color: white;}
-    a   {color: powderblue;}
+    a    {color: powderblue;}
     p    {color: white; font-family: sans-serif; margin: auto; font-size: 200%;}
+    input[type=email] {
+    width: 100%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    box-sizing: border-box;
+    }
     </style>
     
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
@@ -15,7 +21,16 @@
     
     <body>
         <div style="width: 800px">
-        <p id="main"></p>
+        <p id="main">
+        <span id="statusText"></span><br>
+          
+        <form id="myForm" style="visibility: hidden">
+            <input type="email" id="email" placeholder="your email address" required></input><br><br>
+            <button id="reqbutton" style='font-family: Arial, Helvetica, sans-serif; font-size: 18px; background-color: blue; color: white; border-radius: 8px; margin: 10px; padding: 10px;'>
+                Request invitation
+                </button>
+        </form>
+    </p>
         <!-- <div id="map"></div> -->
         </div>
 
@@ -35,49 +50,49 @@
         }
         const params = getParameterByName('rq');
         console.log("params : " + params);
+        if (params != null && params.length > 4) {
+            document.getElementById("statusText").innerHTML = "Request an invitation to scene " + params;
+            document.getElementById("myForm").style.visibility = "visible";
+        } else {
+            document.getElementById("statusText").innerHTML = "";
+            document.getElementById("myForm").style.visibility = "hidden";
+        }
         let now = Date.now();
         let eventCountdownEl = "";
         let eventDurationEl = "";
         // let data = JSON.parse(atob(params));
         // console.log(data);  
-        axios.post('/invitation_req/' + params)
-            .then(function (response) {
-                // let datetimes = "";
-                // var zone = new Date().toLocaleTimeString('en-us',{timeZoneName:'short'}).split(' ')[2]
-                // // console.log(zone)Intl.DateTimeFormat().resolvedOptions().timeZone
-                // let uname = response.data.to.toString().split('@')[0];
-                // console.log(JSON.stringify(response));
-                // if (response.data.timestampStart != undefined && response.data.timestampStart != null && response.data.timestampStart != "") {
-                //     let datetimeString = new Date(response.data.timestampStart);
-                //     datetimes = datetimes + "Event start: " + datetimeString.toLocaleString([], { hour12: true}) + "<small> ("+zone+")</small>.<br>";
-                //     eventCountdownEl = "<div id='sceneEventCountdown'></div>";
-                //     console.log(datetimes);
-                //     countdownTimer(response.data.timestampStart);
-                // }
-                // if (response.data.timestampEnd != undefined && response.data.timestampEnd != null && response.data.timestampEnd != "") {
-                //     let datetimeString = new Date(response.data.timestampEnd);
-                //     datetimes = datetimes + "Event end: " + datetimeString.toLocaleString([], { hour12: true})  + "<small> ("+zone+")</small>.<br>";
-                //     console.log(datetimes);
-                //     eventDurationEl = "Event duration: " + convertMsToHM(response.data.timestampEnd - response.data.timestampStart);
-                // }
-                // if (response.data.pin != undefined && response.data.pin.length > 4) {
-                //     console.log(datetimes);
-                //     main.innerHTML = "Hi " + uname + " - you're all set! <br><a href="+ response.data.url + ">Click here to enter scene...</a>"+
-                //     "<br><br>Your PIN is: " + response.data.pin + "<br><br>" +
-                //     datetimes +
-                //     eventDurationEl +
-                //     eventCountdownEl +
-                //     "<br>Scannable QR code:" +
-                //     "<img style='height: 100%; width: 100%; object-fit: contain' alt='qrcode' src='" + response.data.qrcode + "'/>";
+        let button = document.getElementById("reqbutton");
 
-                // } else {
-                //     main.innerHTML = "Sorry, that invitation is no longer valid";
-                // }
-            }) //end of main fetch
-            .catch(function (error) {
-                console.log(error);
-                main.innerHTML = "Sorry, gotsa error: " + error;
-            });
+        button.addEventListener("click", (event) => {
+            event.preventDefault();
+            if (ValidateEmail()) {
+                
+                console.log("tryna ax permessionz for" + params);
+                axios.post('/invitation_req/' + params)
+                .then(function (response) {
+                    document.getElementById("myForm").style.visibility = "hidden";
+                    main.innerHTML = "Thanks, check your email shortly for a response!";
+                }) //end of main fetch
+                .catch(function (error) {
+                    console.log(error);
+                    main.innerHTML = "Sorry, there was an error";
+                    document.getElementById("myForm").style.visibility = "hidden";
+                });
+            }
+
+        });
+
+        function ValidateEmail() 
+        {
+        if (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(myForm.email.value))
+        {
+            return (true)
+        }
+            alert("You have entered an invalid email address!")
+            return (false)
+        }
+
             
         </script>
 
