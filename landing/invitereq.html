@@ -67,9 +67,11 @@
         button.addEventListener("click", (event) => {
             event.preventDefault();
             if (ValidateEmail()) {
-                
+                let data = {};
+                data.sceneID = params;
+                data.email = email;
                 console.log("tryna ax permessionz for" + params);
-                axios.post('/invitation_req/' + params)
+                axios.post('/invitation_req/', data)
                 .then(function (response) {
                     document.getElementById("myForm").style.visibility = "hidden";
                     main.innerHTML = "Thanks, check your email shortly for a response!";

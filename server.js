@@ -5281,6 +5281,7 @@ app.get('/invitation_check/:hzch', function (req, res) { //called from /landing/
     });
 });
 app.post('invitation_req', function (req,res) {
+    console.log("invite req " + JSON.stringify(req.body));
     if (req.body.shortID != undefined && req.body.shortID.length > 4) {
         db.scenes.findOne({"short_id": req.body.shortID}, function (err, scene) {
             if (err ||!scene) {
@@ -5313,14 +5314,15 @@ app.post('invitation_req', function (req,res) {
                             },
                            
                             function(callback) { //send mail
-
+                                // console.log("OKthen");
+                                callback(null);
                             }
                         ],
                         function (err, result) { // #last function, close async
                             if (err) {
 
                             } else {
-                                console.log("waterfall done: " + result);
+                                console.log("invitation_req done: " + result);
                             }
                            
                             }
