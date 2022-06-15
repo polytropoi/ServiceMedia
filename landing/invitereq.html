@@ -68,13 +68,23 @@
             event.preventDefault();
             if (ValidateEmail()) {
                 let data = {};
-                data.sceneID = params;
-                data.email = email;
+                data.shortID = params;
+                data.email = myForm.email.value;
                 console.log("tryna ax permessionz for" + params);
-                axios.post('/invitation_req/', data)
+                axios.post('../invitation_req/', data)
                 .then(function (response) {
+                    console.log(response.data);
+                    if (response.data.toString().toLowerCase().includes("invitation sent")) {
+                        main.innerHTML = "Thanks, an invitation was sent to your email!";
+                    } else {
+                        if (response.data.toString().toLowerCase().includes("not verified")) {
+                            main.innerHTML = "Sorry, that account has not been verified";
+                        } else {
+                            main.innerHTML = "Sorry, an invitation cannot be sent.";
+                        }
+                        
+                    }
                     document.getElementById("myForm").style.visibility = "hidden";
-                    main.innerHTML = "Thanks, check your email shortly for a response!";
                 }) //end of main fetch
                 .catch(function (error) {
                     console.log(error);
@@ -82,7 +92,6 @@
                     document.getElementById("myForm").style.visibility = "hidden";
                 });
             }
-
         });
 
         function ValidateEmail() 

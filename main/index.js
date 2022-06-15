@@ -9351,8 +9351,8 @@ function showGroup() {
 
                         "<select class=\x22form-control\x22 id=\x22accountStatus\x22 required>" +
                         "<option value=\x22\x22 disabled selected>Select:</option>" +
-                        "<option>Email Validated</option>" +
-                        "<option>Not Validated</option>" +
+                        "<option>Email Verified</option>" +
+                        "<option>Not Verified</option>" +
                         "<option>Blacklisted</option>" +
                         "<option>Demo</option>" +
                     "</select>" +
@@ -9362,6 +9362,7 @@ function showGroup() {
 
                         "<select class=\x22form-control\x22 id=\x22contactStatus\x22 required>" +
                         "<option value=\x22\x22 disabled selected>Select:</option>" +
+                        "<option>Not Indicated</option>" +
                         "<option>Everything</option>" +
                         "<option>My Favorites Only</option>" +
                         "<option>Opt Out People</option>" +
@@ -14579,7 +14580,7 @@ function getAllPeople() {
                 $("#sceneTypeSelect").val(response.data.sceneType);
                 $("#sceneWebTypeSelect").val(response.data.sceneWebType);
                 $("#sceneAccessLinkExpireSelect").val(response.data.sceneAccessLinkExpire);
-                $("#sceneShareWithGroups").val(response.data.sceneFont);
+                $("#sceneShareWithGroups").val(response.data.sceneShareWithGroups);
                 $("#sceneCameraPath").val(response.data.sceneCameraPath);
                 $("#sceneCameraMode").val(response.data.sceneCameraMode);
                 $("#sceneWater").val(response.data.sceneWater != null ? response.data.sceneWater.name : "");
@@ -15997,7 +15998,7 @@ function getAllPeople() {
                         let sceneType = document.getElementById("sceneTypeSelect").value;
                         
                         let sceneWebType = document.getElementById("sceneWebTypeSelect").value;
-
+                        let sceneShareWithGroups = document.getElementById("sceneShareWithGroups").value;
 
                         let sceneCameraPath = document.getElementById("sceneCameraPath").value;
                         let sceneCameraMode = document.getElementById("sceneCameraMode").value;
@@ -16226,6 +16227,7 @@ function getAllPeople() {
                             sceneShareWithPublic: sceneShareWithPublic,
                             sceneShareWithSubscribers: sceneShareWithSubscribers,
                             sceneShareWithPeople: sceneShareWithPeople, //should be an array
+                            sceneShareWithGroups: sceneShareWithGroups, //allow invites, user people groups
                             sceneShareWithMessage: sceneShareWithMessage,
                             sceneEventStart: sceneEventStart,
                             sceneEventEnd: sceneEventEnd,

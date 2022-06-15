@@ -3052,25 +3052,21 @@ app.post('/pickup/', requiredAuthentication, function (req, res) {
                     actionItems.push(actionItem);
                     activities.actionItems = actionItems; //so can push new entries into a single array in this record
                     db.activities.save(activities, function (err, saved) {
-                        if (err || !saved) {
-                            console.log("problemo2 with activities add " + err);
-                            // res.send('profcblemo2 ' + err);
-                            callback(err);
-                        } else {
-                            console.log("new activities record " + saved._id);
-                            db.users.update({"_id": u_id}, {$set: {activitiesID: saved._id}}, function (err, updated) {
-                                if (err || !updated) {
-                                    console.log("problemo2 with activity7 add " + err);
-                                    // res.send('profcblemo2 ' + err);
-                                    callback(err);
-                                } else {
-                                    callback(null, user);
-                                    // res.send("actiuveutyt savve" + JSON.stringify(updated));
-                                }
-                            });
-                            // res.send("invotrye savve" + JSON.stringify(saved));
+                    if (err || !saved) {
+                        console.log("problemo2 with activities add " + err);
+                        callback(err);
+                    } else {
+                        console.log("new activities record " + saved._id);
+                        db.users.update({"_id": u_id}, {$set: {activitiesID: saved._id}}, function (err, updated) {
+                            if (err || !updated) {
+                                console.log("problemo2 with activity7 add " + err);
+                                callback(err);
+                            } else {
+                                callback(null, user);
                             }
-                        });   
+                            });
+                        }
+                    });   
                 }
             },
             function (user, callback) { //add to player inventory
@@ -5262,26 +5258,25 @@ app.get('/invitation_check/:hzch', function (req, res) { //called from /landing/
                 response.timestampStart = invitation.sceneEventStart;
                 response.timestampEnd = invitation.sceneEventEnd;
                 response.url = requestProtocol + "://" + req.headers.host + "/webxr/" + invitation.invitedToSceneShortID + "?p=" + pin;
-                // var codestring = req.protocol + "://" + req.headers.host + "/webxr/" + invitation.invitedToSceneShortID + "?p=" + pin;
+               
                 QRCode.toDataURL(response.url, function (err, url) {
-                    // console.log(url);
-                    // var imgLink = "<img width=\x22128\x22 height=\x22128\x22 alt=\x22qrcode\x22 src=\x22" + url + "\x22/>"
-                    // console.log(response.qrcode);
-                    // res.send(imgLink);
-                    response.qrcode = url;
-                    res.send(response);
-                    });
-                // console.log(response.qrcode);
-
+ 
+                response.qrcode = url;
+                res.send(response);
+                });
+               
             } else {
                 console.log("expired link");
-                res.send("expired");
+                res.send("expired_"+invitation.invitedToSceneShortID); //send back sceneID, to allow invite request
             }
         }
+        db.people.updateOne( { "email": invitation.sentToEmail }, { $set: {accountStatus : "Email Verified"}});
     });
+    
 });
-app.post('invitation_req', function (req,res) {
+app.post('/invitation_req/', function (req,res) {
     console.log("invite req " + JSON.stringify(req.body));
+    let thePerson = null;
     if (req.body.shortID != undefined && req.body.shortID.length > 4) {
         db.scenes.findOne({"short_id": req.body.shortID}, function (err, scene) {
             if (err ||!scene) {
@@ -5297,34 +5292,330 @@ app.post('invitation_req', function (req,res) {
                                 callback(null);
                             },
                             function(callback) { //is accountStatus OK?
-                                person = {};
-                                db.people.findOne({"email": req.body.email}, function (err, person) {
-                                    if (err || !person) {
-                                        console.log("didn't find that person's email for invite req");
+                                
+                                db.people.findOne({"email": req.body.email.trim()}, function (err, person) {
+                                    let action = {};
+                                    let ts = Date.now();
+                                    if (err) {
+                                        console.log("error lookinup person didn't find that person's email for invite req");
+                                        callback("error on personlookup!");
                                     } else {
-                                        if (person.accountStatus != undefined && (person.accountStatus.toString().toLowerCase().includes("blacklist") || person.accountStatus.toString().toLowerCase().includes ("banned"))) {
-                                            callback("nope  - that account is blocked");
-                                        } else if (person.contactStatus != undefined && (person.contactStatus.toString().toLowerCase().includes("global opt out"))) {
-                                            callback("nope  - user has opted out");
+                                        if  (!person) {
+                                            console.log("tryna creqate new persosa");
+                                            let activities = [];
+                                            let action1 = {};
+                                            let action2 = {};
+                                            action1.createNewPerson = ts;
+                                            action2.requestedInvitation = ts + "_" + req.body.shortID + "_" + req.headers['x-forwarded-for'];
+                                            activities.push(action1);
+                                            activities.push(action2); //bc they need to be separate array elements
+                
+                                            db.people.save( { "email": req.body.email.trim()}, { $set: {
+                                                lastUpdate : ts,
+                                                activities : activities,
+                                                accountStatus: 'Not Verified',
+                                                contactStatus: 'Not Indicated'
+                                            }}, 
+                                            function (err, saved) {
+                                                if ( err || !saved ) {
+                                                    console.log('person not saved..');
+                                                    callback (err);
+                                                } else {
+                                                    callback(null);
+                                                    thePerson = saved;
+                                                }
+                                            });
                                         } else {
-                                            callback(null);
+                                            if (person.activities == undefined) {
+                                                person.activities = [];
+                                            }
+                                            action.requestedInvitation = ts + "_" + req.body.shortID + "_" + req.headers['x-forwarded-for'];
+                                            person.activities.push(action);
+                                            if (person.accountStatus == undefined) {
+                                                person.accountStatus = "Not Verified";
+                                            }
+                                            if (person.contactStatus == undefined) {
+                                                person.contactStatus = "Not Indicated";
+                                            }
+                                            db.people.update( { "_id": person._id }, { $set: {
+                                                lastUpdate : ts,
+                                                activities : person.activities,
+                                                accountStatus: person.accountStatus,
+                                                contactStatus: person.contactStatus
+                                            }});
+                                            thePerson = person;
+                                            console.log("gotsa person" + person.activities.length + " "+ person.accountStatus);
+                                            if (person.accountStatus != undefined && (person.accountStatus.toString().toLowerCase().includes("blacklist") || person.accountStatus.toString().toLowerCase().includes ("banned"))) {
+                                                callback("nope  - that account is blocked");
+                                            } else if (person.accountStatus != undefined && (person.activities != undefined && person.activities.length > 3) && person.accountStatus.toString().toLowerCase().includes("not verified")) {
+                                                callback("nope  - that account is not verified");
+                                            } else if (person.contactStatus != undefined && (person.contactStatus.toString().toLowerCase().includes("global opt out"))) {
+                                                callback("nope  - user has opted out"); //pass along and bail later?
+                                            } else {
+                                                callback(null);
+                                            }
                                         }
                                     }
                                 });
                             },
                            
-                            function(callback) { //send mail
-                                // console.log("OKthen");
-                                callback(null);
-                            }
+                            // function(person, callback) { //send mail
+                            //     console.log("gotsa person " + JSON.stringify(person) );
+                            //     callback(null, person);
+                                
+                            // },
+                            function (callback) {
+                                // if (person.length > 0) {
+                                // let emailArray = eData;
+                                db.scenes.findOne({short_id: req.body.shortID}, function (err, scene) {
+                                    if (err || !scene) {
+                                        console.log("error getting scene for sharing: " + err);
+                                        callback(err);
+                                    } else {
+                                        theScene = scene;
+                                        let urlHalf = "";
+                                        if (scene.scenePostcards != null && scene.scenePostcards.length > 0) {
+                                            var oo_id = ObjectID(scene.scenePostcards[0]); //TODO randomize? or ensure latest?  or use assigned default?
+                                            db.image_items.findOne({"_id": oo_id}, function (err, picture_item) {
+                                                if (err || !picture_item || picture_item.length == 0) {
+                                                    console.log("error getting postcard for availablescenes: 2" + err);
+                                                    callback(null, '', eData)
+                                                } else {
+                                                    var item_string_filename = JSON.stringify(picture_item.filename);
+                                                    item_string_filename = item_string_filename.replace(/\"/g, "");
+                                                    var item_string_filename_ext = getExtension(item_string_filename);
+                                                    var expiration = new Date();
+                                                    expiration.setMinutes(expiration.getMinutes() + 30);
+                                                    var baseName = path.basename(item_string_filename, (item_string_filename_ext));
+                    //                                    console.log(baseName);
+                                                    // var thumbName = 'thumb.' + baseName + item_string_filename_ext;
+                                                    var halfName = 'half.' + baseName + item_string_filename_ext;
+                                                    // var quarterName = 'quarter.' + baseName + item_string_filename_ext;
+                                                    // var standardName = 'standard.' + baseName + item_string_filename_ext;
+                                                    var urlHalf = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + "." + halfName, Expires: 6000}); //just send back thumbnail urls for list
+                                                    // var urlQuarter = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + "." + quarterName, Expires: 6000}); //just send back thumbnail urls for list
+                                                    callback(null, urlHalf, scene);
+                                                }
+                                            });
+                                        } else {
+                                            callback(null, '', scene);
+                                        }
+                                    }
+                                });
+                            },
+                            function(urlHalf, sceneData, callback) {
+                                console.log("scene locations " +JSON.stringify(sceneData.sceneLocations));
+                                let geoLinks = "";
+                                let eventData = {};
+                                for (let i = 0; i < sceneData.sceneLocations.length; i++) {
+                                    if (sceneData.sceneLocations[i].type.toLowerCase() == "geographic") { //TODO what if multiple?  this will get last one in array, maybe?
+                                        geoLinks += "<strong><a href='http://maps.google.com?q=" + sceneData.sceneLocations[i].latitude + "," + sceneData.sceneLocations[i].longitude + "'>Map to location: "+sceneData.sceneLocations[i].name+"</a></strong><br><br>"+
+                                        "<a target=\x22_blank\x22 href=\x22http://maps.google.com?q=" + sceneData.sceneLocations[i].latitude + "," + sceneData.sceneLocations[i].longitude + "\x22>" +
+                                            "<img class=\x22img-thumbnail\x22 style=\x22width: 300px;\x22 src=\x22https://maps.googleapis.com/maps/api/staticmap?center=" + sceneData.sceneLocations[i].latitude +
+                                            "," + sceneData.sceneLocations[i].longitude + "&zoom=15&size=600x400&maptype=roadmap&key=AIzaSyCBlNNHgDBmv-vusmuvG3ylf0XjGoMkkCo&markers=color:blue%7Clabel:%7C" + sceneData.sceneLocations[i].latitude + "," + sceneData.sceneLocations[i].longitude + "\x22>" + 
+                                            "</a>";
+                                        if (sceneData.sceneLocations[i].eventData != undefined && sceneData.sceneLocations[i].eventData.toLowerCase().includes('restrict')) {
+                                            eventData.restrictToLocation = true;
+                                        }
+                                    }
+                                }
+                                callback(null, urlHalf, sceneData, geoLinks, eventData);
+                            },
+                    
+                            function(urlHalf, sceneData, geoLinks, eventData, callback) { //pull out  event data
+                                console.log("scene locations " +JSON.stringify(sceneData.sceneTags));
+                    
+                                if ((sceneData.sceneEventStart != undefined && sceneData.sceneEventStart != null) || (sceneData.sceneEventEnd != undefined && sceneEventEnd != null)) {
+                                        eventData.eventStart = sceneData.sceneEventStart;
+                                        eventData.eventEnd = sceneData.sceneEventEnd;
+                                
+                                        if (sceneData.sceneTags != undefined && sceneData.sceneTags != null && sceneData.sceneTags.length > 0 && sceneData.sceneTags.toString().toLowerCase().includes("restrict to event")) {
+                                            eventData.restrictToEvent = true;
+                                        } else {
+                                            eventData.restrictToEvent = false;
+                                        }
+                                    }
+                                callback(null, urlHalf, geoLinks, eventData);
+                            },
+                    
+                            function(urlHalf, geoLinks, eventData, callback) { //spin through validated data, send appropriate mail
+                                // console.log("eDatahs : " +JSON.stringify(eData));
+                                // let trimmedMails = [" a ", "b", " c", "d "].map(function(e){return e.trim();}); erp
+                                // async.each (eData, function (data, callbackzz) {
+                                    // console.log("email data is " + data);
+                                    let requestProtocol = 'https';
+                                    if (req.headers.host.includes("localhost")) {
+                                        requestProtocol = 'http';
+                                    }
+                                    var subject = "Invitation : " + theScene.sceneTitle;
+                                    var from = adminEmail;
+                                   
+                                    var to = [thePerson.email];
+                                   
+                                    var bcc = [];
+                                    
+                                    var timestamp = Math.round(Date.now() / 1000);
+                                    var message = "";
+                                    var restrictToEventMessage = eventData.restrictToEvent ? "<br>Access is restricted to the event time" : "";
+                                    var restrictToLocationMessage = eventData.restrictToLocation ? "<br>Access is restricted to the event location<br>" : "";
+                                   
+                                    var app_link = "servicemedia://scene?" + req.body.short_id;
+                                   
+                                    if (req.body.sceneShareWithMessage === "" || req.body.sceneShareWithMessage == null) {
+                                        message = "Here's your immersive scene invitation - follow the link below to gain access!";
+                                    } 
+                                    // else {
+                                    //     message = " has shared an Immersive Scene with this message: " +
+                                    //         "<hr><br><strong> " + req.body.sceneShareWithMessage +  "</strong><br>";
+                                    // }
+                                    message += restrictToEventMessage + restrictToLocationMessage;
+                                    if (req.body.sceneEventStart != undefined && req.body.sceneEventStart != null && req.body.sceneEventStart != "" ) {
+                                        let datetimeString = new Date(req.body.sceneEventStart);
+                                        message += "<br><strong>Event start: " + datetimeString.toLocaleString([], { hour12: true}) + "</strong><br>";
+                                        // message += "<br><strong>Event start: " + datetimeString.toString() + "</strong><br>";
+                                        console.log(message);
+                                    }
+                                    if (req.body.sceneEventEnd != undefined && req.body.sceneEventEnd != null && req.body.sceneEventEnd != "") {
+                                        let datetimeString = new Date(req.body.sceneEventEnd);
+                                        message += "<strong>Event end: " + datetimeString.toLocaleString([], { hour12: true})  + "</strong><br>";
+                                    }
+                                    message += geoLinks;
+                                    if (theScene.sceneShareWithPublic) {
+                                        var htmlbody = message + "</h3><hr>" +
+                                            "<a href='"+ requestProtocol + "://" + req.headers.host + "/webxr/" + req.body.short_id+"' target='_blank'>" +
+                                            "<button style='font-family: Arial, Helvetica, sans-serif;  font-size: 18px; background-color: blue; color: white; border-radius: 8px; margin: 10px; padding: 10px;'>"+
+                                            "Click here to access this scene!</a></button><br>" +
+                                            "<br> <a href='"+ requestProtocol + "://" + req.headers.host + "/webxr/" + req.body.short_id+"' target='_blank'><img src=" + urlHalf + "></a> " +
+                                            "<br> Scene Title: " + theScene.sceneTitle +
+                                            "<br> Scene Short ID: " + theScene.short_id +
+                                            "<br> Scene Keynote: " + theScene.sceneKeynote +
+                                            "<br> Scene Description: " + theScene.sceneDescription +
+                                            "<br> Owner: " + theScene.userName +
+                                            "<br><br><strong><a href='"+ requestProtocol + "://" + req.headers.host + "/qrcode/" + req.body.short_id + "'>Click here to scan QR Code for this scene</a></strong>" +
+                                            "<br> For more scenes like this, or to get the latest app, visit <a href='https://servicemedia.net'>ServiceMedia.net!</a> ";
+                                        ses.sendEmail( {
+                                                Source: from,
+                                                Destination: { ToAddresses: to, BccAddresses: bcc},
+                                                Message: {
+                                                    Subject: {
+                                                        Data: subject
+                                                    },
+                                                    Body: {
+                                                        Html: {
+                                                            Data: htmlbody
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                            , function(err, data) {
+                                                if(err)  callback(err);
+                                                console.log('Email sent:');
+                                                console.log(data);
+                                            });
+                                        // callbackzz();
+                                        callback(null);
+                                    } else {
+                                        //TODO check user's auth?
+                                        // if (timestamp < user.resetTimestamp + 3600) { //expires in 1 hour!
+                                        bcrypt.genSalt(3, function(err, salt) { //level3 easy, not a password itself
+                                            bcrypt.hash(timestamp.toString(), salt, null, function(err, hash) {
+                                                // reset = hash;
+                                                var cleanhash = validator.blacklist(hash, ['/','.','$']); //make it URL safe
+                                                var invitation = {
+                                                    validated: false,
+                                                    // invitedToSceneShareWithPublic:
+                                                    invitedToSceneTitle: req.body.sceneTitle,
+                                                    invitedToSceneID: req.body._id,
+                                                    invitedToSceneShortID: req.body.short_id,
+                                                    accessTimeWindow: timestamp + 86400, //one day //will deprecate...
+                                                    sceneEventStart : req.body.sceneEventStart,
+                                                    sceneEventEnd: req.body.sceneEventEnd,
+                                                    sceneAccessLinkExpire: req.body.sceneAccessLinkExpire,
+                                                    sceneRestrictToEvent: eventData.restrictToEvent,
+                                                    sceneRestrictToLocation: eventData.restrictToLocation,
+                                                    sentByUserName: thePerson.email,
+                                                    sentByUserID: "00000000000000000",
+                                                    sentToEmail: to,
+                                                    sentToPersonID: thePerson._id,
+                                                    invitationHash: cleanhash,
+                                                    invitationTimestamp: timestamp,
+                                                }
+                                                db.invitations.save(invitation, function (err, saved) {
+                                                    if ( err || !saved ) {
+                                                        console.log('problem saving invitaiton');
+                                                    } else {
+                                                        // var item_id = saved._id.toString();
+                                                        console.log('new invitiation id: ' + saved._id.toString());
+                                                    }
+                                                });
+                                                if (req.body.sceneShareWithMessage === "" || req.body.sceneShareWithMessage == null) {
+                                                    message = "Here's your immersive scene invitation - follow the link below to gain access!";
+                                                    // "<h3>Scene Invitation from " + from + "</h3><hr><br>"
+                                                }
+                                                //  else {
+                                                //     message = req.session.user.userName + " has shared an Immersive Scene with this message: "+
+                                                //         "<hr><strong>" + req.body.sceneShareWithMessage +  "</strong><br><hr>";
+                                                // }
+                                                message += restrictToEventMessage + restrictToLocationMessage;
+                                                if (req.body.sceneEventStart != undefined && req.body.sceneEventStart != null && req.body.sceneEventStart != "") {
+                                                    let datetimeString = new Date(req.body.sceneEventStart);
+                                                    message += "<br><strong>Event start: " + datetimeString.toLocaleString([], { hour12: true}) + "</strong><br>";
+                                                    // message += "<br><strong>Event start: " + datetimeString.toString() + "</strong><br>";
+                                                    console.log(message);
+                                                }
+                                                if (req.body.sceneEventEnd != undefined && req.body.sceneEventEnd != null && req.body.sceneEventEnd != "") {
+                                                    let datetimeString = new Date(req.body.sceneEventEnd);
+                                                    message += "<strong>Event end: " + datetimeString.toLocaleString([], { hour12: true})  + "</strong><br>";
+                                                }
+                                                message += geoLinks;
+                                                var htmlbody = message +
+                                                    "<br> Scene Title: " + theScene.sceneTitle +
+                                                    "<br> Short ID: " + theScene.short_id +
+                                                    "<br> Keynote: " + theScene.sceneKeynote +
+                                                    "<br> Description: " + theScene.sceneDescription +
+                                                    "<br> Owner: " + theScene.userName +
+                                                    "<br><strong>This is a private scene, intended only for subscribers or invited guests.</strong><br>" +
+                                                    "<a href='"+ requestProtocol + "://" + req.headers.host + "/landing/invite.html?iv=" + cleanhash + "' target='_blank'>" +
+                                                    "<button style='font-family: Arial, Helvetica, sans-serif;  font-size: 18px; background-color: blue; color: white; border-radius: 8px; margin: 10px; padding: 10px;'>" +
+                                                    "Click here to authenticate your access!</a></button><br>" +
+                                                    "<br> <img src=" + urlHalf + "> " +
+                                                    "<br> For more info, or to become a subscriber, visit <a href='https://servicemedia.net'>ServiceMedia.net!</a> ";
+                                            ses.sendEmail( {
+                                                    Source: from,
+                                                    Destination: { ToAddresses: to, BccAddresses: bcc },
+                                                    Message: {
+                                                        Subject: {
+                                                            Data: subject
+                                                        },
+                                                        Body: {
+                                                            Html: {
+                                                                Data: htmlbody
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                                , function(err, data) {
+                                                    if(err) callback(err);
+                                                    console.log('Email sent:');
+                                                    console.log(data);
+                                                    
+                                                });
+                                            });
+                                        });
+                                        
+                                    }
+                                    callback(null);
+                                }
+                            // }
                         ],
                         function (err, result) { // #last function, close async
                             if (err) {
-
+                                console.log("error with invitereq " + err);
+                                res.send(err);
                             } else {
-                                console.log("invitation_req done: " + result);
+                                console.log("invitation_req done: " + JSON.stringify(result));
+                                res.send("invitation sent");
                             }
-                           
                             }
                         );
                         
@@ -5674,8 +5965,8 @@ app.post('/share_scene/', requiredAuthentication, function (req, res) { //yep!
             
             async.each (emailSplit, function (email, callbackz) {
 
-
-                db.people.findOne({ $and: [ {userID: uid}, {email: email.trim()} ]}, function(err, person) {
+                // db.people.findOne({ $and: [ {userID: uid}, {email: email.trim()} ]}, function(err, person) {
+                db.people.findOne({email: email.trim()}, function(err, person) {
                     if (err || !person) {
                         
                         console.log("did not find that person : " + err);
@@ -5685,33 +5976,45 @@ app.post('/share_scene/', requiredAuthentication, function (req, res) { //yep!
                         person.email = email.trim();
                         person.activities = [];
                         let action = {};
-                        action.wasSentEmail = ts + "_" + uid;
+                        action.wasSentEmail = ts + "_" + uid + "_" + req.body.short_id;;
                         person.activities.push(action);
+                        person.accountStatus = 'Not Verified';
+                        person.contactStatus = 'Not Indicated';
                         console.log("fixing to save new person " + JSON.stringify(person));
                         db.people.save(person, function (err, saved) {
-                            if ( err || !saved ) {
-                                console.log('person not saved..');
-                                res.end();
+                        if ( err || !saved ) {
+                            console.log('person not saved..');
+                            res.end();
+                            callbackz();
+                            } else {
+                                var person_id = saved._id.toString();
+                                var pursoner = {};
+                                console.log('new person created, id: ' + person_id);
+                                pursoner.personID = person_id;
+                                pursoner.email = email.trim();
+                                emailsFinal.push(pursoner);
                                 callbackz();
-                                } else {
-                                    var person_id = saved._id.toString();
-                                    var pursoner = {};
-                                    console.log('new person created, id: ' + person_id);
-                                    pursoner.personID = person_id;
-                                    pursoner.email = email.trim();
-                                    emailsFinal.push(pursoner);
-                                    callbackz();
-                                    }
-                                });
+                                }
+                            });
                     } else {
                         //TODO update emailCount field? or 'touches'?
                         if (person.activities == undefined) {
                             person.activities = [];
                         }
                         let action = {};
-                        if (person.contactStatus != undefined && person.contactStatus.toString().toLowerCase().includes("opt out global")) {
+                        if (person.accountStatus != undefined && (person.accountStatus.toString().toLowerCase().includes("blacklist") || person.accountStatus.toString().toLowerCase().includes ("banned"))) {
+                           
+                        } else if (person.accountStatus != undefined && (person.activities != undefined && person.activities.length > 3) && person.accountStatus.toString().toLowerCase().includes("not verified")) {
+                            action.sendEmailUnverified = ts + "_" + uid + "_" + req.body.short_id;
+                            person.activities.push(action);
+
+                            db.people.update( { "_id": person._id }, { $set: {
+                                lastUpdate : ts,
+                                activities : person.activities
+                            }});
+                        } else if (person.contactStatus != undefined && person.contactStatus.toString().toLowerCase().includes("opt out global")) {
                             console.log("opt out global for " + email);
-                            action.sendEmailBlockedBlacklist = ts + "_" + uid;
+                            action.sendEmailBlockedBlacklist = ts + "_" + uid+ "_" + req.body.short_id;
                             person.activities.push(action);
 
                             db.people.update( { "_id": person._id }, { $set: {
@@ -5720,7 +6023,7 @@ app.post('/share_scene/', requiredAuthentication, function (req, res) { //yep!
                             }});
                             callbackz(); //do not add to emailsFinal!
                         } else {    
-                            action.wasSentEmail = ts + "_" + uid;
+                            action.wasSentEmail = ts + "_" + uid+ "_" + req.body.short_id;
                             person.activities.push(action);
 
                             db.people.update( { "_id": person._id }, { $set: {
@@ -5741,10 +6044,62 @@ app.post('/share_scene/', requiredAuthentication, function (req, res) { //yep!
                             console.log("HEYWTF! caint find user " +req.session.user._id + " ...call the police!");
                         } else {
                             db.users.updateOne( { "_id": ObjectID(uid) }, { $addToSet: {people : person._id}}); //addToSet should add array if not present, but prevent dupes (!?)
+                            
                             console.log("tryna add a person " + person._id + " to " + req.session.user._id); //TODO add sentMailTo activity to user action inventory
-
+                                    // if (user.activitiesID != undefined && user.activitiesID != null) {
+                                    //     console.log("updati9ng acvitiiies record" + user.activitiesID);
+                                    //     var a_id = ObjectID(user.activitiesID);
+                                    //     let actionItem = {};
+                                    //     actionItem.userID = req.body.userData._id;
+                                    //     actionItem.actionID = req.body.action._id;
+                                    //     actionItem.actionType = req.body.action.actionType;
+                                    //     actionItem.actionResult = req.body.action.actionResult;
+                                    //     actionItem.inScene = req.body.action.inScene;
+                                    //     db.activities.findOne({"_id": a_id}, function (err, activities) {
+                                    //         if (err || !activities) {
+                                    //             console.log("error getting user: " + err);
+                                    //             callback(err);
+                                    //         } else {
+                                    //             console.log("activities list found with count " + activities.actionItems.length);
+                                    //             db.activities.update({ "_id": a_id }, { $push: { actionItems: actionItem }}, {upsert: false}, function (err, saved) {
+                                    //                 if (err || !saved) {
+                                    //                     console.log("problemo with actitiers add " + err);
+                                    //                     // res.send('profcblemo ' + err);
+                                    //                     callback(err);
+                                    //                 } else {
+                                    //                     console.log("ok saved to acttivieis");
+                                    //                     callback(null, user);
+                                    //                     // res.send('updated' + JSON.stringify(saved));
+                                    //                 }
+                                    //             });
+                                    //         }
+                                    //     });
+                                    // } else { //new activitiesID if needed
+                                    //     let activities = {};
+                                    //     let actionItems = [];
+                                    //     actionItems.push(actionItem);
+                                    //     activities.actionItems = actionItems; //so can push new entries into a single array in this record
+                                    //     db.activities.save(activities, function (err, saved) {
+                                    //     if (err || !saved) {
+                                    //         console.log("problemo2 with activities add " + err);
+                                    //         callback(err);
+                                    //     } else {
+                                    //         console.log("new activities record " + saved._id);
+                                    //         db.users.update({"_id": u_id}, {$set: {activitiesID: saved._id}}, function (err, updated) {
+                                    //             if (err || !updated) {
+                                    //                 console.log("problemo2 with activity7 add " + err);
+                                    //                 callback(err);
+                                    //             } else {
+                                    //                 callback(null, user);
+                                    //             }
+                                    //             });
+                                    //         }
+                                    //     });   
+                                    // }
                         }
                     });
+                    
+                    // db.users.upd
 
                     });
                 
@@ -5898,32 +6253,108 @@ app.post('/share_scene/', requiredAuthentication, function (req, res) { //yep!
                     message += "<strong>Event end: " + datetimeString.toLocaleString([], { hour12: true})  + "</strong><br>";
                 }
                 message += geoLinks;
-               
-                    if (theScene.sceneShareWithPublic) {
+                if (theScene.sceneShareWithPublic) {
 
-                        var htmlbody = req.session.user.userName + message + "</h3><hr>" +
-                            // "<br> Click here to access this public scene: <strong><a href='"+ requestProtocol + "://" + req.headers.host + "/webxr/" + req.body.short_id+"' target='_blank'>"+ requestProtocol + "://" + req.headers.host + "/webxr/" + req.body.short_id+"</a></strong>" +
-                            
-                            "<a href='"+ requestProtocol + "://" + req.headers.host + "/webxr/" + req.body.short_id+"' target='_blank'>" +
-                            "<button style='font-family: Arial, Helvetica, sans-serif;  font-size: 18px; background-color: blue; color: white; border-radius: 8px; margin: 10px; padding: 10px;'>"+
-                            "Click here to access this scene!</a></button><br>" +
+                    var htmlbody = req.session.user.userName + message + "</h3><hr>" +
+                        "<a href='"+ requestProtocol + "://" + req.headers.host + "/webxr/" + req.body.short_id+"' target='_blank'>" +
+                        "<button style='font-family: Arial, Helvetica, sans-serif;  font-size: 18px; background-color: blue; color: white; border-radius: 8px; margin: 10px; padding: 10px;'>"+
+                        "Click here to access this scene!</a></button><br>" +
+                        "<br> <a href='"+ requestProtocol + "://" + req.headers.host + "/webxr/" + req.body.short_id+"' target='_blank'><img src=" + urlHalf + "></a> " +
+                        "<br> Scene Title: " + req.body.sceneTitle +
+                        "<br> Scene Short ID: " + req.body.short_id +
+                        "<br> Scene Keynote: " + theScene.sceneKeynote +
+                        "<br> Scene Description: " + theScene.sceneDescription +
+                        "<br> Owner: " + theScene.userName +
+                        "<br><br><strong><a href='"+ requestProtocol + "://" + req.headers.host + "/qrcode/" + req.body.short_id + "'>Click here to scan QR Code for this scene</a></strong>" +
+                        "<br> For more scenes like this, or to get the latest app, visit <a href='https://servicemedia.net'>ServiceMedia.net!</a> ";
+                    ses.sendEmail( {
+                            Source: from,
+                            Destination: { ToAddresses: to, BccAddresses: bcc},
+                            Message: {
+                                Subject: {
+                                    Data: subject
+                                },
+                                Body: {
+                                    Html: {
+                                        Data: htmlbody
+                                    }
+                                }
+                            }
+                        }
+                        , function(err, data) {
+                            if(err) throw err
+                            console.log('Email sent:');
+                            console.log(data);
+                        });
+                    callbackzz();
+                } else {
+                    //TODO check user's auth?
+                    // if (timestamp < user.resetTimestamp + 3600) { //expires in 1 hour!
+                    bcrypt.genSalt(3, function(err, salt) { //level3 easy, not a password itself
+                        bcrypt.hash(timestamp.toString(), salt, null, function(err, hash) {
+                            // reset = hash;
+                            var cleanhash = validator.blacklist(hash, ['/','.','$']); //make it URL safe
+                            var invitation = {
+                                validated: false,
+                                // invitedToSceneShareWithPublic:
+                                invitedToSceneTitle: req.body.sceneTitle,
+                                invitedToSceneID: req.body._id,
+                                invitedToSceneShortID: req.body.short_id,
+                                accessTimeWindow: timestamp + 86400, //one day //will deprecate...
+                                sceneEventStart : req.body.sceneEventStart,
+                                sceneEventEnd: req.body.sceneEventEnd,
+                                sceneAccessLinkExpire: req.body.sceneAccessLinkExpire,
+                                sceneRestrictToEvent: eventData.restrictToEvent,
+                                sceneRestrictToLocation: eventData.restrictToLocation,
+                                sentByUserName: req.session.user.userName,
+                                sentByUserID: req.session.user._id.toString(),
+                                sentToEmail: to,
+                                sentToPersonID: data.personID,
+                                invitationHash: cleanhash,
+                                invitationTimestamp: timestamp,
 
-                            "<br> <a href='"+ requestProtocol + "://" + req.headers.host + "/webxr/" + req.body.short_id+"' target='_blank'><img src=" + urlHalf + "></a> " +
-                            "<br> Scene Title: " + req.body.sceneTitle +
-                            "<br> Scene Short ID: " + req.body.short_id +
-                            "<br> Scene Keynote: " + theScene.sceneKeynote +
-                            "<br> Scene Description: " + theScene.sceneDescription +
-                            "<br> Owner: " + theScene.userName +
 
-                            "<br><br><strong><a href='"+ requestProtocol + "://" + req.headers.host + "/qrcode/" + req.body.short_id + "'>Click here to scan QR Code for this scene</a></strong>" +
+                            }
+                            db.invitations.save(invitation, function (err, saved) {
+                                if ( err || !saved ) {
+                                    console.log('problem saving invitaiton');
+                                } else {
+                                    // var item_id = saved._id.toString();
+                                    console.log('new invitiation id: ' + saved._id.toString());
+                                }
+                            });
+                            if (req.body.sceneShareWithMessage === "" || req.body.sceneShareWithMessage == null) {
+                                message = req.session.user.userName + " has shared an Immersive Scene!";
+                                // "<h3>Scene Invitation from " + from + "</h3><hr><br>"
+                            } else {
+                                message = req.session.user.userName + " has shared an Immersive Scene with this message: "+
+                                    "<hr><strong>" + req.body.sceneShareWithMessage +  "</strong><br><hr>";
+                            }
+                            message += restrictToEventMessage + restrictToLocationMessage;
+                            if (req.body.sceneEventStart != undefined && req.body.sceneEventStart != null && req.body.sceneEventStart != "") {
+                                let datetimeString = new Date(req.body.sceneEventStart);
+                                message += "<br><strong>Event start: " + datetimeString.toLocaleString([], { hour12: true}) + "</strong><br>";
+                                // message += "<br><strong>Event start: " + datetimeString.toString() + "</strong><br>";
+                                console.log(message);
+                            }
+                            if (req.body.sceneEventEnd != undefined && req.body.sceneEventEnd != null && req.body.sceneEventEnd != "") {
+                                let datetimeString = new Date(req.body.sceneEventEnd);
+                                message += "<strong>Event end: " + datetimeString.toLocaleString([], { hour12: true})  + "</strong><br>";
+                            }
+                            message += geoLinks;
+                            var htmlbody = message +
+                                "<br> Scene Title: " + req.body.sceneTitle +
+                                "<br> Short ID: " + req.body.short_id +
+                                "<br> Keynote: " + theScene.sceneKeynote +
+                                "<br> Description: " + theScene.sceneDescription +
+                                "<br> Owner: " + theScene.userName +
+                                "<br><strong>This is a private scene, intended only for subscribers or invited guests.</strong><br>" +
+                                "<a href='"+ requestProtocol + "://" + req.headers.host + "/landing/invite.html?iv=" + cleanhash + "' target='_blank'>" +
+                                "<button style='font-family: Arial, Helvetica, sans-serif;  font-size: 18px; background-color: blue; color: white; border-radius: 8px; margin: 10px; padding: 10px;'>" +
+                                "Click here to authenticate your access!</a></button><br>" +
+                                "<br> <img src=" + urlHalf + "> " +
+                                "<br> For more info, or to become a subscriber, visit <a href='https://servicemedia.net'>ServiceMedia.net!</a> ";
 
-                            // "<br> <a href= http://" + scene_page + "> Here's the shareable public page for this scene. </a> <br>If you have the iOS app, you may load the scene directly with the <a href= "+ app_link +">Mobile App Link</a>" +
-                //            "r><br> <a href= " + mob_link + "> Mobile App link </a> " +
-                            // "<br><a href='https://servicemedia.net/qrcode/" + req.body.short_id + "'>You may also use the app and scan the quick access code here!</a>"
-                            // "<br>You may also enter the scene title or keycode on the ServiceMedia app landing page" +
-                            // "Click this invitation link to authenticate your access (link expires in 10 hours): <br>" +
-                            // req.headers.hostname + "/invitation_check/" + cleanhash +
-                            "<br> For more scenes like this, or to get the latest app, visit <a href='https://servicemedia.net'>ServiceMedia.net!</a> ";
                         ses.sendEmail( {
                                 Source: from,
                                 Destination: { ToAddresses: to, BccAddresses: bcc},
@@ -5942,109 +6373,12 @@ app.post('/share_scene/', requiredAuthentication, function (req, res) { //yep!
                                 if(err) throw err
                                 console.log('Email sent:');
                                 console.log(data);
-                                // res.send("Email sent");
-                               
-                                // res.redirect("http://elnoise.com/#/play/" + audio_item[0].short_id);
-
-                            });
-                        callbackzz();
-                    } else {
-                        //TODO check user's auth?
-                        // if (timestamp < user.resetTimestamp + 3600) { //expires in 1 hour!
-                        bcrypt.genSalt(3, function(err, salt) { //level3 easy, not a password itself
-                            bcrypt.hash(timestamp.toString(), salt, null, function(err, hash) {
-                                // reset = hash;
-                                var cleanhash = validator.blacklist(hash, ['/','.','$']); //make it URL safe
-                                var invitation = {
-                                    validated: false,
-                                    // invitedToSceneShareWithPublic:
-                                    invitedToSceneTitle: req.body.sceneTitle,
-                                    invitedToSceneID: req.body._id,
-                                    invitedToSceneShortID: req.body.short_id,
-                                    accessTimeWindow: timestamp + 86400, //one day //will deprecate...
-                                    sceneEventStart : req.body.sceneEventStart,
-                                    sceneEventEnd: req.body.sceneEventEnd,
-                                    sceneAccessLinkExpire: req.body.sceneAccessLinkExpire,
-                                    sceneRestrictToEvent: eventData.restrictToEvent,
-                                    sceneRestrictToLocation: eventData.restrictToLocation,
-                                    sentByUserName: req.session.user.userName,
-                                    sentByUserID: req.session.user._id.toString(),
-                                    sentToEmail: to,
-                                    sentToPersonID: data.personID,
-                                    invitationHash: cleanhash,
-                                    invitationTimestamp: timestamp,
-
-
-                                }
-                                db.invitations.save(invitation, function (err, saved) {
-                                    if ( err || !saved ) {
-                                        console.log('problem saving invitaiton');
-                                    } else {
-                                        // var item_id = saved._id.toString();
-                                        console.log('new invitiation id: ' + saved._id.toString());
-                                    }
-                                });
-                                if (req.body.sceneShareWithMessage === "" || req.body.sceneShareWithMessage == null) {
-                                    message = req.session.user.userName + " has shared an Immersive Scene!";
-                                    // "<h3>Scene Invitation from " + from + "</h3><hr><br>"
-                                } else {
-                                    message = req.session.user.userName + " has shared an Immersive Scene with this message: "+
-                                        "<hr><strong>" + req.body.sceneShareWithMessage +  "</strong><br><hr>";
-                                }
-                                message += restrictToEventMessage + restrictToLocationMessage;
-                                if (req.body.sceneEventStart != undefined && req.body.sceneEventStart != null && req.body.sceneEventStart != "") {
-                                    let datetimeString = new Date(req.body.sceneEventStart);
-                                    message += "<br><strong>Event start: " + datetimeString.toLocaleString([], { hour12: true}) + "</strong><br>";
-                                    // message += "<br><strong>Event start: " + datetimeString.toString() + "</strong><br>";
-                                    console.log(message);
-                                }
-                                if (req.body.sceneEventEnd != undefined && req.body.sceneEventEnd != null && req.body.sceneEventEnd != "") {
-                                    let datetimeString = new Date(req.body.sceneEventEnd);
-                                    message += "<strong>Event end: " + datetimeString.toLocaleString([], { hour12: true})  + "</strong><br>";
-                                }
-                                message += geoLinks;
-                                var htmlbody = message +
-                                    "<br> Scene Title: " + req.body.sceneTitle +
-                                    "<br> Short ID: " + req.body.short_id +
-                                    "<br> Keynote: " + theScene.sceneKeynote +
-                                    "<br> Description: " + theScene.sceneDescription +
-                                    "<br> Owner: " + theScene.userName +
-                                    "<br><strong>This is a private scene, intended only for subscribers or invited guests.</strong><br>" +
-                                    // "Click this invitation link to authenticate your access (link expires in 10 hours)" +
-                                    // req.headers.host + "/invitation_check/" + cleanhash + "<br>" +
-                                    // "Click this invitation link to authenticate your access: <br>" +
-                                    "<a href='"+ requestProtocol + "://" + req.headers.host + "/landing/invite.html?iv=" + cleanhash + "' target='_blank'>" +
-                                    "<button style='font-family: Arial, Helvetica, sans-serif;  font-size: 18px; background-color: blue; color: white; border-radius: 8px; margin: 10px; padding: 10px;'>" +
-                                    "Click here to authenticate your access!</a></button><br>" +
-                                    "<br> <img src=" + urlHalf + "> " +
- 
-                
-                                    "<br> For more info, or to become a subscriber, visit <a href='https://servicemedia.net'>ServiceMedia.net!</a> ";
-
-                            ses.sendEmail( {
-                                    Source: from,
-                                    Destination: { ToAddresses: to, BccAddresses: bcc},
-                                    Message: {
-                                        Subject: {
-                                            Data: subject
-                                        },
-                                        Body: {
-                                            Html: {
-                                                Data: htmlbody
-                                            }
-                                        }
-                                    }
-                                }
-                                , function(err, data) {
-                                    if(err) throw err
-                                    console.log('Email sent:');
-                                    console.log(data);
-                                   
-                                });
+                                
                             });
                         });
+                    });
                     callbackzz();
-                    }
+                }
 
             }, function(err) {
                
@@ -7716,6 +8050,8 @@ app.post('/newperson', checkAppID, requiredAuthentication, function (req, res) {
     var person = req.body;
     person.userID = req.session.user._id.toString();
     person.dateCreated = Date.now();
+    person.accountStatus = 'Not Verified';
+    person.contactStatus = 'Not Indicated';
     // if (!textitem.desc) {
     //     textitem.desc = textitem.textstring.substr(0,20) + "...";
     // }
@@ -13440,6 +13776,7 @@ app.post('/update_scene/:_id', requiredAuthentication, function (req, res) {
                 sceneShareWithSubscribers : req.body.sceneShareWithSubscribers != null ? req.body.sceneShareWithSubscribers : false,
                 sceneShareWithGroups : req.body.sceneShareWithGroups != null ? req.body.sceneShareWithGroups : "",
                 sceneShareWithPeople : req.body.sceneShareWithPeople != null ? req.body.sceneShareWithPeople : "",
+                sceneShareWithGroups : req.body.sceneShareWithGroups != null ? req.body.sceneShareWithGroups : "",
                 sceneEventStart : req.body.sceneEventStart != null ? req.body.sceneEventStart : "",
                 sceneEventEnd : req.body.sceneEventEnd != null ? req.body.sceneEventEnd : "",
                 sceneAccessLinkExpire : req.body.sceneAccessLinkExpire != null ? req.body.sceneAccessLinkExpire : "",
@@ -20458,13 +20795,13 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                         "<head> " +
                         // "<link href=\x22css/sb-admin-2.css\x22 rel=\x22stylesheet\x22>" +
                         "<style>"+
-                        "body {background-color: #505050;}"+
+                        "body {background-color: #36393d;}"+
                         "h1   {color: white;}"+
                         "a   {color: powderblue;}"+
                         "p    {color: white; font-family: sans-serif; font-size: 150%;}"+
                         "</style>"+
                         "</head> " +
-                        "<p>Access to this scene is restricted.</p><p>If you're a subscriber, you may <a href=\x22/main/login.html\x22>login</a>, or click this link to <a href=\x22/landing/invitereq.html?rq="+sceneData.short_id+"\x22>request an invitation</a></p>" +
+                        "<p>Access to this scene is restricted.</p><p>Click here to <a href=\x22/landing/invitereq.html?rq="+sceneData.short_id+"\x22>request an invitation</a></p>" +
                         "<body> " +
                         "</body>" +
 
