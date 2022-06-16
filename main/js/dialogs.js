@@ -1119,9 +1119,9 @@ function SceneManglerModal(mode) {
     let tabs ="<div class=\x22tab\x22>" +
     "<button class=\x22tablinks\x22 onclick=\x22TabMangler(event, 'Welcome')\x22>Welcome</button>"+
     // "<button class=\x22tablinks\x22 onclick=\x22TabMangler(event, 'Quests')\x22>Quests</button>"+
-    "<button class=\x22tablinks\x22 onclick=\x22TabMangler(event, 'Inventory')\x22>Inventory</button>"+
+    
     "<button class=\x22tablinks\x22 onclick=\x22TabMangler(event, 'Messages')\x22>Messages</button>"+
-
+    "<button class=\x22tablinks\x22 onclick=\x22TabMangler(event, 'Inventory')\x22>Inventory</button>"+
     "<button class=\x22tablinks\x22 onclick=\x22TabMangler(event, 'Tools')\x22>Tools</button>"+
     "<button class=\x22tablinks\x22 onclick=\x22TabMangler(event, 'Locations')\x22>Locations</button>"+
     "<button class=\x22tablinks\x22 onclick=\x22TabMangler(event, 'Events')\x22>Events</button>"+
@@ -1179,16 +1179,17 @@ function SceneManglerModal(mode) {
     "<div "+messagesDisplay+" id=\x22Messages\x22 class=\x22modalMain tabcontent\x22>"+
       // "<form id=\x22form\x22 id=\x22chat_form\x22>"+
       // "<span style=\x22float: left;\x22><h4>Message:</h4></span><span style=\x22float: left;\x22 id=\x22users\x22>"+stringRoomUsers+"</span>"+
-      "<button class=\x22infoButton\x22 id=\x22sendMessageButton\x22><a href=\x22mailto:"+room+"@servicemedia.net\x22>Send Email</a></button>"+
-      "<p>scene mailbox: <a style=\x22color: lightblue;\x22 href=\x22mailto:"+room+"@servicemedia.net\x22>"+room+"@servicemedia.net</a></p>"+
+      "<input class=\x22email_input\x22 type=\x22email\x22 placeholder=\x22email to invite\x22></input><button class=\x22saveButton\x22 id=\x22sendInvitationButton\x22 onclick=\x22SendInvitation()\x22>Send Invitation</button><br>"+
+      // "<button class=\x22infoButton\x22 id=\x22sendMessageButton\x22><a href=\x22mailto:"+room+"@servicemedia.net\x22>Send Email</a></button>"+
+
       "<br><span style=\x22float: left;\x22 id=\x22users\x22>"+stringRoomUsers+"</span>"+
 
       "<button class=\x22saveButton\x22 id=\x22sendMessageButton\x22 onclick=\x22SendMessage()\x22>Send Chat</button><br>"+
       
-      "<textarea class=\x22chat_input\x22 id=\x22chat_input\x22 type=\x22textarea\x22 style=\x22font-size:10pt;rows:4;cols:200;\x22 placeholder=\x22New message...\x22></textarea><br><br>"+
+      "<textarea class=\x22chat_input\x22 id=\x22chat_input\x22 type=\x22textarea\x22 style=\x22font-size:10pt;rows:4;cols:200;\x22 placeholder=\x22New Chat Message...\x22></textarea><br><br>"+
       // "</form>"+
-      
       "<div class=\x22\x22 id=\x22future\x22></div><br><br><br><br>" +
+      "<p>scene mailbox: <a style=\x22color: lightblue;\x22 href=\x22mailto:"+room+"@servicemedia.net\x22>"+room+"@servicemedia.net</a></p>"+
     "</div>"+
 
 
