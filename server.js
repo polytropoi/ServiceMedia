@@ -5289,7 +5289,7 @@ app.post('/invitation_req/', function (req,res) {
                         async.waterfall([
 
                             function(callback) { //is this account in the scene's allowed groups? 
-                                callback(null);
+                                callback(null); //...
                             },
                             function(callback) { //is accountStatus OK?
                                 
@@ -5387,8 +5387,6 @@ app.post('/invitation_req/', function (req,res) {
                                                     var expiration = new Date();
                                                     expiration.setMinutes(expiration.getMinutes() + 30);
                                                     var baseName = path.basename(item_string_filename, (item_string_filename_ext));
-                    //                                    console.log(baseName);
-                                                    // var thumbName = 'thumb.' + baseName + item_string_filename_ext;
                                                     var halfName = 'half.' + baseName + item_string_filename_ext;
                                                     // var quarterName = 'quarter.' + baseName + item_string_filename_ext;
                                                     // var standardName = 'standard.' + baseName + item_string_filename_ext;
@@ -5524,9 +5522,9 @@ app.post('/invitation_req/', function (req,res) {
                                                 var invitation = {
                                                     validated: false,
                                                     // invitedToSceneShareWithPublic:
-                                                    invitedToSceneTitle: req.body.sceneTitle,
-                                                    invitedToSceneID: req.body._id,
-                                                    invitedToSceneShortID: req.body.short_id,
+                                                    invitedToSceneTitle: theScene.sceneTitle,
+                                                    invitedToSceneID: theScene._id,
+                                                    invitedToSceneShortID: theScene.shortID,
                                                     accessTimeWindow: timestamp + 86400, //one day //will deprecate...
                                                     sceneEventStart : req.body.sceneEventStart,
                                                     sceneEventEnd: req.body.sceneEventEnd,
