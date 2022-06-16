@@ -5238,12 +5238,13 @@ app.get('/invitation_check/:hzch', function (req, res) { //called from /landing/
     if (req.headers.host.includes("localhost")) {
         requestProtocol = 'http';
     }
-    console.log("invitation check:" + hash + " protocol: " + req.procotol );
+
     db.invitations.findOne({"invitationHash": hash}, function (err, invitation) {
         if (err || !invitation) {
             console.log("did not find invitation: " + err);
             res.send("not found");
         } else {
+            console.log("invitation check:" + JSON.stringify(invitation));
             var timestamp = Math.round(Date.now() / 1000);
             var pin = Math.random().toString().substr(2,6); //hrm...
             if (timestamp < invitation.invitationTimestamp + 36000) { //expires in 10 hour! //TODO access window start and end timestamps
@@ -5524,7 +5525,7 @@ app.post('/invitation_req/', function (req,res) {
                                                     // invitedToSceneShareWithPublic:
                                                     invitedToSceneTitle: theScene.sceneTitle,
                                                     invitedToSceneID: theScene._id,
-                                                    invitedToSceneShortID: theScene.shortID,
+                                                    invitedToSceneShortID: theScene.short_id,
                                                     accessTimeWindow: timestamp + 86400, //one day //will deprecate...
                                                     sceneEventStart : req.body.sceneEventStart,
                                                     sceneEventEnd: req.body.sceneEventEnd,
@@ -6220,7 +6221,7 @@ app.post('/share_scene/', requiredAuthentication, function (req, res) { //yep!
                 // console.log("email data is " + data);
           
                 var subject = "Invitation : " + req.body.sceneTitle;
-                var from = req.session.user.email;
+                var from = adminEmail;
                
                 var to = [data.email];
                
@@ -6295,17 +6296,18 @@ app.post('/share_scene/', requiredAuthentication, function (req, res) { //yep!
                             var invitation = {
                                 validated: false,
                                 // invitedToSceneShareWithPublic:
-                                invitedToSceneTitle: req.body.sceneTitle,
-                                invitedToSceneID: req.body._id,
-                                invitedToSceneShortID: req.body.short_id,
+                                invitedToSceneTitle: theScene.sceneTitle,
+                                invitedToSceneID: theScene._id,
+                                invitedToSceneShortID: theScene.short_id,
                                 accessTimeWindow: timestamp + 86400, //one day //will deprecate...
-                                sceneEventStart : req.body.sceneEventStart,
-                                sceneEventEnd: req.body.sceneEventEnd,
-                                sceneAccessLinkExpire: req.body.sceneAccessLinkExpire,
+                                sceneEventStart : theScene.sceneEventStart,
+                                sceneEventEnd: theScene.sceneEventEnd,
+                                sceneAccessLinkExpire: theScene.sceneAccessLinkExpire,
                                 sceneRestrictToEvent: eventData.restrictToEvent,
                                 sceneRestrictToLocation: eventData.restrictToLocation,
                                 sentByUserName: req.session.user.userName,
                                 sentByUserID: req.session.user._id.toString(),
+                                sentByUserEmail: req.session.user.email.toString(),
                                 sentToEmail: to,
                                 sentToPersonID: data.personID,
                                 invitationHash: cleanhash,
