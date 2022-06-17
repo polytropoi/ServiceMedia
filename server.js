@@ -2479,24 +2479,25 @@ app.get('/inventory/:_id', requiredAuthentication, usercheck, function (req, res
 
             async.waterfall([
                   
-                    function (callback) {
-                        if (user.inventoryID != undefined && user.inventoryID != null) {
-                            let a_id = ObjectID(user.inventoryID); 
-                            db.inventories.findOne({"_id": a_id}, function (err, inventory) {
-                                if (err || !inventory) {
-                                    console.log("no inventories");
+                function (callback) {
+                    if (user.inventoryID != undefined && user.inventoryID != null) {
+                        let a_id = ObjectID(user.inventoryID); 
+                        db.inventories.findOne({"_id": a_id}, function (err, inventory) {
+                            if (err || !inventory) {
+                                console.log("no inventories");
     //                                      res.json(profileResponse);
-                                    callback(err);
-                                } else {
-                                    // console.log("user activitiesw: " + JSON.stringify(activities));
-                                    profileResponse = inventory;
-                                    callback(null);
-                                }
-                            });
-                        } else {
-                            callback("no inventory found");
-                        }
+                                profileResponse = null;
+                                callback(null);
+                            } else {
+                                // console.log("user activitiesw: " + JSON.stringify(activities));
+                                profileResponse = inventory;
+                                callback(null);
+                            }
+                        });
+                    } else {
+                        callback("no inventory found");
                     }
+                }
 
 //                     function (callback) {
 //                         db.scores.find({"userID": req.params._id}, function (err, scores) {
@@ -5928,7 +5929,11 @@ app.post('/share_scene/', requiredAuthentication, function (req, res) { //yep!
         console.log("share node: " + req.body._id + " mail: " + req.body.sceneShareWithPeople);
 
             var emails = req.body.sceneShareWithPeople;
-            var emailSplit = emails.split(",");
+            if (emails.includes(",")) {
+                var emailSplit = emails.split(",");
+            } else {
+                emailSplit = emails;
+            }
             // emailSplit.forEach(element => {
             //     if (!validator.isEmail) {
             //         res.end("bad bmail!");
@@ -19186,6 +19191,12 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
 
                 function (callback) {
                     let settings = {};  //TODO move this lower down? 
+                    settings._id = sceneResponse._id;
+                    settings.sceneTitle = sceneResponse.sceneTitle;
+                    settings.sceneKeynote = sceneResponse.sceneKeynote;
+                    settings.sceneDescription = sceneResponse.sceneDescription;
+                    settings.sceneEventStart = sceneResponse.sceneEventStart;
+                    settings.sceneEventEnd = sceneResponse.sceneEventEnd;
                     settings.hideAvatars = false;
                     settings.sceneColor1 = sceneResponse.sceneColor1;
                     settings.sceneColor2 = sceneResponse.sceneColor2;

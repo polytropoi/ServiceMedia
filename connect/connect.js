@@ -806,6 +806,7 @@ function tcheck () {
                      socket.connect(socketHost);
                   }
                }
+          
                //socket.connect(socketHost);
             // }
          }
@@ -1417,7 +1418,7 @@ function shallowEqual(object1, object2) {
 //     UpdateContentBox();
 //     document.getElementById("chat_input").value = "";
 // });
-function SendMessage() {
+function SendChatMessage() {
    var message = $('#chat_input').val();
    if (message.length > 0) {
    message = $('<div>').text(message).html(); //sanitize with wierd jquery fu
@@ -1428,6 +1429,72 @@ function SendMessage() {
    UpdateContentBox();
    document.getElementById("chat_input").value = "";
    }
+}
+function ValidateEmail(mail) 
+{
+ if (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(mail))
+  {
+    return (true)
+  }
+    alert("You have entered an invalid email address!")
+    return (false)
+}
+function SendInvitation() {
+   if (!userData.isGuest) {
+      let data = {};
+      let inviteEmail = document.getElementById("email_input").value;
+      let inviteMessage = document.getElementById("chat_input").value;
+      if (inviteEmail != null && ValidateEmail(inviteEmail)) {
+         data.sceneShareWithPeople = [];
+         
+         data.sceneShareWithPeople.push(inviteEmail);
+         
+         data.sceneShareWithMessage = inviteMessage;
+         data.sceneTitle = settings.sceneTitle;
+         data.sceneKeynote = settings.sceneKeynote;
+         data.sceneDescription = settings.sceneDescription;
+         data.short_id = room;
+         data.sceneEventStart = settings.sceneEventStart;
+         data.sceneEventEnd = settings.sceneEventEnd;
+         data.sceneAccessLinkExpire = settings.sceneAccessLinkExpire;
+         data._id = settings._id;
+         console.log(JSON.stringify(data));
+         var xhr = new XMLHttpRequest();
+         xhr.open("POST", '/share_scene/', true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.send(JSON.stringify(data));
+            xhr.onload = function () {
+               // do something to response
+               document.getElementById("emailContainer").innerHTML = "Invitation Sent!";
+               console.log(this.responseText);
+               if (this.responseText.includes("Invitations sent: ")) {
+                 console.log("sent!"); 
+              } else {
+               console.log("not sent!");
+              }
+            };
+      }
+   }
+   // axios.post('/share_scene/', data)
+   //     .then(function (response) {
+   //         console.log(response);
+   //        if (response.data.includes("Invitations sent: ")) {
+   //             // window.location.reload();
+   //             $("#topSuccess").html(response.data);
+   //             $("#topSuccess").show();
+   //         } else {
+   //             $("#topAlert").html(response.data);
+   //             $("#topAlert").show();
+   //         }
+   //     })                      
+   //     .catch(function (error) {
+   //         console.log(error);
+   //     });
+   // },
+   // cancel: function () {
+   //     $("#topAlert").html("Update cancelled");
+   //     $("#topAlert").show();
+   // }
 }
 
 function _arrayBufferToBase64( buffer ) {
@@ -1817,11 +1884,15 @@ function UpdatePrimaryAudioVolume(newVolume) {
 }
 function UpdateAmbientAudioVolume(newVolume) {
    var ambientAudioController = document.getElementById("ambientAudio").components.ambient_audio_control; 
+   if (ambientAudioController != null) {
    ambientAudioController.modVolume(newVolume);
+   }
 }
 function UpdateTriggerAudioVolume(newVolume) {
    var triggerAudioController = document.getElementById("triggerAudio").components.trigger_audio_control;
+   if (triggerAudioController != null) {
    triggerAudioController.modVolume(newVolume);
+   }
 }
 
 //////////////////////////////////////////////// move to primary-audio-control ... //no!

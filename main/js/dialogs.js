@@ -900,44 +900,49 @@ function GetUserInventory () {
     xhr.send();
     xhr.onload = function () {
       // do something to response
-      // console.log("inventory resp: " +this.responseText);
-      let inventoryObjs = JSON.parse(this.responseText);
-      // console.log("inventory: " +inventoryObj.inventoryItems[0].objectName);
-      userInventory = inventoryObjs;
-      if (inventoryObjs != undefined) {
-        let uniqueItems = [];
-        // let itemNames = {}
-        let itemCounts = {};
-        let itemNames = {};
+      console.log("inventory resp: " +this.responseText);
+      if (this.responseText != null && !this.responseText.toLowerCase().includes("no inventory found")) {
+        let inventoryObjs = JSON.parse(this.responseText);
+        // console.log("inventory: " +inventoryObj.inventoryItems[0].objectName);
+        userInventory = inventoryObjs;
+        if (inventoryObjs != undefined) {
+          let uniqueItems = [];
+          // let itemNames = {}
+          let itemCounts = {};
+          let itemNames = {};
 
-        for (let i = 0; i < inventoryObjs.inventoryItems.length; i++) {
-          if (!uniqueItems.includes(inventoryObjs.inventoryItems[i].objectID)) {
-            uniqueItems.push(inventoryObjs.inventoryItems[i].objectID);
-            itemCounts[inventoryObjs.inventoryItems[i].objectID] = 1;
-            itemNames[inventoryObjs.inventoryItems[i].objectID] = inventoryObjs.inventoryItems[i].objectName;
-          } else {
-            itemCounts[inventoryObjs.inventoryItems[i].objectID] = itemCounts[inventoryObjs.inventoryItems[i].objectID] + 1;
-          }
-          if ( i == inventoryObjs.inventoryItems.length - 1 ) {
-            console.log("uniques : " + JSON.stringify(uniqueItems) + " counts : " + JSON.stringify(itemCounts) + " names : " + JSON.stringify(itemNames));
-            for (let u = 0; u < uniqueItems.length; u++) {
-              let buttonNameString = itemNames[uniqueItems[u]] + " (" + itemCounts[uniqueItems[u]]+ ")";
-              console.log("buttonNameStirng: " + buttonNameString);
-              response = response + "<button class=\x22btnInventory\x22 onclick=\x22ShowInventoryItem('"+uniqueItems[u]+"')\x22>"+buttonNameString+"</button>";
-              inventoryDisplayEl.innerHTML = response;
+          for (let i = 0; i < inventoryObjs.inventoryItems.length; i++) {
+            if (!uniqueItems.includes(inventoryObjs.inventoryItems[i].objectID)) {
+              uniqueItems.push(inventoryObjs.inventoryItems[i].objectID);
+              itemCounts[inventoryObjs.inventoryItems[i].objectID] = 1;
+              itemNames[inventoryObjs.inventoryItems[i].objectID] = inventoryObjs.inventoryItems[i].objectName;
+            } else {
+              itemCounts[inventoryObjs.inventoryItems[i].objectID] = itemCounts[inventoryObjs.inventoryItems[i].objectID] + 1;
             }
-            
-          }
+            if ( i == inventoryObjs.inventoryItems.length - 1 ) {
+              console.log("uniques : " + JSON.stringify(uniqueItems) + " counts : " + JSON.stringify(itemCounts) + " names : " + JSON.stringify(itemNames));
+              for (let u = 0; u < uniqueItems.length; u++) {
+                let buttonNameString = itemNames[uniqueItems[u]] + " (" + itemCounts[uniqueItems[u]]+ ")";
+                console.log("buttonNameStirng: " + buttonNameString);
+                response = response + "<button class=\x22btnInventory\x22 onclick=\x22ShowInventoryItem('"+uniqueItems[u]+"')\x22>"+buttonNameString+"</button>";
+                inventoryDisplayEl.innerHTML = response;
+              }
+              
+            }
 
-          
-          // response = response + "<a href=\x22\x22>"+inventoryObjs.inventoryItems[i].objectTitle + "</p>";
-          // response = response +"<button class=\x22btn\x22 style=\x22padding: 5px; margin: 5px\x22 onclick=\x22ShowInventoryItem('"+inventoryObjs.inventoryItems[i].objectID+"')\x22>"+inventoryObjs.inventoryItems[i].objectName + "</button>";
-          // console.log(response);
+            
+            // response = response + "<a href=\x22\x22>"+inventoryObjs.inventoryItems[i].objectTitle + "</p>";
+            // response = response +"<button class=\x22btn\x22 style=\x22padding: 5px; margin: 5px\x22 onclick=\x22ShowInventoryItem('"+inventoryObjs.inventoryItems[i].objectID+"')\x22>"+inventoryObjs.inventoryItems[i].objectName + "</button>";
+            // console.log(response);
+          }
         }
+        // console.log("user inventory response " + response);
       }
-      // console.log("user inventory response " + response);
-      
     };
+    let inviteInput = document.getElementById("emailContainer");
+    if (inviteInput != null) {
+       inviteInput.style.display = "block";
+    }
   } else {
     inventoryDisplayEl.innerHTML = "You must be <a href=\x22../main/login.html\x22>logged in</a> to access your inventory";
   }
@@ -1179,14 +1184,15 @@ function SceneManglerModal(mode) {
     "<div "+messagesDisplay+" id=\x22Messages\x22 class=\x22modalMain tabcontent\x22>"+
       // "<form id=\x22form\x22 id=\x22chat_form\x22>"+
       // "<span style=\x22float: left;\x22><h4>Message:</h4></span><span style=\x22float: left;\x22 id=\x22users\x22>"+stringRoomUsers+"</span>"+
-      "<input class=\x22email_input\x22 type=\x22email\x22 placeholder=\x22email to invite\x22></input><button class=\x22saveButton\x22 id=\x22sendInvitationButton\x22 onclick=\x22SendInvitation()\x22>Send Invitation</button><br>"+
+      "<div id=\x22emailContainer\x22 style=\x22display: none;\x22><input class=\x22email_input\x22 id=\x22email_input\x22  type=\x22email\x22 placeholder=\x22Email to invite\x22></input>"+
+      "<button class=\x22saveButton\x22 id=\x22sendInvitationButton\x22 onclick=\x22SendInvitation()\x22>Send Invitation</button></div><br>"+
       // "<button class=\x22infoButton\x22 id=\x22sendMessageButton\x22><a href=\x22mailto:"+room+"@servicemedia.net\x22>Send Email</a></button>"+
-
+      "<textarea class=\x22chat_input\x22 id=\x22chat_input\x22 type=\x22textarea\x22 style=\x22font-size:10pt;rows:4;cols:200;\x22 placeholder=\x22Message...\x22></textarea><br><br>"+
       "<br><span style=\x22float: left;\x22 id=\x22users\x22>"+stringRoomUsers+"</span>"+
 
-      "<button class=\x22saveButton\x22 id=\x22sendMessageButton\x22 onclick=\x22SendMessage()\x22>Send Chat</button><br>"+
+      "<button class=\x22saveButton\x22 id=\x22sendMessageButton\x22 onclick=\x22SendChatMessage()\x22>Send Chat</button><br>"+
       
-      "<textarea class=\x22chat_input\x22 id=\x22chat_input\x22 type=\x22textarea\x22 style=\x22font-size:10pt;rows:4;cols:200;\x22 placeholder=\x22New Chat Message...\x22></textarea><br><br>"+
+
       // "</form>"+
       "<div class=\x22\x22 id=\x22future\x22></div><br><br><br><br>" +
       "<p>scene mailbox: <a style=\x22color: lightblue;\x22 href=\x22mailto:"+room+"@servicemedia.net\x22>"+room+"@servicemedia.net</a></p>"+

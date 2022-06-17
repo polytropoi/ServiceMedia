@@ -4028,7 +4028,7 @@ AFRAME.registerComponent('mod_model', {
               textIndex = 0;
             }
           }
-          if (this.data.eventData.toLowerCase().includes("audiotrigger")) {
+          if (this.data.eventData != undefined && this.data.eventData != null && this.data.eventData.toString().toLowerCase().includes("audiotrigger")) {
 
             if (this.triggerAudioController != null) {
               this.triggerAudioController.components.trigger_audio_control.playAudio();
