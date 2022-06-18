@@ -413,7 +413,7 @@
     function keyValues (response) { //utility function
         var kvString = "";
         for (var value in response) {
-        kvString += "<p>" + value + " : " + response[value] + "</p>";
+        kvString += "<p>" + value + " : " + response[value] + "</p><br>";
         }
         return kvString;
     }
@@ -9286,35 +9286,37 @@ function showGroup() {
         var sevenDaysAgo = Date.parse(new Date(currentDate.setDate(currentDate.getDate() - 7)));
         var yesterday = Date.parse(new Date(new Date().getTime() - (24 * 60 * 60 * 1000)));
         console.log("The One week ago date="+sevenDaysAgo);
-
-        for (let i = 0; i < response.data.activities.length; i++) {
-            console.log(JSON.stringify(response.data.activities[i]));
-            for (var o in response.data.activities[i]) {
+        var reversedActivities = response.data.activities.reverse();
+        for (let i = 0; i < reversedActivities.length; i++) {
+            console.log(JSON.stringify(reversedActivities[i]));
+            for (var o in reversedActivities[i]) {
 
                 if (o == "wasSentEmail") {
-                    console.log(response.data.activities[i][o].split("_")[0] + " vs " + sevenDaysAgo);
+                    console.log(reversedActivities[i][o].split("_")[0] + " vs " + sevenDaysAgo);
                     mailCountTotal++;
-                    if (response.data.activities[i][o].split("_")[0] > sevenDaysAgo) {
+                    if (reversedActivities[i][o].split("_")[0] > sevenDaysAgo) {
                         mailCountLastWeek++;
                     }
-                    if (response.data.activities[i][o].split("_")[0] > yesterday) {
+                    if (reversedActivities[i][o].split("_")[0] > yesterday) {
                         mailCountLast24++;
                     }
 
                     // let mailDeets = {};
-                    // mailDeets.sentBy = response.data.activities[i][o].split("_")[0];
-                    // mailDeets.sentDate = response.data.activities[i][o].split("_")[1];
+                    // mailDeets.sentBy = reversedActivities[i][o].split("_")[0];
+                    // mailDeets.sentDate = reversedActivities[i][o].split("_")[1];
                     // console.log("maildeet" + JSON.stringify(mailDeets));
                     
                 }
                 //bracket notation on the array element convert
-                activities += o + " | " + response.data.activities[i][o].split("_")[1] + " | " + convertTimestamp(response.data.activities[i][o].split("_")[0]/1000) + " | " + response.data.activities[i][o].split("_")[2] + "<br>";
+                activities += o + " | " + reversedActivities[i][o].split("_")[1] + " | " + convertTimestamp(reversedActivities[i][o].split("_")[0]/1000) + " | " + reversedActivities[i][o].split("_")[2] + "<br>";
+                
                 console.log ("activitiy" + o);
             }
            
         }
+        
         $("#cards").show();
-   
+        
         var card = "<div class=\x22col-lg-12\x22>" +
         "<div class=\x22card shadow mb-4\x22>" +
             "<div class=\x22card-header py-3 d-flex flex-row align-items-center justify-content-between\x22>" +
@@ -9384,7 +9386,7 @@ function showGroup() {
             "</div>" +
             "<div class=\x22col form-group col-md-12\x22>" +
 
-                    "<label for=\x22tags\x22>activities</label>" +
+                    "<label for=\x22tags\x22>activities</label><br>" +
                     activities +
             "</div>" +
             "<div class=\x22form-row\x22>" +
@@ -9395,7 +9397,7 @@ function showGroup() {
             "</div>" +
             "</div>" +
             "</div>" +
-                "<h5 class=\x22mt-0\x22>User Data</h5><br><br>" +
+                "<h5 class=\x22mt-0\x22>Person Data</h5><br><br>" +
                 keyValues(response.data) +
                 
                 "</div>" +

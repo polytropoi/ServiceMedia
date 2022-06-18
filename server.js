@@ -5241,12 +5241,13 @@ app.get('/invitation_check/:hzch', function (req, res) { //called from /landing/
     }
 
     db.invitations.findOne({"invitationHash": hash}, function (err, invitation) {
+        var timestamp = Math.round(Date.now() / 1000);
         if (err || !invitation) {
             console.log("did not find invitation: " + err);
             res.send("not found");
         } else {
-            console.log("invitation check:" + JSON.stringify(invitation));
-            var timestamp = Math.round(Date.now() / 1000);
+            // console.log("invitation check:" + JSON.stringify(invitation));
+           
             var pin = Math.random().toString().substr(2,6); //hrm...
             if (timestamp < invitation.invitationTimestamp + 36000) { //expires in 10 hour! //TODO access window start and end timestamps
                 console.log("timestamp checks out!" + JSON.stringify(invitation));
@@ -5271,8 +5272,16 @@ app.get('/invitation_check/:hzch', function (req, res) { //called from /landing/
                 console.log("expired link");
                 res.send("expired_"+invitation.invitedToSceneShortID); //send back sceneID, to allow invite request
             }
+
+            let action = {};
+
+            action.emailButtonClicked = timestamp + "_" + invitation._id + "_" + invitation.invitedToSceneShortID;
+         
+            db.people.updateOne( { "email": invitation.sentToEmail }, {$set: {accountStatus : "Email Verified", lastUpdate: timestamp}}, {$addToSet: {'activities': action}});
+
         }
-        db.people.updateOne( { "email": invitation.sentToEmail }, { $set: {accountStatus : "Email Verified"}});
+     
+       
     });
     
 });
@@ -5929,6 +5938,7 @@ app.post('/share_scene/', requiredAuthentication, function (req, res) { //yep!
     var emailsFinal = [];
     var emailSplit = [];
     var emailsNotSent = [];
+    let thePerson = {};
     async.waterfall([
 
         function(callback) {
@@ -5998,6 +6008,7 @@ app.post('/share_scene/', requiredAuthentication, function (req, res) { //yep!
                             res.end();
                             callbackz();
                             } else {
+                                thePerson = saved;
                                 var person_id = saved._id.toString();
                                 var pursoner = {};
                                 console.log('new person created, id: ' + person_id);
@@ -6013,6 +6024,7 @@ app.post('/share_scene/', requiredAuthentication, function (req, res) { //yep!
                         if (person.activities == undefined) {
                             person.activities = [];
                         }
+                        thePerson = person;
                         let action = {};
                         if (person.accountStatus != undefined && (person.accountStatus.toString().toLowerCase().includes("blacklist") || person.accountStatus.toString().toLowerCase().includes ("banned"))) {
                             console.log("opt out global for " + email);
@@ -6076,7 +6088,7 @@ app.post('/share_scene/', requiredAuthentication, function (req, res) { //yep!
                         } else {
                             db.users.updateOne( { "_id": ObjectID(uid) }, { $addToSet: {people : person._id}}); //addToSet should add array if not present, but prevent dupes (!?)
                             
-                            console.log("tryna add a person " + person._id + " to " + req.session.user._id); //TODO add sentMailTo activity to user action inventory
+                            console.log("tryna add a person " + person._id + " to user" + req.session.user._id); //TODO add sentMailTo activity to user action inventory
                                     // if (user.activitiesID != undefined && user.activitiesID != null) {
                                     //     console.log("updati9ng acvitiiies record" + user.activitiesID);
                                     //     var a_id = ObjectID(user.activitiesID);
@@ -6266,7 +6278,7 @@ app.post('/share_scene/', requiredAuthentication, function (req, res) { //yep!
                 var message = "";
                 var restrictToEventMessage = eventData.restrictToEvent ? "<br>Access is restricted to the event time" : "";
                 var restrictToLocationMessage = eventData.restrictToLocation ? "<br>Access is restricted to the event location<br>" : "";
-               
+                var isNotPublicMessage = "";
                 var app_link = "servicemedia://scene?" + req.body.short_id;
                
                 if (req.body.sceneShareWithMessage === "" || req.body.sceneShareWithMessage == null) {
@@ -6287,41 +6299,42 @@ app.post('/share_scene/', requiredAuthentication, function (req, res) { //yep!
                     message += "<strong>Event end: " + datetimeString.toLocaleString([], { hour12: true})  + "</strong><br>";
                 }
                 message += geoLinks;
-                if (theScene.sceneShareWithPublic) {
+                            // if (theScene.sceneShareWithPublic) {
 
-                    var htmlbody = req.session.user.userName + message + "</h3><hr>" +
-                        "<a href='"+ requestProtocol + "://" + req.headers.host + "/webxr/" + req.body.short_id+"' target='_blank'>" +
-                        "<button style='font-family: Arial, Helvetica, sans-serif;  font-size: 18px; background-color: blue; color: white; border-radius: 8px; margin: 10px; padding: 10px;'>"+
-                        "Click here to access this scene!</a></button><br>" +
-                        "<br> <a href='"+ requestProtocol + "://" + req.headers.host + "/webxr/" + req.body.short_id+"' target='_blank'><img src=" + urlHalf + "></a> " +
-                        "<br> Scene Title: " + req.body.sceneTitle +
-                        "<br> Scene Short ID: " + req.body.short_id +
-                        "<br> Scene Keynote: " + theScene.sceneKeynote +
-                        "<br> Scene Description: " + theScene.sceneDescription +
-                        "<br> Owner: " + theScene.userName +
-                        "<br><br><strong><a href='"+ requestProtocol + "://" + req.headers.host + "/qrcode/" + req.body.short_id + "'>Click here to scan QR Code for this scene</a></strong>" +
-                        "<br> For more scenes like this, or to get the latest app, visit <a href='https://servicemedia.net'>ServiceMedia.net!</a> ";
-                    ses.sendEmail( {
-                            Source: from,
-                            Destination: { ToAddresses: to, BccAddresses: bcc},
-                            Message: {
-                                Subject: {
-                                    Data: subject
-                                },
-                                Body: {
-                                    Html: {
-                                        Data: htmlbody
-                                    }
-                                }
-                            }
-                        }
-                        , function(err, data) {
-                            if(err) throw err
-                            console.log('Email sent:');
-                            console.log(data);
-                        });
-                    callbackzz();
-                } else {
+                            //     var htmlbody = req.session.user.userName + message + "</h3><hr>" +
+                                   
+                            //         "<button style='font-family: Arial, Helvetica, sans-serif;  font-size: 18px; background-color: blue; color: white; border-radius: 8px; margin: 10px; padding: 10px;'>"+
+                            //         "<a href='"+ requestProtocol + "://" + req.headers.host + "/webxr/" + req.body.short_id+"'?pn=" + thePerson._id + " target='_blank'>" +
+                            //         "Click here to access this scene!</a></button><br>" +
+                            //         "<br> <a href='"+ requestProtocol + "://" + req.headers.host + "/webxr/" + req.body.short_id+"'?pn=" + thePerson._id + "target='_blank'><img src=" + urlHalf + "></a> " +
+                            //         "<br> Scene Title: " + req.body.sceneTitle +
+                            //         "<br> Scene Short ID: " + req.body.short_id +
+                            //         "<br> Scene Keynote: " + theScene.sceneKeynote +
+                            //         "<br> Scene Description: " + theScene.sceneDescription +
+                            //         "<br> Owner: " + theScene.userName +
+                            //         "<br><br><strong><a href='"+ requestProtocol + "://" + req.headers.host + "/qrcode/" + req.body.short_id + "'>Click here to scan QR Code for this scene</a></strong>" +
+                            //         "<br> For more scenes like this, or to get the latest app, visit <a href='https://servicemedia.net'>ServiceMedia.net!</a> ";
+                            //     ses.sendEmail( {
+                            //             Source: from,
+                            //             Destination: { ToAddresses: to, BccAddresses: bcc},
+                            //             Message: {
+                            //                 Subject: {
+                            //                     Data: subject
+                            //                 },
+                            //                 Body: {
+                            //                     Html: {
+                            //                         Data: htmlbody
+                            //                     }
+                            //                 }
+                            //             }
+                            //         }
+                            //         , function(err, data) {
+                            //             if(err) throw err
+                            //             console.log('Email sent:');
+                            //             console.log(data);
+                            //         });
+                            //     callbackzz();
+                            // } else {
                     //TODO check user's auth?
                     // if (timestamp < user.resetTimestamp + 3600) { //expires in 1 hour!
                     bcrypt.genSalt(3, function(err, salt) { //level3 easy, not a password itself
@@ -6376,6 +6389,9 @@ app.post('/share_scene/', requiredAuthentication, function (req, res) { //yep!
                                 let datetimeString = new Date(req.body.sceneEventEnd);
                                 message += "<strong>Event end: " + datetimeString.toLocaleString([], { hour12: true})  + "</strong><br>";
                             }
+                            if (theScene.sceneShareWithPublic) { 
+                                isNotPublicMessage = "<br><strong>This is a private scene, intended only for subscribers or invited guests.</strong><br>";
+                            }
                             message += geoLinks;
                             var htmlbody = message +
                                 "<br> Scene Title: " + req.body.sceneTitle +
@@ -6383,10 +6399,10 @@ app.post('/share_scene/', requiredAuthentication, function (req, res) { //yep!
                                 "<br> Keynote: " + theScene.sceneKeynote +
                                 "<br> Description: " + theScene.sceneDescription +
                                 "<br> Owner: " + theScene.userName +
-                                "<br><strong>This is a private scene, intended only for subscribers or invited guests.</strong><br>" +
+                                isNotPublicMessage +
                                 "<a href='"+ requestProtocol + "://" + req.headers.host + "/landing/invite.html?iv=" + cleanhash + "' target='_blank'>" +
                                 "<button style='font-family: Arial, Helvetica, sans-serif;  font-size: 18px; background-color: blue; color: white; border-radius: 8px; margin: 10px; padding: 10px;'>" +
-                                "Click here to authenticate your access!</a></button><br>" +
+                                "Click here to access this scene!</a></button><br>" +
                                 "<br> <img src=" + urlHalf + "> " +
                                 "<br> For more info, or to become a subscriber, visit <a href='https://servicemedia.net'>ServiceMedia.net!</a> ";
 
@@ -6413,7 +6429,7 @@ app.post('/share_scene/', requiredAuthentication, function (req, res) { //yep!
                         });
                     });
                     callbackzz();
-                }
+                // }
 
             }, function(err) {
                
@@ -16173,6 +16189,10 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                 accessScene = true;
                                 avatarName = invitation.sentToEmail.toString().split('@')[0];
                                 console.log("pin checks out!!");
+                                let action = {};
+
+                                action.invitationSceneAccess = (timestamp * 1000) + "_" + invitation._id + "_" + invitation.invitedToSceneShortID;
+                                db.people.updateOne({"_id": ObjectID(invitation.sentToPersonID)}, {$addToSet: {activities: action}});
                                 // db.invitations.update ( { pin: pin }, { $set: { pinTimeout : ''} }); //burn after reading once! //nm, just sniff the timestamp
                                 callback(null);
                             }
@@ -16190,21 +16210,16 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                 },
                 function (callback) {
                 if (sceneData.sceneTags != null) {        
-                    for (let i = 0; i < sceneData.sceneTags.length; i++) { //not ideal, but it's temporary...
+                    for (let i = 0; i < sceneData.sceneTags.length; i++) { //not ideal, but it's temporary... //no it isn't
                         if (sceneData.sceneTags[i].toLowerCase().includes("debug")) {
                             debugMode = true;
                         }
                         if (sceneData.sceneTags[i].toLowerCase().includes("physics")) {
 
-                            // physicsScripts = "<script src=\x22http://kripken.github.io/ammo.js/builds/ammo.wasm.js\x22></script>"+
-                            // "<script src=\x22../main/ref/aframe/dist/aframe-physics-system.js\x22></script>";
+                          
                             physicsScripts =  "<script src=\x22https://mixedreality.mozilla.org/ammo.js/builds/ammo.wasm.js\x22></script>"+
                             "<script src=\x22../main/vendor/aframe/aframe-physics-system.min.js\x22></script>";
-                                                        // "<script src=\x22//cdn.jsdelivr.net/gh/n5ro/aframe-physics-system@v4.0.1/dist/aframe-physics-system.min.js\x22></script>";
-
-                                
-                            // physicsScripts = "<script src=\x22https://cdn.jsdelivr.net/npm/a-game@0.37.0/dist/a-game.min.js\x22></script>";
-
+                                                        
                         }
                         if (sceneData.sceneTags[i].toLowerCase().includes("instancing")) {
                             // console.log("GOTS SCENE TAG: " + sceneData.sceneTags[i]);

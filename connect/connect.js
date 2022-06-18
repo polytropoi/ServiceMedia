@@ -778,49 +778,58 @@ async function ShowEnableEthereumButton ()  {
 // }
 
 function tcheck () {
+   let pin = getParameterByName('p');
+   if (pin != null) {
+      console.log("GOTSA PIN!" + pin);
+
+   } // else {
    if (token != null) {
-   $.get( "/ami-rite-token/" + token, function( data ) {
-      // console.log("amirite : " + JSON.stringify(data));
-      
-      if (data == '0' || data == '1' || data == '3' || data == '1' || data == '4' || data == '5') {//all auth fails
-         // console.log("guest token");
-         if (socket != undefined) {
-            if (!socket.connected) {
-               socket.connect(socketHost);
+      $.get( "/ami-rite-token/" + token, function( data ) {
+         // console.log("amirite : " + JSON.stringify(data));
+         
+         if (data == '0' || data == '1' || data == '3' || data == '1' || data == '4' || data == '5') {//all auth fails
+            // console.log("guest token");
+            if (socket != undefined) {
+               if (!socket.connected) {
+                  socket.connect(socketHost);
+               }
+            }
+            userData.isGuest = true;
+            // if (getParameterByName('p') != null) {
+            //    console.log("GOTSA PIN!");
+            // }
+            // userData = data;
+         } else {
+            // let user = JSON.parse(data);
+         
+            // if (data.userID  > 1) {
+               if (data._id != null) {
+                  // console.log("gotsa user token" + JSON.stringify(data));
+                  // userid = data._id;
+                  avatarName = data.userName;
+                  userData = data;
+                  if (socket != undefined) {
+                     if (!socket.connected) {
+                        socket.connect(socketHost);
+                     }
+                  }
+            
+                  //socket.connect(socketHost);
+               // }
             }
          }
-         userData.isGuest = true;
-         // userData = data;
+
+               
+
+         // } else {
+         //    console.log("nurp");
+         // }
+      });
       } else {
-         // let user = JSON.parse(data);
-        
-         // if (data.userID  > 1) {
-            if (data._id != null) {
-               // console.log("gotsa user token" + JSON.stringify(data));
-               // userid = data._id;
-               avatarName = data.userName;
-               userData = data;
-               if (socket != undefined) {
-                  if (!socket.connected) {
-                     socket.connect(socketHost);
-                  }
-               }
-          
-               //socket.connect(socketHost);
-            // }
-         }
+         // window.location.href = './login.html';
+         console.log("notoken");
       }
-
-            
-
-      // } else {
-      //    console.log("nurp");
-      // }
-   });
-   } else {
-      // window.location.href = './login.html';
-      console.log("notoken");
-   }
+   // }
 }
 
 if (sceneEl != null) {
