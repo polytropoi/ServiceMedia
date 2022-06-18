@@ -9280,7 +9280,7 @@ function showGroup() {
         let mailCountLastWeek = 0;
         let mailCountTotal = 0;
         let dateRange = "";
-        let activities = "Activity | By/From | Date<br>";
+        let activities = "Activity | By/From | Date | Scene<br>";
         var currentDate = new Date();
         // console.log("The current Date="+currentDate);
         var sevenDaysAgo = Date.parse(new Date(currentDate.setDate(currentDate.getDate() - 7)));
@@ -9288,7 +9288,7 @@ function showGroup() {
         console.log("The One week ago date="+sevenDaysAgo);
 
         for (let i = 0; i < response.data.activities.length; i++) {
-
+            console.log(JSON.stringify(response.data.activities[i]));
             for (var o in response.data.activities[i]) {
 
                 if (o == "wasSentEmail") {
@@ -9308,7 +9308,7 @@ function showGroup() {
                     
                 }
                 //bracket notation on the array element convert
-                activities += o + " | " + response.data.activities[i][o].split("_")[1] + " | " + convertTimestamp(response.data.activities[i][o].split("_")[0]/1000) + "<br>";
+                activities += o + " | " + response.data.activities[i][o].split("_")[1] + " | " + convertTimestamp(response.data.activities[i][o].split("_")[0]/1000) + " | " + response.data.activities[i][o].split("_")[2] + "<br>";
                 console.log ("activitiy" + o);
             }
            
@@ -9352,6 +9352,7 @@ function showGroup() {
                         "<select class=\x22form-control\x22 id=\x22accountStatus\x22 required>" +
                         "<option value=\x22\x22 disabled selected>Select:</option>" +
                         "<option>Email Verified</option>" +
+                        // "<option>Email Validated</option>" + //dupe
                         "<option>Not Verified</option>" +
                         "<option>Blacklisted</option>" +
                         "<option>Demo</option>" +

@@ -43,8 +43,8 @@
         axios.get('/invitation_check/' + params)
             .then(function (response) {
                 let datetimes = "";
-                var zone = new Date().toLocaleTimeString('en-us',{timeZoneName:'short'}).split(' ')[2]
-// console.log(zone)Intl.DateTimeFormat().resolvedOptions().timeZone
+                var zone = new Date().toLocaleTimeString('en-us',{timeZoneName:'short'}).split(' ')[2];
+                // console.log(zone)Intl.DateTimeFormat().resolvedOptions().timeZone
                 if (response.data.toString().toLowerCase().includes("expired")) {
                     let shortID = response.data.toString().split('_')[1]; //expired returns "expired_sceneShortID"
                     main.innerHTML = "Sorry, that invitation has expired.<br>"+

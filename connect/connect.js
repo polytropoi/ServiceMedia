@@ -172,7 +172,6 @@ $(function() {
    }
    if (settings.audioGroups.triggerGroups.length > 0 || settings.audioGroups.ambientGroups.length > 0 || settings.audioGroups.primaryGroups.length > 0) {
       // audioGroupsEl = document.getElementById('audioGroupsEl');
-
       // if (audioGroupsEl != null) {
       //    let audioGroupsController = audioGroupsEl.components.audio_groups_control;
       //    if (audioGroupsController != null) {

@@ -5279,6 +5279,10 @@ app.get('/invitation_check/:hzch', function (req, res) { //called from /landing/
 app.post('/invitation_req/', function (req,res) {
     console.log("invite req " + JSON.stringify(req.body));
     let thePerson = null;
+    let referrer = req.headers['x-forwarded-for'] ||
+    req.connection.remoteAddress ||
+    req.socket.remoteAddress ||
+    req.connection.socket.remoteAddress;
     if (req.body.shortID != undefined && req.body.shortID.length > 4) {
         db.scenes.findOne({"short_id": req.body.shortID}, function (err, scene) {
             if (err ||!scene) {
@@ -5308,7 +5312,7 @@ app.post('/invitation_req/', function (req,res) {
                                             let action1 = {};
                                             let action2 = {};
                                             action1.createNewPerson = ts;
-                                            action2.requestedInvitation = ts + "_" + req.body.shortID + "_" + req.headers['x-forwarded-for'];
+                                            action2.requestedInvitation = ts + "_" + req.body.shortID + "_" + referrer;
                                             activities.push(action1);
                                             activities.push(action2); //bc they need to be separate array elements
                 
@@ -5331,7 +5335,7 @@ app.post('/invitation_req/', function (req,res) {
                                             if (person.activities == undefined) {
                                                 person.activities = [];
                                             }
-                                            action.requestedInvitation = ts + "_" + req.body.shortID + "_" + req.headers['x-forwarded-for'];
+                                            action.requestedInvitation = ts + "_" + req.body.shortID + "_" + referrer;
                                             person.activities.push(action);
                                             if (person.accountStatus == undefined) {
                                                 person.accountStatus = "Not Verified";
@@ -5923,6 +5927,8 @@ app.post('/share_scene/', requiredAuthentication, function (req, res) { //yep!
     let theScene = {};
     let ts = Date.now();
     var emailsFinal = [];
+    var emailSplit = [];
+    var emailsNotSent = [];
     async.waterfall([
 
         function(callback) {
@@ -5930,9 +5936,9 @@ app.post('/share_scene/', requiredAuthentication, function (req, res) { //yep!
 
             var emails = req.body.sceneShareWithPeople;
             if (emails.includes(",")) {
-                var emailSplit = emails.split(",");
+                emailSplit = emails.split(",");
             } else {
-                emailSplit = emails;
+                emailSplit.push(emails); //if there's only one
             }
             // emailSplit.forEach(element => {
             //     if (!validator.isEmail) {
@@ -5943,6 +5949,7 @@ app.post('/share_scene/', requiredAuthentication, function (req, res) { //yep!
             // emailSplit = emailSplit.filter(val => {
             //     return validator.isEmail;
             // });
+
             for (var m = 0; m < emailSplit.length; m++) {
                 emailSplit[m] = emailSplit[m].trim();
                 if (validator.isEmail(emailSplit[m]) == false){
@@ -5980,7 +5987,7 @@ app.post('/share_scene/', requiredAuthentication, function (req, res) { //yep!
                         person.email = email.trim();
                         person.activities = [];
                         let action = {};
-                        action.wasSentEmail = ts + "_" + uid + "_" + req.body.short_id;;
+                        action.wasSentEmail = ts + "_" + uid + "_" + req.body.short_id;
                         person.activities.push(action);
                         person.accountStatus = 'Not Verified';
                         person.contactStatus = 'Not Indicated';
@@ -5997,6 +6004,7 @@ app.post('/share_scene/', requiredAuthentication, function (req, res) { //yep!
                                 pursoner.personID = person_id;
                                 pursoner.email = email.trim();
                                 emailsFinal.push(pursoner);
+                                db.users.updateOne( { "_id": ObjectID(uid) }, { $addToSet: {people : person._id}});
                                 callbackz();
                                 }
                             });
@@ -6007,16 +6015,6 @@ app.post('/share_scene/', requiredAuthentication, function (req, res) { //yep!
                         }
                         let action = {};
                         if (person.accountStatus != undefined && (person.accountStatus.toString().toLowerCase().includes("blacklist") || person.accountStatus.toString().toLowerCase().includes ("banned"))) {
-                           
-                        } else if (person.accountStatus != undefined && (person.activities != undefined && person.activities.length > 3) && person.accountStatus.toString().toLowerCase().includes("not verified")) {
-                            action.sendEmailUnverified = ts + "_" + uid + "_" + req.body.short_id;
-                            person.activities.push(action);
-
-                            db.people.update( { "_id": person._id }, { $set: {
-                                lastUpdate : ts,
-                                activities : person.activities
-                            }});
-                        } else if (person.contactStatus != undefined && person.contactStatus.toString().toLowerCase().includes("opt out global")) {
                             console.log("opt out global for " + email);
                             action.sendEmailBlockedBlacklist = ts + "_" + uid+ "_" + req.body.short_id;
                             person.activities.push(action);
@@ -6025,6 +6023,33 @@ app.post('/share_scene/', requiredAuthentication, function (req, res) { //yep!
                                 lastUpdate : ts,
                                 activities : person.activities
                             }});
+                            emailsNotSent.push(person.email);
+                            // db.users.updateOne( { "_id": ObjectID(uid) }, { $addToSet: {people : person._id}});
+
+                            //TODO respond with message
+                            callbackz();
+                        } else if (person.accountStatus != undefined && (person.activities != undefined && person.activities.length > 3) && person.accountStatus.toString().toLowerCase().includes("not verified")) {
+                            action.sendEmailUnverified = ts + "_" + uid + "_" + req.body.short_id;
+                            person.activities.push(action);
+
+                            db.people.update( { "_id": person._id }, { $set: {
+                                lastUpdate : ts,
+                                activities : person.activities
+                            }});
+                            db.users.updateOne( { "_id": ObjectID(uid) }, { $addToSet: {people : person._id}});
+                            emailsNotSent.push(person.email);
+                            callbackz();
+                        } else if (person.contactStatus != undefined && person.contactStatus.toString().toLowerCase().includes("opt out global")) {
+                            console.log("opt out global for " + email);
+                            action.sendEmailBlockedOptOutGlobal = ts + "_" + uid+ "_" + req.body.short_id;
+                            person.activities.push(action);
+
+                            db.people.update( { "_id": person._id }, { $set: {
+                                lastUpdate : ts,
+                                activities : person.activities
+                            }});
+                            // db.users.updateOne( { "_id": ObjectID(uid) }, { $addToSet: {people : person._id}});
+                            emailsNotSent.push(person.email);
                             callbackz(); //do not add to emailsFinal!
                         } else {    
                             action.wasSentEmail = ts + "_" + uid+ "_" + req.body.short_id;
@@ -6039,8 +6064,10 @@ app.post('/share_scene/', requiredAuthentication, function (req, res) { //yep!
                             pursoner.personID = person._id;
                             pursoner.email = email.trim();
                             emailsFinal.push(pursoner);
+                            db.users.updateOne( { "_id": ObjectID(uid) }, { $addToSet: {people : person._id}});
                             callbackz();
                         }
+                        
                     }
                     //callback won't wait on this, but whatever...
                     db.users.findOne({"_id": ObjectID(uid)}, function (err, user) {
@@ -6122,6 +6149,9 @@ app.post('/share_scene/', requiredAuthentication, function (req, res) { //yep!
             });
 
         },
+        // function (eData, callback) {
+        //     callback(null, eData);
+        // },
         function (eData, callback) {
             if (eData.length > 0) {
             // let emailArray = eData;
@@ -6163,7 +6193,7 @@ app.post('/share_scene/', requiredAuthentication, function (req, res) { //yep!
             });
         } else {
             callback("no valid email!");
-            res.send("nothing sent - no valid email!");
+            res.send("nothing sent - invalid address(es): <br>" + emailsNotSent.toString() );
         }
         },
         function(urlHalf, eData, sceneData, callback) {
