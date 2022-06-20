@@ -64,17 +64,23 @@
         // console.log(data);  
         let button = document.getElementById("reqbutton");
 
-        button.addEventListener("click", (event) => {
+        button.addEventListener("click", (event) => {   
             event.preventDefault();
             if (ValidateEmail()) {
                 let data = {};
-                data.shortID = params;
+                data = {};
+
+
+                data.publicRequest = true;
+                // data.shortID = params;
+                data.short_id = params;
                 data.email = myForm.email.value;
                 console.log("tryna ax permessionz for" + params);
-                axios.post('../invitation_req/', data)
+                axios.post('../share_scene/', data)
                 .then(function (response) {
                     console.log(response.data);
-                    if (response.data.toString().toLowerCase().includes("invitation sent")) {
+                    
+                    if (response.data.toString().toLowerCase().includes("invitations sent")) {
                         main.innerHTML = "Thanks, an invitation was sent to your email!";
                     } else {
                         if (response.data.toString().toLowerCase().includes("not verified")) {

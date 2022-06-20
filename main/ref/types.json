@@ -565,9 +565,10 @@
         "Unknown"
     ],
     "actiontype" : [
-        "OnLoad",
         "Highlight",
         "Select",
+        "Send Email",
+        "OnLoad",
         "Collide",
         "Pickup",
         "Drop",

@@ -3710,6 +3710,7 @@
                         "<label for=\x22fontSelect\x22>Action Type</label>" + //FontSelect
                         "<select class=\x22form-control\x22 id=\x22actionTypeSelect\x22 required>" +
                             "<option value=\x22\x22 disabled selected>Select:</option>" +
+                            "<option>Email</option>" +
                             "<option>OnLoad</option>" +
                             "<option>Highlight</option>" +
                             "<option>Select</option>" +

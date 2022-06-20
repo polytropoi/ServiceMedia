@@ -1469,18 +1469,19 @@ function SendInvitation() {
          console.log(JSON.stringify(data));
          var xhr = new XMLHttpRequest();
          xhr.open("POST", '/share_scene/', true);
-            xhr.setRequestHeader('Content-Type', 'application/json');
-            xhr.send(JSON.stringify(data));
-            xhr.onload = function () {
-               // do something to response
-               document.getElementById("emailContainer").innerHTML = "Invitation Sent!";
-               console.log(this.responseText);
-               if (this.responseText.includes("Invitations sent: ")) {
-                 console.log("sent!"); 
-              } else {
+         xhr.setRequestHeader('Content-Type', 'application/json');
+         xhr.send(JSON.stringify(data));
+         xhr.onload = function () {
+            // do something to response
+            document.getElementById("emailContainer").innerHTML = "Invitation Sent!";
+            console.log(this.responseText);
+            if (this.responseText.includes("Invitations sent: ")) {
+               console.log("sent!"); 
+            } else {
                console.log("not sent!");
-              }
-            };
+               document.getElementById("emailContainer").innerHTML = this.responseText;
+            }
+         };
       }
    }
    // axios.post('/share_scene/', data)
