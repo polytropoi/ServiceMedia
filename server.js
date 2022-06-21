@@ -6285,7 +6285,7 @@ app.post('/share_scene/', function (req, res) { //yep! //make it public?
         }
         },
         function(urlHalf, eData, sceneData, callback) {
-            console.log("scene locations " +JSON.stringify(sceneData.sceneLocations));
+            // console.log("scene locations " +JSON.stringify(sceneData.sceneLocations));
             let geoLinks = "";
             let eventData = {};
             for (let i = 0; i < sceneData.sceneLocations.length; i++) {
