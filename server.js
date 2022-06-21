@@ -5276,12 +5276,12 @@ app.get('/invitation_check/:hzch', function (req, res) { //called from /landing/
 
             let action = {};
             // console.log("opt out global for " + email);
-            action.actionID = emailActionID;
+            // action.actionID = emailActionID;
             action.actionName = "Invitation Click"
             action.actionType = "OnLoad"
             action.actionResult = "Invitation Button Clicked";
             action.timestamp = timestamp;
-            action.userID = ObjectID(uid);
+            // action.userID = uid
         
             action.emailAddressTo = invitation.sentToEmail;
             action.fromScene = invitation.invitedToSceneShortID;
@@ -5953,7 +5953,11 @@ app.post('/share_scene/', function (req, res) { //yep! //make it public?
     var emailsNotSent = [];
     let thePerson = {};
     let emailActionID = "";
-    
+    var ip = req.headers['x-forwarded-for'] ||
+    req.connection.remoteAddress ||
+    req.socket.remoteAddress ||
+    req.connection.socket.remoteAddress;
+
     async.waterfall([
 
         function(callback) {
@@ -6019,10 +6023,12 @@ app.post('/share_scene/', function (req, res) { //yep! //make it public?
         },
 
         function(emailSplit, callback){ //build temp array of objex with email + peopleID
-            
-            var uid = req.session.user._id.toString();
-            console.log("tryna mail to " );
-            
+
+            var uid = ip;
+            if (req.session.user != undefined) {
+                uid = ObjectID(req.session.user._id.toString());
+            }
+            console.log("tryna mail to " +uid);
             async.each (emailSplit, function (email, callbackz) {
 
                 // db.people.findOne({ $and: [ {userID: uid}, {email: email.trim()} ]}, function(err, person) {
@@ -6031,10 +6037,12 @@ app.post('/share_scene/', function (req, res) { //yep! //make it public?
                         
                         console.log("did not find that person : " + err);
                         var person = {};
-                        person.userID = req.session.user._id.toString();
-                        person.dateCreated = ts
+                        if (req.session.user) {
+                            person.userID = req.session.user._id.toString();
+                        }
+                        person.dateCreated = ts;
                         person.email = email.trim();
-                        person.activities = [];
+                        // person.activities = [];
                         let action = {};
                         action.wasSentEmail = ts + "_" + uid + "_" + req.body.short_id;
                         person.activities.push(action);
@@ -6072,7 +6080,7 @@ app.post('/share_scene/', function (req, res) { //yep! //make it public?
                             action.actionType = "Send Email"
                             action.actionResult = "Not Sent - Blacklist";
                             action.timestamp = ts;
-                            action.userID = ObjectID(uid);
+                            action.userID = uid
                         
                             action.targetPersonID = person._id;
                             action.emailAddressTo = person.email;
@@ -6106,7 +6114,7 @@ app.post('/share_scene/', function (req, res) { //yep! //make it public?
                             action.actionType = "Send Email"
                             action.actionResult = "Not Sent - Not Verified";
                             action.timestamp = ts;
-                            action.userID = ObjectID(uid);
+                            action.userID = uid
                         
                             action.targetID = person._id;
                             action.emailAddressTo = person.email;
@@ -6133,7 +6141,7 @@ app.post('/share_scene/', function (req, res) { //yep! //make it public?
                             action.actionType = "Send Email"
                             action.actionResult = "Not Sent - Global Opt Out";
                             action.timestamp = ts;
-                            action.userID = ObjectID(uid);
+                            action.userID = uid
                         
                             action.targetID = person._id;
                             action.emailAddressTo = person.email;
@@ -6156,7 +6164,7 @@ app.post('/share_scene/', function (req, res) { //yep! //make it public?
                             action.actionType = "Send Email"
                             action.actionResult = "Sent Email";
                             action.timestamp = ts;
-                            action.userID = ObjectID(uid);
+                            action.userID = uid
                         
                             action.targetID = person._id;
                             action.emailAddressTo = person.email;
@@ -6169,23 +6177,26 @@ app.post('/share_scene/', function (req, res) { //yep! //make it public?
                             pursoner.personID = person._id;
                             pursoner.email = email.toString().trim();
                             emailsFinal.push(pursoner);
-                            db.users.updateOne( { "_id": ObjectID(uid) }, { $addToSet: {people : person._id}});
+                            if (req.session.user) {
+                                db.users.updateOne( { "_id": uid }, { $addToSet: {people : person._id}});
+                            }
                             callbackz();
                         }
                         
                     }
                     //callback won't wait on this, but whatever...
-                    db.users.findOne({"_id": ObjectID(uid)}, function (err, user) {
-                        if (err ||!user) {
-                            console.log("HEYWTF! caint find user " +req.session.user._id + " ...call the police!");
-                        } else {
-                            db.users.updateOne( { "_id": ObjectID(uid) }, { $addToSet: {people : person._id}}); //addToSet should add array if not present, but prevent dupes (!?)
-                            
-                            console.log("tryna add a person " + person._id + " to user" + req.session.user._id); //TODO add sentMailTo activity to user action inventory
-       
-                        }
-                    });
-                  
+                    if (req.session.user) {
+                        db.users.findOne({"_id": ObjectID(uid)}, function (err, user) {
+                            if (err ||!user) {
+                                console.log("HEYWTF! caint find user " +req.session.user._id + " ...call the police!");
+                            } else {
+                                db.users.updateOne( { "_id": ObjectID(uid) }, { $addToSet: {people : person._id}}); //addToSet should add array if not present, but prevent dupes (!?)
+                                
+                                console.log("tryna add a person " + person._id + " to user" + req.session.user._id); //TODO add sentMailTo activity to user action inventory
+        
+                            }
+                        });
+                    }
                     });
                 
 
@@ -6218,22 +6229,25 @@ app.post('/share_scene/', function (req, res) { //yep! //make it public?
                     let urlHalf = "";
                     if (scene.sceneShareWithGroups != undefined && scene.sceneShareWithGroups != null) {
                         if (scene.sceneShareWithGroups.toString().toLowerCase().includes("disallow all")) {
-                            
+                            callback("nope - invitations disallowed");
+                            let action = {};
                             console.log("invitations not allowed for this scene " + req.body.short_id);
                             action.actionID = emailActionID;
                             action.actionName = "Not Sent - Scene Disallowed";
                             action.actionType = "Send Email";
                             action.actionResult = "Not Sent - Scene Disallowed";
                             action.timestamp = ts;
-                            action.userID = ObjectID(uid);
-                        
+                            if (req.session.user) {
+                                action.userID = ObjectID(req.session.user._id);
+                            }
                             action.targetPersonID = thePerson._id;
                             action.emailAddressTo = thePerson.email;
                             action.fromScene = req.body.short_id;
                             // action.data = req.body.sceneShareWithMessage;
                             
                             db.activities.insertOne(action);
-                            callback("nope - invitations disallowed");
+                            res.send("invitations disallowed for this scene");
+                           
                         } else {
                             if (scene.scenePostcards != null && scene.scenePostcards.length > 0) {
                                 var oo_id = ObjectID(scene.scenePostcards[0]); //TODO randomize? or ensure latest?  or use assigned default?
@@ -6384,6 +6398,13 @@ app.post('/share_scene/', function (req, res) { //yep! //make it public?
                             // } else {
                     //TODO check user's auth?
                     // if (timestamp < user.resetTimestamp + 3600) { //expires in 1 hour!
+                    // let sentByUserID = 
+                    // if (req.session.user) {
+
+                    // } else {
+                    //     sentByUserID: req.session.user._id.toString(),
+                    //     sentByUserEmail: adminEmail,
+                    // }
                     bcrypt.genSalt(3, function(err, salt) { //level3 easy, not a password itself
                         bcrypt.hash(timestamp.toString(), salt, null, function(err, hash) {
                             // reset = hash;
@@ -6400,9 +6421,9 @@ app.post('/share_scene/', function (req, res) { //yep! //make it public?
                                 sceneAccessLinkExpire: theScene.sceneAccessLinkExpire,
                                 sceneRestrictToEvent: eventData.restrictToEvent,
                                 sceneRestrictToLocation: eventData.restrictToLocation,
-                                sentByUserName: req.session.user.userName,
-                                sentByUserID: req.session.user._id.toString(),
-                                sentByUserEmail: req.session.user.email.toString(),
+                                sentByUserName: req.session.user ? req.session.user.userName.toString() : ip,
+                                sentByUserID: req.session.user ? req.session.user._id.toString() : "",
+                                sentByUserEmail: req.session.user ? req.session.user.email.toString() : adminEmail,
                                 sentToEmail: to,
                                 sentToPersonID: data.personID,
                                 invitationHash: cleanhash,
