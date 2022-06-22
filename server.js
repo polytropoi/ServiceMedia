@@ -2359,20 +2359,31 @@ app.get('/profile/:_id', requiredAuthentication, usercheck, function (req, res) 
             async.waterfall([
 
                     function (callback) {
-                        if (user.activitiesID != undefined && user.activitiesID != null) {
-                            let a_id = ObjectID(user.activitiesID); 
-                            db.activities.find({"_id": a_id}, function (err, activities) {
+                        // if (user.activitiesID != undefined && user.activitiesID != null) {
+                            db.activities.find({userID: u_id}, function(err, activities){
                                 if (err || !activities) {
                                     console.log("no activities");
-    //                                      res.json(profileResponse);
+                                    // res.json(profileResponse);
                                     callback();
                                 } else {
-                                    // console.log("user activitiesw: " + JSON.stringify(activities));
-                                    profileResponse.activity = activities;
+                                    // console.log("activieis: " + JSON.stringify(activities)); 
+                                    profileResponse.activities = activities;
                                     callback();
                                 }
                             });
-                        }
+    //                         let a_id = ObjectID(user.activitiesID); 
+    //                         db.activities.find({"_id": a_id}, function (err, activities) {
+    //                             if (err || !activities) {
+    //                                 console.log("no activities");
+    // //                                      res.json(profileResponse);
+    //                                 callback();
+    //                             } else {
+    //                                 // console.log("user activitiesw: " + JSON.stringify(activities));
+    //                                 profileResponse.activity = activities;
+    //                                 callback();
+    //                             }
+    //                         });
+                        // }
                     },
                     function (callback) {
                         if (user.inventoryID != undefined && user.inventoryID != null) {
@@ -2870,16 +2881,17 @@ app.post('/drop/', requiredAuthentication, function (req, res) {
                                 // actionItem.objectName = req.body.object_item.name;
                                 actionItem.timestamp = timestamp;
                                 actionItem.fromScene = req.body.fromScene;
-                                db.activities.update({ _id: a_id }, { $push: { actionItems: actionItem }}, {upsert: false}, function (err, saved) {
-                                    if (err || !saved) {
-                                        // res.send('profcblemo ' + err);
-                                        callback(err);
-                                    } else {
-                                        console.log("ok saved to acttivieeisD");
-                                        callback(null);
-                                        // res.send('updated' + JSON.stringify(saved));
-                                    }
-                                });
+                                db.activities.insertOne(actionItem);
+                                // db.activities.update({ _id: a_id }, { $push: { actionItems: actionItem }}, {upsert: false}, function (err, saved) {
+                                //     if (err || !saved) {
+                                //         // res.send('profcblemo ' + err);
+                                //         callback(err);
+                                //     } else {
+                                //         console.log("ok saved to acttivieeisD");
+                                //         callback(null);
+                                //         // res.send('updated' + JSON.stringify(saved));
+                                //     }
+                                // });
                             } 
                         }
                     });
@@ -2931,18 +2943,18 @@ app.post('/pickup/', requiredAuthentication, function (req, res) {
                                 actionItem.actionName = req.body.object_item.objtype;
                                 actionItem.actionResult = "none";
                             } else {
-                                actionItem.actionID = req.body.action._id;
+                                actionItem.actionID = ObjectID(req.body.action._id);
                                 actionItem.actionType = req.body.action.actionType;
                                 actionItem.actionResult = req.body.action.actionResult;
                                 actionItem.actionName = req.body.action.actionName;
                             }
-                            actionItem.userID = req.body.userData._id;
-                            actionItem.objectID = req.body.object_item._id;
+                            actionItem.userID = ObjectID(req.body.userData._id);
+                            actionItem.objectID = ObjectID(req.body.object_item._id); //platform objectID not the same thing as mongo objectID (urg)
                             actionItem.objectName = req.body.object_item.name;
-                            actionItem.timestamp = timestamp;
+                            actionItem.timestamp = timestamp * 1000;
                             actionItem.fromScene = req.body.fromScene;
                 
-                            inventoryItem.userID = req.body.userData._id;
+                            inventoryItem.userID = req.body.userData._id; //change these to oids later...
                             inventoryItem.objectID = req.body.object_item._id;
                             inventoryItem.objectName = req.body.object_item.name;
                             inventoryItem.objectType = req.body.object_item.objtype;
@@ -3004,7 +3016,7 @@ app.post('/pickup/', requiredAuthentication, function (req, res) {
                              callback("no scene inventory");
                             
                         } else {
-                            console.log("scene inventory: " + JSON.stringify(inventory));
+                            // console.log("scene inventory: " + JSON.stringify(inventory));
                             
                             db.inventories.update({'_id': s_id }, { $pull: { inventoryItems: {objectID: req.body.object_item._id, timestamp: req.body.timestamp} }}, function (err, saved) { //remove from scene inventory
                                 if (err || !saved) {
@@ -3025,8 +3037,19 @@ app.post('/pickup/', requiredAuthentication, function (req, res) {
                     callback(null, user);
                 }
             },
-            function (user, callback) { //log activity
-                if (user.activitiesID != undefined && user.activitiesID != null) {
+            function (user, callback) {
+                db.activities.insertOne(actionItem, function(err, saved){
+                    if (err || !saved) {
+                        callback(err);
+                    } else {
+                        console.log("saved actionItem " + JSON.stringify(saved));
+                        callback(null, user);
+                    }
+                });
+            },
+           /* //nope, activities saved as individual records now, not as array elements in a single record (like inventory)
+            function (user, callback) { //log activity 
+                if (user.activitiesID != undefined && user.activitiesID != null)  {
                     console.log("updati9ng acvitiiies record" + user.activitiesID);
                     var a_id = ObjectID(user.activitiesID);
                     db.activities.findOne({"_id": a_id}, function (err, activities) {
@@ -3071,6 +3094,7 @@ app.post('/pickup/', requiredAuthentication, function (req, res) {
                     });   
                 }
             },
+            */
             function (user, callback) { //add to player inventory
                 if (req.body.action.actionResult.toLowerCase() == "inventory") {
                     if (user.inventoryID != undefined && user.inventoryID != null) {
@@ -5247,13 +5271,13 @@ app.get('/invitation_check/:hzch', function (req, res) { //called from /landing/
             console.log("did not find invitation: " + err);
             res.send("not found");
         } else {
-            // console.log("invitation check:" + JSON.stringify(invitation));
+            console.log("invitation check:" + JSON.stringify(invitation));
            
             var pin = Math.random().toString().substr(2,6); //hrm...
             if (timestamp < invitation.invitationTimestamp + 36000) { //expires in 10 hour! //TODO access window start and end timestamps
                 console.log("timestamp checks out!" + JSON.stringify(invitation));
 
-                db.invitations.update ( { "invitationHash": hash }, { $set: { validated: true, pin : pin, pinTimeout: timestamp + 3600} }); 
+                db.invitations.update ( { "invitationHash": hash }, { $set: { validated: true, pin : pin, pinTimeout: timestamp + 6400} }); 
                 var response = {};
                 response.short_id = invitation.invitedToSceneShortID;
                 response.ok = "yep";
@@ -5274,20 +5298,56 @@ app.get('/invitation_check/:hzch', function (req, res) { //called from /landing/
                 res.send("expired_"+invitation.invitedToSceneShortID); //send back sceneID, to allow invite request
             }
 
+            db.actions.findOne({"actionType": "Send Email"}, function (err, emailAction) {
+                if (err || !emailAction) {
+                    callback("error getting email action!" + err);
+                } else {
+                    action.actionID = emailAction._id;
+                    action.actionName = "Invitation Click"
+                    action.actionType = "Send Email"
+                    action.actionResult = "Invitation Button Clicked";
+                    action.timestamp = timestamp * 1000; //ms trimmed on client
+                    action.targetPersonID = ObjectID(invitation.targetPersonID);
+                    action.userID = ObjectID(invitation.sentByUserID)
+                
+                    action.targetEmail = invitation.sentToEmail;
+                    action.fromScene = invitation.invitedToSceneShortID;
+                    // action.data = req.body.sceneShareWithMessage;
+                    
+                    db.activities.insertOne(action);
+
+                    // invitedToSceneTitle: theScene.sceneTitle,
+                    // invitedToSceneID: theScene._id,
+                    // invitedToSceneShortID: theScene.short_id,
+                    // accessTimeWindow: timestamp + 86400, //one day //will deprecate...
+                    // sceneEventStart : theScene.sceneEventStart,
+                    // sceneEventEnd: theScene.sceneEventEnd,
+                    // sceneAccessLinkExpire: theScene.sceneAccessLinkExpire,
+                    // sceneRestrictToEvent: eventData.restrictToEvent,
+                    // sceneRestrictToLocation: eventData.restrictToLocation,
+                    // sentByUserName: req.session.user ? req.session.user.userName.toString() : ip,
+                    // sentByUserID: req.session.user ? req.session.user._id.toString() : "",
+                    // sentByUserEmail: req.session.user ? req.session.user.email.toString() : adminEmail,
+                    // sentToEmail: to,
+                    // targetPersonID: data.personID,
+                    // invitationHash: cleanhash,
+                    // invitationTimestamp: timestamp,
+                } 
+            });
             let action = {};
             // console.log("opt out global for " + email);
             // action.actionID = emailActionID;
-            action.actionName = "Invitation Click"
-            action.actionType = "OnLoad"
-            action.actionResult = "Invitation Button Clicked";
-            action.timestamp = timestamp;
-            // action.userID = uid
+            // action.actionName = "Invitation Click"
+            // action.actionType = "OnLoad"
+            // action.actionResult = "Invitation Button Clicked";
+            // action.timestamp = timestamp;
+            // // action.userID = uid
         
-            action.emailAddressTo = invitation.sentToEmail;
-            action.fromScene = invitation.invitedToSceneShortID;
-            // action.data = req.body.sceneShareWithMessage;
+            // action.emailAddressTo = invitation.sentToEmail;
+            // action.fromScene = invitation.invitedToSceneShortID;
+            // // action.data = req.body.sceneShareWithMessage;
             
-            db.activities.insertOne(action);
+            // db.activities.insertOne(action);
             // action.emailButtonClicked = timestamp + "_" + invitation._id + "_" + invitation.invitedToSceneShortID;
          
             db.people.updateOne( { "email": invitation.sentToEmail }, {$set: {accountStatus : "Email Verified", lastUpdate: timestamp}});
@@ -6425,7 +6485,7 @@ app.post('/share_scene/', function (req, res) { //yep! //make it public?
                                 sentByUserID: req.session.user ? req.session.user._id.toString() : "",
                                 sentByUserEmail: req.session.user ? req.session.user.email.toString() : adminEmail,
                                 sentToEmail: to,
-                                sentToPersonID: data.personID,
+                                targetPersonID: data.personID,
                                 invitationHash: cleanhash,
                                 invitationTimestamp: timestamp,
                             }
@@ -6441,7 +6501,7 @@ app.post('/share_scene/', function (req, res) { //yep! //make it public?
                             if (req.body.publicRequest) {
                                     message = "An invitation to this private Immersive Scene was requested for you!";
                                 } else {
-                                    if (theScene.sceneShareWithMessage === "" || theScene.sceneShareWithMessage == null) {
+                                    if (theScene.sceneShareWithMessage === "" || theScene.sceneShareWithMessage == null || theScene.sceneShareWithMessage.length < 2) {
                                         message = req.session.user.userName + " has shared an Immersive Scene!";
                                         // "<h3>Scene Invitation from " + from + "</h3><hr><br>"
                                     } else {

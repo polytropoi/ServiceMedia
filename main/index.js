@@ -16785,7 +16785,8 @@ function getAllPeople() {
 
     function showProfileActivity(response) {
         var jsonResponse = response.data;
-        var arr = jsonResponse.activity[0].actionItems;
+        var arr = jsonResponse.activities;
+        console.log(JSON.stringify(arr));
         var tableHead = "<table id=\x22dataTable2\x22 class=\x22display table table-striped table-bordered\x22 style=\x22width:100%\x22>" +
                 "<thead>"+
                 "<tr>"+
@@ -16804,7 +16805,7 @@ function getAllPeople() {
             "<td>" + arr[i].actionType + "</td>" +
             "<td>" + arr[i].actionResult + "</td>" +
 
-            "<td>" + convertTimestamp(arr[i].timestamp) + "</td>" +
+            "<td>" + convertTimestamp(arr[i].timestamp / 1000) + "</td>" +
             "</tr>";
         }
         var tableFoot =  "</tbody>" +
@@ -16820,7 +16821,7 @@ function getAllPeople() {
         var resultElement = document.getElementById('table2Data');
         resultElement.innerHTML = tableHead + tableBody + tableFoot;
         $('#dataTable2').DataTable(
-            {"order": [[ 3, "asc" ]]}
+            {"order": [[ 3, "desc" ]]}
         );
     }
 
