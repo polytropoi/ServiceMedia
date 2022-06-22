@@ -2916,7 +2916,11 @@ app.post('/drop/', requiredAuthentication, function (req, res) {
     }
 );
 });
-
+//new pickup method
+// 1. find user, create action, create inventory
+// 2. lookup user inventory items
+// 3. count objectIDs
+// 4. 
 
 app.post('/pickup/', requiredAuthentication, function (req, res) { 
     let timestamp = Math.round(Date.now() / 1000);
@@ -2954,14 +2958,14 @@ app.post('/pickup/', requiredAuthentication, function (req, res) {
                             actionItem.timestamp = timestamp * 1000;
                             actionItem.fromScene = req.body.fromScene;
                 
-                            inventoryItem.userID = req.body.userData._id; //change these to oids later...
-                            inventoryItem.objectID = req.body.object_item._id;
+                            inventoryItem.userID = ObjectID(req.body.userData._id); //change these to oids later...
+                            inventoryItem.objectID = ObjectID(req.body.object_item._id);
                             inventoryItem.objectName = req.body.object_item.name;
                             inventoryItem.objectType = req.body.object_item.objtype;
                             inventoryItem.objectCategory = req.body.object_item.objcat;
                             inventoryItem.timestamp = timestamp;
                             inventoryItem.fromScene = req.body.fromScene;
-                
+                            
                             // if (req.body.object_item.actionID != undefined && req.body.object_item.actionID != null) { //if not default action
                             //     actionItem.actionID = req.body.object_item.actionID;
                             //     actionItem.actionName = req.body.object_item.actionName;
@@ -2974,7 +2978,80 @@ app.post('/pickup/', requiredAuthentication, function (req, res) {
                     callback("baduserdatazx~!");
                 }
             },
+            function (user, callback) { //check if it came from the scene's inventory, instead of the scene itself, and unset below
+                if (req.body.fromSceneInventory != undefined && req.body.fromSceneInventory != null) { 
+                    console.log("tryna lookup scene inventory " + req.body.fromSceneInventory); //this is sceneID now
+                    // let s_id = ObjectID(req.body.fromSceneInventory);
+                    db.inventory_items.findOne({$and: {"sceneID" : ObjectID(req.body.fromSceneInventory), "objectID": ObjectID(req.body.object_item._id)}}, function (err, item){ //pick one if > 1? by timestamp?
+                        if (err || ! item) {
+                            callback(null, user, null);
+                        } else {
+                            callback(null, user, item._id);
+                        }
+                    });
+
+                            // db.inventories.findOne({'_id': s_id },function (err, inventory){  
+                            //     if (err || !inventory) {
+                            //         callback("no scene inventory");
+                                    
+                            //     } else {
+                            //         // console.log("scene inventory: " + JSON.stringify(inventory));
+                                    
+                            //         db.inventories.update({'_id': s_id }, { $pull: { inventoryItems: {objectID: req.body.object_item._id, timestamp: req.body.timestamp} }}, function (err, saved) { //remove from scene inventory
+                            //             if (err || !saved) {
+                            //                 console.log("problemo with inventory rm " + err);
+                            //                 // res.send("inventory update error " + err);
+                            //                 // res.send("error saving to scene inventory");
+                            //                 callback(err);
+                            //             } else {
+                            //                 console.log("removed fromk scene inventory..." + req.body.object_item._id);
+                            //                 callback(null, user);
+                            //             }
+                            //         });
+                            //     }
+                
+                            //     });
+                    // callback(null, user);
+                } else {
+                    callback(null, user);
+                }
+            },
+            function (user, callback) {
+                if (req.body.object_item.maxPerUser != undefined && req.body.object_item.maxPerUser != null && 
+                    req.body.object_item.maxPerUser != 0 && req.body.object_item.maxPerUser != "0") {
+                    
+                    db.inventory_items.find({$and: {"userID" : ObjectID(req.body.userData.userID), "objectID": ObjectID(req.body.object_item._id)}}, function (err, items) {
+                        if (err || !items) {
+                            callback(err);
+                        } else {
+                            if (items.length > req.body.object_item.maxPerUser) {
+                                callback("maxed!");
+                            } else {
+                                db.inventory_items.insertOne(inventoryItem, function (err, saved){
+                                    if (err || !saved) {
+                                        callback(err);
+                                    } else {
+                                        callback(null, user);
+                                    }
+                                });
+                            }
+                            console.log("user inventory items: " + items.length);
+                            
+                        } 
+                    }); 
+                } else {
+                    db.inventory_items.insertOne(inventoryItem, function (err, saved){
+                        if (err || !saved) {
+                            callback(err);
+                        } else {
+                            callback(null, user);
+                        }
+                    });
+                }
+            },
+            /*
             function (user, callback) { //check inventory limits
+                
                 if (req.body.object_item.maxPerUser != undefined && req.body.object_item.maxPerUser != null && 
                     req.body.object_item.maxPerUser != 0 && req.body.object_item.maxPerUser != "0" && user.inventoryID != undefined && user.inventoryID != null) {
                     var i_id = ObjectID(user.inventoryID);
@@ -3006,7 +3083,7 @@ app.post('/pickup/', requiredAuthentication, function (req, res) {
                     }
                 }
             },
-            function (user, callback) { //check and remove if it came from the scene's inventory, instead of the scene itself
+                        function (user, callback) { //check and remove if it came from the scene's inventory, instead of the scene itself
                 if (req.body.fromSceneInventory != undefined && req.body.fromSceneInventory != null) { 
                     console.log("tryna lookup scene inventory " + req.body.fromSceneInventory);
                     let s_id = ObjectID(req.body.fromSceneInventory);
@@ -3037,6 +3114,9 @@ app.post('/pickup/', requiredAuthentication, function (req, res) {
                     callback(null, user);
                 }
             },
+                    */
+
+    
             function (user, callback) {
                 db.activities.insertOne(actionItem, function(err, saved){
                     if (err || !saved) {
@@ -3094,7 +3174,7 @@ app.post('/pickup/', requiredAuthentication, function (req, res) {
                     });   
                 }
             },
-            */
+           
             function (user, callback) { //add to player inventory
                 if (req.body.action.actionResult.toLowerCase() == "inventory") {
                     if (user.inventoryID != undefined && user.inventoryID != null) {
@@ -3144,7 +3224,9 @@ app.post('/pickup/', requiredAuthentication, function (req, res) {
                 } else {
                     callback(null);
                 }
-            }],
+            }
+             */
+        ],
         function (err, result) { // #last function, close async
             if (err != null) {
                 res.send(err);
@@ -8365,7 +8447,15 @@ app.get('/person/:p_id', requiredAuthentication, function(req, res) {
         }
     });
 });
+// app.get('/delete_inventories', function (req, res) { 
+//     db.inventories.remove({});
+//     console.log("all invitations have been removed");
+// });
 
+// app.get('/delete_allpeople', function (req, res) { 
+//     db.people.remove({});
+//     console.log("all invitations have been removed");
+// });
 // app.get('/delete_invitations', function (req, res) { 
 //     db.invitations.remove({});
 //     console.log("all invitations have been removed");
@@ -17379,7 +17469,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                 console.log("inventory "+sceneData.sceneInventoryID+" not found!");
                                 callback();
                             } else {
-                                // console.log("sceene inventory : " + JSON.stringify(inventory));
+                                console.log("sceene inventory : " + JSON.stringify(inventory));
                                 
                                 var buff = Buffer.from(JSON.stringify(inventory)).toString("base64");
                                 inventoryData = "<a-entity mod_scene_inventory id=\x22sceneInventory\x22 data-inventory='"+buff+"'></a-entity>";

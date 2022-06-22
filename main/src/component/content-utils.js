@@ -2011,7 +2011,7 @@ AFRAME.registerComponent('mod_objex', {
     init: function () {
       let theData = this.el.getAttribute('data-objex');
       let theLocData = this.el.getAttribute('data-objex-locations');
-      this.sceneInventoryItems = null; //might be loaded after init, called from mod_inventory component, if not part of the scene
+      this.sceneInventoryItems = null; //might be loaded after init, called from mod_scene_inventory component, if not part of the scene
       this.fromSceneInventory = null;
 
       this.data.jsonObjectData = JSON.parse(atob(theData)); //object items with model references
