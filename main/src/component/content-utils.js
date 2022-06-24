@@ -1994,7 +1994,7 @@ AFRAME.registerComponent('mod_scene_inventory', {
       let theData = this.el.getAttribute('data-inventory');
       this.data.jsonInventoryData = JSON.parse(atob(theData));
 
-      // console.log("scene inventory: " + JSON.stringify(this.data.jsonInventoryData));
+      console.log("scene inventory: " + JSON.stringify(this.data.jsonInventoryData));
       let objexEl = document.getElementById('sceneObjects');    
       objexEl.components.mod_objex.addSceneInventoryObjects(this.data.jsonInventoryData);
     }
@@ -2012,7 +2012,7 @@ AFRAME.registerComponent('mod_objex', {
       let theData = this.el.getAttribute('data-objex');
       let theLocData = this.el.getAttribute('data-objex-locations');
       this.sceneInventoryItems = null; //might be loaded after init, called from mod_scene_inventory component, if not part of the scene
-      this.fromSceneInventory = null;
+      this.fromSceneInventory = false;
 
       this.data.jsonObjectData = JSON.parse(atob(theData)); //object items with model references
       this.data.jsonLocationsData = JSON.parse(atob(theLocData)); //scene locations with object references
@@ -2048,19 +2048,22 @@ AFRAME.registerComponent('mod_objex', {
       }
       let that = this;
     },
-    addSceneInventoryObjects: function(objex) { //
+    addSceneInventoryObjects: function(inventory_items) { //
       let oIDs = [];
-      this.fromSceneInventory = objex._id //top level of inventory object, items are array property
-      if (objex.inventoryItems != undefined && objex.inventoryItems.length > 0) {
-        this.sceneInventoryItems = objex.inventoryItems;
-      }
-      console.log(JSON.stringify(objex));
+      this.fromSceneInventory = true;
+      // this.fromSceneInventory = objex._id //top level of inventory object, items are array property //NO, this is now the sceneID, set in each inventory_item//NOOO, it's nothing
+      // if (objex.inventoryItems != undefined && objex.inventoryItems.length > 0) {
+        this.sceneInventoryItems = inventory_items;
+      // }
+      console.log("gots scene inventory items: " + JSON.stringify(inventory_items));
       //wait, need to cache the locations where to place the fetched objs... :|
-      for (let i = 0; i < objex.inventoryItems.length; i++) {
-        if (this.returnObjectData(objex.inventoryItems[i].objectID) == null) { //if we don't already have this object data, need to fetch it
-          if (!oIDs.includes(objex.inventoryItems[i].objectID)) { //prevent duplicates
-            oIDs.push(objex.inventoryItems[i].objectID);
-            console.log("gotsa oID from scene inventory that needs fetching!");
+      if (inventory_items) {
+        for (let i = 0; i < inventory_items.length; i++) {
+          if (this.returnObjectData(inventory_items[i].objectID) == null) { //if we don't already have this object data, need to fetch it
+            if (!oIDs.includes(inventory_items[i].objectID)) { //prevent duplicates
+              oIDs.push(inventory_items[i].objectID);
+              console.log("gotsa oID from scene inventory that needs fetching!");
+            }
           }
         }
       }
@@ -2090,6 +2093,7 @@ AFRAME.registerComponent('mod_objex', {
               }
               let objEl = document.createElement("a-entity");
               objEl.setAttribute("mod_object", {'locationData': locationData, 'objectData': this.data.jsonObjectData[j], 'inventoryData': this.sceneInventoryItems[i], 'fromSceneInventory': this.fromSceneInventory, 'timestamp': timestamp});
+              // objEl.setAttribute("mod_object", {'locationData': locationData, 'objectData': this.data.jsonObjectData[j], 'inventoryData': this.sceneInventoryItems[i], 'timestamp': timestamp});
               objEl.id = "obj" + this.data.jsonObjectData[j]._id + "_" + timestamp;
               sceneEl.appendChild(objEl);
               } else {
@@ -2127,7 +2131,8 @@ AFRAME.registerComponent('mod_objex', {
     dropInventoryObject: function (inventoryID, action, inventoryObj) {
       let data = {};
       data.inScene = room;
-      data.inventoryID = inventoryID;
+      // data.inScene
+      // data.inventoryID = inventoryID;
       data.userData = userData;
       // data.object_item = this.data.objectData;
       // data.userData = userData;
@@ -2264,7 +2269,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
     locationData: {default: ''},
     objectData: {default: ''},
     equipped: {default: false},
-    fromSceneInventory: {default: null},
+    fromSceneInventory: {default: false},
     timestamp: {default: null},
     applyForceToNewObject: {default: false},
     forceFactor: {default: 1},

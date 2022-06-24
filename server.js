@@ -104,7 +104,7 @@ app.use (function (req, res, next) {
 
 var databaseUrl = process.env.MONGO_URL; //servicemedia connstring
 
-var collections = ["acl", "auth_req", "domains", "apps", "assets", "assetsbundles", "models", "users", "inventories", "audio_items", "text_items", "audio_item_keys", "image_items", "video_items",
+var collections = ["acl", "auth_req", "domains", "apps", "assets", "assetsbundles", "models", "users", "inventories", "inventory_items", "audio_items", "text_items", "audio_item_keys", "image_items", "video_items",
     "obj_items", "paths", "keys", "scores", "attributes", "achievements", "activity", "actions", "purchases", "storeitems", "scenes", "groups", "weblinks", "locations", "iap"];
 
 var db = mongojs(databaseUrl, collections);
@@ -155,6 +155,7 @@ var store = new MongoDBStore({ //store session cookies in a separate db with dif
 
     var aws = require('aws-sdk');
     const { json } = require("body-parser");
+const { profile } = require("console");
 
     const { lookupService, resolveNaptr, resolveCname } = require("dns");
 
@@ -2385,22 +2386,22 @@ app.get('/profile/:_id', requiredAuthentication, usercheck, function (req, res) 
     //                         });
                         // }
                     },
-                    function (callback) {
-                        if (user.inventoryID != undefined && user.inventoryID != null) {
-                            let a_id = ObjectID(user.inventoryID); 
-                            db.inventories.find({"_id": a_id}, function (err, inventory) {
-                                if (err || !inventory) {
-                                    console.log("no inventories");
-    //                                      res.json(profileResponse);
-                                    callback();
-                                } else {
-                                    // console.log("user activitiesw: " + JSON.stringify(activities));
-                                    profileResponse.inventory = inventory;
-                                    callback();
-                                }
-                            });
-                        }
-                    },
+            //                 function (callback) {
+            //                     if (user.inventoryID != undefined && user.inventoryID != null) {
+            //                         let a_id = ObjectID(user.inventoryID); 
+            //                         db.inventories.find({"_id": a_id}, function (err, inventory) {
+            //                             if (err || !inventory) {
+            //                                 console.log("no inventories");
+            // //                                      res.json(profileResponse);
+            //                                 callback();
+            //                             } else {
+            //                                 // console.log("user activitiesw: " + JSON.stringify(activities));
+            //                                 profileResponse.inventory = inventory;
+            //                                 callback();
+            //                             }
+            //                         });
+            //                     }
+            //                 },
 //                     function (callback) {
 //                         db.activity.find({"userID": req.params._id}, function (err, activities) {
 //                             if (err || !activities) {
@@ -2414,6 +2415,17 @@ app.get('/profile/:_id', requiredAuthentication, usercheck, function (req, res) 
 //                             }
 //                         });
 //                     },
+                    function (callback) {
+                        db.inventory_items.find({"userID": u_id}, function(err, items){
+                            if (err || !items) {
+                                console.log("no inventory items for user " + req.params._id);
+                                callback(null);
+                            } else {
+                                profileResponse.inventory = items;
+                                callback(null);
+                            }
+                        })
+                    },
                     function (callback) {
                         db.scores.find({"userID": req.params._id}, function (err, scores) {
                             if (err || !scores) {
@@ -2476,7 +2488,7 @@ app.get('/profile/:_id', requiredAuthentication, usercheck, function (req, res) 
     });
 });
 
-app.get('/inventory/:_id', requiredAuthentication, usercheck, function (req, res) { //rem'd checkAppID, bc profiles can cross app lines
+app.get('/inventory/:_id', requiredAuthentication, usercheck, function (req, res) { //rem'd checkAppID, bc profiles can cross app lines //NOPE
 
     console.log("tryna get inventory for ... " + req.params._id);
     var u_id = ObjectID(req.params._id);
@@ -2497,7 +2509,7 @@ app.get('/inventory/:_id', requiredAuthentication, usercheck, function (req, res
                         db.inventories.findOne({"_id": a_id}, function (err, inventory) {
                             if (err || !inventory) {
                                 console.log("no inventories");
-    //                                      res.json(profileResponse);
+    //                          res.json(profileResponse);
                                 profileResponse = null;
                                 callback(null);
                             } else {
@@ -2511,20 +2523,7 @@ app.get('/inventory/:_id', requiredAuthentication, usercheck, function (req, res
                     }
                 }
 
-//                     function (callback) {
-//                         db.scores.find({"userID": req.params._id}, function (err, scores) {
-//                             if (err || !scores) {
-//                                 console.log("no scores");
-// //                                      res.json(profileResponse);
-//                                 callback(err);
-//                             } else {
-//                                 // console.log("user scores: " + JSON.stringify(scores));
-//                                 profileResponse.scores = scores;
-//                                 callback();
-//                             }
-//                         });
 
-//                     }
                 ],
                 function (err, result) { // #last function, close async
                     if (err) {
@@ -2540,6 +2539,18 @@ app.get('/inventory/:_id', requiredAuthentication, usercheck, function (req, res
     });
 });
 
+app.get('/user_inventory/:_id', requiredAuthentication, function(req, res){
+    var u_id = ObjectID(req.params._id)
+    db.inventory_items.find({"userID": u_id}, function (err, items){
+        if (err || !items) {
+            res.send("nope");
+        } else {
+            let profileResponse = {};
+            profileResponse.inventoryItems = items;
+            res.send(profileResponse);
+        }
+    });
+});
 
 app.post('/update_profile/:_id', requiredAuthentication, function (req, res) { //for end users to change their personal data
     var u_id = ObjectID(req.params.auth_id);
@@ -2683,7 +2694,85 @@ app.post('/update_profile/:_id', requiredAuthentication, function (req, res) { /
 //     });
 // });
 
+
 app.post('/drop/', requiredAuthentication, function (req, res) { 
+    let timestamp = Math.round(Date.now() / 1000);
+    let i_id = ObjectID(req.body.inventoryObj._id); //player inventory//nope, id of the inventory_item
+    // let sceneInventoryID = null; //scene inventory
+    let sceneInventory = null;
+    let maxperscene = 0;
+    async.waterfall([
+        // function (callback) {
+
+        // },
+        function (callback) { //check object
+            // let sceneInventoryID = scene.sceneInventoryID;
+            let o_id = ObjectID(req.body.inventoryObj.objectID);
+            db.obj_items.findOne({"_id": o_id}, function (err, obj) { //get obj to check maxperscene
+                if (err || !obj) {
+                    console.log("no object found for drop");
+                    callback(err);
+                    // res.send("no object found");
+                } else {
+   
+                    console.log("checking maxperscene " + obj.maxPerScene);
+                    // let iCount = 0;
+                    if (obj.maxPerScene != undefined && obj.maxPerScene != null) {
+                        maxperscene = obj.maxPerScene;
+                    }
+                    callback(null);
+                }
+            });
+        },  
+        function (callback) { //check scene
+            db.scenes.findOne({"short_id": req.body.inScene}, function (err, scene){
+                if (err || !scene) {
+                    console.log("error finding scene to dropin! " + err);
+                    callback(err);
+                } else {
+                    db.inventory_items.find({$and: [{"sceneID" : scene._id, "objectID": ObjectID(req.body.inventoryObj.objectID)}]}, function (err, items) { //query to get count below
+                        if (err || !items) {
+                            console.log("no scene for drop!");
+                            callback(err);
+                        } else {
+                            console.log("gotsa scene for drop items " + items);
+                            if (items.length > maxperscene) {
+                                callback("maxed per scene!");
+                            } else {
+                                db.inventory_items.updateOne({"_id": i_id}, {
+                                $unset: {userID: ""}, 
+                                $set: {sceneID : ObjectID(scene._id), location : req.body.inventoryObj.location}
+                            }, function (err, saved) { //unset userID and set the sceneID for ownership reference
+                                    if (err || !saved) {
+                                        callback("error switching ownerszsipzt! " + err);
+                                    } else {
+                                        callback(null);
+                                    }
+                                });
+                                // callback(null);
+
+                            }
+                            // callback(null);
+                        }
+                    });
+                }
+            })
+            
+        }
+    ],        
+    
+    function (err, result) { // #last function, close async
+        if (err) {
+            res.send(err);
+        } else {
+            res.send('updated');
+            // console.log("returning inventory " + profileResponse);
+        }
+      
+    });
+});
+
+app.post('/dropnope/', requiredAuthentication, function (req, res) { 
     let timestamp = Math.round(Date.now() / 1000);
     let i_id = ObjectID(req.body.inventoryID); //player inventory
     let sceneInventoryID = null; //scene inventory
@@ -2927,6 +3016,7 @@ app.post('/pickup/', requiredAuthentication, function (req, res) {
     // console.log("pickup userid " + req.session.user._id + " data: " + JSON.stringify(req.body));
         let inventoryItem = {};
         let actionItem = {};
+        let sceneInventoryID = null;
         
         var u_id = ObjectID(req.session.user._id);
         // let user = null;
@@ -2940,7 +3030,8 @@ app.post('/pickup/', requiredAuthentication, function (req, res) {
                             callback("baduserdatazz~!");
                         } else {
                             // user = user;
-                            console.log("gotsa userr match for pickup");
+                            
+
                             if (req.body.action == undefined) { //for "Drop" and "Pickup" object types, action is assumed
                                 actionItem.actionID = null;
                                 actionItem.actionType = req.body.object_item.objtype;
@@ -2963,6 +3054,8 @@ app.post('/pickup/', requiredAuthentication, function (req, res) {
                             inventoryItem.objectName = req.body.object_item.name;
                             inventoryItem.objectType = req.body.object_item.objtype;
                             inventoryItem.objectCategory = req.body.object_item.objcat;
+                            inventoryItem.obectSubCategory = req.body.object_item.objsubcat;
+                            inventoryItem.obectClass = req.body.object_item.objclass;
                             inventoryItem.timestamp = timestamp;
                             inventoryItem.fromScene = req.body.fromScene;
                             
@@ -2971,22 +3064,25 @@ app.post('/pickup/', requiredAuthentication, function (req, res) {
                             //     actionItem.actionName = req.body.object_item.actionName;
                             //     // actionItem.actionType = req.body.object_item.actionType;
                             // }
-                            callback(null, user);
+                            console.log("gotsa userr match for pickup action with inventory item " + JSON.stringify(inventoryItem) );
+                            callback(null);
                         }
                     });
                 } else {
                     callback("baduserdatazx~!");
                 }
             },
-            function (user, callback) { //check if it came from the scene's inventory, instead of the scene itself, and unset below
-                if (req.body.fromSceneInventory != undefined && req.body.fromSceneInventory != null) { 
+            function (callback) { //check if it came from the scene's inventory, instead of the scene itself, and unset below
+                console.log("checking if from scene ivnetory " + req.body.fromSceneInventory);
+                if (req.body.fromSceneInventory) { 
                     console.log("tryna lookup scene inventory " + req.body.fromSceneInventory); //this is sceneID now
                     // let s_id = ObjectID(req.body.fromSceneInventory);
                     db.inventory_items.findOne({$and: {"sceneID" : ObjectID(req.body.fromSceneInventory), "objectID": ObjectID(req.body.object_item._id)}}, function (err, item){ //pick one if > 1? by timestamp?
                         if (err || ! item) {
-                            callback(null, user, null);
+                            callback(null);
                         } else {
-                            callback(null, user, item._id);
+                            sceneInventoryID = item._id;
+                            callback(null); //
                         }
                     });
 
@@ -3013,40 +3109,71 @@ app.post('/pickup/', requiredAuthentication, function (req, res) {
                             //     });
                     // callback(null, user);
                 } else {
-                    callback(null, user);
+                    callback(null);
                 }
             },
-            function (user, callback) {
-                if (req.body.object_item.maxPerUser != undefined && req.body.object_item.maxPerUser != null && 
-                    req.body.object_item.maxPerUser != 0 && req.body.object_item.maxPerUser != "0") {
-                    
-                    db.inventory_items.find({$and: {"userID" : ObjectID(req.body.userData.userID), "objectID": ObjectID(req.body.object_item._id)}}, function (err, items) {
-                        if (err || !items) {
-                            callback(err);
-                        } else {
-                            if (items.length > req.body.object_item.maxPerUser) {
-                                callback("maxed!");
-                            } else {
-                                db.inventory_items.insertOne(inventoryItem, function (err, saved){
-                                    if (err || !saved) {
-                                        callback(err);
-                                    } else {
-                                        callback(null, user);
-                                    }
-                                });
-                            }
-                            console.log("user inventory items: " + items.length);
-                            
-                        } 
-                    }); 
-                } else {
-                    db.inventory_items.insertOne(inventoryItem, function (err, saved){
+            function (callback) {
+                if (sceneInventoryID != null) { //if this isn't null the pickup object came from the scene inventory, so just need to reassign it to user
+                    console.log("sceneInventoryID " + i_itemID);
+                    db.inventory_items.updateOne({"_id": i_itemID}, {$unset: {sceneID: ""}, $set: {"userID" : ObjectID(req.body.userData.userID)}}, function (err, saved) {
                         if (err || !saved) {
-                            callback(err);
+                            callback("error switching ownerszsipzt! " + err);
                         } else {
-                            callback(null, user);
+                            callback(null);
                         }
                     });
+                // } else {
+                } else {   //if it didn't come from scene inventory, it's part of scene 'original' data
+                    console.log("checcking max per user " + req.body.object_item.maxPerUser);
+                    if (req.body.object_item.maxPerUser != undefined && req.body.object_item.maxPerUser != null && 
+                        req.body.object_item.maxPerUser != 0 && req.body.object_item.maxPerUser != "0") {
+                        
+                        db.inventory_items.find({$and: [{"userID" : ObjectID(req.body.userData.userID), "objectID": ObjectID(req.body.object_item._id)}]}, function (err, items) {
+                            if (err) {
+                                console.log(err);
+                                callback(err);
+                            } else {
+                                console.log("user inventory items : " + JSON.stringify(items));
+                                if (items || items.length > 0) {
+                                   
+                                    if (items.length > req.body.object_item.maxPerUser) {
+                                        console.log("userCurrentCount: " + items.length + " maxPerUser: " + req.body.object_item.maxPerUser);
+                                        callback("maxed!");
+                                    } else {
+                                        db.inventory_items.insertOne(inventoryItem, function (err, saved){
+                                            if (err || !saved) {
+                                                callback(err);
+                                            } else {
+                                                callback(null);
+                                                console.log("add pickup object to user inventory " + saved._id);
+                                            }
+                                        });
+                                    }
+                                
+                                } else {
+                                    console.log("tryna add inventory item......");
+                                    db.inventory_items.insertOne(inventoryItem, function (err, saved){
+                                        if (err || !saved) {
+                                            callback(err);
+                                        } else {
+                                            console.log("add pickup object to user inventory " + saved._id);
+                                            callback(null);
+                                        }
+                                    });
+                                }
+                            }
+
+                        }); 
+                    } else {
+                        db.inventory_items.insertOne(inventoryItem, function (err, saved){
+                            if (err || !saved) {
+                                callback(err);
+                            } else {
+                                console.log("saved inventoryItem: " + JSON.stringify(saved));
+                                callback(null);
+                            }
+                        });
+                    }
                 }
             },
             /*
@@ -3117,13 +3244,13 @@ app.post('/pickup/', requiredAuthentication, function (req, res) {
                     */
 
     
-            function (user, callback) {
+            function (callback) {
                 db.activities.insertOne(actionItem, function(err, saved){
                     if (err || !saved) {
                         callback(err);
                     } else {
                         console.log("saved actionItem " + JSON.stringify(saved));
-                        callback(null, user);
+                        callback(null);
                     }
                 });
             },
@@ -17460,27 +17587,44 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                         callback();
                     }
                 },
-                function (callback) {     
-                    console.log("inventory "+sceneData.sceneInventoryID);           
-                    if (sceneData.sceneInventoryID != undefined) {
-                        let i_id = ObjectID(sceneData.sceneInventoryID);
-                        db.inventories.findOne({"_id": i_id}, function (err, inventory){
-                            if (err || !inventory) {
-                                console.log("inventory "+sceneData.sceneInventoryID+" not found!");
-                                callback();
+                function (callback) {
+                    // if (req.session.user) {
+                        db.inventory_items.find({"sceneID": sceneData._id}, function (err, items) {
+                            if (err || ! items) {
+                                console.log("no inventory items!");
                             } else {
-                                console.log("sceene inventory : " + JSON.stringify(inventory));
-                                
-                                var buff = Buffer.from(JSON.stringify(inventory)).toString("base64");
+                                console.log("gots inventory items: " + JSON.stringify(items));
+                                var buff = Buffer.from(JSON.stringify(items)).toString("base64");
                                 inventoryData = "<a-entity mod_scene_inventory id=\x22sceneInventory\x22 data-inventory='"+buff+"'></a-entity>";
                                 callback();
                             }
-                        });
-                    } else {
-                        console.log("scene has no inventory");
-                        callback();
-                    }
+                        })
+                    // } else {
+                    //     callback();
+                    // }
+                   
                 },
+                // function (callback) {     
+                //     console.log("inventory "+sceneData.sceneInventoryID);           
+                //     if (sceneData.sceneInventoryID != undefined) {
+                //         let i_id = ObjectID(sceneData.sceneInventoryID);
+                //         db.inventories.findOne({"_id": i_id}, function (err, inventory){
+                //             if (err || !inventory) {
+                //                 console.log("inventory "+sceneData.sceneInventoryID+" not found!");
+                //                 callback();
+                //             } else {
+                //                 console.log("sceene inventory : " + JSON.stringify(inventory));
+                                
+                //                 var buff = Buffer.from(JSON.stringify(inventory)).toString("base64");
+                //                 inventoryData = "<a-entity mod_scene_inventory id=\x22sceneInventory\x22 data-inventory='"+buff+"'></a-entity>";
+                //                 callback();
+                //             }
+                //         });
+                //     } else {
+                //         console.log("scene has no inventory");
+                //         callback();
+                //     }
+                // },
                 function (callback) {
                     var modelz = [];
                 //    console.log("sceneModels : " + JSON.stringify(sceneResponse.sceneModels));

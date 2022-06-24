@@ -895,7 +895,7 @@ function GetUserInventory () {
     console.log("getuserprofile " + userData._id);
     let response = "<button class=\x22uploadButton \x22 style=\x22float: right;\x22 onclick=\x22DequipInventoryItem()\x22>Dequip</button>Items in player inventory:<br><hr>";
     var xhr = new XMLHttpRequest();
-    xhr.open("get", '/inventory/' + userData._id, true);
+    xhr.open("get", '/user_inventory/' + userData._id, true);
     xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.send();
     xhr.onload = function () {

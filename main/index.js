@@ -11136,7 +11136,7 @@ function getAllPeople() {
                     .then(function (typesResponse) {
                         types = typesResponse.data.types;
                         typesData = typesResponse.data; 
-                        console.log("Types " + JSON.stringify(types));
+                        // console.log("Types " + JSON.stringify(types));
                         categories = typesResponse.data.categories;
                         subcategories = typesResponse.data.subcategories;
                         for (let i = 0; i < types.length; i++) {
@@ -16786,7 +16786,7 @@ function getAllPeople() {
     function showProfileActivity(response) {
         var jsonResponse = response.data;
         var arr = jsonResponse.activities;
-        console.log(JSON.stringify(arr));
+        
         var tableHead = "<table id=\x22dataTable2\x22 class=\x22display table table-striped table-bordered\x22 style=\x22width:100%\x22>" +
                 "<thead>"+
                 "<tr>"+
@@ -16827,7 +16827,8 @@ function getAllPeople() {
 
     function showProfileInventory(response) {
         var jsonResponse = response.data;
-        var arr = jsonResponse.inventory[0].inventoryItems;
+        var arr = jsonResponse.inventory;
+        console.log(JSON.stringify(arr));
         var tableHead = "<table id=\x22dataTable1\x22 class=\x22display table table-striped table-bordered\x22 style=\x22width:100%\x22>" +
                 "<thead>"+
                 "<tr>"+
