@@ -3073,15 +3073,18 @@ app.post('/pickup/', requiredAuthentication, function (req, res) {
                 }
             },
             function (callback) { //check if it came from the scene's inventory, instead of the scene itself, and unset below
-                console.log("checking if from scene ivnetory " + req.body.fromSceneInventory);
+                console.log("checking if from scene ivnetory " + req.body.fromSceneInventory); //wait, this shouldbe scene ID!
                 if (req.body.fromSceneInventory) { 
-                    console.log("tryna lookup scene inventory " + req.body.fromSceneInventory); //this is sceneID now
+                    console.log("tryna lookup scene inventory " + req.body.fromSceneInventory + " sceneID " + req.body.sceneID + " obhjectID " + req.body.object_item._id); //this is sceneID now
                     // let s_id = ObjectID(req.body.fromSceneInventory);
-                    db.inventory_items.findOne({$and: {"sceneID" : ObjectID(req.body.fromSceneInventory), "objectID": ObjectID(req.body.object_item._id)}}, function (err, item){ //pick one if > 1? by timestamp?
-                        if (err || ! item) {
+                    db.inventory_items.findOne({$and: [{"sceneID" : ObjectID(req.body.sceneID), "objectID": ObjectID(req.body.object_item._id)}]}, function (err, item){ //pick one if > 1? by timestamp?
+                        if (err || !item) {
+                            console.log("error getting a sceneID! " + err);
                             callback(null);
+                        
                         } else {
                             sceneInventoryID = item._id;
+                            console.log("gotsa sceneInventoryID "+ sceneInventoryID);
                             callback(null); //
                         }
                     });
@@ -3114,27 +3117,28 @@ app.post('/pickup/', requiredAuthentication, function (req, res) {
             },
             function (callback) {
                 if (sceneInventoryID != null) { //if this isn't null the pickup object came from the scene inventory, so just need to reassign it to user
-                    console.log("sceneInventoryID " + i_itemID);
-                    db.inventory_items.updateOne({"_id": i_itemID}, {$unset: {sceneID: ""}, $set: {"userID" : ObjectID(req.body.userData.userID)}}, function (err, saved) {
+                    console.log("sceneInventoryID " + sceneInventoryID);
+                    db.inventory_items.updateOne({"_id": sceneInventoryID}, {$unset: {sceneID: ""}, $set: {"userID" : ObjectID(req.body.userData._id)}}, function (err, saved) {
                         if (err || !saved) {
                             callback("error switching ownerszsipzt! " + err);
                         } else {
+                            console.log("uipdateed invenotyr_ item " + JSON.stringify(saved));
                             callback(null);
                         }
                     });
                 // } else {
                 } else {   //if it didn't come from scene inventory, it's part of scene 'original' data
-                    console.log("checcking max per user " + req.body.object_item.maxPerUser);
+                    console.log("checcking max per user " + req.body.object_item.maxPerUser + " userID: " + req.body.userData._id + " objectID " + req.body.object_item._id);
                     if (req.body.object_item.maxPerUser != undefined && req.body.object_item.maxPerUser != null && 
                         req.body.object_item.maxPerUser != 0 && req.body.object_item.maxPerUser != "0") {
                         
-                        db.inventory_items.find({$and: [{"userID" : ObjectID(req.body.userData.userID), "objectID": ObjectID(req.body.object_item._id)}]}, function (err, items) {
+                        db.inventory_items.find({$and: [{"userID" : ObjectID(req.body.userData._id), "objectID": ObjectID(req.body.object_item._id)}]}, function (err, items) {
                             if (err) {
                                 console.log(err);
                                 callback(err);
                             } else {
-                                console.log("user inventory items : " + JSON.stringify(items));
-                                if (items || items.length > 0) {
+                                console.log("user inventory items : " + items.length);
+                                if (items != null && items.length > 0) {
                                    
                                     if (items.length > req.body.object_item.maxPerUser) {
                                         console.log("userCurrentCount: " + items.length + " maxPerUser: " + req.body.object_item.maxPerUser);

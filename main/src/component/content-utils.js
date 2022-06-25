@@ -2647,7 +2647,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
     this.el.addEventListener('click', (e) => { 
       e.preventDefault();
       // let downtime = (Date.now() / 1000) - this.mouseDownStarttime;
-      console.log("mousedown time "+ this.mouseDowntime + "  on object type: " + this.data.objectData.objtype + " actions " + JSON.stringify(this.data.objectData.actions) + " equipped " + this.data.equipped);
+      // console.log("mousedown time "+ this.mouseDowntime + "  on object type: " + this.data.objectData.objtype + " actions " + JSON.stringify(this.data.objectData.actions) + " equipped " + this.data.equipped);
       if (!this.data.equipped) {
         this.dialogEl = document.getElementById('mod_dialog');
         
@@ -2776,6 +2776,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
       if (this.data.objectData.objtype.toLowerCase() == "pickup"  || this.hasPickupAction) {
       
         let data = {};
+        data.sceneID = settings._id;
         data.fromSceneInventory = this.data.fromSceneInventory;
         data.timestamp = this.data.timestamp;
         data.fromScene = room;
