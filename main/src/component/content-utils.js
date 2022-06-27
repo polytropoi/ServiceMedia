@@ -2352,6 +2352,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
       this.calloutText.id = "objCalloutText_" + this.data.objectData._id;
       this.calloutPanel.setAttribute("gltf-model", "#landscape_panel");
       this.calloutPanel.setAttribute("scale", ".1 .075 .1");
+      this.calloutPanel.setAttribute("material", {'flatShading': true});
       this.calloutEntity.setAttribute("look-at", "#player");
       this.calloutEntity.setAttribute('visible', false);
     
@@ -2480,7 +2481,6 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
       }
       if (this.loadAction != null) {
         if (this.loadAction.actionResult.toLowerCase() == "trigger fx") {
-        
             let particleSpawner = document.getElementById('particleSpawner');
             if (particleSpawner != null) {
               var worldPosition = new THREE.Vector3();
@@ -2491,10 +2491,8 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
               console.log("triggering fx at " + worldPosition + " plus" + this.data.objectData.yPosFudge);
               particleSpawner.components.particle_spawner.spawnParticles(worldPosition, this.data.objectData.particles, 5, this.el.id, this.data.objectData.yPosFudge);
             }
-
         }
       }
-
     });
 
     this.el.addEventListener('body-loaded', () => {  //body-loaded event = physics ready on obj

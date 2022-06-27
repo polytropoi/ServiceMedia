@@ -1544,7 +1544,7 @@ AFRAME.registerComponent('particle_spawner',
   },
 	init: function()
 	{
-    // console.log("tyrna init particles!!!");
+    console.log("tyrna init particles!!!");
 	},
   spawnParticles: function (location, type, lifetime, parentID, yFudge) {
     
@@ -1639,7 +1639,8 @@ AFRAME.registerComponent('mod_particles', {
       });
     }
     if (this.data.type.toLowerCase() =="smoke") {
-      this.el.setAttribute('sprite-particles', {texture: '#smoke1', color: 'lightblue', textureFrame: '6 5', textureLoop: '1', spawnRate: '1', lifeTime: '3', scale: '10'});
+      
+      this.el.setAttribute('sprite-particles', {texture: '#smoke1', color: 'lightblue', blending: 'additive', textureFrame: '6 5', textureLoop: '1', spawnRate: '1', lifeTime: '3', scale: '100'});
     }
     if (this.data.type.toLowerCase() =="smoke/add") {
       this.el.setAttribute('sprite-particles', {texture: '#smoke1', color: 'lightblue', blending: 'additive', textureFrame: '6 5', textureLoop: '1', spawnRate: '1', lifeTime: '3', scale: '10'});
