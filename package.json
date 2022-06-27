@@ -30,7 +30,7 @@
     "morgan": "^1.9.1",
     "node-internet-radio": "^0.1.6",
     "prompt": "^0.2.14",
-    "pug": "^2.0.3",
+    "pug": "^3.0.1",
     "qrcode": "^1.4.4",
     "require-text": "0.0.1",
     "serve-favicon": "^2.5.0",
