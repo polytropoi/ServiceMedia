@@ -10,6 +10,7 @@ let theRenderCanvas = null;
 let locationModalIsOn = false;
 var sceneEl = document.querySelector('a-scene');
 let timedEventsListenerMode = null;
+let showStats = false;
 
 
   $('#modalContent').on('change', '#locationModel', function(e) { //value has phID ~ modelID
@@ -1216,7 +1217,7 @@ function SceneManglerModal(mode) {
       "<label for=\x22file-upload\x22 class=\x22custom-file-upload\x22>Import Mods</label>"+
       "<input type=\x22file\x22 id=\x22file-upload\x22 accept=\x22.txt\x22 onchange=\x22ImportMods(event)\x22></input>"+
         ownerButton +
-      "<button class=\x22reallySaveButton\x22 id=\x22statsButton\x22 onclick=\x22Toggle Stats()\x22>Toggle Stats</button>"+
+      "<button class=\x22goToButton\x22 id=\x22statsButton\x22 onclick=\x22ToggleStats()\x22>Toggle Stats</button>"+
     "</div><hr>"+
     // "<button class=\x22addButton\x22 id=\x22TimekeysButton\x22 onclick=\x22ShowTimekeysModal()\x22>Edit Timekeys</button>"+
     audioSliders +
@@ -1320,6 +1321,28 @@ function SceneManglerModal(mode) {
     //  document.getElementById('modalTitle').innerHTML = "<h3>Scene " + mode + "</h3>";
 }
 
+function ToggleStats () {
+  // let sceneEl = document.querySelector('a-scene');
+  let camEl = document.getElementById('cameraRig');
+  if (camEl) {
+    let initComponent = camEl.components.initializer;
+    showStats = !showStats;
+    // if (!showStats) {
+      console.log("tryna show stats");
+
+      // sceneEl.setAttribute('stats', '');
+      initComponent.toggleStats(showStats);
+
+
+    // } else {
+    //   console.log("tryna hide stats");
+      // sceneEl.removeAttribute('stats');
+      // initComponent.toggleStats(showStats);
+    // }
+  } else {
+    console.log('noscene!');
+  }
+}
 function ShowHideDialogPanel (htmlString) {
 //   console.log("tryna ShowHideDialogPanel " + window.sceneType + " htmlString: " + htmlString);
   

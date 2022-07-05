@@ -187,7 +187,7 @@ AFRAME.registerComponent('initializer', { //adjust for device settings, and call
     // var fogColor = new THREE.Color(0xffffff);
     // sceneEl.background = fogColor; // Setting fogColor as the background color also
     // sceneEl.fog = new THREE.Fog(fogColor, 0.25, 4);
-
+    // sceneEl.setAttribute('stats', '');
     sceneEl.addEventListener('loaded', function () { //for sure?
       console.log("aframe init with isMobile "  + isMobile + " isIOS " + isIOS + " isMacOS " + isMacOS + " headsetConnected " + headsetConnected);
 
@@ -250,7 +250,15 @@ AFRAME.registerComponent('initializer', { //adjust for device settings, and call
     ].includes(navigator.platform)
     // iPad on iOS 13 detection
     || (navigator.userAgent.includes("Mac") && "ontouchend" in document);
+  },
+  toggleStats: function (showStats) {
+    if (showStats) {
+      sceneEl.setAttribute('stats', '');
+    } else {
+      sceneEl.removeAttribute('stats');
+    }
   }
+
 }); //end register
 
 AFRAME.registerComponent('disable-magicwindow', {

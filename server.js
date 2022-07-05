@@ -270,7 +270,7 @@ io.on("connection", socket => {
 });
 */
 /////// SHOW/HIDE Below to run socket.io on same port
-
+/*
 ///this one gets users through handshake
 // var socketUsers = {};
 // var allUsers = [];
@@ -17119,8 +17119,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                 "<a-entity camera initializer=\x22sceneType: 'Mirage Marker'\x22></a-entity>";
 
                             } else if (sceneData.sceneWebType == 'Text Adventure') { //hemm...
-                                // ARScript = "<script src=\x22/main/js/dialog.js\x22></script>"; //WRONGNESS!  TODO fix this to be a reusable placeholder
-                                // camera = "<a-entity id=\x22player\x22 camera initializer=\x22sceneType: 'Text Adventure'\x22></a-entity>";
+                             
                                 ARSceneArg = "vr-mode-ui=\x22enabled: false; arEnabled: false;\x22 disable-magicwindow";
                                 camera = "<a-entity id=\x22cameraRig\x22 initializer=\x22sceneType: 'Text Adventure'\x22 position=\x22"+playerPosition+"\x22>"+
                                 "<a-entity hide-in-ar-mode id=\x22mouseCursor\x22 cursor=\x22rayOrigin: mouse\x22 raycaster=\x22objects: .activeObjexRay\x22></a-entity>"+
@@ -17328,12 +17327,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                 }
                                 
                                 camera = "<a-entity id=\x22cameraRig\x22 "+movementControls+" initializer "+
-                                // camera = "<a-entity id=\x22cameraRig\x22 "+movementControls+" initializer position=\x22"+playerPosition+"\x22 "+
-                                // " "+ physicsMod +">"+    
-                                // camera = "<a-entity id=\x22cameraRig\x22 "+movementControls+" initializer position=\x22"+playerPosition+"\x22 material=\x22color: green; wireframe: true;\x22"+
-                                // " geometry=\x22primitive: cylinder; height: 2; radius: 0.8;\x22 ammo-body=\x22type: kinematic;\x22 ammo-shape=\x22type: cylinder\x22>"+
-                                // camera = "<a-entity id=\x22cameraRig\x22 "+movementControls+" initializer position=\x22"+playerPosition+"\x22 material=\x22color: green; wireframe: true;\x22 geometry=\x22primitive: cylinder; height: 2; radius: 0.8;\x22 ammo-body=\x22type: kinematic;\x22 ammo-shape=\x22type: cylinder\x22>"+
-                                   // "hide-in-ar-mode id=\x22mouseCursor\x22 cursor=\x22rayOrigin: mouse\x22 raycaster=\x22objects: .activeObjexRay\x22>"+ //hide what?
+                              
                                     " id=\x22mouseCursor\x22 cursor=\x22rayOrigin: mouse\x22 raycaster=\x22objects: .activeObjexRay\x22>"+
                                     // "<a-entity id=\x22player\x22 get_pos_rot networked=\x22template:#avatar-template;attachTemplateToLocal:false;\x22 "+spawnInCircle+" camera "+wasd+" look-controls=\x22hmdEnabled: false\x22 position=\x220 1.6 0\x22>" +     
                                     // "<a-entity id=\x22viewportPlaceholder\x22 position=\x220 0 -1\x22></entity>"+   
@@ -18387,13 +18381,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                         // "SetPrimaryAudioEventsData("+JSON.stringify(JSON.stringify(primaryAudioObject))+");\n"+
                                         "usdzDataEntity.setAttribute(\x22usdz\x22, \x22usdzData\x22, \x22"+usdzFiles+"\x22);\n"+ 
                                         "});";
-                                                // camera = "<a-entity id=\x22cameraRig\x22 initializer=\x22usdz: "+usdzFiles+"\x22 position=\x22"+playerPosition+"\x22>"+ //rewrite camera entity to add usdz on init // really?
-                                                // "<a-entity hide-in-ar-mode id=\x22mouseCursor\x22 cursor=\x22rayOrigin: mouse\x22 raycaster=\x22objects: .activeObjexRay\x22></a-entity>"+
-                                                // "<a-entity id=\x22player\x22 get_pos_rot camera "+wasd+" look-controls=\x22hmdEnabled: false\x22 position=\x220 1.6 0\x22>"+
-                                                // "</a-entity>"+
-                                                // "<a-entity networked=\x22template:#hand-template\x22 teleport-controls=\x22cameraRig: #cameraRig; button: grip;\x22 oculus-touch-controls=\x22hand: left\x22 laser-controls=\x22hand: left;\x22 handModelStyle: lowPoly; color: #ffcccc\x22 raycaster=\x22objects: .activeObjexRay;\x22></a-entity>" +
-                                                // "<a-entity networked=\x22template:#hand-template\x22 oculus-touch-controls=\x22hand: right\x22 id=\x22right-hand\x22 hand-controls=\x22hand: right; handModelStyle: lowPoly; color: #ffcccc\x22 aabb-collider=\x22objects: .activeObjexGrab;\x22 grab></a-entity>"+
-                                                // "</a-entity>";
+                                              
                                         usdzModel = modelURL;
                                         // console.log(loadUSDZ);
                                         callbackz();
