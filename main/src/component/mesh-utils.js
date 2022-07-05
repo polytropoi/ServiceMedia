@@ -1445,7 +1445,7 @@ AFRAME.registerComponent('cloud_marker', {
           console.log("gotsa audio trigger controller el");
           let triggerAudioController = triggerAudioControllerEl.components.trigger_audio_control;
           if (triggerAudioController  != null) {
-            console.log("gotsa audio trigger controller");
+            console.log("gotsa audio trigger controller " + distance);
             triggerAudioController.playAudioAtPosition(hitpoint, distance);
           }
          

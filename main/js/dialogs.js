@@ -1216,6 +1216,7 @@ function SceneManglerModal(mode) {
       "<label for=\x22file-upload\x22 class=\x22custom-file-upload\x22>Import Mods</label>"+
       "<input type=\x22file\x22 id=\x22file-upload\x22 accept=\x22.txt\x22 onchange=\x22ImportMods(event)\x22></input>"+
         ownerButton +
+      "<button class=\x22reallySaveButton\x22 id=\x22statsButton\x22 onclick=\x22Toggle Stats()\x22>Toggle Stats</button>"+
     "</div><hr>"+
     // "<button class=\x22addButton\x22 id=\x22TimekeysButton\x22 onclick=\x22ShowTimekeysModal()\x22>Edit Timekeys</button>"+
     audioSliders +

@@ -103,7 +103,7 @@ app.use (function (req, res, next) {
 });
 
 var databaseUrl = process.env.MONGO_URL; //servicemedia connstring
-
+// console.log(databaseUrl);
 var collections = ["acl", "auth_req", "domains", "apps", "assets", "assetsbundles", "models", "users", "inventories", "inventory_items", "audio_items", "text_items", "audio_item_keys", "image_items", "video_items",
     "obj_items", "paths", "keys", "scores", "attributes", "achievements", "activity", "actions", "purchases", "storeitems", "scenes", "groups", "weblinks", "locations", "iap"];
 
@@ -141,7 +141,7 @@ var store = new MongoDBStore({ //store session cookies in a separate db with dif
         saveUninitialized: true,
         store: store,
         rolling: true,
-        secret: 'permanententropy' }));
+        secret: process.env.JWT_SECRET }));
 //    app.use(router);
     app.use(cookieParser());
 //    app.use(bodyParser());
@@ -269,14 +269,14 @@ io.on("connection", socket => {
   });
 });
 */
-/////// toggle below for strr
-/*
+/////// SHOW/HIDE Below to run socket.io on same port
+
 ///this one gets users through handshake
 // var socketUsers = {};
 // var allUsers = [];
 var io = require('socket.io')(server);
 var mongoAdapter = require('socket.io-adapter-mongo');
-io.adapter(mongoAdapter( 'mongodb://sessionmaster:nawman@aws-us-east-1-portal.8.dblayer.com:15103,aws-us-east-1-portal.7.dblayer.com:15103/sessions' ));
+io.adapter(mongoAdapter( process.env.MONGO_SESSIONS_URL ));
 // io.set('origins', 'servicemedia.net');
 io.set('transports', ['polling', 'websocket']);
 io.serveClient(true);
@@ -4245,7 +4245,7 @@ app.post('/process_staging_files', requiredAuthentication, function (req, res) {
                             } else if (groupType == ".mp3" || groupType == ".wav" || groupType == ".aif" || groupType == ".aiff" || groupType == ".ogg" || 
                                 groupType == ".MP3" || groupType == ".WAV" || groupType == ".AIFF" || groupType == ".AIFF" || groupType == ".OGG"  ) { 
                                 // console.log("tryna USE_TRANSLOADIT for audio?" + process.env.USE_TRANSLOADIT);
-                                if (process.env.USE_TRANSLOADIT == true) {
+                                if (process.env.USE_TRANSLOADIT == true) { //nilch need to rem
                                     console.log("transcodeAudioURL request: " + tUrl);
                                     var encodeAudioUrlParams = {
                                         steps: {
@@ -13775,7 +13775,7 @@ app.post('/weblink/', requiredAuthentication, function (req, res) {
                 }
             });
         } else {
-            if (process.env.USE_TRANSLOADIT == true) {
+            if (process.env.USE_TRANSLOADIT == true) { //nilch, over it
             var weblinkParams = {
                 'steps': {
                     'extract': {

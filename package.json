@@ -35,6 +35,7 @@
     "serve-favicon": "^2.5.0",
     "shortid": "^2.2.13",
     "socket.io": "^2.5.0",
+    "socket.io-adapter-mongo": "^2.0.5",
     "ssi": "^0.3.0",
     "stripe": "^4.25.0",
     "stylus": "^0.32.1",

@@ -1309,7 +1309,7 @@ AFRAME.registerComponent('ambient-child', { //objects with this component will f
     },
     
     init: function () {
-        this.cam = document.querySelector("[camera]"); //MUST DO THIS HERE or it doesn't work in tick below... okthen
+        this.cam = document.querySelector("[camera]"); //MUST DO THIS HERE or it doesn't work in tick below?!... okthen
         this.camPosition = "";
         this.distance = "";
         // this.ambientChild = document.querySelector(".ambientChild");
@@ -1447,10 +1447,10 @@ AFRAME.registerComponent('trigger_audio_control', { //trigger audio on designate
             // triggerAudioHowl.play();
             }
         }
-
+        
         triggerAudioHowl.pos(pos.x, pos.y, pos.z);
         const clamp = (num, a, b) => Math.max(Math.min(num, Math.max(a, b)), Math.min(a, b));
-        const rate = clamp(Math.random(), .75, 1.25);
+        const rate = clamp(Math.random(), .75, 1.5);
         triggerAudioHowl.rate(rate + .1);
         // console.log("tryna play at hitpoint " + pos);
         triggerAudioHowl.play();
