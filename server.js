@@ -5471,6 +5471,50 @@ app.post('/resetcheck', function (req, res) {
     });
 });
 
+app.post('/optout/', function (req, res) {
+    console.log("tryna optout " + JSON.stringify(req.body));
+    var timestamp = Math.round(Date.now() / 1000);
+    db.people.findOne({email: req.body.sentToEmail}, function  (err, person) {
+        if (err || !person) {
+            res.send(err);
+        } else {
+            db.people.updateOne( { "email": req.body.sentToEmail }, {$set: {accountStatus : "Email Verified", contactStatus: "Opt Out Global", lastUpdate: timestamp}}, function (err, saved) {
+                if (err || !saved) {
+                    res.send(err);
+                } else {
+                    res.send(saved);
+                }
+            });
+        }
+    });
+});
+
+app.get('/optout_check/:hzch', function (req, res) { //called from /landing/invite.html
+    let hash = req.params.hzch;
+    let requestProtocol = 'https';
+    if (req.headers.host.includes("localhost")) {
+        requestProtocol = 'http';
+    }
+
+    db.invitations.findOne({"invitationHash": hash}, function (err, invitation) {
+        var timestamp = Math.round(Date.now() / 1000);
+        if (err || !invitation) {
+            console.log("did not find invitation: " + err);
+            res.send("not found");
+        } else {
+            // console.log("invitation check:" + JSON.stringify(invitation));
+           
+                var response = {};
+                response.short_id = invitation.invitedToSceneShortID;
+                response.sentByUserName = invitation.sentByUserName;
+                response.sentByUserID = invitation.sentByUserID;
+                response.sentToEmail = invitation.sentToEmail;
+                res.send(response);
+                // response.url = requestProtocol + "://" + req.headers.host + "/webxr/" + invitation.invitedToSceneShortID + "?p=" + pin;
+
+        }
+    }); 
+});
 app.get('/invitation_check/:hzch', function (req, res) { //called from /landing/invite.html
     let hash = req.params.hzch;
     let requestProtocol = 'https';
@@ -5484,7 +5528,7 @@ app.get('/invitation_check/:hzch', function (req, res) { //called from /landing/
             console.log("did not find invitation: " + err);
             res.send("not found");
         } else {
-            console.log("invitation check:" + JSON.stringify(invitation));
+            // console.log("invitation check:" + JSON.stringify(invitation));
            
             var pin = Math.random().toString().substr(2,6); //hrm...
             if (timestamp < invitation.invitationTimestamp + 36000) { //expires in 10 hour! //TODO access window start and end timestamps
@@ -5526,50 +5570,13 @@ app.get('/invitation_check/:hzch', function (req, res) { //called from /landing/
                     action.targetEmail = invitation.sentToEmail;
                     action.fromScene = invitation.invitedToSceneShortID;
                     // action.data = req.body.sceneShareWithMessage;
-                    
                     db.activities.insertOne(action);
-
-                    // invitedToSceneTitle: theScene.sceneTitle,
-                    // invitedToSceneID: theScene._id,
-                    // invitedToSceneShortID: theScene.short_id,
-                    // accessTimeWindow: timestamp + 86400, //one day //will deprecate...
-                    // sceneEventStart : theScene.sceneEventStart,
-                    // sceneEventEnd: theScene.sceneEventEnd,
-                    // sceneAccessLinkExpire: theScene.sceneAccessLinkExpire,
-                    // sceneRestrictToEvent: eventData.restrictToEvent,
-                    // sceneRestrictToLocation: eventData.restrictToLocation,
-                    // sentByUserName: req.session.user ? req.session.user.userName.toString() : ip,
-                    // sentByUserID: req.session.user ? req.session.user._id.toString() : "",
-                    // sentByUserEmail: req.session.user ? req.session.user.email.toString() : adminEmail,
-                    // sentToEmail: to,
-                    // targetPersonID: data.personID,
-                    // invitationHash: cleanhash,
-                    // invitationTimestamp: timestamp,
                 } 
             });
             let action = {};
-            // console.log("opt out global for " + email);
-            // action.actionID = emailActionID;
-            // action.actionName = "Invitation Click"
-            // action.actionType = "OnLoad"
-            // action.actionResult = "Invitation Button Clicked";
-            // action.timestamp = timestamp;
-            // // action.userID = uid
-        
-            // action.emailAddressTo = invitation.sentToEmail;
-            // action.fromScene = invitation.invitedToSceneShortID;
-            // // action.data = req.body.sceneShareWithMessage;
-            
-            // db.activities.insertOne(action);
-            // action.emailButtonClicked = timestamp + "_" + invitation._id + "_" + invitation.invitedToSceneShortID;
-         
             db.people.updateOne( { "email": invitation.sentToEmail }, {$set: {accountStatus : "Email Verified", lastUpdate: timestamp}});
-
         }
-     
-       
-    });
-    
+    }); 
 });
 app.post('/invitation_req/', function (req,res) {
     console.log("invite req " + JSON.stringify(req.body));
@@ -6540,7 +6547,7 @@ app.post('/share_scene/', function (req, res) { //yep! //make it public?
                                         var halfName = 'half.' + baseName + item_string_filename_ext;
                                         // var quarterName = 'quarter.' + baseName + item_string_filename_ext;
                                         // var standardName = 'standard.' + baseName + item_string_filename_ext;
-                                        var urlHalf = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + "." + halfName, Expires: 6000}); //just send back thumbnail urls for list
+                                        var urlHalf = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + "." + halfName, Expires: 60000}); //just send back thumbnail urls for list
                                         // var urlQuarter = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + "." + quarterName, Expires: 6000}); //just send back thumbnail urls for list
                                         callback(null, urlHalf, eData, scene);
                                     }
@@ -6750,7 +6757,7 @@ app.post('/share_scene/', function (req, res) { //yep! //make it public?
                                 "<br> Description: " + theScene.sceneDescription +
                                 "<br> Owner: " + theScene.userName +
                                 "<br> For more info, or to become a subscriber, visit <a href='https://servicemedia.net'>ServiceMedia.net!</a><br><br> "+
-                                "<br> To stop further messages like this, <a href='"+ requestProtocol + "://" + req.headers.host + "/landing/opt_out.html' target='_blank'>click here</a><br><br> ";
+                                "<br> To stop messages like this, <a href='"+ requestProtocol + "://" + req.headers.host + "/landing/opt_out.html?iv=" + cleanhash + "' target='_blank'>click here</a><br><br> ";
 
                         ses.sendEmail( {
                                 Source: from,
