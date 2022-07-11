@@ -15226,8 +15226,8 @@ app.get('/update_public_scene/:_id', requiredAuthentication, function (req, res)
     );
 });
 
-/*
-app.get('/update_aframe_scene/:_id', requiredAuthentication, function (req, res) { //TODO lock down w/ checkAppID, requiredAuthentication
+/* //this one writes to s3 bucket?
+app.get('/update_aframe_scene/:_id', requiredAuthentication, function (req, res) { //TODO lock down w/ checkAppID, requiredAuthentication 
 
     console.log("tryna update webxr scene id: ", req.params._id + " excaped " + entities.decodeHTML(req.params._id));
 
@@ -17072,79 +17072,79 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                 "</a-entity>"+
                             "</a-entity>";
                             locationButton = "<div style=\x22float: right; margin: 10px 10px;\x22 onclick=\x22ShowHideGeoPanel()\x22><i class=\x22fas fa-globe fa-2x\x22></i></div>";
-                        } else if (sceneData.sceneWebType == 'AR Marker Tracking') {
-                                ARScript = "<script src=\x22/main/ref/aframe/dist/aframe-ar.js\x22></script>";
-                                ARSceneArg = "arjs=\x22trackingMethod: best\x22";   
-                                zcamera =  "<a-marker-camera preset='hiro'>" +
-                                                "<a-box scale='.1 .1 .1' position='0 0.5 0' material='color: yellow;'></a-box>" +
-                                            "</a-marker-camera>";
-                                // camera = "<a-marker-camera preset='hiro'></a-marker-camera>";
-                                camera = "<a-marker preset=\x22hiro\x22>" +
-                                // camera = "<a-marker type=\x22pattern\x22 crossorigin=\x22anonymous\x22 patternUrl=\x22https://realitymangler.com/markers/pattern-markerdots.patt\x22>" +
-                                // camera = "<a-marker type=\x22pattern\x22 crossorigin=\x22anonymous\x22 patternUrl=\x22https://realitymangler.com/markers/pattern-markerdots.patt\x22>" +
-                                    // "<a-entity position=\x220 0 0\x22 scale=\x220.05 0.05 0.05\x22"+
-                                    "<a-box scale='.1 .1 .1' position='0 0.5 0' material='color: yellow;'></a-box>" +
-                                    // "></a-entity>"+
-                                "</a-marker>" +
-                                "<a-entity cursor raycaster=\x22far: 20; interval: 1000; objects: .activeObjexRay\x22></a-entity>" +
-                                "<a-entity camera initializer=\x22sceneType: 'AR Marker Tracking'\x22></a-entity>";
+                                            // } else if (sceneData.sceneWebType == 'AR Marker Tracking') {
+                                            //         ARScript = "<script src=\x22/main/ref/aframe/dist/aframe-ar.js\x22></script>";
+                                            //         ARSceneArg = "arjs=\x22trackingMethod: best\x22";   
+                                            //         zcamera =  "<a-marker-camera preset='hiro'>" +
+                                            //                         "<a-box scale='.1 .1 .1' position='0 0.5 0' material='color: yellow;'></a-box>" +
+                                            //                     "</a-marker-camera>";
+                                            //         // camera = "<a-marker-camera preset='hiro'></a-marker-camera>";
+                                            //         camera = "<a-marker preset=\x22hiro\x22>" +
+                                            //         // camera = "<a-marker type=\x22pattern\x22 crossorigin=\x22anonymous\x22 patternUrl=\x22https://realitymangler.com/markers/pattern-markerdots.patt\x22>" +
+                                            //         // camera = "<a-marker type=\x22pattern\x22 crossorigin=\x22anonymous\x22 patternUrl=\x22https://realitymangler.com/markers/pattern-markerdots.patt\x22>" +
+                                            //             // "<a-entity position=\x220 0 0\x22 scale=\x220.05 0.05 0.05\x22"+
+                                            //             "<a-box scale='.1 .1 .1' position='0 0.5 0' material='color: yellow;'></a-box>" +
+                                            //             // "></a-entity>"+
+                                            //         "</a-marker>" +
+                                            //         "<a-entity cursor raycaster=\x22far: 20; interval: 1000; objects: .activeObjexRay\x22></a-entity>" +
+                                            //         "<a-entity camera initializer=\x22sceneType: 'AR Marker Tracking'\x22></a-entity>";
 
-                            } else if (sceneData.sceneWebType == 'AR Barcode Tracking') {
-                                ARScript = "<script src=\x22/main/ref/aframe/dist/aframe-ar.js\x22></script>";
-                                ARSceneArg = "arjs=\x22sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 4x4_BCH_13_5_5\x22";
-                                
-                                camera = "<a-marker type=\x22barcode\x22 value=\x220\x22>" +
-                                    "<a-sphere material=\x22color: blue; opacity: 1\x22 radius=\x220.25\x22></a-sphere>" +
-                                "</a-marker>" +
-                                "<a-marker type=\x22barcode\x22 value=\x221\x22>" +
-                                    "<a-sphere material=\x22color: green; opacity: 1\x22 radius=\x220.25\x22></a-sphere>" +
-                                "</a-marker>" +
-                                "<a-marker type=\x22barcode\x22 value=\x222\x22>" +
-                                    "<a-sphere material=\x22color: red; opacity: 1\x22 radius=\x220.25\x22></a-sphere>" +
-                                "</a-marker>" +
-                                "<a-marker type=\x22barcode\x22 value=\x223\x22>" +
-                                    "<a-sphere material=\x22color: yellow; opacity: 1\x22 radius=\x220.25\x22></a-sphere>" +
-                                "</a-marker>" +
-                                "<a-entity cursor raycaster=\x22far: 20; interval: 1000; objects: .activeObjexRay\x22></a-entity>" +
-                                "<a-entity camera initializer=\x22sceneType: 'AR Barcode Tracking'\x22></a-entity>";
+                                            //     } else if (sceneData.sceneWebType == 'AR Barcode Tracking') {
+                                            //         ARScript = "<script src=\x22/main/ref/aframe/dist/aframe-ar.js\x22></script>";
+                                            //         ARSceneArg = "arjs=\x22sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 4x4_BCH_13_5_5\x22";
+                                                    
+                                            //         camera = "<a-marker type=\x22barcode\x22 value=\x220\x22>" +
+                                            //             "<a-sphere material=\x22color: blue; opacity: 1\x22 radius=\x220.25\x22></a-sphere>" +
+                                            //         "</a-marker>" +
+                                            //         "<a-marker type=\x22barcode\x22 value=\x221\x22>" +
+                                            //             "<a-sphere material=\x22color: green; opacity: 1\x22 radius=\x220.25\x22></a-sphere>" +
+                                            //         "</a-marker>" +
+                                            //         "<a-marker type=\x22barcode\x22 value=\x222\x22>" +
+                                            //             "<a-sphere material=\x22color: red; opacity: 1\x22 radius=\x220.25\x22></a-sphere>" +
+                                            //         "</a-marker>" +
+                                            //         "<a-marker type=\x22barcode\x22 value=\x223\x22>" +
+                                            //             "<a-sphere material=\x22color: yellow; opacity: 1\x22 radius=\x220.25\x22></a-sphere>" +
+                                            //         "</a-marker>" +
+                                            //         "<a-entity cursor raycaster=\x22far: 20; interval: 1000; objects: .activeObjexRay\x22></a-entity>" +
+                                            //         "<a-entity camera initializer=\x22sceneType: 'AR Barcode Tracking'\x22></a-entity>";
 
-                            }  else if (sceneData.sceneWebType == 'Mirage Marker') {
-                                ARScript = "<script src=\x22/main/ref/aframe/dist/aframe-ar.js\x22></script>";
-                                ARSceneArg = "arjs=\x22trackingMethod: best; sourceType: webcam; debugUIEnabled: false;\x22";   
-                                // zcamera =  "<a-marker-camera preset='hiro'>" +
-                                //                 "<a-box scale='.1 .1 .1' position='0 0.5 0' material='color: yellow;'></a-box>" +
-                                //             "</a-marker-camera>";
-                                // camera = "<a-marker-camera preset='hiro'></a-marker-camera>";
-                                // camera = "<a-marker preset=\x22hiro\x22>" +
-                                camera = "<a-marker type=\x22pattern\x22 preset=\x22custom\x22 crossorigin=\x22anonymous\x22 patternUrl=\x22https://realitymangler.com/markers/pods-pattern.patt\x22>" +
-                                // camera = "<a-marker type=\x22pattern\x22 crossorigin=\x22anonymous\x22 patternUrl=\x22https://realitymangler.com/markers/pattern-markerdots.patt\x22>" +
-                                    // "<a-entity position=\x220 0 0\x22 scale=\x220.05 0.05 0.05\x22"+
-                                    "<a-box scale='.1 .1 .1' position='0 0.5 0' material='color: yellow;'></a-box>" +
-                                    // "></a-entity>"+
-                                "</a-marker>" +
-                                "<a-entity cursor raycaster=\x22far: 20; interval: 1000; objects: .activeObjexRay\x22></a-entity>" +
-                                "<a-entity camera initializer=\x22sceneType: 'Mirage Marker'\x22></a-entity>";
+                                            //     }  else if (sceneData.sceneWebType == 'Mirage Marker') {
+                                            //         ARScript = "<script src=\x22/main/ref/aframe/dist/aframe-ar.js\x22></script>";
+                                            //         ARSceneArg = "arjs=\x22trackingMethod: best; sourceType: webcam; debugUIEnabled: false;\x22";   
+                                            //         // zcamera =  "<a-marker-camera preset='hiro'>" +
+                                            //         //                 "<a-box scale='.1 .1 .1' position='0 0.5 0' material='color: yellow;'></a-box>" +
+                                            //         //             "</a-marker-camera>";
+                                            //         // camera = "<a-marker-camera preset='hiro'></a-marker-camera>";
+                                            //         // camera = "<a-marker preset=\x22hiro\x22>" +
+                                            //         camera = "<a-marker type=\x22pattern\x22 preset=\x22custom\x22 crossorigin=\x22anonymous\x22 patternUrl=\x22https://realitymangler.com/markers/pods-pattern.patt\x22>" +
+                                            //         // camera = "<a-marker type=\x22pattern\x22 crossorigin=\x22anonymous\x22 patternUrl=\x22https://realitymangler.com/markers/pattern-markerdots.patt\x22>" +
+                                            //             // "<a-entity position=\x220 0 0\x22 scale=\x220.05 0.05 0.05\x22"+
+                                            //             "<a-box scale='.1 .1 .1' position='0 0.5 0' material='color: yellow;'></a-box>" +
+                                            //             // "></a-entity>"+
+                                            //         "</a-marker>" +
+                                            //         "<a-entity cursor raycaster=\x22far: 20; interval: 1000; objects: .activeObjexRay\x22></a-entity>" +
+                                            //         "<a-entity camera initializer=\x22sceneType: 'Mirage Marker'\x22></a-entity>";
 
-                            } else if (sceneData.sceneWebType == 'Text Adventure') { //hemm...
-                             
-                                ARSceneArg = "vr-mode-ui=\x22enabled: false; arEnabled: false;\x22 disable-magicwindow";
-                                camera = "<a-entity id=\x22cameraRig\x22 initializer=\x22sceneType: 'Text Adventure'\x22 position=\x22"+playerPosition+"\x22>"+
-                                "<a-entity hide-in-ar-mode id=\x22mouseCursor\x22 cursor=\x22rayOrigin: mouse\x22 raycaster=\x22objects: .activeObjexRay\x22></a-entity>"+
-                                // "<a-entity id=\x22player\x22 get_pos_rot networked=\x22template:#avatar-template;attachTemplateToLocal:false;\x22 "+spawnInCircle+" camera "+wasd+" look-controls=\x22hmdEnabled: false\x22 position=\x220 1.6 0\x22>" +     
-                                "<a-entity id=\x22player\x22 look-controls=\x22hmdEnabled: false\x22 position=\x220 1.6 0\x22>" +   
-                                "<a-entity id=\x22viewportPlaceholder\x22 geometry=\x22primitive: plane; height: 0.01; width: .01\x22 position=\x220 0 -3\x22"+
-                                        "material=\x22opacity: 0\x22></a-entity>"+  
-                                "</a-entity>"+ 
-                                "</a-entity>";
-                                dialogButton = "<div class=\x22dialog_button\x22 style=\x22float: left; margin: 10px 10px;\x22 onclick=\x22SceneManglerModal('Welcome')\x22><i class=\x22fas fa-info-circle fa-2x\x22></i></div>";
-                                if (!sceneData.sceneTextUseModals) {
-                                // renderPanel = "<a-entity visible=\x22false\x22 render_canvas=\x22hello: world\x22 id=\x22renderCanvas\x22 look-at=\x22#player\x22 geometry=\x22primitive: plane; width:1; height:1;\x22 scale=\x221 1 1\x22 position=\x220 3.5 -.25\x22 material=\x22shader: html; transparent: true; width:1024; height:1024; fps: 10; target: #renderPanel;\x22></a-entity>\n";
-                                }
-                                transportButtons = "<div class=\x22transport_buttons\x22><div class=\x22previous_button\x22 style=\x22float: left; margin: 10px 10px;\x22 onclick=\x22PreviousButton()\x22><i class=\x22fas fa-step-backward fa-2x\x22></i></div>"+
-                                "<div class=\x22play_button\x22 style=\x22float: left; margin: 10px 10px;\x22 onclick=\x22TransportPlayButton()\x22><i class=\x22fas fa-play-circle fa-2x\x22></i></div>" +
-                                // "<div visible=\x22false\x22 class=\x22pause_button\x22 style=\x22float: left; margin: 10px 10px;\x22 onclick=\x22PauseButton()\x22><i class=\x22fas fa-pause-circle fa-2x\x22></i></div>" +
-                                // "<div class=\x22next_button\x22 style=\x22float: left; margin: 10px 10px;\x22 onclick=\x22ShowHideDialogPanel('default')\x22><i class=\x22fas fa-step-forward fa-2x\x22></i></div>" +
-                                "<div class=\x22next_button\x22 style=\x22float: left; margin: 10px 10px;\x22 onclick=\x22NextButton()\x22><i class=\x22fas fa-step-forward fa-2x\x22></i></div></div>";
+                                            //     } else if (sceneData.sceneWebType == 'Text Adventure') { //hemm...
+                                                
+                                            //         ARSceneArg = "vr-mode-ui=\x22enabled: false; arEnabled: false;\x22 disable-magicwindow";
+                                            //         camera = "<a-entity id=\x22cameraRig\x22 initializer=\x22sceneType: 'Text Adventure'\x22 position=\x22"+playerPosition+"\x22>"+
+                                            //         "<a-entity hide-in-ar-mode id=\x22mouseCursor\x22 cursor=\x22rayOrigin: mouse\x22 raycaster=\x22objects: .activeObjexRay\x22></a-entity>"+
+                                            //         // "<a-entity id=\x22player\x22 get_pos_rot networked=\x22template:#avatar-template;attachTemplateToLocal:false;\x22 "+spawnInCircle+" camera "+wasd+" look-controls=\x22hmdEnabled: false\x22 position=\x220 1.6 0\x22>" +     
+                                            //         "<a-entity id=\x22player\x22 look-controls=\x22hmdEnabled: false\x22 position=\x220 1.6 0\x22>" +   
+                                            //         "<a-entity id=\x22viewportPlaceholder\x22 geometry=\x22primitive: plane; height: 0.01; width: .01\x22 position=\x220 0 -3\x22"+
+                                            //                 "material=\x22opacity: 0\x22></a-entity>"+  
+                                            //         "</a-entity>"+ 
+                                            //         "</a-entity>";
+                                            //         dialogButton = "<div class=\x22dialog_button\x22 style=\x22float: left; margin: 10px 10px;\x22 onclick=\x22SceneManglerModal('Welcome')\x22><i class=\x22fas fa-info-circle fa-2x\x22></i></div>";
+                                            //         if (!sceneData.sceneTextUseModals) {
+                                            //         // renderPanel = "<a-entity visible=\x22false\x22 render_canvas=\x22hello: world\x22 id=\x22renderCanvas\x22 look-at=\x22#player\x22 geometry=\x22primitive: plane; width:1; height:1;\x22 scale=\x221 1 1\x22 position=\x220 3.5 -.25\x22 material=\x22shader: html; transparent: true; width:1024; height:1024; fps: 10; target: #renderPanel;\x22></a-entity>\n";
+                                            //         }
+                                            //         transportButtons = "<div class=\x22transport_buttons\x22><div class=\x22previous_button\x22 style=\x22float: left; margin: 10px 10px;\x22 onclick=\x22PreviousButton()\x22><i class=\x22fas fa-step-backward fa-2x\x22></i></div>"+
+                                            //         "<div class=\x22play_button\x22 style=\x22float: left; margin: 10px 10px;\x22 onclick=\x22TransportPlayButton()\x22><i class=\x22fas fa-play-circle fa-2x\x22></i></div>" +
+                                            //         // "<div visible=\x22false\x22 class=\x22pause_button\x22 style=\x22float: left; margin: 10px 10px;\x22 onclick=\x22PauseButton()\x22><i class=\x22fas fa-pause-circle fa-2x\x22></i></div>" +
+                                            //         // "<div class=\x22next_button\x22 style=\x22float: left; margin: 10px 10px;\x22 onclick=\x22ShowHideDialogPanel('default')\x22><i class=\x22fas fa-step-forward fa-2x\x22></i></div>" +
+                                            //         "<div class=\x22next_button\x22 style=\x22float: left; margin: 10px 10px;\x22 onclick=\x22NextButton()\x22><i class=\x22fas fa-step-forward fa-2x\x22></i></div></div>";
                             } else if (sceneData.sceneWebType == 'Mapbox') { 
                                 // ARScript = "<script src=\x22/main/js/geolocator.js\x22></script><script src=\x22/main/ref/aframe/dist/aframe-ar.js\x22></script>";
                                 dialogButton = "<div class=\x22dialog_button\x22 style=\x22float: left; margin: 10px 10px; width: 50px; height: 50px\x22 onclick=\x22SceneManglerModal('Welcome')\x22><i class=\x22fas fa-info-circle fa-2x\x22></i></div>";
@@ -17319,40 +17319,73 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                     joystickContainer = "";
                                     wasd = "";
                                 }
-                                // camera = "<a-entity id=\x22cameraRig\x22 position=\x220 0 0\x22>"+
-                                // "<a-entity id=\x22head\x22 camera "+wasd+" look-controls touch-controls position=\x220 1.6 0\x22></a-entity>"+
+                              
                                 
                                 let spawnInCircle = "";
                                 if (sceneResponse.sceneNetworking != "None") {
                                     spawnInCircle = "spawn-in-circle=\x22radius:3;\x22";
                                 }
-                                // camera = "<a-entity id=\x22cameraRig\x22 position=\x220 0 0\x22>"+ //controls: gamepad, keyboard, trackpad; 
+
                                 //AFRAME CAMERA
                                 let blinkMod = "blink-controls=\x22cameraRig: #cameraRig\x22";
                                 if (useSimpleNavmesh) {
                                     blinkMod = "blink-controls=\x22cameraRig: #cameraRig; collisionEntities: #navmesh-el;\x22"; //only one navmesh for now
                                 }
                                 
-                                camera = "<a-entity id=\x22cameraRig\x22 "+movementControls+" initializer "+
-                              
-                                    " id=\x22mouseCursor\x22 cursor=\x22rayOrigin: mouse\x22 raycaster=\x22objects: .activeObjexRay\x22>"+
-                                    // "<a-entity id=\x22player\x22 get_pos_rot networked=\x22template:#avatar-template;attachTemplateToLocal:false;\x22 "+spawnInCircle+" camera "+wasd+" look-controls=\x22hmdEnabled: false\x22 position=\x220 1.6 0\x22>" +     
-                                    // "<a-entity id=\x22viewportPlaceholder\x22 position=\x220 0 -1\x22></entity>"+   
-                                    "<a-entity id=\x22player\x22 look-controls get_pos_rot camera "+wasd+" "+ physicsMod +" position=\x22"+playerPosition+"\x22>"+
-                                        "<a-entity id=\x22equipPlaceholder\x22 geometry=\x22primitive: box; height: .1; width: .1; depth: .1\x22 position=\x220 -.65 -.75\x22"+
-                                        "material=\x22opacity: 0\x22></a-entity>"+
-                                        "<a-entity id=\x22viewportPlaceholder\x22 geometry=\x22primitive: plane; height: 0.01; width: .01\x22 position=\x220 0 -1.5\x22"+
-                                        "material=\x22opacity: 0\x22></a-entity>"+
-                                        "<a-entity id=\x22viewportPlaceholder3\x22 geometry=\x22primitive: plane; height: 0.01; width: .01\x22 position=\x220 0 -3\x22"+
-                                        "material=\x22opacity: 0\x22></a-entity>"+
+                                // let follower = "";
+                                if (sceneResponse.sceneCameraMode != undefined && sceneResponse.sceneCameraMode.toLowerCase().includes("third person")) {
+                                    wasd = "wasd-controls=\x22fly: false; acceleration: 35\x22";
+                                    camera = "<a-entity follow-box=\x22target: #player\x22 look-controls>" +
+                                        "<a-entity camera position=\x220 1.6 2\x22 ></a-entity>" +
                                     "</a-entity>"+
-                                    // "<a-entity networked=\x22template:#hand-template\x22 teleport-controls=\x22cameraRig: #cameraRig; button: grip;\x22 oculus-touch-controls=\x22hand: left\x22 laser-controls=\x22hand: left;\x22 handModelStyle: lowPoly; color: #ffcccc\x22 raycaster=\x22objects: .activeObjexRay;\x22></a-entity>" +
-                                    // "<a-entity networked=\x22template:#hand-template\x22 oculus-touch-controls=\x22hand: right\x22 id=\x22right-hand\x22 hand-controls=\x22hand: right; handModelStyle: lowPoly; color: #ffcccc\x22 raycaster=\x22objects: .activeObjexRay;\x22 aabb-collider=\x22objects: .activeObjexGrab;\x22 grab></a-entity>"+
-                                    // "<a-entity id=\x22left-hand\x22 teleport-controls=\x22cameraRig: #cameraRig; button: grip;\x22 laser-controls=\x22hand: left;\x22 handModelStyle: lowPoly; color: #ffcccc\x22 raycaster=\x22objects: .activeObjexRay;\x22 aabb-collider=\x22objects: .activeObjexGrab;\x22 grab></a-entity>" +
-                                    // "<a-entity id=\x22right-hand\x22 teleport-controls=\x22cameraRig: #cameraRig; button: grip;\x22 laser-controls=\x22hand: right;\x22 handModelStyle: lowPoly; color: #ffcccc\x22 raycaster=\x22objects: .activeObjexRay;\x22 aabb-collider=\x22objects: .activeObjexGrab;\x22 grab></a-entity>"+
-                                    "<a-entity id=\x22left-hand\x22 oculus-touch-controls=\x22hand: left\x22 "+blinkMod+" handModelStyle: lowPoly; color: #ffcccc\x22></a-entity>" +
-                                    "<a-entity id=\x22right-hand\x22 oculus-touch-controls=\x22hand: right\x22 laser-controls=\x22hand: right;\x22 handModelStyle: lowPoly; color: #ffcccc\x22 raycaster=\x22objects: .activeObjexRay;\x22 aabb-collider=\x22objects: .activeObjexGrab;\x22 grab></a-entity>"+
-                                    "</a-entity></a-entity>";
+                                    "<a-entity id=\x22cameraRig\x22 "+movementControls+"  initializer "+
+                                
+                                        " id=\x22mouseCursor\x22 cursor=\x22rayOrigin: mouse\x22 raycaster=\x22objects: .activeObjexRay\x22>"+
+                                        
+                                        // "<a-entity id=\x22player\x22 get_pos_rot networked=\x22template:#avatar-template;attachTemplateToLocal:false;\x22 "+spawnInCircle+" camera "+wasd+" look-controls=\x22hmdEnabled: false\x22 position=\x220 1.6 0\x22>" +     
+                                        // "<a-entity id=\x22viewportPlaceholder\x22 position=\x220 0 -1\x22></entity>"+   
+                                        "<a-entity id=\x22player\x22 rotate-with-camera get_pos_rot "+wasd+" "+ physicsMod +" position=\x22"+playerPosition+"\x22>"+
+                                            "<a-entity id=\x22equipPlaceholder\x22 geometry=\x22primitive: box; height: .1; width: .1; depth: .1\x22 position=\x220 -.65 -.75\x22"+
+                                            "material=\x22opacity: 0\x22></a-entity>"+
+                                            "<a-entity id=\x22viewportPlaceholder\x22 geometry=\x22primitive: plane; height: 0.01; width: .01\x22 position=\x220 0 -1.5\x22"+
+                                            "material=\x22opacity: 0\x22></a-entity>"+
+                                            "<a-entity id=\x22viewportPlaceholder3\x22 geometry=\x22primitive: plane; height: 0.01; width: .01\x22 position=\x220 0 -3\x22"+
+                                            "material=\x22opacity: 0\x22></a-entity>"+
+                                            "<a-entity id=\x22vehiclePlaceholder\x22 position=\x220 -1 -3\x22></a-entity>"+
+                                            // "<a-sphere visible=\x22true\x22 scale=\x220.45 0.5 0.4\x22 random-color></a-sphere>"+
+                                        "</a-entity>"+
+                                       
+                                        // "<a-entity networked=\x22template:#hand-template\x22 teleport-controls=\x22cameraRig: #cameraRig; button: grip;\x22 oculus-touch-controls=\x22hand: left\x22 laser-controls=\x22hand: left;\x22 handModelStyle: lowPoly; color: #ffcccc\x22 raycaster=\x22objects: .activeObjexRay;\x22></a-entity>" +
+                                        // "<a-entity networked=\x22template:#hand-template\x22 oculus-touch-controls=\x22hand: right\x22 id=\x22right-hand\x22 hand-controls=\x22hand: right; handModelStyle: lowPoly; color: #ffcccc\x22 raycaster=\x22objects: .activeObjexRay;\x22 aabb-collider=\x22objects: .activeObjexGrab;\x22 grab></a-entity>"+
+                                        // "<a-entity id=\x22left-hand\x22 teleport-controls=\x22cameraRig: #cameraRig; button: grip;\x22 laser-controls=\x22hand: left;\x22 handModelStyle: lowPoly; color: #ffcccc\x22 raycaster=\x22objects: .activeObjexRay;\x22 aabb-collider=\x22objects: .activeObjexGrab;\x22 grab></a-entity>" +
+                                        // "<a-entity id=\x22right-hand\x22 teleport-controls=\x22cameraRig: #cameraRig; button: grip;\x22 laser-controls=\x22hand: right;\x22 handModelStyle: lowPoly; color: #ffcccc\x22 raycaster=\x22objects: .activeObjexRay;\x22 aabb-collider=\x22objects: .activeObjexGrab;\x22 grab></a-entity>"+
+                                        // "<a-entity id=\x22left-hand\x22 oculus-touch-controls=\x22hand: left\x22 "+blinkMod+" handModelStyle: lowPoly; color: #ffcccc\x22></a-entity>" +
+                                        // "<a-entity id=\x22right-hand\x22 oculus-touch-controls=\x22hand: right\x22 laser-controls=\x22hand: right;\x22 handModelStyle: lowPoly; color: #ffcccc\x22 raycaster=\x22objects: .activeObjexRay;\x22 aabb-collider=\x22objects: .activeObjexGrab;\x22 grab></a-entity>"+
+                                        "</a-entity></a-entity>";
+                                } else {
+                                    // defaults to first person cam
+                                    camera = "<a-entity id=\x22cameraRig\x22 "+movementControls+" initializer "+
+                                
+                                        " id=\x22mouseCursor\x22 cursor=\x22rayOrigin: mouse\x22 raycaster=\x22objects: .activeObjexRay\x22>"+
+                                        // "<a-entity id=\x22player\x22 get_pos_rot networked=\x22template:#avatar-template;attachTemplateToLocal:false;\x22 "+spawnInCircle+" camera "+wasd+" look-controls=\x22hmdEnabled: false\x22 position=\x220 1.6 0\x22>" +     
+                                        // "<a-entity id=\x22viewportPlaceholder\x22 position=\x220 0 -1\x22></entity>"+   
+                                        "<a-entity id=\x22player\x22 look-controls get_pos_rot camera "+wasd+" "+ physicsMod +" position=\x22"+playerPosition+"\x22>"+
+                                            "<a-entity id=\x22equipPlaceholder\x22 geometry=\x22primitive: box; height: .1; width: .1; depth: .1\x22 position=\x220 -.65 -.75\x22"+
+                                            "material=\x22opacity: 0\x22></a-entity>"+
+                                            "<a-entity id=\x22viewportPlaceholder\x22 geometry=\x22primitive: plane; height: 0.01; width: .01\x22 position=\x220 0 -1.5\x22"+
+                                            "material=\x22opacity: 0\x22></a-entity>"+
+                                            "<a-entity id=\x22viewportPlaceholder3\x22 geometry=\x22primitive: plane; height: 0.01; width: .01\x22 position=\x220 0 -3\x22"+
+                                            "material=\x22opacity: 0\x22></a-entity>"+
+                                        "</a-entity>"+
+                                       
+                                        // "<a-entity networked=\x22template:#hand-template\x22 teleport-controls=\x22cameraRig: #cameraRig; button: grip;\x22 oculus-touch-controls=\x22hand: left\x22 laser-controls=\x22hand: left;\x22 handModelStyle: lowPoly; color: #ffcccc\x22 raycaster=\x22objects: .activeObjexRay;\x22></a-entity>" +
+                                        // "<a-entity networked=\x22template:#hand-template\x22 oculus-touch-controls=\x22hand: right\x22 id=\x22right-hand\x22 hand-controls=\x22hand: right; handModelStyle: lowPoly; color: #ffcccc\x22 raycaster=\x22objects: .activeObjexRay;\x22 aabb-collider=\x22objects: .activeObjexGrab;\x22 grab></a-entity>"+
+                                        // "<a-entity id=\x22left-hand\x22 teleport-controls=\x22cameraRig: #cameraRig; button: grip;\x22 laser-controls=\x22hand: left;\x22 handModelStyle: lowPoly; color: #ffcccc\x22 raycaster=\x22objects: .activeObjexRay;\x22 aabb-collider=\x22objects: .activeObjexGrab;\x22 grab></a-entity>" +
+                                        // "<a-entity id=\x22right-hand\x22 teleport-controls=\x22cameraRig: #cameraRig; button: grip;\x22 laser-controls=\x22hand: right;\x22 handModelStyle: lowPoly; color: #ffcccc\x22 raycaster=\x22objects: .activeObjexRay;\x22 aabb-collider=\x22objects: .activeObjexGrab;\x22 grab></a-entity>"+
+                                        "<a-entity id=\x22left-hand\x22 oculus-touch-controls=\x22hand: left\x22 "+blinkMod+" handModelStyle: lowPoly; color: #ffcccc\x22></a-entity>" +
+                                        "<a-entity id=\x22right-hand\x22 oculus-touch-controls=\x22hand: right\x22 laser-controls=\x22hand: right;\x22 handModelStyle: lowPoly; color: #ffcccc\x22 raycaster=\x22objects: .activeObjexRay;\x22 aabb-collider=\x22objects: .activeObjexGrab;\x22 grab></a-entity>"+
+                                        "</a-entity></a-entity>";
+                                }
                             }
                             let webxrEnv = "default";
 
@@ -18141,7 +18174,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                         }
                                    
                                     } else {
-                                        locMdl.eventData = ""; //WTF?!  
+                                        locMdl.eventData = ""; //WTF?! uh, dunno
                                     }
                                     if (locMdl.markerType != null && locMdl.markerType != undefined && locMdl.markerType.length > 1) {  
                                         entityType = locMdl.markerType; //e.g. "target"
@@ -18417,27 +18450,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                 function (callback) {
                     // console.log("attributions 2" + JSON.stringify(attributions));
                     if (attributions != null && attributions != undefined && attributions.length > 0) {
-                        /*  //below is the worldspace attrib icon and panel, dep'd
-                            attributionsTextEntity = "<a-entity look-at=\x22#player\x22 scale=\x22.75 .75 .75\x22 position=\x220 1 25\x22>"+ //attributions-text-control is set onload, using attributions string above
-                            "<a-entity id=\x22attributionsTextControl\x22 class=\x22envMap activeObjexRay\x22 toggle-attributions-text "+skyboxEnvMap+" gltf-model=\x22#exclamation\x22></a-entity>"+ 
-                            "<a-entity id=\x22attributionsTextPanel\x22 visible='false' position=\x220 3.5 1\x22>"+ //TODO Need to add separate clickable geo, text object throws error, even w/ geo property
-                                "<a-entity id=\x22attributionsHeaderText\x22 class=\x22envMap activeObjexRay\x22 geometry=\x22primitive: plane; width: 4; height: 1\x22 position=\x220 2.25 0\x22 material=\x22color: grey; transparent: true; opacity: 0.0\x22" +
-                                "text=\x22value:; wrap-count: 35;\x22></a-entity>" +
-                                "<a-entity id=\x22attributionsSourceText\x22 class=\x22envMap activeObjexRay\x22 geometry=\x22primitive: plane; width: 4; height: 1\x22 position=\x220 1.5 0\x22 material=\x22color: grey; transparent: true; opacity: 0.0\x22" +
-                                "text=\x22value:; wrap-count: 25;\x22></a-entity>" +
-                                "<a-entity id=\x22attributionsAuthorText\x22 class=\x22envMap activeObjexRay\x22  geometry=\x22primitive: plane; width: 4; height: 1\x22 position=\x220 .5 0\x22 material=\x22color: grey; transparent: true; opacity: 0.0\x22" +
-                                "text=\x22value:; wrap-count: 25;\x22></a-entity>" +
-                                "<a-entity id=\x22attributionsLicenseText\x22  geometry=\x22primitive: plane; width: 4; height: 1\x22 position=\x220 -.5 0\x22 material=\x22color: grey; transparent: true; opacity: 0.0\x22" +
-                                "text=\x22value:; wrap-count: 25;\x22></a-entity>" +
-                                "<a-entity id=\x22attributionsModsText\x22 geometry=\x22primitive: plane; width: 4; height: 1\x22 position=\x220 -1.5 0\x22 material=\x22color: grey; transparent: true; opacity: 0.0\x22" +
-                                "text=\x22value:; wrap-count: 25;\x22></a-entity>" +
-                                "<a-entity gltf-model=\x22#square_panel\x22 scale=\x223 3 3\x22 position=\x220 0 -.5\x22></a-entity>" +
-                                "<a-entity visible='false' class=\x22envMap activeObjexRay\x22 id=\x22nextAttribution\x22 gltf-model=\x22#next_button\x22 scale=\x22.5 .5 .5\x22 position=\x222 -3.75 1\x22></a-entity>" +
-                                "<a-entity visible='false' class=\x22envMap activeObjexRay\x22 id=\x22previousAttribution\x22 gltf-model=\x22#previous_button\x22 scale=\x22.5 .5 .5\x22 position=\x22-2 -3.75 1\x22></a-entity>" +
-                                "</a-entity></a-entity>";
-                                */
-
-                    //     console.log('processed attributions for ' + attributions.length);
+                      
                         attributionsObject.attributions = attributions;
 
                     let attrib64 = Buffer.from(JSON.stringify(attributionsObject)).toString("base64");
@@ -22368,7 +22381,7 @@ app.post('/update_obj/:_id', requiredAuthentication, function (req, res) {
             console.log("error getting obj items: " + err);
             res.send(err);
         } else {
-            if (obj_item.userID != req.session.user._id.toString() && !req.session.user.authLevel.toLowerCase().includes("domain")) {
+            if (obj_item.userID != req.session.user._id.toString() && !req.session.user.authLevel.toLowerCase().includes("admin")) {
                 res.send("user does not match " + req.session.user.authLevel);
             } else {
                 db.obj_items.update( { _id: o_id }, { $set: { 

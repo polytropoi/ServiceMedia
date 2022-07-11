@@ -2316,7 +2316,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
     this.hasSynth = false;
     this.mod_physics = "";
     this.pushForward = false;
-    this.lookVector = new THREE.Vector3( 0, 0, - 1 );
+    this.lookVector = new THREE.Vector3( 0, 0, -1 );
     this.camera = null;
     let cameraEl = document.querySelector('a-entity[camera]');
     this.triggerAudioController = document.getElementById("triggerAudio");
@@ -2336,11 +2336,24 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
     }
     
     // this.sceneInventoryID = null;
-  
-    if (this.data.objectData.modelURL != undefined) {
-      this.el.setAttribute("gltf-model", this.data.objectData.modelURL); //set as an a-asset in server response
+    if (this.data.locationData.eventData.toLowerCase().includes("driveable")) {
+      let vehiclePlaceholder = document.getElementById("vehiclePlaceholder");
+      if (vehiclePlaceholder) {
+        // vehiclePlaceholder.appendChild(this.el);
+        // this.el.setAttribute("position", {x:0, y:0, z:0});
+        if (this.data.objectData.modelURL != undefined) {
+          vehiclePlaceholder.setAttribute("gltf-model", this.data.objectData.modelURL); //set as an a-asset in server response
+        } else {
+          vehiclePlaceholder.setAttribute("gltf-model", "#" +this.data.objectData.modelID); //set as an a-asset in server response
+        }
+      }
+
     } else {
-      this.el.setAttribute("gltf-model", "#" +this.data.objectData.modelID); //set as an a-asset in server response
+      if (this.data.objectData.modelURL != undefined) {
+        this.el.setAttribute("gltf-model", this.data.objectData.modelURL); //set as an a-asset in server response
+      } else {
+        this.el.setAttribute("gltf-model", "#" +this.data.objectData.modelID); //set as an a-asset in server response
+      }
     }
    
 
@@ -3292,6 +3305,7 @@ AFRAME.registerComponent('mod_model', {
             this.el.setAttribute('fireworks_spawner', {type: 'fireball'});
          
           }
+          
 
           let worldPos = null;
           let hasAnims = false;
@@ -4064,6 +4078,7 @@ AFRAME.registerComponent('mod_model', {
 
         // });
       }
+
       document.querySelector('a-scene').addEventListener('primaryAudioToggle', function () {  //things to trigger on this model if primary audio is playing
         // console.log("primaryAudioToggle!");
         if (primaryAudioHowl.playing()) {
