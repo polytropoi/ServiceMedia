@@ -257,6 +257,14 @@ AFRAME.registerComponent('initializer', { //adjust for device settings, and call
     } else {
       sceneEl.removeAttribute('stats');
     }
+  },
+  toggleShowCurves: function (showCurves) {
+    let showCurvesEl = document.getElementById("showCurves");
+    if (showCurves) {
+      showCurvesEl.setAttribute("visible", true);
+    } else {
+      showCurvesEl.setAttribute("visible", false);
+    }
   }
 
 }); //end register

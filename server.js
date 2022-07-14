@@ -16376,6 +16376,8 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
     let locationPlaceholders = [];
     let locationCallouts = [];
     let locationPictures = [];
+    let curvePoints = [];
+    let curveEntities = "";
     let lightEntities = "";
     let placeholderEntities = "";
     // let placeholderEntities = "<a-entity id=\x22createPlaceholders\x22 create_placeholders></a-entity>";
@@ -16984,6 +16986,12 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                     pictureLocation.data = sceneResponse.sceneLocations[i].eventData; //should be the pic _id
                                     console.log("pictureLocation: " + JSON.stringify(pictureLocation));
                                     locationPictures.push(pictureLocation);
+                                }
+                                if (sceneResponse.sceneLocations[i].markerType == "curve point") {
+                                    let curvePoint = {};
+                                    curvePoint.loc = sceneResponse.sceneLocations[i].x + " " + sceneResponse.sceneLocations[i].y + " " + zFix;
+                                    curvePoint.data = sceneResponse.sceneLocations[i].eventData;
+                                    curvePoints.push(curvePoint);
                                 }
 
                             }
@@ -17612,6 +17620,22 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                         callback();
                     }
                 },
+                function (callback) {
+                    if (curvePoints.length > 0) {
+                        for (let i = 0; i < curvePoints.length; i++) {
+                            
+                            // if (locationLights[i].data != null && locationLights[i].data.length > 3) {
+                            //     if (locationLights[i].data.indexOf("_") != -1) {
+                            //         //
+                            //     }
+                            // }
+                            curveEntities = curveEntities + "<a-curve-point position=\x22"+curvePoints[i].loc+"\x22></a-curve-point>";
+                        }
+                        callback();
+                    } else {
+                        callback();
+                    }
+                },
                 function (callback) {                
                     if (locationPlaceholders.length > 0) {
                         for (let i = 0; i < locationPlaceholders.length; i++) {
@@ -18035,6 +18059,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                             let randomR = Math.random() * (maxR - minR) + minR;
                             let assetUserID = "";
                             let entityType = ""; //used to set entity id
+                            let followCurve = "";
 
                             let usdzFiles = '';
                             let modelParent = "";
@@ -18104,6 +18129,9 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                     if (locMdl.markerType == "follow ambient")  {
                                         ambientChild = "ambientChild"; //follow ambient obj
                                         // ambientOffset
+                                    }
+                                    if (locMdl.markerType == "follow curve") {
+                                        followCurve = "follow-path=\x22incrementBy:0.001; throttleTo:1\x22";
                                     }
                                     if (locMdl.eventData != null && locMdl.eventData != undefined && locMdl.eventData.length > 1) { //eventData has info
                                         // console.log("!!!tryna setup animation " + r.eventData);
@@ -18343,7 +18371,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                                         }
                                                     }
 
-                                                    gltfsEntities = gltfsEntities + "<a-entity id=\x22"+id+"\x22 "+physicsMod+" "+modelParent+" "+scatterSurface+" "+modModel+" class=\x22envMap gltf "+entityType+" "+ambientChild+
+                                                    gltfsEntities = gltfsEntities + "<a-entity id=\x22"+id+"\x22 "+followCurve+" "+physicsMod+" "+modelParent+" "+scatterSurface+" "+modModel+" class=\x22envMap gltf "+entityType+" "+ambientChild+
                                                     " activeObjexGrab activeObjexRay\x22 shadow=\x22cast:true; receive:true\x22 "+skyboxEnvMap+" gltf-model=\x22#" + m_assetID + "\x22 "+objAnim+" "+cannedAnim+
                                                     // " position=\x22"+locMdl.x+" "+locMdl.y+" "+zFix+"\x22 scale=\x22"+scale+" "+scale+" "+scale+"\x22 rotation=\x22"+rotation+"\x22 >" + offsetPos+ "</a-entity>";  //rem rotation bc navmesh donutlike
                                                     " position=\x22"+locMdl.x+" "+locMdl.y+" "+zFix+"\x22 scale=\x22"+scale+" "+scale+" "+scale+"\x22 data-scale=\x22"+scale+"\x22 rotation=\x22"+rotation+"\x22 >" + offsetPos+ "</a-entity>"; 
@@ -20788,7 +20816,12 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                         // if (scatterThings) {
                         //     surfaceScatterScript = 
                         // }
-                        
+                        if (curveEntities.length > 0) {
+                            curveEntities = "<a-curve id=\x22curve1\x22 type=\x22CatmullRom\x22 closed=\x22true\x22>" + curveEntities + "</a-curve>"+
+                            "<a-draw-curve id=\x22showCurves\x22 visible=\x22false\x22 curveref=\x22#curve1\x22 material=\x22shader: line; color: blue;\x22></a-draw-curve>";
+                            //"<a-sphere follow-path=\x22incrementBy:0.001; throttleTo:1\x22 position=\x220 10.25 -5\x22 radius=\x221.25\x22 color=\x22#EF2D5E\x22></a-sphere>";
+                        }
+                         
                         let aScene = "<a-scene "+sceneBackground+" "+physicsInsert+" "+pool_target+" "+pool_launcher+" gesture-detector webxr=\x22overlayElement:#overlay\x22 reflection=\x22directionalLight:#real-light\x22 ar-hit-test=\x22type:footprint; footprintDepth:0.2;\x22 ar-cursor raycaster=\x22objects: .activeObjexRay\x22 screen-controls disable-magicwindow vr-mode-ui keyboard-shortcuts=\x22enterVR: false\x22 device-orientation-permission-ui=\x22enabled: false\x22 " +
                         // let aScene = "<a-scene "+sceneBackground+" "+physicsInsert+" "+pool_target+" "+pool_launcher+" gesture-detector webxr=\x22overlayElement:#overlay\x22 reflection=\x22directionalLight:#real-light\x22 ar-hit-test=\x22target:.activeObjexRay; type:footprint; footprintDepth:0.2;\x22 ar-cursor raycaster=\x22objects: .activeObjexRay\x22 screen-controls disable-magicwindow vr-mode-ui keyboard-shortcuts=\x22enterVR: false\x22 device-orientation-permission-ui=\x22enabled: false\x22 " +
 
@@ -21105,6 +21138,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                         ambientAudioEntity + 
                         triggerAudioEntity +
                         lightEntities +
+                        curveEntities +
                         "<a-light visible=\x22false\x22 show-in-ar-mode id=\x22real-light\x22 type=\x22directional\x22 position=\x221 1 1\x22 intensity=\x220.5\x22></a-light>" +
                         placeholderEntities +
                         loadLocations +

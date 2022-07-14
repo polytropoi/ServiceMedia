@@ -11,6 +11,7 @@ let locationModalIsOn = false;
 var sceneEl = document.querySelector('a-scene');
 let timedEventsListenerMode = null;
 let showStats = false;
+let showCurves = false;
 
 
   $('#modalContent').on('change', '#locationModel', function(e) { //value has phID ~ modelID
@@ -1218,6 +1219,7 @@ function SceneManglerModal(mode) {
       "<input type=\x22file\x22 id=\x22file-upload\x22 accept=\x22.txt\x22 onchange=\x22ImportMods(event)\x22></input>"+
         ownerButton +
       "<button class=\x22goToButton\x22 id=\x22statsButton\x22 onclick=\x22ToggleStats()\x22>Toggle Stats</button>"+
+      "<button class=\x22uploadButton\x22 id=\x22curvesButton\x22 onclick=\x22ToggleShowCurves()\x22>Show Curves</button>"+
     "</div><hr>"+
     // "<button class=\x22addButton\x22 id=\x22TimekeysButton\x22 onclick=\x22ShowTimekeysModal()\x22>Edit Timekeys</button>"+
     audioSliders +
@@ -1321,6 +1323,7 @@ function SceneManglerModal(mode) {
     //  document.getElementById('modalTitle').innerHTML = "<h3>Scene " + mode + "</h3>";
 }
 
+
 function ToggleStats () {
   // let sceneEl = document.querySelector('a-scene');
   let camEl = document.getElementById('cameraRig');
@@ -1332,15 +1335,24 @@ function ToggleStats () {
 
       // sceneEl.setAttribute('stats', '');
       initComponent.toggleStats(showStats);
-
-
-    // } else {
-    //   console.log("tryna hide stats");
-      // sceneEl.removeAttribute('stats');
-      // initComponent.toggleStats(showStats);
-    // }
   } else {
     console.log('noscene!');
+  }
+}
+function ToggleShowCurves () {
+  // let sceneEl = document.querySelector('a-scene');
+  let curvesEl = document.getElementById("showCurves");
+  if (curvesEl) {
+    let camEl = document.getElementById('cameraRig');
+    if (camEl) {
+      let initComponent = camEl.components.initializer;
+      showCurves = !showCurves;
+      // if (!showStats) {
+        console.log("trynashowCurves");
+        initComponent.toggleShowCurves(showCurves);
+    } else {
+      console.log('noscene!');
+    }
   }
 }
 function ShowHideDialogPanel (htmlString) {
