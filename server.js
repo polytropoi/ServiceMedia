@@ -16479,7 +16479,9 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
     enviromentScript = ""; //for aframe env component
     // let debugMode = false;
     // let aframeScriptVersion = "<script src=\x22https://aframe.io/releases/1.3.0/aframe.min.js\x22></script>";
-    let aframeScriptVersion = "<script src=\x22https://cdn.jsdelivr.net/gh/aframevr/aframe@0d23f9b21c33ab6821046ce95835492cb84996c5/dist/aframe-master.min.js\x22></script>";
+    let aframeScriptVersion = "<script src=\x22https://aframe.io/releases/1.3.0/aframe.min.js\x22></script>";
+  
+    
     let surfaceScatterScript = "";
     let locationData = "";
     let modelData = "";
@@ -16612,7 +16614,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                             console.log("GOTS USENAVMESH TAG: " + sceneData.sceneTags[i]);
                             useNavmesh = true;
                         }
-                        if (sceneData.sceneTags[i] == "use simple navmesh") {
+                        if (sceneData.sceneTags[i].toLowerCase().includes ("simple navmesh")) {
                             console.log("GOTS SimpleNavmesh TAG: " + sceneData.sceneTags[i]);
                             useSimpleNavmesh = true;
                         }
@@ -16625,7 +16627,10 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                         if (sceneData.sceneTags[i].toLowerCase().includes("aframe 1.2")) {
                             aframeScriptVersion = "<script src=\x22https://aframe.io/releases/1.2.0/aframe.min.js\x22></script>";
                         }
-
+                        if (sceneData.sceneTags[i].toLowerCase().includes("aframe master")) {
+                            aframeScriptVersion = "<script src=\x22https://cdn.jsdelivr.net/gh/aframevr/aframe@744e2b869e281f840cff7d9cb02e95750ce90920/dist/aframe-master.min.js\x22></script>"; //ref 20220715// nope!
+                        }
+                        
                     }
                 }
                 //TODO use sceneNetworkSettings or whatever
@@ -20906,7 +20911,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                         "<script src=\x22../main/js/navigation.js\x22></script>" + //includes navmesh components (simple and not), and extended-wasd-controls
                         // "<script src=\x22../main/ref/aframe/dist/networked-aframe.min.js\x22></script>" + 
                         // "<script src=\x22../main/ref/aframe/dist/aframe-layout-component.min.js\x22></script>" +  
-                        "<script src=\x22../main/vendor/aframe/aframe-blink-controls.min.js\x22></script>" +  
+                        "<script src=\x22../main/vendor/aframe/aframe-blink-controls.min.js\x22></script>" +   //TODO - check if req comes from vr headset
                        
                         // "<script src=\x22../main/ref/aframe/dist/aframe-randomizer-components.min.js\x22></script>" +
                         enviromentScript +

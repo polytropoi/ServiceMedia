@@ -1362,6 +1362,15 @@ AFRAME.registerComponent('ambient-child', { //objects with this component will f
 // const clampNumber = (num, a, b) => Math.max(Math.min(num, Math.max(a, b)), Math.min(a, b));
 let triggerPosition = "";
 
+// Number.prototype.clamp = function(min, max) {
+//     return Math.min(Math.max(this, min), max);
+// };
+// const min = 0;
+// const max = 100;
+//  // Clamp number between two values with the following line:
+// const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
+
+
 AFRAME.registerComponent('trigger_audio_control', { //trigger audio on designated activeObjex
     schema: {
     url: {default: ''},
@@ -1371,7 +1380,7 @@ AFRAME.registerComponent('trigger_audio_control', { //trigger audio on designate
     },
     
     init: function () {
-
+        
         this.audioGroupsEl = document.getElementById('audioGroupsEl');
         this.audioGroupsController = null;
         // this.cam = document.querySelector("[camera]"); 
@@ -1380,7 +1389,7 @@ AFRAME.registerComponent('trigger_audio_control', { //trigger audio on designate
         // this.ambientChild = document.querySelector(".ambientChild");
         var normalizedVolume = ((this.data.volume - -80) * 100) / (20 - -80) * .01;    
         // triggerAudioHowl.volume(normalizedVolume);
-        // triggerPosition = this.el.object3D.position;
+        this.triggerPosition = {x: this.el.object3D.position.x/100,y: this.el.object3D.position.y/100,x: this.el.object3D.position.z/100}; //howler pos scale * .01 ~= three pos?
         // triggerAudioHowl.pos(triggerPosition);
         // triggerAudioHowl.fade(0, 1, 5000);
         // triggerAudioHowl.play();
@@ -1423,7 +1432,8 @@ AFRAME.registerComponent('trigger_audio_control', { //trigger audio on designate
         // triggerPosition = this.el.object3D.position;
         // triggerAudioHowl.pos(triggerPosition);
         // triggerAudioHowl.fade(0, 1, 5000);
-        triggerAudioHowl.play();
+        let id = triggerAudioHowl.play();
+        triggerAudioHowl.pos(this.triggerPosition, id); 
 
     },
     playAudioAtPosition: function(pos, distance) {
@@ -1447,13 +1457,26 @@ AFRAME.registerComponent('trigger_audio_control', { //trigger audio on designate
             // triggerAudioHowl.play();
             }
         }
-        
-        triggerAudioHowl.pos(pos.x, pos.y, pos.z);
+
+        let volume = Math.min(Math.max(0, 100 - distance), 100) * .01; //clamp between 0-100
+        // let volume = clamp(100 - distance) * .01; //hrm..
+        triggerAudioHowl.volume(volume);
+        console.log("tryna play trigger at volume " + volume);
+            
         const clamp = (num, a, b) => Math.max(Math.min(num, Math.max(a, b)), Math.min(a, b));
-        const rate = clamp(Math.random(), .75, 1.5);
-        triggerAudioHowl.rate(rate + .1);
+        const rate = clamp(Math.random() + .25, .75, 1.25); //fudge pitch a bit slower or faster
+        triggerAudioHowl.rate(rate);
         // console.log("tryna play at hitpoint " + pos);
-        triggerAudioHowl.play();
+        let id = triggerAudioHowl.play();
+        triggerAudioHowl.pos(pos.x / 100, pos.y / 100, pos.z / 100, id);  //HOLY SHIT howler needs small values for position, * .01
+
+        // this.sound = this.sound.play('thunder');
+        // this.sound.pos(x, y, -0.5, this._thunder);
+        // this.sound.volume(1, this._thunder);
+  
+        // // Schedule the next clap.
+        // this.thunder();
+
     }
 
     // tick: function(time, deltaTime) {

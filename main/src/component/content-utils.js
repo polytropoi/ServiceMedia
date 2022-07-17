@@ -2329,6 +2329,9 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
     let cameraEl = document.querySelector('a-entity[camera]');
     this.triggerAudioController = document.getElementById("triggerAudio");
     this.isTriggered = false;
+    this.driveable = false;
+    this.modelParent = null;
+
     if (!cameraEl) {
         cameraEl = document.querySelector('a-camera');
     }
@@ -2344,15 +2347,28 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
     }
     
     // this.sceneInventoryID = null;
-    if (this.data.locationData.eventData.toLowerCase().includes("driveable")) {
+    if (this.data.locationData && this.data.locationData.eventData && this.data.locationData.eventData.toLowerCase().includes("driveable")) {
       let vehiclePlaceholder = document.getElementById("vehiclePlaceholder");
+      this.modelParent = vehiclePlaceholder;
       if (vehiclePlaceholder) {
         // vehiclePlaceholder.appendChild(this.el);
         // this.el.setAttribute("position", {x:0, y:0, z:0});
         if (this.data.objectData.modelURL != undefined) {
+          // vehiclePlaceholder.append(this.el);
           vehiclePlaceholder.setAttribute("gltf-model", this.data.objectData.modelURL); //set as an a-asset in server response
+          let rot = {};
+          rot.x = this.data.locationData.eulerx != undefined ? this.data.locationData.eulerx : 0;
+          rot.y = this.data.locationData.eulery != undefined ? this.data.locationData.eulery : 0;
+          rot.z = this.data.locationData.eulerz != undefined ? this.data.locationData.eulerz : 0;
+          vehiclePlaceholder.setAttribute("rotation", rot);
         } else {
+          // vehiclePlaceholder.append(this.el);
           vehiclePlaceholder.setAttribute("gltf-model", "#" +this.data.objectData.modelID); //set as an a-asset in server response
+          let rot = {};
+          rot.x = this.data.locationData.eulerx != undefined ? this.data.locationData.eulerx : 0;
+          rot.y = this.data.locationData.eulery != undefined ? this.data.locationData.eulery : 0;
+          rot.z = this.data.locationData.eulerz != undefined ? this.data.locationData.eulerz : 0;
+          vehiclePlaceholder.setAttribute("rotation", rot);
         }
       }
 
@@ -2478,10 +2494,17 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
       scale.z = that.data.locationData.markerObjScale != undefined ? that.data.locationData.markerObjScale : 1;
       }
 
-      console.log("setting object position to " + JSON.stringify(pos));
+ 
       if (!this.data.equipped) {
-        that.el.setAttribute("position", pos);
-        that.el.setAttribute("rotation", rot);
+        console.log("setting object pos/rot to " + JSON.stringify(rot));
+        if (this.modelParent != null) {
+          this.modelParent.setAttribute("position", pos);
+          this.modelParent.setAttribute("rotation", rot);
+        } else {
+          that.el.setAttribute("position", pos);
+          that.el.setAttribute("rotation", rot);
+        }
+      
       } else {
         
         this.el.setAttribute('material', {opacity: 0.25, transparent: true});
