@@ -3195,7 +3195,7 @@ AFRAME.registerComponent('mod_model', {
       
     },
     init: function () {
-      let eventData = [];
+      let textData = [];
       let moIndex = -1;
       let idleIndex = -1;
       let danceIndex = -1;
@@ -3236,6 +3236,7 @@ AFRAME.registerComponent('mod_model', {
       this.triggerAudioController = document.getElementById("triggerAudio");
       this.hasTrigger = false;
       this.triggerObject = null;
+      this.hasAudioTrigger = false;
       
       if (this.data.shader != '') {
         // setShader(this.data.shader);
@@ -3244,7 +3245,7 @@ AFRAME.registerComponent('mod_model', {
 
       if (this.data.eventData.length > 1) {
         console.log("model eventData " + JSON.stringify(this.data.eventData));
-        eventData = this.data.eventData.split("~");//tilde delimiter splits string to array
+        textData = this.data.eventData.split("~");//tilde delimiter splits string to array
 
       }
       if (JSON.stringify(this.data.eventData).includes("beat")) {
@@ -3302,8 +3303,8 @@ AFRAME.registerComponent('mod_model', {
             // }
           }
         // let dynSkybox = document.getElementById('')
-          for (let e = 0; e < eventData.length; e++) {
-            if (eventData[e].toLowerCase().includes("refract")){
+          for (let e = 0; e < textData.length; e++) {
+            if (textData[e].toLowerCase().includes("refract")){
               console.log("tryna set refraction");
               obj.material.refractionRatio = .9;
               obj.material.reflectivity = .5;
@@ -3313,7 +3314,7 @@ AFRAME.registerComponent('mod_model', {
           if (this.data.eventData.toLowerCase().includes("spawn")) {
             this.el.classList.add("spawn");
           }
-          if (this.data.eventData.toLowerCase().includes("trigger")) { //for external trigger object, disabled the embedded trigger 
+          if (this.data.eventData.toLowerCase().includes("trigger")) { //for external trigger object, disabled the embedded trigger //TODO make this physicstrigger
             this.el.classList.add("trigger");
             this.el.setAttribute('mod_physics', {isTrigger: true});
             // obj.visible = false;
@@ -3335,6 +3336,12 @@ AFRAME.registerComponent('mod_model', {
 
             this.el.setAttribute('fireworks_spawner', {type: 'fireball'});
          
+          }
+          if (this.data.eventData.toLowerCase().includes("audiotrigger")) {
+            // console.log("gotsa audiotrigg3re!");
+
+            // this.el.setAttribute('fireworks_spawner', {type: 'fireball'});
+            this.hasAudioTrigger = true;
           }
           
 
@@ -3514,7 +3521,7 @@ AFRAME.registerComponent('mod_model', {
                 // hvids = hvids.sort(() => Math.random() - 0.5);  //schweet
                 // vvids = vvids.sort(() => Math.random() - 0.5);  
             } else {
-              console.log("caint fine no video_groups_control");
+              console.log("caint fine no audioo_groups_control");
             }
           }
           for (i = 0; i < this.meshChildren.length; i++) { //apply mods to the special things
@@ -3678,7 +3685,9 @@ AFRAME.registerComponent('mod_model', {
                   if (this.data.eventData.toLowerCase().includes("audiotrigger")) {
                     // var triggerAudioController = document.getElementById("triggerAudio");
                     if (this.triggerAudioController != null) {
+                      
                       this.triggerAudioController.components.trigger_audio_control.playAudio();
+
                     }
                   }
                     calloutEntity.setAttribute('visible', true);
@@ -3897,8 +3906,8 @@ AFRAME.registerComponent('mod_model', {
         if (!this.data.eventData.toLowerCase().includes("undefined") && this.data.eventData.toLowerCase().includes("main") && this.data.eventData.toLowerCase().includes("text")) {
           document.getElementById("mainTextToggle").setAttribute("visible", false);
           this.data.eventData = document.getElementById("mainText").getAttribute("main-text-control", "mainTextString"); 
-          console.log(this.data.eventData);
-          eventData = this.data.eventData.mainTextString.split("~");
+          console.log("target eventData : "+ JSON.stringify(this.data.eventData));
+          textData = this.data.eventData.mainTextString.split("~");
           hasCallout = true;
         } 
         if (hasCallout) {
@@ -4024,11 +4033,11 @@ AFRAME.registerComponent('mod_model', {
             });        
           }
         } else {
-          console.log("no primary audio found!");
+          // console.log("no primary audio found!");
         }
         this.el.addEventListener('mouseenter', (evt) =>  {
           
-          if (evt.detail.intersection != null && hasCallout && !eventData[textIndex].toLowerCase().includes("undefined")) {
+          if (evt.detail.intersection != null && hasCallout && !textData[textIndex].toLowerCase().includes("undefined")) {
             // this.bubble = theEl.querySelector('.bubble');
             // this.bubbleText = theEl.querySelector('.bubbleText');
             calloutOn = true;
@@ -4076,17 +4085,18 @@ AFRAME.registerComponent('mod_model', {
               anchor: "center",
               wrapCount: 20,
               color: "black",
-              value: eventData[textIndex]
+              value: textData[textIndex]
             });
 
-            if (textIndex < eventData.length - 1) {
+            if (textIndex < textData.length - 1) {
               textIndex++;
             } else {
               textIndex = 0;
             }
           }
-          if (this.data.eventData != undefined && this.data.eventData != null && this.data.eventData.toString().toLowerCase().includes("audiotrigger")) {
-
+          // console.log("tryna play audiotrigger " + JSON.stringify(this.data.eventData));
+          if (this.hasAudioTrigger) {
+            // console.log("tryna play audiotrigger");
             if (this.triggerAudioController != null) {
               this.triggerAudioController.components.trigger_audio_control.playAudio();
             }

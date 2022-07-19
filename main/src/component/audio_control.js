@@ -1458,7 +1458,7 @@ AFRAME.registerComponent('trigger_audio_control', { //trigger audio on designate
             }
         }
 
-        let volume = Math.min(Math.max(0, 1000 - distance), 1000) * .001; //clamp between 0-1, out to 1000 units
+        let volume = Math.min(Math.max(0, 1000 - (distance * 4)), 1000) * .001; //clamp between 0-1
         // let volume = clamp(100 - distance) * .01; //hrm..
         triggerAudioHowl.volume(volume);
         
