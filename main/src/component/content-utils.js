@@ -2355,7 +2355,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
         // this.el.setAttribute("position", {x:0, y:0, z:0});
         if (this.data.objectData.modelURL != undefined) {
           // vehiclePlaceholder.append(this.el);
-          vehiclePlaceholder.setAttribute("gltf-model", this.data.objectData.modelURL); //set as an a-asset in server response
+          vehiclePlaceholder.setAttribute("gltf-model", this.data.objectData.modelURL); 
           let rot = {};
           rot.x = this.data.locationData.eulerx != undefined ? this.data.locationData.eulerx : 0;
           rot.y = this.data.locationData.eulery != undefined ? this.data.locationData.eulery : 0;
@@ -2363,7 +2363,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
           vehiclePlaceholder.setAttribute("rotation", rot);
         } else {
           // vehiclePlaceholder.append(this.el);
-          vehiclePlaceholder.setAttribute("gltf-model", "#" +this.data.objectData.modelID); //set as an a-asset in server response
+          vehiclePlaceholder.setAttribute("gltf-model", "#" +this.data.objectData.modelID); 
           let rot = {};
           rot.x = this.data.locationData.eulerx != undefined ? this.data.locationData.eulerx : 0;
           rot.y = this.data.locationData.eulery != undefined ? this.data.locationData.eulery : 0;
@@ -2374,9 +2374,9 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
 
     } else {
       if (this.data.objectData.modelURL != undefined) {
-        this.el.setAttribute("gltf-model", this.data.objectData.modelURL); //set as an a-asset in server response
+        this.el.setAttribute("gltf-model", this.data.objectData.modelURL); 
       } else {
-        this.el.setAttribute("gltf-model", "#" +this.data.objectData.modelID); //set as an a-asset in server response
+        this.el.setAttribute("gltf-model", "#" +this.data.objectData.modelID); 
       }
     }
    
@@ -3754,8 +3754,8 @@ AFRAME.registerComponent('mod_model', {
                   value: hpics[hpicsIndex].title
                 });
                 // this.el.setAttribute("position", this.data.pos);
-                childEnt.addEventListener('mouseenter', function (evt) {
-                  if (this.data.eventData.toLowerCase().includes("audiotrigger")) {
+                childEnt.addEventListener('mouseenter', (evt) => {
+                  if (this.data && this.data.eventData != undefined && this.data.eventData.toLowerCase().includes("audiotrigger")) {
                     // var triggerAudioController = document.getElementById("triggerAudio");
                     if (this.triggerAudioController != null) {
                       this.triggerAudioController.components.trigger_audio_control.playAudio();
@@ -3767,7 +3767,7 @@ AFRAME.registerComponent('mod_model', {
                     calloutEntity.setAttribute("position", pos);
                   // }
                 });
-                childEnt.addEventListener('mouseleave', function (evt) {
+                childEnt.addEventListener('mouseleave', (evt) => {
                   // console.log("tryna mouseexit");
                   calloutEntity.setAttribute('visible', false);
                 });
@@ -3835,7 +3835,7 @@ AFRAME.registerComponent('mod_model', {
                 });
 
                 childEnt.addEventListener('mouseenter', (evt) => {
-                  if (this.data.eventData.toLowerCase().includes("audiotrigger")) {
+                  if (this.data && this.data.eventData != undefined && this.data.eventData.toLowerCase().includes("audiotrigger")) {
                     // this.triggerAudioController = document.getElementById("triggerAudio");
                     if (this.triggerAudioController != null) {
                       this.triggerAudioController.components.trigger_audio_control.playAudio();
@@ -3847,7 +3847,7 @@ AFRAME.registerComponent('mod_model', {
                     calloutEntity.setAttribute("position", pos);
                   // }
                 });
-                childEnt.addEventListener('mouseleave', function (evt) {
+                childEnt.addEventListener('mouseleave', (evt) => {
                   // console.log("tryna mouseexit");
                   calloutEntity.setAttribute('visible', false);
                 });

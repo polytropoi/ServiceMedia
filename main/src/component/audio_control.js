@@ -1442,7 +1442,7 @@ AFRAME.registerComponent('trigger_audio_control', { //trigger audio on designate
         this.audioGroupsEl = document.getElementById('audioGroupsEl');
         if (this.audioGroupsEl != null) {
             this.audioGroupsController = this.audioGroupsEl.components.audio_groups_control;
-            let audioID = this.audioGroupsController.returnRandomTriggerAudioID();
+            let audioID = this.audioGroupsController.returnRandomTriggerAudioID();  //TODO - follow index sequence, use tags?
             let audioItem = this.audioGroupsController.returnAudioItem(audioID);
             if (audioItem != null) {
             console.log("tryna set trigger to src " + audioItem.URLogg);
@@ -1458,38 +1458,21 @@ AFRAME.registerComponent('trigger_audio_control', { //trigger audio on designate
             }
         }
 
-        let volume = Math.min(Math.max(0, 100 - distance), 100) * .01; //clamp between 0-100
+        let volume = Math.min(Math.max(0, 1000 - distance), 1000) * .001; //clamp between 0-1, out to 1000 units
         // let volume = clamp(100 - distance) * .01; //hrm..
         triggerAudioHowl.volume(volume);
-        console.log("tryna play trigger at volume " + volume);
+        
             
         const clamp = (num, a, b) => Math.max(Math.min(num, Math.max(a, b)), Math.min(a, b));
         const rate = clamp(Math.random() + .25, .75, 1.25); //fudge pitch a bit slower or faster
         triggerAudioHowl.rate(rate);
         // console.log("tryna play at hitpoint " + pos);
         let id = triggerAudioHowl.play();
+        console.log("tryna play trigger at volume " + volume + " distance " + distance + " id " + id);
         triggerAudioHowl.pos(pos.x / 100, pos.y / 100, pos.z / 100, id);  //HOLY SHIT howler needs small values for position, * .01
 
-        // this.sound = this.sound.play('thunder');
-        // this.sound.pos(x, y, -0.5, this._thunder);
-        // this.sound.volume(1, this._thunder);
-  
-        // // Schedule the next clap.
-        // this.thunder();
 
     }
-
-    // tick: function(time, deltaTime) {
-    //     if (ambientAudioHowl != null && this.cam != null) { //initialized as a global, included explicitly in page code
-    //         // ambientPosition = this.el.object3D.position; //for spatialization, it's moving based on animation
-    //         this.distance = this.el.object3D.position.distanceTo(this.cam.object3D.position);
-    //         // console.log("ambientDistance: " + this.distance);
-    //        const rate = clampNumber(1 - (this.distance/100), .25, 1.25);
-    //        ambientAudioHowl.rate(rate + .1);
-    //         ambientAudioHowl.pos(this.el.object3D.position.x, this.el.object3D.position.y, this.el.object3D.position.z);
-        
-    //     }
-    // }
 }); //end register
     
 AFRAME.registerComponent('audio_groups_control', { //element and component are added if settings data (in connect.js) includes audio groups
