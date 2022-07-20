@@ -18796,7 +18796,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                     if (hasTriggerAudio) {
                         // triggerAudioEntity = "<a-entity id=\x22triggerAudio\x22 trigger_audio_control=\x22oggurl: "+triggerOggUrl+"; mp3url: "+triggerMp3Url+"; volume: "+sceneTriggerVolume+";\x22"+
                         // "</a-entity>";
-                        triggerAudioEntity = "<a-entity id=\x22triggerAudio\x22 trigger_audio_control=\x22init: yes\x22"+
+                        triggerAudioEntity = "<a-entity id=\x22triggerAudio\x22 trigger_audio_control=\x22volume: "+sceneTriggerVolume+"\x22"+
                         "</a-entity>";
                         triggerAudioScript = "<script>" +      
                         "let triggerAudioHowl = new Howl({" + //inject howler for non-streaming

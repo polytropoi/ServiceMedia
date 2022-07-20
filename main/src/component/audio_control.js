@@ -1387,7 +1387,8 @@ AFRAME.registerComponent('trigger_audio_control', { //trigger audio on designate
         // this.camPosition = "";
         // this.distance = "";
         // this.ambientChild = document.querySelector(".ambientChild");
-        var normalizedVolume = ((this.data.volume - -80) * 100) / (20 - -80) * .01;    
+        // this.normalizedVolume = ((this.data.volume - -80) * 100) / (20 - -80) * .01;    
+        this.modVolume(this.data.volume);
         // triggerAudioHowl.volume(normalizedVolume);
         this.triggerPosition = {x: this.el.object3D.position.x/100,y: this.el.object3D.position.y/100,x: this.el.object3D.position.z/100}; //howler pos scale * .01 ~= three pos?
         // triggerAudioHowl.pos(triggerPosition);
@@ -1415,10 +1416,10 @@ AFRAME.registerComponent('trigger_audio_control', { //trigger audio on designate
     modVolume: function(newVolume) { //from slider in canvasOverlay
         console.log("tryna mod trigger Volume to " + newVolume);
        
-        normalizedVolume = ((newVolume - -80) * 100) / (20 - -80) * .01;
+        this.normalizedVolume = ((newVolume - -80) * 100) / (20 - -80) * .01;
         // console.log("normalizedVolume is " + normalizedVolume);
-        console.log("tryna mod trigger Volume to " + normalizedVolume);
-        triggerAudioHowl.volume(normalizedVolume);
+        console.log("tryna mod trigger Volume to " + this.normalizedVolume);
+        triggerAudioHowl.volume(this.normalizedVolume);
     },
     playAudio: function() {
         this.audioGroupsEl = document.getElementById('audioGroupsEl');
@@ -1428,10 +1429,14 @@ AFRAME.registerComponent('trigger_audio_control', { //trigger audio on designate
             triggerAudioHowl.src = audioItem.mp3url;
             // triggerAudioHowl.play();
         }
-        console.log("tryna play trigger audio");
+        console.log(this.data.volume + "tryna play trigger audio" + this.normalizedVolume);
         // triggerPosition = this.el.object3D.position;
         // triggerAudioHowl.pos(triggerPosition);
         // triggerAudioHowl.fade(0, 1, 5000);
+        triggerAudioHowl.volume(this.normalizedVolume);
+        const clamp = (num, a, b) => Math.max(Math.min(num, Math.max(a, b)), Math.min(a, b));
+        const rate = clamp(Math.random() + .1, .9, 1.1); //fudge pitch a bit slower or faster
+        triggerAudioHowl.rate(rate);
         let id = triggerAudioHowl.play();
         triggerAudioHowl.pos(this.triggerPosition, id); 
 
@@ -1457,7 +1462,7 @@ AFRAME.registerComponent('trigger_audio_control', { //trigger audio on designate
             // triggerAudioHowl.play();
             }
         }
-
+        //umm, maybe split the diff with this.data.volume (scene setting) and the distance driven volume below?
         let volume = Math.min(Math.max(0, 1000 - (distance * 4)), 1000) * .001; //clamp between 0-1
         // let volume = clamp(100 - distance) * .01; //hrm..
         if (volume < .1) {
