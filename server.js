@@ -17486,13 +17486,13 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                             if (sceneResponse.sceneSkyParticles != undefined && sceneResponse.sceneSkyParticles != null && sceneResponse.sceneSkyParticles != "None") { 
                                 if (sceneResponse.sceneSkyParticles.toLowerCase() == "dust") {
                                     // skyParticles = "<a-entity scale='2 2 2' position='0 3 0' particle_mangler particle-system=\x22preset: dust; particleCount: 3000; texture: https://realitymangler.com/assets/textures/smokeparticle2.png; color: " + sceneResponse.sceneColor1 + "," + sceneResponse.sceneColor2 +"\x22></a-entity>";
-                                    skyParticles = "<a-entity scale=\x2220 10 20\x22 position=\x220 5 0\x22 sprite-particles=\x22texture: #sparkle1; blending: additive; color: black..white;  position: -1 -1 -1..1 1 1; velocity: -.01 -.025 -.01 .. .01 .025 .01; spawnRate: 500; lifeTime: 2; scale: .5,1; opacity: 1\x22></a-entity>";
+                                    skyParticles = "<a-entity scale=\x2220 10 20\x22 position=\x220 5 0\x22 sprite-particles=\x22texture: #sparkle1; blending: additive; color: black..white;  position: -1 -1 -1..1 1 1; velocity: -.01 -.025 -.01 .. .01 .025 .01; spawnRate: 500; lifeTime: 2; scale: .25,.75; opacity: 1\x22></a-entity>";
                                 } else if (sceneResponse.sceneSkyParticles.toLowerCase() == "rain") {
                                     // skyParticles = "<a-entity scale='2 2 2' position='0 3 0' particle_mangler particle-system=\x22preset: rain; particleCount: 3000; texture: https://realitymangler.com/assets/textures/raindrop2.png; color: " + sceneResponse.sceneColor1 + "," + sceneResponse.sceneColor2 +"\x22></a-entity>";
-                                    skyParticles = "<a-entity scale=\x2220 10 20\x22 position=\x220 5 0\x22 sprite-particles=\x22texture: #raindrop; blending: additive; color: " +sceneResponse.sceneColor2 + "; position: -1 1 -1..1 1 1; spawnRate: 1000; velocity: 0 -1 0; lifeTime: 4; scale: .1,.5; opacity: .8\x22></a-entity>";
+                                    skyParticles = "<a-entity scale=\x2220 10 20\x22 position=\x220 5 0\x22 sprite-particles=\x22texture: #raindrop; blending: additive; color: " +sceneResponse.sceneColor2 + "; position: -1 1 -1..1 1 1; spawnRate: 1000; velocity: 0 -1 0; lifeTime: 4; scale: .05,.1; opacity: .8\x22></a-entity>";
                                 } else if (sceneResponse.sceneSkyParticles.toLowerCase() == "rain/fog") {
                                     // skyParticles = "<a-entity scale='2 2 2' position='0 3 0' particle_mangler particle-system=\x22preset: rain; particleCount: 3000; texture: https://realitymangler.com/assets/textures/raindrop2.png; color: " + sceneResponse.sceneColor1 + "," + sceneResponse.sceneColor2 +"\x22></a-entity>";
-                                    skyParticles = "<a-entity scale=\x2220 10 20\x22 position=\x220 10 0\x22 sprite-particles=\x22texture: #raindrop; color: " +sceneResponse.sceneColor2 + "; position: -1 1 -1..1 1 1; spawnRate: 1000; velocity: 0 -1 0; lifeTime: 4; scale: .1,.25; opacity: 1\x22></a-entity>"+
+                                    skyParticles = "<a-entity scale=\x2220 10 20\x22 position=\x220 10 0\x22 sprite-particles=\x22texture: #raindrop; color: " +sceneResponse.sceneColor2 + "; position: -1 1 -1..1 1 1; spawnRate: 1000; velocity: 0 -1 0; lifeTime: 4; scale: .05,.1; opacity: .75\x22></a-entity>"+
                                     "<a-entity scale=\x2250 10 50\x22 position=\x220 10 0\x22 sprite-particles=\x22texture: #cloud1; color: " +sceneResponse.sceneColor2 + "; position: -1 -1 -1..1 1 1; velocity: -.05 -.025 -.05 .. .05 .025 .05; spawnRate: 5; lifeTime: 20; scale: 100,200; opacity: 0,.3,0; rotation: 0..360\x22></a-entity>";
                                 } else if (sceneResponse.sceneSkyParticles.toLowerCase() == "rain/fog/add") {
                                     // skyParticles = "<a-entity scale='2 2 2' position='0 3 0' particle_mangler particle-system=\x22preset: rain; particleCount: 3000; texture: https://realitymangler.com/assets/textures/raindrop2.png; color: " + sceneResponse.sceneColor1 + "," + sceneResponse.sceneColor2 +"\x22></a-entity>";
@@ -17521,8 +17521,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                     // skyParticles = "<a-entity scale='15 5 15' position='0 5 0' particle_mangler particle-system=\x22preset: dust; maxAge: 25; velocityValue: 0 -.01 0; direction: -.01; positionSpread: 15 2 15; opacity: .25; particleCount: 50; size: 500; blending: 2; texture: https://realitymangler.com/assets/textures/cloud_lg.png; color: " + sceneResponse.sceneColor1 + "," + sceneResponse.sceneColor2 +"\x22></a-entity>";
                                     skyParticles = "<a-entity scale=\x2250 10 50\x22 position=\x220 10 0\x22 sprite-particles=\x22texture: #cloud1; color: " +sceneResponse.sceneColor2 + "; position: -1 -1 -1..1 1 1; velocity: -.05 -.025 -.05 .. .05 .025 .05; spawnRate: 5; lifeTime: 20; scale: 100,200; opacity: 0,.3,0; rotation: 0..360\x22></a-entity>";
                                 } else if (sceneResponse.sceneSkyParticles.toLowerCase() == "fog/add") {
-                                // skyParticles = "<a-entity scale='15 5 15' position='0 5 0' particle_mangler particle-system=\x22preset: dust; maxAge: 25; velocityValue: 0 -.01 0; direction: -.01; positionSpread: 15 2 15; opacity: .25; particleCount: 50; size: 500; blending: 2; texture: https://realitymangler.com/assets/textures/cloud_lg.png; color: " + sceneResponse.sceneColor1 + "," + sceneResponse.sceneColor2 +"\x22></a-entity>";
-                                skyParticles = "<a-entity scale=\x2250 10 50\x22 position=\x220 10 0\x22 sprite-particles=\x22texture: #cloud1; blending: additive; color: " +sceneResponse.sceneColor2 + "; position: -1 -1 -1..1 1 1; velocity: -.05 -.025 -.05 .. .05 .025 .05; spawnRate: 5; lifeTime: 20; scale: 100,200; opacity: 0,.3,0; rotation: 0..360\x22></a-entity>";
+                                    skyParticles = "<a-entity scale=\x2250 10 50\x22 position=\x220 10 0\x22 sprite-particles=\x22texture: #cloud1; blending: additive; color: " +sceneResponse.sceneColor2 + "; position: -1 -1 -1..1 1 1; velocity: -.05 -.025 -.05 .. .05 .025 .05; spawnRate: 5; lifeTime: 20; scale: 100,200; opacity: 0,.3,0; rotation: 0..360\x22></a-entity>";
                                 } else if (sceneResponse.sceneSkyParticles.toLowerCase() == "clouds") {
                                     // skyParticles = "<a-entity scale='15 5 15' position='0 10 0' particle_mangler particle-system=\x22preset: dust; maxAge: 25; velocityValue: 0 -.01 0; direction: -.01; positionSpread: 30 15 30; opacity: .2; particleCount: 50; size: 1000; blending: 2; texture: https://realitymangler.com/assets/textures/cloud_lg.png; color: " + sceneResponse.sceneColor1 + "," + sceneResponse.sceneColor2 +"\x22></a-entity>";
                                 } else if (sceneResponse.sceneSkyParticles.toLowerCase() == "stars") {    
@@ -17537,9 +17536,9 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                             if (sceneResponse.sceneWater != null) {
                                 if (sceneResponse.sceneWater.name == "water2") {
                                     console.log("water: " + JSON.stringify(sceneResponse.sceneWater));
-                                    ocean = "<a-plane position=\x220  "+sceneResponse.sceneWater.level+" 0\x22 width=\x22100\x22 height=\x22100\x22 rotation=\x22-90 180 -90\x22 segments-height=\x22100\x22 segments-width=\x22100\x22 "+skyboxEnvMap+" material=\x22color: "+sceneResponse.sceneColor3+"; shader:makewaves; uMap: #water; repeat: 500 500;\x22></a-plane>";
+                                    ocean = "<a-plane position=\x220  "+sceneResponse.sceneWater.level+" 0\x22 width=\x22100\x22 height=\x22100\x22 rotation=\x22-90 180 -90\x22 segments-height=\x22100\x22 segments-width=\x22100\x22 "+skyboxEnvMap+" material=\x22color: "+sceneResponse.sceneColor3+"; shader:makewaves; uMap: #water; repeat: 1000 1000;\x22></a-plane>";
                                 } else if (sceneResponse.sceneWater.name == "water1") {
-                                    ocean = "<a-plane position=\x220 "+sceneResponse.sceneWater.level+" 0\x22 width=\x22512\x22 height=\x22512\x22 rotation=\x22-90 180 -90\x22 segments-height=\x2264\x22 segments-width=\x2264\x22 "+skyboxEnvMap+" material=\x22shader:makewaves_small; color: "+sceneResponse.sceneColor3+";uMap: #water1; repeat: 500 500; transparent: true\x22></a-plane>";
+                                    ocean = "<a-plane position=\x220 "+sceneResponse.sceneWater.level+" 0\x22 width=\x22512\x22 height=\x22512\x22 rotation=\x22-90 180 -90\x22 segments-height=\x2264\x22 segments-width=\x2264\x22 "+skyboxEnvMap+" material=\x22shader:makewaves_small; color: "+sceneResponse.sceneColor3+";uMap: #water1; repeat: 1000 1000; transparent: true\x22></a-plane>";
                                 }
                             }
                             if (sceneResponse.sceneUseHeightmap != null && sceneResponse.sceneUseHeightmap) {
@@ -19039,7 +19038,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                         }
                         if (sceneResponse.sceneYouTubeIDs != null && sceneResponse.sceneYouTubeIDs.length > 0) {
                             // yotubes = sceneResponse.sceneYouTubeIDs;
-                            
+                            let youtubeVolume = sceneResponse.sceneMediaAudioVolume != undefined ? sceneResponse.sceneMediaAudioVolume : 80;
                             for (let i = 0; i < sceneResponse.sceneYouTubeIDs.length; i++) {
                                 // youtubeContent = "<iframe width=\x22240\x22 id=\x22youtubeElement\x22 data-yt_id=\x22"+sceneResponse.sceneYouTubeIDs[i]+"\x22 height=\x22180\x22 src=\x22https://www.youtube.com/embed/"+sceneResponse.sceneYouTubeIDs[i]+
                                 // "\x22 frameborder=\x2210\x22 allow=\x22autoplay; picture-in-picture\x22 allowfullscreen></iframe>";
@@ -19052,11 +19051,12 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                     "var firstScriptTag = document.getElementsByTagName('script')[0];\n"+
                                     "firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);\n"+
                                 "</script>";
+                                
                                 // containers = containers + "<div class=\x22css3d youtube\x22 data-attribute=\x22"+sceneResponse.sceneYouTubeIDs[i]+"\x22></div>"; 
                                 youtubeEntity = "<a-entity id=\x22youtubeParent\x22 look-at=\x22#player\x22 position=\x22-6 2 -6\x22>"+
 
                                 // "<a-entity id=\x22youtubePlayer\x22 position=\x220 -1 2\x22 gltf-model=\x22#youtubeplayer\x22 youtube_player=\x22yt_id: "+sceneResponse.sceneYouTubeIDs[i]+"\x22></a-entity></a-entity>";
-                                "<a-entity id=\x22youtubePlayer\x22 position=\x220 -1 1\x22 gltf-model=\x22#youtubeplayer\x22 youtube_player=\x22yt_id: "+sceneResponse.sceneYouTubeIDs[i]+"\x22></a-entity>"+
+                                "<a-entity id=\x22youtubePlayer\x22 position=\x220 -1 1\x22 gltf-model=\x22#youtubeplayer\x22 youtube_player=\x22yt_id: "+sceneResponse.sceneYouTubeIDs[i]+"; volume: "+youtubeVolume+"\x22></a-entity>"+
                                                                 "<a-text wrapCount=\x2270\x22 value=\x22"+sceneResponse.sceneTitle+"\x22 width=\x222\x22 position=\x22-.95 .65 1.1\x22 id=\x22youtubeTitle\x22></a-text>"+
                                 "<a-text width=\x223\x22 position=\x22-.95 -.3 1.1\x22 id=\x22youtubeState\x22></a-text>"+
                                 "<a-text width=\x223\x22 position=\x22-.95 -.4 1.1\x22 id=\x22youtubeStats\x22></a-text>"+

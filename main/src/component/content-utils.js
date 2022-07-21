@@ -4989,7 +4989,8 @@ AFRAME.registerComponent('youtube_player', {  //setup and controls for the 3d pl
       color: {default: 'red'},
       hitpoint: {default: null},
       yt_id: {default: ""},
-      duration: {default: 0}  
+      duration: {default: 0},  
+      volume: {default:80}
   },
   // dependencies: ['raycaster'],
   init: function () {
@@ -5161,8 +5162,10 @@ AFRAME.registerComponent('youtube_player', {  //setup and controls for the 3d pl
     this.intersection = null;
     this.hitpoint = null;
     
-    // if (sceneLocations.locations.length > 0); {
-     
+    // if (youtubePlayer != null) {
+    //   let vol = ((this.data.volume - -80) * 100) / (20 - -80); //vol is stored as -80 to +20
+    //   console.log("youtube volume is " + vol);
+    //   youtubePlayer.setVolume(vol);
     // }
     this.el.addEventListener('raycaster-intersected', e => {  
         this.raycaster = e.detail.el;
@@ -5195,6 +5198,7 @@ AFRAME.registerComponent('youtube_player', {  //setup and controls for the 3d pl
 
     this.el.addEventListener('click', function (event) {
       // thiz.hitpoint = this.hitpoint;
+
       thiz.nStart = new THREE.Vector3();
       thiz.nEnd = new THREE.Vector3();
       thiz.slider_begin.getWorldPosition( thiz.nStart );
@@ -5302,7 +5306,9 @@ AFRAME.registerComponent('youtube_player', {  //setup and controls for the 3d pl
         value: state
       });
     }
-
+    let vol = ((this.data.volume - -80) * 100) / (20 - -80); //vol is stored as -80 to +20
+    console.log("youtube volume is " + vol);
+    youtubePlayer.setVolume(vol);
     if (this.play_button != null) {
       if (state == "loading") {
         this.play_button.material = this.yellowmat;
