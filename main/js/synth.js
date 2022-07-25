@@ -127,25 +127,27 @@ AFRAME.registerComponent('mod_synth', {
     // var pattern = new Tone.Pattern(function(time, note){
     //     //the order of the notes passed in depends on the pattern
     //   }, ["C2", "D4", "E5", "A6"], "upDown");
-      amSynth.triggerAttackRelease("C4", 1)
+      amSynth.triggerAttackRelease("C4", 1);
     },
 
     metalHitDistance: function (distance) {
-      this.distance = distance;
+      // this.distance = distance;
       vol.volume.value = distance * -2;
-      //  console.log("tryna trigger synth note distance " + distance );
+       console.log("tryna trigger synth note distance " + distance );
 
-       bell.triggerAttackRelease(getRandomInt(0,88), 1);
+      //  bell.triggerAttackRelease(getRandomInt(0,88), 1);
+      //  bell.triggerAttackRelease("G4", 1);
+       amSynth.triggerAttackRelease(getRandomInt(64,88), 1);
     },
      
    
      remove: function () {
        // Do something the component or its entity is detached.
-     },
-   
-     tick: function (time, timeDelta) {
-       // Do something on every scene tick or frame.
      }
+   
+    //  tick: function (time, timeDelta) {
+    //    // Do something on every scene tick or frame.
+    //  }
  });
 
  AFRAME.registerComponent('generate_synth_triggers', {

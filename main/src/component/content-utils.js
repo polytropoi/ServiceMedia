@@ -2788,7 +2788,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
     //   this.hitID = hitID;
       // console.log("new hit " + hitID + " " + distance + " " + JSON.stringify(hitpoint));
       // distance = window.playerPosition.distanceTo(hitpoint);
-      // console.log("new hit " + hitID + " distance: " + distance + " " + JSON.stringify(hitpoint));
+      console.log("new hit " + hitID + " distance: " + distance + " " + JSON.stringify(hitpoint));
       // var triggerAudioController = document.getElementById("triggerAudio");
       if (this.triggerAudioController != null) {
         this.triggerAudioController.components.trigger_audio_control.playAudioAtPosition(hitpoint, distance);
@@ -4940,7 +4940,7 @@ AFRAME.registerComponent('follow', {
   }
 });
 
-AFRAME.registerComponent('particle_mangler', {
+AFRAME.registerComponent('particle_mangler', { //nope, deprecated
   schema: {
     preset: {default: "default"},
     randomize: {default: false},
@@ -4990,7 +4990,7 @@ AFRAME.registerComponent('youtube_player', {  //setup and controls for the 3d pl
       hitpoint: {default: null},
       yt_id: {default: ""},
       duration: {default: 0},  
-      volume: {default:80}
+      volume: {default:80} //youtube vol wants 0-100
   },
   // dependencies: ['raycaster'],
   init: function () {

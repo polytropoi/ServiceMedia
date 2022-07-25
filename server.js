@@ -16474,6 +16474,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
     let instancingEntity = "";
     let meshUtilsScript = "<script type=\x22module\x22 src=\x22../main/src/component/mesh-utils.js\x22 defer=\x22defer\x22></script>";
     let physicsScripts = "";
+    let brownianScript = "";
     let extrasScript = "<script src=\x22../main/vendor/aframe/animation-mixer.js\x22></script>"; //swapped with full aframe-extras lib (that includes animation-mixer) for physics and navmesh if needed
     
     enviromentScript = ""; //for aframe env component
@@ -16586,6 +16587,9 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                             "<script src=\x22../main/vendor/aframe/aframe-physics-system.min.js\x22></script>";
                                                         
                         }
+                        if (sceneData.sceneTags[i].toLowerCase().includes("brownian")) {
+                            brownianScript =  "<script src=\x22../main/src/component/aframe-brownian-motion.js\x22></script>";
+                        }
                         if (sceneData.sceneTags[i].toLowerCase().includes("instancing")) {
                             // console.log("GOTS SCENE TAG: " + sceneData.sceneTags[i]);
                             // showTransport = true;
@@ -16630,7 +16634,9 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                         if (sceneData.sceneTags[i].toLowerCase().includes("aframe master")) {
                             aframeScriptVersion = "<script src=\x22https://cdn.jsdelivr.net/gh/aframevr/aframe@744e2b869e281f840cff7d9cb02e95750ce90920/dist/aframe-master.min.js\x22></script>"; //ref 20220715// nope!
                         }
-                        
+                        if (sceneData.sceneTags[i].toLowerCase().includes("aframe ada")) {
+                            aframeScriptVersion = "<script src=\x22https://a-cursor-test.glitch.me/aframe-master.js\x22></script>"; //mod by @adarosecannon
+                        }
                     }
                 }
                 //TODO use sceneNetworkSettings or whatever
@@ -18213,8 +18219,8 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                         if (entityType == "poi") { //bc location-fu looks for this class to get gpsElements, so this causes dupes
                                             entityType = "model";
                                         }
-                                        if (locMdl.eventData.includes("surface")) {
-                                            entityType = entityType +  " surface";
+                                        if (locMdl.eventData.toLowerCase().includes("surface")) {
+                                            entityType = "surface";
                                         }
 
                                     }
@@ -18336,10 +18342,13 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                                
                                                 // let yRot 
                                                 let scatterSurface = "";
+                                                let brownian = "";
                                                 let id = "gltf_" + m_assetID;
                                                 if (locMdl.eventData.toLowerCase().includes("surface")) {
                                                     scatterSurface = "scatter-surface";
                                                     id = 'scatterSurface';
+                                                    entityType = "surface";
+
                                                 }
                                                 let modModel = "mod_model=\x22eventData:"+locMdl.eventData+"\x22";
                                                 // let modMaterial = "";
@@ -18374,12 +18383,35 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                                             "<script type=\x22x-shader/x-fragment\x22 id=\x22noise1_fragment\x22>"+fragmentShader+"</script>";
                                                         }
                                                     }
+                                                    if (locMdl.eventData.toLowerCase().includes("brownian")) {
+                                                        if (locMdl.eventData.toLowerCase().includes("brownian path")) {
+                                                            brownian = "brownian-path=\x22lineEnd:100000;lineStep:100;count:1000;object:#thing-to-clone;positionVariance:52 22 58;spaceVectorOffset:100.1,100,100.2,100.2,100,100.1;rotationFollowsAxis:x;speed:0.01;\x22";
+                                                            gltfsEntities = gltfsEntities + "<a-gltf-model shadow src=\x22#"+m_assetID+"\x22 id=\x22thing-to-clone\x22 visible=\x22true\x22></a-gltf-model>"+
+                                                            "<a-entity "+brownian+
+                                                            " shadow=\x22cast:true; receive:true\x22 "+skyboxEnvMap+" position=\x22"+locMdl.x+" "+locMdl.y+" "+zFix+"\x22 scale=\x22"+scale+
+                                                            " "+scale+" "+scale+"\x22 data-scale=\x22"+scale+"\x22 rotation=\x22"+rotation+"\x22 >" + offsetPos+ "</a-entity>"; 
+                                                        } else {
+                                                            brownian = "brownian-motion=\x22speed:0.1;rotationVariance:.2 .2 .2;positionVariance:2.5 5 2.5;spaceVector:10.1,20.1,30.1,10.1,20.1,30.1;\x22";
+                                                            gltfsEntities = gltfsEntities + "<a-entity id=\x22"+id+"\x22 "+brownian+" "+followCurve+" "+physicsMod+" "+modelParent+" "+scatterSurface+" "+modModel+" class=\x22envMap gltf "+entityType+" "+ambientChild+
+                                                            " activeObjexGrab activeObjexRay\x22 shadow=\x22cast:true; receive:true\x22 "+skyboxEnvMap+" gltf-model=\x22#" + m_assetID + "\x22 "+objAnim+" "+cannedAnim+
+                                                            // " position=\x22"+locMdl.x+" "+locMdl.y+" "+zFix+"\x22 scale=\x22"+scale+" "+scale+" "+scale+"\x22 rotation=\x22"+rotation+"\x22 >" + offsetPos+ "</a-entity>";  //rem rotation bc navmesh donutlike
+                                                            " position=\x22"+locMdl.x+" "+locMdl.y+" "+zFix+"\x22 scale=\x22"+scale+" "+scale+" "+scale+"\x22 data-scale=\x22"+scale+"\x22 rotation=\x22"+rotation+"\x22 >" + offsetPos+ "</a-entity>"; 
+                                                            gltfModel = modelURL;
+                                                        }
+                                                        
+                                                    } else {
+                                                        gltfsEntities = gltfsEntities + "<a-entity id=\x22"+id+"\x22 "+followCurve+" "+physicsMod+" "+modelParent+" "+scatterSurface+" "+modModel+" class=\x22envMap gltf "+entityType+" "+ambientChild+
+                                                        " activeObjexGrab activeObjexRay\x22 shadow=\x22cast:true; receive:true\x22 "+skyboxEnvMap+" gltf-model=\x22#" + m_assetID + "\x22 "+objAnim+" "+cannedAnim+
+                                                        // " position=\x22"+locMdl.x+" "+locMdl.y+" "+zFix+"\x22 scale=\x22"+scale+" "+scale+" "+scale+"\x22 rotation=\x22"+rotation+"\x22 >" + offsetPos+ "</a-entity>";  //rem rotation bc navmesh donutlike
+                                                        " position=\x22"+locMdl.x+" "+locMdl.y+" "+zFix+"\x22 scale=\x22"+scale+" "+scale+" "+scale+"\x22 data-scale=\x22"+scale+"\x22 rotation=\x22"+rotation+"\x22 >" + offsetPos+ "</a-entity>"; 
+                                                        gltfModel = modelURL;
+                                                    }
 
-                                                    gltfsEntities = gltfsEntities + "<a-entity id=\x22"+id+"\x22 "+followCurve+" "+physicsMod+" "+modelParent+" "+scatterSurface+" "+modModel+" class=\x22envMap gltf "+entityType+" "+ambientChild+
-                                                    " activeObjexGrab activeObjexRay\x22 shadow=\x22cast:true; receive:true\x22 "+skyboxEnvMap+" gltf-model=\x22#" + m_assetID + "\x22 "+objAnim+" "+cannedAnim+
-                                                    // " position=\x22"+locMdl.x+" "+locMdl.y+" "+zFix+"\x22 scale=\x22"+scale+" "+scale+" "+scale+"\x22 rotation=\x22"+rotation+"\x22 >" + offsetPos+ "</a-entity>";  //rem rotation bc navmesh donutlike
-                                                    " position=\x22"+locMdl.x+" "+locMdl.y+" "+zFix+"\x22 scale=\x22"+scale+" "+scale+" "+scale+"\x22 data-scale=\x22"+scale+"\x22 rotation=\x22"+rotation+"\x22 >" + offsetPos+ "</a-entity>"; 
-                                                    gltfModel = modelURL;
+                                                    // gltfsEntities = gltfsEntities + "<a-entity id=\x22"+id+"\x22 "+brownian+" "+followCurve+" "+physicsMod+" "+modelParent+" "+scatterSurface+" "+modModel+" class=\x22envMap gltf "+entityType+" "+ambientChild+
+                                                    // " activeObjexGrab activeObjexRay\x22 shadow=\x22cast:true; receive:true\x22 "+skyboxEnvMap+" gltf-model=\x22#" + m_assetID + "\x22 "+objAnim+" "+cannedAnim+
+                                                    // // " position=\x22"+locMdl.x+" "+locMdl.y+" "+zFix+"\x22 scale=\x22"+scale+" "+scale+" "+scale+"\x22 rotation=\x22"+rotation+"\x22 >" + offsetPos+ "</a-entity>";  //rem rotation bc navmesh donutlike
+                                                    // " position=\x22"+locMdl.x+" "+locMdl.y+" "+zFix+"\x22 scale=\x22"+scale+" "+scale+" "+scale+"\x22 data-scale=\x22"+scale+"\x22 rotation=\x22"+rotation+"\x22 >" + offsetPos+ "</a-entity>"; 
+                                                    // gltfModel = modelURL;
                                                 } else { //placement instancing + surface scattering
                                                     console.log("tryna scatter so0methings!@ " + locMdl.eventData.toLowerCase());
                                                     let instancing = "instanced_meshes_mod=\x22_id: "+locMdl.modelID+"; modelID: "+m_assetID+";\x22";
@@ -20939,6 +20971,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                         meshUtilsScript +
                         synthScripts +
                         surfaceScatterScript +
+                        brownianScript +
                         // "<script src=\x22../main/src/util/quaternion.js\x22></script>"+
                         "<script src=\x22../main/vendor/aframe/aframe-particle-system-component.min.js\x22></script>"+
                         // "<script src=\x22../main/vendor/trackedlibs/aabb-collider.js\x22></script>"+
