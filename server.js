@@ -88,13 +88,13 @@ app.use (function (req, res, next) {
     } else {    
     //    console.log ("non ssl request = " + req.headers.host + " tryna redirect");
         if (req.headers.host != "localhost:3000") { //TODO Enviromental Varz
-            // let goodURL = 'https://' + req.get('host') + req.originalUrl;
-            // console.log("tryna redirect to " + goodURL);
-            // res.redirect(goodURL);
+            
             var htmltext = "<html xmlns='http://www.w3.org/1999/xhtml'>" +
                 "<head></head><body> " +
                 "<h4>you must use https to access this site: <a href='https://servicemedia.net'>https://servicemedia.net</a></h4>" +
-                "</body></html>";
+                "</body><script>"+
+                    "window.location.href = window.location.href.replace('http:', 'https:');"
+                "</script></html>";
             res.send(htmltext);
         } else {
             next();
