@@ -56,8 +56,9 @@
               <img src="http://servicemedia.s3.amazonaws.com/assets/pics/fb.png"></a>
           </li>  -->
           <li class="nav-item">
-            <a class="pull-right" style="margin-top:14px; margin-right:14px; width: 32px; height: 32px;" href="https://github.com/polytropoi/ServiceMedia/">
-              <img src="/landing/img/Octocat.png"></a>
+            <div> <a class="pull-left" href="https://www.facebook.com/ServiceMedia-405792179602091/">
+              <img src="http://servicemedia.s3.amazonaws.com/assets/pics/fb.png"></a></div>
+           
           </li> 
           <li class="nav-item">
             <a class="nav-link js-scroll-trigger" href="#contact">Contact</a>
@@ -68,10 +69,20 @@
           <li class="nav-item">
             <a class="nav-link js-scroll-trigger" href="/landing/builds">App</a>
           </li> 
+          
+         
           <li class="nav-item">
-            <a class="pull-right" href="https://www.facebook.com/ServiceMedia-405792179602091/">
-              <img src="http://servicemedia.s3.amazonaws.com/assets/pics/fb.png"></a>
+            <a class="pull-right" style="margin-top:14px; margin-right:14px; width: 32px; height: 32px;" href="https://github.com/polytropoi/ServiceMedia/">
+              <img src="/landing/img/Octocat.png"></a>
           </li> 
+
+
+          <li class="nav-item">
+            <a class="pull-right" style="margin-top:14px; margin-right:14px; width: 18px; height: 18px;" href="https://github.com/sponsors/polytropoi">
+              <img src="/landing/img/smallheart1.png"></a>
+            <!-- <iframe src="https://github.com/sponsors/polytropoi/button" title="Sponsor polytropoi" padding="10" height="35" width="116" style="border: 0;"></iframe> -->
+          </li> 
+
         </ul>
       </div>
     </div>
@@ -282,7 +293,21 @@
         console.log( "document loaded" );
         getScenes();
     });
+    console.log(window.location.href);
+    if (!window.location.href.includes("localhost")) {
+      if (window.location.protocol == 'http:') {
+    
+        console.log("you are accessing us via "
+          + "an insecure protocol (HTTP). "
+          + "Redirecting you to HTTPS.");
+          
+        window.location.href =
+          window.location.href.replace(
+              'http:', 'https:');
+      } 
+    }
     </script>
+
 </body>
 
 </html>
