@@ -81,26 +81,27 @@ var corsOptions = function (origin) {
 
 var oneDay = 86400000;
 
-app.use (function (req, res, next) {
-    var schema = (req.headers['x-forwarded-proto'] || '').toLowerCase();
-    if (schema === 'https') {
-        next();
-    } else {    
-    //    console.log ("non ssl request = " + req.headers.host + " tryna redirect");
-        if (req.headers.host != "localhost:3000") { //TODO Enviromental Varz
-            
-            var htmltext = "<html xmlns='http://www.w3.org/1999/xhtml'>" +
-                "<head></head><body> " +
-                "<h4>you must use https to access this site: <a href='https://servicemedia.net'>https://servicemedia.net</a></h4>" +
-                "</body><script>"+
-                    "window.location.href = window.location.href.replace('http:', 'https:');"
-                "</script></html>";
-            res.send(htmltext);
-        } else {
-            next();
-        }
-    }
-});
+// app.use (function (req, res, next) {
+//     var schema = (req.headers['x-forwarded-proto'] || '').toLowerCase();
+//     if (schema === 'https') {
+//         next();
+//     } else {    
+//     //    console.log ("non ssl request = " + req.headers.host + " tryna redirect");
+//         if (req.headers.host != "localhost:3000") { //TODO Enviromental Varz
+//             next(); //nm do it clientside... :()
+
+//             // var htmltext = "<html xmlns='http://www.w3.org/1999/xhtml'>" +
+//             //     "<head></head><body> " +
+//             //     "<h4>you must use https to access this site: <a href='https://servicemedia.net'>https://servicemedia.net</a></h4>" +
+//             //     "</body><script>"+
+//             //         "window.location.href = window.location.href.replace('http:', 'https:');"
+//             //     "</script></html>";
+//             // res.send(htmltext);
+//         } else {
+//             next();
+//         }
+//     }
+// });
 
 var databaseUrl = process.env.MONGO_URL; //servicemedia connstring
 // console.log(databaseUrl);
