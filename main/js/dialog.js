@@ -13,7 +13,7 @@ var sceneEl = document.querySelector('a-scene');
 // $(function() { 
 if (sceneEl != null && document.querySelector('a-scene') != null) { 
   console.log("gotsa AFRAME SCENE");
-  AFRAME.registerComponent('render_canvas', { 
+  AFRAME.registerComponent('render_canvas', {   //deprecated...?
     schema: {
       initialized: {default: false},
       hello: {default: ''}

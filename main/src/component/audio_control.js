@@ -1463,7 +1463,7 @@ AFRAME.registerComponent('trigger_audio_control', { //trigger audio on designate
             }
         }
         //umm, maybe split the diff with this.data.volume (scene setting) and the distance driven volume below?
-        let volume = Math.min(Math.max(0, 1000 - (distance * 4)), 1000) * .001; //clamp between 0-1
+        let volume = Math.min(Math.max(0, 1000 - (distance * 25)), 1000) * .001; //clamp between 0-1
         // let volume = clamp(100 - distance) * .01; //hrm..
         if (volume < .1) {
             volume = .1;

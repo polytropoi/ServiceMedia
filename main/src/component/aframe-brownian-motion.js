@@ -161,6 +161,16 @@
 			this.initialQuaternion = new THREE.Quaternion().copy(this.el.object3D.quaternion);
 			this.positionOffset = new THREE.Vector3();
 			this.rotationOffset = new THREE.Vector3();
+			this.el.classList.add('activeObjexRay');
+			this.raycaster = new THREE.Raycaster();
+			this.intersection = null;
+			this.hitpoint = null;
+			let that = this;
+			
+			window.addEventListener('click', (e) => {
+				console.log("hit instancew " + this.instanceId );
+			  //   that.instance_clicked(e);
+			  }); 
 		},
 		update() {
 			this.positionOffset.x = (this.data.spaceVector[0] === '' || this.data.spaceVector[0] === undefined) ? Math.random()*2000 - 1000 : Number.parseFloat(this.data.spaceVector[0]);
@@ -240,23 +250,43 @@
 			const data = this.data;
 			const instances = this.instances;
 			const instanceGroup = new THREE.Group();
+			const dummy = new THREE.Object3D();
 			if (this.el.getObject3D('instances')) {
 				this.el.removeObject3D('instances');
 			}
 			instances.splice(0);
 			if (data.object) {
+				
+
 				data.object.object3D.traverse(function (object) {
+
 					if (object.geometry && object.material) {
+
 						const instance = new THREE.InstancedMesh(object.geometry, object.material, data.count);
+		
+						// this.iMesh.setColorAt( i, color.setHex( 0xffffff * Math.random() ) );
+						// instance.setColor(color.setHex( 0xffffff * Math.random()) );
+						
+				
 						instance.instanceMatrix.setUsage( THREE.DynamicDrawUsage );
+						// for (var i=0; i<data.count; i++) {
+						// 	let scale = Math.random() * 5;
+						// 	dummy.scale.set(scale,scale,scale);
+						// 	dummy.updateMatrix();
+						// 	instance.setMatrixAt( i, dummy.matrix );
+						// 	console.log("tryna set scale to " + scale  + " for id " + i);
+						//   }
 						instances.push(instance);
 						instanceGroup.add(instance);
+						
 					}
 				});
+				
 			}
 			this.el.setObject3D('instances', instanceGroup);
 		}
 	}, brownianMotion);
+
 	brownianPath.schema = Object.assign({
 		object: {
 			type: 'selector',
@@ -295,13 +325,24 @@
 		count: {
 			default: 10,
 			description: `Number of lines or instances`
-		}
+		},
+		scaleFactor: {default: 10},
+		interaction: {default: ''}
 	}, brownianMotion.schema);
 
 	brownianPath.init = function tick() {
+
 		brownianMotion.init.call(this);
+
 		this.instances = [];
 		this.updateInstances = this.updateInstances.bind(this);
+		// this.el.classList.add('activeObjexRay');
+		// this.raycaster = new THREE.Raycaster();
+		// this.intersection = null;
+		// this.hitpoint = null;
+		// let that = this;
+		
+		
 	};
 
 	brownianPath.update = function update(oldData) {
@@ -363,6 +404,27 @@
 		for (const ins of this.instances) {
 			ins.instanceMatrix.needsUpdate = true;
 		}
+
+		if (!this.raycaster || this.raycaster == null || this.raycaster == undefined) {
+            return;
+        } else {
+          this.raycaster.setFromCamera( mouse, AFRAME.scenes[0].camera );
+          this.intersection = this.raycaster.intersectObject( this.el.getObject3D('instances'));
+		//   console.log("gotsa intersection: " + this.intersection.name);
+        }
+        // 
+       
+
+        if ( this.intersection != null && this.intersection.length > 0 ) {
+          if (window.playerPosition != null && window.playerPosition != undefined && this.intersection != undefined && this.intersection[0].point != undefined && this.intersection[0].point != null ) {
+			this.instanceId = this.intersection[ 0 ].instanceId;
+			console.log("intersected with instance " + this.instanceId);
+          }
+
+        } else {
+          this.hitID = null;
+          this.instanceId = null;
+        }
 	};
 
 	AFRAME.registerComponent('brownian-motion', brownianMotion);

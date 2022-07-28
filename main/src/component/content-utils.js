@@ -2397,7 +2397,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
       this.calloutText.id = "objCalloutText_" + this.data.objectData._id;
       this.calloutPanel.setAttribute("gltf-model", "#landscape_panel");
       this.calloutPanel.setAttribute("scale", ".1 .075 .1");
-      this.calloutPanel.setAttribute("material", {'flatShading': true});
+      this.calloutPanel.setAttribute("material", {'color': 'black', 'roughness': 1});
       this.calloutEntity.setAttribute("look-at", "#player");
       this.calloutEntity.setAttribute('visible', false);
     
@@ -3039,7 +3039,7 @@ function Pickup (data, id) {
   }
 }
 
-AFRAME.registerComponent('mod_dialog', { //only one of these
+AFRAME.registerComponent('mod_dialog', { //there should only be one of these, unlike callouts
   schema: {
     mode: {default: 'confirm'},
     shader: {default: ''},

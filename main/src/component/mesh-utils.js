@@ -216,11 +216,7 @@ AFRAME.registerComponent('instanced_meshes_sphere', { //scattered randomly, not 
 
         if ( this.intersection != null && this.intersection.length > 0 ) {
           if (window.playerPosition != null && window.playerPosition != undefined && this.intersection[0].point != undefined && this.intersection[0].point != null ) {
-            // let distanq = window.playerPosition.distanceTo(this.intersection[0].point);
-            // this.playerPosition = document.getElementById("player").component.get_pos_rot.returnPosRot();
-            // console.log("intersection! " + this.intersection[ 0 ].instanceId + " distance " + window.playerPosition.distanceTo(this.intersection[0].point));
-            // if (distanq) {
-
+        
               this.instanceId = this.intersection[ 0 ].instanceId;
 
               this.iMesh.setColorAt( this.instanceId, this.highlightColor.setHex( Math.random() * 0xffffff ) );
@@ -228,16 +224,8 @@ AFRAME.registerComponent('instanced_meshes_sphere', { //scattered randomly, not 
               // console.log('windowplayerposition ' + JSON.stringify(window.playerPosition));
               this.rayhit(this.intersection[ 0 ].instanceId, window.playerPosition.distanceTo(this.intersection[0].point), this.intersection[0].point);
 
-            // }
           }
 
-          // cameraPosition = posRotObj.pos;
-          // if (this.intersection[0] != null) {
-          //   this.instanceId = this.intersection[ 0 ].instanceId;
-            
-          //   this.iMesh.setColorAt( this.instanceId, this.highlightColor.setHex( Math.random() * 0xffffff ) );
-          //   this.iMesh.instanceColor.needsUpdate = true;
-          // }
         } else {
           this.hitID = null;
           this.instanceId = null;
@@ -264,23 +252,6 @@ AFRAME.registerComponent('instanced_meshes_sphere', { //scattered randomly, not 
         }
 
       }
-      // let scale = Math.random() * this.data.scaleFactor;
-        // dummy.position.set( x, y, z );
-        // dummy.scale.set(scale,scale,scale);
-
-        // if (this.timeDelta >= 3.0)
-        // {
-        //     clock = new THREE.Clock;
-        //     mesh.scale.set(1,1,1);
-        // }
-        // else
-        // {
-        //     mesh.scale.x = 1-(t/3.0);
-        //     mesh.scale.y = 1-(t/3.0);
-        //     mesh.scale.z = 1-(t/3.0);   
-        // }
-        // this.delta += this.deltaTime;
-      // console.log("time : " + this.time);
       if (this.data.interaction == "growpop") {
         this.iMesh.getMatrixAt(hitID, this.dummyMatrix);
         this.dummyMatrix.decompose(this.dummy.position, this.dummy.quaternion, this.dummy.scale);
@@ -448,7 +419,7 @@ AFRAME.registerComponent('instanced_surface_meshes', {
 
             dummy.updateMatrix();
 
-            this.iMesh.setMatrixAt( i ++, dummy.matrix );
+            this.iMesh.setMatrixAt( i, dummy.matrix );
   
           }
   
