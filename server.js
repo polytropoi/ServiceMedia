@@ -17354,24 +17354,25 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                 
                                 // let follower = "";
                                 if (sceneResponse.sceneCameraMode != undefined && sceneResponse.sceneCameraMode.toLowerCase().includes("third person")) {
-                                    wasd = "wasd-controls=\x22fly: false; acceleration: 35\x22";
-                                    camera = "<a-entity follow-box=\x22target: #player\x22 look-controls>" +
-                                        "<a-entity camera position=\x220 1.6 2\x22 ></a-entity>" +
+                                    wasd = "wasd-controls=\x22fly: true; acceleration: 35\x22";
+                                    // wasd = "extended-wasd-controls=\x22flyEnabled: false; moveSpeed: 4; inputType: keyboard\x22";
+                                    camera = "<a-entity look-controls follow-box=\x22target: #player\x22>" +
+                                        "<a-entity camera position=\x220 1.6 5\x22 ></a-entity>" +
                                     "</a-entity>"+
-                                    "<a-entity id=\x22cameraRig\x22 "+movementControls+"  initializer "+
+                                    "<a-entity id=\x22cameraRig\x22 initializer "+
                                 
                                         " id=\x22mouseCursor\x22 cursor=\x22rayOrigin: mouse\x22 raycaster=\x22objects: .activeObjexRay\x22>"+
                                         
                                         // "<a-entity id=\x22player\x22 get_pos_rot networked=\x22template:#avatar-template;attachTemplateToLocal:false;\x22 "+spawnInCircle+" camera "+wasd+" look-controls=\x22hmdEnabled: false\x22 position=\x220 1.6 0\x22>" +     
                                         // "<a-entity id=\x22viewportPlaceholder\x22 position=\x220 0 -1\x22></entity>"+   
-                                        "<a-entity id=\x22player\x22 rotate-with-camera get_pos_rot "+wasd+" "+ physicsMod +" position=\x22"+playerPosition+"\x22>"+
+                                        "<a-entity id=\x22player\x22 rotate-with-camera "+wasd+" "+ physicsMod +" position=\x22"+playerPosition+"\x22>"+
                                             "<a-entity id=\x22equipPlaceholder\x22 geometry=\x22primitive: box; height: .1; width: .1; depth: .1\x22 position=\x220 -.65 -.75\x22"+
                                             "material=\x22opacity: 0\x22></a-entity>"+
                                             "<a-entity id=\x22viewportPlaceholder\x22 geometry=\x22primitive: plane; height: 0.01; width: .01\x22 position=\x220 0 -1.5\x22"+
                                             "material=\x22opacity: 0\x22></a-entity>"+
                                             "<a-entity id=\x22viewportPlaceholder3\x22 geometry=\x22primitive: plane; height: 0.01; width: .01\x22 position=\x220 0 -3\x22"+
                                             "material=\x22opacity: 0\x22></a-entity>"+
-                                            "<a-entity id=\x22vehiclePlaceholder\x22 position=\x220 -1 -3\x22></a-entity>"+
+                                            "<a-entity id=\x22thirdPersonPlaceholder\x22 position=\x220 0 0\x22></a-entity>"+
                                             // "<a-sphere visible=\x22true\x22 scale=\x220.45 0.5 0.4\x22 random-color></a-sphere>"+
                                         "</a-entity>"+
                                        
@@ -17503,7 +17504,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                     "<a-entity scale=\x2250 10 50\x22 position=\x220 10 0\x22 sprite-particles=\x22texture: #cloud1; color: " +sceneResponse.sceneColor2 + "; position: -1 -1 -1..1 1 1; velocity: -.05 -.025 -.05 .. .05 .025 .05; spawnRate: 5; lifeTime: 20; scale: 100,200; opacity: 0,.3,0; rotation: 0..360\x22></a-entity>";
                                 } else if (sceneResponse.sceneSkyParticles.toLowerCase() == "rain/fog/add") {
                                     // skyParticles = "<a-entity scale='2 2 2' position='0 3 0' particle_mangler particle-system=\x22preset: rain; particleCount: 3000; texture: https://realitymangler.com/assets/textures/raindrop2.png; color: " + sceneResponse.sceneColor1 + "," + sceneResponse.sceneColor2 +"\x22></a-entity>";
-                                    skyParticles = "<a-entity scale=\x2220 10 20\x22 position=\x220 10 0\x22 sprite-particles=\x22texture: #raindrop; color: " +sceneResponse.sceneColor2 + "; blending: additive; position: -1 1 -1..1 1 1; spawnRate: 1000; velocity: 0 -1 0; lifeTime: 3; scale: .1,.5; opacity: 0.85\x22></a-entity>"+
+                                    skyParticles = "<a-entity scale=\x2220 10 20\x22 position=\x220 10 0\x22 sprite-particles=\x22texture: #raindrop; color: " +sceneResponse.sceneColor2 + "; blending: additive; position: -1 1 -1..1 1 1; spawnRate: 1000; velocity: 0 -.75 0; lifeTime: 10; scale: .25,.5; opacity: 1\x22></a-entity>"+
                                     "<a-entity scale=\x2250 10 50\x22 position=\x220 10 0\x22 sprite-particles=\x22texture: #cloud1; color: " +sceneResponse.sceneColor2 + "; blending: additive; position: -1 -1 -1..1 1 1; velocity: -.05 -.025 -.05 .. .05 .025 .05; spawnRate: 5; lifeTime: 20; scale: 100,200; opacity: 0,.3,0; rotation: 0..360\x22></a-entity>";
                                 } else if (sceneResponse.sceneSkyParticles.toLowerCase() == "snow") {
                                     skyParticles = "<a-entity scale='2 2 2' position='0 3 0' particle_mangler particle-system=\x22preset: snow; particleCount: 3000; texture: https://realitymangler.com/assets/textures/cloud_sm.png; color: " + sceneResponse.sceneColor1 + "," + sceneResponse.sceneColor2 +"\x22></a-entity>";
@@ -18386,7 +18387,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                                     }
                                                     if (locMdl.eventData.toLowerCase().includes("brownian")) {
                                                         if (locMdl.eventData.toLowerCase().includes("brownian path")) {
-                                                            brownian = "brownian-path=\x22lineEnd:100000;lineStep:100;count:1000;object:#thing-to-clone;positionVariance:52 22 58;spaceVectorOffset:100.1,100,100.2,100.2,100,100.1;rotationFollowsAxis:x;speed:0.01;\x22";
+                                                            brownian = "brownian-path=\x22lineEnd:100000;lineStep:100;count:100;object:#thing-to-clone;positionVariance:52 22 58;spaceVectorOffset:100.1,100,100.2,100.2,100,100.1;rotationFollowsAxis:x;speed:0.01;\x22";
                                                             gltfsEntities = gltfsEntities + "<a-gltf-model shadow src=\x22#"+m_assetID+"\x22 id=\x22thing-to-clone\x22 visible=\x22true\x22></a-gltf-model>"+
                                                             "<a-entity "+brownian+
                                                             " shadow=\x22cast:true; receive:true\x22 "+skyboxEnvMap+" position=\x22"+locMdl.x+" "+locMdl.y+" "+zFix+"\x22 scale=\x22"+scale+

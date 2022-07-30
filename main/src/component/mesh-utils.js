@@ -1695,6 +1695,10 @@ AFRAME.registerComponent("follow-box", {
   schema: {
     target: {type: "selector"}
   },
+  init: function () {
+    // this.tick = AFRAME.utils.throttleTick(this.tick, 50, this);
+    
+  },
   tick: (function() {
     // create once
     const tmpv = new THREE.Vector3();
@@ -1709,6 +1713,11 @@ AFRAME.registerComponent("follow-box", {
   })()
 });
 AFRAME.registerComponent("rotate-with-camera", {
+  
+  init: function () {
+    // this.tick = AFRAME.utils.throttleTick(this.tick, 50, this);
+    this.thirPersonPlaceholder = document.getElementById("thirdPersonPlaceholder");
+  },
   tick: (function() {
     // create once
     const tmpq = new THREE.Quaternion();
@@ -1722,7 +1731,9 @@ AFRAME.registerComponent("rotate-with-camera", {
         // set attribute is necesarry for wasd-controls
         // console.log("tryna rotoate y to " +  tmpe.y * 180 / Math.PI);
       
-      this.el.setAttribute("rotation", {x: 0, y: tmpe.y * 180 / Math.PI, z: 0 })
+      // this.thirPersonPlaceholder.setAttribute("rotation", {x: 0, y: tmpe.y * 180 / Math.PI, z: 0 });
+      this.el.setAttribute("rotation", {x: 0, y: tmpe.y * 180 / Math.PI, z: 0 });
+      
     }
   })()
 });

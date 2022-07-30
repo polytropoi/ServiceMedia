@@ -2348,27 +2348,27 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
     
     // this.sceneInventoryID = null;
     if (this.data.locationData && this.data.locationData.eventData && this.data.locationData.eventData.toLowerCase().includes("driveable")) {
-      let vehiclePlaceholder = document.getElementById("vehiclePlaceholder");
-      this.modelParent = vehiclePlaceholder;
-      if (vehiclePlaceholder) {
-        // vehiclePlaceholder.appendChild(this.el);
+      let thirdPersonPlaceholder = document.getElementById("thirdPersonPlaceholder");
+      this.modelParent = thirdPersonPlaceholder;
+      if (thirdPersonPlaceholder) {
+        // thirdPersonPlaceholder.appendChild(this.el);
         // this.el.setAttribute("position", {x:0, y:0, z:0});
         if (this.data.objectData.modelURL != undefined) {
-          // vehiclePlaceholder.append(this.el);
-          vehiclePlaceholder.setAttribute("gltf-model", this.data.objectData.modelURL); 
+          // thirdPersonPlaceholder.append(this.el);
+          thirdPersonPlaceholder.setAttribute("gltf-model", this.data.objectData.modelURL); 
           let rot = {};
           rot.x = this.data.locationData.eulerx != undefined ? this.data.locationData.eulerx : 0;
           rot.y = this.data.locationData.eulery != undefined ? this.data.locationData.eulery : 0;
           rot.z = this.data.locationData.eulerz != undefined ? this.data.locationData.eulerz : 0;
-          vehiclePlaceholder.setAttribute("rotation", rot);
+          thirdPersonPlaceholder.setAttribute("rotation", rot);
         } else {
-          // vehiclePlaceholder.append(this.el);
-          vehiclePlaceholder.setAttribute("gltf-model", "#" +this.data.objectData.modelID); 
+          // thirdPersonPlaceholder.append(this.el);
+          thirdPersonPlaceholder.setAttribute("gltf-model", "#" +this.data.objectData.modelID); 
           let rot = {};
           rot.x = this.data.locationData.eulerx != undefined ? this.data.locationData.eulerx : 0;
           rot.y = this.data.locationData.eulery != undefined ? this.data.locationData.eulery : 0;
           rot.z = this.data.locationData.eulerz != undefined ? this.data.locationData.eulerz : 0;
-          vehiclePlaceholder.setAttribute("rotation", rot);
+          thirdPersonPlaceholder.setAttribute("rotation", rot);
         }
       }
 
