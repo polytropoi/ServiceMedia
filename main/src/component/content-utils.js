@@ -4786,6 +4786,12 @@ AFRAME.registerComponent('picture_groups_control', {
       //find the group with the skyboxID, if there is one, and return that (can't mix in scene vs. in group skyboxen..?)
       let group = null;
       let picGroupArray = this.data.jsonData;
+      if (picGroupArray.length > 0) {
+        let nextbuttonEl = document.getElementById('nextButton');
+        let prevbuttonEl = document.getElementById('previousButton');
+        nextbuttonEl.style.visibility = "visible";
+        prevbuttonEl.style.visibility = "visible";
+      }
       console.log("tryna find skybox id " + skyboxID);
       for (let i = 0; i < picGroupArray.length; i++) {
         for (let j = 0; j < picGroupArray[i].images.length; j++) {

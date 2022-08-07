@@ -348,16 +348,12 @@ AFRAME.registerComponent('instanced_surface_meshes', {
     thiz.sampleGeometry = geo;
     thiz.sampleMaterial = mat;
     //set by location.eventData
-        // setTimeout(function(){console.log("done waiting for obj ") }, 3000);
-          // timekey = parseFloat(timekeys[timeKeysIndex]);
-          // console.log(timekey);
+        
       this.surfaces = document.getElementsByClassName("surface");
       console.log("surfaces found " + this.surfaces.length);
       if (this.surfaces.length > 0) {
         this.surface = this.surfaces[0];
-        // this.surface.addEventListener('loaded', (e) => {
-        // let obj = this.surface.getObject3D();
-        // let interval = setInterval(function () {
+    
         if (this.surface.getObject3D('mesh') != null) {
             this.surface.getObject3D('mesh').traverse(node => {
               if (node.isMesh) {
@@ -367,7 +363,7 @@ AFRAME.registerComponent('instanced_surface_meshes', {
                 }
               });
             }
-        // }, 1000);
+
     } 
         // console.log("surfaces found " + this.surfaces.length);
         // if (this.surfaces.length > 0) {
@@ -1972,7 +1968,7 @@ AFRAME.registerComponent("rotate-with-camera", {
      }
  });
  
- AFRAME.registerComponent('follow-path', {
+ AFRAME.registerComponent('follow-path', { //for third person camera
      schema: {
          curve: {default: 'a-curve'}, // css selector
          incrementBy: {default: 0.01},
@@ -1990,4 +1986,27 @@ AFRAME.registerComponent("rotate-with-camera", {
          this.newPos = this.curve.components.curve.curve.getPoint(this.currentPercent);
          this.el.setAttribute('position', this.newPos);        
      },
- })
+ });
+
+ AFRAME.registerComponent('matrix_meshes', { //test method for matrix rooms
+
+  schema: {
+    init: {default: false},
+    roomData: {default: ''}
+  },
+  init() {
+    //loadRoomData is called from connect.js if useMatrix
+  },
+  loadRoomData(roomData) {
+    // console.log(JSON.stringify(roomData)); 
+    this.data.roomData = roomData.chunk;
+    console.log("gots " + this.data.roomData.length + " rooms from matrix.org");
+    for (let i = 0; i < this.data.roomData.length; i++) {
+      console.log(this.data.roomData[i].name);
+    }
+  },
+  showRoomData(instanceID) {
+    console.log(JSON.stringify(this.data.roomData[instanceID]));
+  }
+
+ });

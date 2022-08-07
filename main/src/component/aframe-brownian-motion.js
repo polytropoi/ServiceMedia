@@ -166,10 +166,25 @@
 			this.intersection = null;
 			this.hitpoint = null;
 			let that = this;
+			this.useMatrix = false;
+			this.matrixMeshComponent = null;
+			if (settings.useMatrix) {
+				this.useMatrix = true;
+			}
 			
 			window.addEventListener('click', (e) => {
-				console.log("hit instancew " + this.instanceId );
+				e.preventDefault();
+				console.log("hit instancew " + this.instanceId + " use matrix " + this.useMatrix );
 			  //   that.instance_clicked(e);
+			  if (this.useMatrix) {
+				let matrixMeshEl = document.getElementById("matrix_meshes");
+				if (matrixMeshEl != null) {
+					this.matrixMeshComponent = matrixMeshEl.components.matrix_meshes;
+					if (this.matrixMeshComponent != null) {
+					this.matrixMeshComponent.showRoomData(this.instanceId);
+					}
+				}
+			  }
 			  }); 
 		},
 		update() {
@@ -419,6 +434,9 @@
           if (window.playerPosition != null && window.playerPosition != undefined && this.intersection != undefined && this.intersection[0].point != undefined && this.intersection[0].point != null ) {
 			this.instanceId = this.intersection[ 0 ].instanceId;
 			console.log("intersected with instance " + this.instanceId);
+			if (this.matrixMeshComponent != null) {
+					this.matrixMeshComponent.showRoomData(this.instanceId);
+				}
           }
 
         } else {
