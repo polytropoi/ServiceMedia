@@ -180,8 +180,8 @@
 				let matrixMeshEl = document.getElementById("matrix_meshes");
 				if (matrixMeshEl != null) {
 					this.matrixMeshComponent = matrixMeshEl.components.matrix_meshes;
-					if (this.matrixMeshComponent != null) {
-					this.matrixMeshComponent.showRoomData(this.instanceId);
+					if (this.matrixMeshComponent != null && this.intersection != null) {
+					this.matrixMeshComponent.selectRoomData(this.instanceId);
 					}
 				}
 			  }
@@ -426,16 +426,18 @@
           this.raycaster.setFromCamera( mouse, AFRAME.scenes[0].camera );
           this.intersection = this.raycaster.intersectObject( this.el.getObject3D('instances'));
 		//   console.log("gotsa intersection: " + this.intersection.name);
+			
         }
         // 
        
 
         if ( this.intersection != null && this.intersection.length > 0 ) {
           if (window.playerPosition != null && window.playerPosition != undefined && this.intersection != undefined && this.intersection[0].point != undefined && this.intersection[0].point != null ) {
+			// that.rayhit(evt.detail.intersection.object.name, window.playerPosition.distanceTo(this.intersection.point), this.intersection.point);
 			this.instanceId = this.intersection[ 0 ].instanceId;
-			console.log("intersected with instance " + this.instanceId);
+			// console.log("intersected with instance " + this.instanceId + " " + window.playerPosition.distanceTo(this.intersection[ 0 ].point) + " " + this.intersection[ 0 ].point);
 			if (this.matrixMeshComponent != null) {
-					this.matrixMeshComponent.showRoomData(this.instanceId);
+					this.matrixMeshComponent.showRoomData(this.instanceId, window.playerPosition.distanceTo(this.intersection[ 0 ].point), this.intersection[ 0 ].point);
 				}
           }
 

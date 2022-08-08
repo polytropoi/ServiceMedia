@@ -3123,10 +3123,15 @@ AFRAME.registerComponent('mod_dialog', { //there should only be one of these, un
   yesButton: function () {
     console.log("yesbutton for " + this.objID);
     // this.el.setAttribute("visible", false);
-    let objEl = document.getElementById(this.objID);
-    if (objEl != null) {
-      objEl.components.mod_object.activated();
-      // objEl.components.mod_object.hideObject();
+    if (this.objID.includes("href~")) {
+      let urlSplit = this.objID.split("~");
+      window.location.href = urlSplit[1];
+    } else {
+      let objEl = document.getElementById(this.objID);
+      if (objEl != null) {
+        objEl.components.mod_object.activated();
+        // objEl.components.mod_object.hideObject();
+      }
     }
 
   },

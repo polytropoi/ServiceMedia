@@ -160,44 +160,7 @@ AFRAME.registerComponent('instanced_meshes_sphere', { //scattered randomly, not 
         console.log(that.instanceId);
         that.instance_clicked(that.instanceId);
       }); 
-      // let playerElC = document.querySelector("#player").components;
-      // // console.log("playerEl" + this.playerEl);
-      // this.posRotReader = playerElC.get_pos_rot; 
-      // console.log("this.posRotReader " + this.posRotReader);
-
-      // this.el.addEventListener('raycaster-intersected', e =>{  //no because each little thing can't have a class attached
-      //     this.raycaster = e.detail.el;
-      //     // thiz.raycaster = this.raycaster;
-      //     // this.intersection = this.raycaster.components.raycaster.getIntersection(this.el, true);
-      //     // this.hitpoint = this.intersection.point;
-      //     console.log(this.hitpoint);
-      //     // console.log('ray hit', this.intersection.point);
-      //     // if (!this.intersection.object.name.includes("screen") &&
-      //     //     !this.intersection.object.name.includes("background") &&
-      //     //     !this.intersection.object.name.includes("fastforward") &&
-      //     //     !this.intersection.object.name.includes("rewind") &&
-      //     //     !this.intersection.object.name.includes("previous") &&
-      //     //     !this.intersection.object.name.includes("next") &&
-      //     //     !this.intersection.object.name.includes("handle") &&
-      //     //     !this.intersection.object.name.includes("play") &&
-      //     //     !this.intersection.object.name.includes("pause")) {
-      //     //     this.raycaster = null;
-      //     // } else {
-      //         // thiz.mouseOverObject = this.intersection.object.name;      
-      //         // this.hitpoint = intersection.point;   
-      //         // console.log('ray hit', this.intersection.object.name, thiz.mouseOverObject );
-      //     // }
-      //     this.intersection = this.raycaster.intersectObject( this.iMesh );
-      //     });
-      //     this.el.addEventListener("raycaster-intersected-cleared", () => {
-      //         // console.log("intersection cleared");
-      //         this.raycaster = null;
-      //         this.intersection = null;
-      //     });
-      // if (iMesh == null) {
-      //   this.iMesh = iMesh;
-      // }
-      // this.el.addEv 
+    
 
     },
     tick: function(time, timeDelta) {
@@ -729,19 +692,7 @@ AFRAME.registerComponent('local_marker', {
     this.calloutText = document.createElement("a-text");
     this.viewportHolder = document.getElementById('viewportPlaceholder3');
     var cameraPosition = new THREE.Vector3(); 
-
     this.viewportHolder.object3D.getWorldPosition( cameraPosition );
-
-    this.clientX = 0;
-    this.clientY = 0;
-    
-    let thisEl = this.el;
-
-    this.el.classList.add('activeObjexRay');
-    this.el.classList.add('activeObjexGrab');
-
-    
-   
     this.calloutPanel.setAttribute("gltf-model", "#landscape_panel");
     this.calloutPanel.setAttribute("scale", ".1 .075 .1");
     this.calloutEntity.setAttribute("look-at", "#player");
@@ -752,6 +703,12 @@ AFRAME.registerComponent('local_marker', {
     this.mouseDownPos = new THREE.Vector2();
     this.mousePos = new THREE.Vector2();
     this.distance = 0;
+
+    this.el.classList.add('activeObjexRay');
+    this.el.classList.add('activeObjexGrab');
+    this.clientX = 0;
+    this.clientY = 0;
+    let thisEl = this.el;
     // calloutEntity.setAttribute("render-order", "hud");
     sceneEl.appendChild(this.calloutEntity);
     this.calloutEntity.appendChild(this.calloutPanel);
@@ -772,11 +729,10 @@ AFRAME.registerComponent('local_marker', {
     let theElement = this.el;
     // this.el.setAttribute('skybox-env-map');
     // 
-      this.phID = room + '~localmarker~' + this.timestamp;
+      this.phID = room + '~localmarker~' + this.timestamp; //"placeholder" id, for client side location mods
       this.el.id = this.phID;
       // this.el.addEventListener('model-loaded', () => {
       // console.log("looking for localplaceholder " + localStorage.getItem(this.phID));
-
       this.storedVars = JSON.parse(localStorage.getItem(this.phID));
         if (this.storedVars != null) {
           if (this.storedVars.model == null || this.storedVars.model == undefined || this.storedVars.model == "none") {
@@ -1196,8 +1152,6 @@ AFRAME.registerComponent('cloud_marker', {
    
     this.calloutToggle = false;
     let that = this;
-    // that.calloutEntity = this.calloutEntity;
-    // that.calloutText = this.calloutText;
 
     this.el.addEventListener('mouseenter', function (evt) {
       
@@ -1209,9 +1163,7 @@ AFRAME.registerComponent('cloud_marker', {
           this.playerPosRot = posRotReader.returnPosRot(); 
           window.playerPosition = this.playerPosRot.pos; 
       }
-      // console.log("playerPOsition  " + JSON.stringify(window.playerPosition));
-      // console.log("playerPOsition  " + window.playerPosition);
-
+  
       if (!that.isSelected) {
         this.clientX = evt.clientX;
         this.clientY = evt.clientY;
@@ -1222,16 +1174,7 @@ AFRAME.registerComponent('cloud_marker', {
         let name = evt.detail.intersection.object.name;
         that.distance = window.playerPosition.distanceTo(pos);
         that.rayhit(evt.detail.intersection.object.name, that.distance, evt.detail.intersection.point);
-        // console.log(name);
-        // if (name == "x_handle") {
-        //   that.selectedAxis = 'x';
-        // } else if (name == "y_handle") {
-        //   that.selectedAxis = 'y';
-        // } else if (name == "z_handles") {
-        //   that.selectedAxis = 'z';
-        // } else {
-        //   that.selectedAxis = 'all';
-        // }
+     
         that.selectedAxis = name;
 
         // let elPos = that.el.getAttribute('position');
@@ -1996,17 +1939,197 @@ AFRAME.registerComponent("rotate-with-camera", {
   },
   init() {
     //loadRoomData is called from connect.js if useMatrix
+    var sceneEl = document.querySelector('a-scene');
+    this.matrixCalloutEntity = document.createElement("a-entity");
+    this.matrixCalloutPanel = document.createElement("a-entity");
+    this.matrixCalloutText = document.createElement("a-text");
+    this.viewportHolder = document.getElementById('viewportPlaceholder3');
+    var cameraPosition = new THREE.Vector3(); 
+    this.viewportHolder.object3D.getWorldPosition( cameraPosition );
+    this.matrixCalloutPanel.setAttribute("gltf-model", "#landscape_panel");
+    // this.matrixCalloutEntity.setAttribute("scale", ".1 .1 .1");
+    this.matrixCalloutPanel.setAttribute("scale", ".075 .05 .075");
+    this.matrixCalloutEntity.setAttribute("look-at", "#player");
+    // this.calloutEntity.setAttribute('visible', false);
+    this.dialogEl = document.getElementById('mod_dialog');
+    this.selectedAxis = null;
+    this.isSelected = false;
+    this.hitPosition = null;
+    this.mouseDownPos = new THREE.Vector2();
+    this.mousePos = new THREE.Vector2();
+    this.distance = 0;
+    this.roomData = null;
+    this.clientX = null;
+    this.clientY = null;
+    sceneEl.appendChild(this.matrixCalloutEntity);
+    this.matrixCalloutEntity.appendChild(this.matrixCalloutPanel);
+    this.matrixCalloutEntity.appendChild(this.matrixCalloutText);
+    // this.calloutPanel.setAttribute("position", '0 0 1'); 
+    this.matrixCalloutText.setAttribute("position", '0 0 .1'); //offset the child on z toward camera, to prevent overlap on model
+    this.matrixCalloutText.setAttribute('text', {
+      width: .5,
+      baseline: "bottom",
+      align: "left",
+      font: "/fonts/Exo2Bold.fnt",
+      anchor: "center",
+      wrapCount: 20,
+      color: "white",
+      value: "wha"
+    });
+/*
+    this.el.addEventListener('mouseenter', (evt) => {
+      
+      if (posRotReader != null) {
+        this.playerPosRot = posRotReader.returnPosRot(); 
+        window.playerPosition = this.playerPosRot.pos; 
+      } else {
+          posRotReader = document.getElementById("player").components.get_pos_rot; 
+          this.playerPosRot = posRotReader.returnPosRot(); 
+          window.playerPosition = this.playerPosRot.pos; 
+      }
+  
+      if (!this.isSelected) {
+        this.clientX = evt.clientX;
+        this.clientY = evt.clientY;
+        // console.log("tryna mouseover placeholder");
+        this.calloutToggle = !this.calloutToggle;
+        let pos = evt.detail.intersection.point; //hitpoint on model
+        this.hitPosition = pos;
+        let name = evt.detail.intersection.object.name;
+        this.distance = window.playerPosition.distanceTo(pos);
+        this.rayhit(evt.detail.intersection.object.name, this.distance, evt.detail.intersection.point);
+     
+        this.selectedAxis = name;
+
+        // let elPos = this.el.getAttribute('position');
+        // console.log(pos);
+        if (!name.includes("handle")) {
+          // console.log("tryna show the callout");
+          this.calloutEntity.setAttribute("position", pos);
+          this.calloutEntity.setAttribute('visible', true);
+          this.calloutEntity.setAttribute('scale', {x: this.distance * .20, y: this.distance * .20, z: this.distance * .20} );
+          let theLabel = this.data.label != undefined ? this.data.label : this.data.name;
+          let calloutString = theLabel;
+          if (this.calloutToggle) {
+            // calloutString = "x : " + elPos.x.toFixed(2) + "\n" +"y : " + elPos.y.toFixed(2) + "\n" +"z : " + elPos.z.toFixed(2);
+            calloutString = this.data.description != '' ? this.data.description : theLabel;
+          }
+          this.calloutText.setAttribute("value", calloutString);
+        }
+      }
+    });
+    this.el.addEventListener('mouseleave', (evt) => {
+      this.isSelected = false;
+      this.calloutEntity.setAttribute('visible', false);
+    });
+    */
   },
   loadRoomData(roomData) {
     // console.log(JSON.stringify(roomData)); 
-    this.data.roomData = roomData.chunk;
-    console.log("gots " + this.data.roomData.length + " rooms from matrix.org");
-    for (let i = 0; i < this.data.roomData.length; i++) {
-      console.log(this.data.roomData[i].name);
+    this.roomData = roomData.chunk;
+    console.log("gots " + this.roomData.length + " rooms from matrix.org");
+    for (let i = 0; i < this.roomData.length; i++) {
+      // console.log(this.roomData[i].name);
     }
   },
-  showRoomData(instanceID) {
-    console.log(JSON.stringify(this.data.roomData[instanceID]));
-  }
+  showRoomData(instanceID, distance, hitpoint) {
+    // console.log(JSON.stringify(this.data.roomData[instanceID]));
+
+    if (hitpoint != undefined) {
+      // console.log(instanceID + " " + distance + " " + JSON.stringify(hitpoint));
+      // hitpoint = JSON.parse(hitpoint);
+      let x = hitpoint.x;
+      let y = hitpoint.y;
+      let z = hitpoint.z;
+      this.matrixCalloutEntity.setAttribute("position", {"x": x, "y": y, "z": z});
+      this.matrixCalloutPanel.setAttribute('visible', true);
+      // this.matrixCalloutEntity.setAttribute("position", hitpoint);
+      this.matrixCalloutEntity.setAttribute('visible', true);
+      this.matrixCalloutEntity.setAttribute('scale', {x: distance * .25, y: distance * .25, z: distance * .25} );
+      let roomName = "roomName";
+      if (this.roomData) {
+        roomName = this.roomData[instanceID].name;
+      } else {
+        GetMatrixData();
+      }
+      this.matrixCalloutText.setAttribute("value", roomName);
+    }
+  },
+  selectRoomData(instanceID) {
+    console.log(instanceID);
+    if (this.roomData != null) {
+      console.log(JSON.stringify(this.roomData[instanceID]));
+      let matrixLink = "https://matrix.to/#/"+this.roomData[instanceID].room_id;
+
+      this.dialogEl.components.mod_dialog.showPanel("Join the matrix room " + this.roomData[instanceID].name + "?", "href~https://matrix.to/#/" + this.roomData[instanceID].room_id );
+    } else {
+      GetMatrixData(); //in connect.js
+    }
+   
+  },
+
+  // rayhit: function (hitID, distance, hitpoint) {
+  //   if (this.hitID != hitID) {
+      
+  //     this.intersection = null;
+  //     // this.raycaster = null;
+
+  //     this.hitID = hitID;
+  //     console.log("new hit " + hitID + " " + distance + " " + JSON.stringify(hitpoint) + " interaction:" + this.data.interaction);
+  //     var triggerAudioController = document.getElementById("triggerAudio");
+  //     if (triggerAudioController != null) {
+  //       triggerAudioController.components.trigger_audio_control.playAudioAtPosition(hitpoint, distance);
+  //     }
+
+  //   }
+  //   if (this.data.interaction == "growpop") {
+  //     this.iMesh.getMatrixAt(hitID, this.dummyMatrix);
+  //     this.dummyMatrix.decompose(this.dummy.position, this.dummy.quaternion, this.dummy.scale);
+  //     console.log(parseFloat(this.dummy.scale.x) + " vs " + (parseFloat(this.data.scaleFactor) * 3));
+  //   if (parseFloat(this.dummy.scale.x) > (parseFloat(this.data.scaleFactor) * 2)) {
+  //     console.log("tryna lcik!");
+  //     this.instance_clicked(hitID);
+  //   } else {
+  //     this.scaletmp = this.dummy.scale.x + Math.abs(Math.sin(this.time));
+  //     this.dummy.scale.set( this.scaletmp, this.scaletmp, this.scaletmp );
+  //     this.dummy.updateMatrix();
+  //     this.iMesh.setMatrixAt( this.hitID, this.dummy.matrix );
+  //     this.iMesh.frustumCulled = false;
+  //     this.iMesh.instanceMatrix.needsUpdate = true;
+  //     }
+  //   }
+  //   if (this.data.interaction == "shrinkpop") {
+  //     this.iMesh.getMatrixAt(hitID, this.dummyMatrix);
+  //     this.dummyMatrix.decompose(this.dummy.position, this.dummy.quaternion, this.dummy.scale);
+  //     console.log(parseFloat(this.dummy.scale.x) + " vs " + (parseFloat(this.data.scaleFactor) / 2));
+  //   if (parseFloat(this.dummy.scale.x) < (parseFloat(this.data.scaleFactor) / 2)) {
+  //     console.log("tryna lcik!");
+  //     this.instance_clicked(hitID);
+  //   } else {
+  //     this.scaletmp = this.dummy.scale.x - Math.abs(Math.sin(this.time));
+  //     this.dummy.scale.set( this.scaletmp, this.scaletmp, this.scaletmp );
+  //     this.dummy.updateMatrix();
+  //     this.iMesh.setMatrixAt( this.hitID, this.dummy.matrix );
+  //     this.iMesh.frustumCulled = false;
+  //     this.iMesh.instanceMatrix.needsUpdate = true;
+  //     }
+  //   }
+    
+  // },
+  // instance_clicked: function (id) {
+  //   if (id != null && this.intersection != null) {
+  //   this.dummy.scale.set( 0, 0, 0 );
+  //   this.dummy.updateMatrix();
+  //   console.log(id + " beez clicked!");
+  //   this.iMesh.setMatrixAt( id, this.dummy.matrix );
+  //   this.iMesh.frustumCulled = false;
+  //   this.iMesh.instanceMatrix.needsUpdate = true;
+  //   var triggerAudioController = document.getElementById("triggerAudio");
+  //     if (triggerAudioController != null) {
+  //       triggerAudioController.components.trigger_audio_control.playAudioAtPosition(window.playerPosition, 1);
+  //       }
+  //     // this.iMesh.position.set(id, 0, 0, -100);
+  //   }
+  // }
 
  });

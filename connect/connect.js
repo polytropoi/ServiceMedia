@@ -186,30 +186,31 @@ $(function() {
    }
    if (settings.useMatrix) {
       console.log("Loading browser MATRIX sdk!!!");
+      GetMatrixData();
 
-      var client = matrixcs.createClient("https://matrix.org");
-      client.publicRooms(function (err, data) {
-         if (err) {
-            console.error("err %s", JSON.stringify(err));
-            return;
-         }
-         // console.log("data %s [...]", JSON.stringify(data));
-         console.log("Congratulations! The SDK is working on the browser!");
-         let matrixMeshEl = document.getElementById("matrix_meshes");
-         if (matrixMeshEl != null) {
-            matrixMeshComponent = matrixMeshEl.components.matrix_meshes;
-            if (matrixMeshComponent != null) {
-               matrixMeshComponent.loadRoomData(data);
-            }
-            // matrixMeshEl.components.matrix_meshes.loadRoomData(data);
-         }
-         // var result = document.getElementById("result");
-         // result.innerHTML = "<p>The SDK appears to be working correctly.</p>";
-      });
-   }
-
-   
+   }   
 });
+function GetMatrixData() {
+   var client = matrixcs.createClient("https://matrix.org");
+   client.publicRooms(function (err, data) {
+      if (err) {
+         console.error("err %s", JSON.stringify(err));
+         return;
+      }
+      // console.log("data %s [...]", JSON.stringify(data));
+      console.log("Congratulations! The SDK is working on the browser!");
+      let matrixMeshEl = document.getElementById("matrix_meshes");
+      if (matrixMeshEl != null) {
+         matrixMeshComponent = matrixMeshEl.components.matrix_meshes;
+         if (matrixMeshComponent != null) {
+            matrixMeshComponent.loadRoomData(data);
+         }
+         // matrixMeshEl.components.matrix_meshes.loadRoomData(data);
+      }
+      // var result = document.getElementById("result");
+      // result.innerHTML = "<p>The SDK appears to be working correctly.</p>";
+   });
+}
 
 function MediaTimeUpdate (fancyTimeString) {
    // console.log("MediaTimeUpdate " + fancyTimeString);
