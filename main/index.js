@@ -9871,6 +9871,7 @@ function getAllPeople() {
         "target",
         "curve point",
         "follow curve",
+        "follow parametric curve",
         "follow ambient",
         "placeholder",
         "callout",

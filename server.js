@@ -16380,6 +16380,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
     let curvePoints = [];
     let curveEntities = "";
     let matrixEntities = ""; //matrix.org comms
+    // let parametricEntities = "";
     let lightEntities = "";
     let placeholderEntities = "";
     // let placeholderEntities = "<a-entity id=\x22createPlaceholders\x22 create_placeholders></a-entity>";
@@ -18146,6 +18147,9 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                     if (locMdl.markerType == "follow curve") {
                                         followCurve = "follow-path=\x22incrementBy:0.001; throttleTo:1\x22";
                                     }
+                                    if (locMdl.markerType == "follow parametric curve") {
+                                        followCurve = "curve-follow=\x22curveData: #p_path; type: parametric_curve; duration: 64; loop: true;\x22";
+                                    }
                                     if (locMdl.eventData != null && locMdl.eventData != undefined && locMdl.eventData.length > 1) { //eventData has info
                                         // console.log("!!!tryna setup animation " + r.eventData);
                                         if (locMdl.eventData.toLowerCase().includes("marker")) {
@@ -18830,7 +18834,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                     if (hasTriggerAudio) {
                         // triggerAudioEntity = "<a-entity id=\x22triggerAudio\x22 trigger_audio_control=\x22oggurl: "+triggerOggUrl+"; mp3url: "+triggerMp3Url+"; volume: "+sceneTriggerVolume+";\x22"+
                         // "</a-entity>";
-                        triggerAudioEntity = "<a-entity id=\x22triggerAudio\x22 trigger_audio_control=\x22volume: "+sceneTriggerVolume+"\x22"+
+                        triggerAudioEntity = "<a-entity id=\x22triggerAudio\x22 trigger_audio_control=\x22volume: "+sceneTriggerVolume+"\x22>"+
                         "</a-entity>";
                         triggerAudioScript = "<script>" +      
                         "let triggerAudioHowl = new Howl({" + //inject howler for non-streaming
@@ -20802,6 +20806,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                     } else { //AFrame response below
                         let joystick = "joystick=\x22useNavmesh: false\x22";
                         let extraScripts = "";
+                        let hasParametricCurve = false;
                         if (useNavmesh) {
                             navmeshScripts = "<script src=\x22../three/pathfinding/three-pathfinding.umd.js\x22></script>";
                             // "<script src=\x22../main/vendor/aframe/movement-controls.js\x22></script>";
@@ -20841,9 +20846,14 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                         // if (sceneResponse.sceneTags != null && sceneResponse.sceneTags.includes("no socket")) {
                         //     socketScripts = "";
                         // }   
-                        if (sceneResponse.sceneTags != null && sceneResponse.sceneTags.includes('matrix')) {
+                        if (sceneResponse.sceneTags != null && sceneResponse.sceneTags.includes('matrix')) { //see matrix.org
                             extraScripts = extraScripts + "<script src=\x22../main/js/browser-matrix.min.js\x22></script>"; 
                             matrixEntities = "<a-entity id=\x22matrix_meshes\x22 matrix_meshes=\x22init: true\x22></a-entity>";
+                        }
+                        if (sceneResponse.sceneTags != null && sceneResponse.sceneTags.includes('parametric')) {
+                            hasParametricCurve = true;
+                            extraScripts = extraScripts + "<script src=\x22../main/js/parser.js\x22></script>"; 
+                            curveEntities = curveEntities + "<a-entity id=\x22p_path\x22 parametric_curve=\x22xyzFunctions: 30*cos(t), 3*cos(3*t) + 2, 30*sin(t);tRange: 0, -6.283;\x22></a-entity>"; //TODODO 
                         }
                         let sceneGreeting = sceneResponse.sceneDescription;
                         if (sceneResponse.sceneGreeting != null && sceneResponse.sceneGreeting != undefined && sceneResponse.sceneGreeting != "") {
@@ -20866,7 +20876,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                         // if (scatterThings) {
                         //     surfaceScatterScript = 
                         // }
-                        if (curveEntities.length > 0) {
+                        if (curveEntities.length > 0 && !hasParametricCurve) {
                             curveEntities = "<a-curve id=\x22curve1\x22 type=\x22CatmullRom\x22 closed=\x22true\x22>" + curveEntities + "</a-curve>"+
                             "<a-draw-curve id=\x22showCurves\x22 visible=\x22false\x22 curveref=\x22#curve1\x22 material=\x22shader: line; color: blue;\x22></a-draw-curve>";
                             //"<a-sphere follow-path=\x22incrementBy:0.001; throttleTo:1\x22 position=\x220 10.25 -5\x22 radius=\x221.25\x22 color=\x22#EF2D5E\x22></a-sphere>";
@@ -21161,6 +21171,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                         // assets +
                         // targetObjectAsset +
                         "</a-assets>\n"+
+                        curveEntities +
                         // physicsDummy + 
                         renderPanel +
                         // "<a-entity id=\x22locationData\x22 scale=\x221 1 1\x22 location_data=\x22initialized\x22></a-entity>\n"+  //just a placeholder to catch some location data, after everythign loads
@@ -21190,8 +21201,9 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                         ambientAudioEntity + 
                         triggerAudioEntity +
                         lightEntities +
-                        curveEntities +
+
                         matrixEntities +
+                        // parametricEntities +
                         "<a-light visible=\x22false\x22 show-in-ar-mode id=\x22real-light\x22 type=\x22directional\x22 position=\x221 1 1\x22 intensity=\x220.5\x22></a-light>" +
                         placeholderEntities +
                         loadLocations +

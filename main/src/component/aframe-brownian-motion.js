@@ -425,8 +425,7 @@
         } else {
           this.raycaster.setFromCamera( mouse, AFRAME.scenes[0].camera );
           this.intersection = this.raycaster.intersectObject( this.el.getObject3D('instances'));
-		//   console.log("gotsa intersection: " + this.intersection.name);
-			
+			// console.log("gotsa intersection: " + this.intersection.name);
         }
         // 
        
