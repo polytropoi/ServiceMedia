@@ -722,7 +722,7 @@ AFRAME.registerComponent('local_marker', {
       align: "left",
       font: "/fonts/Exo2Bold.fnt",
       anchor: "center",
-      wrapCount: 16,
+      wrapCount: 12,
       color: "white",
       value: "wha"
     });
@@ -820,10 +820,11 @@ AFRAME.registerComponent('local_marker', {
 
           let elPos = that.el.getAttribute('position');
         if (!name.includes("handle")) {
+          if (that.distance < 66) {
           console.log("trna scale to distance :" + that.distance)
           that.calloutEntity.setAttribute("position", pos);
           that.calloutEntity.setAttribute('visible', true);
-          that.calloutEntity.setAttribute('scale', {x: that.distance * .20, y: that.distance * .20, z: that.distance * .20} );
+          that.calloutEntity.setAttribute('scale', {x: that.distance * .25, y: that.distance * .25, z: that.distance * .25} );
           let theLabel = that.data.label != undefined ? that.data.label : that.data.name;
           let calloutString = theLabel;
           if (that.calloutToggle) { //show pos every other time
@@ -831,8 +832,8 @@ AFRAME.registerComponent('local_marker', {
             calloutString = that.data.description != '' ? that.data.description : theLabel;
           }
           that.calloutText.setAttribute("value", calloutString);
-            
           }
+        }
       }  
     });
 
@@ -1145,7 +1146,7 @@ AFRAME.registerComponent('cloud_marker', {
       align: "left",
       font: "/fonts/Exo2Bold.fnt",
       anchor: "center",
-      wrapCount: 16,
+      wrapCount: 12,
       color: "white",
       value: "wha"
     });
@@ -1181,9 +1182,10 @@ AFRAME.registerComponent('cloud_marker', {
         // console.log(pos);
         if (!name.includes("handle")) {
           // console.log("tryna show the callout");
+          if (that.distance < 66) {
           that.calloutEntity.setAttribute("position", pos);
           that.calloutEntity.setAttribute('visible', true);
-          that.calloutEntity.setAttribute('scale', {x: that.distance * .20, y: that.distance * .20, z: that.distance * .20} );
+          that.calloutEntity.setAttribute('scale', {x: that.distance * .25, y: that.distance * .25, z: that.distance * .25} );
           let theLabel = that.data.label != undefined ? that.data.label : that.data.name;
           let calloutString = theLabel;
           if (that.calloutToggle) {
@@ -1192,6 +1194,7 @@ AFRAME.registerComponent('cloud_marker', {
           }
           that.calloutText.setAttribute("value", calloutString);
         }
+      }
       }
     });
     this.el.addEventListener('mouseleave', function (evt) {
@@ -1976,53 +1979,7 @@ AFRAME.registerComponent("rotate-with-camera", {
       color: "white",
       value: "wha"
     });
-/*
-    this.el.addEventListener('mouseenter', (evt) => {
-      
-      if (posRotReader != null) {
-        this.playerPosRot = posRotReader.returnPosRot(); 
-        window.playerPosition = this.playerPosRot.pos; 
-      } else {
-          posRotReader = document.getElementById("player").components.get_pos_rot; 
-          this.playerPosRot = posRotReader.returnPosRot(); 
-          window.playerPosition = this.playerPosRot.pos; 
-      }
-  
-      if (!this.isSelected) {
-        this.clientX = evt.clientX;
-        this.clientY = evt.clientY;
-        // console.log("tryna mouseover placeholder");
-        this.calloutToggle = !this.calloutToggle;
-        let pos = evt.detail.intersection.point; //hitpoint on model
-        this.hitPosition = pos;
-        let name = evt.detail.intersection.object.name;
-        this.distance = window.playerPosition.distanceTo(pos);
-        this.rayhit(evt.detail.intersection.object.name, this.distance, evt.detail.intersection.point);
-     
-        this.selectedAxis = name;
 
-        // let elPos = this.el.getAttribute('position');
-        // console.log(pos);
-        if (!name.includes("handle")) {
-          // console.log("tryna show the callout");
-          this.calloutEntity.setAttribute("position", pos);
-          this.calloutEntity.setAttribute('visible', true);
-          this.calloutEntity.setAttribute('scale', {x: this.distance * .20, y: this.distance * .20, z: this.distance * .20} );
-          let theLabel = this.data.label != undefined ? this.data.label : this.data.name;
-          let calloutString = theLabel;
-          if (this.calloutToggle) {
-            // calloutString = "x : " + elPos.x.toFixed(2) + "\n" +"y : " + elPos.y.toFixed(2) + "\n" +"z : " + elPos.z.toFixed(2);
-            calloutString = this.data.description != '' ? this.data.description : theLabel;
-          }
-          this.calloutText.setAttribute("value", calloutString);
-        }
-      }
-    });
-    this.el.addEventListener('mouseleave', (evt) => {
-      this.isSelected = false;
-      this.calloutEntity.setAttribute('visible', false);
-    });
-    */
   },
   loadRoomData(roomData) {
     // console.log(JSON.stringify(roomData)); 
@@ -2068,69 +2025,7 @@ AFRAME.registerComponent("rotate-with-camera", {
    
   },
 
-  // rayhit: function (hitID, distance, hitpoint) {
-  //   if (this.hitID != hitID) {
-      
-  //     this.intersection = null;
-  //     // this.raycaster = null;
-
-  //     this.hitID = hitID;
-  //     console.log("new hit " + hitID + " " + distance + " " + JSON.stringify(hitpoint) + " interaction:" + this.data.interaction);
-  //     var triggerAudioController = document.getElementById("triggerAudio");
-  //     if (triggerAudioController != null) {
-  //       triggerAudioController.components.trigger_audio_control.playAudioAtPosition(hitpoint, distance);
-  //     }
-
-  //   }
-  //   if (this.data.interaction == "growpop") {
-  //     this.iMesh.getMatrixAt(hitID, this.dummyMatrix);
-  //     this.dummyMatrix.decompose(this.dummy.position, this.dummy.quaternion, this.dummy.scale);
-  //     console.log(parseFloat(this.dummy.scale.x) + " vs " + (parseFloat(this.data.scaleFactor) * 3));
-  //   if (parseFloat(this.dummy.scale.x) > (parseFloat(this.data.scaleFactor) * 2)) {
-  //     console.log("tryna lcik!");
-  //     this.instance_clicked(hitID);
-  //   } else {
-  //     this.scaletmp = this.dummy.scale.x + Math.abs(Math.sin(this.time));
-  //     this.dummy.scale.set( this.scaletmp, this.scaletmp, this.scaletmp );
-  //     this.dummy.updateMatrix();
-  //     this.iMesh.setMatrixAt( this.hitID, this.dummy.matrix );
-  //     this.iMesh.frustumCulled = false;
-  //     this.iMesh.instanceMatrix.needsUpdate = true;
-  //     }
-  //   }
-  //   if (this.data.interaction == "shrinkpop") {
-  //     this.iMesh.getMatrixAt(hitID, this.dummyMatrix);
-  //     this.dummyMatrix.decompose(this.dummy.position, this.dummy.quaternion, this.dummy.scale);
-  //     console.log(parseFloat(this.dummy.scale.x) + " vs " + (parseFloat(this.data.scaleFactor) / 2));
-  //   if (parseFloat(this.dummy.scale.x) < (parseFloat(this.data.scaleFactor) / 2)) {
-  //     console.log("tryna lcik!");
-  //     this.instance_clicked(hitID);
-  //   } else {
-  //     this.scaletmp = this.dummy.scale.x - Math.abs(Math.sin(this.time));
-  //     this.dummy.scale.set( this.scaletmp, this.scaletmp, this.scaletmp );
-  //     this.dummy.updateMatrix();
-  //     this.iMesh.setMatrixAt( this.hitID, this.dummy.matrix );
-  //     this.iMesh.frustumCulled = false;
-  //     this.iMesh.instanceMatrix.needsUpdate = true;
-  //     }
-  //   }
-    
-  // },
-  // instance_clicked: function (id) {
-  //   if (id != null && this.intersection != null) {
-  //   this.dummy.scale.set( 0, 0, 0 );
-  //   this.dummy.updateMatrix();
-  //   console.log(id + " beez clicked!");
-  //   this.iMesh.setMatrixAt( id, this.dummy.matrix );
-  //   this.iMesh.frustumCulled = false;
-  //   this.iMesh.instanceMatrix.needsUpdate = true;
-  //   var triggerAudioController = document.getElementById("triggerAudio");
-  //     if (triggerAudioController != null) {
-  //       triggerAudioController.components.trigger_audio_control.playAudioAtPosition(window.playerPosition, 1);
-  //       }
-  //     // this.iMesh.position.set(id, 0, 0, -100);
-  //   }
-  // }
+ 
 
  });
 
@@ -2207,7 +2102,7 @@ AFRAME.registerComponent("curve-follow",
 			console.error("no element: " + this.data.curveData);
 			return;
 		}
-		let curveComponent = entity.components.parametric_curve;
+		let curveComponent = entity.components.parametric_curve; //hardcoded
 		if ( !curveComponent )
 		{
 			console.error(

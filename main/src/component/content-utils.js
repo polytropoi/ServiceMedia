@@ -2414,7 +2414,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
         align: "left",
         font: "/fonts/Exo2Bold.fnt",
         anchor: "center",
-        wrapCount: 16,
+        wrapCount: 14,
         color: "white",
         value: "wha"
       });
@@ -2625,7 +2625,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
             console.log("trna scale to distance :" + this.distance);
             this.calloutEntity.setAttribute("position", this.pos);
             this.calloutEntity.setAttribute('visible', true);
-            this.calloutEntity.setAttribute('scale', {x: this.distance * .20, y: this.distance * .20, z: this.distance * .20} );
+            this.calloutEntity.setAttribute('scale', {x: this.distance * .25, y: this.distance * .25, z: this.distance * .25} );
             let theLabel = this.data.objectData.labeltext;
             let calloutString = theLabel;
             if (this.calloutLabelSplit.length > 0) {
