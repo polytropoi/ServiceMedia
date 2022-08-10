@@ -3923,7 +3923,7 @@ AFRAME.registerComponent('mod_model', {
           bubble.classList.add("bubble");
           bubble.setAttribute("position", "2 2 0");
           bubble.setAttribute("rotation", "0 0 0"); 
-          bubble.setAttribute("scale", "1 1 1"); 
+          bubble.setAttribute("scale", "2 2 2"); 
           bubble.setAttribute("visible", false);
           sceneEl.appendChild(bubble);
           
