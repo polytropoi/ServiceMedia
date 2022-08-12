@@ -29,7 +29,11 @@ AFRAME.registerComponent('instanced_meshes_sphere', { //scattered randomly, not 
   this.hitID = 0;
       // var amount = 100;
   this.instanceId = null;
-
+  this.distance = null;
+  // this.hitpoint = null;
+  this.raycaster = null;
+  this.intersection = null;
+  this.hitpoint = null;
   var count = this.data.count;
   var dummy = new THREE.Object3D();
   this.dummy = dummy;
@@ -47,7 +51,11 @@ AFRAME.registerComponent('instanced_meshes_sphere', { //scattered randomly, not 
   this.highlightColor = new THREE.Color();
   this.camera = document.querySelector("[camera]").getObject3D('camera');
   // let gltfs = document.getElementsByClassName('gltfAssets');
-
+  this.useMatrix = false;
+  this.matrixMeshComponent = null;
+  if (settings.useMatrix) {
+    this.useMatrix = true;
+  }
   this.el.setAttribute('gltf-model', '#'+ this.data.modelID);
   console.log("model this.data._id " + this.data._id);
   const scatterModel = document.getElementById(this.data._id);
@@ -152,13 +160,15 @@ AFRAME.registerComponent('instanced_meshes_sphere', { //scattered randomly, not 
       });
       this.el.classList.add('activeObjexRay');
       // let thiz = this;
-      this.raycaster = null;
-      this.intersection = null;
-      this.hitpoint = null;
+
       let that = this;
-      window.addEventListener('click', function () {
-        console.log(that.instanceId);
-        that.instance_clicked(that.instanceId);
+
+      window.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (this.instanceId) {
+          console.log("clicked on instance "+ this.instanceId);
+          this.instance_clicked(this.instanceId); 
+        }
       }); 
     
 
@@ -181,10 +191,12 @@ AFRAME.registerComponent('instanced_meshes_sphere', { //scattered randomly, not 
           if (window.playerPosition != null && window.playerPosition != undefined && this.intersection[0].point != undefined && this.intersection[0].point != null ) {
         
               this.instanceId = this.intersection[ 0 ].instanceId;
-
+              console.log(this.instanceId);
               this.iMesh.setColorAt( this.instanceId, this.highlightColor.setHex( Math.random() * 0xffffff ) );
               this.iMesh.instanceColor.needsUpdate = true;
               // console.log('windowplayerposition ' + JSON.stringify(window.playerPosition));
+              this.distance = window.playerPosition.distanceTo(this.intersection[0].point);
+              this.hitpoint = this.intersection[0].point;
               this.rayhit(this.intersection[ 0 ].instanceId, window.playerPosition.distanceTo(this.intersection[0].point), this.intersection[0].point);
 
           }
@@ -194,9 +206,9 @@ AFRAME.registerComponent('instanced_meshes_sphere', { //scattered randomly, not 
           this.instanceId = null;
         }
 
-        this.iMesh.rotation.x -= this.speed * 2;
+        this.iMesh.rotation.x -= this.speed * .75;
         this.iMesh.rotation.y -= this.speed;
-        this.iMesh.rotation.z -= this.speed * 3;
+        this.iMesh.rotation.z -= this.speed * 1.5;
         // this.iMesh.
 
       }
@@ -206,7 +218,7 @@ AFRAME.registerComponent('instanced_meshes_sphere', { //scattered randomly, not 
         
         this.intersection = null;
         // this.raycaster = null;
-
+        
         this.hitID = hitID;
         console.log("new hit " + hitID + " " + distance + " " + JSON.stringify(hitpoint) + " interaction:" + this.data.interaction);
         var triggerAudioController = document.getElementById("triggerAudio");
@@ -214,6 +226,9 @@ AFRAME.registerComponent('instanced_meshes_sphere', { //scattered randomly, not 
           triggerAudioController.components.trigger_audio_control.playAudioAtPosition(hitpoint, distance);
         }
 
+      }
+      if (this.matrixMeshComponent != null) {
+        this.matrixMeshComponent.showRoomData(this.instanceId, distance, hitpoint);
       }
       if (this.data.interaction == "growpop") {
         this.iMesh.getMatrixAt(hitID, this.dummyMatrix);
@@ -251,17 +266,26 @@ AFRAME.registerComponent('instanced_meshes_sphere', { //scattered randomly, not 
     },
     instance_clicked: function (id) {
       if (id != null && this.intersection != null) {
-      this.dummy.scale.set( 0, 0, 0 );
-      this.dummy.updateMatrix();
-      console.log(id + " beez clicked!");
-      this.iMesh.setMatrixAt( id, this.dummy.matrix );
-      this.iMesh.frustumCulled = false;
-      this.iMesh.instanceMatrix.needsUpdate = true;
+      // this.dummy.scale.set( .9, .9, .9 );
+      // this.dummy.updateMatrix();
+      // console.log(id + " beez clicked!");
+      // this.iMesh.setMatrixAt( id, this.dummy.matrix );
+      // this.iMesh.frustumCulled = false;
+      // this.iMesh.instanceMatrix.needsUpdate = true;
       var triggerAudioController = document.getElementById("triggerAudio");
         if (triggerAudioController != null) {
-          triggerAudioController.components.trigger_audio_control.playAudioAtPosition(window.playerPosition, 1);
+          triggerAudioController.components.trigger_audio_control.playAudioAtPosition(this.hitpoint, this.distance);
           }
         // this.iMesh.position.set(id, 0, 0, -100);
+        if (this.useMatrix) {
+          let matrixMeshEl = document.getElementById("matrix_meshes");
+          if (matrixMeshEl != null) {
+            this.matrixMeshComponent = matrixMeshEl.components.matrix_meshes;
+            if (this.matrixMeshComponent != null && this.intersection != null) {
+            this.matrixMeshComponent.selectRoomData(this.instanceId);
+            }
+          }
+          }
       }
     }
 });
@@ -1953,7 +1977,7 @@ AFRAME.registerComponent("rotate-with-camera", {
     // this.matrixCalloutEntity.setAttribute("scale", ".1 .1 .1");
     this.matrixCalloutPanel.setAttribute("scale", ".075 .05 .075");
     this.matrixCalloutEntity.setAttribute("look-at", "#player");
-    // this.calloutEntity.setAttribute('visible', false);
+    this.matrixCalloutEntity.setAttribute('visible', false);
     this.dialogEl = document.getElementById('mod_dialog');
     this.selectedAxis = null;
     this.isSelected = false;
@@ -2017,7 +2041,9 @@ AFRAME.registerComponent("rotate-with-camera", {
     if (this.roomData != null) {
       console.log(JSON.stringify(this.roomData[instanceID]));
       let matrixLink = "https://matrix.to/#/"+this.roomData[instanceID].room_id;
-
+      if (!this.dialogEl) {
+        this.dialogEl = document.getElementById('mod_dialog');
+      } 
       this.dialogEl.components.mod_dialog.showPanel("Join the matrix room " + this.roomData[instanceID].name + "?", "href~https://matrix.to/#/" + this.roomData[instanceID].room_id );
     } else {
       GetMatrixData(); //in connect.js
