@@ -3125,7 +3125,10 @@ AFRAME.registerComponent('mod_dialog', { //there should only be one of these, un
     // this.el.setAttribute("visible", false);
     if (this.objID.includes("href~")) {
       let urlSplit = this.objID.split("~");
-      window.location.href = urlSplit[1];
+      // window.location.href = urlSplit[1];
+      window.open(urlSplit[1], "_blank");
+      this.el.setAttribute("visible", false);
+      this.dialogPanel.classList.remove('activeObjexRay');
     } else {
       let objEl = document.getElementById(this.objID);
       if (objEl != null) {

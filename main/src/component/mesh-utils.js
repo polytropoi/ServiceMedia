@@ -197,7 +197,7 @@ AFRAME.registerComponent('instanced_meshes_sphere', { //scattered randomly, not 
               // console.log('windowplayerposition ' + JSON.stringify(window.playerPosition));
               this.distance = window.playerPosition.distanceTo(this.intersection[0].point);
               this.hitpoint = this.intersection[0].point;
-              this.rayhit(this.intersection[ 0 ].instanceId, window.playerPosition.distanceTo(this.intersection[0].point), this.intersection[0].point);
+              this.rayhit(this.instanceId, this.distance, this.hitpoint); 
 
           }
 
@@ -2003,15 +2003,19 @@ AFRAME.registerComponent("rotate-with-camera", {
       color: "white",
       value: "wha"
     });
+    this.matrixCalloutPanel.setAttribute('overlay');
+    this.matrixCalloutText.setAttribute('overlay');
 
   },
   loadRoomData(roomData) {
-    // console.log(JSON.stringify(roomData)); 
+   
     this.roomData = roomData.chunk;
-    console.log("gots " + this.roomData.length + " rooms from matrix.org");
-    for (let i = 0; i < this.roomData.length; i++) {
-      // console.log(this.roomData[i].name);
-    }
+    this.roomData.sort((a, b) => (a.num_joined_members < b.num_joined_members) ? 1 : -1);
+    console.log("gots " + this.roomData.length + " rooms from matrix.org :" + JSON.stringify(this.roomData));
+
+    // for (let i = 0; i < this.roomData.length; i++) {
+    //   // console.log(this.roomData[i].name);
+    // }
   },
   showRoomData(instanceID, distance, hitpoint) {
     // console.log(JSON.stringify(this.data.roomData[instanceID]));
@@ -2024,6 +2028,7 @@ AFRAME.registerComponent("rotate-with-camera", {
       let z = hitpoint.z;
       this.matrixCalloutEntity.setAttribute("position", {"x": x, "y": y, "z": z});
       this.matrixCalloutPanel.setAttribute('visible', true);
+
       // this.matrixCalloutEntity.setAttribute("position", hitpoint);
       this.matrixCalloutEntity.setAttribute('visible', true);
       this.matrixCalloutEntity.setAttribute('scale', {x: distance * .25, y: distance * .25, z: distance * .25} );
@@ -2038,7 +2043,7 @@ AFRAME.registerComponent("rotate-with-camera", {
   },
   selectRoomData(instanceID) {
     console.log(instanceID);
-    if (this.roomData != null) {
+    if (instanceID != null && this.roomData != null && this.roomData.length > 0) {
       console.log(JSON.stringify(this.roomData[instanceID]));
       let matrixLink = "https://matrix.to/#/"+this.roomData[instanceID].room_id;
       if (!this.dialogEl) {
@@ -2046,7 +2051,10 @@ AFRAME.registerComponent("rotate-with-camera", {
       } 
       this.dialogEl.components.mod_dialog.showPanel("Join the matrix room " + this.roomData[instanceID].name + "?", "href~https://matrix.to/#/" + this.roomData[instanceID].room_id );
     } else {
-      GetMatrixData(); //in connect.js
+      if (!this.roomData) {
+        GetMatrixData(); //in connect.js
+      }
+     
     }
    
   },
@@ -2209,3 +2217,4 @@ AFRAME.registerComponent("curve-follow",
 		this.el.object3D.rotateOnWorldAxis(this.upVector, rotY);
 	}
 });
+

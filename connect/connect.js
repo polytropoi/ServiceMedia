@@ -52,6 +52,7 @@ let transportTimeStatsEl = null;
 let attributions = [];
 let uiVisible = true;
 let pauseLoops = false;
+let matrixClient = null;
 // let vidz = null;
 // let videoEl = null;
 
@@ -191,25 +192,42 @@ $(function() {
    }   
 });
 function GetMatrixData() {
-   var client = matrixcs.createClient("https://matrix.org");
-   client.publicRooms(function (err, data) {
+   if (!matrixClient) {
+      matrixClient = matrixcs.createClient("https://matrix.org");
+   }
+   matrixClient.publicRooms(function (err, data) { //this pulls a ton of data, so I randomly trim out all but 1000 elements below
       if (err) {
          console.error("err %s", JSON.stringify(err));
          return;
       }
-      // console.log("data %s [...]", JSON.stringify(data));
-      console.log("Congratulations! The SDK is working on the browser!");
+      console.log("Congratulations! The matrix client got " + data.chunk.length + " rooms.");
       let matrixMeshEl = document.getElementById("matrix_meshes");
       if (matrixMeshEl != null) {
          matrixMeshComponent = matrixMeshEl.components.matrix_meshes;
-         if (matrixMeshComponent != null) {
-            matrixMeshComponent.loadRoomData(data);
+         if (matrixMeshComponent != null) {  
+            let length = data.chunk.length;
+            let trimToLength = 5000;
+            let trimmedLength = length - trimToLength;
+            let trimmedIndexes = [];
+            let randomIndex = 0;
+            for (let i = 0; i < trimmedLength; i++) {
+               randomIndex = Math.floor(Math.random()*data.chunk.length);
+               // console.log("pushing randomIndex " + randomIndex);
+               // trimmedIndexes.push(randomIndex);
+               data.chunk.splice(randomIndex, 1)
+               if (i === trimmedLength - 1) {
+                  //sweeeet...
+                  // matrixMeshComponent.loadRoomData(data.chunk.splice(trimmedIndexes, 1)); 
+                  matrixMeshComponent.loadRoomData(data);   
+
+               }
+            } 
+           
          }
          // matrixMeshEl.components.matrix_meshes.loadRoomData(data);
       }
-      // var result = document.getElementById("result");
-      // result.innerHTML = "<p>The SDK appears to be working correctly.</p>";
-   });
+      });
+   // }
 }
 
 function MediaTimeUpdate (fancyTimeString) {
