@@ -234,7 +234,7 @@ AFRAME.registerComponent('instanced_meshes_sphere', { //scattered randomly, not 
         this.iMesh.getMatrixAt(hitID, this.dummyMatrix);
         this.dummyMatrix.decompose(this.dummy.position, this.dummy.quaternion, this.dummy.scale);
         console.log(parseFloat(this.dummy.scale.x) + " vs " + (parseFloat(this.data.scaleFactor) * 3));
-        if (parseFloat(this.dummy.scale.x) > (parseFloat(this.data.scaleFactor) * 2)) {
+        if (parseFloat(this.dummy.scale.x) > (parseFloat(this.data.scaleFactor) * 1.5)) {
           console.log("tryna lcik!");
           this.instance_clicked(hitID);
           this.dummy.scale.set( 0, 0, 0 );
@@ -244,7 +244,7 @@ AFRAME.registerComponent('instanced_meshes_sphere', { //scattered randomly, not 
           this.iMesh.frustumCulled = false;
           this.iMesh.instanceMatrix.needsUpdate = true;
         } else {
-          this.scaletmp = this.dummy.scale.x + Math.abs(Math.sin(this.time));
+          this.scaletmp = this.dummy.scale.x + Math.abs(Math.sin(this.time) / 4);
           this.dummy.scale.set( this.scaletmp, this.scaletmp, this.scaletmp );
           this.dummy.updateMatrix();
           this.iMesh.setMatrixAt( this.hitID, this.dummy.matrix );
@@ -256,7 +256,7 @@ AFRAME.registerComponent('instanced_meshes_sphere', { //scattered randomly, not 
         this.iMesh.getMatrixAt(hitID, this.dummyMatrix);
         this.dummyMatrix.decompose(this.dummy.position, this.dummy.quaternion, this.dummy.scale);
         console.log(parseFloat(this.dummy.scale.x) + " vs " + (parseFloat(this.data.scaleFactor) / 2));
-      if (parseFloat(this.dummy.scale.x) < (parseFloat(this.data.scaleFactor) / 2)) {
+      if (parseFloat(this.dummy.scale.x) < (parseFloat(this.data.scaleFactor) / 4)) {
         console.log("tryna lcik!");
           this.instance_clicked(hitID);
           this.dummy.scale.set( 0, 0, 0 );
@@ -266,7 +266,7 @@ AFRAME.registerComponent('instanced_meshes_sphere', { //scattered randomly, not 
           this.iMesh.frustumCulled = false;
           this.iMesh.instanceMatrix.needsUpdate = true;
         } else {
-          this.scaletmp = this.dummy.scale.x - Math.abs(Math.sin(this.time));
+          this.scaletmp = this.dummy.scale.x - Math.abs(Math.sin(this.time) / 2);
           this.dummy.scale.set( this.scaletmp, this.scaletmp, this.scaletmp );
           this.dummy.updateMatrix();
           this.iMesh.setMatrixAt( this.hitID, this.dummy.matrix );
