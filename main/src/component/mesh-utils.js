@@ -234,16 +234,22 @@ AFRAME.registerComponent('instanced_meshes_sphere', { //scattered randomly, not 
         this.iMesh.getMatrixAt(hitID, this.dummyMatrix);
         this.dummyMatrix.decompose(this.dummy.position, this.dummy.quaternion, this.dummy.scale);
         console.log(parseFloat(this.dummy.scale.x) + " vs " + (parseFloat(this.data.scaleFactor) * 3));
-      if (parseFloat(this.dummy.scale.x) > (parseFloat(this.data.scaleFactor) * 2)) {
-        console.log("tryna lcik!");
-        this.instance_clicked(hitID);
-      } else {
-        this.scaletmp = this.dummy.scale.x + Math.abs(Math.sin(this.time));
-        this.dummy.scale.set( this.scaletmp, this.scaletmp, this.scaletmp );
-        this.dummy.updateMatrix();
-        this.iMesh.setMatrixAt( this.hitID, this.dummy.matrix );
-        this.iMesh.frustumCulled = false;
-        this.iMesh.instanceMatrix.needsUpdate = true;
+        if (parseFloat(this.dummy.scale.x) > (parseFloat(this.data.scaleFactor) * 2)) {
+          console.log("tryna lcik!");
+          this.instance_clicked(hitID);
+          this.dummy.scale.set( 0, 0, 0 );
+          // this.data.interaction = null;
+          this.dummy.updateMatrix();
+          this.iMesh.setMatrixAt( this.hitID, this.dummy.matrix );
+          this.iMesh.frustumCulled = false;
+          this.iMesh.instanceMatrix.needsUpdate = true;
+        } else {
+          this.scaletmp = this.dummy.scale.x + Math.abs(Math.sin(this.time));
+          this.dummy.scale.set( this.scaletmp, this.scaletmp, this.scaletmp );
+          this.dummy.updateMatrix();
+          this.iMesh.setMatrixAt( this.hitID, this.dummy.matrix );
+          this.iMesh.frustumCulled = false;
+          this.iMesh.instanceMatrix.needsUpdate = true;
         }
       }
       if (this.data.interaction == "shrinkpop") {
@@ -252,14 +258,20 @@ AFRAME.registerComponent('instanced_meshes_sphere', { //scattered randomly, not 
         console.log(parseFloat(this.dummy.scale.x) + " vs " + (parseFloat(this.data.scaleFactor) / 2));
       if (parseFloat(this.dummy.scale.x) < (parseFloat(this.data.scaleFactor) / 2)) {
         console.log("tryna lcik!");
-        this.instance_clicked(hitID);
-      } else {
-        this.scaletmp = this.dummy.scale.x - Math.abs(Math.sin(this.time));
-        this.dummy.scale.set( this.scaletmp, this.scaletmp, this.scaletmp );
-        this.dummy.updateMatrix();
-        this.iMesh.setMatrixAt( this.hitID, this.dummy.matrix );
-        this.iMesh.frustumCulled = false;
-        this.iMesh.instanceMatrix.needsUpdate = true;
+          this.instance_clicked(hitID);
+          this.dummy.scale.set( 0, 0, 0 );
+          // this.data.interaction = null;
+          this.dummy.updateMatrix();
+          this.iMesh.setMatrixAt( this.hitID, this.dummy.matrix );
+          this.iMesh.frustumCulled = false;
+          this.iMesh.instanceMatrix.needsUpdate = true;
+        } else {
+          this.scaletmp = this.dummy.scale.x - Math.abs(Math.sin(this.time));
+          this.dummy.scale.set( this.scaletmp, this.scaletmp, this.scaletmp );
+          this.dummy.updateMatrix();
+          this.iMesh.setMatrixAt( this.hitID, this.dummy.matrix );
+          this.iMesh.frustumCulled = false;
+          this.iMesh.instanceMatrix.needsUpdate = true;
         }
       }
       

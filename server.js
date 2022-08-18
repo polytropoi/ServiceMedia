@@ -943,6 +943,10 @@ app.get("/amirite/:_id", function (req, res) {
     }
 });
 
+app.get("/oculus/:encoded", function (req, res) {
+    console.log("oculus sso request " + req.params.encoded);
+});
+
 function AppQuery (app) {
     // console.log(JSON.stringify(app._id));
     let id = app._id;
@@ -18148,7 +18152,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                         followCurve = "follow-path=\x22incrementBy:0.001; throttleTo:1\x22";
                                     }
                                     if (locMdl.markerType == "follow parametric curve") {
-                                        followCurve = "curve-follow=\x22curveData: #p_path; type: parametric_curve; duration: 64; loop: true;\x22";
+                                        followCurve = "curve-follow=\x22curveData: #p_path; type: parametric_curve; reverse: true; duration: 64; loop: true;\x22";
                                     }
                                     if (locMdl.eventData != null && locMdl.eventData != undefined && locMdl.eventData.length > 1) { //eventData has info
                                         // console.log("!!!tryna setup animation " + r.eventData);
@@ -22960,6 +22964,8 @@ app.post('/delete_picture/', requiredAuthentication, function (req, res){ //TODO
         }
     });
 });
+
+
 /*
 app.get('/tranzfer_util_number_one', function (req, res){
     async.waterfall([
