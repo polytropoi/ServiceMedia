@@ -18396,7 +18396,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                                     }
                                                     if (locMdl.eventData.toLowerCase().includes("brownian")) {
                                                         if (locMdl.eventData.toLowerCase().includes("brownian path")) {
-                                                            brownian = "brownian-path=\x22lineEnd:100000;lineStep:100;count:500;object:#thing-to-clone;positionVariance:88 33 86;spaceVectorOffset:101.1,100,100.2,101.2,100,100.1;rotationFollowsAxis:x;speed:0.01;\x22";
+                                                            brownian = "brownian-path=\x22lineEnd:100000;lineStep:100;count:200;object:#thing-to-clone;positionVariance:88 33 86;spaceVectorOffset:101.1,100,100.2,101.2,100,100.3;rotationFollowsAxis:x;speed:0.01;\x22";
                                                             gltfsEntities = gltfsEntities + "<a-gltf-model shadow src=\x22#"+m_assetID+"\x22 id=\x22thing-to-clone\x22 visible=\x22true\x22></a-gltf-model>"+
                                                             "<a-entity "+brownian+
                                                             " shadow=\x22cast:true; receive:true\x22 "+skyboxEnvMap+" position=\x22"+locMdl.x+" "+locMdl.y+" "+zFix+"\x22 scale=\x22"+scale+

@@ -116,7 +116,7 @@ function AudioAnalyzer() {
           // console.log("beat volume " + volume);
           if (beatElements != null) {
             for (let i = 0; i < beatElements.length; i++) {
-              beatElements[i].components.mod_model.beat(volume);
+              beatElements[i].components.mod_model.beat(volume, 500);
               }
             }
             // beatElements.every(beat());
@@ -4168,8 +4168,8 @@ AFRAME.registerComponent('mod_model', {
 
 
   },
-  beat: function (volume) {
-    // console.log("tryna beat " + this.el.id + " " + volume);
+  beat: function (volume, duration) {
+    console.log("tryna beat " + this.el.id + " " + volume);
     if (this.data.eventData.toLowerCase().includes("beat")) {
       let oScale = this.el.getAttribute('data-scale');
       oScale = parseFloat(oScale);
@@ -4179,7 +4179,7 @@ AFRAME.registerComponent('mod_model', {
         scale.y = oScale + volume;
         scale.z = oScale + volume;
         this.el.setAttribute('scale', scale);
-        this.el.setAttribute('animation', 'property: scale; to: '+oScale+' '+oScale+' '+oScale+'; dur: 500; startEvents: beatRecover; easing: easeInOutQuad');
+        this.el.setAttribute('animation', 'property: scale; to: '+oScale+' '+oScale+' '+oScale+'; dur: '+duration+'; startEvents: beatRecover; easing: easeInOutQuad');
         this.el.emit('beatRecover');
 
     }
