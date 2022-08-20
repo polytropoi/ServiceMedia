@@ -18334,7 +18334,8 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
 
                                             "});\n";
                                         } else { //aframe !!!
-                                            let zFix = parseFloat(locMdl.z) * -1; //fix to match unity 
+                                            // let zFix = parseFloat(locMdl.z) * -1; //fix to match unity 
+                                            let zFix = parseFloat(locMdl.z); //nope
 
                                             if (locMdl.eventData.toLowerCase().includes("navmesh")) { //regress for now...
                                                 console.log("GOTSA NAVMESH!!");
