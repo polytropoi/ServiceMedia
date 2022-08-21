@@ -14479,7 +14479,21 @@ function getAllPeople() {
                                 // locationButtons +    
                                 // sceneLocs +
                                 // "timekeys here" +
-                                "<div id=\x22sceneTimedEvents\x22 class=\x22col form-group col-md-12\x22></div>" +
+                                "<div class=\x22col form-group col-md-12\x22>"+
+                                    "<button id=\x22newSceneTimedEvent\x22 type=\x22button\x22 class=\x22btn btn-sm btn-success float-left\x22>New Event</button>" +
+                                
+                                    "<div class=\x22float-right\x22 style=\x22 width: 166px;\x22>Listen To Timeline:"+
+                                        "<select id=\x22sceneListenToTimelineSelector\x22 class=\x22sceneListenToTimelineSelector\x22>" +
+                                            "<option>None</option>" +
+                                            "<option>Primary Audio</option>" +
+                                            "<option>Primary Video</option>" +
+                                            "<option>Primary YouTube</option>" +
+                                            "<option>Scene Elapsed Time</option>" +
+                                        "</select>" +
+                                    "</div>"+
+                                "</div>" + 
+                                "<div id=\x22sceneTimedEvents\x22 class=\x22col form-group col-md-12\x22>"+
+                                "</div>" +
                                 
                                 
                             "</div>" + 
@@ -14608,6 +14622,7 @@ function getAllPeople() {
                 $("#sceneWebXREnvironment").val(response.data.sceneWebXREnvironment);  //aframe enviro component
                 $("#sceneFloorplaneTexture").val(response.data.sceneFloorplaneTexture);
                 $("#sceneHeightmapSelect").val(heightmapName);
+                // $("#sceneListenToTimelineSelector").val(response.data.sceneTimedEvents.listenTo);
                 // $("#sceneScatterOffset").val(response.data.sceneScatterOffset);
                 // sceneFont : req.body.sceneFont,
                 // sceneFontFillColor : req.body.sceneFontFillColor,
@@ -15911,6 +15926,26 @@ function getAllPeople() {
                         $("#sceneTimedEvents").html("no timed events found");
                     }
                     
+                    $(document).on('click','#newSceneTimedEvent',function(e){
+                        e.preventDefault();  
+                        let newTimeKey = {
+                            keytype: "",
+                            keystarttime: 0,
+                            keyduration: 5,
+                            keydata: ""
+                            }
+                        if (timekeys == null) {
+                            timekeys = [];
+                        }
+                        timekeys.push(newTimeKey);
+                        console.log("timekeys: " + JSON.stringify(timekeys));
+                        $("#sceneTimedEvents").html(ReturnTimeKeys(timekeys));
+                        for (let i = 0; i < timekeys.length; i++) { //init the dropdowns in timekey table
+                            console.log("tryna set timed event type " + timekeys[i].keytype);
+                            $("#tk_type_" + i).val(timekeys[i].keytype).change();
+                        }
+
+                    }); 
                     
                     // if (timekeys != undefined) {
 
@@ -15956,7 +15991,7 @@ function getAllPeople() {
                             }
                         }
                     });
-                    $(document).on('click','#newTimedEvent',function(e){
+                    $(document).on('click','#newTimedEvent',function(e){ //above...
                         e.preventDefault();  
                         console.log("tryna set a scene timekey");
                         let newTimeKey = {
@@ -15971,7 +16006,6 @@ function getAllPeople() {
                         for (let i = 0; i < timekeys.length; i++) {
                             $("#tk_type_" + i).val(timekeys[i].keytype).change();
                         }
-    
                     }); 
                     $(document).on('click','.remTimeKey',function(e) {
                         e.preventDefault();  
@@ -16170,6 +16204,9 @@ function getAllPeople() {
                         let sceneTime = {};
                         sceneTime.name = sceneTimeName;
                         let sceneTimeSpeed = {};
+                        let sceneTimedEvents = {};
+                        sceneTimedEvents.timekeys = timekeys;
+                        sceneTimedEvents.listenTo = document.getElementById("sceneListenToTimelineSelector").value;
                         // let sceneUseDynCubeMap =  document.getElementById('sceneUseDynCubeMap').checked;
                         sceneTimeSpeed.name = sceneTimeSpeedName;
                         // let sceneTargetEvent = {};
@@ -16375,7 +16412,8 @@ function getAllPeople() {
                             sceneTriggerPatch1: sceneTriggerPatch1,
                             sceneTriggerPatch2: sceneTriggerPatch2,
                             sceneWebXREnvironment: sceneWebXREnvironment,
-                            sceneLocations: sceneLocations
+                            sceneLocations: sceneLocations,
+                            sceneTimedEvents: sceneTimedEvents
                         };
                         // let headers = { headers: {
                         //     appid: appid,

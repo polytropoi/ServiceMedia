@@ -14370,6 +14370,7 @@ app.post('/update_scene/:_id', requiredAuthentication, function (req, res) {
                 sceneObjects: req.body.sceneObjects,
                 sceneModels: req.body.sceneModels,
                 sceneObjectGroups: req.body.sceneObjectGroups,
+                sceneTimedEvents: req.body.sceneTimedEvents,
                 sceneLastUpdate : lastUpdateTimestamp
                 
                 }
@@ -18337,16 +18338,14 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                             // let zFix = parseFloat(locMdl.z) * -1; //fix to match unity 
                                             let zFix = parseFloat(locMdl.z); //nope
 
-                                            if (locMdl.eventData.toLowerCase().includes("navmesh")) { //regress for now...
+                                            if (locMdl.eventData.toLowerCase().includes("navmesh")) { //regress for now, this is "real" vs simple navmesh...
                                                 console.log("GOTSA NAVMESH!!");
                                                 
                                                 // navmesh = "nav-mesh";
-
                                                 // gltfsEntities = gltfsEntities +"<a-entity nav-mesh normal-material visible=\x22false\x22 position=\x22"+locMdl.x+" "+locMdl.y+" "+zFix+"\x22 rotation=\x22"+rotation+"\x22 scale=\x22"+scale+" "+scale+" "+scale+"\x22 gltf-model=\x22#" + m_assetID + "\x22></a-entity>";
                                                 // gltfsEntities = gltfsEntities +"<a-entity visible=\x22false\x22 position=\x22"+locMdl.x+" "+locMdl.y+" "+zFix+"\x22 rotation=\x22"+rotation+"\x22 gltf-model=\x22#" + m_assetID + "\x22 nav-mesh normal-material></a-entity>";
-                                               
-                                                        // gltfsAssets = gltfsAssets + "<a-asset-item id=\x22" + m_assetID + "\x22 src=\x22"+ modelURL +"\x22></a-asset-item>";
-                                                        // gltfsEntities = gltfsEntities +"<a-entity visible=\x22false\x22 gltf-model=\x22#" + m_assetID + "\x22 nav-mesh></a-entity>";
+                                                // gltfsAssets = gltfsAssets + "<a-asset-item id=\x22" + m_assetID + "\x22 src=\x22"+ modelURL +"\x22></a-asset-item>";
+                                                // gltfsEntities = gltfsEntities +"<a-entity visible=\x22false\x22 gltf-model=\x22#" + m_assetID + "\x22 nav-mesh></a-entity>";
 
                                             } else {
                                                 // console.log("LOCMDL eventDATA is : " + locMdl.eventData.toLowerCase());
