@@ -14622,7 +14622,8 @@ function getAllPeople() {
                 $("#sceneWebXREnvironment").val(response.data.sceneWebXREnvironment);  //aframe enviro component
                 $("#sceneFloorplaneTexture").val(response.data.sceneFloorplaneTexture);
                 $("#sceneHeightmapSelect").val(heightmapName);
-                // $("#sceneListenToTimelineSelector").val(response.data.sceneTimedEvents.listenTo);
+                let listenTo = response.data.sceneTimedEvents && response.data.sceneTimedEvents.listenTo != undefined ? response.data.sceneTimedEvents.listenTo : "None";
+                $("#sceneListenToTimelineSelector").val(listenTo);
                 // $("#sceneScatterOffset").val(response.data.sceneScatterOffset);
                 // sceneFont : req.body.sceneFont,
                 // sceneFontFillColor : req.body.sceneFontFillColor,

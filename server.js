@@ -943,8 +943,30 @@ app.get("/amirite/:_id", function (req, res) {
     }
 });
 
-app.get("/oculus/:encoded", function (req, res) {
-    console.log("oculus sso request " + req.params.encoded);
+app.post("/oculus/:app/:action", function (req, res) {
+    
+    if (req.params.app.toString().toLowerCase() == "cowbots") {
+        console.log("oculus request for cowbots" + JSON.stringify(req.body));
+        if (req.params.action.toString().toLowerCase() == "validate") {
+            let data = {};
+            data.access_token = process.env.COWBOTS_OCULUS_TOKEN;
+            data.nonce = req.body.nonce;
+            data.user_id = req.body.oID;
+            console.log(JSON.stringify(data));
+            axios.post("https://graph.oculus.com/user_nonce_validate/", data) 
+            .then((response) => {
+            // console.log("oculus api validaaqtion response: " + JSON.stringify(response.data));
+            res.send("nonce validation response: " + JSON.stringify(response.data));
+            })
+            .catch(function (error) {
+                res.send(error);
+            })
+        } else {
+            res.send("dunno...no action");
+        }
+    } else {
+        res.send("for who/what?");
+    }
 });
 
 function AppQuery (app) {
