@@ -133,14 +133,16 @@ $(function() {
             // console.log("RAW LOCATIOND DATA " + theData);
    settings = JSON.parse(atob(theSettingsData)); 
    // let audioGroupsEl = null;
-   if (localStorage.getItem(room + "_timeKeys") != null) { //use local ve3rsion if saved
-      timeKeysData = JSON.parse(localStorage.getItem(room + "_timeKeys"));
-      // console.log('local timeKeysData' + JSON.stringify(timeKeysData));
-      timedEventsListenerMode = timeKeysData.listenTo;
-   } else if (settings.sceneTimedEvents != undefined && settings.sceneTimedEvents != null) {
+
+   if (settings.sceneTimedEvents != undefined && settings.sceneTimedEvents != null) {
       timeKeysData = settings.sceneTimedEvents;
       localStorage.setItem(room + '_timeKeys', JSON.stringify(timeKeysData));
       console.log('cloud timekeysdata' + JSON.stringify(timeKeysData));
+   } else if (localStorage.getItem(room + "_timeKeys") != null) { //use local ve3rsion if saved
+         timeKeysData = JSON.parse(localStorage.getItem(room + "_timeKeys"));
+         // console.log('local timeKeysData' + JSON.stringify(timeKeysData));
+         timedEventsListenerMode = timeKeysData.listenTo;
+      
    }
    AddLocalMarkers();
    vidz = document.getElementsByTagName("video");

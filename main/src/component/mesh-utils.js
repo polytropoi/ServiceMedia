@@ -1742,7 +1742,7 @@ AFRAME.registerComponent("rotate-with-camera", {
         // console.log("tryna rotoate y to " +  tmpe.y * 180 / Math.PI);
       
       // this.thirPersonPlaceholder.setAttribute("rotation", {x: 0, y: tmpe.y * 180 / Math.PI, z: 0 });
-      this.el.setAttribute("rotation", {x: 0, y: tmpe.y * 180 / Math.PI, z: 0 });
+      this.el.setAttribute("rotation", {x: 0, y: tmpe.y * 180 / Math.PI, z: 0 }); //hrm..
       
     }
   })()

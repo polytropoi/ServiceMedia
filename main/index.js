@@ -14488,7 +14488,7 @@ function getAllPeople() {
                                             "<option>None</option>" +
                                             "<option>Primary Audio</option>" +
                                             "<option>Primary Video</option>" +
-                                            "<option>Primary YouTube</option>" +
+                                            "<option>YouTube</option>" +
                                             "<option>Scene Elapsed Time</option>" +
                                         "</select>" +
                                     "</div>"+

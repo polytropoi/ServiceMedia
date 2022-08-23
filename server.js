@@ -17480,7 +17480,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                 let tweakColors = "";
                                 if (webxrEnv == "none") {
                                     ground = "ground: none;"
-                                    hemiLight = "<a-light type=\x22hemisphere\x22 color=\x22" + sceneResponse.sceneColor1 + "\x22 groundColor=\x22" + sceneResponse.sceneColor2 + "\x22 intensity=\x22.5\x22 position\x220 0 0\x22>"+
+                                    hemiLight = "<a-light id=\x22hemi-light\x22 type=\x22hemisphere\x22 color=\x22" + sceneResponse.sceneColor1 + "\x22 groundColor=\x22" + sceneResponse.sceneColor2 + "\x22 intensity=\x22.5\x22 position\x220 0 0\x22>"+
                                     "</a-light>";
                                 }
                                 if (sceneResponse.sceneUseFloorPlane && sceneResponse.sceneFloorplaneTexture == "none") {
@@ -17524,7 +17524,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                 aframeEnvironment = "<a-entity id=\x22enviroEl\x22 environment=\x22preset: "+webxrEnv+"; "+ground+" "+fog+" "+shadow+" "+groundcolor+" "+dressingcolor+" "+groundcolor2+" "+skycolor+" "+horizoncolor+" playArea: 12; lighting: distant; lightPosition: -5 10 0;\x22 hide-in-ar-mode "+tweakColors+"></a-entity>";
                                 // environment = "<a-entity environment=\x22preset: "+webxrEnv+"; "+fog+" "+shadow+" "+groundcolor+" "+dressingcolor+" "+groundcolor2+" "+skycolor+" "+horizoncolor+" playArea: 3; lightPosition: 0 2.15 0\x22 hide-in-ar-mode></a-entity>";
                             } else {
-                                hemiLight = "<a-light type=\x22hemisphere\x22 color=\x22" + sceneResponse.sceneColor1 + "\x22 groundColor=\x22" + sceneResponse.sceneColor2 + "\x22 intensity=\x22.5\x22 position\x220 0 0\x22>"+
+                                hemiLight = "<a-light id=\x22hemi-light\x22 type=\x22hemisphere\x22 color=\x22" + sceneResponse.sceneColor1 + "\x22 groundColor=\x22" + sceneResponse.sceneColor2 + "\x22 intensity=\x22.5\x22 position\x220 0 0\x22>"+
                                     "</a-light>";
                             }
                             sceneResponse.scenePostcards = sceneData.scenePostcards;
@@ -17535,10 +17535,10 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                             if (sceneResponse.sceneColor1 != null && sceneResponse.sceneColor1.length > 3 && sceneResponse.sceneColor2 != null && sceneResponse.sceneColor2.length > 3)   {
 
                             }
-                            if (sceneResponse.sceneUseDynamicShadows) {
+                            if (sceneResponse.sceneUseDynamicShadows && (webxrEnv == undefined || webxrEnv == null || webxrEnv == "none")) { //add a shadow light if not using the enviroment lights
                                 // shadowLight = "<a-light type=\x22directional\x22 color=\x22" + sceneResponse.sceneColor1 + "\x22 groundColor=\x22" + sceneResponse.sceneColor2 + "\x22 intensity=\x22.75\x22 target=\x22.target\x22 castShadow=\x22true\x22 shadowMapHeight=\x221024\x22 shadowMapWidth=\x221024\x22 shadowCameraLeft=\x22-2\x22 shadowCameraRight=\x222\x22; shadowCameraBottom=\x22-2\x22; shadowCameraTop=\x222\x22; position\x22-1 4 4\x22>"+
                                 // "</a-light>";
-                                shadowLight = "<a-entity light=\x22type: directional; color:"+sceneResponse.sceneColor1+"; groundColor:"+sceneResponse.sceneColor2+"; castShadow: true; intensity: 0.4; shadowBias: -0.0015; shadowCameraFar: 1000; shadowMapHeight: 2048; shadowMapWidth: 2048;\x22 position=\x225 10 7\x22></a-entity>";
+                                shadowLight = "<a-entity id=\x22shadow-light\x22 light=\x22type: directional; color:"+sceneResponse.sceneColor1+"; groundColor:"+sceneResponse.sceneColor2+"; castShadow: true; intensity: 0.4; shadowBias: -0.0015; shadowCameraFar: 1000; shadowMapHeight: 2048; shadowMapWidth: 2048;\x22 position=\x225 10 7\x22></a-entity>";
                             }
                             if (sceneResponse.sceneUseGlobalFog || sceneResponse.sceneUseSceneFog) {
                                 let fogDensity = sceneResponse.sceneGlobalFogDensity != null ? sceneResponse.sceneGlobalFogDensity : '.01';
@@ -19693,7 +19693,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                             // let envMap = sceneResponse.sceneUseDynCubeMap ? "convert-to-envmap" : "";
                                             skySettings = "<a-sky crossorigin=\x22anonymous\x22 hide-in-ar-mode src=#sky></a-sky>";
                                             // aframeEnvironment = "";
-                                            hemiLight = "<a-light type=\x22hemisphere\x22 color=\x22" + sceneResponse.sceneColor1 + "\x22 groundColor=\x22" + sceneResponse.sceneColor2 + "\x22 intensity=\x221\x22 position\x220 0 0\x22>"+
+                                            hemiLight = "<a-light id=\x22hemi-light\x22 type=\x22hemisphere\x22 color=\x22" + sceneResponse.sceneColor1 + "\x22 groundColor=\x22" + sceneResponse.sceneColor2 + "\x22 intensity=\x221\x22 position\x220 0 0\x22>"+
                                             "</a-light>";
                                         }
                                         callback(null);
