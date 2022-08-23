@@ -1547,6 +1547,36 @@ AFRAME.registerComponent('particle_spawner',
 
 });
 
+AFRAME.registerComponent('mod_flicker', {
+  schema: {
+    type: {type: 'string', default: 'fire'}
+  },
+  init: function() {
+    if (this.data.type.toLowerCase() =="candle") {
+      this.lightAnimation(.5, .75);
+      this.el.addEventListener('animationcomplete', () => {
+        this.lightAnimation(.5, .75);
+      });
+    }
+        
+    if (this.data.type.toLowerCase() =="fire") {
+      this.lightAnimation(.7, 1.5);
+      this.el.addEventListener('animationcomplete', () => {
+          this.lightAnimation(.7, 1.5);
+      });
+    }
+  },
+  lightAnimation: function (min, max){
+      this.intensityMin = min;
+      this.intensityMax = max;
+      let duration = Math.random() * 600;
+      let intensity = randomUniform(this.intensityMin, this.intensityMax);
+      let animation = "property: light.intensity; from: 0.5; to: "+intensity+"; dur: "+duration+"; dir: alternate;";
+      this.el.setAttribute('animation', animation)
+    }
+  
+});
+
 AFRAME.registerComponent('mod_particles', {
   schema: {
     parentID: {type: 'string', default: null},
@@ -1621,6 +1651,8 @@ AFRAME.registerComponent('mod_particles', {
   }
 
 });
+
+
 
 function randomNormal(min, max)
 {

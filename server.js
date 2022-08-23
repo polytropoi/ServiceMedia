@@ -945,11 +945,29 @@ app.get("/amirite/:_id", function (req, res) {
 
 app.post("/oculus/:app/:action", function (req, res) {
     
-    if (req.params.app.toString().toLowerCase() == "cowbots") {
+    if (req.params.app.toString().toLowerCase() == "cowbots_rift") {
         console.log("oculus request for cowbots" + JSON.stringify(req.body));
         if (req.params.action.toString().toLowerCase() == "validate") {
             let data = {};
-            data.access_token = process.env.COWBOTS_OCULUS_TOKEN;
+            data.access_token = process.env.COWBOTS_OCULUS_RIFT_TOKEN;
+            data.nonce = req.body.nonce;
+            data.user_id = req.body.oID;
+            console.log(JSON.stringify(data));
+            axios.post("https://graph.oculus.com/user_nonce_validate/", data) 
+            .then((response) => {
+            // console.log("oculus api validaaqtion response: " + JSON.stringify(response.data));
+            res.send("nonce validation response: " + JSON.stringify(response.data));
+            })
+            .catch(function (error) {
+                res.send(error);
+            })
+        } else {
+            res.send("dunno...no action");
+        }
+    } else if ((req.params.app.toString().toLowerCase() == "cowbots_quest")) {
+        if (req.params.action.toString().toLowerCase() == "validate") {
+            let data = {};
+            data.access_token = process.env.COWBOTS_OCULUS_QUEST_TOKEN;
             data.nonce = req.body.nonce;
             data.user_id = req.body.oID;
             console.log(JSON.stringify(data));
@@ -16401,6 +16419,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
     let videoParent = "look-at=\x22#player\x22"; //billboard by default
     let weblinkLocation = "5 2 5";
     let locationLights = [];
+    let particleLocations = [];
     let locationPlaceholders = [];
     let locationCallouts = [];
     let locationPictures = [];
@@ -17014,6 +17033,12 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                                     lightLocation.loc = sceneResponse.sceneLocations[i].x + " " + sceneResponse.sceneLocations[i].y + " " + zFix;
                                     lightLocation.data = sceneResponse.sceneLocations[i].eventData;
                                     locationLights.push(lightLocation);
+                                }
+                                if (sceneResponse.sceneLocations[i].markerType == "particles" && sceneResponse.sceneLocations[i].eventData != undefined) {
+                                    let particleLocation = {};
+                                    particleLocation.loc = sceneResponse.sceneLocations[i].x + " " + sceneResponse.sceneLocations[i].y + " " + zFix;
+                                    particleLocation.data = sceneResponse.sceneLocations[i].eventData;
+                                    particleLocations.push(particleLocation);
                                 }
                                 if (sceneResponse.sceneLocations[i].markerType != undefined && sceneResponse.sceneLocations[i].markerType.includes("picture")) { 
                                     
@@ -17644,17 +17669,54 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
                 //     }
                     
                 // },
-
+                function (callback) {
+                    if (particleLocations.length > 0) {
+                        for (let i = 0; i < particleLocations.length; i++) {
+                            let color = "";
+                            let distance = 10;
+                            let mod = "";
+                            if (particleLocations[i].data != null && particleLocations[i].data.length > 3) {
+                                if (particleLocations[i].data.indexOf("~") != -1) {
+                                    let split = particleLocations[i].data.split("~");
+                                    color = split[0];
+                                    distance = split[1];
+                                    // if (split.length > 2) {
+                                    //     if (split[2].toLowerCase().includes("flicker")) {
+                                    //         mods = " mod_flicker ";
+                                    //     }
+                                    // }
+                                } else {
+                                    color = locationLights[i].data;
+                                }
+                            }
+                            lightEntities = lightEntities + "<a-light "+mods+" color='" + color + "' position=\x22"+locationLights[i].loc+"\x22 distance=\x22"+distance+"\x22 intensity='0.8' type='point'></a-light>";
+                        }
+                        callback();
+                    } else {
+                        callback();
+                    }
+                },
                 function (callback) {
                     if (locationLights.length > 0) {
                         for (let i = 0; i < locationLights.length; i++) {
                             let color = "";
+                            let distance = 10;
+                            let mod = "";
                             if (locationLights[i].data != null && locationLights[i].data.length > 3) {
-                                if (locationLights[i].data.indexOf("_") != -1) {
-                                    //
+                                if (locationLights[i].data.indexOf("~") != -1) {
+                                    let split = locationLights[i].data.split("~");
+                                    color = split[0];
+                                    distance = split[1];
+                                    if (split.length > 2) {
+                                        if (split[2].toLowerCase().includes("flicker")) {
+                                            mods = " mod_flicker ";
+                                        }
+                                    }
+                                } else {
+                                    color = locationLights[i].data;
                                 }
                             }
-                            lightEntities = lightEntities + "<a-light color='" + locationLights[i].data + "' position=\x22"+locationLights[i].loc+"\x22 distance='10' intensity='0.8' type='point'></a-light>";
+                            lightEntities = lightEntities + "<a-light "+mods+" color='" + color + "' position=\x22"+locationLights[i].loc+"\x22 distance=\x22"+distance+"\x22 intensity='0.8' type='point'></a-light>";
                         }
                         callback();
                     } else {
