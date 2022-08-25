@@ -35,7 +35,7 @@ var express = require("express")
     // app.use(helmet.contentSecurityPolicy());
     app.use(helmet.dnsPrefetchControl());
     app.use(helmet.expectCt());
-    // app.use(helmet.frameguard());
+
     app.use(helmet.hidePoweredBy());
     app.use(helmet.hsts());
     app.use(helmet.ieNoOpen());
@@ -43,20 +43,14 @@ var express = require("express")
     app.use(helmet.permittedCrossDomainPolicies());
     app.use(helmet.referrerPolicy());
     app.use(helmet.xssFilter());
-    // app.use(helmet());
-    // app.use(helmet.frameguard());
-    // app.use(
-    //     helmet.contentSecurityPolicy({
-    //       directives: {
-    //         defaultSrc: ["'self'"],
-    //         frameSrc: ["xrswim.com"],
-    //         upgradeInsecureRequests: []
-    //       },
-    //     })
-    //   );
 
+    // require('./routes/oculus_routes')(app);
+    // app.cosnfigure(function(){
+        // app.use(bodyParser);
+    // });
 
 var stripe = require("stripe")(process.env.STRIPE_KEY);
+
 
 
 var rootHost = process.env.ROOT_HOST
@@ -118,6 +112,7 @@ var store = new MongoDBStore({ //store session cookies in a separate db with dif
     store.db; // The underlying MongoClient object from the MongoDB driver
   });
 
+
     app.use(express.static(path.join(__dirname, './'), { maxAge: oneDay }));
 
     app.use(function(req, res, next) {
@@ -156,11 +151,9 @@ var store = new MongoDBStore({ //store session cookies in a separate db with dif
 
     var aws = require('aws-sdk');
     const { json } = require("body-parser");
-const { profile } = require("console");
+    const { profile } = require("console");
 
     const { lookupService, resolveNaptr, resolveCname } = require("dns");
-
-    // aws.config.loadFromPath('main/conf/aws_conf.json');
 
     aws.config = new aws.Config({accessKeyId: process.env.AWSKEY, secretAccessKey: process.env.AWSSECRET, region: process.env.AWSREGION});
     var ses = new aws.SES({apiVersion : '2010-12-01'});
@@ -173,9 +166,18 @@ const { profile } = require("console");
     server.timeout = 240000;
     server.keepAliveTimeout = 24000;
     server.listen(process.env.PORT || 3000, function() {
-    console.log("Express server listening on port 3000");
-});
+        console.log("Express server listening on port 3000");
+    });
+    app.set('db', db);
+    app.set('store', store);
+    app.set('s3', s3);
 
+    //INCLUDE EXTERNAL ROUTES BELOW
+    var oculus_routes = require('./routes/oculus_routes');
+    app.use('/oculus', oculus_routes);
+    var webxr_routes = require('./routes/webxr_routes');
+    app.use('/webxr', webxr_routes);  
+    
 
 
 // io.attach(http);
@@ -943,49 +945,50 @@ app.get("/amirite/:_id", function (req, res) {
     }
 });
 
-app.post("/oculus/:app/:action", function (req, res) {
+
+// app.post("/oculus/:app/:action", function (req, res) {
     
-    if (req.params.app.toString().toLowerCase() == "cowbots_rift") {
-        console.log("oculus request for cowbots" + JSON.stringify(req.body));
-        if (req.params.action.toString().toLowerCase() == "validate") {
-            let data = {};
-            data.access_token = process.env.COWBOTS_OCULUS_RIFT_TOKEN;
-            data.nonce = req.body.nonce;
-            data.user_id = req.body.oID;
-            console.log(JSON.stringify(data));
-            axios.post("https://graph.oculus.com/user_nonce_validate/", data) 
-            .then((response) => {
-            // console.log("oculus api validaaqtion response: " + JSON.stringify(response.data));
-            res.send("nonce validation response: " + JSON.stringify(response.data));
-            })
-            .catch(function (error) {
-                res.send(error);
-            })
-        } else {
-            res.send("dunno...no action");
-        }
-    } else if ((req.params.app.toString().toLowerCase() == "cowbots_quest")) {
-        if (req.params.action.toString().toLowerCase() == "validate") {
-            let data = {};
-            data.access_token = process.env.COWBOTS_OCULUS_QUEST_TOKEN;
-            data.nonce = req.body.nonce;
-            data.user_id = req.body.oID;
-            console.log(JSON.stringify(data));
-            axios.post("https://graph.oculus.com/user_nonce_validate/", data) 
-            .then((response) => {
-            // console.log("oculus api validaaqtion response: " + JSON.stringify(response.data));
-            res.send("nonce validation response: " + JSON.stringify(response.data));
-            })
-            .catch(function (error) {
-                res.send(error);
-            })
-        } else {
-            res.send("dunno...no action");
-        }
-    } else {
-        res.send("for who/what?");
-    }
-});
+//     if (req.params.app.toString().toLowerCase() == "cowbots_rift") {
+//         console.log("oculus request for cowbots" + JSON.stringify(req.body));
+//         if (req.params.action.toString().toLowerCase() == "validate") {
+//             let data = {};
+//             data.access_token = process.env.COWBOTS_OCULUS_RIFT_TOKEN;
+//             data.nonce = req.body.nonce;
+//             data.user_id = req.body.oID;
+//             console.log(JSON.stringify(data));
+//             axios.post("https://graph.oculus.com/user_nonce_validate/", data) 
+//             .then((response) => {
+//             // console.log("oculus api validaaqtion response: " + JSON.stringify(response.data));
+//             res.send("nonce validation response: " + JSON.stringify(response.data));
+//             })
+//             .catch(function (error) {
+//                 res.send(error);
+//             })
+//         } else {
+//             res.send("dunno...no action");
+//         }
+//     } else if ((req.params.app.toString().toLowerCase() == "cowbots_quest")) {
+//         if (req.params.action.toString().toLowerCase() == "validate") {
+//             let data = {};
+//             data.access_token = process.env.COWBOTS_OCULUS_QUEST_TOKEN;
+//             data.nonce = req.body.nonce;
+//             data.user_id = req.body.oID;
+//             console.log(JSON.stringify(data));
+//             axios.post("https://graph.oculus.com/user_nonce_validate/", data)
+//             .then((response) => {
+//             // console.log("oculus api validaaqtion response: " + JSON.stringify(response.data));
+//             res.send("nonce validation response: " + JSON.stringify(response.data));
+//             })
+//             .catch(function (error) {
+//                 res.send(error);
+//             })
+//         } else {
+//             res.send("dunno...no action");
+//         }
+//     } else {
+//         res.send("for who/what?");
+//     }
+// });
 
 function AppQuery (app) {
     // console.log(JSON.stringify(app._id));
@@ -16283,7 +16286,8 @@ app.post('/netradiodetails', function (req, res) {
 
 
 // app.get('/webxr/:_id', traffic, function (req, res) { //TODO lock down w/ checkAppID, requiredAuthentication - rem'd traffic, maybe later
-app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, requiredAuthentication
+//now in external webxr_router
+app.get('/webxr_nope/:_id', function (req, res) { //TODO lock down w/ checkAppID, requiredAuthentication
     var reqstring = entities.decodeHTML(req.params._id);
     console.log("webxr scene req " + reqstring);
     if (reqstring != undefined && reqstring != 'undefined' && reqstring != null) {
@@ -21464,7 +21468,7 @@ app.get('/webxr/:_id', function (req, res) { //TODO lock down w/ checkAppID, req
     });
     } //if params undefined
 });
-
+//webxr/: end
 
 app.get('/scene/:_id/:platform/:version', function (req, res) { //called from app context - TODO lock down w/ checkAppID, requiredAuthentication
 
