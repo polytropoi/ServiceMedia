@@ -6,9 +6,7 @@ const ObjectID = require("bson-objectid");
 const path = require("path");
 const jwt = require("jsonwebtoken");
 
-webxr_router.get("/test", function (req, res) {
-    res.send("OK!");
-});
+
 
 function getExtension(filename) {
     var i = filename.lastIndexOf('.');
@@ -22,6 +20,19 @@ function convertStringToObjectID (stringID) {
         return null;
     }
 }
+
+function UppercaseFirst(s) {
+    if (s != undefined) {
+    const ufirst = s.charAt(0).toUpperCase() + s.slice(1);
+    return ufirst;
+        } else {
+            return "*";
+        }
+    };
+    
+webxr_router.get("/test", function (req, res) {
+    res.send("OK!");
+});    
 //main xr response route
 webxr_router.get('/:_id', function (req, res) { 
     let db = req.app.get('db');
