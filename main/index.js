@@ -7202,37 +7202,7 @@
 
                     "</div>" +
                     "<div class=\x22form-row\x22>" +
-                    // "<div class=\x22col form-group col-md-3\x22>" +
-                    //     "<label for=\x22storeItemTypeSelect\x22>Item Type</label>" +
-                    //     "<select class=\x22form-control\x22 id=\x22storeItemTypeSelect\x22 required>" +
-                    //     "</select>" + //populated via types below
-                    // "</div>" +
-                    // "<div class=\x22col form-group col-md-3\x22>" +
-                    //     "<label for=\x22storeItemSubTypeSelect\x22>Item SubType</label>" +
-                    //     "<select class=\x22form-control\x22 id=\x22storeItemSubTypeSelect\x22 required>" +
-                    //     "</select>" + //populated below
-                    // "</div>" +
-                    // "<div class=\x22col form-group col-md-3\x22>" +
-                    //     "<label for=\x22storeItemAttributesSelect1\x22>Select Item Attributes</label>" +
-                    //     "<select class=\x22form-control\x22 id=\x22storeItemAttributesSelect1\x22 >" +
-                    //     "<option value=\x22\x22 disabled selected>Select:</option>" +
-                    //     "<option>Fire</option>" +
-                    //     "<option>Water</option>" +
-                    //     "<option>Earth</option>" +
-                    //     "<option>Air</option>" +
-                    //     "<option>Magic</option>" +
-                    //     "<option>Stinky</option>" +
-                    //     "<option>Hot</option>" +
-                    //     "<option>Cold</option>" +
-                    //     "<option>Dry</option>" +
-                    //     "<option>Wet</option>" +
-                    //     "<option>Fast</option>" +
-                    //     "<option>Slow</option>" +
-                    //     "<option>Sneaky</option>" +
-                    //     "<option>Annoying</option>" +
-                    //     "<option>Double</option>" +
-                    //     "</select>" +
-                    // "</div>" +
+                   
                     "<div class=\x22col form-group col-md-3\x22>" +
                         "<a class=\x22btn btn-info\x22 href=\x22index.html?type=objects&mode=select&parent=storeitem&iid="+response.data._id+"\x22><i class=\x22fas fa-hand-pointer\x22></i> Select Object</a>" +
                         storeitemObj +
@@ -9931,45 +9901,6 @@ function getAllPeople() {
             }
         }
 
-        // const types = "<option>hotspot</option>" +
-        //     "<option>callouthotspot</option>" +
-        //     "<option>gatehotspot</option>" +
-        //     "<option>spawnhotspot</option>" +
-        //     "<option>videohotspot</option>" +
-        //     "<option>youtubehotspot</option>" +
-        //     "<option>picturehotspot</option>" +
-        //     "<option>audiohotspot</option>" +
-        //     "<option>key</option>" +
-        //     "<option>audio</option>" +
-        //     "<option>picture</option>" +
-        //     "<option>movie</option>" +
-        //     "<option>youtube</option>" +
-        //     "<option>text</option>" +
-        //     "<option>textbook</option>" +
-        //     "<option>picturebook</option>" +
-        //     "<option>link</option>" +
-        //     "<option>mailbox</option>" +
-        //     "<option>character</option>" +
-        //     "<option>pickup</option>" +
-        //     "<option>drop</option>" +
-        //     "<option>collectible</option>" +
-        //     "<option>media</option>" +
-        //     "<option>equip - beam</option>" +
-        //     "<option>equip - shoot</option>" +
-        //     "<option>equip - throw</option>" +
-        //     "<option>equip - hit</option>" +
-        //     "<option>equip - teleport</option>" +
-        //     "<option>equip - consume</option>" +
-        //     "<option>callout</option>" +
-        //     "<option>lerp</option>" +
-        //     "<option>slerp</option>" +
-        //     "<option>gate</option>" +
-        //     "<option>spawntrigger</option>" +
-        //     "<option>light</option>" +
-        //     "<option>particlesystem</option>" +
-        //     "<option>spawn</option>" +
-        //     "<option>flyer</option>" +
-        //     "<option>walker</option>";
 
         return types;
     }
@@ -12986,79 +12917,7 @@ function getAllPeople() {
                                 "</div>" +
                             "</div>" +
                             "</div>" +
-                            ///sharing below...
-                            // "<div class=\x22form-row\x22>" +
-                            //     "<div class=\x22col form-group col-md-4\x22>" +
-                            //         "<label for=\x22sceneShareWithPeople\x22>Share with People</label>" + //share with people, todo typeahead...
-                            //         "<textarea class=\x22form-control\x22 id=\x22sceneShareWithPeople\x22 placeholder=\x22delimit usernames or emails with comma\x22>" + sceneShareWithPeople + "</textarea>" +
-                            //     "</div>" +
-                            //     "<div class=\x22col form-group col-md-4\x22>" +
-                            //         "<label for=\x22sceneShareMessage\x22>Share with message</label>" + //message to include in sending
-                            //         "<textarea class=\x22form-control\x22 id=\x22sceneShareWithMessage\x22 placeholder=\x22add message to send with invitation\x22>" + sceneShareWithMessage + "</textarea>" +
-                            //     "</div>" +
-                            //     "<div class=\x22col form-group col-md-3\x22>" +
-                            //         "<label for=\x22sceneShareWithGroups\x22>Share with Group</label>" + //share with group
-                            //         "<select class=\x22form-control\x22 id=\x22sceneShareWithGroups\x22 >" +
-                            //             "<option>People Groups Here</option>" +
-                            //             "</select>"+
-                            //     "</div>" +
-                            //     "<div class=\x22col form-group col-md-1\x22>" +
-                            //       "<div id=\x22sendInvitationButton\x22 class=\x22btn btn-info btn-sm\x22>Send Invitation</div>"+
-                            //     "</div>" +
-                            // "</div>" +
-                            // "<div class=\x22form-row\x22>" +    
-                            //     "<div class=\x22col form-group col-md-1\x22>" +
-                            //         "<div class=\x22\x22><label for=\x22scenePublicToggle\x22>Share with Public</label><br>" + //Public/Private
-                            //         "<input class=\x22float-right\x22 type=\x22checkbox\x22  id=\x22scenePublicToggle\x22 data-toggle=\x22toggle\x22 data-size=\x22sm\x22 data-on=\x22<i class='fas fa-check'></i>\x22 data-off=\x22<i class='fas fa-times'></i>\x22 data-onstyle=\x22success\x22 data-offstyle=\x22danger\x22></div>" +
-                            //     "</div>" +
-                            //     "<div class=\x22col form-group col-md-1\x22>" +
-                            //         "<div class=\x22\x22><label for=\x22sceneSubscriberToggle\x22>Share with Subscribers</label><br>" + //Sub/Not
-                            //         "<input type=\x22checkbox\x22  id=\x22sceneSubscriberToggle\x22 data-toggle=\x22toggle\x22 data-size=\x22sm\x22 data-on=\x22<i class='fas fa-check'></i>\x22 data-off=\x22<i class='fas fa-times'></i>\x22 data-onstyle=\x22success\x22 data-offstyle=\x22danger\x22></div>" +
-                            //     "</div>" +
-                            //     "<div class=\x22col form-group col-md-1\x22>" +
-                            //         "<div class=\x22\x22><label for=\x22sceneLocationTracking\x22>Track Location</label><br>" + //geofencing
-                            //         "<input type=\x22checkbox\x22  id=\x22sceneLocationTracking\x22 data-toggle=\x22toggle\x22 data-size=\x22sm\x22 data-on=\x22<i class='fas fa-check'></i>\x22 data-off=\x22<i class='fas fa-times'></i>\x22 data-onstyle=\x22success\x22 data-offstyle=\x22danger\x22></div>" +
-                            //     "</div>" +
-                            //     "<div class=\x22col form-group col-md-1\x22>" +
-                            //         "<div class=\x22\x22><label for=\x22sceneShowAds\x22>Show Ads</label><br>" + //show ads
-                            //         "<input type=\x22checkbox\x22  id=\x22sceneShowAds\x22 data-toggle=\x22toggle\x22 data-size=\x22sm\x22 data-on=\x22<i class='fas fa-check'></i>\x22 data-off=\x22<i class='fas fa-times'></i>\x22 data-onstyle=\x22success\x22 data-offstyle=\x22danger\x22></div>" +
-                            //     "</div>" +
-                            //     // "<div class=\x22col form-group col-md-1\x22>" +
-                            //     //     "<label for=\x22sceneLocationRange\x22>Location Range</label>" + 
-                            //     //     "<input type=\x22number\x22 step=\x220.01\x22 class=\x22form-control\x22 id=\x22sceneLocationRange\x22 placeholder=\x2210\x22 value=\x22" + sceneLocationRange + "\x22 >" +
-                            //     // "</div>" +
-                            //     "<div class=\x22col form-group col-md-1\x22> " +
-                            //         "<label for=\x22networkingBtns\x22> Networking </label>" + 
-                            //         "<br><div id=\x22networkingBtns\x22 class=\x22btn-group btn-group-sm btn-group-toggle flex-wrap\x22 data-toggle=\x22buttons\x22>" +
-                            //             "<label class=\x22btn btn-secondary active\x22>" +
-                            //                 "<input type=\x22radio\x22 name=\x22sceneNetworking\x22 value=\x22None\x22 id=\x22None\x22 autocomplete=\x22off\x22 checked> None " +
-                            //             "</label>" +
-                            //             "<label class=\x22btn btn-secondary\x22>" +
-                            //                 "<input type=\x22radio\x22 name=\x22sceneNetworking\x22 value=\x22SocketIO\x22 id=\x22SocketIO\x22 autocomplete=\x22off\x22> SocketIO " +
-                            //             "</label>" +
-                            //             "<label class=\x22btn btn-secondary\x22>" +
-                            //                 "<input type=\x22radio\x22 name=\x22sceneNetworking\x22 value=\x22WebRTC\x22 id=\x22WebRTC\x22 autocomplete=\x22off\x22> WebRTC " +
-                            //             "</label>" +
-                            //             "<label class=\x22btn btn-secondary\x22>" +
-                            //                 "<input type=\x22radio\x22 name=\x22sceneNetworking\x22 value=\x22AudioChat\x22 id=\x22AudioChat\x22 autocomplete=\x22off\x22> AudioChat " +
-                            //             "</label>" +
-                            //         "</div>" +
-                            //     "</div>" +
-                            //     "<div class=\x22col form-group col-md-2\x22>" +
-                            //         "<label for=\x22sceneAltURL\x22>Scene Alternate URL</label>" + 
-                            //         "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22sceneAltURL\x22 placeholder=\x22Scene Alternate URL\x22 value=\x22" + sceneAltURL + "\x22 >" +
-                                 
-                            //     "</div>" +
-                                
-                            //     "<div class=\x22col form-group col-md-2\x22>" +
-                            //         "<label for=\x22sceneDebugMode\x22>Scene Debug Mode</label>" + 
-                            //         "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22sceneDebugMode\x22 placeholder=\x22Scene Debug Mode\x22 value=\x22" + sceneDebugMode + "\x22 >" +
-                            //     "</div>" +
-                            //     "<div class=\x22col form-group col-md-2\x22>" +
-                            //         "<a class=\x22btn btn-sm btn-dark float-right\x22 target=\x22_blank\x22 href=\x22/qrcode/"+sceneAltURL+"\x22><i class=\x22far fa-file-alt\x22></i> Alternate URL QRCode</a><br><br>" +
-                            //         "<a class=\x22btn btn-sm btn-dark float-right\x22 target=\x22_blank\x22 href=\x22/qrcode/"+short_id+"\x22><i class=\x22far fa-file-alt\x22></i> ServiceMedia URL QRCode</a>" +
-                            //     "</div>" +
-                            // "</div>" +
+                            
                             "<hr/>" +
                         "</div>" +
                             "<button id=\x22sharingSectionButton\x22 class=\x22btn btn-sm btn-primary btn-circle btn-light float-left\x22><i class=\x22fas fa-plus-circle\x22></i> </button>" +
@@ -15756,27 +15615,7 @@ function getAllPeople() {
                        sceneEventEnd = ms;
                     });
 
-                    // $(document).on('change', '#sceneSkyParticlesSelect', function() {
-                    //     // console.log("sceneSkyParticlesSelect change : "+ this.value);
-                    //     for (let i = 0; i < apps.length; i++) {
-                    //         if (this.value == apps[i].appname) {
-                    //             console.log("appname match! " + this.value);  
-                    //             sceneDomain = apps[i].appdomain;
-                    //             sceneAppName = this.value;
-                    //         } 
-                    //     }
-                    // });
-                    // $(document).on('change', '.modelSelector', function() {
-                    //     for (let s = 0; s < sceneLocations.length; s++) {   
-                    //         let locid = this.id.split("_")[1];
-                    //         if (locid == sceneLocations[s].timestamp || this.id == sceneLocations[s].timestamp)   {
-                    //             sceneLocations[s].model = $(this).find('option:selected').text();
-                    //             sceneLocations[s].modelID = this.value;
-
-                    //             console.log("location gltf set " + $(this).find('option:selected').text());
-                    //         }
-                    //     }
-                    // });
+              
                     $(document).on('change', '.modelSelector', function() {
                         for (let s = 0; s < sceneLocations.length; s++) {   
                             let locid = this.id.split("_")[1];

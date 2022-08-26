@@ -5,7 +5,7 @@ const async = require('async');
 const ObjectID = require("bson-objectid");
 const path = require("path");
 const jwt = require("jsonwebtoken");
-
+const requireText = require('require-text');
 
 
 function getExtension(filename) {
@@ -279,12 +279,12 @@ webxr_router.get('/:_id', function (req, res) {
     let physicsScripts = "";
     let brownianScript = "";
     let aframeExtrasScript = "<script src=\x22../main/vendor/aframe/animation-mixer.js\x22></script>"; //swapped with full aframe-extras lib (that includes animation-mixer) for physics and navmesh if needed
-    
+    let vrStatsScript = "";
     enviromentScript = ""; //for aframe env component
     // let debugMode = false;
     // let aframeScriptVersion = "<script src=\x22https://aframe.io/releases/1.3.0/aframe.min.js\x22></script>";
     let aframeScriptVersion = "<script src=\x22https://aframe.io/releases/1.3.0/aframe.min.js\x22></script>";
-  
+    
     
     let surfaceScatterScript = "";
     let locationData = "";
@@ -300,7 +300,7 @@ webxr_router.get('/:_id', function (req, res) {
                 res.end();
             } else { 
                 let accessScene = true;
-                sceneData = sceneData;
+                // sceneData = sceneData;
                 // async.waterfall([ 
                 // function (callback) {
                 //     //TODO use sceneNetworkSettings or whatever
@@ -383,12 +383,12 @@ webxr_router.get('/:_id', function (req, res) {
                         if (sceneData.sceneTags[i].toLowerCase().includes("debug")) {
                             debugMode = true;
                         }
+                        if (sceneData.sceneTags[i].toLowerCase().includes("stats")) {
+                            vrStatsScript = "<script src=\x22https://cdn.jsdelivr.net/gh/kylebakerio/vr-super-stats@1.5.0/vr-super-stats.js\x22></script>";
+                        }
                         if (sceneData.sceneTags[i].toLowerCase().includes("physics")) {
-
-                          
                             physicsScripts =  "<script src=\x22https://mixedreality.mozilla.org/ammo.js/builds/ammo.wasm.js\x22></script>"+
-                            "<script src=\x22../main/vendor/aframe/aframe-physics-system.min.js\x22></script>";
-                                                        
+                            "<script src=\x22../main/vendor/aframe/aframe-physics-system.min.js\x22></script>";                                                        
                         }
                         if (sceneData.sceneTags[i].toLowerCase().includes("brownian")) {
                             brownianScript =  "<script src=\x22../main/src/component/aframe-brownian-motion.js\x22></script>";
@@ -2148,8 +2148,8 @@ webxr_router.get('/:_id', function (req, res) {
                                                             console.log("TRYNA PUT A SHADER@@");
                                                             // modMaterial = "material=\x22shader: noise;\x22";
                                                             modModel = "mod_model=\x22eventData:"+locMdl.eventData+"; shader: noise\x22";
-                                                            let vertexShader  = requireText('./main/src/shaders/noise1_vertex.glsl', require);
-                                                            let fragmentShader = requireText('./main/src/shaders/noise1_fragment.glsl', require);
+                                                            let vertexShader  = requireText('../main/src/shaders/noise1_vertex.glsl', require);
+                                                            let fragmentShader = requireText('../main/src/shaders/noise1_fragment.glsl', require);
                                                             shaderScripts = "<script type=\x22x-shader/x-vertex\x22 id=\x22noise1_vertex\x22>"+vertexShader+"</script>"+
                                                             "<script type=\x22x-shader/x-fragment\x22 id=\x22noise1_fragment\x22>"+fragmentShader+"</script>";
                                                         }
@@ -4555,6 +4555,9 @@ webxr_router.get('/:_id', function (req, res) {
                             "<a-box position=\x220 -1 0\x22 width=\x2233\x22 height=\x221\x22 depth=\x2233\x22 material=\x22opacity: 0; transparent: true;\x22 ammo-body=\x22type: static\x22 ammo-shape=\x22type: box;\x22></a-box>";
                             // physics = "physics";
                         }
+                        if (vrStatsScript.length > 0){
+                            webxrFeatures = webxrFeatures + " vr-super-stats ";
+                        }
                         // if (scatterThings) {
                         //     surfaceScatterScript = 
                         // }
@@ -4636,6 +4639,7 @@ webxr_router.get('/:_id', function (req, res) {
                         // "<script src=\x22//aframe.io/releases/1.3.0/aframe.min.js\x22></script>" +
                         aframeScriptVersion +
                         physicsScripts +
+                        vrStatsScript +
                         aframeExtrasScript +
                         extraScripts +
                         // "<script src=\x22https://cdn.jsdelivr.net/gh/aframevr/aframe@02f028bf319915bd5de1ef8b033495fe80b6729b/dist/aframe-master.min.js\x22></script>" +
