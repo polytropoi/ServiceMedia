@@ -1348,7 +1348,7 @@ webxr_router.get('/:_id', function (req, res) {
                         for (let i = 0; i < particleLocations.length; i++) {
                             let color = "";
                             let distance = 10;
-                            let mod = "";
+                            let mods = "";
                             if (particleLocations[i].data != null && particleLocations[i].data.length > 3) {
                                 if (particleLocations[i].data.indexOf("~") != -1) {
                                     let split = particleLocations[i].data.split("~");
@@ -1363,7 +1363,8 @@ webxr_router.get('/:_id', function (req, res) {
                                     color = locationLights[i].data;
                                 }
                             }
-                            lightEntities = lightEntities + "<a-light "+mods+" color='" + color + "' position=\x22"+locationLights[i].loc+"\x22 distance=\x22"+distance+"\x22 intensity='0.8' type='point'></a-light>";
+                            // wait, that's wrong...
+                            // particleEntities = particleEntities + "<a-light "+mods+" color=\x22" + color + "\x22 position=\x22"+locationLights[i].loc+"\x22 distance=\x22"+distance+"\x22 intensity='0.8' type='point'></a-light>";
                         }
                         callback();
                     } else {
@@ -1375,8 +1376,9 @@ webxr_router.get('/:_id', function (req, res) {
                         for (let i = 0; i < locationLights.length; i++) {
                             let color = "";
                             let distance = 10;
-                            let mod = "";
-                            if (locationLights[i].data != null && locationLights[i].data.length > 3) {
+                            let mods = "";
+                            console.log("gotsa light with data: " + locationLights[i].data);
+                            if (locationLights[i].data != null && locationLights[i].data.length > 0) {
                                 if (locationLights[i].data.indexOf("~") != -1) {
                                     let split = locationLights[i].data.split("~");
                                     color = split[0];
@@ -1390,7 +1392,7 @@ webxr_router.get('/:_id', function (req, res) {
                                     color = locationLights[i].data;
                                 }
                             }
-                            lightEntities = lightEntities + "<a-light "+mods+" color='" + color + "' position=\x22"+locationLights[i].loc+"\x22 distance=\x22"+distance+"\x22 intensity='0.8' type='point'></a-light>";
+                            lightEntities = lightEntities + "<a-light "+mods+" color=\x22" + color + "\x22 position=\x22"+locationLights[i].loc+"\x22 distance=\x22"+distance+"\x22 intensity='0.8' type='point'></a-light>";
                         }
                         callback();
                     } else {
