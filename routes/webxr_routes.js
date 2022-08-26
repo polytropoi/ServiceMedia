@@ -3549,7 +3549,7 @@ webxr_router.get('/:_id', function (req, res) {
                             "<link rel=\x22icon\x22 href=\x22data:,\x22></link>"+
                             "<meta charset='utf-8'/>" +
                             "<meta name='viewport' content='width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0, shrink-to-fit=no'/>" +
-                            "<meta property='og:url' content='" + rootHost + "/webxr/" + sceneResponse.short_id + "' /> " +
+                            "<meta property='og:url' content='" + process.env.ROOT_HOST + "/webxr/" + sceneResponse.short_id + "' /> " +
                             "<meta property='og:type' content='website' /> " +
                             // "<meta property='og:image' content='" + postcard1 + "' /> " +
                             "<meta property='og:image' content='http://" + postcard1 + "' /> " +
@@ -3620,7 +3620,7 @@ webxr_router.get('/:_id', function (req, res) {
                             "<link rel=\x22icon\x22 href=\x22data:,\x22></link>"+
                             "<meta charset='utf-8'/>" +
                             "<meta name='viewport' content='width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0, shrink-to-fit=no'/>" +
-                            "<meta property='og:url' content='" + rootHost + "/webxr/" + sceneResponse.short_id + "' /> " +
+                            "<meta property='og:url' content='" + process.env.ROOT_HOST + "/webxr/" + sceneResponse.short_id + "' /> " +
                             "<meta property='og:type' content='website' /> " +
                             // "<meta property='og:image' content='" + postcard1 + "' /> " +
                             "<meta property='og:image' content='http://" + postcard1 + "' /> " +
@@ -3684,7 +3684,7 @@ webxr_router.get('/:_id', function (req, res) {
                             "<link rel=\x22icon\x22 href=\x22data:,\x22></link>"+
                             "<meta charset='utf-8'/>" +
                             "<meta name='viewport' content='width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0, shrink-to-fit=no'/>" +
-                            "<meta property='og:url' content='" + rootHost + "/webxr/" + sceneResponse.short_id + "' /> " +
+                            "<meta property='og:url' content='" + process.env.ROOT_HOST + "/webxr/" + sceneResponse.short_id + "' /> " +
                             "<meta property='og:type' content='website' /> " +
                             // "<meta property='og:image' content='" + postcard1 + "' /> " +
                             "<meta property='og:image' content='http://" + postcard1 + "' /> " +
@@ -3785,7 +3785,7 @@ webxr_router.get('/:_id', function (req, res) {
                             "<link rel=\x22icon\x22 href=\x22data:,\x22></link>"+
                             "<meta charset='utf-8'/>" +
                             "<meta name='viewport' content='width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0, shrink-to-fit=no'/>" +
-                            "<meta property='og:url' content='" + rootHost + "/webxr/" + sceneResponse.short_id + "' /> " +
+                            "<meta property='og:url' content='" + process.env.ROOT_HOST + "/webxr/" + sceneResponse.short_id + "' /> " +
                             "<meta property='og:type' content='website' /> " +
                             // "<meta property='og:image' content='" + postcard1 + "' /> " +
                             "<meta property='og:image' content='http://" + postcard1 + "' /> " +
@@ -3933,7 +3933,7 @@ webxr_router.get('/:_id', function (req, res) {
                                 "<link rel=\x22icon\x22 href=\x22data:,\x22></link>\n"+
                                 "<meta charset='utf-8'/>\n" +
                                 "<meta name='viewport' content='width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0, shrink-to-fit=no'/>\n" +
-                                "<meta property='og:url' content='" + rootHost + "/webxr/" + sceneResponse.short_id + "' /> \n" +
+                                "<meta property='og:url' content='" + process.env.ROOT_HOST + "/webxr/" + sceneResponse.short_id + "' /> \n" +
                                 "<meta property='og:type' content='website' /> \n" +
                                 // "<meta property='og:image' content='" + postcard1 + "' /> " +
                                 "<meta property='og:image' content='http://" + postcard1 + "' /> \n" +
@@ -4287,7 +4287,7 @@ webxr_router.get('/:_id', function (req, res) {
                         "<link rel=\x22icon\x22 href=\x22data:,\x22></link>"+
                         "<meta charset='utf-8'/>" +
                         "<meta name='viewport' content='width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0, shrink-to-fit=no'/>" +
-                        "<meta property='og:url' content='" + rootHost + "/webxr/" + sceneResponse.short_id + "' /> " +
+                        "<meta property='og:url' content='" + process.env.ROOT_HOST + "/webxr/" + sceneResponse.short_id + "' /> " +
                         "<meta property='og:type' content='website' /> " +
                         // "<meta property='og:image' content='" + postcard1 + "' /> " +
                         "<meta property='og:image' content='http://" + postcard1 + "' /> " +
@@ -4361,7 +4361,7 @@ webxr_router.get('/:_id', function (req, res) {
                         "<link rel=\x22icon\x22 href=\x22data:,\x22></link>"+
                         "<meta charset='utf-8'/>" +
                         "<meta name='viewport' content='width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0, shrink-to-fit=no'/>" +
-                        "<meta property='og:url' content='" + rootHost + "/webxr/" + sceneResponse.short_id + "' /> " +
+                        "<meta property='og:url' content='" + process.env.ROOT_HOST + "/webxr/" + sceneResponse.short_id + "' /> " +
                         "<meta property='og:type' content='website' /> " +
                         // "<meta property='og:image' content='" + postcard1 + "' /> " +
                         "<meta property='og:image' content='http://" + postcard1 + "' /> " +
