@@ -4556,7 +4556,7 @@ webxr_router.get('/:_id', function (req, res) {
                             // physics = "physics";
                         }
                         if (vrStatsScript.length > 0){
-                            webxrFeatures = webxrFeatures + " vr-super-stats ";
+                            webxrFeatures = webxrFeatures + " vr-super-stats=\x22position:0 .4 0; alwaysshow3dstats:true; show2dstats:false;\x22 ";
                         }
                         // if (scatterThings) {
                         //     surfaceScatterScript = 
