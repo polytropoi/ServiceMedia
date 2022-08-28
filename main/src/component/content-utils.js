@@ -1301,7 +1301,8 @@ AFRAME.registerComponent('available-scenes-control', {
           });
           // let sceneHref = "/webxr/" + scenesArray[availableScenesIndex].sceneKey; //wait so link isn't hot till visible
           let sceneHref = "";
-          availableScenePicEl.setAttribute('basic-scene-link', {href: sceneHref});   
+          // availableScenePicEl.setAttribute('basic-scene-link', {href: sceneHref});   
+          availableScenePicEl.setAttribute('link', {href: sceneHref});  
         });
 
       nextButton.addEventListener('click', function () {
@@ -1313,7 +1314,8 @@ AFRAME.registerComponent('available-scenes-control', {
           availableScenesIndex = 0;
         }
         let sceneHref = "/webxr/" + scenesArray[availableScenesIndex].sceneKey;
-        availableScenePicEl.setAttribute('basic-scene-link', {href: sceneHref});
+        // availableScenePicEl.setAttribute('basic-scene-link', {href: sceneHref});
+        availableScenePicEl.setAttribute('link', {href: sceneHref});  
         headerEl.setAttribute('text', {
           baseline: "top",
           align: "left",
@@ -1347,7 +1349,8 @@ AFRAME.registerComponent('available-scenes-control', {
         }
 
         let sceneHref = "/webxr/" + scenesArray[availableScenesIndex].sceneKey;
-        availableScenePicEl.setAttribute('basic-scene-link', {href: sceneHref});
+        // availableScenePicEl.setAttribute('basic-scene-link', {href: sceneHref});
+        availableScenePicEl.setAttribute('link', {href: sceneHref});  
         headerEl.setAttribute('text', {
           baseline: "top",
           align: "left",
@@ -1429,7 +1432,8 @@ AFRAME.registerComponent('toggle-available-scenes', {
           // var scene = scenesArray[Math.floor(Math.random() * scenesArray.length)];
           let sceneHref = "/webxr/" + scenesArray[0].sceneKey;
           console.log(sceneHref);
-          document.getElementById("availableScenePic").setAttribute('basic-scene-link', {href: sceneHref});
+          // document.getElementById("availableScenePic").setAttribute('basic-scene-link', {href: sceneHref});
+          document.getElementById("availableScenePic").setAttribute('link', {href: sceneHref});
 
         } else {
           scenesPanelEl.setAttribute('visible', false);
