@@ -1327,22 +1327,7 @@ webxr_router.get('/:_id', function (req, res) {
 
                     // });
                 },
-                // function (callback) {
-                //     console.log("trigger audio group: " + JSON.stringify(sceneResponse.sceneTriggerAudioGroups));
-                //     if (sceneResponse.sceneTriggerAudioGroups != null && sceneResponse.sceneTriggerAudioGroups.length > 0) {
-                //         vgID = sceneResponse.sceneVideoGroups[0];
-                //         let oo_id = ObjectID(vgID);
 
-                //         db.groups.find({"_id": oo_id}, function (err, groups) {
-                //             if (err || !groups) {
-                //                 callback();
-                //             } else {
-                //             // console.log("gotsa group: "+ JSON.stringify(groups));
-                //             async.each(groups, function (groupID, callbackz) { 
-
-                //     }
-                    
-                // },
                 function (callback) {
                     if (particleLocations.length > 0) {
                         for (let i = 0; i < particleLocations.length; i++) {
@@ -1445,27 +1430,7 @@ webxr_router.get('/:_id', function (req, res) {
                     // }
                    
                 },
-                // function (callback) {     
-                //     console.log("inventory "+sceneData.sceneInventoryID);           
-                //     if (sceneData.sceneInventoryID != undefined) {
-                //         let i_id = ObjectID(sceneData.sceneInventoryID);
-                //         db.inventories.findOne({"_id": i_id}, function (err, inventory){
-                //             if (err || !inventory) {
-                //                 console.log("inventory "+sceneData.sceneInventoryID+" not found!");
-                //                 callback();
-                //             } else {
-                //                 console.log("sceene inventory : " + JSON.stringify(inventory));
-                                
-                //                 var buff = Buffer.from(JSON.stringify(inventory)).toString("base64");
-                //                 inventoryData = "<a-entity mod_scene_inventory id=\x22sceneInventory\x22 data-inventory='"+buff+"'></a-entity>";
-                //                 callback();
-                //             }
-                //         });
-                //     } else {
-                //         console.log("scene has no inventory");
-                //         callback();
-                //     }
-                // },
+            
                 function (callback) {
                     var modelz = [];
                 //    console.log("sceneModels : " + JSON.stringify(sceneResponse.sceneModels));
@@ -2006,8 +1971,8 @@ webxr_router.get('/:_id', function (req, res) {
                                         
                                         callbackz(); //this or one below exits loop
                                     } else {
-                                        // gltfsAssets = gltfsAssets + "<a-asset-item id=\x22" + m_assetID + "\x22 src=\x22"+ modelURL +"\x22></a-asset-item>";
-                                        // gltfsEntities = gltfsEntities + "<a-entity mod_model=\x22eventData:"+locMdl.eventData+"\x22 class=\x22"+entityType+" "+ambientChild+" activeObjexGrab activeObjexRay\x22 shadow=\x22cast:true; receive:true\x22 "+skyboxEnvMap+" gltf-model=\x22#" + m_assetID + "\x22 "+objAnim+" "+cannedAnim+" position=\x22"+locMdl.x+" "+locMdl.y+" "+locMdl.z+"\x22 scale=\x22"+scale+" "+scale+" "+scale+"\x22 rotation=\x22"+rotation+"\x22 >" + offsetPos+ "</a-entity>";
+                                       
+                                        //// scene type filters...
                                         if (sceneResponse.sceneWebType == "ThreeJS") { //three
                                             if (sceneResponse.sceneFaceTracking ) {
                                                 console.log("face tracking asset at " + modelURL);
@@ -2023,12 +1988,7 @@ webxr_router.get('/:_id', function (req, res) {
                                                 // called when the resource is loaded
                                                 "function ( gltf ) {\n"+
                                                     "scene.add( gltf.scene );\n"+
-                                                    // "render();\n"+
-                                                    // "gltf.animations;\n"+ // Array<THREE.AnimationClip>
-                                                    // "gltf.scene;\n"+ // THREE.Group
-                                                    // "gltf.scenes;\n"+ // Array<THREE.Group>
-                                                    // "gltf.cameras;\n"+ // Array<THREE.Camera>
-                                                    // "gltf.asset;\n"+ // Object
+                                                 
                                                     "if (!gltf.scene) return;\n" +
                                                     "gltf.scene.traverse(function (node) {\n" +
                                                         "if (node.material && 'envMap' in node.material) {\n" +
@@ -2052,9 +2012,8 @@ webxr_router.get('/:_id', function (req, res) {
                                                 ");\n";
                                             }
                                             console.log("face tracking asset at " + modelURL);
-                                            // gltfsAssets = modelURL;
-                                            
-                                        } else if (sceneResponse.sceneWebType == "BabylonJS") { //babylon
+                                           
+                                        } else if (sceneResponse.sceneWebType == "BabylonJS") { //babylon, not really...
                                             gltfsAssets = gltfsAssets + "var lookCtrl = null;\nBABYLON.SceneLoader.ImportMesh('', '', \x22"+modelURL+"\x22, scene, function (meshes, particleSystems, skeletons) {"+
                                             "meshes[0].scaling = new BABYLON.Vector3("+scale+", "+scale+", "+scale+");\n"+
                                             "meshes[0].position = new BABYLON.Vector3("+locMdl.x+", "+locMdl.y+", "+locMdl.z+");\n"+
@@ -2064,9 +2023,7 @@ webxr_router.get('/:_id', function (req, res) {
                                                 "console.log(meshes[m].material);\n"+
                                                 // "meshes[m].material.environmentTexture = new BABYLON.CubeTexture('', scene, undefined, undefined, "+JSON.stringify( cubeMapAsset)+");" +
                                                 "if (meshes[m].name.includes(\x22eyeball\x22)) {"+
-                                                    // "skeletons[0].bones.lookAt(mainCam.position);"+
-                                                    // "let meshMat = new BABYLON.StandardMaterial"
-                                                    // "meshes[m].material.reflectionTexture = new BABYLON.CubeTexture('', scene, undefined, undefined, "+JSON.stringify( cubeMapAsset)+");" +
+                                                   
                                                     "console.log(meshes[m].name);"+
                                                     "let characterMesh = meshes[m];"+
                                                     "for (var b = 0; b < skeletons[0].bones.length - 1; b++){\n"+ //then find bone named eye //NM, pointless - can't use bone with gltf :(
@@ -2389,21 +2346,7 @@ webxr_router.get('/:_id', function (req, res) {
                         callback();
                     }
 
-                    // /// NOT - make this a secondary api call, instead of jacking in on ready like available scenes, etc.
-                    // if (sceneResponse.sceneTextItems != null && sceneResponse.sceneTextItems != undefined && sceneResponse.sceneTextItems.length > 0) {
-                    //     moids = sceneResponse.sceneTextItems.map(convertStringToObjectID);
-                    //     db.text_items.find({_id: {$in: moids }}, function (err, text_items){
-                    //         if (err || !text_items) {
-                    //             console.log("error getting text_items: " + err);
-                    //             callback(null);
-                    //         } else {
-                    //             sceneResponse.textItems = text_items;
-                    //             callback(null)
-                    //         }
-                    //     });
-                    // } else {
-                    //     callback(null);
-                    // }
+                 
                 },
                 function (callback) { //fethc audio items
                     
@@ -2596,8 +2539,7 @@ webxr_router.get('/:_id', function (req, res) {
                         "</a-entity></a-entity>";
                     }
                     if (hasTriggerAudio) {
-                        // triggerAudioEntity = "<a-entity id=\x22triggerAudio\x22 trigger_audio_control=\x22oggurl: "+triggerOggUrl+"; mp3url: "+triggerMp3Url+"; volume: "+sceneTriggerVolume+";\x22"+
-                        // "</a-entity>";
+                      
                         triggerAudioEntity = "<a-entity id=\x22triggerAudio\x22 trigger_audio_control=\x22volume: "+sceneTriggerVolume+"\x22>"+
                         "</a-entity>";
                         triggerAudioScript = "<script>" +      
@@ -2605,24 +2547,10 @@ webxr_router.get('/:_id', function (req, res) {
                                 "src: [\x22"+triggerOggUrl+"\x22,\x22"+triggerMp3Url+"\x22], volume: 1, loop: false" + 
                             "});" +
                         "triggerAudioHowl.load();</script>";
-                        // triggerAudioControl = "<script src=\x22../main/src/component/trigger-audio-control.js\x22></script>";
-                        // triggerAudioEntity = "<a-entity id=\x22triggerAudio\x22 trigger_audio_control=\x22oggurl: "+triggerOggUrl+"; mp3url: "+triggerMp3Url+"; volume: "+sceneTriggerVolume+";\x22"+
-                        // "</a-entity>";
+                    
                     }
                     
-                    // if (mp3url == null || mp3url == undefined || mp3url.length < 10) {
-                    //     if (sceneResponse.scenePrimaryAudioStreamURL != null && sceneResponse.scenePrimaryAudioStreamURL.length > 8 ) {
-                    //         // mp3url = sceneResponse.scenePrimaryAudioStreamURL + "/stream";   
-                    //         // oggurl = sceneResponse.scenePrimaryAudioStreamURL + "/stream";   
-                    //         mp3url = sceneResponse.scenePrimaryAudioStreamURL;   
-                    //         oggurl = sceneResponse.scenePrimaryAudioStreamURL;                    
-                    //         streamPrimaryAudio = true;
-                    //         console.log("oggurl " + oggurl);
-                    //         callback();
-                    //     } else {
-                    //         callback();
-                    //     }
-                    // } else {
+                 
                         callback();
                     // }  
                 },
@@ -2650,8 +2578,7 @@ webxr_router.get('/:_id', function (req, res) {
 
                 function (video_items, callback) { //add the signed URLs to the obj array
                     preloadVideo = true; //FOR NOW - testing on ios, need to set a toggle for this...
-                    //for (var i = 0; i < 1; i++) { //only do first one for now..
-                    // let vidPaths = []
+              
                     if (video_items != null && video_items[0] != null) { //only single vid for now, need to loop array
 
                         console.log("video_item: " + JSON.stringify(video_items[0]));
@@ -2697,31 +2624,26 @@ webxr_router.get('/:_id', function (req, res) {
                                             vidSrc = "<source src=\x22"+webm+"\x22 type=\x22video/webm\x22><source src=\x22"+mov+"\x22 type=\x22video/quicktime\x22>";
                                         }
                                     }
-                                }
-                               
+                                }  
                             }
-                            // vidUrl = "["+mov+","+webm+"]"
-                           
                         }
-                        //console.log(baseName);
-                        //[\x22"+oggurl+"\x22,\x22"+mp3url+"\x22]
+                    
                         if (ori.toLowerCase() == "equirectangular") {
                             videosphereAsset = "<video id=\x22videosphere\x22 autoplay loop crossOrigin=\x22anonymous\x22 src=\x22" + vidUrl + "\x22></video>";
                             videoEntity = "<a-videosphere play-on-window-click play-on-vrdisplayactivate-or-enter-vr crossOrigin=\x22anonymous\x22 src=\x22#videosphere\x22 rotation=\x220 180 0\x22 material=\x22shader: flat;\x22></a-videosphere>";
-                        //                                        skySettings = "transparent='true'";
+
                         } else {
                             if (preloadVideo) {
-                                // videoAsset = "<video id=\x22video1\x22 crossOrigin=\x22anonymous\x22 src=\x22" + vidUrl + "\x22></video>";
+                               
                                 videoAsset = "<video id=\x22video1\x22 crossOrigin=\x22anonymous\x22>"+vidSrc+"</video>";
                             } else {
                                 videoAsset = "<video autoplay muted loop=\x22true\x22 webkit-playsinline playsinline id=\x22video1\x22 crossOrigin=\x22anonymous\x22></video>"; 
                             }
-                            // videoEntity = "<a-video  play-on-click src=\x22#video1\x22 position='5 2 -5' width='10' height='6' look-at=\x22#player\x22></a-video>";
-                            // let videoStatus = "<a-text id=\x22videoText\x22 align=\x22center\x22 rotation=\x220 0 0\x22 position=\x22-.5 -1 1\x22 wrapCount=\x2240\x22 value=\x22Click to Play Video\x22></a-text>";
+
                             videoEntity = "<a-entity "+videoParent+" class=\x22activeObjexGrab activeObjexRay\x22 vid_materials=\x22url: "+vidUrl+"\x22 gltf-model=\x22#movieplayer2.glb\x22 position=\x22"+videoLocation+"\x22 rotation=\x22"+videoRotation+"\x22 width='10' height='6'><a-text id=\x22videoText\x22 align=\x22center\x22 rotation=\x220 0 0\x22 position=\x22-.5 -1 1\x22 wrapCount=\x2240\x22 value=\x22Click to Play Video\x22></a-text>" +
                             "</a-entity>";
                         }
-                        //console.log("copying video to s3...");
+
                         callback(null);
                     } else {
                         callback(null);
@@ -2732,10 +2654,7 @@ webxr_router.get('/:_id', function (req, res) {
                     if (sceneResponse.sceneVideoGroups != null && sceneResponse.sceneVideoGroups.length > 0) {
                         vgID = sceneResponse.sceneVideoGroups[0];
                         let oo_id = ObjectID(vgID);
-                        
-                        // if (picturegroupLocation == null || picturegroupLocation.Length > 2) {
-                        //     picturegroupLocation = "-4 3 3";
-                        // }
+
                         db.groups.find({"_id": oo_id}, function (err, groups) {
                             if (err || !groups) {
                                 callback();
@@ -2760,13 +2679,12 @@ webxr_router.get('/:_id', function (req, res) {
                                             if (err) {
                                                 vidGroup.videos = videos;
                                                 console.log("vidgroup error " + err);
-                                                // requestedPictureGroups.push(picGroup);
-                                                // console.log("requestedPictureGroupsERrorort: "+ JSON.stringify(requestedPictureGroups));
+                                             
                                                 callbackz();
                                             } else {
                                                 vidGroup.videos = videos;
                                                 requestedVideoGroups.push(vidGroup);
-                                                // console.log("requestedPictureGroups: "+ JSON.stringify(requestedPictureGroups));
+
                                                 callbackz();
                                             }
                                         });
@@ -2783,14 +2701,12 @@ webxr_router.get('/:_id', function (req, res) {
                                     for (let i = 0; i < requestedVideoGroups[0].videos.length; i++ ) {  //TODO spin first and second level array
                                         // videoElements = videoElements + "<video style=\x22display: none;\x22 loop=\x22true\x22 preload=\x22metadata\x22 type=\x22video/mp4\x22 crossOrigin=\x22anonymous\x22 src=\x22"+requestedVideoGroups[0].videos[i].url+"\x22 playsinline webkit-playsinline id=\x22"+requestedVideoGroups[0].videos[i]._id+"\x22></a-video>";
                                         videoElements = videoElements + "<video style=\x22display: none;\x22 loop=\x22true\x22 crossorigin=\x22use-credentials\x22 webkit-playsinline playsinline id=\x22"+requestedVideoGroups[0].videos[i]._id+"\x22></video>";
-                                        // "<source src=\x22"+requestedVideoGroups[0].videos[i].url+"\x22 type=\x22video/mp4;\x22</source></video>";
-                                        // "<source=\x22"+requestedVideoGroups[0].videos[i].url+"\x22></source></video>";
-                                        // "<source=\x22"+requestedVideoGroups[0].videos[i].url+"\x22 type=\x22video/mp4\x22></video>";
+                                       
                                     }
-                                    // videoGroupsEntity = "<a-entity video_groups_control id=\x22videoGroupsControl\x22 data-video-groups='"+JSON.stringify(requestedVideoGroups)+"'></a-entity>"; //to be picked up by aframe, but data is in data-attribute
+
                                     var buff = Buffer.from(JSON.stringify(requestedVideoGroups)).toString("base64");
                                     videoGroupsEntity = "<a-entity video_groups_data id=\x22videoGroupsData\x22 data-video-groups='"+buff+"'></a-entity>"; 
-                                    hlsScript = "<script src=\x22../main/js/hls.min.js\x22></script>"; //v 1.0.6 
+                                    hlsScript = "<script src=\x22../main/js/hls.min.js\x22></script>"; //v 1.0.6 client hls player ref
                                     callback(null);
                                 }
                             });
@@ -2843,10 +2759,8 @@ webxr_router.get('/:_id', function (req, res) {
                             // yotubes = sceneResponse.sceneYouTubeIDs;
                             let youtubeVolume = sceneResponse.sceneMediaAudioVolume != undefined ? sceneResponse.sceneMediaAudioVolume : 80;
                             for (let i = 0; i < sceneResponse.sceneYouTubeIDs.length; i++) {
-                                // youtubeContent = "<iframe width=\x22240\x22 id=\x22youtubeElement\x22 data-yt_id=\x22"+sceneResponse.sceneYouTubeIDs[i]+"\x22 height=\x22180\x22 src=\x22https://www.youtube.com/embed/"+sceneResponse.sceneYouTubeIDs[i]+
-                                // "\x22 frameborder=\x2210\x22 allow=\x22autoplay; picture-in-picture\x22 allowfullscreen></iframe>";
+                                
                                 youtubeContent = "<div width=\x22240\x22 id=\x22youtubeElement\x22 data-yt_id=\x22"+sceneResponse.sceneYouTubeIDs[i]+"\x22 data-sceneTitle=\x22"+sceneResponse.sceneTitle+"\x22></div>"+
-                                // "\x22 frameborder=\x2210\x22 allow=\x22accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture\x22 allowfullscreen></iframe>";
                                 
                                 "<script>\n"+
                                     "var tag = document.createElement('script');\n"+
@@ -2855,12 +2769,10 @@ webxr_router.get('/:_id', function (req, res) {
                                     "firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);\n"+
                                 "</script>";
                                 
-                                // containers = containers + "<div class=\x22css3d youtube\x22 data-attribute=\x22"+sceneResponse.sceneYouTubeIDs[i]+"\x22></div>"; 
                                 youtubeEntity = "<a-entity id=\x22youtubeParent\x22 look-at=\x22#player\x22 position=\x22-6 2 -6\x22>"+
 
-                                // "<a-entity id=\x22youtubePlayer\x22 position=\x220 -1 2\x22 gltf-model=\x22#youtubeplayer\x22 youtube_player=\x22yt_id: "+sceneResponse.sceneYouTubeIDs[i]+"\x22></a-entity></a-entity>";
                                 "<a-entity id=\x22youtubePlayer\x22 position=\x220 -1 1\x22 gltf-model=\x22#youtubeplayer\x22 youtube_player=\x22yt_id: "+sceneResponse.sceneYouTubeIDs[i]+"; volume: "+youtubeVolume+"\x22></a-entity>"+
-                                                                "<a-text wrapCount=\x2270\x22 value=\x22"+sceneResponse.sceneTitle+"\x22 width=\x222\x22 position=\x22-.95 .65 1.1\x22 id=\x22youtubeTitle\x22></a-text>"+
+                                "<a-text wrapCount=\x2270\x22 value=\x22"+sceneResponse.sceneTitle+"\x22 width=\x222\x22 position=\x22-.95 .65 1.1\x22 id=\x22youtubeTitle\x22></a-text>"+
                                 "<a-text width=\x223\x22 position=\x22-.95 -.3 1.1\x22 id=\x22youtubeState\x22></a-text>"+
                                 "<a-text width=\x223\x22 position=\x22-.95 -.4 1.1\x22 id=\x22youtubeStats\x22></a-text>"+
                                 "</a-entity>";
@@ -2891,10 +2803,7 @@ webxr_router.get('/:_id', function (req, res) {
                         // 
                         screenOverlay = "<div class=\x22screen-overlay\x22>" +
                         "<button id=\x22screenOverlayCloseButton\x22 type=\x22button\x22 class=\x22screen-overlay-close-button\x22>Close View</button><br>"+
-                    //    "<button class=\x22btn\x22 id=\x22play\x22>Play</button>" +
-                    //    "<button class=\x22btn\x22 id=\x22pause\x22>Pause</button>" +
-                    //    "<button class=\x22btn\x22 id=\x22prev\x22>Prev</button>" +     
-                    //    "<button class=\x22btn\x22 id=\x22next\x22>Next</button>" + 
+
 
                         "</div>";
                         audioSliders = "<div id=\x22audioSliders\x22 style=\x22visibility: hidden\x22>"+primaryAudioSliderChunk + ambientAudioSliderChunk + triggerAudioSliderChunk+"</div>";
@@ -2906,22 +2815,11 @@ webxr_router.get('/:_id', function (req, res) {
                         canvasOverlay = "<div id=\x22canvasOverlay\x22 class=\x22canvas-overlay\x22><button id=\x22sceneTitleButton\x22 type=\x22button\x22 class=\x22collapsible\x22>"+sceneResponse.sceneTitle+"</button>" +
 
                         "<div id=\x22overlayContent\x22 class=\x22content\x22>" + youtubeContent +"<hr>"+ fromBy + keynote + desc + appButtons +
-                        // "<div id=\x22overlayContent\x22 class=\x22content\x22>" + youtubeContent +"<hr>"+ fromBy + keynote + desc + primaryAudioSliderChunk + ambientAudioSliderChunk + triggerAudioSliderChunk + appButtons +
-                        // "<div id=\x22overlayContent\x22 class=\x22content\x22>" +  +"<hr>"+ fromBy + keynote + desc + primaryAudioSliderChunk + ambientAudioSliderChunk + triggerAudioSliderChunk + appButtons +
-                        // "&nbsp;&nbsp;<button class=\x22btn\x22 type=\x22button\x22 onclick=\x22toggleLookControl()\x22>Toggle Look</button>" +
-                        // "&nbsp;&nbsp;<a href=\x22servicemedia://scene?" + sceneResponse.short_id + "\x22 class=\x22btn\x22 type=\x22button\x22>App Link</a><br><hr>" +
-                        // userText + connectLink + loginLink +
+                        
                         userText +
                         
                         "<div class=\x22smallfont\x22><span id=\x22users\x22></span></div>"+ 
-                        // "<div id=\x22users_1\x22></div>"+ 
-                        // "<hr><form id=\x22form\x22 id=\x22chat_form\x22>"+
-                        // "<textarea id=\x22chat_input\x22 type=\x22textarea\x22 style=\x22font-size:10pt;rows:4;cols:200;\x22></textarea>"+
-                        // "<input id=\x22sendMessageButton\x22 type=\x22submit\x22 value=\x22Send Message\x22>"+
-                        // "</form>"+
-                        // "<button onclick=\x22CreatePlaceholder()\x22>new location</button>"+
-                        // "<div class=\x22\x22 id=\x22future\x22></div>" +
-                        // "<hr><div><div style=\x22float:right; margin: 5px 10px 5px; 0px;\x22 onclick=\x22SceneManglerModal('Media')\x22><i class=\x22fas fa-headphones \x22></i></div>"+
+                      
                         "<hr><div>"+
                         "<div style=\x22float:right; margin: 5px 10px 5px; 0;\x22 onclick=\x22SceneManglerModal('Events')\x22><i class=\x22fas fa-stopwatch \x22></i></div>"+
                         "<div style=\x22float:right; margin: 5px 10px 5px; 0px;\x22 onclick=\x22SceneManglerModal('Locations')\x22><i class=\x22fas fa-globe \x22></i></div>"+
@@ -2930,29 +2828,22 @@ webxr_router.get('/:_id', function (req, res) {
                         "<div style=\x22float:right;margin: 5px 10px 5px; 0px;\x22 onclick=\x22SceneManglerModal('Inventory')\x22><i class=\x22fas fa-suitcase \x22></i></div>"+
                         mapStyleSelector +
                         "</div>"+
-                        // mapStyleSelector +
+                       
                         "<div>"+
                         mapButtons +
-                        // "<div style=\x22float: right; margin: 5px 10px 5px; 0px;\x22 onclick=\x22ShowHideDialogPanel('default')\x22><i class=\x22fas fa-info-circle \x22></i></div></div>"+
+                     
                         "</div></div>";
 
-                        // youtubeContent +
-                        
+                    
                             console.log("sceneShowAds: " + sceneResponse.sceneShowAds);
-                        if (sceneResponse.sceneShowAds != null && sceneResponse.sceneShowAds != undefined && sceneResponse.sceneShowAds != false) {    
+                        if (sceneResponse.sceneShowAds != null && sceneResponse.sceneShowAds != undefined && sceneResponse.sceneShowAds != false) { //put the ads if you must..   
                             adSquareOverlay = "<script async src=\x22https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js\x22></script>"+
-                            // adSquareOverlay = "<div class=\x22ad-overlay\x22>"+
+                            
                             "<div id=\x22adSquareOverlay\x22 class=\x22ad-overlay\x22>" +
-                            // "<div class=\x22content\x22>#<hr>"+
-                            // "</div></div>"+
-
+                        
                             "<!-- square floater 1 -->"+
                             "<ins class=\x22adsbygoogle\x22"+
-                                // "style=\x22display:block\x22"+
-                                // "data-ad-client=\x22ca-pub-5450402133525063\x22"+
-                                // "data-ad-slot=\x225496489247\x22"+
-                                // "data-ad-format=\x22auto\x22"+
-                                // "data-full-width-responsive=\x22true\x22></ins>"+
+                              
                             "style=\x22display:inline-block;width:150px;height:400px\x22"+
                                 "data-ad-client=\x22ca-pub-5450402133525063\x22"+
                                 "data-ad-slot=\x225496489247\x22></ins>"+
@@ -2963,11 +2854,7 @@ webxr_router.get('/:_id', function (req, res) {
                                 "(adsbygoogle = window.adsbygoogle || []).push({});"+
                             "</script>"+
                             "<script>"+
-                                // "var closer = document.getElementById(\x22adSquareCloseButton\x22);" +
-                                // "closer.addEventListener(\x22click\x22, function() {"+
-                                //     "let ad = document.getElementById(\x22adSquareOverlay\x22);"+
-                                //     "ad.remove();"+ 
-                                // "});"+
+                               
                             "</script>";
                         }
                         callback(null);
@@ -3008,17 +2895,16 @@ webxr_router.get('/:_id', function (req, res) {
                                                 else {
                                                     console.log('SUCCESS copyObject');
                                                     index++;
-                                                    // postcard1 = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + picture_item.userID + "/" + picture_item._id + ".standard." + picture_item.filename, Expires: 6000});
+                                                   
                                                     postcard1 = sceneResponse.sceneDomain +"/"+sceneResponse.short_id +"/"+ picture_item._id + ".standard." + picture_item.filename;
-                                                    // callbackz();
+                                                   
                                                     callbackz();
                                                 }
                                             });
                                         } else {
                                             index++;
                                             postcard1 = sceneResponse.sceneDomain +"/"+sceneResponse.short_id +"/"+ picture_item._id + ".standard." + picture_item.filename;
-                                            // postcard1 = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + picture_item.userID + "/" + picture_item._id + ".standard." + picture_item.filename, Expires: 6000});
-                                            // callbackz();
+                                           
                                             callbackz();
                                         }
                                         
@@ -3032,7 +2918,7 @@ webxr_router.get('/:_id', function (req, res) {
                                     console.log('A file failed to process');
                                     callback();
                                 } else {
-                                    // console.log('postcards processed successfully');
+                                 
                                     callback();
                                 }
                             });
@@ -3046,14 +2932,12 @@ webxr_router.get('/:_id', function (req, res) {
                         pgID = sceneResponse.scenePictureGroups[0];
                         let oo_id = ObjectID(pgID);
                         
-                        // if (picturegroupLocation == null || picturegroupLocation.Length > 2) {
-                        //     picturegroupLocation = "-4 3 3";
-                        // }
+
                         db.groups.find({"_id": oo_id}, function (err, groups) {
                             if (err || !groups) {
                                 callback();
                             } else {
-                            // console.log("gotsa group: "+ JSON.stringify(groups));
+                           
                             async.each(groups, function (groupID, callbackz) { 
                                 let picGroup = {};
                                 picGroup._id = groups[0]._id;
@@ -3081,13 +2965,12 @@ webxr_router.get('/:_id', function (req, res) {
                                             if (err) {
                                                 picGroup.images = images;
                                                 console.log("picturegroup error " + err);
-                                                // requestedPictureGroups.push(picGroup);
-                                                // console.log("requestedPictureGroupsERrorort: "+ JSON.stringify(requestedPictureGroups));
+                                             
                                                 callbackz();
                                             } else {
                                                 picGroup.images = images;
                                                 requestedPictureGroups.push(picGroup);
-                                                // console.log("requestedPictureGroups: "+ JSON.stringify(requestedPictureGroups));
+                                            
                                                 callbackz();
                                             }
                                         });
@@ -3203,26 +3086,7 @@ webxr_router.get('/:_id', function (req, res) {
                                         let link = "";
                                         let lookat = " look-at=\x22#player\x22 ";
                                         console.log("picLocations taken: " + picLocationsPlaced);
-                                            // for (let p = 0; p < locationPictures.length; p++) {
-
-                                            //     // console.log(p + " of  " + locationPictures.length + " total piclocs " + picture_item._id + " vs locationPIcture: " + JSON.stringify(locationPictures[p]));
-                                            //     if (!picLocationsPlaced.includes(locationPictures[p].loc)) { //if this location hasn't been used
-                                            //         // useImageLayout = false;
-                                            //         // picItemsPlaced.push(picture_item._id); 
-                                            //         picLocationsPlaced.push(locationPictures[p].loc);
-                                            //         position = locationPictures[p].loc;
-                                            //         rotation = locationPictures[p].rot;
-                                            //         if (locationPictures[p].type.includes("fixed")) {
-                                            //             console.log("fixed pic @ " + locationPictures[p].loc);
-                                            //             lookat = "";
-                                            //         }
-                                            //         console.log("updated picloc " + JSON.stringify(locationPictures[p]));
-                                            //         // break;
-                                            //         // console.log("!!! gotsa match for picture location!" + locationPictures[p].data);
-                                            //     } else {
-                                            //         // console.log("no pic locs available");
-                                            //     }
-                                            // }
+                                          
                                         if (picIndex < locationPictures.length) {
                                             position = locationPictures[picIndex].loc;
                                             rotation = locationPictures[picIndex].rot;
@@ -3232,41 +3096,20 @@ webxr_router.get('/:_id', function (req, res) {
                                             }
                                             picIndex++;
                                         } 
-                                        // else {
-                                        //     callbackz('no locations available for pic');
-                                        // }
-                                        
-                                        // console.log("picture_item.linkType: " + picture_item.linkType);
-                                        // console.log("picture_item.orientation: " + picture_item.orientation);
+                                       
                                         if (picture_item.linkType != undefined && picture_item.linkType.toLowerCase() != "none") {
                                             if (picture_item.linkType == "NFT") { //never mind, these are old image target fu
-                                                // nftIDs = picture_item._id; //only one for now..
-                                                // console.log("Setting NFT ID "+ nftIDs);
-                                                // if (sceneData.sceneWebType == 'AR Image Tracking') {
-                                                //     ARScript = "<script src=\x22/main/ref/aframe/dist/aframe-ar-nft.js\x22></script>";
-                                                //     ARSceneArg = "arjs=\x22trackingMethod: best\x22 vr-mode-ui=\x22enabled: false;\x22 renderer=\x22logarithmicDepthBuffer: true;\x22 embedded ";
-                                                //     // arjs="trackingMethod: best; sourceType: webcam;debugUIEnabled: false;"
-                                                //     camera = "<a-nft type=\x22nft\x22 url=\x22https://realitymangler.com/markers/"+nftIDs+"\x22 smooth=\x22true\x22 smoothCount=\x2210\x22 smoothTolerance=\x22.01\x22 smoothThreshold=\x225\x22>" +
-                                                //     "<a-box scale='.1 .1 .1' position='0 0.5 0' material='color: yellow;'></a-box>" +
-                                                //     "</a-nft>" +
-                                                //     "<a-entity cursor raycaster=\x22far: 20; interval: 1000; objects: .activeObjexRay\x22></a-entity>" +
-                                                //     "<a-entity camera></a-entity>";
-                                                // }
+                                              
                                             }
                                             if (picture_item.linkURL != undefined && !picture_item.linkURL.includes("undefined") && picture_item.linkURL.length > 6) {
                                                 link = "basic-link=\x22href: "+picture_item.linkURL+";\x22 class=\x22activeObjexGrab activeObjexRay\x22";
                                             }
                                         }
-                                        if (picture_item.useTarget != undefined && picture_item.useTarget != "") { //used by mindar
+                                        if (picture_item.useTarget != undefined && picture_item.useTarget != "") { //used by mindar - good stuff!
                                             console.log("GOTSA urlTarget " + picture_item.urlTarget);
                                             const targetURL = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + picture_item.userID + "/pictures/targets/" + picture_item._id + ".mind", Expires: 6000});
                                             arImageTargets.push(targetURL);
-                                            // ARScript = "<script src=\x22../main/src/util/mindar/mindar-image.js\x22></script> <script src=\x22../main/src/util/mindar/mindar-image-aframe.js\x22></script>";
-                                            // ARSceneArg = "mindar-image=\x22imageTargetSrc: "+picture_item.urlTarget+";\x22 embedded color-space=\x22sRGB\x22"+
-                                            //     " renderer=\x22colorManagement: true, physicallyCorrectLights\x22 vr-mode-ui=\x22enabled: false\x22 device-orientation-permission-ui=\x22enabled: false\x22";
-                                            // camera = "<a-entity mindar-image-target=\x22targetIndex: 0\x22>" +
-                                            // "<a-gltf-model rotation=\x2290 0 0\x22 position=\x220 0 0.1\x22 scale=\x220.25 0.25 0.25\x22 src=\x22#ARModel\x22>"+
-                                            // "</a-entity>";
+                                        
 
                                         }
                                         if (picture_item.hasAlphaChannel) {
@@ -3276,13 +3119,7 @@ webxr_router.get('/:_id', function (req, res) {
                                             // if (picture_item.linkType != undefined && picture_item.orientation != "equirectangular" && picture_item.orientation != "Equirectangular") {
                                             if (picture_item.orientation != "equirectangular" && picture_item.orientation != "Equirectangular") {  //what if linkType is undefined?
  
-                                                // position = 
-
-                                                // let randomX = Math.Random() * (max - min) + min;
-                                                // let randomZ = Math.Random();
-                                                // position = "\x22" +(index*-5)+ " .5 " +(index*-5)+ "\x22"; 
-                                                
-                                                
+                                            
                                                 if (picture_item.orientation == "portrait" || picture_item.orientation == "Portrait") {
                                                     //console.log("gotsa portrait!");
                                                     imageEntities = imageEntities + "<a-entity "+link+""+lookat+"  mod-materials=\x22index:"+index+"\x22 gltf-model=\x22#portrait_panel\x22 material=\x22shader: flat; src: #smimage" + index + "; alphaTest: 0.5;\x22"+
@@ -3469,17 +3306,16 @@ webxr_router.get('/:_id', function (req, res) {
                         "</a-entity>"+
                         "</template>";
                     }
-                    // let playerAvatarTemplate = "<template id=\x22avatar-template\x22><a-entity networked-audio-source class=\x22avatar\x22><a-sphere class=\x22head\x22 color=\x22#5985ff\x22 scale=\x220.45 0.5 0.4\x22>"+
-                    // "</a-sphere><a-entity class=\x22face\x22 position=\x220 0.05 0\x22><a-sphere class=\x22eye\x22 color=\x22#efefef\x22"+
-                    // "position=\x220.16 0.1 -0.35\x22 scale=\x220.12 0.12 0.12\x22><a-sphere class=\x22pupil\x22 color=\x22#000\x22 position=\x220 0 -1\x22 scale=\x220.2 0.2 0.2\x22></a-sphere></a-sphere><a-sphere class=\x22eye\x22 color=\x22#efefef\x22"+ 
-                    // "position=\x22-0.16 0.1 -0.35\x22 scale=\x220.12 0.12 0.12\x22><a-sphere class=\x22pupil\x22 color=\x22#000\x22 position=\x220 0 -1\x22 scale=\x220.2 0.2 0.2\x22></a-sphere></a-sphere></a-entity></a-entity></template>";
+                 
                     let webxrFeatures = "";
                     let arHitTest = "";
                     let arShadowPlane = "";
                     let handsTemplate = "";
                     let aframeRenderSettings = "renderer=\x22antialias: true; colorManagement: true; sortObjects: true; physicallyCorrectLights: true; alpha: true; maxCanvasWidth: 1920; maxCanvasHeight: 1920;\x22";
-                    // if (sceneResponse.sceneType != null && sceneResponse.sceneType != undefined && (sceneResponse.sceneType.toLowerCase() == "augmented" || sceneResponse.sceneType.toLowerCase() == "arkit")) {
-                        console.log("sceneWebType: "+ sceneResponse.sceneWebType);
+                   
+                    //scenetype filters below...
+
+                    console.log("sceneWebType: "+ sceneResponse.sceneWebType);
                     if (sceneResponse.sceneWebType == undefined || sceneResponse.sceneWebType.toLowerCase() == "default" || sceneResponse.sceneWebType.toLowerCase() == "aframe") { 
                         // webxrFeatures = "webxr=\x22optionalFeatures: hit-test, local-floor\x22"; //otherwise hit-test breaks everythign!
                         webxrFeatures = "webxr=\x22optionalFeatures: hit-test, local-floor, dom-overlay; overlayElement:#canvasOverlay;\x22"; //otherwise hit-test breaks everythign!
@@ -3640,25 +3476,12 @@ webxr_router.get('/:_id', function (req, res) {
                             "<link href=\x22../main/vendor/fontawesome-free/css/all.css\x22 rel=\x22stylesheet\x22 type=\x22text/css\x22>" +
                             "<link href=\x22/css/webxr.css\x22 rel=\x22stylesheet\x22 type=\x22text/css\x22>" + 
 
-                            // aframeExtrasScripts + 
-
-                            // primaryAudioScript +
+                          
                             "</head>\n" +
                             "<body style=\x22background-color: black;\x22>\n" +
                             "<div class=\x22avatarName\x22 id="+avatarName+"></div>"+
                             "<div id=\x22token\x22 data-token=\x22"+token+"\x22></div>\n"+
-                            // "<model-viewer class=\x22full-screen-model-viewer\x22 src=\x22"+gltfModel+"\x22"+ 
-                            // "<model-viewer autoplay shadow-intensity=\x221\x22 camera-controls camera-target=\220m 0m 0m\x22 src=\x22"+gltfModel+"\x22"+ 
-                            // "<model-viewer autoplay shadow-intensity=\x221\x22 camera-controls src=\x22"+gltfModel+"\x22"+ 
-                            // " ar ar-placement=\x22floor\x22 ar-modes=\x22webxr scene-viewer quick-look\x22 alt=\x22Viewer for single 3D Model\x22"+ //rem'd autoscale
-                            // " ar ar-placement=\x22"+planeDetectMode+"\x22 ar-modes=\x22webxr scene-viewer quick-look\x22 ar-scale=\x22"+arScaleMode+"\x22 alt=\x22Viewer for single 3D Model\x22"+ 
-                            // "skybox-image=\x22"+skyboxUrl+"\x22"+
-                            // sky +
-                            // "ios-src=\x22"+usdzModel+"\x22>"+
-                            // "<button slot=\x22ar-button\x22 style=\x22background-color: red; color: white; font-size: 36px; border-radius: 4px; border: 1px; position: absolute; bottom: 16px; right: 16px; z-index: 100;\x22>"+
-                            // "AR"+
-                            // "</button>"+
-                            // "</model-viewer>" +
+                         
                             "<a-scene  gps-position=\x22minAccuracy: 100; minDistance: 2; cam3DoF: true\x22></a-scene>" +
                             audioSliders +
                             canvasOverlay +
@@ -4558,9 +4381,7 @@ webxr_router.get('/:_id', function (req, res) {
                         if (vrStatsScript.length > 0){
                             webxrFeatures = webxrFeatures + " vr-super-stats=\x22position:0 .4 0; alwaysshow3dstats:true; show2dstats:false;\x22 ";
                         }
-                        // if (scatterThings) {
-                        //     surfaceScatterScript = 
-                        // }
+                        
                         if (curveEntities.length > 0 && !hasParametricCurve) {
                             curveEntities = "<a-curve id=\x22curve1\x22 type=\x22CatmullRom\x22 closed=\x22true\x22>" + curveEntities + "</a-curve>"+
                             "<a-draw-curve id=\x22showCurves\x22 visible=\x22false\x22 curveref=\x22#curve1\x22 material=\x22shader: line; color: blue;\x22></a-draw-curve>";
@@ -4568,13 +4389,8 @@ webxr_router.get('/:_id', function (req, res) {
                         }
                          
                         let aScene = "<a-scene "+sceneBackground+" "+physicsInsert+" "+pool_target+" "+pool_launcher+" gesture-detector webxr=\x22overlayElement:#overlay\x22 reflection=\x22directionalLight:#real-light\x22 ar-hit-test=\x22type:footprint; footprintDepth:0.2;\x22 ar-cursor raycaster=\x22objects: .activeObjexRay\x22 screen-controls disable-magicwindow vr-mode-ui keyboard-shortcuts=\x22enterVR: false\x22 device-orientation-permission-ui=\x22enabled: false\x22 " +
-                        // let aScene = "<a-scene "+sceneBackground+" "+physicsInsert+" "+pool_target+" "+pool_launcher+" gesture-detector webxr=\x22overlayElement:#overlay\x22 reflection=\x22directionalLight:#real-light\x22 ar-hit-test=\x22target:.activeObjexRay; type:footprint; footprintDepth:0.2;\x22 ar-cursor raycaster=\x22objects: .activeObjexRay\x22 screen-controls disable-magicwindow vr-mode-ui keyboard-shortcuts=\x22enterVR: false\x22 device-orientation-permission-ui=\x22enabled: false\x22 " +
-
-                        // let aScene = "<a-scene "+sceneBackground+" device-orientation-permission-ui " +
-                        // webxrFeatures + " shadow=\x22type: pcfsoft\x22 loading-screen=\x22dotsColor: white; backgroundColor: black; enabled: false\x22 "+joystick+" embedded " + aframeRenderSettings + " " + fogSettings + " "+networkedscene+" "+ARSceneArg+" listen-for-vr-mode>";
+                                               
                         webxrFeatures + " shadow=\x22type: pcfsoft\x22 loading-screen=\x22dotsColor: white; backgroundColor: black; enabled: false\x22 embedded " + aframeRenderSettings + " " + fogSettings + " "+networkedscene+" "+ARSceneArg+" listen-for-vr-mode>";
-                        // webxrFeatures + " shadow=\x22type: pcfsoft\x22 loading-screen=\x22dotsColor: white; backgroundColor: black\x22 joystick embedded " + aframeRenderSettings + " " + 
-                        // fogSettings + " "+networkedscene+" "+ARSceneArg+">";
 
                         let mainDiv = "<div style=\x22width:100%; height:100%\x22>";
 
@@ -4590,9 +4406,7 @@ webxr_router.get('/:_id', function (req, res) {
                             joystickContainer = "";
                   
                         } //else { //default AFRAME with trimmings
-                        // let token = jwt.sign({
-                        //     data: 'foobar'
-                        //   }, 'secret', { expiresIn: '1h' });  
+                        
                         let uid = "0000000000000";
                         if (req.session.user) {
                             uid = req.session.user._id;
@@ -4603,7 +4417,7 @@ webxr_router.get('/:_id', function (req, res) {
                         "<head> " +
                         googleAnalytics +
 
-                        // googleAdSense +
+                        // googleAdSense + //naw, nm
                         "<link rel=\x22icon\x22 href=\x22data:,\x22></link>"+
                         "<meta charset='utf-8'/>" +
                         "<meta name='viewport' content='width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0, shrink-to-fit=no'/>" +
@@ -4623,14 +4437,7 @@ webxr_router.get('/:_id', function (req, res) {
                         // "<meta name=\x22token\x22 content=\x22"+token+"\x22>"+
                         "<link href=\x22../main/vendor/fontawesome-free/css/all.css\x22 rel=\x22stylesheet\x22 type=\x22text/css\x22>" +
                         "<link href=\x22/css/webxr.css\x22 rel=\x22stylesheet\x22 type=\x22text/css\x22>" +
-                        // "<meta name='apple-mobile-web-app-status-bar-style' content='black-translucent' />" +
-                        // "<meta name='apple-mobile-web-app-status-bar-style' content='black'>" +
-                        // "<meta name='robots' content='index,follow'/>" +
-                        // "<script src='../dist/compat.js'></script>" +
-                        //                    "<script src='../dist/unlockaudio.js'></script>" +
-                        // "<script src=\x22../main/ref/aframe/dist/socket.io.slim.js\x22></script>" +
                        
-                        // "<script src=\x22https://unpkg.com/aframe-drag-controls\x22></script>"+
                         "<script src=\x22/main/vendor/jquery/jquery.min.js\x22></script>" +
                         
                         "<script src=\x22../main/ref/aframe/dist/socket.io.slim.js\x22></script>" +
@@ -4661,7 +4468,7 @@ webxr_router.get('/:_id', function (req, res) {
                        
                         joystickScript +
 
-                        "<script src=\x22../main/src/component/aframe-makewaves-shader.js\x22></script>"+
+
                         // "<script src=\x22../main/src/shaders/terrain.js\x22></script>"+
                        
                         "<script src=\x22../main/vendor/aframe/aframe-look-at-component.min.js\x22></script>"+
@@ -4683,13 +4490,14 @@ webxr_router.get('/:_id', function (req, res) {
                         surfaceScatterScript +
                         brownianScript +
                         // "<script src=\x22../main/src/util/quaternion.js\x22></script>"+
-                        "<script src=\x22../main/vendor/aframe/aframe-particle-system-component.min.js\x22></script>"+
                         // "<script src=\x22../main/vendor/trackedlibs/aabb-collider.js\x22></script>"+
+
+                        "<script src=\x22../main/src/component/aframe-makewaves-shader.js\x22></script>"+
                         "<script src=\x22../main/src/shaders/noise.js\x22></script>"+
 
+                        "<script src=\x22../main/vendor/aframe/aframe-particle-system-component.min.js\x22></script>"+
                         "<script src=\x22../main/src/component/aframe-spe-particles-component.js\x22></script>"+
                         "<script src=\x22../main/src/component/aframe-spritesheet-animation.js\x22></script>"+
-                        
                         "<script src=\x22../main/src/component/aframe-sprite-particles-component.js\x22></script>"+
                         
 
@@ -4737,13 +4545,7 @@ webxr_router.get('/:_id', function (req, res) {
                         geoScripts +
                         "<script src=\x22../main/js/dialogs.js\x22></script>"+
                         
-                        // "<script src=\x22../main/src/component/aframe-dialog.js\x22></script>"+
-                        // "<script src=\x22../main/src/component/naf-utils.js\x22></script>"+
-                        // "<a-scene loading-screen=\x22dotsColor: white; backgroundColor: black\x22 joystick embedded" + fogSettings + " " + ARSceneArg + ">" +
-                        // webxr=\x22requiredFeatures: hit-test,local-floor;\x22 needed bvelow?
-                        // "<a-scene "+webxrFeatures+" shadow=\x22type: pcfsoft\x22 loading-screen=\x22dotsColor: white; backgroundColor: black\x22 joystick embedded " + aframeRenderSettings + " " + fogSettings + " "+networkedscene+" "+ARSceneArg+">" +
-                        // "<a-scene device-orientation-permission-ui=\x22enabled: false\x22 "+webxrFeatures+" shadow=\x22type: pcfsoft\x22 loading-screen=\x22dotsColor: white; backgroundColor: black\x22 joystick embedded " + aframeRenderSettings + " " + fogSettings + " "+networkedscene+" "+ARSceneArg+" listen-for-vr-mode>" +
-                        // "<a-scene "+sceneBackground+" disable-magicwindow device-orientation-permission-ui=\x22enabled: false\x22 "+webxrFeatures+" shadow=\x22type: pcfsoft\x22 loading-screen=\x22dotsColor: white; backgroundColor: black\x22 joystick embedded " + aframeRenderSettings + " " + fogSettings + " "+networkedscene+" "+ARSceneArg+" listen-for-vr-mode>" +
+                    
                         aScene +
                         "<div id=\x22overlay\x22></div>"+
                         // skySettings +
@@ -4766,13 +4568,6 @@ webxr_router.get('/:_id', function (req, res) {
                         // "<img id=\x22primaryAudioWaveform\x22 crossorigin=\x22anonymous\x22 src=\x22"+primaryAudioWaveform+"\x22>"+
                         pAudioWaveform +
                         
-                        // "<img id='next' src='../assets/glyphs/next.png'>" +
-                        // "<img id='prev' src='../assets/glyphs/prev.png'>" +
-                        // "<img id='pause' src='../assets/glyphs/pause.png'>" +
-                        // "<img id='play' src='../assets/glyphs/play.png'>" +
-                        //                     "<a-circle src='#smimage1' radius='50' rotation='-90 0 0'></a-circle>"+
-                        // "<a-asset-item id=\x225sided\x22  src=\x22" + gltfUrl + "\x22 crossorigin=\x22anonymous\x22></a-asset-item>" +   
-                        // "<a-asset><img id=\x22sky\x22 src=\x22" + skyboxUrl +"\x22>></a-asset>" +
                         
                         "<a-asset-item id=\x22square1\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/square1.glb\x22></a-asset-item>\n"+
                         "<a-asset-item id=\x22rectangle1\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/rectangle1.glb\x22></a-asset-item>\n"+
