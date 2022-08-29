@@ -181,7 +181,7 @@ AFRAME.registerComponent('primary_audio_player', {  //setup and controls for the
                 this.raycaster = null;
             });
 
-            this.el.addEventListener('click', function (event) {
+            this.el.addEventListener('click', (event) => {
                 event.preventDefault();
                 // thiz.hitpoint = this.hitpoint;
                 console.log("click on paudio with " + thiz.mouseOverObject + " raycaster "+ thiz.raycaster);
@@ -208,20 +208,23 @@ AFRAME.registerComponent('primary_audio_player', {  //setup and controls for the
                         thiz.slider_begin.getWorldPosition( nStart );
                         thiz.slider_end.getWorldPosition( nEnd );
                         // this.hitpoint = this.intersection.point;
-                        console.log("screen hit at " + JSON.stringify(thiz.hitpoint));
-                        let range = nEnd.x.toFixed(2) - nStart.x.toFixed(2);
-                        let correctedStartValue = thiz.hitpoint.x.toFixed(2) - nEnd.x.toFixed(2);
+                        console.log("screen hit at " + JSON.stringify(thiz.hitpoint) + " vs nstart " + JSON.stringify(nStart) + " " + JSON.stringify(nEnd) );
+
+                        // let range = nEnd.x.toFixed(2) - nStart.x.toFixed(2);
+                        // let correctedStartValue = thiz.hitpoint.x.toFixed(2) - nEnd.x.toFixed(2);
+                        let range = nEnd.z.toFixed(2) - nStart.z.toFixed(2);
+                        let correctedStartValue = thiz.hitpoint.z.toFixed(2) - nEnd.z.toFixed(2);
                         let percentage = (((correctedStartValue * 100) / range) + 100).toFixed(2); 
                         // let time = (percentage * (this.video.duration / 100)).toFixed(2);
                         // let touchPosition = (((intersects[i].point.y.toFixed(2) - this.slider_begin.position.y.toFixed(2)) * 100) / (this.slider_end.position.y.toFixed(2) - this.slider_begin.position.y.toFixed(2)));
-                        console.log("bg touch % " + percentage +  " touchPosition " + JSON.stringify(thiz.hitpoint) + " vs start " +  JSON.stringify(nStart) + " vs end " +  JSON.stringify(nEnd));
+                        console.log("bg touch % " + range +  " " + correctedStartValue +  " " + percentage +  " touchPosition " + JSON.stringify(thiz.hitpoint) + " vs start " +  JSON.stringify(nStart) + " vs end " +  JSON.stringify(nEnd));
                         // this.slider_handle.position.x = intersects[i].point.x; 
                         // this.slider_handle.position.z =  nStart.z;
                         // this.slider_handle.position.z =  nStart.y; 
                         thiz.slider_handle.position.lerpVectors(thiz.slider_begin.position, thiz.slider_end.position, percentage * .01);
                         //   this.video.currentTime = time;
                         
-                        if (primaryAudioMangler != null) {
+                        if (primaryAudioMangler != null && percentage > 0 && percentage < 100) {
                             primaryAudioMangler.slider_update(percentage);
                         }
                     
