@@ -279,7 +279,7 @@ webxr_router.get('/:_id', function (req, res) {
     let physicsScripts = "";
     let brownianScript = "";
     let aframeExtrasScript = "<script src=\x22../main/vendor/aframe/animation-mixer.js\x22></script>"; //swapped with full aframe-extras lib (that includes animation-mixer) for physics and navmesh if needed
-    let vrStatsScript = "";
+    let logScripts = "";
     enviromentScript = ""; //for aframe env component
     // let debugMode = false;
     // let aframeScriptVersion = "<script src=\x22https://aframe.io/releases/1.3.0/aframe.min.js\x22></script>";
@@ -384,7 +384,10 @@ webxr_router.get('/:_id', function (req, res) {
                             debugMode = true;
                         }
                         if (sceneData.sceneTags[i].toLowerCase().includes("stats")) {
-                            vrStatsScript = "<script src=\x22https://cdn.jsdelivr.net/gh/kylebakerio/vr-super-stats@1.5.0/vr-super-stats.js\x22></script>";
+                            logScripts = "<script src=\x22https://cdn.jsdelivr.net/gh/kylebakerio/vr-super-stats@1.5.0/vr-super-stats.js\x22></script>";
+                        }
+                        if (sceneData.sceneTags[i].toLowerCase().includes("logs")) {
+                            logScripts = logScripts + "<script src=\x22../main/src/component/a-console.js\x22></script>";
                         }
                         if (sceneData.sceneTags[i].toLowerCase().includes("physics")) {
                             physicsScripts =  "<script src=\x22https://mixedreality.mozilla.org/ammo.js/builds/ammo.wasm.js\x22></script>"+
@@ -1048,7 +1051,9 @@ webxr_router.get('/:_id', function (req, res) {
                                             "material=\x22opacity: 0\x22></a-entity>"+
                                         "</a-entity>"+
                                        
-                                        "<a-entity id=\x22left-hand\x22 oculus-touch-controls=\x22hand: left\x22 "+blinkMod+" handModelStyle: lowPoly; color: #ffcccc\x22></a-entity>" +
+                                        "<a-entity id=\x22left-hand\x22 oculus-touch-controls=\x22hand: left\x22 "+blinkMod+" handModelStyle: lowPoly; color: #ffcccc\x22>"+
+                                            "<a-console position=\x220 .13 -.36\x22 scale=\x22.33 .33 .33\x22 rotation=\x22-70.7 -1.77\x22></a-console>"+
+                                        "</a-entity>" +
                                         "<a-entity id=\x22right-hand\x22 oculus-touch-controls=\x22hand: right\x22 laser-controls=\x22hand: right;\x22 handModelStyle: lowPoly; color: #ffcccc\x22 raycaster=\x22objects: .activeObjexRay;\x22 aabb-collider=\x22objects: .activeObjexGrab;\x22 grab></a-entity>"+
                                         "</a-entity></a-entity>";
                                 }
@@ -4259,7 +4264,7 @@ webxr_router.get('/:_id', function (req, res) {
                             "<a-box position=\x220 -1 0\x22 width=\x2233\x22 height=\x221\x22 depth=\x2233\x22 material=\x22opacity: 0; transparent: true;\x22 ammo-body=\x22type: static\x22 ammo-shape=\x22type: box;\x22></a-box>";
                             // physics = "physics";
                         }
-                        if (vrStatsScript.length > 0){
+                        if (logScripts.length > 0){
                             webxrFeatures = webxrFeatures + " vr-super-stats=\x22position:0 .4 0; alwaysshow3dstats:true; show2dstats:false;\x22 ";
                         }
                         
@@ -4327,7 +4332,7 @@ webxr_router.get('/:_id', function (req, res) {
                         // "<script src=\x22//aframe.io/releases/1.3.0/aframe.min.js\x22></script>" +
                         aframeScriptVersion +
                         physicsScripts +
-                        vrStatsScript +
+                        logScripts +
                         aframeExtrasScript +
                         extraScripts +
                         // "<script src=\x22https://cdn.jsdelivr.net/gh/aframevr/aframe@02f028bf319915bd5de1ef8b033495fe80b6729b/dist/aframe-master.min.js\x22></script>" +
@@ -4439,16 +4444,13 @@ webxr_router.get('/:_id', function (req, res) {
                         // ground +
 
                         skySettings +
-                        "<a-assets timeout=\x225000\x22>" +
-                        // "<a-assets>" +
-                        // "<canvas id=\x22render_canvas\x22></canvas>"+
+                       
+                        ////////////////ASSETS/////////////
+                        "<a-assets timeout=\x2210000\x22>" +
+                       
                         playerAvatarTemplate +
                         handsTemplate + 
-                        // "<img id=\x22landscapeMask\x22 crossorigin='anonymous' src=\x22https://realitymangler.com/assets/landscapeMask.png\x22>"+
-                        // "<a-asset-item id=\x22optimerBoldFont\x22 src=\x22https://rawgit.com/mrdoob/three.js/dev/examples/fonts/optimer_bold.typeface.json\x22></a-asset-item>" +
-                        // "<img id=\x22primaryAudioWaveform\x22 crossorigin=\x22anonymous\x22 src=\x22"+primaryAudioWaveform+"\x22>"+
                         pAudioWaveform +
-                        
                         
                         "<a-asset-item id=\x22square1\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/square1.glb\x22></a-asset-item>\n"+
                         "<a-asset-item id=\x22rectangle1\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/rectangle1.glb\x22></a-asset-item>\n"+
@@ -4491,7 +4493,7 @@ webxr_router.get('/:_id', function (req, res) {
 
                         // "<img id=\x22explosion\x22 src=\x22https://realitymangler.com/assets/textures/explosion.png\x22 crossorigin=\x22anonymous\x22>"+ 
 
-                        // USED FOR TERRAIN, REM FOR NOW...
+                      
                         "<img id=\x22fireballSheet\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/pics/fireball-up.png\x22 crossorigin=\x22anonymous\x22></img>"+
                         "<img id=\x22fireball\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/pics/fireball.png\x22 crossorigin=\x22anonymous\x22></img>"+
                         "<img id=\x22fireanim1\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/pics/fireanim3.png\x22 crossorigin=\x22anonymous\x22></img>"+
@@ -4511,14 +4513,15 @@ webxr_router.get('/:_id', function (req, res) {
                         "<img id=\x22fog1\x22 src=\x22http://servicemedia.s3.amazonaws.com/assets/pics/fog-256.png\x22 crossorigin=\x22anonymous\x22>"+
                         "<img id=\x22cloud1\x22 src=\x22http://servicemedia.s3.amazonaws.com/assets/pics/cloud_lg.png\x22 crossorigin=\x22anonymous\x22>"+
                                 
-                                // "<img id=\x22heightmap\x22 src=\x22https://realitymangler.com/assets/heightmaps/hm4.png\x22 crossorigin=\x22anonymous\x22>"+
-                                // "<img id=\x22lowestTexture\x22 src=\x22https://realitymangler.com/assets/textures/dirttile1.jpg\x22 crossorigin=\x22anonymous\x22>"+
-                                // "<img id=\x22lowTexture\x22 src=\x22https://realitymangler.com/assets/textures/sandtile1.jpg\x22 crossorigin=\x22anonymous\x22>"+
-                                // "<img id=\x22mediumTexture\x22 src=\x22https://realitymangler.com/assets/textures/grasstile2.jpg\x22 crossorigin=\x22anonymous\x22>"+
-                                // "<img id=\x22highTexture\x22 src=\x22https://realitymangler.com/assets/textures/grasstile2.jpg\x22 crossorigin=\x22anonymous\x22>"+
-                                // "<img id=\x22highestTexture\x22 src=\x22https://realitymangler.com/assets/textures/mossrocktile2.jpg\x22 crossorigin=\x22anonymous\x22>"+
+                          // USED FOR TERRAIN, REM FOR NOW...
+                        // "<img id=\x22heightmap\x22 src=\x22https://realitymangler.com/assets/heightmaps/hm4.png\x22 crossorigin=\x22anonymous\x22>"+
+                        // "<img id=\x22lowestTexture\x22 src=\x22https://realitymangler.com/assets/textures/dirttile1.jpg\x22 crossorigin=\x22anonymous\x22>"+
+                        // "<img id=\x22lowTexture\x22 src=\x22https://realitymangler.com/assets/textures/sandtile1.jpg\x22 crossorigin=\x22anonymous\x22>"+
+                        // "<img id=\x22mediumTexture\x22 src=\x22https://realitymangler.com/assets/textures/grasstile2.jpg\x22 crossorigin=\x22anonymous\x22>"+
+                        // "<img id=\x22highTexture\x22 src=\x22https://realitymangler.com/assets/textures/grasstile2.jpg\x22 crossorigin=\x22anonymous\x22>"+
+                        // "<img id=\x22highestTexture\x22 src=\x22https://realitymangler.com/assets/textures/mossrocktile2.jpg\x22 crossorigin=\x22anonymous\x22>"+
 
-                        // "<audio id=\x22song\x22 crossorigin " + loopable + " autoload src=\x22\n"+ mp3url + "\x22></audio>\n"+
+
                         weblinkAssets +
                         gltfsAssets +
                         videoAsset +
@@ -4527,20 +4530,15 @@ webxr_router.get('/:_id', function (req, res) {
                         skyboxAsset +
                         // cubeMapAsset +
                         navmeshAsset +
-                                    // targetAssets +  //TODO
-                                    // launcherAssets +
-                        // geoEntities +
-                        // assets +
-                        // targetObjectAsset +
+
                         "</a-assets>\n"+
+
+                        //////////////ENTITIES////////////////////
+
                         curveEntities +
                         // physicsDummy + 
                         renderPanel +
-                        // "<a-entity id=\x22locationData\x22 scale=\x221 1 1\x22 location_data=\x22initialized\x22></a-entity>\n"+  //just a placeholder to catch some location data, after everythign loads
-                        // "<a-entity layout=\x22type: circle; margin: 2; radius: 10\x22 position=\x220 0 0\x22 rotation=\x2290 0 33\x22>\n"+ //layout pois in big circle// not this..
-                        // geoEntities +
-                        // "</a-entity>\n"+                        
-                        // "<a-entity layout=\x22type: circle; margin: 2; radius: 25\x22 position=\x220 3 0\x22 rotation=\x2290 0 33\x22>\n"+ //layout weblinks in big circle
+
                         weblinkEntities +
                         // "</a-entity>\n"+
                         gltfsEntities + 
@@ -4590,6 +4588,8 @@ webxr_router.get('/:_id', function (req, res) {
                         modelData +
                         objectData +
                         inventoryData +
+
+                        "<a-console look-at=\x22#player\x22 position=\x22-4 1.75 -2\x22></a-console>"+
                         // "<a-entity id=\x22navmesh\x22 geometry=\x22primitive: plane; height: 30; width: 30; buffer: true;\x22 rotation=\x22-90 0 0\x22 nav-mesh></a-entity>"+
                         "</a-scene>\n"+ //CLOSE AFRAME SCENE
                         "</div>\n"+
@@ -4618,12 +4618,10 @@ webxr_router.get('/:_id', function (req, res) {
                         "<div class=\x22augpanel\x22><p></p></div>\n"+
                        
                         joystickContainer +
-                        
-
                         screenOverlay + //socket picture
                         canvasOverlay + //drop down side panel
                         audioSliders +
-                        mapOverlay + //
+                        mapOverlay + 
                         adSquareOverlay +
                         "<div class=\x22next-button\x22 id=\x22nextButton\x22 style=\x22visibility: hidden\x22 onclick=\x22GoToNext()\x22><i class=\x22fas fa-arrow-circle-right fa-2x\x22></i></div>"+
                         "<div class=\x22previous-button\x22 id=\x22previousButton\x22 style=\x22visibility: hidden\x22 onclick=\x22GoToPrevious()\x22><i class=\x22fas fa-arrow-circle-left fa-2x\x22></i></div>"+
