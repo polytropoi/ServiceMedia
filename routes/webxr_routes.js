@@ -840,14 +840,7 @@ webxr_router.get('/:_id', function (req, res) {
                             camera = "<a-entity mindar-image-target=\x22targetIndex: 0\x22>" +
                             "<a-gltf-model rotation=\x2290 0 0\x22 position=\x220 0 0.1\x22 scale=\x220.25 0.25 0.25\x22 src=\x22#gltfAsset1\x22>"+
                             "</a-entity>";
-                            // ARScript = "<script src=\x22/main/ref/aframe/dist/aframe-ar-nft.js\x22></script>";
-                            // ARSceneArg = "arjs=\x22trackingMethod: best; sourceType: webcam; debugUIEnabled: false;\x22 vr-mode-ui=\x22enabled: false;\x22 renderer=\x22logarithmicDepthBuffer: true;\x22 embedded ";
-                            // // arjs="trackingMethod: best; sourceType: webcam;debugUIEnabled: false;"
-                            // camera = "<a-nft type=\x22nft\x22 url=\x22https://realitymangler.com/markers/"+nftIDs+"\x22 smooth=\x22true\x22 smoothCount=\x2210\x22 smoothTolerance=\x22.01\x22 smoothThreshold=\x225\x22>" +
-                            // "<a-box scale='.5 .5 .5' position='0 0.5 0' material='color: yellow;'></a-box>" +
-                            // "</a-nft>" +
-                            // "<a-entity cursor raycaster=\x22far: 20; interval: 1000; objects: .activeObjexRay\x22></a-entity>" +
-                            // "<a-camera></a-camera>";
+                          
                         } else if (sceneData.sceneWebType == 'AR Location Tracking') {
                             // ARScript = "<script src=\x22/main/js/geolocator.js\x22></script><script src=\x22/main/ref/aframe/dist/aframe-ar.js\x22></script>";
                             geoScripts = "<script async src=\x22https://get.geojs.io/v1/ip/geo.js\x22></script><script src=\x22/main/js/geolocator.js\x22></script>";
@@ -858,24 +851,7 @@ webxr_router.get('/:_id', function (req, res) {
                             // locationScripts = "<script>window.onload = () => { navigator.geolocation.getCurrentPosition((position) => {"+ //put this where?
                             // "document.querySelector('a-text').setAttribute('"+geoEntity+"', `latitude: ${position.coords.latitude}; longitude: ${position.coords.longitude};`)});}</script>";
                             ARSceneArg = "gps-position webxr=\x22referenceSpaceType: unbounded; requiredFeatures: unbounded;\x22 vr-mode-ui=\x22enabled: false\x22 arjs=\x22sourceType: webcam; debugUIEnabled: false;\x22";
-                            // ARMarker =  "<a-text location-init-click id=\x22locationStatus\x22 value=\x22Tap globe icon to \ninit geolocation\x22 look-at=\x22[gps-camera]\x22 position=\x22-5 1 5\x22 scale=\x223 3 3\x22></a-text>";
-                            // camera = "<a-camera listen-from-camera gps-camera rotation-reader><a-entity id=\x22mouseCursor\x22 cursor=\x22rayOrigin: mouse\x22 raycaster=\x22objects: .activeObjexRay\x22></a-entity>"+
-                                    // camera = "<a-camera id=\x22player\x22 look-controls-enabled=\x22false\x22 arjs-look-controls=\x22smoothingFactor: 0.1\x22 listen-from-camera gps-camera rotation-reader><a-entity id=\x22mouseCursor\x22 cursor=\x22rayOrigin: mouse\x22 raycaster=\x22objects: .activeObjexRay\x22></a-entity>"+
-                            
-                                    // "</a-camera>";
-                            /*    nope
-                            camera = "<a-camera id=\x22player\x22 look-controls-enabled=\x22false\x22 pitch-roll-look-controls listen-from-camera rotation-reader><a-entity id=\x22mouseCursor\x22 cursor=\x22rayOrigin: mouse\x22 raycaster=\x22objects: .activeObjexRay\x22></a-entity>"+
-                                            // "<a-entity id=\x22player\x22 networked=\x22template:#avatar-template;attachTemplateToLocal:false;\x22 spawn-in-circle=\x22radius:3;\x22>" + //ENABLE LATER
-                                            // "<a-entity id=\x22player\x22 get_pos_rot camera "+wasd+" look-controls=\x22hmdEnabled: false;\x22 position=\x22"+playerPosition+"\x22>"+
-                                        "<a-entity id=\x22equipPlaceholder\x22 geometry=\x22primitive: plane; height: 0.01; width: .01\x22 position=\x220 -.5 -.5\x22"+
-                                        "material=\x22opacity: 0\x22></a-entity>"+
-                                        "<a-entity id=\x22viewportPlaceholder\x22 geometry=\x22primitive: plane; height: 0.01; width: .01\x22 position=\x220 0 -1\x22"+
-                                        "material=\x22opacity: 0\x22></a-entity>"+
-                                        "<a-entity id=\x22viewportPlaceholder3\x22 geometry=\x22primitive: plane; height: 0.01; width: .01\x22 position=\x220 0 -3\x22"+
-                                        "material=\x22opacity: 0\x22></a-entity>"+
-                                        // "</a-entity>"+    
-                                    "</a-camera>";
-                            */
+                           
                             camera = "<a-entity id=\x22player\x22 position=\x220 0 0\x22 camera pitch-roll-look-controls>"+ 
                                 "<a-entity class=\x22hiddenPlaceholders\x22 id=\x22equipPlaceholder\x22 geometry=\x22primitive: plane; height: 0.01; width: .01\x22 position=\x220 -.5 -.65\x22"+ //these seemed to need actual geometry to get a worldspace loc
                                 "material=\x22opacity: 0\x22></a-entity>"+
@@ -892,7 +868,7 @@ webxr_router.get('/:_id', function (req, res) {
                             locationButton = "<div style=\x22float: right; margin: 10px 10px;\x22 onclick=\x22ShowHideGeoPanel()\x22><i class=\x22fas fa-globe fa-2x\x22></i></div>";
                                         
                             } else if (sceneData.sceneWebType == 'Mapbox') { 
-                                // ARScript = "<script src=\x22/main/js/geolocator.js\x22></script><script src=\x22/main/ref/aframe/dist/aframe-ar.js\x22></script>";
+                               
                                 dialogButton = "<div class=\x22dialog_button\x22 style=\x22float: left; margin: 10px 10px; width: 50px; height: 50px\x22 onclick=\x22SceneManglerModal('Welcome')\x22><i class=\x22fas fa-info-circle fa-2x\x22></i></div>";
                                 locationButton = "<div id=\x22loc_button\x22 class=\x22dialog_button\x22 style=\x22float: left; margin: 10px 10px; width: 50px; height: 50px\x22 onclick=\x22ShowHideGeoPanel()\x22><i class=\x22fas fa-globe fa-2x\x22></i></div>";
                                 if (!sceneData.sceneTextUseModals) {
@@ -908,20 +884,8 @@ webxr_router.get('/:_id', function (req, res) {
                                 "<script src=\x22https://api.mapbox.com/mapbox-gl-js/v2.7.0/mapbox-gl.js\x22></script>"+
                                 "<link href=\x22https://api.mapbox.com/mapbox-gl-js/v2.7.0/mapbox-gl.css\x22 rel=\x22stylesheet\x22/>";
 
-                                // "<script src=\x22https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-directions/v4.1.0/mapbox-gl-directions.js\x22></script>"+
-                                // "<link rel=\x22stylesheet\x22 href=\x22https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-directions/v4.1.0/mapbox-gl-directions.css\x22 type=\x22text/css\x22/>";
-                                // "<script src=\x22/main/src/util/threebox.js\x22></script>"+
-                                // "<link href=\x22/css/threebox.css\x22 rel=\x22stylesheet\x22/>";
-                                // "<script src=\x22https://unpkg.com/three@0.106.2/examples/js/loaders/GLTFLoader.js\x22></script>";
-
-                                // ARScript = "<script src=\x22/main/ref/aframe/dist/aframe-ar.js\x22></script>";
-                                // locationScripts = "<script src=\x22../main/src/component/location-fu.js\x22></script>"; //maybe can use non aframe
                                 locationScripts = "<script src=\x22../main/src/component/location-fu.js\x22></script>";
-                                // locationScripts = "<script>window.onload = () => { navigator.geolocation.getCurrentPosition((position) => {"+ //put this where?
-                                // "document.querySelector('a-text').setAttribute('"+geoEntity+"', `latitude: ${position.coords.latitude}; longitude: ${position.coords.longitude};`)});}</script>";
-                                // ARSceneArg = "vr-mode-ui=\x22enabled: false\x22 arjs=\x22sourceType: webcam; debugUIEnabled: false;\x22";
-                                // ARMarker =  "<a-text location-init-click id=\x22locationStatus\x22 value=\x22Tap globe icon to \ninit geolocation\x22 look-at=\x22[gps-camera]\x22 position=\x22-5 1 5\x22 scale=\x223 3 3\x22></a-text>";
-                                // camera = "<a-camera listen-from-camera gps-camera rotation-reader><a-entity id=\x22mouseCursor\x22 cursor=\x22rayOrigin: mouse\x22 raycaster=\x22objects: .activeObjexRay\x22></a-entity>"+
+                               
                                 camera = "<a-camera id=\x22player\x22 look-controls-enabled=\x22false\x22 listen-from-camera gps-camera rotation-reader><a-entity id=\x22mouseCursor\x22 cursor=\x22rayOrigin: mouse\x22 raycaster=\x22objects: .activeObjexRay\x22></a-entity>"+
                                 // "<a-entity id=\x22player\x22 networked=\x22template:#avatar-template;attachTemplateToLocal:false;\x22 spawn-in-circle=\x22radius:3;\x22>" + //ENABLE LATER
                                         "</a-camera>";
@@ -937,15 +901,7 @@ webxr_router.get('/:_id', function (req, res) {
                                     // "<a-entity class=\x22gltf\x22 gltf-model=\x22#globe\x22 class=\x22envMap activeObjexRay\x22 position=\x220 -1.5 0\x22>"+
                                     // "</a-entity>"+
                                 "</a-entity>";
-                                // <div id='map' style='width: 400px; height: 300px;'></div>
-                                // <script>
-                                //     mapboxgl.accessToken = 'pk.eyJ1IjoicG9seXRyb3BvaSIsImEiOiJjajhnaGNhc3YwZndpMnFyd2V3ZmZ3Y3h3In0.OMYc5PSg3_YNMjU797DocA';
-                                //     var map = new mapboxgl.Map({
-                                //     container: 'map',
-                                //     style: 'mapbox://styles/mapbox/streets-v11'
-                                //     });
-                                // </script>;
-                                // mapHeadingAndPitch = 
+                            
                                 mapButtons = "<div id=\x22button_left_1\x22 style=\x22float: left; margin: 10px 10px;\x22 class=\x22\x22 onclick=\x22ToggleDragPan()\x22><i class=\x22fas fa-level-down-alt fa-2x\x22></i></div>"+
                                 "<div id=\x22button_left_2\x22 class=\x22\x22 style=\x22float: left; margin: 10px 10px;\x22 onclick=\x22ZoomOut()\x22 class=\x22tooltip\x22><i class=\x22fas fa-search-minus  fa-2x\x22></i><span class=\x22tooltiptext\x22></span></div>"+
                                 "<div id=\x22button_left_3\x22 class=\x22\x22 style=\x22float: left; margin: 10px 10px;\x22 onclick=\x22ZoomIn()\x22 class=\x22tooltip\x22><i class=\x22fas fa-search-plus fa-2x\x22></i><span class=\x22tooltiptext\x22></span></div>" +
@@ -995,12 +951,9 @@ webxr_router.get('/:_id', function (req, res) {
                                     // joystickScript = "";
                                 }
                                 if (physicsScripts.length > 0) {
-                                    // movementControls = "movement-controls=\x22control: keyboard, gamepad, touch; fly: false;\x22";
-                                    // wasd = "";
+                                  
                                     physicsMod = "geometry=\x22primitive: cylinder; height: 2; radius: 0.5;\x22 ammo-body=\x22type: kinematic;\x22 ammo-shape=\x22type: capsule\x22";
-                                    // aframeExtrasScript = "<script src=\x22..//main/vendor/aframe/aframe-extras_20210520.js\x22></script>";
-                                    // joystickScript = "";
-
+                                   
                                 }
                                  if (physicsScripts.length > 0 && useNavmesh) {
                                     movementControls = "movement-controls=\x22constrainToNavMesh: true; control: keyboard, gamepad, touch; fly: false;\x22";
@@ -1009,31 +962,7 @@ webxr_router.get('/:_id', function (req, res) {
                                     aframeExtrasScript = "<script src=\x22..//main/vendor/aframe/aframe-extras_20210520.js\x22></script>";
                                     // joystickScript = "";
                                 }
-                                //alt 
-                                    // if (!useNavmesh) {
-                                    //     // wasd = "wasd-controls=\x22fly: false; acceleration: 35\x22";
-                                    //     // movementControls = "movement-controls=\x22control: keyboard, gamepad, \x22";
-                                    // } else {
-                                    //     movementControls = "movement-controls=\x22constrainToNavMesh: true; control: keyboard, gamepad, touch; fly: false;\x22"; 
-                                    //     wasd = "";
-                                    //     aframeExtrasScript = "<script src=\x22../main/vendor/aframe/movement-controls.js\x22></script>";
-                                    //     // joystickScript = "";
-                                    // }
-                                    // if (physicsScripts.length > 0) {
-                                    //     movementControls = "movement-controls=\x22control: keyboard, gamepad, touch; fly: false;\x22";
-                                    //     // wasd = "";
-                                    //     physicsMod = "geometry=\x22primitive: cylinder; height: 2; radius: 0.5;\x22 ammo-body=\x22type: kinematic;\x22 ammo-shape=\x22type: capsule\x22";
-                                    //     aframeExtrasScript = "<script src=\x22../main/vendor/aframe/movement-controls.js\x22></script>";
-                                    //     // joystickScript = "";
-
-                                    // }
-                                    // if (physicsScripts.length > 0 && useNavmesh) {
-                                    //     movementControls = "movement-controls=\x22constrainToNavMesh: true; control: keyboard, gamepad, touch; fly: false;\x22";
-                                    //     wasd = "";
-                                    //     physicsMod = "geometry=\x22primitive: cylinder; height: 2; radius: 0.5;\x22 ammo-body=\x22type: kinematic;\x22 ammo-shape=\x22type: capsule\x22";
-                                    //     aframeExtrasScript = "<script src=\x22../main/vendor/aframe/movement-controls.js\x22></script>";
-                                    //     // joystickScript = "";
-                                    // }
+                               
                                 
 
                                 transportButtons = "<div class=\x22transport_buttons\x22><div class=\x22sslidecontainer\x22><input type=\x22range\x22 min=\x221\x22 max=\x22100\x22 value=\x221\x22 class=\x22sslider\x22 id=\x22mainTransportSlider\x22>"+
@@ -1089,8 +1018,7 @@ webxr_router.get('/:_id', function (req, res) {
                                 
                                         " id=\x22mouseCursor\x22 cursor=\x22rayOrigin: mouse\x22 raycaster=\x22objects: .activeObjexRay\x22>"+
                                         
-                                        // "<a-entity id=\x22player\x22 get_pos_rot networked=\x22template:#avatar-template;attachTemplateToLocal:false;\x22 "+spawnInCircle+" camera "+wasd+" look-controls=\x22hmdEnabled: false\x22 position=\x220 1.6 0\x22>" +     
-                                        // "<a-entity id=\x22viewportPlaceholder\x22 position=\x220 0 -1\x22></entity>"+   
+                                       
                                         "<a-entity id=\x22player\x22 rotate-with-camera "+wasd+" "+ physicsMod +" position=\x22"+playerPosition+"\x22>"+
                                             "<a-entity id=\x22equipPlaceholder\x22 geometry=\x22primitive: box; height: .1; width: .1; depth: .1\x22 position=\x220 -.65 -.75\x22"+
                                             "material=\x22opacity: 0\x22></a-entity>"+
@@ -1102,12 +1030,7 @@ webxr_router.get('/:_id', function (req, res) {
                                             // "<a-sphere visible=\x22true\x22 scale=\x220.45 0.5 0.4\x22 random-color></a-sphere>"+
                                         "</a-entity>"+
                                        
-                                        // "<a-entity networked=\x22template:#hand-template\x22 teleport-controls=\x22cameraRig: #cameraRig; button: grip;\x22 oculus-touch-controls=\x22hand: left\x22 laser-controls=\x22hand: left;\x22 handModelStyle: lowPoly; color: #ffcccc\x22 raycaster=\x22objects: .activeObjexRay;\x22></a-entity>" +
-                                        // "<a-entity networked=\x22template:#hand-template\x22 oculus-touch-controls=\x22hand: right\x22 id=\x22right-hand\x22 hand-controls=\x22hand: right; handModelStyle: lowPoly; color: #ffcccc\x22 raycaster=\x22objects: .activeObjexRay;\x22 aabb-collider=\x22objects: .activeObjexGrab;\x22 grab></a-entity>"+
-                                        // "<a-entity id=\x22left-hand\x22 teleport-controls=\x22cameraRig: #cameraRig; button: grip;\x22 laser-controls=\x22hand: left;\x22 handModelStyle: lowPoly; color: #ffcccc\x22 raycaster=\x22objects: .activeObjexRay;\x22 aabb-collider=\x22objects: .activeObjexGrab;\x22 grab></a-entity>" +
-                                        // "<a-entity id=\x22right-hand\x22 teleport-controls=\x22cameraRig: #cameraRig; button: grip;\x22 laser-controls=\x22hand: right;\x22 handModelStyle: lowPoly; color: #ffcccc\x22 raycaster=\x22objects: .activeObjexRay;\x22 aabb-collider=\x22objects: .activeObjexGrab;\x22 grab></a-entity>"+
-                                        // "<a-entity id=\x22left-hand\x22 oculus-touch-controls=\x22hand: left\x22 "+blinkMod+" handModelStyle: lowPoly; color: #ffcccc\x22></a-entity>" +
-                                        // "<a-entity id=\x22right-hand\x22 oculus-touch-controls=\x22hand: right\x22 laser-controls=\x22hand: right;\x22 handModelStyle: lowPoly; color: #ffcccc\x22 raycaster=\x22objects: .activeObjexRay;\x22 aabb-collider=\x22objects: .activeObjexGrab;\x22 grab></a-entity>"+
+                                       
                                         "</a-entity></a-entity>";
                                 } else {
                                     // defaults to first person cam
@@ -1125,10 +1048,6 @@ webxr_router.get('/:_id', function (req, res) {
                                             "material=\x22opacity: 0\x22></a-entity>"+
                                         "</a-entity>"+
                                        
-                                        // "<a-entity networked=\x22template:#hand-template\x22 teleport-controls=\x22cameraRig: #cameraRig; button: grip;\x22 oculus-touch-controls=\x22hand: left\x22 laser-controls=\x22hand: left;\x22 handModelStyle: lowPoly; color: #ffcccc\x22 raycaster=\x22objects: .activeObjexRay;\x22></a-entity>" +
-                                        // "<a-entity networked=\x22template:#hand-template\x22 oculus-touch-controls=\x22hand: right\x22 id=\x22right-hand\x22 hand-controls=\x22hand: right; handModelStyle: lowPoly; color: #ffcccc\x22 raycaster=\x22objects: .activeObjexRay;\x22 aabb-collider=\x22objects: .activeObjexGrab;\x22 grab></a-entity>"+
-                                        // "<a-entity id=\x22left-hand\x22 teleport-controls=\x22cameraRig: #cameraRig; button: grip;\x22 laser-controls=\x22hand: left;\x22 handModelStyle: lowPoly; color: #ffcccc\x22 raycaster=\x22objects: .activeObjexRay;\x22 aabb-collider=\x22objects: .activeObjexGrab;\x22 grab></a-entity>" +
-                                        // "<a-entity id=\x22right-hand\x22 teleport-controls=\x22cameraRig: #cameraRig; button: grip;\x22 laser-controls=\x22hand: right;\x22 handModelStyle: lowPoly; color: #ffcccc\x22 raycaster=\x22objects: .activeObjexRay;\x22 aabb-collider=\x22objects: .activeObjexGrab;\x22 grab></a-entity>"+
                                         "<a-entity id=\x22left-hand\x22 oculus-touch-controls=\x22hand: left\x22 "+blinkMod+" handModelStyle: lowPoly; color: #ffcccc\x22></a-entity>" +
                                         "<a-entity id=\x22right-hand\x22 oculus-touch-controls=\x22hand: right\x22 laser-controls=\x22hand: right;\x22 handModelStyle: lowPoly; color: #ffcccc\x22 raycaster=\x22objects: .activeObjexRay;\x22 aabb-collider=\x22objects: .activeObjexGrab;\x22 grab></a-entity>"+
                                         "</a-entity></a-entity>";
@@ -1138,8 +1057,7 @@ webxr_router.get('/:_id', function (req, res) {
 
                             if (sceneResponse.sceneWebXREnvironment != null && sceneResponse.sceneWebXREnvironment != "none" && sceneResponse.sceneWebXREnvironment != "") {
                                 webxrEnv = sceneResponse.sceneWebXREnvironment;
-                                // console.log("environment: " + environment);
-                                // environment = " environment=\x22preset: "+webxrEnv+"\x22 ";
+                                
                                 enviromentScript = "<script src=\x22../main/ref/aframe/dist/aframe_environment_component.min.js\x22></script>";
                                 let ground = "";
                                 let skycolor = "";
@@ -1165,13 +1083,6 @@ webxr_router.get('/:_id', function (req, res) {
                                     // tweakColors = "mod-colors"; //need to animate
                                 }
 
-
-                                //     // shadowLight = "<a-light type:\x22directional\x22; color:\x22" + sceneResponse.sceneColor1 + "\x22; intensity:\x22.5\x22; castShadow: true; target=\x22.target\x22; position=\x22-1 4 4\x22;>"+
-                                //     // "</a-light>";
-                                //     shadowLight = "<a-light type=\x22directional\x22 color=\x22" + sceneResponse.sceneColor1 + "\x22 groundColor=\x22" + sceneResponse.sceneColor2 + "\x22 intensity=\x22.75\x22 target=\x22.target\x22 castShadow=\x22true\x22 shadowMapHeight=\x221024\x22 shadowMapWidth=\x221024\x22 shadowCameraLeft=\x22-2\x22 shadowCameraRight=\x222\x22; shadowCameraBottom=\x22-2\x22; shadowCameraTop=\x222\x22; position\x22-1 4 4\x22>"+
-                                //     "</a-light>";
-                                //     // light="target:  [object HTMLElement];  color:  #bb98d2;  groundColor:  #ff0056;  castShadow:  true"
-                                // }
                                 if (sceneResponse.sceneUseGlobalFog || sceneResponse.sceneUseSceneFog) {
                                     fogSettings = "fog=\x22type: exponential; density:" +sceneResponse.sceneGlobalFogDensity+ "; near: 1; far: 50; color: " +sceneResponse.sceneColor1 + "\x22";
                                     fog = "fog: " +sceneResponse.sceneGlobalFogDensity+ ";";
@@ -1216,7 +1127,7 @@ webxr_router.get('/:_id', function (req, res) {
                                 let fogDensity = sceneResponse.sceneGlobalFogDensity != null ? sceneResponse.sceneGlobalFogDensity : '.01';
                                 fogSettings = "fog=\x22type: exponential; density:"+fogDensity+"; near: 1; far: 150; color: " +sceneResponse.sceneColor1 + "\x22";
                             }
-                            // console.log("SKEY PARTICLES IS WHAT " + sceneResponse.sceneSkyParticles);
+                            
                             if (sceneResponse.sceneSkyParticles != undefined && sceneResponse.sceneSkyParticles != null && sceneResponse.sceneSkyParticles != "None") { 
                                 if (sceneResponse.sceneSkyParticles.toLowerCase() == "dust") {
                                     // skyParticles = "<a-entity scale='2 2 2' position='0 3 0' particle_mangler particle-system=\x22preset: dust; particleCount: 3000; texture: https://realitymangler.com/assets/textures/smokeparticle2.png; color: " + sceneResponse.sceneColor1 + "," + sceneResponse.sceneColor2 +"\x22></a-entity>";
@@ -1237,10 +1148,6 @@ webxr_router.get('/:_id', function (req, res) {
                                 } else if (sceneResponse.sceneSkyParticles.toLowerCase() == "smoke") {
                                     skyParticles = "<a-entity scale=\x2250 10 50\x22 position=\x220 10 0\x22 sprite-particles=\x22texture: #cloud1; color: " +sceneResponse.sceneColor2 + "; position: -1 -1 -1..1 1 1; velocity: -.05 -.025 -.05 .. .05 .025 .05; spawnRate: 5; lifeTime: 20; scale: 100,200; opacity: 0,.3,0; rotation: 0..360\x22></a-entity>";
 
-                                    // skyParticles = "<a-entity scale='15 5 15' position='0 0 0' particle_mangler particle-system=\x22preset: dust; maxAge: 10; velocityValue: 0 -.01 0; direction: -.01; positionSpread: 15 15 15; opacity: .15; particleCount: 25; size: 300; blending: 2; texture: https://realitymangler.com/assets/textures/cloud_sm.png; color: " + sceneResponse.sceneColor1 + "," + sceneResponse.sceneColor2 +"\x22></a-entity>";
-                                    // skyParticles = "<a-entity position=\x220 3 0\x22 scale=\x222 2 2\x22 mod_particles=\x22type: smoke\x22></a-entity>";
-                                    // skyParticles = "<a-entity position=\x220 1 5\x22 sprite-particles=\x22texture: #smoke1; color: " +sceneResponse.sceneColor4 + "; textureFrame: 6 5; textureLoop: 1; spawnRate: 1; lifeTime: 3; scale: 100;\x22></a-entity>";
-                                    // skyParticles = "<a-entity geometry=\x22primitive: plane; width: .2; height: .2;\x22 look-at=\x22#player\x22 position=\x220 1 0\x22 material=\x22shader: flat; src: #candle1; transparent: true;\x22 spritesheet-animation=\x22rows: 8; columns: 8; frameDuration: 0.02; loop: true;\x22></a-entity>";
                                 } else if (sceneResponse.sceneSkyParticles.toLowerCase() == "explosions") {
                                     // skyParticles = "<a-entity scale='15 5 15' position='0 0 0' particle_mangler particle-system=\x22preset: dust; maxAge: 10; velocityValue: 0 -.01 0; direction: -.01; positionSpread: 15 15 15; opacity: .15; particleCount: 25; size: 300; blending: 2; texture: https://realitymangler.com/assets/textures/cloud_sm.png; color: " + sceneResponse.sceneColor1 + "," + sceneResponse.sceneColor2 +"\x22></a-entity>";
                                     // skyParticles = "<a-entity position=\x220 3 0\x22 scale=\x222 2 2\x22 mod_particles=\x22type: smoke\x22></a-entity>";
@@ -1348,8 +1255,6 @@ webxr_router.get('/:_id', function (req, res) {
                                     color = locationLights[i].data;
                                 }
                             }
-                            // wait, that's wrong...
-                            // particleEntities = particleEntities + "<a-light "+mods+" color=\x22" + color + "\x22 position=\x22"+locationLights[i].loc+"\x22 distance=\x22"+distance+"\x22 intensity='0.8' type='point'></a-light>";
                         }
                         callback();
                     } else {
@@ -1388,11 +1293,6 @@ webxr_router.get('/:_id', function (req, res) {
                     if (curvePoints.length > 0) {
                         for (let i = 0; i < curvePoints.length; i++) {
                             
-                            // if (locationLights[i].data != null && locationLights[i].data.length > 3) {
-                            //     if (locationLights[i].data.indexOf("_") != -1) {
-                            //         //
-                            //     }
-                            // }
                             curveEntities = curveEntities + "<a-curve-point position=\x22"+curvePoints[i].loc+"\x22></a-curve-point>";
                         }
                         callback();
@@ -1537,19 +1437,14 @@ webxr_router.get('/:_id', function (req, res) {
                                     //else if no keys?
                                 } else {
                                     console.log('All files have been processed successfully skyboxEnvMap is ' + skyboxEnvMap);
-                                    // availableScenesResponse.availablesScenes
-                                    // availableScenesEntity = "<a-entity position=\x224 0 -2\x22 id=\x22availableScenesControl\x22 class=\x22envMap activeObjexRay\x22 toggle-available-scenes camera-cube-env=\x22distance: 10000; resolution: 256;\x22 gltf-model=\x22#key\x22></a-entity>";
-                                    // console.log("attributions 2" + JSON.stringify(attributions));
+         
                                     if (availableScenes != null && availableScenes != undefined && availableScenes.length > 0) {
                                     availableScenesEntity = "<a-entity scale=\x22.75 .75 .75\x22 look-at=\x22#player\x22 position=\x22"+scenesKeyLocation+"\x22>"+ //attributions-text-control is set onload, using attributions string above
                                     "<a-entity position=\x220 -2.5 0\x22 scale=\x22.75  .75 .75\x22 id=\x22availableScenesControl\x22 class=\x22envMap activeObjexRay\x22 toggle-available-scenes "+skyboxEnvMap+" gltf-model=\x22#key\x22></a-entity>"+
                                     "<a-entity id=\x22availableScenesPanel\x22 visible='false' position=\x220 -1 0\x22>"+
                                     "<a-entity id=\x22availableScenesHeaderText\x22 geometry=\x22primitive: plane; width: 3.25; height: 1\x22 position=\x220 1.75 0\x22 material=\x22color: grey; transparent: true; opacity: 0.0\x22" +
                                     "text=\x22value:; wrap-count: 35;\x22></a-entity>" +
-                                    // "<a-entity id=\x22availableSceneText\x22 class=\x22envMap activeObjexRay\x22 geometry=\x22primitive: plane; width: 4; height: 1\x22 position=\x220 1.5 0\x22 material=\x22color: grey; transparent: true; opacity: 0.0\x22" +
-                                    // "text=\x22value:; wrap-count: 25;\x22></a-entity>" +
-                                    // "<a-entity id=\x22availableSceneOwner\x22 class=\x22envMap activeObjexRay\x22  geometry=\x22primitive: plane; width: 4; height: 1\x22 position=\x220 .5 0\x22 material=\x22color: grey; transparent: true; opacity: 0.0\x22" +
-                                    // "text=\x22value:; wrap-count: 25;\x22></a-entity>" +
+
                                     "<a-entity id=\x22availableScenePic\x22 class=\x22envMap activeObjexRay\x22 visible=\x22true\x22 position=\x220 3 -.1\x22 gltf-model=\x22#widelandscape_panel\x22 scale=\x22.5 .5 .5\x22 material=\x22shader: flat; alphaTest: 0.5;\x22"+
                                     "rotation='0 0 0'></a-entity>"+
                                     "<a-entity gltf-model=\x22#square_panel\x22 scale=\x222.25 2.25 2.25\x22 position=\x220 2.1 -.25\x22></a-entity>" +
@@ -1560,7 +1455,7 @@ webxr_router.get('/:_id', function (req, res) {
                                     
                                     loadAvailableScenes = "ready(function(){\n" + //attributions data is loaded when page is ready (complex objs don't wanna parse if jacked in server side...?!?)
                                     "let ascontrol = document.getElementById(\x22availableScenesControl\x22);\n"+
-                                    // "console.log('tryna set availablescenes: ' + "+JSON.stringify(JSON.stringify(availableScenesResponse))+");"+
+                                    
                                     "ascontrol.setAttribute(\x22available-scenes-control\x22, \x22jsonData\x22, "+JSON.stringify(JSON.stringify(availableScenesResponse))+");\n"+ //double stringify! yes, it's needed
                                     "});";
                                     callback();
@@ -1781,8 +1676,7 @@ webxr_router.get('/:_id', function (req, res) {
                 },   
                 function (callback) { //models are simpler, fewer properties`
                     if (sceneModelLocations.length > 0) {
-                        // console.log("gotsome models " + JSON.stringify(sceneModelLocations));
-
+                       
                         async.each (sceneModelLocations, function (locMdl, callbackz) { //loop tru w/ async
                             var scale = 1;
                             var offsetPos = "";
@@ -1807,12 +1701,7 @@ webxr_router.get('/:_id', function (req, res) {
 
                             let usdzFiles = '';
                             let modelParent = "";
-                            // console.log("useCubeMap? " + sceneResponse.sceneUseDynCubeMap);
-                            // if (locMdl.eventData != null && locMdl.eventData != undefined && locMdl.eventData.length > 1) {
-                            //     if (locMdl.eventData.includes("noweb")) {
-                            //         callbackz();
-                            //     }
-                            // } else {
+                           
                             if (sceneResponse.sceneUseDynCubeMap) {
                                 skyboxEnvMap = "skybox-env-map shadow=\x22cast:true; receive:true\x22";   
                             }
@@ -1829,17 +1718,14 @@ webxr_router.get('/:_id', function (req, res) {
                                     callbackz(err);
                                 } else {
                                 if (asset.item_type == "glb") {
-                                    
-                                    // console.log("founda matching model: " + JSON.stringify(asset));
-                                    // if (asset.item_type == "glb") {
+
                                     assetUserID = asset.userID;
                                     // var sourcePath =   "servicemedia/users/" + assetUserID + "/gltf/" + locMdl.gltf; //this should be "model" or "filename"
                                     let modelURL = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + assetUserID + "/gltf/" + asset.filename, Expires: 6000});
                                     // console.log("modelURL " + modelURL + " modelType " + asset.item_type);
                                     assetNumber++;
                                     let newAttribution = {};
-                                    // if (asset.sourceTitle != undefined && asset.sourceTitle != "none" && asset.sourceTitle != "undefined" && asset.authorName != undefined && asset.authorName.length > 0 && asset.authorName != "none") {
-                                        // attributions = attributions + "<a href=\x22"+asset.sourceLink+"\x22>'"+asset.sourceTitle+"'</a> by <a href=\x22"+asset.authorLink+"\x22>"+asset.authorName+"</a> under license <a href=\x22https://creativecommons.org/licenses/\x22>"+asset.license+"</a> with mods " + asset.modifications;
+                                    
                                         newAttribution.name = asset.name;
                                         newAttribution._id = asset._id;
                                         newAttribution.contentType = asset.item_type;
@@ -2177,9 +2063,7 @@ webxr_router.get('/:_id', function (req, res) {
                                                             }
                                                         }
                                                     }
-                                                    // if .setAttribute("material", {"color": "white", "blending": "additive", "transparent": false, "alphaTest": .5});
 
-                                                    // console.log("instancing is " + instancing);
                                                     gltfsEntities = gltfsEntities + "<a-entity id=\x22"+id+"\x22 "+instancing+" class=\x22"+entityType+
                                                     " activeObjexGrab activeObjexRay\x22 shadow=\x22cast:true; receive:true\x22 "+skyboxEnvMap+
                                                     " position=\x220 -20 0\x22></a-entity>"+//scatter model below
@@ -2188,10 +2072,7 @@ webxr_router.get('/:_id', function (req, res) {
                                                     " position=\x220 -10 0\x22></a-entity>"; 
 
                                                     gltfModel = modelURL;
-                                                    // gltfsEntities = gltfsEntities + "<a-entity instanced_meshes_mod=\x22_id: "+locMdl._id+"\x22 class=\x22gltf "+entityType+
-                                                    // " activeObjexGrab activeObjexRay\x22 shadow=\x22cast:true; receive:true\x22 "+skyboxEnvMap+" gltf-model=\x22#" + m_assetID + "\x22 "+objAnim+
-                                                    // " position=\x220 -20 0\x22</a-entity>"; 
-                                                    // gltfModel = modelURL;
+                                                   
                                                 }
                                             }
                                         }
