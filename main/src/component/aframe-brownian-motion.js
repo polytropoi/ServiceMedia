@@ -172,19 +172,21 @@
 				this.useMatrix = true;
 			}
 			
-			window.addEventListener('click', (e) => {
+			window.addEventListener('click', (e) => { ///should bind to higher level listener...
 				e.preventDefault();
-				console.log("hit instancew " + this.instanceId + " use matrix " + this.useMatrix );
-			  //   that.instance_clicked(e);
-			  if (this.useMatrix) {
-				let matrixMeshEl = document.getElementById("matrix_meshes");
-				if (matrixMeshEl != null) {
-					this.matrixMeshComponent = matrixMeshEl.components.matrix_meshes;
-					if (this.matrixMeshComponent != null && this.intersection != null) {
-					this.matrixMeshComponent.selectRoomData(this.instanceId);
+				if (this.instanceId) {
+					console.log("hit instancew " + this.instanceId + " use matrix " + this.useMatrix );
+					//   that.instance_clicked(e);
+					if (this.useMatrix) {
+						let matrixMeshEl = document.getElementById("matrix_meshes");
+						if (matrixMeshEl != null) {
+							this.matrixMeshComponent = matrixMeshEl.components.matrix_meshes;
+							if (this.matrixMeshComponent != null && this.intersection != null) {
+							this.matrixMeshComponent.selectRoomData(this.instanceId);
+							}
+						}
 					}
 				}
-			  }
 			  }); 
 		},
 		update() {

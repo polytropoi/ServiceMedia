@@ -595,6 +595,7 @@
         "Equip",
         "Trigger",
         "Throw",
+        "Shoot",
         "Read",
         "Listen/Watch",
         "Create",

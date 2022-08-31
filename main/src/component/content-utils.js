@@ -2048,7 +2048,8 @@ AFRAME.registerComponent('mod_objex', {
             //  console.log ("JSONOBJECTDATA" + this.data.jsonObjectData[k].eventData);
               if (this.data.jsonLocationsData[i].eventData != undefined && this.data.jsonLocationsData[i].eventData.toLowerCase().includes("equip")) {
                 
-                EquipDefaultItem(this.data.jsonLocationsData[i].objectID);
+                // EquipDefaultItem(this.data.jsonLocationsData[i].objectID); //in dialogs.js
+                EquipDefaultItem(this.data.jsonLocationsData[i].objectID); //in dialogs.js
                 
                 // console.log("tryna equip with location/object match " + this.data.jsonLocationsData[i].objectID + " modelID " + this.data.jsonObjectData[k].modelID);
                 // let objEl = document.createElement("a-entity");
@@ -2176,8 +2177,9 @@ AFRAME.registerComponent('mod_objex', {
       }
     },
     equipInventoryObject: function (objectID) {
-      console.log("tryna equip model " + objectID + " equipped " + this.data.equipped );  
+      // console.log("tryna equip model " + objectID + " equipped " + this.data.equipped );  
       this.objectData = this.returnObjectData(objectID);
+      console.log("tryna equip model " + JSON.stringify(this.objectData) + " equipped " + this.data.isEquipped );  
       this.dropPos = new THREE.Vector3();
       this.objEl = document.createElement("a-entity");
       this.equipHolder = document.getElementById("equipPlaceholder");
@@ -2189,8 +2191,12 @@ AFRAME.registerComponent('mod_objex', {
       this.locData.x = 0;
       this.locData.y = 0;
       this.locData.z = 0;
+      this.locData.markerObjScale = this.objectData.objScale;
+      this.locData.eulerx = this.objectData.eulerx;
+      this.locData.eulery = this.objectData.eulery;
+      this.locData.eulerz = this.objectData.eulerz;
       this.locData.timestamp = Date.now();
-      this.objEl.setAttribute("mod_object", {'locationData': this.locData, 'objectData': this.objectData, 'equipped': true});
+      this.objEl.setAttribute("mod_object", {'locationData': this.locData, 'objectData': this.objectData, 'isEquipped': true});
       this.objEl.id = "obj" + this.objectData._id + "_" + this.locData.timestamp;
       this.objEl.classList.add('equipped');
       this.equipHolder.appendChild(this.objEl);
@@ -2231,6 +2237,23 @@ AFRAME.registerComponent('mod_objex', {
       // this.objEl.components.mod_object.applyForce();
 
       // this.el.setAttribute('gltf-model', '#' + modelID.toString());
+    },
+    shootObject: function (objectID) {
+      let downtime = 6000;
+      console.log("tryna set model to " + objectID);  
+      this.objectData = this.returnObjectData(objectID);
+      this.dropPos = new THREE.Vector3();
+      this.objEl = document.createElement("a-entity");
+      this.equipHolder = document.getElementById("equipPlaceholder");
+      this.equipHolder.object3D.getWorldPosition( this.dropPos );
+      this.locData = {};
+      this.locData.x = this.dropPos.x;
+      this.locData.y = this.dropPos.y;
+      this.locData.z = this.dropPos.z;
+      this.locData.timestamp = Date.now();
+      this.objEl.setAttribute("mod_object", {'locationData': this.locData, 'objectData': this.objectData, 'applyForceToNewObject': true, 'forceFactor': downtime, 'removeAfter': "5"});
+      this.objEl.id = "obj" + this.objectData._id + "_" + this.locData.timestamp;
+      sceneEl.appendChild(this.objEl);
     },
     throwObject: function (objectID, downtime) {
       console.log("tryna set model to " + objectID);  
@@ -2288,7 +2311,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
   schema: {
     locationData: {default: ''},
     objectData: {default: ''},
-    equipped: {default: false},
+    isEquipped: {default: false},
     fromSceneInventory: {default: false},
     timestamp: {default: null},
     applyForceToNewObject: {default: false},
@@ -2320,6 +2343,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
     this.dropAction = null;
     this.equipAction = null;
     this.throwAction = null;
+    this.shootAction = null;
     this.selectAction = null;
     this.loadAction = null;
     this.highlightAction = null;
@@ -2387,6 +2411,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
 
     this.hasPickupAction = false;
     this.hasThrowAction = false;
+    this.hasShootAction = false;
 
     if (this.data.objectData.callouttext != undefined && this.data.objectData.callouttext != null && this.data.objectData.callouttext.length > 0) {
       if (this.data.objectData.callouttext.includes('~')) {
@@ -2462,6 +2487,10 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
           this.hasThrowAction = true;
           this.throwAction = this.data.objectData.actions[a];
         }
+        if (this.data.objectData.actions[a].actionType.toLowerCase() == "shoot") {
+          this.hasShootAction = true;
+          this.shootAction = this.data.objectData.actions[a];
+        }
         if (this.data.objectData.actions[a].actionType.toLowerCase() == "equip") {
           this.hasEquipAction = true;
         }
@@ -2475,6 +2504,15 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
     }
     if (this.data.removeAfter != "") { //cleanup if timeout set
       setTimeout( () => { 
+        // this.el.visible = false;
+        // let trailComponent = this.el.components.trail;
+        // if (trailComponent) {
+          this.el.setAttribute("trail", "length", 0); //turn off, dammit
+          // this.el.object3D.remove();
+          // this.el.removeAttribute("trail");
+          // trailComponent.reset();
+        // }
+        // this.el.removeAttribute("trail");
         this.el.parentNode.removeChild(this.el);
       }, 5000);
     }
@@ -2482,24 +2520,24 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
     let that = this;
     this.el.classList.add("activeObjexRay");
     this.el.addEventListener('model-loaded', () => {
-      // console.log("OBJMODEL LOAADIDE!!!" + that.data.locationData.markerObjScale);
+      console.log("OBJMODEL LOAADIDE!!!" + this.data.objectData.name);
       let pos = {};
-      pos.x = that.data.locationData.x;
-      pos.y = that.data.locationData.y;          
-      pos.z = that.data.locationData.z;
+      pos.x = this.data.locationData.x;
+      pos.y = this.data.locationData.y;          
+      pos.z = this.data.locationData.z;
       let rot = {};
-      rot.x = that.data.locationData.eulerx != undefined ? that.data.locationData.eulerx : 0;
-      rot.y = that.data.locationData.eulery != undefined ? that.data.locationData.eulery : 0;
-      rot.z = that.data.locationData.eulerz != undefined ? that.data.locationData.eulerz : 0;
+      rot.x = this.data.locationData.eulerx != undefined ? this.data.locationData.eulerx : 0;
+      rot.y = this.data.locationData.eulery != undefined ? this.data.locationData.eulery : 0;
+      rot.z = this.data.locationData.eulerz != undefined ? this.data.locationData.eulerz : 0;
       let scale = {x: 1, y: 1, z: 1};
-      if (that.data.locationData.markerObjScale != undefined) {
-      scale.x = that.data.locationData.markerObjScale != undefined ? that.data.locationData.markerObjScale : 1;
-      scale.y = that.data.locationData.markerObjScale != undefined ? that.data.locationData.markerObjScale : 1;
-      scale.z = that.data.locationData.markerObjScale != undefined ? that.data.locationData.markerObjScale : 1;
+      if (this.data.locationData.markerObjScale != undefined) {
+      scale.x = this.data.locationData.markerObjScale != undefined ? this.data.locationData.markerObjScale : 1;
+      scale.y = this.data.locationData.markerObjScale != undefined ? this.data.locationData.markerObjScale : 1;
+      scale.z = this.data.locationData.markerObjScale != undefined ? this.data.locationData.markerObjScale : 1;
       }
 
  
-      if (!this.data.equipped) {
+      if (!this.data.isEquipped) {
         console.log("setting object pos/rot to " + JSON.stringify(rot));
         if (this.modelParent != null) {
           this.modelParent.setAttribute("position", pos);
@@ -2510,19 +2548,23 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
         }
       
       } else {
-        
+        // this.el.setAttribute("rotation", rot);
         this.el.setAttribute('material', {opacity: 0.25, transparent: true});
       }
-      that.el.setAttribute("scale", scale);
+      this.el.setAttribute("scale", scale);
+      this.el.setAttribute("rotation", rot);
+      this.el.setAttribute("position", pos);
 
      
       if (that.data.objectData.physics != undefined && that.data.objectData.physics != null && that.data.objectData.physics.toLowerCase() != "none") {
         //  setTimeout(function(){  
-          if (this.data.equipped) {
+          
+          if (this.data.isEquipped) {
             that.el.setAttribute('ammo-body', {type: 'kinematic', linearDamping: .1, angularDamping: .1});
 
           } else {
             that.el.setAttribute('ammo-body', {type: that.data.objectData.physics.toLowerCase(), emitCollisionEvents: true, linearDamping: .1, angularDamping: .1});
+            that.el.setAttribute('trail', {init: true});
           }
           
         // if (that.data.objectData.physics.toLowerCase() == "static") {
@@ -2552,11 +2594,11 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
     });
 
     this.el.addEventListener('body-loaded', () => {  //body-loaded event = physics ready on obj
-      that.el.setAttribute('ammo-shape', {type: that.data.objectData.collidertype.toLowerCase()});
+      this.el.setAttribute('ammo-shape', {type: that.data.objectData.collidertype.toLowerCase()});
       // console.log("ammo shape is " + JSON.stringify(that.el.getAttribute('ammo-shape')));
-      if (that.data.applyForceToNewObject) {
+      if (this.data.applyForceToNewObject) {
 
-        that.applyForce();
+        this.applyForce();
       }
       
     });
@@ -2596,7 +2638,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
 
     this.el.addEventListener('mouseenter', (evt) => {
       evt.preventDefault();
-      if (!this.data.equipped) {
+      if (!this.data.isEquipped) {
         if (posRotReader != null) {
           this.playerPosRot = posRotReader.returnPosRot(); 
           window.playerPosition = this.playerPosRot.pos; 
@@ -2658,51 +2700,20 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
     this.el.addEventListener('mouseleave', (e) => { 
       e.preventDefault();
       // console.log("tryna mouseexit");
-      if (!this.data.equipped) {
+      if (!this.data.isEquipped) {
         if (this.calloutEntity != null) {
           this.calloutEntity.setAttribute('visible', false);
         }
       }
     });
    
-   
-      // if (AFRAME.utils.device.isMobile()) {
-      //   this.el.addEventListener('touchstart', (e) => {
-      //     e.preventDefault();
-      //     console.log("touchstart");
-      //     if (this.data.equipped) {
-      //       this.mouseDownStarttime = (Date.now() / 1000);
-      //       this.el.setAttribute('visible', false);
-      //     }
-      //   });
-      //   this.el.addEventListener('touchend', (e) => {
-      //     e.preventDefault();
-      //     console.log("touchend");
-      //     this.mouseDowntime = (Date.now() / 1000) - this.mouseDownStarttime;
-      //     this.el.setAttribute('visible', true);
-      //   });
-      // } else {   
-      //   this.el.addEventListener('mousedown', (e) => {
-      //     e.preventDefault();
-      //     console.log("mousestart");
-      //     if (this.data.equipped) {
-      //       this.mouseDownStarttime = (Date.now() / 1000);
-      //       this.el.setAttribute('visible', false);
-      //     }
-      //   });
-      //   this.el.addEventListener('mouseup', (e) => {
-      //     e.preventDefault();
-      //     console.log("moouseend");
-      //     this.mouseDowntime = (Date.now() / 1000) - this.mouseDownStarttime;
-      //     this.el.setAttribute('visible', true);
-      //   });
-      // }
+
 
     this.el.addEventListener('click', (e) => { 
       e.preventDefault();
       // let downtime = (Date.now() / 1000) - this.mouseDownStarttime;
-      // console.log("mousedown time "+ this.mouseDowntime + "  on object type: " + this.data.objectData.objtype + " actions " + JSON.stringify(this.data.objectData.actions) + " equipped " + this.data.equipped);
-      if (!this.data.equipped) {
+      console.log("mousedown time "+ this.mouseDowntime + "  on object type: " + this.data.objectData.objtype + " actions " + JSON.stringify(this.data.objectData.actions) + " equipped " + this.data.isEquipped);
+      if (!this.data.isEquipped) {
         this.dialogEl = document.getElementById('mod_dialog');
         
         if (this.data.objectData.objtype.toLowerCase() == "pickup" || this.hasPickupAction) {
@@ -2754,6 +2765,22 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
             }
             this.objexEl.components.mod_objex.throwObject(this.data.objectData._id, this.mouseDowntime, "5");
           }
+        }
+        if (this.hasShootAction) {
+          // console.log("shoot action " + JSON.stringify(this.shootAction));
+          // if (this.shootAction.sourceObjectMod.toLowerCase() == "persist") { //transfer to scene inventory
+          //   this.el.object3D.visible = false;
+          //   DropInventoryItem(this.data.objectData._id); //just drop for now...throw/shoot/swing next!
+          //   setTimeout(() => {
+          //     this.el.object3D.visible = true;
+          //   }, 3000);
+          // } else if (this.throwAction.sourceObjectMod.toLowerCase() == "remove") {
+          //   if (this.mouseDowntime <= 0) {
+          //     this.mouseDowntime = 1;
+          //   }
+          //   this.objexEl.components.mod_objex.shootObject(this.data.objectData._id, this.mouseDowntime, "5");
+          // }
+          this.objexEl.components.mod_objex.shootObject(this.data.objectData._id);
         } 
         if (this.selectAction) {
           console.log("select action " + JSON.stringify(this.selectAction));
@@ -2794,7 +2821,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
       // distance = window.playerPosition.distanceTo(hitpoint);
       console.log("new hit " + hitID + " distance: " + distance + " " + JSON.stringify(hitpoint));
       // var triggerAudioController = document.getElementById("triggerAudio");
-      if (this.triggerAudioController != null) {
+      if (this.triggerAudioController != null && !this.isEquipped) {
         this.triggerAudioController.components.trigger_audio_control.playAudioAtPosition(hitpoint, distance);
       }
       // let synthCtrl = this.el.components.mod_synth;
@@ -2858,6 +2885,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
     //   Ammo.destroy(this.el.body);
       this.el.removeAttribute('ammo-shape');
     }
+    this.el.removeAttribute('trail');
   },
   replaceModel: function (modelID) {
     console.log("tryna set model to " + modelID);
@@ -2909,15 +2937,30 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
     if (this.pushForward && this.camera != null) {
       
       // this.lookVector.applyQuaternion(this.camera.quaternion);
-      if (mouseDowntime != 0) {
-        this.data.forceFactor = mouseDowntime;
+      if (this.hasThrowAction) {
+        if (mouseDowntime != 0) {
+          this.data.forceFactor = mouseDowntime;
+        } else {
+          this.data.forceFactor = 2;
+        }
+        this.camera.getWorldDirection( this.lookVector );
+        console.log("tryna pushForward@! " + this.data.forceFactor);
+        // const velocity = new Ammo.btVector3(2, 1, 0);
+        const velocity = new Ammo.btVector3(this.lookVector.x * 10 * this.data.forceFactor, (this.lookVector.y + .5) * 10 * this.data.forceFactor, this.lookVector.z * 10 * this.data.forceFactor);
+        this.el.body.setLinearVelocity(velocity);
+        Ammo.destroy(velocity);
+      } else if (this.hasShootAction) {
+        this.data.forceFactor = 5; 
+        // this.equipHolder = document.getElementById("equipPlaceholder");
+        // this.equipHolder.object3D.getWorldPosition( this.dropPos );
+        document.getElementById("equipPlaceholder").object3D.getWorldDirection( this.lookVector );
+        console.log("tryna pushForward@! " + this.data.forceFactor);
+        // const velocity = new Ammo.btVector3(2, 1, 0);
+        const velocity = new Ammo.btVector3(this.lookVector.x * -10 * this.data.forceFactor, this.lookVector.y * -10 * this.data.forceFactor, this.lookVector.z * -10 * this.data.forceFactor);
+        this.el.body.setLinearVelocity(velocity);
+        Ammo.destroy(velocity);
       }
-      this.camera.getWorldDirection( this.lookVector );
-      console.log("tryna pushForward@! " + this.data.forceFactor);
-      // const velocity = new Ammo.btVector3(2, 1, 0);
-      const velocity = new Ammo.btVector3(this.lookVector.x * 10 * this.data.forceFactor, (this.lookVector.y + .5) * 10 * this.data.forceFactor, this.lookVector.z * 10 * this.data.forceFactor);
-      this.el.body.setLinearVelocity(velocity);
-      Ammo.destroy(velocity);
+     
     }
   }
  
@@ -2929,40 +2972,6 @@ function getRandomIntInclusive(min, max) {
   return Math.floor(Math.random() * (max - min + 1) + min); //The maximum is inclusive and the minimum is inclusive
 }
 
-
-
-
-// if (AFRAME.utils.device.isMobile()) {
-//   this.el.addEventListener('touchstart', (e) => {
-//     e.preventDefault();
-//     console.log("touchstart");
-//     if (this.data.equipped) {
-//       this.mouseDownStarttime = (Date.now() / 1000);
-//       this.el.setAttribute('visible', false);
-//     }
-//   });
-//   this.el.addEventListener('touchend', (e) => {
-//     e.preventDefault();
-//     console.log("touchend");
-//     this.mouseDowntime = (Date.now() / 1000) - this.mouseDownStarttime;
-//     this.el.setAttribute('visible', true);
-//   });
-// } else {   
-//   this.el.addEventListener('mousedown', (e) => {
-//     e.preventDefault();
-//     console.log("mousestart");
-//     if (this.data.equipped) {
-//       this.mouseDownStarttime = (Date.now() / 1000);
-//       this.el.setAttribute('visible', false);
-//     }
-//   });
-//   this.el.addEventListener('mouseup', (e) => {
-//     e.preventDefault();
-//     console.log("moouseend");
-//     this.mouseDowntime = (Date.now() / 1000) - this.mouseDownStarttime;
-//     this.el.setAttribute('visible', true);
-//   });
-// }
 
 
 
