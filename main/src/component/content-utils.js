@@ -2039,6 +2039,23 @@ AFRAME.registerComponent('mod_objex', {
       // console.log("objxe datas" + JSON.stringify(this.data.jsonObjectData));
       // console.log("objxe location datas" + JSON.stringify(this.data.jsonLocationsData));
       console.log(this.data.jsonLocationsData.length + " locations for " + this.data.jsonObjectData.length);
+
+
+    this.camera = null;
+    let cameraEl = document.querySelector('a-entity[camera]');
+    if (!cameraEl) {
+        cameraEl = document.querySelector('a-camera');
+    }
+    if (!cameraEl) {
+      camaraEl = document.getElementById('player');
+    } 
+    if (cameraEl) {
+      let theCamComponent = cameraEl.components.camera;
+      if (theCamComponent != null) {
+        this.camera = theCamComponent.camera;
+      }
+    }
+
       for (let i = 0; i < this.data.jsonLocationsData.length; i++) {
         for (let k = 0; k < this.data.jsonObjectData.length; k++) {
           if (this.data.jsonLocationsData[i].objectID != undefined && this.data.jsonLocationsData[i].objectID != null && this.data.jsonLocationsData[i].objectID == this.data.jsonObjectData[k]._id) {
@@ -2199,7 +2216,7 @@ AFRAME.registerComponent('mod_objex', {
       this.objEl.setAttribute("mod_object", {'locationData': this.locData, 'objectData': this.objectData, 'isEquipped': true});
       this.objEl.id = "obj" + this.objectData._id + "_" + this.locData.timestamp;
       this.objEl.classList.add('equipped');
-      this.equipHolder.appendChild(this.objEl);
+      this.equipHolder.appendChild(this.objEl); //parent to equip holder instead of scene as below
       // this.el.setAttribute('gltf-model', '#' + modelID.toString());
     },
     selectObject: function (objectID) { //hrm...
@@ -2243,17 +2260,61 @@ AFRAME.registerComponent('mod_objex', {
       console.log("tryna set model to " + objectID);  
       this.objectData = this.returnObjectData(objectID);
       this.dropPos = new THREE.Vector3();
+      this.dropRot = new THREE.Quaternion();
+
       this.objEl = document.createElement("a-entity");
+      // this.equipHolder = document.getElementById("equipPlaceholder");
+      
+      // this.equippedObject = this.equipHolder.querySelector('.equipped');
+      // if (this.equipHolder != null) {
+      //   this.equipHolder.object3D.getWorldPosition(this.dropPos);
+      //   this.equipHolder.object3D.getWorldQuaternion(this.dropRot);
+      //   console.log("ttryna match world rotations with " + JSON.stringify(this.dropRot));
+      // }
       this.equipHolder = document.getElementById("equipPlaceholder");
-      this.equipHolder.object3D.getWorldPosition( this.dropPos );
+      this.equippedObject = this.equipHolder.querySelector('.equipped');
+      if (this.equippedObject != null) {
+        this.equippedObject.object3D.getWorldPosition(this.dropPos);
+        // this.equippedObject.object3D.getWorldQuaternion(this.dropRot);
+        // console.log("ttryna match world rotations with " + JSON.stringify(this.dropRot));
+      }
+
+      this.playerPosRot = posRotReader.returnPosRot(); 
+      console.log("this.playerPosRot" + JSON.stringify(this.playerPosRot));
+      // this.dropPos = this.playerPosRot.pos;
+      this.dropEuler = this.playerPosRot.rot;
+
+      // this.equipHolder.object3D.getWorldPosition( this.dropPos );
+      // this.equipHolderRotation = this.camera;
+      // this.playerPosRot = posRotReader.returnPosRot(); 
+      // this.dropEuler = new THREE.Euler().setFromQuaternion(this.dropRot);
+
       this.locData = {};
-      this.locData.x = this.dropPos.x;
-      this.locData.y = this.dropPos.y;
-      this.locData.z = this.dropPos.z;
+      // this.locData.x = this.dropPos.x;
+      // this.locData.y = this.dropPos.y;
+      // this.locData.z = this.dropPos.z;
+      // this.locData.markerObjScale = this.objectData.objScale;
+
+      this.locData.eulerx = this.playerPosRot.rot.x;
+      this.locData.eulery = this.playerPosRot.rot.y;
+      this.locData.eulerz = this.playerPosRot.rot.z;
+
+      // this.locData.eulerx = this.equipHolderRotation.x + 0;
+      // this.locData.eulery = this.equipHolderRotation.y + 0;
+      // this.locData.eulerz = this.equipHolderRotation.z + 0;
+      // this.playerPosRot = posRotReader.returnPosRot(); 
+      // // window.playerPosition = this.playerPosRot.rot; 
+      // this.locData.eulerx = 0;
+      // this.locData.eulery = 0;
+      // this.locData.eulerz = 0;
       this.locData.timestamp = Date.now();
+      this.objEl.setAttribute("position", this.dropPos);
       this.objEl.setAttribute("mod_object", {'locationData': this.locData, 'objectData': this.objectData, 'applyForceToNewObject': true, 'forceFactor': downtime, 'removeAfter': "5"});
       this.objEl.id = "obj" + this.objectData._id + "_" + this.locData.timestamp;
-      sceneEl.appendChild(this.objEl);
+      sceneEl.append(this.objEl);
+
+      // this.objEl.setAttribute("mod_object", {'locationData': this.locData, 'objectData': this.objectData, 'applyForceToNewObject': true, 'forceFactor': downtime, 'removeAfter': "5"});
+      // this.objEl.id = "obj" + this.objectData._id + "_" + this.locData.timestamp;
     },
     throwObject: function (objectID, downtime) {
       console.log("tryna set model to " + objectID);  
@@ -2353,13 +2414,15 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
     this.mod_physics = "";
     this.pushForward = false;
     this.lookVector = new THREE.Vector3( 0, 0, -1 );
-    this.camera = null;
-    let cameraEl = document.querySelector('a-entity[camera]');
+
+
     this.triggerAudioController = document.getElementById("triggerAudio");
     this.isTriggered = false;
     this.driveable = false;
     this.modelParent = null;
 
+    this.camera = null;
+    let cameraEl = document.querySelector('a-entity[camera]');
     if (!cameraEl) {
         cameraEl = document.querySelector('a-camera');
     }
@@ -2507,7 +2570,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
         // this.el.visible = false;
         // let trailComponent = this.el.components.trail;
         // if (trailComponent) {
-          this.el.setAttribute("trail", "length", 0); //turn off, dammit
+          this.el.setAttribute("trail", "length", 0); //turn off, dammit!
           // this.el.object3D.remove();
           // this.el.removeAttribute("trail");
           // trailComponent.reset();
@@ -2519,8 +2582,9 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
 
     let that = this;
     this.el.classList.add("activeObjexRay");
+
     this.el.addEventListener('model-loaded', () => {
-      console.log("OBJMODEL LOAADIDE!!!" + this.data.objectData.name);
+      console.log(this.data.objectData.name + " OBJMODEL LOAADIDE!!!" + JSON.stringify(this.data.locationData));
       let pos = {};
       pos.x = this.data.locationData.x;
       pos.y = this.data.locationData.y;          
@@ -2540,31 +2604,45 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
       if (!this.data.isEquipped) {
         console.log("setting object pos/rot to " + JSON.stringify(rot));
         if (this.modelParent != null) {
+          console.log("not equipped, has modelparent ");
           this.modelParent.setAttribute("position", pos);
           this.modelParent.setAttribute("rotation", rot);
         } else {
-          that.el.setAttribute("position", pos);
-          that.el.setAttribute("rotation", rot);
+          console.log("not equipped, no modelparent " + JSON.stringify(rot));
+          // this.el.setAttribute("scale", scale);
+          // this.el.object3D.position = pos;
+          // this.el.object3D.rotation = rot;
+          if (!this.hasShootAction) {
+            this.el.setAttribute("position", pos);
+          }
+          
+          // that.el.setAttribute("rotation", rot);
+          this.el.object3D.rotation.set(
+            THREE.Math.degToRad(rot.x),
+            THREE.Math.degToRad(rot.y),
+            THREE.Math.degToRad(rot.z)
+          );
         }
       
       } else {
-        // this.el.setAttribute("rotation", rot);
+        this.el.setAttribute("rotation", rot);
+        // this.el.object3D.rotation = rot;
         this.el.setAttribute('material', {opacity: 0.25, transparent: true});
+        this.el.setAttribute("scale", scale);
       }
-      this.el.setAttribute("scale", scale);
-      this.el.setAttribute("rotation", rot);
-      this.el.setAttribute("position", pos);
 
-     
-      if (that.data.objectData.physics != undefined && that.data.objectData.physics != null && that.data.objectData.physics.toLowerCase() != "none") {
+    
+      // this.el.setAttribute("rotation", rot);
+      // this.el.setAttribute("position", pos);
+
+      if (this.data.objectData.physics != undefined && this.data.objectData.physics != null && this.data.objectData.physics.toLowerCase() != "none") {
         //  setTimeout(function(){  
-          
           if (this.data.isEquipped) {
-            that.el.setAttribute('ammo-body', {type: 'kinematic', linearDamping: .1, angularDamping: .1});
-
-          } else {
-            that.el.setAttribute('ammo-body', {type: that.data.objectData.physics.toLowerCase(), emitCollisionEvents: true, linearDamping: .1, angularDamping: .1});
-            that.el.setAttribute('trail', {init: true});
+            this.el.setAttribute('ammo-body', {type: 'kinematic', linearDamping: .1, angularDamping: .1});
+          } else { //nm, switch to dynamic when fired if needed/
+                this.el.setAttribute('ammo-body', {type: that.data.objectData.physics.toLowerCase(), emitCollisionEvents: true, linearDamping: .1, angularDamping: 1});
+                // this.el.setAttribute('rotate-toward-velocity');
+                this.el.setAttribute('trail', "");
           }
           
         // if (that.data.objectData.physics.toLowerCase() == "static") {
@@ -2597,7 +2675,6 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
       this.el.setAttribute('ammo-shape', {type: that.data.objectData.collidertype.toLowerCase()});
       // console.log("ammo shape is " + JSON.stringify(that.el.getAttribute('ammo-shape')));
       if (this.data.applyForceToNewObject) {
-
         this.applyForce();
       }
       
@@ -2692,8 +2769,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
 
           }
         }
-        
-        // this.applyForce();  //
+
       }
     });
     
@@ -2781,6 +2857,8 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
           //   this.objexEl.components.mod_objex.shootObject(this.data.objectData._id, this.mouseDowntime, "5");
           // }
           this.objexEl.components.mod_objex.shootObject(this.data.objectData._id);
+          // this.applyForce();
+          
         } 
         if (this.selectAction) {
           console.log("select action " + JSON.stringify(this.selectAction));
@@ -2915,7 +2993,23 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
     // newpos = null;
   },
   applyForce: function () {
-    
+    if (this.camera == null) {
+      let cameraEl = document.querySelector('a-entity[camera]');
+      if (!cameraEl) {
+          cameraEl = document.querySelector('a-camera');
+      }
+      if (!cameraEl) {
+        camaraEl = document.getElementById('player');
+      } 
+      if (cameraEl) {
+        let theCamComponent = cameraEl.components.camera;
+        if (theCamComponent != null) {
+          this.camera = theCamComponent.camera;
+        }
+        // this.camera = cameraEl.components.camera.camera;
+      }
+    }
+   
     // let obj = this.el
     // const force = new Ammo.btVector3(0, -3, 0);
     // let position = this.el.getAttribute('position');
@@ -2926,7 +3020,41 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
     // Ammo.destroy(force);
     // Ammo.destroy(pos);
     //where camera is looking
+    
+      if (this.hasShootAction) {
+        // this.el.setAttribute()
 
+        this.dropPos = new THREE.Vector3();
+        this.dropRot = new THREE.Quaternion();
+        this.equipHolder = document.getElementById("equipPlaceholder");
+        // this.el.setAttribute('position', this.equipHolder.getAttribute("position"));
+        this.erot = this.equipHolder.getAttribute("rotation");
+
+        // this.equippedObject = this.equipHolder.querySelector('.equipped');
+        //   if (this.equippedObject != null) {
+        //     this.equippedObject.object3D.getWorldPosition(this.dropPos);
+        //     this.equippedObject.getWorldQuaternion(this.dropRot);
+        //     this.camera.getWorldDirection( this.lookVector );
+        //     console.log("ttryna match world rotations with " + JSON.stringify(this.dropRot));
+        //   }
+
+          // this.cameraQuat = new THREE.Quaternion();
+          // this.camera.getWorldQuaternion(this.cameraQuat);
+          // this.el.object3D.lookAt(this.lookVector);
+          this.el.object3D.position = this.dropPos;
+          // this.el.object3D.rotation = this.dropRot;
+          
+          // this.el.object3D.rotation.set(
+          //   THREE.Math.degToRad(this.erot.x),
+          //   THREE.Math.degToRad(this.erot.y),
+          //   THREE.Math.degToRad(this.erot.z)
+          // );
+          // this.el.object3D.lookAt(this.lookVector);
+
+          // this.el.object3D.matrix.setRotationFromQuaternion( -this.dropRot );
+          // this.el.object3D.updateMatrix();
+      }
+      console.log("tryna apply force shoot action " + this.hasShootAction + " " + this.camera);
     this.pushForward = true;
     setTimeout(() => {
       this.pushForward = false;
@@ -2935,7 +3063,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
   tick: function () {
 
     if (this.pushForward && this.camera != null) {
-      
+      console.log("tryna apply force shoot action " + this.hasShootAction);
       // this.lookVector.applyQuaternion(this.camera.quaternion);
       if (this.hasThrowAction) {
         if (mouseDowntime != 0) {
@@ -2950,13 +3078,14 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
         this.el.body.setLinearVelocity(velocity);
         Ammo.destroy(velocity);
       } else if (this.hasShootAction) {
-        this.data.forceFactor = 5; 
+        this.data.forceFactor = 6; 
         // this.equipHolder = document.getElementById("equipPlaceholder");
         // this.equipHolder.object3D.getWorldPosition( this.dropPos );
-        document.getElementById("equipPlaceholder").object3D.getWorldDirection( this.lookVector );
+        this.camera.getWorldDirection( this.lookVector );
         console.log("tryna pushForward@! " + this.data.forceFactor);
         // const velocity = new Ammo.btVector3(2, 1, 0);
-        const velocity = new Ammo.btVector3(this.lookVector.x * -10 * this.data.forceFactor, this.lookVector.y * -10 * this.data.forceFactor, this.lookVector.z * -10 * this.data.forceFactor);
+        this.el.object3D.lookAt(this.lookVector);
+        const velocity = new Ammo.btVector3(this.lookVector.x * 10 * this.data.forceFactor, this.lookVector.y * 10 * this.data.forceFactor, this.lookVector.z * 10 * this.data.forceFactor);
         this.el.body.setLinearVelocity(velocity);
         Ammo.destroy(velocity);
       }
