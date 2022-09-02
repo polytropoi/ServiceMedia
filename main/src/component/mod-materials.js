@@ -1552,6 +1552,6 @@ AFRAME.registerComponent('trail', {
     this.system.createTrail(this.el.object3D,this.data.length,this.data.width,this.data.resolution,this.data.color,this.data.offset);
   },
   reset: function(){
-    this.system.reset(this.el.object3D);
+    this.system.resetTrail(this.el.object3D);
   }
 });

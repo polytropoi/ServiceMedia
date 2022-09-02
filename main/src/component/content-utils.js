@@ -2196,7 +2196,7 @@ AFRAME.registerComponent('mod_objex', {
     equipInventoryObject: function (objectID) {
       // console.log("tryna equip model " + objectID + " equipped " + this.data.equipped );  
       this.objectData = this.returnObjectData(objectID);
-      console.log("tryna equip model " + JSON.stringify(this.objectData) + " equipped " + this.data.isEquipped );  
+      console.log("tryna equip model " + JSON.stringify(this.objectData));  
       this.dropPos = new THREE.Vector3();
       this.objEl = document.createElement("a-entity");
       this.equipHolder = document.getElementById("equipPlaceholder");
@@ -2208,10 +2208,10 @@ AFRAME.registerComponent('mod_objex', {
       this.locData.x = 0;
       this.locData.y = 0;
       this.locData.z = 0;
-      this.locData.markerObjScale = this.objectData.objScale;
-      this.locData.eulerx = this.objectData.eulerx;
-      this.locData.eulery = this.objectData.eulery;
-      this.locData.eulerz = this.objectData.eulerz;
+      this.locData.markerObjScale = (this.objectData.objScale != undefined && this.objectData.objScale != "") ? this.objectData.objScale : 1; //these come from objectData, not locData
+      this.locData.eulerx = (this.objectData.eulerx != undefined && this.objectData.eulerx != "") ? this.objectData.eulerx : 0;
+      this.locData.eulery = (this.objectData.eulery != undefined && this.objectData.eulery != "") ? this.objectData.eulery : 0;
+      this.locData.eulerz = (this.objectData.eulerz != undefined && this.objectData.eulerz != "") ? this.objectData.eulerz : 0;
       this.locData.timestamp = Date.now();
       this.objEl.setAttribute("mod_object", {'locationData': this.locData, 'objectData': this.objectData, 'isEquipped': true});
       this.objEl.id = "obj" + this.objectData._id + "_" + this.locData.timestamp;
@@ -2257,7 +2257,7 @@ AFRAME.registerComponent('mod_objex', {
     },
     shootObject: function (objectID) {
       let downtime = 6000;
-      console.log("tryna set model to " + objectID);  
+      // console.log("tryna set model to " + objectID);  
       this.objectData = this.returnObjectData(objectID);
       this.dropPos = new THREE.Vector3();
       this.dropRot = new THREE.Quaternion();
@@ -2275,46 +2275,32 @@ AFRAME.registerComponent('mod_objex', {
       this.equippedObject = this.equipHolder.querySelector('.equipped');
       if (this.equippedObject != null) {
         this.equippedObject.object3D.getWorldPosition(this.dropPos);
-        // this.equippedObject.object3D.getWorldQuaternion(this.dropRot);
+        // this.equippedObject.object3D.getWorldQuaternion(this.dropRot); //dunno why not..
         // console.log("ttryna match world rotations with " + JSON.stringify(this.dropRot));
       }
+      if (!posRotReader) {
+        player = document.getElementById("player");
+        posRotReader = document.getElementById("player").components.get_pos_rot; 
+      } 
+      if (posRotReader) {
+        this.playerPosRot = posRotReader.returnPosRot(); 
+        console.log("this.playerPosRot" + JSON.stringify(this.playerPosRot));
+        // this.dropPos = this.playerPosRot.pos;
+        this.dropEuler = this.playerPosRot.rot;
 
-      this.playerPosRot = posRotReader.returnPosRot(); 
-      console.log("this.playerPosRot" + JSON.stringify(this.playerPosRot));
-      // this.dropPos = this.playerPosRot.pos;
-      this.dropEuler = this.playerPosRot.rot;
+        // this.dropEuler = new THREE.Euler().setFromQuaternion(this.dropRot);
+        this.locData = {};
+        this.locData.eulerx = this.playerPosRot.rot.x;
+        this.locData.eulery = this.playerPosRot.rot.y;
+        this.locData.eulerz = this.playerPosRot.rot.z;
 
-      // this.equipHolder.object3D.getWorldPosition( this.dropPos );
-      // this.equipHolderRotation = this.camera;
-      // this.playerPosRot = posRotReader.returnPosRot(); 
-      // this.dropEuler = new THREE.Euler().setFromQuaternion(this.dropRot);
+        this.locData.timestamp = Date.now();
+        this.objEl.setAttribute("position", this.dropPos);
+        this.objEl.setAttribute("mod_object", {'locationData': this.locData, 'objectData': this.objectData, 'applyForceToNewObject': true, 'forceFactor': downtime, 'removeAfter': "5"});
+        this.objEl.id = "obj" + this.objectData._id + "_" + this.locData.timestamp;
+        sceneEl.append(this.objEl);
+      }
 
-      this.locData = {};
-      // this.locData.x = this.dropPos.x;
-      // this.locData.y = this.dropPos.y;
-      // this.locData.z = this.dropPos.z;
-      // this.locData.markerObjScale = this.objectData.objScale;
-
-      this.locData.eulerx = this.playerPosRot.rot.x;
-      this.locData.eulery = this.playerPosRot.rot.y;
-      this.locData.eulerz = this.playerPosRot.rot.z;
-
-      // this.locData.eulerx = this.equipHolderRotation.x + 0;
-      // this.locData.eulery = this.equipHolderRotation.y + 0;
-      // this.locData.eulerz = this.equipHolderRotation.z + 0;
-      // this.playerPosRot = posRotReader.returnPosRot(); 
-      // // window.playerPosition = this.playerPosRot.rot; 
-      // this.locData.eulerx = 0;
-      // this.locData.eulery = 0;
-      // this.locData.eulerz = 0;
-      this.locData.timestamp = Date.now();
-      this.objEl.setAttribute("position", this.dropPos);
-      this.objEl.setAttribute("mod_object", {'locationData': this.locData, 'objectData': this.objectData, 'applyForceToNewObject': true, 'forceFactor': downtime, 'removeAfter': "5"});
-      this.objEl.id = "obj" + this.objectData._id + "_" + this.locData.timestamp;
-      sceneEl.append(this.objEl);
-
-      // this.objEl.setAttribute("mod_object", {'locationData': this.locData, 'objectData': this.objectData, 'applyForceToNewObject': true, 'forceFactor': downtime, 'removeAfter': "5"});
-      // this.objEl.id = "obj" + this.objectData._id + "_" + this.locData.timestamp;
     },
     throwObject: function (objectID, downtime) {
       console.log("tryna set model to " + objectID);  
@@ -2568,14 +2554,15 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
     if (this.data.removeAfter != "") { //cleanup if timeout set
       setTimeout( () => { 
         // this.el.visible = false;
-        // let trailComponent = this.el.components.trail;
-        // if (trailComponent) {
-          this.el.setAttribute("trail", "length", 0); //turn off, dammit!
+        let trailComponent = this.el.components.trail;
+        if (trailComponent) {
+          // this.el.setAttribute("trail", "length", 0); //turn off, dammit!
           // this.el.object3D.remove();
           // this.el.removeAttribute("trail");
-          // trailComponent.reset();
-        // }
-        // this.el.removeAttribute("trail");
+          trailComponent.reset();
+        }
+        // this.sceneEl.remove(this.el.object3D); 
+        // this.el.removeAttribute("trail"); //WHY WON'T YOU DIE
         this.el.parentNode.removeChild(this.el);
       }, 5000);
     }
@@ -2594,7 +2581,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
       rot.y = this.data.locationData.eulery != undefined ? this.data.locationData.eulery : 0;
       rot.z = this.data.locationData.eulerz != undefined ? this.data.locationData.eulerz : 0;
       let scale = {x: 1, y: 1, z: 1};
-      if (this.data.locationData.markerObjScale != undefined) {
+      if (this.data.locationData.markerObjScale != undefined && this.data.locationData.markerObjScale != null && this.data.locationData.markerObjScale != "") {
       scale.x = this.data.locationData.markerObjScale != undefined ? this.data.locationData.markerObjScale : 1;
       scale.y = this.data.locationData.markerObjScale != undefined ? this.data.locationData.markerObjScale : 1;
       scale.z = this.data.locationData.markerObjScale != undefined ? this.data.locationData.markerObjScale : 1;
@@ -2608,10 +2595,10 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
           this.modelParent.setAttribute("position", pos);
           this.modelParent.setAttribute("rotation", rot);
         } else {
-          console.log("not equipped, no modelparent " + JSON.stringify(rot));
-          // this.el.setAttribute("scale", scale);
-          // this.el.object3D.position = pos;
-          // this.el.object3D.rotation = rot;
+            console.log("not equipped, no modelparent " + JSON.stringify(rot));
+            // this.el.setAttribute("scale", scale);
+            // this.el.object3D.position = pos;
+            // this.el.object3D.rotation = rot;
           if (!this.hasShootAction) {
             this.el.setAttribute("position", pos);
           }
@@ -2628,7 +2615,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
         this.el.setAttribute("rotation", rot);
         // this.el.object3D.rotation = rot;
         this.el.setAttribute('material', {opacity: 0.25, transparent: true});
-        this.el.setAttribute("scale", scale);
+        // this.el.setAttribute("scale", scale);
       }
 
     
@@ -2641,11 +2628,12 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
             this.el.setAttribute('ammo-body', {type: 'kinematic', linearDamping: .1, angularDamping: .1});
           } else { //nm, switch to dynamic when fired if needed/
             if (this.hasShootAction) {
-              this.el.setAttribute('ammo-body', {type: that.data.objectData.physics.toLowerCase(), gravity: '0 -.1 0', angularFactor: '1 0 1', emitCollisionEvents: true, linearDamping: .1, angularDamping: 1});
+              this.el.setAttribute('ammo-body', {type: this.data.objectData.physics.toLowerCase(), gravity: '0 -.1 0', angularFactor: '1 0 1', emitCollisionEvents: true, linearDamping: .1, angularDamping: 1});
               this.el.setAttribute('trail', "");
-            } else {
-                this.el.setAttribute('ammo-body', {type: that.data.objectData.physics.toLowerCase(), emitCollisionEvents: true, linearDamping: .1, angularDamping: 1});
+            } else if (this.hasThrowAction) {
+                this.el.setAttribute('ammo-body', {type: this.data.objectData.physics.toLowerCase(), emitCollisionEvents: true, linearDamping: .1, angularDamping: 1});
                 // this.el.setAttribute('rotate-toward-velocity');
+                // this.el.setAttribute('trail', "");
                 this.el.setAttribute('trail', "");
             }
           }
@@ -2861,6 +2849,12 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
           //   }
           //   this.objexEl.components.mod_objex.shootObject(this.data.objectData._id, this.mouseDowntime, "5");
           // }
+          this.el.object3D.visible = false;
+          this.el.classList.remove("activeObjexRay");
+          setTimeout(() => {
+            this.el.object3D.visible = true;
+            this.el.classList.add("activeObjexRay");
+          }, 3000);
           this.objexEl.components.mod_objex.shootObject(this.data.objectData._id);
           // this.applyForce();
           
@@ -2968,7 +2962,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
     //   Ammo.destroy(this.el.body);
       this.el.removeAttribute('ammo-shape');
     }
-    this.el.removeAttribute('trail');
+    // this.el.removeAttribute('trail');
   },
   replaceModel: function (modelID) {
     console.log("tryna set model to " + modelID);
@@ -3013,51 +3007,39 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
         }
         // this.camera = cameraEl.components.camera.camera;
       }
-    }
-   
-    // let obj = this.el
-    // const force = new Ammo.btVector3(0, -3, 0);
-    // let position = this.el.getAttribute('position');
-    // console.log("tryna apply force at position " + JSON.stringify(position));
-    // // const pos = new Ammo.btVector3(this.el.object3D.position.x, this.el.object3D.position.y, this.el.object3D.position.z);
-    // const pos = new Ammo.btVector3(position.x - 1, position.y, position.z);
-    // this.el.body.applyForce(force, pos);
-    // Ammo.destroy(force);
-    // Ammo.destroy(pos);
-    //where camera is looking
-    
+    }  
       if (this.hasShootAction) {
-        // this.el.setAttribute()
+        // // this.el.setAttribute()
 
-        this.dropPos = new THREE.Vector3();
-        this.dropRot = new THREE.Quaternion();
-        this.equipHolder = document.getElementById("equipPlaceholder");
-        // this.el.setAttribute('position', this.equipHolder.getAttribute("position"));
-        this.erot = this.equipHolder.getAttribute("rotation");
+        // this.dropPos = new THREE.Vector3();
+        // this.dropRot = new THREE.Quaternion();
+        // this.equipHolder = document.getElementById("equipPlaceholder");
+        // // this.el.setAttribute('position', this.equipHolder.getAttribute("position"));
+        // this.erot = this.equipHolder.getAttribute("rotation");
 
-        // this.equippedObject = this.equipHolder.querySelector('.equipped');
-        //   if (this.equippedObject != null) {
-        //     this.equippedObject.object3D.getWorldPosition(this.dropPos);
-        //     this.equippedObject.getWorldQuaternion(this.dropRot);
-        //     this.camera.getWorldDirection( this.lookVector );
-        //     console.log("ttryna match world rotations with " + JSON.stringify(this.dropRot));
-        //   }
+        // // this.equippedObject = this.equipHolder.querySelector('.equipped');
+        // //   if (this.equippedObject != null) {
+        // //     this.equippedObject.object3D.getWorldPosition(this.dropPos);
+        // //     this.equippedObject.getWorldQuaternion(this.dropRot);
+        // //     this.camera.getWorldDirection( this.lookVector );
+        // //     console.log("ttryna match world rotations with " + JSON.stringify(this.dropRot));
+        // //   }
 
-          // this.cameraQuat = new THREE.Quaternion();
-          // this.camera.getWorldQuaternion(this.cameraQuat);
-          // this.el.object3D.lookAt(this.lookVector);
-          this.el.object3D.position = this.dropPos;
-          // this.el.object3D.rotation = this.dropRot;
+        //   // this.cameraQuat = new THREE.Quaternion();
+        //   // this.camera.getWorldQuaternion(this.cameraQuat);
+        //   // this.el.object3D.lookAt(this.lookVector);
+        //   this.el.object3D.position = this.dropPos;
+        //   // this.el.object3D.rotation = this.dropRot;
           
-          // this.el.object3D.rotation.set(
-          //   THREE.Math.degToRad(this.erot.x),
-          //   THREE.Math.degToRad(this.erot.y),
-          //   THREE.Math.degToRad(this.erot.z)
-          // );
-          // this.el.object3D.lookAt(this.lookVector);
+        //   // this.el.object3D.rotation.set(
+        //   //   THREE.Math.degToRad(this.erot.x),
+        //   //   THREE.Math.degToRad(this.erot.y),
+        //   //   THREE.Math.degToRad(this.erot.z)
+        //   // );
+        //   // this.el.object3D.lookAt(this.lookVector);
 
-          // this.el.object3D.matrix.setRotationFromQuaternion( -this.dropRot );
-          // this.el.object3D.updateMatrix();
+        //   // this.el.object3D.matrix.setRotationFromQuaternion( -this.dropRot );
+        //   // this.el.object3D.updateMatrix();
       }
       console.log("tryna apply force shoot action " + this.hasShootAction + " " + this.camera);
     this.pushForward = true;
@@ -4467,7 +4449,7 @@ AFRAME.registerComponent('skybox-env-map', {
       if (skyEl != null) {
         let url = skyEl.src;
         this.texture = null;
-        console.log("gotsa sky ref " + url);
+        // console.log("gotsa sky ref " + url);
         let dynSkyEl = document.getElementById('skybox_dynamic');
         if (dynSkyEl != null) {
           // console.log("gotsa sky ref " + url);

@@ -168,7 +168,7 @@
 			let that = this;
 			this.useMatrix = false;
 			this.matrixMeshComponent = null;
-			if (settings.useMatrix) {
+			if (settings && settings.useMatrix) {
 				this.useMatrix = true;
 			}
 			

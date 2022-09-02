@@ -20605,8 +20605,17 @@ app.get('/webxr_nope/:_id', function (req, res) { //TODO lock down w/ checkAppID
                             "<a-draw-curve id=\x22showCurves\x22 visible=\x22false\x22 curveref=\x22#curve1\x22 material=\x22shader: line; color: blue;\x22></a-draw-curve>";
                             //"<a-sphere follow-path=\x22incrementBy:0.001; throttleTo:1\x22 position=\x220 10.25 -5\x22 radius=\x221.25\x22 color=\x22#EF2D5E\x22></a-sphere>";
                         }
-                         
-                        let aScene = "<a-scene "+sceneBackground+" "+physicsInsert+" "+pool_target+" "+pool_launcher+" gesture-detector webxr=\x22overlayElement:#overlay\x22 reflection=\x22directionalLight:#real-light\x22 ar-hit-test=\x22type:footprint; footprintDepth:0.2;\x22 ar-cursor raycaster=\x22objects: .activeObjexRay\x22 screen-controls disable-magicwindow vr-mode-ui keyboard-shortcuts=\x22enterVR: false\x22 device-orientation-permission-ui=\x22enabled: false\x22 " +
+                        let magicWindow = " disable-magicwindow device-orientation-permission-ui=\x22enabled: false\x22 "; //by default use the joystick...
+                        if (sceneResponse.sceneTags.toLowerCase().includes("magicwindow")) {
+                            magicWindow = "";
+                            joystick = "";
+                        }
+
+                        /////////AFRAME SCENE DECLARATION////////////////// 
+                        let aScene = "<a-scene "+sceneBackground+" "+physicsInsert+" "+pool_target+" "+pool_launcher+" gesture-detector webxr=\x22overlayElement:#overlay\x22 " +
+                        "reflection=\x22directionalLight:#real-light\x22 ar-hit-test=\x22type:footprint; footprintDepth:0.2;\x22 ar-cursor raycaster=\x22objects: .activeObjexRay\x22 "+
+                        "screen-controls vr-mode-ui keyboard-shortcuts=\x22enterVR: false\x22" + magicWindow;
+                        // "screen-controls vr-mode-ui keyboard-shortcuts=\x22enterVR: false\x22 disable-magicwindow device-orientation-permission-ui=\x22enabled: false\x22 " +
                         // let aScene = "<a-scene "+sceneBackground+" "+physicsInsert+" "+pool_target+" "+pool_launcher+" gesture-detector webxr=\x22overlayElement:#overlay\x22 reflection=\x22directionalLight:#real-light\x22 ar-hit-test=\x22target:.activeObjexRay; type:footprint; footprintDepth:0.2;\x22 ar-cursor raycaster=\x22objects: .activeObjexRay\x22 screen-controls disable-magicwindow vr-mode-ui keyboard-shortcuts=\x22enterVR: false\x22 device-orientation-permission-ui=\x22enabled: false\x22 " +
 
                         // let aScene = "<a-scene "+sceneBackground+" device-orientation-permission-ui " +

@@ -1446,7 +1446,7 @@ AFRAME.registerComponent('mod_physics', {
         this.el.setAttribute('ammo-body', {type: this.data.body, emitCollisionEvents: true});
         
         // this.el.setAttribute('collision-filter', {collisionForces: false});
-        console.log("ammo body is " + JSON.stringify(this.el.getAttribute('ammo-body')));
+        // console.log("ammo body is " + JSON.stringify(this.el.getAttribute('ammo-body')));
         // this.loadShape();
       }
     });
