@@ -2640,9 +2640,14 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
           if (this.data.isEquipped) {
             this.el.setAttribute('ammo-body', {type: 'kinematic', linearDamping: .1, angularDamping: .1});
           } else { //nm, switch to dynamic when fired if needed/
+            if (this.hasShootAction) {
+              this.el.setAttribute('ammo-body', {type: that.data.objectData.physics.toLowerCase(), gravity: '0 -.1 0', angularFactor: '1 0 1', emitCollisionEvents: true, linearDamping: .1, angularDamping: 1});
+              this.el.setAttribute('trail', "");
+            } else {
                 this.el.setAttribute('ammo-body', {type: that.data.objectData.physics.toLowerCase(), emitCollisionEvents: true, linearDamping: .1, angularDamping: 1});
                 // this.el.setAttribute('rotate-toward-velocity');
                 this.el.setAttribute('trail', "");
+            }
           }
           
         // if (that.data.objectData.physics.toLowerCase() == "static") {
@@ -3084,7 +3089,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
         this.camera.getWorldDirection( this.lookVector );
         console.log("tryna pushForward@! " + this.data.forceFactor);
         // const velocity = new Ammo.btVector3(2, 1, 0);
-        this.el.object3D.lookAt(this.lookVector);
+        // this.el.object3D.lookAt(this.lookVector);
         const velocity = new Ammo.btVector3(this.lookVector.x * 10 * this.data.forceFactor, this.lookVector.y * 10 * this.data.forceFactor, this.lookVector.z * 10 * this.data.forceFactor);
         this.el.body.setLinearVelocity(velocity);
         Ammo.destroy(velocity);
