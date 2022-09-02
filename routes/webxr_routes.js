@@ -4274,8 +4274,18 @@ webxr_router.get('/:_id', function (req, res) {
                             //"<a-sphere follow-path=\x22incrementBy:0.001; throttleTo:1\x22 position=\x220 10.25 -5\x22 radius=\x221.25\x22 color=\x22#EF2D5E\x22></a-sphere>";
                         }
                          
-                        let aScene = "<a-scene "+sceneBackground+" "+physicsInsert+" "+pool_target+" "+pool_launcher+" gesture-detector webxr=\x22overlayElement:#overlay\x22 reflection=\x22directionalLight:#real-light\x22 ar-hit-test=\x22type:footprint; footprintDepth:0.2;\x22 ar-cursor raycaster=\x22objects: .activeObjexRay\x22 screen-controls disable-magicwindow vr-mode-ui keyboard-shortcuts=\x22enterVR: false\x22 device-orientation-permission-ui=\x22enabled: false\x22 " +
-                                               
+                        let magicWindow = " disable-magicwindow device-orientation-permission-ui=\x22enabled: false\x22 "; //by default use the joystick...
+                        if (sceneResponse.sceneTags.includes('magicwindow')) {
+                            magicWindow = "";
+                            joystick = "";
+                            joystickContainer = "";
+                            joystickScript = "";
+                        }
+
+                        /////////AFRAME SCENE DECLARATION////////////////// 
+                        let aScene = "<a-scene "+sceneBackground+" "+physicsInsert+" "+pool_target+" "+pool_launcher+" gesture-detector webxr=\x22overlayElement:#overlay\x22 " +
+                        "reflection=\x22directionalLight:#real-light\x22 ar-hit-test=\x22type:footprint; footprintDepth:0.2;\x22 ar-cursor raycaster=\x22objects: .activeObjexRay\x22 "+
+                        "screen-controls vr-mode-ui keyboard-shortcuts=\x22enterVR: false\x22" + magicWindow +                       
                         webxrFeatures + " shadow=\x22type: pcfsoft\x22 loading-screen=\x22dotsColor: white; backgroundColor: black; enabled: false\x22 embedded " + aframeRenderSettings + " " + fogSettings + " "+networkedscene+" "+ARSceneArg+" listen-for-vr-mode>";
 
                         let mainDiv = "<div style=\x22width:100%; height:100%\x22>";
