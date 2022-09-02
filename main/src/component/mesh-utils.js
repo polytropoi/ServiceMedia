@@ -13,7 +13,8 @@ AFRAME.registerComponent('instanced_meshes_sphere', { //scattered randomly, not 
     modelID: {default: ''},
     count: {default: 100},
     scaleFactor: {default: 10},
-    interaction: {default: ''}
+    interaction: {default: ''},
+    triggerTag: {default: null}
   },
   init: function () {
     console.log("tryna instanced_meshes_sphere");
@@ -223,7 +224,7 @@ AFRAME.registerComponent('instanced_meshes_sphere', { //scattered randomly, not 
         console.log("new hit " + hitID + " " + distance + " " + JSON.stringify(hitpoint) + " interaction:" + this.data.interaction);
         var triggerAudioController = document.getElementById("triggerAudio");
         if (triggerAudioController != null) {
-          triggerAudioController.components.trigger_audio_control.playAudioAtPosition(hitpoint, distance);
+          triggerAudioController.components.trigger_audio_control.playAudioAtPosition(hitpoint, distance, this.data.triggerTag);
         }
 
       }
@@ -286,7 +287,7 @@ AFRAME.registerComponent('instanced_meshes_sphere', { //scattered randomly, not 
       // this.iMesh.instanceMatrix.needsUpdate = true;
       var triggerAudioController = document.getElementById("triggerAudio");
         if (triggerAudioController != null) {
-          triggerAudioController.components.trigger_audio_control.playAudioAtPosition(this.hitpoint, this.distance);
+          triggerAudioController.components.trigger_audio_control.playAudioAtPosition(this.hitpoint, this.distance, this.data.triggerTag);
           }
         // this.iMesh.position.set(id, 0, 0, -100);
         if (this.useMatrix) {
@@ -1022,7 +1023,7 @@ AFRAME.registerComponent('local_marker', {
       if (this.data.eventData.toLowerCase().includes("audiotrigger")) {
         var triggerAudioController = document.getElementById("triggerAudio");
         if (triggerAudioController != null) {
-          triggerAudioController.components.trigger_audio_control.playAudioAtPosition(hitpoint, distance);
+          triggerAudioController.components.trigger_audio_control.playAudioAtPosition(hitpoint, distance, this.data.triggerTag);
         }
       }
     }
@@ -1399,7 +1400,7 @@ AFRAME.registerComponent('cloud_marker', {
           let triggerAudioController = triggerAudioControllerEl.components.trigger_audio_control;
           if (triggerAudioController  != null) {
             console.log("gotsa audio trigger controller " + distance);
-            triggerAudioController.playAudioAtPosition(hitpoint, distance);
+            triggerAudioController.playAudioAtPosition(hitpoint, distance, null);
           }
          
         }

@@ -1444,13 +1444,21 @@ AFRAME.registerComponent('trigger_audio_control', { //trigger audio on designate
         triggerAudioHowl.pos(this.triggerPosition, id); 
 
     },
-    playAudioAtPosition: function(pos, distance) {
-        console.log("tryna play trigger raudio..");
+    playAudioAtPosition: function(pos, distance, tag) {
+        console.log("tryna play trigger audio with tag " + tag);
         // this.modVolume(1);
         this.audioGroupsEl = document.getElementById('audioGroupsEl');
+        let audioID = null;
+
         if (this.audioGroupsEl != null) {
             this.audioGroupsController = this.audioGroupsEl.components.audio_groups_control;
-            let audioID = this.audioGroupsController.returnRandomTriggerAudioID();  //TODO - follow index sequence, use tags?
+            if (tag != null) {
+                audioID = this.audioGroupsController.returnTriggerAudioIDWithTag(tag); 
+            } else {
+                audioID = this.audioGroupsController.returnRandomTriggerAudioID(); 
+            }
+            //TODO - follow index sequence, use tags?
+            
             let audioItem = this.audioGroupsController.returnAudioItem(audioID);
             if (audioItem != null) {
             console.log("tryna set trigger to src " + audioItem.URLogg);
@@ -1502,7 +1510,7 @@ AFRAME.registerComponent('audio_groups_control', { //element and component are a
         console.log("settings.audiogroups: " + JSON.stringify(settings.audioGroups));
         this.data.triggerGroups = settings.audioGroups.triggerGroups;
         this.data.ambientGroups = settings.audioGroups.ambientGroups;
-        this.data.triggerGroups = settings.audioGroups.primaryGroups;
+        this.data.primaryGroups = settings.audioGroups.primaryGroups;
         this.LoadAudioGroups(settings.audioGroups);
 
     },
@@ -1554,9 +1562,23 @@ AFRAME.registerComponent('audio_groups_control', { //element and component are a
         return this.data.audioGroupsData.audioItems[index];
     },
     returnRandomTriggerAudioID: function () {
-        // console.log(JSON.stringify(this.data.audioGroupsData));
+        console.log(JSON.stringify(this.data.audioGroupsData));
+        
         let triggerGroup = this.data.audioGroupsData.triggerGroupItems[0];
         return triggerGroup.items[Math.floor(Math.random()*triggerGroup.items.length)]; //pick a random entry from trigger ids
+    },
+    returnTriggerAudioIDWithTag: function (tag) {
+        
+        console.log("looking for audio trigger with tag " + tag);
+        
+        let triggerGroup = this.data.audioGroupsData.triggerGroupItems[0];
+        for (let i = 0; i < triggerGroup.items.length; i++) {
+            console.log("trigger audio name: " + triggerGroup.items.name + " tags: " + triggerGroup.items[i].tags);
+            if (triggerGroup.items[i].tags.includes(tag)) {
+                return triggerGroup.items[Math.floor(Math.random()*triggerGroup.items.length)]; //pick a random entry from trigger ids
+            }
+        } 
+       
     },
     returnTriggerTag: function() {
 

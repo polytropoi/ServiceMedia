@@ -2363,7 +2363,8 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
     timestamp: {default: null},
     applyForceToNewObject: {default: false},
     forceFactor: {default: 1},
-    removeAfter: {default: ""}
+    removeAfter: {default: ""},
+    triggerTag: {default: null}
   },
   init: function () {
     // console.log("mod_object data " + JSON.stringify(this.data.objectData.modelURL));
@@ -2899,7 +2900,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
       console.log("new hit " + hitID + " distance: " + distance + " " + JSON.stringify(hitpoint));
       // var triggerAudioController = document.getElementById("triggerAudio");
       if (this.triggerAudioController != null && !this.isEquipped) {
-        this.triggerAudioController.components.trigger_audio_control.playAudioAtPosition(hitpoint, distance);
+        this.triggerAudioController.components.trigger_audio_control.playAudioAtPosition(hitpoint, distance, this.triggerTag);
       }
       // let synthCtrl = this.el.components.mod_synth;
       // if (synthCtrl != null) {
