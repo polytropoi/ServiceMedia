@@ -7360,7 +7360,7 @@ app.get('/usergroups/:u_id', requiredAuthentication, function(req, res) {
         }
     });
 });
-app.post('/add_group_item/', requiredAuthentication, function (req, res) {
+app.post('/add_group_item/', requiredAuthentication, function (req, res) { //dunno why I rem'd the groupdata update...?
     console.log(JSON.stringify(req.body));
     var o_id = ObjectID(req.body.group_id);   
     // console.log('groupID requested : ' + req.body.sourceID);
@@ -7372,12 +7372,12 @@ app.post('/add_group_item/', requiredAuthentication, function (req, res) {
             newItems = group.items;
             newItems.push(req.body.item_id);
             var timestamp = Math.round(Date.now() / 1000);
-            // newGroupItem = {};
-            // newGroupItem.itemID = req.body.item_id;
-            // newGroupItem.itemIndex = newGroupData.length;
-            // newGroupData.push(newGroupItem);
+            newGroupItem = {}; //why was this rem'd?
+            newGroupItem.itemID = req.body.item_id; // ""?s
+            newGroupItem.itemIndex = newGroupData.length; // ""?
+            newGroupData.push(newGroupItem); // ""?
             db.groups.update( { "_id": o_id }, { $set: {
-                    // groupdata : newGroupData,
+                    groupdata : newGroupData, // ""?
                     lastUpdateTimestamp: timestamp,
                     items: newItems
                     }
@@ -7487,7 +7487,7 @@ app.post('/updategroup/', requiredAuthentication, function (req, res) {
             console.log("error getting group: " + err);
 
         } else {
-            console.log("tryna update group" + req.body._id);
+            console.log("tryna update grup " + req.body._id);
             let grupdata = group.groupdata;
             var timestamp = Math.round(Date.now() / 1000);
             if (req.body.groupdata != null) {
@@ -7619,7 +7619,7 @@ app.get('/usergroup/:p_id', requiredAuthentication, function(req, res) {
 //                            });
                         group.audio_items = audio_items;
                         res.json(group);
-                        console.log("returning group_item : " + group);
+                        // console.log("returning group_item : " + JSON.stringify(group));
                     });
                 } else if (group.type.toLowerCase() == "video") {
                     db.video_items.find({'_id': { $in: group.items}}).toArray(function (err, video_items) {

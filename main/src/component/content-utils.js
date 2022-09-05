@@ -2076,7 +2076,7 @@ AFRAME.registerComponent('mod_objex', {
               } else {
                 console.log("location/object match " + this.data.jsonLocationsData[i].objectID + " modelID " + this.data.jsonObjectData[k].modelID);
                 let objEl = document.createElement("a-entity");
-                objEl.setAttribute("mod_object", {'locationData': this.data.jsonLocationsData[i], 'objectData': this.data.jsonObjectData[k]});
+                objEl.setAttribute("mod_object", {'eventData': this.data.jsonLocationsData[i].eventData, 'locationData': this.data.jsonLocationsData[i], 'objectData': this.data.jsonObjectData[k]});
                 objEl.id = "obj" + this.data.jsonLocationsData[i].objectID + "_" + this.data.jsonLocationsData[i].timestamp;
                 sceneEl.appendChild(objEl);
               }
@@ -2130,7 +2130,7 @@ AFRAME.registerComponent('mod_objex', {
                 locationData.z = Math.floor(Math.random() * 50);
               }
               let objEl = document.createElement("a-entity");
-              objEl.setAttribute("mod_object", {'locationData': locationData, 'objectData': this.data.jsonObjectData[j], 'inventoryData': this.sceneInventoryItems[i], 'fromSceneInventory': this.fromSceneInventory, 'timestamp': timestamp});
+              objEl.setAttribute("mod_object", {'eventData': null, 'locationData': locationData, 'objectData': this.data.jsonObjectData[j], 'inventoryData': this.sceneInventoryItems[i], 'fromSceneInventory': this.fromSceneInventory, 'timestamp': timestamp});
               // objEl.setAttribute("mod_object", {'locationData': locationData, 'objectData': this.data.jsonObjectData[j], 'inventoryData': this.sceneInventoryItems[i], 'timestamp': timestamp});
               objEl.id = "obj" + this.data.jsonObjectData[j]._id + "_" + timestamp;
               sceneEl.appendChild(objEl);
@@ -2158,7 +2158,7 @@ AFRAME.registerComponent('mod_objex', {
       }
       return objek;
     },
-    addFetchedObject (obj) {
+    addFetchedObject (obj) { //for scene inventory objects, not in player inventory
       console.log("tryna add fetched obj " + obj._id)
       this.data.jsonObjectData.push(obj); 
     },
@@ -2213,7 +2213,7 @@ AFRAME.registerComponent('mod_objex', {
       this.locData.eulery = (this.objectData.eulery != undefined && this.objectData.eulery != "") ? this.objectData.eulery : 0;
       this.locData.eulerz = (this.objectData.eulerz != undefined && this.objectData.eulerz != "") ? this.objectData.eulerz : 0;
       this.locData.timestamp = Date.now();
-      this.objEl.setAttribute("mod_object", {'locationData': this.locData, 'objectData': this.objectData, 'isEquipped': true});
+      this.objEl.setAttribute("mod_object", {'eventData': null, 'locationData': this.locData, 'objectData': this.objectData, 'isEquipped': true});
       this.objEl.id = "obj" + this.objectData._id + "_" + this.locData.timestamp;
       this.objEl.classList.add('equipped');
       this.equipHolder.appendChild(this.objEl); //parent to equip holder instead of scene as below
@@ -2229,7 +2229,7 @@ AFRAME.registerComponent('mod_objex', {
       this.locData.y = this.dropPos.y;
       this.locData.z = this.dropPos.z;
       this.locData.timestamp = Date.now();
-      this.objEl.setAttribute("mod_object", {'locationData': this.locData, 'objectData': this.objectData});
+      this.objEl.setAttribute("mod_object", {'eventData': null, 'locationData': this.locData, 'objectData': this.objectData});
       this.objEl.id = "obj" + this.objectData._id + "_" + this.locData.timestamp;
       sceneEl.appendChild(this.objEl);
       // this.objEl.components.mod_object.applyForce();
@@ -2248,7 +2248,7 @@ AFRAME.registerComponent('mod_objex', {
       this.locData.y = this.dropPos.y;
       this.locData.z = this.dropPos.z;
       this.locData.timestamp = Date.now();
-      this.objEl.setAttribute("mod_object", {'locationData': this.locData, 'objectData': this.objectData});
+      this.objEl.setAttribute("mod_object", {'eventData': null, 'locationData': this.locData, 'objectData': this.objectData});
       this.objEl.id = "obj" + this.objectData._id + "_" + this.locData.timestamp;
       sceneEl.appendChild(this.objEl);
       // this.objEl.components.mod_object.applyForce();
@@ -2296,7 +2296,7 @@ AFRAME.registerComponent('mod_objex', {
 
         this.locData.timestamp = Date.now();
         this.objEl.setAttribute("position", this.dropPos);
-        this.objEl.setAttribute("mod_object", {'locationData': this.locData, 'objectData': this.objectData, 'applyForceToNewObject': true, 'forceFactor': downtime, 'removeAfter': "5"});
+        this.objEl.setAttribute("mod_object", {'eventData': null, 'locationData': this.locData, 'objectData': this.objectData, 'applyForceToNewObject': true, 'forceFactor': downtime, 'removeAfter': "5"});
         this.objEl.id = "obj" + this.objectData._id + "_" + this.locData.timestamp;
         sceneEl.append(this.objEl);
       }
@@ -2314,7 +2314,7 @@ AFRAME.registerComponent('mod_objex', {
       this.locData.y = this.dropPos.y;
       this.locData.z = this.dropPos.z;
       this.locData.timestamp = Date.now();
-      this.objEl.setAttribute("mod_object", {'locationData': this.locData, 'objectData': this.objectData, 'applyForceToNewObject': true, 'forceFactor': downtime, 'removeAfter': "5"});
+      this.objEl.setAttribute("mod_object", {'eventData': null, 'locationData': this.locData, 'objectData': this.objectData, 'applyForceToNewObject': true, 'forceFactor': downtime, 'removeAfter': "5"});
       this.objEl.id = "obj" + this.objectData._id + "_" + this.locData.timestamp;
       sceneEl.appendChild(this.objEl);
       // this.el.setAttribute('gltf-model', '#' + modelID.toString());
@@ -2358,13 +2358,14 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
   schema: {
     locationData: {default: ''},
     objectData: {default: ''},
+    eventData: {default: ''},
     isEquipped: {default: false},
     fromSceneInventory: {default: false},
     timestamp: {default: null},
     applyForceToNewObject: {default: false},
     forceFactor: {default: 1},
     removeAfter: {default: ""},
-    triggerTag: {default: null}
+    triggerTags: {default: null}
   },
   init: function () {
     // console.log("mod_object data " + JSON.stringify(this.data.objectData.modelURL));
@@ -2456,6 +2457,14 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
       } else {
         this.el.setAttribute("gltf-model", "#" +this.data.objectData.modelID); 
       }
+    }
+    if (this.data.objectData.tags != undefined && this.data.objectData.tags != null) {
+      console.log(this.data.objectData.name + " gotsome tags: " + this.data.objectData.tags);
+      this.data.triggerTags = this.data.objectData.tags;
+
+    }
+    if (this.data.locationData && this.data.locationData.eventData && this.data.locationData.eventData.toLowerCase().includes("triggerTag")) {
+      console.log(this.data.objectData.name + " gotsome location eventData " + this.data.locationData.eventData);
     }
    
 
@@ -2900,7 +2909,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
       console.log("new hit " + hitID + " distance: " + distance + " " + JSON.stringify(hitpoint));
       // var triggerAudioController = document.getElementById("triggerAudio");
       if (this.triggerAudioController != null && !this.isEquipped) {
-        this.triggerAudioController.components.trigger_audio_control.playAudioAtPosition(hitpoint, distance, this.triggerTag);
+        this.triggerAudioController.components.trigger_audio_control.playAudioAtPosition(hitpoint, distance, this.data.triggerTags);
       }
       // let synthCtrl = this.el.components.mod_synth;
       // if (synthCtrl != null) {
@@ -3051,7 +3060,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
   tick: function () {
 
     if (this.pushForward && this.camera != null) {
-      console.log("tryna apply force shoot action " + this.hasShootAction);
+      // console.log("tryna apply force shoot action " + this.hasShootAction);
       // this.lookVector.applyQuaternion(this.camera.quaternion);
       if (this.hasThrowAction) {
         if (mouseDowntime != 0) {
@@ -3060,7 +3069,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
           this.data.forceFactor = 2;
         }
         this.camera.getWorldDirection( this.lookVector );
-        console.log("tryna pushForward@! " + this.data.forceFactor);
+        // console.log("tryna pushForward@! " + this.data.forceFactor);
         // const velocity = new Ammo.btVector3(2, 1, 0);
         const velocity = new Ammo.btVector3(this.lookVector.x * 10 * this.data.forceFactor, (this.lookVector.y + .5) * 10 * this.data.forceFactor, this.lookVector.z * 10 * this.data.forceFactor);
         this.el.body.setLinearVelocity(velocity);
@@ -3070,7 +3079,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
         // this.equipHolder = document.getElementById("equipPlaceholder");
         // this.equipHolder.object3D.getWorldPosition( this.dropPos );
         this.camera.getWorldDirection( this.lookVector );
-        console.log("tryna pushForward@! " + this.data.forceFactor);
+        // console.log("tryna pushForward@! " + this.data.forceFactor);
         // const velocity = new Ammo.btVector3(2, 1, 0);
         // this.el.object3D.lookAt(this.lookVector);
         const velocity = new Ammo.btVector3(this.lookVector.x * 10 * this.data.forceFactor, this.lookVector.y * 10 * this.data.forceFactor, this.lookVector.z * 10 * this.data.forceFactor);

@@ -1,3 +1,6 @@
+// deprecated, now in audio_controls.js
+
+/*
 let triggerParams = document.querySelector(".triggerAudioParams").id;
 // const clampNumber = (num, a, b) => Math.max(Math.min(num, Math.max(a, b)), Math.min(a, b));
 let triggerPosition = "";
@@ -68,3 +71,4 @@ AFRAME.registerComponent('trigger_audio_control', { //trigger audio on designate
     // }
 }); //end register
     
+*/

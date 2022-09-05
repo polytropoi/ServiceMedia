@@ -1950,6 +1950,27 @@
             }
         }
         if (sourcetype == "group") {
+            if (itemtype == "audio") {
+                let data = { 
+                    group_id : sourceID,
+                    item_id: itemID
+                };
+                axios.post('/add_group_item', data, headers)
+                .then(function (response) {
+                    console.log(response);
+                    if (response.data.includes("updated")) {
+                            window.location.href = "index.html?type=group&iid=" + sourceID;
+                    } else {
+                        $("#topAlert").html(response.data);
+                        $("#topAlert").show();
+                    }
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+            }
+        }
+        if (sourcetype == "group") {
             if (itemtype == "picture") {
                 let data = { 
                     group_id : sourceID,

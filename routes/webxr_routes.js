@@ -1531,7 +1531,7 @@ webxr_router.get('/:_id', function (req, res) {
                     let actionModels = [];
                     // if (sceneObjectLocations.length > 0) {  // objex have more properties, but are parsed/assigned by components (mod_objex, mod_object) after page load
                         // console.log("sceneObjectLocations " + JSON.stringify(sceneObjectLocations));
-                            let objectIDs = []; //to prevent dupes in objex response below
+                        let objectIDs = []; //to prevent dupes in objex response below
                         async.each (sceneObjectLocations, function (locObj, callbackz) {
                             
                             if (locObj.objectID != undefined && locObj.objectID != "none" && sceneResponse.sceneObjects.indexOf(locObj.objectID) != -1 && objectIDs.indexOf(locObj.objectID) == -1) {
