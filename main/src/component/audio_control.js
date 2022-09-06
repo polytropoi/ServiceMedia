@@ -1580,30 +1580,22 @@ AFRAME.registerComponent('audio_groups_control', { //element and component are a
     },
     returnTriggerAudioIDWithTag: function (tags) {
         
-        
-        
         let triggerGroup = this.data.audioGroupsData.triggerGroupItems[0];
         console.log("looking for audio trigger with tag " + tags[0] + " in files " + triggerGroup.items.length);
         for (let i = 0; i < triggerGroup.items.length; i++) {
-            console.log("looking for triggerGroup.item " + triggerGroup.items[i]);
+            // console.log("looking for triggerGroup.item " + triggerGroup.items[i]);
             for (let j = 0; j < this.data.audioGroupsData.audioItems.length; j++) {
                 // console.log("Ccchekin trigger group item " +triggerGroup.items[i]+ " vs " + this.data.audioGroupsData.audioItems[j]._id);
                 if (triggerGroup.items[i] == this.data.audioGroupsData.audioItems[j]._id) {
                   
-                    console.log("found audio item tags are " + this.data.audioGroupsData.audioItems[j].tags); //not ideal, maybe the groupitems can store tags? or cache them when loaded below?
+                    // console.log("found audio item tags are " + this.data.audioGroupsData.audioItems[j].tags); //not ideal, maybe the groupitems can store tags? or cache them when loaded below?
                     if (this.data.audioGroupsData.audioItems[j].tags.includes(tags[0])) {
-                        console.log("tag match@!");
+                        console.log("tag match to " + tags);
                         return triggerGroup.items[i];
                     }
                 }
             }
-            // console.log("trigger audio name: " + JSON.stringify(triggerGroup.items[i]));
-
-            // if (triggerGroup.items[i].tags != undefined && triggerGroup.items[i].tags.includes(tag)) {
-            //     let tIndex = Math.floor(Math.random()*triggerGroup.items.length);
-            //     console.log("tryna get triggerAudio rIndex " + tIndex);
-            //     // return triggerGroup.items[Math.floor(Math.random()*triggerGroup.items.length)]; //pick a random entry from trigger ids
-            // }
+           
         } 
        
     }

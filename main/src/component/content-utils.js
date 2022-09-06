@@ -323,7 +323,7 @@ AFRAME.registerComponent('disable-magicwindow', {
 // });
 
 
-AFRAME.registerComponent('parent-to', {
+AFRAME.registerComponent('parent-to', { //used with old ar.js...
   schema: {
     tracking: {default: 'marker'}
   },
@@ -2466,7 +2466,10 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
     if (this.data.locationData && this.data.locationData.eventData && this.data.locationData.eventData.toLowerCase().includes("triggerTag")) {
       console.log(this.data.objectData.name + " gotsome location eventData " + this.data.locationData.eventData);
     }
-   
+    if (this.data.locationData && this.data.locationData.markerType) {
+      console.log(this.data.objectData.name + " gotsa markerType : "+ this.data.locationData.markerType);
+    }
+      
 
     this.hasPickupAction = false;
     this.hasThrowAction = false;
@@ -2859,6 +2862,9 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
           //   }
           //   this.objexEl.components.mod_objex.shootObject(this.data.objectData._id, this.mouseDowntime, "5");
           // }
+          if (this.triggerAudioController != null) {
+            this.triggerAudioController.components.trigger_audio_control.playAudioAtPosition(this.hitpoint, this.distance, ["shoot"]);//tagmangler needs an array
+          }
           this.el.object3D.visible = false;
           this.el.classList.remove("activeObjexRay");
           setTimeout(() => {
@@ -5778,160 +5784,3 @@ function CaptureVideo(video) {
   return canvas.toDataURL('image/png');
 }
 
-
-
-// function SetVideoEventsData (type) { 
-  
-//     tkStarttimes = []; //either audio or video, not both
-//     if (timeKeysData.timekeys == undefined || timeKeysData.timekeys == null) {
-//       timeKeysData = JSON.parse(localStorage.getItem(room+ "_timeKeys")); 
-//     } 
-    
-    
-//     if (timeKeysData != undefined && timeKeysData != null && timeKeysData.timekeys.length > 0 ) {
-//       timeKeysData.timekeys.forEach(function (timekey) {
-//       tkStarttimes.push(parseFloat(timekey.keystarttime).toFixed(2));
-//     });
-//     tkStarttimes.sort(function(a, b){
-//       return a - b;
-//     });
-    
-//     if (type == null && timedEventsListenerMode == null) {
-//     timedEventsListenerMode = "Primary Video";
-//     }
-//     if (tkStarttimes.length > 0) {
-//       console.log("tryna run video events listenr with timedEventsListenerMode : " + timedEventsListenerMode);
-//       VideoEventsListener();
-//     }
-//   }
-// }
-// function SetYoutubeEventsData() {
-
-// }
-
-// let timeKeysIndex = 0;
-// let videoInterval = null;
-
-// function VideoEventsListener () {
-//   console.log("TimedEventsListener" );
-//   // let primaryAudioTime = 0;
-//   let timeKeysIndex = 0;
-//   let timekey = 0;
-//   let vidz = document.getElementsByTagName("video");
-//   // let primaryAudioEl = document.querySelector('#primaryAudio');
-//   // let hasPrimaryAudio = false;
-//   let videoEl = null;
-//   // let vidz = document.getElementsByTagName("video");
-//   if (vidz != null && vidz.length > 0) { //either video or audio, not both...?
-//     videoEl = vidz[0];
-//     console.log("videoEl " + videoEl.id);
-//   }
-//   // if (primaryAudioEl != null) {
-//   //   hasPrimaryAudio = true;
-//   // }
-//   // if (vidz != null && vidz.length > 0) { //either video or audio, not both...?
-//   //   videoEl = vidz[0];
-//   // }
-  
-//   let videoInterval = setInterval(function () {
-//      timekey = parseFloat(tkStarttimes[timeKeysIndex]);
-//     //  console.log(timekey);
-//     if (timekey != NaN) {//not not a number
-//       if (timedEventsListenerMode != null && timedEventsListenerMode.toLowerCase() == 'primary video') {
-//         if (videoEl != null && !videoEl.paused && timekey > 0){
-//           //  console.log("currentVideoTIme " + videoEl.currentTime + " vs timekey " + timekey);
-//            if (videoEl.currentTime <= timekey) {
-//               //prease stanby...
-//            } else {
-//               if (timeKeysIndex < tkStarttimes.length) {
-//                  // console.log("vid event " + timeKeysData[timeKeysIndex]);
-//                  PlayVideoEvent(timeKeysData.timekeys[timeKeysIndex]);
-//                  timeKeysIndex++;
-//               } else {
-//                  console.log("end");
-//                  clearInterval(videoInterval);
-//               }
-           
-//             }
-//           }
-//       } else {
-//         if (timedEventsListenerMode != null && timedEventsListenerMode.toLowerCase() == 'youtube') { 
-//           if (youtubePlayer != null && youtubeIsPlaying && timekey > 0) {
-//             if (youtubePlayer.time <= timekey) {
-//               //wait a scootch
-//               } else { 
-//                 if(timeKeysIndex < tkStarttimes.length) {
-//                   // console.log("vid event " + timeKeysData[timeKeysIndex]);
-//                   PlayVideoEvent(timeKeysData.timekeys[timeKeysIndex]);
-//                   timeKeysIndex++;
-//                   } else {
-//                     console.log("end");
-//                     clearInterval(videoInterval);
-//                 }
-//               }
-//             }
-//           }
-//         }
-//       }
-//     }, 50);
-
-// }
-// function PlayVideoEvent(timeKey) {
-//   console.log("event: " + JSON.stringify(timeKey));
-//   // // let timekey = JSON.parse(timeKey);
-//   // console.log("event: " + timeKey.keytype);
-//   var player = document.getElementById("player");
-//   player.setAttribute("player_mover", "init");
-//   let duration = 1;
-//   let posObj = {};
-//   let rotObj = {};
-//      if (timeKey.keytype == "Player Snap") {
-//         // console.log("sceneLocations length is " + sceneLocations.locations.length);
-//         // if (sceneLocations.locations.ength > 0) {
-//         for (let s = 0; s < sceneLocations.locationMods.length; s++) {
-//            // posObj = {};
-//            // rotObj = {};
-            
-//            // console.log(timeKey.keydata.toString() + " vs " + sceneLocations.locationMods[s].label.toString());
-
-//            if (sceneLocations.locationMods[s].label != undefined && timeKey.keydata.toString() == sceneLocations.locationMods[s].label.toString() && (sceneLocations.locationMods[s].markerType == "placeholder" || sceneLocations.locationMods[s].markerType == "poi")) {
-//               posObj.x = sceneLocations.locationMods[s].x;
-//               posObj.y = sceneLocations.locationMods[s].y;
-//               posObj.z = sceneLocations.locationMods[s].z;
-//               rotObj.x = sceneLocations.locationMods[s].eulerx != null ? sceneLocations.locationMods[s].eulerx : 0;
-//               rotObj.y = sceneLocations.locationMods[s].eulery != null ? sceneLocations.locationMods[s].eulery : 0;
-//               rotObj.z = sceneLocations.locationMods[s].eulerz != null ? sceneLocations.locationMods[s].eulerz : 0;
-//               // console.log(JSON.stringify(timeKey) + " tryna fire event Player Snap to " + JSON.stringify(sceneLocations.locations[s]));
-//               player.components.player_mover.move('player', posObj, rotObj, 0); //
-//               // document.getElementById("player").setAttribute("position", sceneLocations.locations[s].x + " " + sceneLocations.locations[s].y + " " + sceneLocations.locations[s].z);
-//               // document.getElementById("player").setAttribute("rotation", sceneLocations.locations[s].eulerx + " " + sceneLocations.locations[s].eulery + " " + sceneLocations.locations[s].eulerz);
-//            } else {
-//               // console.log("label not found");
-//            }
-//         }
-//      } 
-//      if (timeKey.keytype == "Player Lerp") {
-//         // console.log("sceneLocations length is " + sceneLocations.locations.length);
-//      // if (sceneLocations.locations.ength > 0) {
-//         // console.log("event: " + JSON.stringify(timeKey));
-//         for (let s = 0; s < sceneLocations.locationMods.length; s++) {
-//            // console.log(timeKey.keydata + " vs " + JSON.stringify(sceneLocations.locationMods[s]));
-//            if (sceneLocations.locationMods[s].label != undefined && timeKey.keydata.toString() == sceneLocations.locationMods[s].label.toString() && sceneLocations.locationMods[s].markerType == "poi") {
-//               // posObj = {};
-//               // rotObj = {};
-//               posObj.x = sceneLocations.locationMods[s].x;
-//               posObj.y = sceneLocations.locationMods[s].y;
-//               posObj.z = sceneLocations.locationMods[s].z;
-//               rotObj.x = sceneLocations.locationMods[s].eulerx != null ? sceneLocations.locationMods[s].eulerx : 0;
-//               rotObj.y = sceneLocations.locationMods[s].eulery != null ? sceneLocations.locationMods[s].eulery : 0;
-//               rotObj.z = sceneLocations.locationMods[s].eulerz != null ? sceneLocations.locationMods[s].eulerz : 0;
-//               // document.getElementById("player").setAttribute("position", sceneLocations.locations[s].x + " " + sceneLocations.locations[s].y + " " + sceneLocations.locations[s].z);         
-//               duration = timeKey.keyduration;
-//               // console.log(JSON.stringify(timeKey) + " vs " + videoEl.currentTime + " tryna fire event Player lerp to " + JSON.stringify(posObj));
-//               player.components.player_mover.move('player', posObj, rotObj, duration);
-//            } else {
-//               // console.log("label not found");
-//            }
-//         }
-//      } 
-// }
