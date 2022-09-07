@@ -2648,6 +2648,8 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
                 // this.el.setAttribute('rotate-toward-velocity');
                 // this.el.setAttribute('trail', "");
                 this.el.setAttribute('trail', "");
+            } else {
+              this.el.setAttribute('ammo-body', {type: this.data.objectData.physics.toLowerCase(), emitCollisionEvents: true});
             }
           }
           
@@ -2683,7 +2685,31 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
       if (this.data.applyForceToNewObject) {
         this.applyForce();
       }
-      
+
+      this.el.addEventListener("collidestart", (e) => {
+        e.preventDefault();
+        // console.log("mod_physics collisoin with object with :" + this.el.id + " " + e.detail.targetEl.classList);
+        if (this.data.isTrigger) {
+          console.log("TRIGGER COLLIDED "  + this.el.id + " " + e.detail.targetEl.classList);
+          // e.detail.body.disableCollision = true;
+          this.disableCollisionTemp(); //must turn it off or it blocks, no true "trigger" mode afaik (unlike cannonjs!)
+          var triggerAudioController = document.getElementById("triggerAudio");
+          if (triggerAudioController != null) {
+            triggerAudioController.components.trigger_audio_control.playAudio();
+          }
+        } else {
+          console.log("NOT TRIGGER COLLIDED "  + this.el.id + " vs " + e.detail.targetEl.id);
+          // console.log("NOT TRIGGER COLLIDED "  + this.el.id + " " + e.detail.targetEl.classList);
+          if (this.el != e.detail.targetEl) {
+          let mod_obj_component = e.detail.targetEl.components.mod_object;
+            if (mod_obj_component != null) {
+              console.log(this.data.objectData.name + "gotsa collision with " + mod_obj_component.data.objectData.name);
+
+            }
+          }
+        }
+      });
+    
     });
 
     // this.el.addEventListener("collidestart", (e) => {

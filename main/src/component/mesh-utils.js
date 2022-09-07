@@ -1431,15 +1431,7 @@ AFRAME.registerComponent('mod_physics', {
       // this.el.body.setCollisionF
       // console.log("ammo shape is " + JSON.stringify(this.el.getAttribute('ammo-shape')));
     });
-    // this.el.setAttribute('ammo-body', {type: this.data.body});
-    // if (this.data.isTrigger) {
-    //   console.log("TRIGGER LOADED");
-    //   // this.el.setObject3D("mesh", null); 
-    //   // this.el.setAttribute('gltf-model', '#poi1');
-     
-    // } 
-
-
+  
     this.el.addEventListener('model-loaded', () => {
       if (this.data.isTrigger) {
         this.el.setAttribute('ammo-body', {type: "kinematic", emitCollisionEvents: true});
@@ -1465,6 +1457,12 @@ AFRAME.registerComponent('mod_physics', {
         if (triggerAudioController != null) {
           triggerAudioController.components.trigger_audio_control.playAudio();
         }
+      } else {
+        // console.log("NOT TRIGGER COLLIDED "  + this.el.id + " " + e.detail.targetEl.classList);
+        // let mod_obj_component = e.detail.targetEl.components.mod_object;
+        // if (mod_obj_component != null) {
+        //   // console.log("gotsa collision with " + mod_obj_component.data.objectData.name);
+        // }
       }
     });
 

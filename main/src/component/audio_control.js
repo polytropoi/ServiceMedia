@@ -1595,11 +1595,8 @@ AFRAME.registerComponent('audio_groups_control', { //element and component are a
                     }
                 }
             }
-           
-        } 
-       
+        }
     }
-
 });
 
 function FetchAudioGroupsData(groupArray) {
