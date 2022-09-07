@@ -4275,7 +4275,7 @@ webxr_router.get('/:_id', function (req, res) {
                         }
                          
                         let magicWindow = " disable-magicwindow device-orientation-permission-ui=\x22enabled: false\x22 "; //by default use the joystick...
-                        if (sceneResponse.sceneTags.includes('magicwindow')) {
+                        if (sceneResponse.sceneTags != null && sceneResponse.sceneTags.includes('magicwindow')) {
                             magicWindow = "";
                             joystick = "";
                             joystickContainer = "";

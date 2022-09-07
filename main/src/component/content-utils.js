@@ -2156,6 +2156,9 @@ AFRAME.registerComponent('mod_objex', {
           }
         }
       }
+      if (objek == null) {
+        SceneInventoryLoad([objectID]);
+      }
       return objek;
     },
     addFetchedObject (obj) { //for scene inventory objects, not in player inventory
@@ -2569,14 +2572,14 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
         // this.el.visible = false;
         let trailComponent = this.el.components.trail;
         if (trailComponent) {
-          // this.el.setAttribute("trail", "length", 0); //turn off, dammit!
-          // this.el.object3D.remove();
-          // this.el.removeAttribute("trail");
           trailComponent.reset();
         }
         // this.sceneEl.remove(this.el.object3D); 
         // this.el.removeAttribute("trail"); //WHY WON'T YOU DIE
-        this.el.parentNode.removeChild(this.el);
+        if (this.el != null && this.el.parentNode != null) {
+          this.el.parentNode.removeChild(this.el);
+        }
+        
       }, 5000);
     }
 
@@ -2688,6 +2691,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
 
       this.el.addEventListener("collidestart", (e) => {
         e.preventDefault();
+        let mod_obj_component = e.detail.targetEl.components.mod_object;
         // console.log("mod_physics collisoin with object with :" + this.el.id + " " + e.detail.targetEl.classList);
         if (this.data.isTrigger) {
           console.log("TRIGGER COLLIDED "  + this.el.id + " " + e.detail.targetEl.classList);
@@ -2695,16 +2699,65 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
           this.disableCollisionTemp(); //must turn it off or it blocks, no true "trigger" mode afaik (unlike cannonjs!)
           var triggerAudioController = document.getElementById("triggerAudio");
           if (triggerAudioController != null) {
-            triggerAudioController.components.trigger_audio_control.playAudio();
+            triggerAudioController.components.trigger_audio_control.playAudioAtPosition(this.hitpoint, this.distance, ["hit"]);
           }
         } else {
-          console.log("NOT TRIGGER COLLIDED "  + this.el.id + " vs " + e.detail.targetEl.id);
+          // console.log("NOT TRIGGER COLLIDED "  + this.el.id + " vs " + e.detail.targetEl.id);
           // console.log("NOT TRIGGER COLLIDED "  + this.el.id + " " + e.detail.targetEl.classList);
           if (this.el != e.detail.targetEl) {
-          let mod_obj_component = e.detail.targetEl.components.mod_object;
+            
             if (mod_obj_component != null) {
               console.log(this.data.objectData.name + "gotsa collision with " + mod_obj_component.data.objectData.name);
+              if (this.data.objectData.name != mod_obj_component.data.objectData.name) { //don't trigger yerself, but what if...?
+                console.log("actions: " + JSON.stringify(mod_obj_component.data.objectData.actions));
+                var triggerAudioController = document.getElementById("triggerAudio");
+                if (triggerAudioController != null) {
+                  triggerAudioController.components.trigger_audio_control.playAudioAtPosition(this.el.object3D.position, window.playerPosition.distanceTo(this.el.object3D.position), ["hit"]);
+                }
+                for (let i = 0; i < mod_obj_component.data.objectData.actions.length; i++) {
+                  if (mod_obj_component.data.objectData.actions[i].actionType.toLowerCase() == "collide") {
+                    if (mod_obj_component.data.objectData.actions[i].sourceObjectMod.toLowerCase() == "remove") {
+                      let trailComponent = e.detail.targetEl.components.trail;
+                      if (trailComponent) {
+                        trailComponent.reset();
+                      }
+                      e.detail.targetEl.parentNode.removeChild(e.detail.targetEl);
 
+                    }
+                    if (mod_obj_component.data.objectData.actions[i].sourceObjectMod.toLowerCase() == "replace object") {
+                      console.log("tryna replace object...");
+                      let trailComponent = e.detail.targetEl.components.trail;
+                      if (trailComponent) {
+                        trailComponent.reset();
+                      }
+                      e.detail.targetEl.parentNode.removeChild(e.detail.targetEl);
+                      let objexEl = document.getElementById('sceneObjects');    
+                      let objectData = objexEl.components.mod_objex.returnObjectData(mod_obj_component.data.objectData.actions[i].objectID);
+                      if (objectData == null) {
+                        objectData = objexEl.components.mod_objex.returnObjectData(mod_obj_component.data.objectData.actions[i].objectID); //try again, if it's not in the sceneobjectdata it will make a special request
+                      }
+                      if (objectData != null) {
+                        console.log("tryna replace object with " + JSON.stringify(objectData));
+                        // this.objectData = this.returnObjectData(mod_obj_component.data.objectData.actions[i].objectID);
+
+                        // this.dropPos = new THREE.Vector3();
+                        this.objEl = document.createElement("a-entity");
+
+                        this.locData = {};
+                        this.locData.x = this.el.object3D.position.x;
+                        this.locData.y = this.el.object3D.position.y;
+                        this.locData.z = this.el.object3D.position.z;
+                        this.locData.timestamp = Date.now();
+                        this.objEl.setAttribute("mod_object", {'locationData': this.locData, 'objectData': objectData});
+                        this.objEl.id = "obj" + objectData._id + "_" + this.locData.timestamp;
+                        sceneEl.appendChild(this.objEl);
+                      } else {
+                        console.log("caint find object " + mod_obj_component.data.objectData.actions[i].objectID +", tryna fetch it..");
+                      }
+                    }                    
+                  }
+                }
+              }
             }
           }
         }
@@ -2712,18 +2765,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
     
     });
 
-    // this.el.addEventListener("collidestart", (e) => {
-    //   e.preventDefault();
-    //   // console.log("object has collided with object with classlist :" + e.detail.targetEl.classList);
-    //   // let modelComponent = e.detail.targetEl.components.mod_model
-    //   if (e.detail.targetEl.classList.contains('trigger')) {
-    //     console.log("object has collided with trigger #" + e.detail.targetEl.id);
-    //   }
-    //   e.detail.targetEl; // Other entity, which playerEl touched.
-    //   that.distance = window.playerPosition.distanceTo(that.el.getAttribute('position'));
-    //   // console.log("distance  " + that.distance);
-    //   that.rayhit( e.detail.targetEl.id, that.distance, that.el.getAttribute('position'));
-    // });
+
 
     this.el.addEventListener('raycaster-intersected', e =>{  
         this.raycaster = e.detail.el;
@@ -2940,7 +2982,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
       // distance = window.playerPosition.distanceTo(hitpoint);
       console.log("new hit " + hitID + " distance: " + distance + " " + JSON.stringify(hitpoint));
       // var triggerAudioController = document.getElementById("triggerAudio");
-      if (this.triggerAudioController != null && !this.isEquipped) {
+      if (this.triggerAudioController != null && !this.isEquipped && this.data.triggerTags) {
         this.triggerAudioController.components.trigger_audio_control.playAudioAtPosition(hitpoint, distance, this.data.triggerTags);
       }
       // let synthCtrl = this.el.components.mod_synth;
@@ -3059,13 +3101,13 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
         // // this.el.setAttribute('position', this.equipHolder.getAttribute("position"));
         // this.erot = this.equipHolder.getAttribute("rotation");
 
-        // // this.equippedObject = this.equipHolder.querySelector('.equipped');
-        // //   if (this.equippedObject != null) {
-        // //     this.equippedObject.object3D.getWorldPosition(this.dropPos);
-        // //     this.equippedObject.getWorldQuaternion(this.dropRot);
-        // //     this.camera.getWorldDirection( this.lookVector );
-        // //     console.log("ttryna match world rotations with " + JSON.stringify(this.dropRot));
-        // //   }
+        // this.equippedObject = this.equipHolder.querySelector('.equipped');
+        //   if (this.equippedObject != null) {
+        //     this.equippedObject.object3D.getWorldPosition(this.dropPos);
+        //     this.equippedObject.getWorldQuaternion(this.dropRot);
+        //     this.camera.getWorldDirection( this.lookVector );
+        //     console.log("ttryna match world rotations with " + JSON.stringify(this.dropRot));
+        //   }
 
         //   // this.cameraQuat = new THREE.Quaternion();
         //   // this.camera.getWorldQuaternion(this.cameraQuat);
@@ -3082,6 +3124,8 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
 
         //   // this.el.object3D.matrix.setRotationFromQuaternion( -this.dropRot );
         //   // this.el.object3D.updateMatrix();
+
+
       }
       console.log("tryna apply force shoot action " + this.hasShootAction + " " + this.camera);
     this.pushForward = true;
@@ -3113,10 +3157,20 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
         this.camera.getWorldDirection( this.lookVector );
         // console.log("tryna pushForward@! " + this.data.forceFactor);
         // const velocity = new Ammo.btVector3(2, 1, 0);
-        // this.el.object3D.lookAt(this.lookVector);
+        this.el.object3D.lookAt(this.lookVector);
+        // this.el.object3D.rotation = this.lookVector;
+        // const pos = new Ammo.btVector3(this.dropPos.x, this.dropPos.y, this.dropPos.z);
         const velocity = new Ammo.btVector3(this.lookVector.x * 10 * this.data.forceFactor, this.lookVector.y * 10 * this.data.forceFactor, this.lookVector.z * 10 * this.data.forceFactor);
         this.el.body.setLinearVelocity(velocity);
         Ammo.destroy(velocity);
+
+
+      //   const force = new Ammo.btVector3(this.lookVector.x * 10 * this.data.forceFactor, this.lookVector.y * 10 * this.data.forceFactor, this.lookVector.z * 10 * this.data.forceFactor);
+      //  const pos = new Ammo.btVector3(this.dropPos.x, this.dropPos.y, this.dropPos.z);
+      //   el.body.applyForce(force, pos);
+      //   Ammo.destroy(force);
+      //   Ammo.destroy(pos);
+        // Ammo.destroy(pos);
       }
      
     }

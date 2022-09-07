@@ -1446,7 +1446,7 @@ AFRAME.registerComponent('trigger_audio_control', { //trigger audio on designate
     },
     playAudioAtPosition: function(pos, distance, tag) {
         console.log("tryna play trigger audio with tag " + tag);
-        if (triggerAudioHowl != null) {
+        if (triggerAudioHowl != null && tag != undefined && tag != null && tag != "") {
         // this.modVolume(1);
         this.audioGroupsEl = document.getElementById('audioGroupsEl');
         let audioID = null;
@@ -1456,7 +1456,7 @@ AFRAME.registerComponent('trigger_audio_control', { //trigger audio on designate
             if (tag != null) {
                 audioID = this.audioGroupsController.returnTriggerAudioIDWithTag(tag); 
             } else {
-                audioID = this.audioGroupsController.returnRandomTriggerAudioID(); 
+                // audioID = this.audioGroupsController.returnRandomTriggerAudioID(); 
             }
             //TODO - follow index sequence, use tags?
             console.log("tryna get audioID " + audioID);
@@ -1580,21 +1580,25 @@ AFRAME.registerComponent('audio_groups_control', { //element and component are a
     },
     returnTriggerAudioIDWithTag: function (tags) {
         
-        let triggerGroup = this.data.audioGroupsData.triggerGroupItems[0];
-        console.log("looking for audio trigger with tag " + tags[0] + " in files " + triggerGroup.items.length);
-        for (let i = 0; i < triggerGroup.items.length; i++) {
-            // console.log("looking for triggerGroup.item " + triggerGroup.items[i]);
-            for (let j = 0; j < this.data.audioGroupsData.audioItems.length; j++) {
-                // console.log("Ccchekin trigger group item " +triggerGroup.items[i]+ " vs " + this.data.audioGroupsData.audioItems[j]._id);
-                if (triggerGroup.items[i] == this.data.audioGroupsData.audioItems[j]._id) {
-                  
-                    // console.log("found audio item tags are " + this.data.audioGroupsData.audioItems[j].tags); //not ideal, maybe the groupitems can store tags? or cache them when loaded below?
-                    if (this.data.audioGroupsData.audioItems[j].tags.includes(tags[0])) {
-                        console.log("tag match to " + tags);
-                        return triggerGroup.items[i];
+        if (tags) {
+            let triggerGroup = this.data.audioGroupsData.triggerGroupItems[0];
+            console.log("looking for audio trigger with tag " + tags[0] + " in files " + triggerGroup.items.length);
+            for (let i = 0; i < triggerGroup.items.length; i++) {
+                // console.log("looking for triggerGroup.item " + triggerGroup.items[i]);
+                for (let j = 0; j < this.data.audioGroupsData.audioItems.length; j++) {
+                    // console.log("Ccchekin trigger group item " +triggerGroup.items[i]+ " vs " + this.data.audioGroupsData.audioItems[j]._id);
+                    if (triggerGroup.items[i] == this.data.audioGroupsData.audioItems[j]._id) {
+                    
+                        // console.log("found audio item tags are " + this.data.audioGroupsData.audioItems[j].tags); //not ideal, maybe the groupitems can store tags? or cache them when loaded below?
+                        if (this.data.audioGroupsData.audioItems[j].tags.includes(tags[0])) {
+                            console.log("tag match to " + tags);
+                            return triggerGroup.items[i];
+                        }
                     }
                 }
             }
+        } else {
+            return null;
         }
     }
 });

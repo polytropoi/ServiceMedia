@@ -10619,6 +10619,9 @@ function getAllPeople() {
                                 "<option value=\x22\x22 disabled selected>Select:</option>" +
                                 "<option>none</option>" +
                                 "<option>do action</option>" +
+                                "<option>destroy self</option>" +
+                                "<option>destroy other</option>" +
+                                "<option>destroy self and other</option>" +
                                 "<option>action prompt</option>" +
                                 "<option>start dialog</option>" +
                                 "<option>start animation</option>" +
