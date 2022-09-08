@@ -2601,6 +2601,10 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
       scale.x = this.data.locationData.markerObjScale != undefined ? this.data.locationData.markerObjScale : 1;
       scale.y = this.data.locationData.markerObjScale != undefined ? this.data.locationData.markerObjScale : 1;
       scale.z = this.data.locationData.markerObjScale != undefined ? this.data.locationData.markerObjScale : 1;
+      } else if (this.data.objectData.objScale != undefined && this.data.locationData.objScale != null && this.data.locationData.objScale != "" ) {
+        scale.x = this.data.objectData.objScale;
+        scale.y = this.data.objectData.objScale;
+        scale.z = this.data.objectData.objScale;
       }
 
  
@@ -2612,7 +2616,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
           this.modelParent.setAttribute("rotation", rot);
         } else {
             console.log("not equipped, no modelparent " + JSON.stringify(rot));
-            // this.el.setAttribute("scale", scale);
+            this.el.setAttribute("scale", scale);
             // this.el.object3D.position = pos;
             // this.el.object3D.rotation = rot;
           if (!this.hasShootAction) {
@@ -2631,7 +2635,17 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
         this.el.setAttribute("rotation", rot);
         // this.el.object3D.rotation = rot;
         this.el.setAttribute('material', {opacity: 0.25, transparent: true});
-        // this.el.setAttribute("scale", scale);
+     
+            // this.el.object3D.geometry.computeBoundingBox();
+            // // GETTING SIZE
+            // var s = new THREE.Vector3();
+            // var box3 = mesh.geometry.boundingBox;
+            // box3.getSize(s);
+            // console.log("SIZE VECTOR OF EQUIPPED ITEM IS " + JSON.stringify(s));
+        // USING SIZE VECTOR3 to set Y position of mesh
+        // mesh.position.y = s.y / 2;
+        this.el.setAttribute("scale", scale);
+        // this.el.object3D.scale.set(scale);
       }
 
     
@@ -2915,6 +2929,9 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
             }
             this.objexEl.components.mod_objex.throwObject(this.data.objectData._id, this.mouseDowntime, "5");
           }
+          if (this.triggerAudioController != null) {
+            this.triggerAudioController.components.trigger_audio_control.playAudioAtPosition(this.hitpoint, this.distance, ["throw"], .5);//tagmangler needs an array
+          }
         }
         if (this.hasShootAction) {
           // console.log("shoot action " + JSON.stringify(this.shootAction));
@@ -2931,7 +2948,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
           //   this.objexEl.components.mod_objex.shootObject(this.data.objectData._id, this.mouseDowntime, "5");
           // }
           if (this.triggerAudioController != null) {
-            this.triggerAudioController.components.trigger_audio_control.playAudioAtPosition(this.hitpoint, this.distance, ["shoot"]);//tagmangler needs an array
+            this.triggerAudioController.components.trigger_audio_control.playAudioAtPosition(this.hitpoint, this.distance, ["shoot"], .5);//tagmangler needs an array, add vol mod (bc blowing in they face)
           }
           this.el.object3D.visible = false;
           this.el.classList.remove("activeObjexRay");

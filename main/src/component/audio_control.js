@@ -1444,7 +1444,7 @@ AFRAME.registerComponent('trigger_audio_control', { //trigger audio on designate
         triggerAudioHowl.pos(this.triggerPosition, id); 
 
     },
-    playAudioAtPosition: function(pos, distance, tag) {
+    playAudioAtPosition: function(pos, distance, tag, volmod) {
         console.log("tryna play trigger audio with tag " + tag);
         if (triggerAudioHowl != null && tag != undefined && tag != null && tag != "") {
         // this.modVolume(1);
@@ -1481,6 +1481,9 @@ AFRAME.registerComponent('trigger_audio_control', { //trigger audio on designate
             // let volume = clamp(100 - distance) * .01; //hrm..
             if (volume < .1) {
                 volume = .1;
+            }
+            if (this.data.volmod != null) {
+                volume = volume * this.data.volmod;
             }
             triggerAudioHowl.volume(volume);
             

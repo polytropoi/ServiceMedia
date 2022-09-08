@@ -128,7 +128,6 @@ AFRAME.registerComponent('instanced_meshes_sphere', { //scattered randomly, not 
         
       for (var i=0; i<count; i++) {
       //   box = new THREE.Mesh(boxGeo, greyPhongMat);
-        
         // let x = Math.random() * 300 - 150;
         // let y = Math.random() * 300 - 150;
         // let z = Math.random() * 300 - 150;
@@ -153,10 +152,6 @@ AFRAME.registerComponent('instanced_meshes_sphere', { //scattered randomly, not 
           this.iMesh.instanceMatrix.needsUpdate = true;
           
           root.add(this.iMesh);
-
-
-    
-
       
       });
       this.el.classList.add('activeObjexRay');
@@ -1446,17 +1441,17 @@ AFRAME.registerComponent('mod_physics', {
     
 
 
-    this.el.addEventListener("collidestart", (e) => {
+    this.el.addEventListener("collidestart", (e) => { //this is for models, not objects - TODO look up locationData for tags? 
       e.preventDefault();
       // console.log("mod_physics collisoin with object with :" + this.el.id + " " + e.detail.targetEl.classList);
       if (this.data.isTrigger) {
         console.log("TRIGGER COLLIDED "  + this.el.id + " " + e.detail.targetEl.classList);
         // e.detail.body.disableCollision = true;
         this.disableCollisionTemp(); //must turn it off or it blocks, no true "trigger" mode afaik (unlike cannonjs!)
-        var triggerAudioController = document.getElementById("triggerAudio");
-        if (triggerAudioController != null) {
-          triggerAudioController.components.trigger_audio_control.playAudio();
-        }
+        // var triggerAudioController = document.getElementById("triggerAudio");
+        // if (triggerAudioController != null) {
+        //   triggerAudioController.components.trigger_audio_control.playAudio();
+        // }
       } else {
         // console.log("NOT TRIGGER COLLIDED "  + this.el.id + " " + e.detail.targetEl.classList);
         // let mod_obj_component = e.detail.targetEl.components.mod_object;
