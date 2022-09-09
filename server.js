@@ -22364,6 +22364,7 @@ app.post('/update_audio/:_id', requiredAuthentication, function (req, res) {
                 alt_title: req.body.alt_title,
                 alt_artist: req.body.alt_artist,
                 alt_source: req.body.alt_album,
+                sourceText: req.body.sourceText != undefined ? req.body.sourceText : "",
                 clipDuration : req.body.clipDuration != null ? req.body.clipDuration : "",
                 textitemID : req.body.textitemID != null ? req.body.textitemID : "",
                 textgroupID : req.body.textgroupitemID != null ? req.body.textgroupitemID : "",

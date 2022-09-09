@@ -2718,7 +2718,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
         } else {
           // console.log("NOT TRIGGER COLLIDED "  + this.el.id + " vs " + e.detail.targetEl.id);
           // console.log("NOT TRIGGER COLLIDED "  + this.el.id + " " + e.detail.targetEl.classList);
-          if (this.el != e.detail.targetEl) {
+          // if (this.el != e.detail.targetEl) {
             
             if (mod_obj_component != null) {
               console.log(this.data.objectData.name + "gotsa collision with " + mod_obj_component.data.objectData.name);
@@ -2726,7 +2726,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
                 console.log("actions: " + JSON.stringify(mod_obj_component.data.objectData.actions));
                 var triggerAudioController = document.getElementById("triggerAudio");
                 if (triggerAudioController != null) {
-                  triggerAudioController.components.trigger_audio_control.playAudioAtPosition(this.el.object3D.position, window.playerPosition.distanceTo(this.el.object3D.position), ["hit"]);
+                  triggerAudioController.components.trigger_audio_control.playAudioAtPosition(this.el.object3D.position, window.playerPosition.distanceTo(this.el.object3D.position), ["hit, bounce"]);
                 }
                 for (let i = 0; i < mod_obj_component.data.objectData.actions.length; i++) {
                   if (mod_obj_component.data.objectData.actions[i].actionType.toLowerCase() == "collide") {
@@ -2768,12 +2768,13 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
                       } else {
                         console.log("caint find object " + mod_obj_component.data.objectData.actions[i].objectID +", tryna fetch it..");
                       }
-                    }                    
+                    } 
+
                   }
                 }
               }
             }
-          }
+          // }
         }
       });
     

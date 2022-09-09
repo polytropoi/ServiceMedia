@@ -303,9 +303,13 @@ AFRAME.registerComponent('instanced_surface_meshes', {
   schema: {
     _id: {default: ''},
     modelID: {default: ''},
+    objectID: {default: ''},
     count: {default: 2000},
     scaleFactor: {default: 4},
-    yMod: {default: 0}
+    yMod: {default: 0},
+
+    interaction: {default: ''},
+    triggerTag: {default: null}
   },
   init: function () {
      let initialized = false;
@@ -1412,6 +1416,7 @@ AFRAME.registerComponent('mod_physics', {
     isTrigger: {default: false},
     body: {type: 'string', default: 'dynamic'},  // dynamic: A freely-moving object
     shape: {type: 'string', default: 'mesh'},  // hull: Wraps a model in a convex hull, like a shrink-wrap
+    tags: {default: []}
   },
   init() {
     console.log("tryna load ashape with trigger " + this.data.isTrigger);
@@ -1448,16 +1453,20 @@ AFRAME.registerComponent('mod_physics', {
         console.log("TRIGGER COLLIDED "  + this.el.id + " " + e.detail.targetEl.classList);
         // e.detail.body.disableCollision = true;
         this.disableCollisionTemp(); //must turn it off or it blocks, no true "trigger" mode afaik (unlike cannonjs!)
-        // var triggerAudioController = document.getElementById("triggerAudio");
-        // if (triggerAudioController != null) {
-        //   triggerAudioController.components.trigger_audio_control.playAudio();
-        // }
+
       } else {
-        // console.log("NOT TRIGGER COLLIDED "  + this.el.id + " " + e.detail.targetEl.classList);
-        // let mod_obj_component = e.detail.targetEl.components.mod_object;
-        // if (mod_obj_component != null) {
-        //   // console.log("gotsa collision with " + mod_obj_component.data.objectData.name);
-        // }
+        console.log("NOT TRIGGER COLLIDED "  + this.el.id + " " + e.detail.targetEl.classList);
+      
+      }
+      let mod_obj_component = e.detail.targetEl.components.mod_object;
+      if (mod_obj_component != null) {
+        console.log(this.el.id + " gotsa collision with " + mod_obj_component.data.objectData.name);
+        if (mod_obj_component.data.objectData.tags != undefined && mod_obj_component.data.objectData.tags != null) {
+          var triggerAudioController = document.getElementById("triggerAudio");
+          if (triggerAudioController != null) {
+            triggerAudioController.components.trigger_audio_control.playAudioAtPosition(e.detail.targetEl.object3D.position, window.playerPosition.distanceTo(e.detail.targetEl.object3D.position), mod_obj_component.data.objectData.tags);
+          }
+        }
       }
     });
 

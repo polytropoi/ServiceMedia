@@ -2951,7 +2951,9 @@
             if (response.data.lastUpdateTimestamp != null) {
                 date = response.data.lastUpdateTimestamp;
             }
-            
+            let sourceText = (response.data.sourceText != undefined && response.data.sourceText != 'undefined') ? response.data.sourceText : "";
+            sourceText = sourceText.toString().replace(/"/g, '\'');
+            console.log("sourceText " + sourceText);
             let tagsHtml = "";
             let tags = [];
             let timeKeysHtml = "";
@@ -3057,6 +3059,11 @@
                             "<div class=\x22col form-group col-md-2\x22>" + 
                                 "<label for=\x22modifications\x22>Modifications</label>" + 
                                 "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22modifications\x22 value=\x22" + response.data.modifications + "\x22 >" +
+                            "</div>" +
+                            "<div class=\x22col form-group col-md-12\x22>" + 
+                                "<label for=\x22sourceText\x22>Source Text</label>" + 
+                                // "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22sourceText\x22 value=\x22" + response.data.sourceText + "\x22 >" +
+                                "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22sourceText\x22 placeholder=\x22Full Text of Source(s)\x22 value=\x22" + sourceText + "\x22 >" +
                             "</div>" +
                             // "<div class=\x22col form-group col-md-12\x22>" + 
                             //     "<button class=\x22float-right btn btn-md btn-success previewModel\x22>Preview Model</button>" +
@@ -3377,6 +3384,7 @@
                         let alttitle = document.getElementById("audioAltTitle").value;
                         let artist = document.getElementById("audioArtist").value;
                         let album = document.getElementById("audioAlbum").value;
+                        let sourceText = document.getElementById("sourceText").value;
                         let status = $("#isPublic").prop("checked");
                         console.log("isPublic " + status);
                         let item_status = (status == true) ? "private" : "public";
@@ -3392,7 +3400,8 @@
                             alt_title: alttitle,
                             alt_artist: artist,
                             alt_source: album,
-                            clipDuration : duration
+                            clipDuration : duration,
+                            sourceText : sourceText
                             // textitemID : req.body.textitemID != null ? req.body.textitemID : "",
                             // textgroupID : req.body.textgroupitemID != null ? req.body.textgroupitemID : "",
                             // pictureitemID : req.body.pictureitemID != null ? req.body.pictureitemID : "",

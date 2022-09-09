@@ -1450,53 +1450,58 @@ AFRAME.registerComponent('trigger_audio_control', { //trigger audio on designate
         // this.modVolume(1);
         this.audioGroupsEl = document.getElementById('audioGroupsEl');
         let audioID = null;
-
+        let audioIDs = [];
         if (this.audioGroupsEl != null) { //if only a single trigger sound, it's hardwired to the triggerAudioHowl on server response
             this.audioGroupsController = this.audioGroupsEl.components.audio_groups_control;
             if (tag != null) {
-                audioID = this.audioGroupsController.returnTriggerAudioIDWithTag(tag); 
-            } else {
-                // audioID = this.audioGroupsController.returnRandomTriggerAudioID(); 
-            }
-            //TODO - follow index sequence, use tags?
-            console.log("tryna get audioID " + audioID);
-            let audioItem = this.audioGroupsController.returnAudioItem(audioID);
+                let tags = tag.toString().split(',');
+                for (let i = 0; i < tags.length; i++) {
+                    // console.log("looking fo rtag " + tag[i]);
+                    audioID = this.audioGroupsController.returnTriggerAudioIDWithTag(tags[i]);
+                    // } else {
+                    //     // audioID = this.audioGroupsController.returnRandomTriggerAudioID(); 
+                    // }
+                    //TODO - follow index sequence, use tags?
+                    console.log("tag "+ tags[i] + " tryna get audioID " + audioID);
+                    this.audioItem = this.audioGroupsController.returnAudioItem(audioID);
 
-            if (audioItem != null) {
-            console.log("tryna set trigger to src " + audioItem.URLogg);
-            triggerAudioHowl = null;
-            triggerAudioHowl = new Howl({
-                src: [audioItem.URLogg, audioItem.URLmp3],
-                format: ["ogg", "mp3"]
-            });
-            // triggerAudioHowl.format = ["ogg", "mp3"];
-            // triggerAudioHowl.src = [audioItem.URLogg, audioItem.URLmp3];
-            triggerAudioHowl.load();
-            // triggerAudioHowl.play();
+                    if (this.audioItem != null) {
+                        console.log("gotsa audioItem, tryna set trigger to src " + this.audioItem.URLogg);
+                        triggerAudioHowl = null;
+                        triggerAudioHowl = new Howl({
+                            src: [this.audioItem.URLogg, this.audioItem.URLmp3],
+                            format: ["ogg", "mp3"]
+                        });
+                        // triggerAudioHowl.format = ["ogg", "mp3"];
+                        // triggerAudioHowl.src = [audioItem.URLogg, audioItem.URLmp3];
+                        triggerAudioHowl.load();
+                        // triggerAudioHowl.play();
+
+                        //umm, maybe split the diff with this.data.volume (scene setting) and the distance driven volume below?
+                        let volume = Math.min(Math.max(0, 1000 - (distance * 25)), 1000) * .001; //clamp between 0-1
+                        // let volume = clamp(100 - distance) * .01; //hrm..
+                        if (volume < .1) {
+                            volume = .1;
+                        }
+                        if (this.data.volmod != null) {
+                            volume = volume * this.data.volmod;
+                        }
+                        triggerAudioHowl.volume(volume);
+                        
+                            
+                        const clamp = (num, a, b) => Math.max(Math.min(num, Math.max(a, b)), Math.min(a, b));
+                        const rate = clamp(Math.random() + .25, .75, 1.25); //fudge pitch a bit slower or faster
+                        triggerAudioHowl.rate(rate);
+                        // console.log("tryna play at hitpoint " + pos);
+                        let id = triggerAudioHowl.play();
+                        console.log("tryna play trigger at volume " + volume + " distance " + distance + " id " + id);
+                        triggerAudioHowl.pos(pos.x / 100, pos.y / 100, pos.z / 100, id);  //HOLY SHIT howler needs small values for position, * .01
+                        break;
+                        }
+                    }
+                }
             }
         }
-
-            //umm, maybe split the diff with this.data.volume (scene setting) and the distance driven volume below?
-            let volume = Math.min(Math.max(0, 1000 - (distance * 25)), 1000) * .001; //clamp between 0-1
-            // let volume = clamp(100 - distance) * .01; //hrm..
-            if (volume < .1) {
-                volume = .1;
-            }
-            if (this.data.volmod != null) {
-                volume = volume * this.data.volmod;
-            }
-            triggerAudioHowl.volume(volume);
-            
-                
-            const clamp = (num, a, b) => Math.max(Math.min(num, Math.max(a, b)), Math.min(a, b));
-            const rate = clamp(Math.random() + .25, .75, 1.25); //fudge pitch a bit slower or faster
-            triggerAudioHowl.rate(rate);
-            // console.log("tryna play at hitpoint " + pos);
-            let id = triggerAudioHowl.play();
-            console.log("tryna play trigger at volume " + volume + " distance " + distance + " id " + id);
-            triggerAudioHowl.pos(pos.x / 100, pos.y / 100, pos.z / 100, id);  //HOLY SHIT howler needs small values for position, * .01
-        }
-
     }
 }); //end register
     
@@ -1581,11 +1586,11 @@ AFRAME.registerComponent('audio_groups_control', { //element and component are a
         let triggerGroup = this.data.audioGroupsData.triggerGroupItems[0];
         return triggerGroup.items[Math.floor(Math.random()*triggerGroup.items.length)]; //pick a random entry from trigger ids
     },
-    returnTriggerAudioIDWithTag: function (tags) {
+    returnTriggerAudioIDWithTag: function (tag) {
         
-        if (tags) {
+        if (tag) {
             let triggerGroup = this.data.audioGroupsData.triggerGroupItems[0];
-            console.log("looking for audio trigger with tag " + tags[0] + " in files " + triggerGroup.items.length);
+            console.log("looking for audio trigger with tag " + tag + " in files " + triggerGroup.items.length);
             for (let i = 0; i < triggerGroup.items.length; i++) {
                 // console.log("looking for triggerGroup.item " + triggerGroup.items[i]);
                 for (let j = 0; j < this.data.audioGroupsData.audioItems.length; j++) {
@@ -1593,9 +1598,11 @@ AFRAME.registerComponent('audio_groups_control', { //element and component are a
                     if (triggerGroup.items[i] == this.data.audioGroupsData.audioItems[j]._id) {
                     
                         // console.log("found audio item tags are " + this.data.audioGroupsData.audioItems[j].tags); //not ideal, maybe the groupitems can store tags? or cache them when loaded below?
-                        if (this.data.audioGroupsData.audioItems[j].tags.includes(tags[0])) {
-                            console.log("tag match to " + tags);
+                        if (this.data.audioGroupsData.audioItems[j].tags.includes(tag)) {
+                            console.log("tag match to " + tag);
+                            
                             return triggerGroup.items[i];
+                        
                         }
                     }
                 }
