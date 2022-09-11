@@ -919,6 +919,9 @@ AFRAME.registerComponent('attributions-text-control', {
       // console.log("parsedAttribtions data : " +JSON.stringify(this.data.jsonData));
       
       // let tArray = this.data.jsonData.attributions; //must use a declared name for array, raw array doesn't work
+    }, 
+    loadAttributions: () => {
+    
       let tArray = this.data.jsonData;
 
       attributionsArray = tArray; //for toggle component below
@@ -928,7 +931,7 @@ AFRAME.registerComponent('attributions-text-control', {
       // console.log("attributiosn length: " + tArray.length);
       attributionsIndex = 0;  
       if (tArray != undefined && tArray.length > 0) {       
-          this.tArray = tArray;
+          // this.tArray = tArray;
           // tArray.length = tArray.length;
           let headerEl = document.getElementById("attributionsHeaderText");
           let sourceEl = document.getElementById("attributionsSourceText");
@@ -1117,7 +1120,12 @@ AFRAME.registerComponent('attributions-text-control', {
               });
           });
       }
-  }
+    },
+    addAttibutions: (attributions) => {
+      this.data.jsonData.push(attributions);    
+      this.loadAttributions();
+    }
+  
 });
 
 AFRAME.registerComponent('toggle-attributions-text', {
@@ -1151,7 +1159,6 @@ AFRAME.registerComponent('toggle-attributions-text', {
 
           });
       });
-      
 
       let sourceEl = document.getElementById("attributionsSourceText");
       let authorEl = document.getElementById("attributionsAuthorText");
@@ -2615,7 +2622,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
           this.modelParent.setAttribute("position", pos);
           this.modelParent.setAttribute("rotation", rot);
         } else {
-            console.log("not equipped, no modelparent " + JSON.stringify(rot));
+            // console.log("not equipped, no modelparent " + JSON.stringify(rot));
             this.el.setAttribute("scale", scale);
             // this.el.object3D.position = pos;
             // this.el.object3D.rotation = rot;
@@ -2717,7 +2724,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
           }
         } else {
           // console.log("NOT TRIGGER COLLIDED "  + this.el.id + " vs " + e.detail.targetEl.id);
-          // console.log("NOT TRIGGER COLLIDED "  + this.el.id + " " + e.detail.targetEl.classList);
+          // console.log("NOT TRIGGER COLLIDED "  + this.el.object3D.name + " " + e.detail.targetEl.object3D.name + " has mod_object " + mod_obj_component);
           // if (this.el != e.detail.targetEl) {
             
             if (mod_obj_component != null) {

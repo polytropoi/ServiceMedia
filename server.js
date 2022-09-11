@@ -21110,7 +21110,7 @@ app.get('/webxr_nope/:_id', function (req, res) { //TODO lock down w/ checkAppID
     } //if params undefined
 });
 //webxr/: end
-
+///////////UNITY ROUTE
 app.get('/scene/:_id/:platform/:version', function (req, res) { //called from app context - TODO lock down w/ checkAppID, requiredAuthentication
 
     console.log("tryna get scene id: ", req.params._id + " excaped " + entities.decodeHTML(req.params._id));

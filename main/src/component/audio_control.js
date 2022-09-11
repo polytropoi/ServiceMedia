@@ -1564,14 +1564,14 @@ AFRAME.registerComponent('audio_groups_control', { //element and component are a
     },
     returnAudioItem: function (id) {
         let index = -1;
-        console.log("tryna get audio item id " + id);
+        // console.log("tryna get audio item id " + id);
         for (var i = 0; i < this.data.audioGroupsData.audioItems.length; i++){
             if (id == this.data.audioGroupsData.audioItems[i]._id) {
                 index = i;
                 break;
             }
         }
-        console.log("tryna get audio index " + index);
+        // console.log("tryna get audio index " + index);
         if (index != -1) {
             return this.data.audioGroupsData.audioItems[index];
             // return null;
