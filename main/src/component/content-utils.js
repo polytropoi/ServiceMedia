@@ -2113,7 +2113,7 @@ AFRAME.registerComponent('mod_objex', {
         }
       }
       console.log("need to fetch to pop scene inventory: " + oIDs);
-      SceneInventoryLoad(oIDs); //do fetch in external function, below, bc ajax response can't get to component scope if it's here
+      FetchSceneInventoryObjex(oIDs); //do fetch in external function, below, bc ajax response can't get to component scope if it's here
     
     },
     loadSceneInventoryObjects: function () { //coming back from upstream call after updating jsonObjectData with missing sceneInventoryItems
@@ -2163,9 +2163,9 @@ AFRAME.registerComponent('mod_objex', {
           }
         }
       }
-      if (objek == null) {
-        SceneInventoryLoad([objectID]);
-      }
+      // if (objek == null) {
+      //   FetchSceneInventoryObject([objectID]);
+      // }
       return objek;
     },
     addFetchedObject (obj) { //for scene inventory objects, not in player inventory
@@ -2331,7 +2331,28 @@ AFRAME.registerComponent('mod_objex', {
     }
 });
 
-function SceneInventoryLoad(oIDs) { //fetch scene inventory objects, i.e. stuff dropped by users
+function FetchSceneInventoryObject(oID) { //add a single scene inventory object, e.g. child object spawn that isn't in initial collection, but don't init everything
+  let objexEl = document.getElementById('sceneObjects');    
+  // if (oIDs.length > 0) {
+    // objexEl.components.mod_objex.dropObject(data.inventoryObj.objectID);
+    let data = {};
+    data.oIDs = [oID];
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", '/scene_inventory_objex/', true);
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.send(JSON.stringify(data));
+    xhr.onload = function () {
+      // do something to response
+      // console.log("fetched obj resp: " +this.responseText);
+      let response = JSON.parse(this.responseText);
+      // console.log("gotsome objex: " + response.objex.length);
+      if (response.objex.length > 0) {
+          objexEl.components.mod_objex.addFetchedObject(response.objex[0]); //add to scene object collection, so don't have to fetch again
+      } 
+    }
+}
+
+function FetchSceneInventoryObjex(oIDs) { //fetch scene inventory objects, i.e. stuff dropped by users, at start to populate scene
   let objexEl = document.getElementById('sceneObjects');    
   if (oIDs.length > 0) {
     // objexEl.components.mod_objex.dropObject(data.inventoryObj.objectID);
@@ -2746,7 +2767,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
 
                     }
                     if (mod_obj_component.data.objectData.actions[i].sourceObjectMod.toLowerCase() == "replace object") {
-                      console.log("tryna replace object...");
+                      // console.log("tryna replace object...");
                       let trailComponent = e.detail.targetEl.components.trail;
                       if (trailComponent) {
                         trailComponent.reset();
@@ -2754,9 +2775,10 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
                       e.detail.targetEl.parentNode.removeChild(e.detail.targetEl);
                       let objexEl = document.getElementById('sceneObjects');    
                       let objectData = objexEl.components.mod_objex.returnObjectData(mod_obj_component.data.objectData.actions[i].objectID);
-                      if (objectData == null) {
-                        objectData = objexEl.components.mod_objex.returnObjectData(mod_obj_component.data.objectData.actions[i].objectID); //try again, if it's not in the sceneobjectdata it will make a special request
-                      }
+                      // if (objectData == null) {
+
+                      //   // objectData = objexEl.components.mod_objex.returnObjectData(mod_obj_component.data.objectData.actions[i].objectID); //try again, if it's not in the sceneobjectdata it will make a special request
+                      // }
                       if (objectData != null) {
                         console.log("tryna replace object with " + JSON.stringify(objectData));
                         // this.objectData = this.returnObjectData(mod_obj_component.data.objectData.actions[i].objectID);
@@ -2774,6 +2796,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
                         sceneEl.appendChild(this.objEl);
                       } else {
                         console.log("caint find object " + mod_obj_component.data.objectData.actions[i].objectID +", tryna fetch it..");
+                        FetchSceneInventoryObject(mod_obj_component.data.objectData.actions[i].objectID);
                       }
                     } 
 
