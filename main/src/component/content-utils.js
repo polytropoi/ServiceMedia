@@ -906,31 +906,34 @@ AFRAME.registerComponent('toggle-main-text', {
 
 let attributionsArray = [];
 let attributionsIndex = 0;
-AFRAME.registerComponent('attributions-text-control', {
+AFRAME.registerComponent('attributions_text_control', {
 
     schema: {
-      jsonData: {default: ""}
+      jsonData: {default: ""},
+      tArray: {default: []}
     },
     init: function () {
+      // this.tArray = [];
       let theData = this.el.getAttribute('data-attributions');
       // console.log("attributions data" + theData);
       
       this.data.jsonData = JSON.parse(atob(theData)); //convert from base64
-      // console.log("parsedAttribtions data : " +JSON.stringify(this.data.jsonData));
-      
+      console.log("parsedAttribtions data : " +JSON.stringify(this.data.jsonData));
+      this.tArray = this.data.jsonData;
+
+
       // let tArray = this.data.jsonData.attributions; //must use a declared name for array, raw array doesn't work
     }, 
     loadAttributions: () => {
     
-      let tArray = this.data.jsonData;
 
-      attributionsArray = tArray; //for toggle component below
+      // attributionsArray = this.tArray; //for toggle component below//wha?
       
       // this.attributionsObject = attributions; //take from 
       // console.log("attributionsObject " + JSON.stringify(this.attributionsObject));
       // console.log("attributiosn length: " + tArray.length);
       attributionsIndex = 0;  
-      if (tArray != undefined && tArray.length > 0) {       
+      if (this.tArray != undefined && this.tArray.length > 0) {       
           // this.tArray = tArray;
           // tArray.length = tArray.length;
           let headerEl = document.getElementById("attributionsHeaderText");
@@ -941,19 +944,19 @@ AFRAME.registerComponent('attributions-text-control', {
           let nextButton = document.getElementById("nextAttribution");
           let previousButton = document.getElementById("previousAttribution");
 
-          if (tArray[0].sourceTitle != undefined && tArray[0].sourceTitle != null ) {
+          if (this.tArray[0].sourceTitle != undefined && this.tArray[0].sourceTitle != null ) {
 
           headerEl.setAttribute('text', {
             baseline: "top",
             align: "left",
             // color: "lightblue",
-            value: "Attribution 1 of " + tArray.length
+            value: "Attribution 1 of " + this.tArray.length
           });
           sourceEl.setAttribute('text', {
               baseline: "top",
               align: "left",
               // color: "lightblue",
-              value: "Source: " + tArray[0].sourceTitle
+              value: "Source: " + this.tArray[0].sourceTitle
           });
           // if (tArray[0].sourceLink != undefined && tArray[0].sourceLink.length > 0) {
           //   sourceEl.setAttribute('basic-link', {href: tArray[0].sourceLink});
@@ -962,19 +965,19 @@ AFRAME.registerComponent('attributions-text-control', {
             baseline: "top",
             align: "left",
             // color: "lightblue",
-            value: "Author: " + tArray[0].authorName
+            value: "Author: " + this.tArray[0].authorName
           });
-          // if (tArray[0].authorLink != undefined && tArray[0].authorLink.length > 0) {
-          //     authorEl.setAttribute('basic-link', {href: tArray[0].authorLink});
+          // if (this.tArray[0].authorLink != undefined && this.tArray[0].authorLink.length > 0) {
+          //     authorEl.setAttribute('basic-link', {href: this.tArray[0].authorLink});
           // }
           
           licenseEl.setAttribute('text', {
             baseline: "top",
             align: "left",
-            value: "License: " + tArray[0].license
+            value: "License: " + this.tArray[0].license
           });
           licenseEl.setAttribute('basic-link', {href: "https://creativecommons.org/licenses"});
-          let mods = tArray[0].modifications.toLowerCase().includes("undefined") ? "none" : tArray[0].modifications;
+          let mods = this.tArray[0].modifications.toLowerCase().includes("undefined") ? "none" : this.tArray[0].modifications;
           modsEl.setAttribute('text', {
             baseline: "top",
             align: "left",
@@ -986,20 +989,20 @@ AFRAME.registerComponent('attributions-text-control', {
             baseline: "top",
             align: "left",
             // color: "lightblue",
-            value: "Attribution 1 of " + tArray.length
+            value: "Attribution 1 of " + this.tArray.length
           });
           sourceEl.setAttribute('text', {
               baseline: "top",
               align: "left",
               // color: "lightblue",
-              value: "Attribution : " + tArray[0].sourceText
+              value: "Attribution : " + this.tArray[0].sourceText
           });
 
         }
 
           let uiMaterial = new THREE.MeshStandardMaterial( { color: 'blue' } ); 
           
-          if (tArray.length > 1) {
+          if (this.tArray.length > 1) {
             nextButton.setAttribute('visible', true);
             previousButton.setAttribute('visible', true);
             nextButton.setAttribute('visible', true);
@@ -1023,22 +1026,22 @@ AFRAME.registerComponent('attributions-text-control', {
             if (attributionsIndex > 0) {
                   attributionsIndex--;
               } else {
-                attributionsIndex = tArray.length - 1;
+                attributionsIndex = this.tArray.length - 1;
               }
               headerEl.setAttribute('text', {
                 baseline: "top",
                 align: "left",
                 // color: "lightblue",
-                value: "Attribution "+(attributionsIndex+1)+" of " + tArray.length
+                value: "Attribution "+(attributionsIndex+1)+" of " + this.tArray.length
               });
               sourceEl.setAttribute('text', {
                 baseline: "top",
                 align: "left",
                 // color: "lightblue",
-                value: "Source: " + tArray[attributionsIndex].sourceTitle
+                value: "Source: " + this.tArray[attributionsIndex].sourceTitle
               });
-              if (tArray[attributionsIndex].sourceLink != undefined && tArray[attributionsIndex].sourceLink.length > 0) {
-                sourceEl.setAttribute('basic-link', {href: tArray[attributionsIndex].sourceLink});
+              if (this.tArray[attributionsIndex].sourceLink != undefined && this.tArray[attributionsIndex].sourceLink.length > 0) {
+                sourceEl.setAttribute('basic-link', {href: this.tArray[attributionsIndex].sourceLink});
               } else {
                 sourceEl.setAttribute('basic-link', {href: "no"});
                 sourceEl.removeAttribute('basic-link', true);
@@ -1047,10 +1050,10 @@ AFRAME.registerComponent('attributions-text-control', {
                 baseline: "top",
                 align: "left",
                 // color: "lightblue",
-                value: "Author: " + tArray[attributionsIndex].authorName
+                value: "Author: " + this.tArray[attributionsIndex].authorName
               });
-              if (tArray[attributionsIndex].authorLink != undefined && tArray[attributionsIndex].authorLink.length > 0) {
-                authorEl.setAttribute('basic-link', {href: tArray[attributionsIndex].authorLink});
+              if (this.tArray[attributionsIndex].authorLink != undefined && this.tArray[attributionsIndex].authorLink.length > 0) {
+                authorEl.setAttribute('basic-link', {href: this.tArray[attributionsIndex].authorLink});
               } else {
                 console.log("removing link");
                 authorEl.setAttribute('basic-link', {href: "no"});
@@ -1059,18 +1062,18 @@ AFRAME.registerComponent('attributions-text-control', {
               licenseEl.setAttribute('text', {
                 baseline: "top",
                 align: "left",
-                value: "License: " + tArray[attributionsIndex].license
+                value: "License: " + this.tArray[attributionsIndex].license
               });
               licenseEl.setAttribute('basic-link', {href: "https://creativecommons.org/licenses"});
               modsEl.setAttribute('text', {
                 baseline: "top",
                 align: "left",
-                value: "Mods: " + tArray[attributionsIndex].modifications
+                value: "Mods: " + this.tArray[attributionsIndex].modifications
               });
           });          
           nextButton.addEventListener('click', function () {
             console.log("tryna show next from index" + attributionsIndex);
-            if (tArray.length > attributionsIndex + 1) {
+            if (this.tArray.length > attributionsIndex + 1) {
                   attributionsIndex++;
               } else {
                 attributionsIndex = 0;
@@ -1079,16 +1082,16 @@ AFRAME.registerComponent('attributions-text-control', {
                 baseline: "top",
                 align: "left",
                 // color: "lightblue",
-                value: "Attribution "+ (attributionsIndex+1) +" of " + tArray.length
+                value: "Attribution "+ (attributionsIndex+1) +" of " + this.tArray.length
               });
               sourceEl.setAttribute('text', {
                 baseline: "top",
                 align: "left",
                 // color: "lightblue",
-                value: "Source: " + tArray[attributionsIndex].sourceTitle
+                value: "Source: " + this.tArray[attributionsIndex].sourceTitle
               });
-              if (tArray[attributionsIndex].sourceLink != undefined && tArray[attributionsIndex].sourceLink.length > 4) {
-                sourceEl.setAttribute('basic-link', {href: tArray[attributionsIndex].sourceLink});
+              if (this.tArray[attributionsIndex].sourceLink != undefined && this.tArray[attributionsIndex].sourceLink.length > 4) {
+                sourceEl.setAttribute('basic-link', {href: this.tArray[attributionsIndex].sourceLink});
               } else {
                 console.log("removing link");
                 sourceEl.setAttribute('basic-link', {href: "no"}); //try to override to force it
@@ -1098,10 +1101,10 @@ AFRAME.registerComponent('attributions-text-control', {
                 baseline: "top",
                 align: "left",
                 // color: "lightblue",
-                value: "Author: " + tArray[attributionsIndex].authorName
+                value: "Author: " + this.tArray[attributionsIndex].authorName
               });
-              if (tArray[attributionsIndex].authorLink != undefined && tArray[attributionsIndex].authorLink.length > 0) {
-                authorEl.setAttribute('basic-link', {href: tArray[attributionsIndex].authorLink});
+              if (this.tArray[attributionsIndex].authorLink != undefined && this.tArray[attributionsIndex].authorLink.length > 0) {
+                authorEl.setAttribute('basic-link', {href: this.tArray[attributionsIndex].authorLink});
               } else {
                 console.log("removing link");
                 authorEl.setAttribute('basic-link', {href: "no"});
@@ -1110,19 +1113,22 @@ AFRAME.registerComponent('attributions-text-control', {
               licenseEl.setAttribute('text', {
                 baseline: "top",
                 align: "left",
-                value: "License: " + tArray[attributionsIndex].license
+                value: "License: " + this.tArray[attributionsIndex].license
               });
               licenseEl.setAttribute('basic-link', {href: "https://creativecommons.org/licenses"});
               modsEl.setAttribute('text', {
                 baseline: "top",
                 align: "left",
-                value: "Mods: " + tArray[attributionsIndex].modifications
+                value: "Mods: " + this.tArray[attributionsIndex].modifications
               });
           });
       }
     },
-    addAttibutions: (attributions) => {
-      this.data.jsonData.push(attributions);    
+    addAttribution: (attribution) => {
+      console.log("attribution : " + JSON.stringify(attribution) + "into tArray " + JSON.stringify(this.tArray));
+      // this.tArray.attributions.push(attribution);    
+    },
+    addAttibutions: function() {
       this.loadAttributions();
     }
   
@@ -1163,7 +1169,7 @@ AFRAME.registerComponent('toggle-attributions-text', {
       let sourceEl = document.getElementById("attributionsSourceText");
       let authorEl = document.getElementById("attributionsAuthorText");
       this.el.addEventListener('click', function () {
-        if (!document.querySelector("#attributionsTextPanel").getAttribute('visible')){
+        if (!document.querySelector("#attributionsTextPanel").getAttribute('visible')) {
           document.querySelector("#attributionsTextPanel").setAttribute('visible', true);
           if (attributionsArray[attributionsIndex] != undefined) {
             if (attributionsArray[attributionsIndex].sourceLink != undefined && attributionsArray[attributionsIndex].sourceLink.length > 0) {

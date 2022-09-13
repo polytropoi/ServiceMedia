@@ -45,9 +45,9 @@ webxr_router.get('/:_id', function (req, res) {
     // let authString = checkAuthentication(req);
     // console.log("referrer: " + req.header.referrer);
 
-    var audioResponse = {};
-    var pictureResponse = {};
-    var postcardResponse = {};
+    // var audioResponse = {};
+    // var pictureResponse = {};
+    // var postcardResponse = {};
     var sceneResponse = {};
     var requestedPictureItems = [];
     var requestedPictureGroups = [];
@@ -102,10 +102,10 @@ webxr_router.get('/:_id', function (req, res) {
     var debugMode = false;
     var ARMarker = "";
     var arMode = "position";
-    var randomizerScript = "";
-    var animationComponent = "";
-    var targetObjectAsset = "";
-    var targetObjectEntity = "";
+    // var randomizerScript = "";
+    // var animationComponent = "";
+    // var targetObjectAsset = "";
+    // var targetObjectEntity = "";
     var skyParticles;
     var videoAsset = "";
     var videoEntity = "";
@@ -118,16 +118,16 @@ webxr_router.get('/:_id', function (req, res) {
     var nextLink = "";
     var prevLink = "";
     var loopable = "";
-    let usdzs = [];
-    var gltfs = {};
+    // let usdzs = [];
+    // var gltfs = {};
     var sceneGLTFLocations = [];
     var sceneModelLocations = [];
     var sceneObjectLocations = [];
 
     var sceneWeblinkLocations = [];
-    var allGLTFs = {};
-    var gltfUrl = "";
-    var gltfs = "";
+    // var allGLTFs = {};
+    // var gltfUrl = "";
+    // var gltfs = "";
     var gltfsAssets = "";
     var gltfsEntities = "";
     let weblinkAssets = "";
@@ -312,7 +312,6 @@ webxr_router.get('/:_id', function (req, res) {
                 if (req.session) {
                     if (req.session.user) {
                         avatarName = req.session.user.userName;
-                        // if ()
                         isGuest = false;
                     }
                 }
@@ -337,8 +336,7 @@ webxr_router.get('/:_id', function (req, res) {
                         }
                     }
                 }
-                // if (accessScene) {
-                async.waterfall([ 
+                async.waterfall([  // async init
                 
                 function (callback) {
                     let pin = req.query.p;
@@ -1445,7 +1443,7 @@ webxr_router.get('/:_id', function (req, res) {
                                     console.log('All files have been processed successfully skyboxEnvMap is ' + skyboxEnvMap);
          
                                     if (availableScenes != null && availableScenes != undefined && availableScenes.length > 0) {
-                                    availableScenesEntity = "<a-entity scale=\x22.75 .75 .75\x22 look-at=\x22#player\x22 position=\x22"+scenesKeyLocation+"\x22>"+ //attributions-text-control is set onload, using attributions string above
+                                    availableScenesEntity = "<a-entity scale=\x22.75 .75 .75\x22 look-at=\x22#player\x22 position=\x22"+scenesKeyLocation+"\x22>"+ 
                                     "<a-entity position=\x220 -2.5 0\x22 scale=\x22.75  .75 .75\x22 id=\x22availableScenesControl\x22 class=\x22envMap activeObjexRay\x22 toggle-available-scenes "+skyboxEnvMap+" gltf-model=\x22#key\x22></a-entity>"+
                                     "<a-entity id=\x22availableScenesPanel\x22 visible='false' position=\x220 -1 0\x22>"+
                                     "<a-entity id=\x22availableScenesHeaderText\x22 geometry=\x22primitive: plane; width: 3.25; height: 1\x22 position=\x220 1.75 0\x22 material=\x22color: grey; transparent: true; opacity: 0.0\x22" +
@@ -1459,7 +1457,7 @@ webxr_router.get('/:_id', function (req, res) {
                                     "</a-entity></a-entity>";
                                     console.log('processed attributions for ' + availableScenes.length);
                                     
-                                    loadAvailableScenes = "ready(function(){\n" + //attributions data is loaded when page is ready (complex objs don't wanna parse if jacked in server side...?!?)
+                                    loadAvailableScenes = "ready(function(){\n" + //TODO base64 this stuff like the others...
                                     "let ascontrol = document.getElementById(\x22availableScenesControl\x22);\n"+
                                     
                                     "ascontrol.setAttribute(\x22available-scenes-control\x22, \x22jsonData\x22, "+JSON.stringify(JSON.stringify(availableScenesResponse))+");\n"+ //double stringify! yes, it's needed
@@ -2133,7 +2131,7 @@ webxr_router.get('/:_id', function (req, res) {
                         attributionsObject.attributions = attributions;
 
                     let attrib64 = Buffer.from(JSON.stringify(attributionsObject)).toString("base64");
-                        attributionsTextEntity = attributionsTextEntity + "<a-entity id=\x22attributionsEntity\x22 data-attributions=\x22"+attrib64+"\x22 attributions-text-control></a-entity>";
+                        attributionsTextEntity = attributionsTextEntity + "<a-entity id=\x22attributionsEntity\x22 data-attributions=\x22"+attrib64+"\x22 attributions_text_control></a-entity>";
                         callback();
                     } else {
                         callback();
@@ -2243,6 +2241,7 @@ webxr_router.get('/:_id', function (req, res) {
                             callback(null);
                         } else {
                             callback(null, audio_items) //send them along
+
                         }
                     });
                 },
@@ -2279,6 +2278,22 @@ webxr_router.get('/:_id', function (req, res) {
                         if (sceneResponse.sceneTriggerAudioID != undefined && audio_items[i]._id == sceneResponse.sceneTriggerAudioID) {
                             triggerOggUrl = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + audio_items[i].userID + "/audio/" + audio_items[i]._id + "." + oggName, Expires: 6000});
                             triggerMp3Url = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + audio_items[i].userID + "/audio/" + audio_items[i]._id + "." + mp3Name, Expires: 6000});
+                        }
+
+                        if (audio_items[i].sourceText != undefined && audio_items[i].sourceText != null && audio_items[i].sourceText != "") {
+                            let newAttribution = {};
+                                    
+                            newAttribution.name = audio_items[i].title;
+                            newAttribution._id = audio_items[i]._id;
+                            
+                            newAttribution.sourceTitle = audio_items[i].sourceTitle;
+                            newAttribution.sourceLink = audio_items[i].sourceLink;
+                            newAttribution.authorName = audio_items[i].authorName;
+                            newAttribution.authorLink = audio_items[i].authorLink;
+                            newAttribution.license = audio_items[i].license;
+                            newAttribution.sourceText = audio_items[i].sourceText;
+                            newAttribution.modifications = audio_items[i].modifications;
+                            attributions.push(newAttribution);
                         }
                         // console.log("copying audio to s3...");
                     }

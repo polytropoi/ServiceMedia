@@ -902,7 +902,7 @@ function GetUserInventory () {
     xhr.send();
     xhr.onload = function () {
       // do something to response
-      console.log("inventory resp: " +this.responseText);
+      // console.log("inventory resp: " +this.responseText);
       if (this.responseText != null && !this.responseText.toLowerCase().includes("no inventory found")) {
         let inventoryObjs = JSON.parse(this.responseText);
         // console.log("inventory: " +inventoryObj.inventoryItems[0].objectName);

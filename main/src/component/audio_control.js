@@ -1529,6 +1529,44 @@ AFRAME.registerComponent('audio_groups_control', { //element and component are a
     SetAudioGroupsData: function (data) {
         console.log("audiogroups data: " +JSON.stringify(data));
         this.data.audioGroupsData = data;
+        this.attribEl = document.getElementById("attributionsEntity");
+        this.audioAttribs = [];
+        
+        if (this.attribEl) {
+            this.attribControl = this.attribEl.components.attributions_text_control;
+            if (this.attribControl) {
+                for (let i = 0; i < this.data.audioGroupsData.audioItems.length; i++) {
+                    if (this.data.audioGroupsData.audioItems[i].sourceText != undefined && this.data.audioGroupsData.audioItems[i].sourceText != null) {
+                       
+                        let newAttribution = {};
+                                    
+                        newAttribution.name = this.data.audioGroupsData.audioItems[i].title;
+                        newAttribution._id = this.data.audioGroupsData.audioItems[i]._id;
+                        newAttribution.contentType = "audio";
+                        
+                        newAttribution.sourceTitle = this.data.audioGroupsData.audioItems[i].sourceTitle;
+                        newAttribution.sourceLink = this.data.audioGroupsData.audioItems[i].sourceLink;
+                        newAttribution.authorName = this.data.audioGroupsData.audioItems[i].authorName;
+                        newAttribution.authorLink = this.data.audioGroupsData.audioItems[i].authorLink;
+                        newAttribution.license = this.data.audioGroupsData.audioItems[i].license;
+                        newAttribution.sourceText = this.data.audioGroupsData.audioItems[i].sourceText;
+                        newAttribution.modifications = this.data.audioGroupsData.audioItems[i].modifications;
+                        
+                        this.attribControl.data.jsonData.attributions.push(newAttribution);
+                        console.log("attribCOntrorl data: " + JSON.stringify(this.attribControl.data.jsonData)); //mkay this doesn't do anything atm...
+                        //
+
+                        attributions.push("Name: " + this.data.audioGroupsData.audioItems[i].title + " - Type: audio - Source: " + this.data.audioGroupsData.audioItems[i].sourceText);
+                        // this.attribControl.addAttribution(newAttribution);
+                        
+                    }
+                    if (i === this.data.audioGroupsData.audioItems.length) {
+                        this.attribControl.addAttributions();
+                    }
+                } 
+            }
+        }
+
         
     },
 
@@ -1555,6 +1593,7 @@ AFRAME.registerComponent('audio_groups_control', { //element and component are a
         FetchAudioGroupsData(groupArray);
 
     },
+
 
     ambientGroups: function () {
 
