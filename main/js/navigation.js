@@ -553,7 +553,9 @@ AFRAME.registerComponent('simple-navmesh-constraint', {
         default: ''
       }
     },
-    
+    init: function () {
+      console.log("tryna init simple navmesh");
+    },
     update: function () {
       this.lastPosition = null;
       this.excludes = this.data.exclude ? Array.from(document.querySelectorAll(this.data.exclude)):[];

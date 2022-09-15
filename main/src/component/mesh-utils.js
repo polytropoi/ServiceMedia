@@ -318,6 +318,8 @@ AFRAME.registerComponent('instanced_surface_meshes', {
       this.scatterModel = null;
       this.sampleGeometry = null;
       this.sampleMaterial = null;
+      this.raycaster = new THREE.Raycaster();
+      
       // var dummy = new THREE.Object3D();
       this.iMesh = null;
       console.log("model this.data._id " + this.data._id + " tryna instance " + this.data.count);
@@ -339,6 +341,26 @@ AFRAME.registerComponent('instanced_surface_meshes', {
     surfaceEl.addEventListener('surfaceLoaded', function (event) {
       console.log("SURFACE EVENT LOADEDD");
       that.surface(that.sampleGeometry, that.sampleMaterial);
+    });
+    
+    this.el.addEventListener('raycaster-intersected', (e) => {  
+
+        this.raycaster = e.detail.el;
+      
+        this.intersection = this.raycaster.components.raycaster.getIntersection(this.el, true);
+        this.hitpoint = this.intersection.point;
+        
+        console.log('ray hit', this.intersection.object.name);
+
+            // thiz.mouseOverObject = this.intersection.object.name;      
+            // this.hitpoint = intersection.point;   
+            // console.log('ray hit', thiz.mouseOverObject );
+        });
+    
+    this.el.addEventListener("raycaster-intersected-cleared", (e) => {
+        console.log("intersection cleared");
+        // thiz.mouseOverObject = null;
+        this.raycaster = null;
     });
   },
 
@@ -385,44 +407,40 @@ AFRAME.registerComponent('instanced_surface_meshes', {
     // setSurface: function ()
     scatter: function (surface, geo, mat) {
         console.log("tryna scatter!@");
-        let that = this;
+        // let that = this;
 
-        that.sampleGeometry = geo;
-        that.sampleMaterial = mat;
-        that.surfaceMesh = surface;
+        this.sampleGeometry = geo;
+        this.sampleMaterial = mat;
+        this.surfaceMesh = surface;
       // this.surface.setAttribute("activeObjexRay");
-      console.log('surfacemesh name ' + that.surfaceMesh);
+      console.log('surfacemesh name ' + this.surfaceMesh);
 
         var dummy = new THREE.Object3D();
         const count = this.data.count;
     
-        const sampler = new MeshSurfaceSampler( that.surfaceMesh ) // noice!
+        const sampler = new MeshSurfaceSampler( this.surfaceMesh ) // noice!
         .build();
-          this.iMesh = new THREE.InstancedMesh(that.sampleGeometry, that.sampleMaterial, count);
+          this.iMesh = new THREE.InstancedMesh(this.sampleGeometry, this.sampleMaterial, count);
           let position = new THREE.Vector3();
           for (var i=0; i<count; i++) {
 
             sampler.sample( position )
-
             let scale = Math.random() * this.data.scaleFactor;
             // console.log("scale " + scale);
             dummy.position.set(  position.x,position.y + this.data.yMod,position.z );
-
             dummy.scale.set(scale,scale,scale);
-            
             dummy.rotation.y = (Math.random() * 360 ) * Math.PI / 180;
-
             dummy.updateMatrix();
-
             this.iMesh.setMatrixAt( i, dummy.matrix );
-  
           }
   
-              this.iMesh.frustumCulled = false;
-              this.iMesh.instanceMatrix.needsUpdate = true;
-              
-              sceneEl.object3D.add(this.iMesh);
+        this.iMesh.frustumCulled = false;
+        this.iMesh.instanceMatrix.needsUpdate = true;
+            
+        sceneEl.object3D.add(this.iMesh);
 
+        this.el.classList.add('activeObjexRay');
+              
       }
 
 
@@ -1410,7 +1428,7 @@ AFRAME.registerComponent('cloud_marker', {
 
 
 
-AFRAME.registerComponent('mod_physics', {
+AFRAME.registerComponent('mod_physics', { //used by models, not objects which manage physics settings in mod_object
   schema: {
     model: {default: ''},
     isTrigger: {default: false},
@@ -1450,12 +1468,12 @@ AFRAME.registerComponent('mod_physics', {
       e.preventDefault();
       // console.log("mod_physics collisoin with object with :" + this.el.id + " " + e.detail.targetEl.classList);
       if (this.data.isTrigger) {
-        console.log("TRIGGER COLLIDED "  + this.el.id + " " + e.detail.targetEl.classList);
+        console.log("mod_physics TRIGGER collision "  + this.el.id + " " + e.detail.targetEl.classList);
         // e.detail.body.disableCollision = true;
         this.disableCollisionTemp(); //must turn it off or it blocks, no true "trigger" mode afaik (unlike cannonjs!)
 
       } else {
-        console.log("NOT TRIGGER COLLIDED "  + this.el.id + " " + e.detail.targetEl.classList);
+        console.log("mod_physics "  + this.el.id + " " + e.detail.targetEl.classList);
       
       }
       let mod_obj_component = e.detail.targetEl.components.mod_object;
@@ -1602,7 +1620,6 @@ AFRAME.registerComponent('mod_particles', {
       //   console.log("tryna add some yfudge " + this.data.yFudge); 
       //   this.el.setAttribute("position", this.position);
       // }
-
 
     }
     if (this.data.type.toLowerCase() =="candle") {
@@ -2101,13 +2118,8 @@ AFRAME.registerComponent("rotate-with-camera", {
       if (!this.roomData) {
         GetMatrixData(); //in connect.js
       }
-     
     }
-   
   },
-
- 
-
  });
 
  /* 

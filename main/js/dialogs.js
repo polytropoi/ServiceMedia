@@ -14,53 +14,104 @@ let showStats = false;
 let showCurves = false;
 
 
-  $('#modalContent').on('change', '#locationModel', function(e) { //value has phID ~ modelID
-      console.log('model ' + e.target.value);
-      let locSplit = e.target.value.split("~"); 
-      if (locSplit[1].length > 4) { //should be "none" if no model selected
-        let locSplit = e.target.value.split("~"); //split between localstorage key and modelID
-        let localStorageItem = JSON.parse(localStorage.getItem(locSplit[0]));
-        if (localStorageItem != null) {
-          for (let i = 0; i < sceneModels.length; i++) {
-            if (sceneModels[i]._id == locSplit[1]) {
-              let locItemTemp = {modelID: sceneModels[i]._id, model: sceneModels[i].name};
-              let locItem = Object.assign(localStorageItem, locItemTemp); //funky object merge!
-              // locItem.modelID = sceneModels[i]._id;
-              // locItem.model = sceneModels[i].name;
-              if (locItem.scale == null || locItem.scale == undefined || locItem.scale == "") {
-                locItem.scale = 1;
-              }
-              console.log(JSON.stringify(locItem));
-              localStorage.setItem(locSplit[0], JSON.stringify(locItem));
-              console.log(localStorage.getItem(locSplit[0]));
-              let placeholderEl = document.getElementById(locSplit[0]);
+  // $('#modalContent').on('change', '#locationModel', function(e) { //value has phID ~ modelID
+  //     console.log('model ' + e.target.value);
+  //     let locSplit = e.target.value.split("~"); 
+  //     console.log("locSplit" + locSplit);
+  //     if (locSplit[1].length > 4) { //should be "none" if no model selected
+  //       let locSplit = e.target.value.split("~"); //split between localstorage key and modelID
+  //       let localStorageItem = JSON.parse(localStorage.getItem(locSplit[0]));
+  //       console.log("localstorage item " + JSON.stringify(localStorageItem));
+  //       if (localStorageItem != null) {
+  //         for (let i = 0; i < sceneModels.length; i++) {
+  //           if (sceneModels[i]._id == locSplit[1]) {
+  //             let locItemTemp = {modelID: sceneModels[i]._id, model: sceneModels[i].name};
+  //             let locItem = Object.assign(localStorageItem, locItemTemp); //funky object merge!
+  //             // locItem.modelID = sceneModels[i]._id;
+  //             // locItem.model = sceneModels[i].name;
+  //             if (locItem.scale == null || locItem.scale == undefined || locItem.scale == "") {
+  //               locItem.scale = 1;
+  //             }
+  //             console.log(JSON.stringify(locItem));
+  //             localStorage.setItem(locSplit[0], JSON.stringify(locItem));
+  //             console.log(localStorage.getItem(locSplit[0]));
+  //             let placeholderEl = document.getElementById(locSplit[0]);
 
-              console.log("placeholderEl" +placeholderEl);
-              let phComponent = placeholderEl.components.cloud_marker;
-              if (phComponent == null) {
-                phComponent = placeholderEl.components.local_marker;
-              }
-              if (phComponent != null) {
-                phComponent.loadModel(sceneModels[i]._id);
-              }
-              SaveModToLocal(locSplit[0]);
+  //             console.log("placeholderEl" +placeholderEl);
+  //             let phComponent = placeholderEl.components.cloud_marker;
+  //             if (phComponent == null) {
+  //               phComponent = placeholderEl.components.local_marker;
+  //             }
+  //             if (phComponent != null) {
+  //               phComponent.loadModel(sceneModels[i]._id);
+  //             }
+  //             SaveModToLocal(locSplit[0]);
+  //           }
+  //         }
+  //       }
+  //     } else {
+  //       // let locSplit = e.target.value.split("~"); //split between localstorage key and modelID
+  //       let localStorageItem = JSON.parse(localStorage.getItem(locSplit[0]));
+  //       let placeholderEl = document.getElementById(locSplit[0]);
+  //       let phComponent = placeholderEl.components.cloud_marker;
+  //       if (phComponent == null) {
+  //           phComponent = placeholderEl.components.local_marker;
+  //       }
+  //       if (phComponent != null) {
+  //         phComponent.loadModel();
+  //       }
+  //     }
+  // });
+
+  $('#modalContent').on('change', '#locationModel', function(e) { //value has phID ~ modelID  (room~type~timestamp~modelID)
+    console.log('model ' + e.target.value);
+    let locSplit = e.target.value.split("~"); 
+    console.log("locSplit" + locSplit);
+    if (locSplit[1].length > 4) { //should be "none" if no model selected
+      let locSplit = e.target.value.split("~"); //split between localstorage key and modelID
+      let localStorageItem = JSON.parse(localStorage.getItem(locSplit[0]+"~"+locSplit[1]+"~"+locSplit[2]));
+      console.log("localstorage item " + JSON.stringify(localStorageItem));
+      if (localStorageItem != null) {
+        for (let i = 0; i < sceneModels.length; i++) {
+          console.log(sceneModels[i]._id + " vs " + locSplit[3]);
+          if (sceneModels[i]._id == locSplit[3]) {
+            let locItemTemp = {modelID: sceneModels[i]._id, model: sceneModels[i].name};
+            let locItem = Object.assign(localStorageItem, locItemTemp); //funky object merge!
+            // locItem.modelID = sceneModels[i]._id;
+            // locItem.model = sceneModels[i].name;
+            if (locItem.scale == null || locItem.scale == undefined || locItem.scale == "") {
+              locItem.scale = 1;
             }
+            console.log(JSON.stringify(locItem));
+            localStorage.setItem(locSplit[0]+"~"+locSplit[1]+"~"+locSplit[2], JSON.stringify(locItem));
+            console.log(localStorage.getItem(locSplit[0]+"~"+locSplit[1]+"~"+locSplit[2]));
+            let placeholderEl = document.getElementById(locSplit[0]+"~"+locSplit[1]+"~"+locSplit[2]);
+
+            console.log("placeholderEl" +placeholderEl);
+            let phComponent = placeholderEl.components.cloud_marker;
+            if (phComponent == null) {
+              phComponent = placeholderEl.components.local_marker;
+            }
+            if (phComponent != null) {
+              phComponent.loadModel(sceneModels[i]._id);
+            }
+            SaveModToLocal(locSplit[0]+"~"+locSplit[1]+"~"+locSplit[2]);
           }
         }
-      } else {
-        // let locSplit = e.target.value.split("~"); //split between localstorage key and modelID
-        let localStorageItem = JSON.parse(localStorage.getItem(locSplit[0]));
-        let placeholderEl = document.getElementById(locSplit[0]);
-        let phComponent = placeholderEl.components.cloud_marker;
-        if (phComponent == null) {
-            phComponent = placeholderEl.components.local_marker;
-        }
-        if (phComponent != null) {
-            phComponent.loadModel();
-        }
       }
-  });
-
+    } else {
+      // let locSplit = e.target.value.split("~"); //split between localstorage key and modelID
+      let localStorageItem = JSON.parse(localStorage.getItem(locSplit[0]));
+      let placeholderEl = document.getElementById(locSplit[0]);
+      let phComponent = placeholderEl.components.cloud_marker;
+      if (phComponent == null) {
+          phComponent = placeholderEl.components.local_marker;
+      }
+      if (phComponent != null) {
+        phComponent.loadModel();
+      }
+    }
+});
   $('#modalContent').on('change', '#locationMarkerType', function(e) {
       console.log('type ' + e.target.value);
   });
@@ -337,18 +388,19 @@ function ToggleLocationModalListeners () { //add/remove listeners for location m
     });
   }
 }
-function ReturnLocationModelSelect (phID) {
 
+function ReturnLocationModelSelect (phID) {
+    console.log("tryna fine locationitem with phID " + phID);
    let locationItem = JSON.parse(localStorage.getItem(phID));
    let modelSelect = "<option value=\x22"+phID+"~none\x22>none</option>";
    for (let i = 0; i < sceneModels.length; i++) {
-      if (sceneModels[i].isPublic) { //maybe something else?
+      // if (sceneModels[i].isPublic || !isGuest) { //maybe something else?
          if (locationItem != null && locationItem.modelID == sceneModels[i]._id) {
             modelSelect = modelSelect + "<option value=\x22"+phID+"~"+sceneModels[i]._id+"\x22 selected>" + sceneModels[i].name + "</option>";
          } else {
             modelSelect = modelSelect + "<option value=\x22"+phID+"~"+sceneModels[i]._id+"\x22>" + sceneModels[i].name + "</option>";
          }
-      }
+      // }
    }
    return modelSelect;
 }
@@ -431,7 +483,7 @@ function ShowLocationModal(phID) {
         "<div class=\x22row\x22><div class=\x22twocolumn\x22><label for=\x22locationModel\x22>Location Model</label>"+
         "<select id=\x22locationModel\x22 name=\x22locationModel\x22>"+
         // "<option value=\x22placeholder\x22>none</option>"+
-        ReturnLocationModelSelect(phID) +
+        ReturnLocationModelSelect(phID) + //phID = scene shortID ~ cloud/localmarker ~ timestamp
         "</select></div>"+
        
         "<div class=\x22twocolumn\x22><label for=\x22modelScale\x22>Scale</label><br>"+

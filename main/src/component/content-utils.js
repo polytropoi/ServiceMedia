@@ -2679,6 +2679,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
         // USING SIZE VECTOR3 to set Y position of mesh
         // mesh.position.y = s.y / 2;
         this.el.setAttribute("scale", scale);
+        // this.el.remove
         // this.el.object3D.scale.set(scale);
       }
 
@@ -2689,7 +2690,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
       if (this.data.objectData.physics != undefined && this.data.objectData.physics != null && this.data.objectData.physics.toLowerCase() != "none") {
         //  setTimeout(function(){  
           if (this.data.isEquipped) {
-            this.el.setAttribute('ammo-body', {type: 'kinematic', linearDamping: .1, angularDamping: .1});
+            // this.el.setAttribute('ammo-body', {type: 'kinematic', linearDamping: .1, angularDamping: .1});
           } else { //nm, switch to dynamic when fired if needed/
             if (this.hasShootAction) {
               this.el.setAttribute('ammo-body', {type: this.data.objectData.physics.toLowerCase(), gravity: '0 -.1 0', angularFactor: '1 0 1', emitCollisionEvents: true, linearDamping: .1, angularDamping: 1});
