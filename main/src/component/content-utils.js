@@ -2174,6 +2174,9 @@ AFRAME.registerComponent('mod_objex', {
       // }
       return objek;
     },
+    returnObjexData: function() { //everything
+      return this.data.jsonObjectData;
+    },
     addFetchedObject (obj) { //for scene inventory objects, not in player inventory
       console.log("tryna add fetched obj " + obj._id)
       this.data.jsonObjectData.push(obj); 

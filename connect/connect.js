@@ -30,6 +30,7 @@ let timeKeysData = {};
 let tkStarttimes = [];
 let sceneLocations = {locations: [], locationMods: []};
 let sceneModels = [];
+let sceneObjects = [];
 let localKeys = [];
 let sceneColor1 = '#000000';
 let sceneColor2 = '#000000';
@@ -119,6 +120,8 @@ $(function() {
 
    }
 
+
+
    // let modelDataEl = document.getElementById('sceneModels');
    // let modelData = modelDataEl.getAttribute('data-models');
    // sceneModels = JSON.parse(atob(modelData)); //convert from base64
@@ -192,6 +195,7 @@ $(function() {
       GetMatrixData();
 
    }   
+
 });
 function GetMatrixData() {
    if (!matrixClient) {
@@ -333,6 +337,13 @@ function ReturnModelName (_id) {
    for (let i = 0; i < sceneModels.length; i++) {
       if (sceneModels[i]._id == _id) {
          return sceneModels[i].name;
+      }
+   }
+}
+function ReturnObjectName (_id) {
+   for (let i = 0; i < sceneObjects.length; i++) {
+      if (sceneObjects[i]._id == _id) {
+         return sceneObjects[i].name;
       }
    }
 }
@@ -486,20 +497,25 @@ function SaveModToLocal(locationKey) { //Save button on location modal (other se
    locItem.scale = document.getElementById("modelScale").value;
    locItem.phID = locationKey.toString();
    locItem.type = "Worldspace";
-   locItem.modelID = document.getElementById('locationModel').value.split("~")[1]; //model select values have the phID concatted w/ id
+   locItem.modelID = document.getElementById('locationModel').value.split("~")[3]; //model select values have the phID (room~cloud/local~timestamp) plus modelid, so index 3 of split
    locItem.model = ReturnModelName(locItem.modelID);
+   locItem.objectID = document.getElementById('locationObject').value.split("~")[3]; //same as model
+   locItem.objectName = ReturnObjectName(locItem.objectID);
    if (locationKey.toString().includes("local")) {
       locItem.isLocal = true;
    }
    console.log("tryna savelocation "+locationKey+"  : " + JSON.stringify(locItem));
    localStorage.setItem(locationKey, JSON.stringify(locItem));
-   console.log(localStorage.getItem(locationKey));
+   
    let theEl = document.getElementById(locationKey);
    if (theEl != null) {
+      console.log("found the localstorage EL: " + localStorage.getItem(locationKey));
       let scale = (locItem.scale != undefined && locItem.scale != null && locItem.scale != "") ? locItem.scale : 1;
       theEl.setAttribute('position', {x: locItem.x, y: locItem.y, z: locItem.z});
       theEl.setAttribute('rotation', {x: locItem.eulerx, y: locItem.eulery, z: locItem.eulerz});
       theEl.setAttribute('scale', {x: scale, y: scale, z: scale});
+   } else {
+      console.log("DINT FIND THE EL " + locationKey);
    }
    
    AddLocalMarkers();
@@ -512,19 +528,23 @@ function GrabLocation(locationKey) {
 }
 
 function SnapLocation(locationKey) { //snap selected object to player loc
-   console.log("tryna snaplocation : " +locationKey);  
-   let snapEl = document.getElementById(locationKey);
-   let cameraPosition = new THREE.Vector3(); 
-   let viewportHolder = document.getElementById('viewportPlaceholder3');
-   viewportHolder.object3D.getWorldPosition( cameraPosition );
+  
+   this.snapEl = document.getElementById(locationKey);
+   this.cameraPosition = new THREE.Vector3(); 
+   this.viewportHolder = document.getElementById('equipPlaceholder');
+   this.viewportHolder.object3D.getWorldPosition( this.cameraPosition );
 
-   
-   if (snapEl != null) {
-      snapEl.setAttribute('position', cameraPosition);
-      document.getElementById('xpos').value = cameraPosition.x.toFixed(2);
-      document.getElementById('ypos').value = cameraPosition.y.toFixed(2);
-      document.getElementById('zpos').value = cameraPosition.z.toFixed(2);
-   }
+   console.log("tryna snaplocation : " +locationKey + " to " + JSON.stringify(this.cameraPosition));
+   if (this.snapEl != null) {
+      // let scale = this.snapEl.getAttribute("scale");
+      // this.snapEl.setAttribute("scale", 1);
+      this.snapEl.setAttribute('position', this.cameraPosition);
+      // this.snapEl.setAttribute("scale", scale);
+         document.getElementById('xpos').value = cameraPosition.x.toFixed(2); //update elements in the modal dialog
+         document.getElementById('ypos').value = cameraPosition.y.toFixed(2);
+         document.getElementById('zpos').value = cameraPosition.z.toFixed(2);
+         SaveModToLocal(locationKey) 
+      }
 }
 
 function GoToLocation(locationKey) {

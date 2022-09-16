@@ -991,7 +991,7 @@ AFRAME.registerComponent('local_marker', {
   },
   loadModel: function (modelID) { //local model swap
     console.log("tryna load modeID " + modelID);
-    if (modelID != undefined) { 
+    if (modelID != undefined && modelID != null & modelID != "none" && modelID != "") {  
       for (let i = 0; i < sceneModels.length; i++) {
         if (sceneModels[i]._id == modelID) {
           this.el.setAttribute('gltf-model', sceneModels[i].url);
@@ -1343,7 +1343,7 @@ AFRAME.registerComponent('cloud_marker', {
   loadModel: function (modelID) {
     console.log("tryna load modeID " + modelID);
     // console.log("tryna load modeID " + modelID);
-    if (modelID != undefined) {
+    if (modelID != undefined && modelID != null & modelID != "none" && modelID != "") {  
       for (let i = 0; i < sceneModels.length; i++) {
         if (sceneModels[i]._id == modelID) {
           this.el.setAttribute("gltf-model", sceneModels[i].url);

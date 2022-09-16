@@ -67,6 +67,68 @@ let showCurves = false;
     console.log('model ' + e.target.value);
     let locSplit = e.target.value.split("~"); 
     console.log("locSplit" + locSplit);
+    // if (locSplit[1].length > 4) { //should be "none" if no model selected
+      // let locSplit = e.target.value.split("~"); //split between localstorage key and modelID
+      let localStorageItem = JSON.parse(localStorage.getItem(locSplit[0]+"~"+locSplit[1]+"~"+locSplit[2]));
+      console.log("lookedup localstorage item " + JSON.stringify(localStorageItem));
+      let placeholderEl = document.getElementById(locSplit[0]+"~"+locSplit[1]+"~"+locSplit[2]);
+      if (localStorageItem != null && placeholderEl != null) {
+        if (locSplit[3] != "none") { //model id
+          for (let i = 0; i < sceneModels.length; i++) {
+            console.log(sceneModels[i]._id + " vs " + locSplit[3]);
+            if (sceneModels[i]._id == locSplit[3]) {
+              let locItemTemp = {modelID: sceneModels[i]._id, model: sceneModels[i].name};
+              let locItem = Object.assign(localStorageItem, locItemTemp); //funky object merge!
+              // locItem.modelID = sceneModels[i]._id;
+              // locItem.model = sceneModels[i].name;
+              if (locItem.scale == null || locItem.scale == undefined || locItem.scale == "") {
+                locItem.scale = 1;
+              }
+              console.log(JSON.stringify(locItem));
+              localStorage.setItem(locSplit[0]+"~"+locSplit[1]+"~"+locSplit[2], JSON.stringify(locItem));
+              console.log(localStorage.getItem(locSplit[0]+"~"+locSplit[1]+"~"+locSplit[2]));
+
+
+              console.log("placeholderEl" +placeholderEl);
+              let phComponent = placeholderEl.components.cloud_marker;
+              if (phComponent == null) {
+                phComponent = placeholderEl.components.local_marker;
+              }
+              if (phComponent != null) {
+                phComponent.loadModel(sceneModels[i]._id);
+              }
+              SaveModToLocal(locSplit[0]+"~"+locSplit[1]+"~"+locSplit[2]);
+            }
+          } 
+        } else {
+          let phComponent = placeholderEl.components.cloud_marker;
+          if (phComponent == null) {
+            phComponent = placeholderEl.components.local_marker;
+          }
+          if (phComponent != null) {
+            phComponent.loadModel("none");
+          }
+          SaveModToLocal(locSplit[0]+"~"+locSplit[1]+"~"+locSplit[2]);
+        }
+      } else {
+        // let locSplit = e.target.value.split("~"); //split between localstorage key and modelID
+        let localStorageItem = JSON.parse(localStorage.getItem(locSplit[0]));
+        let placeholderEl = document.getElementById(locSplit[0]);
+        let phComponent = placeholderEl.components.cloud_marker;
+        if (phComponent == null) {
+            phComponent = placeholderEl.components.local_marker;
+        }
+        if (phComponent != null) {
+          phComponent.loadModel();
+        }
+      }
+    // }
+  });
+
+  $('#modalContent').on('change', '#locationObject', function(e) { //value has phID ~ modelID  (room~type~timestamp~modelID)
+    console.log('model ' + e.target.value);
+    let locSplit = e.target.value.split("~"); 
+    console.log("locSplit" + locSplit);
     if (locSplit[1].length > 4) { //should be "none" if no model selected
       let locSplit = e.target.value.split("~"); //split between localstorage key and modelID
       let localStorageItem = JSON.parse(localStorage.getItem(locSplit[0]+"~"+locSplit[1]+"~"+locSplit[2]));
@@ -99,19 +161,20 @@ let showCurves = false;
           }
         }
       }
-    } else {
-      // let locSplit = e.target.value.split("~"); //split between localstorage key and modelID
-      let localStorageItem = JSON.parse(localStorage.getItem(locSplit[0]));
-      let placeholderEl = document.getElementById(locSplit[0]);
-      let phComponent = placeholderEl.components.cloud_marker;
-      if (phComponent == null) {
-          phComponent = placeholderEl.components.local_marker;
+      } else {
+        // let locSplit = e.target.value.split("~"); //split between localstorage key and modelID
+        let localStorageItem = JSON.parse(localStorage.getItem(locSplit[0]));
+        let placeholderEl = document.getElementById(locSplit[0]);
+        let phComponent = placeholderEl.components.cloud_marker;
+        if (phComponent == null) {
+            phComponent = placeholderEl.components.local_marker;
+        }
+        if (phComponent != null) {
+          phComponent.loadModel();
+        }
       }
-      if (phComponent != null) {
-        phComponent.loadModel();
-      }
-    }
-});
+  });
+
   $('#modalContent').on('change', '#locationMarkerType', function(e) {
       console.log('type ' + e.target.value);
   });
@@ -390,7 +453,7 @@ function ToggleLocationModalListeners () { //add/remove listeners for location m
 }
 
 function ReturnLocationModelSelect (phID) {
-    console.log("tryna fine locationitem with phID " + phID);
+    console.log("tryna return models for phID " + phID);
    let locationItem = JSON.parse(localStorage.getItem(phID));
    let modelSelect = "<option value=\x22"+phID+"~none\x22>none</option>";
    for (let i = 0; i < sceneModels.length; i++) {
@@ -404,6 +467,28 @@ function ReturnLocationModelSelect (phID) {
    }
    return modelSelect;
 }
+function ReturnLocationObjectSelect (phID) {
+  let objexEl = document.getElementById('sceneObjects');
+  if (objexEl != null) {
+    sceneObjects = objexEl.components.mod_objex.returnObjexData();
+    console.log("tryna return objects for phID " + phID);
+    let locationItem = JSON.parse(localStorage.getItem(phID));
+    let objectSelect = "<option value=\x22"+phID+"~none\x22>none</option>";
+    for (let i = 0; i < sceneObjects.length; i++) {
+        // if (sceneModels[i].isPublic || !isGuest) { //maybe something else?
+          if (locationItem != null && locationItem.objectID == sceneObjects[i]._id) {
+            objectSelect = objectSelect + "<option value=\x22"+phID+"~"+sceneObjects[i]._id+"\x22 selected>" + sceneObjects[i].name + "</option>";
+          } else {
+            objectSelect = objectSelect + "<option value=\x22"+phID+"~"+sceneObjects[i]._id+"\x22>" + sceneObjects[i].name + "</option>";
+          }
+        // }
+    }
+  return objectSelect;
+  } else {
+    return "";
+  }
+}
+
 
 function ReturnLocationMarkerTypeSelect (selected) {
 
@@ -485,9 +570,13 @@ function ShowLocationModal(phID) {
         // "<option value=\x22placeholder\x22>none</option>"+
         ReturnLocationModelSelect(phID) + //phID = scene shortID ~ cloud/localmarker ~ timestamp
         "</select></div>"+
-       
-        "<div class=\x22twocolumn\x22><label for=\x22modelScale\x22>Scale</label><br>"+
-        "<input class=\x22normalfield\x22 type=\x22number\x22 id=\x22modelScale\x22 value=\x22"+thisLocation.scale+"\x22></div></div>"+
+
+        "<div class=\x22row\x22><div class=\x22twocolumn\x22><label for=\x22locationModel\x22>Location Object</label>"+
+        "<select id=\x22locationObject\x22 name=\x22locationObject\x22>"+
+        // "<option value=\x22placeholder\x22>none</option>"+
+        ReturnLocationObjectSelect(phID) + //phID = scene shortID ~ cloud/localmarker ~ timestamp
+        "</select></div>"+
+
         // "</div>"+
 
         "<div class=\x22row\x22><div class=\x22twocolumn\x22><label for=\x22xpos\x22>X Position</label>"+
@@ -508,6 +597,9 @@ function ShowLocationModal(phID) {
 
         "<div class=\x22twocolumn\x22><label for=\x22zrot\x22>Z Rotation</label>"+
         "<input class=\x22zfield\x22 type=\x22number\x22 id=\x22zrot\x22 value=\x22"+thisLocation.eulerz+"\x22></div></div>"+
+
+        "<div class=\x22twocolumn\x22><label for=\x22modelScale\x22>Scale</label><br>"+
+        "<input class=\x22normalfield\x22 type=\x22number\x22 id=\x22modelScale\x22 value=\x22"+thisLocation.scale+"\x22></div></div>"+
 
         "<div class=\x22twocolumn\x22><label for=\x22locationDescription\x22>Description</label>"+
         "<textarea type=\x22textarea\x22 id=\x22locationDescription\x22>"+thisLocation.description+"</textarea><br></div>"+
