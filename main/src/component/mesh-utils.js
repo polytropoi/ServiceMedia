@@ -989,6 +989,33 @@ AFRAME.registerComponent('local_marker', {
 	      that.mousePos.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
     });
   },
+  loadObject: function (objectID) { //local object swap (maybe with child model...);
+    console.log("tryna load modeID " + objectID);
+    if (objectID != undefined && objectID != null & objectID != "none" && objectID != "") {  
+      for (let i = 0; i < sceneObjects.length; i++) {
+        if (sceneObjects[i]._id == objectID) {
+          // this.el.setAttribute('gltf-model', sceneObjects[i].url);
+
+          let objexEl = document.getElementById('sceneObjects');    
+          if (objexEl) { 
+            this.objectData = objexEl.components.mod_objex.returnObjectData(objectID);
+            if (this.objectData) {
+              this.locData.x = this.el.object3D.position.x;
+              this.locData.y = this.el.object3D.position.y;
+              this.locData.z = this.el.object3D.position.z;
+              this.locData.timestamp = Date.now();
+              
+              let objEl = document.createElement("a-entity");
+              
+              objEl.setAttribute("mod_object", {'locationData': this.locData, 'objectData': this.objectData});
+              objEl.id = "obj" + objectData._id + "_" + this.data.locationData.timestamp;
+              sceneEl.appendChild(objEl);
+            }
+          }
+        }
+      }
+    } 
+  },
   loadModel: function (modelID) { //local model swap
     console.log("tryna load modeID " + modelID);
     if (modelID != undefined && modelID != null & modelID != "none" && modelID != "") {  
@@ -1339,6 +1366,35 @@ AFRAME.registerComponent('cloud_marker', {
         // console.log(that.mouse);
     })
 
+  },
+  loadObject: function (objectID) { //local object swap (maybe with child model...);
+    console.log("tryna load modeID " + objectID);
+    if (objectID != undefined && objectID != null & objectID != "none" && objectID != "") {  
+      for (let i = 0; i < sceneObjects.length; i++) {
+        if (sceneObjects[i]._id == objectID) {
+          // this.el.setAttribute('gltf-model', sceneObjects[i].url);
+
+          let objexEl = document.getElementById('sceneObjects');    
+          if (objexEl) { 
+            this.objectData = objexEl.components.mod_objex.returnObjectData(objectID);
+            if (this.objectData) {
+              // let position = that.el.getAttribute("position");
+              this.locData = {};
+              this.locData.x = this.el.object3D.position.x;
+              this.locData.y = this.el.object3D.position.y;
+              this.locData.z = this.el.object3D.position.z;
+              this.locData.timestamp = Date.now();
+              
+              let objEl = document.createElement("a-entity");
+              
+              objEl.setAttribute("mod_object", {'locationData': this.locData, 'objectData': this.objectData});
+              objEl.id = "obj" + objectData._id + "_" + this.locData.timestamp;
+              sceneEl.appendChild(objEl);
+            }
+          }
+        }
+      }
+    } 
   },
   loadModel: function (modelID) {
     console.log("tryna load modeID " + modelID);

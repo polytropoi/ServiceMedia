@@ -111,8 +111,7 @@ let showCurves = false;
           SaveModToLocal(locSplit[0]+"~"+locSplit[1]+"~"+locSplit[2]);
         }
       } else {
-        // let locSplit = e.target.value.split("~"); //split between localstorage key and modelID
-        let localStorageItem = JSON.parse(localStorage.getItem(locSplit[0]));
+
         let placeholderEl = document.getElementById(locSplit[0]);
         let phComponent = placeholderEl.components.cloud_marker;
         if (phComponent == null) {
@@ -125,22 +124,20 @@ let showCurves = false;
     // }
   });
 
-  $('#modalContent').on('change', '#locationObject', function(e) { //value has phID ~ modelID  (room~type~timestamp~modelID)
+  $('#modalContent').on('change', '#locationObject', function(e) { //value has phID ~ objectID  (room~type~timestamp~objectID)
     console.log('model ' + e.target.value);
     let locSplit = e.target.value.split("~"); 
     console.log("locSplit" + locSplit);
-    if (locSplit[1].length > 4) { //should be "none" if no model selected
-      let locSplit = e.target.value.split("~"); //split between localstorage key and modelID
+    if (locSplit[1].length > 4) { //should be "none" if no object selected
+      let locSplit = e.target.value.split("~"); //split between localstorage key and objectID
       let localStorageItem = JSON.parse(localStorage.getItem(locSplit[0]+"~"+locSplit[1]+"~"+locSplit[2]));
       console.log("localstorage item " + JSON.stringify(localStorageItem));
       if (localStorageItem != null) {
-        for (let i = 0; i < sceneModels.length; i++) {
-          console.log(sceneModels[i]._id + " vs " + locSplit[3]);
-          if (sceneModels[i]._id == locSplit[3]) {
-            let locItemTemp = {modelID: sceneModels[i]._id, model: sceneModels[i].name};
+        for (let i = 0; i < sceneObjects.length; i++) {
+          console.log(sceneObjects[i]._id + " vs " + locSplit[3]);
+          if (sceneObjects[i]._id == locSplit[3]) {
+            let locItemTemp = {objectID: sceneObjects[i]._id, objName: sceneObjects[i].name};
             let locItem = Object.assign(localStorageItem, locItemTemp); //funky object merge!
-            // locItem.modelID = sceneModels[i]._id;
-            // locItem.model = sceneModels[i].name;
             if (locItem.scale == null || locItem.scale == undefined || locItem.scale == "") {
               locItem.scale = 1;
             }
@@ -148,29 +145,27 @@ let showCurves = false;
             localStorage.setItem(locSplit[0]+"~"+locSplit[1]+"~"+locSplit[2], JSON.stringify(locItem));
             console.log(localStorage.getItem(locSplit[0]+"~"+locSplit[1]+"~"+locSplit[2]));
             let placeholderEl = document.getElementById(locSplit[0]+"~"+locSplit[1]+"~"+locSplit[2]);
-
             console.log("placeholderEl" +placeholderEl);
             let phComponent = placeholderEl.components.cloud_marker;
             if (phComponent == null) {
               phComponent = placeholderEl.components.local_marker;
             }
             if (phComponent != null) {
-              phComponent.loadModel(sceneModels[i]._id);
+              phComponent.loadObject(sceneObjects[i]._id);
             }
             SaveModToLocal(locSplit[0]+"~"+locSplit[1]+"~"+locSplit[2]);
           }
         }
       }
       } else {
-        // let locSplit = e.target.value.split("~"); //split between localstorage key and modelID
-        let localStorageItem = JSON.parse(localStorage.getItem(locSplit[0]));
+
         let placeholderEl = document.getElementById(locSplit[0]);
         let phComponent = placeholderEl.components.cloud_marker;
         if (phComponent == null) {
             phComponent = placeholderEl.components.local_marker;
         }
         if (phComponent != null) {
-          phComponent.loadModel();
+          phComponent.loadObject();
         }
       }
   });

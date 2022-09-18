@@ -545,7 +545,7 @@ webxr_router.get('/:_id', function (req, res) {
                                 geoEntity = "gps-position";
                             }
                             for (var i = 0; i < sceneResponse.sceneLocations.length; i++) {
-                                console.log("gotsa location markter with type " + sceneResponse.sceneLocations[i].markerType);
+                                // console.log("gotsa location markter with type " + sceneResponse.sceneLocations[i].markerType);
                                 // console.log("sceneLocationTracking is " +sceneResponse.sceneLocationTracking && );
                                 // console.log("sceneLocraitons are a thing and sceneLocationTracking is " +sceneResponse.sceneLocationTracking + " " + sceneResponse.sceneLocations[i].type);
                                 if ((sceneResponse.sceneLocationTracking != null && sceneResponse.sceneLocationTracking == true) || sceneResponse.sceneWebType == "AR Location Tracking") {  

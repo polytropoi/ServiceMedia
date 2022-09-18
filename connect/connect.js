@@ -598,9 +598,9 @@ function GoToNext() {
             currentLocationIndex = 0;
             
          }
-      // if (sceneLocations.locationMods[currentLocationIndex].markerType.toLowerCase() == 'poi') {
+      if (sceneLocations.locationMods[currentLocationIndex].markerType.toLowerCase() == 'poi') {
          GoToLocation(sceneLocations.locationMods[currentLocationIndex].phID);
-      // }
+         }
       }
       if (skyboxEl != null) {
          skyboxEl.components.skybox_dynamic.nextSkybox();
