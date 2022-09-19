@@ -1525,17 +1525,126 @@ webxr_router.get('/:_id', function (req, res) {
                     }
                     callback(null);
                 },
+                // function (callback) {
+                //     let objex = [];
+                //     let actionModels = [];
+                //     console.log("tryna get all sceneObjects " + JSON.stringify(sceneResponse.sceneObjects));
+                //     // if (sceneObjectLocations.length > 0) {  // objex have more properties, but are parsed/assigned by components (mod_objex, mod_object) after page load
+                //         // console.log("sceneObjectLocations " + JSON.stringify(sceneObjectLocations));
+                //         let objectIDs = []; //to prevent dupes in objex response below
+                //         async.each (sceneObjectLocations, function (locObj, callbackz) {
+                            
+                //             if (locObj.objectID != undefined && locObj.objectID != "none" && sceneResponse.sceneObjects.indexOf(locObj.objectID) != -1 && objectIDs.indexOf(locObj.objectID) == -1) {
+                //                 objectIDs.push(locObj.objectID);
+                //                 const o_id = ObjectID(locObj.objectID);
+                //                 db.obj_items.findOne({"_id": o_id}, function (err, objekt) { 
+                //                     if (err || !objekt) { 
+                //                         callbackz(err);
+                //                     } else {
+                                       
+                //                     async.waterfall ([
+                //                         function (cb) {
+                //                             if (objekt.actionIDs != undefined && objekt.actionIDs.length > 0) {
+                //                                 console.log("tryna add obj actions " + objekt.actionIDs);
+                //                                 const aids = objekt.actionIDs.map(item => {
+                //                                     return ObjectID(item);
+                //                                 });
+                //                                 db.actions.find({_id: {$in: aids }}, function (err, actions) {
+                //                                     if (err || !actions) {
+                //                                         // callback(err);
+                //                                         cb(err);
+                //                                     } else {
+                                                        
+                //                                         objekt.actions = actions;
+                //                                         for (let a = 0; a < actions.length; a++) { //whew, now actions may have models, check for that and get urls below
+                //                                             if (actions[a].modelID != undefined && actions[a].modelID != null && actions[a].modelID != "") {
+                //                                                 actionModels.push(actions[a]);
+                //                                             }
+                //                                             if (a === actions.length - 1) {
+                //                                                 cb(null);
+                //                                             }
+                //                                         }
+
+                //                                         // console.log("actions: " + JSON.stringify(objekt.actions));
+                                                        
+                //                                     }
+                //                                 });
+                //                             } else {
+                //                                 cb(null);
+                //                             }
+                //                         },
+                //                         // function (cb) {
+                                            
+                //                         // },
+                //                         function(cb) {
+                //                          //get the model (needs array flexing!)
+                //                         if (objekt.modelID != undefined && objekt.modelID != null) {
+                //                             const m_id = ObjectID(objekt.modelID);
+                //                             // 
+                //                             db.models.findOne({"_id": m_id}, function (err, asset) { 
+                //                             if (err || !asset) { 
+                //                                 cb(err);
+                //                             } else {      
+                //                                 // console.log("founda matching model: " + JSON.stringify(asset));
+                //                                 if (asset.item_type == "glb") {
+                //                                     assetUserID = asset.userID;
+                //                                     // var sourcePath =   "servicemedia/users/" + assetUserID + "/gltf/" + locMdl.gltf; //this should be "model" or "filename"
+                //                                     let modelURL = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + assetUserID + "/gltf/" + asset.filename, Expires: 6000});
+                //                                     objekt.modelURL = modelURL;
+                //                                     gltfsAssets = gltfsAssets + "<a-asset-item id=\x22" + objekt.modelID + "\x22 src=\x22"+ modelURL +"\x22></a-asset-item>";
+                //                                     objex.push(objekt);     
+                //                                     cb(null);
+                //                                 } else {
+                //                                     objex.push(objekt);     
+                //                                     cb(null);
+                //                                 }
+                //                             }
+                //                             });
+                //                             } else {
+                //                             cb(null);
+                //                         }
+                //                     }
+                                   
+                //                     ], //waterfall end
+
+                //                     function (err, result) { // #last function, close async
+                //                        callbackz();
+                //                     }
+                //                     );
+                //                     }
+                //                     });
+                //                 } else {
+                //                     callbackz();
+                //                 }
+                //             }, function(err) {
+                                
+                //             if (err) {
+                //                 console.log('A file failed to process ' + err);    
+                            
+                //                 callback(null, actionModels);
+                //             } else {
+                //                 // console.log("sceneObjex: " + JSON.stringify(objex));
+                //                 var buff = Buffer.from(JSON.stringify(objex)).toString("base64");
+                //                 var buff2 = Buffer.from(JSON.stringify(sceneObjectLocations)).toString("base64");
+                //                 objectData = "<a-entity mod_objex id=\x22sceneObjects\x22 data-objex-locations='"+buff2+"' data-objex='"+buff+"'></a-entity>";
+                //                 callback(null, actionModels);
+                //             }
+                    
+                //         });
+                // },
                 function (callback) {
                     let objex = [];
                     let actionModels = [];
+                    console.log("tryna get all sceneObjects " + JSON.stringify(sceneResponse.sceneObjects));
                     // if (sceneObjectLocations.length > 0) {  // objex have more properties, but are parsed/assigned by components (mod_objex, mod_object) after page load
                         // console.log("sceneObjectLocations " + JSON.stringify(sceneObjectLocations));
                         let objectIDs = []; //to prevent dupes in objex response below
-                        async.each (sceneObjectLocations, function (locObj, callbackz) {
+                        // async.each (sceneObjectLocations, function (locObj, callbackz) { 
+                        async.each (sceneResponse.sceneObjects, function (objectID, callbackz) {  //just return them all now, even if not placed, so they're available for localmods
                             
-                            if (locObj.objectID != undefined && locObj.objectID != "none" && sceneResponse.sceneObjects.indexOf(locObj.objectID) != -1 && objectIDs.indexOf(locObj.objectID) == -1) {
-                                objectIDs.push(locObj.objectID);
-                                const o_id = ObjectID(locObj.objectID);
+                            if (objectID != undefined && objectID != "none" && sceneResponse.sceneObjects.indexOf(objectID) != -1 && objectIDs.indexOf(objectID) == -1) {
+                                objectIDs.push(objectID);
+                                const o_id = ObjectID(objectID);
                                 db.obj_items.findOne({"_id": o_id}, function (err, objekt) { 
                                     if (err || !objekt) { 
                                         callbackz(err);

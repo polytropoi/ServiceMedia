@@ -520,7 +520,7 @@ function SaveModToLocal(locationKey) { //Save button on location modal (other se
    
    AddLocalMarkers();
    ShowHideDialogPanel();
-   SceneManglerModal('Locations');
+   // SceneManglerModal('Locations');
 }
 
 function GrabLocation(locationKey) {

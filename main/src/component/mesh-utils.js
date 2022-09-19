@@ -789,7 +789,7 @@ AFRAME.registerComponent('local_marker', {
       // console.log("looking for localplaceholder " + localStorage.getItem(this.phID));
       this.storedVars = JSON.parse(localStorage.getItem(this.phID));
         if (this.storedVars != null) {
-          if (this.storedVars.model == null || this.storedVars.model == undefined || this.storedVars.model == "none") {
+          if (this.storedVars.model == null || this.storedVars.model == undefined || this.storedVars.model == "none" || this.storedVars.model == "") {
             console.log(this.phID + " storedVars " + JSON.stringify(this.storedVars));
             if (this.storedVars.markerType.toLowerCase() == "placeholder") {
               this.el.setAttribute('gltf-model', '#placeholder');
@@ -875,17 +875,17 @@ AFRAME.registerComponent('local_marker', {
           let elPos = that.el.getAttribute('position');
         if (!name.includes("handle")) {
           if (that.distance < 66) {
-          console.log("trna scale to distance :" + that.distance)
-          that.calloutEntity.setAttribute("position", pos);
-          that.calloutEntity.setAttribute('visible', true);
-          that.calloutEntity.setAttribute('scale', {x: that.distance * .25, y: that.distance * .25, z: that.distance * .25} );
-          let theLabel = that.data.label != undefined ? that.data.label : that.data.name;
-          let calloutString = theLabel;
-          if (that.calloutToggle) { //show pos every other time
-            // calloutString = "x : " + elPos.x.toFixed(2) + "\n" +"y : " + elPos.y.toFixed(2) + "\n" +"z : " + elPos.z.toFixed(2);
-            calloutString = that.data.description != '' ? that.data.description : theLabel;
-          }
-          that.calloutText.setAttribute("value", calloutString);
+            console.log("trna scale to distance :" + that.distance);
+            that.calloutEntity.setAttribute("position", pos);
+            that.calloutEntity.setAttribute('visible', true);
+            that.calloutEntity.setAttribute('scale', {x: that.distance * .25, y: that.distance * .25, z: that.distance * .25} );
+            let theLabel = that.data.label != undefined ? that.data.label : that.data.name;
+            let calloutString = theLabel;
+            if (that.calloutToggle) { //show pos every other time
+              // calloutString = "x : " + elPos.x.toFixed(2) + "\n" +"y : " + elPos.y.toFixed(2) + "\n" +"z : " + elPos.z.toFixed(2);
+              calloutString = that.data.description != '' ? that.data.description : theLabel;
+            }
+            that.calloutText.setAttribute("value", calloutString);
           }
         }
       }  
@@ -910,7 +910,7 @@ AFRAME.registerComponent('local_marker', {
 
     });
     this.el.addEventListener('mouseup', function (evt) {
-      console.log("tryna mouseup local ph");
+      console.log("tryna mouseup localmarker");
       // that.isSelected = false;
 
       // isSelected = false;
@@ -962,6 +962,7 @@ AFRAME.registerComponent('local_marker', {
           console.log("tryna show locationModal " + that.data.timestamp);
           ShowLocationModal(that.phID);
         }
+        AddLocalMarkers();
       } else if (that.data.markerType.toLowerCase() == "mailbox") {
         console.log('tryna sho0w messages modal');
         SceneManglerModal('Messages');
@@ -1000,6 +1001,10 @@ AFRAME.registerComponent('local_marker', {
           if (objexEl) { 
             this.objectData = objexEl.components.mod_objex.returnObjectData(objectID);
             if (this.objectData) {
+              if (this.objectElementID != null) {
+                document.getElementById(this.objectElementID).remove(); //wait, what?
+              }
+              this.locData = {};
               this.locData.x = this.el.object3D.position.x;
               this.locData.y = this.el.object3D.position.y;
               this.locData.z = this.el.object3D.position.z;
@@ -1008,7 +1013,8 @@ AFRAME.registerComponent('local_marker', {
               let objEl = document.createElement("a-entity");
               
               objEl.setAttribute("mod_object", {'locationData': this.locData, 'objectData': this.objectData});
-              objEl.id = "obj" + objectData._id + "_" + this.data.locationData.timestamp;
+              objEl.id = "obj" + objectData._id + "_" + this.locData.timestamp;
+              this.objectElementID = objEl.id; //USED AS A REFERENCE TO GET AND REMOVE (above) EXISTING PLACEHOLDER OBJECT
               sceneEl.appendChild(objEl);
             }
           }
@@ -1101,6 +1107,7 @@ AFRAME.registerComponent('cloud_marker', {
     let thisEl = this.el;
     this.isSelected = false;
     this.data.scale = this.data.scale != undefined ? this.data.scale : 1;
+    this.objectElementID = null;
     // if (!this.data.isNew) {
       // this.phID = room + '_cloudmarker_' + this.data.timestamp;
       // this.el.id = this.phID;
@@ -1125,7 +1132,7 @@ AFRAME.registerComponent('cloud_marker', {
               console.log("tryna set locModel for cloudmarker " + sceneModels[i].url);
             }
           }
-        } else if (this.storedVars.markerType.toLowerCase() == "placeholder") {
+        } else if (this.storedVars.markerType.toLowerCase() == "placeholder") { //hrm, should just be placeholders?
           this.el.setAttribute('gltf-model', '#savedplaceholder');
         } else if (this.storedVars.markerType.toLowerCase() == "poi") {
           this.el.setAttribute('gltf-model', '#poi1');
@@ -1161,6 +1168,8 @@ AFRAME.registerComponent('cloud_marker', {
           locItem.markerType = this.data.markerType;
           locItem.modelID = this.data.modelID;
           locItem.model = this.data.model;
+          locItem.objectID = this.data.objectID;
+          locItem.objName = this.data.objName;
           locItem.phID = this.phID;
 
           // storedVars = locItem;
@@ -1174,6 +1183,9 @@ AFRAME.registerComponent('cloud_marker', {
             }
           }
         } else {
+
+        }
+        if (this.data.objectID != undefined && this.data.objectID != null && this.data.objectID != "none" && this.data.objectID != "") {
 
         }
       }
@@ -1279,15 +1291,10 @@ AFRAME.registerComponent('cloud_marker', {
       }
     });
     this.el.addEventListener('mouseleave', function (evt) {
-      // console.log("tryna mouseexit");
-      that.selectedAxis = null;
-      // this.deselect();
-      if (that.selectedAxis != null) {
-        console.log(that.selectedAxis);
-        // if (!that.selectedAxis.includes('handle')) {
-        //   that.isSelected = false;
-        // }
-      }
+      // that.selectedAxis = null;
+      // if (that.selectedAxis != null) {
+      //   console.log(that.selectedAxis);
+      // }
       that.calloutEntity.setAttribute('visible', false);
     });
 
@@ -1318,7 +1325,7 @@ AFRAME.registerComponent('cloud_marker', {
       
     });
     this.el.addEventListener('mouseup', function (evt) {
-      // console.log("tryna mousedouwn");
+      console.log("mouseup cloudmarker ");
       // that.isSelected = false;
       if (that.data.markerType.toLowerCase() == "placeholder") {
         that.hitPosition = null;
@@ -1336,11 +1343,14 @@ AFRAME.registerComponent('cloud_marker', {
           storedVars.y = position.y.toFixed(2);
           storedVars.z = position.z.toFixed(2);
           that.data.name = storedVars.name;
+          console.log("modded storedvars " + JSON.stringify(storedVars));
         } 
-        AddLocalMarkers();
-        if (that.isSelected && that.selectedAxis != null) {
+
+        localStorage.setItem(that.phID, JSON.stringify(storedVars));
+        if (that.isSelected && that.selectedAxis != null && !that.selectedAxis.includes("handle")) { //don't pop the dialog if just dragging
           ShowLocationModal(that.phID); 
         }
+        AddLocalMarkers();
       } else if (that.data.markerType.toLowerCase() == "mailbox") {
         console.log('tryna sho0w messages modal');
         SceneManglerModal('Messages');
