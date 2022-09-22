@@ -441,7 +441,7 @@ AFRAME.registerComponent('instanced_surface_meshes', {
             let iMesh_1 = new THREE.InstancedMesh(this.sampleGeos[0], this.sampleMats[0], count);
             let iMesh_2 = null;
             if (this.sampleGeos.length > 1) {
-              let iMesh_2 = new THREE.InstancedMesh(this.sampleGeos[1], this.sampleMats[1], count);
+              iMesh_2 = new THREE.InstancedMesh(this.sampleGeos[1], this.sampleMats[1], count);
             }
           
             // this.iMeshes.push(iMesh);
