@@ -436,15 +436,21 @@ AFRAME.registerComponent('instanced_surface_meshes', {
     
         const sampler = new MeshSurfaceSampler( this.surfaceMesh ) // noice!  
         .build();
-          for (let m = 0; m < this.sampleGeos.length; m++) {
-            console.log("tryna scatter sample geo # " + m.toString());
-            let iMesh = new THREE.InstancedMesh(this.sampleGeos[i], this.sampleMats[i], count);
-            this.iMeshes.push(iMesh);
+          // for (let m = 0; m < this.sampleGeos.length; m++) {
+            // console.log("tryna scatter sample geo # " + m.toString());
+            let iMesh_1 = new THREE.InstancedMesh(this.sampleGeos[0], this.sampleMats[0], count);
+            let iMesh_2 = null;
+            if (this.sampleGeos.length > 1) {
+              let iMesh_2 = new THREE.InstancedMesh(this.sampleGeos[1], this.sampleMats[1], count);
+            }
+          
+            // this.iMeshes.push(iMesh);
             // if (m == this.sampleGeos.length - 1) {
               console.log("trryna update tyhe matrix.. ")
               let position = new THREE.Vector3();
+              
               for (var i = 0; i < count; i++) {
-                console.log("scattercount " + i)
+                // console.log("scattercount " + i);
                 sampler.sample( position )
                 let scale = Math.random() * this.data.scaleFactor;
                 // console.log("scale " + scale);
@@ -452,12 +458,16 @@ AFRAME.registerComponent('instanced_surface_meshes', {
                 dummy.scale.set(scale,scale,scale);
                 dummy.rotation.y = (Math.random() * 360 ) * Math.PI / 180;
                 dummy.updateMatrix();
-                for (let k = 0; k < this.sampleGeos.length; k++) { //spin through separate model meshes/materials and instantiate them separately (like leaves and trunk)
-                  let iMesh = new THREE.InstancedMesh(this.sampleGeos[k], this.sampleMats[k], count);
-                  iMesh.setMatrixAt( i, dummy.matrix );
-                  iMesh.frustumCulled = false;
-                  iMesh.instanceMatrix.needsUpdate = true;
-                  sceneEl.object3D.add(iMesh);
+
+                iMesh_1.setMatrixAt( i, dummy.matrix ); //got fussy in a loop, 2 is enough..
+                iMesh_1.frustumCulled = true;
+                iMesh_1.instanceMatrix.needsUpdate = true;
+                sceneEl.object3D.add(iMesh_1);
+                if (iMesh_2) {
+                  iMesh_2.setMatrixAt( i, dummy.matrix );
+                  iMesh_2.frustumCulled = true;
+                  iMesh_2.instanceMatrix.needsUpdate = true;
+                  sceneEl.object3D.add(iMesh_2);
                 }
             }
           
@@ -491,7 +501,7 @@ AFRAME.registerComponent('instanced_surface_meshes', {
 
         this.el.classList.add('activeObjexRay');
               
-      }
+      // }
 
 
     }
