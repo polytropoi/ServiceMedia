@@ -6,7 +6,7 @@ if (typeof AFRAME === 'undefined') {
 
 /* global AFRAME, THREE */
 
-AFRAME.registerComponent('instanced_meshes_sphere', { //scattered randomly, not on surface
+AFRAME.registerComponent('instanced_meshes_sphere', { //scattered randomly in sphere, not on surface
   schema: {
 
     _id: {default: ''},
@@ -318,6 +318,8 @@ AFRAME.registerComponent('instanced_surface_meshes', {
       this.scatterModel = null;
       this.sampleGeometry = null;
       this.sampleMaterial = null;
+      this.sampleGeos = [];
+      this.sampleMats = [];
       this.raycaster = new THREE.Raycaster();
       
       // var dummy = new THREE.Object3D();
@@ -330,17 +332,24 @@ AFRAME.registerComponent('instanced_surface_meshes', {
       console.log("tryna INSTANCE THE THIGNS");
       sObj.traverse(node => {
         if (node.isMesh && node.material) {
-            this.sampleGeometry = node.geometry;
-            this.sampleMaterial = node.material;
-          }
+              this.sampleGeometry = node.geometry;
+              this.sampleGeos.push(this.sampleGeometry);
+              this.sampleMaterial = node.material;
+              this.sampleMats.push(this.sampleMaterial);
+            }
+          });
         });
-      });
       }
-      let that = this;
+    let that = this; //hrrmm..
     let surfaceEl = document.getElementById('scatterSurface');  
-    surfaceEl.addEventListener('surfaceLoaded', function (event) {
+    surfaceEl.addEventListener('surfaceLoaded', () => {
       console.log("SURFACE EVENT LOADEDD");
-      that.surface(that.sampleGeometry, that.sampleMaterial);
+      // for (let i = 0; i < this.sampleGeos.length; i++) {
+      //   if (this.surface)
+      //   this.surface(this.sampleGeos[i], this.sampleMats[i]);
+      // }
+      // that.surface(that.sampleGeometry, that.sampleMaterial);
+      this.surface(this.sampleGeos, this.sampleMats);
     });
     
     this.el.addEventListener('raycaster-intersected', (e) => {  
@@ -380,7 +389,13 @@ AFRAME.registerComponent('instanced_surface_meshes', {
               if (node.isMesh) {
                 this.surfaceMesh = node;    
                 // clearInterval(interval);
-                this.scatter(this.surfaceMesh, thiz.sampleGeometry, thiz.sampleMaterial);
+                // this.scatter(this.surfaceMesh, thiz.sampleGeometry, thiz.sampleMaterial);
+                  //   for (let i = 0; i < this.sampleGeos.length; i++) {
+                  //   // if (this.surface)
+                  //   this.scatter(this.surfaceMesh, this.sampleGeos[i], this.sampleMats[i]);
+                    
+                  // }
+                  this.scatter(this.surfaceMesh);
                 }
               });
             }
@@ -409,42 +424,77 @@ AFRAME.registerComponent('instanced_surface_meshes', {
         console.log("tryna scatter!@");
         // let that = this;
 
-        this.sampleGeometry = geo;
-        this.sampleMaterial = mat;
+        // this.sampleGeometry = geo;
+        // this.sampleMaterial = mat;
         this.surfaceMesh = surface;
       // this.surface.setAttribute("activeObjexRay");
-      console.log('surfacemesh name ' + this.surfaceMesh);
-
+        // console.log('surfacemesh name ' + this.surfaceMesh);
+        this.iMeshes = [];
+        
         var dummy = new THREE.Object3D();
         const count = this.data.count;
     
-        const sampler = new MeshSurfaceSampler( this.surfaceMesh ) // noice!
+        const sampler = new MeshSurfaceSampler( this.surfaceMesh ) // noice!  
         .build();
-          this.iMesh = new THREE.InstancedMesh(this.sampleGeometry, this.sampleMaterial, count);
-          let position = new THREE.Vector3();
-          for (var i=0; i<count; i++) {
+          for (let m = 0; m < this.sampleGeos.length; m++) {
+            console.log("tryna scatter sample geo # " + m.toString());
+            let iMesh = new THREE.InstancedMesh(this.sampleGeos[i], this.sampleMats[i], count);
+            this.iMeshes.push(iMesh);
+            // if (m == this.sampleGeos.length - 1) {
+              console.log("trryna update tyhe matrix.. ")
+              let position = new THREE.Vector3();
+              for (var i = 0; i < count; i++) {
+                console.log("scattercount " + i)
+                sampler.sample( position )
+                let scale = Math.random() * this.data.scaleFactor;
+                // console.log("scale " + scale);
+                dummy.position.set(  position.x,position.y + this.data.yMod,position.z );
+                dummy.scale.set(scale,scale,scale);
+                dummy.rotation.y = (Math.random() * 360 ) * Math.PI / 180;
+                dummy.updateMatrix();
+                for (let k = 0; k < this.sampleGeos.length; k++) { //spin through separate model meshes/materials and instantiate them separately (like leaves and trunk)
+                  let iMesh = new THREE.InstancedMesh(this.sampleGeos[k], this.sampleMats[k], count);
+                  iMesh.setMatrixAt( i, dummy.matrix );
+                  iMesh.frustumCulled = false;
+                  iMesh.instanceMatrix.needsUpdate = true;
+                  sceneEl.object3D.add(iMesh);
+                }
+            }
+          
+          // }
+          // this.iMesh = new THREE.InstancedMesh(this.sampleGeometry, this.sampleMaterial, count);
+        //   let position = new THREE.Vector3();
+        //   for (var i=0; i<count; i++) {
 
-            sampler.sample( position )
-            let scale = Math.random() * this.data.scaleFactor;
-            // console.log("scale " + scale);
-            dummy.position.set(  position.x,position.y + this.data.yMod,position.z );
-            dummy.scale.set(scale,scale,scale);
-            dummy.rotation.y = (Math.random() * 360 ) * Math.PI / 180;
-            dummy.updateMatrix();
-            this.iMesh.setMatrixAt( i, dummy.matrix );
-          }
-  
-        this.iMesh.frustumCulled = false;
-        this.iMesh.instanceMatrix.needsUpdate = true;
+        //     sampler.sample( position )
+        //     let scale = Math.random() * this.data.scaleFactor;
+        //     // console.log("scale " + scale);
+        //     dummy.position.set(  position.x,position.y + this.data.yMod,position.z );
+        //     dummy.scale.set(scale,scale,scale);
+        //     dummy.rotation.y = (Math.random() * 360 ) * Math.PI / 180;
+        //     dummy.updateMatrix();
+        //     for (let k = 0; i < this.iMeshes.length; k++) {
+        //       this.iMeshes[k].setMatrixAt( i, dummy.matrix );
+        //       this.iMesh.frustumCulled = false;
+        //       this.iMesh.instanceMatrix.needsUpdate = true;
+                  
+        //       sceneEl.object3D.add(this.iMesh);
+      
+        //     }
             
-        sceneEl.object3D.add(this.iMesh);
+        //   }
+  
+        // this.iMesh.frustumCulled = false;
+        // this.iMesh.instanceMatrix.needsUpdate = true;
+            
+        // sceneEl.object3D.add(this.iMesh);
 
         this.el.classList.add('activeObjexRay');
               
       }
 
 
-    // }
+    }
   // }
 
 });
