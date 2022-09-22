@@ -460,12 +460,12 @@ AFRAME.registerComponent('instanced_surface_meshes', {
                 dummy.updateMatrix();
 
                 iMesh_1.setMatrixAt( i, dummy.matrix ); //got fussy in a loop, 2 is enough..
-                iMesh_1.frustumCulled = true;
+                iMesh_1.frustumCulled = false; //too funky
                 iMesh_1.instanceMatrix.needsUpdate = true;
                 sceneEl.object3D.add(iMesh_1);
                 if (iMesh_2) {
                   iMesh_2.setMatrixAt( i, dummy.matrix );
-                  iMesh_2.frustumCulled = true;
+                  iMesh_2.frustumCulled = false;
                   iMesh_2.instanceMatrix.needsUpdate = true;
                   sceneEl.object3D.add(iMesh_2);
                 }
