@@ -1877,7 +1877,11 @@ webxr_router.get('/:_id', function (req, res) {
                                         followCurve = "follow-path=\x22incrementBy:0.001; throttleTo:1\x22";
                                     }
                                     if (locMdl.markerType == "follow parametric curve") {
-                                        followCurve = "curve-follow=\x22curveData: #p_path; type: parametric_curve; reverse: true; duration: 64; loop: true;\x22";
+                                        let reverse = false;
+                                        if (locMdl.eventData.toLowerCase().includes("reverse")) {
+                                            reverse = true;
+                                        }
+                                        followCurve = "curve-follow=\x22curveData: #p_path; type: parametric_curve; reverse: "+reverse+"; duration: 64; loop: true;\x22";
                                     }
                                     if (locMdl.eventData != null && locMdl.eventData != undefined && locMdl.eventData.length > 1) { //eventData has info
                                         // console.log("!!!tryna setup animation " + r.eventData);
