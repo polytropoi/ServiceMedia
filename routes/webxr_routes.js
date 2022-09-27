@@ -3256,7 +3256,7 @@ webxr_router.get('/:_id', function (req, res) {
                     settings.sceneEventStart = sceneResponse.sceneEventStart;
                     settings.sceneEventEnd = sceneResponse.sceneEventEnd;
                     settings.hideAvatars = false;
-                    settings.sceneSkyRadius = sceneResponse.sceneSkyRadius;
+                    settings.sceneSkyRadius = sceneResponse.sceneSkyRadius != undefined ? sceneResponse.sceneSkyRadius : 200;
                     settings.sceneColor1 = sceneResponse.sceneColor1;
                     settings.sceneColor2 = sceneResponse.sceneColor2;
                     settings.sceneColor3 = sceneResponse.sceneColor3;
