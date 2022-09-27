@@ -3557,6 +3557,10 @@ AFRAME.registerComponent('mod_model', {
 
       this.el.addEventListener('model-loaded', () => {
       if (!this.isInitialized) {
+        if (this.data.eventData.includes("scatter")) {
+          this.el.object3D.visible = false;
+          console.log("GOTSA SCATTER OBJEK@");
+        }
         // this.oScale = oScale;
         this.bubble = null;
         this.bubbleText = null;
@@ -3568,36 +3572,9 @@ AFRAME.registerComponent('mod_model', {
         if (obj) {
           if (this.data.shader != "") {
             console.log("gotsa shader " + this.data.shader);
-            // this.el.setAttribute('material', 'shader: noise');
-            // setShader(this.da)
+           
             this.recursivelySetChildrenShader(obj);
-            // if (this.data.shader == "noise") {
-            //   this.material = new THREE.ShaderMaterial( {
-            //     uniforms: {
-            //       tExplosion: {
-            //         type: "t",
-            //         value: THREE.ImageUtils.loadTexture( 'https://realitymangler.com/assets/textures/watertile3.png' )
-            //       },
-            //       time: {
-            //         type: "f",
-            //         value: 0.0
-            //       }
-            //     },
-              
-            //     vertexShader: document.getElementById( 'noise1_vertex' ).textContent,
-                
-            //     fragmentShader: document.getElementById( 'noise1_fragment' ).textContent
-              
-            //   } );
-            //   // console.log(document.getElementById( 'noise1_vertex' ).textContent);
-            //   this.hasUniforms = true;
-            //   obj.material = this.material;
-            //   if (mesh.children) {
-            //     for (var i = 0; i < mesh.children.length; i++) {
-            //       mesh.children[i].material = this.material;
-            //     }
-            //   }
-            // }
+
           }
         // let dynSkybox = document.getElementById('')
           for (let e = 0; e < textData.length; e++) {
@@ -3613,7 +3590,7 @@ AFRAME.registerComponent('mod_model', {
           }
           if (this.data.eventData.toLowerCase().includes("trigger")) { //for external trigger object, disabled the embedded trigger //TODO make this physicstrigger
             this.el.classList.add("trigger");
-            this.el.setAttribute('mod_physics', {isTrigger: true});
+            // this.el.setAttribute('mod_physics', {isTrigger: true});
             // obj.visible = false;
           }
           if (this.data.eventData.toLowerCase().includes("transparent")) {

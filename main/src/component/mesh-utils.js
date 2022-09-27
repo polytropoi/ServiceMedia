@@ -448,30 +448,39 @@ AFRAME.registerComponent('instanced_surface_meshes', {
             // if (m == this.sampleGeos.length - 1) {
               console.log("trryna update tyhe matrix.. ")
               let position = new THREE.Vector3();
-              
-              for (var i = 0; i < count; i++) {
+              this.count = 0;
+              for (var i = 0; i < 100000; i++) {
+                if (this.count < count) {
                 // console.log("scattercount " + i);
                 sampler.sample( position )
+                
                 let scale = Math.random() * this.data.scaleFactor;
                 // console.log("scale " + scale);
-                dummy.position.set(  position.x,position.y + this.data.yMod,position.z );
-                dummy.scale.set(scale,scale,scale);
-                dummy.rotation.y = (Math.random() * 360 ) * Math.PI / 180;
-                dummy.updateMatrix();
+                if (position.y > -5) { //loop through till all of them are above the 0
+                  this.count++;
+                  console.log("instance pos " + JSON.stringify(position));
+                  dummy.position.set(  position.x, position.y + this.data.yMod, position.z );
+                  dummy.scale.set(scale,scale,scale);
+                  dummy.rotation.y = (Math.random() * 360 ) * Math.PI / 180;
+                  dummy.updateMatrix();
 
-                iMesh_1.setMatrixAt( i, dummy.matrix ); //got fussy in a loop, 2 is enough..
-                iMesh_1.frustumCulled = false; //too funky
-                iMesh_1.instanceMatrix.needsUpdate = true;
-                sceneEl.object3D.add(iMesh_1);
-                if (iMesh_2) {
-                  iMesh_2.setMatrixAt( i, dummy.matrix );
-                  iMesh_2.frustumCulled = false;
-                  iMesh_2.instanceMatrix.needsUpdate = true;
-                  sceneEl.object3D.add(iMesh_2);
+                  iMesh_1.setMatrixAt( i, dummy.matrix ); //got fussy in a loop, 2 is enough..
+                  iMesh_1.frustumCulled = false; //too funky
+                  iMesh_1.instanceMatrix.needsUpdate = true;
+                  sceneEl.object3D.add(iMesh_1);
+                    if (iMesh_2) {
+                      iMesh_2.setMatrixAt( i, dummy.matrix );
+                      iMesh_2.frustumCulled = false;
+                      iMesh_2.instanceMatrix.needsUpdate = true;
+                      sceneEl.object3D.add(iMesh_2);
+                    }
+                  }
+                } else {
+                  console.log("breaking loop at " + i.toString());
+                  break;
                 }
+              // }
             }
-          
-          // }
           // this.iMesh = new THREE.InstancedMesh(this.sampleGeometry, this.sampleMaterial, count);
         //   let position = new THREE.Vector3();
         //   for (var i=0; i<count; i++) {

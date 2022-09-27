@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>A-Frame AABB Collider Component - Basic</title>
+    <meta name="description" content="Basic example for AABB Collider component."></meta>
+    <script src="https://aframe.io/releases/0.9.2/aframe.js"></script>
+    <script src="https://unpkg.com/aframe-environment-component@1.0.0/dist/aframe-environment-component.min.js"></script>
+    <script src="https://unpkg.com/aframe-event-set-component@4.0.1/dist/aframe-event-set-component.js"></script>
+    <script src="../../dist/aframe-aabb-collider-component.js"></script>
+    <script src="../lib/DragControls.js"></script>
+    <script>
+      AFRAME.registerComponent('drag-controls', {
+        schema: {objects: {type: 'string', default: 'a-entity'}},
+
+        init: function () {
+          var objects = [];
+          var el = this.el;
+          var els;
+          var dragControls;
+
+          els = el.sceneEl.querySelectorAll(this.data.objects);
+          for (i = 0; i < els.length; i++) { objects.push(els[i].object3D); }
+
+          el.sceneEl.addEventListener('renderstart', function () {
+            dragControls = new THREE.DragControls(objects, el.sceneEl.camera,
+                                                  el.sceneEl.renderer.domElement);
+          });
+        }
+      });
+    </script>
+  </head>
+  <body>
+    <a-scene drag-controls="objects: a-box" environment="preset: forest; shadow: true; shadowSize: 10; lightPosition: -1 1 1">
+      <a-box color="red" aabb-collider="objects: a-box" position="-2 1 -5" shadow
+        event-set__hitstart="material.opacity: 0.5; material.color: orange"
+        event-set__hitend="material.opacity: 1; material.color: red"
+      ></a-box>
+
+      <a-box color="green" aabb-collider="objects: a-box" position="0 1 -5" shadow
+        event-set__hitstart="material.opacity: 0.5; material.color: orange"
+        event-set__hitend="material.opacity: 1; material.color: green"
+      ></a-box>
+
+      <a-box color="blue" aabb-collider="objects: a-box" position="2 1 -5" shadow
+        event-set__hitstart="material.opacity: 0.5; material.color: orange"
+        event-set__hitend="material.opacity: 1; material.color: blue"
+      ></a-box>
+
+      <a-entity camera position="0 1.6 0"></a-entity>
+    </a-scene>
+
+   
+  </body>
+</html>
+
