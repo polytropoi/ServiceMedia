@@ -117,10 +117,11 @@ void main() {
     vec4 tex1 = texture2D(uMap, uv * 1.0);
     vec4 tex2 = texture2D(uMap, uv * 1.0 + vec2(0.2));
 
-    vec3 blue = color;
+    // vec3 blue = color;
+    vec4 colorTex = vec4(color, 0.65);
 
-    gl_FragColor = tex1;
-    //gl_FragColor = vec4(blue + vec3(tex1.a * 0.9 - tex2.a * 0.02), 1.0);
+    gl_FragColor = tex1 * colorTex;
+    // gl_FragColor = vec4(blue + vec3(tex1.a * 0.9 - tex2.a * 0.02), 0.5);
 
 }`
 

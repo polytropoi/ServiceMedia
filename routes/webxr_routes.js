@@ -1182,10 +1182,10 @@ webxr_router.get('/:_id', function (req, res) {
                             }
                             if (sceneResponse.sceneWater != null) {
                                 if (sceneResponse.sceneWater.name == "water2") {
-                                    console.log("water: " + JSON.stringify(sceneResponse.sceneWater));
-                                    ocean = "<a-plane position=\x220  "+sceneResponse.sceneWater.level+" 0\x22 width=\x22100\x22 height=\x22100\x22 rotation=\x22-90 180 -90\x22 segments-height=\x22100\x22 segments-width=\x22100\x22 "+skyboxEnvMap+" material=\x22color: "+sceneResponse.sceneColor3+"; shader:makewaves; uMap: #water; repeat: 1000 1000;\x22></a-plane>";
+                                    console.log("water: " + JSON.stringify(sceneResponse.sceneWater)); //these use the escaped aframe shaders, not the eval'd non escaped mode
+                                    ocean = "<a-plane position=\x220  "+sceneResponse.sceneWater.level+" 0\x22 width=\x22256\x22 height=\x22256\x22 rotation=\x22-90 180 -90\x22 segments-height=\x22100\x22 segments-width=\x22100\x22 "+skyboxEnvMap+" material=\x22color: "+sceneResponse.sceneColor3+"; shader:makewaves; uMap: #water; repeat: 500 500;\x22></a-plane>";
                                 } else if (sceneResponse.sceneWater.name == "water1") {
-                                    ocean = "<a-plane position=\x220 "+sceneResponse.sceneWater.level+" 0\x22 width=\x22512\x22 height=\x22512\x22 rotation=\x22-90 180 -90\x22 segments-height=\x2264\x22 segments-width=\x2264\x22 "+skyboxEnvMap+" material=\x22shader:makewaves_small; color: "+sceneResponse.sceneColor3+";uMap: #water1; repeat: 1000 1000; transparent: true\x22></a-plane>";
+                                    ocean = "<a-plane position=\x220 "+sceneResponse.sceneWater.level+" 0\x22 width=\x22256\x22 height=\x22256\x22 rotation=\x22-90 180 -90\x22 segments-height=\x2264\x22 segments-width=\x2264\x22 "+skyboxEnvMap+" material=\x22shader:makewaves_small; color: "+sceneResponse.sceneColor4+";uMap: #water2; repeat: 500 500; transparent: true\x22></a-plane>";
                                 }
                             }
                             if (sceneResponse.sceneUseHeightmap != null && sceneResponse.sceneUseHeightmap) {
@@ -3256,6 +3256,7 @@ webxr_router.get('/:_id', function (req, res) {
                     settings.sceneEventStart = sceneResponse.sceneEventStart;
                     settings.sceneEventEnd = sceneResponse.sceneEventEnd;
                     settings.hideAvatars = false;
+                    settings.sceneSkyRadius = sceneResponse.sceneSkyRadius;
                     settings.sceneColor1 = sceneResponse.sceneColor1;
                     settings.sceneColor2 = sceneResponse.sceneColor2;
                     settings.sceneColor3 = sceneResponse.sceneColor3;
@@ -4640,6 +4641,7 @@ webxr_router.get('/:_id', function (req, res) {
                         "<img id=\x22candle1\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/pics/candle_flame_8x8.png\x22 crossorigin=\x22anonymous\x22></img>"+
                         "<img id=\x22water\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/pics/water2c.jpeg\x22 crossorigin=\x22anonymous\x22>"+
                         "<img id=\x22water1\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/pics/watertile3.png\x22 crossorigin=\x22anonymous\x22>"+
+                        "<img id=\x22water2\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/pics/water2.png\x22 crossorigin=\x22anonymous\x22>"+
                         "<img id=\x22raindrop2\x22 src=\x22http://servicemedia.s3.amazonaws.com/assets/pics/raindrop2.png\x22 crossorigin=\x22anonymous\x22>"+
                         "<img id=\x22raindrop\x22 src=\x22http://servicemedia.s3.amazonaws.com/assets/pics/raindrop.png\x22 crossorigin=\x22anonymous\x22>"+
                         "<img id=\x22explosion1\x22 src=\x22http://servicemedia.s3.amazonaws.com/assets/pics/explosion1.png\x22 crossorigin=\x22anonymous\x22>"+

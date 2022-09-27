@@ -12123,6 +12123,7 @@ function getAllPeople() {
             let sceneWindFactor = response.data.sceneWindFactor != undefined ? response.data.sceneWindFactor : 0; 
             let sceneLightningFactor = response.data.sceneLightningFactor != undefined ? response.data.sceneLightningFactor : 0; 
             let sceneGlobalFogDensity = response.data.sceneGlobalFogDensity != undefined ? response.data.sceneGlobalFogDensity : 0; 
+            let sceneSkyRadius = response.data.sceneSkyRadius != undefined ? response.data.sceneSkyRadius : 200; 
             let sceneMapZoom = response.data.sceneMapZoom != undefined ? response.data.sceneMapZoom : 17; 
             let sceneAssetBundleName = response.data.sceneEnvironment != undefined ? response.data.sceneEnvironment.name : ""; //hrm... maybe should flatten this obj
             let sceneWaterLevel = response.data.sceneWater != undefined ? response.data.sceneWater.level : 0;
@@ -13931,6 +13932,10 @@ function getAllPeople() {
                                     "<label for=\x22sceneGlobalFogDensity\x22>Fog Density</label>" +
                                     "<input type=\x22number\x22 step=\x220.001\x22 class=\x22form-control\x22 aria-describedby=\x22sceneGlobalFogDensity\x22 id=\x22sceneGlobalFogDensity\x22 value=\x22" + sceneGlobalFogDensity + "\x22>" +
                                 "</div>" + 
+                                "<div class=\x22col form-group col-md-1\x22>" +
+                                "<label for=\x22sceneSkyRadius\x22>Sky Radius</label>" +
+                                "<input type=\x22number\x22 step=\x220.001\x22 class=\x22form-control\x22 aria-describedby=\x22sceneSkyRadius\x22 id=\x22sceneSkyRadius\x22 value=\x22" + sceneSkyRadius + "\x22>" +
+                            "</div>" + 
                             "</div>" +
                             "<hr/>" +
             "</div>" +
@@ -14879,7 +14884,7 @@ function getAllPeople() {
                                 for (let l = 0; l < sceneObjex.length; l++) {
                                     // console.log(sceneModelz[j].name);
                                     if (sceneObjex[l]._id != undefined) {
-                                        console.log(sceneObjex[l]._id + " vs " + sceneLocations[k].objectID);
+                                        // console.log(sceneObjex[l]._id + " vs " + sceneLocations[k].objectID);
                                         
                                         var option = document.createElement("option"); 
                                         option.text = sceneObjex[l].name;
@@ -15976,6 +15981,7 @@ function getAllPeople() {
                         let sceneColor2Alt = document.getElementById("sceneColor2Alt").value;
                         let sceneColor3Alt = document.getElementById("sceneColor3Alt").value;
                         let sceneColor4Alt = document.getElementById("sceneColor4Alt").value;
+                        let sceneSkyRadius = document.getElementById("sceneSkyRadius").value;
                         let sceneWindFactor = document.getElementById("sceneWindFactor").value;
                         let sceneLightningFactor = document.getElementById("sceneLightningFactor").value;
                         let sceneIosOK = document.getElementById("sceneIosOK").checked;
@@ -16205,6 +16211,7 @@ function getAllPeople() {
                             sceneColor2Alt: sceneColor2Alt,
                             sceneColor3Alt: sceneColor3Alt,
                             sceneColor4Alt: sceneColor4Alt,
+                            sceneSkyRadius: sceneSkyRadius,
                             sceneWindFactor: sceneWindFactor,
                             sceneLightningFactor: sceneLightningFactor,
                             sceneIosOK: sceneIosOK,

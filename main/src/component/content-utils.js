@@ -235,7 +235,7 @@ AFRAME.registerComponent('initializer', { //adjust for device settings, and call
       this.asky = document.getElementsByTagName('a-sky')[0];
       if (this.asky) {
         console.log("tryna mod asky radius");
-        this.asky.setAttribute("radius", 600);
+        this.asky.setAttribute("radius", settings.sceneSkyRadius);
       }
       
      
