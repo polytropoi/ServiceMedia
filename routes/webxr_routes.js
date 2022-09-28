@@ -423,7 +423,7 @@ webxr_router.get('/:_id', function (req, res) {
                             console.log("GOTS USENAVMESH TAG: " + sceneData.sceneTags[i]);
                             useNavmesh = true;
                         }
-                        if (sceneData.sceneTags[i].toLowerCase().includes ("simple navmesh")) {
+                        if (sceneData.sceneTags[i].toLowerCase().includes("simple navmesh")) {
                             console.log("GOTS SimpleNavmesh TAG: " + sceneData.sceneTags[i]);
                             useSimpleNavmesh = true;
                         }
@@ -937,21 +937,22 @@ webxr_router.get('/:_id', function (req, res) {
                                 wasd = "extended-wasd-controls=\x22flyEnabled: false; moveSpeed: 5; inputType: keyboard\x22";
                                 // joystickScript = "<script src=\x22../main/vendor/aframe/joystick.js\x22></script>";
                                 let physicsMod = "";
-                                if (!useNavmesh && !useSimpleNavmesh) { //simplenavmesh uses raycast, no pathfinding but constraint works!
-                                    // wasd = "wasd-controls=\x22fly: false; acceleration: 35\x22";
-                                    // movementControls = "movement-controls=\x22control: keyboard, gamepad, \x22";
-                                } else {
-                                    if (useSimpleNavmesh) {
-                                        //simple navmesh can use 
-                                        wasd = "extended-wasd-controls=\x22fly: false; moveSpeed: 5; inputType: keyboard\x22 simple-navmesh-constraint=\x22navmesh:#navmesh-el;fall:10; height:.1;\x22";
-                                       
-                                    } else {
-                                        movementControls = "movement-controls=\x22constrainToNavMesh: true; control: keyboard, gamepad, touch; fly: false;\x22"; 
-                                        wasd = "";
-                                        aframeExtrasScript = "<script src=\x22..//main/vendor/aframe/aframe-extras_20210520.js\x22></script>";
-                                    }
+                                // if (!useNavmesh && !useSimpleNavmesh) { //simplenavmesh uses raycast, no pathfinding but constraint works!
+                                //     // wasd = "wasd-controls=\x22fly: false; acceleration: 35\x22";
+                                //     // movementControls = "movement-controls=\x22control: keyboard, gamepad, \x22";
+                                // } else {
+                                // if (useSimpleNavmesh) {
+                                //     //simple navmesh can use 
+                                //     wasd = "extended-wasd-controls=\x22fly: false; moveSpeed: 5; inputType: keyboard\x22 simple-navmesh-constraint=\x22navmesh:#navmesh-el;fall:10; height:.1;\x22";
+                                    
+                                // } 
+                                // else {
+                                //     movementControls = "movement-controls=\x22constrainToNavMesh: true; control: keyboard, gamepad, touch; fly: false;\x22"; 
+                                //     wasd = "";
+                                //     aframeExtrasScript = "<script src=\x22..//main/vendor/aframe/aframe-extras_20210520.js\x22></script>";
+                                // }
                                     // joystickScript = "";
-                                }
+                                // }
                                 if (physicsScripts.length > 0) {
                                   
                                     physicsMod = "geometry=\x22primitive: cylinder; height: 2; radius: 0.5;\x22 ammo-body=\x22type: kinematic;\x22 ammo-shape=\x22type: capsule\x22";
@@ -1008,7 +1009,11 @@ webxr_router.get('/:_id', function (req, res) {
                                 if (useSimpleNavmesh) {
                                     blinkMod = "blink-controls=\x22cameraRig: #cameraRig; collisionEntities: #navmesh-el;\x22"; //only one navmesh for now
                                 }
-                                
+                                if (useSimpleNavmesh) {
+                                    //simple navmesh can use 
+                                    wasd = "extended-wasd-controls=\x22fly: false; moveSpeed: 5; inputType: keyboard\x22 simple-navmesh-constraint=\x22navmesh:#navmesh-el;fall:10; height:1.6;\x22";
+                                    
+                                } 
                                 // let follower = "";
                                 if (sceneResponse.sceneCameraMode != undefined && sceneResponse.sceneCameraMode.toLowerCase().includes("third person")) {
                                     wasd = "wasd-controls=\x22fly: true; acceleration: 35\x22";
@@ -2059,8 +2064,11 @@ webxr_router.get('/:_id', function (req, res) {
                                             let zFix = parseFloat(locMdl.z); //nope
 
                                             if (locMdl.eventData.toLowerCase().includes("navmesh")) { //regress for now, this is "real" vs simple navmesh...
-                                                console.log("GOTSA NAVMESH!!");
-                                                
+                                               
+                                                if (locMdl.eventData.toLowerCase().includes("simple navmesh")) {
+                                                    useSimpleNavmesh = true;
+                                                }
+                                                console.log("GOTSA NAVMESH!! use simple " + useSimpleNavmesh);
                                                 // navmesh = "nav-mesh";
                                                 // gltfsEntities = gltfsEntities +"<a-entity nav-mesh normal-material visible=\x22false\x22 position=\x22"+locMdl.x+" "+locMdl.y+" "+zFix+"\x22 rotation=\x22"+rotation+"\x22 scale=\x22"+scale+" "+scale+" "+scale+"\x22 gltf-model=\x22#" + m_assetID + "\x22></a-entity>";
                                                 // gltfsEntities = gltfsEntities +"<a-entity visible=\x22false\x22 position=\x22"+locMdl.x+" "+locMdl.y+" "+zFix+"\x22 rotation=\x22"+rotation+"\x22 gltf-model=\x22#" + m_assetID + "\x22 nav-mesh normal-material></a-entity>";
