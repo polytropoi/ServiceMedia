@@ -12293,8 +12293,9 @@ function getAllPeople() {
                     let locationMap = "";
                     let location = "";
                     let locationFormElements = "";
-                    let label = sceneLocations[i].label != undefined ? sceneLocations[i].label : sceneLocations[i].name;
-                    let name = sceneLocations[i].name;
+                    // let label = sceneLocations[i].label != undefined ? sceneLocations[i].label : sceneLocations[i].name;
+                    let label = sceneLocations[i].name != undefined ? sceneLocations[i].name : "";
+                    let name = label;
                     if (name == null ||name == undefined) {
                         name = sceneLocations[i].timestamp;
                     }
@@ -12310,6 +12311,7 @@ function getAllPeople() {
                         locationID = Math.floor(Date.now()/1000);
                         sceneLocations[i].timestamp = locationID;
                     }
+                    let locationTags = sceneLocations[i].locationTags != undefined ? sceneLocations[i].locationTags : "";
                     // }
                     // else {
                     //     if (sceneLocations[i].timestamp != null && sceneLocations[i].timestamp != undefined) {
@@ -12386,7 +12388,10 @@ function getAllPeople() {
 
                             "<label for=\x22eventData_" + locationID + "\x22>Event Data</label>" + 
                             "<input type=\x22text\x22 class=\x22form-control locationEventData\x22 id=\x22eventData_" + locationID + "\x22 placeholder=\x220\x22 value=\x22" + sceneLocations[i].eventData + "\x22 >" +
+                            "<label for=\x22locationTags_" + locationID + "\x22>Tags</label>" + 
+                            "<input type=\x22text\x22 class=\x22form-control locationTags\x22 id=\x22locationTags_" + locationID + "\x22 value=\x22" + locationTags + "\x22 >" +
 
+                            //TAGS
                             // "<br><button type=\x22button\x22 class=\x22remSceneLocation btn btn-xs btn-danger float-left\x22 id=\x22" + i + "\x22>Remove</button>"+
                             // "<button type=\x22button\x22 class=\x22copySceneLocation btn btn-xs btn-info float-right\x22 id=\x22" + i + "\x22>Clone</button>"+
                         "</div>" +
@@ -15775,7 +15780,7 @@ function getAllPeople() {
                         for (let s = 0; s < sceneLocations.length; s++) {   
                             let locid = this.id.split("_")[1];
                             if (locid == sceneLocations[s].timestamp || this.id == sceneLocations[s].timestamp) {
-                                sceneLocations[s].label = this.value;
+                                // sceneLocations[s].label = this.value;
                                 sceneLocations[s].name = this.value; //uhg
                                 console.log("lable set " + JSON.stringify(sceneLocations[s]));
                             }
@@ -15788,6 +15793,16 @@ function getAllPeople() {
                             if (locid == sceneLocations[s].timestamp || this.id == sceneLocations[s].timestamp) {
                                 sceneLocations[s].eventData = this.value;
                                 console.log("eventData set " + JSON.stringify(sceneLocations[s]));
+                            }
+                        }
+                    });
+                    $(document).on('change', '.locationTags', function() {
+
+                        for (let s = 0; s < sceneLocations.length; s++) {   
+                            let locid = this.id.split("_")[1];
+                            if (locid == sceneLocations[s].timestamp || this.id == sceneLocations[s].timestamp) {
+                                sceneLocations[s].locationTags = this.value;
+                                console.log("locationTags set " + JSON.stringify(sceneLocations[s]));
                             }
                         }
                     });

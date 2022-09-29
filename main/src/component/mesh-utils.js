@@ -219,7 +219,7 @@ AFRAME.registerComponent('instanced_meshes_sphere', { //scattered randomly in sp
         console.log("new hit " + hitID + " " + distance + " " + JSON.stringify(hitpoint) + " interaction:" + this.data.interaction);
         var triggerAudioController = document.getElementById("triggerAudio");
         if (triggerAudioController != null) {
-          triggerAudioController.components.trigger_audio_control.playAudioAtPosition(hitpoint, distance, this.data.triggerTag);
+          triggerAudioController.components.trigger_audio_control.playAudioAtPosition(hitpoint, distance, this.data.tags);
         }
 
       }
@@ -282,7 +282,7 @@ AFRAME.registerComponent('instanced_meshes_sphere', { //scattered randomly in sp
       // this.iMesh.instanceMatrix.needsUpdate = true;
       var triggerAudioController = document.getElementById("triggerAudio");
         if (triggerAudioController != null) {
-          triggerAudioController.components.trigger_audio_control.playAudioAtPosition(this.hitpoint, this.distance, this.data.triggerTag);
+          triggerAudioController.components.trigger_audio_control.playAudioAtPosition(this.hitpoint, this.distance, this.data.tags);
           }
         // this.iMesh.position.set(id, 0, 0, -100);
         if (this.useMatrix) {
@@ -307,9 +307,9 @@ AFRAME.registerComponent('instanced_surface_meshes', {
     count: {default: 2000},
     scaleFactor: {default: 4},
     yMod: {default: 0},
-
+    eventData: {default: ''},
     interaction: {default: ''},
-    triggerTag: {default: null}
+    tags: {default: ''}
   },
   init: function () {
      let initialized = false;
@@ -320,8 +320,11 @@ AFRAME.registerComponent('instanced_surface_meshes', {
       this.sampleMaterial = null;
       this.sampleGeos = [];
       this.sampleMats = [];
+      this.lastClickedID = 0;
       this.raycaster = new THREE.Raycaster();
-      
+      // if (this.data.tags == undefined || this.data.tags == '') {
+      //   this.data.tags = null;
+      // }
       // var dummy = new THREE.Object3D();
       this.iMesh = null;
       console.log("model this.data._id " + this.data._id + " tryna instance " + this.data.count);
@@ -344,14 +347,16 @@ AFRAME.registerComponent('instanced_surface_meshes', {
     let surfaceEl = document.getElementById('scatterSurface');  
     surfaceEl.addEventListener('surfaceLoaded', () => {
       console.log("SURFACE EVENT LOADEDD");
-      // for (let i = 0; i < this.sampleGeos.length; i++) {
-      //   if (this.surface)
-      //   this.surface(this.sampleGeos[i], this.sampleMats[i]);
-      // }
-      // that.surface(that.sampleGeometry, that.sampleMaterial);
+   
       this.surface(this.sampleGeos, this.sampleMats);
     });
-    
+
+    this.useMatrix = false;
+    this.matrixMeshComponent = null;
+    if (settings.useMatrix) {
+      this.useMatrix = true;
+    }
+/*  this way doesn't work with instanced meshes fsr...  
     this.el.addEventListener('raycaster-intersected', (e) => {  
 
         this.raycaster = e.detail.el;
@@ -371,6 +376,14 @@ AFRAME.registerComponent('instanced_surface_meshes', {
         // thiz.mouseOverObject = null;
         this.raycaster = null;
     });
+*/
+    window.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (this.instanceId) {
+        console.log("clicked on instance "+ this.instanceId);
+        this.instance_clicked(this.instanceId); 
+      }
+    }); 
   },
 
   surface: function(geo, mat) {
@@ -401,23 +414,7 @@ AFRAME.registerComponent('instanced_surface_meshes', {
             }
 
     } 
-        // console.log("surfaces found " + this.surfaces.length);
-        // if (this.surfaces.length > 0) {
-        //   this.surface = this.surfaces[0];
-        //   this.surface.addEventListener('loaded', (e) => {
-
-        //     let obj = this.surface.getObject3D('mesh');
-        //     obj.traverse(node => {
-        //       if (node.isMesh) {
-        //         this.surfaceMesh = node;
-                
-
-        //         this.scatter(this.surfaceMesh, thiz.sampleGeometry, thiz.sampleMaterial);
-        //       }
-        //       });
-        //     });
-        //   }
-    
+   
     },
     // setSurface: function ()
     scatter: function (surface, geo, mat) {
@@ -446,7 +443,7 @@ AFRAME.registerComponent('instanced_surface_meshes', {
           
             // this.iMeshes.push(iMesh);
             // if (m == this.sampleGeos.length - 1) {
-              console.log("trryna update tyhe matrix.. ")
+              // console.log("trryna update tyhe matrix.. ")
               let position = new THREE.Vector3();
               this.count = 0;
               for (var i = 0; i < 100000; i++) {
@@ -458,7 +455,7 @@ AFRAME.registerComponent('instanced_surface_meshes', {
                 // console.log("scale " + scale);
                 if (position.y > -5) { //loop through till all of them are above the 0
                   this.count++;
-                  console.log("instance pos " + JSON.stringify(position));
+                  // console.log("instance pos " + JSON.stringify(position));
                   dummy.position.set(  position.x, position.y + this.data.yMod, position.z );
                   dummy.scale.set(scale,scale,scale);
                   dummy.rotation.y = (Math.random() * 360 ) * Math.PI / 180;
@@ -477,44 +474,93 @@ AFRAME.registerComponent('instanced_surface_meshes', {
                   }
                 } else {
                   console.log("breaking loop at " + i.toString());
+                  this.iMesh = iMesh_1; //maybe https://threejs.org/docs/index.html#examples/en/utils/BufferGeometryUtils.mergeBufferGeometries?
                   break;
                 }
-              // }
             }
-          // this.iMesh = new THREE.InstancedMesh(this.sampleGeometry, this.sampleMaterial, count);
-        //   let position = new THREE.Vector3();
-        //   for (var i=0; i<count; i++) {
-
-        //     sampler.sample( position )
-        //     let scale = Math.random() * this.data.scaleFactor;
-        //     // console.log("scale " + scale);
-        //     dummy.position.set(  position.x,position.y + this.data.yMod,position.z );
-        //     dummy.scale.set(scale,scale,scale);
-        //     dummy.rotation.y = (Math.random() * 360 ) * Math.PI / 180;
-        //     dummy.updateMatrix();
-        //     for (let k = 0; i < this.iMeshes.length; k++) {
-        //       this.iMeshes[k].setMatrixAt( i, dummy.matrix );
-        //       this.iMesh.frustumCulled = false;
-        //       this.iMesh.instanceMatrix.needsUpdate = true;
-                  
-        //       sceneEl.object3D.add(this.iMesh);
-      
-        //     }
-            
-        //   }
-  
-        // this.iMesh.frustumCulled = false;
-        // this.iMesh.instanceMatrix.needsUpdate = true;
-            
-        // sceneEl.object3D.add(this.iMesh);
-
+       
         this.el.classList.add('activeObjexRay');
+
+    },
+    tick: function(time, timeDelta) {
+      // this.timeDelta = timeDelta;
+      this.time = time;
+      if (this.iMesh != null && this.data.tags != undefined  && this.data.tags != 'undefined') {
+        // console.log(this.posRotReader );
+        if (!this.raycaster || this.raycaster == null || this.raycaster == undefined || this.data.tags == undefined) {
+            return;
+        } else {
+          this.raycaster.setFromCamera( mouse, AFRAME.scenes[0].camera );
+          this.intersection = this.raycaster.intersectObject( this.iMesh );
+        }
+    
+        if ( this.intersection != null && this.intersection.length > 0 && this.data.tags != undefined) {
+          if (window.playerPosition != null && window.playerPosition != undefined && this.intersection[0].point != undefined && this.intersection[0].point != null ) {
+        
+            if (this.instanceId != this.intersection[0].instanceId) {
+              this.instanceId = this.intersection[ 0 ].instanceId;
               
-      // }
+              console.log(this.data.tags + " " + this.instanceId);
 
+              // this.iMesh.setColorAt( this.instanceId, this.highlightColor.setHex( Math.random() * 0xffffff ) );
+              // this.iMesh.instanceColor.needsUpdate = true;
+              // console.log('windowplayerposition ' + JSON.stringify(window.playerPosition));
+              if (this.data.tags != undefined) {
+                this.distance = window.playerPosition.distanceTo(this.intersection[0].point);
+                this.hitpoint = this.intersection[0].point;
+                this.rayhit(this.instanceId, this.distance, this.hitpoint); 
+              }
 
+            }
+          }
+
+        } else {
+          this.hitID = null;
+          this.instanceId = null;
+        }
+      }
+    },
+    rayhit: function (hitID, distance, hitpoint) {
+      if (this.hitID != hitID && this.data.tags) {
+        
+        this.intersection = null;
+        
+        this.hitID = hitID;
+        console.log("new hit " + hitID + " " + distance + " " + JSON.stringify(hitpoint) + " interaction:" + this.data.interaction);
+        var triggerAudioController = document.getElementById("triggerAudio");
+        if (triggerAudioController != null) {
+          triggerAudioController.components.trigger_audio_control.playAudioAtPosition(hitpoint, distance, this.data.tags);
+        }
+
+      }
+      if (this.matrixMeshComponent != null) {
+        this.matrixMeshComponent.showRoomData(this.instanceId, distance, hitpoint);
+      }
+
+      
+    },
+    instance_clicked: function (id) {
+      
+      if (id != null && id != this.lastClickedID && this.intersection != null && this.data.tags != 'undefined') {
+        this.lastClickedID = id; //bc double triggering....ugh
+      console.log(this.data.tags + " clicked id " + id);
+      var triggerAudioController = document.getElementById("triggerAudio");
+        if (triggerAudioController != null) {
+          triggerAudioController.components.trigger_audio_control.playAudioAtPosition(this.hitpoint, this.distance, this.data.tags);
+          }
+        // this.iMesh.position.set(id, 0, 0, -100);
+        if (this.useMatrix) {
+          let matrixMeshEl = document.getElementById("matrix_meshes");
+          if (matrixMeshEl != null) {
+            this.matrixMeshComponent = matrixMeshEl.components.matrix_meshes;
+            if (this.matrixMeshComponent != null && this.intersection != null) {
+            this.matrixMeshComponent.selectRoomData(this.instanceId);
+            }
+          }
+        }
+      }
     }
-  // }
+
 
 });
 

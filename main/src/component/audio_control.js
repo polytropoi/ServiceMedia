@@ -1527,7 +1527,7 @@ AFRAME.registerComponent('audio_groups_control', { //element and component are a
     },
 
     SetAudioGroupsData: function (data) {
-        console.log("audiogroups data: " +JSON.stringify(data));
+        // console.log("audiogroups data: " +JSON.stringify(data));
         this.data.audioGroupsData = data;
         this.attribEl = document.getElementById("attributionsEntity");
         this.audioAttribs = [];
@@ -1553,7 +1553,7 @@ AFRAME.registerComponent('audio_groups_control', { //element and component are a
                         newAttribution.modifications = this.data.audioGroupsData.audioItems[i].modifications;
                         
                         this.attribControl.data.jsonData.attributions.push(newAttribution);
-                        console.log("attribCOntrorl data: " + JSON.stringify(this.attribControl.data.jsonData)); //mkay this doesn't do anything atm...
+                        // console.log("attribCOntrorl data: " + JSON.stringify(this.attribControl.data.jsonData)); //mkay this doesn't do anything atm...
                         //
 
                         attributions.push("Name: " + this.data.audioGroupsData.audioItems[i].title + " - Type: audio - Source: " + this.data.audioGroupsData.audioItems[i].sourceText);
@@ -1661,7 +1661,7 @@ function FetchAudioGroupsData(groupArray) {
         dataType: "json",
         data: JSON.stringify(groupArray),
             success: function( data, textStatus, xhr ){
-                console.log("audiogroups data: " + JSON.stringify(data));
+                // console.log("audiogroups data: " + JSON.stringify(data));
                 // return  JSON.stringify(data);
                 let audioGroupsControllerEl = document.getElementById('audioGroupsEl');
                 let audioGroupsController = audioGroupsControllerEl.components.audio_groups_control;
