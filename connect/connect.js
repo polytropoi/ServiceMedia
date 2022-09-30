@@ -144,8 +144,12 @@ $(function() {
    } else if (localStorage.getItem(room + "_timeKeys") != null) { //use local ve3rsion if saved
          timeKeysData = JSON.parse(localStorage.getItem(room + "_timeKeys"));
          // console.log('local timeKeysData' + JSON.stringify(timeKeysData));
-         timedEventsListenerMode = timeKeysData.listenTo;
-      
+         timedEventsListenerMode = timeKeysData.listenTo;  
+   }
+   this.asky = document.getElementsByTagName('a-sky')[0];
+   if (this.asky) {
+     console.log("tryna mod asky radius");
+     this.asky.setAttribute("radius", settings.sceneSkyRadius);
    }
    AddLocalMarkers();
    vidz = document.getElementsByTagName("video");
