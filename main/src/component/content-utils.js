@@ -2117,12 +2117,16 @@ AFRAME.registerComponent('mod_objex', {
       console.log("tryna spawn object with location name : "+ locationName);
       for (let j = 0; j < this.data.jsonObjectData.length; j++) {
         if (this.data.jsonLocationsData[j].name == locationName) {
-          
+          let locationData  = {};
+          locationData.x = this.data.jsonLocationsData[j].x;
+          locationData.y = this.data.jsonLocationsData[j].y;
+          locationData.z = this.data.jsonLocationsData[j].z;
           this.objectData =  this.returnObjectData(this.data.jsonLocationsData[j].objectID);
-          console.log("gotsa object to spawn " + JSON.stringify(this.objectData));
+          console.log("gotsa object to spawn " + JSON.stringify(locationData));
           let objEl = document.createElement("a-entity");
-          objEl.setAttribute("mod_object", {'eventData': null, 'locationData': this.data.jsonLocationsData[j], 'objectData': this.objectData, 'timestamp': this.data.jsonLocationsData[j].timestamp});
+          objEl.setAttribute("mod_object", {'eventData': null, 'locationData': locationData, 'objectData': this.objectData, 'timestamp': this.data.jsonLocationsData[j].timestamp});
           objEl.id = "obj" + this.data.jsonLocationsData[j].objectID + "_" + this.data.jsonLocationsData[j].timestamp;
+          sceneEl.appendChild(objEl);
         }
       }
     },
