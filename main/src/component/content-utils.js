@@ -2076,11 +2076,13 @@ AFRAME.registerComponent('mod_objex', {
                 // objEl.id = "obj" + this.data.jsonLocationsData[i].objectID + "_" + this.data.jsonLocationsData[i].timestamp;
                 // sceneEl.appendChild(objEl);
               } else {
-                console.log("location/object match " + this.data.jsonLocationsData[i].objectID + " modelID " + this.data.jsonObjectData[k].modelID);
-                let objEl = document.createElement("a-entity");
-                objEl.setAttribute("mod_object", {'eventData': this.data.jsonLocationsData[i].eventData, 'locationData': this.data.jsonLocationsData[i], 'objectData': this.data.jsonObjectData[k]});
-                objEl.id = "obj" + this.data.jsonLocationsData[i].objectID + "_" + this.data.jsonLocationsData[i].timestamp;
-                sceneEl.appendChild(objEl);
+                if (!this.data.jsonLocationsData[i].markerType.toLowerCase().includes('spawn')) { //either spawn or spawntrigger types require interaction
+                  console.log("location/object match " + this.data.jsonLocationsData[i].objectID + " modelID " + this.data.jsonObjectData[k].modelID);
+                  let objEl = document.createElement("a-entity");
+                  objEl.setAttribute("mod_object", {'eventData': this.data.jsonLocationsData[i].eventData, 'locationData': this.data.jsonLocationsData[i], 'objectData': this.data.jsonObjectData[k]});
+                  objEl.id = "obj" + this.data.jsonLocationsData[i].objectID + "_" + this.data.jsonLocationsData[i].timestamp;
+                  sceneEl.appendChild(objEl);
+                }
               }
             } 
           }
@@ -2110,6 +2112,19 @@ AFRAME.registerComponent('mod_objex', {
       console.log("need to fetch to pop scene inventory: " + oIDs);
       FetchSceneInventoryObjex(oIDs); //do fetch in external function, below, bc ajax response can't get to component scope if it's here
     
+    },
+    spawnObject: function (locationName) {
+      console.log("tryna spawn object with location name : "+ locationName);
+      for (let j = 0; j < this.data.jsonObjectData.length; j++) {
+        if (this.data.jsonLocationsData[j].name == locationName) {
+          
+          this.objectData =  this.returnObjectData(this.data.jsonLocationsData[j].objectID);
+          console.log("gotsa object to spawn " + JSON.stringify(this.objectData));
+          let objEl = document.createElement("a-entity");
+          objEl.setAttribute("mod_object", {'eventData': null, 'locationData': this.data.jsonLocationsData[j], 'objectData': this.objectData, 'timestamp': this.data.jsonLocationsData[j].timestamp});
+          objEl.id = "obj" + this.data.jsonLocationsData[j].objectID + "_" + this.data.jsonLocationsData[j].timestamp;
+        }
+      }
     },
     loadSceneInventoryObjects: function () { //coming back from upstream call after updating jsonObjectData with missing sceneInventoryItems
       console.log("tryna loadSceneInventoryObjects fromSceneInventory " + this.fromSceneInventory);
@@ -2394,7 +2409,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
     applyForceToNewObject: {default: false},
     forceFactor: {default: 1},
     removeAfter: {default: ""},
-    triggerTags: {default: null}
+    tags: {default: null}
   },
   init: function () {
     // console.log("mod_object data " + JSON.stringify(this.data.objectData.modelURL));
@@ -2489,11 +2504,11 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
     }
     if (this.data.objectData.tags != undefined && this.data.objectData.tags != null) {
       console.log(this.data.objectData.name + " gotsome tags: " + this.data.objectData.tags);
-      this.data.triggerTags = this.data.objectData.tags;
-
+      this.data.tags = this.data.objectData.tags;
     }
-    if (this.data.locationData && this.data.locationData.eventData && this.data.locationData.eventData.toLowerCase().includes("triggerTag")) {
-      console.log(this.data.objectData.name + " gotsome location eventData " + this.data.locationData.eventData);
+
+    if (this.data.locationData && this.data.locationData.locationTags != undefined  && this.data.locationData.locationTags != 'undefined') {
+      this.data.tags = this.data.locationData.locationTags;
     }
     if (this.data.locationData && this.data.locationData.markerType) {
       console.log(this.data.objectData.name + " gotsa markerType : "+ this.data.locationData.markerType);
@@ -2515,9 +2530,11 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
       this.calloutEntity.id = "objCalloutEntity_" + this.data.objectData._id;
       this.calloutPanel.id = "objCalloutPanel_" + this.data.objectData._id;
       this.calloutText.id = "objCalloutText_" + this.data.objectData._id;
+
       this.calloutPanel.setAttribute("gltf-model", "#landscape_panel");
-      this.calloutPanel.setAttribute("scale", ".1 .075 .1");
+      this.calloutPanel.setAttribute("scale", ".125 .1 .125");
       this.calloutPanel.setAttribute("material", {'color': 'black', 'roughness': 1});
+      this.calloutPanel.setAttribute("overlay");
       this.calloutEntity.setAttribute("look-at", "#player");
       this.calloutEntity.setAttribute('visible', false);
     
@@ -2529,7 +2546,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
       this.calloutPanel.setAttribute("position", '0 0 1'); 
       this.calloutText.setAttribute("position", '0 0 1.25'); //offset the child on z toward camera, to prevent overlap on model
       this.calloutText.setAttribute('text', {
-        width: .5,
+        width: .75,
         baseline: "bottom",
         align: "left",
         font: "/fonts/Exo2Bold.fnt",
@@ -2538,6 +2555,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
         color: "white",
         value: "wha"
       });
+      this.calloutText.setAttribute("overlay");
       
     }
     // if (this.data.objectData.synthNotes != undefined && this.data.objectData.synthNotes != null && this.data.objectData.synthNotes.length > 0) {
@@ -2917,9 +2935,9 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
               this.promptSplit = this.data.objectData.prompttext.split('~'); 
             }
             // this.el.components.mod_synth.medTrigger();
-            this.dialogEl.components.mod_dialog.showPanel(this.promptSplit[Math.floor(Math.random()*this.promptSplit.length)], this.el.id );
+            this.dialogEl.components.mod_dialog.showPanel("Pick up " + this.data.objectData.name + "?\n\n" + this.promptSplit[Math.floor(Math.random()*this.promptSplit.length)], this.el.id );
           } else {
-            this.dialogEl.components.mod_dialog.showPanel("pick up this object?", this.el.id );
+            this.dialogEl.components.mod_dialog.showPanel("Pick up " + this.data.objectData.name + "?", this.el.id );
           }
           
         }
@@ -3029,11 +3047,10 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
       // distance = window.playerPosition.distanceTo(hitpoint);
       console.log("new hit " + hitID + " distance: " + distance + " " + JSON.stringify(hitpoint));
       // var triggerAudioController = document.getElementById("triggerAudio");
-      if (this.triggerAudioController != null && !this.isEquipped && this.data.triggerTags) {
-        this.triggerAudioController.components.trigger_audio_control.playAudioAtPosition(hitpoint, distance, this.data.triggerTags);
+      if (this.triggerAudioController != null && !this.isEquipped && this.data.tags) {
+        this.triggerAudioController.components.trigger_audio_control.playAudioAtPosition(hitpoint, distance, this.data.tags);
       }
-      // let synthCtrl = this.el.components.mod_synth;
-      // if (synthCtrl != null) {
+
         if (this.hasSynth) {
           if (this.el.components.mod_synth != null && this.data.objectData.tonejsPatch1 != undefined && this.data.objectData.tonejsPatch1 != null) {
             // this.el.components.mod_synth.trigger(distance);
@@ -3325,7 +3342,8 @@ AFRAME.registerComponent('mod_dialog', { //there should only be one of these, un
   this.dialogPanel = document.getElementById("mod_dialog_panel");
   // this.el.classList.add("activeObjexRay");
   this.cameraPosition = new THREE.Vector3(); 
-  
+  this.dialogText.setAttribute("overlay");
+  this.dialogPanel.setAttribute("overlay");
   this.yesbutton = null;
   this.nobutton = null;
   this.yesButtonMesh = null;
@@ -3361,6 +3379,7 @@ AFRAME.registerComponent('mod_dialog', { //there should only be one of these, un
       }
     });
   });
+  
   
   // this.dial
   let that = this;
@@ -3469,12 +3488,14 @@ function WaitAndHideDialogPanel (time) {
 
 AFRAME.registerComponent('mod_model', {
   schema: {
+      markerType: {default: "none"},
       eventData: {default: ''},
       shader: {default: ''},
       color: {default: ''}
       
     },
     init: function () {
+      
       let textData = [];
       let moIndex = -1;
       let idleIndex = -1;
@@ -3568,13 +3589,12 @@ AFRAME.registerComponent('mod_model', {
             }
 
           }
+
           if (this.data.eventData.toLowerCase().includes("spawn")) {
             this.el.classList.add("spawn");
           }
           if (this.data.eventData.toLowerCase().includes("trigger")) { //for external trigger object, disabled the embedded trigger //TODO make this physicstrigger
             this.el.classList.add("trigger");
-            // this.el.setAttribute('mod_physics', {isTrigger: true});
-            // obj.visible = false;
           }
           if (this.data.eventData.toLowerCase().includes("transparent")) {
             console.log("tryna set transparent");
@@ -3808,20 +3828,7 @@ AFRAME.registerComponent('mod_model', {
               this.child = this.el.object3D.getObjectByName(this.meshChildren[i].name, true);
               this.child.visible = false; //just hide named navmesh, they're loaded externally... 
            
-              // console.log(child);
-              // if (child != null && child != undefined) { 
-                //
-                // this.child = child;
-                  // var navmeshEnt = document.createElement('a-entity');
-                  // navmeshEnt.setObject3D("mesh", this.child.clone());
-                  
-
-                  // navmeshEnt.setAttribute('nav-mesh');
-                  // this.sceneEl.appendChild(navmeshEnt);
-                // navmeshEnt.id = "navmesh";
-                // navmeshEnt.classList.add("navmesh");
-                // this.sceneEl.appendChild(navmeshEnt);
-              // }
+             
             } else if (this.meshChildren[i].name.includes("eye")) {
               console.log("gotsa eye too!");
               let child = this.el.object3D.getObjectByName(this.meshChildren[i].name, true);
@@ -4151,7 +4158,7 @@ AFRAME.registerComponent('mod_model', {
           }
       }
       
-      if (this.el.classList.contains('target')) {
+      if (this.el.classList.contains('target') || this.data.markerType != "none") {
         let textIndex = 0;
         this.position = null;
         // let hasBubble = false;
@@ -4248,8 +4255,10 @@ AFRAME.registerComponent('mod_model', {
         if (primaryAudio != null) {
         const primaryAudioControlParams = primaryAudio.getAttribute('primary_audio_control');
 
-        console.log("gotsa target attach " + primaryAudioControlParams.targetattach);
+     
         if (primaryAudioControlParams.targetattach) { //set by sceneAttachPrimaryAudioToTarget or something like that...
+          console.log("tryna target attach primary audio " + primaryAudioControlParams.targetattach);
+
           document.getElementById("primaryAudioParent").setAttribute("visible", false);
           // document.getElementById("primaryAudioParent").setAttribute("position", theEl.position);
           primaryAudio.emit('targetattach', {targetEntity: this.el}, true);
@@ -4293,10 +4302,11 @@ AFRAME.registerComponent('mod_model', {
           // console.log("no primary audio found!");
         }
         this.el.addEventListener('mouseenter', (evt) =>  {
-          
-          if (evt.detail.intersection != null && hasCallout && !textData[textIndex].toLowerCase().includes("undefined")) {
+          // console.log("mouseovewr markertype " + this.data.markerType);
+          if (evt.detail.intersection != null) {
             // this.bubble = theEl.querySelector('.bubble');
             // this.bubbleText = theEl.querySelector('.bubbleText');
+            if (hasCallout && !textData[textIndex].toLowerCase().includes("undefined")) {
             calloutOn = true;
             this.bubble = sceneEl.querySelector('.bubble');
             this.bubbleText = sceneEl.querySelector('.bubbleText');
@@ -4349,16 +4359,31 @@ AFRAME.registerComponent('mod_model', {
               textIndex++;
             } else {
               textIndex = 0;
+              }
             }
-          }
-          // console.log("tryna play audiotrigger " + JSON.stringify(this.data.eventData));
-          if (this.hasAudioTrigger) {
-            // console.log("tryna play audiotrigger");
-            if (this.triggerAudioController != null) {
-              this.triggerAudioController.components.trigger_audio_control.playAudio();
-            }
-          }
 
+            // console.log("tryna play audiotrigger " + JSON.stringify(this.data.eventData));
+            if (this.hasAudioTrigger) {
+              // console.log("tryna play audiotrigger");
+              if (this.triggerAudioController != null) {
+                this.triggerAudioController.components.trigger_audio_control.playAudio();
+              }
+            }
+            // if (this.data.markerType)
+
+            if (this.data.markerType.toLowerCase() == "spawntrigger") {
+              console.log("gotsa spawnTrigger !!!!!!!");
+              // (evt.detail.intersection distanceTo
+              if (window.playerPosition) {
+                let distance = window.playerPosition.distanceTo(evt.detail.intersection.point);
+                console.log("gotsa spawntrigger distance is " + distance);
+                if (distance < 3) {
+                  let objexEl = document.getElementById('sceneObjects');    
+                  objexEl.components.mod_objex.spawnObject(this.data.eventData);
+                }
+              }
+            }
+          }
         });
         // this.el.addEventListener('mouseleave', function (evt) {
         // //   if (textIndex < eventData.length) {
@@ -4376,6 +4401,7 @@ AFRAME.registerComponent('mod_model', {
 
         // });
       }
+
 
       document.querySelector('a-scene').addEventListener('primaryAudioToggle', function () {  //things to trigger on this model if primary audio is playing
         // console.log("primaryAudioToggle!");

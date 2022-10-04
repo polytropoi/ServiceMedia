@@ -3087,6 +3087,10 @@
                                 "<div class=\x22\x22><label for=\x22Public\x22>Share with Public</label><br>" + //public
                                 "<input type=\x22checkbox\x22  id=\x22isPublic\x22 data-toggle=\x22toggle\x22 data-size=\x22sm\x22 data-on=\x22<i class='fas fa-check'></i>\x22 data-off=\x22<i class='fas fa-times'></i>\x22 data-onstyle=\x22success\x22 data-offstyle=\x22danger\x22></div>" +
                             "</div>" + 
+                            "<div class=\x22col form-group col-md-2\x22>" +
+                                "<div class=\x22\x22><label for=\x22modVol\x22>Modify Volume (0.0 - 1.0)</label><br>" + //public
+                                "<input type=\x22number\x22  id=\x22modVol\x22 step=\x220.001\x22 style=\x22width: 5em\x22 class=\x22form-control\x22 placeholder=\x221.0\x22 value=\x22"+response.data.modVol+"\x22 min=\x220.0\x22 max=\x221.0\x22></div>" +
+                            "</div>" + 
                             
                             "<div class=\x22col form-group col-md-12\x22>" + //wavesurfer
                                 "<div id=\x22waveform\x22></div>" +
@@ -3385,6 +3389,7 @@
                         let artist = document.getElementById("audioArtist").value;
                         let album = document.getElementById("audioAlbum").value;
                         let sourceText = document.getElementById("sourceText").value;
+                        let modVol = document.getElementById("modVol").value;
                         let status = $("#isPublic").prop("checked");
                         console.log("isPublic " + status);
                         let item_status = (status == true) ? "private" : "public";
@@ -3395,6 +3400,7 @@
                             tags: tags,
                             isPublic : status,
                             timekeys : timekeys,
+                            modVol : modVol,
                             // samplekeys : req.body.samplekeys,
                             // user_groups: req.body.user_groups,
                             alt_title: alttitle,

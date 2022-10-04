@@ -3064,7 +3064,7 @@ app.post('/pickup/', requiredAuthentication, function (req, res) {
                                 console.log("user inventory items : " + items.length);
                                 if (items != null && items.length > 0) {
                                    
-                                    if (items.length > req.body.object_item.maxPerUser) {
+                                    if (items.length >= req.body.object_item.maxPerUser) {
                                         console.log("userCurrentCount: " + items.length + " maxPerUser: " + req.body.object_item.maxPerUser);
                                         callback("maxed!");
                                     } else {
@@ -3080,7 +3080,7 @@ app.post('/pickup/', requiredAuthentication, function (req, res) {
                                 
                                 } else {
                                     console.log("tryna add inventory item......");
-                                    db.inventory_items.insertOne(inventoryItem, function (err, saved){
+                                    db.inventory_items.insertOne(inventoryItem, function (err, saved) {
                                         if (err || !saved) {
                                             callback(err);
                                         } else {
@@ -3090,7 +3090,6 @@ app.post('/pickup/', requiredAuthentication, function (req, res) {
                                     });
                                 }
                             }
-
                         }); 
                     } else {
                         db.inventory_items.insertOne(inventoryItem, function (err, saved){
@@ -13649,7 +13648,7 @@ app.post('/clone_scene', requiredAuthentication, function (req,res) {
                     sceneWater : scene.sceneWater,
                     sceneGroundLevel : scene.sceneGroundLevel,
                     sceneWindFactor  : scene.sceneWindFactor != null ?  scene.sceneWindFactor : 0,
-                    sceneSkyRadius  : scene.sceneSkyRadius != null ?  scene.sceneSkyRadius : 100,
+                    sceneSkyRadius  : scene.sceneSkyRadius != null ?  scene.sceneSkyRadius : 202,
                     sceneLightningFactor  : scene.sceneLightningFactor != null ? scene.sceneLightningFactor : 0,
                     sceneCharacters : scene.sceneCharacters,
                     sceneEquipment : scene.sceneEquipment,
@@ -13940,7 +13939,7 @@ app.post('/update_scene/:_id', requiredAuthentication, function (req, res) {
                 sceneWater: req.body.sceneWater,
                 sceneGroundLevel: req.body.sceneGroundLevel,
                 sceneWindFactor : req.body.sceneWindFactor != null ?  req.body.sceneWindFactor : 0,
-                sceneSkyRadius  : req.body.sceneSkyRadius != null ?  req.body.sceneSkyRadius : 200,
+                sceneSkyRadius  : req.body.sceneSkyRadius != null ?  req.body.sceneSkyRadius : 202,
                 sceneLightningFactor : req.body.sceneLightningFactor != null ? req.body.sceneLightningFactor : 0,
                 sceneCharacters: req.body.sceneCharacters,
                 sceneEquipment: req.body.sceneEquipment,
@@ -22366,6 +22365,7 @@ app.post('/update_audio/:_id', requiredAuthentication, function (req, res) {
                 alt_title: req.body.alt_title,
                 alt_artist: req.body.alt_artist,
                 alt_source: req.body.alt_album,
+                modVol: req.body.modVol,
                 sourceText: req.body.sourceText != undefined ? req.body.sourceText : "",
                 clipDuration : req.body.clipDuration != null ? req.body.clipDuration : "",
                 textitemID : req.body.textitemID != null ? req.body.textitemID : "",

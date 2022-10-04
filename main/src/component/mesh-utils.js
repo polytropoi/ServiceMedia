@@ -69,10 +69,10 @@ AFRAME.registerComponent('instanced_meshes_sphere', { //scattered randomly in sp
       if (node.isMesh && node.material) {
           this.sampleGeometry = node.geometry;
           this.sampleMaterial = node.material;
-      }
+        }
+      });
     });
-  });
-}
+  }
   // this.el.setAttribute('gltf-model', gltfs[0]);
   
   this.playerPosition = new THREE.Vector3();
@@ -416,17 +416,13 @@ AFRAME.registerComponent('instanced_surface_meshes', {
     } 
    
     },
-    // setSurface: function ()
     scatter: function (surface, geo, mat) {
         console.log("tryna scatter!@");
-        // let that = this;
 
-        // this.sampleGeometry = geo;
-        // this.sampleMaterial = mat;
         this.surfaceMesh = surface;
       // this.surface.setAttribute("activeObjexRay");
         // console.log('surfacemesh name ' + this.surfaceMesh);
-        this.iMeshes = [];
+        // this.iMeshes = []; //nm
         
         var dummy = new THREE.Object3D();
         const count = this.data.count;
@@ -478,7 +474,6 @@ AFRAME.registerComponent('instanced_surface_meshes', {
                   break;
                 }
             }
-       
         this.el.classList.add('activeObjexRay');
 
     },
@@ -895,6 +890,8 @@ AFRAME.registerComponent('local_marker', {
       color: "white",
       value: "wha"
     });
+    this.calloutPanel.setAttribute("overlay");
+    this.calloutText.setAttribute("overlay");
     let theElement = this.el;
     // this.el.setAttribute('skybox-env-map');
     // 
@@ -1345,7 +1342,7 @@ AFRAME.registerComponent('cloud_marker', {
     this.calloutEntity.appendChild(this.calloutPanel);
     this.calloutEntity.appendChild(this.calloutText);
     this.calloutPanel.setAttribute("position", '0 0 1'); 
-    
+    this.calloutPanel.setAttribute("overlay");
     // this.calloutText.setAttribute("size", ".1 .1 .1");
     this.calloutText.setAttribute("position", '0 0 1.25'); //offset the child on z toward camera, to prevent overlap on model
     this.calloutText.setAttribute('text', {
@@ -1358,6 +1355,7 @@ AFRAME.registerComponent('cloud_marker', {
       color: "white",
       value: "wha"
     });
+    this.calloutText.setAttribute("overlay");
    
     this.calloutToggle = false;
     let that = this;
@@ -2273,9 +2271,10 @@ AFRAME.registerComponent("rotate-with-camera", {
       let z = hitpoint.z;
       this.matrixCalloutEntity.setAttribute("position", {"x": x, "y": y, "z": z});
       this.matrixCalloutPanel.setAttribute('visible', true);
-
+      this.matrixCalloutPanel.setAttribute("overlay");
       // this.matrixCalloutEntity.setAttribute("position", hitpoint);
       this.matrixCalloutEntity.setAttribute('visible', true);
+      this.matrixCalloutEntity.setAttribute("overlay");
       this.matrixCalloutEntity.setAttribute('scale', {x: distance * .25, y: distance * .25, z: distance * .25} );
       let roomName = "roomName";
       if (this.roomData) {
@@ -2284,6 +2283,7 @@ AFRAME.registerComponent("rotate-with-camera", {
         GetMatrixData();
       }
       this.matrixCalloutText.setAttribute("value", roomName);
+      this.matrixCalloutText.setAttribute("overlay");
     }
   },
   selectRoomData(instanceID) {
