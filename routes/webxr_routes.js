@@ -1819,7 +1819,7 @@ webxr_router.get('/:_id', function (req, res) {
 
                             let usdzFiles = '';
                             let modelParent = "";
-                           
+                            let locationTags = locMdl.locationTags;
                             if (sceneResponse.sceneUseDynCubeMap) {
                                 skyboxEnvMap = "skybox-env-map shadow=\x22cast:true; receive:true\x22";   
                             }
@@ -1973,7 +1973,7 @@ webxr_router.get('/:_id', function (req, res) {
                                         console.log(" lat/lng model " + JSON.stringify(locMdl));
                                         // gltfsAssets = gltfsAssets + "<a-asset-item id=\x22" + m_assetID + "\x22 src=\x22"+ modelURL +"\x22></a-asset-item>";
                                         gltfsAssets = gltfsAssets + "<a-asset-item id=\x22" + locMdl.modelID + "\x22 src=\x22"+ modelURL +"\x22></a-asset-item>";
-                                        gltfsEntities = gltfsEntities + "<a-entity class=\x22geo\x22 scale=\x22"+scale+" "+scale+" "+scale+"\x22 data-scale=\x22"+scale+"\x22 mod_model=\x22markerType: "+locMdl.markerType+"; eventData:"+locMdl.eventData+"\x22 class=\x22gltf "+entityType+" "+ambientChild+" activeObjexGrab activeObjexRay\x22 shadow=\x22cast:true; receive:true\x22 "+geoEntity+"=\x22latitude: "+locMdl.latitude+
+                                        gltfsEntities = gltfsEntities + "<a-entity class=\x22geo\x22 scale=\x22"+scale+" "+scale+" "+scale+"\x22 data-scale=\x22"+scale+"\x22 mod_model=\x22markerType: "+locMdl.markerType+"; tags: "+locationTags+"; eventData:"+locMdl.eventData+"\x22 class=\x22gltf "+entityType+" "+ambientChild+" activeObjexGrab activeObjexRay\x22 shadow=\x22cast:true; receive:true\x22 "+geoEntity+"=\x22latitude: "+locMdl.latitude+
                                         // "; latitude: "+locMdl.longitude+";\x22 "+skyboxEnvMap+"  class=\x22gltf\x22 gltf-model=\x22#" + m_assetID + "\x22 "+objAnim+" "+cannedAnim+" scale=\x22"+scale+" "+scale+" "+scale+"\x22 rotation=\x22"+rotation+"\x22 >" + offsetPos+ "</a-entity>";
                                         "; longitude: "+locMdl.longitude+";\x22 "+skyboxEnvMap+" gltf-model=\x22#" + m_assetID + "\x22 "+objAnim+" "+cannedAnim+" rotation=\x22"+rotation+"\x22 >" + offsetPos+ "</a-entity>";
                                         
@@ -2089,7 +2089,7 @@ webxr_router.get('/:_id', function (req, res) {
                                                     entityType = "surface";
 
                                                 }
-                                                let modModel = "mod_model=\x22markerType: "+locMdl.markerType+"; eventData:"+locMdl.eventData+"\x22";
+                                                let modModel = "mod_model=\x22markerType: "+locMdl.markerType+"; tags: "+locMdl.locationTags+"; eventData:"+locMdl.eventData+"\x22";
                                                 // let modMaterial = "";
                                                 if (locMdl.eventData.toLowerCase().includes("gallery")) {
                                                     // modModel = "mod_model_photo_gallery";  maybe later
@@ -2115,7 +2115,7 @@ webxr_router.get('/:_id', function (req, res) {
                                                         if (locMdl.eventData.toLowerCase().includes("noise")) {
                                                             console.log("TRYNA PUT A SHADER@@");
                                                             // modMaterial = "material=\x22shader: noise;\x22";
-                                                            modModel = "mod_model=\x22markerType: "+locMdl.markerType+"; eventData:"+locMdl.eventData+"; shader: noise\x22";
+                                                            modModel = "mod_model=\x22markerType: "+locMdl.markerType+"; tags: "+locMdl.locationTags+"; eventData:"+locMdl.eventData+"; shader: noise\x22";
                                                             let vertexShader  = requireText('../main/src/shaders/noise1_vertex.glsl', require);
                                                             let fragmentShader = requireText('../main/src/shaders/noise1_fragment.glsl', require);
                                                             shaderScripts = "<script type=\x22x-shader/x-vertex\x22 id=\x22noise1_vertex\x22>"+vertexShader+"</script>"+

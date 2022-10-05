@@ -2042,7 +2042,7 @@ AFRAME.registerComponent('mod_objex', {
       // console.log("objxe location datas" + JSON.stringify(this.data.jsonLocationsData));
       console.log(this.data.jsonLocationsData.length + " locations for " + this.data.jsonObjectData.length);
 
-
+    this.triggerAudioController = document.getElementById("triggerAudio");
     this.camera = null;
     let cameraEl = document.querySelector('a-entity[camera]');
     if (!cameraEl) {
@@ -2110,23 +2110,34 @@ AFRAME.registerComponent('mod_objex', {
         }
       }
       console.log("need to fetch to pop scene inventory: " + oIDs);
-      FetchSceneInventoryObjex(oIDs); //do fetch in external function, below, bc ajax response can't get to component scope if it's here
+      FetchSceneInventoryObjex(oIDs); //do fetch in external function, below, bc ajax response can't get to component scope if it's here (?)
     
     },
-    spawnObject: function (locationName) {
+    spawnObject: function (locationName) { //uses name (label) property of location to reference the object to spawn, called from a spawntrigger, using that location's eventData which should have the name... hrm.
       console.log("tryna spawn object with location name : "+ locationName);
       for (let j = 0; j < this.data.jsonObjectData.length; j++) {
         if (this.data.jsonLocationsData[j].name == locationName) {
-          let locationData  = {};
-          locationData.x = this.data.jsonLocationsData[j].x;
-          locationData.y = this.data.jsonLocationsData[j].y;
-          locationData.z = this.data.jsonLocationsData[j].z;
-          this.objectData =  this.returnObjectData(this.data.jsonLocationsData[j].objectID);
-          console.log("gotsa object to spawn " + JSON.stringify(locationData));
-          let objEl = document.createElement("a-entity");
-          objEl.setAttribute("mod_object", {'eventData': null, 'locationData': locationData, 'objectData': this.objectData, 'timestamp': this.data.jsonLocationsData[j].timestamp});
-          objEl.id = "obj" + this.data.jsonLocationsData[j].objectID + "_" + this.data.jsonLocationsData[j].timestamp;
-          sceneEl.appendChild(objEl);
+          let elIDString = "obj" + this.data.jsonLocationsData[j].objectID + "_" + this.data.jsonLocationsData[j].timestamp;
+          let elID = document.getElementById(elIDString);
+          if (!elID) { //only one for now... TODO count maxperscene?  check inventory?
+            let locationData  = {};
+            locationData.x = this.data.jsonLocationsData[j].x;
+            locationData.y = this.data.jsonLocationsData[j].y;
+            locationData.z = this.data.jsonLocationsData[j].z;
+            this.objectData =  this.returnObjectData(this.data.jsonLocationsData[j].objectID);
+            console.log("gotsa object to spawn " + JSON.stringify(this.data.jsonLocationsData[j].locationTags));
+            let objEl = document.createElement("a-entity");
+            objEl.setAttribute("mod_object", {'eventData': null, 'locationData': locationData, 'objectData': this.objectData, 'timestamp': this.data.jsonLocationsData[j].timestamp, 'tags': this.data.jsonLocationsData[j].locationTags});
+            objEl.id = elIDString;
+            sceneEl.appendChild(objEl);
+            if (this.triggerAudioController != null) {
+              let distance = window.playerPosition.distanceTo(locationData);
+              console.log(distance + " distance to spawn lo9c " + locationData);
+              this.triggerAudioController.components.trigger_audio_control.playAudioAtPosition(locationData, distance, ["spawn"], 1);//tagmangler needs an array, add vol mod (bc blowing in they face)
+            }
+          } else {
+            console.log("already spawned one of thoose...");
+          }
         }
       }
     },
@@ -2185,7 +2196,7 @@ AFRAME.registerComponent('mod_objex', {
     returnObjexData: function() { //everything
       return this.data.jsonObjectData;
     },
-    addFetchedObject (obj) { //for scene inventory objects, not in player inventory
+    addFetchedObject (obj) { //for scene inventory objects, not in player inventory, added after initial load
       console.log("tryna add fetched obj " + obj._id)
       this.data.jsonObjectData.push(obj); 
     },
@@ -2458,6 +2469,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
     this.modelParent = null;
 
     this.camera = null;
+    this.tags = this.data.tags;
     let cameraEl = document.querySelector('a-entity[camera]');
     if (!cameraEl) {
         cameraEl = document.querySelector('a-camera');
@@ -2506,19 +2518,41 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
         this.el.setAttribute("gltf-model", "#" +this.data.objectData.modelID); 
       }
     }
-    if (this.data.objectData.tags != undefined && this.data.objectData.tags != null) {
-      console.log(this.data.objectData.name + " gotsome tags: " + this.data.objectData.tags);
-      this.data.tags = this.data.objectData.tags;
-    }
+    // console.log
+    // if (this.data.tags == null) {
+    //   console.log("this.data.tags is null!");
 
-    if (this.data.locationData && this.data.locationData.locationTags != undefined  && this.data.locationData.locationTags != 'undefined') {
-      this.data.tags = this.data.locationData.locationTags;
-    }
-    if (this.data.locationData && this.data.locationData.markerType) {
-      console.log(this.data.objectData.name + " gotsa markerType : "+ this.data.locationData.markerType);
+    //   if (this.data.locationData && this.data.locationData.locationTags != undefined  && this.data.locationData.locationTags != 'undefined') {
+    //     console.log(this.data.objectData.name + " gotsome location tags: " + this.data.locationData.locationTags);
+    //     this.data.tags = this.data.locationData.locationTags;
+    //   } 
+    //   if (this.data.objectData.tags != undefined && this.data.objectData.tags != null && this.data.objectData.tags != "undefined" && this.data.objectData.length > 0) {
+    //     console.log(this.data.objectData.name + " gotsome tags: " + this.data.objectData.tags);
+    //     this.data.tags = this.data.objectData.tags;
+    //   }
+    //   // if (this.data.locationData && this.data.locationData.markerType) {
+    //   //   console.log(this.data.objectData.name + " gotsa markerType : "+ this.data.locationData.markerType);
+    //   // }
+    // }
+      
+    if (this.tags == null) {
+      console.log(this.data.objectData.name + "this.data.tags is null! loctags: " + this.data.locationData.locationTags + " objtags: " + this.data.objectData.tags);
+
+      if (this.data.locationData && this.data.locationData.locationTags != undefined  && this.data.locationData.locationTags != 'undefined') {
+        console.log(this.data.objectData.name + " gotsome location tags: " + this.data.locationData.locationTags);
+        this.tags = this.data.locationData.locationTags;
+      } else if (this.data.objectData.tags != undefined && this.data.objectData.tags != null && this.data.objectData.tags != "undefined" && this.data.objectData.tags.length > 0) {
+        console.log(this.data.objectData.name + " gotsome tags: " + this.data.objectData.tags);
+        this.tags = this.data.objectData.tags;
+      }
+      // if (this.data.locationData && this.data.locationData.markerType) {
+      //   console.log(this.data.objectData.name + " gotsa markerType : "+ this.data.locationData.markerType);
+      // }
+    } else {
+      console.log("this.data.tags is not null!");
+
     }
       
-
     this.hasPickupAction = false;
     this.hasThrowAction = false;
     this.hasShootAction = false;
@@ -2839,7 +2873,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
         this.intersection = this.raycaster.components.raycaster.getIntersection(this.el, true);
         this.hitpoint = this.intersection.point;
         that.hitpoint = this.hitpoint;
-        console.log(that.data.objectData.name);
+        console.log(that.data.objectData.name + " with tags " + this.tags);
        
     });
     this.el.addEventListener("raycaster-intersected-cleared", () => {
@@ -3049,10 +3083,10 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
     //   this.hitID = hitID;
       // console.log("new hit " + hitID + " " + distance + " " + JSON.stringify(hitpoint));
       // distance = window.playerPosition.distanceTo(hitpoint);
-      console.log("new hit " + hitID + " distance: " + distance + " " + JSON.stringify(hitpoint));
+      console.log("new hit " + hitID + " distance: " + distance + " " + JSON.stringify(hitpoint) + " tags " +  this.tags);
       // var triggerAudioController = document.getElementById("triggerAudio");
-      if (this.triggerAudioController != null && !this.isEquipped && this.data.tags) {
-        this.triggerAudioController.components.trigger_audio_control.playAudioAtPosition(hitpoint, distance, this.data.tags);
+      if (this.triggerAudioController != null && !this.isEquipped && this.tags) {
+        this.triggerAudioController.components.trigger_audio_control.playAudioAtPosition(hitpoint, distance, this.tags);
       }
 
         if (this.hasSynth) {
@@ -3490,12 +3524,14 @@ function WaitAndHideDialogPanel (time) {
   // }
 }
 
+////////////////////////// - MOD_MODEL - for "plain" models, these are written (elements + components + props) by the server into response, with declared a-assets, as opposed to "Objects", see mod_objex / mod_object 
 AFRAME.registerComponent('mod_model', {
   schema: {
       markerType: {default: "none"},
       eventData: {default: ''},
       shader: {default: ''},
-      color: {default: ''}
+      color: {default: ''},
+      tags: {default: null}
       
     },
     init: function () {
@@ -4367,16 +4403,21 @@ AFRAME.registerComponent('mod_model', {
             }
 
             // console.log("tryna play audiotrigger " + JSON.stringify(this.data.eventData));
-            if (this.hasAudioTrigger) {
-              // console.log("tryna play audiotrigger");
-              if (this.triggerAudioController != null) {
-                this.triggerAudioController.components.trigger_audio_control.playAudio();
-              }
+            if (this.data.tags != undefined && this.data.tags != null && this.data.tags != "undefined") {
+              console.log("tryna play audio with tags " + this.data.tags);
+              // if (this.triggerAudioController != null) {
+              //   this.triggerAudioController.components.trigger_audio_control.playAudio();
+              
+                if (this.triggerAudioController != null) {
+                  let distance = window.playerPosition.distanceTo(evt.detail.intersection.point);
+                  this.triggerAudioController.components.trigger_audio_control.playAudioAtPosition(evt.detail.intersection.point, distance, this.data.tags, 1);//tagmangler needs an array, add vol mod (bc blowing in they face)
+                }
+              // }
             }
             // if (this.data.markerType)
 
             if (this.data.markerType.toLowerCase() == "spawntrigger") {
-              console.log("gotsa spawnTrigger !!!!!!!");
+              // console.log("gotsa spawnTrigger !!!!!!!");
               // (evt.detail.intersection distanceTo
               if (window.playerPosition) {
                 let distance = window.playerPosition.distanceTo(evt.detail.intersection.point);
@@ -4384,6 +4425,10 @@ AFRAME.registerComponent('mod_model', {
                 if (distance < 3) {
                   let objexEl = document.getElementById('sceneObjects');    
                   objexEl.components.mod_objex.spawnObject(this.data.eventData);
+                  // if (this.triggerAudioController != null) {
+                  //   let distance = window.playerPosition.distanceTo(evt.detail.intersection.point);
+                  //   this.triggerAudioController.components.trigger_audio_control.playAudioAtPosition(evt.detail.intersection.point, distance, ["spawn"], 1);//tagmangler needs an array, add vol mod (bc blowing in they face)
+                  // }
                 }
               }
             }
