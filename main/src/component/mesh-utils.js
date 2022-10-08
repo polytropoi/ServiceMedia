@@ -298,7 +298,7 @@ AFRAME.registerComponent('instanced_meshes_sphere', { //scattered randomly in sp
     }
 });
 
-
+////////////////////////////////////////////////////// main instanced mesh(es) method for surface(s) //////////////////////////
 AFRAME.registerComponent('instanced_surface_meshes', {
   schema: {
     _id: {default: ''},
@@ -538,21 +538,21 @@ AFRAME.registerComponent('instanced_surface_meshes', {
       
       if (id != null && id != this.lastClickedID && this.intersection != null && this.data.tags != 'undefined') {
         this.lastClickedID = id; //bc double triggering....ugh
-      console.log(this.data.tags + " clicked id " + id);
-      var triggerAudioController = document.getElementById("triggerAudio");
-        if (triggerAudioController != null) {
-          triggerAudioController.components.trigger_audio_control.playAudioAtPosition(this.hitpoint, this.distance, this.data.tags);
-          }
-        // this.iMesh.position.set(id, 0, 0, -100);
-        if (this.useMatrix) {
-          let matrixMeshEl = document.getElementById("matrix_meshes");
-          if (matrixMeshEl != null) {
-            this.matrixMeshComponent = matrixMeshEl.components.matrix_meshes;
-            if (this.matrixMeshComponent != null && this.intersection != null) {
-            this.matrixMeshComponent.selectRoomData(this.instanceId);
+        console.log(this.data.tags + " clicked id " + id);
+        var triggerAudioController = document.getElementById("triggerAudio");
+          if (triggerAudioController != null) {
+            triggerAudioController.components.trigger_audio_control.playAudioAtPosition(this.hitpoint, this.distance, this.data.tags);
+            }
+          // this.iMesh.position.set(id, 0, 0, -100);
+          if (this.useMatrix) {
+            let matrixMeshEl = document.getElementById("matrix_meshes");
+            if (matrixMeshEl != null) {
+              this.matrixMeshComponent = matrixMeshEl.components.matrix_meshes;
+              if (this.matrixMeshComponent != null && this.intersection != null) {
+                this.matrixMeshComponent.selectRoomData(this.instanceId);
+              }
             }
           }
-        }
       }
     }
 
@@ -2483,3 +2483,4 @@ AFRAME.registerComponent('rotate-toward-velocity', {
   }
 
 });
+

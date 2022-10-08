@@ -403,6 +403,14 @@ webxr_router.get('/:_id', function (req, res) {
                             
                             instancingEntity = "";
                         } 
+                        if (sceneData.sceneTags[i].toLowerCase().includes("aabb") || sceneData.sceneTags[i].toLowerCase().includes("collision")) {
+                            // console.log("GOTS SCENE TAG: " + sceneData.sceneTags[i]);
+                            // showTransport = true;
+                            
+                            meshUtilsScript = meshUtilsScript + "<script src=\x22../main/src/component/aframe-aabb-collider-component.min.js\x22></script>"; //imports MeshSurfaceScatter
+                            
+
+                        } 
                         if (sceneData.sceneTags[i] == "instancing demo") {
                             
                             instancingEntity = "<a-entity instanced_meshes_sphere></a-entity>";

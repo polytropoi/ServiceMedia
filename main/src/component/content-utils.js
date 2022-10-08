@@ -20,6 +20,7 @@ let youtubeDuration = 0;
 
 
 
+
 function PrimaryAudioInit() {
   console.log("PRIMARY AUDIO INIT()");
   primaryAudioEl = document.querySelector('#primaryAudio');
@@ -221,6 +222,19 @@ AFRAME.registerComponent('initializer', { //adjust for device settings, and call
             console.log("din't found VRBUTTON");
         }
       }  
+
+      // ////// test aabb collisions
+      // document.addEventListener("DOMContentLoaded", function() {
+      //   document.querySelectorAll("a-entity").forEach(function(entity) {
+      //     // entity.addEventListener("hitstart", function(event) {
+      //     //   console.log(
+      //     //     event.target.id,
+      //     //     "collided with",
+      //     //     event.target.components["aabb-collider"]["intersectedEls"].map(x => x.id)
+      //     //   );
+      //     // });
+      //   });
+      // });
      
    });
    if (this.data.usdz != '') {
@@ -461,6 +475,14 @@ AFRAME.registerComponent('get_pos_rot', { //using this one now, returns on reque
     // var entity = this.el;
     // this.geometry = new THREE.SphereBufferGeometry(.1, 16, 16);
     // this.el.append(this.geometry);
+    this.el.addEventListener("hitstart", function(event) {
+      console.log(
+        event.target.id,
+        "collided with",
+        event.target.components["aabb-collider"]["intersectedEls"].map(x => x.id)
+      );
+    });
+    
   },
   returnPos: function () {
     this.el.object3D.getWorldPosition(this.cp);
@@ -3629,7 +3651,11 @@ AFRAME.registerComponent('mod_model', {
             }
 
           }
+          if (this.data.markerType.toLowerCase() == "spawntrigger") {
+            // console.log("tryna add aabb colloidere!");
+            // this.el.setAttribute("aabb-collider", {'objects': 'a-entity'});
 
+          }
           if (this.data.eventData.toLowerCase().includes("spawn")) {
             this.el.classList.add("spawn");
           }
@@ -4422,14 +4448,14 @@ AFRAME.registerComponent('mod_model', {
               if (window.playerPosition) {
                 let distance = window.playerPosition.distanceTo(evt.detail.intersection.point);
                 console.log("gotsa spawntrigger distance is " + distance);
-                if (distance < 3) {
+                // if (distance < 3) {
                   let objexEl = document.getElementById('sceneObjects');    
                   objexEl.components.mod_objex.spawnObject(this.data.eventData);
                   // if (this.triggerAudioController != null) {
                   //   let distance = window.playerPosition.distanceTo(evt.detail.intersection.point);
                   //   this.triggerAudioController.components.trigger_audio_control.playAudioAtPosition(evt.detail.intersection.point, distance, ["spawn"], 1);//tagmangler needs an array, add vol mod (bc blowing in they face)
                   // }
-                }
+                // }
               }
             }
           }
@@ -4486,7 +4512,8 @@ AFRAME.registerComponent('mod_model', {
         });      
       }
     });
-  }, 
+   
+  },  //END INIT 
   returnProperties: function () {
 
 
