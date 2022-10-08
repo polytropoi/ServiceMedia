@@ -450,7 +450,7 @@ AFRAME.registerComponent('pos-rot-reader', { //no
     // console.log(JSON.stringify(cameraPosition) +  " " + JSON.stringify(cameraRotation));
   }
 });
-AFRAME.registerComponent('get_pos_rot', { //using this one now, returns on request
+AFRAME.registerComponent('get_pos_rot', { //ATTACHED TO PLAYER BELOW CAMERA RIG, returns pos/rot on request
   schema: {
     trackables: {default: ''},
     // href: {default: ''},
@@ -475,6 +475,8 @@ AFRAME.registerComponent('get_pos_rot', { //using this one now, returns on reque
     // var entity = this.el;
     // this.geometry = new THREE.SphereBufferGeometry(.1, 16, 16);
     // this.el.append(this.geometry);
+    this.el.setAttribute("geometry", {primitive: 'cylinder', height: 3, radius: 2});
+    this.el.setAttribute("aabb-collider", {objects: 'activeObjexRay'});
     this.el.addEventListener("hitstart", function(event) {
       console.log(
         event.target.id,
@@ -487,9 +489,9 @@ AFRAME.registerComponent('get_pos_rot', { //using this one now, returns on reque
   returnPos: function () {
     this.el.object3D.getWorldPosition(this.cp);
     if (this.cp) {
-    this.cp.x = roundToTwo(this.cp.x);
-    this.cp.y = roundToTwo(this.cp.y);
-    this.cp.z = roundToTwo(this.cp.z);
+      this.cp.x = roundToTwo(this.cp.x);
+      this.cp.y = roundToTwo(this.cp.y);
+      this.cp.z = roundToTwo(this.cp.z);
     
     }
  
@@ -2137,8 +2139,12 @@ AFRAME.registerComponent('mod_objex', {
     },
     spawnObject: function (locationName) { //uses name (label) property of location to reference the object to spawn, called from a spawntrigger, using that location's eventData which should have the name... hrm.
       console.log("tryna spawn object with location name : "+ locationName);
-      for (let j = 0; j < this.data.jsonObjectData.length; j++) {
-        if (this.data.jsonLocationsData[j].name == locationName) {
+      for (let j = 0; j < this.data.jsonLocationsData.length; j++) {
+        let tmpName = this.data.jsonLocationsData[j].name;
+        if (tmpName == 'undefined' || tmpName == null) { //some old ones only have a "label" property. sigh
+          tmpName = this.data.jsonLocationsData[j].label != null ? this.data.jsonLocationsData[j].label : "";
+        }
+        if (tmpName == locationName) {
           let elIDString = "obj" + this.data.jsonLocationsData[j].objectID + "_" + this.data.jsonLocationsData[j].timestamp;
           let elID = document.getElementById(elIDString);
           if (!elID) { //only one for now... TODO count maxperscene?  check inventory?
