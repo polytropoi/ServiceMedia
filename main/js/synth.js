@@ -137,7 +137,7 @@ AFRAME.registerComponent('mod_synth', {
 
       //  bell.triggerAttackRelease(getRandomInt(0,88), 1);
       //  bell.triggerAttackRelease("G4", 1);
-       amSynth.triggerAttackRelease(getRandomInt(64,88), 1);
+       amSynth.triggerAttackRelease(getRandomInt(88,128), 1);
     },
      
    

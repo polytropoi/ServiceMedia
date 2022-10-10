@@ -1248,6 +1248,8 @@ AFRAME.registerComponent('cloud_marker', {
           this.el.setAttribute('gltf-model', '#savedplaceholder');
         } else if (this.storedVars.markerType.toLowerCase() == "poi") {
           this.el.setAttribute('gltf-model', '#poi1');
+        } else if (this.storedVars.markerType.toLowerCase().includes("trigger")) {
+          this.el.setAttribute('gltf-model', '#poi1');  
         } else if (this.storedVars.markerType.toLowerCase() == "mailbox") {
           this.el.setAttribute('gltf-model', '#mailbox');
         }
@@ -1305,6 +1307,8 @@ AFRAME.registerComponent('cloud_marker', {
       this.el.setAttribute('gltf-model', '#savedplaceholder');
     } else if (this.data.markerType.toLowerCase() == "poi") {
       this.el.setAttribute('gltf-model', '#poi1');
+    } else if (this.data.markerType.toLowerCase().includes("trigger")) {
+      this.el.setAttribute('gltf-model', '#poi1');  
     } else if (this.data.markerType.toLowerCase() == "mailbox") {
       this.el.setAttribute('gltf-model', '#mailbox');
     }
@@ -1613,13 +1617,15 @@ AFRAME.registerComponent('mod_physics', { //used by models, not objects which ma
     isTrigger: {default: false},
     body: {type: 'string', default: 'dynamic'},  // dynamic: A freely-moving object
     shape: {type: 'string', default: 'mesh'},  // hull: Wraps a model in a convex hull, like a shrink-wrap
+    eventData: {default: null},
     tags: {default: []}
   },
   init() {
-    console.log("tryna load ashape with trigger " + this.data.isTrigger);
+   
+   
     this.el.addEventListener('body-loaded', () => {  
-
-      if (this.data.isTrigger) {
+      
+      if (this.isTrigger) {
         console.log("TRIGGER LOADED");
         this.el.setAttribute('ammo-shape', {type: "sphere"});
       } else {
@@ -1627,10 +1633,12 @@ AFRAME.registerComponent('mod_physics', { //used by models, not objects which ma
       }
       // this.el.body.setCollisionF
       // console.log("ammo shape is " + JSON.stringify(this.el.getAttribute('ammo-shape')));
+      this.isTrigger = this.data.isTrigger;
+      console.log("tryna load ashape with trigger " + this.isTrigger);
     });
   
     this.el.addEventListener('model-loaded', () => {
-      if (this.data.isTrigger) {
+      if (this.isTrigger) {
         this.el.setAttribute('ammo-body', {type: "kinematic", emitCollisionEvents: true});
       } else {
         this.el.setAttribute('ammo-body', {type: this.data.body, emitCollisionEvents: true});
@@ -1639,14 +1647,15 @@ AFRAME.registerComponent('mod_physics', { //used by models, not objects which ma
         // console.log("ammo body is " + JSON.stringify(this.el.getAttribute('ammo-body')));
         // this.loadShape();
       }
+
     });
     
 
 
     this.el.addEventListener("collidestart", (e) => { //this is for models, not objects - TODO look up locationData for tags? 
       e.preventDefault();
-      // console.log("mod_physics collisoin with object with :" + this.el.id + " " + e.detail.targetEl.classList);
-      if (this.data.isTrigger) {
+      console.log("mod_physics collisoin with object with :" + this.el.id + " " + e.detail.targetEl.classList + " isTrigger " + this.isTrigger);
+      if (this.isTrigger) {
         console.log("mod_physics TRIGGER collision "  + this.el.id + " " + e.detail.targetEl.classList);
         // e.detail.body.disableCollision = true;
         this.disableCollisionTemp(); //must turn it off or it blocks, no true "trigger" mode afaik (unlike cannonjs!)

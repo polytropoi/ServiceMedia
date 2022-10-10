@@ -475,12 +475,10 @@ AFRAME.registerComponent('get_pos_rot', { //ATTACHED TO PLAYER BELOW CAMERA RIG,
     // var entity = this.el;
     // this.geometry = new THREE.SphereBufferGeometry(.1, 16, 16);
     // this.el.append(this.geometry);
-    this.el.setAttribute("geometry", {primitive: 'cylinder', height: 3, radius: 2});
-    this.el.setAttribute("aabb-collider", {objects: 'activeObjexRay'});
+    // this.el.setAttribute("geometry", {primitive: 'cylinder', height: 3, radius: 2});
+    // this.el.setAttribute("aabb-collider", {objects: 'activeObjexRay'});
     this.el.addEventListener("hitstart", function(event) {
       console.log(
-        event.target.id,
-        "collided with",
         event.target.components["aabb-collider"]["intersectedEls"].map(x => x.id)
       );
     });
@@ -2793,16 +2791,16 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
       }
       if (this.loadAction != null) {
         if (this.loadAction.actionResult.toLowerCase() == "trigger fx") {
-            let particleSpawner = document.getElementById('particleSpawner');
-            if (particleSpawner != null) {
-              var worldPosition = new THREE.Vector3();
-              this.el.object3D.getWorldPosition(worldPosition);
-              if (this.data.objectData.yPosFudge != null && this.data.objectData.yPosFudge != "") {
-                worldPosition.y += this.data.objectData.yPosFudge;
-              }
-              console.log("triggering fx at " + worldPosition + " plus" + this.data.objectData.yPosFudge);
-              particleSpawner.components.particle_spawner.spawnParticles(worldPosition, this.data.objectData.particles, 5, this.el.id, this.data.objectData.yPosFudge);
+          let particleSpawner = document.getElementById('particleSpawner');
+          if (particleSpawner != null) {
+            var worldPosition = new THREE.Vector3();
+            this.el.object3D.getWorldPosition(worldPosition);
+            if (this.data.objectData.yPosFudge != null && this.data.objectData.yPosFudge != "") {
+              worldPosition.y += this.data.objectData.yPosFudge;
             }
+            console.log("triggering fx at " + worldPosition + " plus" + this.data.objectData.yPosFudge);
+            particleSpawner.components.particle_spawner.spawnParticles(worldPosition, this.data.objectData.particles, 5, this.el.id, this.data.objectData.yPosFudge);
+          }
         }
       }
     });
@@ -3552,7 +3550,7 @@ function WaitAndHideDialogPanel (time) {
   // }
 }
 
-////////////////////////// - MOD_MODEL - for "plain" models, these are written (elements + components + props) by the server into response, with declared a-assets, as opposed to "Objects", see mod_objex / mod_object 
+////////////////////////// - MOD_MODEL - for "plain" models, these are written (elements + components + props) by the server into response as a-assets, as opposed to "Objects", see mod_objex / mod_object 
 AFRAME.registerComponent('mod_model', {
   schema: {
       markerType: {default: "none"},
@@ -3660,7 +3658,7 @@ AFRAME.registerComponent('mod_model', {
           if (this.data.markerType.toLowerCase() == "spawntrigger") {
             // console.log("tryna add aabb colloidere!");
             // this.el.setAttribute("aabb-collider", {'objects': 'a-entity'});
-
+            this.el.classList.add("activeObjexRay");
           }
           if (this.data.eventData.toLowerCase().includes("spawn")) {
             this.el.classList.add("spawn");
@@ -3879,20 +3877,22 @@ AFRAME.registerComponent('mod_model', {
               
               let child = this.el.object3D.getObjectByName(this.meshChildren[i].name, true);
               child.visible = false;
-              // let triggerEl = document.createElement('a-entity');
-              // // var targetPos = new THREE.Vector3();
-              // // this.child.getWorldPosition(targetPos);
-              // // let child = this.child.clone();
-              // // child.position(targetPos);
-              // triggerEl.setObject3D("mesh", this.child.clone());
 
-              // // triggerEl.setAttribute('geometry', {primitive: 'box', width: 1});
-              // // triggerEl.setAttribute('position', targetPos);
-              // triggerEl.setAttribute('mod_physics', {isTrigger: true});
-              // // triggerEl.classList.add('activeObjexRay');
+              let triggerEl = document.createElement('a-entity');
+              // var targetPos = new THREE.Vector3();
+              // this.child.getWorldPosition(targetPos);
+              // let child = this.child.clone();
+              // child.position(targetPos);
+              triggerEl.setObject3D("box", child.clone());
+              // triggerEl.setObject3D("mesh", child);
+              // child.remove();
+              // triggerEl.setAttribute('geometry', {primitive: 'box', width: 1});
+              // triggerEl.setAttribute('position', targetPos);
+              triggerEl.setAttribute('mod_physics', {isTrigger: true, eventData: this.data.eventData, tags: this.data.tags});
+              // triggerEl.classList.add('activeObjexRay');
               
-              // this.el.appendChild(triggerEl);
-              // triggerEl.classList.add('trigger');
+              this.sceneEl.appendChild(triggerEl);
+              triggerEl.classList.add('trigger');
             }
             if (this.meshChildren[i].name.includes("navmesh")) {
               console.log("gotsa navmesh too!");
@@ -4323,6 +4323,7 @@ AFRAME.registerComponent('mod_model', {
           }, 2000);
           */
         }
+
         let primaryAudio = document.getElementById("primaryAudio");
         if (primaryAudio != null) {
         const primaryAudioControlParams = primaryAudio.getAttribute('primary_audio_control');
@@ -4372,6 +4373,11 @@ AFRAME.registerComponent('mod_model', {
           }
         } else {
           // console.log("no primary audio found!");
+        }
+        if (this.data.markerType.toLowerCase() == "spawntrigger") {
+          this.el.setAttribute('gltf-model', '#roundcube' );
+          // this.el.setAttribute("geometry", {primitive: "box", height: 1, width: 1});
+          
         }
         this.el.addEventListener('mouseenter', (evt) =>  {
           // console.log("mouseovewr markertype " + this.data.markerType);

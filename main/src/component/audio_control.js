@@ -1445,7 +1445,7 @@ AFRAME.registerComponent('trigger_audio_control', { //trigger audio on designate
 
     },
     playAudioAtPosition: function(pos, distance, tag, volmod) {
-        console.log("tryna play trigger audio with tag " + tag);
+        // console.log("tryna play trigger audio with tag " + tag);
         if (triggerAudioHowl != null && tag != undefined && tag != null && tag != "") {
         // this.modVolume(1);
         this.audioGroupsEl = document.getElementById('audioGroupsEl');
@@ -1462,11 +1462,11 @@ AFRAME.registerComponent('trigger_audio_control', { //trigger audio on designate
                     //     // audioID = this.audioGroupsController.returnRandomTriggerAudioID(); 
                     // }
                     //TODO - follow index sequence, use tags?
-                    console.log("tag "+ tags[i] + " tryna get audioID " + audioID);
+                    // console.log("tag "+ tags[i] + " tryna get audioID " + audioID);
                     this.audioItem = this.audioGroupsController.returnAudioItem(audioID);
 
                     if (this.audioItem != null) {
-                        console.log("gotsa audioItem, tryna set trigger to src " + this.audioItem.URLogg);
+                        // console.log("gotsa audioItem, tryna set trigger to src " + this.audioItem.URLogg);
                         triggerAudioHowl = null;
                         triggerAudioHowl = new Howl({
                             src: [this.audioItem.URLogg, this.audioItem.URLmp3],
@@ -1494,7 +1494,7 @@ AFRAME.registerComponent('trigger_audio_control', { //trigger audio on designate
                         triggerAudioHowl.rate(rate);
                         // console.log("tryna play at hitpoint " + pos);
                         let id = triggerAudioHowl.play();
-                        console.log("tryna play trigger at volume " + volume + " distance " + distance + " id " + id);
+                        console.log("tryna play trigger at volume " + volume + " distance " + distance + " id " + id); //calling id here is needed
                         triggerAudioHowl.pos(pos.x / 100, pos.y / 100, pos.z / 100, id);  //HOLY SHIT howler needs small values for position, * .01
                         break;
                         }

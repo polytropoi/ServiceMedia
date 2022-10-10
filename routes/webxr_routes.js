@@ -653,13 +653,14 @@ webxr_router.get('/:_id', function (req, res) {
                                 let zFix = parseFloat(sceneResponse.sceneLocations[i].z); //does nothing    
                                 // console.log("loc with model? " + JSON.stringify(sceneResponse.sceneLocations[i]));
                                 //REM THIS?
-                                if (sceneResponse.sceneLocations[i].markerType == "gltf" || sceneResponse.sceneLocations[i].gltf != null) { //old way, deprecated but still in use...//?
+                                // if (sceneResponse.sceneLocations[i].markerType == "gltf" || sceneResponse.sceneLocations[i].gltf != null) { //old way, deprecated but still in use...//?
                                     
-                                    sceneGLTFLocations.push(sceneResponse.sceneLocations[i]);
-                                    if (sceneResponse.sceneLocations[i].eventData != null && sceneResponse.sceneLocations[i].eventData.length > 4) {
-                                        animationComponent = "<script src=\x22https://unpkg.com/aframe-animation-component@5.1.2/dist/aframe-animation-component.min.js\x22></script>"; //unused!  NEEDS FIXING - this component could be added more than once
-                                    }
-                                }
+                                //     sceneGLTFLocations.push(sceneResponse.sceneLocations[i]);
+                                //     if (sceneResponse.sceneLocations[i].eventData != null && sceneResponse.sceneLocations[i].eventData.length > 4) {
+                                //         animationComponent = "<script src=\x22https://unpkg.com/aframe-animation-component@5.1.2/dist/aframe-animation-component.min.js\x22></script>"; //unused!  NEEDS FIXING - this component could be added more than once
+                                //     }
+                                // }
+
                                 if (sceneResponse.sceneLocations[i].objectID != undefined && sceneResponse.sceneLocations[i].objectID != "none" && sceneResponse.sceneLocations[i].objectID.length > 8) { //attaching object to location 
                                     // console.log("pushinbg object locaition " + sceneResponse.sceneLocations[i]);
                                     sceneObjectLocations.push(sceneResponse.sceneLocations[i]);
@@ -673,7 +674,8 @@ webxr_router.get('/:_id', function (req, res) {
                                     }
                                 }
                                 if (sceneResponse.sceneLocations[i].markerType != undefined && sceneResponse.sceneLocations[i].type.toLowerCase() != 'geographic') {
-                                    if (sceneResponse.sceneLocations[i].markerType.toLowerCase() == "placeholder" || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "poi" || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "mailbox") {
+                                    if (sceneResponse.sceneLocations[i].markerType.toLowerCase() == "placeholder" || sceneResponse.sceneLocations[i].markerType.toLowerCase().includes("trigger") ||
+                                        sceneResponse.sceneLocations[i].markerType.toLowerCase() == "poi" || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "mailbox") {
                                     //    locationPlaceholders.push(sceneResponse.sceneLocations[i].x + " " + sceneResponse.sceneLocations[i].y + " " + zFix);
                                         let tLoc = sceneResponse.sceneLocations[i];
                                         tLoc.phID = sceneResponse.short_id+"~cloudmarker~"+sceneResponse.sceneLocations[i].timestamp;
@@ -1054,7 +1056,7 @@ webxr_router.get('/:_id', function (req, res) {
                                         " id=\x22mouseCursor\x22 cursor=\x22rayOrigin: mouse\x22 raycaster=\x22objects: .activeObjexRay\x22>"+
                                         // "<a-entity id=\x22player\x22 get_pos_rot networked=\x22template:#avatar-template;attachTemplateToLocal:false;\x22 "+spawnInCircle+" camera "+wasd+" look-controls=\x22hmdEnabled: false\x22 position=\x220 1.6 0\x22>" +     
                                         // "<a-entity id=\x22viewportPlaceholder\x22 position=\x220 0 -1\x22></entity>"+   
-                                        "<a-entity id=\x22player\x22 look-controls get_pos_rot camera "+wasd+" "+ physicsMod +" position=\x22"+playerPosition+"\x22>"+
+                                        "<a-entity id=\x22player\x22 geometry=\x22primitive: box; height: 1; width: 1; depth: 1\x22 aabb-collider=\x22objects: .activeObjexRay\x22 look-controls get_pos_rot camera "+wasd+" "+ physicsMod +" position=\x22"+playerPosition+"\x22>"+
                                             "<a-entity id=\x22equipPlaceholder\x22 geometry=\x22primitive: box; height: .1; width: .1; depth: .1\x22 position=\x220 -.65 -.75\x22"+
                                             "material=\x22opacity: 0\x22></a-entity>"+
                                             "<a-entity id=\x22viewportPlaceholder\x22 geometry=\x22primitive: plane; height: 0.01; width: .01\x22 position=\x220 0 -1.5\x22"+
@@ -2085,8 +2087,9 @@ webxr_router.get('/:_id', function (req, res) {
 
                                             } else {
                                                 // console.log("LOCMDL eventDATA is : " + locMdl.eventData.toLowerCase());
+
                                                 gltfsAssets = gltfsAssets + "<a-asset-item class=\x22gltfAssets\x22 id=\x22" + m_assetID + "\x22 src=\x22"+ modelURL +"\x22></a-asset-item>";
-                                               
+                                                
                                                 // let yRot 
                                                 let scatterSurface = "";
                                                 let brownian = "";
@@ -2196,12 +2199,14 @@ webxr_router.get('/:_id', function (req, res) {
                                                             }
                                                         }
                                                     }
+                                                    let modelString = "gltf-model=\x22#" + m_assetID + "\x22";
 
                                                     gltfsEntities = gltfsEntities + "<a-entity id=\x22"+id+"\x22 "+instancing+" class=\x22"+entityType+
                                                     " activeObjexGrab activeObjexRay\x22 shadow=\x22cast:true; receive:true\x22 "+skyboxEnvMap+
                                                     " position=\x220 -20 0\x22></a-entity>"+//scatter model below
                                                     " <a-entity id=\x22"+locMdl.modelID+"\x22 "+modelParent+" "+modModel+" class=\x22gltf "+entityType+ 
-                                                    " activeObjexGrab activeObjexRay\x22 shadow=\x22cast:true; receive:true\x22 "+skyboxEnvMap+" gltf-model=\x22#" + m_assetID + "\x22 "+objAnim+" "+cannedAnim+
+                                                    " activeObjexGrab activeObjexRay\x22 shadow=\x22cast:true; receive:true\x22 "+skyboxEnvMap+" "+modelString+" "+objAnim+" "+cannedAnim+
+                                                    // " activeObjexGrab activeObjexRay\x22 shadow=\x22cast:true; receive:true\x22 "+skyboxEnvMap+" gltf-model=\x22#" + m_assetID + "\x22 "+objAnim+" "+cannedAnim+
                                                     " position=\x220 -10 0\x22></a-entity>"; 
 
                                                     gltfModel = modelURL;
@@ -4625,7 +4630,7 @@ webxr_router.get('/:_id', function (req, res) {
                         "<a-asset-item id=\x22groupicon\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/groupicon.glb\x22></a-asset-item>\n"+
                         "<a-asset-item id=\x22mailbox\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/mailbox2.glb\x22></a-asset-item>\n"+
                         "<a-asset-item id=\x22links\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/links.glb\x22></a-asset-item>\n"+
-                        // "<a-asset-item id=\x22roundcube\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/roundcube.glb\x22></a-asset-item>\n"+
+                        "<a-asset-item id=\x22roundcube\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/roundcube.glb\x22></a-asset-item>\n"+
                         "<a-asset-item id=\x22poi1\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/poi1b.glb\x22></a-asset-item>\n"+
                         "<a-asset-item id=\x22poi2\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/poi_marker2.glb\x22></a-asset-item>\n"+
                         "<a-asset-item id=\x22placeholder\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/placeholder.glb\x22></a-asset-item>\n"+
