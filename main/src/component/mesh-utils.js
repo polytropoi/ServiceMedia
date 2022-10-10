@@ -836,7 +836,8 @@ AFRAME.registerComponent('local_marker', {
     markerType: {default: 'placeholder'},
     eventData: {default: ''},
     isLocal: {default: true},
-    isSelected: {default: false}
+    isSelected: {default: false},
+    tags: {default: null}
 
   },
   init: function () {
@@ -907,6 +908,8 @@ AFRAME.registerComponent('local_marker', {
               this.el.setAttribute('gltf-model', '#placeholder');
             } else if (this.storedVars.markerType.toLowerCase() == "poi") {
               this.el.setAttribute('gltf-model', '#poi1');
+            } else if (this.storedVars.markerType.toLowerCase().includes("trigger")) {
+              this.el.setAttribute('gltf-model', '#poi1');  
             } else if (this.storedVars.markerType.toLowerCase() == "mailbox") {
               this.el.setAttribute('gltf-model', '#mailbox');
             }
@@ -946,6 +949,7 @@ AFRAME.registerComponent('local_marker', {
           locItem.isLocal = true;
           locItem.timestamp = this.timestamp;
           locItem.scale = 1;
+          locItem.tags = '';
           locItem.phID = this.phID;
           console.log("tryna set localmarker with phID " + this.phID);
           localStorage.setItem(this.phID, JSON.stringify(locItem));
@@ -1026,7 +1030,7 @@ AFRAME.registerComponent('local_marker', {
       // that.isSelected = false;
 
       // isSelected = false;
-      if (that.data.markerType.toLowerCase() == "placeholder") {
+      if (that.data.markerType.toLowerCase() == "placeholder" ) {
         that.hitPosition = null;
         if (this.mouseDownPos != undefined) {
           this.mouseDownPos.x = 0;
@@ -1625,15 +1629,15 @@ AFRAME.registerComponent('cloud_marker', {
 AFRAME.registerComponent('mod_physics', { //used by models, not objects which manage physics settings in mod_object
   schema: {
     model: {default: ''},
-    isTrigger: {default: false},
+    isTrigger: {type: 'bool', default: false},
     body: {type: 'string', default: 'dynamic'},  // dynamic: A freely-moving object
     shape: {type: 'string', default: 'mesh'},  // hull: Wraps a model in a convex hull, like a shrink-wrap
     eventData: {default: null},
     tags: {default: []}
   },
   init() {
-   
-   
+    this.isTrigger = this.data.isTrigger;
+  
     this.el.addEventListener('body-loaded', () => {  
       
       if (this.isTrigger) {
@@ -1644,7 +1648,7 @@ AFRAME.registerComponent('mod_physics', { //used by models, not objects which ma
       }
       // this.el.body.setCollisionF
       // console.log("ammo shape is " + JSON.stringify(this.el.getAttribute('ammo-shape')));
-      this.isTrigger = this.data.isTrigger;
+      // this.isTrigger = this.data.isTrigger;
       console.log("tryna load ashape with trigger " + this.isTrigger);
     });
   
@@ -1667,12 +1671,12 @@ AFRAME.registerComponent('mod_physics', { //used by models, not objects which ma
       e.preventDefault();
       console.log("mod_physics collisoin with object with :" + this.el.id + " " + e.detail.targetEl.classList + " isTrigger " + this.isTrigger);
       if (this.isTrigger) {
-        console.log("mod_physics TRIGGER collision "  + this.el.id + " " + e.detail.targetEl.classList);
+        console.log("mod_physics TRIGGER collision "  + this.el.id + " " + e.detail.targetEl.id);
         // e.detail.body.disableCollision = true;
         this.disableCollisionTemp(); //must turn it off or it blocks, no true "trigger" mode afaik (unlike cannonjs!)
 
       } else {
-        console.log("mod_physics "  + this.el.id + " " + e.detail.targetEl.classList);
+        console.log("mod_physics "  + this.el.id + " " + e.detail.targetEl.id);
       
       }
       let mod_obj_component = e.detail.targetEl.components.mod_object;

@@ -3866,25 +3866,29 @@ AFRAME.registerComponent('mod_model', {
           for (i = 0; i < this.meshChildren.length; i++) { //apply mods to the special things
             console.log("gotsa special !! meshChild " + this.meshChildren[i].name);
             if (this.meshChildren[i].name.includes("trigger")) { 
-              
-              let child = this.el.object3D.getObjectByName(this.meshChildren[i].name, true);
-              child.visible = false;
+              //ugh, nm
+                let child = this.el.object3D.getObjectByName(this.meshChildren[i].name, true);
+                child.visible = false;
 
-              let triggerEl = document.createElement('a-entity');
-              // var targetPos = new THREE.Vector3();
-              // this.child.getWorldPosition(targetPos);
-              // let child = this.child.clone();
-              // child.position(targetPos);
-              triggerEl.setObject3D("box", child.clone());
-              // triggerEl.setObject3D("mesh", child);
-              // child.remove();
-              // triggerEl.setAttribute('geometry', {primitive: 'box', width: 1});
-              // triggerEl.setAttribute('position', targetPos);
-              triggerEl.setAttribute('mod_physics', {isTrigger: true, eventData: this.data.eventData, tags: this.data.tags});
-              // triggerEl.classList.add('activeObjexRay');
-              
-              this.sceneEl.appendChild(triggerEl);
-              triggerEl.classList.add('trigger');
+                // let triggerEl = document.createElement('a-entity');
+                // var targetPos = new THREE.Vector3();
+                // child.getWorldPosition(targetPos);
+                // this.child = child.clone();
+                // triggerEl.setObject3D("mesh", this.child);
+                // // let child = this.child.clone();
+                // // this.child.position(targetPos);
+                // // triggerEl.setObject3D("mesh", child.clone());
+                // // triggerEl.setObject3D("mesh", child);
+                // child.remove();
+                // // triggerEl.setAttribute('geometry', {primitive: 'box', width: 1});
+                // triggerEl.setAttribute('position', targetPos);
+                // console.log("gotsa special teryna set a trigger mesh..");
+                // triggerEl.setAttribute('mod_physics', {eventData: this.data.eventData, tags: this.data.tags, isTrigger: true});
+                // // triggerEl.classList.add('activeObjexRay');
+                // triggerEl.id = "TRIGGGER";
+                // this.sceneEl.appendChild(triggerEl);
+                
+                // triggerEl.classList.add('trigger');
             }
             if (this.meshChildren[i].name.includes("navmesh")) {
               console.log("gotsa navmesh too!");

@@ -552,6 +552,8 @@ function ReturnLocationMarkerTypeSelect (selected) {
     const typesArray = [
         "placeholder",
         "poi",
+        "spawntrigger",
+        "trigger",
         "picture",
         "mailbox"];
     for (let i = 0; i < typesArray.length; i++) {
@@ -655,7 +657,10 @@ function ShowLocationModal(phID) {
         "<input class=\x22zfield\x22 type=\x22number\x22 id=\x22zrot\x22 value=\x22"+thisLocation.eulerz+"\x22></div></div>"+
 
         "<div class=\x22twocolumn\x22><label for=\x22modelScale\x22>Scale</label><br>"+
-        "<input class=\x22normalfield\x22 type=\x22number\x22 id=\x22modelScale\x22 value=\x22"+thisLocation.scale+"\x22></div></div>"+
+        "<input class=\x22normalfield\x22 type=\x22number\x22 id=\x22modelScale\x22 value=\x22"+thisLocation.scale+"\x22></div>"+
+
+        "<div class=\x22twocolumn\x22><label for=\x22locationTags\x22>Tags</label>"+
+        "<textarea type=\x22textarea\x22 placeholder=\x22\x22 id=\x22locationTags\x22>"+thisLocation.locationTags+"</textarea><br></div></div>"+
 
         "<div class=\x22twocolumn\x22><label for=\x22locationDescription\x22>Description</label>"+
         "<textarea type=\x22textarea\x22 id=\x22locationDescription\x22>"+thisLocation.description+"</textarea><br></div>"+

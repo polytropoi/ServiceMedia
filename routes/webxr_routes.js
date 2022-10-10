@@ -2111,6 +2111,7 @@ webxr_router.get('/:_id', function (req, res) {
                                                     let physicsMod = "";
                                                     let shape = 'hull';
                                                     if (locMdl.eventData.toLowerCase().includes('physics')){ //ammo for now
+                                                    // let isTrigger = false;
                                                     
                                                         if (locMdl.eventData.toLowerCase().includes('static')){
                                                             // physicsMod = "ammo-body=\x22type: static\x22 ammo-shape=\x22type: box\x22";
