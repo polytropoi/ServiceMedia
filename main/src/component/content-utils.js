@@ -462,25 +462,17 @@ AFRAME.registerComponent('get_pos_rot', { //ATTACHED TO PLAYER BELOW CAMERA RIG,
     this.cr = new THREE.Vector3();
     this.last = new THREE.Vector3();
     this.posRotObj = {};
-    // this.navmeshComponent = null;
-    // this.navmeshEl = document.getElementById('nav_mesh');
-    // if (this.navmeshEl != null) {
-    //   console.log('gotsa navmeshEl!');
-    //   this.navmeshComponent = this.navmeshEl.components.nav_mesh;
-    // }
-   //   document.querySelector('a-scene').addEventListener('loaded', function () {
-  //     console.log("AFRAME Init");
-  //     InitSceneHooks();
-  //  });
-    // var entity = this.el;
-    // this.geometry = new THREE.SphereBufferGeometry(.1, 16, 16);
-    // this.el.append(this.geometry);
-    // this.el.setAttribute("geometry", {primitive: 'cylinder', height: 3, radius: 2});
-    // this.el.setAttribute("aabb-collider", {objects: 'activeObjexRay'});
-    this.el.addEventListener("hitstart", function(event) {
+  
+    this.el.addEventListener("hitstart", function(event) {  //we're attached to the same player element that has the aabb-collider component, so listening here for player trigger hits
       console.log(
         event.target.components["aabb-collider"]["intersectedEls"].map(x => x.id)
       );
+      let cloud_marker = event.target.components["aabb-collider"]["closestIntersectedEl"].components.cloud_marker; //closest trigger if multiple
+      if (cloud_marker != null) { 
+        cloud_marker.playerTriggerHit(); //tell the trigger that player has hit!
+      } else {
+        console.log("no cloud marker");
+      }
     });
     
   },
@@ -2098,7 +2090,7 @@ AFRAME.registerComponent('mod_objex', {
                 // objEl.id = "obj" + this.data.jsonLocationsData[i].objectID + "_" + this.data.jsonLocationsData[i].timestamp;
                 // sceneEl.appendChild(objEl);
               } else {
-                if (!this.data.jsonLocationsData[i].markerType.toLowerCase().includes('spawn')) { //either spawn or spawntrigger types require interaction
+                if (!this.data.jsonLocationsData[i].markerType.toLowerCase().includes('spawn')) { //either spawn or spawntrigger types require interaction //now in cloudmarker, deprecate
                   console.log("location/object match " + this.data.jsonLocationsData[i].objectID + " modelID " + this.data.jsonObjectData[k].modelID);
                   let objEl = document.createElement("a-entity");
                   objEl.setAttribute("mod_object", {'eventData': this.data.jsonLocationsData[i].eventData, 'locationData': this.data.jsonLocationsData[i], 'objectData': this.data.jsonObjectData[k]});
@@ -4454,22 +4446,22 @@ AFRAME.registerComponent('mod_model', {
             }
             // if (this.data.markerType)
 
-            if (this.data.markerType.toLowerCase() == "spawntrigger") {
-              // console.log("gotsa spawnTrigger !!!!!!!");
-              // (evt.detail.intersection distanceTo
-              if (window.playerPosition) {
-                let distance = window.playerPosition.distanceTo(evt.detail.intersection.point);
-                console.log("gotsa spawntrigger distance is " + distance);
-                // if (distance < 3) {
-                  let objexEl = document.getElementById('sceneObjects');    
-                  objexEl.components.mod_objex.spawnObject(this.data.eventData);
-                  // if (this.triggerAudioController != null) {
-                  //   let distance = window.playerPosition.distanceTo(evt.detail.intersection.point);
-                  //   this.triggerAudioController.components.trigger_audio_control.playAudioAtPosition(evt.detail.intersection.point, distance, ["spawn"], 1);//tagmangler needs an array, add vol mod (bc blowing in they face)
-                  // }
-                // }
-              }
-            }
+            // if (this.data.markerType.toLowerCase() == "spawntrigger") {
+            //   // console.log("gotsa spawnTrigger !!!!!!!");
+            //   // (evt.detail.intersection distanceTo
+            //   if (window.playerPosition) {
+            //     let distance = window.playerPosition.distanceTo(evt.detail.intersection.point);
+            //     console.log("gotsa spawntrigger distance is " + distance);
+            //     // if (distance < 3) {
+            //       let objexEl = document.getElementById('sceneObjects');    
+            //       objexEl.components.mod_objex.spawnObject(this.data.eventData);
+            //       // if (this.triggerAudioController != null) {
+            //       //   let distance = window.playerPosition.distanceTo(evt.detail.intersection.point);
+            //       //   this.triggerAudioController.components.trigger_audio_control.playAudioAtPosition(evt.detail.intersection.point, distance, ["spawn"], 1);//tagmangler needs an array, add vol mod (bc blowing in they face)
+            //       // }
+            //     // }
+            //   }
+            // }
           }
         });
         // this.el.addEventListener('mouseleave', function (evt) {

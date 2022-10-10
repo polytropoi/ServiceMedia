@@ -1202,6 +1202,7 @@ AFRAME.registerComponent('cloud_marker', {
     label: {default: ''},
     isNew: {default: true},
     markerType: {default: 'placeholder'},
+    tags: {default: null},
     modelID: {default: ''},
     model: {default: ''},
     scale: {default: 1},
@@ -1539,6 +1540,16 @@ AFRAME.registerComponent('cloud_marker', {
   deselect: function () {
     this.isSelected = false;
     console.log("cloudmarker this.isSelected " + this.isSelected);
+  },
+  playerTriggerHit: function () {
+    console.log("gotsa player trigger hit!");
+        if (this.data.markerType.toLowerCase() == "spawntrigger") {
+
+          let objexEl = document.getElementById('sceneObjects');    
+          objexEl.components.mod_objex.spawnObject(this.data.eventData);
+
+      }
+    
   },
   tick: function() {
     if (this.isSelected && this.mousePos != null && this.mouseDownPos != null) {

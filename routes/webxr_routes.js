@@ -1323,7 +1323,9 @@ webxr_router.get('/:_id', function (req, res) {
                     if (locationPlaceholders.length > 0) {
                         for (let i = 0; i < locationPlaceholders.length; i++) {
                             // console.log("gotsa placeholder at " + locationPlaceholders[i].x);
-                            placeholderEntities = placeholderEntities + "<a-entity id=\x22"+sceneResponse.short_id+"~cloudmarker~"+locationPlaceholders[i].timestamp+"\x22 class=\x22activeObjexGrab activeObjexRay envMap\x22 cloud_marker=\x22phID: "+locationPlaceholders[i].phID+"; scale: "+locationPlaceholders[i].scale+"; modelID: "+locationPlaceholders[i].modelID+"; model: "+locationPlaceholders[i].model+"; markerType: "+locationPlaceholders[i].markerType+"; isNew: false;name: "+locationPlaceholders[i].name+";label: "+locationPlaceholders[i].label+";description: "+locationPlaceholders[i].description+";eventData: "+locationPlaceholders[i].eventData+";timestamp: "+locationPlaceholders[i].timestamp+";\x22 "+skyboxEnvMap+
+                            placeholderEntities = placeholderEntities + "<a-entity id=\x22"+sceneResponse.short_id+"~cloudmarker~"+locationPlaceholders[i].timestamp+"\x22 class=\x22activeObjexGrab activeObjexRay envMap\x22 cloud_marker=\x22phID: "+
+                            locationPlaceholders[i].phID+"; scale: "+locationPlaceholders[i].scale+"; modelID: "+locationPlaceholders[i].modelID+"; model: "+
+                            locationPlaceholders[i].model+"; markerType: "+locationPlaceholders[i].markerType+";  tags: "+locationPlaceholders[i].locationTags+"; isNew: false;name: "+locationPlaceholders[i].name+";label: "+locationPlaceholders[i].label+";description: "+locationPlaceholders[i].description+";eventData: "+locationPlaceholders[i].eventData+";timestamp: "+locationPlaceholders[i].timestamp+";\x22 "+skyboxEnvMap+
 
                             " position=\x22"+locationPlaceholders[i].x+" "+locationPlaceholders[i].y+ " " +locationPlaceholders[i].z+"\x22></a-entity>";
                         }
@@ -4612,7 +4614,7 @@ webxr_router.get('/:_id', function (req, res) {
                         playerAvatarTemplate +
                         handsTemplate + 
                         pAudioWaveform +
-                        
+                        "<a-asset-item id=\x22trigger1\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/trigger1.glb\x22></a-asset-item>\n"+
                         "<a-asset-item id=\x22square1\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/square1.glb\x22></a-asset-item>\n"+
                         "<a-asset-item id=\x22rectangle1\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/rectangle1.glb\x22></a-asset-item>\n"+
                         "<a-asset-item id=\x22avatar_model\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/avatar1c.glb\x22></a-asset-item>\n"+
