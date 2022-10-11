@@ -654,7 +654,7 @@ function ReturnLocationTable () {
             localString = "local "
          }
 
-         if (sceneLocations.locationMods[i].markerType != undefined && (sceneLocations.locationMods[i].markerType.includes("picture") || sceneLocations.locationMods[i].markerType == "poi" || sceneLocations.locationMods[i].markerType == "placeholder" || sceneLocations.locationMods[i].markerType == "mailbox") ) {
+         if (sceneLocations.locationMods[i].markerType != undefined && (sceneLocations.locationMods[i].markerType.includes("picture") || sceneLocations.locationMods[i].markerType == "poi" || sceneLocations.locationMods[i].markerType == "placeholder" || sceneLocations.locationMods[i].markerType.toLowerCase().includes("trigger") || sceneLocations.locationMods[i].markerType == "mailbox") ) {
             let namelabel = (sceneLocations.locationMods[i].label != 'undefined' && sceneLocations.locationMods[i].label != undefined && sceneLocations.locationMods[i].label != null) ? sceneLocations.locationMods[i].label : sceneLocations.locationMods[i].name; 
             tablerows = tablerows + "<tr class=\x22clickableRow\x22 onclick=\x22LocationRowClick('"+sceneLocations.locationMods[i].phID+"')\x22><td>"+sceneLocations.locationMods[i].label+"</td>"+
             "<td>"+sceneLocations.locationMods[i].x+","+sceneLocations.locationMods[i].y+","+sceneLocations.locationMods[i].z+"</td><td>"+sceneLocations.locationMods[i].model+"</td><td>"+localString + sceneLocations.locationMods[i].markerType+"</td></tr>";

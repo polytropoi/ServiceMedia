@@ -847,6 +847,11 @@ AFRAME.registerComponent('local_marker', {
       this.data.timestamp = this.timestamp;
     }
     // this.el.id = "placeholder_" + this.timestamp;
+    this.el.addEventListener("hitstart", function(event) {   //maybe
+      console.log(
+        event.target.components["aabb-collider"]["intersectedEls"].map(x => x.id)
+      );
+    });
     console.log("tryna init local_marker withg timestamp " + this.timestamp );
     // var posRotReader = document.getElementById("player").components.get_pos_rot; 
     let isSelected = false;
@@ -1233,6 +1238,13 @@ AFRAME.registerComponent('cloud_marker', {
       this.phID = this.data.phID;
       // console.log("cloudmarker phID " + this.phID); 
       this.storedVars = JSON.parse(localStorage.getItem(this.phID));
+
+      this.el.addEventListener("hitstart", function(event) {   //maybe
+        console.log(
+          event.target.components["aabb-collider"]["intersectedEls"].map(x => x.id)
+        );
+      });
+      
       if (this.storedVars != null) {
         // console.log(this.phID + " storedVars " + JSON.stringify(this.storedVars));
         
@@ -1314,6 +1326,11 @@ AFRAME.registerComponent('cloud_marker', {
       this.el.setAttribute('gltf-model', '#poi1');
     } else if (this.data.markerType.toLowerCase().includes("trigger")) {
       this.el.setAttribute('gltf-model', '#poi1');  
+      // this.el.addEventListener("hitstart", function(event) {  
+      //   console.log(
+      //     event.target.components["aabb-collider"]["intersectedEls"].map(x => x.id)
+      //   );
+      // });
     } else if (this.data.markerType.toLowerCase() == "mailbox") {
       this.el.setAttribute('gltf-model', '#mailbox');
     }

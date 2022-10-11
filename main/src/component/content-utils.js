@@ -2372,6 +2372,7 @@ AFRAME.registerComponent('mod_objex', {
       this.locData.timestamp = Date.now();
       this.objEl.setAttribute("mod_object", {'eventData': null, 'locationData': this.locData, 'objectData': this.objectData, 'applyForceToNewObject': true, 'forceFactor': downtime, 'removeAfter': "5"});
       this.objEl.id = "obj" + this.objectData._id + "_" + this.locData.timestamp;
+
       sceneEl.appendChild(this.objEl);
       // this.el.setAttribute('gltf-model', '#' + modelID.toString());
     }
@@ -2801,6 +2802,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
       this.el.setAttribute('ammo-shape', {type: that.data.objectData.collidertype.toLowerCase()});
       // console.log("ammo shape is " + JSON.stringify(that.el.getAttribute('ammo-shape')));
       if (this.data.applyForceToNewObject) {
+        // this.el.setAttribute("aabb-collider", {objects: ".activeObjexRay"});
         this.applyForce();
       }
 
@@ -3645,7 +3647,6 @@ AFRAME.registerComponent('mod_model', {
               obj.material.refractionRatio = .9;
               obj.material.reflectivity = .5;
             }
-
           }
           if (this.data.markerType.toLowerCase() == "spawntrigger") {
             // console.log("tryna add aabb colloidere!");
@@ -3657,12 +3658,12 @@ AFRAME.registerComponent('mod_model', {
           }
           if (this.data.eventData.toLowerCase().includes("trigger")) { //for external trigger object, disabled the embedded trigger //TODO make this physicstrigger
             this.el.classList.add("trigger");
+            this.el.classList.add("activeObjexRay");
+            this.el.setAttribute("aabb-collider", {objects: ".activeObjexRay"});
           }
           if (this.data.eventData.toLowerCase().includes("transparent")) {
             console.log("tryna set transparent");
-
             obj.visible = false;
-         
           }
           if (this.data.eventData.toLowerCase().includes("particle")) {
             console.log("tryna spawn a particle!");
