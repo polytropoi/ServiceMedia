@@ -464,14 +464,23 @@ AFRAME.registerComponent('get_pos_rot', { //ATTACHED TO PLAYER BELOW CAMERA RIG,
     this.posRotObj = {};
   
     this.el.addEventListener("hitstart", function(event) {  //we're attached to the same player element that has the aabb-collider component, so listening here for player trigger hits
-      console.log(
-        event.target.components["aabb-collider"]["intersectedEls"].map(x => x.id)
-      );
+      // var source = event.originalTarget;
+      // console.log(
+      //   "TRIGGER event from " + event.target.id//.components["aabb-collider"]["closestIntersectedEl"].id
+      //     // "TRIGGER event from " + source.id
+      //   // event.srcElement.id
+      // );
       let cloud_marker = event.target.components["aabb-collider"]["closestIntersectedEl"].components.cloud_marker; //closest trigger if multiple
       if (cloud_marker != null) { 
         cloud_marker.playerTriggerHit(); //tell the trigger that player has hit!
       } else {
-        console.log("no cloud marker");
+        // console.log('no cloud marker for event.currentTarget : ' +event.target.id);
+        // let mod_object = event.target.components["aabb-collider"]["closestIntersectedEl"].components.mod_object;
+        // if (mod_object != null) {
+        //   console.log("gotsa mod_object! " + JSON.stringify(mod_object.data.objectData));
+        // } else {
+        //   console.log("no mod_object on this guy either "+ event.target.components["aabb-collider"]["closestIntersectedEl"].id);
+        // }
       }
     });
     
@@ -2796,6 +2805,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
           }
         }
       }
+      // this.el.setAttribute("aabb-collider", {objects: ".activeObjexRay"});
     });
 
     this.el.addEventListener('body-loaded', () => {  //body-loaded event = physics ready on obj

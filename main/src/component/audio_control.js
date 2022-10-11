@@ -1445,7 +1445,7 @@ AFRAME.registerComponent('trigger_audio_control', { //trigger audio on designate
 
     },
     playAudioAtPosition: function(pos, distance, tag, volmod) {
-        // console.log("tryna play trigger audio with tag " + tag);
+        console.log("tryna play trigger audio with tag " + tag);
         if (triggerAudioHowl != null && tag != undefined && tag != null && tag != "") {
         // this.modVolume(1);
         this.audioGroupsEl = document.getElementById('audioGroupsEl');
@@ -1494,7 +1494,7 @@ AFRAME.registerComponent('trigger_audio_control', { //trigger audio on designate
                         triggerAudioHowl.rate(rate);
                         // console.log("tryna play at hitpoint " + pos);
                         let id = triggerAudioHowl.play();
-                        console.log("tryna play trigger at volume " + volume + " distance " + distance + " id " + id); //calling id here is needed
+                        // console.log("tryna play trigger at volume " + volume + " distance " + distance + " id " + id); //calling id here is needed
                         triggerAudioHowl.pos(pos.x / 100, pos.y / 100, pos.z / 100, id);  //HOLY SHIT howler needs small values for position, * .01
                         break;
                         }
@@ -1629,7 +1629,7 @@ AFRAME.registerComponent('audio_groups_control', { //element and component are a
         
         if (tag) {
             let triggerGroup = this.data.audioGroupsData.triggerGroupItems[0];
-            console.log("looking for audio trigger with tag " + tag + " in files " + triggerGroup.items.length);
+            // console.log("looking for audio trigger with tag " + tag + " in files " + triggerGroup.items.length);
             for (let i = 0; i < triggerGroup.items.length; i++) {
                 // console.log("looking for triggerGroup.item " + triggerGroup.items[i]);
                 for (let j = 0; j < this.data.audioGroupsData.audioItems.length; j++) {
@@ -1638,7 +1638,7 @@ AFRAME.registerComponent('audio_groups_control', { //element and component are a
                     
                         // console.log("found audio item tags are " + this.data.audioGroupsData.audioItems[j].tags); //not ideal, maybe the groupitems can store tags? or cache them when loaded below?
                         if (this.data.audioGroupsData.audioItems[j].tags.includes(tag)) {
-                            console.log("tag match to " + tag);
+                            // console.log("tag match to " + tag);
                             
                             return triggerGroup.items[i];
                         

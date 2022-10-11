@@ -847,11 +847,11 @@ AFRAME.registerComponent('local_marker', {
       this.data.timestamp = this.timestamp;
     }
     // this.el.id = "placeholder_" + this.timestamp;
-    this.el.addEventListener("hitstart", function(event) {   //maybe
-      console.log(
-        event.target.components["aabb-collider"]["intersectedEls"].map(x => x.id)
-      );
-    });
+    // this.el.addEventListener("hitstart", function(event) {   //maybe
+    //   console.log(
+    //     event.target.components["aabb-collider"]["intersectedEls"].map(x => x.id)
+    //   );
+    // });
     console.log("tryna init local_marker withg timestamp " + this.timestamp );
     // var posRotReader = document.getElementById("player").components.get_pos_rot; 
     let isSelected = false;
@@ -965,7 +965,10 @@ AFRAME.registerComponent('local_marker', {
     let that = this;
     // that.calloutEntity = this.calloutEntity;
     // that.calloutText = this.calloutText;
-    
+    // this.el.addEventListener("model-loaded", (e) => {
+    //   e.preventDefault();
+    //   this.el.setAttribute("aabb_listener", true);
+    // });
     this.el.addEventListener('mouseenter', function (evt) {
       if (posRotReader != null) {
         this.playerPosRot = posRotReader.returnPosRot(); 
@@ -1239,12 +1242,12 @@ AFRAME.registerComponent('cloud_marker', {
       // console.log("cloudmarker phID " + this.phID); 
       this.storedVars = JSON.parse(localStorage.getItem(this.phID));
 
-      this.el.addEventListener("hitstart", function(event) {   //maybe
-        console.log(
-          event.target.components["aabb-collider"]["intersectedEls"].map(x => x.id)
-        );
-      });
-      
+      // this.el.addEventListener("hitstart", function(event) {   //maybe
+      //   console.log(
+      //     event.target.components["aabb-collider"]["intersectedEls"].map(x => x.id)
+      //   );
+      // });
+
       if (this.storedVars != null) {
         // console.log(this.phID + " storedVars " + JSON.stringify(this.storedVars));
         
@@ -1267,6 +1270,7 @@ AFRAME.registerComponent('cloud_marker', {
           this.el.setAttribute('gltf-model', '#poi1');
         } else if (this.storedVars.markerType.toLowerCase().includes("trigger")) {
           this.el.setAttribute('gltf-model', '#poi1');  
+          // this.el.setAttribute("aabb-collider", {objects: ".activeObjexRay"});
         } else if (this.storedVars.markerType.toLowerCase() == "mailbox") {
           this.el.setAttribute('gltf-model', '#mailbox');
         }
@@ -1277,6 +1281,7 @@ AFRAME.registerComponent('cloud_marker', {
         this.data.label = this.storedVars.label;
         this.data.name = this.storedVars.name;
         this.data.markerType = this.storedVars.markerType;
+
       } else {
         
         // else { //new ls key for cloud placeholder
@@ -1326,11 +1331,7 @@ AFRAME.registerComponent('cloud_marker', {
       this.el.setAttribute('gltf-model', '#poi1');
     } else if (this.data.markerType.toLowerCase().includes("trigger")) {
       this.el.setAttribute('gltf-model', '#poi1');  
-      // this.el.addEventListener("hitstart", function(event) {  
-      //   console.log(
-      //     event.target.components["aabb-collider"]["intersectedEls"].map(x => x.id)
-      //   );
-      // });
+    
     } else if (this.data.markerType.toLowerCase() == "mailbox") {
       this.el.setAttribute('gltf-model', '#mailbox');
     }
@@ -1340,6 +1341,8 @@ AFRAME.registerComponent('cloud_marker', {
     if (this.data.eventData.toLowerCase().includes('beat')) {
       this.el.classList.add('beatme');
     }
+
+   
       // console.log("timestamp: " + this.data.timestamp+ " storedVars " + this.storedVars);
     // // } else {
     //   let position = this.viewportHolder.getAttribute('position');
@@ -1381,6 +1384,11 @@ AFRAME.registerComponent('cloud_marker', {
       color: "white",
       value: "wha"
     });
+
+    // this.el.addEventListener("model-loaded", (e) => {
+    //   e.preventDefault();
+    //   this.el.setAttribute("aabb_listener", true);
+    // });
     this.calloutText.setAttribute("overlay");
    
     this.calloutToggle = false;
@@ -1562,15 +1570,21 @@ AFRAME.registerComponent('cloud_marker', {
     this.isSelected = false;
     console.log("cloudmarker this.isSelected " + this.isSelected);
   },
-  playerTriggerHit: function () {
-    console.log("gotsa player trigger hit!");
+  playerTriggerHit: function () { //this uses AABB collider
+    console.log("gotsa player trigger hit!"); 
         if (this.data.markerType.toLowerCase() == "spawntrigger") {
 
           let objexEl = document.getElementById('sceneObjects');    
           objexEl.components.mod_objex.spawnObject(this.data.eventData);
-
       }
-    
+  },
+  physicsTriggerHit: function () {  
+    console.log("gotsa physics trigger hit!"); //maybe check the layer of colliding entity or something...
+    var triggerAudioController = document.getElementById("triggerAudio");
+    if (triggerAudioController != null) {
+      triggerAudioController.components.trigger_audio_control.playAudioAtPosition(this.el.object3D.position, window.playerPosition.distanceTo(this.el.object3D.position), this.data.tags);
+    }
+     
   },
   tick: function() {
     if (this.isSelected && this.mousePos != null && this.mouseDownPos != null) {
@@ -1632,7 +1646,7 @@ AFRAME.registerComponent('cloud_marker', {
           let triggerAudioController = triggerAudioControllerEl.components.trigger_audio_control;
           if (triggerAudioController  != null) {
             console.log("gotsa audio trigger controller " + distance);
-            triggerAudioController.playAudioAtPosition(hitpoint, distance, null);
+            triggerAudioController.playAudioAtPosition(hitpoint, distance, this.data.tags);
           }
          
         }
@@ -1684,21 +1698,22 @@ AFRAME.registerComponent('mod_physics', { //used by models, not objects which ma
     
 
 
-    this.el.addEventListener("collidestart", (e) => { //this is for models, not objects - TODO look up locationData for tags? 
+    this.el.addEventListener("collidestart", (e) => { //this is for models or triggers, not objects - TODO look up locationData for tags? 
       e.preventDefault();
-      console.log("mod_physics collisoin with object with :" + this.el.id + " " + e.detail.targetEl.classList + " isTrigger " + this.isTrigger);
+      // console.log("mod_physics collisoin with object with :" + this.el.id + " " + e.detail.targetEl.classList + " isTrigger " + this.isTrigger);
       if (this.isTrigger) {
         console.log("mod_physics TRIGGER collision "  + this.el.id + " " + e.detail.targetEl.id);
         // e.detail.body.disableCollision = true;
         this.disableCollisionTemp(); //must turn it off or it blocks, no true "trigger" mode afaik (unlike cannonjs!)
-
-      } else {
-        console.log("mod_physics "  + this.el.id + " " + e.detail.targetEl.id);
+        let cloud_marker = e.target.components.cloud_marker; //closest trigger if multiple
+        if (cloud_marker != null) { 
+          cloud_marker.physicsTriggerHit(); //tell the trigger that player has hit!
       
+        }
       }
       let mod_obj_component = e.detail.targetEl.components.mod_object;
       if (mod_obj_component != null) {
-        console.log(this.el.id + " gotsa collision with " + mod_obj_component.data.objectData.name);
+        // console.log(this.el.id + " gotsa collision with " + mod_obj_component.data.objectData.name);
         if (mod_obj_component.data.objectData.tags != undefined && mod_obj_component.data.objectData.tags != null) {
           var triggerAudioController = document.getElementById("triggerAudio");
           if (triggerAudioController != null) {
