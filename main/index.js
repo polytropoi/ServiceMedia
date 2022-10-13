@@ -9906,7 +9906,7 @@ function getAllPeople() {
         "track face",
         "lerp",
         "slerp",
-        "spawn trigger",
+        "spawntrigger",
         "trigger",
         "collider",
         "light",

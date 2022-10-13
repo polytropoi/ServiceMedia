@@ -1749,17 +1749,25 @@ AFRAME.registerComponent('particle_spawner',
     shape: {default: 'sphere'},
     size: {default: 10},
     lifetime: {type: 'number', default: 0},
-    yoffset: {type: 'number', default: 0}
+    yoffset: {type: 'number', default: 0},
+    color: {default: 'lightblue'},
+    scale: {default: 10}
   },
 	init: function()
 	{
     console.log("tyrna init particles!!!");
 	},
-  spawnParticles: function (location, type, lifetime, parentID, yFudge) {
+  spawnParticles: function (location, type, lifetime, parentID, yFudge, pColor, pScale) {
     
     // console.log("mod_particles data: " + JSON.stringify(location));
     this.particle = document.createElement("a-entity");
-    this.particle.setAttribute("mod_particles", {'type': type, 'lifetime': lifetime, 'parentID': parentID, 'yFudge': yFudge});
+    if (pScale == null || pScale == undefined) {
+      pScale = 10;
+    } else {
+      pScale = pScale * 10;
+    } 
+  
+    this.particle.setAttribute("mod_particles", {'type': type, 'lifetime': lifetime, 'parentID': parentID, 'yFudge': yFudge, 'color': pColor, 'scale': pScale});
     
 
  
@@ -1840,7 +1848,9 @@ AFRAME.registerComponent('mod_particles', {
     type: {type: 'string', default: 'sparkler'},
     lifetime: {type: 'number', default: 0},
     scale: {type: 'number', default: 1},
-    yFudge: {type: 'number', default: 0}
+    yFudge: {type: 'number', default: 0},
+    color: {type: 'string', default: 'lightblue'},
+    scale: {type: 'number', default: 10}
 
   },
   init: function() {
@@ -1878,7 +1888,7 @@ AFRAME.registerComponent('mod_particles', {
     }
     if (this.data.type.toLowerCase() =="smoke") {
       
-      this.el.setAttribute('sprite-particles', {texture: '#smoke1', color: 'lightblue', blending: 'additive', textureFrame: '6 5', textureLoop: '1', spawnRate: '1', lifeTime: '3', scale: '100'});
+      this.el.setAttribute('sprite-particles', {texture: '#smoke1', color: this.data.color, blending: 'additive', textureFrame: '6 5', textureLoop: '1', spawnRate: '1', lifeTime: '3', scale: this.data.scale.toString()});
     }
     if (this.data.type.toLowerCase() =="smoke/add") {
       this.el.setAttribute('sprite-particles', {texture: '#smoke1', color: 'lightblue', blending: 'additive', textureFrame: '6 5', textureLoop: '1', spawnRate: '1', lifeTime: '3', scale: '10'});

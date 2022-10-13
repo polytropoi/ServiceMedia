@@ -2801,7 +2801,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
               worldPosition.y += this.data.objectData.yPosFudge;
             }
             console.log("triggering fx at " + worldPosition + " plus" + this.data.objectData.yPosFudge);
-            particleSpawner.components.particle_spawner.spawnParticles(worldPosition, this.data.objectData.particles, 5, this.el.id, this.data.objectData.yPosFudge);
+            particleSpawner.components.particle_spawner.spawnParticles(worldPosition, this.data.objectData.particles, 5, this.el.id, this.data.objectData.yPosFudge, this.data.objectData.color1, this.data.objectData.objScale);
           }
         }
       }
@@ -3023,7 +3023,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
                   console.log("this.loc.y " + worldPosition + " plus" + this.data.objectData.yPosFudge);
                   worldPosition.y += this.data.objectData.yPosFudge;
                 }
-                particleSpawner.components.particle_spawner.spawnParticles(worldPosition, this.data.objectData.particles, 5, this.el.id, this.data.objectData.yPosFudge);
+                particleSpawner.components.particle_spawner.spawnParticles(worldPosition, this.data.objectData.particles, 5, this.el.id, this.data.objectData.yPosFudge, this.data.objectData.color1, this.data.objectData.objScale);
               }
             } else {
               console.log("already triggered - make it a toggle!");
@@ -3092,7 +3092,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
                 }
                 let particle_spawner = particleSpawner.components.particle_spawner;
                 if (particle_spawner != null) {
-                  particleSpawner.components.particle_spawner.spawnParticles(worldPosition, this.data.objectData.particles, 5, this.el.id, this.data.objectData.yPosFudge);
+                  particleSpawner.components.particle_spawner.spawnParticles(worldPosition, this.data.objectData.particles, 5, this.el.id, this.data.objectData.yPosFudge, this.data.objectData.color1, this.data.objectData.objScale);
                 }
                 
               }
