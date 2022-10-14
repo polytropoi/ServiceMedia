@@ -552,6 +552,8 @@ function ReturnLocationMarkerTypeSelect (selected) {
     const typesArray = [
         "placeholder",
         "poi",
+        "gate",
+        "portal",
         "spawntrigger",
         "trigger",
         "picture",
@@ -593,7 +595,7 @@ function ShowLocationModal(phID) {
     }
     let cloudSaveButton = "";
     if (thisLocation != null)  {
-        let label = (thisLocation.label != null && thisLocation.label != undefined && thisLocation.label != 'undefined') ? thisLocation.label : thisLocation.name;
+        let label = (thisLocation.name != null && thisLocation.name != undefined && thisLocation.name != 'undefined') ? thisLocation.name : "location";
         // if (userData.sceneOwner != null) {
         //     cloudSaveButton = "<button class=\x22reallySaveButton\x22 onclick=\x22SaveModsToCloud('"+phID+"')\x22>Save (cloud)</button>";
         // }

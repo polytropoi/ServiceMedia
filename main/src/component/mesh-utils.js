@@ -913,7 +913,12 @@ AFRAME.registerComponent('local_marker', {
               this.el.setAttribute('gltf-model', '#placeholder');
             } else if (this.storedVars.markerType.toLowerCase() == "poi") {
               this.el.setAttribute('gltf-model', '#poi1');
-            } else if (this.storedVars.markerType.toLowerCase().includes("trigger")) {
+            } else if (this.storedVars.markerType.toLowerCase() == "gate") {
+              this.el.setAttribute('gltf-model', '#poi1');
+            } else if (this.storedVars.markerType.toLowerCase() == "portal") {
+              this.el.setAttribute('gltf-model', '#poi1');
+            }
+             else if (this.storedVars.markerType.toLowerCase().includes("trigger")) {
               this.el.setAttribute('gltf-model', '#poi1');  
             } else if (this.storedVars.markerType.toLowerCase() == "mailbox") {
               this.el.setAttribute('gltf-model', '#mailbox');
@@ -1162,6 +1167,22 @@ AFRAME.registerComponent('local_marker', {
   deselect: function () {
     this.isSelected = false;
   },
+  playerTriggerHit: function () { //this uses AABB collider
+    console.log("gotsa player trigger hit on local marker with type " + this.data.markerType.toLowerCase()); 
+      if (this.data.markerType.toLowerCase() == "spawntrigger") {
+
+          let objexEl = document.getElementById('sceneObjects');    
+          objexEl.components.mod_objex.spawnObject(this.data.eventData);
+      }
+  },
+  physicsTriggerHit: function () {  
+    console.log("gotsa physics trigger hit!"); //maybe check the layer of colliding entity or something...
+    var triggerAudioController = document.getElementById("triggerAudio");
+    if (triggerAudioController != null) {
+      triggerAudioController.components.trigger_audio_control.playAudioAtPosition(this.el.object3D.position, window.playerPosition.distanceTo(this.el.object3D.position), this.data.tags);
+    }
+     
+  },
   tick: function() {
     if (this.isSelected && this.mousePos != null && this.mouseDownPos != null) {
 
@@ -1257,22 +1278,22 @@ AFRAME.registerComponent('cloud_marker', {
         this.data.description = this.storedVars.description;
 
 
-        if (this.storedVars.modelID != null && this.storedVars.modelID != undefined && this.storedVars.model != "none") {
-          for (let i = 0; i < sceneModels.length; i++) {
-            if (sceneModels[i]._id == this.storedVars.modelID) {
-              this.el.setAttribute("gltf-model", sceneModels[i].url); //TODO get an asset ID instead?
-              console.log("tryna set locModel for cloudmarker " + sceneModels[i].url);
-            }
-          }
-        } else if (this.storedVars.markerType.toLowerCase() == "placeholder") { //hrm, should just be placeholders?
+
+        if (this.storedVars.markerType.toLowerCase() == "placeholder") { //hrm, should just be placeholders?
           this.el.setAttribute('gltf-model', '#savedplaceholder');
         } else if (this.storedVars.markerType.toLowerCase() == "poi") {
+          this.el.setAttribute('gltf-model', '#poi1');
+        } else if (this.storedVars.markerType.toLowerCase() == "gate") {
+          this.el.setAttribute('gltf-model', '#poi1');
+        } else if (this.storedVars.markerType.toLowerCase() == "portal") {
           this.el.setAttribute('gltf-model', '#poi1');
         } else if (this.storedVars.markerType.toLowerCase().includes("trigger")) {
           this.el.setAttribute('gltf-model', '#poi1');  
           // this.el.setAttribute("aabb-collider", {objects: ".activeObjexRay"});
         } else if (this.storedVars.markerType.toLowerCase() == "mailbox") {
           this.el.setAttribute('gltf-model', '#mailbox');
+        } else {
+          this.el.setAttribute('gltf-model', '#poi1');
         }
 
         if (this.storedVars.scale != null && this.storedVars.scale != undefined && this.storedVars.scale != "none") {
@@ -1281,7 +1302,29 @@ AFRAME.registerComponent('cloud_marker', {
         this.data.label = this.storedVars.label;
         this.data.name = this.storedVars.name;
         this.data.markerType = this.storedVars.markerType;
+        
 
+
+        if (this.storedVars.modelID != null && this.storedVars.modelID != undefined && this.storedVars.model != "none") {
+          for (let i = 0; i < sceneModels.length; i++) {
+            if (sceneModels[i]._id == this.storedVars.modelID) {
+              this.el.setAttribute("gltf-model", sceneModels[i].url); //TODO get an asset ID instead?
+              console.log("tryna set locModel for cloudmarker " + sceneModels[i].url);
+            }
+          }
+        } 
+        // this.el.addEventListener('model-loaded', (evt) => { //load placeholder model first (which is an a-asset) before calling external
+        //   if (this.storedVars.modelID != null && this.storedVars.modelID != undefined && this.storedVars.model != "none") {
+        //       for (let i = 0; i < sceneModels.length; i++) {
+        //         if (sceneModels[i]._id == this.storedVars.modelID) {
+        //           this.el.setAttribute("gltf-model", sceneModels[i].url); //TODO get an asset ID instead?
+        //           console.log("tryna set locModel for cloudmarker " + sceneModels[i].url);
+        //         }
+        //       }
+        //     }
+        // });
+
+        
       } else {
         
         // else { //new ls key for cloud placeholder
@@ -1321,7 +1364,7 @@ AFRAME.registerComponent('cloud_marker', {
         } else {
 
         }
-        if (this.data.objectID != undefined && this.data.objectID != null && this.data.objectID != "none" && this.data.objectID != "") {
+        if (this.data.objectID != undefined && this.data.objectID != null && this.data.objectID != "none" && this.data.objectID != "") { //hrm, cloudmarker objex?
 
         }
       }
@@ -1331,7 +1374,10 @@ AFRAME.registerComponent('cloud_marker', {
       this.el.setAttribute('gltf-model', '#poi1');
     } else if (this.data.markerType.toLowerCase().includes("trigger")) {
       this.el.setAttribute('gltf-model', '#poi1');  
-    
+    } else if (this.data.markerType.toLowerCase() == "gate") {
+      this.el.setAttribute('gltf-model', '#poi1');
+    } else if (this.data.markerType.toLowerCase() == "portal") {
+      this.el.setAttribute('gltf-model', '#poi1');
     } else if (this.data.markerType.toLowerCase() == "mailbox") {
       this.el.setAttribute('gltf-model', '#mailbox');
     }
@@ -1394,6 +1440,13 @@ AFRAME.registerComponent('cloud_marker', {
     this.calloutToggle = false;
     let that = this;
 
+
+    // this.el.addEventListener('model-loaded', (evt) => { //load placeholder model first (which is an a-asset) before calling external
+    //   if (this.storedVars.modelID != null && this.storedVars.modelID != undefined && this.storedVars.model != "none") {
+    //       this.loadModel(this.storedVars.modelID);
+    //     }
+    // });
+
     this.el.addEventListener('mouseenter', function (evt) {
       
       if (posRotReader != null) {
@@ -1426,7 +1479,7 @@ AFRAME.registerComponent('cloud_marker', {
           that.calloutEntity.setAttribute("position", pos);
           that.calloutEntity.setAttribute('visible', true);
           that.calloutEntity.setAttribute('scale', {x: that.distance * .25, y: that.distance * .25, z: that.distance * .25} );
-          let theLabel = that.data.label != undefined ? that.data.label : that.data.name;
+          let theLabel = that.data.name != undefined ? that.data.name : "";
           let calloutString = theLabel;
           if (that.calloutToggle) {
             // calloutString = "x : " + elPos.x.toFixed(2) + "\n" +"y : " + elPos.y.toFixed(2) + "\n" +"z : " + elPos.z.toFixed(2);
@@ -1560,6 +1613,7 @@ AFRAME.registerComponent('cloud_marker', {
       for (let i = 0; i < sceneModels.length; i++) {
         if (sceneModels[i]._id == modelID) {
           this.el.setAttribute("gltf-model", sceneModels[i].url);
+          // this.el.
         }
       }
     } else {
@@ -1571,11 +1625,11 @@ AFRAME.registerComponent('cloud_marker', {
     console.log("cloudmarker this.isSelected " + this.isSelected);
   },
   playerTriggerHit: function () { //this uses AABB collider
-    console.log("gotsa player trigger hit!"); 
+    console.log("gotsa player AABB trigger hit!"); 
         if (this.data.markerType.toLowerCase() == "spawntrigger") {
 
           let objexEl = document.getElementById('sceneObjects');    
-          objexEl.components.mod_objex.spawnObject(this.data.eventData);
+          objexEl.components.mod_objex.spawnObject(this.data.eventData); //eventdata should have the name of a location with spawn markertype
       }
   },
   physicsTriggerHit: function () {  

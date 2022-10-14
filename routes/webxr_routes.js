@@ -674,8 +674,12 @@ webxr_router.get('/:_id', function (req, res) {
                                     }
                                 }
                                 if (sceneResponse.sceneLocations[i].markerType != undefined && sceneResponse.sceneLocations[i].type.toLowerCase() != 'geographic') {
-                                    if (sceneResponse.sceneLocations[i].markerType.toLowerCase() == "placeholder" || sceneResponse.sceneLocations[i].markerType.toLowerCase().includes("trigger") ||
-                                        sceneResponse.sceneLocations[i].markerType.toLowerCase() == "poi" || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "mailbox") {
+                                    if (sceneResponse.sceneLocations[i].markerType.toLowerCase() == "placeholder" 
+                                        || sceneResponse.sceneLocations[i].markerType.toLowerCase().includes("trigger") 
+                                        || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "poi" 
+                                        || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "gate"
+                                        || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "portal"  
+                                        || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "mailbox") {
                                     //    locationPlaceholders.push(sceneResponse.sceneLocations[i].x + " " + sceneResponse.sceneLocations[i].y + " " + zFix);
                                         let tLoc = sceneResponse.sceneLocations[i];
                                         tLoc.phID = sceneResponse.short_id+"~cloudmarker~"+sceneResponse.sceneLocations[i].timestamp;
@@ -1324,7 +1328,7 @@ webxr_router.get('/:_id', function (req, res) {
                         for (let i = 0; i < locationPlaceholders.length; i++) {
                             // console.log("gotsa placeholder at " + locationPlaceholders[i].x);
                             let physics = "";
-                            if (locationPlaceholders[i].markerType.toLowerCase().includes("trigger")) {
+                            if (locationPlaceholders[i].markerType.toLowerCase().includes("trigger") || locationPlaceholders[i].markerType.toLowerCase().includes("gate") || locationPlaceholders[i].markerType.toLowerCase().includes("portal")) {
                                 physics = "mod_physics=\x22body: kinematic; isTrigger: true;\x22";
                             }
                             placeholderEntities = placeholderEntities + "<a-entity id=\x22"+sceneResponse.short_id+"~cloudmarker~"+locationPlaceholders[i].timestamp+"\x22 "+physics+" class=\x22activeObjexGrab activeObjexRay envMap\x22 cloud_marker=\x22phID: "+
@@ -1841,7 +1845,13 @@ webxr_router.get('/:_id', function (req, res) {
                             }
                             // if ((locMdl.eventData != null && locMdl.eventData != undefined && locMdl.eventData.length > 1) && (!locMdl.eventData.includes("noweb"))) {
 
-                            if (locMdl.modelID != undefined && locMdl.modelID != "none" && locMdl.markerType != "placeholder" && sceneResponse.sceneModels.indexOf(locMdl.modelID) != -1) {
+                            if (locMdl.modelID != undefined && locMdl.modelID != "none" && locMdl.markerType != "placeholder"
+                                && locMdl.markerType != "poi"                                
+                                && locMdl.markerType != "trigger"
+                                && locMdl.markerType != "spawntrigger"
+                                && locMdl.markerType != "gate"
+                                && locMdl.markerType != "portal" 
+                                && sceneResponse.sceneModels.indexOf(locMdl.modelID) != -1) {
 
                                 // console.log("tryna set model id:  " + JSON.stringify(locMdl));
                                 // console.log(locMdl.modelID);

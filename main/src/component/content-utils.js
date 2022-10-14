@@ -465,22 +465,20 @@ AFRAME.registerComponent('get_pos_rot', { //ATTACHED TO PLAYER BELOW CAMERA RIG,
   
     this.el.addEventListener("hitstart", function(event) {  //we're attached to the same player element that has the aabb-collider component, so listening here for player trigger hits
       // var source = event.originalTarget;
-      // console.log(
-      //   "TRIGGER event from " + event.target.id//.components["aabb-collider"]["closestIntersectedEl"].id
-      //     // "TRIGGER event from " + source.id
-      //   // event.srcElement.id
-      // );
+      console.log(
+        "player TRIGGER event from " + event.target.components["aabb-collider"]["closestIntersectedEl"].id
+          // "TRIGGER event from " + source.id
+        // event.srcElement.id
+      );
+      //local and cloud marker types have triggers, gates, portals, placeholders
       let cloud_marker = event.target.components["aabb-collider"]["closestIntersectedEl"].components.cloud_marker; //closest trigger if multiple
       if (cloud_marker != null) { 
         cloud_marker.playerTriggerHit(); //tell the trigger that player has hit!
       } else {
-        // console.log('no cloud marker for event.currentTarget : ' +event.target.id);
-        // let mod_object = event.target.components["aabb-collider"]["closestIntersectedEl"].components.mod_object;
-        // if (mod_object != null) {
-        //   console.log("gotsa mod_object! " + JSON.stringify(mod_object.data.objectData));
-        // } else {
-        //   console.log("no mod_object on this guy either "+ event.target.components["aabb-collider"]["closestIntersectedEl"].id);
-        // }
+        let local_marker = event.target.components["aabb-collider"]["closestIntersectedEl"].components.local_marker; //closest trigger if multiple
+        if (local_marker != null) { 
+          local_marker.playerTriggerHit(); //tell the trigger that player has hit!
+        }
       }
     });
     
@@ -3616,7 +3614,7 @@ AFRAME.registerComponent('mod_model', {
 
       if (this.data.eventData.length > 1) {
         console.log("model eventData " + JSON.stringify(this.data.eventData));
-        textData = this.data.eventData.split("~");//tilde delimiter splits string to array
+        textData = this.data.eventData.split("~");//tilde delimiter splits string to array//maybe use description for text instead? 
 
       }
       if (JSON.stringify(this.data.eventData).includes("beat")) {
@@ -3658,19 +3656,21 @@ AFRAME.registerComponent('mod_model', {
               obj.material.reflectivity = .5;
             }
           }
-          if (this.data.markerType.toLowerCase() == "spawntrigger") {
-            // console.log("tryna add aabb colloidere!");
-            // this.el.setAttribute("aabb-collider", {'objects': 'a-entity'});
-            this.el.classList.add("activeObjexRay");
-          }
-          if (this.data.eventData.toLowerCase().includes("spawn")) {
-            this.el.classList.add("spawn");
-          }
-          if (this.data.eventData.toLowerCase().includes("trigger")) { //for external trigger object, disabled the embedded trigger //TODO make this physicstrigger
-            this.el.classList.add("trigger");
-            this.el.classList.add("activeObjexRay");
-            this.el.setAttribute("aabb-collider", {objects: ".activeObjexRay"});
-          }
+              // if (this.data.markerType.toLowerCase() == "spawntrigger") {
+              //   // console.log("tryna add aabb colloidere!");
+              //   // this.el.setAttribute("aabb-collider", {'objects': 'a-entity'});
+              //   this.el.classList.add("activeObjexRay");
+              // }
+              // if (this.data.eventData.toLowerCase().includes("spawn")) {
+              //   this.el.classList.add("spawn");
+              // }
+              // if (this.data.eventData.toLowerCase().includes("trigger") 
+              //   || this.data.eventData.toLowerCase().includes("portal") 
+              //   || this.data.eventData.toLowerCase().includes("gate")) {//for external trigger object, disabled the embedded trigger //TODO make this physicstrigger
+              //   this.el.classList.add("trigger");
+              //   this.el.classList.add("activeObjexRay");
+              //   this.el.setAttribute("aabb-collider", {objects: ".activeObjexRay"});
+              // }
           if (this.data.eventData.toLowerCase().includes("transparent")) {
             console.log("tryna set transparent");
             obj.visible = false;
@@ -4382,7 +4382,7 @@ AFRAME.registerComponent('mod_model', {
           // console.log("no primary audio found!");
         }
         if (this.data.markerType.toLowerCase() == "spawntrigger") {
-          this.el.setAttribute('gltf-model', '#roundcube' );
+          this.el.setAttribute('gltf-model', '#poi1' );
           // this.el.setAttribute("geometry", {primitive: "box", height: 1, width: 1});
           
         }
