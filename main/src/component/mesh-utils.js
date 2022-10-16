@@ -1167,16 +1167,22 @@ AFRAME.registerComponent('local_marker', {
   deselect: function () {
     this.isSelected = false;
   },
-  playerTriggerHit: function () { //this uses AABB collider
+  playerTriggerHit: function () { //might use AABB collider or physics
     console.log("gotsa player trigger hit on local marker with type " + this.data.markerType.toLowerCase()); 
       if (this.data.markerType.toLowerCase() == "spawntrigger") {
 
           let objexEl = document.getElementById('sceneObjects');    
           objexEl.components.mod_objex.spawnObject(this.data.eventData);
       }
+      if (this.data.markerType.toLowerCase() == "gate") {
+        if (this.data.eventData != null && this.data.eventData != "") {
+          let url = "https://servicemedia.net/webxr/" + this.data.eventData;
+          window.location.href = url;
+        }
+      }
   },
-  physicsTriggerHit: function () {  
-    console.log("gotsa physics trigger hit!"); //maybe check the layer of colliding entity or something...
+  physicsTriggerHit: function (id) {  
+    console.log("gotsa physics trigger hit on " + id); //maybe check the layer of colliding entity or something...
     var triggerAudioController = document.getElementById("triggerAudio");
     if (triggerAudioController != null) {
       triggerAudioController.components.trigger_audio_control.playAudioAtPosition(this.el.object3D.position, window.playerPosition.distanceTo(this.el.object3D.position), this.data.tags);
@@ -1354,6 +1360,21 @@ AFRAME.registerComponent('cloud_marker', {
           // storedVars = locItem;
         // }
         localStorage.setItem(this.phID, JSON.stringify(locItem)); 
+
+        if (this.data.markerType.toLowerCase() == "placeholder") {
+          this.el.setAttribute('gltf-model', '#savedplaceholder');
+        } else if (this.data.markerType.toLowerCase() == "poi") {
+          this.el.setAttribute('gltf-model', '#poi1');
+        } else if (this.data.markerType.toLowerCase().includes("trigger")) {
+          this.el.setAttribute('gltf-model', '#poi1');  
+        } else if (this.data.markerType.toLowerCase() == "gate") {
+          this.el.setAttribute('gltf-model', '#poi1');
+        } else if (this.data.markerType.toLowerCase() == "portal") {
+          this.el.setAttribute('gltf-model', '#poi1');
+        } else if (this.data.markerType.toLowerCase() == "mailbox") {
+          this.el.setAttribute('gltf-model', '#mailbox');
+        }
+
         if (this.data.modelID != "none") {
           for (let i = 0; i < sceneModels.length; i++) {
             if (sceneModels[i]._id == this.data.modelID) {
@@ -1368,19 +1389,19 @@ AFRAME.registerComponent('cloud_marker', {
 
         }
       }
-    if (this.data.markerType.toLowerCase() == "placeholder") {
-      this.el.setAttribute('gltf-model', '#savedplaceholder');
-    } else if (this.data.markerType.toLowerCase() == "poi") {
-      this.el.setAttribute('gltf-model', '#poi1');
-    } else if (this.data.markerType.toLowerCase().includes("trigger")) {
-      this.el.setAttribute('gltf-model', '#poi1');  
-    } else if (this.data.markerType.toLowerCase() == "gate") {
-      this.el.setAttribute('gltf-model', '#poi1');
-    } else if (this.data.markerType.toLowerCase() == "portal") {
-      this.el.setAttribute('gltf-model', '#poi1');
-    } else if (this.data.markerType.toLowerCase() == "mailbox") {
-      this.el.setAttribute('gltf-model', '#mailbox');
-    }
+    // if (this.data.markerType.toLowerCase() == "placeholder") {
+    //   this.el.setAttribute('gltf-model', '#savedplaceholder');
+    // } else if (this.data.markerType.toLowerCase() == "poi") {
+    //   this.el.setAttribute('gltf-model', '#poi1');
+    // } else if (this.data.markerType.toLowerCase().includes("trigger")) {
+    //   this.el.setAttribute('gltf-model', '#poi1');  
+    // } else if (this.data.markerType.toLowerCase() == "gate") {
+    //   this.el.setAttribute('gltf-model', '#poi1');
+    // } else if (this.data.markerType.toLowerCase() == "portal") {
+    //   this.el.setAttribute('gltf-model', '#poi1');
+    // } else if (this.data.markerType.toLowerCase() == "mailbox") {
+    //   this.el.setAttribute('gltf-model', '#mailbox');
+    // }
     if (this.data.name == '') {
       this.data.name = this.data.timestamp;
     }
@@ -1631,6 +1652,12 @@ AFRAME.registerComponent('cloud_marker', {
           let objexEl = document.getElementById('sceneObjects');    
           objexEl.components.mod_objex.spawnObject(this.data.eventData); //eventdata should have the name of a location with spawn markertype
       }
+      if (this.data.markerType.toLowerCase() == "gate") {
+        if (this.data.eventData != null && this.data.eventData != "") {
+          let url = "https://servicemedia.net/webxr/" + this.data.eventData;
+          window.location.href = url;
+        }
+      }
   },
   physicsTriggerHit: function () {  
     console.log("gotsa physics trigger hit!"); //maybe check the layer of colliding entity or something...
@@ -1761,10 +1788,21 @@ AFRAME.registerComponent('mod_physics', { //used by models, not objects which ma
         this.disableCollisionTemp(); //must turn it off or it blocks, no true "trigger" mode afaik (unlike cannonjs!)
         let cloud_marker = e.target.components.cloud_marker; //closest trigger if multiple
         if (cloud_marker != null) { 
-          cloud_marker.physicsTriggerHit(); //tell the trigger that player has hit!
-      
+          if (this.detail.targetEl.id == "player") {
+            cloud_marker.playerTriggerHit();
+          } else {
+            cloud_marker.physicsTriggerHit(this.detail.targetEl.id); 
+          }
+        } else  {
+          let local_marker = e.target.components.local_marker;
+          if (local_marker != null) { 
+            if (this.detail.targetEl.id == "player") {
+              local_marker.playerTriggerHit();
+            } else {
+              local_marker.physicsTriggerHit(this.detail.targetEl.id); 
+            }
+          }
         }
-      }
       let mod_obj_component = e.detail.targetEl.components.mod_object;
       if (mod_obj_component != null) {
         // console.log(this.el.id + " gotsa collision with " + mod_obj_component.data.objectData.name);
@@ -1772,6 +1810,7 @@ AFRAME.registerComponent('mod_physics', { //used by models, not objects which ma
           var triggerAudioController = document.getElementById("triggerAudio");
           if (triggerAudioController != null) {
             triggerAudioController.components.trigger_audio_control.playAudioAtPosition(e.detail.targetEl.object3D.position, window.playerPosition.distanceTo(e.detail.targetEl.object3D.position), mod_obj_component.data.objectData.tags);
+            }
           }
         }
       }

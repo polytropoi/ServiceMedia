@@ -1333,9 +1333,9 @@ webxr_router.get('/:_id', function (req, res) {
                             }
                             placeholderEntities = placeholderEntities + "<a-entity id=\x22"+sceneResponse.short_id+"~cloudmarker~"+locationPlaceholders[i].timestamp+"\x22 "+physics+" class=\x22activeObjexGrab activeObjexRay envMap\x22 cloud_marker=\x22phID: "+
                             locationPlaceholders[i].phID+"; scale: "+locationPlaceholders[i].scale+"; modelID: "+locationPlaceholders[i].modelID+"; model: "+
-                            locationPlaceholders[i].model+"; markerType: "+locationPlaceholders[i].markerType+";  tags: "+locationPlaceholders[i].locationTags+"; isNew: false;name: "+locationPlaceholders[i].name+";label: "+locationPlaceholders[i].label+";description: "+locationPlaceholders[i].description+";eventData: "+locationPlaceholders[i].eventData+";timestamp: "+locationPlaceholders[i].timestamp+";\x22 "+skyboxEnvMap+
-
-                            " position=\x22"+locationPlaceholders[i].x+" "+locationPlaceholders[i].y+ " " +locationPlaceholders[i].z+"\x22></a-entity>";
+                            locationPlaceholders[i].model+"; markerType: "+locationPlaceholders[i].markerType+";  tags: "+locationPlaceholders[i].locationTags+"; isNew: false;name: "+
+                            locationPlaceholders[i].name+";label: "+locationPlaceholders[i].label+";description: "+locationPlaceholders[i].description+";eventData: "+locationPlaceholders[i].eventData+";timestamp: "+locationPlaceholders[i].timestamp+";\x22 "+
+                            skyboxEnvMap+ " position=\x22"+locationPlaceholders[i].x+" "+locationPlaceholders[i].y+ " " +locationPlaceholders[i].z+"\x22></a-entity>";
                         }
                         callback();
                     } else {
