@@ -353,7 +353,7 @@ AFRAME.registerComponent('instanced_surface_meshes', {
 
     this.useMatrix = false;
     this.matrixMeshComponent = null;
-    if (settings.useMatrix) {
+    if (settings != null && settings.useMatrix) {
       this.useMatrix = true;
     }
 /*  this way doesn't work with instanced meshes fsr...  
@@ -1276,7 +1276,7 @@ AFRAME.registerComponent('cloud_marker', {
       // });
 
       if (this.storedVars != null) {
-        // console.log(this.phID + " storedVars " + JSON.stringify(this.storedVars));
+        console.log(this.phID + " storedVars " + JSON.stringify(this.storedVars));
         
         this.el.setAttribute('position', {x: this.storedVars.x, y: this.storedVars.y, z: this.storedVars.z});
         this.el.setAttribute('rotation', {x: this.storedVars.eulerx, y: this.storedVars.eulery, z: this.storedVars.eulerz});
@@ -1284,41 +1284,44 @@ AFRAME.registerComponent('cloud_marker', {
         this.data.description = this.storedVars.description;
 
 
+        if (this.storedVars.modelID == null || this.storedVars.modelID == undefined || this.storedVars.model == "none" || this.storedVars.model == "undefined") {
 
-        if (this.storedVars.markerType.toLowerCase() == "placeholder") { //hrm, should just be placeholders?
-          this.el.setAttribute('gltf-model', '#savedplaceholder');
-        } else if (this.storedVars.markerType.toLowerCase() == "poi") {
-          this.el.setAttribute('gltf-model', '#poi1');
-        } else if (this.storedVars.markerType.toLowerCase() == "gate") {
-          this.el.setAttribute('gltf-model', '#poi1');
-        } else if (this.storedVars.markerType.toLowerCase() == "portal") {
-          this.el.setAttribute('gltf-model', '#poi1');
-        } else if (this.storedVars.markerType.toLowerCase().includes("trigger")) {
-          this.el.setAttribute('gltf-model', '#poi1');  
-          // this.el.setAttribute("aabb-collider", {objects: ".activeObjexRay"});
-        } else if (this.storedVars.markerType.toLowerCase() == "mailbox") {
-          this.el.setAttribute('gltf-model', '#mailbox');
+        // if (this.storedVars.markerType.toLowerCase() == "placeholder") { //hrm, should just be placeholders?
+        //   this.el.setAttribute('gltf-model', '#savedplaceholder');
+        // } else if (this.storedVars.markerType.toLowerCase() == "poi") {
+        //   this.el.setAttribute('gltf-model', '#poi1');
+        // } else if (this.storedVars.markerType.toLowerCase() == "gate") {
+        //   this.el.setAttribute('gltf-model', '#poi1');
+        // } else if (this.storedVars.markerType.toLowerCase() == "portal") {
+        //   this.el.setAttribute('gltf-model', '#poi1');
+        // } else if (this.storedVars.markerType.toLowerCase().includes("trigger")) {
+        //   this.el.setAttribute('gltf-model', '#poi1');  
+        //   // this.el.setAttribute("aabb-collider", {objects: ".activeObjexRay"});
+        // } else if (this.storedVars.markerType.toLowerCase() == "mailbox") {
+        //   this.el.setAttribute('gltf-model', '#mailbox');
+        // } else {
+        //   this.el.setAttribute('gltf-model', '#poi1');
+        // }
+        this.el.setAttribute('gltf-model', '#poi1');
         } else {
-          this.el.setAttribute('gltf-model', '#poi1');
-        }
-
-        if (this.storedVars.scale != null && this.storedVars.scale != undefined && this.storedVars.scale != "none") {
-          this.storedVars.scale = 1;
-        }
-        this.data.label = this.storedVars.label;
-        this.data.name = this.storedVars.name;
-        this.data.markerType = this.storedVars.markerType;
-        
-
-
-        if (this.storedVars.modelID != null && this.storedVars.modelID != undefined && this.storedVars.model != "none") {
           for (let i = 0; i < sceneModels.length; i++) {
             if (sceneModels[i]._id == this.storedVars.modelID) {
               this.el.setAttribute("gltf-model", sceneModels[i].url); //TODO get an asset ID instead?
               console.log("tryna set locModel for cloudmarker " + sceneModels[i].url);
             }
           }
-        } 
+        }
+        
+
+
+        // if (this.storedVars.modelID != null && this.storedVars.modelID != undefined && this.storedVars.model != "none") {
+          // for (let i = 0; i < sceneModels.length; i++) {
+          //   if (sceneModels[i]._id == this.storedVars.modelID) {
+          //     this.el.setAttribute("gltf-model", sceneModels[i].url); //TODO get an asset ID instead?
+          //     console.log("tryna set locModel for cloudmarker " + sceneModels[i].url);
+          //   }
+          // }
+        // } 
         // this.el.addEventListener('model-loaded', (evt) => { //load placeholder model first (which is an a-asset) before calling external
         //   if (this.storedVars.modelID != null && this.storedVars.modelID != undefined && this.storedVars.model != "none") {
         //       for (let i = 0; i < sceneModels.length; i++) {
@@ -1330,7 +1333,12 @@ AFRAME.registerComponent('cloud_marker', {
         //     }
         // });
 
-        
+        if (this.storedVars.scale != null && this.storedVars.scale != undefined && this.storedVars.scale != "none") {
+          this.storedVars.scale = 1;
+        }
+        this.data.label = this.storedVars.label;
+        this.data.name = this.storedVars.name;
+        this.data.markerType = this.storedVars.markerType;
       } else {
         
         // else { //new ls key for cloud placeholder
@@ -1646,7 +1654,7 @@ AFRAME.registerComponent('cloud_marker', {
     console.log("cloudmarker this.isSelected " + this.isSelected);
   },
   playerTriggerHit: function () { //this uses AABB collider
-    console.log("gotsa player AABB trigger hit!"); 
+    console.log("gotsa player trigger hit on type " + this.data.markerType); 
         if (this.data.markerType.toLowerCase() == "spawntrigger") {
 
           let objexEl = document.getElementById('sceneObjects');    
@@ -1788,18 +1796,18 @@ AFRAME.registerComponent('mod_physics', { //used by models, not objects which ma
         this.disableCollisionTemp(); //must turn it off or it blocks, no true "trigger" mode afaik (unlike cannonjs!)
         let cloud_marker = e.target.components.cloud_marker; //closest trigger if multiple
         if (cloud_marker != null) { 
-          if (this.detail.targetEl.id == "player") {
+          if (e.detail.targetEl.id == "player") {
             cloud_marker.playerTriggerHit();
           } else {
-            cloud_marker.physicsTriggerHit(this.detail.targetEl.id); 
+            cloud_marker.physicsTriggerHit(e.detail.targetEl.id); 
           }
         } else  {
           let local_marker = e.target.components.local_marker;
           if (local_marker != null) { 
-            if (this.detail.targetEl.id == "player") {
+            if (e.detail.targetEl.id == "player") {
               local_marker.playerTriggerHit();
             } else {
-              local_marker.physicsTriggerHit(this.detail.targetEl.id); 
+              local_marker.physicsTriggerHit(e.detail.targetEl.id); 
             }
           }
         }
