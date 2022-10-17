@@ -307,6 +307,7 @@ AFRAME.registerComponent('instanced_surface_meshes', {
     count: {default: 2000},
     scaleFactor: {default: 4},
     yMod: {default: 0},
+    // yWater: {default: 0},
     eventData: {default: ''},
     interaction: {default: ''},
     tags: {default: ''}
@@ -417,13 +418,16 @@ AFRAME.registerComponent('instanced_surface_meshes', {
    
     },
     scatter: function (surface, geo, mat) {
-        console.log("tryna scatter!@");
-
+       
+        let waterLevel = -5;
+        if (settings) {
+          waterLevel = settings.sceneWaterLevel;
+        }
         this.surfaceMesh = surface;
       // this.surface.setAttribute("activeObjexRay");
         // console.log('surfacemesh name ' + this.surfaceMesh);
         // this.iMeshes = []; //nm
-        
+        console.log("tryna scatter!@ waterLeve " + waterLevel);
         var dummy = new THREE.Object3D();
         const count = this.data.count;
     
@@ -433,8 +437,16 @@ AFRAME.registerComponent('instanced_surface_meshes', {
             // console.log("tryna scatter sample geo # " + m.toString());
             let iMesh_1 = new THREE.InstancedMesh(this.sampleGeos[0], this.sampleMats[0], count);
             let iMesh_2 = null;
-            if (this.sampleGeos.length > 1) {
+            if (this.sampleGeos.length == 2) {
               iMesh_2 = new THREE.InstancedMesh(this.sampleGeos[1], this.sampleMats[1], count);
+            }
+            let iMesh_3 = null;
+            if (this.sampleGeos.length == 3) {
+              iMesh_3 = new THREE.InstancedMesh(this.sampleGeos[2], this.sampleMats[2], count);
+            }
+            let iMesh_4 = null;
+            if (this.sampleGeos.length == 4) {
+              iMesh_4 = new THREE.InstancedMesh(this.sampleGeos[3], this.sampleMats[3], count);
             }
           
             // this.iMeshes.push(iMesh);
@@ -449,7 +461,7 @@ AFRAME.registerComponent('instanced_surface_meshes', {
                 
                 let scale = Math.random() * this.data.scaleFactor;
                 // console.log("scale " + scale);
-                if (position.y > -5) { //loop through till all of them are above the 0
+                if (position.y > waterLevel) { //loop through till all of them are above the 0
                   this.count++;
                   // console.log("instance pos " + JSON.stringify(position));
                   dummy.position.set(  position.x, position.y + this.data.yMod, position.z );
@@ -461,12 +473,25 @@ AFRAME.registerComponent('instanced_surface_meshes', {
                   iMesh_1.frustumCulled = false; //too funky
                   iMesh_1.instanceMatrix.needsUpdate = true;
                   sceneEl.object3D.add(iMesh_1);
-                    if (iMesh_2) {
-                      iMesh_2.setMatrixAt( i, dummy.matrix );
-                      iMesh_2.frustumCulled = false;
-                      iMesh_2.instanceMatrix.needsUpdate = true;
-                      sceneEl.object3D.add(iMesh_2);
-                    }
+                  if (iMesh_2) {
+                    iMesh_2.setMatrixAt( i, dummy.matrix );
+                    iMesh_2.frustumCulled = false;
+                    iMesh_2.instanceMatrix.needsUpdate = true;
+                    sceneEl.object3D.add(iMesh_2);
+                  }
+                  if (iMesh_3) {
+                    iMesh_3.setMatrixAt( i, dummy.matrix );
+                    iMesh_3.frustumCulled = false;
+                    iMesh_3.instanceMatrix.needsUpdate = true;
+                    sceneEl.object3D.add(iMesh_3);
+                  }
+                  if (iMesh_4) {
+                    iMesh_4.setMatrixAt( i, dummy.matrix );
+                    iMesh_4.frustumCulled = false;
+                    iMesh_4.instanceMatrix.needsUpdate = true;
+                    sceneEl.object3D.add(iMesh_4);
+                  }
+
                   }
                 } else {
                   console.log("breaking loop at " + i.toString());
@@ -1268,7 +1293,8 @@ AFRAME.registerComponent('cloud_marker', {
       this.phID = this.data.phID;
       // console.log("cloudmarker phID " + this.phID); 
       this.storedVars = JSON.parse(localStorage.getItem(this.phID));
-
+      // "mod_physics=\x22body: kinematic; isTrigger: true;\x22";
+      this.el.setAttribute("mod_physics", {body: 'kinematic', isTrigger: true})
       // this.el.addEventListener("hitstart", function(event) {   //maybe
       //   console.log(
       //     event.target.components["aabb-collider"]["intersectedEls"].map(x => x.id)
@@ -1302,7 +1328,7 @@ AFRAME.registerComponent('cloud_marker', {
         // } else {
         //   this.el.setAttribute('gltf-model', '#poi1');
         // }
-        this.el.setAttribute('gltf-model', '#poi1');
+          this.el.setAttribute('gltf-model', '#poi1');
         } else {
           for (let i = 0; i < sceneModels.length; i++) {
             if (sceneModels[i]._id == this.storedVars.modelID) {
@@ -1369,29 +1395,30 @@ AFRAME.registerComponent('cloud_marker', {
         // }
         localStorage.setItem(this.phID, JSON.stringify(locItem)); 
 
-        if (this.data.markerType.toLowerCase() == "placeholder") {
-          this.el.setAttribute('gltf-model', '#savedplaceholder');
-        } else if (this.data.markerType.toLowerCase() == "poi") {
+        if (this.data.modelID == null || this.data.modelID == undefined || this.data.model == "none" || this.data.model == "undefined") {
+          // if (this.data.markerType.toLowerCase() == "placeholder") {
+          //     this.el.setAttribute('gltf-model', '#savedplaceholder');
+          //   } else if (this.data.markerType.toLowerCase() == "poi") {
+          //     this.el.setAttribute('gltf-model', '#poi1');
+          //   } else if (this.data.markerType.toLowerCase().includes("trigger")) {
+          //     this.el.setAttribute('gltf-model', '#poi1');  
+          //   } else if (this.data.markerType.toLowerCase() == "gate") {
+          //     this.el.setAttribute('gltf-model', '#poi1');
+          //   } else if (this.data.markerType.toLowerCase() == "portal") {
+          //     this.el.setAttribute('gltf-model', '#poi1');
+          //   } else if (this.data.markerType.toLowerCase() == "mailbox") {
+          //     this.el.setAttribute('gltf-model', '#mailbox');
+          //   }
           this.el.setAttribute('gltf-model', '#poi1');
-        } else if (this.data.markerType.toLowerCase().includes("trigger")) {
-          this.el.setAttribute('gltf-model', '#poi1');  
-        } else if (this.data.markerType.toLowerCase() == "gate") {
-          this.el.setAttribute('gltf-model', '#poi1');
-        } else if (this.data.markerType.toLowerCase() == "portal") {
-          this.el.setAttribute('gltf-model', '#poi1');
-        } else if (this.data.markerType.toLowerCase() == "mailbox") {
-          this.el.setAttribute('gltf-model', '#mailbox');
-        }
-
-        if (this.data.modelID != "none") {
-          for (let i = 0; i < sceneModels.length; i++) {
-            if (sceneModels[i]._id == this.data.modelID) {
-              this.el.setAttribute("gltf-model", sceneModels[i].url);
-              this.el.setAttribute('scale', {x: this.data.scale, y: this.data.scale, z: this.data.scale });
+        } else {
+          if (this.data.modelID != "none") {
+            for (let i = 0; i < sceneModels.length; i++) {
+              if (sceneModels[i]._id == this.data.modelID) {
+                this.el.setAttribute("gltf-model", sceneModels[i].url);
+                this.el.setAttribute('scale', {x: this.data.scale, y: this.data.scale, z: this.data.scale });
+              }
             }
           }
-        } else {
-
         }
         if (this.data.objectID != undefined && this.data.objectID != null && this.data.objectID != "none" && this.data.objectID != "") { //hrm, cloudmarker objex?
 
@@ -1655,17 +1682,21 @@ AFRAME.registerComponent('cloud_marker', {
   },
   playerTriggerHit: function () { //this uses AABB collider
     console.log("gotsa player trigger hit on type " + this.data.markerType); 
-        if (this.data.markerType.toLowerCase() == "spawntrigger") {
+    var triggerAudioController = document.getElementById("triggerAudio");
+    if (triggerAudioController != null) {
+      triggerAudioController.components.trigger_audio_control.playAudioAtPosition(this.el.object3D.position, window.playerPosition.distanceTo(this.el.object3D.position), this.data.tags);
+    }  
+    if (this.data.markerType.toLowerCase() == "spawntrigger") {
 
           let objexEl = document.getElementById('sceneObjects');    
           objexEl.components.mod_objex.spawnObject(this.data.eventData); //eventdata should have the name of a location with spawn markertype
+    }
+    if (this.data.markerType.toLowerCase() == "gate") {
+      if (this.data.eventData != null && this.data.eventData != "") {
+        let url = "https://servicemedia.net/webxr/" + this.data.eventData;
+        window.location.href = url;
       }
-      if (this.data.markerType.toLowerCase() == "gate") {
-        if (this.data.eventData != null && this.data.eventData != "") {
-          let url = "https://servicemedia.net/webxr/" + this.data.eventData;
-          window.location.href = url;
-        }
-      }
+    }
   },
   physicsTriggerHit: function () {  
     console.log("gotsa physics trigger hit!"); //maybe check the layer of colliding entity or something...

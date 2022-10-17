@@ -1327,11 +1327,13 @@ webxr_router.get('/:_id', function (req, res) {
                     if (locationPlaceholders.length > 0) {
                         for (let i = 0; i < locationPlaceholders.length; i++) {
                             // console.log("gotsa placeholder at " + locationPlaceholders[i].x);
-                            let physics = "mod_physics=\x22body: kinematic; isTrigger: true;\x22";
+                            // let physics = "mod_physics=\x22body: kinematic; isTrigger: true;\x22";
+                            let physics = "";
+                            // let gltf = "gltf-model=\x22#poi1\x22"
                             // if (locationPlaceholders[i].markerType.toLowerCase().includes("trigger") || locationPlaceholders[i].markerType.toLowerCase().includes("gate") || locationPlaceholders[i].markerType.toLowerCase().includes("portal")) {
                             //     physics = "mod_physics=\x22body: kinematic; isTrigger: true;\x22";
                             // }
-                            placeholderEntities = placeholderEntities + "<a-entity id=\x22"+sceneResponse.short_id+"~cloudmarker~"+locationPlaceholders[i].timestamp+"\x22 "+physics+" class=\x22activeObjexGrab activeObjexRay envMap\x22 cloud_marker=\x22phID: "+
+                            placeholderEntities = placeholderEntities + "<a-entity id=\x22"+sceneResponse.short_id+"~cloudmarker~"+locationPlaceholders[i].timestamp+"\x22  "+physics+" class=\x22activeObjexGrab activeObjexRay envMap\x22 cloud_marker=\x22phID: "+
                             locationPlaceholders[i].phID+"; scale: "+locationPlaceholders[i].scale+"; modelID: "+locationPlaceholders[i].modelID+"; model: "+
                             locationPlaceholders[i].model+"; markerType: "+locationPlaceholders[i].markerType+";  tags: "+locationPlaceholders[i].locationTags+"; isNew: false;name: "+
                             locationPlaceholders[i].name+";label: "+locationPlaceholders[i].label+";description: "+locationPlaceholders[i].description+";eventData: "+locationPlaceholders[i].eventData+";timestamp: "+locationPlaceholders[i].timestamp+";\x22 "+
@@ -3312,7 +3314,7 @@ webxr_router.get('/:_id', function (req, res) {
                     settings.skyboxURL = skyboxUrl;
                     settings.useSynth = hasSynth;
                     settings.useMatrix = (sceneResponse.sceneTags != null && sceneResponse.sceneTags.includes('matrix'));
-                    
+                    settings.sceneWaterLevel = sceneResponse.sceneWater.level != undefined ? sceneResponse.sceneWater.level : 0; 
                     let audioGroups = {};
                     audioGroups.triggerGroups = sceneResponse.sceneTriggerAudioGroups;
                     audioGroups.ambientGroups = sceneResponse.sceneAmbientAudioGroups;
