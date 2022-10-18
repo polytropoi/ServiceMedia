@@ -1693,7 +1693,7 @@ AFRAME.registerComponent('cloud_marker', {
     }
     if (this.data.markerType.toLowerCase() == "gate") {
       if (this.data.eventData != null && this.data.eventData != "") {
-        let url = "https://servicemedia.net/webxr/" + this.data.eventData;
+        let url = "/webxr/" + this.data.eventData;
         window.location.href = url;
       }
     }

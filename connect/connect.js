@@ -29,6 +29,7 @@ let posRotRunning = false;
 let timeKeysData = {};
 let tkStarttimes = [];
 let sceneLocations = {locations: [], locationMods: []};
+let poiLocations = [];
 let sceneModels = [];
 let sceneObjects = [];
 let localKeys = [];
@@ -577,6 +578,7 @@ function GoToLocation(locationKey) {
       } 
    }
 }
+
 function GoToNext() {
    console.log("tryna gotonext " + window.sceneType);
 // if (currentLocationIndex > 0) {
@@ -595,16 +597,17 @@ function GoToNext() {
       FlyToMapPosition(lbData.split("_")[0],lbData.split("_")[1], false);
     
    } else {
-      if (sceneLocations != null && sceneLocations.locationMods != undefined && sceneLocations.locationMods != null  && sceneLocations.locationMods.length > 0) {
-         if (currentLocationIndex < sceneLocations.locationMods.length - 1) {
+
+      if (sceneLocations != null && poiLocations.length > 0) {
+         if (currentLocationIndex < poiLocations.length - 1) {
             currentLocationIndex++;
          } else {
             currentLocationIndex = 0;
             
          }
-      if (sceneLocations.locationMods[currentLocationIndex].markerType.toLowerCase() == 'poi') {
-         GoToLocation(sceneLocations.locationMods[currentLocationIndex].phID);
-         }
+      // if (sceneLocations.locationMods[currentLocationIndex].markerType.toLowerCase() == 'poi') {
+         GoToLocation(poiLocations[currentLocationIndex].phID);
+         // }
       }
       if (skyboxEl != null) {
          skyboxEl.components.skybox_dynamic.nextSkybox();
@@ -628,14 +631,14 @@ function GoToPrevious() {
       FlyToMapPosition(lbData.split("_")[0],lbData.split("_")[1], false);
     
    } else {
-      if (sceneLocations != null && sceneLocations.locationMods != undefined && sceneLocations.locationMods != null && sceneLocations.locationMods.length > 0) {
+      if (sceneLocations != null && poiLocations.length > 0) {
          if (currentLocationIndex > 0) {
             currentLocationIndex--;
          } else {
-            currentLocationIndex = sceneLocations.locationMods.length - 1;
+            currentLocationIndex = poiLocations.length - 1;
          }
         
-            GoToLocation(sceneLocations.locationMods[currentLocationIndex].phID);
+            GoToLocation(poiLocations[currentLocationIndex].phID);
          // }
       }
       if (skyboxEl != null) {
@@ -717,12 +720,15 @@ function AddLocalMarkers() {// new or modded markers not saved to cloud
                   let theItemObject = JSON.parse(theItem);
                   theItemObject.isLocal = true;
                   locationMods.push(theItemObject);
+                  if (theItemObject.markerType == "poi") {
+                     let nextbuttonEl = document.getElementById('nextButton');
+                     let prevbuttonEl = document.getElementById('previousButton');
+                     nextbuttonEl.style.visibility = "visible";
+                     prevbuttonEl.style.visibility = "visible";
+                     poiLocations.push(theItemObject);
+                  }
                
                }
-               let nextbuttonEl = document.getElementById('nextButton');
-               let prevbuttonEl = document.getElementById('previousButton');
-               nextbuttonEl.style.visibility = "visible";
-               prevbuttonEl.style.visibility = "visible";
                
                
             } else if (theKey.toString().includes("~cloudmarker~")) { //a cloudmarker, if modded by user, becomes a defacto "local" marker, unless/until admin saves to cloud
@@ -736,10 +742,13 @@ function AddLocalMarkers() {// new or modded markers not saved to cloud
                //    return true;
                // }}
                locationMods.push(cItem);
-               let nextbuttonEl = document.getElementById('nextButton');
-               let prevbuttonEl = document.getElementById('previousButton');
-               nextbuttonEl.style.visibility = "visible";
-               prevbuttonEl.style.visibility = "visible";
+               if (cItem.markerType == "poi") {
+                  let nextbuttonEl = document.getElementById('nextButton');
+                  let prevbuttonEl = document.getElementById('previousButton');
+                  nextbuttonEl.style.visibility = "visible";
+                  prevbuttonEl.style.visibility = "visible";
+                  poiLocations.push((cItem));
+               }
             } else if (theKey.toString().includes('color')) {
                // console.log("gots color " + theKey + " item " + theItem);
             }
@@ -760,11 +769,11 @@ function AddLocalMarkers() {// new or modded markers not saved to cloud
                }
             }
           
-            
+            // console.log("POILOCATIONS : "+ poiLocations.length);
          }
          if (localStorage.length - 1 === i) {
             sceneLocations.locationMods = locationMods;
-            // console.log("updated locationmods " + JSON.stringify(sceneLocations.locationMods));
+            console.log("updated locationmods " + JSON.stringify(sceneLocations.locationMods));
             // console.log("LOCATIONMODS: " + JSON.stringify(sceneLocations.locationMods));
             // AddCloudMarkers(); //add the ones from admin
          }
@@ -934,7 +943,7 @@ if (sceneEl != null) {
                      this.data.youtubePosition.z = this.data.jsonData[i].z;
                      // console.log("YOTUBE POSOTION: " +JSON.stringify(this.data.youtubePosition));
                   }
-                  if (this.data.jsonData[i].markerType.toLowerCase().includes("poi") || this.data.jsonData[i].markerType.toLowerCase().includes("placeholder")) {
+                  if (this.data.jsonData[i].markerType.toLowerCase().includes("poi")) {
                      let nextbuttonEl = document.getElementById('nextButton');
                      let prevbuttonEl = document.getElementById('previousButton');
                      nextbuttonEl.style.visibility = "visible";
