@@ -1373,6 +1373,8 @@ AFRAME.registerComponent('cloud_marker', {
       } else {
         
         // else { //new ls key for cloud placeholder
+        console.log(this.phID + " unstoredVars " + JSON.stringify(this.storedVars));
+
           let locItem = {};
           let position = this.el.getAttribute('position'); //
           let rotation = this.el.getAttribute('rotation');
@@ -1398,7 +1400,7 @@ AFRAME.registerComponent('cloud_marker', {
 
           // storedVars = locItem;
         // }
-        localStorage.setItem(this.phID, JSON.stringify(locItem)); 
+        
 
         if (this.data.modelID == null || this.data.modelID == undefined || this.data.model == "none" || this.data.model == "undefined") {
           // if (this.data.markerType.toLowerCase() == "placeholder") {
@@ -1420,10 +1422,10 @@ AFRAME.registerComponent('cloud_marker', {
             for (let i = 0; i < sceneModels.length; i++) {
               if (sceneModels[i]._id == this.data.modelID) {
                 this.el.setAttribute("gltf-model", sceneModels[i].url);
-                this.el.setAttribute('position', {x: this.data.x, y: this.data.y, z: this.data.z});
-                this.el.setAttribute('rotation', {x: this.data.eulerx, y: this.data.eulery, z: this.data.eulerz});
+                // this.el.setAttribute('position', {x: this.data.x, y: this.data.y, z: this.data.z});
+                // this.el.setAttribute('rotation', {x: this.data.eulerx, y: this.data.eulery, z: this.data.eulerz});
                 this.el.setAttribute('scale', {x: this.data.scale, y: this.data.scale, z: this.data.scale });
-                console.log("tryna set new locModel for cloudmarker " + sceneModels[i].url);
+                console.log("tryna set new locModel for cloudmarker " + this.data.model);
 
               }
             }
@@ -1432,6 +1434,7 @@ AFRAME.registerComponent('cloud_marker', {
         if (this.data.objectID != undefined && this.data.objectID != null && this.data.objectID != "none" && this.data.objectID != "") { //hrm, cloudmarker objex?
 
         }
+        localStorage.setItem(this.phID, JSON.stringify(locItem)); 
       }
     // if (this.data.markerType.toLowerCase() == "placeholder") {
     //   this.el.setAttribute('gltf-model', '#savedplaceholder');
