@@ -3289,6 +3289,7 @@ webxr_router.get('/:_id', function (req, res) {
 
                 function (callback) {
                     let settings = {};  //TODO move this lower down? 
+
                     settings._id = sceneResponse._id;
                     settings.sceneTitle = sceneResponse.sceneTitle;
                     settings.sceneKeynote = sceneResponse.sceneKeynote;
@@ -3320,8 +3321,12 @@ webxr_router.get('/:_id', function (req, res) {
                     audioGroups.ambientGroups = sceneResponse.sceneAmbientAudioGroups;
                     audioGroups.primaryGroups = sceneResponse.scenePrimaryAudioGroups;
                     settings.audioGroups = audioGroups; 
+                    settings.clearLocalMods = false;
                     if (sceneResponse.sceneTags != null && sceneResponse.sceneTags.includes("hide avatars")) {
                         settings.hideAvatars = true;
+                    }
+                    if (sceneResponse.sceneTags != null && sceneResponse.sceneTags.includes("clear localmods")) {
+                        settings.clearLocalMods = true;
                     }
                     
                     if (sceneResponse.triggerAudioGroups != null && sceneResponse.triggerAudioGroups.length > 0) {

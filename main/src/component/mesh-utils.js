@@ -1333,7 +1333,12 @@ AFRAME.registerComponent('cloud_marker', {
           for (let i = 0; i < sceneModels.length; i++) {
             if (sceneModels[i]._id == this.storedVars.modelID) {
               this.el.setAttribute("gltf-model", sceneModels[i].url); //TODO get an asset ID instead?
-              console.log("tryna set locModel for cloudmarker " + sceneModels[i].url);
+              this.el.setAttribute('position', {x: this.storedVars.x, y: this.storedVars.y, z: this.storedVars.z});
+              this.el.setAttribute('rotation', {x: this.storedVars.eulerx, y: this.storedVars.eulery, z: this.storedVars.eulerz});
+              this.el.setAttribute('scale', {x: this.storedVars.scale, y: this.storedVars.scale, z: this.storedVars.scale });
+              // this.el.setAttribute('position')
+              console.log("tryna set locModel for cloudmarker " + this.storedVars.model);
+              break;
             }
           }
         }
@@ -1415,7 +1420,11 @@ AFRAME.registerComponent('cloud_marker', {
             for (let i = 0; i < sceneModels.length; i++) {
               if (sceneModels[i]._id == this.data.modelID) {
                 this.el.setAttribute("gltf-model", sceneModels[i].url);
+                this.el.setAttribute('position', {x: this.data.x, y: this.data.y, z: this.data.z});
+                this.el.setAttribute('rotation', {x: this.data.eulerx, y: this.data.eulery, z: this.data.eulerz});
                 this.el.setAttribute('scale', {x: this.data.scale, y: this.data.scale, z: this.data.scale });
+                console.log("tryna set new locModel for cloudmarker " + sceneModels[i].url);
+
               }
             }
           }
@@ -1498,9 +1507,9 @@ AFRAME.registerComponent('cloud_marker', {
 
 
     // this.el.addEventListener('model-loaded', (evt) => { //load placeholder model first (which is an a-asset) before calling external
-    //   if (this.storedVars.modelID != null && this.storedVars.modelID != undefined && this.storedVars.model != "none") {
-    //       this.loadModel(this.storedVars.modelID);
-    //     }
+    //   evt.preventDefault();
+    //   console.log("MODEL LOADED FOR CLOUDMARKER!!!");
+    //   // this.el.setAttribute
     // });
 
     this.el.addEventListener('mouseenter', function (evt) {
@@ -1514,7 +1523,7 @@ AFRAME.registerComponent('cloud_marker', {
           window.playerPosition = this.playerPosRot.pos; 
       }
   
-      if (!that.isSelected) {
+      if (!that.isSelected && evt.detail.intersection) {
         this.clientX = evt.clientX;
         this.clientY = evt.clientY;
         // console.log("tryna mouseover placeholder");
@@ -1680,11 +1689,14 @@ AFRAME.registerComponent('cloud_marker', {
     this.isSelected = false;
     console.log("cloudmarker this.isSelected " + this.isSelected);
   },
-  playerTriggerHit: function () { //this uses AABB collider
+  playerTriggerHit: function () { //this uses AABB collider//nope, all physics now...
     console.log("gotsa player trigger hit on type " + this.data.markerType); 
     var triggerAudioController = document.getElementById("triggerAudio");
     if (triggerAudioController != null) {
-      triggerAudioController.components.trigger_audio_control.playAudioAtPosition(this.el.object3D.position, window.playerPosition.distanceTo(this.el.object3D.position), this.data.tags);
+      if (window.playerPosition) {
+        triggerAudioController.components.trigger_audio_control.playAudioAtPosition(this.el.object3D.position, window.playerPosition.distanceTo(this.el.object3D.position), this.data.tags);
+      }
+      
     }  
     if (this.data.markerType.toLowerCase() == "spawntrigger") {
 
@@ -2452,7 +2464,7 @@ AFRAME.registerComponent("rotate-with-camera", {
    
     this.roomData = roomData.chunk;
     this.roomData.sort((a, b) => (a.num_joined_members < b.num_joined_members) ? 1 : -1);
-    console.log("gots " + this.roomData.length + " rooms from matrix.org :" + JSON.stringify(this.roomData));
+    // console.log("gots " + this.roomData.length + " rooms from matrix.org :" + JSON.stringify(this.roomData));
 
     // for (let i = 0; i < this.roomData.length; i++) {
     //   // console.log(this.roomData[i].name);

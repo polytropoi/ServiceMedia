@@ -12127,7 +12127,7 @@ function getAllPeople() {
             let sceneWindFactor = response.data.sceneWindFactor != undefined ? response.data.sceneWindFactor : 0; 
             let sceneLightningFactor = response.data.sceneLightningFactor != undefined ? response.data.sceneLightningFactor : 0; 
             let sceneGlobalFogDensity = response.data.sceneGlobalFogDensity != undefined ? response.data.sceneGlobalFogDensity : 0; 
-            let sceneSkyRadius = response.data.sceneSkyRadius != undefined ? response.data.sceneSkyRadius : 200; 
+            let sceneSkyRadius = response.data.sceneSkyRadius != undefined ? response.data.sceneSkyRadius : 202; 
             let sceneMapZoom = response.data.sceneMapZoom != undefined ? response.data.sceneMapZoom : 17; 
             let sceneAssetBundleName = response.data.sceneEnvironment != undefined ? response.data.sceneEnvironment.name : ""; //hrm... maybe should flatten this obj
             let sceneWaterLevel = response.data.sceneWater != undefined ? response.data.sceneWater.level : 0;

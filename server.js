@@ -1217,6 +1217,19 @@ app.get("/qrcode_tls_path_folder/:domain/:code", function (req, res) {
         res.send(imgLink);
     });
 });
+app.get("/qrcode_path/:fullpath", function (req, res) {
+    console.log("tryna get qrcode for " + req.params.fullpath);
+    var options = {scale: 10, width: 1024}
+    var s = "https://" +req.params.fullpath;
+    // console.log("tryan qrcode for" + s);
+    let string = s.replace(/~/g, "/");
+    console.log("tryan qrcode for" + string);
+    QRCode.toDataURL(string, options, function (err, url) {
+        // console.log(url);
+        var imgLink = "<div><img width=\x22auto\x22 height=\x22100%\x22 style=\x22display: block;\x22 alt=\x22qrcode\x22 src=\x22" + url + "\x22/></div>"
+        res.send(imgLink);
+    });
+});
 
 app.get("/qcode/:domain/:code", function (req, res) {
     var options = {scale: 10, width: 1024}

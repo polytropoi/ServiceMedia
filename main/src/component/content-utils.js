@@ -222,7 +222,18 @@ AFRAME.registerComponent('initializer', { //adjust for device settings, and call
             console.log("din't found VRBUTTON");
         }
       }  
-
+      this.asky = document.getElementsByTagName('a-sky')[0];
+      if (this.asky && settings) {
+        console.log("tryna mod asky radius " + settings.sceneSkyRadius);
+        // this.asky1 = this.askies[0];
+        this.asky.setAttribute("radius", settings.sceneSkyRadius);
+        let skybox = document.getElementById("skybox");
+        if (skybox) {
+          skybox.setAttribute("radius", settings.sceneSkyRadius -1); //in case using reflection and enviro is on..
+        }
+      }
+      
+   
       // ////// test aabb collisions
       // document.addEventListener("DOMContentLoaded", function() {
       //   document.querySelectorAll("a-entity").forEach(function(entity) {
@@ -2059,7 +2070,7 @@ AFRAME.registerComponent('mod_objex', {
 
       this.data.jsonObjectData = JSON.parse(atob(theData)); //object items with model references
       this.data.jsonLocationsData = JSON.parse(atob(theLocData)); //scene locations with object references
-      console.log("objxe datas" + JSON.stringify(this.data.jsonObjectData));
+      // console.log("objxe datas" + JSON.stringify(this.data.jsonObjectData));
       // console.log("objxe location datas" + JSON.stringify(this.data.jsonLocationsData));
       console.log(this.data.jsonLocationsData.length + " locations for " + this.data.jsonObjectData.length);
 

@@ -147,11 +147,7 @@ $(function() {
          // console.log('local timeKeysData' + JSON.stringify(timeKeysData));
          timedEventsListenerMode = timeKeysData.listenTo;  
    }
-   this.asky = document.getElementsByTagName('a-sky')[0];
-   if (this.asky) {
-     console.log("tryna mod asky radius");
-     this.asky.setAttribute("radius", settings.sceneSkyRadius);
-   }
+
    AddLocalMarkers();
    vidz = document.getElementsByTagName("video");
    if (vidz != null && vidz.length > 0) { //either video or audio, not both...?
@@ -198,8 +194,23 @@ $(function() {
    if (settings.useMatrix) {
       console.log("Loading browser MATRIX sdk!!!");
       GetMatrixData();
+   }
+   if (settings.clearLocalMods) {
+      for (var i=0; i < localStorage.length; i++)  {
+      
+         let theKey = localStorage.key(i);
+         if (theKey.includes(room) && theKey.includes("localmarker")) {
+            localStorage.removeItem(theKey);
+            console.log("removed " + theKey);
+         }
+      }
+   }
 
-   }   
+   this.asky = document.getElementsByTagName('a-sky')[0];
+   if (this.asky && settings) {
+     console.log("tryna mod asky radius " + settings.sceneSkyRadius);
+     this.asky.setAttribute("radius", settings.sceneSkyRadius);
+   }
 
 });
 function GetMatrixData() {
@@ -727,7 +738,6 @@ function AddLocalMarkers() {// new or modded markers not saved to cloud
                      prevbuttonEl.style.visibility = "visible";
                      poiLocations.push(theItemObject);
                   }
-               
                }
                
                
@@ -748,6 +758,14 @@ function AddLocalMarkers() {// new or modded markers not saved to cloud
                   nextbuttonEl.style.visibility = "visible";
                   prevbuttonEl.style.visibility = "visible";
                   poiLocations.push((cItem));
+               }
+              let phEl = document.getElementById(theKey);
+
+               if (phEl) {
+                 let cloud_marker = phEl.components.cloud_marker;
+                 if (cloud_marker) {
+                  console.log("LocalMods to CLoudMarkerz!");
+                 }
                }
             } else if (theKey.toString().includes('color')) {
                // console.log("gots color " + theKey + " item " + theItem);
