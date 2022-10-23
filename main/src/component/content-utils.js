@@ -229,7 +229,16 @@ AFRAME.registerComponent('initializer', { //adjust for device settings, and call
         this.asky.setAttribute("radius", settings.sceneSkyRadius);
         let skybox = document.getElementById("skybox");
         if (skybox) {
-          skybox.setAttribute("radius", settings.sceneSkyRadius -1); //in case using reflection and enviro is on..
+          let skyrad = settings.sceneSkyRadius - 2;
+          console.log("tryna mod asky radius " + skyrad);
+          skybox.setAttribute("radius", skyrad); //in case using reflection and enviro is on..
+        } else {
+          let skyboxD = document.getElementById("skybox_dynamic");
+          if (skyboxD) {
+            let skyradD = settings.sceneSkyRadius - 5;
+            console.log("tryna mod asky radius " + skyradD);
+            skyboxD.setAttribute("radius", skyradD); //in case using reflection and enviro is on..
+          }
         }
       }
       
@@ -3727,7 +3736,7 @@ AFRAME.registerComponent('mod_model', {
               // if (clips[i].name.includes("mouthopen")) {
               //   moIndex = i;
               // }
-              if (clips[i].name.toLowerCase().includes("mixamo.com_armature_0")) {
+              if (clips[i].name.toLowerCase().includes("mixamo")) {
                 console.log("gotsa mixamo idle anim");
                 idleIndex = i;
                 idleClips.push(clips[i]);
@@ -3753,6 +3762,7 @@ AFRAME.registerComponent('mod_model', {
                     console.log("model has anims " + this.data.eventData + " idelIndex " + idleIndex);
                   if (this.data.eventData.includes("loop_all_anims")) {
                     theEl.setAttribute('animation-mixer', {
+                      "clip": clips[0].name,
                       "loop": "repeat",
                     });
                   }
@@ -4506,7 +4516,28 @@ AFRAME.registerComponent('mod_model', {
 
         // });
       }
-
+      document.querySelector('a-scene').addEventListener('youtubeToggle', function (event) {
+        console.log("GOTSA YOUTUBNE EVENT: " + event.detail.isPlaying);  
+        if (event.detail.isPlaying) {
+          if (danceIndex != -1) { //moIndex = "mouthopen"
+            theEl.setAttribute('animation-mixer', {
+              "clip": clips[danceIndex].name,
+              "loop": "repeat"
+              // "repetitions": 10,
+              // "timeScale": 2
+            });
+          }
+        } else {
+          if (idleIndex != -1) { 
+            theEl.setAttribute('animation-mixer', {
+              "clip": clips[idleIndex].name,
+              "loop": "repeat"
+              // "repetitions": 10,
+              // "timeScale": 2
+            });
+          }
+        }
+      });
 
       document.querySelector('a-scene').addEventListener('primaryAudioToggle', function () {  //things to trigger on this model if primary audio is playing
         // console.log("primaryAudioToggle!");
@@ -4539,7 +4570,9 @@ AFRAME.registerComponent('mod_model', {
             // });
             }
           }
-        });      
+        });
+        
+
       }
     });
    
@@ -5557,6 +5590,7 @@ AFRAME.registerComponent('youtube_player', {  //setup and controls for the 3d pl
     this.intersection = null;
     this.hitpoint = null;
     
+
     // if (youtubePlayer != null) {
     //   let vol = ((this.data.volume - -80) * 100) / (20 - -80); //vol is stored as -80 to +20
     //   console.log("youtube volume is " + vol);
@@ -5614,10 +5648,12 @@ AFRAME.registerComponent('youtube_player', {  //setup and controls for the 3d pl
           console.log("tryna play youtube");
           youtubePlayer.playVideo();
           PauseIntervals(false);
+          // this.el.emit('youtubeToggle', {isPlaying : false}, true);
         } else {
           console.log("tryna pauze youtube");
           youtubePlayer.pauseVideo();
           PauseIntervals(true);
+          // this.el.emit('youtubeToggle', {isPlaying : true}, true);
         }
       } else if (thiz.mouseOverObject.includes("slider_background")) {
           console.log("meshname clickded: " + thiz.mouseOverObject + " at hit point " + thiz.hitpoint);
@@ -5719,14 +5755,20 @@ AFRAME.registerComponent('youtube_player', {  //setup and controls for the 3d pl
         this.screen.material = this.readyMaterial;
       } else if (state == "playing") {
           this.play_button.material = this.greenmat;
+          console.log("tryna send youtube eve3nt...");
+          this.el.emit('youtubeToggle', {isPlaying : true}, true);
           if (this.transportPlayButton != null) {
             this.transportPlayButton.style.color = 'lightgreen';
+           
         }
         this.screen.material = this.playingMaterial;
       } else if (state == "paused") {
+        console.log("tryna send youtube eve3nt...");
+        this.el.emit('youtubeToggle', {isPlaying : false}, true);
           this.play_button.material = this.redmat;
           if (this.transportPlayButton != null) {
             this.transportPlayButton.style.color = 'red';
+            // this.el.emit('youtubeToggle', {isPlaying : false}, true);
         }
         this.screen.material = this.pausedMaterial;
       }
@@ -5892,6 +5934,9 @@ function onYouTubeIframeAPIReady () { //must be global, called when youtube embe
         // youtubePlayer(youtubeIsPlaying);
         let time = 0;
         // let statsDiv = document.getElementById("transportStats");
+        
+        // this.el.emit('youtubeToggle', {isPlaying : true}, true);
+
         this.interval = setInterval(() => {
           time = event.target.getCurrentTime();
           currentTime = time.toFixed(2);
@@ -5916,6 +5961,7 @@ function onYouTubeIframeAPIReady () { //must be global, called when youtube embe
         youtubeIsPlaying = false;
         console.log("youtube is not playing");
         clearInterval(this.interval);
+        // this.el.emit('youtubeToggle', {isPlaying : false}, true);
       }
       // let interval = setInterval(() => {
       //   if (youtubeIsPlaying) {

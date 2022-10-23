@@ -1203,7 +1203,7 @@ function geoip(json){
     init: function () {
       mode = 'mapbox';
       window.sceneType = mode;
-      InitSceneHooks();
+      // InitSceneHooks();
       UpdateLocationInfo();
       mapboxgl.accessToken = this.data.mbid;
       // console.log("tryna mapbox with toik,e mn " + mapbox_config.accessToken);

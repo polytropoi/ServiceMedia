@@ -1413,9 +1413,9 @@ function SceneManglerModal(mode) {
     "<div "+toolsDisplay+" id=\x22Tools\x22 class=\x22modalMain tabcontent\x22>"+
     // "<div class=\x22\x22>"+
     "<div class=\x22row\x22>"+
-      "<button class=\x22saveButton\x22 id=\x22exportButton\x22 onclick=\x22ExportMods()\x22>Export Mods</button>"+
-      "<label for=\x22file-upload\x22 class=\x22custom-file-upload\x22>Import Mods</label>"+
-      "<input type=\x22file\x22 id=\x22file-upload\x22 accept=\x22.txt\x22 onchange=\x22ImportMods(event)\x22></input>"+
+      // "<button class=\x22saveButton\x22 id=\x22exportButton\x22 onclick=\x22ExportMods()\x22>Export Mods</button>"+
+      // "<label for=\x22file-upload\x22 class=\x22custom-file-upload\x22>Import Mods</label>"+
+      // "<input type=\x22file\x22 id=\x22file-upload\x22 accept=\x22.txt\x22 onchange=\x22ImportMods(event)\x22></input>"+
         ownerButton +
       "<button class=\x22goToButton\x22 id=\x22statsButton\x22 onclick=\x22ToggleStats()\x22>Toggle Stats</button>"+
       "<button class=\x22uploadButton\x22 id=\x22curvesButton\x22 onclick=\x22ToggleShowCurves()\x22>Show Curves</button>"+
@@ -1425,33 +1425,38 @@ function SceneManglerModal(mode) {
     ReturnColorButtons() +
 
     "<hr><div class=\x22row\x22>"+
-    "<div class=\x22twocolumn\x22><label for=\x22addpic\x22>Add Picture Asset</label><button class=\x22addButton\x22 id=\x22AddPicButton\x22 onclick=\x22AddPicture()\x22>Add</button>"+
-    "<button class=\x22uploadButton\x22 id=\x22UpoadPicButton\x22 onclick=\x22UploadPicture()\x22>Upload</button>"+
-    "<input class=\x22addfield\x22 type=\x22text\x22 id=\x22addpic\x22 placeholder=\x22picture URL or IPFS\x22></div>"+
+    "<button class=\x22saveButton\x22 id=\x22exportButton\x22 onclick=\x22ExportMods()\x22>Export Mods</button>"+
+    "<label for=\x22file-upload\x22 class=\x22custom-file-upload\x22>Import Mods</label>"+
+    "<input type=\x22file\x22 id=\x22file-upload\x22 accept=\x22.txt\x22 onchange=\x22ImportMods(event)\x22></input>"+
+    "<button class=\x22deleteButton\x22 id=\x22ClearAllPlaceholdersButton\x22 onclick=\x22ClearPlaceholders()\x22>Clear All Mods</button>" +
+    "<button class=\x22deleteButton\x22 id=\x22ClearAllPlaceholdersButton\x22 onclick=\x22ClearPlaceholders()\x22>Clear Scene Mods</button>"+
+      // "<div class=\x22twocolumn\x22><label for=\x22addpic\x22>Add Picture Asset</label><button class=\x22addButton\x22 id=\x22AddPicButton\x22 onclick=\x22AddPicture()\x22>Add</button>"+
+      // "<button class=\x22uploadButton\x22 id=\x22UpoadPicButton\x22 onclick=\x22UploadPicture()\x22>Upload</button>"+
+      // "<input class=\x22addfield\x22 type=\x22text\x22 id=\x22addpic\x22 placeholder=\x22picture URL or IPFS\x22></div>"+
 
-    "<div class=\x22twocolumn\x22><label for=\x22addmodel\x22>Add Model Asset (*.glb)</label><button class=\x22addButton\x22 id=\x22AddModelButton\x22 onclick=\x22AddModel()\x22>Add</button>"+
-    "<button class=\x22uploadButton\x22 id=\x22UploadModelButton\x22 onclick=\x22UploadModel()\x22>Upload</button>"+
-    "<input class=\x22addfield\x22 type=\x22text\x22 id=\x22addmodel\x22 placeholder=\x22*.glb model URL or IPFS\x22></div>"+
-    // "</div>"+
+      // "<div class=\x22twocolumn\x22><label for=\x22addmodel\x22>Add Model Asset (*.glb)</label><button class=\x22addButton\x22 id=\x22AddModelButton\x22 onclick=\x22AddModel()\x22>Add</button>"+
+      // "<button class=\x22uploadButton\x22 id=\x22UploadModelButton\x22 onclick=\x22UploadModel()\x22>Upload</button>"+
+      // "<input class=\x22addfield\x22 type=\x22text\x22 id=\x22addmodel\x22 placeholder=\x22*.glb model URL or IPFS\x22></div>"+
+      // // "</div>"+
 
-    "<div class=\x22twocolumn\x22><label for=\x22addmodel\x22>Add Primary Audio</label><button class=\x22addButton\x22 id=\x22AddModelButton\x22 onclick=\x22AddModel()\x22>Add</button>"+
-    "<button class=\x22uploadButton\x22 id=\x22UploadModelButton\x22 onclick=\x22UploadModel()\x22>Upload</button>"+
-    "<input class=\x22addfield\x22 type=\x22text\x22 id=\x22addmodel\x22 placeholder=\x22audio URL or IPFS\x22></div>"+
-    // "</div>"+
-    "<div class=\x22twocolumn\x22><label for=\x22addmodel\x22>Add Asset (*.usdz)</label><button class=\x22addButton\x22 id=\x22AddModelButton\x22 onclick=\x22AddModel()\x22>Add</button>"+
-    "<button class=\x22uploadButton\x22 id=\x22UploadModelButton\x22 onclick=\x22UploadModel()\x22>Upload</button>"+
-    "<input class=\x22addfield\x22 type=\x22text\x22 id=\x22addmodel\x22 placeholder=\x22*.usdz URL or IPFS\x22></div>"+
+      // "<div class=\x22twocolumn\x22><label for=\x22addmodel\x22>Add Primary Audio</label><button class=\x22addButton\x22 id=\x22AddModelButton\x22 onclick=\x22AddModel()\x22>Add</button>"+
+      // "<button class=\x22uploadButton\x22 id=\x22UploadModelButton\x22 onclick=\x22UploadModel()\x22>Upload</button>"+
+      // "<input class=\x22addfield\x22 type=\x22text\x22 id=\x22addmodel\x22 placeholder=\x22audio URL or IPFS\x22></div>"+
+      // // "</div>"+
+      // "<div class=\x22twocolumn\x22><label for=\x22addmodel\x22>Add Asset (*.usdz)</label><button class=\x22addButton\x22 id=\x22AddModelButton\x22 onclick=\x22AddModel()\x22>Add</button>"+
+      // "<button class=\x22uploadButton\x22 id=\x22UploadModelButton\x22 onclick=\x22UploadModel()\x22>Upload</button>"+
+      // "<input class=\x22addfield\x22 type=\x22text\x22 id=\x22addmodel\x22 placeholder=\x22*.usdz URL or IPFS\x22></div>"+
 
-    "<div class=\x22twocolumn\x22><label for=\x22addmodel\x22>Add Ambient Audio</label><button class=\x22addButton\x22 id=\x22AddModelButton\x22 onclick=\x22AddModel()\x22>Add</button>"+
-    "<button class=\x22uploadButton\x22 id=\x22UploadModelButton\x22 onclick=\x22UploadModel()\x22>Upload</button>"+
-    "<input class=\x22addfield\x22 type=\x22text\x22 id=\x22addmodel\x22 placeholder=\x22audio URL or IPFS\x22></div>"+
+      // "<div class=\x22twocolumn\x22><label for=\x22addmodel\x22>Add Ambient Audio</label><button class=\x22addButton\x22 id=\x22AddModelButton\x22 onclick=\x22AddModel()\x22>Add</button>"+
+      // "<button class=\x22uploadButton\x22 id=\x22UploadModelButton\x22 onclick=\x22UploadModel()\x22>Upload</button>"+
+      // "<input class=\x22addfield\x22 type=\x22text\x22 id=\x22addmodel\x22 placeholder=\x22audio URL or IPFS\x22></div>"+
 
-    "<div class=\x22twocolumn\x22><label for=\x22addmodel\x22>Add Trigger Audio</label><button class=\x22addButton\x22 id=\x22AddModelButton\x22 onclick=\x22AddModel()\x22>Add</button>"+
-    "<button class=\x22uploadButton\x22 id=\x22UploadModelButton\x22 onclick=\x22UploadModel()\x22>Upload</button>"+
-    "<input class=\x22addfield\x22 type=\x22text\x22 id=\x22addmodel\x22 placeholder=\x22audio URL or IPFS\x22></div>"+
-    "<br>"+
+      // "<div class=\x22twocolumn\x22><label for=\x22addmodel\x22>Add Trigger Audio</label><button class=\x22addButton\x22 id=\x22AddModelButton\x22 onclick=\x22AddModel()\x22>Add</button>"+
+      // "<button class=\x22uploadButton\x22 id=\x22UploadModelButton\x22 onclick=\x22UploadModel()\x22>Upload</button>"+
+      // "<input class=\x22addfield\x22 type=\x22text\x22 id=\x22addmodel\x22 placeholder=\x22audio URL or IPFS\x22></div>"+
+      // "<br>"+
     "</div>"+
-    "<br><br><br><button class=\x22deleteButton\x22 id=\x22ClearAllPlaceholdersButton\x22 onclick=\x22ClearPlaceholders()\x22>Clear All Mods</button>"+
+    // "<br><br><br><button class=\x22deleteButton\x22 id=\x22ClearAllPlaceholdersButton\x22 onclick=\x22ClearPlaceholders()\x22>Clear All Mods</button>"+
     "</div>"+
 
 

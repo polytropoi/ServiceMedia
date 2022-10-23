@@ -206,12 +206,25 @@ $(function() {
       }
    }
 
-   this.asky = document.getElementsByTagName('a-sky')[0];
-   if (this.asky && settings) {
-     console.log("tryna mod asky radius " + settings.sceneSkyRadius);
-     this.asky.setAttribute("radius", settings.sceneSkyRadius);
-   }
-
+   // this.asky = document.getElementsByTagName('a-sky')[0];
+   // if (this.asky && settings) {
+   //   console.log("tryna mod asky radius " + settings.sceneSkyRadius);
+   //   // this.asky1 = this.askies[0];
+   //   this.asky.setAttribute("radius", settings.sceneSkyRadius);
+   //   let skybox = document.getElementById("skybox");
+   //   if (skybox) {
+   //     let skyrad = settings.sceneSkyRadius - 2;
+   //     console.log("tryna mod asky radius " + skyrad);
+   //     skybox.setAttribute("radius", skyrad); //in case using reflection and enviro is on..
+   //   } else {
+   //     let skyboxD = document.getElementById("skybox_dynamic");
+   //     if (skyboxD) {
+   //       let skyradD = settings.sceneSkyRadius - 2;
+   //       console.log("tryna mod asky radius " + skyradD);
+   //       skyboxD.setAttribute("radius", skyradD); //in case using reflection and enviro is on..
+   //     }
+   //   }
+   // }
 });
 function GetMatrixData() {
    if (!matrixClient) {
@@ -2193,7 +2206,10 @@ function SetYoutubeEventsData() {
 let timeKeysIndex = 0;
 let listenerInterval = null;
 let loopIntervals = [];
-function TimedEventListener () {
+
+////////////////////////////////////// main method for timed events listening to all the things.../////////////////////////
+
+function TimedEventListener () { 
  console.log("TimedEventsListener" + timedEventsListenerMode );
  // let primaryAudioTime = 0;
  timeKeysIndex = 0;
@@ -2212,7 +2228,7 @@ function TimedEventListener () {
    if (timekey != NaN) {//not not a number
      if (timedEventsListenerMode != null && timedEventsListenerMode.toLowerCase() == 'primary audio') {
       // if (hasPrimaryAudio) {
-         if (primaryAudioHowl != null && primaryAudioHowl != undefined && primaryAudioHowl.playing) {
+         if (primaryAudioHowl != undefined && primaryAudioHowl != null && primaryAudioHowl.playing) {
          primaryAudioTime = primaryAudioHowl.seek();
             if (primaryAudioTime < .2) {
                timeKeysIndex = 0; 
