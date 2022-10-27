@@ -948,7 +948,7 @@ AFRAME.registerComponent('attributions_text_control', {
       // console.log("attributions data" + theData);
       
       this.data.jsonData = JSON.parse(atob(theData)); //convert from base64
-      console.log("parsedAttribtions data : " +JSON.stringify(this.data.jsonData));
+      // console.log("parsedAttribtions data : " +JSON.stringify(this.data.jsonData));
       this.tArray = this.data.jsonData;
 
 
@@ -2279,7 +2279,7 @@ AFRAME.registerComponent('mod_objex', {
     equipInventoryObject: function (objectID) {
       // console.log("tryna equip model " + objectID + " equipped " + this.data.equipped );  
       this.objectData = this.returnObjectData(objectID);
-      console.log("tryna equip model " + JSON.stringify(this.objectData));  
+      // console.log("tryna equip model " + JSON.stringify(this.objectData));  
       this.dropPos = new THREE.Vector3();
       this.objEl = document.createElement("a-entity");
       this.equipHolder = document.getElementById("equipPlaceholder");
@@ -2507,7 +2507,22 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
     this.mod_physics = "";
     this.pushForward = false;
     this.lookVector = new THREE.Vector3( 0, 0, -1 );
+    
+    this.textIndex = 0;
+    this.position = null;
+    this.textData = [];
 
+    // let textData = [];
+    let moIndex = -1;
+    let idleIndex = -1;
+    let danceIndex = -1;
+    let walkIndex = -1;
+    let runIndex = -1;
+    let clips = null;
+    let danceClips = [];
+    let idleClips = [];
+    let walkClips = [];
+    let mouthClips = [];
 
     this.triggerAudioController = document.getElementById("triggerAudio");
     this.isTriggered = false;
@@ -2564,27 +2579,12 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
         this.el.setAttribute("gltf-model", "#" +this.data.objectData.modelID); 
       }
     }
-    // console.log
-    // if (this.data.tags == null) {
-    //   console.log("this.data.tags is null!");
 
-    //   if (this.data.locationData && this.data.locationData.locationTags != undefined  && this.data.locationData.locationTags != 'undefined') {
-    //     console.log(this.data.objectData.name + " gotsome location tags: " + this.data.locationData.locationTags);
-    //     this.data.tags = this.data.locationData.locationTags;
-    //   } 
-    //   if (this.data.objectData.tags != undefined && this.data.objectData.tags != null && this.data.objectData.tags != "undefined" && this.data.objectData.length > 0) {
-    //     console.log(this.data.objectData.name + " gotsome tags: " + this.data.objectData.tags);
-    //     this.data.tags = this.data.objectData.tags;
-    //   }
-    //   // if (this.data.locationData && this.data.locationData.markerType) {
-    //   //   console.log(this.data.objectData.name + " gotsa markerType : "+ this.data.locationData.markerType);
-    //   // }
-    // }
       
     if (this.tags == null) {
       console.log(this.data.objectData.name + "this.data.tags is null! loctags: " + this.data.locationData.locationTags + " objtags: " + this.data.objectData.tags);
 
-      if (this.data.locationData && this.data.locationData.locationTags != undefined  && this.data.locationData.locationTags != 'undefined') {
+      if (this.data.locationData && this.data.locationData.locationTags != undefined  && this.data.locationData.locationTags != 'undefined' && this.data.locationData.locationTags.length > 0) {
         console.log(this.data.objectData.name + " gotsome location tags: " + this.data.locationData.locationTags);
         this.tags = this.data.locationData.locationTags;
       } else if (this.data.objectData.tags != undefined && this.data.objectData.tags != null && this.data.objectData.tags != "undefined" && this.data.objectData.tags.length > 0) {
@@ -2598,49 +2598,54 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
       console.log("this.data.tags is not null!");
 
     }
+    if (this.data.objectData.triggerScale == undefined || this.data.objectData.triggerScale == null || this.data.objectData.triggerScale == "" || this.data.objectData.triggerScale == 0) {
+      this.data.objectData.triggerScale = 1;
+    } 
       
     this.hasPickupAction = false;
     this.hasThrowAction = false;
     this.hasShootAction = false;
 
-    if (this.data.objectData.callouttext != undefined && this.data.objectData.callouttext != null && this.data.objectData.callouttext.length > 0) {
-      if (this.data.objectData.callouttext.includes('~')) {
-        this.calloutLabelSplit = this.data.objectData.callouttext.split('~'); 
-      }
-      
-      this.calloutEntity = document.createElement("a-entity");
-      this.calloutPanel = document.createElement("a-entity");
-      this.calloutText = document.createElement("a-text");
-      this.calloutEntity.id = "objCalloutEntity_" + this.data.objectData._id;
-      this.calloutPanel.id = "objCalloutPanel_" + this.data.objectData._id;
-      this.calloutText.id = "objCalloutText_" + this.data.objectData._id;
+    if (this.tags != null && !this.tags.includes("thoughtbubble") && !this.tags.includes("hide callout")  ) { //TODO implement Callout Options!
+      if (this.data.objectData.callouttext != undefined && this.data.objectData.callouttext != null && this.data.objectData.callouttext.length > 0) {
+        if (this.data.objectData.callouttext.includes('~')) {
+          this.calloutLabelSplit = this.data.objectData.callouttext.split('~'); 
+          this.textData = this.calloutLabelSplit;
+        }
+        
+        this.calloutEntity = document.createElement("a-entity");
+        this.calloutPanel = document.createElement("a-entity");
+        this.calloutText = document.createElement("a-text");
+        this.calloutEntity.id = "objCalloutEntity_" + this.data.objectData._id;
+        this.calloutPanel.id = "objCalloutPanel_" + this.data.objectData._id;
+        this.calloutText.id = "objCalloutText_" + this.data.objectData._id;
 
-      this.calloutPanel.setAttribute("gltf-model", "#landscape_panel");
-      this.calloutPanel.setAttribute("scale", ".125 .1 .125");
-      this.calloutPanel.setAttribute("material", {'color': 'black', 'roughness': 1});
-      this.calloutPanel.setAttribute("overlay");
-      this.calloutEntity.setAttribute("look-at", "#player");
-      this.calloutEntity.setAttribute('visible', false);
-    
-      // calloutEntity.setAttribute("render-order", "hud");
-      sceneEl.appendChild(this.calloutEntity);
-      this.calloutEntity.appendChild(this.calloutPanel);
-      this.calloutEntity.appendChild(this.calloutText);
+        this.calloutPanel.setAttribute("gltf-model", "#landscape_panel");
+        this.calloutPanel.setAttribute("scale", ".125 .1 .125");
+        this.calloutPanel.setAttribute("material", {'color': 'black', 'roughness': 1});
+        this.calloutPanel.setAttribute("overlay");
+        this.calloutEntity.setAttribute("look-at", "#player");
+        this.calloutEntity.setAttribute('visible', false);
       
-      this.calloutPanel.setAttribute("position", '0 0 1'); 
-      this.calloutText.setAttribute("position", '0 0 1.25'); //offset the child on z toward camera, to prevent overlap on model
-      this.calloutText.setAttribute('text', {
-        width: .75,
-        baseline: "bottom",
-        align: "left",
-        font: "/fonts/Exo2Bold.fnt",
-        anchor: "center",
-        wrapCount: 14,
-        color: "white",
-        value: "wha"
-      });
-      this.calloutText.setAttribute("overlay");
-      
+        // calloutEntity.setAttribute("render-order", "hud");
+        sceneEl.appendChild(this.calloutEntity);
+        this.calloutEntity.appendChild(this.calloutPanel);
+        this.calloutEntity.appendChild(this.calloutText);
+        
+        this.calloutPanel.setAttribute("position", '0 0 1'); 
+        this.calloutText.setAttribute("position", '0 0 1.25'); //offset the child on z toward camera, to prevent overlap on model
+        this.calloutText.setAttribute('text', {
+          width: .75,
+          baseline: "bottom",
+          align: "left",
+          font: "/fonts/Exo2Bold.fnt",
+          anchor: "center",
+          wrapCount: 14,
+          color: "white",
+          value: "wha"
+        });
+        this.calloutText.setAttribute("overlay");
+      } 
     }
     // if (this.data.objectData.synthNotes != undefined && this.data.objectData.synthNotes != null && this.data.objectData.synthNotes.length > 0) {
     if (this.data.objectData.tonejsPatch1 != undefined && this.data.objectData.tonejsPatch1 != null) {  
@@ -2651,7 +2656,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
    
     if (this.data.objectData.actions != undefined && this.data.objectData.actions.length > 0) {
       for (let a = 0; a < this.data.objectData.actions.length; a++) {
-          console.log("action: " + JSON.stringify(this.data.objectData.actions[a].actionType));
+          // console.log("action: " + JSON.stringify(this.data.objectData.actions[a].actionType));
         if (this.data.objectData.actions[a].actionType.toLowerCase() == "onload") {
           // this.hasSelectAction = true;
           this.loadAction = this.data.objectData.actions[a];
@@ -2725,16 +2730,17 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
       rot.y = this.data.locationData.eulery != undefined ? this.data.locationData.eulery : 0;
       rot.z = this.data.locationData.eulerz != undefined ? this.data.locationData.eulerz : 0;
       let scale = {x: 1, y: 1, z: 1};
-      if (this.data.locationData.markerObjScale != undefined && this.data.locationData.markerObjScale != null && this.data.locationData.markerObjScale != "") {
+      if (this.data.locationData.markerObjScale != undefined && this.data.locationData.markerObjScale != null && this.data.locationData.markerObjScale != "" && this.data.locationData.markerObjScale != 0) {
       scale.x = this.data.locationData.markerObjScale != undefined ? this.data.locationData.markerObjScale : 1;
       scale.y = this.data.locationData.markerObjScale != undefined ? this.data.locationData.markerObjScale : 1;
       scale.z = this.data.locationData.markerObjScale != undefined ? this.data.locationData.markerObjScale : 1;
-      } else if (this.data.objectData.objScale != undefined && this.data.locationData.objScale != null && this.data.locationData.objScale != "" ) {
+      } else if (this.data.objectData.objScale != undefined && this.data.objectData.objScale != null && this.data.objectData.objScale != "" && this.data.objectData.objScale != 0 ) {
         scale.x = this.data.objectData.objScale;
         scale.y = this.data.objectData.objScale;
         scale.z = this.data.objectData.objScale;
+      } else {
+        this.data.objectData.objScale = 1;
       }
-
  
       if (!this.data.isEquipped) {
         console.log("setting object pos/rot to " + JSON.stringify(rot));
@@ -2777,9 +2783,15 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
         // this.el.object3D.scale.set(scale);
       }
 
-    
-      // this.el.setAttribute("rotation", rot);
-      // this.el.setAttribute("position", pos);
+      // obj.traverse(node => { //spin through object heirarchy to sniff for special names, e.g. "eye"
+      //   this.nodeName = node.name;
+      //   if (this.data.eventData.includes("eyelook") && this.nodeName.includes("eye")) { //must be set in the data and as a name on the model
+      //     if (node instanceof THREE.Mesh) {
+      //       this.meshChildren.push(node);
+      //       console.log("gotsa eye!");
+      //     }
+      //   }
+      // });
 
       if (this.data.objectData.physics != undefined && this.data.objectData.physics != null && this.data.objectData.physics.toLowerCase() != "none") {
         //  setTimeout(function(){  
@@ -2818,13 +2830,457 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
             if (this.data.objectData.yPosFudge != null && this.data.objectData.yPosFudge != "") {
               worldPosition.y += this.data.objectData.yPosFudge;
             }
-            console.log("triggering fx at " + worldPosition + " plus" + this.data.objectData.yPosFudge);
-            particleSpawner.components.particle_spawner.spawnParticles(worldPosition, this.data.objectData.particles, 5, this.el.id, this.data.objectData.yPosFudge, this.data.objectData.color1, this.data.objectData.objScale);
+            console.log("triggering fx at " + JSON.stringify(worldPosition) + " plus" + this.data.objectData.yPosFudge);
+            particleSpawner.components.particle_spawner.spawnParticles(worldPosition, this.data.objectData.particles, 5, this.el.id, this.data.objectData.yPosFudge, this.data.objectData.color1, this.data.objectData.triggerScale);
           }
         }
+        // if (this.selectAction.actionResult.toLowerCase() == "trigger fx") {
+        //   if (!this.isTriggered) {
+        //     // var worldPosition = new THREE.Vector3();
+        //     // this.el.object3D.getWorldPosition(worldPosition);
+        //     this.isTriggered = true;
+        //     let particleSpawner = document.getElementById('particleSpawner');
+        //     if (particleSpawner != null) {
+        //       var worldPosition = new THREE.Vector3();
+        //       this.el.object3D.getWorldPosition(worldPosition);
+        //       if (this.data.objectData.yPosFudge != null && this.data.objectData.yPosFudge != "") {
+        //         worldPosition.y += this.data.objectData.yPosFudge;
+        //       }
+        //       console.log("triggering fx at " + JSON.stringify(worldPosition) + " plus" + this.data.objectData.yPosFudge);
+        //       particleSpawner.components.particle_spawner.spawnParticles(worldPosition, this.data.objectData.particles, 5, null, this.data.objectData.yPosFudge, this.data.objectData.color1, this.data.objectData.triggerScale);
+        //     }
+        //   } else {
+        //     console.log("already triggered - make it a toggle!");
+        //   }
+        // }
+
       }
       // this.el.setAttribute("aabb-collider", {objects: ".activeObjexRay"});
-    });
+
+
+      // // if (!this.isInitialized) {
+      //   if (this.data.eventData.includes("scatter")) {
+      //     // this.el.object3D.visible = false;
+      //     console.log("GOTSA SCATTER OBJEK@");
+      //   }
+        // this.oScale = oScale;
+        this.bubble = null;
+        this.bubbleText = null;
+        this.isInitialized = true;
+        this.meshChildren = [];
+        let theEl = this.el;
+        const obj = this.el.getObject3D('mesh');
+        
+        if (obj) {
+          if (this.data.shader != "") {
+            console.log("gotsa shader " + this.data.shader);
+           
+            // this.recursivelySetChildrenShader(obj);
+
+          }
+          // let dynSkybox = document.getElementById('')
+          // for (let e = 0; e < textData.length; e++) {
+          //   if (textData[e].toLowerCase().includes("refract")){
+          //     console.log("tryna set refraction");
+          //     obj.material.refractionRatio = .9;
+          //     obj.material.reflectivity = .5;
+          //   }
+          // }
+
+          if (this.data.eventData.toLowerCase().includes("transparent")) {
+            console.log("tryna set transparent");
+            obj.visible = false;
+          }
+          if (this.data.eventData.toLowerCase().includes("particle")) {
+            console.log("tryna spawn a particle!");
+
+            this.el.setAttribute('mod_particles', {type: 'fireball'});
+         
+          }
+          if (this.data.eventData.toLowerCase().includes("fireworks")) {
+            console.log("tryna spawn fireworks!");
+
+            this.el.setAttribute('fireworks_spawner', {type: 'fireball'});
+         
+          }
+          if (this.data.eventData.toLowerCase().includes("audiotrigger")) {
+            // console.log("gotsa audiotrigg3re!");
+
+            // this.el.setAttribute('fireworks_spawner', {type: 'fireball'});
+            this.hasAudioTrigger = true;
+          }
+          
+
+          let worldPos = null;
+          let hasAnims = false;
+          let hasPicPositions = false;
+          let hasVidPositions = false;
+          let hasAudioPositions = false;
+          camera = AFRAME.scenes[0].camera; 
+          mixer = new THREE.AnimationMixer( obj );
+          clips = obj.animations;
+
+          if (clips != null) { 
+            for (i = 0; i < clips.length; i++) { //get reference to all anims
+              hasAnims = true;
+              console.log("model has animation: " + clips[i].name);
+              
+              if (clips[i].name.includes("mouthopen")) {
+                moIndex = i;
+                mouthClips.push(clips[i]);
+              }
+              // if (clips[i].name.includes("mouthopen")) {
+              //   moIndex = i;
+              // }
+              if (clips[i].name.toLowerCase().includes("mixamo")) {
+                console.log("gotsa mixamo idle anim");
+                idleIndex = i;
+                idleClips.push(clips[i]);
+              }
+              if (clips[i].name.toLowerCase().includes("take 001")) {
+                idleIndex = i;
+                idleClips.push(clips[i]);
+              }
+              if (clips[i].name.toLowerCase().includes("idle")) {
+                idleIndex = i;
+                idleClips.push(clips[i]);
+              }
+              if (clips[i].name.toLowerCase().includes("walk")) {
+                walkIndex = i;
+                walkClips.push(clips[i]);
+              }
+              if (clips[i].name.toLowerCase().includes("dance")) { //etc..
+                danceIndex = i;
+                danceClips.push(clips[i]);
+              }
+              if (i == clips.length - 1) {
+                  if (hasAnims) {
+                    console.log("model has anims " + this.data.eventData + " idelIndex " + idleIndex);
+                  if (this.data.eventData.includes("loop_all_anims")) {
+                    theEl.setAttribute('animation-mixer', {
+                      "clip": clips[0].name,
+                      "loop": "repeat",
+                    });
+                  }
+                  if (this.data.eventData.includes("loop_dance_anims")) {
+                    theEl.setAttribute('animation-mixer', {
+                      "loop": "repeat",
+                    });
+                  }
+                  if (idleIndex != -1) {
+                    theEl.setAttribute('animation-mixer', {
+                      "clip": clips[idleIndex].name,
+                      "loop": "repeat",
+                    });
+                  }
+                }
+              }
+            }
+
+          }
+          obj.traverse(node => { //spin through object heirarchy to sniff for special names, e.g. "eye"
+            this.nodeName = node.name;
+           
+            if (this.data.eventData.includes("eyelook") && this.nodeName.includes("eye")) { //must be set in the data and as a name on the model
+              if (node instanceof THREE.Mesh) {
+              this.meshChildren.push(node);
+              console.log("gotsa eye!");
+              }
+            }
+           
+          });
+          
+          for (i = 0; i < this.meshChildren.length; i++) { //apply mods to the special things
+            console.log("gotsa special !! meshChild " + this.meshChildren[i].name);
+            if (this.meshChildren[i].name.includes("trigger")) { 
+              //ugh, nm
+                let child = this.el.object3D.getObjectByName(this.meshChildren[i].name, true);
+                child.visible = false;
+
+                // let triggerEl = document.createElement('a-entity');
+                // var targetPos = new THREE.Vector3();
+                // child.getWorldPosition(targetPos);
+                // this.child = child.clone();
+                // triggerEl.setObject3D("mesh", this.child);
+                // // let child = this.child.clone();
+                // // this.child.position(targetPos);
+                // // triggerEl.setObject3D("mesh", child.clone());
+                // // triggerEl.setObject3D("mesh", child);
+                // child.remove();
+                // // triggerEl.setAttribute('geometry', {primitive: 'box', width: 1});
+                // triggerEl.setAttribute('position', targetPos);
+                // console.log("gotsa special teryna set a trigger mesh..");
+                // triggerEl.setAttribute('mod_physics', {eventData: this.data.eventData, tags: this.data.tags, isTrigger: true});
+                // // triggerEl.classList.add('activeObjexRay');
+                // triggerEl.id = "TRIGGGER";
+                // this.sceneEl.appendChild(triggerEl);
+                
+                // triggerEl.classList.add('trigger');
+            }
+              if (this.meshChildren[i].name.includes("eye")) {
+              console.log("gotsa eye too!");
+              let child = this.el.object3D.getObjectByName(this.meshChildren[i].name, true);
+              if (child != null) { 
+                let box = new THREE.Box3().setFromObject(child); //bounding box for position
+                let center = new THREE.Vector3();
+                box.getCenter(center); //get centerpoint of eye child geometry, in localspace
+                child.geometry.center(); //reset pivot of eye geo
+                child.position.set(0,0,0); //clear transforms so position below won't be offset
+                let theEye = document.createElement("a-entity");
+                theEye.setObject3D("Object3D", child);
+                theEye.setAttribute("look-at", "#player");
+                this.el.appendChild(theEye); //set as child of DOM heirarchy, not just parent model
+                theEye.setAttribute("position", obj.worldToLocal(center)); //set position as local to 
+                // obj.updateMatrix();
+                // obj.updateMatrixWorld();
+              }
+            } else if(this.meshChildren[i].name.includes("callout")) {
+              // console.log("gotsa callout! " + this.meshChildren[i].name);
+              let child = this.el.object3D.getObjectByName(this.meshChildren[i].name, true);
+              // console.log(child);
+              if (child != null && child != undefined) { 
+                //
+                var calloutChild = document.createElement('a-entity');
+                calloutChild.classList.add("activeObjexRay");
+                calloutChild.setObject3D("Object3D", child);
+                var callout = this.meshChildren[i].name.split("_")[0];
+                // console.log("callout string is " + callout);
+
+                // calloutChild.addEventListener('model-loaded', () => {
+                  // console.log("callout! " +callout);
+                  calloutChild.setAttribute("model-callout", callout);
+
+                this.el.appendChild(calloutChild);
+
+              }
+            }
+          }
+      
+          // if (this.el.classList.contains('target') || this.data.markerType != "none") {
+
+          // let hasBubble = false;
+          // let theEl = this.element;
+          this.el.setAttribute('gesture-handler-add'); //ar mode only?
+          var sceneEl = document.querySelector('a-scene');
+          let hasCallout = false;
+          let calloutOn = false;
+
+          /// SHOULD INSTEAD LOOK AT THE OBJECT TEXT PROPS?!?
+          // if (this.tags != null && this.tags.includes("thoughtbubble") && !this.data.eventData.toLowerCase().includes("undefined") && this.data.eventData.toLowerCase().includes("main") && this.data.eventData.toLowerCase().includes("text")) {
+          if (this.data.eventData.toLowerCase().includes("main") && this.data.eventData.toLowerCase().includes("text")) {
+            document.getElementById("mainTextToggle").setAttribute("visible", false);
+            this.data.eventData = document.getElementById("mainText").getAttribute("main-text-control", "mainTextString"); 
+            console.log("target eventData : "+ JSON.stringify(this.data.eventData));
+            this.textData = this.data.eventData.mainTextString.split("~");
+          } else {
+            // this.textData = 
+          }
+
+          if (this.tags != null && this.tags.includes("thoughtbubble")) {
+
+          
+            hasCallout = true;
+          } 
+          if (hasCallout) {
+            let bubble = document.createElement("a-entity");
+            this.bubble = bubble;
+            console.log("made a bubble!" + bubble);
+            bubble.setAttribute("look-at", "#player");
+            bubble.classList.add("bubble");
+            bubble.setAttribute("position", "2 2 0");
+            bubble.setAttribute("rotation", "0 0 0"); 
+            bubble.setAttribute("scale", "2 2 2"); 
+            bubble.setAttribute("visible", false);
+            sceneEl.appendChild(bubble);
+            
+            let bubbleBackground = document.createElement("a-entity");
+            bubbleBackground.classList.add("bubbleBackground");
+            bubbleBackground.setAttribute("gltf-model", "#thoughtbubble"); //just switch this for other callout types (speech and plain callout)
+            bubbleBackground.setAttribute("position", "0 0 1");
+            bubbleBackground.setAttribute("rotation", "0 0 0"); 
+            bubbleBackground.setAttribute("scale", "-.1 .1 .1"); 
+            // bubble.setAttribute("material", {"color": "white", "blending": "additive", "transparent": false, "alphaTest": .5});
+            bubbleBackground.setAttribute("material", {"color": "white", "shader": "flat"}); //doh, doesn't work for gltfs... 
+            bubble.appendChild(bubbleBackground);
+
+            
+            let bubbleText = document.createElement("a-text");
+            this.bubbleText = bubbleText;
+            bubbleText.classList.add("bubbleText");
+            // bubbleText.setAttribute("visible", false);
+            bubbleText.setAttribute("position", "0 0 1.1");
+            bubbleText.setAttribute("scale", ".1 .1 .1"); 
+            // bubbleText.setAttribute("look-at", "#player");
+            bubbleText.setAttribute("width", 3);
+            bubbleText.setAttribute("height", 2);
+            bubble.appendChild(bubbleText);
+            
+            bubbleBackground.addEventListener('model-loaded', () => {
+              const bubbleObj = bubbleBackground.getObject3D('mesh');
+              // var material = new THREE.MeshBasicMaterial({map: bubbleObj.material.map}); 
+              // material.color = "white";
+              bubbleObj.traverse(node => {
+                  // node.material = material;
+                  node.material.flatShading = true;
+                  node.material.needsUpdate = true
+                });
+              });
+              /*
+            setInterval(function(){ //get "viewport" position (normalized screen coords)
+              if (calloutOn) {
+              let pos = new THREE.Vector3();
+              pos = pos.setFromMatrixPosition(obj.matrixWorld); //world pos of model, kindof
+              // worldPos = pos;
+              pos.project(camera);
+              var width = window.innerWidth, height = window.innerHeight; 
+              let widthHalf = width / 2;
+              let heightHalf = height / 2;
+              pos.x = (pos.x * widthHalf) + widthHalf;
+              pos.y = - (pos.y * heightHalf) + heightHalf;
+              pos.z = 0;
+              // if (pos.x != NaN) { //does it twice because matrix set, disregard if it returns NaN :( //fixed?
+              //   console.log("screen position: " + (pos.x/width).toFixed(1) + " " + (pos.y/height).toFixed(1)); //"viewport position"
+              // }
+              if ((pos.x/width) < .45) {
+                console.log("flip left");
+                bubbleBackground.setAttribute("position", "4 2 1");
+                bubbleBackground.setAttribute("scale", "-.1 .1 .1"); 
+                bubbleText.setAttribute("position", "4 2 1.1");
+              } 
+              if ((pos.x/width) > .55) {
+                console.log("flip right");
+                bubbleBackground.setAttribute("position", "-4 2 1");
+                bubbleBackground.setAttribute("scale", ".1 .1 .1"); 
+                bubbleText.setAttribute("position", "-4 2 1.1");
+              }
+
+              }
+            }, 2000);
+            */
+            // }
+          }
+
+          let primaryAudio = document.getElementById("primaryAudio");
+          if (primaryAudio != null) {
+            const primaryAudioControlParams = primaryAudio.getAttribute('primary_audio_control');
+
+        
+            if (primaryAudioControlParams.targetattach) { //set by sceneAttachPrimaryAudioToTarget or something like that...
+              console.log("tryna target attach primary audio " + primaryAudioControlParams.targetattach);
+
+            document.getElementById("primaryAudioParent").setAttribute("visible", false);
+            // document.getElementById("primaryAudioParent").setAttribute("position", theEl.position);
+            primaryAudio.emit('targetattach', {targetEntity: this.el}, true);
+            primaryAudioHowl.pos(this.el.object3D.position.x, this.el.object3D.position.y, this.el.object3D.position.z);
+            
+            this.el.addEventListener('click', function () {
+
+              this.bubble = sceneEl.querySelector('.bubble');
+              if (this.bubble) {
+                this.bubble.setAttribute('visible', false);
+              }
+              calloutOn = false;
+              // this.bubbleText = theEl.querySelector('.bubbleText');
+              // this.bubble = sceneEl.querySelector('.bubble');
+              // this.bubbleText = sceneEl.querySelector('.bubbleText');
+              // if (hasCallout) {
+              //   this.bubble.setAttribute("visible", false);
+              //   this.bubbleText.setAttribute("visible", false);
+              // }
+              if (!primaryAudioHowl.playing()) {
+                  primaryAudioHowl.play();
+                  console.log('...tryna play...');
+                  if (moIndex != -1) { //moIndex = "mouthopen"
+                    theEl.setAttribute('animation-mixer', {
+                      "clip": clips[moIndex].name,
+                      "loop": "repeat",
+                      "repetitions": 10,
+                      "timeScale": 2
+                    });
+                    theEl.addEventListener('animation-finished', function () { //clunky but whatever - this is the "recommended way" ?!?
+                      theEl.removeAttribute('animation-mixer');
+                    });
+                  }
+                } else {
+                      primaryAudioHowl.pause();
+                      console.log('...tryna pause...');
+                  }
+              });        
+            }
+          } 
+          // this.el.addEventListener('mouseenter2', (evt) =>  {
+          //   console.log("mouseovewr markertype " + this.data.locationData.markerType + " tags" + this.tags );
+          //   if (evt.detail.intersection != null) {
+          //     // this.bubble = theEl.querySelector('.bubble');
+          //     // this.bubbleText = theEl.querySelector('.bubbleText');
+          //     if ((this.tags != null && this.tags.includes("thoughtbubble")) && hasCallout && !textData[textIndex].toLowerCase().includes("undefined")) {
+          //     calloutOn = true;
+          //     this.bubble = sceneEl.querySelector('.bubble');
+          //     this.bubbleText = sceneEl.querySelector('.bubbleText');
+          //     this.bubbleBackground = sceneEl.querySelector('.bubbleBackground');
+          //     this.bubble.setAttribute("visible", true);
+          //     let pos = evt.detail.intersection.point; //hitpoint on model
+          //     this.bubble.setAttribute('position', pos);
+          //     this.bubbleText.setAttribute("visible", true);
+          //     // this.bubbleText.setAttribute('position', pos);
+
+          //     // let pos = new THREE.Vector3();
+          //     // pos = pos.setFromMatrixPosition(obj.matrixWorld); //world pos of model, kindof
+          //     // worldPos = pos;
+          //     let camera = AFRAME.scenes[0].camera; 
+          //     pos.project(camera);
+          //     var width = window.innerWidth, height = window.innerHeight; 
+          //     let widthHalf = width / 2;
+          //     let heightHalf = height / 2;
+          //     pos.x = (pos.x * widthHalf) + widthHalf;
+          //     pos.y = - (pos.y * heightHalf) + heightHalf;
+          //     pos.z = 0;
+          //     // if (pos.x != NaN) { //does it twice because matrix set, disregard if it returns NaN :( //fixed?
+          //     //   console.log("screen position: " + (pos.x/width).toFixed(1) + " " + (pos.y/height).toFixed(1)); //"viewport position"
+          //     // }
+          //     if ((pos.x/width) < .45) {
+          //       console.log("flip left");
+          //       this.bubbleBackground.setAttribute("position", ".5 .2 .5");
+          //       this.bubbleBackground.setAttribute("scale", "-.2 .2 .2"); 
+          //       this.bubbleText.setAttribute("scale", ".2 .2 .2"); 
+          //       this.bubbleText.setAttribute("position", ".5 .2 .55");
+          //     } 
+          //     if ((pos.x/width) > .55) {
+          //       console.log("flip right");
+          //       this.bubbleBackground.setAttribute("position", "-.5 .2 .5");
+          //       this.bubbleBackground.setAttribute("scale", ".2 .2 .2"); 
+          //       this.bubbleText.setAttribute("scale", ".2 .2 .2")
+          //       this.bubbleText.setAttribute("position", "-.5 .2 .55");
+          //     }
+          //     this.bubbleText.setAttribute('text', {
+          //       baseline: "bottom",
+          //       align: "center",
+          //       font: "/fonts/Exo2Bold.fnt",
+          //       anchor: "center",
+          //       wrapCount: 20,
+          //       color: "black",
+          //       value: textData[textIndex]
+          //     });
+
+          //     if (textIndex < textData.length - 1) {
+          //       textIndex++;
+          //     } else {
+          //       textIndex = 0;
+          //       }
+          //     }
+
+          //     // console.log("tryna play audiotrigger " + JSON.stringify(this.data.eventData));
+          //     if (this.data.tags != undefined && this.data.tags != null && this.data.tags != "undefined") {
+          //       console.log("tryna play audio with tags " + this.data.tags);
+          //       if (this.triggerAudioController != null) {
+          //         let distance = window.playerPosition.distanceTo(evt.detail.intersection.point);
+          //         this.triggerAudioController.components.trigger_audio_control.playAudioAtPosition(evt.detail.intersection.point, distance, this.data.tags, 1);//tagmangler needs an array, add vol mod (bc blowing in they face)
+          //       }
+          //     }
+          //   }     
+          // });
+        }
+    }); //end model-loaded listener
 
     this.el.addEventListener('body-loaded', () => {  //body-loaded event = physics ready on obj
       this.el.setAttribute('ammo-shape', {type: that.data.objectData.collidertype.toLowerCase()});
@@ -2911,7 +3367,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
         }
       });
     
-    });
+    }); //end body-loaded listener
 
 
 
@@ -2948,7 +3404,6 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
         }
         // console.log(window.playerPosition);
         if (!this.isSelected && evt.detail.intersection != null) {
-          // document.getElementById("player").component.get_pos_rot.returnPosRot();
           this.clientX = evt.clientX;
           this.clientY = evt.clientY;
           // console.log("tryna mouseover placeholder");
@@ -2963,36 +3418,115 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
           this.rayhit(evt.detail.intersection.object.name, this.distance, evt.detail.intersection.point);
 
             this.selectedAxis = name;
+          ////////TODO - wire in to Hightlight Options / Callout Options in Object view
+          if (this.tags != null && this.tags.includes("thoughtbubble")) {
+            calloutOn = true;
+            this.bubble = sceneEl.querySelector('.bubble');
+            this.bubbleText = sceneEl.querySelector('.bubbleText');
+            this.bubbleBackground = sceneEl.querySelector('.bubbleBackground');
+            this.bubble.setAttribute("visible", true);
+            let pos = evt.detail.intersection.point; //hitpoint on model
+            this.bubble.setAttribute('position', pos);
+            this.bubbleText.setAttribute("visible", true);
+            // this.bubbleText.setAttribute('position', pos);
 
-            let elPos = this.el.getAttribute('position');
-          if (this.calloutEntity != null && this.distance < 20) {
-            this.calloutEntity.setAttribute('visible', false);
-            console.log("trna scale to distance :" + this.distance);
-            this.calloutEntity.setAttribute("position", this.pos);
-            this.calloutEntity.setAttribute('visible', true);
-            this.calloutEntity.setAttribute('scale', {x: this.distance * .25, y: this.distance * .25, z: this.distance * .25} );
-            let theLabel = this.data.objectData.labeltext;
-            let calloutString = theLabel;
-            if (this.calloutLabelSplit.length > 0) {
-              if (this.calloutLabelIndex < this.calloutLabelSplit.length - 1) {
-                this.calloutLabelIndex++;
-              } else {
-                this.calloutLabelIndex = 0;
-              }
-              calloutString = this.calloutLabelSplit[this.calloutLabelIndex];
-            }
-            // if (this.calloutToggle) { //show pos every other time
-            //   // calloutString = "x : " + elPos.x.toFixed(2) + "\n" +"y : " + elPos.y.toFixed(2) + "\n" +"z : " + elPos.z.toFixed(2);
-            //   calloutString = this.data.description != '' ? this.data.description : theLabel;
+            // let pos = new THREE.Vector3();
+            // pos = pos.setFromMatrixPosition(obj.matrixWorld); //world pos of model, kindof
+            // worldPos = pos;
+            let camera = AFRAME.scenes[0].camera; 
+            pos.project(camera);
+            var width = window.innerWidth, height = window.innerHeight; 
+            let widthHalf = width / 2;
+            let heightHalf = height / 2;
+            pos.x = (pos.x * widthHalf) + widthHalf;
+            pos.y = - (pos.y * heightHalf) + heightHalf;
+            pos.z = 0;
+            // if (pos.x != NaN) { //does it twice because matrix set, disregard if it returns NaN :( //fixed?
+            //   console.log("screen position: " + (pos.x/width).toFixed(1) + " " + (pos.y/height).toFixed(1)); //"viewport position"
             // }
+            if ((pos.x/width) < .45) {
+              console.log("flip left");
+              this.bubbleBackground.setAttribute("position", ".5 .2 .5");
+              this.bubbleBackground.setAttribute("scale", "-.2 .2 .2"); 
+              this.bubbleText.setAttribute("scale", ".2 .2 .2"); 
+              this.bubbleText.setAttribute("position", ".5 .2 .55");
+            } 
+            if ((pos.x/width) > .55) {
+              console.log("flip right");
+              this.bubbleBackground.setAttribute("position", "-.5 .2 .5");
+              this.bubbleBackground.setAttribute("scale", ".2 .2 .2"); 
+              this.bubbleText.setAttribute("scale", ".2 .2 .2")
+              this.bubbleText.setAttribute("position", "-.5 .2 .55");
+            }
+            this.bubbleText.setAttribute('text', {
+              baseline: "bottom",
+              align: "center",
+              font: "/fonts/Exo2Bold.fnt",
+              anchor: "center",
+              wrapCount: 20,
+              color: "black",
+              value: this.textData[this.textIndex]
+            });
+
+            if (this.textIndex < this.textData.length - 1) {
+              this.textIndex++;
+            } else {
+              this.textIndex = 0;
+            }
+          } else { //"normal" callout 
+            // document.getElementById("player").component.get_pos_rot.returnPosRot();
+            // this.clientX = evt.clientX;
+            // this.clientY = evt.clientY;
+            // // console.log("tryna mouseover placeholder");
+            // // that.calloutToggle = !that.calloutToggle;
+
+            // this.pos = evt.detail.intersection.point; //hitpoint on model
+            // let name = evt.detail.intersection.object.name;
+            // this.hitPosition = this.pos;
+            // // if (player != null && window.playerPosition != undefined) {
+            // this.distance = window.playerPosition.distanceTo(this.hitPosition);
+            // // console.log("distance  " + this.distance);
+            // this.rayhit(evt.detail.intersection.object.name, this.distance, evt.detail.intersection.point);
+
+            //   this.selectedAxis = name;
+
+            // let elPos = this.el.getAttribute('position');
+            if (this.calloutEntity != null && this.distance < 20) {
+              this.calloutEntity.setAttribute('visible', false);
+              console.log("trna scale to distance :" + this.distance);
+              this.calloutEntity.setAttribute("position", this.pos);
+              this.calloutEntity.setAttribute('visible', true);
+              this.calloutEntity.setAttribute('scale', {x: this.distance * .25, y: this.distance * .25, z: this.distance * .25} );
+              let theLabel = this.data.objectData.labeltext;
+              let calloutString = theLabel;
+              if (this.calloutLabelSplit.length > 0) {
+                if (this.calloutLabelIndex < this.calloutLabelSplit.length - 1) {
+                  this.calloutLabelIndex++;
+                } else {
+                  this.calloutLabelIndex = 0;
+                }
+                calloutString = this.calloutLabelSplit[this.calloutLabelIndex];
+              }
+
             this.calloutText.setAttribute("value", calloutString);
-          }
-          if (this.hasHighlightAction) {
+            }
 
-          }
-        }
+            if (this.hasHighlightAction) {
 
+            }
+          }
+
+          if (this.tags != undefined && this.tags != null && this.tags != "undefined") {
+            console.log("tryna play audio with tags " + this.tags);
+            if (this.triggerAudioController != null) {
+              // let distance = window.playerPosition.distanceTo(this.hitpoint);
+              // this.triggerAudioController.components.trigger_audio_control.playAudioAtPosition(evt.detail.intersection.point, distance, this.tags, 1);//tagmangler needs an array, add vol mod (bc blowing in they face)
+              this.triggerAudioController.components.trigger_audio_control.playAudioAtPosition(this.pos, this.distance, this.tags, 1);
+            }
+          }
+        }     
       }
+      
     });
     
     this.el.addEventListener('mouseleave', (e) => { 
@@ -3002,6 +3536,10 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
         if (this.calloutEntity != null) {
           this.calloutEntity.setAttribute('visible', false);
         }
+        this.bubble = sceneEl.querySelector('.bubble');
+        if (this.bubble) {
+          this.bubble.setAttribute('visible', false);
+        }
       }
     });
    
@@ -3010,7 +3548,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
     this.el.addEventListener('click', (e) => { 
       e.preventDefault();
       // let downtime = (Date.now() / 1000) - this.mouseDownStarttime;
-      console.log("mousedown time "+ this.mouseDowntime + "  on object type: " + this.data.objectData.objtype + " actions " + JSON.stringify(this.data.objectData.actions) + " equipped " + this.data.isEquipped);
+      // console.log("mousedown time "+ this.mouseDowntime + "  on object type: " + this.data.objectData.objtype + " actions " + JSON.stringify(this.data.objectData.actions) + " equipped " + this.data.isEquipped);
       if (!this.data.isEquipped) {
         this.dialogEl = document.getElementById('mod_dialog');
         
@@ -3031,17 +3569,18 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
           console.log("select action " + JSON.stringify(this.selectAction));
           if (this.selectAction.actionResult.toLowerCase() == "trigger fx") {
             if (!this.isTriggered) {
+              // var worldPosition = new THREE.Vector3();
+              // this.el.object3D.getWorldPosition(worldPosition);
               this.isTriggered = true;
               let particleSpawner = document.getElementById('particleSpawner');
               if (particleSpawner != null) {
-                this.loc = this.el.getAttribute('position');
+                var worldPosition = new THREE.Vector3();
+                this.el.object3D.getWorldPosition(worldPosition);
                 if (this.data.objectData.yPosFudge != null && this.data.objectData.yPosFudge != "") {
-                  var worldPosition = new THREE.Vector3();
-                  this.el.object3D.getWorldPosition(worldPosition);
-                  console.log("this.loc.y " + worldPosition + " plus" + this.data.objectData.yPosFudge);
                   worldPosition.y += this.data.objectData.yPosFudge;
                 }
-                particleSpawner.components.particle_spawner.spawnParticles(worldPosition, this.data.objectData.particles, 5, this.el.id, this.data.objectData.yPosFudge, this.data.objectData.color1, this.data.objectData.objScale);
+                console.log("triggering fx at " + JSON.stringify(worldPosition) + " plus" + this.data.objectData.yPosFudge);
+                particleSpawner.components.particle_spawner.spawnParticles(worldPosition, this.data.objectData.particles, 5, null, this.data.objectData.yPosFudge, this.data.objectData.color1, this.data.objectData.triggerScale);
               }
             } else {
               console.log("already triggered - make it a toggle!");
@@ -3110,7 +3649,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
                 }
                 let particle_spawner = particleSpawner.components.particle_spawner;
                 if (particle_spawner != null) {
-                  particleSpawner.components.particle_spawner.spawnParticles(worldPosition, this.data.objectData.particles, 5, this.el.id, this.data.objectData.yPosFudge, this.data.objectData.color1, this.data.objectData.objScale);
+                  particleSpawner.components.particle_spawner.spawnParticles(worldPosition, this.data.objectData.particles, 5, this.el.id, this.data.objectData.yPosFudge, this.data.objectData.color1, this.data.objectData.triggerScale);
                 }
                 
               }
@@ -3326,7 +3865,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
     }
   }
  
-});
+}); //mod_object end
 
 function getRandomIntInclusive(min, max) {
   min = Math.ceil(min);
@@ -3620,7 +4159,7 @@ AFRAME.registerComponent('mod_model', {
       this.shaderMaterial = null;
       this.hasUniforms = false;
       this.start = Date.now();
-      console.log("oScale of model::: " + oScale);
+      // console.log("oScale of model::: " + oScale);
       this.tick = AFRAME.utils.throttleTick(this.tick, 50, this);
       this.triggerAudioController = document.getElementById("triggerAudio");
       this.hasTrigger = false;
@@ -3633,7 +4172,7 @@ AFRAME.registerComponent('mod_model', {
       }      
 
       if (this.data.eventData.length > 1) {
-        console.log("model eventData " + JSON.stringify(this.data.eventData));
+        // console.log("model eventData " + JSON.stringify(this.data.eventData));
         textData = this.data.eventData.split("~");//tilde delimiter splits string to array//maybe use description for text instead? 
 
       }
@@ -3720,14 +4259,14 @@ AFRAME.registerComponent('mod_model', {
           let hasPicPositions = false;
           let hasVidPositions = false;
           let hasAudioPositions = false;
-          camera = AFRAME.scenes[0].camera; //better for THREE operations than querySelector, they say...
+          camera = AFRAME.scenes[0].camera; 
           mixer = new THREE.AnimationMixer( obj );
           clips = obj.animations;
 
           if (clips != null) { 
             for (i = 0; i < clips.length; i++) { //get reference to all anims
               hasAnims = true;
-              console.log("model has animation: " + clips[i].name);
+              // console.log("model has animation: " + clips[i].name);
               
               if (clips[i].name.includes("mouthopen")) {
                 moIndex = i;
@@ -4408,7 +4947,7 @@ AFRAME.registerComponent('mod_model', {
           
         }
         this.el.addEventListener('mouseenter', (evt) =>  {
-          // console.log("mouseovewr markertype " + this.data.markerType);
+          console.log("mouseovewr markertype " + this.data.markerType);
           if (evt.detail.intersection != null) {
             // this.bubble = theEl.querySelector('.bubble');
             // this.bubbleText = theEl.querySelector('.bubbleText');
@@ -4520,20 +5059,52 @@ AFRAME.registerComponent('mod_model', {
         console.log("GOTSA YOUTUBNE EVENT: " + event.detail.isPlaying);  
         if (event.detail.isPlaying) {
           if (danceIndex != -1) { //moIndex = "mouthopen"
+            var clip = danceClips[Math.floor(Math.random()*danceClips.length)];
             theEl.setAttribute('animation-mixer', {
-              "clip": clips[danceIndex].name,
-              "loop": "repeat"
-              // "repetitions": 10,
-              // "timeScale": 2
+              // "clip": clips[danceIndex].name,
+              "clip": clip.name,
+              "loop": "repeat",
+              "crossFadeDuration": 1,
+              "repetitions": Math.floor(Math.random()*2),
+              "timeScale": .75 + Math.random()/2
+            });
+           
+            theEl.addEventListener('animation-finished', function () { 
+              theEl.removeAttribute('animation-mixer');
+              clip = danceClips[Math.floor(Math.random()*danceClips.length)];
+              theEl.setAttribute('animation-mixer', {
+                // "clip": clips[danceIndex].name,
+                "clip": clip.name,
+                "loop": "repeat",
+                "crossFadeDuration": 1,
+                "repetitions": Math.floor(Math.random()*2),
+                "timeScale": .75 + Math.random()/2
+              });
             });
           }
         } else {
           if (idleIndex != -1) { 
+            var clip = idleClips[Math.floor(Math.random()*idleClips.length)];
             theEl.setAttribute('animation-mixer', {
-              "clip": clips[idleIndex].name,
-              "loop": "repeat"
-              // "repetitions": 10,
-              // "timeScale": 2
+              // "clip": clips[danceIndex].name,
+              "clip": clip.name,
+              "loop": "repeat",
+              "crossFadeDuration": 1,
+              "repetitions": Math.floor(Math.random()*2),
+              "timeScale": .75 + Math.random()/2
+            });
+           
+            theEl.addEventListener('animation-finished', function () { //clunky but whatever 
+              theEl.removeAttribute('animation-mixer');
+              clip = idleClips[Math.floor(Math.random()*idleClips.length)];
+              theEl.setAttribute('animation-mixer', {
+                // "clip": clips[danceIndex].name,
+                "clip": clip.name,
+                "loop": "repeat",
+                "crossFadeDuration": 1,
+                "repetitions": Math.floor(Math.random()*2),
+                "timeScale": .75 + Math.random()/2
+              });
             });
           }
         }
@@ -4573,7 +5144,7 @@ AFRAME.registerComponent('mod_model', {
         });
         
 
-      }
+    }
     });
    
   },  //END INIT 

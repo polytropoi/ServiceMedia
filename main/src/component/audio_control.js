@@ -1466,7 +1466,7 @@ AFRAME.registerComponent('trigger_audio_control', { //trigger audio on designate
                     this.audioItem = this.audioGroupsController.returnAudioItem(audioID);
 
                     if (this.audioItem != null) {
-                        // console.log("gotsa audioItem, tryna set trigger to src " + this.audioItem.URLogg);
+                        console.log("gotsa audioItem, tryna set trigger to src " + this.audioItem.URLogg);
                         triggerAudioHowl = null;
                         triggerAudioHowl = new Howl({
                             src: [this.audioItem.URLogg, this.audioItem.URLmp3],
@@ -1494,7 +1494,7 @@ AFRAME.registerComponent('trigger_audio_control', { //trigger audio on designate
                         triggerAudioHowl.rate(rate);
                         // console.log("tryna play at hitpoint " + pos);
                         let id = triggerAudioHowl.play();
-                        // console.log("tryna play trigger at volume " + volume + " distance " + distance + " id " + id); //calling id here is needed
+                        console.log("tryna play trigger at volume " + volume + " distance " + distance + " id " + id); //calling id here is needed
                         triggerAudioHowl.pos(pos.x / 100, pos.y / 100, pos.z / 100, id);  //HOLY SHIT howler needs small values for position, * .01
                         break;
                         }

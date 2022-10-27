@@ -10897,11 +10897,11 @@ function getAllPeople() {
                             "</div>" +
                             "<div class=\x22col form-group col-md-1\x22>" + 
                                 "<label for=\x22colliderScale\x22>Collider Scale</label>" + 
-                                "<input type=\x22number\x22 class=\x22form-control\x22 id=\x22colliderScale\x22 placeholder=\x221\x22 value=\x22" + response.data.colliderScale + "\x22 >" +
+                                "<input type=\x22number\x22 step=\x220.001\x22 class=\x22form-control\x22 id=\x22colliderScale\x22 placeholder=\x221\x22 value=\x22" + response.data.colliderScale + "\x22 >" +
                             "</div>" +
                             "<div class=\x22col form-group col-md-1\x22>" + 
                                 "<label for=\x22triggerScale\x22>Trigger Scale</label>" + 
-                                "<input type=\x22number\x22 class=\x22form-control\x22 id=\x22triggerScale\x22 placeholder=\x221\x22 value=\x22" + response.data.triggerScale + "\x22 >" +
+                                "<input type=\x22number\x22 step=\x220.001\x22 class=\x22form-control\x22 id=\x22triggerScale\x22 placeholder=\x221\x22 value=\x22" + response.data.triggerScale + "\x22 >" +
                             "</div>" +
                             "<div class=\x22col form-group col-md-1\x22>" + 
                                 "<label for=\x22xoffset\x22>Collider Offset X</label>" + 

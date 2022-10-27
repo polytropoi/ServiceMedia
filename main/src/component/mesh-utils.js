@@ -1466,46 +1466,54 @@ AFRAME.registerComponent('cloud_marker', {
     // }
     this.clientX = 0;
     this.clientY = 0;
-    // this.calloutText = calloutText;
-    // calloutText.setAttribute('overlay');
-    // gltf-model=\x22#square_panel\x22
-    this.calloutPanel.setAttribute("gltf-model", "#landscape_panel");
-    this.calloutPanel.setAttribute("scale", ".1 .075 .1");
-    // this.calloutEntity.getObject3D("mesh").scale()
-    this.calloutEntity.setAttribute("look-at", "#player");
-    this.calloutEntity.setAttribute('visible', false);
     this.selectedAxis = null;
     this.isSelected = false;
     this.hitPosition = null;
     this.mouseDownPos = new THREE.Vector2();
     this.mousePos = new THREE.Vector2();
     this.distance = 0;
-    // calloutEntity.setAttribute("render-order", "hud");
-    sceneEl.appendChild(this.calloutEntity);
-    this.calloutEntity.appendChild(this.calloutPanel);
-    this.calloutEntity.appendChild(this.calloutText);
-    this.calloutPanel.setAttribute("position", '0 0 1'); 
-    this.calloutPanel.setAttribute("overlay");
-    // this.calloutText.setAttribute("size", ".1 .1 .1");
-    this.calloutText.setAttribute("position", '0 0 1.25'); //offset the child on z toward camera, to prevent overlap on model
-    this.calloutText.setAttribute('text', {
-      width: .5,
-      baseline: "bottom",
-      align: "left",
-      font: "/fonts/Exo2Bold.fnt",
-      anchor: "center",
-      wrapCount: 12,
-      color: "white",
-      value: "wha"
-    });
+    // this.calloutText = calloutText;
+    // calloutText.setAttribute('overlay');
+    // gltf-model=\x22#square_panel\x22
+    if (!this.data.tags.includes("hide callout") && !this.data.tags.includes("hide callout")) {
+      this.calloutPanel.setAttribute("gltf-model", "#landscape_panel");
+      this.calloutPanel.setAttribute("scale", ".1 .075 .1");
+      // this.calloutEntity.getObject3D("mesh").scale()
+      this.calloutEntity.setAttribute("look-at", "#player");
+      this.calloutEntity.setAttribute('visible', false);
+      // this.selectedAxis = null;
+      // this.isSelected = false;
+      // this.hitPosition = null;
+      // this.mouseDownPos = new THREE.Vector2();
+      // this.mousePos = new THREE.Vector2();
+      // this.distance = 0;
+      // calloutEntity.setAttribute("render-order", "hud");
+      sceneEl.appendChild(this.calloutEntity);
+      this.calloutEntity.appendChild(this.calloutPanel);
+      this.calloutEntity.appendChild(this.calloutText);
+      this.calloutPanel.setAttribute("position", '0 0 1'); 
+      this.calloutPanel.setAttribute("overlay");
+      // this.calloutText.setAttribute("size", ".1 .1 .1");
+      this.calloutText.setAttribute("position", '0 0 1.25'); //offset the child on z toward camera, to prevent overlap on model
+      this.calloutText.setAttribute('text', {
+        width: .5,
+        baseline: "bottom",
+        align: "left",
+        font: "/fonts/Exo2Bold.fnt",
+        anchor: "center",
+        wrapCount: 12,
+        color: "white",
+        value: "wha"
+      });
+    }
+      // this.el.addEventListener("model-loaded", (e) => {
+      //   e.preventDefault();
+      //   this.el.setAttribute("aabb_listener", true);
+      // });
+      this.calloutText.setAttribute("overlay");
+    
+      this.calloutToggle = false;
 
-    // this.el.addEventListener("model-loaded", (e) => {
-    //   e.preventDefault();
-    //   this.el.setAttribute("aabb_listener", true);
-    // });
-    this.calloutText.setAttribute("overlay");
-   
-    this.calloutToggle = false;
     let that = this;
 
 
@@ -1541,7 +1549,7 @@ AFRAME.registerComponent('cloud_marker', {
 
         // let elPos = that.el.getAttribute('position');
         // console.log(pos);
-        if (!name.includes("handle")) {
+        if (!name.includes("handle") && that.calloutEntity != null) {
           // console.log("tryna show the callout");
           if (that.distance < 66) {
           that.calloutEntity.setAttribute("position", pos);
@@ -1900,36 +1908,32 @@ AFRAME.registerComponent('particle_spawner',
     color: {default: 'lightblue'},
     scale: {default: 10}
   },
-	init: function()
-	{
-    console.log("tyrna init particles!!!");
-	},
+	// init: function()
+	// {
+  //   // console.log("tyrna init particles!!!");
+	// },
   spawnParticles: function (location, type, lifetime, parentID, yFudge, pColor, pScale) {
     
-    // console.log("mod_particles data: " + JSON.stringify(location));
+    console.log("particle_spawner mod_particles location data: " + JSON.stringify(location) + " scale " + pScale);
     this.particle = document.createElement("a-entity");
-    if (pScale == null || pScale == undefined) {
+    if (pScale == NaN || pScale == null || pScale == undefined) {
       pScale = 10;
     } else {
       pScale = pScale * 10;
     } 
   
-    this.particle.setAttribute("mod_particles", {'type': type, 'lifetime': lifetime, 'parentID': parentID, 'yFudge': yFudge, 'color': pColor, 'scale': pScale});
     
-
- 
-    // this.particle.setAttribute("type", type);
-    // this.particle.setAttribute("lifetime", lifetime);
     if (parentID != null) { 
-
       let pparent = document.getElementById(parentID);
       let obj = pparent.object3D;
-   
       let box = new THREE.Box3().setFromObject(obj); //bounding box for position
       let center = new THREE.Vector3();
       box.getCenter(center);
       let pos =  obj.worldToLocal(center);
       console.log("premod pos " + JSON.stringify(pos));
+      pparent.appendChild(this.particle);
+      this.particle.setAttribute("position", JSON.stringify(pos));
+
       if (yFudge != null) {
         let newPos = {};
         newPos.x = pos.x;
@@ -1937,21 +1941,16 @@ AFRAME.registerComponent('particle_spawner',
         newPos.z = pos.z;
         console.log("tryna mod "+JSON.stringify(newPos)+" yfudge " + yFudge);
         this.particle.setAttribute("position", newPos);
+        this.particle.setAttribute("mod_particles", {'location': location, 'type': type, 'lifetime': lifetime, 'parentID': parentID, 'yFudge': yFudge, 'color': pColor, 'scale': pScale});
       } else {
         this.particle.setAttribute("position", pos);
+        this.particle.setAttribute("mod_particles", {'location': location, 'type': type, 'lifetime': lifetime, 'parentID': parentID, 'yFudge': yFudge, 'color': pColor, 'scale': pScale});
       }
-
-      var worldPosition = new THREE.Vector3();
-        obj.getWorldPosition(worldPosition);
-     
-       //get centerpoint of geometry, in localspace
-       //set position as local to 
-
-      pparent.appendChild(this.particle);
-
+      
     } else {
-      this.particle.setAttribute("position", location);
       this.el.sceneEl.appendChild(this.particle);
+      this.particle.setAttribute("position", location);
+      this.particle.setAttribute("mod_particles", {'location': location, 'type': type, 'lifetime': lifetime, 'parentID': parentID, 'yFudge': yFudge, 'color': pColor, 'scale': pScale});
     }
     
   }
@@ -2002,46 +2001,54 @@ AFRAME.registerComponent('mod_particles', {
   },
   init: function() {
     // let particleAttributes = {};
-    console.log("mod_particles data: " + JSON.stringify(this.data));
+    console.log("mod_particles data: " + this.data.scale);
     this.position = new THREE.Vector3();
-    this.el.object3D.getWorldPosition(this.position);
-   
-    if (this.data.parentID != null) {
-      // if (this.data.yFudge != 0) {
-      //   this.position.y += this.data.yFudge;
-      //   console.log("tryna add some yfudge " + this.data.yFudge); 
-      //   this.el.setAttribute("position", this.position);
-      // }
 
+    if (this.data.scale == null || this.data.scale == 0) {
+      this.data.scale = 1;
     }
+    // if (this.data.parentID != null) {
+    //   this.el.parentElement.object3D.getWorldPosition(this.position);
+    //   if (this.data.yFudge != 0) {
+    //     this.position.y += this.data.yFudge;
+    //     console.log("tryna add some yfudge " + this.data.yFudge); 
+    //     this.el.setAttribute("position", this.position);
+    //   }
+    // } else {
+    //   this.el.object3D.getWorldPosition(this.position);
+    // }
     if (this.data.type.toLowerCase() =="candle") {
       // this.el.setAttribute('scale', '.25 .25 .25');
-      this.el.setAttribute('sprite-particles', {texture: '#candle1', color: 'yellow', textureFrame: '8 8', textureLoop: '4', spawnRate: '1', lifeTime: '1', scale: '2'});
-      this.el.setAttribute('light', {type: 'point', castShadow: 'true', color: 'yellow', intensity: .5, distance: 10, decay: 5});
+      this.el.setAttribute('sprite-particles', {enable: true, texture: '#candle1', color: this.data.color, textureFrame: '8 8', textureLoop: '4', spawnRate: '1', lifeTime: '1', scale: this.data.scale.toString()});
+      this.el.setAttribute('light', {type: 'point', castShadow: 'true', color: this.data.color, intensity: .5, distance: 10, decay: 5});
       this.lightAnimation(.5, .75);
       this.el.addEventListener('animationcomplete', () => {
           this.lightAnimation(.5, .75);
       });
+
     }
         
     if (this.data.type.toLowerCase() =="fire") {
       // this.el.setAttribute('scale', '.25 .25 .25');
-      this.el.setAttribute('sprite-particles', {texture: '#fireanim1', color: 'yellow', blending: 'additive', textureFrame: '6 6', textureLoop: '3', spawnRate: '2', lifeTime: '1.1', scale: '12'});
-      this.el.setAttribute('light', {type: 'point', castShadow: 'true', color: 'yellow', intensity: .75, distance: 15, decay: 8});
+      console.log("tryna light a fire! "  + JSON.stringify(this.data.location) + " scale " + this.data.scale);
+      this.el.setAttribute('sprite-particles', {enable: true, texture: '#fireanim1', color: this.data.color, blending: 'additive', textureFrame: '6 6', textureLoop: '3', spawnRate: '2', lifeTime: '1.1', scale: this.data.scale.toString()});
+      this.el.setAttribute('light', {type: 'point', castShadow: 'true', color: this.data.color, intensity: .75, distance: 15, decay: 8});
       this.lightAnimation(.7, 1.5);
       this.el.addEventListener('animationcomplete', () => {
           this.lightAnimation(.7, 1.5);
       });
+      // this.el.setAttribute("position", this.data.location);
     }
     if (this.data.type.toLowerCase() =="smoke") {
-      
-      this.el.setAttribute('sprite-particles', {texture: '#smoke1', color: this.data.color, blending: 'additive', textureFrame: '6 5', textureLoop: '1', spawnRate: '1', lifeTime: '3', scale: this.data.scale.toString()});
+      console.log("tryna light a smoke! " + JSON.stringify(this.data.location) + " scale " + this.data.scale );
+      this.el.setAttribute('sprite-particles', {enable: true, texture: '#smoke1', color: this.data.color, blending: 'additive', textureFrame: '6 5', textureLoop: '1', spawnRate: '1', lifeTime: '3', scale: this.data.scale.toString()});
+      // this.el.setAttribute("position", this.data.location);
     }
     if (this.data.type.toLowerCase() =="smoke/add") {
-      this.el.setAttribute('sprite-particles', {texture: '#smoke1', color: 'lightblue', blending: 'additive', textureFrame: '6 5', textureLoop: '1', spawnRate: '1', lifeTime: '3', scale: '10'});
+      this.el.setAttribute('sprite-particles', {enable: true, texture: '#smoke1', color: 'lightblue', blending: 'additive', textureFrame: '6 5', textureLoop: '1', spawnRate: '1', lifeTime: '3', scale: '10'});
     }
     if (this.data.type.toLowerCase() =="smoke/add") {
-      this.el.setAttribute('sprite-particles', {texture: '#smoke1', color: 'lightblue', blending: 'additive', textureFrame: '6 5', textureLoop: '1', spawnRate: '1', lifeTime: '3', scale: '10'});
+      this.el.setAttribute('sprite-particles', {enable: true, texture: '#smoke1', color: 'lightblue', blending: 'additive', textureFrame: '6 5', textureLoop: '1', spawnRate: '1', lifeTime: '3', scale: '10'});
     }
     // this.el.setAttribute('sprite-particles', 'texture', '#smoke1');
     // this.el.setAttribute('sprite-particles', 'color', 'blue');
