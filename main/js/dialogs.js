@@ -1153,7 +1153,7 @@ function GetUserInventory () {
        inviteInput.style.display = "block";
     }
   } else {
-    inventoryDisplayEl.innerHTML = "You must be <a href=\x22../main/login.html\x22>logged in</a> to access your inventory";
+    inventoryDisplayEl.innerHTML = "You must be <a href=\x22../main/login.html\x22>logged in</a> to access your inventory <button class=\x22uploadButton \x22 style=\x22float: right;\x22 onclick=\x22DequipInventoryItem()\x22>Dequip</button>";
   }
 }
 
