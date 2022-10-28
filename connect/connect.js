@@ -567,13 +567,18 @@ function SnapLocation(locationKey) { //snap selected object to player loc
    if (this.snapEl != null) {
       // let scale = this.snapEl.getAttribute("scale");
       // this.snapEl.setAttribute("scale", 1);
-      this.snapEl.setAttribute('position', this.cameraPosition);
+      let snapx = cameraPosition.x.toFixed(2);
+      let snapy = cameraPosition.y.toFixed(2);
+      let snapz = cameraPosition.z.toFixed(2);
       // this.snapEl.setAttribute("scale", scale);
-         document.getElementById('xpos').value = cameraPosition.x.toFixed(2); //update elements in the modal dialog
-         document.getElementById('ypos').value = cameraPosition.y.toFixed(2);
-         document.getElementById('zpos').value = cameraPosition.z.toFixed(2);
-         SaveModToLocal(locationKey) 
-      }
+         document.getElementById('xpos').value = snapx; //update elements in the modal dialog
+         document.getElementById('ypos').value = snapy;
+         document.getElementById('zpos').value = snapz;
+         SaveModToLocal(locationKey);
+         this.snapEl.setAttribute('position', {"x": snapx, "y": snapy, "z": snapz});
+      } else {
+         console.log("couldnot find this.snapEl " + locationKey);
+      } 
 }
 
 function GoToLocation(locationKey) {

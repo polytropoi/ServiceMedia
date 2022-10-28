@@ -7380,6 +7380,12 @@ app.post('/add_group_item/', requiredAuthentication, function (req, res) { //dun
         if (err || !group) {
             console.log("error getting group: " + err);
         } else {  //TODO check for proper type?
+            if (group.groupdata == undefined || group.groupdata == null) {
+                group.groupdata = [];
+            }
+            if (group.items == undefined || group.items == null) {
+                group.items = [];
+            }
             newGroupData = group.groupdata;
             newItems = group.items;
             newItems.push(req.body.item_id);
@@ -7389,9 +7395,9 @@ app.post('/add_group_item/', requiredAuthentication, function (req, res) { //dun
             newGroupItem.itemIndex = newGroupData.length; // ""?
             newGroupData.push(newGroupItem); // ""?
             db.groups.update( { "_id": o_id }, { $set: {
-                    groupdata : newGroupData, // ""?
-                    lastUpdateTimestamp: timestamp,
-                    items: newItems
+                        groupdata : newGroupData, // ""?
+                        lastUpdateTimestamp: timestamp,
+                        items: newItems
                     }
                 }, function (err, rezponse) {
                     if (err || !rezponse) {

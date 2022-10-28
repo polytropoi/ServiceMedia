@@ -525,7 +525,7 @@ AFRAME.registerComponent('instanced_surface_meshes', {
               // this.iMesh.setColorAt( this.instanceId, this.highlightColor.setHex( Math.random() * 0xffffff ) );
               // this.iMesh.instanceColor.needsUpdate = true;
               // console.log('windowplayerposition ' + JSON.stringify(window.playerPosition));
-              if (this.data.tags != undefined) {
+              if (this.data.tags != undefined && window.playerPosition != undefined && window.playerPosition) {
                 this.distance = window.playerPosition.distanceTo(this.intersection[0].point);
                 this.hitpoint = this.intersection[0].point;
                 this.rayhit(this.instanceId, this.distance, this.hitpoint); 
@@ -1580,23 +1580,25 @@ AFRAME.registerComponent('cloud_marker', {
       // that.hitPosition = evt.detail.intersection.point;
 
       console.log("tryna mousedouwn" + this.mouseDownPos);
-      let name = evt.detail.intersection.object.name;
-      // console.log(name);
-      // if (name == "x_handle") {
-      //   that.selectedAxis = 'x';
-      // } else if (name == "y_handle") {
-      //   that.selectedAxis = 'y';
-      // } else if (name == "z_handles") {
-      //   that.selectedAxis = 'z';
-      // } else {
-      //   that.selectedAxis = 'all';
-      // }
-      that.selectedAxis = name;
-      // document.getElementById("player").component.get_pos_rot.returnPosRot();
-      if (window.playerPosition != null) {
-        // 
-        // console.log("intersection! " + this.intersection[ 0 ].instanceId + " distance " + window.playerPosition.distanceTo(this.intersection[0].point));
-        that.rayhit(evt.detail.intersection.object.name, window.playerPosition.distanceTo(evt.detail.intersection.point), evt.detail.intersection.point);
+      if (evt.detail.intersection.object != null) {
+        let name = evt.detail.intersection.object.name;
+        // console.log(name);
+        // if (name == "x_handle") {
+        //   that.selectedAxis = 'x';
+        // } else if (name == "y_handle") {
+        //   that.selectedAxis = 'y';
+        // } else if (name == "z_handles") {
+        //   that.selectedAxis = 'z';
+        // } else {
+        //   that.selectedAxis = 'all';
+        // }
+        that.selectedAxis = name;
+        // document.getElementById("player").component.get_pos_rot.returnPosRot();
+        if (window.playerPosition != null) {
+          // 
+          // console.log("intersection! " + this.intersection[ 0 ].instanceId + " distance " + window.playerPosition.distanceTo(this.intersection[0].point));
+          that.rayhit(evt.detail.intersection.object.name, window.playerPosition.distanceTo(evt.detail.intersection.point), evt.detail.intersection.point);
+        }
       }
       
     });

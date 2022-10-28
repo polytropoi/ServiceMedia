@@ -2606,13 +2606,13 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
     this.hasThrowAction = false;
     this.hasShootAction = false;
 
-    if (this.tags != null && !this.tags.includes("thoughtbubble") && !this.tags.includes("hide callout")  ) { //TODO implement Callout Options!
+    if ((this.tags != null && !this.tags.includes("thoughtbubble")) && !this.tags.includes("hide callout")) { //TODO implement Callout Options!
       if (this.data.objectData.callouttext != undefined && this.data.objectData.callouttext != null && this.data.objectData.callouttext.length > 0) {
         if (this.data.objectData.callouttext.includes('~')) {
           this.calloutLabelSplit = this.data.objectData.callouttext.split('~'); 
           this.textData = this.calloutLabelSplit;
         }
-        
+        console.log(this.data.objectData.name + "callouttext " + this.data.objectData.callouttext );
         this.calloutEntity = document.createElement("a-entity");
         this.calloutPanel = document.createElement("a-entity");
         this.calloutText = document.createElement("a-text");
@@ -3197,7 +3197,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
                       "repetitions": 10,
                       "timeScale": 2
                     });
-                    theEl.addEventListener('animation-finished', function () { //clunky but whatever - this is the "recommended way" ?!?
+                    theEl.addEventListener('animation-finished', function () { 
                       theEl.removeAttribute('animation-mixer');
                     });
                   }
@@ -3406,7 +3406,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
         if (!this.isSelected && evt.detail.intersection != null) {
           this.clientX = evt.clientX;
           this.clientY = evt.clientY;
-          // console.log("tryna mouseover placeholder");
+          console.log("tryna mouseover " + this.data.objectData.name);
           // that.calloutToggle = !that.calloutToggle;
 
           this.pos = evt.detail.intersection.point; //hitpoint on model
@@ -3477,7 +3477,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
             // document.getElementById("player").component.get_pos_rot.returnPosRot();
             // this.clientX = evt.clientX;
             // this.clientY = evt.clientY;
-            // // console.log("tryna mouseover placeholder");
+            console.log("tryna callout " + this.calloutEntity.id);
             // // that.calloutToggle = !that.calloutToggle;
 
             // this.pos = evt.detail.intersection.point; //hitpoint on model
@@ -3522,6 +3522,18 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
               // let distance = window.playerPosition.distanceTo(this.hitpoint);
               // this.triggerAudioController.components.trigger_audio_control.playAudioAtPosition(evt.detail.intersection.point, distance, this.tags, 1);//tagmangler needs an array, add vol mod (bc blowing in they face)
               this.triggerAudioController.components.trigger_audio_control.playAudioAtPosition(this.pos, this.distance, this.tags, 1);
+              if (moIndex != -1) { //moIndex = "mouthopen"
+                this.el.setAttribute('animation-mixer', {
+                  "clip": clips[moIndex].name,
+                  "loop": "repeat",
+                  "repetitions": 10,
+                  "timeScale": 2
+                });
+                this.el.addEventListener('animation-finished', (e) => { //clunky but whatever - this is the "recommended way" ?!?
+                  e.preventDefault();
+                  this.el.removeAttribute('animation-mixer');
+                });
+              }
             }
           }
         }     

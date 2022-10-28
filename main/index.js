@@ -6581,7 +6581,7 @@
                 "</form>" +
           
                 "<button type=\x22button\x22 class=\x22btn btn-sm btn-info float-right\x22 id=\x22grabVideoFrame\x22>Grab Video Frame</button><br><br><br>" +
-                "<a type=\x22button\x22 href=\x22/stream/video/?vid="+response.data._id+"\x22 target=\x22_blank\x22 class=\x22btn btn-sm btn-success float-right\x22>Test HLS Stream</a><br><br><br>" +
+                "<a type=\x22button\x22 href=\x22/test/video/?vid="+response.data._id+"\x22 target=\x22_blank\x22 class=\x22btn btn-sm btn-success float-right\x22>Test HLS Stream</a><br><br><br>" +
                 
                 "<button type=\x22button\x22 class=\x22btn btn-sm btn-warning float-right\x22 id=\x22encodeHLS\x22>Encode to HLS</button>" +
                 "<button type=\x22button\x22 class=\x22btn btn-sm btn-danger float-left\x22 onclick=\x22deleteItem('video','" + item_id + "')\x22>Delete Video</button>" +
