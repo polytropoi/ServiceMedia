@@ -1410,7 +1410,7 @@ function RandomHexColor() {
          // pAvatar.setAttribute('position', posX + " " + posY + " " + posZ);
          // pAvatar.setAttribute('rotation', rotX + " " + rotY + " " + rotZ);
       } else {
-         UpdatePlayerAvatars();
+         UpdatePlayerAvatars(roomUsers);
       }
       EmitSelfPosition();
    });
@@ -1694,8 +1694,9 @@ AFRAME.registerComponent('create_avatars', {
  });
 }
 function UpdatePlayerAvatars(roomUsers) { //aframe only, need to flex.. //no, just make this a component function, to avoid creating a-entities outside of aframe
-   // console.log("tryna UpdatePlayerAvatars" + window.sceneType);
-   if (sceneEl != null && window.sceneType == "aframe" && !settings.hideAvatars) {
+   console.log("tryna UpdatePlayerAvatars" + JSON.stringify(roomUsers));
+   
+   if (sceneEl != null && window.sceneType == "aframe" && !settings.hideAvatars && roomUsers) {
       var keys = Object.keys(roomUsers);
       var alreadyCreated = ""; //temp string to prevent doubles
       for(var i=0; i<keys.length; i++) { //create new avatars as needed
