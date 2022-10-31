@@ -1026,13 +1026,14 @@ webxr_router.get('/:_id', function (req, res) {
                                 if (useSimpleNavmesh) {
                                     //simple navmesh can use 
                                     wasd = "extended-wasd-controls=\x22fly: false; moveSpeed: 5; inputType: keyboard\x22 simple-navmesh-constraint=\x22navmesh:#navmesh-el;fall:10; height:1.6;\x22";
+                                    // wasd = "wasd-controls=\x22fly: true; acceleration: 35\x22 ";
                                     
                                 } 
                                 // let follower = "";
                                 if (sceneResponse.sceneCameraMode != undefined && sceneResponse.sceneCameraMode.toLowerCase().includes("third person")) {
-                                    wasd = "wasd-controls=\x22fly: true; acceleration: 35\x22";
+                                    wasd = "wasd-controls=\x22fly: true; acceleration: 75\x22 simple-navmesh-constraint=\x22navmesh:#navmesh-el;fall:10; height:0;\x22";
                                     // wasd = "extended-wasd-controls=\x22flyEnabled: false; moveSpeed: 4; inputType: keyboard\x22";
-                                    camera = "<a-entity look-controls follow-box=\x22target: #player\x22>" +
+                                    camera = "<a-entity look-controls follow-camera=\x22target: #player\x22>" +
                                         "<a-entity camera position=\x220 1.6 5\x22 ></a-entity>" +
                                     "</a-entity>"+
                                     "<a-entity id=\x22cameraRig\x22 initializer "+
@@ -1040,7 +1041,7 @@ webxr_router.get('/:_id', function (req, res) {
                                         " id=\x22mouseCursor\x22 cursor=\x22rayOrigin: mouse\x22 raycaster=\x22objects: .activeObjexRay\x22>"+
                                         
                                        
-                                        "<a-entity id=\x22player\x22 rotate-with-camera "+wasd+" "+ physicsMod +" position=\x22"+playerPosition+"\x22>"+
+                                        "<a-entity id=\x22player\x22  rotate-with-camera "+wasd+" "+ physicsMod +" position=\x22"+playerPosition+"\x22>"+
                                             "<a-entity id=\x22equipPlaceholder\x22 geometry=\x22primitive: box; height: .1; width: .1; depth: .1\x22 position=\x220 -.65 -.75\x22"+
                                             "material=\x22opacity: 0\x22></a-entity>"+
                                             "<a-entity id=\x22viewportPlaceholder\x22 geometry=\x22primitive: plane; height: 0.01; width: .01\x22 position=\x220 0 -1.5\x22"+

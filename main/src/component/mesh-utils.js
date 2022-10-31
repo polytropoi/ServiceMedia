@@ -2122,32 +2122,41 @@ AFRAME.registerComponent('emit-when-near', {
 });
 /////// for third person camera, see
 ///https://stackoverflow.com/questions/71336022/how-can-i-get-a-third-person-perspective-for-a-model-using-aframe
-AFRAME.registerComponent("follow-box", {
+AFRAME.registerComponent("follow-camera", {
   schema: {
     target: {type: "selector"}
   },
   init: function () {
-    // this.tick = AFRAME.utils.throttleTick(this.tick, 50, this);
-    
+    // this.tick = AFRAME.utils.throttleTick(this.tick, 500, this);
+    this.tmpv = new THREE.Vector3();
+    this.target = this.data.target.object3D;
+    this.position = new THREE.Vector3();
+    this.iValue = 1;
+    this.t = 0;
   },
-  tick: (function() {
-    // create once
-    const tmpv = new THREE.Vector3();
+  moveCamera: function () {
 
-    return function(t, dt) {
-      if (!this.data.target) return; // ignore when there is no target
-      const target = this.data.target.object3D; // get the mesh
+  },
+  tick: function(t, dt) {
+   
+      if (!this.target) return; // ignore when there is no target
+      // const target = this.data.target.object3D; // get the mesh
       // track the position
-      const position = target.getWorldPosition(tmpv); // get the world position
-      this.el.object3D.position.lerp(tmpv, .2); // linear interpolation towards the world position
-    }
-  })()
+      this.target.getWorldPosition(this.tmpv); // get the world position
+      this.t = 
+      this.iValue = 1.0 - Math.pow(0.001, (dt * .001)); //HELLYES! smooth interpolation independent of frame rate 
+      // console.log("tryna interpoolate at " + this.iValue + " posotion " + JSON.stringify(this.tmpv) + " time " + dt);
+      this.el.object3D.position.lerp(this.tmpv, this.iValue); // linear interpolation towards the world position
+    // }
+  }
 });
 AFRAME.registerComponent("rotate-with-camera", {
   
   init: function () {
     // this.tick = AFRAME.utils.throttleTick(this.tick, 50, this);
-    this.thirPersonPlaceholder = document.getElementById("thirdPersonPlaceholder");
+    this.thirdPersonPlaceholder = document.getElementById("thirdPersonPlaceholder");
+    // this.tick = AFRAME.utils.throttleTick(this.tick, 500, this);
+
   },
   tick: (function() {
     // create once
