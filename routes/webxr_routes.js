@@ -1025,13 +1025,13 @@ webxr_router.get('/:_id', function (req, res) {
                                 }
                                 if (useSimpleNavmesh) {
                                     //simple navmesh can use 
-                                    wasd = "extended-wasd-controls=\x22fly: false; moveSpeed: 5; inputType: keyboard\x22 simple-navmesh-constraint=\x22navmesh:#navmesh-el;fall:10; height:1.6;\x22";
+                                    wasd = "extended-wasd-controls=\x22fly: false; moveSpeed: "+sceneResponse.scenePlayer.playerSpeed+"; inputType: keyboard\x22 simple-navmesh-constraint=\x22navmesh:#navmesh-el;fall:10; height:"+sceneResponse.scenePlayer.playerHeight+"\x22";
                                     // wasd = "wasd-controls=\x22fly: true; acceleration: 35\x22 ";
                                     
                                 } 
                                 // let follower = "";
                                 if (sceneResponse.sceneCameraMode != undefined && sceneResponse.sceneCameraMode.toLowerCase().includes("third person")) {
-                                    wasd = "wasd-controls=\x22fly: true; acceleration: 75\x22 simple-navmesh-constraint=\x22navmesh:#navmesh-el;fall:10; height:0;\x22";
+                                    wasd = "wasd-controls=\x22fly: true; acceleration: "+sceneResponse.scenePlayer.playerSpeed+"\x22 simple-navmesh-constraint=\x22navmesh:#navmesh-el;fall:10; height:0;\x22";
                                     // wasd = "extended-wasd-controls=\x22flyEnabled: false; moveSpeed: 4; inputType: keyboard\x22";
                                     camera = "<a-entity look-controls follow-camera=\x22target: #player\x22>" +
                                         "<a-entity camera position=\x220 1.6 5\x22 ></a-entity>" +
