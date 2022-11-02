@@ -2167,7 +2167,7 @@ AFRAME.registerComponent("rotate-with-camera", {
       if (!this.el.sceneEl.camera) return; // ignore when there is no camera
       const cam = this.el.sceneEl.camera.el; // get the camera entity
       cam.object3D.getWorldQuaternion(tmpq); // get the world rotation
-        tmpe.setFromQuaternion(tmpq, 'YXZ')
+        tmpe.setFromQuaternion(tmpq, 'YXZ');
         // set attribute is necesarry for wasd-controls
         // console.log("tryna rotoate y to " +  tmpe.y * 180 / Math.PI);
       

@@ -433,8 +433,8 @@ AFRAME.registerComponent('extended-wasd-controls', {
 		{
 			// this code is only useful when trying to combine 
 			//   look-controls with extended-wasd rotation
-			// totalTurnAngle += this.lookControls.yawObject.rotation.y;
-			// totalLookAngle += this.lookControls.pitchObject.rotation.x;
+			totalTurnAngle += this.lookControls.yawObject.rotation.y;
+			totalLookAngle += this.lookControls.pitchObject.rotation.x;
 		}
 		else
 		{
