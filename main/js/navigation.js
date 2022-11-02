@@ -401,7 +401,12 @@ AFRAME.registerComponent('extended-wasd-controls', {
 		this.lookAngle = 0; // around local X axis
 
 		// this will = null or an object
-		this.lookControls = this.el.components["look-controls"];
+    this.lookControlElement = document.querySelectorAll("[look-controls]")[0];
+    this.lookControls = null;
+    if (this.lookControlElement) {
+      this.lookControls = this.lookControlElement.components["look-controls"];
+    }
+		
 		
 		// allows easy extraction of turn angle
 		this.el.object3D.rotation.order = 'YXZ';
@@ -434,10 +439,11 @@ AFRAME.registerComponent('extended-wasd-controls', {
 			// this code is only useful when trying to combine 
 			//   look-controls with extended-wasd rotation
 			totalTurnAngle += this.lookControls.yawObject.rotation.y;
-			totalLookAngle += this.lookControls.pitchObject.rotation.x;
+			// totalLookAngle += this.lookControls.pitchObject.rotation.x;
+      // console.log(totalLookAngle);
 		}
-		else
-		{
+		// else
+		// {
 			if (this.data.inputType == "keyboard") {
 				// need to reset rotatePercent values
 				//   when querying which keys are currently pressed
@@ -469,8 +475,14 @@ AFRAME.registerComponent('extended-wasd-controls', {
 
 			if ( this.data.turnEnabled )
 			{
-				this.turnAngle += this.rotatePercent.y * turnAmount;
-				this.el.object3D.rotation.y = this.turnAngle;
+        if (this.lookControls) {
+          this.turnAngle = totalTurnAngle; //for third person cam, has look controller on parent, just need to mod the y
+        } else {
+          this.turnAngle += this.rotatePercent.y * turnAmount;
+
+        }
+        this.el.object3D.rotation.y = this.turnAngle;
+			
 			}
 
 			// enforce bounds on look angle (avoid upside-down perspective) 
@@ -481,7 +493,7 @@ AFRAME.registerComponent('extended-wasd-controls', {
 				if (this.lookAngle < -maxLookAngle)
 					this.lookAngle = -maxLookAngle;
 			}
-		}
+		// }
 
 		// translations
 
@@ -503,9 +515,9 @@ AFRAME.registerComponent('extended-wasd-controls', {
 				this.movePercent.z -= 1;
 
 			if (this.isKeyPressed(this.data.moveRightKey))
-				this.movePercent.x += 1;
+				this.movePercent.x += .5;
 			if (this.isKeyPressed(this.data.moveLeftKey))
-				this.movePercent.x -= 1;
+				this.movePercent.x -= .5;
 
 			if ( this.data.flyEnabled )
 			{
