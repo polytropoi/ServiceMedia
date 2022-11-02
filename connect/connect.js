@@ -588,22 +588,25 @@ function GoToLocation(locationKey) {
    if (targetEl != null) { 
       let targetLocation = targetEl.getAttribute('position');
       if (targetLocation != null) {
-      // console.log("tryna playerToLocation: " +JSON.stringify(targetLocation));
-      if (player == null) {
-         player = document.getElementById('player');
-      }
+      
+         if (player == null) {
+            player = document.getElementById('player');
+         }
 
-            let worldPos = new THREE.Vector3();
-            // location.getWorldPosition(worldPos);
-      worldPos = {x: targetLocation.x, y: targetLocation.y + 1, z: targetLocation.z + 3};
-            // cameraEl.object3D.getWorldPosition( cameraPosition );
-      //       const zmod = worldPos.z + 5;
-      //       const ymod = worldPos.y - 1;
-      //       const xmod = worldPos.x;
-      // let pos = {x: xmod, y: ymod, z: zmod};
-      player.setAttribute('position', worldPos);
-      window.playerPosition = worldPos;
-      // ShowHideDialogPanel(); 
+               let worldPos = new THREE.Vector3();
+               // location.getWorldPosition(worldPos);
+         worldPos = {'x': targetLocation.x, 'y': targetLocation.y + 1, 'z': targetLocation.z + 3};
+               // cameraEl.object3D.getWorldPosition( cameraPosition );
+         //       const zmod = worldPos.z + 5;
+         //       const ymod = worldPos.y - 1;
+         //       const xmod = worldPos.x;
+         // let pos = {x: xmod, y: ymod, z: zmod};
+
+         player.setAttribute('position', worldPos);
+         console.log("tryna playerToLocation: " + player.getAttribute('position'));
+         window.playerPosition = worldPos;
+
+         // ShowHideDialogPanel(); 
       } 
    }
 }
