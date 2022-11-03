@@ -948,7 +948,7 @@ webxr_router.get('/:_id', function (req, res) {
                                     "</div>" +
                                 "</div>";
                                 let movementControls = ""; //aframe extras, can constrain to navmesh 
-                                wasd = "extended-wasd-controls=\x22flyEnabled: false; moveSpeed: 5; inputType: keyboard\x22";
+                                wasd = "extended_wasd_controls=\x22flyEnabled: false; moveSpeed: 5; inputType: keyboard\x22";
                                 // joystickScript = "<script src=\x22../main/vendor/aframe/joystick.js\x22></script>";
                                 let physicsMod = "";
                                 // if (!useNavmesh && !useSimpleNavmesh) { //simplenavmesh uses raycast, no pathfinding but constraint works!
@@ -957,7 +957,7 @@ webxr_router.get('/:_id', function (req, res) {
                                 // } else {
                                 // if (useSimpleNavmesh) {
                                 //     //simple navmesh can use 
-                                //     wasd = "extended-wasd-controls=\x22fly: false; moveSpeed: 5; inputType: keyboard\x22 simple-navmesh-constraint=\x22navmesh:#navmesh-el;fall:10; height:.1;\x22";
+                                //     wasd = "extended_wasd_controls=\x22fly: false; moveSpeed: 5; inputType: keyboard\x22 simple-navmesh-constraint=\x22navmesh:#navmesh-el;fall:10; height:.1;\x22";
                                     
                                 // } 
                                 // else {
@@ -1003,7 +1003,7 @@ webxr_router.get('/:_id', function (req, res) {
                                    // renderPanel = "<a-entity visible=\x22false\x22 render_canvas id=\x22renderCanvas\x22 look-at=\x22#player\x22 geometry=\x22primitive: plane; width:1; height:1;\x22 scale=\x221 1 1\x22 position=\x220 3.5 -.25\x22 material=\x22shader: html; transparent: true; width:1024; height:1024; fps: 10; target: #renderPanel;\x22></a-entity>\n";
                                 }
                                 if (sceneResponse.sceneFlyable) {
-                                    wasd = "extended-wasd-controls=\x22flyEnabled: true; moveSpeed: 4; inputType: keyboard\x22";
+                                    wasd = "extended_wasd_controls=\x22flyEnabled: true; moveSpeed: 4; inputType: keyboard\x22";
                                 }
                                 // if (useNavmesh) {
                                 //     // "wasd-controls=\x22fly: false; acceleration: 35\x22";
@@ -1031,15 +1031,15 @@ webxr_router.get('/:_id', function (req, res) {
                                 }
                                 if (useSimpleNavmesh) {
                                     //simple navmesh can use 
-                                    wasd = "extended-wasd-controls=\x22fly: false; moveSpeed: "+sceneResponse.scenePlayer.playerSpeed+"; inputType: keyboard\x22 simple-navmesh-constraint=\x22navmesh:#navmesh-el;fall:10; height:"+sceneResponse.scenePlayer.playerHeight+"\x22";
+                                    wasd = "extended_wasd_controls=\x22fly: false; moveSpeed: "+sceneResponse.scenePlayer.playerSpeed+"; inputType: keyboard\x22 simple-navmesh-constraint=\x22navmesh:#navmesh-el;fall:10; height:"+sceneResponse.scenePlayer.playerHeight+"\x22";
                                     // wasd = "wasd-controls=\x22fly: true; acceleration: 35\x22 ";
                                     
                                 } 
                                 // let follower = "";
                                 if (sceneResponse.sceneCameraMode != undefined && sceneResponse.sceneCameraMode.toLowerCase().includes("third person")) {
                                     // wasd = "wasd-controls=\x22fly: true; acceleration: "+sceneResponse.scenePlayer.playerSpeed+"\x22 simple-navmesh-constraint=\x22navmesh:#navmesh-el;fall:10; height:0;\x22";
-                                    // wasd = "extended-wasd-controls=\x22flyEnabled: false; moveSpeed: 4; inputType: keyboard\x22";
-                                    wasd = "extended-wasd-controls-thirdperson=\x22fly: false; moveSpeed: "+sceneResponse.scenePlayer.playerSpeed+"; inputType: keyboard\x22 simple-navmesh-constraint=\x22navmesh:#navmesh-el;fall:10; height: 0\x22";
+                                    // wasd = "extended_wasd_controls=\x22flyEnabled: false; moveSpeed: 4; inputType: keyboard\x22";
+                                    wasd = "extended_wasd_thirdperson=\x22fly: false; moveSpeed: "+sceneResponse.scenePlayer.playerSpeed+"; inputType: keyboard\x22 simple-navmesh-constraint=\x22navmesh:#navmesh-el;fall:10; height: 0\x22";
                                     camera = "<a-entity look-controls follow-camera=\x22target: #player\x22>" +
                                         "<a-entity camera position=\x220 1.6 5\x22 ></a-entity>" +
                                     "</a-entity>"+
@@ -4281,7 +4281,7 @@ webxr_router.get('/:_id', function (req, res) {
                         "<script src=\x22../main/vendor/howler/src/howler.core.js\x22></script>"+
                         "<script src=\x22../main/vendor/howler/src/howler.spatial.js\x22></script>"+
                         // "<script src=\x22../main/js/hls.min.js\x22></script>" + //v 1.0.6 
-                        // "<script src=\x22../main/js/navigation.js\x22></script>" + //includes navmesh components (simple and not), and extended-wasd-controls
+                        // "<script src=\x22../main/js/navigation.js\x22></script>" + //includes navmesh components (simple and not), and extended_wasd_controls
 
                         primaryAudioScript +
                         ambientAudioScript +
@@ -4537,7 +4537,7 @@ webxr_router.get('/:_id', function (req, res) {
                         "<script src=\x22../main/vendor/howler/src/howler.spatial.js\x22></script>"+
                         hlsScript +
                         
-                        "<script src=\x22../main/js/navigation.js\x22></script>" + //includes navmesh components (simple and not), and extended-wasd-controls
+                        "<script src=\x22../main/js/navigation.js\x22></script>" + //includes navmesh components (simple and not), and extended_wasd_controls
                         // "<script src=\x22../main/ref/aframe/dist/networked-aframe.min.js\x22></script>" + 
                         // "<script src=\x22../main/ref/aframe/dist/aframe-layout-component.min.js\x22></script>" +  
                         "<script src=\x22../main/vendor/aframe/aframe-blink-controls.min.js\x22></script>" +   //TODO - check if req comes from vr headset

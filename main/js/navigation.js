@@ -238,12 +238,14 @@ AFRAME.registerComponent('screen-controls',
 
         // let isIOS = DetectiOS();
 		this.component = null;
-		this.jsContainer = document.getElementById('joystickContainer');
-		this.isMobile = AFRAME.utils.device.isMobile();
+		this.jsContainer = null;
+		this.isMobile = false;
 		
 		this.el.addEventListener('loaded', (e) => {
 		e.preventDefault();	
-
+		this.component = null;
+		this.jsContainer = document.getElementById('joystickContainer');
+		this.isMobile = AFRAME.utils.device.isMobile();
 			// let headsetConnected = AFRAME.utils.device.checkHeadsetConnected();
 			// let isMacOS = (navigator.appVersion.indexOf('Mac') != -1);
 			// console.log("tryna init screen controls with isMobile "  + isMobile + " and isMacOS " + isMacOS + " headsetConnected " + headsetConnected);
@@ -260,9 +262,9 @@ AFRAME.registerComponent('screen-controls',
 			if (this.isMobile) {  //passed in above//nm	
 				if (this.jsContainer != null) {
 					this.jsContainer.style.visibility = 'visible';
-					this.component = this.el.components["extended-wasd-controls"];
+					this.component = this.el.components.extended_wasd_controls;
 					if (this.component == null) {
-						this.component = this.el.components["extended-wasd-controls-thirdperson"];
+						this.component = this.el.components.extended_wasd_thirdperson;
 						if (this.component) {
 							this.component.setJoystickInput();
 						} else {
@@ -314,7 +316,7 @@ AFRAME.registerComponent('screen-controls',
           
       }
 });
-AFRAME.registerComponent('extended-wasd-controls', {
+AFRAME.registerComponent('extended_wasd_controls', {
 
 	schema: 
 	{
@@ -444,7 +446,7 @@ AFRAME.registerComponent('extended-wasd-controls', {
 		let totalTurnAngle = 0;
 		let totalLookAngle = 0;
 
-		// look-controls and extended-wasd-controls are compatible
+		// look-controls and extended_wasd_controls are compatible
 		//   with desktop/mouse combo but not for tablet/gyroscope combo ("magic window" effect)
 		//   (at least not with this code)
 		// thus, look/turn automatically disabled when look-controls present
@@ -555,7 +557,7 @@ AFRAME.registerComponent('extended-wasd-controls', {
 	}
 });
 
-AFRAME.registerComponent('extended-wasd-controls-thirdperson', {
+AFRAME.registerComponent('extended_wasd_thirdperson', {
 
 	schema: 
 	{
@@ -695,7 +697,7 @@ AFRAME.registerComponent('extended-wasd-controls-thirdperson', {
 		let totalTurnAngle = 0;
 		let totalLookAngle = 0;
 
-		// look-controls and extended-wasd-controls are compatible
+		// look-controls and extended_wasd_controls are compatible
 		//   with desktop/mouse combo but not for tablet/gyroscope combo ("magic window" effect)
 		//   (at least not with this code)
 		// thus, look/turn automatically disabled when look-controls present
