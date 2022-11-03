@@ -237,62 +237,65 @@ AFRAME.registerComponent('screen-controls',
     {
 
         // let isIOS = DetectiOS();
+		this.el.addEventListener('loaded', e => {
+		e.preventDefault();	
     	this.isMobile = AFRAME.utils.device.isMobile();
-        // let headsetConnected = AFRAME.utils.device.checkHeadsetConnected();
-        // let isMacOS = (navigator.appVersion.indexOf('Mac') != -1);
-        // console.log("tryna init screen controls with isMobile "  + isMobile + " and isMacOS " + isMacOS + " headsetConnected " + headsetConnected);
+			// let headsetConnected = AFRAME.utils.device.checkHeadsetConnected();
+			// let isMacOS = (navigator.appVersion.indexOf('Mac') != -1);
+			// console.log("tryna init screen controls with isMobile "  + isMobile + " and isMacOS " + isMacOS + " headsetConnected " + headsetConnected);
 
-        // let d = document.createElement("DIV");
-        // d.setAttribute("id","joystickEl");
-        // const style = "position: absolute; left: 0; right: 0; bottom:10px; margin-left: auto; margin-right: auto; width: 89px; height: 89px; opacity:0.5;z-index:100;";
-        // d.setAttribute("style",style);
-        // document.querySelector("body").appendChild(d)
-		// this.isMobile = false;
-		this.component = null;
-		this.jsContainer = document.getElementById('joystickContainer');
-		// this.playerEl = document.getElementById("player");
-	
-        if (this.isMobile) {  //passed in above//nm	
-            if (this.jsContainer != null) {
-            	this.jsContainer.style.visibility = 'visible';
-				this.component = this.el.components["extended-wasd-controls"];
-				if (this.component == null) {
-					this.component = this.el.components["extended-wasd-controls-thirdperson"];
-					if (this.component) {
-						this.component.setJoystickInput();
+			// let d = document.createElement("DIV");
+			// d.setAttribute("id","joystickEl");
+			// const style = "position: absolute; left: 0; right: 0; bottom:10px; margin-left: auto; margin-right: auto; width: 89px; height: 89px; opacity:0.5;z-index:100;";
+			// d.setAttribute("style",style);
+			// document.querySelector("body").appendChild(d)
+			// this.isMobile = false;
+			this.component = null;
+			this.jsContainer = document.getElementById('joystickContainer');
+			// this.playerEl = document.getElementById("player");
+		
+			if (this.isMobile) {  //passed in above//nm	
+				if (this.jsContainer != null) {
+					this.jsContainer.style.visibility = 'visible';
+					this.component = this.el.components["extended-wasd-controls"];
+					if (this.component == null) {
+						this.component = this.el.components["extended-wasd-controls-thirdperson"];
+						if (this.component) {
+							this.component.setJoystickInput();
+						} else {
+							console.log("caint find no ewasd component!");
+						}
 					} else {
-						console.log("caint find no ewasd component!");
+						this.component.setJoystickInput();
 					}
-				} else {
-					this.component.setJoystickInput();
+					this.joystick1 = new Joystick("joystickEl", 64, 8);
+					
+					console.log("controls initialized : JOYSTICK" );
+				//   this.isMobile = true;
 				}
-				this.joystick1 = new Joystick("joystickEl", 64, 8);
+			} else {
+				// let jsContainer = document.getElementById('joystickContainer');
+				if (this.jsContainer != null) {
+					this.jsContainer.style.display = 'none';
+				}
+				console.log("controls initialized : KEYBOID" );
 				
-				console.log("controls initialized : JOYSTICK" );
-			//   this.isMobile = true;
-            }
-        } else {
-            // let jsContainer = document.getElementById('joystickContainer');
-            if (this.jsContainer != null) {
-                this.jsContainer.style.display = 'none';
-            }
-            console.log("controls initialized : KEYBOID" );
-            
-        }
-        // if (!headsetConnected || isMacOS) {
-        //     let vrButton = document.querySelector(".a-enter-vr");
-        //     if (vrButton != null) {
-        //         console.log("found VRBUTTON");
-        //       vrButton.style.display = 'none'; //to hell with cardboard/gearvr/daydream
-        //       vrButton.style.visible = 'false';
-        //     } else {
-        //         console.log("din't found VRBUTTON");
-        //     }
-        // }
-        
-        // this.joystick1 = new Joystick("joystickEl", 64, 8);
-       
-        // this.component.setJoystickInput();
+			}
+			// if (!headsetConnected || isMacOS) {
+			//     let vrButton = document.querySelector(".a-enter-vr");
+			//     if (vrButton != null) {
+			//         console.log("found VRBUTTON");
+			//       vrButton.style.display = 'none'; //to hell with cardboard/gearvr/daydream
+			//       vrButton.style.visible = 'false';
+			//     } else {
+			//         console.log("din't found VRBUTTON");
+			//     }
+			// }
+			
+			// this.joystick1 = new Joystick("joystickEl", 64, 8);
+		
+			// this.component.setJoystickInput();
+		});
       },
 
       tick: function(time, deltaTime)
