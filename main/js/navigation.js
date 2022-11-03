@@ -237,9 +237,13 @@ AFRAME.registerComponent('screen-controls',
     {
 
         // let isIOS = DetectiOS();
-		this.el.addEventListener('loaded', e => {
+		this.component = null;
+		this.jsContainer = document.getElementById('joystickContainer');
+		this.isMobile = AFRAME.utils.device.isMobile();
+		
+		this.el.addEventListener('loaded', (e) => {
 		e.preventDefault();	
-    	this.isMobile = AFRAME.utils.device.isMobile();
+
 			// let headsetConnected = AFRAME.utils.device.checkHeadsetConnected();
 			// let isMacOS = (navigator.appVersion.indexOf('Mac') != -1);
 			// console.log("tryna init screen controls with isMobile "  + isMobile + " and isMacOS " + isMacOS + " headsetConnected " + headsetConnected);
@@ -250,8 +254,7 @@ AFRAME.registerComponent('screen-controls',
 			// d.setAttribute("style",style);
 			// document.querySelector("body").appendChild(d)
 			// this.isMobile = false;
-			this.component = null;
-			this.jsContainer = document.getElementById('joystickContainer');
+
 			// this.playerEl = document.getElementById("player");
 		
 			if (this.isMobile) {  //passed in above//nm	
