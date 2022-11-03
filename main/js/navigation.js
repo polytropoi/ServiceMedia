@@ -247,6 +247,9 @@ AFRAME.registerComponent('screen-controls',
             if (jsContainer != null) {
               jsContainer.style.visibility = 'visible';
               this.component = document.getElementById("player").components["extended-wasd-controls"];
+              if (!this.component) {
+                this.component = document.getElementById("player").components["extended-wasd-controls-thirdperson"];
+              }
               this.joystick1 = new Joystick("joystickEl", 64, 8);
               this.component.setJoystickInput();
               console.log("controls initialized : JOYSTICK" );
