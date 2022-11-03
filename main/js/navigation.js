@@ -226,7 +226,8 @@ class Joystick
 		document.addEventListener('touchend', handleUp);
 	}
 }
-AFRAME.registerComponent('screen-controls', 
+
+AFRAME.registerComponent('screen-controls-firstpersonnilch', 
 {
 	schema: 
 	{
@@ -316,6 +317,127 @@ AFRAME.registerComponent('screen-controls',
           
       }
 });
+AFRAME.registerComponent('screen-controls-thirdperson', 
+{
+	schema: 
+	{
+		isMobile: {default: false},
+		camType: {default: "first"}
+	},
+    init: function () 
+    {
+
+        // let isIOS = DetectiOS();
+		this.component = null;
+		this.jsContainer = null;
+		this.isMobile = false;
+		
+		this.el.addEventListener('loaded', (e) => {
+			e.preventDefault();	
+			this.component = null;
+			this.jsContainer = document.getElementById('joystickContainer');
+			this.isMobile = AFRAME.utils.device.isMobile();
+		
+		
+			if (this.isMobile) {  //passed in above//nm	
+				if (this.jsContainer != null) {
+					this.jsContainer.style.visibility = 'visible';
+					this.component = this.el.components.extended_wasd_thirdperson;
+					// this.component = this.el.components.extended_wasd_controls;
+					// if (this.component == null) {
+					// 	this.component = this.el.components.extended_wasd_thirdperson;
+					// 	if (this.component) {
+					// 		this.component.setJoystickInput();
+					// 	} else {
+					// 		console.log("caint find no ewasd component!");
+					// 	}
+					// } else {
+						
+					// }
+					this.joystick1 = new Joystick("joystickEl", 64, 8);
+					this.component.setJoystickInput();
+					console.log("controls initialized : JOYSTICK" );
+				//   this.isMobile = true;
+				}
+			} else {
+				// let jsContainer = document.getElementById('joystickContainer');
+				if (this.jsContainer != null) {
+					this.jsContainer.style.display = 'none';
+				}
+				console.log("controls initialized : KEYBOID" );
+			}
+		});
+      },
+
+      tick: function(time, deltaTime)
+      {
+          if (this.isMobile && this.component != null && this.jsContainer) {
+            this.component.movePercent.x =  this.joystick1.value.x;
+            this.component.movePercent.z = -this.joystick1.value.y;
+          }
+      }
+});
+
+AFRAME.registerComponent('screen-controls-firstperson', 
+{
+	schema: 
+	{
+		isMobile: {default: false},
+		camType: {default: "first"}
+	},
+    init: function () 
+    {
+
+        // let isIOS = DetectiOS();
+		this.component = null;
+		this.jsContainer = null;
+		this.isMobile = false;
+		
+		this.el.addEventListener('loaded', (e) => {
+			e.preventDefault();	
+			this.component = null;
+			this.jsContainer = document.getElementById('joystickContainer');
+			this.isMobile = AFRAME.utils.device.isMobile();
+		
+		
+			if (this.isMobile) {  //passed in above//nm	
+				if (this.jsContainer != null) {
+					this.jsContainer.style.visibility = 'visible';
+					this.component = this.el.components.extended_wasd_controls;
+					// this.component = this.el.components.extended_wasd_controls;
+					// if (this.component == null) {
+					// 	this.component = this.el.components.extended_wasd_thirdperson;
+					// 	if (this.component) {
+					// 		this.component.setJoystickInput();
+					// 	} else {
+					// 		console.log("caint find no ewasd component!");
+					// 	}
+					// } else {
+						
+					// }
+					this.joystick1 = new Joystick("joystickEl", 64, 8);
+					this.component.setJoystickInput();
+					console.log("controls initialized : JOYSTICK" );
+				//   this.isMobile = true;
+				}
+			} else {
+				// let jsContainer = document.getElementById('joystickContainer');
+				if (this.jsContainer != null) {
+					this.jsContainer.style.display = 'none';
+				}
+				console.log("controls initialized : KEYBOID" );
+			}
+		});
+      },
+
+      tick: function(time, deltaTime)
+      {
+          if (this.isMobile && this.component != null && this.jsContainer) {
+            this.component.movePercent.x =  this.joystick1.value.x;
+            this.component.movePercent.z = -this.joystick1.value.y;
+          }
+      }
+});
 AFRAME.registerComponent('extended_wasd_controls', {
 
 	schema: 
@@ -386,6 +508,7 @@ AFRAME.registerComponent('extended_wasd_controls', {
 	{
 		// register key down/up events 
 		//  and keep track of all keys currently pressed
+		this.el.setAttribute('screen-controls-firstperson', true);
 		this.keyPressedSet = new Set();
 				
 		let self = this;
@@ -628,6 +751,8 @@ AFRAME.registerComponent('extended_wasd_thirdperson', {
 
 	init: function()
 	{
+
+		this.el.setAttribute('screen-controls-thirdperson', true);
 		// register key down/up events 
 		//  and keep track of all keys currently pressed
 		this.keyPressedSet = new Set();

@@ -1637,7 +1637,7 @@ AFRAME.registerComponent('audio_groups_control', { //element and component are a
                     if (triggerGroup.items[i] == this.data.audioGroupsData.audioItems[j]._id) {
                     
                         // console.log("found audio item tags are " + this.data.audioGroupsData.audioItems[j].tags); //not ideal, maybe the groupitems can store tags? or cache them when loaded below?
-                        if (this.data.audioGroupsData.audioItems[j].tags.includes(tag)) {
+                        if (this.data.audioGroupsData.audioItems[j].tags && this.data.audioGroupsData.audioItems[j].tags.includes(tag)) {
                             // console.log("tag match to " + tag);
                             
                             return triggerGroup.items[i];
