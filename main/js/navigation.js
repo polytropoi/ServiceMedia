@@ -332,8 +332,8 @@ AFRAME.registerComponent('screen-controls-thirdperson',
 		this.jsContainer = null;
 		this.isMobile = false;
 		
-		this.el.addEventListener('loaded', (e) => {
-			e.preventDefault();	
+		// this.el.addEventListener('loaded', (e) => {
+			// e.preventDefault();	
 			this.component = null;
 			this.jsContainer = document.getElementById('joystickContainer');
 			this.isMobile = AFRAME.utils.device.isMobile();
@@ -366,7 +366,7 @@ AFRAME.registerComponent('screen-controls-thirdperson',
 				}
 				console.log("controls initialized : KEYBOID" );
 			}
-		});
+		// });
       },
 
       tick: function(time, deltaTime)
@@ -393,8 +393,8 @@ AFRAME.registerComponent('screen-controls-firstperson',
 		this.jsContainer = null;
 		this.isMobile = false;
 		
-		this.el.addEventListener('loaded', (e) => {
-			e.preventDefault();	
+		// this.el.addEventListener('loaded', (e) => {
+			// e.preventDefault();	
 			this.component = null;
 			this.jsContainer = document.getElementById('joystickContainer');
 			this.isMobile = AFRAME.utils.device.isMobile();
@@ -427,7 +427,7 @@ AFRAME.registerComponent('screen-controls-firstperson',
 				}
 				console.log("controls initialized : KEYBOID" );
 			}
-		});
+		// });
       },
 
       tick: function(time, deltaTime)
@@ -509,6 +509,7 @@ AFRAME.registerComponent('extended_wasd_controls', {
 		// register key down/up events 
 		//  and keep track of all keys currently pressed
 		this.el.setAttribute('screen-controls-firstperson', true);
+
 		this.keyPressedSet = new Set();
 				
 		let self = this;
@@ -552,8 +553,17 @@ AFRAME.registerComponent('extended_wasd_controls', {
 		
 		// allows easy extraction of turn angle
 		this.el.object3D.rotation.order = 'YXZ';
+		
+		this.lookControlElement = document.querySelectorAll("[look-controls]")[0];
+		this.lookControls = null;
+		if (this.lookControlElement) {
+		  this.lookControls = this.lookControlElement.components["look-controls"];
+		}
 	},
-	
+	setJoystickInput: function () {
+        console.log("setting ewasd controller input to JOYSTICK!");
+        this.data.inputType = "joystick";
+    },
 
 	tick: function (time, timeDelta) 
 	{
