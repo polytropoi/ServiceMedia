@@ -194,21 +194,23 @@ AFRAME.registerComponent('initializer', { //adjust for device settings, and call
         if (vrButton != null) {
           vrButton.style.display = 'none'; //to hell with cardboard/gearvr/daydream
         }
-        if (js != null) {
-          console.log("hiding joystick");
-          js.style.visibility = 'visible'; //light up joystick if mobile
-        }
+        // if (js != null) {
+        //   console.log("hiding joystick");
+        //   js.style.visibility = 'visible'; //light up joystick if mobile
+        // }
         // sceneEl.setAttribute('screen-controls', 'enabled', true); 
-        let ewasd = document.getElementById("player").components["extended-wasd-controls"];
-        if (ewasd != null) {
-          ewasd.setJoystickInput(); // might do this in screen-controls component too, but np
-        }
+        // let ewasd = document.getElementById("player").components["extended_wasd_controls"];
+        // if (ewasd != null) {
+        //   ewasd.setJoystickInput(); // might do this in screen-controls component too, but np
+        // } else {
+        //   ewasd = 
+        // }
       } else {
         // let js = document.getElementById('joystickContainer');
-        if (js != null) {
-          console.log("hiding joystick"); //really hide if not mobile
-          js.style.display = 'none';
-        }
+        // if (js != null) {
+        //   console.log("hiding joystick"); //really hide if not mobile
+        //   js.style.display = 'none';
+        // }
       }
       let envEl = document.getElementById('enviroEl');
       if (envEl != null) {
