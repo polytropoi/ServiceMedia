@@ -250,14 +250,14 @@ AFRAME.registerComponent('screen-controls',
 		// this.isMobile = false;
 		this.component = null;
 		this.jsContainer = document.getElementById('joystickContainer');
-		this.playerEl = document.getElementById("player");
+		// this.playerEl = document.getElementById("player");
 	
         if (this.isMobile) {  //passed in above//nm	
             if (this.jsContainer != null) {
             	this.jsContainer.style.visibility = 'visible';
-				this.component = this.playerEl.components["extended-wasd-controls"];
-				if (!this.component) {
-					this.component = this.playerEl.components["extended-wasd-controls-thirdperson"];
+				this.component = this.el.components["extended-wasd-controls"];
+				if (this.component == null) {
+					this.component = this.el.components["extended-wasd-controls-thirdperson"];
 					if (this.component) {
 						this.component.setJoystickInput();
 					} else {
@@ -298,7 +298,7 @@ AFRAME.registerComponent('screen-controls',
       tick: function(time, deltaTime)
       {
           
-          if (this.isMobile && this.component && this.jsContainer) {
+          if (this.isMobile && this.component != null && this.jsContainer) {
             // console.log( this.joystick1.value );
             // console.log( this.component.movePercent );
             
