@@ -158,6 +158,7 @@ AFRAME.registerComponent('initializer', { //adjust for device settings, and call
   },
   init: function () {
     var sceneEl = document.querySelector('a-scene');
+    sceneEl.setAttribute("screen-controls", true);
     let type = this.data.sceneType;
     let isIOS = DetectiOS();
     let isMobile = AFRAME.utils.device.isMobile();
@@ -178,6 +179,7 @@ AFRAME.registerComponent('initializer', { //adjust for device settings, and call
     // sceneEl.background = fogColor; // Setting fogColor as the background color also
     // sceneEl.fog = new THREE.Fog(fogColor, 0.25, 4);
     // sceneEl.setAttribute('stats', '');
+    sceneEl.setAttribute("screen-controls", {'isMobile': isMobile});
     sceneEl.addEventListener('loaded', function () { //for sure?
       console.log("aframe init with isMobile "  + isMobile + " isIOS " + isIOS + " isMacOS " + isMacOS + " headsetConnected " + headsetConnected);
 

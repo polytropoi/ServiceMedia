@@ -228,6 +228,11 @@ class Joystick
 }
 AFRAME.registerComponent('screen-controls', 
 {
+	schema: 
+	{
+		isMobile: {default: false},
+		camType: {default: "first"}
+	},
     init: function () 
     {
         // let isIOS = DetectiOS();
@@ -241,13 +246,13 @@ AFRAME.registerComponent('screen-controls',
         // const style = "position: absolute; left: 0; right: 0; bottom:10px; margin-left: auto; margin-right: auto; width: 89px; height: 89px; opacity:0.5;z-index:100;";
         // d.setAttribute("style",style);
         // document.querySelector("body").appendChild(d)
-		this.isMobile = false;
+		// this.isMobile = false;
 		this.component = document.getElementById("player").components["extended-wasd-controls"];
-        if (AFRAME.utils.device.isMobile()) {
+        if (this.data.isMobile) {
             let jsContainer = document.getElementById('joystickContainer');
             if (jsContainer != null) {
               jsContainer.style.visibility = 'visible';
-            //   this.component = document.getElementById("player").components["extended-wasd-controls"];
+              this.component = document.getElementById("player").components["extended-wasd-controls"];
               if (!this.component) {
                 this.component = document.getElementById("player").components["extended-wasd-controls-thirdperson"];
 				if (!this.component) {
@@ -286,7 +291,7 @@ AFRAME.registerComponent('screen-controls',
       tick: function(time, deltaTime)
       {
           
-          if (this.isMobile) {
+          if (this.isMobile && this.component) {
             // console.log( this.joystick1.value );
             // console.log( this.component.movePercent );
             
