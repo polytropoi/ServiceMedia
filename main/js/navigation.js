@@ -237,7 +237,7 @@ AFRAME.registerComponent('screen-controls',
     {
 
         // let isIOS = DetectiOS();
-        // let isMobile = AFRAME.utils.device.isMobile();
+    	this.isMobile = AFRAME.utils.device.isMobile();
         // let headsetConnected = AFRAME.utils.device.checkHeadsetConnected();
         // let isMacOS = (navigator.appVersion.indexOf('Mac') != -1);
         // console.log("tryna init screen controls with isMobile "  + isMobile + " and isMacOS " + isMacOS + " headsetConnected " + headsetConnected);
@@ -247,12 +247,13 @@ AFRAME.registerComponent('screen-controls',
         // const style = "position: absolute; left: 0; right: 0; bottom:10px; margin-left: auto; margin-right: auto; width: 89px; height: 89px; opacity:0.5;z-index:100;";
         // d.setAttribute("style",style);
         // document.querySelector("body").appendChild(d)
-		this.isMobile = false;
+		// this.isMobile = false;
+		this.jsContainer = document.getElementById('joystickContainer');
 		this.component = document.getElementById("player").components["extended-wasd-controls"];
-        if (this.data.isMobile) {  //passed in above
-            let jsContainer = document.getElementById('joystickContainer');
-            if (jsContainer != null) {
-              jsContainer.style.visibility = 'visible';
+        if (this.isMobile) {  //passed in above//nm
+            
+            if (this.jsContainer != null) {
+              this.jsContainer.style.visibility = 'visible';
             //   this.component = document.getElementById("player").components["extended-wasd-controls"];
               if (!this.component) {
                 this.component = document.getElementById("player").components["extended-wasd-controls-thirdperson"];
@@ -263,12 +264,12 @@ AFRAME.registerComponent('screen-controls',
               this.joystick1 = new Joystick("joystickEl", 64, 8);
               this.component.setJoystickInput();
               console.log("controls initialized : JOYSTICK" );
-			  this.isMobile = true;
+			//   this.isMobile = true;
             }
         } else {
-            let js = document.getElementById('joystickContainer');
-            if (js != null) {
-                js.style.display = 'none';
+            // let jsContainer = document.getElementById('joystickContainer');
+            if (jsContainer != null) {
+                jsContainer.style.display = 'none';
             }
             console.log("controls initialized : KEYBOID" );
             
@@ -292,7 +293,7 @@ AFRAME.registerComponent('screen-controls',
       tick: function(time, deltaTime)
       {
           
-          if (this.isMobile && this.component) {
+          if (this.isMobile && this.component && this.jsContainer) {
             // console.log( this.joystick1.value );
             // console.log( this.component.movePercent );
             
