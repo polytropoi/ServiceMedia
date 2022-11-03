@@ -248,28 +248,33 @@ AFRAME.registerComponent('screen-controls',
         // d.setAttribute("style",style);
         // document.querySelector("body").appendChild(d)
 		// this.isMobile = false;
+		this.component = null;
 		this.jsContainer = document.getElementById('joystickContainer');
-		this.component = document.getElementById("player").components["extended-wasd-controls"];
-        if (this.isMobile) {  //passed in above//nm
-            
+		this.playerEl = document.getElementById("player");
+	
+        if (this.isMobile) {  //passed in above//nm	
             if (this.jsContainer != null) {
-              this.jsContainer.style.visibility = 'visible';
-            //   this.component = document.getElementById("player").components["extended-wasd-controls"];
-              if (!this.component) {
-                this.component = document.getElementById("player").components["extended-wasd-controls-thirdperson"];
+            	this.jsContainer.style.visibility = 'visible';
+				this.component = this.playerEl.components["extended-wasd-controls"];
 				if (!this.component) {
-					console.log("caint find no ewasd component!");
+					this.component = this.playerEl.components["extended-wasd-controls-thirdperson"];
+					if (this.component) {
+						this.component.setJoystickInput();
+					} else {
+						console.log("caint find no ewasd component!");
+					}
+				} else {
+					this.component.setJoystickInput();
 				}
-              } 
-              this.joystick1 = new Joystick("joystickEl", 64, 8);
-              this.component.setJoystickInput();
-              console.log("controls initialized : JOYSTICK" );
+				this.joystick1 = new Joystick("joystickEl", 64, 8);
+				
+				console.log("controls initialized : JOYSTICK" );
 			//   this.isMobile = true;
             }
         } else {
             // let jsContainer = document.getElementById('joystickContainer');
-            if (jsContainer != null) {
-                jsContainer.style.display = 'none';
+            if (this.jsContainer != null) {
+                this.jsContainer.style.display = 'none';
             }
             console.log("controls initialized : KEYBOID" );
             
