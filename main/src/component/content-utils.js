@@ -2535,7 +2535,9 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
 
     this.camera = null;
     this.tags = this.data.tags;
-    let cameraEl = document.querySelector('a-entity[camera]');
+
+    this.raycaster = null;
+    let cameraEl = document.querySelector('a-entity[camera]');  
     if (!cameraEl) {
         cameraEl = document.querySelector('a-camera');
     }
@@ -2549,33 +2551,35 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
       }
       // this.camera = cameraEl.components.camera.camera;
     }
-    
+
+    this.thirdPersonPlaceholder = null;
     // this.sceneInventoryID = null;
     if (this.data.locationData && this.data.locationData.eventData && this.data.locationData.eventData.toLowerCase().includes("driveable")) {
-      let thirdPersonPlaceholder = document.getElementById("thirdPersonPlaceholder");
+      this.thirdPersonPlaceholder = document.getElementById("thirdPersonPlaceholder"); //it's in the server response
       this.modelParent = thirdPersonPlaceholder;
-      if (thirdPersonPlaceholder) {
+      if (this.thirdPersonPlaceholder) {
         // thirdPersonPlaceholder.appendChild(this.el);
         // this.el.setAttribute("position", {x:0, y:0, z:0});
         if (this.data.objectData.modelURL != undefined) {
           // thirdPersonPlaceholder.append(this.el);
-          thirdPersonPlaceholder.setAttribute("gltf-model", this.data.objectData.modelURL); 
+          this.thirdPersonPlaceholder.setAttribute("gltf-model", this.data.objectData.modelURL); 
           let rot = {};
           rot.x = this.data.locationData.eulerx != undefined ? this.data.locationData.eulerx : 0;
           rot.y = this.data.locationData.eulery != undefined ? this.data.locationData.eulery : 0;
           rot.z = this.data.locationData.eulerz != undefined ? this.data.locationData.eulerz : 0;
-          thirdPersonPlaceholder.setAttribute("rotation", rot);
+          this.thirdPersonPlaceholder.setAttribute("rotation", rot);
         } else {
           // thirdPersonPlaceholder.append(this.el);
-          thirdPersonPlaceholder.setAttribute("gltf-model", "#" +this.data.objectData.modelID); 
+          this.thirdPersonPlaceholder.setAttribute("gltf-model", "#" +this.data.objectData.modelID); 
           let rot = {};
           rot.x = this.data.locationData.eulerx != undefined ? this.data.locationData.eulerx : 0;
           rot.y = this.data.locationData.eulery != undefined ? this.data.locationData.eulery : 0;
           rot.z = this.data.locationData.eulerz != undefined ? this.data.locationData.eulerz : 0;
-          thirdPersonPlaceholder.setAttribute("rotation", rot);
+          this.thirdPersonPlaceholder.setAttribute("rotation", rot);
         }
+        // this.thirdPersonPlaceholder.setAttribute("object_raycaster", true);
       }
-
+      
     } else {
       if (this.data.objectData.modelURL != undefined) {
         this.el.setAttribute("gltf-model", this.data.objectData.modelURL); 
@@ -4963,7 +4967,7 @@ AFRAME.registerComponent('mod_model', {
           
         }
         this.el.addEventListener('mouseenter', (evt) =>  {
-          console.log("mouseovewr markertype " + this.data.markerType);
+          // console.log("mouseovewr model " + this.el.id);
           if (evt.detail.intersection != null) {
             // this.bubble = theEl.querySelector('.bubble');
             // this.bubbleText = theEl.querySelector('.bubbleText');

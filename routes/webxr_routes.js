@@ -1056,6 +1056,7 @@ webxr_router.get('/:_id', function (req, res) {
                                             "<a-entity id=\x22viewportPlaceholder3\x22 geometry=\x22primitive: plane; height: 0.01; width: .01\x22 position=\x220 0 -3\x22"+
                                             "material=\x22opacity: 0\x22></a-entity>"+
                                             "<a-entity id=\x22thirdPersonPlaceholder\x22 position=\x220 0 0\x22></a-entity>"+
+                                            "<a-entity id=\x22playCaster\x22 position=\x220 .5 .5\x22></a-entity>"+
                                             // "<a-sphere visible=\x22true\x22 scale=\x220.45 0.5 0.4\x22 random-color></a-sphere>"+
                                         "</a-entity>"+
                                        
@@ -3323,7 +3324,8 @@ webxr_router.get('/:_id', function (req, res) {
                     settings.skyboxURL = skyboxUrl;
                     settings.useSynth = hasSynth;
                     settings.useMatrix = (sceneResponse.sceneTags != null && sceneResponse.sceneTags.includes('matrix'));
-                    settings.sceneWaterLevel = sceneResponse.sceneWater.level != undefined ? sceneResponse.sceneWater.level : 0; 
+                    settings.sceneWaterLevel = (sceneResponse.sceneWater != undefined && sceneResponse.sceneWater.level != undefined) ? sceneResponse.sceneWater.level : 0;
+                    settings.sceneCameraMode = sceneResponse.sceneCameraMode != undefined ? sceneResponse.sceneCameraMode : "First Person"; 
                     let audioGroups = {};
                     audioGroups.triggerGroups = sceneResponse.sceneTriggerAudioGroups;
                     audioGroups.ambientGroups = sceneResponse.sceneAmbientAudioGroups;

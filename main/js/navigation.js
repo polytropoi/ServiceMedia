@@ -62,61 +62,6 @@ function DetectiOS() {
 } 
 
 
-// // "use strict";
-//   const direction = new THREE.Vector3();
-
-//   AFRAME.registerComponent("ar-cursor", {
-//     dependencies: ["raycaster"],
-//     init() {
-//         // console.log('ar-cursor init');
-//       const sceneEl = this.el;
-//       sceneEl.addEventListener("enter-vr", () => {
-//         if (sceneEl.is("ar-mode")) {
-//           sceneEl.xrSession.addEventListener("select", this.onselect.bind(this));
-//         }
-//       });
-//     },
-//     onselect(e) {
-//       const frame = e.frame;
-//       const inputSource = e.inputSource;
-//       const referenceSpace = this.el.renderer.xr.getReferenceSpace();
-//       const pose = frame.getPose(inputSource.targetRaySpace, referenceSpace);
-//       if (!pose) return;
-//       const transform = pose.transform;
-      
-//       direction.set(0, 0, -1);
-//       direction.applyQuaternion(transform.orientation);
-//       this.el.setAttribute("raycaster", {
-//         origin: transform.position,
-//         direction
-//       });
-//       this.el.components.raycaster.checkIntersections();
-//       const els = this.el.components.raycaster.intersectedEls;
-//       for (const el of els) {
-//         const obj = el.object3D;
-//         let elVisible = obj.visible;
-//         obj.traverseAncestors(parent => {
-//           if (parent.visible === false ) {
-//             elVisible = false
-//           }
-//         });
-//         if (elVisible) {
-          
-//           // Cancel the ar-hit-test behaviours
-//           this.el.components['ar-hit-test'].hitTest = null;
-//           this.el.components['ar-hit-test'].bboxMesh.visible = false;
-          
-//           // Emit click on the element for events
-//           const details = this.el.components.raycaster.getIntersection(el);
-//           el.emit('click', details);
-          
-//           // Don't go to the next element
-//           break;
-//         }
-//       }
-//     }
-//   });
-
 class Joystick
 {
 	// stickID: ID of HTML element (representing joystick) that will be dragged
@@ -227,7 +172,7 @@ class Joystick
 	}
 }
 
-AFRAME.registerComponent('screen-controls-firstpersonnilch', 
+AFRAME.registerComponent('screen-controls-nilch', 
 {
 	schema: 
 	{
@@ -247,18 +192,6 @@ AFRAME.registerComponent('screen-controls-firstpersonnilch',
 		this.component = null;
 		this.jsContainer = document.getElementById('joystickContainer');
 		this.isMobile = AFRAME.utils.device.isMobile();
-			// let headsetConnected = AFRAME.utils.device.checkHeadsetConnected();
-			// let isMacOS = (navigator.appVersion.indexOf('Mac') != -1);
-			// console.log("tryna init screen controls with isMobile "  + isMobile + " and isMacOS " + isMacOS + " headsetConnected " + headsetConnected);
-
-			// let d = document.createElement("DIV");
-			// d.setAttribute("id","joystickEl");
-			// const style = "position: absolute; left: 0; right: 0; bottom:10px; margin-left: auto; margin-right: auto; width: 89px; height: 89px; opacity:0.5;z-index:100;";
-			// d.setAttribute("style",style);
-			// document.querySelector("body").appendChild(d)
-			// this.isMobile = false;
-
-			// this.playerEl = document.getElementById("player");
 		
 			if (this.isMobile) {  //passed in above//nm	
 				if (this.jsContainer != null) {
@@ -287,20 +220,6 @@ AFRAME.registerComponent('screen-controls-firstpersonnilch',
 				console.log("controls initialized : KEYBOID" );
 				
 			}
-			// if (!headsetConnected || isMacOS) {
-			//     let vrButton = document.querySelector(".a-enter-vr");
-			//     if (vrButton != null) {
-			//         console.log("found VRBUTTON");
-			//       vrButton.style.display = 'none'; //to hell with cardboard/gearvr/daydream
-			//       vrButton.style.visible = 'false';
-			//     } else {
-			//         console.log("din't found VRBUTTON");
-			//     }
-			// }
-			
-			// this.joystick1 = new Joystick("joystickEl", 64, 8);
-		
-			// this.component.setJoystickInput();
 		});
       },
 
@@ -308,9 +227,7 @@ AFRAME.registerComponent('screen-controls-firstpersonnilch',
       {
           
           if (this.isMobile && this.component != null && this.jsContainer) {
-            // console.log( this.joystick1.value );
-            // console.log( this.component.movePercent );
-            
+
             this.component.movePercent.x =  this.joystick1.value.x;
             this.component.movePercent.z = -this.joystick1.value.y;
           }
@@ -343,17 +260,7 @@ AFRAME.registerComponent('screen-controls-thirdperson',
 				if (this.jsContainer != null) {
 					this.jsContainer.style.visibility = 'visible';
 					this.component = this.el.components.extended_wasd_thirdperson;
-					// this.component = this.el.components.extended_wasd_controls;
-					// if (this.component == null) {
-					// 	this.component = this.el.components.extended_wasd_thirdperson;
-					// 	if (this.component) {
-					// 		this.component.setJoystickInput();
-					// 	} else {
-					// 		console.log("caint find no ewasd component!");
-					// 	}
-					// } else {
-						
-					// }
+				
 					this.joystick1 = new Joystick("joystickEl", 64, 8);
 					this.component.setJoystickInput();
 					console.log("controls initialized : JOYSTICK" );
@@ -404,17 +311,7 @@ AFRAME.registerComponent('screen-controls-firstperson',
 				if (this.jsContainer != null) {
 					this.jsContainer.style.visibility = 'visible';
 					this.component = this.el.components.extended_wasd_controls;
-					// this.component = this.el.components.extended_wasd_controls;
-					// if (this.component == null) {
-					// 	this.component = this.el.components.extended_wasd_thirdperson;
-					// 	if (this.component) {
-					// 		this.component.setJoystickInput();
-					// 	} else {
-					// 		console.log("caint find no ewasd component!");
-					// 	}
-					// } else {
-						
-					// }
+				
 					this.joystick1 = new Joystick("joystickEl", 64, 8);
 					this.component.setJoystickInput();
 					console.log("controls initialized : JOYSTICK" );
@@ -1068,6 +965,183 @@ AFRAME.registerComponent('simple-navmesh-constraint', {
       }
     }())
   });
+
+
+//////////////// raycast from object for collision detection //////// //NM, maybe later...
+AFRAME.registerComponent('object_raycaster', {
+    schema: {
+		init: {default: false},
+		lookfor: {
+			default: ''
+		},
+    //   fall: {
+    //     default: 0.5
+    //   },
+    //   height: {
+    //     default: 1.6
+    //   },
+      exclude: {
+        default: ''
+      }
+    },
+    init: function () {
+      console.log("tryna init object raycaster");
+	  this.lastPosition = null;
+		this.sceneEl = document.querySelector('a-scene');
+		this.objects = [];
+		this.arrow = null;
+		// this.objexRegistered = false;
+		// for (var object of this.sceneEl.object3D.children) {
+		// 	if (object.userData != null) {
+		// 		console.log("GOTSOME USERDATA OBEJX :" + JSON.stringify(object.userData));
+		// 	}
+		// 	// console.log
+		// }
+    },
+	registerObjects: function () {
+		console.log("tryna registerObjects ");
+		for (var object of this.sceneEl.object3D.children) {
+			if (object.userData != null) {
+				
+				if (object.userData.collide) {
+					console.log("GOTSOME USERDATA OBEJX :" + JSON.stringify(object.userData));
+					this.objects.push(object);
+				}
+				
+			}
+			// console.log
+
+		}
+	},
+    update: function () {
+		this.lastPosition = null;
+		for (var object of this.sceneEl.object3D.children) {
+			if (object.userData != null) {
+				
+				if (object.userData.collide) {
+					console.log("GOTSOME USERDATA OBEJX :" + JSON.stringify(object.userData));
+					this.objects.push(object);
+				}
+				
+			}
+			// console.log
+
+		}
+		// for (var object of this.sceneEl.object3D.children) {
+		// 	if (object.userData != null) {
+		// 		console.log("GOTSOME USERDATA OBEJX :" + object.userData);
+		// 	}
+		// 	// console.log
+		// }
+		// this.excludes = this.data.exclude ? Array.from(document.querySelectorAll(this.data.exclude)):[];
+		// const els = Array.from(document.querySelectorAll(this.data.navmesh));
+		// if (els === null) {
+		//   console.warn('navmesh-physics: Did not match any elements');
+		//   this.objects = [];
+		// } else {
+		//   this.objects = els.map(el => el.object3D).concat(this.excludes.map(el => el.object3D));
+		// }
+    },
+  
+    tick: (function () {
+      const nextPosition = new THREE.Vector3();
+      const tempVec = new THREE.Vector3();
+
+    //   const scanPattern = [
+    //     [0,1], // Default the next location
+    //     [0,0.5], // Check that the path to that location was fine
+    //     [30,0.4], // A little to the side shorter range
+    //     [-30,0.4], // A little to the side shorter range
+    //     [60,0.2], // Moderately to the side short range
+    //     [-60,0.2], // Moderately to the side short range
+    //     [80,0.06], // Perpendicular very short range
+    //     [-80,0.06], // Perpendicular very short range
+    //   ];
+      const down = new THREE.Vector3(0,-1,0);
+      const raycaster = new THREE.Raycaster();
+    //   const gravity = -1;
+    //   const maxYVelocity = 0.5;
+    //   const results = [];
+    //   let yVel = 0;
+      let firstTry = true;
+	  const results = [];
+      return function tick(time, delta) {
+        // if (this.lastPosition === null) {
+        //   firstTry = true;
+        //   this.lastPosition = new THREE.Vector3();
+        //   this.el.object3D.getWorldPosition(this.lastPosition);
+        // }
+        
+        const el = this.el;
+        if (this.objects.length === 0) return;
+
+		this.el.object3D.getWorldPosition(nextPosition);
+        this.el.object3D.getWorldDirection(tempVec);
+        // if (nextPosition.distanceTo(this.lastPosition) === 0) return;
+        
+        // let didHit = false;
+        // So that it does not get stuck it takes as few samples around the user and finds the most appropriate
+        // scanPatternLoop:
+        // for (const [angle, distance] of scanPattern) {
+        //   tempVec.subVectors(nextPosition, this.lastPosition);
+        //   tempVec.applyAxisAngle(down, angle*Math.PI/180);
+        //   tempVec.multiplyScalar(distance);
+        //   tempVec.add(this.lastPosition);
+        //   tempVec.y += maxYVelocity;
+        //   tempVec.y -= this.data.height;
+		tempVec.normalize();
+		// console.log("tryna set raycaster from " + JSON.stringify(nextPosition) + " dir " + JSON.stringify(tempVec));
+          raycaster.set(nextPosition, tempVec);
+          raycaster.far = 1.5;
+		  if (this.arrow) {
+			this.sceneEl.object3D.remove(this.arrow);
+		  }
+		  this.arrow = new THREE.ArrowHelper( raycaster.ray.direction, raycaster.ray.origin, 1.5, 0xff0000 );
+		  this.sceneEl.object3D.add( this.arrow );
+          raycaster.intersectObjects(this.objects, true, results);
+          
+          if (results.length) {
+			console.log("results: "+ results[0].instanceId);
+            // If it hit something we want to avoid then ignore it and stop looking
+            // for (const result of results) {
+			// 	//instanceId>
+
+			// 	console.log("object_raycaster hitresult : "+ result.object.instanceId);
+            // //   if(this.excludes.includes(result.object.el)) {
+            // //     // results.splice(0);
+            // //     // continue scanPatternLoop;
+            // //   }
+            // }
+            // const hitPos = results[0].point;
+            // results.splice(0);
+            // hitPos.y += this.data.height;
+            // if (nextPosition.y - (hitPos.y - yVel*2) > 0.01) {
+            //   yVel += Math.max(gravity * delta * 0.001, -maxYVelocity);
+            //   hitPos.y = nextPosition.y + yVel;
+            // } else {
+            //   yVel = 0;
+            // }
+            // el.object3D.position.copy(hitPos);
+            // this.el.object3D.parent.worldToLocal(this.el.object3D.position);
+            // this.lastPosition.copy(hitPos);
+            // didHit = true;
+            // break;
+          }
+          
+        // }
+        
+        // if (didHit) {
+        //   firstTry = false;
+        // }
+        
+        // if (!firstTry && !didHit) {
+        // //   this.el.object3D.position.copy(this.lastPosition);
+        // //   this.el.object3D.parent.worldToLocal(this.el.object3D.position);
+        // }
+      }
+    }())
+  });
+
 //uses threejs pathfinding, from aframe-extras
 AFRAME.registerComponent('nav_mesh', { 
     schema: {

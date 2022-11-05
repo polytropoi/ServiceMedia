@@ -328,6 +328,11 @@ AFRAME.registerComponent('instanced_surface_meshes', {
       // }
       // var dummy = new THREE.Object3D();
       this.iMesh = null;
+      this.iMesh_1 = null;
+      this.iMesh_2 = null;
+      this.iMesh_3 = null;
+      this.iMesh_4 = null;
+
       console.log("model this.data._id " + this.data._id + " tryna instance " + this.data.count);
       const scatterModel = document.getElementById(this.data._id);
       if (scatterModel != null) {
@@ -352,6 +357,7 @@ AFRAME.registerComponent('instanced_surface_meshes', {
       this.surface(this.sampleGeos, this.sampleMats);
     });
 
+    this.thirdPersonPlaceholder = document.getElementById("playCaster");
     this.useMatrix = false;
     this.matrixMeshComponent = null;
     if (settings != null && settings.useMatrix) {
@@ -435,29 +441,36 @@ AFRAME.registerComponent('instanced_surface_meshes', {
         .build();
           // for (let m = 0; m < this.sampleGeos.length; m++) {
             // console.log("tryna scatter sample geo # " + m.toString());
+            // let userData = {"collide": true, "instanced": true, count: count};
             let iMesh_1 = new THREE.InstancedMesh(this.sampleGeos[0], this.sampleMats[0], count);
+
             let iMesh_2 = null;
             if (this.sampleGeos.length == 2) {
               iMesh_2 = new THREE.InstancedMesh(this.sampleGeos[1], this.sampleMats[1], count);
+              // iMesh_1.userData = userData;
             }
             let iMesh_3 = null;
             if (this.sampleGeos.length == 3) {
               iMesh_3 = new THREE.InstancedMesh(this.sampleGeos[2], this.sampleMats[2], count);
+              // iMesh_1.userData = userData;
             }
             let iMesh_4 = null;
             if (this.sampleGeos.length == 4) {
               iMesh_4 = new THREE.InstancedMesh(this.sampleGeos[3], this.sampleMats[3], count);
+              // iMesh_1.userData = userData;
             }
           
             // this.iMeshes.push(iMesh);
             // if (m == this.sampleGeos.length - 1) {
               // console.log("trryna update tyhe matrix.. ")
               let position = new THREE.Vector3();
+              let normal = new THREE.Vector3();
               this.count = 0;
               for (var i = 0; i < 100000; i++) {
                 if (this.count < count) {
                 // console.log("scattercount " + i);
-                sampler.sample( position )
+                // sampler.sample( position, normal ) //wtf?
+                sampler.sample( position );
                 
                 let scale = Math.random() * this.data.scaleFactor;
                 // console.log("scale " + scale);
@@ -467,56 +480,135 @@ AFRAME.registerComponent('instanced_surface_meshes', {
                   dummy.position.set(  position.x, position.y + this.data.yMod, position.z );
                   dummy.scale.set(scale,scale,scale);
                   dummy.rotation.y = (Math.random() * 360 ) * Math.PI / 180;
+                  //   dummy.lookAt( _normal ); //use eventData? 
                   dummy.updateMatrix();
 
                   iMesh_1.setMatrixAt( i, dummy.matrix ); //got fussy in a loop, 2 is enough..
                   iMesh_1.frustumCulled = false; //too funky
                   iMesh_1.instanceMatrix.needsUpdate = true;
+                  iMesh_1.userData = {"collide": true, "instanced": true, count: count};
                   sceneEl.object3D.add(iMesh_1);
+                  this.iMesh = iMesh_1;
+                  this.iMesh_1 = iMesh_1;
                   if (iMesh_2) {
                     iMesh_2.setMatrixAt( i, dummy.matrix );
                     iMesh_2.frustumCulled = false;
                     iMesh_2.instanceMatrix.needsUpdate = true;
+                    iMesh_2.userData = {"collide": true, "instanced": true, count: count};
                     sceneEl.object3D.add(iMesh_2);
+                    this.iMesh = iMesh_2;
+                    this.iMesh_2 = iMesh_2;
                   }
                   if (iMesh_3) {
                     iMesh_3.setMatrixAt( i, dummy.matrix );
                     iMesh_3.frustumCulled = false;
                     iMesh_3.instanceMatrix.needsUpdate = true;
+                    iMesh_3.userData = {"collide": true, "instanced": true, count: count};
                     sceneEl.object3D.add(iMesh_3);
+                    // this.iMesh = iMesh_3;
+                    this.iMesh_3 = iMesh_3;
                   }
                   if (iMesh_4) {
                     iMesh_4.setMatrixAt( i, dummy.matrix );
                     iMesh_4.frustumCulled = false;
                     iMesh_4.instanceMatrix.needsUpdate = true;
+                    iMesh_4.userData = {"collide": true, "instanced": true, count: count};
                     sceneEl.object3D.add(iMesh_4);
+                    this.iMesh_4 = iMesh_4;
                   }
 
                   }
-                } else {
-                  console.log("breaking loop at " + i.toString());
-                  this.iMesh = iMesh_1; //maybe https://threejs.org/docs/index.html#examples/en/utils/BufferGeometryUtils.mergeBufferGeometries?
-                  break;
-                }
+              } else {
+                console.log("breaking loop at " + i.toString());
+                //this.iMesh = iMesh_2; //maybe https://threejs.org/docs/index.html#examples/en/utils/BufferGeometryUtils.mergeBufferGeometries?
+
+                break;
+                
+              }
             }
         this.el.classList.add('activeObjexRay');
+        // let oray = document.querySelector("[object_raycaster]");
+        // if (oray) {
+        //   oray.components.object_raycaster.registerObjects();
+        // } else {
+        //   console.log("CaintFINd no oRay");
+        // }
+        // function resampleParticle ( i ) {
+
+        //   sampler.sample( _position, _normal );
+        //   _normal.add( _position );
+  
+        //   dummy.position.copy( _position );
+        //   dummy.scale.set( scales[ i ], scales[ i ], scales[ i ] );
+        //   dummy.lookAt( _normal );
+        //   dummy.updateMatrix();
+  
+        //   stemMesh.setMatrixAt( i, dummy.matrix );
+        //   blossomMesh.setMatrixAt( i, dummy.matrix );
+  
+        // }
+
+    },
+    removeInstance: function (instanceId) {
+      console.log("tryna remove instnace " + instanceId);
+      var dummy = new THREE.Object3D();
+      dummy.scale.set(0,0,0);
+      dummy.updateMatrix();
+      this.iMesh_1.setMatrixAt( instanceId, dummy.matrix );
+      this.iMesh_1.instanceMatrix.needsUpdate = true;
+      if (this.iMesh_2) {
+        this.iMesh_2.setMatrixAt( instanceId, dummy.matrix );
+        this.iMesh_2.instanceMatrix.needsUpdate = true;
+      }
+      if (this.iMesh_3) {
+        this.iMesh_3.setMatrixAt( instanceId, dummy.matrix );
+        this.iMesh_3.instanceMatrix.needsUpdate = true;
+      }
+      if (this.iMesh_4) {
+        this.iMesh_4.setMatrixAt( instanceId, dummy.matrix );
+        this.iMesh_4.instanceMatrix.needsUpdate = true;
+      }
 
     },
     tick: function(time, timeDelta) {
       // this.timeDelta = timeDelta;
       this.time = time;
+      this.thirdPersonPlaceholderPosition = new THREE.Vector3();
+      this.thirdPersonPlaceholderDirection = new THREE.Vector3();
       if (this.iMesh != null && this.data.tags != undefined  && this.data.tags != 'undefined') {
         // console.log(this.posRotReader );
         if (!this.raycaster || this.raycaster == null || this.raycaster == undefined || this.data.tags == undefined) {
             return;
         } else {
-          this.raycaster.setFromCamera( mouse, AFRAME.scenes[0].camera );
-          this.intersection = this.raycaster.intersectObject( this.iMesh );
+          if (settings.sceneCameraMode === "Third Person") {
+            
+            this.thirdPersonPlaceholder.object3D.getWorldPosition(this.thirdPersonPlaceholderPosition);
+            this.thirdPersonPlaceholder.object3D.getWorldDirection(this.thirdPersonPlaceholderDirection);
+            this.thirdPersonPlaceholderDirection.normalize();
+            this.thirdPersonPlaceholderDirection.negate();
+            // console.log("setting thirrd person raycaster! from " + JSON.stringify(this.thirdPersonPlaceholderPosition) + " to " + JSON.stringify(this.thirdPersonPlaceholderDirection));
+            this.raycaster.set(this.thirdPersonPlaceholderPosition, this.thirdPersonPlaceholderDirection);
+            this.raycaster.far = 10;
+            // raycaster.far = 1.5;
+           
+            this.intersection = this.raycaster.intersectObject( this.iMesh );
+ 
+            
+          } else { //first person use mouse for raycast
+            this.raycaster.setFromCamera( mouse, AFRAME.scenes[0].camera ); 
+            this.intersection = this.raycaster.intersectObject( this.iMesh );
+          }
+          if (this.arrow) {
+            this.el.sceneEl.object3D.remove(this.arrow);
+          }
+          this.arrow = new THREE.ArrowHelper( this.raycaster.ray.direction, this.raycaster.ray.origin, 10, 0xff0000 );
+          this.el.sceneEl.object3D.add( this.arrow );
         }
     
-        if ( this.intersection != null && this.intersection.length > 0 && this.data.tags != undefined) {
-          if (window.playerPosition != null && window.playerPosition != undefined && this.intersection[0].point != undefined && this.intersection[0].point != null ) {
-        
+        if ( this.intersection != null && this.intersection.length > 0) {
+          console.log("gotsaz intersection!" + this.intersection[0].instanceId);
+          // if (window.playerPosition != null && window.playerPosition != undefined && this.intersection[0].point != undefined && this.intersection[0].point != null ) {
+          if (this.intersection[0].point != undefined && this.intersection[0].point != null ) {
             if (this.instanceId != this.intersection[0].instanceId) {
               this.instanceId = this.intersection[ 0 ].instanceId;
               
@@ -525,8 +617,10 @@ AFRAME.registerComponent('instanced_surface_meshes', {
               // this.iMesh.setColorAt( this.instanceId, this.highlightColor.setHex( Math.random() * 0xffffff ) );
               // this.iMesh.instanceColor.needsUpdate = true;
               // console.log('windowplayerposition ' + JSON.stringify(window.playerPosition));
-              if (this.data.tags != undefined && window.playerPosition != undefined && window.playerPosition) {
-                this.distance = window.playerPosition.distanceTo(this.intersection[0].point);
+              // if (this.data.tags != undefined && window.playerPosition != undefined && window.playerPosition) {
+              if (this.data.tags != undefined && this.data.tags.length) {  
+                // this.distance = window.playerPosition.distanceTo(this.intersection[0].point);
+                this.distance = this.raycaster.ray.origin.distanceTo( this.intersection[0].point );
                 this.hitpoint = this.intersection[0].point;
                 this.rayhit(this.instanceId, this.distance, this.hitpoint); 
               }
@@ -546,21 +640,25 @@ AFRAME.registerComponent('instanced_surface_meshes', {
         this.intersection = null;
         
         this.hitID = hitID;
-        console.log("new hit " + hitID + " " + distance + " " + JSON.stringify(hitpoint) + " interaction:" + this.data.interaction);
+        console.log("new hit " + hitID + " " + distance + " " + JSON.stringify(hitpoint) + " interaction:" + this.data.interaction + " eventData " + this.data.eventData.toLowerCase());
         var triggerAudioController = document.getElementById("triggerAudio");
         if (triggerAudioController != null) {
           triggerAudioController.components.trigger_audio_control.playAudioAtPosition(hitpoint, distance, this.data.tags);
         }
-
+        if (this.data.tags.toLowerCase().includes("kill")) {
+          this.removeInstance(this.instanceId);
+        }
       }
       if (this.matrixMeshComponent != null) {
         this.matrixMeshComponent.showRoomData(this.instanceId, distance, hitpoint);
       }
 
       
+
+      
     },
     instance_clicked: function (id) {
-      
+      console.log(id);  
       if (id != null && id != this.lastClickedID && this.intersection != null && this.data.tags != 'undefined') {
         this.lastClickedID = id; //bc double triggering....ugh
         console.log(this.data.tags + " clicked id " + id);
