@@ -593,16 +593,18 @@ AFRAME.registerComponent('instanced_surface_meshes', {
            
             this.intersection = this.raycaster.intersectObject( this.iMesh );
  
-            
+            if (this.arrow) { //show helper arrow, TODO toggle from dialogs.js
+              this.el.sceneEl.object3D.remove(this.arrow);
+            }
+            this.arrow = new THREE.ArrowHelper( this.raycaster.ray.direction, this.raycaster.ray.origin, 10, 0xff0000 );
+            this.el.sceneEl.object3D.add( this.arrow );
+
+
           } else { //first person use mouse for raycast
             this.raycaster.setFromCamera( mouse, AFRAME.scenes[0].camera ); 
             this.intersection = this.raycaster.intersectObject( this.iMesh );
           }
-          if (this.arrow) {
-            this.el.sceneEl.object3D.remove(this.arrow);
-          }
-          this.arrow = new THREE.ArrowHelper( this.raycaster.ray.direction, this.raycaster.ray.origin, 10, 0xff0000 );
-          this.el.sceneEl.object3D.add( this.arrow );
+         
         }
     
         if ( this.intersection != null && this.intersection.length > 0) {

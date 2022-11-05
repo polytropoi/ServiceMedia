@@ -3485,7 +3485,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
             // document.getElementById("player").component.get_pos_rot.returnPosRot();
             // this.clientX = evt.clientX;
             // this.clientY = evt.clientY;
-            console.log("tryna callout " + this.calloutEntity.id);
+            // console.log("tryna callout " + this.calloutEntity.id);
             // // that.calloutToggle = !that.calloutToggle;
 
             // this.pos = evt.detail.intersection.point; //hitpoint on model
@@ -6235,7 +6235,7 @@ AFRAME.registerComponent('youtube_player', {  //setup and controls for the 3d pl
         // if (primaryAudioMangler != null) {
         //     primaryAudioMangler.playPauseToggle();
         // }
-        if (!youtubeIsPlaying) {
+        if (!youtubeIsPlaying && youtubePlayer) {
           console.log("tryna play youtube");
           youtubePlayer.playVideo();
           PauseIntervals(false);
