@@ -4577,9 +4577,9 @@ webxr_router.get('/:_id', function (req, res) {
                         "<script src=\x22../main/src/component/aframe-makewaves-shader.js\x22></script>"+
                         "<script src=\x22../main/src/shaders/noise.js\x22></script>"+
 
-                        "<script src=\x22../main/vendor/aframe/aframe-particle-system-component.min.js\x22></script>"+
-                        "<script src=\x22../main/src/component/aframe-spe-particles-component.js\x22></script>"+
-                        "<script src=\x22../main/src/component/aframe-spritesheet-animation.js\x22></script>"+
+                        // "<script src=\x22../main/vendor/aframe/aframe-particle-system-component.min.js\x22></script>"+
+                        // "<script src=\x22../main/src/component/aframe-spe-particles-component.js\x22></script>"+
+                        // "<script src=\x22../main/src/component/aframe-spritesheet-animation.js\x22></script>"+
                         "<script src=\x22../main/src/component/aframe-sprite-particles-component.js\x22></script>"+
                         
 

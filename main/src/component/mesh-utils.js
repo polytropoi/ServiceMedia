@@ -357,11 +357,19 @@ AFRAME.registerComponent('instanced_surface_meshes', {
       this.surface(this.sampleGeos, this.sampleMats);
     });
 
-    this.thirdPersonPlaceholder = document.getElementById("playCaster");
+    this.thirdPersonPlaceholder = document.getElementById("playCaster"); //hrm, should rename
     this.useMatrix = false;
     this.matrixMeshComponent = null;
     if (settings != null && settings.useMatrix) {
       this.useMatrix = true;
+    }
+
+    this.particlesEl = null;
+    // this.particlesComponent = null;
+    if (this.data.tags.toLowerCase().includes("bang")) {
+      this.particlesEl = document.createElement("a-entity");
+      // this.particlesEl.setAttribute("mod_particles", {"enabled": false});
+      this.el.sceneEl.appendChild(this.particlesEl); //hrm...
     }
 /*  this way doesn't work with instanced meshes fsr...  
     this.el.addEventListener('raycaster-intersected', (e) => {  
@@ -568,6 +576,23 @@ AFRAME.registerComponent('instanced_surface_meshes', {
         this.iMesh_4.setMatrixAt( instanceId, dummy.matrix );
         this.iMesh_4.instanceMatrix.needsUpdate = true;
       }
+      if (this.particlesEl) {
+          this.particlesEl.setAttribute('sprite-particles', {
+            enable: true, 
+            duration: '1', 
+            texture: '#explosion1', 
+            color: 'black..white', 
+            blending: 'additive', 
+            textureFrame: '8 8', 
+            textureLoop: '1', 
+            spawnRate: '1', 
+            lifeTime: '1', 
+            opacity: '0,1,0', 
+            rotation: '0..360', 
+            scale: '100,500'
+          });
+      this.particlesEl.setAttribute('sprite-particles', {"duration": .1});
+    }
 
     },
     tick: function(time, timeDelta) {
@@ -582,13 +607,13 @@ AFRAME.registerComponent('instanced_surface_meshes', {
         } else {
           if (settings.sceneCameraMode === "Third Person") {
             
-            this.thirdPersonPlaceholder.object3D.getWorldPosition(this.thirdPersonPlaceholderPosition);
+            this.thirdPersonPlaceholder.object3D.getWorldPosition(this.thirdPersonPlaceholderPosition);  //actually it's id "playCaster"
             this.thirdPersonPlaceholder.object3D.getWorldDirection(this.thirdPersonPlaceholderDirection);
             this.thirdPersonPlaceholderDirection.normalize();
             this.thirdPersonPlaceholderDirection.negate();
             // console.log("setting thirrd person raycaster! from " + JSON.stringify(this.thirdPersonPlaceholderPosition) + " to " + JSON.stringify(this.thirdPersonPlaceholderDirection));
             this.raycaster.set(this.thirdPersonPlaceholderPosition, this.thirdPersonPlaceholderDirection);
-            this.raycaster.far = 10;
+            this.raycaster.far = 15;
             // raycaster.far = 1.5;
            
             this.intersection = this.raycaster.intersectObject( this.iMesh );
@@ -648,6 +673,7 @@ AFRAME.registerComponent('instanced_surface_meshes', {
           triggerAudioController.components.trigger_audio_control.playAudioAtPosition(hitpoint, distance, this.data.tags);
         }
         if (this.data.tags.toLowerCase().includes("kill")) {
+          this.particlesEl.setAttribute("position", hitpoint);
           this.removeInstance(this.instanceId);
         }
       }
@@ -2149,8 +2175,10 @@ AFRAME.registerComponent('mod_particles', {
     if (this.data.type.toLowerCase() =="smoke/add") {
       this.el.setAttribute('sprite-particles', {enable: true, texture: '#smoke1', color: 'lightblue', blending: 'additive', textureFrame: '6 5', textureLoop: '1', spawnRate: '1', lifeTime: '3', scale: '10'});
     }
-    if (this.data.type.toLowerCase() =="smoke/add") {
-      this.el.setAttribute('sprite-particles', {enable: true, texture: '#smoke1', color: 'lightblue', blending: 'additive', textureFrame: '6 5', textureLoop: '1', spawnRate: '1', lifeTime: '3', scale: '10'});
+    if (this.data.type.toLowerCase() =="bang") {
+      
+      this.el.setAttribute('sprite-particles', {enable: true, duration: '1', texture: '#explosion1', color: 'black..white', blending: 'additive', textureFrame: '6 5', textureLoop: '1', spawnRate: '1', lifeTime: '1', opacity: '0,1,0', rotation: '0..360', scale: '10'});
+
     }
     // this.el.setAttribute('sprite-particles', 'texture', '#smoke1');
     // this.el.setAttribute('sprite-particles', 'color', 'blue');
