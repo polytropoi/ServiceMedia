@@ -2609,7 +2609,24 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
     if (this.data.objectData.triggerScale == undefined || this.data.objectData.triggerScale == null || this.data.objectData.triggerScale == "" || this.data.objectData.triggerScale == 0) {
       this.data.objectData.triggerScale = 1;
     } 
-      
+    setTimeout(() => { //to make sure audio group data is loaded
+      if (this.tags && this.tags.includes("loop")){
+        console.log("tryna trigger mod_object loop");
+        var triggerAudioController = document.getElementById("triggerAudio");
+        if (triggerAudioController != null) {
+  
+          triggerAudioController.components.trigger_audio_control.loopAndFollow(this.el.id, this.tags);
+        }
+      }   
+    }, 2000);
+    // if (this.tags && this.tags.includes("loop")){
+          
+    //   var triggerAudioController = document.getElementById("triggerAudio");
+    //   if (triggerAudioController != null) {
+
+    //     triggerAudioController.components.trigger_audio_control.loopAndFollow(this.el.id, this.tags);
+    //   }
+    // }     
     this.hasPickupAction = false;
     this.hasThrowAction = false;
     this.hasShootAction = false;
@@ -2728,7 +2745,9 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
     this.el.classList.add("activeObjexRay");
 
     this.el.addEventListener('model-loaded', () => {
+
       console.log(this.data.objectData.name + " OBJMODEL LOAADIDE!!!" + JSON.stringify(this.data.locationData));
+  
       let pos = {};
       pos.x = this.data.locationData.x;
       pos.y = this.data.locationData.y;          
@@ -2772,8 +2791,8 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
             THREE.Math.degToRad(rot.z)
           );
         }
-      
-      } else {
+   
+      } else { //if we're equipped
         this.el.setAttribute("rotation", rot);
         // this.el.object3D.rotation = rot;
         this.el.setAttribute('material', {opacity: 0.25, transparent: true});
@@ -2818,16 +2837,6 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
               this.el.setAttribute('ammo-body', {type: this.data.objectData.physics.toLowerCase(), emitCollisionEvents: true});
             }
           }
-          
-        // if (that.data.objectData.physics.toLowerCase() == "static") {
-        //  that.el.setAttribute('mod_physics', {body: 'static', shape: 'mesh'});
-        // } else if (that.data.objectData.physics.toLowerCase() == "dynamic") {
-        //   // that.el.setAttribute('mod_physics', {body: 'dynamic', shape: 'box'});
-        //   // console.log("TRYNA SET DYMANIX!");
-        //     that.el.setAttribute('ammo-body', {type: 'dynamic'});
-        //     // that.el.setAttribute('ammo-shape', 'box');
-        //     }
-          // }, 3000);  
       }
       if (this.loadAction != null) {
         if (this.loadAction.actionResult.toLowerCase() == "trigger fx") {
@@ -2842,25 +2851,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
             particleSpawner.components.particle_spawner.spawnParticles(worldPosition, this.data.objectData.particles, 5, this.el.id, this.data.objectData.yPosFudge, this.data.objectData.color1, this.data.objectData.triggerScale);
           }
         }
-        // if (this.selectAction.actionResult.toLowerCase() == "trigger fx") {
-        //   if (!this.isTriggered) {
-        //     // var worldPosition = new THREE.Vector3();
-        //     // this.el.object3D.getWorldPosition(worldPosition);
-        //     this.isTriggered = true;
-        //     let particleSpawner = document.getElementById('particleSpawner');
-        //     if (particleSpawner != null) {
-        //       var worldPosition = new THREE.Vector3();
-        //       this.el.object3D.getWorldPosition(worldPosition);
-        //       if (this.data.objectData.yPosFudge != null && this.data.objectData.yPosFudge != "") {
-        //         worldPosition.y += this.data.objectData.yPosFudge;
-        //       }
-        //       console.log("triggering fx at " + JSON.stringify(worldPosition) + " plus" + this.data.objectData.yPosFudge);
-        //       particleSpawner.components.particle_spawner.spawnParticles(worldPosition, this.data.objectData.particles, 5, null, this.data.objectData.yPosFudge, this.data.objectData.color1, this.data.objectData.triggerScale);
-        //     }
-        //   } else {
-        //     console.log("already triggered - make it a toggle!");
-        //   }
-        // }
+
 
       }
       // this.el.setAttribute("aabb-collider", {objects: ".activeObjexRay"});
@@ -3679,9 +3670,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
           }
         }       
       }
-      // setTimeout(() => {
-        // this.el.setAttribute('visible', true);
-      // }, 1000);
+
     });
   },
 

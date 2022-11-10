@@ -1131,8 +1131,10 @@ AFRAME.registerComponent('local_marker', {
         window.playerPosition = this.playerPosRot.pos; 
       } else {
         posRotReader = document.getElementById("player").components.get_pos_rot; 
-        this.playerPosRot = posRotReader.returnPosRot(); 
-        window.playerPosition = this.playerPosRot.pos; 
+        if (posRotReader) {
+          this.playerPosRot = posRotReader.returnPosRot(); 
+          window.playerPosition = this.playerPosRot.pos; 
+        }
       }
       // console.log("playerPOsition  " + JSON.stringify(window.playerPosition));
       if (!that.isSelected) {
@@ -1145,14 +1147,14 @@ AFRAME.registerComponent('local_marker', {
         let pos = evt.detail.intersection.point; //hitpoint on model
         let name = evt.detail.intersection.object.name;
         that.hitPosition = pos;
-        if (player != null)
+        if (player != null && window.playerPosition != null) { 
         that.distance = window.playerPosition.distanceTo(pos);
 
         that.rayhit(evt.detail.intersection.object.name, that.distance, evt.detail.intersection.point);
 
           that.selectedAxis = name;
 
-          let elPos = that.el.getAttribute('position');
+          // let elPos = that.el.getAttribute('position');
         if (!name.includes("handle")) {
           if (that.distance < 66) {
             console.log("trna scale to distance :" + that.distance);
@@ -1166,6 +1168,7 @@ AFRAME.registerComponent('local_marker', {
               calloutString = that.data.description != '' ? that.data.description : theLabel;
             }
             that.calloutText.setAttribute("value", calloutString);
+          }
           }
         }
       }  

@@ -1304,7 +1304,7 @@ AFRAME.registerComponent('ambient_audio_control', { //ambient file will loop and
     }); //end register
     
 // }
-AFRAME.registerComponent('ambient-child', { //objects with this component will follow the ambient object
+AFRAME.registerComponent('ambient-child', { //objects with this component will follow the ambient object //nah, set in ambient-audio above
     schema: {
     // color: {default: 'red'},
     // url: {default: ''},
@@ -1407,6 +1407,10 @@ AFRAME.registerComponent('trigger_audio_control', { //trigger audio on designate
         //         intensity: 1.0,
         //         color: 'purple'
         //     }, true);
+        this.loopIDs = [];
+        this.rate = 1;
+        this.loopID = null;
+        this.loopHowl = null;
     },
     randomTriggerAudio: function () {
         if (this.audioGroupsEl != null) {
@@ -1424,6 +1428,8 @@ AFRAME.registerComponent('trigger_audio_control', { //trigger audio on designate
         console.log("tryna mod trigger Volume to " + this.normalizedVolume);
         triggerAudioHowl.volume(this.normalizedVolume);
     },
+
+
     playAudio: function() {
         this.audioGroupsEl = document.getElementById('audioGroupsEl');
         if (this.audioGroupsEl != null) {
@@ -1497,6 +1503,102 @@ AFRAME.registerComponent('trigger_audio_control', { //trigger audio on designate
                         console.log("tryna play trigger at volume " + volume + " distance " + distance + " id " + id); //calling id here is needed
                         triggerAudioHowl.pos(pos.x / 100, pos.y / 100, pos.z / 100, id);  //HOLY SHIT howler needs small values for position, * .01
                         break;
+                        }
+                    }
+                }
+            }
+        }
+    },
+    modLoop: function (modType, modValue) { //TODO send in min/max?
+
+        // this.lastModValue 
+        console.log(this.loopID + " " + this.rate);
+        if (this.loopHowl) {
+            if (modType == "rate") {
+                if (modValue != 0) { //modvalue 0 === this.rate 1
+                    if (this.rate > 2.475) {
+                        this.rate = 2.5;
+                    } else {
+                        this.rate = lerp(this.rate, 2.5, .01); //eg, engine noise, footsteps get faster
+                    }
+                    if (this.rate) {
+                        this.loopHowl.rate(this.rate, this.loopID); //what if multiplez?
+                    }
+                } else {
+                    
+
+                    this.loopHowl.rate(1, this.loopID);
+                    this.rate = 1;
+                    // console.log("reset this.rzate" +this.rate);
+                }
+            }
+        }
+
+    },
+    loopAndFollow: function(targetID, tag) {
+
+        if (triggerAudioHowl != null && tag != undefined && tag != null && tag != "") {
+            console.log("tryna loopAndFollow trigger audio with tag " + tag + " for targetID " + targetID);
+        // this.modVolume(1);
+        this.audioGroupsEl = document.getElementById('audioGroupsEl');
+        let audioID = null;
+        let audioIDs = [];
+        if (this.audioGroupsEl != null) { //if only a single trigger sound, it's hardwired to the triggerAudioHowl on server response
+            this.audioGroupsController = this.audioGroupsEl.components.audio_groups_control;
+            if (tag != null) {
+                let tags = tag.toString().split(",");
+                console.log("tags  "+ tags)
+                for (let i = 0; i < tags.length; i++) {
+                    console.log("looking fo rtag " + tags[i]);
+                    let trimmedTag = tags[i].trim();
+                    audioID = this.audioGroupsController.returnTriggerAudioIDWithTag(trimmedTag);
+                    // } else {
+                    //     // audioID = this.audioGroupsController.returnRandomTriggerAudioID(); 
+                    // }
+                    //TODO - follow index sequence, use tags?
+                    // console.log("tag "+ tags[i] + " tryna get audioID " + audioID);
+                    if (!audioID) continue; //if no match skip this one and keep looping
+                    this.audioItem = this.audioGroupsController.returnAudioItem(audioID);
+
+                    if (this.audioItem != null) {
+                        console.log("gotsa loop and floow audioItem, tryna set trigger to src " + this.audioItem.URLogg);
+                        // triggerAudioHowl = null;
+                        this.loopHowl = new Howl({
+                            src: [this.audioItem.URLogg, this.audioItem.URLmp3],
+                            format: ["ogg", "mp3"], 
+                            loop: true
+                        });
+                        // triggerAudioHowl.format = ["ogg", "mp3"];
+                        // triggerAudioHowl.src = [audioItem.URLogg, audioItem.URLmp3];
+                        this.loopHowl.load();
+                        // triggerAudioHowl.play();
+
+                        //umm, maybe split the diff with this.data.volume (scene setting) and the distance driven volume below?
+                        // let volume = Math.min(Math.max(0, 1000 - (distance * 25)), 1000) * .001; //clamp between 0-1
+                        // let volume = clamp(100 - distance) * .01; //hrm..
+
+                        let volume = .25; //clamp between 0-1
+                        if (volume < .1) {
+                            volume = .1;
+                        }
+                        if (this.data.volmod != null) {
+                            volume = volume * this.data.volmod;
+                        }
+                        this.loopHowl.volume(volume);
+                        this.targetEl = document.getElementById(targetID);
+                        this.targetPosition = new THREE.Vector3();
+                        this.targetEl.object3D.getWorldPosition(this.targetPosition);
+                            
+                        // const clamp = (num, a, b) => Math.max(Math.min(num, Math.max(a, b)), Math.min(a, b));
+                        // const rate = clamp(Math.random() + .25, .75, 1.25); //fudge pitch a bit slower or faster
+                        // triggerAudioHowl.rate(rate);
+                        // console.log("tryna play at hitpoint " + pos);
+                        let id = this.loopHowl.play();
+                        // this.loopIDs.push(id);
+                        this.loopID = id;
+                        // console.log("tryna play trigger at volume " + volume + " distance " + distance + " id " + id); //calling id here is needed
+                        // triggerAudioHowl.pos(this.targetPosition.x / 100, this.targetPosition.y / 100, this.targetPosition.z / 100, id);  //HOLY SHIT howler needs small values for position, * .01
+                        break; //bail from loop aafter match
                         }
                     }
                 }
@@ -1627,7 +1729,7 @@ AFRAME.registerComponent('audio_groups_control', { //element and component are a
     },
     returnTriggerAudioIDWithTag: function (tag) {
         
-        if (tag) {
+        if (tag && this.data.audioGroupsData) {
             let triggerGroup = this.data.audioGroupsData.triggerGroupItems[0];
             // console.log("looking for audio trigger with tag " + tag + " in files " + triggerGroup.items.length);
             for (let i = 0; i < triggerGroup.items.length; i++) {

@@ -656,10 +656,27 @@ AFRAME.registerComponent('extended_wasd_thirdperson', {
        	return this.keyPressedSet.has(keyName);
 	},
 
+	resetAudio: function (keyName) {
+		if (!keyName) return;
+		if (this.triggerAudioController) {
+			console.log("checkn keyups " + keyName + " vs " + this.data.moveForwardKey );
+			if (keyName == "w") {
+				console.log("resetting audioloop");
+				this.triggerAudioController.modLoop("rate", 0 );
+			}
+		}
+	}, 
 	init: function()
 	{
 
 		this.el.setAttribute('screen-controls-thirdperson', true);
+		this.triggerAudioEl  = document.getElementById("triggerAudio");
+		this.triggerAudioController = null;
+		
+		if (this.triggerAudioEl != null) {
+			this.triggerAudioController = this.triggerAudioEl.components.trigger_audio_control;
+		}
+		
 		// register key down/up events 
 		//  and keep track of all keys currently pressed
 		this.keyPressedSet = new Set();
@@ -677,6 +694,8 @@ AFRAME.registerComponent('extended_wasd_thirdperson', {
 			function(eventData) 
 			{ 
 				self.registerKeyUp( self.convertKeyName(eventData.key) );
+				self.resetAudio( self.resetAudio(eventData.key) );
+				
 			} 
 		);
 
@@ -701,11 +720,11 @@ AFRAME.registerComponent('extended_wasd_thirdperson', {
 		this.lookAngle = 0; // around local X axis
 
 		// this will = null or an object
-    this.lookControlElement = document.querySelectorAll("[look-controls]")[0];
-    this.lookControls = null;
-    if (this.lookControlElement) {
-      this.lookControls = this.lookControlElement.components["look-controls"];
-    }
+		this.lookControlElement = document.querySelectorAll("[look-controls]")[0]; 
+		this.lookControls = null;
+		if (this.lookControlElement) {
+			this.lookControls = this.lookControlElement.components["look-controls"];
+		}
 		
 		
 		// allows easy extraction of turn angle
@@ -717,6 +736,7 @@ AFRAME.registerComponent('extended_wasd_thirdperson', {
     },
 	tick: function (time, timeDelta) 
 	{
+
 		let moveAmount = (timeDelta/1000) * this.data.moveSpeed;
 		// need to convert angle measures from degrees to radians
 		let turnAmount = (timeDelta/1000) * THREE.Math.degToRad(this.data.turnSpeed);
@@ -738,7 +758,7 @@ AFRAME.registerComponent('extended_wasd_thirdperson', {
 		{
 			// this code is only useful when trying to combine 
 			//   look-controls with extended-wasd rotation
-			totalTurnAngle += this.lookControls.yawObject.rotation.y;
+			totalTurnAngle += this.lookControls.yawObject.rotation.y; 
 			// totalLookAngle += this.lookControls.pitchObject.rotation.x;
       // console.log(totalLookAngle);
 		}
@@ -783,16 +803,16 @@ AFRAME.registerComponent('extended_wasd_thirdperson', {
         }
         this.el.object3D.rotation.y = this.turnAngle;
 			
-			}
+		}
 
-			// enforce bounds on look angle (avoid upside-down perspective) 
-			if ( this.data.maxLookEnabled )
-			{
-				if (this.lookAngle > maxLookAngle)
-					this.lookAngle = maxLookAngle;
-				if (this.lookAngle < -maxLookAngle)
-					this.lookAngle = -maxLookAngle;
-			}
+		// enforce bounds on look angle (avoid upside-down perspective) 
+		if ( this.data.maxLookEnabled )
+		{
+			if (this.lookAngle > maxLookAngle)
+				this.lookAngle = maxLookAngle;
+			if (this.lookAngle < -maxLookAngle)
+				this.lookAngle = -maxLookAngle;
+		}
 		// }
 
 		// translations
@@ -842,6 +862,17 @@ AFRAME.registerComponent('extended_wasd_thirdperson', {
 							 -c * this.movePercent.z - s * this.movePercent.x ).multiplyScalar( moveAmount );
 
 		this.el.object3D.position.add( this.moveVector );
+
+		if (this.triggerAudioController) {
+			if (this.isKeyPressed(this.data.moveForwardKey)) {
+				this.triggerAudioController.modLoop("rate", this.movePercent.z );
+			}
+			// } else {
+			// 	if (this.registerKeyUp(this.data.moveForwardKey)) {
+			// 		this.triggerAudioController.modLoop("rate", 0 );
+			// 	}
+			// }
+		}
 	}
 });
 
