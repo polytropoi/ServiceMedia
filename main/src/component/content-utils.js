@@ -300,9 +300,9 @@ AFRAME.registerComponent('disable-magicwindow', {
   init: function () {
     var cameraEl = document.querySelector('[look-controls]');
     if (cameraEl != null) {
-    var lookControlsComponent = cameraEl.components['look-controls'];
-    if (!lookControlsComponent.magicWindowControls) { return; }
-    lookControlsComponent.magicWindowControls.enabled = false;
+    var lookControlsComponent = cameraEl.components["look-controls"];
+    // if (!lookControlsComponent.magicWindowControls) { return; }
+    lookControlsComponent.magicWindowTrackingEnabled = false;
     }
   }
 });

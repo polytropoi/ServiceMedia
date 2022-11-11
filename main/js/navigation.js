@@ -265,6 +265,7 @@ AFRAME.registerComponent('screen-controls-thirdperson',
 					this.component.setJoystickInput();
 					console.log("controls initialized : JOYSTICK" );
 				//   this.isMobile = true;
+
 				}
 			} else {
 				// let jsContainer = document.getElementById('joystickContainer');
@@ -724,6 +725,7 @@ AFRAME.registerComponent('extended_wasd_thirdperson', {
 		this.lookControls = null;
 		if (this.lookControlElement) {
 			this.lookControls = this.lookControlElement.components["look-controls"];
+			this.lookControls.reverseTouchDrag = true;
 		}
 		
 		
