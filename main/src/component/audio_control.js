@@ -1512,7 +1512,7 @@ AFRAME.registerComponent('trigger_audio_control', { //trigger audio on designate
     modLoop: function (modType, modValue) { //TODO send in min/max?
 
         // this.lastModValue 
-        console.log(this.loopID + " " + this.rate);
+        // console.log(this.loopID + " " + this.rate);
         if (this.loopHowl) {
             if (modType == "rate") {
                 if (modValue != 0) { //modvalue 0 === this.rate 1

@@ -313,7 +313,7 @@ AFRAME.registerComponent('instanced_surface_meshes', {
     tags: {default: ''}
   },
   init: function () {
-     let initialized = false;
+    this.scatterFinished = false;
      let clickCount = 0;
       this.surfaceMesh = null;
       this.scatterModel = null;
@@ -323,10 +323,7 @@ AFRAME.registerComponent('instanced_surface_meshes', {
       this.sampleMats = [];
       this.lastClickedID = 0;
       this.raycaster = new THREE.Raycaster();
-      // if (this.data.tags == undefined || this.data.tags == '') {
-      //   this.data.tags = null;
-      // }
-      // var dummy = new THREE.Object3D();
+
       this.iMesh = null;
       this.iMesh_1 = null;
       this.iMesh_2 = null;
@@ -334,28 +331,33 @@ AFRAME.registerComponent('instanced_surface_meshes', {
       this.iMesh_4 = null;
 
       console.log("model this.data._id " + this.data._id + " tryna instance " + this.data.count);
-      const scatterModel = document.getElementById(this.data._id);
-      if (scatterModel != null) {
-      scatterModel.addEventListener('model-loaded', (event) => {
-      const sObj = scatterModel.getObject3D('mesh');
-      console.log("tryna INSTANCE THE THIGNS");
-      sObj.traverse(node => {
+
+      this.el.addEventListener('model-loaded', (event) => {
+        event.preventDefault();;
+        const sObj = this.el.getObject3D('mesh');
+        console.log("tryna INSTANCE THE THIGNS");
+        this.sampleGeos = [];
+        this.sampleMats = [];
+        sObj.traverse(node => {
         if (node.isMesh && node.material) {
-              this.sampleGeometry = node.geometry;
-              this.sampleGeos.push(this.sampleGeometry);
-              this.sampleMaterial = node.material;
-              this.sampleMats.push(this.sampleMaterial);
+            this.sampleGeometry = node.geometry;
+            this.sampleGeos.push(this.sampleGeometry);
+            this.sampleMaterial = node.material;
+            this.sampleMats.push(this.sampleMaterial);
+            
             }
           });
-        });
-      }
+        if (!this.scatterFinished) {
+          this.surfaceLoaded(); //surface should be ready, if not it will reload samplegeos below
+        }
+      });
     let that = this; //hrrmm..
-    let surfaceEl = document.getElementById('scatterSurface');  
-    surfaceEl.addEventListener('surfaceLoaded', () => {
-      console.log("SURFACE EVENT LOADEDD");
-   
-      this.surface(this.sampleGeos, this.sampleMats);
-    });
+    // let surfaceEl = document.getElementById('scatterSurface');   
+    // surfaceEl.addEventListener('surfaceLoaded', () => { //no, now scatter-surface calls surfaceLoaded below when surface is ready
+    //   console.log("SURFACE EVENT LOADEDD");
+  
+    //   this.surface(this.sampleGeos, this.sampleMats);
+    // });
 
     this.thirdPersonPlaceholder = document.getElementById("playCaster"); //hrm, should rename
     this.useMatrix = false;
@@ -400,48 +402,129 @@ AFRAME.registerComponent('instanced_surface_meshes', {
       }
     }); 
   },
+  // loadScatterModel: function () { //unused now...
+  //   if (!this.sampleGeos.length) {
+  //     // console.log("tryna get scatter model id" + this.data._id);
+  //     // const scatterModel = document.getElementById(this.data._id);
+  //     // if (scatterModel != null) {
 
-  surface: function(geo, mat) {
-    let thiz = this;
-    thiz.sampleGeometry = geo;
-    thiz.sampleMaterial = mat;
-    //set by location.eventData
-        
-      this.surfaces = document.getElementsByClassName("surface");
-      console.log("surfaces found " + this.surfaces.length);
-      if (this.surfaces.length > 0) {
-        this.surface = this.surfaces[0];
+  //     // this.el.addEventListener('model-loaded', (event) => {
+  //     //     event.preventDefault();;
+  //       const sObj = this.el.getObject3D('mesh');
+  //       if (sObj) {
+  //       console.log("tryna INSTANCE THE THIGNS");
+  //       this.sampleGeos = [];
+  //       this.sampleMats = [];
+  //       sObj.traverse(node => {
+  //         if (node.isMesh && node.material) {
+  //             this.sampleGeometry = node.geometry;
+  //             this.sampleGeos.push(this.sampleGeometry);
+  //             this.sampleMaterial = node.material;
+  //             this.sampleMats.push(this.sampleMaterial);
+              
+  //             }
+  //           // });
+
+  //         });
+  //         this.surfaceLoaded();
+  //       }
+
+  //     } else {
+  //       this.surfaceLoaded();
+  //     }
+  //   // }
+  //   // } else {
+  //   //   this.surfaceLoaded();
+  //   // }
+  // },
+  surfaceLoaded: function () {
+    console.log("instanced_surface_meshes.surfaceLoaded call");
+        if (!this.surfaceMesh) {
+          this.surfaces = document.getElementsByClassName("surface");
+          console.log("surfaces found " + this.surfaces.length);
+          if (this.surfaces.length > 0) {
+            this.surface = this.surfaces[0];
+            if (this.surface.getObject3D('mesh') != null) {
+              this.surface.getObject3D('mesh').traverse(node => {
+                if (node.isMesh) {
+                  this.surfaceMesh = node;    
+                  if (this.sampleGeos.length) {
+                    console.log("gots samplegeos");
+                    this.scatterMeshes();
     
-        if (this.surface.getObject3D('mesh') != null) {
-            this.surface.getObject3D('mesh').traverse(node => {
-              if (node.isMesh) {
-                this.surfaceMesh = node;    
-                // clearInterval(interval);
-                // this.scatter(this.surfaceMesh, thiz.sampleGeometry, thiz.sampleMaterial);
-                  //   for (let i = 0; i < this.sampleGeos.length; i++) {
-                  //   // if (this.surface)
-                  //   this.scatter(this.surfaceMesh, this.sampleGeos[i], this.sampleMats[i]);
-                    
-                  // }
-                  this.scatter(this.surfaceMesh);
+                  } else {
+                    console.log("no samplegeos");
+                  }
                 }
               });
             }
+          } 
+        } else {
+          if (!this.sampleGeos.length) {
+          console.log("tryna reload samplegeos");
 
-    } 
+          const sObj = this.el.getObject3D('mesh');
+          if (sObj) {
+          console.log("tryna INSTANCE THE THIGNS");
+          this.sampleGeos = [];
+          this.sampleMats = [];
+          sObj.traverse(node => {
+            if (node.isMesh && node.material) {
+                this.sampleGeometry = node.geometry;
+                this.sampleGeos.push(this.sampleGeometry);
+                this.sampleMaterial = node.material;
+                this.sampleMats.push(this.sampleMaterial);
+                
+                }
+              // });
+            });
+            if (this.sampleGeos.length) {
+              this.scatterMeshes();
+            }
+          }
+        }  else {
+          console.log("gots samplegeos")
+          this.scatterMeshes();
+        }
+      }
+  },
+
+  // setSurface: function() { //unused now...
    
-    },
-    scatter: function (surface, geo, mat) {
-       
+  //     if (this.surface) {
+  //       // this.surface = this.surfaces[0];
+    
+  //       if (this.surface.getObject3D('mesh') != null) {
+  //         this.surface.getObject3D('mesh').traverse(node => {
+  //           if (node.isMesh) {
+  //             this.surfaceMesh = node;    
+  //             if (this.sampleGeos.length) {
+  //               console.log("gots samplegeos");
+  //               this.scatterMeshes();
+
+  //             } else {
+  //               console.log("no samplegeos");
+  //               this.loadScatterModel();
+  //             }
+  //           }
+  //         });
+  //       }
+  //     } 
+   
+  //   },
+    scatterMeshes: function () {
+      if (!this.scatterFinished && this.surfaceMesh && this.sampleGeos.length) {
+        this.scatterFinished = true;
+        
         let waterLevel = -5;
         if (settings) {
           waterLevel = settings.sceneWaterLevel;
         }
-        this.surfaceMesh = surface;
+        // this.surfaceMesh
       // this.surface.setAttribute("activeObjexRay");
         // console.log('surfacemesh name ' + this.surfaceMesh);
         // this.iMeshes = []; //nm
-        console.log("tryna scatter!@ waterLeve " + waterLevel);
+        console.log("tryna scatter!@ waterLeve " + waterLevel + " object with #meshes  "+ this.sampleGeos.length);
         var dummy = new THREE.Object3D();
         const count = this.data.count;
     
@@ -535,6 +618,7 @@ AFRAME.registerComponent('instanced_surface_meshes', {
               }
             }
         this.el.classList.add('activeObjexRay');
+        this.initialized = true;
         // let oray = document.querySelector("[object_raycaster]");
         // if (oray) {
         //   oray.components.object_raycaster.registerObjects();
@@ -555,6 +639,10 @@ AFRAME.registerComponent('instanced_surface_meshes', {
         //   blossomMesh.setMatrixAt( i, dummy.matrix );
   
         // }
+      } else {
+        console.log(this.scatterFinished + " " + this.surfaceMesh + " " + this.sampleGeos.length);
+        //this.loadScatterModel();
+      }
 
     },
     removeInstance: function (instanceId) {
@@ -951,8 +1039,17 @@ AFRAME.registerComponent('scatter-surface', {
   init: function () {
     let that = this;
     this.el.addEventListener('model-loaded', (event) => {
+      event.preventDefault();
       console.log("SCATTER SURFACE LOADED");
-      setTimeout(function(){ that.el.emit('surfaceLoaded', true);   }, 2000);// put some fudge, wait a bit for scatter meshes to load before firing
+      // that.el.emit('surfaceLoaded', true);
+      // setTimeout(function(){ that.el.emit('surfaceLoaded', true);   }, 2000);// put some fudge, wait a bit for scatter meshes to load before firing
+      let imeshes = document.querySelectorAll("[instanced_surface_meshes]");
+      console.log("gots imeshes " + imeshes);
+      for (let i = 0; i < imeshes.length; i++) {
+        console.log("imesh " + imeshes[i]);
+        imeshes[i].components.instanced_surface_meshes.surfaceLoaded();
+      }
+    
     });
   }
 });

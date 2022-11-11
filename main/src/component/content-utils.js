@@ -4199,7 +4199,15 @@ AFRAME.registerComponent('mod_model', {
       if (!this.isInitialized) {
         if (this.data.eventData.includes("scatter")) {
           this.el.object3D.visible = false;
-          console.log("GOTSA SCATTER OBJEK@");
+          // console.log("GOTSA SCATTER OBJEK@");
+          // document.getElementById("scatterSurface").components.instanced_surface_meshes.surfaceLoaded();
+          // let imeshes = document.querySelectorAll("[instanced_surface_meshes]");
+          // console.log("gots imeshes " + imeshes);
+          // for (let i = 0; i < imeshes.length; i++) {
+          //   console.log("imesh " + imeshes[i]);
+          //   imeshes[i].components.instanced_surface_meshes.surfaceLoaded(this.el);
+          // }
+
         }
         // this.oScale = oScale;
         this.bubble = null;
