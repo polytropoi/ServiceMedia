@@ -1511,7 +1511,8 @@ AFRAME.registerComponent('trigger_audio_control', { //trigger audio on designate
     },
     modLoop: function (modType, modValue) { //TODO send in min/max?
 
-        // this.lastModValue 
+        // if (modValue != this.lastModValue) {
+
         // console.log(this.loopID + " " + this.rate);
         if (this.loopHowl) {
             if (modType == "rate") {
@@ -1533,6 +1534,7 @@ AFRAME.registerComponent('trigger_audio_control', { //trigger audio on designate
                 }
             }
         }
+    // }
 
     },
     loopAndFollow: function(targetID, tag) {

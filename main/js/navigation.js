@@ -866,8 +866,10 @@ AFRAME.registerComponent('extended_wasd_thirdperson', {
 		this.el.object3D.position.add( this.moveVector );
 
 		if (this.triggerAudioController) {
-			if (this.isKeyPressed(this.data.moveForwardKey)) {
+			if (this.isKeyPressed(this.data.moveForwardKey || this.movePercent.z != 0)) {
 				this.triggerAudioController.modLoop("rate", this.movePercent.z );
+			} else {
+				this.triggerAudioController.modLoop("rate", 0 );
 			}
 			// } else {
 			// 	if (this.registerKeyUp(this.data.moveForwardKey)) {
