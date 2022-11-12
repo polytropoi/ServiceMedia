@@ -661,7 +661,7 @@ AFRAME.registerComponent('extended_wasd_thirdperson', {
 		if (!keyName) return;
 		if (this.triggerAudioController) {
 			console.log("checkn keyups " + keyName + " vs " + this.data.moveForwardKey );
-			if (keyName == "w") {
+			if (keyName.toString().toLowerCase() == this.data.moveForwardKey.toString().toLowerCase()) {
 				console.log("resetting audioloop");
 				this.triggerAudioController.modLoop("rate", 0 );
 			}
