@@ -275,6 +275,13 @@ AFRAME.registerComponent('screen-controls-thirdperson',
 				console.log("controls initialized : KEYBOID" );
 			}
 		// });
+		this.triggerAudioEl  = document.getElementById("triggerAudio");
+		this.triggerAudioController = null;
+		
+		if (this.triggerAudioEl != null) {
+			this.triggerAudioController = this.triggerAudioEl.components.trigger_audio_control;
+		}
+
       },
 
       tick: function(time, deltaTime)
@@ -282,6 +289,12 @@ AFRAME.registerComponent('screen-controls-thirdperson',
           if (this.isMobile && this.component != null && this.jsContainer) {
             this.component.movePercent.x =  this.joystick1.value.x;
             this.component.movePercent.z = -this.joystick1.value.y;
+			if (this.triggerAudioController && this.component.movePercent.z != 0) {
+				this.triggerAudioController.modLoop("rate", this.movePercent.z );
+			} else {
+				this.triggerAudioController.modLoop("rate", 0);
+			}
+
           }
       }
 });
@@ -866,10 +879,8 @@ AFRAME.registerComponent('extended_wasd_thirdperson', {
 		this.el.object3D.position.add( this.moveVector );
 
 		if (this.triggerAudioController) {
-			if (this.isKeyPressed(this.data.moveForwardKey || this.movePercent.z != 0)) {
+			if (this.isKeyPressed(this.data.moveForwardKey)) {
 				this.triggerAudioController.modLoop("rate", this.movePercent.z );
-			} else {
-				this.triggerAudioController.modLoop("rate", 0 );
 			}
 			// } else {
 			// 	if (this.registerKeyUp(this.data.moveForwardKey)) {
