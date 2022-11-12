@@ -725,7 +725,7 @@ AFRAME.registerComponent('extended_wasd_thirdperson', {
 		this.lookControls = null;
 		if (this.lookControlElement) {
 			this.lookControls = this.lookControlElement.components["look-controls"];
-			this.lookControls.reverseTouchDrag = true;
+			// this.lookControls.reverseTouchDrag = true;
 		}
 		
 		
