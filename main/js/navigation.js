@@ -290,7 +290,7 @@ AFRAME.registerComponent('screen-controls-thirdperson',
             this.component.movePercent.x =  this.joystick1.value.x;
             this.component.movePercent.z = -this.joystick1.value.y;
 			if (this.triggerAudioController && this.component.movePercent.z != 0) {
-				this.triggerAudioController.modLoop("rate", this.movePercent.z );
+				this.triggerAudioController.modLoop("rate", this.component.movePercent.z );
 			} else {
 				this.triggerAudioController.modLoop("rate", 0);
 			}
