@@ -744,6 +744,11 @@ AFRAME.registerComponent('extended_wasd_thirdperson', {
 		
 		// allows easy extraction of turn angle
 		this.el.object3D.rotation.order = 'YXZ';
+
+		this.isFlyable = false;
+		if (settings && settings.sceneCameraFlyable) {
+			this.isFlyable = true;
+		}
 	},
 	setJoystickInput: function () {
         console.log("setting ewasd controller input to JOYSTICK!");
@@ -774,7 +779,7 @@ AFRAME.registerComponent('extended_wasd_thirdperson', {
 			// this code is only useful when trying to combine 
 			//   look-controls with extended-wasd rotation
 			totalTurnAngle += this.lookControls.yawObject.rotation.y; 
-			// totalLookAngle += this.lookControls.pitchObject.rotation.x;
+			totalLookAngle += this.lookControls.pitchObject.rotation.x;
       // console.log(totalLookAngle);
 		}
 		// else
@@ -811,12 +816,17 @@ AFRAME.registerComponent('extended_wasd_thirdperson', {
 			if ( this.data.turnEnabled )
 			{
         if (this.lookControls) {
-          this.turnAngle = totalTurnAngle; //for third person cam, has look controller on parent, just need to mod the y
-        } else {
-          this.turnAngle += this.rotatePercent.y * turnAmount;
-
+          	this.turnAngle = totalTurnAngle; //for third person cam, has look controller on parent, just need to mod the y
+			if (this.isFlyable) { //unless we can fly!
+				this.lookAngle = totalLookAngle;
+			}
+			
+		} else {
+          	this.turnAngle += this.rotatePercent.y * turnAmount;
+			this.lookAngle += this.rotatePercent.x * lookAmount;
         }
         this.el.object3D.rotation.y = this.turnAngle;
+		this.el.object3D.rotation.x = this.lookAngle;
 			
 		}
 

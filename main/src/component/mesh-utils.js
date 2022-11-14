@@ -52,6 +52,8 @@ AFRAME.registerComponent('instanced_meshes_sphere', { //scattered randomly in sp
   this.highlightColor = new THREE.Color();
   this.camera = document.querySelector("[camera]").getObject3D('camera');
   // let gltfs = document.getElementsByClassName('gltfAssets');
+
+  this.thirdPersonPlaceholder = document.getElementById("playCaster"); 
   this.useMatrix = false;
   this.matrixMeshComponent = null;
   if (settings.useMatrix) {
@@ -77,43 +79,43 @@ AFRAME.registerComponent('instanced_meshes_sphere', { //scattered randomly in sp
   
   this.playerPosition = new THREE.Vector3();
   this.el.addEventListener('model-loaded', () => {
-  this.obj = this.el.getObject3D('mesh');
-  console.log("tryna INSTANCE THE THIGNS");
-  this.raycaster = new THREE.Raycaster();
-  this.material = null;
-  this.obj.traverse(node => {
-      // if (node.geometry && node.material) {
-      if (node.isMesh && node.material) {
-          this.geometry = node.geometry;
-          this.material = node.material;
+    this.obj = this.el.getObject3D('mesh');
+    console.log("tryna INSTANCE THE THIGNS");
+    this.raycaster = new THREE.Raycaster();
+    this.material = null;
+    this.obj.traverse(node => {
+        // if (node.geometry && node.material) {
+        if (node.isMesh && node.material) {
+            this.geometry = node.geometry;
+            this.material = node.material;
+        }
+    })
+    const color = new THREE.Color();
+    this.texture = null;
+    this.textureArray = [];    
+    for (let i = 1; i < 7; i++) {
+      this.envmapEl = document.querySelector("#envmap_" + i);
+      if (this.envmapEl) {
+      this.path = this.envmapEl.getAttribute("src");
+      // console.log("envMap path " + this.path);
+      this.textureArray.push(this.path);
       }
-  })
-  const color = new THREE.Color();
-  this.texture = null;
-  this.textureArray = [];    
-  for (let i = 1; i < 7; i++) {
-    this.envmapEl = document.querySelector("#envmap_" + i);
-    if (this.envmapEl) {
-    this.path = this.envmapEl.getAttribute("src");
-    // console.log("envMap path " + this.path);
-    this.textureArray.push(this.path);
     }
-  }
-  if (this.textureArray.length == 6) {
-    this.texture = new THREE.CubeTextureLoader().load(this.textureArray);
-    this.texture.format = THREE[data.format];
-  //   this.material = new THREE.MeshBasicMaterial
-  //   this.material = new THREE.MeshStandardMaterial( { color: '#63B671', envMap: this.texture } ); 
-    this.material.envMap = this.texture;  
-    this.material.envMapIntensity = .5;      
-  //   this.material.reflectivity = 1;
-    this.material.roughness = .15;
-    
-  //   this.material.metalness = .1;
-  //   this.material.emissive = new THREE.Color("white");
-  //   this.material.emissiveIntensity = .01;
-    this.material.needsUpdate = true;
-  }
+    if (this.textureArray.length == 6) {
+      this.texture = new THREE.CubeTextureLoader().load(this.textureArray);
+      this.texture.format = THREE[data.format];
+    //   this.material = new THREE.MeshBasicMaterial
+    //   this.material = new THREE.MeshStandardMaterial( { color: '#63B671', envMap: this.texture } ); 
+      this.material.envMap = this.texture;  
+      this.material.envMapIntensity = .5;      
+    //   this.material.reflectivity = 1;
+      this.material.roughness = .15;
+      
+    //   this.material.metalness = .1;
+    //   this.material.emissive = new THREE.Color("white");
+    //   this.material.emissiveIntensity = .01;
+      this.material.needsUpdate = true;
+    }
 
 
       this.iMesh = new THREE.InstancedMesh(this.geometry, this.material, count);
@@ -148,12 +150,12 @@ AFRAME.registerComponent('instanced_meshes_sphere', { //scattered randomly in sp
 
       }
 
-          this.iMesh.frustumCulled = false;
-          this.iMesh.instanceMatrix.needsUpdate = true;
-          
-          root.add(this.iMesh);
+      this.iMesh.frustumCulled = false;
+      this.iMesh.instanceMatrix.needsUpdate = true;
       
-      });
+      root.add(this.iMesh);
+      
+  });
       this.el.classList.add('activeObjexRay');
       // let thiz = this;
 
@@ -172,26 +174,49 @@ AFRAME.registerComponent('instanced_meshes_sphere', { //scattered randomly in sp
     tick: function(time, timeDelta) {
       // this.timeDelta = timeDelta;
       this.time = time;
+
       if (this.iMesh != null) {
         // console.log(this.posRotReader );
         if (!this.raycaster || this.raycaster == null || this.raycaster == undefined) {
             return;
         } else {
-          this.raycaster.setFromCamera( mouse, AFRAME.scenes[0].camera );
-          this.intersection = this.raycaster.intersectObject( this.iMesh );
+          if (settings && settings.sceneCameraMode == "Third Person") {
+            this.thirdPersonPlaceholderPosition = new THREE.Vector3();
+            this.thirdPersonPlaceholderDirection = new THREE.Vector3();
+            this.thirdPersonPlaceholder.object3D.getWorldPosition(this.thirdPersonPlaceholderPosition);  //actually it's id "playCaster"
+            this.thirdPersonPlaceholder.object3D.getWorldDirection(this.thirdPersonPlaceholderDirection);
+            this.thirdPersonPlaceholderDirection.normalize();
+            this.thirdPersonPlaceholderDirection.negate();
+            // console.log("setting thirrd person raycaster! from " + JSON.stringify(this.thirdPersonPlaceholderPosition) + " to " + JSON.stringify(this.thirdPersonPlaceholderDirection));
+            this.raycaster.set(this.thirdPersonPlaceholderPosition, this.thirdPersonPlaceholderDirection);
+            this.raycaster.far = 50;
+            // raycaster.far = 1.5;
+           
+            this.intersection = this.raycaster.intersectObject( this.iMesh );
+ 
+            if (this.arrow) { //show helper arrow, TODO toggle from dialogs.js
+              this.el.sceneEl.object3D.remove(this.arrow);
+            }
+            this.arrow = new THREE.ArrowHelper( this.raycaster.ray.direction, this.raycaster.ray.origin, 10, 0xff0000 );
+            this.el.sceneEl.object3D.add( this.arrow );
+          } else {
+            this.raycaster.setFromCamera( mouse, AFRAME.scenes[0].camera );
+            this.intersection = this.raycaster.intersectObject( this.iMesh );
+          }
         }
         // 
        
 
         if ( this.intersection != null && this.intersection.length > 0 ) {
-          if (window.playerPosition != null && window.playerPosition != undefined && this.intersection[0].point != undefined && this.intersection[0].point != null ) {
-        
+          // if (window.playerPosition != null && window.playerPosition != undefined && this.intersection[0].point != undefined && this.intersection[0].point != null ) {
+          if (this.intersection[0].point != undefined && this.intersection[0].point != null ) {
               this.instanceId = this.intersection[ 0 ].instanceId;
               console.log(this.instanceId);
               this.iMesh.setColorAt( this.instanceId, this.highlightColor.setHex( Math.random() * 0xffffff ) );
               this.iMesh.instanceColor.needsUpdate = true;
               // console.log('windowplayerposition ' + JSON.stringify(window.playerPosition));
-              this.distance = window.playerPosition.distanceTo(this.intersection[0].point);
+              // this.distance = window.playerPosition.distanceTo(this.intersection[0].point);
+              this.distance = this.raycaster.ray.origin.distanceTo( this.intersection[0].point );
               this.hitpoint = this.intersection[0].point;
               this.rayhit(this.instanceId, this.distance, this.hitpoint); 
 
@@ -207,9 +232,16 @@ AFRAME.registerComponent('instanced_meshes_sphere', { //scattered randomly in sp
         this.iMesh.rotation.z -= this.speed * 1.5;
         // this.iMesh.
 
+        if (this.arrow) { //show helper arrow, TODO toggle from dialogs.js
+          this.el.sceneEl.object3D.remove(this.arrow);
+        }
+        this.arrow = new THREE.ArrowHelper( this.raycaster.ray.direction, this.raycaster.ray.origin, 50, 0xff0000 );
+        this.el.sceneEl.object3D.add( this.arrow );
+
       }
     },
     rayhit: function (hitID, distance, hitpoint) {
+      console.log(hitID + " beez hit!");
       if (this.hitID != hitID) {
         
         this.intersection = null;
@@ -276,7 +308,7 @@ AFRAME.registerComponent('instanced_meshes_sphere', { //scattered randomly in sp
       if (id != null && this.intersection != null) {
       // this.dummy.scale.set( .9, .9, .9 );
       // this.dummy.updateMatrix();
-      // console.log(id + " beez clicked!");
+      console.log(id + " beez clicked!");
       // this.iMesh.setMatrixAt( id, this.dummy.matrix );
       // this.iMesh.frustumCulled = false;
       // this.iMesh.instanceMatrix.needsUpdate = true;
@@ -2347,7 +2379,7 @@ AFRAME.registerComponent('emit-when-near', {
       this.emiting = false;
     }
   }
-});
+}); //move to navigation.js?
 /////// for third person camera, see
 ///https://stackoverflow.com/questions/71336022/how-can-i-get-a-third-person-perspective-for-a-model-using-aframe
 AFRAME.registerComponent("follow-camera", {
@@ -2371,14 +2403,14 @@ AFRAME.registerComponent("follow-camera", {
       // const target = this.data.target.object3D; // get the mesh
       // track the position
       this.target.getWorldPosition(this.tmpv); // get the world position
-      this.t = 
-      this.iValue = 1.0 - Math.pow(0.001, (dt * .001)); //HELLYES! smooth interpolation independent of frame rate 
+      // this.t = 
+      this.iValue = 1.0 - Math.pow(0.001, (dt * .0005)); //HELLYES! smooth interpolation independent of frame rate 
       // console.log("tryna interpoolate at " + this.iValue + " posotion " + JSON.stringify(this.tmpv) + " time " + dt);
       this.el.object3D.position.lerp(this.tmpv, this.iValue); // linear interpolation towards the world position
     // }
   }
 });
-AFRAME.registerComponent("rotate-with-camera", {
+AFRAME.registerComponent("rotate-with-camera", { //unused
   
   init: function () {
     // this.tick = AFRAME.utils.throttleTick(this.tick, 50, this);
@@ -2401,6 +2433,7 @@ AFRAME.registerComponent("rotate-with-camera", {
       
       // this.thirPersonPlaceholder.setAttribute("rotation", {x: 0, y: tmpe.y * 180 / Math.PI, z: 0 });
       this.el.setAttribute("rotation", {x: 0, y: tmpe.y * 180 / Math.PI, z: 0 }); //hrm..
+      // this.el.setAttribute("rotation", {x: tmpe.x * 180 / Math.PI, y: tmpe.y * 180 / Math.PI, z: tmpe.x * 180 / Math.PI }); //hrm..
       
     }
   })()

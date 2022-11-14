@@ -3335,6 +3335,7 @@ webxr_router.get('/:_id', function (req, res) {
                     settings.useMatrix = (sceneResponse.sceneTags != null && sceneResponse.sceneTags.includes('matrix'));
                     settings.sceneWaterLevel = (sceneResponse.sceneWater != undefined && sceneResponse.sceneWater.level != undefined) ? sceneResponse.sceneWater.level : 0;
                     settings.sceneCameraMode = sceneResponse.sceneCameraMode != undefined ? sceneResponse.sceneCameraMode : "First Person"; 
+                    settings.sceneCameraFlyable = sceneResponse.sceneFlyable != undefined ? sceneResponse.sceneFlyable : false;
                     let audioGroups = {};
                     audioGroups.triggerGroups = sceneResponse.sceneTriggerAudioGroups;
                     audioGroups.ambientGroups = sceneResponse.sceneAmbientAudioGroups;

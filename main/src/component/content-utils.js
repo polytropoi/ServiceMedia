@@ -3618,7 +3618,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
           }
         }
         if (this.hasShootAction) {
-          // console.log("shoot action " + JSON.stringify(this.shootAction));
+          console.log("shoot action " + JSON.stringify(this.shootAction));
           // if (this.shootAction.sourceObjectMod.toLowerCase() == "persist") { //transfer to scene inventory
           //   this.el.object3D.visible = false;
           //   DropInventoryItem(this.data.objectData._id); //just drop for now...throw/shoot/swing next!
