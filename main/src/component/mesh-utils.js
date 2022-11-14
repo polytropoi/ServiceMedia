@@ -14,6 +14,7 @@ AFRAME.registerComponent('instanced_meshes_sphere', { //scattered randomly in sp
     count: {default: 100},
     scaleFactor: {default: 10},
     interaction: {default: ''},
+    tags: {default: ''},
     triggerTag: {default: null}
   },
   init: function () {
@@ -76,7 +77,16 @@ AFRAME.registerComponent('instanced_meshes_sphere', { //scattered randomly in sp
     });
   }
   // this.el.setAttribute('gltf-model', gltfs[0]);
-  
+  this.particlesEl = null;
+
+  // this.arrowColor = '3FFF33'; //
+
+  // this.particlesComponent = null;
+  if (this.data.tags && this.data.tags.toLowerCase().includes("bang")) {
+    this.particlesEl = document.createElement("a-entity");
+    // this.particlesEl.setAttribute("mod_particles", {"enabled": false});
+    this.el.sceneEl.appendChild(this.particlesEl); //hrm...
+  }
   this.playerPosition = new THREE.Vector3();
   this.el.addEventListener('model-loaded', () => {
     this.obj = this.el.getObject3D('mesh');
@@ -197,7 +207,14 @@ AFRAME.registerComponent('instanced_meshes_sphere', { //scattered randomly in sp
             if (this.arrow) { //show helper arrow, TODO toggle from dialogs.js
               this.el.sceneEl.object3D.remove(this.arrow);
             }
-            this.arrow = new THREE.ArrowHelper( this.raycaster.ray.direction, this.raycaster.ray.origin, 10, 0xff0000 );
+
+            if (this.intersection != null && this.intersection.length > 0 ) {
+              // this.arrowColor = "green"; //0xff0000 = "green";
+              this.arrow = new THREE.ArrowHelper( this.raycaster.ray.direction, this.raycaster.ray.origin, 25, 0x0b386 );
+            } else {
+              this.arrow = new THREE.ArrowHelper( this.raycaster.ray.direction, this.raycaster.ray.origin, 25, 0xff0000 );
+            }
+            
             this.el.sceneEl.object3D.add( this.arrow );
           } else {
             this.raycaster.setFromCamera( mouse, AFRAME.scenes[0].camera );
@@ -219,7 +236,7 @@ AFRAME.registerComponent('instanced_meshes_sphere', { //scattered randomly in sp
               this.distance = this.raycaster.ray.origin.distanceTo( this.intersection[0].point );
               this.hitpoint = this.intersection[0].point;
               this.rayhit(this.instanceId, this.distance, this.hitpoint); 
-
+              this.arrowColor = '0xff0000';
           }
 
         } else {
@@ -232,11 +249,11 @@ AFRAME.registerComponent('instanced_meshes_sphere', { //scattered randomly in sp
         this.iMesh.rotation.z -= this.speed * 1.5;
         // this.iMesh.
 
-        if (this.arrow) { //show helper arrow, TODO toggle from dialogs.js
-          this.el.sceneEl.object3D.remove(this.arrow);
-        }
-        this.arrow = new THREE.ArrowHelper( this.raycaster.ray.direction, this.raycaster.ray.origin, 50, 0xff0000 );
-        this.el.sceneEl.object3D.add( this.arrow );
+        // if (this.arrow) { //show helper arrow, TODO toggle from dialogs.js
+        //   this.el.sceneEl.object3D.remove(this.arrow);
+        // }
+        // this.arrow = new THREE.ArrowHelper( this.raycaster.ray.direction, this.raycaster.ray.origin, 50, 0xff0000 );
+        // this.el.sceneEl.object3D.add( this.arrow );
 
       }
     },
@@ -258,12 +275,17 @@ AFRAME.registerComponent('instanced_meshes_sphere', { //scattered randomly in sp
       if (this.matrixMeshComponent != null) {
         this.matrixMeshComponent.showRoomData(this.instanceId, distance, hitpoint);
       }
+
       if (this.data.interaction == "growpop") {
         this.iMesh.getMatrixAt(hitID, this.dummyMatrix);
         this.dummyMatrix.decompose(this.dummy.position, this.dummy.quaternion, this.dummy.scale);
         console.log(parseFloat(this.dummy.scale.x) + " vs " + (parseFloat(this.data.scaleFactor) * 3));
         if (parseFloat(this.dummy.scale.x) > (parseFloat(this.data.scaleFactor) * 1.5)) {
           console.log("tryna lcik!");
+          if (this.data.tags && this.data.tags.toLowerCase().includes("kill")) {
+            this.particlesEl.setAttribute("position", hitpoint);
+            this.removeInstance(hitID);
+          }
           this.instance_clicked(hitID);
           this.dummy.scale.set( 0, 0, 0 );
           // this.data.interaction = null;
@@ -285,8 +307,12 @@ AFRAME.registerComponent('instanced_meshes_sphere', { //scattered randomly in sp
         this.dummyMatrix.decompose(this.dummy.position, this.dummy.quaternion, this.dummy.scale);
         console.log(parseFloat(this.dummy.scale.x) + " vs " + (parseFloat(this.data.scaleFactor) / 2));
       if (parseFloat(this.dummy.scale.x) < (parseFloat(this.data.scaleFactor) / 4)) {
-        console.log("tryna lcik!");
+        console.log("tryna lcik! ttags " + this.data.tags );
           this.instance_clicked(hitID);
+          if (this.data.tags && this.data.tags.toLowerCase().includes("kill")) {
+            this.particlesEl.setAttribute("position", hitpoint);
+            this.removeInstance(hitID);
+          }
           this.dummy.scale.set( 0, 0, 0 );
           // this.data.interaction = null;
           this.dummy.updateMatrix();
@@ -303,6 +329,26 @@ AFRAME.registerComponent('instanced_meshes_sphere', { //scattered randomly in sp
         }
       }
       
+    },
+    removeInstance: function (instanceID) {
+      console.log("tryna remove instance");
+      if (this.particlesEl) {
+        this.particlesEl.setAttribute('sprite-particles', {
+          enable: true, 
+          duration: '1', 
+          texture: '#explosion1', 
+          color: 'black..white', 
+          blending: 'additive', 
+          textureFrame: '8 8', 
+          textureLoop: '1', 
+          spawnRate: '1', 
+          lifeTime: '1', 
+          opacity: '0,1,0', 
+          rotation: '0..360', 
+          scale: '100,500'
+        });
+      this.particlesEl.setAttribute('sprite-particles', {"duration": .1});
+      }
     },
     instance_clicked: function (id) {
       if (id != null && this.intersection != null) {
@@ -400,7 +446,7 @@ AFRAME.registerComponent('instanced_surface_meshes', {
 
     this.particlesEl = null;
     // this.particlesComponent = null;
-    if (this.data.tags.toLowerCase().includes("bang")) {
+    if (this.data.tags && this.data.tags.toLowerCase().includes("bang")) {
       this.particlesEl = document.createElement("a-entity");
       // this.particlesEl.setAttribute("mod_particles", {"enabled": false});
       this.el.sceneEl.appendChild(this.particlesEl); //hrm...
@@ -712,7 +758,7 @@ AFRAME.registerComponent('instanced_surface_meshes', {
             scale: '100,500'
           });
       this.particlesEl.setAttribute('sprite-particles', {"duration": .1});
-    }
+      }
 
     },
     tick: function(time, timeDelta) {
@@ -792,7 +838,7 @@ AFRAME.registerComponent('instanced_surface_meshes', {
         if (triggerAudioController != null) {
           triggerAudioController.components.trigger_audio_control.playAudioAtPosition(hitpoint, distance, this.data.tags);
         }
-        if (this.data.tags.toLowerCase().includes("kill")) {
+        if (this.data.tags && this.data.tags.toLowerCase().includes("kill")) {
           this.particlesEl.setAttribute("position", hitpoint);
           this.removeInstance(this.instanceId);
         }

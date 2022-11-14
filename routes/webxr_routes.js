@@ -2212,7 +2212,7 @@ webxr_router.get('/:_id', function (req, res) {
                                                         } else if (locMdl.eventData.toLowerCase().includes('wiggle')) {
                                                             interaction = " interaction: wiggle; ";
                                                         }
-                                                        instancing = "instanced_meshes_sphere=\x22_id: "+locMdl.modelID+"; modelID: "+m_assetID+"; "+interaction+"\x22"; //scatter random sphere, e.g. in the sky..
+                                                        instancing = "instanced_meshes_sphere=\x22_id: "+locMdl.modelID+"; modelID: "+m_assetID+"; "+interaction+" tags: "+locMdl.locationTags+"\x22";; //scatter random sphere, e.g. in the sky..
                                                         // console.log("instancing is " + instancing);
                                                     }
                                                     
@@ -2231,7 +2231,7 @@ webxr_router.get('/:_id', function (req, res) {
                                                             instancing = "instanced_surface_meshes=\x22_id: "+locMdl.modelID+"; modelID: "+m_assetID+"; yMod: "+locMdl.y+"; count: "+split[1]+"; scaleFactor: "+scale+"; tags: "+locMdl.locationTags+"\x22";
                                                             // console.log("!!!tryna spoolit scatter dasta..." + instancing);
                                                             if (locMdl.eventData.toLowerCase().includes("everywhere")) {
-                                                                instancing = "instanced_meshes_sphere=\x22_id: "+locMdl.modelID+"; modelID: "+m_assetID+"; count: "+split[1]+"; scaleFactor: "+scale+";"+interaction+"\x22"; //scatter everywhere, e.g. in the sky..
+                                                                instancing = "instanced_meshes_sphere=\x22_id: "+locMdl.modelID+"; modelID: "+m_assetID+"; tags: "+locMdl.locationTags+" count: "+split[1]+"; scaleFactor: "+scale+";"+interaction+"\x22"; //scatter everywhere, e.g. in the sky..
                                                                 // console.log("instancing is " + instancing);
                                                             }
                                                         }

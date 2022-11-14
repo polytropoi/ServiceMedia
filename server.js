@@ -13373,19 +13373,51 @@ app.post('/newgroup', requiredAuthentication, function (req, res) {
     });
 });
 
-app.post('/delete_group/', requiredAuthentication, function (req, res) { //weird, post + path
-    console.log("tryna delete key: " + req.body._id);
+app.post('/delete_group/', requiredAuthentication, function (req, res) { 
     var o_id = ObjectID(req.body._id);
     db.groups.remove( { "_id" : o_id }, 1 );
     res.send("delback");
 });
 
-app.post('/delete_scene/:_id', checkAppID, requiredAuthentication, function (req, res) {
-    console.log("tryna delete key: " + req.body._id);
+app.post('/clone_group/', requiredAuthentication, function (req, res) { 
+    console.log("tryna clone group : " + req.body._id);
     var o_id = ObjectID(req.body._id);
-    db.scenes.remove( { "_id" : o_id }, 1 );
-    res.send("deleted");
+    db.groups.findOne({ "_id" : o_id}, function(err, group) {
+    if (err || !group) {
+        res.send("group not found!");
+    } else {
+        var clonedgroup = group;
+        clonedgroup._id = new ObjectID(); //better way
+        clonedgroup.userID = req.session.user._id.toString();
+        clonedgroup.userName = req.session.user.username;
+        clonedgroup.name = group.name + " clone";
+        var timestamp = Math.round(Date.now() / 1000);
+        clonedgroup.lastUpdate = timestamp;
+        console.log("new group data " + JSON.stringify(clonedgroup));
+        db.groups.insert(clonedgroup, function (err, saved) {
+            if ( err || !saved ) {
+                // console.log('group not saved..');
+                res.send("error " + err );
+            } else {
+                var item_id = saved._id.toString();
+                console.log('new group created, id: ' + item_id);
+                res.send("cloned group : " + item_id);
+            }
+        });
+    }
+    
+    });
+
+
 });
+
+///  maybe later, with cleanup options
+// app.post('/delete_scene/:_id', checkAppID, requiredAuthentication, function (req, res) { 
+//     console.log("tryna delete key: " + req.body._id);
+//     var o_id = ObjectID(req.body._id);
+//     db.scenes.remove( { "_id" : o_id }, 1 );
+//     res.send("deleted");
+// });
 
 app.post('/update_weblink/', requiredAuthentication, function (req, res) { //refresh the websrape
                 

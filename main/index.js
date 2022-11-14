@@ -1242,6 +1242,40 @@
         // $("#topPage").show();
         // $("#topPage").html(aframeScene);
     }
+    function cloneGroup(groupid) {
+        // let data = {_id: groupid};
+        let url = "/clone_group";
+        $.confirm({
+            title: 'Confirm Group Clone!',
+            content: 'Are you sure you want to clone this group?',
+            buttons: {
+                confirm: function () {
+                    let data = { 
+                        _id : groupid
+                    };
+                    axios.post(url, data)
+                    .then(function (response) {
+                        console.log(response);
+                        if (response.data.includes("cloned")) {
+                            $("#topSuccess").html("Group cloned! Return to Groups page to view it.");
+                            $("#topSuccess").show();
+                        } else {
+                            $("#topAlert").html(response.data);
+                            $("#topAlert").show();
+                        }
+                    })
+                    .catch(function (error) {
+                        $("#topAlert").html(error);
+                        $("#topAlert").show();
+                    });
+                    },
+                    cancel: function () {
+                        $("#topAlert").html("Cloning cancelled");
+                        $("#topAlert").show();
+                    },
+                }
+            });
+    }
     function deleteItem(type, itemid) { //delete an actual thing, w/ confirm
             let data = [];
             let url = "";
@@ -8336,6 +8370,7 @@ function showGroup() {
                                     "<input type=\x22text\x22 size=\x224\x22  class=\x22float-right\x22 id=\x22itemIndex\x22 value=\x22" + arr[i].itemIndex + "\x22>" +
                                     "<br><a href=\x22#\x22 class=\x22btn btn-xs btn-danger\x22 onclick=\x22removeItem('group','item','" + response.data._id + "','" + arr[i]._id + "')\x22>Remove</a>" +
                                     "<a href=\x22index.html?type=saudio&iid="+ arr[i]._id +"\x22 class=\x22float-right btn btn-xs btn-info\x22>Edit</a>" +
+                                    "<br><label for=\x22itemIndex\x22>tags: "+arr[i].tags+" </label>" +
                             "</div>" +
                         "</div>";
                     break;
@@ -8595,7 +8630,8 @@ function showGroup() {
             "</div>" +
             // addButton +
             "<a class=\x22btn btn-sm btn-primary float-right\x22 href=\x22index.html?type="+modtype+"&mode=select&parent=group&iid=" + response.data._id + "\x22\x22>Add Item</a>" +
-            "<button type=\x22button\x22 class=\x22btn btn-sm btn-danger float-left\x22 onclick=\x22deleteItem('group','" + response.data._id + "')\x22>Delete Group</button>";
+            "<button type=\x22button\x22 class=\x22btn btn-sm btn-danger float-left\x22 onclick=\x22deleteItem('group','" + response.data._id + "')\x22>Delete Group</button>" +
+            "<button type=\x22button\x22 class=\x22btn btn-sm btn-info float-right\x22 onclick=\x22cloneGroup('" + response.data._id + "')\x22>Clone Group</button><br><br>";
             "</div>" +
             "</div>" +
             "<div class=\x22row\x22>" +
@@ -8836,7 +8872,7 @@ function showGroup() {
                         "</div>";
                     }
                 }
-                if (!select || (select && (mode == "paudiogroup"))) { //TODO trigger and ambient?
+                if (!select || (select && (mode == "paudiogroup"))) { 
 
                     if (arr[i].type != null && arr[i].type.toLowerCase() == "audio") {
                         // console.log("cehckin for paudiogroup" + JSON.stringify(arr[i]));
@@ -8881,7 +8917,7 @@ function showGroup() {
                         "</div>";
                     }
                 }
-                if (!select || (select && (mode == "aaudiogroup"))) { //TODO trigger and ambient?
+                if (!select || (select && (mode == "aaudiogroup"))) { 
                     
                     if (arr[i].type != null && arr[i].type.toLowerCase() == "audio") {
                         // console.log("cehckin for aaudiogroup");
@@ -8927,7 +8963,7 @@ function showGroup() {
                         "</div>";
                     }
                 }
-                if (!select || (select && (mode == "taudiogroup"))) { //TODO trigger and ambient?
+                if (!select || (select && (mode == "taudiogroup"))) {
                     
                     if (arr[i].type != null && arr[i].type.toLowerCase() == "audio") {
                         // console.log("cehckin for taudiogroup");
