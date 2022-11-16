@@ -2530,6 +2530,8 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
     this.currentPos = new THREE.Vector3();
     this.currentRot = new THREE.Vector3();
     // this.rotObjectMatrix = new THREE.Matrix4();//
+    this.axis = new THREE.Vector3();
+    this.up = new THREE.Vector3(0, 1, 0);
     this.line = null;
     this.equipHolder = document.getElementById("equipPlaceholder");
     
@@ -2726,7 +2728,8 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
         // this.el.visible = false;
         let trailComponent = this.el.components.trail;
         if (trailComponent) {
-          trailComponent.reset();
+          trailComponent.kill();
+          // this.el.removeAttribute("trail");
         }
         // this.sceneEl.remove(this.el.object3D); 
         // this.el.removeAttribute("trail"); //WHY WON'T YOU DIE
@@ -3284,16 +3287,16 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
         e.preventDefault();
         let mod_obj_component = e.detail.targetEl.components.mod_object;
         // console.log("mod_physics collisoin with object with :" + this.el.id + " " + e.detail.targetEl.classList);
-        if (this.data.isTrigger) {
-          console.log("TRIGGER COLLIDED "  + this.el.id + " " + e.detail.targetEl.classList);
+        if (this.data.isTrigger) { //
+          console.log("TRIGGER HIT "  + this.el.id + " " + e.detail.targetEl.classList);
           // e.detail.body.disableCollision = true;
-          this.disableCollisionTemp(); //must turn it off or it blocks, no true "trigger" mode afaik (unlike cannonjs!)
+          this.disableCollisionTemp(); //must turn it off or it blocks, no true "trigger" mode afaik (unlike cannonjs!) //um, no just use kinematic type...
           var triggerAudioController = document.getElementById("triggerAudio");
           if (triggerAudioController != null) {
             triggerAudioController.components.trigger_audio_control.playAudioAtPosition(this.hitpoint, this.distance, ["hit"]);
           }
         } else {
-          // console.log("NOT TRIGGER COLLIDED "  + this.el.id + " vs " + e.detail.targetEl.id);
+          console.log("COLLIDER HIT "  + this.el.id + " vs " + e.detail.targetEl.id);
           // console.log("NOT TRIGGER COLLIDED "  + this.el.object3D.name + " " + e.detail.targetEl.object3D.name + " has mod_object " + mod_obj_component);
           // if (this.el != e.detail.targetEl) {
             
@@ -3312,16 +3315,23 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
                       if (trailComponent) {
                         trailComponent.reset();
                       }
-                      e.detail.targetEl.parentNode.removeChild(e.detail.targetEl);
+                      if (e.detail.targetEl.parentNode) {
+                        e.detail.targetEl.parentNode.removeChild(e.detail.targetEl);
+                      }
+                      // e.detail.targetEl.parentNode.removeChild(e.detail.targetEl);
 
                     }
                     if (mod_obj_component.data.objectData.actions[i].sourceObjectMod.toLowerCase() == "replace object") {
                       // console.log("tryna replace object...");
                       let trailComponent = e.detail.targetEl.components.trail;
                       if (trailComponent) {
-                        trailComponent.reset();
+                        trailComponent.kill();
+                        // e.detail.targetEl.removeAttribute("trail");
                       }
-                      e.detail.targetEl.parentNode.removeChild(e.detail.targetEl);
+                      if (e.detail.targetEl.parentNode) {
+                        e.detail.targetEl.parentNode.removeChild(e.detail.targetEl);
+                      }
+                      // e.detail.targetEl.parentNode.removeChild(e.detail.targetEl);
                       let objexEl = document.getElementById('sceneObjects');    
                       let objectData = objexEl.components.mod_objex.returnObjectData(mod_obj_component.data.objectData.actions[i].objectID);
                       // if (objectData == null) {
@@ -3352,6 +3362,23 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
                   }
                 }
               }
+            }
+            if (this.hasShootAction && e.detail.targetEl.id != "player") {
+              console.log("tryna cleanup!")
+              this.el.sceneEl.object3D.remove(this.line);
+             
+              let trailComponent = this.el.components.trail;
+              if (trailComponent) {
+                trailComponent.kill();
+                // this.el.removeAttribute("trail");
+              }
+              // if (this.el.parentNode) {
+              //   this.el.parentNode.removeChild(this.el);
+              // } else {
+              //   let me = this.el.id;
+              //   document.getElementById(me).remove();
+              // }
+              
             }
           // }
         }
@@ -3506,12 +3533,12 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
             }
           }
 
-          if (this.tags != undefined && this.tags != null && this.tags != "undefined") {
+          if (this.tags != undefined && this.tags != null && this.tags != "undefined") { //MAYBE SHOULD BE UNDER RAYHIT?
             console.log("tryna play audio with tags " + this.tags);
-            if (this.triggerAudioController != null) {
+            // if (this.triggerAudioController != null) {
               // let distance = window.playerPosition.distanceTo(this.hitpoint);
               // this.triggerAudioController.components.trigger_audio_control.playAudioAtPosition(evt.detail.intersection.point, distance, this.tags, 1);//tagmangler needs an array, add vol mod (bc blowing in they face)
-              this.triggerAudioController.components.trigger_audio_control.playAudioAtPosition(this.pos, this.distance, this.tags, 1);
+              // this.triggerAudioController.components.trigger_audio_control.playAudioAtPosition(this.pos, this.distance, this.tags, 1);
               if (moIndex != -1) { //moIndex = "mouthopen"
                 this.el.setAttribute('animation-mixer', {
                   "clip": clips[moIndex].name,
@@ -3519,12 +3546,11 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
                   "repetitions": 10,
                   "timeScale": 2
                 });
-                this.el.addEventListener('animation-finished', (e) => { //clunky but whatever - this is the "recommended way" ?!?
-                  e.preventDefault();
+                this.el.addEventListener('animation-finished', (e) => { 
                   this.el.removeAttribute('animation-mixer');
                 });
               }
-            }
+            // }
           }
         }     
       }
@@ -3766,33 +3792,45 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
   },
   moveOnCurve: function () {
     console.log("tryna followPath!");
-    if (this.line) {
-      this.el.sceneEl.object3D.remove(this.line);
-    }
+
     this.points = [];
     this.tempVectorP = new THREE.Vector3();
     this.tempVectorR = new THREE.Vector3();
+
+    // this.playerEl = document.getElementById("player");
     // this.tempVectorR = new THREE.Quaternion();
     this.pVec = new THREE.Vector3();
     this.equipHolder.object3D.getWorldPosition(this.tempVectorP);
     this.equipHolder.object3D.getWorldDirection(this.tempVectorR);
     
+    this.el.object3D.position.copy(this.equipHolder.object3D.position);
     this.el.object3D.quaternion.copy(this.equipHolder.object3D.quaternion);
 
     this.tempVectorR.normalize();
     this.tempVectorR.negate();
 
     for (var i = 0; i < 5; i += 1) {  
-      let distance = parseInt(i) * 50;
+      let distance = parseInt(i) * 20;
       // this.pVec = new THREE.Vector3().copy.addVectors(this.tempVectorP, this.tempVectorR.multiplyScalar( distance ));
       console.log("pushed " + distance + " " + JSON.stringify(this.pVec));
       this.pVec = new THREE.Vector3().copy( this.tempVectorP ).addScaledVector( this.tempVectorR, distance ); //oik then
       this.points.push(this.pVec);
-      console.log("pushed " + distance + " " + JSON.stringify(this.pVec));
+      // console.log("pushed " + distance + " " + JSON.stringify(this.pVec));
     //  this.points.push(new THREE.Vector3(this.tempVectorP.x, this.tempVectorP.y, this.tempVectorP.z + 1000 * (i / 4)));
     //  this.points.push(new THREE.Vector3(this.tempVectorP.x, this.tempVectorP.y, this.tempVectorP.z).normalize().multiplyScalar(i * 20));
     }
     this.curve = new THREE.CatmullRomCurve3(this.points);
+
+    // box.position.copy( spline.getPointAt( counter ) );
+
+        // tangent = spline.getTangentAt( counter ).normalize();
+
+        // axis.crossVectors( up, tangent ).normalize();
+
+        // var radians = Math.acos( up.dot( tangent ) );
+
+        // box.quaternion.setFromAxisAngle( axis, radians );
+
 
     this.material = new THREE.LineBasicMaterial( { color: 0x0000ff } );
     // this.material = new THREE.LineBasicMaterial( {
@@ -3905,18 +3943,25 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
         this.posIndex++;
         if (this.posIndex > 100) {
           // this.curve = null;
+          // this.followPath = false;
+          console.log("tryna cleanup!")
           this.el.sceneEl.object3D.remove(this.line);
-          this.el.parentNode.removeChild(this.el);
+         
           let trailComponent = this.el.components.trail;
           if (trailComponent) {
-            trailComponent.reset();
+            trailComponent.kill();
+            // this.el.removeAttribute("trail");
           }
+          this.followPath = false;
+          // this.el.parentNode.removeChild(this.el);
+          this.el.removeAttribute("trail");
+          this.el.sceneEl.object3D.remove(this.line);
         } else {
         this.currentPos = this.curve.getPoint(this.posIndex / 100);
-        // this.currentRot = this.curve.getTangent(this.posIndex / 100);
+        this.currentTan = this.curve.getTangent(this.posIndex / 100).normalize();
         // this.el.object3D.getWorldDirection(this.currentRot);
         // this.el.object3D.rotation.set(this.currentRot);
-        console.log("tryna set positionn to" + JSON.stringify(this.currentPos));
+        // console.log("tryna set positionn to" + JSON.stringify(this.currentPos));
         this.el.object3D.position.copy(this.currentPos);
         // this.el.object3D.rotation.copy(this.currentRot);
 
@@ -3938,8 +3983,18 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
         // camera.rotation.x = camRot.x;
         // camera.rotation.y = camRot.y;
         // camera.rotation.z = camRot.z;
-        
-        this.el.object3D.lookAt(this.curve.getPoint(99 / 100).negate());
+        // box.position.copy( spline.getPointAt( counter ) );
+
+// tangent = spline.getTangentAt( counter ).normalize();
+
+              // this.axis.crossVectors( this.up, this.currentTan ).normalize();
+
+              // this.radians = Math.acos( this.up.dot( this.currentTan ) );
+
+              // this.el.object3D.quaternion.setFromAxisAngle( this.axis, this.radians );
+              this.el.object3D.lookAt(this.curve.getPoint(99/100).negate());
+        // this.el.object3D.lookAt(this.curve.getPoint(this.posIndex + 1).negate()); //hrm, still not 
+        // this.el.object3D.lookAt(this.currentRot.add(this.curve.getPoint(this.posIndex + 1 / 100).negate())); 
         // this.el.object3D.quaternion.copy(this.equipHolder.object3D.quaternion);
         // this.el.object3D.position.needsUpdate = true;
         // this.el.object3D.quaternion.needsUpdate = true;

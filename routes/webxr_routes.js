@@ -1067,7 +1067,7 @@ webxr_router.get('/:_id', function (req, res) {
                                        
                                        
                                         "</a-entity></a-entity>";
-                                } else {
+                                } else { // first person cam, default
                                     let lookcontrols = "look-controls=\x22magicWindowTrackingEnabled: false;\x22";
                                     if (sceneResponse.sceneTags != null && (sceneResponse.sceneTags.includes('magicwindow') || sceneResponse.sceneTags.includes('magic window'))) {
                                         lookcontrols = "look-controls"; // because magicwinders enabled by default

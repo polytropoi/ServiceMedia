@@ -1453,7 +1453,10 @@ AFRAME.registerComponent('mod-materials', {
 AFRAME.registerSystem('trail', {
   schema: {},  // System schema. Parses into `this.data`.
 
-  init: function () {},
+  init: function () {
+    this.isDead = false;
+    this.trailmesh = null;
+  },
   
   trails: { haveTrails: [] },
   
@@ -1478,6 +1481,7 @@ AFRAME.registerSystem('trail', {
     var material = new THREE.MeshBasicMaterial( { color: color, side: THREE.DoubleSide, wireframe: false, transparent: true, opacity: 0.2 } ); // opacity: 0.2
     trail.mesh = new THREE.Mesh( geometry, material );
     trail.mesh.position.add(offset);
+    this.trailmesh = trail.mesh;
     this.el.sceneEl.object3D.add( trail.mesh );
 
     this.trails.haveTrails.push( object );
@@ -1533,9 +1537,26 @@ AFRAME.registerSystem('trail', {
       trail.trailHistory = [];
     });
   },
+
+  killTrail: function killTrail (object) {
+    object.userData.trails.forEach(trail=>{
+      // length = 0;
+      // width = 0;
+      resolution = 0;
+      trailHistory = [];
+      // trail.trailVertexPositions = [];
+    });
+    this.el.sceneEl.object3D.remove( this.trailmesh );
+    // object.userData.trails = [];
+    // // this.isDead = true;
+    // this.el.sceneEl.object3D.remove( trail.mesh );
+  },
   
   tick: function(t,dt){
-    this.updateTrails();
+    // if (!this.isDead) {
+      this.updateTrails();
+    // }
+   
   }
 });
 
@@ -1553,5 +1574,8 @@ AFRAME.registerComponent('trail', {
   },
   reset: function(){
     this.system.resetTrail(this.el.object3D);
+  },
+  kill: function(){
+    this.system.killTrail(this.el.object3D);
   }
 });
