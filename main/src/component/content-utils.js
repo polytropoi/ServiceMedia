@@ -2344,26 +2344,14 @@ AFRAME.registerComponent('mod_objex', {
     },
     shootObject: function (objectID) {
       let downtime = 6000;
-      // console.log("tryna set model to " + objectID);  
       this.objectData = this.returnObjectData(objectID);
       this.dropPos = new THREE.Vector3();
       this.dropRot = new THREE.Quaternion();
-
       this.objEl = document.createElement("a-entity");
-      // this.equipHolder = document.getElementById("equipPlaceholder");
-      
-      // this.equippedObject = this.equipHolder.querySelector('.equipped');
-      // if (this.equipHolder != null) {
-      //   this.equipHolder.object3D.getWorldPosition(this.dropPos);
-      //   this.equipHolder.object3D.getWorldQuaternion(this.dropRot);
-      //   console.log("ttryna match world rotations with " + JSON.stringify(this.dropRot));
-      // }
       this.equipHolder = document.getElementById("equipPlaceholder");
       this.equippedObject = this.equipHolder.querySelector('.equipped');
       if (this.equippedObject != null) {
         this.equippedObject.object3D.getWorldPosition(this.dropPos);
-        // this.equippedObject.object3D.getWorldQuaternion(this.dropRot); //dunno why not..
-        // console.log("ttryna match world rotations with " + JSON.stringify(this.dropRot));
       }
       if (!posRotReader) {
         player = document.getElementById("player");
@@ -2372,18 +2360,15 @@ AFRAME.registerComponent('mod_objex', {
       if (posRotReader) {
         this.playerPosRot = posRotReader.returnPosRot(); 
         console.log("this.playerPosRot" + JSON.stringify(this.playerPosRot));
-        // this.dropPos = this.playerPosRot.pos;
         this.dropEuler = this.playerPosRot.rot;
-
-        // this.dropEuler = new THREE.Euler().setFromQuaternion(this.dropRot);
         this.locData = {};
         this.locData.eulerx = this.playerPosRot.rot.x;
         this.locData.eulery = this.playerPosRot.rot.y;
         this.locData.eulerz = this.playerPosRot.rot.z;
-
         this.locData.timestamp = Date.now();
         this.objEl.setAttribute("position", this.dropPos);
-        this.objEl.setAttribute("mod_object", {'eventData': null, 'locationData': this.locData, 'objectData': this.objectData, 'applyForceToNewObject': true, 'forceFactor': downtime, 'removeAfter': "5"});
+        // this.objEl.setAttribute("mod_object", {'eventData': null, 'locationData': this.locData, 'objectData': this.objectData, 'applyForceToNewObject': true, 'forceFactor': downtime, 'removeAfter': "5"});
+        this.objEl.setAttribute("mod_object", {'eventData': null, 'locationData': this.locData, 'objectData': this.objectData, 'followPathNewObject': true, 'forceFactor': downtime, 'removeAfter': "5"});
         this.objEl.id = "obj" + this.objectData._id + "_" + this.locData.timestamp;
         sceneEl.append(this.objEl);
       }
@@ -2472,6 +2457,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
     fromSceneInventory: {default: false},
     timestamp: {default: null},
     applyForceToNewObject: {default: false},
+    followPathNewObject: {default: false},
     forceFactor: {default: 1},
     removeAfter: {default: ""},
     tags: {default: null}
@@ -2510,6 +2496,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
     this.hasSynth = false;
     this.mod_physics = "";
     this.pushForward = false;
+    this.followPath = false;
     this.lookVector = new THREE.Vector3( 0, 0, -1 );
     
     this.textIndex = 0;
@@ -2537,6 +2524,15 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
     this.tags = this.data.tags;
 
     this.raycaster = null;
+
+    this.curve = null;
+    this.posIndex = 0; 
+    this.currentPos = new THREE.Vector3();
+    this.currentRot = new THREE.Vector3();
+    // this.rotObjectMatrix = new THREE.Matrix4();//
+    this.line = null;
+    this.equipHolder = document.getElementById("equipPlaceholder");
+    
     let cameraEl = document.querySelector('a-entity[camera]');  
     if (!cameraEl) {
         cameraEl = document.querySelector('a-camera');
@@ -2747,7 +2743,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
     this.el.addEventListener('model-loaded', () => {
 
       console.log(this.data.objectData.name + " OBJMODEL LOAADIDE!!!" + JSON.stringify(this.data.locationData));
-  
+      
       let pos = {};
       pos.x = this.data.locationData.x;
       pos.y = this.data.locationData.y;          
@@ -2791,7 +2787,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
             THREE.Math.degToRad(rot.z)
           );
         }
-   
+      
       } else { //if we're equipped
         this.el.setAttribute("rotation", rot);
         // this.el.object3D.rotation = rot;
@@ -2809,24 +2805,17 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
         // this.el.remove
         // this.el.object3D.scale.set(scale);
       }
-
-      // obj.traverse(node => { //spin through object heirarchy to sniff for special names, e.g. "eye"
-      //   this.nodeName = node.name;
-      //   if (this.data.eventData.includes("eyelook") && this.nodeName.includes("eye")) { //must be set in the data and as a name on the model
-      //     if (node instanceof THREE.Mesh) {
-      //       this.meshChildren.push(node);
-      //       console.log("gotsa eye!");
-      //     }
-      //   }
-      // });
-
+      if (this.data.followPathNewObject) {
+        this.moveOnCurve();
+      }
       if (this.data.objectData.physics != undefined && this.data.objectData.physics != null && this.data.objectData.physics.toLowerCase() != "none") {
         //  setTimeout(function(){  
           if (this.data.isEquipped) {
             // this.el.setAttribute('ammo-body', {type: 'kinematic', linearDamping: .1, angularDamping: .1});
           } else { //nm, switch to dynamic when fired if needed/
             if (this.hasShootAction) {
-              this.el.setAttribute('ammo-body', {type: this.data.objectData.physics.toLowerCase(), gravity: '0 -.1 0', angularFactor: '1 0 1', emitCollisionEvents: true, linearDamping: .1, angularDamping: 1});
+              // this.el.setAttribute('ammo-body', {type: this.data.objectData.physics.toLowerCase(), gravity: '0 -.1 0', angularFactor: '1 0 1', emitCollisionEvents: true, linearDamping: .1, angularDamping: 1}); //nope, shoot is not physical now
+              this.el.setAttribute('ammo-body', {type: 'kinematic', emitCollisionEvents: true});
               this.el.setAttribute('trail', "");
             } else if (this.hasThrowAction) {
                 this.el.setAttribute('ammo-body', {type: this.data.objectData.physics.toLowerCase(), emitCollisionEvents: true, linearDamping: .1, angularDamping: 1});
@@ -3278,6 +3267,8 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
           //     }
           //   }     
           // });
+
+    
         }
     }); //end model-loaded listener
 
@@ -3773,6 +3764,51 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
     // pos = null;
     // newpos = null;
   },
+  moveOnCurve: function () {
+    console.log("tryna followPath!");
+    if (this.line) {
+      this.el.sceneEl.object3D.remove(this.line);
+    }
+    this.points = [];
+    this.tempVectorP = new THREE.Vector3();
+    this.tempVectorR = new THREE.Vector3();
+    // this.tempVectorR = new THREE.Quaternion();
+    this.pVec = new THREE.Vector3();
+    this.equipHolder.object3D.getWorldPosition(this.tempVectorP);
+    this.equipHolder.object3D.getWorldDirection(this.tempVectorR);
+    
+    this.el.object3D.quaternion.copy(this.equipHolder.object3D.quaternion);
+
+    this.tempVectorR.normalize();
+    this.tempVectorR.negate();
+
+    for (var i = 0; i < 5; i += 1) {  
+      let distance = parseInt(i) * 50;
+      // this.pVec = new THREE.Vector3().copy.addVectors(this.tempVectorP, this.tempVectorR.multiplyScalar( distance ));
+      console.log("pushed " + distance + " " + JSON.stringify(this.pVec));
+      this.pVec = new THREE.Vector3().copy( this.tempVectorP ).addScaledVector( this.tempVectorR, distance ); //oik then
+      this.points.push(this.pVec);
+      console.log("pushed " + distance + " " + JSON.stringify(this.pVec));
+    //  this.points.push(new THREE.Vector3(this.tempVectorP.x, this.tempVectorP.y, this.tempVectorP.z + 1000 * (i / 4)));
+    //  this.points.push(new THREE.Vector3(this.tempVectorP.x, this.tempVectorP.y, this.tempVectorP.z).normalize().multiplyScalar(i * 20));
+    }
+    this.curve = new THREE.CatmullRomCurve3(this.points);
+
+    this.material = new THREE.LineBasicMaterial( { color: 0x0000ff } );
+    // this.material = new THREE.LineBasicMaterial( {
+    //   color: 0xffffff,
+    //   linewidth: 15, // in world units with size attenuation, pixels otherwise
+    //   vertexColors: true,
+
+    //   //resolution:  // to be set by renderer, eventually
+    //   dashed: false,
+    //   alphaToCoverage: true,
+    // } );
+    this.geometry = new THREE.BufferGeometry().setFromPoints( this.points );
+    this.line = new THREE.Line( this.geometry, this.material );
+    this.el.sceneEl.object3D.add( this.line );
+    this.followPath = true;
+  },
   applyForce: function () {
     if (this.camera == null) {
       let cameraEl = document.querySelector('a-entity[camera]');
@@ -3790,7 +3826,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
         // this.camera = cameraEl.components.camera.camera;
       }
     }  
-      if (this.hasShootAction) {
+    if (this.hasShootAction) { //this isn't phsyics now
         // // this.el.setAttribute()
 
         // this.dropPos = new THREE.Vector3();
@@ -3825,14 +3861,14 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
 
 
       }
-      console.log("tryna apply force shoot action " + this.hasShootAction + " " + this.camera);
+    console.log("tryna apply force shoot action " + this.hasShootAction + " " + this.camera);
     this.pushForward = true;
     setTimeout(() => {
       this.pushForward = false;
     }, 100);
   },
   tick: function () {
-
+    
     if (this.pushForward && this.camera != null) {
       // console.log("tryna apply force shoot action " + this.hasShootAction);
       // this.lookVector.applyQuaternion(this.camera.quaternion);
@@ -3862,15 +3898,55 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
         this.el.body.setLinearVelocity(velocity);
         Ammo.destroy(velocity);
 
-
-      //   const force = new Ammo.btVector3(this.lookVector.x * 10 * this.data.forceFactor, this.lookVector.y * 10 * this.data.forceFactor, this.lookVector.z * 10 * this.data.forceFactor);
-      //  const pos = new Ammo.btVector3(this.dropPos.x, this.dropPos.y, this.dropPos.z);
-      //   el.body.applyForce(force, pos);
-      //   Ammo.destroy(force);
-      //   Ammo.destroy(pos);
-        // Ammo.destroy(pos);
       }
      
+      } else if (this.followPath && this.curve) {
+        
+        this.posIndex++;
+        if (this.posIndex > 100) {
+          // this.curve = null;
+          this.el.sceneEl.object3D.remove(this.line);
+          this.el.parentNode.removeChild(this.el);
+          let trailComponent = this.el.components.trail;
+          if (trailComponent) {
+            trailComponent.reset();
+          }
+        } else {
+        this.currentPos = this.curve.getPoint(this.posIndex / 100);
+        // this.currentRot = this.curve.getTangent(this.posIndex / 100);
+        // this.el.object3D.getWorldDirection(this.currentRot);
+        // this.el.object3D.rotation.set(this.currentRot);
+        console.log("tryna set positionn to" + JSON.stringify(this.currentPos));
+        this.el.object3D.position.copy(this.currentPos);
+        // this.el.object3D.rotation.copy(this.currentRot);
+
+        // this.el.object3D.quaternion.copy(this.equipHolder.object3D.quaternion);
+          // this.rotObjectMatrix.makeRotationFromQuaternion(this.equipHolder.object3D.quaternion);
+          // this.el.object3D.quaternion.setFromRotationMatrix(this.rotObjectMatrix);
+
+        // this.el.object3D.position.x = this.currentPos.x;
+        // this.el.object3D.position.y = this.currentPos.y;
+        // this.el.object3D.position.z = this.currentPos.z;
+        // this.el.object3D.rotation.x = this.currentRot.x;
+        // this.el.object3D.rotation.y = this.currentRot.y;
+        // this.el.object3D.rotation.z = this.currentRot.z;
+
+        // camera.position.x = camPos.x;
+        // camera.position.y = camPos.y;
+        // camera.position.z = camPos.z;
+        
+        // camera.rotation.x = camRot.x;
+        // camera.rotation.y = camRot.y;
+        // camera.rotation.z = camRot.z;
+        
+        this.el.object3D.lookAt(this.curve.getPoint(99 / 100).negate());
+        // this.el.object3D.quaternion.copy(this.equipHolder.object3D.quaternion);
+        // this.el.object3D.position.needsUpdate = true;
+        // this.el.object3D.quaternion.needsUpdate = true;
+        /// see https://threejs.org/docs/#api/en/core/Object3D.lookAt - "does not support non-uniformly scaled parents"
+
+
+      } 
     }
   }
  
