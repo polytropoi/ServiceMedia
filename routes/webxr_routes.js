@@ -184,6 +184,7 @@ webxr_router.get('/:_id', function (req, res) {
     // let parametricEntities = "";
     let lightEntities = "";
     let placeholderEntities = "";
+    let proceduralEntities = "";
     // let placeholderEntities = "<a-entity id=\x22createPlaceholders\x22 create_placeholders></a-entity>";
     let calloutEntities = "";
     let carLocation = "";
@@ -820,7 +821,7 @@ webxr_router.get('/:_id', function (req, res) {
                                     curvePoints.push(curvePoint);
                                 }
                                 if (sceneResponse.sceneLocations[i].markerType == "tunnel") {
-                                    placeholderEntities = placeholderEntities + "<a-entity mod_tunnel=\x22init: true;\x22></a-entity>";
+                                    proceduralEntities = proceduralEntities + "<a-entity mod_tunnel=\x22init: true;\x22></a-entity>";
                                 }
 
                             }
@@ -4776,6 +4777,7 @@ webxr_router.get('/:_id', function (req, res) {
                         // parametricEntities +
                         "<a-light visible=\x22false\x22 show-in-ar-mode id=\x22real-light\x22 type=\x22directional\x22 position=\x221 1 1\x22 intensity=\x220.5\x22></a-light>" +
                         placeholderEntities +
+                        proceduralEntities +
                         loadLocations +
                         "<a-entity id=\x22createAvatars\x22 create_avatars></a-entity>"+
                         "<a-entity id=\x22particleSpawner\x22 particle_spawner></a-entity>"+

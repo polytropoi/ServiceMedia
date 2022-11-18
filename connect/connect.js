@@ -2239,7 +2239,7 @@ function TimedEventListener () {
       // if (hasPrimaryAudio) {
          if (primaryAudioHowl != undefined && primaryAudioHowl != null && primaryAudioHowl.playing) {
          primaryAudioTime = primaryAudioHowl.seek();
-            if (primaryAudioTime < .2) {
+            if (primaryAudioTime != 0 && primaryAudioTime < .2) {
                timeKeysIndex = 0; 
                console.log("resetting timekeysindex!");
             }
