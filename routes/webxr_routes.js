@@ -819,6 +819,9 @@ webxr_router.get('/:_id', function (req, res) {
                                     curvePoint.data = sceneResponse.sceneLocations[i].eventData;
                                     curvePoints.push(curvePoint);
                                 }
+                                if (sceneResponse.sceneLocations[i].markerType == "tunnel") {
+                                    placeholderEntities = placeholderEntities + "<a-entity mod_tunnel=\x22init: true;\x22></a-entity>";
+                                }
 
                             }
                             // loadLocations = "ready(function(){\n" +

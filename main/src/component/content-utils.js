@@ -4326,18 +4326,15 @@ AFRAME.registerComponent('mod_model', {
       this.el.addEventListener('beatme', e => console.log("beat"));
       this.isInitialized = false; //to prevent model-loaded from retriggering when childrens are added to this parent
 
+
+
+
+      ///////////////////////////////////////////////// model loaded event start /////////////////////////////
       this.el.addEventListener('model-loaded', () => {
       if (!this.isInitialized) {
         if (this.data.eventData.includes("scatter")) {
           this.el.object3D.visible = false;
           // console.log("GOTSA SCATTER OBJEK@");
-          // document.getElementById("scatterSurface").components.instanced_surface_meshes.surfaceLoaded();
-          // let imeshes = document.querySelectorAll("[instanced_surface_meshes]");
-          // console.log("gots imeshes " + imeshes);
-          // for (let i = 0; i < imeshes.length; i++) {
-          //   console.log("imesh " + imeshes[i]);
-          //   imeshes[i].components.instanced_surface_meshes.surfaceLoaded(this.el);
-          // }
 
         }
         // this.oScale = oScale;
@@ -4363,21 +4360,7 @@ AFRAME.registerComponent('mod_model', {
               obj.material.reflectivity = .5;
             }
           }
-              // if (this.data.markerType.toLowerCase() == "spawntrigger") {
-              //   // console.log("tryna add aabb colloidere!");
-              //   // this.el.setAttribute("aabb-collider", {'objects': 'a-entity'});
-              //   this.el.classList.add("activeObjexRay");
-              // }
-              // if (this.data.eventData.toLowerCase().includes("spawn")) {
-              //   this.el.classList.add("spawn");
-              // }
-              // if (this.data.eventData.toLowerCase().includes("trigger") 
-              //   || this.data.eventData.toLowerCase().includes("portal") 
-              //   || this.data.eventData.toLowerCase().includes("gate")) {//for external trigger object, disabled the embedded trigger //TODO make this physicstrigger
-              //   this.el.classList.add("trigger");
-              //   this.el.classList.add("activeObjexRay");
-              //   this.el.setAttribute("aabb-collider", {objects: ".activeObjexRay"});
-              // }
+             
           if (this.data.eventData.toLowerCase().includes("transparent")) {
             console.log("tryna set transparent");
             obj.visible = false;
@@ -5943,7 +5926,27 @@ AFRAME.registerComponent('picture_groups_control', {
         }
       }
       return group;
-
+    },
+    returnTileableData: function () {
+      //find the group with the skyboxID, if there is one, and return that (can't mix in scene vs. in group skyboxen..?)
+      let group = null;
+      let picGroupArray = this.data.jsonData;
+      // if (picGroupArray.length > 0) {
+      //   let nextbuttonEl = document.getElementById('nextButton');
+      //   let prevbuttonEl = document.getElementById('previousButton');
+      //   nextbuttonEl.style.visibility = "visible";
+      //   prevbuttonEl.style.visibility = "visible";
+      // }
+      console.log("tryna find tileable pics");
+      for (let i = 0; i < picGroupArray.length; i++) {
+        for (let j = 0; j < picGroupArray[i].images.length; j++) {
+          if (picGroupArray[i].images[j].orientation == "Tileable") {
+            group = picGroupArray[i];
+            break;
+          }
+        }
+      }
+      return group;
     }
 });
 

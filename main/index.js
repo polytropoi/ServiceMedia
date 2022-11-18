@@ -9915,6 +9915,7 @@ function getAllPeople() {
         "portal",
         "curve point",
         "follow curve",
+        "tunnel",
         "follow parametric curve",
         "follow ambient",
         "placeholder",

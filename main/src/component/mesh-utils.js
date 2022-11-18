@@ -3022,3 +3022,180 @@ AFRAME.registerComponent('rotate-toward-velocity', {
 
 });
 
+AFRAME.registerComponent('mod_tunnel', {
+  schema: {
+    init: {default: false},
+    tags: {default: ''},
+      
+  },
+  init: function () {
+  // if (this.data.markerType == "tunnel") {
+    // Create an empty array to stores the points
+      this.loaded = false;
+      this.verticleez = null;
+      this.tubeGeometry_o = null;
+      this.tubeGeometry = null;
+      console.log("tryna make a tunnel");
+      this.points = [];
+      this.speed = .001;
+      // Define points along Z axis
+      for (var i = 0; i < 5; i += 1) {
+      this.points.push(new THREE.Vector3(0, 0, -100 * (i / 4)));
+      }
+
+      // Create a curve based on the points
+      // this.el.setAttribute("position", {x: 50, y: 0, z: 0});
+      this.curve = new THREE.CatmullRomCurve3(this.points);
+      // Create the geometry of the tube based on the curve
+      // The other values are respectively : 
+      // 70 : the number of segments along the tube
+      // 0.02 : its radius (yeah it's a tiny tube)
+      // 50 : the number of segments that make up the cross-section
+      // false : a value to set if the tube is closed or not
+      let picGroupMangler = document.getElementById("pictureGroupsData");
+
+      if (picGroupMangler != null && picGroupMangler != undefined) {
+        this.tileablePicData = picGroupMangler.components.picture_groups_control.returnTileableData();
+        // console.log(JSON.stringify(this.skyboxData));
+        this.texture = new THREE.TextureLoader().load(this.tileablePicData.images[0].url);
+        this.texture.encoding = THREE.sRGBEncoding;
+       // Empty geometry
+      this.geometry = new THREE.BufferGeometry();
+      // Create vertices based on the curve
+      this.vertArray = this.curve.getPoints(70);
+      // this.vertArray = new THREE.Float32Array
+      // this.geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( this.vertArray, 3 ) );
+      this.geometry = new THREE.BufferGeometry().setFromPoints( this.curve.getPoints(70) );
+      // geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
+        // Create a line from the points with a basic line material
+      this.splineMesh = new THREE.Line(this.geometry, new THREE.LineBasicMaterial());
+
+      this.tubeGeometry = new THREE.TubeBufferGeometry(this.curve, 70, 5, 50, false);
+      // const ref = document.querySelector("#cloud1");
+      // var texture = new THREE.TextureLoader().load(ref.src);
+      // texture.encoding = THREE.sRGBEncoding; 
+      // Define a material for the tube with a jpg as texture instead of plain color
+      this.tubeMaterial = new THREE.MeshStandardMaterial({
+      side: THREE.BackSide, // Since the camera will be inside the tube we need to reverse the faces
+      map: this.texture // rockPattern is a texture previously loaded
+      });
+      // Repeat the pattern to prevent the texture being stretched
+      this.tubeMaterial.map.wrapS = THREE.RepeatWrapping;
+      this.tubeMaterial.map.wrapT = THREE.RepeatWrapping;
+      this.tubeMaterial.map.repeat.set(4, 4);
+
+      // Create a mesh based on tubeGeometry and tubeMaterial
+      this.tubeMesh = new THREE.Mesh(this.tubeGeometry, this.tubeMaterial);
+
+      // Add the tube into the scene
+      this.el.sceneEl.object3D.add(this.tubeMesh);
+      this.el.sceneEl.object3D.add(this.splineMesh);
+      this.loaded = true;
+      this.tubeGeometry_o = this.tubeGeometry.clone();
+    } else {
+      console.log("no pic");
+    }
+
+      // }
+    },
+    // from https://github.com/Mamboleoo/InfiniteTubes/blob/master/js/demo6.js
+    updateCurve: function() {
+      var index = 0,
+      vertice_o = null,
+      vertice = null;
+      this.verticleez_old = this.tubeGeometry_o.attributes.position.array; //for reference
+      this.verticleez = this.tubeGeometry.attributes.position.array;
+      this.splineVerts = this.splineMesh.geometry.attributes.position.array;
+      this.vert = null;
+      var x = 0;
+      var y = 0;
+      var z = 0
+      var index = 0;
+      // For each vertice of the tube, move it a bit based on the spline
+      for (var i = 0, j = this.tubeGeometry.attributes.position.array.length; i < j; i += 3) {
+        // if (i % 3) { //ignore the z?
+        // Get the original tube vertice
+        // vertice_o = this.tubeGeometry_o.geometry.attributes.position.array[i];
+        // Get the visible tube vertice
+        // vertice = this.verticleez[i];
+        // if (vertice != 0) {
+        // console.log("vertice: " + JSON.stringify(vertice));
+        // Calculate index of the vertice based on the Z axis
+        // The tube is made of 30 circles of vertices
+        // index = Math.floor(i / this.splineVerts.length);
+        // Update tube vertice
+          this.verticleez[i] += ((this.verticleez_old[i] + this.splineVerts[index]) - this.verticleez[i]) / 10; 
+          this.verticleez[i+1] += ((this.verticleez_old[i + 1] + this.splineVerts[index + 1]) - this.verticleez[i + 1]) / 5;
+
+        // vertice.x += ((vertice_o.x + this.splineMesh.geometry.vertices[index].x) - vertice.x) / 10;
+        // vertice.y += ((vertice_o.y + this.splineMesh.geometry.vertices[index].y) - vertice.y) / 5;
+
+        // this.verticleez[i] += ((this.verticleez_old[i] + Math.random()/2) - this.verticleez[i]) / 10; 
+        // this.verticleez[i+1] += ((this.verticleez_old[i + 1] + Math.random()/2) - this.verticleez[i+1]) / 5;
+
+        // this.vert = this.tubeGeometry_o.attributes.position.array[i] += (Math.random() * .1);
+        // console.log("this.vert " + this.vert);
+        // this.tubeGeometry.attributes.position.array[i] = this.vert;
+        // vertice.y += Math.random();
+        // vertice.x += ((vertice_o.x + .5) - vertice.x) / 10;
+        // vertice.y += ((vertice_o.y + .5) - vertice.y) / 5;
+        // }
+        }
+      
+      // Warn ThreeJs that the points have changed
+      this.tubeGeometry.attributes.position.needsUpdate = true;
+
+      this.tubeGeometry.computeVertexNormals();
+
+          // // Update the points along the curve base on mouse position
+          // this.curve.points[2].x = -this.mouse.position.x * 0.1;
+          // this.curve.points[4].x = -this.mouse.position.x * 0.1;
+          // this.curve.points[2].y = this.mouse.position.y * 0.1;
+
+          this.curve.points[2].x = -Math.random() * .1;
+          this.curve.points[4].x = -Math.random() * .1;
+          this.curve.points[2].y = Math.random()  * .1;
+          
+          // // Warn ThreeJs that the spline has changed
+          this.splineMesh.geometry.attributes.position.needsUpdate = true;
+          // this.geometry = new THREE.BufferGeometry().setFromPoints( this.curve.getPoints(70) );
+
+        //   for (let i = 0; i < this.splineVerts.length; i += 3) {
+        //     // const v = new THREE.Vector3(this.splineVerts[i], this.splineVerts[i + 1], this.splineVerts[i + 2]).multiplyScalar(2)
+        //     this.splineVerts[i] += ( Math.random() - 0.5 ) * 2;
+        //     this.splineVerts[i + 1] += ( Math.random() - 0.5 ) * 2;
+        //     // this.splineVerts[i + 2] += ( Math.random() - 0.5 ) * 3;
+
+
+
+        // }
+        this.splineMesh.geometry.attributes.position.needsUpdate = true;
+
+        this.geometry = new THREE.BufferGeometry().setFromPoints( this.curve.getPoints(70) );
+        // geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
+          // Create a line from the points with a basic line material
+        this.splineMesh = new THREE.Line(this.geometry, new THREE.LineBasicMaterial());
+        // this.spline.attributes.position.needsUpdate = true;
+          // for ( var i = 0, l = this.splineVerts; i < l; i ++ ) {
+
+          //   this.splineVerts[ index ++ ] = x;
+          //   this.splineVerts[ index ++ ] = y;
+          //   this.splineVerts[ index ++ ] = z;
+        
+          //   x += ( Math.random() - 0.5 ) * 3;
+          //   y += ( Math.random() - 0.5 ) * 3;
+          //   z += ( Math.random() - 0.5 ) * 3;
+        
+          // }
+          // this.splineMesh.geometry.attributes.position.array = this.curve.getPoints(70);
+
+    },
+    tick: function () {
+      if (this.loaded && this.tubeGeometry && this.tubeMaterial) {
+        // console.log("modding speernd " + this.speed);
+        this.tubeMaterial.map.offset.x += this.speed;
+        this.updateCurve();
+      }
+      
+    }
+})
