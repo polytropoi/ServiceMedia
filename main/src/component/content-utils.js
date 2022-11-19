@@ -2554,8 +2554,9 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
     // this.sceneInventoryID = null;
     if (this.data.locationData && this.data.locationData.eventData && this.data.locationData.eventData.toLowerCase().includes("driveable")) {
       this.thirdPersonPlaceholder = document.getElementById("thirdPersonPlaceholder"); //it's in the server response
-      this.modelParent = thirdPersonPlaceholder;
+
       if (this.thirdPersonPlaceholder) {
+        this.modelParent = this.thirdPersonPlaceholder;
         // thirdPersonPlaceholder.appendChild(this.el);
         // this.el.setAttribute("position", {x:0, y:0, z:0});
         if (this.data.objectData.modelURL != undefined) {

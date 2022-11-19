@@ -2389,7 +2389,7 @@ function PlayTimedEvent(timeKey) {
       if (timeKey.keytype.toLowerCase().includes("color lerp")) {
          console.log("tryna beat loop");
          let envEl = document.getElementById('enviroEl');
-         if (envEl != null) {
+         if (envEl != null && envEl.components.enviro_mods) {
             // console.log("beat volume " + volume);
             envEl.components.enviro_mods.colorlerp(timeKey.keyduration); //does loop on arg
          }

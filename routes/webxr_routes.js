@@ -1071,7 +1071,39 @@ webxr_router.get('/:_id', function (req, res) {
                                        
                                        
                                         "</a-entity></a-entity>";
-                                } else { // first person cam, default
+                                } else if (sceneResponse.sceneCameraMode != undefined && sceneResponse.sceneCameraMode.toLowerCase().includes("fixedd")) { //hrm..
+                                    let lookcontrols = "look-controls=\x22magicWindowTrackingEnabled: false; reverseTouchDrag: true\x22";
+                                    if (sceneResponse.sceneTags != null && (sceneResponse.sceneTags.includes('magicwindow') || sceneResponse.sceneTags.includes('magic window'))) {
+                                        lookcontrols = "look-controls=\x22reverseTouchDrag: true\x22"; // because magicwinders enabled by default
+                                    }
+                                    wasd = "";
+                                    // wasd = "wasd-controls=\x22fly: true; acceleration: "+sceneResponse.scenePlayer.playerSpeed+"\x22 simple-navmesh-constraint=\x22navmesh:#navmesh-el;fall:10; height:0;\x22";
+                                    // wasd = "extended_wasd_controls=\x22flyEnabled: false; moveSpeed: 4; inputType: keyboard\x22";
+                                    // wasd = "extended_wasd_thirdperson=\x22fly: false; moveSpeed: "+sceneResponse.scenePlayer.playerSpeed+"; inputType: keyboard\x22 simple-navmesh-constraint=\x22navmesh:#navmesh-el;fall:10; height: 0\x22";
+                                    camera = "<a-entity "+lookcontrols+" follow-camera=\x22target: #player\x22>" +
+                                        "<a-entity camera position=\x220 5 7\x22 ></a-entity>" +
+                                    "</a-entity>"+
+                                    "<a-entity id=\x22cameraRig\x22 initializer "+
+                                
+                                        " id=\x22mouseCursor\x22 cursor=\x22rayOrigin: mouse\x22 raycaster=\x22objects: .activeObjexRay\x22>"+
+                                        
+                                       
+                                        "<a-entity id=\x22player\x22 "+wasd+" "+ physicsMod +" position=\x22"+playerPosition+"\x22>"+
+                                            "<a-entity id=\x22equipPlaceholder\x22 geometry=\x22primitive: box; height: .1; width: .1; depth: .1\x22 position=\x220 -.65 -.75\x22"+
+                                            "material=\x22opacity: 0\x22></a-entity>"+
+                                            "<a-entity id=\x22viewportPlaceholder\x22 geometry=\x22primitive: plane; height: 0.01; width: .01\x22 position=\x220 0 -1.5\x22"+
+                                            "material=\x22opacity: 0\x22></a-entity>"+
+                                            "<a-entity id=\x22viewportPlaceholder3\x22 geometry=\x22primitive: plane; height: 0.01; width: .01\x22 position=\x220 0 -3\x22"+
+                                            "material=\x22opacity: 0\x22></a-entity>"+
+                                            "<a-entity id=\x22thirdPersonPlaceholder\x22 position=\x220 0 0\x22></a-entity>"+
+                                            "<a-entity id=\x22playCaster\x22 position=\x220 .5 .5\x22></a-entity>"+
+                                            // "<a-sphere visible=\x22true\x22 scale=\x220.45 0.5 0.4\x22 random-color></a-sphere>"+
+                                        "</a-entity>"+
+                                       
+                                       
+                                        "</a-entity></a-entity>";
+                                }  
+                                else { // first person cam, default
                                     let lookcontrols = "look-controls=\x22magicWindowTrackingEnabled: false;\x22";
                                     if (sceneResponse.sceneTags != null && (sceneResponse.sceneTags.includes('magicwindow') || sceneResponse.sceneTags.includes('magic window'))) {
                                         lookcontrols = "look-controls"; // because magicwinders enabled by default
@@ -4533,7 +4565,12 @@ webxr_router.get('/:_id', function (req, res) {
                         // "<meta name=\x22token\x22 content=\x22"+token+"\x22>"+
                         "<link href=\x22../main/vendor/fontawesome-free/css/all.css\x22 rel=\x22stylesheet\x22 type=\x22text/css\x22>" +
                         "<link href=\x22/css/webxr.css\x22 rel=\x22stylesheet\x22 type=\x22text/css\x22>" +
-                       
+                                              //<!-- Import maps polyfill -->
+                       //<!-- Remove this when import maps will be widely supported -->
+                       "<script async src=\x22https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js\x22></script>"+
+                       "<script type=\x22importmap\x22> {\x22imports\x22: {" +
+                            "\x22three\x22: \x22/three/build/three.module.js\x22"+
+                        "}}</script>"+
                         "<script src=\x22/main/vendor/jquery/jquery.min.js\x22></script>" +
                         
                         "<script src=\x22../main/ref/aframe/dist/socket.io.slim.js\x22></script>" +
@@ -4863,6 +4900,12 @@ webxr_router.get('/:_id', function (req, res) {
                            
                         
                        "</script>\n"+
+                    //    //<!-- Import maps polyfill -->
+                    //    //<!-- Remove this when import maps will be widely supported -->
+                    //    "<script async src=\x22https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js\x22></script>"+
+                    //    "<script type=\x22importmap\x22> {\x22imports\x22: {" +
+                    //         " \x22three\x22: \x22/three/build/three.module.js\x22"+
+                    //     "}}</script>"+
                         sceneManglerButtons +
                        
                         videoElements +
