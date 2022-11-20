@@ -1,4 +1,7 @@
-import {MeshSurfaceSampler} from '/three/examples/jsm/math/MeshSurfaceSampler.js'; //can because "type=module"
+// can't really import if there are threejs dependencies, bc aframe embeds it ("superthree")... 
+// so these need to be called from global, in /examples/js instead of /jsm
+
+import {MeshSurfaceSampler} from '/three/examples/jsm/math/MeshSurfaceSampler.js'; //can because "type=module" 
 import { Flow } from '/three/examples/jsm/modifiers/CurveModifier.js'; 
 // import { Line2 } from '/three/examples/jsm/lines/Line2.js'; //hrm..
 // import { LineMaterial } from '/three/examples/jsm/lines/LineMaterial.js';
@@ -81,12 +84,9 @@ AFRAME.registerComponent('instanced_meshes_sphere', { //scattered randomly in sp
       });
     });
   }
-  // this.el.setAttribute('gltf-model', gltfs[0]);
+
   this.particlesEl = null;
 
-  // this.arrowColor = '3FFF33'; //
-
-  // this.particlesComponent = null;
   if (this.data.tags && this.data.tags.toLowerCase().includes("bang")) {
     this.particlesEl = document.createElement("a-entity");
     // this.particlesEl.setAttribute("mod_particles", {"enabled": false});
@@ -141,7 +141,7 @@ AFRAME.registerComponent('instanced_meshes_sphere', { //scattered randomly in sp
 
       let euler = new THREE.Euler(Math.PI, 0, 0, "ZYX");
       let radius = this.data.scaleFactor * 10 + (count/2);
-      this.clock = new THREE.Clock();
+      this.clock = new THREE.Clock();  //wha
         
       for (var i=0; i<count; i++) {
       //   box = new THREE.Mesh(boxGeo, greyPhongMat);
@@ -2724,7 +2724,7 @@ AFRAME.registerComponent("rotate-with-camera", { //unused
      }
  });
  
- AFRAME.registerComponent('follow-path', { //for third person camera
+ AFRAME.registerComponent('follow-path', { //for third person camera//deprecate
      schema: {
          curve: {default: 'a-curve'}, // css selector
          incrementBy: {default: 0.01},
@@ -2794,7 +2794,7 @@ AFRAME.registerComponent("rotate-with-camera", { //unused
 
   },
   loadRoomData(roomData) {
-   
+  
     this.roomData = roomData.chunk;
     this.roomData.sort((a, b) => (a.num_joined_members < b.num_joined_members) ? 1 : -1);
     // console.log("gots " + this.roomData.length + " rooms from matrix.org :" + JSON.stringify(this.roomData));
@@ -3027,6 +3027,87 @@ AFRAME.registerComponent('rotate-toward-velocity', {
 
 });
 
+AFRAME.registerComponent('mod_curve', {
+  schema: {
+    init: {default: false},
+    isClosed: {default: false},
+    eventData: {default: ''}
+  },
+
+  init: function () {
+
+    this.loaded = false;
+
+    console.log("tryna make a mod_curve");
+
+    this.newPosition = null; 
+    this.tangent = null;
+    this.radians = null; 
+    this.fraction = 0;
+
+    this.normal = new THREE.Vector3( 0, 1, 0 ); // up
+    this.axis = new THREE.Vector3( );
+    this.points = [];
+    this.speed = .001;
+
+    this.speedMod = 1;
+    // this.el.getAttribute("position");
+
+    for (var i = 0; i < 5; i += 1) {
+      this.points.push(new THREE.Vector3(0, 0, -100 * (i / 4)));
+    }
+    this.curve = new THREE.CatmullRomCurve3(this.points);
+    this.c_points = this.curve.getPoints( 50 );
+    this.c_geometry = new THREE.BufferGeometry().setFromPoints( this.c_points );
+    this.c_material = new THREE.LineBasicMaterial( { color: 0x4287f5 } );
+    this.curveLine = new THREE.Line( this.c_geometry, this.c_material ); //this one stays a curve
+
+    setTimeout( () => {
+      this.isReady = true;
+    }, 10000 * Math.random() );
+  },
+  updateCurve: function() {
+
+    this.curveLine.geometry.attributes.position.needsUpdate = true;
+    this.speedmod = Math.random() * (2 - .5) + .5;
+    if (this.fraction == 0) {
+      this.curve.points[0].x =Math.ceil(Math.random() * 4) * (Math.round(Math.random()) ? 1 : -1);
+      this.curve.points[0].y =Math.ceil(Math.random() * 4) * (Math.round(Math.random()) ? 1 : -1);
+      this.curve.points[1].x =-Math.ceil(Math.random() * 4) * (Math.round(Math.random()) ? 1 : -1);
+      this.curve.points[1].y =-Math.ceil(Math.random() * 4) * (Math.round(Math.random()) ? 1 : -1);
+      this.curve.points[2].x =Math.ceil(Math.random() * 4) * (Math.round(Math.random()) ? 1 : -1);
+      this.curve.points[2].y =Math.ceil(Math.random() * 4) * (Math.round(Math.random()) ? 1 : -1);
+      this.curve.points[3].x =-Math.ceil(Math.random() * 4) * (Math.round(Math.random()) ? 1 : -1);
+      this.curve.points[3].y =-Math.ceil(Math.random() * 4) * (Math.round(Math.random()) ? 1 : -1);
+    }
+    this.fraction += 0.001 * this.speedMod;
+    if ( this.fraction > 1) {
+      this.fraction = 0;
+
+      //normal.set( 0, 1, 0 );
+    }
+
+    
+    this.el.object3D.position.copy( this.curve.getPoint( 1 - this.fraction ) ); //or just the fraction to go backwards
+       
+    this.tangent = this.curve.getTangent( this.fraction );
+    this.axis.crossVectors( this.normal, this.tangent ).normalize( );
+  
+    //radians = Math.acos( normal.dot( tangent ) );	
+    //char.quaternion.setFromAxisAngle( axis, radians );
+    
+    this.el.object3D.quaternion.setFromAxisAngle( this.axis, Math.PI / 2 );
+  },
+  tick: function () {
+    if (this.curve && this.curveLine && this.isReady) {
+      // console.log("modding speernd " + this.speed);
+      // this.tubeMaterial.map.offset.x += this.speed;
+      this.updateCurve();
+    }  
+  }
+
+});
+
 AFRAME.registerComponent('mod_tunnel', {
   schema: {
     init: {default: false},
@@ -3093,6 +3174,7 @@ AFRAME.registerComponent('mod_tunnel', {
 
       this.c_material = new THREE.LineBasicMaterial( { color: 0x4287f5 } );
 
+      this.curveLine = new THREE.Line( this.c_geometry, this.c_material ); //this one stays a curve
       // this.c_material = new LineMaterial( {
 
       //   color: 0xffffff,
@@ -3112,7 +3194,7 @@ AFRAME.registerComponent('mod_tunnel', {
       // line.scale.set( 1, 1, 1 );
 
       // Create the final object to add to the scene
-          this.curveLine = new THREE.Line( this.c_geometry, this.c_material ); //this one stays a curve
+          // this.curveLine = new THREE.Line( this.c_geometry, this.c_material ); //this one stays a curve
           // // line = new Line2( geometry, matLine );
           // this.curveLine.computeLineDistances();
           // this.curveLine.scale.set( 1, 1, 1 );
@@ -3142,28 +3224,16 @@ AFRAME.registerComponent('mod_tunnel', {
       this.geometry = new THREE.BufferGeometry();
       // Create vertices based on the curve
       this.vertArray = this.curve.getPoints(70);
-      // this.vertArray = new THREE.Float32Array
-      // this.geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( this.vertArray, 3 ) );
+
       this.geometry = new THREE.BufferGeometry().setFromPoints( this.curve.getPoints(70) );
 
-      // geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
-        // Create a line from the points with a basic line material
       this.splineMesh = new THREE.Line(this.geometry, new THREE.LineBasicMaterial()); //another line to mod the vertexes
 
-      // Create the geometry of the tube based on the curve
-      // The other values are respectively : 
-      // 70 : the number of segments along the tube
-      // 0.02 : its radius (yeah it's a tiny tube)
-      // 50 : the number of segments that make up the cross-section
-      // false : a value to set if the tube is closed or not
+
       this.tubeGeometry = new THREE.TubeBufferGeometry(this.curve, 70, 5, 50, false);
-      // const ref = document.querySelector("#cloud1");
-      // var texture = new THREE.TextureLoader().load(ref.src);
-      // texture.encoding = THREE.sRGBEncoding; 
-      // Define a material for the tube with a jpg as texture instead of plain color
       this.tubeMaterial = new THREE.MeshStandardMaterial({
       side: THREE.BackSide, // Since the camera will be inside the tube we need to reverse the faces
-      map: this.texture, // rockPattern is a texture previously loaded
+      map: this.texture, 
       transparent: true
       });
       // Repeat the pattern to prevent the texture being stretched
@@ -3251,10 +3321,7 @@ AFRAME.registerComponent('mod_tunnel', {
       // this.curve.points[int1].x = -Math.random() * .5;
       // this.curve.points[int2].x = -Math.random() * .5;
       // this.curve.points[int3].y = Math.random()  * .5;
-            this.curve.points[0].x = -Math.random() * .5;
-            this.curve.points[2].x = -Math.random() * .5;
-            this.curve.points[3].y = -Math.random() * .5;
-            this.curve.points[4].y = Math.random()  * .5;
+
             // this.c_points = this.curve.getPoints( 50 );
             // this.c_geometry.setFromPoints( this.c_points );
       // // Warn ThreeJs that the spline has changed
@@ -3264,28 +3331,47 @@ AFRAME.registerComponent('mod_tunnel', {
       // this.geometry = new THREE.BufferGeometry().setFromPoints( this.curve.getPoints(70) );
 
       for (let i = 0; i < this.splineVerts.length; i += 3) {
+
+
         // const v = new THREE.Vector3(this.splineVerts[i], this.splineVerts[i + 1], this.splineVerts[i + 2]).multiplyScalar(2)
         // this.splineVerts[i] += ( Math.random() - 0.5 ) / 2;
         this.splineVerts[i] = this.splineVerts_o[i] + (( Math.random() - 0.5 ) / 4) - this.splineVerts[i];
         // this.splineVerts[i + 1] += ( Math.random() - 0.5 ) / 2;
         this.splineVerts[i + 1] = this.splineVerts_o[i + 1] + (( Math.random() - 0.5 ) / 4) - this.splineVerts[i + 1];
         // this.splineVerts[i + 2] += ( Math.random() - 0.5 ) * 3;
+
       }
       this.splineMesh.geometry.attributes.position.needsUpdate = true;
       // this.curve.attributes.needsUpdate = true;
 
       // this.flow.moveAlongCurve(.06);
       // this.flow.object3D.needsUpdate = true;
-      this.fraction += 0.001;
-	
-      if ( this.fraction > 1 ) {
-      
-        this.fraction = 0;
-        //normal.set( 0, 1, 0 );
-        
+
+      if (this.fraction == 0) {
+        // this.curve.points[0].x = -Math.random() * 2;
+        // this.curve.points[2].x = -Math.random() * 2;
+        // this.curve.points[3].y = -Math.random() * 2;
+        // this.curve.points[4].y = Math.random()  * 2;
+        this.curve.points[0].x =Math.ceil(Math.random() * 2) * (Math.round(Math.random()) ? 1 : -1);
+        this.curve.points[0].y =Math.ceil(Math.random() * 2) * (Math.round(Math.random()) ? 1 : -1);
+        this.curve.points[1].x =-Math.ceil(Math.random() * 2) * (Math.round(Math.random()) ? 1 : -1);
+        this.curve.points[1].y =-Math.ceil(Math.random() * 2) * (Math.round(Math.random()) ? 1 : -1);
+        this.curve.points[2].x =Math.ceil(Math.random() * 2) * (Math.round(Math.random()) ? 1 : -1);
+        this.curve.points[2].y =Math.ceil(Math.random() * 2) * (Math.round(Math.random()) ? 1 : -1);
+        this.curve.points[3].x =-Math.ceil(Math.random() * 2) * (Math.round(Math.random()) ? 1 : -1);
+        this.curve.points[3].y =-Math.ceil(Math.random() * 2) * (Math.round(Math.random()) ? 1 : -1);
       }
+      this.fraction += 0.001;
+      if ( this.fraction > 1) {
+        this.fraction = 0;
+
+        //normal.set( 0, 1, 0 );
+      }
+      // if (Math.random() > .9) {
+        
+      // }
       
-      this.objectToCurve.position.copy( this.curve.getPoint( this.fraction ) );
+      this.objectToCurve.position.copy( this.curve.getPoint( 1 - this.fraction ) );
          
       this.tangent = this.curve.getTangent( this.fraction );
       this.axis.crossVectors( this.normal, this.tangent ).normalize( );
