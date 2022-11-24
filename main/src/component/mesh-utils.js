@@ -1,7 +1,7 @@
 // can't really import if there are threejs dependencies, bc aframe embeds it ("superthree")... 
 // so these need to be called from global, in /examples/js instead of /jsm
 
-import {MeshSurfaceSampler} from '/three/examples/jsm/math/MeshSurfaceSampler.js'; //can because "type=module" 
+import {MeshSurfaceSampler} from '/three/examples/jsm/math/MeshSurfaceSampler.js'; //can because "type=module" //no. 
 import { Flow } from '/three/examples/jsm/modifiers/CurveModifier.js'; 
 // import { Line2 } from '/three/examples/jsm/lines/Line2.js'; //hrm..
 // import { LineMaterial } from '/three/examples/jsm/lines/LineMaterial.js';
@@ -13,6 +13,363 @@ if (typeof AFRAME === 'undefined') {
 }
 
 /* global AFRAME, THREE */
+
+AFRAME.registerComponent('equipped_object_control', { //for fixed cam or vr, not center cursor // nope
+  schema: {
+    init: {default: false},
+    range: {default: 20}
+  },
+  init: function () {
+  
+  this.equipPlaceholder = document.getElementById("equipPlaceholder");
+  this.mod_object_component = this.el.components.mod_object;
+  this.startPoint = new THREE.Vector3();
+  this.tempVector = new THREE.Vector3();
+  this.endMesh = new THREE.Mesh(new THREE.SphereBufferGeometry(0.25, 16, 8), new THREE.MeshBasicMaterial({color: "blue", wireframe: true}));
+  if (this.mod_object_component) {
+    // if (this.mod_object.isEquipped) {
+      console.log("equipped object control is on!" );
+    // }   
+    const { left, top, width, height } = this.el.sceneEl.getBoundingClientRect();
+
+
+
+    // var aspect = window.innerWidth / window.innerHeight;
+    const frustumSize = 100;
+    const aspect = width / height;
+    // this.camera = new THREE.OrthographicCamera( frustumSize * aspect / - 2, frustumSize * aspect / 2, frustumSize / 2, frustumSize / - 2, 1, 100 );
+
+    // camera = new THREE.OrthographicCamera( frustumSize * aspect / - 2, frustumSize * aspect / 2, frustumSize / 2, frustumSize / - 2, 0.1, 100 );
+    // this.camera = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, 1, 100 );
+        this.lookVector = new THREE.Vector3();
+        this.vec = new THREE.Vector3(); // create once and reuse
+        this.pos = new THREE.Vector3(); // create once and reuse
+        this.camera = this.el.sceneEl.camera;
+        this.cursorEl = document.createElement("a-entity");
+        this.el.sceneEl.appendChild(this.cursorEl);
+        // this.camera.position.x = this.perspectiveCamera.position.x;
+        // this.camera.position.y = this.perspectiveCamera.position.y;
+        // this.camera.position.z = this.perspectiveCamera.position.z;
+          // this.camera.position.x = 0;
+          // this.camera.position.y = -30;
+          // this.camera.position.z = 0;
+    // vec.set(
+    //     ( event.clientX / window.innerWidth ) * 2 - 1,
+    //     - ( event.clientY / window.innerHeight ) * 2 + 1,
+    //     0.5 );
+
+    // vec.unproject( camera );
+
+    // vec.sub( camera.position ).normalize();
+
+    // var distance = - camera.position.z / vec.z;
+
+    // pos.copy( camera.position ).add( vec.multiplyScalar( distance ) );
+
+    // this.thirdPersonPlaceholderPosition = new THREE.Vector3();
+    // this.thirdPersonPlaceholderDirection = new THREE.Vector3();
+    // this.thirdPersonPlaceholder.object3D.getWorldPosition(this.thirdPersonPlaceholderPosition);  //actually it's id "playCaster"
+    // this.thirdPersonPlaceholder.object3D.getWorldDirection(this.thirdPersonPlaceholderDirection);
+    // this.thirdPersonPlaceholderDirection.normalize();
+    // this.thirdPersonPlaceholderDirection.negate();
+    // // console.log("setting thirrd person raycaster! from " + JSON.stringify(this.thirdPersonPlaceholderPosition) + " to " + JSON.stringify(this.thirdPersonPlaceholderDirection));
+    // this.raycaster.set(this.thirdPersonPlaceholderPosition, this.thirdPersonPlaceholderDirection);
+    // this.raycaster.far = 50;
+    // // raycaster.far = 1.5;
+   
+    // this.intersection = this.raycaster.intersectObject( this.iMesh );
+
+    // if (this.arrow) { //show helper arrow, TODO toggle from dialogs.js
+    //   this.el.sceneEl.object3D.remove(this.arrow);
+    // }
+
+    // if (this.intersection != null && this.intersection.length > 0 ) {
+    //   // this.arrowColor = "green"; //0xff0000 = "green";
+    //   this.arrow = new THREE.ArrowHelper( this.raycaster.ray.direction, this.raycaster.ray.origin, 25, 0x0b386 );
+    // } else {
+    //   this.arrow = new THREE.ArrowHelper( this.raycaster.ray.direction, this.raycaster.ray.origin, 25, 0xff0000 );
+    // }
+    const cgeometry = new THREE.BoxGeometry( 1, 1, 1 );
+    const cmaterial = new THREE.MeshPhongMaterial( { color: 0x99ffff, wireframe: false } );
+    this.worldCursor = new THREE.Mesh( cgeometry, cmaterial );
+    // this.world
+    this.el.sceneEl.object3D.add(this.worldCursor);
+    // this.el.sceneEl.object3D.add(this.camera);
+    // this.el.sceneEl.object3D.add( this.arrow );
+    this.mouseP = {};
+
+    let tG = new THREE.BufferGeometry().setFromPoints([
+      new THREE.Vector3(),
+      new THREE.Vector3()
+    ]);
+    let tM = new THREE.LineBasicMaterial({color: "yellow"});
+    this.beam = new THREE.Line(tG, tM);
+    this.el.sceneEl.object3D.add(this.beam);
+    this.el.sceneEl.object3D.add(this.endMesh);
+
+    document.addEventListener('mousemove_nm', (e) => {  
+
+
+      e.preventDefault();
+
+
+      // this.splineMesh.geometry.attributes.position.needsUpdate = true;
+      
+
+    
+
+      // for (let i = 0; i < this.splineVerts.length; i += 3) {
+
+
+      //   this.splineVerts[i] = this.splineVerts_o[i] + (( Math.random() - 0.5 ) / 4) - this.splineVerts[i];
+      //   // this.splineVerts[i + 1] += ( Math.random() - 0.5 ) / 2;
+      //   this.splineVerts[i + 1] = this.splineVerts_o[i + 1] + (( Math.random() - 0.5 ) / 4) - this.splineVerts[i + 1];
+      //   // this.splineVerts[i + 2] += ( Math.random() - 0.5 ) * 3;
+
+      // }
+      // this.splineMesh.geometry.attributes.position.needsUpdate = true;
+      // console.log("mousemove ev ent");
+      // let mouse = new THREE.Vector2();
+      // let camera = AFRAME.scenes[0].camera;
+      // let rect = document.querySelector('body').getBoundingClientRect();
+      // mouse.x = ( (e.clientX - rect.left) / rect.width ) * 2 - 1;
+      // mouse.y = - ( (e.clientY - rect.top) / rect.height ) * 2 + 1;
+      // let vector = new THREE.Vector3( mouse.x, mouse.y, -1 ).unproject( camera );
+      if (this.camera) {
+
+
+      // this.camera.getWorldDirection( this.lookVector ); //ha does nothing if child
+      // this.el.object3D.lookAt(this.lookVector);
+
+      // console.log("tryna pushForward@! " + this.data.forceFactor);
+      // const velocity = new Ammo.btVector3(2, 1, 0);
+
+      //   this.camera = this.el.sceneEl.camera;
+      // } else {
+        // const {
+        //   clientX,
+        //   clientY
+        // } = e
+        // console.log(JSON.stringify(mouseP));
+        const { left, top, width, height } = this.el.sceneEl.getBoundingClientRect();
+
+            // this.vec.set(
+            //     ((e.clientX - left) / width) * 2 - 1,
+            //     -((e.clientY - top) / height) * 2 + 1,
+            //     1
+            //     // (this.camera.near + this.camera.far) / (this.camera.near - this.camera.far)
+            //   );
+          // this.vec.set(( e.clientX / window.innerWidth ) * 2 - 1, -(( e.clientY / window.innerHeight ) * 2 + 1), .5);
+          this.mouseP.x = ( e.clientX / width ) * 2 - 1;
+          this.mouseP.y = - ( e.clientY / height ) * 2 + 1;
+          // this.vec.set(this.mouseP.x, this.mouseP.y, this.camera.position.near);
+          this.vec.set( this.mouseP.x, this.mouseP.y, ( this.camera.near + this.camera.far ) / ( this.camera.near - this.camera.far ) );
+         
+          // this.vec.set((e.clientX / window.innerWidth) * 2 - 1, -(e.clientY / window.innerHeight) * 2 + 1,0);
+          // this.vec.set(e.clientX, e.clientY, 1);
+          // this.camera.updateProjectionMatrix();
+        
+          this.vec.unproject( this.camera );
+
+          this.vec.sub( this.camera.position ).normalize();
+
+          this.distance = this.camera.position.z / this.vec.z;
+          // this.distance = ( targetZ - camera.position.z ) / vec.z;
+          // vec.sub( camera.position ).normalize();
+          // console.log("distance: " + this.distance + "ws vec: " + JSON.stringify(this.vec));
+            if (this.worldCursor) {
+              // this.worldCursor.position.copy( this.camera.position ).add( this.vec.multiplyScalar( 8 ) );
+
+              // mouseMesh.position.copy(pos);
+              // var distance = ( targetZ - camera.position.z ) / vec.z;
+              // var distance = - this.camera.position.z / this.vec.z;
+              this.worldCursor.updateMatrixWorld();
+
+              this.pos = this.camera.position.clone().add( this.vec.multiplyScalar( 20 ) );
+              // console.log("pos " + JSON.stringify(this.pos));
+              this.worldCursor.position.copy(this.pos);
+              // this.worldCursor.position.copy(this.vec.multiplyScalar( 5 ));
+              // console.log(JSON.stringify(this.worldCursor.position));
+            }
+        } else {
+          this.camera = this.el.sceneEl.camera;
+        }
+    });
+  }
+
+  },
+  showBeam: function (hitpoint) {
+    console.log("tryna show beam");
+    // const MAX_POINTS = 500;
+    // // geometry
+    // const geometry = new THREE.BufferGeometry();
+
+    // // attributes
+    // const positions = new Float32Array( MAX_POINTS * 3 ); // 3 vertices per point
+    // geometry.setAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
+
+    // // draw range
+    // const drawCount = 2; // draw the first 2 points, only
+    // geometry.setDrawRange( 0, drawCount );
+
+    // // material
+    // const material = new THREE.LineBasicMaterial( { color: 0xff0000 } );
+
+    // // line
+    // const line = new THREE.Line( geometry, material );
+    // // scene.add( line );
+
+    // positions = line.geometry.attributes.position.array;
+
+    // let x, y, z, index;
+    // x = y = z = index = 0;
+
+    // for ( let i = 0, l = MAX_POINTS; i < l; i ++ ) {
+
+    //     positions[ index ++ ] = x;
+    //     positions[ index ++ ] = y;
+    //     positions[ index ++ ] = z;
+
+    //     x += ( Math.random() - 0.5 ) * 30;
+    //     y += ( Math.random() - 0.5 ) * 30;
+    //     z += ( Math.random() - 0.5 ) * 30;
+
+    // }
+    // line.geometry.attributes.position.needsUpdate = true;
+    
+
+    if (this.equipPlaceholder) {
+
+       // temp vector for re-use
+      // this.startMesh = new THREE.Mesh(new THREE.SphereBufferGeometry(0.25, 16, 8), new THREE.MeshBasicMaterial({color: "red", wireframe: true}));
+   
+      // scene.add(observer, target);
+      this.beam.updateMatrixWorld();
+      this.endMesh.position = hitpoint.clone();
+      this.equipPlaceholder.object3D.getWorldPosition(this.startPoint);
+      // this.endPoint = hitpoint;
+
+        this.distance = this.startPoint.distanceTo(hitpoint);
+        this.tempVector.subVectors(hitpoint, this.startPoint).normalize().negate().multiplyScalar(this.distance).add(this.startPoint);
+        console.log("tryna make a beam from " + JSON.stringify(hitpoint) +" distance " + this.distance);
+        // let d = oP.distanceTo(tP);
+      
+      // tV.subVectors(tP, oP).normalize().multiplyScalar(d + 10).add(oP);
+      // this.endMesh.position.copy(this.endPoint)
+      this.beam.geometry.attributes.position.setXYZ(0, this.startPoint.x, this.startPoint.y, this.startPoint.z);
+      // this.beam.geometry.attributes.position.setXYZ(1, this.tempVector.x, this.tempVector.y, this.tempVector.z);
+      this.beam.geometry.attributes.position.setXYZ(1, hitpoint.x, hitpoint.y, hitpoint.z);
+      this.beam.geometry.attributes.position.needsUpdate = true;
+      // this.el.object3D.lookAt(hitpoint);
+    } else {
+      console.log("caint find no placeholderrz");
+    }
+  },
+  tick: function () {
+    
+  }
+});
+
+AFRAME.registerComponent('targeting_raycaster', { //add to models if needed //NOPE
+
+  init: function () {
+    this.doTheThing = false;
+    this.raycaster = null;
+    this.intersection = null;
+    this.hitpoint = new THREE.Vector3();
+    this.currentLocation = new THREE.Vector3();
+    console.log("TRYAN PUTA RAYCASTERR");
+    // this.el.classList.add('activeObjexRay');
+    this.mod_model_component = this.el.components.mod_model;
+    if (this.mod_model_component) {
+      console.log("TRYAN PUTA RAYCASTERR on MOD_MODEKL with tags" + this.mod_model_component.data.tags + " eventdata " + this.mod_model_component.data.eventData );
+    }
+    this.el.addEventListener('raycaster-intersected', (e) =>{  
+
+      // if (this.el.object3D) {
+      this.raycaster = e.detail.el;
+      this.intersection = this.raycaster.components.raycaster.getIntersection(this.el);
+      // this.hitpoint = this.intersection.point;
+
+      if ( this.intersection && this.intersection.object.name) {
+
+          // this.hitpoint.x = this.intersection.point.x.toFixed(2);
+          // this.hitpoint.y = this.intersection.point.y.toFixed(2);
+          // this.hitpoint.z = this.intersection.point.z.toFixed(2);
+
+            // this.distance = this.raycaster.components.raycaster.ray.origin.distanceTo( this.hitpoint );
+            // this.hitpoint = this.intersection[0].point;
+
+          // this.el.object3D.getWorldPosition(this.hitpoint);
+          this.hitpoint = this.intersection.point.clone();
+          this.hitpoint.x = this.hitpoint.x.toFixed(2);
+          this.hitpoint.y = this.hitpoint.y.toFixed(2);
+          this.hitpoint.z = this.hitpoint.z.toFixed(2);
+          console.log('ray hit at' + JSON.stringify(this.hitpoint));
+          this.rayhit(this.hitpoint); 
+
+        }
+      // }
+
+    });
+    this.el.addEventListener("raycaster-intersected-cleared", () => {
+      this.raycaster = null;
+      this.intersection = null;
+    });
+
+  },
+  
+  rayhit: function (hitpoint) {
+   
+      this.intersection = null;
+      // this.raycaster = null;
+      
+      // this.hitID = hitID;
+      // console.log("new hit " + hitID + " " + distance + " " + JSON.stringify(hitpoint) + " interaction:" + this.data.interaction);
+        // var triggerAudioController = document.getElementById("triggerAudio");
+        // if (triggerAudioController != null) {
+        //   triggerAudioController.components.trigger_audio_control.playAudioAtPosition(hitpoint, distance, this.data.tags);
+        // }
+      this.equipControl = document.querySelector(".equipped");
+      if (this.equipControl && this.equipControl.components) {
+        this.equipControl.components.equipped_object_control.showBeam(hitpoint);
+      }
+
+
+    
+  },
+  tick: function () {
+    if ( this.intersection != null && this.intersection.length > 0) {
+      console.log("gotsaz intersection!" + this.intersection[0].instanceId);
+      // if (window.playerPosition != null && window.playerPosition != undefined && this.intersection[0].point != undefined && this.intersection[0].point != null ) {
+      if (this.intersection[0].point != undefined && this.intersection[0].point != null ) {
+        if (this.instanceId != this.intersection[0].instanceId) {
+          this.instanceId = this.intersection[ 0 ].instanceId;
+          
+          console.log(this.data.tags + " " + this.instanceId);
+
+          // this.iMesh.setColorAt( this.instanceId, this.highlightColor.setHex( Math.random() * 0xffffff ) );
+          // this.iMesh.instanceColor.needsUpdate = true;
+          // console.log('windowplayerposition ' + JSON.stringify(window.playerPosition));
+          // if (this.data.tags != undefined && window.playerPosition != undefined && window.playerPosition) {
+          if (this.data.tags != undefined && this.data.tags.length) {  
+            // this.distance = window.playerPosition.distanceTo(this.intersection[0].point);
+            this.distance = this.raycaster.ray.origin.distanceTo( this.intersection[0].point );
+            this.hitpoint = this.intersection[0].point;
+            this.rayhit(this.instanceId, this.distance, this.hitpoint); 
+          }
+
+        }
+      }
+
+    } else {
+      this.hitID = null;
+      this.instanceId = null;
+    }
+   
+  }
+});
+
 
 AFRAME.registerComponent('instanced_meshes_sphere', { //scattered randomly in sphere, not on surface
   schema: {
@@ -112,23 +469,15 @@ AFRAME.registerComponent('instanced_meshes_sphere', { //scattered randomly in sp
       this.envmapEl = document.querySelector("#envmap_" + i);
       if (this.envmapEl) {
       this.path = this.envmapEl.getAttribute("src");
-      // console.log("envMap path " + this.path);
       this.textureArray.push(this.path);
       }
     }
     if (this.textureArray.length == 6) {
       this.texture = new THREE.CubeTextureLoader().load(this.textureArray);
       this.texture.format = THREE[data.format];
-    //   this.material = new THREE.MeshBasicMaterial
-    //   this.material = new THREE.MeshStandardMaterial( { color: '#63B671', envMap: this.texture } ); 
       this.material.envMap = this.texture;  
       this.material.envMapIntensity = .5;      
-    //   this.material.reflectivity = 1;
       this.material.roughness = .15;
-      
-    //   this.material.metalness = .1;
-    //   this.material.emissive = new THREE.Color("white");
-    //   this.material.emissiveIntensity = .01;
       this.material.needsUpdate = true;
     }
 
@@ -189,9 +538,7 @@ AFRAME.registerComponent('instanced_meshes_sphere', { //scattered randomly in sp
     tick: function(time, timeDelta) {
       // this.timeDelta = timeDelta;
       this.time = time;
-
       if (this.iMesh != null) {
-        // console.log(this.posRotReader );
         if (!this.raycaster || this.raycaster == null || this.raycaster == undefined) {
             return;
         } else {
@@ -219,16 +566,12 @@ AFRAME.registerComponent('instanced_meshes_sphere', { //scattered randomly in sp
             } else {
               this.arrow = new THREE.ArrowHelper( this.raycaster.ray.direction, this.raycaster.ray.origin, 25, 0xff0000 );
             }
-            
             this.el.sceneEl.object3D.add( this.arrow );
           } else {
             this.raycaster.setFromCamera( mouse, AFRAME.scenes[0].camera );
             this.intersection = this.raycaster.intersectObject( this.iMesh );
           }
         }
-        // 
-       
-
         if ( this.intersection != null && this.intersection.length > 0 ) {
           // if (window.playerPosition != null && window.playerPosition != undefined && this.intersection[0].point != undefined && this.intersection[0].point != null ) {
           if (this.intersection[0].point != undefined && this.intersection[0].point != null ) {
@@ -243,7 +586,6 @@ AFRAME.registerComponent('instanced_meshes_sphere', { //scattered randomly in sp
               this.rayhit(this.instanceId, this.distance, this.hitpoint); 
               this.arrowColor = '0xff0000';
           }
-
         } else {
           this.hitID = null;
           this.instanceId = null;
@@ -1082,41 +1424,6 @@ AFRAME.registerComponent('instanced_meshes_mod2', {
 });
 // import { MeshSurfaceSampler } from '/three/examples/jsm/math/MeshSurfaceSampler.js'; //can because "type=module"
 
-
-AFRAME.registerComponent('targeting_raycaster', {
-
-  init: function () {
-    this.doTheThing = false;
-    this.raycaster = null;
-    this.intersection = null;
-    this.hitpoint = null;
-  this.el.addEventListener('raycaster-intersected', e =>{  
-    if (this.video != undefined) {
-      this.raycaster = e.detail.el;
-      thiz.raycaster = this.raycaster;
-      this.intersection = this.raycaster.components.raycaster.getIntersection(this.el);
-      hitpoint = this.intersection.point;
-      
-      console.log('ray hit', this.intersection.point, this.intersection.object.name);
-    if (!this.intersection.object.name.includes("screen")) {
-        this.raycaster = null;
-        mouseOverObject = null;
-
-    } else {
-        mouseOverObject = this.intersection.object.name;      
-        // this.hitpoint = intersection.point;   
-        console.log('ray hit', this.intersection.point, this.intersection.object.name, mouseOverObject );
-        }
-      }
-    });
-  this.el.addEventListener("raycaster-intersected-cleared", () => {
-    this.raycaster = null;
-    });
-  },
-  tick: function () {
-   
-  }
-});
 
 AFRAME.registerComponent('scatter-surface', {
   init: function () {
@@ -3141,76 +3448,22 @@ AFRAME.registerComponent('mod_tunnel', {
       this.points.push(new THREE.Vector3(0, 0, -100 * (i / 4)));
       }
 
-      // Create a curve based on the points
-      // this.el.setAttribute("position", {x: 50, y: 0, z: 0});
       this.curve = new THREE.CatmullRomCurve3(this.points);
       this.c_points = this.curve.getPoints( 50 );
       // // this.c_geometry = new THREE.BufferGeometry().setFromPoints( this.c_points );//won't work with fatlines...
       this.c_geometry = new THREE.BufferGeometry().setFromPoints( this.c_points );
 
-      // // const divisions = Math.round( 12 * points.length );
-			// 	const point = new THREE.Vector3();
-			// 	const color = new THREE.Color();
-      //   const positions = [];
-      //   const divisions = Math.round( 12 * this.c_points.length );
-			// 	const colors = [];
-			// 	for ( let i = 0, l = divisions; i < l; i ++ ) {
-
-			// 		const t = i / l;
-
-      //     this.curve.getPoint( t, point );
-			// 		positions.push( point.x, point.y, point.z );
-
-			// 		color.setHSL( t, 1.0, 0.5 );
-			// 		colors.push( color.r, color.g, color.b );
-
-			// 	}
-
-
-			// 	// Line2 ( LineGeometry, LineMaterial )
-
-
-
-
       this.c_material = new THREE.LineBasicMaterial( { color: 0x4287f5 } );
 
       this.curveLine = new THREE.Line( this.c_geometry, this.c_material ); //this one stays a curve
-      // this.c_material = new LineMaterial( {
 
-      //   color: 0xffffff,
-      //   linewidth: 5, // in world units with size attenuation, pixels otherwise
-      //   vertexColors: true,
-
-      //   //resolution:  // to be set by renderer, eventually
-      //   dashed: false,
-      //   alphaToCoverage: true,
-
-      // } );
-      // this.c_geometry = new LineGeometry();
-      // this.c_geometry.setPositions( positions );
-      // this.c_geometry.setColors( colors );
-      // line = new Line2( geometry, matLine );
-      // line.computeLineDistances();
-      // line.scale.set( 1, 1, 1 );
-
-      // Create the final object to add to the scene
-          // this.curveLine = new THREE.Line( this.c_geometry, this.c_material ); //this one stays a curve
-          // // line = new Line2( geometry, matLine );
-          // this.curveLine.computeLineDistances();
-          // this.curveLine.scale.set( 1, 1, 1 );
-          const cgeometry = new THREE.BoxGeometry( 1, 1, 1 );
-          const cmaterial = new THREE.MeshPhongMaterial( { color: 0x99ffff, wireframe: false } );
-          this.objectToCurve = new THREE.Mesh( cgeometry, cmaterial );
-          
-          // this.flow = new Flow( cobjectToCurve ); 
-          // this.flow.updateCurve( 0, this.curve );
-;
-
+      const cgeometry = new THREE.BoxGeometry( 1, 1, 1 );
+      const cmaterial = new THREE.MeshPhongMaterial( { color: 0x99ffff, wireframe: false } );
+      this.objectToCurve = new THREE.Mesh( cgeometry, cmaterial );
+    
       let picGroupMangler = document.getElementById("pictureGroupsData");
 
       if (picGroupMangler != null && picGroupMangler != undefined) {
-
-
 
         this.tileablePicData = picGroupMangler.components.picture_groups_control.returnTileableData();
         // console.log(JSON.stringify(this.skyboxData));
@@ -3306,35 +3559,18 @@ AFRAME.registerComponent('mod_tunnel', {
         }
       
       // Warn ThreeJs that the points have changed
-      this.tubeGeometry.attributes.position.needsUpdate = true;
+      this.tubeGeometry.attributes.position.needsUpdate = true; //not
 
       this.tubeGeometry.computeVertexNormals();
 
-      // // Update the points along the curve base on mouse position
-      // this.curve.points[2].x = -this.mouse.position.x * 0.1;
-      // this.curve.points[4].x = -this.mouse.position.x * 0.1;
-      // this.curve.points[2].y = this.mouse.position.y * 0.1;
-      
-      // let int1 = Math.floor(Math.random() * (this.curve.points.length - 0) + 0);
-      // let int2 = Math.floor(Math.random() * (this.curve.points.length - 0) + 0);
-      // let int3 = Math.floor(Math.random() * (this.curve.points.length - 0) + 0);
-      // this.curve.points[int1].x = -Math.random() * .5;
-      // this.curve.points[int2].x = -Math.random() * .5;
-      // this.curve.points[int3].y = Math.random()  * .5;
-
-            // this.c_points = this.curve.getPoints( 50 );
-            // this.c_geometry.setFromPoints( this.c_points );
-      // // Warn ThreeJs that the spline has changed
       this.splineMesh.geometry.attributes.position.needsUpdate = true;
       
       this.curveLine.geometry.attributes.position.needsUpdate = true;
-      // this.geometry = new THREE.BufferGeometry().setFromPoints( this.curve.getPoints(70) );
+    
 
       for (let i = 0; i < this.splineVerts.length; i += 3) {
 
 
-        // const v = new THREE.Vector3(this.splineVerts[i], this.splineVerts[i + 1], this.splineVerts[i + 2]).multiplyScalar(2)
-        // this.splineVerts[i] += ( Math.random() - 0.5 ) / 2;
         this.splineVerts[i] = this.splineVerts_o[i] + (( Math.random() - 0.5 ) / 4) - this.splineVerts[i];
         // this.splineVerts[i + 1] += ( Math.random() - 0.5 ) / 2;
         this.splineVerts[i + 1] = this.splineVerts_o[i + 1] + (( Math.random() - 0.5 ) / 4) - this.splineVerts[i + 1];

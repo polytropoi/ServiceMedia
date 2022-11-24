@@ -2067,6 +2067,8 @@ AFRAME.registerComponent('mod_scene_inventory', {
     }
   });
 
+
+////////////////////////////////////////////  mod_objex spins through data and spawn objects attached to locations with mod_object component below ////////////////////////////
 AFRAME.registerComponent('mod_objex', {
   schema: {
       eventData: {default: ''},
@@ -2182,7 +2184,7 @@ AFRAME.registerComponent('mod_objex', {
             if (this.triggerAudioController != null) {
               let distance = window.playerPosition.distanceTo(locationData);
               console.log(distance + " distance to spawn lo9c " + locationData);
-              this.triggerAudioController.components.trigger_audio_control.playAudioAtPosition(locationData, distance, ["spawn"], 1);//tagmangler needs an array, add vol mod (bc blowing in they face)
+              this.triggerAudioController.components.trigger_audio_control.playAudioAtPosition(locationData, distance, ["spawn"], 1);//tagmangler needs an array, add vol mod 
             }
           } else {
             console.log("already spawned one of thoose...");
@@ -2448,7 +2450,8 @@ function FetchSceneInventoryObjex(oIDs) { //fetch scene inventory objects, i.e. 
     objexEl.components.mod_objex.loadSceneInventoryObjects(); //ok load em up
   }
 }
-AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component above
+/////////////////////////////////////////  mod_object component attached to 3D Cbjects, which have more properties than 3D Models, + actions - instantiated from mod_objex component above
+AFRAME.registerComponent('mod_object', {
   schema: {
     locationData: {default: ''},
     objectData: {default: ''},
@@ -2498,7 +2501,20 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
     this.pushForward = false;
     this.followPath = false;
     this.lookVector = new THREE.Vector3( 0, 0, -1 );
-    
+    // this.startPoint = new THREE.Vector3();
+    // this.tempVector = new THREE.Vector3();
+    // this.endMesh = new THREE.Mesh(new THREE.SphereBufferGeometry(0.25, 16, 8), new THREE.MeshBasicMaterial({color: "blue", wireframe: true}));
+    this.positionMe = new THREE.Vector3();
+    this.directionMe = new THREE.Vector3();
+    this.raycaster = null;
+    // let tG = new THREE.BufferGeometry().setFromPoints([
+    //   new THREE.Vector3(),
+    //   new THREE.Vector3()
+    // ]);
+    // let tM = new THREE.LineBasicMaterial({color: "yellow"});
+    // this.beam = new THREE.Line(tG, tM);
+
+
     this.textIndex = 0;
     this.position = null;
     this.textData = [];
@@ -2523,7 +2539,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
     this.camera = null;
     this.tags = this.data.tags;
 
-    this.raycaster = null;
+    // this.raycaster = null;
 
     this.curve = null;
     this.posIndex = 0; 
@@ -2709,6 +2725,12 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
           this.hasThrowAction = true;
           this.throwAction = this.data.objectData.actions[a];
         }
+        if (this.data.objectData.actions[a].actionType.toLowerCase() == "trigger") {
+          // this.hasThrowAction = true;
+          // this.throwAction = this.data.objectData.actions[a];
+          // this.el.setAttribute("equipped_object_control", {init: true});
+        }
+
         if (this.data.objectData.actions[a].actionType.toLowerCase() == "shoot") {
           this.hasShootAction = true;
           this.shootAction = this.data.objectData.actions[a];
@@ -2793,7 +2815,12 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
         }
       
       } else { //if we're equipped
-        this.el.setAttribute("rotation", rot);
+        // this.el.setAttribute("rotation", rot);
+        this.el.object3D.rotation.set(
+          THREE.Math.degToRad(rot.x),
+          THREE.Math.degToRad(rot.y),
+          THREE.Math.degToRad(rot.z)
+        );
         // this.el.object3D.rotation = rot;
         this.el.setAttribute('material', {opacity: 0.25, transparent: true});
      
@@ -2808,9 +2835,12 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
         this.el.setAttribute("scale", scale);
         // this.el.remove
         // this.el.object3D.scale.set(scale);
+        // this.el.sceneEl.object3D.add(this.beam);
+        // this.el.sceneEl.object3D.add(this.endMesh);
+        this.raycaster = new THREE.Raycaster();
       }
       if (this.data.followPathNewObject) {
-        this.moveOnCurve();
+        this.moveOnCurve(); //todo fix quats!
       }
       if (this.data.objectData.physics != undefined && this.data.objectData.physics != null && this.data.objectData.physics.toLowerCase() != "none") {
         //  setTimeout(function(){  
@@ -3266,7 +3296,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
           //       console.log("tryna play audio with tags " + this.data.tags);
           //       if (this.triggerAudioController != null) {
           //         let distance = window.playerPosition.distanceTo(evt.detail.intersection.point);
-          //         this.triggerAudioController.components.trigger_audio_control.playAudioAtPosition(evt.detail.intersection.point, distance, this.data.tags, 1);//tagmangler needs an array, add vol mod (bc blowing in they face)
+          //         this.triggerAudioController.components.trigger_audio_control.playAudioAtPosition(evt.detail.intersection.point, distance, this.data.tags, 1);//tagmangler needs an array, add vol mod 
           //       }
           //     }
           //   }     
@@ -3390,9 +3420,9 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
 
 
     this.el.addEventListener('raycaster-intersected', e =>{  
-        this.raycaster = e.detail.el;
-        that.raycaster = this.raycaster;
-        this.intersection = this.raycaster.components.raycaster.getIntersection(this.el, true);
+        this.raycaster_e = e.detail.el;
+        // that.raycaster = this.raycaster;
+        this.intersection = this.raycaster_e.components.raycaster.getIntersection(this.el, true);
         this.hitpoint = this.intersection.point;
         that.hitpoint = this.hitpoint;
         console.log(that.data.objectData.name + " with tags " + this.tags);
@@ -3401,7 +3431,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
     this.el.addEventListener("raycaster-intersected-cleared", () => {
         // console.log("intersection cleared");
         that.mouseOverObject = null;
-        this.raycaster = null;
+        this.raycaster_e = null;
         this.hitpoint = null;
         that.hitpoint = null;
         this.playerPosRot = null; 
@@ -3538,7 +3568,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
             console.log("tryna play audio with tags " + this.tags);
             // if (this.triggerAudioController != null) {
               // let distance = window.playerPosition.distanceTo(this.hitpoint);
-              // this.triggerAudioController.components.trigger_audio_control.playAudioAtPosition(evt.detail.intersection.point, distance, this.tags, 1);//tagmangler needs an array, add vol mod (bc blowing in they face)
+              // this.triggerAudioController.components.trigger_audio_control.playAudioAtPosition(evt.detail.intersection.point, distance, this.tags, 1);//tagmangler needs an array, add vol mod 
               // this.triggerAudioController.components.trigger_audio_control.playAudioAtPosition(this.pos, this.distance, this.tags, 1);
               if (moIndex != -1) { //moIndex = "mouthopen"
                 this.el.setAttribute('animation-mixer', {
@@ -3650,7 +3680,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
           //   this.objexEl.components.mod_objex.shootObject(this.data.objectData._id, this.mouseDowntime, "5");
           // }
           if (this.triggerAudioController != null) {
-            this.triggerAudioController.components.trigger_audio_control.playAudioAtPosition(this.hitpoint, this.distance, ["shoot"], .5);//tagmangler needs an array, add vol mod (bc blowing in they face)
+            this.triggerAudioController.components.trigger_audio_control.playAudioAtPosition(this.hitpoint, this.distance, ["shoot"], .5);//tagmangler needs an array, add vol mod 
           }
           this.el.object3D.visible = false;
           this.el.classList.remove("activeObjexRay");
@@ -3691,6 +3721,51 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
 
     });
   },
+  equippedRayHit: function (hitpoint) {
+    console.log( "equippedRayHit@!");
+    if (this.data.isEquipped) {
+
+      // let tG = new THREE.BufferGeometry().setFromPoints([
+      //   new THREE.Vector3(),
+      //   new THREE.Vector3()
+      // ]);
+      // let tM = new THREE.LineBasicMaterial({color: "yellow"});
+      // this.beam = new THREE.Line(tG, tM);
+      // this.el.sceneEl.object3D.add(this.beam);
+      // this.el.sceneEl.object3D.add(this.endMesh);
+          //  this.beam.updateMatrixWorld();
+            // this.endMesh.position = hitpoint.clone();
+            // this.el.object3D.getWorldPosition(this.startPoint);
+            // // this.endPoint = hitpoint;
+
+            //   this.distance = this.startPoint.distanceTo(hitpoint);
+            //   this.tempVector.subVectors(hitpoint, this.startPoint).normalize().multiplyScalar(this.distance).add(this.startPoint);
+            //   console.log("tryna make a beam from " + JSON.stringify(hitpoint) +" distance " + this.distance);
+            //   // let d = oP.distanceTo(tP);
+            
+            // // tV.subVectors(tP, oP).normalize().multiplyScalar(d + 10).add(oP);
+            // // this.endMesh.position.copy(this.endPoint)
+            // this.beam.geometry.attributes.position.setXYZ(0, this.startPoint.x, this.startPoint.y, this.startPoint.z);
+            // this.beam.geometry.attributes.position.setXYZ(1, this.tempVector.x, this.tempVector.y, this.tempVector.z).negate();
+            // //  this.beam.geometry.attributes.position.setXYZ(1, hitpoint.x, hitpoint.y, hitpoint.z);
+            // this.beam.geometry.attributes.position.needsUpdate = true;
+     // this.el.object3D.lookAt(hitpoint);
+
+
+     this.el.object3D.getWorldPosition(this.positionMe);  //actually it's id "playCaster"
+     this.el.object3D.getWorldDirection(this.directionMe).negate();
+     this.positionMe.normalize();
+     this.positionMe.negate();
+     // console.log("setting thirrd person raycaster! from " + JSON.stringify(this.thirdPersonPlaceholderPosition) + " to " + JSON.stringify(this.thirdPersonPlaceholderDirection));
+    //  this.raycaster.set(this.positionMe, this.directionMe);
+    //  this.raycaster.far = 50;
+     // raycaster.far = 1.5;
+    
+    //  this.intersection = this.raycaster.intersectObject( this.iMesh );
+
+
+    }
+  },
 
   rayhit: function (hitID, distance, hitpoint) { //also called on collisionstart event
     // if (this.hitID != hitID) {
@@ -3699,7 +3774,7 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
       // distance = window.playerPosition.distanceTo(hitpoint);
       console.log("new hit " + hitID + " distance: " + distance + " " + JSON.stringify(hitpoint) + " tags " +  this.tags);
       // var triggerAudioController = document.getElementById("triggerAudio");
-      if (this.triggerAudioController != null && !this.isEquipped && this.tags) {
+      if (this.triggerAudioController != null && !this.data.isEquipped && this.tags) {
         this.triggerAudioController.components.trigger_audio_control.playAudioAtPosition(hitpoint, distance, this.tags);
       }
 
@@ -4003,6 +4078,36 @@ AFRAME.registerComponent('mod_object', { //instantiated from mod_objex component
 
 
       } 
+    }
+
+    if (this.data.isEquipped) {
+      if (this.arrow) { //show helper arrow, TODO toggle from dialogs.js
+        this.el.sceneEl.object3D.remove(this.arrow);
+      }
+      this.el.object3D.getWorldPosition(this.positionMe);  //actually it's id "playCaster"
+     this.el.object3D.getWorldDirection(this.directionMe).negate();
+     this.positionMe.normalize();
+     if (this.raycaster != null) {
+
+     
+     this.raycaster.set(this.positionMe, this.directionMe);
+     this.raycaster.far = 50;
+     // raycaster.far = 1.5;
+    
+    //  this.intersection = this.raycaster.intersectObject( this.el.sceneEl.object3D.children, true );
+     
+      }
+     if (this.arrow) { //show helper arrow, TODO toggle from dialogs.js
+       this.el.sceneEl.object3D.remove(this.arrow);
+     }
+    //  this.positionMe.negate();
+     //  if (this.intersection != null && this.intersection.length > 0 ) {
+     //    // this.arrowColor = "green"; //0xff0000 = "green";
+     //    this.arrow = new THREE.ArrowHelper( this.directionMe, this.positionMe, 25, 0x0b386 );
+     //  } else {
+      this.arrow = new THREE.ArrowHelper( this.directionMe, this.positionMe, 50, 0xff0000 );
+     //  }
+      this.el.sceneEl.object3D.add( this.arrow );
     }
   }
  
@@ -4328,8 +4433,6 @@ AFRAME.registerComponent('mod_model', {
       this.isInitialized = false; //to prevent model-loaded from retriggering when childrens are added to this parent
 
 
-
-
       ///////////////////////////////////////////////// model loaded event start /////////////////////////////
       this.el.addEventListener('model-loaded', () => {
       if (!this.isInitialized) {
@@ -4385,6 +4488,25 @@ AFRAME.registerComponent('mod_model', {
             this.hasAudioTrigger = true;
           }
           
+          // if (this.data.eventData.toLowerCase().includes("target")) {
+
+            this.el.addEventListener('raycaster-intersected', e =>{  
+                this.raycaster = e.detail.el;
+                // that.raycaster = this.raycaster;
+                this.intersection = this.raycaster.components.raycaster.getIntersection(this.el, true);
+                this.hitpoint = this.intersection.point;
+
+                console.log("mod_model target hit " + this.el.id + " with tags " + this.data.tags);
+              
+            });
+            this.el.addEventListener("raycaster-intersected-cleared", () => {
+                
+                this.raycaster = null;
+                this.hitpoint = null;
+
+                
+            });
+          // }
 
           let worldPos = null;
           let hasAnims = false;
@@ -5147,10 +5269,27 @@ AFRAME.registerComponent('mod_model', {
               
                 if (this.triggerAudioController != null) {
                   let distance = window.playerPosition.distanceTo(evt.detail.intersection.point);
-                  this.triggerAudioController.components.trigger_audio_control.playAudioAtPosition(evt.detail.intersection.point, distance, this.data.tags, 1);//tagmangler needs an array, add vol mod (bc blowing in they face)
+                  this.triggerAudioController.components.trigger_audio_control.playAudioAtPosition(evt.detail.intersection.point, distance, this.data.tags, 1);//tagmangler needs an array, add vol mod 
                 }
               // }
             }
+
+            if (this.data.eventData && this.data.eventData.toLowerCase().includes("target")) {
+                // this.el.setAttribute("targeting_raycaster", {'init': true}); //no
+              
+        
+              this.equipControl = document.querySelector(".equipped"); //if there's something equipped, let it know this mod_model has been hit
+              if (this.equipControl && this.equipControl.components) {
+                this.hitpoint = evt.detail.intersection.point.clone();
+                this.hitpoint.x = this.hitpoint.x.toFixed(2);
+                this.hitpoint.y = this.hitpoint.y.toFixed(2);
+                this.hitpoint.z = this.hitpoint.z.toFixed(2);
+                console.log('ray hit at' + JSON.stringify(this.hitpoint));
+                this.equipControl.components.mod_object.equippedRayHit(this.hitpoint);
+              }
+            }
+          
+            // this.rayhit(this.hitpoint); 
             // if (this.data.markerType)
 
             // if (this.data.markerType.toLowerCase() == "spawntrigger") {
@@ -5164,7 +5303,7 @@ AFRAME.registerComponent('mod_model', {
             //       objexEl.components.mod_objex.spawnObject(this.data.eventData);
             //       // if (this.triggerAudioController != null) {
             //       //   let distance = window.playerPosition.distanceTo(evt.detail.intersection.point);
-            //       //   this.triggerAudioController.components.trigger_audio_control.playAudioAtPosition(evt.detail.intersection.point, distance, ["spawn"], 1);//tagmangler needs an array, add vol mod (bc blowing in they face)
+            //       //   this.triggerAudioController.components.trigger_audio_control.playAudioAtPosition(evt.detail.intersection.point, distance, ["spawn"], 1);//tagmangler needs an array, add vol mod 
             //       // }
             //     // }
             //   }
@@ -5187,7 +5326,8 @@ AFRAME.registerComponent('mod_model', {
 
         // });
       }
-      document.querySelector('a-scene').addEventListener('youtubeToggle', function (event) {
+     
+      document.querySelector('a-scene').addEventListener('youtubeToggle', function (event) { //things to trigger on this model if primary audio is playing
         console.log("GOTSA YOUTUBNE EVENT: " + event.detail.isPlaying);  
         if (event.detail.isPlaying) {
           if (danceIndex != -1) { //moIndex = "mouthopen"
@@ -5255,7 +5395,7 @@ AFRAME.registerComponent('mod_model', {
               // "repetitions": 10,
               // "timeScale": 2
             });
-            // theEl.addEventListener('animation-finished', function () { //clunky but whatever - this is the "recommended way" ?!?
+            // theEl.addEventListener('animation-finished', function () { 
             //   theEl.removeAttribute('animation-mixer');
             // });
           }
@@ -5268,21 +5408,20 @@ AFRAME.registerComponent('mod_model', {
               // "repetitions": 10,
               // "timeScale": 2
             });
-            // theEl.addEventListener('animation-finished', function () { //clunky but whatever - this is the "recommended way" ?!?
+            // theEl.addEventListener('animation-finished', function () { 
             //   theEl.removeAttribute('animation-mixer');
             // });
             }
           }
         });
-        
+        ///////////todo primary video drive anims
 
     }
     });
    
   },  //END INIT 
   returnProperties: function () {
-
-
+    //placeholder
 
   },
   beat: function (volume, duration) {
@@ -5349,8 +5488,8 @@ AFRAME.registerComponent('mod_model', {
     }
   }
 
-});
-///////////
+});  ///end mod_model///////////
+
 AFRAME.registerComponent('video_transport', { //alt for testing perf
   schema: {
       videoID: {default: ''},
@@ -5524,7 +5663,7 @@ AFRAME.registerComponent('skybox_dynamic', {
     this.texture = null;
     let picGroupMangler = document.getElementById("pictureGroupsData");
 
-    if (picGroupMangler != null && picGroupMangler != undefined) {
+    if (picGroupMangler != null && picGroupMangler != undefined && picGroupMangler.components.picture_groups_control) {
       this.skyboxData = picGroupMangler.components.picture_groups_control.returnSkyboxData(this.data.id);
       // console.log(JSON.stringify(this.skyboxData));
     } else {

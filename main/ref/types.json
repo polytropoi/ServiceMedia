@@ -180,7 +180,7 @@
  
         {"Projected Ammo": ["Stone", "Cannonball", "Fireball", "Arrow", "Bolt", "12 Gauge", "20 Gauge", "7.62 mm", "9 mm", "22 cal", "45 cal", "50 cal", "Railgun", "Artillery", "Other"]},
         {"Propulsed Ammo": ["RPG", "Anti-tank", "Anti-ship", "Anti-aircraft", "Anti-satellite", "Nuclear", "Other"]},
-        {"Charged Ammo": ["Laser", "Plasma", "Directed Energy", "Other"]},
+        {"Charged Ammo": ["Beam", "Plasma", "Directed Energy", "Other"]},
 
         {"Consumer Waste": ["Used Metal Container", "Used Plastic Container", "Food Waste", "Yard Waste"] },
         {"Industrial Waste": ["Used Metal Container", "Used Plastic Container", "Construction Waste", "Cleaner", "Fuel", "Coolant", "Ash", "Lubricant", "Toxic", "Nuclear"] },
@@ -189,7 +189,7 @@
         {"Striking Weapon": ["Mace", "Hammer", "Flail", "Other"]},
         {"Thrusting Weapon": ["Spear", "Rapier", "Halberd", "Other"]},
 
-        {"Shooting Weapon": ["Gun", "Bow", "Laser", "Plasma", "Disruptor", "Other"]},
+        {"Shooting Weapon": ["Gun", "Bow", "Beam", "Plasma", "Disruptor", "Other"]},
         {"Throwing Weapon": ["Sling", "Grenade", "Excrement", "Garbage", "Snowball", "Fireball", "Flowerball", "Heartball", "Other"]},
         {"Launched Weapon": ["Missile", "Drone", "Firework", "Other"]},
 

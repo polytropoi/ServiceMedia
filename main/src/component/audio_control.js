@@ -810,7 +810,7 @@ AFRAME.registerComponent('primary_audio_player', {  //setup and controls for the
                         fancyTimeString = ""+data.title + "<br><span style='color: lightgreen'><strong> playing </strong></span>" + fancyTimeFormat(seek) + " / " + fancyTimeFormat(this.duration) + " - " + this.percentComplete + "%";
                         if (timedEventsListenerMode != null && timedEventsListenerMode.toLowerCase() == 'primary audio') {
                             // this.statsDiv.innerHTML = fancyTimeString;
-                            MediaTimeUpdate(fancyTimeString);
+                            if (MediaTimeUpdate) { MediaTimeUpdate(fancyTimeString); }
                             currentTime = seek;
                         }
 
@@ -845,8 +845,8 @@ AFRAME.registerComponent('primary_audio_player', {  //setup and controls for the
                         fancyTimeString = ""+data.title + "<br><span style='color: yellow'><strong> loading </strong></span>" + fancyTimeFormat(seek) + " / " + fancyTimeFormat(this.duration) + " - " + this.percentComplete + "%";
                         if (this.statsDiv != null && timedEventsListenerMode != null && timedEventsListenerMode.toLowerCase() == 'primary audio') {
                             // this.statsDiv.innerHTML = fancyTimeString;
-                            // MediaTimeUpdate(fancyTimeString);
-                            MediaTimeUpdate(fancyTimeString);
+                            // if (MediaTimeUpdate) { MediaTimeUpdate(fancyTimeString); }
+                            if (MediaTimeUpdate) { MediaTimeUpdate(fancyTimeString); }
                             currentTime = seek;
                         }
                         if (this.transportPlayButton != null && timedEventsListenerMode != null && timedEventsListenerMode.toLowerCase() == 'primary audio') {
@@ -882,8 +882,8 @@ AFRAME.registerComponent('primary_audio_player', {  //setup and controls for the
                         fancyTimeString = ""+data.title + "<br><span style='color: yellow'><strong> loading </strong></span>" + fancyTimeFormat(seek) + " / " + fancyTimeFormat(this.duration) + " - " + this.percentComplete + "%";
                         if (this.statsDiv != null && timedEventsListenerMode != null && timedEventsListenerMode.toLowerCase() == 'primary audio') {
                             // this.statsDiv.innerHTML = fancyTimeString;
-                            // MediaTimeUpdate(fancyTimeString);
-                            MediaTimeUpdate(fancyTimeString);
+                            // if (MediaTimeUpdate) { MediaTimeUpdate(fancyTimeString); }
+                            if (MediaTimeUpdate) { MediaTimeUpdate(fancyTimeString); }
                         }
                         if (this.transportPlayButton != null && timedEventsListenerMode != null && timedEventsListenerMode.toLowerCase() == 'primary audio') {
                             this.transportPlayButton.style.color = 'yellow';
@@ -901,7 +901,7 @@ AFRAME.registerComponent('primary_audio_player', {  //setup and controls for the
                         fancyTimeString = ""+data.title + "<br><span style='color: blue'><strong> ready </strong></span>" + fancyTimeFormat(seek) + " / " + fancyTimeFormat(this.duration) + " - " + this.percentComplete + "%";
                         if (this.statsDiv != null && timedEventsListenerMode != null && timedEventsListenerMode.toLowerCase() == 'primary audio') {
                             // this.statsDiv.innerHTML = fancyTimeString;
-                            MediaTimeUpdate(fancyTimeString);
+                            if (MediaTimeUpdate) { MediaTimeUpdate(fancyTimeString); }
                             currentTime = seek;
                         }
                         if (this.transportPlayButton != null && timedEventsListenerMode != null && timedEventsListenerMode.toLowerCase() == 'primary audio') {
@@ -1026,7 +1026,7 @@ AFRAME.registerComponent('primary_audio_events', {
         jsonData: {default: ""}
         },
     init: function() {
-        if (room == undefined) {
+        if (!room) {
            room = window.location.pathname.split("/").pop();
         }
         let patk = localStorage.getItem(room +"_timeKeys"); //so it must be a clean scene to import "default" audio events!
@@ -1451,7 +1451,7 @@ AFRAME.registerComponent('trigger_audio_control', { //trigger audio on designate
 
     },
     playAudioAtPosition: function(pos, distance, tag, volmod) {
-        console.log("tryna play trigger audio with tag " + tag);
+        // console.log("tryna play trigger audio with tag " + tag);
         if (triggerAudioHowl != null && tag != undefined && tag != null && tag != "") {
         // this.modVolume(1);
         this.audioGroupsEl = document.getElementById('audioGroupsEl');
