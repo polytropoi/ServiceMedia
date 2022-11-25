@@ -2507,6 +2507,23 @@ AFRAME.registerComponent('mod_object', {
     this.positionMe = new THREE.Vector3();
     this.directionMe = new THREE.Vector3();
     this.raycaster = null;
+    this.lineMaterial = new THREE.LineBasicMaterial({
+      color: 0xff0000
+    });
+    this.lineStart = new THREE.Vector3();
+    this.lineMiddle = new THREE.Vector3();
+    this.lineEnd = new THREE.Vector3();
+    this.lineGeometry = new THREE.BufferGeometry().setFromPoints([
+      this.lineStart,
+      // this.lineMiddle,
+      this.lineEnd
+    ]);
+
+    this.lineObject = new THREE.Line(this.lineGeometry, this.lineMaterial);
+    this.el.sceneEl.object3D.add(this.lineObject);
+    this.curve = null;
+    // could be any number
+
     // let tG = new THREE.BufferGeometry().setFromPoints([
     //   new THREE.Vector3(),
     //   new THREE.Vector3()
@@ -2541,7 +2558,6 @@ AFRAME.registerComponent('mod_object', {
 
     // this.raycaster = null;
 
-    this.curve = null;
     this.posIndex = 0; 
     this.currentPos = new THREE.Vector3();
     this.currentRot = new THREE.Vector3();
@@ -2838,6 +2854,8 @@ AFRAME.registerComponent('mod_object', {
         // this.el.sceneEl.object3D.add(this.beam);
         // this.el.sceneEl.object3D.add(this.endMesh);
         this.raycaster = new THREE.Raycaster();
+
+
       }
       if (this.data.followPathNewObject) {
         this.moveOnCurve(); //todo fix quats!
@@ -3302,7 +3320,7 @@ AFRAME.registerComponent('mod_object', {
           //   }     
           // });
 
-    
+
         }
     }); //end model-loaded listener
 
@@ -3721,7 +3739,7 @@ AFRAME.registerComponent('mod_object', {
 
     });
   },
-  equippedRayHit: function (hitpoint) {
+  equippedRayHit: function (hitpoint) { //nope, just added to mod_object if it's equipped and stuff
     console.log( "equippedRayHit@!");
     if (this.data.isEquipped) {
 
@@ -3752,10 +3770,11 @@ AFRAME.registerComponent('mod_object', {
      // this.el.object3D.lookAt(hitpoint);
 
 
-     this.el.object3D.getWorldPosition(this.positionMe);  //actually it's id "playCaster"
-     this.el.object3D.getWorldDirection(this.directionMe).negate();
-     this.positionMe.normalize();
-     this.positionMe.negate();
+      // this.el.object3D.getWorldPosition(this.positionMe);  //actually it's id "playCaster"
+      // this.el.object3D.getWorldDirection(this.directionMe).negate();
+      // this.positionMe.normalize();
+      // this.positionMe.negate();
+
      // console.log("setting thirrd person raycaster! from " + JSON.stringify(this.thirdPersonPlaceholderPosition) + " to " + JSON.stringify(this.thirdPersonPlaceholderDirection));
     //  this.raycaster.set(this.positionMe, this.directionMe);
     //  this.raycaster.far = 50;
@@ -4039,76 +4058,86 @@ AFRAME.registerComponent('mod_object', {
         // this.el.object3D.rotation.set(this.currentRot);
         // console.log("tryna set positionn to" + JSON.stringify(this.currentPos));
         this.el.object3D.position.copy(this.currentPos);
-        // this.el.object3D.rotation.copy(this.currentRot);
 
-        // this.el.object3D.quaternion.copy(this.equipHolder.object3D.quaternion);
-          // this.rotObjectMatrix.makeRotationFromQuaternion(this.equipHolder.object3D.quaternion);
-          // this.el.object3D.quaternion.setFromRotationMatrix(this.rotObjectMatrix);
-
-        // this.el.object3D.position.x = this.currentPos.x;
-        // this.el.object3D.position.y = this.currentPos.y;
-        // this.el.object3D.position.z = this.currentPos.z;
-        // this.el.object3D.rotation.x = this.currentRot.x;
-        // this.el.object3D.rotation.y = this.currentRot.y;
-        // this.el.object3D.rotation.z = this.currentRot.z;
-
-        // camera.position.x = camPos.x;
-        // camera.position.y = camPos.y;
-        // camera.position.z = camPos.z;
-        
-        // camera.rotation.x = camRot.x;
-        // camera.rotation.y = camRot.y;
-        // camera.rotation.z = camRot.z;
-        // box.position.copy( spline.getPointAt( counter ) );
-
-// tangent = spline.getTangentAt( counter ).normalize();
-
-              // this.axis.crossVectors( this.up, this.currentTan ).normalize();
-
-              // this.radians = Math.acos( this.up.dot( this.currentTan ) );
-
-              // this.el.object3D.quaternion.setFromAxisAngle( this.axis, this.radians );
-              this.el.object3D.lookAt(this.curve.getPoint(99/100).negate());
-        // this.el.object3D.lookAt(this.curve.getPoint(this.posIndex + 1).negate()); //hrm, still not 
-        // this.el.object3D.lookAt(this.currentRot.add(this.curve.getPoint(this.posIndex + 1 / 100).negate())); 
-        // this.el.object3D.quaternion.copy(this.equipHolder.object3D.quaternion);
-        // this.el.object3D.position.needsUpdate = true;
-        // this.el.object3D.quaternion.needsUpdate = true;
-        /// see https://threejs.org/docs/#api/en/core/Object3D.lookAt - "does not support non-uniformly scaled parents"
-
+        this.el.object3D.lookAt(this.curve.getPoint(99/100).negate());
 
       } 
     }
 
     if (this.data.isEquipped) {
-      if (this.arrow) { //show helper arrow, TODO toggle from dialogs.js
-        this.el.sceneEl.object3D.remove(this.arrow);
+     
+      this.equipHolder.object3D.getWorldPosition(this.positionMe);  //actually it's id "playCaster"
+      this.equipHolder.object3D.getWorldDirection(this.directionMe).negate();
+   
+      if (this.raycaster != null) {
+      this.raycaster.set(this.positionMe, this.directionMe);
+      this.raycaster.far = 50;
       }
-      this.el.object3D.getWorldPosition(this.positionMe);  //actually it's id "playCaster"
-     this.el.object3D.getWorldDirection(this.directionMe).negate();
-     this.positionMe.normalize();
-     if (this.raycaster != null) {
 
+      if (this.lineGeometry && this.lineObject && this.lineStart) {
+                
+        // this.lineStart.x = this.positionMe.x
+        // this.lineStart.y = this.positionMe.y;
+        // this.lineStart.z = this.positionMe.z;
+        // this.lineEnd.x = this.directionMe.x;
+        // this.lineEnd.y = this.directionMe.y;
+        // this.lineEnd.z = this.directionMe.z;
+
+        this.lineEnd.copy( this.positionMe ).add( this.directionMe.multiplyScalar( 50 ) );
+        
+        // get the point in the middle
+
+        this.lineMiddle.lerpVectors(this.lineStart, this.lineEnd, 0.5); //maybe don't need...
+
+        // console.log(JSON.stringify(this.lineStart), JSON.stringify(this.lineMiddle), JSON.stringify(this.lineEnd));
+        this.lineGeometry.setFromPoints([this.positionMe, this.lineEnd]);
+        this.lineGeometry.attributes.position.needsUpdate = true;
+
+        }
      
-     this.raycaster.set(this.positionMe, this.directionMe);
-     this.raycaster.far = 50;
-     // raycaster.far = 1.5;
+
+        // if (this.arrow) { //show helper arrow, TODO toggle from dialogs.js
+        //   this.el.sceneEl.object3D.remove(this.arrow);
+        // }
+
     
-    //  this.intersection = this.raycaster.intersectObject( this.el.sceneEl.object3D.children, true );
-     
-      }
-     if (this.arrow) { //show helper arrow, TODO toggle from dialogs.js
-       this.el.sceneEl.object3D.remove(this.arrow);
-     }
-    //  this.positionMe.negate();
-     //  if (this.intersection != null && this.intersection.length > 0 ) {
-     //    // this.arrowColor = "green"; //0xff0000 = "green";
-     //    this.arrow = new THREE.ArrowHelper( this.directionMe, this.positionMe, 25, 0x0b386 );
-     //  } else {
-      this.arrow = new THREE.ArrowHelper( this.directionMe, this.positionMe, 50, 0xff0000 );
-     //  }
-      this.el.sceneEl.object3D.add( this.arrow );
     }
+  },
+  drawRaycasterLine: function () {
+
+      let material = new THREE.LineBasicMaterial({
+        color: 0xff0000,
+        linewidth: 10
+      });
+      let geometry = new THREE.Geometry();
+      let startVec = new THREE.Vector3(
+        raycaster.ray.origin.x,
+        raycaster.ray.origin.y,
+        raycaster.ray.origin.z);
+  
+      let endVec = new THREE.Vector3(
+        raycaster.ray.direction.x,
+        raycaster.ray.direction.y,
+        raycaster.ray.direction.z);
+      
+      // could be any number
+      endVec.multiplyScalar(5000);
+      
+      // get the point in the middle
+      let midVec = new THREE.Vector3();
+      midVec.lerpVectors(startVec, endVec, 0.5);
+  
+      geometry.vertices.push(startVec);
+      geometry.vertices.push(midVec);
+      geometry.vertices.push(endVec);
+  
+      console.log('vec start', startVec);
+      console.log('vec mid', midVec);
+      console.log('vec end', endVec);
+  
+      let line = new THREE.Line(geometry, material);
+      this.el.sceneEl.objec3D.add(line);
+    
   }
  
 }); //mod_object end
