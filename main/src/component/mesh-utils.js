@@ -748,7 +748,7 @@ AFRAME.registerComponent('instanced_surface_meshes', {
             rotation: '0..360', 
             scale: '100,500'
           });
-      this.particlesEl.setAttribute('sprite-particles', {"duration": .1});
+      this.particlesEl.setAttribute('sprite-particles', {"duration": .1}); //resets after changing duration, so interrupts loop :*
       }
 
     },
@@ -3037,10 +3037,8 @@ AFRAME.registerComponent('mod_curve', {
 
       //normal.set( 0, 1, 0 );
     }
-
     
-    this.el.object3D.position.copy( this.curve.getPoint( 1 - this.fraction ) ); //or just the fraction to go backwards
-       
+    this.el.object3D.position.copy( this.curve.getPoint( 1 - this.fraction ) ); //or just the fraction to go backwards       
     this.tangent = this.curve.getTangent( this.fraction );
     this.axis.crossVectors( this.normal, this.tangent ).normalize( );
   
@@ -3048,6 +3046,14 @@ AFRAME.registerComponent('mod_curve', {
     //char.quaternion.setFromAxisAngle( axis, radians );
     
     this.el.object3D.quaternion.setFromAxisAngle( this.axis, Math.PI / 2 );
+  },
+  reset: function () {
+    this.fraction = 0;
+
+    this.scaleMod = Math.random().toFixed(2) * 3;
+    this.el.object3D.scale.set(this.scaleMod,this.scaleMod,this.scaleMod)
+    // this.el.object3D.scale.y = this.scaleMod;
+    // this.el.object3D.scale.z = this.scaleMod;
   },
   tick: function () {
     if (this.curve && this.curveLine && this.isReady) {
@@ -3062,14 +3068,9 @@ AFRAME.registerComponent('mod_curve', {
 AFRAME.registerComponent('mod_tunnel', {
   schema: {
     init: {default: false},
-    tags: {default: ''},
-    
-      
+    tags: {default: ''}
   },
   init: function () {
-  // if (this.data.markerType == "tunnel") {
-    // Create an empty array to stores the points
-    // this.tick = AFRAME.utils.throttleTick(this.tick, 100, this);
       this.loaded = false;
       this.verticleez = null;
       this.tubeGeometry_o = null;
@@ -3077,83 +3078,55 @@ AFRAME.registerComponent('mod_tunnel', {
       this.splineMesh = null;
       this.splineMesh_o = null;
       console.log("tryna make a tunnel");
-
       this.newPosition = null; 
       this.tangent = null;
       this.radians = null; 
       this.fraction = 0;
-
       this.normal = new THREE.Vector3( 0, 1, 0 ); // up
-      this.axis = new THREE.Vector3( );
+      this.axis = new THREE.Vector3();
       this.points = [];
       this.speed = .001;
       // Define points along Z axis
       for (var i = 0; i < 5; i += 1) {
-      this.points.push(new THREE.Vector3(0, 0, -100 * (i / 4)));
+        this.points.push(new THREE.Vector3(0, 0, -100 * (i / 4)));
       }
-
       this.curve = new THREE.CatmullRomCurve3(this.points);
-      this.c_points = this.curve.getPoints( 50 );
-      // // this.c_geometry = new THREE.BufferGeometry().setFromPoints( this.c_points );//won't work with fatlines...
-      this.c_geometry = new THREE.BufferGeometry().setFromPoints( this.c_points );
-
-      this.c_material = new THREE.LineBasicMaterial( { color: 0x4287f5 } );
-
-      this.curveLine = new THREE.Line( this.c_geometry, this.c_material ); //this one stays a curve
-
-      const cgeometry = new THREE.BoxGeometry( 1, 1, 1 );
-      const cmaterial = new THREE.MeshPhongMaterial( { color: 0x99ffff, wireframe: false } );
-      this.objectToCurve = new THREE.Mesh( cgeometry, cmaterial );
-    
+      // this.c_points = this.curve.getPoints( 50 );
+      // // // this.c_geometry = new THREE.BufferGeometry().setFromPoints( this.c_points );//won't work with fatlines...
+      // this.c_geometry = new THREE.BufferGeometry().setFromPoints( this.c_points );
+      // this.c_material = new THREE.LineBasicMaterial( { color: 0x4287f5 } );
+      // this.curveLine = new THREE.Line( this.c_geometry, this.c_material ); //this one stays a curve
+      // const cgeometry = new THREE.BoxGeometry( 1, 1, 1 );
+      // const cmaterial = new THREE.MeshPhongMaterial( { color: 0x99ffff, wireframe: false } );
+      // this.objectToCurve = new THREE.Mesh( cgeometry, cmaterial );
       let picGroupMangler = document.getElementById("pictureGroupsData");
 
       if (picGroupMangler != null && picGroupMangler != undefined) {
-
         this.tileablePicData = picGroupMangler.components.picture_groups_control.returnTileableData();
-        // console.log(JSON.stringify(this.skyboxData));
-        
-        this.texture = new THREE.TextureLoader().load(
-          this.tileablePicData.images[0].url
-          //todo onload do stuff below
-          );
+        this.texture = new THREE.TextureLoader().load( this.tileablePicData.images[0].url );
         this.texture.encoding = THREE.sRGBEncoding;
-       // Empty geometry
-      this.geometry = new THREE.BufferGeometry();
-      // Create vertices based on the curve
-      this.vertArray = this.curve.getPoints(70);
+        this.geometry = new THREE.BufferGeometry();    
+        this.vertArray = this.curve.getPoints(70);
+        this.geometry = new THREE.BufferGeometry().setFromPoints( this.curve.getPoints(70) );
 
-      this.geometry = new THREE.BufferGeometry().setFromPoints( this.curve.getPoints(70) );
-
-      this.splineMesh = new THREE.Line(this.geometry, new THREE.LineBasicMaterial()); //another line to mod the vertexes
-
-
-      this.tubeGeometry = new THREE.TubeBufferGeometry(this.curve, 70, 5, 50, false);
-      this.tubeMaterial = new THREE.MeshStandardMaterial({
-      side: THREE.BackSide, // Since the camera will be inside the tube we need to reverse the faces
-      map: this.texture, 
-      transparent: true
-      });
-      // Repeat the pattern to prevent the texture being stretched
-      this.tubeMaterial.map.wrapS = THREE.RepeatWrapping;
-      this.tubeMaterial.map.wrapT = THREE.RepeatWrapping;
-      this.tubeMaterial.map.repeat.set(4, 2);
-
-      // Create a mesh based on tubeGeometry and tubeMaterial
-      this.tubeMesh = new THREE.Mesh(this.tubeGeometry, this.tubeMaterial);
-
-      // Add the tube into the scene
-      this.el.sceneEl.object3D.add(this.tubeMesh);
-      this.el.sceneEl.object3D.add(this.splineMesh);
-      this.el.sceneEl.object3D.add(this.curveLine);
-      this.el.sceneEl.object3D.add(this.objectToCurve);
-      this.loaded = true;
-      this.tubeGeometry_o = this.tubeGeometry.clone();
-      this.splineMesh_o = this.splineMesh.clone();
-    } else {
-      console.log("no pic");
-    }
-
-      // }
+        this.splineMesh = new THREE.Line(this.geometry, new THREE.LineBasicMaterial()); //another line to mod the vertexes
+        this.tubeGeometry = new THREE.TubeBufferGeometry(this.curve, 70, 5, 50, false);
+        this.tubeMaterial = new THREE.MeshStandardMaterial({
+        side: THREE.BackSide, // Since the camera will be inside the tube we need to reverse the faces
+        map: this.texture, 
+        transparent: true
+        });
+        // Repeat the pattern to prevent the texture being stretched
+        this.tubeMaterial.map.wrapS = THREE.RepeatWrapping;
+        this.tubeMaterial.map.wrapT = THREE.RepeatWrapping;
+        this.tubeMaterial.map.repeat.set(4, 2);
+        // Create a mesh based on tubeGeometry and tubeMaterial
+        this.tubeMesh = new THREE.Mesh(this.tubeGeometry, this.tubeMaterial);
+        this.el.sceneEl.object3D.add(this.tubeMesh);
+        this.loaded = true;
+      } else {
+        console.log("no pic");
+      }
     },
     // from https://github.com/Mamboleoo/InfiniteTubes/blob/master/js/demo6.js
     updateCurve: function() {
@@ -3169,9 +3142,8 @@ AFRAME.registerComponent('mod_tunnel', {
       var y = 0;
       var z = 0
       var index = 0;
-
       // For each vertice of the tube, move it a bit based on the spline
-      for (var i = 0, j = this.tubeGeometry.attributes.position.array.length; i < j; i += 3) {
+      for (var i = 0, j = this.tubeGeometry.attributes.position.array.length; i < j; i += 3) { //TODO modzbelow to tweak the tunnel
         // if (i % 3) { //ignore the z?
         // Get the original tube vertice
         // vertice_o = this.tubeGeometry_o.geometry.attributes.position.array[i];
@@ -3200,38 +3172,74 @@ AFRAME.registerComponent('mod_tunnel', {
         // vertice.x += ((vertice_o.x + .5) - vertice.x) / 10;
         // vertice.y += ((vertice_o.y + .5) - vertice.y) / 5;
         // }
-        }
-      
+      }
       // Warn ThreeJs that the points have changed
-      this.tubeGeometry.attributes.position.needsUpdate = true; //not
+      // this.tubeGeometry.attributes.position.needsUpdate = true; //not
+      // this.tubeGeometry.computeVertexNormals();
+    },
+    tick: function () {
+      if (this.loaded && this.tubeGeometry && this.tubeMaterial) {
+        // console.log("modding speernd " + this.speed);
+        this.tubeMaterial.map.offset.x += this.speed;
+        // this.updateCurve();
+      }
+    }
+});
 
-      this.tubeGeometry.computeVertexNormals();
 
+AFRAME.registerComponent('mod_line', {
+  schema: {
+    init: {default: false},
+    tags: {default: ''}
+  },
+  init: function () {
+      this.loaded = false;
+      this.verticleez = null;
+      this.tubeGeometry_o = null;
+      this.tubeGeometry = null;
+      this.splineMesh = null;
+      this.splineMesh_o = null;
+      console.log("tryna make a tunnel");
+      this.newPosition = null; 
+      this.tangent = null;
+      // this.radians = null; 
+      this.fraction = 0;
+      this.normal = new THREE.Vector3( 0, 1, 0 ); // up
+      this.axis = new THREE.Vector3( );
+      this.points = [];
+      this.speed = .001;
+      // Define points along Z axis
+      for (var i = 0; i < 5; i += 1) {
+        this.points.push(new THREE.Vector3(0, 0, -100 * (i / 4))); //
+      }
+      this.curve = new THREE.CatmullRomCurve3(this.points);
+      this.c_points = this.curve.getPoints( 50 );
+      // // this.c_geometry = new THREE.BufferGeometry().setFromPoints( this.c_points );//won't work with fatlines...
+      this.c_geometry = new THREE.BufferGeometry().setFromPoints( this.c_points );
+      this.c_material = new THREE.LineBasicMaterial( { color: 0x4287f5 } );
+      this.curveLine = new THREE.Line( this.c_geometry, this.c_material ); //this one stays a curve
+      const cgeometry = new THREE.BoxGeometry( 1, 1, 1 );
+      const cmaterial = new THREE.MeshPhongMaterial( { color: 0x99ffff, wireframe: false } );
+      this.objectToCurve = new THREE.Mesh( cgeometry, cmaterial );
+    },
+    // from https://github.com/Mamboleoo/InfiniteTubes/blob/master/js/demo6.js
+    updateCurve: function() {
+      this.splineVerts = this.splineMesh.geometry.attributes.position.array;
+      this.splineVerts_o = this.splineMesh_o.geometry.attributes.position.array;
+      this.vert = null;
       this.splineMesh.geometry.attributes.position.needsUpdate = true;
-      
       this.curveLine.geometry.attributes.position.needsUpdate = true;
-    
-
-      for (let i = 0; i < this.splineVerts.length; i += 3) {
-
-
+      for (let i = 0; i < this.splineVerts.length; i += 3) { //typed array
         this.splineVerts[i] = this.splineVerts_o[i] + (( Math.random() - 0.5 ) / 4) - this.splineVerts[i];
         // this.splineVerts[i + 1] += ( Math.random() - 0.5 ) / 2;
         this.splineVerts[i + 1] = this.splineVerts_o[i + 1] + (( Math.random() - 0.5 ) / 4) - this.splineVerts[i + 1];
         // this.splineVerts[i + 2] += ( Math.random() - 0.5 ) * 3;
-
       }
       this.splineMesh.geometry.attributes.position.needsUpdate = true;
       // this.curve.attributes.needsUpdate = true;
-
       // this.flow.moveAlongCurve(.06);
       // this.flow.object3D.needsUpdate = true;
-
       if (this.fraction == 0) {
-        // this.curve.points[0].x = -Math.random() * 2;
-        // this.curve.points[2].x = -Math.random() * 2;
-        // this.curve.points[3].y = -Math.random() * 2;
-        // this.curve.points[4].y = Math.random()  * 2;
         this.curve.points[0].x =Math.ceil(Math.random() * 2) * (Math.round(Math.random()) ? 1 : -1);
         this.curve.points[0].y =Math.ceil(Math.random() * 2) * (Math.round(Math.random()) ? 1 : -1);
         this.curve.points[1].x =-Math.ceil(Math.random() * 2) * (Math.round(Math.random()) ? 1 : -1);
@@ -3244,42 +3252,11 @@ AFRAME.registerComponent('mod_tunnel', {
       this.fraction += 0.001;
       if ( this.fraction > 1) {
         this.fraction = 0;
-
-        //normal.set( 0, 1, 0 );
       }
-      // if (Math.random() > .9) {
-        
-      // }
-      
-      this.objectToCurve.position.copy( this.curve.getPoint( 1 - this.fraction ) );
-         
+      this.objectToCurve.position.copy( this.curve.getPoint( 1 - this.fraction ) );         
       this.tangent = this.curve.getTangent( this.fraction );
-      this.axis.crossVectors( this.normal, this.tangent ).normalize( );
-    
-      //radians = Math.acos( normal.dot( tangent ) );	
-      //char.quaternion.setFromAxisAngle( axis, radians );
-      
+      this.axis.crossVectors( this.normal, this.tangent ).normalize( );  
       this.objectToCurve.quaternion.setFromAxisAngle( this.axis, Math.PI / 2 );
-      
-      
-      // this.geometry = new THREE.BufferGeometry().setFromPoints( this.curve.getPoints(70) );
-      // geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
-        // Create a line from the points with a basic line material
-      // this.splineMesh = new THREE.Line(this.geometry, new THREE.LineBasicMaterial());
-      // this.spline.attributes.position.needsUpdate = true;
-        // for ( var i = 0, l = this.splineVerts; i < l; i ++ ) {
-
-        //   this.splineVerts[ index ++ ] = x;
-        //   this.splineVerts[ index ++ ] = y;
-        //   this.splineVerts[ index ++ ] = z;
-      
-        //   x += ( Math.random() - 0.5 ) * 3;
-        //   y += ( Math.random() - 0.5 ) * 3;
-        //   z += ( Math.random() - 0.5 ) * 3;
-      
-        // }
-        // this.splineMesh.geometry.attributes.position.array = this.curve.getPoints(70);
-
     },
     tick: function () {
       if (this.loaded && this.tubeGeometry && this.tubeMaterial) {
@@ -3287,6 +3264,5 @@ AFRAME.registerComponent('mod_tunnel', {
         this.tubeMaterial.map.offset.x += this.speed;
         this.updateCurve();
       }
-      
     }
-})
+});

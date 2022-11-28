@@ -810,7 +810,7 @@ AFRAME.registerComponent('primary_audio_player', {  //setup and controls for the
                         fancyTimeString = ""+data.title + "<br><span style='color: lightgreen'><strong> playing </strong></span>" + fancyTimeFormat(seek) + " / " + fancyTimeFormat(this.duration) + " - " + this.percentComplete + "%";
                         if (timedEventsListenerMode != null && timedEventsListenerMode.toLowerCase() == 'primary audio') {
                             // this.statsDiv.innerHTML = fancyTimeString;
-                            if (MediaTimeUpdate) { MediaTimeUpdate(fancyTimeString); }
+                            if (AudioTimeUpdate) { AudioTimeUpdate(fancyTimeString); }
                             currentTime = seek;
                         }
 
@@ -845,8 +845,8 @@ AFRAME.registerComponent('primary_audio_player', {  //setup and controls for the
                         fancyTimeString = ""+data.title + "<br><span style='color: yellow'><strong> loading </strong></span>" + fancyTimeFormat(seek) + " / " + fancyTimeFormat(this.duration) + " - " + this.percentComplete + "%";
                         if (this.statsDiv != null && timedEventsListenerMode != null && timedEventsListenerMode.toLowerCase() == 'primary audio') {
                             // this.statsDiv.innerHTML = fancyTimeString;
-                            // if (MediaTimeUpdate) { MediaTimeUpdate(fancyTimeString); }
-                            if (MediaTimeUpdate) { MediaTimeUpdate(fancyTimeString); }
+                            // if (AudioTimeUpdate) { AudioTimeUpdate(fancyTimeString); }
+                            if (AudioTimeUpdate) { AudioTimeUpdate(fancyTimeString); }
                             currentTime = seek;
                         }
                         if (this.transportPlayButton != null && timedEventsListenerMode != null && timedEventsListenerMode.toLowerCase() == 'primary audio') {
@@ -882,8 +882,8 @@ AFRAME.registerComponent('primary_audio_player', {  //setup and controls for the
                         fancyTimeString = ""+data.title + "<br><span style='color: yellow'><strong> loading </strong></span>" + fancyTimeFormat(seek) + " / " + fancyTimeFormat(this.duration) + " - " + this.percentComplete + "%";
                         if (this.statsDiv != null && timedEventsListenerMode != null && timedEventsListenerMode.toLowerCase() == 'primary audio') {
                             // this.statsDiv.innerHTML = fancyTimeString;
-                            // if (MediaTimeUpdate) { MediaTimeUpdate(fancyTimeString); }
-                            if (MediaTimeUpdate) { MediaTimeUpdate(fancyTimeString); }
+                            // if (AudioTimeUpdate) { AudioTimeUpdate(fancyTimeString); }
+                            if (AudioTimeUpdate) { AudioTimeUpdate(fancyTimeString); }
                         }
                         if (this.transportPlayButton != null && timedEventsListenerMode != null && timedEventsListenerMode.toLowerCase() == 'primary audio') {
                             this.transportPlayButton.style.color = 'yellow';
@@ -901,7 +901,7 @@ AFRAME.registerComponent('primary_audio_player', {  //setup and controls for the
                         fancyTimeString = ""+data.title + "<br><span style='color: blue'><strong> ready </strong></span>" + fancyTimeFormat(seek) + " / " + fancyTimeFormat(this.duration) + " - " + this.percentComplete + "%";
                         if (this.statsDiv != null && timedEventsListenerMode != null && timedEventsListenerMode.toLowerCase() == 'primary audio') {
                             // this.statsDiv.innerHTML = fancyTimeString;
-                            if (MediaTimeUpdate) { MediaTimeUpdate(fancyTimeString); }
+                            if (AudioTimeUpdate) { AudioTimeUpdate(fancyTimeString); }
                             currentTime = seek;
                         }
                         if (this.transportPlayButton != null && timedEventsListenerMode != null && timedEventsListenerMode.toLowerCase() == 'primary audio') {
@@ -1013,7 +1013,21 @@ AFRAME.registerComponent('primary_audio_player', {  //setup and controls for the
         }); //end register
     }
 
-
+    function AudioTimeUpdate (fancyTimeString) {
+        // console.log("AudioTimeUpdate " + fancyTimeString);
+        // transportTimeStatsEl = document.getElementById("transportStats");
+        if (transportTimeStatsEl == null) {
+            transportTimeStatsEl = document.getElementById("transportStats");
+        } else {
+            transportTimeStatsEl.innerHTML = fancyTimeString;
+        }
+        modalTimeStatsEl = document.getElementById('modalTimeStats');
+        if (modalTimeStatsEl == null) {
+            } else {
+                modalTimeStatsEl.innerHTML = fancyTimeString;
+            }
+            
+        }
 AFRAME.registerComponent('primary_audio_events', {
 
     // schema: {
@@ -1026,27 +1040,32 @@ AFRAME.registerComponent('primary_audio_events', {
         jsonData: {default: ""}
         },
     init: function() {
-        if (!room) {
-           room = window.location.pathname.split("/").pop();
+        // if (room) {
+        this.room = window.location.pathname.split("/").pop();
+        // }
+        if (this.room) {
+            let patk = localStorage.getItem(this.room +"_timeKeys"); //so it must be a clean scene to import "default" audio events!
+            // console.log("PRIMARY AUDIO EVENTS " + patk);
+            if (patk == null) {
+            let theData = this.el.getAttribute('data-audio-events');
+            this.data.jsonData = JSON.parse(atob(theData)); //convert from base64;
+            let tkObject = {};
+            tkObject.listenTo = "Primary Audio";
+
+            tkObject.timekeys = this.data.jsonData.timekeys;
+            // let timekeys = this.data.jsonData.timekeys;
+            // timekeys.listenTo = "primary audio";
+            // console.log("timekeys: " + timekeys);
+            // localStorage.setItem(room + "_timeKeys", JSON.stringify(timekeys)); 
+            localStorage.setItem(room + "_timeKeys", JSON.stringify(tkObject)); 
+
+            // console.log(JSON.stringify(timekeys));
+            } 
+            SetPrimaryAudioEventsData();
+        } else {
+            console.log("primary audio events fail!  no roooom!");
         }
-        let patk = localStorage.getItem(room +"_timeKeys"); //so it must be a clean scene to import "default" audio events!
-        // console.log("PRIMARY AUDIO EVENTS " + patk);
-        if (patk == null) {
-        let theData = this.el.getAttribute('data-audio-events');
-        this.data.jsonData = JSON.parse(atob(theData)); //convert from base64;
-        let tkObject = {};
-        tkObject.listenTo = "Primary Audio";
-
-        tkObject.timekeys = this.data.jsonData.timekeys;
-        // let timekeys = this.data.jsonData.timekeys;
-        // timekeys.listenTo = "primary audio";
-        // console.log("timekeys: " + timekeys);
-        // localStorage.setItem(room + "_timeKeys", JSON.stringify(timekeys)); 
-        localStorage.setItem(room + "_timeKeys", JSON.stringify(tkObject)); 
-
-        // console.log(JSON.stringify(timekeys));
-        } 
-        SetPrimaryAudioEventsData();
+        
     },
     currentAudioTime: function(audioTime) {
         console.log("audiotime : " + audioTime);

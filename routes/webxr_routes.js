@@ -384,7 +384,7 @@ webxr_router.get('/:_id', function (req, res) {
                             debugMode = true;
                         }
                         if (sceneData.sceneTags[i].toLowerCase().includes("stats")) {
-                            logScripts = "<script src=\x22https://cdn.jsdelivr.net/gh/kylebakerio/vr-super-stats@1.5.0/vr-super-stats.js\x22></script>";
+                            // logScripts = "<script src=\x22https://cdn.jsdelivr.net/gh/kylebakerio/vr-super-stats@1.5.0/vr-super-stats.js\x22></script>";
                         }
                         if (sceneData.sceneTags[i].toLowerCase().includes("logs")) {
                             logScripts = logScripts + "<script src=\x22../main/src/component/a-console.js\x22></script>";
@@ -4498,7 +4498,7 @@ webxr_router.get('/:_id', function (req, res) {
                             // physics = "physics";
                         }
                         if (logScripts.length > 0){
-                            webxrFeatures = webxrFeatures + " vr-super-stats=\x22position:0 .4 0; alwaysshow3dstats:true; show2dstats:false;\x22 ";
+                            // webxrFeatures = webxrFeatures + " vr-super-stats=\x22position:0 .4 0; alwaysshow3dstats:true; show2dstats:false;\x22 ";
                         }
                         
                         if (curveEntities.length > 0 && !hasParametricCurve) {

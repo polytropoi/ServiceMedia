@@ -2305,6 +2305,8 @@ AFRAME.registerComponent('mod_objex', {
       this.objEl.setAttribute("mod_object", {'eventData': null, 'locationData': this.locData, 'objectData': this.objectData, 'isEquipped': true});
       this.objEl.id = "obj" + this.objectData._id + "_" + this.locData.timestamp;
       this.objEl.classList.add('equipped');
+      
+      this.objEl.classList.add('activeObjexRay');
       this.equipHolder.appendChild(this.objEl); //parent to equip holder instead of scene as below
       // this.el.setAttribute('gltf-model', '#' + modelID.toString());
     },
@@ -2506,7 +2508,7 @@ AFRAME.registerComponent('mod_object', {
     // this.endMesh = new THREE.Mesh(new THREE.SphereBufferGeometry(0.25, 16, 8), new THREE.MeshBasicMaterial({color: "blue", wireframe: true}));
     this.positionMe = new THREE.Vector3();
     this.directionMe = new THREE.Vector3();
-    this.raycaster = null;
+    this.equippedRaycaster = null;
     this.lineMaterial = new THREE.LineBasicMaterial({
       color: 0xff0000
     });
@@ -2581,6 +2583,7 @@ AFRAME.registerComponent('mod_object', {
       }
       // this.camera = cameraEl.components.camera.camera;
     }
+
 
     this.thirdPersonPlaceholder = null;
     // this.sceneInventoryID = null;
@@ -2659,6 +2662,7 @@ AFRAME.registerComponent('mod_object', {
     //   }
     // }     
     this.hasPickupAction = false;
+    this.hasTriggerAction = false;
     this.hasThrowAction = false;
     this.hasShootAction = false;
 
@@ -2742,9 +2746,10 @@ AFRAME.registerComponent('mod_object', {
           this.throwAction = this.data.objectData.actions[a];
         }
         if (this.data.objectData.actions[a].actionType.toLowerCase() == "trigger") {
-          // this.hasThrowAction = true;
+          this.hasTriggerAction = true;
           // this.throwAction = this.data.objectData.actions[a];
           // this.el.setAttribute("equipped_object_control", {init: true});
+          
         }
 
         if (this.data.objectData.actions[a].actionType.toLowerCase() == "shoot") {
@@ -2761,6 +2766,31 @@ AFRAME.registerComponent('mod_object', {
           // this.hasDropAction = true;
         }
       }
+    }
+
+    if (this.data.isEquipped) {
+
+      if (this.hasTriggerAction) {
+        this.el.setAttribute("raycaster", {"objects": ".target", "far": "50", "position": "0 -0.5 0", "rotation": "90 0 0"});
+        this.equippedRaycaster = this.el.components.raycaster;
+      }
+      if (this.hasShootAction || this.hasThrowAction) {
+        this.el.classList.add("activeObjexRay");
+      }
+      
+      // this.cameraRigEl = document.getElementById("cameraRig");
+      // if (this.cameraRigEl) {
+      //   this.cameraRigEl.removeAttribute("raycaster");
+      //   this.cameraRigEl.removeAttribute("cursor");
+      // }
+      // // this.el.sceneEl.removeAttribute("raycaster");
+      // this.rightHandEl = document.getElementById("right-hand");
+      // if (this.rightHandEl) {
+      //   this.rightHandEl.removeAttribute("raycaster");
+      // }
+
+    } else {
+      this.el.classList.add("activeObjexRay");
     }
     if (this.data.removeAfter != "") { //cleanup if timeout set
       setTimeout( () => { 
@@ -2780,7 +2810,7 @@ AFRAME.registerComponent('mod_object', {
     }
 
     let that = this;
-    this.el.classList.add("activeObjexRay");
+
 
     this.el.addEventListener('model-loaded', () => {
 
@@ -2849,11 +2879,24 @@ AFRAME.registerComponent('mod_object', {
         // USING SIZE VECTOR3 to set Y position of mesh
         // mesh.position.y = s.y / 2;
         this.el.setAttribute("scale", scale);
+        this.lineEl = document.createElement("a-entity");
+        this.el.sceneEl.appendChild(this.lineEl);
+        this.lineEl.setAttribute("mod_line");
+
         // this.el.remove
         // this.el.object3D.scale.set(scale);
         // this.el.sceneEl.object3D.add(this.beam);
         // this.el.sceneEl.object3D.add(this.endMesh);
-        this.raycaster = new THREE.Raycaster();
+        // this.equippedRaycaster = new THREE.Raycaster();
+        // this.cameraRigEl = document.getElementById("cameraRig");
+        // if (this.cameraRigEl) {
+        //   this.cameraRigEl.removeAttribute("raycaster");
+        // }
+        // this.el.sceneEl.removeAttribute("raycaster");
+        // this.rightHandEl = document.getElementById("right-hand");
+        // if (this.rightHandEl) {
+        //   this.rightHandEl.removeAttribute("raycaster");
+        // }
 
 
       }
@@ -4069,10 +4112,17 @@ AFRAME.registerComponent('mod_object', {
       this.equipHolder.object3D.getWorldPosition(this.positionMe);  //actually it's id "playCaster"
       this.equipHolder.object3D.getWorldDirection(this.directionMe).negate();
    
-      if (this.raycaster != null) {
-      this.raycaster.set(this.positionMe, this.directionMe);
-      this.raycaster.far = 50;
+      if (this.equippedRaycaster != null) {
+        // console.log("gotsa raycaster!");
+      // this.equippedRaycaster.set(this.positionMe, this.directionMe.normalize());
+      // this.equippedRaycaster.far = 50;
+      if (this.arrow) { //show helper arrow, TODO toggle from dialogs.js
+        this.el.sceneEl.object3D.remove(this.arrow);
       }
+      this.arrow = new THREE.ArrowHelper( this.directionMe, this.positionMe, 10, 0xff0000 );
+      // this.arrow = new THREE.ArrowHelper( this.equippedRaycaster.components.raycaster.direction, this.equippedRaycaster.components.raycaster.origin, 10, 0xff0000 );
+      this.el.sceneEl.object3D.add( this.arrow );
+      } 
 
       if (this.lineGeometry && this.lineObject && this.lineStart) {
                 
@@ -4094,11 +4144,8 @@ AFRAME.registerComponent('mod_object', {
         this.lineGeometry.attributes.position.needsUpdate = true;
 
         }
-     
 
-        // if (this.arrow) { //show helper arrow, TODO toggle from dialogs.js
-        //   this.el.sceneEl.object3D.remove(this.arrow);
-        // }
+       
 
     
     }
@@ -4440,8 +4487,13 @@ AFRAME.registerComponent('mod_model', {
       this.hasTrigger = false;
       this.triggerObject = null;
       this.hasAudioTrigger = false;
+      this.particlesEl = null;
       
+      this.hitpoint = new THREE.Vector3();
+
       if (this.data.shader != '') {
+
+
         // setShader(this.data.shader);
         this.setShader(); //at the bottom
       }      
@@ -4517,23 +4569,44 @@ AFRAME.registerComponent('mod_model', {
             this.hasAudioTrigger = true;
           }
           
-          // if (this.data.eventData.toLowerCase().includes("target")) {
+          if (this.data.eventData.toLowerCase().includes("target")) {
+              this.particlesEl = document.createElement("a-entity");
+              this.el.sceneEl.appendChild(this.particlesEl); //hrm...
+              this.el.classList.add("target");
+              this.el.classList.remove("activeObjexRay");
+          }
 
-            this.el.addEventListener('raycaster-intersected', e =>{  
-                this.raycaster = e.detail.el;
-                // that.raycaster = this.raycaster;
-                this.intersection = this.raycaster.components.raycaster.getIntersection(this.el, true);
-                this.hitpoint = this.intersection.point;
-
-                console.log("mod_model target hit " + this.el.id + " with tags " + this.data.tags);
-              
+          this.el.addEventListener('raycaster-intersected', e =>{  
+            this.raycaster = e.detail.el;
+            // that.raycaster = this.raycaster;
+            // this.intersection = this.raycaster.components.raycaster.getIntersection(this.el);
+            // if (this.intersection.point) {
+            //   // console.log("intersection " + JSON.stringify(this.intersection.point));
+            //   this.hitpoint.x = this.intersection.point.x.toFixed(2);
+            //   this.hitpoint.y = this.intersection.point.y.toFixed(2);
+            //   this.hitpoint.z = this.intersection.point.z.toFixed(2);
+            //   this.rayhit(this.hitpoint);
+            // }
+            // console.log("raycaster "+ e.detail.el.id +" mod_model target hit " + this.el.id + " with tags " + this.data.tags);
+            if (this.raycaster) {
+              this.intersection = this.raycaster.components.raycaster.getIntersection(this.el);
+              if (!this.intersection) { 
+                  return; 
+                } else {
+                  if (this.intersection.point) {
+                    // console.log("intersection " + JSON.stringify(this.intersection.point));
+                    // this.hitpoint.x = this.intersection.point.x.toFixed(2);
+                    // this.hitpoint.y = this.intersection.point.y.toFixed(2);
+                    // this.hitpoint.z = this.intersection.point.z.toFixed(2);
+                    this.rayhit(this.intersection.point);
+                  }
+                }
+              // console.log(intersection.point);
+              }
             });
             this.el.addEventListener("raycaster-intersected-cleared", () => {
-                
                 this.raycaster = null;
-                this.hitpoint = null;
-
-                
+                // this.killParticles();
             });
           // }
 
@@ -5305,17 +5378,19 @@ AFRAME.registerComponent('mod_model', {
 
             if (this.data.eventData && this.data.eventData.toLowerCase().includes("target")) {
                 // this.el.setAttribute("targeting_raycaster", {'init': true}); //no
+                this.el.classList.add("target");
+                this.el.classList.remove("activeObjexRay");
               
         
-              this.equipControl = document.querySelector(".equipped"); //if there's something equipped, let it know this mod_model has been hit
-              if (this.equipControl && this.equipControl.components) {
-                this.hitpoint = evt.detail.intersection.point.clone();
-                this.hitpoint.x = this.hitpoint.x.toFixed(2);
-                this.hitpoint.y = this.hitpoint.y.toFixed(2);
-                this.hitpoint.z = this.hitpoint.z.toFixed(2);
-                console.log('ray hit at' + JSON.stringify(this.hitpoint));
-                this.equipControl.components.mod_object.equippedRayHit(this.hitpoint);
-              }
+              // this.equipControl = document.querySelector(".equipped"); //if there's something equipped, let it know this mod_model has been hit //  unused..
+              // if (this.equipControl && this.equipControl.components) {
+              //   this.hitpoint = evt.detail.intersection.point.clone();
+              //   this.hitpoint.x = this.hitpoint.x.toFixed(2);
+              //   this.hitpoint.y = this.hitpoint.y.toFixed(2);
+              //   this.hitpoint.z = this.hitpoint.z.toFixed(2);
+              //   console.log('ray hit at' + JSON.stringify(this.hitpoint));
+              //   this.equipControl.components.mod_object.equippedRayHit(this.hitpoint);
+              // }
             }
           
             // this.rayhit(this.hitpoint); 
@@ -5448,7 +5523,7 @@ AFRAME.registerComponent('mod_model', {
     }
     });
    
-  },  //END INIT 
+  },  //END INIT mod_model
   returnProperties: function () {
     //placeholder
 
@@ -5515,7 +5590,56 @@ AFRAME.registerComponent('mod_model', {
 
       }
     }
+
+  },
+  killParticles: function () {
+    if (this.particlesEl) {
+      this.particlesEl.setAttribute('sprite-particles', {"enable": false});
+    }
+  },
+  rayhit: function (hitpoint) {
+
+    if (this.data.eventData.toLowerCase().includes("target")) {        
+      if (this.particlesEl) {
+        // hitpoint.x = hitpoint.x.toFixed(2);
+        // hitpoint.y = hitpoint.y.toFixed(2);
+        // hitpoint.z = hitpoint.z.toFixed(2);
+        console.log("gotsa rayhit on id " + this.el.id + " eventdata " + this.data.eventData + " at " + JSON.stringify(hitpoint));
+        
+        this.particlesEl.setAttribute("position", {"x": hitpoint.x, "y": hitpoint.y,"z": hitpoint.z});
+        // this.particlesEl.object3D.position.set(hitpoint.x, hitpoint.y, hitpoint.z);
+        this.particlesEl.setAttribute('sprite-particles', {
+          enable: true, 
+          duration: '2', 
+          texture: '#explosion1', 
+          color: 'black..white', 
+          blending: 'additive', 
+          textureFrame: '8 8', 
+          textureLoop: '1', 
+          spawnRate: '1', 
+          lifeTime: '1', 
+          opacity: '0,1,0', 
+          rotation: '0..360', 
+          scale: '100,500'
+        });
+      // this.particlesEl.setAttribute('sprite-particles', {"enable": false});
+      this.particlesEl.setAttribute('sprite-particles', {"duration": .5});
+      
+      this.el.object3D.scale.set(0, 0, 0);
+      // this.el.object3D.scale.y = 0;
+      // this.el.object3D.scale.z = 0;
+      this.mod_curve = this.el.components.mod_curve;
+      if (this.mod_curve) {
+        this.mod_curve.reset();
+      }
+      } else {
+        this.particlesEl = document.createElement("a-entity");
+        this.el.sceneEl.appendChild(this.particlesEl); //hrm...
+      }
+    }
   }
+
+  
 
 });  ///end mod_model///////////
 
