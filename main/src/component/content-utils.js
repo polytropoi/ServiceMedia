@@ -2512,6 +2512,7 @@ AFRAME.registerComponent('mod_object', {
     this.lineMaterial = new THREE.LineBasicMaterial({
       color: 0xff0000
     });
+    // this.lineEl = null;
     this.lineStart = new THREE.Vector3();
     this.lineMiddle = new THREE.Vector3();
     this.lineEnd = new THREE.Vector3();
@@ -2524,6 +2525,7 @@ AFRAME.registerComponent('mod_object', {
     this.lineObject = new THREE.Line(this.lineGeometry, this.lineMaterial);
     this.el.sceneEl.object3D.add(this.lineObject);
     this.curve = null;
+    this.isTriggered = false;
     // could be any number
 
     // let tG = new THREE.BufferGeometry().setFromPoints([
@@ -2551,7 +2553,7 @@ AFRAME.registerComponent('mod_object', {
     let mouthClips = [];
 
     this.triggerAudioController = document.getElementById("triggerAudio");
-    this.isTriggered = false;
+    this.triggerOn = false;
     this.driveable = false;
     this.modelParent = null;
 
@@ -2879,10 +2881,13 @@ AFRAME.registerComponent('mod_object', {
         // USING SIZE VECTOR3 to set Y position of mesh
         // mesh.position.y = s.y / 2;
         this.el.setAttribute("scale", scale);
-        this.lineEl = document.createElement("a-entity");
-        this.el.sceneEl.appendChild(this.lineEl);
-        this.lineEl.setAttribute("mod_line");
+       
+        // this.lineEl = document.createElement("a-entity");
+        // this.el.sceneEl.appendChild(this.lineEl);
+        // this.lineEl.setAttribute("mod_line", {"init": true});
+        // this.lineEl.setAttribute("position", pos);
 
+        this.el.setAttribute("mod_line", {"init": true});
         // this.el.remove
         // this.el.object3D.scale.set(scale);
         // this.el.sceneEl.object3D.add(this.beam);
@@ -3753,6 +3758,9 @@ AFRAME.registerComponent('mod_object', {
           // this.applyForce();
           
         } 
+        if (this.hasTriggerAction) {
+
+        }
         if (this.selectAction) {
           console.log("select action " + JSON.stringify(this.selectAction));
           if (this.selectAction.actionResult.toLowerCase() == "trigger fx") { //e.g. light a torch
@@ -3840,17 +3848,17 @@ AFRAME.registerComponent('mod_object', {
         this.triggerAudioController.components.trigger_audio_control.playAudioAtPosition(hitpoint, distance, this.tags);
       }
 
-        if (this.hasSynth) {
-          if (this.el.components.mod_synth != null && this.data.objectData.tonejsPatch1 != undefined && this.data.objectData.tonejsPatch1 != null) {
-            // this.el.components.mod_synth.trigger(distance);
-            if (this.data.objectData.tonejsPatch1 == "Metal") {
-              this.el.components.mod_synth.metalHitDistance(distance);
-            } else if (this.data.objectData.tonejsPatch1 == "AM Synth") {
-              this.el.components.mod_synth.amHitDistance(distance);
-            }
-           
+      if (this.hasSynth) {
+        if (this.el.components.mod_synth != null && this.data.objectData.tonejsPatch1 != undefined && this.data.objectData.tonejsPatch1 != null) {
+          // this.el.components.mod_synth.trigger(distance);
+          if (this.data.objectData.tonejsPatch1 == "Metal") {
+            this.el.components.mod_synth.metalHitDistance(distance);
+          } else if (this.data.objectData.tonejsPatch1 == "AM Synth") {
+            this.el.components.mod_synth.amHitDistance(distance);
           }
+          
         }
+      }
       // } else {
       //   console.log("no synth");
       // }
@@ -4111,39 +4119,31 @@ AFRAME.registerComponent('mod_object', {
      
       this.equipHolder.object3D.getWorldPosition(this.positionMe);  //actually it's id "playCaster"
       this.equipHolder.object3D.getWorldDirection(this.directionMe).negate();
+      // if (this.lineEl) {
+      //   // this.lineEl.components.mod_line.updateCurve(this.positionMe, this.directionMe);
+      // }
+     
    
       if (this.equippedRaycaster != null) {
-        // console.log("gotsa raycaster!");
-      // this.equippedRaycaster.set(this.positionMe, this.directionMe.normalize());
-      // this.equippedRaycaster.far = 50;
-      if (this.arrow) { //show helper arrow, TODO toggle from dialogs.js
-        this.el.sceneEl.object3D.remove(this.arrow);
-      }
-      this.arrow = new THREE.ArrowHelper( this.directionMe, this.positionMe, 10, 0xff0000 );
-      // this.arrow = new THREE.ArrowHelper( this.equippedRaycaster.components.raycaster.direction, this.equippedRaycaster.components.raycaster.origin, 10, 0xff0000 );
-      this.el.sceneEl.object3D.add( this.arrow );
+
+        // if (this.isTriggered) {
+        //   this.el.components.mod_line.showLine(true);
+        // }
+          // if (this.arrow) { //show helper arrow, TODO toggle from dialogs.js
+          //   this.el.sceneEl.object3D.remove(this.arrow);
+          // }
+          // this.arrow = new THREE.ArrowHelper( this.directionMe, this.positionMe, 10, 0xff0000 );
+          // // this.arrow = new THREE.ArrowHelper( this.equippedRaycaster.components.raycaster.direction, this.equippedRaycaster.components.raycaster.origin, 10, 0xff0000 );
+          // this.el.sceneEl.object3D.add( this.arrow );
       } 
 
-      if (this.lineGeometry && this.lineObject && this.lineStart) {
-                
-        // this.lineStart.x = this.positionMe.x
-        // this.lineStart.y = this.positionMe.y;
-        // this.lineStart.z = this.positionMe.z;
-        // this.lineEnd.x = this.directionMe.x;
-        // this.lineEnd.y = this.directionMe.y;
-        // this.lineEnd.z = this.directionMe.z;
-
-        this.lineEnd.copy( this.positionMe ).add( this.directionMe.multiplyScalar( 50 ) );
-        
-        // get the point in the middle
-
-        this.lineMiddle.lerpVectors(this.lineStart, this.lineEnd, 0.5); //maybe don't need...
-
-        // console.log(JSON.stringify(this.lineStart), JSON.stringify(this.lineMiddle), JSON.stringify(this.lineEnd));
-        this.lineGeometry.setFromPoints([this.positionMe, this.lineEnd]);
-        this.lineGeometry.attributes.position.needsUpdate = true;
-
-        }
+      // if (this.lineGeometry && this.lineObject && this.lineStart) { //for testing
+      //   this.lineEnd.copy( this.positionMe ).add( this.directionMe.multiplyScalar( 50 ) );
+      //   this.lineMiddle.lerpVectors(this.lineStart, this.lineEnd, 0.5); //maybe don't need...
+      //   // console.log(JSON.stringify(this.lineStart), JSON.stringify(this.lineMiddle), JSON.stringify(this.lineEnd));
+      //   this.lineGeometry.setFromPoints([this.positionMe, this.lineEnd]);
+      //   this.lineGeometry.attributes.position.needsUpdate = true;
+      // }
 
        
 
@@ -4490,7 +4490,7 @@ AFRAME.registerComponent('mod_model', {
       this.particlesEl = null;
       
       this.hitpoint = new THREE.Vector3();
-
+      this.tags = this.data.tags;
       if (this.data.shader != '') {
 
 
@@ -4598,7 +4598,10 @@ AFRAME.registerComponent('mod_model', {
                     // this.hitpoint.x = this.intersection.point.x.toFixed(2);
                     // this.hitpoint.y = this.intersection.point.y.toFixed(2);
                     // this.hitpoint.z = this.intersection.point.z.toFixed(2);
-                    this.rayhit(this.intersection.point);
+                    // this.rayhit(this.intersection.point);
+                    this.distance = window.playerPosition.distanceTo( this.intersection.point );
+                    // this.hitpoint = this.intersection[0].point;
+                    this.rayhit(e.detail.el.id, this.distance, this.intersection.point ); 
                   }
                 }
               // console.log(intersection.point);
@@ -5597,14 +5600,14 @@ AFRAME.registerComponent('mod_model', {
       this.particlesEl.setAttribute('sprite-particles', {"enable": false});
     }
   },
-  rayhit: function (hitpoint) {
+  rayhit: function (id, distance, hitpoint) {
 
     if (this.data.eventData.toLowerCase().includes("target")) {        
       if (this.particlesEl) {
         // hitpoint.x = hitpoint.x.toFixed(2);
         // hitpoint.y = hitpoint.y.toFixed(2);
         // hitpoint.z = hitpoint.z.toFixed(2);
-        console.log("gotsa rayhit on id " + this.el.id + " eventdata " + this.data.eventData + " at " + JSON.stringify(hitpoint));
+        console.log("gotsa rayhit on id " + this.el.id + " eventdata " + this.data.eventData + " at " + JSON.stringify(hitpoint) + " tags" + this.data.tags);
         
         this.particlesEl.setAttribute("position", {"x": hitpoint.x, "y": hitpoint.y,"z": hitpoint.z});
         // this.particlesEl.object3D.position.set(hitpoint.x, hitpoint.y, hitpoint.z);
@@ -5635,6 +5638,22 @@ AFRAME.registerComponent('mod_model', {
       } else {
         this.particlesEl = document.createElement("a-entity");
         this.el.sceneEl.appendChild(this.particlesEl); //hrm...
+      }
+    }
+
+    if (this.triggerAudioController != null && !this.data.isEquipped && this.tags) {
+      this.triggerAudioController.components.trigger_audio_control.playAudioAtPosition(hitpoint, distance, this.tags);
+    }
+
+    if (this.hasSynth) {
+      if (this.el.components.mod_synth != null && this.data.objectData.tonejsPatch1 != undefined && this.data.objectData.tonejsPatch1 != null) {
+        // this.el.components.mod_synth.trigger(distance);
+        if (this.data.objectData.tonejsPatch1 == "Metal") {
+          this.el.components.mod_synth.metalHitDistance(distance);
+        } else if (this.data.objectData.tonejsPatch1 == "AM Synth") {
+          this.el.components.mod_synth.amHitDistance(distance);
+        }
+        
       }
     }
   }

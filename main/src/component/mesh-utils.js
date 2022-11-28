@@ -3190,16 +3190,24 @@ AFRAME.registerComponent('mod_tunnel', {
 AFRAME.registerComponent('mod_line', {
   schema: {
     init: {default: false},
-    tags: {default: ''}
+    tags: {default: ''},
+    originID: {default: ''},
+    showLine: {default: false}
   },
   init: function () {
+      this.positionMe = new THREE.Vector3();
+      this.directionMe = new THREE.Vector3();
+      this.equipHolder = document.getElementById("equipPlaceholder");
+      this.equipHolder.object3D.getWorldPosition(this.positionMe); 
+      this.equipHolder.object3D.getWorldDirection(this.directionMe).negate();
+
       this.loaded = false;
       this.verticleez = null;
       this.tubeGeometry_o = null;
       this.tubeGeometry = null;
       this.splineMesh = null;
       this.splineMesh_o = null;
-      console.log("tryna make a tunnel");
+      console.log("tryna make a mod_line");
       this.newPosition = null; 
       this.tangent = null;
       // this.radians = null; 
@@ -3208,60 +3216,146 @@ AFRAME.registerComponent('mod_line', {
       this.axis = new THREE.Vector3( );
       this.points = [];
       this.speed = .001;
-      // Define points along Z axis
-      for (var i = 0; i < 5; i += 1) {
-        this.points.push(new THREE.Vector3(0, 0, -100 * (i / 4))); //
-      }
+      // // Define points along Z axis
+      // for (var i = 0; i < 4; i += 1) {
+      //   this.points.push(new THREE.Vector3(0, 0, -100 * (i / 4))); //
+      // }
+      this.equipHolder.object3D.getWorldPosition(this.positionMe); 
+      this.equipHolder.object3D.getWorldDirection(this.directionMe).negate();
+
+      this.points[0] = new THREE.Vector3();
+      this.points[1] = new THREE.Vector3();
+      this.points[2] = new THREE.Vector3();
+      this.points[3] = new THREE.Vector3();
+
       this.curve = new THREE.CatmullRomCurve3(this.points);
       this.c_points = this.curve.getPoints( 50 );
       // // this.c_geometry = new THREE.BufferGeometry().setFromPoints( this.c_points );//won't work with fatlines...
       this.c_geometry = new THREE.BufferGeometry().setFromPoints( this.c_points );
-      this.c_material = new THREE.LineBasicMaterial( { color: 0x4287f5 } );
+      this.c_material = new THREE.LineBasicMaterial( { color: 0x00ff2a } );
       this.curveLine = new THREE.Line( this.c_geometry, this.c_material ); //this one stays a curve
-      const cgeometry = new THREE.BoxGeometry( 1, 1, 1 );
-      const cmaterial = new THREE.MeshPhongMaterial( { color: 0x99ffff, wireframe: false } );
+      
+      const cgeometry = new THREE.SphereGeometry( .1, 16, 8 );
+      const cmaterial = new THREE.MeshBasicMaterial( { color: 0x00ff2a, wireframe: true } );
       this.objectToCurve = new THREE.Mesh( cgeometry, cmaterial );
+      this.lineEnd = new THREE.Vector3();
+      this.lineMiddle1 = new THREE.Vector3();
+      this.lineMiddle2 = new THREE.Vector3();
+
+      this.pointsCopy = [];
+      this.pointsCopy[0] = new THREE.Vector3();
+      this.pointsCopy[1] = new THREE.Vector3();
+      this.pointsCopy[2] = new THREE.Vector3();
+      this.pointsCopy[3] = new THREE.Vector3();
+
+      this.pointsTemp = [];
+      this.pointsTemp[0] = new THREE.Vector3();
+      this.pointsTemp[1] = new THREE.Vector3();
+      this.pointsTemp[2] = new THREE.Vector3();
+      this.pointsTemp[3] = new THREE.Vector3();
+
+
+
+
+      this.el.sceneEl.object3D.add(this.curveLine);
+
+      this.el.sceneEl.object3D.add(this.objectToCurve);
+      window.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        this.data.showLine = true;
+      });
+      window.addEventListener('mouseup', (e) => {
+        e.preventDefault();
+        this.data.showLine = false;
+      }); 
+
+    },
+    toggleLine(showLine) {
+      if (showLine) {
+        this.data.showLine = true;
+      } else {
+        this.data.showLine = false;
+      }
     },
     // from https://github.com/Mamboleoo/InfiniteTubes/blob/master/js/demo6.js
     updateCurve: function() {
-      this.splineVerts = this.splineMesh.geometry.attributes.position.array;
-      this.splineVerts_o = this.splineMesh_o.geometry.attributes.position.array;
-      this.vert = null;
-      this.splineMesh.geometry.attributes.position.needsUpdate = true;
-      this.curveLine.geometry.attributes.position.needsUpdate = true;
-      for (let i = 0; i < this.splineVerts.length; i += 3) { //typed array
-        this.splineVerts[i] = this.splineVerts_o[i] + (( Math.random() - 0.5 ) / 4) - this.splineVerts[i];
-        // this.splineVerts[i + 1] += ( Math.random() - 0.5 ) / 2;
-        this.splineVerts[i + 1] = this.splineVerts_o[i + 1] + (( Math.random() - 0.5 ) / 4) - this.splineVerts[i + 1];
-        // this.splineVerts[i + 2] += ( Math.random() - 0.5 ) * 3;
-      }
-      this.splineMesh.geometry.attributes.position.needsUpdate = true;
-      // this.curve.attributes.needsUpdate = true;
-      // this.flow.moveAlongCurve(.06);
-      // this.flow.object3D.needsUpdate = true;
-      if (this.fraction == 0) {
-        this.curve.points[0].x =Math.ceil(Math.random() * 2) * (Math.round(Math.random()) ? 1 : -1);
-        this.curve.points[0].y =Math.ceil(Math.random() * 2) * (Math.round(Math.random()) ? 1 : -1);
-        this.curve.points[1].x =-Math.ceil(Math.random() * 2) * (Math.round(Math.random()) ? 1 : -1);
-        this.curve.points[1].y =-Math.ceil(Math.random() * 2) * (Math.round(Math.random()) ? 1 : -1);
-        this.curve.points[2].x =Math.ceil(Math.random() * 2) * (Math.round(Math.random()) ? 1 : -1);
-        this.curve.points[2].y =Math.ceil(Math.random() * 2) * (Math.round(Math.random()) ? 1 : -1);
-        this.curve.points[3].x =-Math.ceil(Math.random() * 2) * (Math.round(Math.random()) ? 1 : -1);
-        this.curve.points[3].y =-Math.ceil(Math.random() * 2) * (Math.round(Math.random()) ? 1 : -1);
-      }
-      this.fraction += 0.001;
+      // console.log("tyrha updateCurve");
+      // this.splineVerts = this.splineMesh.geometry.attributes.position.array;
+      // this.splineVerts_o = this.splineMesh_o.geometry.attributes.position.array;
+      // this.vert = null;
+      // this.splineMesh.geometry.attributes.position.needsUpdate = true;
+
+      this.equipHolder.object3D.getWorldPosition(this.positionMe);  //actually it's id "playCaster"
+      this.equipHolder.object3D.getWorldDirection(this.directionMe).negate();
+
+      // this.points[0].copy(this.positionMe);
+      // this.points[0].copy( (this.positionMe ).add( this.directionMe.multiplyScalar( 1 )) );
+      // this.points[1].copy( (this.positionMe ).add( this.directionMe.multiplyScalar( 5 )) );
+      // this.points[2].copy( (this.positionMe ).add( this.directionMe.multiplyScalar( 10 )) );
+      // this.points[3].copy( (this.positionMe ).add( this.directionMe.multiplyScalar( 15 )) );
+
+      this.pointsTemp[0].copy( (this.positionMe ).addScaledVector( this.directionMe, .5 )); 
+      this.pointsTemp[1].copy( (this.positionMe ).addScaledVector( this.directionMe, 5 )); 
+      this.pointsTemp[2].copy( (this.positionMe ).addScaledVector( this.directionMe, 10 )); 
+      this.pointsTemp[3].copy( (this.positionMe ).addScaledVector( this.directionMe, 15 )); 
+      this.pointsCopy[0].copy(this.pointsTemp[0]);  
+      this.pointsCopy[1].copy(this.pointsTemp[1]);  
+      this.pointsCopy[2].copy(this.pointsTemp[2]);  
+      this.pointsCopy[3].copy(this.pointsTemp[3]);  
+
+      // this.points[1].copy( (this.positionMe ).addScaledVector( this.directionMe, 5 )); 
+      // this.points[2].copy( (this.positionMe ).addScaledVector( this.directionMe, 10 )); 
+      // this.points[3].copy( (this.positionMe ).addScaledVector( this.directionMe, 15 )); 
+      // this.curve.points[1].x =-Math.ceil(Math.random() * 2) * (Math.round(Math.random()) ? 1 : -1);
+      // this.curve.points[1].y =-Math.ceil(Math.random() * 2) * (Math.round(Math.random()) ? 1 : -1);
+      // this.curve.points[2].x =Math.ceil(Math.random() *  2) * (Math.round(Math.random()) ? 1 : -1);
+      // this.curve.points[2].y =Math.ceil(Math.random() *  2) * (Math.round(Math.random()) ? 1 : -1);
+      // this.curve.points[3].x =-Math.ceil(Math.random() * 2) * (Math.round(Math.random()) ? 1 : -1);
+      // this.curve.points[3].y =-Math.ceil(Math.random() * 2) * (Math.round(Math.random()) ? 1 : -1);
+
+      // get the point in the middle
+      // this.lineMiddle.lerpVectors(this.lineStart, this.lineEnd, 0.5); //maybe don't need...
+      // console.log(JSON.stringify(this.lineStart), JSON.stringify(this.lineMiddle), JSON.stringify(this.lineEnd));
+      // for (let i = 0; i < this.splineVerts.length; i += 3) { //typed array, only modding x [i] and y [i+1], z (length) stays same
+      //   this.splineVerts[i] = this.splineVerts_o[i] + (( Math.random() - 0.5 ) / 4) - this.splineVerts[i]; 
+        
+      //   this.splineVerts[i + 1] = this.splineVerts_o[i + 1] + (( Math.random() - 0.5 ) / 4) - this.splineVerts[i + 1];
+      // }
+      // this.splineMesh.geometry.attributes.position.needsUpdate = true;
+
+      this.fraction += 0.05;
       if ( this.fraction > 1) {
+        this.pointsCopy[1].x =-Math.round(Math.random()) * (Math.round(Math.random()) ? 1 : -1);
+        this.pointsCopy[1].y =-Math.round(Math.random()) * (Math.round(Math.random()) ? 1 : -1);
+        this.pointsCopy[2].x =Math.round(Math.random()) * (Math.round(Math.random()) ? 1 : -1);
+        this.pointsCopy[2].y =Math.round(Math.random()) * (Math.round(Math.random()) ? 1 : -1);
+        this.pointsCopy[3].x =-Math.round(Math.random()) * (Math.round(Math.random()) ? 1 : -1);
+        this.pointsCopy[3].y =-Math.round(Math.random()) * (Math.round(Math.random()) ? 1 : -1);
+        this.points[0].lerpVectors(this.pointsTemp[0], this.pointsCopy[0], 0.1); 
+        this.points[1].lerpVectors(this.pointsTemp[1], this.pointsCopy[1], 0.1); 
+        this.points[2].lerpVectors(this.pointsTemp[2], this.pointsCopy[2], 0.1); 
+        this.points[3].lerpVectors(this.pointsTemp[3], this.pointsCopy[3], 0.1); 
         this.fraction = 0;
       }
-      this.objectToCurve.position.copy( this.curve.getPoint( 1 - this.fraction ) );         
+      // this.points[0].position.lerpVectors(this.pointsTemp[0], this.pointsCopy[0], 0.5); 
+      // this.points[1].position.lerpVectors(this.pointsTemp[1], this.pointsCopy[1], 0.5); 
+      // this.points[2].position.lerpVectors(this.pointsTemp[2], this.pointsCopy[2], 0.5); 
+      // this.points[3].position.lerpVectors(this.pointsTemp[3], this.pointsCopy[3], 0.5); 
+      // this.curve.geometry.position.attributes.needsUpdate = true;
+
+      this.objectToCurve.position.copy( this.curve.getPoint( this.fraction ) );         
       this.tangent = this.curve.getTangent( this.fraction );
       this.axis.crossVectors( this.normal, this.tangent ).normalize( );  
       this.objectToCurve.quaternion.setFromAxisAngle( this.axis, Math.PI / 2 );
+      this.c_points = this.curve.getPoints( 50 );
+      this.c_geometry.setFromPoints(this.pointsTemp);
+      this.c_geometry.attributes.position.needsUpdate = true;
+      this.curveLine.geometry.attributes.position.needsUpdate = true;
     },
     tick: function () {
-      if (this.loaded && this.tubeGeometry && this.tubeMaterial) {
+      if (this.curveLine && this.data.showLine) {
         // console.log("modding speernd " + this.speed);
-        this.tubeMaterial.map.offset.x += this.speed;
+        // this.tubeMaterial.map.offset.x += this.speed;
         this.updateCurve();
       }
     }

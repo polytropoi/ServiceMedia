@@ -12228,7 +12228,8 @@ function getAllPeople() {
                 // response.data.scenePictureGroups = [];
                 for (let i =0; i < response.data.scenePictureGroups.length; i++) {
                     for (let j = 0; j < response.data.sceneGroups.length; j++) {
-                        if (response.data.sceneGroups[j].type == "picture" && response.data.scenePictureGroups[i] == response.data.sceneGroups[j]._id) {
+                        console.log("checking for scenePictureGroups VS " + JSON.stringify(response.data.sceneGroups[j]) )
+                        if (response.data.sceneGroups[j].type.toLowerCase().includes("picture") && response.data.scenePictureGroups[i] == response.data.sceneGroups[j]._id) {
                             // picGroups.push(response.data.sceneGroups[j]);
                             picGroupButtons = picGroupButtons + "<div class=\x22btn btn-dark btn-sm float-right\x22><a style=\x22color:white;\x22 target=\x22_blank\x22 role=\x22button\x22" +
                             "href=\x22index.html?type=group&iid="+response.data.sceneGroups[j]._id+"\x22>" +
