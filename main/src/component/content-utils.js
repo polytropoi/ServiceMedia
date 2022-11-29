@@ -2977,6 +2977,9 @@ AFRAME.registerComponent('mod_object', {
           //   }
           // }
 
+          if (this.data.eventData.toLowerCase().includes("ar target")) {
+            this.el.id = "ar_target_object";
+          }
           if (this.data.eventData.toLowerCase().includes("transparent")) {
             console.log("tryna set transparent");
             obj.visible = false;
@@ -4546,6 +4549,9 @@ AFRAME.registerComponent('mod_model', {
               obj.material.refractionRatio = .9;
               obj.material.reflectivity = .5;
             }
+          }
+          if (this.data.eventData.toLowerCase().includes("ar target")) {
+            this.el.id = "ar_target_object";
           }
           if (this.data.eventData.toLowerCase().includes("spawn")) {
             this.el.classList.add("spawn");

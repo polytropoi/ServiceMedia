@@ -9,7 +9,7 @@
       }
     });
 
-    
+
     AFRAME.registerComponent('usdz', { //catch the usdz links if in iOS and there's one or more in the scene
       schema: {
         initialized: {default: ''},
@@ -253,7 +253,7 @@
         }
       });
 
-      AFRAME.registerComponent('ar-hit-test-spawn', {
+      AFRAME.registerComponent('mod_ar_hit_test', {
         schema: {
           mode: {default: 'position'},
         },
@@ -266,12 +266,17 @@
           this.viewerSpace = null;
           this.refSpace = null;
           console.log("arMode is " + this.data.mode);
-          let data = this.data;
+
+          this.spawnObjects = document.querySelectorAll('.spawn');
+          this.targetObject = document.querySelectorAll(".ar_target_object");
+
           this.el.sceneEl.renderer.xr.addEventListener('sessionend', (ev) => {
             this.viewerSpace = null;
             this.refSpace = null;
             this.xrHitTestSource = null;
           });
+          
+          
           this.el.sceneEl.renderer.xr.addEventListener('sessionstart', (ev) => {
             let session = this.el.sceneEl.renderer.xr.getSession();
             // AugPanel("scanning for surfaces..");  
@@ -287,47 +292,33 @@
                 let position = element.getAttribute('position');
                 // AugPanel("selecting Hit Test Position " + positon);
                 // document.querySelector('.target').setAttribute('position', position);
-                var targets = document.querySelectorAll('.spawn');
+
 
                 
-                // if (data.mode == 'spawn') {
-                if (targets != undefined && targets != null) {
-                  const index = getRandomInt(targets.length);
-                  console.log("tryna clone a target with index " + index);
-                  var obj = targets[index].getObject3D('mesh');
+                if (this.data.mode == 'spawn') {
+                  if (spawnObjects != undefined && spawnObjects != null) {
+                    const index = getRandomInt(spawnObjects.length);
+                    console.log("tryna clone a target with index " + index);
+                    var obj = spawnObjects[index].getObject3D('mesh');
 
-                  // var clone = targets[index].cloneNode(true);
-                  let clone = document.createElement('a-entity');
-                  let scaleFactor = Math.random();
-                  clone.setObject3D('mesh', obj.clone()); 
-                  clone.setAttribute('position', position);
-                  clone.setAttribute('scale', {scaleFactor, scaleFactor, scaleFactor});
-                  clone.classList.add("activeObjexRay");
-                  sceneEl.appendChild(clone);
+      
+                    let clone = document.createElement('a-entity');
+                    let scaleFactor = Math.random();
+                    clone.setObject3D('mesh', obj.clone()); 
+                    clone.setAttribute('position', position);
+                    clone.setAttribute('scale', {scaleFactor, scaleFactor, scaleFactor});
+                    clone.classList.add("activeObjexRay");
+                    sceneEl.appendChild(clone);
+                  }
+                } else {
+                if (this.data.mode == 'position') {
+                  if (target != undefined) {
+                    console.log("tryna reposition target");
+                      target.setAttribute('position', position);
+                    }
+                  }
+                  
                 }
-                // }
-
-                // if (data.mode == 'position') {
-                // if (target != undefined) {
-                //   console.log("tryna reposition target");
-                //     target.setAttribute('position', position);
-                //   }
-                // }
-                // var entity = document.createElement('a-entity');
-                // sceneEl.appendChild(entity);          
-                // clone.visible = true;
-                // clone.setAttribute('position', position);
-                // // clone.position.x += Math.random() * 5;
-                // // clone.position.y += 0.5;
-                // // clone.position.z = -20 + Math.random() * 20;
-                // entity.setObject3D('clone', clone);  
-                // var testBox = document.createElement('a-box');
-                // testBox.setAttribute('position', position);
-                // document.getElementById('light').setAttribute('position', {
-                //   x: (position.x - 2),
-                //   y: (position.y + 4),
-                //   z: (position.z + 2)
-                // });
               });
     
               if (this.el.sceneEl.is('ar-mode')) {
