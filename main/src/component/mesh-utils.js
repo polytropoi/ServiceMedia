@@ -3050,7 +3050,8 @@ AFRAME.registerComponent('mod_curve', {
   reset: function () {
     this.fraction = 0;
 
-    this.scaleMod = Math.random().toFixed(2) * 3;
+    this.scaleMod = .5 + Math.random().toFixed(2) * 2;
+    console.log("resetting to "+ this.scaleMod);
     this.el.object3D.scale.set(this.scaleMod,this.scaleMod,this.scaleMod)
     // this.el.object3D.scale.y = this.scaleMod;
     // this.el.object3D.scale.z = this.scaleMod;
@@ -3256,13 +3257,23 @@ AFRAME.registerComponent('mod_line', {
 
       this.el.sceneEl.object3D.add(this.curveLine);
       this.el.sceneEl.object3D.add(this.objectToCurve);
+      this.triggerAudioController = document.getElementById("triggerAudio");
+      this.modValue = 0;
       window.addEventListener('mousedown', (e) => {
         e.preventDefault();
         this.data.showLine = true;
+        if (this.triggerAudioController) {
+          this.triggerAudioController.components.trigger_audio_control.loopToggle(true);
+          this.triggerAudioController.components.trigger_audio_control.modLoop("rate", this.modValue);
+        }
       });
       window.addEventListener('mouseup', (e) => {
         e.preventDefault();
         this.data.showLine = false;
+        if (this.triggerAudioController) {
+          this.triggerAudioController.components.trigger_audio_control.modLoop("rate", 0);
+          this.triggerAudioController.components.trigger_audio_control.loopToggle(false);
+        }
       }); 
 
     },
@@ -3348,9 +3359,9 @@ AFRAME.registerComponent('mod_line', {
       this.axis.crossVectors( this.normal, this.tangent ).normalize( );  
       this.objectToCurve.quaternion.setFromAxisAngle( this.axis, Math.PI / 2 );
       this.c_points = this.curve.getPoints( 50 );
-      this.c_geometry.setFromPoints(this.pointsCopy);
+      this.c_geometry.setFromPoints(this.c_points);
       this.c_geometry.attributes.position.needsUpdate = true;
-      this.curveLine.geometry.attributes.position.needsUpdate = true;
+      // this.curveLine.geometry.attributes.position.needsUpdate = true;
     },
     tick: function () {
       if (this.curveLine && this.data.showLine) {

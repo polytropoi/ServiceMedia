@@ -2650,8 +2650,8 @@ AFRAME.registerComponent('mod_object', {
         console.log("tryna trigger mod_object loop");
         var triggerAudioController = document.getElementById("triggerAudio");
         if (triggerAudioController != null) {
-  
-          triggerAudioController.components.trigger_audio_control.loopAndFollow(this.el.id, this.tags);
+          
+          triggerAudioController.components.trigger_audio_control.loopAndFollow(this.el.id, this.tags, !this.hasTriggerAction); //don't autoplay if hastriggeraction
         }
       }   
     }, 2000);

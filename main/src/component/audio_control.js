@@ -1536,6 +1536,7 @@ AFRAME.registerComponent('trigger_audio_control', { //trigger audio on designate
         if (this.loopHowl) {
             if (modType == "rate") {
                 if (modValue != 0) { //modvalue 0 === this.rate 1
+
                     if (this.rate > 2.475) {
                         this.rate = 2.5;
                     } else {
@@ -1545,8 +1546,6 @@ AFRAME.registerComponent('trigger_audio_control', { //trigger audio on designate
                         this.loopHowl.rate(this.rate, this.loopID); //what if multiplez?
                     }
                 } else {
-                    
-
                     this.loopHowl.rate(1, this.loopID);
                     this.rate = 1;
                     // console.log("reset this.rzate" +this.rate);
@@ -1554,9 +1553,17 @@ AFRAME.registerComponent('trigger_audio_control', { //trigger audio on designate
             }
         }
     // }
-
     },
-    loopAndFollow: function(targetID, tag) {
+    loopToggle: function (pause) {
+        if (this.loopHowl) {
+            if (!pause) {
+                this.loopHowl.pause();
+            } else {
+                this.loopHowl.play();
+            }
+        }
+    },
+    loopAndFollow: function(targetID, tag, autoPlay) {
 
         if (triggerAudioHowl != null && tag != undefined && tag != null && tag != "") {
             console.log("tryna loopAndFollow trigger audio with tag " + tag + " for targetID " + targetID);
@@ -1609,17 +1616,21 @@ AFRAME.registerComponent('trigger_audio_control', { //trigger audio on designate
                         this.targetEl = document.getElementById(targetID);
                         this.targetPosition = new THREE.Vector3();
                         this.targetEl.object3D.getWorldPosition(this.targetPosition);
-                            
-                        // const clamp = (num, a, b) => Math.max(Math.min(num, Math.max(a, b)), Math.min(a, b));
-                        // const rate = clamp(Math.random() + .25, .75, 1.25); //fudge pitch a bit slower or faster
-                        // triggerAudioHowl.rate(rate);
-                        // console.log("tryna play at hitpoint " + pos);
+                            // const clamp = (num, a, b) => Math.max(Math.min(num, Math.max(a, b)), Math.min(a, b));
+                            // const rate = clamp(Math.random() + .25, .75, 1.25); //fudge pitch a bit slower or faster
+                            // triggerAudioHowl.rate(rate);
+                            // console.log("tryna play at hitpoint " + pos);
                         let id = this.loopHowl.play();
-                        // this.loopIDs.push(id);
+                            // this.loopIDs.push(id);
                         this.loopID = id;
-                        // console.log("tryna play trigger at volume " + volume + " distance " + distance + " id " + id); //calling id here is needed
-                        // triggerAudioHowl.pos(this.targetPosition.x / 100, this.targetPosition.y / 100, this.targetPosition.z / 100, id);  //HOLY SHIT howler needs small values for position, * .01
-                        break; //bail from loop aafter match
+                        if (!autoPlay) {
+                            this.loopHowl.pause();
+                        }
+                        // 
+
+                            // console.log("tryna play trigger at volume " + volume + " distance " + distance + " id " + id); //calling id here is needed
+                            // triggerAudioHowl.pos(this.targetPosition.x / 100, this.targetPosition.y / 100, this.targetPosition.z / 100, id);  //HOLY SHIT howler needs small values for position, * .01
+                            break; //bail from loop aafter match
                         }
                     }
                 }
