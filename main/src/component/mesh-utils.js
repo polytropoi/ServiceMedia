@@ -3221,7 +3221,7 @@ AFRAME.registerComponent('mod_line', {
       //   this.points.push(new THREE.Vector3(0, 0, -100 * (i / 4))); //
       // }
       this.equipHolder.object3D.getWorldPosition(this.positionMe); 
-      this.equipHolder.object3D.getWorldDirection(this.directionMe).negate();
+      this.equipHolder.object3D.getWorldDirection(this.directionMe).negate().normalize();
 
       this.points[0] = new THREE.Vector3();
       this.points[1] = new THREE.Vector3();
@@ -3236,7 +3236,7 @@ AFRAME.registerComponent('mod_line', {
       this.curveLine = new THREE.Line( this.c_geometry, this.c_material ); //this one stays a curve
       
       const cgeometry = new THREE.SphereGeometry( .1, 16, 8 );
-      const cmaterial = new THREE.MeshBasicMaterial( { color: 0x00ff2a, wireframe: true } );
+      const cmaterial = new THREE.MeshBasicMaterial( { color: 0x00ff2a, wireframe: false, transparent: true, opacity: .5 } );
       this.objectToCurve = new THREE.Mesh( cgeometry, cmaterial );
       this.lineEnd = new THREE.Vector3();
       this.lineMiddle1 = new THREE.Vector3();
@@ -3254,11 +3254,7 @@ AFRAME.registerComponent('mod_line', {
       this.pointsTemp[2] = new THREE.Vector3();
       this.pointsTemp[3] = new THREE.Vector3();
 
-
-
-
       this.el.sceneEl.object3D.add(this.curveLine);
-
       this.el.sceneEl.object3D.add(this.objectToCurve);
       window.addEventListener('mousedown', (e) => {
         e.preventDefault();
@@ -3270,13 +3266,13 @@ AFRAME.registerComponent('mod_line', {
       }); 
 
     },
-    toggleLine(showLine) {
-      if (showLine) {
-        this.data.showLine = true;
-      } else {
-        this.data.showLine = false;
-      }
-    },
+    // toggleLine(showLine) {
+    //   if (showLine == ) {
+    //     this.data.showLine = true;
+    //   } else {
+    //     this.data.showLine = false;
+    //   }
+    // },
     // from https://github.com/Mamboleoo/InfiniteTubes/blob/master/js/demo6.js
     updateCurve: function() {
       // console.log("tyrha updateCurve");
@@ -3325,17 +3321,21 @@ AFRAME.registerComponent('mod_line', {
 
       this.fraction += 0.05;
       if ( this.fraction > 1) {
-        this.pointsCopy[1].x =-Math.round(Math.random()) * (Math.round(Math.random()) ? 1 : -1);
-        this.pointsCopy[1].y =-Math.round(Math.random()) * (Math.round(Math.random()) ? 1 : -1);
-        this.pointsCopy[2].x =Math.round(Math.random()) * (Math.round(Math.random()) ? 1 : -1);
-        this.pointsCopy[2].y =Math.round(Math.random()) * (Math.round(Math.random()) ? 1 : -1);
-        this.pointsCopy[3].x =-Math.round(Math.random()) * (Math.round(Math.random()) ? 1 : -1);
-        this.pointsCopy[3].y =-Math.round(Math.random()) * (Math.round(Math.random()) ? 1 : -1);
-        this.points[0].lerpVectors(this.pointsTemp[0], this.pointsCopy[0], 0.1); 
-        this.points[1].lerpVectors(this.pointsTemp[1], this.pointsCopy[1], 0.1); 
-        this.points[2].lerpVectors(this.pointsTemp[2], this.pointsCopy[2], 0.1); 
-        this.points[3].lerpVectors(this.pointsTemp[3], this.pointsCopy[3], 0.1); 
-        this.fraction = 0;
+
+        // if (this.data.showLine) {
+          this.fraction = 0;
+          this.pointsCopy[1].x =-Math.round(Math.random()) * (Math.round(Math.random()) ? 1 : -1);
+          this.pointsCopy[1].y =-Math.round(Math.random()) * (Math.round(Math.random()) ? 1 : -1);
+          this.pointsCopy[2].x =Math.round(Math.random()) * (Math.round(Math.random()) ? 1 : -1);
+          this.pointsCopy[2].y =Math.round(Math.random()) * (Math.round(Math.random()) ? 1 : -1);
+          this.pointsCopy[3].x =-Math.round(Math.random()) * (Math.round(Math.random()) ? 1 : -1);
+          this.pointsCopy[3].y =-Math.round(Math.random()) * (Math.round(Math.random()) ? 1 : -1);
+          this.points[0].lerpVectors(this.pointsTemp[0], this.pointsCopy[0], 0.1); 
+          this.points[1].lerpVectors(this.pointsTemp[1], this.pointsCopy[1], 0.1); 
+          this.points[2].lerpVectors(this.pointsTemp[2], this.pointsCopy[2], 0.1); 
+          this.points[3].lerpVectors(this.pointsTemp[3], this.pointsCopy[3], 0.1);
+        // } 
+       
       }
       // this.points[0].position.lerpVectors(this.pointsTemp[0], this.pointsCopy[0], 0.5); 
       // this.points[1].position.lerpVectors(this.pointsTemp[1], this.pointsCopy[1], 0.5); 
@@ -3348,7 +3348,7 @@ AFRAME.registerComponent('mod_line', {
       this.axis.crossVectors( this.normal, this.tangent ).normalize( );  
       this.objectToCurve.quaternion.setFromAxisAngle( this.axis, Math.PI / 2 );
       this.c_points = this.curve.getPoints( 50 );
-      this.c_geometry.setFromPoints(this.pointsTemp);
+      this.c_geometry.setFromPoints(this.pointsCopy);
       this.c_geometry.attributes.position.needsUpdate = true;
       this.curveLine.geometry.attributes.position.needsUpdate = true;
     },

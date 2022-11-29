@@ -2886,8 +2886,10 @@ AFRAME.registerComponent('mod_object', {
         // this.el.sceneEl.appendChild(this.lineEl);
         // this.lineEl.setAttribute("mod_line", {"init": true});
         // this.lineEl.setAttribute("position", pos);
+        if (this.hasTriggerAction) {
+          this.el.setAttribute("mod_line", {"init": true});
+        }
 
-        this.el.setAttribute("mod_line", {"init": true});
         // this.el.remove
         // this.el.object3D.scale.set(scale);
         // this.el.sceneEl.object3D.add(this.beam);
@@ -4545,7 +4547,9 @@ AFRAME.registerComponent('mod_model', {
               obj.material.reflectivity = .5;
             }
           }
-             
+          if (this.data.eventData.toLowerCase().includes("spawn")) {
+            this.el.classList.add("spawn");
+          }             
           if (this.data.eventData.toLowerCase().includes("transparent")) {
             console.log("tryna set transparent");
             obj.visible = false;
