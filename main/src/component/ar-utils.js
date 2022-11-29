@@ -1,37 +1,44 @@
+    AFRAME.registerComponent('exit-ar-button', {
+      schema: {
+          element: {type: 'selector'}
+      },
+      init: function () {
+        this.data.element.addEventListener('click', ev => {
+            this.el.sceneEl.renderer.xr.getSession().end();
+        });
+      }
+    });
 
-      // AFRAME.registerComponent('detect_device', {
-      //   init
-      // });
+    
+    AFRAME.registerComponent('usdz', { //catch the usdz links if in iOS and there's one or more in the scene
+      schema: {
+        initialized: {default: ''},
+        // usdzData: {
+        //   parse: JSON.parse,
+        //   stringify: JSON.stringify
+        // }
+        usdzData: {default: ''} //just one for now
+      },
+      init: function() {
+        let usdzFiles = this.data.usdzData;
+          console.log("usdz data " + JSON.stringify(usdzFiles));
+          document.querySelector('a-scene').addEventListener('loaded', function () { //for sure?
+        //     console.log("AFRAME Init");
+            // previewUSDZ(usdzFiles);
+            ShowARButton(usdzFiles);
 
-      AFRAME.registerComponent('usdz', { //catch the usdz links if in iOS and there's one or more in the scene
-        schema: {
-          initialized: {default: ''},
-          // usdzData: {
-          //   parse: JSON.parse,
-          //   stringify: JSON.stringify
-          // }
-          usdzData: {default: ''} //just one for now
-        },
-        init: function() {
-          let usdzFiles = this.data.usdzData;
-            console.log("usdz data " + JSON.stringify(usdzFiles));
-            document.querySelector('a-scene').addEventListener('loaded', function () { //for sure?
-          //     console.log("AFRAME Init");
-              // previewUSDZ(usdzFiles);
-              ShowARButton(usdzFiles);
-
-           });    
-            // this.el.setAttribute("primary_audio_control", "timekeys", this.timekeys);
-        }
-        // usdzLink: (function () {
-        //   const anchor = document.createElement('a');
-        //   anchor.setAttribute('rel', 'ar');
-        //   anchor.appendChild(document.createElement('img'));
-        //   anchor.setAttribute('href', this.data.usdzData);
-        //   anchor.click();
-        // })
-      });
-      // See also https://github.com/aframevr/aframe/pull/4356
+          });    
+          // this.el.setAttribute("primary_audio_control", "timekeys", this.timekeys);
+      }
+      // usdzLink: (function () {
+      //   const anchor = document.createElement('a');
+      //   anchor.setAttribute('rel', 'ar');
+      //   anchor.appendChild(document.createElement('img'));
+      //   anchor.setAttribute('href', this.data.usdzData);
+      //   anchor.click();
+      // })
+    });
+    // See also https://github.com/aframevr/aframe/pull/4356
 
 
       // "use strict";
@@ -204,7 +211,7 @@
       function getRandomInt(max) {
         return Math.floor(Math.random() * max);
       }
-      AFRAME.registerComponent('ar-hit-test-spawnNO', {
+      AFRAME.registerComponent('ar-hit-test-spawn_no', {
         schema: {
           mode: {default: 'position'},
         },

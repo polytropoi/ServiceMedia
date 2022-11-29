@@ -1242,6 +1242,27 @@ background-color: #000000;
  }
 
 
+ #ar_overlay {
+  display: none;
+}
+/* Show the DOM Overlay element while active (:xr-overlay pseudoclass) */
+#ar_overlay:xr-overlay {
+  display: initial;
+}
+#ar_greeting {
+  background-color: rgba(1, 1, 1, 0.25);
+  margin: 10px;
+}
+#exit-ar {
+  position: absolute;
+  right: 40px;
+  bottom: 40px;
+  background: rgba(127,127,127,0.25);
+  color: white;
+  border: 1px solid rgba(255,255,255,0.25);
+  padding: 6px 8px;
+  font-weight: bold;
+}
 
       /* div {
         border-radius: 5px;
