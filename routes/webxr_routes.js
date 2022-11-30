@@ -3440,7 +3440,7 @@ webxr_router.get('/:_id', function (req, res) {
                     console.log("sceneWebType: "+ sceneResponse.sceneWebType);
                     if (sceneResponse.sceneWebType == undefined || sceneResponse.sceneWebType.toLowerCase() == "default" || sceneResponse.sceneWebType.toLowerCase() == "aframe") { 
                         // webxrFeatures = "webxr=\x22optionalFeatures: hit-test, local-floor\x22"; //otherwise hit-test breaks everythign!
-                        webxrFeatures = "webxr=\x22requiredFeatures: hit-test,local-floor; optionalFeatures: dom-overlay, unbounded; overlayElement:#ar_overlay;\x22"; //otherwise hit-test breaks everythign!
+                        webxrFeatures = "webxr=\x22requiredFeatures: hit-test, local-floor, dom-overlay; optionalFeatures: unbounded; overlayElement:#ar_overlay;\x22"; //otherwise hit-test breaks everythign!
                         // arHitTest = "ar-hit-test-spawn=\x22mode: "+arMode+"\x22";
                         // arShadowPlane = "<a-plane show-in-ar-mode id="shadow-plane" material="shader:shadow" shadow="cast:false;" visible=\x22false\x22 height=\x2210\x22 width=\x2210\x22 rotation=\x22-90 0 0\x22 shadow=\x22receive:true\x22 ar-shadows=\x22opacity: 0.3\x22 static-body=\x22shape: none\x22 shape__main=\x22shape: box; halfExtents: 100 100 0.125; offset: 0 0 -0.125\x22>" +
                         arShadowPlane = "<a-plane show-in-ar-mode visible=\x22false\x22 id=\x22shadow-plane\x22 material=\x22shader:shadow\x22 shadow=\x22cast:false;\x22 follow-shadow=\x22.activeObjexRay\x22 height=\x2233\x22 width=\x2233\x22 rotation=\x22-90 0 0\x22>" +
@@ -4521,8 +4521,8 @@ webxr_router.get('/:_id', function (req, res) {
                         }
 
                         /////////AFRAME SCENE DECLARATION////////////////// 
-                        let aScene = "<a-scene "+sceneBackground+" "+physicsInsert+" "+pool_target+" "+pool_launcher+" gesture-detector webxr=\x22overlayElement:#overlay\x22 " +
-                        "reflection=\x22directionalLight:#real-light\x22 ar-hit-test=\x22target:#ar_target_object; type:footprint; footprintDepth:0.2;\x22 ar-cursor raycaster=\x22objects: .activeObjexRay\x22 "+
+                        let aScene = "<a-scene "+sceneBackground+" "+physicsInsert+" "+pool_target+" "+pool_launcher+" gesture-detector " +
+                        "reflection=\x22directionalLight:#real-light\x22 ar-hit-test=\x22target:#ar_target_object; type:footprint; footprintDepth:0.1;\x22 ar-cursor raycaster=\x22objects: .activeObjexRay\x22 "+
                         // "screen-controls vr-mode-ui keyboard-shortcuts=\x22enterVR: false\x22" + magicWindow +   
                         " vr-mode-ui keyboard-shortcuts=\x22enterVR: false\x22" +  //add screen-controls from initializer                      
                         webxrFeatures + " shadow=\x22type: pcfsoft\x22 loading-screen=\x22dotsColor: white; backgroundColor: black; enabled: false\x22 embedded " + aframeRenderSettings + " " + fogSettings + " "+networkedscene+" "+ARSceneArg+" listen-for-vr-mode>";
@@ -4682,7 +4682,7 @@ webxr_router.get('/:_id', function (req, res) {
                         locationData +
                         geoScripts +
                         "<script src=\x22../main/js/dialogs.js\x22></script>"+
-                        "<div id=\x22ar_overlay\x22 display=\x22none\x22><span id=\x22ar_greeting\x22>Hi, I'm the DOM Overlay</span><button id=\x22exit_ar\x22>Exit AR</button></div>"+                        
+                        "<div id=\x22ar_overlay\x22><span id=\x22ar_message\x22></span></div>"+                        
                     
                         aScene +
                         "<div id=\x22overlay\x22></div>"+
@@ -4823,6 +4823,7 @@ webxr_router.get('/:_id', function (req, res) {
                         loadLocations +
                         "<a-entity id=\x22createAvatars\x22 create_avatars></a-entity>"+
                         "<a-entity id=\x22particleSpawner\x22 particle_spawner></a-entity>"+
+                        // "<a-entity id=\x22ar_target_object\x22></a-entity>"+  //make ar objects the children of this?
                         audioVizEntity +
                         instancingEntity +
                         arHitTest + 
@@ -4879,7 +4880,7 @@ webxr_router.get('/:_id', function (req, res) {
                         adSquareOverlay +
                         "<div class=\x22next-button\x22 id=\x22nextButton\x22 style=\x22visibility: hidden\x22 onclick=\x22GoToNext()\x22><i class=\x22fas fa-arrow-circle-right fa-2x\x22></i></div>"+
                         "<div class=\x22previous-button\x22 id=\x22previousButton\x22 style=\x22visibility: hidden\x22 onclick=\x22GoToPrevious()\x22><i class=\x22fas fa-arrow-circle-left fa-2x\x22></i></div>"+
-                        "<a href=\x22''\x22 target=\x22_blank\x22 class=\x22ar-buttoon\x22>AR</a>" +
+                        "<a href=\x22''\x22 target=\x22_blank\x22 class=\x22ar-buttoon\x22>AR</a>" + //?
                         
                         "<div id=\x22token\x22 data-token=\x22"+token+"\x22>\n"+
                         

@@ -1249,9 +1249,15 @@ background-color: #000000;
 #ar_overlay:xr-overlay {
   display: initial;
 }
-#ar_greeting {
-  background-color: rgba(1, 1, 1, 0.25);
-  margin: 10px;
+#ar_message {
+  position: absolute;
+      left: 0;
+      bottom: 0;
+      right: 0;
+      padding: 1em;
+      background: #33333355;
+      border-top: 5px solid #ffffff55;
+      color: white;
 }
 #exit_ar {
   position: absolute;
