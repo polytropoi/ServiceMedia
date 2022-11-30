@@ -4682,7 +4682,7 @@ webxr_router.get('/:_id', function (req, res) {
                         locationData +
                         geoScripts +
                         "<script src=\x22../main/js/dialogs.js\x22></script>"+
-                        "<div id=\x22ar_overlay\x22><span id=\x22ar_message\x22></span></div>"+                        
+                        "<div id=\x22ar_overlay\x22><span id=\x22ar_message\x22>Launching AR Mode...</span></div>"+                        
                     
                         aScene +
                         "<div id=\x22overlay\x22></div>"+
