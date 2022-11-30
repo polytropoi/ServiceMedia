@@ -41,60 +41,227 @@
     // See also https://github.com/aframevr/aframe/pull/4356
 
 
-      // "use strict";
-      const direction = new THREE.Vector3();
-
-      AFRAME.registerComponent("ar-cursor", {
-        dependencies: ["raycaster"],
-        init() {
-            // console.log('ar-cursor init');
-          const sceneEl = this.el;
-          sceneEl.addEventListener("enter-vr", () => {
-            if (sceneEl.is("ar-mode")) {
-              sceneEl.xrSession.addEventListener("select", this.onselect.bind(this));
-            }
-          });
-        },
-        onselect(e) {
-          const frame = e.frame;
-          const inputSource = e.inputSource;
-          const referenceSpace = this.el.renderer.xr.getReferenceSpace();
-          const pose = frame.getPose(inputSource.targetRaySpace, referenceSpace);
-          if (!pose) return;
-          const transform = pose.transform;
-          
-          direction.set(0, 0, -1);
-          direction.applyQuaternion(transform.orientation);
-          this.el.setAttribute("raycaster", {
-            origin: transform.position,
-            direction
-          });
-          this.el.components.raycaster.checkIntersections();
-          const els = this.el.components.raycaster.intersectedEls;
-          for (const el of els) {
-            const obj = el.object3D;
-            let elVisible = obj.visible;
-            obj.traverseAncestors(parent => {
-              if (parent.visible === false ) {
-                elVisible = false
+      (function() {
+        "use strict";
+        const direction = new THREE.Vector3();
+      
+        AFRAME.registerComponent("ar-cursor", {
+          dependencies: ["raycaster"],
+          init() {
+            const sceneEl = this.el;
+            sceneEl.addEventListener("enter-vr", () => {
+              if (sceneEl.is("ar-mode")) {
+                sceneEl.xrSession.addEventListener("select", this.onselect.bind(this));
               }
             });
-            if (elVisible) {
-              
-              // Cancel the ar-hit-test behaviours
-              this.el.components['ar-hit-test'].hitTest = null;
-              this.el.components['ar-hit-test'].bboxMesh.visible = false;
-              
-              // Emit click on the element for events
-              const details = this.el.components.raycaster.getIntersection(el);
-              el.emit('click', details);
-              
-              // Don't go to the next element
-              break;
+          },
+          onselect(e) {
+            const frame = e.frame;
+            const inputSource = e.inputSource;
+            const referenceSpace = this.el.renderer.xr.getReferenceSpace();
+            const pose = frame.getPose(inputSource.targetRaySpace, referenceSpace);
+            const transform = pose.transform;
+            
+            direction.set(0, 0, -1);
+            direction.applyQuaternion(transform.orientation);
+            this.el.setAttribute("raycaster", {
+              origin: transform.position,
+              direction
+            });
+            this.el.components.raycaster.checkIntersections();
+            const els = this.el.components.raycaster.intersectedEls;
+            for (const el of els) {
+              const obj = el.object3D;
+              let elVisible = obj.visible;
+              obj.traverseAncestors(parent => {
+                if (parent.visible === false ) {
+                  elVisible = false
+                }
+              });
+              if (elVisible) {
+                
+                // Cancel the ar-hit-test behaviours
+                this.el.components['ar-hit-test'].hitTest = null;
+                this.el.components['ar-hit-test'].bboxMesh.visible = false;
+                
+                // Emit click on the element for events
+                const details = this.el.components.raycaster.getIntersection(el);
+                el.emit('click', details);
+                
+                // Don't go to the next element
+                break;
+              }
+            }
+          }
+        });
+      })();
+
+          /* global AFRAME, THREE */
+    (function () {
+      "use strict";
+      
+      const bbox = new THREE.Box3();
+      const normal = new THREE.Vector3();
+      const cameraWorldPosition = new THREE.Vector3();
+      const tempMat = new THREE.Matrix4();
+      const sphere = new THREE.Sphere();
+      const zeroVector = new THREE.Vector3();
+      const planeVector = new THREE.Vector3();
+      const tempVector = new THREE.Vector3();
+      
+      function distanceOfPointFromPlane(positionOnPlane, planeNormal, p1) {
+        // the d value in the plane equation a*x + b*y + c*z=d
+        const d = planeNormal.dot(positionOnPlane);
+      
+        // distance of point from plane
+        return (d - planeNormal.dot(p1))/planeNormal.length();
+      }
+      
+      function nearestPointInPlane(positionOnPlane, planeNormal, p1, out) {
+        const t = distanceOfPointFromPlane(positionOnPlane, planeNormal, p1);
+        // closest point on the plane
+        out.copy(planeNormal);
+        out.multiplyScalar(t);
+        out.add(p1);
+        return out;
+      }
+      
+      AFRAME.registerGeometry('shadow-plane', {
+        schema: {
+          width: { default: 1, min: 0 },
+          height: { default: 1, min: 0 }
+        },
+      
+        init: function (data) {
+          this.geometry = new THREE.PlaneGeometry(data.width, data.height);
+          this.geometry.rotateX(-Math.PI / 2);
+        }
+      });
+      
+      /**
+        Automatically adjust the view frustum to cover the objects in the scene
+      */
+      AFRAME.registerComponent('auto-shadow-cam', {
+        schema: {
+          targets: {
+            type: 'selectorAll',
+            default: "[ar-shadow-helper]"
+          },
+        },
+        tick() {
+          const camera = this.el.components.light?.light?.shadow?.camera;
+          if (!camera || !this.data.targets.length) return;
+      
+          camera.getWorldDirection(normal);
+          camera.getWorldPosition(cameraWorldPosition);
+          tempMat.copy(camera.matrixWorld);
+          tempMat.invert();
+      
+          camera.near    = 1;
+          camera.left    = 100000;
+          camera.right   = -100000;
+          camera.top     = -100000;
+          camera.bottom  = 100000;
+          for (const el of this.data.targets) {
+            bbox.setFromObject(el.object3D);
+            bbox.getBoundingSphere(sphere);
+            const distanceToPlane = distanceOfPointFromPlane(cameraWorldPosition, normal, sphere.center);
+            const pointOnCameraPlane = nearestPointInPlane(cameraWorldPosition, normal, sphere.center, tempVector);
+      
+            const pointInXYPlane = pointOnCameraPlane.applyMatrix4(tempMat);
+            camera.near    = Math.min(-distanceToPlane - sphere.radius - 1, camera.near);
+            camera.left    = Math.min(-sphere.radius + pointInXYPlane.x, camera.left);
+            camera.right   = Math.max( sphere.radius + pointInXYPlane.x, camera.right);
+            camera.top     = Math.max( sphere.radius + pointInXYPlane.y, camera.top);
+            camera.bottom  = Math.min(-sphere.radius + pointInXYPlane.y, camera.bottom);
+          }
+          camera.updateProjectionMatrix();
+        }
+      });
+        
+      /**
+      It also attatches itself to objects and resizes and positions itself to get the most shadow
+      */
+      AFRAME.registerComponent('ar-shadow-helper', {
+        schema: {
+          target: {
+            type: 'selector',
+          },
+          light: {
+            type: 'selector',
+            default: 'a-light'
+          },
+          startVisibleInAR: {
+            default: true
+          },
+          border: {
+            default: 0.33
+          }
+        },
+        init: function () {
+          var self = this;
+          
+          this.el.object3D.renderOrder = -1;
+      
+          this.el.sceneEl.addEventListener('enter-vr', function () {
+            if (self.el.sceneEl.is('ar-mode')) {
+              self.el.object3D.visible = self.data.startVisibleInAR;
+            }
+          });
+          this.el.sceneEl.addEventListener('exit-vr', function () {
+            self.el.object3D.visible = false;
+          });
+      
+          this.el.sceneEl.addEventListener('ar-hit-test-select-start', function () {
+            // self.el.object3D.visible = false;
+          });
+      
+          this.el.sceneEl.addEventListener('ar-hit-test-select', function () {
+            // self.el.object3D.visible = true;
+          });
+        },
+        tick: function () {
+      
+          const obj = this.el.object3D;
+          const border = this.data.border;
+          const borderWidth = tempVector.set(0,0,0);
+          
+          // Match the size and rotation of the object
+          if (this.data.target) {
+            bbox.setFromObject(this.data.target.object3D);
+            bbox.getSize(obj.scale);
+            borderWidth.copy(obj.scale).multiplyScalar(border);
+            obj.scale.multiplyScalar(1 + border*2);
+            obj.position.copy(this.data.target.object3D.position);
+            obj.quaternion.copy(this.data.target.object3D.quaternion);
+          }
+          
+          // Adjust the plane to get the most shadow
+          if (this.data.light) {
+            const light = this.data.light;
+            const shadow = light.components.light.light.shadow;
+          
+            if (shadow) {
+              const camera = shadow.camera;
+              camera.getWorldDirection(normal);
+          
+              planeVector.set(0,1,0).applyQuaternion(obj.quaternion);
+              const projectionOfCameraDirectionOnPlane = nearestPointInPlane(zeroVector, planeVector, normal, planeVector);
+              if (
+                Math.abs(projectionOfCameraDirectionOnPlane.x) > 0.01 ||
+                Math.abs(projectionOfCameraDirectionOnPlane.y) > 0.01 ||
+                Math.abs(projectionOfCameraDirectionOnPlane.z) > 0.01
+              ) {
+                projectionOfCameraDirectionOnPlane.normalize().multiply(borderWidth);
+                obj.position.add(projectionOfCameraDirectionOnPlane);
+              }
             }
           }
         }
       });
+      }());
+  
+
       AFRAME.registerComponent('ar-init', {
         // Set this object invisible while in AR mode.
         init: function () {
@@ -253,7 +420,7 @@
         }
       });
 
-      AFRAME.registerComponent('mod_ar_hit_test', {
+      AFRAME.registerComponent('mod_ar_spawn', { //no
         schema: {
           mode: {default: 'position'},
         },
@@ -310,13 +477,13 @@
                     clone.classList.add("activeObjexRay");
                     sceneEl.appendChild(clone);
                   }
-                } else {
-                if (this.data.mode == 'position') {
-                  if (target != undefined) {
-                    console.log("tryna reposition target");
-                      target.setAttribute('position', position);
-                    }
-                  }
+                // } else {
+                // if (this.data.mode == 'position') {
+                //   if (this.targetObject != undefined) {
+                //     console.log("tryna reposition target");
+                //     this.targetObject.setAttribute('position', position);
+                //     }
+                //   }
                   
                 }
               });
@@ -363,6 +530,106 @@
         }
       }); 
 
+
+
+
+      AFRAME.registerComponent('ar-hit-test-spawn', {
+        schema: {
+          mode: {default: 'position'},
+        },
+        init: function () { 
+          
+          // webxr=\x22requiredFeatures: hit-test,local-floor;\x22 
+          // if (this.el.sceneEl.is('ar-mode')) {
+          console.log("tryna init ar-hit-test");
+          this.xrHitTestSource = null;
+          this.viewerSpace = null;
+          this.refSpace = null;
+          console.log("arMode is " + this.data.mode);
+          let data = this.data;
+          this.el.sceneEl.renderer.xr.addEventListener('sessionend', (ev) => {
+            this.viewerSpace = null;
+            this.refSpace = null;
+            this.xrHitTestSource = null;
+          });
+          this.el.sceneEl.renderer.xr.addEventListener('sessionstart', (ev) => {
+            let session = this.el.sceneEl.renderer.xr.getSession();
+            // AugPanel("scanning for surfaces..");  
+            console.log("scanning for surfaces..")
+            let element = this.el;
+            // var el = this.el;
+            var sceneEl = document.querySelector('a-scene');
+            
+            if (this.el.sceneEl.is('ar-mode')) {
+
+              session.addEventListener('select', function () {
+                console.log("tryna select!");
+                let position = element.getAttribute('position');
+                // AugPanel("selecting Hit Test Position " + positon);
+                // document.querySelector('.target').setAttribute('position', position);
+                var targets = document.querySelectorAll('.spawn');
+
+                
+                // if (data.mode == 'spawn') {
+                if (targets != undefined && targets != null) {
+                  const index = getRandomInt(targets.length);
+                  console.log("tryna clone a target with index " + index);
+                  var obj = targets[index].getObject3D('mesh');
+
+                  // var clone = targets[index].cloneNode(true);
+                  let clone = document.createElement('a-entity');
+                  let scaleFactor = Math.random();
+                  clone.setObject3D('mesh', obj.clone()); 
+                  clone.setAttribute('position', position);
+                  clone.setAttribute('scale', {scaleFactor, scaleFactor, scaleFactor});
+                  clone.classList.add("activeObjexRay");
+                  sceneEl.appendChild(clone);
+                }
+              
+                // });
+              });
+    
+              if (this.el.sceneEl.is('ar-mode')) {
+                session.requestReferenceSpace('viewer').then((space) => {
+                  this.viewerSpace = space;
+                  session.requestHitTestSource({space: this.viewerSpace})
+                      .then((hitTestSource) => {
+                        this.xrHitTestSource = hitTestSource;
+                      });
+                });
+              }
+              session.requestReferenceSpace('local-floor').then((space) => {
+                  this.refSpace = space;
+              });
+            }
+            // }
+          });
+          // }
+
+        },
+        tick: function () {
+          if (this.el.sceneEl.is('ar-mode')) {
+            if (!this.viewerSpace) return;
+  
+            let frame = this.el.sceneEl.frame;
+            let xrViewerPose = frame.getViewerPose(this.refSpace);
+  
+            if (this.xrHitTestSource && xrViewerPose) {
+              let hitTestResults = frame.getHitTestResults(this.xrHitTestSource);
+              if (hitTestResults.length > 0) {
+                let pose = hitTestResults[0].getPose(this.refSpace);
+  
+                let inputMat = new THREE.Matrix4();
+                inputMat.fromArray(pose.transform.matrix);
+  
+                let position = new THREE.Vector3();
+                position.setFromMatrixPosition(inputMat);
+                this.el.setAttribute('position', position);
+              }
+            }
+          }
+        }
+      }); 
 
 /* global AFRAME, THREE */ 
 //pinch scale/swipe rotate for ar modelz

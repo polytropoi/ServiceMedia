@@ -1979,7 +1979,7 @@ webxr_router.get('/:_id', function (req, res) {
                                         }
                                         if (locMdl.eventData.toLowerCase().includes("spawn")) {
                                             arMode = "spawn";
-
+                                           
                                         }
                                         if (locMdl.eventData.toLowerCase().includes("navmesh")) {
                                             if (locMdl.eventData.toLowerCase().includes("simple navmesh")) {
@@ -3432,13 +3432,16 @@ webxr_router.get('/:_id', function (req, res) {
                     let handsTemplate = "";
                     let aframeRenderSettings = "renderer=\x22antialias: true; logarithmicDepthBuffer: false; colorManagement: true; sortObjects: true; physicallyCorrectLights: true; alpha: true; maxCanvasWidth: 1920; maxCanvasHeight: 1920;\x22";
                    
+                    if (arMode == "spawn") {
+                        arHitTest = "<a-entity show-in-ar-mode visible=\x22false\x22 id=\x22reticleEntity\x22 gltf-model=\x22#reticle2\x22 scale=\x220.8 0.8 0.8\x22 ar-hit-test-spawn=\x22mode: "+arMode+"\x22></a-entity>\n"; //for ar spawning...
+                    }
                     //scenetype filters below...
 
                     console.log("sceneWebType: "+ sceneResponse.sceneWebType);
                     if (sceneResponse.sceneWebType == undefined || sceneResponse.sceneWebType.toLowerCase() == "default" || sceneResponse.sceneWebType.toLowerCase() == "aframe") { 
                         // webxrFeatures = "webxr=\x22optionalFeatures: hit-test, local-floor\x22"; //otherwise hit-test breaks everythign!
                         webxrFeatures = "webxr=\x22requiredFeatures: hit-test,local-floor; optionalFeatures: dom-overlay, unbounded; overlayElement:#ar_overlay;\x22"; //otherwise hit-test breaks everythign!
-                        arHitTest = "mod_ar_hit_test=\x22mode: "+arMode+" target:#ar_target_object;\x22";
+                        // arHitTest = "ar-hit-test-spawn=\x22mode: "+arMode+"\x22";
                         // arShadowPlane = "<a-plane show-in-ar-mode id="shadow-plane" material="shader:shadow" shadow="cast:false;" visible=\x22false\x22 height=\x2210\x22 width=\x2210\x22 rotation=\x22-90 0 0\x22 shadow=\x22receive:true\x22 ar-shadows=\x22opacity: 0.3\x22 static-body=\x22shape: none\x22 shape__main=\x22shape: box; halfExtents: 100 100 0.125; offset: 0 0 -0.125\x22>" +
                         arShadowPlane = "<a-plane show-in-ar-mode visible=\x22false\x22 id=\x22shadow-plane\x22 material=\x22shader:shadow\x22 shadow=\x22cast:false;\x22 follow-shadow=\x22.activeObjexRay\x22 height=\x2233\x22 width=\x2233\x22 rotation=\x22-90 0 0\x22>" +
                             "</a-plane>";
@@ -4381,22 +4384,24 @@ webxr_router.get('/:_id', function (req, res) {
                         // "<a-entity id=\x22navmesh\x22 geometry=\x22primitive: plane; height: 30; width: 30; buffer: true;\x22 rotation=\x22-90 0 0\x22 nav-mesh></a-entity>"+
                         
                         "</div>\n"+ //close maindiv
-                        "<style>\n"+
-                        "a{ color:#fff;\n"+
-                        "text-decoration:none;\n"+
-                        "}\n"+
-                        ".footer {\n"+
-                        "position: fixed;\n"+
-                        "left: 0;\n"+
-                        "bottom: 0;\n"+
-                        "width: 100%;\n"+
-                        "background-color: black;\n"+
-                        "color: white;\n"+
-                        // "text-align: left;\n"+
-                        "font-family: \x22Trebuchet MS\x22, Helvetica, sans-serif\n"+
-                        "}\n"+
-                        "</style>\n"+
+
+                            // "<style>\n"+
+                            // "a{ color:#fff;\n"+
+                            // "text-decoration:none;\n"+
+                            // "}\n"+
+                            // ".footer {\n"+
+                            // "position: fixed;\n"+
+                            // "left: 0;\n"+
+                            // "bottom: 0;\n"+
+                            // "width: 100%;\n"+
+                            // "background-color: black;\n"+
+                            // "color: white;\n"+
+                            // // "text-align: left;\n"+
+                            // "font-family: \x22Trebuchet MS\x22, Helvetica, sans-serif\n"+
+                            // "}\n"+
+                            // "</style>\n"+
                         // "<div class=\x22renderPanel\x22 id=\x22renderPanel\x22></div>\n"+
+
                         sceneTextItemData +
                         "<div id=\x22geopanel\x22 class=\x22geopanel\x22><span></span></div>\n"+
                         // "<div id=\x22sceneGreeting\x22 style=\x22z-index: -20;\x22>"+sceneGreeting+"</div>"+
@@ -4517,7 +4522,7 @@ webxr_router.get('/:_id', function (req, res) {
 
                         /////////AFRAME SCENE DECLARATION////////////////// 
                         let aScene = "<a-scene "+sceneBackground+" "+physicsInsert+" "+pool_target+" "+pool_launcher+" gesture-detector webxr=\x22overlayElement:#overlay\x22 " +
-                        "reflection=\x22directionalLight:#real-light\x22 ar-hit-test=\x22type:footprint; footprintDepth:0.2;\x22 ar-cursor raycaster=\x22objects: .activeObjexRay\x22 "+
+                        "reflection=\x22directionalLight:#real-light\x22 ar-hit-test=\x22target:#ar_target_object; type:footprint; footprintDepth:0.2;\x22 ar-cursor raycaster=\x22objects: .activeObjexRay\x22 "+
                         // "screen-controls vr-mode-ui keyboard-shortcuts=\x22enterVR: false\x22" + magicWindow +   
                         " vr-mode-ui keyboard-shortcuts=\x22enterVR: false\x22" +  //add screen-controls from initializer                      
                         webxrFeatures + " shadow=\x22type: pcfsoft\x22 loading-screen=\x22dotsColor: white; backgroundColor: black; enabled: false\x22 embedded " + aframeRenderSettings + " " + fogSettings + " "+networkedscene+" "+ARSceneArg+" listen-for-vr-mode>";
@@ -4820,7 +4825,7 @@ webxr_router.get('/:_id', function (req, res) {
                         "<a-entity id=\x22particleSpawner\x22 particle_spawner></a-entity>"+
                         audioVizEntity +
                         instancingEntity +
-                        "<a-entity show-in-ar-mode visible=\x22false\x22 id=\x22reticleEntity\x22 gltf-model=\x22#reticle2\x22 scale=\x220.8 0.8 0.8\x22 "+arHitTest+"></a-entity>\n"+ //for ar spawning...
+                        arHitTest + 
                         
                         arShadowPlane +
                         hemiLight +
@@ -4842,21 +4847,21 @@ webxr_router.get('/:_id', function (req, res) {
                         // "<a-entity id=\x22navmesh\x22 geometry=\x22primitive: plane; height: 30; width: 30; buffer: true;\x22 rotation=\x22-90 0 0\x22 nav-mesh></a-entity>"+
                         "</a-scene>\n"+ //CLOSE AFRAME SCENE
                         "</div>\n"+
-                        "<style>\n"+
-                        "a{ color:#fff;\n"+
-                        "text-decoration:none;\n"+
-                        "}\n"+
-                        ".footer {\n"+
-                        "position: fixed;\n"+
-                        "left: 0;\n"+
-                        "bottom: 0;\n"+
-                        "width: 100%;\n"+
-                        "background-color: black;\n"+
-                        "color: white;\n"+
-                        // "text-align: left;\n"+
-                        "font-family: \x22Trebuchet MS\x22, Helvetica, sans-serif\n"+
-                        "}\n"+
-                        "</style>\n"+
+                            // "<style>\n"+
+                            // "a{ color:#fff;\n"+
+                            // "text-decoration:none;\n"+
+                            // "}\n"+
+                            // ".footer {\n"+
+                            // "position: fixed;\n"+
+                            // "left: 0;\n"+
+                            // "bottom: 0;\n"+
+                            // "width: 100%;\n"+
+                            // "background-color: black;\n"+
+                            // "color: white;\n"+
+                            // // "text-align: left;\n"+
+                            // "font-family: \x22Trebuchet MS\x22, Helvetica, sans-serif\n"+
+                            // "}\n"+
+                            // "</style>\n"+
                         // "<div class=\x22renderPanel\x22 id=\x22renderPanel\x22></div>\n"+
                         sceneTextItemData +
                         "<div id=\x22geopanel\x22 class=\x22geopanel\x22><span></span></div>\n"+
