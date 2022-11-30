@@ -4882,6 +4882,12 @@ webxr_router.get('/:_id', function (req, res) {
                         "<div class=\x22previous-button\x22 id=\x22previousButton\x22 style=\x22visibility: hidden\x22 onclick=\x22GoToPrevious()\x22><i class=\x22fas fa-arrow-circle-left fa-2x\x22></i></div>"+
                         "<a href=\x22''\x22 target=\x22_blank\x22 class=\x22ar-buttoon\x22>AR</a>" + //?
                         
+                        "<a-light id=\x22dirlight\x22 auto-shadow-cam intensity=\x220.7\x22 light=\x22castShadow:true;type:directional\x22 position=\x2210 10 10\x22></a-light>"+ //ar light detection
+                        
+                        //This plane is only visible in AR and follows the given target to provide it with shadows.
+                        "<a-entity material=\x22shader:shadow; depthWrite:false; opacity:0.9;\x22 visible=\x22false\x22 geometry=\x22primitive:shadow-plane;\x22 shadow=\x22cast:false;receive:true;\x22" +
+                        " ar-shadow-helper=\x22target:#ar_target_object;light:#dirlight;\x22></a-entity>"+
+
                         "<div id=\x22token\x22 data-token=\x22"+token+"\x22>\n"+
                         
                         // "<div style=\x22float: left; margin: 10px 10px;\x22 onclick=\x22screenCap()\x22><i class=\x22fas fa-camera  fa-2x\x22></i></div>\n"+ 

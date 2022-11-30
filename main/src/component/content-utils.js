@@ -4551,7 +4551,7 @@ AFRAME.registerComponent('mod_model', {
             }
           }
           if (this.data.eventData.toLowerCase().includes("ar_target")) {
-            this.el.id = "ar_target_object";
+            this.el.id = "ar_target_object"; //hrm, physics doesn't like
           }
           if (this.data.eventData.toLowerCase().includes("spawn")) {
             this.el.classList.add("spawn");
@@ -4562,19 +4562,14 @@ AFRAME.registerComponent('mod_model', {
           }
           if (this.data.eventData.toLowerCase().includes("particle")) {
             console.log("tryna spawn a particle!");
-
             this.el.setAttribute('mod_particles', {type: 'fireball'});
-         
           }
           if (this.data.eventData.toLowerCase().includes("fireworks")) {
             console.log("tryna spawn fireworks!");
-
             this.el.setAttribute('fireworks_spawner', {type: 'fireball'});
-         
           }
           if (this.data.eventData.toLowerCase().includes("audiotrigger")) {
             // console.log("gotsa audiotrigg3re!");
-
             // this.el.setAttribute('fireworks_spawner', {type: 'fireball'});
             this.hasAudioTrigger = true;
           }

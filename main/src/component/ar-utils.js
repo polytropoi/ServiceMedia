@@ -41,11 +41,11 @@
     // See also https://github.com/aframevr/aframe/pull/4356
 
 
-      (function() {
-        "use strict";
-        const direction = new THREE.Vector3();
+      // (function() {
+    "use strict";
+    const direction = new THREE.Vector3();
       
-        AFRAME.registerComponent("ar-cursor", {
+    AFRAME.registerComponent("ar-cursor", {
           dependencies: ["raycaster"],
           init() {
             const sceneEl = this.el;
@@ -94,10 +94,9 @@
             }
           }
         });
-      })();
-
+      
           /* global AFRAME, THREE */
-    (function () {
+    // (function () {
       "use strict";
       
       const bbox = new THREE.Box3();
@@ -259,7 +258,7 @@
           }
         }
       });
-      }());
+      
   
 
       AFRAME.registerComponent('ar-init', {
@@ -273,6 +272,20 @@
 
             if (this.el.sceneEl.is('ar-mode')) {
 
+                  // message.textContent = '';
+          
+                  // this.addEventListener('ar-hit-test-start', function () {
+                  //   message.innerHTML = `Scanning environment, finding surface.`
+                  // }, { once: true });
+          
+                  // this.addEventListener('ar-hit-test-achieved', function () {
+                  //   message.innerHTML = `Select the location to place the target<br />By tapping on the screen or selecting with your controller.`
+                  // }, { once: true });
+          
+                  // this.addEventListener('ar-hit-test-select', function () {
+                  //   message.textContent = 'Cool!';
+                  // }, { once: true });
+              
                 // this.el.setAttribute('visible', true);
                 // webxrFeatures = "webxr=\x22requiredFeatures: hit-test, local-floor;\x22"; //otherwise hit-test breaks everythign!
                 // arHitTest = "ar-hit-test=\x22mode: "+arMode+"\x22";
@@ -378,6 +391,7 @@
       function getRandomInt(max) {
         return Math.floor(Math.random() * max);
       }
+     
       AFRAME.registerComponent('ar-hit-test-spawn_no', {
         schema: {
           mode: {default: 'position'},
@@ -887,4 +901,69 @@ AFRAME.registerComponent("gesture-detector", {
 
     return numberNames[Math.min(touchCount, 4) - 1];
   }
+});
+
+/* jshint esversion: 9 */
+/* global THREE, AFRAME */
+
+AFRAME.registerComponent("hide-on-hit-test-start", {
+  init: function() {
+    var self = this;
+    this.el.sceneEl.addEventListener("ar-hit-test-start", function() {
+      self.el.object3D.visible = false;
+    });
+    this.el.sceneEl.addEventListener("exit-vr", function() {
+      self.el.object3D.visible = true;
+    });
+  }
+});
+
+window.addEventListener("DOMContentLoaded", function() {
+  const sceneEl = document.querySelector("a-scene");
+  const message = document.getElementById("dom-overlay-message");
+
+  // If the user taps on any buttons or interactive elements we may add then prevent
+  // Any WebXR select events from firing
+  message.addEventListener("beforexrselect", e => {
+    e.preventDefault();
+  });
+
+  sceneEl.addEventListener("enter-vr", function() {
+    if (this.is("ar-mode")) {
+      // Entered AR
+      message.textContent = "";
+
+      // Hit testing is available
+      this.addEventListener(
+        "ar-hit-test-start",
+        function() {
+          message.innerHTML = `Scanning environment, finding surface.`;
+        },
+        { once: true }
+      );
+
+      // Has managed to start doing hit testing
+      this.addEventListener(
+        "ar-hit-test-achieved",
+        function() {
+          message.innerHTML = `Select the location to place object<br />by tapping on the screen or selecting with your controller.`;
+        },
+        { once: true }
+      );
+
+      // User has placed an object
+      this.addEventListener(
+        "ar-hit-test-select",
+        function() {
+          // Object placed for the first time
+          message.textContent = "Well done!";
+        },
+        { once: true }
+      );
+    }
+  });
+
+  sceneEl.addEventListener("exit-vr", function() {
+    message.textContent = "Exited Immersive Mode";
+  });
 });
