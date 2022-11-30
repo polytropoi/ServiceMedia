@@ -392,47 +392,47 @@
         return Math.floor(Math.random() * max);
       }
      
-      AFRAME.registerComponent('ar-hit-test-spawn_no', {
-        schema: {
-          mode: {default: 'position'},
-        },
-        init: function () { 
+      // AFRAME.registerComponent('ar-hit-test-spawn_no', {
+      //   schema: {
+      //     mode: {default: 'position'},
+      //   },
+      //   init: function () { 
          
-          sceneEl.addEventListener('enter-vr', (e) => {
-            if (this.el.sceneEl.is('ar-mode')) {
-              var target = document.querySelector('.spawn');
+      //     sceneEl.addEventListener('enter-vr', (e) => {
+      //       if (this.el.sceneEl.is('ar-mode')) {
+      //         var target = document.querySelector('.spawn');
 
-              // message.textContent = '';
-              this.el.addEventListener('ar-hit-test-start', (e) => {
-                // message.innerHTML = `Scanning environment, finding surface.`
-                Debug.Log("Scanning environment, finding surface.");
-              }, { once: true });
-              this.el.addEventListener('ar-hit-test-achieved', (e) => {
-                // message.innerHTML = `Select the location to place the furniture. By tapping on the screen or selecting with your controller.`
-                Debug.Log("Select the location to place the furniture. By tapping on the screen or selecting with your controller.");
+      //         // message.textContent = '';
+      //         this.el.addEventListener('ar-hit-test-start', (e) => {
+      //           // message.innerHTML = `Scanning environment, finding surface.`
+      //           Debug.Log("Scanning environment, finding surface.");
+      //         }, { once: true });
+      //         this.el.addEventListener('ar-hit-test-achieved', (e) => {
+      //           // message.innerHTML = `Select the location to place the furniture. By tapping on the screen or selecting with your controller.`
+      //           Debug.Log("Select the location to place the furniture. By tapping on the screen or selecting with your controller.");
                
-              }, { once: true });
-              this.el.addEventListener('ar-hit-test-select', function () {
-                Debug.Log("tryna place object");
-                if (target != undefined && target != null) {
-                  let position = this.el.getAttribute('position');
-                  // const index = getRandomInt(targets.length);
-                  console.log("tryna clone a target at position " + position);
-                  var obj = target.getObject3D('mesh');
+      //         }, { once: true });
+      //         this.el.addEventListener('ar-hit-test-select', function () {
+      //           Debug.Log("tryna place object");
+      //           if (target != undefined && target != null) {
+      //             let position = this.el.getAttribute('position');
+      //             // const index = getRandomInt(targets.length);
+      //             console.log("tryna clone a target at position " + position);
+      //             var obj = target.getObject3D('mesh');
       
-                  // var clone = targets[index].cloneNode(true);
-                  let clone = document.createElement('a-entity');
-                  clone.setObject3D('mesh', obj.clone()); 
-                  clone.setAttribute('position', position);
-                  clone.classList.add("activeObjexRay");
-                  sceneEl.appendChild(clone);
-                }
-              }, { once: false });
-            }
-          });
+      //             // var clone = targets[index].cloneNode(true);
+      //             let clone = document.createElement('a-entity');
+      //             clone.setObject3D('mesh', obj.clone()); 
+      //             clone.setAttribute('position', position);
+      //             clone.classList.add("activeObjexRay");
+      //             sceneEl.appendChild(clone);
+      //           }
+      //         }, { once: false });
+      //       }
+      //     });
 
-        }
-      });
+      //   }
+      // });
 
       // AFRAME.registerComponent('mod_ar_spawn', { //no
       //   schema: {
@@ -918,26 +918,29 @@ AFRAME.registerComponent("hide-on-hit-test-start", {
   }
 });
 
+/* hrm...
 window.addEventListener("DOMContentLoaded", function() {
   const sceneEl = document.querySelector("a-scene");
-  const message = document.getElementById("ar_overlay");
+  const ar_overlay = document.getElementById("ar_overlay");
 
   // If the user taps on any buttons or interactive elements we may add then prevent
   // Any WebXR select events from firing
-  message.addEventListener("beforexrselect", e => {
-    e.preventDefault();
-  });
+  if (ar_overlay) {
+    ar_overlay.addEventListener("beforexrselect", e => {
+      e.preventDefault();
+    });
+  }
 
   sceneEl.addEventListener("enter-vr", function() {
     if (this.is("ar-mode")) {
       // Entered AR
-      message.textContent = "";
+      ar_overlay.textContent = "";
 
       // Hit testing is available
       this.addEventListener(
         "ar-hit-test-start",
         function() {
-          message.innerHTML = `Scanning environment, finding surface.`;
+          ar_overlay.innerHTML = `Scanning environment, finding surface.`;
         },
         { once: true }
       );
@@ -946,7 +949,7 @@ window.addEventListener("DOMContentLoaded", function() {
       this.addEventListener(
         "ar-hit-test-achieved",
         function() {
-          message.innerHTML = `Select the location to place object<br />by tapping on the screen or selecting with your controller.`;
+          ar_overlay.innerHTML = `Select the location to place object<br />by tapping on the screen or selecting with your controller.`;
         },
         { once: true }
       );
@@ -956,7 +959,7 @@ window.addEventListener("DOMContentLoaded", function() {
         "ar-hit-test-select",
         function() {
           // Object placed for the first time
-          message.textContent = "Well done!";
+          ar_overlay.textContent = "Well done!";
         },
         { once: true }
       );
@@ -964,6 +967,7 @@ window.addEventListener("DOMContentLoaded", function() {
   });
 
   sceneEl.addEventListener("exit-vr", function() {
-    message.textContent = "Exited Immersive Mode";
+    ar_overlay.textContent = "Exited Immersive Mode";
   });
 });
+*/
