@@ -434,115 +434,115 @@
         }
       });
 
-      AFRAME.registerComponent('mod_ar_spawn', { //no
-        schema: {
-          mode: {default: 'position'},
-        },
-        init: function () { 
+      // AFRAME.registerComponent('mod_ar_spawn', { //no
+      //   schema: {
+      //     mode: {default: 'position'},
+      //   },
+      //   init: function () { 
           
-          // webxr=\x22requiredFeatures: hit-test,local-floor;\x22 
-          // if (this.el.sceneEl.is('ar-mode')) {
-          console.log("tryna init ar-hit-test");
-          this.xrHitTestSource = null;
-          this.viewerSpace = null;
-          this.refSpace = null;
-          console.log("arMode is " + this.data.mode);
+      //     // webxr=\x22requiredFeatures: hit-test,local-floor;\x22 
+      //     // if (this.el.sceneEl.is('ar-mode')) {
+      //     console.log("tryna init ar-hit-test");
+      //     this.xrHitTestSource = null;
+      //     this.viewerSpace = null;
+      //     this.refSpace = null;
+      //     console.log("arMode is " + this.data.mode);
 
-          this.spawnObjects = document.querySelectorAll('.spawn');
-          this.targetObject = document.querySelectorAll(".ar_target_object");
+      //     this.spawnObjects = document.querySelectorAll('.spawn');
+      //     // this.targetObject = document.querySelectorAll(".ar_target_object");
 
-          this.el.sceneEl.renderer.xr.addEventListener('sessionend', (ev) => {
-            this.viewerSpace = null;
-            this.refSpace = null;
-            this.xrHitTestSource = null;
-          });
+      //     this.el.sceneEl.renderer.xr.addEventListener('sessionend', (ev) => {
+      //       this.viewerSpace = null;
+      //       this.refSpace = null;
+      //       this.xrHitTestSource = null;
+      //     });
           
           
-          this.el.sceneEl.renderer.xr.addEventListener('sessionstart', (ev) => {
-            let session = this.el.sceneEl.renderer.xr.getSession();
-            // AugPanel("scanning for surfaces..");  
-            console.log("scanning for surfaces..")
-            let element = this.el;
-            // var el = this.el;
-            var sceneEl = document.querySelector('a-scene');
+      //     this.el.sceneEl.renderer.xr.addEventListener('sessionstart', (ev) => {
+      //       let session = this.el.sceneEl.renderer.xr.getSession();
+      //       // AugPanel("scanning for surfaces..");  
+      //       console.log("scanning for surfaces..")
+      //       let element = this.el;
+      //       // var el = this.el;
+      //       var sceneEl = document.querySelector('a-scene');
             
-            if (this.el.sceneEl.is('ar-mode')) {
+      //       if (this.el.sceneEl.is('ar-mode')) {
 
-              session.addEventListener('select', function () {
-                console.log("tryna select!");
-                let position = element.getAttribute('position');
-                // AugPanel("selecting Hit Test Position " + positon);
-                // document.querySelector('.target').setAttribute('position', position);
+      //         session.addEventListener('select', function () {
+      //           console.log("tryna select!");
+      //           let position = element.getAttribute('position');
+      //           // AugPanel("selecting Hit Test Position " + positon);
+      //           // document.querySelector('.target').setAttribute('position', position);
 
 
                 
-                if (this.data.mode == 'spawn') {
-                  if (spawnObjects != undefined && spawnObjects != null) {
-                    const index = getRandomInt(spawnObjects.length);
-                    console.log("tryna clone a target with index " + index);
-                    var obj = spawnObjects[index].getObject3D('mesh');
+      //           if (this.data.mode == 'spawn') {
+      //             if (spawnObjects != undefined && spawnObjects != null) {
+      //               const index = getRandomInt(spawnObjects.length);
+      //               console.log("tryna clone a target with index " + index);
+      //               var obj = spawnObjects[index].getObject3D('mesh');
 
       
-                    let clone = document.createElement('a-entity');
-                    let scaleFactor = Math.random();
-                    clone.setObject3D('mesh', obj.clone()); 
-                    clone.setAttribute('position', position);
-                    clone.setAttribute('scale', {scaleFactor, scaleFactor, scaleFactor});
-                    clone.classList.add("activeObjexRay");
-                    sceneEl.appendChild(clone);
-                  }
-                // } else {
-                // if (this.data.mode == 'position') {
-                //   if (this.targetObject != undefined) {
-                //     console.log("tryna reposition target");
-                //     this.targetObject.setAttribute('position', position);
-                //     }
-                //   }
+      //               let clone = document.createElement('a-entity');
+      //               let scaleFactor = Math.random();
+      //               clone.setObject3D('mesh', obj.clone()); 
+      //               clone.setAttribute('position', position);
+      //               clone.setAttribute('scale', {scaleFactor, scaleFactor, scaleFactor});
+      //               clone.classList.add("activeObjexRay");
+      //               sceneEl.appendChild(clone);
+      //             }
+      //           // } else {
+      //           // if (this.data.mode == 'position') {
+      //           //   if (this.targetObject != undefined) {
+      //           //     console.log("tryna reposition target");
+      //           //     this.targetObject.setAttribute('position', position);
+      //           //     }
+      //           //   }
                   
-                }
-              });
+      //           }
+      //         });
     
-              if (this.el.sceneEl.is('ar-mode')) {
-                session.requestReferenceSpace('viewer').then((space) => {
-                  this.viewerSpace = space;
-                  session.requestHitTestSource({space: this.viewerSpace})
-                      .then((hitTestSource) => {
-                        this.xrHitTestSource = hitTestSource;
-                      });
-                });
-              }
-              session.requestReferenceSpace('local-floor').then((space) => {
-                  this.refSpace = space;
-              });
-            }
-            // }
-          });
-          // }
+      //         if (this.el.sceneEl.is('ar-mode')) {
+      //           session.requestReferenceSpace('viewer').then((space) => {
+      //             this.viewerSpace = space;
+      //             session.requestHitTestSource({space: this.viewerSpace})
+      //                 .then((hitTestSource) => {
+      //                   this.xrHitTestSource = hitTestSource;
+      //                 });
+      //           });
+      //         }
+      //         session.requestReferenceSpace('local-floor').then((space) => {
+      //             this.refSpace = space;
+      //         });
+      //       }
+      //       // }
+      //     });
+      //     // }
 
-        },
-        tick: function () {
-          if (this.el.sceneEl.is('ar-mode')) {
-            if (!this.viewerSpace) return;
+      //   },
+      //   tick: function () {
+      //     if (this.el.sceneEl.is('ar-mode')) {
+      //       if (!this.viewerSpace) return;
   
-            let frame = this.el.sceneEl.frame;
-            let xrViewerPose = frame.getViewerPose(this.refSpace);
+      //       let frame = this.el.sceneEl.frame;
+      //       let xrViewerPose = frame.getViewerPose(this.refSpace);
   
-            if (this.xrHitTestSource && xrViewerPose) {
-              let hitTestResults = frame.getHitTestResults(this.xrHitTestSource);
-              if (hitTestResults.length > 0) {
-                let pose = hitTestResults[0].getPose(this.refSpace);
+      //       if (this.xrHitTestSource && xrViewerPose) {
+      //         let hitTestResults = frame.getHitTestResults(this.xrHitTestSource);
+      //         if (hitTestResults.length > 0) {
+      //           let pose = hitTestResults[0].getPose(this.refSpace);
   
-                let inputMat = new THREE.Matrix4();
-                inputMat.fromArray(pose.transform.matrix);
+      //           let inputMat = new THREE.Matrix4();
+      //           inputMat.fromArray(pose.transform.matrix);
   
-                let position = new THREE.Vector3();
-                position.setFromMatrixPosition(inputMat);
-                this.el.setAttribute('position', position);
-              }
-            }
-          }
-        }
-      }); 
+      //           let position = new THREE.Vector3();
+      //           position.setFromMatrixPosition(inputMat);
+      //           this.el.setAttribute('position', position);
+      //         }
+      //       }
+      //     }
+      //   }
+      // }); 
 
 
 
