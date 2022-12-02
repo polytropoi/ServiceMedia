@@ -34,6 +34,24 @@ webxr_router.get("/test", function (req, res) {
     res.send("OK!");
 });    
 
+function hexToRgb(c){
+    if(/^#([a-f0-9]{3}){1,2}$/.test(c)){
+        if(c.length== 4){
+            c= '#'+[c[1], c[1], c[2], c[2], c[3], c[3]].join('');
+        }
+        c= '0x'+c.substring(1);
+        return ''+[(c>>16)&255, (c>>8)&255, c&255].join(',')+')';
+        // return ""+(c>>16)&255+ ", "+(c>>8)&255+ ", "+ c&255+"";
+    }
+    return '';
+}
+function HexToRgbValues (c) {
+    var aRgbHex = '1502BE'.match(/.{1,2}/g);
+    var aRgb = parseInt(aRgbHex[0], 16) + " " + parseInt(aRgbHex[1], 16) + " " +  parseInt(aRgbHex[2], 16);
+console.log(aRgb); //[21, 2, 190]
+    return aRgb;
+}
+
 ////////////////////PRIMARY SERVERSIDE /WEBXR ROUTE///////////////////
 webxr_router.get('/:_id', function (req, res) { 
     let db = req.app.get('db');
@@ -1154,6 +1172,9 @@ webxr_router.get('/:_id', function (req, res) {
                                 if (sceneResponse.sceneUseFloorPlane && sceneResponse.sceneFloorplaneTexture == "none") {
                                     ground = "ground: none; dressing: none;"
                                 }
+                                if (sceneResponse.sceneUseFloorPlane && sceneResponse.sceneFloorplaneTexture.toLowerCase() == "flat") {
+                                    ground = "ground: flat; dressing: none;"
+                                }
                                 if (sceneResponse.sceneUseDynamicShadows) {
                                     shadow = "shadow: true;"
                                 }
@@ -1185,6 +1206,9 @@ webxr_router.get('/:_id', function (req, res) {
                                 aframeEnvironment = "<a-entity id=\x22enviroEl\x22 environment=\x22preset: "+webxrEnv+"; "+ground+" "+fog+" "+shadow+" "+groundcolor+" "+dressingcolor+" "+groundcolor2+" "+skycolor+" "+horizoncolor+" playArea: 15; lighting: distant; lightPosition: -5 10 0;\x22 hide-in-ar-mode "+tweakColors+"></a-entity>";
                                 // environment = "<a-entity environment=\x22preset: "+webxrEnv+"; "+fog+" "+shadow+" "+groundcolor+" "+dressingcolor+" "+groundcolor2+" "+skycolor+" "+horizoncolor+" playArea: 3; lightPosition: 0 2.15 0\x22 hide-in-ar-mode></a-entity>";
                             } else {
+                                // aframeEnvironment =  "<a-gradient-sky material=\x22shader: gradient; topColor: "+HexToRgbValues(sceneResponse.sceneColor1)+"; bottomColor: "+HexToRgbValues(sceneResponse.sceneColor2)+";\x22></a-gradient-sky>";
+                                // aframeEnvironment =  "<a-gradient-sky material=\x22shader: gradient; topColor:0 1 0; bottomColor:1 0 0;\x22></a-gradient-sky>";
+                                aframeEnvironment = "<a-sky color="+sceneResponse.sceneColor1+"></a-sky>";
                                 hemiLight = "<a-light id=\x22hemi-light\x22 type=\x22hemisphere\x22 color=\x22" + sceneResponse.sceneColor1 + "\x22 groundColor=\x22" + sceneResponse.sceneColor2 + "\x22 intensity=\x22.5\x22 position\x220 0 0\x22>"+
                                     "</a-light>";
                             }
@@ -3440,7 +3464,7 @@ webxr_router.get('/:_id', function (req, res) {
                     console.log("sceneWebType: "+ sceneResponse.sceneWebType);
                     if (sceneResponse.sceneWebType == undefined || sceneResponse.sceneWebType.toLowerCase() == "default" || sceneResponse.sceneWebType.toLowerCase() == "aframe") { 
                         // webxrFeatures = "webxr=\x22optionalFeatures: hit-test, local-floor\x22"; //otherwise hit-test breaks everythign!
-                        webxrFeatures = "webxr=\x22requiredFeatures: hit-test, local-floor, dom-overlay; optionalFeatures: unbounded; overlayElement:#ar_overlay;\x22"; //otherwise hit-test breaks everythign!
+                        webxrFeatures = "webxr=\x22optionalFeatures: hit-test, local-floor, dom-overlay, unbounded; overlayElement:#ar_overlay;\x22"; //otherwise hit-test breaks everythign!
                         // arHitTest = "ar-hit-test-spawn=\x22mode: "+arMode+"\x22";
                         // arShadowPlane = "<a-plane show-in-ar-mode id="shadow-plane" material="shader:shadow" shadow="cast:false;" visible=\x22false\x22 height=\x2210\x22 width=\x2210\x22 rotation=\x22-90 0 0\x22 shadow=\x22receive:true\x22 ar-shadows=\x22opacity: 0.3\x22 static-body=\x22shape: none\x22 shape__main=\x22shape: box; halfExtents: 100 100 0.125; offset: 0 0 -0.125\x22>" +
                         arShadowPlane = "<a-plane show-in-ar-mode visible=\x22false\x22 id=\x22shadow-plane\x22 material=\x22shader:shadow\x22 shadow=\x22cast:false;\x22 follow-shadow=\x22.activeObjexRay\x22 height=\x2233\x22 width=\x2233\x22 rotation=\x22-90 0 0\x22>" +
@@ -4652,6 +4676,8 @@ webxr_router.get('/:_id', function (req, res) {
 
 
                         "<script src=\x22../main/src/component/mod-materials.js\x22></script>"+
+
+                        // "<script src=\x22../main/src/component/aframe-gradientsky.min.js\x22></script>"+
                         "<script src=\x22../main/src/component/ar-utils.js\x22></script>"+
                         "<script src=\x22../main/src/component/spawn-in-circle.js\x22></script>"+
                         // "<script src=\x22/main/vendor/jquery/jquery.min.js\x22></script>" +
@@ -4682,8 +4708,8 @@ webxr_router.get('/:_id', function (req, res) {
                         locationData +
                         geoScripts +
                         "<script src=\x22../main/js/dialogs.js\x22></script>"+
-                        
-                        // "<div id=\x22ar_overlay\x22><span id=\x22ar_message\x22>Launching AR Mode...</span></div>"+                        
+
+                        "<div id=\x22ar_overlay\x22><span id=\x22ar_message\x22></span></div>"+                        
                     
                         aScene +
                         "<div id=\x22overlay\x22></div>"+

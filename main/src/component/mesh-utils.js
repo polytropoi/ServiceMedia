@@ -3104,14 +3104,15 @@ AFRAME.registerComponent('mod_tunnel', {
 
       if (picGroupMangler != null && picGroupMangler != undefined) {
         this.tileablePicData = picGroupMangler.components.picture_groups_control.returnTileableData();
-        this.texture = new THREE.TextureLoader().load( this.tileablePicData.images[0].url );
+        let picIndex = Math.floor(Math.random()*this.tileablePicData.images.length);
+        this.texture = new THREE.TextureLoader().load( this.tileablePicData.images[picIndex].url );
         this.texture.encoding = THREE.sRGBEncoding;
         this.geometry = new THREE.BufferGeometry();    
         this.vertArray = this.curve.getPoints(70);
         this.geometry = new THREE.BufferGeometry().setFromPoints( this.curve.getPoints(70) );
 
         this.splineMesh = new THREE.Line(this.geometry, new THREE.LineBasicMaterial()); //another line to mod the vertexes
-        this.tubeGeometry = new THREE.TubeBufferGeometry(this.curve, 70, 5, 50, false);
+        this.tubeGeometry = new THREE.TubeBufferGeometry(this.curve, 70, 10, 50, false);
         this.tubeMaterial = new THREE.MeshStandardMaterial({
         side: THREE.BackSide, // Since the camera will be inside the tube we need to reverse the faces
         map: this.texture, 
@@ -3128,6 +3129,28 @@ AFRAME.registerComponent('mod_tunnel', {
       } else {
         console.log("no pic");
       }
+    },
+    randomTexture: function() {
+      let picIndex = Math.floor(Math.random()*this.tileablePicData.images.length);
+        this.texture = new THREE.TextureLoader().load( this.tileablePicData.images[picIndex].url );
+        this.texture.encoding = THREE.sRGBEncoding;
+        this.geometry = new THREE.BufferGeometry();    
+        this.vertArray = this.curve.getPoints(70);
+        this.geometry = new THREE.BufferGeometry().setFromPoints( this.curve.getPoints(70) );
+
+        this.splineMesh = new THREE.Line(this.geometry, new THREE.LineBasicMaterial()); //another line to mod the vertexes
+        this.tubeGeometry = new THREE.TubeBufferGeometry(this.curve, 70, 10, 50, false);
+        this.tubeMaterial = new THREE.MeshStandardMaterial({
+        side: THREE.BackSide, // Since the camera will be inside the tube we need to reverse the faces
+        map: this.texture, 
+        transparent: true
+        });
+        // Repeat the pattern to prevent the texture being stretched
+        this.tubeMaterial.map.wrapS = THREE.RepeatWrapping;
+        this.tubeMaterial.map.wrapT = THREE.RepeatWrapping;
+        this.tubeMaterial.map.repeat.set(4, 2);
+        // Create a mesh based on tubeGeometry and tubeMaterial
+        this.tubeMesh = new THREE.Mesh(this.tubeGeometry, this.tubeMaterial);
     },
     // from https://github.com/Mamboleoo/InfiniteTubes/blob/master/js/demo6.js
     updateCurve: function() {
@@ -3330,17 +3353,25 @@ AFRAME.registerComponent('mod_line', {
       // }
       // this.splineMesh.geometry.attributes.position.needsUpdate = true;
 
-      this.fraction += 0.05;
+      this.fraction += 0.1;
       if ( this.fraction > 1) {
 
         // if (this.data.showLine) {
           this.fraction = 0;
-          this.pointsCopy[1].x =-Math.round(Math.random()) * (Math.round(Math.random()) ? 1 : -1);
-          this.pointsCopy[1].y =-Math.round(Math.random()) * (Math.round(Math.random()) ? 1 : -1);
-          this.pointsCopy[2].x =Math.round(Math.random()) * (Math.round(Math.random()) ? 1 : -1);
-          this.pointsCopy[2].y =Math.round(Math.random()) * (Math.round(Math.random()) ? 1 : -1);
-          this.pointsCopy[3].x =-Math.round(Math.random()) * (Math.round(Math.random()) ? 1 : -1);
-          this.pointsCopy[3].y =-Math.round(Math.random()) * (Math.round(Math.random()) ? 1 : -1);
+          // this.pointsCopy[1].x =-Math.round(Math.random()) * (Math.round(Math.random()) ? 1 : -1);
+          // this.pointsCopy[1].y =-Math.round(Math.random()) * (Math.round(Math.random()) ? 1 : -1);
+          // this.pointsCopy[2].x =Math.round(Math.random()) * (Math.round(Math.random()) ? 1 : -1);
+          // this.pointsCopy[2].y =Math.round(Math.random()) * (Math.round(Math.random()) ? 1 : -1);
+          // this.pointsCopy[3].x =-Math.round(Math.random()) * (Math.round(Math.random()) ? 1 : -1);
+          // this.pointsCopy[3].y =-Math.round(Math.random()) * (Math.round(Math.random()) ? 1 : -1);
+          
+          this.pointsCopy[1].x = Math.round(Math.random()) * (Math.round(Math.random()) ? 1 : -1);
+          this.pointsCopy[1].y = Math.round(Math.random()) * (Math.round(Math.random()) ? 1 : -1);
+          this.pointsCopy[2].x = Math.round(Math.random()) * (Math.round(Math.random()) ? 1 : -1);
+          this.pointsCopy[2].y = Math.round(Math.random()) * (Math.round(Math.random()) ? 1 : -1);
+          this.pointsCopy[3].x = Math.round(Math.random()) * (Math.round(Math.random()) ? 1 : -1);
+          this.pointsCopy[3].y = Math.round(Math.random()) * (Math.round(Math.random()) ? 1 : -1);
+
           this.points[0].lerpVectors(this.pointsTemp[0], this.pointsCopy[0], 0.1); 
           this.points[1].lerpVectors(this.pointsTemp[1], this.pointsCopy[1], 0.1); 
           this.points[2].lerpVectors(this.pointsTemp[2], this.pointsCopy[2], 0.1); 
@@ -3371,3 +3402,57 @@ AFRAME.registerComponent('mod_line', {
       }
     }
 });
+
+// AFRAME.registerShader('gradient', {
+//   schema: {
+//     topColor: {type: 'vec3', default: '1 0 0', is: 'uniform'},
+//     bottomColor: {type: 'vec3', default: '0 0 1', is: 'uniform'},
+//     offset: {type: 'float', default: '400', is: 'uniform'},
+//     exponent: {type: 'float', default: '0.6', is: 'uniform'}
+//   },
+//   vertexShader: [
+//     'varying vec3 vWorldPosition;',
+
+//     'void main() {',
+
+//     'vec4 worldPosition = modelMatrix * vec4( position, 1.0 );',
+//     'vWorldPosition = worldPosition.xyz;',
+
+//      'gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0 );',
+
+//     '}'
+//   ].join('\n'),
+//   fragmentShader: [
+//     'uniform vec3 bottomColor;',
+//     'uniform vec3 topColor;',
+//     'uniform float offset;',
+//     'uniform float exponent;',
+//     'varying vec3 vWorldPosition;',
+//     'void main() {',
+//     ' float h = normalize( vWorldPosition + offset ).y;',
+//     ' gl_FragColor = vec4( mix( bottomColor, topColor, max( pow( max(h, 0.0 ), exponent ), 0.0 ) ), 1.0 );',
+//     '}'
+//   ].join('\n')
+// });
+
+// AFRAME.registerPrimitive('a-gradient-sky', {
+//   defaultComponents: {
+//     geometry: {
+//       primitive: 'sphere',
+//       radius: 5000,
+//       segmentsWidth: 64,
+//       segmentsHeight: 20
+//     },
+//     material: {
+//       shader: 'gradient'
+//     },
+//     scale: '-1 1 1'
+//   },
+
+//   mappings: {
+//     topColor: 'material.topColor',
+//     bottomColor: 'material.bottomColor',
+//     offset: 'material.offset',
+//     exponent: 'material.exponent'
+//   }
+// });

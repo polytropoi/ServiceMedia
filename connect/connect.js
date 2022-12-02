@@ -644,8 +644,18 @@ function GoToNext() {
       if (skyboxEl != null) {
          skyboxEl.components.skybox_dynamic.nextSkybox();
       }
+      // let tunnels = document.getElementsByTagName("mod_tunnel");
+         // let tunnels = document.querySelectorAll("[shadow]")
+         // if (tunnels) {
+         //    for (let i = 0; i < tunnels.length; i++) {
+         //       console.log("gotsa tunnel tryna switch texture...");
+         //       tunnels[i].el.components.mod_tunnel.randomTexture();
+         //    }
+         // }
+         
    }
 }
+// }
 function GoToPrevious() {
 
    if (window.sceneType == "mapbox") {

@@ -1040,13 +1040,29 @@ AFRAME.registerComponent('primary_audio_events', {
 
         // console.log(JSON.stringify(timekeys));
         } 
-        SetPrimaryAudioEventsData();
+        SetPrimaryAudioEventsDataAFrame();
     },
     currentAudioTime: function(audioTime) {
         console.log("audiotime : " + audioTime);
     }
 });
 
+function SetPrimaryAudioEventsDataAFrame () { //dupe of the one in connect.js, but it needs to be here to catch the one above
+
+    timeKeysData = JSON.parse(localStorage.getItem(room+ "_timeKeys"));
+    tkStarttimes = [];
+    if (timeKeysData != undefined && timeKeysData != null && timeKeysData.timekeys != undefined && timeKeysData.timekeys.length > 0 )
+       timeKeysData.timekeys.forEach(function (timekey) {
+       tkStarttimes.push(parseFloat(timekey.keystarttime).toFixed(2));
+    });
+    tkStarttimes.sort(function(a, b){
+       return a - b;
+    });
+ 
+    timedEventsListenerMode = "Primary Audio"; 
+    TimedEventListener();
+ 
+ }
 // AFRAME.registerComponent('primary_audio_analyzer', {
 
 //     schema: {
