@@ -3087,6 +3087,8 @@ AFRAME.registerComponent('mod_tunnel', {
       this.axis = new THREE.Vector3();
       this.points = [];
       this.speed = .001;
+      this.picModIndex = 0;
+      this.texture = null;
       // Define points along Z axis
       for (var i = 0; i < 5; i += 1) {
         this.points.push(new THREE.Vector3(0, 0, -100 * (i / 4)));
@@ -3102,6 +3104,8 @@ AFRAME.registerComponent('mod_tunnel', {
       // this.objectToCurve = new THREE.Mesh( cgeometry, cmaterial );
       let picGroupMangler = document.getElementById("pictureGroupsData");
 
+
+
       if (picGroupMangler != null && picGroupMangler != undefined) {
         this.tileablePicData = picGroupMangler.components.picture_groups_control.returnTileableData();
         let picIndex = Math.floor(Math.random()*this.tileablePicData.images.length);
@@ -3114,9 +3118,9 @@ AFRAME.registerComponent('mod_tunnel', {
         this.splineMesh = new THREE.Line(this.geometry, new THREE.LineBasicMaterial()); //another line to mod the vertexes
         this.tubeGeometry = new THREE.TubeBufferGeometry(this.curve, 70, 10, 50, false);
         this.tubeMaterial = new THREE.MeshStandardMaterial({
-        side: THREE.BackSide, // Since the camera will be inside the tube we need to reverse the faces
-        map: this.texture, 
-        transparent: true
+          side: THREE.BackSide, // Since the camera will be inside the tube we need to reverse the faces
+          map: this.texture, 
+          transparent: true
         });
         // Repeat the pattern to prevent the texture being stretched
         this.tubeMaterial.map.wrapS = THREE.RepeatWrapping;
@@ -3131,26 +3135,12 @@ AFRAME.registerComponent('mod_tunnel', {
       }
     },
     randomTexture: function() {
-      let picIndex = Math.floor(Math.random()*this.tileablePicData.images.length);
+        let picIndex = Math.floor(Math.random()*this.tileablePicData.images.length);
         this.texture = new THREE.TextureLoader().load( this.tileablePicData.images[picIndex].url );
-        this.texture.encoding = THREE.sRGBEncoding;
-        this.geometry = new THREE.BufferGeometry();    
-        this.vertArray = this.curve.getPoints(70);
-        this.geometry = new THREE.BufferGeometry().setFromPoints( this.curve.getPoints(70) );
-
-        this.splineMesh = new THREE.Line(this.geometry, new THREE.LineBasicMaterial()); //another line to mod the vertexes
-        this.tubeGeometry = new THREE.TubeBufferGeometry(this.curve, 70, 10, 50, false);
-        this.tubeMaterial = new THREE.MeshStandardMaterial({
-        side: THREE.BackSide, // Since the camera will be inside the tube we need to reverse the faces
-        map: this.texture, 
-        transparent: true
-        });
-        // Repeat the pattern to prevent the texture being stretched
+        this.tubeMaterial.map = this.texture;
         this.tubeMaterial.map.wrapS = THREE.RepeatWrapping;
         this.tubeMaterial.map.wrapT = THREE.RepeatWrapping;
         this.tubeMaterial.map.repeat.set(4, 2);
-        // Create a mesh based on tubeGeometry and tubeMaterial
-        this.tubeMesh = new THREE.Mesh(this.tubeGeometry, this.tubeMaterial);
     },
     // from https://github.com/Mamboleoo/InfiniteTubes/blob/master/js/demo6.js
     updateCurve: function() {

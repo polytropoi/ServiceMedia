@@ -1154,7 +1154,8 @@ webxr_router.get('/:_id', function (req, res) {
                             if (sceneResponse.sceneWebXREnvironment != null && sceneResponse.sceneWebXREnvironment != "none" && sceneResponse.sceneWebXREnvironment != "") {
                                 webxrEnv = sceneResponse.sceneWebXREnvironment;
                                 
-                                enviromentScript = "<script src=\x22../main/ref/aframe/dist/aframe_environment_component.min.js\x22></script>";
+                                // enviromentScript = "<script src=\x22../main/ref/aframe/dist/aframe_environment_component.min.js\x22></script>"; --aframe-environment-component
+                                enviromentScript = "<script src=\x22../main/src/component/aframe_environment_component_mod.js\x22></script>";
                                 let ground = "";
                                 let skycolor = "";
                                 let groundcolor = "";
@@ -1207,8 +1208,8 @@ webxr_router.get('/:_id', function (req, res) {
                                 // environment = "<a-entity environment=\x22preset: "+webxrEnv+"; "+fog+" "+shadow+" "+groundcolor+" "+dressingcolor+" "+groundcolor2+" "+skycolor+" "+horizoncolor+" playArea: 3; lightPosition: 0 2.15 0\x22 hide-in-ar-mode></a-entity>";
                             } else {
                                 // aframeEnvironment =  "<a-gradient-sky material=\x22shader: gradient; topColor: "+HexToRgbValues(sceneResponse.sceneColor1)+"; bottomColor: "+HexToRgbValues(sceneResponse.sceneColor2)+";\x22></a-gradient-sky>";
-                                // aframeEnvironment =  "<a-gradient-sky material=\x22shader: gradient; topColor:0 1 0; bottomColor:1 0 0;\x22></a-gradient-sky>";
-                                aframeEnvironment = "<a-sky color="+sceneResponse.sceneColor1+"></a-sky>";
+                                skySettings =  "<a-sky id=\x22skyEl\x22 color=\x22" + sceneResponse.sceneColor1 + "\x22 mod_sky=\x22enabled: true; color: "+sceneResponse.sceneColor1+";\x22></a-sky>";
+                                // skySettings = "<a-entity id=\x22skyEl\x22 mod_sky=\x22enabled: true; color: "+sceneResponse.sceneColor1+";></a-entity>"; //just plain color if not using enviro component //todo gradient sky? sun/sky component?
                                 hemiLight = "<a-light id=\x22hemi-light\x22 type=\x22hemisphere\x22 color=\x22" + sceneResponse.sceneColor1 + "\x22 groundColor=\x22" + sceneResponse.sceneColor2 + "\x22 intensity=\x22.5\x22 position\x220 0 0\x22>"+
                                     "</a-light>";
                             }

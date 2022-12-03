@@ -205,6 +205,11 @@ $(function() {
          }
       }
    }
+   let primaryAudioEventData = document.getElementById("audioEventsData");
+   if (primaryAudioEventData) {
+      SetPrimaryAudioEventsData();
+   }
+  
 
    // this.asky = document.getElementsByTagName('a-sky')[0];
    // if (this.asky && settings) {
@@ -645,13 +650,13 @@ function GoToNext() {
          skyboxEl.components.skybox_dynamic.nextSkybox();
       }
       // let tunnels = document.getElementsByTagName("mod_tunnel");
-         // let tunnels = document.querySelectorAll("[shadow]")
-         // if (tunnels) {
-         //    for (let i = 0; i < tunnels.length; i++) {
-         //       console.log("gotsa tunnel tryna switch texture...");
-         //       tunnels[i].el.components.mod_tunnel.randomTexture();
-         //    }
-         // }
+      let tunnels = document.querySelectorAll("[mod_tunnel]")
+      if (tunnels) {
+         for (let i = 0; i < tunnels.length; i++) {
+            console.log("gotsa tunnel tryna switch texture...");
+            tunnels[i].components.mod_tunnel.randomTexture();
+         }
+      }
          
    }
 }
@@ -685,6 +690,13 @@ function GoToPrevious() {
       }
       if (skyboxEl != null) {
          skyboxEl.components.skybox_dynamic.previousSkybox();
+      }
+      let tunnels = document.querySelectorAll("[mod_tunnel]")
+      if (tunnels) {
+         for (let i = 0; i < tunnels.length; i++) {
+            console.log("gotsa tunnel tryna switch texture...");
+            tunnels[i].components.mod_tunnel.randomTexture();
+         }
       }
    }
 }
@@ -770,8 +782,6 @@ function AddLocalMarkers() {// new or modded markers not saved to cloud
                      poiLocations.push(theItemObject);
                   }
                }
-               
-               
             } else if (theKey.toString().includes("~cloudmarker~")) { //a cloudmarker, if modded by user, becomes a defacto "local" marker, unless/until admin saves to cloud
                let keySplit = theKey.split("~"); //room is zero, timestamp is 2
               
@@ -2035,7 +2045,7 @@ function UpdateTriggerAudioVolume(newVolume) {
 //////////////////////////////////////////////// move to primary-audio-control ... //no!
 
 function SetPrimaryAudioEventsData () {
-
+   console.log("setting primary audio events data!");
    timeKeysData = JSON.parse(localStorage.getItem(room+ "_timeKeys"));
    tkStarttimes = [];
    if (timeKeysData != undefined && timeKeysData != null && timeKeysData.timekeys != undefined && timeKeysData.timekeys.length > 0 )
@@ -2247,18 +2257,19 @@ function TimedEventListener () {
    if (timekey != NaN) {//not not a number
      if (timedEventsListenerMode != null && timedEventsListenerMode.toLowerCase() == 'primary audio') {
       // if (hasPrimaryAudio) {
-         if (primaryAudioHowl != undefined && primaryAudioHowl != null && primaryAudioHowl.playing) {
-         primaryAudioTime = primaryAudioHowl.seek();
-            if (primaryAudioTime != 0 && primaryAudioTime < .2) {
+         if (primaryAudioHowl != undefined && primaryAudioHowl != null && primaryAudioHowl.playing()) {
+         let primaryAudioTime = primaryAudioHowl.seek();
+            
+            if (primaryAudioTime != 0 && primaryAudioTime < .2) { //needs fudge?
                timeKeysIndex = 0; 
                console.log("resetting timekeysindex!");
             }
-            if (primaryAudioTime <= timekey) {
+            if (primaryAudioTime != 0 && primaryAudioTime <= timekey) {
                   // console.log(primaryAudioTime + "less than " + timekey);
                   //just waiting...
                } else {
                   if (timeKeysIndex < tkStarttimes.length) {
-                     console.log("TRYNA PLAY TIMEKEY " + JSON.stringify(timeKeysData.timekeys[timeKeysIndex]));
+                     console.log("TRYNA PLAY TIMEKEY "+ JSON.stringify(timeKeysData.timekeys[timeKeysIndex]) +" at primaryAudioTime "+ primaryAudioTime.toString() );
                      PlayTimedEvent(timeKeysData.timekeys[timeKeysIndex]);
                      timeKeysIndex++;
                   } else {
@@ -2340,6 +2351,7 @@ function LoopTimedEvent(keyType, duration) {
    // console.log("tryna looop " + keyType  + " " +duration);
    let beatElements = document.getElementsByClassName("beatme");
    let envEl = document.getElementById('enviroEl');
+   let skyEl = document.getElementById('skyEl');
    
    let theInterval = setInterval(function () {
       if (!pauseLoops) {
@@ -2373,13 +2385,16 @@ function LoopTimedEvent(keyType, duration) {
                envEl.components.enviro_mods.colortweak();
             }
          }
-         // if (keyType.toLowerCase().includes("color lerp")) {
-         //    console.log("tryna beat loop");
-         //    if (envEl != null) {
-         //       // console.log("beat volume " + volume);
-         //       envEl.components.enviro_mods.colorlerp();
-         //    }
-         // }
+         if (keyType.toLowerCase().includes("color lerp")) {
+            console.log("tryna color lerp");
+            if (envEl != null) {
+               // console.log("beat volume " + volume);
+               envEl.components.enviro_mods.colorlerp(duration);
+            } else if (skyEl != null) {
+               
+               skyEl.components.mod_sky.colorlerp();
+            }
+         }
       } else {
          console.log("loops are paused");
       }

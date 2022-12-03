@@ -1,3 +1,5 @@
+this whole script is deprecated!
+/*
 let params = document.querySelector(".primaryAudioParams").id;
 
 let stream = params.split("_")[0];

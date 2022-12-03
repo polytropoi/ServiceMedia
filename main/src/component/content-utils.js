@@ -5949,13 +5949,80 @@ AFRAME.registerComponent('skybox_dynamic', {
   }
 });
 
-AFRAME.registerComponent('enviro_mods', {
+AFRAME.registerComponent('mod_sky', { //
+  schema: {
+    enabled: {default: true},
+    color: {default: 'lightblue'}
+
+  }, 
+  init: function () {
+    // this.skyEl = document.getElementById('sk');
+    let color1 = this.data.color;
+    // let color2 = settings.sceneColor1Alt.replace('#', '');
+    // console.log("tryna set colors " + color1 + " " + color2);
+    this.startColor = new THREE.Color('blue');
+    this.endColor = new THREE.Color('red');
+    this.lerpedColor = new THREE.Color();
+    // this.startColor.set(color1);
+    // this.endColor.set(color2);
+    // var geometry = new THREE.SphereGeometry(100, 60, 40);  
+    // var material = new THREE.MeshBasicMaterial({ 
+    //   'color': this.startColor
+    //   // 'side': 'back',
+    // });
+
+    this.skySphereMat = this.el.getObject3D('mesh').material;
+    // this.skySphere.scale.set(-1, 1, 1);  
+    // this.el.sceneEl.object3D.add(this.skySphere);
+    // this.el.setObject3D(this.skySphere);
+    
+
+    // this.skySphere.eulerOrder = 'XZY';  
+    // this.skySphere.renderDepth = 1000.0;  
+    this.tweakMe = false;
+    this.lerpMe = false;
+  },
+  colortweak: function () {
+    console.log("colortweak");
+    // if (this.skyEl) {
+    // this.el.setAttribute('animation', 'property: sky.color; to: '+settings.sceneColor1Alt+'; dur: 1000; loop: true; dir: alternate');
+    // this.el.emit('colorRecover');
+    this.tweakMe = true;
+    
+  },
+  colorlerp: function (duration) {
+    if (settings && settings.sceneColor1Alt) {
+      console.log("tryna lerp color : " + JSON.stringify(this.el.object3DMap));
+      this.el.setAttribute('animation', 'property: color; to: '+settings.sceneColor1Alt+'; dur: 3000;');
+      // this.lerpMe = true;
+      }
+  },
+  tick: function (time) {
+    if (this.tweakMe) {
+      let s = Math.sin(time * 2.0) * 0.5 + 0.5;
+      this.el.object3D.material.color.copy(this.startColor).lerpHSL(this.endColor, s);
+    } else if (this.lerpMe) {
+      // this.lerpedColor = (this.startColor).lerpHSL(this.endColor, time);
+      // console.log("truyna lerp to "+ JSON.stringify(this.lerpedColor));
+      // this.skySphereMat.color.copy(this.lerpedColor);
+      // this.skySphereMat.color.copy(this.startColor).lerp(this.endColor, 0.5 * (Math.sin(time) + 1));
+      this.lerpColor = (this.startColor).lerp(this.endColor, 0.5 * (Math.sin(time) + 1));
+      console.log("truyna lerp to "+ JSON.stringify(this.lerpColor));
+      this.el.setAttribute("color", this.lerpColor )
+    }
+    
+  }
+
+});
+
+AFRAME.registerComponent('enviro_mods', { //tweak properties of environment component at runtime
   schema: {
     enabled: {default: true}
   }, 
   init: function () {
     this.enviroDressing = document.querySelector('.environmentDressing');
     this.enviroEl = document.getElementById('enviroEl');
+    // this.skyEl = document.getElementById('a_sky');
   },
   beat: function () {
     scale = {};
@@ -6005,24 +6072,35 @@ AFRAME.registerComponent('enviro_mods', {
     //   horizonColor: settings.sceneColor2
     // });
 
-    this.enviroEl.setAttribute('animation', 'property: environment.groundColor; to: '+settings.sceneColor3+'; dur: 1000; startEvents: colorRecover');
-    this.enviroEl.setAttribute('animation_1', 'property: environment.groundColor2; to: '+settings.sceneColor4+'; dur: 1000; startEvents: colorRecover');
-    this.enviroEl.setAttribute('animation_2', 'property: environment.dressingColor; to: '+settings.sceneColor4+'; dur: 1000; startEvents: colorRecover');
-    this.enviroEl.setAttribute('animation_3', 'property: environment.skyColor; to: '+settings.sceneColor1+'; dur: 1000; startEvents: colorRecover');
-    this.enviroEl.setAttribute('animation_4', 'property: environment.horizonColor; to: '+settings.sceneColor2+'; dur: 1000; startEvents: colorRecover');
+    // this.enviroEl.setAttribute('animation', 'property: environment.groundColor; to: '+settings.sceneColor3+'; dur: 1000; startEvents: colorRecover');
+    // this.enviroEl.setAttribute('animation_1', 'property: environment.groundColor2; to: '+settings.sceneColor4+'; dur: 1000; startEvents: colorRecover');
+    // this.enviroEl.setAttribute('animation_2', 'property: environment.dressingColor; to: '+settings.sceneColor4+'; dur: 1000; startEvents: colorRecover');
+    this.enviroEl.setAttribute('animation_3', 'property: \x22environment.skyColor\x22; to: '+settings.sceneColor1+'; dur: 1000; startEvents: colorRecover');
+    this.enviroEl.setAttribute('animation_4', 'property: \x22environment.horizonColor\x22; to: '+settings.sceneColor2+'; dur: 1000; startEvents: colorRecover');
     this.el.emit('colorRecover');
   },
   colorlerp: function (duration) {
     if (settings && settings.sceneColor1Alt) {
-      duration = duration * 1000;
-      console.log("TRYNA COLOR LOERP " + duration);
-      // this.el.emit('colorTo');
-      this.enviroEl.setAttribute('animation', 'property: environment.skyColor; to: '+settings.sceneColor1Alt+'; dur: '+duration+'; loop: true; dir: alternate');
-      this.enviroEl.setAttribute('animation__1', 'property: environment.horizonColor; to: '+settings.sceneColor2Alt+'; dur: '+duration+'; loop: true; dir: alternate');
-      this.enviroEl.setAttribute('animation__2', 'property: environment.groundColor; to: '+settings.sceneColor3Alt+'; dur: '+duration+'; loop: true; dir: alternate');
-      this.enviroEl.setAttribute('animation__3', 'property: environment.groundColor2; to: '+settings.sceneColor4Alt+'; dur: '+duration+'; loop: true; dir: alternate');
-      this.enviroEl.setAttribute('animation__4', 'property: environment.dressingColor; to: '+settings.sceneColor4Alt+'; dur: '+duration+'; loop: true; dir: alternate');
 
+      // this.el.emit('colorTo');
+      if (this.enviroEl) {
+              // duration = duration * 1000;
+      console.log("TRYNA mod enviro with COLOR LOERP " + duration);
+      this.enviroEl.setAttribute('animation__1', 'property: environment.skyColor; to: '+settings.sceneColor1Alt+'; dur: '+duration+'; dir: alternate; startEvents: colorRecover');
+      this.enviroEl.setAttribute('animation__2', 'property: environment.horizonColor; to: '+settings.sceneColor2Alt+'; dur: '+duration+'; dir: alternate; startEvents: colorRecover');
+      this.el.emit('colorRecover');
+      // this.enviroEl.setAttribute('animation__2', 'property: environment.groundColor; to: '+settings.sceneColor3Alt+'; dur: '+duration+'; loop: true; dir: alternate');
+      // this.enviroEl.setAttribute('animation__3', 'property: environment.groundColor2; to: '+settings.sceneColor4Alt+'; dur: '+duration+'; loop: true; dir: alternate');
+      // this.enviroEl.setAttribute('animation__4', 'property: environment.dressingColor; to: '+settings.sceneColor4Alt+'; dur: '+duration+'; loop: true; dir: alternate');
+      } else {
+        // if (this.skyEl) {
+        //   this.skyEl.setAttribute('animation', 'property: color; to: '+settings.sceneColor1Alt+'; dur: '+duration+'; loop: true; dir: alternate');
+        // // this.skyEl.setAttribute('animation__1', 'property: environment.horizonColor; to: '+settings.sceneColor2Alt+'; dur: '+duration+'; loop: true; dir: alternate');
+        // // this.skyEl.setAttribute('animation__2', 'property: environment.groundColor; to: '+settings.sceneColor3Alt+'; dur: '+duration+'; loop: true; dir: alternate');
+        // // this.skyEl.setAttribute('animation__3', 'property: environment.groundColor2; to: '+settings.sceneColor4Alt+'; dur: '+duration+'; loop: true; dir: alternate');
+        // // this.skyEl.setAttribute('animation__4', 'property: environment.dressingColor; to: '+settings.sceneColor4Alt+'; dur: '+duration+'; loop: true; dir: alternate');
+        // }
+      }
       // this.el.emit('colorTo');
       // setTimeout(function () { 
         // this.enviroEl.setAttribute('animation_5', 'property: environment.groundColor; to: '+settings.sceneColor3+'; dur: 2500; delay: 2500');
@@ -6273,15 +6351,15 @@ AFRAME.registerComponent('toggle-picture-group', {
   },
     init: function () {
     
-      this.el.addEventListener('click', function () {
-        console.log("tryna toggle pictureGroupPanel " + document.querySelector("#pictureGroupPanel").getAttribute('visible'));
-        if (!document.querySelector("#pictureGroupPanel").getAttribute('visible')){
-          document.querySelector("#pictureGroupPanel").setAttribute('visible', true);
-          document.querySelector("#pictureGroupsControl").emit('toggleOnPicGroup');
-        } else {
-          document.querySelector("#pictureGroupPanel").setAttribute('visible', false);
-        }
-      });
+    this.el.addEventListener('click', function () {
+      console.log("tryna toggle pictureGroupPanel " + document.querySelector("#pictureGroupPanel").getAttribute('visible'));
+      if (!document.querySelector("#pictureGroupPanel").getAttribute('visible')){
+        document.querySelector("#pictureGroupPanel").setAttribute('visible', true);
+        document.querySelector("#pictureGroupsControl").emit('toggleOnPicGroup');
+      } else {
+        document.querySelector("#pictureGroupPanel").setAttribute('visible', false);
+      }
+    });
   }
 });
 

@@ -1015,7 +1015,7 @@ AFRAME.registerComponent('primary_audio_player', {  //setup and controls for the
 
     function AudioTimeUpdate (fancyTimeString) {
         // console.log("AudioTimeUpdate " + fancyTimeString);
-        // transportTimeStatsEl = document.getElementById("transportStats");
+        transportTimeStatsEl = document.getElementById("transportStats");
         if (transportTimeStatsEl == null) {
             transportTimeStatsEl = document.getElementById("transportStats");
         } else {
@@ -1060,8 +1060,12 @@ AFRAME.registerComponent('primary_audio_events', {
             localStorage.setItem(room + "_timeKeys", JSON.stringify(tkObject)); 
 
             // console.log(JSON.stringify(timekeys));
+                // setTimeout(() => {
+                //     SetPrimaryAudioEventsData();
+                // }, 1000);
             } 
-            SetPrimaryAudioEventsData();
+            // SetPrimaryAudioEventsData();
+              
         } else {
             console.log("primary audio events fail!  no roooom!");
         }
@@ -1072,6 +1076,23 @@ AFRAME.registerComponent('primary_audio_events', {
     }
 });
 
+// function SetPrimaryAudioEventsDataAFrame () { //dupe of method in connectjs, so aframe stuff above is able to grip it
+//     this.room = window.location.pathname.split("/").pop();
+//     timeKeysData = JSON.parse(localStorage.getItem(this.room+ "_timeKeys"));
+//     tkStarttimes = [];
+//     if (timeKeysData != undefined && timeKeysData != null && timeKeysData.timekeys != undefined && timeKeysData.timekeys.length > 0 )
+//        timeKeysData.timekeys.forEach(function (timekey) {
+//        tkStarttimes.push(parseFloat(timekey.keystarttime).toFixed(2));
+//     });
+//     tkStarttimes.sort(function(a, b){
+//        return a - b;
+//     });
+ 
+//     timedEventsListenerMode = "Primary Audio"; 
+//     // if (TimedEventListener() != undefined) {
+//         TimedEventListener();
+//     // }
+//  }
 // AFRAME.registerComponent('primary_audio_analyzer', {
 
 //     schema: {
