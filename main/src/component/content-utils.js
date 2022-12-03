@@ -3456,7 +3456,7 @@ AFRAME.registerComponent('mod_object', {
                         this.objEl.id = "obj" + objectData._id + "_" + this.locData.timestamp;
                         sceneEl.appendChild(this.objEl);
                       } else {
-                        console.log("caint find object " + mod_obj_component.data.objectData.actions[i].objectID +", tryna fetch it..");
+                        console.log("caint find object "+ mod_obj_component.data.objectData.actions[i].objectID +", tryna fetch it..");
                         FetchSceneInventoryObject(mod_obj_component.data.objectData.actions[i].objectID);
                       }
                     } 
@@ -3843,8 +3843,8 @@ AFRAME.registerComponent('mod_object', {
   },
 
   rayhit: function (hitID, distance, hitpoint) { //also called on collisionstart event
-    // if (this.hitID != hitID) {
-    //   this.hitID = hitID;
+      // if (this.hitID != hitID) {
+      //   this.hitID = hitID;
       // console.log("new hit " + hitID + " " + distance + " " + JSON.stringify(hitpoint));
       // distance = window.playerPosition.distanceTo(hitpoint);
       console.log("new hit " + hitID + " distance: " + distance + " " + JSON.stringify(hitpoint) + " tags " +  this.tags);
@@ -4604,9 +4604,14 @@ AFRAME.registerComponent('mod_model', {
                     // this.hitpoint.y = this.intersection.point.y.toFixed(2);
                     // this.hitpoint.z = this.intersection.point.z.toFixed(2);
                     // this.rayhit(this.intersection.point);
-                    this.distance = window.playerPosition.distanceTo( this.intersection.point );
+                    if (window.playerPosition) {
+                      this.distance = window.playerPosition.distanceTo( this.intersection.point );
+                    } else {
+                      this.distance = 10;
+                    }
+                   
                     // this.hitpoint = this.intersection[0].point;
-                    this.rayhit(e.detail.el.id, this.distance, this.intersection.point ); 
+                    this.rayhit( e.detail.el.id, this.distance, this.intersection.point ); 
                   }
                 }
               // console.log(intersection.point);

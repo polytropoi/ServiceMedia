@@ -746,7 +746,7 @@ AFRAME.registerComponent('extended_wasd_thirdperson', {
 		this.el.object3D.rotation.order = 'YXZ';
 
 		this.isFlyable = false;
-		if (settings && settings.sceneCameraFlyable) {
+		if (settings != undefined && settings != null && settings.sceneCameraFlyable) {
 			this.isFlyable = true;
 		}
 	},
