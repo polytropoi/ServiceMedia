@@ -5954,6 +5954,60 @@ AFRAME.registerComponent('skybox_dynamic', {
   }
 });
 
+AFRAME.registerComponent('mod_background', { //nosky bg mods
+  schema: {
+    enabled: {default: true},
+    color: {default: 'lightblue'}
+
+  }, 
+  init: function () {
+   
+    this.tweakMe = false;
+    this.lerpMe = false;
+    this.colors = [
+      new THREE.Color(0xff0000),
+      new THREE.Color(0xffff00),
+      new THREE.Color(0x00ff00),
+      new THREE.Color(0x0000ff)
+    ];
+    
+  },
+  colortweak: function () {
+    console.log("colortweak");
+    // if (this.skyEl) {
+    // this.el.setAttribute('animation', 'property: sky.color; to: '+settings.sceneColor1Alt+'; dur: 1000; loop: true; dir: alternate');
+    // this.el.emit('colorRecover');
+    this.tweakMe = true;
+    
+  },
+  colorlerp: function (duration) {
+    if (settings && settings.sceneColor1Alt) {
+      console.log("tryna lerp color : " + JSON.stringify(this.el.object3DMap));
+      // this.el.setAttribute('animation', 'property: color; to: '+settings.sceneColor1Alt+'; dur: 3000;');
+      this.lerpMe = true;
+      }
+  },
+  tick: function (time) {
+    if (this.tweakMe) {
+      // let s = Math.sin(time * 2.0) * 0.5 + 0.5;
+      // this.el.object3D.material.color.copy(this.startColor).lerp(this.endColor, s);
+    } else if (this.lerpMe) {
+      const f = Math.floor(duration / this.colors.length);
+      const i1 = Math.floor((time / f) % this.colors.length);
+      let i2 = i1 + 1;
+    
+      if (i2 === this.colors.length) i2 = 0;
+    
+      const color1 = this.colors[i1];
+      const color2 = this.colors[i2];
+      const a = (time / f) % this.colors.length % 1;
+    
+      this.el.sceneEl.background.copy(color1);
+      this.el.sceneEl.background.lerp(color2, a);
+    } 
+  }
+});
+
 AFRAME.registerComponent('mod_sky', { //
   schema: {
     enabled: {default: true},
@@ -5975,12 +6029,23 @@ AFRAME.registerComponent('mod_sky', { //
     //   'color': this.startColor
     //   // 'side': 'back',
     // });
-
-    this.skySphereMat = this.el.getObject3D('mesh').material;
+    // this.skySphereMat = this.el.getObject3D('mesh').material;
     // this.skySphere.scale.set(-1, 1, 1);  
     // this.el.sceneEl.object3D.add(this.skySphere);
     // this.el.setObject3D(this.skySphere);
-    
+    this.skySphereMat = null;
+    this.mesh = this.el.getObject3D('mesh');
+
+    if (this.mesh != null) {
+      this.mesh.traverse(function (node) {
+
+      if (node.material) {
+      // if (node.material) {
+        console.log("skymaterial color is " + JSON.stringify(node.material.color));
+          this.skySphereMat = node.material;
+          }
+        });
+      }
 
     // this.skySphere.eulerOrder = 'XZY';  
     // this.skySphere.renderDepth = 1000.0;  
@@ -5997,27 +6062,28 @@ AFRAME.registerComponent('mod_sky', { //
   },
   colorlerp: function (duration) {
     if (settings && settings.sceneColor1Alt) {
-      console.log("tryna lerp color : " + JSON.stringify(this.el.object3DMap));
-      this.el.setAttribute('animation', 'property: color; to: '+settings.sceneColor1Alt+'; dur: 3000;');
-      // this.lerpMe = true;
+      console.log("tryna lerp color : " + JSON.stringify(this.el.object3DMap)); 
+      // this.el.setAttribute('animation', 'property: color; to: '+settings.sceneColor1Alt+'; dur: 3000;'); //maybe just do from and it's ok?
+      this.lerpMe = true;
       }
   },
   tick: function (time) {
     if (this.tweakMe) {
       let s = Math.sin(time * 2.0) * 0.5 + 0.5;
-      this.el.object3D.material.color.copy(this.startColor).lerpHSL(this.endColor, s);
+      this.el.object3D.material.color.copy(this.startColor).lerp(this.endColor, s);
     } else if (this.lerpMe) {
-      // this.lerpedColor = (this.startColor).lerpHSL(this.endColor, time);
-      // console.log("truyna lerp to "+ JSON.stringify(this.lerpedColor));
-      // this.skySphereMat.color.copy(this.lerpedColor);
+      // let s = Math.sin(time * 2.0) * 0.5 + 0.5;
+      // this.mesh.material.color.setColor(this.startColor).lerpHSL(this.endColor, s);
+      // this.mesh.material.color 
+      // this.mesh.material.color.set(this.startColor).lerp(this.endColor, 0.5 * (Math.sin(time) + 1));
+      this.skySphereMat.color.set(this.startColor);
+      // this.skySphereMat.color.set(this.lerpedColor);
       // this.skySphereMat.color.copy(this.startColor).lerp(this.endColor, 0.5 * (Math.sin(time) + 1));
-      this.lerpColor = (this.startColor).lerp(this.endColor, 0.5 * (Math.sin(time) + 1));
-      console.log("truyna lerp to "+ JSON.stringify(this.lerpColor));
-      this.el.setAttribute("color", this.lerpColor )
-    }
-    
+      // this.lerpColor = (this.startColor).lerp(this.endColor, 0.5 * (Math.sin(time) + 1));
+      // console.log("truyna lerp to "+ JSON.stringify(this.lerpColor));
+      // this.el.setAttribute("color", this.lerpColor )
+    } 
   }
-
 });
 
 AFRAME.registerComponent('enviro_mods', { //tweak properties of environment component at runtime
@@ -6028,6 +6094,8 @@ AFRAME.registerComponent('enviro_mods', { //tweak properties of environment comp
     this.enviroDressing = document.querySelector('.environmentDressing');
     this.enviroEl = document.getElementById('enviroEl');
     // this.skyEl = document.getElementById('a_sky');
+    this.isLerping = false;
+    this.isTweaking = false;
   },
   beat: function () {
     scale = {};
@@ -6063,9 +6131,9 @@ AFRAME.registerComponent('enviro_mods', { //tweak properties of environment comp
   colortweak: function () {
     console.log("colortweak");
     this.enviroEl.setAttribute('environment', {
-      groundColor: "#000000".replace(/0/g,function(){return (~~(Math.random()*16)).toString(16);}),
-      groundColor2: "#000000".replace(/0/g,function(){return (~~(Math.random()*16)).toString(16);}),
-      dressingColor: "#000000".replace(/0/g,function(){return (~~(Math.random()*16)).toString(16);}),
+      // groundColor: "#000000".replace(/0/g,function(){return (~~(Math.random()*16)).toString(16);}),
+      // groundColor2: "#000000".replace(/0/g,function(){return (~~(Math.random()*16)).toString(16);}),
+      // dressingColor: "#000000".replace(/0/g,function(){return (~~(Math.random()*16)).toString(16);}),
       skyColor: "#000000".replace(/0/g,function(){return (~~(Math.random()*16)).toString(16);}),
       horizonColor: "#000000".replace(/0/g,function(){return (~~(Math.random()*16)).toString(16);})
     });
@@ -6088,15 +6156,18 @@ AFRAME.registerComponent('enviro_mods', { //tweak properties of environment comp
     if (settings && settings.sceneColor1Alt) {
 
       // this.el.emit('colorTo');
-      if (this.enviroEl) {
-              // duration = duration * 1000;
-      console.log("TRYNA mod enviro with COLOR LOERP " + duration);
-      this.enviroEl.setAttribute('animation__1', 'property: environment.skyColor; to: '+settings.sceneColor1Alt+'; dur: '+duration+'; dir: alternate; startEvents: colorRecover');
-      this.enviroEl.setAttribute('animation__2', 'property: environment.horizonColor; to: '+settings.sceneColor2Alt+'; dur: '+duration+'; dir: alternate; startEvents: colorRecover');
-      this.el.emit('colorRecover');
-      // this.enviroEl.setAttribute('animation__2', 'property: environment.groundColor; to: '+settings.sceneColor3Alt+'; dur: '+duration+'; loop: true; dir: alternate');
-      // this.enviroEl.setAttribute('animation__3', 'property: environment.groundColor2; to: '+settings.sceneColor4Alt+'; dur: '+duration+'; loop: true; dir: alternate');
-      // this.enviroEl.setAttribute('animation__4', 'property: environment.dressingColor; to: '+settings.sceneColor4Alt+'; dur: '+duration+'; loop: true; dir: alternate');
+      if (this.enviroEl && !this.isLerping) {
+        this.isLerping = true;
+                // duration = duration * 1000;
+        this.currentSkyColor = this.enviroEl.getAttribute("environment")
+        console.log("TRYNA mod enviro with COLOR LOERP " + duration);
+        this.enviroEl.setAttribute('animation__1', 'property: environment.skyColor; from: '+settings.sceneColor1+'; to: '+settings.sceneColor1Alt+'; dur: '+duration+'; loop: true; dir: alternate; pauseEvents: pauseColors; resumeEvents: resumeColors;');
+        this.enviroEl.setAttribute('animation__2', 'property: environment.horizonColor; from: '+settings.sceneColor2+'; to: '+settings.sceneColor2Alt+'; dur: '+duration+'; loop: true; dir: alternate; pauseEvents: pauseColors; resumeEvents: resumeColors;');
+        // this.enviroEl.setAttribute('animation__2', 'property: environment.groundColor; from: '+settings.sceneColor3+'; to: '+settings.sceneColor3Alt+'; dur: '+duration+'; loop: true; dir: alternate; pauseEvents: pauseColors; resumeEvents: resumeColors;');
+        // this.enviroEl.setAttribute('animation__3', 'property: environment.groundColor2; from: '+settings.sceneColor4+'; to: '+settings.sceneColor4Alt+'; dur: '+duration+'; loop: true; dir: alternate; pauseEvents: pauseColors; resumeEvents: resumeColors;');
+        // this.enviroEl.setAttribute('animation__4', 'property: environment.dressingColor; from: '+settings.sceneColor4+'; to: '+settings.sceneColor4Alt+'; dur: '+duration+'; loop: true; dir: alternate;  pauseEvents: pauseColors; resumeEvents: resumeColors;');
+              // this.el.emit('colorRecover');
+
       } else {
         // if (this.skyEl) {
         //   this.skyEl.setAttribute('animation', 'property: color; to: '+settings.sceneColor1Alt+'; dur: '+duration+'; loop: true; dir: alternate');

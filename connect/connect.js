@@ -2416,7 +2416,8 @@ function PlayTimedEvent(timeKey) {
          let envEl = document.getElementById('enviroEl');
          if (envEl != null && envEl.components.enviro_mods) {
             // console.log("beat volume " + volume);
-            envEl.components.enviro_mods.colorlerp(timeKey.keyduration); //does loop on arg
+            duration = timeKey.keyduration * 1000;
+            envEl.components.enviro_mods.colorlerp(duration); //does loop on arg
          }
       }
    }

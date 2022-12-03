@@ -204,7 +204,7 @@
 	    // create sky
 	    this.sky = document.createElement('a-sky');
 	    this.sky.setAttribute('radius', this.STAGE_SIZE);
-	    this.sky.setAttribute('theta-length', 180);
+	    this.sky.setAttribute('theta-length', 180); //normal is 110, but leaves a black circle at bottom
 	    this.sky.classList.add('environment');
 
 	    // stars are created when needed
@@ -287,6 +287,9 @@
 
 	    return '#' + fogColor.getHexString();
 	  },
+	  modSkyColor: function (newSkyColor) {
+
+	  },
 
 	  update: function (oldDataNonPreset) {
 	    var oldData;
@@ -300,7 +303,7 @@
 	      Object.assign(this.environmentData, this.data);
 	      Object.assign(this.environmentData, this.presets[this.data.preset]);
 	      Object.assign(this.environmentData, this.el.components.environment.attrValue);
-	      console.log(this.environmentData);
+	    //   console.log(this.environmentData);
 	    }
 
 	    var skyType = this.environmentData.skyType;
@@ -496,7 +499,7 @@
 	        }
 	      }
 	    }
-	    console.log('%c' + params.join('; '), 'color: #f48;font-weight:bold');
+	    // console.log('%c' + params.join('; '), 'color: #f48;font-weight:bold');
 	  },
 
 	  // Custom Math.random() with seed. Given this.environmentData.seed and x, it always returns the same "random" number
