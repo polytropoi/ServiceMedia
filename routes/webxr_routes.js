@@ -839,7 +839,19 @@ webxr_router.get('/:_id', function (req, res) {
                                     curvePoints.push(curvePoint);
                                 }
                                 if (sceneResponse.sceneLocations[i].markerType == "tunnel") {
-                                    proceduralEntities = proceduralEntities + "<a-entity mod_tunnel=\x22init: true;\x22></a-entity>";
+                                    let scrollDirection = 'x';
+                                    let scrollSpeed = .001;
+                                    if (sceneResponse.sceneLocations[i].eventData && sceneResponse.sceneLocations[i].eventData.toLowerCase().includes('scroll y')) {
+                                        scrollDirection = 'y';
+                                    }
+                                    if (sceneResponse.sceneLocations[i].eventData && sceneResponse.sceneLocations[i].eventData.toLowerCase().includes('speed')) {
+                                        speedSplit = sceneResponse.sceneLocations[i].eventData.toLowerCase().split('~');
+                                        if (speedSplit.length > 1) {
+                                            scrollSpeed = speedSplit[1];
+                                        }
+                                        
+                                    }
+                                    proceduralEntities = proceduralEntities + "<a-entity mod_tunnel=\x22init: true; scrollDirection: "+scrollDirection+"; scrollSpeed: "+scrollSpeed+"\x22></a-entity>";
                                 }
 
                             }

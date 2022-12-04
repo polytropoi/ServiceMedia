@@ -314,7 +314,7 @@ AFRAME.registerComponent('primary_audio_player', {  //setup and controls for the
                 var defaultColor = 'blue';
                 this.primaryAudioText = document.querySelector("#primaryAudioText");
                 this.isPlaying = false;
-                this.cam = document.querySelector("[camera]"); //MUST DO THIS HERE or it doesn't work in tick below... okthen
+                this.cam = document.querySelector("[camera]"); 
                 // this.pPos = this.cam.object3D.position; //for spatialization
                 // Howler.pos(this.pPos.x, this.pPos.y, this.pPos.z);
                 // let waveform = document.querySelector("#primaryAudioWaveformImageEntity");

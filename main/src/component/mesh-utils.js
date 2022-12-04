@@ -3069,7 +3069,9 @@ AFRAME.registerComponent('mod_curve', {
 AFRAME.registerComponent('mod_tunnel', {
   schema: {
     init: {default: false},
-    tags: {default: ''}
+    tags: {default: ''},
+    scrollDirection: {default: 'x'},
+    scrollSpeed: {default: .0001}
   },
   init: function () {
       this.loaded = false;
@@ -3086,7 +3088,7 @@ AFRAME.registerComponent('mod_tunnel', {
       this.normal = new THREE.Vector3( 0, 1, 0 ); // up
       this.axis = new THREE.Vector3();
       this.points = [];
-      this.speed = .001;
+      this.speed = this.data.scrollSpeed;
       this.picModIndex = 0;
       this.texture = null;
       // Define points along Z axis
@@ -3138,9 +3140,9 @@ AFRAME.registerComponent('mod_tunnel', {
         let picIndex = Math.floor(Math.random()*this.tileablePicData.images.length);
         this.texture = new THREE.TextureLoader().load( this.tileablePicData.images[picIndex].url );
         this.tubeMaterial.map = this.texture;
-        this.tubeMaterial.map.wrapS = THREE.RepeatWrapping;
-        this.tubeMaterial.map.wrapT = THREE.RepeatWrapping;
-        this.tubeMaterial.map.repeat.set(4, 2);
+        // this.tubeMaterial.map.wrapS = THREE.RepeatWrapping;
+        // this.tubeMaterial.map.wrapT = THREE.RepeatWrapping;
+        // this.tubeMaterial.map.repeat.set(4, 2);
     },
     // from https://github.com/Mamboleoo/InfiniteTubes/blob/master/js/demo6.js
     updateCurve: function() {
@@ -3194,7 +3196,12 @@ AFRAME.registerComponent('mod_tunnel', {
     tick: function () {
       if (this.loaded && this.tubeGeometry && this.tubeMaterial) {
         // console.log("modding speernd " + this.speed);
-        this.tubeMaterial.map.offset.x += this.speed;
+        if (this.data.scrollDirection == 'x') {
+          this.tubeMaterial.map.offset.x += this.speed;
+        }
+        if (this.data.scrollDirection == 'y') {
+          this.tubeMaterial.map.offset.y += this.speed;
+        }
         // this.updateCurve();
       }
     }
