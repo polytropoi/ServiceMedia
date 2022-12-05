@@ -6382,16 +6382,20 @@ AFRAME.registerComponent('picture_groups_control', {
       let group = null;
       let picGroupArray = this.data.jsonData;
       if (picGroupArray.length > 0) {
-        let nextbuttonEl = document.getElementById('nextButton');
-        let prevbuttonEl = document.getElementById('previousButton');
-        nextbuttonEl.style.visibility = "visible";
-        prevbuttonEl.style.visibility = "visible";
+        // let nextbuttonEl = document.getElementById('nextButton');
+        // let prevbuttonEl = document.getElementById('previousButton');
+        // nextbuttonEl.style.visibility = "visible";
+        // prevbuttonEl.style.visibility = "visible";
       }
       console.log("tryna find skybox id " + skyboxID);
       for (let i = 0; i < picGroupArray.length; i++) {
         for (let j = 0; j < picGroupArray[i].images.length; j++) {
-          if (picGroupArray[i].images[j]._id == skyboxID) {
+          if (picGroupArray[i].images[j]._id == skyboxID) { //todo sniff for equirect
             group = picGroupArray[i];
+            let nextbuttonEl = document.getElementById('nextButton');
+            let prevbuttonEl = document.getElementById('previousButton');
+            nextbuttonEl.style.visibility = "visible";
+            prevbuttonEl.style.visibility = "visible";
             break;
           }
         }

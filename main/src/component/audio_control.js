@@ -353,7 +353,7 @@ AFRAME.registerComponent('primary_audio_player', {  //setup and controls for the
                 // document.querySelector("#primaryAudioText").setAttribute("look-at", "#player");
                 document.querySelector("#primaryAudioText").setAttribute('text', {
                     // width: 4, 
-                    align: "left",
+                    align: "center",
                     value: data.title
                 });
                 console.log("PRIMARY AUDIO AUTOPLAY is " + this.data.autoplay );

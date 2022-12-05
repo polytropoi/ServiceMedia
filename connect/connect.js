@@ -2264,12 +2264,12 @@ function TimedEventListener () {
                timeKeysIndex = 0; 
                console.log("resetting timekeysindex!");
             }
-            if (primaryAudioTime != 0 && primaryAudioTime <= timekey) {
+            // if (primaryAudioTime != 0 && primaryAudioTime) {
                   // console.log(primaryAudioTime + "less than " + timekey);
                   //just waiting...
                } else {
                   if (timeKeysIndex < tkStarttimes.length) {
-                     console.log("TRYNA PLAY TIMEKEY "+ JSON.stringify(timeKeysData.timekeys[timeKeysIndex]) +" at primaryAudioTime "+ primaryAudioTime.toString() );
+                     // console.log("TRYNA PLAY TIMEKEY "+ JSON.stringify(timeKeysData.timekeys[timeKeysIndex]) +" at primaryAudioTime "+ primaryAudioTime.toString() );
                      PlayTimedEvent(timeKeysData.timekeys[timeKeysIndex]);
                      timeKeysIndex++;
                   } else {
@@ -2278,7 +2278,7 @@ function TimedEventListener () {
                     
                   }
                }
-            }
+            // }
          // }
       } else if (timedEventsListenerMode != null && timedEventsListenerMode.toLowerCase() == 'primary video') {
          if (videoEl != null && !videoEl.paused && timekey > 0){

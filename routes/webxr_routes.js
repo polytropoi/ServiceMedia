@@ -2645,12 +2645,8 @@ webxr_router.get('/:_id', function (req, res) {
                             "</a-entity>";
                             // "<a-entity gltf-model=\x22#play_button\x22 scale=\x22.15 .1 .1\x22 position=\x220 0 -.2\x22 material=\x22color: black; transparent: true; opacity: 0.1\x22></a-entity>" +
                             if (sceneResponse.scenePrimaryAudioTriggerEvents) {
-                                // loadAudioEvents = "ready(function(){\n" +
-                                // "let paecontrol = document.getElementById(\x22primaryAudio\x22);\n"+
-                                // "paecontrol.setAttribute(\x22primary_audio_events\x22, \x22jsonData\x22, "+JSON.stringify(JSON.stringify(primaryAudioObject))+");\n"+ //double stringify! yes, it's needed
-                                // "});";
-                            var buff = Buffer.from(JSON.stringify(primaryAudioObject)).toString("base64");
-                            loadAudioEvents = "<a-entity primary_audio_events id=\x22audioEventsData\x22 data-audio-events='"+buff+"'></a-entity>"; 
+                                var buff = Buffer.from(JSON.stringify(primaryAudioObject)).toString("base64");
+                                loadAudioEvents = "<a-entity primary_audio_events id=\x22audioEventsData\x22 data-audio-events='"+buff+"'></a-entity>"; 
                             }
                         }
                     }
@@ -2665,11 +2661,15 @@ webxr_router.get('/:_id', function (req, res) {
                         "</script>";
                         // primaryAudioControl = "<script src=\x22../main/src/component/primary-audio-control.js\x22></script>";
                         primaryAudioEntity = "<a-entity id=\x22primaryAudioParent\x22 look-at=\x22#player\x22 position=\x22"+audioLocation+"\x22>"+ //parent
-                        "<a-entity id=\x22primaryAudioText\x22 geometry=\x22primitive: plane; width: 1; height: .30\x22 position=\x220 0 2.5\x22 material=\x22color: grey; transparent: true; opacity: 0.0\x22"+
+                        "<a-entity id=\x22primaryAudioText\x22 geometry=\x22primitive: plane; width: 1; height: .5\x22 position=\x220 .5 2.5\x22 material=\x22color: grey; transparent: true; opacity: 0.0\x22"+
                         "text=\x22value:Click to play;\x22></a-entity>"+
-                        "<a-entity gltf-model=\x22#landscape_panel\x22 scale=\x22.15 .1 .1\x22 position=\x220 0 2.4\x22 material=\x22color: black; transparent: true; opacity: 0.1\x22></a-entity>" +
+                        "<a-entity gltf-model=\x22#landscape_panel\x22 scale=\x220.075 0.05 0.05\x22 position=\x220 .5 2.4\x22 material=\x22color: black; transparent: true; opacity: 0.1\x22></a-entity>" +
                         "<a-entity id=\x22primaryAudio\x22 mixin=\x22grabmix\x22 class=\x22activeObjexGrab activeObjexRay\x22 entity-callout=\x22calloutString: 'play/pause'\x22 primary_audio_control=\x22oggurl: "+oggurl+"; mp3url: "+mp3url+"; volume: "+scenePrimaryVolume+"; autoplay: "+sceneResponse.sceneAutoplayPrimaryAudio+";"+
-                        "title: "+primaryAudioTitle+"\x22  geometry=\x22primitive: sphere; radius: .25;\x22 material=\x22shader: noise;\x22 position=\x22-1 0 2.6\x22></a-entity></a-entity>";
+                        "title: "+primaryAudioTitle+"\x22  geometry=\x22primitive: sphere; radius: .25;\x22 material=\x22shader: noise;\x22 position=\x220 0 2.6\x22></a-entity></a-entity>";
+                        if (sceneResponse.scenePrimaryAudioTriggerEvents) { //maybe pass a do not listen?
+                            var buff = Buffer.from(JSON.stringify(primaryAudioObject)).toString("base64");
+                            loadAudioEvents = "<a-entity primary_audio_events id=\x22audioEventsData\x22 data-audio-events='"+buff+"'></a-entity>"; 
+                        }
                     }
                     if (hasAmbientAudio) {
                         ambientAudioScript = "<script>" +      
