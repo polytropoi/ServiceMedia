@@ -14407,16 +14407,16 @@ function getAllPeople() {
                 "<button id=\x22eventsSectionButton\x22 class=\x22btn btn-sm btn-primary btn-circle btn-light float-left\x22><i class=\x22fas fa-plus-circle\x22></i> </button>" +
                             "<h4>Events</h4>" +
                             "</hr>" +  
-                "<div style=\x22display:none;\x22 id=\x22eventsSection\x22>" +
+                            "<div style=\x22display:none;\x22 id=\x22eventsSection\x22>" +
                             "<div class=\x22form-row\x22>" +  
                                 // "<div class=\x22col form-group col-md-3\x22>" +
                                 // locationButtons +    
                                 // sceneLocs +
                                 // "timekeys here" +
-                                "<div class=\x22col form-group col-md-12\x22>"+
+                                "<div class=\x22col form-group col-md-12\x22>" +
                                     "<button id=\x22newSceneTimedEvent\x22 type=\x22button\x22 class=\x22btn btn-sm btn-success float-left\x22>New Event</button>" +
-                                
-                                    "<div class=\x22float-right\x22 style=\x22 width: 166px;\x22>Listen To Timeline:"+
+                                    "<button id=\x22importAudioTimedEvents\x22 type=\x22button\x22 style=\x22visibility: hidden;\x22 class=\x22btn btn-sm btn-info float-right\x22>Import Audio Events</button><br><br>" +
+                                    "<div class=\x22float-right\x22 style=\x22 width: 166px;\x22>Listen To Timeline:" +
                                         "<select id=\x22sceneListenToTimelineSelector\x22 class=\x22sceneListenToTimelineSelector\x22>" +
                                             "<option>None</option>" +
                                             "<option>Primary Audio</option>" +
@@ -14424,8 +14424,9 @@ function getAllPeople() {
                                             "<option>YouTube</option>" +
                                             "<option>Scene Elapsed Time</option>" +
                                         "</select>" +
-                                    "</div>"+
+                                    "</div>" +
                                 "</div>" + 
+                               
                                 "<div id=\x22sceneTimedEvents\x22 class=\x22col form-group col-md-12\x22>"+
                                 "</div>" +
                                 
@@ -15863,7 +15864,7 @@ function getAllPeople() {
                     if (response.data.sceneTimedEvents != null) {    
                         timekeys = response.data.sceneTimedEvents.timekeys;     
                     }
-                    if (timekeys != null) {
+                    if (timekeys != null && timekeys.length) {
                         $("#sceneTimedEvents").html(ReturnTimeKeys(timekeys));
                         for (let i = 0; i < timekeys.length; i++) { //init the dropdowns in timekey table
                             console.log("tryna set timed event type " + timekeys[i].keytype);
@@ -15871,8 +15872,11 @@ function getAllPeople() {
                         }
                     } else {
                         $("#sceneTimedEvents").html("no timed events found");
+                        if (response.data.scenePrimaryAudioID != undefined && response.data.scenePrimaryAudioID != null && response.data.scenePrimaryAudioID.length > 8 ) {
+                            document.getElementById("importAudioTimedEvents").style.visibility = "visible";
+                        }
                     }
-                    
+
                     $(document).on('click','#newSceneTimedEvent',function(e){
                         e.preventDefault();  
                         let newTimeKey = {
@@ -15891,7 +15895,40 @@ function getAllPeople() {
                             console.log("tryna set timed event type " + timekeys[i].keytype);
                             $("#tk_type_" + i).val(timekeys[i].keytype).change();
                         }
+                    }); 
+                    $(document).on('click','#importAudioTimedEvents',function(e) {
+                        e.preventDefault();  
+                        console.log("tryna import timed eve3ntsk " + response.data.scenePrimaryAudioID);
+                        if (response.data.scenePrimaryAudioID) {
 
+                                var stump = {};
+
+                                stump.sceneID = response.data._id;
+                                stump.audioID = response.data.scenePrimaryAudioID;
+                                // console.log("tryna add scene weblink" + stump.sceneID);
+                                axios.post('/import_scene_audio_timed_events/', stump)
+                                .then(function (response) {
+                                    console.log(response);
+                                    if (response.data != "ok") {
+                                        $("#topAlert").html(response.data);
+                                        $("#topAlert").show();
+                                        // window.location.href=sceneWebLinks.link_url;
+                                        // window.open(sceneWebLinks.link_url, '_blank');
+                                    } else {
+                                        $("#topSuccess").html("timekeys updated, reload scene to view");
+                                        $("#topSuccess").show();
+                                        // window.location.reload();
+                                    }
+                                })                      
+                                .catch(function (error) {
+                                    console.log(error);
+                                    $("#topAlert").html(error);
+                                    $("#topAlert").show();
+                                });
+                            } else {
+                                console.log("must import a primary audio to do that!");
+                            }
+ 
                     }); 
                     
                     // if (timekeys != undefined) {

@@ -2586,6 +2586,13 @@ AFRAME.registerComponent('mod_object', {
       // this.camera = cameraEl.components.camera.camera;
     }
 
+    if (JSON.stringify(this.data.eventData).includes("beat")) {
+      console.log ("adding class beatmee");
+      this.el.classList.add("beatme");
+      // this.el.addEventListener('beatme', e => console.log("beat" + e.detail.volume()));
+      
+    }
+
 
     this.thirdPersonPlaceholder = null;
     // this.sceneInventoryID = null;
@@ -3971,18 +3978,11 @@ AFRAME.registerComponent('mod_object', {
     //  this.points.push(new THREE.Vector3(this.tempVectorP.x, this.tempVectorP.y, this.tempVectorP.z).normalize().multiplyScalar(i * 20));
     }
     this.curve = new THREE.CatmullRomCurve3(this.points);
-
-    // box.position.copy( spline.getPointAt( counter ) );
-
+      // box.position.copy( spline.getPointAt( counter ) );
         // tangent = spline.getTangentAt( counter ).normalize();
-
         // axis.crossVectors( up, tangent ).normalize();
-
         // var radians = Math.acos( up.dot( tangent ) );
-
         // box.quaternion.setFromAxisAngle( axis, radians );
-
-
     this.material = new THREE.LineBasicMaterial( { color: 0x0000ff } );
     // this.material = new THREE.LineBasicMaterial( {
     //   color: 0xffffff,
@@ -4189,7 +4189,22 @@ AFRAME.registerComponent('mod_object', {
   
       let line = new THREE.Line(geometry, material);
       this.el.sceneEl.objec3D.add(line);
-    
+  },
+  beat: function (volume, duration) {
+    console.log("tryna beat " + this.el.id + " " + volume);
+    if (this.data.eventData.toLowerCase().includes("beat")) {
+      let oScale = this.el.getAttribute('data-scale');
+      oScale = parseFloat(oScale);
+      volume = volume.toFixed(2) * .1;
+      let scale = {};
+        scale.x = oScale + volume;
+        scale.y = oScale + volume;
+        scale.z = oScale + volume;
+        this.el.setAttribute('scale', scale);
+        this.el.setAttribute('animation', 'property: scale; to: '+oScale+' '+oScale+' '+oScale+'; dur: '+duration+'; startEvents: beatRecover; easing: easeInOutQuad');
+        this.el.emit('beatRecover');
+
+    }
   }
  
 }); //mod_object end
@@ -6381,7 +6396,7 @@ AFRAME.registerComponent('picture_groups_control', {
       //find the group with the skyboxID, if there is one, and return that (can't mix in scene vs. in group skyboxen..?)
       let group = null;
       let picGroupArray = this.data.jsonData;
-      if (picGroupArray.length > 0) {
+      if (picGroupArray.length > 0) { //todo if pois or multiple equirects
         // let nextbuttonEl = document.getElementById('nextButton');
         // let prevbuttonEl = document.getElementById('previousButton');
         // nextbuttonEl.style.visibility = "visible";

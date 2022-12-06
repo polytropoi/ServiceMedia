@@ -11537,7 +11537,7 @@ app.post('/add_scene_audio/', requiredAuthentication, function (req, res) {
 
     var s_id = ObjectID(req.body.scene_id);   
     var a_id = ObjectID(req.body.audio_id);   
-    console.log('tryna add a scene pic : ' + req.body);
+    console.log('tryna import primary audio : ' + req.body);
 
     db.scenes.findOne({ "_id": s_id}, function (err, scene) {
         if (err || !scene) {
@@ -11560,6 +11560,41 @@ app.post('/add_scene_audio/', requiredAuthentication, function (req, res) {
         }
     });
 });
+
+app.post('/import_scene_audio_timed_events/', requiredAuthentication, function (req, res) {
+
+    var s_id = ObjectID(req.body.sceneID);   
+    var a_id = ObjectID(req.body.audioID);   
+    console.log('tryna import scene audio timed e3vents : ' + req.body);
+
+    db.scenes.findOne({ "_id": s_id}, function (err, scene) {
+        if (err || !scene) {
+            console.log("error getting scene for audio timekey import: " + err);
+        } else {
+            db.audio_items.findOne({ "_id": a_id}, function (err, audio) {
+                if (err || !audio) {
+                    console.log("error getting audio items 4: " + err);
+                } else {
+                    if (audio.timekeys != undefined && audio.timekeys != null && audio.timekeys.length) {
+                        let sceneTimedEvents = {};
+                        sceneTimedEvents.timekeys = audio.timekeys;
+                        db.scenes.update({ "_id": s_id }, { $set: {sceneTimedEvents: sceneTimedEvents}});
+                        
+                        if (err) {
+                            res.send(error);w
+                        } else {    
+                            res.send("updated " + new Date());
+                        }
+                     } else {
+                        res.send("no timekeys found for that audio item.");
+                     } 
+                      
+                }
+            });
+        }
+    });
+});
+
 
 //
 //    db.image_items.findOne({ "_id" : o_id}, function(err, pic) {

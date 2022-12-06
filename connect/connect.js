@@ -2366,12 +2366,12 @@ function LoopTimedEvent(keyType, duration) {
             for (let i = 0; i < beatElements.length; i++) {
                if (beatElements[i].components.mod_model != undefined) {
                   beatElements[i].components.mod_model.beat(.75, duration);
-               }
-               if (beatElements[i].components.cloud_marker != undefined) {
+               } else if (beatElements[i].components.mod_object != undefined) {
+                  beatElements[i].components.mod_object.beat(.75, duration);
+               } else if (beatElements[i].components.cloud_marker != undefined) {
                   beatElements[i].components.cloud_marker.beat(.15, duration);
                }
-               }
-
+            }
             }
             if (envEl != null) {
                // console.log("beat volume " + volume);
