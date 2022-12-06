@@ -2601,16 +2601,20 @@ app.get('/inventory/:_id', requiredAuthentication, usercheck, function (req, res
 });
 
 app.get('/user_inventory/:_id', requiredAuthentication, function(req, res){
-    var u_id = ObjectID(req.params._id)
-    db.inventory_items.find({"userID": u_id}, function (err, items){
-        if (err || !items) {
-            res.send("nope");
-        } else {
-            let profileResponse = {};
-            profileResponse.inventoryItems = items;
-            res.send(profileResponse);
-        }
-    });
+    if (req.params._id != undefined && req.params._id != null) {
+        var u_id = ObjectID(req.params._id);
+        db.inventory_items.find({"userID": u_id}, function (err, items){
+            if (err || !items) {
+                res.send("nope");
+            } else {
+                let profileResponse = {};
+                profileResponse.inventoryItems = items;
+                res.send(profileResponse);
+            }
+        });
+    } else {
+        res.send('no inventory userid!');
+    }
 });
 
 app.post('/update_profile/:_id', requiredAuthentication, function (req, res) { //for end users to change their personal data

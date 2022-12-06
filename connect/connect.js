@@ -507,6 +507,7 @@ function ImportMods (event) {
    }
 }
 function SaveTimekeysToLocal () {
+   console.log(JSON.stringify(timeKeysData));
    localStorage.setItem(room + "_timeKeys", JSON.stringify(timeKeysData));
 }
 
@@ -2313,7 +2314,7 @@ function TimedEventListener () {
                } else { 
                   
                   if(timeKeysIndex < tkStarttimes.length) {
-                     //    console.log("FIRING " + youtubePlayer.time + " vs " + timekey);
+                        // console.log("FIRING " + youtubePlayer.time + " vs " + timekey);
                      //    console.log("youtube event index " + timeKeysIndex + " " + JSON.stringify(timeKeysData.timekeys[timeKeysIndex]));
                      PlayTimedEvent(timeKeysData.timekeys[timeKeysIndex]);
                      timeKeysIndex++;
