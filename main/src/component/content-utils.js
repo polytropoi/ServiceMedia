@@ -559,7 +559,8 @@ AFRAME.registerComponent('get_pos_rot', { //ATTACHED TO PLAYER BELOW CAMERA RIG,
   },
   tick: function () {
     if (window != null) { //declared in server response, should init before any other client stuff
-      window.playerPosition = this.cp;
+        window.playerPosition = this.cp;
+
     } 
     // if (this.navmeshComponent != null) {
     //   // this.navmeshComponent.clampPosition(this.cp);
@@ -2128,7 +2129,7 @@ AFRAME.registerComponent('mod_objex', {
                   let objEl = document.createElement("a-entity");
                   objEl.setAttribute("mod_object", {'eventData': this.data.jsonLocationsData[i].eventData, 'locationData': this.data.jsonLocationsData[i], 'objectData': this.data.jsonObjectData[k]});
                   objEl.id = "obj" + this.data.jsonLocationsData[i].objectID + "_" + this.data.jsonLocationsData[i].timestamp;
-                  sceneEl.appendChild(objEl);
+                  this.el.sceneEl.appendChild(objEl);
                 }
               }
             } 
@@ -2697,7 +2698,7 @@ AFRAME.registerComponent('mod_object', {
         this.calloutEntity.setAttribute('visible', false);
       
         // calloutEntity.setAttribute("render-order", "hud");
-        sceneEl.appendChild(this.calloutEntity);
+        this.el.sceneEl.appendChild(this.calloutEntity);
         this.calloutEntity.appendChild(this.calloutPanel);
         this.calloutEntity.appendChild(this.calloutText);
         
@@ -7042,6 +7043,7 @@ function onYouTubeIframeAPIReady () { //must be global, called when youtube embe
           'onStateChange': onPlayerStateChange
         }
     });
+    youtubePlayer.h.attributes.sandbox.value = "allow-presentation";
     youtube_player = document.getElementById("youtubePlayer").components.youtube_player;
   }
 

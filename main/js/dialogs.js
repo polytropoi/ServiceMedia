@@ -1023,6 +1023,9 @@ function ToggleTimeKeyUIListeners () {
 
 }
 
+function ReturnCurrentPlayerLocation() {
+  return "<div>Current Location : "+JSON.stringify(window.playerPosition)+"</div>";
+}
 function ReturnColorButtons () {
 
     sceneColor1 = localStorage.getItem(room+"_sceneColor1");
@@ -1461,11 +1464,13 @@ function SceneManglerModal(mode) {
     // "<br><br><br><button class=\x22deleteButton\x22 id=\x22ClearAllPlaceholdersButton\x22 onclick=\x22ClearPlaceholders()\x22>Clear All Mods</button>"+
     "</div>"+
 
-
+    
     "<div "+locationsDisplay+" id=\x22Locations\x22 class=\x22modalMain tabcontent\x22>"+
+
+
     "<button class=\x22goToButton\x22 id=\x22nextButton\x22 onclick=\x22GoToNext()\x22>GoTo Next</button>"+
     "<button class=\x22goToButton\x22 id=\x22prevButton\x22 onclick=\x22GoToPrevious()\x22>GoTo Previous</button>"+
-    
+    ReturnCurrentPlayerLocation() +
       "<button style=\x22float:left\x22 class=\x22saveButton\x22 id=\x22CreatePlaceholderButton\x22 onclick=\x22CreatePlaceholder()\x22>New Local Placeholder</button>"+
       "<br><br><br><div>"+locationTable+"</div><br>"+
     "</div>"+     
