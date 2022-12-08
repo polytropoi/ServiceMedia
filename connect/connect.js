@@ -171,7 +171,7 @@ $(function() {
       sceneEl = document.querySelector('a-scene');
       skyboxEl.setAttribute('skybox_dynamic', {enabled: true, id: settings.skyboxIDs[0]});
       skyboxEl.id = 'skybox_dynamic';
-      this.el.sceneEl.appendChild(skyboxEl);
+      sceneEl.appendChild(skyboxEl);
       
    }
    if (settings.skyboxID == "") {
@@ -769,7 +769,7 @@ function AddLocalMarkers() {// new or modded markers not saved to cloud
                   var sceneEl = document.querySelector('a-scene');
                   phEl.setAttribute('skybox-env-map', '');
                   phEl.setAttribute('local_marker', {'timestamp': keySplit[2]});
-                  this.el.sceneEl.appendChild(phEl);
+                  sceneEl.appendChild(phEl);
                }
                if (theItem != null && sceneLocations.locations != null) {
                   let theItemObject = JSON.parse(theItem);
@@ -871,7 +871,7 @@ function CreatePlaceholder () {
    var sceneEl = document.querySelector('a-scene');
    phEl.setAttribute('skybox-env-map', '');
    phEl.setAttribute('local_marker', '');
-   this.el.sceneEl.appendChild(phEl);
+   sceneEl.appendChild(phEl);
    ShowHideDialogPanel();
    
  }
@@ -1672,7 +1672,7 @@ function ReturnPlayerData() { //return my un/color to set marker at current map 
 function Disconnect() {
    console.log("tryna disconnect..");
    socket.disconnect();
-   let roomAvatars = this.el.sceneEl.querySelectorAll('.avatar');
+   let roomAvatars = sceneEl.querySelectorAll('.avatar');
    for (var a=0; a<roomAvatars.length; a++) { //clean up disconnected avatars
       roomAvatars[a].remove();
    }
@@ -1756,7 +1756,7 @@ function UpdatePlayerAvatars(roomUsers) { //aframe only, need to flex.. //no, ju
          }
       }
 
-      let roomAvatars = this.el.sceneEl.querySelectorAll('.avatar');
+      let roomAvatars = sceneEl.querySelectorAll('.avatar');
       console.log("roomAvatars " + roomAvatars);
       var dupeCheck = "";
       for (var a=0; a<roomAvatars.length; a++) { //clean up disconnected avatars
