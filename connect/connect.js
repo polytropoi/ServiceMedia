@@ -189,7 +189,7 @@ $(function() {
       let audioGroupsEl = document.createElement('a-entity');
       audioGroupsEl.setAttribute("id","audioGroupsEl");
       audioGroupsEl.setAttribute("audio_groups_control", {init: ''});
-      this.el.sceneEl.appendChild(audioGroupsEl);
+      sceneEl.appendChild(audioGroupsEl);
    }
    if (settings.useMatrix) {
       console.log("Loading browser MATRIX sdk!!!");
