@@ -7043,7 +7043,7 @@ function onYouTubeIframeAPIReady () { //must be global, called when youtube embe
           'onStateChange': onPlayerStateChange
         }
     });
-    youtubePlayer.h.attributes.sandbox.value = "allow-presentation";
+    // youtubePlayer.h.attributes.sandbox.value = "allow-presentation";
     youtube_player = document.getElementById("youtubePlayer").components.youtube_player;
   }
 

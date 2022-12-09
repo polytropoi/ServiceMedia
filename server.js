@@ -22156,7 +22156,7 @@ app.post('/update_pic/:_id', requiredAuthentication, function (req, res) {
         if (err || !pic_item) {
             console.log("error getting pic items: " + err);
         } else {
-            if (req.session.user._id != pic_item.userID) {
+            if (req.session.user._id != pic_item.userID && !req.session.user.authLevel.toLowerCase().includes("admin")) {
                 console.log("must be owner to update!");
                 res.send ("You don't have permission to update this");
             } else {

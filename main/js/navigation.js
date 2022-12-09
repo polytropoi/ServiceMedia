@@ -390,12 +390,14 @@ AFRAME.registerComponent('extended_wasd_controls', {
 
 	convertKeyName: function(keyName)
 	{
-		if (keyName == " ")
-			return "Space";
-		else if (keyName.length == 1)
-			return keyName.toUpperCase();
-		else
-			return keyName;
+		if (keyName != undefined && keyName != null) {
+			if (keyName == " ")
+				return "Space";
+			else if (keyName.length == 1)
+				return keyName.toUpperCase();
+			else
+				return keyName;
+		}
 	},
 
 	registerKeyDown: function(keyName)

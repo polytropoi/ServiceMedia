@@ -142,9 +142,10 @@ $(function() {
       timeKeysData = settings.sceneTimedEvents;
       localStorage.setItem(room + '_timeKeys', JSON.stringify(timeKeysData));
       console.log('cloud timekeysdata' + JSON.stringify(timeKeysData));
+      timedEventsListenerMode = timeKeysData.listenTo;  
    } else if (localStorage.getItem(room + "_timeKeys") != null) { //use local ve3rsion if saved
          timeKeysData = JSON.parse(localStorage.getItem(room + "_timeKeys"));
-         // console.log('local timeKeysData' + JSON.stringify(timeKeysData));
+         console.log('local timeKeysData' + JSON.stringify(timeKeysData));
          timedEventsListenerMode = timeKeysData.listenTo;  
    }
 
@@ -2046,8 +2047,9 @@ function UpdateTriggerAudioVolume(newVolume) {
 //////////////////////////////////////////////// move to primary-audio-control ... //no!
 
 function SetPrimaryAudioEventsData () {
-   console.log("setting primary audio events data!");
+
    timeKeysData = JSON.parse(localStorage.getItem(room+ "_timeKeys"));
+   console.log("setting primary audio events data! " + JSON.stringify(timeKeysData));
    tkStarttimes = [];
    if (timeKeysData != undefined && timeKeysData != null && timeKeysData.timekeys != undefined && timeKeysData.timekeys.length > 0 )
       timeKeysData.timekeys.forEach(function (timekey) {
@@ -2259,27 +2261,28 @@ function TimedEventListener () {
      if (timedEventsListenerMode != null && timedEventsListenerMode.toLowerCase() == 'primary audio') {
       // if (hasPrimaryAudio) {
          if (primaryAudioHowl != undefined && primaryAudioHowl != null && primaryAudioHowl.playing()) {
-         let primaryAudioTime = primaryAudioHowl.seek();
+         
+            let primaryAudioTime = primaryAudioHowl.seek();
             
             if (primaryAudioTime != 0 && primaryAudioTime < .2) { //needs fudge?
                timeKeysIndex = 0; 
                console.log("resetting timekeysindex!");
             }
-            // if (primaryAudioTime != 0 && primaryAudioTime) {
+            if (primaryAudioTime != 0 && primaryAudioTime < timekey) {
                   // console.log(primaryAudioTime + "less than " + timekey);
                   //just waiting...
+            } else {
+               if (timeKeysIndex < tkStarttimes.length) {
+                  // console.log("TRYNA PLAY TIMEKEY "+ JSON.stringify(timeKeysData.timekeys[timeKeysIndex]) +" at primaryAudioTime "+ primaryAudioTime.toString() );
+                  PlayTimedEvent(timeKeysData.timekeys[timeKeysIndex]);
+                  timeKeysIndex++;
                } else {
-                  if (timeKeysIndex < tkStarttimes.length) {
-                     // console.log("TRYNA PLAY TIMEKEY "+ JSON.stringify(timeKeysData.timekeys[timeKeysIndex]) +" at primaryAudioTime "+ primaryAudioTime.toString() );
-                     PlayTimedEvent(timeKeysData.timekeys[timeKeysIndex]);
-                     timeKeysIndex++;
-                  } else {
-                     console.log("end");
-                     clearInterval(listenerInterval);
-                    
-                  }
+                  console.log("end");
+                  clearInterval(listenerInterval);
+                  
                }
-            // }
+            }
+         }
          // }
       } else if (timedEventsListenerMode != null && timedEventsListenerMode.toLowerCase() == 'primary video') {
          if (videoEl != null && !videoEl.paused && timekey > 0){
