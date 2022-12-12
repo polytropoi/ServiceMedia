@@ -3418,57 +3418,58 @@ AFRAME.registerComponent('mod_object', {
                 if (triggerAudioController != null) {
                   triggerAudioController.components.trigger_audio_control.playAudioAtPosition(this.el.object3D.position, window.playerPosition.distanceTo(this.el.object3D.position), ["hit, bounce"]);
                 }
-                for (let i = 0; i < mod_obj_component.data.objectData.actions.length; i++) {
-                  if (mod_obj_component.data.objectData.actions[i].actionType.toLowerCase() == "collide") {
-                    if (mod_obj_component.data.objectData.actions[i].sourceObjectMod.toLowerCase() == "remove") {
-                      let trailComponent = e.detail.targetEl.components.trail;
-                      if (trailComponent) {
-                        trailComponent.reset();
-                      }
-                      if (e.detail.targetEl.parentNode) {
-                        e.detail.targetEl.parentNode.removeChild(e.detail.targetEl);
-                      }
-                      // e.detail.targetEl.parentNode.removeChild(e.detail.targetEl);
+                if (mod_obj_component.data.objectData.actions) {
+                  for (let i = 0; i < mod_obj_component.data.objectData.actions.length; i++) {
+                    if (mod_obj_component.data.objectData.actions[i].actionType.toLowerCase() == "collide") {
+                      if (mod_obj_component.data.objectData.actions[i].sourceObjectMod.toLowerCase() == "remove") {
+                        let trailComponent = e.detail.targetEl.components.trail;
+                        if (trailComponent) {
+                          trailComponent.reset();
+                        }
+                        if (e.detail.targetEl.parentNode) {
+                          e.detail.targetEl.parentNode.removeChild(e.detail.targetEl);
+                        }
+                        // e.detail.targetEl.parentNode.removeChild(e.detail.targetEl);
 
+                      }
+                      if (mod_obj_component.data.objectData.actions[i].sourceObjectMod.toLowerCase() == "replace object") {
+                        // console.log("tryna replace object...");
+                        let trailComponent = e.detail.targetEl.components.trail;
+                        if (trailComponent) {
+                          trailComponent.kill();
+                          // e.detail.targetEl.removeAttribute("trail");
+                        }
+                        if (e.detail.targetEl.parentNode) {
+                          e.detail.targetEl.parentNode.removeChild(e.detail.targetEl);
+                        }
+                        // e.detail.targetEl.parentNode.removeChild(e.detail.targetEl);
+                        let objexEl = document.getElementById('sceneObjects');    
+                        let objectData = objexEl.components.mod_objex.returnObjectData(mod_obj_component.data.objectData.actions[i].objectID);
+                        // if (objectData == null) {
+
+                        //   // objectData = objexEl.components.mod_objex.returnObjectData(mod_obj_component.data.objectData.actions[i].objectID); //try again, if it's not in the sceneobjectdata it will make a special request
+                        // }
+                        if (objectData != null) {
+                          console.log("tryna replace object with " + JSON.stringify(objectData));
+                          // this.objectData = this.returnObjectData(mod_obj_component.data.objectData.actions[i].objectID);
+
+                          // this.dropPos = new THREE.Vector3();
+                          this.objEl = document.createElement("a-entity");
+
+                          this.locData = {};
+                          this.locData.x = this.el.object3D.position.x;
+                          this.locData.y = this.el.object3D.position.y;
+                          this.locData.z = this.el.object3D.position.z;
+                          this.locData.timestamp = Date.now();
+                          this.objEl.setAttribute("mod_object", {'locationData': this.locData, 'objectData': objectData});
+                          this.objEl.id = "obj" + objectData._id + "_" + this.locData.timestamp;
+                          sceneEl.appendChild(this.objEl);
+                        } else {
+                          console.log("caint find object "+ mod_obj_component.data.objectData.actions[i].objectID +", tryna fetch it..");
+                          FetchSceneInventoryObject(mod_obj_component.data.objectData.actions[i].objectID);
+                        }
+                      } 
                     }
-                    if (mod_obj_component.data.objectData.actions[i].sourceObjectMod.toLowerCase() == "replace object") {
-                      // console.log("tryna replace object...");
-                      let trailComponent = e.detail.targetEl.components.trail;
-                      if (trailComponent) {
-                        trailComponent.kill();
-                        // e.detail.targetEl.removeAttribute("trail");
-                      }
-                      if (e.detail.targetEl.parentNode) {
-                        e.detail.targetEl.parentNode.removeChild(e.detail.targetEl);
-                      }
-                      // e.detail.targetEl.parentNode.removeChild(e.detail.targetEl);
-                      let objexEl = document.getElementById('sceneObjects');    
-                      let objectData = objexEl.components.mod_objex.returnObjectData(mod_obj_component.data.objectData.actions[i].objectID);
-                      // if (objectData == null) {
-
-                      //   // objectData = objexEl.components.mod_objex.returnObjectData(mod_obj_component.data.objectData.actions[i].objectID); //try again, if it's not in the sceneobjectdata it will make a special request
-                      // }
-                      if (objectData != null) {
-                        console.log("tryna replace object with " + JSON.stringify(objectData));
-                        // this.objectData = this.returnObjectData(mod_obj_component.data.objectData.actions[i].objectID);
-
-                        // this.dropPos = new THREE.Vector3();
-                        this.objEl = document.createElement("a-entity");
-
-                        this.locData = {};
-                        this.locData.x = this.el.object3D.position.x;
-                        this.locData.y = this.el.object3D.position.y;
-                        this.locData.z = this.el.object3D.position.z;
-                        this.locData.timestamp = Date.now();
-                        this.objEl.setAttribute("mod_object", {'locationData': this.locData, 'objectData': objectData});
-                        this.objEl.id = "obj" + objectData._id + "_" + this.locData.timestamp;
-                        sceneEl.appendChild(this.objEl);
-                      } else {
-                        console.log("caint find object "+ mod_obj_component.data.objectData.actions[i].objectID +", tryna fetch it..");
-                        FetchSceneInventoryObject(mod_obj_component.data.objectData.actions[i].objectID);
-                      }
-                    } 
-
                   }
                 }
               }
@@ -5119,7 +5120,7 @@ AFRAME.registerComponent('mod_model', {
                 calloutEntity.setAttribute('visible', false);
 
                 calloutText.setAttribute("position", '0 0 .5'); //offset the child on z toward camera, to prevent overlap on model
-                calloutText.setAttribute("look-at", "#player")
+                calloutText.setAttribute("look-at", "#player");
                 calloutText.setAttribute('text', {
                   width: 2,
                   baseline: "bottom",
@@ -5405,7 +5406,7 @@ AFRAME.registerComponent('mod_model', {
               // }
             }
 
-            if (this.data.eventData && this.data.eventData.toLowerCase().includes("target")) {
+            if (this.data.eventData && this.data.eventData.length && this.data.eventData.toLowerCase().includes("target")) {
                 // this.el.setAttribute("targeting_raycaster", {'init': true}); //no
                 this.el.classList.add("target");
                 this.el.classList.remove("activeObjexRay");
@@ -5628,7 +5629,7 @@ AFRAME.registerComponent('mod_model', {
   },
   rayhit: function (id, distance, hitpoint) {
 
-    if (this.data.eventData.toLowerCase().includes("target")) {        
+    if (this.data.eventData && this.data.eventData.length && this.data.eventData.toLowerCase().includes("target")) {        
       if (this.particlesEl) {
         // hitpoint.x = hitpoint.x.toFixed(2);
         // hitpoint.y = hitpoint.y.toFixed(2);
@@ -7044,7 +7045,11 @@ function onYouTubeIframeAPIReady () { //must be global, called when youtube embe
         }
     });
     // youtubePlayer.h.attributes.sandbox.value = "allow-presentation";
+   
+
     youtube_player = document.getElementById("youtubePlayer").components.youtube_player;
+    // https://stackoverflow.com/questions/55724586/youtube-iframe-without-allow-presentation
+    youtubePlayer.h.attributes.sandbox.value = "allow-same-origin allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox allow-presentation";
   }
 
   function onPlayerReady(event) {

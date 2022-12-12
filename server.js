@@ -8270,7 +8270,7 @@ app.get('/mypeople/:u_id', requiredAuthentication,  function(req, res) {
 });
 
 app.get('/person/:p_id', requiredAuthentication, function(req, res) {
-    console.log('tryna return usertexts for: ' + req.params.p_id);
+    console.log('tryna return person for: ' + req.params.p_id);
     var o_id = ObjectID(req.params.p_id);
     db.people.findOne({_id: o_id}, function(err, person) {
         if (err || !person) {
@@ -8481,6 +8481,18 @@ app.post('/updatetext/:_id', requiredAuthentication, function (req, res) {
     res.send("updated " + new Date());
 });
 
+app.get('/svg/:_id', function(req, res) { 
+    console.log('tryna return svg for: ' + req.params._id);
+    var o_id = ObjectID(req.params._id);
+    db.text_items.findOne({_id: o_id}, function(err, text_item) {
+        if (err || !text_item) {
+            console.log("error getting text_items : " + err);
+        } else {
+            res.send(text_item.textstring); //text file saved as svg format
+            console.log("returning svg item " + req.params._id);
+        }
+    });
+});
 
 app.get('/usertexts/:u_id', requiredAuthentication, function(req, res) {
     console.log('tryna return usertexts for: ' + req.params.u_id);
@@ -8512,7 +8524,6 @@ app.get('/usertext/:p_id', requiredAuthentication, function(req, res) {
         if (err || !text_item) {
             console.log("error getting text_items : " + err);
         } else {
-
             res.json(text_item);
             console.log("returning text items for " + req.params.u_id);
         }
@@ -8640,6 +8651,7 @@ app.get('/userpic/:p_id', requiredAuthentication, function(req, res) {
         }
     });
 });
+
 app.get('/hls/:_id', function(req, res) {
     var pID = req.params._id;
     console.log("hls pid " + req.params._id);

@@ -4449,6 +4449,7 @@
                         "<select class=\x22form-control\x22 id=\x22textType\x22 >" +
                         "<option value=\x22\x22 disabled selected>Select:</option>" +
                         "<option>Default</option>" +
+                        "<option>SVG Document</option>" +
                         "<option>Full HTML Page</option>" +
                         "<option>Question/Answer</option>" +
                         "<option>Question/Multichoice</option>" +
@@ -4724,7 +4725,7 @@
                         if (!editor) {
                             editor = CodeMirror.fromTextArea(textArea, {
                                 mode: {
-                                    name: "javascript",
+                                    name: "htmlmixed",
                                     json: true
                                 },
                                 lineNumbers: true,
@@ -4738,7 +4739,25 @@
                         // editor.setOption("theme", "neo.css");
                         // editor.load(getJsonTemplate('Question/Multichoice'));
                         // document.getElementById("textstring").remove();
-                        isJson = true;
+                        isJson = false;
+                    }
+                    if (this.value == 'SVG Document') {
+                        // document.getElementById('textstring').value = getJsonTemplate('Question/Answer');    
+                        if (!editor) {
+                            editor = CodeMirror.fromTextArea(textArea, {
+                                mode: 'xml',
+                                // theme: 'eclipse',
+                                lineNumbers: true,
+                                lineWrapping: true,
+                            });
+                            if (document.getElementById("textstring").value == "") {
+                                editor.setValue("boilerplate svg here");
+                            }
+                        }
+                        // editor.setOption("theme", "neo.css");
+                        // editor.load(getJsonTemplate('Question/Multichoice'));
+                        // document.getElementById("textstring").remove();
+                        isJson = false;
                     }
                 // } else {
                 //     console.log("can't change once set to a json type!");
@@ -4823,6 +4842,21 @@
                         }
 
                         isJson = true;
+                    }
+                }
+                if ($(e).val() == 'SVG Document') {
+                    if (!editor) {
+                        editor = CodeMirror.fromTextArea(textArea, {
+                            mode: 'xml',
+                            htmlMode: true,
+                            lineNumbers: true,
+                            lineWrapping: true,
+                        });
+                        if (document.getElementById("textstring").value == "") {
+                            editor.setValue("boilerplace svg here..");
+                        }
+
+                        isJson = false;
                     }
                 }
             }
@@ -9922,6 +9956,8 @@ function getAllPeople() {
         "key",
         "audio",
         "audiogroup",
+        "svg fixed",
+        "svg billboard",
         "picture fixed",
         "picture billboard",
         "picturegroup",

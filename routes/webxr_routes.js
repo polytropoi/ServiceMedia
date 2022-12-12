@@ -692,7 +692,7 @@ webxr_router.get('/:_id', function (req, res) {
                                         animationComponent = "<script src=\x22https://unpkg.com/aframe-animation-component@5.1.2/dist/aframe-animation-component.min.js\x22></script>"; //unused !NEEDS FIXING - this component could be added more than once
                                     }
                                 }
-                                if (sceneResponse.sceneLocations[i].markerType != undefined && sceneResponse.sceneLocations[i].type.toLowerCase() != 'geographic') {
+                                if (sceneResponse.sceneLocations[i].markerType != undefined && sceneResponse.sceneLocations[i].type.toLowerCase() != 'geographic') { //cloudmarkers, special type allows local mods
                                     if (sceneResponse.sceneLocations[i].markerType.toLowerCase() == "placeholder" 
                                         || sceneResponse.sceneLocations[i].markerType.toLowerCase().includes("trigger") 
                                         || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "poi" 
@@ -853,6 +853,8 @@ webxr_router.get('/:_id', function (req, res) {
                                     }
                                     proceduralEntities = proceduralEntities + "<a-entity mod_tunnel=\x22init: true; scrollDirection: "+scrollDirection+"; scrollSpeed: "+scrollSpeed+"\x22></a-entity>";
                                 }
+
+
 
                             }
                             // loadLocations = "ready(function(){\n" +
@@ -2449,17 +2451,16 @@ webxr_router.get('/:_id', function (req, res) {
                     if (sceneResponse.sceneTextItems != null && sceneResponse.sceneTextItems != undefined && sceneResponse.sceneTextItems != "") {
                         if (sceneResponse.sceneWebType != "HTML from Text Item") {
                         // for (let i = 0; i < sceneTextItems.length; i++) {
-                            sceneTextItemData = "<div id=\x22sceneTextItems\x22 data-attribute=\x22"+sceneResponse.sceneTextItems+"\x22></div>"; 
+                            // sceneTextItemData = "<div id=\x22sceneTextItems\x22 data-attribute=\x22"+sceneResponse.sceneTextItems+"\x22></div>"; 
                             // dialogButton = "<div class=\x22dialog_button\x22 style=\x22float: left; margin: 10px 10px;\x22 onclick=\x22SceneManglerModal('Welcome')\x22><i class=\x22fas fa-info-circle fa-2x\x22></i></div>";
-                            if (!sceneResponse.sceneTextUseModals) {
-                                //renderPanel = "<a-entity visible=\x22false\x22 render_canvas id=\x22renderCanvas\x22 look-at=\x22#player\x22 geometry=\x22primitive: plane; width:1; height:1;\x22 scale=\x221 1 1\x22 position=\x220 3.5 -.25\x22 material=\x22shader: html; transparent: true; width:1024; height:1024; fps: 10; target: #renderPanel;\x22></a-entity>\n";
-                                renderPanel = "<a-entity use-textitem-modals></a-entity>\n";
-                            } else {
-                                renderPanel = "<a-entity use-textitem-modals></a-entity>\n";
-                            }
-                            callback();
-                        } else {
-                            // if (sceneResponse.sceneTextItems != null && sceneResponse.sceneTextItems != undefined && sceneResponse.sceneTextItems.length > 0) {
+                            
+                            //hrm...dunno....
+                                // if (!sceneResponse.sceneTextUseModals) {
+                                //     //renderPanel = "<a-entity visible=\x22false\x22 render_canvas id=\x22renderCanvas\x22 look-at=\x22#player\x22 geometry=\x22primitive: plane; width:1; height:1;\x22 scale=\x221 1 1\x22 position=\x220 3.5 -.25\x22 material=\x22shader: html; transparent: true; width:1024; height:1024; fps: 10; target: #renderPanel;\x22></a-entity>\n";
+                                //     renderPanel = "<a-entity use-textitem-modals></a-entity>\n";
+                                // } else {
+                                //     renderPanel = "<a-entity use-textitem-modals></a-entity>\n";
+                                // }
                             moids = ObjectID(sceneResponse.sceneTextItems[0]);
                             db.text_items.findOne({_id: moids}, function (err, text_item){
                                 if (err || !text_item) {
@@ -2467,7 +2468,26 @@ webxr_router.get('/:_id', function (req, res) {
                                     sceneTextItemData = "no data found";
                                     callback(null);
                                 } else {
+                                    //  = text_item;
+                                    // console.log("gots textItemData : " + JSON.stringify(text_item));
+                                    // sceneTextItemData = "<div id=\x22sceneTextItems\x22 data-attribute=\x22"+text_item._id+"\x22><img id=\x22svgSrc\x22 src=\x22data:image/svg+xml;charset=utf-8,"+text_item.textstring+"\x22></div>"; //text string is an svg
+                                    sceneTextItemData = "<div id=\x22sceneTextItems\x22 data-attribute=\x22"+text_item._id+"\x22></div>";
+                                    // sceneTextItemData = text_item.textstring; 
+                                    callback(null);
+                                }
+                            });
+                            // callback();
+                        } else { //if it's an html...
+                            // if (sceneResponse.sceneTextItems != null && sceneResponse.sceneTextItems != undefined && sceneResponse.sceneTextItems.length > 0) {
+                            
+                            db.text_items.findOne({_id: moids}, function (err, text_item){
+                                if (err || !text_item) {
+                                    console.log("error getting text_items: " + err);
+                                    sceneTextItemData = "no data found";
+                                    callback(null);
+                                } else {
                                     sceneTextItemData = text_item;
+                                   
                                     callback(null)
                                 }
                             });
@@ -2964,6 +2984,7 @@ webxr_router.get('/:_id', function (req, res) {
 
                         "<div id=\x22overlayContent\x22 class=\x22content\x22>" + youtubeContent +"<hr>"+ fromBy + keynote + desc + appButtons +
                         
+
                         userText +
                         
                         "<div class=\x22smallfont\x22><span id=\x22users\x22></span></div>"+ 
@@ -4469,7 +4490,7 @@ webxr_router.get('/:_id', function (req, res) {
                         "</body>" +
                     "</html>";
                     
-                    } else { //AFrame response below
+                    } else { /////////////////////////////////////////////////////////------------- Default / AFrame response below ------------------------------
                         let joystick = "joystick=\x22useNavmesh: false\x22";
                         let extraScripts = "";
                         let hasParametricCurve = false;
@@ -4863,7 +4884,7 @@ webxr_router.get('/:_id', function (req, res) {
                         loadLocations +
                         "<a-entity id=\x22createAvatars\x22 create_avatars></a-entity>"+
                         "<a-entity id=\x22particleSpawner\x22 particle_spawner></a-entity>"+
-                        
+                        "<a-plane loadsvg id=\x22flying_dialog\x22 look-at=\x22#player\x22 width=\x221\x22 height=\x221\x22 position=\x220 1.5 -1\x22></a-plane>"+
                         audioVizEntity +
                         instancingEntity +
                         arHitTest + 
@@ -4904,6 +4925,8 @@ webxr_router.get('/:_id', function (req, res) {
                             // "}\n"+
                             // "</style>\n"+
                         // "<div class=\x22renderPanel\x22 id=\x22renderPanel\x22></div>\n"+
+                        "<canvas id=\x22flying_canvas\x22 style=\x22text-align:center;\x22 width=\x221024\x22 height=\x221024\x22></canvas>"+
+
                         sceneTextItemData +
                         "<div id=\x22geopanel\x22 class=\x22geopanel\x22><span></span></div>\n"+
                         "<div id=\x22sceneGreeting\x22 style=\x22z-index: -20;\x22>"+sceneGreeting+"</div>"+

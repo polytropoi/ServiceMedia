@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg"
+     xml:lang="en-GB" width="4.3in" height="3in">
+    <title>How Doth the Little Crocodile - Lewis Carroll</title>
+    <desc>From Alice in Wonderland</desc>
+    <style>
+@import
+  url(http://fonts.googleapis.com/css?family=Sofia);
+
+        svg {
+            font-family: "Sofia", sans-serif;
+            font-size: 20pt;
+        }
+        .verse {
+            fill: darkGreen;
+            stroke: #031;
+            word-spacing: 2px;                             
+        }
+        .verse > tspan:nth-child(2n) {                     
+            fill: navy;
+            stroke: #013;
+        }
+    </style>
+    <defs>
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+    <feGaussianBlur stdDeviation="10 10" result="glow"/>
+    <feMerge>
+    <feMergeNode in="glow"/>
+    <feMergeNode in="glow"/>
+    <feMergeNode in="glow"/>
+    </feMerge>
+    </filter>
+    </defs>
+    <defs>
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="110%">
+    <feGaussianBlur stdDeviation="2 2" result="shadow"/>
+    <feOffset dx="2" dy="2"/>
+    </filter>
+    </defs>
+    <rect fill="#CEE" fill-opacity="0.7" rx="20" ry="20" width="100%" height="100%" />
+    <text style="filter: url(#shadow);" class="verse">                                   
+        <tspan dy="1.2em" x="10"
+               >How doth the little crocodile</tspan>      
+        <tspan dy="1.2em" x="10" dx="1em"
+               >Improve his shining tail,</tspan>          
+        <tspan dy="1.2em" x="10"
+               >And pour the waters of the Nile</tspan>
+        <tspan dy="1.2em" x="10" dx="1em"
+               >On every golden scale!</tspan>
+    </text>
+        <text class="verse">                                   
+        <tspan dy="1.2em" x="10"
+               >How doth the little crocodile</tspan>      
+        <tspan dy="1.2em" x="10" dx="1em"
+               >Improve his shining tail,</tspan>          
+        <tspan dy="1.2em" x="10"
+               >And pour the waters of the Nile</tspan>
+        <tspan dy="1.2em" x="10" dx="1em"
+               >On every golden scale!</tspan>
+    </text>
+    <text class="verse" y="50%">                           
+        <tspan dy="1.2em" x="10"
+               >How cheerfully he seems to grin,</tspan>
+        <tspan dy="1.2em" x="10" dx="1em"
+               >How neatly spreads his claws,</tspan>
+        <tspan dy="1.2em" x="10"
+               >And welcomes little fishes in</tspan>
+        <tspan dy="1.2em" x="10" dx="1em"
+               >With gently smiling jaws!</tspan>
+    </text>
+</svg>

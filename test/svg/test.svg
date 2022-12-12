@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .small {
+      font: italic 24px sans-serif;
+    }
+    .heavy {
+      font: bold 100px sans-serif;
+    }
+
+    /* Note that the color of the text is set with the    *
+     * fill property, the color property is for HTML only */
+    .Rrrrr {
+      font: italic 170px serif;
+      fill: yellow;
+    }
+  </style>
+<rect id="svg_bg_rect" x="2" y="2" rx="30" ry="30" width="94%" height="94%" style="fill:red;stroke:black;stroke-width:5;opacity:0.5" />
+<!-- fill="#CEE" fill-opacity="0.7" rx="20" ry="20" width="100%" height="100%" -->
+  <text x="20" y="135" class="small">My</text>
+  <text x="40" y="135" class="heavy">cat</text>
+  <text x="55" y="155" class="small">is</text>
+  <text x="65" y="200" class="Rrrrr">Grumpy!</text>
+
+  <text x="10" y="200" style="font-size: 4em; font-family: system-ui; fill:green;">Several lines:
+    <tspan x="10" y="245">First line.</tspan>
+    <tspan x="10" y="470">Second line.</tspan>
+    <tspan x="10" y="605">I testify that the beginning of all things is a Certain Nature, which is perpetual, coequalling all things, 
+    and that the visible natures, with their births and decay, are times wherein the ends to which that nature brings them are beheld and summoned. 
+    Now, I instruct you that the stars are igneous, and are kept within bounds by the air. If the humidity and density of the air did not exist to separate the flames of the sun from living things, then the Sun would consume all creatures. But God has provided the separating air, lest that which He has created should be burnt up. Do you not: observe that the Sun when it rises in the heaven overcomes the air by its heat, and that the warmth penetrates from the upper to the lower parts of the air? If, then, the air did not presently breathe forth those winds whereby creatures are generated, the Sun by its heat would certainly destroy all that lives. But the Sun is kept in check by the air, which thus conquers because it unites the heat of the Sun to its own heat, and the humidity of water to its own humidity. Have you not remarked how tenuous water is drawn up into the air by the action of the heat of the Sun, which thus helps the water against itself? If the water did not nourish the air by such tenuous moisture, assuredly the Sun would overcome the air. The fire, therefore, extracts moisture from the water, by means of which the air conquers the fire itself. Thus, fire and water are enemies between which there is no consanguinity, for the fire is hot and dry, but the water is cold and moist. The air, which is warm and moist, joins these together by its concording medium; between the humidity of water and the heat of fire the air is thus placed to establish peace. rind look ye all how there shall arise a spirit from the tenuous vapour of the air, because the heat being joined to the humour, there necessarily issues something tenuous, which will become a wind. For the heat of the Sun extracts something tenuous out of the air, which also becomes spirit and life to all creatures. All this, however, is disposed in such manner by the will of God, and a coruscation appears when the heat of the Sun touches and breaks up a cloud.</tspan>
+  </text>
+
+  
+</svg>

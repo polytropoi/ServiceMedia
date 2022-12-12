@@ -3453,3 +3453,88 @@ AFRAME.registerComponent('mod_line', {
 //     exponent: 'material.exponent'
 //   }
 // });
+
+//  from https://stackoverflow.com/questions/57820253/a-frame-converts-my-svg-into-a-pixel-image
+AFRAME.registerComponent('loadsvg', {
+  init: function() {  
+      // let canvas = document.getElementById('flying_canvas');
+      // let textData = document.getElementById('sceneTextItems');
+      // let murl = "/svg/" + textData.getAttribute('data-attribute');
+      // console.log("tryna get svg " + murl);
+      // let ctx = canvas.getContext('2d');
+      // var img = new Image();
+      // var url = "";
+      // img.onload = () => {
+      //     //ctx.fillStyle = "rgba(255, 255, 255, 0.0)";
+      //     //ctx.fillRect(0, 0, 256, 256); 
+      //     ctx.drawImage(img, 0, 0, 1024, 1024);
+          
+      //     let mesh = this.el.getObject3D("mesh")
+      //     var texture = new THREE.Texture(canvas);
+      //     texture.needsUpdate = true;
+
+      //     var material = new THREE.MeshBasicMaterial({ 
+      //       map: texture, 
+      //       transparent: true
+      //     });
+          
+      //     let tmp = mesh.material
+      //     mesh.material = material
+      //     tmp.dispose()
+      //     // URL.revokeObjectURL(url);
+      // }
+          let textData = document.getElementById('sceneTextItems');
+          let murl = "/svg/" + textData.getAttribute('data-attribute');
+          console.log("tryna get svg " + murl);
+
+          var xhr = new XMLHttpRequest();
+          xhr.open("get", murl, true);
+          xhr.setRequestHeader('Content-Type', 'application/json');
+          xhr.send();
+          xhr.onload = function () {
+            if (this.responseText != null) {
+
+              let canvas = document.getElementById('flying_canvas');
+              // let textData = document.getElementById('sceneTextItems');
+              // let murl = "/svg/" + textData.getAttribute('data-attribute');
+              // console.log("tryna get svg " + murl);
+              let ctx = canvas.getContext('2d');
+              var img = new Image();
+              // var url = "";
+              img.onload = () => {
+                  //ctx.fillStyle = "rgba(255, 255, 255, 0.0)";
+                  //ctx.fillRect(0, 0, 256, 256); 
+                  ctx.drawImage(img, 0, 0, 1024, 1024);
+                  
+                  let mesh = this.el.getObject3D("mesh")
+                  var texture = new THREE.Texture(canvas);
+                  texture.needsUpdate = true;
+
+                  var material = new THREE.MeshBasicMaterial({ 
+                    map: texture, 
+                    transparent: true
+                  });
+                  
+                  let tmp = mesh.material
+                  mesh.material = material
+                  tmp.dispose()
+                  // URL.revokeObjectURL(url);
+              }
+              console.log("tryna snet an svg to canvas...");
+              let blob = new Blob([this.responseText], {type: 'image/svg+xml'});
+              let url = URL.createObjectURL(blob);
+              img.src = url;
+            
+            
+            }
+          }
+    //  image.addEventListener('load', () => URL.revokeObjectURL(url), {once: true});
+      // let blob = new Blob([svg], {type: 'image/svg+xml'});
+      // img.src = url;
+      // img.src = "/test/svg/alice.svg";
+      // svgEl.style.display = "inline";
+      // let src = svgEl.innerHTML;
+      // console.log(svgEl);
+      // img = svgEl; 
+  }
+});
