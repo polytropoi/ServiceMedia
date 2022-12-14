@@ -3455,86 +3455,269 @@ AFRAME.registerComponent('mod_line', {
 // });
 
 //  from https://stackoverflow.com/questions/57820253/a-frame-converts-my-svg-into-a-pixel-image
-AFRAME.registerComponent('loadsvg', {
+
+AFRAME.registerComponent('loadsvg_xhr', {
   init: function() {  
-      // let canvas = document.getElementById('flying_canvas');
-      // let textData = document.getElementById('sceneTextItems');
-      // let murl = "/svg/" + textData.getAttribute('data-attribute');
-      // console.log("tryna get svg " + murl);
-      // let ctx = canvas.getContext('2d');
-      // var img = new Image();
-      // var url = "";
-      // img.onload = () => {
-      //     //ctx.fillStyle = "rgba(255, 255, 255, 0.0)";
-      //     //ctx.fillRect(0, 0, 256, 256); 
-      //     ctx.drawImage(img, 0, 0, 1024, 1024);
-          
-      //     let mesh = this.el.getObject3D("mesh")
-      //     var texture = new THREE.Texture(canvas);
-      //     texture.needsUpdate = true;
 
-      //     var material = new THREE.MeshBasicMaterial({ 
-      //       map: texture, 
-      //       transparent: true
-      //     });
-          
-      //     let tmp = mesh.material
-      //     mesh.material = material
-      //     tmp.dispose()
-      //     // URL.revokeObjectURL(url);
-      // }
-          let textData = document.getElementById('sceneTextItems');
-          let murl = "/svg/" + textData.getAttribute('data-attribute');
-          console.log("tryna get svg " + murl);
+      let textData = document.getElementById('sceneTextItems');
+      let murl = "/svg/" + textData.getAttribute('data-attribute');
+      console.log("tryna get svg " + murl);
+      var img = new Image();
+      var xhr = new XMLHttpRequest();
+      xhr.open("get", murl, true);
+      xhr.setRequestHeader('Content-Type', 'application/json');
+      xhr.send();
+      xhr.onload = function () {
+        if (this.responseText != null) {
 
-          var xhr = new XMLHttpRequest();
-          xhr.open("get", murl, true);
-          xhr.setRequestHeader('Content-Type', 'application/json');
-          xhr.send();
-          xhr.onload = function () {
-            if (this.responseText != null) {
+          let canvas = document.getElementById('flying_canvas');
+          // let textData = document.getElementById('sceneTextItems');
+          // let murl = "/svg/" + textData.getAttribute('data-attribute');
+          // console.log("tryna get svg " + murl);
+          // let ctx = canvas.getContext('2d');
 
-              let canvas = document.getElementById('flying_canvas');
-              // let textData = document.getElementById('sceneTextItems');
-              // let murl = "/svg/" + textData.getAttribute('data-attribute');
-              // console.log("tryna get svg " + murl);
-              let ctx = canvas.getContext('2d');
-              var img = new Image();
-              // var url = "";
-              img.onload = () => {
-                  //ctx.fillStyle = "rgba(255, 255, 255, 0.0)";
-                  //ctx.fillRect(0, 0, 256, 256); 
-                  ctx.drawImage(img, 0, 0, 1024, 1024);
-                  
-                  let mesh = this.el.getObject3D("mesh")
-                  var texture = new THREE.Texture(canvas);
-                  texture.needsUpdate = true;
+          // var url = "";
+         
+          console.log("tryna snet an svg to canvas...");
+          let blob = new Blob([this.responseText], {type: 'image/svg+xml'});
+          let url = URL.createObjectURL(blob);
+          img.src = url;
+        
+        
+        }
+      }
+      img.onload = () => {
+        //ctx.fillStyle = "rgba(255, 255, 255, 0.0)";
+        //ctx.fillRect(0, 0, 256, 256); 
+        ctx.drawImage(img, 0, 0, 1024, 1024);
+        
+        let mesh = this.el.getObject3D("mesh")
+        var texture = new THREE.Texture(canvas);
+        texture.needsUpdate = true;
 
-                  var material = new THREE.MeshBasicMaterial({ 
-                    map: texture, 
-                    transparent: true
-                  });
-                  
-                  let tmp = mesh.material
-                  mesh.material = material
-                  tmp.dispose()
-                  // URL.revokeObjectURL(url);
-              }
-              console.log("tryna snet an svg to canvas...");
-              let blob = new Blob([this.responseText], {type: 'image/svg+xml'});
-              let url = URL.createObjectURL(blob);
-              img.src = url;
-            
-            
-            }
-          }
-    //  image.addEventListener('load', () => URL.revokeObjectURL(url), {once: true});
-      // let blob = new Blob([svg], {type: 'image/svg+xml'});
-      // img.src = url;
-      // img.src = "/test/svg/alice.svg";
-      // svgEl.style.display = "inline";
-      // let src = svgEl.innerHTML;
-      // console.log(svgEl);
-      // img = svgEl; 
+        var material = new THREE.MeshBasicMaterial({ 
+          map: texture, 
+          transparent: true
+        });
+        
+        let tmp = mesh.material
+        mesh.material = material
+        tmp.dispose()
+        // URL.revokeObjectURL(url);
+    }
   }
 });
+
+
+AFRAME.registerComponent('loadsvg_blob', { //use this one with embedded font
+  init: function() {  
+      
+        let canvas = document.getElementById('flying_canvas');
+        let svgData = document.querySelectorAll("[svgItem]")[0];
+        // let textData = document.getElementById('svgItem');
+        if (svgData)  {
+          
+          // let murl = "/svg/" + textData.getAttribute('data-attribute');
+          console.log("tryna get svg " + svgData);
+          let ctx = canvas.getContext('2d');
+          var img = new Image();
+          let blob = new Blob([svgData.innerHTML], {type: 'image/svg+xml'});
+          let url = URL.createObjectURL(blob);
+          img.src = url;
+        
+          // var url = "";
+          img.onload = () => {
+              //ctx.fillStyle = "rgba(255, 255, 255, 0.0)";
+              //ctx.fillRect(0, 0, 256, 256); 
+              ctx.drawImage(img, 0, 0, 1024, 1024);
+              
+              let mesh = this.el.getObject3D("mesh")
+              var texture = new THREE.Texture(canvas);
+              texture.needsUpdate = true;
+
+              var material = new THREE.MeshBasicMaterial({ 
+                map: texture, 
+                transparent: true
+              });
+              
+              let tmp = mesh.material
+              mesh.material = material
+              tmp.dispose()
+              URL.revokeObjectURL(url);
+          }
+          console.log("tryna set an inline svg to canvas...");
+          this.el.setAttribute("visible", true);
+          // let src = svgEl.innerHTML;
+        }
+    }
+});
+
+
+AFRAME.registerComponent('loadsvg', {
+  schema: {
+    init: {default: false},
+    eventdata: {default: ''},
+    tags: {default: ''}
+    },
+  init: function() {
+      // grab the canvas element
+      var canvas = document.querySelector(".canvasItem");
+      var ctx = canvas.getContext('2d');
+
+      let svgData = document.querySelector(".svgItem");
+
+      if (this.data.eventdata) {
+        let altSvgData = document.getElementById(this.data.eventdata);
+        if (altSvgData) {
+          svgData = altSvgData;
+        }
+      }
+
+      if (svgData != null) {
+        // create an image, which will contain the svg data
+        var img = new Image();
+
+        // this will be triggered when the provided .svg is loaded
+        img.onload = () => {
+          // draw the image on the canvas
+          ctx.drawImage(img, 0, 0, 1024, 1024);
+
+          // create the texture and material
+          let texture = new THREE.Texture(canvas);
+          texture.needsUpdate = true;
+          let material = new THREE.MeshBasicMaterial({ 
+            map: texture,
+            transparent: true
+            // transparent: true
+
+          });
+
+          // grab the mesh, replace the material, dispose the old one
+          let mesh = this.el.getObject3D("mesh")
+          let tmp = mesh.material
+          mesh.material = material
+          tmp.dispose()
+        }
+        // provide the .svg file as the image source 
+        console.log(svgData.innerHTML);
+        let blob = new Blob([svgData.innerHTML], {type: 'image/svg+xml'});
+        let url = URL.createObjectURL(blob);
+        img.src = url;
+        // img.src = svgData.innerHTML;
+      }
+    }
+});
+
+
+    // AFRAME.registerComponent('loadcanvas', {
+    //   init: function() {
+    //     this.canvas = document.getElementById("flying_canvas");
+
+    //     this.context = this.canvas.getContext('2d');
+    //     this.context.clearRect(0, 0, 1024, 1024)
+    //     this.context.strokeStyle = "rgb(255, 0, 0)";
+    //     this.context.fillStyle = "rgba(255, 255, 0, .5)";
+    //     this.context.beginPath();
+    //     this.context.roundRect(0, 0, 900, 900, 60);
+    //     this.context.stroke();
+    //     this.context.fill();
+    //     // this.context.fillStyle = "#8888FF";
+    //     // this.context.fillRect(0,0, 1024,1024);
+    //     this.context.font='italic 32px sans-serif';
+    //     this.context.fillText('Hello World', 10,30);		
+
+    //     let mesh = this.el.getObject3D("mesh");
+    //     var texture = new THREE.Texture(canvas);
+    //     texture.needsUpdate = true;
+
+    //     var material = new THREE.MeshBasicMaterial({ 
+    //       map: texture, 
+    //       transparent: true
+    //     });
+        
+    //     let tmp = mesh.material
+    //     mesh.material = material
+    //     tmp.dispose();
+              
+    //     // let material = this.el.getObject3D('mesh').material;
+    //     //   if (!material.map) {
+    //     //    	return;
+    //     //   } else {
+    //     //     material.map.needsUpdate = true;
+    //     //   }  	
+    //     // }
+    //     // this.x = 200;
+    //     // this.y = 100;
+    //     // this.dx = 5;
+    //     // this.dy = 3;
+    //   }
+      
+    //   // tick: function(t)
+    //   // {
+    //   // 	this.x += this.dx;
+    //   // 	this.y += this.dy;
+        
+    //   // 	if (this.x > 512-50 || this.x < 0)
+    //   // 		this.dx *= -1;
+    //   // 	if (this.y > 512-50 || this.y < 0)
+    //   // 		this.dy *= -1;
+      
+    //   // 	// clear canvas
+    //   // 	this.context.fillStyle = "#8888FF";
+    //   // 	this.context.fillRect(0,0, 512,512);
+        
+    //   // 	// draw rectangle
+    //   // 	this.context.fillStyle = "#FF0000";
+    //   // 	this.context.fillRect( this.x, this.y, 50, 50 );
+
+    //   // 	// thanks to https://github.com/aframevr/aframe/issues/3936 for the update fix
+    //   // 	let material = this.el.getObject3D('mesh').material;
+    //   //     if (!material.map) {
+    //   //      	return;
+    //   //     } else {
+    //   //       material.map.needsUpdate = true;
+    //   //     }
+              
+    //   // }
+      
+    // });
+
+// AFRAME.registerComponent('load_threemeshui', { //nope
+//   init: function() {
+
+//     // window.onclick = function(event) {
+//     //   event.preventDefault();
+          
+//     // }
+
+//     this.makeContainer();
+//   },
+//   makeContainer: function() {
+
+//       this.container = new ThreeMeshUI.Block({ //no object3D error
+//         width: 1.45,
+//         height: 0.5,
+//         padding: 0.05,
+//         justifyContent: "center",
+//         textAlign: "center",
+//         fontFamily: "/fonts/Roboto-msdf.json",
+//         fontTexture: "/fonts/Roboto-msdf.png"
+//       });
+
+//       this.container.position.set(0, 1, -1.8);
+//       this.container.rotation.x = -0.55;
+//       this.el.sceneEl.add(this.container);
+
+//       //
+
+//       this.container.add(
+//         new ThreeMeshUI.Text({
+//           content: "three-mesh-ui.min.js",
+//           fontSize: 0.125
+//         })
+//       );
+//     },
+//     tick: function () {
+//       ThreeMeshUI.update();
+//     }
+// });

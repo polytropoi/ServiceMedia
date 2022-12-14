@@ -8342,7 +8342,7 @@ app.get('/action/:p_id', requiredAuthentication, function(req, res) {
 });
 app.post('/update_action/', requiredAuthentication, admin, function (req, res) {
     //        var textitem = req.body;
-        console.log("req.body update text:" + JSON.stringify(req.body));
+        // console.log("req.body update text:" + JSON.stringify(req.body));
         var o_id = ObjectID(req.body._id);
     //        textitem.userID = req.session.user._id.toString();
         var timestamp = Math.round(Date.now() / 1000);

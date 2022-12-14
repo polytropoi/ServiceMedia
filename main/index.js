@@ -4399,7 +4399,14 @@
         console.log(error);
         });
     } 
-
+    function base64convert (files) {
+        console.clear()
+        const reader = new FileReader()
+        reader.onload = (e) => {
+          console.log(e.target.result)
+        }
+        reader.readAsDataURL(files[0])
+      }
     function showText(item_id) {
         let config = { headers: {
             appid: appid,
@@ -4425,7 +4432,7 @@
         var card = "<div class=\x22col-lg-12\x22>" +
         "<div class=\x22card shadow mb-4\x22>" +
             "<div class=\x22card-header py-3 d-flex flex-row align-items-center justify-content-between\x22>" +
-            "<h6 class=\x22m-0 font-weight-bold text-primary\x22>Text Details - Title: "+ response.data.title + " | _id: " +response.data._id+ "</h6>" +
+            "<h6 class=\x22m-0 font-weight-bold text-primary\x22>Text Details - Title: "+ response.data.title + " | _id: " +response.data._id+ "</h6> <a href=\x22/svg/" +response.data._id+ "\x22>test svg " +response.data._id+ "</a>" +
             "</div>" +
             "<div class=\x22card-body\x22>" +
                 // "<div class=\x22media\x22>" +
@@ -4489,6 +4496,11 @@
                         "<label for=\x22sourceURL\x22>Source URL</label>" + 
                         "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22sourceURL\x22 value=\x22" + response.data.sourceURL + "\x22 >" +
                     "</div>" +
+                    "<div class=\x22col form-group col-md-2\x22>" + 
+                        "<label>Convert TTF to Base64</label>" + 
+                        "<input type=\x22file\x22 onchange=\x22base64convert(this.files)\x22></input>"+
+                    "</div>" +
+                   
                 "</div>" +     
                 "<div class=\x22form-row\x22>" +
 

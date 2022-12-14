@@ -853,6 +853,18 @@ webxr_router.get('/:_id', function (req, res) {
                                     }
                                     proceduralEntities = proceduralEntities + "<a-entity mod_tunnel=\x22init: true; scrollDirection: "+scrollDirection+"; scrollSpeed: "+scrollSpeed+"\x22></a-entity>";
                                 }
+                                let scale = 1;
+                                if (sceneResponse.sceneLocations[i].markerObjScale && sceneResponse.sceneLocations[i].markerObjScale != "" && sceneResponse.sceneLocations[i].markerObjScale != 0) {
+                                    scale = sceneResponse.sceneLocations[i].markerObjScale;
+                                }
+                                if (sceneResponse.sceneLocations[i].markerType == "svg fixed") {
+                                    proceduralEntities = proceduralEntities + " <a-plane loadsvg=\x22eventdata: "+sceneResponse.sceneLocations[i].eventData+"; tags:  "+sceneResponse.sceneLocations[i].locationTags+"\x22 id=\x22svg_"+sceneResponse.sceneLocations[i].timestamp+
+                                    "\x22 width=\x22"+scale+"\x22 height=\x22"+scale+"\x22 position=\x22"+sceneResponse.sceneLocations[i].x + " " + sceneResponse.sceneLocations[i].y + " " + zFix+"\x22></a-plane>";
+                                }
+                                if (sceneResponse.sceneLocations[i].markerType == "svg billboard") {
+                                    proceduralEntities = proceduralEntities + " <a-plane loadsvg=\x22eventdata: "+sceneResponse.sceneLocations[i].eventData+"; tags:  "+sceneResponse.sceneLocations[i].locationTags+"\x22 id=\x22svg_"+sceneResponse.sceneLocations[i].timestamp+
+                                    "\x22 look-at=\x22#player\x22 width=\x22"+scale+"\x22 height=\x22"+scale+"\x22 position=\x22"+sceneResponse.sceneLocations[i].x + " " + sceneResponse.sceneLocations[i].y + " " + zFix+"\x22></a-plane>";
+                                }
 
 
 
@@ -2446,11 +2458,12 @@ webxr_router.get('/:_id', function (req, res) {
                         callback();
                     }
                 },
-                function (callback) { 
 
+                function (callback) { 
+                    //hrm, get a list of text locations and spin through these...
                     if (sceneResponse.sceneTextItems != null && sceneResponse.sceneTextItems != undefined && sceneResponse.sceneTextItems != "") {
                         if (sceneResponse.sceneWebType != "HTML from Text Item") {
-                        // for (let i = 0; i < sceneTextItems.length; i++) {
+                        for (let i = 0; i < sceneResponse.sceneTextItems.length; i++) {
                             // sceneTextItemData = "<div id=\x22sceneTextItems\x22 data-attribute=\x22"+sceneResponse.sceneTextItems+"\x22></div>"; 
                             // dialogButton = "<div class=\x22dialog_button\x22 style=\x22float: left; margin: 10px 10px;\x22 onclick=\x22SceneManglerModal('Welcome')\x22><i class=\x22fas fa-info-circle fa-2x\x22></i></div>";
                             
@@ -2461,22 +2474,30 @@ webxr_router.get('/:_id', function (req, res) {
                                 // } else {
                                 //     renderPanel = "<a-entity use-textitem-modals></a-entity>\n";
                                 // }
-                            moids = ObjectID(sceneResponse.sceneTextItems[0]);
-                            db.text_items.findOne({_id: moids}, function (err, text_item){
-                                if (err || !text_item) {
-                                    console.log("error getting text_items: " + err);
-                                    sceneTextItemData = "no data found";
-                                    callback(null);
-                                } else {
-                                    //  = text_item;
-                                    // console.log("gots textItemData : " + JSON.stringify(text_item));
-                                    // sceneTextItemData = "<div id=\x22sceneTextItems\x22 data-attribute=\x22"+text_item._id+"\x22><img id=\x22svgSrc\x22 src=\x22data:image/svg+xml;charset=utf-8,"+text_item.textstring+"\x22></div>"; //text string is an svg
-                                    sceneTextItemData = "<div id=\x22sceneTextItems\x22 data-attribute=\x22"+text_item._id+"\x22></div>";
-                                    // sceneTextItemData = text_item.textstring; 
-                                    callback(null);
-                                }
-                            });
-                            // callback();
+
+                            
+                                moids = ObjectID(sceneResponse.sceneTextItems[i]);
+                                db.text_items.findOne({_id: moids}, function (err, text_item){
+                                    if (err || !text_item) {
+                                        console.log("error getting text_items: " + err);
+                                        sceneTextItemData = "no data found";
+                                        // callback(null);
+                                    } else {
+                                        //  = text_item;
+
+                                        if (text_item.type == "SVG Document") {
+                                            // console.log("gots svgItem : " + JSON.stringify(text_item));
+                                            sceneTextItemData = sceneTextItemData + "<canvas class=\x22canvasItem\x22 id=\x22svg_canvas_"+text_item._id+"\x22 style=\x22text-align:center;\x22 width=\x221024\x22 height=\x221024\x22></canvas>"+
+                                            "<div style=\x22visibility: hidden\x22 class=\x22svgItem\x22 id=\x22"+text_item._id+"\x22 data-attribute=\x22"+text_item._id+"\x22>"+text_item.textstring+"</div>"; //text string is an svg
+                                        }
+                                        // sceneTextItemData = "<div id=\x22sceneTextItems\x22 data-attribute=\x22"+text_item._id+"\x22></div>";
+                                        // sceneTextItemData = text_item.textstring; 
+                                        // callback(null);
+                                    }
+                                });
+                            // }
+                        }
+                            callback();
                         } else { //if it's an html...
                             // if (sceneResponse.sceneTextItems != null && sceneResponse.sceneTextItems != undefined && sceneResponse.sceneTextItems.length > 0) {
                             
@@ -2486,7 +2507,7 @@ webxr_router.get('/:_id', function (req, res) {
                                     sceneTextItemData = "no data found";
                                     callback(null);
                                 } else {
-                                    sceneTextItemData = text_item;
+                                    sceneTextItemData = text_item.textstring; // html with the trimmings...
                                    
                                     callback(null)
                                 }
@@ -3582,6 +3603,8 @@ webxr_router.get('/:_id', function (req, res) {
                             "<meta name=\x22mobile-web-app-capable\x22 content=\x22yes\x22>" +
                             "<meta name=\x22apple-mobile-web-app-capable\x22 content=\x22yes\x22>" +
                             
+
+
                             "<link href=\x22../main/vendor/fontawesome-free/css/all.css\x22 rel=\x22stylesheet\x22 type=\x22text/css\x22>" +
                             "<link href=\x22/css/modelviewer.css\x22 rel=\x22stylesheet\x22 type=\x22text/css\x22>" + 
                             "<link href=\x22/css/webxr.css\x22 rel=\x22stylesheet\x22 type=\x22text/css\x22>" + 
@@ -4630,15 +4653,21 @@ webxr_router.get('/:_id', function (req, res) {
                         // "<meta name=\x22token\x22 content=\x22"+token+"\x22>"+
                         "<link href=\x22../main/vendor/fontawesome-free/css/all.css\x22 rel=\x22stylesheet\x22 type=\x22text/css\x22>" +
                         "<link href=\x22/css/webxr.css\x22 rel=\x22stylesheet\x22 type=\x22text/css\x22>" +
+
+                        //TODO FONT INCLUDES?  
+                        // "<link href=\x22https://fonts.googleapis.com/css?family=Miltonian+Tattoo&display=swap\x22 rel=\x22stylesheet\x22></link>" +
+
                                               //<!-- Import maps polyfill -->
                        //<!-- Remove this when import maps will be widely supported -->
                        "<script async src=\x22https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js\x22></script>"+
+
                        "<script type=\x22importmap\x22> {\x22imports\x22: {" +
                             "\x22three\x22: \x22/three/build/three.module.js\x22"+
                         "}}</script>"+
                         "<script src=\x22/main/vendor/jquery/jquery.min.js\x22></script>" +
                         
                         "<script src=\x22../main/ref/aframe/dist/socket.io.slim.js\x22></script>" +
+                        
                         "<script src=\x22/connect/connect.js\x22 defer=\x22defer\x22></script>" +
                 
                         // "<script src=\x22//aframe.io/releases/1.3.0/aframe.min.js\x22></script>" +
@@ -4690,6 +4719,7 @@ webxr_router.get('/:_id', function (req, res) {
                         // "<script src=\x22../main/src/util/quaternion.js\x22></script>"+
                         // "<script src=\x22../main/vendor/trackedlibs/aabb-collider.js\x22></script>"+
 
+                        // "<script src=\x22../main/src/component/three-mesh-ui.min.js\x22></script>"+
                         "<script src=\x22../main/src/component/aframe-makewaves-shader.js\x22></script>"+
                         "<script src=\x22../main/src/shaders/noise.js\x22></script>"+
 
@@ -4714,6 +4744,8 @@ webxr_router.get('/:_id', function (req, res) {
                         // "<script src=\x22../main/src/component/aframe-gradientsky.min.js\x22></script>"+
                         "<script src=\x22../main/src/component/ar-utils.js\x22></script>"+
                         "<script src=\x22../main/src/component/spawn-in-circle.js\x22></script>"+
+
+
                         // "<script src=\x22/main/vendor/jquery/jquery.min.js\x22></script>" +
                         // "<script src=\x22/connect/connect.js\x22 defer=\x22defer\x22></script>" +
                         // "<script type=\x22module\x22 src=\x22/main/src/component/drag-mangler.js\x22></script>"+
@@ -4884,7 +4916,11 @@ webxr_router.get('/:_id', function (req, res) {
                         loadLocations +
                         "<a-entity id=\x22createAvatars\x22 create_avatars></a-entity>"+
                         "<a-entity id=\x22particleSpawner\x22 particle_spawner></a-entity>"+
-                        "<a-plane loadsvg id=\x22flying_dialog\x22 look-at=\x22#player\x22 width=\x221\x22 height=\x221\x22 position=\x220 1.5 -1\x22></a-plane>"+
+                        // "<a-plane loadsvg_blob id=\x22flying_dialog\x22 material=\x22shader: flat; transparent: true; opacity .5; src: #flying_canvas;\x22 look-at=\x22#player\x22 width=\x221\x22 height=\x221\x22 position=\x220 1.5 -1\x22></a-plane>"+
+                        // "<a-plane loadsvg id=\x22flying_dialog\x22 look-at=\x22#player\x22 width=\x221\x22 height=\x221\x22 position=\x220 1.5 -1\x22></a-plane>"+
+
+                        // "<a-entity load_threemeshui></a-entity>"+
+
                         audioVizEntity +
                         instancingEntity +
                         arHitTest + 
@@ -4925,7 +4961,7 @@ webxr_router.get('/:_id', function (req, res) {
                             // "}\n"+
                             // "</style>\n"+
                         // "<div class=\x22renderPanel\x22 id=\x22renderPanel\x22></div>\n"+
-                        "<canvas id=\x22flying_canvas\x22 style=\x22text-align:center;\x22 width=\x221024\x22 height=\x221024\x22></canvas>"+
+                        
 
                         sceneTextItemData +
                         "<div id=\x22geopanel\x22 class=\x22geopanel\x22><span></span></div>\n"+
