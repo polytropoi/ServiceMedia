@@ -3556,22 +3556,25 @@ AFRAME.registerComponent('loadsvg_blob', { //use this one with embedded font
 AFRAME.registerComponent('loadsvg', {
   schema: {
     init: {default: false},
+    id: {default: ""},
     eventdata: {default: ''},
     tags: {default: ''}
     },
   init: function() {
       // grab the canvas element
-      var canvas = document.querySelector(".canvasItem");
+      // var canvas = document.querySelector(".canvasItem");
+      var canvas = document.getElementById("svg_canvas_"+ this.data.id);
       var ctx = canvas.getContext('2d');
 
-      let svgData = document.querySelector(".svgItem");
+      // let svgData = document.querySelector(".svgItem");
+      let svgData = document.getElementById("svg_item_"+ this.data.id);
 
-      if (this.data.eventdata) {
-        let altSvgData = document.getElementById(this.data.eventdata);
-        if (altSvgData) {
-          svgData = altSvgData;
-        }
-      }
+      // if (this.data.eventdata) {
+      //   let altSvgData = document.getElementById(this.data.eventdata);
+      //   if (altSvgData) {
+      //     svgData = altSvgData;
+      //   }
+      // }
 
       if (svgData != null) {
         // create an image, which will contain the svg data
@@ -3599,15 +3602,77 @@ AFRAME.registerComponent('loadsvg', {
           tmp.dispose()
         }
         // provide the .svg file as the image source 
-        console.log(svgData.innerHTML);
+        // console.log(svgData.innerHTML);
         let blob = new Blob([svgData.innerHTML], {type: 'image/svg+xml'});
-        let url = URL.createObjectURL(blob);
+        let url = URL.createObjectURL(blob); //necessary to include the embedded font
         img.src = url;
         // img.src = svgData.innerHTML;
       }
     }
 });
 
+
+AFRAME.registerComponent('load_threesvg', {
+  schema: {
+    init: {default: false},
+    eventdata: {default: ''},
+    tags: {default: ''}
+    },
+  init: function() {
+      // instantiate a loader
+const loader = new SVGLoader();
+let murl = "/svg/" + textData.getAttribute('data-attribute');
+// load a SVG resource
+loader.load(
+        // resource URL
+        murl,
+        // called when the resource is loaded
+        function ( data ) {
+
+          const paths = data.paths;
+          const group = new THREE.Group();
+
+          for ( let i = 0; i < paths.length; i ++ ) {
+
+            const path = paths[ i ];
+
+            const material = new THREE.MeshBasicMaterial( {
+              color: path.color,
+              side: THREE.DoubleSide,
+              depthWrite: false
+            } );
+
+            const shapes = SVGLoader.createShapes( path );
+
+            for ( let j = 0; j < shapes.length; j ++ ) {
+
+              const shape = shapes[ j ];
+              const geometry = new THREE.ShapeGeometry( shape );
+              const mesh = new THREE.Mesh( geometry, material );
+              group.add( mesh );
+
+            }
+
+          }
+
+          this.el.sceneEl.add( group );
+
+        },
+        // called when loading is in progresses
+        function ( xhr ) {
+
+          console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+        },
+        // called when loading has errors
+        function ( error ) {
+
+          console.log( 'An error happened' );
+
+        }
+      );
+    }
+});
 
     // AFRAME.registerComponent('loadcanvas', {
     //   init: function() {

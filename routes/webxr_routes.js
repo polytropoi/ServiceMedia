@@ -141,6 +141,7 @@ webxr_router.get('/:_id', function (req, res) {
     var sceneGLTFLocations = [];
     var sceneModelLocations = [];
     var sceneObjectLocations = [];
+    var sceneTextLocations = [];
 
     var sceneWeblinkLocations = [];
     // var allGLTFs = {};
@@ -857,14 +858,27 @@ webxr_router.get('/:_id', function (req, res) {
                                 if (sceneResponse.sceneLocations[i].markerObjScale && sceneResponse.sceneLocations[i].markerObjScale != "" && sceneResponse.sceneLocations[i].markerObjScale != 0) {
                                     scale = sceneResponse.sceneLocations[i].markerObjScale;
                                 }
-                                if (sceneResponse.sceneLocations[i].markerType == "svg fixed") {
-                                    proceduralEntities = proceduralEntities + " <a-plane loadsvg=\x22eventdata: "+sceneResponse.sceneLocations[i].eventData+"; tags:  "+sceneResponse.sceneLocations[i].locationTags+"\x22 id=\x22svg_"+sceneResponse.sceneLocations[i].timestamp+
+                                if (sceneResponse.sceneLocations[i].markerType == "svg canvas fixed") {
+                                    sceneTextLocations.push(sceneResponse.sceneLocations[i]);
+                                    proceduralEntities = proceduralEntities + " <a-plane loadsvg=\x22description: "+sceneResponse.sceneLocations[i].description+"; eventdata: "+sceneResponse.sceneLocations[i].eventData+"; tags:  "+sceneResponse.sceneLocations[i].locationTags+"\x22 id=\x22svg_"+sceneResponse.sceneLocations[i].timestamp+
                                     "\x22 width=\x22"+scale+"\x22 height=\x22"+scale+"\x22 position=\x22"+sceneResponse.sceneLocations[i].x + " " + sceneResponse.sceneLocations[i].y + " " + zFix+"\x22></a-plane>";
                                 }
-                                if (sceneResponse.sceneLocations[i].markerType == "svg billboard") {
-                                    proceduralEntities = proceduralEntities + " <a-plane loadsvg=\x22eventdata: "+sceneResponse.sceneLocations[i].eventData+"; tags:  "+sceneResponse.sceneLocations[i].locationTags+"\x22 id=\x22svg_"+sceneResponse.sceneLocations[i].timestamp+
-                                    "\x22 look-at=\x22#player\x22 width=\x22"+scale+"\x22 height=\x22"+scale+"\x22 position=\x22"+sceneResponse.sceneLocations[i].x + " " + sceneResponse.sceneLocations[i].y + " " + zFix+"\x22></a-plane>";
+                                if (sceneResponse.sceneLocations[i].markerType == "svg canvas billboard") {
+
+                                    sceneTextLocations.push(sceneResponse.sceneLocations[i]);
+                                    // proceduralEntities = proceduralEntities + " <a-plane loadsvg=\x22description: "+sceneResponse.sceneLocations[i].description+"; eventdata: "+sceneResponse.sceneLocations[i].eventData+"; tags:  "+sceneResponse.sceneLocations[i].locationTags+"\x22 id=\x22svg_"+sceneResponse.sceneLocations[i].timestamp+
+                                    // "\x22 look-at=\x22#player\x22 width=\x22"+scale+"\x22 height=\x22"+scale+"\x22 position=\x22"+sceneResponse.sceneLocations[i].x + " " + sceneResponse.sceneLocations[i].y + " " + zFix+"\x22></a-plane>";
                                 }
+                                if (sceneResponse.sceneLocations[i].markerType == "svg fixed") {
+                                    sceneTextLocations.push(sceneResponse.sceneLocations[i]);
+
+                                }
+                                if (sceneResponse.sceneLocations[i].markerType == "svg billboard") {
+                                    sceneTextLocations.push(sceneResponse.sceneLocations[i]);
+                                    // proceduralEntities = proceduralEntities + " <a-entity load_threesvg=\x22description: "+sceneResponse.sceneLocations[i].description+"; eventdata: "+sceneResponse.sceneLocations[i].eventData+"; tags:  "+sceneResponse.sceneLocations[i].locationTags+"\x22 id=\x22svg_"+sceneResponse.sceneLocations[i].timestamp+
+                                    // "\x22 look-at=\x22#player\x22 width=\x22"+scale+"\x22 height=\x22"+scale+"\x22 position=\x22"+sceneResponse.sceneLocations[i].x + " " + sceneResponse.sceneLocations[i].y + " " + zFix+"\x22></a-entity>";
+                                }
+
 
 
 
@@ -2462,8 +2476,10 @@ webxr_router.get('/:_id', function (req, res) {
                 function (callback) { 
                     //hrm, get a list of text locations and spin through these...
                     if (sceneResponse.sceneTextItems != null && sceneResponse.sceneTextItems != undefined && sceneResponse.sceneTextItems != "") {
-                        if (sceneResponse.sceneWebType != "HTML from Text Item") {
-                        for (let i = 0; i < sceneResponse.sceneTextItems.length; i++) {
+                        if (sceneResponse.sceneWebType != "HTML from Text Item") { //if it's not a plain html page
+                        for (let i = 0; i < sceneTextLocations.length; i++) {  //TODO ASYNC
+
+                            console.log("cheking sceneLocation " + JSON.stringify(sceneTextLocations[i]));
                             // sceneTextItemData = "<div id=\x22sceneTextItems\x22 data-attribute=\x22"+sceneResponse.sceneTextItems+"\x22></div>"; 
                             // dialogButton = "<div class=\x22dialog_button\x22 style=\x22float: left; margin: 10px 10px;\x22 onclick=\x22SceneManglerModal('Welcome')\x22><i class=\x22fas fa-info-circle fa-2x\x22></i></div>";
                             
@@ -2474,33 +2490,51 @@ webxr_router.get('/:_id', function (req, res) {
                                 // } else {
                                 //     renderPanel = "<a-entity use-textitem-modals></a-entity>\n";
                                 // }
-
                             
-                                moids = ObjectID(sceneResponse.sceneTextItems[i]);
-                                db.text_items.findOne({_id: moids}, function (err, text_item){
-                                    if (err || !text_item) {
-                                        console.log("error getting text_items: " + err);
-                                        sceneTextItemData = "no data found";
-                                        // callback(null);
-                                    } else {
-                                        //  = text_item;
-
-                                        if (text_item.type == "SVG Document") {
-                                            // console.log("gots svgItem : " + JSON.stringify(text_item));
-                                            sceneTextItemData = sceneTextItemData + "<canvas class=\x22canvasItem\x22 id=\x22svg_canvas_"+text_item._id+"\x22 style=\x22text-align:center;\x22 width=\x221024\x22 height=\x221024\x22></canvas>"+
-                                            "<div style=\x22visibility: hidden\x22 class=\x22svgItem\x22 id=\x22"+text_item._id+"\x22 data-attribute=\x22"+text_item._id+"\x22>"+text_item.textstring+"</div>"; //text string is an svg
-                                        }
-                                        // sceneTextItemData = "<div id=\x22sceneTextItems\x22 data-attribute=\x22"+text_item._id+"\x22></div>";
-                                        // sceneTextItemData = text_item.textstring; 
-                                        // callback(null);
+                            let textID = sceneTextLocations[i].description; //check desc for id, if not then event data
+                            if (!textID || textID.length < 5) {
+                                textID = sceneTextLocations[i].eventData;
+                            }
+                            console.log("tryna get svg " + textID);
+                            if (textID && textID.length > 5) { 
+                                if (sceneTextLocations[i].markerType == "svg canvas billboard") {
+                                   
+                                    let oid = ObjectID(textID);
+                                    db.text_items.findOne({_id: oid}, function (err, text_item){
+                                        if (err || !text_item) {
+                                            console.log("error getting text_items: " + err);
+                                            sceneTextItemData = "no data found";
+                                            // callback(null);
+                                        } else {
+                                            //  = text_item;
+    
+                                            if (text_item.type == "SVG Document") {
+                                                // console.log("gots svgItem : " + JSON.stringify(text_item));
+                                                let scale = 1;
+                                                if (sceneTextLocations[i].markerObjScale && sceneTextLocations[i].markerObjScale != "" && sceneTextLocations[i].markerObjScale != 0) {
+                                                    scale = sceneTextLocations[i].markerObjScale;
+                                                }
+                    
+                                                sceneTextItemData = sceneTextItemData + "<canvas class=\x22canvasItem\x22 id=\x22svg_canvas_"+textID+"\x22 style=\x22text-align:center;\x22 width=\x221024\x22 height=\x221024\x22></canvas>"+
+                                                "<div style=\x22visibility: hidden\x22 class=\x22svgItem\x22 id=\x22svg_item_"+textID+"\x22 data-attribute=\x22"+text_item._id+"\x22>"+text_item.textstring+"</div>"; //text string is an svg
+                                                proceduralEntities = proceduralEntities + " <a-plane loadsvg=\x22id:"+textID+"; description: "+sceneTextLocations[i].description+"; eventdata: "+sceneTextLocations[i].eventData+"; tags:  "+sceneTextLocations[i].locationTags+"\x22 id=\x22svg_"+sceneTextLocations[i].timestamp+
+                                                "\x22 look-at=\x22#player\x22 width=\x22"+scale+"\x22 height=\x22"+scale+"\x22 position=\x22"+sceneTextLocations[i].x + " " + sceneTextLocations[i].y + " " + sceneTextLocations[i].y+"\x22></a-plane>";
+                                            }
+                                            // sceneTextItemData = "<div id=\x22sceneTextItems\x22 data-attribute=\x22"+text_item._id+"\x22></div>";
+                                            // sceneTextItemData = text_item.textstring; 
+                                            // callback(null);
+                                            }
+                                        });
                                     }
-                                });
-                            // }
-                        }
-                            callback();
+                                }
+                            }
+                            // if (i === sceneTextLocations.length - 1) {
+                                callback();
+                            // } 
+                        
+                        // callback();
                         } else { //if it's an html...
                             // if (sceneResponse.sceneTextItems != null && sceneResponse.sceneTextItems != undefined && sceneResponse.sceneTextItems.length > 0) {
-                            
                             db.text_items.findOne({_id: moids}, function (err, text_item){
                                 if (err || !text_item) {
                                     console.log("error getting text_items: " + err);
