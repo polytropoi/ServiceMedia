@@ -2477,7 +2477,7 @@ webxr_router.get('/:_id', function (req, res) {
                     //hrm, get a list of text locations and spin through these...
                     if (sceneResponse.sceneTextItems != null && sceneResponse.sceneTextItems != undefined && sceneResponse.sceneTextItems != "") {
                         if (sceneResponse.sceneWebType != "HTML from Text Item") { //if it's not a plain html page
-                        for (let i = 0; i < sceneTextLocations.length; i++) {  //TODO ASYNC
+                            for (let i = 0; i < sceneTextLocations.length; i++) {  //TODO ASYNC
 
                             console.log("cheking sceneLocation " + JSON.stringify(sceneTextLocations[i]));
                             // sceneTextItemData = "<div id=\x22sceneTextItems\x22 data-attribute=\x22"+sceneResponse.sceneTextItems+"\x22></div>"; 
@@ -2518,7 +2518,34 @@ webxr_router.get('/:_id', function (req, res) {
                                                 sceneTextItemData = sceneTextItemData + "<canvas class=\x22canvasItem\x22 id=\x22svg_canvas_"+textID+"\x22 style=\x22text-align:center;\x22 width=\x221024\x22 height=\x221024\x22></canvas>"+
                                                 "<div style=\x22visibility: hidden\x22 class=\x22svgItem\x22 id=\x22svg_item_"+textID+"\x22 data-attribute=\x22"+text_item._id+"\x22>"+text_item.textstring+"</div>"; //text string is an svg
                                                 proceduralEntities = proceduralEntities + " <a-plane loadsvg=\x22id:"+textID+"; description: "+sceneTextLocations[i].description+"; eventdata: "+sceneTextLocations[i].eventData+"; tags:  "+sceneTextLocations[i].locationTags+"\x22 id=\x22svg_"+sceneTextLocations[i].timestamp+
-                                                "\x22 look-at=\x22#player\x22 width=\x22"+scale+"\x22 height=\x22"+scale+"\x22 position=\x22"+sceneTextLocations[i].x + " " + sceneTextLocations[i].y + " " + sceneTextLocations[i].y+"\x22></a-plane>";
+                                                "\x22 look-at=\x22#player\x22 width=\x22"+scale+"\x22 height=\x22"+scale+"\x22 position=\x22"+sceneTextLocations[i].x + " " + sceneTextLocations[i].y + " " + sceneTextLocations[i].z+"\x22></a-plane>";
+                                            }
+                                            // sceneTextItemData = "<div id=\x22sceneTextItems\x22 data-attribute=\x22"+text_item._id+"\x22></div>";
+                                            // sceneTextItemData = text_item.textstring; 
+                                            // callback(null);
+                                            }
+                                        });
+                                    // }
+                                } else if (sceneTextLocations[i].markerType == "svg billboard") {
+                                   
+                                    let oid = ObjectID(textID);
+                                    db.text_items.findOne({_id: oid}, function (err, text_item){
+                                        if (err || !text_item) {
+                                            console.log("error getting text_items: " + err);
+                                            sceneTextItemData = "no data found";
+                                            // callback(null);
+                                        } else {
+                                            //  = text_item;
+    
+                                            if (text_item.type == "SVG Document") {
+                                                // console.log("gots svgItem : " + JSON.stringify(text_item));
+                                                let scale = 1;
+                                                if (sceneTextLocations[i].markerObjScale && sceneTextLocations[i].markerObjScale != "" && sceneTextLocations[i].markerObjScale != 0) {
+                                                    scale = sceneTextLocations[i].markerObjScale;
+                                                }
+                                                // sceneTextItemData = sceneTextItemData + "<div style=\x22visibility: hidden\x22 class=\x22svgItem\x22 id=\x22svg_item_"+textID+"\x22 data-attribute=\x22"+text_item._id+"\x22>"+text_item.textstring+"</div>";
+                                                proceduralEntities = proceduralEntities + " <a-entity load_threesvg=\x22id:"+textID+"; description: "+sceneTextLocations[i].description+"; eventdata: "+sceneTextLocations[i].eventData+"; tags:  "+sceneTextLocations[i].locationTags+"\x22 id=\x22svg_"+sceneTextLocations[i].timestamp+
+                                                "\x22 look-at=\x22#player\x22 width=\x22"+scale+"\x22 height=\x22"+scale+"\x22 position=\x22"+sceneTextLocations[i].x + " " + sceneTextLocations[i].y + " " + sceneTextLocations[i].z+"\x22></a-entity>";
                                             }
                                             // sceneTextItemData = "<div id=\x22sceneTextItems\x22 data-attribute=\x22"+text_item._id+"\x22></div>";
                                             // sceneTextItemData = text_item.textstring; 
@@ -2527,12 +2554,10 @@ webxr_router.get('/:_id', function (req, res) {
                                         });
                                     }
                                 }
-                            }
-                            // if (i === sceneTextLocations.length - 1) {
-                                callback();
-                            // } 
-                        
-                        // callback();
+                            } //loopend
+                            
+                            callback();
+                       
                         } else { //if it's an html...
                             // if (sceneResponse.sceneTextItems != null && sceneResponse.sceneTextItems != undefined && sceneResponse.sceneTextItems.length > 0) {
                             db.text_items.findOne({_id: moids}, function (err, text_item){
@@ -4693,11 +4718,19 @@ webxr_router.get('/:_id', function (req, res) {
 
                                               //<!-- Import maps polyfill -->
                        //<!-- Remove this when import maps will be widely supported -->
-                       "<script async src=\x22https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js\x22></script>"+
+                    //    "<script async src=\x22https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js\x22></script>"+
 
-                       "<script type=\x22importmap\x22> {\x22imports\x22: {" +
-                            "\x22three\x22: \x22/three/build/three.module.js\x22"+
-                        "}}</script>"+
+                    //    "<script type=\x22importmap\x22> {\x22imports\x22: {" +
+                    //         "\x22three\x22: \x22/src/lib/three.module.js\x22"+
+                    //     "}}</script>"+
+                   
+                    "<script async src=\x22https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js\x22></script>"+
+                    "<script type=\x22importmap\x22> {\x22imports\x22: {" +
+                        "\x22three\x22: \x22https://unpkg.com/three@0.147.0/build/three.module.js\x22,"+
+                        "\x22three/addons/\x22: \x22https://unpkg.com/browse/three@0.147.0/examples/jsm/\x22"+
+                        "}"+
+                    "}</script>"+
+
                         "<script src=\x22/main/vendor/jquery/jquery.min.js\x22></script>" +
                         
                         "<script src=\x22../main/ref/aframe/dist/socket.io.slim.js\x22></script>" +
@@ -5048,12 +5081,15 @@ webxr_router.get('/:_id', function (req, res) {
                            
                         
                        "</script>\n"+
-                    //    //<!-- Import maps polyfill -->
-                    //    //<!-- Remove this when import maps will be widely supported -->
-                    //    "<script async src=\x22https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js\x22></script>"+
-                    //    "<script type=\x22importmap\x22> {\x22imports\x22: {" +
-                    //         " \x22three\x22: \x22/three/build/three.module.js\x22"+
-                    //     "}}</script>"+
+ 
+                       //<!-- Import maps polyfill -->
+                        //<!-- Remove this when import maps will be widely supported -->
+                        // "<script async src=\x22https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js\x22></script>"+
+                        // "<script type=\x22importmap\x22> {\x22imports\x22: {" +
+                        //     " \x22three\x22: \x22/s/three.module.js\x22"+
+                        // "}}</script>"+
+
+                    
                         sceneManglerButtons +
                        
                         videoElements +

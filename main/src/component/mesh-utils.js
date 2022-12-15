@@ -1,8 +1,8 @@
-// can't really import if there are threejs dependencies, bc aframe embeds it ("superthree")... 
-// so these need to be called from global, in /examples/js instead of /jsm
 
 import {MeshSurfaceSampler} from '/three/examples/jsm/math/MeshSurfaceSampler.js'; //can because "type=module" //no. 
-import { Flow } from '/three/examples/jsm/modifiers/CurveModifier.js'; 
+
+import { SVGLoader } from '/three/examples/jsm/loaders/SVGLoader.js'; // ref'd in import maps
+// import { Flow } from '/three/examples/jsm/modifiers/CurveModifier.js'; 
 // import { Line2 } from '/three/examples/jsm/lines/Line2.js'; //hrm..
 // import { LineMaterial } from '/three/examples/jsm/lines/LineMaterial.js';
 // import { LineGeometry } from '/three/examples/jsm/lines/LineGeometry.js';
@@ -3614,21 +3614,28 @@ AFRAME.registerComponent('loadsvg', {
 
 AFRAME.registerComponent('load_threesvg', {
   schema: {
+  
     init: {default: false},
+    id: {default: ""},
     eventdata: {default: ''},
-    tags: {default: ''}
+    tags: {default: ''},
+    width: {default: 600},
+    height: {default: 600}
     },
   init: function() {
       // instantiate a loader
-const loader = new SVGLoader();
-let murl = "/svg/" + textData.getAttribute('data-attribute');
-// load a SVG resource
-loader.load(
-        // resource URL
-        murl,
-        // called when the resource is loaded
-        function ( data ) {
+    const loader = new SVGLoader();
+    let svgUrl = "/svg/" + this.data.id;
+    // load a SVG resource
+    console.log("tryna get svg " + svgUrl);
+    // loader.load(
+    //     // resource URL
+    //     murl,
+    //     // called when the resource is loaded
+    //     function ( data ) {
 
+    loader.loadAsync(svgUrl).then((data) => {
+          
           const paths = data.paths;
           const group = new THREE.Group();
 
@@ -3638,7 +3645,8 @@ loader.load(
 
             const material = new THREE.MeshBasicMaterial( {
               color: path.color,
-              side: THREE.DoubleSide,
+              transparent: true,
+              // side: THREE.DoubleSide,
               depthWrite: false
             } );
 
@@ -3649,13 +3657,24 @@ loader.load(
               const shape = shapes[ j ];
               const geometry = new THREE.ShapeGeometry( shape );
               const mesh = new THREE.Mesh( geometry, material );
-              group.add( mesh );
+              
+              group.scale.setScalar(0.1);
+              group.scale.y *= -1;
 
+              // group.scale.set(1) *= -1;
+              group.add( mesh );
             }
 
           }
 
-          this.el.sceneEl.add( group );
+                        // group.scale.multiplyScalar( 0.25 );
+          group.position.x =- ( 50 );
+
+          // group.rotation.set(0, 0, 0);
+          group.position.y =+ ( 50 );
+          this.el.setObject3D("mesh", group);
+          // this.el.Object3D.position.set(0,0,0);
+          // this.el.sceneEl.add( group );
 
         },
         // called when loading is in progresses
@@ -3672,6 +3691,23 @@ loader.load(
         }
       );
     }
+
+  //   let svgLoader = new SVGLoader();
+  //   let data = svgLoader.parse(svgUrl);
+  //   data.paths.forEach(dp => {
+  //     let shapes = dp.toShapes(true);
+  //     shapes.forEach(sh => {
+  //       let g = new THREE.ExtrudeBufferGeometry(sh, {bevelEnabled: false, depth: 2});
+  //       g.center();
+  //       let m = new THREE.MeshLambertMaterial({color: 0xFACE8D});
+  //       let o = new THREE.Mesh(g, m);
+  //       o.scale.setScalar(0.05);
+  //       console.log(o);
+  //       this.el.setObject3D(o);
+  //     });
+      
+  //   });
+  // }
 });
 
     // AFRAME.registerComponent('loadcanvas', {

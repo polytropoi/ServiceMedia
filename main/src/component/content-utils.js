@@ -167,6 +167,7 @@ AFRAME.registerComponent('initializer', { //adjust for device settings, and call
     // let ios = this.detectIOS();
     // console.log("scene TYpe is " + type + " is IOS " + ios);
 
+
     // let iOS = iOS();
     // if (!AFRAME.utils.device.isMobile() && !AFRAME.utils.device.checkHeadsetConnected()) {
     //   if (!AFRAME.utils.device.isMobile()) {
@@ -181,9 +182,9 @@ AFRAME.registerComponent('initializer', { //adjust for device settings, and call
     // sceneEl.setAttribute('stats', '');
     // sceneEl.setAttribute("screen-controls", {'isMobile': isMobile});
     sceneEl.addEventListener('loaded', function () { //for sure?
-      console.log("aframe init with isMobile "  + isMobile + " isIOS " + isIOS + " isMacOS " + isMacOS + " headsetConnected " + headsetConnected);
+      // console.log("aframe init with isMobile "  + isMobile + " isIOS " + isIOS + " isMacOS " + isMacOS + " headsetConnected " + headsetConnected);
 
-      console.log("AFRAME Init");
+      // console.log("three is" + THREE.path);
       window.sceneType = type;
       // InitSceneHooks(type);
       PrimaryAudioInit();
