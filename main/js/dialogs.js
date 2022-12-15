@@ -1325,6 +1325,7 @@ function SceneManglerModal(mode) {
         ownerButton = "<button class=\x22addButton\x22 id=\x22editButton\x22><a href=\x22../main/?type=scene&iid="+userData.sceneID+"\x22>Edit Scene</a></button>"+
         "<button class=\x22reallySaveButton\x22 onclick=\x22SaveModsToCloud()\x22>Save Mods To Cloud</button>";
     }
+    let oculusButton = "<button class=\x22addButton\x22 id=\x22oculusButton\x22><a href=\x22https://www.oculus.com/open_url/?url=https%3A%2F%2Fservicemedia.net/webxr/"+room+"\x22>Open on Oculus Quest</a></button>";
     let tabs ="<div class=\x22tab\x22>" +
     "<button class=\x22tablinks\x22 onclick=\x22TabMangler(event, 'Welcome')\x22>Welcome</button>"+
     // "<button class=\x22tablinks\x22 onclick=\x22TabMangler(event, 'Quests')\x22>Quests</button>"+
@@ -1416,6 +1417,7 @@ function SceneManglerModal(mode) {
     "<div "+toolsDisplay+" id=\x22Tools\x22 class=\x22modalMain tabcontent\x22>"+
     // "<div class=\x22\x22>"+
     "<div class=\x22row\x22>"+
+    oculusButton +
       // "<button class=\x22saveButton\x22 id=\x22exportButton\x22 onclick=\x22ExportMods()\x22>Export Mods</button>"+
       // "<label for=\x22file-upload\x22 class=\x22custom-file-upload\x22>Import Mods</label>"+
       // "<input type=\x22file\x22 id=\x22file-upload\x22 accept=\x22.txt\x22 onchange=\x22ImportMods(event)\x22></input>"+
