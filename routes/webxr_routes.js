@@ -6,6 +6,7 @@ const ObjectID = require("bson-objectid");
 const path = require("path");
 const jwt = require("jsonwebtoken");
 const requireText = require('require-text');
+const { Console } = require("console");
 
 
 function getExtension(filename) {
@@ -401,6 +402,10 @@ webxr_router.get('/:_id', function (req, res) {
                     for (let i = 0; i < sceneData.sceneTags.length; i++) { //not ideal, but it's temporary... //no it isn't
                         if (sceneData.sceneTags[i].toLowerCase().includes("debug")) {
                             debugMode = true;
+                        }
+                        if (sceneData.sceneTags[i].toLowerCase().includes("timer")) { //uses css font @import...
+                             proceduralEntities = proceduralEntities + "<a-plane live_canvas=\x22src:#flying_canvas\x22 id=\x22flying_info_canvas\x22 material=\x22shader: flat; transparent: true;\x22look-at=\x22#player\x22 width=\x221\x22 height=\x221\x22 position=\x220 1.5 -1\x22></a-plane>";
+
                         }
                         if (sceneData.sceneTags[i].toLowerCase().includes("stats")) {
                             // logScripts = "<script src=\x22https://cdn.jsdelivr.net/gh/kylebakerio/vr-super-stats@1.5.0/vr-super-stats.js\x22></script>";
@@ -2476,6 +2481,27 @@ webxr_router.get('/:_id', function (req, res) {
                 function (callback) { 
                     //hrm, get a list of text locations and spin through these...
                     if (sceneResponse.sceneTextItems != null && sceneResponse.sceneTextItems != undefined && sceneResponse.sceneTextItems != "") {
+
+                        console.log("sceneTeextITmmmes " + sceneResponse.sceneTextItems);
+                        let toids = sceneResponse.sceneTextItems.map(convertStringToObjectID);
+                        console.log("sceneTeextITmmmes " + sceneResponse.sceneTextItems + " vs toids " + toids);
+                        db.text_items.find({$and:[{_id: {$in: toids}}, {type: "Font"}]}, function(err, items) {
+                            if (err || !items) {
+                                console.log("no font or caint find those sceneTextItems!");
+                            } else {
+
+                                // console.log("fonts item : "+ JSON.stringify(items[0]));
+                                
+                                // sceneTextItemData = sceneTextItemData + "<div style=\x22visibility: hidden;\x22 class=\x22embeddedFont\x22 id=\x22embeddedFont\x22 data-attribute=\x22"+items[0].textstring+"\x22></div>"; //sceneTextItemData is outside of a-scene, so use div 
+                                sceneTextItemData = sceneTextItemData + "<span style=\x22font-family: 'Lobster', cursive;\x22>&nbsp;</span>"; //init so canvas can use?
+                            }
+                        });
+                        // for (let t = 0; t < sceneResponse.sceneTextItems.length; t++) {
+                        //     console.log(sceneResponse.sceneTextItems[t]);
+                            // if (sceneResponse.sceneTextItems[t].type == "Font") {
+                                
+                            // }
+                        // }
                         if (sceneResponse.sceneWebType != "HTML from Text Item") { //if it's not a plain html page
                             for (let i = 0; i < sceneTextLocations.length; i++) {  //TODO ASYNC
 
@@ -2552,11 +2578,10 @@ webxr_router.get('/:_id', function (req, res) {
                                             // callback(null);
                                             }
                                         });
-                                    }
-                                }
-                            } //loopend
-                            
-                            callback();
+                                } 
+                            }
+                        } 
+                        callback();
                        
                         } else { //if it's an html...
                             // if (sceneResponse.sceneTextItems != null && sceneResponse.sceneTextItems != undefined && sceneResponse.sceneTextItems.length > 0) {
@@ -2567,17 +2592,15 @@ webxr_router.get('/:_id', function (req, res) {
                                     callback(null);
                                 } else {
                                     sceneTextItemData = text_item.textstring; // html with the trimmings...
-                                   
+                                
                                     callback(null)
                                 }
                             });
                         }
                         // }
-                    } else {
+                    } else { //no text items 
                         callback();
-                    }
-
-                 
+                    }1                 
                 },
                 function (callback) { //fethc audio items
                     
@@ -4943,7 +4966,7 @@ webxr_router.get('/:_id', function (req, res) {
                         skyboxAsset +
                         // cubeMapAsset +
                         navmeshAsset +
-
+                        "<canvas crossorigin=\x22anonymous\x22 id=\x22flying_canvas\x22 width=\x221024\x22 height=\x221024\x22></canvas>"+
                         "</a-assets>\n"+
 
                         //////////////ENTITIES////////////////////
@@ -4984,7 +5007,8 @@ webxr_router.get('/:_id', function (req, res) {
                         "<a-entity id=\x22createAvatars\x22 create_avatars></a-entity>"+
                         "<a-entity id=\x22particleSpawner\x22 particle_spawner></a-entity>"+
                         // "<a-plane loadsvg_blob id=\x22flying_dialog\x22 material=\x22shader: flat; transparent: true; opacity .5; src: #flying_canvas;\x22 look-at=\x22#player\x22 width=\x221\x22 height=\x221\x22 position=\x220 1.5 -1\x22></a-plane>"+
-                        // "<a-plane loadsvg id=\x22flying_dialog\x22 look-at=\x22#player\x22 width=\x221\x22 height=\x221\x22 position=\x220 1.5 -1\x22></a-plane>"+
+                        // "<a-plane live_canvas=\x22src:#flying_canvas\x22 id=\x22flying_info_canvas\x22 material=\x22shader: flat; transparent: true;\x22look-at=\x22#player\x22 width=\x221\x22 height=\x221\x22 position=\x220 1.5 -1\x22></a-plane>"+
+
 
                         // "<a-entity load_threemeshui></a-entity>"+
 

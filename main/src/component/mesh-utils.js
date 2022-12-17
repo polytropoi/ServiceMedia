@@ -3710,78 +3710,178 @@ AFRAME.registerComponent('load_threesvg', {
   // }
 });
 
-    // AFRAME.registerComponent('loadcanvas', {
-    //   init: function() {
-    //     this.canvas = document.getElementById("flying_canvas");
+  AFRAME.registerComponent('live_canvas', {
+    dependencies: ['geometry', 'material'],
+    schema: {
+      src: { type: "string", default: "#id"}
+    },
+    init() {
+      this.isReady = false;
+      if (!document.querySelector(this.data.src)) {
+        console.error("no such canvas")
+        return
+      }
+      this.canvas = document.querySelector(this.data.src);
+      this.context = this.canvas.getContext('2d');
+      this.tick = AFRAME.utils.throttleTick(this.tick, 1000, this);
+      // this.fontEl = document.getElementById("embeddedFont");
+      // this.font = null;
+      if (this.fontEl) {
+        this.fontID = this.fontEl.getAttribute('data-attribute');
+        this.fontURLRaw = "/font/" + this.fontID;
+        // this.fontURL = "url("+this.fontURLRaw+") format(\x22ttf\x22)";
 
-    //     this.context = this.canvas.getContext('2d');
-    //     this.context.clearRect(0, 0, 1024, 1024)
-    //     this.context.strokeStyle = "rgb(255, 0, 0)";
-    //     this.context.fillStyle = "rgba(255, 255, 0, .5)";
-    //     this.context.beginPath();
-    //     this.context.roundRect(0, 0, 900, 900, 60);
-    //     this.context.stroke();
-    //     this.context.fill();
-    //     // this.context.fillStyle = "#8888FF";
-    //     // this.context.fillRect(0,0, 1024,1024);
-    //     this.context.font='italic 32px sans-serif';
-    //     this.context.fillText('Hello World', 10,30);		
+        this.fontURL = "url(https://fonts.googleapis.com/css?family=Sofia)";
 
-    //     let mesh = this.el.getObject3D("mesh");
-    //     var texture = new THREE.Texture(canvas);
-    //     texture.needsUpdate = true;
+        console.log("tryna get font: " + this.fontURL);
+        this.font = new FontFace('efont', this.fontURL );
+        // document.fonts.add(this.font);
+        this.font.load().then(function (font) {
+          document.fonts.add(font);
+          // Ready to use the font in a canvas context
+          console.log("font ready!");
 
-    //     var material = new THREE.MeshBasicMaterial({ 
-    //       map: texture, 
-    //       transparent: true
-    //     });
-        
-    //     let tmp = mesh.material
-    //     mesh.material = material
-    //     tmp.dispose();
-              
-    //     // let material = this.el.getObject3D('mesh').material;
-    //     //   if (!material.map) {
-    //     //    	return;
-    //     //   } else {
-    //     //     material.map.needsUpdate = true;
-    //     //   }  	
-    //     // }
-    //     // this.x = 200;
-    //     // this.y = 100;
-    //     // this.dx = 5;
-    //     // this.dy = 3;
-    //   }
+          // this.context.font='100px efont';
+          this.context.font = '68px Lobster';
+          this.el.setAttribute('material', 'src', this.data.src);
+          this.isReady = true;
+        });
+      } else {
+        console.log("no font found..");
+        // this.context.font='bold 100px Arial';
+        this.context.font = '100px Lobster';
+        this.el.setAttribute('material', 'src', this.data.src);
+        this.isReady = true;
+      }
+
+
+
+      this.time = 0;
+
+    //  if (!this.font) {
       
-    //   // tick: function(t)
-    //   // {
-    //   // 	this.x += this.dx;
-    //   // 	this.y += this.dy;
-        
-    //   // 	if (this.x > 512-50 || this.x < 0)
-    //   // 		this.dx *= -1;
-    //   // 	if (this.y > 512-50 || this.y < 0)
-    //   // 		this.dy *= -1;
-      
-    //   // 	// clear canvas
-    //   // 	this.context.fillStyle = "#8888FF";
-    //   // 	this.context.fillRect(0,0, 512,512);
-        
-    //   // 	// draw rectangle
-    //   // 	this.context.fillStyle = "#FF0000";
-    //   // 	this.context.fillRect( this.x, this.y, 50, 50 );
+    //  } else {
 
-    //   // 	// thanks to https://github.com/aframevr/aframe/issues/3936 for the update fix
-    //   // 	let material = this.el.getObject3D('mesh').material;
-    //   //     if (!material.map) {
-    //   //      	return;
-    //   //     } else {
-    //   //       material.map.needsUpdate = true;
-    //   //     }
-              
-    //   // }
+    //  }
+    },
+    tick(time, deltaTime) {
+      if (this.isReady) {
+      var material;
+
+      material = this.el.getObject3D('mesh').material;
+      if (!material.map) {
+        console.error("no material map");
+        this.el.removeAttribute('live-canvas');
+        return;
+      }
+
+      this.time = Math.round(time/1000);
+     this.context.clearRect(0,0,1024,1024);
+     
+
+      // this.context.fillStyle = "red";
+      this.context.textAlign = "center";
+      // ctx.font = 'bold 88px Arial';
+      this.context.strokeStyle = 'white';
+      // this.context.strokeWidth = 5px
+      this.context.fillStyle = 'rgba(20,20,20,0.5)';
+      this.context.lineWidth = 5;
+      this.context.beginPath();
+      this.context.roundRect(10, 333, 1000, 333, 20);
+      this.context.stroke();
+      this.context.fill();
+      this.context.strokeStyle = 'red';
+      this.context.fillStyle = 'white';
+      this.context.strokeText("Elapsed time: " + this.time, this.canvas.width/2, this.canvas.height/2);
+      this.context.fillText("Elapsed time: " + this.time, this.canvas.width/2, this.canvas.height/2);
+
+      material.map.needsUpdate = true;
+      }
+    }
+  });
+
+  AFRAME.registerComponent('loadcanvas', {
+    init: function() {
+      // this.canvas = document.getElementById("flying_canvas");
+      this.canvas = document.createElement("canvas");
+      this.context = this.canvas.getContext('2d');
+      // this.context.clearRect(0, 0, 1024, 1024)
+      // this.context.strokeStyle = "rgb(255, 0, 0)";
+      // this.context.fillStyle = "rgba(255, 255, 0, .5)";
+
+      this.context.beginPath();
+      this.context.roundRect(0, 0, 200, 100, 10);
+      this.context.stroke();
+      this.context.fill();
+     
+      this.context.font='bold 32px Arial';
+      this.context.fillStyle = "red";
+      this.context.textAlign = "center";
+      // ctx.font = 'bold 88px Arial';
+      this.context.strokeStyle = 'red';
+      this.context.fillStyle = 'white';
+      this.context.lineWidth = 2;
+      this.context.strokeText("Hello World!", this.canvas.width/2, this.canvas.height/2);
+      this.context.fillText("Hello World!", this.canvas.width/2, this.canvas.height/2);
+      // this.context.strokeText("Hello World", this.canvas.width/2, this.canvas.height/2);
+      // this.context.fillText('Hello World', 10,30);		
+
+
+      let mesh = this.el.getObject3D("mesh");
+      var texture = new THREE.Texture(this.canvas);
+      texture.needsUpdate = true;
+
+      var material = new THREE.MeshBasicMaterial({ 
+        map: texture, 
+        transparent: true
+      });
       
-    // });
+      let tmp = mesh.material
+      mesh.material = material
+      tmp.dispose();
+            
+      // let material = this.el.getObject3D('mesh').material;
+      //   if (!material.map) {
+      //    	return;
+      //   } else {
+      //     material.map.needsUpdate = true;
+      //   }  	
+      // }
+      // this.x = 200;
+      // this.y = 100;
+      // this.dx = 5;
+      // this.dy = 3;
+    }
+    
+    // tick: function(t)
+    // {
+    // 	this.x += this.dx;
+    // 	this.y += this.dy;
+      
+    // 	if (this.x > 512-50 || this.x < 0)
+    // 		this.dx *= -1;
+    // 	if (this.y > 512-50 || this.y < 0)
+    // 		this.dy *= -1;
+    
+    // 	// clear canvas
+    // 	this.context.fillStyle = "#8888FF";
+    // 	this.context.fillRect(0,0, 512,512);
+      
+    // 	// draw rectangle
+    // 	this.context.fillStyle = "#FF0000";
+    // 	this.context.fillRect( this.x, this.y, 50, 50 );
+
+    // 	// thanks to https://github.com/aframevr/aframe/issues/3936 for the update fix
+    // 	let material = this.el.getObject3D('mesh').material;
+    //     if (!material.map) {
+    //      	return;
+    //     } else {
+    //       material.map.needsUpdate = true;
+    //     }
+            
+    // }
+    
+  });
 
 // AFRAME.registerComponent('load_threemeshui', { //nope
 //   init: function() {

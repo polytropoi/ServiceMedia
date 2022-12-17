@@ -4455,7 +4455,8 @@
                         "<label for=\x22textType\x22>Type</label>" +
                         "<select class=\x22form-control\x22 id=\x22textType\x22 >" +
                         "<option value=\x22\x22 disabled selected>Select:</option>" +
-                        "<option>Default</option>" +
+                        "<option>Plain Text</option>" +
+                        "<option>Font</option>" +
                         "<option>SVG Document</option>" +
                         "<option>Full HTML Page</option>" +
                         "<option>Question/Answer</option>" +
@@ -4463,7 +4464,8 @@
                         "<option>Blog Post</option>" +
                         "<option>Documentation Page</option>" +
                         "<option>Javascript</option>" +
-                        
+                        "<option>JSON</option>" +
+                        "<option>XML</option>" +
                         "<option>C#</option>" +
                         "<option>Shader</option>" +
                         "<option>Quote</option>" +
@@ -5128,6 +5130,7 @@
                 selectHeader +
                     // "<th></th>"+
                 "<th>Name</th>"+
+                "<th>Type</th>"+
                 "<th>Date</th>"+
                 "<th>HiddenDate</th>"+
                 "<th>Tags</th>"+
@@ -15440,7 +15443,20 @@ function getAllPeople() {
                         }
                         const id = "#" + this.id;
                         $(id).parent().hide(); //not grandparent!
-                    }); 
+                    });
+                    $(document).on('click','.remTextItem',function(e){
+                        e.preventDefault();  
+                        console.log("tryna remove textItem " + this.id);
+                        for( var i = 0; i < sceneTextItems.length; i++){ 
+                            if ( sceneTextItems[i] === this.id) {
+                                sceneTextItems.splice(i, 1); 
+                            }
+                        }
+                       
+                        const id = "#" + this.id;
+                        $(id).parent().parent().hide();
+                        // console.log("pictures: " + JSON.stringify(pictures));
+                    });  
                     $(document).on('click','.remScenePic',function(e){
                         e.preventDefault();  
                         console.log("tryna remove scenePic " + this.id);

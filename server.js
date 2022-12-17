@@ -8493,6 +8493,19 @@ app.get('/svg/:_id', function(req, res) {
         }
     });
 });
+app.get('/font/:_id', function(req, res) { 
+    console.log('tryna return font for: ' + req.params._id);
+    var o_id = ObjectID(req.params._id);
+    db.text_items.findOne({_id: o_id}, function(err, text_item) {
+        if (err || !text_item || text_item.type != "Font") {
+            console.log("error getting font text_item : " + err);
+            res.send(err);
+        } else {
+            res.send(text_item.textstring); //text file saved as svg format
+            console.log("returning font item " + req.params._id);
+        }
+    });
+});
 
 app.get('/usertexts/:u_id', requiredAuthentication, function(req, res) {
     console.log('tryna return usertexts for: ' + req.params.u_id);
