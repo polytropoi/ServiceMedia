@@ -4456,6 +4456,7 @@
                         "<select class=\x22form-control\x22 id=\x22textType\x22 >" +
                         "<option value=\x22\x22 disabled selected>Select:</option>" +
                         "<option>Plain Text</option>" +
+                        "<option>CSS</option>" +
                         "<option>Font</option>" +
                         "<option>SVG Document</option>" +
                         "<option>Full HTML Page</option>" +
@@ -4540,6 +4541,16 @@
                     "</div>" +
                 "</div>" +
                 "<div class=\x22form-row\x22>" +
+                    "<div class=\x22col form-group col-md-3\x22>" +
+                        "<label for=\x22fontSelect\x22>GoogleFont</label>" + //FontSelect
+                        "<select class=\x22form-control\x22 id=\x22googleFontSelect\x22 >" +
+                            "<option value=\x22\x22 disabled selected>Select:</option>" +
+
+                            "<option>Lobster</option>" +
+                            "<option>Luckiest Guy</option>" +
+
+                        "</select>" +
+                    "</div>" +
                     "<div class=\x22col form-group col-md-3\x22>" +
                         "<label for=\x22fontSelect\x22>Font</label>" + //FontSelect
                         "<select class=\x22form-control\x22 id=\x22fontSelect\x22 >" +
@@ -9985,6 +9996,7 @@ function getAllPeople() {
         "youtube",
         // "youtube billboard",
         "text",
+        "text billboard",
         "textbook",
         "picturebook",
         "link",
@@ -12176,6 +12188,10 @@ function getAllPeople() {
             let sceneText = response.data.sceneText != undefined ? response.data.sceneText : ""; 
             let sceneGreeting = response.data.sceneGreeting != undefined ? response.data.sceneGreeting : ""; 
             let sceneQuest = response.data.sceneQuest != undefined ? response.data.sceneQuest : ""; 
+            // let sceneFont = response.data.sceneFont != undefined ? response.data.sceneFont : "";
+            let sceneFontWeb1 = response.data.sceneFontWeb1 != undefined ? response.data.sceneFontWeb1 : "";
+            let sceneFontWeb2 = response.data.sceneFontWeb2 != undefined ? response.data.sceneFontWeb2 : "";
+            let sceneFontWeb3 = response.data.sceneFontWeb3 != undefined ? response.data.sceneFontWeb3 : "";
             let sceneFontFillColor = response.data.sceneFontFillColor != undefined ? response.data.sceneFontFillColor : ""; 
             let sceneFontOutlineColor = response.data.sceneFontOutlineColor != undefined ? response.data.sceneFontOutlineColor : ""; 
             let sceneFontGlowColor = response.data.sceneFontGlowColor != undefined ? response.data.sceneFontGlowColor : ""; 
@@ -13326,17 +13342,110 @@ function getAllPeople() {
                                 textButtons +
                                 text_items +
                             "<br><div class=\x22form-row\x22>" +
-                                "<div class=\x22col form-group col-md-9\x22>" +
+                                "<div class=\x22col form-group col-md-4\x22>" +
                                     "<label for=\x22greetingText\x22>Greeting Text</label>" + //sceneGreeting
                                     "<textarea class=\x22form-control\x22 id=\x22sceneGreeting\x22 placeholder=\x22Enter greeting text here\x22 value=\x22" + sceneGreeting + "\x22></textarea>" +
                                 "</div>" +       
-                                "<div class=\x22col form-group col-md-9\x22>" +
+                                "<div class=\x22col form-group col-md-4\x22>" +
                                     "<label for=\x22questText\x22>Quest Text</label>" + //sceneQuest
                                     "<textarea class=\x22form-control\x22 id=\x22sceneQuest\x22 placeholder=\x22Enter quest text here\x22 value=\x22" + sceneQuest + "\x22></textarea>" +
                                 "</div>" +                            
-                                "<div class=\x22col form-group col-md-9\x22>" +
+                                "<div class=\x22col form-group col-md-4\x22>" +
                                     "<label for=\x22sceneText\x22>Scene Text</label>" + //sceneText
                                     "<textarea class=\x22form-control\x22 id=\x22sceneText\x22 placeholder=\x22Enter main text here - delimit sequence breaks with '~'\x22 value=\x22" + sceneText + "\x22></textarea>" +
+                                "</div>" +
+                                "<div class=\x22col form-group col-md-3\x22>" +
+                                    "<label for=\x22sceneFontWeb1Select\x22>Web Font 1</label>" + //FontSelect
+                                    "<select class=\x22form-control\x22 id=\x22sceneFontWeb1Select\x22 >" +
+                                        "<option value=\x22\x22 disabled selected>Select:</option>" +
+                                        "<option>Acme.woff</option>" +
+                                        "<option>AlphaSlabOne.woff</option>" +
+                                        "<option>CherryCreamSoda.woff</option>" +
+                                        "<option>ElderGodsBB.ttf</option>" +
+                                        "<option>GorditasBold.woff</option>" +
+                                        "<option>JollyLodger.woff</option>" +
+                                        
+                                        "<option>eurof35.ttf</option>" +
+                                        "<option>Jura-Medium-LB.ttf</option>" +
+                                        "<option>LaffayetteComicPro.ttf</option>" +
+                                        "<option>IrishGrover.woff</option>" +
+                                        "<option>Karla-Regular.ttf</option>" +
+                                        "<option>kimberle.ttf</option>" +
+
+                                        "<option>Lobster.woff</option>" +
+                                        "<option>LobsterTwo.woff</option>" +
+                                        "<option>LuckiestGuy-Regular.ttf</option>" +
+                                        "<option>MountainsOfChristmasBold.woff</option>" +
+                                        "<option>Pacifico.woff</option>" +
+                                        "<option>Philosopher.woff</option>" +
+                                        "<option>OleoScriptSwashCaps.woff</option>" +
+                                        "<option>Rancho.woff</option>" +
+
+                                       
+                                    "</select>" +
+                                "</div>" +
+                                "<div class=\x22col form-group col-md-3\x22>" +
+                                    "<label for=\x22sceneFontWeb2Select\x22>Web Font 2</label>" + //FontSelect
+                                    "<select class=\x22form-control\x22 id=\x22sceneFontWeb2Select\x22 >" +
+                                    "<option value=\x22\x22 disabled selected>Select:</option>" +
+                                    "<option>Acme.woff</option>" +
+                                    "<option>AlphaSlabOne.woff</option>" +
+                                    "<option>CherryCreamSoda.woff</option>" +
+                                    "<option>ElderGodsBB.ttf</option>" +
+                                    "<option>GorditasBold.woff</option>" +
+                                    "<option>JollyLodger.woff</option>" +
+                                    
+                                    "<option>eurof35.ttf</option>" +
+                                    "<option>Jura-Medium-LB.ttf</option>" +
+                                    "<option>LaffayetteComicPro.ttf</option>" +
+                                    
+                                    "<option>IrishGrover.woff</option>" +
+                                    "<option>Karla-Regular.ttf</option>" +
+                                    "<option>kimberle.ttf</option>" +
+
+                                    "<option>Lobster.woff</option>" +
+                                    "<option>LobsterTwo.woff</option>" +
+                                    "<option>LuckiestGuy-Regular.ttf</option>" +
+                                    "<option>MountainsOfChristmasBold.woff</option>" +
+                                    "<option>Pacifico.woff</option>" +
+                                    "<option>Philosopher.woff</option>" +
+                                    "<option>OleoScriptSwashCaps.woff</option>" +
+                                    "<option>Rancho.woff</option>" +
+
+
+                                   
+                                "</select>" +
+                                       
+                                    "</select>" +
+                                "</div>" +
+                                "<div class=\x22col form-group col-md-3\x22>" +
+                                    "<label for=\x22sceneFontWeb3Select\x22>Web Font 3</label>" + //FontSelect
+                                    "<select class=\x22form-control\x22 id=\x22sceneFontWeb3Select\x22 >" +
+                                        "<option value=\x22\x22 disabled selected>Select:</option>" +
+                                        "<option>Acme.woff</option>" +
+                                        "<option>AlphaSlabOne.woff</option>" +
+                                        "<option>CherryCreamSoda.woff</option>" +
+                                        "<option>ElderGodsBB.ttf</option>" +
+                                        "<option>GorditasBold.woff</option>" +
+                                        "<option>JollyLodger.woff</option>" +
+                                        
+                                        "<option>eurof35.ttf</option>" +
+                                        "<option>Jura-Medium-LB.ttf</option>" +
+                                        "<option>LaffayetteComicPro.ttf</option>" +
+                                        "<option>IrishGrover.woff</option>" +
+                                        "<option>Karla-Regular.ttf</option>" +
+                                        "<option>kimberle.ttf</option>" +
+
+                                        "<option>Lobster.woff</option>" +
+                                        "<option>LobsterTwo.woff</option>" +
+                                        "<option>LuckiestGuy-Regular.ttf</option>" +
+                                        "<option>MountainsOfChristmasBold.woff</option>" +
+                                        "<option>Pacifico.woff</option>" +
+                                        "<option>Philosopher.woff</option>" +
+                                        "<option>OleoScriptSwashCaps.woff</option>" +
+                                        "<option>Rancho.woff</option>" +
+
+                                    "</select>" +
                                 "</div>" +
                             "</div>" +
                             "<div class=\x22form-row\x22>" +
@@ -14584,7 +14693,9 @@ function getAllPeople() {
                 $("#sceneQuest").val(sceneQuest);
                 
                 // $("#sceneAppNameSelect").val(); //then pop the values if not new
-
+                $("#sceneFontWeb1Select").val(response.data.sceneFontWeb1);
+                $("#sceneFontWeb2Select").val(response.data.sceneFontWeb2);
+                $("#sceneFontWeb3Select").val(response.data.sceneFontWeb3);
                 $("#sceneFontSelect").val(response.data.sceneFont);
                 $("#sceneCategorySelect").val(response.data.sceneCategory);
                 $("#sceneTypeSelect").val(response.data.sceneType);
@@ -15722,6 +15833,28 @@ function getAllPeople() {
                             } 
                         }
                     });
+                    $(document).on('change', '#sceneFontWeb1Select', function() {
+                        console.log("sceneFontWeb1 change : "+ this.value);
+                        sceneFontWeb1 = this.value;
+                    });
+                    $(document).on('change', '#sceneFontWeb2Select', function() {
+                        console.log("sceneFontWeb2 change : "+ this.value);
+                        sceneFontWeb2 = this.value;
+                    });
+                    $(document).on('change', '#sceneFontWeb3Select', function() {
+                        console.log("sceneFontWeb3 change : "+ this.value);
+                        sceneFontWeb3 = this.value;
+                    });
+                    $(document).on('change', '#sceneAppNameSelect', function() {
+                        // console.log("sceneAppNameSelect change : "+ this.value);
+                        for (let i = 0; i < apps.length; i++) {
+                            if (this.value == apps[i].appname) {
+                                console.log("appname match! " + this.value);  
+                                sceneDomain = apps[i].appdomain;
+                                sceneAppName = this.value;
+                            } 
+                        }
+                    });
                     // $(document).on('change', '#sceneAccessLinkExpire', function() {
                     //     // console.log("sceneAppNameSelect change : "+ this.value);
                     //     for (let i = 0; i < apps.length; i++) {
@@ -16177,6 +16310,7 @@ function getAllPeople() {
                         let sceneUseSkybox = document.getElementById("sceneUseSkybox").checked;
                         let sceneUseSceneFog = document.getElementById("sceneUseSceneFog").checked;
                         let sceneGlobalFogDensity = document.getElementById("sceneGlobalFogDensity").value;
+
                         // let sceneUseGlobalFog = document.getElementById("sceneUseGlobalFog").checked;
                         let sceneUseVolumetricFog = document.getElementById("sceneUseVolumetricFog").checked;
                         let sceneUseSunShafts = document.getElementById("sceneUseSunShafts").checked;
@@ -16195,6 +16329,7 @@ function getAllPeople() {
                         // console.log("sceneAmbientSynth1Volume " + sceneAmbientSynth1Volume);
                         let sceneUseThreeDeeText = document.getElementById("sceneUseThreeDeeText").checked;
                         let sceneTextLoop = document.getElementById("sceneTextLoop").checked;
+
                         let sceneTextAudioSync = document.getElementById("sceneTextAudioSync").checked;
                         let sceneTextUseModals = document.getElementById("sceneTextUseModals").checked;
                         let scenePrimaryTextRotate = document.getElementById("scenePrimaryTextRotate").checked;
@@ -16331,6 +16466,7 @@ function getAllPeople() {
                             sceneStickyness: sceneStickyness,
                             sceneSource: sceneSource,
                             sceneText: sceneText,
+
                             scenePictures: scenePictures,
                             scenePictureGroups: scenePictureGroups,
                             sceneVideos: sceneVideos,
@@ -16429,6 +16565,9 @@ function getAllPeople() {
                             // sceneRenderFloorPlane: sceneRenderFloorPlane,
                             sceneScatterMeshes: sceneScatterMeshes,
                             sceneScatterObjects: sceneScatterObjects,
+                            sceneFontWeb1: sceneFontWeb1,
+                            sceneFontWeb2: sceneFontWeb2,
+                            sceneFontWeb3: sceneFontWeb3,
                             sceneUseThreeDeeText: sceneUseThreeDeeText,
                             sceneTextLoop: sceneTextLoop,
                             sceneTextUseModals: sceneTextUseModals,

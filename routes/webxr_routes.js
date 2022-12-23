@@ -162,8 +162,9 @@ webxr_router.get('/:_id', function (req, res) {
     let ambientLight = "<a-light type='ambient' intensity='.25'></a-light>";
     // let ambientLight = "";
     let htmltext = "";
-    let sceneNextScene = "";
-    let scenePreviousScene = "";
+    let styleIncludes = "";
+    // let sceneNextScene = "";
+    // let scenePreviousScene = "";
     let synthScripts = "";
     let streamPrimaryAudio = false;
     let audioControl = "<script src=\x22../main/src/component/audio_control.js\x22></script>";
@@ -178,14 +179,14 @@ webxr_router.get('/:_id', function (req, res) {
     // let triggerAudioControl = "";
     let triggerAudioEntity = "";
     let pAudioWaveform = "";
-    let primaryAudioLoop = false;
+    // let primaryAudioLoop = false;
     let networkedscene = "";
     // let socketHost = req.headers.host;
     let socketHost = "strr.us";
     let avatarName = "guest";
-    let skyGradientScript = "";
+    // let skyGradientScript = "";
     let textLocation = "";
-    let pictureLocation = "";
+    // let pictureLocation = "";
     let picturegroupLocation = "-4 2 3";
     let scenesKeyLocation = "8 2 -4";
     let audioLocation = "-3 1.7 -4";
@@ -212,7 +213,7 @@ webxr_router.get('/:_id', function (req, res) {
     // let cubeMapAsset = ""; //deprecated, all at runtime now..
     let contentUtils = "<script src=\x22../main/src/component/content-utils.js\x22 defer=\x22defer\x22></script>"; 
     let videosphereAsset = "";
-    let mainTextEntity = "";
+    let textEntities = "";
     let attributionsTextEntity = "";
     let audioVizScript = "";
     let audioVizEntity = "";
@@ -403,7 +404,7 @@ webxr_router.get('/:_id', function (req, res) {
                         if (sceneData.sceneTags[i].toLowerCase().includes("debug")) {
                             debugMode = true;
                         }
-                        if (sceneData.sceneTags[i].toLowerCase().includes("timer")) { //uses css font @import...
+                        if (sceneData.sceneTags[i].toLowerCase().includes("timer")) { //uses css font @import... //no! 
                              proceduralEntities = proceduralEntities + "<a-plane live_canvas=\x22src:#flying_canvas\x22 id=\x22flying_info_canvas\x22 material=\x22shader: flat; transparent: true;\x22look-at=\x22#player\x22 width=\x221\x22 height=\x221\x22 position=\x220 1.5 -1\x22></a-plane>";
 
                         }
@@ -874,6 +875,10 @@ webxr_router.get('/:_id', function (req, res) {
                                     // proceduralEntities = proceduralEntities + " <a-plane loadsvg=\x22description: "+sceneResponse.sceneLocations[i].description+"; eventdata: "+sceneResponse.sceneLocations[i].eventData+"; tags:  "+sceneResponse.sceneLocations[i].locationTags+"\x22 id=\x22svg_"+sceneResponse.sceneLocations[i].timestamp+
                                     // "\x22 look-at=\x22#player\x22 width=\x22"+scale+"\x22 height=\x22"+scale+"\x22 position=\x22"+sceneResponse.sceneLocations[i].x + " " + sceneResponse.sceneLocations[i].y + " " + zFix+"\x22></a-plane>";
                                 }
+                                if (sceneResponse.sceneLocations[i].markerType == "text") {
+                                    sceneTextLocations.push(sceneResponse.sceneLocations[i]);
+
+                                }
                                 if (sceneResponse.sceneLocations[i].markerType == "svg fixed") {
                                     sceneTextLocations.push(sceneResponse.sceneLocations[i]);
 
@@ -883,6 +888,7 @@ webxr_router.get('/:_id', function (req, res) {
                                     // proceduralEntities = proceduralEntities + " <a-entity load_threesvg=\x22description: "+sceneResponse.sceneLocations[i].description+"; eventdata: "+sceneResponse.sceneLocations[i].eventData+"; tags:  "+sceneResponse.sceneLocations[i].locationTags+"\x22 id=\x22svg_"+sceneResponse.sceneLocations[i].timestamp+
                                     // "\x22 look-at=\x22#player\x22 width=\x22"+scale+"\x22 height=\x22"+scale+"\x22 position=\x22"+sceneResponse.sceneLocations[i].x + " " + sceneResponse.sceneLocations[i].y + " " + zFix+"\x22></a-entity>";
                                 }
+
 
 
 
@@ -1430,7 +1436,7 @@ webxr_router.get('/:_id', function (req, res) {
                                     color = locationLights[i].data;
                                 }
                             }
-                            lightEntities = lightEntities + "<a-light "+mods+" color=\x22" + color + "\x22 position=\x22"+locationLights[i].loc+"\x22 distance=\x22"+distance+"\x22 intensity='2' type='point'></a-light>";
+                            lightEntities = lightEntities + "<a-light "+mods+" color=\x22" + color + "\x22 position=\x22"+locationLights[i].loc+"\x22 distance=\x22"+distance+"\x22 intensity='5' type='point'></a-light>";
                         }
                         callback();
                     } else {
@@ -2447,7 +2453,7 @@ webxr_router.get('/:_id', function (req, res) {
                     if (sceneResponse.sceneText != null && sceneResponse.sceneText != "" && sceneResponse.sceneText.length > 0) {
                         // contentUtils = "<script src=\x22../main/src/component/content-utils.js\x22></script>"; 
 
-                        if (!textLocation.length > 0) {textLocation = "-10 1.5 -5";}
+                        if (!textLocation.length > 0) {textLocation = "-10 1 -5";}
                         // console.log("tryna get sceneText!");
                         let mainText = sceneResponse.sceneText.replace(/([\"]+)/gi, '\'');
                         mainText = mainText.replace(/([\;]+)/gi, '\:');
@@ -2456,53 +2462,106 @@ webxr_router.get('/:_id', function (req, res) {
                         // let maintext64 = cleanbase64(sceneResponse.sceneText);
                         // let maintext64 = "<div id=\x22restrictToLocation\x22 data-location='"+buff+"'></div>";
                         // mainText = sceneResponse.sceneText;
-                        mainTextEntity = "<a-entity look-at=\x22#player\x22 scale=\x22.75 .75 .75\x22 position=\x22"+textLocation+"\x22>"+
-                                "<a-entity "+skyboxEnvMap+" id=\x22mainTextToggle\x22 class=\x22envMap activeObjexRay\x22 position=\x220 -.5 .5\x22 toggle-main-text  gltf-model=\x22#exclamation\x22></a-entity>"+
+                        textEntities = textEntities + "<a-entity look-at=\x22#player\x22 scale=\x22.25 .25 .25\x22 position=\x22"+textLocation+"\x22>"+
+                                "<a-entity "+skyboxEnvMap+" id=\x22mainTextToggle\x22 class=\x22envMap activeObjexRay\x22 position=\x220 -1 .5\x22 toggle-main-text  gltf-model=\x22#exclamation\x22></a-entity>"+
                                 "<a-entity id=\x22mainTextPanel\x22 visible='false' position=\x220 0 0\x22>" +
-                                "<a-entity id=\x22mainTextHeader\x22 visible='false' geometry=\x22primitive: plane; width: 4; height: 1\x22 position=\x220 7.25 0\x22 material=\x22color: grey; transparent: true; opacity: 0.0\x22" +
-                                "text=\x22value:; wrap-count: 40;\x22></a-entity>" +
+                                // "<a-entity id=\x22mainTextHeader\x22 visible='false' geometry=\x22primitive: plane; width: 4; height: 1\x22 position=\x220 7.25 0\x22 material=\x22color: grey; transparent: true; opacity: 0.0\x22" +
+                                // "text=\x22value:; wrap-count: 40;\x22></a-entity>" +
+                                "<a-entity id=\x22mainTextHeader\x22 visible='false' position=\x225 9.75 0\x22></a-entity>" +
+                                
                                 // "<a-entity id=\x22mainText\x22 main-text-control=\x22mainTextString: "+mainText.replace(/([^a-z0-9\,\?\'\-\_\.\!\*\&\$\n\~]+)/gi, ' ')+"; mode: "+sceneResponse.scenePrimaryTextMode+"\x22 geometry=\x22primitive: plane; width: 4.5; height: 6\x22 position=\x220 6.75 0\x22 material=\x22color: grey; transparent: true; opacity: 0.0\x22" +
                                 // "<a-entity id=\x22mainText\x22 data-maintext=\x22"+maintext64+"\x22 main-text-control=\x22mainTextString: "+mainText.replace(/([^a-z0-9\,\(\)\?\'\-\_\.\!\*\&\$\n\~]+)/gi, ' ')+"; mode: "+sceneResponse.scenePrimaryTextMode+"\x22 geometry=\x22primitive: plane; width: 4.5; height: 6\x22 position=\x220 6.75 0\x22 material=\x22color: grey; transparent: true; opacity: 0.0\x22" +
-                                "<a-entity id=\x22mainText\x22 data-maintext='"+maintext64+"' main-text-control=\x22mainTextString: ; mode: "+sceneResponse.scenePrimaryTextMode+"\x22 geometry=\x22primitive: plane; width: 4.5; height: 6\x22 position=\x220 6.75 0\x22 material=\x22color: grey; transparent: true; opacity: 0.0\x22" +
+                                // "<a-entity id=\x22mainText\x22 data-maintext='"+maintext64+"' main-text-control=\x22mainTextString: ; mode: "+sceneResponse.scenePrimaryTextMode+"\x22 geometry=\x22primitive: plane; width: 4.5; height: 6\x22 position=\x220 6.75 0\x22 material=\x22color: grey; transparent: true; opacity: 0.0\x22" +
+                                "<a-entity id=\x22mainText\x22 data-maintext='"+maintext64+"' main-text-control=\x22font: "+sceneResponse.sceneFontWeb1+"; mainTextString: ; mode: "+sceneResponse.scenePrimaryTextMode+"\x22 position=\x22-5 9.25 0\x22></a-entity>" +
 
                                 // "<a-entity id=\x22mainText\x22 main-text-control=\x22mainTextString: "+mainText+"; mode: "+sceneResponse.scenePrimaryTextMode+"\x22 geometry=\x22primitive: plane; width: 4.5; height: 6\x22 position=\x220 6.75 0\x22 material=\x22color: grey; transparent: true; opacity: 0.0\x22" +
-                                "text=\x22value:; wrap-count: 30;\x22>" +
+                                // "text=\x22value:; wrap-count: 30;\x22>" +
                                 // "text=\x22value:"+sceneResponse.sceneText+"; wrap-count: 25;\x22>" +
-                                "<a-entity visible='false' class=\x22envMap activeObjexRay\x22 id=\x22nextMainText\x22 gltf-model=\x22#next_button\x22 scale=\x22.5 .5 .5\x22 position=\x222 -8 1\x22></a-entity>" +
-                                "<a-entity visible='false' class=\x22envMap activeObjexRay\x22 id=\x22previousMainText\x22 gltf-model=\x22#previous_button\x22 scale=\x22.5 .5 .5\x22 position=\x22-2 -8 1\x22></a-entity>" +
-                                "<a-entity gltf-model=\x22#square_panel\x22 scale=\x223 4 3\x22 position=\x220 -3 -.5\x22></a-entity>" +
-                            "</a-entity></a-entity></a-entity>";
+                                "<a-entity visible='false' class=\x22envMap activeObjexRay\x22 id=\x22nextMainText\x22 gltf-model=\x22#next_button\x22 scale=\x22.5 .5 .5\x22 position=\x223 -1 2\x22></a-entity>" +
+                                "<a-entity visible='false' class=\x22envMap activeObjexRay\x22 id=\x22previousMainText\x22 gltf-model=\x22#previous_button\x22 scale=\x22.5 .5 .5\x22 position=\x22-3 -1 2\x22></a-entity>" +
+                                "<a-entity gltf-model=\x22#square_panel\x22 scale=\x226 6 6\x22 position=\x220 5 -.5\x22></a-entity>" +
+                            "</a-entity></a-entity>";
                         callback();
                     } else {
                         callback();
                     }
                 },
+                // function (callback) { //spin through text items and pull out special ones... //later..
+                //     if (sceneResponse.sceneTextItems != null && sceneResponse.sceneTextItems != undefined && sceneResponse.sceneTextItems != "") {
+                //         // fontIndex
+                //         console.log("sceneTeextITmmmes " + sceneResponse.sceneTextItems);
+                //         let toids = sceneResponse.sceneTextItems.map(convertStringToObjectID);
+                //         console.log("sceneTeextITmmmes " + sceneResponse.sceneTextItems + " vs toids " + toids);
+                //         db.text_items.find({$and:[{_id: {$in: toids}}, {type: "Font"}]}, function(err, items) {
+                //             if (err || !items) {
+                //                 console.log("no font or caint find those sceneTextItems!");
+                //             } else {
+                                
+                //                 //TODO async loop items..
+                //                 styleIncludes = "<link rel=\x22stylesheet\x22 href=\x22https://fonts.googleapis.com/css?family=Luckiest+Guy\x22></link>\x22";
+                //                 // console.log("fonts item : "+ JSON.stringify(items[0]));
+                //                 // if ()
+                //                 // sceneTextItemData = sceneTextItemData + "<div style=\x22visibility: hidden;\x22 class=\x22embeddedFont\x22 id=\x22embeddedFont\x22 data-attribute=\x22"+items[0].textstring+"\x22></div>"; //sceneTextItemData is outside of a-scene, so use div 
+                //                 sceneTextItemData = sceneTextItemData + "<span id=\x22font_\x22 class=\x22externalFont\x22 data-attribute=\x22font-family: 'Luckiest Guy', regular;\x22 style=\x22font-family: 'Luckiest Guy', regular;\x22>&nbsp;</span>"; //init so canvas can use?
+                //                 // callback();
+                //             }
+                //         });
+                //     } 
+                //     callback();
+                // },
+                // function (callback) {
+                //     if (sceneResponse.sceneFontWeb1 && sceneResponse.sceneFontWeb1 != "None") {
 
+                //         let mod1 = sceneResponse.sceneFontWeb1.replace(" ", "+");
+                //         console.log("consarnit font " + mod1);
+                //         // styleIncludes = styleIncludes + "<link href=\x22/fonts/web/"+mod1+".css\x22 rel=\x22stylesheet\x22 type=\x22text/css\x22></link>\x22";
+                //         // styleIncludes += "<link href=\x22https://fonts.googleapis.com/css?family="+mod1+"&display=swap\x22 rel=\x22preload\x22 as=\x22font\x22></link>\x22";
+                //         // styleIncludes = styleIncludes +"<link rel=\x22preload\x22 href=\x22/fonts/web/"+mod1+".woff2\x22 as=\x22font\x22 crossorigin></link>";
+                //         // <style>
+                //         // styleIncludes = styleIncludes + "<style>@import url(https://fonts.googleapis.com/css?family=Lobster);</style>";
+                //         // @font-face {
+                //         // font-family: 'Quicksand';
+                //         // font-style: normal;
+                //         // font-weight: 400;
+                //         // src: local('Quicksand Regular'), local('Quicksand-Regular'), url(https://studentmunch.com/wp-content/themes/studentmunch/fonts/quicksand.woff2) format('woff2');
+                //         // unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+                //         // }
+                //         // </style>
+
+                //         sceneTextItemData = sceneTextItemData + "<span id=\x22sceneFontWeb1\x22 class=\x22externalFont\x22 data-attribute=\x22"+sceneResponse.sceneFontWeb1+"\x22 style=\x22font-family: '"+sceneResponse.sceneFontWeb1+"', regular;\x22>&nbsp;</span>"; //init so canvas can use?
+                //     }
+                //     if (sceneResponse.sceneFontWeb2 && sceneResponse.sceneFontWeb2 != "None") {
+                //         let mod2 = sceneResponse.sceneFontWeb1.replace(" ", "+");
+                //         styleIncludes += "<link rel=\x22stylesheet\x22 href=\x22https://fonts.googleapis.com/css?family="+mod2+"\x22></link>\x22";
+                //         sceneTextItemData += "<span id=\x22font_\x22 class=\x22externalFont\x22 data-attribute=\x22font-family: '"+sceneResponse.sceneFontWeb1+"', regular;\x22 style=\x22font-family: '"+sceneResponse.sceneFontWeb1+"', regular;\x22>&nbsp;</span>"; //init so canvas can use?
+                //     }
+                //     callback();
+                // },
                 function (callback) { 
                     //hrm, get a list of text locations and spin through these...
                     if (sceneResponse.sceneTextItems != null && sceneResponse.sceneTextItems != undefined && sceneResponse.sceneTextItems != "") {
 
-                        console.log("sceneTeextITmmmes " + sceneResponse.sceneTextItems);
-                        let toids = sceneResponse.sceneTextItems.map(convertStringToObjectID);
-                        console.log("sceneTeextITmmmes " + sceneResponse.sceneTextItems + " vs toids " + toids);
-                        db.text_items.find({$and:[{_id: {$in: toids}}, {type: "Font"}]}, function(err, items) {
-                            if (err || !items) {
-                                console.log("no font or caint find those sceneTextItems!");
-                            } else {
+                        // console.log("sceneTeextITmmmes " + sceneResponse.sceneTextItems);
+                        // let toids = sceneResponse.sceneTextItems.map(convertStringToObjectID);
+                        // console.log("sceneTeextITmmmes " + sceneResponse.sceneTextItems + " vs toids " + toids);
+                        // db.text_items.find({$and:[{_id: {$in: toids}}, {type: "Font"}]}, function(err, items) {
+                        //     if (err || !items) {
+                        //         console.log("no font or caint find those sceneTextItems!");
+                        //     } else {
 
-                                // console.log("fonts item : "+ JSON.stringify(items[0]));
-                                
-                                // sceneTextItemData = sceneTextItemData + "<div style=\x22visibility: hidden;\x22 class=\x22embeddedFont\x22 id=\x22embeddedFont\x22 data-attribute=\x22"+items[0].textstring+"\x22></div>"; //sceneTextItemData is outside of a-scene, so use div 
-                                sceneTextItemData = sceneTextItemData + "<span style=\x22font-family: 'Lobster', cursive;\x22>&nbsp;</span>"; //init so canvas can use?
-                            }
-                        });
+                        //         // console.log("fonts item : "+ JSON.stringify(items[0]));
+                        //         // if ()
+                        //         // sceneTextItemData = sceneTextItemData + "<div style=\x22visibility: hidden;\x22 class=\x22embeddedFont\x22 id=\x22embeddedFont\x22 data-attribute=\x22"+items[0].textstring+"\x22></div>"; //sceneTextItemData is outside of a-scene, so use div 
+                        //         sceneTextItemData = sceneTextItemData + "<span class=\x22externalFont\x22 data-attribute=\x22font-family: 'Luckiest Guy', regular;\x22 style=\x22font-family: 'Luckiest Guy', regular;\x22>&nbsp;</span>"; //init so canvas can use?
+                        //     }
+                        // });
                         // for (let t = 0; t < sceneResponse.sceneTextItems.length; t++) {
                         //     console.log(sceneResponse.sceneTextItems[t]);
                             // if (sceneResponse.sceneTextItems[t].type == "Font") {
                                 
                             // }
                         // }
-                        if (sceneResponse.sceneWebType != "HTML from Text Item") { //if it's not a plain html page
+                        if (sceneResponse.sceneWebType != "HTML from Text Item") { //if it's not just a regular html page
                             for (let i = 0; i < sceneTextLocations.length; i++) {  //TODO ASYNC
 
                             console.log("cheking sceneLocation " + JSON.stringify(sceneTextLocations[i]));
@@ -3515,6 +3574,9 @@ webxr_router.get('/:_id', function (req, res) {
                     settings.sceneEventEnd = sceneResponse.sceneEventEnd;
                     settings.hideAvatars = false;
                     settings.sceneSkyRadius = sceneResponse.sceneSkyRadius != undefined ? sceneResponse.sceneSkyRadius : 202;
+                    settings.sceneFontWeb1 = sceneResponse.sceneFontWeb1;
+                    settings.sceneFontWeb2 = sceneResponse.sceneFontWeb2;
+                    settings.sceneFontWeb3 = sceneResponse.sceneFontWeb3;
                     settings.sceneColor1 = sceneResponse.sceneColor1;
                     settings.sceneColor2 = sceneResponse.sceneColor2;
                     settings.sceneColor3 = sceneResponse.sceneColor3;
@@ -3692,6 +3754,10 @@ webxr_router.get('/:_id', function (req, res) {
                             "<link href=\x22/css/webxr.css\x22 rel=\x22stylesheet\x22 type=\x22text/css\x22>" + 
                             "<script type=\x22module\x22 src=\x22https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js\x22></script>"+
                             extraScripts + 
+                            // extraStyles +
+                            // "<style>\n"+
+                            //     // "@import url(https://fonts.googleapis.com/css?family=Lobster);"+ //todo check for font refs
+                            // "/<style>\n"+
 
                             // primaryAudioScript +
                             "</head>\n" +
@@ -3781,9 +3847,9 @@ webxr_router.get('/:_id', function (req, res) {
                             console.log("Tryna do a location tracker!");
                             
                         } else if (sceneData.sceneWebType == "BabylonJS") {
-                            let uwfx_shader = requireText('./babylon/uwfx_shader.txt', require);
-                            let uwfx_scene = requireText('./babylon/uwfx_scene.txt', require);
-                            let uwfx_assets = requireText('./babylon/uwfx_assets.txt', require);
+                            // let uwfx_shader = requireText('./babylon/uwfx_shader.txt', require);
+                            // let uwfx_scene = requireText('./babylon/uwfx_scene.txt', require);
+                            // let uwfx_assets = requireText('./babylon/uwfx_assets.txt', require);
                         
                             console.log("skyboxUrl" + skyboxUrl);
                             htmltext = "<!DOCTYPE html>\n" +
@@ -4733,6 +4799,7 @@ webxr_router.get('/:_id', function (req, res) {
                         "<meta name=\x22mobile-web-app-capable\x22 content=\x22yes\x22>" +
                         "<meta name=\x22apple-mobile-web-app-capable\x22 content=\x22yes\x22>" +
                         // "<meta name=\x22token\x22 content=\x22"+token+"\x22>"+
+                        styleIncludes +
                         "<link href=\x22../main/vendor/fontawesome-free/css/all.css\x22 rel=\x22stylesheet\x22 type=\x22text/css\x22>" +
                         "<link href=\x22/css/webxr.css\x22 rel=\x22stylesheet\x22 type=\x22text/css\x22>" +
 
@@ -4828,7 +4895,7 @@ webxr_router.get('/:_id', function (req, res) {
                         
                         // "<script src=\x22../main/vendor/trackedlibs/grab.js\x22></script>"+  
 
-
+                        "<script src=\x22../main/src/component/aframe-troika-text.min.js\x22></script>"+
                         "<script src=\x22../main/src/component/mod-materials.js\x22></script>"+
 
                         // "<script src=\x22../main/src/component/aframe-gradientsky.min.js\x22></script>"+
@@ -4984,7 +5051,7 @@ webxr_router.get('/:_id', function (req, res) {
                         geoEntities +
                         videoEntity +
                         youtubeEntity +
-                        mainTextEntity +
+                        textEntities +
                         attributionsTextEntity +
                         availableScenesEntity +
                         pictureGroupsEntity +
@@ -5032,11 +5099,17 @@ webxr_router.get('/:_id', function (req, res) {
                         objectData +
                         inventoryData +
 
-                        "<a-console look-at=\x22#player\x22 position=\x22-4 1.75 -2\x22></a-console>"+
+                        // "<a-entity position=\x22-10 1 10\x22 look-at=\x22#player\x22 troika-text=\x22value: Hello World!; font: ../fonts/web/RetroLoops.ttf; fontSize: 2; color: blue; outlineColor: white; outlineWidth: 2%;\x22 troika-text-material=\x22shader: standard; roughness: .8; metalness: 0.8;\x22></a-entity>"+
+                        // "<a-entity position=\x22-20 1-10\x22 scale=\x22.5 .5 .5\x22 look-at=\x22#player\x22 troika-text=\x22value: Hello World!; font: ../fonts/web/MountainsOfChristmasBold.woff; lineHeight: .85; maxWidth: 10; fontSize: 6; color: white; fillOpacity: .5;  outlineColor: white; outlineWidth: 1%; outlineBlur: .25; strokeColor: red; strokeWidth: 1%;\x22></a-entity>"+
+
+                        // "<a-console look-at=\x22#player\x22 position=\x22-4 1.75 -2\x22></a-console>"+
                         // "<a-entity id=\x22navmesh\x22 geometry=\x22primitive: plane; height: 30; width: 30; buffer: true;\x22 rotation=\x22-90 0 0\x22 nav-mesh></a-entity>"+
                         "</a-scene>\n"+ //CLOSE AFRAME SCENE
                         "</div>\n"+
                             // "<style>\n"+
+                            //     "@import url(https://fonts.googleapis.com/css?family=Lobster);"+ //todo check for font refs
+                            // "/<style>\n"+
+
                             // "a{ color:#fff;\n"+
                             // "text-decoration:none;\n"+
                             // "}\n"+

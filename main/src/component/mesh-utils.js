@@ -1539,16 +1539,20 @@ AFRAME.registerComponent('cloud_marker', {
     this.cursor = document.querySelector('[cursor]');
     this.calloutEntity = document.createElement("a-entity");
     this.calloutPanel = document.createElement("a-entity");
-    this.calloutText = document.createElement("a-text");
+    this.calloutText = document.createElement("a-entity");
     this.viewportHolder = document.getElementById("viewportPlaceholder3");
     let thisEl = this.el;
     this.isSelected = false;
     this.data.scale = this.data.scale != undefined ? this.data.scale : 1;
     this.objectElementID = null;
-    // if (!this.data.isNew) {
-      // this.phID = room + '_cloudmarker_' + this.data.timestamp;
-      // this.el.id = this.phID;
-      // this.el.setAttribute('id', this.phID);
+    this.font1 = "Acme.woff";
+    this.font2 = "Acme.woff";
+    if (settings && settings.sceneFontWeb1) {
+      this.font1 = settings.sceneFontWeb1;
+    }
+    if (settings && settings.sceneFontWeb1) {
+      this.font2 = settings.sceneFontWeb2;
+    }
       
       this.phID = this.data.phID;
       // console.log("cloudmarker phID " + this.phID); 
@@ -1755,15 +1759,16 @@ AFRAME.registerComponent('cloud_marker', {
       this.calloutPanel.setAttribute("overlay");
       // this.calloutText.setAttribute("size", ".1 .1 .1");
       this.calloutText.setAttribute("position", '0 0 1.25'); //offset the child on z toward camera, to prevent overlap on model
-      this.calloutText.setAttribute('text', {
-        width: .5,
+      this.calloutText.setAttribute('troika-text', {
+        // width: .5,
         baseline: "bottom",
         align: "left",
-        font: "/fonts/Exo2Bold.fnt",
+        fontSize: .1,
+        font: "/fonts/web/"+ this.font2,
         anchor: "center",
         wrapCount: 12,
         color: "white",
-        value: "wha"
+        value: ""
       });
     }
       // this.el.addEventListener("model-loaded", (e) => {
@@ -1821,7 +1826,7 @@ AFRAME.registerComponent('cloud_marker', {
             // calloutString = "x : " + elPos.x.toFixed(2) + "\n" +"y : " + elPos.y.toFixed(2) + "\n" +"z : " + elPos.z.toFixed(2);
             calloutString = that.data.description != '' ? that.data.description : theLabel;
           }
-          that.calloutText.setAttribute("value", calloutString);
+          that.calloutText.setAttribute("troika-text", {value: calloutString});
         }
       }
       }
@@ -3691,24 +3696,40 @@ AFRAME.registerComponent('load_threesvg', {
         }
       );
     }
-
-  //   let svgLoader = new SVGLoader();
-  //   let data = svgLoader.parse(svgUrl);
-  //   data.paths.forEach(dp => {
-  //     let shapes = dp.toShapes(true);
-  //     shapes.forEach(sh => {
-  //       let g = new THREE.ExtrudeBufferGeometry(sh, {bevelEnabled: false, depth: 2});
-  //       g.center();
-  //       let m = new THREE.MeshLambertMaterial({color: 0xFACE8D});
-  //       let o = new THREE.Mesh(g, m);
-  //       o.scale.setScalar(0.05);
-  //       console.log(o);
-  //       this.el.setObject3D(o);
-  //     });
-      
-  //   });
-  // }
 });
+  function LiveCanvasFont(fontName) {
+    console.log("tryna load canvas font.." + fontName);
+    let liveCanvasEl = document.getElementById("flying_info_canvas");
+    if (liveCanvasEl) {
+      let mod1 = fontName.replace(" ", "+");
+      // let fontURL = "http://localhost:3000/fonts/web/" + fontID.toLowerCase() + ".woff2";
+      let fontURL = "url('https://fonts.googleapis.com/css?family="+mod1+"')";
+      // // this.fontURL = "url(https://fonts.googleapis.com/css?family=Sofia)";
+      console.log("tryna get font: " +  fontURL);
+      const myFont = new FontFace('thisfont', fontURL);
+      myFont.load().then((font) => {
+        document.fonts.add(font);
+        console.log('Font loaded');
+        liveCanvasEl.components.live_canvas.fontLoaded();
+      });
+    }
+
+
+    var loadCSS = function(url, callback){
+      var link = document.createElement('link');
+          link.type = 'text/css';
+          link.rel = 'stylesheet';
+          link.href = url;
+  
+      document.getElementsByTagName('head')[0].appendChild(link);
+  
+      var img = document.createElement('img');
+          img.onerror = function(){
+              if(callback) callback(link);
+          }
+          img.src = url;
+  }
+  }
 
   AFRAME.registerComponent('live_canvas', {
     dependencies: ['geometry', 'material'],
@@ -3724,32 +3745,79 @@ AFRAME.registerComponent('load_threesvg', {
       this.canvas = document.querySelector(this.data.src);
       this.context = this.canvas.getContext('2d');
       this.tick = AFRAME.utils.throttleTick(this.tick, 1000, this);
-      // this.fontEl = document.getElementById("embeddedFont");
+      // this.fontEl = document.getElementById("sceneFontWeb1");
       // this.font = null;
       if (this.fontEl) {
-        this.fontID = this.fontEl.getAttribute('data-attribute');
-        this.fontURLRaw = "/font/" + this.fontID;
-        // this.fontURL = "url("+this.fontURLRaw+") format(\x22ttf\x22)";
+        let fontID = this.fontEl.getAttribute('data-attribute');
+        // LiveCanvasFont(fontID);
+        var link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.type = 'text/css';
+        link.href = 'http://fonts.googleapis.com/css?family=Lobster';
+        document.getElementsByTagName('head')[0].appendChild(link);
 
-        this.fontURL = "url(https://fonts.googleapis.com/css?family=Sofia)";
+        // Trick from http://stackoverflow.com/questions/2635814/
+        var image = new Image;
+        image.src = link.href;
+        image.onerror = () => { //clever girl, spoof the mime type to get a callback when the link-not-image is loaded
+          console.log("tryna get font: " +  link.href);
+            this.context.font = '150px "Lobster"';
+            this.context.textBaseline = 'top';
+            this.context.fillText('Hello!', 20, 10);
+        };
 
-        console.log("tryna get font: " + this.fontURL);
-        this.font = new FontFace('efont', this.fontURL );
-        // document.fonts.add(this.font);
-        this.font.load().then(function (font) {
-          document.fonts.add(font);
-          // Ready to use the font in a canvas context
-          console.log("font ready!");
+            // let mod1 = fontID.replace(" ", "+");
+            // // let fontURL = "http://localhost:3000/fonts/web/" + fontID.toLowerCase() + ".woff2";
+            // let fontURL = "url('https://fonts.googleapis.com/css?family="+mod1+"')";
 
-          // this.context.font='100px efont';
-          this.context.font = '68px Lobster';
-          this.el.setAttribute('material', 'src', this.data.src);
-          this.isReady = true;
-        });
+            // // // this.fontURL = "url(https://fonts.googleapis.com/css?family=Sofia)";
+
+            // console.log("tryna get font: " +  fontURL);
+            // // let efont = new FontFace(fontID, this.fontURL );
+            // // // document.fonts.add(this.font); 
+            // // efont.load().then(function (font) { 
+            // //   document.fonts.add(font);
+            // //   // Ready to use the font in a canvas context
+            // //   console.log("font ready!");
+
+            // //   // this.context.font='100px efont';
+            // //   this.context.font =  '100px' + fontID;
+            // //   this.el.setAttribute('material', 'src', this.data.src);
+            // //   this.isReady = true;
+            // // });
+            //   const myFont = new FontFace('thisfont', fontURL);
+
+            //   myFont.loadAsync().then((font) => {
+            //   document.fonts.add(font);
+
+            //   console.log('Font loaded');
+              
+            //   this.context.font =  '100px thisfont';
+            //   this.el.setAttribute('material', 'src', this.data.src);
+            //   this.isReady = true;
+            // });
       } else {
-        console.log("no font found..");
+        // console.log("no font found..");
         // this.context.font='bold 100px Arial';
-        this.context.font = '100px Lobster';
+        // let mod1 = settings.sceneFontWeb1.replace(" ", "+");
+        // // styleIncludes += "<link rel=\x22stylesheet\x22 href=\x22https://fonts.googleapis.com/css?family="+mod1+"\x22></link>\x22";
+        // this.fontURL = "url('https://fonts.googleapis.com/css?family="+mod1+"')";
+
+        // this.fontURL = "url(https://fonts.googleapis.com/css?family=Sofia)";
+
+        // console.log("tryna get font: " + this.fontURL);
+        // let efont = new FontFace(settings.sceneFontWeb1, this.fontURL );
+        //
+        // efont.loadAsync().then(function (font) { 
+        //   document.fonts.add(font);
+        //   // Ready to use the font in a canvas context
+        //   console.log("font ready!");
+        //   document.fonts.add(font); 
+        //   // this.context.font='100px efont';
+         
+        // });
+
+        this.context.font = '100px "Arial"';
         this.el.setAttribute('material', 'src', this.data.src);
         this.isReady = true;
       }
@@ -3764,21 +3832,22 @@ AFRAME.registerComponent('load_threesvg', {
 
     //  }
     },
+    fontLoaded () {
+      this.context.font = '100px' + settings.sceneFontWeb1;
+      this.el.setAttribute('material', 'src', this.data.src);
+      this.isReady = true;
+    },
     tick(time, deltaTime) {
       if (this.isReady) {
       var material;
-
       material = this.el.getObject3D('mesh').material;
       if (!material.map) {
         console.error("no material map");
         this.el.removeAttribute('live-canvas');
         return;
       }
-
       this.time = Math.round(time/1000);
-     this.context.clearRect(0,0,1024,1024);
-     
-
+      this.context.clearRect(0,0,1024,1024);
       // this.context.fillStyle = "red";
       this.context.textAlign = "center";
       // ctx.font = 'bold 88px Arial';
@@ -3794,7 +3863,6 @@ AFRAME.registerComponent('load_threesvg', {
       this.context.fillStyle = 'white';
       this.context.strokeText("Elapsed time: " + this.time, this.canvas.width/2, this.canvas.height/2);
       this.context.fillText("Elapsed time: " + this.time, this.canvas.width/2, this.canvas.height/2);
-
       material.map.needsUpdate = true;
       }
     }

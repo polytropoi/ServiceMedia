@@ -749,13 +749,14 @@ AFRAME.registerComponent('play-on-vrdisplayactivate-or-enter-vr', { //play video
 
 AFRAME.registerComponent('main-text-control', {
     schema: {
+        font: {default: ""},
         mainTextString: {default: ''},
         mode: {default: ""},
         jsonData: {default: ""}
       },
       init: function () {
         let theData = this.el.getAttribute('data-maintext');
-        // console.log("theData" + theData);
+        console.log("maintext font " + this.data.font);
         this.data.jsonData = JSON.parse(atob(theData)); //convert from base64
         // console.log(this.data.jsonData);
         this.data.mainTextString = this.data.jsonData;
@@ -803,20 +804,49 @@ AFRAME.registerComponent('main-text-control', {
             this.textArray = textArray;
             // tArray.length = this.textArray.length;
 
-            document.querySelector("#mainText").setAttribute('text', {
-                baseline: "top",
-                align: "left",
-                value: this.textArray[0]
+            // document.querySelector("#mainText").setAttribute('text', {
+            //     baseline: "top",
+            //     align: "left",
+            //     value: this.textArray[0]
+            // });
+            document.querySelector("#mainText").setAttribute('troika-text', {
+              value: this.textArray[0],
+              font: '../fonts/web/' + this.data.font,
+              lineHeight: 1,
+              baseline: "top",
+                  anchor: "left",
+              maxWidth: 10,
+              fontSize: .6,
+              color: 'white',
+              // fillOpacity: 5,
+              // outlineColor: 'white',
+              // outlineWidth: '1%',
+              // outlineBlur: .25,
+              strokeColor: 'red',
+              strokeWidth: '1%'
+
             });
+            // troika-text=\x22value: Hello World!; 
+            // font: ../fonts/web/MountainsOfChristmasBold.woff; lineHeight: .85; maxWidth: 10; fontSize: 6; color: white; fillOpacity: .5;  outlineColor: white; outlineWidth: 1%; outlineBlur: .25; strokeColor: red; strokeWidth: 1%;\x22
 
             // console.log("mainTextString: " + textArray[0]);
             let uiMaterial = new THREE.MeshStandardMaterial( { color: '#63B671' } ); 
             if (this.textArray.length > 1) {
               mainTextHeader.setAttribute('visible', true);
-              mainTextHeader.setAttribute('text', {
+                // mainTextHeader.setAttribute('text', {
+                //     baseline: "top",
+                //     align: "left",
+                //     value: "page 1 of " + textArray.length 
+                // });
+                mainTextHeader.setAttribute('troika-text', {
                   baseline: "top",
-                  align: "left",
-                  value: "page 1 of " + textArray.length 
+                  anchor: "right",
+                  value: "page 1 of " + textArray.length,
+                  font: '../fonts/web/' + this.data.font,
+                  lineHeight: .85,
+                  maxWidth: 10,
+                  fontSize: .3,
+                  color: 'white'
               });
               nextButton.setAttribute('visible', true);
               previousButton.setAttribute('visible', true);
@@ -841,14 +871,14 @@ AFRAME.registerComponent('main-text-control', {
                         index = 0;
                     }
                     // console.log(textArray[index]);
-                    document.querySelector("#mainText").setAttribute('text', {
-                      baseline: "top",
-                      align: "left",
+                    document.querySelector("#mainText").setAttribute('troika-text', {
+                      // baseline: "top",
+                      // align: "left",
                         value: textArray[index]
                     });
-                    mainTextHeader.setAttribute('text', {
-                      baseline: "top",
-                      align: "left",
+                    mainTextHeader.setAttribute('troika-text', {
+                      // baseline: "top",
+                      // align: "left",
                       value: "page "+(index+1)+" of " + textArray.length
                     });
                 });
@@ -860,14 +890,14 @@ AFRAME.registerComponent('main-text-control', {
                       index = textArray.length - 1;
                   }
                   // console.log(textArray[index]);
-                  document.querySelector("#mainText").setAttribute('text', {
-                    baseline: "top",
-                    align: "left",
+                  document.querySelector("#mainText").setAttribute('troika-text', {
+                    // baseline: "top",
+                    // align: "left",
                       value: textArray[index]
                   });
-                  mainTextHeader.setAttribute('text', {
-                    baseline: "top",
-                    align: "left",
+                  mainTextHeader.setAttribute('troika-text', {
+                    // baseline: "top",
+                    // align: "left",
                     value: "page "+(index+1)+" of " + textArray.length
                   });
               });
@@ -1515,9 +1545,13 @@ AFRAME.registerComponent('entity-callout', {
     init: function () {
       var sceneEl = document.querySelector('a-scene');
       //let calloutString = this.data.calloutString;
+      this.font = "Acme.woff";
+      if (settings && settings.sceneFontWeb2) {
+        this.font = settings.sceneFontWeb2;
+      }
 
       let calloutEntity = document.createElement("a-entity");
-      let calloutText = document.createElement("a-text");
+      let calloutText = document.createElement("a-entity");
      
       // this.calloutText = calloutText;
       // calloutText.setAttribute('overlay');
@@ -1527,12 +1561,12 @@ AFRAME.registerComponent('entity-callout', {
       sceneEl.appendChild(calloutEntity);
       calloutEntity.appendChild(calloutText);
       calloutText.setAttribute("position", '0 0 .3'); //offset the child on z toward camera, to prevent overlap on model
-      calloutText.setAttribute('text', {
+      calloutText.setAttribute('troika-text', {
         baseline: "bottom",
         align: "center",
-        font: "/fonts/Exo2Bold.fnt",
+        font: "/fonts/web/" + this.font,
         anchor: "center",
-        wrapCount: 150,
+
         color: "white",
         value: "Play/Pause"
       });
@@ -1564,7 +1598,7 @@ AFRAME.registerComponent('model-callout', {
       name = name.replace(/\_/g, " ");
       
       let calloutEntity = document.createElement("a-entity");
-      let calloutText = document.createElement("a-text");
+      let calloutText = document.createElement("a-entity");
      
       // this.calloutText = calloutText;
       // calloutText.setAttribute('overlay');
@@ -1574,10 +1608,10 @@ AFRAME.registerComponent('model-callout', {
       sceneEl.appendChild(calloutEntity);
       calloutEntity.appendChild(calloutText);
       calloutText.setAttribute("position", '0 0 3'); //offset the child on z toward camera, to prevent overlap on model
-      calloutText.setAttribute('text', {
+      calloutText.setAttribute('troika-text', {
         baseline: "bottom",
         align: "center",
-        font: "/fonts/Exo2Bold.fnt",
+        font: "/fonts/web/" + settings.sceneFontWeb2,
         anchor: "center",
         wrapCount: 30,
         color: "black",
@@ -2002,7 +2036,7 @@ AFRAME.registerComponent('model-callout', {
         // console.log("calloutstring: " + this.data.calloutString);
         let calloutEntity = document.createElement("a-entity");
         calloutEntity.setAttribute("scale", '.25 .25 .25');
-        let calloutText = document.createElement("a-text");
+        let calloutText = document.createElement("a-entity");
         this.el.setAttribute("position", '0 0 0');
         // this.calloutText = calloutText;
         // calloutText.setAttribute('overlay');
@@ -2015,10 +2049,11 @@ AFRAME.registerComponent('model-callout', {
         // console.log("avatar-callout set position " + JSON.stringify(this.el.getAttribute("position")));
         calloutEntity.appendChild(calloutText);
         calloutText.setAttribute("position", '0 0 2'); //offset the child on z toward camera, to prevent overlap on model
-        calloutText.setAttribute('text', {
+        calloutText.setAttribute('troika-text', {
           baseline: "bottom",
           align: "center",
-          font: "/fonts/Exo2Bold.fnt",
+          fontSize: .2,
+          font: "/fonts/web/" + settings.sceneFontWeb2,
           anchor: "center",
           wrapCount: 30,
           color: "white",
@@ -2686,7 +2721,7 @@ AFRAME.registerComponent('mod_object', {
         console.log(this.data.objectData.name + "callouttext " + this.data.objectData.callouttext );
         this.calloutEntity = document.createElement("a-entity");
         this.calloutPanel = document.createElement("a-entity");
-        this.calloutText = document.createElement("a-text");
+        this.calloutText = document.createElement("a-entity");
         this.calloutEntity.id = "objCalloutEntity_" + this.data.objectData._id;
         this.calloutPanel.id = "objCalloutPanel_" + this.data.objectData._id;
         this.calloutText.id = "objCalloutText_" + this.data.objectData._id;
@@ -2702,16 +2737,16 @@ AFRAME.registerComponent('mod_object', {
         this.el.sceneEl.appendChild(this.calloutEntity);
         this.calloutEntity.appendChild(this.calloutPanel);
         this.calloutEntity.appendChild(this.calloutText);
-        
+        let font = "Acme.woff"; 
         this.calloutPanel.setAttribute("position", '0 0 1'); 
         this.calloutText.setAttribute("position", '0 0 1.25'); //offset the child on z toward camera, to prevent overlap on model
-        this.calloutText.setAttribute('text', {
-          width: .75,
+        this.calloutText.setAttribute('troika-text', {
+          fontSize: .1,
           baseline: "bottom",
           align: "left",
-          font: "/fonts/Exo2Bold.fnt",
+          font: "/fonts/web/" + font,
           anchor: "center",
-          wrapCount: 14,
+          // wrapCount: 14,
           color: "white",
           value: "wha"
         });
@@ -3637,7 +3672,7 @@ AFRAME.registerComponent('mod_object', {
                 calloutString = this.calloutLabelSplit[this.calloutLabelIndex];
               }
 
-            this.calloutText.setAttribute("value", calloutString);
+            this.calloutText.setAttribute("troika-text", {value: calloutString});
             }
 
             if (this.hasHighlightAction) {
@@ -4514,6 +4549,15 @@ AFRAME.registerComponent('mod_model', {
       
       this.hitpoint = new THREE.Vector3();
       this.tags = this.data.tags;
+      this.font1 = "Acme.woff";
+      this.font2 = "Acme.woff";
+      
+      if (settings && settings.sceneFontWeb1) {
+        this.font1 = settings.sceneFontWeb1;
+      }
+      if (settings && settings.sceneFontWeb1) {
+        this.font2 = settings.sceneFontWeb2;
+      }
       if (this.data.shader != '') {
 
 
@@ -4951,8 +4995,8 @@ AFRAME.registerComponent('mod_model', {
                 // console.log(this.data.name + " positon" + JSON.stringify(this.data.pos));
                 let calloutEntity = document.createElement("a-entity");
                 // calloutEntity.setAttribute('geometry', {primitive: 'plane', height: .25, width: .75, color: "black"});
-                calloutEntity.setAttribute("scale", '4 4 4');
-                let calloutText = document.createElement("a-text");
+                calloutEntity.setAttribute("scale", '2 2 2');
+                let calloutText = document.createElement("a-entity");
                 this.el.sceneEl.appendChild(calloutEntity);
                 calloutEntity.appendChild(calloutText);
                 calloutEntity.setAttribute("look-at", "#player");
@@ -4960,13 +5004,14 @@ AFRAME.registerComponent('mod_model', {
 
                 calloutText.setAttribute("position", '0 0 .5'); //offset the child on z toward camera, to prevent overlap on model
                 calloutText.setAttribute("look-at", "#player")
-                calloutText.setAttribute('text', {
+                calloutText.setAttribute('troika-text', {
                   width: 2,
                   baseline: "bottom",
                   align: "center",
-                  font: "/fonts/Exo2Bold.fnt",
+                  fontSize: .1,
+                  font: "/fonts/web/" + this.font2,
                   anchor: "center",
-                  wrapCount: 300,
+                  // wrapCount: 300,
                   color: "white",
                   value: spics[spicsIndex].title
                 });
@@ -5033,8 +5078,8 @@ AFRAME.registerComponent('mod_model', {
                 // console.log(this.data.name + " positon" + JSON.stringify(this.data.pos));
                 let calloutEntity = document.createElement("a-entity");
                 // calloutEntity.setAttribute('geometry', {primitive: 'plane', height: .25, width: .75, color: "black"});
-                calloutEntity.setAttribute("scale", '4 4 4');
-                let calloutText = document.createElement("a-text");
+                calloutEntity.setAttribute("scale", '2 2 2');
+                let calloutText = document.createElement("a-entity");
                 this.el.sceneEl.appendChild(calloutEntity);
                 calloutEntity.appendChild(calloutText);
                 calloutEntity.setAttribute("look-at", "#player");
@@ -5042,13 +5087,14 @@ AFRAME.registerComponent('mod_model', {
 
                 calloutText.setAttribute("position", '0 0 .5'); //offset the child on z toward camera, to prevent overlap on model
                 calloutText.setAttribute("look-at", "#player")
-                calloutText.setAttribute('text', {
-                  width: 2,
+                calloutText.setAttribute('troika-text', {
+                  // width: 2,
                   baseline: "bottom",
                   align: "center",
-                  font: "/fonts/Exo2Bold.fnt",
+                  fontSize: .1,
+                  font: "/fonts/web/" + this.font2,
                   anchor: "center",
-                  wrapCount: 300,
+                  // wrapCount: 300,
                   color: "white",
                   value: hpics[hpicsIndex].title
                 });
@@ -5112,8 +5158,8 @@ AFRAME.registerComponent('mod_model', {
                 // console.log(this.data.name + " positon" + JSON.stringify(this.data.pos));
                 let calloutEntity = document.createElement("a-entity");
               
-                calloutEntity.setAttribute("scale", '4 4 4');
-                let calloutText = document.createElement("a-text");
+                calloutEntity.setAttribute("scale", '2 2 2');
+                let calloutText = document.createElement("a-entity");
                 this.el.sceneEl.appendChild(calloutEntity);
                 calloutEntity.appendChild(calloutText);
 
@@ -5122,11 +5168,11 @@ AFRAME.registerComponent('mod_model', {
 
                 calloutText.setAttribute("position", '0 0 .5'); //offset the child on z toward camera, to prevent overlap on model
                 calloutText.setAttribute("look-at", "#player");
-                calloutText.setAttribute('text', {
+                calloutText.setAttribute('troika-text', {
                   width: 2,
                   baseline: "bottom",
                   align: "center",
-                  font: "/fonts/Exo2Bold.fnt",
+                  font: "/fonts/web/" + this.font2,
                   anchor: "center",
                   wrapCount: 300,
                   color: "white",
@@ -5377,10 +5423,10 @@ AFRAME.registerComponent('mod_model', {
               this.bubbleText.setAttribute("scale", ".2 .2 .2")
               this.bubbleText.setAttribute("position", "-.5 .2 .55");
             }
-            this.bubbleText.setAttribute('text', {
+            this.bubbleText.setAttribute('troika-text', {
               baseline: "bottom",
               align: "center",
-              font: "/fonts/Exo2Bold.fnt",
+              font: "/fonts/web/" + this.font2,
               anchor: "center",
               wrapCount: 20,
               color: "black",
@@ -7050,7 +7096,7 @@ function onYouTubeIframeAPIReady () { //must be global, called when youtube embe
 
     youtube_player = document.getElementById("youtubePlayer").components.youtube_player;
     // https://stackoverflow.com/questions/55724586/youtube-iframe-without-allow-presentation
-    youtubePlayer.h.attributes.sandbox.value = "allow-same-origin allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox allow-presentation";
+    // youtubePlayer.h.attributes.sandbox.value = "allow-same-origin allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox allow-presentation";
   }
 
   function onPlayerReady(event) {
