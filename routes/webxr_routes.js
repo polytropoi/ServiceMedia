@@ -2480,7 +2480,7 @@ webxr_router.get('/:_id', function (req, res) {
                                 "<a-entity visible='false' class=\x22envMap activeObjexRay\x22 id=\x22nextMainText\x22 gltf-model=\x22#next_button\x22 scale=\x22.5 .5 .5\x22 position=\x223 -1 2\x22></a-entity>" +
                                 "<a-entity visible='false' class=\x22envMap activeObjexRay\x22 id=\x22previousMainText\x22 gltf-model=\x22#previous_button\x22 scale=\x22.5 .5 .5\x22 position=\x22-3 -1 2\x22></a-entity>" +
                                 "<a-entity gltf-model=\x22#square_panel\x22 scale=\x226 6 6\x22 position=\x220 5 -.5\x22></a-entity>" +
-                            "</a-entity></a-entity>";
+                            "</a-entity></a-entity></a-entity>";
                         callback();
                     } else {
                         callback();
@@ -4716,7 +4716,13 @@ webxr_router.get('/:_id', function (req, res) {
                         let sceneGreeting = sceneResponse.sceneDescription;
                         if (sceneResponse.sceneGreeting != null && sceneResponse.sceneGreeting != undefined && sceneResponse.sceneGreeting != "") {
                             sceneGreeting = sceneResponse.sceneGreeting;
+                            if (sceneResponse.sceneTags.includes("greeting")) {
+                                console.log("greeting is " + sceneResponse.sceneGreeting);
+                                textEntities = textEntities + "<a-entity scene_greeting_dialog=\x22greetingText : "+sceneResponse.sceneGreeting+";\x22></a-entity>";
+                            }
                         }
+                        
+
                         let sceneQuest = "No quests for this scene...yet!";
                         if (sceneResponse.sceneQuest != null && sceneResponse.sceneQuest != undefined && sceneResponse.sceneQuest != "") {
                             sceneQuest = sceneResponse.sceneQuest;

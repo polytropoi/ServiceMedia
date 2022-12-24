@@ -7332,3 +7332,47 @@ function CaptureVideo(video) {
   return canvas.toDataURL('image/png');
 }
 
+///////////////////// end YOUTUBE PLAYER ABOVE ////////////////////
+
+
+
+AFRAME.registerComponent('scene_greeting_dialog', {  //setup and controls for the 3d player
+  schema: {
+      
+      greetingText: {default: ""}
+  },
+  // dependencies: ['raycaster'],
+  init: function () {
+    // console.log("tryna set scene greeting " + this.data.greetingText);
+    this.font = "Acme.woff";
+    if (settings && settings.sceneFontWeb1) {
+      this.font = settings.sceneFontWeb1;
+    }
+    this.el.setAttribute("troika-text", {
+      fontSize: .6,
+      font: "/fonts/web/" + this.font,
+      strokeWidth: '1%',
+      strokeColor: 'black',
+      value: this.data.greetingText
+    });
+   
+    // this.viewportHolder = document.getElementById('viewportPlaceholder3');
+    // this.viewportHolder.object3D.getWorldPosition( loc );
+    // this.el.setAttribute("look-at", "#player");
+    // this.el.setAttribute("position", {x: loc.x, y: loc.y + 1, z: loc.z});
+    setTimeout(() => {
+      if (settings && settings.sceneFontWeb1) {
+        this.font = settings.sceneFontWeb1;
+      }
+      console.log("tryna set scene greeting " + this.data.greetingText);
+      let loc = new THREE.Vector3();
+      this.viewportHolder = document.getElementById('viewportPlaceholder3');
+    this.viewportHolder.object3D.getWorldPosition( loc );
+    
+    this.el.setAttribute("position", {x: loc.x, y: loc.y + 1, z: loc.z});
+    }, 3000);
+  },
+  setLocation: function () {
+    
+  }
+});
