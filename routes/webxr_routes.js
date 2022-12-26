@@ -4713,20 +4713,26 @@ webxr_router.get('/:_id', function (req, res) {
                             extraScripts = extraScripts + "<script src=\x22../main/js/parser.js\x22></script>"; 
                             curveEntities = curveEntities + "<a-entity id=\x22p_path\x22 parametric_curve=\x22xyzFunctions: 30*cos(t), 3*cos(3*t) + 2, 30*sin(t);tRange: 0, -6.283;\x22></a-entity>"; //TODODO 
                         }
+
+                        let sceneQuest = "";
+                        if (sceneResponse.sceneQuest != null && sceneResponse.sceneQuest != undefined && sceneResponse.sceneQuest != "") {
+                            sceneQuest = sceneResponse.sceneQuest;
+                        }
+
                         let sceneGreeting = sceneResponse.sceneDescription;
+                       
+
                         if (sceneResponse.sceneGreeting != null && sceneResponse.sceneGreeting != undefined && sceneResponse.sceneGreeting != "") {
                             sceneGreeting = sceneResponse.sceneGreeting;
+
                             if (sceneResponse.sceneTags.includes("greeting")) {
                                 console.log("greeting is " + sceneResponse.sceneGreeting);
-                                textEntities = textEntities + "<a-entity scene_greeting_dialog=\x22greetingText : "+sceneResponse.sceneGreeting+";\x22></a-entity>";
+                                textEntities = textEntities + "<a-entity look-at=\x22#player\x22 scene_greeting_dialog=\x22greetingText : "+sceneResponse.sceneGreeting+"; questText : "+sceneQuest+";\x22></a-entity>";
                             }
                         }
                         
 
-                        let sceneQuest = "No quests for this scene...yet!";
-                        if (sceneResponse.sceneQuest != null && sceneResponse.sceneQuest != undefined && sceneResponse.sceneQuest != "") {
-                            sceneQuest = sceneResponse.sceneQuest;
-                        }
+
                         // console.log("scenne greeting is " + sceneGreeting);
                         let physicsInsert = "";
                         let physicsDummy = "";

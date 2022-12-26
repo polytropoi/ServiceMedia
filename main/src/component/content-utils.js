@@ -7336,31 +7336,67 @@ function CaptureVideo(video) {
 
 
 
-AFRAME.registerComponent('scene_greeting_dialog', {  //setup and controls for the 3d player
+AFRAME.registerComponent('scene_greeting_dialog', {  //if "greeting" scenetag + sceneResponse.sceneGreeting
   schema: {
-      
-      greetingText: {default: ""}
+    lookAt: {default: false},
+    lookAtTarget: {default: "#player"},
+    backgroundEl: {default: ""},  
+    greetingText: {default: ""},
+    showQuestText: {default: false},
+    questText: {default: ""}
   },
   // dependencies: ['raycaster'],
   init: function () {
-    // console.log("tryna set scene greeting " + this.data.greetingText);
+    console.log("tryna set scene greeting " + this.data.greetingText);
     this.font = "Acme.woff";
     if (settings && settings.sceneFontWeb1) {
       this.font = settings.sceneFontWeb1;
     }
-    this.el.setAttribute("troika-text", {
+    this.font2 = "Acme.woff";
+    if (settings && settings.sceneFontWeb2) {
+      this.font2 = settings.sceneFontWeb2;
+    }
+    
+    this.greetingEl = document.createElement("a-entity");
+    this.el.appendChild(this.greetingEl);
+  
+    this.questEl = null;
+    if (this.data.questText.length) {
+      this.questEl = document.createElement("a-entity");
+      this.el.appendChild(this.questEl);
+      this.questEl.setAttribute("position", "0 -1.5 0");
+    }
+
+    this.greetingEl.setAttribute("troika-text", {
       fontSize: .6,
+      maxWidth: 5,
+      align: "center",
       font: "/fonts/web/" + this.font,
+      lineHeight: .85,
       strokeWidth: '1%',
+
       strokeColor: 'black',
       value: this.data.greetingText
     });
+    if (this.questEl) {
+      this.questEl.setAttribute("troika-text", {
+      fontSize: .3,
+      maxWidth: 5,
+      align: "center",
+      font: "/fonts/web/" + this.font2,
+      strokeWidth: '1%',
+      strokeColor: 'black',
+      value: this.data.questText
+    });
+    }
+
    
     // this.viewportHolder = document.getElementById('viewportPlaceholder3');
     // this.viewportHolder.object3D.getWorldPosition( loc );
     // this.el.setAttribute("look-at", "#player");
     // this.el.setAttribute("position", {x: loc.x, y: loc.y + 1, z: loc.z});
-    setTimeout(() => {
+
+    setTimeout(() => { //wait to settle player position, maybe DOMLoaded event? 
       if (settings && settings.sceneFontWeb1) {
         this.font = settings.sceneFontWeb1;
       }
