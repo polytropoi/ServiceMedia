@@ -188,7 +188,7 @@ webxr_router.get('/:_id', function (req, res) {
     let textLocation = "";
     // let pictureLocation = "";
     let picturegroupLocation = "-4 2 3";
-    let scenesKeyLocation = "8 2 -4";
+    let scenesKeyLocation = null;
     let audioLocation = "-3 1.7 -4";
     let videoLocation = "10 2 15";
     let videoRotation = "0 0 0";
@@ -788,7 +788,7 @@ webxr_router.get('/:_id', function (req, res) {
                                     picturegroupLocation = sceneResponse.sceneLocations[i].x + " " + sceneResponse.sceneLocations[i].y + " " + zFix;
                                     console.log("gotsa picture geroup " + picturegroupLocation);
                                 }
-                                if (sceneResponse.sceneLocations[i].markerType == "key") {
+                                if (sceneResponse.sceneLocations[i].markerType == "available scenes key") { 
                                     
                                     scenesKeyLocation = sceneResponse.sceneLocations[i].x + " " + sceneResponse.sceneLocations[i].y + " " + zFix;
                                     console.log("gotsa sceneKye loc " + scenesKeyLocation);
@@ -1600,7 +1600,7 @@ webxr_router.get('/:_id', function (req, res) {
                                 } else {
                                     console.log('All files have been processed successfully skyboxEnvMap is ' + skyboxEnvMap);
          
-                                    if (availableScenes != null && availableScenes != undefined && availableScenes.length > 0) {
+                                    if (scenesKeyLocation && availableScenes != null && availableScenes != undefined && availableScenes.length > 0) {
                                     availableScenesEntity = "<a-entity scale=\x22.75 .75 .75\x22 look-at=\x22#player\x22 position=\x22"+scenesKeyLocation+"\x22>"+ 
                                     "<a-entity position=\x220 -2.5 0\x22 scale=\x22.75  .75 .75\x22 id=\x22availableScenesControl\x22 class=\x22envMap activeObjexRay\x22 toggle-available-scenes "+skyboxEnvMap+" gltf-model=\x22#key\x22></a-entity>"+
                                     "<a-entity id=\x22availableScenesPanel\x22 visible='false' position=\x220 -1 0\x22>"+
@@ -4727,7 +4727,7 @@ webxr_router.get('/:_id', function (req, res) {
 
                             if (sceneResponse.sceneTags.includes("greeting")) {
                                 console.log("greeting is " + sceneResponse.sceneGreeting);
-                                textEntities = textEntities + "<a-entity look-at=\x22#player\x22 scene_greeting_dialog=\x22greetingText : "+sceneResponse.sceneGreeting+"; questText : "+sceneQuest+";\x22></a-entity>";
+                                textEntities = textEntities + "<a-entity class=\x22activeObjexRay\x22 look-at=\x22#player\x22 scene_greeting_dialog=\x22greetingText : "+sceneResponse.sceneGreeting+"; questText : "+sceneQuest+";\x22></a-entity>";
                             }
                         }
                         

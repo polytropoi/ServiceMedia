@@ -1788,7 +1788,7 @@ AFRAME.registerComponent('cloud_marker', {
     //   // this.el.setAttribute
     // });
 
-    this.el.addEventListener('mouseenter', function (evt) {
+    this.el.addEventListener('mouseenter', (evt) => {
       
       if (posRotReader != null) {
         this.playerPosRot = posRotReader.returnPosRot(); 
@@ -1820,6 +1820,7 @@ AFRAME.registerComponent('cloud_marker', {
           that.calloutEntity.setAttribute("position", pos);
           that.calloutEntity.setAttribute('visible', true);
           that.calloutEntity.setAttribute('scale', {x: that.distance * .25, y: that.distance * .25, z: that.distance * .25} );
+          this.el.setAttribute('scale', {x: that.distance * .25, y: that.distance * .25, z: that.distance * .25} );
           let theLabel = that.data.name != undefined ? that.data.name : "";
           let calloutString = theLabel;
           if (that.calloutToggle) {

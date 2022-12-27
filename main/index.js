@@ -9979,7 +9979,7 @@ function getAllPeople() {
         "follow parametric curve",
         "follow ambient",
         "placeholder",
-        "key",
+        "available scenes key",
         "audio",
         "audiogroup",
         "canvas fixed",

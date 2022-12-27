@@ -7340,13 +7340,14 @@ AFRAME.registerComponent('scene_greeting_dialog', {  //if "greeting" scenetag + 
   schema: {
     lookAt: {default: false},
     lookAtTarget: {default: "#player"},
-    backgroundEl: {default: ""},  
+    background: {default: ""},  
     greetingText: {default: ""},
     showQuestText: {default: false},
     questText: {default: ""}
   },
   // dependencies: ['raycaster'],
   init: function () {
+
     console.log("tryna set scene greeting " + this.data.greetingText);
     this.font = "Acme.woff";
     if (settings && settings.sceneFontWeb1) {
@@ -7357,6 +7358,23 @@ AFRAME.registerComponent('scene_greeting_dialog', {  //if "greeting" scenetag + 
       this.font2 = settings.sceneFontWeb2;
     }
     
+
+    // if (this.data.background) {
+      // if (this.data.background != "rectangle") {
+        this.backgroundEl = document.createElement("a-entity");
+        this.el.appendChild(this.backgroundEl);
+        this.backgroundEl.setAttribute("position", " 0 0 -.5");
+        this.backgroundEl.setAttribute('geometry', {'primitive': 'plane', 'width': '5', 'height': '5'});
+        this.backgroundEl.setAttribute('material', {opacity: 0});
+        this.backgroundEl.classList.add("activeObjexRay");
+        this.backgroundEl.addEventListener('click', (e) => {
+        console.log("tryna hide greeritgn");
+        this.el.setAttribute("visible", false);
+      });
+      // }
+    // }
+  
+
     this.greetingEl = document.createElement("a-entity");
     this.el.appendChild(this.greetingEl);
   
@@ -7405,8 +7423,10 @@ AFRAME.registerComponent('scene_greeting_dialog', {  //if "greeting" scenetag + 
       this.viewportHolder = document.getElementById('viewportPlaceholder3');
     this.viewportHolder.object3D.getWorldPosition( loc );
     
-    this.el.setAttribute("position", {x: loc.x, y: loc.y + 1, z: loc.z});
+    this.el.setAttribute("position", {x: loc.x, y: loc.y + .5, z: loc.z});
     }, 3000);
+
+    
   },
   setLocation: function () {
     
