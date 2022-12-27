@@ -7338,12 +7338,16 @@ function CaptureVideo(video) {
 
 AFRAME.registerComponent('scene_greeting_dialog', {  //if "greeting" scenetag + sceneResponse.sceneGreeting
   schema: {
+    
     lookAt: {default: false},
     lookAtTarget: {default: "#player"},
     background: {default: ""},  
     greetingText: {default: ""},
     showQuestText: {default: false},
-    questText: {default: ""}
+    questText: {default: ""},
+    hideClick: {default: false},
+    startButton: {default: true},
+    startText: {default: "Start"}
   },
   // dependencies: ['raycaster'],
   init: function () {
@@ -7357,32 +7361,71 @@ AFRAME.registerComponent('scene_greeting_dialog', {  //if "greeting" scenetag + 
     if (settings && settings.sceneFontWeb2) {
       this.font2 = settings.sceneFontWeb2;
     }
-    
+    this.fillColor = "white";
+    this.outlineColor = "black";
+    if (settings && settings.sceneFontFillColor) {
+      this.fillColor = settings.sceneFontFillColor;
+    }
+    if (settings && settings.sceneFontOutlineColor) {
+      this.outlineColor = settings.sceneFontOutlineColor;
+    }
 
     // if (this.data.background) {
       // if (this.data.background != "rectangle") {
-        this.backgroundEl = document.createElement("a-entity");
-        this.el.appendChild(this.backgroundEl);
-        this.backgroundEl.setAttribute("position", " 0 0 -.5");
-        this.backgroundEl.setAttribute('geometry', {'primitive': 'plane', 'width': '5', 'height': '5'});
-        this.backgroundEl.setAttribute('material', {opacity: 0});
-        this.backgroundEl.classList.add("activeObjexRay");
-        this.backgroundEl.addEventListener('click', (e) => {
-        console.log("tryna hide greeritgn");
+    // this.backgroundEl = document.createElement("a-entity");
+    // this.el.appendChild(this.backgroundEl);
+    // this.backgroundEl.setAttribute("position", " 0 0 -.5");
+    // this.backgroundEl.setAttribute('geometry', {'primitive': 'plane', 'width': '5', 'height': '5'});
+    // this.backgroundEl.setAttribute('material', {opacity: 0});
+    // this.backgroundEl.classList.add("activeObjexRay");
+    // if (this.data.hideClick) {
+    //   this.backgroundEl.addEventListener('click', (e) => {
+    //     console.log("tryna hide greeritgn");
+    //     this.el.setAttribute("visible", false);
+    //   });
+    // }
+
+    if (this.data.startButton) {
+      this.startButtonBackgroundEl = document.createElement("a-entity");
+      this.startButtonTextEl = document.createElement("a-entity");
+      this.el.appendChild(this.startButtonBackgroundEl);
+      this.el.appendChild(this.startButtonTextEl);
+      this.startButtonBackgroundEl.setAttribute("position", " 0 -2 -.01");
+      this.startButtonTextEl.setAttribute("position", " 0 -2 0");
+      this.startButtonBackgroundEl.setAttribute('geometry', {'primitive': 'plane', 'width': '1.5', 'height': '.75'});
+      this.startButtonBackgroundEl.classList.add("activeObjexRay");
+      this.startButtonTextEl.setAttribute("troika-text", {
+        fontSize: .3,
+        color: this.fillColor,
+        maxWidth: 5,
+        align: "center",
+        font: "/fonts/web/" + this.font2,
+        strokeWidth: '1%',
+        strokeColor: this.outlineColor,
+        value: this.data.startText
+      });
+
+      this.startButtonBackgroundEl.addEventListener('click', (e) => {
+        console.log("tryna start!");
+        PlayPauseMedia();
         this.el.setAttribute("visible", false);
       });
+    }
+
+
       // }
     // }
   
 
     this.greetingEl = document.createElement("a-entity");
     this.el.appendChild(this.greetingEl);
-  
+    this.greetingEl.setAttribute("position", "0 .75 0");
+
     this.questEl = null;
     if (this.data.questText.length) {
       this.questEl = document.createElement("a-entity");
       this.el.appendChild(this.questEl);
-      this.questEl.setAttribute("position", "0 -1.5 0");
+      this.questEl.setAttribute("position", "0 -.75 0");
     }
 
     this.greetingEl.setAttribute("troika-text", {
@@ -7392,18 +7435,19 @@ AFRAME.registerComponent('scene_greeting_dialog', {  //if "greeting" scenetag + 
       font: "/fonts/web/" + this.font,
       lineHeight: .85,
       strokeWidth: '1%',
-
-      strokeColor: 'black',
+      color: this.fillColor,
+      strokeColor: this.outlineColor,
       value: this.data.greetingText
     });
     if (this.questEl) {
       this.questEl.setAttribute("troika-text", {
-      fontSize: .3,
+      fontSize: .2,
       maxWidth: 5,
       align: "center",
       font: "/fonts/web/" + this.font2,
       strokeWidth: '1%',
-      strokeColor: 'black',
+      color: this.fillColor,
+      strokeColor: this.outlineColor,
       value: this.data.questText
     });
     }

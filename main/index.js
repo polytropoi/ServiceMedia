@@ -16244,6 +16244,9 @@ function getAllPeople() {
                         let sceneStickyness = document.getElementById("sceneStickyness").value;
                         let sceneSource = document.getElementById("sceneSource").value;
                         let sceneText = document.getElementById("sceneText").value;
+                        let sceneFontFillColor = document.getElementById("sceneFontFillColor").value;
+                        let sceneFontOutlineColor = document.getElementById("sceneFontOutlineColor").value;
+
                         let scenePrimaryAudioTitle = document.getElementById("scenePrimaryAudioTitle").value;
                         let scenePrimaryAudioStreamURL = document.getElementById("scenePrimaryAudioStreamURL").value;
                     
@@ -16466,7 +16469,8 @@ function getAllPeople() {
                             sceneStickyness: sceneStickyness,
                             sceneSource: sceneSource,
                             sceneText: sceneText,
-
+                            sceneFontFillColor: sceneFontFillColor,
+                            sceneFontOutlineColor: sceneFontOutlineColor,
                             scenePictures: scenePictures,
                             scenePictureGroups: scenePictureGroups,
                             sceneVideos: sceneVideos,

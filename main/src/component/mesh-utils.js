@@ -1820,7 +1820,10 @@ AFRAME.registerComponent('cloud_marker', {
           that.calloutEntity.setAttribute("position", pos);
           that.calloutEntity.setAttribute('visible', true);
           that.calloutEntity.setAttribute('scale', {x: that.distance * .25, y: that.distance * .25, z: that.distance * .25} );
-          this.el.setAttribute('scale', {x: that.distance * .25, y: that.distance * .25, z: that.distance * .25} );
+          if (this.data.markerType == "poi") {
+            this.el.setAttribute('scale', {x: that.distance * .25, y: that.distance * .25, z: that.distance * .25} );
+          }
+         
           let theLabel = that.data.name != undefined ? that.data.name : "";
           let calloutString = theLabel;
           if (that.calloutToggle) {
@@ -3844,7 +3847,7 @@ AFRAME.registerComponent('load_threesvg', {
       material = this.el.getObject3D('mesh').material;
       if (!material.map) {
         console.error("no material map");
-        this.el.removeAttribute('live-canvas');
+        this.el.removeAttribute('live_canvas');
         return;
       }
       this.time = Math.round(time/1000);

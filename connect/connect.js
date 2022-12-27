@@ -2467,14 +2467,16 @@ function PlayTimedEvent(timeKey) {
       }
    } 
     if (timeKey.keytype == "Player Lerp") {
-       // console.log("sceneLocations length is " + sceneLocations.locations.length);
+       
     // if (sceneLocations.locations.ength > 0) {
-       // console.log("event: " + JSON.stringify(timeKey));
+      //  console.log("event: " + JSON.stringify(timeKey));
+      console.log("trynba lerp to " + timeKey.keydata.toString());
        for (let s = 0; s < sceneLocations.locationMods.length; s++) {
-         if (sceneLocations.locationMods[s].label != undefined && sceneLocations.locationMods[s].label != null) {
-            tempLabel = sceneLocations.locationMods[s].label;
-         } else if (sceneLocations.locationMods[s].name != undefined && sceneLocations.locationMods[s].name != null) {
-            tempLabel =sceneLocations.locationMods[s].name;
+         // if (sceneLocations.locationMods[s].label != undefined && sceneLocations.locationMods[s].label != null) {
+         //    tempLabel = sceneLocations.locationMods[s].label;
+         // } else 
+         if (sceneLocations.locationMods[s].name != undefined && sceneLocations.locationMods[s].name != null) {
+            tempLabel = sceneLocations.locationMods[s].name;
          }
 
          if (timeKey.keydata.toString() == tempLabel && (sceneLocations.locationMods[s].markerType == "placeholder" || sceneLocations.locationMods[s].markerType == "poi")) {
