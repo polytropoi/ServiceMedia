@@ -7369,6 +7369,10 @@ AFRAME.registerComponent('scene_greeting_dialog', {  //if "greeting" scenetag + 
     if (settings && settings.sceneFontOutlineColor) {
       this.outlineColor = settings.sceneFontOutlineColor;
     }
+    this.textBackgroundColor = "black";
+    if (settings && settings.sceneTextBackgroundColor) {
+      this.textBackgroundColor = settings.sceneTextBackgroundColor;
+    }
 
     // if (this.data.background) {
       // if (this.data.background != "rectangle") {
@@ -7393,6 +7397,7 @@ AFRAME.registerComponent('scene_greeting_dialog', {  //if "greeting" scenetag + 
       this.startButtonBackgroundEl.setAttribute("position", " 0 -2 -.01");
       this.startButtonTextEl.setAttribute("position", " 0 -2 0");
       this.startButtonBackgroundEl.setAttribute('geometry', {'primitive': 'plane', 'width': '1.5', 'height': '.75'});
+      this.startButtonBackgroundEl.setAttribute('material', {'color': this.textBackgroundColor })
       this.startButtonBackgroundEl.classList.add("activeObjexRay");
       this.startButtonTextEl.setAttribute("troika-text", {
         fontSize: .3,

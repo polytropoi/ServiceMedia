@@ -2060,14 +2060,15 @@ AFRAME.registerComponent('cloud_marker', {
           let triggerAudioController = triggerAudioControllerEl.components.trigger_audio_control;
           if (triggerAudioController  != null) {
             console.log("gotsa audio trigger controller " + distance);
-            triggerAudioController.playAudioAtPosition(hitpoint, distance, this.data.tags);
+            let triggertags = this.data.tags != null && this.data.tags != "" ? this.data.tags : "click";
+            triggerAudioController.playAudioAtPosition(hitpoint, distance, triggertags);
           }
          
         }
       }
     }
 
-});
+}); //////// end cloud_marker /////////////////////
 
 
 

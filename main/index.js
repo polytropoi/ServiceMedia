@@ -12194,8 +12194,10 @@ function getAllPeople() {
             let sceneFontWeb3 = response.data.sceneFontWeb3 != undefined ? response.data.sceneFontWeb3 : "";
             let sceneFontFillColor = response.data.sceneFontFillColor != undefined ? response.data.sceneFontFillColor : ""; 
             let sceneFontOutlineColor = response.data.sceneFontOutlineColor != undefined ? response.data.sceneFontOutlineColor : ""; 
-            let sceneFontGlowColor = response.data.sceneFontGlowColor != undefined ? response.data.sceneFontGlowColor : ""; 
+            let sceneTextBackground = response.data.sceneTextBackground != undefined ? response.data.sceneTextBackground : ""; 
             let sceneTextBackgroundColor = response.data.sceneTextBackgroundColor != undefined ? response.data.sceneTextBackgroundColor : ""; 
+            let sceneFontGlowColor = response.data.sceneFontGlowColor != undefined ? response.data.sceneFontGlowColor : ""; 
+            
             let scenePrimaryTextFontSize = response.data.scenePrimaryTextFontSize != undefined ? response.data.scenePrimaryTextFontSize : 16;
             let scenePrimaryAudioStreamURL = response.data.scenePrimaryAudioStreamURL != undefined ? response.data.scenePrimaryAudioStreamURL : ""; 
             let scenePrimaryAudioTitle = response.data.scenePrimaryAudioTitle != undefined ? response.data.scenePrimaryAudioTitle : ""; 
@@ -13525,11 +13527,12 @@ function getAllPeople() {
                                 "</div>" +
                                 "<div class=\x22col form-group col-md-3\x22>" +
                                     "<label for=\x22sceneTextBackground\x22>Text Background</label>" + //FontSelect
-                                    "<select class=\x22form-control\x22 id=\x22sceneTextBackground\x22 >" +
-                                        "<option>scifi</option>" +
-                                        "<option>parchement</option>" +
-                                        "<option>ARKit</option>" +
-                                        "<option>Geographic</option>" +
+                                    "<select class=\x22form-control\x22 id=\x22sceneTextBackgroundSelect\x22 >" +
+                                        "<option>None</option>" +
+                                        "<option>Default</option>" +
+                                        "<option>SciFi</option>" +
+                                        "<option>Parchement</option>" +
+                                       
                                     "</select>" +
                                 "</div>" +
                             "</div>" +
@@ -14687,7 +14690,7 @@ function getAllPeople() {
                 $("#sceneFontOutlineColor").val(sceneFontOutlineColor);
                 $("#sceneFontGlowColor").val(sceneFontGlowColor);
                 $("#sceneTextBackgroundColor").val(sceneTextBackgroundColor);
-
+                $("#sceneTextBackgroundSelect").val(response.data.sceneTextBackground);
                 $("#sceneText").val(sceneText);
                 $("#sceneGreeting").val(sceneGreeting);
                 $("#sceneQuest").val(sceneQuest);
@@ -15833,6 +15836,10 @@ function getAllPeople() {
                             } 
                         }
                     });
+                    $(document).on('change', '#sceneTextBackgroundSelect', function() {
+                        console.log("sceneFontWeb1 change : "+ this.value);
+                        sceneTextBackground = this.value;
+                    });
                     $(document).on('change', '#sceneFontWeb1Select', function() {
                         console.log("sceneFontWeb1 change : "+ this.value);
                         sceneFontWeb1 = this.value;
@@ -16246,6 +16253,7 @@ function getAllPeople() {
                         let sceneText = document.getElementById("sceneText").value;
                         let sceneFontFillColor = document.getElementById("sceneFontFillColor").value;
                         let sceneFontOutlineColor = document.getElementById("sceneFontOutlineColor").value;
+                        let sceneTextBackgroundColor = document.getElementById("sceneTextBackgroundColor").value;
 
                         let scenePrimaryAudioTitle = document.getElementById("scenePrimaryAudioTitle").value;
                         let scenePrimaryAudioStreamURL = document.getElementById("scenePrimaryAudioStreamURL").value;
@@ -16573,6 +16581,8 @@ function getAllPeople() {
                             sceneFontWeb2: sceneFontWeb2,
                             sceneFontWeb3: sceneFontWeb3,
                             sceneUseThreeDeeText: sceneUseThreeDeeText,
+                            sceneTextBackground: sceneTextBackground,
+                            sceneTextBackgroundColor: sceneTextBackgroundColor,
                             sceneTextLoop: sceneTextLoop,
                             sceneTextUseModals: sceneTextUseModals,
                             sceneTextAudioSync: sceneTextAudioSync,

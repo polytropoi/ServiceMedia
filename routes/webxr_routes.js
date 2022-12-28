@@ -3579,6 +3579,8 @@ webxr_router.get('/:_id', function (req, res) {
                     settings.sceneFontWeb3 = sceneResponse.sceneFontWeb3;
                     settings.sceneFontFillColor = sceneResponse.sceneFontFillColor;
                     settings.sceneFontOutlineColor = sceneResponse.sceneFontOutlineColor;
+                    settings.sceneTextBackground = sceneResponse.sceneTextBackground;
+                    settings.sceneTextBackgroundColor = sceneResponse.sceneTextBackgroundColor;
                     settings.sceneColor1 = sceneResponse.sceneColor1;
                     settings.sceneColor2 = sceneResponse.sceneColor2;
                     settings.sceneColor3 = sceneResponse.sceneColor3;
