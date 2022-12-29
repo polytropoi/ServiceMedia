@@ -1740,8 +1740,8 @@ AFRAME.registerComponent('cloud_marker', {
     // calloutText.setAttribute('overlay');
     // gltf-model=\x22#square_panel\x22
     if (!this.data.tags.includes("hide callout") && !this.data.tags.includes("hide callout")) {
-      this.calloutPanel.setAttribute("gltf-model", "#landscape_panel");
-      this.calloutPanel.setAttribute("scale", ".1 .075 .1");
+      // this.calloutPanel.setAttribute("gltf-model", "#landscape_panel");
+      // this.calloutPanel.setAttribute("scale", ".1 .075 .1");
       // this.calloutEntity.getObject3D("mesh").scale()
       this.calloutEntity.setAttribute("look-at", "#player");
       this.calloutEntity.setAttribute('visible', false);
@@ -1753,10 +1753,10 @@ AFRAME.registerComponent('cloud_marker', {
       // this.distance = 0;
       // calloutEntity.setAttribute("render-order", "hud");
       sceneEl.appendChild(this.calloutEntity);
-      this.calloutEntity.appendChild(this.calloutPanel);
+      // this.calloutEntity.appendChild(this.calloutPanel);
       this.calloutEntity.appendChild(this.calloutText);
-      this.calloutPanel.setAttribute("position", '0 0 1'); 
-      this.calloutPanel.setAttribute("overlay");
+      // this.calloutPanel.setAttribute("position", '0 0 1'); 
+      // this.calloutPanel.setAttribute("overlay");
       // this.calloutText.setAttribute("size", ".1 .1 .1");
       this.calloutText.setAttribute("position", '0 0 1.25'); //offset the child on z toward camera, to prevent overlap on model
       this.calloutText.setAttribute('troika-text', {
@@ -1820,7 +1820,7 @@ AFRAME.registerComponent('cloud_marker', {
           that.calloutEntity.setAttribute("position", pos);
           that.calloutEntity.setAttribute('visible', true);
           that.calloutEntity.setAttribute('scale', {x: that.distance * .25, y: that.distance * .25, z: that.distance * .25} );
-          if (this.data.markerType == "poi") {
+          if (this.data.markerType == "poi" && !this.data.modelID) {
             this.el.setAttribute('scale', {x: that.distance * .25, y: that.distance * .25, z: that.distance * .25} );
           }
          
@@ -1975,7 +1975,7 @@ AFRAME.registerComponent('cloud_marker', {
     console.log("gotsa player trigger hit on type " + this.data.markerType); 
     var triggerAudioController = document.getElementById("triggerAudio");
     if (triggerAudioController != null) {
-      if (window.playerPosition) {
+      if (window.playerPosition && this.el.object3D) {
         triggerAudioController.components.trigger_audio_control.playAudioAtPosition(this.el.object3D.position, window.playerPosition.distanceTo(this.el.object3D.position), this.data.tags);
       }
       

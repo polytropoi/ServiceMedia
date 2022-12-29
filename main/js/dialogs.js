@@ -1517,10 +1517,10 @@ function SceneManglerModal(mode) {
     
     "<div id=\x22About\x22 class=\x22modalMain tabcontent\x22>"+
         // "<p>"
-        "<div>Attributions: <br>"+
+        "<div>Use WASD keys to move, R to rise, F to fall. <br><br>Attributions: <br>"+
         ReturnAttributions()+
         "</div>"+
-        "<p>This scene is powered by the <a href=\x22https://servicemedia.net\x22>ServiceMedia Network</a></p>"+
+        "<p> This scene is powered by the <a href=\x22https://servicemedia.net\x22>ServiceMedia Network</a></p>"+
     "</div>"+
      
      "</div>";

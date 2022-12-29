@@ -822,7 +822,7 @@ AFRAME.registerComponent('main-text-control', {
               // outlineColor: 'white',
               // outlineWidth: '1%',
               // outlineBlur: .25,
-              strokeColor: 'red',
+              strokeColor: 'black',
               strokeWidth: '1%'
 
             });
@@ -7083,9 +7083,9 @@ function onYouTubeIframeAPIReady () { //must be global, called when youtube embe
       height: '200',
       width: '240',
       videoId: yt_id,
-      playerVars: {
-        'playsinline': 1
-      },
+      // playerVars: {
+      //   'playsinline': 1
+      // },
         events: {
           'onReady': onPlayerReady,
           'onStateChange': onPlayerStateChange
@@ -7341,7 +7341,6 @@ AFRAME.registerComponent('scene_greeting_dialog', {  //if "greeting" scenetag + 
     
     lookAt: {default: false},
     lookAtTarget: {default: "#player"},
-    background: {default: ""},  
     greetingText: {default: ""},
     showQuestText: {default: false},
     questText: {default: ""},
@@ -7368,6 +7367,10 @@ AFRAME.registerComponent('scene_greeting_dialog', {  //if "greeting" scenetag + 
     }
     if (settings && settings.sceneFontOutlineColor) {
       this.outlineColor = settings.sceneFontOutlineColor;
+    }
+    this.textBackgroundStyle = "Default";
+    if (settings && settings.sceneTextBackground) {
+      this.textBackgroundStyle = settings.sceneTextBackground;
     }
     this.textBackgroundColor = "black";
     if (settings && settings.sceneTextBackgroundColor) {
@@ -7396,8 +7399,33 @@ AFRAME.registerComponent('scene_greeting_dialog', {  //if "greeting" scenetag + 
       this.el.appendChild(this.startButtonTextEl);
       this.startButtonBackgroundEl.setAttribute("position", " 0 -2 -.01");
       this.startButtonTextEl.setAttribute("position", " 0 -2 0");
-      this.startButtonBackgroundEl.setAttribute('geometry', {'primitive': 'plane', 'width': '1.5', 'height': '.75'});
-      this.startButtonBackgroundEl.setAttribute('material', {'color': this.textBackgroundColor })
+      this.startButtonMaterial = new THREE.MeshStandardMaterial( { 'color': this.textBackgroundColor, 'transparent': true, 'opacity': .85 } ); 
+      // todo switch bg
+      // this.startButtonBackgroundEl.setAttribute('geometry', {'primitive': 'plane', 'width': '1.5', 'height': '.75'});
+            this.startButtonBackgroundEl.setAttribute("gltf-model", "#flat_round_rect");
+
+            // // wait until model is loaded
+            this.startButtonBackgroundEl.addEventListener('model-loaded', (event) => {
+              let obj = this.startButtonBackgroundEl.getObject3D('mesh');
+              obj.traverse(node => {
+                node.material = this.startButtonMaterial;
+              });
+            });
+            //   this.startButtonBackgroundEl.object3D.traverse(function(object3D){
+            //     var mat = object3D.material;
+            //     if (mat) {
+                  
+            //       // modify material here
+            //       // mat.color.setRGB(1,0,1)
+            
+            //       // or replace it completely
+            //       object3D.material = this.startButtonMaterial;
+                  
+            //     }
+            //   });
+              
+            // });
+      // this.startButtonBackgroundEl.setAttribute('material', { 'color': this.textBackgroundColor, 'transparent': true, 'opacity': .5 })
       this.startButtonBackgroundEl.classList.add("activeObjexRay");
       this.startButtonTextEl.setAttribute("troika-text", {
         fontSize: .3,
@@ -7413,7 +7441,7 @@ AFRAME.registerComponent('scene_greeting_dialog', {  //if "greeting" scenetag + 
       this.startButtonBackgroundEl.addEventListener('click', (e) => {
         console.log("tryna start!");
         PlayPauseMedia();
-        this.el.setAttribute("visible", false);
+        // this.el.setAttribute("visible", false);
       });
     }
 

@@ -6017,11 +6017,12 @@ app.post('/share_scene/', function (req, res) { //yep! //make it public?
                             person.userID = req.session.user._id.toString();
                         }
                         person.dateCreated = ts;
-                        person.email = email.trim();
+                        person.email = email.toString().trim();
                         // person.activities = [];
                         let action = {};
                         action.wasSentEmail = ts + "_" + uid + "_" + req.body.short_id;
-                        person.activities.push(action);
+                        // person.activities = [];
+                        // person.activities.push(action);
                         person.accountStatus = 'Not Verified';
                         person.contactStatus = 'Not Indicated';
                         console.log("fixing to save new person " + JSON.stringify(person));
@@ -6036,7 +6037,7 @@ app.post('/share_scene/', function (req, res) { //yep! //make it public?
                                 var pursoner = {};
                                 console.log('new person created, id: ' + person_id);
                                 pursoner.personID = person_id;
-                                pursoner.email = email.trim();
+                                pursoner.email = email.toString().trim();
                                 emailsFinal.push(pursoner);
                                 db.users.updateOne( { "_id": ObjectID(uid) }, { $addToSet: {people : person._id}});
                                 callbackz();
@@ -13576,30 +13577,30 @@ app.post('/weblink/', requiredAuthentication, function (req, res) {
                 }
             });
         } else {
-            if (process.env.USE_TRANSLOADIT == true) { //nilch, over it
-            var weblinkParams = {
-                'steps': {
-                    'extract': {
-                        'robot': '/html/convert',
-                        'url' : req.body.link_url
-                    }
-                },
-                'template_id': process.env.TRANSLOADIT_WEBSCRAPE_TEMPLATE,
-                'fields' : { 'link_id' : link._id,
-                    'user_id' : req.session.user._id
-                }
-            };
+        //     if (process.env.USE_TRANSLOADIT == true) { //nilch, over it
+        //     var weblinkParams = {
+        //         'steps': {
+        //             'extract': {
+        //                 'robot': '/html/convert',
+        //                 'url' : req.body.link_url
+        //             }
+        //         },
+        //         'template_id': process.env.TRANSLOADIT_WEBSCRAPE_TEMPLATE,
+        //         'fields' : { 'link_id' : link._id,
+        //             'user_id' : req.session.user._id
+        //         }
+        //     };
 
-            transloadClient.send(weblinkParams, function(ok) {
-                console.log('Success: ' + JSON.stringify(ok));
-                if (ok != null && ok != undefined) {
-                    var dateNow = Date.now();
-                    db.weblinks.update({"_id": link._id}, { $set: {"render_date": dateNow}});
-                }
-            }, function(err) {
-                console.log('Error: ' + JSON.stringify(err));
-            });
-        } else {
+        //     transloadClient.send(weblinkParams, function(ok) {
+        //         console.log('Success: ' + JSON.stringify(ok));
+        //         if (ok != null && ok != undefined) {
+        //             var dateNow = Date.now();
+        //             db.weblinks.update({"_id": link._id}, { $set: {"render_date": dateNow}});
+        //         }
+        //     }, function(err) {
+        //         console.log('Error: ' + JSON.stringify(err));
+        //     });
+        // } else {
             console.log(" link item found for " + lurl);
             var token=jwt.sign({userId:req.session.user._id},process.env.JWT_SECRET);
             const options = {
@@ -13625,7 +13626,7 @@ app.post('/weblink/', requiredAuthentication, function (req, res) {
                 db.weblinks.update({"_id": link._id}, { $set: {"render_date": dateNow, "link_title": req.body.link_title}});
                 res.send("ok");
             
-            }
+            // }
         }
     });
 });
