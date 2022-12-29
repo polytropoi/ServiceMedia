@@ -4,6 +4,7 @@ const entities = require("entities");
 const async = require('async');
 const ObjectID = require("bson-objectid");
 const path = require("path");
+const validator = require('validator');
 const jwt = require("jsonwebtoken");
 const requireText = require('require-text');
 const { Console } = require("console");
@@ -2612,7 +2613,8 @@ webxr_router.get('/:_id', function (req, res) {
                                         });
                                     // }
                                 } else if (sceneTextLocations[i].markerType == "svg billboard") {
-                                   
+                                   console.log("tryna get svg billboard " + textID);
+                                    if (validator.isMongoId(textID)) {
                                     let oid = ObjectID(textID);
                                     db.text_items.findOne({_id: oid}, function (err, text_item){
                                         if (err || !text_item) {
@@ -2637,6 +2639,7 @@ webxr_router.get('/:_id', function (req, res) {
                                             // callback(null);
                                             }
                                         });
+                                    } 
                                 } 
                             }
                         } 
