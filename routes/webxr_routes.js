@@ -3327,7 +3327,7 @@ webxr_router.get('/:_id', function (req, res) {
                                     // "text=\x22value:; wrap-count: 25;\x22></a-entity>" +
                                     // "<a-entity id=\x22availableSceneOwner\x22 class=\x22envMap activeObjexRay\x22  geometry=\x22primitive: plane; width: 4; height: 1\x22 position=\x220 .5 0\x22 material=\x22color: grey; transparent: true; opacity: 0.0\x22" +
                                     // "text=\x22value:; wrap-count: 25;\x22></a-entity>" +
-                                    "<a-entity id=\x22pictureGroupPic\x22 visible=\x22true\x22 position=\x220 2.25 -.1\x22 gltf-model=\x22#landscape_panel\x22 scale=\x221 1 1\x22 material=\x22shader: flat; alphaTest: 0.5;\x22"+
+                                    "<a-entity id=\x22pictureGroupPic\x22 visible=\x22true\x22 position=\x220 2.25 -.1\x22 gltf-model=\x22#flatrect2\x22 scale=\x224 4 4\x22 material=\x22shader: flat; alphaTest: 0.5;\x22"+
                                     "rotation='0 0 0'></a-entity>"+
                                     // "<a-entity gltf-model=\x22#square_panel\x22 scale=\x222.25 2.25 2.25\x22 position=\x220 2.1 -.25\x22></a-entity>" +
                                     "<a-entity visible='true' class=\x22envMap activeObjexRay\x22 id=\x22pictureGroupNextButton\x22 gltf-model=\x22#next_button\x22 scale=\x22.5 .5 .5\x22 position=\x222.25 -.75 0\x22></a-entity>" +
@@ -4977,6 +4977,7 @@ webxr_router.get('/:_id', function (req, res) {
                         "<a-asset-item id=\x22rectangle1\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/rectangle1.glb\x22></a-asset-item>\n"+
                         "<a-asset-item id=\x22avatar_model\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/avatar1c.glb\x22></a-asset-item>\n"+
                         "<a-asset-item id=\x22flat_round_rect\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/flatroundrect.glb\x22></a-asset-item>\n"+
+                        "<a-asset-item id=\x22flatrect2\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/flatrect2.glb\x22></a-asset-item>\n"+
                         "<a-asset-item id=\x22landscape_panel\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/landscape_panel7.glb\x22></a-asset-item>\n"+
                         "<a-asset-item id=\x22widelandscape_panel\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/panel5b.glb\x22></a-asset-item>\n"+
                         "<a-asset-item id=\x22dialog_panel\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/dialogpanel2.glb\x22></a-asset-item>\n"+
