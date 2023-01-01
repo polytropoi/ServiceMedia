@@ -1587,12 +1587,12 @@ AFRAME.registerComponent('cloud_marker', {
         // } else if (this.storedVars.markerType.toLowerCase().includes("trigger")) {
         //   this.el.setAttribute('gltf-model', '#poi1');  
         //   // this.el.setAttribute("aabb-collider", {objects: ".activeObjexRay"});
-        // } else if (this.storedVars.markerType.toLowerCase() == "mailbox") {
-        //   this.el.setAttribute('gltf-model', '#mailbox');
-        // } else {
-        //   this.el.setAttribute('gltf-model', '#poi1');
-        // }
-          this.el.setAttribute('gltf-model', '#poi1');
+          if (this.storedVars.markerType.toLowerCase() == "mailbox") {
+            this.el.setAttribute('gltf-model', '#mailbox');
+          } else {
+            this.el.setAttribute('gltf-model', '#poi1');
+          }
+          // this.el.setAttribute('gltf-model', '#poi1');
         } else {
           for (let i = 0; i < sceneModels.length; i++) {
             if (sceneModels[i]._id == this.storedVars.modelID) {
@@ -1759,6 +1759,11 @@ AFRAME.registerComponent('cloud_marker', {
       // this.calloutPanel.setAttribute("overlay");
       // this.calloutText.setAttribute("size", ".1 .1 .1");
       this.calloutText.setAttribute("position", '0 0 1.25'); //offset the child on z toward camera, to prevent overlap on model
+      this.font2 = "Acme.woff";
+
+      if (settings && settings.sceneFontWeb1) {
+        this.font2 = settings.sceneFontWeb2;
+      }
       this.calloutText.setAttribute('troika-text', {
         // width: .5,
         baseline: "bottom",
@@ -2736,15 +2741,19 @@ AFRAME.registerComponent("rotate-with-camera", { //unused
     this.clientX = null;
     this.clientY = null;
     sceneEl.appendChild(this.matrixCalloutEntity);
-    this.matrixCalloutEntity.appendChild(this.matrixCalloutPanel);
+    // this.matrixCalloutEntity.appendChild(this.matrixCalloutPanel);
     this.matrixCalloutEntity.appendChild(this.matrixCalloutText);
     // this.calloutPanel.setAttribute("position", '0 0 1'); 
     this.matrixCalloutText.setAttribute("position", '0 0 .1'); //offset the child on z toward camera, to prevent overlap on model
-    this.matrixCalloutText.setAttribute('text', {
+
+    let font = "Acme.woff";
+    
+    this.matrixCalloutText.setAttribute('troika-text', {
       width: .5,
       baseline: "bottom",
       align: "left",
-      font: "/fonts/Exo2Bold.fnt",
+      font: "/fonts/web/" + font,
+      fontSize: .3,
       anchor: "center",
       wrapCount: 20,
       color: "white",

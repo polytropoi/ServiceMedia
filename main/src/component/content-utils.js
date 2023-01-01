@@ -1546,7 +1546,7 @@ AFRAME.registerComponent('entity-callout', {
       var sceneEl = document.querySelector('a-scene');
       //let calloutString = this.data.calloutString;
       this.font = "Acme.woff";
-      if (settings && settings.sceneFontWeb2) {
+      if (settings && settings.sceneFontWeb2 && settings.sceneFontWeb2.length) {
         this.font = settings.sceneFontWeb2;
       }
 
@@ -1565,8 +1565,10 @@ AFRAME.registerComponent('entity-callout', {
         baseline: "bottom",
         align: "center",
         font: "/fonts/web/" + this.font,
+        fontSize: .1,
         anchor: "center",
-
+        outlineColor: "black",
+        outlineWidth: "2%",
         color: "white",
         value: "Play/Pause"
       });
@@ -1608,13 +1610,19 @@ AFRAME.registerComponent('model-callout', {
       sceneEl.appendChild(calloutEntity);
       calloutEntity.appendChild(calloutText);
       calloutText.setAttribute("position", '0 0 3'); //offset the child on z toward camera, to prevent overlap on model
+      let font = "Acme.woff"; 
+      if (settings && settings.sceneFontWeb2 && settings.sceneFontWeb2.length) {
+        font = settings.sceneFontWeb2;
+      }
       calloutText.setAttribute('troika-text', {
         baseline: "bottom",
         align: "center",
-        font: "/fonts/web/" + settings.sceneFontWeb2,
+        font: "/fonts/web/" + font,
         anchor: "center",
         wrapCount: 30,
-        color: "black",
+        color: "white",
+        outlineColor: "black",
+        outlineWidth: "2%",
         value: name
       });
       this.el.addEventListener('mouseenter', function (evt) {
@@ -2049,14 +2057,20 @@ AFRAME.registerComponent('model-callout', {
         // console.log("avatar-callout set position " + JSON.stringify(this.el.getAttribute("position")));
         calloutEntity.appendChild(calloutText);
         calloutText.setAttribute("position", '0 0 2'); //offset the child on z toward camera, to prevent overlap on model
+        let font = "Acme.woff"; 
+        if (settings && settings.sceneFontWeb2 && settings.sceneFontWeb2.length) {
+          font = settings.sceneFontWeb2;
+        }
         calloutText.setAttribute('troika-text', {
           baseline: "bottom",
           align: "center",
           fontSize: .2,
-          font: "/fonts/web/" + settings.sceneFontWeb2,
+          font: "/fonts/web/" + font,
           anchor: "center",
           wrapCount: 30,
           color: "white",
+          outlineColor: "black",
+          outlineWidth: "2%",
           value: this.data.calloutString
         });
 
@@ -2720,25 +2734,31 @@ AFRAME.registerComponent('mod_object', {
         }
         console.log(this.data.objectData.name + "callouttext " + this.data.objectData.callouttext );
         this.calloutEntity = document.createElement("a-entity");
-        this.calloutPanel = document.createElement("a-entity");
+       
         this.calloutText = document.createElement("a-entity");
         this.calloutEntity.id = "objCalloutEntity_" + this.data.objectData._id;
-        this.calloutPanel.id = "objCalloutPanel_" + this.data.objectData._id;
+      
         this.calloutText.id = "objCalloutText_" + this.data.objectData._id;
-
-        this.calloutPanel.setAttribute("gltf-model", "#landscape_panel");
-        this.calloutPanel.setAttribute("scale", ".125 .1 .125");
-        this.calloutPanel.setAttribute("material", {'color': 'black', 'roughness': 1});
-        this.calloutPanel.setAttribute("overlay");
+          
+        // TODO flex with sceneTextBackground
+        // this.calloutPanel.id = "objCalloutPanel_" + this.data.objectData._id;
+        // this.calloutPanel = document.createElement("a-entity"); 
+        // this.calloutPanel.setAttribute("gltf-model", "#landscape_panel");
+        // this.calloutPanel.setAttribute("scale", ".125 .1 .125");
+        // this.calloutPanel.setAttribute("material", {'color': 'black', 'roughness': 1});
+        // this.calloutPanel.setAttribute("overlay");
         this.calloutEntity.setAttribute("look-at", "#player");
         this.calloutEntity.setAttribute('visible', false);
       
         // calloutEntity.setAttribute("render-order", "hud");
         this.el.sceneEl.appendChild(this.calloutEntity);
-        this.calloutEntity.appendChild(this.calloutPanel);
+        // this.calloutEntity.appendChild(this.calloutPanel);
         this.calloutEntity.appendChild(this.calloutText);
         let font = "Acme.woff"; 
-        this.calloutPanel.setAttribute("position", '0 0 1'); 
+        if (settings && settings.sceneFontWeb2 && settings.sceneFontWeb2.length) {
+          font = settings.sceneFontWeb2;
+        }
+        // this.calloutPanel.setAttribute("position", '0 0 1'); 
         this.calloutText.setAttribute("position", '0 0 1.25'); //offset the child on z toward camera, to prevent overlap on model
         this.calloutText.setAttribute('troika-text', {
           fontSize: .1,
@@ -2748,7 +2768,9 @@ AFRAME.registerComponent('mod_object', {
           anchor: "center",
           // wrapCount: 14,
           color: "white",
-          value: "wha"
+          outlineColor: "black",
+          outlineWidth: "2%",
+          value: ""
         });
         this.calloutText.setAttribute("overlay");
       } 
@@ -3608,10 +3630,12 @@ AFRAME.registerComponent('mod_object', {
             // if (pos.x != NaN) { //does it twice because matrix set, disregard if it returns NaN :( //fixed?
             //   console.log("screen position: " + (pos.x/width).toFixed(1) + " " + (pos.y/height).toFixed(1)); //"viewport position"
             // }
+
             if ((pos.x/width) < .45) {
               console.log("flip left");
               this.bubbleBackground.setAttribute("position", ".5 .2 .5");
               this.bubbleBackground.setAttribute("scale", "-.2 .2 .2"); 
+              // this.bubbleBackground.setAttribute('scale', {x: this.distance * -.25, y: this.distance * .25, z: this.distance * .25} );
               this.bubbleText.setAttribute("scale", ".2 .2 .2"); 
               this.bubbleText.setAttribute("position", ".5 .2 .55");
             } 
@@ -3619,13 +3643,19 @@ AFRAME.registerComponent('mod_object', {
               console.log("flip right");
               this.bubbleBackground.setAttribute("position", "-.5 .2 .5");
               this.bubbleBackground.setAttribute("scale", ".2 .2 .2"); 
+              // this.bubbleBackground.setAttribute('scale', {x: this.distance * -.25, y: this.distance * .25, z: this.distance * .25} );
               this.bubbleText.setAttribute("scale", ".2 .2 .2")
               this.bubbleText.setAttribute("position", "-.5 .2 .55");
             }
-            this.bubbleText.setAttribute('text', {
+            let font = "Acme.woff";
+            if (settings && settings.sceneFontWeb2 && settings.sceneFontWeb2.length) {
+              font = settings.sceneFontWeb2;
+            }
+            this.bubbleText.setAttribute('troika-text', {
               baseline: "bottom",
               align: "center",
-              font: "/fonts/Exo2Bold.fnt",
+              font: "/fonts/web/" + font,
+              fontSize: .2,
               anchor: "center",
               wrapCount: 20,
               color: "black",
@@ -5269,15 +5299,16 @@ AFRAME.registerComponent('mod_model', {
           bubble.appendChild(bubbleBackground);
 
           
-          let bubbleText = document.createElement("a-text");
+          // let bubbleText = document.createElement("a-text");
+          let bubbleText = document.createElement("a-entity");
           this.bubbleText = bubbleText;
           bubbleText.classList.add("bubbleText");
           // bubbleText.setAttribute("visible", false);
           bubbleText.setAttribute("position", "0 0 1.1");
           bubbleText.setAttribute("scale", ".1 .1 .1"); 
           // bubbleText.setAttribute("look-at", "#player");
-          bubbleText.setAttribute("width", 3);
-          bubbleText.setAttribute("height", 2);
+          // bubbleText.setAttribute("width", 3);
+          // bubbleText.setAttribute("height", 2);
           bubble.appendChild(bubbleText);
           
           bubbleBackground.addEventListener('model-loaded', () => {
@@ -5423,6 +5454,11 @@ AFRAME.registerComponent('mod_model', {
               this.bubbleText.setAttribute("scale", ".2 .2 .2")
               this.bubbleText.setAttribute("position", "-.5 .2 .55");
             }
+            this.font2 = "Acme.woff";
+            if (settings && settings.sceneFontWeb2 && settings.sceneFontWeb2.length) {
+              this.font2 = settings.sceneFontWeb2;
+            }
+
             this.bubbleText.setAttribute('troika-text', {
               baseline: "bottom",
               align: "center",
@@ -7357,7 +7393,7 @@ AFRAME.registerComponent('scene_greeting_dialog', {  //if "greeting" scenetag + 
       this.font = settings.sceneFontWeb1;
     }
     this.font2 = "Acme.woff";
-    if (settings && settings.sceneFontWeb2) {
+    if (settings && settings.sceneFontWeb2 && settings.sceneFontWeb2.length) {
       this.font2 = settings.sceneFontWeb2;
     }
     this.fillColor = "white";
@@ -7397,8 +7433,8 @@ AFRAME.registerComponent('scene_greeting_dialog', {  //if "greeting" scenetag + 
       this.startButtonTextEl = document.createElement("a-entity");
       this.el.appendChild(this.startButtonBackgroundEl);
       this.el.appendChild(this.startButtonTextEl);
-      this.startButtonBackgroundEl.setAttribute("position", " 0 -2 -.01");
-      this.startButtonTextEl.setAttribute("position", " 0 -2 0");
+      this.startButtonBackgroundEl.setAttribute("position", " 0 -1 -.01");
+      this.startButtonTextEl.setAttribute("position", " 0 -1 0");
       this.startButtonMaterial = new THREE.MeshStandardMaterial( { 'color': this.textBackgroundColor, 'transparent': true, 'opacity': .85 } ); 
       // todo switch bg
       // this.startButtonBackgroundEl.setAttribute('geometry', {'primitive': 'plane', 'width': '1.5', 'height': '.75'});
@@ -7452,13 +7488,13 @@ AFRAME.registerComponent('scene_greeting_dialog', {  //if "greeting" scenetag + 
 
     this.greetingEl = document.createElement("a-entity");
     this.el.appendChild(this.greetingEl);
-    this.greetingEl.setAttribute("position", "0 .75 0");
+    this.greetingEl.setAttribute("position", "0 1 0");
 
     this.questEl = null;
     if (this.data.questText.length) {
       this.questEl = document.createElement("a-entity");
       this.el.appendChild(this.questEl);
-      this.questEl.setAttribute("position", "0 -.75 0");
+      this.questEl.setAttribute("position", "0 0 0");
     }
 
     this.greetingEl.setAttribute("troika-text", {
@@ -7474,15 +7510,15 @@ AFRAME.registerComponent('scene_greeting_dialog', {  //if "greeting" scenetag + 
     });
     if (this.questEl) {
       this.questEl.setAttribute("troika-text", {
-      fontSize: .2,
-      maxWidth: 5,
-      align: "center",
-      font: "/fonts/web/" + this.font2,
-      strokeWidth: '1%',
-      color: this.fillColor,
-      strokeColor: this.outlineColor,
-      value: this.data.questText
-    });
+        fontSize: .2,
+        maxWidth: 5,
+        align: "center",
+        font: "/fonts/web/" + this.font2,
+        strokeWidth: '1%',
+        color: this.fillColor,
+        strokeColor: this.outlineColor,
+        value: this.data.questText
+      });
     }
 
    
@@ -7498,9 +7534,9 @@ AFRAME.registerComponent('scene_greeting_dialog', {  //if "greeting" scenetag + 
       console.log("tryna set scene greeting " + this.data.greetingText);
       let loc = new THREE.Vector3();
       this.viewportHolder = document.getElementById('viewportPlaceholder3');
-    this.viewportHolder.object3D.getWorldPosition( loc );
-    
-    this.el.setAttribute("position", {x: loc.x, y: loc.y + .5, z: loc.z});
+      this.viewportHolder.object3D.getWorldPosition( loc );
+      
+      this.el.setAttribute("position", {x: loc.x, y: loc.y + .75, z: loc.z});
     }, 3000);
 
     
