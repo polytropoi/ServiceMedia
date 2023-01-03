@@ -2251,7 +2251,7 @@ webxr_router.get('/:_id', function (req, res) {
                                                     entityType = "surface";
 
                                                 }
-                                                let modModel = "mod_model=\x22markerType: "+locMdl.markerType+"; tags: "+locMdl.locationTags+"; eventData:"+locMdl.eventData+"\x22";
+                                                let modModel = "mod_model=\x22markerType: "+locMdl.markerType+"; tags: "+locMdl.locationTags+"; description:"+locMdl.description+"; eventData:"+locMdl.eventData+"\x22";
                                                 // let modMaterial = "";
                                                 if (locMdl.eventData.toLowerCase().includes("gallery")) {
                                                     // modModel = "mod_model_photo_gallery";  maybe later
@@ -2662,7 +2662,7 @@ webxr_router.get('/:_id', function (req, res) {
                         // }
                     } else { //no text items 
                         callback();
-                    }1                 
+                    }             
                 },
                 function (callback) { //fethc audio items
                     
@@ -5000,7 +5000,7 @@ webxr_router.get('/:_id', function (req, res) {
                         "<a-asset-item id=\x22savedplaceholder\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/savedplaceholder.glb\x22></a-asset-item>\n"+
                         "<a-asset-item id=\x22key\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/key1b.glb\x22></a-asset-item>\n"+
                         "<a-asset-item id=\x22camera_icon\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/camera1.glb\x22></a-asset-item>\n"+
-                        "<a-asset-item id=\x22talkbubble\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/talkbubble1.glb\x22></a-asset-item>\n"+
+                        "<a-asset-item id=\x22talkbubble\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/talkbubble1b.glb\x22></a-asset-item>\n"+
                         "<a-asset-item id=\x22thoughtbubble\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/thoughtbubble1.glb\x22></a-asset-item>\n"+
                         "<a-asset-item id=\x22poimarker\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/poi_marker.glb\x22></a-asset-item>\n"+
                         "<a-asset-item id=\x22globe\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/mapglobe1.glb\x22></a-asset-item>\n"+

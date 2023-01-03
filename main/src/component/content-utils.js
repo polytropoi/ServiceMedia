@@ -749,7 +749,7 @@ AFRAME.registerComponent('play-on-vrdisplayactivate-or-enter-vr', { //play video
 
 AFRAME.registerComponent('main-text-control', {
     schema: {
-        font: {default: ""},
+        // font: {default: ""},
         mainTextString: {default: ''},
         mode: {default: ""},
         jsonData: {default: ""}
@@ -765,6 +765,7 @@ AFRAME.registerComponent('main-text-control', {
         let nextButton = document.getElementById("nextMainText");
         let previousButton = document.getElementById("previousMainText");
         let mainTextHeader = document.getElementById("mainTextHeader");
+
         if (this.data.mainTextString != undefined) {
             // console.log("maintext " + this.data.mainTextString);
             
@@ -809,9 +810,18 @@ AFRAME.registerComponent('main-text-control', {
             //     align: "left",
             //     value: this.textArray[0]
             // });
+
+            this.font = "Acme.woff";
+
+            if (settings && settings.sceneFontWeb1) {
+              this.font = settings.sceneFontWeb1;
+            }
+            // if (settings && settings.sceneFontWeb1) {
+            //   this.font2 = settings.sceneFontWeb2;
+            // }
             document.querySelector("#mainText").setAttribute('troika-text', {
               value: this.textArray[0],
-              font: '../fonts/web/' + this.data.font,
+              font: '../fonts/web/' + this.font,
               lineHeight: 1,
               baseline: "top",
                   anchor: "left",
@@ -842,7 +852,7 @@ AFRAME.registerComponent('main-text-control', {
                   baseline: "top",
                   anchor: "right",
                   value: "page 1 of " + textArray.length,
-                  font: '../fonts/web/' + this.data.font,
+                  font: '../fonts/web/' + this.font,
                   lineHeight: .85,
                   maxWidth: 10,
                   fontSize: .3,
@@ -1540,52 +1550,57 @@ AFRAME.registerComponent('toggle-available-scenes', {
 
 AFRAME.registerComponent('entity-callout', {
   schema: {
-      calloutString: {default: "play/pause"},
+      calloutString: {default: ""}
+
     },
     init: function () {
-      var sceneEl = document.querySelector('a-scene');
-      //let calloutString = this.data.calloutString;
-      this.font = "Acme.woff";
-      if (settings && settings.sceneFontWeb2 && settings.sceneFontWeb2.length) {
-        this.font = settings.sceneFontWeb2;
-      }
+      if (this.data.calloutString != "") {
+        var sceneEl = document.querySelector('a-scene');
+        console.log("tryna init ENTITY CALLOUT " + this.el.id + " desc " + this.data.description );
+        //let calloutString = this.data.calloutString;
+        this.font = "Acme.woff";
+        if (settings && settings.sceneFontWeb2 && settings.sceneFontWeb2.length) {
+          this.font = settings.sceneFontWeb2;
+        }
 
-      let calloutEntity = document.createElement("a-entity");
-      let calloutText = document.createElement("a-entity");
-     
-      // this.calloutText = calloutText;
-      // calloutText.setAttribute('overlay');
-      calloutEntity.setAttribute("look-at", "#player");
-      calloutEntity.setAttribute('visible', false);
-      // calloutEntity.setAttribute("render-order", "hud");
-      sceneEl.appendChild(calloutEntity);
-      calloutEntity.appendChild(calloutText);
-      calloutText.setAttribute("position", '0 0 .3'); //offset the child on z toward camera, to prevent overlap on model
-      calloutText.setAttribute('troika-text', {
-        baseline: "bottom",
-        align: "center",
-        font: "/fonts/web/" + this.font,
-        fontSize: .1,
-        anchor: "center",
-        outlineColor: "black",
-        outlineWidth: "2%",
-        color: "white",
-        value: "Play/Pause"
-      });
-      this.el.addEventListener('mouseenter', function (evt) {
-        console.log("tryna mouseover entity-callout");
-        calloutEntity.setAttribute('visible', true);
-        let pos = evt.detail.intersection.point; //hitpoint on model
-        // console.log(pos);
-        calloutEntity.setAttribute("position", pos);
-        // calloutText.updateMatrixWorld();
-      });
-      this.el.addEventListener('mouseleave', function (evt) {
-        // console.log("tryna mouseexit");
+        let calloutEntity = document.createElement("a-entity");
+        let calloutText = document.createElement("a-entity");
+      
+        // this.calloutText = calloutText;
+        // calloutText.setAttribute('overlay');
+        calloutEntity.setAttribute("look-at", "#player");
         calloutEntity.setAttribute('visible', false);
-      });
+        // calloutEntity.setAttribute("render-order", "hud");
+        sceneEl.appendChild(calloutEntity);
+        calloutEntity.appendChild(calloutText);
+        calloutText.setAttribute("position", '0 0 .3'); //offset the child on z toward camera, to prevent overlap on model
+        calloutText.setAttribute('troika-text', {
+          baseline: "bottom",
+          align: "center",
+          font: "/fonts/web/" + this.font,
+          fontSize: .1,
+          anchor: "center",
+          outlineColor: "black",
+          outlineWidth: "2%",
+          color: "white",
+          value: "Play/Pause"
+        });
+        this.el.addEventListener('mouseenter', function (evt) {
+          console.log("tryna mouseover entity-callout");
+          calloutEntity.setAttribute('visible', true);
+          let pos = evt.detail.intersection.point; //hitpoint on model
+          // console.log(pos);
+          calloutEntity.setAttribute("position", pos);
+          // calloutText.updateMatrixWorld();
+        });
+        this.el.addEventListener('mouseleave', function (evt) {
+          // console.log("tryna mouseexit");
+          calloutEntity.setAttribute('visible', false);
+        });
+      }
     }
   });
+// }
 
 AFRAME.registerComponent('model-callout', {
   schema: {
@@ -4528,7 +4543,8 @@ AFRAME.registerComponent('mod_model', {
       eventData: {default: ''},
       shader: {default: ''},
       color: {default: ''},
-      tags: {default: null}
+      tags: {default: null},
+      description: {default: ''}
       
     },
     init: function () {
@@ -4576,7 +4592,10 @@ AFRAME.registerComponent('mod_model', {
       this.triggerObject = null;
       this.hasAudioTrigger = false;
       this.particlesEl = null;
+      this.hasCallout = false;
+      this.hasCalloutBackground = false;
       
+      console.log("MOD MODEL eventData : " + this.data.eventData);
       this.hitpoint = new THREE.Vector3();
       this.tags = this.data.tags;
       this.font1 = "Acme.woff";
@@ -4627,6 +4646,7 @@ AFRAME.registerComponent('mod_model', {
         let theEl = this.el;
         const obj = this.el.getObject3D('mesh');
         
+
         if (obj) {
           if (this.data.shader != "") {
             console.log("gotsa shader " + this.data.shader);
@@ -4671,6 +4691,11 @@ AFRAME.registerComponent('mod_model', {
               this.el.sceneEl.appendChild(this.particlesEl); //hrm...
               this.el.classList.add("target");
               this.el.classList.remove("activeObjexRay");
+          }
+          if (this.data.eventData.toLowerCase().includes("callout") && this.data.description && this.data.description != "") {
+            // this.el.setAttribute("entity-callout", {'calloutString': this.data.description});
+            this.hasCallout = true;
+
           }
 
           this.el.addEventListener('raycaster-intersected', e =>{  
@@ -5260,7 +5285,7 @@ AFRAME.registerComponent('mod_model', {
           }
       }
       
-      if (this.el.classList.contains('target') || this.data.markerType != "none") {
+      if (this.el.classList.contains('target') || this.data.markerType != "none" || this.hasCallout) {
         let textIndex = 0;
         this.position = null;
         // let hasBubble = false;
@@ -5268,18 +5293,23 @@ AFRAME.registerComponent('mod_model', {
         this.el.setAttribute('gesture-handler-add'); //ar mode only?
         var sceneEl = document.querySelector('a-scene');
         let hasCallout = false;
+        if (this.hasCallout) {
+          hasCallout = true;
+        }
         let calloutOn = false;
         if (!this.data.eventData.toLowerCase().includes("undefined") && this.data.eventData.toLowerCase().includes("main") && this.data.eventData.toLowerCase().includes("text")) {
           document.getElementById("mainTextToggle").setAttribute("visible", false);
-          this.data.eventData = document.getElementById("mainText").getAttribute("main-text-control", "mainTextString"); 
-          console.log("target eventData : "+ JSON.stringify(this.data.eventData));
-          textData = this.data.eventData.mainTextString.split("~");
+          let tdata = document.getElementById("mainText").getAttribute("main-text-control", "mainTextString"); 
+          // console.log("target eventData : "+ JSON.stringify(this.data.eventData));
+          textData = tdata.mainTextString.split("~");
           hasCallout = true;
-        } 
+        } else {
+          textData = this.data.description.split("~");
+        }
         if (hasCallout) {
           let bubble = document.createElement("a-entity");
           this.bubble = bubble;
-          console.log("made a bubble!" + bubble);
+          console.log("made a bubble!" + this.data.eventData.toLowerCase());
           bubble.setAttribute("look-at", "#player");
           bubble.classList.add("bubble");
           bubble.setAttribute("position", "2 2 0");
@@ -5288,16 +5318,54 @@ AFRAME.registerComponent('mod_model', {
           bubble.setAttribute("visible", false);
           sceneEl.appendChild(bubble);
           
-          let bubbleBackground = document.createElement("a-entity");
-          bubbleBackground.classList.add("bubbleBackground");
-          bubbleBackground.setAttribute("gltf-model", "#thoughtbubble"); //just switch this for other callout types (speech and plain callout)
-          bubbleBackground.setAttribute("position", "0 0 1");
-          bubbleBackground.setAttribute("rotation", "0 0 0"); 
-          bubbleBackground.setAttribute("scale", "-.1 .1 .1"); 
-          // bubble.setAttribute("material", {"color": "white", "blending": "additive", "transparent": false, "alphaTest": .5});
-          bubbleBackground.setAttribute("material", {"color": "white", "shader": "flat"}); //doh, doesn't work for gltfs... 
-          bubble.appendChild(bubbleBackground);
+          bubbleBackground = null;
+          if (this.data.eventData.toLowerCase().includes("thought")) {
+            this.hasCalloutBackground = true;
+            console.log("ttryhana put a thought bubble on mod_model");
+            bubbleBackground = document.createElement("a-entity");
+            bubbleBackground.classList.add("bubbleBackground");
+            bubbleBackground.setAttribute("gltf-model", "#thoughtbubble"); //just switch this for other callout types (speech and plain callout)
+            bubbleBackground.setAttribute("position", "0 0 1");
+            bubbleBackground.setAttribute("rotation", "0 0 0"); 
+            bubbleBackground.setAttribute("scale", "-.1 .1 .1"); 
+            // bubble.setAttribute("material", {"color": "white", "blending": "additive", "transparent": false, "alphaTest": .5});
+            bubbleBackground.setAttribute("material", {"color": "white", "shader": "flat"}); //doh, doesn't work for gltfs... 
+            bubble.appendChild(bubbleBackground);
 
+            bubbleBackground.addEventListener('model-loaded', () => {
+              const bubbleObj = bubbleBackground.getObject3D('mesh');
+              // var material = new THREE.MeshBasicMaterial({map: bubbleObj.material.map}); 
+              // material.color = "white";
+              bubbleObj.traverse(node => {
+                  // node.material = material;
+                  node.material.flatShading = true;
+                  node.material.needsUpdate = true
+                });
+              });
+          }
+          if (this.data.eventData.toString().toLowerCase().includes("speech") || this.data.eventData.toString().toLowerCase().includes("talk")) {
+            this.hasCalloutBackground = true;
+            bubbleBackground = document.createElement("a-entity");
+            bubbleBackground.classList.add("bubbleBackground");
+            bubbleBackground.setAttribute("gltf-model", "#talkbubble"); //just switch this for other callout types (speech and plain callout)
+            bubbleBackground.setAttribute("position", "0 0 1");
+            bubbleBackground.setAttribute("rotation", "0 0 0"); 
+            bubbleBackground.setAttribute("scale", "-.1 .1 .1"); 
+            // bubble.setAttribute("material", {"color": "white", "blending": "additive", "transparent": false, "alphaTest": .5});
+            bubbleBackground.setAttribute("material", {"color": "white", "shader": "flat"}); //doh, doesn't work for gltfs... 
+            bubble.appendChild(bubbleBackground);
+
+            bubbleBackground.addEventListener('model-loaded', () => {
+              const bubbleObj = bubbleBackground.getObject3D('mesh');
+              // var material = new THREE.MeshBasicMaterial({map: bubbleObj.material.map}); 
+              // material.color = "white";
+              bubbleObj.traverse(node => {
+                  // node.material = material;
+                  node.material.flatShading = true;
+                  node.material.needsUpdate = true
+                });
+              });
+          }
           
           // let bubbleText = document.createElement("a-text");
           let bubbleText = document.createElement("a-entity");
@@ -5311,16 +5379,7 @@ AFRAME.registerComponent('mod_model', {
           // bubbleText.setAttribute("height", 2);
           bubble.appendChild(bubbleText);
           
-          bubbleBackground.addEventListener('model-loaded', () => {
-            const bubbleObj = bubbleBackground.getObject3D('mesh');
-            // var material = new THREE.MeshBasicMaterial({map: bubbleObj.material.map}); 
-            // material.color = "white";
-            bubbleObj.traverse(node => {
-                // node.material = material;
-                node.material.flatShading = true;
-                node.material.needsUpdate = true
-              });
-            });
+
             /*
           setInterval(function(){ //get "viewport" position (normalized screen coords)
             if (calloutOn) {
@@ -5440,20 +5499,36 @@ AFRAME.registerComponent('mod_model', {
             // if (pos.x != NaN) { //does it twice because matrix set, disregard if it returns NaN :( //fixed?
             //   console.log("screen position: " + (pos.x/width).toFixed(1) + " " + (pos.y/height).toFixed(1)); //"viewport position"
             // }
-            if ((pos.x/width) < .45) {
-              console.log("flip left");
-              this.bubbleBackground.setAttribute("position", ".5 .2 .5");
-              this.bubbleBackground.setAttribute("scale", "-.2 .2 .2"); 
-              this.bubbleText.setAttribute("scale", ".2 .2 .2"); 
-              this.bubbleText.setAttribute("position", ".5 .2 .55");
-            } 
-            if ((pos.x/width) > .55) {
-              console.log("flip right");
-              this.bubbleBackground.setAttribute("position", "-.5 .2 .5");
-              this.bubbleBackground.setAttribute("scale", ".2 .2 .2"); 
-              this.bubbleText.setAttribute("scale", ".2 .2 .2")
-              this.bubbleText.setAttribute("position", "-.5 .2 .55");
+            console.log(this.distance + "distance mod");
+            if (this.hasCalloutBackground) { //eg thought or speech bubble
+              if ((pos.x/width) < .45) {
+                console.log("flip left");
+                if (this.bubbleBackground) {
+                  this.bubbleBackground.setAttribute("position", ".5 .2 .5");
+                  // this.bubbleBackground.setAttribute("scale", "-.2 .2 .2"); 
+                  this.bubbleBackground.setAttribute('scale', {x: this.distance * -.05, y: this.distance * .05, z: this.distance * .05} );
+                }
+                // this.bubbleText.setAttribute("scale", ".2 .2 .2"); 
+                this.bubbleText.setAttribute("position", ".5 .2 .51");
+                this.bubbleText.setAttribute('scale', {x: this.distance * .05, y: this.distance * .05, z: this.distance * .05} );
+              } 
+              if ((pos.x/width) > .55) {
+                console.log("flip right");
+                if (this.bubbleBackground) {
+                  this.bubbleBackground.setAttribute("position", "-.5 .2 .5");
+                  this.bubbleBackground.setAttribute('scale', {x: this.distance * .05, y: this.distance * .05, z: this.distance * .05} );
+                  // this.bubbleBackground.setAttribute("scale", ".2 .2 .2"); 
+
+                }
+                // this.bubbleText.setAttribute("scale", ".2 .2 .2")
+                this.bubbleText.setAttribute('scale', {x: this.distance * .05, y: this.distance * .05, z: this.distance * .05} );
+                this.bubbleText.setAttribute("position", "-.5 .2 .51");
+              }
+            } else {
+              this.bubbleText.setAttribute('scale', {x: this.distance * .05, y: this.distance * .05, z: this.distance * .05} );
+              // this.bubble.setAttribute("position", this.hitpoint);
             }
+
             this.font2 = "Acme.woff";
             if (settings && settings.sceneFontWeb2 && settings.sceneFontWeb2.length) {
               this.font2 = settings.sceneFontWeb2;
@@ -5464,7 +5539,8 @@ AFRAME.registerComponent('mod_model', {
               align: "center",
               font: "/fonts/web/" + this.font2,
               anchor: "center",
-              wrapCount: 20,
+              // wrapCount: 20,
+              fontSize: .3,
               color: "black",
               value: textData[textIndex]
             });

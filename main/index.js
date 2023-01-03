@@ -12518,7 +12518,10 @@ function getAllPeople() {
                                 "<label for=\x22\x22>Location Model: </label>" + 
                                 "<select class=\x22form-control modelSelector\x22 id=\x22modelSelect_"+locationID+"\x22>" +
                                 "<option value=\x22\x22 disabled selected>Select : </option>" +
-                                "<option value=\x22none\x22> none</option>" +
+                                "<option value=\x22none\x22>none</option>" +
+                                // "<option value=\x22cube\x22>cube</option>" +
+                                // "<option value=\x22sphere\x22>sphere</option>" +
+                                // "<option value=\x22cylinder\x22>cylinder</option>" +
                                 "</select>" +
                             "</div>" +
                             "<div id=\x22selectLocationObject_" + locationID + "\x22>" +
