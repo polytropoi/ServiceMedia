@@ -1773,6 +1773,8 @@ AFRAME.registerComponent('cloud_marker', {
         anchor: "center",
         wrapCount: 12,
         color: "white",
+        outlineColor: "black",
+        outlineWidth: "2%",
         value: ""
       });
     }

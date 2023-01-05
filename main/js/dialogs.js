@@ -850,41 +850,66 @@ document.addEventListener('keyup', event => {
 function PlayPauseMedia () {
   // isPlaying = !isPlaying;
   // if (isPlaying) {
+
   console.log("playPause media " + timedEventsListenerMode);
   if (timedEventsListenerMode != null) {
     if (timedEventsListenerMode.toLowerCase() == "primary audio") {
-      PlayPausePrimaryAudio();
+      // PlayPausePrimaryAudio();
+      // if (primaryAudio)
+      var primaryAudioController = document.getElementById("primaryAudio").components.primary_audio_control; 
+      if (primaryAudioController) {
+        let isPlaying = primaryAudioController.playPauseToggle(); //returns a bool 
+        return isPlaying;
+      }
+      
     } else if (timedEventsListenerMode.toLowerCase() == "primary video") {
-      if (!primaryVideo.paused) {
-        pauseVideo();
-        PauseIntervals(true);
-      } else {
-        playVideo();
-        PauseIntervals(false);
+      var videoControllerEl = document.getElementById('primary_video');  
+        if (videoControllerEl != null) {
+          console.log("gotsa video embedVideo");
+          let videoController = videoControllerEl.components.vid_materials_embed;
+          if (videoController) {
+          console.log("gotsa primaryVideo " + videoController.current_player_state());
+          // if (videoController.current_player_state() != "playing" ) {
+            // playVideo();
+            let isPlaying = videoController.togglePlayPauseVideo();
+            if (isPlaying) {
+              console.log("video is pllaying" + isPlaying);
+              PauseIntervals(false);
+              return true;
+            } else {
+              // pauseVideo();
+              PauseIntervals(true);
+              return false;
+            }
+        }
       }
 
-    } else if (timedEventsListenerMode.toLowerCase() == "primary video") {
-      if (videoEl != null) {
-        if (!videoEl.paused) {
-          console.log("tryna play youtube");
-          videoEl.play();
-          PauseIntervals(false);
-        } else {
-          console.log("tryna pauze youtube");
-          videoEl.pause();
-          PauseIntervals(true);
-        }
-      } 
+    // } else if (timedEventsListenerMode.toLowerCase() == "primary video") {
+    //   if (videoEl != null) {
+    //     if (!videoEl.paused) {
+    //       console.log("tryna play primary video");
+    //       videoEl.play();
+    //       PauseIntervals(false);
+    //       return true;
+    //     } else {
+    //       console.log("tryna pauze primary video");
+    //       videoEl.pause();
+    //       PauseIntervals(true);
+    //       return false;
+    //     }
+    //   } 
     } else if (timedEventsListenerMode.toLowerCase() == "youtube") {
       if (youtubePlayer != null) {
         if (!youtubeIsPlaying) {
           console.log("tryna play youtube");
           PauseIntervals(false);
           youtubePlayer.playVideo();
+          return true;
         } else {
           console.log("tryna pauze youtube");
           youtubePlayer.pauseVideo();
           PauseIntervals(true);
+          return false;
         }
       } 
     }

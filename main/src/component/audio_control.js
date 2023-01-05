@@ -458,6 +458,7 @@ AFRAME.registerComponent('primary_audio_player', {  //setup and controls for the
                     this.isPlaying = true;
                     this.el.setAttribute('material', 'color', 'green');
                     PauseIntervals(false);
+                    return true;
                 } else {    
                     console.log("tryna pause");
                     primaryAudioHowl.pause();
@@ -465,6 +466,7 @@ AFRAME.registerComponent('primary_audio_player', {  //setup and controls for the
                     this.isPlaying = false;
                     this.el.setAttribute('material', 'color', 'red');
                     PauseIntervals(true);
+                    return false;
                 
                 }
             },
@@ -695,12 +697,14 @@ AFRAME.registerComponent('primary_audio_player', {  //setup and controls for the
                 this.el.emit('primaryAudioToggle', {isPlaying : true}, true);
                 this.isPlaying = true;
                 PauseIntervals(false);
+                return true;
             } else {    
                 console.log("tryna pause");
                 this.primaryAudioHowl.pause();
                 this.el.emit('primaryAudioToggle', {isPlaying : false}, true);
                 this.isPlaying = false;
                 PauseIntervals(true);
+                return false;
             }
         },
         fastForward: function() {

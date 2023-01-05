@@ -155,7 +155,7 @@ AFRAME.registerComponent('mod-materials', {
         }
       }
     });
-  AFRAME.registerComponent('vid_materials', { //mapped on internal geo, if no external mesh assigned
+  AFRAME.registerComponent('vid_materials', { //mapped on internal geo, if no external mesh assigned// deprecated..?
     schema: {
       url: {default: ''},
       url_webm: {default: ''},
@@ -331,6 +331,7 @@ AFRAME.registerComponent('mod-materials', {
           this.textureArray.push(this.path);
           }
         }
+        // this.id = "primary_video";  //hrm, could be multiples...
         this.cmTexture = new THREE.CubeTextureLoader().load(this.textureArray);
         this.cmTexture.format = THREE.RGBFormat;
         // let video = document.getElementById(this.data.id);
@@ -626,7 +627,7 @@ AFRAME.registerComponent('mod-materials', {
                 this.mouseOverObject = null;
 
               } else {
-                  // this.mouseOverObject = this.intersection.object.name;      
+                  this.mouseOverObject = this.intersection.object.name;      
                   // this.hitpoint = this.intersection.point;   
                   console.log('ray hit', this.intersection.point, this.intersection.object.name, this.mouseOverObject );
               }
@@ -642,10 +643,10 @@ AFRAME.registerComponent('mod-materials', {
           this.mouseOverObject = null;
           // }
       });
-      this.el.addEventListener('click', (e) =>  {
+      this.el.addEventListener('click', () =>  {
         e.preventDefault();
         // this.video = video;
-        console.log(this.mouseOverObject + " raycaster "+ this.raycaster);
+        // console.log(this.mouseOverObject + " raycaster "+ this.raycaster);
         // this.mouseOverObject = mouseOverObject;
         // this.hitpoint = hitpoint;
         // thiz.slider_handle = this.slider_handle;
@@ -661,8 +662,9 @@ AFRAME.registerComponent('mod-materials', {
             if (this.raycaster != null) {
                 
 
-              if (this.mouseOverObject.includes("play") || this.mouseOverObject.includes("screen") || this.mouseOverObject.includes("hvid")) {
+              if (this.mouseOverObject.includes("play") || this.mouseOverObject.includes("play_button") || this.mouseOverObject.includes("screen") || this.mouseOverObject.includes("hvid")) {
                 console.log(this.mouseOverObject + "video paused " + this.video.paused + "video readyState " + this.video.readyState);
+                // this.togglePlayPauseVideo();
                 if (this.video.paused) {
                   console.log("tryna play!");
                   playVideo(this.video);
@@ -753,6 +755,42 @@ AFRAME.registerComponent('mod-materials', {
             console.log("this.video is undefined!");
           }
           });
+        },
+        togglePlayPauseVideo () {
+          if (this.video.paused) {
+            console.log("tryna play!");
+            playVideo(this.video);
+            
+            // this.isPlaying = true;
+            if (this.pauseButtonMesh != null) {
+            this.pauseButtonMesh.visible = true;
+            this.playButtonMesh.visible = false;
+            }
+            
+            this.player_status_update("playing");
+            return true;
+            // this.play_button.material = this.greenmat;
+            // break;
+          } else {
+            if (this.video.readyState > 2) {
+            console.log("tryna pauyse!");
+            
+            pauseVideo(this.video);
+            // this.isPlaying = false;
+            if (this.pauseButtonMesh != null) {
+            this.pauseButtonMesh.visible = false; 
+            this.playButtonMesh.visible = true;   
+            }
+            this.player_status_update("paused");
+            return false;
+            // this.play_button.material = this.redmat;
+            
+            // break;
+          }
+        }
+        },
+        current_player_state () {
+          return this.playerState;
         },
         player_status_update (state) {
           this.playerState = state;

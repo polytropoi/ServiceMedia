@@ -2487,81 +2487,12 @@ webxr_router.get('/:_id', function (req, res) {
                         callback();
                     }
                 },
-                // function (callback) { //spin through text items and pull out special ones... //later..
-                //     if (sceneResponse.sceneTextItems != null && sceneResponse.sceneTextItems != undefined && sceneResponse.sceneTextItems != "") {
-                //         // fontIndex
-                //         console.log("sceneTeextITmmmes " + sceneResponse.sceneTextItems);
-                //         let toids = sceneResponse.sceneTextItems.map(convertStringToObjectID);
-                //         console.log("sceneTeextITmmmes " + sceneResponse.sceneTextItems + " vs toids " + toids);
-                //         db.text_items.find({$and:[{_id: {$in: toids}}, {type: "Font"}]}, function(err, items) {
-                //             if (err || !items) {
-                //                 console.log("no font or caint find those sceneTextItems!");
-                //             } else {
-                                
-                //                 //TODO async loop items..
-                //                 styleIncludes = "<link rel=\x22stylesheet\x22 href=\x22https://fonts.googleapis.com/css?family=Luckiest+Guy\x22></link>\x22";
-                //                 // console.log("fonts item : "+ JSON.stringify(items[0]));
-                //                 // if ()
-                //                 // sceneTextItemData = sceneTextItemData + "<div style=\x22visibility: hidden;\x22 class=\x22embeddedFont\x22 id=\x22embeddedFont\x22 data-attribute=\x22"+items[0].textstring+"\x22></div>"; //sceneTextItemData is outside of a-scene, so use div 
-                //                 sceneTextItemData = sceneTextItemData + "<span id=\x22font_\x22 class=\x22externalFont\x22 data-attribute=\x22font-family: 'Luckiest Guy', regular;\x22 style=\x22font-family: 'Luckiest Guy', regular;\x22>&nbsp;</span>"; //init so canvas can use?
-                //                 // callback();
-                //             }
-                //         });
-                //     } 
-                //     callback();
-                // },
-                // function (callback) {
-                //     if (sceneResponse.sceneFontWeb1 && sceneResponse.sceneFontWeb1 != "None") {
 
-                //         let mod1 = sceneResponse.sceneFontWeb1.replace(" ", "+");
-                //         console.log("consarnit font " + mod1);
-                //         // styleIncludes = styleIncludes + "<link href=\x22/fonts/web/"+mod1+".css\x22 rel=\x22stylesheet\x22 type=\x22text/css\x22></link>\x22";
-                //         // styleIncludes += "<link href=\x22https://fonts.googleapis.com/css?family="+mod1+"&display=swap\x22 rel=\x22preload\x22 as=\x22font\x22></link>\x22";
-                //         // styleIncludes = styleIncludes +"<link rel=\x22preload\x22 href=\x22/fonts/web/"+mod1+".woff2\x22 as=\x22font\x22 crossorigin></link>";
-                //         // <style>
-                //         // styleIncludes = styleIncludes + "<style>@import url(https://fonts.googleapis.com/css?family=Lobster);</style>";
-                //         // @font-face {
-                //         // font-family: 'Quicksand';
-                //         // font-style: normal;
-                //         // font-weight: 400;
-                //         // src: local('Quicksand Regular'), local('Quicksand-Regular'), url(https://studentmunch.com/wp-content/themes/studentmunch/fonts/quicksand.woff2) format('woff2');
-                //         // unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-                //         // }
-                //         // </style>
-
-                //         sceneTextItemData = sceneTextItemData + "<span id=\x22sceneFontWeb1\x22 class=\x22externalFont\x22 data-attribute=\x22"+sceneResponse.sceneFontWeb1+"\x22 style=\x22font-family: '"+sceneResponse.sceneFontWeb1+"', regular;\x22>&nbsp;</span>"; //init so canvas can use?
-                //     }
-                //     if (sceneResponse.sceneFontWeb2 && sceneResponse.sceneFontWeb2 != "None") {
-                //         let mod2 = sceneResponse.sceneFontWeb1.replace(" ", "+");
-                //         styleIncludes += "<link rel=\x22stylesheet\x22 href=\x22https://fonts.googleapis.com/css?family="+mod2+"\x22></link>\x22";
-                //         sceneTextItemData += "<span id=\x22font_\x22 class=\x22externalFont\x22 data-attribute=\x22font-family: '"+sceneResponse.sceneFontWeb1+"', regular;\x22 style=\x22font-family: '"+sceneResponse.sceneFontWeb1+"', regular;\x22>&nbsp;</span>"; //init so canvas can use?
-                //     }
-                //     callback();
-                // },
                 function (callback) { 
                     //hrm, get a list of text locations and spin through these...
                     if (sceneResponse.sceneTextItems != null && sceneResponse.sceneTextItems != undefined && sceneResponse.sceneTextItems != "") {
 
-                        // console.log("sceneTeextITmmmes " + sceneResponse.sceneTextItems);
-                        // let toids = sceneResponse.sceneTextItems.map(convertStringToObjectID);
-                        // console.log("sceneTeextITmmmes " + sceneResponse.sceneTextItems + " vs toids " + toids);
-                        // db.text_items.find({$and:[{_id: {$in: toids}}, {type: "Font"}]}, function(err, items) {
-                        //     if (err || !items) {
-                        //         console.log("no font or caint find those sceneTextItems!");
-                        //     } else {
 
-                        //         // console.log("fonts item : "+ JSON.stringify(items[0]));
-                        //         // if ()
-                        //         // sceneTextItemData = sceneTextItemData + "<div style=\x22visibility: hidden;\x22 class=\x22embeddedFont\x22 id=\x22embeddedFont\x22 data-attribute=\x22"+items[0].textstring+"\x22></div>"; //sceneTextItemData is outside of a-scene, so use div 
-                        //         sceneTextItemData = sceneTextItemData + "<span class=\x22externalFont\x22 data-attribute=\x22font-family: 'Luckiest Guy', regular;\x22 style=\x22font-family: 'Luckiest Guy', regular;\x22>&nbsp;</span>"; //init so canvas can use?
-                        //     }
-                        // });
-                        // for (let t = 0; t < sceneResponse.sceneTextItems.length; t++) {
-                        //     console.log(sceneResponse.sceneTextItems[t]);
-                            // if (sceneResponse.sceneTextItems[t].type == "Font") {
-                                
-                            // }
-                        // }
                         if (sceneResponse.sceneWebType != "HTML from Text Item") { //if it's not just a regular html page
                             for (let i = 0; i < sceneTextLocations.length; i++) {  //TODO ASYNC
 
@@ -2606,9 +2537,7 @@ webxr_router.get('/:_id', function (req, res) {
                                                 proceduralEntities = proceduralEntities + " <a-plane loadsvg=\x22id:"+textID+"; description: "+sceneTextLocations[i].description+"; eventdata: "+sceneTextLocations[i].eventData+"; tags:  "+sceneTextLocations[i].locationTags+"\x22 id=\x22svg_"+sceneTextLocations[i].timestamp+
                                                 "\x22 look-at=\x22#player\x22 width=\x22"+scale+"\x22 height=\x22"+scale+"\x22 position=\x22"+sceneTextLocations[i].x + " " + sceneTextLocations[i].y + " " + sceneTextLocations[i].z+"\x22></a-plane>";
                                             }
-                                            // sceneTextItemData = "<div id=\x22sceneTextItems\x22 data-attribute=\x22"+text_item._id+"\x22></div>";
-                                            // sceneTextItemData = text_item.textstring; 
-                                            // callback(null);
+
                                             }
                                         });
                                     // }
@@ -2634,9 +2563,7 @@ webxr_router.get('/:_id', function (req, res) {
                                                 proceduralEntities = proceduralEntities + " <a-entity load_threesvg=\x22id:"+textID+"; description: "+sceneTextLocations[i].description+"; eventdata: "+sceneTextLocations[i].eventData+"; tags:  "+sceneTextLocations[i].locationTags+"\x22 id=\x22svg_"+sceneTextLocations[i].timestamp+
                                                 "\x22 look-at=\x22#player\x22 width=\x22"+scale+"\x22 height=\x22"+scale+"\x22 position=\x22"+sceneTextLocations[i].x + " " + sceneTextLocations[i].y + " " + sceneTextLocations[i].z+"\x22></a-entity>";
                                             }
-                                            // sceneTextItemData = "<div id=\x22sceneTextItems\x22 data-attribute=\x22"+text_item._id+"\x22></div>";
-                                            // sceneTextItemData = text_item.textstring; 
-                                            // callback(null);
+
                                             }
                                         });
                                     } 
