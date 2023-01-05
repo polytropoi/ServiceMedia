@@ -848,10 +848,8 @@ document.addEventListener('keyup', event => {
 });
 
 function PlayPauseMedia () {
-  // isPlaying = !isPlaying;
-  // if (isPlaying) {
-
-  console.log("playPause media " + timedEventsListenerMode);
+  
+  console.log("PlayPauseMedia listening to " + timedEventsListenerMode);
   if (timedEventsListenerMode != null) {
     if (timedEventsListenerMode.toLowerCase() == "primary audio") {
       // PlayPausePrimaryAudio();
@@ -884,20 +882,6 @@ function PlayPauseMedia () {
         }
       }
 
-    // } else if (timedEventsListenerMode.toLowerCase() == "primary video") {
-    //   if (videoEl != null) {
-    //     if (!videoEl.paused) {
-    //       console.log("tryna play primary video");
-    //       videoEl.play();
-    //       PauseIntervals(false);
-    //       return true;
-    //     } else {
-    //       console.log("tryna pauze primary video");
-    //       videoEl.pause();
-    //       PauseIntervals(true);
-    //       return false;
-    //     }
-    //   } 
     } else if (timedEventsListenerMode.toLowerCase() == "youtube") {
       if (youtubePlayer != null) {
         if (!youtubeIsPlaying) {
@@ -916,69 +900,7 @@ function PlayPauseMedia () {
   }
 
 }
-// function ReturnTimeKeys() { //helper function for showAudio view below //reuse for video?
-//     // timeKeysData = 
- 
-//     if (tkStarttimes != null && tkStarttimes.length > 0) {
-//         tkStarttimes.sort((a, b) => parseFloat(a.keystarttime) - parseFloat(b.keystarttime));
-        
-        
-//         var tableHead = "<table id=\x22timekeyTable\x22 class=\x22display table table-striped table-bordered\x22 style=\x22width:100%\x22>" +
-//         "<thead>"+
-//         "<tr>"+
-//         "<th style=\x22color: white;\x22>Event Time</th>"+
-//         "<th style=\x22color: white;\x22>Duration</th>"+
-//         "<th style=\x22color: white;\x22>Type</th>"+
-//         "<th style=\x22color: white;\x22>Data</th>"+
-//         "<th style=\x22color: white;\x22>Label</th>"+
-//         "<th></th>"+
-//         "</tr>"+
-//         "</thead>"+
-//         "<tbody>";
-//         var tableBody = "";
-//         var selectButton = "";
-//         for (var i = 0; i < tkStarttimes.length; i++) {
-//             // console.log(JSON.stringify(timekeys[i]));
-//             let theTimekey = {};
-//             if (tkStarttimes.length == 1) {
-//               theTimekey = timeKeysData.timekeys[0];
-//             } else {
-//               theTimekey = timeKeysData.timekeys.find(function(tk, index) { //kinda bad, what if 2 have same?
-//                 if(tk.keystarttime == tkStarttimes[i]) {
-//                     return true;
-//                 }
-//             });
-//             } 
-//             let theLabel = "";
-//             if (theTimekey != null && theTimekey.keylabel != undefined && theTimekey.keylabel != null) {
-//               theLabel = theTimekey.label;
-//             }
-//             tableBody = tableBody +
-//             "<tr>" +
-//             // "<td>" + timekeys[i].keystarttime + "</td>" +
-//             // "<td>" + timekeys[i].keyduration + "</td>" +
-//             "<td><input type=\x22text\x22 class=\x22tk_start form-control\x22 id=\x22tk_start_" + i + "\x22 value=\x22" + theTimekey.keystarttime + "\x22></td>" +
-//             "<td><input type=\x22text\x22 width=\x2210\x22 class=\x22tk_duration form-control\x22 id=\x22tk_duration_" + i + "\x22 value=\x22" + theTimekey.keyduration + "\x22></td>" +
-//             "<td>" + 
-//             "<select id=\x22tk_type_"+ i +"\x22 class=\x22tk_type form-control\x22>" +
-//               ReturnTimedEventSelectors(theTimekey.keytype) +
-//             "</select>" +
-//             "</td>" +
-            
-//             "<td><input type=\x22text\x22 class=\x22tk_data form-control\x22 id=\x22tk_data_" + i + "\x22 value=\x22" + theTimekey.keydata + "\x22></td>" +
-//             "<td><input type=\x22text\x22 class=\x22tk_data form-control\x22 id=\x22tk_label_" + i + "\x22 value=\x22" + theTimekey.keylabel + "\x22></td>" +
-//             // "<td><button class=\x22btn btn-xs btn-info\x22>Update</button><button class=\x22btn btn-xs btn-danger\x22>Remove</button></td>" +
-//             "<td><button class=\x22remTimeKey btn btn-sm btn-danger\x22 id=\x22tk_rm_"+ i +"\x22>Remove</button></td>" +
-//             "</tr>";
-//         }
-//         var tableFoot =  "</tbody>" +
-//         "</table>";
-//         timeKeysHtml = tableHead + tableBody + tableFoot;
-//         return timeKeysHtml;
-//     } else {
-//         return "<br><br>No Timekeys Found";
-//     }
-// }
+
 function ReturnTimeKeys() { 
   // if (timeKeysData != null) {
     if (timeKeysData != null && timeKeysData.timekeys != undefined && timeKeysData.timekeys != null && timeKeysData.timekeys.length > 0) {

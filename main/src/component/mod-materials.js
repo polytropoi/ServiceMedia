@@ -643,13 +643,9 @@ AFRAME.registerComponent('mod-materials', {
           this.mouseOverObject = null;
           // }
       });
-      this.el.addEventListener('click', () =>  {
+      this.el.addEventListener('click', (e) =>  {
         e.preventDefault();
-        // this.video = video;
-        // console.log(this.mouseOverObject + " raycaster "+ this.raycaster);
-        // this.mouseOverObject = mouseOverObject;
-        // this.hitpoint = hitpoint;
-        // thiz.slider_handle = this.slider_handle;
+   
         if (this.video != undefined && this.video != null) {
             this.nStart = new THREE.Vector3();
             this.nEnd = new THREE.Vector3();
@@ -671,8 +667,8 @@ AFRAME.registerComponent('mod-materials', {
                   
                   // this.isPlaying = true;
                   if (this.pauseButtonMesh != null) {
-                  this.pauseButtonMesh.visible = true;
-                  this.playButtonMesh.visible = false;
+                    this.pauseButtonMesh.visible = true;
+                    this.playButtonMesh.visible = false;
                   }
                   
                   this.player_status_update("playing");
@@ -680,14 +676,14 @@ AFRAME.registerComponent('mod-materials', {
                   // break;
                 } else {
                   if (this.video.readyState > 2) {
-                  console.log("tryna pauyse!");
-                  
-                  pauseVideo(this.video);
-                  // this.isPlaying = false;
-                  if (this.pauseButtonMesh != null) {
-                  this.pauseButtonMesh.visible = false; 
-                  this.playButtonMesh.visible = true;   
-                  }
+                    console.log("tryna pauyse!");
+                    
+                    pauseVideo(this.video);
+                    // this.isPlaying = false;
+                    if (this.pauseButtonMesh != null) {
+                      this.pauseButtonMesh.visible = false; 
+                      this.playButtonMesh.visible = true;   
+                    }
                   this.player_status_update("paused");
                   // this.play_button.material = this.redmat;
                   
