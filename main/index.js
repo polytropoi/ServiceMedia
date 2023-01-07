@@ -13365,10 +13365,15 @@ function getAllPeople() {
                                         "<option value=\x22\x22 disabled selected>Select:</option>" +
                                         "<option>Acme.woff</option>" +
                                         "<option>AlphaSlabOne.woff</option>" +
+                                        "<option>Bitter.woff</option>" +
                                         "<option>CherryCreamSoda.woff</option>" +
+                                        "<option>Catamaran.woff</option>" +
                                         "<option>ElderGodsBB.ttf</option>" +
                                         "<option>GorditasBold.woff</option>" +
+                                        "<option>Geostar.woff</option>" +
                                         "<option>JollyLodger.woff</option>" +
+                                        "<option>FreckleFace.woff</option>" +
+                                        "<option>Kavoon.woff</option>" +
                                         
                                         "<option>eurof35.ttf</option>" +
                                         "<option>Jura-Medium-LB.ttf</option>" +
@@ -13395,15 +13400,19 @@ function getAllPeople() {
                                     "<option value=\x22\x22 disabled selected>Select:</option>" +
                                     "<option>Acme.woff</option>" +
                                     "<option>AlphaSlabOne.woff</option>" +
+                                    "<option>Bitter.woff</option>" +
                                     "<option>CherryCreamSoda.woff</option>" +
+                                    "<option>Catamaran.woff</option>" +
                                     "<option>ElderGodsBB.ttf</option>" +
                                     "<option>GorditasBold.woff</option>" +
+                                    "<option>Geostar.woff</option>" +
                                     "<option>JollyLodger.woff</option>" +
+                                    "<option>FreckleFace.woff</option>" +
+                                    "<option>Kavoon.woff</option>" +
                                     
                                     "<option>eurof35.ttf</option>" +
                                     "<option>Jura-Medium-LB.ttf</option>" +
                                     "<option>LaffayetteComicPro.ttf</option>" +
-                                    
                                     "<option>IrishGrover.woff</option>" +
                                     "<option>Karla-Regular.ttf</option>" +
                                     "<option>kimberle.ttf</option>" +
@@ -13416,8 +13425,6 @@ function getAllPeople() {
                                     "<option>Philosopher.woff</option>" +
                                     "<option>OleoScriptSwashCaps.woff</option>" +
                                     "<option>Rancho.woff</option>" +
-
-
                                    
                                 "</select>" +
                                        
@@ -13429,10 +13436,15 @@ function getAllPeople() {
                                         "<option value=\x22\x22 disabled selected>Select:</option>" +
                                         "<option>Acme.woff</option>" +
                                         "<option>AlphaSlabOne.woff</option>" +
+                                        "<option>Bitter.woff</option>" +
                                         "<option>CherryCreamSoda.woff</option>" +
+                                        "<option>Catamaran.woff</option>" +
                                         "<option>ElderGodsBB.ttf</option>" +
                                         "<option>GorditasBold.woff</option>" +
+                                        "<option>Geostar.woff</option>" +
                                         "<option>JollyLodger.woff</option>" +
+                                        "<option>FreckleFace.woff</option>" +
+                                        "<option>Kavoon.woff</option>" +
                                         
                                         "<option>eurof35.ttf</option>" +
                                         "<option>Jura-Medium-LB.ttf</option>" +

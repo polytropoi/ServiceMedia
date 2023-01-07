@@ -3003,7 +3003,9 @@ AFRAME.registerComponent('mod_curve', {
   schema: {
     init: {default: false},
     isClosed: {default: false},
-    eventData: {default: ''}
+    eventData: {default: ''},
+    orientToCurve: {default: false}
+
   },
 
   init: function () {
@@ -3018,6 +3020,7 @@ AFRAME.registerComponent('mod_curve', {
     this.fraction = 0;
 
     this.normal = new THREE.Vector3( 0, 1, 0 ); // up
+    // this.normal = new THREE.Vector3( 0, 0, 0 ); // up
     this.axis = new THREE.Vector3( );
     this.points = [];
     this.speed = .001;
@@ -3060,13 +3063,16 @@ AFRAME.registerComponent('mod_curve', {
     }
     
     this.el.object3D.position.copy( this.curve.getPoint( 1 - this.fraction ) ); //or just the fraction to go backwards       
-    this.tangent = this.curve.getTangent( this.fraction );
-    this.axis.crossVectors( this.normal, this.tangent ).normalize( );
-  
-    //radians = Math.acos( normal.dot( tangent ) );	
-    //char.quaternion.setFromAxisAngle( axis, radians );
+      this.tangent = this.curve.getTangent( this.fraction );
+      // this.normal = this.curve.getNormal( this.fraction );
+      this.axis.crossVectors( this.normal, this.tangent ).normalize( );
     
-    this.el.object3D.quaternion.setFromAxisAngle( this.axis, Math.PI / 2 );
+      //radians = Math.acos( normal.dot( tangent ) );	
+      //char.quaternion.setFromAxisAngle( axis, radians );
+      
+    if (this.data.orientToCurve) {
+      this.el.object3D.quaternion.setFromAxisAngle( this.axis, Math.PI / 2 );
+    }
   },
   reset: function () {
     this.fraction = 0;

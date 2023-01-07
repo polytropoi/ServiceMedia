@@ -2040,7 +2040,7 @@ webxr_router.get('/:_id', function (req, res) {
                                     }
                                     if (locMdl.markerType == "follow curve") {
                                         // followCurve = "follow-path=\x22incrementBy:0.001; throttleTo:1\x22";
-                                        followCurve = "mod_curve=\x22init: true\x22"
+                                        followCurve = "mod_curve=\x22init: true\x22"  //hrm, add a bunch of params here...
                                     }
                                     if (locMdl.markerType == "follow parametric curve") {
                                         let reverse = false;
@@ -4661,7 +4661,7 @@ webxr_router.get('/:_id', function (req, res) {
 
                             if (sceneResponse.sceneTags.includes("greeting")) {
                                 console.log("greeting is " + sceneResponse.sceneGreeting);
-                                textEntities = textEntities + "<a-entity class=\x22activeObjexRay\x22 look-at=\x22#player\x22 scene_greeting_dialog=\x22greetingText : "+sceneResponse.sceneGreeting+"; questText : "+sceneQuest+";\x22></a-entity>";
+                                textEntities = textEntities + "<a-entity class=\x22activeObjexRay\x22 look-at=\x22#player\x22 scene_greeting_dialog=\x22font1 : "+sceneResponse.sceneFontWeb1+"; font2 : "+sceneResponse.sceneFontWeb2+"; greetingText : "+sceneResponse.sceneGreeting+"; questText : "+sceneQuest+";\x22></a-entity>";
                             }
                         }
                         
@@ -4749,23 +4749,14 @@ webxr_router.get('/:_id', function (req, res) {
                         "<link href=\x22../main/vendor/fontawesome-free/css/all.css\x22 rel=\x22stylesheet\x22 type=\x22text/css\x22>" +
                         "<link href=\x22/css/webxr.css\x22 rel=\x22stylesheet\x22 type=\x22text/css\x22>" +
 
-                        //TODO FONT INCLUDES?  
-                        // "<link href=\x22https://fonts.googleapis.com/css?family=Miltonian+Tattoo&display=swap\x22 rel=\x22stylesheet\x22></link>" +
-
-                                              //<!-- Import maps polyfill -->
-                       //<!-- Remove this when import maps will be widely supported -->
-                    //    "<script async src=\x22https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js\x22></script>"+
-
-                    //    "<script type=\x22importmap\x22> {\x22imports\x22: {" +
-                    //         "\x22three\x22: \x22/src/lib/three.module.js\x22"+
-                    //     "}}</script>"+
+                     
                    
-                    "<script async src=\x22https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js\x22></script>"+
-                    "<script type=\x22importmap\x22> {\x22imports\x22: {" +
-                        "\x22three\x22: \x22https://unpkg.com/three@0.147.0/build/three.module.js\x22,"+
-                        "\x22three/addons/\x22: \x22https://unpkg.com/browse/three@0.147.0/examples/jsm/\x22"+
-                        "}"+
-                    "}</script>"+
+                        "<script async src=\x22https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js\x22></script>"+
+                        "<script type=\x22importmap\x22> {\x22imports\x22: {" +
+                            "\x22three\x22: \x22https://unpkg.com/three@0.147.0/build/three.module.js\x22,"+
+                            "\x22three/addons/\x22: \x22https://unpkg.com/browse/three@0.147.0/examples/jsm/\x22"+
+                            "}"+
+                        "}</script>"+
 
                         "<script src=\x22/main/vendor/jquery/jquery.min.js\x22></script>" +
                         
@@ -4773,13 +4764,13 @@ webxr_router.get('/:_id', function (req, res) {
                         
                         "<script src=\x22/connect/connect.js\x22 defer=\x22defer\x22></script>" +
                 
-                        // "<script src=\x22//aframe.io/releases/1.3.0/aframe.min.js\x22></script>" +
+                        
                         aframeScriptVersion +
                         physicsScripts +
                         logScripts +
                         aframeExtrasScript +
                         extraScripts +
-                        // "<script src=\x22https://cdn.jsdelivr.net/gh/aframevr/aframe@02f028bf319915bd5de1ef8b033495fe80b6729b/dist/aframe-master.min.js\x22></script>" +
+                       
                        
                         
 
@@ -4789,12 +4780,12 @@ webxr_router.get('/:_id', function (req, res) {
                         
                         "<script src=\x22../main/js/navigation.js\x22></script>" + //includes navmesh components (simple and not), and extended_wasd_controls
                         // "<script src=\x22../main/ref/aframe/dist/networked-aframe.min.js\x22></script>" + 
-                        // "<script src=\x22../main/ref/aframe/dist/aframe-layout-component.min.js\x22></script>" +  
+                       
                         "<script src=\x22../main/vendor/aframe/aframe-blink-controls.min.js\x22></script>" +   //TODO - check if req comes from vr headset
                        
-                        // "<script src=\x22../main/ref/aframe/dist/aframe-randomizer-components.min.js\x22></script>" +
+                        
                         enviromentScript +
-                        // "<script src=\x22../main/ref/aframe/dist/aframe_environment_component.min.js\x22></script>" +
+                       
                        
                         joystickScript +
 
@@ -4802,10 +4793,7 @@ webxr_router.get('/:_id', function (req, res) {
                         // "<script src=\x22../main/src/shaders/terrain.js\x22></script>"+
                        
                         "<script src=\x22../main/vendor/aframe/aframe-look-at-component.min.js\x22></script>"+
-                        // "<script src=\x22../main/vendor/aframe/aframe-teleport-controls.min.js\x22></script>"+
-                        
-                        // "<script src=\x22../main/vendor/aframe/aframe-entity-generator-component.min.js\x22></script>"+
-                        // "<script src=\x22../main/vendor/aframe/aframe-text-geometry-component.min.js\x22></script>"+
+                      
                         // "<script src=\x22../main/vendor/html2canvas/aframe-html-shader.min.js\x22></script>"+
                         primaryAudioScript +
                         ambientAudioScript +
@@ -4831,16 +4819,6 @@ webxr_router.get('/:_id', function (req, res) {
                         // "<script src=\x22../main/src/component/aframe-spritesheet-animation.js\x22></script>"+
                         "<script src=\x22../main/src/component/aframe-sprite-particles-component.js\x22></script>"+
                         
-
-                        // "<script src=\x22../main/vendor/aframe/animation-mixer.js\x22></script>"+
-                        // "<script src=\x22//cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js\x22></script>" +
-                        // "<script src=\x22../main/vendor/aframe/aframe-extras.controls.js\x22></script>"+  
-                        // "<script src=\x22../main/vendor/aframe/aframe-extras-pathfinding_20210520.js\x22></script>"+  
-                        // "<script src=\x22..//main/vendor/aframe/aframe-extras_20210520.js\x22></script>"+  
-                        
-                        
-                        // "<script src=\x22../main/vendor/trackedlibs/grab.js\x22></script>"+  
-
                         "<script src=\x22../main/src/component/aframe-troika-text.min.js\x22></script>"+
                         "<script src=\x22../main/src/component/mod-materials.js\x22></script>"+
 
@@ -4849,11 +4827,6 @@ webxr_router.get('/:_id', function (req, res) {
                         "<script src=\x22../main/src/component/spawn-in-circle.js\x22></script>"+
 
 
-                        // "<script src=\x22/main/vendor/jquery/jquery.min.js\x22></script>" +
-                        // "<script src=\x22/connect/connect.js\x22 defer=\x22defer\x22></script>" +
-                        // "<script type=\x22module\x22 src=\x22/main/src/component/drag-mangler.js\x22></script>"+
-                        // convertEquirectToCubemap +
-                        // "<script data-ad-client=\x22ca-pub-5450402133525063\x22 async src=\x22https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js\x22></script>"+
                         "</head>" +
                         "<body bgcolor='black'>" +
                         
@@ -5055,25 +5028,7 @@ webxr_router.get('/:_id', function (req, res) {
                         // "<a-entity id=\x22navmesh\x22 geometry=\x22primitive: plane; height: 30; width: 30; buffer: true;\x22 rotation=\x22-90 0 0\x22 nav-mesh></a-entity>"+
                         "</a-scene>\n"+ //CLOSE AFRAME SCENE
                         "</div>\n"+
-                            // "<style>\n"+
-                            //     "@import url(https://fonts.googleapis.com/css?family=Lobster);"+ //todo check for font refs
-                            // "/<style>\n"+
-
-                            // "a{ color:#fff;\n"+
-                            // "text-decoration:none;\n"+
-                            // "}\n"+
-                            // ".footer {\n"+
-                            // "position: fixed;\n"+
-                            // "left: 0;\n"+
-                            // "bottom: 0;\n"+
-                            // "width: 100%;\n"+
-                            // "background-color: black;\n"+
-                            // "color: white;\n"+
-                            // // "text-align: left;\n"+
-                            // "font-family: \x22Trebuchet MS\x22, Helvetica, sans-serif\n"+
-                            // "}\n"+
-                            // "</style>\n"+
-                        // "<div class=\x22renderPanel\x22 id=\x22renderPanel\x22></div>\n"+
+                         
                         
 
                         sceneTextItemData +
@@ -5115,26 +5070,15 @@ webxr_router.get('/:_id', function (req, res) {
                         navmeshScripts +
                         shaderScripts +
 
-                  "<script>\n"+
+                        "<script>\n"+ //TODO base64 this like the others, and only when a key marker is set
                             // "var avatarName = \x22" + avatarName + "\x22;\n" +
                             // "let globalStateObject = {};"
                            "function ready(f){/in/.test(document.readyState)?setTimeout('ready('+f+')',9):f()}\n"+
-                            
                             //    loadAttributions +
                                loadAvailableScenes +
                             // loadPictureGroups +
                             
-                           
-                        
                        "</script>\n"+
- 
-                       //<!-- Import maps polyfill -->
-                        //<!-- Remove this when import maps will be widely supported -->
-                        // "<script async src=\x22https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js\x22></script>"+
-                        // "<script type=\x22importmap\x22> {\x22imports\x22: {" +
-                        //     " \x22three\x22: \x22/s/three.module.js\x22"+
-                        // "}}</script>"+
-
                     
                         sceneManglerButtons +
                        

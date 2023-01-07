@@ -7514,6 +7514,8 @@ function CaptureVideo(video) {
 AFRAME.registerComponent('scene_greeting_dialog', {  //if "greeting" scenetag + sceneResponse.sceneGreeting
   schema: {
     
+    font1: {default: ""},
+    font2: {default: ""},
     lookAt: {default: false},
     lookAtTarget: {default: "#player"},
     greetingText: {default: ""},
@@ -7527,11 +7529,21 @@ AFRAME.registerComponent('scene_greeting_dialog', {  //if "greeting" scenetag + 
   init: function () {
 
     console.log("tryna set scene greeting " + this.data.greetingText);
-    this.font = "Acme.woff";
+    if (this.data.font1 != null && this.data.font1 != "") {
+      this.font = this.data.font1; 
+    } else {
+      this.font = "Acme.woff"; 
+    }
+    // this.font = this.data.font1; 
     if (settings && settings.sceneFontWeb1) {
       this.font = settings.sceneFontWeb1;
     }
-    this.font2 = "Acme.woff";
+    if (this.data.font2 != null && this.data.font2 != "") {
+      this.font2 = this.data.font2; 
+    } else {
+      this.font = "Acme.woff"; 
+    }
+    // this.font2 = "Acme.woff";
     if (settings && settings.sceneFontWeb2 && settings.sceneFontWeb2.length) {
       this.font2 = settings.sceneFontWeb2;
     }
