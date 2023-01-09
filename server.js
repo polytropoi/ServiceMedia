@@ -4315,20 +4315,24 @@ app.post('/process_staging_files', requiredAuthentication, function (req, res) {
                             group.type = "video";
                             group.name = "video " + ts;
                         } else {
-                            callbk(null);
-                        }
-                        db.groups.save(group, function (err, saved) {
-                            if ( err || !saved ) {
-                                console.log('group not saved..');
-                                callbk(err);
-                                // res.send("nilch");
+                            // callbk(null); caught in db save below?  
+                        if (group.type != undefined && group.type != null) {
+                            db.groups.save(group, function (err, saved) {
+                                if ( err || !saved ) {
+                                    console.log('group not saved..');
+                                    callbk(err);
+                                    // res.send("nilch");
+                                } else {
+                                    groupID = saved._id.toString();
+                                    console.log('new group created, id: ' + groupID);
+                                    callbk(null);
+                                    //res.send("group created : " + item_id);
+                                }
+                            });
                             } else {
-                                groupID = saved._id.toString();
-                                console.log('new group created, id: ' + groupID);
                                 callbk(null);
-                                //res.send("group created : " + item_id);
                             }
-                        });
+                        }
                     } else { //no group if only one
                         callbk(null);
                     }

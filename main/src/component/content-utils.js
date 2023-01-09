@@ -2540,6 +2540,7 @@ AFRAME.registerComponent('mod_object', {
     this.calloutEntity = null;
     this.calloutPanel = null;
     this.calloutText = null;
+    this.calloutString = "";
     this.selectedAxis = null;
     this.isSelected = false;
     this.hitPosition = null;
@@ -3217,12 +3218,12 @@ AFRAME.registerComponent('mod_object', {
                 var calloutChild = document.createElement('a-entity');
                 calloutChild.classList.add("activeObjexRay");
                 calloutChild.setObject3D("Object3D", child);
-                var callout = this.meshChildren[i].name.split("_")[0];
-                // console.log("callout string is " + callout);
+                this.calloutString = this.meshChildren[i].name.split("_")[0];
+                console.log("callout string is " + this.meshChildren[i].name);
 
                 // calloutChild.addEventListener('model-loaded', () => {
                   // console.log("callout! " +callout);
-                  calloutChild.setAttribute("model-callout", callout);
+                  calloutChild.setAttribute("model-callout", this.calloutString);
 
                 this.el.appendChild(calloutChild);
 
@@ -4595,6 +4596,7 @@ AFRAME.registerComponent('mod_model', {
       this.hasCallout = false;
       this.hasCalloutBackground = false;
       
+      this.calloutString = "";
       this.hitpoint = null;
       console.log("MOD MODEL eventData : " + this.data.eventData);
       this.hitpoint = new THREE.Vector3();
@@ -4975,22 +4977,24 @@ AFRAME.registerComponent('mod_model', {
                 // obj.updateMatrixWorld();
               }
             } else if(this.meshChildren[i].name.includes("callout")) {
-              // console.log("gotsa callout! " + this.meshChildren[i].name);
+             
               let child = this.el.object3D.getObjectByName(this.meshChildren[i].name, true);
               // console.log(child);
+              this.hasCallout = true;
               if (child != null && child != undefined) { 
                 //
-                var calloutChild = document.createElement('a-entity');
-                calloutChild.classList.add("activeObjexRay");
-                calloutChild.setObject3D("Object3D", child);
-                var callout = this.meshChildren[i].name.split("_")[0];
+                // var calloutChild = document.createElement('a-entity');
+                // calloutChild.classList.add("activeObjexRay");
+                // calloutChild.setObject3D("Object3D", child);
+                this.calloutString = this.meshChildren[i].name.split("_")[0];
+                console.log("gotsa callout! " + this.calloutString);
                 // console.log("callout string is " + callout);
 
                 // calloutChild.addEventListener('model-loaded', () => {
                   // console.log("callout! " +callout);
-                  calloutChild.setAttribute("model-callout", callout);
+                //   calloutChild.setAttribute("model-callout", this.calloutString);
 
-                this.el.appendChild(calloutChild);
+                // this.el.appendChild(calloutChild);
 
               }
             } else if(this.meshChildren[i].name.includes("haudio") && hvids.length > 0) {
@@ -5084,6 +5088,7 @@ AFRAME.registerComponent('mod_model', {
 
                     }
                   }
+                  
                     calloutEntity.setAttribute('visible', true);
                     let pos = evt.detail.intersection.point; //hitpoint on model
                     console.log("mousing a pic agt " + JSON.stringify(pos) + " title " + spics[spicsIndex].title);
@@ -5145,7 +5150,7 @@ AFRAME.registerComponent('mod_model', {
                 calloutEntity.setAttribute('visible', false);
 
                 calloutText.setAttribute("position", '0 0 .5'); //offset the child on z toward camera, to prevent overlap on model
-                calloutText.setAttribute("look-at", "#player")
+                // calloutText.setAttribute("look-at", "#player")
                 calloutText.setAttribute('troika-text', {
                   // width: 2,
                   baseline: "bottom",
@@ -5169,6 +5174,7 @@ AFRAME.registerComponent('mod_model', {
                     let pos = evt.detail.intersection.point; //hitpoint on model
                     console.log("mousing a pic agt " + JSON.stringify(pos) + " title " + hpics[hpicsIndex].title);
                     calloutEntity.setAttribute("position", pos);
+                    calloutEntity.setAttribute('scale', {x: this.distance * .25, y: this.distance * .25, z: this.distance * .25} );
                   // }
                 });
                 childEnt.addEventListener('mouseleave', (evt) => {
@@ -5480,21 +5486,22 @@ AFRAME.registerComponent('mod_model', {
             if (this.calloutEntity != null) {
               this.calloutEntity.setAttribute('visible', false);
             }
-            this.bubble = sceneEl.querySelector('.bubble');
+            // this.bubble = sceneEl.querySelector('.bubble');
             if (this.bubble) {
               this.bubble.setAttribute('visible', false);
-              if (this.bubbleBackground) {
-                this.bubbleBackground.setAttribute('scale', '1 1 1');
-              }
-                this.bubbleText.setAttribute('scale', '1 1 1' );
+              // if (this.bubbleBackground) {
+              //   this.bubbleBackground.setAttribute('scale', '1 1 1');
+              // }
+              //   this.bubbleText.setAttribute('scale', '1 1 1' );
             }
           }
         });
         this.el.addEventListener('mouseenter', (evt) =>  {
-          // console.log("mouseovewr model " + this.el.id);
+          console.log("mouseovewr model " + this.el.id);
           if (evt.detail.intersection != null && this.hitpoint != null) {
             
             if (hasCallout && !textData[textIndex].toLowerCase().includes("undefined")) {
+              console.log("callout is " + this.calloutString);
               let pos = evt.detail.intersection.point; //hitpoint on model
               // this.bubble.setAttribute('position', {"x": pos.x.toFixed(2), "y": pos.y.toFixed(2), "z": pos.z.toFixed(2)});
               this.bubble.setAttribute('position', evt.detail.intersection.point);
@@ -5585,11 +5592,13 @@ AFRAME.registerComponent('mod_model', {
   
 
             } else {
+              console.log("callout is " + this.calloutString);
+              distance = evt.detail.intersection.distance;
               this.bubble.setAttribute('position', pos);
               this.bubble.setAttribute("visible", true);
               this.bubbleText.setAttribute("visible", true);
-              
-              this.bubbleText.setAttribute('scale', {x: distance * .04, y: distance * .04, z: distance * .04} );
+              this.bubble.setAttribute('scale', {x: distance * .25, y: distance * .25, z: distance * .25} );
+              // this.bubbleText.setAttribute('scale', {x: distance * .04, y: distance * .04, z: distance * .04} );
               // this.bubbleText.setAttribute("position", "-.5 .2 .51");
               this.bubbleText.setAttribute('troika-text', {
                 baseline: "bottom",
@@ -5601,7 +5610,7 @@ AFRAME.registerComponent('mod_model', {
                 color: "white",
                 outlineColor: "black",
                 outlineWidth: "2%",
-                value: textData[textIndex]
+                value: this.calloutString
               });
   
               // this.bubble.setAttribute("position", this.hitpoint);
