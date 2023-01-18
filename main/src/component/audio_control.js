@@ -366,37 +366,38 @@ AFRAME.registerComponent('primary_audio_player', {  //setup and controls for the
                 }
                 document.querySelector("#primaryAudioText").setAttribute('visible', true);
                 // document.querySelector("#primaryAudioText").setAttribute("look-at", "#player");
-                getJSON('/netradiodetails', function(err, data) {
-                    if (data != null) {
-                        if (err !== null) {
-                            console.log('Something went wrong: ' + data);
-                        } else {
-                            console.log('streamdata ' + data.title);
-                            document.querySelector("#primaryAudioText").setAttribute('text', {
-                                // width: 4, 
-                                align: "left",
-                                value: "Stream: "+hostname+"\nPlaying: "+ data.title + "\n\nListeners: " + data.listeners + "\nBitrate: " + data.bitrate
-                            });
-                        }
-                    }
-                });
+                
+                        // getJSON('/netradiodetails', function(err, data) { //deprecated for now, bad vuln
+                        //     if (data != null) {
+                        //         if (err !== null) {
+                        //             console.log('Something went wrong: ' + data);
+                        //         } else {
+                        //             console.log('streamdata ' + data.title);
+                        //             document.querySelector("#primaryAudioText").setAttribute('text', {
+                        //                 // width: 4, 
+                        //                 align: "left",
+                        //                 value: "Stream: "+hostname+"\nPlaying: "+ data.title + "\n\nListeners: " + data.listeners + "\nBitrate: " + data.bitrate
+                        //             });
+                        //         }
+                        //     }
+                        // });
                 el.addEventListener('mouseenter', function () {
                     document.querySelector("#primaryAudioText").setAttribute('visible', true);
                     // document.querySelector("#primaryAudioText").setAttribute("look-at", "#player");
-                    getJSON('/netradiodetails', function(err, data) {
-                        if (data != null) {
-                            if (err !== null) {
-                                console.log('Something went wrong: ' + data);
-                            } else {
-                                console.log('streamdata ' + data.title);
-                                document.querySelector("#primaryAudioText").setAttribute('text', {
-                                    // width: 4, 
-                                    align: "left",
-                                    value: "Stream: "+hostname+"\nPlaying: "+ data.title + "\n\nListeners: " + data.listeners + "\nBitrate: " + data.bitrate
-                                });
-                            }
-                        }
-                    });
+                        // getJSON('/netradiodetails', function(err, data) { //deprecated for now, bad vuln
+                        //     if (data != null) {
+                        //         if (err !== null) {
+                        //             console.log('Something went wrong: ' + data);
+                        //         } else {
+                        //             console.log('streamdata ' + data.title);
+                        //             document.querySelector("#primaryAudioText").setAttribute('text', {
+                        //                 // width: 4, 
+                        //                 align: "left",
+                        //                 value: "Stream: "+hostname+"\nPlaying: "+ data.title + "\n\nListeners: " + data.listeners + "\nBitrate: " + data.bitrate
+                        //             });
+                        //         }
+                        //     }
+                        // });
                     // console.log('mousenter primary_audio_control');
                 });
                 el.setAttribute('light', {

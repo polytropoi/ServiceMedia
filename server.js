@@ -25,7 +25,7 @@ var express = require("express")
     , shortid = require('shortid')
     , QRCode = require('qrcode')
     // , transloadit = require('node-transloadit')
-    , internetradio = require('node-internet-radio')
+    // , internetradio = require('node-internet-radio')
     , requireText = require('require-text');
 
 
@@ -16026,11 +16026,13 @@ function getRandomInt(max) {
 app.post('/netradiodetails', function (req, res) {
     let streamurl = req.body.url;
     
-    // console.log("streamurl = "+ streamurl);
-    internetradio.getStationInfo(streamurl, function(error, station) {
-        console.log(station);
-        res.send(station);
-      }, internetradio.StreamSource.SHOUTCAST_V2);
+    // deprecated for now, lib has a bad vuln
+    // internetradio.getStationInfo(streamurl, function(error, station) {
+    //     console.log(station);
+    //     res.send(station);
+    //   }, internetradio.StreamSource.SHOUTCAST_V2);
+
+
 });
 // app.post('/netradioheaders', function (req, res) { //no workie
 //     let streamurl = req.body.url;
