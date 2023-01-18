@@ -183,7 +183,7 @@ webxr_router.get('/:_id', function (req, res) {
     // let primaryAudioLoop = false;
     let networkedscene = "";
     // let socketHost = req.headers.host;
-    let socketHost = "strr.us";
+    let socketHost = process.env.SOCKET_HOST;
     let avatarName = "guest";
     // let skyGradientScript = "";
     let textLocation = "";
@@ -482,7 +482,11 @@ webxr_router.get('/:_id', function (req, res) {
                 //TODO use sceneNetworkSettings or whatever
                 // socketScripts = "<script src=\x22/connect/connect.js\x22 defer=\x22defer\x22></script>" +
                 // "<script src=\x22/main/vendor/jquery/jquery.min.js\x22></script>" +
-                socketScripts = "<script src=\x22https://strr.us/socket.io/socket.io.js\x22></script>";
+                // socketScripts = "<script src=\x22https://strr.us/socket.io/socket.io.js\x22></script>";
+                if (process.env.SOCKET_HOST != "NONE") {
+                    socketScripts = "<script src=\x22/socket.io/socket.io.js\x22></script>"; //
+                }
+                
                 // "<script src=\x22/main/vendor/jscookie/js.cookie.min.js\x22></script>" +
                     
                 // TODO - backstretch include var!
@@ -4760,7 +4764,7 @@ webxr_router.get('/:_id', function (req, res) {
 
                         "<script src=\x22/main/vendor/jquery/jquery.min.js\x22></script>" +
                         
-                        "<script src=\x22../main/ref/aframe/dist/socket.io.slim.js\x22></script>" +
+                        // "<script src=\x22../main/ref/aframe/dist/socket.io.slim.js\x22></script>" +
                         
                         "<script src=\x22/connect/connect.js\x22 defer=\x22defer\x22></script>" +
                 

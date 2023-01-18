@@ -278,8 +278,8 @@ io.on("connection", socket => {
 // var socketUsers = {};
 // var allUsers = [];
 var io = require('socket.io')(server);
-var mongoAdapter = require('socket.io-adapter-mongo');
-io.adapter(mongoAdapter( process.env.MONGO_SESSIONS_URL ));
+// var mongoAdapter = require('socket.io-adapter-mongo');
+// io.adapter(mongoAdapter( process.env.MONGO_SESSIONS_URL ));
 // io.set('origins', 'servicemedia.net');
 io.set('transports', ['polling', 'websocket']);
 io.serveClient(true);
@@ -11701,7 +11701,7 @@ app.post('/appscenes/',  requiredAuthentication, function (req, res) { //get sce
 });
 app.get('/uscene/:user_id/:scene_id',  requiredAuthentication, uscene, function (req, res) { //view for updating scene for this user
 
-    console.log("tryna get scene id: ", req.params.scene_id + " excaped " + entities.decodeHTML(req.params._id));
+    console.log("tryna get scene id: ", req.params.scene_id + " excaped " + entities.decodeHTML(req.params.scene_id));
     var reqstring = entities.decodeHTML(req.params.scene_id).toString().replace(":", "");
 //    var sceneID = req.params.scene_id.toString().replace(":", "");
     var audioResponse = {};
@@ -14894,7 +14894,7 @@ app.get('/update_public_scene/:_id', requiredAuthentication, function (req, res)
                     "<a class=\x22mx-2 btn btn-primary btn-sm\x22 href=\x22../" + sceneResponse.short_id + "/webxr.html\x22 target=\x22_blank\x22>WebXR</a>" +
                     "</li>" +
                     "<li>" +
-                    "<a class=\x22mx-2 btn btn-primary btn-sm\x22 href=\x22https://strr.us/connect/?scene=" + sceneResponse.short_id + "\x22 target=\x22_blank\x22>Livecast</a>" +
+                    "<a class=\x22mx-2 btn btn-primary btn-sm\x22 href=\x22/connect/?scene=" + sceneResponse.short_id + "\x22 target=\x22_blank\x22>Livecast</a>" +
                     "</li>" +
                     "<li>" +
                     "<a class=\x22mx-2 pull-right  glyphicon glyphicon-envelope btn btn-primary btn-sm\x22 href=\x22mailto:" + sceneResponse.short_id + "@" + sceneResponse.sceneDomain + "\x22>Message</a>"+
@@ -16167,7 +16167,7 @@ app.get('/webxr_nope/:_id', function (req, res) { //TODO lock down w/ checkAppID
     let primaryAudioLoop = false;
     let networkedscene = "";
     // let socketHost = req.headers.host;
-    let socketHost = "strr.us";
+    let socketHost = process.env.SOCKET_HOST;
     let avatarName = "guest";
     let skyGradientScript = "";
     let textLocation = "";
@@ -16452,7 +16452,8 @@ app.get('/webxr_nope/:_id', function (req, res) { //TODO lock down w/ checkAppID
                 //TODO use sceneNetworkSettings or whatever
                 // socketScripts = "<script src=\x22/connect/connect.js\x22 defer=\x22defer\x22></script>" +
                 // "<script src=\x22/main/vendor/jquery/jquery.min.js\x22></script>" +
-                socketScripts = "<script src=\x22https://strr.us/socket.io/socket.io.js\x22></script>";
+                // socketScripts = "<script src=\x22https://strr.us/socket.io/socket.io.js\x22></script>";
+                socketScripts = "<script src=\x22/socket.io/socket.io.js\x22></script>";
                 // "<script src=\x22/main/vendor/jscookie/js.cookie.min.js\x22></script>" +
                     
                 // TODO - backstretch include var!
@@ -18897,7 +18898,7 @@ app.get('/webxr_nope/:_id', function (req, res) { //TODO lock down w/ checkAppID
                         let windowsIcon = "<span class=\x22windows_no\x22>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>";
                         let getAppLink = "<span class=\x22smallfont\x22><a class=\x22btn\x22 href=\x22https://servicemedia.net/landing/builds\x22 target=\x22_blank\x22>Get the app</a></span>&nbsp;";
 
-                        let connectLink = "<span class=\x22smallfont\x22><a class=\x22btn\x22 href=\x22https://strr.us/connect/?scene="+sceneResponse.short_id+"\x22 target=\x22_blank\x22>Connect</a></span>&nbsp;";
+                        let connectLink = "<span class=\x22smallfont\x22><a class=\x22btn\x22 href=\x22/connect/?scene="+sceneResponse.short_id+"\x22 target=\x22_blank\x22>Connect</a></span>&nbsp;";
                         let loginLink = "<span class=\x22smallfont\x22><a class=\x22btn\x22 href=\x22https://servicemedia.net/main/login.html\x22 target=\x22_blank\x22>Login</a></span>";
                         let primaryAudioSliderChunk = "";
                         let ambientAudioSliderChunk = "";

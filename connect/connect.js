@@ -65,7 +65,8 @@ let mouseDowntime = 0;
 var token = document.getElementById("token").getAttribute("data-token"); 
 var localtoken = localStorage.getItem("smToken");
 // let socketHost = "http://localhost:3000";
-let socketHost = "https://strr.us";
+let socketHost = null;
+var socket = null; //the socket.io instance below
 
 
 $('a-entity').each(function() {  //external way of getting click duration for physics
@@ -196,7 +197,7 @@ $(function() {
       console.log("Loading browser MATRIX sdk!!!");
       GetMatrixData();
    }
-   if (settings.clearLocalMods) {
+   if (settings.clearLocalMods) { //??????
       for (var i=0; i < localStorage.length; i++)  {
       
          let theKey = localStorage.key(i);
@@ -206,10 +207,16 @@ $(function() {
          }
       }
    }
+
+   if (settings.socketHost) {
+      socketHost = settings.socketHost;
+   }
+
    let primaryAudioEventData = document.getElementById("audioEventsData");
    if (primaryAudioEventData) {
       SetPrimaryAudioEventsData();
    }
+
   
 
    // this.asky = document.getElementsByTagName('a-sky')[0];
@@ -687,7 +694,7 @@ function GoToPrevious() {
             currentLocationIndex = poiLocations.length - 1;
          }
         
-            GoToLocation(poiLocations[currentLocationIndex].phID);
+         GoToLocation(poiLocations[currentLocationIndex].phID);
          // }
       }
       if (skyboxEl != null) {
@@ -875,7 +882,7 @@ function CreatePlaceholder () {
    sceneEl.appendChild(phEl);
    ShowHideDialogPanel();
    
- }
+}
 
 async function ConnectToEthereum() {
    const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
@@ -928,7 +935,7 @@ function tcheck () {
          
          if (data == '0' || data == '1' || data == '3' || data == '1' || data == '4' || data == '5') {//all auth fails
             // console.log("guest token");
-            if (socket != undefined) {
+            if (socket != null && socket != undefined) {
                if (!socket.connected) {
                   socket.connect(socketHost);
                }
@@ -947,7 +954,7 @@ function tcheck () {
                   // userid = data._id;
                   avatarName = data.userName;
                   userData = data;
-                  if (socket != undefined) {
+                  if (socket != null && socket != undefined) {
                      if (!socket.connected) {
                         socket.connect(socketHost);
                      }
@@ -1241,8 +1248,10 @@ function RandomHexColor() {
    return  "#000000".replace(/0/g,function(){return (~~(Math.random()*16)).toString(16);});
 }
 
-// if (settings.hideAvatars) {
-   var socket = io.connect(socketHost, {
+function InitSocket () {
+if (settings && !socket) {
+
+   socket = io.connect(socketHost, {
          query : {
             token: token,
             uname: avatarName,
@@ -1252,7 +1261,8 @@ function RandomHexColor() {
          url: socketHost + "/socket.io/?EIO=4&transport=polling&t=NNjNltH",
          autoConnect: false,  //connection is opened if token checks out above
          reconnection: false
-   });      
+         });      
+      }
 
    socket.on('connect', function() {
    
@@ -1439,6 +1449,21 @@ function RandomHexColor() {
       }
       EmitSelfPosition();
    });
+
+   socket.on('selfplayerposition', function() {
+      let pAvatar = document.getElementById(mySocketID);
+      if (pAvatar != null) {
+         pAvatar.setAttribute('position', cameraPosition.x + " " + cameraPosition.y + " " + cameraPosition.z);
+      }
+   });
+
+   socket.on('disconnect', function() {
+      UpdatePlayerAvatars(roomUsers);
+   });
+   socket.on('user left', function(id) {
+      console.log("user left with socket id " + id);
+   });
+} //InitSocket end
 // } //end if settings.hideAvatars
 function MoveElement(id,posRotObj) { //jesjus wweeeeped
    var element = document.getElementById(id);
@@ -1472,19 +1497,19 @@ function MoveElement(id,posRotObj) { //jesjus wweeeeped
    }, 100);
 }
 
-socket.on('selfplayerposition', function() {
-   let pAvatar = document.getElementById(mySocketID);
-   if (pAvatar != null) {
-      pAvatar.setAttribute('position', cameraPosition.x + " " + cameraPosition.y + " " + cameraPosition.z);
-   }
-});
+// socket.on('selfplayerposition', function() {
+//    let pAvatar = document.getElementById(mySocketID);
+//    if (pAvatar != null) {
+//       pAvatar.setAttribute('position', cameraPosition.x + " " + cameraPosition.y + " " + cameraPosition.z);
+//    }
+// });
 
-socket.on('disconnect', function() {
-   UpdatePlayerAvatars(roomUsers);
-});
-socket.on('user left', function(id) {
-   console.log("user left with socket id " + id);
-})
+// socket.on('disconnect', function() {
+//    UpdatePlayerAvatars(roomUsers);
+// });
+// socket.on('user left', function(id) {
+//    console.log("user left with socket id " + id);
+// });
 // function lerp (start, end, amt){
 //    return (1-amt)*start+amt*end
 //  }
@@ -1519,7 +1544,10 @@ function EmitSelfPosition() {
                if (JSON.stringify(cameraPosition) != lastPosition) {
                      // console.log('emitting!');
                   // window.playerPosition = cameraPosition;
-                  socket.emit("updateplayerposition", room, avatarName, cameraPosition.x, cameraPosition.y, cameraPosition.z, cameraRotation.x, cameraRotation.y, cameraRotation.z, mySocketID, "aframe"); 
+                  if (socket) {
+                     socket.emit("updateplayerposition", room, avatarName, cameraPosition.x, cameraPosition.y, cameraPosition.z, cameraRotation.x, cameraRotation.y, cameraRotation.z, mySocketID, "aframe"); 
+                  }
+                  
                   lastPosition = JSON.stringify(cameraPosition);
                   // lastRotation = JSON.stringify(cameraRotation);                     
                }
@@ -1572,7 +1600,10 @@ function SendChatMessage() {
    console.log("tryna send " + message);
    $('#future').prepend("<div class=\x22messageBubbleOut\x22 style=\x22float: right;\x22>you:</span> " +  message +"</div><br><br><br>");
    // $('#future').prepend($('<div style=\x22float: right;\x22><span style=\x22margin: 5px 5px 5px 5px;\x22 class=\x22smallfont_lightgreen\x22>').html( ">you:</span> " +  message +"</div>").append("<hr>"));
-   socket.emit('user message', message); //but not to ourselfs
+   if (socket) {
+      socket.emit('user message', message); //but not to ourselfs
+   }
+   
    UpdateContentBox();
    document.getElementById("chat_input").value = "";
    }
