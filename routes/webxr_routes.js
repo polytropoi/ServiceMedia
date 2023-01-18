@@ -483,7 +483,7 @@ webxr_router.get('/:_id', function (req, res) {
                 // socketScripts = "<script src=\x22/connect/connect.js\x22 defer=\x22defer\x22></script>" +
                 // "<script src=\x22/main/vendor/jquery/jquery.min.js\x22></script>" +
                 // socketScripts = "<script src=\x22https://strr.us/socket.io/socket.io.js\x22></script>";
-                if (process.env.SOCKET_HOST != "NONE") {
+                if (socketHost != null && socketHost != "NONE") {
                     socketScripts = "<script src=\x22/socket.io/socket.io.js\x22></script>"; //
                 }
                 
@@ -537,7 +537,7 @@ webxr_router.get('/:_id', function (req, res) {
                         sceneNextScene = sceneResponse.sceneNextScene;
                         let poiIndex = 0;
                         scenePreviousScene = sceneResponse.scenePreviousScene;
-                        console.log("sceneResponse.sceneNetworking " + sceneResponse.sceneNetworking);
+                        console.log("sceneResponse.sceneNetworking " + sceneResponse.sceneNetworking); //for networked aframe, baybe bring it back
                         if (sceneResponse.sceneNetworking == "SocketIO")
                         networkedscene = "networked-scene=\x22serverURL: "+socketHost+"; app: "+sceneData.sceneDomain+" ; room: "+sceneData.short_id+"; connectOnLoad: true; onConnect: onConnect; adapter: socketio; audio: false; debug: false;\x22";
                         if (sceneResponse.sceneNetworking == "WebRTC")
