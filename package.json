@@ -35,7 +35,7 @@
     "socket.io": "^2.5.0",
     "socket.io-adapter-mongo": "^2.0.5",
     "ssi": "^0.3.0",
-    "stripe": "^4.25.0",
+    "stripe": "^11.6.0",
     "validator": "^13.7.0"
   }
 }
