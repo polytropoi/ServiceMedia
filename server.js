@@ -16,6 +16,7 @@ var express = require("express")
     , session = require('express-session')
     , entities = require("entities")
     , validator = require('validator')
+    , minio = require('minio')
     // , util = require('util')
     , helmet = require('helmet')
     , ObjectID = require("bson-objectid")
@@ -158,8 +159,20 @@ var store = new MongoDBStore({ //store session cookies in a separate db with dif
     aws.config = new aws.Config({accessKeyId: process.env.AWSKEY, secretAccessKey: process.env.AWSSECRET, region: process.env.AWSREGION});
     var ses = new aws.SES({apiVersion : '2010-12-01'});
     var s3 = new aws.S3();
+
+    var minioClient = null;
+    if (process.env.MINIOKEY && process.env.MINIOKEY != "" && process.env.MINIOENDPOINT && process.env.MINIOENDPOINT != "") {
+            minioClient = new minio.Client({
+            endPoint: process.env.MINIOENDPOINT,
+            port: 9000,
+            useSSL: false,
+            accessKey: process.env.MINIOKEY,
+            secretKey: process.env.MINIOSECRET
+        });
+    }
+
     var appAuth = "noauth";
-    let docClient = new aws.DynamoDB.DocumentClient();
+    // let docClient = new aws.DynamoDB.DocumentClient();
     let trafficTable = "traffic_1";
 
     var server = http.createServer(app);
@@ -648,15 +661,15 @@ function traffic (req, res, next) {
             
         }
     };
-    docClient.put(params, function (err, data) {
-        if (err) {
-           console.log("traffic logging error : " + err);
-            next();
-        } else {
-            // console.log("XXXX updated traffic log " + req.body);
-            next();
-        }
-    });
+    // docClient.put(params, function (err, data) {
+    //     if (err) {
+    //        console.log("traffic logging error : " + err);
+    //         next();
+    //     } else {
+    //         // console.log("XXXX updated traffic log " + req.body);
+    //         next();
+    //     }
+    // });
 }
 
 function nameCleaner(name) {
@@ -877,7 +890,15 @@ function saveActivity (data) {
         }
     });
 }
-
+/////////////////////////  TODO - replace all s3 getSignedUrl calls with this, promised based version, to suport minio, etc... !
+async function ReturnPresignedUrl(bucket, key, time) {
+    
+    if (minioClient) {
+        return minioClient.presignedGetObject(bucket, key, time);
+    } else {
+        return s3.getSignedUrl('getObject', {Bucket: bucket, Key: key, Expires: time}); //returns a promise if called in async function?
+    } 
+}
 
 //ROUTES BELOW
 ////////////////////////////////////////////////////////////////
@@ -13075,6 +13096,7 @@ app.post('/linkable_scenes/',  function (req, res) {
     });
 });
 */
+
 app.get('/publicscenes', function (req, res) { //deprecated, see available scenes above...
     console.log("host is " + req.get('host'));
     // if (req.get('host') == "servicemedia.net") {
@@ -13093,13 +13115,8 @@ app.get('/publicscenes', function (req, res) { //deprecated, see available scene
             async.each(scenes,
                 // 2nd param is the function that each item is passed to
                 function (scene, callback) {
-                    // Call an asynchronous function, often a save() to DB
-                    //            scene.someAsyncCall(function () {
-                    // Async call is done, alert via callback
                     if (scene.scenePostcards != null && scene.scenePostcards.length > 0 && scene.scenePostcards[0] != undefined) {
                         postcardIndex = getRandomInt(0, scene.scenePostcards.length - 1);
-//                        db.image_items.find({postcardForScene: scene.short_id}).sort({otimestamp: -1}).limit(maxItems).toArray(function (err, picture_items) {
-//                    console.log("tryna find postcard: " + scene.scenePostcards[postcardIndex]);
                         var oo_id = ObjectID(scene.scenePostcards[postcardIndex]); //TODO randomize? or ensure latest?  or use assigned default?
                         db.image_items.findOne({"_id": oo_id}, function (err, picture_item) {
 
@@ -13107,49 +13124,45 @@ app.get('/publicscenes', function (req, res) { //deprecated, see available scene
                                 console.log("error getting picture items: 3" + JSON.stringify(scene.scenePostcards[postcardIndex]));
 
                             } else {
-//                                console.log("# " + picture_items.length);
-//                                    for (var i = 0; i < 1; i++) {
-
                                 var item_string_filename = JSON.stringify(picture_item.filename);
                                 item_string_filename = item_string_filename.replace(/\"/g, "");
                                 var item_string_filename_ext = getExtension(item_string_filename);
                                 var expiration = new Date();
                                 expiration.setMinutes(expiration.getMinutes() + 30);
                                 var baseName = path.basename(item_string_filename, (item_string_filename_ext));
-//                                    console.log(baseName);
                                 var thumbName = 'thumb.' + baseName + item_string_filename_ext;
                                 var halfName = 'half.' + baseName + item_string_filename_ext;
                                 var quarterName = 'quarter.' + baseName + item_string_filename_ext;
-                                var standardName = 'standard.' + baseName + item_string_filename_ext;
+                                // var standardName = 'standard.' + baseName + item_string_filename_ext;
 
-//                            var urlThumb = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_items[i].userID, Key: picture_items[i]._id + "." + thumbName, Expires: 6000}); //just send back thumbnail urls for list
-                                var urlHalf = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + "." + halfName, Expires: 6000}); //just send back thumbnail urls for list
-                                var urlQuarter = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + "." + quarterName, Expires: 6000}); //just send back thumbnail urls for list
-                                var tempOwnerName = "test"
-                                var availableScene = {
-                                    sceneWindowsOK: scene.sceneWindowsOK,
-                                    sceneAndroidOK: scene.sceneAndroidOK,
-                                    sceneIosOK: scene.sceneIosOK,
-                                    sceneDomain: scene.sceneDomain,
-                                    sceneTitle: scene.sceneTitle,
-                                    sceneKey: scene.short_id,
-                                    sceneStatus: scene.sceneShareWithPublic ? "public" : "private",
-//                                  sceneOwner: scene.userName,
-                                    sceneOwner: tempOwnerName,
-                                    scenePostcardHalf: urlHalf,
-                                    scenePostcardQuarter: urlQuarter
-                                };
-                                if (availableScene.sceneDomain != "xrswim.com") { //hrm...
-                                    availableScenesResponse.availableScenes.push(availableScene);
-                                }
-                                
+                                (async () => {  //new way of fetching urls as a promise, to flex with minio, etc..
+                                    try {
+                                        var urlHalf = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, "users/" + picture_item.userID + "/pictures/" + picture_item._id + "." + halfName, 6000);
+                                        var urlQuarter = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, "users/" + picture_item.userID + "/pictures/" + picture_item._id + "." + quarterName, 6000);
+                                        // console.log("tyryna get mibno urls... " + urlHalf);
+                                        var tempOwnerName = "test"
+                                        var availableScene = {
+                                            sceneWindowsOK: scene.sceneWindowsOK,
+                                            sceneAndroidOK: scene.sceneAndroidOK,
+                                            sceneIosOK: scene.sceneIosOK,
+                                            sceneDomain: scene.sceneDomain,
+                                            sceneTitle: scene.sceneTitle,
+                                            sceneKey: scene.short_id,
+                                            sceneStatus: scene.sceneShareWithPublic ? "public" : "private",
+        //                                  sceneOwner: scene.userName,
+                                            sceneOwner: tempOwnerName,
+                                            scenePostcardHalf: urlHalf,
+                                            scenePostcardQuarter: urlQuarter
+                                        };
+                                        if (availableScene.sceneDomain != "xrswim.com") { //hrm...
+                                            availableScenesResponse.availableScenes.push(availableScene);
+                                        }
+                                        callback();
+                                    } catch (e) {
+                                        callback(e);
+                                    }
+                                })();
                             }
-    //                        console.log("publicScene: " + publicScene);
-    //                        availableScenesResponse.availableScenes.push(availableScene);
-    //                        console.log("publicScenesResponse :" + JSON.stringify(publicScenesResponse));
-//                            publicScenes.push(publicScene);
-//                                }
-                            callback();
                         });
                     } else {
                         callback();
@@ -13157,18 +13170,15 @@ app.get('/publicscenes', function (req, res) { //deprecated, see available scene
                 },
                 // 3rd param is the function to call when everything's done
                 function (err) {
-                    // All tasks are done now
-//            doSomethingOnceAllAreDone();
-//                console.log("publicScenesResponse :" + JSON.stringify(publicScenesResponse));
-                    res.send(availableScenesResponse);
+                    if (err) {
+                        res.send(err);
+                    } else {
+                        res.send(availableScenesResponse);
+                    }
                 }
             );
         }
-
     });
-// } else {
-//     res.redirect("https://servicemedia.net");
-// }
 });
 
 app.get('/singlescenedata/:scenekey', function (req, res) { //returns a public scene id and standard url for postcard
