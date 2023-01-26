@@ -21,7 +21,7 @@
         if (cookie != null && cookie._id != null) {
         console.log("gotsa cookie: " + cookie._id );
         $.get( "/ami-rite/" + cookie._id, function( data ) {
-            console.log("amirite : " + JSON.stringify(data));
+            // console.log("amirite : " + JSON.stringify(data));
             if (data == 0) {
                 window.location.href = './login.html';
                 // console.log("data equals zero?");
@@ -17351,6 +17351,7 @@ function getAllPeople() {
             })
             .use(Uppy.AwsS3, {
             getUploadParameters (file) {
+                console.log('tryna fetch /stagingputurl/' + cookie._id);
             return fetch('/stagingputurl/' + cookie._id, {
             method: 'post',
         // Send and receive JSON.

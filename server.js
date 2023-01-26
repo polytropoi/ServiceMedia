@@ -890,7 +890,7 @@ function saveActivity (data) {
         }
     });
 }
-/////////////////////////  TODO - replace all s3 getSignedUrl calls with this, promised based version, to suport minio, etc... !
+///////////////////////// OBJECT STORE (S3, Minio, etc) OPS BELOW - TODO - replace all s3 getSignedUrl calls with this, promised based version, to suport minio, etc... (!)
 async function ReturnPresignedUrl(bucket, key, time) {
     
     if (minioClient) {
@@ -899,6 +899,45 @@ async function ReturnPresignedUrl(bucket, key, time) {
         return s3.getSignedUrl('getObject', {Bucket: bucket, Key: key, Expires: time}); //returns a promise if called in async function?
     } 
 }
+async function ReturnObjectMetadata(bucket, key) { //s3.headObject == minio.statObject
+    if (minioClient) {
+
+    } else {
+        s3.headObject(params, function (err, data) {
+            if (err && err.code === 'NotFound') {
+                // Handle no object on cloud here
+                console.log(err);
+                // callback(err);
+                // res.send("staged file not found");
+                return err
+            } else {
+                // meateada = metadata;
+                console.log("staged file meateada " + data);
+                // callback(null);
+                return data;
+            }
+        });
+    }
+}
+async function CopyObject(targetBucket, copySource, key) {
+    if (minioClient) {
+
+    } else {
+        s3.copyObject({Bucket: targetBucket, CopySource: copySource, Key: key}, function (err,data){
+            if (err) {
+                console.log("ERROR copyObject" + err);
+                // callback(err);
+                return err;
+            } else {
+                console.log("SUCCESS copyObject key " + key );
+                return data;
+                // callback(null);
+                // callback(null, item_id, tUrl);
+            }
+        });
+    }
+} 
+
 
 //ROUTES BELOW
 ////////////////////////////////////////////////////////////////
@@ -3801,17 +3840,18 @@ app.post('/process_staging_files', requiredAuthentication, function (req, res) {
     var itemsExtensions = itemsArray.map(item => {
         return getExtension(item.key).toLowerCase();
     });
-
+    var stagingBucket = process.env.STAGING_BUCKET_NAME;
     var meateada = {};
     var groupitems = [];
     var params = {
-        Bucket: 'archive1',
+        Bucket: process.env.STAGING_BUCKET_NAME,
     };
+    params.Delete = {Objects:[]};
     var originalName = function (name) {
         var index = name.indexOf("_");
         return name.substring(index + 1); //strip off prepended timestamp and _ for title and stuff
     }
-    params.Delete = {Objects:[]};
+
     const allEqual = itemsExtensions => itemsExtensions.every( v => v === itemsExtensions[0] ); //if all extensions the same, then make a group (which is the point)
     console.log("same extensions: "+ itemsExtensions[0]);
 
@@ -3836,19 +3876,54 @@ app.post('/process_staging_files', requiredAuthentication, function (req, res) {
                         function (callback) {
                             console.log("groupTYpe : " + groupType);
                             // console.log("Bucket exists and we have access");
-                            var params = {Bucket: 'archive1', Delimiter: item.uid, Key: "staging/" + item.uid + "/" + itemKey}    
-                            s3.headObject(params, function (err, data) {
-                                if (err && err.code === 'NotFound') {
-                                    // Handle no object on cloud here
-                                    console.log(err);
-                                    callback(err);
-                                    res.send("staged file not found");
+                            (async () => {  // to flex with minio, etc..
+                                if (minioClient) {
+                                    try {
+                                        minioClient.statObject(stagingBucket, "staging/" + item.uid + "/" + itemKey, function(err, stat) {
+                                            if (err) {
+                                              return console.log(err)
+                                            }
+                                            console.log("minio statObject " + stat);
+                                            callback(null);
+                                        });
+                                        callback(null);
+                                    } catch (e) {
+                                        callback(e);
+                                    }
                                 } else {
-                                    // meateada = metadata;
-                                    console.log("staged file meateada " + data);
-                                    callback(null);
+                                    var params = {Bucket: stagingBucket, Delimiter: item.uid, Key: "staging/" + item.uid + "/" + itemKey}    
+                                    s3.headObject(params, function (err, data) {
+                                        if (err && err.code === 'NotFound') {
+                                            // Handle no object on cloud here
+                                            console.log(err);
+                                            callback(err);
+                                            res.send("staged file not found");
+                                        } else {
+                                            // meateada = metadata;
+                                            console.log("staged file meateada " + data);
+                                            callback(null);
+                                        }
+                                    });
                                 }
-                            });
+                            })();
+                            // var params = {Bucket: 'archive1', Delimiter: item.uid, Key: "staging/" + item.uid + "/" + itemKey}    
+                            // s3.headObject(params, function (err, data) {
+                            //     if (err && err.code === 'NotFound') {
+                            //         // Handle no object on cloud here
+                            //         console.log(err);
+                            //         callback(err);
+                            //         res.send("staged file not found");
+                            //     } else {
+                            //         // meateada = metadata;
+                            //         console.log("staged file meateada " + data);
+                            //         callback(null);
+                            //     }
+                            // });
+                            // if (ReturnObjectMetadata(stagingBucket, "staging/" + item.uid + "/" + itemKey)) {
+
+                            // } else {
+
+                            // }
                         },
                         //TODO do this later, and copy the whole user folder
                         // function(callback) { //copy file to the archive folder (current staging one will be deleted) 
@@ -3866,32 +3941,74 @@ app.post('/process_staging_files', requiredAuthentication, function (req, res) {
                         //     });
                         // },
                         function (callback) { // get the size for the source file
-                            console.log("item uid : " + item.uid);
-                            var params = {Bucket: 'archive1', Key: "staging/" + item.uid + "/" + itemKey};
-                            s3.headObject(params, function(err, data) {
-                                if (err) {
-                                    console.log(err, err.stack);  // an error occurred
-                                    callback(err);
+                            // console.log("item uid : " + item.uid);
+                            // var params = {Bucket: 'archive1', Key: "staging/" + item.uid + "/" + itemKey};
+                            // s3.headObject(params, function(err, data) {
+                            //     if (err) {
+                            //         console.log(err, err.stack);  // an error occurred
+                            //         callback(err);
+                            //     } else {
+                            //         console.log(data);           // successful response
+                            //         size = data.ContentLength;
+                            //         console.log("sizeOf = " + size);
+                            //         callback(null);
+                            //     }    
+                            // });
+                            (async () => {  //flex with minio, etc..
+                                if (minioClient) {
+                                    try {
+                                        minioClient.statObject(stagingBucket, "staging/" + item.uid + "/" + itemKey, function(err, stat) {
+                                            if (err) {
+                                              return console.log(err)
+                                            }
+                                            console.log("minio statObject " + stat);
+                                            callback(null);
+                                        });
+                                        
+                                    } catch (e) {
+                                        callback(e);
+                                    }
                                 } else {
-                                    console.log(data);           // successful response
-                                    size = data.ContentLength;
-                                    console.log("sizeOf = " + size);
-                                    callback(null);
-                                }    
-                            });
+                                    var params = {Bucket: stagingBucket, Key: "staging/" + item.uid + "/" + itemKey}    
+                                    s3.headObject(params, function (err, data) {
+                                        if (err && err.code === 'NotFound') {
+                                            // Handle no object on cloud here
+                                            console.log(err);
+                                            callback(err);
+                                            res.send("staged file not found");
+                                        } else {
+                                            console.log(data);  
+                                            size = data.ContentLength;
+                                            console.log("sizeOf = " + size);
+                                            callback(null);
+                                        }
+                                    });
+                                }
+                            })();
+                            
                         },
                         function (callback) { // Get a url for the source file
-                            console.log("item uid : " + item.uid);
-                            var params = {Bucket: 'archive1', Key: "staging/" + item.uid + "/" + itemKey};
-                            s3.getSignedUrl('getObject', params, function (err, url) {
-                                if (err) {
-                                    console.log(err);
-                                    cb();
-                                } else {
-                                    console.log("The URL is", url);
+                            console.log("stagign item uid : " + item.uid);
+                            // var params = {Bucket: 'archive1', Key: "staging/" + item.uid + "/" + itemKey};
+
+                            // s3.getSignedUrl('getObject', params, function (err, url) {
+                            //     if (err) {
+                            //         console.log(err);
+                            //         cb(); //?
+                            //     } else {
+                            //         console.log("The URL is", url);
+                            //         callback(null, url);
+                            //     }
+                            // });
+                            (async () => {  
+                                try {
+                                    url = await ReturnPresignedUrl(stagingBucket, "staging/" + item.uid + "/" + itemKey, 6000);
+                                    
                                     callback(null, url);
+                                } catch (e) {
+                                    callback(e);
                                 }
-                            });
+                            })();
                         },
                         function (tUrl, callback) { //make an appropriate (by file extension) record in the db and get an _id
                             if (groupType == ".jpg" || groupType == ".jpeg" || groupType == ".JPG" || groupType == ".png" || groupType == ".PNG") {
@@ -3921,17 +4038,29 @@ app.post('/process_staging_files', requiredAuthentication, function (req, res) {
                                             var ck = "users/" + saved.userID + "/pictures/originals/" + item_id + ".original." + saved.filename; //path change!
                                             console.log("tryna copy origiinal to " + ck);
                                             var targetBucket = "servicemedia";
-                                            s3.copyObject({Bucket: targetBucket, CopySource: copySource, Key: ck}, function (err,data){
-                                                if (err) {
-                                                    console.log("ERROR copyObject" + err);
-                                                    callback(err);
-                                                } else {
-                                                    console.log("SUCCESS copyObject key " + ck );
-                                                    // callback(null);
-                                                    callback(null, item_id, tUrl);
+                                            (async () => {  
+                                                try {
+                                                    if (minioClient) {
+
+                                                    } else {
+                                                        s3.copyObject({Bucket: targetBucket, CopySource: copySource, Key: ck}, function (err,data){
+                                                            if (err) {
+                                                                console.log("ERROR copyObject" + err);
+                                                                callback(err);
+                                                            } else {
+                                                                console.log("SUCCESS copyObject key " + ck );
+                                                                // callback(null);
+                                                                callback(null, item_id, tUrl);
+                                                            }
+                                                        });
+                                                    }
+                                                    // let copyResponse = await CopyObject(targetBucket, copySource, ck).promise(); //later
+                                                    // console.log("copy response: "+ copyResponse);
+                                                    // callback(null, item_id, tUrl);
+                                                } catch (e) {
+                                                    callback(e);
                                                 }
-                                            });
-                                            
+                                            })();
                                         }
                                     }
                                 );
@@ -3968,16 +4097,37 @@ app.post('/process_staging_files', requiredAuthentication, function (req, res) {
                                             var ck = "users/" + saved.userID + "/audio/originals/" + item_id + ".original." + saved.filename; //path change!
                                             console.log("tryna copy origiinal to " + ck);
                                             var targetBucket = "servicemedia";
-                                            s3.copyObject({Bucket: targetBucket, CopySource: copySource, Key: ck}, function (err,data){
-                                                if (err) {
-                                                    console.log("ERROR audio copyObject" + err);
-                                                    callback(err);
-                                                } else {
-                                                    console.log("SUCCESS copyObject audio key " + ck );
-                                                    // callback(null);
-                                                    callback(null, item_id, tUrl);
+
+                                            (async () => {  
+                                                try {
+                                                    if (minioClient) {
+
+                                                    } else {
+                                                        s3.copyObject({Bucket: targetBucket, CopySource: copySource, Key: ck}, function (err,data){
+                                                            if (err) {
+                                                                console.log("ERROR copyObject" + err);
+                                                                callback(err);
+                                                            } else {
+                                                                console.log("SUCCESS copyObject key " + ck );
+                                                                // callback(null);
+                                                                callback(null, item_id, tUrl);
+                                                            }
+                                                        });
+                                                    }
+                                                } catch (e) {
+                                                    callback(e);
                                                 }
-                                            });
+                                            })();
+                                            // s3.copyObject({Bucket: targetBucket, CopySource: copySource, Key: ck}, function (err,data){
+                                            //     if (err) {
+                                            //         console.log("ERROR audio copyObject" + err);
+                                            //         callback(err);
+                                            //     } else {
+                                            //         console.log("SUCCESS copyObject audio key " + ck );
+                                            //         // callback(null);
+                                            //         callback(null, item_id, tUrl);
+                                            //     }
+                                            // });
                                         }
                                     }
                                 );
@@ -4130,7 +4280,7 @@ app.post('/process_staging_files', requiredAuthentication, function (req, res) {
                                     //   console.log(response.statusText);
                                     //   console.log(response.headers);
                                     //   console.log(response.config);
-                                        callback(null);
+                                        
                                     })
                                     .catch(function (error) {
                                         // handle error
@@ -4139,6 +4289,7 @@ app.post('/process_staging_files', requiredAuthentication, function (req, res) {
                                     })
                                     .then(function () {
                                         // console.log('nerp');
+                                        callback(null);
                                     });
 
                                    
@@ -4179,7 +4330,7 @@ app.post('/process_staging_files', requiredAuthentication, function (req, res) {
                                     //   console.log(response.statusText);
                                     //   console.log(response.headers);
                                     //   console.log(response.config);
-                                        callback(null);
+                                        // callback(null);
                                     })
                                     .catch(function (error) {
                                         // handle error
@@ -4188,6 +4339,7 @@ app.post('/process_staging_files', requiredAuthentication, function (req, res) {
                                     })
                                     .then(function () {
                                         // console.log('nerp');
+                                        callback(null);
                                     });
                                 }
                             } else if (groupType.toLowerCase() == ".mpg" || groupType.toLowerCase() == ".mp4" || groupType.toLowerCase() == ".mkv" || groupType.toLowerCase() == ".webm" || groupType.toLowerCase() == ".mov") {
@@ -4196,91 +4348,178 @@ app.post('/process_staging_files', requiredAuthentication, function (req, res) {
                                 
                                 var ck = "users/" + item.uid + "/video/" + iID + "/" + iID + "." + itemKey;
                                 console.log("tryna process a video file " + copySource + " to " + targetBucket + ck);
-                                s3.copyObject({Bucket: targetBucket, CopySource: copySource, Key: ck}, function (err, data){
-                                    if (err) {
-                                        console.log("ERROR copyObject" + err);
-                                        callback(err);
+
+
+                                // s3.copyObject({Bucket: targetBucket, CopySource: copySource, Key: ck}, function (err, data){
+                                //     if (err) {
+                                //         console.log("ERROR copyObject" + err);
+                                //         callback(err);
+                                //     }
+                                //     else {
+                                //         console.log("SUCCESS copyObject key " + ck );
+                                //         callback(null);
+                                //     }
+                                // });
+                                (async () => {  
+                                    try {
+                                        if (minioClient) {
+
+                                        } else {
+                                            s3.copyObject({Bucket: targetBucket, CopySource: copySource, Key: ck}, function (err,data){
+                                                if (err) {
+                                                    console.log("ERROR copyObject" + err);
+                                                    callback(err);
+                                                } else {
+                                                    console.log("SUCCESS copyObject key " + ck );
+                                                    // callback(null);
+                                                    callback(null);
+                                                }
+                                            });
+                                        }
+                                    } catch (e) {
+                                        callback(e);
                                     }
-                                    else {
-                                        console.log("SUCCESS copyObject key " + ck );
-                                        callback(null);
-                                    }
-                                });
+                                })();
                             } else if (groupType == ".glb") {
                                 var targetBucket = "servicemedia";
                                 var copySource = "archive1/staging/" + item.uid + "/" + itemKey;
                                 var ck = "users/" + item.uid + "/gltf/" + itemKey;
                                 console.log("tryna copy glb to " + ck);
-                                s3.copyObject({Bucket: targetBucket, CopySource: copySource, Key: ck}, function (err,data){
-                                    if (err) {
-                                        console.log("ERROR copyObject" + err);
-                                        callback(err);
-                                    } else {
-                                        console.log("SUCCESS copyObject key " + ck );
-                                        callback(null);
+                                (async () => {  
+                                    try {
+                                        if (minioClient) {
+
+                                        } else {
+                                            s3.copyObject({Bucket: targetBucket, CopySource: copySource, Key: ck}, function (err,data){
+                                                if (err) {
+                                                    console.log("ERROR copyObject" + err);
+                                                    callback(err);
+                                                } else {
+                                                    console.log("SUCCESS copyObject key " + ck );
+                                                    // callback(null);
+                                                    callback(null);
+                                                }
+                                            });
+                                        }
+                                    } catch (e) {
+                                        callback(e);
                                     }
-                                });
+                                })();
+                                // s3.copyObject({Bucket: targetBucket, CopySource: copySource, Key: ck}, function (err,data){
+                                //     if (err) {
+                                //         console.log("ERROR copyObject" + err);
+                                //         callback(err);
+                                //     } else {
+                                //         console.log("SUCCESS copyObject key " + ck );
+                                //         callback(null);
+                                //     }
+                                // });
                             } else if (groupType == ".usdz") {
                                 var targetBucket = "servicemedia";
                                 var copySource = "archive1/staging/" + item.uid + "/" + itemKey;
                                 var ck = "users/" + item.uid + "/usdz/" + itemKey;
                                 console.log("tryna copy usdz to " + ck);
-                                s3.copyObject({Bucket: targetBucket, CopySource: copySource, Key: ck}, function (err,data){
-                                    if (err) {
-                                        console.log("ERROR copyObject" + err);
-                                        callback(err);
-                                    } else {
-                                        console.log("SUCCESS copyObject key " + ck );
-                                        callback(null);
+                                (async () => {  
+                                    try {
+                                        if (minioClient) {
+
+                                        } else {
+                                            s3.copyObject({Bucket: targetBucket, CopySource: copySource, Key: ck}, function (err,data){
+                                                if (err) {
+                                                    console.log("ERROR copyObject" + err);
+                                                    callback(err);
+                                                } else {
+                                                    console.log("SUCCESS copyObject key " + ck );
+                                                    // callback(null);
+                                                    callback(null);
+                                                }
+                                            });
+                                        }
+                                    } catch (e) {
+                                        callback(e);
                                     }
-                                });
+                                })();
+                                // s3.copyObject({Bucket: targetBucket, CopySource: copySource, Key: ck}, function (err,data){
+                                //     if (err) {
+                                //         console.log("ERROR copyObject" + err);
+                                //         callback(err);
+                                //     } else {
+                                //         console.log("SUCCESS copyObject key " + ck );
+                                //         callback(null);
+                                //     }
+                                // });
                             } else if (groupType == ".reality") {
                                 var targetBucket = "servicemedia";
                                 var copySource = "archive1/staging/" + item.uid + "/" + itemKey;
                                 var ck = "users/" + item.uid + "/reality/" + itemKey;
                                 console.log("tryna copy usdz to " + ck);
-                                s3.copyObject({Bucket: targetBucket, CopySource: copySource, Key: ck}, function (err,data){
-                                    if (err) {
-                                        console.log("ERROR copyObject" + err);
-                                        callback(err);
-                                    } else {
-                                        console.log("SUCCESS copyObject key " + ck );
-                                        callback(null);
+                                (async () => {  
+                                    try {
+                                        if (minioClient) {
+
+                                        } else {
+                                            s3.copyObject({Bucket: targetBucket, CopySource: copySource, Key: ck}, function (err,data){
+                                                if (err) {
+                                                    console.log("ERROR copyObject" + err);
+                                                    callback(err);
+                                                } else {
+                                                    console.log("SUCCESS copyObject key " + ck );
+                                                    // callback(null);
+                                                    callback(null);
+                                                }
+                                            });
+                                        }
+                                    } catch (e) {
+                                        callback(e);
                                     }
-                                });
+                                })();
+                                // s3.copyObject({Bucket: targetBucket, CopySource: copySource, Key: ck}, function (err,data){
+                                //     if (err) {
+                                //         console.log("ERROR copyObject" + err);
+                                //         callback(err);
+                                //     } else {
+                                //         console.log("SUCCESS copyObject key " + ck );
+                                //         callback(null);
+                                //     }
+                                // });
                             }  
                             
 
                         },
                         function (callback) {
-                            // var mediafolder;
-                            // if (groupType == ".jpg" || groupType == ".jpeg" || groupType == ".JPG" || groupType == ".png" || groupType == ".PNG") {
-                            //     mediafolder = "";
-                            // }
-                            // if (groupType == ".mp3" || groupType == ".wav" || groupType == ".aif" ||  groupType == ".AIFF" || groupType == ".WAV"  )  {
-                            //     mediafolder = ""; 
-                            // }
-                            // if (groupType == ".mp4") {
-                            //     mediafolder = "";
-                            // }
-                            // if (groupType == ".glb") {
-                            //     mediafolder = "gltf/";
-                            // }
-                            // params = {
-                            //     Bucket: 'archive1',
-                            // };
-                            // params.Delete = {Objects:[]};
-                            params.Delete.Objects.push({Key: 'staging/' + item.uid + '/' + item.key});
+                           
+                            params.Delete.Objects.push({Key: 'staging/' + item.uid + '/' + item.key}); //clean up 
                             // console.log("delete params: " + JSON.stringify(params));
-                            s3.deleteObjects(params, function(err, data) {
-                                if (err) {
-                                    console.log("error deleting " + err);
-                                    callback(err);
-                                } else {
-                                    // console.log('deleted staging files: ' + JSON.stringify(params));
-                                    callback(null);
+
+                            (async () => {  
+                                try {
+                                    if (minioClient) {
+
+                                    } else {
+                                        s3.deleteObjects(params, function(err, data) {
+                                            if (err) {
+                                                console.log("error deleting " + err);
+                                                callback(err);
+                                            } else {
+                                                // console.log('deleted staging files: ' + JSON.stringify(params));
+                                                callback(null);
+                                            }
+                                        });
+                                    }
+                                } catch (e) {
+                                    callback(e);
                                 }
-                            });
+                            })();
+
+                            // s3.deleteObjects(params, function(err, data) {
+                            //     if (err) {
+                            //         console.log("error deleting " + err);
+                            //         callback(err);
+                            //     } else {
+                            //         // console.log('deleted staging files: ' + JSON.stringify(params));
+                            //         callback(null);
+                            //     }
+                            // });
                             // callback(null);
                         },
                         ], //inner waterfall async end                        
@@ -4315,11 +4554,12 @@ app.post('/process_staging_files', requiredAuthentication, function (req, res) {
                     })
                 },
                 function (callbk) {
-                    console.log("tryna make group for " + uid);
+                  
                     var group = {};                
                     group.userID = uid;
                     group.items = groupitems;
                     if (group.items.length > 1) {
+                        console.log("tryna make group for " + uid + " length " + group.items.length);
                         if (groupType == ".jpg") {
                             group.type = "picture";
                             group.name = "pictures " + ts;
@@ -4785,39 +5025,120 @@ app.post('/stagingputurl/:_id', requiredAuthentication, function (req, res) {
                 Expires: 100
               };
             // var url = s3.getSignedUrl('putObject', {Bucket: 'servicemedia', Key: "users/" + u_id + "/staging" + req.params.platform_sig, Expires: 600});
-            s3.getSignedUrl('putObject', params, function(err, signedUrl) {
-                let response;
-                if (err) {
-                  response = {
-                    statusCode: 500,
-                    headers: {
-                      'Access-Control-Allow-Origin': '*',
-                    },
-                    body: JSON.stringify({
-                      error: 'Did not receive signed url'
-                    }),
-                  };
-                  console.log("putObject url error : " + err );
-                  res.json(err);
-                } else {
-                  response = {
-                    statusCode: 200,
-                    headers: {
-                      'Access-Control-Allow-Origin': '*', // Required for CORS support to work
-                    },
-                    body: "",
-                    // body: JSON.stringify({
-                    //   message: `Url successfully created`,
-                    //   signedUrl,
-                    // }),
-                    method: "put",
-                    url: signedUrl,
-                    fields: []
-                    };
-                    console.log("putObject url : " + signedUrl );
-                    res.json(response);
+            (async () => {  
+                try {
+                    if (minioClient) {
+                        minioClient.presignedPutObject(process.env.STAGING_BUCKET_NAME, req.body.filename, 1000, function(err, presignedUrl) {
+                            if (err) {
+                                response = {
+                                statusCode: 500,
+                                headers: {
+                                    'Access-Control-Allow-Origin': '*',
+                                },
+                                body: JSON.stringify({
+                                    error: 'Did not receive signed url'
+                                }),
+                                };
+                                console.log("putObject url error : " + err );
+                                res.json(err);
+                                
+                            } else {
+                                response = {
+                                statusCode: 200,
+                                headers: {
+                                    'Access-Control-Allow-Origin': '*', // Required for CORS support to work
+                                },
+                                body: "",
+                                // body: JSON.stringify({
+                                //   message: `Url successfully created`,
+                                //   signedUrl,
+                                // }),
+                                method: "put",
+                                url: presignedUrl,
+                                fields: []
+                                };
+                                console.log("putObject url : " + presignedUrl );
+                                res.json(response);
+                            }
+                            
+                          })
+                    } else {
+                        s3.getSignedUrl('putObject', params, function(err, signedUrl) {
+                            let response;
+                            if (err) {
+                                response = {
+                                statusCode: 500,
+                                headers: {
+                                    'Access-Control-Allow-Origin': '*',
+                                },
+                                body: JSON.stringify({
+                                    error: 'Did not receive signed url'
+                                }),
+                                };
+                                console.log("putObject url error : " + err );
+                                res.json(err);
+                            } else {
+                                response = {
+                                statusCode: 200,
+                                headers: {
+                                    'Access-Control-Allow-Origin': '*', // Required for CORS support to work
+                                },
+                                body: "",
+                                // body: JSON.stringify({
+                                //   message: `Url successfully created`,
+                                //   signedUrl,
+                                // }),
+                                method: "put",
+                                url: signedUrl,
+                                fields: []
+                                };
+                                console.log("putObject url : " + signedUrl );
+                                res.json(response);
+                            }
+                        });
+                    }
+                } catch (e) {
+                    callback(e);
                 }
-            });
+            })();
+            // minioClient.presignedPutObject('mybucket', 'hello.txt', 24*60*60, function(err, presignedUrl) {
+            //     if (err) return console.log(err)
+            //     console.log(presignedUrl)
+            //   })
+
+            // s3.getSignedUrl('putObject', params, function(err, signedUrl) {
+            //     let response;
+            //     if (err) {
+            //       response = {
+            //         statusCode: 500,
+            //         headers: {
+            //           'Access-Control-Allow-Origin': '*',
+            //         },
+            //         body: JSON.stringify({
+            //           error: 'Did not receive signed url'
+            //         }),
+            //       };
+            //       console.log("putObject url error : " + err );
+            //       res.json(err);
+            //     } else {
+            //       response = {
+            //         statusCode: 200,
+            //         headers: {
+            //           'Access-Control-Allow-Origin': '*', // Required for CORS support to work
+            //         },
+            //         body: "",
+            //         // body: JSON.stringify({
+            //         //   message: `Url successfully created`,
+            //         //   signedUrl,
+            //         // }),
+            //         method: "put",
+            //         url: signedUrl,
+            //         fields: []
+            //         };
+            //         console.log("putObject url : " + signedUrl );
+            //         res.json(response);
+            //     }
+            // });
         }
     });
 });
@@ -4831,47 +5152,119 @@ app.get('/staging/:_id', requiredAuthentication, function (req, res) {
     stagedItems = [];
     async.waterfall([
         function (callback) {
-            var params = {
-                Bucket: 'archive1',
-                Prefix: 'staging/' + u_id + '/'
-            }
-            s3.listObjects(params, function(err, data) {
-                if (err) {
-                    console.log(err);
-                    return callback(err);
+           
+            // (async () => {  
+                var params = {
+                    Bucket: process.env.STAGING_BUCKET_NAME,
+                    Prefix: 'staging/' + u_id + '/'
                 }
-                if (data.Contents.length == 0) {
-                    console.log("no content found");
-                    callback(null);
-                } else {
-                    response = data.Contents;
-                    callback();
-                }
-            });
+                // try {
+                    if (minioClient) {
+                        var data = [];
+                        var stream = minioClient.listObjects(process.env.STAGING_BUCKET_NAME,'staging/' + u_id + '/', false);
+                        stream.on('data', function(obj) { data.push(obj); } );
+                        stream.on("end", function (obj) { 
+                            // if (data.Contents.length == 0) {
+                            //     console.log("no content found");
+                            //     callback(null);
+                            // } else {
+                                console.log("data: " + JSON.stringify(data));
+                                response = data;
+                                callback();
+                            // }
+                           
+                        });
+                        stream.on('error', function(err) { 
+                            console.log(err);
+                            callback(err);
+                        } );
+
+
+                    } else {
+                        s3.listObjects(params, function(err, data) {
+                            if (err) {
+                                console.log(err);
+                                return callback(err);
+                            }
+                            if (data.Contents.length == 0) {
+                                console.log("no content found");
+                                callback(null);
+                            } else {
+                                console.log(data.Contents);
+                                response = data.Contents;
+                                callback();
+                            }
+                        });
+                    }
+            //     } catch (e) {
+            //         callback(e);
+            //     }
+            // })();
+            // s3.listObjects(params, function(err, data) {
+            //     if (err) {
+            //         console.log(err);
+            //         return callback(err);
+            //     }
+            //     if (data.Contents.length == 0) {
+            //         console.log("no content found");
+            //         callback(null);
+            //     } else {
+            //         response = data.Contents;
+            //         callback();
+            //     }
+            // });
         },
         function (callback) {
 
             async.each (response, function (r, callbackz) { //loop tru w/ async
-                // console.log("r = " + JSON.stringify(r.Headers));
-                var name = r.Key;
-                if (!name.includes("cubemaps")) { //skip cubemaps stored here for now...
-                name = name.replace('staging/' + u_id + '/', "");
-                var itme = {}
-                itme.name = name;
-                // console.log("modding name : " + itme.name);
-                var assetURL = s3.getSignedUrl('getObject', {Bucket: 'archive1', Key: r.Key, Expires: 60000});
-                itme.url = assetURL;
-
-                stagedItems.push(itme);
-                callbackz();
+                // console.log("r = " + JSON.stringify(r));
+                var name = ""
+                if (minioClient) {
+                    name = r.name;
                 } else {
-                callbackz();
+                    name = r.Key;
                 }
+                (async () => {  
+                    try {
+                        // console.log("tryna ghet name "+ name);
+                        let url = await ReturnPresignedUrl(process.env.STAGING_BUCKET_NAME, name, 6000);
+                        name = name.replace('staging/' + u_id + '/', "");
+                        var itme = {}
+                        itme.name = name;
+                        // console.log("modding name : " + itme.name + " " + url);
+                        
+                        // var assetURL = s3.getSignedUrl('getObject', {Bucket: process.env.STAGING_BUCKET_NAME, Key: r.Key, Expires: 60000});
+                        itme.url = url;
+        
+                        stagedItems.push(itme);
+                        callbackz();
+                        // callback(null, url);
+                    } catch (e) {
+                        console.log(e);
+                        callbackz(e);
+                    }
+                })();
+
+                    // if (!name.includes("cubemaps")) { //skip cubemaps stored here for now...
+                    //     // name = name.replace('staging/' + u_id + '/', "");
+                    //     // var itme = {}
+                    //     // itme.name = name;
+                    //     // // console.log("modding name : " + itme.name);
+                        
+                    //     // var assetURL = s3.getSignedUrl('getObject', {Bucket: process.env.STAGING_BUCKET_NAME, Key: r.Key, Expires: 60000});
+                    //     // itme.url = assetURL;
+        
+                    //     // stagedItems.push(itme);
+                    //     // callbackz();
+                    //     } else {
+                    //     callbackz();
+                    //     }
+                
             }, function(err) {
                
                 if (err) {
                     console.log('A file failed to process');
-                    callbackz(err);
+                    callback(err);
                 } else {
                     console.log('All files have been processed successfully');
                     stagedItems.reverse();
@@ -13135,7 +13528,7 @@ app.get('/publicscenes', function (req, res) { //deprecated, see available scene
                                 var quarterName = 'quarter.' + baseName + item_string_filename_ext;
                                 // var standardName = 'standard.' + baseName + item_string_filename_ext;
 
-                                (async () => {  //new way of fetching urls as a promise, to flex with minio, etc..
+                                (async () => {  // to flex with minio, etc..
                                     try {
                                         var urlHalf = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, "users/" + picture_item.userID + "/pictures/" + picture_item._id + "." + halfName, 6000);
                                         var urlQuarter = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, "users/" + picture_item.userID + "/pictures/" + picture_item._id + "." + quarterName, 6000);
