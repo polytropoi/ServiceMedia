@@ -4109,12 +4109,21 @@ app.post('/process_staging_files', requiredAuthentication, function (req, res) {
                                             var copySource = "archive1/staging/" + saved.userID + "/" + saved.filename;
                                             var ck = "users/" + saved.userID + "/audio/originals/" + item_id + ".original." + saved.filename; //path change!
                                             console.log("tryna copy origiinal to " + ck);
-                                            var targetBucket = "servicemedia";
+                                            var targetBucket = process.env.S3_ROOT_BUCKET_NAME;
 
                                             (async () => {  
                                                 try {
                                                     if (minioClient) {
-
+                                                        minioClient.copyObject(targetBucket, ck, copySource, function(e, data) {
+                                                            if (e) {
+                                                                callback(e);
+                                                            } else {
+                                                                console.log("Successfully copied the object:");
+                                                                console.log("etag = " + data.etag + ", lastModified = " + data.lastModified);
+                                                                callback(null, item_id, tUrl);
+                                                            }
+                                                            
+                                                          });
                                                     } else {
                                                         s3.copyObject({Bucket: targetBucket, CopySource: copySource, Key: ck}, function (err,data){
                                                             if (err) {
@@ -4378,7 +4387,16 @@ app.post('/process_staging_files', requiredAuthentication, function (req, res) {
                                 (async () => {  
                                     try {
                                         if (minioClient) {
-
+                                            minioClient.copyObject(targetBucket, ck, copySource, function(e, data) {
+                                                if (e) {
+                                                    callback(e);
+                                                } else {
+                                                    console.log("Successfully copied audio object:");
+                                                    console.log("etag = " + data.etag + ", lastModified = " + data.lastModified);
+                                                    callback(null);
+                                                }
+                                                
+                                              });
                                         } else {
                                             s3.copyObject({Bucket: targetBucket, CopySource: copySource, Key: ck}, function (err,data){
                                                 if (err) {
@@ -4403,7 +4421,16 @@ app.post('/process_staging_files', requiredAuthentication, function (req, res) {
                                 (async () => {  
                                     try {
                                         if (minioClient) {
-
+                                            minioClient.copyObject(targetBucket, ck, copySource, function(e, data) {
+                                                if (e) {
+                                                    callback(e);
+                                                } else {
+                                                    console.log("Successfully copied glb object:");
+                                                    console.log("etag = " + data.etag + ", lastModified = " + data.lastModified);
+                                                    callback(null);
+                                                }
+                                                
+                                              });
                                         } else {
                                             s3.copyObject({Bucket: targetBucket, CopySource: copySource, Key: ck}, function (err,data){
                                                 if (err) {
@@ -4437,7 +4464,16 @@ app.post('/process_staging_files', requiredAuthentication, function (req, res) {
                                 (async () => {  
                                     try {
                                         if (minioClient) {
-
+                                            minioClient.copyObject(targetBucket, ck, copySource, function(e, data) {
+                                                if (e) {
+                                                    callback(e);
+                                                } else {
+                                                    console.log("Successfully copied usdz object:");
+                                                    console.log("etag = " + data.etag + ", lastModified = " + data.lastModified);
+                                                    callback(null);
+                                                }
+                                                
+                                              });
                                         } else {
                                             s3.copyObject({Bucket: targetBucket, CopySource: copySource, Key: ck}, function (err,data){
                                                 if (err) {
@@ -4471,7 +4507,16 @@ app.post('/process_staging_files', requiredAuthentication, function (req, res) {
                                 (async () => {  
                                     try {
                                         if (minioClient) {
-
+                                            minioClient.copyObject(targetBucket, ck, copySource, function(e, data) {
+                                                if (e) {
+                                                    callback(e);
+                                                } else {
+                                                    console.log("Successfully copied the object:");
+                                                    console.log("etag = " + data.etag + ", lastModified = " + data.lastModified);
+                                                    callback(null);
+                                                }
+                                                
+                                              });
                                         } else {
                                             s3.copyObject({Bucket: targetBucket, CopySource: copySource, Key: ck}, function (err,data){
                                                 if (err) {
@@ -4509,7 +4554,7 @@ app.post('/process_staging_files', requiredAuthentication, function (req, res) {
                             (async () => {  
                                 try {
                                     if (minioClient) { // --really only one here...
-                                        minioClient.removeObject(process.env.S3_ROOT_BUCKET_NAME, 'staging/' + item.uid + '/' + item.key, function(err) {
+                                        minioClient.removeObject(process.env.STAGING_BUCKET_NAME, 'staging/' + item.uid + '/' + item.key, function(err) {
                                             if (err) {
                                               console.log('Unable to remove object', err);
                                               callback(err);
@@ -9039,13 +9084,13 @@ app.get('/userpic/:p_id', requiredAuthentication, function(req, res) {
             var standardName = 'standard.' + baseName + item_string_filename_ext;
             var originalName = 'original.' + baseName + item_string_filename_ext;
             // console.log("original name : " + originalName);
-            var urlThumb = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + "." + thumbName, Expires: 6000}); 
-            var urlHalf = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + "." + halfName, Expires: 6000}); 
-            var urlStandard = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + "." + standardName, Expires: 6000});
-            var urlTarget = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/targets/" + picture_item._id + ".mind", Expires: 6000});
-            var urlOriginal = "";
+            // var urlThumb = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + "." + thumbName, Expires: 6000}); 
+            // var urlHalf = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + "." + halfName, Expires: 6000}); 
+            // var urlStandard = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + "." + standardName, Expires: 6000});
+            // var urlTarget = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/targets/" + picture_item._id + ".mind", Expires: 6000});
+            // var urlOriginal = "";
             //var urlPng = knoxClient.signedUrl(audio_item[0]._id + "." + pngName, expiration);
-            console.log("urlTarget " + urlTarget);
+            // console.log("urlTarget " + urlTarget);
 
             (async () => { 
 

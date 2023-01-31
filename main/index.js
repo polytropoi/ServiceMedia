@@ -5418,7 +5418,9 @@
 
                     "<div class=\x22col form-group col-md-12\x22>" + 
                         
-                    "<a target=\x22_blank\x22 href=\x22" +response.data.URLstandard+ "\x22><img class=\x22rounded img-fluid mr-3\x22 src=\x22" + response.data.URLhalf+ "\x22></a>" +
+                    "<a target=\x22_blank\x22 href=\x22" +response.data.URLstandard+ "\x22><img class=\x22rounded img-fluid mr-3\x22 src=\x22" + response.data.URLhalf+ "\x22></a><br><br>" +
+                    "<a target=\x22_blank\x22 href=\x22" +response.data.URLoriginal+ "\x22>Original</a><br>" +
+                    "<a target=\x22_blank\x22 href=\x22" +response.data.URLhalf+ "\x22>Half</a>" +
                     "</div>" +       
                 "</div>" +
                 // "<div class=\x22form-row\x22>" +
