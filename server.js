@@ -52,8 +52,6 @@ var express = require("express")
 
 var stripe = require("stripe")(process.env.STRIPE_KEY);
 
-
-
 var rootHost = process.env.ROOT_HOST
 var topName = process.env.ROOT_NAME;
 var requirePayment = true; //if subscription is required to login, true for servicemedia
@@ -3879,14 +3877,17 @@ app.post('/process_staging_files', requiredAuthentication, function (req, res) {
                             (async () => {  // to flex with minio, etc..
                                 if (minioClient) {
                                     try {
-                                        minioClient.statObject(stagingBucket, "staging/" + item.uid + "/" + itemKey, function(err, stat) {
+                                        minioClient.statObject(stagingBucket, "staging/" + item.uid + "/" + itemKey, function(err, stat) { //statObject = headObject at s3
                                             if (err) {
-                                              return console.log(err)
+                                                console.log(err);
+                                                callback(err);
+                                            } else {
+                                                console.log("minio statObject " + stat);
+                                                callback(null);
                                             }
-                                            console.log("minio statObject " + stat);
-                                            callback(null);
+
                                         });
-                                        callback(null);
+                                        // callback(null);
                                     } catch (e) {
                                         callback(e);
                                     }
@@ -3959,10 +3960,13 @@ app.post('/process_staging_files', requiredAuthentication, function (req, res) {
                                     try {
                                         minioClient.statObject(stagingBucket, "staging/" + item.uid + "/" + itemKey, function(err, stat) {
                                             if (err) {
-                                              return console.log(err)
+                                                console.log(err)
+                                                callback(err);
+                                            } else {
+                                                console.log("minio statObject " + stat);
+                                                callback(null);
                                             }
-                                            console.log("minio statObject " + stat);
-                                            callback(null);
+                                          
                                         });
                                         
                                     } catch (e) {
@@ -4037,11 +4041,20 @@ app.post('/process_staging_files', requiredAuthentication, function (req, res) {
                                             var copySource = "archive1/staging/" + saved.userID + "/" + saved.filename;
                                             var ck = "users/" + saved.userID + "/pictures/originals/" + item_id + ".original." + saved.filename; //path change!
                                             console.log("tryna copy origiinal to " + ck);
-                                            var targetBucket = "servicemedia";
+                                            var targetBucket = process.env.S3_ROOT_BUCKET_NAME;
                                             (async () => {  
                                                 try {
                                                     if (minioClient) {
-
+                                                        minioClient.copyObject(targetBucket, ck, copySource, function(e, data) {
+                                                            if (e) {
+                                                                callback(e);
+                                                            } else {
+                                                                console.log("Successfully copied the object:");
+                                                                console.log("etag = " + data.etag + ", lastModified = " + data.lastModified);
+                                                                callback(null, item_id, tUrl);
+                                                            }
+                                                            
+                                                          });
                                                     } else {
                                                         s3.copyObject({Bucket: targetBucket, CopySource: copySource, Key: ck}, function (err,data){
                                                             if (err) {
@@ -4267,30 +4280,32 @@ app.post('/process_staging_files', requiredAuthentication, function (req, res) {
                                 //         console.log('transloadit Error: ' + JSON.stringify(err));
                                 //         callback(err);
                                 //     });
-                                // } else { //NEW WAY uses GrabAndSqueeze
-                                    console.log("userid = " + req.session.user._id);
-                                    var token=jwt.sign({userId:req.session.user._id},process.env.JWT_SECRET);
-                                    const options = {
-                                        headers: {'X-Access-Token': token}
-                                      };
-                                    axios.get(process.env.GS_HOST + "/resize_uploaded_picture/"+iID, options)
-                                    .then((response) => {
-                                    //   console.log(response.data);
-                                      console.log("grabAndSqueeze response: " + response.status);
-                                    //   console.log(response.statusText);
-                                    //   console.log(response.headers);
-                                    //   console.log(response.config);
-                                        
-                                    })
-                                    .catch(function (error) {
-                                        // handle error
-                                        // console.log(error);
-                                        callback(error);
-                                    })
-                                    .then(function () {
-                                        // console.log('nerp');
-                                        callback(null);
-                                    });
+                                
+                            // } else { //NEW WAY uses GrabAndSqueeze
+                                console.log("userid = " + req.session.user._id);
+                                var token=jwt.sign({userId:req.session.user._id},process.env.JWT_SECRET);
+                                const options = {
+                                    headers: {'X-Access-Token': token}
+                                    };
+                                axios.get(process.env.GS_HOST + "/resize_uploaded_picture/"+iID, options)
+                                .then((response) => {
+                                //   console.log(response.data);
+                                    console.log("grabAndSqueeze response: " + response.status);
+                                //   console.log(response.statusText);
+                                //   console.log(response.headers);
+                                //   console.log(response.config);
+                                    
+                                })
+                                
+                                .then(function () {
+                                    // console.log('nerp');
+                                    callback(null);
+                                })
+                                .catch(function (error) {
+                                    // handle error
+                                    // console.log(error);
+                                    callback(error);
+                                });
 
                                    
                             } else if (groupType == ".mp3" || groupType == ".wav" || groupType == ".aif" || groupType == ".aiff" || groupType == ".ogg" || 
@@ -4488,13 +4503,20 @@ app.post('/process_staging_files', requiredAuthentication, function (req, res) {
                         },
                         function (callback) {
                            
-                            params.Delete.Objects.push({Key: 'staging/' + item.uid + '/' + item.key}); //clean up 
+                            params.Delete.Objects.push({Key: 'staging/' + item.uid + '/' + item.key}); //clean up
                             // console.log("delete params: " + JSON.stringify(params));
 
                             (async () => {  
                                 try {
-                                    if (minioClient) {
-
+                                    if (minioClient) { // --really only one here...
+                                        minioClient.removeObject(process.env.S3_ROOT_BUCKET_NAME, 'staging/' + item.uid + '/' + item.key, function(err) {
+                                            if (err) {
+                                              console.log('Unable to remove object', err);
+                                              callback(err);
+                                            }
+                                            console.log('Removed the object');
+                                            callback(null);
+                                          })
                                     } else {
                                         s3.deleteObjects(params, function(err, data) {
                                             if (err) {
@@ -5168,7 +5190,7 @@ app.get('/staging/:_id', requiredAuthentication, function (req, res) {
                             //     console.log("no content found");
                             //     callback(null);
                             // } else {
-                                console.log("data: " + JSON.stringify(data));
+                                // console.log("data: " + JSON.stringify(data));
                                 response = data;
                                 callback();
                             // }
@@ -5190,7 +5212,7 @@ app.get('/staging/:_id', requiredAuthentication, function (req, res) {
                                 console.log("no content found");
                                 callback(null);
                             } else {
-                                console.log(data.Contents);
+                                // console.log(data.Contents);
                                 response = data.Contents;
                                 callback();
                             }
@@ -7462,7 +7484,7 @@ app.post('/picarray/', checkAppID, requiredAuthentication, function(req,res) {
 });
 
 // app.get('/userpics/:u_id', checkAppID, requiredAuthentication, function(req, res) {
-app.get('/userpics/:u_id', requiredAuthentication, function(req, res) {
+app.get('/userpics/:u_id', requiredAuthentication, function (req, res) {
     console.log('tryna return userpics for: ' + req.params.u_id);
     let query = {userID: req.params.u_id};
     if (!req.session.user.authLevel.toLowerCase().includes("domain")) {
@@ -7475,6 +7497,7 @@ app.get('/userpics/:u_id', requiredAuthentication, function(req, res) {
             console.log("error getting picture items: " + err);
         } else {
             console.log("userpics for " + req.params.u_id);
+            (async () => { 
             for (var i = 0; i < picture_items.length; i++) {
                 // console.log("pic userID: "+ picture_items[i].userID);
                 var item_string_filename = JSON.stringify(picture_items[i].filename);
@@ -7485,18 +7508,21 @@ app.get('/userpics/:u_id', requiredAuthentication, function(req, res) {
                 var baseName = path.basename(item_string_filename, (item_string_filename_ext));
 //                        console.log(baseName + "xxxxxxx");
                 var thumbName = 'thumb.' + baseName + item_string_filename_ext;
-                var halfName = 'half.' + baseName + item_string_filename_ext;
-                var standardName = 'standard.' + baseName + item_string_filename_ext;
-                //var pngName = baseName + '.png';
-                var urlThumb = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_items[i].userID + "/pictures/" + picture_items[i]._id + "." + thumbName, Expires: 6000}); //just send back thumbnail urls for list
+                // var halfName = 'half.' + baseName + item_string_filename_ext;
+                // var standardName = 'standard.' + baseName + item_string_filename_ext;
+    
+                var urlThumb = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, "users/" + picture_items[i].userID + "/pictures/" + picture_items[i]._id + "." + thumbName, 6000); 
+                picture_items[i].URLthumb = urlThumb;
+                // console.log(urlThumb);
+
+                // var urlThumb = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_items[i].userID + "/pictures/" + picture_items[i]._id + "." + thumbName, Expires: 6000}); //just send back thumbnail urls for list
                 //var urlPng = knoxClient.signedUrl(audio_item[0]._id + "." + pngName, expiration);
-                picture_items[i].URLthumb = urlThumb; //jack in teh signed urls into the object array
+                //jack in teh signed urls into the object array
                 //console.log("picture item: " + urlThumb, picture_items[0]);
-
-            }
-
-            res.json(picture_items);
-            console.log("returning picture_items for " + req.params.u_id);
+                }
+                res.json(picture_items);
+                console.log("returning picture_items for " + req.params.u_id);
+            })();
         }
     });
 });
@@ -9013,73 +9039,70 @@ app.get('/userpic/:p_id', requiredAuthentication, function(req, res) {
             var standardName = 'standard.' + baseName + item_string_filename_ext;
             var originalName = 'original.' + baseName + item_string_filename_ext;
             // console.log("original name : " + originalName);
-            var urlThumb = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + "." + thumbName, Expires: 6000}); //just send back thumbnail urls for list
-            var urlHalf = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + "." + halfName, Expires: 6000}); //just send back thumbnail urls for list
-            var urlStandard = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + "." + standardName, Expires: 6000}); //just send back thumbnail urls for list
+            var urlThumb = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + "." + thumbName, Expires: 6000}); 
+            var urlHalf = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + "." + halfName, Expires: 6000}); 
+            var urlStandard = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + "." + standardName, Expires: 6000});
             var urlTarget = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/targets/" + picture_item._id + ".mind", Expires: 6000});
             var urlOriginal = "";
             //var urlPng = knoxClient.signedUrl(audio_item[0]._id + "." + pngName, expiration);
             console.log("urlTarget " + urlTarget);
-            var params = {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: "users/" + picture_item.userID + "/pictures/originals/" + picture_item._id + "." + originalName};
-            s3.headObject(params, function(err, data) { //some old pix aren't saved with .original. in filename, check for that
-                if (err) {
-                    console.log("dinna find that pic");
-                    originalName = baseName + item_string_filename_ext;
-                    urlOriginal = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/originals/" + originalName, Expires: 6000}); 
+
+            (async () => { 
+
+                var urlThumb = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, "users/" + picture_item.userID + "/pictures/" + picture_item._id + "." + thumbName, 6000); 
+                var urlStandard = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, "users/" + picture_item.userID + "/pictures/" + picture_item._id + "." + standardName, 6000); 
+                var urlHalf = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, "users/" + picture_item.userID + "/pictures/" + picture_item._id + "." + halfName, 6000); 
+                var urlTarget = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, "users/" + picture_item.userID + "/pictures/targets/" + picture_item._id + ".mind", 6000); 
+                var urlOriginal = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, "users/" + picture_item.userID + "/pictures/originals/" + picture_item._id + "." + originalName, 6000); 
+                // var urlHalf = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + "." + halfName, Expires: 6000}); 
+                // var urlStandard = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + "." + standardName, Expires: 6000});
+                // var urlTarget = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/targets/" + picture_item._id + ".mind", Expires: 6000});
+                if (minioClient) {
                     picture_item.URLthumb = urlThumb; //jack in teh signed urls into the object array
                     picture_item.URLhalf = urlHalf;
                     picture_item.URLstandard = urlStandard;
                     picture_item.URLoriginal = urlOriginal;
                     picture_item.URLtarget = urlTarget;
-                    // console.log("urlTarget " + urlTarget);
+                    // res.json(picture)
                     res.json(picture_item);
-                    console.log("returning picture_item for " + picture_item);
+                    console.log("returning picture_item for " + req.params.u_id);    
                 } else {
-                    console.log("found that orig pic");
-                    urlOriginal = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/originals/" + picture_item._id + "." + originalName, Expires: 6000}); 
-                    picture_item.URLthumb = urlThumb; //jack in teh signed urls into the object array
-                    picture_item.URLhalf = urlHalf;
-                    picture_item.URLstandard = urlStandard;
-                    picture_item.URLoriginal = urlOriginal;
-                    picture_item.URLtarget = urlTarget;
-                    // console.log("urlTarget " + urlTarget);
-                    if (picture_item.orientation != null && picture_item.orientation != undefined && picture_item.orientation.toLowerCase() == "equirectangular") {
-                        //return cubemaps?  
+                var params = {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: "users/" + picture_item.userID + "/pictures/originals/" + picture_item._id + "." + originalName};
+                s3.headObject(params, function(err, data) { //some old pix aren't saved with .original. in filename, check for that
+                    if (err) {
+                        console.log("dinna find that pic");
+                        originalName = baseName + item_string_filename_ext;
+                        urlOriginal = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/originals/" + originalName, Expires: 6000}); 
+                        picture_item.URLthumb = urlThumb; //jack in teh signed urls into the object array
+                        picture_item.URLhalf = urlHalf;
+                        picture_item.URLstandard = urlStandard;
+                        picture_item.URLoriginal = urlOriginal;
+                        picture_item.URLtarget = urlTarget;
+                        // console.log("urlTarget " + urlTarget);
                         res.json(picture_item);
-
-                        // let cubeMapAsset = [];
-                        // let cmParams = {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: "users/"+picture_item.userID+"/cubemaps/"+picture_item._id+"_px.jpg"};
-                        // s3.headObject(cmParams, function(err, data) { //some old pix aren't saved with .original. in filename, check for that
-                        // if (err) { 
-                        //     console.log("no cubemaps have been generated for this item");
-                        //     res.json(picture_item);
-                        // } else {
-
-                        //     let path1 = s3.getSignedUrl('getObject', {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: "users/"+picture_item.userID+"/cubemaps/"+picture_item._id+"_px.jpg", Expires: 6000});  
-                        //     let path2 = s3.getSignedUrl('getObject', {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: "users/"+picture_item.userID+"/cubemaps/"+picture_item._id+"_nx.jpg", Expires: 6000});  
-                        //     let path3 = s3.getSignedUrl('getObject', {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: "users/"+picture_item.userID+"/cubemaps/"+picture_item._id+"_py.jpg", Expires: 6000});  
-                        //     let path4 = s3.getSignedUrl('getObject', {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: "users/"+picture_item.userID+"/cubemaps/"+picture_item._id+"_ny.jpg", Expires: 6000});  
-                        //     let path5 = s3.getSignedUrl('getObject', {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: "users/"+picture_item.userID+"/cubemaps/"+picture_item._id+"_pz.jpg", Expires: 6000});  
-                        //     let path6 = s3.getSignedUrl('getObject', {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: "users/"+picture_item.userID+"/cubemaps/"+picture_item._id+"_nz.jpg", Expires: 6000});                                    
-                        //     cubeMapAsset.push(path1);
-                        //     cubeMapAsset.push(path2);
-                        //     cubeMapAsset.push(path3);
-                        //     cubeMapAsset.push(path4);
-                        //     cubeMapAsset.push(path5);
-                        //     cubeMapAsset.push(path6);
-                        //     picture_item.cubeMapAsset = cubeMapAsset;
-                        //     res.json(picture_item);
-                        //     }
-                        // });
+                        console.log("returning picture_item for " + picture_item);
                     } else {
-                        res.json(picture_item);
+                        console.log("found that orig pic");
+                        urlOriginal = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/originals/" + picture_item._id + "." + originalName, Expires: 6000}); 
+                        picture_item.URLthumb = urlThumb; //jack in teh signed urls into the object array
+                        picture_item.URLhalf = urlHalf;
+                        picture_item.URLstandard = urlStandard;
+                        picture_item.URLoriginal = urlOriginal;
+                        picture_item.URLtarget = urlTarget;
+                        // console.log("urlTarget " + urlTarget);
+                        if (picture_item.orientation != null && picture_item.orientation != undefined && picture_item.orientation.toLowerCase() == "equirectangular") {
+                            //return cubemaps?  
+                            res.json(picture_item);
+
+                        } else {
+                            res.json(picture_item);
+                        }
                     }
-                    // console.log("urlOriginal " + urlOriginal);
-                   
-                    // console.log("returning picture_item for " + picture_item);
-            
+                    });
                 }
-            });
+                // res.json(picture_items);
+                // console.log("returning picture_items for " + req.params.u_id);    
+            })();
         }
     });
 });
@@ -23165,64 +23188,95 @@ app.post('/delete_picture/', requiredAuthentication, function (req, res){ //TODO
             var quarterName = 'quarter.' + baseName + item_string_filename_ext;
             var standardName = 'standard.' + baseName + item_string_filename_ext;
 
-            // s3.headObject
-            var params = {
-                Bucket: 'servicemedia',// required
-                Delete: { // required
-                    Objects: [ // required
-                        {
-                            Key: "users/" + pic_item[0].userID + "/" + item_string_filename 
-                        },
-                        {
-                            Key: "users/" + pic_item[0].userID + "/" + pic_item[0]._id + ".original." + item_string_filename 
-                        },
-                        {
-                            Key: "users/" + pic_item[0].userID + "/" + pic_item[0]._id + "." + thumbName 
-                        },
-                        {
-                            Key: "users/" + pic_item[0].userID + "/" + pic_item[0]._id + "." + quarterName 
-                        },
-                        {
-                            Key: "users/" + pic_item[0].userID + "/" + pic_item[0]._id + "." + halfName 
-                        },
-                        {
-                            Key: "users/" + pic_item[0].userID + "/" + pic_item[0]._id + "." + standardName 
-                        },
-                        {
-                            Key: "users/" + pic_item[0].userID + "/pictures/" + item_string_filename 
-                        },
-                        {
-                            Key: "users/" + pic_item[0].userID + "/pictures/originals/" + pic_item[0]._id + ".original." + item_string_filename 
-                        },
-                        {
-                            Key: "users/" + pic_item[0].userID + "/pictures/" + pic_item[0]._id + "." + thumbName 
-                        },
-                        {
-                            Key: "users/" + pic_item[0].userID + "/pictures/" + pic_item[0]._id + "." + quarterName 
-                        },
-                        {
-                            Key: "users/" + pic_item[0].userID + "/pictures/" + pic_item[0]._id + "." + halfName 
-                        },
-                        {
-                            Key: "users/" + pic_item[0].userID + "/pictures/" + pic_item[0]._id + "." + standardName 
-                        }
-                        // ... more items ...
-                    ],
-                    Quiet: true || false
-                }
-                //MFA: 'STRING_VALUE',
-            };
-            console.log("tryna delete picture with params " + JSON.stringify(params));
-            s3.deleteObjects(params, function(err, data) {
-                if (err) {
-                    console.log(err, err.stack);
-                    res.send(err);
-                } else {
-                    console.log("pics delete response " + JSON.stringify(data));
-                    db.image_items.remove( { "_id" : o_id }, 1 );  // TODO what if files are gone but db reference remains? 
-                    res.send("deleted");
-                }
-            });
+            if (minioClient) {
+                var keys = []
+                keys.push(
+                    "users/" + pic_item[0].userID + "/" + item_string_filename,
+                    "users/" + pic_item[0].userID + "/" + pic_item[0]._id + ".original." + item_string_filename,
+                    "users/" + pic_item[0].userID + "/" + pic_item[0]._id + "." + thumbName,
+                    "users/" + pic_item[0].userID + "/" + pic_item[0]._id + "." + quarterName,
+                    "users/" + pic_item[0].userID + "/" + pic_item[0]._id + "." + halfName,
+                    "users/" + pic_item[0].userID + "/" + pic_item[0]._id + "." + standardName,
+                    "users/" + pic_item[0].userID + "/pictures/" + item_string_filename,
+                    "users/" + pic_item[0].userID + "/pictures/originals/" + pic_item[0]._id + ".original." + item_string_filename,
+                    "users/" + pic_item[0].userID + "/pictures/" + pic_item[0]._id + "." + thumbName,
+                    "users/" + pic_item[0].userID + "/pictures/" + pic_item[0]._id + "." + quarterName,
+                    "users/" + pic_item[0].userID + "/pictures/" + pic_item[0]._id + "." + halfName,
+                    "users/" + pic_item[0].userID + "/pictures/" + pic_item[0]._id + "." + standardName
+                    );
+                minioClient.removeObjects(process.env.S3_ROOT_BUCKET_NAME, keys, function(e) {
+                    if (e) {
+                        console.log('Unable to remove Objects ',e);
+                        res.send('Unable to remove Objects ',e);
+                    } else {
+                        console.log('Removed the objects successfully');
+                        db.image_items.remove( { "_id" : o_id }, 1 );  // TODO what if files are gone but db reference remains? 
+                        res.send("deleted");
+                    }
+
+                });
+                        
+            } else {
+                
+                // s3.headObject
+                var params = {
+                    Bucket: 'servicemedia',// required
+                    Delete: { // required
+                        Objects: [ // required
+                            {
+                                Key: "users/" + pic_item[0].userID + "/" + item_string_filename 
+                            },
+                            {
+                                Key: "users/" + pic_item[0].userID + "/" + pic_item[0]._id + ".original." + item_string_filename 
+                            },
+                            {
+                                Key: "users/" + pic_item[0].userID + "/" + pic_item[0]._id + "." + thumbName 
+                            },
+                            {
+                                Key: "users/" + pic_item[0].userID + "/" + pic_item[0]._id + "." + quarterName 
+                            },
+                            {
+                                Key: "users/" + pic_item[0].userID + "/" + pic_item[0]._id + "." + halfName 
+                            },
+                            {
+                                Key: "users/" + pic_item[0].userID + "/" + pic_item[0]._id + "." + standardName 
+                            },
+                            {
+                                Key: "users/" + pic_item[0].userID + "/pictures/" + item_string_filename 
+                            },
+                            {
+                                Key: "users/" + pic_item[0].userID + "/pictures/originals/" + pic_item[0]._id + ".original." + item_string_filename 
+                            },
+                            {
+                                Key: "users/" + pic_item[0].userID + "/pictures/" + pic_item[0]._id + "." + thumbName 
+                            },
+                            {
+                                Key: "users/" + pic_item[0].userID + "/pictures/" + pic_item[0]._id + "." + quarterName 
+                            },
+                            {
+                                Key: "users/" + pic_item[0].userID + "/pictures/" + pic_item[0]._id + "." + halfName 
+                            },
+                            {
+                                Key: "users/" + pic_item[0].userID + "/pictures/" + pic_item[0]._id + "." + standardName 
+                            }
+                            // ... more items ...
+                        ],
+                        Quiet: true || false
+                    }
+                    //MFA: 'STRING_VALUE',
+                };
+                console.log("tryna delete picture with params " + JSON.stringify(params));
+                s3.deleteObjects(params, function(err, data) {
+                    if (err) {
+                        console.log(err, err.stack);
+                        res.send(err);
+                    } else {
+                        console.log("pics delete response " + JSON.stringify(data));
+                        db.image_items.remove( { "_id" : o_id }, 1 );  // TODO what if files are gone but db reference remains? 
+                        res.send("deleted");
+                    }
+                });
+            }
         }
     });
 });
