@@ -4356,14 +4356,14 @@ app.post('/process_staging_files', requiredAuthentication, function (req, res) {
                                     //   console.log(response.config);
                                         // callback(null);
                                     })
+                                    .then(function () {
+                                        // console.log('nerp');
+                                        callback(null);
+                                    })
                                     .catch(function (error) {
                                         // handle error
                                         // console.log(error);
                                         callback(error);
-                                    })
-                                    .then(function () {
-                                        // console.log('nerp');
-                                        callback(null);
                                     });
                                 }
                             } else if (groupType.toLowerCase() == ".mpg" || groupType.toLowerCase() == ".mp4" || groupType.toLowerCase() == ".mkv" || groupType.toLowerCase() == ".webm" || groupType.toLowerCase() == ".mov") {
@@ -8540,8 +8540,9 @@ app.get('/useraudio/:u_id', requiredAuthentication, function(req, res) {
 
         } else {
             console.log("# " + audio_items.length);
-            for (var i = 0; i < audio_items.length; i++) {
 
+            (async () => {
+            for (var i = 0; i < audio_items.length; i++) {
                 var item_string_filename = JSON.stringify(audio_items[i].filename);
                 item_string_filename = item_string_filename.replace(/\"/g, "");
                 var item_string_filename_ext = getExtension(item_string_filename);
@@ -8552,15 +8553,20 @@ app.get('/useraudio/:u_id', requiredAuthentication, function(req, res) {
                 var mp3Name = baseName + '.mp3';
                 var oggName = baseName + '.ogg';
                 var pngName = baseName + '.png';
-                var urlMp3 = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + audio_items[i].userID + "/audio/" + audio_items[i]._id + "." + mp3Name, Expires: 60000});
-                var urlOgg = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + audio_items[i].userID + "/audio/" + audio_items[i]._id + "." + oggName, Expires: 60000});
-                var urlPng = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + audio_items[i].userID + "/audio/" + audio_items[i]._id + "." + pngName, Expires: 60000});
+
+                var urlMp3 = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, "users/" + audio_items[i].userID + "/audio/" + audio_items[i]._id + "." + mp3Name, 6000); 
+                var urlOgg = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, "users/" + audio_items[i].userID + "/audio/" + audio_items[i]._id + "." + oggName, 6000); 
+                var urlPng = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, "users/" + audio_items[i].userID + "/audio/" + audio_items[i]._id + "." + pngName, 6000); 
+
+                // var urlMp3 = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + audio_items[i].userID + "/audio/" + audio_items[i]._id + "." + mp3Name, Expires: 60000});
+                // var urlOgg = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + audio_items[i].userID + "/audio/" + audio_items[i]._id + "." + oggName, Expires: 60000});
+                // var urlPng = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + audio_items[i].userID + "/audio/" + audio_items[i]._id + "." + pngName, Expires: 60000});
                 audio_items[i].URLmp3 = urlMp3; //jack in teh signed urls into the object array
                 audio_items[i].URLogg = urlOgg;
                 audio_items[i].URLpng = urlPng;
-
-            }
-            res.json(audio_items);
+                }
+                res.json(audio_items);
+            })();
 //                console.log("returning audio_items for " + req.params.u_id);
         }
     });
@@ -23049,43 +23055,68 @@ app.post('/delete_audio/', requiredAuthentication, function (req, res){
             var mp3Name = baseName + ".mp3";
             var oggName = baseName + ".ogg";
 
-            var params = {
-                Bucket: 'servicemedia', // required
-                Delete: { // required
-                    Objects: [ // required
-                        {
-                            Key: "users/" + req.session.user._id.toString() + "/" + item_string_filename // required
-                        },
-                        {
-                            Key: "users/" + req.session.user._id.toString() + "/" + audio_item[0]._id + "." + pngName // required
-                        },
-                        {
-                            Key: "users/" + req.session.user._id.toString() + "/" + audio_item[0]._id + "." + mp3Name // required
-                        },
-                        {
-                            Key: "users/" + req.session.user._id.toString() + "/" + audio_item[0]._id + "." + oggName // required
+            (async () => {
+
+                if (minioClient) {
+                    var keys = []
+                    keys.push(
+                        "users/" + req.session.user._id.toString() + "/" + item_string_filename,
+                        "users/" + req.session.user._id.toString() + "/" + audio_item[0]._id + "." + pngName,
+                        "users/" + req.session.user._id.toString() + "/" + audio_item[0]._id + "." + mp3Name,
+                        "users/" + req.session.user._id.toString() + "/" + audio_item[0]._id + "." + oggName,
+
+                        );
+                    minioClient.removeObjects(process.env.S3_ROOT_BUCKET_NAME, keys, function(e) {
+                        if (e) {
+                            console.log('Unable to remove Objects ',e);
+                            res.send('Unable to remove Objects ',e);
+                        } else {
+                            console.log('Removed the objects successfully');
+                            db.audio_items.remove( { "_id" : o_id }, 1 );  // TODO what if files are gone but db reference remains? 
+                            res.send("deleted");
                         }
-                        // ... more items ...
-                    ],
-                    Quiet: true || false
-                }
-                //MFA: 'STRING_VALUE',
-            };
+    
+                    });
+                } else {
+                    var params = {
+                        Bucket: 'servicemedia', // required
+                        Delete: { // required
+                            Objects: [ // required
+                                {
+                                    Key: "users/" + req.session.user._id.toString() + "/" + item_string_filename // required
+                                },
+                                {
+                                    Key: "users/" + req.session.user._id.toString() + "/" + audio_item[0]._id + "." + pngName // required
+                                },
+                                {
+                                    Key: "users/" + req.session.user._id.toString() + "/" + audio_item[0]._id + "." + mp3Name // required
+                                },
+                                {
+                                    Key: "users/" + req.session.user._id.toString() + "/" + audio_item[0]._id + "." + oggName // required
+                                }
+                                // ... more items ...
+                            ],
+                            Quiet: true || false
+                        }
+                        //MFA: 'STRING_VALUE',
+                    };
 
-            s3.deleteObjects(params, function(err, data) {
-                if (err) {
-                    console.log(err, err.stack);
-                    res.send(err);
-                    // an error occurred
+                    s3.deleteObjects(params, function(err, data) {
+                        if (err) {
+                            console.log(err, err.stack);
+                            res.send(err);
+                            // an error occurred
+                        }
+                        else {
+                            console.log(data);
+                            db.audio_items.remove( { "_id" : o_id }, 1 );
+                            res.send("deleted");
+                            // successful response
+                        }
+                    });
                 }
-                else {
-                    console.log(data);
-                    db.audio_items.remove( { "_id" : o_id }, 1 );
-                    res.send("deleted");
-                    // successful response
-                }
-            });
-
+            })();
+        
         }
     });
 });
