@@ -4320,44 +4320,44 @@ app.post('/process_staging_files', requiredAuthentication, function (req, res) {
                             } else if (groupType == ".mp3" || groupType == ".wav" || groupType == ".aif" || groupType == ".aiff" || groupType == ".ogg" || 
                                 groupType == ".MP3" || groupType == ".WAV" || groupType == ".AIFF" || groupType == ".AIFF" || groupType == ".OGG"  ) { 
                                 // console.log("tryna USE_TRANSLOADIT for audio?" + process.env.USE_TRANSLOADIT);
-                                if (process.env.USE_TRANSLOADIT == true) { //nilch need to rem
-                                    console.log("transcodeAudioURL request: " + tUrl);
-                                    var encodeAudioUrlParams = {
-                                        steps: {
-                                            ':orig': {
-                                                robot: '/http/import',
-                                                url : tUrl
-                                            }
-                                        },
-                                        'template_id': '84da9df057e311e4bdecf5e543756029',
-                                        'fields' : { audio_item_id : iID,
-                                            user_id : req.session.user._id.toString()
-                                        }
-                                    };
-                                    transloadClient.send(encodeAudioUrlParams, function(ok) {
-                                        console.log('Success: ' + JSON.stringify(ok));
-                                        callback(null);
-                                    }, function(err) {
-                                        console.log('Error: ' + JSON.stringify(err));
-                                        callback(err);
-                                    });
-                                } else {
-                                    console.log("userid = " + req.session.user._id);
+                                // if (process.env.USE_TRANSLOADIT == true) { //nilch need to rem
+                                //     console.log("transcodeAudioURL request: " + tUrl);
+                                //     var encodeAudioUrlParams = {
+                                //         steps: {
+                                //             ':orig': {
+                                //                 robot: '/http/import',
+                                //                 url : tUrl
+                                //             }
+                                //         },
+                                //         'template_id': '84da9df057e311e4bdecf5e543756029',
+                                //         'fields' : { audio_item_id : iID,
+                                //             user_id : req.session.user._id.toString()
+                                //         }
+                                //     };
+                                //     transloadClient.send(encodeAudioUrlParams, function(ok) {
+                                //         console.log('Success: ' + JSON.stringify(ok));
+                                //         callback(null);
+                                //     }, function(err) {
+                                //         console.log('Error: ' + JSON.stringify(err));
+                                //         callback(err);
+                                //     });
+                                // } else {
+                                    console.log("tryna process audio userid = " + req.session.user._id);
                                     var token=jwt.sign({userId:req.session.user._id},process.env.JWT_SECRET);
                                     const options = {
                                         headers: {'X-Access-Token': token}
                                         };
                                     axios.get(process.env.GS_HOST + "/process_audio_download/"+iID, options)
-                                    .then((response) => {
-                                    //   console.log(response.data);
-                                        console.log("grabAndSqueeze process_audio response: " + response.data);
-                                    //   console.log(response.statusText);
-                                    //   console.log(response.headers);
-                                    //   console.log(response.config);
-                                        // callback(null);
-                                    })
+                                    // .then((response) => {
+                                    // //   console.log(response.data);
+                                    //     console.log("grabAndSqueeze process_audio response: " + response.data);
+                                    // //   console.log(response.statusText);
+                                    // //   console.log(response.headers);
+                                    // //   console.log(response.config);
+                                    //     // callback(null);
+                                    // })
                                     .then(function () {
-                                        // console.log('nerp');
+                                        console.log("grabAndSqueeze process_audio response: " + response.data);
                                         callback(null);
                                     })
                                     .catch(function (error) {
@@ -4365,7 +4365,7 @@ app.post('/process_staging_files', requiredAuthentication, function (req, res) {
                                         // console.log(error);
                                         callback(error);
                                     });
-                                }
+                                // }
                             } else if (groupType.toLowerCase() == ".mpg" || groupType.toLowerCase() == ".mp4" || groupType.toLowerCase() == ".mkv" || groupType.toLowerCase() == ".webm" || groupType.toLowerCase() == ".mov") {
                                 var targetBucket = "servicemedia";
                                 var copySource = "archive1/staging/" + item.uid + "/" + itemKey;
@@ -9634,28 +9634,35 @@ app.get('/audio/:id', requiredAuthentication, function (req, res){ //TODO Authen
                 //     callback(null);
                 // },
                 function(text_string, callback) { //add the signed URLs to the obj array
-                    var item_string_filename = JSON.stringify(audio_item.filename);
-                    item_string_filename = item_string_filename.replace(/\"/g, "");
-                    var item_string_filename_ext = getExtension(item_string_filename);
-                    var expiration = new Date();
-                    expiration.setMinutes(expiration.getMinutes() + 3);
-                    var baseName = path.basename(item_string_filename, (item_string_filename_ext));
-                    console.log(baseName);
-                    var mp3Name = baseName + '.mp3';
-                    var oggName = baseName + '.ogg';
-                    var pngName = baseName + '.png';
-                    var urlMp3 = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + audio_item.userID + "/audio/" + audio_item._id + "." + mp3Name, Expires: 6000});
-                    var urlOgg = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + audio_item.userID + "/audio/" + audio_item._id + "." + oggName, Expires: 6000});
-                    var urlPng = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + audio_item.userID + "/audio/" + audio_item._id + "." + pngName, Expires: 6000});
-                    audio_item.URLmp3 = urlMp3; //jack in teh signed urls into the object array
-                    audio_item.URLogg = urlOgg;
-                    audio_item.URLpng = urlPng;
-                    if (orig != null) {
-                        audio_item.URLorig = orig;
-                    }
-                    audio_item.textString = text_string;
 
-                    callback(null);
+                    (async () => {
+                        var item_string_filename = JSON.stringify(audio_item.filename);
+                        item_string_filename = item_string_filename.replace(/\"/g, "");
+                        var item_string_filename_ext = getExtension(item_string_filename);
+                        var expiration = new Date();
+                        expiration.setMinutes(expiration.getMinutes() + 3);
+                        var baseName = path.basename(item_string_filename, (item_string_filename_ext));
+                        console.log(baseName);
+                        var mp3Name = baseName + '.mp3';
+                        var oggName = baseName + '.ogg';
+                        var pngName = baseName + '.png';
+
+                        var urlMp3 = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, "users/" + audio_item.userID + "/audio/" + audio_item._id + "." + mp3Name, 6000); 
+                        var urlOgg = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, "users/" + audio_item.userID + "/audio/" + audio_item._id + "." + oggName, 6000); 
+                        var urlPng = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, "users/" + audio_item.userID + "/audio/" + audio_item._id + "." + pngName, 6000); 
+                        // var urlMp3 = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + audio_item.userID + "/audio/" + audio_item._id + "." + mp3Name, Expires: 6000});
+                        // var urlOgg = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + audio_item.userID + "/audio/" + audio_item._id + "." + oggName, Expires: 6000});
+                        // var urlPng = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + audio_item.userID + "/audio/" + audio_item._id + "." + pngName, Expires: 6000});
+                        audio_item.URLmp3 = urlMp3; //jack in teh signed urls into the object array
+                        audio_item.URLogg = urlOgg;
+                        audio_item.URLpng = urlPng;
+                        if (orig != null) {
+                            audio_item.URLorig = orig;
+                        }
+                        audio_item.textString = text_string;
+
+                        callback(null);
+                    })();
                 }],
 
                 function(err, result) { // #last function, close async
