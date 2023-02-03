@@ -9168,17 +9168,79 @@ app.get('/hls/:_id', function(req, res) {
                 console.log("error getting hls video item: " + err);
                 res.send("error getting hls video item: " + err);
             } else {
-                let chkParams = {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: 'users/' + video_item.userID + '/video/' + video_item._id + '/hls/output.m3u8'};
-                s3.getObject(chkParams, function(err, manifest) { 
-                if (err) { 
-                    res.send("no hls manifest found");
-                } else {
-                    // console.log("gotsa m3u8: " + manifest.Body.toString());
-                    var params = {
-                        Bucket: process.env.S3_ROOT_BUCKET_NAME,
-                        Prefix: 'users/' + video_item.userID + '/video/' + video_item._id + '/hls/'
-                    }
-                    s3.listObjects(params, function(err, data) {
+
+                (async () => {
+                    if (minioClient) {
+                        let buffer = [];
+                        await minioClient.getObject(process.env.S3_ROOT_BUCKET_NAME, 'users/' + video_item.userID + '/video/' + video_item._id + '/hls/output.m3u8', function(err, dataStream) {
+                            if (err) {
+                              console.log(err);
+                            }
+                            dataStream.on('data', function(chunk) {
+                            //   size += chunk.length
+                              buffer.push(chunk);
+                              // chunk.pipe(fileStream);
+                            })
+                            dataStream.on('end', function() {
+                                let manifestString = buffer.toString();
+                                console.log(manifestString);
+
+                                var data = [];
+                                var stream = minioClient.listObjects(process.env.S3_ROOT_BUCKET_NAME,'users/' + video_item.userID + '/video/' + video_item._id + '/hls/', false);
+                                stream.on('data', function(obj) { 
+                                    data.push(obj) 
+                                } )
+                                stream.on("end", function (obj) { 
+                                    console.log("minio bucket list: " + JSON.stringify(data)); 
+
+                                    async.each (data, function (s3Object, callbackz) { //takes a shake so async, and respond when it's done
+                                        console.log("minio data element: " + JSON.stringify(s3Object));
+                                        if (getExtension(s3Object.name) == ".ts") { //swap out .ts files (e.g 001.ts) for signed urls
+                                            console.log("minio key " + path.basename(s3Object.name)); 
+                                            // let url = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, s3Object.name.toString(), 36000);
+                                            minioClient.presignedGetObject(process.env.S3_ROOT_BUCKET_NAME, s3Object.name.toString(), 24*60*60, function(err, presignedUrl) { //use callback version here, can't await?
+                                                if (err) return console.log(err);
+                                                // console.log("url " + presignedUrl);
+                                                manifestString = manifestString.replace(path.basename(s3Object.name.toString()), presignedUrl);
+                                                callbackz();
+                                              });                                          
+                                        } else {
+                                            callbackz();
+                                        }
+                                            
+                                        }, function(err) {
+                                            if (err) {
+                                                // console.log('hls mangler failed to process');
+                                                res.send("error! " + err);
+                                            } else {
+                                                // console.log('All files have been processed successfully');
+                                                res.setHeader('content-type', 'application/x-mpegURL');
+                                                res.send(manifestString);
+                                            }
+                                    });
+                                })
+                                stream.on('error', function(err) { 
+                                    console.log(err)
+                                } );
+                            });
+                                dataStream.on('error', function(err) {
+                                console.log(err);
+                            
+                            });
+                        });
+                    } else {
+                    let chkParams = {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: 'users/' + video_item.userID + '/video/' + video_item._id + '/hls/output.m3u8'};
+                    s3.getObject(chkParams, function(err, manifest) { 
+                    if (err) { 
+                        res.send("no hls manifest found");
+                    } else {
+                        // console.log("gotsa m3u8: " + manifest.Body.toString());
+                        var params = {
+                            Bucket: process.env.S3_ROOT_BUCKET_NAME,
+                            Prefix: 'users/' + video_item.userID + '/video/' + video_item._id + '/hls/'
+                        }
+                        
+                        s3.listObjects(params, function(err, data) {
                         if (err) {
                             console.log(err);
                             res.send("error: " + err);
@@ -9195,22 +9257,24 @@ app.get('/hls/:_id', function(req, res) {
                                     // console.log("url " + url);
                                     manifestString = manifestString.replace(path.basename(s3Object.Key), url);
                                 }
-                                callbackz();
-                            }, function(err) {
-                                if (err) {
-                                    // console.log('hls mangler failed to process');
-                                    res.send("error! " + err);
-                                } else {
-                                    // console.log('All files have been processed successfully');
-                                    res.setHeader('content-type', 'application/x-mpegURL');
-                                    res.send(manifestString);
+                                    callbackz();
+                                }, function(err) {
+                                    if (err) {
+                                        // console.log('hls mangler failed to process');
+                                        res.send("error! " + err);
+                                    } else {
+                                        // console.log('All files have been processed successfully');
+                                        res.setHeader('content-type', 'application/x-mpegURL');
+                                        res.send(manifestString);
+                                    }
+                                });
+                                
                                 }
                             });
-                            
                             }
                         });
                     }
-                });
+                })();
             }
         });
     } else {
@@ -9231,10 +9295,17 @@ app.get('/uservid/:p_id', requiredAuthentication, function(req, res) {
             var item_string_filename_ext = getExtension(item_string_filename);
             var expiration = new Date();
             expiration.setMinutes(expiration.getMinutes() + 30);
-            var vidUrl = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + video_item.userID + "/video/" + video_item._id + "/" + video_item._id + "." + video_item.filename, Expires: 6000}); //just send back thumbnail urls for list
+
+            (async () => {
+            // var vidUrl = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + video_item.userID + "/video/" + video_item._id + "/" + video_item._id + "." + video_item.filename, Expires: 6000}); //just send back thumbnail urls for list
+            var vidUrl = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, "users/" + video_item.userID + "/video/" + video_item._id + "/" + video_item._id + "." + video_item.filename, 6000);
             //var urlPng = knoxClient.signedUrl(audio_item[0]._id + "." + pngName, expiration);
             video_item.URLvid = vidUrl; //jack in teh signed urls into the object array
-            
+                        console.log("returning video_item : " + video_item.URLvid);
+            res.json(video_item);
+            })();
+
+
             //TODO 1. pull m3u8 file, extract the .ts names, replace them  with signed urls, add modded manifest to response
     //         let cmParams = {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: "users/"+picture_item.userID+"/cubemaps/"+picture_item._id+"_px.jpg"};
     //                     s3.headObject(cmParams, function(err, data) { //some old pix aren't saved with .original. in filename, check for that
@@ -9262,8 +9333,7 @@ app.get('/uservid/:p_id', requiredAuthentication, function(req, res) {
     //                         }
     //                     });
         
-            console.log("returning video_item : " + video_item);
-            res.json(video_item);
+
 
         }
     });
