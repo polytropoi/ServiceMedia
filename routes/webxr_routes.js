@@ -9,7 +9,9 @@ const jwt = require("jsonwebtoken");
 const requireText = require('require-text');
 const { Console } = require("console");
 const minio = require('minio');
-
+// let minio = app.get('minio');
+let db = app.get('db');
+let s3 = app.get('s3'); 
 
 var minioClient = null;
 if (process.env.MINIOKEY && process.env.MINIOKEY != "" && process.env.MINIOENDPOINT && process.env.MINIOENDPOINT != "") {
@@ -98,46 +100,48 @@ console.log(aRgb); //[21, 2, 190]
     return aRgb;
 }
 
+function ReturnPresignedUrlSync (bucket, key, time) {
+    if (minioClient) {
+        minioClient.presignedGetObject(bucket, key, time, function(err, presignedUrl) { //use callback version here, can't await?
+            if (err) {
+                console.log(err);
+                return "err";
+            } else {
+                console.log("minio sync url " + presignedUrl)
+               return presignedUrl;
+                
+            }
+        });
+    } else {
+        let url = s3.getSignedUrl('getObject', {Bucket: bucket, Key: key, Expires: time});
+        console.log("s3 sync url" + url);
+        return url;
+    }
+}
+async function ReturnPresignedUrl(bucket, key, time) {
+    
+    if (minioClient) {
+        try {
+            return minioClient.presignedGetObject(bucket, key, time);
+        } catch (error) {
+            return error
+        }
+    } else {
+        try {
+            return s3.getSignedUrl('getObject', {Bucket: bucket, Key: key, Expires: time}); //returns a promise if called in async function?
+        } catch (error) {
+            return error;
+        } 
+    }
+}
+
 ////////////////////PRIMARY SERVERSIDE /WEBXR ROUTE///////////////////
 webxr_router.get('/:_id', function (req, res) { 
-    let db = req.app.get('db');
-    let s3 = req.app.get('s3');
+    // let db = req.app.get('db');
+    // let s3 = req.app.get('s3');
     // let minioClient = req.app.get('minioClient');
 
-    function ReturnPresignedUrlSync (bucket, key, time) {
-        if (minioClient) {
-            minioClient.presignedGetObject(bucket, key, time, function(err, presignedUrl) { //use callback version here, can't await?
-                if (err) {
-                    console.log(err);
-                    return "err";
-                } else {
-                    console.log("minio sync url " + presignedUrl)
-                   return presignedUrl;
-                    
-                }
-            });
-        } else {
-            let url = s3.getSignedUrl('getObject', {Bucket: bucket, Key: key, Expires: time});
-            console.log("s3 sync url" + url);
-            return url;
-        }
-    }
-    async function ReturnPresignedUrl(bucket, key, time) {
-        
-        if (minioClient) {
-            try {
-                return minioClient.presignedGetObject(bucket, key, time);
-            } catch (error) {
-                return error
-            }
-        } else {
-            try {
-                return s3.getSignedUrl('getObject', {Bucket: bucket, Key: key, Expires: time}); //returns a promise if called in async function?
-            } catch (error) {
-                return error;
-            } 
-        }
-    }
+
 
     var reqstring = entities.decodeHTML(req.params._id);
     console.log("webxr scene req " + reqstring);
@@ -1965,11 +1969,14 @@ webxr_router.get('/:_id', function (req, res) {
                                                 if (asset.item_type == "glb") {
                                                     assetUserID = asset.userID;
                                                     // var sourcePath =   "servicemedia/users/" + assetUserID + "/gltf/" + locMdl.gltf; //this should be "model" or "filename"
-                                                    let modelURL = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + assetUserID + "/gltf/" + asset.filename, Expires: 6000});
-                                                    objekt.modelURL = modelURL;
-                                                    gltfsAssets = gltfsAssets + "<a-asset-item id=\x22" + objekt.modelID + "\x22 src=\x22"+ modelURL +"\x22></a-asset-item>";
-                                                    objex.push(objekt);     
-                                                    cb(null);
+                                                    (async () => {
+                                                        // let modelURL = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + assetUserID + "/gltf/" + asset.filename, Expires: 6000});
+                                                        let modelURL = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, 'users/' + assetUserID + "/gltf/" + asset.filename, 6000);
+                                                        objekt.modelURL = modelURL;
+                                                        gltfsAssets = gltfsAssets + "<a-asset-item id=\x22" + objekt.modelID + "\x22 src=\x22"+ modelURL +"\x22></a-asset-item>";
+                                                        objex.push(objekt);     
+                                                        cb(null);
+                                                    })();
                                                 } else {
                                                     objex.push(objekt);     
                                                     cb(null);
@@ -2027,12 +2034,14 @@ webxr_router.get('/:_id', function (req, res) {
                                 if (asset.item_type == "glb") {
                                     // let assetUserID = asset.userID;
                                     // var sourcePath =   "servicemedia/users/" + assetUserID + "/gltf/" + locMdl.gltf; //this should be "model" or "filename"
-                                    let modelURL = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + asset.userID + "/gltf/" + asset.filename, Expires: 6000});
-                                    
-                                    gltfsAssets = gltfsAssets + "<a-asset-item class=\x22gltfAssets\x22 crossorigin=\x22anonymous\x22 response-type=\x22arraybuffer\x22 id=\x22" + actionModel.modelID + "\x22 src=\x22"+ modelURL +"\x22></a-asset-item>";
-                                    // objex.push(objekt);     
-                                    console.log("adding actionModel :" + actionModel.modelName);
-                                    callbackz(null);
+                                    (async () => {
+                                        // let modelURL = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + asset.userID + "/gltf/" + asset.filename, Expires: 6000});
+                                        let modelURL = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, 'users/' + assetUserID + "/gltf/" + asset.filename, 6000);
+                                        gltfsAssets = gltfsAssets + "<a-asset-item class=\x22gltfAssets\x22 crossorigin=\x22anonymous\x22 response-type=\x22arraybuffer\x22 id=\x22" + actionModel.modelID + "\x22 src=\x22"+ modelURL +"\x22></a-asset-item>";
+                                        // objex.push(objekt);     
+                                        console.log("adding actionModel :" + actionModel.modelName);
+                                        callbackz(null);
+                                    })();
                                 } else {
                                     // objex.push(objekt);     
                                     callbackz(null);
@@ -2104,12 +2113,18 @@ webxr_router.get('/:_id', function (req, res) {
                                 if (err || !asset) { 
                                     callbackz(err);
                                 } else {
+
+                                (async () => {
                                 if (asset.item_type == "glb") {
 
                                     assetUserID = asset.userID;
+                                    let modelURL = "";
                                     // var sourcePath =   "servicemedia/users/" + assetUserID + "/gltf/" + locMdl.gltf; //this should be "model" or "filename"
-                                    let modelURL = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + assetUserID + "/gltf/" + asset.filename, Expires: 6000});
+                                    // (async () => {
+                                    // modelURL = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + assetUserID + "/gltf/" + asset.filename, Expires: 6000});
+                                        modelURL = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, 'users/' + assetUserID + "/gltf/" + asset.filename, 6000);
                                     // console.log("modelURL " + modelURL + " modelType " + asset.item_type);
+
                                     assetNumber++;
                                     let newAttribution = {};
                                     
@@ -2483,7 +2498,8 @@ webxr_router.get('/:_id', function (req, res) {
                                         // var sourcePath =   "servicemedia/users/" + assetUserID + "/usdz/" + locMdl.gltf;
                                         // let assetType = "usdz";
                                         // if (asset.type == "reality")
-                                        let modelURL = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + assetUserID + "/" + asset.item_type + "/" + asset.filename, Expires: 6000});
+                                        // let modelURL = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + assetUserID + "/" + asset.item_type + "/" + asset.filename, Expires: 6000});
+                                        let modelURL = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, 'users/' + assetUserID + "/gltf/" + asset.filename, 6000);
                                         console.log("non-gltf modelURL " + modelURL + " modelType " + asset.item_type);
                                         usdzFiles = modelURL;
                                         
@@ -2498,6 +2514,7 @@ webxr_router.get('/:_id', function (req, res) {
                                         // console.log(loadUSDZ);
                                         callbackz();
                                     }
+                                })(); //end (async
                                     } 
                                 });
                                 } else {
@@ -2515,6 +2532,8 @@ webxr_router.get('/:_id', function (req, res) {
                                 callback(null);
                             }
                         });
+
+
                     } else {
                         callback(null);
                     }
@@ -2714,57 +2733,69 @@ webxr_router.get('/:_id', function (req, res) {
                 },
                 
                 function (audio_items, callback) { //add the signed URLs to the obj array 
-                    for (var i = 0; i < audio_items.length; i++) { //?? TODO do this async - if it's slow shit might get out of whack//NOTE gonna pull audioevents from client, rather than jack in from here
-                        // console.log("audio_item: " + JSON.stringify(audio_items[i]));
-                        var item_string_filename = JSON.stringify(audio_items[i].filename);
-                        item_string_filename = item_string_filename.replace(/\"/g, "");
-                        var item_string_filename_ext = getExtension(item_string_filename);
-                        var expiration = new Date();
-                        expiration.setMinutes(expiration.getMinutes() + 1000);
-                        var baseName = path.basename(item_string_filename, (item_string_filename_ext));
-                        //console.log(baseName);
-                        var mp3Name = baseName + '.mp3';
-                        var oggName = baseName + '.ogg';
-                        var pngName = baseName + '.png';
-                        // primaryAudioTitle = audio_items[i].filename;
+                    (async () => {
+                        for (var i = 0; i < audio_items.length; i++) { //?? TODO do this async - if it's slow shit might get out of whack//NOTE gonna pull audioevents from client, rather than jack in from here
+                            // console.log("audio_item: " + JSON.stringify(audio_items[i]));
+                            var item_string_filename = JSON.stringify(audio_items[i].filename);
+                            item_string_filename = item_string_filename.replace(/\"/g, "");
+                            var item_string_filename_ext = getExtension(item_string_filename);
+                            var expiration = new Date();
+                            expiration.setMinutes(expiration.getMinutes() + 1000);
+                            var baseName = path.basename(item_string_filename, (item_string_filename_ext));
+                            //console.log(baseName);
+                            var mp3Name = baseName + '.mp3';
+                            var oggName = baseName + '.ogg';
+                            var pngName = baseName + '.png';
+                            // primaryAudioTitle = audio_items[i].filename;
 
-                        if (sceneResponse.scenePrimaryAudioID != undefined && audio_items[i]._id == sceneResponse.scenePrimaryAudioID) {
-                            primaryAudioTitle = audio_items[i].title;
-                            primaryAudioObject = audio_items[i];
-                        // primaryAudioWaveform = 
-                            mp3url = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + audio_items[i].userID + "/audio/" + audio_items[i]._id + "." + mp3Name, Expires: 6000});
-                            oggurl = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + audio_items[i].userID + "/audio/" + audio_items[i]._id + "." + oggName, Expires: 6000});
-                            pngurl = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + audio_items[i].userID + "/audio/" + audio_items[i]._id + "." + pngName, Expires: 6000});
-                            primaryAudioWaveform = pngurl;
-                            pAudioWaveform = "<img id=\x22primaryAudioWaveform\x22 crossorigin=\x22anonymous\x22 src=\x22"+primaryAudioWaveform+"\x22>";
-                        }
-                        if (sceneResponse.sceneAmbientAudioID != undefined && audio_items[i]._id == sceneResponse.sceneAmbientAudioID) {
-                            ambientOggUrl = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + audio_items[i].userID + "/audio/" + audio_items[i]._id + "." + oggName, Expires: 6000});
-                            ambientMp3Url = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + audio_items[i].userID + "/audio/" + audio_items[i]._id + "." + mp3Name, Expires: 6000});
-                        }                        
-                        if (sceneResponse.sceneTriggerAudioID != undefined && audio_items[i]._id == sceneResponse.sceneTriggerAudioID) {
-                            triggerOggUrl = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + audio_items[i].userID + "/audio/" + audio_items[i]._id + "." + oggName, Expires: 6000});
-                            triggerMp3Url = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + audio_items[i].userID + "/audio/" + audio_items[i]._id + "." + mp3Name, Expires: 6000});
-                        }
+                            if (sceneResponse.scenePrimaryAudioID != undefined && audio_items[i]._id == sceneResponse.scenePrimaryAudioID) {
+                                primaryAudioTitle = audio_items[i].title;
+                                primaryAudioObject = audio_items[i];
+                            // primaryAudioWaveform = 
+                                // mp3url = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + audio_items[i].userID + "/audio/" + audio_items[i]._id + "." + mp3Name, Expires: 6000});
+                                // oggurl = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + audio_items[i].userID + "/audio/" + audio_items[i]._id + "." + oggName, Expires: 6000});
+                                // pngurl = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + audio_items[i].userID + "/audio/" + audio_items[i]._id + "." + pngName, Expires: 6000});
 
-                        if (audio_items[i].sourceText != undefined && audio_items[i].sourceText != null && audio_items[i].sourceText != "") {
-                            let newAttribution = {};
-                                    
-                            newAttribution.name = audio_items[i].title;
-                            newAttribution._id = audio_items[i]._id;
-                            
-                            newAttribution.sourceTitle = audio_items[i].sourceTitle;
-                            newAttribution.sourceLink = audio_items[i].sourceLink;
-                            newAttribution.authorName = audio_items[i].authorName;
-                            newAttribution.authorLink = audio_items[i].authorLink;
-                            newAttribution.license = audio_items[i].license;
-                            newAttribution.sourceText = audio_items[i].sourceText;
-                            newAttribution.modifications = audio_items[i].modifications;
-                            attributions.push(newAttribution);
+                                mp3url = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, 'users/' + audio_items[i].userID + "/audio/" + audio_items[i]._id + "." + mp3Name, 6000);
+                                oggurl = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, 'users/' + audio_items[i].userID + "/audio/" + audio_items[i]._id + "." + oggName, 6000);
+                                pngurl = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, 'users/' + audio_items[i].userID + "/audio/" + audio_items[i]._id + "." + pngName, 6000);
+                                console.log("primary audio url is " + mp3url);
+                                primaryAudioWaveform = pngurl;
+                                pAudioWaveform = "<img id=\x22primaryAudioWaveform\x22 crossorigin=\x22anonymous\x22 src=\x22"+primaryAudioWaveform+"\x22>";
+                            }
+                            if (sceneResponse.sceneAmbientAudioID != undefined && audio_items[i]._id == sceneResponse.sceneAmbientAudioID) {
+
+                                // ambientOggUrl = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + audio_items[i].userID + "/audio/" + audio_items[i]._id + "." + oggName, Expires: 6000});
+                                // ambientMp3Url = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + audio_items[i].userID + "/audio/" + audio_items[i]._id + "." + mp3Name, Expires: 6000});
+                                ambientOggUrl = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, 'users/' + audio_items[i].userID + "/audio/" + audio_items[i]._id + "." + oggName, 6000);
+                                ambientMp3Url = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, 'users/' + audio_items[i].userID + "/audio/" + audio_items[i]._id + "." + mp3Name, 6000);
+                            }                        
+                            if (sceneResponse.sceneTriggerAudioID != undefined && audio_items[i]._id == sceneResponse.sceneTriggerAudioID) {
+                                // triggerOggUrl = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + audio_items[i].userID + "/audio/" + audio_items[i]._id + "." + oggName, Expires: 6000});
+                                // triggerMp3Url = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + audio_items[i].userID + "/audio/" + audio_items[i]._id + "." + mp3Name, Expires: 6000});
+                                triggerOggUrl = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, 'users/' + audio_items[i].userID + "/audio/" + audio_items[i]._id + "." + oggName, 6000);
+                                triggerMp3Url = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, 'users/' + audio_items[i].userID + "/audio/" + audio_items[i]._id + "." + mp3Name, 6000);
+                            }
+
+                            if (audio_items[i].sourceText != undefined && audio_items[i].sourceText != null && audio_items[i].sourceText != "") {
+                                let newAttribution = {};
+                                        
+                                newAttribution.name = audio_items[i].title;
+                                newAttribution._id = audio_items[i]._id;
+                                
+                                newAttribution.sourceTitle = audio_items[i].sourceTitle;
+                                newAttribution.sourceLink = audio_items[i].sourceLink;
+                                newAttribution.authorName = audio_items[i].authorName;
+                                newAttribution.authorLink = audio_items[i].authorLink;
+                                newAttribution.license = audio_items[i].license;
+                                newAttribution.sourceText = audio_items[i].sourceText;
+                                newAttribution.modifications = audio_items[i].modifications;
+                                attributions.push(newAttribution);
+                            }
+                            // console.log("copying audio to s3...");
                         }
-                        // console.log("copying audio to s3...");
-                    }
-                    callback(null);
+                        callback(null);
+                    })();//async end
                 },
                 function (callback) {
                     
@@ -2950,70 +2981,77 @@ webxr_router.get('/:_id', function (req, res) {
               
                     if (video_items != null && video_items[0] != null) { //only single vid for now, need to loop array
 
-                        console.log("video_item: " + JSON.stringify(video_items[0]));
-                        var item_string_filename = JSON.stringify(video_items[0].filename);
-                        item_string_filename = item_string_filename.replace(/\"/g, "");
-                        var item_string_filename_ext = getExtension(item_string_filename);
-                        var expiration = new Date();
-                        expiration.setMinutes(expiration.getMinutes() + 1000);
-                        var baseName = path.basename(item_string_filename, (item_string_filename_ext));
-                        var namePlusExtension = baseName + item_string_filename_ext.toLowerCase();
-                        //console.log("mp4 video: " + mp4Name + " " + video_items[0]._id);
-                        console.log("gotsa vid with ext : "+item_string_filename_ext.toLowerCase()); 
-                        let mov = "";
-                        let webm = "";
-                        let vidSrc = "";
-                        var vid = video_items[0]._id;
-                        var ori = video_items[0].orientation != null ? video_items[0].orientation : "";
-                        if (item_string_filename_ext.toLowerCase() == ".mp4" || item_string_filename_ext.toLowerCase() == ".mkv") { //single src OK for these
-                            vidUrl = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + video_items[0].userID + "/video/" + vid + "/" + vid + "." + namePlusExtension, Expires: 6000});
-                            vidSrc = "<source src=\x22"+vidUrl+"\x22 type=\x22video/mp4\x22>";
-                        } else {
-                            //for transparent video, need both mov + webm!
-                            if (item_string_filename_ext.toLowerCase() == ".mov") {
-                                mov = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + video_items[0].userID + "video/" + vid + "/" + vid + "." + namePlusExtension, Expires: 6000});
-                                for (let i = 0; i < video_items.length; i++) {
-                                    if (video_items[0]._id != video_items[i]._id) {
-                                        if (video_items[0].title == video_items[i].title) {
-                                            console.log("found a webm to match the mov");
-                                            webm = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + video_items[i].userID + "/" + video_items[i]._id + "." +  video_items[i].filename, Expires: 6000});
-                                            vidSrc = "<source src=\x22"+webm+"\x22 type=\x22video/webm\x22><source src=\x22"+mov+"\x22 type=\x22video/webm\x22>";
-                                        }
-                                    }
-                                }
-                                
-                            }
-                            if (item_string_filename_ext.toLowerCase() == ".webm") {
-                                webm = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + video_items[0].userID + "/" + vid + "." + namePlusExtension, Expires: 6000});
-                                for (let i = 0; i < video_items.length; i++) {
-                                    if (video_items[0]._id != video_items[i]._id) {
-                                        if (video_items[0].title == video_items[i].title) {
-                                            console.log("found a mov to match the webm " + video_items[0]._id + " vs " + video_items[i]._id);
-                                            mov = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + video_items[i].userID + "/" + video_items[i]._id + "." + video_items[i].filename, Expires: 6000});
-                                            vidSrc = "<source src=\x22"+webm+"\x22 type=\x22video/webm\x22><source src=\x22"+mov+"\x22 type=\x22video/quicktime\x22>";
-                                        }
-                                    }
-                                }  
-                            }
-                        }
-                    
-                        if (ori.toLowerCase() == "equirectangular") {
-                            videosphereAsset = "<video id=\x22videosphere\x22 autoplay loop crossOrigin=\x22anonymous\x22 src=\x22" + vidUrl + "\x22></video>";
-                            videoEntity = "<a-videosphere play-on-window-click play-on-vrdisplayactivate-or-enter-vr crossOrigin=\x22anonymous\x22 src=\x22#videosphere\x22 rotation=\x220 180 0\x22 material=\x22shader: flat;\x22></a-videosphere>";
-
-                        } else {
-                            if (preloadVideo) {
-                               
-                                videoAsset = "<video id=\x22video1\x22 crossOrigin=\x22anonymous\x22>"+vidSrc+"</video>";
+                        (async () => {
+                            console.log("video_item: " + JSON.stringify(video_items[0]));
+                            var item_string_filename = JSON.stringify(video_items[0].filename);
+                            item_string_filename = item_string_filename.replace(/\"/g, "");
+                            var item_string_filename_ext = getExtension(item_string_filename);
+                            var expiration = new Date();
+                            expiration.setMinutes(expiration.getMinutes() + 1000);
+                            var baseName = path.basename(item_string_filename, (item_string_filename_ext));
+                            var namePlusExtension = baseName + item_string_filename_ext.toLowerCase();
+                            //console.log("mp4 video: " + mp4Name + " " + video_items[0]._id);
+                            console.log("gotsa vid with ext : "+item_string_filename_ext.toLowerCase()); 
+                            let mov = "";
+                            let webm = "";
+                            let vidSrc = "";
+                            var vid = video_items[0]._id;
+                            var ori = video_items[0].orientation != null ? video_items[0].orientation : "";
+                            if (item_string_filename_ext.toLowerCase() == ".mp4" || item_string_filename_ext.toLowerCase() == ".mkv") { //single src OK for these
+                                // vidUrl = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + video_items[0].userID + "/video/" + vid + "/" + vid + "." + namePlusExtension, Expires: 6000});
+                                vidUrl = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, 'users/' + video_items[0].userID + "/video/" + vid + "/" + vid + "." + namePlusExtension, 6000);
+                                vidSrc = "<source src=\x22"+vidUrl+"\x22 type=\x22video/mp4\x22>";
                             } else {
-                                videoAsset = "<video autoplay muted loop=\x22true\x22 webkit-playsinline playsinline id=\x22video1\x22 crossOrigin=\x22anonymous\x22></video>"; 
+                                //for transparent video, need both mov + webm!
+                                if (item_string_filename_ext.toLowerCase() == ".mov") {
+                                    // mov = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + video_items[0].userID + "video/" + vid + "/" + vid + "." + namePlusExtension, Expires: 6000});
+                                    mov = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, 'users/' + video_items[0].userID + "/video/" + vid + "/" + vid + "." + namePlusExtension, 6000);
+                                    for (let i = 0; i < video_items.length; i++) {
+                                        if (video_items[0]._id != video_items[i]._id) {
+                                            if (video_items[0].title == video_items[i].title) {
+                                                console.log("found a webm to match the mov");
+                                                // webm = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + video_items[i].userID + "/" + video_items[i]._id + "." +  video_items[i].filename, Expires: 6000});
+                                                webm = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, 'users/' + video_items[i].userID + "/" + video_items[i]._id + "." +  video_items[i].filename, 6000);
+                                                vidSrc = "<source src=\x22"+webm+"\x22 type=\x22video/webm\x22><source src=\x22"+mov+"\x22 type=\x22video/webm\x22>";
+                                            }
+                                        }
+                                    }
+                                    
+                                }
+                                if (item_string_filename_ext.toLowerCase() == ".webm") {
+                                    // webm = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + video_items[0].userID + "/" + vid + "." + namePlusExtension, Expires: 6000});
+                                    webm = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, 'users/' + video_items[0].userID + "/video/" + vid + "/" + vid + "." + namePlusExtension, 6000);
+                                    for (let i = 0; i < video_items.length; i++) {
+                                        if (video_items[0]._id != video_items[i]._id) {
+                                            if (video_items[0].title == video_items[i].title) {
+                                                console.log("found a mov to match the webm " + video_items[0]._id + " vs " + video_items[i]._id);
+                                                // mov = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + video_items[i].userID + "/" + video_items[i]._id + "." + video_items[i].filename, Expires: 6000});
+                                                mov = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, 'users/' + video_items[i].userID + "/" + video_items[i]._id + "." +  video_items[i].filename, 6000);
+                                                vidSrc = "<source src=\x22"+mov+"\x22 type=\x22video/webm\x22><source src=\x22"+mov+"\x22 type=\x22video/quicktime\x22>";
+                                            }
+                                        }
+                                    }  
+                                }
+                            }
+                        
+                            if (ori.toLowerCase() == "equirectangular") {
+                                videosphereAsset = "<video id=\x22videosphere\x22 autoplay loop crossOrigin=\x22anonymous\x22 src=\x22" + vidUrl + "\x22></video>";
+                                videoEntity = "<a-videosphere play-on-window-click play-on-vrdisplayactivate-or-enter-vr crossOrigin=\x22anonymous\x22 src=\x22#videosphere\x22 rotation=\x220 180 0\x22 material=\x22shader: flat;\x22></a-videosphere>";
+
+                            } else {
+                                if (preloadVideo) {
+                                
+                                    videoAsset = "<video id=\x22video1\x22 crossOrigin=\x22anonymous\x22>"+vidSrc+"</video>";
+                                } else {
+                                    videoAsset = "<video autoplay muted loop=\x22true\x22 webkit-playsinline playsinline id=\x22video1\x22 crossOrigin=\x22anonymous\x22></video>"; 
+                                }
+
+                                videoEntity = "<a-entity "+videoParent+" class=\x22activeObjexGrab activeObjexRay\x22 vid_materials=\x22url: "+vidUrl+"\x22 gltf-model=\x22#movieplayer2.glb\x22 position=\x22"+videoLocation+"\x22 rotation=\x22"+videoRotation+"\x22 width='10' height='6'><a-text id=\x22videoText\x22 align=\x22center\x22 rotation=\x220 0 0\x22 position=\x22-.5 -1 1\x22 wrapCount=\x2240\x22 value=\x22Click to Play Video\x22></a-text>" +
+                                "</a-entity>";
                             }
 
-                            videoEntity = "<a-entity "+videoParent+" class=\x22activeObjexGrab activeObjexRay\x22 vid_materials=\x22url: "+vidUrl+"\x22 gltf-model=\x22#movieplayer2.glb\x22 position=\x22"+videoLocation+"\x22 rotation=\x22"+videoRotation+"\x22 width='10' height='6'><a-text id=\x22videoText\x22 align=\x22center\x22 rotation=\x220 0 0\x22 position=\x22-.5 -1 1\x22 wrapCount=\x2240\x22 value=\x22Click to Play Video\x22></a-text>" +
-                            "</a-entity>";
-                        }
-
-                        callback(null);
+                            callback(null);
+                        })(); //async end
                     } else {
                         callback(null);
                     }
@@ -3041,7 +3079,9 @@ webxr_router.get('/:_id', function (req, res) {
                                         callbackz();
                                     } else {
                                         async.each(videos, function(video, cbimage) { //jack in a signed url for each
-                                            video.url = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + video.userID + "/video/" + video._id + "/" + video._id + "." + video.filename, Expires: 6000}); //TODO: puthemsina video folder!
+                                            // video.url = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + video.userID + "/video/" + video._id + "/" + video._id + "." + video.filename, Expires: 6000}); //TODO: puthemsina video folder!
+                                            video.url = ReturnPresignedUrlSync(process.env.S3_ROOT_BUCKET_NAME, 'users/' + video.userID + "/video/" + video._id + "/" + video._id + "." + video.filename, 6000);
+                                            
                                             cbimage();
                                         }, 
                                         function (err) {
@@ -3230,13 +3270,13 @@ webxr_router.get('/:_id', function (req, res) {
                         callback(null);
                     
                 },
-
-                function (callback) {
+                /*
+                function (callback) { //deprecate this one? no need to copy to static routes..
                     var postcards = [];
                     // console.log("sceneResponse.scenePostcards: " + JSON.stringify(sceneResponse.scenePostcards));
                     if (sceneResponse.scenePostcards != null && sceneResponse.scenePostcards.length > 0) {
                         var index = 0;
-                        async.each(sceneResponse.scenePostcards, function (postcardID, callbackz) { //nested async-ery!
+                        async.each(sceneResponse.scenePostcards, function (postcardID, callbackz) { 
                             index++;
                             var oo_id = ObjectID(postcardID);
                             // console.log("index? " + index);
@@ -3296,6 +3336,7 @@ webxr_router.get('/:_id', function (req, res) {
                             callback();
                         }
                 },
+                */
                 function (callback) {
                     console.log("pictureGroups: " + sceneResponse.scenePictureGroups);
                     if (sceneResponse.scenePictureGroups != null && sceneResponse.scenePictureGroups.length > 0) {
@@ -3320,14 +3361,18 @@ webxr_router.get('/:_id', function (req, res) {
                                         callbackz();
                                     } else {
                                         async.each(images, function(image, cbimage) { //jack in a signed url for each
-                                            if (image.orientation != null && image.orientation != undefined && image.orientation.toLowerCase() == "equirectangular") { 
-                                                skyboxIDs.push(image._id);
-                                                image.url = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + image.userID + "/pictures/originals/" + image._id + ".original." + image.filename, Expires: 6000});
-                                                cbimage();
-                                            } else {
-                                                image.url = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + image.userID + "/pictures/" + image._id + ".standard." + image.filename, Expires: 6000}); //i.e. 1024
-                                                cbimage();
-                                            }
+                                            (async () => {
+                                                if (image.orientation != null && image.orientation != undefined && image.orientation.toLowerCase() == "equirectangular") { 
+                                                    skyboxIDs.push(image._id);
+                                                    // image.url = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + image.userID + "/pictures/originals/" + image._id + ".original." + image.filename, Expires: 6000});
+                                                    image.url = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, 'users/' + image.userID + "/pictures/originals/" + image._id + ".original." + image.filename, 6000);
+                                                    cbimage();
+                                                } else {
+                                                    // image.url = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + image.userID + "/pictures/" + image._id + ".standard." + image.filename, Expires: 6000}); //i.e. 1024
+                                                    image.url = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, 'users/' + image.userID + "/pictures/" + image._id + ".standard." + image.filename, 6000);
+                                                    cbimage();
+                                                }
+                                            })();
                                             
                                             
                                         }, 

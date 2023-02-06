@@ -9183,7 +9183,7 @@ app.get('/hls/:_id', function(req, res) {
                             })
                             dataStream.on('end', function() {
                                 let manifestString = buffer.toString();
-                                console.log(manifestString);
+                                // console.log(manifestString);
 
                                 var data = [];
                                 var stream = minioClient.listObjects(process.env.S3_ROOT_BUCKET_NAME,'users/' + video_item.userID + '/video/' + video_item._id + '/hls/', false);
@@ -9196,7 +9196,7 @@ app.get('/hls/:_id', function(req, res) {
                                     async.each (data, function (s3Object, callbackz) { //takes a shake so async, and respond when it's done
                                         // console.log("minio data element: " + JSON.stringify(s3Object));
                                         if (getExtension(s3Object.name) == ".ts") { //swap out .ts files (e.g 001.ts) for signed urls
-                                            console.log("minio key " + path.basename(s3Object.name)); 
+                                            // console.log("minio key " + path.basename(s3Object.name)); 
                                             // let url = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, s3Object.name.toString(), 36000);
                                             minioClient.presignedGetObject(process.env.S3_ROOT_BUCKET_NAME, s3Object.name.toString(), 24*60*60, function(err, presignedUrl) { //use callback version here, can't await?
                                                 if (err) return console.log(err);
