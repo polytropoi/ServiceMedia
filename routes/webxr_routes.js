@@ -8,7 +8,51 @@ const validator = require('validator');
 const jwt = require("jsonwebtoken");
 const requireText = require('require-text');
 const { Console } = require("console");
+const minio = require('minio');
 
+
+var minioClient = null;
+if (process.env.MINIOKEY && process.env.MINIOKEY != "" && process.env.MINIOENDPOINT && process.env.MINIOENDPOINT != "") {
+        minioClient = new minio.Client({
+        endPoint: process.env.MINIOENDPOINT,
+        port: 9000,
+        useSSL: false,
+        accessKey: process.env.MINIOKEY,
+        secretKey: process.env.MINIOSECRET
+    });
+}
+
+// function ReturnPresignedUrlSync (bucket, key, time) {
+//     if (minioClient) {
+//         minioClient.presignedGetObject(bucket, key, time, function(err, presignedUrl) { //use callback version here, can't await?
+//             if (err) {
+//                 console.log(err);
+//                 return "err";
+//             } else {
+//                 return presignedUrl;
+                
+//             }
+//         });
+//     } else {
+//         return s3.getSignedUrl('getObject', {Bucket: bucket, Key: key, Expires: time});
+//     }
+// }
+// async function ReturnPresignedUrl(bucket, key, time) {
+    
+//     if (minioClient) {
+//         try {
+//             return minioClient.presignedGetObject(bucket, key, time);
+//         } catch (error) {
+//             return error
+//         }
+//     } else {
+//         try {
+//             return s3.getSignedUrl('getObject', {Bucket: bucket, Key: key, Expires: time}); //returns a promise if called in async function?
+//         } catch (error) {
+//             return error;
+//         } 
+//     }
+// }
 
 function getExtension(filename) {
     var i = filename.lastIndexOf('.');
@@ -58,6 +102,42 @@ console.log(aRgb); //[21, 2, 190]
 webxr_router.get('/:_id', function (req, res) { 
     let db = req.app.get('db');
     let s3 = req.app.get('s3');
+    // let minioClient = req.app.get('minioClient');
+
+    function ReturnPresignedUrlSync (bucket, key, time) {
+        if (minioClient) {
+            minioClient.presignedGetObject(bucket, key, time, function(err, presignedUrl) { //use callback version here, can't await?
+                if (err) {
+                    console.log(err);
+                    return "err";
+                } else {
+                    console.log("minio sync url " + presignedUrl)
+                   return presignedUrl;
+                    
+                }
+            });
+        } else {
+            let url = s3.getSignedUrl('getObject', {Bucket: bucket, Key: key, Expires: time});
+            console.log("s3 sync url" + url);
+            return url;
+        }
+    }
+    async function ReturnPresignedUrl(bucket, key, time) {
+        
+        if (minioClient) {
+            try {
+                return minioClient.presignedGetObject(bucket, key, time);
+            } catch (error) {
+                return error
+            }
+        } else {
+            try {
+                return s3.getSignedUrl('getObject', {Bucket: bucket, Key: key, Expires: time}); //returns a promise if called in async function?
+            } catch (error) {
+                return error;
+            } 
+        }
+    }
 
     var reqstring = entities.decodeHTML(req.params._id);
     console.log("webxr scene req " + reqstring);
@@ -318,6 +398,8 @@ webxr_router.get('/:_id', function (req, res) {
     let joystickContainer  = "";
     let arImageTargets = [];
 
+
+    
     db.scenes.findOne({"short_id": reqstring}, function (err, sceneData) { 
             if (err || !sceneData) {
                 console.log("1 error getting scene data: " + err);
@@ -1511,10 +1593,24 @@ webxr_router.get('/:_id', function (req, res) {
                                     callbackz();
                                 } else {
                                     // console.log("got user model:" + model._id);
-                                    let url = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + model.userID + "/gltf/" + model.filename, Expires: 6000});
-                                    model.url = url;
-                                    modelz.push(model);
-                                    callbackz();
+                                    if (minioClient) {
+
+                                        minioClient.presignedGetObject(process.env.S3_ROOT_BUCKET_NAME, 'users/' + model.userID + "/gltf/" + model.filename, 6000, function(err, presignedUrl) { //use callback version here, can't await?
+                                            if (err) {
+                                                console.log(err);
+                                                callbackz(err);
+                                            } else {
+                                                model.url = presignedUrl;
+                                                modelz.push(model);
+                                                callbackz();
+                                            }
+                                        });    
+                                    } else { 
+                                        let url = s3.getSignedUrl('getObject', {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: 'users/' + model.userID + "/gltf/" + model.filename, Expires: 6000});
+                                        model.url = url;
+                                        modelz.push(model);
+                                        callbackz();
+                                    }
                                 }
                             });
                         }, function(err) {
@@ -1570,27 +1666,31 @@ webxr_router.get('/:_id', function (req, res) {
                                         var halfName = 'half.' + baseName + item_string_filename_ext;
                                         var quarterName = 'quarter.' + baseName + item_string_filename_ext;
 
-                                        var urlHalf = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + "." + halfName, Expires: 6000}); //just send back thumbnail urls for list
-                                        var urlQuarter = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + "." + quarterName, Expires: 6000}); //just send back thumbnail urls for list
-                                        availableScene = {
-                                            sceneTitle: scene.sceneTitle,
-                                            sceneKey: scene.short_id,
-                                            sceneType: scene.sceneType,
-                                            sceneLastUpdate: scene.sceneLastUpdate,
-                                            sceneDescription: scene.sceneDescription,
-                                            sceneKeynote: scene.sceneKeynote,
-                                            sceneAndroidOK: scene.sceneAndroidOK,
-                                            sceneIosOK: scene.sceneIosOK,
-                                            sceneWindowsOK: scene.sceneWindowsOK,
-                                            sceneStatus: scene.sceneShareWithPublic ? "public" : "private",
-                                            sceneOwner: scene.userName ? "" : scene.userName,
-                                            scenePostcardQuarter: urlQuarter,
-                                            scenePostcardHalf: urlHalf
-                                        };
-                                        availableScenesResponse.availableScenes.push(availableScene);
+                                        // var urlHalf = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + "." + halfName, Expires: 6000}); //just send back thumbnail urls for list
+                                        // var urlQuarter = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + "." + quarterName, Expires: 6000}); //just send back thumbnail urls for list
+                                        (async () => {
+                                            var urlHalf = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, "users/" + picture_item.userID + "/pictures/" + picture_item._id + "." + halfName, 6000); //just send back thumbnail urls for list
+                                            var urlQuarter = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, "users/" + picture_item.userID + "/pictures/" + picture_item._id + "." + quarterName, 6000); //just send back thumbnail urls for list
+                                            
+                                            availableScene = {
+                                                sceneTitle: scene.sceneTitle,
+                                                sceneKey: scene.short_id,
+                                                sceneType: scene.sceneType,
+                                                sceneLastUpdate: scene.sceneLastUpdate,
+                                                sceneDescription: scene.sceneDescription,
+                                                sceneKeynote: scene.sceneKeynote,
+                                                sceneAndroidOK: scene.sceneAndroidOK,
+                                                sceneIosOK: scene.sceneIosOK,
+                                                sceneWindowsOK: scene.sceneWindowsOK,
+                                                sceneStatus: scene.sceneShareWithPublic ? "public" : "private",
+                                                sceneOwner: scene.userName ? "" : scene.userName,
+                                                scenePostcardQuarter: urlQuarter,
+                                                scenePostcardHalf: urlHalf
+                                            };
+                                            availableScenesResponse.availableScenes.push(availableScene);
 
-                                        cb();
-
+                                            cb();
+                                        })();
                                         }
                                     });
                                 } else {
@@ -1676,12 +1776,15 @@ webxr_router.get('/:_id', function (req, res) {
                                     }
 
                                     index++;
-                                    var urlStandard = s3.getSignedUrl('getObject', {Bucket: 'servicemedia.web', Key: weblink._id +"/"+ weblink._id + ".standard.jpg", Expires: 6000});
-                                    weblinkAssets = weblinkAssets + "<img id=\x22wlimage" + index + "\x22 crossorigin=\x22anonymous\x22 src='" + urlStandard + "'>";
-                                    let link = "basic-link=\x22href: "+weblink.link_url+";\x22 class=\x22activeObjexGrab activeObjexRay\x22";
-                                    let caption = "<a-troika-text class=\x22pCap\x22 align=\x22center\x22 rotation=\x220 0 0\x22 font=\x22../fonts/web/Acme.woff\x22 outlineWidth=\x222%\x22 outlineColor=\x22black\x22  fontSize=\x221\x22 anchor=\x22top\x22 maxWidth=\x2210\x22 position=\x220 1.1 .1\x22 wrapCount=\x2240\x22 value=\x22"+weblink.link_title+"\x22></a-troika-text>";
-                                    weblinkEntities = weblinkEntities + "<a-entity "+link+" position=\x22"+position+"\x22 weblink-materials=\x22index:"+index+"\x22 look-at=\x22#player\x22 gltf-model=\x22#flatsquare\x22 scale=\x22"+scale+"\x22 material=\x22shader: flat; src: #wlimage" + index + "; alphaTest: 0.5;\x22"+
-                                    " visible='true'>"+caption+"</a-entity>";   
+                                    // (async () => {
+                                        var urlStandard = ReturnPresignedUrlSync(process.env.S3_WEBSCRAPE_BUCKET_NAME, weblink._id +"/"+ weblink._id + ".standard.jpg", 6000);
+
+                                        weblinkAssets = weblinkAssets + "<img id=\x22wlimage" + index + "\x22 crossorigin=\x22anonymous\x22 src='" + urlStandard + "'>";
+                                        let link = "basic-link=\x22href: "+weblink.link_url+";\x22 class=\x22activeObjexGrab activeObjexRay\x22";
+                                        let caption = "<a-troika-text class=\x22pCap\x22 align=\x22center\x22 rotation=\x220 0 0\x22 font=\x22../fonts/web/Acme.woff\x22 outlineWidth=\x222%\x22 outlineColor=\x22black\x22  fontSize=\x221\x22 anchor=\x22top\x22 maxWidth=\x2210\x22 position=\x220 1.1 .1\x22 wrapCount=\x2240\x22 value=\x22"+weblink.link_title+"\x22></a-troika-text>";
+                                        weblinkEntities = weblinkEntities + "<a-entity "+link+" position=\x22"+position+"\x22 weblink-materials=\x22index:"+index+"\x22 look-at=\x22#player\x22 gltf-model=\x22#flatsquare\x22 scale=\x22"+scale+"\x22 material=\x22shader: flat; src: #wlimage" + index + "; alphaTest: 0.5;\x22"+
+                                        " visible='true'>"+caption+"</a-entity>";   
+                                    // })();
                                 }
                             });
                         }
