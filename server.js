@@ -9160,7 +9160,7 @@ app.get('/userpic/:p_id', requiredAuthentication, function(req, res) {
 
 app.get('/hls/:_id', function(req, res) {
     var pID = req.params._id;
-    console.log("hls pid " + req.params._id);
+    // console.log("hls pid " + req.params._id);
     if (ObjectID.isValid(pID)) {
         var o_id = ObjectID(pID);
         db.video_items.findOne({"_id": o_id}, function(err, video_item) {
@@ -9191,10 +9191,10 @@ app.get('/hls/:_id', function(req, res) {
                                     data.push(obj) 
                                 } )
                                 stream.on("end", function (obj) { 
-                                    console.log("minio bucket list: " + JSON.stringify(data)); 
+                                    // console.log("minio bucket list: " + JSON.stringify(data)); 
 
                                     async.each (data, function (s3Object, callbackz) { //takes a shake so async, and respond when it's done
-                                        console.log("minio data element: " + JSON.stringify(s3Object));
+                                        // console.log("minio data element: " + JSON.stringify(s3Object));
                                         if (getExtension(s3Object.name) == ".ts") { //swap out .ts files (e.g 001.ts) for signed urls
                                             console.log("minio key " + path.basename(s3Object.name)); 
                                             // let url = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, s3Object.name.toString(), 36000);

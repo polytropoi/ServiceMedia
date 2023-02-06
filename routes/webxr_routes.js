@@ -498,7 +498,8 @@ webxr_router.get('/:_id', function (req, res) {
                             logScripts = logScripts + "<script src=\x22../main/src/component/a-console.js\x22></script>";
                         }
                         if (sceneData.sceneTags[i].toLowerCase().includes("physics")) {
-                            physicsScripts =  "<script src=\x22https://mixedreality.mozilla.org/ammo.js/builds/ammo.wasm.js\x22></script>"+
+                            // physicsScripts =  "<script src=\x22https://mixedreality.mozilla.org/ammo.js/builds/ammo.wasm.js\x22></script>"+
+                            physicsScripts =  "<script src=\x22https://cdn.jsdelivr.net/gh/MozillaReality/ammo.js@8bbc0ea/builds/ammo.wasm.js\x22></script>"+
                             "<script src=\x22../main/vendor/aframe/aframe-physics-system.min.js\x22></script>";                                                        
                         }
                         if (sceneData.sceneTags[i].toLowerCase().includes("brownian")) {
@@ -554,7 +555,8 @@ webxr_router.get('/:_id', function (req, res) {
                             aframeScriptVersion = "<script src=\x22https://aframe.io/releases/1.2.0/aframe.min.js\x22></script>";
                         }
                         if (sceneData.sceneTags[i].toLowerCase().includes("aframe master")) {
-                            aframeScriptVersion = "<script src=\x22https://cdn.jsdelivr.net/gh/aframevr/aframe@744e2b869e281f840cff7d9cb02e95750ce90920/dist/aframe-master.min.js\x22></script>"; //ref 20220715// nope!
+                            // aframeScriptVersion = "<script src=\x22https://cdn.jsdelivr.net/gh/aframevr/aframe@744e2b869e281f840cff7d9cb02e95750ce90920/dist/aframe-master.min.js\x22></script>"; //ref 20220715// nope!
+                            aframeScriptVersion = "<script src=\x22https://aframe.io/releases/1.4.1/aframe.min.js\x22></script>"; //ref 20220715// nope!
                         }
                         if (sceneData.sceneTags[i].toLowerCase().includes("aframe ada")) {
                             aframeScriptVersion = "<script src=\x22https://a-cursor-test.glitch.me/aframe-master.js\x22></script>"; //mod by @adarosecannon
