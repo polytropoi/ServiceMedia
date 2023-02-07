@@ -5975,7 +5975,7 @@ AFRAME.registerComponent('skybox_dynamic', {
 
   init: function () {
     this.skyboxIndex = 0;
-    this.skyEl = document.getElementById('skybox');
+    this.skyEl = document.getElementById('a_sky');
     this.skyboxData = null;
     this.texture = null;
     let picGroupMangler = document.getElementById("pictureGroupsData");
