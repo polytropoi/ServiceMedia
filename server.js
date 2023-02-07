@@ -4716,23 +4716,49 @@ app.post('/staging_delete', requiredAuthentication, function (req, res) {
 });
 app.post('/staging_delete_array', requiredAuthentication, function (req, res) {
     console.log("staging delete: " + JSON.stringify(req.body));
-    params = {
-            Bucket: 'archive1',
-            // Prefix: 'staging/' + u_id + '/'
-        };
-    params.Delete = {Objects:[]};
-    req.body.deleteMe.items.forEach(function(content) {
-        params.Delete.Objects.push({Key: 'staging/' + content.uid + '/' + content.key});
-    });
-    console.log("delete params: " + JSON.stringify(params));
-    s3.deleteObjects(params, function(err, data) {
-        if (err) {
-            console.log("error deleting " + err)
-            res.send("error deleting " + err);
-        } else {
-            res.send("files deleted" + JSON.stringify(data));
-        }
-    });
+
+    if (minioClient) {
+        var keys = []
+        // keys.push(
+        //     "users/" + req.session.user._id.toString() + "/" + item_string_filename,
+        //     "users/" + req.session.user._id.toString() + "/" + audio_item[0]._id + "." + pngName,
+        //     "users/" + req.session.user._id.toString() + "/" + audio_item[0]._id + "." + mp3Name,
+        //     "users/" + req.session.user._id.toString() + "/" + audio_item[0]._id + "." + oggName,
+
+        //     );
+        req.body.deleteMe.items.forEach(function(content) {
+            keys.push('staging/' + content.uid + '/' + content.key);
+        });    
+        minioClient.removeObjects(process.env.STAGING_BUCKET_NAME, keys, function(e) {
+            if (e) {
+                console.log('Unable to remove Objects ',e);
+                res.send('Unable to remove Objects ',e);
+            } else {
+                console.log('Removed the objects successfully');
+                res.send("deleted");
+            }
+
+        });
+    } else {
+        params = {
+                Bucket: process.env.STAGING_BUCKET_NAME,
+                // Prefix: 'staging/' + u_id + '/'
+            };
+
+        params.Delete = {Objects:[]};
+        req.body.deleteMe.items.forEach(function(content) {
+            params.Delete.Objects.push({Key: 'staging/' + content.uid + '/' + content.key});
+        });
+        console.log("delete params: " + JSON.stringify(params));
+        s3.deleteObjects(params, function(err, data) {
+            if (err) {
+                console.log("error deleting " + err)
+                res.send("error deleting " + err);
+            } else {
+                res.send("files deleted" + JSON.stringify(data));
+            }
+        });
+    }
 });
 
 app.post('/putobjecturl/', requiredAuthentication, function (req, res) {
@@ -5283,17 +5309,25 @@ app.get('/staging/:_id', requiredAuthentication, function (req, res) {
         },
         function (callback) {
 
-            async.each (response, function (r, callbackz) { //loop tru w/ async
+            // async.each (response, function (r, callbackz) { //loop tru w/ async
                 // console.log("r = " + JSON.stringify(r));
-                var name = ""
-                if (minioClient) {
-                    name = r.name;
-                } else {
-                    name = r.Key;
-                }
+                // var name = ""
+                // if (minioClient) {
+                //     name = r.name;
+                // } else {
+                //     name = r.Key;
+                // }
                 (async () => {  
-                    try {
+                    // try {
                         // console.log("tryna ghet name "+ name);
+                    for (let i = 0; i < response.length; i++) {
+                        var name = ""
+                        if (minioClient) {
+                            name = response[i].name; 
+                        } else {
+                            name = response[i].Key; //close but not identical!
+                        }
+
                         let url = await ReturnPresignedUrl(process.env.STAGING_BUCKET_NAME, name, 6000);
                         name = name.replace('staging/' + u_id + '/', "");
                         var itme = {}
@@ -5304,12 +5338,17 @@ app.get('/staging/:_id', requiredAuthentication, function (req, res) {
                         itme.url = url;
         
                         stagedItems.push(itme);
-                        callbackz();
-                        // callback(null, url);
-                    } catch (e) {
-                        console.log(e);
-                        callbackz(e);
+                        // callbackz();
                     }
+                    console.log(stagedItems.length + ' staging files have been fetched');
+                    stagedItems.reverse();
+                    rezponze.stagedItems = stagedItems;
+                    callback(null);
+                        // callback(null, url);
+                    // } catch (e) {
+                    //     console.log(e);
+                    //     callbackz(e);
+                    // }
                 })();
 
                     // if (!name.includes("cubemaps")) { //skip cubemaps stored here for now...
@@ -5327,23 +5366,23 @@ app.get('/staging/:_id', requiredAuthentication, function (req, res) {
                     //     callbackz();
                     //     }
                 
-            }, function(err) {
+            // }, function(err) {
                
-                if (err) {
-                    console.log('A file failed to process');
-                    callback(err);
-                } else {
-                    console.log('All files have been processed successfully');
-                    stagedItems.reverse();
-                    rezponze.stagedItems = stagedItems;
-                    callback(null);
-                }
-            });
+            //     if (err) {
+            //         console.log('A file failed to process');
+            //         callback(err);
+            //     } else {
+            //         console.log(stagedItems.length + ' staging files have been processed successfully');
+            //         stagedItems.reverse();
+            //         rezponze.stagedItems = stagedItems;
+            //         callback(null);
+            //     }
+            // });
         }
     ],
     function (err, result) { // #last function, close async
         res.json(rezponze);
-        console.log("waterfall done: " + result);
+        // console.log("staging files fetchd! : " + result);
     });
 });
 
