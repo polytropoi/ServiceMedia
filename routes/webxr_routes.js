@@ -3450,108 +3450,114 @@ webxr_router.get('/:_id', function (req, res) {
                                         callbackz();
                                     } else {
                                         // console.log("gotsa picture_item " + JSON.stringify(picture_item));
-                                        
-                                        var version = ".standard.";
-                                        if (picture_item.orientation != undefined) {
-                                            // if (picture_item.orientation.toLowerCase() == "equirectangular" && sceneResponse.sceneUseSkybox) {
-                                            if (picture_item.orientation.toLowerCase() == "equirectangular") {
-                                                // console
-                                                skyboxID = picID;
-                                                version = ".original.";
-                                                fogSettings = "";
-                                                skyboxIDs.push(picID);
-                                                // convertEquirectToCubemap = "<script src=\x22../main/ref/aframe/dist/equirect-to-cubemap.js\x22></script>";
-                                            }
-                                        }
-                                     
-                                        
-                                        let max = 30;
-                                        let min = -30;
-                                        let x = Math.random() * (max - min) + min;
-                                        // let y = Math.random() * (max.y - min.y) + min.y;
-                                        let z = Math.random() * (max - min) + min;
-                                        if (z >= -15 && z <= 15) {
-                                            if (z < 0) {
-                                                z = -20;
-                                            } else {
-                                                z = 20;
-                                            }
-                                           
-                                        }
-                                        if (x >= -15 && z <= 15) {
-                                            if (x < 0) {
-                                                x = -20;
-                                            } else {
-                                                x = 20;
-                                            }
-                                            
-                                        }
-                                        index++;
-                                        let position = x + " " + 2 + " " + z;
-                                        let rotation = "0 90 0";
-                                        image1url = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + picture_item.userID + "/pictures/" + picture_item._id + ".standard." + picture_item.filename, Expires: 6000});
-                                        picArray.push(image1url);
-                                        imageAssets = imageAssets + "<img id=\x22smimage" + index + "\x22 crossorigin=\x22anonymous\x22 src='" + image1url + "'>";
-                                        let caption = "";
-                                        if (picture_item.captionUpper != null && picture_item.captionUpper != undefined) {
-                                            caption = "<a-text class=\x22pCap\x22 align=\x22center\x22 rotation=\x220 0 0\x22 position=\x220 1.3 -.1\x22 wrapCount=\x2240\x22 value=\x22"+picture_item.captionUpper+"\x22></a-text>";
-                                        }
-                                        let lowerCap = "";
-                                        let actionCall = "";
-                                        let link = "";
-                                        let lookat = " look-at=\x22#player\x22 ";
-                                        console.log("picLocations taken: " + picLocationsPlaced);
-                                          
-                                        if (picIndex < locationPictures.length) {
-                                            position = locationPictures[picIndex].loc;
-                                            rotation = locationPictures[picIndex].rot;
-                                            if (locationPictures[picIndex].type.includes("fixed")) {
-                                                console.log("fixed pic @ " + locationPictures[picIndex].loc);
-                                                lookat = "";
-                                            }
-                                            picIndex++;
-                                        } 
-                                       
-                                        if (picture_item.linkType != undefined && picture_item.linkType.toLowerCase() != "none") {
-                                            if (picture_item.linkType == "NFT") { //never mind, these are old image target fu
-                                              
-                                            }
-                                            if (picture_item.linkURL != undefined && !picture_item.linkURL.includes("undefined") && picture_item.linkURL.length > 6) {
-                                                link = "basic-link=\x22href: "+picture_item.linkURL+";\x22 class=\x22activeObjexGrab activeObjexRay\x22";
-                                            }
-                                        }
-                                        if (picture_item.useTarget != undefined && picture_item.useTarget != "") { //used by mindar - good stuff!
-                                            console.log("GOTSA urlTarget " + picture_item.urlTarget);
-                                            const targetURL = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + picture_item.userID + "/pictures/targets/" + picture_item._id + ".mind", Expires: 6000});
-                                            arImageTargets.push(targetURL);
-                                        
+                                        (async () => {
 
-                                        }
-                                        if (picture_item.hasAlphaChannel) {
-                                            imageEntities = imageEntities + "<a-entity "+link+""+lookat+" geometry=\x22primitive: plane; height: 10; width: 10\x22 material=\x22shader: flat; transparent: true; src: #smimage" + index + "; alphaTest: 0.5;\x22"+
-                                            " position=\x22"+position+"\x22 rotation=\x22"+rotation+"\x22 visible='true'>"+caption+"</a-entity>";
-                                        } else {
-                                            // if (picture_item.linkType != undefined && picture_item.orientation != "equirectangular" && picture_item.orientation != "Equirectangular") {
-                                            if (picture_item.orientation != "equirectangular" && picture_item.orientation != "Equirectangular") {  //what if linkType is undefined?
- 
-                                            
-                                                if (picture_item.orientation == "portrait" || picture_item.orientation == "Portrait") {
-                                                    //console.log("gotsa portrait!");
-                                                    imageEntities = imageEntities + "<a-entity "+link+""+lookat+"  mod-materials=\x22index:"+index+"\x22 gltf-model=\x22#portrait_panel\x22 material=\x22shader: flat; src: #smimage" + index + "; alphaTest: 0.5;\x22"+
-                                                    " position=\x22"+position+"\x22 rotation=\x22"+rotation+"\x22 visible='true'>"+caption+"</a-entity>";
-                                                } else if (picture_item.orientation == "square" || picture_item.orientation == "Square") {
-                                                    imageEntities = imageEntities + "<a-entity "+link+""+lookat+"  mod-materials=\x22index:"+index+"\x22 gltf-model=\x22#square_panel\x22 scale=\x223 3 3\x22 material=\x22shader: flat; src: #smimage" + index + "; alphaTest: 0.5;\x22"+
-                                                    " position=\x22"+position+"\x22 rotation=\x22"+rotation+"\x22 visible='true'>"+caption+"</a-entity>";
-                                                } else if (picture_item.orientation == "circle" || picture_item.orientation == "Circle") {
-                                                    imageEntities = imageEntities + "<a-entity "+link+""+lookat+"  mod-materials=\x22index:"+index+"\x22 gltf-model=\x22#circle_panel\x22 material=\x22shader: flat; src: #smimage" + index + "; alphaTest: 0.5;\x22"+
-                                                    " position=\x22"+position+"\x22 rotation=\x22"+rotation+"\x22 visible='true'>"+caption+"</a-entity>";
-                                                } else {
-                                                    imageEntities = imageEntities + "<a-entity "+link+""+lookat+"  mod-materials=\x22index:"+index+"\x22 gltf-model=\x22#landscape_panel\x22 material=\x22shader: flat; src: #smimage" + index + "; alphaTest: 0.5;\x22"+
-                                                    " position=\x22"+position+"\x22 rotation=\x22"+rotation+"\x22 visible='true'>"+caption+"</a-entity>";
+                                            var version = ".standard.";
+                                            if (picture_item.orientation != undefined) {
+                                                // if (picture_item.orientation.toLowerCase() == "equirectangular" && sceneResponse.sceneUseSkybox) {
+                                                if (picture_item.orientation.toLowerCase() == "equirectangular") {
+                                                    // console
+                                                    skyboxID = picID;
+                                                    version = ".original.";
+                                                    fogSettings = "";
+                                                    skyboxIDs.push(picID);
+                                                    // convertEquirectToCubemap = "<script src=\x22../main/ref/aframe/dist/equirect-to-cubemap.js\x22></script>";
                                                 }
                                             }
-                                        }
-                                        callbackz();
+                                        
+                                            
+                                            let max = 30;
+                                            let min = -30;
+                                            let x = Math.random() * (max - min) + min;
+                                            // let y = Math.random() * (max.y - min.y) + min.y;
+                                            let z = Math.random() * (max - min) + min;
+                                            if (z >= -15 && z <= 15) {
+                                                if (z < 0) {
+                                                    z = -20;
+                                                } else {
+                                                    z = 20;
+                                                }
+                                            
+                                            }
+                                            if (x >= -15 && z <= 15) {
+                                                if (x < 0) {
+                                                    x = -20;
+                                                } else {
+                                                    x = 20;
+                                                }
+                                                
+                                            }
+                                            index++;
+                                            let position = x + " " + 2 + " " + z;
+                                            let rotation = "0 90 0";
+
+                                            // image1url = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + picture_item.userID + "/pictures/" + picture_item._id + ".standard." + picture_item.filename, Expires: 6000});
+                                            image1url = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, 'users/' + picture_item.userID + "/pictures/" + picture_item._id + ".standard." + picture_item.filename, 6000);
+                                            picArray.push(image1url);
+                                            
+
+                                            imageAssets = imageAssets + "<img id=\x22smimage" + index + "\x22 crossorigin=\x22anonymous\x22 src='" + image1url + "'>";
+                                            let caption = "";
+                                            if (picture_item.captionUpper != null && picture_item.captionUpper != undefined) {
+                                                caption = "<a-text class=\x22pCap\x22 align=\x22center\x22 rotation=\x220 0 0\x22 position=\x220 1.3 -.1\x22 wrapCount=\x2240\x22 value=\x22"+picture_item.captionUpper+"\x22></a-text>";
+                                            }
+                                            let lowerCap = "";
+                                            let actionCall = "";
+                                            let link = "";
+                                            let lookat = " look-at=\x22#player\x22 ";
+                                            console.log("picLocations taken: " + picLocationsPlaced);
+                                            
+                                            if (picIndex < locationPictures.length) {
+                                                position = locationPictures[picIndex].loc;
+                                                rotation = locationPictures[picIndex].rot;
+                                                if (locationPictures[picIndex].type.includes("fixed")) {
+                                                    console.log("fixed pic @ " + locationPictures[picIndex].loc);
+                                                    lookat = "";
+                                                }
+                                                picIndex++;
+                                            } 
+                                        
+                                            if (picture_item.linkType != undefined && picture_item.linkType.toLowerCase() != "none") {
+                                                if (picture_item.linkType == "NFT") { //never mind, these are old image target fu
+                                                
+                                                }
+                                                if (picture_item.linkURL != undefined && !picture_item.linkURL.includes("undefined") && picture_item.linkURL.length > 6) {
+                                                    link = "basic-link=\x22href: "+picture_item.linkURL+";\x22 class=\x22activeObjexGrab activeObjexRay\x22";
+                                                }
+                                            }
+                                            if (picture_item.useTarget != undefined && picture_item.useTarget != "") { //used by mindar - good stuff!
+                                                console.log("GOTSA urlTarget " + picture_item.urlTarget);
+                                                const targetURL = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + picture_item.userID + "/pictures/targets/" + picture_item._id + ".mind", Expires: 6000});
+                                                arImageTargets.push(targetURL);
+                                            
+
+                                            }
+                                            if (picture_item.hasAlphaChannel) {
+                                                imageEntities = imageEntities + "<a-entity "+link+""+lookat+" geometry=\x22primitive: plane; height: 10; width: 10\x22 material=\x22shader: flat; transparent: true; src: #smimage" + index + "; alphaTest: 0.5;\x22"+
+                                                " position=\x22"+position+"\x22 rotation=\x22"+rotation+"\x22 visible='true'>"+caption+"</a-entity>";
+                                            } else {
+                                                // if (picture_item.linkType != undefined && picture_item.orientation != "equirectangular" && picture_item.orientation != "Equirectangular") {
+                                                if (picture_item.orientation != "equirectangular" && picture_item.orientation != "Equirectangular") {  //what if linkType is undefined?
+    
+                                                
+                                                    if (picture_item.orientation == "portrait" || picture_item.orientation == "Portrait") {
+                                                        //console.log("gotsa portrait!");
+                                                        imageEntities = imageEntities + "<a-entity "+link+""+lookat+"  mod-materials=\x22index:"+index+"\x22 gltf-model=\x22#portrait_panel\x22 material=\x22shader: flat; src: #smimage" + index + "; alphaTest: 0.5;\x22"+
+                                                        " position=\x22"+position+"\x22 rotation=\x22"+rotation+"\x22 visible='true'>"+caption+"</a-entity>";
+                                                    } else if (picture_item.orientation == "square" || picture_item.orientation == "Square") {
+                                                        imageEntities = imageEntities + "<a-entity "+link+""+lookat+"  mod-materials=\x22index:"+index+"\x22 gltf-model=\x22#square_panel\x22 scale=\x223 3 3\x22 material=\x22shader: flat; src: #smimage" + index + "; alphaTest: 0.5;\x22"+
+                                                        " position=\x22"+position+"\x22 rotation=\x22"+rotation+"\x22 visible='true'>"+caption+"</a-entity>";
+                                                    } else if (picture_item.orientation == "circle" || picture_item.orientation == "Circle") {
+                                                        imageEntities = imageEntities + "<a-entity "+link+""+lookat+"  mod-materials=\x22index:"+index+"\x22 gltf-model=\x22#circle_panel\x22 material=\x22shader: flat; src: #smimage" + index + "; alphaTest: 0.5;\x22"+
+                                                        " position=\x22"+position+"\x22 rotation=\x22"+rotation+"\x22 visible='true'>"+caption+"</a-entity>";
+                                                    } else {
+                                                        imageEntities = imageEntities + "<a-entity "+link+""+lookat+"  mod-materials=\x22index:"+index+"\x22 gltf-model=\x22#landscape_panel\x22 material=\x22shader: flat; src: #smimage" + index + "; alphaTest: 0.5;\x22"+
+                                                        " position=\x22"+position+"\x22 rotation=\x22"+rotation+"\x22 visible='true'>"+caption+"</a-entity>";
+                                                    }
+                                                }
+                                            }
+                                            callbackz();
+                                        })();
                                     }
                                 });
                             },
