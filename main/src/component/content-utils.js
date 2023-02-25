@@ -7600,5 +7600,27 @@ AFRAME.registerComponent('scene_greeting_dialog', {  //if "greeting" scenetag + 
   },
   setLocation: function () {
     
+  },
+  modGreeting: function () {
+
+  },
+  modQuest: function (text) {
+    if (this.questEl) {
+      this.questEl.setAttribute("troika-text", {
+        fontSize: .2,
+        maxWidth: 5,
+        align: "center",
+        font: "/fonts/web/" + this.font2,
+        strokeWidth: '1%',
+        color: this.fillColor,
+        strokeColor: this.outlineColor,
+        value: text
+      });
+    }
+
+  },
+  hideButton: function () {
+
   }
+
 });

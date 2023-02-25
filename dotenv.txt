@@ -9,14 +9,22 @@ ADMIN_EMAIL="admin@example.com"
 DOMAIN_ADMIN_EMAIL="admin@example.com"
 MONGO_URL="dbuser:dbpw@dbhost.com:<portnumber>/databasename"
 MONGO_SESSIONS_URL="dbuser:dbpw@dbhost.com:<portnumber>/databasename"
+
 JWT_SECRET="mysecretkey"
+
 MAPBOX_KEY="mapboxKey"
+
 STRIPE_KEY="stripeKey"
+
 S3_WEBSCRAPE_BUCKET_NAME="s3_BucketName"
 S3_ROOT_BUCKET_NAME="s3_BucketName"
-GOOGLE_ANALYTICS_KEY="MyGoogleAnalyticsKey"
+
 AWSKEY="myAWSKey"
 AWSSECRET="myAWSSecret"
 AWSREGION="myAWSRegion"
 
+GOOGLE_ANALYTICS_KEY="MyGoogleAnalyticsKey"
 
+MINIOKEY="minio_UN"
+MINIOSECRET="minio_PW"
+MINIOENDPOINT="localhost"

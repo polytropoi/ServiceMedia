@@ -14598,8 +14598,9 @@ function getAllPeople() {
                                 // sceneLocs +
                                 // "timekeys here" +
                                 "<div class=\x22col form-group col-md-12\x22>" +
-                                    "<button id=\x22newSceneTimedEvent\x22 type=\x22button\x22 class=\x22btn btn-sm btn-success float-left\x22>New Event</button>" +
-                                    "<button id=\x22importAudioTimedEvents\x22 type=\x22button\x22 style=\x22visibility: hidden;\x22 class=\x22btn btn-sm btn-info float-right\x22>Import Audio Events</button><br><br>" +
+                                    "<button id=\x22newSceneTimedEvent\x22 type=\x22button\x22 class=\x22btn btn-sm btn-success float-right\x22>New Event</button><br>" +
+                                    
+                                    "<button id=\x22importAudioTimedEvents\x22 type=\x22button\x22 style=\x22visibility: hidden;\x22 class=\x22btn btn-sm btn-info float-left\x22>Import Audio Events</button><br><br>" +
                                     "<div class=\x22float-right\x22 style=\x22 width: 166px;\x22>Listen To Timeline:" +
                                         "<select id=\x22sceneListenToTimelineSelector\x22 class=\x22sceneListenToTimelineSelector\x22>" +
                                             "<option>None</option>" +
@@ -14609,11 +14610,13 @@ function getAllPeople() {
                                             "<option>Scene Elapsed Time</option>" +
                                         "</select>" +
                                     "</div>" +
+                                    // "<button id=\x22deleteAllSceneTimekeys\x22 type=\x22button\x22 class=\x22btn btn-sm btn-danger float-left\x22>Clear Scene Timekeys</button>" +
                                 "</div>" + 
                                
                                 "<div id=\x22sceneTimedEvents\x22 class=\x22col form-group col-md-12\x22>"+
+
                                 "</div>" +
-                                
+                                "<button id=\x22deleteAllSceneTimekeys\x22 type=\x22button\x22 class=\x22btn btn-sm btn-danger float-left\x22>Clear Scene Events</button>" +
                                 
                             "</div>" + 
                                 // "<div class=\x22col form-group col-md-12\x22>" +
@@ -15629,13 +15632,8 @@ function getAllPeople() {
                     }); 
                     $(document).on('click','.remSceneLocation',function(e){
                         e.preventDefault();  
-                        
                         console.log("tryna remove sceneLocations " + this.id);
-                        // for( var i = 0; i < sceneLocations.length; i++){ 
-                        //     if ( sceneLocations[i] === this.id) {
-                                sceneLocations.splice(this.id, 1); 
-                        //     }
-                        // }
+                        sceneLocations.splice(this.id, 1); 
                         const id = "#" + this.id;
                         $(id).parent().parent().hide();
                         reloadOnSubmit = true;
@@ -15658,6 +15656,10 @@ function getAllPeople() {
                         newLoc.description = "";
                         newLoc.timestamp = Math.floor(Date.now()/1000);
                         // let copySceneLocations = sceneLocations.slice();
+                        if (!sceneLocations) {
+                            sceneLocations = [];
+                        }
+
                         sceneLocations.push(newLoc);
                         console.log(JSON.stringify(sceneLocations));
                         reloadOnSubmit = true;
@@ -16101,7 +16103,13 @@ function getAllPeople() {
                             document.getElementById("importAudioTimedEvents").style.visibility = "visible";
                         }
                     }
+                    $(document).on('click','#deleteAllSceneTimekeys',function(e){
+                        e.preventDefault();  
 
+                            timekeys = [];
+                            console.log("keys deleted, update to persist these changes!");
+                      
+                    }); 
                     $(document).on('click','#newSceneTimedEvent',function(e){
                         e.preventDefault();  
                         let newTimeKey = {

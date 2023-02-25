@@ -2065,13 +2065,13 @@ function UpdatePrimaryAudioVolume(newVolume) {
 function UpdateAmbientAudioVolume(newVolume) {
    var ambientAudioController = document.getElementById("ambientAudio").components.ambient_audio_control; 
    if (ambientAudioController != null) {
-   ambientAudioController.modVolume(newVolume);
+      ambientAudioController.modVolume(newVolume);
    }
 }
 function UpdateTriggerAudioVolume(newVolume) {
    var triggerAudioController = document.getElementById("triggerAudio").components.trigger_audio_control;
    if (triggerAudioController != null) {
-   triggerAudioController.modVolume(newVolume);
+      triggerAudioController.modVolume(newVolume);
    }
 }
 
@@ -2284,58 +2284,58 @@ function TimedEventListener () {
 //    console.log("videoEl " + videoEl.id);
 //  }
  if (timeKeysData != null && timeKeysData.timekeys != undefined && timeKeysData.timekeys.length > 0) {
- 
- let listenerInterval = setInterval(function () {
-    timekey = parseFloat(tkStarttimes[timeKeysIndex]);
-   //  console.log(timekey);
-   if (timekey != NaN) {//not not a number
-     if (timedEventsListenerMode != null && timedEventsListenerMode.toLowerCase() == 'primary audio') {
-      // if (hasPrimaryAudio) {
-         if (primaryAudioHowl != undefined && primaryAudioHowl != null && primaryAudioHowl.playing()) {
-         
-            let primaryAudioTime = primaryAudioHowl.seek();
+   
+   let listenerInterval = setInterval(function () {
+      timekey = parseFloat(tkStarttimes[timeKeysIndex]);
+      //  console.log(timekey);
+      if (timekey && timekey != NaN) {//not not a number
+      if (timedEventsListenerMode != null && timedEventsListenerMode.toLowerCase() == 'primary audio') {
+         // if (hasPrimaryAudio) {
+            if (primaryAudioHowl != undefined && primaryAudioHowl != null && primaryAudioHowl.playing()) {
             
-            if (primaryAudioTime != 0 && primaryAudioTime < .2) { //needs fudge?
-               timeKeysIndex = 0; 
-               console.log("resetting timekeysindex!");
-            }
-            if (primaryAudioTime != 0 && primaryAudioTime < timekey) {
-                  // console.log(primaryAudioTime + "less than " + timekey);
-                  //just waiting...
-            } else {
-               if (timeKeysIndex < tkStarttimes.length) {
-                  // console.log("TRYNA PLAY TIMEKEY "+ JSON.stringify(timeKeysData.timekeys[timeKeysIndex]) +" at primaryAudioTime "+ primaryAudioTime.toString() );
-                  PlayTimedEvent(timeKeysData.timekeys[timeKeysIndex]);
-                  timeKeysIndex++;
+               let primaryAudioTime = primaryAudioHowl.seek();
+               
+               if (primaryAudioTime != 0 && primaryAudioTime < .2) { //needs fudge?
+                  timeKeysIndex = 0; 
+                  console.log("resetting timekeysindex!");
+               }
+               if (primaryAudioTime != 0 && primaryAudioTime < timekey) {
+                     // console.log(primaryAudioTime + "less than " + timekey);
+                     //just waiting...
                } else {
-                  console.log("end");
-                  clearInterval(listenerInterval);
-                  
+                  if (timeKeysIndex < tkStarttimes.length) {
+                     // console.log("TRYNA PLAY TIMEKEY "+ JSON.stringify(timeKeysData.timekeys[timeKeysIndex]) +" at primaryAudioTime "+ primaryAudioTime.toString() );
+                     PlayTimedEvent(timeKeysData.timekeys[timeKeysIndex]);
+                     timeKeysIndex++;
+                  } else {
+                     console.log("end");
+                     clearInterval(listenerInterval);
+                     
+                  }
                }
             }
-         }
-         // }
-      } else if (timedEventsListenerMode != null && timedEventsListenerMode.toLowerCase() == 'primary video') {
-         if (videoEl != null && !videoEl.paused && timekey > 0){
-           //  console.log("currentVideoTIme " + videoEl.currentTime + " vs timekey " + timekey);
-            if (videoEl.currentTime < .2) {
-               timeKeysIndex = 0; 
-               console.log("resetting timekeysindex!");
-            }
-            if (videoEl.currentTime <= timekey) {
-               //prease stanby...
-            } else {
-               if (timeKeysIndex < tkStarttimes.length) {
-                  // console.log("vid event " + timeKeysData[timeKeysIndex]);
-                  PlayTimedEvent(timeKeysData.timekeys[timeKeysIndex]);
-                  timeKeysIndex++;
-               } else {
-                  console.log("end");
-                  clearInterval(listenerInterval);
+            // }
+         } else if (timedEventsListenerMode != null && timedEventsListenerMode.toLowerCase() == 'primary video') {
+            if (videoEl != null && !videoEl.paused && timekey > 0){
+            //  console.log("currentVideoTIme " + videoEl.currentTime + " vs timekey " + timekey);
+               if (videoEl.currentTime < .1) {
+                  timeKeysIndex = 0; 
+                  console.log("resetting timekeysindex!");
                }
-            
-             }
-           }
+               if (videoEl.currentTime <= timekey) {
+                  //prease stanby...
+               } else {
+                  if (timeKeysIndex < tkStarttimes.length) {
+                     // console.log("vid event " + timeKeysData[timeKeysIndex]);
+                     PlayTimedEvent(timeKeysData.timekeys[timeKeysIndex]);
+                     timeKeysIndex++;
+                  } else {
+                     console.log("end");
+                     clearInterval(listenerInterval);
+                  }
+               
+               }
+            }
          } else if (timedEventsListenerMode != null && timedEventsListenerMode.toLowerCase() == 'youtube') { 
             if (youtubePlayer != null && youtubeIsPlaying && timekey > 0) {
                if (youtubePlayer.getCurrentTime() <= .1) {
@@ -2459,8 +2459,20 @@ function PlayTimedEvent(timeKey) {
    if (timeKey.keytype.toLowerCase().includes("beat")) {
       if (primaryAudioEl != null) {
          // console.log("beat volume " + volume);
-           primaryAudioEl.components.primary_audio_control.timekey_beat(.5);
-       }
+         primaryAudioEl.components.primary_audio_control.timekey_beat(.5);
+      }
+   }
+   if (timeKey.keytype.toLowerCase().includes("text")) {
+      let greetingDialogEl = document.getElementById("sceneGreetingDialog");
+      if (greetingDialogEl) {
+         let dialogComponent = greetingDialogEl.components.scene_greeting_dialog;
+         if (dialogComponent) {
+            console.log("tryna modGreeting " + timeKey.keydata);
+            dialogComponent.modQuest(timeKey.keydata);
+         } else {
+            console.log("caint find no dangblurn dialog component!");
+         }
+      }
    }
    if (timeKey.keytype.toLowerCase().includes("clear")) {
       ClearIntervals();
