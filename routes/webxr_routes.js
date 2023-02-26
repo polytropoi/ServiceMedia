@@ -3294,7 +3294,7 @@ webxr_router.get('/:_id', function (req, res) {
                                     callback(err);
                                 } else {
                                     postcard1 = ReturnPresignedUrlSync(process.env.S3_ROOT_BUCKET_NAME, 'users/' + picture_item.userID +"/pictures/"+ picture_item._id + ".standard." + picture_item.filename, 6000); //just return a single 
-                                    console.log("postcard1 " + postcard1);
+                                    // console.log("postcard1 " + postcard1);
                                     callback(null);
                                     // var params = {
                                     //     Bucket: sceneResponse.sceneDomain,
