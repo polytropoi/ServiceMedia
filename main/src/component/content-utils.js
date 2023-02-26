@@ -7412,6 +7412,9 @@ AFRAME.registerComponent('scene_greeting_dialog', {  //if "greeting" scenetag + 
     
     font1: {default: ""},
     font2: {default: ""},
+    fillColor: {default: "white"},
+    outlineColor: {default: "black"},
+    backgroundColor: {default: "grey"},
     lookAt: {default: false},
     lookAtTarget: {default: "#player"},
     greetingText: {default: ""},
@@ -7443,8 +7446,8 @@ AFRAME.registerComponent('scene_greeting_dialog', {  //if "greeting" scenetag + 
     if (settings && settings.sceneFontWeb2 && settings.sceneFontWeb2.length) {
       this.font2 = settings.sceneFontWeb2;
     }
-    this.fillColor = "white";
-    this.outlineColor = "black";
+    this.fillColor = this.data.fillColor;
+    this.outlineColor = this.data.outlineColor;
     if (settings && settings.sceneFontFillColor) {
       this.fillColor = settings.sceneFontFillColor;
     }
@@ -7455,7 +7458,7 @@ AFRAME.registerComponent('scene_greeting_dialog', {  //if "greeting" scenetag + 
     if (settings && settings.sceneTextBackground) {
       this.textBackgroundStyle = settings.sceneTextBackground;
     }
-    this.textBackgroundColor = "black";
+    this.textBackgroundColor = this.data.backgroundColor;
     if (settings && settings.sceneTextBackgroundColor) {
       this.textBackgroundColor = settings.sceneTextBackgroundColor;
     }

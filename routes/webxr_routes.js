@@ -3270,15 +3270,19 @@ webxr_router.get('/:_id', function (req, res) {
                         callback(null);
                     
                 },
-                /*
+
                 function (callback) { //deprecate this one? no need to copy to static routes..
                     var postcards = [];
-                    // console.log("sceneResponse.scenePostcards: " + JSON.stringify(sceneResponse.scenePostcards));
+                    console.log("sceneResponse.scenePostcards: " + JSON.stringify(sceneResponse.scenePostcards));
                     if (sceneResponse.scenePostcards != null && sceneResponse.scenePostcards.length > 0) {
-                        var index = 0;
-                        async.each(sceneResponse.scenePostcards, function (postcardID, callbackz) { 
-                            index++;
-                            var oo_id = ObjectID(postcardID);
+                        // var index = 0;
+                        // var postcard = sceneResponse.scenePostcards[Math.floor(Math.random()*sceneResponse.scenePostcards.length)]; //get random one // no, last one
+                        var postcard = sceneResponse.scenePostcards[sceneResponse.scenePostcards.length - 1];
+                        // postcard1 = ReturnPresignedUrlSync(process.env.S3_ROOT_BUCKET_NAME, '/users/' + postcard.userID +"/pictures/"+ postcard._id + ".standard." + postcard.filename, 6000); //just return a single 
+                        // callback(null);
+                        // async.each(sceneResponse.scenePostcards, function (postcardID, callbackz) { 
+                        //     index++;
+                            var oo_id = ObjectID(postcard);
                             // console.log("index? " + index);
 
                             db.image_items.findOne({"_id": oo_id}, function (err, picture_item) {
@@ -3286,57 +3290,62 @@ webxr_router.get('/:_id', function (req, res) {
                                 bucketFolder = sceneResponse.sceneDomain;
                                 // console.log("params " + JSON.stringify(params)); 
                                 if (err || !picture_item) {
-                                    console.log("error getting postcard " + postcardID + err);
-                                    callbackz();
+                                    console.log("error getting postcard " + postcard._id + err);
+                                    callback(err);
                                 } else {
-                                    var params = {
-                                        Bucket: sceneResponse.sceneDomain,
-                                        Key: sceneResponse.short_id + "/"+ postcardID + ".standard." + picture_item.filename
-                                    }
-                                    s3.headObject(params, function(err, data) { //check that the postcard is pushed to static route
-                                        if (err) {
-                                            console.log("postcard missing from static route, tryna copy to " + sceneResponse.sceneDomain);
-                                            s3.copyObject({Bucket: bucketFolder, CopySource: 'servicemedia/users/' + picture_item.userID +"/pictures/"+ picture_item._id + ".standard." + picture_item.filename,
-                                                Key: sceneResponse.short_id + "/"+ picture_item._id + ".standard." + picture_item.filename}, function (err, data) {
-                                                if (err) {
-                                                    console.log("ERROR copyObject" + err);
-                                                    callbackz();
-                                                }
-                                                else {
-                                                    console.log('SUCCESS copyObject');
-                                                    index++;
+                                    postcard1 = ReturnPresignedUrlSync(process.env.S3_ROOT_BUCKET_NAME, 'users/' + picture_item.userID +"/pictures/"+ picture_item._id + ".standard." + picture_item.filename, 6000); //just return a single 
+                                    console.log("postcard1 " + postcard1);
+                                    callback(null);
+                                    // var params = {
+                                    //     Bucket: sceneResponse.sceneDomain,
+                                    //     Key: sceneResponse.short_id + "/"+ postcardID + ".standard." + picture_item.filename
+                                    // }
+                                    // s3.headObject(params, function(err, data) { //check that the postcard is pushed to static route
+                                    //     if (err) {
+                                    //         console.log("postcard missing from static route, tryna copy to " + sceneResponse.sceneDomain);
+                                    //         s3.copyObject({Bucket: bucketFolder, CopySource: 'servicemedia/users/' + picture_item.userID +"/pictures/"+ picture_item._id + ".standard." + picture_item.filename,
+                                    //             Key: sceneResponse.short_id + "/"+ picture_item._id + ".standard." + picture_item.filename}, function (err, data) {
+                                    //             if (err) {
+                                    //                 console.log("ERROR copyObject" + err);
+                                    //                 callbackz();
+                                    //             }
+                                    //             else {
+                                    //                 console.log('SUCCESS copyObject');
+                                    //                 index++;
                                                    
-                                                    postcard1 = sceneResponse.sceneDomain +"/"+sceneResponse.short_id +"/"+ picture_item._id + ".standard." + picture_item.filename;
+                                    //                 postcard1 = sceneResponse.sceneDomain +"/"+sceneResponse.short_id +"/"+ picture_item._id + ".standard." + picture_item.filename;
                                                    
-                                                    callbackz();
-                                                }
-                                            });
-                                        } else {
-                                            index++;
-                                            postcard1 = sceneResponse.sceneDomain +"/"+sceneResponse.short_id +"/"+ picture_item._id + ".standard." + picture_item.filename;
+                                    //                 callbackz();
+                                    //             }
+                                    //         });
+                                    //     } else {
+                                    //         index++;
+                                    //         postcard1 = sceneResponse.sceneDomain +"/"+sceneResponse.short_id +"/"+ picture_item._id + ".standard." + picture_item.filename;
                                            
-                                            callbackz();
-                                        }
+                                    //         callbackz();
+                                    //     }
                                         
-                                    });
-                                    
-                                    }
-                                });
-                            },
-                            function (err) {                       
-                                if (err) {
-                                    console.log('A file failed to process');
-                                    callback();
-                                } else {
-                                 
-                                    callback();
+                                    // });
                                 }
                             });
-                        } else {
-                            callback();
-                        }
+                        //             }
+                        //         });
+                        //     },
+                        //     function (err) {                       
+                        //         if (err) {
+                        //             console.log('A file failed to process');
+                        //             callback();
+                        //         } else {
+                                 
+                        //             callback();
+                        //         }
+                        //     });
+                    } else {
+                        console.log("no postcard!");
+                        callback();
+                    }
                 },
-                */
+                
                 function (callback) {
                     console.log("pictureGroups: " + sceneResponse.scenePictureGroups);
                     if (sceneResponse.scenePictureGroups != null && sceneResponse.scenePictureGroups.length > 0) {
@@ -3834,7 +3843,7 @@ webxr_router.get('/:_id', function (req, res) {
                             "<meta property='og:url' content='" + process.env.ROOT_HOST + "/webxr/" + sceneResponse.short_id + "' /> " +
                             "<meta property='og:type' content='website' /> " +
                             // "<meta property='og:image' content='" + postcard1 + "' /> " +
-                            "<meta property='og:image' content='http://" + postcard1 + "' /> " +
+                            "<meta property='og:image' content='" + postcard1 + "' /> " +
                             "<meta property='og:image:height' content='1024' /> " +
                             "<meta property='og:image:width' content='1024' /> " +
                             "<meta property='og:title' content='" + sceneResponse.sceneTitle + "' /> " +
@@ -3962,7 +3971,7 @@ webxr_router.get('/:_id', function (req, res) {
                         "<meta property='og:url' content='" + process.env.ROOT_HOST + "/webxr/" + sceneResponse.short_id + "' /> " +
                         "<meta property='og:type' content='website' /> " +
                         // "<meta property='og:image' content='" + postcard1 + "' /> " +
-                        "<meta property='og:image' content='http://" + postcard1 + "' /> " +
+                        "<meta property='og:image' content='" + postcard1 + "' /> " +
                         "<meta property='og:image:height' content='1024' /> " +
                         "<meta property='og:image:width' content='1024' /> " +
                         "<meta property='og:title' content='" + sceneResponse.sceneTitle + "' /> " +
@@ -4036,7 +4045,7 @@ webxr_router.get('/:_id', function (req, res) {
                         "<meta property='og:url' content='" + process.env.ROOT_HOST + "/webxr/" + sceneResponse.short_id + "' /> " +
                         "<meta property='og:type' content='website' /> " +
                         // "<meta property='og:image' content='" + postcard1 + "' /> " +
-                        "<meta property='og:image' content='http://" + postcard1 + "' /> " +
+                        "<meta property='og:image' content='" + postcard1 + "' /> " +
                         "<meta property='og:image:height' content='1024' /> " +
                         "<meta property='og:image:width' content='1024' /> " +
                         "<meta property='og:title' content='" + sceneResponse.sceneTitle + "' /> " +
@@ -4223,7 +4232,8 @@ webxr_router.get('/:_id', function (req, res) {
 
                             if (sceneResponse.sceneTags.includes("greeting")) {
                                 console.log("greeting is " + sceneResponse.sceneGreeting);
-                                textEntities = textEntities + "<a-entity id=\x22sceneGreetingDialog\x22 class=\x22activeObjexRay\x22 look-at=\x22#player\x22 scene_greeting_dialog=\x22font1 : "+sceneResponse.sceneFontWeb1+"; font2 : "+sceneResponse.sceneFontWeb2+"; greetingText : "+sceneResponse.sceneGreeting+"; questText : "+sceneQuest+";\x22></a-entity>";
+                                textEntities = textEntities + "<a-entity id=\x22sceneGreetingDialog\x22 class=\x22activeObjexRay\x22 look-at=\x22#player\x22 scene_greeting_dialog=\x22fillColor : "+sceneResponse.sceneFontFillColor+
+                                "; outlineColor : "+sceneResponse.sceneFontOutlineColor+"; backgroundColor : "+sceneResponse.sceneTextBackgroundColor+"; font1 : "+sceneResponse.sceneFontWeb1+"; font2 : "+sceneResponse.sceneFontWeb2+"; greetingText : "+sceneResponse.sceneGreeting+"; questText : "+sceneQuest+";\x22></a-entity>";
                             }
                         }
                         
@@ -4296,7 +4306,7 @@ webxr_router.get('/:_id', function (req, res) {
                         "<meta property='og:url' content='" + process.env.ROOT_HOST + "/webxr/" + sceneResponse.short_id + "' /> " +
                         "<meta property='og:type' content='website' /> " +
                         // "<meta property='og:image' content='" + postcard1 + "' /> " +
-                        "<meta property='og:image' content='http://" + postcard1 + "' /> " +
+                        "<meta property='og:image' content='" + postcard1 + "' /> " +
                         "<meta property='og:image:height' content='1024' /> " +
                         "<meta property='og:image:width' content='1024' /> " +
                         "<meta property='og:title' content='" + sceneResponse.sceneTitle + "' /> " +
