@@ -736,7 +736,7 @@ function geoip(json){
   function SetYouAreHereMarker () {  //do this for all players
     if (theMap && currentLocation != []) {
 
-      console.log("SOCKETID IS  " + socket.id);
+      // console.log("SOCKETID IS  " + socket.id);
       let playerData = ReturnPlayerData(); //roomusers from socket connection
       let color = "blue";
       let un = "";
@@ -1362,14 +1362,17 @@ function geoip(json){
           let eventData = null;
           if (sceneLocations.locations != undefined) {
             for (let m = 0; m < sceneLocations.locations.length; m++) {
-              if (gpsElements[i].getAttribute(geoEntity.toString())._id == sceneLocations.locations[m].timestamp) {//match the id to get the sceneLcoation data
+              if (gpsElements[i].getAttribute(geoEntity.toString())._id == sceneLocations.locations[m].timestamp) { //match the id to get the sceneLcoation data
                 let modelUrl = 'https://servicemedia.s3.amazonaws.com/assets/models/avatar1c.glb';
                 if (sceneLocations.locations[m].modelID != null) {
-                  // console.log("Looking for model id: " + sceneLocations.locations[m].modelID);   
+                  console.log("Looking for model id: " + sceneLocations.locations[m].modelID);   
 
                   let locationModel = document.getElementById(sceneLocations.locations[m].modelID.toString());               
-                  console.log("Looking for model : " + locationModel.getAttribute('src'));
-                  modelUrl = locationModel.getAttribute('src');
+                  // console.log("Looking for model : " + locationModel.getAttribute('src'));
+                  if (locationModel) {
+                    modelUrl = locationModel.getAttribute('src');
+                  }
+                  
                 }
                 if (sceneLocations.locations[m].markerObjScale != null && sceneLocations.locations[m].markerObjScale != undefined) {
                   scale = parseFloat(sceneLocations.locations[m].markerObjScale);
