@@ -2007,9 +2007,9 @@ AFRAME.registerComponent('model-callout', {
                             // lerpedPos.x = lerp((currentPos.x / iteration) - currentPos.x, pos.x, .1);
                             // lerpedPos.y = lerp((currentPos.y / iteration) - currentPos.y, pos.y, .1);
                             // lerpedPos.z = lerp((currentPos.z / iteration) - currentPos.z, pos.z, .1);
-                            lerpedPos.x = lerp(currentPos.x, pos.x, (.01 * iteration)/durationAll);
-                          lerpedPos.y = lerp(currentPos.y, pos.y, (.01 * iteration)/durationAll);
-                            lerpedPos.z = lerp(currentPos.z, pos.z,  (.01 * iteration)/durationAll);
+                            lerpedPos.x = lerp(currentPos.x, pos.x, (.02 * iteration)/durationAll);
+                          lerpedPos.y = lerp(currentPos.y, pos.y, (.02 * iteration)/durationAll);
+                            lerpedPos.z = lerp(currentPos.z, pos.z,  (.02 * iteration)/durationAll);
               element.setAttribute('rotation', rot);
               element.setAttribute('position', lerpedPos);
               //  console.log("tryna lerp to " + lerpedPos.x + " " + lerpedPos.y + " " + lerpedPos.z + " iteration " + (durationAll - iteration));
@@ -7059,7 +7059,7 @@ AFRAME.registerComponent('youtube_player', {  //setup and controls for the 3d pl
           // console.log("tryna update slider to " + percentage);
           this.slider_handle.position.lerpVectors(this.slider_begin.position, this.slider_end.position, percentage);
   }, 
-  player_status_update (state) {
+  player_status_update: function (state) {
     this.playerState = state;
     if (this.youtubeState != null) {
       this.youtubeState.setAttribute('text', {
@@ -7106,7 +7106,7 @@ AFRAME.registerComponent('youtube_player', {  //setup and controls for the 3d pl
       }
     }
   },
-  update_stats (timestring) {
+  update_stats: function (timestring) {
     this.youtubeStats.setAttribute('text', {
       baseline: "bottom",
           wrapCount: 70,
@@ -7114,6 +7114,12 @@ AFRAME.registerComponent('youtube_player', {  //setup and controls for the 3d pl
       value: timestring
     });
     MediaTimeUpdate(timestring);
+  },
+  randomTime: function() {
+    let duration = youtubePlayer.getDuration();
+    let randomTimeValue = Math.random() * (duration - .1) + .1;
+    
+    youtubePlayer.seekTo(randomTimeValue, true);
   },
   tick: function() {
       if (!this.raycaster) {

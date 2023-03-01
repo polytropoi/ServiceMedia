@@ -410,17 +410,9 @@ AFRAME.registerComponent('mod-materials', {
 
                 console.log("gotsa screen mesh");
                 this.meshArray.push(this.screenMesh);
-                // let screenMesh = document.createElement("a-entity");
-                // screenMesh.classList.add("activeObjexRay");
-                // screenMesh.setObject3D("mesh", this.screenMesh);
-                // // this.screenMesh.remove();
-                // this.sceneEl.appendChild(screenMesh);
+
               } 
-              // else {
-              //   this.screenMesh = this.mesh;
-              //   this.screenIsTop = true;
-              //   console.log("screenmesh is " + this.mesh.name);
-              // }
+         
               if (node.name.toLowerCase().includes("fastforward")) {
                 this.ffwdMesh = node; 
                 this.meshArray.push(this.ffwdMesh);
@@ -528,34 +520,14 @@ AFRAME.registerComponent('mod-materials', {
               if (timedEventsListenerMode == null) {
                 timedEventsListenerMode = "Primary Video";
               }
-              // if (this.video.src.includes(".webm") || this.video.src.includes(".mov")) { 
-              //   this.vidtexture.format = THREE.RGBAFormat; 
-              //   console.log("tryna set ALPHA VIDEO TEXTURE");
-              // } else {
-              //   this.vidtexture.format = THREE.RGBFormat;
-              // }
-              // this.vidtexture = new THREE.VideoTexture( this.video );
+          
               this.vidtexture = new THREE.VideoTexture( this.video );
               this.vidtexture.flipY = this.data.flipY; 
               this.vidtexture.minFilter = THREE.NearestFilter;
               this.vidtexture.magFilter = THREE.NearestFilter;
               this.playmaterial = new THREE.MeshBasicMaterial( { map: this.vidtexture } ); 
               
-              // this.playmaterial = material;
-                // this.meshnode = null;
-             
-                // this.mesh.traverse(node => {
-                //   if (node instanceof THREE.Mesh) {
-                //     if (node.material != null && node.material != undefined && node.name.toLowerCase().includes("hvid")) { //TODO || "vvid"
-                //       this.meshnode = node;
-                //       console.log("gotsa vid material " + node.name);
-                //       } 
-                //     }
-                // });
-              // if (this.video.readyState >= 2) {
-                // playVideo(this.video);
-              // playVideo(this.video);
-              // setTimeout(()=> { //wait a bit to make sure it's playing
+           
               console.log("tryna bind vid material to mesh");
 
               this.playmaterial.map.needsUpdate = true;   
@@ -576,27 +548,22 @@ AFRAME.registerComponent('mod-materials', {
                 this.playButtonMesh.visible = false;
               }
 
-              // if (this.video.readyState >= 2) {
-              //   this.playButtonMesh.visible = true;
-              // }
-                // },500);
-              // }
-            // } //else {
+              
               this.redmat = new THREE.MeshStandardMaterial({
-                color: "red"    // red (can also use a CSS color string here)
-                // flatShading: true,
+                color: "red"    
+                
               });
               this.greenmat = new THREE.MeshStandardMaterial({
-                color: "lightgreen"    // red (can also use a CSS color string here)
-                // flatShading: true,
+                color: "lightgreen"    
+                
               });
               this.yellowmat = new THREE.MeshStandardMaterial({
-                color: "yellow"    // red (can also use a CSS color string here)
-                // flatShading: true,
+                color: "yellow"    
+                
               });
               this.bluemat = new THREE.MeshStandardMaterial({
-                color: "blue"    // red (can also use a CSS color string here)
-                // flatShading: true,
+                color: "blue"    
+                
               });
               this.player_status_update("loading");
               this.video.addEventListener( 'canplay', this.player_status_update("ready"), false); //next step when kinda loaded
@@ -752,6 +719,10 @@ AFRAME.registerComponent('mod-materials', {
           }
           });
         },
+        randomTime () {
+          let randomTimeValue = Math.random() * (this.video.duration - 1) + 1;
+          this.video.currentTime = randomTimeValue;
+        },
         togglePlayPauseVideo () {
           if (this.video.paused) {
             console.log("tryna play!");
@@ -827,24 +798,24 @@ AFRAME.registerComponent('mod-materials', {
             if (this.durationtimeformat = null) {
               this.durationtimeformat = fancyTimeFormat(this.video.duration)
             }
-          if (!this.video.paused && this.slider_handle != null) {
-            this.playmaterial.map.needsUpdate = true;  
-            currentTime = this.video.currentTime.toFixed(2);
-            this.percent = this.video.currentTime / this.video.duration;
-            // console.log(this.percent);
-            this.slider_handle.position.lerpVectors(this.slider_begin.position, this.slider_end.position, this.percent);
-            this.fancyTimeString = fancyTimeFormat(this.video.currentTime)  + " / "+ fancyTimeFormat(this.video.duration)  + " : " + (this.percent * 100).toFixed(2) +" %";
-            this.videoStatus.setAttribute('text', {
-              // width: 4, 
-              align: "left",
-              value: this.fancyTimeString,
-              font: "/fonts/Exo2Bold.fnt",
-              anchor: "center",
-              wrapCount: 100,
-              color: "white",
-            });
-            MediaTimeUpdate(this.fancyTimeString);
-          }
+            if (!this.video.paused && this.slider_handle != null) {
+              this.playmaterial.map.needsUpdate = true;  
+              currentTime = this.video.currentTime.toFixed(2);
+              this.percent = this.video.currentTime / this.video.duration;
+              // console.log(this.percent);
+              this.slider_handle.position.lerpVectors(this.slider_begin.position, this.slider_end.position, this.percent);
+              this.fancyTimeString = fancyTimeFormat(this.video.currentTime)  + " / "+ fancyTimeFormat(this.video.duration)  + " : " + (this.percent * 100).toFixed(2) +" %";
+              this.videoStatus.setAttribute('text', {
+                // width: 4, 
+                align: "left",
+                value: this.fancyTimeString,
+                font: "/fonts/Exo2Bold.fnt",
+                anchor: "center",
+                wrapCount: 100,
+                color: "white",
+              });
+              MediaTimeUpdate(this.fancyTimeString);
+            }
           }
         }   
     });

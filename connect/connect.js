@@ -2413,6 +2413,28 @@ function LoopTimedEvent(keyType, duration) {
                envEl.components.enviro_mods.beat(.5);
             }
          }
+         if (keyType.toLowerCase().includes("random time")) {
+            if (timedEventsListenerMode != null && timedEventsListenerMode.toLowerCase() == 'primary audio') {
+               if (primaryAudioEl != null) {
+                  // console.log("beat volume " + volume);
+                  primaryAudioEl.components.primary_audio_control.randomTime();
+               }
+            } else if (timedEventsListenerMode != null && timedEventsListenerMode.toLowerCase() == 'primary video') {
+               var videoControllerEl = document.getElementById('primary_video');  
+               if (videoControllerEl != null) {
+                  console.log("gotsa video embedVideo");
+                  let videoController = videoControllerEl.components.vid_materials_embed;
+                  if (videoController) {
+                     videoController.randomTime();
+                  }
+               }
+            } else if (timedEventsListenerMode != null && timedEventsListenerMode.toLowerCase() == 'youtube') {
+               let youtube_player = document.getElementById("youtubePlayer").components.youtube_player;
+               if (youtube_player) {
+                  youtube_player.randomTime();
+               }
+            }
+         }
          if (keyType.toLowerCase().includes("color tweak")) {
             console.log("tryna beat loop");
             if (envEl != null) {
@@ -2460,6 +2482,28 @@ function PlayTimedEvent(timeKey) {
       if (primaryAudioEl != null) {
          // console.log("beat volume " + volume);
          primaryAudioEl.components.primary_audio_control.timekey_beat(.5);
+      }
+   }
+   if (timeKey.keytype.toLowerCase().includes("random time")) {
+      if (timedEventsListenerMode != null && timedEventsListenerMode.toLowerCase() == 'primary audio') {
+         if (primaryAudioEl != null) {
+            // console.log("beat volume " + volume);
+            primaryAudioEl.components.primary_audio_control.randomTime();
+         }
+      } else if (timedEventsListenerMode != null && timedEventsListenerMode.toLowerCase() == 'primary video') {
+         var videoControllerEl = document.getElementById('primary_video');  
+         if (videoControllerEl != null) {
+            console.log("gotsa video embedVideo");
+            let videoController = videoControllerEl.components.vid_materials_embed;
+            if (videoController) {
+               videoController.randomTime();
+            }
+         }
+      } else if (timedEventsListenerMode != null && timedEventsListenerMode.toLowerCase() == 'youtube') {
+         let youtube_player = document.getElementById("youtubePlayer").components.youtube_player;
+         if (youtube_player) {
+            youtube_player.randomTime();
+         }
       }
    }
    if (timeKey.keytype.toLowerCase().includes("text")) {

@@ -752,6 +752,11 @@ AFRAME.registerComponent('primary_audio_player', {  //setup and controls for the
             //     this.isPlaying = false;
             // }
         },
+        randomTime: function() {
+            let randomTimeValue = Math.random() * (this.duration - 1) + 1;
+            this.primaryAudioHowl.seek(randomTimeValue);
+
+        },
         start: function() {
             this.primaryAudioHowl.seek(0);
         },
