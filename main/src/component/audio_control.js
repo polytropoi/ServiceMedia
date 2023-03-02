@@ -49,7 +49,7 @@ var getJSON = function(url, callback) { //netradio details
 AFRAME.registerComponent('primary_audio_player', {  //setup and controls for the 3d player
     schema: {
         color: {default: 'red'},
-        hitpoint: {default: null}
+        hitpoint: {default: ''}
     },
     // dependencies: ['raycaster'],
     init: function () {

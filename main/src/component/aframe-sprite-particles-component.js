@@ -30,7 +30,7 @@
 
   const RANDOM_REPEAT_COUNT = 131072 // random numbers will start repeating after this number of particles
 
-  const degToRad = THREE.Math.degToRad
+  const degToRad = THREE.MathUtils.degToRad
 
   const ATTR_TO_DEFINES = {
     acceleration: "USE_PARTICLE_ACCELERATION",
@@ -255,7 +255,7 @@
       this.params[PARTICLE_SIZE_PARAM] = data.particleSize
       this.params[USE_PERSPECTIVE_PARAM] = data.usePerspective ? 1 : 0
       this.params[DIRECTION_PARAM] = data.direction === "forward" ? 0 : 1
-      this.params[DRAG_PARAM] = THREE.Math.clamp(data.drag, 0, 1)
+      this.params[DRAG_PARAM] = THREE.MathUtils.clamp(data.drag, 0, 1)
       this.params[SCREEN_DEPTH_OFFSET_PARAM] = data.screenDepthOffset*1e-5
       this.params[RIBBON_WIDTH_PARAM] = data.ribbonWidth
       this.params[RIBBON_UV_MULTIPLIER_PARAM] = data.ribbonUVMultiplier

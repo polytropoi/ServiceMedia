@@ -2464,7 +2464,7 @@ AFRAME.registerComponent("rotate-with-camera", { //unused
  * from https://github.com/kylebakerio/aframe-curve-component/blob/master/index.js
  */
  var zAxis = new THREE.Vector3(0, 0, 1);
- var degToRad = THREE.Math.degToRad;
+ var degToRad = THREE.MathUtils.degToRad;
  
  AFRAME.registerComponent('curve-point', {
  

@@ -50,7 +50,7 @@
 	  throw new Error('Component attempted to register before AFRAME was available.');
 	}
 
-	var degToRad = THREE.Math.degToRad;
+	var degToRad = THREE.MathUtils.degToRad;
 	var almostEqual = __webpack_require__(1);
 	/**
 	 * Linear Interpolation component for A-Frame.

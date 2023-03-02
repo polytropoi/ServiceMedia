@@ -1762,7 +1762,7 @@ AFRAME.registerComponent('model-callout', {
     },
     move: (function (id, pos, rot) { //called directly from connect.js 
       // console.log("rot " + JSON.stringify(rot));
-      var DEG2RAD = THREE.Math.DEG2RAD;
+      var DEG2RAD = THREE.MathUtils.DEG2RAD;
       var element = document.getElementById(id);
       var iteration = 0;
       var currentQuat = new THREE.Quaternion();
@@ -1942,7 +1942,7 @@ AFRAME.registerComponent('model-callout', {
         clearInterval(this.intervals[i]);
       }
       this.intervals = [];
-      var DEG2RAD = THREE.Math.DEG2RAD;
+      var DEG2RAD = THREE.MathUtils.DEG2RAD;
       var element = document.getElementById(id);
       var iteration = 0;
       var currentQuat = new THREE.Quaternion();
@@ -2938,18 +2938,18 @@ AFRAME.registerComponent('mod_object', {
           
           // that.el.setAttribute("rotation", rot);
           this.el.object3D.rotation.set(
-            THREE.Math.degToRad(rot.x),
-            THREE.Math.degToRad(rot.y),
-            THREE.Math.degToRad(rot.z)
+            THREE.MathUtils.degToRad(rot.x),
+            THREE.MathUtils.degToRad(rot.y),
+            THREE.MathUtils.degToRad(rot.z)
           );
         }
       
       } else { //if we're equipped
         // this.el.setAttribute("rotation", rot);
         this.el.object3D.rotation.set(
-          THREE.Math.degToRad(rot.x),
-          THREE.Math.degToRad(rot.y),
-          THREE.Math.degToRad(rot.z)
+          THREE.MathUtils.degToRad(rot.x),
+          THREE.MathUtils.degToRad(rot.y),
+          THREE.MathUtils.degToRad(rot.z)
         );
         // this.el.object3D.rotation = rot;
         this.el.setAttribute('material', {opacity: 0.25, transparent: true});
@@ -4034,9 +4034,9 @@ AFRAME.registerComponent('mod_object', {
         //   // this.el.object3D.rotation = this.dropRot;
           
         //   // this.el.object3D.rotation.set(
-        //   //   THREE.Math.degToRad(this.erot.x),
-        //   //   THREE.Math.degToRad(this.erot.y),
-        //   //   THREE.Math.degToRad(this.erot.z)
+        //   //   THREE.MathUtils.degToRad(this.erot.x),
+        //   //   THREE.MathUtils.degToRad(this.erot.y),
+        //   //   THREE.MathUtils.degToRad(this.erot.z)
         //   // );
         //   // this.el.object3D.lookAt(this.lookVector);
 
@@ -7057,7 +7057,10 @@ AFRAME.registerComponent('youtube_player', {  //setup and controls for the 3d pl
       //     primaryAudioMangler.slider_update(percentage);
       // }
           // console.log("tryna update slider to " + percentage);
-          this.slider_handle.position.lerpVectors(this.slider_begin.position, this.slider_end.position, percentage);
+          if (this.slider_handle) {
+            this.slider_handle.position.lerpVectors(this.slider_begin.position, this.slider_end.position, percentage);
+          }
+          
   }, 
   player_status_update: function (state) {
     this.playerState = state;

@@ -1517,7 +1517,7 @@ AFRAME.registerSystem('trail', {
         if ( index === trail.trailHistory.length ) index = trail.trailHistory.length - 1;
         var pos = trail.trailHistory[index];
         // custom the shape changing this width parameter
-        var width = THREE.Math.mapLinear( j, 0, trail.resolution + 1, 0, 1 ) * trail.width / 2;
+        var width = THREE.MathUtils.mapLinear( j, 0, trail.resolution + 1, 0, 1 ) * trail.width / 2;
         if ( typeof pos != "undefined" ) {
           // update vertices using a "2D cross product"
           // one side of the trail, left or right

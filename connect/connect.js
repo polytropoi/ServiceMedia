@@ -101,15 +101,16 @@ $(function() {
       player.setAttribute("player_mover", "init");
    }
    let modelDataEl = document.getElementById('sceneModels');
-   let modelData = modelDataEl.getAttribute('data-models');
-   sceneModels = JSON.parse(atob(modelData)); //convert from base64
-   // console.log("sceneModels " + JSON.stringify(sceneModels));
-   for (let i = 0; i < sceneModels.length; i++) {
-      if (sceneModels[i].sourceText != undefined && sceneModels[i].sourceText != 'undefined' && sceneModels[i].sourceText != null && sceneModels[i].sourceText.length > 0) {
-         attributions.push("Name: " + sceneModels[i].name + " - Type: " + sceneModels[i].item_type + " - Source: " + sceneModels[i].sourceText);
+   if (modelDataEl) {
+      let modelData = modelDataEl.getAttribute('data-models');
+      sceneModels = JSON.parse(atob(modelData)); //convert from base64
+      // console.log("sceneModels " + JSON.stringify(sceneModels));
+      for (let i = 0; i < sceneModels.length; i++) {
+         if (sceneModels[i].sourceText != undefined && sceneModels[i].sourceText != 'undefined' && sceneModels[i].sourceText != null && sceneModels[i].sourceText.length > 0) {
+            attributions.push("Name: " + sceneModels[i].name + " - Type: " + sceneModels[i].item_type + " - Source: " + sceneModels[i].sourceText);
+         }
       }
    }
-
    console.log("last_page was " + localStorage.getItem("last_page") + " servertoken: "+ token + " localtoken: " + localtoken);
    setTimeout(function () {
       localStorage.setItem("last_page", room);
@@ -179,7 +180,9 @@ $(function() {
    if (settings.skyboxID == "") {
       // skyboxEl.components.skybox_dynamic.nextSkybox();
    }
-   if (settings.audioGroups.triggerGroups.length > 0 || settings.audioGroups.ambientGroups.length > 0 || settings.audioGroups.primaryGroups.length > 0) {
+   if (settings.audioGroups && settings.audioGroups.triggerGroups && settings.audioGroups.triggerGroups.length > 0 || 
+      settings.audioGroups && settings.audioGroups.ambientGroups && settings.audioGroups.ambientGroups.length > 0 ||
+      settings.audioGroups && settings.audioGroups.primaryGroups &&  settings.audioGroups.primaryGroups.length > 0) {
       // audioGroupsEl = document.getElementById('audioGroupsEl');
       // if (audioGroupsEl != null) {
       //    let audioGroupsController = audioGroupsEl.components.audio_groups_control;

@@ -387,11 +387,12 @@ webxr_router.get('/:_id', function (req, res) {
     let physicsScripts = "";
     let brownianScript = "";
     let aframeExtrasScript = "<script src=\x22../main/vendor/aframe/animation-mixer.js\x22></script>"; //swapped with full aframe-extras lib (that includes animation-mixer) for physics and navmesh if needed
+    // let aframeExtrasScript = "<script src=\x22../main/src/component/aframe-extras.min.js\x22></script>"; 
     let logScripts = "";
     enviromentScript = ""; //for aframe env component
     // let debugMode = false;
     // let aframeScriptVersion = "<script src=\x22https://aframe.io/releases/1.3.0/aframe.min.js\x22></script>";
-    let aframeScriptVersion = "<script src=\x22https://aframe.io/releases/1.3.0/aframe.min.js\x22></script>";
+    let aframeScriptVersion = "<script src=\x22https://aframe.io/releases/1.4.1/aframe.min.js\x22></script>";
     
     
     let surfaceScatterScript = "";
@@ -1176,7 +1177,9 @@ webxr_router.get('/:_id', function (req, res) {
                                 //     // "wasd-controls=\x22fly: false; acceleration: 35\x22";
                                 // }
                                 if (sceneResponse.sceneCameraMode == "Orbit") {
-                                    joystickScript = "<script src=\x22../main/vendor/aframe/aframe-orbit-controls.min.js\x22></script>";
+                                    // joystickScript = "<script src=\x22../main/vendor/aframe/aframe-orbit-controls.min.js\x22></script>";
+                                    // joystickScript = "<script src=\x22../main/src/component/aframe-orbit-controls.min.js\x22></script>";
+                                    joystickScript = "<script src=\x22https://unpkg.com/aframe-orbit-controls@1.3.0/dist/aframe-orbit-controls.min.js\x22></script>";
                                     wasd = "orbit-controls=\x22target: 0 1.6 -.5; minDistance: .5; maxDistance: 100; initialPosition: 0 1 3; enableDamping: true;\x22";
                                 }
                                 if (sceneResponse.sceneCameraMode == "Fixed") {
@@ -1299,7 +1302,7 @@ webxr_router.get('/:_id', function (req, res) {
                                 webxrEnv = sceneResponse.sceneWebXREnvironment;
                                 
                                 // enviromentScript = "<script src=\x22../main/ref/aframe/dist/aframe_environment_component.min.js\x22></script>"; --aframe-environment-component
-                                enviromentScript = "<script src=\x22../main/src/component/aframe_environment_component_mod.js\x22></script>";
+                                enviromentScript = "<script src=\x22../main/src/component/aframe_environment_component_m2.js\x22></script>";
                                 let ground = "";
                                 let skycolor = "";
                                 let groundcolor = "";
@@ -2866,39 +2869,42 @@ webxr_router.get('/:_id', function (req, res) {
                             "primaryAudioMesh.add( primaryAudio );\n";
                             
                         } else { //aframe below
-                            let html5 = "html5: true,";
-                            if (sceneResponse.scenePrimaryAudioVisualizer == true) {  //audio analysis won't work in html5 mode
-                                html5 = "html5: false,";
-                            } 
-                            primaryAudioScript = "<script>\n" +      
-                            "let primaryAudioHowl = new Howl({" + //inject howler for non-streaming
-                                    "src: [\x22"+oggurl+"\x22,\x22"+mp3url+"\x22], "+html5+" ctx: true, volume: 0," + loopable +
-                                "});" +
-                            "primaryAudioHowl.load();</script>";
-                            // primaryAudioControl = "<script src=\x22../main/src/component/primary-audio-control.js\x22></script>";
-                            primaryAudioEntity = "<a-entity audio-play-on-window-click id=\x22primaryAudioParent\x22 look-at=\x22#player\x22 position=\x22"+audioLocation+"\x22>"+ //parent
-                           
+                            if (mp3url.length > 8) {
+                                let html5 = "html5: true,";
+                                if (sceneResponse.scenePrimaryAudioVisualizer == true) {  //audio analysis won't work in html5 mode
+                                    html5 = "html5: false,";
+                                } 
+
+                                primaryAudioScript = "<script>\n" +      
+                                "let primaryAudioHowl = new Howl({" + //inject howler for non-streaming
+                                        "src: [\x22"+oggurl+"\x22,\x22"+mp3url+"\x22], "+html5+" ctx: true, volume: 0," + loopable +
+                                    "});" +
+                                "primaryAudioHowl.load();</script>";
+                                // primaryAudioControl = "<script src=\x22../main/src/component/primary-audio-control.js\x22></script>";
+                                primaryAudioEntity = "<a-entity audio-play-on-window-click id=\x22primaryAudioParent\x22 look-at=\x22#player\x22 position=\x22"+audioLocation+"\x22>"+ //parent
                             
-                            "<a-entity gltf-model=\x22#backpanel_horiz1\x22 position=\x220 -1.25 0\x22 material=\x22color: black; transparent: true;\x22></a-entity>" +
-                            // "<a-image id=\x22primaryAudioWaveformImageEntity\x22 position = \x220 -.1 0\x22 width=\x221\x22 height=\x22.25\x22 src=\x22#primaryAudioWaveform\x22 crossorigin=\x22anonymous\x22 transparent=\x22true\x22></a-image>"+
-                            // "</a-entity>"+
-                            // "<a-entity gltf-model=\x22#audioplayer\x22 scale=\x221 1 1\x22 position=\x220 0 -.2\x22></a-entity>" +
-                            "<a-entity position=\x220 -1.25 0\x22 primary_audio_player id=\x22primaryAudioPlayer\x22 gltf-model=\x22#audioplayer\x22></a-entity>"+
-                            // "<a-entity id=\x22primaryAudioText\x22 geometry=\x22primitive: plane; width: 1; height: .30\x22 position=\x22-.85 -.2 -1\x22 material=\x22color: grey; transparent: true; opacity: 0.0\x22"+
-                            "<a-entity id=\x22primaryAudioText\x22 position=\x22.5 0 -1\x22 "+
-                            "text=\x22value:Click to play;\x22></a-entity>"+
-                            // "<a-entity id=\x22primaryAudio\x22 mixin=\x22grabmix\x22 class=\x22activeObjexGrab activeObjexRay\x22 entity-callout=\x22calloutString: 'play/pause'\x22 primary_audio_control=\x22oggurl: "+oggurl+"; mp3url: "+mp3url+"; audioID: "+sceneResponse.scenePrimaryAudioID+"; volume: "+scenePrimaryVolume+"; audioevents:"+sceneResponse.scenePrimaryAudioTriggerEvents+"; targetattach:"+sceneResponse.sceneAttachPrimaryAudioToTarget+"; autoplay: "+sceneResponse.sceneAutoplayPrimaryAudio+";"+
-                            // "title: "+primaryAudioTitle+"\x22 geometry=\x22primitive: sphere; radius: .175;\x22 material=\x22shader: noise;\x22 position=\x220 -.5 -1\x22>"+
-                            "<a-entity id=\x22primaryAudio\x22 primary_audio_control=\x22oggurl: "+oggurl+"; mp3url: "+mp3url+"; audioID: "+sceneResponse.scenePrimaryAudioID+"; volume: "+scenePrimaryVolume+"; audioevents:"+sceneResponse.scenePrimaryAudioTriggerEvents+"; targetattach:"+sceneResponse.sceneAttachPrimaryAudioToTarget+"; autoplay: "+sceneResponse.sceneAutoplayPrimaryAudio+";"+
-                            "title: "+primaryAudioTitle+"\x22>"+
-                            
-                            "</a-entity>"+
-                            
-                            "</a-entity>";
-                            // "<a-entity gltf-model=\x22#play_button\x22 scale=\x22.15 .1 .1\x22 position=\x220 0 -.2\x22 material=\x22color: black; transparent: true; opacity: 0.1\x22></a-entity>" +
-                            if (sceneResponse.scenePrimaryAudioTriggerEvents) {
-                                var buff = Buffer.from(JSON.stringify(primaryAudioObject)).toString("base64");
-                                loadAudioEvents = "<a-entity primary_audio_events id=\x22audioEventsData\x22 data-audio-events='"+buff+"'></a-entity>"; 
+                                
+                                "<a-entity gltf-model=\x22#backpanel_horiz1\x22 position=\x220 -1.25 0\x22 material=\x22color: black; transparent: true;\x22></a-entity>" +
+                                // "<a-image id=\x22primaryAudioWaveformImageEntity\x22 position = \x220 -.1 0\x22 width=\x221\x22 height=\x22.25\x22 src=\x22#primaryAudioWaveform\x22 crossorigin=\x22anonymous\x22 transparent=\x22true\x22></a-image>"+
+                                // "</a-entity>"+
+                                // "<a-entity gltf-model=\x22#audioplayer\x22 scale=\x221 1 1\x22 position=\x220 0 -.2\x22></a-entity>" +
+                                "<a-entity position=\x220 -1.25 0\x22 primary_audio_player id=\x22primaryAudioPlayer\x22 gltf-model=\x22#audioplayer\x22></a-entity>"+
+                                // "<a-entity id=\x22primaryAudioText\x22 geometry=\x22primitive: plane; width: 1; height: .30\x22 position=\x22-.85 -.2 -1\x22 material=\x22color: grey; transparent: true; opacity: 0.0\x22"+
+                                "<a-entity id=\x22primaryAudioText\x22 position=\x22.5 0 -1\x22 "+
+                                "text=\x22value:Click to play;\x22></a-entity>"+
+                                // "<a-entity id=\x22primaryAudio\x22 mixin=\x22grabmix\x22 class=\x22activeObjexGrab activeObjexRay\x22 entity-callout=\x22calloutString: 'play/pause'\x22 primary_audio_control=\x22oggurl: "+oggurl+"; mp3url: "+mp3url+"; audioID: "+sceneResponse.scenePrimaryAudioID+"; volume: "+scenePrimaryVolume+"; audioevents:"+sceneResponse.scenePrimaryAudioTriggerEvents+"; targetattach:"+sceneResponse.sceneAttachPrimaryAudioToTarget+"; autoplay: "+sceneResponse.sceneAutoplayPrimaryAudio+";"+
+                                // "title: "+primaryAudioTitle+"\x22 geometry=\x22primitive: sphere; radius: .175;\x22 material=\x22shader: noise;\x22 position=\x220 -.5 -1\x22>"+
+                                "<a-entity id=\x22primaryAudio\x22 primary_audio_control=\x22oggurl: "+oggurl+"; mp3url: "+mp3url+"; audioID: "+sceneResponse.scenePrimaryAudioID+"; volume: "+scenePrimaryVolume+"; audioevents:"+sceneResponse.scenePrimaryAudioTriggerEvents+"; targetattach:"+sceneResponse.sceneAttachPrimaryAudioToTarget+"; autoplay: "+sceneResponse.sceneAutoplayPrimaryAudio+";"+
+                                "title: "+primaryAudioTitle+"\x22>"+
+                                
+                                "</a-entity>"+
+                                
+                                "</a-entity>";
+                                // "<a-entity gltf-model=\x22#play_button\x22 scale=\x22.15 .1 .1\x22 position=\x220 0 -.2\x22 material=\x22color: black; transparent: true; opacity: 0.1\x22></a-entity>" +
+                                if (sceneResponse.scenePrimaryAudioTriggerEvents) {
+                                    var buff = Buffer.from(JSON.stringify(primaryAudioObject)).toString("base64");
+                                    loadAudioEvents = "<a-entity primary_audio_events id=\x22audioEventsData\x22 data-audio-events='"+buff+"'></a-entity>"; 
+                                }
                             }
                         }
                     }
@@ -2924,30 +2930,32 @@ webxr_router.get('/:_id', function (req, res) {
                         }
                     }
                     if (hasAmbientAudio) {
-                        ambientAudioScript = "<script>" +      
-                        "let ambientAudioHowl = new Howl({" + //inject howler for non-streaming
-                                "src: [\x22"+ambientOggUrl+"\x22,\x22"+ambientMp3Url+"\x22], volume: 0, loop: true" + 
-                            "});" +
-                        "ambientAudioHowl.load();</script>";
-                        ambientAudioControl = "<script src=\x22../main/src/component/ambient-audio-control.js\x22></script>";
-                        let ambientPosAnim = "animation__yoyo=\x22property: position; to: -33 3 0; dur: 60000; dir: alternate; easing: easeInSine; loop: true;\x22 ";
-                        let ambientRotAnim = "animation__rot=\x22property:rotation; dur:60000; to: 0 360 0; loop: true; easing:linear;\x22 ";        
-                        // posAnim = "animation__pos=\x22property: position; to: random-position; dur: 15000; loop: true;";  
-                        ambientAudioEntity = "<a-entity "+ambientRotAnim+"><a-entity id=\x22ambientAudio\x22 ambient_audio_control=\x22oggurl: "+ambientOggUrl+"; mp3url: "+ambientMp3Url+";\x22 volume: "+sceneAmbientVolume+"; "+
-                        // "geometry=\x22primitive: sphere; radius: .5\x22 "+ambientPosAnim+" position=\x2233 3 0\x22>" +
-                        ambientPosAnim+" position=\x2233 3 0\x22>" +
-                        "</a-entity></a-entity>";
+                        // if (ambientMp3Url.length > 8) {
+                            ambientAudioScript = "<script>" +      
+                            "let ambientAudioHowl = new Howl({" + //inject howler for non-streaming
+                                    "src: [\x22"+ambientOggUrl+"\x22,\x22"+ambientMp3Url+"\x22], volume: 0, loop: true" + 
+                                "});" +
+                            "ambientAudioHowl.load();</script>";
+                            ambientAudioControl = "<script src=\x22../main/src/component/ambient-audio-control.js\x22></script>";
+                            let ambientPosAnim = "animation__yoyo=\x22property: position; to: -33 3 0; dur: 60000; dir: alternate; easing: easeInSine; loop: true;\x22 ";
+                            let ambientRotAnim = "animation__rot=\x22property:rotation; dur:60000; to: 0 360 0; loop: true; easing:linear;\x22 ";        
+                            // posAnim = "animation__pos=\x22property: position; to: random-position; dur: 15000; loop: true;";  
+                            ambientAudioEntity = "<a-entity "+ambientRotAnim+"><a-entity id=\x22ambientAudio\x22 ambient_audio_control=\x22oggurl: "+ambientOggUrl+"; mp3url: "+ambientMp3Url+";\x22 volume: "+sceneAmbientVolume+"; "+
+                            // "geometry=\x22primitive: sphere; radius: .5\x22 "+ambientPosAnim+" position=\x2233 3 0\x22>" +
+                            ambientPosAnim+" position=\x2233 3 0\x22>" +
+                            "</a-entity></a-entity>";
+                        // }
                     }
                     if (hasTriggerAudio) {
-                      
-                        triggerAudioEntity = "<a-entity id=\x22triggerAudio\x22 trigger_audio_control=\x22volume: "+sceneTriggerVolume+"\x22>"+
-                        "</a-entity>";
-                        triggerAudioScript = "<script>" +      
-                        "let triggerAudioHowl = new Howl({" + //inject howler for non-streaming
-                                "src: [\x22"+triggerOggUrl+"\x22,\x22"+triggerMp3Url+"\x22], volume: 1, loop: false" + 
-                            "});" +
-                        "triggerAudioHowl.load();</script>";
-                    
+                        // if (triggerMp3Url.length > 8) {
+                            triggerAudioEntity = "<a-entity id=\x22triggerAudio\x22 trigger_audio_control=\x22volume: "+sceneTriggerVolume+"\x22>"+
+                            "</a-entity>";
+                            triggerAudioScript = "<script>" +      
+                            "let triggerAudioHowl = new Howl({" + //inject howler for non-streaming
+                                    "src: [\x22"+triggerOggUrl+"\x22,\x22"+triggerMp3Url+"\x22], volume: 1, loop: false" + 
+                                "});" +
+                            "triggerAudioHowl.load();</script>";
+                        // }
                     }
                     
                  
@@ -4188,6 +4196,7 @@ webxr_router.get('/:_id', function (req, res) {
                             // joystick = "joystick=\x22useNavmesh: true\x22";
                             
                         }
+                        
                         if (!showTransport) {
                             transportButtons = "";
                         }
@@ -4323,7 +4332,7 @@ webxr_router.get('/:_id', function (req, res) {
 
                      
                    
-                        "<script async src=\x22https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js\x22></script>"+
+                        "<script async src=\x22https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js\x22></script>"+
                         "<script type=\x22importmap\x22> {\x22imports\x22: {" +
                             "\x22three\x22: \x22https://unpkg.com/three@0.147.0/build/three.module.js\x22,"+
                             "\x22three/addons/\x22: \x22https://unpkg.com/browse/three@0.147.0/examples/jsm/\x22"+
@@ -4439,7 +4448,7 @@ webxr_router.get('/:_id', function (req, res) {
                         skySettings +
                        
                         ////////////////ASSETS/////////////
-                        "<a-assets timeout=\x2210000\x22>" +
+                        "<a-assets timeout=\x222000\x22>" +
                        
                         playerAvatarTemplate +
                         handsTemplate + 
@@ -4527,7 +4536,7 @@ webxr_router.get('/:_id', function (req, res) {
                         skyboxAsset +
                         // cubeMapAsset +
                         navmeshAsset +
-                        "<canvas crossorigin=\x22anonymous\x22 id=\x22flying_canvas\x22 width=\x221024\x22 height=\x221024\x22></canvas>"+
+                        // "<canvas crossorigin=\x22anonymous\x22 id=\x22flying_canvas\x22 width=\x221024\x22 height=\x221024\x22></canvas>"+
                         "</a-assets>\n"+
 
                         //////////////ENTITIES////////////////////

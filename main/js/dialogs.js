@@ -694,6 +694,7 @@ function ReturnTimedEventSelectors (selectedType) {
       "Beat",
         "Next",
         "Previous",
+        "Random Time",
         "Clear Loops",
         "Player Snap",
         "Player Lerp",

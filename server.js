@@ -4627,7 +4627,7 @@ app.post('/process_staging_files', requiredAuthentication, function (req, res) {
                     group.items = groupitems;
                     if (group.items.length > 1) {
                         console.log("tryna make group for " + uid + " length " + group.items.length);
-                        if (groupType == ".jpg") {
+                        if (groupType == ".jpg" || groupType == ".jpeg") {
                             group.type = "picture";
                             group.name = "pictures " + ts;
                         } else if (groupType == ".png") {
