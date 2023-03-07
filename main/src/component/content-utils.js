@@ -7437,6 +7437,7 @@ AFRAME.registerComponent('scene_greeting_dialog', {  //if "greeting" scenetag + 
   // dependencies: ['raycaster'],
   init: function () {
 
+    this.behavior = this.data.behavior;
     console.log("tryna set scene greeting " + this.data.greetingText);
     if (this.data.font1 != null && this.data.font1 != "") {
       this.font = this.data.font1; 
@@ -7546,10 +7547,12 @@ AFRAME.registerComponent('scene_greeting_dialog', {  //if "greeting" scenetag + 
             value: "Play"
           });
         }
-        console.log("TRYNA HIDE DIALOG! " + this.data.behavior);
-        if (this.data.behavior == "hide") {
+        console.log("TRYNA HIDE DIALOG! " + this.behavior);
+        if (this.behavior == 'hide') {
           // this.el.setAttribute("visible", false);
-          this.el.remove();
+          console.log("TRYNA HIDE DIALOG! " + this.data.behavior);
+          this.el.parentNode.removeChild(this.el);
+          // this.el.parent.remove(this.el);
         }
         // console.log("tryna start! playing " + PlayPauseMedia());
         

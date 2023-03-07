@@ -1344,7 +1344,7 @@ AFRAME.registerComponent('rotate_player_camera', {
 		// this.rotate == !this.rotate;
 		// if (this)
 		console.log("tryna ROTATE_PLAYER_CAMERA");
-		this.el.setAttribute('animation', 'property: rotation; to: 0 -360 0; dur: 30000; loop: true;');
+		this.el.setAttribute('animation', 'property: rotation; to: 0 -360 0; dur: 50000; easing: easeInOutSine; loop: true;');
 		// cannedAnim = "animation=\x22property: rotation; to: 0 360 0; loop: true; dur: "+duration+"\x22";
 	},
 
