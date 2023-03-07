@@ -1329,3 +1329,23 @@ AFRAME.registerComponent('nav_mesh', {
     }
 
 });
+
+AFRAME.registerComponent('rotate_player_camera', { 
+    schema: {
+      initialized: {default: false},
+
+    },
+    init: function(){
+		initialized = true;
+		this.rotate = false;
+		this.rotateOn();
+	},
+	rotateOn: function() {
+		// this.rotate == !this.rotate;
+		// if (this)
+		console.log("tryna ROTATE_PLAYER_CAMERA");
+		this.el.setAttribute('animation', 'property: rotation; to: 0 -360 0; dur: 30000; loop: true;');
+		// cannedAnim = "animation=\x22property: rotation; to: 0 360 0; loop: true; dur: "+duration+"\x22";
+	},
+
+});

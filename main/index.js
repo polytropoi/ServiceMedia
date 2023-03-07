@@ -13222,6 +13222,7 @@ function getAllPeople() {
                                     "<option>Third Person</option>" +
                                     "<option>Follow Path</option>" +
                                     "<option>Fixed</option>" +
+                                    "<option>Fixed Rotate</option>" +
                                     "<option>First Person / Path</option>" +
                                     "<option>Third Person / Path</option>" +
                                     // "<option>Cubemap</option>" +

@@ -7419,6 +7419,7 @@ function CaptureVideo(video) {
 AFRAME.registerComponent('scene_greeting_dialog', {  //if "greeting" scenetag + sceneResponse.sceneGreeting
   schema: {
     
+    behavior: {default: "none"},
     font1: {default: ""},
     font2: {default: ""},
     fillColor: {default: "white"},
@@ -7471,6 +7472,7 @@ AFRAME.registerComponent('scene_greeting_dialog', {  //if "greeting" scenetag + 
     if (settings && settings.sceneTextBackgroundColor) {
       this.textBackgroundColor = settings.sceneTextBackgroundColor;
     }
+
 
     // if (this.data.background) {
       // if (this.data.background != "rectangle") {
@@ -7544,7 +7546,12 @@ AFRAME.registerComponent('scene_greeting_dialog', {  //if "greeting" scenetag + 
             value: "Play"
           });
         }
-        // console.log("tryna start! " + PlayPauseMedia());
+        console.log("TRYNA HIDE DIALOG! " + this.data.behavior);
+        if (this.data.behavior == "hide") {
+          // this.el.setAttribute("visible", false);
+          this.el.remove();
+        }
+        // console.log("tryna start! playing " + PlayPauseMedia());
         
         // this.startButtonBackgroundEl.setAttribute("visible", false);
       });
