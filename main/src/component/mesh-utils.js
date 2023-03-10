@@ -2999,6 +2999,57 @@ AFRAME.registerComponent('rotate-toward-velocity', {
 
 });
 
+AFRAME.registerComponent('mod_random_path', {
+  schema: {
+    init: {default: false},
+    isClosed: {default: false},
+    eventData: {default: ''},
+    orientToCurve: {default: false}
+
+  },
+
+  init: function () {
+
+    this.maxpoints = 100;
+    const geometry = new THREE.BufferGeometry();
+
+    // attributes
+    const positions = new Float32Array( this.maxpoints * 3 ); // 3 vertices per point
+    geometry.setAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
+  
+    // drawcalls
+    drawCount = 2; // draw the first 2 points, only
+    geometry.setDrawRange( 0, drawCount );
+
+    const material = new THREE.LineBasicMaterial( { color: 0xff0000, linewidth: 2 } );
+
+    // line
+    line = new THREE.Line( geometry,  material );
+  },
+  updatePositions: function () {
+    const positions = line.geometry.attributes.position.array;
+
+    let x = 0;
+    let y = 0;
+    let z = 0;
+    let index = 0;
+
+    for ( let i = 0, l = this.maxpoints; i < l; i ++ ) {
+
+      positions[ index ++ ] = x;
+      positions[ index ++ ] = y;
+      positions[ index ++ ] = z;
+
+      x += ( Math.random() - 0.5 ) * 30;
+      y += ( Math.random() - 0.5 ) * 30;
+      z += ( Math.random() - 0.5 ) * 30;
+
+	  }
+
+  }
+
+});
+
 AFRAME.registerComponent('mod_curve', {
   schema: {
     init: {default: false},

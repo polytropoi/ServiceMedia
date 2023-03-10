@@ -2174,6 +2174,10 @@ webxr_router.get('/:_id', function (req, res) {
                                         // followCurve = "follow-path=\x22incrementBy:0.001; throttleTo:1\x22";
                                         followCurve = "mod_curve=\x22init: true\x22"  //hrm, add a bunch of params here...
                                     }
+                                    if (locMdl.markerType == "follow random path") {
+                                        // followCurve = "follow-path=\x22incrementBy:0.001; throttleTo:1\x22";
+                                        followCurve = "mod_random_path=\x22init: true\x22"  //hrm, add a bunch of params here...
+                                    }
                                     if (locMdl.markerType == "follow parametric curve") {
                                         let reverse = false;
                                         if (locMdl.eventData.toLowerCase().includes("reverse")) {
@@ -2417,14 +2421,15 @@ webxr_router.get('/:_id', function (req, res) {
                                                             "<script type=\x22x-shader/x-fragment\x22 id=\x22noise1_fragment\x22>"+fragmentShader+"</script>";
                                                         }
                                                     }
-                                                    if (locMdl.eventData.toLowerCase().includes("brownian")) {
-                                                        if (locMdl.eventData.toLowerCase().includes("brownian path")) {
-                                                            brownian = "brownian-path=\x22lineEnd:100000;lineStep:100;count:200;object:#thing-to-clone;positionVariance:88 33 86;spaceVectorOffset:101.1,100,100.2,101.2,100,100.3;rotationFollowsAxis:x;speed:0.01;\x22";
+                                                    if (locMdl.markerType == "brownian path" || locMdl.markerType == "brownian motion") {
+                                                        if (locMdl.markerType == "brownian path") {
+
+                                                            brownian = "brownian-path=\x22lineEnd:100000;lineStep:100;count:100;object:#thing-to-clone;positionVariance:88 33 86;spaceVectorOffset:101.1,100,100.2,101.2,100,100.3;rotationFollowsAxis:x;speed:0.01;\x22";
                                                             gltfsEntities = gltfsEntities + "<a-gltf-model shadow src=\x22#"+m_assetID+"\x22 id=\x22thing-to-clone\x22 visible=\x22true\x22></a-gltf-model>"+
                                                             "<a-entity "+brownian+
                                                             " shadow=\x22cast:true; receive:true\x22 "+skyboxEnvMap+" position=\x22"+locMdl.x+" "+locMdl.y+" "+zFix+"\x22 scale=\x22"+scale+
                                                             " "+scale+" "+scale+"\x22 data-scale=\x22"+scale+"\x22 rotation=\x22"+rotation+"\x22 >" + offsetPos+ "</a-entity>";
-                                                        } else {
+                                                        } else if (locMdl.markerType == "brownian motion") {
                                                             brownian = "brownian-motion=\x22speed:0.1;rotationVariance:.2 .2 .2;positionVariance:2.5 5 2.5;spaceVector:10.1,20.1,30.1,10.1,20.1,30.1;\x22";
                                                             gltfsEntities = gltfsEntities + "<a-entity id=\x22"+id+"\x22 "+brownian+" "+followCurve+" "+physicsMod+" "+modelParent+" "+scatterSurface+" "+modModel+" class=\x22envMap gltf "+entityType+" "+ambientChild+
                                                             " activeObjexGrab activeObjexRay\x22 shadow=\x22cast:true; receive:true\x22 "+skyboxEnvMap+" gltf-model=\x22#" + m_assetID + "\x22 "+objAnim+" "+cannedAnim+
@@ -2433,7 +2438,7 @@ webxr_router.get('/:_id', function (req, res) {
                                                             gltfModel = modelURL;
                                                         }
                                                         
-                                                    } else {
+                                                    } else { //don't use brownian
                                                         gltfsEntities = gltfsEntities + "<a-entity id=\x22"+id+"\x22 "+followCurve+" "+physicsMod+" "+modelParent+" "+scatterSurface+" "+modModel+" class=\x22envMap gltf "+entityType+" "+ambientChild+
                                                         " activeObjexGrab activeObjexRay\x22 shadow=\x22cast:true; receive:true\x22 "+skyboxEnvMap+" gltf-model=\x22#" + m_assetID + "\x22 "+objAnim+" "+cannedAnim+
                                                         // " position=\x22"+locMdl.x+" "+locMdl.y+" "+zFix+"\x22 scale=\x22"+scale+" "+scale+" "+scale+"\x22 rotation=\x22"+rotation+"\x22 >" + offsetPos+ "</a-entity>";  //rem rotation bc navmesh donutlike

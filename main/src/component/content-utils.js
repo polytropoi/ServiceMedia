@@ -3866,9 +3866,45 @@ AFRAME.registerComponent('mod_object', {
           
         }
       }
-      // } else {
-      //   console.log("no synth");
-      // }
+
+      if (this.data.eventData && this.data.eventData.length && this.data.eventData.toLowerCase().includes("target")) {        
+        if (this.particlesEl) {
+          
+            console.log("gotsa rayhit on id " + this.el.id + " eventdata " + this.data.eventData + " at " + JSON.stringify(hitpoint) + " tags" + this.data.tags);
+            
+            this.particlesEl.setAttribute("position", {"x": hitpoint.x, "y": hitpoint.y,"z": hitpoint.z});
+            // this.particlesEl.object3D.position.set(hitpoint.x, hitpoint.y, hitpoint.z);
+            this.particlesEl.setAttribute('sprite-particles', {
+              enable: true, 
+              duration: '2', 
+              texture: '#explosion1', 
+              color: 'black..white', 
+              blending: 'additive', 
+              textureFrame: '8 8', 
+              textureLoop: '1', 
+              spawnRate: '1', 
+              lifeTime: '1', 
+              opacity: '0,1,0', 
+              rotation: '0..360', 
+              scale: '100,500'
+            });
+          // this.particlesEl.setAttribute('sprite-particles', {"enable": false});
+          this.particlesEl.setAttribute('sprite-particles', {"duration": .5});
+          
+          this.el.object3D.scale.set(0, 0, 0);
+          // this.el.object3D.scale.y = 0;
+          // this.el.object3D.scale.z = 0;
+          this.mod_curve = this.el.components.mod_curve;
+          if (this.mod_curve) {
+            this.mod_curve.reset();
+          }
+        } else {
+          this.particlesEl = document.createElement("a-entity");
+          this.el.sceneEl.appendChild(this.particlesEl); //hrm...
+        }
+      }
+  
+   
   },
 
   activated: function () {
@@ -5749,37 +5785,35 @@ AFRAME.registerComponent('mod_model', {
 
     if (this.data.eventData && this.data.eventData.length && this.data.eventData.toLowerCase().includes("target")) {        
       if (this.particlesEl) {
-        // hitpoint.x = hitpoint.x.toFixed(2);
-        // hitpoint.y = hitpoint.y.toFixed(2);
-        // hitpoint.z = hitpoint.z.toFixed(2);
-        console.log("gotsa rayhit on id " + this.el.id + " eventdata " + this.data.eventData + " at " + JSON.stringify(hitpoint) + " tags" + this.data.tags);
         
-        this.particlesEl.setAttribute("position", {"x": hitpoint.x, "y": hitpoint.y,"z": hitpoint.z});
-        // this.particlesEl.object3D.position.set(hitpoint.x, hitpoint.y, hitpoint.z);
-        this.particlesEl.setAttribute('sprite-particles', {
-          enable: true, 
-          duration: '2', 
-          texture: '#explosion1', 
-          color: 'black..white', 
-          blending: 'additive', 
-          textureFrame: '8 8', 
-          textureLoop: '1', 
-          spawnRate: '1', 
-          lifeTime: '1', 
-          opacity: '0,1,0', 
-          rotation: '0..360', 
-          scale: '100,500'
-        });
-      // this.particlesEl.setAttribute('sprite-particles', {"enable": false});
-      this.particlesEl.setAttribute('sprite-particles', {"duration": .5});
-      
-      this.el.object3D.scale.set(0, 0, 0);
-      // this.el.object3D.scale.y = 0;
-      // this.el.object3D.scale.z = 0;
-      this.mod_curve = this.el.components.mod_curve;
-      if (this.mod_curve) {
-        this.mod_curve.reset();
-      }
+          console.log("gotsa rayhit on id " + this.el.id + " eventdata " + this.data.eventData + " at " + JSON.stringify(hitpoint) + " tags" + this.data.tags);
+          
+          this.particlesEl.setAttribute("position", {"x": hitpoint.x, "y": hitpoint.y,"z": hitpoint.z});
+          // this.particlesEl.object3D.position.set(hitpoint.x, hitpoint.y, hitpoint.z);
+          this.particlesEl.setAttribute('sprite-particles', {
+            enable: true, 
+            duration: '2', 
+            texture: '#explosion1', 
+            color: 'black..white', 
+            blending: 'additive', 
+            textureFrame: '8 8', 
+            textureLoop: '1', 
+            spawnRate: '1', 
+            lifeTime: '1', 
+            opacity: '0,1,0', 
+            rotation: '0..360', 
+            scale: '100,500'
+          });
+        // this.particlesEl.setAttribute('sprite-particles', {"enable": false});
+        this.particlesEl.setAttribute('sprite-particles', {"duration": .5});
+        
+        this.el.object3D.scale.set(0, 0, 0);
+        // this.el.object3D.scale.y = 0;
+        // this.el.object3D.scale.z = 0;
+        this.mod_curve = this.el.components.mod_curve;
+        if (this.mod_curve) {
+          this.mod_curve.reset();
+        }
       } else {
         this.particlesEl = document.createElement("a-entity");
         this.el.sceneEl.appendChild(this.particlesEl); //hrm...
