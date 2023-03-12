@@ -150,7 +150,8 @@
 	const nre = new THREE.Euler(0,0,0,'ZXY');
 	const nrq = new THREE.Quaternion();
 	const emptyOffset = [0,0,0,0,0,0];
-	const _scale = new THREE.Vector3(1,1,1);
+	let _scale = new THREE.Vector3(1,1,1);
+	let _scales = [];
 	const _matrix = new THREE.Matrix4();
 
 	const brownianMotion = {
@@ -267,7 +268,7 @@
 			const data = this.data;
 			const instances = this.instances;
 			const instanceGroup = new THREE.Group();
-			const dummy = new THREE.Object3D();
+			// const dummy = new THREE.Object3D();
 			if (this.el.getObject3D('instances')) {
 				this.el.removeObject3D('instances');
 			}
@@ -283,8 +284,6 @@
 		
 						// this.iMesh.setColorAt( i, color.setHex( 0xffffff * Math.random() ) );
 						// instance.setColor(color.setHex( 0xffffff * Math.random()) );
-						
-				
 						instance.instanceMatrix.setUsage( THREE.DynamicDrawUsage );
 						// for (var i=0; i<data.count; i++) {
 						// 	let scale = Math.random() * 5;
@@ -349,10 +348,19 @@
 
 	brownianPath.init = function tick() {
 
-		brownianMotion.init.call(this);
+		
 
 		this.instances = [];
 		this.updateInstances = this.updateInstances.bind(this);
+		_scale = {x: this.data.scaleFactor, y: this.data.scaleFactor, z: this.data.scaleFactor};
+
+		// for (var i=0; i<this.data.count; i++) {
+		// 	let scale = new THREE.Vector3(Math.random() * this.data.scaleFactor, Math.random() * this.data.scaleFactor, Math.random() * this.data.scaleFactor);
+		// 	// _scale = {x: this.data.scaleFactor, y: this.data.scaleFactor, z: this.data.scaleFactor};
+		// 	_scales.push(scale);
+
+		// }
+		brownianMotion.init.call(this);
 		// this.el.classList.add('activeObjexRay');
 		// this.raycaster = new THREE.Raycaster();
 		// this.intersection = null;
