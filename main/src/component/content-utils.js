@@ -2980,14 +2980,18 @@ AFRAME.registerComponent('mod_object', {
             if (this.hasShootAction) {
               // this.el.setAttribute('ammo-body', {type: this.data.objectData.physics.toLowerCase(), gravity: '0 -.1 0', angularFactor: '1 0 1', emitCollisionEvents: true, linearDamping: .1, angularDamping: 1}); //nope, shoot is not physical now
               this.el.setAttribute('ammo-body', {type: 'kinematic', emitCollisionEvents: true});
+              //this.el.body.restitution = .9;
               this.el.setAttribute('trail', "");
             } else if (this.hasThrowAction) {
-                this.el.setAttribute('ammo-body', {type: this.data.objectData.physics.toLowerCase(), emitCollisionEvents: true, linearDamping: .1, angularDamping: 1});
+                this.el.setAttribute('ammo-body', {type: this.data.objectData.physics.toLowerCase(), emitCollisionEvents: true, linearDamping: .1, angularDamping: .1});
                 // this.el.setAttribute('rotate-toward-velocity');
                 // this.el.setAttribute('trail', "");
+                this.el.body.restitution = .9;
                 this.el.setAttribute('trail', "");
             } else {
               this.el.setAttribute('ammo-body', {type: this.data.objectData.physics.toLowerCase(), emitCollisionEvents: true});
+              //this.el.body.restitution = .9;
+
             }
           }
       }
@@ -4103,6 +4107,7 @@ AFRAME.registerComponent('mod_object', {
         // const velocity = new Ammo.btVector3(2, 1, 0);
         const velocity = new Ammo.btVector3(this.lookVector.x * 10 * this.data.forceFactor, (this.lookVector.y + .5) * 10 * this.data.forceFactor, this.lookVector.z * 10 * this.data.forceFactor);
         this.el.body.setLinearVelocity(velocity);
+        //this.el.body.restitution = .9;
         Ammo.destroy(velocity);
       } else if (this.hasShootAction) {
         this.data.forceFactor = 6; 
@@ -4116,6 +4121,7 @@ AFRAME.registerComponent('mod_object', {
         // const pos = new Ammo.btVector3(this.dropPos.x, this.dropPos.y, this.dropPos.z);
         const velocity = new Ammo.btVector3(this.lookVector.x * 10 * this.data.forceFactor, this.lookVector.y * 10 * this.data.forceFactor, this.lookVector.z * 10 * this.data.forceFactor);
         this.el.body.setLinearVelocity(velocity);
+        //this.el.body.restitution = .9;
         Ammo.destroy(velocity);
 
       }
@@ -4528,6 +4534,8 @@ AFRAME.registerComponent('mod_model', {
       let vvids = [];
       let audios = [];
       let vvidsIndex = 0;
+
+      let colliders = [];
       this.sceneEl = document.querySelector('a-scene');
       let oScale = 1;
       this.shaderMaterial = null;
@@ -4763,6 +4771,12 @@ AFRAME.registerComponent('mod_model', {
           }
           obj.traverse(node => { //spin through object heirarchy to sniff for special names, e.g. "eye"
             this.nodeName = node.name;
+            if (this.nodeName.includes("collider")) { //must be set in the data and as a name on the model
+              if (node instanceof THREE.Mesh) {
+              this.meshChildren.push(node);
+              console.log("gotsa collider!");
+              }
+            }
             if (this.nodeName.includes("trigger")) { //must be set in the data and as a name on the model
               if (node instanceof THREE.Mesh) {
               this.meshChildren.push(node);
@@ -4880,7 +4894,6 @@ AFRAME.registerComponent('mod_model', {
               //ugh, nm
                 let child = this.el.object3D.getObjectByName(this.meshChildren[i].name, true);
                 child.visible = false;
-
                 // let triggerEl = document.createElement('a-entity');
                 // var targetPos = new THREE.Vector3();
                 // child.getWorldPosition(targetPos);
@@ -4898,7 +4911,6 @@ AFRAME.registerComponent('mod_model', {
                 // // triggerEl.classList.add('activeObjexRay');
                 // triggerEl.id = "TRIGGGER";
                 // this.sceneEl.appendChild(triggerEl);
-                
                 // triggerEl.classList.add('trigger');
             }
             if (this.meshChildren[i].name.includes("navmesh")) {
@@ -4906,7 +4918,40 @@ AFRAME.registerComponent('mod_model', {
               // let child = this.meshChildren[i].clone();
               this.child = this.el.object3D.getObjectByName(this.meshChildren[i].name, true);
               this.child.visible = false; //just hide named navmesh, they're loaded externally... 
-           
+
+            } else if (this.meshChildren[i].name.includes("collider")) { //for models just assume this is static
+              console.log("gotsa collider " + this.meshChildren[i].name);
+              this.el.object3D.updateMatrixWorld();
+              let child = this.el.object3D.getObjectByName(this.meshChildren[i].name, true);
+              if (child != null) { 
+                // let box = new THREE.Box3().setFromObject(child); //bounding box for position
+                // let center = new THREE.Vector3();
+                // box.getCenter(center); //get centerpoint of eye child geometry, in localspace
+                // child.geometry.center(); //reset pivot of eye geo
+                // child.position.set(0,0,0); //clear transforms so position below won't be offset
+                let childPos = new THREE.Vector3();
+                let childRot = new THREE.Quaternion();
+
+                child.getWorldPosition(childPos);
+                child.getWorldQuaternion(childRot);
+                // console.log("childPos " + JSON.stringify(childPos));
+                this.child = child.clone();
+                this.child.visible = false; 
+                this.child.position.set(childPos);
+                this.child.rotation.setFromQuaternion(childRot);
+
+                let colliderEl = document.createElement("a-entity");
+                colliderEl.setObject3D("mesh", this.child);
+                // colliderEl.setAttribute("look-at", "#player");
+                colliderEl.setAttribute("mod_physics", "body: static; shape: mesh; bounciness: 1; isTrigger: false");
+                colliderEl.id = this.meshChildren[i].name;
+
+                this.el.appendChild(colliderEl); //set as child of DOM heirarchy, not just parent model
+                // theEye.setAttribute("position", obj.worldToLocal(center)); //set position as local to 
+                // obj.updateMatrix();
+                // obj.updateMatrixWorld();
+              }
+            
              
             } else if (this.meshChildren[i].name.includes("eye")) {
               console.log("gotsa eye too!");

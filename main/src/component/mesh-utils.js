@@ -14,6 +14,176 @@ if (typeof AFRAME === 'undefined') {
 
 /* global AFRAME, THREE */
 
+// creates a pinboard height x width, + 2m at top & bottom, laid flat.
+/* Components in this modeule are derived from:
+ * https://github.com/c-frame/aframe-physics-system/blob/master/examples/components/pinboard.js
+ */
+AFRAME.registerComponent('pinboard', {
+
+  schema: {
+      physics: {type: 'string'}, // physx , ammo or cannon
+      width: {type: 'number', default: 10},
+      height: {type: 'number', default: 10},
+  },
+
+  init() {
+
+      const width = this.data.width;
+      const height = this.data.height;
+
+      const createBox = (width, height, depth, x, y, z, color, yRot) => {
+          const box = document.createElement('a-box');
+          box.setAttribute('width', width)
+          box.setAttribute('height', height)
+          box.setAttribute('depth', depth)
+          box.setAttribute('color', color)
+          if (this.data.physics === "ammo") {
+            box.setAttribute('ammo-body', 'type:static')
+            box.setAttribute('ammo-shape', 'type:box;fit:all')
+          }
+          else if (this.data.physics === "cannon") {
+            box.setAttribute('static-body', '')
+          }
+          else {
+            box.setAttribute('physx-body', 'type:static')
+          }  
+          box.object3D.position.set(x, y, z)
+          box.object3D.rotation.set(0, yRot, 0)
+          this.el.appendChild(box)
+
+          return box
+      }
+
+      const createPin = (x, y, z, yRot) => {
+        const pin = document.createElement('a-entity');
+        pin.id = Math.random().toString(36).substring(2)
+        pin.setAttribute('instanced-mesh-member', 'mesh: #pin-mesh; memberMesh: true')
+        if (this.data.physics === "ammo") {
+          // pin.setAttribute('ammo-body', 'type:static')
+          // pin.setAttribute('ammo-shape', 'type:box; fit:all')
+          //mod_phy
+          pin.setAttribute('mod_physics', 'body: static; shape: box; isTrigger: true');
+        }
+        else if (this.data.physics === "cannon") {
+          pin.setAttribute('static-body', '')
+        }
+        else {
+          pin.setAttribute('physx-body', 'type:static')
+        }
+        pin.object3D.position.set(x, y, z)
+        pin.object3D.rotation.set(0, yRot, 0)
+        this.el.appendChild(pin)
+
+        return pin
+      }
+
+      this.base = createBox(width, 1, height + 4, 0, -0.5, 0, 'grey', 0)
+      createBox(0.1, 2, height + 4, width / 2 + 0.05, 0, 0, 'grey', 0)
+      createBox(0.1, 2, height + 4, -width / 2 - 0.05, 0, 0, 'grey', 0)
+
+      for (let ii = 0; ii < this.data.height; ii++) {
+          const even = ii % 2
+          for (let jj = 0; jj < this.data.width - 1; jj++) {
+
+              createPin(jj - width / 2  + even / 2 + 0.75,
+                        0.5,
+                        ii - height / 2 + 0.5,
+                        Math.PI / 4)
+          }
+      }
+  }
+})
+
+AFRAME.registerComponent('dynamic-ball', {
+
+  schema: {
+      physics: {type: 'string'}, // physx or ammo.
+      yKill: {type: 'number', default: -50}
+  },
+
+  init() {
+      const el = this.el
+      el.setAttribute('instanced-mesh-member', 'mesh:#ball-mesh; memberMesh: true')
+
+      if (this.data.physics === "ammo") {
+        el.setAttribute('ammo-body', 'type:dynamic; mass:1; linearDamping: 0; angularDamping: 0;');
+        el.body.restitution = 10;
+        // el.body.mass = 1;
+        // Explicitly specifying a shape is more efficient than auto-fitting.
+        el.setAttribute('ammo-shape', 'type:sphere; fit:manual; sphereRadius: 1')
+    }
+    else if (this.data.physics === "cannon") {
+        // necessary to explicitly specify sphere radius, as async call to 
+        // set radius attribute on el may not have completed yet, and Cannon uses
+        // the default radius of 1.
+        // This is seen when recycling balls (deleting and recreating them).
+        el.setAttribute('dynamic-body', 'shape: sphere; sphereRadius: 0.3')
+    }
+    else {
+        el.setAttribute('physx-body', 'type:dynamic')
+    }
+  },
+
+  tick() {
+      if (this.el.object3D.position.y < this.data.yKill) {
+        console.log("fixin to kill at ykill " + this.data.yKill)
+          this.el.emit("recycle")
+      }
+  }
+})
+
+AFRAME.registerComponent('ball-recycler', {
+
+  schema: {
+      physics: {type: 'string'}, // physx, ammo or cannon.
+      ballCount: {type: 'number', default: 10},
+      width: {type: 'number', default: 8}, // width of spawn field
+      depth: {type: 'number', default: 8}, // depth of spawn field (after initial spawn balls always spawned at far depth)
+      yKill: {type: 'number', default: -50}
+  },
+
+  init() {
+
+      this.recycleBall = this.recycleBall.bind(this);
+      this.ballcount = 0;
+      // at start of day, spawn balls 
+      for (let ii = 0; ii < this.data.ballCount; ii++) {
+
+          this.createBall(false)
+      }
+  },
+
+  createBall(recycled) {
+
+      const { height, depth, width } = this.data
+      const pos = this.el.object3D.position
+
+      const ball = document.createElement('a-entity')
+      ball.id = 'ball-' + this.ballcount
+      this.ballcount++
+          
+      ball.setAttribute('dynamic-ball', {yKill: this.data.yKill,
+                                         physics: this.data.physics})
+      let x = pos.x + Math.random() * width - width / 2
+      let z = recycled ? (pos.z -depth / 2) : (pos.z + Math.random() * depth - depth / 2)
+      ball.object3D.position.set(x, pos.y, z)
+      this.el.sceneEl.appendChild(ball)
+
+      ball.addEventListener('recycle', this.recycleBall);
+
+  },
+
+  recycleBall(evt) {
+
+      const ball = evt.target
+
+      ball.parentNode.removeChild(ball);
+      this.createBall(true)
+
+  }
+});
+
+
 
 AFRAME.registerComponent('instanced_meshes_sphere', { //scattered randomly in sphere, not on surface
   schema: {
@@ -35,8 +205,8 @@ AFRAME.registerComponent('instanced_meshes_sphere', { //scattered randomly in sp
       var mtx = new THREE.Matrix4();
     console.log("THIS DATA SCATTER " + this.data._id + " " + this.data.modelID);
 
-      this.triggerAudioController = document.querySelector("#triggerAudio");
-
+  this.triggerAudioController = document.querySelector("#triggerAudio");
+  this.isTrigger = true;
   this.hitID = 0;
       // var amount = 100;
   this.instanceId = null;
@@ -72,7 +242,9 @@ AFRAME.registerComponent('instanced_meshes_sphere', { //scattered randomly in sp
   this.el.setAttribute('gltf-model', '#'+ this.data.modelID);
   console.log("model this.data._id " + this.data._id);
   const scatterModel = document.getElementById(this.data._id);
+
   if (scatterModel != null) {
+  
     scatterModel.addEventListener('model-loaded', (event) => {
     const sObj = scatterModel.getObject3D('mesh');
     console.log("tryna INSTANCE THE THIGNS");
@@ -141,6 +313,7 @@ AFRAME.registerComponent('instanced_meshes_sphere', { //scattered randomly in sp
         // let x = Math.random() * 300 - 150;
         // let y = Math.random() * 300 - 150;
         // let z = Math.random() * 300 - 150;
+        // let physics_item = new  
         let x = Math.random() * radius - (radius/2);
         let y = Math.random() * radius - (radius/2);
         let z = Math.random() * radius - (radius/2);
@@ -156,12 +329,38 @@ AFRAME.registerComponent('instanced_meshes_sphere', { //scattered randomly in sp
         this.iMesh.setColorAt( i, color.setHex( 0xffffff ) );
         this.iMesh.setMatrixAt( i ++, dummy.matrix );
 
+
+
       }
 
       this.iMesh.frustumCulled = false;
       this.iMesh.instanceMatrix.needsUpdate = true;
       
       root.add(this.iMesh);
+      // this.el.object3D.add(this.iMesh);
+      // physics.add(this.iMesh);
+      if (this.isTrigger) {
+        console.log("tryna set kinematic trigger!");
+        this.el.setAttribute('ammo-body', {type: "kinematic", emitCollisionEvents: true});
+      } else {
+        this.el.setAttribute('ammo-body', {type: this.data.body, emitCollisionEvents: true});
+        
+      }
+
+      this.el.addEventListener('body-loaded', () => {  
+          
+        if (this.isTrigger) {
+          console.log("TRIGGER LOADED");
+          this.el.setAttribute('ammo-shape', {type: "sphere"});
+        } else {
+          this.el.setAttribute('ammo-shape', {type: this.data.shape});
+        }
+        // this.el.body.setCollisionF
+        // console.log("ammo shape is " + JSON.stringify(this.el.getAttribute('ammo-shape')));
+        // this.isTrigger = this.data.isTrigger;
+        console.log("tryna load ashape with trigger " + this.isTrigger);
+      });
+
       
   });
       this.el.classList.add('activeObjexRay');
@@ -1119,7 +1318,7 @@ AFRAME.registerComponent('local_marker', {
     eventData: {default: ''},
     isLocal: {default: true},
     isSelected: {default: false},
-    tags: {default: null}
+    tags: {default: ''}
 
   },
   init: function () {
@@ -1526,7 +1725,7 @@ AFRAME.registerComponent('cloud_marker', {
     label: {default: ''},
     isNew: {default: true},
     markerType: {default: 'placeholder'},
-    tags: {default: null},
+    tags: {default: ''},
     modelID: {default: ''},
     model: {default: ''},
     scale: {default: 1},
@@ -1558,7 +1757,7 @@ AFRAME.registerComponent('cloud_marker', {
       // console.log("cloudmarker phID " + this.phID); 
       this.storedVars = JSON.parse(localStorage.getItem(this.phID));
       // "mod_physics=\x22body: kinematic; isTrigger: true;\x22";
-      this.el.setAttribute("mod_physics", {body: 'kinematic', isTrigger: true})
+      this.el.setAttribute("mod_physics", {body: 'kinematic', shape: 'sphere', sphereRadius: .5, isTrigger: true})
       // this.el.addEventListener("hitstart", function(event) {   //maybe
       //   console.log(
       //     event.target.components["aabb-collider"]["intersectedEls"].map(x => x.id)
@@ -2079,54 +2278,89 @@ AFRAME.registerComponent('cloud_marker', {
 
 
 
+// AFRAME.registerComponent('mod_trigger', { //phsyics set elsewhere (eg instanced-mesh component), only for triggering events
+//   schema: {
+//     tags: {default: []}
+//   },
+//   init() {
+   
+
+
+//     this.el.addEventListener("collidestart", (e) => { //this is for models or triggers, not objects - TODO look up locationData for tags? 
+//       e.preventDefault();
+//           console.log("mod_trigger hit");
+//           var triggerAudioController = document.getElementById("triggerAudio");
+//           if (triggerAudioController != null) {
+//             triggerAudioController.components.trigger_audio_control.playAudioAtPosition(e.detail.targetEl.object3D.position, window.playerPosition.distanceTo(e.detail.targetEl.object3D.position), "note");
+//             }
+          
+//         });
+  
+//   }
+// });
+
+
 AFRAME.registerComponent('mod_physics', { //used by models, not objects which manage physics settings in mod_object
   schema: {
     model: {default: ''},
     isTrigger: {type: 'bool', default: false},
-    body: {type: 'string', default: 'dynamic'},  // dynamic: A freely-moving object
-    shape: {type: 'string', default: 'mesh'},  // hull: Wraps a model in a convex hull, like a shrink-wrap
-    eventData: {default: null},
+    body: {type: 'string', default: 'static'},  // dynamic: A freely-moving object
+    shape: {type: 'string', default: 'box'},  // 
+    fit: {type: 'string', default: 'manual'},
+    radius: {type: 'number', default: .5},
+    bounciness: {type: 'number', default: 0}, //i.e. 'restitution'
+    eventData: {default: ''},
     tags: {default: []}
   },
   init() {
     this.isTrigger = this.data.isTrigger;
   
-    this.el.addEventListener('body-loaded', () => {  
-      
-      if (this.isTrigger) {
-        console.log("TRIGGER LOADED");
-        this.el.setAttribute('ammo-shape', {type: "sphere"});
-      } else {
-        this.el.setAttribute('ammo-shape', {type: this.data.shape});
-      }
-      // this.el.body.setCollisionF
-      // console.log("ammo shape is " + JSON.stringify(this.el.getAttribute('ammo-shape')));
-      // this.isTrigger = this.data.isTrigger;
-      console.log("tryna load ashape with trigger " + this.isTrigger);
-    });
+    console.log("truyna init mod_physics for id " + this.el.id + " model " + this.data.model);
   
-    this.el.addEventListener('model-loaded', () => {
-      if (this.isTrigger) {
-        this.el.setAttribute('ammo-body', {type: "kinematic", emitCollisionEvents: true});
-      } else {
-        this.el.setAttribute('ammo-body', {type: this.data.body, emitCollisionEvents: true});
-        
-        // this.el.setAttribute('collision-filter', {collisionForces: false});
-        // console.log("ammo body is " + JSON.stringify(this.el.getAttribute('ammo-body')));
-        // this.loadShape();
-      }
+    if (this.data.model != '') {
 
-    });
-    
+      this.el.addEventListener('model-loaded', () => {
+        if (this.isTrigger) {
+          this.el.setAttribute('ammo-body', {type: "kinematic", emitCollisionEvents: true});
+        } else {
+          this.el.setAttribute('ammo-body', {type: this.data.body, emitCollisionEvents: true, restitution: this.data.bounciness});
+          this.el.body.restitution = this.data.bounciness;
+          this.el.body.mass = .5;
+         
+        }
+      });
+
+      this.el.addEventListener('body-loaded', () => {  
+        if (this.isTrigger) {
+          console.log("TRIGGER LOADED");
+          this.el.setAttribute('ammo-shape', {type: "sphere"});
+        } else {
+          this.el.setAttribute('ammo-shape', {type: this.data.shape});
+        }
+        // this.el.body.setCollisionF
+        // console.log("ammo shape is " + JSON.stringify(this.el.getAttribute('ammo-shape')));
+        // this.isTrigger = this.data.isTrigger;
+        console.log("tryna load ashape with trigger " + this.isTrigger);
+      });
+
+    } else {
+      if (this.el.object3D) {
+        this.el.setAttribute('ammo-body', {type: this.data.body, emitCollisionEvents: true});
+        this.el.body.restitution = 10;
+        this.el.setAttribute('ammo-shape', {type: 'mesh'});
+      }
+     
+      
+    }
 
 
     this.el.addEventListener("collidestart", (e) => { //this is for models or triggers, not objects - TODO look up locationData for tags? 
       e.preventDefault();
       // console.log("mod_physics collisoin with object with :" + this.el.id + " " + e.detail.targetEl.classList + " isTrigger " + this.isTrigger);
-      if (this.isTrigger) {
-        console.log("mod_physics TRIGGER collision "  + this.el.id + " " + e.detail.targetEl.id);
+      if (this.isTrigger) { 
+        // console.log("mod_physics TRIGGER collision "  + this.el.id + " " + e.detail.targetEl.id);
         // e.detail.body.disableCollision = true;
-        this.disableCollisionTemp(); //must turn it off or it blocks, no true "trigger" mode afaik (unlike cannonjs!)
+        // this.disableCollisionTemp(); //must turn it off or it blocks, no true "trigger" mode afaik (unlike cannonjs!)
         let cloud_marker = e.target.components.cloud_marker; //closest trigger if multiple
         if (cloud_marker != null) { 
           if (e.detail.targetEl.id == "player") {
@@ -2136,24 +2370,53 @@ AFRAME.registerComponent('mod_physics', { //used by models, not objects which ma
           }
         } else  {
           let local_marker = e.target.components.local_marker;
-          if (local_marker != null) { 
-            if (e.detail.targetEl.id == "player") {
-              local_marker.playerTriggerHit();
-            } else {
-              local_marker.physicsTriggerHit(e.detail.targetEl.id); 
-            }
+            if (local_marker != null) { 
+              if (e.detail.targetEl.id == "player") {
+                local_marker.playerTriggerHit();
+              } else {
+                local_marker.physicsTriggerHit(e.detail.targetEl.id); 
+              }
+            // } else {
+            
           }
         }
-      let mod_obj_component = e.detail.targetEl.components.mod_object;
-      if (mod_obj_component != null) {
-        // console.log(this.el.id + " gotsa collision with " + mod_obj_component.data.objectData.name);
-        if (mod_obj_component.data.objectData.tags != undefined && mod_obj_component.data.objectData.tags != null) {
+        if (this.el.id.toLowerCase().includes("pin")) {
           var triggerAudioController = document.getElementById("triggerAudio");
           if (triggerAudioController != null) {
-            triggerAudioController.components.trigger_audio_control.playAudioAtPosition(e.detail.targetEl.object3D.position, window.playerPosition.distanceTo(e.detail.targetEl.object3D.position), mod_obj_component.data.objectData.tags);
-            }
+            console.log("mod_physics TRIGGER collision "  + this.el.id + " " + e.detail.targetEl.id);
+            triggerAudioController.components.trigger_audio_control.playSingleAtPosition(e.detail.targetEl.object3D.position, window.playerPosition.distanceTo(e.detail.targetEl.object3D.position), "bell");
           }
+          const force = new Ammo.btVector3(0, 1, -10);
+          const pos = new Ammo.btVector3(this.el.object3D.position.x, e.detail.targetEl.object3D.position.y, e.detail.targetEl.object3D.position.z);
+          e.detail.targetEl.body.applyImpulse(force, pos);
+          Ammo.destroy(force);
+          Ammo.destroy(pos);
+          // this.el.material.color.setHex("#000000".replace(/0/g,function(){return (~~(Math.random()*16)).toString(16);}));
         }
+        if (this.el.id.toLowerCase().includes("wall")) {
+          var triggerAudioController = document.getElementById("triggerAudio");
+          if (triggerAudioController != null) {
+            console.log("mod_physics TRIGGER collision "  + this.el.id + " " + e.detail.targetEl.id);
+            triggerAudioController.components.trigger_audio_control.playAudioAtPosition(e.detail.targetEl.object3D.position, window.playerPosition.distanceTo(e.detail.targetEl.object3D.position), "bang");
+          }
+          const force = new Ammo.btVector3(0, 1, -10);
+          const pos = new Ammo.btVector3(this.el.object3D.position.x, e.detail.targetEl.object3D.position.y, e.detail.targetEl.object3D.position.z);
+          e.detail.targetEl.body.applyImpulse(force, pos);
+          Ammo.destroy(force);
+          Ammo.destroy(pos);
+          // this.el.material.color.setHex("#000000".replace(/0/g,function(){return (~~(Math.random()*16)).toString(16);}));
+        }
+
+      // let mod_obj_component = e.detail.targetEl.components.mod_object;
+      // if (mod_obj_component != null) {
+      //   // console.log(this.el.id + " gotsa collision with " + mod_obj_component.data.objectData.name);
+      //   if (mod_obj_component.data.objectData.tags != undefined && mod_obj_component.data.objectData.tags != null) {
+      //     var triggerAudioController = document.getElementById("triggerAudio");
+      //     if (triggerAudioController != null) {
+      //       triggerAudioController.components.trigger_audio_control.playAudioAtPosition(e.detail.targetEl.object3D.position, window.playerPosition.distanceTo(e.detail.targetEl.object3D.position), mod_obj_component.data.objectData.tags);
+      //     }
+      //   }
+        
       }
     });
 
@@ -2164,7 +2427,7 @@ AFRAME.registerComponent('mod_physics', { //used by models, not objects which ma
   //     });
   
   },
-  disableCollisionTemp: function () { //bc ammo don't have no triggerz wtf!
+  disableCollisionTemp: function () { //bc ammo don't have no triggerz
     this.el.setAttribute('ammo-body', {disableCollision: true});
     setTimeout( () => {
       this.el.setAttribute('ammo-body', {disableCollision: false}); 
@@ -2174,6 +2437,8 @@ AFRAME.registerComponent('mod_physics', { //used by models, not objects which ma
     
   }
 });
+
+
 
 
 AFRAME.registerComponent('particle_spawner', 

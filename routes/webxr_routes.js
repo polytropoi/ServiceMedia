@@ -390,7 +390,7 @@ webxr_router.get('/:_id', function (req, res) {
     // let aframeExtrasScript = "<script src=\x22../main/src/component/aframe-extras.min.js\x22></script>"; 
     let logScripts = "";
     enviromentScript = ""; //for aframe env component
-    // let debugMode = false;
+    
     // let aframeScriptVersion = "<script src=\x22https://aframe.io/releases/1.3.0/aframe.min.js\x22></script>";
     let aframeScriptVersion = "<script src=\x22https://aframe.io/releases/1.4.1/aframe.min.js\x22></script>";
     
@@ -513,23 +513,27 @@ webxr_router.get('/:_id', function (req, res) {
                         if (sceneData.sceneTags[i].toLowerCase().includes("instancing")) {
                             // console.log("GOTS SCENE TAG: " + sceneData.sceneTags[i]);
                             // showTransport = true;
-                            
-                            meshUtilsScript = "<script type=\x22module\x22 src=\x22../main/src/component/mesh-utils.js\x22></script>"; //imports MeshSurfaceScatter
-                            
+                            meshUtilsScript = "<script type=\x22module\x22 src=\x22../main/src/component/instanced_mesh.js\x22></script><script type=\x22module\x22 src=\x22../main/src/component/mesh-utils.js\x22></script>"; //imports MeshSurfaceScatter
                             instancingEntity = "";
                         } 
+
                         if (sceneData.sceneTags[i].toLowerCase().includes("aabb") || sceneData.sceneTags[i].toLowerCase().includes("collision")) {
                             // console.log("GOTS SCENE TAG: " + sceneData.sceneTags[i]);
                             // showTransport = true;
-                            
                             meshUtilsScript = meshUtilsScript + "<script src=\x22../main/src/component/aframe-aabb-collider-component.min.js\x22></script>"; //imports MeshSurfaceScatter
-                            
-
                         } 
                         if (sceneData.sceneTags[i] == "instancing demo") {
                             
                             instancingEntity = "<a-entity instanced_meshes_sphere></a-entity>";
+                        }
+                        if (sceneData.sceneTags[i] == "pinball") {
+                            
+                            // instancingEntity =  "<a-entity id=\x22pinboard\x22 pinboard=\x22physics: ammo; height:20; width: 20\x22 position = \x220 0 -20\x22 rotation = \x2245 0 0\x22>" +
+                            //                     "<a-box id=\x22pin-mesh\x22 color=\x22black\x22 width=\x220.1\x22 depth=\x220.1\x22 height=\x221\x22 instanced-mesh=\x22capacity: 500\x22></a-box></a-entity>" +
+                                                instancingEntity = "<a-sphere id=\x22ball-mesh\x22 radius=\x221\x22 color=\x22yellow\x22 instanced-mesh=\x22capacity: 100; updateMode: auto\x22></a-sphere>" +
+                                                "<a-entity id=\x22ball-recycler\x22 ball-recycler=\x22physics: ammo; ballCount: 10; width: 30; depth: 15; yKill: -30\x22 position=\x220 20 -25\x22></a-entity>";
                         } 
+
                         if (sceneData.sceneTags[i] == "show transport") {
                             // console.log("GOTS SCENE TAG: " + sceneData.sceneTags[i]);
                             showTransport = true;
@@ -2392,7 +2396,7 @@ webxr_router.get('/:_id', function (req, res) {
                                                 if (locMdl.eventData.toLowerCase().includes("gallery")) {
                                                     // modModel = "mod_model_photo_gallery";  maybe later
                                                 }
-                                                if (!locMdl.eventData.toLowerCase().includes("scatter")) { //normal placement
+                                                if (!locMdl.eventData.toLowerCase().includes("scatter")) { //not scatterd, normal placement
                                                     let physicsMod = "";
                                                     let shape = 'hull';
                                                     if (locMdl.eventData.toLowerCase().includes('physics')){ //ammo for now
@@ -2401,12 +2405,12 @@ webxr_router.get('/:_id', function (req, res) {
                                                         if (locMdl.eventData.toLowerCase().includes('static')){
                                                             // physicsMod = "ammo-body=\x22type: static\x22 ammo-shape=\x22type: box\x22";
                                                             // physicsMod = "ammo-body=\x22type: static\x22 ammo-shape=\x22type: box\x22";
-                                                            physicsMod = "mod_physics=\x22body: static; shape: mesh;\x22"
+                                                            physicsMod = "mod_physics=\x22body: static; shape: mesh; model: "+locMdl.name+"\x22"
                                                         }
                                                         if (locMdl.eventData.toLowerCase().includes('dynamic')){
                                                             // physicsMod = "ammo-body=\x22type: static\x22 ammo-shape=\x22type: box\x22";
                                                             // physicsMod = "ammo-body=\x22type: static\x22 ammo-shape=\x22type: box\x22";
-                                                            physicsMod = "mod_physics=\x22body: dynamic; shape: box;\x22"
+                                                            physicsMod = "mod_physics=\x22body: dynamic; shape: box; model: "+locMdl.name+"\x22"
                                                             
                                                         }
                                                     }
