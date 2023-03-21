@@ -4590,8 +4590,32 @@ AFRAME.registerComponent('mod_model', {
 
 
       ///////////////////////////////////////////////// model loaded event start /////////////////////////////
-      this.el.addEventListener('model-loaded', () => {
+
+      ///////////////////////////////////////////////////////// -listeners......
+              
+      this.el.addEventListener('model-loaded', () => { // - model-loaded
       if (!this.isInitialized) {
+
+
+        if (this.data.eventData.includes("physics")) {
+          if (this.data.eventData.includes("static")) {
+          // this.el.object3D.visible = false;
+          // console.log("GOTSA SCATTER OBJEK@");
+            // this.el.setAttribute("mod_physics", {body: "static", shape: })
+
+            this.el.setAttribute('ammo-body', {type: "static"});
+            if (this.data.eventData.includes("box")) {
+              this.el.setAttribute('ammo-shape', {type: "box"});
+            } else if  (this.data.eventData.includes("sphere")) {
+              this.el.setAttribute('ammo-shape', {type: "sphere"});
+            } else {
+              this.el.setAttribute('ammo-shape', {type: "mesh"});
+            }
+          } else if (this.data.eventData.includes("dynamic")) {
+
+          }
+        }
+
         if (this.data.eventData.includes("scatter")) {
           this.el.object3D.visible = false;
           // console.log("GOTSA SCATTER OBJEK@");
@@ -4655,10 +4679,10 @@ AFRAME.registerComponent('mod_model', {
             // this.el.setAttribute("entity-callout", {'calloutString': this.data.description});
             this.hasLocationCallout = true;
             this.hasCallout = true;
-
           }
 
-          this.el.addEventListener('raycaster-intersected', e =>{  
+
+          this.el.addEventListener('raycaster-intersected', e =>{  // raycaster-intersected
             this.raycaster = e.detail.el;
             // that.raycaster = this.raycaster;
             // this.intersection = this.raycaster.components.raycaster.getIntersection(this.el);
@@ -4943,7 +4967,7 @@ AFRAME.registerComponent('mod_model', {
                 let colliderEl = document.createElement("a-entity");
                 colliderEl.setObject3D("mesh", this.child);
                 // colliderEl.setAttribute("look-at", "#player");
-                colliderEl.setAttribute("mod_physics", "body: static; shape: mesh; bounciness: 1; isTrigger: false");
+                colliderEl.setAttribute("mod_physics", "body: static; shape: mesh; bounciness: 1; isTrigger: true; model: child");
                 colliderEl.id = this.meshChildren[i].name;
 
                 this.el.appendChild(colliderEl); //set as child of DOM heirarchy, not just parent model

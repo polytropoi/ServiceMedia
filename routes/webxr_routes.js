@@ -2399,18 +2399,18 @@ webxr_router.get('/:_id', function (req, res) {
                                                 if (!locMdl.eventData.toLowerCase().includes("scatter")) { //not scatterd, normal placement
                                                     let physicsMod = "";
                                                     let shape = 'hull';
-                                                    if (locMdl.eventData.toLowerCase().includes('physics')){ //ammo for now
+                                                    if (locMdl.eventData.toLowerCase().includes('physics')){ //ammo for now // no do it in mod_model (where model isloaded)
                                                     // let isTrigger = false;
                                                     
                                                         if (locMdl.eventData.toLowerCase().includes('static')){
                                                             // physicsMod = "ammo-body=\x22type: static\x22 ammo-shape=\x22type: box\x22";
                                                             // physicsMod = "ammo-body=\x22type: static\x22 ammo-shape=\x22type: box\x22";
-                                                            physicsMod = "mod_physics=\x22body: static; shape: mesh; model: "+locMdl.name+"\x22"
+                                                            // physicsMod = "mod_physics=\x22body: static; shape: box; model: "+locMdl.name+"\x22"
                                                         }
                                                         if (locMdl.eventData.toLowerCase().includes('dynamic')){
                                                             // physicsMod = "ammo-body=\x22type: static\x22 ammo-shape=\x22type: box\x22";
                                                             // physicsMod = "ammo-body=\x22type: static\x22 ammo-shape=\x22type: box\x22";
-                                                            physicsMod = "mod_physics=\x22body: dynamic; shape: box; model: "+locMdl.name+"\x22"
+                                                            // physicsMod = "mod_physics=\x22body: dynamic; shape: box; model: "+locMdl.name+"\x22"
                                                             
                                                         }
                                                     }

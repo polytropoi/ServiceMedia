@@ -1757,7 +1757,7 @@ AFRAME.registerComponent('cloud_marker', {
       // console.log("cloudmarker phID " + this.phID); 
       this.storedVars = JSON.parse(localStorage.getItem(this.phID));
       // "mod_physics=\x22body: kinematic; isTrigger: true;\x22";
-      this.el.setAttribute("mod_physics", {body: 'kinematic', shape: 'sphere', sphereRadius: .5, isTrigger: true})
+      
       // this.el.addEventListener("hitstart", function(event) {   //maybe
       //   console.log(
       //     event.target.components["aabb-collider"]["intersectedEls"].map(x => x.id)
@@ -1806,8 +1806,10 @@ AFRAME.registerComponent('cloud_marker', {
           }
         }
         
-
-
+        // this.el.addEventListener('model-loaded', () => {
+          
+        // });
+        
         // if (this.storedVars.modelID != null && this.storedVars.modelID != undefined && this.storedVars.model != "none") {
           // for (let i = 0; i < sceneModels.length; i++) {
           //   if (sceneModels[i]._id == this.storedVars.modelID) {
@@ -1988,12 +1990,23 @@ AFRAME.registerComponent('cloud_marker', {
     let that = this;
 
 
-    // this.el.addEventListener('model-loaded', (evt) => { //load placeholder model first (which is an a-asset) before calling external
-    //   evt.preventDefault();
-    //   console.log("MODEL LOADED FOR CLOUDMARKER!!!");
-    //   // this.el.setAttribute
-    // });
+    this.el.addEventListener('model-loaded', (evt) => { //load placeholder model first (which is an a-asset) before calling external
+      evt.preventDefault();
+      console.log("MODEL LOADED FOR CLOUDMARKER!!!");
+      this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"placeholder"});
+      // this.el.setAttribute("ammo-body", {type: "kinematic"});
+      // this.el.setAttribute('ammo-body', {type: 'kinematic', emitCollisionEvents: true});
+    });
 
+    // this.el.addEventListener('body-loaded', (evt) => { //load placeholder model first (which is an a-asset) before calling external
+    //   evt.preventDefault();
+    //   console.log("boduy LOADED FOR CLOUDMARKER!!!");
+    //   // this.el.setAttribute("mod_physics", {body: "kinematic", shape: "sphere", isTrigger: true, model:"placeholder"});
+    //   // this.el.setAttribute("ammo-body", {type: "kinematic"});
+    //   this.el.setAttribute("ammo-shape", {type: "sphere", fit: "all"});
+
+    // });
+   
     this.el.addEventListener('mouseenter', (evt) => {
       
       if (posRotReader != null) {
@@ -2300,52 +2313,75 @@ AFRAME.registerComponent('cloud_marker', {
 // });
 
 
-AFRAME.registerComponent('mod_physics', { //used by models, not objects which manage physics settings in mod_object
+AFRAME.registerComponent('mod_physics', { //used by models and placeholders, not objects which manage physics settings in mod_object
   schema: {
     model: {default: ''},
-    isTrigger: {type: 'bool', default: false},
+    isTrigger: {type: 'bool', default: false}, // it emits/triggers events, not a 'silent' collider
+    isAudioTrigger: {type: 'bool', default: false}, // emits/triggers audio events
     body: {type: 'string', default: 'static'},  // dynamic: A freely-moving object
-    shape: {type: 'string', default: 'box'},  // 
+    shape: {type: 'string', default: 'box'},  // onthefly on glb uses 'mesh' type
     fit: {type: 'string', default: 'manual'},
     radius: {type: 'number', default: .5},
-    bounciness: {type: 'number', default: 0}, //i.e. 'restitution'
+    bounciness: {type: 'number', default: 0}, //i.e. 'restitution' - or use as forceFactor?
     eventData: {default: ''},
     tags: {default: []}
   },
   init() {
     this.isTrigger = this.data.isTrigger;
+    this.model = this.data.model;
+    this.body = this.data.body;
+    this.shape = this.data.shape;
+    this.isGhost = false; //
+    console.log("truyna init mod_physics for id " + this.el.id + " model " + this.model +" isTrigger "+ this.isTrigger + " body " + this.data.body );
   
-    console.log("truyna init mod_physics for id " + this.el.id + " model " + this.data.model);
-  
-    if (this.data.model != '') {
+    if (this.model == "child") { //i.e. set on a child mesh with name including 'collider', in mod_model
 
-      this.el.addEventListener('model-loaded', () => {
-        if (this.isTrigger) {
-          this.el.setAttribute('ammo-body', {type: "kinematic", emitCollisionEvents: true});
-        } else {
-          this.el.setAttribute('ammo-body', {type: this.data.body, emitCollisionEvents: true, restitution: this.data.bounciness});
-          this.el.body.restitution = this.data.bounciness;
-          this.el.body.mass = .5;
+      
+      // this.el.addEventListener('model-loaded', () => {
+        // if (this.isTrigger) {
+        //   this.el.setAttribute('ammo-body', {type: "kinematic", emitCollisionEvents: this.isTrigger});
+        // } else {
+          this.el.setAttribute('ammo-body', {type: this.body, emitCollisionEvents: this.isTrigger});
+          // this.el.body.restitution = this.data.bounciness;
+          // this.el.body.mass = .5;
          
-        }
-      });
+        // }
+      // });
 
-      this.el.addEventListener('body-loaded', () => {  
-        if (this.isTrigger) {
-          console.log("TRIGGER LOADED");
-          this.el.setAttribute('ammo-shape', {type: "sphere"});
-        } else {
-          this.el.setAttribute('ammo-shape', {type: this.data.shape});
-        }
+      // this.el.addEventListener('body-loaded', () => {  
+        // if (this.isTrigger) {
+        //   console.log("TRIGGER LOADED");
+        //   this.el.setAttribute('ammo-shape', {type: "sphere"});
+        // } else {
+          this.el.setAttribute('ammo-shape', {type: this.shape});
+        // }
         // this.el.body.setCollisionF
         // console.log("ammo shape is " + JSON.stringify(this.el.getAttribute('ammo-shape')));
         // this.isTrigger = this.data.isTrigger;
         console.log("tryna load ashape with trigger " + this.isTrigger);
-      });
-
+      // });
+    
+    } else if (this.data.model == "placeholder") { //from cloudmarker, always kinematic
+      this.isGhost = true;
+      // console.log("truyna init mod_physics for id " + this.el.id + " model " + this.model +" isTrigger "+ this.isTrigger + " body " + this.data.body );
+      this.el.setAttribute('ammo-body', {type: 'kinematic', emitCollisionEvents: this.isTrigger}); //placeholder model already loaded in mod_model
+      // this.el.addEventListener('body-loaded', () => {  
+        // if (this.isTrigger) {
+        //   console.log("TRIGGER LOADED");
+        //   this.el.setAttribute('ammo-shape', {type: "sphere"});
+        // } else {
+          this.el.setAttribute("ammo-shape", {type: "box"});
+          // this.el.body.type = 'kinematic';
+        // }
+        // this.el.body.setCollisionF
+        // console.log("ammo shape is " + JSON.stringify(this.el.getAttribute('ammo-shape')));
+        // this.isTrigger = this.data.isTrigger;
+        console.log("tryna load placeholder  " + this.isTrigger);
+      // });
+    
     } else {
       if (this.el.object3D) {
-        this.el.setAttribute('ammo-body', {type: this.data.body, emitCollisionEvents: true});
+        this.el.setAttribute('ammo-body', {type: this.data.body, emitCollisionEvents: this.isTrigger});
         this.el.body.restitution = 10;
         this.el.setAttribute('ammo-shape', {type: 'mesh'});
       }
@@ -2355,12 +2391,12 @@ AFRAME.registerComponent('mod_physics', { //used by models, not objects which ma
 
 
     this.el.addEventListener("collidestart", (e) => { //this is for models or triggers, not objects - TODO look up locationData for tags? 
-      e.preventDefault();
-      // console.log("mod_physics collisoin with object with :" + this.el.id + " " + e.detail.targetEl.classList + " isTrigger " + this.isTrigger);
+      // e.preventDefault();
+      // console.log("mod_physics collisoin with object with :" + this.el.id + " " + e.detail.targetEl.id + " isTrigger " + this.isTrigger);
       if (this.isTrigger) { 
         // console.log("mod_physics TRIGGER collision "  + this.el.id + " " + e.detail.targetEl.id);
         // e.detail.body.disableCollision = true;
-        // this.disableCollisionTemp(); //must turn it off or it blocks, no true "trigger" mode afaik (unlike cannonjs!)
+        // this.disableCollisionTemp(); //must turn it off or it blocks, no true "trigger" mode //or just use kinematic
         let cloud_marker = e.target.components.cloud_marker; //closest trigger if multiple
         if (cloud_marker != null) { 
           if (e.detail.targetEl.id == "player") {
@@ -2384,7 +2420,7 @@ AFRAME.registerComponent('mod_physics', { //used by models, not objects which ma
           var triggerAudioController = document.getElementById("triggerAudio");
           if (triggerAudioController != null) {
             console.log("mod_physics TRIGGER collision "  + this.el.id + " " + e.detail.targetEl.id);
-            triggerAudioController.components.trigger_audio_control.playSingleAtPosition(e.detail.targetEl.object3D.position, window.playerPosition.distanceTo(e.detail.targetEl.object3D.position), "bell");
+            triggerAudioController.components.trigger_audio_control.playSingleAtPosition(e.detail.targetEl.object3D.position, window.playerPosition.distanceTo(e.detail.targetEl.object3D.position), ["bell"], 1);
           }
           const force = new Ammo.btVector3(0, 1, -10);
           const pos = new Ammo.btVector3(this.el.object3D.position.x, e.detail.targetEl.object3D.position.y, e.detail.targetEl.object3D.position.z);
@@ -2397,7 +2433,7 @@ AFRAME.registerComponent('mod_physics', { //used by models, not objects which ma
           var triggerAudioController = document.getElementById("triggerAudio");
           if (triggerAudioController != null) {
             console.log("mod_physics TRIGGER collision "  + this.el.id + " " + e.detail.targetEl.id);
-            triggerAudioController.components.trigger_audio_control.playAudioAtPosition(e.detail.targetEl.object3D.position, window.playerPosition.distanceTo(e.detail.targetEl.object3D.position), "bang");
+            triggerAudioController.components.trigger_audio_control.playAudioAtPosition(e.detail.targetEl.object3D.position, window.playerPosition.distanceTo(e.detail.targetEl.object3D.position), ["bang"], 1);
           }
           const force = new Ammo.btVector3(0, 1, -10);
           const pos = new Ammo.btVector3(this.el.object3D.position.x, e.detail.targetEl.object3D.position.y, e.detail.targetEl.object3D.position.z);
@@ -2418,6 +2454,10 @@ AFRAME.registerComponent('mod_physics', { //used by models, not objects which ma
       //   }
         
       }
+      if (this.isGhost) {
+        this.el.setAttribute('ammo-body', {disableCollision: true});
+        this.disableCollisionTemp();
+      }
     });
 
   // loadShape: function () {
@@ -2427,8 +2467,8 @@ AFRAME.registerComponent('mod_physics', { //used by models, not objects which ma
   //     });
   
   },
-  disableCollisionTemp: function () { //bc ammo don't have no triggerz
-    this.el.setAttribute('ammo-body', {disableCollision: true});
+  disableCollisionTemp: function () { //bc ammo don't have no triggerz, except "ghostobject" !?
+    
     setTimeout( () => {
       this.el.setAttribute('ammo-body', {disableCollision: false}); 
       console.log("trigger cooldown done") }, 3000);
