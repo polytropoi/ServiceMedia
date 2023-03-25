@@ -3345,7 +3345,7 @@ webxr_router.get('/:_id', function (req, res) {
                                             });
                                         } else {
                                             
-                                            postcard1 = sceneResponse.sceneDomain +"/"+sceneResponse.short_id +"/"+ picture_item._id + ".standard." + picture_item.filename;
+                                            postcard1 = "http://" + sceneResponse.sceneDomain +"/"+sceneResponse.short_id +"/"+ picture_item._id + ".standard." + picture_item.filename;
                                             console.log("gotsa postcard " + postcard1 );
                                             callback();
                                         }
