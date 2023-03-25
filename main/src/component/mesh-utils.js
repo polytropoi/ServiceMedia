@@ -4144,36 +4144,7 @@ AFRAME.registerComponent('load_threesvg', {
             this.context.fillText('Hello!', 20, 10);
         };
 
-            // let mod1 = fontID.replace(" ", "+");
-            // // let fontURL = "http://localhost:3000/fonts/web/" + fontID.toLowerCase() + ".woff2";
-            // let fontURL = "url('https://fonts.googleapis.com/css?family="+mod1+"')";
-
-            // // // this.fontURL = "url(https://fonts.googleapis.com/css?family=Sofia)";
-
-            // console.log("tryna get font: " +  fontURL);
-            // // let efont = new FontFace(fontID, this.fontURL );
-            // // // document.fonts.add(this.font); 
-            // // efont.load().then(function (font) { 
-            // //   document.fonts.add(font);
-            // //   // Ready to use the font in a canvas context
-            // //   console.log("font ready!");
-
-            // //   // this.context.font='100px efont';
-            // //   this.context.font =  '100px' + fontID;
-            // //   this.el.setAttribute('material', 'src', this.data.src);
-            // //   this.isReady = true;
-            // // });
-            //   const myFont = new FontFace('thisfont', fontURL);
-
-            //   myFont.loadAsync().then((font) => {
-            //   document.fonts.add(font);
-
-            //   console.log('Font loaded');
-              
-            //   this.context.font =  '100px thisfont';
-            //   this.el.setAttribute('material', 'src', this.data.src);
-            //   this.isReady = true;
-            // });
+         
       } else {
         // console.log("no font found..");
         // this.context.font='bold 100px Arial';
@@ -4329,42 +4300,3 @@ AFRAME.registerComponent('load_threesvg', {
     
   });
 
-// AFRAME.registerComponent('load_threemeshui', { //nope
-//   init: function() {
-
-//     // window.onclick = function(event) {
-//     //   event.preventDefault();
-          
-//     // }
-
-//     this.makeContainer();
-//   },
-//   makeContainer: function() {
-
-//       this.container = new ThreeMeshUI.Block({ //no object3D error
-//         width: 1.45,
-//         height: 0.5,
-//         padding: 0.05,
-//         justifyContent: "center",
-//         textAlign: "center",
-//         fontFamily: "/fonts/Roboto-msdf.json",
-//         fontTexture: "/fonts/Roboto-msdf.png"
-//       });
-
-//       this.container.position.set(0, 1, -1.8);
-//       this.container.rotation.x = -0.55;
-//       this.el.sceneEl.add(this.container);
-
-//       //
-
-//       this.container.add(
-//         new ThreeMeshUI.Text({
-//           content: "three-mesh-ui.min.js",
-//           fontSize: 0.125
-//         })
-//       );
-//     },
-//     tick: function () {
-//       ThreeMeshUI.update();
-//     }
-// });

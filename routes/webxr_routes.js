@@ -182,6 +182,7 @@ webxr_router.get('/:_id', function (req, res) {
     var short_id = "";
     var picArray = [];
     var imageAssets = "";
+    var modelAssets = "";
     var imageEntities = "";
     var skyboxUrl = "";
     var skyboxID = "";
@@ -1391,13 +1392,16 @@ webxr_router.get('/:_id', function (req, res) {
                                 if (sceneResponse.sceneSkyParticles.toLowerCase() == "dust") {
                                     // skyParticles = "<a-entity scale='2 2 2' position='0 3 0' particle_mangler particle-system=\x22preset: dust; particleCount: 3000; texture: https://realitymangler.com/assets/textures/smokeparticle2.png; color: " + sceneResponse.sceneColor1 + "," + sceneResponse.sceneColor2 +"\x22></a-entity>";
                                     skyParticles = "<a-entity scale=\x2220 10 20\x22 position=\x220 5 0\x22 sprite-particles=\x22texture: #sparkle1; blending: additive; color: black..white;  position: -1 -1 -1..1 1 1; velocity: -.01 -.025 -.01 .. .01 .025 .01; spawnRate: 500; lifeTime: 2; scale: .25,.75; opacity: 1\x22></a-entity>";
+                                    imageAssets = imageAssets + "<img id=\x22sparkle1\x22 src=\x22http://servicemedia.s3.amazonaws.com/assets/pics/sparkle.png\x22 crossorigin=\x22anonymous\x22>";
                                 } else if (sceneResponse.sceneSkyParticles.toLowerCase() == "rain") {
                                     // skyParticles = "<a-entity scale='2 2 2' position='0 3 0' particle_mangler particle-system=\x22preset: rain; particleCount: 3000; texture: https://realitymangler.com/assets/textures/raindrop2.png; color: " + sceneResponse.sceneColor1 + "," + sceneResponse.sceneColor2 +"\x22></a-entity>";
                                     skyParticles = "<a-entity scale=\x2220 10 20\x22 position=\x220 5 0\x22 sprite-particles=\x22texture: #raindrop; blending: additive; color: " +sceneResponse.sceneColor2 + "; position: -1 1 -1..1 1 1; spawnRate: 1000; velocity: 0 -1 0; lifeTime: 4; scale: .05,.1; opacity: .8\x22></a-entity>";
+                                    imageAssets = imageAssets + "<img id=\x22raindrop2\x22 src=\x22http://servicemedia.s3.amazonaws.com/assets/pics/raindrop2.png\x22 crossorigin=\x22anonymous\x22>";
                                 } else if (sceneResponse.sceneSkyParticles.toLowerCase() == "rain/fog") {
                                     // skyParticles = "<a-entity scale='2 2 2' position='0 3 0' particle_mangler particle-system=\x22preset: rain; particleCount: 3000; texture: https://realitymangler.com/assets/textures/raindrop2.png; color: " + sceneResponse.sceneColor1 + "," + sceneResponse.sceneColor2 +"\x22></a-entity>";
                                     skyParticles = "<a-entity scale=\x2220 10 20\x22 position=\x220 10 0\x22 sprite-particles=\x22texture: #raindrop; color: " +sceneResponse.sceneColor2 + "; position: -1 1 -1..1 1 1; spawnRate: 1000; velocity: 0 -.75 0; lifeTime: 10; scale: .15,.25; opacity: 1\x22></a-entity>"+
                                     "<a-entity scale=\x2250 10 50\x22 position=\x220 10 0\x22 sprite-particles=\x22texture: #cloud1; color: " +sceneResponse.sceneColor2 + "; blending: additive; position: -1 -1 -1..1 1 1; velocity: -.05 -.025 -.05 .. .05 .025 .05; spawnRate: 5; lifeTime: 20; scale: 200,400; opacity: 0,.3,0; rotation: 0..360\x22></a-entity>";
+                                    imageAssets = imageAssets + "<img id=\x22raindrop2\x22 src=\x22http://servicemedia.s3.amazonaws.com/assets/pics/raindrop.png\x22 crossorigin=\x22anonymous\x22>"
                                 } else if (sceneResponse.sceneSkyParticles.toLowerCase() == "rain/fog/add") {
                                     // skyParticles = "<a-entity scale='2 2 2' position='0 3 0' particle_mangler particle-system=\x22preset: rain; particleCount: 3000; texture: https://realitymangler.com/assets/textures/raindrop2.png; color: " + sceneResponse.sceneColor1 + "," + sceneResponse.sceneColor2 +"\x22></a-entity>";
                                     skyParticles = "<a-entity scale=\x2220 10 20\x22 position=\x220 10 0\x22 sprite-particles=\x22texture: #raindrop; color: " +sceneResponse.sceneColor2 + "; blending: additive; position: -1 1 -1..1 1 1; spawnRate: 1000; velocity: 0 -.75 0; lifeTime: 10; scale: .15,.25; opacity: 1\x22></a-entity>"+
@@ -3293,7 +3297,7 @@ webxr_router.get('/:_id', function (req, res) {
                     
                 },
 
-                function (callback) { //deprecate this one? no need to copy to static routes..
+                function (callback) { //undeprecate! need a static route or they timeout, duh...
                     var postcards = [];
                     console.log("sceneResponse.scenePostcards: " + JSON.stringify(sceneResponse.scenePostcards));
                     if (sceneResponse.scenePostcards != null && sceneResponse.scenePostcards.length > 0) {
@@ -3315,39 +3319,38 @@ webxr_router.get('/:_id', function (req, res) {
                                     console.log("error getting postcard " + postcard._id + err);
                                     callback(err);
                                 } else {
-                                    postcard1 = ReturnPresignedUrlSync(process.env.S3_ROOT_BUCKET_NAME, 'users/' + picture_item.userID +"/pictures/"+ picture_item._id + ".standard." + picture_item.filename, 6000); //just return a single 
-                                    // console.log("postcard1 " + postcard1);
-                                    callback(null);
-                                    // var params = {
-                                    //     Bucket: sceneResponse.sceneDomain,
-                                    //     Key: sceneResponse.short_id + "/"+ postcardID + ".standard." + picture_item.filename
-                                    // }
-                                    // s3.headObject(params, function(err, data) { //check that the postcard is pushed to static route
-                                    //     if (err) {
-                                    //         console.log("postcard missing from static route, tryna copy to " + sceneResponse.sceneDomain);
-                                    //         s3.copyObject({Bucket: bucketFolder, CopySource: 'servicemedia/users/' + picture_item.userID +"/pictures/"+ picture_item._id + ".standard." + picture_item.filename,
-                                    //             Key: sceneResponse.short_id + "/"+ picture_item._id + ".standard." + picture_item.filename}, function (err, data) {
-                                    //             if (err) {
-                                    //                 console.log("ERROR copyObject" + err);
-                                    //                 callbackz();
-                                    //             }
-                                    //             else {
-                                    //                 console.log('SUCCESS copyObject');
-                                    //                 index++;
+                                    // postcard1 = ReturnPresignedUrlSync(process.env.S3_ROOT_BUCKET_NAME, 'users/' + picture_item.userID +"/pictures/"+ picture_item._id + ".standard." + picture_item.filename, 6000); //just return a single 
+                                    // // console.log("postcard1 " + postcard1);
+                                    // callback(null);
+                                    var params = {
+                                        Bucket: sceneResponse.sceneDomain,
+                                        Key: sceneResponse.short_id + "/"+ postcard + ".standard." + picture_item.filename
+                                    }
+                                    s3.headObject(params, function(err, data) { //check that the postcard is pushed to static route
+                                        if (err) {
+                                            console.log("postcard missing from static route, tryna copy to " + sceneResponse.sceneDomain);
+                                            s3.copyObject({Bucket: bucketFolder, CopySource: 'servicemedia/users/' + picture_item.userID +"/pictures/"+ picture_item._id + ".standard." + picture_item.filename,
+                                                Key: sceneResponse.short_id + "/"+ picture_item._id + ".standard." + picture_item.filename}, function (err, data) {
+                                                if (err) {
+                                                    console.log("ERROR copyObject" + err);
+                                                    callback();
+                                                } else {
+                                                    console.log('SUCCESS copyObject');
+                                                    
                                                    
-                                    //                 postcard1 = sceneResponse.sceneDomain +"/"+sceneResponse.short_id +"/"+ picture_item._id + ".standard." + picture_item.filename;
+                                                    postcard1 = sceneResponse.sceneDomain +"/"+sceneResponse.short_id +"/"+ picture_item._id + ".standard." + picture_item.filename;
                                                    
-                                    //                 callbackz();
-                                    //             }
-                                    //         });
-                                    //     } else {
-                                    //         index++;
-                                    //         postcard1 = sceneResponse.sceneDomain +"/"+sceneResponse.short_id +"/"+ picture_item._id + ".standard." + picture_item.filename;
-                                           
-                                    //         callbackz();
-                                    //     }
+                                                    callback();
+                                                }
+                                            });
+                                        } else {
+                                            
+                                            postcard1 = sceneResponse.sceneDomain +"/"+sceneResponse.short_id +"/"+ picture_item._id + ".standard." + picture_item.filename;
+                                            console.log("gotsa postcard " + postcard1 );
+                                            callback();
+                                        }
                                         
-                                    // });
+                                    });
                                 }
                             });
                         //             }
@@ -4472,6 +4475,7 @@ webxr_router.get('/:_id', function (req, res) {
                         playerAvatarTemplate +
                         handsTemplate + 
                         pAudioWaveform +
+                        modelAssets +
                         "<a-asset-item id=\x22trigger1\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/trigger1.glb\x22></a-asset-item>\n"+
                         "<a-asset-item id=\x22square1\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/square1.glb\x22></a-asset-item>\n"+
                         "<a-asset-item id=\x22rectangle1\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/rectangle1.glb\x22></a-asset-item>\n"+
@@ -4517,7 +4521,7 @@ webxr_router.get('/:_id', function (req, res) {
 
                         // "<img id=\x22explosion\x22 src=\x22https://realitymangler.com/assets/textures/explosion.png\x22 crossorigin=\x22anonymous\x22>"+ 
 
-                      
+                        // spriteAssets +
                         "<img id=\x22fireballSheet\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/pics/fireball-up.png\x22 crossorigin=\x22anonymous\x22></img>"+
                         "<img id=\x22fireball\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/pics/fireball.png\x22 crossorigin=\x22anonymous\x22></img>"+
                         "<img id=\x22fireanim1\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/pics/fireanim3.png\x22 crossorigin=\x22anonymous\x22></img>"+
