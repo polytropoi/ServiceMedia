@@ -752,11 +752,11 @@ webxr_router.get('/:_id', function (req, res) {
                                         if (sceneResponse.sceneWebType == "AR Location Tracking") {
                                             //TODO jack in models / objs here?
                                             geoEntities = geoEntities + "<a-entity look-at=\x22#player\x22 shadow=\x22cast:true; receive:true\x22 "+geoEntity+"=\x22latitude: "+sceneResponse.sceneLocations[i].latitude+
-                                            "; longitude: "+sceneResponse.sceneLocations[i].longitude+";  _id: "+sceneResponse.sceneLocations[i].timestamp+"\x22 "+skyboxEnvMap+" class=\x22gltf poi envMap\x22 gltf-model=\x22#poimarker\x22><a-entity scale=\x22.5 .5 .5\x22 position=\x22-.1 .5 0.1\x22 text-geometry=\x22value: "+poiIndex+"\x22></a-entity></a-entity>";
+                                            "; longitude: "+sceneResponse.sceneLocations[i].longitude+";  _id: "+sceneResponse.sceneLocations[i].timestamp+"\x22 "+skyboxEnvMap+" class=\x22gltf poi envMap\x22 gltf-model=\x22#poi1\x22><a-entity scale=\x22.5 .5 .5\x22 position=\x22-.1 .5 0.1\x22 text-geometry=\x22value: "+poiIndex+"\x22></a-entity></a-entity>";
                                         
                                         } else if (sceneResponse.sceneWebType != "Mapbox") {
                                             geoEntities = geoEntities + "<a-entity look-at=\x22#player\x22 shadow=\x22cast:true; receive:true\x22 "+geoEntity+"=\x22latitude: "+sceneResponse.sceneLocations[i].latitude+
-                                            "; longitude: "+sceneResponse.sceneLocations[i].longitude+";  _id: "+sceneResponse.sceneLocations[i].timestamp+"\x22 "+skyboxEnvMap+" class=\x22gltf poi envMap\x22 gltf-model=\x22#poimarker\x22><a-entity scale=\x22.5 .5 .5\x22 position=\x22-.1 .5 0.1\x22 text-geometry=\x22value: "+poiIndex+"\x22></a-entity></a-entity>";
+                                            "; longitude: "+sceneResponse.sceneLocations[i].longitude+";  _id: "+sceneResponse.sceneLocations[i].timestamp+"\x22 "+skyboxEnvMap+" class=\x22gltf poi envMap\x22 gltf-model=\x22#poi1\x22><a-entity scale=\x22.5 .5 .5\x22 position=\x22-.1 .5 0.1\x22 text-geometry=\x22value: "+poiIndex+"\x22></a-entity></a-entity>";
                                             // console.log(geoEntities);
                                         } else {
                                             //for mapbox just using aframe to pass data
@@ -1749,8 +1749,10 @@ webxr_router.get('/:_id', function (req, res) {
                                     "<a-entity visible='true' class=\x22envMap activeObjexRay\x22 id=\x22availableScenesPreviousButton\x22 gltf-model=\x22#previous_button\x22 scale=\x22.5 .5 .5\x22 position=\x22-1.5 -.75 0\x22></a-entity>" +
                                     "</a-entity></a-entity>";
                                     console.log('processed attributions for ' + availableScenes.length);
+
+                                    modelAssets = modelAssets + "<a-asset-item id=\x22widelandscape_panel\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/panel5b.glb\x22></a-asset-item>\n";
                                     
-                                    loadAvailableScenes = "ready(function(){\n" + //TODO base64 this stuff like the others...
+                                    loadAvailableScenes = "ready(function(){\n" + //TODO base64 this stuff like the others...very
                                     "let ascontrol = document.getElementById(\x22availableScenesControl\x22);\n"+
                                     
                                     "ascontrol.setAttribute(\x22available-scenes-control\x22, \x22jsonData\x22, "+JSON.stringify(JSON.stringify(availableScenesResponse))+");\n"+ //double stringify! yes, it's needed
@@ -2188,7 +2190,9 @@ webxr_router.get('/:_id', function (req, res) {
                                     }
                                     if (locMdl.markerType == "follow curve") {
                                         // followCurve = "follow-path=\x22incrementBy:0.001; throttleTo:1\x22";
-                                        followCurve = "mod_curve=\x22init: true\x22"  //hrm, add a bunch of params here...
+                                        followCurve = "mod_curve=\x22init: true\x22";  //hrm, add a bunch of params here...
+                                        //TODO use scene image with proper type/tag 
+                                        imageAssets = imageAssets + "<img id=\x22explosion1\x22 src=\x22http://servicemedia.s3.amazonaws.com/assets/pics/explosion1.png\x22 crossorigin=\x22anonymous\x22>";
                                     }
                                     if (locMdl.markerType == "follow random path") {
                                         // followCurve = "follow-path=\x22incrementBy:0.001; throttleTo:1\x22";
@@ -2505,6 +2509,8 @@ webxr_router.get('/:_id', function (req, res) {
                                                         }
                                                     }
                                                     let modelString = "gltf-model=\x22#" + m_assetID + "\x22";
+                                                    //todo, check for scene image with spritesheet type / tag
+                                                    imageAssets = imageAssets + "<img id=\x22explosion1\x22 src=\x22http://servicemedia.s3.amazonaws.com/assets/pics/explosion1.png\x22 crossorigin=\x22anonymous\x22>"; //for particles
 
                                                     gltfsEntities = gltfsEntities + "<a-entity id=\x22"+id+"\x22 "+modelString+" "+instancing+" class=\x22"+entityType+
                                                     " activeObjexGrab activeObjexRay\x22 shadow=\x22cast:true; receive:true\x22 "+skyboxEnvMap+
@@ -2926,6 +2932,7 @@ webxr_router.get('/:_id', function (req, res) {
                                 "</a-entity>"+
                                 
                                 "</a-entity>";
+                                modelAssets = modelAssets + "<a-asset-item id=\x22backpanel_horiz1\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/backpanel_horiz1.glb\x22></a-asset-item>\n";
                                 // "<a-entity gltf-model=\x22#play_button\x22 scale=\x22.15 .1 .1\x22 position=\x220 0 -.2\x22 material=\x22color: black; transparent: true; opacity: 0.1\x22></a-entity>" +
                                 if (sceneResponse.scenePrimaryAudioTriggerEvents) {
                                     var buff = Buffer.from(JSON.stringify(primaryAudioObject)).toString("base64");
@@ -3462,7 +3469,8 @@ webxr_router.get('/:_id', function (req, res) {
                                     // "pgcontrol.setAttribute(\x22picture_groups_control\x22, \x22jsonData\x22, "+JSON.stringify(JSON.stringify(requestedPictureGroups))+");\n"+ //double stringify! yes, it's needed
                                     var buff = Buffer.from(JSON.stringify(requestedPictureGroups)).toString("base64");
                                     pictureGroupsData = "<a-entity picture_groups_control id=\x22pictureGroupsData\x22 data-picture-groups='"+buff+"'></a-entity>"; //to be picked up by aframe, but data is in data-attribute
-
+                                    modelAssets = modelAssets + "<a-asset-item id=\x22flatrect2\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/flatrect2.glb\x22></a-asset-item>"+
+                                    "\n<a-asset-item id=\x22camera_icon\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/camera1.glb\x22></a-asset-item>\n";
                                     "});";
                                     callback(null);
                                 }
@@ -3586,15 +3594,20 @@ webxr_router.get('/:_id', function (req, res) {
                                                         //console.log("gotsa portrait!");
                                                         imageEntities = imageEntities + "<a-entity "+link+""+lookat+"  mod-materials=\x22index:"+index+"\x22 gltf-model=\x22#portrait_panel\x22 material=\x22shader: flat; src: #smimage" + index + "; alphaTest: 0.5;\x22"+
                                                         " position=\x22"+position+"\x22 rotation=\x22"+rotation+"\x22 visible='true'>"+caption+"</a-entity>";
+                                                        modelAssets = modelAssets + "<a-asset-item id=\x22portrait_panel\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/panel5c.glb\x22></a-asset-item>\n";
                                                     } else if (picture_item.orientation == "square" || picture_item.orientation == "Square") {
                                                         imageEntities = imageEntities + "<a-entity "+link+""+lookat+"  mod-materials=\x22index:"+index+"\x22 gltf-model=\x22#square_panel\x22 scale=\x223 3 3\x22 material=\x22shader: flat; src: #smimage" + index + "; alphaTest: 0.5;\x22"+
                                                         " position=\x22"+position+"\x22 rotation=\x22"+rotation+"\x22 visible='true'>"+caption+"</a-entity>";
+                                                        modelAssets = modelAssets + "<a-asset-item id=\x22square_panel\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/panelsquare1.glb\x22></a-asset-item>\n";
                                                     } else if (picture_item.orientation == "circle" || picture_item.orientation == "Circle") {
                                                         imageEntities = imageEntities + "<a-entity "+link+""+lookat+"  mod-materials=\x22index:"+index+"\x22 gltf-model=\x22#circle_panel\x22 material=\x22shader: flat; src: #smimage" + index + "; alphaTest: 0.5;\x22"+
                                                         " position=\x22"+position+"\x22 rotation=\x22"+rotation+"\x22 visible='true'>"+caption+"</a-entity>";
+                                                        modelAssets = modelAssets + "<a-asset-item id=\x22circle_panel\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/panelcircle1.glb\x22></a-asset-item>\n";
                                                     } else {
                                                         imageEntities = imageEntities + "<a-entity "+link+""+lookat+"  mod-materials=\x22index:"+index+"\x22 gltf-model=\x22#landscape_panel\x22 material=\x22shader: flat; src: #smimage" + index + "; alphaTest: 0.5;\x22"+
                                                         " position=\x22"+position+"\x22 rotation=\x22"+rotation+"\x22 visible='true'>"+caption+"</a-entity>";
+                                                        //modelAssets...
+                                                        // modelAssets = modelAssets + 
                                                     }
                                                 }
                                             }
@@ -4274,6 +4287,7 @@ webxr_router.get('/:_id', function (req, res) {
                                 textEntities = textEntities + "<a-entity id=\x22sceneGreetingDialog\x22 class=\x22activeObjexRay\x22 look-at=\x22#player\x22 scene_greeting_dialog=\x22behavior: hide; fillColor : "+sceneResponse.sceneFontFillColor+
                                 "; outlineColor : "+sceneResponse.sceneFontOutlineColor+"; backgroundColor : "+sceneResponse.sceneTextBackgroundColor+"; font1 : "+sceneResponse.sceneFontWeb1+"; font2 : "+sceneResponse.sceneFontWeb2+"; greetingText : "+sceneResponse.sceneGreeting+"; questText : "+sceneQuest+";\x22></a-entity>";
                             }
+                            modelAssets = modelAssets + "<a-asset-item id=\x22flat_round_rect\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/flatroundrect.glb\x22></a-asset-item>\n";
                         }
                         
 
@@ -4484,38 +4498,43 @@ webxr_router.get('/:_id', function (req, res) {
                         handsTemplate + 
                         pAudioWaveform +
                         modelAssets +
-                        "<a-asset-item id=\x22trigger1\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/trigger1.glb\x22></a-asset-item>\n"+
+                        // "<a-asset-item id=\x22trigger1\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/trigger1.glb\x22></a-asset-item>\n"+
                         "<a-asset-item id=\x22square1\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/square1.glb\x22></a-asset-item>\n"+
                         "<a-asset-item id=\x22rectangle1\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/rectangle1.glb\x22></a-asset-item>\n"+
-                        "<a-asset-item id=\x22avatar_model\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/avatar1c.glb\x22></a-asset-item>\n"+
-                        "<a-asset-item id=\x22flat_round_rect\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/flatroundrect.glb\x22></a-asset-item>\n"+
-                        "<a-asset-item id=\x22flatrect2\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/flatrect2.glb\x22></a-asset-item>\n"+
+                        // "<a-asset-item id=\x22avatar_model\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/avatar1c.glb\x22></a-asset-item>\n"+
+                        // "<a-asset-item id=\x22flat_round_rect\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/flatroundrect.glb\x22></a-asset-item>\n"+
+                        // "<a-asset-item id=\x22flatrect2\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/flatrect2.glb\x22></a-asset-item>\n"+
                         "<a-asset-item id=\x22flatsquare\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/flatsquare.glb\x22></a-asset-item>\n"+
                         "<a-asset-item id=\x22landscape_panel\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/landscape_panel7.glb\x22></a-asset-item>\n"+
-                        "<a-asset-item id=\x22widelandscape_panel\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/panel5b.glb\x22></a-asset-item>\n"+
+                        // "<a-asset-item id=\x22widelandscape_panel\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/panel5b.glb\x22></a-asset-item>\n"+
                         "<a-asset-item id=\x22dialog_panel\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/dialogpanel2.glb\x22></a-asset-item>\n"+
-                        "<a-asset-item id=\x22backpanel_horiz1\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/backpanel_horiz1.glb\x22></a-asset-item>\n"+
-                        "<a-asset-item id=\x22portrait_panel\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/panel5c.glb\x22></a-asset-item>\n"+
+                        // "<a-asset-item id=\x22backpanel_horiz1\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/backpanel_horiz1.glb\x22></a-asset-item>\n"+
+                        // "<a-asset-item id=\x22portrait_panel\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/panel5c.glb\x22></a-asset-item>\n"+
                         "<a-asset-item id=\x22square_panel\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/panelsquare1.glb\x22></a-asset-item>\n"+
-                        "<a-asset-item id=\x22circle_panel\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/panelcircle1.glb\x22></a-asset-item>\n"+
+                        // "<a-asset-item id=\x22circle_panel\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/panelcircle1.glb\x22></a-asset-item>\n"+
                         "<a-asset-item id=\x22exclamation\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/exclamation.glb\x22></a-asset-item>\n"+
                         "<a-asset-item id=\x22previous_button\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/previous.glb\x22></a-asset-item>\n"+
                         "<a-asset-item id=\x22next_button\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/next.glb\x22></a-asset-item>\n"+
-                        "<a-asset-item id=\x22filmcam\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/filmcam1.glb\x22></a-asset-item>\n"+
-                        "<a-asset-item id=\x22groupicon\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/groupicon.glb\x22></a-asset-item>\n"+
+                        // "<a-asset-item id=\x22filmcam\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/filmcam1.glb\x22></a-asset-item>\n"+
+                        // "<a-asset-item id=\x22groupicon\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/groupicon.glb\x22></a-asset-item>\n"+
+                        
                         "<a-asset-item id=\x22mailbox\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/mailbox2.glb\x22></a-asset-item>\n"+
                         "<a-asset-item id=\x22links\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/links.glb\x22></a-asset-item>\n"+
                         "<a-asset-item id=\x22roundcube\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/roundcube.glb\x22></a-asset-item>\n"+
                         "<a-asset-item id=\x22poi1\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/poi1b.glb\x22></a-asset-item>\n"+
-                        "<a-asset-item id=\x22poi2\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/poi_marker2.glb\x22></a-asset-item>\n"+
-                        "<a-asset-item id=\x22placeholder\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/placeholder.glb\x22></a-asset-item>\n"+
-                        "<a-asset-item id=\x22savedplaceholder\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/savedplaceholder.glb\x22></a-asset-item>\n"+
+                        // "<a-asset-item id=\x22poi2\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/poi_marker2.glb\x22></a-asset-item>\n"+
+                        // "<a-asset-item id=\x22placeholder\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/placeholder.glb\x22></a-asset-item>\n"+
+                        // "<a-asset-item id=\x22savedplaceholder\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/savedplaceholder.glb\x22></a-asset-item>\n"+
+                        
                         "<a-asset-item id=\x22key\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/key1b.glb\x22></a-asset-item>\n"+
-                        "<a-asset-item id=\x22camera_icon\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/camera1.glb\x22></a-asset-item>\n"+
+                        
+                        // "<a-asset-item id=\x22camera_icon\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/camera1.glb\x22></a-asset-item>\n"+
+                        
                         "<a-asset-item id=\x22talkbubble\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/talkbubble1b.glb\x22></a-asset-item>\n"+
+                        
                         "<a-asset-item id=\x22thoughtbubble\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/thoughtbubble1.glb\x22></a-asset-item>\n"+
-                        "<a-asset-item id=\x22poimarker\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/poi_marker.glb\x22></a-asset-item>\n"+
-                        "<a-asset-item id=\x22globe\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/mapglobe1.glb\x22></a-asset-item>\n"+
+                        // "<a-asset-item id=\x22poimarker\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/poi_marker.glb\x22></a-asset-item>\n"+
+                        // "<a-asset-item id=\x22globe\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/mapglobe1.glb\x22></a-asset-item>\n"+
                         "<a-asset-item id=\x22youtubeplayer\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/youtubeplayer2.glb\x22></a-asset-item>\n"+
                         "<a-asset-item id=\x22audioplayer\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/audioplayer_3x1_d.glb\x22></a-asset-item>\n"+
                         // "<a-asset-item id=\x22castle\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/castle.glb\x22></a-asset-item>\n"+
@@ -4534,7 +4553,7 @@ webxr_router.get('/:_id', function (req, res) {
                                 // "<img id=\x22fireball\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/pics/fireball.png\x22 crossorigin=\x22anonymous\x22></img>"+
                                 // "<img id=\x22fireanim1\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/pics/fireanim3.png\x22 crossorigin=\x22anonymous\x22></img>"+
                                 // "<img id=\x22torchanim1\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/pics/firetorchanim2.png\x22 crossorigin=\x22anonymous\x22></img>"+
-                                // "<img id=\x22candle1\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/pics/candle_flame_8x8.png\x22 crossorigin=\x22anonymous\x22></img>"+
+                                "<img id=\x22candle1\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/pics/candle_flame_8x8.png\x22 crossorigin=\x22anonymous\x22></img>"+
                                 // "<img id=\x22water\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/pics/water2c.jpeg\x22 crossorigin=\x22anonymous\x22>"+
                                 // "<img id=\x22water1\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/pics/watertile3.png\x22 crossorigin=\x22anonymous\x22>"+
                                 // "<img id=\x22water2\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/pics/water2.png\x22 crossorigin=\x22anonymous\x22>"+
@@ -4542,7 +4561,7 @@ webxr_router.get('/:_id', function (req, res) {
                                 // "<img id=\x22raindrop\x22 src=\x22http://servicemedia.s3.amazonaws.com/assets/pics/raindrop.png\x22 crossorigin=\x22anonymous\x22>"+
                                 // "<img id=\x22explosion1\x22 src=\x22http://servicemedia.s3.amazonaws.com/assets/pics/explosion1.png\x22 crossorigin=\x22anonymous\x22>"+
                                 // "<img id=\x22fireworksanim1\x22 src=\x22http://servicemedia.s3.amazonaws.com/assets/pics/fireworks_sheet.png\x22 crossorigin=\x22anonymous\x22>"+
-                                // "<img id=\x22smoke1\x22 src=\x22http://servicemedia.s3.amazonaws.com/assets/pics/smokeanim2.png\x22 crossorigin=\x22anonymous\x22>"+
+                                "<img id=\x22smoke1\x22 src=\x22http://servicemedia.s3.amazonaws.com/assets/pics/smokeanim2.png\x22 crossorigin=\x22anonymous\x22>"+
                                 // "<img id=\x22fireball-up\x22 src=\x22http://servicemedia.s3.amazonaws.com/assets/pics/fireball-up.png\x22 crossorigin=\x22anonymous\x22>"+
                                 // "<img id=\x22fireball1\x22 src=\x22http://servicemedia.s3.amazonaws.com/assets/pics/fireball.png\x22 crossorigin=\x22anonymous\x22>"+
                                 // "<img id=\x22sparkle1\x22 src=\x22http://servicemedia.s3.amazonaws.com/assets/pics/sparkle.png\x22 crossorigin=\x22anonymous\x22>"+
