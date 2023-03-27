@@ -531,8 +531,8 @@ webxr_router.get('/:_id', function (req, res) {
                             
                             // instancingEntity =  "<a-entity id=\x22pinboard\x22 pinboard=\x22physics: ammo; height:20; width: 20\x22 position = \x220 0 -20\x22 rotation = \x2245 0 0\x22>" +
                             //                     "<a-box id=\x22pin-mesh\x22 color=\x22black\x22 width=\x220.1\x22 depth=\x220.1\x22 height=\x221\x22 instanced-mesh=\x22capacity: 500\x22></a-box></a-entity>" +
-                                                instancingEntity = "<a-sphere id=\x22ball-mesh\x22 radius=\x221\x22 color=\x22yellow\x22 instanced-mesh=\x22capacity: 100; updateMode: auto\x22></a-sphere>" +
-                                                "<a-entity id=\x22ball-recycler\x22 ball-recycler=\x22physics: ammo; ballCount: 10; width: 30; depth: 15; yKill: -30\x22 position=\x220 20 -25\x22></a-entity>";
+                            instancingEntity = "<a-sphere id=\x22ball-mesh\x22 radius=\x221\x22 color=\x22yellow\x22 instanced-mesh=\x22capacity: 100; updateMode: auto\x22></a-sphere>" +
+                            "<a-entity id=\x22ball-recycler\x22 ball-recycler=\x22physics: ammo; ballCount: 10; width: 30; depth: 15; yKill: -30\x22 position=\x220 20 -25\x22></a-entity>";
                         } 
 
                         if (sceneData.sceneTags[i] == "show transport") {
@@ -1401,21 +1401,24 @@ webxr_router.get('/:_id', function (req, res) {
                                     // skyParticles = "<a-entity scale='2 2 2' position='0 3 0' particle_mangler particle-system=\x22preset: rain; particleCount: 3000; texture: https://realitymangler.com/assets/textures/raindrop2.png; color: " + sceneResponse.sceneColor1 + "," + sceneResponse.sceneColor2 +"\x22></a-entity>";
                                     skyParticles = "<a-entity scale=\x2220 10 20\x22 position=\x220 10 0\x22 sprite-particles=\x22texture: #raindrop; color: " +sceneResponse.sceneColor2 + "; position: -1 1 -1..1 1 1; spawnRate: 1000; velocity: 0 -.75 0; lifeTime: 10; scale: .15,.25; opacity: 1\x22></a-entity>"+
                                     "<a-entity scale=\x2250 10 50\x22 position=\x220 10 0\x22 sprite-particles=\x22texture: #cloud1; color: " +sceneResponse.sceneColor2 + "; blending: additive; position: -1 -1 -1..1 1 1; velocity: -.05 -.025 -.05 .. .05 .025 .05; spawnRate: 5; lifeTime: 20; scale: 200,400; opacity: 0,.3,0; rotation: 0..360\x22></a-entity>";
-                                    imageAssets = imageAssets + "<img id=\x22raindrop2\x22 src=\x22http://servicemedia.s3.amazonaws.com/assets/pics/raindrop.png\x22 crossorigin=\x22anonymous\x22>"
+                                    imageAssets = imageAssets + "<img id=\x22raindrop2\x22 src=\x22http://servicemedia.s3.amazonaws.com/assets/pics/raindrop.png\x22 crossorigin=\x22anonymous\x22>";
                                 } else if (sceneResponse.sceneSkyParticles.toLowerCase() == "rain/fog/add") {
                                     // skyParticles = "<a-entity scale='2 2 2' position='0 3 0' particle_mangler particle-system=\x22preset: rain; particleCount: 3000; texture: https://realitymangler.com/assets/textures/raindrop2.png; color: " + sceneResponse.sceneColor1 + "," + sceneResponse.sceneColor2 +"\x22></a-entity>";
                                     skyParticles = "<a-entity scale=\x2220 10 20\x22 position=\x220 10 0\x22 sprite-particles=\x22texture: #raindrop; color: " +sceneResponse.sceneColor2 + "; blending: additive; position: -1 1 -1..1 1 1; spawnRate: 1000; velocity: 0 -.75 0; lifeTime: 10; scale: .15,.25; opacity: 1\x22></a-entity>"+
                                     "<a-entity scale=\x2250 10 50\x22 position=\x220 10 0\x22 sprite-particles=\x22texture: #cloud1; color: " +sceneResponse.sceneColor2 + "; blending: additive; position: -1 -1 -1..1 1 1; velocity: -.05 -.025 -.05 .. .05 .025 .05; spawnRate: 5; lifeTime: 20; scale: 100,200; opacity: 0,.3,0; rotation: 0..360\x22></a-entity>";
+                                    imageAssets = imageAssets + "<img id=\x22cloud1\x22 src=\x22http://servicemedia.s3.amazonaws.com/assets/pics/cloud_lg.png\x22 crossorigin=\x22anonymous\x22>";
                                 } else if (sceneResponse.sceneSkyParticles.toLowerCase() == "snow") {
                                     skyParticles = "<a-entity scale='2 2 2' position='0 3 0' particle_mangler particle-system=\x22preset: snow; particleCount: 3000; texture: https://realitymangler.com/assets/textures/cloud_sm.png; color: " + sceneResponse.sceneColor1 + "," + sceneResponse.sceneColor2 +"\x22></a-entity>";
+                                
                                 } else if (sceneResponse.sceneSkyParticles.toLowerCase() == "smoke") {
                                     skyParticles = "<a-entity scale=\x2250 10 50\x22 position=\x220 10 0\x22 sprite-particles=\x22texture: #cloud1; color: " +sceneResponse.sceneColor2 + "; position: -1 -1 -1..1 1 1; velocity: -.05 -.025 -.05 .. .05 .025 .05; spawnRate: 5; lifeTime: 20; scale: 100,200; opacity: 0,.3,0; rotation: 0..360\x22></a-entity>";
-
+                                    imageAssets = imageAssets + "<img id=\x22cloud1\x22 src=\x22http://servicemedia.s3.amazonaws.com/assets/pics/cloud_lg.png\x22 crossorigin=\x22anonymous\x22>";
                                 } else if (sceneResponse.sceneSkyParticles.toLowerCase() == "explosions") {
                                     // skyParticles = "<a-entity scale='15 5 15' position='0 0 0' particle_mangler particle-system=\x22preset: dust; maxAge: 10; velocityValue: 0 -.01 0; direction: -.01; positionSpread: 15 15 15; opacity: .15; particleCount: 25; size: 300; blending: 2; texture: https://realitymangler.com/assets/textures/cloud_sm.png; color: " + sceneResponse.sceneColor1 + "," + sceneResponse.sceneColor2 +"\x22></a-entity>";
                                     // skyParticles = "<a-entity position=\x220 3 0\x22 scale=\x222 2 2\x22 mod_particles=\x22type: smoke\x22></a-entity>";
                                     skyParticles = "<a-entity scale=\x2220 20 20\x22 position=\x220 20 0\x22 sprite-particles=\x22texture: #explosion1; textureFrame: 8 8; blending: additive; color: black..white;"+
                                     " position: -1 -1 -1..1 1 1; velocity: -.1 -.05 -.1 .. .1 .05 .1; spawnRate: 20; lifeTime: 1; scale: 50,200; opacity: 0,1,0; rotation: 0..360\x22></a-entity>";
+                                    imageAssets = imageAssets + "<img id=\x22explosion1\x22 src=\x22http://servicemedia.s3.amazonaws.com/assets/pics/explosion1.png\x22 crossorigin=\x22anonymous\x22>";
                                 } else if (sceneResponse.sceneSkyParticles.toLowerCase() == "fireworks") {
                                     
                                     skyParticles = "<a-entity scale=\x2240 10 40\x22 position=\x220 40 0\x22 sprite-particles=\x22texture: #fireworksanim1; textureFrame: 5 5; blending: additive; color: black..white;"+
@@ -1423,11 +1426,14 @@ webxr_router.get('/:_id', function (req, res) {
                                     // skyParticles =  "<a-entity scale=\x221 1 1\x22 position=\x220 1 0\x22 sprite-particles=\x22texture: #blob1; color: yellow, red; spawnRate: 300; spawnType: burst; radialVelocity: 2..4; radialAcceleration: -2; lifeTime: 1; scale: 1; particleSize: 25\x22></a-entity>";
                                     // "<a-entity scale=\x2220 20 20\x22 position=\x220 20 0\x22 sprite-particles=\x22texture: #fireworksanim1; textureFrame: 5 5; blending: additive; color: black..white;"+
                                     // " position: -1 -1 -1..1 1 1; velocity: -.1 -.05 -.1 .. .1 .05 .1; spawnRate: 20; lifeTime: 1; scale: 50,200; opacity: 0,1,0; rotation: 0..360\x22></a-entity>";
+                                    imageAssets = imageAssets + "<img id=\x22fireworksanim1\x22 src=\x22http://servicemedia.s3.amazonaws.com/assets/pics/fireworks_sheet.png\x22 crossorigin=\x22anonymous\x22>";
                                 } else if (sceneResponse.sceneSkyParticles.toLowerCase() == "fog") {
                                     // skyParticles = "<a-entity scale='15 5 15' position='0 5 0' particle_mangler particle-system=\x22preset: dust; maxAge: 25; velocityValue: 0 -.01 0; direction: -.01; positionSpread: 15 2 15; opacity: .25; particleCount: 50; size: 500; blending: 2; texture: https://realitymangler.com/assets/textures/cloud_lg.png; color: " + sceneResponse.sceneColor1 + "," + sceneResponse.sceneColor2 +"\x22></a-entity>";
                                     skyParticles = "<a-entity scale=\x2250 10 50\x22 position=\x220 10 0\x22 sprite-particles=\x22texture: #cloud1; color: " +sceneResponse.sceneColor2 + "; position: -1 -1 -1..1 1 1; velocity: -.05 -.025 -.05 .. .05 .025 .05; spawnRate: 5; lifeTime: 20; scale: 100,200; opacity: 0,.3,0; rotation: 0..360\x22></a-entity>";
+                                    imageAssets = imageAssets + "<img id=\x22cloud1\x22 src=\x22http://servicemedia.s3.amazonaws.com/assets/pics/cloud_lg.png\x22 crossorigin=\x22anonymous\x22>";
                                 } else if (sceneResponse.sceneSkyParticles.toLowerCase() == "fog/add") {
                                     skyParticles = "<a-entity scale=\x2250 10 50\x22 position=\x220 10 0\x22 sprite-particles=\x22texture: #cloud1; blending: additive; color: " +sceneResponse.sceneColor2 + "; position: -1 -1 -1..1 1 1; velocity: -.05 -.025 -.05 .. .05 .025 .05; spawnRate: 5; lifeTime: 20; scale: 100,200; opacity: 0,.3,0; rotation: 0..360\x22></a-entity>";
+                                    imageAssets = imageAssets + "<img id=\x22cloud1\x22 src=\x22http://servicemedia.s3.amazonaws.com/assets/pics/cloud_lg.png\x22 crossorigin=\x22anonymous\x22>";
                                 } else if (sceneResponse.sceneSkyParticles.toLowerCase() == "clouds") {
                                     // skyParticles = "<a-entity scale='15 5 15' position='0 10 0' particle_mangler particle-system=\x22preset: dust; maxAge: 25; velocityValue: 0 -.01 0; direction: -.01; positionSpread: 30 15 30; opacity: .2; particleCount: 50; size: 1000; blending: 2; texture: https://realitymangler.com/assets/textures/cloud_lg.png; color: " + sceneResponse.sceneColor1 + "," + sceneResponse.sceneColor2 +"\x22></a-entity>";
                                 } else if (sceneResponse.sceneSkyParticles.toLowerCase() == "stars") {    
@@ -1443,8 +1449,10 @@ webxr_router.get('/:_id', function (req, res) {
                                 if (sceneResponse.sceneWater.name == "water2") {
                                     console.log("water: " + JSON.stringify(sceneResponse.sceneWater)); //these use the escaped aframe shaders, not the eval'd non escaped mode
                                     ocean = "<a-plane position=\x220  "+sceneResponse.sceneWater.level+" 0\x22 width=\x22256\x22 height=\x22256\x22 rotation=\x22-90 180 -90\x22 segments-height=\x22100\x22 segments-width=\x22100\x22 "+skyboxEnvMap+" material=\x22color: "+sceneResponse.sceneColor3+"; shader:makewaves; uMap: #water; repeat: 500 500;\x22></a-plane>";
+                                    imageAssets = imageAssets + "<img id=\x22water\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/pics/water2c.jpeg\x22 crossorigin=\x22anonymous\x22>";
                                 } else if (sceneResponse.sceneWater.name == "water1") {
                                     ocean = "<a-plane position=\x220 "+sceneResponse.sceneWater.level+" 0\x22 width=\x22256\x22 height=\x22256\x22 rotation=\x22-90 180 -90\x22 segments-height=\x2264\x22 segments-width=\x2264\x22 "+skyboxEnvMap+" material=\x22shader:makewaves_small; color: "+sceneResponse.sceneColor4+";uMap: #water2; repeat: 500 500; transparent: true\x22></a-plane>";
+                                    imageAssets = imageAssets + "<img id=\x22water2\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/pics/water2.png\x22 crossorigin=\x22anonymous\x22>";
                                 }
                             }
                             if (sceneResponse.sceneUseHeightmap != null && sceneResponse.sceneUseHeightmap) {
@@ -4522,25 +4530,25 @@ webxr_router.get('/:_id', function (req, res) {
                         // "<img id=\x22explosion\x22 src=\x22https://realitymangler.com/assets/textures/explosion.png\x22 crossorigin=\x22anonymous\x22>"+ 
 
                         // spriteAssets +
-                        "<img id=\x22fireballSheet\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/pics/fireball-up.png\x22 crossorigin=\x22anonymous\x22></img>"+
-                        "<img id=\x22fireball\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/pics/fireball.png\x22 crossorigin=\x22anonymous\x22></img>"+
-                        "<img id=\x22fireanim1\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/pics/fireanim3.png\x22 crossorigin=\x22anonymous\x22></img>"+
-                        "<img id=\x22torchanim1\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/pics/firetorchanim2.png\x22 crossorigin=\x22anonymous\x22></img>"+
-                        "<img id=\x22candle1\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/pics/candle_flame_8x8.png\x22 crossorigin=\x22anonymous\x22></img>"+
-                        "<img id=\x22water\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/pics/water2c.jpeg\x22 crossorigin=\x22anonymous\x22>"+
-                        "<img id=\x22water1\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/pics/watertile3.png\x22 crossorigin=\x22anonymous\x22>"+
-                        "<img id=\x22water2\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/pics/water2.png\x22 crossorigin=\x22anonymous\x22>"+
-                        "<img id=\x22raindrop2\x22 src=\x22http://servicemedia.s3.amazonaws.com/assets/pics/raindrop2.png\x22 crossorigin=\x22anonymous\x22>"+
-                        "<img id=\x22raindrop\x22 src=\x22http://servicemedia.s3.amazonaws.com/assets/pics/raindrop.png\x22 crossorigin=\x22anonymous\x22>"+
-                        "<img id=\x22explosion1\x22 src=\x22http://servicemedia.s3.amazonaws.com/assets/pics/explosion1.png\x22 crossorigin=\x22anonymous\x22>"+
-                        "<img id=\x22fireworksanim1\x22 src=\x22http://servicemedia.s3.amazonaws.com/assets/pics/fireworks_sheet.png\x22 crossorigin=\x22anonymous\x22>"+
-                        "<img id=\x22smoke1\x22 src=\x22http://servicemedia.s3.amazonaws.com/assets/pics/smokeanim2.png\x22 crossorigin=\x22anonymous\x22>"+
-                        "<img id=\x22fireball-up\x22 src=\x22http://servicemedia.s3.amazonaws.com/assets/pics/fireball-up.png\x22 crossorigin=\x22anonymous\x22>"+
-                        "<img id=\x22fireball1\x22 src=\x22http://servicemedia.s3.amazonaws.com/assets/pics/fireball.png\x22 crossorigin=\x22anonymous\x22>"+
-                        "<img id=\x22sparkle1\x22 src=\x22http://servicemedia.s3.amazonaws.com/assets/pics/sparkle.png\x22 crossorigin=\x22anonymous\x22>"+
-                        "<img id=\x22blob1\x22 src=\x22http://servicemedia.s3.amazonaws.com/assets/pics/blob.png\x22 crossorigin=\x22anonymous\x22>"+
-                        "<img id=\x22fog1\x22 src=\x22http://servicemedia.s3.amazonaws.com/assets/pics/fog-256.png\x22 crossorigin=\x22anonymous\x22>"+
-                        "<img id=\x22cloud1\x22 src=\x22http://servicemedia.s3.amazonaws.com/assets/pics/cloud_lg.png\x22 crossorigin=\x22anonymous\x22>"+
+                                // "<img id=\x22fireballSheet\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/pics/fireball-up.png\x22 crossorigin=\x22anonymous\x22></img>"+
+                                // "<img id=\x22fireball\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/pics/fireball.png\x22 crossorigin=\x22anonymous\x22></img>"+
+                                // "<img id=\x22fireanim1\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/pics/fireanim3.png\x22 crossorigin=\x22anonymous\x22></img>"+
+                                // "<img id=\x22torchanim1\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/pics/firetorchanim2.png\x22 crossorigin=\x22anonymous\x22></img>"+
+                                // "<img id=\x22candle1\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/pics/candle_flame_8x8.png\x22 crossorigin=\x22anonymous\x22></img>"+
+                                // "<img id=\x22water\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/pics/water2c.jpeg\x22 crossorigin=\x22anonymous\x22>"+
+                                // "<img id=\x22water1\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/pics/watertile3.png\x22 crossorigin=\x22anonymous\x22>"+
+                                // "<img id=\x22water2\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/pics/water2.png\x22 crossorigin=\x22anonymous\x22>"+
+                                // "<img id=\x22raindrop2\x22 src=\x22http://servicemedia.s3.amazonaws.com/assets/pics/raindrop2.png\x22 crossorigin=\x22anonymous\x22>"+
+                                // "<img id=\x22raindrop\x22 src=\x22http://servicemedia.s3.amazonaws.com/assets/pics/raindrop.png\x22 crossorigin=\x22anonymous\x22>"+
+                                // "<img id=\x22explosion1\x22 src=\x22http://servicemedia.s3.amazonaws.com/assets/pics/explosion1.png\x22 crossorigin=\x22anonymous\x22>"+
+                                // "<img id=\x22fireworksanim1\x22 src=\x22http://servicemedia.s3.amazonaws.com/assets/pics/fireworks_sheet.png\x22 crossorigin=\x22anonymous\x22>"+
+                                // "<img id=\x22smoke1\x22 src=\x22http://servicemedia.s3.amazonaws.com/assets/pics/smokeanim2.png\x22 crossorigin=\x22anonymous\x22>"+
+                                // "<img id=\x22fireball-up\x22 src=\x22http://servicemedia.s3.amazonaws.com/assets/pics/fireball-up.png\x22 crossorigin=\x22anonymous\x22>"+
+                                // "<img id=\x22fireball1\x22 src=\x22http://servicemedia.s3.amazonaws.com/assets/pics/fireball.png\x22 crossorigin=\x22anonymous\x22>"+
+                                // "<img id=\x22sparkle1\x22 src=\x22http://servicemedia.s3.amazonaws.com/assets/pics/sparkle.png\x22 crossorigin=\x22anonymous\x22>"+
+                                // "<img id=\x22blob1\x22 src=\x22http://servicemedia.s3.amazonaws.com/assets/pics/blob.png\x22 crossorigin=\x22anonymous\x22>"+
+                                // "<img id=\x22fog1\x22 src=\x22http://servicemedia.s3.amazonaws.com/assets/pics/fog-256.png\x22 crossorigin=\x22anonymous\x22>"+
+                                // "<img id=\x22cloud1\x22 src=\x22http://servicemedia.s3.amazonaws.com/assets/pics/cloud_lg.png\x22 crossorigin=\x22anonymous\x22>"+
                                 
                           // USED FOR TERRAIN, REM FOR NOW...
                         // "<img id=\x22heightmap\x22 src=\x22https://realitymangler.com/assets/heightmaps/hm4.png\x22 crossorigin=\x22anonymous\x22>"+
@@ -4735,744 +4743,5 @@ webxr_router.get('/:_id', function (req, res) {
 
 
 
-
-//this one tries to write everything to an s3 bucket as static files, predates serverside version above, deprecated (or at least rusty...)
-/*
-webxr_router.get('/update_aframe_scene/:_id', requiredAuthentication, function (req, res) { //TODO lock down w/ checkAppID, requiredAuthentication 
-
-    console.log("tryna update webxr scene id: ", req.params._id + " excaped " + entities.decodeHTML(req.params._id));
-
-    var reqstring = entities.decodeHTML(req.params._id);
-    var audioResponse = {};
-    var pictureResponse = {};
-    var postcardResponse = {};
-    var sceneResponse = {};
-    var requestedPictureItems = [];
-    var requestedAudioItems = [];
-    var requestedVideoItems = [];
-    var requestedTextItems = [];
-    sceneResponse.audio = [];
-    sceneResponse.pictures = [];
-    sceneResponse.postcards = [];
-    var sceneOwnerID = "";
-    var mp3url = "";
-    var oggurl = "";
-    var pngurl = "";
-    var mp4url = "";
-    var postcard1 = "";
-    var image1url = "";
-    var short_id = "";
-    var picArray = [];
-    var imageAssets = "";
-    var imageEntities = "";
-    var skyboxUrl = "";
-    var skyboxID = "";
-    var skySettings = "";
-    var fogSettings = "";
-    var ground = "";
-    var ocean = "";
-    var camera = "";
-    var environment = "";
-    var oceanScript = "";
-    var ARScript = "";
-    var ARSceneArg = "";
-    var ARMarker = "";
-    var randomizerScript = "";
-    var animationComponent = "";
-    var targetObjectAsset = "";
-    var targetObjectEntity = "";
-    var skyParticles;
-    var videoAsset = "";
-    var videoEntity = "";
-    var nextLink = "";
-    var prevLink = "";
-    var loopable = "";
-    var gltfs = {};
-    var sceneGLTFs = [];
-    var allGLTFs = {};
-    var gltfUrl = "";
-    var gltfs = "";
-    var gltfsAssets = "";
-    var gltfsEntities = "";
-    // var gltfItems = [];
-    var bucketFolder = "eloquentnoise.com";
-    var playerPosition = "0 5 0";
-    var style = "<link rel=\x22stylesheet\x22 type=\x22text/css\x22 href=\x22../styles/embedded.css\x22>";
-
-    async.waterfall([
-
-
-                function (callback) {
-                    var o_id = ObjectID(reqstring);
-                    db.scenes.findOne({"_id": o_id},
-                        function (err, sceneData) { //fetch the path info by title TODO: urlsafe string
-
-                            if (err || !sceneData) {
-                                console.log("error getting scene data: " + err);
-                                callback(err);
-                            } else { //make arrays of the pics and audio items
-                                sceneOwnerID = sceneData.user_id;
-                                short_id = sceneData.short_id;
-                                sceneResponse = sceneData;
-                                if (sceneResponse.sceneDomain != null && sceneResponse.sceneDomain != "") {
-                                    bucketFolder = sceneResponse.sceneDomain;
-                                } else {
-                                    callback(err);
-                                }
-                                if (sceneData.scenePictures != null) {
-                                    sceneData.scenePictures.forEach(function (picture) {
-                                        var p_id = ObjectID(picture); //convert to binary to search by _id beloiw
-                                        requestedPictureItems.push(p_id); //populate array
-                                    });
-                                }
-                                if (sceneData.sceneType == "ARKit") {
-                                    ARScript = "<script src=\x22https://raw.githack.com/jeromeetienne/AR.js/1.7.7/aframe/build/aframe-ar.js\x22></script>";
-                                    // ARSceneArg = "arjs=\x22sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3;\x22";           
-                                    ARSceneArg = "arjs='sourceType: webcam;'";                                    
-                                    // ARMarker =  "<a-marker-camera preset='custom' type='pattern' patternUrl='https://nilch.com/markers/pattern-playicon.patt'>" +
-                                    // ARMarker =  "<a-marker-camera type='barcode' value='0'>" +
-                                    ARMarker =  "<a-marker-camera preset='hiro'>" +
-                                                    "<a-box scale='.1 .1 .1' position='0 0.5 0' material='color: yellow;'></a-box>" +
-                                                "</a-marker-camera>";
-                                    // camera = "<a-marker-camera preset='hiro'></a-marker-camera>";
-                                                
-                                } else {
-                                    let wasd = "wasd-controls=\x22fly: false; acceleration: 33;\x22";
-                                    if (sceneResponse.sceneFlyable) {
-                                        "wasd-controls=\x22fly: true; acceleration: 50;\x22";
-                                    }
-                                    camera = "<a-entity id=\x22cameraRig\x22 position=\x220 0 0\x22>"+
-                
-                                    "<a-entity id=\x22head\x22 camera "+wasd+" look-controls touch-controls position=\x220 1.6 0\x22></a-entity>"+
-                                    "<a-entity oculus-touch-controls=\x22hand: left\x22 laser-controls=\x22hand: left;\x22 handModelStyle: lowPoly; color: #ffcccc\x22 raycaster=\x22objects: .activeObjexRay;\x22></a-entity>" +
-                                    "<a-entity oculus-touch-controls=\x22hand: right\x22 id=\x22right-hand\x22 hand-controls=\x22hand: right; handModelStyle: lowPoly; color: #ffcccc\x22 aabb-collider=\x22objects: .activeObjexGrab;\x22 grab></a-entity>"+
-                                    "</a-entity>";
-                                    // camera = "<a-entity position=\x220 3 0\x22 id=\x22cameraRig\x22>" +
-                                   
-                                }
-
-                                sceneResponse.scenePostcards = sceneData.scenePostcards;
-                                if (sceneResponse.sceneColor1 != null && sceneResponse.sceneColor1.length > 3) {
-                                    skySettings = "<a-sky color='" + sceneResponse.sceneColor1 + "'></a-sky>"; //overwritten below if there's a skybox texture
-                                } 
-                                
-                                if (sceneResponse.sceneUseGlobalFog || sceneResponse.sceneUseSceneFog) {
-                                    fogSettings = "fog=\x22type: linear; density:.002; near: 1; far: 50; color: " +sceneResponse.sceneColor1 + "\x22";
-                                }
-//                                if (sceneResponse.sceneUseSkyParticles) { 
-//                                    skyParticles = "<a-entity scale='.5 .5 .5' position='0 3 0' particle-system=\x22preset: dust; randomize: true color: " + sceneResponse.sceneColor1 + "," + sceneResponse.sceneColor2 +"\x22></a-entity>";
-//                                }
-                                if (sceneResponse.sceneRenderFloorPlane) {
-                                    // ground = "<a-plane rotation='-90 0 0' position='0 -1 0' width='100' height='100' color=\x22" + sceneResponse.sceneColor2 + "\x22></a-plane>";
-                                    ground = "<a-plane rotation='-90 0 0' position='0 -1 0' width='100' height='100'></a-plane>";
-                                }
-                                if (sceneResponse.sceneWater != null && sceneResponse.sceneWater.name != "none") {
-                                    ocean = "<a-ocean width='50' depth='50' density='50' opacity='.7' position='0 3 0'></a-ocean>";
-                                }
-                                // if (sceneResponse.sceneUseTargetObject && sceneResponse.sceneTargetObject.name == "gltftest" ) {
-                                //     targetObjectAsset = "<a-asset-item id=\x22targetObj\x22 src=\x22../assets/models/korkus/KorkusOnly.gltf\x22></a-asset-item>";
-                                //     targetObjectEntity = "<a-entity class=\x22gltf\x22 gltf-model=\x22#targetObj\x22 position='-5 5 5'></a-entity>";
-                                // }
-                                if (sceneResponse.sceneNextScene != null && sceneResponse.sceneNextScene != "") {
-                                    nextLink = "href=\x22../" + sceneResponse.sceneNextScene + "\x22";
-                                }
-                                if (sceneResponse.scenePreviousScene != null && sceneResponse.scenePreviousScene != "") {
-                                    prevLink = "href=\x22../" + sceneResponse.scenePreviousScene + "\x22";
-                                }
-                                if (sceneResponse.sceneLoopPrimaryAudio) {
-                                    loopable = "loop='true'";
-                                }
-                                if (sceneResponse.sceneLocations != null && sceneResponse.sceneLocations.length > 0) {
-                                    for (var i = 0; i < sceneResponse.sceneLocations.length; i++) {
-                                        if (sceneResponse.sceneLocations[i].markerType == "gltf") {
-                                            sceneGLTFs.push(sceneResponse.sceneLocations[i]);
-                                            if (sceneResponse.sceneLocations[i].eventData != null && sceneResponse.sceneLocations[i].eventData.length > 4) {
-                                                animationComponent = "<script src=\x22https://unpkg.com/aframe-animation-component@5.1.2/dist/aframe-animation-component.min.js\x22></script>";
-                                            }
-                                        }
-                                        if (sceneResponse.sceneLocations[i].markerType == "player") {
-                                            playerPosition = sceneResponse.sceneLocations[i].x + " " + sceneResponse.sceneLocations[i].y + " " + sceneResponse.sceneLocations[i].z;
-                                        }
-                                    }
-                                }
-                                if (sceneData.scenePrimaryAudioID != null && sceneData.scenePrimaryAudioID.length > 4) {
-                                    var pid = ObjectID(sceneData.scenePrimaryAudioID);
-                                    console.log("tryna get [ObjectID(sceneData.scenePrimaryAudioID)]" + ObjectID(sceneData.scenePrimaryAudioID));
-                                    requestedAudioItems.push(ObjectID(sceneData.scenePrimaryAudioID));
-
-//                                  sceneResponse = sceneData[0];
-                                    // console.log(JSON.stringify(requestedAudioItems));
-                                }
-                                callback();
-                                
-                            }
-                            // callback();
-
-                        });
-            },
-       
-            function (callback) {
-                if (sceneGLTFs.length > 0) {
-                    var assetNumber = 1;
-                    var scale = 1;
-                                var offsetPos = "";
-                                var rotAnim = "";
-                                var posAnim = "";
-                                var rightRot = true;
-                                var rotVal = 360;
-                                var objAnim = "";
-                    async.each (sceneGLTFs, function (r, callbackz) { //loop tru w/ async
-                        // for (var i = 0; i < sceneGLTFs)
-                        var sourcePath =   "servicemedia/users/" + sceneOwnerID + "/gltf/" + r.gltf;
-                        console.log("tryna copy " + sourcePath);
-                        // var assetURL = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: fileKey, Expires: 60000});
-                        // itme.url = assetURL;
-                        assetNumber++;
-                        var assetID = "gltfasset" + assetNumber;
-                        // gltfItems.push(itme);
-                        // gltfs = gltfs + "<a-gltf-model src=\x22" + assetURL + "\x22 crossorigin=\x22anonymous\x22 position =\x22"+r.x+" "+r.y+" "+r.z+"\x22></a-gltf-model>";
-                        // gltfsAssets = gltfsAssets + "<a-asset-item id=\x22" + assetID + "\x22 src=\x22"+ assetURL +"\x22></a-asset-item>";
-                        // gltfsEntities = gltfsEntities + "<a-entity class=\x22gltf\x22 gltf-model=\x22#" + assetID + "\x22></a-entity>";
-                        // console.log("sceneGLTFs: " + gltfs);
-                        s3.copyObject({Bucket: bucketFolder, CopySource: sourcePath, Key: short_id +"/"+ r.gltf}, function (err,data){
-                            if (err) {
-                                console.log("ERROR copyObject");
-                                console.log(err);
-                                callbackz(err);
-                            } else {
-                                console.log('SUCCESS copyObject' + JSON.stringify(data));
-                                randomizerScript = "<script src=\x22https://unpkg.com/aframe-randomizer-components@3.0.2/dist/aframe-randomizer-components.min.js\x22></script>;"
-                                
-                                if (r.markerObjScale != null && r.markerType != undefined){
-                                    scale = r.markerObjScale;
-                                }
-                                if (r.eventData != null && r.eventData != undefined && r.eventData.length > 4) { //eventData has anim 
-                                    console.log("!!!tryna setup animation " + r.eventData);
-
-                                    rightRot = !rightRot;
-                                    if (rightRot == true) {
-                                        rotVal = -360;
-                                    }
-                                    var eSplit = r.eventData.split("~");
-                                    if (eSplit[0] == "orbit") { 
-
-                                        offsetPos =  "<a-entity position=\x22"+ eSplit[1] + " 0 0\x22></a-entity>";
-                                        // rotAnim = " rotation=\x220 0 0\x22 animation=\x22property: rotation; to: 0 " + rotVal + " 0; repeat=\x22indefinite\x22 easing=\x22linear\x22 dur: 20000\x22 ";
-                                        rotAnim = " animation__rot=\x22property:rotation; dur:3000; to:0 360 0; loop: true; easing:linear;\x22 ";                                    
-                                        posAnim = " animation__pos=\x22property: position; to: random-position; dur: 15000; loop: true;\x22 ";
-                                    }
-                                }
-                                gltfsAssets = gltfsAssets + "<a-asset-item id=\x22" + assetID + "\x22 src=\x22"+ r.gltf +"\x22></a-asset-item>";
-                                gltfsEntities = gltfsEntities + "<a-entity class=\x22gltf\x22 gltf-model=\x22#" + assetID + "\x22 position =\x22"+r.x+" "+r.y+" "+r.z+"\x22 random-rotation scale=\x22"+scale+" "+scale+" "+scale+"\x22 " + posAnim + " " + rotAnim + " " + objAnim + ">" + offsetPos + "</a-entity>";
-                                callbackz();
-                            }
-                        });
-                        
-                    }, function(err) {
-                       
-                        if (err) {
-                            console.log('A file failed to process');
-                            callbackz(err);
-                        } else {
-                            console.log('All files have been processed successfully');
-                            // gltfItems.reverse();
-                            // rezponze.gltfItems = gltfItems;
-                            callback(null);
-                        }
-                    });
-                } else {
-                    callback();
-                }
-            },
-            function (callback) {
-                if (sceneResponse.sceneNextScene != null && sceneResponse.sceneNextScene != "") {
-                    db.scenes.findOne({$or: [ { short_id: sceneResponse.sceneNextScene }, { sceneTitle: sceneResponse.sceneNextScene } ]}, function (err, scene) {
-                        if (scene == err) {
-                            console.log("didn't find that scene");
-                        } else {
-                            nextLink = "href=\x22../" + scene.short_id + "/index.html\x22";    
-                        }
-                    }); 
-                }
-                if (sceneResponse.scenePreviousScene != null && sceneResponse.scenePreviousScene != "") {
-                    db.scenes.findOne({$or: [ { short_id: sceneResponse.scenePreviousScene }, { sceneTitle: sceneResponse.scenePreviousScene } ]}, function (err, scene) {
-                        if (scene == err) {
-                            console.log("didn't find that scene");
-                        } else {
-                            prevLink = "href=\x22../" + scene.short_id + "/index.html\x22";    
-                        }
-                    }); 
-                }
-                callback();
-            },
-
-            function (callback) { //fethc audio items
-
-                    db.audio_items.find({_id: {$in: requestedAudioItems }}, function (err, audio_items) {
-                        if (err || !audio_items) {
-                            console.log("error getting audio items: " + err);
-                            callback(null);
-                        } else {
-
-                            callback(null, audio_items) //send them along
-                        }
-                    });
-            },
-            
-            function (audio_items, callback) { //add the signed URLs to the obj array
-                    for (var i = 0; i < audio_items.length; i++) {
-                        console.log("audio_item: ", audio_items[i]);
-                        var item_string_filename = JSON.stringify(audio_items[i].filename);
-                        item_string_filename = item_string_filename.replace(/\"/g, "");
-                        var item_string_filename_ext = getExtension(item_string_filename);
-                        var expiration = new Date();
-                        expiration.setMinutes(expiration.getMinutes() + 1000);
-                        var baseName = path.basename(item_string_filename, (item_string_filename_ext));
-                        //console.log(baseName);
-                        var mp3Name = baseName + '.mp3';
-                        var oggName = baseName + '.ogg';
-                        var pngName = baseName + '.png';
-                        s3.copyObject({Bucket: bucketFolder, CopySource: 'servicemedia/users/' + audio_items[i].userID +"/"+ audio_items[i]._id + "." + mp3Name, Key: short_id +"/"+ audio_items[i]._id + "." + mp3Name}, function (err,data){
-                            if (err) {
-                                console.log("ERROR copyObject");
-                                console.log(err);
-                            }
-                            else {
-                                console.log('SUCCESS copyObject');
-                            }
-                        });
-
-                        s3.copyObject({Bucket: bucketFolder, CopySource: 'servicemedia/users/' + audio_items[i].userID +"/"+ audio_items[i]._id + "." + oggName, Key: short_id +"/"+ audio_items[i]._id + "." + oggName}, function (err,data){
-                            if (err) {
-                                console.log("ERROR copyObject");
-                                console.log(err);
-                            }
-                            else {
-                                console.log('SUCCESS copyObject');
-
-                            }
-                        });
-                        s3.copyObject({Bucket: bucketFolder, CopySource: 'servicemedia/users/' + audio_items[i].userID +"/"+ audio_items[i]._id + "." + pngName, Key: short_id +"/"+ audio_items[i]._id + "." + pngName}, function (err,data){
-                            if (err) {
-                                console.log("ERROR copyObject" + err);
-                            }
-                            else {
-                                console.log('SUCCESS copyObject');
-                            }
-                        });
-                        mp3url = audio_items[i]._id + "." + mp3Name;
-                        oggurl = audio_items[i]._id + "." + oggName;
-                        pngurl = audio_items[i]._id + "." + pngName;
-                        console.log("copying audio to s3...");
-                    }
-
-                    callback(null);
-                },
-            function (callback) {
-                    if (mp3url == null || mp3url == undefined || mp3url.length < 10) {
-                        if (sceneResponse.scenePrimaryAudioStreamURL != null && sceneResponse.scenePrimaryAudioStreamURL.length > 8 ) {
-                            mp3url = sceneResponse.scenePrimaryAudioStreamURL + "/stream";   
-                            oggurl = sceneResponse.scenePrimaryAudioStreamURL + "/stream";                    
-                            callback();
-                        } else {
-                            callback();
-                        }
-                    } else {
-                        callback();
-                    }  
-            },
-            function (callback) { //fethc video items
-                if (sceneResponse.sceneVideos != null) {
-                    sceneResponse.sceneVideos.forEach(function (vid) {
-                        console.log("looking for sceneVideo : " + JSON.stringify(vid));
-                        var p_id = ObjectID(vid); //convert to binary to search by _id beloiw
-                        requestedVideoItems.push(p_id); //populate array
-                    });
-                    db.video_items.find({_id: {$in: requestedVideoItems}}, function (err, video_items) {
-                        if (err || !video_items) {
-                            console.log("error getting video items: " + err);
-                            callback(null, new Array());
-                        } else {
-                            console.log("gotsome video items: " + JSON.stringify(video_items[0]));
-
-                            callback(null, video_items) //send them along
-                        }
-                    });
-                } else {
-                    callback(null, new Array());
-                }
-            },
-
-            function (video_items, callback) { //add the signed URLs to the obj array
-
-                    //for (var i = 0; i < 1; i++) { //only do first one for now..
-                        if (video_items != null && video_items[0] != null) {
-                            console.log("video_item: " + JSON.stringify(video_items[0]));
-                            var item_string_filename = JSON.stringify(video_items[0].filename);
-                            item_string_filename = item_string_filename.replace(/\"/g, "");
-                            var item_string_filename_ext = getExtension(item_string_filename);
-                            var expiration = new Date();
-                            expiration.setMinutes(expiration.getMinutes() + 1000);
-                            var baseName = path.basename(item_string_filename, (item_string_filename_ext));
-                            //console.log(baseName);
-                            var mp4Name = baseName + '.mp4';
-                            console.log("mp4 video: " + mp4Name + " " + video_items[0]._id);
-                            var vid = video_items[0]._id;
-                            var ori = video_items[0].orientation != null ? video_items[0].orientation : "";
-                            mp4url = vid + "." + mp4Name;
-                            s3.copyObject({
-                                Bucket: bucketFolder,
-                                CopySource: 'servicemedia/users' + video_items[0].userID + "/" + video_items[0]._id + "." + mp4Name,
-                                Key: short_id + "/" + video_items[0]._id + "." + mp4Name
-                            }, function (err, data) {
-                                if (err) {
-                                    console.log("ERROR copyObject");
-                                    console.log(err);
-                                    callback(null);
-                                } else {
-                                    console.log('SUCCESS copyObject for video item ');
-
-//                                    videoAsset = "<video id=\x22video1\x22 src=\x22" + mp4url + "\x22 autoplay='true' loop='true'>";
-                                    if (ori == "equirectangular") {
-                                        videoEntity = "<a-videosphere src=\x22" + mp4url + "\x22 rotation=\x220 180 0\x22 material=\x22shader: flat; transparent: true;\x22></a-videosphere>";
-//                                        skySettings = "transparent='true'";
-                                    } else {
-                                        videoEntity = "<a-video src=\x22#video1\x22 position='5 5 -5' width='8' height='4.5' look-at=\x22#player\x22></a-video>";
-                                    }
-                                    console.log("copying video to s3...");
-                                    callback(null);
-
-                                }
-                            });
-                    } else {
-                        callback(null);
-                    }
-            },
-
-            function (callback) {
-                var postcards = [];
-                console.log("sceneResponse.scenePostcards: " + JSON.stringify(sceneResponse.scenePostcards));
-                if (sceneResponse.scenePostcards != null && sceneResponse.scenePostcards.length > 0) {
-                    var index = 0;
-                    async.each(sceneResponse.scenePostcards, function (postcardID, callbackz) { //nested async-ery!
-                        var oo_id = ObjectID(postcardID);
-
-                        db.image_items.findOne({"_id": oo_id}, function (err, picture_item) {
-                            if (err || !picture_item) {
-                                console.log("error getting postcard " + postcardID + err);
-                                callbackz();
-                            } else {
-
-                                s3.copyObject({Bucket: bucketFolder, CopySource: 'servicemedia/users/' + picture_item.userID +"/"+ picture_item._id + ".standard." + picture_item.filename,
-                                    Key: short_id +"/"+ picture_item._id + ".standard." + picture_item.filename}, function (err, data) {
-                                    if (err) {
-                                        console.log("ERROR copyObject" + err);
-                                    }
-                                    else {
-                                        console.log('SUCCESS copyObject');
-
-                                    }
-
-                                });
-                                index++;
-                                postcard1 = picture_item._id + ".standard." + picture_item.filename;
-//                                picArray.push(image1url);
-//                                imageAssets = imageAssets + "<img id=\x22smimage" + index + "\x22 src='"+ image1url +"'>";
-//                                imageEntities = imageEntities + "<a-image look-at=\x22#player\x22 width='10' segments-height='4' segments-width='2' height='10' position='-2 6 2' rotation='0 180 0' visible='true' src=\x22#smimage" + index + "\x22></a-image>";
-                                callbackz();
-                            }
-                        });
-                        },
-                        function (err) {
-                       
-                            if (err) {
-                                console.log('A file failed to process');
-                                callback(null);
-                            } else {
-                                console.log('All files have been processed successfully');
-                                callback(null);
-                            }
-                        });
-                    } else {
-    //                      callback(null);
-                        callback(null);
-                    }
-         },
-            function (callback) {
-                var postcards = [];
-                console.log("sceneResponse.scenePictures: " + JSON.stringify(sceneResponse.scenePictures));
-                if (sceneResponse.scenePictures != null && sceneResponse.scenePictures.length > 0) {
-                    var index = 0;
-                    async.each(sceneResponse.scenePictures, function (picID, callbackz) { //nested async-ery!
-                            var oo_id = ObjectID(picID);
-
-                            db.image_items.findOne({"_id": oo_id}, function (err, picture_item) {
-                                if (err || !picture_item) {
-                                    console.log("error getting scenePictures " + picID + err);
-                                    callbackz();
-                                } else {
-                                    console.log("tryna copy picID " + picID + " orientation " + picture_item.orientation);
-                                    var version = ".standard.";
-                                    if (picture_item.orientation == "equirectangular") {
-                                        skyboxID = picID;
-                                        version = ".original.";
-                                    }
-                                    s3.copyObject({Bucket: bucketFolder, CopySource: 'servicemedia/users/' + picture_item.userID +"/"+ picture_item.filename, //use full rez pic for skyboxen
-                                        Key: short_id +"/"+ picture_item._id + version + picture_item.filename}, function (err, data) {
-                                        if (err) {
-                                            console.log("ERROR copyObject" + err);
-                                        } else {
-                                            console.log('SUCCESS copyObject');
-                                        }
-                                    });
-                                    if (picture_item.orientation != "equirectangular") {
-                                        index++;
-                                        image1url = picture_item._id + ".standard." + picture_item.filename;
-                                        picArray.push(image1url);
-                                        imageAssets = imageAssets + "<img id=\x22smimage" + index + "\x22 src='" + image1url + "'>";
-                                        imageEntities = imageEntities + "<a-image look-at=\x22#player\x22 width='10' segments-height='4' segments-width='2' height='10' position='-2 6 2' rotation='0 180 0' visible='true' src=\x22#smimage" + index + "\x22></a-image>";
-                                    }
-                                    callbackz();
-                                }
-                            });
-                        },
-                        function (err) {
-                           
-                            if (err) {
-                                console.log('A file failed to process');
-                                callback(null);
-                            } else {
-                                console.log('All files have been processed successfully');
-                                callback(null);
-                            }
-                        });
-                } else {
-                    //                      callback(null);
-                    callback(null);
-                }
-            },
-
-            function (callback) {
-
-//                if (sceneResponse.sceneUseSkybox && sceneResponse.sceneSkybox != null) {
-//                    if (sceneResponse.sceneUseSkybox) {
-                            if (skyboxID != "") {
-                                var oo_id = ObjectID(skyboxID);
-                            } else {
-                                if (sceneResponse.sceneSkybox != null && sceneResponse.sceneSkybox != "")
-                                var oo_id = ObjectID(sceneResponse.sceneSkybox);
-                            }
-
-                            if (oo_id) {
-
-                                db.image_items.findOne({"_id": oo_id}, function (err, picture_item) {
-                                    if (err || !picture_item) {
-                                        console.log("error getting skybox " + sceneResponse.sceneSkybox + err);
-                                        callback(null);
-                                    } else {
-
-                                        s3.copyObject({Bucket: bucketFolder, CopySource: 'servicemedia/users/' + picture_item.userID + "/" + picture_item.filename,
-                                            Key: short_id + "/" + picture_item._id + ".original." + picture_item.filename}, function (err, data) {
-                                            if (err) {
-                                                console.log("ERROR copyObject" + err);
-                                            }
-                                            else {
-                                                console.log('SUCCESS copyObject');
-
-                                            }
-
-                                        });
-//                                    skyboxAsset = "<img id=\x22smskybox"\x22 src='" + skyboxUrl + "'>";
-//                                    skyboxEntity = "<a-image look-at=\x22#player\x22 width='10' segments-height='4' segments-width='2' height='10' position='-2 6 2' rotation='0 180 0' visible='true' src=\x22#smimage" + index + "\x22></a-image>";
-                                        skyboxUrl = picture_item._id + ".original." + picture_item.filename;
-                                        skySettings = "<a-sky hide-in-ar-mode src=#sky></a-sky>";
-                                        callback(null);
-                                    }
-                                });
-                            } else {
-                                callback(null);
-                            }
-//                } else {
-//                    //                      callback(null);
-//                    callback(null);
-//                }
-            },
-
-            function (callback) {
-                var playButton = "<script>" +
-                "AFRAME.registerComponent('playbutton', {" +
-                "schema: {" + 
-                  "'target': {type: 'selector'}, " +
-                    "}," +
-                  "init: function () {" +
-                  "var play=false;    " +
-                  "var mAudio = document.getElementById(\x22mainaudio\x22);" +
-                    "this.el.addEventListener(\x22click\x22,()=>{" +
-                    "if(play){" +
-                        "console.log(\x22tryna play\x22);" +
-                        "mAudio.play();" +
-                        //   "this.data.target.setAttribute(\x22visible\x22,\x22false\x22);" +
-                        // "this.el.querySelector(\x22a\x22).innerHTML=\x22Play\x22;" +
-                        "}else{" +
-                        "console.log(\x22tryna pause\x22);" +
-                        "mAudio.pause();" +
-                    //   "this.data.target.setAttribute(\x22visible\x22,\x22true\x22);" +
-                    //   " this.el.querySelector(\x22a\x22).innerHTML=\x22Pause\x22;" +
-                        "}" +
-                      "play=!play;" +
-                      "});" +
-                    "  }" +
-                "});" +
-                "</script>";
-                var embeddedHTML = "<div class=\x22screen dark main\x22>" +                
-                // "<ul>" +
-                // "<li>" +
-                "<a class=\x22button\x22 href=\x22http://" + sceneResponse.sceneDomain + "\x22>Home</a>" +
-                // "</li>" +
-                // "<li>" +
-                "<a class=\x22button\x22 href=\x22http://" + sceneResponse.sceneDomain + "/" + sceneResponse.short_id + "/index.html\x22>" + sceneResponse.sceneTitle + " : " + sceneResponse.short_id + "</a>" +
-                // "</li>" +
-                // "<li>" +
-                "<a-entity playbutton><a class=\x22button\x22 href=\x22javascript:void(0)\x22>Play Main Audio</a></a-entity>" +
-                // "<audio controls " + loopable + " id=\x22mainaudio\x22>" +
-                //  "<source src='" + oggurl + "'type='audio/ogg'>" +
-                //  "<source src='" + mp3url + "'type='audio/mpeg'>" +
-                //  "Your browser does not support the audio element. " +
-                //  "</audio>" +
-                // "</li>" +
-                // "</ul>" +
-                "</div>";
-                var htmltext = "<html xmlns='http://www.w3.org/1999/xhtml'>" +
-                    "<head> " +
-                    "<meta charset='utf-8'/>" +
-                    "<meta name='viewport' content='width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0, shrink-to-fit=no'/>" +
-                    "<meta property='og:url' content='http://" + sceneResponse.sceneDomain + "/" + sceneResponse.short_id + "' /> " +
-                    "<meta property='og:type' content='website' /> " +
-                    "<meta property='og:image' content='http://" + sceneResponse.sceneDomain + "/" + sceneResponse.short_id + "/" + postcard1 + "' /> " +
-                    "<meta property='og:image:height' content='1024' /> " +
-                    "<meta property='og:image:width' content='1024' /> " +
-                    "<meta property='og:title' content='" + sceneResponse.sceneTitle + "' /> " +
-                    "<meta property='og:description' content='" + sceneResponse.sceneDescription + "' /> " +
-                    "<title>" + sceneResponse.sceneTitle + "</title>" +
-                    "<meta name='description' content='" + sceneResponse.sceneDescription + "'/>" +
-                    "<meta name=\x22mobile-web-app-capable\x22 content=\x22yes\x22>" +
-                    "<meta name=\x22apple-mobile-web-app-capable\x22 content=\x22yes\x22>" +
-                    "<meta name='apple-mobile-web-app-status-bar-style' content='black-translucent' />" +
-                    "<meta name='apple-mobile-web-app-status-bar-style' content='black'>" +
-                    "<meta name='robots' content='index,follow'/>" +
-                    // "<script src='../dist/compat.js'></script>" +
-//                    "<script src='../dist/unlockaudio.js'></script>" +
-
-                    "<script src='https://aframe.io/releases/1.0.3/aframe.min.js'></script>" +
-//                    "<script src='../dist/aframe-particle-system-component.min.js'></script>" +
-                    // "<script src='../dist/aframe-href-component.js'></script>" +
-//                    "<script>window.WebVRConfig = {BUFFER_SCALE: 1.0,};</script>"+
-                    // "<script src='https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.0.1/dist/aframe-extras.min.js'></script>" +
-                    "<script src='https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.0.1/dist/aframe-extras.min.js'></script>" +
-                    // <script src="https://unpkg.com/aframe-look-at-component@0.8.0/dist/aframe-look-at-component.min.js"></script>
-                    "<script src='https://unpkg.com/aframe-look-at-component@0.8.x/dist/aframe-look-at-component.min.js'></script>" +
-                    "<script src='https://unpkg.com/aframe-layout-component@4.0.1/dist/aframe-layout-component.min.js'></script>" +
-                    "<script src='https://supereggbert.github.io/aframe-htmlembed-component/dist/build.js'></script>" +
-                    ARScript +
-
-                    "<link rel=\x22stylesheet\x22 href=\x22https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css\x22 integrity=\x22sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm\x22 crossorigin=\x22anonymous\x22></link>"+
-
-                    style +
-                    playButton + 
-                    
-                    "</head>" +
-
-                    "<body bgcolor='black'>" +
-                    "<div style=\x22width:100%; height:100%\x22>"+
-
-                    "<div style=\x22display: none;\x22>" +
-                    "<audio controls " + loopable + " id=\x22mainaudio\x22>" +
-                     "<source src='" + oggurl + "'type='audio/ogg'>" +
-                     "<source src='" + mp3url + "'type='audio/mpeg'>" +
-                     "Your browser does not support the audio element. " +
-                    "</audio>" +
-                    "</div>" +
-                    // "</li>" +
-                    // "</ul>" +
-
-                    // "</nav>" +
-                    // // "<div id=/x22fb-root/x22></div>" +
-//                  "<div style='background-image: url(" + image1url + "); height: 100%; width: 100%; border: 1px solid black;'>" +
-
-                    "<a-scene " + fogSettings + " " + ARSceneArg + " " + environment + ">" +
-                    ARMarker +
-                    camera +
-
-                    "<a-entity look-at=\x22#player\x22 ppc=\x22500\x22 htmlembed position=\x220 6 -6\x22 >" +
-                    // "<div style=\x22bg-light\x22><h1>"+sceneResponse.sceneKeynote+"</h1><p>"+sceneResponse.sceneDescription+"</p></div><img src=\x22"+picArray[0]+"\x22 class=\x22image-thumbnail\x22 alt=\x22image\x22>"+ 
-                    // "<div style=\x22background-color: white;\x22><p style=\x22color:blue;margin:20px;font-size:46px;\x22>"+sceneResponse.sceneKeynote+"</p><p style=\x22color:red;margin:20px;font-size:36px;\x22>"+sceneResponse.sceneDescription+"</p></div>"+
-                    // "<div><h1>"+sceneResponse.sceneKeynote+"</h1><p>"+sceneResponse.sceneDescription+"</p></div>"+ 
-                    
-                    embeddedHTML +
-                    "</a-entity>" +
-
-
-                    ground +
-                    skyParticles +
-                    "<a-assets>" +
-
-                    "<a-asset><img id=\x22sky\x22 src=\x22" + skyboxUrl +"\x22>></a-asset>" +
-                    imageAssets +
-                    "<audio id=\x22song\x22 crossorigin " + loopable + " autoload src=\x22" + mp3url + "\x22></audio>" +
-                    gltfsAssets +
-                    videoAsset +
-//                    targetObjectAsset +
-                    "</a-assets>" +
-
-                    gltfsEntities + 
-                    "<a-entity position='0 3.5 0' layout=\x22type: circle; radius: 30\x22>" +
-                    imageEntities +
-                    "</a-entity>" +
-//                    targetObjectEntity +
-                    videoEntity +
-
-                    "<a-sound position='2 5 2'" + loopable +  "sound='src: #song' autoplay='true'></a-sound>" +
-//                    "<a-entity ring-on-beat=\x22analyserEl: #audioanalyser; position='0 4 0'></a-entity>"+
-//                    "<a-sphere material=\x22 sphericalEnvMap:\x22" + skyboxUrl + "\x22 roughness: 0 transparent='true' opacity='.9'\x22 audioanalyser-volume-scale=\x22analyserEl: #audioanalyser; multiplier: .005\x22 color=\x22" + sceneResponse.sceneColor2 + "\x22 radius='5' position='0 10 0'></a-sphere>"+
-//                    "<a-gltf-model src='../assets/models/heart1/heart1.gltf' position='4 10 -4' rotation='-90 0 0' color='red'></a-gltf-model>" +
-//                    "<a-curvedimage src='#my-image' height='3.0' radius='5.7' theta-length='72' 'rotation='0 100 0' scale='0.8 0.8 0.8'></a-curvedimage>"+d
-
-                    // "<a-sky src=\x22" + skyboxUrl + "\x22 color='" + sceneResponse.sceneColor1 + "'></a-sky>" +
-
-                    skySettings +
-
-                    "<a-light type='ambient' color='" + sceneResponse.sceneColor2 + "'></a-light>" +
-                    "<a-light color='" + sceneResponse.sceneColor2 + "' distance='100' intensity='0.4' type='point'></a-light>" +
-                    "<a-light color='" + sceneResponse.sceneColor2 + "' position='3 10 -10' distance='50' intensity='0.4' type='point'></a-light>" +
-
-                    "<12234>" +
-                    "</div>" +
-
-                    "<script src=\x22https://code.jquery.com/jquery-3.2.1.slim.min.js\x22 integrity=\x22sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN\x22 crossorigin=\x22anonymous\x22></script>" +
-                    // "<script src=\x22https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js\x22 integrity=\x22sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q\x22 crossorigin=\x22anonymous\x22></script>" +
-                    "<script src=\x22https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js\x22 integrity=\x22sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl\x22 crossorigin=\x22anonymous\x22></script>" +
-                    "</body>" +
-
-                "</html>";
-                s3.putObject({ Bucket: bucketFolder, Key: short_id+"/"+"webxr.html", Body: htmltext,  ContentType: 'text/html;charset utf-8', ContentEncoding: 'UTF8' }, function (err, data) {
-                    console.log('uploaded');
-                    callback(null);
-                });
-
-
-            }
-        ], //waterfall end
-
-        function (err, result) { // #last function, close async
-            if (err != null) {
-                res.send("error!! " + err);
-            } else {
-                res.send("generated");
-                console.log("webxr gen done: " + result);
-            }
-        }
-    );
-});
-*/
 
 module.exports = webxr_router;
