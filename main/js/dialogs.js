@@ -1270,10 +1270,10 @@ function SceneManglerModal(mode) {
     }
     let ownerButton = "";
     if (userData.sceneOwner == "indaehoose") {
-        ownerButton = "<button class=\x22addButton\x22 id=\x22editButton\x22><a href=\x22../main/?type=scene&iid="+userData.sceneID+"\x22>Edit Scene</a></button>"+
-        "<button class=\x22reallySaveButton\x22 onclick=\x22SaveModsToCloud()\x22>Save Mods To Cloud</button>";
+        ownerButton = "<button style=\x22float: right;\x22 class=\x22addButton\x22 id=\x22editButton\x22><a href=\x22../main/?type=scene&iid="+userData.sceneID+"\x22>Edit Scene</a></button>"+
+        "<button style=\x22float: right;\x22 class=\x22reallySaveButton\x22 onclick=\x22SaveModsToCloud()\x22>Save Mods To Cloud</button>";
     }
-    let oculusButton = "<button class=\x22addButton\x22 id=\x22oculusButton\x22><a href=\x22https://www.oculus.com/open_url/?url=https%3A%2F%2Fservicemedia.net/webxr/"+room+"\x22>Open on Oculus Quest</a></button>";
+    let oculusButton = "<button style=\x22float: right;\x22 class=\x22addButton\x22 id=\x22oculusButton\x22><a href=\x22https://www.oculus.com/open_url/?url=https%3A%2F%2Fservicemedia.net/webxr/"+room+"\x22>Open on Oculus Quest</a></button>";
     let tabs ="<div class=\x22tab\x22>" +
     "<button class=\x22tablinks\x22 onclick=\x22TabMangler(event, 'Welcome')\x22>Welcome</button>"+
     // "<button class=\x22tablinks\x22 onclick=\x22TabMangler(event, 'Quests')\x22>Quests</button>"+
@@ -1369,22 +1369,23 @@ function SceneManglerModal(mode) {
       // "<button class=\x22saveButton\x22 id=\x22exportButton\x22 onclick=\x22ExportMods()\x22>Export Mods</button>"+
       // "<label for=\x22file-upload\x22 class=\x22custom-file-upload\x22>Import Mods</label>"+
       // "<input type=\x22file\x22 id=\x22file-upload\x22 accept=\x22.txt\x22 onchange=\x22ImportMods(event)\x22></input>"+
-        ownerButton +
-      "<button class=\x22goToButton\x22 id=\x22statsButton\x22 onclick=\x22ToggleStats()\x22>Show Stats</button>"+
-      "<button class=\x22goToButton\x22 id=\x22statsButton\x22 onclick=\x22ToggleStats()\x22>Show Raycasts</button>"+
-      "<button class=\x22goToButton\x22 id=\x22statsButton\x22 onclick=\x22ToggleStats()\x22>Show Colliders</button>"+
-      "<button class=\x22uploadButton\x22 id=\x22curvesButton\x22 onclick=\x22ToggleShowCurves()\x22>Show Curves</button>"+
+        // ownerButton +
+      "<button style=\x22float: right;\x22 class=\x22goToButton\x22 id=\x22statsButton\x22 onclick=\x22ToggleStats()\x22>Show Stats</button>"+
+      // "<button class=\x22goToButton\x22 id=\x22statsButton\x22 onclick=\x22ToggleStats()\x22>Show Raycasts</button>"+
+      // "<button class=\x22goToButton\x22 id=\x22statsButton\x22 onclick=\x22ToggleStats()\x22>Show Colliders</button>"+
+      // "<button class=\x22uploadButton\x22 id=\x22curvesButton\x22 onclick=\x22ToggleShowCurves()\x22>Show Curves</button>"+
     "</div><hr>"+
     // "<button class=\x22addButton\x22 id=\x22TimekeysButton\x22 onclick=\x22ShowTimekeysModal()\x22>Edit Timekeys</button>"+
     audioSliders +
     ReturnColorButtons() +
 
     "<hr><div class=\x22row\x22>"+
-    "<button class=\x22saveButton\x22 id=\x22exportButton\x22 onclick=\x22ExportMods()\x22>Export Mods</button>"+
-    "<label for=\x22file-upload\x22 class=\x22custom-file-upload\x22>Import Mods</label>"+
+    "<button style=\x22float: left;\x22 class=\x22saveButton\x22 id=\x22exportButton\x22 onclick=\x22ExportMods()\x22>Export Mods</button>"+
+    "<label style=\x22float: left;\x22 for=\x22file-upload\x22 class=\x22custom-file-upload\x22>Import Mods</label>"+
     "<input type=\x22file\x22 id=\x22file-upload\x22 accept=\x22.txt\x22 onchange=\x22ImportMods(event)\x22></input>"+
     "<button class=\x22deleteButton\x22 id=\x22ClearAllPlaceholdersButton\x22 onclick=\x22ClearPlaceholders()\x22>Clear All Mods</button>" +
     "<button class=\x22deleteButton\x22 id=\x22ClearAllPlaceholdersButton\x22 onclick=\x22ClearPlaceholders()\x22>Clear Scene Mods</button>"+
+    ownerButton +
       // "<div class=\x22twocolumn\x22><label for=\x22addpic\x22>Add Picture Asset</label><button class=\x22addButton\x22 id=\x22AddPicButton\x22 onclick=\x22AddPicture()\x22>Add</button>"+
       // "<button class=\x22uploadButton\x22 id=\x22UpoadPicButton\x22 onclick=\x22UploadPicture()\x22>Upload</button>"+
       // "<input class=\x22addfield\x22 type=\x22text\x22 id=\x22addpic\x22 placeholder=\x22picture URL or IPFS\x22></div>"+

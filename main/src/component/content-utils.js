@@ -2669,6 +2669,7 @@ AFRAME.registerComponent('mod_object', {
       
     }
 
+    this.el.setAttribute("shadow", {cast:true, receive:true});
 
     this.thirdPersonPlaceholder = null;
     // this.sceneInventoryID = null;
@@ -2973,6 +2974,7 @@ AFRAME.registerComponent('mod_object', {
         this.moveOnCurve(); //todo fix quats!
       }
       if (this.data.objectData.physics != undefined && this.data.objectData.physics != null && this.data.objectData.physics.toLowerCase() != "none") {
+        console.log("tryna add physics to mod_objecty " + JSON.stringify(this.data.objectData));
         //  setTimeout(function(){  
           if (this.data.isEquipped) {
             // this.el.setAttribute('ammo-body', {type: 'kinematic', linearDamping: .1, angularDamping: .1});
