@@ -1979,9 +1979,20 @@ webxr_router.get('/:_id', function (req, res) {
                                                 cb(null);
                                             }
                                         },
-                                        // function (cb) {
-                                            
-                                        // },
+                                        function (cb) { //sprite sheets for object particle systems
+                                            if (objekt.particles != undefined && objekt.particles != null && objekt.particles != "None" ) {
+                                                if (objekt.particles.toString().includes("Fire")) {
+                                                    imageAssets = imageAssets + "<img id=\x22fireanim1\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/pics/fireanim3.png\x22 crossorigin=\x22anonymous\x22></img>";
+                                                }
+                                                if (objekt.particles.toString().includes("Candle")) {
+                                                    imageAssets = imageAssets + "<img id=\x22candle1\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/pics/candle_flame_8x8.png\x22 crossorigin=\x22anonymous\x22></img>";
+                                                }
+                                                if (objekt.particles.toString().includes("Smoke")) {
+                                                    imageAssets = imageAssets + "<img id=\x22smoke1\x22 src=\x22http://servicemedia.s3.amazonaws.com/assets/pics/smokeanim2.png\x22 crossorigin=\x22anonymous\x22>";
+                                                }
+                                            }
+                                            cb(null);
+                                        },
                                         function(cb) {
                                          //get the model (needs array flexing!)
                                         if (objekt.modelID != undefined && objekt.modelID != null) {
@@ -4553,7 +4564,7 @@ webxr_router.get('/:_id', function (req, res) {
                                 // "<img id=\x22fireball\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/pics/fireball.png\x22 crossorigin=\x22anonymous\x22></img>"+
                                 // "<img id=\x22fireanim1\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/pics/fireanim3.png\x22 crossorigin=\x22anonymous\x22></img>"+
                                 // "<img id=\x22torchanim1\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/pics/firetorchanim2.png\x22 crossorigin=\x22anonymous\x22></img>"+
-                                "<img id=\x22candle1\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/pics/candle_flame_8x8.png\x22 crossorigin=\x22anonymous\x22></img>"+
+                                // "<img id=\x22candle1\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/pics/candle_flame_8x8.png\x22 crossorigin=\x22anonymous\x22></img>"+
                                 // "<img id=\x22water\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/pics/water2c.jpeg\x22 crossorigin=\x22anonymous\x22>"+
                                 // "<img id=\x22water1\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/pics/watertile3.png\x22 crossorigin=\x22anonymous\x22>"+
                                 // "<img id=\x22water2\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/pics/water2.png\x22 crossorigin=\x22anonymous\x22>"+
@@ -4561,7 +4572,7 @@ webxr_router.get('/:_id', function (req, res) {
                                 // "<img id=\x22raindrop\x22 src=\x22http://servicemedia.s3.amazonaws.com/assets/pics/raindrop.png\x22 crossorigin=\x22anonymous\x22>"+
                                 // "<img id=\x22explosion1\x22 src=\x22http://servicemedia.s3.amazonaws.com/assets/pics/explosion1.png\x22 crossorigin=\x22anonymous\x22>"+
                                 // "<img id=\x22fireworksanim1\x22 src=\x22http://servicemedia.s3.amazonaws.com/assets/pics/fireworks_sheet.png\x22 crossorigin=\x22anonymous\x22>"+
-                                "<img id=\x22smoke1\x22 src=\x22http://servicemedia.s3.amazonaws.com/assets/pics/smokeanim2.png\x22 crossorigin=\x22anonymous\x22>"+
+                                // "<img id=\x22smoke1\x22 src=\x22http://servicemedia.s3.amazonaws.com/assets/pics/smokeanim2.png\x22 crossorigin=\x22anonymous\x22>"+
                                 // "<img id=\x22fireball-up\x22 src=\x22http://servicemedia.s3.amazonaws.com/assets/pics/fireball-up.png\x22 crossorigin=\x22anonymous\x22>"+
                                 // "<img id=\x22fireball1\x22 src=\x22http://servicemedia.s3.amazonaws.com/assets/pics/fireball.png\x22 crossorigin=\x22anonymous\x22>"+
                                 // "<img id=\x22sparkle1\x22 src=\x22http://servicemedia.s3.amazonaws.com/assets/pics/sparkle.png\x22 crossorigin=\x22anonymous\x22>"+

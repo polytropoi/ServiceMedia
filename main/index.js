@@ -10937,6 +10937,7 @@ function getAllPeople() {
                                 "<label for=\x22particlesSelect\x22>Particle System</label>" +
                                 "<select class=\x22form-control\x22 id=\x22particlesSelect\x22>" +
                                 "<option value=\x22\x22 disabled selected>Select:</option>" +
+                                "<option>None</option>" +
                                 "<option>Fire</option>" +
                                 "<option>Candle</option>" +
                                 "<option>Smoke</option>" +
@@ -10950,6 +10951,7 @@ function getAllPeople() {
                                 "<label for=\x22lightSelect\x22>Lighting</label>" +
                                 "<select class=\x22form-control\x22 id=\x22lightSelect\x22>" +
                                 "<option value=\x22\x22 disabled selected>Select:</option>" +
+                                "<option>None</option>" +
                                 "<option>Fire</option>" +
                                 "<option>Candle</option>" +
                                 "<option>Rings</option>" +

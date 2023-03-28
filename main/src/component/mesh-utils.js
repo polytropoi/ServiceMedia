@@ -599,10 +599,11 @@ AFRAME.registerComponent('instanced_surface_meshes', {
       this.iMesh_4 = null;
 
       console.log("model this.data._id " + this.data._id + " tryna instance " + this.data.count);
-
+      // this.el.setAttribute("visible",false);
       this.el.addEventListener('model-loaded', (event) => {
         event.preventDefault();;
         const sObj = this.el.getObject3D('mesh');
+        
         console.log("tryna INSTANCE THE THIGNS");
         this.sampleGeos = [];
         this.sampleMats = [];
@@ -734,6 +735,7 @@ AFRAME.registerComponent('instanced_surface_meshes', {
           const sObj = this.el.getObject3D('mesh');
           if (sObj) {
           console.log("tryna INSTANCE THE THIGNS");
+          // sObj.visible = false;
           this.sampleGeos = [];
           this.sampleMats = [];
           sObj.traverse(node => {
@@ -827,7 +829,7 @@ AFRAME.registerComponent('instanced_surface_meshes', {
               this.count = 0;
               for (var i = 0; i < 100000; i++) {
                 if (this.count < count) {
-                // console.log("scattercount " + i);
+                
                 // sampler.sample( position, normal ) //wtf?
                 sampler.sample( position );
                 
@@ -2601,10 +2603,10 @@ AFRAME.registerComponent('mod_particles', {
     // } else {
     //   this.el.object3D.getWorldPosition(this.position);
     // }
-    if (this.data.type.toLowerCase() =="candle") {
+    if (this.data.type.toLowerCase() =="candle") { //need to embed a location (light obj or empty named light), or find center point
       // this.el.setAttribute('scale', '.25 .25 .25');
       this.el.setAttribute('sprite-particles', {enable: true, texture: '#candle1', color: this.data.color, textureFrame: '8 8', textureLoop: '4', spawnRate: '1', lifeTime: '1', scale: this.data.scale.toString()});
-      this.el.setAttribute('light', {type: 'point', castShadow: true, color: this.data.color, intensity: 1, distance: 10, decay: 1});
+      this.el.setAttribute('light', {type: 'point', castShadow: true, color: this.data.color, intensity: 1, distance: 8, decay: 1});
       this.lightAnimation(.5, 1);
       this.el.addEventListener('animationcomplete', () => {
           this.lightAnimation(.5, 1);
@@ -2616,7 +2618,7 @@ AFRAME.registerComponent('mod_particles', {
       // this.el.setAttribute('scale', '.25 .25 .25');
       console.log("tryna light a fire! "  + JSON.stringify(this.data.location) + " scale " + this.data.scale);
       this.el.setAttribute('sprite-particles', {enable: true, texture: '#fireanim1', color: this.data.color, blending: 'additive', textureFrame: '6 6', textureLoop: '3', spawnRate: '2', lifeTime: '1.1', scale: this.data.scale.toString()});
-      this.el.setAttribute('light', {type: 'point', castShadow: true, color: this.data.color, intensity: .75, distance: 15, decay: 8});
+      this.el.setAttribute('light', {type: 'point', castShadow: true, color: this.data.color, intensity: .75, distance: 15, decay: 4});
       this.lightAnimation(.7, 1.5);
       this.el.addEventListener('animationcomplete', () => {
           this.lightAnimation(.7, 1.5);
