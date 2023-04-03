@@ -12,93 +12,12 @@ if (typeof AFRAME === 'undefined') {
   throw new Error('Component attempted to register before AFRAME was available.');
 }
 
-/* global AFRAME, THREE */
-
-// creates a pinboard height x width, + 2m at top & bottom, laid flat.
-/* Components in this modeule are derived from:
- * https://github.com/c-frame/aframe-physics-system/blob/master/examples/components/pinboard.js
- */
-AFRAME.registerComponent('pinboard', {
-
-  schema: {
-      physics: {type: 'string'}, // physx , ammo or cannon
-      width: {type: 'number', default: 10},
-      height: {type: 'number', default: 10},
-  },
-
-  init() {
-
-      const width = this.data.width;
-      const height = this.data.height;
-
-      const createBox = (width, height, depth, x, y, z, color, yRot) => {
-          const box = document.createElement('a-box');
-          box.setAttribute('width', width)
-          box.setAttribute('height', height)
-          box.setAttribute('depth', depth)
-          box.setAttribute('color', color)
-          if (this.data.physics === "ammo") {
-            box.setAttribute('ammo-body', 'type:static')
-            box.setAttribute('ammo-shape', 'type:box;fit:all')
-          }
-          else if (this.data.physics === "cannon") {
-            box.setAttribute('static-body', '')
-          }
-          else {
-            box.setAttribute('physx-body', 'type:static')
-          }  
-          box.object3D.position.set(x, y, z)
-          box.object3D.rotation.set(0, yRot, 0)
-          this.el.appendChild(box)
-
-          return box
-      }
-
-      const createPin = (x, y, z, yRot) => {
-        const pin = document.createElement('a-entity');
-        pin.id = Math.random().toString(36).substring(2)
-        pin.setAttribute('instanced-mesh-member', 'mesh: #pin-mesh; memberMesh: true')
-        if (this.data.physics === "ammo") {
-          // pin.setAttribute('ammo-body', 'type:static')
-          // pin.setAttribute('ammo-shape', 'type:box; fit:all')
-          //mod_phy
-          pin.setAttribute('mod_physics', 'body: static; shape: box; isTrigger: true');
-        }
-        else if (this.data.physics === "cannon") {
-          pin.setAttribute('static-body', '')
-        }
-        else {
-          pin.setAttribute('physx-body', 'type:static')
-        }
-        pin.object3D.position.set(x, y, z)
-        pin.object3D.rotation.set(0, yRot, 0)
-        this.el.appendChild(pin)
-
-        return pin
-      }
-
-      this.base = createBox(width, 1, height + 4, 0, -0.5, 0, 'grey', 0)
-      createBox(0.1, 2, height + 4, width / 2 + 0.05, 0, 0, 'grey', 0)
-      createBox(0.1, 2, height + 4, -width / 2 - 0.05, 0, 0, 'grey', 0)
-
-      for (let ii = 0; ii < this.data.height; ii++) {
-          const even = ii % 2
-          for (let jj = 0; jj < this.data.width - 1; jj++) {
-
-              createPin(jj - width / 2  + even / 2 + 0.75,
-                        0.5,
-                        ii - height / 2 + 0.5,
-                        Math.PI / 4)
-          }
-      }
-  }
-})
 
 AFRAME.registerComponent('dynamic-ball', {
 
   schema: {
       physics: {type: 'string'}, // physx or ammo.
-      yKill: {type: 'number', default: -50}
+      yKill: {type: 'number', default: -10}
   },
 
   init() {
@@ -106,11 +25,9 @@ AFRAME.registerComponent('dynamic-ball', {
       el.setAttribute('instanced-mesh-member', 'mesh:#ball-mesh; memberMesh: true')
 
       if (this.data.physics === "ammo") {
-        el.setAttribute('ammo-body', 'type:dynamic; mass:1; linearDamping: 0; angularDamping: 0;');
-        el.body.restitution = 10;
-        // el.body.mass = 1;
+        el.setAttribute('ammo-body', 'type:dynamic')
         // Explicitly specifying a shape is more efficient than auto-fitting.
-        el.setAttribute('ammo-shape', 'type:sphere; fit:manual; sphereRadius: 1')
+        el.setAttribute('ammo-shape', 'type:sphere; fit:manual; sphereRadius: 0.3')
     }
     else if (this.data.physics === "cannon") {
         // necessary to explicitly specify sphere radius, as async call to 
@@ -126,12 +43,11 @@ AFRAME.registerComponent('dynamic-ball', {
 
   tick() {
       if (this.el.object3D.position.y < this.data.yKill) {
-        console.log("fixin to kill at ykill " + this.data.yKill)
           this.el.emit("recycle")
       }
   }
 })
-
+//from https://github.com/diarmidmackenzie/instanced-mesh/blob/main/tests/components/pinboard.js
 AFRAME.registerComponent('ball-recycler', {
 
   schema: {
@@ -139,13 +55,13 @@ AFRAME.registerComponent('ball-recycler', {
       ballCount: {type: 'number', default: 10},
       width: {type: 'number', default: 8}, // width of spawn field
       depth: {type: 'number', default: 8}, // depth of spawn field (after initial spawn balls always spawned at far depth)
-      yKill: {type: 'number', default: -50}
+      yKill: {type: 'number', default: -10}
   },
 
   init() {
 
       this.recycleBall = this.recycleBall.bind(this);
-      this.ballcount = 0;
+      this.ballCount = 0;
       // at start of day, spawn balls 
       for (let ii = 0; ii < this.data.ballCount; ii++) {
 
@@ -157,10 +73,10 @@ AFRAME.registerComponent('ball-recycler', {
 
       const { height, depth, width } = this.data
       const pos = this.el.object3D.position
-
+      
       const ball = document.createElement('a-entity')
-      ball.id = 'ball-' + this.ballcount
-      this.ballcount++
+      ball.id = 'ball-'+this.ballCount;
+      this.ballCount++
           
       ball.setAttribute('dynamic-ball', {yKill: this.data.yKill,
                                          physics: this.data.physics})
@@ -181,9 +97,150 @@ AFRAME.registerComponent('ball-recycler', {
       this.createBall(true)
 
   }
+})
+
+function randomNumber(min, max) {
+  return Math.random() * (max - min) + min;
+};
+
+AFRAME.registerComponent('scatter_physics', { //scattered randomly (hemisphere), no instancing...
+  schema: {
+
+    _id: {default: ''},
+    modelID: {default: ''},
+    count: {default: 10},
+    scaleFactor: {default: 10},
+    interaction: {default: ''},
+    tags: {default: ''},
+    triggerTag: {default: null}
+  },
+  
+  init: function () {
+    this.count = 0;
+    this.radius = 50;
+    // this.el.setAttribute('gltf-model', '#'+ this.data.modelID);
+    console.log("tryna set scatter model " + this.data.modelID);
+ 
+    this.sampleMaterial = null;
+
+    this.el.addEventListener('model-loaded', (event) => {
+      const sObj = this.el.getObject3D('mesh');
+      console.log("gotsa mesh!");
+    
+      sObj.traverse(node => {
+        if (node.isMesh && node.material) {
+            this.sampleGeometry = node.geometry;
+            this.sampleMaterial = node.material;
+          }
+        });
+    });
+    
+    this.instancedElements = [];
+        for (var i=0; i<this.data.count; i++) {
+         
+          // let scale = Math.random() * this.data.scaleFactor;
+          // const { height, depth, width } = this.data
+          // const pos = this.el.object3D.position
+    
+          const iEl = document.createElement('a-entity')
+          iEl.id = 'i_' + this.count;
+          this.count++
+          iEl.setAttribute('gltf-model', '#'+ this.data.modelID);
+
+          // iEl.setAttribute('instanced-mesh-member', {mesh:this.el.id, memberMesh: true});
+          // iEl.setAttribute('instanced-mesh-member', {mesh:'#gltf_'+this.data.modelID, memberMesh: true});
+                    
+          this.el.sceneEl.appendChild(iEl);
+          
+          this.instancedElements.push(iEl);
+
+          if (this.instancedElements.length == this.data.count) {
+            this.applyPhysics();
+          }
+        }   
+  }, 
+  applyPhysics: function () {
+    let radius = this.radius;
+    for (var i=0; i< this.instancedElements.length; i++) {
+
+      let x = Math.random() * radius - (radius/2);
+      // let y = Math.random() * radius - (radius/2);
+      let y = randomNumber(0, 10);
+      let z = Math.random() * radius - (radius/2);
+      // this.instancedElements[i].setAttribute('position', {x: x, y: y, z: z});
+
+      this.instancedElements[i].object3D.position.set(x, y, z);
+      this.instancedElements[i].object3D.rotation.x = (Math.random() * 360 ) * Math.PI / 180;
+      this.instancedElements[i].object3D.rotation.y = (Math.random() * 360 ) * Math.PI / 180;
+      this.instancedElements[i].object3D.rotation.z = (Math.random() * 360 ) * Math.PI / 180;
+
+      this.instancedElements[i].setAttribute('mod_physics', {'model': 'instance', 'body': 'dynamic', 'shape': 'sphere'});
+
+    }
+  }
 });
 
 
+AFRAME.registerComponent('instanced_meshes_sphere_physics', { //scattered randomly in sphere, using instanced-mesh component, but can't get the colliders to fit... :(
+  schema: {
+
+    _id: {default: ''},
+    modelID: {default: ''},
+    count: {default: 100},
+    scaleFactor: {default: 10},
+    interaction: {default: ''},
+    tags: {default: ''},
+    triggerTag: {default: null}
+  },
+  init: function () {
+    this.count = 0;
+    this.radius = 100;
+    // this.el.setAttribute('gltf-model', '#'+ this.data.modelID);
+    console.log("tryna set scatter model " + this.data.modelID);
+ 
+    this.instancedElements = [];
+        for (var i=0; i<this.data.count; i++) {
+     
+         
+          let scale = Math.random() * this.data.scaleFactor;
+          // const { height, depth, width } = this.data
+          // const pos = this.el.object3D.position
+    
+          const iEl = document.createElement('a-entity')
+          iEl.id = 'i_' + this.count;
+          this.count++
+          console.log("mesh selector " + this.el.id);
+          // iEl.setAttribute('instanced-mesh-member', {mesh:this.el.id, memberMesh: true});
+          iEl.setAttribute('instanced-mesh-member', {mesh:'#gltf_'+this.data.modelID, memberMesh: true});
+                    
+          this.el.sceneEl.appendChild(iEl);
+          
+          this.instancedElements.push(iEl);
+
+          if (this.instancedElements.length == this.data.count) {
+            this.applyPhysics();
+          }
+        }   
+  }, 
+
+  applyPhysics: function () {
+    let radius = this.radius;
+    for (var i=0; i< this.instancedElements.length; i++) {
+      this.instancedElements[i].setAttribute('mod_physics', {'model': 'instance', 'body': 'dynamic', 'shape': 'sphere', 'fit': 'manual'});
+      let x = Math.random() * radius - (radius/2);
+      let y = Math.random() * radius - (radius/2);
+      let z = Math.random() * radius - (radius/2);
+      // this.instancedElements[i].setAttribute('position', {x: x, y: y, z: z});
+      this.instancedElements[i].object3D.position.set(x, y, z)
+      this.instancedElements[i].object3D.position.rotation.x = (Math.random() * 360 ) * Math.PI / 180;
+      this.instancedElements[i].object3D.position.rotation.y = (Math.random() * 360 ) * Math.PI / 180;
+      this.instancedElements[i].object3D.position.rotation.z = (Math.random() * 360 ) * Math.PI / 180;
+      // this.instancedElements[i].setAttribute('ammo-body', {type: 'dynamic', emitCollisionEvents: this.isTrigger});
+
+      // this.instancedElements[i].setAttribute('ammo-shape', {type: 'sphere'});
+    }
+  }
+});
 
 AFRAME.registerComponent('instanced_meshes_sphere', { //scattered randomly in sphere, not on surface
   schema: {
@@ -197,7 +254,7 @@ AFRAME.registerComponent('instanced_meshes_sphere', { //scattered randomly in sp
     triggerTag: {default: null}
   },
   init: function () {
-    console.log("tryna instanced_meshes_sphere");
+    console.log("tryna init instanced_meshes_sphere");
     this.tick = AFRAME.utils.throttleTick(this.tick, 50, this);
       var el = this.el;
       var root = this.el.object3D;
@@ -331,6 +388,7 @@ AFRAME.registerComponent('instanced_meshes_sphere', { //scattered randomly in sp
 
 
 
+
       }
 
       this.iMesh.frustumCulled = false;
@@ -339,27 +397,27 @@ AFRAME.registerComponent('instanced_meshes_sphere', { //scattered randomly in sp
       root.add(this.iMesh);
       // this.el.object3D.add(this.iMesh);
       // physics.add(this.iMesh);
-      if (this.isTrigger) {
-        console.log("tryna set kinematic trigger!");
-        this.el.setAttribute('ammo-body', {type: "kinematic", emitCollisionEvents: true});
-      } else {
-        this.el.setAttribute('ammo-body', {type: this.data.body, emitCollisionEvents: true});
+      // if (this.isTrigger) {
+        // console.log("tryna set kinematic trigger!");
+        // this.el.setAttribute('ammo-body', {type: "kinematic", emitCollisionEvents: true});
+      // } else {
+      //   this.el.setAttribute('ammo-body', {type: this.data.body, emitCollisionEvents: true});
         
-      }
+      // }
 
-      this.el.addEventListener('body-loaded', () => {  
+      // this.el.addEventListener('body-loaded', () => {  
           
-        if (this.isTrigger) {
-          console.log("TRIGGER LOADED");
-          this.el.setAttribute('ammo-shape', {type: "sphere"});
-        } else {
-          this.el.setAttribute('ammo-shape', {type: this.data.shape});
-        }
-        // this.el.body.setCollisionF
-        // console.log("ammo shape is " + JSON.stringify(this.el.getAttribute('ammo-shape')));
-        // this.isTrigger = this.data.isTrigger;
-        console.log("tryna load ashape with trigger " + this.isTrigger);
-      });
+      //   // if (this.isTrigger) {
+      //     console.log("TRIGGER LOADED");
+      //     this.el.setAttribute('ammo-shape', {type: "sphere"});
+      //   // } else {
+      //   //   this.el.setAttribute('ammo-shape', {type: this.data.shape});
+      //   // }
+      //   // this.el.body.setCollisionF
+      //   // console.log("ammo shape is " + JSON.stringify(this.el.getAttribute('ammo-shape')));
+      //   // this.isTrigger = this.data.isTrigger;
+      //   console.log("tryna load ashape with trigger " + this.isTrigger);
+      // });
 
       
   });
@@ -2313,7 +2371,19 @@ AFRAME.registerComponent('cloud_marker', {
   
 //   }
 // });
-
+AFRAME.registerComponent('wrap_location', { //used by models and placeholders, not objects which manage physics settings in mod_object
+  schema: {
+    floor: {default: ''}
+  },
+  init() {
+    this.tick = AFRAME.utils.throttleTick(this.tick, 100, this);
+  }, 
+  tick() {
+    if (this.el.object3D.position.y < -22) {
+      this.el.object3D.position.y = 50
+    }
+  }
+});
 
 AFRAME.registerComponent('mod_physics', { //used by models and placeholders, not objects which manage physics settings in mod_object
   schema: {
@@ -2334,32 +2404,35 @@ AFRAME.registerComponent('mod_physics', { //used by models and placeholders, not
     this.body = this.data.body;
     this.shape = this.data.shape;
     this.isGhost = false; //
-    console.log("truyna init mod_physics for id " + this.el.id + " model " + this.model +" isTrigger "+ this.isTrigger + " body " + this.data.body );
-  
-    if (this.model == "child") { //i.e. set on a child mesh with name including 'collider', in mod_model
 
+
+
+    this.el.addEventListener('model-loaded', () => {  
+      if (this.model == "instance") {
+        this.el.setAttribute('ammo-body', {type: 'dynamic', mass: 0.1, gravity: '0 0 0', linearSleepingThreshold: 0.1, emitCollisionEvents: this.isTrigger});
+        console.log("tryna load instance body");
+      }
+    });
+    this.el.addEventListener('body-loaded', () => {  
+      if (this.model == "instance") {
+        // this.el.setAttribute('ammo-shape', {type: 'sphere', fit: 'manual', sphereRadius: 1 });
+        this.el.setAttribute('ammo-shape', {type: 'sphere'});
+        console.log("tryna load ashape with trigger " + this.el);
+        this.randomPush();
+      }
+    });
+
+    if (this.model == "instance") { //i.e. adding to an instanced/spawned/pooled mesh...
+      this.isTrigger = true; //cheat
       
-      // this.el.addEventListener('model-loaded', () => {
-        // if (this.isTrigger) {
-        //   this.el.setAttribute('ammo-body', {type: "kinematic", emitCollisionEvents: this.isTrigger});
-        // } else {
-          this.el.setAttribute('ammo-body', {type: this.body, emitCollisionEvents: this.isTrigger});
-          // this.el.body.restitution = this.data.bounciness;
-          // this.el.body.mass = .5;
-         
-        // }
-      // });
 
-      // this.el.addEventListener('body-loaded', () => {  
-        // if (this.isTrigger) {
-        //   console.log("TRIGGER LOADED");
-        //   this.el.setAttribute('ammo-shape', {type: "sphere"});
-        // } else {
+    } else if (this.model == "child") { //i.e. set on a child mesh with name including 'collider', in mod_model, mesh should already be loaded
+
+    
+          this.el.setAttribute('ammo-body', {type: this.body, emitCollisionEvents: this.isTrigger});
+
           this.el.setAttribute('ammo-shape', {type: this.shape});
-        // }
-        // this.el.body.setCollisionF
-        // console.log("ammo shape is " + JSON.stringify(this.el.getAttribute('ammo-shape')));
-        // this.isTrigger = this.data.isTrigger;
+        
         console.log("tryna load ashape with trigger " + this.isTrigger);
       // });
     
@@ -2394,7 +2467,7 @@ AFRAME.registerComponent('mod_physics', { //used by models and placeholders, not
 
     this.el.addEventListener("collidestart", (e) => { //this is for models or triggers, not objects - TODO look up locationData for tags? 
       // e.preventDefault();
-      // console.log("mod_physics collisoin with object with :" + this.el.id + " " + e.detail.targetEl.id + " isTrigger " + this.isTrigger);
+      console.log("mod_physics collisoin with object with :" + this.el.id + " " + e.detail.targetEl.id + " isTrigger " + this.isTrigger);
       if (this.isTrigger) { 
         // console.log("mod_physics TRIGGER collision "  + this.el.id + " " + e.detail.targetEl.id);
         // e.detail.body.disableCollision = true;
@@ -2468,6 +2541,13 @@ AFRAME.registerComponent('mod_physics', { //used by models and placeholders, not
   //       console.log("ammo shape is " + JSON.stringify(this.el.getAttribute('ammo-shape')));
   //     });
   
+  },
+  randomPush: function () {
+
+    const velocity = new Ammo.btVector3(Math.random(), Math.random(), Math.random());
+    this.el.body.setLinearVelocity(velocity);
+    //this.el.body.restitution = .9;
+    Ammo.destroy(velocity);
   },
   disableCollisionTemp: function () { //bc ammo don't have no triggerz, except "ghostobject" !?
     
@@ -2650,7 +2730,7 @@ AFRAME.registerComponent('mod_particles', {
     // if (intensity < this.intensityMin) {
     //   intensity = this.intensityMin;
     // }
-    console.log("inteisity is " + intensity + " dur " + duration);
+    // console.log("inteisity is " + intensity + " dur " + duration);
     let animation = "property: light.intensity; from: 0.5; to: "+intensity+"; dur: "+duration+"; dir: alternate;";
     // console.log(intensity);
     // updating the animation component with the .setAttribute function

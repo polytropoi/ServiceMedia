@@ -525,7 +525,7 @@ webxr_router.get('/:_id', function (req, res) {
                         } 
                         if (sceneData.sceneTags[i] == "instancing demo") {
                             
-                            instancingEntity = "<a-entity instanced_meshes_sphere></a-entity>";
+                            // instancingEntity = "<a-entity instanced_meshes_sphere_physics></a-entity>";
                         }
                         if (sceneData.sceneTags[i] == "pinball") {
                             
@@ -2495,8 +2495,10 @@ webxr_router.get('/:_id', function (req, res) {
                                                         } else if (locMdl.eventData.toLowerCase().includes('wiggle')) {
                                                             interaction = " interaction: wiggle; ";
                                                         }
-                                                        instancing = "instanced_meshes_sphere=\x22_id: "+locMdl.modelID+"; modelID: "+m_assetID+"; "+interaction+" tags: "+locMdl.locationTags+"\x22";; //scatter random sphere, e.g. in the sky..
+                                                        // instancing = "instanced-mesh=\x22capacity:100; updateMode: auto;\x22 instanced_meshes_sphere_physics=\x22_id: "+locMdl.modelID+"; modelID: "+m_assetID+"; "+interaction+" tags: "+locMdl.locationTags+"\x22"; //scatter random sphere, e.g. in the sky..
                                                         // console.log("instancing is " + instancing);
+                                                        // instancingEntity = "<a-sphere id=\x22ball-mesh\x22 radius=\x221\x22 color=\x22yellow\x22 instanced-mesh=\x22capacity: 100; updateMode: auto\x22></a-sphere>" +
+                                                        // "<a-entity id=\x22ball-recycler\x22 ball-recycler=\x22physics: ammo; ballCount: 10; width: 30; depth: 15; yKill: -30\x22 position=\x220 20 -25\x22></a-entity>";
                                                     }
                                                     
                                                     // console.log("locMdl is " + JSON.stringify(locMdl));
@@ -2514,15 +2516,23 @@ webxr_router.get('/:_id', function (req, res) {
                                                             instancing = "instanced_surface_meshes=\x22_id: "+locMdl.modelID+"; modelID: "+m_assetID+"; yMod: "+locMdl.y+"; count: "+split[1]+"; scaleFactor: "+scale+"; tags: "+locMdl.locationTags+"\x22";
                                                             // console.log("!!!tryna spoolit scatter dasta..." + instancing);
                                                             if (locMdl.eventData.toLowerCase().includes("everywhere")) {
-                                                                instancing = "instanced_meshes_sphere=\x22_id: "+locMdl.modelID+"; modelID: "+m_assetID+"; tags: "+locMdl.locationTags+" count: "+split[1]+"; scaleFactor: "+scale+";"+interaction+"\x22"; //scatter everywhere, e.g. in the sky..
+                                                                // instancing = "instanced-mesh=\x22capacity:100; updateMode: auto;\x22 instanced_meshes_sphere=\x22_id: "+locMdl.modelID+"; modelID: "+m_assetID+"; tags: "+locMdl.locationTags+" count: "+split[1]+"; scaleFactor: "+scale+";"+interaction+"\x22"; //scatter everywhere, e.g. in the sky..
                                                                 // console.log("instancing is " + instancing);
+                                                                // instancing = " instanced-mesh=\x22capacity:100; updateMode: 'auto'; positioning: 'world'\x22 "; //scatter everywhere, e.g. in the sky..
+                                                                instancingEntity = instancingEntity + "<a-entity instanced_meshes_sphere=\x22_id: "+locMdl.modelID+"; modelID: "+m_assetID+"; "+interaction+" tags: "+locMdl.locationTags+"\x22></a-entity>";
+                                                            }
+                                                            if (locMdl.eventData.toLowerCase().includes("physics")) {
+                                                                // instancing = "instanced-mesh=\x22capacity:100; updateMode: auto;\x22 instanced_meshes_sphere=\x22_id: "+locMdl.modelID+"; modelID: "+m_assetID+"; tags: "+locMdl.locationTags+" count: "+split[1]+"; scaleFactor: "+scale+";"+interaction+"\x22"; //scatter everywhere, e.g. in the sky..
+                                                                // console.log("instancing is " + instancing);
+                                                                // instancing = " instanced-mesh=\x22capacity:100; updateMode: 'auto'; positioning: 'world'\x22 "; //scatter everywhere, e.g. in the sky..
+                                                                instancingEntity = instancingEntity + "<a-entity scatter_physics=\x22_id: "+locMdl.modelID+"; modelID: "+m_assetID+"; "+interaction+" tags: "+locMdl.locationTags+"\x22></a-entity>";
                                                             }
                                                         }
                                                     }
                                                     let modelString = "gltf-model=\x22#" + m_assetID + "\x22";
                                                     //todo, check for scene image with spritesheet type / tag
                                                     imageAssets = imageAssets + "<img id=\x22explosion1\x22 src=\x22http://servicemedia.s3.amazonaws.com/assets/pics/explosion1.png\x22 crossorigin=\x22anonymous\x22>"; //for particles
-
+                                                    
                                                     gltfsEntities = gltfsEntities + "<a-entity id=\x22"+id+"\x22 "+modelString+" "+instancing+" class=\x22"+entityType+
                                                     " activeObjexGrab activeObjexRay\x22 shadow=\x22cast:true; receive:true\x22 "+skyboxEnvMap+
                                                     " position=\x220 -20 0\x22></a-entity>";//scatter model below //nm, just load it from here w/ modelString
@@ -4308,7 +4318,7 @@ webxr_router.get('/:_id', function (req, res) {
                         let physicsDummy = "";
                         if (physicsScripts.length > 0) {
                             // physicsInsert = "physics=\x22driver: ammo; debug: true; gravity: -9.8; debugDrawMode: 0;\x22";
-                            physicsInsert = "physics=\x22driver: ammo; debug: "+debugMode+"; gravity: -9.8; debugDrawMode: 1;\x22";
+                            physicsInsert = "physics=\x22driver: ammo; debug: "+debugMode+"; debugDrawMode: 1;\x22";
                             physicsDummy = "<a-box position=\x220 10 -10\x22 width=\x223\x22 height=\x223\x22 depth=\x223\x22 ammo-body=\x22type: dynamic\x22 ammo-shape=\x22type: box;\x22></a-box>"+
                             "<a-box position=\x220 -1 0\x22 width=\x2233\x22 height=\x221\x22 depth=\x2233\x22 material=\x22opacity: 0; transparent: true;\x22 ammo-body=\x22type: static\x22 ammo-shape=\x22type: box;\x22></a-box>";
                             // physics = "physics";
@@ -4503,7 +4513,8 @@ webxr_router.get('/:_id', function (req, res) {
                         skySettings +
                        
                         ////////////////ASSETS/////////////
-                        "<a-assets timeout=\x222000\x22>" +
+                        // "<a-assets timeout=\x222000\x22>" +
+                        "<a-assets>" +
                        
                         playerAvatarTemplate +
                         handsTemplate + 

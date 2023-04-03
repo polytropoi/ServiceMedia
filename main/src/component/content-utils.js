@@ -2974,17 +2974,19 @@ AFRAME.registerComponent('mod_object', {
         this.moveOnCurve(); //todo fix quats!
       }
       if (this.data.objectData.physics != undefined && this.data.objectData.physics != null && this.data.objectData.physics.toLowerCase() != "none") {
-        console.log("tryna add physics to mod_objecty " + JSON.stringify(this.data.objectData));
+        console.log("tryna add physics to mod_objecty " + this.data.objectData.name + " is equipped " + this.data.isEquipped);
         //  setTimeout(function(){  
           if (this.data.isEquipped) {
             // this.el.setAttribute('ammo-body', {type: 'kinematic', linearDamping: .1, angularDamping: .1});
           } else { //nm, switch to dynamic when fired if needed/
             if (this.hasShootAction) {
               // this.el.setAttribute('ammo-body', {type: this.data.objectData.physics.toLowerCase(), gravity: '0 -.1 0', angularFactor: '1 0 1', emitCollisionEvents: true, linearDamping: .1, angularDamping: 1}); //nope, shoot is not physical now
+              console.log("tryna shoot!");
               this.el.setAttribute('ammo-body', {type: 'kinematic', emitCollisionEvents: true});
               //this.el.body.restitution = .9;
               this.el.setAttribute('trail', "");
             } else if (this.hasThrowAction) {
+              console.log("tryna throw..");
                 this.el.setAttribute('ammo-body', {type: this.data.objectData.physics.toLowerCase(), emitCollisionEvents: true, linearDamping: .1, angularDamping: .1});
                 // this.el.setAttribute('rotate-toward-velocity');
                 // this.el.setAttribute('trail', "");
