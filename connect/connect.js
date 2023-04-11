@@ -2408,6 +2408,8 @@ function LoopTimedEvent(keyType, duration) {
                   beatElements[i].components.mod_object.beat(.75, duration);
                } else if (beatElements[i].components.cloud_marker != undefined) {
                   beatElements[i].components.cloud_marker.beat(.15, duration);
+               } else if (beatElements[i].components.mod_physics != undefined) {
+                  beatElements[i].components.mod_physics.randomPush();
                }
             }
             }

@@ -2525,7 +2525,17 @@ webxr_router.get('/:_id', function (req, res) {
                                                                 // instancing = "instanced-mesh=\x22capacity:100; updateMode: auto;\x22 instanced_meshes_sphere=\x22_id: "+locMdl.modelID+"; modelID: "+m_assetID+"; tags: "+locMdl.locationTags+" count: "+split[1]+"; scaleFactor: "+scale+";"+interaction+"\x22"; //scatter everywhere, e.g. in the sky..
                                                                 // console.log("instancing is " + instancing);
                                                                 // instancing = " instanced-mesh=\x22capacity:100; updateMode: 'auto'; positioning: 'world'\x22 "; //scatter everywhere, e.g. in the sky..
-                                                                instancingEntity = instancingEntity + "<a-entity scatter_physics=\x22_id: "+locMdl.modelID+"; modelID: "+m_assetID+"; "+interaction+" tags: "+locMdl.locationTags+"\x22></a-entity>";
+                                                                instancingEntity = instancingEntity + "<a-entity scatter_physics=\x22_id: "+locMdl.modelID+"; count: "+split[1]+"; radius: 20; modelID: "+m_assetID+"; "+interaction+" tags: "+locMdl.locationTags+"\x22></a-entity>";
+                                                            }
+                                                            if (locMdl.eventData.toLowerCase().includes("instances")) {
+                                                                //TODO use model primatives
+                                                                instancingEntity = instancingEntity + "<a-sphere id=\x22i-mesh-sphere\x22 "+skyboxEnvMap+" radius=\x221\x22 material=\x22roughness: .2; color: blue; opacity: .5; transparent: true;\x22 instanced-mesh=\x22capacity: "+split[1]+"; updateMode: auto\x22></a-sphere>" +
+                                                                "<a-entity instanced_meshes_sphere_physics=\x22_id: "+locMdl.modelID+"; count: "+split[1]+"; modelID: "+m_assetID+"; "+interaction+" tags: "+locMdl.locationTags+"\x22></a-entity>";
+                                                            }
+                                                            if (locMdl.eventData.toLowerCase().includes("atomic")) {
+                                                                //TODO use model primatives
+                                                                instancingEntity = instancingEntity + "<a-sphere id=\x22i-mesh-sphere\x22 "+skyboxEnvMap+" radius=\x221\x22 material=\x22roughness: .2; color: blue; opacity: .5; transparent: true;\x22 instanced-mesh=\x22capacity: "+split[1]+"; updateMode: auto\x22></a-sphere>" +
+                                                                "<a-entity instanced_meshes_sphere_physics=\x22_id: "+locMdl.modelID+"; count: "+split[1]+"; modelID: "+m_assetID+"; "+interaction+" tags: "+locMdl.locationTags+"\x22></a-entity>";
                                                             }
                                                         }
                                                     }

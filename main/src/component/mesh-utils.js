@@ -1,7 +1,7 @@
 
 import {MeshSurfaceSampler} from '/three/examples/jsm/math/MeshSurfaceSampler.js'; //can because "type=module" //no. 
 
-import { SVGLoader } from '/three/examples/jsm/loaders/SVGLoader.js'; // ref'd in import maps
+// import { SVGLoader } from '/three/examples/jsm/loaders/SVGLoader.js'; // ref'd in import maps
 // import { Flow } from '/three/examples/jsm/modifiers/CurveModifier.js'; 
 // import { Line2 } from '/three/examples/jsm/lines/Line2.js'; //hrm..
 // import { LineMaterial } from '/three/examples/jsm/lines/LineMaterial.js';
@@ -11,6 +11,228 @@ import { SVGLoader } from '/three/examples/jsm/loaders/SVGLoader.js'; // ref'd i
 if (typeof AFRAME === 'undefined') {
   throw new Error('Component attempted to register before AFRAME was available.');
 }
+
+
+
+AFRAME.registerComponent('mod_physics', { //used by models, placeholders, instanced meshes, not objects which manage physics settings in mod_object
+  schema: {
+    model: {default: ''},
+    isTrigger: {type: 'bool', default: false}, // it emits/triggers events, not a 'silent' collider
+    isAudioTrigger: {type: 'bool', default: false}, // emits/triggers audio events
+    body: {type: 'string', default: 'static'},  // dynamic: A freely-moving object
+    shape: {type: 'string', default: 'box'},  // onthefly on glb uses 'mesh' type
+    fit: {type: 'string', default: 'manual'},
+    radius: {type: 'number', default: .5},
+    bounciness: {type: 'number', default: 0}, //i.e. 'restitution' - or use as forceFactor?
+    eventData: {default: ''},
+    tags: {default: []},
+    attractorID: {default: ''},
+    attractorLocation: {default: ''}
+  },
+  init() {
+    this.isTrigger = this.data.isTrigger;
+    this.model = this.data.model;
+    this.body = this.data.body;
+    this.shape = this.data.shape;
+    this.isGhost = false; //
+    this.isReady = false;
+    this.rotationMatrix = new THREE.Matrix4();
+    this.targetQuaternion = new THREE.Quaternion();
+
+    this.attractor = new THREE.Vector3(0, 0, 0);
+    this.mesh = null;
+  
+    if (this.data.tags.includes("beat")) {
+      this.el.classList.add("beatme");
+    }
+
+    this.el.addEventListener('model-loaded', () => {  
+      this.mesh = this.el.object3D('mesh');
+      if (this.model == "spawned") {
+        this.el.setAttribute('ammo-body', {type: 'dynamic', mass: 1, gravity: '0 0 0', linearSleepingThreshold: 0.1, emitCollisionEvents: this.isTrigger});
+        this.el.body.restitution = 10;
+        console.log("tryna load instance body");
+      }
+    });
+    this.el.addEventListener('body-loaded', () => {  
+      if (this.model == "spawned") {
+        this.el.setAttribute('ammo-shape', {type: 'sphere', fit: 'manual', sphereRadius: 1 });
+        // this.el.setAttribute('ammo-shape', {type: 'sphere'});
+        console.log("tryna load ashape with trigger " + this.el.id);
+        this.randomPush();
+      }
+    });
+
+    if (this.model == "instance") { //i.e. adding to an instanced/spawned/pooled mesh...
+      this.isTrigger = true; //cheat
+      this.el.setAttribute('ammo-body', {type: 'dynamic', mass: 1, gravity: '0 0 0', angularDampling: .1, linearSleepingThreshold: 0.1, emitCollisionEvents: this.isTrigger});
+      this.el.setAttribute('ammo-shape', {type: 'sphere', fit: 'manual', sphereRadius: 1 });
+      this.randomPush();
+
+    } else if (this.model == "atomic") { //i.e. adding to an instanced/spawned/pooled mesh...
+      this.isTrigger = true; //cheat
+      this.el.setAttribute('ammo-body', {type: 'dynamic', mass: 1, gravity: '0 0 0', angularDampling: .1, linearSleepingThreshold: 0.1, emitCollisionEvents: this.isTrigger});
+      this.el.setAttribute('ammo-shape', {type: 'sphere', fit: 'manual', sphereRadius: 1 });
+      // this.randomPush();
+      this.isReady();
+
+    } else if (this.model == "child") { //i.e. set on a child mesh with name including 'collider', in mod_model, mesh should already be loaded
+
+    
+          this.el.setAttribute('ammo-body', {type: this.body, emitCollisionEvents: this.isTrigger});
+
+          this.el.setAttribute('ammo-shape', {type: this.shape});
+        
+        console.log("tryna load ashape with trigger " + this.isTrigger);
+      // });
+    
+    } else if (this.data.model == "placeholder") { //from cloudmarker, always kinematic
+      this.isGhost = true;
+      // console.log("truyna init mod_physics for id " + this.el.id + " model " + this.model +" isTrigger "+ this.isTrigger + " body " + this.data.body );
+      this.el.setAttribute('ammo-body', {type: 'kinematic', emitCollisionEvents: this.isTrigger}); //placeholder model already loaded in mod_model
+      // this.el.addEventListener('body-loaded', () => {  
+        // if (this.isTrigger) {
+        //   console.log("TRIGGER LOADED");
+        //   this.el.setAttribute('ammo-shape', {type: "sphere"});
+        // } else {
+          this.el.setAttribute("ammo-shape", {type: "box"});
+          // this.el.body.type = 'kinematic';
+        // }
+        // this.el.body.setCollisionF
+        // console.log("ammo shape is " + JSON.stringify(this.el.getAttribute('ammo-shape')));
+        // this.isTrigger = this.data.isTrigger;
+        console.log("tryna load placeholder  " + this.isTrigger);
+      // });
+    
+    } else {
+      if (this.el.object3D) {
+        this.el.setAttribute('ammo-body', {type: this.data.body, emitCollisionEvents: this.isTrigger});
+        this.el.body.restitution = 10;
+        this.el.setAttribute('ammo-shape', {type: 'mesh'});
+      }
+     
+      
+    }
+
+
+    this.el.addEventListener("collidestart", (e) => { //this is for models or triggers, not objects - TODO look up locationData for tags? 
+      // e.preventDefault();
+      console.log("mod_physics collisoin with object with :" + this.el.id + " " + e.detail.targetEl.id + " isTrigger " + this.isTrigger);
+      if (this.isTrigger) { 
+        // console.log("mod_physics TRIGGER collision "  + this.el.id + " " + e.detail.targetEl.id);
+        // e.detail.body.disableCollision = true;
+        // this.disableCollisionTemp(); //must turn it off or it blocks, no true "trigger" mode //or just use kinematic
+        let cloud_marker = e.target.components.cloud_marker; //closest trigger if multiple
+        if (cloud_marker != null) { 
+          if (e.detail.targetEl.id == "player") {
+            cloud_marker.playerTriggerHit();
+          } else {
+            cloud_marker.physicsTriggerHit(e.detail.targetEl.id); 
+          }
+        } else  {
+          let local_marker = e.target.components.local_marker;
+            if (local_marker != null) { 
+              if (e.detail.targetEl.id == "player") {
+                local_marker.playerTriggerHit();
+              } else {
+                local_marker.physicsTriggerHit(e.detail.targetEl.id); 
+              }
+            // } else {
+            
+          }
+        }
+        if (this.el.id.toLowerCase().includes("pin")) {
+          var triggerAudioController = document.getElementById("triggerAudio");
+          if (triggerAudioController != null) {
+            console.log("mod_physics TRIGGER collision "  + this.el.id + " " + e.detail.targetEl.id);
+            triggerAudioController.components.trigger_audio_control.playSingleAtPosition(e.detail.targetEl.object3D.position, window.playerPosition.distanceTo(e.detail.targetEl.object3D.position), ["bell"], 1);
+          }
+          const force = new Ammo.btVector3(0, 1, -10);
+          const pos = new Ammo.btVector3(this.el.object3D.position.x, e.detail.targetEl.object3D.position.y, e.detail.targetEl.object3D.position.z);
+          e.detail.targetEl.body.applyImpulse(force, pos);
+          Ammo.destroy(force);
+          Ammo.destroy(pos);
+          // this.el.material.color.setHex("#000000".replace(/0/g,function(){return (~~(Math.random()*16)).toString(16);}));
+        }
+        if (this.el.id.toLowerCase().includes("wall")) {
+          var triggerAudioController = document.getElementById("triggerAudio");
+          if (triggerAudioController != null && this.model == "spawned") {
+            console.log("mod_physics TRIGGER collision "  + this.el.id + " " + e.detail.targetEl.id);
+            triggerAudioController.components.trigger_audio_control.playAudioAtPosition(e.detail.targetEl.object3D.position, window.playerPosition.distanceTo(e.detail.targetEl.object3D.position), ["bang"], 1);
+          }
+          this.forwardPush();
+          // const force = new Ammo.btVector3(0, 0, -5);
+          // const pos = new Ammo.btVector3(e.detail.targetEl.object3D.position.x, this.el.object3D.position.y, e.detail.targetEl.object3D.position.z);
+          // // const pos = new Ammo.btVector3(this.el.object3D.position.x, this.el.object3D.position.y, this.el.object3D.position.z);
+          // e.detail.targetEl.body.applyImpulse(force, pos);
+          // Ammo.destroy(force);
+          // Ammo.destroy(pos);
+          // this.el.material.color.setHex("#000000".replace(/0/g,function(){return (~~(Math.random()*16)).toString(16);}));
+        }
+
+      // let mod_obj_component = e.detail.targetEl.components.mod_object;
+      // if (mod_obj_component != null) {
+      //   // console.log(this.el.id + " gotsa collision with " + mod_obj_component.data.objectData.name);
+      //   if (mod_obj_component.data.objectData.tags != undefined && mod_obj_component.data.objectData.tags != null) {
+      //     var triggerAudioController = document.getElementById("triggerAudio");
+      //     if (triggerAudioController != null) {
+      //       triggerAudioController.components.trigger_audio_control.playAudioAtPosition(e.detail.targetEl.object3D.position, window.playerPosition.distanceTo(e.detail.targetEl.object3D.position), mod_obj_component.data.objectData.tags);
+      //     }
+      //   }
+        
+      }
+      if (this.isGhost) {
+        this.el.setAttribute('ammo-body', {disableCollision: true});
+        this.disableCollisionTemp();
+      }
+    });
+
+  // loadShape: function () {
+  //   this.el.addEventListener('body-loaded', () => {  
+  //       this.el.setAttribute('ammo-shape', {type: this.data.shape});
+  //       console.log("ammo shape is " + JSON.stringify(this.el.getAttribute('ammo-shape')));
+  //     });
+  
+  },
+  forwardPush: function () {
+    const velocity = new Ammo.btVector3(0, 0, -10);
+    this.el.body.setLinearVelocity(velocity);
+   
+    Ammo.destroy(velocity);
+  },
+  randomPush: function () {
+    console.log("trunya push");
+    const velocity = new Ammo.btVector3(randomNumber(-20, 20), randomNumber(-20, 20), randomNumber(-40, 40));
+    // const velocity = new Ammo.btVector3(0, 0, 10);
+    this.el.body.setLinearVelocity(velocity);
+   
+    Ammo.destroy(velocity);
+  },
+  disableCollisionTemp: function () { //bc ammo don't have no triggerz, except "ghostobject" !?
+    
+    setTimeout( () => {
+      this.el.setAttribute('ammo-body', {disableCollision: false}); 
+      console.log("trigger cooldown done") }, 3000);
+  },
+  enableCollision: function () {
+    
+  },
+  tick: function (time, deltaTime) {
+     if (this.isReady) {
+        if (this.attractor) {
+          // const delta = clock.getDelta();
+          this.rotationMatrix.lookAt( this.attractor, this.mesh.position, this.mesh.up );
+          this.targetQuaternion.setFromRotationMatrix( this.rotationMatrix );
+          if ( ! this.mesh.quaternion.equals( this.targetQuaternion ) ) {
+            const step = this.speed * deltaTime;
+            this.mesh.quaternion.rotateTowards( targetQuaternion, step );
+          }
+          this.forwardPush();
+      }
+    }
+  }
+});
+
 
 
 AFRAME.registerComponent('dynamic-ball', {
@@ -117,23 +339,7 @@ AFRAME.registerComponent('scatter_physics', { //scattered randomly (hemisphere),
   
   init: function () {
     this.count = 0;
-    this.radius = 50;
-    // this.el.setAttribute('gltf-model', '#'+ this.data.modelID);
-    console.log("tryna set scatter model " + this.data.modelID);
- 
-    this.sampleMaterial = null;
-
-    this.el.addEventListener('model-loaded', (event) => {
-      const sObj = this.el.getObject3D('mesh');
-      console.log("gotsa mesh!");
-    
-      sObj.traverse(node => {
-        if (node.isMesh && node.material) {
-            this.sampleGeometry = node.geometry;
-            this.sampleMaterial = node.material;
-          }
-        });
-    });
+    this.radius = 20;
     
     this.instancedElements = [];
         for (var i=0; i<this.data.count; i++) {
@@ -143,7 +349,7 @@ AFRAME.registerComponent('scatter_physics', { //scattered randomly (hemisphere),
           // const pos = this.el.object3D.position
     
           const iEl = document.createElement('a-entity')
-          iEl.id = 'i_' + this.count;
+          iEl.id = 's_' + this.count;
           this.count++
           iEl.setAttribute('gltf-model', '#'+ this.data.modelID);
 
@@ -174,7 +380,7 @@ AFRAME.registerComponent('scatter_physics', { //scattered randomly (hemisphere),
       this.instancedElements[i].object3D.rotation.y = (Math.random() * 360 ) * Math.PI / 180;
       this.instancedElements[i].object3D.rotation.z = (Math.random() * 360 ) * Math.PI / 180;
 
-      this.instancedElements[i].setAttribute('mod_physics', {'model': 'instance', 'body': 'dynamic', 'shape': 'sphere'});
+      this.instancedElements[i].setAttribute('mod_physics', {'model': 'spawned', 'body': 'dynamic', 'shape': 'sphere'});
 
     }
   }
@@ -183,10 +389,10 @@ AFRAME.registerComponent('scatter_physics', { //scattered randomly (hemisphere),
 
 AFRAME.registerComponent('instanced_meshes_sphere_physics', { //scattered randomly in sphere, using instanced-mesh component, but can't get the colliders to fit... :(
   schema: {
-
+    type: {default: 'instance'},
     _id: {default: ''},
     modelID: {default: ''},
-    count: {default: 100},
+    count: {default: 20},
     scaleFactor: {default: 10},
     interaction: {default: ''},
     tags: {default: ''},
@@ -194,8 +400,10 @@ AFRAME.registerComponent('instanced_meshes_sphere_physics', { //scattered random
   },
   init: function () {
     this.count = 0;
-    this.radius = 100;
+    this.radius = 20;
     // this.el.setAttribute('gltf-model', '#'+ this.data.modelID);
+    
+
     console.log("tryna set scatter model " + this.data.modelID);
  
     this.instancedElements = [];
@@ -211,7 +419,17 @@ AFRAME.registerComponent('instanced_meshes_sphere_physics', { //scattered random
           this.count++
           console.log("mesh selector " + this.el.id);
           // iEl.setAttribute('instanced-mesh-member', {mesh:this.el.id, memberMesh: true});
-          iEl.setAttribute('instanced-mesh-member', {mesh:'#gltf_'+this.data.modelID, memberMesh: true});
+          iEl.setAttribute('instanced-mesh-member', {mesh:'#i-mesh-sphere', memberMesh: true});
+
+          if (this.data.tags.includes("beat")) {
+            iEl.classList.add("beatme");
+          }
+          // const material1 = new THREE.MeshPhysicalMaterial({
+          //   roughness: 0,
+          //   transmission: 1,
+          //   thickness: 2
+          // });
+
                     
           this.el.sceneEl.appendChild(iEl);
           
@@ -226,20 +444,21 @@ AFRAME.registerComponent('instanced_meshes_sphere_physics', { //scattered random
   applyPhysics: function () {
     let radius = this.radius;
     for (var i=0; i< this.instancedElements.length; i++) {
-      this.instancedElements[i].setAttribute('mod_physics', {'model': 'instance', 'body': 'dynamic', 'shape': 'sphere', 'fit': 'manual'});
+      this.instancedElements[i].setAttribute('mod_physics', {'model': this.data.type, 'body': 'dynamic', 'shape': 'sphere', 'fit': 'manual'});
       let x = Math.random() * radius - (radius/2);
       let y = Math.random() * radius - (radius/2);
       let z = Math.random() * radius - (radius/2);
       // this.instancedElements[i].setAttribute('position', {x: x, y: y, z: z});
       this.instancedElements[i].object3D.position.set(x, y, z)
-      this.instancedElements[i].object3D.position.rotation.x = (Math.random() * 360 ) * Math.PI / 180;
-      this.instancedElements[i].object3D.position.rotation.y = (Math.random() * 360 ) * Math.PI / 180;
-      this.instancedElements[i].object3D.position.rotation.z = (Math.random() * 360 ) * Math.PI / 180;
+      // this.instancedElements[i].object3D.position.rotation.x = (Math.random() * 360 ) * Math.PI / 180;
+      // this.instancedElements[i].object3D.position.rotation.y = (Math.random() * 360 ) * Math.PI / 180;
+      // this.instancedElements[i].object3D.position.rotation.z = (Math.random() * 360 ) * Math.PI / 180;
       // this.instancedElements[i].setAttribute('ammo-body', {type: 'dynamic', emitCollisionEvents: this.isTrigger});
 
       // this.instancedElements[i].setAttribute('ammo-shape', {type: 'sphere'});
     }
-  }
+  },
+
 });
 
 AFRAME.registerComponent('instanced_meshes_sphere', { //scattered randomly in sphere, not on surface
@@ -2382,181 +2601,6 @@ AFRAME.registerComponent('wrap_location', { //used by models and placeholders, n
     if (this.el.object3D.position.y < -22) {
       this.el.object3D.position.y = 50
     }
-  }
-});
-
-AFRAME.registerComponent('mod_physics', { //used by models and placeholders, not objects which manage physics settings in mod_object
-  schema: {
-    model: {default: ''},
-    isTrigger: {type: 'bool', default: false}, // it emits/triggers events, not a 'silent' collider
-    isAudioTrigger: {type: 'bool', default: false}, // emits/triggers audio events
-    body: {type: 'string', default: 'static'},  // dynamic: A freely-moving object
-    shape: {type: 'string', default: 'box'},  // onthefly on glb uses 'mesh' type
-    fit: {type: 'string', default: 'manual'},
-    radius: {type: 'number', default: .5},
-    bounciness: {type: 'number', default: 0}, //i.e. 'restitution' - or use as forceFactor?
-    eventData: {default: ''},
-    tags: {default: []}
-  },
-  init() {
-    this.isTrigger = this.data.isTrigger;
-    this.model = this.data.model;
-    this.body = this.data.body;
-    this.shape = this.data.shape;
-    this.isGhost = false; //
-
-
-
-    this.el.addEventListener('model-loaded', () => {  
-      if (this.model == "instance") {
-        this.el.setAttribute('ammo-body', {type: 'dynamic', mass: 0.1, gravity: '0 0 0', linearSleepingThreshold: 0.1, emitCollisionEvents: this.isTrigger});
-        console.log("tryna load instance body");
-      }
-    });
-    this.el.addEventListener('body-loaded', () => {  
-      if (this.model == "instance") {
-        // this.el.setAttribute('ammo-shape', {type: 'sphere', fit: 'manual', sphereRadius: 1 });
-        this.el.setAttribute('ammo-shape', {type: 'sphere'});
-        console.log("tryna load ashape with trigger " + this.el);
-        this.randomPush();
-      }
-    });
-
-    if (this.model == "instance") { //i.e. adding to an instanced/spawned/pooled mesh...
-      this.isTrigger = true; //cheat
-      
-
-    } else if (this.model == "child") { //i.e. set on a child mesh with name including 'collider', in mod_model, mesh should already be loaded
-
-    
-          this.el.setAttribute('ammo-body', {type: this.body, emitCollisionEvents: this.isTrigger});
-
-          this.el.setAttribute('ammo-shape', {type: this.shape});
-        
-        console.log("tryna load ashape with trigger " + this.isTrigger);
-      // });
-    
-    } else if (this.data.model == "placeholder") { //from cloudmarker, always kinematic
-      this.isGhost = true;
-      // console.log("truyna init mod_physics for id " + this.el.id + " model " + this.model +" isTrigger "+ this.isTrigger + " body " + this.data.body );
-      this.el.setAttribute('ammo-body', {type: 'kinematic', emitCollisionEvents: this.isTrigger}); //placeholder model already loaded in mod_model
-      // this.el.addEventListener('body-loaded', () => {  
-        // if (this.isTrigger) {
-        //   console.log("TRIGGER LOADED");
-        //   this.el.setAttribute('ammo-shape', {type: "sphere"});
-        // } else {
-          this.el.setAttribute("ammo-shape", {type: "box"});
-          // this.el.body.type = 'kinematic';
-        // }
-        // this.el.body.setCollisionF
-        // console.log("ammo shape is " + JSON.stringify(this.el.getAttribute('ammo-shape')));
-        // this.isTrigger = this.data.isTrigger;
-        console.log("tryna load placeholder  " + this.isTrigger);
-      // });
-    
-    } else {
-      if (this.el.object3D) {
-        this.el.setAttribute('ammo-body', {type: this.data.body, emitCollisionEvents: this.isTrigger});
-        this.el.body.restitution = 10;
-        this.el.setAttribute('ammo-shape', {type: 'mesh'});
-      }
-     
-      
-    }
-
-
-    this.el.addEventListener("collidestart", (e) => { //this is for models or triggers, not objects - TODO look up locationData for tags? 
-      // e.preventDefault();
-      console.log("mod_physics collisoin with object with :" + this.el.id + " " + e.detail.targetEl.id + " isTrigger " + this.isTrigger);
-      if (this.isTrigger) { 
-        // console.log("mod_physics TRIGGER collision "  + this.el.id + " " + e.detail.targetEl.id);
-        // e.detail.body.disableCollision = true;
-        // this.disableCollisionTemp(); //must turn it off or it blocks, no true "trigger" mode //or just use kinematic
-        let cloud_marker = e.target.components.cloud_marker; //closest trigger if multiple
-        if (cloud_marker != null) { 
-          if (e.detail.targetEl.id == "player") {
-            cloud_marker.playerTriggerHit();
-          } else {
-            cloud_marker.physicsTriggerHit(e.detail.targetEl.id); 
-          }
-        } else  {
-          let local_marker = e.target.components.local_marker;
-            if (local_marker != null) { 
-              if (e.detail.targetEl.id == "player") {
-                local_marker.playerTriggerHit();
-              } else {
-                local_marker.physicsTriggerHit(e.detail.targetEl.id); 
-              }
-            // } else {
-            
-          }
-        }
-        if (this.el.id.toLowerCase().includes("pin")) {
-          var triggerAudioController = document.getElementById("triggerAudio");
-          if (triggerAudioController != null) {
-            console.log("mod_physics TRIGGER collision "  + this.el.id + " " + e.detail.targetEl.id);
-            triggerAudioController.components.trigger_audio_control.playSingleAtPosition(e.detail.targetEl.object3D.position, window.playerPosition.distanceTo(e.detail.targetEl.object3D.position), ["bell"], 1);
-          }
-          const force = new Ammo.btVector3(0, 1, -10);
-          const pos = new Ammo.btVector3(this.el.object3D.position.x, e.detail.targetEl.object3D.position.y, e.detail.targetEl.object3D.position.z);
-          e.detail.targetEl.body.applyImpulse(force, pos);
-          Ammo.destroy(force);
-          Ammo.destroy(pos);
-          // this.el.material.color.setHex("#000000".replace(/0/g,function(){return (~~(Math.random()*16)).toString(16);}));
-        }
-        if (this.el.id.toLowerCase().includes("wall")) {
-          var triggerAudioController = document.getElementById("triggerAudio");
-          if (triggerAudioController != null) {
-            console.log("mod_physics TRIGGER collision "  + this.el.id + " " + e.detail.targetEl.id);
-            triggerAudioController.components.trigger_audio_control.playAudioAtPosition(e.detail.targetEl.object3D.position, window.playerPosition.distanceTo(e.detail.targetEl.object3D.position), ["bang"], 1);
-          }
-          const force = new Ammo.btVector3(0, 1, -10);
-          const pos = new Ammo.btVector3(this.el.object3D.position.x, e.detail.targetEl.object3D.position.y, e.detail.targetEl.object3D.position.z);
-          e.detail.targetEl.body.applyImpulse(force, pos);
-          Ammo.destroy(force);
-          Ammo.destroy(pos);
-          // this.el.material.color.setHex("#000000".replace(/0/g,function(){return (~~(Math.random()*16)).toString(16);}));
-        }
-
-      // let mod_obj_component = e.detail.targetEl.components.mod_object;
-      // if (mod_obj_component != null) {
-      //   // console.log(this.el.id + " gotsa collision with " + mod_obj_component.data.objectData.name);
-      //   if (mod_obj_component.data.objectData.tags != undefined && mod_obj_component.data.objectData.tags != null) {
-      //     var triggerAudioController = document.getElementById("triggerAudio");
-      //     if (triggerAudioController != null) {
-      //       triggerAudioController.components.trigger_audio_control.playAudioAtPosition(e.detail.targetEl.object3D.position, window.playerPosition.distanceTo(e.detail.targetEl.object3D.position), mod_obj_component.data.objectData.tags);
-      //     }
-      //   }
-        
-      }
-      if (this.isGhost) {
-        this.el.setAttribute('ammo-body', {disableCollision: true});
-        this.disableCollisionTemp();
-      }
-    });
-
-  // loadShape: function () {
-  //   this.el.addEventListener('body-loaded', () => {  
-  //       this.el.setAttribute('ammo-shape', {type: this.data.shape});
-  //       console.log("ammo shape is " + JSON.stringify(this.el.getAttribute('ammo-shape')));
-  //     });
-  
-  },
-  randomPush: function () {
-
-    const velocity = new Ammo.btVector3(Math.random(), Math.random(), Math.random());
-    this.el.body.setLinearVelocity(velocity);
-    //this.el.body.restitution = .9;
-    Ammo.destroy(velocity);
-  },
-  disableCollisionTemp: function () { //bc ammo don't have no triggerz, except "ghostobject" !?
-    
-    setTimeout( () => {
-      this.el.setAttribute('ammo-body', {disableCollision: false}); 
-      console.log("trigger cooldown done") }, 3000);
-  },
-  enableCollision: function () {
-    
   }
 });
 

@@ -1529,7 +1529,7 @@ app.post("/authreq", function (req, res) {
                                                 console.log("auth = " + appAuth);
                                             }
 
-                                        } else if (password == "321FireMeBoy123") { // VERY STUMPID FOR ADIN OVERRIDE TODO: IMPERSONATE USER LOGIC?
+                                        } else if (password == process.env.TESTPASS) { //TODO: IMPERSONATE USER LOGIC?
                                             console.log("admin override..?!");
                                             // req.session.auth = "noauth";
                                             // res.send("noauth");
@@ -10837,6 +10837,7 @@ app.post('/delete_storeitem/', requiredAuthentication, admin, function (req, res
     db.storeitems.remove( { "_id" : o_id }, 1 );
     res.send("deleted");
 });
+
 app.post('/purchase', checkAppID, requiredAuthentication, function (req, res) {
     console.log("tryna post purchase: " + JSON.stringify(req.body));
 
