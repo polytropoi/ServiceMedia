@@ -3788,6 +3788,7 @@ webxr_router.get('/:_id', function (req, res) {
                     audioGroups.primaryGroups = sceneResponse.scenePrimaryAudioGroups;
                     settings.audioGroups = audioGroups; 
                     settings.clearLocalMods = false;
+                    settings.sceneVideoStreams = sceneResponse.sceneVideoStreamUrls;
                     if (sceneResponse.sceneTags != null && sceneResponse.sceneTags.includes("hide avatars")) {
                         settings.hideAvatars = true;
                     }

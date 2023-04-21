@@ -12161,8 +12161,30 @@ function getAllPeople() {
         }, 1000);
     }
 
-    //big scene view below!
+    function PlayHLSVideo (elID, url) {
 
+
+    
+            var video = document.getElementById(elID);
+            if (video != null && Hls.isSupported()) {
+                var hls = new Hls({
+                debug: true,
+                });
+                hls.loadSource(url);
+                hls.attachMedia(video);
+                hls.on(Hls.Events.MEDIA_ATTACHED, function () {
+                video.muted = true;
+                video.play();
+                });
+            } else {
+                console.log("didn't find video " + elID + " hls ok" + Hls.isSupported())
+            }
+            // hls.js is not supported on platforms that do not have Media Source Extensions (MSE) enabled.
+            // When the browser has built-in HLS support (check using `canPlayType`), we can provide an HLS manifest (i.e. .m3u8 URL) directly to the video element through the `src` property.
+            // This is using the built-in support of the plain video element, without using hls.js.
+
+        }
+    
     function showScene(response) {
             // console.log("locations " + JSON.stringify(response.data.sceneLocations));
             $("#pageTitle").html("Scene " + response.data.sceneTitle + " details");
@@ -12261,6 +12283,7 @@ function getAllPeople() {
             let sceneColor3Alt = response.data.sceneColor3Alt != undefined ? response.data.sceneColor3Alt : ""; 
             let sceneColor4Alt = response.data.sceneColor4Alt != undefined ? response.data.sceneColor4Alt : ""; 
             let sceneYouTubeIDs = (response.data.sceneYouTubeIDs != undefined && response.data.sceneYouTubeIDs != null) ? response.data.sceneYouTubeIDs : new Array();
+            let sceneVideoStreamUrls = (response.data.sceneVideoStreamUrls != undefined && response.data.sceneVideoStreamUrls != null) ? response.data.sceneVideoStreamUrls : new Array();
             // let scenePictureGroups = ""; 
             let scenePictureGroups = (response.data.scenePictureGroups != undefined && response.data.scenePictureGroups != null) ? response.data.scenePictureGroups : ""; 
             let scenePictures = (response.data.scenePictures != undefined && response.data.scenePictures != null) ? response.data.scenePictures : ""; //ids
@@ -12300,7 +12323,10 @@ function getAllPeople() {
             //         console.log(error);
             // });
             // console.log("SCENE GREETING IS " + sceneGreeting);
+
             sceneYouTubeIDs = [].concat(sceneYouTubeIDs); //force to array "type"
+            sceneVideoStreamUrls = [].concat(sceneVideoStreamUrls);
+
             let heightmapName = "";
             if (response.data.sceneHeightmap != null && response.data.sceneHeightmap.name != undefined) {
                 heightmapName = response.data.sceneHeightmap.name;
@@ -12732,12 +12758,7 @@ function getAllPeople() {
                 for (let i = 0; i < sceneYouTubeIDs.length; i++) {
                     youTubes = youTubes +
                     "<div class=\x22card\x22 style=\x22width:256px;\x22>" +
-                        // "<div class=\x22embed-responsive embed-responsive-16by9\x22>" +
-                        // "<iframe class=\x22embed-responsive-item\x22 src=\x22https://www.youtube.com/embed/" + sceneYouTubeIDs[i] +"\x22 allowfullscreen></iframe>" +
-                        // "</div>" +
-                        // "<div><a role=\x22button\x22 class=\x22badge badge-xs badge-info float-left\x22 href=\x22https://www.youtube.com/watch?v="+response.data.sceneYouTubeIDs[i]+"\x22>^</a>" +
-                        // "<button type=\x22button\x22 class=\x22remYouTube badge badge-xs badge-danger float-right\x22 id=\x22"+response.data.sceneYouTubeIDs[i] +"\x22>X</button></div>" +
-                        // "<div class=\x22youtube-container\x22>" +   
+                        
                         "<iframe width=\x22240\x22 height=\x22180\x22 src=\x22https://www.youtube.com/embed/"+sceneYouTubeIDs[i]+"\x22 frameborder=\x220\x22 allow=\x22accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture\x22 allowfullscreen></iframe>" +
                         "<button id=\x22"+sceneYouTubeIDs[i]+"\x22 type=\x22button\x22 class=\x22remYouTube badge badge-sm badge-danger float-right\x22>X</button>" +
                         "<span class=\x22badge badge-pill badge-light float-right badge-sm\x22>ID: "+sceneYouTubeIDs[i]+"</span>" +
@@ -12746,6 +12767,19 @@ function getAllPeople() {
                     }
                     // youTubes = youTubes + "</div>";
                 }
+            let videoStreams = "";    
+            if (response.data.sceneVideoStreamUrls != null && response.data.sceneVideoStreamUrls != undefined && response.data.sceneVideoStreamUrls.length > 0 ) {
+                console.log("tryna fetch vidstreams " + JSON.stringify(response.data.sceneVideoStreamUrls));
+                for (let i = 0; i < sceneVideoStreamUrls.length; i++) {
+                    let vindex = "videostream_" + (i * 100).toString();
+                    videoStreams = videoStreams +
+                    "<div class=\x22card\x22 style=\x22width:320px;\x22>" +
+                    "<video id=\x22" + vindex + "\x22 width=\x22320\x22 height=\x22240\x22 controls>"+
+                    "</video><button id=\x22button_"+vindex+"\x22 onclick=\x22PlayHLSVideo('"+vindex+"','" + sceneVideoStreamUrls[i] + "')\x22 type=\x22button\x22 class=\x22badge badge-sm badge-success float-right\x22>play</button></div>";
+
+                    }
+                    
+                }  
             let primaryAudio = {};
             let ambientAudio = {};
             let triggerAudio = {};
@@ -13327,7 +13361,7 @@ function getAllPeople() {
                             "<div class=\x22col form-group\x22>" +
                             "</div>" +     
                             "<div class=\x22col form-group\x22>" +
-                                "<label for=\x22sceneTags\x22>YouTube Videos</label><br>" + //Tags
+                                "<label for=\x22youtubes\x22>YouTube Videos</label><br>" + 
                                 "<div class=\x22input-group\x22>" +
                                     "<div class=\x22input-group-prepend\x22>" +
                                     "<a href=\x22#\x22 class=\x22btn input-group-text\x22 id=\x22addYouTubeButton\x22>+</a>" +
@@ -13337,10 +13371,24 @@ function getAllPeople() {
                                     // "</div>" +
                                 "</div>" +
                             "</div>" + 
+                                "<div class=\x22col form-group\x22>" +
+                                "<label for=\x22streams\x22>Stream URLs</label><br>" + 
+                                "<div class=\x22input-group\x22>" +
+                                    "<div class=\x22input-group-prepend\x22>" +
+                                    "<a href=\x22#\x22 class=\x22btn input-group-text\x22 id=\x22addVideoStreamButton\x22>+</a>" +
+                                    "</div>" +
+                                    "<input id=\x22addVideoStreamInput\x22 type=\x22text\x22 class=\x22form-control\x22 placeholder=\x22Add HLS Streaming URL (*.m3u8)\x22 aria-label=\x22Input group example\x22 aria-describedby=\x22x22addVideoStreamInput\x22>" +
+                                    // "<div id=\x22ytDisplay\x22>" +
+                                    // "</div>" +
+                                "</div>" +
+                            "</div>" + 
                             "<div class=\x22form-row\x22>" +
                                 sceneVids +
                                 youTubes +
+                                videoStreams +
                                 "<div id=\x22ytDisplay\x22>" +
+                                "</div>" +
+                                "<div id=\x22streamDisplay\x22>" +
                                 "</div>" +
                             "</div>" +    
                             "<hr/>" +
@@ -15447,7 +15495,26 @@ function getAllPeople() {
                             }
                         });
                     });
+                    $(document).on('click', '#addVideoStreamButton', function(e){
+                        e.preventDefault();
+                        let newStreamUrl = document.getElementById("addVideoStreamInput").value;
+                        console.log("tryna add new video stream url: " + newStreamUrl);
 
+                        
+                        sceneVideoStreamUrls.push(newStreamUrl);
+                        let html = "";
+                        for (let i = 0; i < sceneVideoStreamUrls.length; i++) {
+                            let vindex = "videostream_" + i.toString();
+                            html = html + 
+                            "<div class=\x22card\x22 style=\x22width:320px;\x22>" +
+                            "<video id=\x22" + vindex + "\x22 width=\x22320\x22 height=\x22240\x22 controls>"+
+                            
+                            "</video><button id=\x22button_"+vindex+"\x22 onclick=\x22PlayHLSVideo('"+vindex+"','" + sceneVideoStreamUrls[i] + "')\x22 type=\x22button\x22 class=\x22badge badge-sm badge-success float-right\x22>play</button></div>";
+                            
+                        }
+                        $("#streamDisplay").empty();
+                        $("#streamDisplay").html(html);
+                    });
                     $(document).on('click', '#addYouTubeButton', function(e){
                         e.preventDefault();
                         let newYTID = document.getElementById("addYouTubeInput").value;
@@ -15695,6 +15762,17 @@ function getAllPeople() {
                         document.getElementById('sceneSubmitButton').click();
                         
                     }); 
+                    $(document).on('click','.remStreamUrl',function(e){
+                        e.preventDefault();  
+                        console.log("tryna remove youtube " + this.id);
+                        for( var i = 0; i < sceneVideoStreamUrls.length; i++) { 
+                            if ( sceneVideoStreamUrls[i] === this.id) {
+                                sceneVideoStreamUrls.splice(i, 1); 
+                            }
+                        }
+                        const id = "#" + this.id;
+                        $(id).parent().parent().hide();
+                    });  
                     $(document).on('click','.remYouTube',function(e){
                         e.preventDefault();  
                         console.log("tryna remove youtube " + this.id);
@@ -16515,6 +16593,7 @@ function getAllPeople() {
                             scenePictureGroups: scenePictureGroups,
                             sceneVideos: sceneVideos,
                             sceneYouTubeIDs: sceneYouTubeIDs,
+                            sceneVideoStreamUrls: sceneVideoStreamUrls,
                             sceneModels: sceneModels,
                             sceneObjects: sceneObjects,
                             scenePostcards: scenePostcards,

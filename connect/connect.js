@@ -94,6 +94,8 @@ $('a-entity').each(function() {  //external way of getting click duration for ph
  
  });
 
+
+/////////////////// main onload function below, populate settings, etc.
 $(function() { 
    player = document.getElementById("player");
    posRotReader = document.getElementById("player").components.get_pos_rot; 

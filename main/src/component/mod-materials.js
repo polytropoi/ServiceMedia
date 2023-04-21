@@ -340,6 +340,11 @@ AFRAME.registerComponent('mod-materials', {
 
         // primaryVideo = video;
         let m3u8 = '/hls/'+this.data.id;
+
+        if (settings.sceneVideoStreams != null) {
+          m3u8 = settings.sceneVideoStreams[0];
+          this.data.videoTitle = settings.sceneTitle;
+        }
         if (Hls.isSupported()) {
           // console.log("hls supported!");
           // var hls = new Hls();

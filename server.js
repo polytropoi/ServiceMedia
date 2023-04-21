@@ -3901,7 +3901,7 @@ app.post('/process_staging_files', requiredAuthentication, function (req, res) {
                                             res.send("staged file not found");
                                         } else {
                                             // meateada = metadata;
-                                            console.log("staged file meateada " + data);
+                                            console.log("head staged file meateada " + data);
                                             callback(null);
                                         }
                                     });
@@ -14173,6 +14173,7 @@ app.post('/clone_scene', requiredAuthentication, function (req,res) {
                     sceneNumber : scene.sceneNumber,
                     sceneTags : scene.sceneTags,
                     sceneYouTubeIDs : (scene.sceneYouTubeIDs != null && scene.sceneYouTubeIDs != undefined) ? scene.sceneYouTubeIDs : [],
+                    sceneVideoStreamUrls : (scene.sceneVideoStreamUrls != null && scene.sceneVideoStreamUrls != undefined) ? scene.sceneVideoStreamUrls : [],
                     sceneLinks : scene.sceneLinks,
                     scenePeopleGroupID : scene.scenePeopleGroupID,
                     sceneLocationGroups : scene.sceneLocationGroups,
@@ -14458,6 +14459,7 @@ app.post('/update_scene/:_id', requiredAuthentication, function (req, res) {
                 sceneTitle : req.body.sceneTitle,
                 sceneTags : req.body.sceneTags,
                 sceneYouTubeIDs : (req.body.sceneYouTubeIDs != null && req.body.sceneYouTubeIDs != undefined) ? req.body.sceneYouTubeIDs : [],
+                sceneVideoStreamUrls : (req.body.sceneVideoStreamUrls != null && req.body.sceneVideoStreamUrls != undefined) ? req.body.sceneVideoStreamUrls : [],
                 sceneLinks : req.body.sceneLinks,
                 scenePeopleGroupID : req.body.scenePeopleGroupID,
                 sceneLocationGroups : req.body.sceneLocationGroups,
