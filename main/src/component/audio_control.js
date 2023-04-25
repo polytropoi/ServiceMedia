@@ -1570,7 +1570,6 @@ AFRAME.registerComponent('trigger_audio_control', { //trigger audio on designate
     },
     playSingleAtPosition: function(pos, distance, tag, volmod) {
         
-
         if (triggerAudioHowl != null && tag != undefined && tag != null && tag != "") {
         // this.modVolume(1);
         // console.log("tryna play trigger audio with tag " + tag);

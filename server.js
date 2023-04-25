@@ -910,7 +910,7 @@ async function ReturnObjectMetadata(bucket, key) { //s3.headObject == minio.stat
                 return err
             } else {
                 // meateada = metadata;
-                console.log("staged file meateada " + data);
+                console.log("ReturnObjectMetadata file meateada " + data);
                 // callback(null);
                 return data;
             }
@@ -3898,7 +3898,7 @@ app.post('/process_staging_files', requiredAuthentication, function (req, res) {
                                             // Handle no object on cloud here
                                             console.log(err);
                                             callback(err);
-                                            res.send("staged file not found");
+                                            // res.send("staged file not found");
                                         } else {
                                             // meateada = metadata;
                                             console.log("head staged file meateada " + data);
