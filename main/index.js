@@ -7206,6 +7206,9 @@
     let header ="dbID,Name,DisplayName,Archetype,Type,Subtype,Price,UseGameCurrency,Color,newMeshName,materialName,newTextureName,meshInProject,inGame,uiClass,overrides,inStore,rarity\n";
     return header + csv
     }
+    function newStoreItem() { //TODO instead of reusing the form...
+        
+    }
     function showStoreItem(response) {
         console.log("tryna show store item with response : " + JSON.stringify(response));
             let isEmpty = $.isEmptyObject(response); //reuse the form to create new vs update existing record
@@ -7304,7 +7307,17 @@
                     "</div>" +
                     "</div>" +
                     "<div class=\x22form-row\x22>" +  
-
+                    "<div class=\x22col form-group col-md-3\x22>" +
+                        "<label for=\x22storeItemTypeSelect\x22>Select Type</label>" +
+                        "<select class=\x22form-control\x22 id=\x22storeItemTypeSelect\x22 >" +
+                        "<option value=\x22\x22 disabled selected>Select:</option>" +
+                        "<option>Event Ticket</option>" +
+                        "<option>Subscription</option>" +
+                        "<option>Physical Purchase</option>" +
+                        "<option>Virtual Purchase</option>" +
+                        "<option>Physical + Virtual Purchase</option>" +
+                        "</select>" +
+                    "</div>" +
                     "<div class=\x22col form-group col-md-3\x22>" +
                         "<label for=\x22storeItemStatus\x22>Select Item Status</label>" +
                         "<select class=\x22form-control\x22 id=\x22storeItemStatus\x22 >" +

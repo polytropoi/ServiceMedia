@@ -341,7 +341,7 @@ AFRAME.registerComponent('mod-materials', {
         // primaryVideo = video;
         let m3u8 = '/hls/'+this.data.id;
 
-        if (settings.sceneVideoStreams != null) {
+        if (settings.sceneVideoStreams != null && settings.sceneVideoStreams.length > 0) {
           m3u8 = settings.sceneVideoStreams[0];
           this.data.videoTitle = settings.sceneTitle;
         }
@@ -663,7 +663,7 @@ AFRAME.registerComponent('mod-materials', {
                 }
               }
               // break;
-            } else if (this.mouseOverObject.includes("slider_background")) {
+            } else if (this.mouseOverObject.includes("slider_background") && this.video.duration) {
 
                     // this.slider_begin.position.y/this.slider_end.position.y 
                     let nStart = new THREE.Vector3();
@@ -672,9 +672,12 @@ AFRAME.registerComponent('mod-materials', {
                     this.slider_end.getWorldPosition( nEnd );
                     console.log("background hit at " + JSON.stringify(this.hitpoint));
                     let range = nEnd.x.toFixed(2) - nStart.x.toFixed(2);
-                    let correctedStartValue = this.hitpoint.x.toFixed(2) - nEnd.x.toFixed(2);
-                    let percentage = (((correctedStartValue * 100) / range) + 100).toFixed(2); 
+                    let correctedStartValue = 0;
+                    correctedStartValue = this.hitpoint.x.toFixed(2) - nEnd.x.toFixed(2);
+                    let percentage = 0;
+                    percentage = (((correctedStartValue * 100) / range) + 100).toFixed(2); 
                     let time = (percentage * (this.video.duration / 100)).toFixed(2);
+
                     // let touchPosition = (((intersects[i].point.y.toFixed(2) - this.slider_begin.position.y.toFixed(2)) * 100) / (this.slider_end.position.y.toFixed(2) - this.slider_begin.position.y.toFixed(2)));
                     console.log("bg touch % " + percentage +  " touchPosition " + + JSON.stringify(this.hitpoint) + " vs start " +  JSON.stringify(nStart) + " vs end " +  JSON.stringify(nEnd));
                     // this.slider_handle.position.x = intersects[i].point.x; 
