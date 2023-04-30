@@ -324,13 +324,13 @@ AFRAME.registerComponent('mod-materials', {
         /// ------------- cubemaap fu
         this.textureArray = [];
         this.el.classList.add("activeObjexRay");
-        for (let i = 1; i < 7; i++) {
-          this.envmapEl = document.querySelector("#envmap_" + i);
-          if (this.envmapEl) {
-          this.path = this.envmapEl.getAttribute("src");
-          this.textureArray.push(this.path);
-          }
-        }
+        // for (let i = 1; i < 7; i++) {
+        //   this.envmapEl = document.querySelector("#envmap_" + i);
+        //   if (this.envmapEl) {
+        //   this.path = this.envmapEl.getAttribute("src");
+        //   this.textureArray.push(this.path);
+        //   }
+        // }
         // this.id = "primary_video";  //hrm, could be multiples...
         this.cmTexture = new THREE.CubeTextureLoader().load(this.textureArray);
         this.cmTexture.format = THREE.RGBFormat;
@@ -530,9 +530,15 @@ AFRAME.registerComponent('mod-materials', {
               this.vidtexture.flipY = this.data.flipY; 
               this.vidtexture.minFilter = THREE.NearestFilter;
               this.vidtexture.magFilter = THREE.NearestFilter;
-              this.playmaterial = new THREE.MeshBasicMaterial( { map: this.vidtexture } ); 
+              // this.playmaterial = new THREE.MeshBasicMaterial( { map: this.vidtexture } ); 
               
-           
+              this.playmaterial = new THREE.MeshPhongMaterial({
+                map: this.vidtexture,
+                emissiveMap: this.vidtexture,
+                side: THREE.FrontSide,
+                emissive: 0xffffff,
+                emissiveIntensity: 1
+              });
               console.log("tryna bind vid material to mesh");
 
               this.playmaterial.map.needsUpdate = true;   

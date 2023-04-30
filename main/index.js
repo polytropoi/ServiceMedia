@@ -4666,7 +4666,7 @@
             "</div>" +
             "</div>" +
                 // "<h5 class=\x22mt-0\x22></h5><br><br>" +
-                keyValues(response.data) +
+                // keyValues(response.data) +
                 
                 // "</div>" +
                 "</div>" +
@@ -7245,6 +7245,7 @@
                 }
                 itemAccessGroups = itemAccessGroups +  "</div>";
             }
+            let itemID = !isEmpty ? response.data._id : "";
             let itemName = !isEmpty ? response.data.itemName : "";
             let objectID = !isEmpty ? response.data.objectID : "";
             let objectName = !isEmpty ? response.data.objectName : ""; 
@@ -7350,7 +7351,7 @@
                     "<div class=\x22form-row\x22>" +
                    
                     "<div class=\x22col form-group col-md-3\x22>" +
-                        "<a class=\x22btn btn-info\x22 href=\x22index.html?type=objects&mode=select&parent=storeitem&iid="+response.data._id+"\x22><i class=\x22fas fa-hand-pointer\x22></i> Select Object</a>" +
+                        "<a class=\x22btn btn-info\x22 href=\x22index.html?type=objects&mode=select&parent=storeitem&iid="+itemID+"\x22><i class=\x22fas fa-hand-pointer\x22></i> Select Object</a>" +
                         storeitemObj +
                     "</div>" +
                     "</div>" +

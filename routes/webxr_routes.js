@@ -1330,7 +1330,7 @@ webxr_router.get('/:_id', function (req, res) {
                                 if (sceneResponse.sceneUseFloorPlane && sceneResponse.sceneFloorplaneTexture == "none") {
                                     ground = "ground: none; dressing: none;"
                                 }
-                                if (sceneResponse.sceneUseFloorPlane && sceneResponse.sceneFloorplaneTexture.toLowerCase() == "flat") {
+                                if (sceneResponse.sceneUseFloorPlane && sceneResponse.sceneFloorplaneTexture != null && sceneResponse.sceneFloorplaneTexture.toLowerCase() == "flat") {
                                     ground = "ground: flat; dressing: none;"
                                 }
                                 if (sceneResponse.sceneUseDynamicShadows) {
@@ -2768,14 +2768,17 @@ webxr_router.get('/:_id', function (req, res) {
                        
                         } else { //if it's an html...
                             // if (sceneResponse.sceneTextItems != null && sceneResponse.sceneTextItems != undefined && sceneResponse.sceneTextItems.length > 0) {
-                            db.text_items.findOne({_id: moids}, function (err, text_item){
+                                console.log("Tryna fetch scenetextitgme " + sceneResponse.sceneTextItems);
+                                let oid = ObjectID(sceneResponse.sceneTextItems.toString());
+                            db.text_items.findOne({_id: oid}, function (err, text_item){
                                 if (err || !text_item) {
                                     console.log("error getting text_items: " + err);
                                     sceneTextItemData = "no data found";
                                     callback(null);
                                 } else {
                                     sceneTextItemData = text_item.textstring; // html with the trimmings...
-                                
+                                    // console.log("full on html: " + sceneTextItemData);
+                                    // htmltext = sceneTextItemData;
                                     callback(null)
                                 }
                             });
@@ -3359,7 +3362,7 @@ webxr_router.get('/:_id', function (req, res) {
 
                             db.image_items.findOne({"_id": oo_id}, function (err, picture_item) {
 
-                                bucketFolder = sceneResponse.sceneDomain;
+                                bucketFolder = sceneResponse.sceneDomain; //TODO use "public" bucket if set in process.ENV
                                 // console.log("params " + JSON.stringify(params)); 
                                 if (err || !picture_item) {
                                     console.log("error getting postcard " + postcard._id + err);
@@ -3370,13 +3373,14 @@ webxr_router.get('/:_id', function (req, res) {
                                     // callback(null);
                                     var params = {
                                         Bucket: sceneResponse.sceneDomain,
-                                        Key: sceneResponse.short_id + "/"+ postcard + ".standard." + picture_item.filename
+                                        Key: "postcards/" + sceneResponse.short_id + "/"+ postcard + ".standard." + picture_item.filename //put in postcards folder instead of root, duh
                                     }
+                                    //todo - MINIO support
                                     s3.headObject(params, function(err, data) { //check that the postcard is pushed to static route
                                         if (err) {
                                             console.log("postcard missing from static route, tryna copy to " + sceneResponse.sceneDomain);
                                             s3.copyObject({Bucket: bucketFolder, CopySource: 'servicemedia/users/' + picture_item.userID +"/pictures/"+ picture_item._id + ".standard." + picture_item.filename,
-                                                Key: sceneResponse.short_id + "/"+ picture_item._id + ".standard." + picture_item.filename}, function (err, data) {
+                                                Key: "postcards/" + sceneResponse.short_id + "/"+ picture_item._id + ".standard." + picture_item.filename}, function (err, data) {
                                                 if (err) {
                                                     console.log("ERROR copyObject" + err);
                                                     callback();
@@ -3384,14 +3388,14 @@ webxr_router.get('/:_id', function (req, res) {
                                                     console.log('SUCCESS copyObject');
                                                     
                                                    
-                                                    postcard1 = sceneResponse.sceneDomain +"/"+sceneResponse.short_id +"/"+ picture_item._id + ".standard." + picture_item.filename;
+                                                    postcard1 = sceneResponse.sceneDomain +"/postcards/"+sceneResponse.short_id +"/"+ picture_item._id + ".standard." + picture_item.filename;
                                                    
                                                     callback();
                                                 }
                                             });
                                         } else {
                                             
-                                            postcard1 = "http://" + sceneResponse.sceneDomain +"/"+sceneResponse.short_id +"/"+ picture_item._id + ".standard." + picture_item.filename;
+                                            postcard1 = "http://" + sceneResponse.sceneDomain +"/postcards/"+sceneResponse.short_id +"/"+ picture_item._id + ".standard." + picture_item.filename;
                                             console.log("gotsa postcard " + postcard1 );
                                             callback();
                                         }
@@ -3977,10 +3981,10 @@ webxr_router.get('/:_id', function (req, res) {
                             // "<script>InitSceneHooks(\x22Model Viewer\x22)</script>";
                             "</html>";
                             console.log("Tryna do a model viewer");
-                        } else if (sceneResponse.sceneWebType == "HTML from Text Item") {
+                    } else if (sceneResponse.sceneWebType == "HTML from Text Item") {
 
-                            htmltext = sceneTextItemData.textstring;
-                            console.log("Tryna send html from text itme");
+                        htmltext = sceneTextItemData;
+                        console.log("Tryna send html from text itme " + htmltext);
 
                         
                     
