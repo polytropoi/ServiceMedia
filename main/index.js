@@ -15258,6 +15258,7 @@ function getAllPeople() {
                         sceneYouTubeIDs = [];
                         sceneVideos = [];
                         sceneVideoGroups = [];
+                        sceneVideoStreamUrls = [];
                     });  
                     $(document).on('click','.clearScenePrimaryAudio',function(e) {
                         e.preventDefault();  

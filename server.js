@@ -1949,7 +1949,7 @@ app.post('/check_sub_email/', requiredAuthentication, function(req, res){ //conv
                                         if ( err || !newUser ){
                                             console.log("db error, new user not saved", err);
                                             res.send("error creating user : " + err);
-                                        } else  {
+                                        } else {
                                             console.log("new user saved to db");
                                             var user_id = newUser._id.toString();
                                             console.log("userID: " + user_id);
@@ -1979,29 +1979,29 @@ app.post('/check_sub_email/', requiredAuthentication, function(req, res){ //conv
                                                     //res.redirect("http://elnoise.com/#/login");
                                                 });
                                         
-                                        res.send("Thanks! A validation email has been sent to the address you provided; you must click on the validation link to activate your account.");
-                                        // res.redirect("/#/newthanks");
-                                        var htmlbody = req.body.email + " iap subscriber converting to user with receipt : " + JSON.stringify(req.body.receipt);
-                                        ses.sendEmail( {
-                                            Source: "admin@servicemedia.net",
-                                            Destination: { ToAddresses: [adminEmail]},
-                                            Message: {
-                                                Subject: {
-                                                    Data: "new iap user " + req.body.email
-                                                },
-                                                Body: {
-                                                    Html: {
-                                                        Data: htmlbody
+                                            res.send("Thanks! A validation email has been sent to the address you provided; you must click on the validation link to activate your account.");
+                                            // res.redirect("/#/newthanks");
+                                            var htmlbody = req.body.email + " iap subscriber converting to user with receipt : " + JSON.stringify(req.body.receipt);
+                                            ses.sendEmail( {
+                                                Source: "admin@servicemedia.net",
+                                                Destination: { ToAddresses: [adminEmail]},
+                                                Message: {
+                                                    Subject: {
+                                                        Data: "new iap user " + req.body.email
+                                                    },
+                                                    Body: {
+                                                        Html: {
+                                                            Data: htmlbody
+                                                        }
                                                     }
                                                 }
                                             }
-                                        }
-                                        , function(err, data) {
-                                            if(err) throw err
-                                            console.log('Email sent:');
-                                            console.log(data);
-                                           
-                                        });
+                                            , function(err, data) {
+                                                if(err) throw err
+                                                console.log('Email sent:');
+                                                console.log(data);
+                                            
+                                            });
                                         }
                                     });
                                 });
@@ -7067,13 +7067,14 @@ app.post('/share_scene/', function (req, res) { //yep! //make it public?
  });
  });
  */
-app.post('/newuser', checkAppID, function (req, res) {
+// app.post('/newuser', checkAppID, function (req, res) {
+app.post('/newuser', requiredAuthentication, admin, function (req, res) {    
 //        $scope.user.domain = "servicmedia";
 //        $scope.user.appid = "55b2ecf840edea7583000001";
 
     var appid = req.headers.appid;
     var domain = req.body.domain;
-    console.log('newUser request from: ' + req.body.userName);
+    console.log('newUser request from: ' + JSON.stringify(req.body));
     // ws.send("authorized");
     if (req.body.userPass.length < 7) {  //weak
         console.log("bad password");
@@ -7109,15 +7110,16 @@ app.post('/newuser', checkAppID, function (req, res) {
                                         createDate : timestamp,
                                         validationHash : cleanhash,
                                         createIP : ip,
-                                        odomain : req.body.domain, //original domain
-                                        oappid : req.headers.appid.toString().replace(":", ""), //original app id
+                                        paymentStatus: "ok", //hrm...
+                                        // odomain : req.body.domain, //original domain
+                                        // oappid : req.headers.appid.toString().replace(":", ""), //original app id
                                         password : hash
                                     },
                                     function (err, newUser){
                                         if ( err || !newUser ){
                                             console.log("db error, new user not saved", err);
                                             res.send("error");
-                                        } else  {
+                                        } else {
                                             console.log("new user saved to db");
                                             var user_id = newUser._id.toString();
                                             console.log("userID: " + user_id);

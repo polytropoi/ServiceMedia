@@ -34,28 +34,28 @@
               <div class="text-center">
                 <h1 class="h4 text-gray-900 mb-4">Create an Account!</h1>
               </div>
-              <form class="user">
+              <form id="theForm" class="user"></form>
                 <div class="form-group row">
                   <div class="col-sm-6 mb-3 mb-sm-0">
-                    <input type="text" class="form-control form-control-user" id="exampleFirstName" placeholder="User Name">
+                    <input type="text" class="form-control form-control-user" id="userName" placeholder="User Name">
                   </div>
                   <!-- <div class="col-sm-6">
                     <input type="text" class="form-control form-control-user" id="exampleLastName" placeholder="Last Name">
                   </div> -->
                 </div>
                 <div class="form-group">
-                  <input type="email" class="form-control form-control-user" id="exampleInputEmail" placeholder="Email Address">
+                  <input type="email" class="form-control form-control-user" id="userEmail" placeholder="Email Address">
                 </div>
                 <div class="form-group row">
                   <div class="col-sm-6 mb-3 mb-sm-0">
-                    <input type="password" class="form-control form-control-user" id="exampleInputPassword" placeholder="Password">
+                    <input type="password" class="form-control form-control-user" id="inputPassword" placeholder="Password">
                   </div>
                   <div class="col-sm-6">
-                    <input type="password" class="form-control form-control-user" id="exampleRepeatPassword" placeholder="Repeat Password">
+                    <input type="password" class="form-control form-control-user" id="repeatPassword" placeholder="Repeat Password">
                   </div>
                 </div>
-                <a href="login.html" class="btn btn-primary btn-user btn-block">
-                  Register Account
+                <a href="#" onclick="newuserreq();" class="btn btn-primary btn-user btn-block">
+                  Register New Account
                 </a>
                 <hr>
                 <!-- <a href="index.html" class="btn btn-google btn-user btn-block">
@@ -89,7 +89,43 @@
 
   <!-- Custom scripts for all pages-->
   <script src="js/sb-admin-2.min.js"></script>
+  <script>
 
+    function newuserreq() {
+      var hostname = "";
+      var userName = $( "#userName" ).val();
+      var userEmail = $( "#userEmail" ).val();
+      var userPass = $( "#repeatPassword" ).val();
+      console.log("tryna submit for uName " + userName);
+      var posting = $.ajax({
+      url: hostname + "/newuser",
+      type: 'POST',
+        contentType: "application/json; charset=utf-8",
+      dataType: "json",
+      data: JSON.stringify({
+            userName: userName,
+            userEmail: userEmail,
+            userPass: userPass
+            // param2: $('#textbox2').val()
+          }),
+        success: function( data, textStatus, xhr ){
+            console.log(data);
+            // var r = data.replace(/["']/g, ""); //cleanup
+            // var resp = r.split('~'); //response is tilde delimited
+            // Cookies.set('_id', resp[0], { expires: 7 });
+            // $('#response pre').html( "response " + resp[1] );
+            // window.localStorage.setItem("smToken", resp[3]);
+            // cookie = Cookies.get();
+            // location.href = "./index.html";  
+        },
+        error: function( xhr, textStatus, errorThrown ){
+            console.log( xhr.responseText );
+            $('#theForm').html( hr.responseText);
+            // Cookies.remove('_id');
+          }
+        });
+      }
+  </script>
 </body>
 
 </html>
