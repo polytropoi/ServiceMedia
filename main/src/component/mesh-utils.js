@@ -359,7 +359,7 @@ AFRAME.registerComponent('scatter_physics', { //scattered randomly (hemisphere),
           
           // iEl.setAttribute('instanced-mesh-member', {mesh:this.el.id, memberMesh: true});
           // iEl.setAttribute('instanced-mesh-member', {mesh:'#gltf_'+this.data.modelID, memberMesh: true});
-          iEl.setAttribute('spawned_object', {'modelID': this.data.modelID, 'scaleFactor': this.data.scaleFactor});
+          iEl.setAttribute('spawned_object', {'modelID': this.data.modelID, 'scaleFactor': this.data.scaleFactor, 'tags': this.data.tags});
           this.el.sceneEl.appendChild(iEl);
           
           this.instancedElements.push(iEl);
@@ -398,13 +398,16 @@ AFRAME.registerComponent('spawned_object', { //cooked on the fly...
     // count: {default: 10},
     scaleFactor: {type: 'number', default: 1},
     // interaction: {default: ''},
-    // tags: {default: ''},
+    tags: {default: ''},
     // triggerTag: {default: null}
   },
   
   init: function() {
-    this.el.classList.add("activeObjex")
+    this.el.classList.add("activeObjexRay");
     this.isTrigger = true;
+    if (this.data.tags.includes("beat")) {
+      this.el.classList.add("beatme");
+    }
     this.el.setAttribute('gltf-model', '#'+ this.data.modelID);
     this.el.setAttribute('scale', {x: this.data.scaleFactor, y: this.data.scaleFactor, z: this.data.scaleFactor});
     this.el.addEventListener('model-loaded', () => {  
@@ -434,15 +437,34 @@ AFRAME.registerComponent('spawned_object', { //cooked on the fly...
         if (e.detail.targetEl.id.includes("wall")) {
           console.log("mod_physics TRIGGER collision "  + this.el.id + " " + e.detail.targetEl.id);
           var triggerAudioController = document.getElementById("triggerAudio");
-          if (triggerAudioController != null) {
+          // if (triggerAudioController != null) {
             
-            triggerAudioController.components.trigger_audio_control.playAudioAtPosition(e.detail.targetEl.object3D.position, window.playerPosition.distanceTo(e.detail.targetEl.object3D.position), ["bang"], 1);
-          }
+          //   triggerAudioController.components.trigger_audio_control.playAudioAtPosition(e.detail.targetEl.object3D.position, window.playerPosition.distanceTo(e.detail.targetEl.object3D.position), ["bang"], 1);
+          // }
           this.randomPush();
 
         }        
       }
       
+    });
+    this.el.addEventListener('mouseenter', (e) => {
+      e.preventDefault();
+      // console.log("gotsa spawn : " + evt.detail.intersection.object.name);
+      // const velocity = new Ammo.btVector3(randomNumber(-2, 2), randomNumber(-2, 2), randomNumber(-4, 4));
+      // // const velocity = new Ammo.btVector3(0, 0, 10);
+      // this.el.body.setLinearVelocity(velocity);
+      // console.log("mod_physics TRIGGER collision "  + this.el.id + " " + e.detail.targetEl.id);
+      var triggerAudioController = document.getElementById("triggerAudio");
+      if (triggerAudioController != null && e.detail.intersection) {
+        
+        triggerAudioController.components.trigger_audio_control.playAudioAtPosition(e.detail.intersection.point, window.playerPosition.distanceTo(e.detail.intersection.point), ["bang"], 1);
+      }
+      const velocity = new Ammo.btVector3(randomNumber(-4, 4), randomNumber(-4, 8), randomNumber(-8, 8));
+      // const velocity = new Ammo.btVector3(0, 0, 10);
+      this.el.body.setLinearVelocity(velocity);
+     
+      Ammo.destroy(velocity);
+
     });
 
   },
