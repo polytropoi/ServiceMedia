@@ -405,6 +405,7 @@ AFRAME.registerComponent('spawned_object', { //cooked on the fly...
   init: function() {
     this.el.classList.add("activeObjexRay");
     this.isTrigger = true;
+    this.isSelected = false;
     if (this.data.tags.includes("beat")) {
       this.el.classList.add("beatme");
     }
@@ -447,25 +448,59 @@ AFRAME.registerComponent('spawned_object', { //cooked on the fly...
       }
       
     });
-    this.el.addEventListener('mouseenter', (e) => {
-      e.preventDefault();
-      // console.log("gotsa spawn : " + evt.detail.intersection.object.name);
-      // const velocity = new Ammo.btVector3(randomNumber(-2, 2), randomNumber(-2, 2), randomNumber(-4, 4));
-      // // const velocity = new Ammo.btVector3(0, 0, 10);
-      // this.el.body.setLinearVelocity(velocity);
-      // console.log("mod_physics TRIGGER collision "  + this.el.id + " " + e.detail.targetEl.id);
-      var triggerAudioController = document.getElementById("triggerAudio");
-      if (triggerAudioController != null && e.detail.intersection) {
-        
-        triggerAudioController.components.trigger_audio_control.playAudioAtPosition(e.detail.intersection.point, window.playerPosition.distanceTo(e.detail.intersection.point), ["bang"], 1);
-      }
-      const velocity = new Ammo.btVector3(randomNumber(-4, 4), randomNumber(-4, 8), randomNumber(-8, 8));
-      // const velocity = new Ammo.btVector3(0, 0, 10);
-      this.el.body.setLinearVelocity(velocity);
-     
-      Ammo.destroy(velocity);
 
-    });
+    this.el.addEventListener('raycaster-intersected', e =>{  // raycaster-intersected
+      this.raycaster = e.detail.el;
+
+      if (this.raycaster && !this.isSelected) {
+        this.intersection = this.raycaster.components.raycaster.getIntersection(this.el);
+       
+        if (!this.intersection) { 
+            return; 
+          } else {
+            if (this.intersection.point) {
+              this.isSelected = true;
+              this.hitpoint = this.intersection.point;
+
+              if (window.playerPosition) {
+                this.distance = window.playerPosition.distanceTo( this.intersection.point );
+              } else {
+                this.distance = 5;
+                console.log("setting distance to 5");
+              }
+             
+              // this.hitpoint = this.intersection[0].point;
+              this.rayhit( e.detail.el.id, this.distance, this.intersection.point ); 
+            }
+          }
+        // console.log(intersection.point);
+        }
+      });
+      this.el.addEventListener("raycaster-intersected-cleared", () => {
+          this.raycaster = null;
+          this.isSelected = false;
+          // this.killParticles();
+      });
+    
+    //   this.el.addEventListener('mouseenter', (e) => {
+    //   e.preventDefault();
+    //   // console.log("gotsa spawn : " + evt.detail.intersection.object.name);
+    //   // const velocity = new Ammo.btVector3(randomNumber(-2, 2), randomNumber(-2, 2), randomNumber(-4, 4));
+    //   // // const velocity = new Ammo.btVector3(0, 0, 10);
+    //   // this.el.body.setLinearVelocity(velocity);
+    //   // console.log("mod_physics TRIGGER collision "  + this.el.id + " " + e.detail.targetEl.id);
+    //   var triggerAudioController = document.getElementById("triggerAudio");
+    //   if (triggerAudioController != null && e.detail.intersection) {
+        
+    //     triggerAudioController.components.trigger_audio_control.playAudioAtPosition(e.detail.intersection.point, window.playerPosition.distanceTo(e.detail.intersection.point), ["bang"], 1);
+    //   }
+    //   const velocity = new Ammo.btVector3(randomNumber(-4, 4), randomNumber(-4, 8), randomNumber(-8, 8));
+    //   // const velocity = new Ammo.btVector3(0, 0, 10);
+    //   this.el.body.setLinearVelocity(velocity);
+     
+    //   Ammo.destroy(velocity);
+
+    // });
 
   },
   forwardPush: function () {
@@ -482,6 +517,31 @@ AFRAME.registerComponent('spawned_object', { //cooked on the fly...
    
     Ammo.destroy(velocity);
   },
+  rayhit: function (hitID, distance, hitpoint) {
+    
+      distance = window.playerPosition.distanceTo(hitpoint);
+      console.log("new hit " + hitID + " " + distance + " " + JSON.stringify(hitpoint));
+
+      
+        var triggerAudioControllerEl = document.getElementById("triggerAudio");
+        
+        if (triggerAudioControllerEl != null) {
+          // console.log("gotsa audio trigger controller el");
+          let triggerAudioController = triggerAudioControllerEl.components.trigger_audio_control;
+          if (triggerAudioController  != null) {
+            console.log("gotsa audio trigger controller " + distance);
+            let triggertags = this.data.tags != null && this.data.tags != "" ? this.data.tags : "bang";
+            triggerAudioController.playAudioAtPosition(hitpoint, distance, triggertags);
+          }
+         
+        }
+      
+         const velocity = new Ammo.btVector3(randomNumber(-4, 4), randomNumber(-4, 8), randomNumber(-8, 8));
+      // const velocity = new Ammo.btVector3(0, 0, 10);
+      this.el.body.setLinearVelocity(velocity);
+     
+      Ammo.destroy(velocity);
+    }
 });
 
 AFRAME.registerComponent('instanced_meshes_sphere_physics', { //scattered randomly in sphere, using instanced-mesh component, but can't get the colliders to fit... :(

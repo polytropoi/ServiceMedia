@@ -24,6 +24,7 @@ if (process.env.MINIOKEY && process.env.MINIOKEY != "" && process.env.MINIOENDPO
     });
 }
 
+const nonLocalDomains = ["regalrooms.tv", "bishopstudiosaustin.com"]; //TODO you know what! (put this in sceneDomain object)
 // function ReturnPresignedUrlSync (bucket, key, time) {
 //     if (minioClient) {
 //         minioClient.presignedGetObject(bucket, key, time, function(err, presignedUrl) { //use callback version here, can't await?
@@ -134,6 +135,8 @@ async function ReturnPresignedUrl(bucket, key, time) {
         } 
     }
 }
+
+
 
 ////////////////////PRIMARY SERVERSIDE /WEBXR ROUTE///////////////////
 webxr_router.get('/:_id', function (req, res) { 
@@ -3363,6 +3366,10 @@ webxr_router.get('/:_id', function (req, res) {
                             db.image_items.findOne({"_id": oo_id}, function (err, picture_item) {
 
                                 bucketFolder = sceneResponse.sceneDomain; //TODO use "public" bucket if set in process.ENV
+                                if (nonLocalDomains.includes(bucketFolder)) { //TODO this should be a param of domain object
+                                    bucketFolder = "realitymangler.com";  //THIS! 
+                                    console.log("NONLOCALDOMAIN WTF!");
+                                }
                                 // console.log("params " + JSON.stringify(params)); 
                                 if (err || !picture_item) {
                                     console.log("error getting postcard " + postcard._id + err);
@@ -3372,7 +3379,7 @@ webxr_router.get('/:_id', function (req, res) {
                                     // // console.log("postcard1 " + postcard1);
                                     // callback(null);
                                     var params = {
-                                        Bucket: sceneResponse.sceneDomain,
+                                        Bucket: bucketFolder,
                                         Key: "postcards/" + sceneResponse.short_id + "/"+ postcard + ".standard." + picture_item.filename //put in postcards folder instead of root, duh
                                     }
                                     //todo - MINIO support
@@ -3395,7 +3402,7 @@ webxr_router.get('/:_id', function (req, res) {
                                             });
                                         } else {
                                             
-                                            postcard1 = "http://" + sceneResponse.sceneDomain +"/postcards/"+sceneResponse.short_id +"/"+ picture_item._id + ".standard." + picture_item.filename;
+                                            postcard1 = "http://" + bucketFolder +"/postcards/"+sceneResponse.short_id +"/"+ picture_item._id + ".standard." + picture_item.filename;
                                             console.log("gotsa postcard " + postcard1 );
                                             callback();
                                         }
