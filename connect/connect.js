@@ -64,8 +64,8 @@ let mouseDowntime = 0;
 // var navMaersh = null;
 var token = document.getElementById("token").getAttribute("data-token"); 
 var localtoken = localStorage.getItem("smToken");
-// let socketHost = "http://localhost:3000";
-let socketHost = null;
+let socketHost = "http://localhost:3000";
+// let socketHost = null;
 var socket = null; //the socket.io instance below
 
 
@@ -213,8 +213,13 @@ $(function() {
       }
    }
 
-   if (settings.socketHost) {
-      socketHost = settings.socketHost;
+   if (settings.networking == 'SocketIO' && settings.socketHost) {
+      if (settings.socketHost.length > 6) { //i.e. not "none" or empty
+         socketHost = settings.socketHost;
+         InitSocket();
+      }
+      
+
    }
 
    let primaryAudioEventData = document.getElementById("audioEventsData");
@@ -405,6 +410,19 @@ function ReturnAttributions () {
       }
    }
    return attribString;
+}
+
+function SendAdminMessage() {
+   let aMessage = $('#chat_input').val();
+   console.log(socket + " " + userData.sceneOwner + " " + $('#chat_input').val())
+   if (socket && userData.sceneOwner && aMessage.length > 0) {
+      socket.emit('admin message', aMessage);
+      document.getElementById("chat_input").value = "";
+      if (aMessage.toString().toLowerCase() == "next") {
+         GoToNext();
+      }
+   }
+
 }
 
 function SaveModsToCloud() { //Save button on location modal
@@ -670,6 +688,9 @@ function GoToNext() {
             console.log("gotsa tunnel tryna switch texture...");
             tunnels[i].components.mod_tunnel.randomTexture();
          }
+      }
+      if (socket) {
+         EmitSelfPosition();
       }
          
    }
@@ -1281,9 +1302,15 @@ if (settings && !socket) {
    socket.on('user joined', function(data) {
       console.log(data + 'joined room ' + room);
       socket.emit('room users', room);
-      
       UpdatePlayerAvatars(roomUsers);
       EmitSelfPosition();
+   });
+
+   socket.on('admin message', function (data) {
+      console.log('recieved admin message : ' + data + ' in room ' + room);
+      if (data.toString().toLowerCase() == "next") {
+         GoToNext();
+      }
    });
 
    socket.on('room users', function (data) {
@@ -1544,7 +1571,7 @@ function EmitSelfPosition() {
                var posRotObj = posRotReader.returnPosRot();
                cameraPosition = posRotObj.pos;
                cameraRotation = posRotObj.rot;
-               // console.log(cameraPosition.x.toString() + " vs " + window.playerPosition.x.toString());
+               console.log(cameraPosition.x.toString() + " vs " + window.playerPosition.x.toString());
                // if (JSON.stringify(cameraPosition) != lastPosition && JSON.stringify(cameraRotation) != lastRotation) {
                if (JSON.stringify(cameraPosition) != lastPosition) {
                      // console.log('emitting!');
@@ -1599,18 +1626,23 @@ function shallowEqual(object1, object2) {
 //     document.getElementById("chat_input").value = "";
 // });
 function SendChatMessage() {
-   var message = $('#chat_input').val();
-   if (message.length > 0) {
-   message = $('<div>').text(message).html(); //sanitize with wierd jquery fu
-   console.log("tryna send " + message);
-   $('#future').prepend("<div class=\x22messageBubbleOut\x22 style=\x22float: right;\x22>you:</span> " +  message +"</div><br><br><br>");
-   // $('#future').prepend($('<div style=\x22float: right;\x22><span style=\x22margin: 5px 5px 5px 5px;\x22 class=\x22smallfont_lightgreen\x22>').html( ">you:</span> " +  message +"</div>").append("<hr>"));
    if (socket) {
-      socket.emit('user message', message); //but not to ourselfs
-   }
-   
-   UpdateContentBox();
-   document.getElementById("chat_input").value = "";
+      var message = $('#chat_input').val();
+      if (message.length > 0) {
+      message = $('<div>').text(message).html(); //sanitize with wierd jquery fu
+      console.log("tryna send " + message);
+      $('#future').prepend("<div class=\x22messageBubbleOut\x22 style=\x22float: right;\x22>you:</span> " +  message +"</div><br><br><br>");
+      // $('#future').prepend($('<div style=\x22float: right;\x22><span style=\x22margin: 5px 5px 5px 5px;\x22 class=\x22smallfont_lightgreen\x22>').html( ">you:</span> " +  message +"</div>").append("<hr>"));
+      if (socket) {
+         socket.emit('user message', message); //but not to ourselfs
+      }
+      
+      UpdateContentBox();
+      document.getElementById("chat_input").value = "";
+      }
+   } else {
+      console.log("socket not connected..");
+      $('#future').prepend("<div class=\x22messageBubbleOut\x22 style=\x22float: right;\x22></span>Socket Not Connected!</div><br><br><br>");
    }
 }
 function ValidateEmail(mail) 

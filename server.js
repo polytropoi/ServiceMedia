@@ -284,7 +284,7 @@ io.on("connection", socket => {
 });
 */
 /////// SHOW/HIDE Below to run socket.io on same port
-/*
+
 ///this one gets users through handshake
 // var socketUsers = {};
 // var allUsers = [];
@@ -427,6 +427,11 @@ io.on('connection', function(socket) {
     socket.on('user message', function(data) {
         // console.log(socket.uname + " user message: " + data + " for room " + room);
         socket.in(room).emit('user messages', socket.uname, data);
+//        socket.broadcast.emit('messages',data);
+    });
+    socket.on('admin message', function(data) {
+        // console.log(socket.uname + " user message: " + data + " for room " + room);
+        socket.in(room).emit('admin message', data);
 //        socket.broadcast.emit('messages',data);
     });
 
@@ -4291,7 +4296,7 @@ app.post('/process_staging_files', requiredAuthentication, function (req, res) {
                                 //     });
                                 
                             // } else { //NEW WAY uses GrabAndSqueeze
-                                console.log("userid = " + req.session.user._id);
+                                console.log("tryna push pic to GS " + groupType);
                                 var token=jwt.sign({userId:req.session.user._id},process.env.JWT_SECRET);
                                 const options = {
                                     headers: {'X-Access-Token': token}
@@ -4303,13 +4308,13 @@ app.post('/process_staging_files', requiredAuthentication, function (req, res) {
                                 //   console.log(response.statusText);
                                 //   console.log(response.headers);
                                 //   console.log(response.config);
-                                    
-                                })
-                                
-                                .then(function () {
-                                    // console.log('nerp');
                                     callback(null);
                                 })
+                                
+                                // .then(function () {
+                                //     // console.log('nerp');
+                                //     callback(null);
+                                // })
                                 .catch(function (error) {
                                     // handle error
                                     // console.log(error);

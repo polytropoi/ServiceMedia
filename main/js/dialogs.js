@@ -1269,9 +1269,11 @@ function SceneManglerModal(mode) {
         locationTable = "no locations are available";
     }
     let ownerButton = "";
+    let sendAdminMessageButton = "";
     if (userData.sceneOwner == "indaehoose") {
         ownerButton = "<button style=\x22float: right;\x22 class=\x22addButton\x22 id=\x22editButton\x22><a href=\x22../main/?type=scene&iid="+userData.sceneID+"\x22>Edit Scene</a></button>"+
         "<button style=\x22float: right;\x22 class=\x22reallySaveButton\x22 onclick=\x22SaveModsToCloud()\x22>Save Mods To Cloud</button>";
+        sendAdminMessageButton = "<button style=\x22float: left;\x22 class=\x22reallySaveButton\x22 onclick=\x22SendAdminMessage()\x22>Send Admin Message</button>";
     }
     let oculusButton = "<button style=\x22float: right;\x22 class=\x22addButton\x22 id=\x22oculusButton\x22><a href=\x22https://www.oculus.com/open_url/?url=https%3A%2F%2Fservicemedia.net/webxr/"+room+"\x22>Open on Oculus Quest</a></button>";
     let tabs ="<div class=\x22tab\x22>" +
@@ -1343,7 +1345,7 @@ function SceneManglerModal(mode) {
       // "<button class=\x22infoButton\x22 id=\x22sendMessageButton\x22><a href=\x22mailto:"+room+"@servicemedia.net\x22>Send Email</a></button>"+
       "<textarea class=\x22chat_input\x22 id=\x22chat_input\x22 type=\x22textarea\x22 style=\x22font-size:10pt;rows:4;cols:200;\x22 placeholder=\x22Message...\x22></textarea><br><br>"+
       "<br><span style=\x22float: left;\x22 id=\x22users\x22>"+stringRoomUsers+"</span>"+
-
+      sendAdminMessageButton +
       "<button class=\x22saveButton\x22 id=\x22sendMessageButton\x22 onclick=\x22SendChatMessage()\x22>Send Chat</button><br>"+
       
 

@@ -625,7 +625,7 @@ webxr_router.get('/:_id', function (req, res) {
             function (callback) {
                 if (sceneData.sceneUseDynCubeMap) {
                     skyboxEnvMap = "skybox-env-map";   
-                    console.log("skyboxEnvMap is " + skyboxEnvMap);
+                    // console.log("skyboxEnvMap is " + skyboxEnvMap);
                 }
 
                         sceneOwnerID = sceneData.user_id;
@@ -634,24 +634,28 @@ webxr_router.get('/:_id', function (req, res) {
                         sceneNextScene = sceneResponse.sceneNextScene;
                         let poiIndex = 0;
                         scenePreviousScene = sceneResponse.scenePreviousScene;
-                        console.log("sceneResponse.sceneNetworking " + sceneResponse.sceneNetworking); //for networked aframe, baybe bring it back
-                        if (sceneResponse.sceneNetworking == "SocketIO")
-                        networkedscene = "networked-scene=\x22serverURL: "+socketHost+"; app: "+sceneData.sceneDomain+" ; room: "+sceneData.short_id+"; connectOnLoad: true; onConnect: onConnect; adapter: socketio; audio: false; debug: false;\x22";
-                        if (sceneResponse.sceneNetworking == "WebRTC")
-                        networkedscene = "networked-scene=\x22serverURL: "+socketHost+"; app: "+sceneData.sceneDomain+" ; room: "+sceneData.short_id+"; connectOnLoad: true; onConnect: onConnect; adapter: webrtc; audio: false; debug: false;\x22";
-                        if (sceneResponse.sceneNetworking == "AudioChat")
-                        networkedscene = "networked-scene=\x22serverURL: "+socketHost+"; app: "+sceneData.sceneDomain+" ; room: "+sceneData.short_id+"; connectOnLoad: true; onConnect: onConnect; adapter: webrtc; audio: true; debug: false;\x22";
-                        if (sceneResponse.sceneNetworking != "None") {
-                        networkingEntity = "<a-entity look-at=\x22#player\x22 position=\x22-8 1.1 -12\x22>" +
-                        "<a-entity naf-connect=\x22avatarName:"+avatarName+"\x22 class=\x22gltf\x22 gltf-model=\x22#groupicon\x22 material=\x22shader: noise;\x22 class=\x22activeObjexGrab activeObjexRay\x22>"+
-                            // "<a-text id=\x22statusText\x22 look-at=\x22#player\x22 rotation=\x220 180 0\x22 position=\x220 .5 0\x22 value=\x22\x22></a-text>"+
-                        "</a-entity>"+
-                            "<a-entity visible=\x22false\x22 id=\x22statusText\x22 geometry=\x22primitive: plane; width: 1.5; height: 1.5\x22 position=\x220 2.1 -1\x22 material=\x22color: grey; transparent: true; opacity: 0.0\x22" +
-                                "text=\x22value:status:; wrapCount: 20;\x22>" +
-                                "<a-entity class=\x22gltf\x22 gltf-model=\x22#square_panel\x22 scale=\x221.5 1.5 1.5\x22 position=\x220 -.25 -.5\x22></a-entity>" +
-                            "</a-entity>"+
-                        "</a-entity>";
-                        }
+                        //////////////networked aframe below, rem for now... 
+                        /*
+                                    console.log("sceneResponse.sceneNetworking " + sceneResponse.sceneNetworking); //for networked aframe, baybe bring it back
+                                    if (sceneResponse.sceneNetworking == "SocketIO")
+                                    networkedscene = "networked-scene=\x22serverURL: "+socketHost+"; app: "+sceneData.sceneDomain+" ; room: "+sceneData.short_id+"; connectOnLoad: true; onConnect: onConnect; adapter: socketio; audio: false; debug: false;\x22";
+                                    if (sceneResponse.sceneNetworking == "WebRTC")
+                                    networkedscene = "networked-scene=\x22serverURL: "+socketHost+"; app: "+sceneData.sceneDomain+" ; room: "+sceneData.short_id+"; connectOnLoad: true; onConnect: onConnect; adapter: webrtc; audio: false; debug: false;\x22";
+                                    if (sceneResponse.sceneNetworking == "AudioChat")
+                                    networkedscene = "networked-scene=\x22serverURL: "+socketHost+"; app: "+sceneData.sceneDomain+" ; room: "+sceneData.short_id+"; connectOnLoad: true; onConnect: onConnect; adapter: webrtc; audio: true; debug: false;\x22";
+                                    if (sceneResponse.sceneNetworking != "None") {
+                                    networkingEntity = "<a-entity look-at=\x22#player\x22 position=\x22-8 1.1 -12\x22>" +
+                                    "<a-entity naf-connect=\x22avatarName:"+avatarName+"\x22 class=\x22gltf\x22 gltf-model=\x22#groupicon\x22 material=\x22shader: noise;\x22 class=\x22activeObjexGrab activeObjexRay\x22>"+
+                                        // "<a-text id=\x22statusText\x22 look-at=\x22#player\x22 rotation=\x220 180 0\x22 position=\x220 .5 0\x22 value=\x22\x22></a-text>"+
+                                    "</a-entity>"+
+                                        "<a-entity visible=\x22false\x22 id=\x22statusText\x22 geometry=\x22primitive: plane; width: 1.5; height: 1.5\x22 position=\x220 2.1 -1\x22 material=\x22color: grey; transparent: true; opacity: 0.0\x22" +
+                                            "text=\x22value:status:; wrapCount: 20;\x22>" +
+                                            "<a-entity class=\x22gltf\x22 gltf-model=\x22#square_panel\x22 scale=\x221.5 1.5 1.5\x22 position=\x220 -.25 -.5\x22></a-entity>" +
+                                        "</a-entity>"+
+                                    "</a-entity>";
+                                    }
+                        */
+                        //////////////////////
                         // console.log("networking: " + networkingEntity);
 
                         // if (sceneResponse.sceneDomain != null && sceneResponse.sceneDomain != "") {
@@ -938,6 +942,8 @@ webxr_router.get('/:_id', function (req, res) {
                                     pictureLocation.rot = eulerx + " " + eulery + " " + eulerz;
                                     pictureLocation.type = sceneResponse.sceneLocations[i].markerType;
                                     pictureLocation.data = sceneResponse.sceneLocations[i].eventData; //should be the pic _id
+                                    pictureLocation.scale = sceneResponse.sceneLocations[i].scale;
+                                    pictureLocation.tags = sceneResponse.sceneLocations[i].tags;
                                     console.log("pictureLocation: " + JSON.stringify(pictureLocation));
                                     locationPictures.push(pictureLocation);
                                 }
@@ -3582,12 +3588,17 @@ webxr_router.get('/:_id', function (req, res) {
                                             index++;
                                             let position = x + " " + 2 + " " + z;
                                             let rotation = "0 90 0";
-
+                                            let scale = 1;
                                             // image1url = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + picture_item.userID + "/pictures/" + picture_item._id + ".standard." + picture_item.filename, Expires: 6000});
-                                            image1url = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, 'users/' + picture_item.userID + "/pictures/" + picture_item._id + ".standard." + picture_item.filename, 6000);
+                                            if (picture_item.orientation == "circle" || picture_item.orientation == "Circle" || picture_item.orientation == "square" || picture_item.orientation == "Square" ) {
+                                                image1url = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, 'users/' + picture_item.userID + "/pictures/originals/" + picture_item._id + ".original." + picture_item.filename, 6000);
+                                                // 'users/' + picture_item.userID + '/pictures/originals/' + picture_item._id + '.original.' + picture_item.filename
+                                            } else {
+                                                image1url = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, 'users/' + picture_item.userID + "/pictures/" + picture_item._id + ".standard." + picture_item.filename, 6000);
+                                            }
+                                            // image1url = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, 'users/' + picture_item.userID + "/pictures/" + picture_item._id + ".standard." + picture_item.filename, 6000);
                                             picArray.push(image1url);
                                             
-
                                             imageAssets = imageAssets + "<img id=\x22smimage" + index + "\x22 crossorigin=\x22anonymous\x22 src='" + image1url + "'>";
                                             let caption = "";
                                             if (picture_item.captionUpper != null && picture_item.captionUpper != undefined) {
@@ -3605,6 +3616,9 @@ webxr_router.get('/:_id', function (req, res) {
                                                 if (locationPictures[picIndex].type.includes("fixed")) {
                                                     console.log("fixed pic @ " + locationPictures[picIndex].loc);
                                                     lookat = "";
+                                                }
+                                                if (locationPictures[picIndex].scale) {
+
                                                 }
                                                 picIndex++;
                                             } 
@@ -3630,8 +3644,7 @@ webxr_router.get('/:_id', function (req, res) {
                                             } else {
                                                 // if (picture_item.linkType != undefined && picture_item.orientation != "equirectangular" && picture_item.orientation != "Equirectangular") {
                                                 if (picture_item.orientation != "equirectangular" && picture_item.orientation != "Equirectangular") {  //what if linkType is undefined?
-    
-                                                
+
                                                     if (picture_item.orientation == "portrait" || picture_item.orientation == "Portrait") {
                                                         //console.log("gotsa portrait!");
                                                         imageEntities = imageEntities + "<a-entity "+link+""+lookat+"  mod-materials=\x22index:"+index+"\x22 gltf-model=\x22#portrait_panel\x22 material=\x22shader: flat; src: #smimage" + index + "; alphaTest: 0.5;\x22"+
@@ -3800,6 +3813,9 @@ webxr_router.get('/:_id', function (req, res) {
                     settings.audioGroups = audioGroups; 
                     settings.clearLocalMods = false;
                     settings.sceneVideoStreams = sceneResponse.sceneVideoStreamUrls;
+                    settings.socketHost = process.env.SOCKET_HOST;
+                    settings.networking = sceneResponse.sceneNetworking;
+
                     if (sceneResponse.sceneTags != null && sceneResponse.sceneTags.includes("hide avatars")) {
                         settings.hideAvatars = true;
                     }
@@ -4364,7 +4380,7 @@ webxr_router.get('/:_id', function (req, res) {
                         }
 
                         /////////AFRAME SCENE DECLARATION////////////////// 
-                        let aScene = "<a-scene "+sceneBackground+" "+physicsInsert+" "+pool_target+" "+pool_launcher+" gesture-detector " +
+                        let aScene = "<a-scene "+sceneBackground+" "+physicsInsert+" "+pool_target+" "+pool_launcher+" gesture-detector renderer=\x22colorManagement: true\x22" +
                         "reflection=\x22directionalLight:#real-light\x22 ar-hit-test=\x22target:#target_object; type:footprint; footprintDepth:0.1;\x22 ar-cursor raycaster=\x22objects: .activeObjexRay\x22 "+
                         // "screen-controls vr-mode-ui keyboard-shortcuts=\x22enterVR: false\x22" + magicWindow +   
                         " vr-mode-ui keyboard-shortcuts=\x22enterVR: false\x22" +  //add screen-controls from initializer                      
@@ -4545,7 +4561,7 @@ webxr_router.get('/:_id', function (req, res) {
                         // "<a-asset-item id=\x22trigger1\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/trigger1.glb\x22></a-asset-item>\n"+
                         "<a-asset-item id=\x22square1\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/square1.glb\x22></a-asset-item>\n"+
                         "<a-asset-item id=\x22rectangle1\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/rectangle1.glb\x22></a-asset-item>\n"+
-                        // "<a-asset-item id=\x22avatar_model\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/avatar1c.glb\x22></a-asset-item>\n"+
+                        "<a-asset-item id=\x22avatar_model\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/avatar1c.glb\x22></a-asset-item>\n"+
                         // "<a-asset-item id=\x22flat_round_rect\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/flatroundrect.glb\x22></a-asset-item>\n"+
                         // "<a-asset-item id=\x22flatrect2\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/flatrect2.glb\x22></a-asset-item>\n"+
                         "<a-asset-item id=\x22flatsquare\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/flatsquare.glb\x22></a-asset-item>\n"+
