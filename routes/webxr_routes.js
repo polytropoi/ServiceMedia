@@ -2427,7 +2427,7 @@ webxr_router.get('/:_id', function (req, res) {
                                                     entityType = "surface";
 
                                                 }
-                                                let modModel = "mod_model=\x22markerType: "+locMdl.markerType+"; tags: "+locMdl.locationTags+"; description:"+locMdl.description+"; eventData:"+locMdl.eventData+"\x22";
+                                                let modModel = "mod_model=\x22markerType: "+locMdl.markerType+"; tags: "+locMdl.locationTags+"; description:"+locMdl.description+"; eventData:"+locMdl.eventData+";\x22";
                                                 // let modMaterial = "";
                                                 if (locMdl.eventData.toLowerCase().includes("gallery")) {
                                                     // modModel = "mod_model_photo_gallery";  maybe later
@@ -3777,7 +3777,7 @@ webxr_router.get('/:_id', function (req, res) {
                     settings.sceneDescription = sceneResponse.sceneDescription;
                     settings.sceneEventStart = sceneResponse.sceneEventStart;
                     settings.sceneEventEnd = sceneResponse.sceneEventEnd;
-                    settings.hideAvatars = false;
+                    settings.hideAvatars = true;
                     settings.sceneSkyRadius = sceneResponse.sceneSkyRadius != undefined ? sceneResponse.sceneSkyRadius : 202;
                     settings.sceneFontWeb1 = sceneResponse.sceneFontWeb1;
                     settings.sceneFontWeb2 = sceneResponse.sceneFontWeb2;
@@ -3816,8 +3816,8 @@ webxr_router.get('/:_id', function (req, res) {
                     settings.socketHost = process.env.SOCKET_HOST;
                     settings.networking = sceneResponse.sceneNetworking;
 
-                    if (sceneResponse.sceneTags != null && sceneResponse.sceneTags.includes("hide avatars")) {
-                        settings.hideAvatars = true;
+                    if (sceneResponse.sceneTags != null && sceneResponse.sceneTags.includes("show avatars")) {
+                        settings.hideAvatars = false;
                     }
                     if (sceneResponse.sceneTags != null && sceneResponse.sceneTags.includes("clear localmods")) {
                         settings.clearLocalMods = true;
@@ -4476,7 +4476,7 @@ webxr_router.get('/:_id', function (req, res) {
 
                         // "<script src=\x22../main/src/shaders/terrain.js\x22></script>"+
                        
-                        "<script src=\x22../main/vendor/aframe/aframe-look-at-component.min.js\x22></script>"+
+                        "<script src=\x22../main/vendor/aframe/aframe-look-at-component.js\x22></script>"+
                       
                         // "<script src=\x22../main/vendor/html2canvas/aframe-html-shader.min.js\x22></script>"+
                         primaryAudioScript +

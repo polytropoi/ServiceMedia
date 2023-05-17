@@ -316,7 +316,8 @@ AFRAME.registerComponent('mod-materials', {
         index: {default: ''},
         meshname: {default: ''},
         id: {default: ''},
-        flipY: {default: false}
+        flipY: {default: false},
+        eventData: {default: ''}
       },
       init: function () {
         console.log("video id is : " + this.data.id);
@@ -372,6 +373,7 @@ AFRAME.registerComponent('mod-materials', {
           console.log("hls.js not supported (ios?), goiing native!");
           this.video.src = m3u8;
         }
+        
 
         // this.hls.on(Hls.Events.MANIFEST_PARSED,function() {}
         // pauseVideo(this.video);
@@ -456,13 +458,15 @@ AFRAME.registerComponent('mod-materials', {
               }
               if (node.name.toLowerCase().includes("slider_end")) {
                 this.slider_end = node; 
-                
+                console.log("gotsa slider end mesh");
               }
               if (node.name.toLowerCase().includes("slider_begin")) {
                 this.slider_begin = node; 
+                console.log("gotsa slider begin mesh");
               }
               if (node.name.toLowerCase().includes("slider_handle")) {
                 this.slider_handle = node; 
+                console.log("gotsa slider handle mesh");
               }
               // if (this.pauseButtonMesh)
             // }
@@ -478,7 +482,7 @@ AFRAME.registerComponent('mod-materials', {
           if (this.slider_handle != null) {
             let videoNameText = document.createElement("a-text");
             this.el.appendChild(videoNameText);
-            videoNameText.setAttribute("position", "-.3 .55 -1");
+            videoNameText.setAttribute("position", "-.2 .45 -1");
             videoNameText.setAttribute("scale", "1 1 1"); 
             // bubbleText.setAttribute("look-at", "#player");
             videoNameText.setAttribute("width", 3);
@@ -486,7 +490,7 @@ AFRAME.registerComponent('mod-materials', {
             videoNameText.setAttribute('text', {
               // width: 4, 
               align: "left",
-              value: "Title: "+ this.data.videoTitle,
+              value: this.data.videoTitle,
               font: "/fonts/Exo2Bold.fnt",
               anchor: "center",
               wrapCount: 100,
@@ -495,7 +499,7 @@ AFRAME.registerComponent('mod-materials', {
 
             this.videoStatus = document.createElement("a-text");
             this.el.appendChild(this.videoStatus);
-            this.videoStatus.setAttribute("position", "2.4 .55 -1");
+            this.videoStatus.setAttribute("position", "2.4 .5 -1");
             this.videoStatus.setAttribute("scale", "1 1 1"); 
             // bubbleText.setAttribute("look-at", "#player");
             this.videoStatus.setAttribute("width", 3);
@@ -530,15 +534,15 @@ AFRAME.registerComponent('mod-materials', {
               this.vidtexture.flipY = this.data.flipY; 
               this.vidtexture.minFilter = THREE.NearestFilter;
               this.vidtexture.magFilter = THREE.NearestFilter;
-              // this.playmaterial = new THREE.MeshBasicMaterial( { map: this.vidtexture } ); 
+              this.playmaterial = new THREE.MeshBasicMaterial( { map: this.vidtexture } ); 
               
-              this.playmaterial = new THREE.MeshPhongMaterial({
-                map: this.vidtexture,
-                emissiveMap: this.vidtexture,
-                side: THREE.FrontSide,
-                emissive: 0xffffff,
-                emissiveIntensity: 1
-              });
+              // this.playmaterial = new THREE.MeshPhongMaterial({
+              //   map: this.vidtexture,
+              //   // emissiveMap: this.vidtexture,
+              //   side: THREE.FrontSide
+              //   // emissive: 0xffffff,
+              //   // emissiveIntensity: .1
+              // });
               console.log("tryna bind vid material to mesh");
 
               this.playmaterial.map.needsUpdate = true;   
@@ -676,7 +680,7 @@ AFRAME.registerComponent('mod-materials', {
                     let nEnd = new THREE.Vector3();
                     this.slider_begin.getWorldPosition( nStart );
                     this.slider_end.getWorldPosition( nEnd );
-                    console.log("background hit at " + JSON.stringify(this.hitpoint));
+                    console.log("background hit at " + JSON.stringify(this.hitpoint) );
                     let range = nEnd.x.toFixed(2) - nStart.x.toFixed(2);
                     let correctedStartValue = 0;
                     correctedStartValue = this.hitpoint.x.toFixed(2) - nEnd.x.toFixed(2);
@@ -685,7 +689,7 @@ AFRAME.registerComponent('mod-materials', {
                     let time = (percentage * (this.video.duration / 100)).toFixed(2);
 
                     // let touchPosition = (((intersects[i].point.y.toFixed(2) - this.slider_begin.position.y.toFixed(2)) * 100) / (this.slider_end.position.y.toFixed(2) - this.slider_begin.position.y.toFixed(2)));
-                    console.log("bg touch % " + percentage +  " touchPosition " + + JSON.stringify(this.hitpoint) + " vs start " +  JSON.stringify(nStart) + " vs end " +  JSON.stringify(nEnd));
+                    // console.log("bg touch % " + percentage +  " touchPosition " + + JSON.stringify(this.hitpoint) + " vs start " +  JSON.stringify(nStart) + " vs end " +  JSON.stringify(nEnd));
                     // this.slider_handle.position.x = intersects[i].point.x; 
                     // this.slider_handle.position.z =  nStart.z;
                     // this.slider_handle.position.z =  nStart.y; 

@@ -741,7 +741,6 @@ AFRAME.registerComponent('play-on-vrdisplayactivate-or-enter-vr', { //play video
     video.play();
   }
 });
-// AFRAME.registerComponent('screenshot', {
 
   // document.querySelector('a-scene').components.screenshot.capture('perspective');
 
@@ -4589,9 +4588,22 @@ AFRAME.registerComponent('mod_model', {
         
       }
 
+
       this.el.addEventListener('beatme', e => console.log("beat"));
       this.isInitialized = false; //to prevent model-loaded from retriggering when childrens are added to this parent
 
+      if (this.data.eventData) {
+        if (this.data.eventData.toLowerCase().includes("billboard")) {
+          if (this.data.eventData.toLowerCase().includes("yonly")) {
+            console.log("tryna set billboard yonly");
+            this.el.setAttribute("look-at-y", "#player");
+          } else {
+             
+            this.el.setAttribute("look-at", "#player");
+          }
+        
+        }
+      }
 
       ///////////////////////////////////////////////// model loaded event start /////////////////////////////
 
@@ -5036,6 +5048,7 @@ AFRAME.registerComponent('mod_model', {
                   vProps.id = hvids[hvidsIndex]._id;
                   vProps.meshname = this.meshChildren[i].name;
                   vProps.videoTitle = hvids[hvidsIndex].title;
+                  vProps.eventData = this.data.eventData;
                   this.childEnt = document.createElement('a-entity'); 
                   this.el.appendChild(this.childEnt);
                   // this.clone = this.child.clone();
