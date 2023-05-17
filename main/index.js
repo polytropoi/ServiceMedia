@@ -2936,6 +2936,7 @@
                     "<option>Beat</option>" +
                     "<option>Next</option>" +
                     "<option>Previous</option>" +
+                    "<option>GoTo Time</option>" +
                     "<option>Random Time</option>" +
                     "<option>Color Lerp</option>" +
                     "<option>Color Tweak</option>" +

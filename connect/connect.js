@@ -2474,6 +2474,7 @@ function LoopTimedEvent(keyType, duration) {
                }
             }
          }
+
          if (keyType.toLowerCase().includes("color tweak")) {
             console.log("tryna beat loop");
             if (envEl != null) {
@@ -2542,6 +2543,28 @@ function PlayTimedEvent(timeKey) {
          let youtube_player = document.getElementById("youtubePlayer").components.youtube_player;
          if (youtube_player) {
             youtube_player.randomTime();
+         }
+      }
+   }
+   if (timeKey.keytype.toLowerCase().includes("goto time")) {
+      if (timedEventsListenerMode != null && timedEventsListenerMode.toLowerCase() == 'primary audio') {
+         if (primaryAudioEl != null) {
+            // console.log("beat volume " + volume);
+            primaryAudioEl.components.primary_audio_control.gotoTime(timeKey.keydata);
+         }
+      } else if (timedEventsListenerMode != null && timedEventsListenerMode.toLowerCase() == 'primary video') {
+         var videoControllerEl = document.getElementById('primary_video');  
+         if (videoControllerEl != null) {
+            console.log("gotsa video embedVideo");
+            let videoController = videoControllerEl.components.vid_materials_embed;
+            if (videoController) {
+               videoController.gotoTime(timeKey.keydata);
+            }
+         }
+      } else if (timedEventsListenerMode != null && timedEventsListenerMode.toLowerCase() == 'youtube') {
+         let youtube_player = document.getElementById("youtubePlayer").components.youtube_player;
+         if (youtube_player) {
+            youtube_player.gotoTime(timeKey.keydata);
          }
       }
    }

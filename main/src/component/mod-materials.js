@@ -741,6 +741,10 @@ AFRAME.registerComponent('mod-materials', {
           let randomTimeValue = Math.random() * (this.video.duration - 1) + 1;
           this.video.currentTime = randomTimeValue;
         },
+        gotoTime (seconds) {
+
+          this.video.currentTime = seconds;
+        },
         togglePlayPauseVideo () {
           if (this.video.paused) {
             console.log("tryna play!");
