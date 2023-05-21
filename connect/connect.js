@@ -79,14 +79,14 @@ $('a-entity').each(function() {  //external way of getting click duration for ph
    });
    $(this).bind('mouseup', function() {
      mouseDowntime = (Date.now() / 1000) - mouseDownStarttime;
-     console.log(" mouseDowntime " +mouseDowntime);
+   //   console.log(" mouseDowntime " +mouseDowntime);
    });
    $(this).bind('touchstart', function() {
       mouseDownStarttime = Date.now() / 1000;
     });
     $(this).bind('touchend', function() {
       mouseDowntime = (Date.now() / 1000) - mouseDownStarttime;
-      console.log(" touchDowntime " +mouseDowntime);
+      // console.log(" touchDowntime " +mouseDowntime);
     });
     $(this).bind('beforexrselect', e => {
       e.preventDefault();

@@ -695,6 +695,7 @@ function ReturnTimedEventSelectors (selectedType) {
         "Next",
         "Previous",
         "Random Time",
+        "GoTo Time",
         "Clear Loops",
         "Player Snap",
         "Player Lerp",

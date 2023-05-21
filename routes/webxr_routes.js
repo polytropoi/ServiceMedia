@@ -2208,9 +2208,12 @@ webxr_router.get('/:_id', function (req, res) {
                                         ambientChild = "ambientChild"; //follow ambient obj
                                         // ambientOffset
                                     }
-                                    if (locMdl.markerType == "follow curve") {
+                                    if (locMdl.markerType == "follow curve" || (locMdl.eventData != null && locMdl.eventData != undefined && locMdl.eventData.length > 1 && locMdl.eventData.toLowerCase().includes("follow curve")))  {
                                         // followCurve = "follow-path=\x22incrementBy:0.001; throttleTo:1\x22";
                                         followCurve = "mod_curve=\x22init: true\x22";  //hrm, add a bunch of params here...
+                                        if (locMdl.markerType == "picture group") {
+
+                                        }
                                         //TODO use scene image with proper type/tag 
                                         imageAssets = imageAssets + "<img id=\x22explosion1\x22 src=\x22http://servicemedia.s3.amazonaws.com/assets/pics/explosion1.png\x22 crossorigin=\x22anonymous\x22>";
                                     }
@@ -3437,21 +3440,27 @@ webxr_router.get('/:_id', function (req, res) {
                 function (callback) {
                     console.log("pictureGroups: " + sceneResponse.scenePictureGroups);
                     if (sceneResponse.scenePictureGroups != null && sceneResponse.scenePictureGroups.length > 0) {
-                        pgID = sceneResponse.scenePictureGroups[0];
-                        let oo_id = ObjectID(pgID);
+                        // pgID = sceneResponse.scenePictureGroups[0];
                         
+                        // let oo_id = ObjectID(pgID);
 
-                        db.groups.find({"_id": oo_id}, function (err, groups) {
+                        var objectIDs = sceneResponse.scenePictureGroups.map(convertStringToObjectID);
+                        db.groups.find({_id: {$in : objectIDs}}, function (err, groups) {
                             if (err || !groups) {
                                 callback();
                             } else {
-                           
-                            async.each(groups, function (groupID, callbackz) { 
+                            // console.log("pic groups: " + JSON.stringify(groups))
+                            async.each(groups, function (group, callbackz) { 
                                 let picGroup = {};
-                                picGroup._id = groups[0]._id;
-                                picGroup.name = groups[0].name;
-                                picGroup.userID = groups[0].userID;
-                                let ids = groups[0].items.map(convertStringToObjectID);
+                                picGroup._id = group._id;
+                                picGroup.name = group.name;
+                                picGroup.userID = group.userID;
+                                let ids = group.items.map(convertStringToObjectID);
+
+                                // picGroup._id = groups[0]._id;
+                                // picGroup.name = groups[0].name;
+                                // picGroup.userID = groups[0].userID;
+                                // let ids = groups[0].items.map(convertStringToObjectID);
                                 // let modImages =
                                 db.image_items.find({_id : {$in : ids}}, function (err, images) { // get all the image records in group
                                     if (err || !images) {
@@ -3517,7 +3526,7 @@ webxr_router.get('/:_id', function (req, res) {
                                     // "pgcontrol.setAttribute(\x22picture_groups_control\x22, \x22jsonData\x22, "+JSON.stringify(JSON.stringify(requestedPictureGroups))+");\n"+ //double stringify! yes, it's needed
                                     var buff = Buffer.from(JSON.stringify(requestedPictureGroups)).toString("base64");
                                     pictureGroupsData = "<a-entity picture_groups_control id=\x22pictureGroupsData\x22 data-picture-groups='"+buff+"'></a-entity>"; //to be picked up by aframe, but data is in data-attribute
-                                    modelAssets = modelAssets + "<a-asset-item id=\x22flatrect2\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/flatrect2.glb\x22></a-asset-item>"+
+                                    modelAssets = modelAssets + "<a-asset-item id=\x22flatrect2\x22 crossorigin=\x22anonymous\x22 id=\x22flatrect2\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/flatrect2.glb\x22></a-asset-item>"+
                                     "\n<a-asset-item id=\x22camera_icon\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/camera1.glb\x22></a-asset-item>\n";
                                     "});";
                                     callback(null);

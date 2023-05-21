@@ -1350,7 +1350,7 @@ AFRAME.registerComponent('available-scenes-control', {
         }
       );
       this.el.addEventListener('toggleOnAvailableScenes', function (event) {
-        console.log('toggleOnPicGroup event detected with', event.detail);
+        console.log('toggleOnAvailableScenes event detected with', event.detail);
         let mesh = pictureGroupPicEl.getObject3D('mesh');
         this.href = picGroupArray[0].images[0].url;
         console.log("tryna load initial scene pic " + this.href);
@@ -3404,7 +3404,7 @@ AFRAME.registerComponent('mod_object', {
             if (mod_obj_component != null) {
               console.log(this.data.objectData.name + "gotsa collision with " + mod_obj_component.data.objectData.name);
               if (this.data.objectData.name != mod_obj_component.data.objectData.name) { //don't trigger yerself, but what if...?
-                console.log("actions: " + JSON.stringify(mod_obj_component.data.objectData.actions));
+                // console.log("actions: " + JSON.stringify(mod_obj_component.data.objectData.actions));
                 var triggerAudioController = document.getElementById("triggerAudio");
                 if (triggerAudioController != null) {
                   triggerAudioController.components.trigger_audio_control.playAudioAtPosition(this.el.object3D.position, window.playerPosition.distanceTo(this.el.object3D.position), ["hit, bounce"]);
@@ -4880,9 +4880,9 @@ AFRAME.registerComponent('mod_model', {
                     hpics.push(picGroupArray[0].images[x]);
                   } else if (picGroupArray[0].images[x].orientation != undefined && picGroupArray[0].images[x].orientation != null && picGroupArray[0].images[x].orientation.toLowerCase() === "portrait") {
                     vpics.push(picGroupArray[0].images[x]);
-                   } else if (picGroupArray[0].images[x].orientation != undefined && picGroupArray[0].images[x].orientation != null && picGroupArray[0].images[x].orientation.toLowerCase() === "square") {
-                      spics.push(picGroupArray[0].images[x]);
-                    }
+                  } else if (picGroupArray[0].images[x].orientation != undefined && picGroupArray[0].images[x].orientation != null && picGroupArray[0].images[x].orientation.toLowerCase() === "square") {
+                    spics.push(picGroupArray[0].images[x]);
+                  }
                 }
               }
               hpics = hpics.sort(() => Math.random() - 0.5);  //schweet
@@ -6512,6 +6512,7 @@ AFRAME.registerComponent('picture_groups_control', {
 
   init: function () {
     let picGroupArray = [];
+    this.picGroupArrayIndex = 0;
     // console.log("picgroupdata: " + JSON.stringify(this.data.jsonData));
     
     let theData = this.el.getAttribute('data-picture-groups');
@@ -6520,17 +6521,22 @@ AFRAME.registerComponent('picture_groups_control', {
     
     if (this.data.jsonData != null && this.data.jsonData.length > 0) {
       let pictureGroupPicEl = document.getElementById("pictureGroupPic"); 
+      this.pictureGroupPicEl = pictureGroupPicEl;
       let nextButton = document.getElementById("pictureGroupNextButton"); //get children like this instead
       let previousButton = document.getElementById("pictureGroupPreviousButton");
       picGroupArray = this.data.jsonData; //it's an array of arrays
-    
+      
+      this.picGroupArray = picGroupArray;
       // let picGroup = picGroupArray[0];
       // console.log("picGroup :" + JSON.stringify(picGroup));a
       let picGroupIndex = 0;
-      pictureGroupPicEl.addEventListener('model-loaded', () => {
+      this.picGroupIndex = 0;
+
+
+      this.pictureGroupPicEl.addEventListener('model-loaded', () => {
         let mesh = pictureGroupPicEl.getObject3D('mesh');
-        this.href = picGroupArray[0].images[0].url;
-        console.log("tryna load initial scene pic " + this.href);
+        this.href = this.picGroupArray[this.picGroupArrayIndex].images[0].url;
+        console.log("tryna load initial scene pic " + this.href + " from " + JSON.stringify(this.picGroupArray));
         this.texture = null;
         this.material = null;
         // const obj = pictureGroupPicEl.getObject3D('mesh');
@@ -6556,60 +6562,66 @@ AFRAME.registerComponent('picture_groups_control', {
           }
         );
       });
-      this.el.addEventListener('toggleOnPicGroup', function (event) {
-        console.log('toggleOnPicGroup event detected with', event.detail);
-        let mesh = pictureGroupPicEl.getObject3D('mesh');
-        this.href = picGroupArray[0].images[0].url;
-        console.log("tryna load initial scene pic " + this.href);
-        this.texture = null;
-        this.material = null;
-        // const obj = pictureGroupPicEl.getObject3D('mesh');
-        var loader = new THREE.TextureLoader();
-        // load a resource
-        loader.load(
-          // resource URL
-          this.href,
-          // onLoad callback
-          function ( texture ) { 
-            this.texture = texture;
-            this.texture.encoding = THREE.sRGBEncoding; 
-            this.texture.flipY = false; 
-            this.material = new THREE.MeshBasicMaterial( { map: this.texture } ); 
+      this.el.addEventListener('toggleOnPicGroup',  (event) => {
+        event.preventDefault();
+        
+        // console.log('toggleOnPicGroup event detected with' + JSON.stringify(this.picGroupArray));
+        // let mesh = this.pictureGroupPicEl.getObject3D('mesh');
+        // this.href = this.picGroupArray[this.picGroupArrayIndex].images[0].url;
+        // console.log("tryna load initial scene pic " + this.href);
+        // this.texture = null;
+        // this.material = null;
+        // // const obj = pictureGroupPicEl.getObject3D('mesh');
+        // var loader = new THREE.TextureLoader();
+        // // load a resource
+        // loader.load(
+        //   // resource URL
+        //   this.href,
+        //   // onLoad callback
+        //   function ( texture ) { 
+        //     this.texture = texture;
+        //     this.texture.encoding = THREE.sRGBEncoding; 
+        //     this.texture.flipY = false; 
+        //     this.material = new THREE.MeshBasicMaterial( { map: this.texture } ); 
               
-            mesh.traverse(node => { //needs a callback here to insure it gets painted the first time
-              console.log("gotsa obj + mat");
-              node.material = this.material;
-            });
-          },
-          function ( err ) {
-            console.error( 'An error happened.' );
-          }
-        );
+        //     mesh.traverse(node => { //needs a callback here to insure it gets painted the first time
+        //       console.log("gotsa obj + mat");
+        //       node.material = this.material;
+        //     });
+        //   },
+        //   function ( err ) {
+        //     console.error( 'An error happened.' );
+        //   }
+        // );
+        
       });
         
-        nextButton.addEventListener('click', function () {
-          // let picGroupArray = this.data.jsonData;
-          let picGroup = picGroupArray[0];
-          console.log("tryna show next from index" + picGroupIndex + " of " + picGroup.images.length);
-          if (picGroup.images.length > picGroupIndex + 1) {
-            picGroupIndex++;
-            } else {
-              picGroupIndex = 0;
-          }
-          const obj = pictureGroupPicEl.getObject3D('mesh');
-          const href = picGroupArray[0].images[picGroupIndex].url;
-          console.log("tryna set texture..." + href);
-          var texture = new THREE.TextureLoader().load(href);
-          texture.encoding = THREE.sRGBEncoding; 
-          texture.flipY = false; 
-          var material = new THREE.MeshBasicMaterial( { map: texture } ); 
-          obj.traverse(node => {
-            node.material = material;
-          });
+        nextButton.addEventListener('click', (event) => {
+          event.preventDefault();
+          // // let picGroupArray = this.data.jsonData;
+          // let picGroup = this.picGroupArray[this.picGroupArrayIndex];
+          // console.log("tryna show next from index" + picGroupIndex + " of " + picGroup.images.length);
+          // if (picGroup.images.length > picGroupIndex + 1) {
+          //     picGroupIndex++;
+          //   } else {
+          //     picGroupIndex = 0;
+          //   }
+          // const obj = pictureGroupPicEl.getObject3D('mesh');
+          // const href = this.picGroupArray[this.picGroupArrayIndex].images[picGroupIndex].url;
+          // console.log("tryna set texture..." + href);
+          // var texture = new THREE.TextureLoader().load(href);
+          // texture.encoding = THREE.sRGBEncoding; 
+          // texture.flipY = false; 
+          // var material = new THREE.MeshBasicMaterial( { map: texture } ); 
+          // obj.traverse(node => {
+          //   node.material = material;
+          // });
+          // this.nextPicGroupArrayIndex();
+          this.NextButtonClick();
         });
         previousButton.addEventListener('click', function () {
           // let picGroupArray = this.data.jsonData;
-          let picGroup = picGroupArray[0];
+          let picGroup = picGroupArray[this.picGroupArrayIndex];
           console.log("tryna show next from index" + picGroupIndex + " of " + picGroup.images.length);
           if (picGroupIndex > 0) {
               picGroupIndex--;
@@ -6617,7 +6629,7 @@ AFRAME.registerComponent('picture_groups_control', {
               picGroupIndex = picGroup.images.length - 1;
           }
           const obj = pictureGroupPicEl.getObject3D('mesh');
-          const href = picGroupArray[0].images[picGroupIndex].url;
+          const href = picGroupArray[this.picGroupArrayIndex].images[picGroupIndex].url;
           console.log("tryna set texture..." + href);
           var texture = new THREE.TextureLoader().load(href);
           texture.encoding = THREE.sRGBEncoding; 
@@ -6628,6 +6640,80 @@ AFRAME.registerComponent('picture_groups_control', {
           });
         });
       }
+    },
+    toggleOnPicGroup: function () {
+    //   console.log('toggleOnPicGroup event detected with' + JSON.stringify(this.picGroupArray));
+      let mesh = this.pictureGroupPicEl.getObject3D('mesh');
+      this.href = this.picGroupArray[this.picGroupArrayIndex].images[0].url;
+      console.log("tryna load initial scene pic " + this.href);
+      this.texture = null;
+      this.material = null;
+      // const obj = pictureGroupPicEl.getObject3D('mesh');
+      var loader = new THREE.TextureLoader();
+      // load a resource
+      loader.load(
+        // resource URL
+        this.href,
+        // onLoad callback
+        function ( texture ) { 
+          this.texture = texture;
+          this.texture.encoding = THREE.sRGBEncoding; 
+          this.texture.flipY = false; 
+          this.material = new THREE.MeshBasicMaterial( { map: this.texture } ); 
+            
+          mesh.traverse(node => { //needs a callback here to insure it gets painted the first time
+            console.log("gotsa obj + mat");
+            node.material = this.material;
+          });
+        },
+        function ( err ) {
+          console.error( 'An error happened.' );
+        }
+      );
+      
+    },
+    NextButtonClick: function () {
+      // this.nextPicGroupArrayIndex();
+      // let picGroupArray = this.data.jsonData;
+     
+      console.log(this.picGroupArrayIndex + " of " + this.picGroupArray.length + " group tryna show next from index " + this.picGroupIndex + " of " + this.picGroupArray[this.picGroupArrayIndex].images.length);
+      this.picGroup = this.picGroupArray[this.picGroupArrayIndex];
+      if (this.picGroup.images.length > this.picGroupIndex + 1) { //bakards..
+          this.picGroupIndex++;
+        } else {
+          this.picGroupIndex = 0;
+        }
+      const obj = this.pictureGroupPicEl.getObject3D('mesh');
+      const href = this.picGroupArray[this.picGroupArrayIndex].images[this.picGroupIndex].url;
+      console.log("tryna set texture " + href);
+      var texture = new THREE.TextureLoader().load(href);
+      texture.encoding = THREE.sRGBEncoding; 
+      texture.flipY = false; 
+      var material = new THREE.MeshBasicMaterial( { map: texture } ); 
+      obj.traverse(node => {
+        node.material = material;
+      });
+        
+    },
+
+    
+    nextPicGroupArrayIndex: function () {
+      if (this.picGroupArrayIndex < this.picGroupArray.length - 1) {
+        this.picGroupArrayIndex++;
+      } else {
+        this.picGroupArrayIndex = 0;
+      }
+      console.log("updated picGroupArrayIndex " + this.picGroupArrayIndex + " of " + this.picGroupArray.length);
+    },
+    previousPicGroupArrayIndex: function () {
+      if (this.picGroupArrayIndex == 0) {
+        this.picGroupArrayIndex = this.picGroupArray.length;
+      } else {
+        this.picGroupArrayIndex--;
+      }
+    },
+    setPicGroupArrayIndex: function (index) {
+      this.picGroupArrayIndex = index;
     },
     returnPictureData: function () {
       return this.data.jsonData;
@@ -6661,12 +6747,6 @@ AFRAME.registerComponent('picture_groups_control', {
       //find the group with the skyboxID, if there is one, and return that (can't mix in scene vs. in group skyboxen..?)
       let group = null;
       let picGroupArray = this.data.jsonData;
-      // if (picGroupArray.length > 0) {
-      //   let nextbuttonEl = document.getElementById('nextButton');
-      //   let prevbuttonEl = document.getElementById('previousButton');
-      //   nextbuttonEl.style.visibility = "visible";
-      //   prevbuttonEl.style.visibility = "visible";
-      // }
       console.log("tryna find tileable pics");
       for (let i = 0; i < picGroupArray.length; i++) {
         for (let j = 0; j < picGroupArray[i].images.length; j++) {
@@ -6677,8 +6757,59 @@ AFRAME.registerComponent('picture_groups_control', {
         }
       }
       return group;
+    }, 
+    initFlyingPics: function () {
+      this.flyingPicEls = [];
+      console.log("tryna init flying pics");
+      for (let i = 0; i < 5; i++) {
+        this.scalemod = Math.random() * (i) + .5;
+          let flyingPicEl = document.createElement("a-entity");
+          this.el.sceneEl.appendChild(flyingPicEl); 
+          flyingPicEl.setAttribute('gltf-model', '#flatrect2'); // mod for orientation
+          flyingPicEl.setAttribute('look-at', '#player'); //toggle by eventData
+          flyingPicEl.setAttribute('mod_curve', true); //pass data in?
+
+          flyingPicEl.classList.add("flyingPic");
+        
+          this.picGroup = this.picGroupArray[this.picGroupArrayIndex];
+          if (this.picGroup.images.length > this.picGroupIndex + 1) { //bakards..
+              this.picGroupIndex++;
+            } else {
+              this.picGroupIndex = 0;
+            }
+            flyingPicEl.addEventListener('model-loaded', () => {
+              const obj = flyingPicEl.getObject3D('mesh');
+              // obj.scale.set(this.scalemod, this.scalemod, this.scalemod);
+              // const href = this.picGroupArray[this.picGroupArrayIndex + 1].images[this.picGroupIndex + i].url;
+              const href = this.returnRandomPicture();
+              console.log("tryna set texture " + this.picGroupArray[this.picGroupArrayIndex].images[this.picGroupIndex + i].filename);
+              var texture = new THREE.TextureLoader().load(href);
+              texture.encoding = THREE.sRGBEncoding; 
+              texture.flipY = false; 
+              var material = new THREE.MeshBasicMaterial( { map: texture } ); 
+              obj.traverse(node => {
+                node.material = material;
+              });
+              
+          });
+          
+        }
+    },
+    returnRandomPicture: function () {
+      let randomIndex = Math.floor(Math.random() * this.picGroupArray[this.picGroupArrayIndex].images.length);
+      return this.picGroupArray[this.picGroupArrayIndex].images[randomIndex].url;
     }
 });
+
+// AFRAME.registerComponent('fly_by', {
+
+//   schema: {
+//       jsonData: {default: ""}
+//   },
+//   init: function() {
+      
+//   }
+// });
 
 AFRAME.registerComponent('toggle-picture-group', {
   schema: {
@@ -6686,17 +6817,25 @@ AFRAME.registerComponent('toggle-picture-group', {
   },
     init: function () {
     
-    this.el.addEventListener('click', function () {
-      console.log("tryna toggle pictureGroupPanel " + document.querySelector("#pictureGroupPanel").getAttribute('visible'));
+    this.el.addEventListener('click', (e) => {
+      e.preventDefault();
+      console.log("tryna toggle pictureGroupPanel ");
       if (!document.querySelector("#pictureGroupPanel").getAttribute('visible')){
         document.querySelector("#pictureGroupPanel").setAttribute('visible', true);
-        document.querySelector("#pictureGroupsControl").emit('toggleOnPicGroup');
+        let pgEl = document.getElementById("pictureGroupsData"); 
+        if (pgEl) {
+          pgEl.components.picture_groups_control.toggleOnPicGroup();
+          // pgEl.components.picture_groups_control.initFlyingPics();
+        } 
+        
       } else {
         document.querySelector("#pictureGroupPanel").setAttribute('visible', false);
       }
     });
   }
 });
+
+
 
 // AFRAME.registerComponent('primary_audio_events', {
 
