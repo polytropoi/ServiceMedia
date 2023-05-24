@@ -6501,7 +6501,17 @@ AFRAME.registerComponent('text-items-control', {
     }
 });
 
-AFRAME.registerComponent('picture_groups_control', {
+AFRAME.registerComponent('picture_group', { 
+  schema: {
+    mode: {default: 'flying'}
+    
+  },
+
+  init: function () {
+  }
+});
+
+AFRAME.registerComponent('picture_groups_control', { //has all the picgroup data
   schema: {
     // jsonData: {
     //   parse: JSON.parse,
@@ -6513,8 +6523,7 @@ AFRAME.registerComponent('picture_groups_control', {
   init: function () {
     let picGroupArray = [];
     this.picGroupArrayIndex = 0;
-    // console.log("picgroupdata: " + JSON.stringify(this.data.jsonData));
-    
+      
     let theData = this.el.getAttribute('data-picture-groups');
     this.data.jsonData = JSON.parse(atob(theData)); //convert from base64
     // console.log("picgroupdata: " + JSON.stringify(this.data.jsonData[0]));
@@ -6522,27 +6531,31 @@ AFRAME.registerComponent('picture_groups_control', {
     if (this.data.jsonData != null && this.data.jsonData.length > 0) {
       let pictureGroupPicEl = document.getElementById("pictureGroupPic"); 
       this.pictureGroupPicEl = pictureGroupPicEl;
-      let nextButton = document.getElementById("pictureGroupNextButton"); //get children like this instead
+      let nextButton = document.getElementById("pictureGroupNextButton"); 
       let previousButton = document.getElementById("pictureGroupPreviousButton");
+      let flyButton = document.getElementById("pictureGroupFlyButton");
+      let layoutButton = document.getElementById("pictureGroupLayoutButton");
+
       picGroupArray = this.data.jsonData; //it's an array of arrays
-      
       this.picGroupArray = picGroupArray;
-      // let picGroup = picGroupArray[0];
-      // console.log("picGroup :" + JSON.stringify(picGroup));a
-      let picGroupIndex = 0;
       this.picGroupIndex = 0;
+      this.loader = new THREE.TextureLoader();
+      this.flyingPicEls = [];
+      this.layoutPicEls = [];
 
-
-      this.pictureGroupPicEl.addEventListener('model-loaded', () => {
+      this.pictureGroupPicEl.addEventListener('model-loaded', (event) => {
+        event.preventDefault();
         let mesh = pictureGroupPicEl.getObject3D('mesh');
         this.href = this.picGroupArray[this.picGroupArrayIndex].images[0].url;
         console.log("tryna load initial scene pic " + this.href + " from " + JSON.stringify(this.picGroupArray));
         this.texture = null;
         this.material = null;
+        // this.isTransparent = false;
+        // this.isTransparent = this.picGroupArray[this.picGroupArrayIndex].images[0].hasAlphaChannel;
         // const obj = pictureGroupPicEl.getObject3D('mesh');
-        var loader = new THREE.TextureLoader();
+        // var loader = new THREE.TextureLoader();
         // load a resource
-        loader.load(
+        this.loader.load(
           // resource URL
           this.href,
           // onLoad callback
@@ -6550,9 +6563,9 @@ AFRAME.registerComponent('picture_groups_control', {
             this.texture = texture;
             this.texture.encoding = THREE.sRGBEncoding; 
             this.texture.flipY = false; 
-            this.material = new THREE.MeshBasicMaterial( { map: this.texture } ); 
+            this.material = new THREE.MeshBasicMaterial( { map: texture, transparent: true} ); 
               
-            mesh.traverse(node => { //needs a callback here to insure it gets painted the first time
+            mesh.traverse(node => { 
               console.log("gotsa obj + mat");
               node.material = this.material;
             });
@@ -6562,96 +6575,53 @@ AFRAME.registerComponent('picture_groups_control', {
           }
         );
       });
-      this.el.addEventListener('toggleOnPicGroup',  (event) => {
+      
+      nextButton.addEventListener('click', (event) => {
         event.preventDefault();
         
-        // console.log('toggleOnPicGroup event detected with' + JSON.stringify(this.picGroupArray));
-        // let mesh = this.pictureGroupPicEl.getObject3D('mesh');
-        // this.href = this.picGroupArray[this.picGroupArrayIndex].images[0].url;
-        // console.log("tryna load initial scene pic " + this.href);
-        // this.texture = null;
-        // this.material = null;
-        // // const obj = pictureGroupPicEl.getObject3D('mesh');
-        // var loader = new THREE.TextureLoader();
-        // // load a resource
-        // loader.load(
-        //   // resource URL
-        //   this.href,
-        //   // onLoad callback
-        //   function ( texture ) { 
-        //     this.texture = texture;
-        //     this.texture.encoding = THREE.sRGBEncoding; 
-        //     this.texture.flipY = false; 
-        //     this.material = new THREE.MeshBasicMaterial( { map: this.texture } ); 
-              
-        //     mesh.traverse(node => { //needs a callback here to insure it gets painted the first time
-        //       console.log("gotsa obj + mat");
-        //       node.material = this.material;
-        //     });
-        //   },
-        //   function ( err ) {
-        //     console.error( 'An error happened.' );
-        //   }
-        // );
-        
+        this.NextButtonClick();
       });
+
+      previousButton.addEventListener('click', (event) => {
+        event.preventDefault();
         
-        nextButton.addEventListener('click', (event) => {
-          event.preventDefault();
-          // // let picGroupArray = this.data.jsonData;
-          // let picGroup = this.picGroupArray[this.picGroupArrayIndex];
-          // console.log("tryna show next from index" + picGroupIndex + " of " + picGroup.images.length);
-          // if (picGroup.images.length > picGroupIndex + 1) {
-          //     picGroupIndex++;
-          //   } else {
-          //     picGroupIndex = 0;
-          //   }
-          // const obj = pictureGroupPicEl.getObject3D('mesh');
-          // const href = this.picGroupArray[this.picGroupArrayIndex].images[picGroupIndex].url;
-          // console.log("tryna set texture..." + href);
-          // var texture = new THREE.TextureLoader().load(href);
-          // texture.encoding = THREE.sRGBEncoding; 
-          // texture.flipY = false; 
-          // var material = new THREE.MeshBasicMaterial( { map: texture } ); 
-          // obj.traverse(node => {
-          //   node.material = material;
-          // });
-          // this.nextPicGroupArrayIndex();
-          this.NextButtonClick();
-        });
-        previousButton.addEventListener('click', function () {
-          // let picGroupArray = this.data.jsonData;
-          let picGroup = picGroupArray[this.picGroupArrayIndex];
-          console.log("tryna show next from index" + picGroupIndex + " of " + picGroup.images.length);
-          if (picGroupIndex > 0) {
-              picGroupIndex--;
-            } else {
-              picGroupIndex = picGroup.images.length - 1;
-          }
-          const obj = pictureGroupPicEl.getObject3D('mesh');
-          const href = picGroupArray[this.picGroupArrayIndex].images[picGroupIndex].url;
-          console.log("tryna set texture..." + href);
-          var texture = new THREE.TextureLoader().load(href);
-          texture.encoding = THREE.sRGBEncoding; 
-          texture.flipY = false; 
-          var material = new THREE.MeshBasicMaterial( { map: texture } ); 
-          obj.traverse(node => {
-            node.material = material;
-          });
-        });
-      }
+        this.PreviousButtonClick();
+      });
+      flyButton.addEventListener('click', (event) => {
+        event.preventDefault();
+        
+        this.FlyButtonClick();
+      });
+      layoutButton.addEventListener('click', (event) => {
+        event.preventDefault();
+        
+        this.LayoutButtonClick();
+      });
+
+    }
     },
     toggleOnPicGroup: function () {
-    //   console.log('toggleOnPicGroup event detected with' + JSON.stringify(this.picGroupArray));
+      if (this.flyingPicEls.length > 0) {
+        for (i = 0; i < this.flyingPicEls.length; i++) {
+          this.flyingPicEls[i].parentNode.removeChild(this.flyingPicEls[i]);
+        }
+      }
+      if (this.layoutPicEls.length > 0) {
+        for (i = 0; i < this.layoutPicEls.length; i++) {
+          this.layoutPicEls[i].parentNode.removeChild(this.layoutPicEls[i]);
+        }
+      }
+      this.layoutPicEls = [];
+      this.flyingPicEls = [];
       let mesh = this.pictureGroupPicEl.getObject3D('mesh');
       this.href = this.picGroupArray[this.picGroupArrayIndex].images[0].url;
       console.log("tryna load initial scene pic " + this.href);
       this.texture = null;
       this.material = null;
       // const obj = pictureGroupPicEl.getObject3D('mesh');
-      var loader = new THREE.TextureLoader();
+      
       // load a resource
-      loader.load(
+      this.loader.load(
         // resource URL
         this.href,
         // onLoad callback
@@ -6659,7 +6629,7 @@ AFRAME.registerComponent('picture_groups_control', {
           this.texture = texture;
           this.texture.encoding = THREE.sRGBEncoding; 
           this.texture.flipY = false; 
-          this.material = new THREE.MeshBasicMaterial( { map: this.texture } ); 
+          this.material = new THREE.MeshBasicMaterial( {map: texture, transparent: true} ); 
             
           mesh.traverse(node => { //needs a callback here to insure it gets painted the first time
             console.log("gotsa obj + mat");
@@ -6689,14 +6659,70 @@ AFRAME.registerComponent('picture_groups_control', {
       var texture = new THREE.TextureLoader().load(href);
       texture.encoding = THREE.sRGBEncoding; 
       texture.flipY = false; 
-      var material = new THREE.MeshBasicMaterial( { map: texture } ); 
+      var material = new THREE.MeshBasicMaterial( { map: texture, transparent: this.picGroupArray[this.picGroupArrayIndex].images[this.picGroupIndex].hasAlphaChannel } ); 
       obj.traverse(node => {
         node.material = material;
       });
         
     },
-
-    
+    PreviousButtonClick: function () {
+      // this.nextPicGroupArrayIndex();
+      // let picGroupArray = this.data.jsonData;
+     
+      console.log(this.picGroupArrayIndex + " of " + this.picGroupArray.length + " group tryna show next from index " + this.picGroupIndex + " of " + this.picGroupArray[this.picGroupArrayIndex].images.length);
+      this.picGroup = this.picGroupArray[this.picGroupArrayIndex];
+      if (this.picGroupIndex > 0) {
+          this.picGroupIndex--;
+        } else {
+          this.picGroupIndex = this.picGroup.images.length - 1;
+      }
+      const obj = this.pictureGroupPicEl.getObject3D('mesh');
+      const href = this.picGroupArray[this.picGroupArrayIndex].images[this.picGroupIndex].url;
+      console.log("tryna set texture " + href);
+      var texture = new THREE.TextureLoader().load(href);
+      texture.encoding = THREE.sRGBEncoding; 
+      texture.flipY = false; 
+      var material = new THREE.MeshBasicMaterial( { map: texture, transparent: this.picGroupArray[this.picGroupArrayIndex].images[this.picGroupIndex].hasAlphaChannel } ); 
+      obj.traverse(node => {
+        node.material = material;
+      });
+        
+    },
+    FlyButtonClick: function () {
+      document.querySelector("#pictureGroupPanel").setAttribute('visible', false);
+      if (this.flyingPicEls.length > 0) {
+        for (i = 0; i < this.flyingPicEls.length; i++) {
+          this.flyingPicEls[i].parentNode.removeChild(this.flyingPicEls[i]);
+        }
+      }
+      if (this.layoutPicEls.length > 0) {
+        for (i = 0; i < this.layoutPicEls.length; i++) {
+          this.layoutPicEls[i].parentNode.removeChild(this.layoutPicEls[i]);
+        }
+      }
+      this.layoutPicEls = [];
+      this.flyingPicEls = [];
+      this.initFlyingPics();
+        
+    },
+    LayoutButtonClick: function () {
+      document.querySelector("#pictureGroupPanel").setAttribute('visible', false);
+      if (this.flyingPicEls.length > 0) {
+        for (i = 0; i < this.flyingPicEls.length; i++) {
+          this.flyingPicEls[i].parentNode.removeChild(this.flyingPicEls[i]);
+        }
+      }
+     
+      if (this.layoutPicEls.length > 0) {
+        for (i = 0; i < this.layoutPicEls.length; i++) {
+          this.layoutPicEls[i].parentNode.removeChild(this.layoutPicEls[i]);
+        }
+      }
+      this.layoutPicEls = [];
+      this.flyingPicEls = [];
+      this.initLayoutPics();
+        
+    },
     nextPicGroupArrayIndex: function () {
       if (this.picGroupArrayIndex < this.picGroupArray.length - 1) {
         this.picGroupArrayIndex++;
@@ -6723,10 +6749,7 @@ AFRAME.registerComponent('picture_groups_control', {
       let group = null;
       let picGroupArray = this.data.jsonData;
       if (picGroupArray.length > 0) { //todo if pois or multiple equirects
-        // let nextbuttonEl = document.getElementById('nextButton');
-        // let prevbuttonEl = document.getElementById('previousButton');
-        // nextbuttonEl.style.visibility = "visible";
-        // prevbuttonEl.style.visibility = "visible";
+       
       }
       console.log("tryna find skybox id " + skyboxID);
       for (let i = 0; i < picGroupArray.length; i++) {
@@ -6744,13 +6767,13 @@ AFRAME.registerComponent('picture_groups_control', {
       return group;
     },
     returnTileableData: function () {
-      //find the group with the skyboxID, if there is one, and return that (can't mix in scene vs. in group skyboxen..?)
+
       let group = null;
       let picGroupArray = this.data.jsonData;
       console.log("tryna find tileable pics");
       for (let i = 0; i < picGroupArray.length; i++) {
         for (let j = 0; j < picGroupArray[i].images.length; j++) {
-          if (picGroupArray[i].images[j].orientation == "Tileable") {
+          if (picGroupArray[i].images[j].orientation == "Tileable") { //todo check tags
             group = picGroupArray[i];
             break;
           }
@@ -6759,18 +6782,33 @@ AFRAME.registerComponent('picture_groups_control', {
       return group;
     }, 
     initFlyingPics: function () {
-      this.flyingPicEls = [];
+      this.nextPicGroupArrayIndex();
+      
       console.log("tryna init flying pics");
-      for (let i = 0; i < 5; i++) {
-        this.scalemod = Math.random() * (i) + .5;
+      for (let i = 0; i < this.picGroupArray[this.picGroupArrayIndex].images.length; i++) {
+        console.log("tryuna set a pic with orientation" + this.picGroupArray[this.picGroupArrayIndex].images[i].orientation);
+        setTimeout(() => {
+          this.scalemod = Math.random() * 1.5;
           let flyingPicEl = document.createElement("a-entity");
           this.el.sceneEl.appendChild(flyingPicEl); 
-          flyingPicEl.setAttribute('gltf-model', '#flatrect2'); // mod for orientation
-          flyingPicEl.setAttribute('look-at', '#player'); //toggle by eventData
-          flyingPicEl.setAttribute('mod_curve', true); //pass data in?
+          let orientation = this.picGroupArray[this.picGroupArrayIndex].images[i].orientation;
 
+          if (!orientation || orientation.includes("Landscape")) {
+            flyingPicEl.setAttribute('gltf-model', '#flatrect2'); // mod for orientation
+          } else if (orientation.includes("Portrait")) {
+            flyingPicEl.setAttribute('gltf-model', '#portrait_panel');
+          } else if (orientation.includes("Square")) {
+
+          }
+         
+          flyingPicEl.setAttribute('look-at', '#player'); //toggle by eventData
+
+          flyingPicEl.setAttribute('mod_curve', {'init': true, 'speedFactor': .75, 'spreadFactor': 4, 'distance': -20, 'type': 'pictureGroup'}); //pass data in?
+
+          flyingPicEl.setAttribute('scale', {'x': this.scalemod, 'y': this.scalemod, 'z': this.scalemod}); //toggle by eventData
           flyingPicEl.classList.add("flyingPic");
-        
+          flyingPicEl.id = "flyingPic_" + i;
+          this.flyingPicEls.push(flyingPicEl);
           this.picGroup = this.picGroupArray[this.picGroupArrayIndex];
           if (this.picGroup.images.length > this.picGroupIndex + 1) { //bakards..
               this.picGroupIndex++;
@@ -6780,36 +6818,102 @@ AFRAME.registerComponent('picture_groups_control', {
             flyingPicEl.addEventListener('model-loaded', () => {
               const obj = flyingPicEl.getObject3D('mesh');
               // obj.scale.set(this.scalemod, this.scalemod, this.scalemod);
-              // const href = this.picGroupArray[this.picGroupArrayIndex + 1].images[this.picGroupIndex + i].url;
-              const href = this.returnRandomPicture();
-              console.log("tryna set texture " + this.picGroupArray[this.picGroupArrayIndex].images[this.picGroupIndex + i].filename);
+              const href = this.picGroupArray[this.picGroupArrayIndex].images[i].url;
+              // const href = this.returnRandomPicture();
+              console.log("tryna set texture with alpha " + this.picGroupArray[this.picGroupArrayIndex].images[i].hasAlphaChannel);
+              
               var texture = new THREE.TextureLoader().load(href);
               texture.encoding = THREE.sRGBEncoding; 
               texture.flipY = false; 
-              var material = new THREE.MeshBasicMaterial( { map: texture } ); 
+
+              var material = new THREE.MeshBasicMaterial( { map: texture, transparent: this.picGroupArray[this.picGroupArrayIndex].images[i].hasAlphaChannel } ); 
               obj.traverse(node => {
                 node.material = material;
-              });
-              
-          });
-          
+              }); 
+            });
+          console.log("waiting on " + i)
+        }, i * 2000);
+      }
+    },
+    initLayoutPics: function () {
+      this.nextPicGroupArrayIndex();
+      
+      // this.radius = 20;
+      // console.log("tryna init layout pics");
+      // var theta = (i / this.picGroupArray[this.picGroupArrayIndex].images.length) * Math.PI * 2;
+      // this.el.object3D.position.copy.x
+
+      // const curve = new THREE.EllipseCurve(
+      //   this.el.object3D.position.copy.x, this.el.object3D.position.copy.y,            // Center x, y
+      //   100.0, 100.0,          // x radius, y radius
+      //   0.0, 2.0 * Math.PI,  // Start angle, stop angle
+      // );
+      // const pts = curve.getSpacedPoints(this.picGroupArray[this.picGroupArrayIndex].images.length);
+      if (!this.layoutEl) {
+        this.layoutEl = document.createElement("a-entity");
+        this.el.appendChild(this.layoutEl);
+        this.layoutEl.setAttribute('position', '0 2 0');
+        this.layoutEl.setAttribute('layout', {'type': 'circle', 'radius': 10, 'plane': 'xz'}); //layout component
+
+      } 
+      for (let i = 0; i < this.picGroupArray[this.picGroupArrayIndex].images.length; i++) {
+        console.log("tryuna set a pic with orientation" + this.picGroupArray[this.picGroupArrayIndex].images[i].orientation);
+        // this.scalemod = Math.random() * 2.5;
+        this.scalemod = 1.5;
+        let layoutPicEl = document.createElement("a-entity");
+        this.layoutEl.appendChild(layoutPicEl); 
+        let orientation = this.picGroupArray[this.picGroupArrayIndex].images[i].orientation;
+
+        if (!orientation || orientation.includes("Landscape")) {
+          layoutPicEl.setAttribute('gltf-model', '#flatrect2'); // mod for orientation
+        } else if (orientation.includes("Portrait")) {
+          layoutPicEl.setAttribute('gltf-model', '#portrait_panel');
+        } else if (orientation.includes("Square")) {
+
         }
+        // this.isPositive = Math.random() > .5 ? 1 : -1;
+        // this.x = Math.random() * i + 10 * this.isPositive;
+        // this.z = Math.random() * i + 10 * this.isPositive;
+        // layoutPicEl.setAttribute('position', {'x': pts.x, 'y': pts.y, 'z': pts.z});
+        layoutPicEl.setAttribute('look-at', '#player'); //toggle by eventData
+        // layoutPicEl.setAttribute('mod_curve', {'init': true, 'speedFactor': .75, 'spreadFactor': 6, 'distance': -30, 'type': 'pictureGroup'}); //pass data in?
+        layoutPicEl.setAttribute('scale', {'x': this.scalemod, 'y': this.scalemod, 'z': this.scalemod}); //toggle by eventData
+        layoutPicEl.classList.add("layoutPic");
+        // layoutPicEl.setAttribute('brownian-motion', {'speed': '0.1', 'rotationVariance':'.2 .2 .2', 'positionVariance':'2.5 5 2.5', 'spaceVector':'10.1,20.1,30.1,10.1,20.1,30.1'});
+        layoutPicEl.setAttribute('look-at', '#player'); //toggle by eventData
+        layoutPicEl.id = "layoutPic_" + i;
+        this.layoutPicEls.push(layoutPicEl);
+        this.picGroup = this.picGroupArray[this.picGroupArrayIndex];
+
+        if (this.picGroup.images.length > this.picGroupIndex + 1) { //bakards..
+            this.picGroupIndex++;
+          } else {
+            this.picGroupIndex = 0;
+          }
+          layoutPicEl.addEventListener('model-loaded', () => {
+            const obj = layoutPicEl.getObject3D('mesh');
+            // obj.scale.set(this.scalemod, this.scalemod, this.scalemod);
+            const href = this.picGroupArray[this.picGroupArrayIndex].images[i].url;
+            // const href = this.returnRandomPicture();
+            console.log("tryna set texture with alpha " + this.picGroupArray[this.picGroupArrayIndex].images[i].hasAlphaChannel);
+            
+            var texture = new THREE.TextureLoader().load(href);
+            texture.encoding = THREE.sRGBEncoding; 
+            texture.flipY = false; 
+
+            var material = new THREE.MeshBasicMaterial( { map: texture, transparent: this.picGroupArray[this.picGroupArrayIndex].images[i].hasAlphaChannel } ); 
+            obj.traverse(node => {
+              node.material = material;
+            }); 
+          });
+        console.log("waiting on " + i);
+      }
     },
     returnRandomPicture: function () {
       let randomIndex = Math.floor(Math.random() * this.picGroupArray[this.picGroupArrayIndex].images.length);
       return this.picGroupArray[this.picGroupArrayIndex].images[randomIndex].url;
     }
 });
-
-// AFRAME.registerComponent('fly_by', {
-
-//   schema: {
-//       jsonData: {default: ""}
-//   },
-//   init: function() {
-      
-//   }
-// });
 
 AFRAME.registerComponent('toggle-picture-group', {
   schema: {

@@ -1300,14 +1300,16 @@ webxr_router.get('/:_id', function (req, res) {
                                         // "<a-entity id=\x22player\x22 get_pos_rot networked=\x22template:#avatar-template;attachTemplateToLocal:false;\x22 "+spawnInCircle+" camera "+wasd+" look-controls=\x22hmdEnabled: false\x22 position=\x220 1.6 0\x22>" +     
                                         // "<a-entity id=\x22viewportPlaceholder\x22 position=\x220 0 -1\x22></entity>"+   
                                         "<a-entity id=\x22player\x22 "+lookcontrols+" get_pos_rot camera "+wasd+" "+ physicsMod +" position=\x22"+playerPosition+"\x22>"+
-                                            "<a-entity id=\x22equipPlaceholder\x22 geometry=\x22primitive: box; height: .1; width: .1; depth: .1\x22 position=\x220 -.65 -.75\x22"+
+                                            "<a-entity id=\x22equipPlaceholder\x22 visible=\x22false\x22 geometry=\x22primitive: box; height: .1; width: .1; depth: .1;\x22 position=\x220 -.65 -.75\x22"+
                                             "material=\x22opacity: 0\x22></a-entity>"+
-                                            "<a-entity id=\x22viewportPlaceholder\x22 geometry=\x22primitive: plane; height: 0.01; width: .01\x22 position=\x220 0 -1.5\x22"+
+                                            "<a-entity id=\x22viewportPlaceholder\x22 visible=\x22false\x22 geometry=\x22primitive: plane; height: 0.01; width: .01\x22 position=\x220 0 -1.5\x22"+
                                             "material=\x22opacity: 0\x22></a-entity>"+
-                                            "<a-entity id=\x22viewportPlaceholder3\x22 geometry=\x22primitive: plane; height: 0.01; width: .01\x22 position=\x220 0 -3\x22"+
+                                            "<a-entity id=\x22viewportPlaceholder3\x22 visible=\x22false\x22 geometry=\x22primitive: plane; height: 0.01; width: .01\x22 position=\x220 0 -3\x22"+
+                                            "material=\x22opacity: 0\x22></a-entity>"+
+                                            "<a-entity id=\x22viewportPlaceholderFar\x22 visible=\x22false\x22 geometry=\x22primitive: plane; height: 0.01; width: .01\x22 position=\x220 0 -30\x22"+
                                             "material=\x22opacity: 0\x22></a-entity>"+
                                         "</a-entity>"+
-                                       
+
                                         "<a-entity id=\x22left-hand\x22 oculus-touch-controls=\x22hand: left\x22 "+blinkMod+" handModelStyle: lowPoly; color: #ffcccc\x22>"+
                                             "<a-console position=\x220 .13 -.36\x22 scale=\x22.33 .33 .33\x22 rotation=\x22-70.7 -1.77\x22></a-console>"+
                                         "</a-entity>" +
@@ -1780,6 +1782,7 @@ webxr_router.get('/:_id', function (req, res) {
                         let index = 0;
                         
                         for (var i = 0; i < sceneResponse.sceneWebLinks.length; i++) {
+                            if (isValidObjectID(sceneResponse.sceneWebLinks[i])) {
                             db.weblinks.findOne({'_id': ObjectID(sceneResponse.sceneWebLinks[i])}, function (err, weblink){
                                 if (err || !weblink) {
                                     console.log("can't find weblink");
@@ -1826,8 +1829,9 @@ webxr_router.get('/:_id', function (req, res) {
                                         weblinkEntities = weblinkEntities + "<a-entity "+link+" position=\x22"+position+"\x22 weblink-materials=\x22index:"+index+"\x22 look-at=\x22#player\x22 gltf-model=\x22#flatsquare\x22 scale=\x22"+scale+"\x22 material=\x22shader: flat; src: #wlimage" + index + "; alphaTest: 0.5;\x22"+
                                         " visible='true'>"+caption+"</a-entity>";   
                                     // })();
-                                }
-                            });
+                                    }
+                                });
+                            }
                         }
                     }
                     callback(null);
@@ -3508,25 +3512,22 @@ webxr_router.get('/:_id', function (req, res) {
                                     pictureGroupsEntity = "<a-entity scale=\x22.75 .75 .75\x22 look-at=\x22#player\x22 position=\x22"+picturegroupLocation+"\x22>"+ 
                                     "<a-entity position=\x220 -2.5 0\x22 scale=\x22.75  .75 .75\x22 id=\x22pictureGroupsControl\x22 class=\x22envMap activeObjexRay\x22 "+skyboxEnvMap+" toggle-picture-group gltf-model=\x22#camera_icon\x22></a-entity>"+
                                     "<a-entity id=\x22pictureGroupPanel\x22 visible=\x22false\x22 position=\x220 -1 0\x22>"+
-                                    "<a-entity id=\x22pictureGroupHeaderText\x22 geometry=\x22primitive: plane; width: 3.25; height: 1\x22 position=\x220 1.75 0\x22 material=\x22color: grey; transparent: true; opacity: 0.0\x22" +
-                                    "text=\x22value:; wrap-count: 35;\x22></a-entity>" +
-                                    // "<a-entity id=\x22availableSceneText\x22 class=\x22envMap activeObjexRay\x22 geometry=\x22primitive: plane; width: 4; height: 1\x22 position=\x220 1.5 0\x22 material=\x22color: grey; transparent: true; opacity: 0.0\x22" +
-                                    // "text=\x22value:; wrap-count: 25;\x22></a-entity>" +
-                                    // "<a-entity id=\x22availableSceneOwner\x22 class=\x22envMap activeObjexRay\x22  geometry=\x22primitive: plane; width: 4; height: 1\x22 position=\x220 .5 0\x22 material=\x22color: grey; transparent: true; opacity: 0.0\x22" +
-                                    // "text=\x22value:; wrap-count: 25;\x22></a-entity>" +
+                                    // "<a-entity id=\x22pictureGroupHeaderText\x22 geometry=\x22primitive: plane; width: 3.25; height: 1\x22 position=\x220 1.75 0\x22 material=\x22color: grey; transparent: true; opacity: 0.0\x22" +
+                                    // "text=\x22value:; wrap-count: 35;\x22></a-entity>" +
+                                    
                                     "<a-entity id=\x22pictureGroupPic\x22 visible=\x22true\x22 position=\x220 2.25 -.1\x22 gltf-model=\x22#flatrect2\x22 scale=\x224 4 4\x22 material=\x22shader: flat; alphaTest: 0.5;\x22"+
                                     "rotation='0 0 0'></a-entity>"+
                                     // "<a-entity gltf-model=\x22#square_panel\x22 scale=\x222.25 2.25 2.25\x22 position=\x220 2.1 -.25\x22></a-entity>" +
+                                    "<a-entity visible='true' class=\x22envMap activeObjexRay\x22 id=\x22pictureGroupFlyButton\x22 gltf-model=\x22#next_button\x22 scale=\x22.25 .25 .25\x22 position=\x223.25 -.75 0\x22></a-entity>" +
+                                    "<a-entity visible='true' class=\x22envMap activeObjexRay\x22 id=\x22pictureGroupLayoutButton\x22 gltf-model=\x22#previous_button\x22 scale=\x22.25 .25 .25\x22 position=\x22-3.25 -.75 0\x22></a-entity>" +
                                     "<a-entity visible='true' class=\x22envMap activeObjexRay\x22 id=\x22pictureGroupNextButton\x22 gltf-model=\x22#next_button\x22 scale=\x22.5 .5 .5\x22 position=\x222.25 -.75 0\x22></a-entity>" +
-                                    "<a-entity visible='true' class=\x22envMap activeObjexRay\x22 id=\x22pictureGroupPreviousButton\x22 gltf-model=\x22#previous_button\x22 scale=\x22.5 .5 .5\x22 position=\x22-2.25   -.75 0\x22></a-entity>" +
+                                    "<a-entity visible='true' class=\x22envMap activeObjexRay\x22 id=\x22pictureGroupPreviousButton\x22 gltf-model=\x22#previous_button\x22 scale=\x22.5 .5 .5\x22 position=\x22-2.25  -.75 0\x22></a-entity>" +
                                     "</a-entity></a-entity>";
-                                    // loadPictureGroups = "ready(function(){\n" + //after page is ready..
-                                    // "let pgcontrol = document.getElementById(\x22pictureGroupsControl\x22);\n"+
-                                    // "console.log('tryna set availablescenes: ' + "+JSON.stringify(JSON.stringify(availableScenesResponse))+");"+
-                                    // "pgcontrol.setAttribute(\x22picture_groups_control\x22, \x22jsonData\x22, "+JSON.stringify(JSON.stringify(requestedPictureGroups))+");\n"+ //double stringify! yes, it's needed
+                                   
                                     var buff = Buffer.from(JSON.stringify(requestedPictureGroups)).toString("base64");
                                     pictureGroupsData = "<a-entity picture_groups_control id=\x22pictureGroupsData\x22 data-picture-groups='"+buff+"'></a-entity>"; //to be picked up by aframe, but data is in data-attribute
-                                    modelAssets = modelAssets + "<a-asset-item id=\x22flatrect2\x22 crossorigin=\x22anonymous\x22 id=\x22flatrect2\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/flatrect2.glb\x22></a-asset-item>"+
+                                    modelAssets = modelAssets + "<a-asset-item id=\x22portrait_panel\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/flatrect2_portrait.glb\x22></a-asset-item>\n" +
+                                    "<a-asset-item id=\x22flatrect2\x22 crossorigin=\x22anonymous\x22 id=\x22flatrect2\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/flatrect2.glb\x22></a-asset-item>"+
                                     "\n<a-asset-item id=\x22camera_icon\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/camera1.glb\x22></a-asset-item>\n";
                                     "});";
                                     callback(null);
@@ -3540,7 +3541,7 @@ webxr_router.get('/:_id', function (req, res) {
                     }
 
                 },
-                function (callback) {
+                function (callback) {  //places scene pics (not in a group)
                     // var postcards = [];
                     // console.log("sceneResponse.scenePictures: " + JSON.stringify(sceneResponse.scenePictures));
                     if (sceneResponse.scenePictures != null && sceneResponse.scenePictures.length > 0) {
@@ -4486,7 +4487,7 @@ webxr_router.get('/:_id', function (req, res) {
                         // "<script src=\x22../main/src/shaders/terrain.js\x22></script>"+
                        
                         "<script src=\x22../main/vendor/aframe/aframe-look-at-component.js\x22></script>"+
-                      
+                        "<script src=\x22../main/vendor/aframe/aframe-layout-component.js\x22></script>"+
                         // "<script src=\x22../main/vendor/html2canvas/aframe-html-shader.min.js\x22></script>"+
                         primaryAudioScript +
                         ambientAudioScript +

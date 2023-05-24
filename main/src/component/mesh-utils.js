@@ -3643,8 +3643,12 @@ AFRAME.registerComponent('mod_curve', {
     init: {default: false},
     isClosed: {default: false},
     eventData: {default: ''},
-    orientToCurve: {default: false}
-
+    orientToCurve: {default: false},
+    speedFactor: {default: 1},
+    spreadFactor: {default: 4},
+    distance: {default: -100},
+    type: {default: 'model'},
+    origin: {default: 'world zero'}
   },
 
   init: function () {
@@ -3653,22 +3657,27 @@ AFRAME.registerComponent('mod_curve', {
 
     console.log("tryna make a mod_curve");
 
-    this.newPosition = null; 
+    this.newPosition = null;
     this.tangent = null;
-    this.radians = null; 
+    this.radians = null;
     this.fraction = 0;
 
     this.normal = new THREE.Vector3( 0, 1, 0 ); // up
-    // this.normal = new THREE.Vector3( 0, 0, 0 ); // up
     this.axis = new THREE.Vector3( );
     this.points = [];
     this.speed = .001;
+    this.speedMod = this.data.speedFactor;
 
-    this.speedMod = 1;
-    // this.el.getAttribute("position");
+    this.viewportLocation = new THREE.Vector3();
+    this.viewportHolder = document.getElementById('viewportPlaceholder');
+    this.viewportHolder.object3D.getWorldPosition( this.viewportLocation );
 
     for (var i = 0; i < 5; i += 1) {
-      this.points.push(new THREE.Vector3(0, 0, -100 * (i / 4)));
+      if (this.data.origin == 'world zero') {
+        this.points.push(new THREE.Vector3(0, 0, this.data.distance * (i / 4)));
+      } else if (this.data.origin == 'viewport') {
+        this.points.push(new THREE.Vector3(this.viewportLocation * (i / 4)));
+      }
     }
     this.curve = new THREE.CatmullRomCurve3(this.points);
     this.c_points = this.curve.getPoints( 50 );
@@ -3685,14 +3694,14 @@ AFRAME.registerComponent('mod_curve', {
     this.curveLine.geometry.attributes.position.needsUpdate = true;
     this.speedmod = Math.random() * (2 - .5) + .5;
     if (this.fraction == 0) {
-      this.curve.points[0].x =Math.ceil(Math.random() * 4) * (Math.round(Math.random()) ? 1 : -1);
-      this.curve.points[0].y =Math.ceil(Math.random() * 4) * (Math.round(Math.random()) ? 1 : -1);
-      this.curve.points[1].x =-Math.ceil(Math.random() * 4) * (Math.round(Math.random()) ? 1 : -1);
-      this.curve.points[1].y =-Math.ceil(Math.random() * 4) * (Math.round(Math.random()) ? 1 : -1);
-      this.curve.points[2].x =Math.ceil(Math.random() * 4) * (Math.round(Math.random()) ? 1 : -1);
-      this.curve.points[2].y =Math.ceil(Math.random() * 4) * (Math.round(Math.random()) ? 1 : -1);
-      this.curve.points[3].x =-Math.ceil(Math.random() * 4) * (Math.round(Math.random()) ? 1 : -1);
-      this.curve.points[3].y =-Math.ceil(Math.random() * 4) * (Math.round(Math.random()) ? 1 : -1);
+      this.curve.points[0].x =Math.ceil(Math.random() * this.data.spreadFactor) * (Math.round(Math.random()) ? 1 : -1);
+      this.curve.points[0].y =Math.ceil(Math.random() * this.data.spreadFactor) * (Math.round(Math.random()) ? 1 : -1);
+      this.curve.points[1].x =-Math.ceil(Math.random() * this.data.spreadFactor) * (Math.round(Math.random()) ? 1 : -1);
+      this.curve.points[1].y =-Math.ceil(Math.random() * this.data.spreadFactor) * (Math.round(Math.random()) ? 1 : -1);
+      this.curve.points[2].x =Math.ceil(Math.random() * this.data.spreadFactor) * (Math.round(Math.random()) ? 1 : -1);
+      this.curve.points[2].y =Math.ceil(Math.random() * this.data.spreadFactor) * (Math.round(Math.random()) ? 1 : -1);
+      this.curve.points[3].x =-Math.ceil(Math.random() * this.data.spreadFactor) * (Math.round(Math.random()) ? 1 : -1);
+      this.curve.points[3].y =-Math.ceil(Math.random() * this.data.spreadFactor) * (Math.round(Math.random()) ? 1 : -1);
     }
     this.fraction += 0.001 * this.speedMod;
     if ( this.fraction > 1) {
@@ -3702,9 +3711,9 @@ AFRAME.registerComponent('mod_curve', {
     }
     
     this.el.object3D.position.copy( this.curve.getPoint( 1 - this.fraction ) ); //or just the fraction to go backwards       
-      this.tangent = this.curve.getTangent( this.fraction );
-      // this.normal = this.curve.getNormal( this.fraction );
-      this.axis.crossVectors( this.normal, this.tangent ).normalize( );
+    this.tangent = this.curve.getTangent( this.fraction );
+    // this.normal = this.curve.getNormal( this.fraction );
+    this.axis.crossVectors( this.normal, this.tangent ).normalize( );
     
       //radians = Math.acos( normal.dot( tangent ) );	
       //char.quaternion.setFromAxisAngle( axis, radians );
@@ -3718,9 +3727,11 @@ AFRAME.registerComponent('mod_curve', {
 
     this.scaleMod = .5 + Math.random().toFixed(2) * 2;
     console.log("resetting to "+ this.scaleMod);
-    this.el.object3D.scale.set(this.scaleMod,this.scaleMod,this.scaleMod)
-    // this.el.object3D.scale.y = this.scaleMod;
-    // this.el.object3D.scale.z = this.scaleMod;
+    this.el.object3D.scale.set(this.scaleMod,this.scaleMod,this.scaleMod);
+    if (this.data.type == "pictureGroup") {
+      
+    }
+
   },
   tick: function () {
     if (this.curve && this.curveLine && this.isReady) {
