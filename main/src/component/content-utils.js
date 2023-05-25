@@ -1351,7 +1351,7 @@ AFRAME.registerComponent('available-scenes-control', {
       );
       this.el.addEventListener('toggleOnAvailableScenes', function (event) {
         console.log('toggleOnAvailableScenes event detected with', event.detail);
-        let mesh = pictureGroupPicEl.getObject3D('mesh');
+        let mesh = this.pictureGroupPicEl.getObject3D('mesh');
         this.href = picGroupArray[0].images[0].url;
         console.log("tryna load initial scene pic " + this.href);
         this.texture = null;
@@ -2359,7 +2359,7 @@ AFRAME.registerComponent('mod_objex', {
     equipInventoryObject: function (objectID) {
       // console.log("tryna equip model " + objectID + " equipped " + this.data.equipped );  
       this.objectData = this.returnObjectData(objectID);
-      // console.log("tryna equip model " + JSON.stringify(this.objectData));  
+      console.log("tryna equip model " + JSON.stringify(this.objectData));  
       this.dropPos = new THREE.Vector3();
       this.objEl = document.createElement("a-entity");
       this.equipHolder = document.getElementById("equipPlaceholder");
@@ -6523,38 +6523,50 @@ AFRAME.registerComponent('picture_groups_control', { //has all the picgroup data
   init: function () {
     let picGroupArray = [];
     this.picGroupArrayIndex = 0;
-      
+    
+    this.loader = new THREE.TextureLoader();
+
     let theData = this.el.getAttribute('data-picture-groups');
     this.data.jsonData = JSON.parse(atob(theData)); //convert from base64
     // console.log("picgroupdata: " + JSON.stringify(this.data.jsonData[0]));
+    let pictureGroupPicLandscapeEl = document.getElementById("pictureGroupPicLandscape"); 
+    let pictureGroupPicPortraitEl = document.getElementById("pictureGroupPicPortrait");
+    let pictureGroupPicSquareEl = document.getElementById("pictureGroupPicSquare");  
+    this.pictureGroupPicLandscapeEl = pictureGroupPicLandscapeEl;
+    this.pictureGroupPicPortraitEl = pictureGroupPicPortraitEl;
+    this.pictureGroupPicSquareEl = pictureGroupPicSquareEl;
+    let nextButton = document.getElementById("pictureGroupNextButton"); 
+    let previousButton = document.getElementById("pictureGroupPreviousButton");
+    let flyButton = document.getElementById("pictureGroupFlyButton");
+    let layoutButton = document.getElementById("pictureGroupLayoutButton");
+
+    picGroupArray = this.data.jsonData; //it's an array of arrays
+    this.picGroupArray = picGroupArray;
+    this.picGroupIndex = 0;
     
+    this.flyingPicEls = [];
+    this.layoutPicEls = [];
+    this.landscapeMesh = null;
+    this.portraitMesh = null;
+    this.squareMesh = null;
+    this.texture = null;
+    this.material = null;
     if (this.data.jsonData != null && this.data.jsonData.length > 0) {
-      let pictureGroupPicEl = document.getElementById("pictureGroupPic"); 
-      this.pictureGroupPicEl = pictureGroupPicEl;
-      let nextButton = document.getElementById("pictureGroupNextButton"); 
-      let previousButton = document.getElementById("pictureGroupPreviousButton");
-      let flyButton = document.getElementById("pictureGroupFlyButton");
-      let layoutButton = document.getElementById("pictureGroupLayoutButton");
+      // this.pictureGroupPicEl = document.getElementById("pictureGroupPicLandscape"); 
+      // this.pictureGroupPicEl = pictureGroupPicEl;
 
-      picGroupArray = this.data.jsonData; //it's an array of arrays
-      this.picGroupArray = picGroupArray;
-      this.picGroupIndex = 0;
-      this.loader = new THREE.TextureLoader();
-      this.flyingPicEls = [];
-      this.layoutPicEls = [];
 
-      this.pictureGroupPicEl.addEventListener('model-loaded', (event) => {
-        event.preventDefault();
-        let mesh = pictureGroupPicEl.getObject3D('mesh');
+      let orientation = this.picGroupArray[this.picGroupArrayIndex].images[0].orientation;
+
+      this.setPanelVisibility(orientation);
+
+
+      pictureGroupPicLandscapeEl.addEventListener('model-loaded', (event) => {
+        // event.preventDefault();
+        let landscapeMesh = pictureGroupPicLandscapeEl.getObject3D('mesh');
+        this.landscapeMesh = landscapeMesh;
         this.href = this.picGroupArray[this.picGroupArrayIndex].images[0].url;
-        console.log("tryna load initial scene pic " + this.href + " from " + JSON.stringify(this.picGroupArray));
-        this.texture = null;
-        this.material = null;
-        // this.isTransparent = false;
-        // this.isTransparent = this.picGroupArray[this.picGroupArrayIndex].images[0].hasAlphaChannel;
-        // const obj = pictureGroupPicEl.getObject3D('mesh');
-        // var loader = new THREE.TextureLoader();
-        // load a resource
+        // console.log("tryna load initial scene pic " + this.href + " from " + JSON.stringify(this.picGroupArray));
         this.loader.load(
           // resource URL
           this.href,
@@ -6565,7 +6577,7 @@ AFRAME.registerComponent('picture_groups_control', { //has all the picgroup data
             this.texture.flipY = false; 
             this.material = new THREE.MeshBasicMaterial( { map: texture, transparent: true} ); 
               
-            mesh.traverse(node => { 
+            landscapeMesh.traverse(node => { 
               console.log("gotsa obj + mat");
               node.material = this.material;
             });
@@ -6575,16 +6587,68 @@ AFRAME.registerComponent('picture_groups_control', { //has all the picgroup data
           }
         );
       });
-      
+
+      pictureGroupPicPortraitEl.addEventListener('model-loaded', (event) => {
+        // event.preventDefault();
+        portraitMesh = pictureGroupPicPortraitEl.getObject3D('mesh');
+        this.portraitMesh = portraitMesh;
+        this.href = this.picGroupArray[this.picGroupArrayIndex].images[0].url;
+        // console.log("tryna load initial scene pic " + this.href + " from " + JSON.stringify(this.picGroupArray));
+        this.texture = null;
+        this.loader.load(
+          // resource URL
+          this.href,
+          // onLoad callback
+          function ( texture ) { 
+            this.texture = texture;
+            this.texture.encoding = THREE.sRGBEncoding; 
+            this.texture.flipY = false; 
+            this.material = new THREE.MeshBasicMaterial( { map: texture, transparent: true} ); 
+            portraitMesh.traverse(node => { 
+              console.log("gotsa obj + mat");
+              node.material = this.material;
+            });
+          },
+          function ( err ) {
+            console.error( 'An error happened.' );
+          }
+        );
+      });
+      pictureGroupPicSquareEl.addEventListener('model-loaded', (event) => {
+        // event.preventDefault();
+        squareMesh = pictureGroupPicSquareEl.getObject3D('mesh');
+        this.squareMesh = squareMesh;
+        this.href = this.picGroupArray[this.picGroupArrayIndex].images[0].url;
+        // console.log("tryna load initial scene pic " + this.href + " from " + JSON.stringify(this.picGroupArray));
+        this.texture = null;
+        this.loader.load(
+          // resource URL
+          this.href,
+          // onLoad callback
+          function ( texture ) { 
+            this.texture = texture;
+            this.texture.encoding = THREE.sRGBEncoding; 
+            this.texture.flipY = false; 
+            this.material = new THREE.MeshBasicMaterial( { map: texture, transparent: true} ); 
+            squareMesh.traverse(node => { 
+              console.log("gotsa obj + mat");
+              node.material = this.material;
+            });
+          },
+          function ( err ) {
+            console.error( 'An error happened.' );
+          }
+        );
+      });
       nextButton.addEventListener('click', (event) => {
         event.preventDefault();
-        
+        // this.pictureGroupPicEl.removeAttribute('gltf-model');
         this.NextButtonClick();
       });
 
       previousButton.addEventListener('click', (event) => {
         event.preventDefault();
-        
+        // this.pictureGroupPicEl.removeAttribute('gltf-model');
         this.PreviousButtonClick();
       });
       flyButton.addEventListener('click', (event) => {
@@ -6600,6 +6664,21 @@ AFRAME.registerComponent('picture_groups_control', { //has all the picgroup data
 
     }
     },
+    setPanelVisibility: function (orientation) {
+      if (!orientation || orientation.includes("Landscape") || orientation.includes("Equirectangular")) {
+        this.pictureGroupPicLandscapeEl.setAttribute('visible', true);
+        this.pictureGroupPicPortraitEl.setAttribute('visible', false);
+        this.pictureGroupPicSquareEl.setAttribute('visible', false);
+      } else if (orientation.includes("Portrait")) {
+        this.pictureGroupPicLandscapeEl.setAttribute('visible', false);
+        this.pictureGroupPicPortraitEl.setAttribute('visible', true);
+        this.pictureGroupPicSquareEl.setAttribute('visible', false);
+      } else if (orientation.includes("Square")) {
+        this.pictureGroupPicLandscapeEl.setAttribute('visible', false);
+        this.pictureGroupPicPortraitEl.setAttribute('visible', false);
+        this.pictureGroupPicSquareEl.setAttribute('visible', true);
+      }
+    },
     toggleOnPicGroup: function () {
       if (this.flyingPicEls.length > 0) {
         for (i = 0; i < this.flyingPicEls.length; i++) {
@@ -6611,48 +6690,80 @@ AFRAME.registerComponent('picture_groups_control', { //has all the picgroup data
           this.layoutPicEls[i].parentNode.removeChild(this.layoutPicEls[i]);
         }
       }
+      let pictureGroupPicLandscapeEl = document.getElementById("pictureGroupPicLandscape"); 
+      let pictureGroupPicPortraitEl = document.getElementById("pictureGroupPicPortrait");
+      let pictureGroupPicSquareEl = document.getElementById("pictureGroupPicSquare");  
+      this.pictureGroupPicLandscapeEl = pictureGroupPicLandscapeEl;
+      this.pictureGroupPicPortraitEl = pictureGroupPicPortraitEl;
+      this.pictureGroupPicSquareEl = pictureGroupPicSquareEl;
       this.layoutPicEls = [];
       this.flyingPicEls = [];
-      let mesh = this.pictureGroupPicEl.getObject3D('mesh');
-      this.href = this.picGroupArray[this.picGroupArrayIndex].images[0].url;
-      console.log("tryna load initial scene pic " + this.href);
-      this.texture = null;
-      this.material = null;
-      // const obj = pictureGroupPicEl.getObject3D('mesh');
-      
-      // load a resource
-      this.loader.load(
-        // resource URL
-        this.href,
-        // onLoad callback
-        function ( texture ) { 
-          this.texture = texture;
-          this.texture.encoding = THREE.sRGBEncoding; 
-          this.texture.flipY = false; 
-          this.material = new THREE.MeshBasicMaterial( {map: texture, transparent: true} ); 
-            
-          mesh.traverse(node => { //needs a callback here to insure it gets painted the first time
-            console.log("gotsa obj + mat");
-            node.material = this.material;
-          });
-        },
-        function ( err ) {
-          console.error( 'An error happened.' );
-        }
-      );
+      let picElMesh = null;
+      let orientation = this.picGroupArray[this.picGroupArrayIndex].images[this.picGroupIndex].orientation;
+
+      if (!orientation || orientation.includes("Landscape") || orientation.includes("Equirectangular")) {
+        // this.pictureGroupPicEl.setAttribute('gltf-model', '#flatrect2'); // mod for orientation
+        // this.pictureGroupPicEl = document.getElementById("pictureGroupPicLandscape"); 
+        picElMesh = this.pictureGroupPicLandscapeEl.getObject3D('mesh');
+      } else if (orientation.includes("Portrait")) {
+        // this.pictureGroupPicEl.setAttribute('gltf-model', '#portrait_panel');
+        // this.pictureGroupPicEl = document.getElementById("pictureGroupPicPortrait"); 
+        picElMesh = this.pictureGroupPicPortraitEl.getObject3D('mesh');
+      } else if (orientation.includes("Square")) {
+        // this.pictureGroupPicEl.setAttribute('gltf-model', '#flatsquare');
+        // this.pictureGroupPicEl = document.getElementById("pictureGroupPicSquare"); 
+        picElMesh = this.squareMesh;
+      }
+
+      if (picElMesh) { //no onload so it may miss first time
+        this.href = this.picGroupArray[this.picGroupArrayIndex].images[this.picGroupIndex].url;
+        console.log("tryna load initial scene pic " + this.href);
+        this.texture = null;
+        this.material = null;
+        // const obj = pictureGroupPicEl.getObject3D('mesh');
+        
+        // load a resource
+        this.loader.load(
+          // resource URL
+          this.href,
+          // onLoad callback
+          function ( texture ) { 
+            this.texture = texture;
+            this.texture.encoding = THREE.sRGBEncoding; 
+            this.texture.flipY = false; 
+            this.material = new THREE.MeshBasicMaterial( {map: texture, transparent: true} ); 
+              
+            picElMesh.traverse(node => { //needs a callback here to insure it gets painted the first time
+              console.log("gotsa obj + mat");
+              node.material = this.material;
+            });
+          },
+          function ( err ) {
+            console.error( 'An error happened.' );
+          }
+        );
+      }
       
     },
     NextButtonClick: function () {
-      // this.nextPicGroupArrayIndex();
-      // let picGroupArray = this.data.jsonData;
-     
+
+
       console.log(this.picGroupArrayIndex + " of " + this.picGroupArray.length + " group tryna show next from index " + this.picGroupIndex + " of " + this.picGroupArray[this.picGroupArrayIndex].images.length);
       this.picGroup = this.picGroupArray[this.picGroupArrayIndex];
       if (this.picGroup.images.length > this.picGroupIndex + 1) { //bakards..
           this.picGroupIndex++;
         } else {
           this.picGroupIndex = 0;
-        }
+      }
+      let orientation = this.picGroupArray[this.picGroupArrayIndex].images[this.picGroupIndex].orientation;
+      this.setPanelVisibility(orientation);
+      if (!orientation || orientation.includes("Landscape")  || orientation.includes("Equirectangular")) {
+        this.pictureGroupPicEl = document.getElementById("pictureGroupPicLandscape"); 
+      } else if (orientation.includes("Portrait")) {
+        this.pictureGroupPicEl = document.getElementById("pictureGroupPicPortrait"); 
+      } else if (orientation.includes("Square")) {
+        this.pictureGroupPicEl = document.getElementById("pictureGroupPicSquare"); 
+      }
       const obj = this.pictureGroupPicEl.getObject3D('mesh');
       const href = this.picGroupArray[this.picGroupArrayIndex].images[this.picGroupIndex].url;
       console.log("tryna set texture " + href);
@@ -6663,6 +6774,44 @@ AFRAME.registerComponent('picture_groups_control', { //has all the picgroup data
       obj.traverse(node => {
         node.material = material;
       });
+        
+      // if (!orientation || orientation.includes("Landscape")) { //um, instead can do it like Previous button below...
+  
+      //   const href = this.picGroupArray[this.picGroupArrayIndex].images[this.picGroupIndex].url;
+      //   console.log("tryna set texture " + href);
+      //   var texture = new THREE.TextureLoader().load(href);
+      //   texture.encoding = THREE.sRGBEncoding; 
+      //   texture.flipY = false; 
+      //   var material = new THREE.MeshBasicMaterial( { map: texture, transparent: this.picGroupArray[this.picGroupArrayIndex].images[this.picGroupIndex].hasAlphaChannel } ); 
+      //   this.landscapeMesh.traverse(node => {
+      //     node.material = material;
+      //   });
+      // } else if (orientation.includes("Portrait")) {
+   
+      //   // const obj = this.pictureGroupPicEl.getObject3D('mesh');
+      //   const href = this.picGroupArray[this.picGroupArrayIndex].images[this.picGroupIndex].url;
+      //   console.log("tryna set texture " + href);
+      //   var texture = new THREE.TextureLoader().load(href);
+      //   texture.encoding = THREE.sRGBEncoding; 
+      //   texture.flipY = false; 
+      //   var material = new THREE.MeshBasicMaterial( { map: texture, transparent: this.picGroupArray[this.picGroupArrayIndex].images[this.picGroupIndex].hasAlphaChannel } ); 
+      //   this.portraitMesh.traverse(node => {
+      //     node.material = material;
+      //   });
+      // } else if (orientation.includes("Square")) {
+    
+      //   // const obj = this.pictureGroupPicEl.getObject3D('mesh');
+      //   const href = this.picGroupArray[this.picGroupArrayIndex].images[this.picGroupIndex].url;
+      //   console.log("tryna set texture " + href);
+      //   var texture = new THREE.TextureLoader().load(href);
+      //   texture.encoding = THREE.sRGBEncoding; 
+      //   texture.flipY = false; 
+      //   var material = new THREE.MeshBasicMaterial( { map: texture, transparent: this.picGroupArray[this.picGroupArrayIndex].images[this.picGroupIndex].hasAlphaChannel } ); 
+      //   this.squareMesh.traverse(node => {
+      //     node.material = material;
+      //   });
+      // }
+     
         
     },
     PreviousButtonClick: function () {
@@ -6675,6 +6824,17 @@ AFRAME.registerComponent('picture_groups_control', { //has all the picgroup data
           this.picGroupIndex--;
         } else {
           this.picGroupIndex = this.picGroup.images.length - 1;
+      }
+
+      let orientation = this.picGroupArray[this.picGroupArrayIndex].images[this.picGroupIndex].orientation;
+      this.setPanelVisibility(orientation);
+
+      if (!orientation || orientation.includes("Landscape") || orientation.includes("Equirectangular")) {
+        this.pictureGroupPicEl = document.getElementById("pictureGroupPicLandscape"); 
+      } else if (orientation.includes("Portrait")) {
+        this.pictureGroupPicEl = document.getElementById("pictureGroupPicPortrait"); 
+      } else if (orientation.includes("Square")) {
+        this.pictureGroupPicEl = document.getElementById("pictureGroupPicSquare"); 
       }
       const obj = this.pictureGroupPicEl.getObject3D('mesh');
       const href = this.picGroupArray[this.picGroupArrayIndex].images[this.picGroupIndex].url;
@@ -6788,17 +6948,18 @@ AFRAME.registerComponent('picture_groups_control', { //has all the picgroup data
       for (let i = 0; i < this.picGroupArray[this.picGroupArrayIndex].images.length; i++) {
         console.log("tryuna set a pic with orientation" + this.picGroupArray[this.picGroupArrayIndex].images[i].orientation);
         setTimeout(() => {
-          this.scalemod = Math.random() * 1.5;
+          this.scalemod = Math.random() * 2.5;
           let flyingPicEl = document.createElement("a-entity");
           this.el.sceneEl.appendChild(flyingPicEl); 
+          flyingPicEl.setAttribute('position', '0 -100 0')
           let orientation = this.picGroupArray[this.picGroupArrayIndex].images[i].orientation;
 
-          if (!orientation || orientation.includes("Landscape")) {
+          if (!orientation || orientation.includes("Landscape") || orientation.includes("Equirectangular")) {
             flyingPicEl.setAttribute('gltf-model', '#flatrect2'); // mod for orientation
           } else if (orientation.includes("Portrait")) {
             flyingPicEl.setAttribute('gltf-model', '#portrait_panel');
           } else if (orientation.includes("Square")) {
-
+            flyingPicEl.setAttribute('gltf-model', '#flatsquare');
           }
          
           flyingPicEl.setAttribute('look-at', '#player'); //toggle by eventData
@@ -6832,7 +6993,7 @@ AFRAME.registerComponent('picture_groups_control', { //has all the picgroup data
               }); 
             });
           console.log("waiting on " + i)
-        }, i * 2000);
+        }, i * 1000);
       }
     },
     initLayoutPics: function () {
@@ -6864,7 +7025,7 @@ AFRAME.registerComponent('picture_groups_control', { //has all the picgroup data
         this.layoutEl.appendChild(layoutPicEl); 
         let orientation = this.picGroupArray[this.picGroupArrayIndex].images[i].orientation;
 
-        if (!orientation || orientation.includes("Landscape")) {
+        if (!orientation || orientation.includes("Landscape") || orientation.includes("Equirectangular")) {
           layoutPicEl.setAttribute('gltf-model', '#flatrect2'); // mod for orientation
         } else if (orientation.includes("Portrait")) {
           layoutPicEl.setAttribute('gltf-model', '#portrait_panel');

@@ -1300,14 +1300,14 @@ webxr_router.get('/:_id', function (req, res) {
                                         // "<a-entity id=\x22player\x22 get_pos_rot networked=\x22template:#avatar-template;attachTemplateToLocal:false;\x22 "+spawnInCircle+" camera "+wasd+" look-controls=\x22hmdEnabled: false\x22 position=\x220 1.6 0\x22>" +     
                                         // "<a-entity id=\x22viewportPlaceholder\x22 position=\x220 0 -1\x22></entity>"+   
                                         "<a-entity id=\x22player\x22 "+lookcontrols+" get_pos_rot camera "+wasd+" "+ physicsMod +" position=\x22"+playerPosition+"\x22>"+
-                                            "<a-entity id=\x22equipPlaceholder\x22 visible=\x22false\x22 geometry=\x22primitive: box; height: .1; width: .1; depth: .1;\x22 position=\x220 -.65 -.75\x22"+
+                                            "<a-entity id=\x22equipPlaceholder\x22 geometry=\x22primitive: box; height: .1; width: .1; depth: .1;\x22 position=\x220 -.65 -.75\x22"+
                                             "material=\x22opacity: 0\x22></a-entity>"+
-                                            "<a-entity id=\x22viewportPlaceholder\x22 visible=\x22false\x22 geometry=\x22primitive: plane; height: 0.01; width: .01\x22 position=\x220 0 -1.5\x22"+
+                                            "<a-entity id=\x22viewportPlaceholder\x22 geometry=\x22primitive: plane; height: 0.01; width: .01\x22 position=\x220 0 -1.5\x22"+
                                             "material=\x22opacity: 0\x22></a-entity>"+
-                                            "<a-entity id=\x22viewportPlaceholder3\x22 visible=\x22false\x22 geometry=\x22primitive: plane; height: 0.01; width: .01\x22 position=\x220 0 -3\x22"+
+                                            "<a-entity id=\x22viewportPlaceholder3\x22 geometry=\x22primitive: plane; height: 0.01; width: .01\x22 position=\x220 0 -3\x22"+
                                             "material=\x22opacity: 0\x22></a-entity>"+
-                                            "<a-entity id=\x22viewportPlaceholderFar\x22 visible=\x22false\x22 geometry=\x22primitive: plane; height: 0.01; width: .01\x22 position=\x220 0 -30\x22"+
-                                            "material=\x22opacity: 0\x22></a-entity>"+
+                                            // "<a-entity id=\x22viewportPlaceholderFar\x22 visible=\x22false\x22 geometry=\x22primitive: plane; height: 0.01; width: .01\x22 position=\x220 0 -30\x22"+
+                                            // "material=\x22opacity: 0\x22></a-entity>"+
                                         "</a-entity>"+
 
                                         "<a-entity id=\x22left-hand\x22 oculus-touch-controls=\x22hand: left\x22 "+blinkMod+" handModelStyle: lowPoly; color: #ffcccc\x22>"+
@@ -1782,7 +1782,7 @@ webxr_router.get('/:_id', function (req, res) {
                         let index = 0;
                         
                         for (var i = 0; i < sceneResponse.sceneWebLinks.length; i++) {
-                            if (isValidObjectID(sceneResponse.sceneWebLinks[i])) {
+                            if (ObjectID.isValid(sceneResponse.sceneWebLinks[i])) {
                             db.weblinks.findOne({'_id': ObjectID(sceneResponse.sceneWebLinks[i])}, function (err, weblink){
                                 if (err || !weblink) {
                                     console.log("can't find weblink");
@@ -3515,7 +3515,13 @@ webxr_router.get('/:_id', function (req, res) {
                                     // "<a-entity id=\x22pictureGroupHeaderText\x22 geometry=\x22primitive: plane; width: 3.25; height: 1\x22 position=\x220 1.75 0\x22 material=\x22color: grey; transparent: true; opacity: 0.0\x22" +
                                     // "text=\x22value:; wrap-count: 35;\x22></a-entity>" +
                                     
-                                    "<a-entity id=\x22pictureGroupPic\x22 visible=\x22true\x22 position=\x220 2.25 -.1\x22 gltf-model=\x22#flatrect2\x22 scale=\x224 4 4\x22 material=\x22shader: flat; alphaTest: 0.5;\x22"+
+                                    "<a-entity id=\x22pictureGroupPicLandscape\x22 visible=\x22true\x22 position=\x220 2.25 -.1\x22 gltf-model=\x22#flatrect2\x22 scale=\x224 4 4\x22 material=\x22shader: flat; alphaTest: 0.5;\x22"+
+                                    "rotation='0 0 0'></a-entity>"+
+                                    "<a-entity id=\x22pictureGroupPicPortrait\x22 visible=\x22false\x22 position=\x220 3.25 -.1\x22 gltf-model=\x22#portrait_panel\x22 scale=\x224 4 4\x22 material=\x22shader: flat; alphaTest: 0.5;\x22"+
+                                    "rotation='0 0 0'></a-entity>"+
+                                    "<a-entity id=\x22pictureGroupPicSquare\x22 visible=\x22false\x22 position=\x220 2.25 -.1\x22 gltf-model=\x22#flatsquare\x22 scale=\x224 4 4\x22 material=\x22shader: flat; alphaTest: 0.5;\x22"+
+                                    "rotation='0 0 0'></a-entity>"+
+                                    "<a-entity id=\x22pictureGroupPicCircle\x22 visible=\x22false\x22 position=\x220 2.25 -.1\x22 gltf-model=\x22#flatcircle\x22 scale=\x224 4 4\x22 material=\x22shader: flat; alphaTest: 0.5;\x22"+
                                     "rotation='0 0 0'></a-entity>"+
                                     // "<a-entity gltf-model=\x22#square_panel\x22 scale=\x222.25 2.25 2.25\x22 position=\x220 2.1 -.25\x22></a-entity>" +
                                     "<a-entity visible='true' class=\x22envMap activeObjexRay\x22 id=\x22pictureGroupFlyButton\x22 gltf-model=\x22#next_button\x22 scale=\x22.25 .25 .25\x22 position=\x223.25 -.75 0\x22></a-entity>" +
