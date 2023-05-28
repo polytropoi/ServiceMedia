@@ -1193,8 +1193,9 @@ webxr_router.get('/:_id', function (req, res) {
                                 if (sceneResponse.sceneCameraMode == "Orbit") {
                                     // joystickScript = "<script src=\x22../main/vendor/aframe/aframe-orbit-controls.min.js\x22></script>";
                                     // joystickScript = "<script src=\x22../main/src/component/aframe-orbit-controls.min.js\x22></script>";
-                                    joystickScript = "<script src=\x22https://unpkg.com/aframe-orbit-controls@1.3.0/dist/aframe-orbit-controls.min.js\x22></script>";
-                                    wasd = "orbit-controls=\x22target: 0 1.6 -.5; minDistance: .5; maxDistance: 100; initialPosition: 0 1 3; enableDamping: true;\x22";
+                                    joystickScript = "<script src=\x22../main/vendor/aframe/aframe-orbit-controls.min.js\x22></script>";
+                                    
+                                    // wasd = "orbit-controls=\x22target: 0 0 0; minDistance: .5; maxDistance: 100; initialPosition: 0 1 -5; enableDamping: true;\x22";
                                 }
                                 if (sceneResponse.sceneCameraMode == "Fixed") {
                                     joystickScript = "";
@@ -1256,7 +1257,43 @@ webxr_router.get('/:_id', function (req, res) {
                                        
                                        
                                         "</a-entity></a-entity>";
-                                } else if (sceneResponse.sceneCameraMode != undefined && sceneResponse.sceneCameraMode.toLowerCase().includes("fixedd")) { //hrm..
+                                } else if (sceneResponse.sceneCameraMode != undefined && sceneResponse.sceneCameraMode.toLowerCase().includes("orbit")) { //hrm..
+                                    // let lookcontrols = "look-controls=\x22enabled: false\x22";
+                                    // let lookcontrols = "look-controls=\x22enabled: false\x22";
+                                    // if (sceneResponse.sceneTags != null && (sceneResponse.sceneTags.includes('magicwindow') || sceneResponse.sceneTags.includes('magic window'))) {
+                                    //     lookcontrols = "look-controls=\x22reverseTouchDrag: true\x22"; // because magicwinders enabled by default
+                                    // }
+                                    wasd = "";
+                                    // wasd = "wasd-controls=\x22fly: true; acceleration: "+sceneResponse.scenePlayer.playerSpeed+"\x22 simple-navmesh-constraint=\x22navmesh:#navmesh-el;fall:10; height:0;\x22";
+                                    // wasd = "extended_wasd_controls=\x22flyEnabled: false; moveSpeed: 4; inputType: keyboard\x22";
+                                    // wasd = "extended_wasd_thirdperson=\x22fly: false; moveSpeed: "+sceneResponse.scenePlayer.playerSpeed+"; inputType: keyboard\x22 simple-navmesh-constraint=\x22navmesh:#navmesh-el;fall:10; height: 0\x22";
+                                    camera = "<a-entity camera look-controls id=\x22player\x22 orbit-controls=\x22target: 0 0 0; minDistance: 0.5; maxDistance: 180; initialPosition: 0 5 5\x22>"+
+                                    "<a-entity id=\x22mouseCursor\x22 cursor=\x22rayOrigin: mouse\x22 raycaster=\x22objects: .activeObjexRay\x22></a-entity>"+
+                                    "</a-entity>";
+                                        
+                                    // joystickScript = "<script src=\x22../main/vendor/aframe/aframe-orbit-controls.min.js\x22></script>";
+                                    joystickScript = "<script src=\x22https://cdn.jsdelivr.net/gh/diarmidmackenzie/superframe@fix-orbit-controls/components/orbit-controls/dist/aframe-orbit-controls.min.js\x22></script>";
+                                    // "</a-entity>";
+                                    // "<a-entity id=\x22cameraRig\x22 initializer "+
+                                
+                                    //     " id=\x22mouseCursor\x22 cursor=\x22rayOrigin: mouse\x22 raycaster=\x22objects: .activeObjexRay\x22>"+
+                                        
+                                    //     "<a-entity id=\x22player\x22 "+wasd+" "+ physicsMod +" position=\x22"+playerPosition+"\x22>"+
+                                    //         "<a-entity id=\x22equipPlaceholder\x22 geometry=\x22primitive: box; height: .1; width: .1; depth: .1\x22 position=\x220 -.65 -.75\x22"+
+                                    //         "material=\x22opacity: 0\x22></a-entity>"+
+                                    //         "<a-entity id=\x22viewportPlaceholder\x22 geometry=\x22primitive: plane; height: 0.01; width: .01\x22 position=\x220 0 -1.5\x22"+
+                                    //         "material=\x22opacity: 0\x22></a-entity>"+
+                                    //         "<a-entity id=\x22viewportPlaceholder3\x22 geometry=\x22primitive: plane; height: 0.01; width: .01\x22 position=\x220 0 -3\x22"+
+                                    //         "material=\x22opacity: 0\x22></a-entity>"+
+                                    //         "<a-entity id=\x22thirdPersonPlaceholder\x22 position=\x220 0 0\x22></a-entity>"+
+                                    //         "<a-entity id=\x22playCaster\x22 position=\x220 .5 .5\x22></a-entity>"+
+                                    //         // "<a-sphere visible=\x22true\x22 scale=\x220.45 0.5 0.4\x22 random-color></a-sphere>"+
+                                    //     "</a-entity>"+
+                                       
+                                       
+                                    //     "</a-entity></a-entity>";
+                                    
+                                } else if (sceneResponse.sceneCameraMode != undefined && sceneResponse.sceneCameraMode.toLowerCase().includes("fixed")) { //hrm..
                                     let lookcontrols = "look-controls=\x22magicWindowTrackingEnabled: false; reverseTouchDrag: true\x22";
                                     if (sceneResponse.sceneTags != null && (sceneResponse.sceneTags.includes('magicwindow') || sceneResponse.sceneTags.includes('magic window'))) {
                                         lookcontrols = "look-controls=\x22reverseTouchDrag: true\x22"; // because magicwinders enabled by default
@@ -1272,7 +1309,6 @@ webxr_router.get('/:_id', function (req, res) {
                                 
                                         " id=\x22mouseCursor\x22 cursor=\x22rayOrigin: mouse\x22 raycaster=\x22objects: .activeObjexRay\x22>"+
                                         
-                                       
                                         "<a-entity id=\x22player\x22 "+wasd+" "+ physicsMod +" position=\x22"+playerPosition+"\x22>"+
                                             "<a-entity id=\x22equipPlaceholder\x22 geometry=\x22primitive: box; height: .1; width: .1; depth: .1\x22 position=\x220 -.65 -.75\x22"+
                                             "material=\x22opacity: 0\x22></a-entity>"+
@@ -1287,8 +1323,7 @@ webxr_router.get('/:_id', function (req, res) {
                                        
                                        
                                         "</a-entity></a-entity>";
-                                }  
-                                else { // first person cam, default
+                                } else { // first person cam, default
                                     let lookcontrols = "look-controls=\x22magicWindowTrackingEnabled: false;\x22";
                                     if (sceneResponse.sceneTags != null && (sceneResponse.sceneTags.includes('magicwindow') || sceneResponse.sceneTags.includes('magic window'))) {
                                         lookcontrols = "look-controls"; // because magicwinders enabled by default
@@ -4105,31 +4140,51 @@ webxr_router.get('/:_id', function (req, res) {
                         "<meta name=\x22apple-mobile-web-app-capable\x22 content=\x22yes\x22>" +                        
                         "<link href=\x22../main/vendor/fontawesome-free/css/all.css\x22 rel=\x22stylesheet\x22 type=\x22text/css\x22>" +
                         "<link href=\x22/css/webxr.css\x22 rel=\x22stylesheet\x22 type=\x22text/css\x22>" + 
+                       
+                        "<script src=\x22/main/vendor/jquery/jquery.min.js\x22></script>" +
+                        "<script src=\x22/connect/connect.js\x22 defer=\x22defer\x22></script>" +
+                       
+
+                        settingsData +
                         aframeScriptVersion + 
                         extraScripts + 
+                        contentUtils +
+                        hlsScript +
+
+                       
                         // "<script src=\x22https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js\x22></script>"+
                         "<script src=\x22https://cdnjs.cloudflare.com/ajax/libs/stats.js/16/Stats.min.js\x22></script>"+
-
+                        "<script src=\x22../main/src/shaders/noise.js\x22></script>"+
+                        "<script src=\x22../main/src/component/aframe-sprite-particles-component.js\x22></script>"+
 
                         "<script src=\x22../main/src/util/mindar/mindar-image.js\x22></script>"+
                         "<script src=\x22../main/src/util/mindar/mindar-image-aframe.js\x22></script>"+
 
                         // primaryAudioScript +
-                        
+                        "<script src=\x22../main/src/component/aframe-troika-text.min.js\x22></script>"+
+                        "<script src=\x22../main/src/component/mod-materials.js\x22></script>"+
                         "</head>\n" +
                         "<body>\n" +
                         "<div class=\x22avatarName\x22 id="+avatarName+"></div>"+
                         "<div id=\x22token\x22 data-token=\x22"+token+"\x22></div>\n"+
                         "<div class=\x22ar-container\x22>"+
-                        "<a-scene mindar-image=\x22imageTargetSrc: "+arImageTargets[0]+";\x22 embedded color-space=\x22sRGB\x22"+
-
+                        "<a-scene mindar-image=\x22imageTargetSrc: "+arImageTargets[0]+";\x22 embedded color-space=\x22sRGB\x22"+    
                             // "<a-scene mindar-image=\x22imageTargetSrc: https://servicemedia.s3.amazonaws.com/users/5150540ab038969c24000008/pictures/targets/6185599f5b7b7950e4548144.mind;\x22 embedded color-space=\x22sRGB\x22"+
                             " renderer=\x22colorManagement: true, physicallyCorrectLights\x22 vr-mode-ui=\x22enabled: false\x22 device-orientation-permission-ui=\x22enabled: false\x22>"+
+                            "<a-assets>"+
+                            videoAsset +
                             gltfsAssets +    
+                            "</a-assets>"+
+                            videoGroupsEntity+
                             "<a-entity mindar-image-target=\x22targetIndex: 0\x22>" +
                                 "<a-gltf-model rotation=\x2290 0 0\x22 position=\x220 0 0.1\x22 scale=\x220.25 0.25 0.25\x22 src=\x22#gltfasset2\x22>"+
+                                // videoEntity +
+                                // gltfsEntities +
                             "</a-entity>"+
-                            "<a-camera position=\x220 0 0\x22 look-controls=\x22enabled: false\x22></a-camera>"
+                    
+                            
+                            
+                            "<a-camera id=\x22player\x22 position=\x220 0 0\x22 look-controls=\x22enabled: false\x22></a-camera>"
                         "</a-scene>"+
                         "</div>"+    
                         
@@ -4145,148 +4200,6 @@ webxr_router.get('/:_id', function (req, res) {
                         "</html>";
                         console.log("Tryna do a AR Image Tracking scene");
 
-                    } else if (sceneResponse.sceneWebType == 'Napboxx') { //rem'd aframe version below - maybe later?
-                           
-                            mainDiv = "<div id=\x22map\x22 class=\x22map\x22 style=\x22width:100%; height:100%\x22>"; //closed at end
-                            joystickContainer = "";
-                            let uid = "0000000000000";
-                        if (req.session.user) {
-                            uid = req.session.user._id;
-                        }
-                        var token=jwt.sign({userId:uid,shortID:sceneResponse.short_id},process.env.JWT_SECRET, { expiresIn: '1h' });  
-                        let modal = "<div id=\x22theModal\x22 class=\x22modal\x22><div id=\x22modalContent\x22 class=\x22modal-content\x22></div></div>";
-                        htmltext = "<html xmlns='http://www.w3.org/1999/xhtml'>" +
-                        "<head> " +
-                        googleAnalytics +
-
-                        // googleAdSense +
-                        "<link rel=\x22icon\x22 href=\x22data:,\x22></link>"+
-                        "<meta charset='utf-8'/>" +
-                        "<meta name='viewport' content='width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0, shrink-to-fit=no'/>" +
-                        "<meta property='og:url' content='" + process.env.ROOT_HOST + "/webxr/" + sceneResponse.short_id + "' /> " +
-                        "<meta property='og:type' content='website' /> " +
-                        // "<meta property='og:image' content='" + postcard1 + "' /> " +
-                        "<meta property='og:image' content='" + postcard1 + "' /> " +
-                        "<meta property='og:image:height' content='1024' /> " +
-                        "<meta property='og:image:width' content='1024' /> " +
-                        "<meta property='og:title' content='" + sceneResponse.sceneTitle + "' /> " +
-                        "<meta property='og:description' content='" + sceneResponse.sceneDescription + "' /> " +
-                        "<title>" + sceneResponse.sceneTitle + "</title>" +
-                        "<meta name='description' content='" + sceneResponse.sceneDescription + "'/>" +
-                        // "<meta name=\x22monetization\x22 content=\x22$ilp.uphold.com/EMJQj4qKRxdF\x22>" +
-                        "<meta name=\x22mobile-web-app-capable\x22 content=\x22yes\x22>" +
-                        "<meta name=\x22apple-mobile-web-app-capable\x22 content=\x22yes\x22>" +
-                        // "<meta name=\x22token\x22 content=\x22"+token+"\x22>"+
-                        "<link href=\x22../main/vendor/fontawesome-free/css/all.css\x22 rel=\x22stylesheet\x22 type=\x22text/css\x22>" +
-                        "<link href=\x22/css/webxr.css\x22 rel=\x22stylesheet\x22 type=\x22text/css\x22>" +
-                        
-                        "<script src=\x22/main/vendor/jquery/jquery.min.js\x22></script>" +
-                        
-                        // "<script src=\x22../main/ref/aframe/dist/socket.io.slim.js\x22></script>" +
-                        // "<script src=\x22/connect/connect.js\x22 defer=\x22defer\x22></script>" +
-                
-
-                        "<script src=\x22../main/vendor/howler/src/howler.core.js\x22></script>"+
-                        "<script src=\x22../main/vendor/howler/src/howler.spatial.js\x22></script>"+
-                        // "<script src=\x22../main/js/hls.min.js\x22></script>" + //v 1.0.6 
-                        // "<script src=\x22../main/js/navigation.js\x22></script>" + //includes navmesh components (simple and not), and extended_wasd_controls
-
-                        primaryAudioScript +
-                        ambientAudioScript +
-                        triggerAudioScript +
-                        "</head>" +
-                        "<body bgcolor='black'>" +
-                        
-                        modal +
-                        
-                        // "<div id=\x22"+mainDivID+"\x22 class=\x22"mainDivClass"\x22 style=\x22width:100%; height:100%\x22>"+
-                        mainDiv + //main Div wrapper, different for map
-
-                        "<div class=\x22primaryAudioParams\x22 "+primaryAudioParams+" id="+streamPrimaryAudio+ "_" +oggurl+"></div>"+  //TODO Fix!  concatting the id is stupid, use data-attributes
-                        "<div class=\x22ambientAudioParams\x22 id="+ambientUrl+"></div>"+
-                        "<div class=\x22triggerAudioParams\x22 id="+triggerUrl+"></div>"+
-                        settingsData +
-                        // "<div class=\x22attributionParams\x22 id="+JSON.stringify(attributions)+"></div>"+
-                        "<div class=\x22avatarName\x22 id="+avatarName+"></div>"+
-                        // primaryAudioControl +
-                        // ambientAudioControl +
-                        // triggerAudioControl +
-                        audioControl +
-                        // "<script> function screenCap() {console.log(\x22tryna screenCap()\x22); document.querySelector('a-scene').components.screenshot.capture('perspective')};"+    
-                        // "</script>"+
-                        containers +
-                        locationScripts +
-                        geoScripts +
-                        "<script src=\x22../main/js/dialogs.js\x22></script>"+
-                        geoEntities +
-                     
-                        pictureGroupsData +
-                       
-                        loadLocations +
-                        // "<a-entity id=\x22createAvatars\x22 create_avatars></a-entity>"+
-                        audioVizEntity +
-                        instancingEntity +
-                        // "<a-entity show-in-ar-mode visible=\x22false\x22 id=\x22reticleEntity\x22 gltf-model=\x22#reticle2\x22 scale=\x220.8 0.8 0.8\x22 "+arHitTest+"></a-entity>\n"+ //for ar spawning...
-                        arShadowPlane +
-                        hemiLight +
-                        shadowLight +
-                        // navmarsh +
-                        loadAudioEvents +
-                        
-                        modelData +
-                        objectData +
-                        inventoryData +
-                        // "<a-entity id=\x22navmesh\x22 geometry=\x22primitive: plane; height: 30; width: 30; buffer: true;\x22 rotation=\x22-90 0 0\x22 nav-mesh></a-entity>"+
-                        
-                        "</div>\n"+ //close maindiv
-
-                            // "<style>\n"+
-                            // "a{ color:#fff;\n"+
-                            // "text-decoration:none;\n"+
-                            // "}\n"+
-                            // ".footer {\n"+
-                            // "position: fixed;\n"+
-                            // "left: 0;\n"+
-                            // "bottom: 0;\n"+
-                            // "width: 100%;\n"+
-                            // "background-color: black;\n"+
-                            // "color: white;\n"+
-                            // // "text-align: left;\n"+
-                            // "font-family: \x22Trebuchet MS\x22, Helvetica, sans-serif\n"+
-                            // "}\n"+
-                            // "</style>\n"+
-                        // "<div class=\x22renderPanel\x22 id=\x22renderPanel\x22></div>\n"+
-
-                        sceneTextItemData +
-                        "<div id=\x22geopanel\x22 class=\x22geopanel\x22><span></span></div>\n"+
-                        // "<div id=\x22sceneGreeting\x22 style=\x22z-index: -20;\x22>"+sceneGreeting+"</div>"+
-                        // "<div id=\x22sceneQuest\x22 style=\x22z-index: -20;\x22>"+sceneQuest+"</div>"+
-                        "<div class=\x22backmask\x22 style=\x22position: fixed; left: 0; top: 0; z-index: -5; overflow: hidden\x22></div>"+ //to hide lower elements
-                       
-                        
-
-                        screenOverlay + //socket picture
-                        canvasOverlay + //drop down side panel
-                        audioSliders +
-                        mapOverlay + //
-                        adSquareOverlay +
-                        "<div class=\x22next-button\x22 id=\x22nextButton\x22 style=\x22visibility: hidden\x22 onclick=\x22GoToNext()\x22><i class=\x22fas fa-arrow-circle-right fa-2x\x22></i></div>"+
-                        "<div class=\x22previous-button\x22 id=\x22previousButton\x22 style=\x22visibility: hidden\x22 onclick=\x22GoToPrevious()\x22><i class=\x22fas fa-arrow-circle-left fa-2x\x22></i></div>"+
-                        "<a href=\x22''\x22 target=\x22_blank\x22 class=\x22ar-buttoon\x22>AR</a>" +
-                        
-                        "<div id=\x22token\x22 data-token=\x22"+token+"\x22>\n"+
-                        
-                        // "<div style=\x22float: left; margin: 10px 10px;\x22 onclick=\x22screenCap()\x22><i class=\x22fas fa-camera  fa-2x\x22></i></div>\n"+ 
-                        locationButton+
-                        dialogButton+
-                        ethereumButton+ 
-                        transportButtons+ 
-                        
-                        loadAvailableScenes + //TODO is this still loaded via ready?
-
-                        "</body>" +
-                    "</html>";
-                    
                     } else { /////////////////////////////////////////////////////////------------- Default / AFrame response below ------------------------------
                         let joystick = "joystick=\x22useNavmesh: false\x22";
                         let extraScripts = "";
@@ -4416,7 +4329,7 @@ webxr_router.get('/:_id', function (req, res) {
                             joystickContainer = "";
                   
                         } //else { //default AFRAME with trimmings
-                        
+                        //AR Image Tracking...?
                         let uid = "0000000000000";
                         if (req.session.user) {
                             uid = req.session.user._id;
@@ -4622,36 +4535,6 @@ webxr_router.get('/:_id', function (req, res) {
                         // videoAsset + 
                         imageAssets +
 
-                        // "<img id=\x22explosion\x22 src=\x22https://realitymangler.com/assets/textures/explosion.png\x22 crossorigin=\x22anonymous\x22>"+ 
-
-                        // spriteAssets +
-                                // "<img id=\x22fireballSheet\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/pics/fireball-up.png\x22 crossorigin=\x22anonymous\x22></img>"+
-                                // "<img id=\x22fireball\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/pics/fireball.png\x22 crossorigin=\x22anonymous\x22></img>"+
-                                // "<img id=\x22fireanim1\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/pics/fireanim3.png\x22 crossorigin=\x22anonymous\x22></img>"+
-                                // "<img id=\x22torchanim1\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/pics/firetorchanim2.png\x22 crossorigin=\x22anonymous\x22></img>"+
-                                // "<img id=\x22candle1\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/pics/candle_flame_8x8.png\x22 crossorigin=\x22anonymous\x22></img>"+
-                                // "<img id=\x22water\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/pics/water2c.jpeg\x22 crossorigin=\x22anonymous\x22>"+
-                                // "<img id=\x22water1\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/pics/watertile3.png\x22 crossorigin=\x22anonymous\x22>"+
-                                // "<img id=\x22water2\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/pics/water2.png\x22 crossorigin=\x22anonymous\x22>"+
-                                // "<img id=\x22raindrop2\x22 src=\x22http://servicemedia.s3.amazonaws.com/assets/pics/raindrop2.png\x22 crossorigin=\x22anonymous\x22>"+
-                                // "<img id=\x22raindrop\x22 src=\x22http://servicemedia.s3.amazonaws.com/assets/pics/raindrop.png\x22 crossorigin=\x22anonymous\x22>"+
-                                // "<img id=\x22explosion1\x22 src=\x22http://servicemedia.s3.amazonaws.com/assets/pics/explosion1.png\x22 crossorigin=\x22anonymous\x22>"+
-                                // "<img id=\x22fireworksanim1\x22 src=\x22http://servicemedia.s3.amazonaws.com/assets/pics/fireworks_sheet.png\x22 crossorigin=\x22anonymous\x22>"+
-                                // "<img id=\x22smoke1\x22 src=\x22http://servicemedia.s3.amazonaws.com/assets/pics/smokeanim2.png\x22 crossorigin=\x22anonymous\x22>"+
-                                // "<img id=\x22fireball-up\x22 src=\x22http://servicemedia.s3.amazonaws.com/assets/pics/fireball-up.png\x22 crossorigin=\x22anonymous\x22>"+
-                                // "<img id=\x22fireball1\x22 src=\x22http://servicemedia.s3.amazonaws.com/assets/pics/fireball.png\x22 crossorigin=\x22anonymous\x22>"+
-                                // "<img id=\x22sparkle1\x22 src=\x22http://servicemedia.s3.amazonaws.com/assets/pics/sparkle.png\x22 crossorigin=\x22anonymous\x22>"+
-                                // "<img id=\x22blob1\x22 src=\x22http://servicemedia.s3.amazonaws.com/assets/pics/blob.png\x22 crossorigin=\x22anonymous\x22>"+
-                                // "<img id=\x22fog1\x22 src=\x22http://servicemedia.s3.amazonaws.com/assets/pics/fog-256.png\x22 crossorigin=\x22anonymous\x22>"+
-                                // "<img id=\x22cloud1\x22 src=\x22http://servicemedia.s3.amazonaws.com/assets/pics/cloud_lg.png\x22 crossorigin=\x22anonymous\x22>"+
-                                
-                          // USED FOR TERRAIN, REM FOR NOW...
-                        // "<img id=\x22heightmap\x22 src=\x22https://realitymangler.com/assets/heightmaps/hm4.png\x22 crossorigin=\x22anonymous\x22>"+
-                        // "<img id=\x22lowestTexture\x22 src=\x22https://realitymangler.com/assets/textures/dirttile1.jpg\x22 crossorigin=\x22anonymous\x22>"+
-                        // "<img id=\x22lowTexture\x22 src=\x22https://realitymangler.com/assets/textures/sandtile1.jpg\x22 crossorigin=\x22anonymous\x22>"+
-                        // "<img id=\x22mediumTexture\x22 src=\x22https://realitymangler.com/assets/textures/grasstile2.jpg\x22 crossorigin=\x22anonymous\x22>"+
-                        // "<img id=\x22highTexture\x22 src=\x22https://realitymangler.com/assets/textures/grasstile2.jpg\x22 crossorigin=\x22anonymous\x22>"+
-                        // "<img id=\x22highestTexture\x22 src=\x22https://realitymangler.com/assets/textures/mossrocktile2.jpg\x22 crossorigin=\x22anonymous\x22>"+
 
 
                         weblinkAssets +
@@ -4705,9 +4588,6 @@ webxr_router.get('/:_id', function (req, res) {
                         // "<a-plane loadsvg_blob id=\x22flying_dialog\x22 material=\x22shader: flat; transparent: true; opacity .5; src: #flying_canvas;\x22 look-at=\x22#player\x22 width=\x221\x22 height=\x221\x22 position=\x220 1.5 -1\x22></a-plane>"+
                         // "<a-plane live_canvas=\x22src:#flying_canvas\x22 id=\x22flying_info_canvas\x22 material=\x22shader: flat; transparent: true;\x22look-at=\x22#player\x22 width=\x221\x22 height=\x221\x22 position=\x220 1.5 -1\x22></a-plane>"+
 
-
-                        // "<a-entity load_threemeshui></a-entity>"+
-
                         audioVizEntity +
                         instancingEntity +
                         arHitTest + 
@@ -4728,12 +4608,7 @@ webxr_router.get('/:_id', function (req, res) {
                         objectData +
                         inventoryData +
 
-                        // "<a-entity position=\x22-10 1 10\x22 look-at=\x22#player\x22 troika-text=\x22value: Hello World!; font: ../fonts/web/RetroLoops.ttf; fontSize: 2; color: blue; outlineColor: white; outlineWidth: 2%;\x22 troika-text-material=\x22shader: standard; roughness: .8; metalness: 0.8;\x22></a-entity>"+
-                        // "<a-entity position=\x22-20 1-10\x22 scale=\x22.5 .5 .5\x22 look-at=\x22#player\x22 troika-text=\x22value: Hello World!; font: ../fonts/web/MountainsOfChristmasBold.woff; lineHeight: .85; maxWidth: 10; fontSize: 6; color: white; fillOpacity: .5;  outlineColor: white; outlineWidth: 1%; outlineBlur: .25; strokeColor: red; strokeWidth: 1%;\x22></a-entity>"+
-
-                        // "<a-console look-at=\x22#player\x22 position=\x22-4 1.75 -2\x22></a-console>"+
-                        // "<a-entity id=\x22navmesh\x22 geometry=\x22primitive: plane; height: 30; width: 30; buffer: true;\x22 rotation=\x22-90 0 0\x22 nav-mesh></a-entity>"+
-                        "</a-scene>\n"+ //CLOSE AFRAME SCENE
+                        "</a-scene>\n"+ ///////////////////////----- CLOSE AFRAME SCENE !
                         "</div>\n"+
                          
                         

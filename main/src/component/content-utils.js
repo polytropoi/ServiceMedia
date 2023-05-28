@@ -2986,15 +2986,14 @@ AFRAME.registerComponent('mod_object', {
               this.el.setAttribute('trail', "");
             } else if (this.hasThrowAction) {
               console.log("tryna throw..");
-                this.el.setAttribute('ammo-body', {type: this.data.objectData.physics.toLowerCase(), emitCollisionEvents: true, linearDamping: .1, angularDamping: .1});
+                this.el.setAttribute('ammo-body', { type: this.data.objectData.physics.toLowerCase(), emitCollisionEvents: true, linearDamping: .1, angularDamping: .1 });
                 // this.el.setAttribute('rotate-toward-velocity');
                 // this.el.setAttribute('trail', "");
-                this.el.body.restitution = .9;
+                // this.el.body.restitution = .9;
                 this.el.setAttribute('trail', "");
             } else {
-              this.el.setAttribute('ammo-body', {type: this.data.objectData.physics.toLowerCase(), emitCollisionEvents: true});
+              this.el.setAttribute('ammo-body', { type: this.data.objectData.physics.toLowerCase(), emitCollisionEvents: true });
               //this.el.body.restitution = .9;
-
             }
           }
       }
@@ -3011,17 +3010,15 @@ AFRAME.registerComponent('mod_object', {
             particleSpawner.components.particle_spawner.spawnParticles(worldPosition, this.data.objectData.particles, 5, this.el.id, this.data.objectData.yPosFudge, this.data.objectData.color1, this.data.objectData.triggerScale);
           }
         }
-
-
       }
-      // this.el.setAttribute("aabb-collider", {objects: ".activeObjexRay"});
+        // this.el.setAttribute("aabb-collider", {objects: ".activeObjexRay"});
 
 
-      // // if (!this.isInitialized) {
-      //   if (this.data.eventData.includes("scatter")) {
-      //     // this.el.object3D.visible = false;
-      //     console.log("GOTSA SCATTER OBJEK@");
-      //   }
+        // // if (!this.isInitialized) {
+        //   if (this.data.eventData.includes("scatter")) {
+        //     // this.el.object3D.visible = false;
+        //     console.log("GOTSA SCATTER OBJEK@");
+        //   }
         // this.oScale = oScale;
         this.bubble = null;
         this.bubbleText = null;
