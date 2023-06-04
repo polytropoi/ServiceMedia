@@ -25,8 +25,8 @@ var express = require("express")
     , bcrypt = require('bcrypt-nodejs')
     , shortid = require('shortid')
     , QRCode = require('qrcode')
-    // , transloadit = require('node-transloadit')
-    // , internetradio = require('node-internet-radio')
+    // , transloadit = require('node-transloadit') done witchoo!
+    // , internetradio = require('node-internet-radio') bad behavior..
     , requireText = require('require-text');
 
 
@@ -15673,25 +15673,30 @@ app.get('/scene/:_id/:platform/:version', function (req, res) { //called from ap
                     // callback(null);
 
                     async.each (sceneResponse.sceneWebLinks, function (objID, callbackz) { //nested async-ery!
-                        db.weblinks.findOne({'_id': ObjectID(objID)}, function (err, weblink){
+                        if (ObjectID.isValid(objID)) {
+                        db.weblinks.findOne({'_id': ObjectID(objID)}, function (err, weblink) {
                             if (err || !weblink) {
-                                console.log("can't find weblink");
-                                callbackz();
-                            } else {
-                                // let weblink = {};
-                                var urlThumb = s3.getSignedUrl('getObject', {Bucket: 'servicemedia.web', Key: objID + "/" + objID + ".thumb.jpg", Expires: 6000});
-                                var urlHalf = s3.getSignedUrl('getObject', {Bucket: 'servicemedia.web', Key: objID + "/" + objID + ".half.jpg", Expires: 6000});
-                                var urlStandard = s3.getSignedUrl('getObject', {Bucket: 'servicemedia.web', Key: objID + "/" + objID + ".standard.jpg", Expires: 6000});
-                                weblink.urlThumb = urlThumb;
-                                weblink.urlHalf = urlHalf;
-                                weblink.urlStandard = urlStandard;
-                                weblink.link_id = weblink._id;
-                                // weblink.link_url;
-                                // console.log("tryna push weblink " + JSON.stringify(weblink));
-                                sceneWebLinx.push(weblink);
-                                callbackz();
-                            }
-                        });
+                            console.log("can't find weblink");
+                            callbackz();
+                                } else {
+                                    // let weblink = {};
+                                    var urlThumb = s3.getSignedUrl('getObject', {Bucket: 'servicemedia.web', Key: objID + "/" + objID + ".thumb.jpg", Expires: 6000});
+                                    var urlHalf = s3.getSignedUrl('getObject', {Bucket: 'servicemedia.web', Key: objID + "/" + objID + ".half.jpg", Expires: 6000});
+                                    var urlStandard = s3.getSignedUrl('getObject', {Bucket: 'servicemedia.web', Key: objID + "/" + objID + ".standard.jpg", Expires: 6000});
+                                    weblink.urlThumb = urlThumb;
+                                    weblink.urlHalf = urlHalf;
+                                    weblink.urlStandard = urlStandard;
+                                    weblink.link_id = weblink._id;
+                                    // weblink.link_url;
+                                    // console.log("tryna push weblink " + JSON.stringify(weblink));
+                                    sceneWebLinx.push(weblink);
+                                    callbackz();
+                                }
+                            });
+                        } else {
+                            console.log("invalide weblink oid");
+                            callbackz();
+                        }
                     }, function(err) {
                        
                         if (err) {

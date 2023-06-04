@@ -8131,11 +8131,11 @@ AFRAME.registerComponent('scene_greeting_dialog', {  //if "greeting" scenetag + 
       if (settings && settings.sceneFontWeb1) {
         this.font = settings.sceneFontWeb1;
       }
-      console.log("tryna set scene greeting " + this.data.greetingText);
+      
       let loc = new THREE.Vector3();
       this.viewportHolder = document.getElementById('viewportPlaceholder3');
       this.viewportHolder.object3D.getWorldPosition( loc );
-      
+      console.log("tryna set scene greeting at location " + JSON.stringify(loc));
       this.el.setAttribute("position", {x: loc.x, y: loc.y + .55, z: loc.z});
     }, 3000);
 
