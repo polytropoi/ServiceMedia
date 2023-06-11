@@ -826,7 +826,7 @@ AFRAME.registerComponent('mod-materials', {
               this.percent = this.video.currentTime / this.video.duration;
               // console.log(this.percent);
               this.slider_handle.position.lerpVectors(this.slider_begin.position, this.slider_end.position, this.percent);
-              this.fancyTimeString = fancyTimeFormat(this.video.currentTime)  + " / "+ fancyTimeFormat(this.video.duration)  + " : " + (this.percent * 100).toFixed(2) +" %";
+              this.fancyTimeString = fancyTimeFormat(this.video.currentTime)  + " / "+ fancyTimeFormat(this.video.duration)  + " : " + (this.percent * 100).toFixed(2) +" %\n"+currentTime;
               this.videoStatus.setAttribute('text', {
                 // width: 4, 
                 align: "left",

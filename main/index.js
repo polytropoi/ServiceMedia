@@ -2938,6 +2938,7 @@
                     "<option>Previous</option>" +
                     "<option>GoTo Time</option>" +
                     "<option>Random Time</option>" +
+                    "<option>Reset Timekeys</option>" +
                     "<option>Color Lerp</option>" +
                     "<option>Color Tweak</option>" +
                     "<option>Player Snap</option>" +
@@ -13141,6 +13142,8 @@ function getAllPeople() {
                                     "<label for=\x22sceneShareWithGroups\x22>Share With</label>" + //share with group
                                     "<select class=\x22form-control\x22 id=\x22sceneShareWithGroups\x22 >" +
                                     "<option value=\x22\x22 disabled selected>Select:</option>" +
+                                    "<option>Disallow All</option>" +
+                                        "<option>Scene People Only</option>" +
                                         "<option>Disallow All</option>" +
                                         "<option>Allow All</option>" +
                                         "<option>My People Only</option>" +

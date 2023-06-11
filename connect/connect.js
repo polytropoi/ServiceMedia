@@ -1571,7 +1571,7 @@ function EmitSelfPosition() {
                var posRotObj = posRotReader.returnPosRot();
                cameraPosition = posRotObj.pos;
                cameraRotation = posRotObj.rot;
-               console.log(cameraPosition.x.toString() + " vs " + window.playerPosition.x.toString());
+               // console.log(cameraPosition.x.toString() + " vs " + window.playerPosition.x.toString());
                // if (JSON.stringify(cameraPosition) != lastPosition && JSON.stringify(cameraRotation) != lastRotation) {
                if (JSON.stringify(cameraPosition) != lastPosition) {
                      // console.log('emitting!');
@@ -2328,6 +2328,9 @@ function TimedEventListener () {
       if (timekey && timekey != NaN) {//not not a number
       if (timedEventsListenerMode != null && timedEventsListenerMode.toLowerCase() == 'primary audio') {
          // if (hasPrimaryAudio) {
+            // if (timeKeysData.timekeys[timeKeysIndex].keytype == "Reset Timekeys") {
+            //    timeKeysIndex = 0;
+            // }
             if (primaryAudioHowl != undefined && primaryAudioHowl != null && primaryAudioHowl.playing()) {
             
                let primaryAudioTime = primaryAudioHowl.seek();
@@ -2353,9 +2356,13 @@ function TimedEventListener () {
             }
             // }
          } else if (timedEventsListenerMode != null && timedEventsListenerMode.toLowerCase() == 'primary video') {
-            if (videoEl != null && !videoEl.paused && timekey > 0){
-            //  console.log("currentVideoTIme " + videoEl.currentTime + " vs timekey " + timekey);
-               if (videoEl.currentTime < .1) {
+            if (videoEl != null && !videoEl.paused && timekey > 0) {
+             console.log(videoEl.currentTime + " timeKeysIndex " + timeKeysIndex + " type " + timeKeysData.timekeys[timeKeysIndex].keytype);
+               // if (timeKeysData.timekeys[timeKeysIndex].keytype == "Reset Timekeys") {
+               //    timeKeysIndex = 0;
+               //    // videoEl.currentTime = 0;
+               // }
+               if (videoEl.currentTime < 1) {
                   timeKeysIndex = 0; 
                   console.log("resetting timekeysindex!");
                }
@@ -2374,6 +2381,9 @@ function TimedEventListener () {
                }
             }
          } else if (timedEventsListenerMode != null && timedEventsListenerMode.toLowerCase() == 'youtube') { 
+            // if (timeKeysData.timekeys[timeKeysIndex].keytype == "Reset Timekeys") {
+            //    timeKeysIndex = 0;
+            // }
             if (youtubePlayer != null && youtubeIsPlaying && timekey > 0) {
                if (youtubePlayer.getCurrentTime() <= .1) {
                   timeKeysIndex = 0; 
