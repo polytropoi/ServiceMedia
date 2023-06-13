@@ -44,7 +44,7 @@ let sceneColor4Alt = '#000000';
 let volumePrimary = 0;
 let volumeAmbient = 0;
 let volumeTrigger = 0;
-let settings = null;
+let settings; //push this to an aframe component for fetching...
 let currentLocationIndex = -1;
 let currentTime = 0;  //depends on listenerMode
 let fancyTimeString = "";
@@ -140,6 +140,7 @@ $(function() {
    let theSettingsData = settingsEl.getAttribute('data-settings');
             // console.log("RAW LOCATIOND DATA " + theData);
    settings = JSON.parse(atob(theSettingsData)); 
+   // let settingsAframe = createElement("a-entity")
    // let audioGroupsEl = null;
 
    if (settings.sceneTimedEvents != undefined && settings.sceneTimedEvents != null) {

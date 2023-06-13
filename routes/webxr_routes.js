@@ -3866,6 +3866,7 @@ webxr_router.get('/:_id', function (req, res) {
                     settings.sceneVideoStreams = sceneResponse.sceneVideoStreamUrls;
                     settings.socketHost = process.env.SOCKET_HOST;
                     settings.networking = sceneResponse.sceneNetworking;
+                    settings.playerStartPosition = playerPosition;
 
                     if (sceneResponse.sceneTags != null && sceneResponse.sceneTags.includes("show avatars")) {
                         settings.hideAvatars = false;
@@ -3888,6 +3889,7 @@ webxr_router.get('/:_id', function (req, res) {
                     // settings.scenePrimaryAudioGroups = sceneResponse.scenePrimaryAudioGroups;
                     var sbuff = Buffer.from(JSON.stringify(settings)).toString("base64");
                     settingsData = "<div id=\x22settingsDataElement\x22 data-settings=\x22"+sbuff+"\x22></div>";
+                    // settingsDataEntity = "<a-entity id=\x22settingsDataEntity\x22 data-settings=\x22"+sbuff+"\x22></a-entity>"; ? maybe
 
                     let grabMix = "<a-mixin id=\x22grabmix\x22" + //mixin for grabbable objex
                         "event-set__grab=\x22material.color: #FFEF4F\x22" +
@@ -4029,7 +4031,7 @@ webxr_router.get('/:_id', function (req, res) {
                             "<div class=\x22avatarName\x22 id="+avatarName+"></div>"+
                             "<div id=\x22token\x22 data-token=\x22"+token+"\x22></div>\n"+
                             // "<model-viewer class=\x22full-screen-model-viewer\x22 src=\x22"+gltfModel+"\x22"+ 
-                            "<model-viewer autoplay shadow-intensity=\x221\x22 camera-controls camera-target=\220m 0m 0m\x22 src=\x22"+gltfModel+"\x22"+ 
+                            "<model-viewer autoplay shadow-intensity=\x221\x22 camera-controls camera-target=\x220m 0m 0m\x22 src=\x22"+gltfModel+"\x22"+ 
                             // "<model-viewer autoplay shadow-intensity=\x221\x22 camera-controls src=\x22"+gltfModel+"\x22"+ 
                             // " ar ar-placement=\x22floor\x22 ar-modes=\x22webxr scene-viewer quick-look\x22 alt=\x22Viewer for single 3D Model\x22"+ //rem'd autoscale
                             " ar ar-placement=\x22"+planeDetectMode+"\x22 ar-modes=\x22webxr scene-viewer quick-look\x22 ar-scale=\x22"+arScaleMode+"\x22 alt=\x22Viewer for single 3D Model\x22"+ 
@@ -4336,24 +4338,27 @@ webxr_router.get('/:_id', function (req, res) {
                         }
                         var token=jwt.sign({userId:uid,shortID:sceneResponse.short_id},process.env.JWT_SECRET, { expiresIn: '1h' });  
                         let modal = "<div id=\x22theModal\x22 class=\x22modal\x22><div id=\x22modalContent\x22 class=\x22modal-content\x22></div></div>";
-                        htmltext = "<html xmlns='http://www.w3.org/1999/xhtml'>" +
+                        htmltext = "<html>" +
+                        "<!doctype html>"+
+                        "<html lang=\x22en\x22>"+
                         "<head> " +
+                        "<meta charset=\x22utf-8\x22/>" +
                         googleAnalytics +
 
                         // googleAdSense + //naw, nm
-                        "<link rel=\x22icon\x22 href=\x22data:,\x22></link>"+
-                        "<meta charset='utf-8'/>" +
-                        "<meta name='viewport' content='width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0, shrink-to-fit=no'/>" +
-                        "<meta property='og:url' content='" + process.env.ROOT_HOST + "/webxr/" + sceneResponse.short_id + "' /> " +
-                        "<meta property='og:type' content='website' /> " +
-                        // "<meta property='og:image' content='" + postcard1 + "' /> " +
-                        "<meta property='og:image' content='" + postcard1 + "' /> " +
-                        "<meta property='og:image:height' content='1024' /> " +
-                        "<meta property='og:image:width' content='1024' /> " +
-                        "<meta property='og:title' content='" + sceneResponse.sceneTitle + "' /> " +
-                        "<meta property='og:description' content='" + sceneResponse.sceneDescription + "' /> " +
+                        // "<link rel=\x22icon\x22 href=\x22data:\x22></link>"+
+                        "<meta charset=\x22utf-8\x22/>" +
+                        "<meta name=\x22viewport\x22 content=\x22width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0, shrink-to-fit=no\x22/>" +
+                        "<meta property=\x22og:url\x22 content=\x22" + process.env.ROOT_HOST + "/webxr/" + sceneResponse.short_id + "\x22 /> " +
+                        "<meta property=\x22og:type\x22 content=\x22website\x22 /> " +
+                        // "<meta property=\x22og:image\x22 content=\x22" + postcard1 + "\x22 /> " +
+                        "<meta property=\x22og:image\x22 content=\x22" + postcard1 + "\x22 /> " +
+                        "<meta property=\x22og:image:height\x22 content=\x221024\x22 /> " +
+                        "<meta property=\x22og:image:width\x22 content=\x221024\x22 /> " +
+                        "<meta property=\x22og:title\x22 content=\x22" + sceneResponse.sceneTitle + "\x22 /> " +
+                        "<meta property=\x22og:description\x22 content=\x22" + sceneResponse.sceneDescription + "\x22 /> " +
                         "<title>" + sceneResponse.sceneTitle + "</title>" +
-                        "<meta name='description' content='" + sceneResponse.sceneDescription + "'/>" +
+                        "<meta name=\x22description\x22 content=\x22" + sceneResponse.sceneDescription + "\x22/>" +
                         // "<meta name=\x22monetization\x22 content=\x22$ilp.uphold.com/EMJQj4qKRxdF\x22>" +
                         "<meta name=\x22mobile-web-app-capable\x22 content=\x22yes\x22>" +
                         "<meta name=\x22apple-mobile-web-app-capable\x22 content=\x22yes\x22>" +
@@ -4374,11 +4379,12 @@ webxr_router.get('/:_id', function (req, res) {
                         "<script src=\x22/main/vendor/jquery/jquery.min.js\x22></script>" +
                         
                         // "<script src=\x22../main/ref/aframe/dist/socket.io.slim.js\x22></script>" +
-                        
+                       
                         "<script src=\x22/connect/connect.js\x22 defer=\x22defer\x22></script>" +
                 
                         
                         aframeScriptVersion +
+                        "<script src=\x22../main/src/component/aframe-troika-text.min.js\x22 defer=\x22defer\x22></script>"+
                         physicsScripts +
                         logScripts +
                         aframeExtrasScript +
@@ -4432,7 +4438,7 @@ webxr_router.get('/:_id', function (req, res) {
                         // "<script src=\x22../main/src/component/aframe-spritesheet-animation.js\x22></script>"+
                         "<script src=\x22../main/src/component/aframe-sprite-particles-component.js\x22></script>"+
                         
-                        "<script src=\x22../main/src/component/aframe-troika-text.min.js\x22></script>"+
+
                         "<script src=\x22../main/src/component/mod-materials.js\x22></script>"+
 
                         // "<script src=\x22../main/src/component/aframe-gradientsky.min.js\x22></script>"+
@@ -4441,7 +4447,7 @@ webxr_router.get('/:_id', function (req, res) {
 
 
                         "</head>" +
-                        "<body bgcolor='black'>" +
+                        "<body bgcolor=\x22black\x22>" +
                         
                         modal +
                         

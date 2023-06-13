@@ -12915,57 +12915,57 @@ function getAllPeople() {
                     if (triggerAudioGroupButtons.length > 0) {
                         triggerAudio.URLpng = "ref/groups_selected.png";
                     }
-                    sceneButtons = "<label for=\x22scenePicButtons\x22>Link to Scenes</label><div id=\x22sceneSceneButtons\x22 style=\x22margin: 0px 10px;\x22  class=\x22btn-group float-right\22 role=\x22group\x22 aria-label=\x22button group\x22>" +
+                    sceneButtons = "<label for=\x22scenePicButtons\x22>Link to Scenes</label><div id=\x22sceneSceneButtons\x22 style=\x22margin: 0px 10px;\x22  class=\x22btn-group float-right\x22 role=\x22group\x22 aria-label=\x22button group\x22>" +
                     "<a class=\x22btn btn-primary\x22 href=\x22index.html?type=newscene\x22><i class=\x22fas fa-file-upload\x22></i> New </a>" +
                     "<a class=\x22btn btn-info\x22 href=\x22index.html?type=scenes&mode=select&parent=scene&iid="+response.data._id+"\x22><i class=\x22fas fa-hand-pointer\x22></i> Select </a>" +
                     "<a class=\x22btn btn-success\x22 href=\x22index.html?type=groups&mode=scenegroup&parent=scene&iid="+response.data._id+"\x22><i class=\x22fas fa-hand-pointer\x22></i> Group </a>" +
                     "<button class=\x22btn btn-danger clearSceneScenes\x22><i class=\x22fas fa-broom\x22></i> Clear </button></div>";
-                    picButtons = "<label for=\x22scenePicButtons\x22>Scene Pictures </label><div id=\x22scenePicButtons\x22 style=\x22margin: 0px 10px;\x22  class=\x22btn-group float-right\22 role=\x22group\x22 aria-label=\x22button group\x22>" +
+                    picButtons = "<label for=\x22scenePicButtons\x22>Scene Pictures </label><div id=\x22scenePicButtons\x22 style=\x22margin: 0px 10px;\x22  class=\x22btn-group float-right\x22 role=\x22group\x22 aria-label=\x22button group\x22>" +
                     "<a class=\x22btn btn-primary\x22 href=\x22index.html?type=bulkup\x22><i class=\x22fas fa-file-upload\x22></i> Upload </a>" +
                     "<a class=\x22btn btn-info\x22 href=\x22index.html?type=pictures&mode=select&parent=scene&iid="+response.data._id+"\x22><i class=\x22fas fa-hand-pointer\x22></i> Select </a>" +
                     "<a class=\x22btn btn-success\x22 href=\x22index.html?type=groups&mode=picgroup&parent=scene&iid="+response.data._id+"\x22><i class=\x22fas fa-hand-pointer\x22></i> Group </a>" +
                     "<button class=\x22btn btn-danger clearScenePictures\x22><i class=\x22fas fa-broom\x22></i> Clear </button></div>";
-                    postcardButtons = "<label for=\x22scenePostcardButtons\x22>Postcards </label><div id=\x22scenePostcardButtons\x22 style=\x22margin: 0px 10px;\x22  class=\x22btn-group float-right\22 role=\x22group\x22 aria-label=\x22button group\x22>" +
+                    postcardButtons = "<label for=\x22scenePostcardButtons\x22>Postcards </label><div id=\x22scenePostcardButtons\x22 style=\x22margin: 0px 10px;\x22  class=\x22btn-group float-right\x22 role=\x22group\x22 aria-label=\x22button group\x22>" +
                     "<a class=\x22btn btn-primary\x22 href=\x22index.html?type=bulkup\x22><i class=\x22fas fa-file-upload\x22></i> Upload </a>" +
                     "<a class=\x22btn btn-info\x22 href=\x22index.html?type=pictures&mode=postselect&parent=scene&iid="+response.data._id+"\x22><i class=\x22fas fa-hand-pointer\x22></i> Select </a>" +
                     "<button class=\x22btn btn-danger clearScenePostcards\x22><i class=\x22fas fa-broom\x22></i> Clear </button></div>";
-                    vidButtons = " <div style=\x22margin: 0px 10px;\x22  class=\x22btn-group float-right\22 role=\x22group\x22 aria-label=\x22button group\x22>" +
+                    vidButtons = " <div style=\x22margin: 0px 10px;\x22  class=\x22btn-group float-right\x22 role=\x22group\x22 aria-label=\x22button group\x22>" +
                     "<a class=\x22btn btn-primary\x22 href=\x22index.html?type=bulkup\x22><i class=\x22fas fa-file-upload\x22></i> Upload </a>" +
                     "<a class=\x22btn btn-info\x22 href=\x22index.html?type=video&mode=select&parent=scene&iid="+response.data._id+"\x22><i class=\x22fas fa-hand-pointer\x22></i> Select </a>" +
                     "<a class=\x22btn btn-success\x22 href=\x22index.html?type=groups&mode=vidgroup&parent=scene&iid="+response.data._id+"\x22><i class=\x22fas fa-hand-pointer\x22></i> Group </a>" +
                     "<button class=\x22btn btn-danger clearSceneVids\x22><i class=\x22fas fa-broom\x22></i> Clear </button></div>";
-                    primaryAudioButtons = " <div style=\x22margin: 0px 10px;\x22  class=\x22btn-group float-right\22 role=\x22group\x22 aria-label=\x22button group\x22>" +
+                    primaryAudioButtons = " <div style=\x22margin: 0px 10px;\x22  class=\x22btn-group float-right\x22 role=\x22group\x22 aria-label=\x22button group\x22>" +
                     "<a class=\x22btn btn-primary btn-sm\x22 href=\x22index.html?type=bulkup\x22><i class=\x22fas fa-file-upload\x22></i> Upload </a>" +
                     "<a class=\x22btn btn-info btn-sm\x22 href=\x22index.html?type=audio&mode=paudio&parent=scene&iid="+response.data._id+"\x22><i class=\x22fas fa-hand-pointer\x22></i> Select </a>" +
                     "<a class=\x22btn btn-success btn-sm\x22 href=\x22index.html?type=groups&mode=paudiogroup&parent=scene&iid="+response.data._id+"\x22><i class=\x22fas fa-hand-pointer\x22></i> Group </a>" +
                     "<button class=\x22btn btn-danger btn-sm clearScenePrimaryAudio\x22><i class=\x22fas fa-broom\x22></i> Clear </button></div>";
-                    ambientAudioButtons = " <div style=\x22margin: 0px 10px;\x22  class=\x22btn-group float-right\22 role=\x22group\x22 aria-label=\x22button group\x22>" +
+                    ambientAudioButtons = " <div style=\x22margin: 0px 10px;\x22  class=\x22btn-group float-right\x22 role=\x22group\x22 aria-label=\x22button group\x22>" +
                     "<a class=\x22btn btn-primary btn-sm\x22 href=\x22index.html?type=bulkup\x22><i class=\x22fas fa-file-upload\x22></i> Upload </a>" +
                     "<a class=\x22btn btn-info btn-sm\x22 href=\x22index.html?type=audio&mode=aaudio&parent=scene&iid="+response.data._id+"\x22><i class=\x22fas fa-hand-pointer\x22></i> Select </a>" +
                     "<a class=\x22btn btn-success btn-sm\x22 href=\x22index.html?type=groups&mode=aaudiogroup&parent=scene&iid="+response.data._id+"\x22><i class=\x22fas fa-hand-pointer\x22></i> Group </a>" +
                     "<button class=\x22btn btn-danger btn-sm clearSceneAmbientAudio\x22><i class=\x22fas fa-broom\x22></i> Clear </button></div>";
-                    triggerAudioButtons = " <div style=\x22margin: 0px 10px;\x22  class=\x22btn-group float-right\22 role=\x22group\x22 aria-label=\x22button group\x22>" +
+                    triggerAudioButtons = " <div style=\x22margin: 0px 10px;\x22  class=\x22btn-group float-right\x22 role=\x22group\x22 aria-label=\x22button group\x22>" +
                     "<a class=\x22btn btn-primary btn-sm\x22 href=\x22index.html?type=bulkup\x22><i class=\x22fas fa-file-upload\x22></i> Upload </a>" +
                     "<a class=\x22btn btn-info btn-sm\x22 href=\x22index.html?type=audio&mode=taudio&parent=scene&iid="+response.data._id+"\x22><i class=\x22fas fa-hand-pointer\x22></i> Select </a>" +
                     "<a class=\x22btn btn-success btn-sm\x22 href=\x22index.html?type=groups&mode=taudiogroup&parent=scene&iid="+response.data._id+"\x22><i class=\x22fas fa-hand-pointer\x22></i> Group </a>" +
                     "<button class=\x22btn btn-danger btn-sm clearSceneTriggerAudio\x22><i class=\x22fas fa-broom\x22></i> Clear </button></div>";
-                    modelButtons = " <div style=\x22margin: 0px 10px;\x22  class=\x22btn-group float-right\22 role=\x22group\x22 aria-label=\x22button group\x22>" +
+                    modelButtons = " <div style=\x22margin: 0px 10px;\x22  class=\x22btn-group float-right\x22 role=\x22group\x22 aria-label=\x22button group\x22>" +
                     "<a class=\x22btn btn-primary\x22 href=\x22index.html?type=models\x22><i class=\x22fas fa-file-upload\x22></i> New </a>" +
                     "<a class=\x22btn btn-info\x22 href=\x22index.html?type=models&mode=select&parent=scene&iid="+response.data._id+"\x22><i class=\x22fas fa-hand-pointer\x22></i> Select </a>" +
                     "<a class=\x22btn btn-success\x22 href=\x22index.html?type=groups&mode=modelgroup&parent=scene&iid="+response.data._id+"\x22><i class=\x22fas fa-hand-pointer\x22></i> Group </a>" +
                     "<button class=\x22btn btn-danger\x22 onclick=\x22ClearScenePostcards()\x22><i class=\x22fas fa-broom\x22></i> Clear </button></div>";
-                    objButtons = " <div style=\x22margin: 0px 10px;\x22  class=\x22btn-group float-right\22 role=\x22group\x22 aria-label=\x22button group\x22>" +
+                    objButtons = " <div style=\x22margin: 0px 10px;\x22  class=\x22btn-group float-right\x22 role=\x22group\x22 aria-label=\x22button group\x22>" +
                     "<a class=\x22btn btn-primary\x22 href=\x22index.html?type=objex\x22><i class=\x22fas fa-file-upload\x22></i> New </a>" +
                     "<a class=\x22btn btn-info\x22 href=\x22index.html?type=objex&mode=select&parent=scene&iid="+response.data._id+"\x22><i class=\x22fas fa-hand-pointer\x22></i> Select </a>" +
                     "<a class=\x22btn btn-success\x22 href=\x22index.html?type=groups&mode=objgroup&parent=scene&iid="+response.data._id+"\x22><i class=\x22fas fa-hand-pointer\x22></i> Group </a>" +
                     "<button class=\x22btn btn-danger\x22 onclick=\x22ClearScenePostcards()\x22><i class=\x22fas fa-broom\x22></i> Clear </button></div>";
-                    locationButtons = " <div style=\x22margin: 0px 10px;\x22  class=\x22btn-group float-right\22 role=\x22group\x22 aria-label=\x22button group\x22>" +
+                    locationButtons = " <div style=\x22margin: 0px 10px;\x22  class=\x22btn-group float-right\x22 role=\x22group\x22 aria-label=\x22button group\x22>" +
                     // "<a class=\x22btn btn-primary\x22 href=\x22index.html?type=locations\x22><i class=\x22fas fa-file-upload\x22></i> New </a>" +
                     "<a class=\x22btn btn-primary newSceneLocation\x22 href=\x22#\x22><i class=\x22fas fa-file-upload\x22></i> New </a>" +
                     "<a class=\x22btn btn-info\x22 href=\x22index.html?type=locations&mode=select&parent=scene&iid="+response.data._id+"\x22><i class=\x22fas fa-hand-pointer\x22></i> Select </a>" +
                     "<a class=\x22btn btn-success\x22 href=\x22index.html?type=groups&mode=locgroup&parent=scene&iid="+response.data._id+"\x22><i class=\x22fas fa-hand-pointer\x22></i> Group </a>" +
                     "<button class=\x22btn btn-danger\x22 onclick=\x22ClearSceneLocations()\x22><i class=\x22fas fa-broom\x22></i> Clear </button></div>";
-                    textButtons = " <div style=\x22margin: 0px 10px;\x22  class=\x22btn-group float-right\22 role=\x22group\x22 aria-label=\x22button group\x22>" +
+                    textButtons = " <div style=\x22margin: 0px 10px;\x22  class=\x22btn-group float-right\x22 role=\x22group\x22 aria-label=\x22button group\x22>" +
                     "<a class=\x22btn btn-primary\x22 href=\x22index.html?type=texts\x22><i class=\x22fas fa-file-upload\x22></i> New </a>" +
                     "<a class=\x22btn btn-info\x22 href=\x22index.html?type=texts&mode=select&parent=scene&iid="+response.data._id+"\x22><i class=\x22fas fa-hand-pointer\x22></i> Select </a>" +
                     "<a class=\x22btn btn-success\x22 href=\x22index.html?type=groups&mode=textgroup&parent=scene&iid="+response.data._id+"\x22><i class=\x22fas fa-hand-pointer\x22></i> Group </a>" +

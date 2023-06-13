@@ -154,6 +154,7 @@ AFRAME.registerComponent('initializer', { //adjust for device settings, and call
     initialized: {default: ''},
     // href: {default: ''},
     usdz: {default: ''},
+    // settingsData: {default: ''},
     sceneType: {default: 'aframe'}
   },
   init: function () {
@@ -164,6 +165,8 @@ AFRAME.registerComponent('initializer', { //adjust for device settings, and call
     let isMobile = AFRAME.utils.device.isMobile();
     let headsetConnected = AFRAME.utils.device.checkHeadsetConnected();
     let isMacOS = (navigator.appVersion.indexOf('Mac') != -1);
+    // this.data.settingsData = settings;
+    // console.log("settings " + this.data.settingsData);
     // let ios = this.detectIOS();
     // console.log("scene TYpe is " + type + " is IOS " + ios);
 
@@ -1637,7 +1640,6 @@ AFRAME.registerComponent('model-callout', {
         align: "center",
         font: "/fonts/web/" + font,
         anchor: "center",
-        wrapCount: 30,
         color: "white",
         outlineColor: "black",
         outlineWidth: "2%",
@@ -2090,7 +2092,6 @@ AFRAME.registerComponent('model-callout', {
           fontSize: .2,
           font: "/fonts/web/" + font,
           anchor: "center",
-          wrapCount: 30,
           color: "white",
           outlineColor: "black",
           outlineWidth: "2%",
@@ -2791,7 +2792,6 @@ AFRAME.registerComponent('mod_object', {
           align: "left",
           font: "/fonts/web/" + font,
           anchor: "center",
-          // wrapCount: 14,
           color: "white",
           outlineColor: "black",
           outlineWidth: "2%",
@@ -3587,7 +3587,7 @@ AFRAME.registerComponent('mod_object', {
               font: "/fonts/web/" + font,
               fontSize: .2,
               anchor: "center",
-              wrapCount: 20,
+              // wrapCount: 20,
               color: "black",
               value: this.textData[this.textIndex]
 
@@ -5272,7 +5272,7 @@ AFRAME.registerComponent('mod_model', {
                   align: "center",
                   font: "/fonts/web/" + this.font2,
                   anchor: "center",
-                  wrapCount: 300,
+                  // wrapCount: 300,
                   color: "white",
                   value: vpics[vpicsIndex].title
                 });
@@ -7287,13 +7287,7 @@ AFRAME.registerComponent('youtube_player', {  //setup and controls for the 3d pl
       
       this.youtubeState = document.getElementById("youtubeState");
       this.youtubeStats = document.getElementById("youtubeStats");
-      // this.youtubeStats.setAttribute('text', {
-      //   baseline: "bottom",
-      //       wrapCount: 70,
-      //   align: "left",
-      //   value: "loading..."
-      // });
-      
+
       this.duration = 0
       this.el.object3D.position = new THREE.Vector3('0 0 0');
       this.playerState = "";
@@ -7959,7 +7953,7 @@ AFRAME.registerComponent('scene_greeting_dialog', {  //if "greeting" scenetag + 
   init: function () {
 
     this.behavior = this.data.behavior;
-    console.log("tryna set scene greeting " + this.data.greetingText);
+    console.log("tryna set scene greeting " + this.data.greetingText + " " + settings.sceneFontWeb1);
     if (this.data.font1 != null && this.data.font1 != "") {
       this.font = this.data.font1; 
     } else {
@@ -8130,14 +8124,15 @@ AFRAME.registerComponent('scene_greeting_dialog', {  //if "greeting" scenetag + 
     setTimeout(() => { //wait to settle player position, maybe DOMLoaded event? 
       if (settings && settings.sceneFontWeb1) {
         this.font = settings.sceneFontWeb1;
-      }
+
       
-      let loc = new THREE.Vector3();
-      this.viewportHolder = document.getElementById('viewportPlaceholder3');
-      this.viewportHolder.object3D.getWorldPosition( loc );
-      console.log("tryna set scene greeting at location " + JSON.stringify(loc));
-      this.el.setAttribute("position", {x: loc.x, y: loc.y + .55, z: loc.z});
-    }, 3000);
+        let loc = new THREE.Vector3();
+        this.viewportHolder = document.getElementById('viewportPlaceholder3');
+        this.viewportHolder.object3D.getWorldPosition( loc );
+        console.log("tryna set scene greeting at location " + JSON.stringify(loc));
+        this.el.setAttribute("position", {x: loc.x, y: loc.y + .55, z: loc.z});
+      }
+    }, 4000);
 
     
   },
