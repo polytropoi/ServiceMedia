@@ -4,6 +4,7 @@
     // 3. controller functions fetch json and generate html
     // 4. dom elements are selected and updated with new stuff as needed
 
+
     var cookie = Cookies.get();
     var type = getParameterByName("type", window.location.href); //these params used for routing in bigSwitch
     var appid = getParameterByName("appid", window.location.href);
@@ -987,7 +988,7 @@
         $.get( "/staging/" + cookie._id, function( data ) {
             // console.log("tryna get staging data : " + JSON.stringify(data));
             $( "#staging-area" ).html( showStaging(data) );
-            let newButton = "<a href=\x22index.html?type=bulkup\x22 class=\x22btn btn-info  float-right\x22 >Upload Files</button>";
+            let newButton = "<a href=\x22index.html?type=bulkup\x22 class=\x22btn btn-info  float-right\x22 >Upload Files</a>";
             $("#newButton").html(newButton);
             $("#newButton").show();
         });
@@ -13087,6 +13088,11 @@ function getAllPeople() {
                                 "<div class=\x22\x22><label for=\x22sceneWindowsOK\x22>Windows Enabled</label><br>" + 
                                 "<input class=\x22float-right\x22 type=\x22checkbox\x22  id=\x22sceneWindowsOK\x22 data-toggle=\x22toggle\x22 data-size=\x22sm\x22 data-on=\x22<i class='fas fa-check'></i>\x22 data-off=\x22<i class='fas fa-times'></i>\x22 data-onstyle=\x22success\x22 data-offstyle=\x22danger\x22></div>" +
                             "</div>" +
+                            // "</div>" +
+                            "<div class=\x22col form-group col-md-1\x22>" +
+                                "<div class=\x22\x22><label for=\x22sceneWebGLOK\x22>WebGL Enabled</label><br>" + 
+                                "<input class=\x22float-right\x22 type=\x22checkbox\x22  id=\x22sceneWebGLOK\x22 data-toggle=\x22toggle\x22 data-size=\x22sm\x22 data-on=\x22<i class='fas fa-check'></i>\x22 data-off=\x22<i class='fas fa-times'></i>\x22 data-onstyle=\x22success\x22 data-offstyle=\x22danger\x22></div>" +
+                            "</div>" +
                             "<div class=\x22col form-group col-md-1\x22>" +
                                 "<label for=\x22scenePreviousScene\x22>Prev Scene</label>" + //scenePrevious
                                 "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22scenePreviousScene\x22 placeholder=\x22Previous Scene\x22 value=\x22" + scenePreviousScene + "\x22 >" +
@@ -13096,7 +13102,7 @@ function getAllPeople() {
                                 "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22sceneNextScene\x22 placeholder=\x22Next Scene\x22 value=\x22" + sceneNextScene + "\x22 >" +
                             "</div>" +
                             "<div class=\x22col form-group col-md-6\x22>" +
-                            sceneButtons +
+                                sceneButtons +
                                 // "<label for=\x22sceneLinks\x22>Scene Links</label><br>" + //SceneLinks 
                                 // "<div class=\x22input-group\x22>" +
                                 //     "<div class=\x22input-group-prepend\x22>" +
@@ -14848,6 +14854,10 @@ function getAllPeople() {
                 if (response.data.sceneWindowsOK) {
                 $('#sceneWindowsOK').bootstrapToggle('on');
                 }
+                $('#sceneWebGLOK').bootstrapToggle();
+                if (response.data.sceneWebGLOK) {
+                $('#sceneWebGLOK').bootstrapToggle('on');
+                }
                 $('#scenePublicToggle').bootstrapToggle();
                 if (response.data.sceneShareWithPublic) {
                 $('#scenePublicToggle').bootstrapToggle('on');
@@ -16422,6 +16432,7 @@ function getAllPeople() {
                         let sceneIosOK = document.getElementById("sceneIosOK").checked;
                         let sceneAndroidOK = document.getElementById("sceneAndroidOK").checked;
                         let sceneWindowsOK = document.getElementById("sceneWindowsOK").checked;
+                        let sceneWebGLOK = document.getElementById("sceneWebGLOK").checked;
                         let sceneLocationTracking = document.getElementById("sceneLocationTracking").checked;
                         let sceneShowAds = document.getElementById("sceneShowAds").checked;
                         let sceneFlyable = document.getElementById("sceneFlyable").checked;
@@ -16657,6 +16668,7 @@ function getAllPeople() {
                             sceneIosOK: sceneIosOK,
                             sceneAndroidOK: sceneAndroidOK,
                             sceneWindowsOK: sceneWindowsOK,
+                            sceneWebGLOK: sceneWebGLOK,
                             sceneLocationTracking: sceneLocationTracking,
                             sceneShowAds: sceneShowAds,
                             sceneWebLinks: sceneWebLinks,
@@ -16910,6 +16922,9 @@ function getAllPeople() {
             var windows = arr[i].sceneWindowsOK ? 
             "<a href=\x22#\x22 class=\x22btn btn-success btn-circle \x22><i class=\x22fab fa-windows\x22></i></a>" :
             "<a href=\x22#\x22 class=\x22btn btn-danger btn-circle \x22><i class=\x22fab fa-windows\x22></i></a>";
+            var webgl = arr[i].sceneWebGLOK ? 
+            "<a href=\x22#\x22 class=\x22btn btn-success btn-circle \x22><i class=\x22fab fa-browser\x22></i></a>" :
+            "<a href=\x22#\x22 class=\x22btn btn-danger btn-circle \x22><i class=\x22fab fa-browser\x22></i></a>";
             tableBody = tableBody +
             "<tr>" +
             // "<td><button class=\x22btn btn-sm\x22 onclick=\x22getScene('" + arr[i]._id + "')\x22><i class=\x22far fa-edit\x22></i></button><a onclick=\x22getScene('" + arr[i]._id + "')\x22 href=\x22#\x22>" + arr[i].sceneTitle + "</a></td>" +
@@ -16920,7 +16935,7 @@ function getAllPeople() {
             "<td>" + arr[i].sceneStickyness + "</td>" +
             "<td>" + arr[i].sceneShareWithPublic + "</td>" +
             "<td>" + arr[i].sceneLastUpdate + "</td>" +
-            "<td>" + android + ios + windows + "</td>" +
+            "<td>" + android + ios + windows + webgl + "</td>" +
             "</tr>";
         }
         var tableFoot =  "</tbody>" +
@@ -17034,6 +17049,9 @@ function getAllPeople() {
             var windows = arr[i].sceneWindowsOK ? 
             "<a href=\x22#\x22 class=\x22btn btn-success btn-circle \x22><i class=\x22fab fa-windows\x22></i></a>" :
             "<a href=\x22#\x22 class=\x22btn btn-danger btn-circle \x22><i class=\x22fab fa-windows\x22></i></a>";
+            var webgl = arr[i].sceneWebGLOK ? 
+            "<a href=\x22#\x22 class=\x22btn btn-success btn-circle \x22><i class=\x22fab fa-windows\x22></i></a>" :
+            "<a href=\x22#\x22 class=\x22btn btn-danger btn-circle \x22><i class=\x22fab fa-windows\x22></i></a>";
             tableBody = tableBody +
             "<tr>" +
             selectButton +
@@ -17044,7 +17062,7 @@ function getAllPeople() {
             "<td>" + arr[i].sceneDomain + "</td>" +
             "<td>" + arr[i].sceneShareWithPublic + "</td>" +
             "<td>" + arr[i].sceneLastUpdate + "</td>" +
-            "<td>" + android + ios + windows + "</td>" +
+            "<td>" + android + ios + windows + webgl +"</td>" +
             "</tr>";
         }
         var tableFoot =  "</tbody>" +
@@ -17440,6 +17458,11 @@ function getAllPeople() {
                 const fileNameMo = fileNameM.replace(/,/g, '');
                 const fileNameMod = fileNameMo.toLowerCase();
                 console.log(currentFile.name +" vs "+ fileNameMod);
+                // const extension = fileNameMod.split('.').pop();
+                // const contentType = currentFile.type;
+                // if (extension == "glb") {
+                //     contentType = 'model/gltf-binary';
+                // }
                 const modifiedFile = Object.assign(
                 {},
                     currentFile,
@@ -17491,6 +17514,7 @@ function getAllPeople() {
                 url: data.url,
                 fields: data.fields,
                 headers: {
+                    // "Content-Type": file.type
                     "Content-Type": file.type
                     }
                 }

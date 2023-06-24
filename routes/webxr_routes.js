@@ -396,7 +396,7 @@ webxr_router.get('/:_id', function (req, res) {
     enviromentScript = ""; //for aframe env component
     
     // let aframeScriptVersion = "<script src=\x22https://aframe.io/releases/1.3.0/aframe.min.js\x22></script>";
-    let aframeScriptVersion = "<script src=\x22https://aframe.io/releases/1.4.1/aframe.min.js\x22></script>";
+    let aframeScriptVersion = "<script src=\x22https://aframe.io/releases/1.4.2/aframe.min.js\x22></script>";
     
     
     let surfaceScatterScript = "";

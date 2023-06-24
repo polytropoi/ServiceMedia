@@ -4425,7 +4425,10 @@ app.post('/process_staging_files', requiredAuthentication, function (req, res) {
                                 console.log("tryna copy glb to " + ck);
                                 (async () => {  
                                     try {
+                                        let metadata = {"Content-Type":"model/gltf-binary"};
+                                        // metadata.Content-Type = 'model/gltf-binary';
                                         if (minioClient) {
+                                            // minioClient.copyObject(targetBucket, ck, copySource, metadata, function(e, data) { //hrm dunno, needs testing
                                             minioClient.copyObject(targetBucket, ck, copySource, function(e, data) {
                                                 if (e) {
                                                     callback(e);
@@ -4437,7 +4440,8 @@ app.post('/process_staging_files', requiredAuthentication, function (req, res) {
                                                 
                                               });
                                         } else {
-                                            s3.copyObject({Bucket: targetBucket, CopySource: copySource, Key: ck}, function (err,data){
+                                            console.log("tryna copy with metadata" + JSON.stringify(metadata));
+                                            s3.copyObject({Bucket: targetBucket, CopySource: copySource, Key: ck, ContentType: 'model/gltf-binary', Metadata: metadata}, function (err,data){ //no workiie?
                                                 if (err) {
                                                     console.log("ERROR copyObject" + err);
                                                     callback(err);
@@ -5098,11 +5102,16 @@ app.post('/imagetarget_puturl/:_id/:image_id', requiredAuthentication, function 
 
 
 app.post('/stagingputurl/:_id', requiredAuthentication, function (req, res) {
-    console.log("tryna get a puturl for : " + req.body.uid + " contentTYpe : " + req.body.contentType);
+    
     var cType = req.body.contentType;
     // if (cType = "application/octet-stream") {
     //     cType = "binary/octet-stream";
     // }
+    // if (cType.includes("gltf")) {
+    //     console.log("tryna mod content type!");
+    //     cType = "model/gltf-binary";
+    // }
+    console.log("tryna get a puturl for : " + req.body.uid + " contentTYpe : " + cType);
     var u_id = ObjectID(req.params._id);
     db.users.findOne({"_id": u_id}, function (err, user) {
         if (err || !user) {
@@ -5118,6 +5127,7 @@ app.post('/stagingputurl/:_id', requiredAuthentication, function (req, res) {
                 // ContentType: 'text/csv',
                 Body: '',
                 ContentType: cType,
+            
                 // Key: 'staging/' + u_id + '/' + timestamp + '_' + req.body.filename,
                 Key: req.body.filename,
                 Expires: 100
@@ -5146,6 +5156,9 @@ app.post('/stagingputurl/:_id', requiredAuthentication, function (req, res) {
                                 headers: {
                                     'Access-Control-Allow-Origin': '*', // Required for CORS support to work
                                 },
+                                // metadata: {
+                                //     'Content-Type': cType
+                                // },
                                 body: "",
                                 // body: JSON.stringify({
                                 //   message: `Url successfully created`,
@@ -5181,6 +5194,9 @@ app.post('/stagingputurl/:_id', requiredAuthentication, function (req, res) {
                                 headers: {
                                     'Access-Control-Allow-Origin': '*', // Required for CORS support to work
                                 },
+                                // metadata: {
+                                //     'Content-Type': cType
+                                // },
                                 body: "",
                                 // body: JSON.stringify({
                                 //   message: `Url successfully created`,
@@ -12304,7 +12320,7 @@ app.get('/uscenes/:_id',  requiredAuthentication, usercheck, function (req, res)
     if (req.session.user.authLevel.toLowerCase().includes("domain")) { //domain admins can see everything
         query = {};
     }
-    db.scenes.find(query, { sceneTitle: 1, short_id: 1, sceneLastUpdate: 1, sceneDomain: 1, userName: 1, user_id: 1, sceneAndroidOK: 1, sceneIosOK: 1, sceneWindowsOK: 1, sceneShareWithPublic: 1 },  function(err, scenes) {
+    db.scenes.find(query, { sceneTitle: 1, short_id: 1, sceneLastUpdate: 1, sceneDomain: 1, userName: 1, user_id: 1, sceneAndroidOK: 1, sceneIosOK: 1, sceneWindowsOK: 1, sceneWebGLOK: 1, sceneShareWithPublic: 1 },  function(err, scenes) {
         if (err || !scenes) {
             console.log("cain't get no scenes... " + err);
             res.send("noscenes");
@@ -12318,7 +12334,7 @@ app.get('/uscenes/:appid',  requiredAuthentication, usercheck, function (req, re
     var o_id = ObjectID(req.params.appid);
     var scenesResponse = {};
 
-    db.scenes.find({ "user_id" : req.params._id}, { sceneTitle: 1, short_id: 1, sceneLastUpdate: 1, sceneDomain: 1, userName: 1, user_id: 1, sceneAndroidOK: 1, sceneIosOK: 1, sceneWindowsOK: 1, sceneShareWithPublic: 1 },  function(err, scenes) {
+    db.scenes.find({ "user_id" : req.params._id}, { sceneTitle: 1, short_id: 1, sceneLastUpdate: 1, sceneDomain: 1, userName: 1, user_id: 1, sceneAndroidOK: 1, sceneIosOK: 1, sceneWindowsOK: 1, sceneWebGLOK: 1,  sceneShareWithPublic: 1 },  function(err, scenes) {
         if (err || !scenes) {
             console.log("cain't get no scenes... " + err);
             res.send("noscenes");
@@ -12331,7 +12347,7 @@ app.post('/uscenes/',  requiredAuthentication, usercheck, function (req, res) { 
     console.log("tryna get user scenes: ",req.params._id);
     var o_id = ObjectID(req.params._id);
     var scenesResponse = {};
-    db.scenes.find({ "sceneAppName" : req.body.appName}, { sceneTitle: 1, short_id: 1, sceneLastUpdate: 1, userName: 1, user_id: 1, sceneAndroidOK: 1, sceneIosOK: 1, sceneWindowsOK: 1, sceneShareWithPublic: 1 },  function(err, scenes) {
+    db.scenes.find({ "sceneAppName" : req.body.appName}, { sceneTitle: 1, short_id: 1, sceneLastUpdate: 1, userName: 1, user_id: 1, sceneAndroidOK: 1, sceneIosOK: 1, sceneWindowsOK: 1, sceneWebGLOK: 1, sceneShareWithPublic: 1 },  function(err, scenes) {
         if (err || !scenes) {
             console.log("cain't get no scenes... " + err);
             res.send("noscenes");
@@ -12345,7 +12361,7 @@ app.post('/appscenes/',  requiredAuthentication, function (req, res) { //get sce
 
     // var o_id = ObjectID(req.params.appid);
     // var scenesResponse = {};
-    db.scenes.find({ "sceneDomain" : req.body.sceneDomain}, { sceneTitle: 1, short_id: 1, sceneLastUpdate: 1, userName: 1, user_id: 1, sceneAndroidOK: 1, sceneIosOK: 1, sceneWindowsOK: 1, sceneShareWithPublic: 1, sceneStickyness: 1 },  function(err, scenes) {
+    db.scenes.find({ "sceneDomain" : req.body.sceneDomain}, { sceneTitle: 1, short_id: 1, sceneLastUpdate: 1, userName: 1, user_id: 1, sceneAndroidOK: 1, sceneIosOK: 1, sceneWindowsOK: 1, sceneWebGLOK: 1, sceneShareWithPublic: 1, sceneStickyness: 1 },  function(err, scenes) {
         if (err || !scenes) {
             console.log("cain't get no scenes... " + err);
             res.send("noscenes");
@@ -12968,6 +12984,7 @@ app.get('/availablescenes/:_id',  requiredAuthentication, function (req, res) {
                                     sceneAndroidOK: scene.sceneAndroidOK,
                                     sceneIosOK: scene.sceneIosOK,
                                     sceneWindowsOK: scene.sceneWindowsOK,
+                                    sceneWebGLOK: scene.sceneWebGLOK,
                                     sceneStatus: scene.sceneShareWithPublic ? "public" : "private",
                                     sceneOwner: scene.userName ? "" : scene.userName,
                                     scenePostcardQuarter: urlQuarter,
@@ -13129,6 +13146,7 @@ app.get('/available_user_scenes/:user_id', requiredAuthentication, function(req,
                                                 sceneAndroidOK: scene.sceneAndroidOK,
                                                 sceneIosOK: scene.sceneIosOK,
                                                 sceneWindowsOK: scene.sceneWindowsOK,
+                                                sceneWebGLOK: scene.sceneWebGLOK,
                                                 sceneStatus: scene.sceneShareWithPublic ? "public" : "private",
                                                 sceneOwner: scene.userName ? "" : scene.userName,
                                                 scenePostcardQuarter: urlQuarter,
@@ -13244,13 +13262,14 @@ app.get('/available_domain_scenes/:domain',  function (req, res) { //public scen
                                                     sceneAndroidOK: scene.sceneAndroidOK,
                                                     sceneIosOK: scene.sceneIosOK,
                                                     sceneWindowsOK: scene.sceneWindowsOK,
+                                                    sceneWebGLOK: scene.sceneWebGLOK,
                                                     sceneStatus: scene.sceneShareWithPublic ? "public" : "private",
                                                     sceneOwner: scene.userName ? "" : scene.userName,
                                                     scenePostcardQuarter: "nilch",
-                                                    scenePostcardHalf: "nilch",
-                                                    sceneAndroidOK: scene.sceneAndroidOK,
-                                                    sceneIosOK: scene.sceneIosOK,
-                                                    sceneWindowsOK: scene.sceneWindowsOK
+                                                    scenePostcardHalf: "nilch"
+                                                    // sceneAndroidOK: scene.sceneAndroidOK,
+                                                    // sceneIosOK: scene.sceneIosOK,
+                                                    // sceneWindowsOK: scene.sceneWindowsOK
                                                 };
                                                 callback(null, availableScene);
                                             } else {
@@ -13287,7 +13306,7 @@ app.get('/available_domain_scenes/:domain',  function (req, res) { //public scen
                                                 sceneCategory: scene.sceneCategory,
                                                 sceneSource: scene.sceneSource,
                                                 sceneTags: scene.sceneTags,
-                                                // sceneWebGLOK: scene.sceneWebGLOK,
+                                                sceneWebGLOK: scene.sceneWebGLOK,
                                                 sceneAndroidOK: scene.sceneAndroidOK,
                                                 sceneIosOK: scene.sceneIosOK,
                                                 sceneWindowsOK: scene.sceneWindowsOK,
@@ -13309,7 +13328,7 @@ app.get('/available_domain_scenes/:domain',  function (req, res) { //public scen
                                             sceneLastUpdate: scene.sceneLastUpdate,
                                             sceneDescription: scene.sceneDescription,
                                             sceneKeynote: scene.sceneKeynote,
-                                            // sceneWebGLOK: scene.sceneWebGLOK,
+                                            sceneWebGLOK: scene.sceneWebGLOK,
                                             sceneAndroidOK: scene.sceneAndroidOK,
                                             sceneIosOK: scene.sceneIosOK,
                                             sceneWindowsOK: scene.sceneWindowsOK,
@@ -13411,6 +13430,7 @@ app.get('/available_domain_scenes/:domain/:user_id/:platform_id',  requiredAuthe
         },
         function (calllback) {
             var platformString = "";
+
             if (req.params.platform_id == "1") {
                 platformString = "sceneWindowsOK";
             } else if (req.params.platform_id == "2") {
@@ -13425,8 +13445,8 @@ app.get('/available_domain_scenes/:domain/:user_id/:platform_id',  requiredAuthe
                 query = {$and: [{ [platformString]: true}, {sceneShareWithPublic: true }, {sceneStickyness: { $lt: 4 }}]};
                 // if (req.params.user_id != null && req.params.user_id.Length > 8)
                 // query = {$or: [{ "user_id": req.params.user_id}, {sceneShareWithPublic: true }]}; //also all scenes with this user_id
-            } else if (req.params.platform_id == "4") { // return all for now..
-                query = {$and: [{ "sceneDomain": req.params.domain}, {sceneShareWithPublic: true }]};
+    // } else if (req.params.platform_id == "4") { // return all for now..
+    //     query = {$and: [{ "sceneDomain": req.params.domain}, {sceneShareWithPublic: true }]};
                 // if (req.params.user_id != null && req.params.user_id.Length > 8)
                 // query = {$or: [{ "sceneDomain": req.params.domain}, { "user_id": req.params.user_id}, {sceneShareWithPublic: true }]};
             } else {
@@ -13472,6 +13492,7 @@ app.get('/available_domain_scenes/:domain/:user_id/:platform_id',  requiredAuthe
                                                         sceneAndroidOK: scene.sceneAndroidOK,
                                                         sceneIosOK: scene.sceneIosOK,
                                                         sceneWindowsOK: scene.sceneWindowsOK,
+                                                        sceneWebGLOK: scene.sceneWebGLOK,
                                                         sceneStatus: scene.sceneShareWithPublic ? "public" : "private",
                                                         sceneOwner: scene.userName ? "" : scene.userName,
                                                         scenePostcardQuarter: "nilch",
@@ -13508,6 +13529,7 @@ app.get('/available_domain_scenes/:domain/:user_id/:platform_id',  requiredAuthe
                                                         sceneAndroidOK: scene.sceneAndroidOK,
                                                         sceneIosOK: scene.sceneIosOK,
                                                         sceneWindowsOK: scene.sceneWindowsOK,
+                                                        sceneWebGLOK: scene.sceneWebGLOK,
                                                         sceneStatus: scene.sceneShareWithPublic ? "public" : "private",
                                                         sceneOwner: scene.userName ? "" : scene.userName,
                                                         scenePostcardQuarter: urlQuarter,
@@ -13529,6 +13551,7 @@ app.get('/available_domain_scenes/:domain/:user_id/:platform_id',  requiredAuthe
                                                 sceneAndroidOK: scene.sceneAndroidOK,
                                                 sceneIosOK: scene.sceneIosOK,
                                                 sceneWindowsOK: scene.sceneWindowsOK,
+                                                sceneWebGLOK: scene.sceneWebGLOK,
                                                 sceneStatus: scene.sceneShareWithPublic ? "public" : "private",
                                                 sceneOwner: scene.userName ? "" : scene.userName,
                                                 scenePostcardQuarter: "nilch",
@@ -14502,6 +14525,7 @@ app.post('/update_scene/:_id', requiredAuthentication, function (req, res) {
                 sceneAndroidOK : req.body.sceneAndroidOK != null ? req.body.sceneAndroidOK : false,
                 sceneIosOK : req.body.sceneIosOK != null ? req.body.sceneIosOK : false,
                 sceneWindowsOK : req.body.sceneWindowsOK != null ? req.body.sceneWindowsOK : false,
+                sceneWebGLOK : req.body.sceneWebGLOK != null ? req.body.sceneWebGLOK : false,
                 sceneLocationTracking : req.body.sceneLocationTracking != null ? req.body.sceneLocationTracking : false,
                 sceneShowAds : req.body.sceneShowAds != null ? req.body.sceneShowAds : false,
                 sceneShareWithPublic : req.body.sceneShareWithPublic != null ? req.body.sceneShareWithPublic : false,
