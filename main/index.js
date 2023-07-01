@@ -12930,7 +12930,7 @@ function getAllPeople() {
                     "<a class=\x22btn btn-primary\x22 href=\x22index.html?type=bulkup\x22><i class=\x22fas fa-file-upload\x22></i> Upload </a>" +
                     "<a class=\x22btn btn-info\x22 href=\x22index.html?type=pictures&mode=postselect&parent=scene&iid="+response.data._id+"\x22><i class=\x22fas fa-hand-pointer\x22></i> Select </a>" +
                     "<button class=\x22btn btn-danger clearScenePostcards\x22><i class=\x22fas fa-broom\x22></i> Clear </button></div>";
-                    vidButtons = " <div style=\x22margin: 0px 10px;\x22  class=\x22btn-group float-right\x22 role=\x22group\x22 aria-label=\x22button group\x22>" +
+                    vidButtons = "<label for=\x22scenePicButtons\x22>Scene Videos </label><div style=\x22margin: 0px 10px;\x22  class=\x22btn-group float-right\x22 role=\x22group\x22 aria-label=\x22button group\x22>" +
                     "<a class=\x22btn btn-primary\x22 href=\x22index.html?type=bulkup\x22><i class=\x22fas fa-file-upload\x22></i> Upload </a>" +
                     "<a class=\x22btn btn-info\x22 href=\x22index.html?type=video&mode=select&parent=scene&iid="+response.data._id+"\x22><i class=\x22fas fa-hand-pointer\x22></i> Select </a>" +
                     "<a class=\x22btn btn-success\x22 href=\x22index.html?type=groups&mode=vidgroup&parent=scene&iid="+response.data._id+"\x22><i class=\x22fas fa-hand-pointer\x22></i> Group </a>" +
@@ -12959,7 +12959,7 @@ function getAllPeople() {
                     "<a class=\x22btn btn-primary\x22 href=\x22index.html?type=objex\x22><i class=\x22fas fa-file-upload\x22></i> New </a>" +
                     "<a class=\x22btn btn-info\x22 href=\x22index.html?type=objex&mode=select&parent=scene&iid="+response.data._id+"\x22><i class=\x22fas fa-hand-pointer\x22></i> Select </a>" +
                     "<a class=\x22btn btn-success\x22 href=\x22index.html?type=groups&mode=objgroup&parent=scene&iid="+response.data._id+"\x22><i class=\x22fas fa-hand-pointer\x22></i> Group </a>" +
-                    "<button class=\x22btn btn-danger\x22 onclick=\x22ClearScenePostcards()\x22><i class=\x22fas fa-broom\x22></i> Clear </button></div>";
+                    "<button class=\x22btn btn-danger\x22 onclick=\x22ClearSceneObjects()\x22><i class=\x22fas fa-broom\x22></i> Clear </button></div>";
                     locationButtons = " <div style=\x22margin: 0px 10px;\x22  class=\x22btn-group float-right\x22 role=\x22group\x22 aria-label=\x22button group\x22>" +
                     // "<a class=\x22btn btn-primary\x22 href=\x22index.html?type=locations\x22><i class=\x22fas fa-file-upload\x22></i> New </a>" +
                     "<a class=\x22btn btn-primary newSceneLocation\x22 href=\x22#\x22><i class=\x22fas fa-file-upload\x22></i> New </a>" +
@@ -13380,8 +13380,9 @@ function getAllPeople() {
                 "<div style=\x22display:none;\x22 id=\x22videoSection\x22>" +
                             "<div class=\x22col form-group\x22>" +
                             vidButtons +
-                            vidGroupButtons +
                             "</div>" + 
+                            // vidGroupButtons +
+                            
                             "<div class=\x22col form-group\x22>" +
                             "</div>" +     
                             "<div class=\x22col form-group\x22>" +

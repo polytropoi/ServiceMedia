@@ -15618,13 +15618,15 @@ app.get('/scene/:_id/:platform/:version', function (req, res) { //called from ap
     sceneResponse.pictures = [];
     sceneResponse.postcards = [];
     let sceneModelLocations = [];
+    // let sceneVideoStreamURLs = [];
     var gltfObjects = [];
     sceneResponse.sceneBundleUrl = "";
     var versionID = req.params.version;
+    
     async.waterfall([
 
             function (callback) {
-//                    var o_id = ObjectID(reqstring);
+
                 db.scenes.find({$or: [{ sceneTitle: reqstring },
                         { short_id : reqstring },
                         { _id : reqstring}]},
@@ -15758,10 +15760,21 @@ app.get('/scene/:_id/:platform/:version', function (req, res) { //called from ap
                 }
             },
 
-            function (callback) { //TODO jack in version part of path~
+            // function (callback) { 
+
+            //     if (sceneResponse.sceneVideoStreamUrls) {
+            //         var urlScene = s3.getSignedUrl('getObject', {Bucket: 'mvmv.us', Key: versionID + '/' + 'scenes_' + platformType + '/' + sceneResponse.sceneEnvironment.name, Expires: 6000});
+            //         sceneResponse.sceneEnvironment.sceneBundleUrl = urlScene;
+            //         console.log(urlScene);
+            //         callback(null);
+            //     } else {
+            //         callback(null);
+            //     }
+            // },
+
+            function (callback) { //TODO jack in version part of path~ AND USE .ENV values!
 
                 if (sceneResponse.sceneUseEnvironment) {
-//                    var urlScene = s3.getSignedUrl('getObject', {Bucket: 'mvmv.us', Key: versionID + '/' + 'scenes_' + platformType + '/' + sceneResponse.sceneEnvironment.name + '_' + platformType + '.unity3d', Expires: 6000});
                     var urlScene = s3.getSignedUrl('getObject', {Bucket: 'mvmv.us', Key: versionID + '/' + 'scenes_' + platformType + '/' + sceneResponse.sceneEnvironment.name, Expires: 6000});
                     sceneResponse.sceneEnvironment.sceneBundleUrl = urlScene;
                     console.log(urlScene);
@@ -15816,7 +15829,6 @@ app.get('/scene/:_id/:platform/:version', function (req, res) { //called from ap
                     var urlMp3 = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + audio_items[i].userID + "/audio/" + audio_items[i]._id + "." + mp3Name, Expires: 60000});
                     var urlOgg = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + audio_items[i].userID + "/audio/" + audio_items[i]._id + "." + oggName, Expires: 60000});
                     var urlPng = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + audio_items[i].userID + "/audio/" + audio_items[i]._id + "." + pngName, Expires: 60000});
-//                            audio_items.URLmp3 = urlMp3; //jack in teh signed urls into the object array
                     audio_items[i].URLmp3 = urlMp3; //jack in teh signed urls into the object array
                     audio_items[i].URLogg = urlOgg;
                     audio_items[i].URLpng = urlPng;
@@ -15831,7 +15843,7 @@ app.get('/scene/:_id/:platform/:version', function (req, res) { //called from ap
                 //   console.log('tryna send ' + audio_items);
                 audioResponse = audio_items;
                 sceneResponse.audio = audioResponse;
-//                        console.log("audio", audioResponse);
+
                 callback(null, audio_items);
             },
 
@@ -15896,18 +15908,18 @@ app.get('/scene/:_id/:platform/:version', function (req, res) { //called from ap
                         picture_items[i].urlOriginal = urlOriginal;
                         let cubeMapAsset = [];
                         if (sceneResponse.sceneUseDynCubeMap != null && sceneResponse.sceneUseDynCubeMap) {
-                            let path1 = s3.getSignedUrl('getObject', {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: "users/"+picture_items[i].userID+"/cubemaps/"+picture_items[i]._id+"_px.jpg", Expires: 6000});  
-                            let path2 = s3.getSignedUrl('getObject', {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: "users/"+picture_items[i].userID+"/cubemaps/"+picture_items[i]._id+"_nx.jpg", Expires: 6000});  
-                            let path3 = s3.getSignedUrl('getObject', {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: "users/"+picture_items[i].userID+"/cubemaps/"+picture_items[i]._id+"_py.jpg", Expires: 6000});  
-                            let path4 = s3.getSignedUrl('getObject', {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: "users/"+picture_items[i].userID+"/cubemaps/"+picture_items[i]._id+"_ny.jpg", Expires: 6000});  
-                            let path5 = s3.getSignedUrl('getObject', {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: "users/"+picture_items[i].userID+"/cubemaps/"+picture_items[i]._id+"_pz.jpg", Expires: 6000});  
-                            let path6 = s3.getSignedUrl('getObject', {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: "users/"+picture_items[i].userID+"/cubemaps/"+picture_items[i]._id+"_nz.jpg", Expires: 6000});                                    
-                            cubeMapAsset.push(path1);
-                            cubeMapAsset.push(path2);
-                            cubeMapAsset.push(path3);
-                            cubeMapAsset.push(path4);
-                            cubeMapAsset.push(path5);
-                            cubeMapAsset.push(path6);
+                                // let path1 = s3.getSignedUrl('getObject', {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: "users/"+picture_items[i].userID+"/cubemaps/"+picture_items[i]._id+"_px.jpg", Expires: 6000});  
+                                // let path2 = s3.getSignedUrl('getObject', {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: "users/"+picture_items[i].userID+"/cubemaps/"+picture_items[i]._id+"_nx.jpg", Expires: 6000});  
+                                // let path3 = s3.getSignedUrl('getObject', {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: "users/"+picture_items[i].userID+"/cubemaps/"+picture_items[i]._id+"_py.jpg", Expires: 6000});  
+                                // let path4 = s3.getSignedUrl('getObject', {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: "users/"+picture_items[i].userID+"/cubemaps/"+picture_items[i]._id+"_ny.jpg", Expires: 6000});  
+                                // let path5 = s3.getSignedUrl('getObject', {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: "users/"+picture_items[i].userID+"/cubemaps/"+picture_items[i]._id+"_pz.jpg", Expires: 6000});  
+                                // let path6 = s3.getSignedUrl('getObject', {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: "users/"+picture_items[i].userID+"/cubemaps/"+picture_items[i]._id+"_nz.jpg", Expires: 6000});                                    
+                                // cubeMapAsset.push(path1);
+                                // cubeMapAsset.push(path2);
+                                // cubeMapAsset.push(path3);
+                                // cubeMapAsset.push(path4);
+                                // cubeMapAsset.push(path5);
+                                // cubeMapAsset.push(path6);
                             sceneResponse.cubeMapAsset = cubeMapAsset;
                         }
                     }
@@ -16148,7 +16160,7 @@ app.get('/scene/:_id/:platform/:version', function (req, res) { //called from ap
             console.log("waterfall done: " + result);
         }
     );
-});
+}); //end UNITY
 
 
 

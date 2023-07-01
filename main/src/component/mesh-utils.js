@@ -416,7 +416,7 @@ AFRAME.registerComponent('spawned_object', { //cooked on the fly...
       // this.mesh = this.el.object3D('mesh');
         // if (this.model == "spawned") {
           this.el.setAttribute('ammo-body', {type: 'dynamic', mass: 1, gravity: '0 0 0', linearSleepingThreshold: 0.1, emitCollisionEvents: this.isTrigger});
-          this.el.body.restitution = 10;
+          // this.el.body.restitution = 10;
           console.log("tryna load spawned object body");
         // }
       // }
