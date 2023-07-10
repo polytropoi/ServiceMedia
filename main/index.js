@@ -12179,9 +12179,7 @@ function getAllPeople() {
     }
 
     function PlayHLSVideo (elID, url) {
-
-
-    
+   
             var video = document.getElementById(elID);
             if (video != null && Hls.isSupported()) {
                 var hls = new Hls({
@@ -12789,11 +12787,11 @@ function getAllPeople() {
                 console.log("tryna fetch vidstreams " + JSON.stringify(response.data.sceneVideoStreamUrls));
                 for (let i = 0; i < sceneVideoStreamUrls.length; i++) {
                     let vindex = "videostream_" + (i * 100).toString();
-                    videoStreams = videoStreams +
-                    "<div class=\x22card\x22 style=\x22width:320px;\x22>" +
-                    "<video id=\x22" + vindex + "\x22 width=\x22320\x22 height=\x22240\x22 controls>"+
-                    "</video><button id=\x22button_"+vindex+"\x22 onclick=\x22PlayHLSVideo('"+vindex+"','" + sceneVideoStreamUrls[i] + "')\x22 type=\x22button\x22 class=\x22badge badge-sm badge-success float-right\x22>play</button></div>";
-
+                        videoStreams = videoStreams +
+                        "<div class=\x22card\x22 style=\x22width:320px;\x22>" +
+                        "<video id=\x22" + vindex + "\x22 width=\x22320\x22 height=\x22240\x22 controls>" +
+                        "</video><button id=\x22button_"+vindex+"\x22 onclick=\x22PlayHLSVideo('"+vindex+"','" + sceneVideoStreamUrls[i] + "')\x22 type=\x22button\x22 class=\x22badge badge-sm badge-success\x22>play</button>"+
+                        "<button id=\x22button_"+vindex+"_rm\x22 type=\x22button\x22 class=\x22remHLSVid badge badge-sm badge-danger\x22>remove</button></div>";
                     }
                     
                 }  
@@ -13381,7 +13379,7 @@ function getAllPeople() {
                             "<div class=\x22col form-group\x22>" +
                             vidButtons +
                             "</div>" + 
-                            // vidGroupButtons +
+                            vidGroupButtons +
                             
                             "<div class=\x22col form-group\x22>" +
                             "</div>" +     
@@ -15600,17 +15598,12 @@ function getAllPeople() {
                         $("#tagDisplay").html(html);
                     }); 
 
-                    // $(document).on('click','.remSceneVid',function(e){ //redundant
-                    //     e.preventDefault();  
-                    //     console.log("tryna remove pictureGroup " + this.id);
-                    //     for( var i = 0; i < pictures.length; i++){ 
-                    //         if ( pictures[i] === this.id) {
-                    //             pictures.splice(i, 1); 
-                    //         }
-                    //     }
-                    //     const id = "#" + this.id;
-                    //     $(id).parent().parent().hide();
-                    // });  
+                    $(document).on('click','.remHLSVid',function(e){ 
+                        e.preventDefault();  
+                        console.log("tryna remove HLS videos " + this.id);
+                        sceneVideoStreamUrls.length = 0;
+                        
+                    });  
                     $(document).on('click','.refWeblink',function(e){
                         e.preventDefault();  
                         console.log("tryna refresh weblink " + this.id);
