@@ -359,9 +359,9 @@ webxr_router.get('/:_id', function (req, res) {
     // let wasd = "wasd-controls=\x22fly: false; acceleration: 35; constrainToNavMesh: true;\x22";
     let wasd = "";
     //TODO use process env for google analytics
-    let googleAnalytics = "<!-- Global site tag (gtag.js) - Google Analytics --><script async src=\x22https://www.googletagmanager.com/gtag/js?id=UA-163893846-1\x22></script>"+
-        "<script>window.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());gtag('config', 'UA-163893846-1');"+
-        "</script>";
+    // let googleAnalytics = "<!-- Global site tag (gtag.js) - Google Analytics --><script async src=\x22https://www.googletagmanager.com/gtag/js?id=UA-163893846-1\x22></script>"+
+    //     "<script>window.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());gtag('config', 'UA-163893846-1');"+
+    //     "</script>";
         
     let googleAdSense = "<script data-ad-client=\x22ca-pub-5450402133525063\x22 async src=\x22https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js\x22></script>";   
     // let metamaskScript = "";
@@ -3240,7 +3240,12 @@ webxr_router.get('/:_id', function (req, res) {
                                     }
 
                                     var buff = Buffer.from(JSON.stringify(requestedVideoGroups)).toString("base64");
-                                    videoGroupsEntity = "<a-entity video_groups_data id=\x22videoGroupsData\x22 data-video-groups='"+buff+"'></a-entity>"; 
+                                    if (sceneResponse.sceneWebType == "Video Landing") {
+                                        videoGroupsEntity = "<div id=\x22videoGroupsData\x22 data-video-groups='"+buff+"'></div>"; 
+                                    } else {
+                                        videoGroupsEntity = "<a-entity video_groups_data id=\x22videoGroupsData\x22 data-video-groups='"+buff+"'></a-entity>"; 
+                                    }
+                                   
                                     hlsScript = "<script src=\x22../main/js/hls.min.js\x22></script>"; //v 1.0.6 client hls player ref
                                     callback(null);
                                 }
@@ -3823,6 +3828,7 @@ webxr_router.get('/:_id', function (req, res) {
                     let settings = {};  //TODO move this lower down? 
 
                     settings._id = sceneResponse._id;
+                    settings.sceneType = sceneResponse.sceneWebType;
                     settings.sceneTitle = sceneResponse.sceneTitle;
                     settings.sceneKeynote = sceneResponse.sceneKeynote;
                     settings.sceneDescription = sceneResponse.sceneDescription;
@@ -3993,7 +3999,7 @@ webxr_router.get('/:_id', function (req, res) {
                             "<meta charset=\x22UTF-8\x22>"+
                             "<meta name=\x22google\x22 content=\x22notranslate\x22>" +
                             "<meta http-equiv=\x22Content-Language\x22 content=\x22en\x22></meta>" +
-                            googleAnalytics +
+                            // googleAnalytics +
                             
                             "<link rel=\x22icon\x22 href=\x22data:,\x22></link>"+
                             "<meta charset='utf-8'/>" +
@@ -4045,6 +4051,7 @@ webxr_router.get('/:_id', function (req, res) {
                             audioSliders +
                             canvasOverlay +
                             dialogButton +
+                           
                             attributionsTextEntity +
                             // "<div id=\x22sceneGreeting\x22 style=\x22z-index: -20;\x22>"+sceneGreeting+"</div>"+
                             // "<div id=\x22sceneQuest\x22 style=\x22z-index: -20;\x22>"+sceneQuest+"</div>"+
@@ -4061,9 +4068,81 @@ webxr_router.get('/:_id', function (req, res) {
 
                         htmltext = sceneTextItemData;
                         console.log("Tryna send html from text itme " + htmltext);
-
-                        
                     
+                    } else if (sceneResponse.sceneWebType == "Video Landing") {
+                        // if (!sceneGreeting || !sceneGreeting.length) {
+                        //     sceneGreeting = "Welcome!";
+                        // } 
+
+                        htmltext = "<!DOCTYPE html>\n" +
+                        "<head> " +
+                        "<meta name=\x22viewport\x22 content=\x22width=device-width, initial-scale=1\x22 />"+
+                        "<html lang=\x22en\x22 xml:lang=\x22en\x22 xmlns= \x22http://www.w3.org/1999/xhtml\x22>"+
+                        "<meta charset=\x22UTF-8\x22>"+
+                        "<meta name=\x22google\x22 content=\x22notranslate\x22>" +
+                        "<meta http-equiv=\x22Content-Language\x22 content=\x22en\x22></meta>" +
+                        // googleAnalytics +
+                        
+                        "<link rel=\x22icon\x22 href=\x22data:,\x22></link>"+
+                        "<meta charset='utf-8'/>" +
+                        "<meta name='viewport' content='width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0, shrink-to-fit=no'/>" +
+                        "<meta property='og:url' content='" + process.env.ROOT_HOST + "/webxr/" + sceneResponse.short_id + "' /> " +
+                        "<meta property='og:type' content='website' /> " +
+                        // "<meta property='og:image' content='" + postcard1 + "' /> " +
+                        "<meta property='og:image' content='" + postcard1 + "' /> " +
+                        "<meta property='og:image:height' content='1024' /> " +
+                        "<meta property='og:image:width' content='1024' /> " +
+                        "<meta property='og:title' content='" + sceneResponse.sceneTitle + "' /> " +
+                        "<meta property='og:description' content='" + sceneResponse.sceneDescription + "' /> " +
+                        "<meta property='name' content='modelviewer' /> " +
+                        "<title>" + sceneResponse.sceneTitle + "</title>" +
+                        "<meta name='description' content='" + sceneResponse.sceneDescription + "'/>" +
+                        // "<meta name=\x22monetization\x22 content=\x22"+process.env.COIL_PAYMENT_POINTER+"\x22>" +
+                        "<meta name=\x22mobile-web-app-capable\x22 content=\x22yes\x22>" +
+                        "<meta name=\x22apple-mobile-web-app-capable\x22 content=\x22yes\x22>" +                        
+                        "<link href=\x22../main/vendor/fontawesome-free/css/all.css\x22 rel=\x22stylesheet\x22 type=\x22text/css\x22>" +
+                        "<link href=\x22/css/webxr.css\x22 rel=\x22stylesheet\x22 type=\x22text/css\x22>" + 
+                       
+                        "<script src=\x22/main/vendor/jquery/jquery.min.js\x22></script>" +
+                        "<script src=\x22../main/js/dialogs.js\x22></script>" +
+                        
+                        "<script src=\x22/connect/connect.js\x22 defer=\x22defer\x22></script>" +
+                       
+                        "</head>\n" +
+                        "<body bgcolor=\x22"+sceneResponse.sceneColor1+"\x22>\n" +
+                        "<div class=\x22avatarName\x22 id="+avatarName+"></div>"+
+                        "<div id=\x22token\x22 data-token=\x22"+token+"\x22></div>\n"+
+                        settingsData +
+                        // aframeScriptVersion + 
+                        // extraScripts + 
+                        // contentUtils +
+                        hlsScript +
+                        // videoEntity +
+                        videoGroupsEntity +
+                        "<center><div><br><br><div class=\x22header\x22>"+sceneResponse.sceneGreeting+ " " + sceneResponse.sceneQuest+"</div><video controls height='600' id='video'></video>"+
+                        "<div id=\x22sceneGreeting\x22 class=\x22linkfooter\x22>"+
+                        "<h4>Immersive Links:</h4><br>"+
+                        "<a href=\x22https://servicemedia.net/webxr/"+ sceneResponse.sceneNextScene + "\x22>WebXR link</a> | "+
+                        "<a href=\x22http://smxr.net/index.html?scene="+ sceneResponse.sceneNextScene + "\x22>Unity Web link</a> | "+
+                        "<a href=\x22https://servicemedia.net/webxr/"+ sceneResponse.sceneNextScene + "\x22>App link</a>"+
+                        // sceneResponse.sceneGreeting+ " " + sceneResponse.sceneQuest+"</div>" +
+                        // "<div id=\x22sceneQuest\x22 class=\x22linkfooter\x22 style=\x22z-index: -20;\x22>"+sceneResponse.sceneQuest+"</div>" +
+                        "</div></center>"+
+                        audioSliders +
+                        canvasOverlay +
+                        dialogButton +
+                        // "<div id=\x22sceneGreeting\x22 class=\x22linkfooter\x22 style=\x22z-index: -20;\x22>"+sceneResponse.sceneGreeting+"</div>" +
+                        // "<div id=\x22sceneQuest\x22 class=\x22linkfooter\x22 style=\x22z-index: -20;\x22>"+sceneResponse.sceneQuest+"</div>" +
+                        "<div id=\x22theModal\x22 class=\x22modal\x22><div id=\x22modalContent\x22 class=\x22modal-content\x22></div>";
+                        attributionsTextEntity +
+                       
+                        "<div class=\x22smallfont\x22><span id=\x22users\x22></span></div>"+ 
+                        "</body>\n" +
+                        socketScripts +
+                        // "<script>InitSceneHooks(\x22Model Viewer\x22)</script>";
+                        "</html>";
+                        console.log("Tryna do a Video Landing scene");
+
                     } else if (sceneResponse.sceneWebType == "AR Image Tracking") { //aframe plus mindar
                         // dialogButton = "";
                         let extraScripts = "";
@@ -4121,7 +4200,7 @@ webxr_router.get('/:_id', function (req, res) {
                         "<meta charset=\x22UTF-8\x22>"+
                         "<meta name=\x22google\x22 content=\x22notranslate\x22>" +
                         "<meta http-equiv=\x22Content-Language\x22 content=\x22en\x22></meta>" +
-                        googleAnalytics +
+                        // googleAnalytics +
                         
                         "<link rel=\x22icon\x22 href=\x22data:,\x22></link>"+
                         "<meta charset='utf-8'/>" +
@@ -4343,7 +4422,7 @@ webxr_router.get('/:_id', function (req, res) {
                         "<html lang=\x22en\x22>"+
                         "<head> " +
                         "<meta charset=\x22utf-8\x22/>" +
-                        googleAnalytics +
+                        // googleAnalytics +
 
                         // googleAdSense + //naw, nm
                         // "<link rel=\x22icon\x22 href=\x22data:\x22></link>"+

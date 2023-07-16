@@ -19,29 +19,33 @@
         }
 
         var vid = getParameterByName("vid", window.location.href);
+        var src = getParameterByName("src", window.location.href);
+        if (src == '0') {
+            var video = document.getElementById('video');
+          if (Hls.isSupported()) {
+            var hls = new Hls({
+              debug: true,
+            });
+            hls.loadSource('/hls/' + vid);
+            hls.attachMedia(video);
+            hls.on(Hls.Events.MEDIA_ATTACHED, function () {
+              // video.muted = true;
+              video.play();
+            });
+          }
+          // hls.js is not supported on platforms that do not have Media Source Extensions (MSE) enabled.
+          // When the browser has built-in HLS support (check using `canPlayType`), we can provide an HLS manifest (i.e. .m3u8 URL) directly to the video element throught the `src` property.
+          // This is using the built-in support of the plain video element, without using hls.js.
+          else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+            video.src = '/hls/'+ vid;
+            video.addEventListener('canplay', function () {
+              video.play();
+            });
+          }
+        } else {
+          console.log("src is wha?");
+        }
 
-        var video = document.getElementById('video');
-        if (Hls.isSupported()) {
-          var hls = new Hls({
-            debug: true,
-          });
-          hls.loadSource('/hls/' + vid);
-          hls.attachMedia(video);
-          hls.on(Hls.Events.MEDIA_ATTACHED, function () {
-            // video.muted = true;
-            video.play();
-          });
-        }
-        // hls.js is not supported on platforms that do not have Media Source Extensions (MSE) enabled.
-        // When the browser has built-in HLS support (check using `canPlayType`), we can provide an HLS manifest (i.e. .m3u8 URL) directly to the video element throught the `src` property.
-        // This is using the built-in support of the plain video element, without using hls.js.
-        else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-          video.src = '/hls/'+ vid;
-          video.addEventListener('canplay', function () {
-            video.play();
-          });
-        }
-      
       </script>
 </body>
 </html>

@@ -97,22 +97,25 @@ $('a-entity').each(function() {  //external way of getting click duration for ph
 
 /////////////////// main onload function below, populate settings, etc.
 $(function() { 
+
    player = document.getElementById("player");
-   posRotReader = document.getElementById("player").components.get_pos_rot; 
-   if (player != null) {
-      player.setAttribute("player_mover", "init");
-   }
-   let modelDataEl = document.getElementById('sceneModels');
-   if (modelDataEl) {
-      let modelData = modelDataEl.getAttribute('data-models');
-      sceneModels = JSON.parse(atob(modelData)); //convert from base64
-      // console.log("sceneModels " + JSON.stringify(sceneModels));
-      for (let i = 0; i < sceneModels.length; i++) {
-         if (sceneModels[i].sourceText != undefined && sceneModels[i].sourceText != 'undefined' && sceneModels[i].sourceText != null && sceneModels[i].sourceText.length > 0) {
-            attributions.push("Name: " + sceneModels[i].name + " - Type: " + sceneModels[i].item_type + " - Source: " + sceneModels[i].sourceText);
-         }
-      }
-   }
+
+
+   // posRotReader = document.getElementById("player").components.get_pos_rot; 
+   // if (player != null) {
+   //    player.setAttribute("player_mover", "init");
+   // }
+   // let modelDataEl = document.getElementById('sceneModels');
+   // if (modelDataEl) {
+   //    let modelData = modelDataEl.getAttribute('data-models');
+   //    sceneModels = JSON.parse(atob(modelData)); //convert from base64
+   //    // console.log("sceneModels " + JSON.stringify(sceneModels));
+   //    for (let i = 0; i < sceneModels.length; i++) {
+   //       if (sceneModels[i].sourceText != undefined && sceneModels[i].sourceText != 'undefined' && sceneModels[i].sourceText != null && sceneModels[i].sourceText.length > 0) {
+   //          attributions.push("Name: " + sceneModels[i].name + " - Type: " + sceneModels[i].item_type + " - Source: " + sceneModels[i].sourceText);
+   //       }
+   //    }
+   // }
    console.log("last_page was " + localStorage.getItem("last_page") + " servertoken: "+ token + " localtoken: " + localtoken);
    setTimeout(function () {
       localStorage.setItem("last_page", room);
@@ -139,7 +142,7 @@ $(function() {
    let settingsEl = document.getElementById('settingsDataElement'); //volume, color, etc...
    let theSettingsData = settingsEl.getAttribute('data-settings');
             // console.log("RAW LOCATIOND DATA " + theData);
-   settings = JSON.parse(atob(theSettingsData)); 
+   settings = JSON.parse(atob(theSettingsData)); //big pile of params
    // let settingsAframe = createElement("a-entity")
    // let audioGroupsEl = null;
 
@@ -162,42 +165,61 @@ $(function() {
     }
    // this.statsDiv = document.getElementById("transportStats");
    // document.getElementsByTagName('a-sky')[0].setAttribute('radius', 400); //nope!?!   
-   console.log("room: " +room);
+
+   console.log("room: " +room + " vid " + settings.sceneVideoStreams );
+
    $('#room_id').append($('<button><h4><strong>').text("Welcome to scene " + room).append("</strong></h4></button>"));
-   if (window.sceneType == null || window.sceneType == "Default" || window.sceneType == "Aframe") {
+   if (window.sceneType == "Default" || window.sceneType == "Aframe") {
       window.sceneType == "aframe";
       if (settings.hideAvatars) {
          player.setAttribute("player_mover", "init");
          EmitSelfPosition();
       }
-   }  
-   if (settings.skyboxIDs != null) {
-      console.log("skyboxIDS: " + JSON.stringify(settings.skyboxIDs));
-      skyboxEl = document.createElement('a-entity');
-      sceneEl = document.querySelector('a-scene');
-      skyboxEl.setAttribute('skybox_dynamic', {enabled: true, id: settings.skyboxIDs[0]});
-      skyboxEl.id = 'skybox_dynamic';
-      sceneEl.appendChild(skyboxEl);
-      
-   }
-   if (settings.skyboxID == "") {
-      // skyboxEl.components.skybox_dynamic.nextSkybox();
-   }
-   if (settings.audioGroups && settings.audioGroups.triggerGroups && settings.audioGroups.triggerGroups.length > 0 || 
-      settings.audioGroups && settings.audioGroups.ambientGroups && settings.audioGroups.ambientGroups.length > 0 ||
-      settings.audioGroups && settings.audioGroups.primaryGroups &&  settings.audioGroups.primaryGroups.length > 0) {
-      // audioGroupsEl = document.getElementById('audioGroupsEl');
-      // if (audioGroupsEl != null) {
-      //    let audioGroupsController = audioGroupsEl.components.audio_groups_control;
-      //    if (audioGroupsController != null) {
-      //       audioGroupsController.LoadAudioGroups(settings.audioGroups);
-      //    }
-      // }
-      // audioGroupsEl.components.audio_groups_control.LoadAudioGroups(settings.audioGroups);
-      let audioGroupsEl = document.createElement('a-entity');
-      audioGroupsEl.setAttribute("id","audioGroupsEl");
-      audioGroupsEl.setAttribute("audio_groups_control", {init: ''});
-      sceneEl.appendChild(audioGroupsEl);
+      posRotReader = document.getElementById("player").components.get_pos_rot; 
+      if (player != null) {
+         player.setAttribute("player_mover", "init");
+      }
+      let modelDataEl = document.getElementById('sceneModels');
+      if (modelDataEl) {
+         let modelData = modelDataEl.getAttribute('data-models');
+         sceneModels = JSON.parse(atob(modelData)); //convert from base64
+         // console.log("sceneModels " + JSON.stringify(sceneModels));
+         for (let i = 0; i < sceneModels.length; i++) {
+            if (sceneModels[i].sourceText != undefined && sceneModels[i].sourceText != 'undefined' && sceneModels[i].sourceText != null && sceneModels[i].sourceText.length > 0) {
+               attributions.push("Name: " + sceneModels[i].name + " - Type: " + sceneModels[i].item_type + " - Source: " + sceneModels[i].sourceText);
+            }
+         }
+      }
+
+      if (settings.skyboxIDs != null) {
+         console.log("skyboxIDS: " + JSON.stringify(settings.skyboxIDs));
+         skyboxEl = document.createElement('a-entity');
+         sceneEl = document.querySelector('a-scene');
+         skyboxEl.setAttribute('skybox_dynamic', {enabled: true, id: settings.skyboxIDs[0]});
+         skyboxEl.id = 'skybox_dynamic';
+         sceneEl.appendChild(skyboxEl);
+         
+      }
+   
+      if (settings.skyboxID == "") {
+         // skyboxEl.components.skybox_dynamic.nextSkybox();
+      }
+      if (settings.audioGroups && settings.audioGroups.triggerGroups && settings.audioGroups.triggerGroups.length > 0 || 
+         settings.audioGroups && settings.audioGroups.ambientGroups && settings.audioGroups.ambientGroups.length > 0 ||
+         settings.audioGroups && settings.audioGroups.primaryGroups &&  settings.audioGroups.primaryGroups.length > 0) {
+         // audioGroupsEl = document.getElementById('audioGroupsEl');
+         // if (audioGroupsEl != null) {
+         //    let audioGroupsController = audioGroupsEl.components.audio_groups_control;
+         //    if (audioGroupsController != null) {
+         //       audioGroupsController.LoadAudioGroups(settings.audioGroups);
+         //    }
+         // }
+         // audioGroupsEl.components.audio_groups_control.LoadAudioGroups(settings.audioGroups);
+         let audioGroupsEl = document.createElement('a-entity');
+         audioGroupsEl.setAttribute("id","audioGroupsEl");
+         audioGroupsEl.setAttribute("audio_groups_control", {init: ''});
+         sceneEl.appendChild(audioGroupsEl);
+      }
    }
    if (settings.useMatrix) {
       console.log("Loading browser MATRIX sdk!!!");
@@ -219,8 +241,30 @@ $(function() {
          socketHost = settings.socketHost;
          InitSocket();
       }
-      
-
+   }
+   if (settings.sceneType == "Video Landing" && settings.sceneVideoStreams && settings.sceneVideoStreams.length) {
+      var video = document.getElementById('video');
+      if (Hls.isSupported()) {
+        var hls = new Hls({
+          debug: true,
+        });
+      //   hls.loadSource('/hls/' + vid);
+        hls.loadSource(settings.sceneVideoStreams[0]);
+        hls.attachMedia(video);
+        hls.on(Hls.Events.MEDIA_ATTACHED, function () {
+          // video.muted = true;
+          video.play();
+        });
+      }
+      // hls.js is not supported on platforms that do not have Media Source Extensions (MSE) enabled.
+      // When the browser has built-in HLS support (check using `canPlayType`), we can provide an HLS manifest (i.e. .m3u8 URL) directly to the video element throught the `src` property.
+      // This is using the built-in support of the plain video element, without using hls.js.
+      else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+        video.src = '/hls/'+ vid;
+        video.addEventListener('canplay', function () {
+          video.play();
+        });
+      }
    }
 
    let primaryAudioEventData = document.getElementById("audioEventsData");
@@ -2107,9 +2151,12 @@ function UpdateAmbientAudioVolume(newVolume) {
    }
 }
 function UpdateTriggerAudioVolume(newVolume) {
-   var triggerAudioController = document.getElementById("triggerAudio").components.trigger_audio_control;
-   if (triggerAudioController != null) {
-      triggerAudioController.modVolume(newVolume);
+   var triggerAudioEl = document.getElementById("triggerAudio");
+   if (triggerAudioEl) {
+      var triggerAudioController = triggerAudioEl.components.trigger_audio_control;
+      if (triggerAudioController != null) {
+         triggerAudioController.modVolume(newVolume);
+      }
    }
 }
 

@@ -120,7 +120,7 @@
         },
         error: function( xhr, textStatus, errorThrown ){
             console.log( xhr.responseText );
-            $('#theForm').html( hr.responseText);
+            $('#theForm').html( xhr.responseText);
             // Cookies.remove('_id');
           }
         });

@@ -6681,7 +6681,7 @@
                 "</form>" +
           
                 "<button type=\x22button\x22 class=\x22btn btn-sm btn-info float-right\x22 id=\x22grabVideoFrame\x22>Grab Video Frame</button><br><br><br>" +
-                "<a type=\x22button\x22 href=\x22/test/video/?vid="+response.data._id+"\x22 target=\x22_blank\x22 class=\x22btn btn-sm btn-success float-right\x22>Test HLS Stream</a><br><br><br>" +
+                "<a type=\x22button\x22 href=\x22/test/video/?src=0&vid="+response.data._id+"\x22 target=\x22_blank\x22 class=\x22btn btn-sm btn-success float-right\x22>Test HLS Stream</a><br><br><br>" +
                 
                 "<button type=\x22button\x22 class=\x22btn btn-sm btn-warning float-right\x22 id=\x22encodeHLS\x22>Encode to HLS</button>" +
                 "<button type=\x22button\x22 class=\x22btn btn-sm btn-danger float-left\x22 onclick=\x22deleteItem('video','" + item_id + "')\x22>Delete Video</button>" +
@@ -12977,6 +12977,7 @@ function getAllPeople() {
                     "<div class=\x22card-header py-3 d-flex flex-row align-items-center justify-content-between\x22>" +
                         "<h6 class=\x22m-0 font-weight-bold text-primary\x22>Scene Details - "+ sceneTitle +" | _id: "+ response.data._id +
                         " | <a target=\x22_blank\x22 href=\x22../webxr/"+ response.data.short_id +"\x22>WebXR Link</a>" +
+                        " | <a target=\x22_blank\x22 href=\x22http://smxr.net/index.html?scene="+ response.data.short_id +"\x22>Unity Web Link</a>" +
                         " | <a target=\x22_blank\x22 href=\x22servicemedia://scene?"+ response.data.short_id +"\x22>App Link</a></h6>" +
                         // "<a class=\x22btn btn-xs\x22 href=\x22../webxr/"+response.data.short_id +">WebXR</a>"+
                         "<button id=\x22showHideAll\x22 class=\x22btn btn-sm btn-light float-right\x22><i class=\x22fas fa-plus-circle\x22></i> show/hide all</button>" +
@@ -13058,6 +13059,7 @@ function getAllPeople() {
                                     "<option>ThreeJS</option>" +
                                     "<option>BabylonJS</option>" +
                                     "<option>HTML from Text Item</option>" +
+                                    "<option>Video Landing</option>" +
                                     "<option>AR Barcode Tracking</option>" +
                                     "<option>AR Image Tracking</option>" +
                                     "<option>AR Location Tracking</option>" +
