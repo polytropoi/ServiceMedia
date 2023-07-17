@@ -1,6 +1,14 @@
 const raycaster = new THREE.Raycaster(); //reuse this!  
 const mouse = new THREE.Vector2();
 let primaryVideo = null;
+// let mainDiv = document.getElementById("mainDiv");
+// let videoEl = null;
+
+// let vidzz = document.getElementsByTagName("video"); //vidz declared in content-utils?
+//   if (vidz != null && vidz.length > 0) { //either video or audio, not both...?
+//     videoEl = vidzz[0];
+//     console.log("videoEl " + videoEl.src);
+//   }
 
 function onMouseMove( event ) {
 
@@ -268,6 +276,7 @@ AFRAME.registerComponent('mod-materials', {
       try {
         await video.play();
         console.log("video should be playing...anytimenow");
+        
       } catch(err) {
         console.log("video error: " + err);
       }
@@ -282,6 +291,7 @@ AFRAME.registerComponent('mod-materials', {
             playPromise.then(_ => {
             
               video.pause();
+              // mainDiv.dispatchEvent('primaryVideoToggle', {isPlaying : false}, true);
             })
             .catch(error => {
 
@@ -646,7 +656,7 @@ AFRAME.registerComponent('mod-materials', {
                 if (this.video.paused) {
                   console.log("tryna play!");
                   playVideo(this.video);
-                  
+                  this.sceneEl.emit('primaryVideoToggle', {isPlaying : true}, true);
                   // this.isPlaying = true;
                   if (this.pauseButtonMesh != null) {
                     this.pauseButtonMesh.visible = true;
@@ -661,6 +671,7 @@ AFRAME.registerComponent('mod-materials', {
                     console.log("tryna pauyse!");
                     
                     pauseVideo(this.video);
+                    this.sceneEl.emit('primaryVideoToggle', {isPlaying : false}, true);
                     // this.isPlaying = false;
                     if (this.pauseButtonMesh != null) {
                       this.pauseButtonMesh.visible = false; 
@@ -749,7 +760,7 @@ AFRAME.registerComponent('mod-materials', {
           if (this.video.paused) {
             console.log("tryna play!");
             playVideo(this.video);
-            
+            this.sceneEl.emit('primaryVideoToggle', {isPlaying : true}, true);
             // this.isPlaying = true;
             if (this.pauseButtonMesh != null) {
             this.pauseButtonMesh.visible = true;
@@ -765,6 +776,7 @@ AFRAME.registerComponent('mod-materials', {
             console.log("tryna pauyse!");
             
             pauseVideo(this.video);
+            this.sceneEl.emit('primaryVideoToggle', {isPlaying : false}, true);
             // this.isPlaying = false;
             if (this.pauseButtonMesh != null) {
             this.pauseButtonMesh.visible = false; 

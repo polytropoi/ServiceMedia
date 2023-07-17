@@ -5693,7 +5693,7 @@ AFRAME.registerComponent('mod_model', {
 
       }
      
-      document.querySelector('a-scene').addEventListener('youtubeToggle', function (event) { //things to trigger on this model if primary audio is playing
+      document.querySelector('a-scene').addEventListener('youtubeToggle', function (event) { //things to trigger on this model if youtube is playing
         console.log("GOTSA YOUTUBNE EVENT: " + event.detail.isPlaying);  
         if (event.detail.isPlaying) {
           if (danceIndex != -1) { //moIndex = "mouthopen"
@@ -5780,7 +5780,38 @@ AFRAME.registerComponent('mod_model', {
             }
           }
         });
-        ///////////todo primary video drive anims
+        document.querySelector('a-scene').addEventListener('primaryVideoToggle', function (e) {  //things to trigger on this model if primary video is playing
+          // console.log("primaryVideoToggle " + e.detail);
+          if (e.detail.isPlaying) {
+  
+            console.log("primaryVideoToggle is playing!");
+            
+            if (danceIndex != -1) { //moIndex = "mouthopen"
+              theEl.setAttribute('animation-mixer', {
+                "clip": clips[danceIndex].name,
+                "loop": "repeat"
+                // "repetitions": 10,
+                // "timeScale": 2
+              });
+              // theEl.addEventListener('animation-finished', function () { 
+              //   theEl.removeAttribute('animation-mixer');
+              // });
+            }
+          } else {
+              console.log("primaryVideoToggle not playing");
+              if (idleIndex != -1) { 
+              theEl.setAttribute('animation-mixer', {
+                "clip": clips[idleIndex].name,
+                "loop": "repeat"
+                // "repetitions": 10,
+                // "timeScale": 2
+              });
+              // theEl.addEventListener('animation-finished', function () { 
+              //   theEl.removeAttribute('animation-mixer');
+              // });
+              }
+            }
+          });
 
     }
     });
