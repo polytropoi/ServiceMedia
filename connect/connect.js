@@ -820,7 +820,7 @@ function LocationRowClick(data) {
 function AddLocalMarkers() {// new or modded markers not saved to cloud
    console.log("tryna add local keys count " + localStorage.length);
    let locationMods = []; //local scope for local mods 
-   if (localStorage.length > 0) {
+   if (localStorage.length > 0 && (settings.sceneType == "Default" || settings.sceneType == "AFrame")) {
       for (var i=0; i < localStorage.length; i++)  {
          let theKey = localStorage.key(i);
 
