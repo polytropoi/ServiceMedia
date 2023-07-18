@@ -715,7 +715,7 @@ background-color: #000000;
       width: 100%;
       background-color: rgba(0, 0, 0, 0);
       color: white;
-      z-index: 2;
+      /* z-index: 2; */
       font-family: Trebuchet MS, Helvetica, sans-serif;
       font-size: 22px;
       }

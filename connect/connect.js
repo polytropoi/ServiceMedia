@@ -243,6 +243,7 @@ $(function() {
       }
    }
    if (settings.sceneType == "Video Landing" && settings.sceneVideoStreams && settings.sceneVideoStreams.length) {
+      SetVideoEventsData();
       var video = document.getElementById('video');
       if (Hls.isSupported()) {
         var hls = new Hls({
@@ -2323,7 +2324,7 @@ function SetPrimaryAudioEventsData () {
 
 
 function SetVideoEventsData (type) { 
-  
+   console.log("tryna SetVideoEventsData");
    tkStarttimes = []; //either audio or video, not both
    if (timeKeysData.timekeys == undefined || timeKeysData.timekeys == null) {
      timeKeysData = JSON.parse(localStorage.getItem(room+ "_timeKeys")); 
@@ -2611,13 +2612,17 @@ function PlayTimedEvent(timeKey) {
             primaryAudioEl.components.primary_audio_control.gotoTime(timeKey.keydata);
          }
       } else if (timedEventsListenerMode != null && timedEventsListenerMode.toLowerCase() == 'primary video') {
-         var videoControllerEl = document.getElementById('primary_video');  
-         if (videoControllerEl != null) {
-            console.log("gotsa video embedVideo");
-            let videoController = videoControllerEl.components.vid_materials_embed;
-            if (videoController) {
-               videoController.gotoTime(timeKey.keydata);
+         if (settings.sceneType == "Default" || settings.sceneType == "AFrame") {
+            var videoControllerEl = document.getElementById('primary_video');  
+            if (videoControllerEl != null) {
+               console.log("gotsa video embedVideo");
+               let videoController = videoControllerEl.components.vid_materials_embed;
+               if (videoController) {
+                  videoController.gotoTime(timeKey.keydata);
+               }
             }
+         } else { //normal html, just ?
+            video.currentTime = timeKey.keydata;
          }
       } else if (timedEventsListenerMode != null && timedEventsListenerMode.toLowerCase() == 'youtube') {
          let youtube_player = document.getElementById("youtubePlayer").components.youtube_player;

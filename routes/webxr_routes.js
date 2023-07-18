@@ -342,6 +342,7 @@ webxr_router.get('/:_id', function (req, res) {
     let videoElements = "";
     let hlsScript = "";
     // let loadPictureGroups = "";
+    let tilepicUrl = "";
     let availableScenesInclude = "";
     let restrictToLocation = false;
     let isGuest = true;
@@ -358,6 +359,8 @@ webxr_router.get('/:_id', function (req, res) {
     let hasTriggerAudio = true;
     // let wasd = "wasd-controls=\x22fly: false; acceleration: 35; constrainToNavMesh: true;\x22";
     let wasd = "";
+
+
     //TODO use process env for google analytics
     // let googleAnalytics = "<!-- Global site tag (gtag.js) - Google Analytics --><script async src=\x22https://www.googletagmanager.com/gtag/js?id=UA-163893846-1\x22></script>"+
     //     "<script>window.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());gtag('config', 'UA-163893846-1');"+
@@ -3652,6 +3655,11 @@ webxr_router.get('/:_id', function (req, res) {
                                             } else {
                                                 image1url = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, 'users/' + picture_item.userID + "/pictures/" + picture_item._id + ".standard." + picture_item.filename, 6000);
                                             }
+                                            if (picture_item.orientation == "Tileable") {
+
+                                                tilepicUrl = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, 'users/' + picture_item.userID + "/pictures/originals/" + picture_item._id + ".original." + picture_item.filename, 6000);
+                                                console.log("GOTSA TILEABLE PIC! " + tilepicUrl);
+                                            }
                                             // image1url = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, 'users/' + picture_item.userID + "/pictures/" + picture_item._id + ".standard." + picture_item.filename, 6000);
                                             picArray.push(image1url);
                                             
@@ -4073,6 +4081,12 @@ webxr_router.get('/:_id', function (req, res) {
                         // if (!sceneGreeting || !sceneGreeting.length) {
                         //     sceneGreeting = "Welcome!";
                         // } 
+                        // let hasTile = false;
+                        let bgstyle = "style=\x22background-color: "+sceneResponse.sceneColor1+";\x22"
+                        // bgcolor=\x22"+sceneResponse.sceneColor1+"\x22>\n
+                        if (tilepicUrl != "") {
+                            bgstyle = "style=\x22background-color: "+sceneResponse.sceneColor1+"; background-image: url("+tilepicUrl+"); background-repeat: repeat;\x22";
+                        }
 
                         htmltext = "<!DOCTYPE html>\n" +
                         "<head> " +
@@ -4109,7 +4123,7 @@ webxr_router.get('/:_id', function (req, res) {
                         "<script src=\x22/connect/connect.js\x22 defer=\x22defer\x22></script>" +
                        
                         "</head>\n" +
-                        "<body bgcolor=\x22"+sceneResponse.sceneColor1+"\x22>\n" +
+                        "<body "+bgstyle+">" +
                         "<div class=\x22avatarName\x22 id="+avatarName+"></div>"+
                         "<div id=\x22token\x22 data-token=\x22"+token+"\x22></div>\n"+
                         settingsData +
@@ -4119,7 +4133,7 @@ webxr_router.get('/:_id', function (req, res) {
                         hlsScript +
                         // videoEntity +
                         videoGroupsEntity +
-                        "<center><div><br><br><div class=\x22header\x22>"+sceneResponse.sceneGreeting+ " " + sceneResponse.sceneQuest+"</div><video controls height='600' id='video'></video>"+
+                        "<center><div><br><br><div class=\x22header\x22>"+sceneResponse.sceneGreeting+ " " + sceneResponse.sceneQuest+"</div><video controls width='95%' height='600' id='video'></video>"+
                         "<div id=\x22sceneGreeting\x22 class=\x22linkfooter\x22>"+
                         "<h4>Immersive Links:</h4><br>"+
                         "<a href=\x22https://servicemedia.net/webxr/"+ sceneResponse.sceneNextScene + "\x22>WebXR link</a> | "+
