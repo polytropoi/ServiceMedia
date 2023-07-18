@@ -4133,7 +4133,7 @@ webxr_router.get('/:_id', function (req, res) {
                         hlsScript +
                         // videoEntity +
                         videoGroupsEntity +
-                        "<center><div><br><br><div class=\x22header\x22>"+sceneResponse.sceneGreeting+ " " + sceneResponse.sceneQuest+"</div><video controls width='80%' height='1000px' id='video'></video>"+
+                        "<center><div><br><br><div class=\x22header\x22>"+sceneResponse.sceneGreeting+ " " + sceneResponse.sceneQuest+"</div><video controls width='80%' height='10%' id='video'></video>"+
                         "<div id=\x22sceneGreeting\x22 class=\x22linkfooter\x22>"+
                         "<h4>Immersive Links:</h4><br>"+
                         "<a href=\x22https://servicemedia.net/webxr/"+ sceneResponse.sceneNextScene + "\x22>WebXR link</a> | "+
