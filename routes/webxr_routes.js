@@ -4082,10 +4082,10 @@ webxr_router.get('/:_id', function (req, res) {
                         //     sceneGreeting = "Welcome!";
                         // } 
                         // let hasTile = false;
-                        let bgstyle = "style=\x22background-color: "+sceneResponse.sceneColor1+";\x22"
+                        let bgstyle = "style=\x22height:100%; width:100%; overflow:auto; background-color: "+sceneResponse.sceneColor1+";\x22"
                         // bgcolor=\x22"+sceneResponse.sceneColor1+"\x22>\n
                         if (tilepicUrl != "") {
-                            bgstyle = "style=\x22background-color: "+sceneResponse.sceneColor1+"; background-image: url("+tilepicUrl+"); background-repeat: repeat;\x22";
+                            bgstyle = "style=\x22height:100%; width:100%; overflow:auto; background-color: "+sceneResponse.sceneColor1+"; background-image: url("+tilepicUrl+"); background-repeat: repeat;\x22";
                         }
 
                         htmltext = "<!DOCTYPE html>\n" +
@@ -4133,7 +4133,7 @@ webxr_router.get('/:_id', function (req, res) {
                         hlsScript +
                         // videoEntity +
                         videoGroupsEntity +
-                        "<center><div><br><br><div class=\x22header\x22>"+sceneResponse.sceneGreeting+ " " + sceneResponse.sceneQuest+"</div><video controls width='95%' height='600' id='video'></video>"+
+                        "<center><div><br><br><div class=\x22header\x22>"+sceneResponse.sceneGreeting+ " " + sceneResponse.sceneQuest+"</div><video controls width='80%' height='1000px' id='video'></video>"+
                         "<div id=\x22sceneGreeting\x22 class=\x22linkfooter\x22>"+
                         "<h4>Immersive Links:</h4><br>"+
                         "<a href=\x22https://servicemedia.net/webxr/"+ sceneResponse.sceneNextScene + "\x22>WebXR link</a> | "+
