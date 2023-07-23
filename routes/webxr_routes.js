@@ -453,6 +453,10 @@ webxr_router.get('/:_id', function (req, res) {
                         }
                     }
                 }
+
+                if (sceneData.sceneWebType == "Redirect to Unity Webplayer") {
+                    res.redirect('http://smxr.net/index.html?scene=' + reqstring);
+                } else {
                 async.waterfall([  // async init
                 
                 function (callback) {
@@ -4805,6 +4809,7 @@ webxr_router.get('/:_id', function (req, res) {
     
         
         } //intial sceneData request, condition on type
+    }//end else if not redirected
     });
     } //if params undefined
 });

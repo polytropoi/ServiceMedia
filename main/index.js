@@ -13067,6 +13067,8 @@ function getAllPeople() {
                                     "<option>Mirage Marker</option>" +
                                     "<option>Camera Background</option>" +
                                     "<option>Text Adventure</option>" +
+                                    "<option>Redirect to Alt</option>" +
+                                    "<option>Redirect to Unity Webplayer</option>" +
                                 "</select>" +
                             "</div>" +
                             "<div class=\x22col form-group col-md-2\x22>" +
