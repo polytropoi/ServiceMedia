@@ -117,6 +117,7 @@ $(function() {
    //    }
    // }
    console.log("last_page was " + localStorage.getItem("last_page") + " servertoken: "+ token + " localtoken: " + localtoken);
+   
    setTimeout(function () {
       localStorage.setItem("last_page", room);
       tcheck(); //token auth
@@ -143,9 +144,9 @@ $(function() {
    let theSettingsData = settingsEl.getAttribute('data-settings');
             // console.log("RAW LOCATIOND DATA " + theData);
    settings = JSON.parse(atob(theSettingsData)); //big pile of params
-   // let settingsAframe = createElement("a-entity")
+   // let settingsAFrame = createElement("a-entity")
    // let audioGroupsEl = null;
-
+   // console.log("settings " + JSON.stringify(settings));
    if (settings.sceneTimedEvents != undefined && settings.sceneTimedEvents != null) {
       timeKeysData = settings.sceneTimedEvents;
       localStorage.setItem(room + '_timeKeys', JSON.stringify(timeKeysData));
@@ -166,11 +167,11 @@ $(function() {
    // this.statsDiv = document.getElementById("transportStats");
    // document.getElementsByTagName('a-sky')[0].setAttribute('radius', 400); //nope!?!   
 
-   console.log("room: " +room + " vid " + settings.sceneVideoStreams );
+   console.log("room: " +room + " vid " + settings.sceneVideoStreams + " type " + settings.sceneType);
 
    $('#room_id').append($('<button><h4><strong>').text("Welcome to scene " + room).append("</strong></h4></button>"));
-   if (window.sceneType == "Default" || window.sceneType == "Aframe") {
-      window.sceneType == "aframe";
+   if (settings.sceneType == "Default" || settings.sceneType == "AFrame" || settings.sceneType == "default" || settings.sceneType == "aframe") {
+      // window.sceneType == "aframe";
       if (settings.hideAvatars) {
          player.setAttribute("player_mover", "init");
          EmitSelfPosition();
@@ -190,9 +191,9 @@ $(function() {
             }
          }
       }
-
+      console.log("skyboxIDS: " + JSON.stringify(settings));
       if (settings.skyboxIDs != null) {
-         console.log("skyboxIDS: " + JSON.stringify(settings.skyboxIDs));
+         
          skyboxEl = document.createElement('a-entity');
          sceneEl = document.querySelector('a-scene');
          skyboxEl.setAttribute('skybox_dynamic', {enabled: true, id: settings.skyboxIDs[0]});
@@ -695,9 +696,9 @@ function GoToLocation(locationKey) {
 }
 
 function GoToNext() {
-   console.log("tryna gotonext " + window.sceneType);
+   console.log("tryna gotonext " + settings.sceneType);
 // if (currentLocationIndex > 0) {
-   if (window.sceneType == "mapbox") {
+   if (settings.sceneType == "mapbox") {
       
       var locbuttons = document.getElementsByClassName("locbutton");
       if (currentLocationIndex < locbuttons.length - 1) {
@@ -726,6 +727,8 @@ function GoToNext() {
       }
       if (skyboxEl != null) {
          skyboxEl.components.skybox_dynamic.nextSkybox();
+      } else {
+         console.log("no skyboxEl!");
       }
       // let tunnels = document.getElementsByTagName("mod_tunnel");
       let tunnels = document.querySelectorAll("[mod_tunnel]")
@@ -744,7 +747,7 @@ function GoToNext() {
 // }
 function GoToPrevious() {
 
-   if (window.sceneType == "mapbox") {
+   if (settings.sceneType == "mapbox") {
       
       var locbuttons = document.getElementsByClassName("locbutton");
       if (currentLocationIndex > 0) {
@@ -1835,7 +1838,7 @@ AFRAME.registerComponent('create_avatars', {
 function UpdatePlayerAvatars(roomUsers) { //aframe only, need to flex.. //no, just make this a component function, to avoid creating a-entities outside of aframe
    console.log("tryna UpdatePlayerAvatars" + JSON.stringify(roomUsers));
    
-   if (sceneEl != null && window.sceneType == "aframe" && !settings.hideAvatars && roomUsers) {
+   if (sceneEl != null && (settings.sceneType == "aframe" || settings.sceneType == "AFrame" || settings.sceneType == "Default") && !settings.hideAvatars && roomUsers) {
       var keys = Object.keys(roomUsers);
       var alreadyCreated = ""; //temp string to prevent doubles
       for(var i=0; i<keys.length; i++) { //create new avatars as needed
@@ -1922,7 +1925,7 @@ var buf;        // Audio buffer
 function InitSceneHooks(type) {
    // window.sceneType = type; //global that needs to get sniffed
    console.log("tryna InitSceneHooks window.sceneType " + window.sceneType);
-   if (window.sceneType == "Default" || window.sceneType == "Aframe") {
+   if (window.sceneType == "Default" || window.sceneType == "AFrame") {
       window.sceneType == "aframe";
       EmitSelfPosition();
    }   

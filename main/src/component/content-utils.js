@@ -6157,6 +6157,7 @@ AFRAME.registerComponent('skybox_dynamic', {
       }
   },
   nextSkybox: function () {
+    console.log("tryna get next skybox");
     if (this.skyboxData != null && this.skyboxData != undefined) {
       if (this.skyboxIndex < this.skyboxData.images.length - 1) {
         this.skyboxIndex++;
