@@ -13040,11 +13040,14 @@ function getAllPeople() {
                                 "<select class=\x22form-control\x22 id=\x22sceneTypeSelect\x22>" +
                                     "<option value=\x22\x22 disabled selected>Select:</option>" +
                                     "<option>Default</option>" +
-                                    "<option>Virtual</option>" +
-                                    "<option>ARKit</option>" +
-                                    "<option>Oculus</option>" +
+                                    "<option>ARF</option>" +
+                                    "<option>Isomorphic</option>" +
+                                    "<option>Sidescroll</option>" +
+                                    "<option>2D Layout</option>" +
+                                    "<option>Orbit</option>" +
+                                    "<option>Meta OpenXR</option>" +
                                     "<option>OpenXR</option>" +
-                                    
+                                                                        
                                 "</select>" +
                             "</div>" +
                             "<div class=\x22col form-group col-md-2\x22>" +
