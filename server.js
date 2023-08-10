@@ -16172,7 +16172,7 @@ app.get('/scene/:_id/:platform/:version', function (req, res) { //called from ap
                 }
             },
             function (objex, callback) { //inject username, last step (since only id is in scene doc)
-                sceneResponse.token = token;
+                // sceneResponse.token = token;
                 if ((sceneResponse.userName == null || sceneResponse.userName.length < 1) && (sceneResponse.user_id != null)) {
 
                     var oo_id = ObjectID(sceneResponse.user_id);
