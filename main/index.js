@@ -13041,6 +13041,7 @@ function getAllPeople() {
                                     "<option value=\x22\x22 disabled selected>Select:</option>" +
                                     "<option>Default</option>" +
                                     "<option>ARF</option>" +
+                                    "<option>Geographic</option>" +
                                     "<option>Isomorphic</option>" +
                                     "<option>Sidescroll</option>" +
                                     "<option>2D Layout</option>" +
@@ -17099,7 +17100,11 @@ function getAllPeople() {
         // console.log(userid);
         axios.get('/profile/' + userid, config)
         .then(function (response) {
-            // console.log(JSON.stringify(response.data.activity));
+            console.log("apikey " + response.data.apikey);
+            // let apikey = "";
+            // if (response.data.apikey && response.data.apikey.length > 4) {
+            //     // apikey = "<div>API Key : " + response.data.apikey + "</div>";
+            // }
             showProfileInventory(response);
             showProfileActivity(response);
             showProfilePurchases(response);  //populate datatables
@@ -17115,9 +17120,9 @@ function getAllPeople() {
                     "<i class=\x22fas fa-ellipsis-v fa-sm fa-fw text-gray-400\x22></i>" +
                     "</a>" +
                     "<div class=\x22dropdown-menu dropdown-menu-right shadow animated--fade-in\x22 aria-labelledby=\x22dropdownMenuLink\x22>" +
-                    "<div class=\x22dropdown-header\x22>Dropdown Header:</div>" +
-                    "<a class=\x22dropdown-item\x22 href=\x22#\x22>Edit</a>" +
-                    "<a class=\x22dropdown-item\x22 href=\x22#\x22>Another action</a>" +
+                    "<div class=\x22dropdown-header\x22>Actions:</div>" +
+                    "<a class=\x22dropdown-item\x22 onclick=\x22createAPIKey('" + response.data._id + "')\x22 href=\x22#\x22>Create API Key</a>" +
+                    // "<a class=\x22dropdown-item\x22 href=\x22#\x22>Another action</a>" +
                     "<div class=\x22dropdown-divider\x22></div>" +
                     "<a class=\x22dropdown-item\x22 href=\x22#\x22>Something else here</a>" +
                     "</div>" +
@@ -17132,8 +17137,10 @@ function getAllPeople() {
                 "<li class=\x22list-inline-item\x22>| email : <strong>"+ response.data.email +"</strong></li>" +
                 "<li class=\x22list-inline-item\x22>| created : <strong>"+ convertTimestamp(response.data.createDate) +"</strong></li>" +
                 "<li class=\x22list-inline-item\x22>| @ IP : <strong>"+ response.data.createIP +"</strong></li>" +
+                "<li class=\x22list-inline-item\x22>| API Key : <strong>"+ response.data.apikey +"</strong></li>" +
                 "</ul>" +
                 "</div>" +
+                
             "</div>" +
             "</div>";
             $("#cardrow").html(card);
@@ -17141,6 +17148,21 @@ function getAllPeople() {
     .catch(function (error) {
         console.log(error);
     });
+    }
+    function createAPIKey (uid) {
+        let data = {userID: uid};
+        // let config = { headers: { appid: appid,
+        //     }
+        // }
+        axios.post('/create_apikey/', data)
+        .then(function (response) {
+        // console.log(JSON.stringify(response));
+        // var jsonResponse = response.data;
+        //  var jsonResponse = response.data;
+        
+        console.log(response.data);
+
+        });
     }
     function showProfilePurchases(response) {
     var jsonResponse = response.data;

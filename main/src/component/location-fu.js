@@ -536,7 +536,7 @@ function geoip(json){
   // let styleIndex = 0;
   // let styleIDs = []
   let rotateOn = false;
-  let dragPanEnabled = false;
+  let dragPanEnabled = true;
 
   function ZoomIn () {
     if (theMap != null) {
@@ -566,11 +566,11 @@ function geoip(json){
       theMap.easeTo({
         pitch:0
       });
-      theMap.dragPan.enable({
+      map.dragPan.enable({
         linearity: 0.3,
         // easing: bezier(0, 0, 0.3, 1),
-        maxSpeed: 300,
-        deceleration: 1500,
+        maxSpeed: 3,
+        deceleration: 1.5,
         });
         dragPanEnabled = true;
       }
@@ -585,7 +585,7 @@ function geoip(json){
     // Divide timestamp by 100 to slow rotation to ~10 degrees / sec
     // if (rotateOn) { 
       // if (rotator == null) {
-        theMap.rotateTo((timestamp / 1000) % 360, { duration: 0 });
+      theMap.rotateTo((timestamp / 1000) % 360, { duration: 0 });
       // }
       
       // Request the next frame of the animation.
@@ -846,7 +846,7 @@ function geoip(json){
       // console.log("lat " )
       var map = new mapboxgl.Map({
         // style: 'mapbox://styles/mapbox/light-v10',
-        style: 'mapbox://styles/mapbox-map-design/ckhqrf2tz0dt119ny6azh975y',
+        // style: 'mapbox://styles/mapbox-map-design/ckhqrf2tz0dt119ny6azh975y',
         // style: 'mapbox://styles/polytropoi/ckke5tnp40mrt17ohfhkxy29q',
         
         container: 'map',
@@ -891,6 +891,7 @@ function geoip(json){
         let that = this;
         console.log("do builtings " + doBuildings + " do terrain " + doTerrain);
         map.on('load', function () {
+          map.setConfigProperty('basemap', 'lightPreset', 'dusk');
           // map.addControl(
           //   new MapboxDirections({
           //   accessToken: mapboxgl.accessToken
@@ -911,15 +912,15 @@ function geoip(json){
             map.setTerrain({ 'source': 'mapbox-dem', 'exaggeration': 1.25 });
           }
           // add a sky layer that will show when the map is highly pitched
-          map.addLayer({
-            'id': 'sky',
-            'type': 'sky',
-            'paint': {
-            'sky-type': 'atmosphere',
-            'sky-atmosphere-sun': [0.0, 0.0],
-            'sky-atmosphere-sun-intensity': 15
-            }
-          });
+            // map.addLayer({
+            //   'id': 'sky',
+            //   'type': 'sky',
+            //   'paint': {
+            //   'sky-type': 'atmosphere',
+            //   'sky-atmosphere-sun': [0.0, 0.0],
+            //   'sky-atmosphere-sun-intensity': 15
+            //   }
+            // });
 
           // map.addLayer({
           //   id: 'custom_layer',
@@ -958,51 +959,57 @@ function geoip(json){
         //   maxSpeed: 300,
         //   deceleration: 1500,
         //   });
-        map.dragPan.disable();
-        map.scrollZoom.disable();
+        map.dragPan.enable({
+          linearity: 0.3,
+          // easing: bezier(0, 0, 0.3, 1),
+          maxSpeed: 3,
+          deceleration: 1.5,
+          });
+        // map.dragPan.disable();
+        map.scrollZoom.enable();
         map['doubleClickZoom'].disable();
         map['dragRotate'].enable();
         map.touchPitch.enable();
         map.touchZoomRotate.enable({ around: 'center' });
         // map.scrollZoom.enable({ around: 'center' });
-        if (doBuildings) {
-          console.log("tryna do buildingz");
-          map.addLayer({
-            'id': '3d-buildings',
-            'source': 'composite',
-            'source-layer': 'building',
-            'filter': ['==', 'extrude', 'true'],
-            'type': 'fill-extrusion',
-            'minzoom': 15,
-            'paint': {
-              'fill-extrusion-color': '#aaa',
-              
-              // use an 'interpolate' expression to add a smooth transition effect to the
-              // buildings as the user zooms in
-              'fill-extrusion-height': [
-              'interpolate',
-              ['linear'],
-              ['zoom'],
-              15,
-              0,
-              15.05,
-              ['get', 'height']
-              ],
-              'fill-extrusion-base': [
-              'interpolate',
-              ['linear'],
-              ['zoom'],
-              15,
-              0,
-              15.05,
-              ['get', 'min_height']
-              ],
-              'fill-extrusion-opacity': 0.6
-              } 
-            },
-            labelLayerId
-          );
-        }
+          // if (doBuildings) {
+          //   console.log("tryna do buildingz");
+          //   map.addLayer({
+          //     'id': '3d-buildings',
+          //     'source': 'composite',
+          //     'source-layer': 'building',
+          //     'filter': ['==', 'extrude', 'true'],
+          //     'type': 'fill-extrusion',
+          //     'minzoom': 15,
+          //     'paint': {
+          //       'fill-extrusion-color': '#aaa',
+                
+          //       // use an 'interpolate' expression to add a smooth transition effect to the
+          //       // buildings as the user zooms in
+          //       'fill-extrusion-height': [
+          //       'interpolate',
+          //       ['linear'],
+          //       ['zoom'],
+          //       15,
+          //       0,
+          //       15.05,
+          //       ['get', 'height']
+          //       ],
+          //       'fill-extrusion-base': [
+          //       'interpolate',
+          //       ['linear'],
+          //       ['zoom'],
+          //       15,
+          //       0,
+          //       15.05,
+          //       ['get', 'min_height']
+          //       ],
+          //       'fill-extrusion-opacity': 0.6
+          //       } 
+          //     },
+          //     labelLayerId
+          //   );
+          // }
         let currentLocString = "<button class=\x22locbutton\x22 id=\x22"+currentLocation[0]+"_"+currentLocation[1]+"\x22>You are here</button><br><br>";
         // console.log(currentLocString);
         let index = 0; 
@@ -1174,7 +1181,7 @@ function geoip(json){
         // map['touchZoomRotate'].enable();
         
         mapStyle.addEventListener('change', (event) => {
-          MapStyleSelectChange(event.target.value);
+          // MapStyleSelectChange(event.target.value);
         });
 
           // mapStyle.addEventListener("change", MapStyleSelectChange(mapStyle.value));
@@ -1208,12 +1215,13 @@ function geoip(json){
       mapboxgl.accessToken = this.data.mbid;
       // console.log("tryna mapbox with toik,e mn " + mapbox_config.accessToken);
       gpsElements = document.querySelectorAll(".geopoi,.geo");
+      if (gpsElements.length > 0) {
       let latitude = gpsElements[0].getAttribute(geoEntity.toString()).latitude;
       let longitude = gpsElements[0].getAttribute(geoEntity.toString()).longitude;
       // console.log("lat " )
       var map = new mapboxgl.Map({
         // style: 'mapbox://styles/mapbox/light-v10',
-        style: 'mapbox://styles/mapbox-map-design/ckhqrf2tz0dt119ny6azh975y',
+        // style: 'mapbox://styles/mapbox-map-design/ckhqrf2tz0dt119ny6azh975y',
         // style: 'mapbox://styles/polytropoi/ckke5tnp40mrt17ohfhkxy29q',
         
         container: 'map',
@@ -1225,7 +1233,7 @@ function geoip(json){
 
 
         });
-        map.scrollZoom.disable();
+        map.scrollZoom.enable();
         theMap = map;
 
        
@@ -1250,6 +1258,7 @@ function geoip(json){
           //   }),
           //   'top-right'
           //   );
+
           if (doTerrain) {
             map.addSource('mapbox-dem', {
             'type': 'raster-dem',
@@ -1264,15 +1273,15 @@ function geoip(json){
             map.setTerrain({ 'source': 'mapbox-dem', 'exaggeration': 1.25 });
           }
           // add a sky layer that will show when the map is highly pitched
-          map.addLayer({
-            'id': 'sky',
-            'type': 'sky',
-            'paint': {
-            'sky-type': 'atmosphere',
-            'sky-atmosphere-sun': [0.0, 0.0],
-            'sky-atmosphere-sun-intensity': 15
-            }
-          });
+          // map.addLayer({
+          //   'id': 'sky',
+          //   'type': 'sky',
+          //   'paint': {
+          //   'sky-type': 'atmosphere',
+          //   'sky-atmosphere-sun': [0.0, 0.0],
+          //   'sky-atmosphere-sun-intensity': 15
+          //   }
+          // });
 
      
         var layers = map.getStyle().layers;
@@ -1283,19 +1292,21 @@ function geoip(json){
           break;
           }
         }
-        // map.dragPan.enable({
-        //   linearity: 0.3,
-        //   // easing: bezier(0, 0, 0.3, 1),
-        //   maxSpeed: 300,
-        //   deceleration: 1500,
-        //   });
-        map.dragPan.disable();
-        map.scrollZoom.disable();
-        map['doubleClickZoom'].disable();
+        map.dragPan.enable({
+          linearity: 0.3,
+          // easing: bezier(0, 0, 0.3, 1),
+          maxSpeed: 3,
+          deceleration: 1.5,
+          });
+                // map.dragPan.disable();
+                map.scrollZoom.enable();
+                // map['doubleClickZoom'].disable();
         map['dragRotate'].enable();
         map.touchPitch.enable();
         map.touchZoomRotate.enable({ around: 'center' });
-
+        // map.on('style.load', () => {
+          map.setConfigProperty('basemap', 'lightPreset', 'dusk');
+      // });
         map.on('mousemove', (e) => {
           // document.getElementById('info').innerHTML =
           // // `e.point` is the x, y coordinates of the `mousemove` event
@@ -1306,44 +1317,44 @@ function geoip(json){
           console.log(JSON.stringify(e.lngLat.wrap()));
           });
         // map.scrollZoom.enable({ around: 'center' });
-        if (doBuildings) {
-          console.log("tryna do buildingz");
-          map.addLayer({
-            'id': '3d-buildings',
-            'source': 'composite',
-            'source-layer': 'building',
-            'filter': ['==', 'extrude', 'true'],
-            'type': 'fill-extrusion',
-            'minzoom': 15,
-            'paint': {
-              'fill-extrusion-color': '#aaa',
-              
-              // use an 'interpolate' expression to add a smooth transition effect to the
-              // buildings as the user zooms in
-              'fill-extrusion-height': [
-              'interpolate',
-              ['linear'],
-              ['zoom'],
-              15,
-              0,
-              15.05,
-              ['get', 'height']
-              ],
-              'fill-extrusion-base': [
-              'interpolate',
-              ['linear'],
-              ['zoom'],
-              15,
-              0,
-              15.05,
-              ['get', 'min_height']
-              ],
-              'fill-extrusion-opacity': 0.6
-              } 
-            },
-            labelLayerId
-          );
-        }
+            // if (doBuildings) {
+            //   console.log("tryna do buildingz");
+            //   map.addLayer({
+            //     'id': '3d-buildings',
+            //     'source': 'composite',
+            //     'source-layer': 'building',
+            //     'filter': ['==', 'extrude', 'true'],
+            //     'type': 'fill-extrusion',
+            //     'minzoom': 15,
+            //     'paint': {
+            //       'fill-extrusion-color': '#aaa',
+                  
+            //       // use an 'interpolate' expression to add a smooth transition effect to the
+            //       // buildings as the user zooms in
+            //       'fill-extrusion-height': [
+            //       'interpolate',
+            //       ['linear'],
+            //       ['zoom'],
+            //       15,
+            //       0,
+            //       15.05,
+            //       ['get', 'height']
+            //       ],
+            //       'fill-extrusion-base': [
+            //       'interpolate',
+            //       ['linear'],
+            //       ['zoom'],
+            //       15,
+            //       0,
+            //       15.05,
+            //       ['get', 'min_height']
+            //       ],
+            //       'fill-extrusion-opacity': 0.6
+            //       } 
+            //     },
+            //     labelLayerId
+            //   );
+            // }
         let currentLocString = "<button class=\x22locbutton\x22 id=\x22"+currentLocation[0]+"_"+currentLocation[1]+"\x22>You are here</button><br><br>";
         // console.log(currentLocString);
         let index = 0; 
@@ -1488,7 +1499,7 @@ function geoip(json){
               '\x22 class=\x22locbutton tooltip\x22 onclick=\x22PopupNextPreviousButtons(\x27'+latlngStringPrevious+'\x27)\x22><i style=\x22margin-left: 10px; margin-right: 10px;\x22 class=\x22fas fa-arrow-circle-left fa-2x\x22></i><span class=\x22tooltiptext\x22>Previous Location</span></div>')
               .addTo(theMap);
 
-
+              
             let marker = new mapboxgl
               .Marker()
                 .setLngLat([gpsElements[i].getAttribute(geoEntity.toString()).longitude, gpsElements[i].getAttribute(geoEntity.toString()).latitude])
@@ -1516,24 +1527,26 @@ function geoip(json){
             // rotateOn = false;
           }
         });
-        let mapStyle = document.getElementById('mapStyle');
-        console.log(mapStyle)
-        if (mapStyle != null) {
-          console.log(mapStyle.value);
 
-        // map['touchZoomRotate'].enable();
-        
-        mapStyle.addEventListener('change', (event) => {
-          MapStyleSelectChange(event.target.value);
-        });
+            // let mapStyle = document.getElementById('mapStyle');
+            // console.log(mapStyle)
+            // if (mapStyle != null) {
+            //   console.log(mapStyle.value);
 
-          // mapStyle.addEventListener("change", MapStyleSelectChange(mapStyle.value));
-        }
+            // // map['touchZoomRotate'].enable();
+            
+            //   mapStyle.addEventListener('change', (event) => {
+            //     // MapStyleSelectChange(event.target.value);
+            //   });
+
+            //   // mapStyle.addEventListener("change", MapStyleSelectChange(mapStyle.value));
+            // }
         // UpdateMarkers();
       }); //map load end
 
       // UpdateGeoPanel(currentLocString);
-
       
-      }
-  });
+      }//gpsElements is empty
+    
+    }
+  }); // end mapbox init

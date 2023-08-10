@@ -778,7 +778,7 @@ function usercheck (req, res, next) { //gotsta beez the owner of requested resou
 }
 function domainadmin (req, res, next) { //TODO also check acl
     db.users.findOne({_id: ObjectID(req.session.user._id)}, function (err, user) {
-        if (err || ! user) {
+        if (err || !user) {
             res.send("noauth");
         } else {
             if (user.authLevel.includes("domain_admin") || user.authLevel.includes("admin")) { //should be separate, but later..
@@ -893,6 +893,42 @@ function saveActivity (data) {
         }
     });
 }
+////////////////////////// create API KEYS
+
+
+app.post('/create_apikey/', requiredAuthentication, function(req, res){
+    
+    var uid = req.body.userID; 
+    console.log("tryna create API Key for " + JSON.stringify(req.body.userID));
+    if (uid) {
+        var oo_id = ObjectID(uid);
+        db.users.findOne({_id: oo_id}, function (err, user) {  
+            if (err || !user) {
+            req.session.error = 'Create API Key Failed - user not found ' + uid;
+            console.log('Create API Key Failed - user not found ' + uid);
+            res.send('noauth');
+        } else {
+            console.log("gotsa user " + user._id + " authLevel " + user.authLevel + " status " + user.status);
+            if (user.apikey && user.apikey.length > 4) { //hrm 
+                res.send("cain't have but one apikey, please contact system administrator");
+                // res.send(newkey);
+            } else {
+                let timestamp = Date.now();
+                timestamp = parseInt(timestamp);
+                let newkey = "smxr_apikey_" + uid + "_" + timestamp;
+                db.users.update( { _id: oo_id }, { $set: { 
+                    apikey: newkey
+                }});
+                res.send("apikey created!");
+                }
+            }
+        });
+    } else {
+        res.send("nope");
+    }
+});
+
+
 ///////////////////////// OBJECT STORE (S3, Minio, etc) OPS BELOW - TODO - replace all s3 getSignedUrl calls with this, promised based version, to suport minio, etc... (!)
 async function ReturnPresignedUrl(bucket, key, time) {
     
@@ -3532,7 +3568,7 @@ app.get('/asset_conv/:_id', requiredAuthentication, usercheck, function (req, re
     });
 });
 
-app.get('/sceneassetputurl/:u_id', checkAppID, requiredAuthentication, usercheck, function (req, res) {
+app.get('/sceneassetputurl/:u_id', requiredAuthentication, usercheck, function (req, res) {
 
     db.users.findOne({"_id": u_id}, function (err, user) {
         if (err || !user) {
@@ -16136,7 +16172,7 @@ app.get('/scene/:_id/:platform/:version', function (req, res) { //called from ap
                 }
             },
             function (objex, callback) { //inject username, last step (since only id is in scene doc)
-
+                sceneResponse.token = token;
                 if ((sceneResponse.userName == null || sceneResponse.userName.length < 1) && (sceneResponse.user_id != null)) {
 
                     var oo_id = ObjectID(sceneResponse.user_id);
