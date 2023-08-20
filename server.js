@@ -2191,7 +2191,7 @@ app.post('/createapp/', requiredAuthentication, admin, domainadmin, function (re
 app.post('/updateapp/:appid', requiredAuthentication, admin, function (req, res) {
         console.log("tryna update appid " + req.params.appid + " body: " + JSON.stringify(req.body));
         db.apps.update({"_id": ObjectID(req.body._id)},
-        {$set: {appname: req.body.appname, appStatus: req.body.appStatus, appdomain: req.body.appdomain}}, function (err, app) {
+        {$set: {appname: req.body.appname, appStatus: req.body.appStatus, appdomain: req.body.appdomain, appunitydomain: req.body.appunitydomain}}, function (err, app) {
             console.log("tryna update app " + req.body._id);
         // db.apps.update(req.body,  function (err, app) {
             if (err || !app) {
@@ -15685,6 +15685,7 @@ app.get('/scene/:_id/:platform/:version', function (req, res) { //called from ap
                             // requestedAudioItems = [ ObjectID(sceneData[0].sceneTriggerAudioID), ObjectID(sceneData[0].sceneAmbientAudioID), ObjectID(sceneData[0].scenePrimaryAudioID)];
                             // console.log("sceneScatterOFfsetn " + sceneData[0].sceneScatterOffset);
                             sceneResponse = sceneData[0];
+                            
                             callback(null);
                         }
 
@@ -15796,17 +15797,75 @@ app.get('/scene/:_id/:platform/:version', function (req, res) { //called from ap
                 }
             },
 
-            // function (callback) { 
+            function (callback) { 
+                let sceneTimedEvents = {};  //TODO move this lower down? 
 
-            //     if (sceneResponse.sceneVideoStreamUrls) {
-            //         var urlScene = s3.getSignedUrl('getObject', {Bucket: 'mvmv.us', Key: versionID + '/' + 'scenes_' + platformType + '/' + sceneResponse.sceneEnvironment.name, Expires: 6000});
-            //         sceneResponse.sceneEnvironment.sceneBundleUrl = urlScene;
-            //         console.log(urlScene);
-            //         callback(null);
-            //     } else {
-            //         callback(null);
-            //     }
-            // },
+                // settings._id = sceneResponse._id;
+                // settings.sceneType = sceneResponse.sceneWebType;
+                // settings.sceneTitle = sceneResponse.sceneTitle;
+                // settings.sceneKeynote = sceneResponse.sceneKeynote;
+                // settings.sceneDescription = sceneResponse.sceneDescription;
+                // settings.sceneEventStart = sceneResponse.sceneEventStart;
+                // settings.sceneEventEnd = sceneResponse.sceneEventEnd;
+                // settings.hideAvatars = true;
+                // settings.sceneSkyRadius = sceneResponse.sceneSkyRadius != undefined ? sceneResponse.sceneSkyRadius : 202;
+                // settings.sceneFontWeb1 = sceneResponse.sceneFontWeb1;
+                // settings.sceneFontWeb2 = sceneResponse.sceneFontWeb2;
+                // settings.sceneFontWeb3 = sceneResponse.sceneFontWeb3;
+                // settings.sceneFontFillColor = sceneResponse.sceneFontFillColor;
+                // settings.sceneFontOutlineColor = sceneResponse.sceneFontOutlineColor;
+                // settings.sceneTextBackground = sceneResponse.sceneTextBackground;
+                // settings.sceneTextBackgroundColor = sceneResponse.sceneTextBackgroundColor;
+                // settings.sceneColor1 = sceneResponse.sceneColor1;
+                // settings.sceneColor2 = sceneResponse.sceneColor2;
+                // settings.sceneColor3 = sceneResponse.sceneColor3;
+                // settings.sceneColor4 = sceneResponse.sceneColor4;
+                // settings.sceneColor1Alt = sceneResponse.sceneColor1Alt;
+                // settings.sceneColor2Alt = sceneResponse.sceneColor2Alt;
+                // settings.sceneColor3Alt = sceneResponse.sceneColor3Alt;
+                // settings.sceneColor4Alt = sceneResponse.sceneColor4Alt;
+                // settings.volumePrimary = sceneResponse.scenePrimaryVolume;
+                // settings.volumeAmbient = sceneResponse.sceneAmbientVolume;
+                // settings.volumeTrigger = sceneResponse.sceneTriggerVolume; 
+                // settings.sceneTimedEvents = sceneResponse.sceneTimedEvents; //could be big!?
+                // settings.skyboxIDs = skyboxIDs;
+                // settings.skyboxID = skyboxID;
+                // settings.skyboxURL = skyboxUrl;
+                // settings.useSynth = hasSynth;
+                // settings.useMatrix = (sceneResponse.sceneTags != null && sceneResponse.sceneTags.includes('matrix'));
+                // settings.sceneWaterLevel = (sceneResponse.sceneWater != undefined && sceneResponse.sceneWater.level != undefined) ? sceneResponse.sceneWater.level : 0;
+                // settings.sceneCameraMode = sceneResponse.sceneCameraMode != undefined ? sceneResponse.sceneCameraMode : "First Person"; 
+                // settings.sceneCameraFlyable = sceneResponse.sceneFlyable != undefined ? sceneResponse.sceneFlyable : false;
+                // let audioGroups = {};
+                // audioGroups.triggerGroups = sceneResponse.sceneTriggerAudioGroups;
+                // audioGroups.ambientGroups = sceneResponse.sceneAmbientAudioGroups;
+                // audioGroups.primaryGroups = sceneResponse.scenePrimaryAudioGroups;
+                // settings.audioGroups = audioGroups; 
+                // settings.clearLocalMods = false;
+                // settings.sceneVideoStreams = sceneResponse.sceneVideoStreamUrls;
+                // settings.socketHost = process.env.SOCKET_HOST;
+                // settings.networking = sceneResponse.sceneNetworking;
+                // settings.playerStartPosition = playerPosition;
+
+                // if (sceneResponse.sceneTags != null && sceneResponse.sceneTags.includes("show avatars")) {
+                //     settings.hideAvatars = false;
+                // }
+                // if (sceneResponse.sceneTags != null && sceneResponse.sceneTags.includes("clear localmods")) {
+                //     settings.clearLocalMods = true;
+                // }
+                
+                // if (sceneResponse.triggerAudioGroups != null && sceneResponse.triggerAudioGroups.length > 0) {
+                //     hasTriggerAudio = true;
+                // }
+                // if (sceneResponse.ambientAudioGroups != null && sceneResponse.ambientAudioGroups.length > 0) {
+                //     hasAmbientAudio = true;
+                // }
+                // if (sceneResponse.primayAudioGroups != null && sceneResponse.primayAudioGroups.length > 0) {
+                //     hasPrimaryAudio = true;
+                // }
+                // sceneResponse.settings = settings;
+                callback(null);
+            },
 
             function (callback) { //TODO jack in version part of path~ AND USE .ENV values!
 

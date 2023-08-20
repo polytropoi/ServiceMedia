@@ -8051,6 +8051,7 @@
                 let appName = !isEmpty ? response.data.appname : "";  //ternarys are OK if not nested.  really. 
                 let appDomain = !isEmpty ? response.data.appdomain : "";
                 let appStatus = !isEmpty ? response.data.appStatus : "";
+                let appUnityDomain = !isEmpty ? response.data.appunitydomain : "";
                 let extraButtons = "";
                 let submitButtonName = !isEmpty ? "Update" : "Create";
                 submitButtonRoute = !isEmpty ? "/updateapp/" + response.data._id : "/createapp/";
@@ -8060,6 +8061,9 @@
                         "<a class=\x22btn btn-dark btn-sm float-right\x22 href=\x22index.html?appid=" + response.data._id + "&type=users&mode=selectadmin&parent=app&iid=" + response.data._id + "\x22>Add App Administrator</a>";
                 } else {
 
+                }
+                if (appUnityDomain == "undefined") {
+                    appUnityDomain = "";
                 }
                 var card = "<div class=\x22col-lg-12\x22>" +
                     "<div class=\x22card shadow mb-4\x22>" +
@@ -8091,6 +8095,10 @@
                                     "<select class=\x22form-control\x22 id=\x22appDomainSelect\x22 required>" +
                                         //pop'd dynamically below
                                     "</select>" +
+                                "</div>" +
+                                "<div class=\x22col form-group\x22>" +
+                                    "<label for=\x22appUnityDomain\x22>Unity Web Domain</label>" +
+                                    "<input type=\x22text\x22 class=\x22form-control\x22 id=\x22appUnityDomain\x22 placeholder=\x22Unity Web Domain\x22 value=\x22" + appUnityDomain + "\x22 >" +
                                 "</div>" +
                             //     "<div class=\x22col form-group\x22>" +
                             //     "<label for=\x22siName\x22>Add Admin UserID</label>" +
@@ -8131,11 +8139,13 @@
                         let appName = document.getElementById("appName").value;
                         let appStatus = document.getElementById("appStatusSelect").value;
                         let appDomain = document.getElementById("appDomainSelect").value;
+                        let appUnityDomain = document.getElementById("appUnityDomain").value;
                         let data = {
                             // _id : response.data._id,
                             appname : appName,
                             appStatus: appStatus,
                             appdomain: appDomain,
+                            appunitydomain : appUnityDomain,
                             appPictureIDs: appPictureIDs,
                             appAdminIDs: appAdminIDs
                         };
@@ -16380,6 +16390,7 @@ function getAllPeople() {
                         let sceneShareWithSubscribers = document.getElementById("sceneSubscriberToggle").checked;
                         let sceneDebugMode = document.getElementById("sceneDebugMode").value;
                         let sceneAltURL = document.getElementById("sceneAltURL").value;
+                        // let sceneUnityWebDomain = document.getElementById("sceneUnityWebDomain").value;
                         let sceneKeynote = document.getElementById("sceneKeynote").value;
                         let sceneDescription = document.getElementById("sceneDescription").value;
                         let sceneShareWithPeople = document.getElementById("sceneShareWithPeople").value;

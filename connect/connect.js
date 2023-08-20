@@ -153,9 +153,9 @@ $(function() {
       console.log('cloud timekeysdata' + JSON.stringify(timeKeysData));
       timedEventsListenerMode = timeKeysData.listenTo;  
    } else if (localStorage.getItem(room + "_timeKeys") != null) { //use local ve3rsion if saved
-         timeKeysData = JSON.parse(localStorage.getItem(room + "_timeKeys"));
-         console.log('local timeKeysData' + JSON.stringify(timeKeysData));
-         timedEventsListenerMode = timeKeysData.listenTo;  
+      timeKeysData = JSON.parse(localStorage.getItem(room + "_timeKeys"));
+      console.log('local timeKeysData' + JSON.stringify(timeKeysData));
+      timedEventsListenerMode = timeKeysData.listenTo;  
    }
 
    AddLocalMarkers();
@@ -163,7 +163,7 @@ $(function() {
    if (vidz != null && vidz.length > 0) { //either video or audio, not both...?
       videoEl = vidz[0];
       console.log("videoEl " + videoEl.id);
-    }
+   }
    // this.statsDiv = document.getElementById("transportStats");
    // document.getElementsByTagName('a-sky')[0].setAttribute('radius', 400); //nope!?!   
 
@@ -824,108 +824,110 @@ function LocationRowClick(data) {
 function AddLocalMarkers() {// new or modded markers not saved to cloud
    console.log("tryna add local keys count " + localStorage.length);
    let locationMods = []; //local scope for local mods 
-   if (localStorage.length > 0 && (settings.sceneType == "Default" || settings.sceneType == "AFrame")) {
-      for (var i=0; i < localStorage.length; i++)  {
-         let theKey = localStorage.key(i);
+   if (settings) {
+      if (localStorage.length > 0 && (settings.sceneType == "Default" || settings.sceneType == "AFrame")) {
+         for (var i=0; i < localStorage.length; i++)  {
+            let theKey = localStorage.key(i);
 
-         let gotsaMatch = false;
+            let gotsaMatch = false;
 
-         if (theKey != null && theKey.toString().includes(room)) {
-            let theItem = localStorage.getItem(theKey);
-            // console.log("local key:" + theKey + " item " + theItem);
-            // console.log(theKey);
-            let keySplit = theKey.split("~"); //room is zero, timestamp is 2
-            localKeys.push(keySplit[2]);// use this to filter the unmodded ones in AddCloudMarkers below, and tell modded vs unmodded locs //nevermind
-            if (theKey.toString().includes("~localmarker~")) {
+            if (theKey != null && theKey.toString().includes(room)) {
+               let theItem = localStorage.getItem(theKey);
+               // console.log("local key:" + theKey + " item " + theItem);
+               // console.log(theKey);
+               let keySplit = theKey.split("~"); //room is zero, timestamp is 2
+               localKeys.push(keySplit[2]);// use this to filter the unmodded ones in AddCloudMarkers below, and tell modded vs unmodded locs //nevermind
+               if (theKey.toString().includes("~localmarker~")) {
 
-               // localKeys.push(keySplit[2]);
+                  // localKeys.push(keySplit[2]);
+                  
+                  // theItemObject = JSON.parse(theItem);
+                  // theItemObject.markerType = theItemObject.markerType + " (local)";
+                  console.log("localplaceholder key:" + theKey + " el " + document.getElementById(theKey));
+                  let phEl = document.getElementById(theKey);
+
+                  if (phEl == null) {
+                     // console.log("creating local el " + theKey);
+                     phEl = document.createElement('a-entity');   
+                     phEl.id = theKey;
+                     var sceneEl = document.querySelector('a-scene');
+                     phEl.setAttribute('skybox-env-map', '');
+                     phEl.setAttribute('local_marker', {'timestamp': keySplit[2]});
+                     sceneEl.appendChild(phEl);
+                  }
+                  if (theItem != null && sceneLocations.locations != null) {
+                     let theItemObject = JSON.parse(theItem);
+                     theItemObject.isLocal = true;
+                     locationMods.push(theItemObject);
+                     if (theItemObject.markerType == "poi") {
+                        let nextbuttonEl = document.getElementById('nextButton');
+                        let prevbuttonEl = document.getElementById('previousButton');
+                        nextbuttonEl.style.visibility = "visible";
+                        prevbuttonEl.style.visibility = "visible";
+                        poiLocations.push(theItemObject);
+                     }
+                  }
+               } else if (theKey.toString().includes("~cloudmarker~")) { //a cloudmarker, if modded by user, becomes a defacto "local" marker, unless/until admin saves to cloud
+                  let keySplit = theKey.split("~"); //room is zero, timestamp is 2
                
-               // theItemObject = JSON.parse(theItem);
-               // theItemObject.markerType = theItemObject.markerType + " (local)";
-               console.log("localplaceholder key:" + theKey + " el " + document.getElementById(theKey));
-               let phEl = document.getElementById(theKey);
-
-               if (phEl == null) {
-                  // console.log("creating local el " + theKey);
-                  phEl = document.createElement('a-entity');
-                  phEl.id = theKey;
-                  var sceneEl = document.querySelector('a-scene');
-                  phEl.setAttribute('skybox-env-map', '');
-                  phEl.setAttribute('local_marker', {'timestamp': keySplit[2]});
-                  sceneEl.appendChild(phEl);
-               }
-               if (theItem != null && sceneLocations.locations != null) {
-                  let theItemObject = JSON.parse(theItem);
-                  theItemObject.isLocal = true;
-                  locationMods.push(theItemObject);
-                  if (theItemObject.markerType == "poi") {
+                  let cItem = JSON.parse(theItem);
+                  // cItem.isLocal = true;
+                  // console.log('cloudplaceholder ' + JSON.stringify(cItem) );
+                  // sceneLocations.locations.find(function(keySplit, index) { //kinda bad, what if 2 have same?
+                  // if(tk.keystarttime == tkStarttimes[i]) {
+                  //    return true;
+                  // }}
+                  locationMods.push(cItem);
+                  if (cItem.markerType == "poi") {
                      let nextbuttonEl = document.getElementById('nextButton');
                      let prevbuttonEl = document.getElementById('previousButton');
                      nextbuttonEl.style.visibility = "visible";
                      prevbuttonEl.style.visibility = "visible";
-                     poiLocations.push(theItemObject);
+                     poiLocations.push((cItem));
+                  }
+               let phEl = document.getElementById(theKey);
+
+                  if (phEl) {
+                  let cloud_marker = phEl.components.cloud_marker;
+                  if (cloud_marker) {
+                     console.log("LocalMods to CLoudMarkerz!");
+                  }
+                  }
+               } else if (theKey.toString().includes('color')) {
+                  // console.log("gots color " + theKey + " item " + theItem);
+               }
+            
+
+               let enviroEl = document.getElementById('enviroEl'); //attached to aframe environment thing
+               if (enviroEl != null) {
+                  if (theKey.toString().includes("sceneColor1")) {  
+                        enviroEl.setAttribute('environment', 'skyColor', theItem);
+                     } else if (theKey.toString().includes("sceneColor2")) {
+                        console.log("theColror eky " + theKey + " " + theItem);
+                        enviroEl.setAttribute('environment', 'horizonColor', theItem);
+                     } else if (theKey.toString().includes("sceneColor3")) {
+                        enviroEl.setAttribute('environment', 'groundColor', theItem);
+                     } else if (theKey.toString().includes("sceneColor4")) {
+                        enviroEl.setAttribute('environment', 'groundColor2', theItem);
+                        enviroEl.setAttribute('environment', 'dressingColor', theItem);
                   }
                }
-            } else if (theKey.toString().includes("~cloudmarker~")) { //a cloudmarker, if modded by user, becomes a defacto "local" marker, unless/until admin saves to cloud
-               let keySplit = theKey.split("~"); //room is zero, timestamp is 2
-              
-               let cItem = JSON.parse(theItem);
-               // cItem.isLocal = true;
-               // console.log('cloudplaceholder ' + JSON.stringify(cItem) );
-               // sceneLocations.locations.find(function(keySplit, index) { //kinda bad, what if 2 have same?
-               // if(tk.keystarttime == tkStarttimes[i]) {
-               //    return true;
-               // }}
-               locationMods.push(cItem);
-               if (cItem.markerType == "poi") {
-                  let nextbuttonEl = document.getElementById('nextButton');
-                  let prevbuttonEl = document.getElementById('previousButton');
-                  nextbuttonEl.style.visibility = "visible";
-                  prevbuttonEl.style.visibility = "visible";
-                  poiLocations.push((cItem));
-               }
-              let phEl = document.getElementById(theKey);
-
-               if (phEl) {
-                 let cloud_marker = phEl.components.cloud_marker;
-                 if (cloud_marker) {
-                  console.log("LocalMods to CLoudMarkerz!");
-                 }
-               }
-            } else if (theKey.toString().includes('color')) {
-               // console.log("gots color " + theKey + " item " + theItem);
+            
+               // console.log("POILOCATIONS : "+ poiLocations.length);
             }
-         
-
-            let enviroEl = document.getElementById('enviroEl'); //attached to aframe environment thing
-            if (enviroEl != null) {
-               if (theKey.toString().includes("sceneColor1")) {  
-                     enviroEl.setAttribute('environment', 'skyColor', theItem);
-                  } else if (theKey.toString().includes("sceneColor2")) {
-                     console.log("theColror eky " + theKey + " " + theItem);
-                     enviroEl.setAttribute('environment', 'horizonColor', theItem);
-                  } else if (theKey.toString().includes("sceneColor3")) {
-                     enviroEl.setAttribute('environment', 'groundColor', theItem);
-                  } else if (theKey.toString().includes("sceneColor4")) {
-                     enviroEl.setAttribute('environment', 'groundColor2', theItem);
-                     enviroEl.setAttribute('environment', 'dressingColor', theItem);
-               }
+            if (localStorage.length - 1 === i) {
+               sceneLocations.locationMods = locationMods;
+               console.log("updated locationmods " + JSON.stringify(sceneLocations.locationMods));
+               // console.log("LOCATIONMODS: " + JSON.stringify(sceneLocations.locationMods));
+               // AddCloudMarkers(); //add the ones from admin
             }
-          
-            // console.log("POILOCATIONS : "+ poiLocations.length);
          }
-         if (localStorage.length - 1 === i) {
-            sceneLocations.locationMods = locationMods;
-            console.log("updated locationmods " + JSON.stringify(sceneLocations.locationMods));
-            // console.log("LOCATIONMODS: " + JSON.stringify(sceneLocations.locationMods));
-            // AddCloudMarkers(); //add the ones from admin
-         }
+         // if (!gotsaMatch) {
+         //    locationMods.push(cloudLocations[c]);
+         // }
+      } else {
+         // AddCloudMarkers(); 
       }
-      // if (!gotsaMatch) {
-      //    locationMods.push(cloudLocations[c]);
-      // }
-   } else {
-      // AddCloudMarkers(); 
    }
 }
 

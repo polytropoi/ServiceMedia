@@ -409,6 +409,7 @@ webxr_router.get('/:_id', function (req, res) {
     let inventoryData = "";
     let joystickContainer  = "";
     let arImageTargets = [];
+    let sceneUnityWebDomain = "http://smxr.net";
 
 
     
@@ -455,7 +456,28 @@ webxr_router.get('/:_id', function (req, res) {
                 }
 
                 if (sceneData.sceneWebType == "Redirect to Unity Webplayer") {
-                    res.redirect('http://smxr.net/index.html?scene=' + reqstring);
+                
+                    // if (sceneData.sceneUnityWebDomain && sceneData.sceneUnityWebDomain.length > 4) {
+                    //     sceneUnityWebDomain = sceneData.sceneUnityWebDomain;
+                    // }
+                    db.apps.findOne({"appdomain": sceneData.sceneDomain}, function(err,app) {
+                        if (err || !app) {
+                            console.log("no apps for you!");
+                            // res.json(domain);
+                            res.redirect(process.env.ROOT_HOST);
+                        } else {
+                            // domain.apps = apps;
+                            // res.json(domain);
+                            if (app.appunitydomain) {
+                                sceneUnityWebDomain = app.appunitydomain;
+                            }
+
+                            res.redirect(sceneUnityWebDomain + '/?scene=' + reqstring);
+                        }
+                    })
+                    
+                    // res.redirect('http://smxr.net/index.html?scene=' + reqstring);
+                    
                 } else {
                 async.waterfall([  // async init
                 
@@ -4144,7 +4166,7 @@ webxr_router.get('/:_id', function (req, res) {
                         "<h4>Immersive Links:</h4><br>"+
                         "<a href=\x22https://servicemedia.net/webxr/"+ sceneResponse.sceneNextScene + "\x22>WebXR link</a> | "+
                         "<a href=\x22http://smxr.net/index.html?scene="+ sceneResponse.sceneNextScene + "\x22>Unity Web link</a> | "+
-                        "<a href=\x22https://servicemedia.net/webxr/"+ sceneResponse.sceneNextScene + "\x22>App link</a>"+
+                        // "<a href=\x22https://servicemedia.net/webxr/"+ sceneResponse.sceneNextScene + "\x22>App link</a>"+
                         // sceneResponse.sceneGreeting+ " " + sceneResponse.sceneQuest+"</div>" +
                         // "<div id=\x22sceneQuest\x22 class=\x22linkfooter\x22 style=\x22z-index: -20;\x22>"+sceneResponse.sceneQuest+"</div>" +
                         "</div></center>"+
