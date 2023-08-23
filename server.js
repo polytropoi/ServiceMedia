@@ -6494,6 +6494,24 @@ app.post('/send_invite/', requiredAuthentication, function (req, res) { //nope
         });
 });
 
+app.post('/ext_auth_req/:domain', function (req, res) {
+    console.log("tryna get ext_auth_req!" + req.body.email);
+    const data = {};
+    data.email = req.body.email.toString().trim();
+    var token=jwt.sign({app:req.params.domain},process.env.JWT_SECRET);
+    const options = {
+        headers: {'X-Access-Token': token}
+        };
+    axios.post("http://localhost:8000/ext_auth_response/", data, options)
+    .then((response) => {
+    // .then(function () {
+        console.log("ext_auth emails: " + JSON.stringify(response.data));
+        res.send(response.data)
+    })
+    .catch(function (error) {
+        res.send("er3oror! " + error);
+    });
+});
 
 app.post('/share_scene/', function (req, res) { //yep! //make it public?
 
