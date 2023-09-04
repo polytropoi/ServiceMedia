@@ -263,9 +263,9 @@ $(function() {
       // This is using the built-in support of the plain video element, without using hls.js.
       else if (video.canPlayType('application/vnd.apple.mpegurl')) {
         video.src = '/hls/'+ vid;
-        video.addEventListener('canplay', function () {
-          video.play();
-        });
+      //   video.addEventListener('canplay', function () {
+      //     video.play();
+      //   });
       }
    }
 

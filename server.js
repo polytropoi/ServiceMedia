@@ -6502,7 +6502,7 @@ app.post('/ext_auth_req/:domain', function (req, res) {
     const options = {
         headers: {'X-Access-Token': token}
         };
-    axios.post("https://rrxr.net/ext_auth_response/", data, options) //todo FLEXIT
+    axios.post("https://rrxr.net/ext_auth_response/", data, options) //todo FLEXIT via app record
     .then((response) => {
     // .then(function () {
         console.log("ext_auth emails: " + JSON.stringify(response.data));
