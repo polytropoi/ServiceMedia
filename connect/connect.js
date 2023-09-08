@@ -274,7 +274,7 @@ $(function() {
       SetPrimaryAudioEventsData();
    }
 
-  
+   sceneEl = document.querySelector('a-scene');
 
    // this.asky = document.getElementsByTagName('a-sky')[0];
    // if (this.asky && settings) {
@@ -1854,7 +1854,12 @@ function UpdatePlayerAvatars(roomUsers) { //aframe only, need to flex.. //no, ju
             if (!avatarEl && !alreadyCreated.includes(key)) {
                console.log("tryna create avatar for " + roomUsers[key]);
                alreadyCreated += key;
-               document.getElementById('createAvatars').components.create_avatars.createAvatar(key);
+               let createAvatarEl = document.getElementById('createAvatars');
+               if (createAvatarEl) {
+                  let createAvatarComponent = createAvatarEl.components.create_avatars;
+                  if (createAvatarComponent)
+                  createAvatarComponent.createAvatar(key); //YES, it's below, but...
+               }
                // let avatar = document.createElement("a-entity"); //this make bad!
                // // let avatar = sceneEl.createElement("a-entity");
                // // avatar.setAttribute('avatar-pos-rot');

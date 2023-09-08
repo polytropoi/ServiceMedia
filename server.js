@@ -452,6 +452,26 @@ io.on('connection', function(socket) {
 
 });
 //*/
+
+function ReturnPresignedUrlSync (bucket, key, time) {
+    if (minioClient) {
+        minioClient.presignedGetObject(bucket, key, time, function(err, presignedUrl) { //use callback version here, can't await?
+            if (err) {
+                console.log(err);
+                return "err";
+            } else {
+                console.log("minio sync url " + presignedUrl)
+               return presignedUrl;
+                
+            }
+        });
+    } else {
+        let url = s3.getSignedUrl('getObject', {Bucket: bucket, Key: key, Expires: time});
+        console.log("s3 sync url" + url);
+        return url;
+    }
+}
+
 function tokenAuthentication(token) { //use for route security?
     jwt.verify(token, process.env.JWT_SECRET, function (err, payload) {
         console.log(JSON.stringify(payload));
@@ -15672,6 +15692,7 @@ app.get('/scene/:_id/:platform/:version', function (req, res) { //called from ap
     sceneResponse.pictures = [];
     sceneResponse.postcards = [];
     let sceneModelLocations = [];
+    var requestedVideoGroups = [];
     // let sceneVideoStreamURLs = [];
     var gltfObjects = [];
     sceneResponse.sceneBundleUrl = "";
@@ -15816,73 +15837,82 @@ app.get('/scene/:_id/:platform/:version', function (req, res) { //called from ap
             },
 
             function (callback) { 
-                let sceneTimedEvents = {};  //TODO move this lower down? 
+                console.log("videoGroups: " + sceneResponse.sceneVideoGroups);
+                    if (sceneResponse.sceneVideoGroups != null && sceneResponse.sceneVideoGroups.length > 0) {
+                        vgID = sceneResponse.sceneVideoGroups[0];
+                        let oo_id = ObjectID(vgID);
 
-                // settings._id = sceneResponse._id;
-                // settings.sceneType = sceneResponse.sceneWebType;
-                // settings.sceneTitle = sceneResponse.sceneTitle;
-                // settings.sceneKeynote = sceneResponse.sceneKeynote;
-                // settings.sceneDescription = sceneResponse.sceneDescription;
-                // settings.sceneEventStart = sceneResponse.sceneEventStart;
-                // settings.sceneEventEnd = sceneResponse.sceneEventEnd;
-                // settings.hideAvatars = true;
-                // settings.sceneSkyRadius = sceneResponse.sceneSkyRadius != undefined ? sceneResponse.sceneSkyRadius : 202;
-                // settings.sceneFontWeb1 = sceneResponse.sceneFontWeb1;
-                // settings.sceneFontWeb2 = sceneResponse.sceneFontWeb2;
-                // settings.sceneFontWeb3 = sceneResponse.sceneFontWeb3;
-                // settings.sceneFontFillColor = sceneResponse.sceneFontFillColor;
-                // settings.sceneFontOutlineColor = sceneResponse.sceneFontOutlineColor;
-                // settings.sceneTextBackground = sceneResponse.sceneTextBackground;
-                // settings.sceneTextBackgroundColor = sceneResponse.sceneTextBackgroundColor;
-                // settings.sceneColor1 = sceneResponse.sceneColor1;
-                // settings.sceneColor2 = sceneResponse.sceneColor2;
-                // settings.sceneColor3 = sceneResponse.sceneColor3;
-                // settings.sceneColor4 = sceneResponse.sceneColor4;
-                // settings.sceneColor1Alt = sceneResponse.sceneColor1Alt;
-                // settings.sceneColor2Alt = sceneResponse.sceneColor2Alt;
-                // settings.sceneColor3Alt = sceneResponse.sceneColor3Alt;
-                // settings.sceneColor4Alt = sceneResponse.sceneColor4Alt;
-                // settings.volumePrimary = sceneResponse.scenePrimaryVolume;
-                // settings.volumeAmbient = sceneResponse.sceneAmbientVolume;
-                // settings.volumeTrigger = sceneResponse.sceneTriggerVolume; 
-                // settings.sceneTimedEvents = sceneResponse.sceneTimedEvents; //could be big!?
-                // settings.skyboxIDs = skyboxIDs;
-                // settings.skyboxID = skyboxID;
-                // settings.skyboxURL = skyboxUrl;
-                // settings.useSynth = hasSynth;
-                // settings.useMatrix = (sceneResponse.sceneTags != null && sceneResponse.sceneTags.includes('matrix'));
-                // settings.sceneWaterLevel = (sceneResponse.sceneWater != undefined && sceneResponse.sceneWater.level != undefined) ? sceneResponse.sceneWater.level : 0;
-                // settings.sceneCameraMode = sceneResponse.sceneCameraMode != undefined ? sceneResponse.sceneCameraMode : "First Person"; 
-                // settings.sceneCameraFlyable = sceneResponse.sceneFlyable != undefined ? sceneResponse.sceneFlyable : false;
-                // let audioGroups = {};
-                // audioGroups.triggerGroups = sceneResponse.sceneTriggerAudioGroups;
-                // audioGroups.ambientGroups = sceneResponse.sceneAmbientAudioGroups;
-                // audioGroups.primaryGroups = sceneResponse.scenePrimaryAudioGroups;
-                // settings.audioGroups = audioGroups; 
-                // settings.clearLocalMods = false;
-                // settings.sceneVideoStreams = sceneResponse.sceneVideoStreamUrls;
-                // settings.socketHost = process.env.SOCKET_HOST;
-                // settings.networking = sceneResponse.sceneNetworking;
-                // settings.playerStartPosition = playerPosition;
+                        db.groups.find({"_id": oo_id}, function (err, groups) {
+                            if (err || !groups) {
+                                callback();
+                            } else {
+                            // console.log("gotsa group: "+ JSON.stringify(groups));
+                            async.each(groups, function (groupID, callbackz) { 
+                                let vidGroup = {};
+                                vidGroup._id = groups[0]._id;
+                                vidGroup.name = groups[0].name;
+                                vidGroup.userID = groups[0].userID;
+                                let ids = groups[0].items.map(convertStringToObjectID);
+                                // let modImages =
+                                db.video_items.find({_id : {$in : ids}}, function (err, videos) { // get all the image records in group
+                                    if (err || !videos) {
+                                        callbackz();
+                                    } else {
+                                        async.each(videos, function(video, cbimage) { //jack in a signed url for each
+                                            // video.url = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + video.userID + "/video/" + video._id + "/" + video._id + "." + video.filename, Expires: 6000}); //TODO: puthemsina video folder!
+                                            video.url = ReturnPresignedUrlSync(process.env.S3_ROOT_BUCKET_NAME, 'users/' + video.userID + "/video/" + video._id + "/" + video._id + "." + video.filename, 6000);
+                                            
+                                            cbimage();
+                                        }, 
+                                        function (err) {
+                                            if (err) {
+                                                vidGroup.videos = videos;
+                                                console.log("vidgroup error " + err);
+                                             
+                                                callbackz();
+                                            } else {
+                                                vidGroup.videos = videos;
+                                                requestedVideoGroups.push(vidGroup);
 
-                // if (sceneResponse.sceneTags != null && sceneResponse.sceneTags.includes("show avatars")) {
-                //     settings.hideAvatars = false;
-                // }
-                // if (sceneResponse.sceneTags != null && sceneResponse.sceneTags.includes("clear localmods")) {
-                //     settings.clearLocalMods = true;
-                // }
-                
-                // if (sceneResponse.triggerAudioGroups != null && sceneResponse.triggerAudioGroups.length > 0) {
-                //     hasTriggerAudio = true;
-                // }
-                // if (sceneResponse.ambientAudioGroups != null && sceneResponse.ambientAudioGroups.length > 0) {
-                //     hasAmbientAudio = true;
-                // }
-                // if (sceneResponse.primayAudioGroups != null && sceneResponse.primayAudioGroups.length > 0) {
-                //     hasPrimaryAudio = true;
-                // }
-                // sceneResponse.settings = settings;
-                callback(null);
+                                                callbackz();
+                                            }
+                                        });
+                                    }
+                                });
+                            },
+                            function (err) {
+                                if (err) {
+                                    console.log('A file failed to process');
+                                    callback(null);
+                                } else {
+                                    console.log('All vidGroups processed successfully');
+                                    // videoElements = ""; //jack in video elements, ios don't like them cooked up in script
+                                    // for (let i = 0; i < requestedVideoGroups[0].videos.length; i++ ) {  //TODO spin first and second level array
+                                    //     // videoElements = videoElements + "<video style=\x22display: none;\x22 loop=\x22true\x22 preload=\x22metadata\x22 type=\x22video/mp4\x22 crossOrigin=\x22anonymous\x22 src=\x22"+requestedVideoGroups[0].videos[i].url+"\x22 playsinline webkit-playsinline id=\x22"+requestedVideoGroups[0].videos[i]._id+"\x22></a-video>";
+                                    //     videoElements = videoElements + "<video style=\x22display: none;\x22 loop=\x22true\x22 crossorigin=\x22use-credentials\x22 webkit-playsinline playsinline id=\x22"+requestedVideoGroups[0].videos[i]._id+"\x22></video>";
+                                       
+                                    // }
+
+                                    // // var buff = Buffer.from(JSON.stringify(requestedVideoGroups)).toString("base64");
+                                    // if (sceneResponse.sceneWebType == "Video Landing") {
+                                    //     videoGroupsEntity = "<div id=\x22videoGroupsData\x22 data-video-groups='"+buff+"'></div>"; 
+                                    // } else {
+                                    //     videoGroupsEntity = "<a-entity video_groups_data id=\x22videoGroupsData\x22 data-video-groups='"+buff+"'></a-entity>"; 
+                                    // }
+                                   
+                                    // hlsScript = "<script src=\x22../main/js/hls.min.js\x22></script>"; //v 1.0.6 client hls player ref
+                                    sceneResponse.sceneVideoStreamUrls[0] = requestedVideoGroups[0].videos[0].url;
+                                    callback(null);
+                                }
+                            });
+                            // callback();
+                            }
+                        });
+                    } else {
+                        callback();
+                    }
+
+                // callback(null);
             },
 
             function (callback) { //TODO jack in version part of path~ AND USE .ENV values!
