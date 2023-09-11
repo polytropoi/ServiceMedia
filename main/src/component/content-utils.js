@@ -5539,7 +5539,7 @@ AFRAME.registerComponent('mod_model', {
 
             // if (hasCallout && !textData[textIndex].toLowerCase().includes("undefined")) {
             if (hasCallout) {
-              // console.log("callout is " + this.calloutString);
+              console.log("callout is " + this.calloutString);
               let pos = evt.detail.intersection.point; //hitpoint on model
               // this.bubble.setAttribute('position', {"x": pos.x.toFixed(2), "y": pos.y.toFixed(2), "z": pos.z.toFixed(2)});
               this.bubble.setAttribute('position', evt.detail.intersection.point);

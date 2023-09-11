@@ -425,18 +425,18 @@ AFRAME.registerComponent('spawned_object', { //cooked on the fly...
       // if (this.model == "spawned") {
         this.el.setAttribute('ammo-shape', {type: 'sphere', fit: 'manual', sphereRadius: this.data.scaleFactor });
         // this.el.setAttribute('ammo-shape', {type: 'sphere'});
-        console.log("tryna load spawned object shape with trigger " + this.el.id);
+        // console.log("tryna load spawned object shape with trigger " + this.el.id);
         this.randomPush();
       // }
     });
 
     this.el.addEventListener("collidestart", (e) => { 
       e.preventDefault();
-      console.log("mod_physics collision on object  :" + this.el.id + " by " + e.detail.targetEl.id + " isTrigger " + this.isTrigger);
+      // console.log("mod_physics collision on object  :" + this.el.id + " by " + e.detail.targetEl.id + " isTrigger " + this.isTrigger);
       if (this.isTrigger) { 
       
         if (e.detail.targetEl.id.includes("wall")) {
-          console.log("mod_physics TRIGGER collision "  + this.el.id + " " + e.detail.targetEl.id);
+          // console.log("mod_physics TRIGGER collision "  + this.el.id + " " + e.detail.targetEl.id);
           var triggerAudioController = document.getElementById("triggerAudio");
           // if (triggerAudioController != null) {
             
@@ -510,7 +510,7 @@ AFRAME.registerComponent('spawned_object', { //cooked on the fly...
     Ammo.destroy(velocity);
   },
   randomPush: function () {
-    console.log("trunya push");
+    // console.log("trunya push");
     const velocity = new Ammo.btVector3(randomNumber(-2, 2), randomNumber(-2, 2), randomNumber(-4, 4));
     // const velocity = new Ammo.btVector3(0, 0, 10);
     this.el.body.setLinearVelocity(velocity);
@@ -520,7 +520,7 @@ AFRAME.registerComponent('spawned_object', { //cooked on the fly...
   rayhit: function (hitID, distance, hitpoint) {
     
       distance = window.playerPosition.distanceTo(hitpoint);
-      console.log("new hit " + hitID + " " + distance + " " + JSON.stringify(hitpoint));
+      // console.log("new hit " + hitID + " " + distance + " " + JSON.stringify(hitpoint));
 
       
         var triggerAudioControllerEl = document.getElementById("triggerAudio");
@@ -529,7 +529,7 @@ AFRAME.registerComponent('spawned_object', { //cooked on the fly...
           // console.log("gotsa audio trigger controller el");
           let triggerAudioController = triggerAudioControllerEl.components.trigger_audio_control;
           if (triggerAudioController  != null) {
-            console.log("gotsa audio trigger controller " + distance);
+            // console.log("gotsa audio trigger controller " + distance);
             let triggertags = this.data.tags != null && this.data.tags != "" ? this.data.tags : "bang";
             triggerAudioController.playAudioAtPosition(hitpoint, distance, triggertags);
           }
@@ -2165,11 +2165,12 @@ AFRAME.registerComponent('cloud_marker', {
     modelID: {default: ''},
     model: {default: ''},
     scale: {default: 1},
-    description: {default: ''}
+    description: {default: ''},
+    allowMods: {default: false}
   },
   init: function () {
-
-   var sceneEl = document.querySelector('a-scene');
+    console.log("tryna set a cloudmarker with scale " + this.data.scale);
+   var sceneEl = document.querySelector('a-scene'); 
     //let calloutString = this.data.calloutString;
     this.cursor = document.querySelector('[cursor]');
     this.calloutEntity = document.createElement("a-entity");
@@ -2178,7 +2179,7 @@ AFRAME.registerComponent('cloud_marker', {
     this.viewportHolder = document.getElementById("viewportPlaceholder3");
     let thisEl = this.el;
     this.isSelected = false;
-    this.data.scale = this.data.scale != undefined ? this.data.scale : 1;
+    this.data.scale = (this.data.scale != undefined && this.data.scale != 'undefined' && this.data.scale != null) ? this.data.scale : 1;
     this.objectElementID = null;
     this.font1 = "Acme.woff";
     this.font2 = "Acme.woff";
@@ -2191,15 +2192,18 @@ AFRAME.registerComponent('cloud_marker', {
       
       this.phID = this.data.phID;
       // console.log("cloudmarker phID " + this.phID); 
-      this.storedVars = JSON.parse(localStorage.getItem(this.phID));
-      // "mod_physics=\x22body: kinematic; isTrigger: true;\x22";
-      
-      // this.el.addEventListener("hitstart", function(event) {   //maybe
-      //   console.log(
-      //     event.target.components["aabb-collider"]["intersectedEls"].map(x => x.id)
-      //   );
-      // });
 
+      // if (this.data.model == null || this.data.model == '') {
+      //   if (this.data.markerType.toLowerCase() == "mailbox") {
+      //     this.el.setAttribute('gltf-model', '#mailbox');
+      //   } else {
+      //     this.el.setAttribute('gltf-model', '#poi1');
+      //   }
+      // }
+      if (this.data.allowMods) {
+        this.storedVars = JSON.parse(localStorage.getItem(this.phID));
+      }
+      
       if (this.storedVars != null) {
         console.log(this.phID + " storedVars " + JSON.stringify(this.storedVars));
         
@@ -2271,10 +2275,11 @@ AFRAME.registerComponent('cloud_marker', {
         this.data.label = this.storedVars.label;
         this.data.name = this.storedVars.name;
         this.data.markerType = this.storedVars.markerType;
-      } else {
+        
+      } else { ///////////////////////////////no mods or mods not allowed (default)
         
         // else { //new ls key for cloud placeholder
-        console.log(this.phID + " unstoredVars " + JSON.stringify(this.storedVars));
+        // console.log(this.phID + " unstoredVars " + JSON.stringify(this.data));
 
           let locItem = {};
           let position = this.el.getAttribute('position'); //
@@ -2302,22 +2307,24 @@ AFRAME.registerComponent('cloud_marker', {
           // storedVars = locItem;
         // }
         
-
-        if (this.data.modelID == null || this.data.modelID == undefined || this.data.model == "none" || this.data.model == "undefined") {
-          // if (this.data.markerType.toLowerCase() == "placeholder") {
-          //     this.el.setAttribute('gltf-model', '#savedplaceholder');
-          //   } else if (this.data.markerType.toLowerCase() == "poi") {
-          //     this.el.setAttribute('gltf-model', '#poi1');
-          //   } else if (this.data.markerType.toLowerCase().includes("trigger")) {
-          //     this.el.setAttribute('gltf-model', '#poi1');  
-          //   } else if (this.data.markerType.toLowerCase() == "gate") {
-          //     this.el.setAttribute('gltf-model', '#poi1');
-          //   } else if (this.data.markerType.toLowerCase() == "portal") {
-          //     this.el.setAttribute('gltf-model', '#poi1');
-          //   } else if (this.data.markerType.toLowerCase() == "mailbox") {
-          //     this.el.setAttribute('gltf-model', '#mailbox');
-          //   }
+        console.log("this.data " + JSON.stringify(this.data));
+        if (this.data.modelID == null || this.data.modelID == undefined || this.data.model == "" || this.data.model == "none" || this.data.model == "undefined") {
+          if (this.data.markerType.toLowerCase() == "placeholder") {
+              this.el.setAttribute('gltf-model', '#savedplaceholder');
+            } else if (this.data.markerType.toLowerCase() == "poi") {
+              this.el.setAttribute('gltf-model', '#poi1');
+            } else if (this.data.markerType.toLowerCase().includes("trigger")) {
+              this.el.setAttribute('gltf-model', '#poi1');  
+            } else if (this.data.markerType.toLowerCase() == "gate") {
+              this.el.setAttribute('gltf-model', '#poi1');
+            } else if (this.data.markerType.toLowerCase() == "portal") {
+              this.el.setAttribute('gltf-model', '#poi1');
+            } else if (this.data.markerType.toLowerCase() == "mailbox") {
+              console.log("TRYNA SET MODEL TO MAILBOX!")
+              this.el.setAttribute('gltf-model', '#mailbox');
+            }
           this.el.setAttribute('gltf-model', '#poi1');
+          // this.el.setAttribute('scale', {x: this.data.scale, y: this.data.scale, z: this.data.scale });
         } else {
           if (this.data.modelID != "none") {
             for (let i = 0; i < sceneModels.length; i++) {
@@ -2326,7 +2333,7 @@ AFRAME.registerComponent('cloud_marker', {
                 // this.el.setAttribute('position', {x: this.data.x, y: this.data.y, z: this.data.z});
                 // this.el.setAttribute('rotation', {x: this.data.eulerx, y: this.data.eulery, z: this.data.eulerz});
                 this.el.setAttribute('scale', {x: this.data.scale, y: this.data.scale, z: this.data.scale });
-                console.log("tryna set new locModel for cloudmarker " + this.data.model);
+                console.log("tryna set new locModel for cloudmarker " + this.data.model + " " + sceneModels[i].url);
 
               }
             }
@@ -2335,7 +2342,8 @@ AFRAME.registerComponent('cloud_marker', {
         if (this.data.objectID != undefined && this.data.objectID != null && this.data.objectID != "none" && this.data.objectID != "") { //hrm, cloudmarker objex?
 
         }
-        localStorage.setItem(this.phID, JSON.stringify(locItem)); 
+      
+        // localStorage.setItem(this.phID, JSON.stringify(locItem)); 
       }
     // if (this.data.markerType.toLowerCase() == "placeholder") {
     //   this.el.setAttribute('gltf-model', '#savedplaceholder');
@@ -2428,7 +2436,7 @@ AFRAME.registerComponent('cloud_marker', {
 
     this.el.addEventListener('model-loaded', (evt) => { //load placeholder model first (which is an a-asset) before calling external
       evt.preventDefault();
-      console.log("MODEL LOADED FOR CLOUDMARKER!!!");
+      console.log("MODEL LOADED FOR CLOUDMARKER!!!" + this.el.id);
       this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"placeholder"});
       // this.el.setAttribute("ammo-body", {type: "kinematic"});
       // this.el.setAttribute('ammo-body', {type: 'kinematic', emitCollisionEvents: true});
@@ -2470,7 +2478,7 @@ AFRAME.registerComponent('cloud_marker', {
         // let elPos = that.el.getAttribute('position');
         // console.log(pos);
         if (!name.includes("handle") && that.calloutEntity != null) {
-          // console.log("tryna show the callout");
+          console.log("tryna show the callout " + that.distance);
           if (that.distance < 66) {
           that.calloutEntity.setAttribute("position", pos);
           that.calloutEntity.setAttribute('visible', true);

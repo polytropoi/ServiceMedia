@@ -1526,7 +1526,7 @@ AFRAME.registerComponent('trigger_audio_control', { //trigger audio on designate
                     this.audioItem = this.audioGroupsController.returnAudioItem(audioID);
 
                     if (this.audioItem != null) {
-                        console.log("gotsa audioItem, tryna set trigger to src " + this.audioItem.URLogg);
+                        // console.log("gotsa audioItem, tryna set trigger to src " + this.audioItem.URLogg);
                         triggerAudioHowl = null;
                         triggerAudioHowl = new Howl({
                             src: [this.audioItem.URLogg, this.audioItem.URLmp3],

@@ -846,6 +846,15 @@ webxr_router.get('/:_id', function (req, res) {
                                         tLoc.phID = sceneResponse.short_id+"~cloudmarker~"+sceneResponse.sceneLocations[i].timestamp;
                                         // console.log("TRYNA SET PLACEHOLDER LOCATION : " + JSON.stringify(tLoc) );
                                         // sceneResponse.sceneLocations[i].phID = 
+                                        if (!tLoc.markerObjScale) {
+                                            tLoc.markerObjScale = 1;
+                                        }
+                                        // if (tLoc.model == undefined) {
+                                        //     if (tLoc.markerType == "mailbox")
+                                        //     tLoc.model = "#mailbox";
+                                        // }
+                                        // tLoc.markerObjScale = (parseFloat(tLoc.markerObjScale) != undefined && parseFloat(tLoc.markerObjScale) != null) ? parseFloat(tLoc.markerObjScale) : 1;
+                                        console.log("TRYNA SET PLACEHOLDER LOCATION : " + JSON.stringify(tLoc) );
                                         locationPlaceholders.push(tLoc);
                                     }
 
@@ -998,7 +1007,8 @@ webxr_router.get('/:_id', function (req, res) {
                                     proceduralEntities = proceduralEntities + "<a-entity mod_tunnel=\x22init: true; scrollDirection: "+scrollDirection+"; scrollSpeed: "+scrollSpeed+"\x22></a-entity>";
                                 }
                                 let scale = 1;
-                                if (sceneResponse.sceneLocations[i].markerObjScale && sceneResponse.sceneLocations[i].markerObjScale != "" && sceneResponse.sceneLocations[i].markerObjScale != 0) {
+                                if (sceneResponse.sceneLocations[i].markerObjScale && sceneResponse.sceneLocations[i].markerObjScale != undefined && sceneResponse.sceneLocations[i].markerObjScale != "" && sceneResponse.sceneLocations[i].markerObjScale != 0) {
+                                // if (!parseFloat(sceneResponse.sceneLocations[i].markerObjScale).isNaN()) {    
                                     scale = sceneResponse.sceneLocations[i].markerObjScale;
                                 }
                                 if (sceneResponse.sceneLocations[i].markerType == "svg canvas fixed") {
@@ -1659,7 +1669,7 @@ webxr_router.get('/:_id', function (req, res) {
                             //     physics = "mod_physics=\x22body: kinematic; isTrigger: true;\x22";
                             // }
                             placeholderEntities = placeholderEntities + "<a-entity id=\x22"+sceneResponse.short_id+"~cloudmarker~"+locationPlaceholders[i].timestamp+"\x22  "+physics+" class=\x22activeObjexGrab activeObjexRay envMap\x22 cloud_marker=\x22phID: "+
-                            locationPlaceholders[i].phID+"; scale: "+locationPlaceholders[i].scale+"; modelID: "+locationPlaceholders[i].modelID+"; model: "+
+                            locationPlaceholders[i].phID+"; scale: "+locationPlaceholders[i].markerObjScale+"; modelID: "+locationPlaceholders[i].modelID+"; model: "+
                             locationPlaceholders[i].model+"; markerType: "+locationPlaceholders[i].markerType+";  tags: "+locationPlaceholders[i].locationTags+"; isNew: false;name: "+
                             locationPlaceholders[i].name+";label: "+locationPlaceholders[i].label+";description: "+locationPlaceholders[i].description+";eventData: "+locationPlaceholders[i].eventData+";timestamp: "+locationPlaceholders[i].timestamp+";\x22 "+
                             skyboxEnvMap+ " position=\x22"+locationPlaceholders[i].x+" "+locationPlaceholders[i].y+ " " +locationPlaceholders[i].z+"\x22 rotation=\x22"+locationPlaceholders[i].eulerx+" "+locationPlaceholders[i].eulery+ " " +locationPlaceholders[i].eulerz+"\x22></a-entity>";
@@ -2213,16 +2223,19 @@ webxr_router.get('/:_id', function (req, res) {
                             }
                             // if ((locMdl.eventData != null && locMdl.eventData != undefined && locMdl.eventData.length > 1) && (!locMdl.eventData.includes("noweb"))) {
 
+                            //filter out cloudmarker types
+                            // console.log(sceneResponse.sceneModels.indexOf(locMdl.modelID) + " index locMdl deets " + JSON.stringify(locMdl));
                             if (locMdl.modelID != undefined && locMdl.modelID != "none" && locMdl.markerType != "placeholder"
                                 && locMdl.markerType != "poi"                                
                                 && locMdl.markerType != "trigger"
                                 && locMdl.markerType != "spawntrigger"
                                 && locMdl.markerType != "gate"
+                                && locMdl.markerType != "mailbox"
                                 && locMdl.markerType != "portal" 
                                 && sceneResponse.sceneModels.indexOf(locMdl.modelID) != -1) {
 
                                 // console.log("tryna set model id:  " + JSON.stringify(locMdl));
-                                // console.log(locMdl.modelID);
+                                console.log("gots a mod_model : " + locMdl.name);
                                 const m_id = ObjectID(locMdl.modelID);
                                 // 
                                 db.models.findOne({"_id": m_id}, function (err, asset) { 
@@ -2379,7 +2392,7 @@ webxr_router.get('/:_id', function (req, res) {
                                         }
 
                                     }
-                                    if (locMdl.latitude != null && locMdl.longitude != null && locMdl.latitude != 0 && locMdl.longitude != 0) { 
+                                    if (locMdl.type.toLowerCase() == "geographic" && locMdl.latitude != null && locMdl.longitude != null && locMdl.latitude != 0 && locMdl.longitude != 0) { 
                                         console.log(" lat/lng model " + JSON.stringify(locMdl));
                                         // gltfsAssets = gltfsAssets + "<a-asset-item id=\x22" + m_assetID + "\x22 src=\x22"+ modelURL +"\x22></a-asset-item>";
                                         gltfsAssets = gltfsAssets + "<a-asset-item id=\x22" + locMdl.modelID + "\x22 src=\x22"+ modelURL +"\x22></a-asset-item>";
@@ -2432,43 +2445,43 @@ webxr_router.get('/:_id', function (req, res) {
                                             console.log("face tracking asset at " + modelURL);
                                            
                                         } else if (sceneResponse.sceneWebType == "BabylonJS") { //babylon, not really...
-                                            gltfsAssets = gltfsAssets + "var lookCtrl = null;\nBABYLON.SceneLoader.ImportMesh('', '', \x22"+modelURL+"\x22, scene, function (meshes, particleSystems, skeletons) {"+
-                                            "meshes[0].scaling = new BABYLON.Vector3("+scale+", "+scale+", "+scale+");\n"+
-                                            "meshes[0].position = new BABYLON.Vector3("+locMdl.x+", "+locMdl.y+", "+locMdl.z+");\n"+
-                                            "meshes[0].rotation = new BABYLON.Vector3("+rx+", "+ry+", "+rz+");\n"+
+                                            // gltfsAssets = gltfsAssets + "var lookCtrl = null;\nBABYLON.SceneLoader.ImportMesh('', '', \x22"+modelURL+"\x22, scene, function (meshes, particleSystems, skeletons) {"+
+                                            // "meshes[0].scaling = new BABYLON.Vector3("+scale+", "+scale+", "+scale+");\n"+
+                                            // "meshes[0].position = new BABYLON.Vector3("+locMdl.x+", "+locMdl.y+", "+locMdl.z+");\n"+
+                                            // "meshes[0].rotation = new BABYLON.Vector3("+rx+", "+ry+", "+rz+");\n"+
                                            
-                                            "for (var m = 0; m < meshes.length; m++){\n"+ //find mesh named eye
-                                                "console.log(meshes[m].material);\n"+
-                                                // "meshes[m].material.environmentTexture = new BABYLON.CubeTexture('', scene, undefined, undefined, "+JSON.stringify( cubeMapAsset)+");" +
-                                                "if (meshes[m].name.includes(\x22eyeball\x22)) {"+
+                                            // "for (var m = 0; m < meshes.length; m++){\n"+ //find mesh named eye
+                                            //     "console.log(meshes[m].material);\n"+
+                                            //     // "meshes[m].material.environmentTexture = new BABYLON.CubeTexture('', scene, undefined, undefined, "+JSON.stringify( cubeMapAsset)+");" +
+                                            //     "if (meshes[m].name.includes(\x22eyeball\x22)) {"+
                                                    
-                                                    "console.log(meshes[m].name);"+
-                                                    "let characterMesh = meshes[m];"+
-                                                    "for (var b = 0; b < skeletons[0].bones.length - 1; b++){\n"+ //then find bone named eye //NM, pointless - can't use bone with gltf :(
+                                            //         "console.log(meshes[m].name);"+
+                                            //         "let characterMesh = meshes[m];"+
+                                            //         "for (var b = 0; b < skeletons[0].bones.length - 1; b++){\n"+ //then find bone named eye //NM, pointless - can't use bone with gltf :(
                                                        
-                                                        "if (skeletons[0].bones[b].name == \x22Eye\x22) {\n"+
-                                                            // "skeletons[0].bones.lookAt(mainCam.position);"+
-                                                            "console.log(skeletons[0].bones[b].name);\n"+
-                                                            "scene.beginAnimation(skeletons[0], 0, 100, true, 1.0);\n"+
-                                                            // "let lookCtrl = new BABYLON.BoneLookController(meshes[0], skeletons[0].bones[b], mainCam.position, {adjustYaw:Math.PI*.5, adjustPitch:Math.PI*.5, adjustRoll:Math.PI});\n"+
-                                                            "var skeleton = skeletons[0];\n"+
-                                                            "var time = 0;\n"+
-                                                            "var state = 'Initial';\n"+
-                                                            "var lastAppliedQuat = new BABYLON.Quaternion();\n"+
-                                                            "var stateTime = 0;\n"+
-                                                            "var timingFunc = (x) => Math.cos(x * Math.PI) * -0.5 + 0.5;\n"+
-                                                            // var cubeTex = new BABYLON.CubeTexture("", scene, );
-                                                            "scene.registerBeforeRender(function(){\n" +
+                                            //             "if (skeletons[0].bones[b].name == \x22Eye\x22) {\n"+
+                                            //                 // "skeletons[0].bones.lookAt(mainCam.position);"+
+                                            //                 "console.log(skeletons[0].bones[b].name);\n"+
+                                            //                 "scene.beginAnimation(skeletons[0], 0, 100, true, 1.0);\n"+
+                                            //                 // "let lookCtrl = new BABYLON.BoneLookController(meshes[0], skeletons[0].bones[b], mainCam.position, {adjustYaw:Math.PI*.5, adjustPitch:Math.PI*.5, adjustRoll:Math.PI});\n"+
+                                            //                 "var skeleton = skeletons[0];\n"+
+                                            //                 "var time = 0;\n"+
+                                            //                 "var state = 'Initial';\n"+
+                                            //                 "var lastAppliedQuat = new BABYLON.Quaternion();\n"+
+                                            //                 "var stateTime = 0;\n"+
+                                            //                 "var timingFunc = (x) => Math.cos(x * Math.PI) * -0.5 + 0.5;\n"+
+                                            //                 // var cubeTex = new BABYLON.CubeTexture("", scene, );
+                                            //                 "scene.registerBeforeRender(function(){\n" +
                                                             
-                                                           "});\n"+
+                                            //                "});\n"+
                                                             
-                                                        "}\n"+
-                                                    "}\n"+
-                                                    //  "lookCtrl = new BABYLON.BoneLookController(characterMesh, skeletons[0].bones[m], mainCam.position, {adjustYaw:Math.PI*.5, adjustPitch:Math.PI*.5, adjustRoll:Math.PI});\n"+
-                                                "}\n"+
-                                            "}\n"+
+                                            //             "}\n"+
+                                            //         "}\n"+
+                                            //         //  "lookCtrl = new BABYLON.BoneLookController(characterMesh, skeletons[0].bones[m], mainCam.position, {adjustYaw:Math.PI*.5, adjustPitch:Math.PI*.5, adjustRoll:Math.PI});\n"+
+                                            //     "}\n"+
+                                            // "}\n"+
 
-                                            "});\n";
+                                            // "});\n";
                                         } else { //aframe !!!
                                             // let zFix = parseFloat(locMdl.z) * -1; //fix to match unity 
                                             let zFix = parseFloat(locMdl.z); //nope
