@@ -562,9 +562,9 @@ function ImportMods (event) {
          for (let i = 0; i < mods.locationMods.length; i++) {
             if (mods.locationMods[i].phID != null && mods.locationMods[i].phID.includes(room)) {
                if (mods.locationMods[i].type == null || mods.locationMods[i].type == undefined) {
-                  mods.locationMods[i].type = "Worldspace";
+                  mods.locationMods[i].type = "worldspace";
                } 
-               localStorage.setItem(mods.locationMods[i].phID, JSON.stringify(mods.locationMods[i]));
+               localStorage.setItem(mods.locationMods[i].phID, JSON.stringify(mods.locationMods[i])); //main location data localstorage setting
             }
             if (mods.locationMods.length - 1 === i) {
                window.location.reload();
@@ -713,14 +713,15 @@ function GoToNext() {
       FlyToMapPosition(lbData.split("_")[0],lbData.split("_")[1], false);
     
    } else {
-
-      if (sceneLocations != null && poiLocations.length > 0) {
+      // console.log(JSON.stringify(sceneLocations) + " charlie " + JSON.stringify(poiLocations));
+      if (sceneLocations != null && poiLocations.length > 0) { 
          if (currentLocationIndex < poiLocations.length - 1) {
             currentLocationIndex++;
          } else {
             currentLocationIndex = 0;
             
          }
+         console.log(poiLocations[currentLocationIndex].phID);
       // if (sceneLocations.locationMods[currentLocationIndex].markerType.toLowerCase() == 'poi') {
          GoToLocation(poiLocations[currentLocationIndex].phID);
          // }
@@ -1093,6 +1094,7 @@ if (sceneEl != null) {
                      let prevbuttonEl = document.getElementById('previousButton');
                      nextbuttonEl.style.visibility = "visible";
                      prevbuttonEl.style.visibility = "visible";
+                     poiLocations.push(this.data.jsonData[i]);
 
                   }
                }

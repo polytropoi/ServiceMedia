@@ -1026,6 +1026,34 @@ app.get("/", function (req, res) {
 
 // });
 
+app.get("/unity/:id", function (req, res){ //redirect to unity
+
+    // let oid = ObjectID(req.params.id);
+    db.scenes.findOne({"short_id" : req.params.id}, function (err, scene) {
+        if (err || !scene) {
+            res.send("Sorry, that scene was not found");
+        } else {
+            if (scene.sceneWebGLOK) {
+                db.apps.findOne({"appdomain": scene.sceneDomain}, function(err,app) {
+                    if (err || !app) {
+                        console.log("no apps for you!");
+                        res.send("Sorry, hostname for unity web player not found"); //nice landing, sniff useragent and show mobile deeplinks if present
+                    } else {
+                        // domain.apps = apps;
+                        // res.json(domain);
+                        if (app.appunitydomain) {
+                            sceneUnityWebDomain = app.appunitydomain;
+                        }
+                        res.redirect(sceneUnityWebDomain + '/?scene=' + req.params.id);
+                    }
+                });
+            } else {
+                res.send("Sorry, that scene is not configured to support the Unity Web Player");
+            }
+        }
+    });
+});
+
 app.get("/privacy.html", function (req,res) {
     res.redirect("/main/privacy.html");
 });

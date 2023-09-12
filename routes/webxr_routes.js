@@ -457,9 +457,6 @@ webxr_router.get('/:_id', function (req, res) {
 
                 if (sceneData.sceneWebType == "Redirect to Unity Webplayer") {
                 
-                    // if (sceneData.sceneUnityWebDomain && sceneData.sceneUnityWebDomain.length > 4) {
-                    //     sceneUnityWebDomain = sceneData.sceneUnityWebDomain;
-                    // }
                     db.apps.findOne({"appdomain": sceneData.sceneDomain}, function(err,app) {
                         if (err || !app) {
                             console.log("no apps for you!");
@@ -474,10 +471,8 @@ webxr_router.get('/:_id', function (req, res) {
 
                             res.redirect(sceneUnityWebDomain + '/?scene=' + reqstring);
                         }
-                    })
-                    
-                    // res.redirect('http://smxr.net/index.html?scene=' + reqstring);
-                    
+                    });
+                                        
                 } else {
                 async.waterfall([  // async init
                 
