@@ -15929,7 +15929,7 @@ app.get('/scene/:_id/:platform/:version', function (req, res) { //called from ap
                                     // }
                                    
                                     // hlsScript = "<script src=\x22../main/js/hls.min.js\x22></script>"; //v 1.0.6 client hls player ref
-                                    sceneResponse.sceneVideoStreamUrls[0] = requestedVideoGroups[0].videos[0].url;
+                                    // sceneResponse.sceneVideoStreamUrls[0] = requestedVideoGroups[0].videos[0].url;
                                     callback(null);
                                 }
                             });
