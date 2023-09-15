@@ -1034,6 +1034,7 @@ app.get("/unity/:id", function (req, res){ //redirect to unity
             res.send("Sorry, that scene was not found");
         } else {
             if (scene.sceneWebGLOK) {
+                let sceneUnityWebDomain = process.env.ROOT_HOST;
                 db.apps.findOne({"appdomain": scene.sceneDomain}, function(err,app) {
                     if (err || !app) {
                         console.log("no apps for you!");
@@ -1041,9 +1042,12 @@ app.get("/unity/:id", function (req, res){ //redirect to unity
                     } else {
                         // domain.apps = apps;
                         // res.json(domain);
+                        
                         if (app.appunitydomain) {
                             sceneUnityWebDomain = app.appunitydomain;
+
                         }
+                        // console.log(sceneUnityWebDomain);
                         res.redirect(sceneUnityWebDomain + '/?scene=' + req.params.id);
                     }
                 });
