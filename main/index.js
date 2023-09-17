@@ -12986,8 +12986,10 @@ function getAllPeople() {
                     "<div class=\x22card shadow mb-4\x22>" +
                     "<div class=\x22card-header py-3 d-flex flex-row align-items-center justify-content-between\x22>" +
                         "<h6 class=\x22m-0 font-weight-bold text-primary\x22>Scene Details - "+ sceneTitle +" | _id: "+ response.data._id +
+                        " | <a target=\x22_blank\x22 href=\x22../landing/"+ response.data.short_id +"\x22>Landing Link</a>" +                       
                         " | <a target=\x22_blank\x22 href=\x22../webxr/"+ response.data.short_id +"\x22>WebXR Link</a>" +
-                        " | <a target=\x22_blank\x22 href=\x22http://smxr.net/index.html?scene="+ response.data.short_id +"\x22>Unity Web Link</a>" +
+                        " | <a target=\x22_blank\x22 href=\x22../unity/"+ response.data.short_id +"\x22>Unity Link</a>" +
+                        // " | <a target=\x22_blank\x22 href=\x22http://smxr.net/index.html?scene="+ response.data.short_id +"\x22>Unity Web Link</a>" +
                         " | <a target=\x22_blank\x22 href=\x22servicemedia://scene?"+ response.data.short_id +"\x22>App Link</a></h6>" +
                         // "<a class=\x22btn btn-xs\x22 href=\x22../webxr/"+response.data.short_id +">WebXR</a>"+
                         "<button id=\x22showHideAll\x22 class=\x22btn btn-sm btn-light float-right\x22><i class=\x22fas fa-plus-circle\x22></i> show/hide all</button>" +
@@ -13225,11 +13227,13 @@ function getAllPeople() {
                                     sceneEventDuration +
                                     sceneEventCountdown +
                                 "</div>" +
+                                
                                 // "<div>" +
                                 "<div class=\x22col form-group col-md-2\x22>" +
                                     "<div id=\x22sendInvitationButton\x22 class=\x22btn float-right btn-info btn-sm\x22>Send Invitation</div><br>"+
                                     "<div id=\x22sendInvitationButton\x22 class=\x22btn float-left btn-warning btn-sm\x22>Send Test</div>"+
                                 "</div>" +
+
                             "</div>" +
                             "<div class=\x22form-row\x22>" +    
                                 "<div class=\x22col form-group col-md-1\x22>" +
@@ -13283,6 +13287,38 @@ function getAllPeople() {
                                     "<a class=\x22btn btn-sm btn-dark float-right\x22 target=\x22_blank\x22 href=\x22/qrcode/"+sceneAltURL+"\x22><i class=\x22far fa-file-alt\x22></i> Alternate URL QRCode</a><br><br>" +
                                     "<a class=\x22btn btn-sm btn-dark float-right\x22 target=\x22_blank\x22 href=\x22/qrcode/"+short_id+"\x22><i class=\x22far fa-file-alt\x22></i> ServiceMedia URL QRCode</a>" +
                                 "</div>" +
+                                // "<div class=\x22col form-group col-md-3\x22>" +
+                                // "<label for=\x22sceneStyleTheme\x22>Style Theme</label>" +
+                                //     "<select class=\x22form-control\x22 id=\x22sceneStyleTheme\x22 >" +
+                                //     "<option value=\x22\x22 disabled selected>Select:</option>" +
+                                //     "<option>Cerulean</option>" +
+                                //     "<option>Darkly</option>" +
+                                //     "<option>Litera</option>" +
+                                //     "<option>Materia</option>" +
+                                //     "<option>Pulse</option>" +
+                                //     "<option>Simplex</option>" +
+                                //     "<option>Solar</option>" +
+                                //     "<option>United</option>" +
+                                //     "<option>Zephyr</option>" +
+                                //     "<option>Cosmo</option>" +
+                                //     "<option>Flatly</option>" +
+                                //     "<option>Lumen</option>" +
+                                //     "<option>Minty</option>" +
+                                //     "<option>Quartz</option>" +
+                                //     "<option>Sketchy</option>" +
+                                //     "<option>Spacelab</option>" +
+                                //     "<option>Vapor</option>" +
+                                //     "<option>Cyborg</option>" +
+                                //     "<option>Journal</option>" +
+                                //     "<option>Lux</option>" +
+                                //     "<option>Morph</option>" +
+                                //     "<option>Sandstone</option>" +
+                                //     "<option>Slate</option>" +
+                                //     "<option>Superhero</option>" +
+                                //     "<option>Yeti</option>" +
+                               
+                                //     "</select>" +
+                                // "</div>" +
                             "</div>" +
 
                         // "</div>" + 
@@ -13638,16 +13674,49 @@ function getAllPeople() {
                                     "<label for=\x22sceneTextBackgroundColor\x22>Background Color</label>" + //sceneText
                                     "<input id=\x22sceneTextBackgroundColor\x22 class=\x22form-control\x22 type=\x22color\x22>" +
                                 "</div>" +
-                                "<div class=\x22col form-group col-md-3\x22>" +
-                                    "<label for=\x22sceneTextBackground\x22>Text Background</label>" + //FontSelect
-                                    "<select class=\x22form-control\x22 id=\x22sceneTextBackgroundSelect\x22 >" +
-                                        "<option>None</option>" +
-                                        "<option>Default</option>" +
-                                        "<option>SciFi</option>" +
-                                        "<option>Parchement</option>" +
+                                // "<div class=\x22col form-group col-md-3\x22>" +
+                                //     "<label for=\x22sceneTextBackground\x22>Text Background</label>" + //FontSelect
+                                //     "<select class=\x22form-control\x22 id=\x22sceneTextBackgroundSelect\x22 >" +
+                                //         "<option>None</option>" +
+                                //         "<option>Default</option>" +
+                                //         "<option>SciFi</option>" +
+                                //         "<option>Parchement</option>" +
                                        
+                                //     "</select>" +
+                                // "</div>" +
+                                "<div class=\x22col form-group col-md-3\x22>" +
+                                "<label for=\x22sceneStyleTheme\x22>Style Theme</label>" +
+                                    "<select class=\x22form-control\x22 id=\x22sceneStyleTheme\x22 >" +
+                                    "<option value=\x22\x22 disabled selected>Select:</option>" +
+                                    "<option>Cerulean</option>" +
+                                    "<option>Darkly</option>" +
+                                    "<option>Litera</option>" +
+                                    "<option>Materia</option>" +
+                                    "<option>Pulse</option>" +
+                                    "<option>Simplex</option>" +
+                                    "<option>Solar</option>" +
+                                    "<option>United</option>" +
+                                    "<option>Zephyr</option>" +
+                                    "<option>Cosmo</option>" +
+                                    "<option>Flatly</option>" +
+                                    "<option>Lumen</option>" +
+                                    "<option>Minty</option>" +
+                                    "<option>Quartz</option>" +
+                                    "<option>Sketchy</option>" +
+                                    "<option>Spacelab</option>" +
+                                    "<option>Vapor</option>" +
+                                    "<option>Cyborg</option>" +
+                                    "<option>Journal</option>" +
+                                    "<option>Lux</option>" +
+                                    "<option>Morph</option>" +
+                                    "<option>Sandstone</option>" +
+                                    "<option>Slate</option>" +
+                                    "<option>Superhero</option>" +
+                                    "<option>Yeti</option>" +
+                               
                                     "</select>" +
                                 "</div>" +
+
                             "</div>" +
                             "<div class=\x22form-row\x22>" +
                                 "<div class=\x22col form-group col-md-2\x22>" +
@@ -14810,7 +14879,7 @@ function getAllPeople() {
                 $("#sceneText").val(sceneText);
                 $("#sceneGreeting").val(sceneGreeting);
                 $("#sceneQuest").val(sceneQuest);
-                
+                $("#sceneStyleTheme").val(response.data.sceneStyleTheme);
                 // $("#sceneAppNameSelect").val(); //then pop the values if not new
                 $("#sceneFontWeb1Select").val(response.data.sceneFontWeb1);
                 $("#sceneFontWeb2Select").val(response.data.sceneFontWeb2);
@@ -16383,7 +16452,8 @@ function getAllPeople() {
                         let sceneWebType = document.getElementById("sceneWebTypeSelect").value;
                         let sceneShareWithGroups = document.getElementById("sceneShareWithGroups").value;
 
-                        let sceneCameraPath = document.getElementById("sceneCameraPath").value;
+
+                        // let sceneCameraPath = document.getElementById("sceneCameraPath").value;
                         let sceneCameraMode = document.getElementById("sceneCameraMode").value;
 
                         let sceneShareWithPublic = document.getElementById("scenePublicToggle").checked;
@@ -16403,6 +16473,9 @@ function getAllPeople() {
                         let sceneStickyness = document.getElementById("sceneStickyness").value;
                         let sceneSource = document.getElementById("sceneSource").value;
                         let sceneText = document.getElementById("sceneText").value;
+
+                        let sceneStyleTheme = document.getElementById("sceneStyleTheme").value;
+
                         let sceneFontFillColor = document.getElementById("sceneFontFillColor").value;
                         let sceneFontOutlineColor = document.getElementById("sceneFontOutlineColor").value;
                         let sceneTextBackgroundColor = document.getElementById("sceneTextBackgroundColor").value;
@@ -16671,6 +16744,7 @@ function getAllPeople() {
                             sceneColor2: sceneColor2,
                             sceneColor3: sceneColor3,
                             sceneColor4: sceneColor4,
+                            sceneStyleTheme: sceneStyleTheme,
                             sceneColor1Alt: sceneColor1Alt,
                             sceneColor2Alt: sceneColor2Alt,
                             sceneColor3Alt: sceneColor3Alt,

@@ -188,6 +188,8 @@ var store = new MongoDBStore({ //store session cookies in a separate db with dif
     app.use('/oculus', oculus_routes);
     var webxr_routes = require('./routes/webxr_routes');
     app.use('/webxr', webxr_routes);  
+    var landing_routes = require('./routes/landing_routes');
+    app.use('/landing', landing_routes);  
     
 
 
@@ -14494,6 +14496,7 @@ app.post('/clone_scene', requiredAuthentication, function (req,res) {
                     sceneUseMicrophoneInput  : scene.sceneUseMicrophoneInput != null ? scene.sceneUseMicrophoneInput : false,
                     sceneKeynote  : scene.sceneKeynote,
                     sceneDescription  : scene.sceneDescription,
+                    sceneStyleTheme: scene.sceneStyleTheme != null ? scene.sceneStyleTheme : "",
                     sceneFontWeb1  : scene.sceneFontWeb1,
                     sceneFontWeb2  : scene.sceneFontWeb2,
                     sceneFont  : scene.sceneFont,
@@ -14722,6 +14725,7 @@ app.post('/update_scene/:_id', requiredAuthentication, function (req, res) {
                 sceneColor1 : req.body.sceneColor1,
                 sceneColor2 : req.body.sceneColor2,
                 sceneColor3 : req.body.sceneColor3,
+                sceneStyleTheme: req.body.sceneStyleTheme != null ? req.body.sceneStyleTheme : "",
                 sceneColor4Alt : req.body.sceneColor4Alt,
                 sceneColor1Alt : req.body.sceneColor1Alt,
                 sceneColor2Alt : req.body.sceneColor2Alt,
