@@ -138,7 +138,7 @@ async function ReturnPresignedUrl(bucket, key, time) {
 
 
 
-////////////////////PRIMARY SERVERSIDE /WEBXR ROUTE///////////////////
+////////////////////PRIMARY SERVERSIDE LANDING ROUTE///////////////////
 landing_router.get('/:_id', function (req, res) { 
     // let db = req.app.get('db');
     // let s3 = req.app.get('s3');
@@ -409,7 +409,10 @@ landing_router.get('/:_id', function (req, res) {
     let inventoryData = "";
     let joystickContainer  = "";
     let arImageTargets = [];
-    let sceneUnityWebDomain = "http://smxr.net";
+    let sceneUnityWebDomain = "/";
+    let postcardImages = [];
+    
+
 
 
     
@@ -3072,7 +3075,7 @@ landing_router.get('/:_id', function (req, res) {
                                     console.log("error getting postcard " + postcard._id + err);
                                     callback(err);
                                 } else {
-                                    // postcard1 = ReturnPresignedUrlSync(process.env.S3_ROOT_BUCKET_NAME, 'users/' + picture_item.userID +"/pictures/"+ picture_item._id + ".standard." + picture_item.filename, 6000); //just return a single 
+                                    postcardImages.push(ReturnPresignedUrlSync(process.env.S3_ROOT_BUCKET_NAME, 'users/' + picture_item.userID +"/pictures/"+ picture_item._id + ".standard." + picture_item.filename, 12000)); //just return a single 
                                     // // console.log("postcard1 " + postcard1);
                                     // callback(null);
                                     var params = {
@@ -3091,14 +3094,14 @@ landing_router.get('/:_id', function (req, res) {
                                                 } else {
                                                     console.log('SUCCESS copyObject');
                                                     
-                                                   
+                                                    
                                                     postcard1 = sceneResponse.sceneDomain +"/postcards/"+sceneResponse.short_id +"/"+ picture_item._id + ".standard." + picture_item.filename;
                                                    
                                                     callback();
                                                 }
                                             });
                                         } else {
-                                            
+                                            postcardImages.push()
                                             postcard1 = "http://" + bucketFolder +"/postcards/"+sceneResponse.short_id +"/"+ picture_item._id + ".standard." + picture_item.filename;
                                             console.log("gotsa postcard " + postcard1 );
                                             callback();
@@ -3560,6 +3563,7 @@ landing_router.get('/:_id', function (req, res) {
                         // } 
                         // let hasTile = false;
                         // let bgstyle = "style=\x22height:100%; width:100%; overflow:auto; background-color: "+sceneResponse.sceneColor1+";\x22"
+                        let availableScenesHTML = "";
                         let bgstyle = "style=\x22height:100%; width:100%; overflow:auto;\x22";
                         // bgcolor=\x22"+sceneResponse.sceneColor1+"\x22>\n
                         if (tilepicUrl != "") {
@@ -3582,6 +3586,18 @@ landing_router.get('/:_id', function (req, res) {
                         }
                         if (!sceneResponse.sceneShareWithSubscribers && sceneResponse.sceneWebGLOK) {
                            platformButtons += "<a class=\x22mx-auto btn btn-xl btn-info \x22 href=\x22../unity/"+ sceneResponse.short_id + "\x22>Enter Unity Scene</a> ";
+                        }
+                        var audioHtml = "";
+                        // var audioHtml = '<div class=\x22col-md-12 pull-left\x22><audio controls><source src=\x22#\x22 type=\x22audio/mp3\x22></audio></div><hr>';   
+
+                        // if (arr[i].primaryAudioUrl != undefined) {
+                        //     audioHtml = '<div><audio controls><source src=\x22' + arr[i].primaryAudioUrl  + '\x22 type=\x22audio/mp3\x22></audio></div>';
+                        // }
+                        // if (arr[i].scenePrimaryAudioStreamURL != undefined) {
+                        //     audioHtml = '<div><audio controls><source src=\x22' + arr[i].scenePrimaryAudioStreamURL  + '\x22 type=\x22audio/mp3\x22></audio></div>';
+                        // }
+                        if (mp3url != undefined && mp3url.length > 6) {
+                            audioHtml = '<div><audio controls><source src=\x22' + mp3url + '\x22 type=\x22audio/mp3\x22></audio></div>';
                         }
 
                         htmltext = "<!DOCTYPE html>\n" +
@@ -3620,54 +3636,30 @@ landing_router.get('/:_id', function (req, res) {
                         // "<script src=\x22../main/js/dialogs.js\x22></script>" +
                         
                         // "<script src=\x22/connect/connect.js\x22 defer=\x22defer\x22></script>" +
+                        "<style> audio {"+
+                                "filter: sepia(20%) saturate(70%) grayscale(1) contrast(99%) invert(92%);"+
+                                "width: 100%;"+
+                                "height: 66px;"+
+                            "}"+
+                        "</style>"+ 
                        
                         "</head>\n" +
                         "<body "+bgstyle+">" +
-                        // "<body>" +
-                        // "<div class=\x22avatarName\x22 id="+avatarName+"></div>"+
-                        // "<div id=\x22token\x22 data-token=\x22"+token+"\x22></div>\n"+
-                        settingsData +
-                        // aframeScriptVersion + 
-                        // extraScripts + 
-                        // contentUtils +
-                        // hlsScript +
-                        // // videoEntity +
-                        // videoGroupsEntity +
                       
-
-                        // "<center><div>"+
-
-                        // "<br><br><br><br><div id=\x22sceneGreeting\x22 class=\x22linkfooter\x22>"+
-                        // "<div class=\x22header\x22>"+sceneGreeting+ " " + sceneQuest+"</div>"+
-
-                        // "<section class=\x22py-5\x22>"+
+                        "<div class=\x22avatarName\x22 id="+avatarName+"></div>"+
+                        "<div id=\x22token\x22 data-token=\x22"+token+"\x22></div>\n"+
+                        settingsData +
+                      
                         "<div class=\x22container px-4 px-lg-5 my-5\x22>"+
                             "<div class=\x22row gx-4 gx-lg-5 align-items-center\x22>"+
                                 "<div class=\x22col-md-6\x22>"+
-                                // "<div class=\x22card\x22 style=\x22height: 50%\x22>"+
-                                // "<img src=\x22"+postcard1+"\x22 class=\x22card-img-top mt-0\x22 >"+
-                                // "<div class=\x22card-body\x22>"+
-                                
-                                //     "<h5 class=\x22card-title\x22>Card title</h5>"+
-                                //     "<p class=\x22card-text\x22>Some quick example text to build on the card title and make up the bulk of the card's content.</p>"+
-                                //     // "<a href="#" class="btn btn-primary">Go somewhere</a>"+
-                                //     "<a class=\x22mx-auto btn btn-xl btn-info \x22 href=\x22../webxr/"+ sceneResponse.short_id + "\x22>Visit WebXR Scene</a> "+
-                                //     "<a class=\x22mx-auto btn btn-xl btn-info \x22 href=\x22../unity/"+ sceneResponse.short_id + "\x22>Visit Unity Scene</a> "+
-                                // "</div>"+
-                                // "</div>"+
-                                
-                                
-                                "<img class=\x22img-fluid\x22 src=\x22"+postcard1+"\x22 alt=\x22...\x22 />"+
+                               
+                                "<img class=\x22img-fluid\x22 src=\x22"+postcardImages[0]+"\x22 alt=\x22...\x22 />"+
+                                audioHtml +
                                 // "<img class=\x22card-img-top mb-5 mb-md-0\x22 src=\x22"+postcard1+"\x22 alt=\x22...\x22 />"+
                                 "<p class=\x22lead\x22>"+sceneResponse.sceneDescription+"</p>"+
                                
-                                
-                                
-                                
-
-
-                                // "<p class=\x22lead\x22>"+sceneResponse.sceneText+"</p>"+
-                              
+                                        // "<p class=\x22lead\x22>"+sceneResponse.sceneText+"</p>"+                      
                                
                                 "</div>"+
                                 "<div class=\x22col-md-6\x22>"+
@@ -3676,15 +3668,9 @@ landing_router.get('/:_id', function (req, res) {
                                     "<div class=\x22fs-5 mb-5\x22>"+
                                         
                                     "<p class=\x22lead\x22>"+scenePrice+"</p>"+
-                                    
-                                        // "<span class=\x22text-decoration-line-through\x22>$45.00</span>"+
-                                        // "<span>Price: FREE!</span>"+
-                                        // "<span>"+sceneResponse.sceneDescription+"</span>"+
                                         "<p class=\x22lead\x22>"+sceneGreeting+"</p>"+
                                         "<p class=\x22lead\x22>"+sceneQuest+"</p>"+
                                         // "<span>"+sceneQuest+"</span>"+
-
-                                    
 
                                     platformButtons +
                                
@@ -3706,7 +3692,12 @@ landing_router.get('/:_id', function (req, res) {
                                 "<hr>"+
                                 "<p class=\x22lead\x22>"+sceneResponse.sceneText+"</p>"+
                                 "</div>"+
+                            "</div>"+
+                                "<div class=\x22row gx-4 gx-lg-5 align-items-center\x22>"+
+                                "<div class=\x22col-md-12\x22>"+
+                                availableScenesHTML +
                                 "</div>"+
+                            "</div>"+
                         "</div>"+
                     // "</section>"+
 
