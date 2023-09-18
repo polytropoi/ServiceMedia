@@ -3557,7 +3557,7 @@ landing_router.get('/:_id', function (req, res) {
                     } 
                    
                     
-                   if (sceneResponse.sceneWebType != "Video Landing") {
+                   if (sceneResponse.sceneWebType != "Video Landing Nevermind") {
                         // if (!sceneGreeting || !sceneGreeting.length) {
                         //     sceneGreeting = "Welcome!";
                         // } 
@@ -3569,7 +3569,7 @@ landing_router.get('/:_id', function (req, res) {
                         if (tilepicUrl != "") {
                             bgstyle = "style=\x22height:100%; width:100%; overflow:auto; background-color: "+sceneResponse.sceneColor1+"; background-image: url("+tilepicUrl+"); background-repeat: repeat;\x22";
                         }
-                        let scenePrice = "Price: FREE!";
+                        let scenePrice = "Access open to public!";
                         if (sceneResponse.sceneShareWithSubscribers) {
                             scenePrice ="<span>Access Requires Subscription</span><br><br><a class=\x22mx-auto btn btn-xl btn-success \x22 href=\x22../webxr/"+ sceneResponse.short_id + "\x22>Become a Subscriber!</a> ";
                             //  "Subscribe or Login to access this scene - "
