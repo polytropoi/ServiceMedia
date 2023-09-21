@@ -12,6 +12,8 @@ const minio = require('minio');
 // let minio = app.get('minio');
 let db = app.get('db');
 let s3 = app.get('s3'); 
+const stripe = require('stripe')(process.env.STRIPE_KEY);
+const endpointSecret = process.env.STRIPE_ENDPOINT_SECRET;
 
 var minioClient = null;
 if (process.env.MINIOKEY && process.env.MINIOKEY != "" && process.env.MINIOENDPOINT && process.env.MINIOENDPOINT != "") {
@@ -135,7 +137,34 @@ async function ReturnPresignedUrl(bucket, key, time) {
         } 
     }
 }
-
+app.post('/create-checkout-session', async (req, res) => {
+    const session = await stripe.checkout.sessions.create({
+  
+      line_items: [
+        {
+          price_data: {
+            currency: 'usd',
+            product_data: {
+              name: 'super cool immersive rock show',
+            },
+            unit_amount: 2000,
+          },
+          quantity: 1,
+        },
+      ],
+      mode: 'payment',
+      success_url: process.env.ROOT_HOST +'/stripe_events',
+      cancel_url: process.env.ROOT_HOST +'/static/cancel.html',
+      payment_intent_data: {
+        metadata: {
+          product_id: '1000',
+          product_name: 'super cool immersive rock show!'
+        }
+      }
+    });
+  
+    res.redirect(303, session.url);
+  });
 
 
 ////////////////////PRIMARY SERVERSIDE LANDING ROUTE///////////////////
@@ -2916,7 +2945,7 @@ landing_router.get('/:_id', function (req, res) {
                         let getAppLink = "<span class=\x22smallfont\x22><a class=\x22btn\x22 href=\x22https://servicemedia.net/landing/builds\x22 target=\x22_blank\x22>Get the app</a></span>&nbsp;";
 
                         let connectLink = "<span class=\x22smallfont\x22><a class=\x22btn\x22 href=\x22https://strr.us/connect/?scene="+sceneResponse.short_id+"\x22 target=\x22_blank\x22>Connect</a></span>&nbsp;";
-                        let loginLink = "<span class=\x22smallfont\x22><a class=\x22btn\x22 href=\x22https://servicemedia.net/main/login.html\x22 target=\x22_blank\x22>Login</a></span>";
+                        let loginLink = "<span class=\x22smallfont\x22><a class=\x22btn\x22 href=\x22https://servicemedia.net/main/sign_in.html\x22 target=\x22_blank\x22>Login</a></span>";
                         let primaryAudioSliderChunk = "";
                         let ambientAudioSliderChunk = "";
                         let triggerAudioSliderChunk = "";
@@ -3565,23 +3594,49 @@ landing_router.get('/:_id', function (req, res) {
                         // let bgstyle = "style=\x22height:100%; width:100%; overflow:auto; background-color: "+sceneResponse.sceneColor1+";\x22"
                         let availableScenesHTML = "";
                         let bgstyle = "style=\x22height:100%; width:100%; overflow:auto;\x22";
+                        let sceneAccess = "Access Open to Public"
+                        // if (sceneResponse.sceneShareWithSubscribers) {
+                        //     sceneAccess ="<span>Access Requires Subscription</span><br>";
+                        // }
                         // bgcolor=\x22"+sceneResponse.sceneColor1+"\x22>\n
                         if (tilepicUrl != "") {
                             bgstyle = "style=\x22height:100%; width:100%; overflow:auto; background-color: "+sceneResponse.sceneColor1+"; background-image: url("+tilepicUrl+"); background-repeat: repeat;\x22";
                         }
-                        let scenePrice = "Access open to public!";
+                        // let sceneAccess = "Access open to public!";
                         if (sceneResponse.sceneShareWithSubscribers) {
-                            scenePrice ="<span>Access Requires Subscription</span><br><br><a class=\x22mx-auto btn btn-xl btn-success \x22 href=\x22../webxr/"+ sceneResponse.short_id + "\x22>Become a Subscriber!</a> ";
+                            if (isGuest) {
+                                sceneAccess ="<span>Access Requires Subscription</span><br>"+
+                                // "<form action=\x22../create-checkout-session\x22 method=\x22POST\x22>"+
+                                // "<button class=\x22mx-auto btn btn-xl btn-success \x22 type=\x22submit\x22>Become a Subscriber!</button>"+
+                                // "</form>";
+                                
+                                "<a class=\x22mx-auto btn btn-xl btn-info \x22 href=\x22../main/sign_in.html\x22>Subscriber Login</a> "+
+                                "<p>Login if you're a subscriber, or </p>" +
+                                "<p><a class=\x22mx-auto btn btn-xl btn-success \x22 href=\x22https://buy.stripe.com/test_fZe6pdebx9vB7LO8wx\x22>Become a Subscriber!</a> </p>";
+                            } else {
+                                sceneAccess ="<span>Access Requires Subscription</span><br>"+
+                                "<h4 class=\x22text-success\x22>Welcome <strong>" + avatarName + "</strong>!</h4>";
+                            }
                             //  "Subscribe or Login to access this scene - "
+                        } else {
+                            if (!isGuest) {
+                                sceneAccess += "<p><h4 class=\x22text-success\x22>Welcome <strong>" + avatarName + "</strong>!</h4></p>";
+                            }
+                            
+                        // }
                         }
                         let styleTheme = "slate";
                         if (sceneResponse.sceneStyleTheme != null && sceneResponse.sceneStyleTheme != undefined && sceneResponse.sceneStyleTheme.length > 0 && sceneResponse.sceneStyleTheme != 'undefined') {
                             styleTheme = sceneResponse.sceneStyleTheme;
                         }
 
-                        platformButtons = "";
-                        if (!sceneResponse.sceneShareWithSubscribers) {
-                            platformButtons += "<a class=\x22mx-auto btn btn-xl btn-info \x22 href=\x22../webxr/"+ sceneResponse.short_id + "\x22>Enter WebXR Scene</a> ";
+                        // platformButtons = "";
+                        let platformButtons = "<a class=\x22mx-auto btn btn-xl btn-info \x22 href=\x22../webxr/"+ sceneResponse.short_id + "\x22>Enter WebXR Scene</a> ";
+                        if (sceneResponse.sceneShareWithSubscribers) {
+                            if (isGuest) {
+                                platformButtons = "";
+                            }
+                            
                             //  "Subscribe or Login to access this scene - "
                         }
                         if (!sceneResponse.sceneShareWithSubscribers && sceneResponse.sceneWebGLOK) {
@@ -3599,7 +3654,7 @@ landing_router.get('/:_id', function (req, res) {
                         if (mp3url != undefined && mp3url.length > 6) {
                             audioHtml = '<div><audio controls><source src=\x22' + mp3url + '\x22 type=\x22audio/mp3\x22></audio></div>';
                         }
-
+                        console.log("avatar name: " + avatarName + " token " + token);
                         htmltext = "<!DOCTYPE html>\n" +
                         "<head> " +
                         "<meta name=\x22viewport\x22 content=\x22width=device-width, initial-scale=1\x22 />"+
@@ -3637,7 +3692,7 @@ landing_router.get('/:_id', function (req, res) {
                         
                         // "<script src=\x22/connect/connect.js\x22 defer=\x22defer\x22></script>" +
                         "<style> audio {"+
-                                "filter: sepia(20%) saturate(70%) grayscale(1) contrast(99%) invert(92%);"+
+                                "filter: sepia(20%) saturate(70%) grayscale(1) contrast(99%) invert(92%);"+ 
                                 "width: 100%;"+
                                 "height: 66px;"+
                             "}"+
@@ -3653,7 +3708,7 @@ landing_router.get('/:_id', function (req, res) {
                         "<div class=\x22container px-4 px-lg-5 my-5\x22>"+
                             "<div class=\x22row gx-4 gx-lg-5 align-items-center\x22>"+
                                 "<div class=\x22col-md-6\x22>"+
-                               
+
                                 "<img class=\x22img-fluid\x22 src=\x22"+postcardImages[0]+"\x22 alt=\x22...\x22 />"+
                                 audioHtml +
                                 // "<img class=\x22card-img-top mb-5 mb-md-0\x22 src=\x22"+postcard1+"\x22 alt=\x22...\x22 />"+
@@ -3667,7 +3722,7 @@ landing_router.get('/:_id', function (req, res) {
                                     "<h1 class=\x22display-5 fw-bolder\x22>"+sceneResponse.sceneTitle+"</h1>"+
                                     "<div class=\x22fs-5 mb-5\x22>"+
                                         
-                                    "<p class=\x22lead\x22>"+scenePrice+"</p>"+
+                                    "<p class=\x22lead\x22>"+sceneAccess+"</p>"+
                                         "<p class=\x22lead\x22>"+sceneGreeting+"</p>"+
                                         "<p class=\x22lead\x22>"+sceneQuest+"</p>"+
                                         // "<span>"+sceneQuest+"</span>"+
@@ -3727,7 +3782,7 @@ landing_router.get('/:_id', function (req, res) {
                         // socketScripts +
                         // "<script>InitSceneHooks(\x22Model Viewer\x22)</script>";
                         "</html>";
-                        console.log("Tryna do a Video Landing scene");
+                        // console.log("Tryna do a Video Landing scene");
 
                     
                     } else { /////////////////////////////////////////////////////////------------- Default / AFrame response below ------------------------------

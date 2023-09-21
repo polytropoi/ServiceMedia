@@ -6,7 +6,7 @@
         $.get( "/ami-rite/" + cookie._id, function( data ) {
             // console.log("amirite : " + JSON.stringify(data.domains));
             if (data == 0) {
-                window.location.href = './login.html';
+                window.location.href = './sign_in.html';
             } else {
 
             let username = data.userName;
@@ -18,6 +18,6 @@
             }
         });
         } else {
-            window.location.href = './login.html';
+            window.location.href = './sign_in.html';
         }
     }

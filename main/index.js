@@ -24,7 +24,7 @@
         $.get( "/ami-rite/" + cookie._id, function( data ) {
             // console.log("amirite : " + JSON.stringify(data));
             if (data == 0) {
-                window.location.href = './login.html';
+                window.location.href = './sign_in.html';
                 // console.log("data equals zero?");
             } else {
             var userNameLabel = document.getElementById('userNameLabel');
@@ -86,7 +86,7 @@
                 }
             });
         } else {
-            window.location.href = './login.html';
+            window.location.href = './sign_in.html';
             // console.log("cookies are null?" + cookie._id);
         }
     }
@@ -17145,7 +17145,7 @@ function getAllPeople() {
             // "<td><button class=\x22btn btn-sm\x22 onclick=\x22getScene('" + arr[i]._id + "')\x22><i class=\x22far fa-edit\x22></i></button><a onclick=\x22getScene('" + arr[i]._id + "')\x22 href=\x22#\x22>" + arr[i].sceneTitle + "</a></td>" +
             "<td><a href=\x22index.html?type=scene&iid=" + arr[i]._id + "\x22>" + arr[i].sceneTitle + "</a>"+
             "<button class=\x22btn btn-sm\x22 onclick=\x22CloneScene('" + arr[i]._id + "', '" + arr[i].short_id + "')\x22><i class=\x22far fa-clone\x22></i></button></td>" +
-            "<td><a href=\x22/webxr/" + arr[i].short_id + "\x22>" + arr[i].short_id + "</a></td>" +
+            "<td><a href=\x22/landing/" + arr[i].short_id + "\x22 target=\x22_blank\x22>" + arr[i].short_id + "</a></td>" +
             "<td>" + arr[i].sceneDomain + "</td>" +
             "<td>" + arr[i].sceneShareWithPublic + "</td>" +
             "<td>" + arr[i].sceneLastUpdate + "</td>" +
@@ -17527,7 +17527,18 @@ function getAllPeople() {
     }
     function logout() {
         Cookies.remove('_id');
+        // location.reload();
+        let data = {};
+        axios.post('/logout/', data)
+        .then(function (response) {
+        // console.log(JSON.stringify(response));
+        // var jsonResponse = response.data;
+        //  var jsonResponse = response.data;
+        
+        console.log(response.data);
         location.reload();
+        });
+
     } 
     function convertTimestamp(unixtimestamp){
         var months_arr = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];

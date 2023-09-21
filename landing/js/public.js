@@ -2,12 +2,12 @@ if (location.hostname !== 'localhost' && window.location.protocol === 'http:') w
 
 function getScenes() {
     console.log("tryna getScenes()");
-	var resultElement = document.getElementById('scenesInner');
+	var resultElement = document.getElementById('getResult1');
   	resultElement.innerHTML = '';
 	axios.get('publicscenes')
   .then(function (response) {
     // console.log(JSON.stringify(response));
-	resultElement.innerHTML = showScenes(response);
+	resultElement.innerHTML = generateSuccessHTMLOutput(response);
   })
   .catch(function (error) {
     console.log(error);
@@ -15,11 +15,82 @@ function getScenes() {
   });
 }
 
+function generateSuccessHTMLOutput(response) {
+	var jsonResponse = response.data;
+	var arr = jsonResponse.availableScenes;
+  console.log(JSON.stringify(arr));
+    // var root = "servicemedia.net/webxr";
+  var html = "";
+     for(var i = 0; i < arr.length; i++) {
+      // console.log("root" + root);
+      var audioHtml = '<div><audio controls><source src=\x22#\x22 type=\x22audio/mp3\x22></audio></div>';
+            // var audioHtml = '<div class=\x22col-md-12 pull-left\x22><audio controls><source src=\x22#\x22 type=\x22audio/mp3\x22></audio></div><hr>';   
+      var keynoteHtml = "";
+      var descHtml = "";
+      if (arr[i].primaryAudioUrl != undefined) {
+          audioHtml = '<div><audio controls><source src=\x22' + arr[i].primaryAudioUrl  + '\x22 type=\x22audio/mp3\x22></audio></div>';
+      }
+      if (arr[i].scenePrimaryAudioStreamURL != undefined) {
+          audioHtml = '<div><audio controls><source src=\x22' + arr[i].scenePrimaryAudioStreamURL  + '\x22 type=\x22audio/mp3\x22></audio></div>';
+      }
+      
+      if (arr[i].sceneKeynote != null) {
+          keynoteHtml = '<div >Keynote: ' + arr[i].sceneKeynote + '</div><br>'
+      }
+      if (arr[i].sceneDescription != null) {
+          descHtml = '<div >Description: ' + arr[i].sceneDescription + '</div><br>'
+      }
+      // html = html + '<div class=\x22col-md-4\x22>' + 
+      //               '<div class=\x22card\x22>' +
+      //               '<a class=\x22pull-left \x22 href=\x22servicemedia://scene?' +  arr[i].sceneKey + '\x22>App Link</a>' +
+      //               '<a class=\x22pull-right \x22 href=\x22https://servicemedia.net/qrcode/' +  arr[i].sceneKey + '\x22>QR Code</a>' +
+     
+      
+      //         '<a href=\x22https://servicemedia.net/webxr/'+ arr[i].sceneKey + '\x22 target=\x22_blank\x22>' +
+      //         '<img src='+ arr[i].scenePostcardOrig + ' class=\x22img-thumbnail\x22></a>' +
+      //           audioHtml +
+
+      //       //   'Last Update: ' + arr[i].sceneLastUpdate +
+
+      //         '<h4><small> Title: </small>' + arr[i].sceneTitle + '<br><small> Key: </small>' + arr[i].sceneKey +  '</h4> ' +
+      //         '<h4><small> From: </small>' + arr[i].sceneSource + '<br><small> Description: </small>' + arr[i].sceneDescription +  '</h4> ' +
+              
+      //         '</div></div>';
+
+           
+        html = html + "<div class=\x22col\x22>"+
+          "<div class=\x22card shadow-sm\x22>"+
+            // "<svg class=\x22bd-placeholder-img card-img-top\x22 width=\x22100%\x22 height=\x22225\x22 xmlns=\x22http://www.w3.org/2000/svg\x22 role=\x22img\x22 aria-label=\x22Placeholder: Thumbnail\x22 "+
+            // "preserveAspectRatio=\x22xMidYMid slice\x22 focusable=\x22false\x22><title>Placeholder</title><rect width=\x22100%\x22 height=\x22100%\x22 fill=\x22#55595c\x22/><text x=\x2250%\x22 y=\x2250%\x22 fill=\x22#eceeef\x22 dy=\x22.3em\x22>Thumbnail</text></svg>"+
+            '<a href=\x22https://smxr.net/landing/'+ arr[i].sceneKey + '\x22 target=\x22_blank\x22>' +
+            "<img src=\x22"+ arr[i].scenePostcardHalf +"\x22 class=\x22cropped1 img-fluid\x22></a>"+
+            "<div class=\x22card-body\x22>"+
+              "<p class=\x22card-text\x22><strong>"+arr[i].sceneTitle+"</strong></p>"+
+              "<p class=\x22card-text\x22>"+arr[i].sceneDescription+"</p>"+
+              "<div class=\x22d-flex justify-content-between align-items-center\x22>"+
+                "<div class=\x22btn-group\x22>"+
+                  "<a href=\x22https://smxr.net/landing/" +  arr[i].sceneKey + "\x22 target=\x22_blank\x22 type=\x22button\x22 class=\x22btn btn-sm btn-outline-secondary\x22>Landing</a>"+
+                  "<a href=\x22https://smxr.net/webxr/" +  arr[i].sceneKey + "\x22 target=\x22_blank\x22 type=\x22button\x22 class=\x22btn btn-sm btn-outline-secondary\x22>WebXR</a>"+
+                  "<a href=\x22https://smxr.net/qrcode/" +  arr[i].sceneKey + "\x22 target=\x22_blank\x22 type=\x22button\x22 class=\x22btn btn-sm btn-outline-secondary\x22>QR Code</a>"+
+                "</div>"+
+                // "<small class=\x22text-body-secondary\x22>9 mins</small>"+
+              "</div>"+
+            "</div>"+
+          "</div>"+
+        "</div>";
+
+
+
+     };
+     return  html;
+
+}
+
 function showScenes(response) {
 	var jsonResponse = response.data;
     var arr = jsonResponse.availableScenes;
     shuffle(arr);
-var html = "<div class=\x22row\x22>";
+    var html = "<div class=\x22row\x22>";
      for(var i = 0; i < arr.length; i++) {
       // console.log("root" + root);
     //   var audioHtml = '<div><audio controls><source src=\x22#\x22 type=\x22audio/mp3\x22></audio></div><hr>';
@@ -41,21 +112,41 @@ var html = "<div class=\x22row\x22>";
     //   if (arr[i].sceneDescription != null) {
     //       descHtml = '<div >Description: ' + arr[i].sceneDescription + '</div><br>';
     //   }
-      html = html + '<div class=\x22my-2 col-md-3\x22>' + 
-      '<div class=\x22bg-dark card\x22>' +
-          // '<a class=\x22text-light\x22 href=\x22https://servicemedia.net/qrcode/' +  arr[i].sceneKey + '\x22>QR Code</a>' +      
-          '<a class=\x22text-light\x22 href=\x22http://'+location.host+'/qrcode/' +  arr[i].sceneKey + '\x22>QR Code</a>' +      
-      // // '<div style=\x22background-image: url(' + arr[i].scenePostcardHalf + ');background-repeat: no-repeat; width: 100%;height: 100%;\x22>' +
-          '<a href=\x22http://'+location.host+'/landing/'+ arr[i].sceneKey + '\x22 target=\x22_blank\x22>' +
-          '<img src='+ arr[i].scenePostcardHalf + ' style=\x22background-color: #000;\x22 class=\x22img-thumbnail\x22></a>' +
-        //    audioHtml +
-           // "</div>" +
-           // "<div class=\x22media-body\x22>" + 
-           // '<s/div>' +
-        //   'Last Update: ' + arr[i].sceneLastUpdate +
-          '<span class=\x22text-light\x22>' + arr[i].sceneTitle + ' <br><a href=\x22http://'+ arr[i].sceneDomain+'\x22>' + arr[i].sceneDomain +  '</a></span> ' +
+      // html = html + '<div class=\x22my-2 col-md-3\x22>' + 
+      // '<div class=\x22bg-dark card\x22>' +
+      //     // '<a class=\x22text-light\x22 href=\x22https://servicemedia.net/qrcode/' +  arr[i].sceneKey + '\x22>QR Code</a>' +      
+      //     '<a class=\x22text-light\x22 href=\x22http://'+location.host+'/qrcode/' +  arr[i].sceneKey + '\x22>QR Code</a>' +      
+      // // // '<div style=\x22background-image: url(' + arr[i].scenePostcardHalf + ');background-repeat: no-repeat; width: 100%;height: 100%;\x22>' +
+      //     '<a href=\x22http://'+location.host+'/landing/'+ arr[i].sceneKey + '\x22 target=\x22_blank\x22>' +
+      //     '<img src='+ arr[i].scenePostcardHalf + ' style=\x22background-color: #000;\x22 class=\x22img-thumbnail\x22></a>' +
+      //   //    audioHtml +
+      //      // "</div>" +
+      //      // "<div class=\x22media-body\x22>" + 
+      //      // '<s/div>' +
+      //   //   'Last Update: ' + arr[i].sceneLastUpdate +
+      //     '<span class=\x22text-light\x22>' + arr[i].sceneTitle + ' <br><a href=\x22http://'+ arr[i].sceneDomain+'\x22>' + arr[i].sceneDomain +  '</a></span> ' +
 
-          '</div></div>';
+      //     '</div></div>';
+      html = html + "<div class=\x22col\x22>"+
+          "<div class=\x22card shadow-sm\x22>"+
+            // "<svg class=\x22bd-placeholder-img card-img-top\x22 width=\x22100%\x22 height=\x22225\x22 xmlns=\x22http://www.w3.org/2000/svg\x22 role=\x22img\x22 aria-label=\x22Placeholder: Thumbnail\x22 "+
+            // "preserveAspectRatio=\x22xMidYMid slice\x22 focusable=\x22false\x22><title>Placeholder</title><rect width=\x22100%\x22 height=\x22100%\x22 fill=\x22#55595c\x22/><text x=\x2250%\x22 y=\x2250%\x22 fill=\x22#eceeef\x22 dy=\x22.3em\x22>Thumbnail</text></svg>"+
+            '<a href=\x22https://smxr.net/landing/'+ arr[i].sceneKey + '\x22 target=\x22_blank\x22>' +
+            "<img src=\x22"+ arr[i].scenePostcardHalf +"\x22 class=\x22cropped1 img-fluid\x22></a>"+
+            "<div class=\x22card-body\x22>"+
+              "<p class=\x22card-text\x22><strong>"+arr[i].sceneTitle+"</strong></p>"+
+              "<p class=\x22card-text\x22>"+arr[i].sceneDescription+"</p>"+
+              "<div class=\x22d-flex justify-content-between align-items-center\x22>"+
+                "<div class=\x22btn-group\x22>"+
+                  "<a href=\x22https://smxr.net/landing/" +  arr[i].sceneKey + "\x22 target=\x22_blank\x22 type=\x22button\x22 class=\x22btn btn-sm btn-outline-secondary\x22>Landing</a>"+
+                  "<a href=\x22https://smxr.net/webxr/" +  arr[i].sceneKey + "\x22 target=\x22_blank\x22 type=\x22button\x22 class=\x22btn btn-sm btn-outline-secondary\x22>WebXR</a>"+
+                  "<a href=\x22https://smxr.net/qrcode/" +  arr[i].sceneKey + "\x22 target=\x22_blank\x22 type=\x22button\x22 class=\x22btn btn-sm btn-outline-secondary\x22>QR Code</a>"+
+                "</div>"+
+                // "<small class=\x22text-body-secondary\x22>9 mins</small>"+
+              "</div>"+
+            "</div>"+
+          "</div>"+
+        "</div>";
 
      };
      return  html + "</div>";

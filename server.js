@@ -1036,7 +1036,7 @@ app.get("/unity/:id", function (req, res){ //redirect to unity
             res.send("Sorry, that scene was not found");
         } else {
             if (scene.sceneWebGLOK) {
-                let sceneUnityWebDomain = process.env.ROOT_HOST;
+                let sceneUnityWebDomain = "https://mvmv.us";
                 db.apps.findOne({"appdomain": scene.sceneDomain}, function(err,app) {
                     if (err || !app) {
                         console.log("no apps for you!");
@@ -13785,6 +13785,7 @@ app.get('/publicscenes', function (req, res) { //deprecated, see available scene
                                             sceneDomain: scene.sceneDomain,
                                             sceneTitle: scene.sceneTitle,
                                             sceneKey: scene.short_id,
+                                            sceneDescription: scene.sceneDescription,
                                             sceneStatus: scene.sceneShareWithPublic ? "public" : "private",
         //                                  sceneOwner: scene.userName,
                                             sceneOwner: tempOwnerName,
