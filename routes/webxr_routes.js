@@ -136,10 +136,49 @@ async function ReturnPresignedUrl(bucket, key, time) {
     }
 }
 
+function saveTraffic (req, res, next) {
+    let timestamp = Date.now();
+
+    timestamp = parseInt(timestamp);
+    console.log("tryna save req" + req.body);
+    var ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || null;
+    // let request = {};
+    let data = {
+            timestamp: timestamp,
+            baseUrl: req.baseUrl,
+            headers: JSON.stringify(req.headers),
+            cookie: JSON.stringify(req.session.cookie),
+            username: req.session.user.userName,
+            userID: req.session.user._id,
+            userEmail: req.session.user.email,
+            userStatus: req.session.user.status,
+            fresh: req.fresh,
+            hostname: req.hostname,
+            ip: req.ip,
+            referring_ip: ip,
+            method: req.method,
+            originalUrl: req.originalUrl,
+            params: JSON.stringify(req.params),
+           
+        }
+        db.traffic.save(data, function (err, saved) {
+            if ( err || !saved ) {
+                console.log('traffic not saved!' + err);
+                next();
+                // res.send("nilch");
+            } else {
+                next();
+                var item_id = saved._id.toString();
+                console.log('new traffic id: ' + item_id);
+                // res.send(item_id);
+            }
+        });
+}
+
 
 
 ////////////////////PRIMARY SERVERSIDE /WEBXR ROUTE///////////////////
-webxr_router.get('/:_id', function (req, res) { 
+webxr_router.get('/:_id', saveTraffic, function (req, res) { 
     // let db = req.app.get('db');
     // let s3 = req.app.get('s3');
     // let minioClient = req.app.get('minioClient');
@@ -849,7 +888,7 @@ webxr_router.get('/:_id', function (req, res) {
                                         //     tLoc.model = "#mailbox";
                                         // }
                                         // tLoc.markerObjScale = (parseFloat(tLoc.markerObjScale) != undefined && parseFloat(tLoc.markerObjScale) != null) ? parseFloat(tLoc.markerObjScale) : 1;
-                                        console.log("TRYNA SET PLACEHOLDER LOCATION : " + JSON.stringify(tLoc) );
+                                        // console.log("TRYNA SET PLACEHOLDER LOCATION : " + JSON.stringify(tLoc) );
                                         locationPlaceholders.push(tLoc);
                                     }
 

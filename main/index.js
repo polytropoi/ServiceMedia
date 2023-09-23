@@ -99,8 +99,25 @@
             $("#topPage").hide();
         }
         console.log("tryna switch to type " + type);
+        if (!type) {
+            type = "dashboard";
+        }
         switch (type) { //type is first level param for each route
-        case "webxr": //uses :appid param
+        case "dashboard": //uses :appid param
+            $("#cards").show();
+            $("#tables").show();
+            $("#table1").show();
+            $("#table1Title").html("Inventory");
+            $("#table2").show();
+            $("#table2Title").html("Activities");
+            $("#table3").show();
+            $("#table3Title").html("Scores");
+            $("#table4").show();
+            $("#table4Title").html("Purchases");
+            $("#pageTitle").html("Dashboard - " + username);
+            getProfile();
+        break;    
+            case "webxr": //uses :appid param
             $("#topPage").show();
             $("#pageTitle").html("");
             getWebXRScene();
@@ -476,14 +493,14 @@
         "<option>osiris</option>" +
         "</select>";
         $("#envSelector").html(selector);
-        setAframeScene();
-        $(function() {
-            $(document).on('change', '#enviroSelect', function() {
-                console.log(this.id + " value " + this.value);
-                let environment = this.value;
-                window.location.href = 'index.html?env=' + environment;
-            });
-        });
+        // setAframeScene();
+        // $(function() {
+        //     $(document).on('change', '#enviroSelect', function() {
+        //         console.log(this.id + " value " + this.value);
+        //         let environment = this.value;
+        //         window.location.href = 'index.html?env=' + environment;
+        //     });
+        // });
     }
     function clearThreeJSCache() {
         // console.log("tryna clear threeejs cache...");
@@ -505,7 +522,7 @@
         // console.log(THREE.Cache);
     }
 
-    function setAframeScene() {
+    function NsetAframeScene() {
         // THREE.Cache.clear();
         clearThreeJSCache();
 
@@ -12985,7 +13002,7 @@ function getAllPeople() {
                 var card = "<div class=\x22col-lg-12\x22>" +
                     "<div class=\x22card shadow mb-4\x22>" +
                     "<div class=\x22card-header py-3 d-flex flex-row align-items-center justify-content-between\x22>" +
-                        "<h6 class=\x22m-0 font-weight-bold text-primary\x22>Scene Details - "+ sceneTitle +" | _id: "+ response.data._id +
+                        "<h6 class=\x22m-0 font-weight-bold text-primary\x22>Scene Details - "+ sceneTitle +" | _id: "+ response.data._id + " | short_id: "+ response.data.short_id +
                         " | <a target=\x22_blank\x22 href=\x22../landing/"+ response.data.short_id +"\x22>Landing Link</a>" +                       
                         " | <a target=\x22_blank\x22 href=\x22../webxr/"+ response.data.short_id +"\x22>WebXR Link</a>" +
                         " | <a target=\x22_blank\x22 href=\x22../unity/"+ response.data.short_id +"\x22>Unity Link</a>" +
@@ -17018,7 +17035,10 @@ function getAllPeople() {
             // "<td><a class=\x22btn btn-sm\x22 href=\x22index.html?type=scene&iid=" + arr[i]._id + "\x22><i class=\x22far fa-edit\x22></i></button><a href=\x22index.html?type=scene&iid=" + arr[i]._id + "\x22>" + arr[i].sceneTitle + "</a>"+
             "<td><a href=\x22index.html?type=scene&iid=" + arr[i]._id + "\x22>" + arr[i].sceneTitle + "</a>"+
             "<button class=\x22btn btn-sm\x22 onclick=\x22CloneScene('" + arr[i]._id + "', '" + arr[i].short_id + "')\x22><i class=\x22far fa-clone\x22></i></button></td>" +
-            "<td><a href=\x22/webxr/" + arr[i].short_id + "\x22 target=\x22_blank\x22>" + arr[i].short_id + "</a></td>" +
+            "<td><a href=\x22index.html?type=scene&iid=" + arr[i]._id + "\x22 target=\x22_blank\x22>Edit" + 
+            "</a> | <a href=\x22/landing/" + arr[i].short_id + "\x22 target=\x22_blank\x22>Landing" + 
+            "</a> | <a href=\x22/webxr/" + arr[i].short_id + "\x22 target=\x22_blank\x22>WebXR" + 
+            "</a> | <a href=\x22/unity/" + arr[i].short_id + "\x22 target=\x22_blank\x22>Unity</a></td>" +
             "<td>" + arr[i].sceneStickyness + "</td>" +
             "<td>" + arr[i].sceneShareWithPublic + "</td>" +
             "<td>" + arr[i].sceneLastUpdate + "</td>" +
@@ -17028,8 +17048,8 @@ function getAllPeople() {
         var tableFoot =  "</tbody>" +
             "<tfoot>" +
             "<tr>" +
-            "<th>Scene Title</th>"+
-            "<th>Scene Key</th>"+
+            "<th>Title</th>"+
+            "<th>Links</th>"+
             "<th>Stickyness</th>"+
             "<th>Public</th>"+
             "<th>Last Update</th>"+
@@ -17190,6 +17210,9 @@ function getAllPeople() {
             // if (response.data.apikey && response.data.apikey.length > 4) {
             //     // apikey = "<div>API Key : " + response.data.apikey + "</div>";
             // }
+            if (response.data.authLevel.toLowerCase().includes("admin")) {
+                showTraffic();
+            }
             showProfileInventory(response);
             showProfileActivity(response);
             showProfilePurchases(response);  //populate datatables
@@ -17219,6 +17242,7 @@ function getAllPeople() {
                 "<li class=\x22list-inline-item\x22>| userID : <strong>"+ response.data._id +"</strong></li>" +
                 "<li class=\x22list-inline-item\x22>| userType : <strong>"+ response.data.type +"</strong></li>" +
                 "<li class=\x22list-inline-item\x22>| status : <strong>"+ response.data.status +"</strong></li>" +
+                "<li class=\x22list-inline-item\x22>| authLevel : <strong>"+ response.data.authLevel +"</strong></li>" +
                 "<li class=\x22list-inline-item\x22>| email : <strong>"+ response.data.email +"</strong></li>" +
                 "<li class=\x22list-inline-item\x22>| created : <strong>"+ convertTimestamp(response.data.createDate) +"</strong></li>" +
                 "<li class=\x22list-inline-item\x22>| @ IP : <strong>"+ response.data.createIP +"</strong></li>" +
@@ -17233,6 +17257,120 @@ function getAllPeople() {
     .catch(function (error) {
         console.log(error);
     });
+    }
+    function showTraffic() {
+        axios.post('/return_traffic/')
+        .then(function (response) {
+        console.log("traffic data: " + JSON.stringify(response.data));
+            document.getElementById("dashboardCharts").style.display = 'block';
+                    
+                    // Set new default font family and font color to mimic Bootstrap's default styling
+            Chart.defaults.global.defaultFontFamily = '-apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif';
+            Chart.defaults.global.defaultFontColor = '#292b2c';
+
+            // Area Chart Example
+            var ctx = document.getElementById("totalTraffic");
+            var myLineChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ["Mar 1", "Mar 2", "Mar 3", "Mar 4", "Mar 5", "Mar 6", "Mar 7", "Mar 8", "Mar 9", "Mar 10", "Mar 11", "Mar 12", "Mar 13"],
+                datasets: [{
+                label: "Sessions",
+                lineTension: 0.3,
+                backgroundColor: "rgba(2,117,216,0.2)",
+                borderColor: "rgba(2,117,216,1)",
+                pointRadius: 5,
+                pointBackgroundColor: "rgba(2,117,216,1)",
+                pointBorderColor: "rgba(255,255,255,0.8)",
+                pointHoverRadius: 5,
+                pointHoverBackgroundColor: "rgba(2,117,216,1)",
+                pointHitRadius: 50,
+                pointBorderWidth: 2,
+                data: [10000, 30162, 26263, 18394, 18287, 28682, 31274, 33259, 25849, 24159, 32651, 31984, 38451],
+                }],
+            },
+            options: {
+                scales: {
+                xAxes: [{
+                    time: {
+                    unit: 'date'
+                    },
+                    gridLines: {
+                    display: false
+                    },
+                    ticks: {
+                    maxTicksLimit: 7
+                    }
+                }],
+                yAxes: [{
+                    ticks: {
+                    min: 0,
+                    max: 40000,
+                    maxTicksLimit: 5
+                    },
+                    gridLines: {
+                    color: "rgba(0, 0, 0, .125)",
+                    }
+                }],
+                },
+                legend: {
+                display: false
+                }
+            }
+            });
+
+                    // Bar Chart Example
+            var ctx2 = document.getElementById("topPages");
+            var myLineChart = new Chart(ctx2, {
+            type: 'bar',
+            data: {
+                labels: ["January", "February", "March", "April", "May", "June"],
+                datasets: [{
+                label: "Revenue",
+                backgroundColor: "rgba(2,117,216,1)",
+                borderColor: "rgba(2,117,216,1)",
+                data: [4215, 5312, 6251, 7841, 9821, 14984],
+                }],
+            },
+            options: {
+                scales: {
+                xAxes: [{
+                    time: {
+                    unit: 'month'
+                    },
+                    gridLines: {
+                    display: false
+                    },
+                    ticks: {
+                    maxTicksLimit: 6
+                    }
+                }],
+                yAxes: [{
+                    ticks: {
+                    min: 0,
+                    max: 15000,
+                    maxTicksLimit: 5
+                    },
+                    gridLines: {
+                    display: true
+                    }
+                }],
+                },
+                legend: {
+                display: false
+                }
+            }
+            });
+
+        
+        
+        
+        
+        
+        });
+
+
+
     }
     function createAPIKey (uid) {
         let data = {userID: uid};
@@ -17249,6 +17387,7 @@ function getAllPeople() {
 
         });
     }
+
     function showProfilePurchases(response) {
     var jsonResponse = response.data;
     var arr = jsonResponse.purchases;
@@ -17331,7 +17470,7 @@ function getAllPeople() {
     function showProfileInventory(response) {
         var jsonResponse = response.data;
         var arr = jsonResponse.inventory;
-        console.log(JSON.stringify(arr));
+        // console.log(JSON.stringify(arr));
         var tableHead = "<table id=\x22dataTable1\x22 class=\x22display table table-striped table-bordered\x22 style=\x22width:100%\x22>" +
                 "<thead>"+
                 "<tr>"+

@@ -17,6 +17,7 @@
 
     <!-- Custom styles for this template -->
     <link href="css/sb-admin-2.css" rel="stylesheet">
+    <!-- <link href="../main/css/bootstrap5.3/css/styles.css" type="text/stylesheet" rel="stylesheet"> -->
     <!-- <link href="/css/webxr.css" rel="stylesheet"> -->
     <link rel="stylesheet" href="vendor/jquery-confirm/jquery-confirm.min.css" rel="stylesheet">
     <link href="vendor/bootstrap-toggle/bootstrap-toggle.min.css" rel="stylesheet">
@@ -24,7 +25,7 @@
     <link href="vendor/uppy/uppy.min.css" rel="stylesheet">
     <!-- Custom styles for this page -->
     <link href="vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
-    <script src="ref/aframe/dist/aframe-v1.2.0.js"></script>
+    <!-- <script src="ref/aframe/dist/aframe-v1.2.0.js"></script> -->
     <!-- <script src="vendor/trackedlibs/grab.js"></script> -->
     <!-- <script src="vendor/aframe-html-embed/build.js"></script> -->
     <!-- <style>
@@ -178,10 +179,11 @@
 
         <!-- Sidebar - Brand -->
         <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.html">
-          <div class="sidebar-brand-icon rotate-n-15">
+          <!-- <div class="sidebar-brand-icon rotate-n-15">
             <i class="fas fa-robot"></i>
-          </div>
-          <div class="sidebar-brand-text mx-3">ServiceMedia</div>
+          </div> -->
+          <!-- <div class="sidebar-brand-text mxy-auto">SMXR.NET</div> -->
+          <span>smxr.net</span>
         </a>
 
         <!-- Divider -->
@@ -568,6 +570,31 @@
           <!-- Begin Page Content -->
           
           <!-- top page -->
+          <div id="dashboardCharts" style="display:none;" class="container-fluid">     
+            <div class="row">
+              <div class="col-lg-6">
+                  <div class="card mb-4">
+                      <div class="card-header">
+                          <i class="fas fa-chart-bar me-1"></i>
+                          Total Traffic
+                      </div>
+                      <div class="card-body"><canvas id="totalTraffic" width="100%" height="50"></canvas></div>
+                      <div class="card-footer small text-muted">Updated yesterday at 11:59 PM</div>
+                  </div>
+              </div>
+              <div class="col-lg-6">
+                  <div class="card mb-4">
+                      <div class="card-header">
+                          <i class="fas fa-chart-pie me-1"></i>
+                          Top Pages
+                      </div>
+                      <div class="card-body"><canvas id="topPages" width="100%" height="50"></canvas></div>
+                      <div class="card-footer small text-muted">Updated yesterday at 11:59 PM</div>
+                  </div>
+              </div>
+            </div>
+          </div>
+          
           <div id="topPageDemo2" style="display:none;" class="container-fluid">     
           <div class="row">
         
@@ -1066,6 +1093,32 @@
             <div id="cardrow8" class="row">
             </div>
           </div>
+          
+          <div id="dashboardCharts" style="display:none;" class="container-fluid">     
+            <div class="row">
+              <div class="col-lg-6">
+                  <div class="card mb-4">
+                      <div class="card-header">
+                          <i class="fas fa-chart-bar me-1"></i>
+                          Total Traffic
+                      </div>
+                      <div class="card-body"><canvas id="totalTraffic" width="100%" height="50"></canvas></div>
+                      <div class="card-footer small text-muted">Updated yesterday at 11:59 PM</div>
+                  </div>
+              </div>
+              <div class="col-lg-6">
+                  <div class="card mb-4">
+                      <div class="card-header">
+                          <i class="fas fa-chart-pie me-1"></i>
+                          Top Pages
+                      </div>
+                      <div class="card-body"><canvas id="topPages" width="100%" height="50"></canvas></div>
+                      <div class="card-footer small text-muted">Updated yesterday at 11:59 PM</div>
+                  </div>
+              </div>
+            </div>
+          </div>
+          
           <!-- /.container-fluid -->
           <div id="tables" style="display:none;" class="container-fluid">
               <!-- Tables -->
@@ -1120,7 +1173,7 @@
         <footer class="sticky-footer bg-white">
           <div class="container my-auto">
             <div class="copyright text-center my-auto">
-              <span>Copyright &copy; servicemedia.net 2020</span>
+              <span>Copyright &copy; ServiceMedia Inc. 2023</span>
             </div>
           </div>
         </footer>
@@ -1148,7 +1201,7 @@
               </div>
               <div class="modal-body p-4" id="result">
 
-                  <div class="row" id="aframeScene">
+                  <!-- <div class="row" id="aframeScene"> -->
                       <!-- <div class="col-sm-6 col-lg-3"></div> -->
                   
                   </div>
@@ -1231,6 +1284,7 @@
       <script src="js/hls.min.js"></script>
 
       <!-- Page level custom scripts -->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js" crossorigin="anonymous"></script>
       <script src="js/demo/datatables-demo.js"></script>
 
       <!-- Page level custom scripts -->
@@ -1241,22 +1295,25 @@
       <script src="index.js"></script>
       
       <!-- aframe -->
-      <script src="vendor/aframe/aframe-environment-component.min.js"></script> 
+      <!-- <script src="vendor/aframe/aframe-environment-component.min.js"></script> 
       <script src="../main/src/component/content-utils.js"></script>  
-      <script src="../main/ref/aframe/dist/equirect-to-cubemap.js"></script>  
+      <script src="../main/ref/aframe/dist/equirect-to-cubemap.js"></script>   -->
                                         
       <!-- <script src="vendor/teleport/aframe-teleport-controls.min.js"></script>  -->
       <!-- <script src='https://supereggbert.github.io/aframe-htmlembed-component/dist/build.js'></script>"--> 
       <!-- <script src="vendor/aframe/aframe-extras.min.js"></script> -->
-      <script src="vendor/trackedlibs/aabb-collider.js"></script>
+      <!-- <script src="vendor/trackedlibs/aabb-collider.js"></script>
       <script src="src/shaders/noise.js"></script>
       <script src="vendor/aframe/animation-mixer.js"></script>
-      <script src="vendor/trackedlibs/grab.js"></script>
+      <script src="vendor/trackedlibs/grab.js"></script> -->
       <!-- <script src="vendor/aframe/aframe-teleport-controls.min.js"></script> -->
-      <script src="vendor/aframe/aframe-look-at-component.min.js"></script>
-      <script src="/main/src/util/mindar/mindar-image.js"></script> 
+      <!-- <script src="vendor/aframe/aframe-look-at-component.min.js"></script>
+      <script src="/main/src/util/mindar/mindar-image.js"></script>  -->
 
-        
+      <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js" crossorigin="anonymous"></script>
+      <script src="assets/demo/chart-area-demo.js"></script>
+      <script src="assets/demo/chart-bar-demo.js"></script>
+      <script src="assets/demo/chart-pie-demo.js"></script> -->
   </body>
 
   </html>

@@ -18,10 +18,11 @@ function getScenes() {
 function generateSuccessHTMLOutput(response) {
 	var jsonResponse = response.data;
 	var arr = jsonResponse.availableScenes;
-  console.log(JSON.stringify(arr));
+  // console.log(JSON.stringify(arr));
+  const shuffledArray = arr.sort((a, b) => 0.5 - Math.random());
     // var root = "servicemedia.net/webxr";
   var html = "";
-     for(var i = 0; i < arr.length; i++) {
+     for(var i = 0; i < shuffledArray.length; i++) {
       // console.log("root" + root);
       var audioHtml = '<div><audio controls><source src=\x22#\x22 type=\x22audio/mp3\x22></audio></div>';
             // var audioHtml = '<div class=\x22col-md-12 pull-left\x22><audio controls><source src=\x22#\x22 type=\x22audio/mp3\x22></audio></div><hr>';   

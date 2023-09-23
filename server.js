@@ -99,7 +99,7 @@ var oneDay = 86400000;
 var databaseUrl = process.env.MONGO_URL; //servicemedia connstring
 // console.log(databaseUrl);
 var collections = ["acl", "auth_req", "domains", "apps", "assets", "assetsbundles", "models", "users", "inventories", "inventory_items", "audio_items", "text_items", "audio_item_keys", "image_items", "video_items",
-    "obj_items", "paths", "keys", "scores", "attributes", "achievements", "activity", "actions", "purchases", "storeitems", "scenes", "groups", "weblinks", "locations", "iap"];
+    "obj_items", "paths", "keys", "traffic", "scores", "attributes", "achievements", "activity", "actions", "purchases", "storeitems", "scenes", "groups", "weblinks", "locations", "iap"];
 
 var db = mongojs(databaseUrl, collections);
 var store = new MongoDBStore({ //store session cookies in a separate db with different user, so nice
@@ -171,7 +171,7 @@ var store = new MongoDBStore({ //store session cookies in a separate db with dif
 
     var appAuth = "noauth";
     // let docClient = new aws.DynamoDB.DocumentClient();
-    let trafficTable = "traffic_1";
+    // let trafficTable = "traffic_1";
 
     var server = http.createServer(app);
     server.timeout = 240000;
@@ -661,20 +661,49 @@ function requiredAuthentication(req, res, next) { //primary auth method, used as
 
 
 
-function traffic (req, res, next) {
+// function traffic (req, res, next) { //deprecated, used dynamodb
+//     let timestamp = Date.now();
+
+//     timestamp = parseInt(timestamp);
+//     console.log("tryna save req" + req.body);
+//     var ip = req.headers['x-forwarded-for'] ||
+//      req.socket.remoteAddress ||
+//      null;
+//     let params = {
+//         TableName: trafficTable, //dynamodb table name at aws
+//         Item: {
+//             timestamp: timestamp,
+//             baseUrl: req.baseUrl,
+//             body: JSON.stringify(req.body),
+//             fresh: req.fresh,
+//             hostname: req.hostname,
+//             ip: req.ip,
+//             referring_ip: ip,
+//             method: req.method,
+//             originalUrl: req.originalUrl,
+//             params: JSON.stringify(req.params),
+//             headers: JSON.stringify(req.headers)
+            
+//         }
+//     };
+// }
+
+function saveTraffic (req, res, next) {
     let timestamp = Date.now();
 
     timestamp = parseInt(timestamp);
     console.log("tryna save req" + req.body);
-    var ip = req.headers['x-forwarded-for'] ||
-     req.socket.remoteAddress ||
-     null;
-    let params = {
-        TableName: trafficTable, //dynamodb table name at aws
-        Item: {
+    var ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || null;
+    // let request = {};
+    let data = {
             timestamp: timestamp,
             baseUrl: req.baseUrl,
-            body: JSON.stringify(req.body),
+            headers: JSON.stringify(req.headers),
+            cookie: JSON.stringify(req.session.cookie),
+            username: req.session.user.userName,
+            userID: req.session.user._id,
+            userEmail: req.session.user.email,
+            userStatus: req.session.user.status,
             fresh: req.fresh,
             hostname: req.hostname,
             ip: req.ip,
@@ -682,20 +711,25 @@ function traffic (req, res, next) {
             method: req.method,
             originalUrl: req.originalUrl,
             params: JSON.stringify(req.params),
-            headers: JSON.stringify(req.headers)
-            
+           
         }
-    };
-    // docClient.put(params, function (err, data) {
-    //     if (err) {
-    //        console.log("traffic logging error : " + err);
-    //         next();
-    //     } else {
-    //         // console.log("XXXX updated traffic log " + req.body);
-    //         next();
-    //     }
-    // });
+        db.traffic.save(data, function (err, saved) {
+            if ( err || !saved ) {
+                console.log('traffic not saved!' + err);
+                next();
+                // res.send("nilch");
+            } else {
+                next();
+                var item_id = saved._id.toString();
+                console.log('new traffic id: ' + item_id);
+                // res.send(item_id);
+            }
+        });
 }
+
+
+
+
 
 function nameCleaner(name) {
 
@@ -1028,7 +1062,7 @@ app.get("/", function (req, res) {
 
 // });
 
-app.get("/unity/:id", function (req, res){ //redirect to unity
+app.get("/unity/:id", saveTraffic, function (req, res){ //redirect to unity
 
     // let oid = ObjectID(req.params.id);
     db.scenes.findOne({"short_id" : req.params.id}, function (err, scene) {
@@ -1403,6 +1437,17 @@ app.post("/logout", requiredAuthentication, function (req, res) {
     //res.redirect("/");
 });
 
+// app.post("/logout", checkAppID, requiredAuthentication, function (req, res) {
+app.post("/return_traffic", requiredAuthentication, function (req, res) {    
+    db.traffic.find({}, function (err, trafficdata) {
+        if (err || !trafficdata) {
+            res.send(err);
+        } else {
+            res.json(trafficdata);
+        }
+    })
+});
+    
 //    if (req.headers.appid) { //TODO BRING IT BACK~
 //        var a_id = ObjectID(req.headers.appid.toString().replace(":", ""));
 //        db.apps.findOne({_id: a_id }, function (err, app) {
