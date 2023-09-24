@@ -166,22 +166,29 @@ app.post('/create-checkout-session', async (req, res) => {
     res.redirect(303, session.url);
   });
 
+
   function saveTraffic (req, res, next) {
     let timestamp = Date.now();
 
     timestamp = parseInt(timestamp);
-    console.log("tryna save req" + req.body);
+    // console.log("tryna save req" + );
     var ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || null;
     // let request = {};
+
+    var userdata = {
+        username: req.session.user ? req.session.user.userName : "",
+        _id: req.session.user ? req.session.user._id : "",
+        email: req.session.user ? req.session.user.email : "",
+        status: req.session.user ? req.session.user.status : "",
+        authlevel: req.session.user ? req.session.user.authLevel : ""
+    };
+    // console.log("traffic userdata " + JSON.stringify(userdata));
     let data = {
             timestamp: timestamp,
             baseUrl: req.baseUrl,
             headers: JSON.stringify(req.headers),
             cookie: JSON.stringify(req.session.cookie),
-            username: req.session.user.userName,
-            userID: req.session.user._id,
-            userEmail: req.session.user.email,
-            userStatus: req.session.user.status,
+            userdata: userdata,
             fresh: req.fresh,
             hostname: req.hostname,
             ip: req.ip,
@@ -195,15 +202,14 @@ app.post('/create-checkout-session', async (req, res) => {
             if ( err || !saved ) {
                 console.log('traffic not saved!' + err);
                 next();
-                // res.send("nilch");
+                
             } else {
                 next();
-                var item_id = saved._id.toString();
-                console.log('new traffic id: ' + item_id);
-                // res.send(item_id);
+                // var item_id = saved._id.toString();
+                // console.log('new traffic id: ' + item_id);
             }
         });
-}
+    }
 
 ////////////////////PRIMARY SERVERSIDE LANDING ROUTE///////////////////
 landing_router.get('/:_id', saveTraffic, function (req, res) { 
@@ -3630,6 +3636,7 @@ landing_router.get('/:_id', saveTraffic, function (req, res) {
                         // } 
                         // let hasTile = false;
                         // let bgstyle = "style=\x22height:100%; width:100%; overflow:auto; background-color: "+sceneResponse.sceneColor1+";\x22"
+
                         let availableScenesHTML = "";
                         let bgstyle = "style=\x22height:100%; width:100%; overflow:auto;\x22";
                         let sceneAccess = "Access Open to Public"
@@ -3640,7 +3647,12 @@ landing_router.get('/:_id', saveTraffic, function (req, res) {
                         if (tilepicUrl != "") {
                             bgstyle = "style=\x22height:100%; width:100%; overflow:auto; background-color: "+sceneResponse.sceneColor1+"; background-image: url("+tilepicUrl+"); background-repeat: repeat;\x22";
                         }
-                        // let sceneAccess = "Access open to public!";
+                        let sceneOwner = "";
+                        let sceneEditButton = "";
+                        if (sceneOwner != null || req.session.user.authLevel.includes("domain_admin")) {
+                           sceneEditButton = "<a class=\x22mx-auto btn btn-xl btn-primary float-right\x22 target=\x22_blank\x22 href=\x22../main/index.html?type=scene&iid="+sceneResponse._id+"\x22>Edit Scene</a>";
+                        }
+
                         if (sceneResponse.sceneShareWithSubscribers) {
                             if (isGuest) {
                                 sceneAccess ="<span>Access Requires Subscription</span><br>"+
@@ -3681,18 +3693,15 @@ landing_router.get('/:_id', saveTraffic, function (req, res) {
                            platformButtons += "<a class=\x22mx-auto btn btn-xl btn-info \x22 href=\x22../unity/"+ sceneResponse.short_id + "\x22>Enter Unity Scene</a> ";
                         }
                         var audioHtml = "";
-                        // var audioHtml = '<div class=\x22col-md-12 pull-left\x22><audio controls><source src=\x22#\x22 type=\x22audio/mp3\x22></audio></div><hr>';   
-
-                        // if (arr[i].primaryAudioUrl != undefined) {
-                        //     audioHtml = '<div><audio controls><source src=\x22' + arr[i].primaryAudioUrl  + '\x22 type=\x22audio/mp3\x22></audio></div>';
-                        // }
-                        // if (arr[i].scenePrimaryAudioStreamURL != undefined) {
-                        //     audioHtml = '<div><audio controls><source src=\x22' + arr[i].scenePrimaryAudioStreamURL  + '\x22 type=\x22audio/mp3\x22></audio></div>';
-                        // }
+                        let uid = "0000000000000";
+                        if (req.session.user) {
+                            uid = req.session.user._id;
+                        }
                         if (mp3url != undefined && mp3url.length > 6) {
                             audioHtml = '<div><audio controls><source src=\x22' + mp3url + '\x22 type=\x22audio/mp3\x22></audio></div>';
                         }
-                        console.log("avatar name: " + avatarName + " token " + token);
+                        var token=jwt.sign({userId:uid,shortID:sceneResponse.short_id},process.env.JWT_SECRET, { expiresIn: '1h' }); 
+                        // console.log("avatar name: " + avatarName + " token " + token);
                         htmltext = "<!DOCTYPE html>\n" +
                         "<head> " +
                         "<meta name=\x22viewport\x22 content=\x22width=device-width, initial-scale=1\x22 />"+
@@ -3726,9 +3735,9 @@ landing_router.get('/:_id', saveTraffic, function (req, res) {
                         "<script src=\x22https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js\x22 integrity=\x22sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL\x22 crossorigin=\x22anonymous\x22></script>"+                       
                         
                         "<script src=\x22/main/vendor/jquery/jquery.min.js\x22></script>" +
-                        // "<script src=\x22../main/js/dialogs.js\x22></script>" +
+                        "<script src=\x22../main/js/dialogs.js\x22></script>" +
                         
-                        // "<script src=\x22/connect/connect.js\x22 defer=\x22defer\x22></script>" +
+                        "<script src=\x22/connect/connect.js\x22 defer=\x22defer\x22></script>" +
                         "<style> audio {"+
                                 "filter: sepia(20%) saturate(70%) grayscale(1) contrast(99%) invert(92%);"+ 
                                 "width: 100%;"+
@@ -3756,17 +3765,20 @@ landing_router.get('/:_id', saveTraffic, function (req, res) {
                                
                                 "</div>"+
                                 "<div class=\x22col-md-6\x22>"+
+                                
                                     "<div class=\x22small mb-1\x22>"+sceneResponse.sceneKeynote+"</div>"+
                                     "<h1 class=\x22display-5 fw-bolder\x22>"+sceneResponse.sceneTitle+"</h1>"+
                                     "<div class=\x22fs-5 mb-5\x22>"+
-                                        
+                                       
                                     "<p class=\x22lead\x22>"+sceneAccess+"</p>"+
-                                        "<p class=\x22lead\x22>"+sceneGreeting+"</p>"+
+                                    
+                                        "<p class=\x22lead\x22>"+sceneGreeting+"</p>"+ 
+                                        
                                         "<p class=\x22lead\x22>"+sceneQuest+"</p>"+
                                         // "<span>"+sceneQuest+"</span>"+
 
                                     platformButtons +
-                               
+                                    sceneEditButton + 
                                     "</div>"+
                                    
                                     "<div class=\x22d-flex\x22>"+

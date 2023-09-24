@@ -116,7 +116,7 @@ $(function() {
    //       }
    //    }
    // }
-   console.log("last_page was " + localStorage.getItem("last_page") + " servertoken: "+ token + " localtoken: " + localtoken);
+   console.log("last_page was " + localStorage.getItem("last_page") + " servertoken: "+ token + " localtoken: " + localtoken + " userdata.sceneOwner " + userData.sceneOwner);
    
    setTimeout(function () {
       localStorage.setItem("last_page", room);
@@ -1009,7 +1009,7 @@ function tcheck () {
    } // else {
    if (token != null) {
       $.get( "/ami-rite-token/" + token, function( data ) {
-         // console.log("amirite : " + JSON.stringify(data));
+         console.log("amirite : " + JSON.stringify(data));
          
          if (data == '0' || data == '1' || data == '3' || data == '1' || data == '4' || data == '5') {//all auth fails
             // console.log("guest token");
