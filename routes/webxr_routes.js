@@ -411,7 +411,8 @@ webxr_router.get('/:_id', saveTraffic, function (req, res) {
     //     "<script>window.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());gtag('config', 'UA-163893846-1');"+
     //     "</script>";
         
-    let googleAdSense = "<script data-ad-client=\x22ca-pub-5450402133525063\x22 async src=\x22https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js\x22></script>";   
+    // let googleAdSense = "<script data-ad-client=\x22ca-pub-5450402133525063\x22 async src=\x22https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js\x22></script>";   
+    let googleAdSense = "";
     // let metamaskScript = "";
     let sceneData = "";
     let nftIDs = "";
@@ -3462,25 +3463,25 @@ webxr_router.get('/:_id', saveTraffic, function (req, res) {
                     
                             console.log("sceneShowAds: " + sceneResponse.sceneShowAds);
                         if (sceneResponse.sceneShowAds != null && sceneResponse.sceneShowAds != undefined && sceneResponse.sceneShowAds != false) { //put the ads if you must..   
-                            adSquareOverlay = "<script async src=\x22https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js\x22></script>"+
+                            // adSquareOverlay = "<script async src=\x22https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js\x22></script>"+
                             
-                            "<div id=\x22adSquareOverlay\x22 class=\x22ad-overlay\x22>" +
+                            // "<div id=\x22adSquareOverlay\x22 class=\x22ad-overlay\x22>" +
                         
-                            "<!-- square floater 1 -->"+
-                            "<ins class=\x22adsbygoogle\x22"+
+                            // "<!-- square floater 1 -->"+
+                            // "<ins class=\x22adsbygoogle\x22"+
                               
-                            "style=\x22display:inline-block;width:150px;height:400px\x22"+
-                                "data-ad-client=\x22ca-pub-5450402133525063\x22"+
-                                "data-ad-slot=\x225496489247\x22></ins>"+
-                                // "<br><button id=\x22adSquareCloseButton\x22 type=\x22button\x22 class=\x22closeable\x22>Close Ad</button>"+
-                            "</div>" +
-                            "<br><br><button id=\x22adSquareCloseButton\x22 type=\x22button\x22 class=\x22closeable\x22>Close Ad</button>"+
-                            "<script>"+
-                                "(adsbygoogle = window.adsbygoogle || []).push({});"+
-                            "</script>"+
-                            "<script>"+
+                            // "style=\x22display:inline-block;width:150px;height:400px\x22"+
+                            //     "data-ad-client=\x22ca-pub-5450402133525063\x22"+
+                            //     "data-ad-slot=\x225496489247\x22></ins>"+
+                            //     // "<br><button id=\x22adSquareCloseButton\x22 type=\x22button\x22 class=\x22closeable\x22>Close Ad</button>"+
+                            // "</div>" +
+                            // "<br><br><button id=\x22adSquareCloseButton\x22 type=\x22button\x22 class=\x22closeable\x22>Close Ad</button>"+
+                            // "<script>"+
+                            //     "(adsbygoogle = window.adsbygoogle || []).push({});"+
+                            // "</script>"+
+                            // "<script>"+
                                
-                            "</script>";
+                            // "</script>";
                         }
                         callback(null);
                     

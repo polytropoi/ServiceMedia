@@ -17258,11 +17258,73 @@ function getAllPeople() {
         console.log(error);
     });
     }
+    Date.prototype.addDays = function(days) {
+        var date = new Date(this.valueOf());
+        date.setDate(date.getDate() + days);
+        return date;
+    }
+        
+    function groupReducer(obj, prop) {
+              
+        return obj.reduce(function (acc, item) { //reduce!
+       
+          let key = item[prop]
+      
+          if (!acc[key]) {
+      
+            acc[key] = []
+      
+          }
+      
+          acc[key].push(item)
+      
+          return acc
+      
+        }, {})
+      
+    }
+    function linkBarClickEvent(event, array){
+        if(array[0]){
+        //    foo.bar;
+            e = array[0];
+            // console.log("link clicked! " + Object.keys(array[0]));
+            // console.log(e._index)
+            var x_value = this.data.labels[e._index];
+            var y_value = this.data.datasets[0].data[e._index];
+            // console.log(x_value);
+            window.open(x_value, '_blank');
+            // console.log(y_value);
+        }
+    }
     function showTraffic() {
         axios.post('/return_traffic/')
         .then(function (response) {
             let trafficCount = response.data.length;
-        console.log("traffic data length: " + trafficCount);
+            let tArr = response.data;
+            let dateStart = new Date(tArr[0].timestamp);
+
+
+            let groupedTraffic = groupReducer(tArr, 'originalUrl');
+            // console.log("groupedTraffic " + JSON.stringify(groupedTraffic));
+            
+            // groupedTraffic.forEach (function(url) {
+            //     console.log("link : " + url + url.length);
+            // });
+            let urls = Object.keys(groupedTraffic);
+            let urlCounts = [];
+            for (let i = 0; i < urls.length; i++) {
+                // console.log("url : " + urls[i] + " count " + groupedTraffic[urls[i]].length);
+                let url = urls[i];
+                let item = {};
+                item.url = url;
+                item.count = groupedTraffic[urls[i]].length;
+                urlCounts.push(item);
+            }
+            urlCounts.sort(({count:a}, {count:b}) => b-a);
+
+            // // 
+            //  console.log("traffic data length: " + trafficCount + " start date " + dateStart);
+            console.log("groupedTraffic " + JSON.stringify(urlCounts));
             document.getElementById("dashboardCharts").style.display = 'block';
                     
                     // Set new default font family and font color to mimic Bootstrap's default styling
@@ -17275,7 +17337,7 @@ function getAllPeople() {
             var myLineChart = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: ["Mar 1", "Mar 2", "Mar 3", "Mar 4", "Mar 5", "Mar 6", "Mar 7", "Mar 8", "Mar 9", "Mar 10", "Mar 11", "Mar 12", "Mar 13"],
+                labels: [dateStart.toLocaleDateString(), dateStart.addDays(1).toLocaleDateString(), dateStart.addDays(1).toLocaleDateString(), dateStart.addDays(2).toLocaleDateString(), dateStart.addDays(3).toLocaleDateString(), dateStart.addDays(4).toLocaleDateString(), dateStart.addDays(5).toLocaleDateString(), dateStart.addDays(6).toLocaleDateString(), dateStart.addDays(7).toLocaleDateString(), dateStart.addDays(8).toLocaleDateString(), dateStart.addDays(9).toLocaleDateString(), dateStart.addDays(10).toLocaleDateString(), dateStart.addDays(11).toLocaleDateString()],
                 datasets: [{
                 label: "Requests",
                 lineTension: 0.3,
@@ -17288,8 +17350,9 @@ function getAllPeople() {
                 pointHoverBackgroundColor: "rgba(2,117,216,1)",
                 pointHitRadius: 50,
                 pointBorderWidth: 2,
-                data: [trafficCount, 30162, 26263, 18394, 18287, 28682, 31274, 33259, 25849, 24159, 32651, 31984, 38451],
+                data: [trafficCount, 222, 222, 222, 222, 222, 222, 222, 222, 222, 222, 222, 222],
                 }],
+
             },
             options: {
                 scales: {
@@ -17307,7 +17370,7 @@ function getAllPeople() {
                 yAxes: [{
                     ticks: {
                     min: 0,
-                    max: 40000,
+                    max: 1000,
                     maxTicksLimit: 5
                     },
                     gridLines: {
@@ -17326,12 +17389,12 @@ function getAllPeople() {
             var myLineChart = new Chart(ctx2, {
             type: 'bar',
             data: {
-                labels: ["January", "February", "March", "April", "May", "June"],
+                labels: [urlCounts[0].url, urlCounts[1].url, urlCounts[2].url, urlCounts[3].url, urlCounts[4].url, urlCounts[5].url, urlCounts[6].url, urlCounts[7].url],
                 datasets: [{
-                label: "Revenue",
+                label: "Views",
                 backgroundColor: "rgba(2,117,216,1)",
                 borderColor: "rgba(2,117,216,1)",
-                data: [4215, 5312, 6251, 7841, 9821, 14984],
+                data: [urlCounts[0].count, urlCounts[1].count, urlCounts[2].count, urlCounts[3].count, urlCounts[4].count, urlCounts[5].count, urlCounts[6].count, urlCounts[7].count],
                 }],
             },
             options: {
@@ -17350,7 +17413,7 @@ function getAllPeople() {
                 yAxes: [{
                     ticks: {
                     min: 0,
-                    max: 15000,
+                    max: 100,
                     maxTicksLimit: 5
                     },
                     gridLines: {
@@ -17360,13 +17423,10 @@ function getAllPeople() {
                 },
                 legend: {
                 display: false
-                }
+                },
+                onClick: linkBarClickEvent
             }
             });
-
-        
-        
-        
         
         
         });
