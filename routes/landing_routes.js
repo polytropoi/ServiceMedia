@@ -3649,7 +3649,7 @@ landing_router.get('/:_id', saveTraffic, function (req, res) {
                         }
                         let sceneOwner = "";
                         let sceneEditButton = "";
-                        if (sceneOwner != null || req.session.user.authLevel.includes("domain_admin")) {
+                        if (sceneOwner != "" || (!isGuest && req.session.user && req.session.user.authLevel.includes("domain_admin"))) { //hrm..
                            sceneEditButton = "<a class=\x22mx-auto btn btn-xl btn-primary float-right\x22 target=\x22_blank\x22 href=\x22../main/index.html?type=scene&iid="+sceneResponse._id+"\x22>Edit Scene</a>";
                         }
 

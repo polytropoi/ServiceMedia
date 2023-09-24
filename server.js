@@ -688,22 +688,29 @@ function requiredAuthentication(req, res, next) { //primary auth method, used as
 //     };
 // }
 
+
 function saveTraffic (req, res, next) {
     let timestamp = Date.now();
 
     timestamp = parseInt(timestamp);
-    console.log("tryna save req" + req.body);
+    // console.log("tryna save req" + );
     var ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || null;
     // let request = {};
+
+    var userdata = {
+        username: req.session.user ? req.session.user.userName : "",
+        _id: req.session.user ? req.session.user._id : "",
+        email: req.session.user ? req.session.user.email : "",
+        status: req.session.user ? req.session.user.status : "",
+        authlevel: req.session.user ? req.session.user.authLevel : ""
+    };
+    // console.log("traffic userdata " + JSON.stringify(userdata));
     let data = {
             timestamp: timestamp,
             baseUrl: req.baseUrl,
             headers: JSON.stringify(req.headers),
             cookie: JSON.stringify(req.session.cookie),
-            username: req.session.user.userName,
-            userID: req.session.user._id,
-            userEmail: req.session.user.email,
-            userStatus: req.session.user.status,
+            userdata: userdata,
             fresh: req.fresh,
             hostname: req.hostname,
             ip: req.ip,
@@ -717,16 +724,14 @@ function saveTraffic (req, res, next) {
             if ( err || !saved ) {
                 console.log('traffic not saved!' + err);
                 next();
-                // res.send("nilch");
+                
             } else {
                 next();
-                var item_id = saved._id.toString();
-                console.log('new traffic id: ' + item_id);
-                // res.send(item_id);
+                // var item_id = saved._id.toString();
+                // console.log('new traffic id: ' + item_id);
             }
         });
-}
-
+    }
 
 
 
