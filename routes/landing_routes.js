@@ -483,7 +483,7 @@ landing_router.get('/:_id', saveTraffic, function (req, res) {
     let inventoryData = "";
     let joystickContainer  = "";
     let arImageTargets = [];
-    let sceneUnityWebDomain = "/";
+    let sceneUnityWebDomain = "https://mvmv.us";
     let postcardImages = [];
     
 
@@ -545,7 +545,7 @@ landing_router.get('/:_id', saveTraffic, function (req, res) {
                             if (app.appunitydomain) {
                                 sceneUnityWebDomain = app.appunitydomain;
                             }
-
+                            // console.log(sceneUnityWebDomain)
                             res.redirect(sceneUnityWebDomain + '/?scene=' + reqstring);
                         }
                     });
