@@ -17205,13 +17205,19 @@ function getAllPeople() {
         // console.log(userid);
         axios.get('/profile/' + userid, config)
         .then(function (response) {
-            console.log("apikey " + response.data.apikey);
+            // console.log("traffic domain "+ apps[0].appdomain);
+            domains = apps[0].appdomain;
             // let apikey = "";
             // if (response.data.apikey && response.data.apikey.length > 4) {
             //     // apikey = "<div>API Key : " + response.data.apikey + "</div>";
             // }
-            if (response.data.authLevel.toLowerCase().includes("admin")) {
+            if (response.data.authLevel.toLowerCase().includes("domain_admin")) {
                 showTraffic();
+            } else if (response.data.authLevel.toLowerCase().includes("admin")) {
+                if (domains) {
+                    showTraffic(domains);
+                }
+                
             }
             showProfileInventory(response);
             showProfileActivity(response);
@@ -17265,51 +17271,70 @@ function getAllPeople() {
     }
         
     function groupReducer(obj, prop) {
-              
         return obj.reduce(function (acc, item) { //reduce!
-       
           let key = item[prop]
-      
           if (!acc[key]) {
-      
             acc[key] = []
-      
           }
-      
           acc[key].push(item)
-      
           return acc
-      
         }, {})
       
     }
     function linkBarClickEvent(event, array){
         if(array[0]){
-        //    foo.bar;
             e = array[0];
-            // console.log("link clicked! " + Object.keys(array[0]));
-            // console.log(e._index)
-            var x_value = this.data.labels[e._index];
-            var y_value = this.data.datasets[0].data[e._index];
-            // console.log(x_value);
+            var x_value = this.data.labels[e._index]; //url
+            var y_value = this.data.datasets[0].data[e._index]; //count
             window.open(x_value, '_blank');
-            // console.log(y_value);
         }
     }
-    function showTraffic() {
-        axios.post('/return_traffic/')
+    function showTraffic(appdomain) { //arg if not domain_admin
+        
+        console.log("appdomain " + appdomain);
+        let data = {};
+        if (appdomain) {
+            data.appdomain = appdomain;
+        }
+        axios.post('/return_traffic/', data)
         .then(function (response) {
             let trafficCount = response.data.length;
             let tArr = response.data;
+
+            ///date math for line chart
             let dateStart = new Date(tArr[0].timestamp);
+            let dateEnd = new Date(tArr[tArr.length - 1].timestamp);
+            let numberOfDays = (dateEnd - dateStart) / (1000 * 3600 * 24);
+            console.log("numberOfDays is "+ numberOfDays);
+        
+            let dayLabels = [];
+            let dayCounts = [];
+            let showCountNumber = Math.round(numberOfDays) + 1;
 
 
-            let groupedTraffic = groupReducer(tArr, 'originalUrl');
-            // console.log("groupedTraffic " + JSON.stringify(groupedTraffic));
+            // dayLabels.push(dateStart.toLocaleDateString());
+            for (let i = 0; i < showCountNumber; i++) { //start at one 
+                dayLabels.push(dateStart.addDays(i).toLocaleDateString());
+            }
+            let dayCount = 1;
+            for (let l = 0; l < tArr.length; l++ ) {
+                for (let s = 0; s < showCountNumber; s++) {
+
+                    if (tArr[l].timestamp >= dateStart.addDays(s) & tArr[l].timestamp <= dateStart.addDays(s + 1)) {
+                        dayCounts[s] = dayCount++;
+                        // console.log("Day " + s + " " + dayCounts[s]);
+                    } else {
+                        dayCount = 1;
+                    }
+                }
+                
+            }
+
             
-            // groupedTraffic.forEach (function(url) {
-            //     console.log("link : " + url + url.length);
-            // });
+            //munging to get top pages bar chart
+            let groupedTraffic = groupReducer(tArr, 'originalUrl');
+            // console.log("groupedTraffic " + JSON.stringify(tArr[0]));
+            console.log("traffic count " + trafficCount);
             let urls = Object.keys(groupedTraffic);
             let urlCounts = [];
             for (let i = 0; i < urls.length; i++) {
@@ -17322,14 +17347,13 @@ function getAllPeople() {
             }
             urlCounts.sort(({count:a}, {count:b}) => b-a);
 
-            // // 
-            //  console.log("traffic data length: " + trafficCount + " start date " + dateStart);
             console.log("groupedTraffic " + JSON.stringify(urlCounts));
+
             document.getElementById("dashboardCharts").style.display = 'block';
                     
                     // Set new default font family and font color to mimic Bootstrap's default styling
             Chart.defaults.global.defaultFontFamily = '-apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif';
-            Chart.defaults.global.defaultFontColor = '#292b2c';
+            Chart.defaults.global.defaultFontColor = '#292b2c';``
 
             
             // Area Chart Example
@@ -17337,7 +17361,8 @@ function getAllPeople() {
             var myLineChart = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: [dateStart.toLocaleDateString(), dateStart.addDays(1).toLocaleDateString(), dateStart.addDays(1).toLocaleDateString(), dateStart.addDays(2).toLocaleDateString(), dateStart.addDays(3).toLocaleDateString(), dateStart.addDays(4).toLocaleDateString(), dateStart.addDays(5).toLocaleDateString(), dateStart.addDays(6).toLocaleDateString(), dateStart.addDays(7).toLocaleDateString(), dateStart.addDays(8).toLocaleDateString(), dateStart.addDays(9).toLocaleDateString(), dateStart.addDays(10).toLocaleDateString(), dateStart.addDays(11).toLocaleDateString()],
+                // labels: [dateStart.toLocaleDateString(), dateStart.addDays(1).toLocaleDateString(), dateStart.addDays(2).toLocaleDateString()],
+                labels: dayLabels,
                 datasets: [{
                 label: "Requests",
                 lineTension: 0.3,
@@ -17350,7 +17375,8 @@ function getAllPeople() {
                 pointHoverBackgroundColor: "rgba(2,117,216,1)",
                 pointHitRadius: 50,
                 pointBorderWidth: 2,
-                data: [trafficCount, 222, 222, 222, 222, 222, 222, 222, 222, 222, 222, 222, 222],
+                // data: [trafficCount],
+                data: dayCounts
                 }],
 
             },
@@ -17370,7 +17396,7 @@ function getAllPeople() {
                 yAxes: [{
                     ticks: {
                     min: 0,
-                    max: 1000,
+                    max: 500,
                     maxTicksLimit: 5
                     },
                     gridLines: {
@@ -17386,15 +17412,26 @@ function getAllPeople() {
 
                     // Bar Chart Example
             var ctx2 = document.getElementById("topPages");
+            let toppagesLabels = [];
+            let toppagesCounts = [];
+            let showNumber = urlCounts.length < 8 ? urlCounts.length : 7;
+            console.log(showNumber);
+            for (let i = 0; i < showNumber; i++) {
+                toppagesLabels.push(urlCounts[i].url);
+                toppagesCounts.push(urlCounts[i].count);
+            }
+            
             var myLineChart = new Chart(ctx2, {
             type: 'bar',
             data: {
-                labels: [urlCounts[0].url, urlCounts[1].url, urlCounts[2].url, urlCounts[3].url, urlCounts[4].url, urlCounts[5].url, urlCounts[6].url, urlCounts[7].url],
+                // labels: [urlCounts[0].url, urlCounts[1].url, urlCounts[2].url],
+                labels: toppagesLabels,
                 datasets: [{
                 label: "Views",
                 backgroundColor: "rgba(2,117,216,1)",
                 borderColor: "rgba(2,117,216,1)",
-                data: [urlCounts[0].count, urlCounts[1].count, urlCounts[2].count, urlCounts[3].count, urlCounts[4].count, urlCounts[5].count, urlCounts[6].count, urlCounts[7].count],
+                // data: [urlCounts[0].count, urlCounts[1].count, urlCounts[2].count],
+                data: toppagesCounts
                 }],
             },
             options: {

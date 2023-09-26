@@ -167,7 +167,52 @@ app.post('/create-checkout-session', async (req, res) => {
   });
 
 
-  function saveTraffic (req, res, next) {
+//   function saveTraffic (req, res, next) {
+//     let timestamp = Date.now();
+
+//     timestamp = parseInt(timestamp);
+//     // console.log("tryna save req" + );
+//     var ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || null;
+//     // let request = {};
+
+//     var userdata = {
+//         username: req.session.user ? req.session.user.userName : "",
+//         _id: req.session.user ? req.session.user._id : "",
+//         email: req.session.user ? req.session.user.email : "",
+//         status: req.session.user ? req.session.user.status : "",
+//         authlevel: req.session.user ? req.session.user.authLevel : ""
+//     };
+//     // console.log("traffic userdata " + JSON.stringify(userdata));
+//     let data = {
+//             timestamp: timestamp,
+//             baseUrl: req.baseUrl,
+//             headers: JSON.stringify(req.headers),
+//             cookie: JSON.stringify(req.session.cookie),
+//             userdata: userdata,
+//             fresh: req.fresh,
+//             hostname: req.hostname,
+//             ip: req.ip,
+//             referring_ip: ip,
+//             method: req.method,
+//             originalUrl: req.originalUrl,
+//             params: JSON.stringify(req.params),
+           
+//         }
+//         db.traffic.save(data, function (err, saved) {
+//             if ( err || !saved ) {
+//                 console.log('traffic not saved!' + err);
+//                 next();
+                
+//             } else {
+//                 next();
+//                 // var item_id = saved._id.toString();
+//                 // console.log('new traffic id: ' + item_id);
+//             }
+//         });
+//     }
+
+
+function saveTraffic (req, domain, shortID) {
     let timestamp = Date.now();
 
     timestamp = parseInt(timestamp);
@@ -184,6 +229,8 @@ app.post('/create-checkout-session', async (req, res) => {
     };
     // console.log("traffic userdata " + JSON.stringify(userdata));
     let data = {
+            short_id: shortID,
+            appdomain: domain,
             timestamp: timestamp,
             baseUrl: req.baseUrl,
             headers: JSON.stringify(req.headers),
@@ -201,18 +248,18 @@ app.post('/create-checkout-session', async (req, res) => {
         db.traffic.save(data, function (err, saved) {
             if ( err || !saved ) {
                 console.log('traffic not saved!' + err);
-                next();
+                // next();
                 
             } else {
-                next();
+                // next();
                 // var item_id = saved._id.toString();
                 // console.log('new traffic id: ' + item_id);
             }
         });
-    }
+    }    
 
 ////////////////////PRIMARY SERVERSIDE LANDING ROUTE///////////////////
-landing_router.get('/:_id', saveTraffic, function (req, res) { 
+landing_router.get('/:_id', function (req, res) { 
     // let db = req.app.get('db');
     // let s3 = req.app.get('s3');
     // let minioClient = req.app.get('minioClient');
@@ -495,6 +542,7 @@ landing_router.get('/:_id', saveTraffic, function (req, res) {
                 console.log("1 error getting scene data: " + err);
                 res.end();
             } else { 
+                saveTraffic(req, sceneData.sceneDomain, sceneData.short_id);
                 let accessScene = true;
                 // sceneData = sceneData;
                 // async.waterfall([ 

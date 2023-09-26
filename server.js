@@ -183,6 +183,8 @@ var store = new MongoDBStore({ //store session cookies in a separate db with dif
     app.set('store', store);
     app.set('s3', s3);
 
+    db.scenes.createIndex( { short_id: -1 } );
+
     //INCLUDE EXTERNAL ROUTES BELOW
     var oculus_routes = require('./routes/oculus_routes');
     app.use('/oculus', oculus_routes);
@@ -689,7 +691,52 @@ function requiredAuthentication(req, res, next) { //primary auth method, used as
 // }
 
 
-function saveTraffic (req, res, next) {
+// function saveTraffic (req, res, next) {
+//     let timestamp = Date.now();
+
+//     timestamp = parseInt(timestamp);
+//     // console.log("tryna save req" + );
+//     var ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || null;
+//     // let request = {};
+
+//     var userdata = {
+//         username: req.session.user ? req.session.user.userName : "",
+//         _id: req.session.user ? req.session.user._id : "",
+//         email: req.session.user ? req.session.user.email : "",
+//         status: req.session.user ? req.session.user.status : "",
+//         authlevel: req.session.user ? req.session.user.authLevel : ""
+//     };
+//     // console.log("traffic userdata " + JSON.stringify(userdata));
+//     let data = {
+//             timestamp: timestamp,
+//             baseUrl: req.baseUrl,
+//             headers: JSON.stringify(req.headers),
+//             cookie: JSON.stringify(req.session.cookie),
+//             userdata: userdata,
+//             fresh: req.fresh,
+//             hostname: req.hostname,
+//             ip: req.ip,
+//             referring_ip: ip,
+//             method: req.method,
+//             originalUrl: req.originalUrl,
+//             params: JSON.stringify(req.params),
+           
+//         }
+//         db.traffic.save(data, function (err, saved) {
+//             if ( err || !saved ) {
+//                 console.log('traffic not saved!' + err);
+//                 next();
+                
+//             } else {
+//                 next();
+//                 // var item_id = saved._id.toString();
+//                 // console.log('new traffic id: ' + item_id);
+//             }
+//         });
+//     }
+
+
+function saveTraffic (req, domain, shortID) {
     let timestamp = Date.now();
 
     timestamp = parseInt(timestamp);
@@ -706,6 +753,8 @@ function saveTraffic (req, res, next) {
     };
     // console.log("traffic userdata " + JSON.stringify(userdata));
     let data = {
+            short_id: shortID,
+            appdomain: domain,
             timestamp: timestamp,
             baseUrl: req.baseUrl,
             headers: JSON.stringify(req.headers),
@@ -723,16 +772,15 @@ function saveTraffic (req, res, next) {
         db.traffic.save(data, function (err, saved) {
             if ( err || !saved ) {
                 console.log('traffic not saved!' + err);
-                next();
+                // next();
                 
             } else {
-                next();
+                // next();
                 // var item_id = saved._id.toString();
                 // console.log('new traffic id: ' + item_id);
             }
         });
-    }
-
+    }    
 
 
 
@@ -1067,13 +1115,14 @@ app.get("/", function (req, res) {
 
 // });
 
-app.get("/unity/:id", saveTraffic, function (req, res){ //redirect to unity
+app.get("/unity/:id", function (req, res){ //redirect to unity
 
     // let oid = ObjectID(req.params.id);
     db.scenes.findOne({"short_id" : req.params.id}, function (err, scene) {
         if (err || !scene) {
             res.send("Sorry, that scene was not found");
         } else {
+            saveTraffic(req, scene.sceneDomain, scene.short_id);
             if (scene.sceneWebGLOK) {
                 let sceneUnityWebDomain = "https://mvmv.us";
                 db.apps.findOne({"appdomain": scene.sceneDomain}, function(err,app) {
@@ -1443,16 +1492,132 @@ app.post("/logout", requiredAuthentication, function (req, res) {
 });
 
 // app.post("/logout", checkAppID, requiredAuthentication, function (req, res) {
-app.post("/return_traffic", requiredAuthentication, function (req, res) {    
+app.post("/return_traffic_old", requiredAuthentication, function (req, res) {    
+    let trafficDataMod = [];
     db.traffic.find({}, function (err, trafficdata) {
         if (err || !trafficdata) {
             res.send(err);
         } else {
-            res.json(trafficdata);
+            console.log("trafficdata length 1 " + trafficdata.length);
+            nodupes = [];
+            async.each (trafficdata, function (item, tcallback) { //pull out short_id from urls and flatten
+                var n = item.originalUrl.lastIndexOf('/');
+                var result = item.originalUrl.substring(n + 1);
+                if (nodupes.indexOf(result) == -1) {
+                    nodupes.push(result);
+                }
+                // console.log(result);
+                item.short_id = result; //for easier comparison below
+                trafficDataMod.push(item);
+                tcallback();
+            }, function(err) {
+                if (err) {
+                    console.log('traffic return loop brokend');
+                    res.send(err);
+                } else {
+                    dquery = { short_id : { $in : nodupes }};
+                    if (req.body.appdomain) {
+                        console.log("appdomain: "+ req.body.appdomain);
+                        dquery = { $and: [{short_id : { $in : nodupes }}, {sceneDomain: req.body.appdomain}]};
+                    }
+                    console.log("query: "+ JSON.stringify(dquery));
+                    // db.scenes.find({ short_id : { $in : nodupes }}, { short_id: 1, sceneTitle: 1, sceneDomain: 1, sceneAppName: 1, _id: 0 }, function (error, scenes) { //include domains and and app names
+                    db.scenes.find(dquery, { short_id: 1, sceneTitle: 1, sceneDomain: 1, sceneAppName: 1, _id: 0 }, function (error, scenes) { //include domains and and app names
+                        if (error || !scenes) {
+                            res.send(error);
+                        } else {
+                            // trafficdata.scenedata = scenes; //add for reference on client
+                            console.log("scenes legnth " + scenes.length);
+                            if (req.body.appdomain) {
+                                shortIDs = []; //make a simple array to use below
+                                for (let s = 0; s < scenes.length; s++) {
+                                    // console.log("pushing short_ids " + scenes[s].short_id );
+                                    shortIDs.push(scenes[s].short_id);
+
+                                }
+                                // async.each (scenes, function (scene, callbk) {
+
+
+                                //     }, function (err) {
+                                //         if (err) {
+
+                                //         } else {
+
+                                //     }
+                                    
+                                // });
+                                console.log(shortIDs);
+                                let i = 0; //iterator for below...
+                                async.each (trafficDataMod, function (sitem, callbackz) {   
+
+                                    if (sitem && sitem.hasOwnProperty('short_id')) {
+                                        // console.log(sitem);
+                                        // var n = sitem.originalUrl.lastIndexOf('/');
+                                        // var result = sitem.originalUrl.substring(n + 1);
+                                        if (shortIDs.indexOf(sitem.short_id) == -1) {
+
+                                            trafficDataMod.splice(i, 1); //remove element from traffic if not for this domain
+                                        } else {
+                                            console.log("shortid" + sitem.short_id + "setting appdomain " + req.body.appdomain);
+                                            sitem.appdomain = req.body.appdomain; //or add domain reference
+                                        }
+                                    }
+                                    i++;
+                                    callbackz();
+                                }, function(err) {
+                                    if (err) {
+                                        console.log('bad key');
+                                        res.send(err);
+                                    } else {
+                                        console.log("domain trafffic length: "+ trafficDataMod.length);
+                                        res.json(trafficDataMod);         
+                                    }
+                                });
+                                // for (let i = 0; i < trafficdata.length; i++) {
+                                //     if (shortIDs.indexOf(trafficdata[i].short_id) == -1) {
+                                //         trafficdata.splice(i, 1); //remove element from traffic if not for this domain
+                                //     } else {
+                                //         trafficdata[i].appdomain = req.body.appdomain; //or add domain reference
+                                //     }
+                                // }
+                                                
+                                
+                            } else {
+                                res.json(trafficdata);
+                            }
+                        }
+                    }); 
+                }
+            });
+           
         }
     })
 });
-    
+
+app.post("/return_traffic", requiredAuthentication, function (req, res) {    
+    // let trafficDataMod = [];
+    db.traffic.find({}, function (err, trafficdata) {
+        if (err || !trafficdata) {
+            res.send(err);
+        } else {
+            if (req.body.appdomain) {
+                for (let i = 0; i < trafficdata.length; i++) {
+                    if (trafficdata[i].appdomain != req.body.appdomain) {
+                        trafficdata.splice(i, 1);
+                    }
+                }
+                res.json(trafficdata);
+            } else {
+                res.json(trafficdata);
+            }
+            
+        }
+    })
+});
+
+// function trafficFilter (domain)
+
+
 //    if (req.headers.appid) { //TODO BRING IT BACK~
 //        var a_id = ObjectID(req.headers.appid.toString().replace(":", ""));
 //        db.apps.findOne({_id: a_id }, function (err, app) {
