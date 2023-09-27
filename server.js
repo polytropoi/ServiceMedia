@@ -152,7 +152,7 @@ var store = new MongoDBStore({ //store session cookies in a separate db with dif
     const { json } = require("body-parser");
     const { profile } = require("console");
 
-    const { lookupService, resolveNaptr, resolveCname } = require("dns");
+    const { lookupService, resolveNaptr, resolveCname, resolveMx } = require("dns");
 
     aws.config = new aws.Config({accessKeyId: process.env.AWSKEY, secretAccessKey: process.env.AWSSECRET, region: process.env.AWSREGION});
     var ses = new aws.SES({apiVersion : '2010-12-01'});
@@ -1548,18 +1548,18 @@ app.post("/return_traffic_old", requiredAuthentication, function (req, res) {
                                 // });
                                 console.log(shortIDs);
                                 let i = 0; //iterator for below...
-                                async.each (trafficDataMod, function (sitem, callbackz) {   
+                                async.each (trafficDataMod, function (trafficItem, callbackz) {   
 
-                                    if (sitem && sitem.hasOwnProperty('short_id')) {
-                                        // console.log(sitem);
-                                        // var n = sitem.originalUrl.lastIndexOf('/');
-                                        // var result = sitem.originalUrl.substring(n + 1);
-                                        if (shortIDs.indexOf(sitem.short_id) == -1) {
+                                    if (trafficItem && trafficItem.hasOwnProperty('short_id')) {
+                                        // console.log(trafficItem);
+                                        // var n = trafficItem.originalUrl.lastIndexOf('/');
+                                        // var result = trafficItem.originalUrl.substring(n + 1);
+                                        if (shortIDs.indexOf(trafficItem.short_id) == -1) {
 
                                             trafficDataMod.splice(i, 1); //remove element from traffic if not for this domain
                                         } else {
-                                            console.log("shortid" + sitem.short_id + "setting appdomain " + req.body.appdomain);
-                                            sitem.appdomain = req.body.appdomain; //or add domain reference
+                                            console.log("shortid" + trafficItem.short_id + "setting appdomain " + req.body.appdomain);
+                                            trafficItem.appdomain = req.body.appdomain; //or add domain reference
                                         }
                                     }
                                     i++;
@@ -1596,46 +1596,24 @@ app.post("/return_traffic_old", requiredAuthentication, function (req, res) {
 
 app.post("/return_traffic", requiredAuthentication, function (req, res) {    
     // let trafficDataMod = [];
-    db.traffic.find({}, function (err, trafficdata) {
+    let query = {};
+    if (req.body.appdomain) {
+        query.appdomain = req.body.appdomain.toString();
+    }
+    // console.log("tryna quyery for " + JSON.stringify(query));
+    db.traffic.find(query, function (err, trafficdata) {
         if (err || !trafficdata) {
             res.send(err);
         } else {
-            if (req.body.appdomain) {
-                for (let i = 0; i < trafficdata.length; i++) {
-                    if (trafficdata[i].appdomain != req.body.appdomain) {
-                        trafficdata.splice(i, 1);
-                    }
-                }
-                res.json(trafficdata);
-            } else {
+            console.log("all trafffic length: "+ trafficdata.length);
                 res.json(trafficdata);
             }
             
-        }
-    })
+        });
+    // })
 });
 
-// function trafficFilter (domain)
 
-
-//    if (req.headers.appid) { //TODO BRING IT BACK~
-//        var a_id = ObjectID(req.headers.appid.toString().replace(":", ""));
-//        db.apps.findOne({_id: a_id }, function (err, app) {
-//            if (err || !app) {
-//                console.log("no app id!");
-//                req.session.error = 'Access denied!';
-//                res.send("noappauth");
-////                next();
-//            } else {
-//                console.log("hey, gotsa appID!");
-//                next();
-//            }
-//        });
-//    } else {
-//        console.log("no app id!");
-//        req.session.error = 'Access denied!';
-//        res.send("noappauth");
-//    }
 app.post("/authreq_noasync", function (req, res) {
     console.log('authRequest from: ' + req.body.uname + " " + req.body.umail);
     var currentDate = Math.floor(new Date().getTime()/1000);

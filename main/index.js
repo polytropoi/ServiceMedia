@@ -472,27 +472,27 @@
 
     function showDashBoid() { //#topPage
 
-        let selector = "<select class=\x22form-control\x22 id=\x22enviroSelect\x22>" +
-        "<option value=\x22\x22 disabled selected>Select Environment : </option>" +
-        "<option>default</option>" +
-        "<option>contact</option>" +
-        "<option>egypt</option>" +
-        "<option>checkerboard</option>" +
-        "<option>forest</option>" +
-        "<option>goaland</option>" +
-        "<option>yavapai</option>" +
-        "<option>goldmine</option>" +
-        "<option>arches</option>" +
-        "<option>threetowers</option>" +
-        "<option>poison</option>" +
-        "<option>tron</option>" +
-        "<option>japan</option>" +
-        "<option>dream</option>" +
-        "<option>volcano</option>" +
-        "<option>starry</option>" +
-        "<option>osiris</option>" +
-        "</select>";
-        $("#envSelector").html(selector);
+                // let selector = "<select class=\x22form-control\x22 id=\x22enviroSelect\x22>" +
+                // "<option value=\x22\x22 disabled selected>Select Environment : </option>" +
+                // "<option>default</option>" +
+                // "<option>contact</option>" +
+                // "<option>egypt</option>" +
+                // "<option>checkerboard</option>" +
+                // "<option>forest</option>" +
+                // "<option>goaland</option>" +
+                // "<option>yavapai</option>" +
+                // "<option>goldmine</option>" +
+                // "<option>arches</option>" +
+                // "<option>threetowers</option>" +
+                // "<option>poison</option>" +
+                // "<option>tron</option>" +
+                // "<option>japan</option>" +
+                // "<option>dream</option>" +
+                // "<option>volcano</option>" +
+                // "<option>starry</option>" +
+                // "<option>osiris</option>" +
+                // "</select>";
+                // $("#envSelector").html(selector);
         // setAframeScene();
         // $(function() {
         //     $(document).on('change', '#enviroSelect', function() {
@@ -17301,37 +17301,60 @@ function getAllPeople() {
             let trafficCount = response.data.length;
             let tArr = response.data;
 
-            ///date math for line chart
-            let dateStart = new Date(tArr[0].timestamp);
+            ////////////////////////////////////////////////////////////date math for line chart
+            let datetimeStart = new Date(tArr[0].timestamp).toISOString();
+            console.log(datetimeStart);
+            let dateStartSplit = datetimeStart.substring(0, 10).split("-");
+            console.log(dateStartSplit);
+            let dateStart = new Date( dateStartSplit[0], dateStartSplit[1] - 1, dateStartSplit[2]);
+            console.log(dateStart);
             let dateEnd = new Date(tArr[tArr.length - 1].timestamp);
             let numberOfDays = (dateEnd - dateStart) / (1000 * 3600 * 24);
-            console.log("numberOfDays is "+ numberOfDays);
+            
         
             let dayLabels = [];
             let dayCounts = [];
-            let showCountNumber = Math.round(numberOfDays) + 1;
-
-
-            // dayLabels.push(dateStart.toLocaleDateString());
-            for (let i = 0; i < showCountNumber; i++) { //start at one 
-                dayLabels.push(dateStart.addDays(i).toLocaleDateString());
+            let showCountNumber = Math.round(numberOfDays);
+            if (showCountNumber == 0) {
+                showCountNumber = 1;
             }
-            let dayCount = 1;
-            for (let l = 0; l < tArr.length; l++ ) {
-                for (let s = 0; s < showCountNumber; s++) {
 
-                    if (tArr[l].timestamp >= dateStart.addDays(s) & tArr[l].timestamp <= dateStart.addDays(s + 1)) {
-                        dayCounts[s] = dayCount++;
-                        // console.log("Day " + s + " " + dayCounts[s]);
+            console.log("numberOfDays is "+ numberOfDays + " = " + showCountNumber);
+            // dayLabels.push(dateStart.toLocaleDateString());
+
+            for (let i = 0; i < showCountNumber; i++) { //prime the pump
+                dayLabels.push(dateStart.addDays(i).toLocaleDateString());
+                dayCounts.push(0);
+            }
+           
+            for (let t = 0; t < tArr.length; t++ ) {
+                if (appdomain) {
+                    if (tArr[t].hasOwnProperty('short_id') && tArr[t].hasOwnProperty('appdomain') && tArr[t].appdomain == appdomain ) {
+                        for (let s = 0; s < showCountNumber; s++) {
+                            if (tArr[t].timestamp >= dateStart.addDays(s) & tArr[t].timestamp <= dateStart.addDays(s + 1)) {
+                                dayCounts[s] = dayCounts[s] + 1; 
+                                console.log("Day " + s + " " + dayCounts[s]);
+                            } 
+                        }
+                        // totalCount++;
                     } else {
-                        dayCount = 1;
+                        console.log("killing thi9s:" + JSON.stringify(tArr[t]));
+                        tArr.splice(t, 1); //drop if they don't have the stuff...
+                    }
+                } else {
+                    for (let s = 0; s < showCountNumber; s++) {
+                        if (tArr[t].timestamp >= dateStart.addDays(s) & tArr[t].timestamp <= dateStart.addDays(s + 1)) {
+                            dayCounts[s] = dayCounts[s] + 1; 
+                            // console.log("Day " + s + " " + dayCounts[s]);
+                        } 
                     }
                 }
                 
             }
 
-            
-            //munging to get top pages bar chart
+            console.log("daycounts" + dayCounts);
+
+            ////////////////////////////////////////////////////////// top pages bar chart
             let groupedTraffic = groupReducer(tArr, 'originalUrl');
             // console.log("groupedTraffic " + JSON.stringify(tArr[0]));
             console.log("traffic count " + trafficCount);
@@ -17347,7 +17370,7 @@ function getAllPeople() {
             }
             urlCounts.sort(({count:a}, {count:b}) => b-a);
 
-            console.log("groupedTraffic " + JSON.stringify(urlCounts));
+            // console.log("groupedTraffic " + JSON.stringify(urlCounts));
 
             document.getElementById("dashboardCharts").style.display = 'block';
                     
