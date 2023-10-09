@@ -3336,8 +3336,19 @@ webxr_router.get('/:_id', function (req, res) {
                             }
                         
                             if (ori.toLowerCase() == "equirectangular") {
-                                videosphereAsset = "<video id=\x22videosphere\x22 autoplay loop crossOrigin=\x22anonymous\x22 src=\x22" + vidUrl + "\x22></video>";
-                                videoEntity = "<a-videosphere play-on-window-click play-on-vrdisplayactivate-or-enter-vr crossOrigin=\x22anonymous\x22 src=\x22#videosphere\x22 rotation=\x220 180 0\x22 material=\x22shader: flat;\x22></a-videosphere>";
+                                if (video_items[0].tags.includes("hls")) {
+                                    let vProps = {};
+                                    vProps.id = video_items[0]._id;
+
+                                    vProps.videoTitle = video_items[0].title;
+                                
+                                    videoEntity = "<a-sphere shadow=\x22receive: false\x22 class=\x22activeObjexGrab activeObjexRay\x22 scale=\x22-1 -1 1\x22 vid_materials_embed=\x22id:"+vProps.id+"; isSkybox: true;\x22 play-on-vrdisplayactivate-or-enter-vr crossOrigin=\x22anonymous\x22 rotation=\x220 180 0\x22 material=\x22shader: flat;\x22></a-sphere>";
+                                    
+                                } else {
+                                    videosphereAsset = "<video id=\x22videosphere\x22 autoplay loop crossOrigin=\x22anonymous\x22 src=\x22" + vidUrl + "\x22></video>";
+                                    videoEntity = "<a-videosphere play-on-window-click play-on-vrdisplayactivate-or-enter-vr crossOrigin=\x22anonymous\x22 src=\x22#videosphere\x22 rotation=\x220 180 0\x22 material=\x22shader: flat;\x22></a-videosphere>";
+                                }
+                              
 
                             } else {
                                 if (preloadVideo) {
@@ -4105,7 +4116,7 @@ webxr_router.get('/:_id', function (req, res) {
                     let arHitTest = "";
                     let arShadowPlane = "";
                     let handsTemplate = "";
-                    let aframeRenderSettings = "renderer=\x22antialias: true; logarithmicDepthBuffer: false; colorManagement: true; sortObjects: true; physicallyCorrectLights: true; alpha: true; maxCanvasWidth: 1920; maxCanvasHeight: 1920;\x22";
+                    let aframeRenderSettings = "renderer=\x22antialias: true; logarithmicDepthBuffer: true; colorManagement: false; sortObjects: true; physicallyCorrectLights: true; alpha: true; maxCanvasWidth: 1920; maxCanvasHeight: 1920;\x22";
                    
                     if (arMode == "spawn") {
                         arHitTest = "<a-entity show-in-ar-mode visible=\x22false\x22 id=\x22reticleEntity\x22 gltf-model=\x22#reticle2\x22 scale=\x220.8 0.8 0.8\x22 ar-hit-test-spawn=\x22mode: "+arMode+"\x22></a-entity>\n"; //for ar spawning...

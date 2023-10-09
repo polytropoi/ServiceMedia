@@ -7149,7 +7149,7 @@
         .catch(function (error) {
         console.log(error);
         });
-        let newButton = "<a href=\x22index.html?type=bulkup\x22 class=\x22btn btn-info  float-right\x22 >Upload New Video</button>";
+        let newButton = "<a href=\x22/process_video_hls_local\x22 class=\x22btn btn-info \x22 >Process Local Video</button><a href=\x22index.html?type=bulkup\x22 class=\x22btn btn-info  float-right\x22 >Upload New Video</button>";
         $("#newButton").html(newButton);
         $("#newButton").show();
     }

@@ -1313,6 +1313,7 @@ app.get("/ami-rite-token/:token", function (req, res) {
             }
     });
 });
+
 app.get("/ami-rite/:_id", function (req, res) {
     if (req.session.user) {
         if (req.session.user._id.toString() == req.params._id) {
@@ -4083,6 +4084,35 @@ app.post('/process_video_hls', requiredAuthentication, function (req, res) {
     //     // console.log('nerp');
     // });
 });
+
+app.get('/process_video_hls_local', requiredAuthentication, function (req, res) {
+    console.log("userid = " + req.session.user._id);
+    var token=jwt.sign({userId:req.session.user._id},process.env.JWT_SECRET);
+    const options = {
+        headers: {'X-Access-Token': token}
+      };
+    // let iID = req.body.id;
+    axios.get(process.env.GS_HOST + "/process_video_hls_local", options)
+    .then((response) => {
+    //   console.log(response.data);
+      console.log("grabAndSqueeze response: " + response.status);
+      res.send("processing video");
+    //   console.log(response.statusText);
+    //   console.log(response.headers);
+    //   console.log(response.config);
+        // callback(null);
+    })
+    .catch(function (error) {
+        // handle error
+        console.log(error);
+        res.send("error: " + error);
+        // callback(error);
+    })
+    // .then(function () {
+    //     // console.log('nerp');
+    // });
+});
+
 
 app.post('/ipfs_up', requiredAuthentication, function (req, res) {
     console.log("userid = " + req.session.user._id);
@@ -9548,7 +9578,7 @@ app.get('/userpic/:p_id', requiredAuthentication, function(req, res) {
     });
 });
 
-app.get('/hls/:_id', function(req, res) {
+app.get('/hls/:_id', function(req, res) {  //main playback route for hls vids
     var pID = req.params._id;
     // console.log("hls pid " + req.params._id);
     if (ObjectID.isValid(pID)) {
@@ -9591,7 +9621,7 @@ app.get('/hls/:_id', function(req, res) {
                                             minioClient.presignedGetObject(process.env.S3_ROOT_BUCKET_NAME, s3Object.name.toString(), 24*60*60, function(err, presignedUrl) { //use callback version here, can't await?
                                                 if (err) return console.log(err);
                                                 // console.log("url " + presignedUrl);
-                                                manifestString = manifestString.replace(path.basename(s3Object.name.toString()), presignedUrl);
+                                                manifestString = manifestString.replace(path.basename(s3Object.name.toString()), presignedUrl); //rebuild the manifest with signed urls - brilliant!
                                                 callbackz();
                                               });                                          
                                         } else {
@@ -9645,7 +9675,7 @@ app.get('/hls/:_id', function(req, res) {
                                     // console.log("filename " + path.basename(s3Object.Key)); 
                                     let url = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: s3Object.Key, Expires: 36000});
                                     // console.log("url " + url);
-                                    manifestString = manifestString.replace(path.basename(s3Object.Key), url);
+                                    manifestString = manifestString.replace(path.basename(s3Object.Key), url); //rebuild the manifest with signed urls
                                 }
                                     callbackz();
                                 }, function(err) {
@@ -15444,9 +15474,25 @@ app.get('/update_public_scene/:_id', requiredAuthentication, function (req, res)
 
 //                                    videoAsset = "<video id=\x22video1\x22 src=\x22" + mp4url + "\x22 autoplay='true' loop='true'>";
                                     if (ori == "equirectangular") {
-                                        videosphereAsset =  
-                                        videoEntity = "<a-videosphere src=\x22" + mp4url + "\x22 rotation=\x220 180 0\x22 material=\x22shader: flat; transparent: true;\x22></a-videosphere>";
+                                        // videosphereAsset =  
+                                        
+                                        console.log("vidoe item zero: " + JSON.stringify(video_items[0]));
+                                        if (video_items[0].tags.includes("hls")) {
+                                            let vProps = {};
+                                            
+                                            vProps.id = video_items[0]._id;
+                                            
+                                            vProps.videoTitle = video_items[0].title;
+                                            
+                                            videoEntity = "<a-videosphere vrotation=\x220 180 0\x22 material=\x22shader: flat; transparent: true;\x22></a-videosphere>";
+                                            
+                                        } else {
+                                            videoEntity = "<a-videosphere src=\x22" + mp4url + "\x22 rotation=\x220 180 0\x22 material=\x22shader: flat; transparent: true;\x22></a-videosphere>";
+                                        }
+
+                                       
 //                                        skySettings = "transparent='true'";
+
                                     } else {
                                         videoEntity = "<a-video src=\x22#video1\x22 position='25 5 -15' width='8' height='4.5' look-at=\x22#player\x22></a-video>";
                                         console.log("VIDEO ENTITIE 11396 " + videoEntity);
@@ -17088,7 +17134,7 @@ app.post('/delete_video/', requiredAuthentication, function (req, res){
             item_string_filename = item_string_filename.replace(/\"/g, "");
             var item_string_filename_ext = getExtension(item_string_filename);
             var baseName = path.basename(item_string_filename, (item_string_filename_ext));
-            console.log(baseName);
+            console.log("looking for vid named" + baseName);
 
             var delete_params = {
                 Bucket: process.env.S3_ROOT_BUCKET_NAME, // required
@@ -17113,8 +17159,10 @@ app.post('/delete_video/', requiredAuthentication, function (req, res){
                     
                 }
                 if (data.Contents.length == 0) {
-                    console.log("no content found");
-                  
+                    // console.log("no content found");
+                    db.video_items.remove( { "_id" : o_id }, 1 );
+                    console.log("no content found, video_item record deleted");
+                    res.send("deleted");
                 } else {
                     response = data.Contents;
                     data.Contents.forEach(function(content) {
