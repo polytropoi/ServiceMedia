@@ -662,7 +662,7 @@ AFRAME.registerComponent('mod-materials', {
             if (this.data.isSkybox) {
               console.log("tryna play skybox vid");
               this.togglePlayPauseVideo();
-              this.el.getObject3D('mesh').scale.set(200, 200, 200);
+              // this.el.getObject3D('mesh').scale.set(200, 200, 200);
               // this.el.components.a-sphere.setAttribute("radius", 100);
             } else {
 
