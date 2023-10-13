@@ -8194,3 +8194,4 @@ AFRAME.registerComponent('scene_greeting_dialog', {  //if "greeting" scenetag + 
   }
 
 });
+////////////////// end scene dialog component

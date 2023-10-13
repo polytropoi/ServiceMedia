@@ -971,3 +971,37 @@ window.addEventListener("DOMContentLoaded", function() {
   });
 });
 */
+
+AFRAME.registerComponent('thumbstick-logging',{
+  init: function () {
+    this.el.addEventListener('thumbstickmoved', this.logThumbstick);
+  },
+  logThumbstick: function (evt) {
+    if (evt.detail.y > 0.95) { console.log("DOWN"); }
+    if (evt.detail.y < -0.95) { console.log("UP"); }
+    if (evt.detail.x < -0.95) { console.log("LEFT"); }
+    if (evt.detail.x > 0.95) { console.log("RIGHT"); }
+  }
+});
+
+AFRAME.registerComponent('toggle-console',{
+  init: function () {
+    let toggleOn = false;
+    let consoleEl = document.getElementById("consoleEntity");
+    this.el.addEventListener('triggerdown', (e) => {
+      toggleOn = !toggleOn;
+      if (toggleOn) {
+        consoleEl.visible = true;
+      } else {
+        consoleEl.visible = false;
+      }
+    });
+  },
+  // triggerDownEvent: function (evt) {
+  //   console.log("tryna trigger console");
+  //   let consoleEl = document.getElementById("consoleEntity");
+  //   if (consoleEl) {
+  //     conso
+  //   }
+  // }
+});

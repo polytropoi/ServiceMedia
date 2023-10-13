@@ -388,9 +388,9 @@ AFRAME.registerComponent('mod-materials', {
 
         // this.hls.on(Hls.Events.MANIFEST_PARSED,function() {}
         // pauseVideo(this.video);
-        if (!this.data.isSkybox) {
+        // if (!this.data.isSkybox) {
           this.el.classList.add("video_embed");
-        }
+        // }
        
 
           console.log("tryna setup video");

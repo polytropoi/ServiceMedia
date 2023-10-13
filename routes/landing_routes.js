@@ -4067,8 +4067,8 @@ landing_router.get('/:_id', function (req, res) {
                         "<script src=\x22../main/src/component/mod-materials.js\x22></script>"+
 
                         // "<script src=\x22../main/src/component/aframe-gradientsky.min.js\x22></script>"+
-                        "<script src=\x22../main/src/component/ar-utils.js\x22></script>"+
-                        "<script src=\x22../main/src/component/spawn-in-circle.js\x22></script>"+
+                        // "<script src=\x22../main/src/component/ar-utils.js\x22></script>"+
+                        // "<script src=\x22../main/src/component/spawn-in-circle.js\x22></script>"+
 
 
                         "</head>" +
