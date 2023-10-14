@@ -918,8 +918,10 @@ AFRAME.registerComponent("hide-on-hit-test-start", {
   }
 });
 
-/* hrm...
-window.addEventListener("DOMContentLoaded", function() {
+AFRAME.registerComponent("xr_listener", { //maybe use for init
+
+  init: function() {
+// window.addEventListener("DOMContentLoaded", function() {
   const sceneEl = document.querySelector("a-scene");
   const ar_overlay = document.getElementById("ar_overlay");
 
@@ -969,8 +971,10 @@ window.addEventListener("DOMContentLoaded", function() {
   sceneEl.addEventListener("exit-vr", function() {
     ar_overlay.textContent = "Exited Immersive Mode";
   });
+// });
+  }
 });
-*/
+
 
 AFRAME.registerComponent('thumbstick-logging',{
   init: function () {
@@ -986,14 +990,16 @@ AFRAME.registerComponent('thumbstick-logging',{
 
 AFRAME.registerComponent('toggle-console',{
   init: function () {
-    let toggleOn = false;
-    let consoleEl = document.getElementById("consoleEntity");
+    this.toggleOn = false;
+    this.consoleEl = document.getElementById("consoleEntity");
     this.el.addEventListener('triggerdown', (e) => {
-      toggleOn = !toggleOn;
-      if (toggleOn) {
-        consoleEl.visible = true;
-      } else {
-        consoleEl.visible = false;
+      this.toggleOn = !this.toggleOn;
+      if (this.el.sceneEl.is('vr-mode')) {
+        if (toggleOn) {
+          this.consoleEl.visible = true;
+        } else {
+          this.consoleEl.visible = false;
+        }
       }
     });
   },

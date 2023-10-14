@@ -1684,6 +1684,9 @@ function SendChatMessage() {
       if (message.length > 0) {
       message = $('<div>').text(message).html(); //sanitize with wierd jquery fu
       console.log("tryna send " + message);
+      if (message.includes("https://")) {
+         message = "<a href=\x22"+message+"\x22 target=\x22_blank\x22>"+message+"</a>";
+      }
       $('#future').prepend("<div class=\x22messageBubbleOut\x22 style=\x22float: right;\x22>you:</span> " +  message +"</div><br><br><br>");
       // $('#future').prepend($('<div style=\x22float: right;\x22><span style=\x22margin: 5px 5px 5px 5px;\x22 class=\x22smallfont_lightgreen\x22>').html( ">you:</span> " +  message +"</div>").append("<hr>"));
       if (socket) {
