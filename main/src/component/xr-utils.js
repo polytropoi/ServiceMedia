@@ -985,6 +985,7 @@ AFRAME.registerComponent('thumbstick-logging',{
     if (evt.detail.y < -0.95) { console.log("UP"); }
     if (evt.detail.x < -0.95) { console.log("LEFT"); }
     if (evt.detail.x > 0.95) { console.log("RIGHT"); }
+    // this.el.setAttribute("a-cursor")
   }
 });
 
