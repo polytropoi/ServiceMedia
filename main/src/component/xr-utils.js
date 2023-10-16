@@ -918,7 +918,7 @@ AFRAME.registerComponent("hide-on-hit-test-start", {
   }
 });
 
-AFRAME.registerComponent("xr_listener", { //maybe use for init
+AFRAME.registerComponent("lefthand_xr_listener", { //maybe use for init
 
   init: function() {
 // window.addEventListener("DOMContentLoaded", function() {
@@ -965,6 +965,22 @@ AFRAME.registerComponent("xr_listener", { //maybe use for init
         },
         { once: true }
       );
+    } else {
+      this.toggleOn = false;
+      this.consoleEl = document.createElement('a-console');
+      this.consoleEl.setAttribute("position", "0 .13 -.36", "scale", ".3 .33 .33", "rotation", "-70.7 -1.77")
+      this.el.appendChild(consoleEl);
+      this.el.addEventListener('triggerdown', (e) => {
+        this.toggleOn = !this.toggleOn;
+
+          if (toggleOn) {
+            this.consoleEl.visible = true;
+          } else {
+            this.consoleEl.visible = false;
+          }
+        
+      });
+
     }
   });
 
@@ -979,6 +995,8 @@ AFRAME.registerComponent("xr_listener", { //maybe use for init
 AFRAME.registerComponent('thumbstick-logging',{
   init: function () {
     this.el.addEventListener('thumbstickmoved', this.logThumbstick);
+
+    
   },
   logThumbstick: function (evt) {
     if (evt.detail.y > 0.95) { console.log("DOWN"); }
@@ -989,21 +1007,20 @@ AFRAME.registerComponent('thumbstick-logging',{
   }
 });
 
-AFRAME.registerComponent('toggle-console',{
-  init: function () {
-    this.toggleOn = false;
-    this.consoleEl = document.getElementById("consoleEntity");
-    this.el.addEventListener('triggerdown', (e) => {
-      this.toggleOn = !this.toggleOn;
-      if (this.el.sceneEl.is('vr-mode')) {
-        if (toggleOn) {
-          this.consoleEl.visible = true;
-        } else {
-          this.consoleEl.visible = false;
-        }
-      }
-    });
-  },
+// AFRAME.registerComponent('toggle-console',{
+//   init: function () {
+//     this.toggleOn = false;
+//     this.el.addEventListener('triggerdown', (e) => {
+//       this.toggleOn = !this.toggleOn;
+//       if (this.el.sceneEl.is('vr-mode')) {
+//         if (toggleOn) {
+//           this.consoleEl.visible = true;
+//         } else {
+//           this.consoleEl.visible = false;
+//         }
+//       }
+//     });
+//   },
   // triggerDownEvent: function (evt) {
   //   console.log("tryna trigger console");
   //   let consoleEl = document.getElementById("consoleEntity");
@@ -1011,4 +1028,4 @@ AFRAME.registerComponent('toggle-console',{
   //     conso
   //   }
   // }
-});
+// });
