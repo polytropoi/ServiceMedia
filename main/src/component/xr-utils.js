@@ -965,19 +965,19 @@ AFRAME.registerComponent("lefthand_xr_listener", { //maybe use for init
         },
         { once: true }
       );
-    } else {
-      this.toggleOn = false;
-      this.consoleEl = document.createElement('a-console');
-      this.consoleEl.setAttribute("position", "0 .13 -.36", "scale", ".3 .33 .33", "rotation", "-70.7 -1.77")
-      this.el.appendChild(consoleEl);
+    // } else {
+      // this.toggleOn = false;
+      this.consoleEl = document.createElement('a-entity');
+      this.consoleEl.setAttribute("a-console", {position: '0 .13 -.36', scale: '.3 .33 .33', rotation: '-70.7 -1.77'});
+      this.el.appendChild(this.consoleEl);
       this.el.addEventListener('triggerdown', (e) => {
-        this.toggleOn = !this.toggleOn;
+        // this.toggleOn = !this.toggleOn;
 
-          if (toggleOn) {
-            this.consoleEl.visible = true;
-          } else {
-            this.consoleEl.visible = false;
-          }
+        //   if (toggleOn) {
+        //     this.consoleEl.visible = true;
+        //   } else {
+        //     this.consoleEl.visible = false;
+        //   }
         
       });
 
