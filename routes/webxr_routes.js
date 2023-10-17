@@ -665,6 +665,7 @@ webxr_router.get('/:_id', function (req, res) {
                         }
                         if (sceneData.sceneTags[i].toLowerCase().includes("logs")) {
                             logScripts = logScripts + "<script src=\x22../main/src/component/a-console.js\x22></script>";
+                            
                         }
                         if (sceneData.sceneTags[i].toLowerCase().includes("physics")) {
                             // physicsScripts =  "<script src=\x22https://mixedreality.mozilla.org/ammo.js/builds/ammo.wasm.js\x22></script>"+
@@ -1497,6 +1498,10 @@ webxr_router.get('/:_id', function (req, res) {
                                         "</a-entity></a-entity>";
                                 } else { // first person cam, default
                                     let lookcontrols = "look-controls=\x22magicWindowTrackingEnabled: false;\x22";
+                                    let console = "";
+                                    if (logScripts != "") {
+                                        console = "<a-console id=\x22consoleEntity\x22 position=\x220\ .13 -.36\x22 scale=\x22.33 .33 .33\x22 rotation=\x22-70.7 -1.77\x22></a-console>";   
+                                    }
                                     if (sceneResponse.sceneTags != null && (sceneResponse.sceneTags.includes('magicwindow') || sceneResponse.sceneTags.includes('magic window'))) {
                                         lookcontrols = "look-controls"; // because magicwinders enabled by default
                                     }
@@ -1518,8 +1523,7 @@ webxr_router.get('/:_id', function (req, res) {
                                         "</a-entity>"+
 
                                         "<a-entity id=\x22left-hand\x22 thumbstick-logging lefthand_xr_listener oculus-touch-controls=\x22hand: left\x22 "+blinkMod+" handModelStyle: lowPoly; color: #ffcccc\x22>"+
-                                            // "<a-console id=\x22consoleEntity\x22 position=\x220\ .13 -.36\x22 scale=\x22.33 .33 .33\x22 rotation=\x22-70.7 -1.77\x22></a-console>"+
-
+                                            console +
                                         "</a-entity>" +
                                         "<a-entity id=\x22right-hand\x22 oculus-touch-controls=\x22hand: right\x22 laser-controls=\x22hand: right;\x22 handModelStyle: lowPoly; color: #ffcccc\x22 raycaster=\x22objects: .activeObjexRay;\x22 grab></a-entity>"+
                                         "</a-entity></a-entity>";

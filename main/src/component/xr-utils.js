@@ -967,17 +967,15 @@ AFRAME.registerComponent("lefthand_xr_listener", { //maybe use for init
       );
     // } else {
       // this.toggleOn = false;
-      this.consoleEl = document.createElement('a-entity');
-      this.consoleEl.setAttribute("a-console", {position: '0 .13 -.36', scale: '.3 .33 .33', rotation: '-70.7 -1.77'});
-      this.el.appendChild(this.consoleEl);
+      // this.consoleEl = document.createElement('a-console');
+      // this.consoleEl.setAttribute('position', '0 .13 -.36', scale, '.3 .33 .33', rotation: '-70.7 -1.77'});
+      // "foo", {
+      //   "one": "foo",
+      //   "two": "bar"});
+      // this.el.appendChild(this.consoleEl);
       this.el.addEventListener('triggerdown', (e) => {
-        // this.toggleOn = !this.toggleOn;
+        console.log("left triggerdown!~");
 
-        //   if (toggleOn) {
-        //     this.consoleEl.visible = true;
-        //   } else {
-        //     this.consoleEl.visible = false;
-        //   }
         
       });
 
