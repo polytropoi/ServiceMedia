@@ -320,6 +320,8 @@ webxr_router.get('/:_id', function (req, res) {
     var picArray = [];
     var imageAssets = "";
     var modelAssets = "";
+    var externalAssets = "";
+    var externalEntities = "";
     var imageEntities = "";
     var skyboxUrl = "";
     var skyboxID = "";
@@ -519,6 +521,7 @@ webxr_router.get('/:_id', function (req, res) {
     let showTransport = false;
     let useNavmesh = false;
     let useSimpleNavmesh = false;
+    let useStarterKit = false;  //load the libs as from https://github.com/AdaRoseCannon/aframe-xr-boilerplate - movement controls, simple navmesh, handy work, physx etc.
     let showDialog = false;
     let showSceneManglerButtons = false;
     let ethereumButton = "";
@@ -528,13 +531,16 @@ webxr_router.get('/:_id', function (req, res) {
     let meshUtilsScript = "<script type=\x22module\x22 src=\x22../main/src/component/mesh-utils.js\x22 defer=\x22defer\x22></script>";
     let physicsScripts = "";
     let brownianScript = "";
-    let aframeExtrasScript = "<script src=\x22../main/vendor/aframe/animation-mixer.js\x22></script>"; //swapped with full aframe-extras lib (that includes animation-mixer) for physics and navmesh if needed
+    // let aframeExtrasScript = "<script src=\x22../main/vendor/aframe/animation-mixer.js\x22></script>"; //swapped with full aframe-extras lib (that includes animation-mixer) for physics and navmesh if needed
     // let aframeExtrasScript = "<script src=\x22../main/src/component/aframe-extras.min.js\x22></script>"; 
+    // let aframeExtrasScript =<script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.0.0/dist/components/sphere-collider.min.js"></script>
+    // <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.0.0/dist/aframe-extras.controls.min.js"></script>
+    let aframeExtrasScript = "<script src=\x22https://cdn.jsdelivr.net/npm/aframe-extras@7.1.0/dist/aframe-extras.min.js\x22></script>";
     let logScripts = "";
     enviromentScript = ""; //for aframe env component
     
     // let aframeScriptVersion = "<script src=\x22https://aframe.io/releases/1.3.0/aframe.min.js\x22></script>";
-    let aframeScriptVersion = "<script src=\x22https://aframe.io/releases/1.4.2/aframe.min.js\x22></script>";
+    let aframeScriptVersion = "<script src=\x22https://cdn.jsdelivr.net/npm/aframe@1.4.2/dist/aframe-master.min.js\x22></script>";
     
     
     let surfaceScatterScript = "";
@@ -734,6 +740,16 @@ webxr_router.get('/:_id', function (req, res) {
                         }
                         if (sceneData.sceneTags[i].toLowerCase().includes("aframe ada")) {
                             aframeScriptVersion = "<script src=\x22https://a-cursor-test.glitch.me/aframe-master.js\x22></script>"; //mod by @adarosecannon
+                        }
+                        if (sceneData.sceneTags[i].toLowerCase().includes("starterkit")) {
+
+                            useStarterKit = true;
+                            externalAssets = externalAssets + "<a-asset-item id=\x22right-gltf\x22 src=\x22https://vazxmixjsiawhamofees.supabase.co/storage/v1/object/public/models/skeleton-right-hand-webxr/model.gltf\x22></a-asset-item>"+
+                            "<a-asset-item id=\x22left-gltf\x22 src=\x22https://vazxmixjsiawhamofees.supabase.co/storage/v1/object/public/models/skeleton-left-hand-webxr/model.gltf\x22></a-asset-item>"+
+                            "<a-asset-item id=\x22watch-gltf\x22 src=\x22https://cdn.glitch.global/d29f98b4-ddd1-4589-8b66-e2446690e697/watch.glb?v=1645016979219\x22></a-asset-item>"+
+                            "<a-asset-item id=\x22sword-gltf\x22 src=\x22https://cdn.glitch.global/d29f98b4-ddd1-4589-8b66-e2446690e697/katana.glb?v=1648465043810\x22></a-asset-item>"+
+                            "<a-asset-item id=\x22watergun-gltf\x22 src=\x22https://cdn.glitch.global/d29f98b4-ddd1-4589-8b66-e2446690e697/watergun.glb?v=1646916260646\x22></a-asset-item>";
+                            externalEntities = requireText('../main/includes/hands.html', require);
                         }
                     }
                 }
@@ -1309,11 +1325,11 @@ webxr_router.get('/:_id', function (req, res) {
                                 //     // wasd = "wasd-controls=\x22fly: false; acceleration: 35\x22";
                                 //     // movementControls = "movement-controls=\x22control: keyboard, gamepad, \x22";
                                 // } else {
-                                // if (useSimpleNavmesh) {
-                                //     //simple navmesh can use 
-                                //     wasd = "extended_wasd_controls=\x22fly: false; moveSpeed: 5; inputType: keyboard\x22 simple-navmesh-constraint=\x22navmesh:#navmesh-el;fall:10; height:.1;\x22";
+                                if (useSimpleNavmesh) {
+                                    //simple navmesh can use 
+                                    wasd = "extended_wasd_controls=\x22fly: false; moveSpeed: 5; inputType: keyboard\x22 simple-navmesh-constraint=\x22navmesh:#navmesh-el;fall:10; height:.1;\x22";
                                     
-                                // } 
+                                } 
                                 // else {
                                 //     movementControls = "movement-controls=\x22constrainToNavMesh: true; control: keyboard, gamepad, touch; fly: false;\x22"; 
                                 //     wasd = "";
@@ -1321,7 +1337,7 @@ webxr_router.get('/:_id', function (req, res) {
                                 // }
                                     // joystickScript = "";
                                 // }
-                                if (physicsScripts.length > 0) {
+                                if (physicsScripts.length > 0) { //inject into player for collider
                                   
                                     physicsMod = "geometry=\x22primitive: cylinder; height: 2; radius: 0.5;\x22 ammo-body=\x22type: kinematic;\x22 ammo-shape=\x22type: capsule\x22";
                                    
@@ -1391,13 +1407,15 @@ webxr_router.get('/:_id', function (req, res) {
                                 let blinkMod = "blink-controls=\x22cameraRig: #cameraRig\x22";
                                 if (useSimpleNavmesh) {
                                     blinkMod = "blink-controls=\x22cameraRig: #cameraRig; collisionEntities: #navmesh-el;\x22"; //only one navmesh for now
-                                }
-                                if (useSimpleNavmesh) {
-                                    //simple navmesh can use 
                                     wasd = "extended_wasd_controls=\x22fly: false; moveSpeed: "+sceneResponse.scenePlayer.playerSpeed+"; inputType: keyboard\x22 simple-navmesh-constraint=\x22navmesh:#navmesh-el;fall:10; height:"+sceneResponse.scenePlayer.playerHeight+"\x22";
-                                    // wasd = "wasd-controls=\x22fly: true; acceleration: 35\x22 ";
+                                }
+                                
+                                // if (useSimpleNavmesh) { //this lives in navigation.js
+                                //     //simple navmesh can use 
+                                //     wasd = "extended_wasd_controls=\x22fly: false; moveSpeed: "+sceneResponse.scenePlayer.playerSpeed+"; inputType: keyboard\x22 simple-navmesh-constraint=\x22navmesh:#navmesh-el;fall:10; height:"+sceneResponse.scenePlayer.playerHeight+"\x22";
+                                //     // wasd = "wasd-controls=\x22fly: true; acceleration: 35\x22 ";
                                     
-                                } 
+                                // } 
                                 // let follower = "";
 
                                 if (sceneResponse.sceneCameraMode != undefined && sceneResponse.sceneCameraMode.toLowerCase().includes("third person")) {
@@ -1527,6 +1545,27 @@ webxr_router.get('/:_id', function (req, res) {
                                         "</a-entity>" +
                                         "<a-entity id=\x22right-hand\x22 oculus-touch-controls=\x22hand: right\x22 laser-controls=\x22hand: right;\x22 handModelStyle: lowPoly; color: #ffcccc\x22 raycaster=\x22objects: .activeObjexRay;\x22 grab></a-entity>"+
                                         "</a-entity></a-entity>";
+
+                                    if (useStarterKit) {
+                                        // physicsScripts = "<script src=\x22https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.0.0/dist/components/sphere-collider.min.js\x22></script>"+
+                                        // "<script src=\x22https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.0.0/dist/aframe-extras.controls.min.js\x22></script>"+
+                                        physicsScripts = "<script src=\x22https://cdn.jsdelivr.net/gh/c-frame/physx@v0.1.0/dist/physx.min.js\x22></script>"+
+                                        // "<script src=\x22https://cdn.jsdelivr.net/npm/aframe-blink-controls@0.4.3/dist/aframe-blink-controls.min.js\x22></script>"+
+                                        "<script src=\x22https://cdn.jsdelivr.net/npm/handy-work@3.1.10/build/handy-controls.min.js\x22></script>"+
+                                        "<script src=\x22https://cdn.jsdelivr.net/npm/handy-work@3.1.10/build/magnet-helpers.min.js\x22></script>";
+                                        // camera = "<a-entity id=\x22cameraRig\x22 simple-navmesh-constraint=\x22navmesh:.navmesh;fall:0.5;height:0;exclude:.navmesh-hole; movement-controls=\x22speed:0.15;camera:#head;\x22"+
+                                        if (useSimpleNavmesh) {
+                                            // need id=\x22mouseCursor\x22?
+                                            camera = "<a-entity initializer cursor=\x22rayOrigin: mouse\x22 simple-navmesh-constraint=\x22navmesh:#navmesh-el;fall:10; height:"+sceneResponse.scenePlayer.playerHeight+"\x22 raycaster=\x22objects: .activeObjexRay\x22 id=\x22cameraRig\x22 movement-controls=\x22speed:0.15;camera:#head;\x22"+
+                                            "position=\x22-1 0 1\x22 rotation=\x220 45 0\x22 origin-on-ar-start> <a-entity id=\x22head\x22 camera=\x22near:0.01;\x22 get_pos_rot look-controls=\x22pointerLockEnabled: false\x22 position=\x220 1.65 0\x22><a-entity id=player></a-entity></a-entity></a-entity></a-entity>";
+                                        } else {
+                                            // need id=\x22mouseCursor\x22?
+                                            camera = "<a-entity initializer cursor=\x22rayOrigin: mouse\x22 raycaster=\x22objects: .activeObjexRay\x22 id=\x22cameraRig\x22 movement-controls=\x22speed:0.15;camera:#head;\x22"+
+                                            "position=\x22-1 0 1\x22 rotation=\x220 45 0\x22 origin-on-ar-start> <a-entity id=\x22head\x22 camera=\x22near:0.01;\x22 get_pos_rot look-controls=\x22pointerLockEnabled: false\x22 position=\x220 1.65 0\x22><a-entity id=player></a-entity></a-entity></a-entity></a-entity>";
+                                        }
+                                        
+                                    }
+
                                 }
                             }
                             let webxrEnv = "default";
@@ -3838,7 +3877,13 @@ webxr_router.get('/:_id', function (req, res) {
                                             let scale = 1;
                                             // image1url = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + picture_item.userID + "/pictures/" + picture_item._id + ".standard." + picture_item.filename, Expires: 6000});
                                             if (picture_item.orientation == "circle" || picture_item.orientation == "Circle" || picture_item.orientation == "square" || picture_item.orientation == "Square" ) {
-                                                image1url = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, 'users/' + picture_item.userID + "/pictures/originals/" + picture_item._id + ".original." + picture_item.filename, 6000);
+                                                if (picture_item.tags.includes("old")) {
+                                                    image1url = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, 'users/' + picture_item.userID + "/pictures/originals/" + picture_item.filename, 6000);
+                                                } else {
+                                                   
+                                                    image1url = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, 'users/' + picture_item.userID + "/pictures/originals/" + picture_item._id + ".original." + picture_item.filename, 6000);
+                                                }
+                                               
                                                 // 'users/' + picture_item.userID + '/pictures/originals/' + picture_item._id + '.original.' + picture_item.filename
                                             } else {
                                                 image1url = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, 'users/' + picture_item.userID + "/pictures/" + picture_item._id + ".standard." + picture_item.filename, 6000);
@@ -4131,7 +4176,7 @@ webxr_router.get('/:_id', function (req, res) {
                     console.log("sceneWebType: "+ sceneResponse.sceneWebType);
                     if (sceneResponse.sceneWebType == undefined || sceneResponse.sceneWebType.toLowerCase() == "default" || sceneResponse.sceneWebType.toLowerCase() == "aframe") { 
                         // webxrFeatures = "webxr=\x22optionalFeatures: hit-test, local-floor\x22"; //otherwise hit-test breaks everythign!
-                        webxrFeatures = "webxr=\x22optionalFeatures: hit-test, local-floor, dom-overlay, unbounded; overlayElement:#ar_overlay;\x22"; //otherwise hit-test breaks everythign!
+                        webxrFeatures = "webxr=\x22requiredFeatures: hit-test, local-floor; optionalFeatures: dom-overlay, unbounded; overlayElement: #ar_overlay;\x22 "; //otherwise hit-test breaks everythign!
                         // arHitTest = "ar-hit-test-spawn=\x22mode: "+arMode+"\x22";
                         // arShadowPlane = "<a-plane show-in-ar-mode id="shadow-plane" material="shader:shadow" shadow="cast:false;" visible=\x22false\x22 height=\x2210\x22 width=\x2210\x22 rotation=\x22-90 0 0\x22 shadow=\x22receive:true\x22 ar-shadows=\x22opacity: 0.3\x22 static-body=\x22shape: none\x22 shape__main=\x22shape: box; halfExtents: 100 100 0.125; offset: 0 0 -0.125\x22>" +
                         arShadowPlane = "<a-plane show-in-ar-mode visible=\x22false\x22 id=\x22shadow-plane\x22 material=\x22shader:shadow\x22 shadow=\x22cast:false;\x22 follow-shadow=\x22.activeObjexRay\x22 height=\x2233\x22 width=\x2233\x22 rotation=\x22-90 0 0\x22>" +
@@ -4536,7 +4581,11 @@ webxr_router.get('/:_id', function (req, res) {
                             extraScripts = extraScripts + "<script src=\x22../main/js/parser.js\x22></script>"; 
                             curveEntities = curveEntities + "<a-entity id=\x22p_path\x22 parametric_curve=\x22xyzFunctions: 30*cos(t), 3*cos(3*t) + 2, 30*sin(t);tRange: 0, -6.283;\x22></a-entity>"; //TODODO 
                         }
-
+                        // if (sceneResponse.sceneTags != null && sceneResponse.sceneTags.includes('hand')) {
+                        //     extraScripts = extraScripts + "<script src=\x22https://cdn.jsdelivr.net/npm/handy-work@3.1.10/build/handy-controls.min.js\x22></script>"+
+                        //     "<script src=\x22https://cdn.jsdelivr.net/npm/handy-work@3.1.10/build/magnet-helpers.min.js\x22></script>";
+                        //     // "<script src=\x22https://cdn.jsdelivr.net/npm/aframe-htmlmesh@2.0.1/build/aframe-html.min.js\\x22></script>";
+                        // }
                         let sceneQuest = "";
                         if (sceneResponse.sceneQuest != null && sceneResponse.sceneQuest != undefined && sceneResponse.sceneQuest != "") {
                             sceneQuest = sceneResponse.sceneQuest;
@@ -4566,7 +4615,7 @@ webxr_router.get('/:_id', function (req, res) {
                         // console.log("scenne greeting is " + sceneGreeting);
                         let physicsInsert = "";
                         let physicsDummy = "";
-                        if (physicsScripts.length > 0) {
+                        if (physicsScripts.length > 0) { //default is ammo
                             // physicsInsert = "physics=\x22driver: ammo; debug: true; gravity: -9.8; debugDrawMode: 0;\x22";
                             physicsInsert = "physics=\x22driver: ammo; debug: "+debugMode+"; debugDrawMode: 1;\x22";
                             physicsDummy = "<a-box position=\x220 10 -10\x22 width=\x223\x22 height=\x223\x22 depth=\x223\x22 ammo-body=\x22type: dynamic\x22 ammo-shape=\x22type: box;\x22></a-box>"+
@@ -4576,7 +4625,17 @@ webxr_router.get('/:_id', function (req, res) {
                         if (logScripts.length > 0){
                             // webxrFeatures = webxrFeatures + " vr-super-stats=\x22position:0 .4 0; alwaysshow3dstats:true; show2dstats:false;\x22 ";
                         }
-                        
+                        if (useStarterKit) { //uses PHYSX, not ammo.js as above
+                            physicsInsert = " physx=\x22autoLoad: true; delay: 1000; wasmUrl: https://cdn.jsdelivr.net/gh/c-frame/physx@v0.1.0/wasm/physx.release.wasm; useDefaultScene: false;\x22 ";
+                        //     webxr="overlayElement:#dom-overlay;"
+                        //     background="color:skyblue;"
+                        //     reflection="directionalLight:#dirlight;"
+                        // renderer="alpha:true;physicallyCorrectLights:true;colorManagement:true;exposure:2;toneMapping:ACESFilmic;"
+                        //     ar-hit-test="target:#my-ar-objects;type:footprint;footprintDepth:0.2;"
+                        //     shadow="type: pcfsoft"
+                        //     gltf-model="dracoDecoderPath: https://www.gstatic.com/draco/versioned/decoders/1.5.6/;"
+                        // ar-cursor raycaster="objects: #my-ar-objects a-sphere"
+                        }
                         if (curveEntities.length > 0 && !hasParametricCurve) {
                             curveEntities = "<a-curve id=\x22curve1\x22 type=\x22CatmullRom\x22 closed=\x22true\x22>" + curveEntities + "</a-curve>"+
                             "<a-draw-curve id=\x22showCurves\x22 visible=\x22false\x22 curveref=\x22#curve1\x22 material=\x22shader: line; color: blue;\x22></a-draw-curve>";
@@ -4651,9 +4710,10 @@ webxr_router.get('/:_id', function (req, res) {
                      
                    
                         "<script async src=\x22https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js\x22></script>"+
+
                         "<script type=\x22importmap\x22> {\x22imports\x22: {" +
-                            "\x22three\x22: \x22https://unpkg.com/three@0.147.0/build/three.module.js\x22,"+
-                            "\x22three/addons/\x22: \x22https://unpkg.com/browse/three@0.147.0/examples/jsm/\x22"+
+                            "\x22three\x22: \x22https://unpkg.com/three@0.147.1/build/three.module.js\x22,"+
+                            "\x22three/addons/\x22: \x22https://unpkg.com/browse/three@0.147.1/examples/jsm/\x22"+
                             "}"+
                         "}</script>"+
 
@@ -4682,7 +4742,8 @@ webxr_router.get('/:_id', function (req, res) {
                         // "<script src=\x22../main/ref/aframe/dist/networked-aframe.min.js\x22></script>" + 
                        
                         "<script src=\x22../main/vendor/aframe/aframe-blink-controls.min.js\x22></script>" +   //TODO - check if req comes from vr headset
-                       
+
+
                         
                         enviromentScript +
                        
@@ -4774,7 +4835,10 @@ webxr_router.get('/:_id', function (req, res) {
                         handsTemplate + 
                         pAudioWaveform +
                         modelAssets +
+                        externalAssets +
                         // "<a-asset-item id=\x22trigger1\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/trigger1.glb\x22></a-asset-item>\n"+
+
+
                         "<a-asset-item id=\x22square1\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/square1.glb\x22></a-asset-item>\n"+
                         "<a-asset-item id=\x22rectangle1\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/rectangle1.glb\x22></a-asset-item>\n"+
                         "<a-asset-item id=\x22avatar_model\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/avatar1c.glb\x22></a-asset-item>\n"+
@@ -4847,6 +4911,7 @@ webxr_router.get('/:_id', function (req, res) {
                         skyParticles +
                         imageEntities +
                         // targetObjectEntity +
+                        externalEntities +
                         geoEntities +
                         videoEntity +
                         youtubeEntity +

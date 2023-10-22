@@ -172,7 +172,7 @@ class Joystick
 	}
 }
 
-AFRAME.registerComponent('screen-controls-nilch', 
+AFRAME.registerComponent('screen-controls-nilch', //deprecated
 {
 	schema: 
 	{
@@ -924,21 +924,31 @@ AFRAME.registerComponent('simple-navmesh-constraint', {
       }
     },
     init: function () {
-      console.log("tryna init simple navmesh");
+      
+	  if (this.data.navmesh != '') {
+		this.hasNavmesh = true; //might get applied without a navmesh assigned
+		console.log("tryna init simple navmesh with a navmesh");
+	  } else {
+		console.log("tryna init simple navmesh no navmesh found!");
+	  }
+	  
     },
     update: function () {
-      this.lastPosition = null;
-      this.excludes = this.data.exclude ? Array.from(document.querySelectorAll(this.data.exclude)):[];
-      const els = Array.from(document.querySelectorAll(this.data.navmesh));
-      if (els === null) {
-        console.warn('navmesh-physics: Did not match any elements');
-        this.objects = [];
-      } else {
-        this.objects = els.map(el => el.object3D).concat(this.excludes.map(el => el.object3D));
-      }
+		if (this.hasNavmesh) {
+			this.lastPosition = null;
+			this.excludes = this.data.exclude ? Array.from(document.querySelectorAll(this.data.exclude)):[];
+			const els = Array.from(document.querySelectorAll(this.data.navmesh));
+			if (els === null) {
+				console.warn('navmesh-physics: Did not match any elements');
+				this.objects = [];
+			} else {
+				this.objects = els.map(el => el.object3D).concat(this.excludes.map(el => el.object3D));
+			}
+		}
     },
   
     tick: (function () {
+	// if (this.hasNavmesh) {
       const nextPosition = new THREE.Vector3();
       const tempVec = new THREE.Vector3();
       const scanPattern = [
@@ -964,8 +974,9 @@ AFRAME.registerComponent('simple-navmesh-constraint', {
           firstTry = true;
           this.lastPosition = new THREE.Vector3();
           this.el.object3D.getWorldPosition(this.lastPosition);
+		 
         }
-        
+        // console.log("position: " + this.lastPosition.x);
         const el = this.el;
         if (this.objects.length === 0) return;
   
@@ -1021,7 +1032,11 @@ AFRAME.registerComponent('simple-navmesh-constraint', {
           this.el.object3D.parent.worldToLocal(this.el.object3D.position);
         }
       }
+	// } else {
+	// 	console.log("no navmesh found!");
+	// }
     }())
+	
   });
 
 

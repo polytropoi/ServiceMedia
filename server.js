@@ -12764,26 +12764,28 @@ app.get('/uscene/:user_id/:scene_id',  requiredAuthentication, uscene, function 
                 if (sceneResponse.sceneWebLinks != null && sceneResponse.sceneWebLinks.length > 0) {
                     let weblinx = [];
                     for (var i = 0; i < sceneResponse.sceneWebLinks.length; i++) {
-                        console.log(JSON.stringify(sceneResponse.sceneWebLinks[i]));
-                        db.weblinks.findOne({'_id': ObjectID(sceneResponse.sceneWebLinks[i])}, function (err, weblink) {
-                            if (err || !weblink) {
-                                console.log("can't find weblink");
-                            } else {
-                                console.log(JSON.stringify(weblink));
-                                let link = {};
-                                var urlThumb = s3.getSignedUrl('getObject', {Bucket: 'servicemedia.web', Key: weblink._id + "/" + weblink._id + ".thumb.jpg", Expires: 6000});
-                                var urlHalf = s3.getSignedUrl('getObject', {Bucket: 'servicemedia.web', Key:  weblink._id + "/" + weblink._id + ".half.jpg", Expires: 6000});
-                                var urlStandard = s3.getSignedUrl('getObject', {Bucket: 'servicemedia.web', Key:  weblink._id + "/" + weblink._id + ".standard.jpg", Expires: 6000});
-                                
-                                link.urlThumb = urlThumb;
-                                link.urlHalf = urlHalf;
-                                link.urlStandard = urlStandard;
-                                link.link_url = weblink.link_url;
-                                link.link_title = weblink.link_title;
-                                link._id = weblink._id;
-                                weblinx.push(link);
-                            }
-                        });
+                        console.log("weblink: " + JSON.stringify(sceneResponse.sceneWebLinks[i]));
+                        if (ObjectID.isValid(sceneResponse.sceneWebLinks[i])) {
+                            db.weblinks.findOne({'_id': ObjectID(sceneResponse.sceneWebLinks[i])}, function (err, weblink) {
+                                if (err || !weblink) {
+                                    console.log("can't find weblink");
+                                } else {
+                                    console.log(JSON.stringify(weblink));
+                                    let link = {};
+                                    var urlThumb = s3.getSignedUrl('getObject', {Bucket: 'servicemedia.web', Key: weblink._id + "/" + weblink._id + ".thumb.jpg", Expires: 6000});
+                                    var urlHalf = s3.getSignedUrl('getObject', {Bucket: 'servicemedia.web', Key:  weblink._id + "/" + weblink._id + ".half.jpg", Expires: 6000});
+                                    var urlStandard = s3.getSignedUrl('getObject', {Bucket: 'servicemedia.web', Key:  weblink._id + "/" + weblink._id + ".standard.jpg", Expires: 6000});
+                                    
+                                    link.urlThumb = urlThumb;
+                                    link.urlHalf = urlHalf;
+                                    link.urlStandard = urlStandard;
+                                    link.link_url = weblink.link_url;
+                                    link.link_title = weblink.link_title;
+                                    link._id = weblink._id;
+                                    weblinx.push(link);
+                                }
+                            });
+                        }
                     }
                     sceneResponse.weblinx = weblinx;
                     console.log("weblinx " + sceneResponse.weblinx);
