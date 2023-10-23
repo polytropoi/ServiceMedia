@@ -4634,6 +4634,12 @@ AFRAME.registerComponent('mod_model', {
           // console.log("GOTSA SCATTER OBJEK@");
 
         }
+        if (this.data.eventData.includes("pickup")) { //USING PHYSX, needs useStarterKit = true!
+          this.el.setAttribute("toggle-physics");
+          this.el.setAttribute("physx-body-from-model", {type:'dynamic',mass:2}); 
+
+        }
+        
         // this.oScale = oScale;
         this.bubble = null;
         this.bubbleText = null;

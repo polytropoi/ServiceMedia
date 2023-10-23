@@ -1562,13 +1562,19 @@ webxr_router.get('/:_id', function (req, res) {
                                             cameraRigEntity = "<a-entity id=\x22cameraRig\x22 initializer cursor=\x22rayOrigin: mouse\x22 simple-navmesh-constraint=\x22navmesh:#navmesh-el;fall:10; height:"+
                                             sceneResponse.scenePlayer.playerHeight+"\x22 raycaster=\x22objects: .activeObjexRay\x22  movement-controls=\x22speed:0.15;camera:#head;\x22"+
                                             "position=\x22-1 0 1\x22 rotation=\x220 45 0\x22 origin-on-ar-start> <a-entity id=\x22head\x22 camera=\x22near:0.01;\x22 look-controls=\x22pointerLockEnabled: false\x22 position=\x220 1.65 0\x22>"+
-                                            "<a-entity id=player get_pos_rot></a-entity></a-entity>"+ handEntities +"</a-entity>";
+                                            "<a-entity id=player get_pos_rot></a-entity>"+
+                                            "<a-entity class=\x22hiddenPlaceholders\x22 id=\x22viewportPlaceholder3\x22 geometry=\x22primitive: plane; height: 0.01; width: .01\x22 position=\x220 0 -3\x22"+
+                                            "material=\x22opacity: 0\x22></a-entity>"+
+                                            "</a-entity>"+ handEntities +"</a-entity>";
                                         } else {
                                             // need id=\x22mouseCursor\x22?
                                             cameraRigEntity = "<a-entity id=\x22cameraRig\x22 initializer cursor=\x22rayOrigin: mouse\x22 raycaster=\x22objects: .activeObjexRay\x22 id=\x22cameraRig\x22 position=\x22"+
                                             playerPosition+"\x22 movement-controls=\x22speed:0.15;camera:#head;\x22"+
                                             "position=\x22-1 0 1\x22 rotation=\x220 45 0\x22 origin-on-ar-start> <a-entity id=\x22head\x22 camera=\x22near:0.01;\x22 look-controls=\x22pointerLockEnabled: false\x22 position=\x220 1.65 0\x22>"+
-                                            "<a-entity id=player get_pos_rot></a-entity></a-entity>"+ handEntities +"</a-entity>";
+                                            "<a-entity id=player get_pos_rot></a-entity>"+
+                                            "<a-entity class=\x22hiddenPlaceholders\x22 id=\x22viewportPlaceholder3\x22 geometry=\x22primitive: plane; height: 0.01; width: .01\x22 position=\x220 0 -3\x22"+
+                                            "material=\x22opacity: 0\x22></a-entity>"+
+                                            "</a-entity>"+ handEntities +"</a-entity>";
                                         }
                                         
                                     }

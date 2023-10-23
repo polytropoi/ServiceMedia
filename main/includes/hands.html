@@ -78,6 +78,7 @@
 
 
 <script>
+  let cameraRig = document.getElementById("cameraRig");
   let movementType = 'teleport';
   function toggleThumbstick(detail) {
     const rayPointers = ['[data-right="ray"]', '[data-left="ray"]'].map(s => document.querySelector(s));
@@ -93,7 +94,7 @@
     }
   }
   // If the user is teleporting disable movement-controls in XR
-  const sceneEl = document.querySelector("a-scene");
+  sceneEl = document.querySelector("a-scene");
   sceneEl.addEventListener("enter-vr", function() {
     if (movementType === 'teleport') {
       cameraRig.setAttribute('movement-controls', 'enabled', false);
