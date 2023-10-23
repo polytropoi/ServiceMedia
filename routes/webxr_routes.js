@@ -336,7 +336,7 @@ webxr_router.get('/:_id', function (req, res) {
     var ocean = "";
     let terrain = "";
     let enviroScripts = "";
-    var camera = "";
+    var cameraRigEntity = "";
     var oceanScript = "";
     var ARScript = "";
     var locationScripts = "";
@@ -748,7 +748,10 @@ webxr_router.get('/:_id', function (req, res) {
                             "<a-asset-item id=\x22left-gltf\x22 src=\x22https://vazxmixjsiawhamofees.supabase.co/storage/v1/object/public/models/skeleton-left-hand-webxr/model.gltf\x22></a-asset-item>"+
                             "<a-asset-item id=\x22watch-gltf\x22 src=\x22https://cdn.glitch.global/d29f98b4-ddd1-4589-8b66-e2446690e697/watch.glb?v=1645016979219\x22></a-asset-item>"+
                             "<a-asset-item id=\x22sword-gltf\x22 src=\x22https://cdn.glitch.global/d29f98b4-ddd1-4589-8b66-e2446690e697/katana.glb?v=1648465043810\x22></a-asset-item>"+
-                            "<a-asset-item id=\x22watergun-gltf\x22 src=\x22https://cdn.glitch.global/d29f98b4-ddd1-4589-8b66-e2446690e697/watergun.glb?v=1646916260646\x22></a-asset-item>";
+                            "<a-asset-item id=\x22watergun-gltf\x22 src=\x22https://cdn.glitch.global/d29f98b4-ddd1-4589-8b66-e2446690e697/watergun.glb?v=1646916260646\x22></a-asset-item>"+
+                            "<a-mixin id=\x22animations\x22 animation__click=\x22property: components.material.material.color; type: color; to: blue; startEvents: click; dur: 500;\x22></a-mixin>"+
+                            "<a-mixin id=\x22blink\x22 blink-controls=\x22rotateOnTeleport:false;cameraRig: #cameraRig; teleportOrigin: #head; collisionEntities:.navmesh, .activeObjexRay, #navmesh_el;\x22></a-mixin>"+
+                            "<a-mixin id=\x22handle-visual\x22 geometry=\x22width:0.05;height:0.05;depth:0.2\x22></a-mixin>";
                             handEntities = requireText('../main/includes/hands.html', require);
                         }
                     }
@@ -1206,7 +1209,7 @@ webxr_router.get('/:_id', function (req, res) {
                             
                             // camera = "<a-entity cursor raycaster=\x22far: 20; interval: 1000; objects: .activeObjexRay\x22></a-entity>" +
                             // "<a-entity camera></a-entity>";
-                            camera = "<a-entity id=\x22cameraRig\x22 initializer position=\x22"+playerPosition+"\x22>"+
+                            cameraRigEntity = "<a-entity id=\x22cameraRig\x22 initializer position=\x22"+playerPosition+"\x22>"+
                             "<a-entity id=\x22mouseCursor\x22 cursor=\x22rayOrigin: mouse\x22 raycaster=\x22objects: .activeObjexRay\x22></a-entity>"+
                             // "<a-entity id=\x22player\x22 get_pos_rot networked=\x22template:#avatar-template;attachTemplateToLocal:false;\x22 "+spawnInCircle+" camera "+wasd+" look-controls=\x22hmdEnabled: false\x22 position=\x220 1.6 0\x22>" +     
                             "<a-entity id=\x22player\x22 get_pos_rot=\x22init: true;\x22 camera "+wasd+" look-controls=\x22hmdEnabled: false\x22 position=\x220 1.6 0\x22>" +     
@@ -1221,7 +1224,7 @@ webxr_router.get('/:_id', function (req, res) {
                             ARScript = "<script src=\x22./main/src/util/mindar/mindar-image.js\x22></script> <script src=\x22./main/src/util/mindar/mindar-image-aframe.js\x22></script>";
                             ARSceneArg = "mindar-image=\x22imageTargetSrc: "+arImageTargets[0]+";\x22 embedded color-space=\x22sRGB\x22"+
                                 " renderer=\x22colorManagement: true, physicallyCorrectLights\x22 vr-mode-ui=\x22enabled: false\x22 device-orientation-permission-ui=\x22enabled: false\x22";
-                            camera = "<a-entity mindar-image-target=\x22targetIndex: 0\x22>" +
+                            cameraRigEntity = "<a-entity mindar-image-target=\x22targetIndex: 0\x22>" +
                             "<a-gltf-model rotation=\x2290 0 0\x22 position=\x220 0 0.1\x22 scale=\x220.25 0.25 0.25\x22 src=\x22#gltfAsset1\x22>"+
                             "</a-entity>";
                           
@@ -1236,7 +1239,7 @@ webxr_router.get('/:_id', function (req, res) {
                             // "document.querySelector('a-text').setAttribute('"+geoEntity+"', `latitude: ${position.coords.latitude}; longitude: ${position.coords.longitude};`)});}</script>";
                             ARSceneArg = "gps-position webxr=\x22referenceSpaceType: unbounded; requiredFeatures: unbounded;\x22 vr-mode-ui=\x22enabled: false\x22 arjs=\x22sourceType: webcam; debugUIEnabled: false;\x22";
                            
-                            camera = "<a-entity id=\x22player\x22 position=\x220 0 0\x22 camera pitch-roll-look-controls>"+ 
+                            cameraRigEntity = "<a-entity id=\x22player\x22 position=\x220 0 0\x22 camera pitch-roll-look-controls>"+ 
                                 "<a-entity class=\x22hiddenPlaceholders\x22 id=\x22equipPlaceholder\x22 geometry=\x22primitive: plane; height: 0.01; width: .01\x22 position=\x220 -.5 -.65\x22"+ //these seemed to need actual geometry to get a worldspace loc
                                 "material=\x22opacity: 0\x22></a-entity>"+
                                 "<a-entity class=\x22hiddenPlaceholders\x22 id=\x22viewportPlaceholder\x22 geometry=\x22primitive: plane; height: 0.01; width: .01\x22 position=\x220 0 -1\x22"+
@@ -1272,7 +1275,7 @@ webxr_router.get('/:_id', function (req, res) {
 
                                 locationScripts = "<script src=\x22../main/src/component/location-fu.js\x22></script>";
                                
-                                camera = "<a-camera id=\x22player\x22 look-controls-enabled=\x22false\x22 listen-from-camera gps-camera rotation-reader><a-entity id=\x22mouseCursor\x22 cursor=\x22rayOrigin: mouse\x22 raycaster=\x22objects: .activeObjexRay\x22></a-entity>"+
+                                cameraRigEntity = "<a-camera id=\x22player\x22 look-controls-enabled=\x22false\x22 listen-from-camera gps-camera rotation-reader><a-entity id=\x22mouseCursor\x22 cursor=\x22rayOrigin: mouse\x22 raycaster=\x22objects: .activeObjexRay\x22></a-entity>"+
                                 // "<a-entity id=\x22player\x22 networked=\x22template:#avatar-template;attachTemplateToLocal:false;\x22 spawn-in-circle=\x22radius:3;\x22>" + //ENABLE LATER
                                         "</a-camera>";
                                 let doBuildings = false;
@@ -1426,7 +1429,7 @@ webxr_router.get('/:_id', function (req, res) {
                                     // wasd = "wasd-controls=\x22fly: true; acceleration: "+sceneResponse.scenePlayer.playerSpeed+"\x22 simple-navmesh-constraint=\x22navmesh:#navmesh-el;fall:10; height:0;\x22";
                                     // wasd = "extended_wasd_controls=\x22flyEnabled: false; moveSpeed: 4; inputType: keyboard\x22";
                                     wasd = "extended_wasd_thirdperson=\x22fly: false; moveSpeed: "+sceneResponse.scenePlayer.playerSpeed+"; inputType: keyboard\x22 simple-navmesh-constraint=\x22navmesh:#navmesh-el;fall:10; height: 0\x22";
-                                    camera = "<a-entity "+lookcontrols+" follow-camera=\x22target: #player\x22>" +
+                                    cameraRigEntity = "<a-entity "+lookcontrols+" follow-camera=\x22target: #player\x22>" +
                                         "<a-entity camera position=\x220 5 7\x22 ></a-entity>" +
                                     "</a-entity>"+
                                     "<a-entity id=\x22cameraRig\x22 initializer "+
@@ -1458,7 +1461,7 @@ webxr_router.get('/:_id', function (req, res) {
                                     // wasd = "wasd-controls=\x22fly: true; acceleration: "+sceneResponse.scenePlayer.playerSpeed+"\x22 simple-navmesh-constraint=\x22navmesh:#navmesh-el;fall:10; height:0;\x22";
                                     // wasd = "extended_wasd_controls=\x22flyEnabled: false; moveSpeed: 4; inputType: keyboard\x22";
                                     // wasd = "extended_wasd_thirdperson=\x22fly: false; moveSpeed: "+sceneResponse.scenePlayer.playerSpeed+"; inputType: keyboard\x22 simple-navmesh-constraint=\x22navmesh:#navmesh-el;fall:10; height: 0\x22";
-                                    camera = "<a-entity camera look-controls id=\x22player\x22 orbit-controls=\x22target: 0 0 0; minDistance: 0.5; maxDistance: 180; initialPosition: 0 5 5\x22>"+
+                                    cameraRigEntity = "<a-entity camera look-controls id=\x22player\x22 orbit-controls=\x22target: 0 0 0; minDistance: 0.5; maxDistance: 180; initialPosition: 0 5 5\x22>"+
                                     "<a-entity id=\x22mouseCursor\x22 cursor=\x22rayOrigin: mouse\x22 raycaster=\x22objects: .activeObjexRay\x22></a-entity>"+
                                     "</a-entity>";
                                         
@@ -1493,7 +1496,7 @@ webxr_router.get('/:_id', function (req, res) {
                                     // wasd = "wasd-controls=\x22fly: true; acceleration: "+sceneResponse.scenePlayer.playerSpeed+"\x22 simple-navmesh-constraint=\x22navmesh:#navmesh-el;fall:10; height:0;\x22";
                                     // wasd = "extended_wasd_controls=\x22flyEnabled: false; moveSpeed: 4; inputType: keyboard\x22";
                                     // wasd = "extended_wasd_thirdperson=\x22fly: false; moveSpeed: "+sceneResponse.scenePlayer.playerSpeed+"; inputType: keyboard\x22 simple-navmesh-constraint=\x22navmesh:#navmesh-el;fall:10; height: 0\x22";
-                                    camera = "<a-entity "+lookcontrols+" follow-camera=\x22target: #player\x22>" +
+                                    cameraRigEntity = "<a-entity "+lookcontrols+" follow-camera=\x22target: #player\x22>" +
                                         "<a-entity camera position=\x220 5 7\x22 ></a-entity>" +
                                     "</a-entity>"+
                                     "<a-entity id=\x22cameraRig\x22 initializer "+
@@ -1524,7 +1527,7 @@ webxr_router.get('/:_id', function (req, res) {
                                         lookcontrols = "look-controls"; // because magicwinders enabled by default
                                     }
                                     // defaults to first person cam
-                                    camera = "<a-entity id=\x22cameraRig\x22 "+movementControls+" initializer "+
+                                    cameraRigEntity = "<a-entity id=\x22cameraRig\x22 "+movementControls+" initializer "+
                                 
                                         " id=\x22mouseCursor\x22 cursor=\x22rayOrigin: mouse\x22 raycaster=\x22objects: .activeObjexRay\x22>"+
                                         // "<a-entity id=\x22player\x22 get_pos_rot networked=\x22template:#avatar-template;attachTemplateToLocal:false;\x22 "+spawnInCircle+" camera "+wasd+" look-controls=\x22hmdEnabled: false\x22 position=\x220 1.6 0\x22>" +     
@@ -1556,16 +1559,16 @@ webxr_router.get('/:_id', function (req, res) {
                                         // camera = "<a-entity id=\x22cameraRig\x22 simple-navmesh-constraint=\x22navmesh:.navmesh;fall:0.5;height:0;exclude:.navmesh-hole; movement-controls=\x22speed:0.15;camera:#head;\x22"+
                                         if (useSimpleNavmesh) {
                                             // need id=\x22mouseCursor\x22?
-                                            camera = "<a-entity id=\x22cameraRig\x22 initializer cursor=\x22rayOrigin: mouse\x22 simple-navmesh-constraint=\x22navmesh:#navmesh-el;fall:10; height:"+
+                                            cameraRigEntity = "<a-entity id=\x22cameraRig\x22 initializer cursor=\x22rayOrigin: mouse\x22 simple-navmesh-constraint=\x22navmesh:#navmesh-el;fall:10; height:"+
                                             sceneResponse.scenePlayer.playerHeight+"\x22 raycaster=\x22objects: .activeObjexRay\x22  movement-controls=\x22speed:0.15;camera:#head;\x22"+
-                                            "position=\x22-1 0 1\x22 rotation=\x220 45 0\x22 origin-on-ar-start> <a-entity id=\x22head\x22 camera=\x22near:0.01;\x22 get_pos_rot look-controls=\x22pointerLockEnabled: false\x22 position=\x220 1.65 0\x22>"+
-                                            "<a-entity id=player></a-entity></a-entity></a-entity>"+ handEntities +"</a-entity>";
+                                            "position=\x22-1 0 1\x22 rotation=\x220 45 0\x22 origin-on-ar-start> <a-entity id=\x22head\x22 camera=\x22near:0.01;\x22 get_pos_rot look-controls=\x22pointerLockEnabled: false\x22 position=\x220 0 0\x22>"+
+                                            "<a-entity id=player></a-entity></a-entity>"+ handEntities +"</a-entity>";
                                         } else {
                                             // need id=\x22mouseCursor\x22?
-                                            camera = "<a-entity id=\x22cameraRig\x22 initializer cursor=\x22rayOrigin: mouse\x22 raycaster=\x22objects: .activeObjexRay\x22 id=\x22cameraRig\x22 position=\x22"+
+                                            cameraRigEntity = "<a-entity id=\x22cameraRig\x22 initializer cursor=\x22rayOrigin: mouse\x22 raycaster=\x22objects: .activeObjexRay\x22 id=\x22cameraRig\x22 position=\x22"+
                                             playerPosition+"\x22 movement-controls=\x22speed:0.15;camera:#head;\x22"+
-                                            "position=\x22-1 0 1\x22 rotation=\x220 45 0\x22 origin-on-ar-start> <a-entity id=\x22head\x22 camera=\x22near:0.01;\x22 get_pos_rot look-controls=\x22pointerLockEnabled: false\x22 position=\x220 1.65 0\x22>"+
-                                            "<a-entity id=player></a-entity></a-entity></a-entity>"+ handEntities +"</a-entity>";
+                                            "position=\x22-1 0 1\x22 rotation=\x220 45 0\x22 origin-on-ar-start> <a-entity id=\x22head\x22 camera=\x22near:0.01;\x22 get_pos_rot look-controls=\x22pointerLockEnabled: false\x22 position=\x220 0 0\x22>"+
+                                            "<a-entity id=player></a-entity></a-entity>"+ handEntities +"</a-entity>";
                                         }
                                         
                                     }
@@ -4656,7 +4659,7 @@ webxr_router.get('/:_id', function (req, res) {
 
                         /////////AFRAME SCENE DECLARATION////////////////// 
                         let aScene = "<a-scene "+sceneBackground+" "+physicsInsert+" "+pool_target+" "+pool_launcher+" gesture-detector renderer=\x22colorManagement: true\x22" +
-                        "reflection=\x22directionalLight:#real-light\x22 ar-hit-test=\x22target:#target_object; type:footprint; footprintDepth:0.1;\x22 ar-cursor raycaster=\x22objects: .activeObjexRay\x22 "+
+                        "reflection=\x22directionalLight:#real-light\x22 ar-hit-test=\x22target:.activeObjectRay; type:footprint; footprintDepth:0.1;\x22 ar-cursor raycaster=\x22objects: .activeObjexRay a-sphere\x22 "+
                         // "screen-controls vr-mode-ui keyboard-shortcuts=\x22enterVR: false\x22" + magicWindow +   
                         " vr-mode-ui keyboard-shortcuts=\x22enterVR: false\x22" +  //add screen-controls from initializer                      
                         webxrFeatures + " shadow=\x22type: pcfsoft\x22 loading-screen=\x22dotsColor: white; backgroundColor: black; enabled: false\x22 embedded " + aframeRenderSettings + " " + fogSettings + " "+networkedscene+" "+ARSceneArg+" listen-for-vr-mode>";
@@ -4821,12 +4824,12 @@ webxr_router.get('/:_id', function (req, res) {
                         aScene +
                         "<div id=\x22overlay\x22></div>"+
                         // skySettings +
-                        aframeEnvironment +
-                        ambientLight + 
-                        camera +
-                        // ARMarker +
-                        ocean +
-                        terrain +
+                        // aframeEnvironment +
+                        // ambientLight + 
+                        // cameraRigEntity +
+                        // // ARMarker +
+                        // ocean +
+                        // terrain +
                         // ground +
 
                         skySettings +
@@ -4904,7 +4907,12 @@ webxr_router.get('/:_id', function (req, res) {
                         "</a-assets>\n"+
 
                         //////////////ENTITIES////////////////////
-
+                        aframeEnvironment +
+                        ambientLight + 
+                        cameraRigEntity +
+                        // ARMarker +
+                        ocean +
+                        terrain +
                         curveEntities +
                         // physicsDummy + 
                         renderPanel +

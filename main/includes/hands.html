@@ -75,3 +75,31 @@
     <a-sphere data-left="thumb-tip" radius="0.004" visible="false" physx-body="type: kinematic;"></a-sphere>
   </a-entity>
 </a-entity>
+
+
+<script>
+  let movementType = 'teleport';
+  function toggleThumbstick(detail) {
+    const rayPointers = ['[data-right="ray"]', '[data-left="ray"]'].map(s => document.querySelector(s));
+    const type = detail.value;
+    movementType = type;
+    if (type === 'move') {
+      cameraRig.setAttribute('movement-controls', 'enabled', true);
+      for (const p of rayPointers) p.removeAttribute('mixin');
+    }
+    if (type === 'teleport') {
+      cameraRig.setAttribute('movement-controls', 'enabled', false);
+      for (const p of rayPointers) p.setAttribute('mixin', 'blink');
+    }
+  }
+  // If the user is teleporting disable movement-controls in XR
+  const sceneEl = document.querySelector("a-scene");
+  sceneEl.addEventListener("enter-vr", function() {
+    if (movementType === 'teleport') {
+      cameraRig.setAttribute('movement-controls', 'enabled', false);
+    }
+  });
+  sceneEl.addEventListener("exit-vr", function() {
+    cameraRig.setAttribute('movement-controls', 'enabled', true);
+  });
+</script>
