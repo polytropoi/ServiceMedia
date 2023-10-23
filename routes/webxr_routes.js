@@ -321,7 +321,7 @@ webxr_router.get('/:_id', function (req, res) {
     var imageAssets = "";
     var modelAssets = "";
     var externalAssets = "";
-    var externalEntities = "";
+    var handEntities = "";
     var imageEntities = "";
     var skyboxUrl = "";
     var skyboxID = "";
@@ -749,7 +749,7 @@ webxr_router.get('/:_id', function (req, res) {
                             "<a-asset-item id=\x22watch-gltf\x22 src=\x22https://cdn.glitch.global/d29f98b4-ddd1-4589-8b66-e2446690e697/watch.glb?v=1645016979219\x22></a-asset-item>"+
                             "<a-asset-item id=\x22sword-gltf\x22 src=\x22https://cdn.glitch.global/d29f98b4-ddd1-4589-8b66-e2446690e697/katana.glb?v=1648465043810\x22></a-asset-item>"+
                             "<a-asset-item id=\x22watergun-gltf\x22 src=\x22https://cdn.glitch.global/d29f98b4-ddd1-4589-8b66-e2446690e697/watergun.glb?v=1646916260646\x22></a-asset-item>";
-                            externalEntities = requireText('../main/includes/hands.html', require);
+                            handEntities = requireText('../main/includes/hands.html', require);
                         }
                     }
                 }
@@ -1556,12 +1556,16 @@ webxr_router.get('/:_id', function (req, res) {
                                         // camera = "<a-entity id=\x22cameraRig\x22 simple-navmesh-constraint=\x22navmesh:.navmesh;fall:0.5;height:0;exclude:.navmesh-hole; movement-controls=\x22speed:0.15;camera:#head;\x22"+
                                         if (useSimpleNavmesh) {
                                             // need id=\x22mouseCursor\x22?
-                                            camera = "<a-entity initializer cursor=\x22rayOrigin: mouse\x22 simple-navmesh-constraint=\x22navmesh:#navmesh-el;fall:10; height:"+sceneResponse.scenePlayer.playerHeight+"\x22 raycaster=\x22objects: .activeObjexRay\x22 id=\x22cameraRig\x22 movement-controls=\x22speed:0.15;camera:#head;\x22"+
-                                            "position=\x22-1 0 1\x22 rotation=\x220 45 0\x22 origin-on-ar-start> <a-entity id=\x22head\x22 camera=\x22near:0.01;\x22 get_pos_rot look-controls=\x22pointerLockEnabled: false\x22 position=\x220 1.65 0\x22><a-entity id=player></a-entity></a-entity></a-entity></a-entity>";
+                                            camera = "<a-entity id=\x22cameraRig\x22 initializer cursor=\x22rayOrigin: mouse\x22 simple-navmesh-constraint=\x22navmesh:#navmesh-el;fall:10; height:"+
+                                            sceneResponse.scenePlayer.playerHeight+"\x22 raycaster=\x22objects: .activeObjexRay\x22  movement-controls=\x22speed:0.15;camera:#head;\x22"+
+                                            "position=\x22-1 0 1\x22 rotation=\x220 45 0\x22 origin-on-ar-start> <a-entity id=\x22head\x22 camera=\x22near:0.01;\x22 get_pos_rot look-controls=\x22pointerLockEnabled: false\x22 position=\x220 1.65 0\x22>"+
+                                            "<a-entity id=player></a-entity></a-entity></a-entity>"+ handEntities +"</a-entity>";
                                         } else {
                                             // need id=\x22mouseCursor\x22?
-                                            camera = "<a-entity initializer cursor=\x22rayOrigin: mouse\x22 raycaster=\x22objects: .activeObjexRay\x22 id=\x22cameraRig\x22 movement-controls=\x22speed:0.15;camera:#head;\x22"+
-                                            "position=\x22-1 0 1\x22 rotation=\x220 45 0\x22 origin-on-ar-start> <a-entity id=\x22head\x22 camera=\x22near:0.01;\x22 get_pos_rot look-controls=\x22pointerLockEnabled: false\x22 position=\x220 1.65 0\x22><a-entity id=player></a-entity></a-entity></a-entity></a-entity>";
+                                            camera = "<a-entity id=\x22cameraRig\x22 initializer cursor=\x22rayOrigin: mouse\x22 raycaster=\x22objects: .activeObjexRay\x22 id=\x22cameraRig\x22 position=\x22"+
+                                            playerPosition+"\x22 movement-controls=\x22speed:0.15;camera:#head;\x22"+
+                                            "position=\x22-1 0 1\x22 rotation=\x220 45 0\x22 origin-on-ar-start> <a-entity id=\x22head\x22 camera=\x22near:0.01;\x22 get_pos_rot look-controls=\x22pointerLockEnabled: false\x22 position=\x220 1.65 0\x22>"+
+                                            "<a-entity id=player></a-entity></a-entity></a-entity>"+ handEntities +"</a-entity>";
                                         }
                                         
                                     }
@@ -4911,7 +4915,7 @@ webxr_router.get('/:_id', function (req, res) {
                         skyParticles +
                         imageEntities +
                         // targetObjectEntity +
-                        externalEntities +
+
                         geoEntities +
                         videoEntity +
                         youtubeEntity +
