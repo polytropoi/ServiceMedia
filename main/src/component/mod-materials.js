@@ -317,6 +317,7 @@ AFRAME.registerComponent('mod-materials', {
   //       }
   //   }
     //////////////////////////// - VID MATERIALS EMBED
+
     AFRAME.registerComponent('vid_materials_embed', { 
       schema: {
         videoTitle: {default: ''},
@@ -331,7 +332,7 @@ AFRAME.registerComponent('mod-materials', {
         eventData: {default: ''}
       },
       init: function () {
-        console.log("video id is : " + this.data.id);
+        console.log("tryna init video_mterialxs_embed video id is : " + this.data.id);
         this.video = null;
         /// ------------- cubemaap fu
         this.textureArray = [];
@@ -353,11 +354,11 @@ AFRAME.registerComponent('mod-materials', {
         // primaryVideo = video;
         let m3u8 = '/hls/'+this.data.id;
 
-        if (settings.sceneVideoStreams != null && settings.sceneVideoStreams.length > 0) {
+        if (settings != undefined && settings.sceneVideoStreams != null && settings.sceneVideoStreams.length > 0) {
           m3u8 = settings.sceneVideoStreams[0];
           this.data.videoTitle = settings.sceneTitle;
         }
-        if (Hls.isSupported()) {
+        if (Hls != undefined && Hls.isSupported()) {
           // console.log("hls supported!");
           // var hls = new Hls();
           // this.hls = hls;
@@ -552,7 +553,7 @@ AFRAME.registerComponent('mod-materials', {
               if (timedEventsListenerMode == null) {
                 timedEventsListenerMode = "Primary Video";
               }
-          
+
               this.vidtexture = new THREE.VideoTexture( this.video );
               this.vidtexture.flipY = this.data.flipY; 
               // this.vidtexture.minFilter = THREE.LinearMipmapNearestFilter;
@@ -572,10 +573,10 @@ AFRAME.registerComponent('mod-materials', {
               // this.playmaterial.generateMipmaps = true;   
               this.playmaterial.map.needsUpdate = true;   
               this.playmaterial.needsUpdate = true;
-              // this.playmaterial.format = THREE.RG;
-              // if (this.screenMesh.material == null) {
-                
+              // } else {
+              //   console.log("this.video not ready!");
               // }
+
               if (this.screenMesh != null) {
                 this.screenMesh.material = this.playmaterial;
                 this.isInitialized = true;
@@ -661,7 +662,11 @@ AFRAME.registerComponent('mod-materials', {
 
             if (this.data.isSkybox) {
               console.log("tryna play skybox vid");
-              this.togglePlayPauseVideo();
+              // this.togglePlayPauseVideo();
+              if (this.video.paused) {
+                console.log("tryna play!");
+                playVideo(this.video);
+              }
               // this.el.getObject3D('mesh').scale.set(200, 200, 200);
               // this.el.components.a-sphere.setAttribute("radius", 100);
             } else {

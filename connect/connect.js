@@ -147,6 +147,7 @@ $(function() {
    // let settingsAFrame = createElement("a-entity")
    // let audioGroupsEl = null;
    // console.log("settings " + JSON.stringify(settings));
+
    if (settings.sceneTimedEvents != undefined && settings.sceneTimedEvents != null) {
       timeKeysData = settings.sceneTimedEvents;
       localStorage.setItem(room + '_timeKeys', JSON.stringify(timeKeysData));
@@ -243,6 +244,15 @@ $(function() {
          InitSocket();
       }
    }
+
+   let sceneGreetingDialogEl = document.getElementById("sceneGreetingDialog");
+   if (sceneGreetingDialogEl) {
+      let sgdialogComponent = sceneGreetingDialogEl.components.scene_greeting_dialog;
+      if (sgdialogComponent) {
+         sgdialogComponent.initMe();
+      }
+   }
+
    if (settings.sceneType == "Video Landing" && settings.sceneVideoStreams && settings.sceneVideoStreams.length) {
       SetVideoEventsData();
       var video = document.getElementById('video');

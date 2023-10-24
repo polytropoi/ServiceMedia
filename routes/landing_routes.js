@@ -2929,10 +2929,10 @@ landing_router.get('/:_id', function (req, res) {
                                 }
                             }
                         
-                            if (ori.toLowerCase() == "equirectangular") {
-                                videosphereAsset = "<video id=\x22videosphere\x22 autoplay loop crossOrigin=\x22anonymous\x22 src=\x22" + vidUrl + "\x22></video>";
-                                videoEntity = "<a-videosphere play-on-window-click play-on-vrdisplayactivate-or-enter-vr crossOrigin=\x22anonymous\x22 src=\x22#videosphere\x22 rotation=\x220 180 0\x22 material=\x22shader: flat;\x22></a-videosphere>";
-
+                            if (ori.toLowerCase() == "equirectangular") { //not on landing!
+                                // videosphereAsset = "<video id=\x22videosphere\x22 autoplay loop crossOrigin=\x22anonymous\x22 src=\x22" + vidUrl + "\x22></video>";
+                                // videoEntity = "<a-videosphere play-on-window-click play-on-vrdisplayactivate-or-enter-vr crossOrigin=\x22anonymous\x22 src=\x22#videosphere\x22 rotation=\x220 180 0\x22 material=\x22shader: flat;\x22></a-videosphere>";
+                                //play hls instead!
                             } else {
                                 if (preloadVideo) {
                                 

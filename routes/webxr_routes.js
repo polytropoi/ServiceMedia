@@ -1566,7 +1566,7 @@ webxr_router.get('/:_id', function (req, res) {
                                             "<a-entity class=\x22hiddenPlaceholders\x22 id=\x22viewportPlaceholder3\x22 geometry=\x22primitive: plane; height: 0.01; width: .01\x22 position=\x220 0 -3\x22"+
                                             "material=\x22opacity: 0\x22></a-entity>"+
                                             "</a-entity>"+ handEntities +"</a-entity>";
-                                        } else {
+                                        } else { //no navmesh
                                             // need id=\x22mouseCursor\x22?
                                             cameraRigEntity = "<a-entity id=\x22cameraRig\x22 initializer cursor=\x22rayOrigin: mouse\x22 raycaster=\x22objects: .activeObjexRay\x22 id=\x22cameraRig\x22 position=\x22"+
                                             playerPosition+"\x22 movement-controls=\x22speed:0.15;camera:#head;\x22"+
@@ -3399,8 +3399,8 @@ webxr_router.get('/:_id', function (req, res) {
 
                                     vProps.videoTitle = video_items[0].title;
                                 
-                                    videoEntity = "<a-sphere id=\x22primary_video\x22 shadow=\x22receive: false\x22 class=\x22activeObjexGrab activeObjexRay\x22 scale=\x22-1 -1 1\x22 vid_materials_embed=\x22id:"+vProps.id+"; isSkybox: true;\x22 play-on-vrdisplayactivate-or-enter-vr crossOrigin=\x22anonymous\x22 rotation=\x220 180 0\x22 material=\x22shader: flat;\x22></a-sphere>";
-                                    
+                                    videoEntity = "<a-sphere id=\x22primary_video\x22 shadow=\x22receive: false\x22 class=\x22activeObjexGrab activeObjexRay\x22 scale=\x22-50 -50 50\x22 vid_materials_embed=\x22id:"+vProps.id+"; isSkybox: true;\x22 play-on-vrdisplayactivate-or-enter-vr crossOrigin=\x22anonymous\x22 rotation=\x220 180 0\x22 material=\x22shader: flat;\x22></a-sphere>";
+                                    hlsScript = "<script src=\x22../main/js/hls.min.js\x22></script>";
                                 } else {
                                     videosphereAsset = "<video id=\x22videosphere\x22 autoplay loop crossOrigin=\x22anonymous\x22 src=\x22" + vidUrl + "\x22></video>";
                                     videoEntity = "<a-videosphere play-on-window-click play-on-vrdisplayactivate-or-enter-vr crossOrigin=\x22anonymous\x22 src=\x22#videosphere\x22 rotation=\x220 180 0\x22 material=\x22shader: flat;\x22></a-videosphere>";
@@ -4123,7 +4123,7 @@ webxr_router.get('/:_id', function (req, res) {
                     audioGroups.primaryGroups = sceneResponse.scenePrimaryAudioGroups;
                     settings.audioGroups = audioGroups; 
                     settings.clearLocalMods = false;
-                    settings.sceneVideoStreams = sceneResponse.sceneVideoStreamUrls;
+                    settings.sceneVideoStreams = (sceneResponse.sceneVideoStreamUrls != undefined && sceneResponse.sceneVideoStreamUrls != null) ? sceneResponse.sceneVideoStreamUrls : [];
                     settings.socketHost = process.env.SOCKET_HOST;
                     settings.networking = sceneResponse.sceneNetworking;
                     settings.playerStartPosition = playerPosition;

@@ -4530,6 +4530,8 @@ AFRAME.registerComponent('mod_model', {
       let svidsIndex = 0;
       let hvids = [];
       let hvidsIndex = 0;
+      let evids = []; //equirect/skybox
+      let evidsIndex = 0;
 
       let vvids = [];
       let audios = [];
@@ -4846,7 +4848,7 @@ AFRAME.registerComponent('mod_model', {
               
               }
             }
-            if (this.nodeName.toLowerCase().includes("hpic") || this.nodeName.toLowerCase().includes("vpic") || this.nodeName.toLowerCase().includes("spic")) { //must be set in the data and as a name on the model
+            if (this.nodeName.toLowerCase().includes("hpic") || this.nodeName.toLowerCase().includes("vpic") || this.nodeName.toLowerCase().includes("spic") || this.nodeName.toLowerCase().includes("epic")) { //must be set in the data and as a name on the model
               if (node instanceof THREE.Mesh) {
                 this.meshChildren.push(node);
                   hasPicPositions = true;
@@ -4854,7 +4856,7 @@ AFRAME.registerComponent('mod_model', {
                 // console.log(this.nodeName);
               }
             }
-            if (this.nodeName.toLowerCase().includes("hvid") || this.nodeName.toLowerCase().includes("vvid") || this.nodeName.toLowerCase().includes("svid")) { //must be set in the data and as a name on the model
+            if (this.nodeName.toLowerCase().includes("hvid") || this.nodeName.toLowerCase().includes("vvid") || this.nodeName.toLowerCase().includes("svid")|| this.nodeName.toLowerCase().includes("evid")) { //must be set in the data and as a name on the model
               // if (node instanceof THREE.Mesh) {
                 this.meshChildren.push(node);
                   hasVidPositions = true;
@@ -4907,11 +4909,15 @@ AFRAME.registerComponent('mod_model', {
                   vvids.push(vidGroupArray[0].videos[x]);
                 } else if (vidGroupArray[0].videos[x].orientation != undefined && vidGroupArray[0].videos[x].orientation != null && vidGroupArray[0].videos[x].orientation.toLowerCase() === "square") {
                   svids.push(vidGroupArray[0].videos[x]);
+                } else if (vidGroupArray[0].videos[x].orientation != undefined && vidGroupArray[0].videos[x].orientation != null && vidGroupArray[0].videos[x].orientation.toLowerCase() === "equirectangular") {
+                  evids.push(vidGroupArray[0].videos[x]);
                 }
+
               }
               hvids = hvids.sort(() => Math.random() - 0.5);  //schweet
               vvids = vvids.sort(() => Math.random() - 0.5);  
               svids = svids.sort(() => Math.random() - 0.5);  
+              
             } else {
               console.log("caint fine no video_groups_control");
             }
@@ -7987,171 +7993,182 @@ AFRAME.registerComponent('scene_greeting_dialog', {  //if "greeting" scenetag + 
     startButton: {default: true},
     startText: {default: "Start"}
   },
-  // dependencies: ['raycaster'],
   init: function () {
+    this.isInitialized = false;
+    let interval = setInterval(() => { 
+      if (settings && settings.sceneFontWeb1) {
+        clearInterval(interval);
+        this.initMe();
+      }
+    }, 1000);
+  },
+  // dependencies: ['raycaster'],
+  initMe: function () {
 
-    this.behavior = this.data.behavior;
-    console.log("tryna set scene greeting " + this.data.greetingText + " " + settings.sceneFontWeb1);
-    if (this.data.font1 != null && this.data.font1 != "") {
-      this.font = this.data.font1; 
-    } else {
-      this.font = "Acme.woff"; 
-    }
-    // this.font = this.data.font1; 
-    if (settings && settings.sceneFontWeb1) {
-      this.font = settings.sceneFontWeb1;
-    }
-    if (this.data.font2 != null && this.data.font2 != "") {
-      this.font2 = this.data.font2; 
-    } else {
-      this.font = "Acme.woff"; 
-    }
-    // this.font2 = "Acme.woff";
-    if (settings && settings.sceneFontWeb2 && settings.sceneFontWeb2.length) {
-      this.font2 = settings.sceneFontWeb2;
-    }
-    this.fillColor = this.data.fillColor;
-    this.outlineColor = this.data.outlineColor;
-    if (settings && settings.sceneFontFillColor) {
-      this.fillColor = settings.sceneFontFillColor;
-    }
-    if (settings && settings.sceneFontOutlineColor) {
-      this.outlineColor = settings.sceneFontOutlineColor;
-    }
-    this.textBackgroundStyle = "Default";
-    if (settings && settings.sceneTextBackground) {
-      this.textBackgroundStyle = settings.sceneTextBackground;
-    }
-    this.textBackgroundColor = this.data.backgroundColor;
-    if (settings && settings.sceneTextBackgroundColor) {
-      this.textBackgroundColor = settings.sceneTextBackgroundColor;
-    }
-
-
-    // if (this.data.background) {
-      // if (this.data.background != "rectangle") {
-    // this.backgroundEl = document.createElement("a-entity");
-    // this.el.appendChild(this.backgroundEl);
-    // this.backgroundEl.setAttribute("position", " 0 0 -.5");
-    // this.backgroundEl.setAttribute('geometry', {'primitive': 'plane', 'width': '5', 'height': '5'});
-    // this.backgroundEl.setAttribute('material', {opacity: 0});
-    // this.backgroundEl.classList.add("activeObjexRay");
-    // if (this.data.hideClick) {
-    //   this.backgroundEl.addEventListener('click', (e) => {
-    //     console.log("tryna hide greeritgn");
-    //     this.el.setAttribute("visible", false);
-    //   });
-    // }
-
-    if (this.data.startButton) {
-      this.startButtonBackgroundEl = document.createElement("a-entity");
-      this.startButtonTextEl = document.createElement("a-entity");
-      this.el.appendChild(this.startButtonBackgroundEl);
-      this.el.appendChild(this.startButtonTextEl);
-      this.startButtonBackgroundEl.setAttribute("position", " 0 -1 -.01");
-      this.startButtonTextEl.setAttribute("position", " 0 -1 0");
-      this.startButtonMaterial = new THREE.MeshStandardMaterial( { 'color': this.textBackgroundColor, 'transparent': true, 'opacity': .85 } ); 
-      // todo switch bg
-      // this.startButtonBackgroundEl.setAttribute('geometry', {'primitive': 'plane', 'width': '1.5', 'height': '.75'});
-            this.startButtonBackgroundEl.setAttribute("gltf-model", "#flat_round_rect");
-
-            // // wait until model is loaded
-            this.startButtonBackgroundEl.addEventListener('model-loaded', (event) => {
-              let obj = this.startButtonBackgroundEl.getObject3D('mesh');
-              obj.traverse(node => {
-                node.material = this.startButtonMaterial;
-              });
-            });
-            //   this.startButtonBackgroundEl.object3D.traverse(function(object3D){
-            //     var mat = object3D.material;
-            //     if (mat) {
-                  
-            //       // modify material here
-            //       // mat.color.setRGB(1,0,1)
-            
-            //       // or replace it completely
-            //       object3D.material = this.startButtonMaterial;
-                  
-            //     }
-            //   });
-              
-            // });
-      // this.startButtonBackgroundEl.setAttribute('material', { 'color': this.textBackgroundColor, 'transparent': true, 'opacity': .5 })
-      this.startButtonBackgroundEl.classList.add("activeObjexRay");
-      this.startButtonTextEl.setAttribute("troika-text", {
-        fontSize: .3,
-        color: this.fillColor,
-        maxWidth: 5,
-        align: "center",
-        font: "/fonts/web/" + this.font2,
-        strokeWidth: '1%',
-        strokeColor: this.outlineColor,
-        value: this.data.startText
-      });
-
-      this.startButtonBackgroundEl.addEventListener('click', (e) => {
-        let isPlaying = PlayPauseMedia();
-        if (isPlaying) {
-          this.startButtonTextEl.setAttribute("troika-text", {
-            value: "Pause"
-          });
-        } else {
-          this.startButtonTextEl.setAttribute("troika-text", {
-            value: "Play"
-          });
-        }
-        console.log("TRYNA HIDE DIALOG! " + this.behavior);
-        if (this.behavior == 'hide') {
-          // this.el.setAttribute("visible", false);
-          console.log("TRYNA HIDE DIALOG! " + this.data.behavior);
-          this.el.parentNode.removeChild(this.el);
-          // this.el.parent.remove(this.el);
-        }
-        // console.log("tryna start! playing " + PlayPauseMedia());
-        
-        // this.startButtonBackgroundEl.setAttribute("visible", false);
-      });
-    }
+    if (!this.isInitialized) {
+      this.isInitialized = true;
+      this.behavior = this.data.behavior;
+      console.log("tryna set scene greeting " + this.data.greetingText + " " + settings.sceneFontWeb1);
+      if (this.data.font1 != null && this.data.font1 != "") {
+        this.font = this.data.font1; 
+      } else {
+        this.font = "Acme.woff"; 
+      }
+      // this.font = this.data.font1; 
+      if (settings && settings.sceneFontWeb1) {
+        this.font = settings.sceneFontWeb1;
+      }
+      if (this.data.font2 != null && this.data.font2 != "") {
+        this.font2 = this.data.font2; 
+      } else {
+        this.font = "Acme.woff"; 
+      }
+      // this.font2 = "Acme.woff";
+      if (settings && settings.sceneFontWeb2 && settings.sceneFontWeb2.length) {
+        this.font2 = settings.sceneFontWeb2;
+      }
+      this.fillColor = this.data.fillColor;
+      this.outlineColor = this.data.outlineColor;
+      if (settings && settings.sceneFontFillColor) {
+        this.fillColor = settings.sceneFontFillColor;
+      }
+      if (settings && settings.sceneFontOutlineColor) {
+        this.outlineColor = settings.sceneFontOutlineColor;
+      }
+      this.textBackgroundStyle = "Default";
+      if (settings && settings.sceneTextBackground) {
+        this.textBackgroundStyle = settings.sceneTextBackground;
+      }
+      this.textBackgroundColor = this.data.backgroundColor;
+      if (settings && settings.sceneTextBackgroundColor) {
+        this.textBackgroundColor = settings.sceneTextBackgroundColor;
+      }
 
 
+      // if (this.data.background) {
+        // if (this.data.background != "rectangle") {
+      // this.backgroundEl = document.createElement("a-entity");
+      // this.el.appendChild(this.backgroundEl);
+      // this.backgroundEl.setAttribute("position", " 0 0 -.5");
+      // this.backgroundEl.setAttribute('geometry', {'primitive': 'plane', 'width': '5', 'height': '5'});
+      // this.backgroundEl.setAttribute('material', {opacity: 0});
+      // this.backgroundEl.classList.add("activeObjexRay");
+      // if (this.data.hideClick) {
+      //   this.backgroundEl.addEventListener('click', (e) => {
+      //     console.log("tryna hide greeritgn");
+      //     this.el.setAttribute("visible", false);
+      //   });
       // }
-    // }
-  
 
-    this.greetingEl = document.createElement("a-entity");
-    this.el.appendChild(this.greetingEl);
-    this.greetingEl.setAttribute("position", "0 1 0");
+      if (this.data.startButton) {
+        this.startButtonBackgroundEl = document.createElement("a-entity");
+        this.startButtonTextEl = document.createElement("a-entity");
+        this.el.appendChild(this.startButtonBackgroundEl);
+        this.el.appendChild(this.startButtonTextEl);
+        this.startButtonBackgroundEl.setAttribute("position", " 0 -1 -.01");
+        this.startButtonTextEl.setAttribute("position", " 0 -1 0");
+        this.startButtonMaterial = new THREE.MeshStandardMaterial( { 'color': this.textBackgroundColor, 'transparent': true, 'opacity': .85 } ); 
+        // todo switch bg
+        // this.startButtonBackgroundEl.setAttribute('geometry', {'primitive': 'plane', 'width': '1.5', 'height': '.75'});
+              this.startButtonBackgroundEl.setAttribute("gltf-model", "#flat_round_rect");
 
-    this.questEl = null;
-    if (this.data.questText.length) {
-      this.questEl = document.createElement("a-entity");
-      this.el.appendChild(this.questEl);
-      this.questEl.setAttribute("position", "0 0 0");
-    }
+              // // wait until model is loaded
+              this.startButtonBackgroundEl.addEventListener('model-loaded', (event) => {
+                let obj = this.startButtonBackgroundEl.getObject3D('mesh');
+                obj.traverse(node => {
+                  node.material = this.startButtonMaterial;
+                });
+              });
+              //   this.startButtonBackgroundEl.object3D.traverse(function(object3D){
+              //     var mat = object3D.material;
+              //     if (mat) {
+                    
+              //       // modify material here
+              //       // mat.color.setRGB(1,0,1)
+              
+              //       // or replace it completely
+              //       object3D.material = this.startButtonMaterial;
+                    
+              //     }
+              //   });
+                
+              // });
+        // this.startButtonBackgroundEl.setAttribute('material', { 'color': this.textBackgroundColor, 'transparent': true, 'opacity': .5 })
+        this.startButtonBackgroundEl.classList.add("activeObjexRay");
+        this.startButtonTextEl.setAttribute("troika-text", {
+          fontSize: .3,
+          color: this.fillColor,
+          maxWidth: 5,
+          align: "center",
+          font: "/fonts/web/" + this.font2,
+          strokeWidth: '1%',
+          strokeColor: this.outlineColor,
+          value: this.data.startText
+        });
 
-    this.greetingEl.setAttribute("troika-text", {
-      fontSize: .6,
-      maxWidth: 5,
-      align: "center",
-      font: "/fonts/web/" + this.font,
-      lineHeight: .85,
-      strokeWidth: '1%',
-      color: this.fillColor,
-      strokeColor: this.outlineColor,
-      value: this.data.greetingText
-    });
-    if (this.questEl) {
-      this.questEl.setAttribute("troika-text", {
-        fontSize: .2,
+        this.startButtonBackgroundEl.addEventListener('click', (e) => {
+          let isPlaying = PlayPauseMedia();
+          if (isPlaying) {
+            this.startButtonTextEl.setAttribute("troika-text", {
+              value: "Pause"
+            });
+          } else {
+            this.startButtonTextEl.setAttribute("troika-text", {
+              value: "Play"
+            });
+          }
+          console.log("TRYNA HIDE DIALOG! " + this.behavior);
+          if (this.behavior == 'hide') {
+            // this.el.setAttribute("visible", false);
+            console.log("TRYNA HIDE DIALOG! " + this.data.behavior);
+            this.el.parentNode.removeChild(this.el);
+            // this.el.parent.remove(this.el);
+          }
+          // console.log("tryna start! playing " + PlayPauseMedia());
+          
+          // this.startButtonBackgroundEl.setAttribute("visible", false);
+        });
+      }
+
+
+        // }
+      // }
+    
+
+      this.greetingEl = document.createElement("a-entity");
+      this.el.appendChild(this.greetingEl);
+      this.greetingEl.setAttribute("position", "0 1 0");
+
+      this.questEl = null;
+      if (this.data.questText.length) {
+        this.questEl = document.createElement("a-entity");
+        this.el.appendChild(this.questEl);
+        this.questEl.setAttribute("position", "0 0 0");
+      }
+
+      this.greetingEl.setAttribute("troika-text", {
+        fontSize: .6,
         maxWidth: 5,
         align: "center",
-        font: "/fonts/web/" + this.font2,
+        font: "/fonts/web/" + this.font,
+        lineHeight: .85,
         strokeWidth: '1%',
         color: this.fillColor,
         strokeColor: this.outlineColor,
-        value: this.data.questText
+        value: this.data.greetingText
       });
-    }
+      if (this.questEl) {
+        this.questEl.setAttribute("troika-text", {
+          fontSize: .2,
+          maxWidth: 5,
+          align: "center",
+          font: "/fonts/web/" + this.font2,
+          strokeWidth: '1%',
+          color: this.fillColor,
+          strokeColor: this.outlineColor,
+          value: this.data.questText
+        });
+      }
 
    
     // this.viewportHolder = document.getElementById('viewportPlaceholder3');
@@ -8170,8 +8187,8 @@ AFRAME.registerComponent('scene_greeting_dialog', {  //if "greeting" scenetag + 
         console.log("tryna set scene greeting at location " + JSON.stringify(loc));
         this.el.setAttribute("position", {x: loc.x, y: loc.y + .55, z: loc.z});
       }
-    }, 4000);
-
+    }, 3000);
+  }
     
   },
   setLocation: function () {
