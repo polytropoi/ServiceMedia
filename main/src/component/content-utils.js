@@ -4637,9 +4637,15 @@ AFRAME.registerComponent('mod_model', {
 
         }
         if (this.data.eventData.includes("pickup")) { //USING PHYSX, needs useStarterKit = true!
-          this.el.setAttribute("toggle-physics");
-          this.el.setAttribute("physx-body-from-model", {type:'dynamic',mass:2}); 
-
+          this.el.setAttribute("data-pick-up");
+          if (this.data.eventData.includes("physx")) {
+            this.el.setAttribute("toggle-physics");
+            this.el.setAttribute("physx-body-from-model", {type:'dynamic',mass:2}); 
+          }
+          if (this.data.eventData.includes("magnet") || this.data.eventData.includes("snap")) {
+            this.el.classList.add("magnet-left");
+            this.el.classList.add("magnet-right");
+          }
         }
         
         // this.oScale = oScale;
@@ -7995,7 +8001,7 @@ AFRAME.registerComponent('scene_greeting_dialog', {  //if "greeting" scenetag + 
   },
   init: function () {
     this.isInitialized = false;
-    let interval = setInterval(() => { 
+    let interval = setInterval(() => { //hrm...
       if (settings && settings.sceneFontWeb1) {
         clearInterval(interval);
         this.initMe();
