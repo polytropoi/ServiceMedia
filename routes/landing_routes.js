@@ -2045,23 +2045,23 @@ landing_router.get('/:_id', function (req, res) {
                                             arMode = "spawn";
                                            
                                         }
-                                        if (locMdl.eventData.toLowerCase().includes("navmesh")) {
-                                            if (locMdl.eventData.toLowerCase().includes("simple navmesh")) {
-                                                navmeshAsset = "<a-asset-item id=\x22" + m_assetID + "\x22 src=\x22"+ modelURL +"\x22></a-asset-item>";
-                                                navmeshEntity = "<a-entity id=\x22navmesh-el\x22 visible=\x22false\x22 gltf-model=\x22#" + m_assetID + "\x22></a-entity>";
-                                            } else {
-                                                navmeshAsset = "<a-asset-item id=\x22" + m_assetID + "\x22 src=\x22"+ modelURL +"\x22></a-asset-item>";
-                                                // navmeshEntity = "<a-entity nav_mesh scale=\x22"+scale+" "+scale+" "+scale+"\x22> gltf-model=\x22#" + m_assetID + "\x22</a-entity>";
-                                                // navmeshEntity = "<a-entity id=\x22nav_mesh\x22 nav_mesh=\x22show: false;\x22 gltf-model=\x22#" + m_assetID + "\x22></a-entity>";
-                                                // if (locMdl.eventData.toLowerCase().includes("show")) {
-                                                //     navmeshEntity = "<a-entity id=\x22nav_mesh\x22 nav_mesh=\x22show: true;\x22 gltf-model=\x22#" + m_assetID + "\x22></a-entity>";
-                                                // }
-                                                navmeshEntity = "<a-entity id=\x22nav-mesh\x22 nav-mesh visible=\x22false\x22 gltf-model=\x22#" + m_assetID + "\x22></a-entity>";
-                                                if (locMdl.eventData.toLowerCase().includes("show")) {
-                                                    navmeshEntity = "<a-entity id=\x22nav-mesh\x22 nav-mesh gltf-model=\x22#" + m_assetID + "\x22></a-entity>";
-                                                }
-                                            }
-                                        }
+                                        // if (locMdl.eventData.toLowerCase().includes("navmesh")) {
+                                        //     if (locMdl.eventData.toLowerCase().includes("simple navmesh")) {
+                                        //         navmeshAsset = "<a-asset-item id=\x22" + m_assetID + "\x22 src=\x22"+ modelURL +"\x22></a-asset-item>";
+                                        //         navmeshEntity = "<a-entity id=\x22navmesh-el\x22 visible=\x22false\x22 gltf-model=\x22#" + m_assetID + "\x22></a-entity>";
+                                        //     } else {
+                                        //         navmeshAsset = "<a-asset-item id=\x22" + m_assetID + "\x22 src=\x22"+ modelURL +"\x22></a-asset-item>";
+                                        //         // navmeshEntity = "<a-entity nav_mesh scale=\x22"+scale+" "+scale+" "+scale+"\x22> gltf-model=\x22#" + m_assetID + "\x22</a-entity>";
+                                        //         // navmeshEntity = "<a-entity id=\x22nav_mesh\x22 nav_mesh=\x22show: false;\x22 gltf-model=\x22#" + m_assetID + "\x22></a-entity>";
+                                        //         // if (locMdl.eventData.toLowerCase().includes("show")) {
+                                        //         //     navmeshEntity = "<a-entity id=\x22nav_mesh\x22 nav_mesh=\x22show: true;\x22 gltf-model=\x22#" + m_assetID + "\x22></a-entity>";
+                                        //         // }
+                                        //         navmeshEntity = "<a-entity id=\x22nav-mesh\x22 nav-mesh visible=\x22false\x22 gltf-model=\x22#" + m_assetID + "\x22></a-entity>";
+                                        //         if (locMdl.eventData.toLowerCase().includes("show")) {
+                                        //             navmeshEntity = "<a-entity id=\x22nav-mesh\x22 nav-mesh gltf-model=\x22#" + m_assetID + "\x22></a-entity>";
+                                        //         }
+                                        //     }
+                                        // }
                                         
                                         rightRot = !rightRot;
                                         if (rightRot == true) {

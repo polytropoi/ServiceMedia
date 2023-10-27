@@ -321,6 +321,7 @@ webxr_router.get('/:_id', function (req, res) {
     var imageAssets = "";
     var modelAssets = "";
     var externalAssets = "";
+    var externalEntities = "";
     var handEntities = "";
     var imageEntities = "";
     var skyboxUrl = "";
@@ -522,6 +523,7 @@ webxr_router.get('/:_id', function (req, res) {
     let useNavmesh = false;
     let useSimpleNavmesh = false;
     let useStarterKit = false;  //load the libs as from https://github.com/AdaRoseCannon/aframe-xr-boilerplate - movement controls, simple navmesh, handy work, physx etc.
+    let useSuperHands = false;  //or instead load the superhands stuff https://github.com/c-frame/aframe-super-hands-component
     let showDialog = false;
     let showSceneManglerButtons = false;
     let ethereumButton = "";
@@ -744,15 +746,29 @@ webxr_router.get('/:_id', function (req, res) {
                         if (sceneData.sceneTags[i].toLowerCase().includes("starterkit")) {
 
                             useStarterKit = true;
-                            externalAssets = externalAssets + "<a-asset-item id=\x22right-gltf\x22 src=\x22https://vazxmixjsiawhamofees.supabase.co/storage/v1/object/public/models/skeleton-right-hand-webxr/model.gltf\x22></a-asset-item>"+
-                            "<a-asset-item id=\x22left-gltf\x22 src=\x22https://vazxmixjsiawhamofees.supabase.co/storage/v1/object/public/models/skeleton-left-hand-webxr/model.gltf\x22></a-asset-item>"+
-                            "<a-asset-item id=\x22watch-gltf\x22 src=\x22https://cdn.glitch.global/d29f98b4-ddd1-4589-8b66-e2446690e697/watch.glb?v=1645016979219\x22></a-asset-item>"+
-                            "<a-asset-item id=\x22sword-gltf\x22 src=\x22https://cdn.glitch.global/d29f98b4-ddd1-4589-8b66-e2446690e697/katana.glb?v=1648465043810\x22></a-asset-item>"+
-                            "<a-asset-item id=\x22watergun-gltf\x22 src=\x22https://cdn.glitch.global/d29f98b4-ddd1-4589-8b66-e2446690e697/watergun.glb?v=1646916260646\x22></a-asset-item>"+
-                            "<a-mixin id=\x22animations\x22 animation__click=\x22property: components.material.material.color; type: color; to: blue; startEvents: click; dur: 500;\x22></a-mixin>"+
-                            "<a-mixin id=\x22blink\x22 blink-controls=\x22rotateOnTeleport:false;cameraRig: #cameraRig; teleportOrigin: #head; collisionEntities:.navmesh, .activeObjexRay, #navmesh_el;\x22></a-mixin>"+
-                            "<a-mixin id=\x22handle-visual\x22 geometry=\x22width:0.05;height:0.05;depth:0.2\x22></a-mixin>";
+                            // externalAssets = externalAssets + "<a-asset-item id=\x22right-gltf\x22 src=\x22https://vazxmixjsiawhamofees.supabase.co/storage/v1/object/public/models/skeleton-right-hand-webxr/model.gltf\x22></a-asset-item>"+
+                            // "<a-asset-item id=\x22left-gltf\x22 src=\x22https://vazxmixjsiawhamofees.supabase.co/storage/v1/object/public/models/skeleton-left-hand-webxr/model.gltf\x22></a-asset-item>"+
+                            // "<a-asset-item id=\x22watch-gltf\x22 src=\x22https://cdn.glitch.global/d29f98b4-ddd1-4589-8b66-e2446690e697/watch.glb?v=1645016979219\x22></a-asset-item>"+
+                            // "<a-asset-item id=\x22sword-gltf\x22 src=\x22https://cdn.glitch.global/d29f98b4-ddd1-4589-8b66-e2446690e697/katana.glb?v=1648465043810\x22></a-asset-item>"+
+                            // "<a-asset-item id=\x22watergun-gltf\x22 src=\x22https://cdn.glitch.global/d29f98b4-ddd1-4589-8b66-e2446690e697/watergun.glb?v=1646916260646\x22></a-asset-item>"+
+                            // "<a-mixin id=\x22animations\x22 animation__click=\x22property: components.material.material.color; type: color; to: blue; startEvents: click; dur: 500;\x22></a-mixin>"+
+                            // "<a-mixin id=\x22blink\x22 blink-controls=\x22rotateOnTeleport:false;cameraRig: #cameraRig; teleportOrigin: #head; collisionEntities:.navmesh, .activeObjexRay, #navmesh_el;\x22></a-mixin>"+
+                            // "<a-mixin id=\x22handle-visual\x22 geometry=\x22width:0.05;height:0.05;depth:0.2\x22></a-mixin>";
+                            externalAssets = externalAssets + requireText('../main/includes/handsAssets.html', require);
                             handEntities = requireText('../main/includes/hands.html', require);
+                        } else if ((sceneData.sceneTags[i].toLowerCase().includes("superhands")) ) {
+                            useSuperHands = true;
+                            handEntities = requireText('../main/includes/superhands.html', require);
+                            externalAssets = externalAssets + requireText('../main/includes/superhandsAssets.html', require);
+                            physicsScripts = "<script src=\x22https://unpkg.com/super-hands@^3.0.3/dist/super-hands.min.js\x22></script>"+
+                                            "<script src=\x22https://cdn.jsdelivr.net/gh/c-frame/aframe-physics-system@v4.1.0/dist/aframe-physics-system.js\x22></script>"+
+                                            "<script src=\x22https://unpkg.com/aframe-event-set-component@^4.1.1/dist/aframe-event-set-component.min.js\x22></script>"+
+                                            "<script src=\x22https://unpkg.com/aframe-physics-extras/dist/aframe-physics-extras.min.js\x22></script>";
+                            // if (sceneData.sceneTags[i].toLowerCase().includes("testcubes")) {
+                                externalEntities = externalEntities + requireText('../main/includes/testcubes.html', require);
+                            // }
+                        //     handEntities = "<a-entity sphere-collider="objects: .activeObjexRay" super-hands hand-controls="hand: left"></a-entity>"+
+                        //    "<a-entity sphere-collider=\x22objects: .activeObjexRay\x22 super-hands hand-controls=\x22hand: right\x22></a-entity>";
                         }
                     }
                 }
@@ -1340,12 +1356,12 @@ webxr_router.get('/:_id', function (req, res) {
                                 // }
                                     // joystickScript = "";
                                 // }
-                                if (physicsScripts.length > 0) { //inject into player for collider
+                                if (physicsScripts.length > 0 && !useSuperHands && !useStarterKit) { //inject into player for collider
                                   
                                     physicsMod = "geometry=\x22primitive: cylinder; height: 2; radius: 0.5;\x22 ammo-body=\x22type: kinematic;\x22 ammo-shape=\x22type: capsule\x22";
                                    
                                 }
-                                 if (physicsScripts.length > 0 && useNavmesh) {
+                                 if (physicsScripts.length > 0 && useNavmesh && !useSuperHands && !useStarterKit) {
                                     movementControls = "movement-controls=\x22constrainToNavMesh: true; control: keyboard, gamepad, touch; fly: false;\x22";
                                     wasd = "";
                                     physicsMod = "geometry=\x22primitive: cylinder; height: 2; radius: 0.5;\x22 ammo-body=\x22type: kinematic;\x22 ammo-shape=\x22type: capsule\x22";
@@ -1526,6 +1542,13 @@ webxr_router.get('/:_id', function (req, res) {
                                     if (sceneResponse.sceneTags != null && (sceneResponse.sceneTags.includes('magicwindow') || sceneResponse.sceneTags.includes('magic window'))) {
                                         lookcontrols = "look-controls"; // because magicwinders enabled by default
                                     }
+                                    
+                                   
+                                    if (!useSuperHands) { //if not superhands or starterkit, use default oculus hands, superhand entities set above
+                                        handEntities = "<a-entity id=\x22left-hand\x22 thumbstick-logging lefthand_xr_listener oculus-touch-controls=\x22hand: left\x22 "+blinkMod+" handModelStyle: lowPoly; color: #ffcccc\x22>"+
+                                        console + "</a-entity>" +
+                                        "<a-entity id=\x22right-hand\x22 oculus-touch-controls=\x22hand: right\x22 laser-controls=\x22hand: right;\x22 handModelStyle: lowPoly; color: #ffcccc\x22 raycaster=\x22objects: .activeObjexRay;\x22 grab></a-entity>";
+                                    }
                                     // defaults to first person cam
                                     cameraRigEntity = "<a-entity id=\x22cameraRig\x22 "+movementControls+" initializer "+
                                 
@@ -1543,13 +1566,10 @@ webxr_router.get('/:_id', function (req, res) {
                                             // "material=\x22opacity: 0\x22></a-entity>"+
                                         "</a-entity>"+
 
-                                        "<a-entity id=\x22left-hand\x22 thumbstick-logging lefthand_xr_listener oculus-touch-controls=\x22hand: left\x22 "+blinkMod+" handModelStyle: lowPoly; color: #ffcccc\x22>"+
-                                            console +
-                                        "</a-entity>" +
-                                        "<a-entity id=\x22right-hand\x22 oculus-touch-controls=\x22hand: right\x22 laser-controls=\x22hand: right;\x22 handModelStyle: lowPoly; color: #ffcccc\x22 raycaster=\x22objects: .activeObjexRay;\x22 grab></a-entity>"+
+                                        handEntities +
                                         "</a-entity></a-entity>";
 
-                                    if (useStarterKit) {
+                                    if (useStarterKit) { //can't do starterkit + superhands!
                                         // physicsScripts = "<script src=\x22https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.0.0/dist/components/sphere-collider.min.js\x22></script>"+
                                         // "<script src=\x22https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.0.0/dist/aframe-extras.controls.min.js\x22></script>"+
                                         physicsScripts = "<script src=\x22https://cdn.jsdelivr.net/gh/c-frame/physx@v0.1.0/dist/physx.min.js\x22></script>"+
@@ -2378,7 +2398,7 @@ webxr_router.get('/:_id', function (req, res) {
                         callback(null);
                     }
                 },   
-                function (callback) { //models are simpler, fewer properties`
+                function (callback) { //models are simpler, fewer properties, no actions or anim control, but with mesh name sniffing in mod_model component on client
                     if (sceneModelLocations.length > 0) {
                        
                         async.each (sceneModelLocations, function (locMdl, callbackz) { //loop tru w/ async
@@ -2500,6 +2520,7 @@ webxr_router.get('/:_id', function (req, res) {
                                         followCurve = "curve-follow=\x22curveData: #p_path; type: parametric_curve; reverse: "+reverse+"; duration: 64; loop: true;\x22";
                                     }
                                     if (locMdl.eventData != null && locMdl.eventData != undefined && locMdl.eventData.length > 1) { //eventData has info
+                                        let groundMod = "";
                                         // console.log("!!!tryna setup animation " + r.eventData);
                                         if (locMdl.eventData.toLowerCase().includes("marker")) {
                                             modelParent = "parent-to=\x22tracking: marker\x22";
@@ -2510,8 +2531,12 @@ webxr_router.get('/:_id', function (req, res) {
                                         }
                                         if (locMdl.eventData.toLowerCase().includes("navmesh")) {
                                             if (locMdl.eventData.toLowerCase().includes("simple navmesh")) {
+                                                
+                                                if (locMdl.eventData.toLowerCase().includes("ground")) { 
+                                                    // groundMod = "static-body=\x22shape: auto;\x22"; //no, it needs to wait for model-loaded
+                                                }
                                                 navmeshAsset = "<a-asset-item id=\x22" + m_assetID + "\x22 src=\x22"+ modelURL +"\x22></a-asset-item>";
-                                                navmeshEntity = "<a-entity id=\x22navmesh-el\x22 visible=\x22false\x22 gltf-model=\x22#" + m_assetID + "\x22></a-entity>";
+                                                navmeshEntity = "<a-entity "+groundMod+" id=\x22navmesh-el\x22 visible=\x22false\x22 gltf-model=\x22#" + m_assetID + "\x22></a-entity>";
                                             } else {
                                                 navmeshAsset = "<a-asset-item id=\x22" + m_assetID + "\x22 src=\x22"+ modelURL +"\x22></a-asset-item>";
                                                 // navmeshEntity = "<a-entity nav_mesh scale=\x22"+scale+" "+scale+" "+scale+"\x22> gltf-model=\x22#" + m_assetID + "\x22</a-entity>";
@@ -2552,6 +2577,9 @@ webxr_router.get('/:_id', function (req, res) {
                                         }
                                         if (locMdl.eventData.includes("ground")) {
                                             locMdl.y = 0;
+                                            
+                                            // groundMod = "static-body=\x22shape: hull;\x22";
+                                            
                                         }
                                         if (eSplit[0] == "yoyo" || eSplit[1] == "yoyo") {
                                             cannedAnim = "animation__yoyo=\x22property: position; dir: alternate; dur: 10000; easing: easeInSine; loop: true; to: "+locMdl.x+" "+(parseFloat(locMdl.y) + 2)+" "+locMdl.z+"\x22";
@@ -2709,6 +2737,8 @@ webxr_router.get('/:_id', function (req, res) {
                                                 if (!locMdl.eventData.toLowerCase().includes("scatter")) { //not scatterd, normal placement
                                                     let physicsMod = "";
                                                     let shape = 'hull';
+                                                    let groundMod = "";
+
                                                     if (locMdl.eventData.toLowerCase().includes('physics')){ //ammo for now // no do it in mod_model (where model isloaded)
                                                     // let isTrigger = false;
                                                     
@@ -4113,6 +4143,8 @@ webxr_router.get('/:_id', function (req, res) {
                     settings.skyboxID = skyboxID;
                     settings.skyboxURL = skyboxUrl;
                     settings.useSynth = hasSynth;
+                    settings.useStarterKit = useStarterKit;
+                    settings.useSuperHands = useSuperHands;
                     settings.useMatrix = (sceneResponse.sceneTags != null && sceneResponse.sceneTags.includes('matrix'));
                     settings.sceneWaterLevel = (sceneResponse.sceneWater != undefined && sceneResponse.sceneWater.level != undefined) ? sceneResponse.sceneWater.level : 0;
                     settings.sceneCameraMode = sceneResponse.sceneCameraMode != undefined ? sceneResponse.sceneCameraMode : "First Person"; 
@@ -4649,6 +4681,10 @@ webxr_router.get('/:_id', function (req, res) {
                         //     gltf-model="dracoDecoderPath: https://www.gstatic.com/draco/versioned/decoders/1.5.6/;"
                         // ar-cursor raycaster="objects: #my-ar-objects a-sphere"
                         }
+                        if (useSuperHands) {
+                            physicsInsert = " physics ";
+                            physicsDummy = "";
+                        }
                         if (curveEntities.length > 0 && !hasParametricCurve) {
                             curveEntities = "<a-curve id=\x22curve1\x22 type=\x22CatmullRom\x22 closed=\x22true\x22>" + curveEntities + "</a-curve>"+
                             "<a-draw-curve id=\x22showCurves\x22 visible=\x22false\x22 curveref=\x22#curve1\x22 material=\x22shader: line; color: blue;\x22></a-draw-curve>";
@@ -4929,7 +4965,7 @@ webxr_router.get('/:_id', function (req, res) {
                         skyParticles +
                         imageEntities +
                         // targetObjectEntity +
-
+                        externalEntities +
                         geoEntities +
                         videoEntity +
                         youtubeEntity +
