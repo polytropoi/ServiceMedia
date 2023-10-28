@@ -46,15 +46,15 @@
     <!-- The direction hands are facing, we will also attach labels to show the currently detected pose or controller button -->
     <!-- These also do teleportaion for Blink controls in VR -->
     <a-entity data-right="ray" mixin="blink" cursor="" raycaster="objects:[html];far:0.3;showLine:false;lineColor:black;">
-      <a-entity position="0 0 -0.22" visible="false" class="pose-label" text="value: Hello World; align: center;"></a-entity>
+      <a-entity position="0 0 -0.22" visible="false" class="pose-label" text="value: Hello World; align: center;" physx-grab></a-entity>
     </a-entity>
     <a-entity data-left="ray" mixin="blink" cursor="" raycaster="objects:[html];far:0.3;showLine:false;lineColor:black;">
-      <a-entity position="0 0 -0.22" visible="false" class="pose-label" text="value: Hello World; align: center;"></a-entity>
+      <a-entity position="0 0 -0.22" visible="false" class="pose-label" text="value: Hello World; align: center;" physx-grab></a-entity>
     </a-entity>
     
     <!-- These get drawn towards grabable objects, moving the whole hand and the attached elements-->
-    <a-entity id="left-magnet" data-left="grip"  data-magnet="magnet-left"  grab-magnet-target="startEvents:squeezestart,pose_fist;stopEvents:pose_flat_fuseShort,squeezeend;noMagnetEl:#left-no-magnet;" physx-grab></a-entity>
-    <a-entity id="right-magnet" data-right="grip" data-magnet="magnet-right" grab-magnet-target="startEvents:squeezestart,pose_fist;stopEvents:pose_flat_fuseShort,squeezeend;noMagnetEl:#right-no-magnet;" physx-grab></a-entity>
+    <a-entity id="left-magnet" data-left="grip"  data-magnet="magnet-left"  grab-magnet-target="startEvents:squeezestart,pose_fist;stopEvents:pose_flat_fuseShort,squeezeend;noMagnetEl:#left-no-magnet;" ></a-entity>
+    <a-entity id="right-magnet" data-right="grip" data-magnet="magnet-right" grab-magnet-target="startEvents:squeezestart,pose_fist;stopEvents:pose_flat_fuseShort,squeezeend;noMagnetEl:#right-no-magnet;" ></a-entity>
 
     <!-- markers to let us know the real location of the hands, you probably want to make them visible="false" or just make them empty <a-entities> -->
     <a-entity id="left-no-magnet" data-left="grip" data-no-magnet>

@@ -5003,36 +5003,38 @@ AFRAME.registerComponent('mod_model', {
               this.child.visible = false; //just hide named navmesh, they're loaded externally... 
 
             } else if (this.meshChildren[i].name.includes("collider")) { //for models just assume this is static
-              console.log("gotsa collider " + this.meshChildren[i].name);
-              this.el.object3D.updateMatrixWorld();
-              let child = this.el.object3D.getObjectByName(this.meshChildren[i].name, true);
-              if (child != null) { 
-                // let box = new THREE.Box3().setFromObject(child); //bounding box for position
-                // let center = new THREE.Vector3();
-                // box.getCenter(center); //get centerpoint of eye child geometry, in localspace
-                // child.geometry.center(); //reset pivot of eye geo
-                // child.position.set(0,0,0); //clear transforms so position below won't be offset
-                let childPos = new THREE.Vector3();
-                let childRot = new THREE.Quaternion();
+              if (settings.usePhysicsType == "ammo") {
+                console.log("gotsa collider " + this.meshChildren[i].name);
+                this.el.object3D.updateMatrixWorld();
+                let child = this.el.object3D.getObjectByName(this.meshChildren[i].name, true);
+                if (child != null) { 
+                  // let box = new THREE.Box3().setFromObject(child); //bounding box for position
+                  // let center = new THREE.Vector3();
+                  // box.getCenter(center); //get centerpoint of eye child geometry, in localspace
+                  // child.geometry.center(); //reset pivot of eye geo
+                  // child.position.set(0,0,0); //clear transforms so position below won't be offset
+                  let childPos = new THREE.Vector3();
+                  let childRot = new THREE.Quaternion();
 
-                child.getWorldPosition(childPos);
-                child.getWorldQuaternion(childRot);
-                // console.log("childPos " + JSON.stringify(childPos));
-                this.child = child.clone();
-                this.child.visible = false; 
-                this.child.position.set(childPos);
-                this.child.rotation.setFromQuaternion(childRot);
+                  child.getWorldPosition(childPos);
+                  child.getWorldQuaternion(childRot);
+                  // console.log("childPos " + JSON.stringify(childPos));
+                  this.child = child.clone();
+                  this.child.visible = false; 
+                  this.child.position.set(childPos);
+                  this.child.rotation.setFromQuaternion(childRot);
 
-                let colliderEl = document.createElement("a-entity");
-                colliderEl.setObject3D("mesh", this.child);
-                // colliderEl.setAttribute("look-at", "#player");
-                colliderEl.setAttribute("mod_physics", "body: static; shape: mesh; bounciness: 1; isTrigger: true; model: child");
-                colliderEl.id = this.meshChildren[i].name;
+                  let colliderEl = document.createElement("a-entity");
+                  colliderEl.setObject3D("mesh", this.child);
+                  // colliderEl.setAttribute("look-at", "#player");
+                  colliderEl.setAttribute("mod_physics", "body: static; shape: mesh; bounciness: 1; isTrigger: true; model: child");
+                  colliderEl.id = this.meshChildren[i].name;
 
-                this.el.appendChild(colliderEl); //set as child of DOM heirarchy, not just parent model
-                // theEye.setAttribute("position", obj.worldToLocal(center)); //set position as local to 
-                // obj.updateMatrix();
-                // obj.updateMatrixWorld();
+                  this.el.appendChild(colliderEl); //set as child of DOM heirarchy, not just parent model
+                  // theEye.setAttribute("position", obj.worldToLocal(center)); //set position as local to 
+                  // obj.updateMatrix();
+                  // obj.updateMatrixWorld();
+                }
               }
             
              

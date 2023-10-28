@@ -767,8 +767,8 @@ webxr_router.get('/:_id', function (req, res) {
                             // "<a-mixin id=\x22animations\x22 animation__click=\x22property: components.material.material.color; type: color; to: blue; startEvents: click; dur: 500;\x22></a-mixin>"+
                             // "<a-mixin id=\x22blink\x22 blink-controls=\x22rotateOnTeleport:false;cameraRig: #cameraRig; teleportOrigin: #head; collisionEntities:.navmesh, .activeObjexRay, #navmesh_el;\x22></a-mixin>"+
                             // "<a-mixin id=\x22handle-visual\x22 geometry=\x22width:0.05;height:0.05;depth:0.2\x22></a-mixin>";
-                            externalAssets = externalAssets + requireText('../main/includes/handsAssets.html', require);
-                            handEntities = requireText('../main/includes/hands.html', require);
+                            externalAssets = externalAssets + requireText('../main/includes/starterKitHandsAssets.html', require);
+                            handEntities = requireText('../main/includes/starterKitHands.html', require);
                         } else if ((sceneData.sceneTags[i].toLowerCase().includes("superhands")) ) {
                             useSuperHands = true;
                             usePhysicsType = "cannon";
@@ -1559,7 +1559,7 @@ webxr_router.get('/:_id', function (req, res) {
                                     }
                                     
                                    
-                                    if (!useSuperHands) { //if not superhands or starterkit, use default oculus hands, superhand entities set above
+                                    if (!useSuperHands && !useStarterKit) { //if not superhands or starterkit, use default oculus hands, superhand entities set above
                                         let ammoHands = "";
                                         let hapticsHands = ""; //grab?
                                         if (usePhysicsType == "ammo") {
