@@ -1361,3 +1361,260 @@ AFRAME.registerComponent('window-replace', {
     }.bind(this));
   }
 });
+
+AFRAME.registerComponent('collision-listener-right', {
+  init: function() {
+  this.el.addEventListener('collidestart', function(e) {
+  document.querySelector('#right-hand').components.haptics.pulse(1, 150)
+  
+  })
+  }
+  });
+  AFRAME.registerComponent('collision-listener-left', {
+  init: function() {
+  this.el.addEventListener('collidestart', function(e) {
+  document.querySelector('#left-hand').components.haptics.pulse(1, 150)
+  })
+  }
+  });
+
+  /**
+ * Force Pushable component.
+ * 
+ * Based on an original component by Don McCurdy in aframe-physics-system
+ * 
+ * Copyright (c) 2016 Don McCurdy
+ *
+ * Applies behavior to the current entity such that cursor clicks will apply a
+ * strong impulse, pushing the entity away from the viewer.
+ *
+ * Requires: physx
+ */
+AFRAME.registerComponent('physx-force-pushable', {
+  schema: {
+    force: { default: 10 }
+  },
+  init: function () {
+
+    this.pStart = new THREE.Vector3();
+    this.sourceEl = this.el.sceneEl.querySelector('[camera]');
+    this.forcePushPhysX = this.forcePushPhysX.bind(this);
+    
+
+    this.sourcePosition = new THREE.Vector3();
+    this.force = new THREE.Vector3();
+    this.pos = new THREE.Vector3();
+  },
+
+  play() {
+    this.el.addEventListener('click', this.forcePushPhysX);
+  },
+  
+  pause() {
+    this.el.removeEventListener('click', this.forcePushPhysX);
+  },
+
+  forcePushPhysX: function (e) {
+
+    const el = this.el
+    if (!el.components['physx-body']) return
+    const body = el.components['physx-body'].rigidBody
+    if (!body) return
+
+    const force = this.force
+    const source = this.sourcePosition
+    
+    // WebXR requires care getting camera position https://github.com/mrdoob/three.js/issues/18448
+    source.setFromMatrixPosition( this.sourceEl.object3D.matrixWorld );
+
+    el.object3D.getWorldPosition(force)
+    force.sub(source)
+    
+    force.normalize();
+
+    // not sure about units, but force seems stronger with PhysX than Cannon, so scaling down
+    // by a factor of 5.
+    force.multiplyScalar(this.data.force / 5);
+
+    // use data from intersection to determine point at which to apply impulse.
+    const pos = this.pos
+    pos.copy(e.detail.intersection.point)
+    el.object3D.worldToLocal(pos)
+
+    body.addImpulseAtLocalPos(force, pos);
+  }
+});
+
+/**
+ * Grab component.
+ * 
+ * Based on an original component by Don McCurdy in aframe-physics-system
+ * 
+ * Copyright (c) 2016 Don McCurdy
+ */
+
+AFRAME.registerComponent('physx-grab', {
+  init: function () {
+
+    // If a state of "grabbed" is set on a physx-body entity, 
+    // the entity is automatically transformed into a kinematic entity.
+    // To avoid triggering this (we want to grab using constraints, and leave the
+    // body as dynamic), we use a non-clashing name for the state we set on the entity when
+    // grabbing it.
+    this.GRABBED_STATE = 'grabbed-dynamic';
+
+    this.grabbing = false;
+    this.hitEl =      /** @type {AFRAME.Element}    */ null;
+    this.physics =    /** @type {AFRAME.System}     */ this.el.sceneEl.systems.physics;
+
+    // Bind event handlers
+    this.onHit = this.onHit.bind(this);
+    this.onGripOpen = this.onGripOpen.bind(this);
+    this.onGripClose = this.onGripClose.bind(this);
+
+  },
+
+  play: function () {
+    var el = this.el;
+    el.addEventListener('contactbegin', this.onHit);
+    el.addEventListener('gripdown', this.onGripClose);
+    el.addEventListener('gripup', this.onGripOpen);
+    el.addEventListener('trackpaddown', this.onGripClose);
+    el.addEventListener('trackpadup', this.onGripOpen);
+    el.addEventListener('triggerdown', this.onGripClose);
+    el.addEventListener('triggerup', this.onGripOpen);
+  },
+
+  pause: function () {
+    var el = this.el;
+    el.removeEventListener('contactbegin', this.onHit);
+    el.removeEventListener('gripdown', this.onGripClose);
+    el.removeEventListener('gripup', this.onGripOpen);
+    el.removeEventListener('trackpaddown', this.onGripClose);
+    el.removeEventListener('trackpadup', this.onGripOpen);
+    el.removeEventListener('triggerdown', this.onGripClose);
+    el.removeEventListener('triggerup', this.onGripOpen);
+  },
+
+  onGripClose: function (evt) {
+    this.grabbing = true;
+  },
+
+  onGripOpen: function (evt) {
+    var hitEl = this.hitEl;
+    this.grabbing = false;
+    if (!hitEl) { return; }
+    hitEl.removeState(this.GRABBED_STATE);
+
+    this.hitEl = undefined;
+
+    this.removeJoint()
+  },
+
+  onHit: function (evt) {
+    var hitEl = evt.detail.otherComponent.el;
+    // If the element is already grabbed (it could be grabbed by another controller).
+    // If the hand is not grabbing the element does not stick.
+    // If we're already grabbing something you can't grab again.
+    if (!hitEl || hitEl.is(this.GRABBED_STATE) || !this.grabbing || this.hitEl) { return; }
+    hitEl.addState(this.GRABBED_STATE);
+    this.hitEl = hitEl;
+
+    this.addJoint(hitEl, evt.target)
+  },
+
+  addJoint(el, target) {
+
+    this.removeJoint()
+
+    this.joint = document.createElement('a-entity') 
+    this.joint.setAttribute("physx-joint", `type: Fixed; target: #${target.id}`)
+
+    el.appendChild(this.joint)
+  },
+
+  removeJoint() {
+
+    if (!this.joint) return
+    this.joint.parentElement.removeChild(this.joint)
+    this.joint = null
+  }
+});
+
+/**
+ * Based on an original component by Don McCurdy in aframe-physics-system
+ * 
+ * Copyright (c) 2016 Don McCurdy
+ * 
+ * Rain of Entities component.
+ *
+ * Creates a spawner on the scene, which periodically generates new entities
+ * and drops them from the sky. Objects falling below altitude=0 will be
+ * recycled after a few seconds.
+ *
+ * Requires: physics
+ */
+AFRAME.registerComponent('rain-of-entities', {
+  schema: {
+    tagName:    { default: 'a-box' },
+    components: { default: ['dynamic-body', 'force-pushable', 'color|#39BB82', 'scale|0.2 0.2 0.2'] },
+    spread:     { default: 10, min: 0 },
+    maxCount:   { default: 10, min: 0 },
+    interval:   { default: 1000, min: 0 },
+    lifetime:   { default: 10000, min: 0 }
+  },
+  init: function () {
+    this.boxes = [];
+    this.timeout = setInterval(this.spawn.bind(this), this.data.interval);
+  },
+  spawn: function () {
+    if (this.boxes.length >= this.data.maxCount) {
+      clearInterval(this.timeout);
+      this.timeout= null;
+      return;
+    }
+
+    var data = this.data,
+        box = document.createElement(data.tagName);
+
+    this.boxes.push(box);
+    this.el.appendChild(box);
+
+    box.setAttribute('position', this.randomPosition());
+    data.components.forEach(function (s) {
+      var parts = s.split('|');
+      box.setAttribute(parts[0], parts[1] || '');
+    });
+
+    // Recycling is important, kids.
+    setInterval(function () {
+      if (box.object3D.position.y > 0) return;
+      this.recycleBox(box);
+    }.bind(this), this.data.lifetime);
+    
+  },
+  randomPosition: function () {
+    var spread = this.data.spread;
+    return {
+      x: Math.random() * spread - spread / 2,
+      y: 3,
+      z: Math.random() * spread - spread / 2
+    };
+  },
+
+  recycleBox(box) {
+
+
+    box.removeAttribute("physx-body")
+    box.object3D.position.copy(this.randomPosition());
+    box.object3D.quaternion.identity();
+    box.setAttribute("physx-body", "")
+
+  },
+
+  remove() {
+    if (this.timeout) {
+      clearInterval(this.timeout)
+    }
+  }
+});

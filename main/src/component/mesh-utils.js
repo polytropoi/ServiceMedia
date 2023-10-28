@@ -91,6 +91,7 @@ AFRAME.registerComponent('mod_physics', { //used by models, placeholders, instan
     
     } else if (this.data.model == "placeholder") { //from cloudmarker, always kinematic
       this.isGhost = true;
+      if (settings.usePhysicsType == "ammo") {
       // console.log("truyna init mod_physics for id " + this.el.id + " model " + this.model +" isTrigger "+ this.isTrigger + " body " + this.data.body );
       this.el.setAttribute('ammo-body', {type: 'kinematic', emitCollisionEvents: this.isTrigger}); //placeholder model already loaded in mod_model
       // this.el.addEventListener('body-loaded', () => {  
@@ -104,6 +105,7 @@ AFRAME.registerComponent('mod_physics', { //used by models, placeholders, instan
         // this.el.body.setCollisionF
         // console.log("ammo shape is " + JSON.stringify(this.el.getAttribute('ammo-shape')));
         // this.isTrigger = this.data.isTrigger;
+        }
         console.log("tryna load placeholder  " + this.isTrigger);
       // });
     

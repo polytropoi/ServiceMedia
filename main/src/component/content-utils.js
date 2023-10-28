@@ -4613,24 +4613,54 @@ AFRAME.registerComponent('mod_model', {
 
 
         if (this.data.eventData.includes("physics")) {
-          if (this.data.eventData.includes("static")) {
-          // this.el.object3D.visible = false;
-          // console.log("GOTSA SCATTER OBJEK@");
-            // this.el.setAttribute("mod_physics", {body: "static", shape: })
+          if (settings.usePhysicsType == "ammo") {
+            if (this.data.eventData.includes("static")) {
+            // this.el.object3D.visible = false;
+            // console.log("GOTSA SCATTER OBJEK@");
+              // this.el.setAttribute("mod_physics", {body: "static", shape: })
 
-            this.el.setAttribute('ammo-body', {type: "static"});
-            if (this.data.eventData.includes("box")) {
-              this.el.setAttribute('ammo-shape', {type: "box"});
-            } else if  (this.data.eventData.includes("sphere")) {
-              this.el.setAttribute('ammo-shape', {type: "sphere"});
-            } else {
-              this.el.setAttribute('ammo-shape', {type: "mesh"});
+              this.el.setAttribute('ammo-body', {type: "static"});
+              if (this.data.eventData.includes("box")) {
+                this.el.setAttribute('ammo-shape', {type: "box"});
+              } else if  (this.data.eventData.includes("sphere")) {
+                this.el.setAttribute('ammo-shape', {type: "sphere"});
+              } else {
+                this.el.setAttribute('ammo-shape', {type: "mesh"});
+              }
+            } else if (this.data.eventData.includes("dynamic")) {
+
             }
-          } else if (this.data.eventData.includes("dynamic")) {
-
+          } else if (settings.usePhysicsType == "cannon") {
+            
+              if (this.data.eventData.includes("static")) {
+                this.el.setAttribute("static-body", {"shape": "auto"});
+              } else if (this.data.eventData.includes("dynamic")){
+                console.log("tryna set  "+settings.usePhysicsType+"  physics " + this.data.eventData);
+                this.el.setAttribute("dynamic-body", {"shape": "box"});
+              }
+          } else if (settings.usePhysicsType == "physx") { 
+            console.log("tryna set  "+settings.usePhysicsType+"  physics " + this.data.eventData);
+            if (this.data.eventData.includes("static")) {
+              this.el.setAttribute("physx-body", {"type":"static", "shape": "mesh"});
+            } else if (this.data.eventData.includes("dynamic")){
+              this.el.setAttribute("physx-body", {"type":"dynamic", "shape": "mesh"});
+            }
           }
         }
-
+        if (this.data.eventData.toLowerCase().includes("ground")) { 
+          // groundMod = "static-body=\x22shape: auto;\x22"; //no, it needs to wait for model-loaded
+          if (settings.useSuperHands) {
+            console.log("tryna useSuperHands and set the ground static-body");
+            this.el.setAttribute("static-body", {'shape': 'auto'});
+            let testCubeEl = document.createElement("a-entity");
+            
+            testCubeEl.setAttribute('mixin', 'cube');
+            testCubeEl.setAttribute('position', '1, 10, .5');
+            testCubeEl.setAttribute('material', {'color': 'purple'});
+            this.el.sceneEl.appendChild(testCubeEl);
+            // <a-entity class="cube" mixin="cube" position="1 5.265 -0.5" material="color: green"></a-entity>
+          }
+        }
         if (this.data.eventData.includes("scatter")) {
           this.el.object3D.visible = false;
           // console.log("GOTSA SCATTER OBJEK@");
@@ -4638,15 +4668,13 @@ AFRAME.registerComponent('mod_model', {
         }
         if (this.data.eventData.includes("pickup")) { //USING PHYSX, needs useStarterKit = true!
           this.el.setAttribute("data-pick-up");
-          if (this.data.eventData.includes("physx")) {
-            this.el.setAttribute("toggle-physics");
-            this.el.setAttribute("physx-body-from-model", {type:'dynamic',mass:2}); 
-          }
+          
           if (this.data.eventData.includes("magnet") || this.data.eventData.includes("snap")) {
             this.el.classList.add("magnet-left");
             this.el.classList.add("magnet-right");
           }
         }
+
         
         // this.oScale = oScale;
         this.bubble = null;

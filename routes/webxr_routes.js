@@ -524,6 +524,7 @@ webxr_router.get('/:_id', function (req, res) {
     let useSimpleNavmesh = false;
     let useStarterKit = false;  //load the libs as from https://github.com/AdaRoseCannon/aframe-xr-boilerplate - movement controls, simple navmesh, handy work, physx etc.
     let useSuperHands = false;  //or instead load the superhands stuff https://github.com/c-frame/aframe-super-hands-component
+    let usePhysicsType = "";
     let showDialog = false;
     let showSceneManglerButtons = false;
     let ethereumButton = "";
@@ -677,8 +678,10 @@ webxr_router.get('/:_id', function (req, res) {
                         }
                         if (sceneData.sceneTags[i].toLowerCase().includes("physics")) {
                             // physicsScripts =  "<script src=\x22https://mixedreality.mozilla.org/ammo.js/builds/ammo.wasm.js\x22></script>"+
+                            usePhysicsType = "ammo";
                             physicsScripts =  "<script src=\x22https://cdn.jsdelivr.net/gh/MozillaReality/ammo.js@8bbc0ea/builds/ammo.wasm.js\x22></script>"+
-                            "<script src=\x22../main/vendor/aframe/aframe-physics-system.min.js\x22></script>";                                                        
+                            "<script src=\x22../main/vendor/aframe/aframe-physics-system.min.js\x22></script>"+
+                            "<script src=\x22https://unpkg.com/aframe-haptics-component/dist/aframe-haptics-component.min.js\x22></script>";                                              
                         }
                         if (sceneData.sceneTags[i].toLowerCase().includes("brownian")) {
                             brownianScript =  "<script src=\x22../main/src/component/aframe-brownian-motion.js\x22></script>";
@@ -727,6 +730,15 @@ webxr_router.get('/:_id', function (req, res) {
                             console.log("GOTS SimpleNavmesh TAG: " + sceneData.sceneTags[i]);
                             useSimpleNavmesh = true;
                         }
+                        if (sceneData.sceneTags[i].toLowerCase().includes("ammo test")) {
+                            externalEntities = externalEntities + requireText('../main/includes/ammoTestEntities.html', require);
+                        }
+                        if (sceneData.sceneTags[i].toLowerCase().includes("cannon test")) {
+                            externalEntities = externalEntities + requireText('../main/includes/cannonTestEntities.html', require);
+                        }
+                        if (sceneData.sceneTags[i].toLowerCase().includes("physx test")) {
+                            externalEntities = externalEntities + requireText('../main/includes/physxTestEntities.html', require);
+                        }
                         if (sceneData.sceneTags[i] == "show ethereum") {
                             ethereumButton = "<div class=\x22ethereum_button\x22 id=\x22ethereumButton\x22 style=\x22margin: 10px 10px;\x22><i class=\x22fab fa-ethereum fa-2x\x22></i></div>";
                         }
@@ -746,6 +758,7 @@ webxr_router.get('/:_id', function (req, res) {
                         if (sceneData.sceneTags[i].toLowerCase().includes("starterkit")) {
 
                             useStarterKit = true;
+                            usePhysicsType = "phsyx";
                             // externalAssets = externalAssets + "<a-asset-item id=\x22right-gltf\x22 src=\x22https://vazxmixjsiawhamofees.supabase.co/storage/v1/object/public/models/skeleton-right-hand-webxr/model.gltf\x22></a-asset-item>"+
                             // "<a-asset-item id=\x22left-gltf\x22 src=\x22https://vazxmixjsiawhamofees.supabase.co/storage/v1/object/public/models/skeleton-left-hand-webxr/model.gltf\x22></a-asset-item>"+
                             // "<a-asset-item id=\x22watch-gltf\x22 src=\x22https://cdn.glitch.global/d29f98b4-ddd1-4589-8b66-e2446690e697/watch.glb?v=1645016979219\x22></a-asset-item>"+
@@ -758,6 +771,7 @@ webxr_router.get('/:_id', function (req, res) {
                             handEntities = requireText('../main/includes/hands.html', require);
                         } else if ((sceneData.sceneTags[i].toLowerCase().includes("superhands")) ) {
                             useSuperHands = true;
+                            usePhysicsType = "cannon";
                             handEntities = requireText('../main/includes/superhands.html', require);
                             externalAssets = externalAssets + requireText('../main/includes/superhandsAssets.html', require);
                             physicsScripts = "<script src=\x22https://unpkg.com/super-hands@^3.0.3/dist/super-hands.min.js\x22></script>"+
@@ -1359,6 +1373,7 @@ webxr_router.get('/:_id', function (req, res) {
                                 if (physicsScripts.length > 0 && !useSuperHands && !useStarterKit) { //inject into player for collider
                                   
                                     physicsMod = "geometry=\x22primitive: cylinder; height: 2; radius: 0.5;\x22 ammo-body=\x22type: kinematic;\x22 ammo-shape=\x22type: capsule\x22";
+
                                    
                                 }
                                  if (physicsScripts.length > 0 && useNavmesh && !useSuperHands && !useStarterKit) {
@@ -1545,9 +1560,26 @@ webxr_router.get('/:_id', function (req, res) {
                                     
                                    
                                     if (!useSuperHands) { //if not superhands or starterkit, use default oculus hands, superhand entities set above
-                                        handEntities = "<a-entity id=\x22left-hand\x22 thumbstick-logging lefthand_xr_listener oculus-touch-controls=\x22hand: left\x22 "+blinkMod+" handModelStyle: lowPoly; color: #ffcccc\x22>"+
-                                        console + "</a-entity>" +
-                                        "<a-entity id=\x22right-hand\x22 oculus-touch-controls=\x22hand: right\x22 laser-controls=\x22hand: right;\x22 handModelStyle: lowPoly; color: #ffcccc\x22 raycaster=\x22objects: .activeObjexRay;\x22 grab></a-entity>";
+                                        let ammoHands = "";
+                                        let hapticsHands = ""; //grab?
+                                        if (usePhysicsType == "ammo") {
+                                            ammoHands = " ammo-body=\x22type: kinematic; emitCollisionEvents: true;\x22 ammo-shape=\x22type: sphere\x22 ";
+                                            hapticsHands = "haptics"
+                                        }
+                                        handEntities = "<a-entity id=\x22left-hand\x22 thumbstick-logging lefthand_xr_listener oculus-touch-controls=\x22hand: left\x22 "+blinkMod+" handModelStyle: lowPoly; color: #ffcccc\x22 "+hapticsHands+">"+
+                                        console + 
+                                        "<a-sphere color=\x22blue\x22 radius=\x220.06\x22 "+ammoHands+" collision-listener-right></a-sphere></a-entity>" +
+                                        "<a-entity id=\x22right-hand\x22 oculus-touch-controls=\x22hand: right\x22 laser-controls=\x22hand: right;\x22 handModelStyle: lowPoly; color: #ffcccc\x22 raycaster=\x22objects: .activeObjexRay;\x22 grab "+hapticsHands+">"+
+                                        "<a-sphere color=\x22orange\x22 radius=\x220.06\x22 "+ammoHands+" collision-listener-left></a-sphere>"+
+                                        "</a-entity>";
+                                    
+                                        // <a-entity id="right-hand" position="0.15 1.4 -0.4" oculus-touch-controls="hand: right;model:false" vive-controls="hand: right;model:false" vive-focus-controls="hand: right;model:false" windows-motion-controls="hand: right;model:false" haptics>
+                                        // <a-sphere color="blue" radius="0.06" ammo-body="type: kinematic; emitCollisionEvents: true;" ammo-shape="type: sphere" collision-listener-right></a-sphere>
+                                        // </a-entity>
+                                        
+                                        // <a-entity id="left-hand" position="-0.15 1.4 -0.4" oculus-touch-controls="hand: left;model:false" vive-controls="hand: left;model:false" vive-focus-controls="hand: left;model:false" windows-motion-controls="hand: left;model:false" haptics>
+                                        // <a-sphere color="orange" radius="0.06" ammo-body="type: kinematic; emitCollisionEvents: true;" ammo-shape="type: sphere" collision-listener-left></a-sphere>
+                                        // </a-entity>
                                     }
                                     // defaults to first person cam
                                     cameraRigEntity = "<a-entity id=\x22cameraRig\x22 "+movementControls+" initializer "+
@@ -1572,6 +1604,7 @@ webxr_router.get('/:_id', function (req, res) {
                                     if (useStarterKit) { //can't do starterkit + superhands!
                                         // physicsScripts = "<script src=\x22https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.0.0/dist/components/sphere-collider.min.js\x22></script>"+
                                         // "<script src=\x22https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.0.0/dist/aframe-extras.controls.min.js\x22></script>"+
+                                        usePhysicsType = "physx";
                                         physicsScripts = "<script src=\x22https://cdn.jsdelivr.net/gh/c-frame/physx@v0.1.0/dist/physx.min.js\x22></script>"+
                                         // "<script src=\x22https://cdn.jsdelivr.net/npm/aframe-blink-controls@0.4.3/dist/aframe-blink-controls.min.js\x22></script>"+
                                         "<script src=\x22https://cdn.jsdelivr.net/npm/handy-work@3.1.10/build/handy-controls.min.js\x22></script>"+
@@ -4145,6 +4178,7 @@ webxr_router.get('/:_id', function (req, res) {
                     settings.useSynth = hasSynth;
                     settings.useStarterKit = useStarterKit;
                     settings.useSuperHands = useSuperHands;
+                    settings.usePhysicsType = usePhysicsType;
                     settings.useMatrix = (sceneResponse.sceneTags != null && sceneResponse.sceneTags.includes('matrix'));
                     settings.sceneWaterLevel = (sceneResponse.sceneWater != undefined && sceneResponse.sceneWater.level != undefined) ? sceneResponse.sceneWater.level : 0;
                     settings.sceneCameraMode = sceneResponse.sceneCameraMode != undefined ? sceneResponse.sceneCameraMode : "First Person"; 
@@ -4671,7 +4705,7 @@ webxr_router.get('/:_id', function (req, res) {
                             // webxrFeatures = webxrFeatures + " vr-super-stats=\x22position:0 .4 0; alwaysshow3dstats:true; show2dstats:false;\x22 ";
                         }
                         if (useStarterKit) { //uses PHYSX, not ammo.js as above
-                            physicsInsert = " physx=\x22autoLoad: true; delay: 1000; wasmUrl: https://cdn.jsdelivr.net/gh/c-frame/physx@v0.1.0/wasm/physx.release.wasm; useDefaultScene: false;\x22 ";
+                            physicsInsert = " physx=\x22debug: true; autoLoad: true; delay: 1000; wasmUrl: https://cdn.jsdelivr.net/gh/c-frame/physx@v0.1.0/wasm/physx.release.wasm; useDefaultScene: false;\x22 ";
                         //     webxr="overlayElement:#dom-overlay;"
                         //     background="color:skyblue;"
                         //     reflection="directionalLight:#dirlight;"
@@ -4682,7 +4716,7 @@ webxr_router.get('/:_id', function (req, res) {
                         // ar-cursor raycaster="objects: #my-ar-objects a-sphere"
                         }
                         if (useSuperHands) {
-                            physicsInsert = " physics ";
+                            physicsInsert = " physics=\x22debug: "+debugMode+"; debugDrawMode: 1;\x22";
                             physicsDummy = "";
                         }
                         if (curveEntities.length > 0 && !hasParametricCurve) {
