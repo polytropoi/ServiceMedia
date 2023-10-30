@@ -767,19 +767,19 @@ webxr_router.get('/:_id', function (req, res) {
                             // "<a-mixin id=\x22animations\x22 animation__click=\x22property: components.material.material.color; type: color; to: blue; startEvents: click; dur: 500;\x22></a-mixin>"+
                             // "<a-mixin id=\x22blink\x22 blink-controls=\x22rotateOnTeleport:false;cameraRig: #cameraRig; teleportOrigin: #head; collisionEntities:.navmesh, .activeObjexRay, #navmesh_el;\x22></a-mixin>"+
                             // "<a-mixin id=\x22handle-visual\x22 geometry=\x22width:0.05;height:0.05;depth:0.2\x22></a-mixin>";
-                            externalAssets = externalAssets + requireText('../main/includes/starterKitHandsAssets.html', require);
-                            handEntities = requireText('../main/includes/starterKitHands.html', require);
+                            externalAssets = externalAssets + requireText('../main/includes/physxAssets.html', require);
+                            handEntities = requireText('../main/includes/physxEntities.html', require);
                         } else if ((sceneData.sceneTags[i].toLowerCase().includes("superhands")) ) {
                             useSuperHands = true;
                             usePhysicsType = "cannon";
-                            handEntities = requireText('../main/includes/superhands.html', require);
-                            externalAssets = externalAssets + requireText('../main/includes/superhandsAssets.html', require);
+                            handEntities = requireText('../main/includes/cannonEntities.html', require);
+                            externalAssets = externalAssets + requireText('../main/includes/cannonAssets.html', require);
                             physicsScripts = "<script src=\x22https://unpkg.com/super-hands@^3.0.3/dist/super-hands.min.js\x22></script>"+
                                             "<script src=\x22https://cdn.jsdelivr.net/gh/c-frame/aframe-physics-system@v4.1.0/dist/aframe-physics-system.js\x22></script>"+
                                             "<script src=\x22https://unpkg.com/aframe-event-set-component@^4.1.1/dist/aframe-event-set-component.min.js\x22></script>"+
                                             "<script src=\x22https://unpkg.com/aframe-physics-extras/dist/aframe-physics-extras.min.js\x22></script>";
                             // if (sceneData.sceneTags[i].toLowerCase().includes("testcubes")) {
-                                externalEntities = externalEntities + requireText('../main/includes/testcubes.html', require);
+                                externalEntities = externalEntities + requireText('../main/includes/cannonTestEntities.html', require);
                             // }
                         //     handEntities = "<a-entity sphere-collider="objects: .activeObjexRay" super-hands hand-controls="hand: left"></a-entity>"+
                         //    "<a-entity sphere-collider=\x22objects: .activeObjexRay\x22 super-hands hand-controls=\x22hand: right\x22></a-entity>";
@@ -1479,7 +1479,7 @@ webxr_router.get('/:_id', function (req, res) {
                                             "<a-entity id=\x22playCaster\x22 position=\x220 .5 .5\x22></a-entity>"+
                                             // "<a-sphere visible=\x22true\x22 scale=\x220.45 0.5 0.4\x22 random-color></a-sphere>"+
                                         "</a-entity>"+
-                                       
+                                        //TODO - hands?
                                        
                                         "</a-entity></a-entity>";
                                 } else if (sceneResponse.sceneCameraMode != undefined && sceneResponse.sceneCameraMode.toLowerCase().includes("orbit")) { //hrm..
@@ -1624,7 +1624,7 @@ webxr_router.get('/:_id', function (req, res) {
                                             cameraRigEntity = "<a-entity id=\x22cameraRig\x22 initializer cursor=\x22rayOrigin: mouse\x22 raycaster=\x22objects: .activeObjexRay\x22 id=\x22cameraRig\x22 position=\x22"+
                                             playerPosition+"\x22 movement-controls=\x22speed:0.15;camera:#head;\x22"+
                                             "position=\x22-1 0 1\x22 rotation=\x220 45 0\x22 origin-on-ar-start> <a-entity id=\x22head\x22 camera=\x22near:0.01;\x22 look-controls=\x22pointerLockEnabled: false\x22 position=\x220 1.65 0\x22>"+
-                                            "<a-entity id=player get_pos_rot></a-entity>"+
+                                            "<a-entity id=player get_pos_rot></a-entity>"+ //el w/ id=player is always tracked for ranging
                                             "<a-entity class=\x22hiddenPlaceholders\x22 id=\x22viewportPlaceholder3\x22 geometry=\x22primitive: plane; height: 0.01; width: .01\x22 position=\x220 0 -3\x22"+
                                             "material=\x22opacity: 0\x22></a-entity>"+
                                             "</a-entity>"+ handEntities +"</a-entity>";

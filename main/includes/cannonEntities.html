@@ -7,8 +7,8 @@
 </a-entity> -->
 
 <a-entity id="rhand" mixin="touch"
-                  hand-controls="hand: right">
+                  hand-controls="hand: right" oculus-touch-controls="hand: right" laser-controls="hand: right" raycaster="objects: .activeObjexRay;">
         </a-entity>
         <a-entity id="lhand" mixin="touch"
-                  hand-controls="hand: left">
+                  hand-controls="hand: left" oculus-touch-controls="hand: left"; blink-controls="cameraRig: #cameraRig; collisionEntities: #navmesh-el;">
         </a-entity>
