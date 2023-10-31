@@ -1365,3 +1365,93 @@ AFRAME.registerComponent('rotate_player_camera', {
 	},
 
 });
+AFRAME.registerComponent('agent-action', {
+	schema:{
+		  waypoints:{type:'array', default:[]},
+		  progress:{type:'number', default:0},
+		  animations:{type:'array', default:['Idle01', 'Walking01']},
+		  actionType:{type:'string', default:'Patrol'},
+		  navStart:{type:'boolean', default:false}
+	  },
+	
+	
+	/*************************************************************/
+  
+	init: function(){
+	  const el = this.el;
+	  const data = this.data;
+	  const scene = document.querySelector('a-scene')
+	  
+	  // Get waypoints in array
+	  data.waypoints = scene.getElementsByClassName('waypoint');
+	  console.log("gotsome waypoints " + data.waypoints.length);
+	  this.agentAction();
+	//   this.el.addEventListener('model-loaded', ()=>{
+		
+		/****************************************/
+		el.addEventListener('navigation-start', (e)=>{
+		//   console.log("Nav start");
+		  if(!data.navStart){
+			// this.actorAnimation(data.animations[1], 2.4);
+			// data.navStart=true;
+		  }
+		});
+  
+		/****************************************/
+		el.addEventListener('navigation-end', (e)=>{
+		//   console.log("Nav end");
+		//   this.actorAnimation(data.animations[0], 2.4);
+		  this.agentAction();
+		})
+  
+		/****************************************/
+		el.addEventListener('navigation-null', (e)=>{
+		  console.log("Nav Null");
+		  // this.actorAnimation(data.animations[0], 2.4);
+		});
+	//   });
+	},
+	
+	/*************************************************************/
+	
+	actorAnimation: function(animation, time){
+	  // console.log("Start animation");
+	  // console.log("Animation =", animation);
+	  const el=this.el;
+	  const data = this.data;
+	  el.setAttribute('animation-mixer', 'clip', animation);
+	  el.setAttribute('animation-mixer', 'timeScale', time);
+	  el.setAttribute('animation-mixer', 'crossFadeDuration', 0);
+	},
+	
+	/*************************************************************/
+	
+	agentAction: function(){
+	  let travelTo;
+	  let spent=false;
+	  const data = this.data;
+	  
+	//   if(this.el.id === 'Player'&& !spent){
+	// 	console.log("Action type:", data.actionType);
+	// 	console.log("Progress:", data.progress);
+	// 	spent=true;
+	//   }
+	  
+	//   if(data.actionType==='Patrol'){
+	// 	travelTo = data.progress;
+	// 	data.progress++;
+	// 	// Let's keep the guy patrolling forever!
+	// 	if(data.progress>=data.waypoints.length){
+	// 	  data.progress=0;
+	// 	}
+	//   }else if(data.actionType==='Random'){
+		travelTo = Math.floor(Math.random()*data.waypoints.length);
+	//   };
+   
+	  this.el.setAttribute('nav-agent', {
+		active:true,
+		destination:data.waypoints[travelTo].getAttribute('position')
+	  });
+	//   console.log("trynna travelTo " + travelTo);
+	}
+  });
