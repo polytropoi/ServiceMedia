@@ -729,6 +729,9 @@ webxr_router.get('/:_id', function (req, res) {
                         if (sceneData.sceneTags[i].toLowerCase().includes("simple navmesh")) {
                             console.log("GOTS SimpleNavmesh TAG: " + sceneData.sceneTags[i]);
                             useSimpleNavmesh = true;
+                        } else if (sceneData.sceneTags[i].toLowerCase().includes("navmesh")) {
+                            console.log("GOTS USENAVMESH TAG: " + sceneData.sceneTags[i]);
+                            useNavmesh = true;
                         }
                         if (sceneData.sceneTags[i].toLowerCase().includes("ammo test")) {
                             externalEntities = externalEntities + requireText('../main/includes/ammoTestEntities.html', require);
@@ -791,7 +794,7 @@ webxr_router.get('/:_id', function (req, res) {
                 // "<script src=\x22/main/vendor/jquery/jquery.min.js\x22></script>" +
                 // socketScripts = "<script src=\x22https://strr.us/socket.io/socket.io.js\x22></script>";
                 if (socketHost != null && socketHost != "NONE") {
-                    socketScripts = "<script src=\x22/socket.io/socket.io.js\x22></script>"; //
+                    socketScripts = "<script src=\x22/socket.io/socket.io.js\x22></script>"; //TODO naf, etc..
                 }
                 
                 // "<script src=\x22/main/vendor/jscookie/js.cookie.min.js\x22></script>" +
@@ -1380,7 +1383,7 @@ webxr_router.get('/:_id', function (req, res) {
                                     movementControls = "movement-controls=\x22constrainToNavMesh: true; control: keyboard, gamepad, touch; fly: false;\x22";
                                     wasd = "";
                                     physicsMod = "geometry=\x22primitive: cylinder; height: 2; radius: 0.5;\x22 ammo-body=\x22type: kinematic;\x22 ammo-shape=\x22type: capsule\x22";
-                                    aframeExtrasScript = "<script src=\x22..//main/vendor/aframe/aframe-extras_20210520.js\x22></script>";
+                                    // aframeExtrasScript = "<script src=\x22..//main/vendor/aframe/aframe-extras_20210520.js\x22></script>";
                                     // joystickScript = "";
                                 }
                                
@@ -4179,6 +4182,8 @@ webxr_router.get('/:_id', function (req, res) {
                     settings.useStarterKit = useStarterKit;
                     settings.useSuperHands = useSuperHands;
                     settings.usePhysicsType = usePhysicsType;
+                    settings.useNavmesh = useNavmesh; //"real" navmesh w/ pathfinding
+                    settings.useSimpleNavmesh = useSimpleNavmesh;
                     settings.useMatrix = (sceneResponse.sceneTags != null && sceneResponse.sceneTags.includes('matrix'));
                     settings.sceneWaterLevel = (sceneResponse.sceneWater != undefined && sceneResponse.sceneWater.level != undefined) ? sceneResponse.sceneWater.level : 0;
                     settings.sceneCameraMode = sceneResponse.sceneCameraMode != undefined ? sceneResponse.sceneCameraMode : "First Person"; 
@@ -4612,7 +4617,7 @@ webxr_router.get('/:_id', function (req, res) {
                         let extraScripts = "";
                         let hasParametricCurve = false;
                         if (useNavmesh) {
-                            navmeshScripts = "<script src=\x22../three/pathfinding/three-pathfinding.umd.js\x22></script>";
+                            // navmeshScripts = "<script src=\x22../three/pathfinding/three-pathfinding.umd.js\x22></script>";
                             // "<script src=\x22../main/vendor/aframe/movement-controls.js\x22></script>";
                             // navmeshScripts = "<script type=\x22module\x22 src=\x22../main/js/navigation.js\x22></script>";
                             // navmarsh = "<a-entity nav-mesh normal-material visible=\x22false\x22 gltf-model=\x22#castle_navmesh\x22></a-entity>"+

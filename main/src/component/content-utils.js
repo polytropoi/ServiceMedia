@@ -4649,15 +4649,29 @@ AFRAME.registerComponent('mod_model', {
         }
         if (this.data.eventData.toLowerCase().includes("ground")) { 
           // groundMod = "static-body=\x22shape: auto;\x22"; //no, it needs to wait for model-loaded
-          if (settings.useSuperHands) {
+          if (settings.usePhysicsType == "cannon") {
             console.log("tryna useSuperHands and set the ground static-body");
             this.el.setAttribute("static-body", {'shape': 'auto'});
-            let testCubeEl = document.createElement("a-entity");
+            // let testCubeEl = document.createElement("a-entity");
             
-            testCubeEl.setAttribute('mixin', 'cube');
-            testCubeEl.setAttribute('position', '1, 10, .5');
-            testCubeEl.setAttribute('material', {'color': 'purple'});
-            this.el.sceneEl.appendChild(testCubeEl);
+            // testCubeEl.setAttribute('mixin', 'cube');
+            // testCubeEl.setAttribute('position', '1, 10, .5');
+            // testCubeEl.setAttribute('material', {'color': 'purple'});
+            // this.el.sceneEl.appendChild(testCubeEl);
+            // <a-entity class="cube" mixin="cube" position="1 5.265 -0.5" material="color: green"></a-entity>
+          }
+        }
+        if (this.data.eventData.toLowerCase().includes("navmesh")) { 
+          // groundMod = "static-body=\x22shape: auto;\x22"; //no, it needs to wait for model-loaded
+          if (settings.useNavmesh) {
+            // console.log("tryna add navmesh!");
+            // this.el.setAttribute("nav-mesh", "");
+            // let testCubeEl = document.createElement("a-entity");
+            
+            // testCubeEl.setAttribute('mixin', 'cube');
+            // testCubeEl.setAttribute('position', '1, 10, .5');
+            // testCubeEl.setAttribute('material', {'color': 'purple'});
+            // this.el.sceneEl.appendChild(testCubeEl);
             // <a-entity class="cube" mixin="cube" position="1 5.265 -0.5" material="color: green"></a-entity>
           }
         }
