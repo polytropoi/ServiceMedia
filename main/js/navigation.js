@@ -1385,10 +1385,38 @@ AFRAME.registerComponent('agent-action', {
 	  // Get waypoints in array
 	  data.waypoints = scene.getElementsByClassName('waypoint');
 	  console.log("gotsome waypoints " + data.waypoints.length);
-	  this.agentAction();
-	//   this.el.addEventListener('model-loaded', ()=>{
+	  let modModelComponent = this.el.components.mod_model; //in content-utils.js
+	  if (modModelComponent) {
+		console.log("gotsa MOD_MODEL component..");
+		this.agentAction();
+	//   this.el.addEventListener('model-loaded', ()=>{ //no need, this is set after model-loaded in mod_model
 		
-		/****************************************/
+		el.addEventListener('navigation-start', (e)=>{
+			//   console.log("Nav start");
+			
+			  if(!data.navStart){
+				// this.actorAnimation(data.animations[1], 2.4);
+
+				data.navStart=true;
+				modModelComponent.playWalkAnimation();
+			  }
+			});
+	  
+			/****************************************/
+			el.addEventListener('navigation-end', (e)=>{
+			//   console.log("Nav end");
+			//   this.actorAnimation(data.animations[0], 2.4);
+			  this.agentAction();
+			})
+	  
+			/****************************************/
+			el.addEventListener('navigation-null', (e)=>{
+			  console.log("Nav Null");
+			  // this.actorAnimation(data.animations[0], 2.4);
+			});
+	  } else {
+	  this.agentAction();
+
 		el.addEventListener('navigation-start', (e)=>{
 		//   console.log("Nav start");
 		  if(!data.navStart){
@@ -1410,6 +1438,7 @@ AFRAME.registerComponent('agent-action', {
 		  // this.actorAnimation(data.animations[0], 2.4);
 		});
 	//   });
+	  }
 	},
 	
 	/*************************************************************/

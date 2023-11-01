@@ -109,6 +109,26 @@ AFRAME.registerComponent('mod_physics', { //used by models, placeholders, instan
         console.log("tryna load placeholder  " + this.isTrigger);
       // });
     
+    } else if (this.data.model == "agent") { //must be kinematic, moves as nav-agent on navmesh
+
+      if (settings.usePhysicsType == "ammo") {
+      // console.log("truyna init mod_physics for id " + this.el.id + " model " + this.model +" isTrigger "+ this.isTrigger + " body " + this.data.body );
+      this.el.setAttribute('ammo-body', {type: 'kinematic', emitCollisionEvents: this.isTrigger}); //placeholder model already loaded in mod_model
+      // this.el.addEventListener('body-loaded', () => {  
+        // if (this.isTrigger) {
+        //   console.log("TRIGGER LOADED");
+        //   this.el.setAttribute('ammo-shape', {type: "sphere"});
+        // } else {
+          this.el.setAttribute("ammo-shape", {type: "box"});
+          // this.el.body.type = 'kinematic';
+        // }
+        // this.el.body.setCollisionF
+        // console.log("ammo shape is " + JSON.stringify(this.el.getAttribute('ammo-shape')));
+        // this.isTrigger = this.data.isTrigger;
+        }
+        console.log("tryna load placeholder  " + this.isTrigger);
+      // });
+    
     } else {
       if (this.el.object3D) {
         this.el.setAttribute('ammo-body', {type: this.data.body, emitCollisionEvents: this.isTrigger});

@@ -2590,7 +2590,7 @@ webxr_router.get('/:_id', function (req, res) {
                                                 // if (locMdl.eventData.toLowerCase().includes("show")) {
                                                 //     navmeshEntity = "<a-entity id=\x22nav_mesh\x22 nav_mesh=\x22show: true;\x22 gltf-model=\x22#" + m_assetID + "\x22></a-entity>";
                                                 // }
-                                                navmeshEntity = "<a-entity id=\x22nav-mesh\x22 nav-mesh visible=\x22false\x22 gltf-model=\x22#" + m_assetID + "\x22></a-entity>";
+                                                navmeshEntity = "<a-entity id=\x22nav-mesh\x22 nav-mesh visible=\x22false\x22 gltf-model=\x22#" + m_assetID + "\x22></a-entity>"; //maybe id=navmesh-el so simple navmesh can use it too?
                                                 if (locMdl.eventData.toLowerCase().includes("show")) {
                                                     navmeshEntity = "<a-entity id=\x22nav-mesh\x22 nav-mesh gltf-model=\x22#" + m_assetID + "\x22></a-entity>";
                                                 }

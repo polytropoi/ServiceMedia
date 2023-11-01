@@ -1214,13 +1214,13 @@
             camera +
             "<a-assets>" +
                 "<a-asset-item id='glb' src='"+ jsonObj.url +"' response-type='arraybuffer'></a-asset-item>" +
-                "<a-cubemap><img id='envMap_1' crossorigin='anonymous' src='https://archive1.s3.amazonaws.com/staging/5150540ab038969c24000008/cubemaps/5ec29e986757cf21f5633c89_1.jpg'>" +
-                    "<img id='envMap_2' crossorigin='anonymous' src='https://archive1.s3.amazonaws.com/staging/5150540ab038969c24000008/cubemaps/5ec29e986757cf21f5633c89_2.jpg'>" +
-                    "<img id='envMap_3' crossorigin='anonymous' src='https://archive1.s3.amazonaws.com/staging/5150540ab038969c24000008/cubemaps/5ec29e986757cf21f5633c89_3.jpg'>" +
-                    "<img id='envMap_4' crossorigin='anonymous' src='https://archive1.s3.amazonaws.com/staging/5150540ab038969c24000008/cubemaps/5ec29e986757cf21f5633c89_4.jpg'>" +
-                    "<img id='envMap_5' crossorigin='anonymous' src='https://archive1.s3.amazonaws.com/staging/5150540ab038969c24000008/cubemaps/5ec29e986757cf21f5633c89_5.jpg'>" +
-                    "<img id='envMap_6' crossorigin='anonymous' src='https://archive1.s3.amazonaws.com/staging/5150540ab038969c24000008/cubemaps/5ec29e986757cf21f5633c89_6.jpg'>" +
-                "</a-cubemap>" +
+                // "<a-cubemap><img id='envMap_1' crossorigin='anonymous' src='https://archive1.s3.amazonaws.com/staging/5150540ab038969c24000008/cubemaps/5ec29e986757cf21f5633c89_1.jpg'>" +
+                //     "<img id='envMap_2' crossorigin='anonymous' src='https://archive1.s3.amazonaws.com/staging/5150540ab038969c24000008/cubemaps/5ec29e986757cf21f5633c89_2.jpg'>" +
+                //     "<img id='envMap_3' crossorigin='anonymous' src='https://archive1.s3.amazonaws.com/staging/5150540ab038969c24000008/cubemaps/5ec29e986757cf21f5633c89_3.jpg'>" +
+                //     "<img id='envMap_4' crossorigin='anonymous' src='https://archive1.s3.amazonaws.com/staging/5150540ab038969c24000008/cubemaps/5ec29e986757cf21f5633c89_4.jpg'>" +
+                //     "<img id='envMap_5' crossorigin='anonymous' src='https://archive1.s3.amazonaws.com/staging/5150540ab038969c24000008/cubemaps/5ec29e986757cf21f5633c89_5.jpg'>" +
+                //     "<img id='envMap_6' crossorigin='anonymous' src='https://archive1.s3.amazonaws.com/staging/5150540ab038969c24000008/cubemaps/5ec29e986757cf21f5633c89_6.jpg'>" +
+                // "</a-cubemap>" +
             "</a-assets>" + 
             "<a-entity position='0 4 0' gltf-model='#glb' skybox-env-map shadow='receive: true'></a-entity>" +
             "<a-light type='hemisphere'></a-light>"+

@@ -3140,7 +3140,7 @@ AFRAME.registerComponent('mod_object', {
           obj.traverse(node => { //spin through object heirarchy to sniff for special names, e.g. "eye"
             this.nodeName = node.name;
            
-            if (this.data.eventData.includes("eyelook") && this.nodeName.includes("eye")) { //must be set in the data and as a name on the model
+            if (this.data.eventData.includes("eyelook") && this.nodeName.includes("eye")) { //must be set in eventData and as mesh name
               if (node instanceof THREE.Mesh) {
               this.meshChildren.push(node);
               console.log("gotsa eye!");
@@ -3219,7 +3219,7 @@ AFRAME.registerComponent('mod_object', {
 
           // let hasBubble = false;
           // let theEl = this.element;
-          this.el.setAttribute('gesture-handler-add'); //ar mode only?
+          // this.el.setAttribute('gesture-handler-add'); //ar mode only?
           var sceneEl = document.querySelector('a-scene');
           let hasCallout = false;
           let calloutOn = false;
@@ -4514,6 +4514,8 @@ AFRAME.registerComponent('mod_model', {
       let idleClips = [];
       let walkClips = [];
       let mouthClips = [];
+
+      this.walkClips = walkClips;
       
       let mixer = null;
       let camera = null;
@@ -4660,19 +4662,18 @@ AFRAME.registerComponent('mod_model', {
             // this.el.sceneEl.appendChild(testCubeEl);
             // <a-entity class="cube" mixin="cube" position="1 5.265 -0.5" material="color: green"></a-entity>
           }
-        }
-        if (this.data.eventData.toLowerCase().includes("navmesh")) { 
+        } 
+        if (this.data.eventData.toLowerCase().includes("navmesh")) { //no, this is set on the server ~line 2586
           // groundMod = "static-body=\x22shape: auto;\x22"; //no, it needs to wait for model-loaded
           if (settings.useNavmesh) {
-            // console.log("tryna add navmesh!");
-            // this.el.setAttribute("nav-mesh", "");
-            // let testCubeEl = document.createElement("a-entity");
             
-            // testCubeEl.setAttribute('mixin', 'cube');
-            // testCubeEl.setAttribute('position', '1, 10, .5');
-            // testCubeEl.setAttribute('material', {'color': 'purple'});
-            // this.el.sceneEl.appendChild(testCubeEl);
-            // <a-entity class="cube" mixin="cube" position="1 5.265 -0.5" material="color: green"></a-entity>
+          }
+        }
+        if (this.data.eventData.toLowerCase().includes("agent")) { 
+          if (settings.useNavmesh) {
+            this.el.setAttribute("nav-agent", "");
+            this.el.setAttribute("agent-action", "");  
+            this.el.setAttribute("mod_physics", {'model': 'agent'});
           }
         }
         if (this.data.eventData.includes("scatter")) {
@@ -4832,6 +4833,7 @@ AFRAME.registerComponent('mod_model', {
               if (clips[i].name.toLowerCase().includes("walk")) {
                 walkIndex = i;
                 walkClips.push(clips[i]);
+                console.log("gotsa walk animation");
               }
               if (clips[i].name.toLowerCase().includes("dance")) { //etc..
                 danceIndex = i;
@@ -4840,17 +4842,17 @@ AFRAME.registerComponent('mod_model', {
               if (i == clips.length - 1) {
                   if (hasAnims) {
                     console.log("model has anims " + this.data.eventData + " idelIndex " + idleIndex);
-                  if (this.data.eventData.includes("loop_all_anims")) {
-                    theEl.setAttribute('animation-mixer', {
-                      "clip": clips[0].name,
-                      "loop": "repeat",
-                    });
-                  }
-                  if (this.data.eventData.includes("loop_dance_anims")) {
-                    theEl.setAttribute('animation-mixer', {
-                      "loop": "repeat",
-                    });
-                  }
+                  // if (this.data.eventData.includes("loop_all_anims")) {
+                  //   theEl.setAttribute('animation-mixer', {
+                  //     "clip": clips[0].name,
+                  //     "loop": "repeat",
+                  //   });
+                  // }
+                  // if (this.data.eventData.includes("loop_dance_anims")) {
+                  //   theEl.setAttribute('animation-mixer', {
+                  //     "loop": "repeat",
+                  //   });
+                  // }
                   if (idleIndex != -1) {
                     theEl.setAttribute('animation-mixer', {
                       "clip": clips[idleIndex].name,
@@ -4864,31 +4866,31 @@ AFRAME.registerComponent('mod_model', {
           }
           obj.traverse(node => { //spin through object heirarchy to sniff for special names, e.g. "eye"
             this.nodeName = node.name;
-            if (this.nodeName.includes("collider")) { //must be set in the data and as a name on the model
+            if (this.nodeName.includes("collider")) { //must be set in eventData and as mesh name 
               if (node instanceof THREE.Mesh) {
               this.meshChildren.push(node);
               console.log("gotsa collider!");
               }
             }
-            if (this.nodeName.includes("trigger")) { //must be set in the data and as a name on the model
+            if (this.nodeName.includes("trigger")) { //must be set in eventData and as mesh name
               if (node instanceof THREE.Mesh) {
               this.meshChildren.push(node);
               console.log("gotsa trigger!");
               }
             }
-            if (this.nodeName.includes("navmesh")) { //must be set in the data and as a name on the model
+            if (this.nodeName.includes("navmesh")) { //must be set in eventData and as mesh name (better to be external, though)
               if (node instanceof THREE.Mesh) {
               this.meshChildren.push(node);
               console.log("gotsa navmesh!");
               }
             }
-            if (this.data.eventData.includes("eyelook") && this.nodeName.includes("eye")) { //must be set in the data and as a name on the model
+            if (this.data.eventData.includes("eyelook") && this.nodeName.includes("eye")) { //must be set in eventData and as mesh name
               if (node instanceof THREE.Mesh) {
               this.meshChildren.push(node);
               console.log("gotsa eye!");
               }
             }
-            if (this.nodeName.toLowerCase().includes("callout")) { //must be set in the data and as a name on the model
+            if (this.nodeName.toLowerCase().includes("callout")) { //must be set in eventData and as mesh name
               if (node instanceof THREE.Mesh) {
               this.meshChildren.push(node);
 
@@ -4896,7 +4898,7 @@ AFRAME.registerComponent('mod_model', {
               
               }
             }
-            if (this.nodeName.toLowerCase().includes("hpic") || this.nodeName.toLowerCase().includes("vpic") || this.nodeName.toLowerCase().includes("spic") || this.nodeName.toLowerCase().includes("epic")) { //must be set in the data and as a name on the model
+            if (this.nodeName.toLowerCase().includes("hpic") || this.nodeName.toLowerCase().includes("vpic") || this.nodeName.toLowerCase().includes("spic") || this.nodeName.toLowerCase().includes("epic")) { 
               if (node instanceof THREE.Mesh) {
                 this.meshChildren.push(node);
                   hasPicPositions = true;
@@ -4904,7 +4906,7 @@ AFRAME.registerComponent('mod_model', {
                 // console.log(this.nodeName);
               }
             }
-            if (this.nodeName.toLowerCase().includes("hvid") || this.nodeName.toLowerCase().includes("vvid") || this.nodeName.toLowerCase().includes("svid")|| this.nodeName.toLowerCase().includes("evid")) { //must be set in the data and as a name on the model
+            if (this.nodeName.toLowerCase().includes("hvid") || this.nodeName.toLowerCase().includes("vvid") || this.nodeName.toLowerCase().includes("svid")|| this.nodeName.toLowerCase().includes("evid")) { 
               // if (node instanceof THREE.Mesh) {
                 this.meshChildren.push(node);
                   hasVidPositions = true;
@@ -4912,7 +4914,7 @@ AFRAME.registerComponent('mod_model', {
                 // console.log(this.nodeName);
               // }
             }
-            if (this.nodeName.toLowerCase().includes("haudio") || this.nodeName.toLowerCase().includes("vaudio")) { //must be set in the data and as a name on the model
+            if (this.nodeName.toLowerCase().includes("haudio") || this.nodeName.toLowerCase().includes("vaudio")) { 
               // if (node instanceof THREE.Mesh) {
                 this.meshChildren.push(node);
                   hasAudioPositions = true;
@@ -5876,12 +5878,42 @@ AFRAME.registerComponent('mod_model', {
           });
 
     }
+
     });
    
   },  //END INIT mod_model
   returnProperties: function () {
     //placeholder
 
+  },
+  playWalkAnimation: function () { //to be used be external movement components, e.g. nav-agent 
+    let theEl = this.el;
+    let clips = this.walkClips;  //to pass below the listeners..?
+    console.log("tryna walk with walkclips " + this.walkClips.length );
+    if (this.walkClips.length > 0) {
+    var clip = this.walkClips[Math.floor(Math.random()*this.walkClips.length)];
+      theEl.setAttribute('animation-mixer', {
+        // "clip": clips[danceIndex].name,
+        "clip": clip.name,
+        "loop": "repeat",
+        "crossFadeDuration": 1
+        // "repetitions": Math.floor(Math.random()*2)
+        // "timeScale": .75 + Math.random()/2
+      });
+      
+      theEl.addEventListener('animation-finished', function () { 
+        theEl.removeAttribute('animation-mixer');
+        var clip = clips[Math.floor(Math.random()*clips.length)];
+        theEl.setAttribute('animation-mixer', {
+          // "clip": clips[danceIndex].name,
+          "clip": clip.name,
+          "loop": "repeat",
+          "crossFadeDuration": 1
+          // "repetitions": Math.floor(Math.random()*2),
+          // "timeScale": .75 + Math.random()/2
+        });
+      });
+    }
   },
   beat: function (volume, duration) {
     console.log("tryna beat " + this.el.id + " " + volume);
