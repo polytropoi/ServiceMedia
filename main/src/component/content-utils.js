@@ -4673,7 +4673,7 @@ AFRAME.registerComponent('mod_model', {
           if (settings.useNavmesh) {
             this.el.setAttribute("nav-agent", "");
             this.el.setAttribute("agent-action", "");  
-            this.el.setAttribute("mod_physics", {'model': 'agent'});
+            this.el.setAttribute("mod_physics", {'model': 'agent', 'isTrigger': true});
           }
         }
         if (this.data.eventData.includes("scatter")) {

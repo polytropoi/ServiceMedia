@@ -1582,6 +1582,9 @@ AFRAME.registerComponent('trigger_audio_control', { //trigger audio on designate
             if (tag != null) {
                 let tags = tag.toString().split(',');
                 for (let i = 0; i < tags.length; i++) {
+                    audioID = null;
+                    this.audioItem = null;
+                    this.triggerSprite == ""
                     // console.log("looking fo rtag " + tag[i]);
                     audioID = this.audioGroupsController.returnTriggerAudioIDWithTag(tags[i]);
                     // } else {
@@ -1591,17 +1594,20 @@ AFRAME.registerComponent('trigger_audio_control', { //trigger audio on designate
                     // console.log("tag "+ tags[i] + " tryna get audioID " + audioID);
                     this.audioItem = this.audioGroupsController.returnAudioItem(audioID);
 
-                    if (this.audioItem != null) {
-                        // console.log("gotsa audioItem, tryna set trigger to src " + triggerAudioHowl.src);
-                        if (this.triggerSprite == "") {
-                            console.log("gotsa audioItem, tryna set trigger to src " + triggerAudioHowl.src);
+                    if (this.audioItem != null) { //sprite won't work dynamically... :(
+
+                        // console.log("gotsa audioItem: " + JSON.stringify(this.audioItem));
+                        // if (this.triggerSprite == "") {
+                            // console.log("gotsa audioItem, tryna set trigger to src " + triggerAudioHowl.src);
+                            let spritename = tags[i];
                             this.triggerAudioHowl = new Howl({
                                 src: this.audioItem.URLogg,
                                 format: "ogg",
-                                sprite: {trigger: [0, 5000]}
+                                // sprite: {trigger: [0, 5000]}
                             }); 
-                            this.triggerSprite = "trigger";
-                        }
+                            // this.triggerAudioHowl._sprite.
+                            // this.triggerSprite = "trigger";
+                        // }
                             // triggerAudioHowl.src = this.audioItem.URLogg;
                             // triggerAudioHowl.format = "ogg";
                         // } else {
@@ -1630,18 +1636,18 @@ AFRAME.registerComponent('trigger_audio_control', { //trigger audio on designate
                         if (volume < .1) {
                             volume = .1;
                         }
-                        if (this.data.volmod != null) {
-                            volume = volume * this.data.volmod;
+                        if (volmod != null) {
+                            volume = volume * volmod;
                         }
                         this.triggerAudioHowl.volume(volume);
                         
-                        this.triggerAudioHowl.play(this.triggerSprite);
+                        this.triggerAudioHowl.play();
                         // const clamp = (num, a, b) => Math.max(Math.min(num, Math.max(a, b)), Math.min(a, b));
                         
                         // // console.log("tryna play at hitpoint " + pos);
                         // triggerAudioHowl.play(t);
                         // console.log("tryna play trigger at volume " + volume + " distance " + distance); //calling id here is needed
-                        // triggerAudioHowl.pos(pos.x / 100, pos.y / 100, pos.z / 100);  //HOLY SHIT howler needs small values for position, * .01
+                        this.triggerAudioHowl.pos(pos.x / 100, pos.y / 100, pos.z / 100);  //HOLY SHIT howler needs small values for position, * .01
                         break;
                         }
                     }

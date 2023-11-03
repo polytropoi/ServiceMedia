@@ -28,7 +28,8 @@ AFRAME.registerComponent('mod_physics', { //used by models, placeholders, instan
     eventData: {default: ''},
     tags: {default: []},
     attractorID: {default: ''},
-    attractorLocation: {default: ''}
+    attractorLocation: {default: ''},
+    cooldownTime: {default: 2.0}
   },
   init() {
     this.isTrigger = this.data.isTrigger;
@@ -46,6 +47,7 @@ AFRAME.registerComponent('mod_physics', { //used by models, placeholders, instan
     if (this.data.tags.includes("beat")) {
       this.el.classList.add("beatme");
     }
+    this.isCooling = false;
 
     // this.el.addEventListener('model-loaded', () => {   //unused
     //   // if (this.el.object3D) {
@@ -92,6 +94,7 @@ AFRAME.registerComponent('mod_physics', { //used by models, placeholders, instan
     } else if (this.data.model == "placeholder") { //from cloudmarker, always kinematic
       this.isGhost = true;
       if (settings.usePhysicsType == "ammo") {
+
       // console.log("truyna init mod_physics for id " + this.el.id + " model " + this.model +" isTrigger "+ this.isTrigger + " body " + this.data.body );
       this.el.setAttribute('ammo-body', {type: 'kinematic', emitCollisionEvents: this.isTrigger}); //placeholder model already loaded in mod_model
       // this.el.addEventListener('body-loaded', () => {  
@@ -139,7 +142,7 @@ AFRAME.registerComponent('mod_physics', { //used by models, placeholders, instan
       
     }
 
-
+    
     this.el.addEventListener("collidestart", (e) => { //this is for models or triggers, not objects - TODO look up locationData for tags? 
       // e.preventDefault();
       // console.log("mod_physics collision on object  :" + this.el.id + " by " + e.detail.targetEl.id + " isTrigger " + this.isTrigger);
@@ -164,6 +167,61 @@ AFRAME.registerComponent('mod_physics', { //used by models, placeholders, instan
               }
             // } else {
             
+          }
+        }
+        if (e.detail.targetEl.id.includes("ball")) {
+          if (!this.isCooling) {
+            this.isCooling = true;
+          var triggerAudioController = document.getElementById("triggerAudio");
+          if (triggerAudioController != null) { 
+             
+              console.log("mod_physics TRIGGER collision "  + this.el.id + " " + e.detail.targetEl.id);
+              triggerAudioController.components.trigger_audio_control.playSingleAtPosition(e.detail.targetEl.object3D.position, window.playerPosition.distanceTo(e.detail.targetEl.object3D.position), ["bang"], .7);
+             
+              
+              setTimeout( () => {
+                this.isCooling = false;
+              }, 5000);
+            } 
+          }
+        }
+        if (e.detail.targetEl.id.includes("box")) {
+          if (!this.isCooling) {
+            this.isCooling = true;
+            var triggerAudioController = document.getElementById("triggerAudio");
+            if (triggerAudioController != null) {
+              console.log("mod_physics TRIGGER collision "  + this.el.id + " " + e.detail.targetEl.id);
+              triggerAudioController.components.trigger_audio_control.playSingleAtPosition(e.detail.targetEl.object3D.position, window.playerPosition.distanceTo(e.detail.targetEl.object3D.position), ["bell"], .7);
+              setTimeout( () => {
+                this.isCooling = false;
+              }, 5000);
+            }
+          }
+        }
+        if (e.detail.targetEl.id.includes("player")) {
+          if (!this.isCooling) {
+            this.isCooling = true;
+            var triggerAudioController = document.getElementById("triggerAudio");
+            if (triggerAudioController != null) {
+              // console.log("mod_physics TRIGGER collision "  + this.el.id + " " + e.detail.targetEl.id);
+              triggerAudioController.components.trigger_audio_control.playSingleAtPosition(e.detail.targetEl.object3D.position, window.playerPosition.distanceTo(e.detail.targetEl.object3D.position), ["magic"], .7);
+              setTimeout( () => {
+                this.isCooling = false;
+              }, 5000);
+            }
+          }
+        }
+        if (this.data.model == "agent") {
+          if (!this.isCooling) {
+            this.isCooling = true;
+            var triggerAudioController = document.getElementById("triggerAudio");
+            if (triggerAudioController != null) {
+              console.log("mod_physics TRIGGER collision "  + this.el.id + " " + e.detail.targetEl.id);
+              triggerAudioController.components.trigger_audio_control.playSingleAtPosition(e.detail.targetEl.object3D.position, window.playerPosition.distanceTo(e.detail.targetEl.object3D.position), ["laugh"], .7);
+              setTimeout( () => {
+                this.isCooling = false;
+              }, 5000);
+            }
           }
         }
         if (this.el.id.toLowerCase().includes("pin")) {

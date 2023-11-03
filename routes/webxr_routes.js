@@ -736,6 +736,9 @@ webxr_router.get('/:_id', function (req, res) {
                         if (sceneData.sceneTags[i].toLowerCase().includes("ammo test")) {
                             externalEntities = externalEntities + requireText('../main/includes/ammoTestEntities.html', require);
                         }
+                        if (sceneData.sceneTags[i].toLowerCase().includes("ammo no nav")) {
+                            externalEntities = externalEntities + requireText('../main/includes/ammoTestEntities2.html', require);
+                        }
                         if (sceneData.sceneTags[i].toLowerCase().includes("cannon test")) {
                             externalEntities = externalEntities + requireText('../main/includes/cannonTestEntities.html', require);
                         }
