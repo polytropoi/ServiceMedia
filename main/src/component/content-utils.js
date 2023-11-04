@@ -444,7 +444,8 @@ AFRAME.registerComponent('listen-from-camera', { //attached to cam entity, updat
 function roundToTwo(num) {    
   return +(Math.round(num + "e+2")  + "e-2");
 }
-AFRAME.registerComponent('pos-rot-reader', { //no
+
+AFRAME.registerComponent('pos-rot-reader', { //no, deprecated - get_pos_rot instead
   init: function () {
     // Set up the tick throttling.
     this.tick = AFRAME.utils.throttleTick(this.tick, 250, this);
@@ -2143,7 +2144,8 @@ AFRAME.registerComponent('mod_scene_inventory', {
   });
 
 
-////////////////////////////////////////////  mod_objex spins through data and spawn objects attached to locations with mod_object component below ////////////////////////////
+////////////////////////////////////////////  mod_objex: spins through data and spawn objects attached to locations with mod_object component below ////////////////////////////
+////////////////////////////////////////////  vs mod_model(s) written into response individually, for static and/or preloaded assets
 AFRAME.registerComponent('mod_objex', {
   schema: {
       eventData: {default: ''},
@@ -2164,21 +2166,21 @@ AFRAME.registerComponent('mod_objex', {
       // console.log("objxe location datas" + JSON.stringify(this.data.jsonLocationsData));
       console.log(this.data.jsonLocationsData.length + " locations for " + this.data.jsonObjectData.length);
 
-    this.triggerAudioController = document.getElementById("triggerAudio");
-    this.camera = null;
-    let cameraEl = document.querySelector('a-entity[camera]');
-    if (!cameraEl) {
-        cameraEl = document.querySelector('a-camera');
-    }
-    if (!cameraEl) {
-      camaraEl = document.getElementById('player');
-    } 
-    if (cameraEl) {
-      let theCamComponent = cameraEl.components.camera;
-      if (theCamComponent != null) {
-        this.camera = theCamComponent.camera;
+      this.triggerAudioController = document.getElementById("triggerAudio");
+      this.camera = null;
+      let cameraEl = document.querySelector('a-entity[camera]');
+      if (!cameraEl) {
+          cameraEl = document.querySelector('a-camera');
       }
-    }
+      if (!cameraEl) {
+        camaraEl = document.getElementById('player');
+      } 
+      if (cameraEl) {
+        let theCamComponent = cameraEl.components.camera;
+        if (theCamComponent != null) {
+          this.camera = theCamComponent.camera;
+        }
+      }
 
       for (let i = 0; i < this.data.jsonLocationsData.length; i++) {
         for (let k = 0; k < this.data.jsonObjectData.length; k++) {
@@ -2201,6 +2203,7 @@ AFRAME.registerComponent('mod_objex', {
                 if (!this.data.jsonLocationsData[i].markerType.toLowerCase().includes('spawn')) { //either spawn or spawntrigger types require interaction //now in cloudmarker, deprecate
                   console.log("location/object match " + this.data.jsonLocationsData[i].objectID + " modelID " + this.data.jsonObjectData[k].modelID);
                   let objEl = document.createElement("a-entity");
+                  //set mod_object component:
                   objEl.setAttribute("mod_object", {'eventData': this.data.jsonLocationsData[i].eventData, 'locationData': this.data.jsonLocationsData[i], 'objectData': this.data.jsonObjectData[k]});
                   objEl.id = "obj" + this.data.jsonLocationsData[i].objectID + "_" + this.data.jsonLocationsData[i].timestamp;
                   this.el.sceneEl.appendChild(objEl);

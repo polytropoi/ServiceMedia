@@ -905,8 +905,7 @@ AFRAME.registerComponent('extended_wasd_thirdperson', {
 });
 
 
-/* Constrain an object to a navmesh, for example place this element after wasd-controls like so:
-`wasd-controls navmesh-physics="#navmesh-el"`
+/* 
 from https://github.com/AdaRoseCannon/aframe-xr-boilerplate/blob/glitch/simple-navmesh-constraint.js
 */
 AFRAME.registerComponent('simple-navmesh-constraint', {
@@ -926,16 +925,16 @@ AFRAME.registerComponent('simple-navmesh-constraint', {
     },
     init: function () {
       
-	  if (this.data.navmesh != '') {
-		this.hasNavmesh = true; //might get applied without a navmesh assigned
-		console.log("tryna init simple navmesh with a navmesh");
-	  } else {
-		console.log("tryna init simple navmesh no navmesh found!");
-	  }
+	//   if (this.data.navmesh != '') {
+	// 	this.hasNavmesh = true; //might get applied without a navmesh assigned
+	// 	console.log("tryna init simple navmesh with a navmesh");
+	//   } else {
+	// 	console.log("tryna init simple navmesh no navmesh found!");
+	//   }
 	  
     },
     update: function () {
-		if (this.hasNavmesh) {
+		// if (this.hasNavmesh) {
 			this.lastPosition = null;
 			this.excludes = this.data.exclude ? Array.from(document.querySelectorAll(this.data.exclude)):[];
 			const els = Array.from(document.querySelectorAll(this.data.navmesh));
@@ -945,7 +944,7 @@ AFRAME.registerComponent('simple-navmesh-constraint', {
 			} else {
 				this.objects = els.map(el => el.object3D).concat(this.excludes.map(el => el.object3D));
 			}
-		}
+		// }
     },
   
     tick: (function () {
@@ -1216,7 +1215,7 @@ AFRAME.registerComponent('object_raycaster', {
     }())
   });
 
-//uses threejs pathfinding, from aframe-extras
+//uses threejs pathfinding, from aframe-extras //?
 AFRAME.registerComponent('nav_mesh', { 
     schema: {
       initialized: {default: false},
@@ -1365,9 +1364,106 @@ AFRAME.registerComponent('rotate_player_camera', {
 	},
 
 });
-AFRAME.registerComponent('agent-action', {
+
+AFRAME.registerComponent('waypoint-snap', {
+	init: function(){
+	let navEl = document.getElementById("nav-mesh");
+	navEl.addEventListener('model-loaded', () => {
+		let results = [];
+	
+	let navElObj = navEl.getObject3D('mesh');
+          
+	if (navElObj) {
+		let position = this.el.getAttribute('position');
+		let raycaster = new THREE.Raycaster();
+		raycaster.set(new THREE.Vector3(position.x, position.y + 10, position.z), new THREE.Vector3(0, -1, 0));
+		// var intersects = raycaster.intersectObject(navElObj);
+		raycaster.intersectObjects(navElObj, true, results);
+			
+		// if (results.length) {
+		if(results.length > 0) {
+			console.log("gotsan navmesh intersect: " + results.length, results[0].object.name, results[0].point.y);
+			position.y = results[0].point.y; //snap y of waypoint to navmesh y
+			this.el.setAttribute('position', position);
+			// data.waypoints[i].
+			} else {
+				console.log('Nope.');
+			}
+		} else {
+			console.log("cain't find no navmesh!");
+		}
+		});
+	}
+}); 
+AFRAME.registerComponent('nav_mesh_controller', {
 	schema:{
 		  waypoints:{type:'array', default:[]},
+		  debug: {default: false}
+
+	  },
+	init: function() {
+		this.isReady = false;
+		this.goodWaypoints = [];
+		this.waypoints = [];
+		this.waypoints = document.getElementsByClassName('waypoint');
+		this.el.addEventListener('model-loaded', () => {
+			// this.isReady = true;
+			console.log("Nav mesh loaddded!!");
+			this.registerWaypoints();
+		});
+		// if (this.el.object3D) {
+		// 	this.isReady = true;
+		// }
+	},
+	amIReady: function () {
+		return this.isReady;
+	},
+	registerWaypoints: function() {
+		// let waypoints = this.waypoints;
+		
+		results = [];
+		for (let i = 0; i < this.waypoints.length; i++) {
+
+				let position = this.waypoints[i].getAttribute('position');
+				var testLineMaterial = new THREE.LineBasicMaterial({ color: 0xFF0000 });
+				var points = [];
+				points.push(new THREE.Vector3(position.x, position.y + 10, position.z));
+				points.push(new THREE.Vector3(position.x, position.y - 10, position.z));
+				var geometry = new THREE.BufferGeometry().setFromPoints(points);
+				var line = new THREE.Line(geometry, testLineMaterial);
+
+			if (this.data.debug) {
+				this.el.sceneEl.object3D.add(line);
+			}
+			let raycaster = new THREE.Raycaster();
+			raycaster.set(new THREE.Vector3(position.x, position.y + 5, position.z), new THREE.Vector3(0, -1, 0.01));
+			// var intersects = raycaster.intersectObject(navElObj);
+			let results = raycaster.intersectObject(this.el.getObject3D('mesh'), true);
+				
+			// if (results.length) {
+			if(results.length > 0) {
+				console.log("gotsa navmesh intersect: " + results.length, results[0].object.name, results[0].point.y);
+				position.y = results[0].point.y; //snap y of waypoint to navmesh y
+				this.waypoints[i].setAttribute('position', position);
+				this.goodWaypoints.push(this.waypoints[i]);
+				// data.waypoints[i].
+			} else {
+				console.log('bad nav waypoint');
+				// waypoints.splice(i, 1);
+			}
+		}
+	
+		this.isReady = true;
+	},
+	registerAgents: function () {
+
+	}
+
+});
+
+AFRAME.registerComponent('agent-action', {
+	schema:{
+		//   waypoints:{type:'array', default:[]},
 		  progress:{type:'number', default:0},
 		  animations:{type:'array', default:['Idle01', 'Walking01']},
 		  actionType:{type:'string', default:'Patrol'},
@@ -1381,10 +1477,38 @@ AFRAME.registerComponent('agent-action', {
 	  const el = this.el;
 	  const data = this.data;
 	  const scene = document.querySelector('a-scene')
-	  
+	  this.initialized = false;
+	  this.navMeshController = null;
 	  // Get waypoints in array
-	  data.waypoints = scene.getElementsByClassName('waypoint');
-	  console.log("gotsome waypoints " + data.waypoints.length);
+	//   let raycaster = new THREE.Raycaster();
+
+	let navMeshControllerEl = document.getElementById("nav-mesh");
+	if (navMeshControllerEl) {
+		this.navMeshController = navMeshControllerEl.components["nav_mesh_controller"];
+		if (this.navMeshController) {
+			console.log("gotsa NAVMESHCONTROLLER ");
+		} else {
+			let interval = setInterval( () => {
+				let navMeshControllerEl = document.getElementById("nav-mesh");
+				if (navMeshControllerEl) {
+					this.navMeshController = navMeshControllerEl.components["nav_mesh_controller"];
+					console.log("gotsa NAVMESHCONTROLLER ");
+					
+					if (this.navMeshController.goodWaypoints != undefined && this.navMeshController.goodWaypoints.length > 0) {
+						this.agentAction();
+						clearInterval(interval);
+					}
+				} 
+			}, 1000);
+		}
+		
+	} else {
+		
+	}
+
+		
+	//   console.log("gotsome waypoints " + this.navMeshController.waypoints.length);
+
 	  let modModelComponent = this.el.components.mod_model; //in content-utils.js
 	  if (modModelComponent) {
 		console.log("gotsa MOD_MODEL component..");
@@ -1414,6 +1538,11 @@ AFRAME.registerComponent('agent-action', {
 			  console.log("Nav Null");
 			  // this.actorAnimation(data.animations[0], 2.4);
 			});
+			// setTimeout( () => {
+            
+				this.initialized = true;
+			// }, 2000);
+			
 	  } else {
 	  this.agentAction();
 
@@ -1438,7 +1567,10 @@ AFRAME.registerComponent('agent-action', {
 		  // this.actorAnimation(data.animations[0], 2.4);
 		});
 	//   });
+
 	  }
+
+
 	},
 	
 	/*************************************************************/
@@ -1456,31 +1588,42 @@ AFRAME.registerComponent('agent-action', {
 	/*************************************************************/
 	
 	agentAction: function(){
-	  let travelTo;
-	  let spent=false;
-	  const data = this.data;
-	  
-	//   if(this.el.id === 'Player'&& !spent){
-	// 	console.log("Action type:", data.actionType);
-	// 	console.log("Progress:", data.progress);
-	// 	spent=true;
-	//   }
-	  
-	//   if(data.actionType==='Patrol'){
-	// 	travelTo = data.progress;
-	// 	data.progress++;
-	// 	// Let's keep the guy patrolling forever!
-	// 	if(data.progress>=data.waypoints.length){
-	// 	  data.progress=0;
-	// 	}
-	//   }else if(data.actionType==='Random'){
-		travelTo = Math.floor(Math.random()*data.waypoints.length);
-	//   };
-   
-	  this.el.setAttribute('nav-agent', {
-		active:true,
-		destination:data.waypoints[travelTo].getAttribute('position')
-	  });
-	//   console.log("trynna travelTo " + travelTo);
-	}
+
+		if (this.navMeshController && this.navMeshController.goodWaypoints.length > 0) {
+			// console.log("agent action with navmeschcontroller " + this.navMeshController.isReady + this.navMeshController.goodWaypoints.length);
+			// if (this.navMeshController.goodWaypoints && this.navMeshController.goodWaypoints.length > 0) {
+				// console.log("this.navMeshController.waypoints.length " + this.navMeshController.waypoints.length);
+				// let nextWaypointIndex;
+				
+				
+				//   if(this.el.id === 'Player'&& !spent){
+				// 	console.log("Action type:", data.actionType);
+				// 	console.log("Progress:", data.progress);
+				// 	spent=true;
+				//   }
+				
+				//   if(data.actionType==='Patrol'){
+				// 	nextWaypointIndex = data.progress;
+				// 	data.progress++;
+				// 	// Let's keep the guy patrolling forever!
+				// 	if(data.progress>=data.waypoints.length){
+				// 	  data.progress=0;
+				// 	}
+				//   }else if(data.actionType==='Random'){
+				let nextWaypointIndex = Math.floor(Math.random()*this.navMeshController.goodWaypoints.length);
+				//   };
+
+				this.el.setAttribute('nav-agent', {
+					active:true,
+					destination:this.navMeshController.goodWaypoints[nextWaypointIndex].getAttribute('position')
+				});
+				//   console.log("trynna nextWaypointIndex " + nextWaypointIndex);
+				// } else {
+				// 	console.log("no waypoints found");
+				// }
+			
+			} else {
+				console.log("cain't find navmensch controllern waypoints");	
+			}
+		}
   });

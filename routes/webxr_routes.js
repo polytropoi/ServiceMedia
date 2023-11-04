@@ -726,7 +726,7 @@ webxr_router.get('/:_id', function (req, res) {
                             console.log("GOTS USENAVMESH TAG: " + sceneData.sceneTags[i]);
                             useNavmesh = true;
                         }
-                        if (sceneData.sceneTags[i].toLowerCase().includes("simple navmesh")) {
+                        if (sceneData.sceneTags[i].toLowerCase().includes("simplenav")) {
                             console.log("GOTS SimpleNavmesh TAG: " + sceneData.sceneTags[i]);
                             useSimpleNavmesh = true;
                         } else if (sceneData.sceneTags[i].toLowerCase().includes("navmesh")) {
@@ -756,7 +756,7 @@ webxr_router.get('/:_id', function (req, res) {
                         }
                         if (sceneData.sceneTags[i].toLowerCase().includes("aframe master")) {
                             // aframeScriptVersion = "<script src=\x22https://cdn.jsdelivr.net/gh/aframevr/aframe@744e2b869e281f840cff7d9cb02e95750ce90920/dist/aframe-master.min.js\x22></script>"; //ref 20220715// nope!
-                            aframeScriptVersion = "<script src=\x22https://aframe.io/releases/1.4.1/aframe.min.js\x22></script>"; //ref 20220715// nope!
+                            aframeScriptVersion = "<script src=\x22https://cdn.jsdelivr.net/gh/aframevr/aframe@4eb6fb31fa3937b9a65cf05051829e6345964e1e/dist/aframe-master.min.js\x22></script>"; //ref 20231103 (integrated hands!)
                         }
                         if (sceneData.sceneTags[i].toLowerCase().includes("aframe ada")) {
                             aframeScriptVersion = "<script src=\x22https://a-cursor-test.glitch.me/aframe-master.js\x22></script>"; //mod by @adarosecannon
@@ -789,6 +789,8 @@ webxr_router.get('/:_id', function (req, res) {
                             // }
                         //     handEntities = "<a-entity sphere-collider="objects: .activeObjexRay" super-hands hand-controls="hand: left"></a-entity>"+
                         //    "<a-entity sphere-collider=\x22objects: .activeObjexRay\x22 super-hands hand-controls=\x22hand: right\x22></a-entity>";
+                        } else if ((sceneData.sceneTags[i].toLowerCase().includes("aframe hands")) ) {
+                            
                         }
                     }
                 }
@@ -1357,7 +1359,8 @@ webxr_router.get('/:_id', function (req, res) {
                                     "</div>" +
                                 "</div>";
                                 let movementControls = ""; //aframe extras, can constrain to navmesh 
-                                wasd = "extended_wasd_controls=\x22flyEnabled: false; moveSpeed: 5; inputType: keyboard\x22";
+                                // wasd = "extended_wasd_controls=\x22flyEnabled: false; moveSpeed: 5; inputType: keyboard\x22";
+                                wasd = "extended_wasd_controls=\x22fly: false; moveSpeed: 5; inputType: keyboard\x22 simple-navmesh-constraint=\x22navmesh:#nav-mesh;fall:10; height:.1;\x22";
                                 // joystickScript = "<script src=\x22../main/vendor/aframe/joystick.js\x22></script>";
                                 let physicsMod = "";
                                 // if (!useNavmesh && !useSimpleNavmesh) { //simplenavmesh uses raycast, no pathfinding but constraint works!
@@ -1366,7 +1369,7 @@ webxr_router.get('/:_id', function (req, res) {
                                 // } else {
                                 if (useSimpleNavmesh) {
                                     //simple navmesh can use 
-                                    wasd = "extended_wasd_controls=\x22fly: false; moveSpeed: 5; inputType: keyboard\x22 simple-navmesh-constraint=\x22navmesh:#navmesh-el;fall:10; height:.1;\x22";
+                                    wasd = "extended_wasd_controls=\x22fly: false; moveSpeed: 5; inputType: keyboard\x22 simple-navmesh-constraint=\x22navmesh:#nav-mesh;fall:10; height:.1;\x22";
                                     
                                 } 
                                 // else {
@@ -1383,8 +1386,10 @@ webxr_router.get('/:_id', function (req, res) {
                                    
                                 }
                                  if (physicsScripts.length > 0 && useNavmesh && !useSuperHands && !useStarterKit) {
-                                    movementControls = "movement-controls=\x22constrainToNavMesh: true; control: keyboard, gamepad, touch; fly: false;\x22";
-                                    wasd = "";
+
+                                    // movementControls = "movement-controls=\x22constrainToNavMesh: true; control: keyboard, gamepad, touch; fly: false;\x22";
+                                    // movementControls = "extended_wasd_controls=\x22fly: false; moveSpeed: 5; inputType: keyboard\x22 simple-navmesh-constraint=\x22navmesh:#nav-mesh;fall:10; height:.1;\x22";
+                                    // wasd = "";
                                     physicsMod = "geometry=\x22primitive: cylinder; height: 2; radius: 0.5;\x22 ammo-body=\x22type: kinematic;\x22 ammo-shape=\x22type: capsule\x22";
                                     // aframeExtrasScript = "<script src=\x22..//main/vendor/aframe/aframe-extras_20210520.js\x22></script>";
                                     // joystickScript = "";
@@ -1446,33 +1451,34 @@ webxr_router.get('/:_id', function (req, res) {
                                 //AFRAME CAMERA
                                 let blinkMod = "blink-controls=\x22cameraRig: #cameraRig\x22";
                                 if (useSimpleNavmesh) {
-                                    blinkMod = "blink-controls=\x22cameraRig: #cameraRig; collisionEntities: #navmesh-el;\x22"; //only one navmesh for now
-                                    wasd = "extended_wasd_controls=\x22fly: false; moveSpeed: "+sceneResponse.scenePlayer.playerSpeed+"; inputType: keyboard\x22 simple-navmesh-constraint=\x22navmesh:#navmesh-el;fall:10; height:"+sceneResponse.scenePlayer.playerHeight+"\x22";
+                                    blinkMod = "blink-controls=\x22cameraRig: #cameraRig; collisionEntities: #nav-mesh;\x22"; //only one navmesh for now
+                                    wasd = "extended_wasd_controls=\x22fly: false; moveSpeed: "+sceneResponse.scenePlayer.playerSpeed+"; inputType: keyboard\x22 simple-navmesh-constraint=\x22navmesh:#nav-mesh;fall:10; height:"+sceneResponse.scenePlayer.playerHeight+"\x22";
                                 }
                                 
                                 // if (useSimpleNavmesh) { //this lives in navigation.js
                                 //     //simple navmesh can use 
-                                //     wasd = "extended_wasd_controls=\x22fly: false; moveSpeed: "+sceneResponse.scenePlayer.playerSpeed+"; inputType: keyboard\x22 simple-navmesh-constraint=\x22navmesh:#navmesh-el;fall:10; height:"+sceneResponse.scenePlayer.playerHeight+"\x22";
+                                //     wasd = "extended_wasd_controls=\x22fly: false; moveSpeed: "+sceneResponse.scenePlayer.playerSpeed+"; inputType: keyboard\x22 simple-navmesh-constraint=\x22navmesh:#nav-mesh;fall:10; height:"+sceneResponse.scenePlayer.playerHeight+"\x22";
                                 //     // wasd = "wasd-controls=\x22fly: true; acceleration: 35\x22 ";
                                     
                                 // } 
                                 // let follower = "";
 
+                                ////////////////////////// - THIRD PERSON CAMERA SETUP - //////////////////////////////
                                 if (sceneResponse.sceneCameraMode != undefined && sceneResponse.sceneCameraMode.toLowerCase().includes("third person")) {
                                     let lookcontrols = "look-controls=\x22magicWindowTrackingEnabled: false; reverseTouchDrag: true\x22";
                                     if (sceneResponse.sceneTags != null && (sceneResponse.sceneTags.includes('magicwindow') || sceneResponse.sceneTags.includes('magic window'))) {
                                         lookcontrols = "look-controls=\x22reverseTouchDrag: true\x22"; // because magicwinders enabled by default
                                     }
-                                    // wasd = "wasd-controls=\x22fly: true; acceleration: "+sceneResponse.scenePlayer.playerSpeed+"\x22 simple-navmesh-constraint=\x22navmesh:#navmesh-el;fall:10; height:0;\x22";
+                                    // wasd = "wasd-controls=\x22fly: true; acceleration: "+sceneResponse.scenePlayer.playerSpeed+"\x22 simple-navmesh-constraint=\x22navmesh:#nav-mesh;fall:10; height:0;\x22";
                                     // wasd = "extended_wasd_controls=\x22flyEnabled: false; moveSpeed: 4; inputType: keyboard\x22";
                                     // let navConstraint = "";
                                     wasd = "extended_wasd_thirdperson=\x22fly: false; moveSpeed: "+sceneResponse.scenePlayer.playerSpeed+"; inputType: keyboard\x22";
                                     if (useSimpleNavmesh) {
-                                        wasd = "extended_wasd_thirdperson=\x22fly: false; moveSpeed: "+sceneResponse.scenePlayer.playerSpeed+"; inputType: keyboard\x22 simple-navmesh-constraint=\x22navmesh:#navmesh-el;fall:10; height: 0\x22";
+                                        wasd = "extended_wasd_thirdperson=\x22fly: false; moveSpeed: "+sceneResponse.scenePlayer.playerSpeed+"; inputType: keyboard\x22 simple-navmesh-constraint=\x22navmesh:#nav-mesh;fall:10; height: 0\x22";
                                     } else if (useNavmesh) {
                                         // let navConstraint = "constrainToNavMesh: true; enabled: true; speed:0.2;\x22";
-                                        // "extended_wasd_thirdperson=\x22fly: false; moveSpeed: "+sceneResponse.scenePlayer.playerSpeed+"; inputType: keyboard constrainToNavMesh: true; enabled: true; speed:0.2;\x22";
-                                        wasd = "extended_wasd_thirdperson=\x22fly: false; moveSpeed: "+sceneResponse.scenePlayer.playerSpeed+"; inputType: keyboard\x22 simple-navmesh-constraint=\x22navmesh:#navmesh-el;fall:10; height: 0\x22";
+                                        // wasd = "extended_wasd_thirdperson=\x22fly: false; moveSpeed: "+sceneResponse.scenePlayer.playerSpeed+"; inputType: keyboard constrainToNavMesh: true; enabled: true; speed:0.2;\x22";
+                                        wasd = "extended_wasd_thirdperson=\x22fly: false; moveSpeed: "+sceneResponse.scenePlayer.playerSpeed+"; inputType: keyboard\x22 simple-navmesh-constraint=\x22navmesh:#nav-mesh;fall:10; height: 0\x22";
                                     }
                                     
                                     // wasd = "extended_wasd_thirdperson=\x22fly: false; moveSpeed: "+sceneResponse.scenePlayer.playerSpeed+"; inputType: keyboard\x22 " + navConstraint;
@@ -1484,7 +1490,7 @@ webxr_router.get('/:_id', function (req, res) {
                                         " id=\x22mouseCursor\x22 cursor=\x22rayOrigin: mouse\x22 raycaster=\x22objects: .activeObjexRay\x22>"+
                                         
                                        
-                                        "<a-entity id=\x22player\x22 "+wasd+" "+ physicsMod +" position=\x22"+playerPosition+"\x22>"+
+                                        "<a-entity get_pos_rot id=\x22player\x22 "+wasd+" "+ physicsMod +" position=\x22"+playerPosition+"\x22>"+
                                             "<a-entity id=\x22equipPlaceholder\x22 geometry=\x22primitive: box; height: .1; width: .1; depth: .1\x22 position=\x220 -.65 -.75\x22"+
                                             "material=\x22opacity: 0\x22></a-entity>"+
                                             "<a-entity id=\x22viewportPlaceholder\x22 geometry=\x22primitive: plane; height: 0.01; width: .01\x22 position=\x220 0 -1.5\x22"+
@@ -1505,9 +1511,9 @@ webxr_router.get('/:_id', function (req, res) {
                                     //     lookcontrols = "look-controls=\x22reverseTouchDrag: true\x22"; // because magicwinders enabled by default
                                     // }
                                     wasd = "";
-                                    // wasd = "wasd-controls=\x22fly: true; acceleration: "+sceneResponse.scenePlayer.playerSpeed+"\x22 simple-navmesh-constraint=\x22navmesh:#navmesh-el;fall:10; height:0;\x22";
+                                    // wasd = "wasd-controls=\x22fly: true; acceleration: "+sceneResponse.scenePlayer.playerSpeed+"\x22 simple-navmesh-constraint=\x22navmesh:#nav-mesh;fall:10; height:0;\x22";
                                     // wasd = "extended_wasd_controls=\x22flyEnabled: false; moveSpeed: 4; inputType: keyboard\x22";
-                                    // wasd = "extended_wasd_thirdperson=\x22fly: false; moveSpeed: "+sceneResponse.scenePlayer.playerSpeed+"; inputType: keyboard\x22 simple-navmesh-constraint=\x22navmesh:#navmesh-el;fall:10; height: 0\x22";
+                                    // wasd = "extended_wasd_thirdperson=\x22fly: false; moveSpeed: "+sceneResponse.scenePlayer.playerSpeed+"; inputType: keyboard\x22 simple-navmesh-constraint=\x22navmesh:#nav-mesh;fall:10; height: 0\x22";
                                     cameraRigEntity = "<a-entity camera look-controls id=\x22player\x22 orbit-controls=\x22target: 0 0 0; minDistance: 0.5; maxDistance: 180; initialPosition: 0 5 5\x22>"+
                                     "<a-entity id=\x22mouseCursor\x22 cursor=\x22rayOrigin: mouse\x22 raycaster=\x22objects: .activeObjexRay\x22></a-entity>"+
                                     "</a-entity>";
@@ -1540,9 +1546,9 @@ webxr_router.get('/:_id', function (req, res) {
                                         lookcontrols = "look-controls=\x22reverseTouchDrag: true\x22"; // because magicwinders enabled by default
                                     }
                                     wasd = "";
-                                    // wasd = "wasd-controls=\x22fly: true; acceleration: "+sceneResponse.scenePlayer.playerSpeed+"\x22 simple-navmesh-constraint=\x22navmesh:#navmesh-el;fall:10; height:0;\x22";
+                                    // wasd = "wasd-controls=\x22fly: true; acceleration: "+sceneResponse.scenePlayer.playerSpeed+"\x22 simple-navmesh-constraint=\x22navmesh:#nav-mesh;fall:10; height:0;\x22";
                                     // wasd = "extended_wasd_controls=\x22flyEnabled: false; moveSpeed: 4; inputType: keyboard\x22";
-                                    // wasd = "extended_wasd_thirdperson=\x22fly: false; moveSpeed: "+sceneResponse.scenePlayer.playerSpeed+"; inputType: keyboard\x22 simple-navmesh-constraint=\x22navmesh:#navmesh-el;fall:10; height: 0\x22";
+                                    // wasd = "extended_wasd_thirdperson=\x22fly: false; moveSpeed: "+sceneResponse.scenePlayer.playerSpeed+"; inputType: keyboard\x22 simple-navmesh-constraint=\x22navmesh:#nav-mesh;fall:10; height: 0\x22";
                                     cameraRigEntity = "<a-entity "+lookcontrols+" follow-camera=\x22target: #player\x22>" +
                                         "<a-entity camera position=\x220 5 7\x22 ></a-entity>" +
                                     "</a-entity>"+
@@ -1575,18 +1581,18 @@ webxr_router.get('/:_id', function (req, res) {
                                     }
                                     
                                    
-                                    if (!useSuperHands && !useStarterKit) { //if not superhands or starterkit, use default oculus hands, superhand entities set above
+                                    if (!useSuperHands && !useStarterKit) { //if not superhands or starterkit, use default oculus-touch controls + aframe hands 
                                         let ammoHands = "";
                                         let hapticsHands = ""; //grab?
                                         if (usePhysicsType == "ammo") {
                                             ammoHands = " ammo-body=\x22type: kinematic; emitCollisionEvents: true;\x22 ammo-shape=\x22type: sphere\x22 ";
                                             hapticsHands = "haptics"
                                         }
-                                        handEntities = "<a-entity id=\x22left-hand\x22 thumbstick-logging lefthand_xr_listener oculus-touch-controls=\x22hand: left\x22 "+blinkMod+" handModelStyle: lowPoly; color: #ffcccc\x22 "+hapticsHands+">"+
+                                        handEntities = "<a-entity id=\x22left-hand\x22 hand-tracking-grab-controls=\x22hand: left\x22 thumbstick-logging lefthand_xr_listener oculus-touch-controls=\x22hand: left\x22 "+blinkMod+" handModelStyle: lowPoly; color: #ffcccc\x22 "+hapticsHands+">"+
                                         console + 
-                                        "<a-sphere color=\x22blue\x22 radius=\x220.06\x22 "+ammoHands+" collision-listener-right></a-sphere></a-entity>" +
-                                        "<a-entity id=\x22right-hand\x22 oculus-touch-controls=\x22hand: right\x22 laser-controls=\x22hand: right;\x22 handModelStyle: lowPoly; color: #ffcccc\x22 raycaster=\x22objects: .activeObjexRay;\x22 grab "+hapticsHands+">"+
-                                        "<a-sphere color=\x22orange\x22 radius=\x220.06\x22 "+ammoHands+" collision-listener-left></a-sphere>"+
+                                        "<a-sphere color=\x22blue\x22 opacity=\x220.1\x22 radius=\x220.06\x22 "+ammoHands+" collision-listener-right></a-sphere></a-entity>" +
+                                        "<a-entity id=\x22right-hand\x22 hand-tracking-grab-controls=\x22hand: right\x22 oculus-touch-controls=\x22hand: right\x22 laser-controls=\x22hand: right;\x22 handModelStyle: lowPoly; color: #ffcccc\x22 raycaster=\x22objects: .activeObjexRay;\x22 grab "+hapticsHands+">"+
+                                        "<a-sphere color=\x22orange\x22 opacity=\x220.1\x22 radius=\x220.06\x22 "+ammoHands+" collision-listener-left></a-sphere>"+
                                         "</a-entity>";
                                     
                                         // <a-entity id="right-hand" position="0.15 1.4 -0.4" oculus-touch-controls="hand: right;model:false" vive-controls="hand: right;model:false" vive-focus-controls="hand: right;model:false" windows-motion-controls="hand: right;model:false" haptics>
@@ -1598,12 +1604,17 @@ webxr_router.get('/:_id', function (req, res) {
                                         // </a-entity>
                                     }
                                     // defaults to first person cam
-                                    cameraRigEntity = "<a-entity id=\x22cameraRig\x22 "+movementControls+" initializer "+
-                                
-                                        " id=\x22mouseCursor\x22 cursor=\x22rayOrigin: mouse\x22 raycaster=\x22objects: .activeObjexRay\x22>"+
+                                    //////////////////////////////////// FIRST PERSON CAMERA SETUP
+                                    // cameraRigEntity = "<a-entity id=\x22cameraRig\x22 "+movementControls+" initializer "+
+                                    wasd = "extended_wasd_controls=\x22fly: false; moveSpeed: "+sceneResponse.scenePlayer.playerSpeed+"; inputType: keyboard\x22";
+                                    if (useSimpleNavmesh || useNavmesh) {
+                                        wasd = "extended_wasd_controls=\x22fly: false; moveSpeed: "+sceneResponse.scenePlayer.playerSpeed+"; inputType: keyboard\x22 simple-navmesh-constraint=\x22navmesh:#nav-mesh;fall:10; height: 1.6\x22";
+                                    } 
+                                    cameraRigEntity = "<a-entity id=\x22cameraRig\x22 initializer "+
+                                        " id=\x22mouseCursor\x22 cursor=\x22rayOrigin: mouse\x22 raycaster=\x22objects: .activeObjexRay\x22 position=\x22"+playerPosition+"\x22>"+
                                         // "<a-entity id=\x22player\x22 get_pos_rot networked=\x22template:#avatar-template;attachTemplateToLocal:false;\x22 "+spawnInCircle+" camera "+wasd+" look-controls=\x22hmdEnabled: false\x22 position=\x220 1.6 0\x22>" +     
                                         // "<a-entity id=\x22viewportPlaceholder\x22 position=\x220 0 -1\x22></entity>"+   
-                                        "<a-entity id=\x22player\x22 "+lookcontrols+" get_pos_rot camera "+wasd+" "+ physicsMod +" position=\x22"+playerPosition+"\x22>"+
+                                        "<a-entity id=\x22player\x22 "+lookcontrols+" get_pos_rot camera "+wasd+" "+ physicsMod +" position=\x220 0 0\x22>"+
                                             "<a-entity id=\x22equipPlaceholder\x22 geometry=\x22primitive: box; height: .1; width: .1; depth: .1;\x22 position=\x220 -.65 -.75\x22"+
                                             "material=\x22opacity: 0\x22></a-entity>"+
                                             "<a-entity id=\x22viewportPlaceholder\x22 geometry=\x22primitive: plane; height: 0.01; width: .01\x22 position=\x220 0 -1.5\x22"+
@@ -1628,7 +1639,7 @@ webxr_router.get('/:_id', function (req, res) {
                                         // camera = "<a-entity id=\x22cameraRig\x22 simple-navmesh-constraint=\x22navmesh:.navmesh;fall:0.5;height:0;exclude:.navmesh-hole; movement-controls=\x22speed:0.15;camera:#head;\x22"+
                                         if (useSimpleNavmesh) {
                                             // need id=\x22mouseCursor\x22?
-                                            cameraRigEntity = "<a-entity id=\x22cameraRig\x22 initializer cursor=\x22rayOrigin: mouse\x22 simple-navmesh-constraint=\x22navmesh:#navmesh-el;fall:10; height:"+
+                                            cameraRigEntity = "<a-entity id=\x22cameraRig\x22 position=\x22"+playerPosition+"\x22 initializer cursor=\x22rayOrigin: mouse\x22 simple-navmesh-constraint=\x22navmesh:#nav-mesh;fall:10; height:"+
                                             sceneResponse.scenePlayer.playerHeight+"\x22 raycaster=\x22objects: .activeObjexRay\x22  movement-controls=\x22speed:0.15;camera:#head;\x22"+
                                             "position=\x22-1 0 1\x22 rotation=\x220 45 0\x22 origin-on-ar-start> <a-entity id=\x22head\x22 camera=\x22near:0.01;\x22 look-controls=\x22pointerLockEnabled: false\x22 position=\x220 1.65 0\x22>"+
                                             "<a-entity id=player get_pos_rot></a-entity>"+
@@ -2579,25 +2590,32 @@ webxr_router.get('/:_id', function (req, res) {
                                            
                                         }
                                         if (locMdl.eventData.toLowerCase().includes("navmesh")) {
-                                            if (locMdl.eventData.toLowerCase().includes("simple navmesh")) {
+                                            if (locMdl.eventData.toLowerCase().includes("simplenav")) {
+                                              
                                                 
-                                                if (locMdl.eventData.toLowerCase().includes("ground")) { 
-                                                    // groundMod = "static-body=\x22shape: auto;\x22"; //no, it needs to wait for model-loaded
+                                                // if (locMdl.eventData.toLowerCase().includes("ground")) { 
+                                                //     // groundMod = "static-body=\x22shape: auto;\x22"; //no, it needs to wait for model-loaded
+                                                // }
+                                                // navmeshAsset = "<a-asset-item id=\x22" + m_assetID + "\x22 src=\x22"+ modelURL +"\x22></a-asset-item>";
+                                                // navmeshEntity = "<a-entity "+groundMod+" id=\x22nav-mesh\x22 visible=\x22false\x22 gltf-model=\x22#" + m_assetID + "\x22></a-entity>";
+                                            }
+                                            
+                                            // else {
+                                                let visible = false;
+                                                if (sceneResponse.sceneTags != null && (sceneResponse.sceneTags.includes('debug'))) {
+                                                    visible = true;
                                                 }
-                                                navmeshAsset = "<a-asset-item id=\x22" + m_assetID + "\x22 src=\x22"+ modelURL +"\x22></a-asset-item>";
-                                                navmeshEntity = "<a-entity "+groundMod+" id=\x22navmesh-el\x22 visible=\x22false\x22 gltf-model=\x22#" + m_assetID + "\x22></a-entity>";
-                                            } else {
                                                 navmeshAsset = "<a-asset-item id=\x22" + m_assetID + "\x22 src=\x22"+ modelURL +"\x22></a-asset-item>";
                                                 // navmeshEntity = "<a-entity nav_mesh scale=\x22"+scale+" "+scale+" "+scale+"\x22> gltf-model=\x22#" + m_assetID + "\x22</a-entity>";
                                                 // navmeshEntity = "<a-entity id=\x22nav_mesh\x22 nav_mesh=\x22show: false;\x22 gltf-model=\x22#" + m_assetID + "\x22></a-entity>";
                                                 // if (locMdl.eventData.toLowerCase().includes("show")) {
                                                 //     navmeshEntity = "<a-entity id=\x22nav_mesh\x22 nav_mesh=\x22show: true;\x22 gltf-model=\x22#" + m_assetID + "\x22></a-entity>";
                                                 // }
-                                                navmeshEntity = "<a-entity id=\x22nav-mesh\x22 nav-mesh visible=\x22false\x22 gltf-model=\x22#" + m_assetID + "\x22></a-entity>"; //maybe id=navmesh-el so simple navmesh can use it too?
-                                                if (locMdl.eventData.toLowerCase().includes("show")) {
-                                                    navmeshEntity = "<a-entity id=\x22nav-mesh\x22 nav-mesh gltf-model=\x22#" + m_assetID + "\x22></a-entity>";
-                                                }
-                                            }
+                                                navmeshEntity = "<a-entity id=\x22nav-mesh\x22 nav-mesh nav_mesh_controller visible=\x22"+visible+"\x22 gltf-model=\x22#" + m_assetID + "\x22></a-entity>"; //maybe id=nav-mesh so simple navmesh can use it too?
+                                                // if (locMdl.eventData.toLowerCase().includes("show")) {
+                                                //     navmeshEntity = "<a-entity id=\x22nav-mesh\x22 nav-mesh gltf-model=\x22#" + m_assetID + "\x22></a-entity>";
+                                                // }
+                                            
                                         }
                                         
                                         rightRot = !rightRot;
@@ -2753,7 +2771,7 @@ webxr_router.get('/:_id', function (req, res) {
 
                                             if (locMdl.eventData.toLowerCase().includes("navmesh")) { //regress for now, this is "real" vs simple navmesh...
                                                
-                                                if (locMdl.eventData.toLowerCase().includes("simple navmesh")) {
+                                                if (locMdl.eventData.toLowerCase().includes("simplenav")) {
                                                     useSimpleNavmesh = true;
                                                 }
                                                 console.log("GOTSA NAVMESH!! use simple " + useSimpleNavmesh);

@@ -129,7 +129,7 @@ AFRAME.registerComponent('mod_physics', { //used by models, placeholders, instan
         // console.log("ammo shape is " + JSON.stringify(this.el.getAttribute('ammo-shape')));
         // this.isTrigger = this.data.isTrigger;
         }
-        console.log("tryna load placeholder  " + this.isTrigger);
+        // console.log("tryna load agent  " + this.isTrigger);
       // });
     
     } else {
@@ -175,7 +175,7 @@ AFRAME.registerComponent('mod_physics', { //used by models, placeholders, instan
           var triggerAudioController = document.getElementById("triggerAudio");
           if (triggerAudioController != null) { 
              
-              console.log("mod_physics TRIGGER collision "  + this.el.id + " " + e.detail.targetEl.id);
+              // console.log("mod_physics TRIGGER collision "  + this.el.id + " " + e.detail.targetEl.id);
               triggerAudioController.components.trigger_audio_control.playSingleAtPosition(e.detail.targetEl.object3D.position, window.playerPosition.distanceTo(e.detail.targetEl.object3D.position), ["bang"], .7);
              
               
@@ -190,7 +190,7 @@ AFRAME.registerComponent('mod_physics', { //used by models, placeholders, instan
             this.isCooling = true;
             var triggerAudioController = document.getElementById("triggerAudio");
             if (triggerAudioController != null) {
-              console.log("mod_physics TRIGGER collision "  + this.el.id + " " + e.detail.targetEl.id);
+              // console.log("mod_physics TRIGGER collision "  + this.el.id + " " + e.detail.targetEl.id);
               triggerAudioController.components.trigger_audio_control.playSingleAtPosition(e.detail.targetEl.object3D.position, window.playerPosition.distanceTo(e.detail.targetEl.object3D.position), ["bell"], .7);
               setTimeout( () => {
                 this.isCooling = false;
@@ -216,7 +216,7 @@ AFRAME.registerComponent('mod_physics', { //used by models, placeholders, instan
             this.isCooling = true;
             var triggerAudioController = document.getElementById("triggerAudio");
             if (triggerAudioController != null) {
-              console.log("mod_physics TRIGGER collision "  + this.el.id + " " + e.detail.targetEl.id);
+              // console.log("mod_physics TRIGGER collision "  + this.el.id + " " + e.detail.targetEl.id);
               triggerAudioController.components.trigger_audio_control.playSingleAtPosition(e.detail.targetEl.object3D.position, window.playerPosition.distanceTo(e.detail.targetEl.object3D.position), ["laugh"], .7);
               setTimeout( () => {
                 this.isCooling = false;
@@ -227,7 +227,7 @@ AFRAME.registerComponent('mod_physics', { //used by models, placeholders, instan
         if (this.el.id.toLowerCase().includes("pin")) {
           var triggerAudioController = document.getElementById("triggerAudio");
           if (triggerAudioController != null) {
-            console.log("mod_physics TRIGGER collision "  + this.el.id + " " + e.detail.targetEl.id);
+            // console.log("mod_physics TRIGGER collision "  + this.el.id + " " + e.detail.targetEl.id);
             triggerAudioController.components.trigger_audio_control.playSingleAtPosition(e.detail.targetEl.object3D.position, window.playerPosition.distanceTo(e.detail.targetEl.object3D.position), ["bell"], 1);
           }
           const force = new Ammo.btVector3(0, 1, -10);
