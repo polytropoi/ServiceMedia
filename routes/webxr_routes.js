@@ -726,7 +726,7 @@ webxr_router.get('/:_id', function (req, res) {
                             console.log("GOTS USENAVMESH TAG: " + sceneData.sceneTags[i]);
                             useNavmesh = true;
                         }
-                        if (sceneData.sceneTags[i].toLowerCase().includes("simplenav")) {
+                        if (sceneData.sceneTags[i].toLowerCase().includes("simplenav") || sceneData.sceneTags[i].toLowerCase().includes("simple navmesh")) {
                             console.log("GOTS SimpleNavmesh TAG: " + sceneData.sceneTags[i]);
                             useSimpleNavmesh = true;
                         } else if (sceneData.sceneTags[i].toLowerCase().includes("navmesh")) {
@@ -1475,7 +1475,7 @@ webxr_router.get('/:_id', function (req, res) {
                                     wasd = "extended_wasd_thirdperson=\x22fly: false; moveSpeed: "+sceneResponse.scenePlayer.playerSpeed+"; inputType: keyboard\x22";
                                     if (useSimpleNavmesh) {
                                         wasd = "extended_wasd_thirdperson=\x22fly: false; moveSpeed: "+sceneResponse.scenePlayer.playerSpeed+"; inputType: keyboard\x22 simple-navmesh-constraint=\x22navmesh:#nav-mesh;fall:10; height: 0\x22";
-                                    } else if (useNavmesh) {
+                                    } else if (useNavmesh) { //well just use them both!
                                         // let navConstraint = "constrainToNavMesh: true; enabled: true; speed:0.2;\x22";
                                         // wasd = "extended_wasd_thirdperson=\x22fly: false; moveSpeed: "+sceneResponse.scenePlayer.playerSpeed+"; inputType: keyboard constrainToNavMesh: true; enabled: true; speed:0.2;\x22";
                                         wasd = "extended_wasd_thirdperson=\x22fly: false; moveSpeed: "+sceneResponse.scenePlayer.playerSpeed+"; inputType: keyboard\x22 simple-navmesh-constraint=\x22navmesh:#nav-mesh;fall:10; height: 0\x22";
@@ -1504,42 +1504,20 @@ webxr_router.get('/:_id', function (req, res) {
                                         //TODO - hands?
                                        
                                         "</a-entity></a-entity>";
+
+                                ///////////////// - Orbit camera - /////////////////
                                 } else if (sceneResponse.sceneCameraMode != undefined && sceneResponse.sceneCameraMode.toLowerCase().includes("orbit")) { //hrm..
-                                    // let lookcontrols = "look-controls=\x22enabled: false\x22";
-                                    // let lookcontrols = "look-controls=\x22enabled: false\x22";
-                                    // if (sceneResponse.sceneTags != null && (sceneResponse.sceneTags.includes('magicwindow') || sceneResponse.sceneTags.includes('magic window'))) {
-                                    //     lookcontrols = "look-controls=\x22reverseTouchDrag: true\x22"; // because magicwinders enabled by default
-                                    // }
+                                   
                                     wasd = "";
-                                    // wasd = "wasd-controls=\x22fly: true; acceleration: "+sceneResponse.scenePlayer.playerSpeed+"\x22 simple-navmesh-constraint=\x22navmesh:#nav-mesh;fall:10; height:0;\x22";
-                                    // wasd = "extended_wasd_controls=\x22flyEnabled: false; moveSpeed: 4; inputType: keyboard\x22";
-                                    // wasd = "extended_wasd_thirdperson=\x22fly: false; moveSpeed: "+sceneResponse.scenePlayer.playerSpeed+"; inputType: keyboard\x22 simple-navmesh-constraint=\x22navmesh:#nav-mesh;fall:10; height: 0\x22";
+
                                     cameraRigEntity = "<a-entity camera look-controls id=\x22player\x22 orbit-controls=\x22target: 0 0 0; minDistance: 0.5; maxDistance: 180; initialPosition: 0 5 5\x22>"+
                                     "<a-entity id=\x22mouseCursor\x22 cursor=\x22rayOrigin: mouse\x22 raycaster=\x22objects: .activeObjexRay\x22></a-entity>"+
                                     "</a-entity>";
                                         
                                     // joystickScript = "<script src=\x22../main/vendor/aframe/aframe-orbit-controls.min.js\x22></script>";
                                     joystickScript = "<script src=\x22https://cdn.jsdelivr.net/gh/diarmidmackenzie/superframe@fix-orbit-controls/components/orbit-controls/dist/aframe-orbit-controls.min.js\x22></script>";
-                                    // "</a-entity>";
-                                    // "<a-entity id=\x22cameraRig\x22 initializer "+
                                 
-                                    //     " id=\x22mouseCursor\x22 cursor=\x22rayOrigin: mouse\x22 raycaster=\x22objects: .activeObjexRay\x22>"+
-                                        
-                                    //     "<a-entity id=\x22player\x22 "+wasd+" "+ physicsMod +" position=\x22"+playerPosition+"\x22>"+
-                                    //         "<a-entity id=\x22equipPlaceholder\x22 geometry=\x22primitive: box; height: .1; width: .1; depth: .1\x22 position=\x220 -.65 -.75\x22"+
-                                    //         "material=\x22opacity: 0\x22></a-entity>"+
-                                    //         "<a-entity id=\x22viewportPlaceholder\x22 geometry=\x22primitive: plane; height: 0.01; width: .01\x22 position=\x220 0 -1.5\x22"+
-                                    //         "material=\x22opacity: 0\x22></a-entity>"+
-                                    //         "<a-entity id=\x22viewportPlaceholder3\x22 geometry=\x22primitive: plane; height: 0.01; width: .01\x22 position=\x220 0 -3\x22"+
-                                    //         "material=\x22opacity: 0\x22></a-entity>"+
-                                    //         "<a-entity id=\x22thirdPersonPlaceholder\x22 position=\x220 0 0\x22></a-entity>"+
-                                    //         "<a-entity id=\x22playCaster\x22 position=\x220 .5 .5\x22></a-entity>"+
-                                    //         // "<a-sphere visible=\x22true\x22 scale=\x220.45 0.5 0.4\x22 random-color></a-sphere>"+
-                                    //     "</a-entity>"+
-                                       
-                                       
-                                    //     "</a-entity></a-entity>";
-                                    
+                                ///////////////// - Fixed camera - /////////////////
                                 } else if (sceneResponse.sceneCameraMode != undefined && sceneResponse.sceneCameraMode.toLowerCase().includes("fixed")) { //hrm..
                                     let lookcontrols = "look-controls=\x22magicWindowTrackingEnabled: false; reverseTouchDrag: true\x22";
                                     if (sceneResponse.sceneTags != null && (sceneResponse.sceneTags.includes('magicwindow') || sceneResponse.sceneTags.includes('magic window'))) {
@@ -1550,13 +1528,13 @@ webxr_router.get('/:_id', function (req, res) {
                                     // wasd = "extended_wasd_controls=\x22flyEnabled: false; moveSpeed: 4; inputType: keyboard\x22";
                                     // wasd = "extended_wasd_thirdperson=\x22fly: false; moveSpeed: "+sceneResponse.scenePlayer.playerSpeed+"; inputType: keyboard\x22 simple-navmesh-constraint=\x22navmesh:#nav-mesh;fall:10; height: 0\x22";
                                     cameraRigEntity = "<a-entity "+lookcontrols+" follow-camera=\x22target: #player\x22>" +
-                                        "<a-entity camera position=\x220 5 7\x22 ></a-entity>" +
+                                        "<a-entity camera position=\x220 0 0\x22 ></a-entity>" +
                                     "</a-entity>"+
                                     "<a-entity id=\x22cameraRig\x22 initializer "+
                                 
                                         " id=\x22mouseCursor\x22 cursor=\x22rayOrigin: mouse\x22 raycaster=\x22objects: .activeObjexRay\x22>"+
                                         
-                                        "<a-entity id=\x22player\x22 "+wasd+" "+ physicsMod +" position=\x22"+playerPosition+"\x22>"+
+                                        "<a-entity id=\x22player\x22 "+wasd+" "+ physicsMod +" position=\x220 0 0\x22>"+
                                             "<a-entity id=\x22equipPlaceholder\x22 geometry=\x22primitive: box; height: .1; width: .1; depth: .1\x22 position=\x220 -.65 -.75\x22"+
                                             "material=\x22opacity: 0\x22></a-entity>"+
                                             "<a-entity id=\x22viewportPlaceholder\x22 geometry=\x22primitive: plane; height: 0.01; width: .01\x22 position=\x220 0 -1.5\x22"+
@@ -1570,7 +1548,9 @@ webxr_router.get('/:_id', function (req, res) {
                                        
                                        
                                         "</a-entity></a-entity>";
-                                } else { // first person cam, default
+
+                                ///////////////// - First Person camera - /////////////////        
+                                } else { 
                                     let lookcontrols = "look-controls=\x22magicWindowTrackingEnabled: false;\x22";
                                     let console = "";
                                     if (logScripts != "") {
@@ -1603,8 +1583,8 @@ webxr_router.get('/:_id', function (req, res) {
                                         // <a-sphere color="orange" radius="0.06" ammo-body="type: kinematic; emitCollisionEvents: true;" ammo-shape="type: sphere" collision-listener-left></a-sphere>
                                         // </a-entity>
                                     }
-                                    // defaults to first person cam
-                                    //////////////////////////////////// FIRST PERSON CAMERA SETUP
+                                    
+                                    //////////////////////////////////// FP cameraRig
                                     // cameraRigEntity = "<a-entity id=\x22cameraRig\x22 "+movementControls+" initializer "+
                                     wasd = "extended_wasd_controls=\x22fly: false; moveSpeed: "+sceneResponse.scenePlayer.playerSpeed+"; inputType: keyboard\x22";
                                     if (useSimpleNavmesh || useNavmesh) {
@@ -1660,14 +1640,15 @@ webxr_router.get('/:_id', function (req, res) {
                                     }
 
                                 }
-                            }
+                            } //end AFrame scene variations
+
                             let webxrEnv = "default";
 
                             if (sceneResponse.sceneWebXREnvironment != null && sceneResponse.sceneWebXREnvironment != "none" && sceneResponse.sceneWebXREnvironment != "") {
                                 webxrEnv = sceneResponse.sceneWebXREnvironment;
                                 
-                                // enviromentScript = "<script src=\x22../main/ref/aframe/dist/aframe_environment_component.min.js\x22></script>"; --aframe-environment-component
-                                enviromentScript = "<script src=\x22../main/src/component/aframe_environment_component_m2.js\x22></script>";
+                                // enviromentScript = "<script src=\x22../main/ref/aframe/dist/aframe_environment_component.min.js\x22></script>"; --ronment-component
+                                enviromentScript = "<script src=\x22../main/src/component/aframe-environment-component_m3.js\x22></script>";
                                 let ground = "";
                                 let skycolor = "";
                                 let groundcolor = "";
@@ -1689,7 +1670,7 @@ webxr_router.get('/:_id', function (req, res) {
                                     ground = "ground: flat; dressing: none;"
                                 }
                                 if (sceneResponse.sceneUseDynamicShadows) {
-                                    shadow = "shadow: true;"
+                                    shadow = "shadow: true; shadowSize: 100;"
                                 }
                                 if (sceneResponse.sceneTweakColors) {
                                     // tweakColors = "mod-colors"; //need to animate
@@ -1716,7 +1697,8 @@ webxr_router.get('/:_id', function (req, res) {
                                     groundcolor2 = "groundColor2: " + sceneResponse.sceneColor4 + ";";
                                 }      
                                 // "+ground+"
-                                aframeEnvironment = "<a-entity id=\x22enviroEl\x22 environment=\x22preset: "+webxrEnv+"; "+ground+" "+fog+" "+shadow+" "+groundcolor+" "+dressingcolor+" "+groundcolor2+" "+skycolor+" "+horizoncolor+" playArea: 15; lighting: distant; lightPosition: -5 10 0;\x22 hide-in-ar-mode "+tweakColors+"></a-entity>";
+                                aframeEnvironment = "<a-entity id=\x22enviroEl\x22 environment=\x22preset: "+webxrEnv+"; "+ground+" "+fog+" "+shadow+" "+groundcolor+" "+dressingcolor+" "+groundcolor2+" "+skycolor+" "+horizoncolor+
+                                " playArea: 25; lighting: distant;\x22 hide-in-ar-mode "+tweakColors+"></a-entity>";
                                 // environment = "<a-entity environment=\x22preset: "+webxrEnv+"; "+fog+" "+shadow+" "+groundcolor+" "+dressingcolor+" "+groundcolor2+" "+skycolor+" "+horizoncolor+" playArea: 3; lightPosition: 0 2.15 0\x22 hide-in-ar-mode></a-entity>";
                             } else {
                                 // aframeEnvironment =  "<a-gradient-sky material=\x22shader: gradient; topColor: "+HexToRgbValues(sceneResponse.sceneColor1)+"; bottomColor: "+HexToRgbValues(sceneResponse.sceneColor2)+";\x22></a-gradient-sky>";
@@ -1855,10 +1837,7 @@ webxr_router.get('/:_id', function (req, res) {
                             }
                             callback();
                             
-                        // }
-                        // callback();
 
-                    // });
                 },
 
                 function (callback) {
@@ -2494,7 +2473,8 @@ webxr_router.get('/:_id', function (req, res) {
                             //filter out cloudmarker types
                             // console.log(sceneResponse.sceneModels.indexOf(locMdl.modelID) + " index locMdl deets " + JSON.stringify(locMdl));
                             if (locMdl.modelID != undefined && locMdl.modelID != "none" && locMdl.markerType != "placeholder"
-                                && locMdl.markerType != "poi"                                
+                                && locMdl.markerType != "poi"
+                                && locMdl.markerType != "waypoint"                                
                                 && locMdl.markerType != "trigger"
                                 && locMdl.markerType != "spawntrigger"
                                 && locMdl.markerType != "gate"
@@ -2665,6 +2645,8 @@ webxr_router.get('/:_id', function (req, res) {
                                     } else {
                                         locMdl.eventData = ""; //WTF?! uh, dunno
                                     }
+
+                                    /////////////////////////////// marker types and filters /////////////////////////////////
                                     if (locMdl.markerType != null && locMdl.markerType != undefined && locMdl.markerType.length > 1) {  
                                         entityType = locMdl.markerType; //e.g. "target"
                                         if (entityType == "poi") { //bc location-fu looks for this class to get gpsElements, so this causes dupes
@@ -2675,16 +2657,19 @@ webxr_router.get('/:_id', function (req, res) {
                                         }
 
                                     }
+                                    /////////////////////////////// Geographic location types w/ lat/lng
                                     if (locMdl.type.toLowerCase() == "geographic" && locMdl.latitude != null && locMdl.longitude != null && locMdl.latitude != 0 && locMdl.longitude != 0) { 
                                         console.log(" lat/lng model " + JSON.stringify(locMdl));
                                         // gltfsAssets = gltfsAssets + "<a-asset-item id=\x22" + m_assetID + "\x22 src=\x22"+ modelURL +"\x22></a-asset-item>";
                                         gltfsAssets = gltfsAssets + "<a-asset-item id=\x22" + locMdl.modelID + "\x22 src=\x22"+ modelURL +"\x22></a-asset-item>";
-                                        gltfsEntities = gltfsEntities + "<a-entity class=\x22geo\x22 scale=\x22"+scale+" "+scale+" "+scale+"\x22 data-scale=\x22"+scale+"\x22 mod_model=\x22markerType: "+locMdl.markerType+"; tags: "+locationTags+"; eventData:"+locMdl.eventData+"\x22 class=\x22gltf "+entityType+" "+ambientChild+" activeObjexGrab activeObjexRay\x22 shadow=\x22cast:true; receive:true\x22 "+geoEntity+"=\x22latitude: "+locMdl.latitude+
+                                        gltfsEntities = gltfsEntities + "<a-entity class=\x22geo\x22 scale=\x22"+scale+" "+scale+" "+scale+"\x22 data-scale=\x22"+scale+"\x22 mod_model=\x22markerType: "+
+                                        locMdl.markerType+"; tags: "+locationTags+"; eventData:"+locMdl.eventData+"\x22 class=\x22gltf "+entityType+" "+ambientChild+" activeObjexGrab activeObjexRay\x22 shadow=\x22cast:true; receive:true\x22 "+geoEntity+"=\x22latitude: "+locMdl.latitude+
                                         // "; latitude: "+locMdl.longitude+";\x22 "+skyboxEnvMap+"  class=\x22gltf\x22 gltf-model=\x22#" + m_assetID + "\x22 "+objAnim+" "+cannedAnim+" scale=\x22"+scale+" "+scale+" "+scale+"\x22 rotation=\x22"+rotation+"\x22 >" + offsetPos+ "</a-entity>";
                                         "; longitude: "+locMdl.longitude+";\x22 "+skyboxEnvMap+" gltf-model=\x22#" + m_assetID + "\x22 "+objAnim+" "+cannedAnim+" rotation=\x22"+rotation+"\x22 >" + offsetPos+ "</a-entity>";
                                         
                                         callbackz(); //this or one below exits loop
-                                    } else {
+
+                                    } else { ///NOT positioned by lat/lng
                                        
                                         //// scene type filters...
                                         if (sceneResponse.sceneWebType == "ThreeJS") { //three
@@ -2727,7 +2712,7 @@ webxr_router.get('/:_id', function (req, res) {
                                             }
                                             console.log("face tracking asset at " + modelURL);
                                            
-                                        } else if (sceneResponse.sceneWebType == "BabylonJS") { //babylon, not really...
+                                        } else if (sceneResponse.sceneWebType == "BabylonJS") { //hrm, maybe later
                                             // gltfsAssets = gltfsAssets + "var lookCtrl = null;\nBABYLON.SceneLoader.ImportMesh('', '', \x22"+modelURL+"\x22, scene, function (meshes, particleSystems, skeletons) {"+
                                             // "meshes[0].scaling = new BABYLON.Vector3("+scale+", "+scale+", "+scale+");\n"+
                                             // "meshes[0].position = new BABYLON.Vector3("+locMdl.x+", "+locMdl.y+", "+locMdl.z+");\n"+
@@ -2765,21 +2750,21 @@ webxr_router.get('/:_id', function (req, res) {
                                             // "}\n"+
 
                                             // "});\n";
+
+
+                                        ///////////////////////////////// AFrame scene type below //////////////////////////
                                         } else { //aframe !!!
-                                            // let zFix = parseFloat(locMdl.z) * -1; //fix to match unity 
+                                            // let zFix = parseFloat(locMdl.z) * -1; //fix to match unity //nm, modded unity client
                                             let zFix = parseFloat(locMdl.z); //nope
 
-                                            if (locMdl.eventData.toLowerCase().includes("navmesh")) { //regress for now, this is "real" vs simple navmesh...
+                                            if (locMdl.eventData.toLowerCase().includes("navmesh")) { //use for pathfinding
+                                                
                                                
-                                                if (locMdl.eventData.toLowerCase().includes("simplenav")) {
+                                                if (locMdl.eventData.toLowerCase().includes("simplenav")) { //also use simple-navmesh-constraint for player!  
                                                     useSimpleNavmesh = true;
                                                 }
                                                 console.log("GOTSA NAVMESH!! use simple " + useSimpleNavmesh);
-                                                // navmesh = "nav-mesh";
-                                                // gltfsEntities = gltfsEntities +"<a-entity nav-mesh normal-material visible=\x22false\x22 position=\x22"+locMdl.x+" "+locMdl.y+" "+zFix+"\x22 rotation=\x22"+rotation+"\x22 scale=\x22"+scale+" "+scale+" "+scale+"\x22 gltf-model=\x22#" + m_assetID + "\x22></a-entity>";
-                                                // gltfsEntities = gltfsEntities +"<a-entity visible=\x22false\x22 position=\x22"+locMdl.x+" "+locMdl.y+" "+zFix+"\x22 rotation=\x22"+rotation+"\x22 gltf-model=\x22#" + m_assetID + "\x22 nav-mesh normal-material></a-entity>";
-                                                // gltfsAssets = gltfsAssets + "<a-asset-item id=\x22" + m_assetID + "\x22 src=\x22"+ modelURL +"\x22></a-asset-item>";
-                                                // gltfsEntities = gltfsEntities +"<a-entity visible=\x22false\x22 gltf-model=\x22#" + m_assetID + "\x22 nav-mesh></a-entity>";
+
 
                                             } else {
                                                 // console.log("LOCMDL eventDATA is : " + locMdl.eventData.toLowerCase());
@@ -2801,7 +2786,9 @@ webxr_router.get('/:_id', function (req, res) {
                                                 if (locMdl.eventData.toLowerCase().includes("gallery")) {
                                                     // modModel = "mod_model_photo_gallery";  maybe later
                                                 }
-                                                if (!locMdl.eventData.toLowerCase().includes("scatter")) { //not scatterd, normal placement
+
+                                                //////////   DEFAULT not scatterd, normal placement
+                                                if (!locMdl.eventData.toLowerCase().includes("scatter")) { 
                                                     let physicsMod = "";
                                                     let shape = 'hull';
                                                     let groundMod = "";
@@ -2849,7 +2836,7 @@ webxr_router.get('/:_id', function (req, res) {
                                                             gltfModel = modelURL;
                                                         }
                                                         
-                                                    } else { //don't use brownian
+                                                    } else { //DEFAULT entity conf (don't use brownian)
                                                         gltfsEntities = gltfsEntities + "<a-entity id=\x22"+id+"\x22 "+followCurve+" "+physicsMod+" "+modelParent+" "+scatterSurface+" "+modModel+" class=\x22envMap gltf "+entityType+" "+ambientChild+
                                                         " activeObjexGrab activeObjexRay\x22 shadow=\x22cast:true; receive:true\x22 "+skyboxEnvMap+" gltf-model=\x22#" + m_assetID + "\x22 "+objAnim+" "+cannedAnim+
                                                         // " position=\x22"+locMdl.x+" "+locMdl.y+" "+zFix+"\x22 scale=\x22"+scale+" "+scale+" "+scale+"\x22 rotation=\x22"+rotation+"\x22 >" + offsetPos+ "</a-entity>";  //rem rotation bc navmesh donutlike
@@ -2857,12 +2844,8 @@ webxr_router.get('/:_id', function (req, res) {
                                                         gltfModel = modelURL;
                                                     }
 
-                                                    // gltfsEntities = gltfsEntities + "<a-entity id=\x22"+id+"\x22 "+brownian+" "+followCurve+" "+physicsMod+" "+modelParent+" "+scatterSurface+" "+modModel+" class=\x22envMap gltf "+entityType+" "+ambientChild+
-                                                    // " activeObjexGrab activeObjexRay\x22 shadow=\x22cast:true; receive:true\x22 "+skyboxEnvMap+" gltf-model=\x22#" + m_assetID + "\x22 "+objAnim+" "+cannedAnim+
-                                                    // // " position=\x22"+locMdl.x+" "+locMdl.y+" "+zFix+"\x22 scale=\x22"+scale+" "+scale+" "+scale+"\x22 rotation=\x22"+rotation+"\x22 >" + offsetPos+ "</a-entity>";  //rem rotation bc navmesh donutlike
-                                                    // " position=\x22"+locMdl.x+" "+locMdl.y+" "+zFix+"\x22 scale=\x22"+scale+" "+scale+" "+scale+"\x22 data-scale=\x22"+scale+"\x22 rotation=\x22"+rotation+"\x22 >" + offsetPos+ "</a-entity>"; 
-                                                    // gltfModel = modelURL;
-                                                } else { //placement instancing + surface scattering
+                                                  //SCATTERING placement instancing + surface scattering
+                                                } else { 
                                                     console.log("tryna scatter so0methings!@ " + locMdl.eventData.toLowerCase());
                                                     let instancing = "instanced_meshes_mod=\x22_id: "+locMdl.modelID+"; modelID: "+m_assetID+";\x22";
                                                     let interaction = "";
@@ -4647,24 +4630,24 @@ webxr_router.get('/:_id', function (req, res) {
                         let joystick = "joystick=\x22useNavmesh: false\x22";
                         let extraScripts = "";
                         let hasParametricCurve = false;
-                        if (useNavmesh) {
-                            // navmeshScripts = "<script src=\x22../three/pathfinding/three-pathfinding.umd.js\x22></script>";
-                            // "<script src=\x22../main/vendor/aframe/movement-controls.js\x22></script>";
-                            // navmeshScripts = "<script type=\x22module\x22 src=\x22../main/js/navigation.js\x22></script>";
-                            // navmarsh = "<a-entity nav-mesh normal-material visible=\x22false\x22 gltf-model=\x22#castle_navmesh\x22></a-entity>"+
-                            //                 "<a-entity position=\x220 0 0\x22 scale=\x223 3 3\x22 "+skyboxEnvMap+" gltf-model=\x22#castle\x22></a-entity>";
-                            joystick = "joystick=\x22useNavmesh: true\x22";
+                        // if (useNavmesh) {
+                        //     // navmeshScripts = "<script src=\x22../three/pathfinding/three-pathfinding.umd.js\x22></script>";
+                        //     // "<script src=\x22../main/vendor/aframe/movement-controls.js\x22></script>";
+                        //     // navmeshScripts = "<script type=\x22module\x22 src=\x22../main/js/navigation.js\x22></script>";
+                        //     // navmarsh = "<a-entity nav-mesh normal-material visible=\x22false\x22 gltf-model=\x22#castle_navmesh\x22></a-entity>"+
+                        //     //                 "<a-entity position=\x220 0 0\x22 scale=\x223 3 3\x22 "+skyboxEnvMap+" gltf-model=\x22#castle\x22></a-entity>";
+                        //     joystick = "joystick=\x22useNavmesh: true\x22";
                             
-                        }
-                        if (useSimpleNavmesh) {
-                            // navmeshScripts = "</script><script src=\x22../main/js/navigation.js\x22></script>";
-                            // "<script src=\x22../main/vendor/aframe/movement-controls.js\x22></script>";
-                            // navmeshScripts = "<script type=\x22module\x22 src=\x22../main/js/navigation.js\x22></script>";
-                            // navmarsh = "<a-entity nav-mesh normal-material visible=\x22false\x22 gltf-model=\x22#castle_navmesh\x22></a-entity>"+
-                            //                 "<a-entity position=\x220 0 0\x22 scale=\x223 3 3\x22 "+skyboxEnvMap+" gltf-model=\x22#castle\x22></a-entity>";
-                            // joystick = "joystick=\x22useNavmesh: true\x22";
+                        // }
+                        // if (useSimpleNavmesh) {
+                        //     // navmeshScripts = "</script><script src=\x22../main/js/navigation.js\x22></script>";
+                        //     // "<script src=\x22../main/vendor/aframe/movement-controls.js\x22></script>";
+                        //     // navmeshScripts = "<script type=\x22module\x22 src=\x22../main/js/navigation.js\x22></script>";
+                        //     // navmarsh = "<a-entity nav-mesh normal-material visible=\x22false\x22 gltf-model=\x22#castle_navmesh\x22></a-entity>"+
+                        //     //                 "<a-entity position=\x220 0 0\x22 scale=\x223 3 3\x22 "+skyboxEnvMap+" gltf-model=\x22#castle\x22></a-entity>";
+                        //     // joystick = "joystick=\x22useNavmesh: true\x22";
                             
-                        }
+                        // }
                         
                         if (!showTransport) {
                             transportButtons = "";
