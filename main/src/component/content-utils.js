@@ -3253,7 +3253,12 @@ AFRAME.registerComponent('mod_object', {
             bubble.setAttribute("rotation", "0 0 0"); 
             bubble.setAttribute("scale", "2 2 2"); 
             bubble.setAttribute("visible", false);
-            sceneEl.appendChild(bubble);
+            if (this.data.eventData.toLowerCase().includes('agent')) {
+              this.el.appendChild(bubble); //make it a child if
+            } else {
+              sceneEl.appendChild(bubble); //or else put at top
+            }
+           
             
             let bubbleBackground = document.createElement("a-entity");
             bubbleBackground.classList.add("bubbleBackground");
@@ -4675,7 +4680,7 @@ AFRAME.registerComponent('mod_model', {
         if (this.data.eventData.toLowerCase().includes("agent")) { 
           if (settings.useNavmesh) {
             this.el.setAttribute("nav-agent", "");
-            this.el.setAttribute("agent-action", "");  
+            this.el.setAttribute("nav-agent-controller", "");  
             this.el.setAttribute("mod_physics", {'model': 'agent', 'isTrigger': true});
           }
         }
@@ -4925,6 +4930,31 @@ AFRAME.registerComponent('mod_model', {
                 // console.log(this.nodeName);
               // }
             }
+            if (this.data.markerType === "character") {
+              // const vector = new THREE.Vector3();
+              
+              let skinnedMeshColliderEl = document.createElement("a-sphere"); //screw it, can't got the boundingbox fu to work...
+              skinnedMeshColliderEl.setAttribute("scale", ".5 1 .5"); //todo pass in scale
+              // skinnedMeshColliderEl.setObject3D(sphere);\
+              skinnedMeshColliderEl.setAttribute("material", {"color": "purple", "transparent": true, "opacity": 0.1});
+              skinnedMeshColliderEl.setAttribute("visible", false);
+              // skinnedMeshColliderEl.setAttribute("opacity", "0.1");
+              skinnedMeshColliderEl.classList.add("activeObjexRay");
+              this.el.appendChild(skinnedMeshColliderEl);
+              
+              skinnedMeshColliderEl.setAttribute("position", "0 1 0"); //to do mod by scale
+              // console.log("character node name " + node.name);
+              if (node instanceof THREE.Mesh) {
+                // 
+                console.log("character node mesh name " + node.name);
+                // const box = new THREE.Box3();
+                  node.frustumCulled = false;
+                  
+              }
+              this.hasLocationCallout = true; //eg no background (thought or speech bubbgles)
+            }
+              
+
           });
           if (hasPicPositions) {
             let picGroupMangler = document.getElementById("pictureGroupsData");
@@ -5394,8 +5424,8 @@ AFRAME.registerComponent('mod_model', {
             }
           }
       }
-      
-      if (this.el.classList.contains('target') || this.data.markerType != "none" || this.hasCallout) {
+
+      if (this.el.classList.contains('target') || this.data.markerType != "none" || this.hasCallout || this.hasLocationCallout) {
         let textIndex = 0;
         this.position = null;
         // let hasBubble = false;
@@ -5403,7 +5433,7 @@ AFRAME.registerComponent('mod_model', {
         this.el.setAttribute('gesture-handler-add'); //ar mode only?
         var sceneEl = document.querySelector('a-scene');
         let hasCallout = false;
-        if (this.hasCallout) {
+        if (this.hasCallout || this.hasLocationCallout) {
           hasCallout = true;
         }
         let calloutOn = false;
@@ -5420,13 +5450,24 @@ AFRAME.registerComponent('mod_model', {
           let bubble = document.createElement("a-entity");
           this.bubble = bubble;
           console.log("made a bubble!" + this.data.eventData.toLowerCase());
-         
+          let position = this.el.getAttribute("position")
           bubble.classList.add("bubble");
-          bubble.setAttribute("position", "2 2 0");
-          bubble.setAttribute("rotation", "0 0 0"); 
+          // bubble.setAttribute("position", "2 2 0");
+          // bubble.setAttribute("rotation", "0 0 0"); 
           // bubble.setAttribute("scale", "2 2 2"); 
           bubble.setAttribute("visible", false);
-          sceneEl.appendChild(bubble);
+          if (this.data.eventData.toLowerCase().includes('agent')) {
+
+
+            this.el.appendChild(bubble); //make it a child if
+            bubble.setAttribute("position", "0 1 0");
+            bubble.setAttribute("rotation", "0 0 0"); 
+
+          } else {
+            sceneEl.appendChild(bubble); //or else put at top
+            bubble.setAttribute("position", "2 2 0");
+            bubble.setAttribute("rotation", "0 0 0"); 
+          }
           
           bubbleBackground = null;
           if (this.data.eventData.toLowerCase().includes("thought")) {
@@ -5600,16 +5641,26 @@ AFRAME.registerComponent('mod_model', {
             }
           }
         });
-        this.el.addEventListener('mouseenter', (evt) =>  {
-          console.log("mouseovewr model " + this.el.id + this.hasLocationCallout + hasCallout + this.hasCallout + this.hasCalloutBackground + textData[textIndex]);
-          if (evt.detail.intersection != null && this.hitpoint != null) {
+        console.log("MOD_MODEL markertype " + this.data.markerType +  " this.hasCallout " + this.hasCallout + " this.data.description " + this.data.description);
 
+        this.el.addEventListener('mouseenter', (evt) =>  {
+          console.log("mouseovewr model " + this.el.id + this.hasLocationCallout + this.data.markerType + this.hasCallout + this.hasCalloutBackground + textData[textIndex]);
+          if (evt.detail.intersection != null && this.hitpoint != null) {
+            if (this.calloutString == "") {
+              this.calloutString = textData[textIndex];
+            }
             // if (hasCallout && !textData[textIndex].toLowerCase().includes("undefined")) {
-            if (hasCallout) {
-              console.log("callout is " + this.calloutString);
+          if (this.hasCallout || hasCallout || this.hasLocationCallout) {
+             
               let pos = evt.detail.intersection.point; //hitpoint on model
               // this.bubble.setAttribute('position', {"x": pos.x.toFixed(2), "y": pos.y.toFixed(2), "z": pos.z.toFixed(2)});
-              this.bubble.setAttribute('position', evt.detail.intersection.point);
+              if (this.data.eventData.toLowerCase().includes("agent")) {
+                this.bubble.setAttribute('position', '0 1 0');
+              } else {
+                this.bubble.setAttribute('position', evt.detail.intersection.point);
+              }
+              
+
               this.font2 = "Acme.woff";
               if (settings && settings.sceneFontWeb2 && settings.sceneFontWeb2.length) {
                 this.font2 = settings.sceneFontWeb2;
@@ -5624,6 +5675,9 @@ AFRAME.registerComponent('mod_model', {
            
             let distance = evt.detail.intersection.distance;
             this.distance = distance;
+            console.log("callout is " + this.calloutString + " distance " + distance);
+            // if (distance) { //
+
             if (this.hasCalloutBackground && distance) { //eg thought or speech bubble
               if (distance < 10) {
                 const min = .1;
@@ -5692,6 +5746,7 @@ AFRAME.registerComponent('mod_model', {
                   value: textData[textIndex]
                 });
               } else {
+                console.log("tryna show bubble!");
                 this.bubble.setAttribute("visible", false);
                 this.bubbleBackground.setAttribute('scale', '1 1 1');
                 this.bubbleText.setAttribute('scale', '1 1 1' );
@@ -5699,15 +5754,16 @@ AFRAME.registerComponent('mod_model', {
   
 
             } else {
-              if (this.hasLocationCallout) {
+              if (this.hasLocationCallout || this.data.markerType === "character") {
                 console.log("not bubble callout is " + textData[textIndex]);
                 distance = evt.detail.intersection.distance;
-                  this.bubble.setAttribute('position', pos);
+                  // this.bubble.setAttribute('position', pos);
                   this.bubble.setAttribute("visible", true);
                   this.bubbleText.setAttribute("visible", true);
                   this.bubbleText.setAttribute('scale', {x: distance * .1, y: distance * .1, z: distance * .1} );
                 // this.bubbleText.setAttribute('scale', {x: distance * .04, y: distance * .04, z: distance * .04} );
-                this.bubbleText.setAttribute("position", "-.5 .2 .51");
+                // this.bubbleText.setAttribute("position", "-.5 .2 .51");
+                this.bubbleText.setAttribute("position", "0 .75 -.5"); //
                 this.bubbleText.setAttribute('troika-text', {
                   baseline: "bottom",
                   align: "center",
@@ -5815,7 +5871,7 @@ AFRAME.registerComponent('mod_model', {
         }
       });
 
-      document.querySelector('a-scene').addEventListener('primaryAudioToggle', function () {  //things to trigger on this model if primary audio is playing
+        document.querySelector('a-scene').addEventListener('primaryAudioToggle', function () {  //things to trigger on this model if primary audio is playing
         // console.log("primaryAudioToggle!");
         if (primaryAudioHowl.playing()) {
 
@@ -5878,9 +5934,9 @@ AFRAME.registerComponent('mod_model', {
               // });
               }
             }
-          });
+        });
 
-    }
+      }
 
     });
    

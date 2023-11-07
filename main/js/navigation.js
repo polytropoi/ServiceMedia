@@ -1502,12 +1502,12 @@ AFRAME.registerComponent('nav_mesh_controller', {
 		
 	},
 	registerAgents: function () {
-
+		//todo
 	}
 
 });
 
-AFRAME.registerComponent('agent-action', {
+AFRAME.registerComponent('nav-agent-controller', {
 	schema:{
 		//   waypoints:{type:'array', default:[]},
 		  progress:{type:'number', default:0},
@@ -1519,98 +1519,76 @@ AFRAME.registerComponent('agent-action', {
 	
 	/*************************************************************/
   
-	init: function(){
-	  const el = this.el;
-	  const data = this.data;
-	  const scene = document.querySelector('a-scene')
-	  this.initialized = false;
-	  this.navMeshController = null;
-	  // Get waypoints in array
-	//   let raycaster = new THREE.Raycaster();
-	this.navMeshControllerEl = null;
-	let interval = setInterval( () => { //make sure we gotsa navmesh and it's ready
+	init: function() {
+		const el = this.el;
+		const data = this.data;
+		const scene = document.querySelector('a-scene')
+		this.initialized = false;
+		this.navMeshController = null;
+	  	// Get waypoints in array
+		//   let raycaster = new THREE.Raycaster();
+		this.navMeshControllerEl = null;
+		let interval = setInterval( () => { //make sure we gotsa navmesh and it's ready
 		let navMeshControllerEl = document.getElementById("nav-mesh");
 		if (navMeshControllerEl) {
 			this.navMeshControllerEl = navMeshControllerEl;
 			this.navMeshController = navMeshControllerEl.components["nav_mesh_controller"];
 			if (this.navMeshController) {
-				console.log("gotsa NAVMESHCONTROLLER ");
-					if (this.navMeshController.goodWaypoints != undefined && this.navMeshController.goodWaypoints.length > 0) {
-						// this.el.setAttribute("position", )
-						
-						this.checkPosition();
-						clearInterval(interval);
-					}
-				} 
-				
-			}
+				// console.log("gotsa NAVMESHCONTROLLER ");
+				if (this.navMeshController.goodWaypoints != undefined && this.navMeshController.goodWaypoints.length > 0) {		
+					this.checkPosition(); //make sure the agent is in a good spot
+					clearInterval(interval);
+				}
+			} 
+		}
 	}, 1000);
 
-		
 	//   console.log("gotsome waypoints " + this.navMeshController.waypoints.length);
-
-	  let modModelComponent = this.el.components.mod_model; //in content-utils.js
-	  if (modModelComponent) {
-		console.log("gotsa MOD_MODEL component..");
+	let modModelComponent = this.el.components.mod_model; //in content-utils.js
+	if (modModelComponent) {
+	
 		this.agentAction();
-	//   this.el.addEventListener('model-loaded', ()=>{ //no need, this is set after model-loaded in mod_model
-		
 		el.addEventListener('navigation-start', (e)=>{
-			//   console.log("Nav start");
 			
-			  if(!data.navStart){
-				// this.actorAnimation(data.animations[1], 2.4);
-
-				data.navStart=true;
-				modModelComponent.playWalkAnimation();
-			  }
-			});
-	  
-			/****************************************/
-			el.addEventListener('navigation-end', (e)=>{
-			//   console.log("Nav end");
-			//   this.actorAnimation(data.animations[0], 2.4);
-			  this.agentAction();
-			})
-	  
-			/****************************************/
-			el.addEventListener('navigation-null', (e)=>{
-			  console.log("Nav Null");
-			  // this.actorAnimation(data.animations[0], 2.4);
-			});
-			// setTimeout( () => {
-            
-				this.initialized = true;
-			// }, 2000);
+			if(!data.navStart){
 			
-	  } else {
-	  this.agentAction();
+			data.navStart=true;
+			modModelComponent.playWalkAnimation();
+			}
+		});
+	
+		/****************************************/
+		el.addEventListener('navigation-end', (e)=>{
+		//   console.log("Nav end");
+		//   this.actorAnimation(data.animations[0], 2.4);
+			this.agentAction();
+		})
+	
+		/****************************************/
+		el.addEventListener('navigation-null', (e)=>{
+			console.log("Nav Null");
+			// this.actorAnimation(data.animations[0], 2.4);
+		});
+	
+	} else {
+	  	this.agentAction();
 
 		el.addEventListener('navigation-start', (e)=>{
-		//   console.log("Nav start");
 		  if(!data.navStart){
-			// this.actorAnimation(data.animations[1], 2.4);
-			// data.navStart=true;
+
 		  }
 		});
   
 		/****************************************/
 		el.addEventListener('navigation-end', (e)=>{
-		//   console.log("Nav end");
-		//   this.actorAnimation(data.animations[0], 2.4);
 		  this.agentAction();
 		})
   
 		/****************************************/
 		el.addEventListener('navigation-null', (e)=>{
 		  console.log("Nav Null");
-		  // this.actorAnimation(data.animations[0], 2.4);
 		});
-	//   });
-
-	  }
-
-
+	}
 	},
 	
 	checkPosition: function () { //starting from legit spot?
@@ -1633,44 +1611,25 @@ AFRAME.registerComponent('agent-action', {
 			this.agentAction();
 		}
 	},
-	/*************************************************************/
+	// /*************************************************************/
 	
-	actorAnimation: function(animation, time){
-	  // console.log("Start animation");
-	  // console.log("Animation =", animation);
-	  const el=this.el;
-	  const data = this.data;
-	  el.setAttribute('animation-mixer', 'clip', animation);
-	  el.setAttribute('animation-mixer', 'timeScale', time);
-	  el.setAttribute('animation-mixer', 'crossFadeDuration', 0);
-	},
+	// actorAnimation: function(animation, time){
+	//   // console.log("Start animation");
+	//   // console.log("Animation =", animation);
+	//   const el=this.el;
+	//   const data = this.data;
+	//   el.setAttribute('animation-mixer', 'clip', animation);
+	//   el.setAttribute('animation-mixer', 'timeScale', time);
+	//   el.setAttribute('animation-mixer', 'crossFadeDuration', 0);
+	// },
 	
-	/*************************************************************/
+	// /*************************************************************/
 	
 	agentAction: function(){
 
 		if (this.navMeshController && this.navMeshController.goodWaypoints.length > 0) {
-			// console.log("agent action with navmeschcontroller " + this.navMeshController.isReady + this.navMeshController.goodWaypoints.length);
-			// if (this.navMeshController.goodWaypoints && this.navMeshController.goodWaypoints.length > 0) {
-				// console.log("this.navMeshController.waypoints.length " + this.navMeshController.waypoints.length);
-				// let nextWaypointIndex;
-				
-				
-				//   if(this.el.id === 'Player'&& !spent){
-				// 	console.log("Action type:", data.actionType);
-				// 	console.log("Progress:", data.progress);
-				// 	spent=true;
-				//   }
-				
-				//   if(data.actionType==='Patrol'){
-				// 	nextWaypointIndex = data.progress;
-				// 	data.progress++;
-				// 	// Let's keep the guy patrolling forever!
-				// 	if(data.progress>=data.waypoints.length){
-				// 	  data.progress=0;
-				// 	}
-				//   }else if(data.actionType==='Random'){
-				let nextWaypointIndex = Math.floor(Math.random()*this.navMeshController.goodWaypoints.length);
+
+				let nextWaypointIndex = Math.floor(Math.random()*this.navMeshController.goodWaypoints.length); //random for now
 				//   };
 
 				this.el.setAttribute('nav-agent', {
