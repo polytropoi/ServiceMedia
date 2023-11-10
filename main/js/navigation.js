@@ -1531,7 +1531,7 @@ AFRAME.registerComponent('nav_agent_controller', {
 		this.navMeshControllerEl = null;
 		let interval = setInterval( () => { //make sure we gotsa navmesh and it's ready
 		let navMeshControllerEl = document.getElementById("nav-mesh");
-		this.agentState = "Idle";
+		this.currentState = "random";
 		if (navMeshControllerEl) {
 			this.navMeshControllerEl = navMeshControllerEl;
 			this.navMeshController = navMeshControllerEl.components["nav_mesh_controller"];
@@ -1622,38 +1622,31 @@ AFRAME.registerComponent('nav_agent_controller', {
 			this.agentAction();
 		}
 	},
-	// /*************************************************************/
 	
-	// actorAnimation: function(animation, time){
-	//   // console.log("Start animation");
-	//   // console.log("Animation =", animation);
-	//   const el=this.el;
-	//   const data = this.data;
-	//   el.setAttribute('animation-mixer', 'clip', animation);
-	//   el.setAttribute('animation-mixer', 'timeScale', time);
-	//   el.setAttribute('animation-mixer', 'crossFadeDuration', 0);
-	// },
 	
-	// /*************************************************************/
-	
-	agentAction: function(state){
+	agentAction: function(){
+		console.log("tryna do agentAction with state " + this.currentState);
+			if (this.navMeshController && this.navMeshController.goodWaypoints.length > 0) {
+				switch (this.currentState) { //type is first level param for each route
 
-		if (this.navMeshController && this.navMeshController.goodWaypoints.length > 0) {
+				case "random": 
+					let nextWaypointIndex = Math.floor(Math.random()*this.navMeshController.goodWaypoints.length); //random for now
+					this.el.setAttribute('nav-agent', {
+						active:true,
+						destination:this.navMeshController.goodWaypoints[nextWaypointIndex].getAttribute('position')
+					});
+				break;  
 
-				let nextWaypointIndex = Math.floor(Math.random()*this.navMeshController.goodWaypoints.length); //random for now
-				//   };
+				case "pause":
 
-				this.el.setAttribute('nav-agent', {
-					active:true,
-					destination:this.navMeshController.goodWaypoints[nextWaypointIndex].getAttribute('position')
-				});
-				//   console.log("trynna nextWaypointIndex " + nextWaypointIndex);
-				// } else {
-				// 	console.log("no waypoints found");
-				// }
-			
+					this.el.setAttribute('nav-agent', {
+						active:false
+					});
+				break;
+				}    
+				
 			} else {
 				console.log("cain't find navmensch controllern waypoints");	
 			}
 		}
-  });
+	});

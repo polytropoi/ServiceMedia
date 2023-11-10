@@ -2627,10 +2627,10 @@ AFRAME.registerComponent('mod_object', {
     let walkIndex = -1;
     let runIndex = -1;
     let clips = null;
-    let danceClips = [];
-    let idleClips = [];
+    this.danceClips = [];
+    this.idleClips = [];
     this.walkClips = [];
-    let mouthClips = [];
+    this.mouthClips = [];
 
     this.triggerAudioController = document.getElementById("triggerAudio");
     this.triggerOn = false;
@@ -2755,7 +2755,7 @@ AFRAME.registerComponent('mod_object', {
     // }     
     if (this.data.objectData.physics === "Navmesh Agent" || this.data.eventData.toLowerCase().includes("agent")) { 
       this.isNavAgent = true;
-      // this.navAgentController = this.el.components.nav_agent_controller;
+      this.navAgentController = this.el.components.nav_agent_controller;
     } 
 
     this.hasPickupAction = false;
@@ -3723,7 +3723,24 @@ AFRAME.registerComponent('mod_object', {
           }
 
           if (this.isNavAgent) {
-            // navAgentController
+            if (this.navAgentController) {
+              if (this.idleClips.length) {
+                this.navAgentController.currentState = "pause";
+                this.navAgentController.agentAction();
+                var clip = this.idleClips[Math.floor(Math.random()*this.idleClips.length)];
+                this.el.setAttribute('animation-mixer', {
+                  "clip": clip.name,
+                  "loop": "repeat",
+                  "crossFadeDuration": .5
+                });
+                
+
+              } else {
+                console.log("this.idleClips is empty!");
+              }
+            } else {
+              this.navAgentController = this.el.components.nav_agent_controller;
+            } 
           }
           if (this.tags != undefined && this.tags != null && this.tags != "undefined") { //MAYBE SHOULD BE UNDER RAYHIT?
             console.log("tryna play audio with tags " + this.tags);
@@ -3760,6 +3777,27 @@ AFRAME.registerComponent('mod_object', {
         if (this.bubble) {
           this.bubble.setAttribute('visible', false);
         }
+      }
+      if (this.isNavAgent) {
+        if (this.navAgentController) {
+         
+          setTimeout(() => {
+            if (this.navAgentController.currentState == "pause") {
+            var clip = this.walkClips[Math.floor(Math.random()*this.walkClips.length)];
+            this.el.setAttribute('animation-mixer', {
+              "clip": clip.name,
+              "loop": "repeat",
+              "crossFadeDuration": .5
+            });
+            this.navAgentController.currentState = "random";
+            this.navAgentController.agentAction();
+            }
+          }, 5000);
+
+          
+        } else {
+          this.navAgentController = this.el.components.nav_agent_controller;
+        } 
       }
     });
    
