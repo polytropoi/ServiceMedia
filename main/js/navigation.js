@@ -1507,12 +1507,13 @@ AFRAME.registerComponent('nav_mesh_controller', {
 
 });
 
-AFRAME.registerComponent('nav-agent-controller', {
+AFRAME.registerComponent('nav_agent_controller', {
 	schema:{
 		//   waypoints:{type:'array', default:[]},
 		  progress:{type:'number', default:0},
 		  animations:{type:'array', default:['Idle01', 'Walking01']},
 		  actionType:{type:'string', default:'random'},
+		  
 		  navStart:{type:'boolean', default:false}
 	  },
 	
@@ -1635,7 +1636,7 @@ AFRAME.registerComponent('nav-agent-controller', {
 	
 	// /*************************************************************/
 	
-	agentAction: function(){
+	agentAction: function(state){
 
 		if (this.navMeshController && this.navMeshController.goodWaypoints.length > 0) {
 

@@ -889,7 +889,7 @@ webxr_router.get('/:_id', function (req, res) {
                             });
                         }
                         
-                        if (sceneResponse.sceneTags.toLowerCase().includes("debug") || sceneResponse.sceneDebugMode != null && sceneResponse.sceneDebugMode != undefined && sceneResponse.sceneDebugMode != "") {
+                        if (sceneResponse.sceneTags != null && sceneResponse.sceneTags.includes("debug") || sceneResponse.sceneDebugMode != null && sceneResponse.sceneDebugMode != undefined && sceneResponse.sceneDebugMode != "") {
                             debugMode = true;
                         }
                         if (sceneResponse.sceneYouTubeIDs != null && sceneResponse.sceneYouTubeIDs.length > 0) {

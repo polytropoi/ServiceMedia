@@ -2640,6 +2640,7 @@ AFRAME.registerComponent('mod_object', {
     this.camera = null;
     this.tags = this.data.tags;
     this.isNavAgent = false;
+    this.navAgentController = null;
     // this.raycaster = null;
 
     this.posIndex = 0; 
@@ -2754,6 +2755,7 @@ AFRAME.registerComponent('mod_object', {
     // }     
     if (this.data.objectData.physics === "Navmesh Agent" || this.data.eventData.toLowerCase().includes("agent")) { 
       this.isNavAgent = true;
+      // this.navAgentController = this.el.components.nav_agent_controller;
     } 
 
     this.hasPickupAction = false;
@@ -3119,7 +3121,7 @@ AFRAME.registerComponent('mod_object', {
           if (this.data.eventData.toLowerCase().includes("agent")) { 
             if (settings.useNavmesh) {
               this.el.setAttribute("nav-agent", "");
-              this.el.setAttribute("nav-agent-controller", "");  
+              this.el.setAttribute("nav_agent_controller", "");  
               this.el.classList.add("nav_agent");
               // this.el.setAttribute("mod_physics", {'model': 'agent', 'isTrigger': true});
             }
@@ -3720,6 +3722,9 @@ AFRAME.registerComponent('mod_object', {
             }
           }
 
+          if (this.isNavAgent) {
+            // navAgentController
+          }
           if (this.tags != undefined && this.tags != null && this.tags != "undefined") { //MAYBE SHOULD BE UNDER RAYHIT?
             console.log("tryna play audio with tags " + this.tags);
             // if (this.triggerAudioController != null) {
@@ -4780,7 +4785,7 @@ AFRAME.registerComponent('mod_model', {
         if (this.data.eventData.toLowerCase().includes("agent")) { 
           if (settings.useNavmesh) {
             this.el.setAttribute("nav-agent", "");
-            this.el.setAttribute("nav-agent-controller", "");  
+            this.el.setAttribute("nav_agent_controller", "");  
             this.el.setAttribute("mod_physics", {'model': 'agent', 'isTrigger': true});
           }
         }
