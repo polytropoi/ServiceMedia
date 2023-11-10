@@ -889,7 +889,7 @@ webxr_router.get('/:_id', function (req, res) {
                             });
                         }
                         
-                        if (sceneResponse.sceneDebugMode != null && sceneResponse.sceneDebugMode != undefined && sceneResponse.sceneDebugMode != "") {
+                        if (sceneResponse.sceneTags.toLowerCase().includes("debug") || sceneResponse.sceneDebugMode != null && sceneResponse.sceneDebugMode != undefined && sceneResponse.sceneDebugMode != "") {
                             debugMode = true;
                         }
                         if (sceneResponse.sceneYouTubeIDs != null && sceneResponse.sceneYouTubeIDs.length > 0) {
@@ -4213,6 +4213,7 @@ webxr_router.get('/:_id', function (req, res) {
                     settings.socketHost = process.env.SOCKET_HOST;
                     settings.networking = sceneResponse.sceneNetworking;
                     settings.playerStartPosition = playerPosition;
+                    settings.debugMode = debugMode;
 
                     if (sceneResponse.sceneTags != null && sceneResponse.sceneTags.includes("show avatars")) {
                         settings.hideAvatars = false;

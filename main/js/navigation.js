@@ -1512,7 +1512,7 @@ AFRAME.registerComponent('nav-agent-controller', {
 		//   waypoints:{type:'array', default:[]},
 		  progress:{type:'number', default:0},
 		  animations:{type:'array', default:['Idle01', 'Walking01']},
-		  actionType:{type:'string', default:'Patrol'},
+		  actionType:{type:'string', default:'random'},
 		  navStart:{type:'boolean', default:false}
 	  },
 	
@@ -1530,6 +1530,7 @@ AFRAME.registerComponent('nav-agent-controller', {
 		this.navMeshControllerEl = null;
 		let interval = setInterval( () => { //make sure we gotsa navmesh and it's ready
 		let navMeshControllerEl = document.getElementById("nav-mesh");
+		this.agentState = "Idle";
 		if (navMeshControllerEl) {
 			this.navMeshControllerEl = navMeshControllerEl;
 			this.navMeshController = navMeshControllerEl.components["nav_mesh_controller"];
@@ -1545,49 +1546,58 @@ AFRAME.registerComponent('nav-agent-controller', {
 
 	//   console.log("gotsome waypoints " + this.navMeshController.waypoints.length);
 	let modModelComponent = this.el.components.mod_model; //in content-utils.js
+
 	if (modModelComponent) {
-	
 		this.agentAction();
 		el.addEventListener('navigation-start', (e)=>{
-			
 			if(!data.navStart){
-			
-			data.navStart=true;
-			modModelComponent.playWalkAnimation();
+				data.navStart=true;
+				modModelComponent.playWalkAnimation();
 			}
 		});
-	
-		/****************************************/
 		el.addEventListener('navigation-end', (e)=>{
-		//   console.log("Nav end");
-		//   this.actorAnimation(data.animations[0], 2.4);
 			this.agentAction();
 		})
-	
-		/****************************************/
 		el.addEventListener('navigation-null', (e)=>{
 			console.log("Nav Null");
 			// this.actorAnimation(data.animations[0], 2.4);
-		});
-	
+		});		
 	} else {
-	  	this.agentAction();
-
-		el.addEventListener('navigation-start', (e)=>{
-		  if(!data.navStart){
-
-		  }
-		});
-  
-		/****************************************/
-		el.addEventListener('navigation-end', (e)=>{
-		  this.agentAction();
-		})
-  
-		/****************************************/
-		el.addEventListener('navigation-null', (e)=>{
-		  console.log("Nav Null");
-		});
+		let modObjectComponent = this.el.components.mod_object; //in content-utils.js
+		if (modObjectComponent) {
+			this.agentAction();
+			el.addEventListener('navigation-start', (e)=>{
+			if(!data.navStart){
+				data.navStart=true;
+				modObjectComponent.playWalkAnimation();
+			}
+			});
+	
+			/****************************************/
+			el.addEventListener('navigation-end', (e)=>{
+			this.agentAction();
+			})
+	
+			/****************************************/
+			el.addEventListener('navigation-null', (e)=>{
+			console.log("Nav Null");
+			});
+		} else { //i.e. test/external assets
+			this.agentAction();
+			el.addEventListener('navigation-start', (e)=>{
+			
+			});
+	
+			/****************************************/
+			el.addEventListener('navigation-end', (e)=>{
+			this.agentAction();
+			})
+	
+			/****************************************/
+			el.addEventListener('navigation-null', (e)=>{
+			console.log("Nav Null");
+			});
+		}
 	}
 	},
 	

@@ -3806,6 +3806,8 @@
                             "<option>Highlight</option>" +
                             "<option>Select</option>" +
                             "<option>Collide</option>" +
+                            "<option>Find</option>" +
+                            "<option>Consume</option>" +
                             "<option>Pickup</option>" +
                             "<option>Drop</option>" +
                             "<option>Collect</option>" +

@@ -2536,6 +2536,7 @@ AFRAME.registerComponent('mod_object', {
     locationData: {default: ''},
     objectData: {default: ''},
     eventData: {default: ''},
+    markerType: {default: 'none'},
     isEquipped: {default: false},
     fromSceneInventory: {default: false},
     timestamp: {default: null},
@@ -2628,7 +2629,7 @@ AFRAME.registerComponent('mod_object', {
     let clips = null;
     let danceClips = [];
     let idleClips = [];
-    let walkClips = [];
+    this.walkClips = [];
     let mouthClips = [];
 
     this.triggerAudioController = document.getElementById("triggerAudio");
@@ -2638,7 +2639,7 @@ AFRAME.registerComponent('mod_object', {
 
     this.camera = null;
     this.tags = this.data.tags;
-
+    this.isNavAgent = false;
     // this.raycaster = null;
 
     this.posIndex = 0; 
@@ -2671,6 +2672,7 @@ AFRAME.registerComponent('mod_object', {
       // this.el.addEventListener('beatme', e => console.log("beat" + e.detail.volume()));
       
     }
+
 
     this.el.setAttribute("shadow", {cast:true, receive:true});
 
@@ -2750,12 +2752,18 @@ AFRAME.registerComponent('mod_object', {
     //     triggerAudioController.components.trigger_audio_control.loopAndFollow(this.el.id, this.tags);
     //   }
     // }     
+    if (this.data.objectData.physics === "Navmesh Agent" || this.data.eventData.toLowerCase().includes("agent")) { 
+      this.isNavAgent = true;
+    } 
+
     this.hasPickupAction = false;
     this.hasTriggerAction = false;
     this.hasThrowAction = false;
     this.hasShootAction = false;
 
-    if ((this.tags != null && !this.tags.includes("thoughtbubble")) && !this.tags.includes("hide callout")) { //TODO implement Callout Options!
+    // if ((this.tags != null && !this.tags.includes("thoughtbubble")) && !this.tags.includes("hide callout")) { //TODO implement Callout Options!
+    
+    // if (!this.tags.includes("hide callout")) { //TODO implement Callout Options!
       if (this.data.objectData.callouttext != undefined && this.data.objectData.callouttext != null && this.data.objectData.callouttext.length > 0) {
         if (this.data.objectData.callouttext.includes('~')) {
           this.calloutLabelSplit = this.data.objectData.callouttext.split('~'); 
@@ -2765,6 +2773,8 @@ AFRAME.registerComponent('mod_object', {
         this.calloutEntity = document.createElement("a-entity");
        
         this.calloutText = document.createElement("a-entity");
+                // this.calloutEntity.appendChild(this.calloutPanel);
+          this.calloutEntity.appendChild(this.calloutText);
         this.calloutEntity.id = "objCalloutEntity_" + this.data.objectData._id;
       
         this.calloutText.id = "objCalloutText_" + this.data.objectData._id;
@@ -2780,15 +2790,22 @@ AFRAME.registerComponent('mod_object', {
         this.calloutEntity.setAttribute('visible', false);
       
         // calloutEntity.setAttribute("render-order", "hud");
-        this.el.sceneEl.appendChild(this.calloutEntity);
-        // this.calloutEntity.appendChild(this.calloutPanel);
-        this.calloutEntity.appendChild(this.calloutText);
+        if (this.isNavAgent) {
+          this.el.appendChild(this.calloutEntity);
+          this.calloutEntity.setAttribute("position", "0 1 0");
+        } else {
+          this.el.sceneEl.appendChild(this.calloutEntity);
+        }
+
+
         let font = "Acme.woff"; 
         if (settings && settings.sceneFontWeb2 && settings.sceneFontWeb2.length) {
           font = settings.sceneFontWeb2;
         }
         // this.calloutPanel.setAttribute("position", '0 0 1'); 
-        this.calloutText.setAttribute("position", '0 0 1.25'); //offset the child on z toward camera, to prevent overlap on model
+        if (!this.isNavAgent) {
+          this.calloutText.setAttribute("position", '0 0 1.25'); //offset the child on z toward camera, to prevent overlap on model
+        }
         this.calloutText.setAttribute('troika-text', {
           fontSize: .1,
           baseline: "bottom",
@@ -2802,7 +2819,7 @@ AFRAME.registerComponent('mod_object', {
         });
         this.calloutText.setAttribute("overlay");
       } 
-    }
+    // }
     // if (this.data.objectData.synthNotes != undefined && this.data.objectData.synthNotes != null && this.data.objectData.synthNotes.length > 0) {
     if (this.data.objectData.tonejsPatch1 != undefined && this.data.objectData.tonejsPatch1 != null) {  
       this.el.setAttribute("mod_synth", "init");
@@ -2901,7 +2918,7 @@ AFRAME.registerComponent('mod_object', {
 
     this.el.addEventListener('model-loaded', () => {
 
-      console.log(this.data.objectData.name + " OBJMODEL LOAADIDE!!!" + JSON.stringify(this.data.locationData));
+      console.log(this.data.objectData.name + " OBJMODEL LOAADIDE!!!" + JSON.stringify(this.data.objectData));
       
       let pos = {};
       pos.x = this.data.locationData.x;
@@ -2946,6 +2963,32 @@ AFRAME.registerComponent('mod_object', {
             THREE.MathUtils.degToRad(rot.z)
           );
         }
+        console.log("OBJTYPE IS : " +this.data.objectData.objtype);
+        if (this.data.objectData.objtype === "Character") { 
+          // const vector = new THREE.Vector3();
+          
+          let skinnedMeshColliderEl = document.createElement("a-sphere"); //screw it, can't got the boundingbox fu to work...
+          skinnedMeshColliderEl.setAttribute("scale", ".5 1 .5"); //todo pass in scale
+          // skinnedMeshColliderEl.setObject3D(sphere);
+          if (settings && settings.debugMode) {
+            skinnedMeshColliderEl.setAttribute("material", {"color": "purple", "transparent": true, "opacity": 0.1});
+          } else {
+            skinnedMeshColliderEl.setAttribute("material", {"transparent": true, "opacity": 0});
+          }
+          skinnedMeshColliderEl.classList.add("activeObjexRay");
+          this.el.appendChild(skinnedMeshColliderEl);
+          
+          skinnedMeshColliderEl.setAttribute("position", "0 1 0"); //to do mod by scale
+          // console.log("character node name " + node.name);
+          // if (node instanceof THREE.Mesh) {
+          //   // 
+          //   console.log("character node mesh name " + node.name);
+          //   // const box = new THREE.Box3();
+          //     node.frustumCulled = false;
+              
+          // }
+          this.hasLocationCallout = true; //eg no background (thought or speech bubbgles)
+        }
       
       } else { //if we're equipped
         // this.el.setAttribute("rotation", rot);
@@ -2968,7 +3011,6 @@ AFRAME.registerComponent('mod_object', {
           this.el.setAttribute("mod_line", {"init": true});
         }
 
-       
 
 
       }
@@ -2976,7 +3018,7 @@ AFRAME.registerComponent('mod_object', {
         this.moveOnCurve(); //todo fix quats!
       }
       if (this.data.objectData.physics != undefined && this.data.objectData.physics != null && this.data.objectData.physics.toLowerCase() != "none") {
-        console.log("tryna add physics to mod_objecty " + this.data.objectData.name + " is equipped " + this.data.isEquipped);
+        console.log("tryna add physics to mod_objecty " + this.data.objectData.name + " is equipped " + this.data.isEquipped + " body " + this.data.objectData.physics);
         //  setTimeout(function(){  
           if (this.data.isEquipped) {
             // this.el.setAttribute('ammo-body', {type: 'kinematic', linearDamping: .1, angularDamping: .1});
@@ -2994,8 +3036,11 @@ AFRAME.registerComponent('mod_object', {
                 // this.el.setAttribute('trail', "");
                 // this.el.body.restitution = .9;
                 this.el.setAttribute('trail', "");
+            } else if (this.data.objectData.physics.toLowerCase() == "navmesh agent") {
+              this.el.setAttribute('ammo-body', {type: 'kinematic', emitCollisionEvents: true });
             } else {
-              this.el.setAttribute('ammo-body', { type: this.data.objectData.physics.toLowerCase(), emitCollisionEvents: true });
+              console.log("tryna set physics body "+ this.data.objectData.physics.toLowerCase());
+              this.el.setAttribute('ammo-body', { type: 'dynamic', emitCollisionEvents: true });
               //this.el.body.restitution = .9;
             }
           }
@@ -3071,7 +3116,14 @@ AFRAME.registerComponent('mod_object', {
             // this.el.setAttribute('fireworks_spawner', {type: 'fireball'});
             this.hasAudioTrigger = true;
           }
-          
+          if (this.data.eventData.toLowerCase().includes("agent")) { 
+            if (settings.useNavmesh) {
+              this.el.setAttribute("nav-agent", "");
+              this.el.setAttribute("nav-agent-controller", "");  
+              this.el.classList.add("nav_agent");
+              // this.el.setAttribute("mod_physics", {'model': 'agent', 'isTrigger': true});
+            }
+          }
 
           let worldPos = null;
           let hasAnims = false;
@@ -3089,7 +3141,7 @@ AFRAME.registerComponent('mod_object', {
               
               if (clips[i].name.includes("mouthopen")) {
                 moIndex = i;
-                mouthClips.push(clips[i]);
+                this.mouthClips.push(clips[i]);
               }
               // if (clips[i].name.includes("mouthopen")) {
               //   moIndex = i;
@@ -3097,23 +3149,23 @@ AFRAME.registerComponent('mod_object', {
               if (clips[i].name.toLowerCase().includes("mixamo")) {
                 console.log("gotsa mixamo idle anim");
                 idleIndex = i;
-                idleClips.push(clips[i]);
+                this.idleClips.push(clips[i]);
               }
               if (clips[i].name.toLowerCase().includes("take 001")) {
                 idleIndex = i;
-                idleClips.push(clips[i]);
+                this.idleClips.push(clips[i]);
               }
               if (clips[i].name.toLowerCase().includes("idle")) {
                 idleIndex = i;
-                idleClips.push(clips[i]);
+                this.idleClips.push(clips[i]);
               }
               if (clips[i].name.toLowerCase().includes("walk")) {
                 walkIndex = i;
-                walkClips.push(clips[i]);
+                this.walkClips.push(clips[i]);
               }
               if (clips[i].name.toLowerCase().includes("dance")) { //etc..
                 danceIndex = i;
-                danceClips.push(clips[i]);
+                this.danceClips.push(clips[i]);
               }
               if (i == clips.length - 1) {
                   if (hasAnims) {
@@ -3142,7 +3194,8 @@ AFRAME.registerComponent('mod_object', {
           }
           obj.traverse(node => { //spin through object heirarchy to sniff for special names, e.g. "eye"
             this.nodeName = node.name;
-           
+            node.frustumCulled = false; //just turn off for everything, objects are special...
+
             if (this.data.eventData.includes("eyelook") && this.nodeName.includes("eye")) { //must be set in eventData and as mesh name
               if (node instanceof THREE.Mesh) {
               this.meshChildren.push(node);
@@ -3150,7 +3203,7 @@ AFRAME.registerComponent('mod_object', {
               }
             }
            
-          });
+          });         
           
           for (i = 0; i < this.meshChildren.length; i++) { //apply mods to the special things
             console.log("gotsa special !! meshChild " + this.meshChildren[i].name);
@@ -3159,7 +3212,7 @@ AFRAME.registerComponent('mod_object', {
                 let child = this.el.object3D.getObjectByName(this.meshChildren[i].name, true);
                 child.visible = false;
 
-                // let triggerEl = document.createElement('a-entity');
+                // let triggerEl = document.createElement('a-entity'); //later
                 // var targetPos = new THREE.Vector3();
                 // child.getWorldPosition(targetPos);
                 // this.child = child.clone();
@@ -3236,6 +3289,10 @@ AFRAME.registerComponent('mod_object', {
             this.textData = this.data.eventData.mainTextString.split("~");
           } else {
             // this.textData = 
+            if (this.data.eventData.toLowerCase().includes("callout") ) {
+              hasCallout = true;
+              this.textData = this.data.locationData.description;
+            }
           }
 
           if (this.tags != null && this.tags.includes("thoughtbubble")) {
@@ -3382,7 +3439,8 @@ AFRAME.registerComponent('mod_object', {
     }); //end model-loaded listener
 
     this.el.addEventListener('body-loaded', () => {  //body-loaded event = physics ready on obj
-      this.el.setAttribute('ammo-shape', {type: that.data.objectData.collidertype.toLowerCase()});
+      console.log("loaded mod_object physics body now applying shape: : " + this.data.objectData.collidertype.toLowerCase());
+      this.el.setAttribute('ammo-shape', {type: this.data.objectData.collidertype.toLowerCase()});
       // console.log("ammo shape is " + JSON.stringify(that.el.getAttribute('ammo-shape')));
       if (this.data.applyForceToNewObject) {
         // this.el.setAttribute("aabb-collider", {objects: ".activeObjexRay"});
@@ -3402,7 +3460,7 @@ AFRAME.registerComponent('mod_object', {
             triggerAudioController.components.trigger_audio_control.playAudioAtPosition(this.hitpoint, this.distance, ["hit"]);
           }
         } else {
-          console.log("COLLIDER HIT "  + this.el.id + " vs " + e.detail.targetEl.id);
+          // console.log("COLLIDER HIT "  + this.el.id + " vs " + e.detail.targetEl.id);
           // console.log("NOT TRIGGER COLLIDED "  + this.el.object3D.name + " " + e.detail.targetEl.object3D.name + " has mod_object " + mod_obj_component);
           // if (this.el != e.detail.targetEl) {
             
@@ -3493,16 +3551,18 @@ AFRAME.registerComponent('mod_object', {
     
     }); //end body-loaded listener
 
+    
 
 
     this.el.addEventListener('raycaster-intersected', e =>{  
         this.raycaster_e = e.detail.el;
         // that.raycaster = this.raycaster;
         this.intersection = this.raycaster_e.components.raycaster.getIntersection(this.el, true);
-        this.hitpoint = this.intersection.point;
-        that.hitpoint = this.hitpoint;
-        console.log(that.data.objectData.name + " with tags " + this.tags);
-       
+        if (this.intersection) {
+          this.hitpoint = this.intersection.point;
+          that.hitpoint = this.hitpoint;
+          console.log(that.data.objectData.name + " with tags " + this.tags);
+        }
     });
     this.el.addEventListener("raycaster-intersected-cleared", () => {
         // console.log("intersection cleared");
@@ -3516,7 +3576,8 @@ AFRAME.registerComponent('mod_object', {
     });
 
     this.el.addEventListener('mouseenter', (evt) => {
-      evt.preventDefault();
+      console.log("mouse enter mod_object "+ this.el.id);
+      // evt.preventDefault();
       if (!this.data.isEquipped) {
         if (posRotReader != null) {
           this.playerPosRot = posRotReader.returnPosRot(); 
@@ -3545,9 +3606,11 @@ AFRAME.registerComponent('mod_object', {
           ////////TODO - wire in to Hightlight Options / Callout Options in Object view
           if (this.tags != null && this.tags.includes("thoughtbubble")) {
             calloutOn = true;
+
             this.bubble = sceneEl.querySelector('.bubble');
             this.bubbleText = sceneEl.querySelector('.bubbleText');
             this.bubbleBackground = sceneEl.querySelector('.bubbleBackground');
+            
             this.bubble.setAttribute("visible", true);
             let pos = evt.detail.intersection.point; //hitpoint on model
             this.bubble.setAttribute('position', pos);
@@ -3627,9 +3690,15 @@ AFRAME.registerComponent('mod_object', {
             if (this.calloutEntity != null && this.distance < 20) {
               this.calloutEntity.setAttribute('visible', false);
               console.log("trna scale to distance :" + this.distance);
-              this.calloutEntity.setAttribute("position", this.pos);
+           
+              
               this.calloutEntity.setAttribute('visible', true);
               this.calloutEntity.setAttribute('scale', {x: this.distance * .25, y: this.distance * .25, z: this.distance * .25} );
+              if (!this.isNavAgent) {
+                this.calloutEntity.setAttribute("position", this.pos);
+              } else {
+                this.calloutEntity.setAttribute("position", "0 2 0");
+              }
               let theLabel = this.data.objectData.labeltext;
               let calloutString = theLabel;
               if (this.calloutLabelSplit.length > 0) {
@@ -3642,6 +3711,8 @@ AFRAME.registerComponent('mod_object', {
               }
 
             this.calloutText.setAttribute("troika-text", {value: calloutString});
+            } else {
+              console.log("mod_object no callout " + this.calloutEntity + " " + this.distance);
             }
 
             if (this.hasHighlightAction) {
@@ -3808,6 +3879,35 @@ AFRAME.registerComponent('mod_object', {
       }
 
     });
+  },
+  playWalkAnimation: function () { //to be used be external movement components, e.g. nav-agent 
+    let theEl = this.el;
+    let clips = this.walkClips;  //to pass below the listeners..?
+    console.log("tryna walk with walkclips " + this.walkClips.length );
+    if (this.walkClips.length > 0) {
+    var clip = this.walkClips[Math.floor(Math.random()*this.walkClips.length)];
+      theEl.setAttribute('animation-mixer', {
+        // "clip": clips[danceIndex].name,
+        "clip": clip.name,
+        "loop": "repeat",
+        "crossFadeDuration": 1
+        // "repetitions": Math.floor(Math.random()*2)
+        // "timeScale": .75 + Math.random()/2
+      });
+      
+      theEl.addEventListener('animation-finished', function () { 
+        theEl.removeAttribute('animation-mixer');
+        var clip = clips[Math.floor(Math.random()*clips.length)];
+        theEl.setAttribute('animation-mixer', {
+          // "clip": clips[danceIndex].name,
+          "clip": clip.name,
+          "loop": "repeat",
+          "crossFadeDuration": 1
+          // "repetitions": Math.floor(Math.random()*2),
+          // "timeScale": .75 + Math.random()/2
+        });
+      });
+    }
   },
   equippedRayHit: function (hitpoint) { //nope, just added to mod_object if it's equipped and stuff
     console.log( "equippedRayHit@!");
@@ -4252,7 +4352,7 @@ AFRAME.registerComponent('mod_object', {
     }
   }
  
-}); //mod_object end
+}); ///////////////////////// MOD_OBJECT END
 
 function getRandomIntInclusive(min, max) {
   min = Math.ceil(min);
@@ -5684,9 +5784,9 @@ AFRAME.registerComponent('mod_model', {
                 const max = 1;
 
                 calloutOn = true;
-                this.bubble = sceneEl.querySelector('.bubble');
-                this.bubbleText = sceneEl.querySelector('.bubbleText');
-                this.bubbleBackground = sceneEl.querySelector('.bubbleBackground');
+                this.bubble = sceneEl.querySelector('.bubble'); //TODO should not be a class, but a generated id
+                this.bubbleText = sceneEl.querySelector('.bubbleText'); //same
+                this.bubbleBackground = sceneEl.querySelector('.bubbleBackground'); //same
     
                
                 
@@ -5755,7 +5855,7 @@ AFRAME.registerComponent('mod_model', {
 
             } else {
               if (this.hasLocationCallout || this.data.markerType === "character") {
-                console.log("not bubble callout is " + textData[textIndex]);
+                console.log("mod_model not bubble callout is " + textData[textIndex]);
                 distance = evt.detail.intersection.distance;
                   // this.bubble.setAttribute('position', pos);
                   this.bubble.setAttribute("visible", true);
