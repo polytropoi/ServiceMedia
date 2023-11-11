@@ -3042,7 +3042,7 @@ AFRAME.registerComponent('mod_object', {
               this.el.setAttribute('ammo-body', {type: 'kinematic', emitCollisionEvents: true });
             } else {
               console.log("tryna set physics body "+ this.data.objectData.physics.toLowerCase());
-              this.el.setAttribute('ammo-body', { type: 'dynamic', emitCollisionEvents: true });
+              this.el.setAttribute('ammo-body', { type: this.data.objectData.physics.toLowerCase(), emitCollisionEvents: true });
               //this.el.body.restitution = .9;
             }
           }
