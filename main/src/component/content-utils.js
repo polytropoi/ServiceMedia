@@ -3281,7 +3281,7 @@ AFRAME.registerComponent('mod_object', {
           var sceneEl = document.querySelector('a-scene');
           let hasCallout = false;
           let calloutOn = false;
-
+          let eventData = this.data.eventData;
           /// SHOULD INSTEAD LOOK AT THE OBJECT TEXT PROPS?!?
           // if (this.tags != null && this.tags.includes("thoughtbubble") && !this.data.eventData.toLowerCase().includes("undefined") && this.data.eventData.toLowerCase().includes("main") && this.data.eventData.toLowerCase().includes("text")) {
           if (this.data.eventData.toLowerCase().includes("main") && this.data.eventData.toLowerCase().includes("text")) {
@@ -3298,7 +3298,6 @@ AFRAME.registerComponent('mod_object', {
           }
 
           if (this.tags != null && this.tags.includes("thoughtbubble")) {
-
           
             hasCallout = true;
           } 
@@ -3312,7 +3311,7 @@ AFRAME.registerComponent('mod_object', {
             bubble.setAttribute("rotation", "0 0 0"); 
             bubble.setAttribute("scale", "2 2 2"); 
             bubble.setAttribute("visible", false);
-            if (this.data.eventData.toLowerCase().includes('agent')) {
+            if (eventData.includes("agent")) {
               this.el.appendChild(bubble); //make it a child if
             } else {
               sceneEl.appendChild(bubble); //or else put at top

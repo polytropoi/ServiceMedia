@@ -17439,7 +17439,7 @@ function getAllPeople() {
             var ctx2 = document.getElementById("topPages");
             let toppagesLabels = [];
             let toppagesCounts = [];
-            let showNumber = urlCounts.length < 8 ? urlCounts.length : 7;
+            let showNumber = urlCounts.length < 8 ? urlCounts.length : 10;
             console.log(showNumber);
             for (let i = 0; i < showNumber; i++) {
                 toppagesLabels.push(urlCounts[i].url);
@@ -17469,13 +17469,13 @@ function getAllPeople() {
                     display: false
                     },
                     ticks: {
-                    maxTicksLimit: 6
+                    maxTicksLimit: 10
                     }
                 }],
                 yAxes: [{
                     ticks: {
                     min: 0,
-                    max: 100,
+                    max: 1000,
                     maxTicksLimit: 5
                     },
                     gridLines: {
