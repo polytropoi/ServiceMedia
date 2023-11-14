@@ -192,7 +192,7 @@ $(function() {
             }
          }
       }
-      console.log("skyboxIDS: " + JSON.stringify(settings));
+      console.log("settings: " + JSON.stringify(settings));
       if (settings.skyboxIDs != null) {
          
          skyboxEl = document.createElement('a-entity');

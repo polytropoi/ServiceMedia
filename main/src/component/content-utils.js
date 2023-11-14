@@ -2577,11 +2577,14 @@ AFRAME.registerComponent('mod_object', {
     this.loadAction = null;
     this.highlightAction = null;
     this.collideAction = null;
+    this.findAction = null;
     this.synth = null;
     this.hasSynth = false;
     this.mod_physics = "";
     this.pushForward = false;
     this.followPath = false;
+    this.targetLocations = [];
+
     this.lookVector = new THREE.Vector3( 0, 0, -1 );
     // this.startPoint = new THREE.Vector3();
     // this.tempVector = new THREE.Vector3();
@@ -2606,14 +2609,7 @@ AFRAME.registerComponent('mod_object', {
     this.el.sceneEl.object3D.add(this.lineObject);
     this.curve = null;
     this.isTriggered = false;
-    // could be any number
 
-    // let tG = new THREE.BufferGeometry().setFromPoints([
-    //   new THREE.Vector3(),
-    //   new THREE.Vector3()
-    // ]);
-    // let tM = new THREE.LineBasicMaterial({color: "yellow"});
-    // this.beam = new THREE.Line(tG, tM);
 
 
     this.textIndex = 0;
@@ -2716,17 +2712,23 @@ AFRAME.registerComponent('mod_object', {
 
       
     if (this.tags == null) {
-      console.log(this.data.objectData.name + "this.data.tags is null! loctags: " + this.data.locationData.locationTags + " objtags: " + this.data.objectData.tags);
-
+      // console.log(this.data.objectData.name + "this.data.tags is null! loctags: " + this.data.locationData.locationTags + " objtags: " + this.data.objectData.tags);
+      this.tags = [];
       if (this.data.locationData && this.data.locationData.locationTags != undefined  && this.data.locationData.locationTags != 'undefined' && this.data.locationData.locationTags.length > 0) {
-        console.log(this.data.objectData.name + " gotsome location tags: " + this.data.locationData.locationTags);
+        // console.log(this.data.objectData.name + " gotsome location tags: " + this.data.locationData.locationTags);
         this.tags = this.data.locationData.locationTags;
-      } else if (this.data.objectData.tags != undefined && this.data.objectData.tags != null && this.data.objectData.tags != "undefined" && this.data.objectData.tags.length > 0) {
-        console.log(this.data.objectData.name + " gotsome tags: " + this.data.objectData.tags);
-        this.tags = this.data.objectData.tags;
+        
+      } 
+      if (this.data.objectData.tags != undefined && this.data.objectData.tags != null && this.data.objectData.tags != "undefined" && this.data.objectData.tags.length > 0) {
+        // console.log(this.data.objectData.name + " gotsome tags: " + this.data.objectData.tags);
+        this.tags = [...this.tags, ...this.data.objectData.tags]; //spread operator!
       }
       // if (this.data.locationData && this.data.locationData.markerType) {
-      //   console.log(this.data.objectData.name + " gotsa markerType : "+ this.data.locationData.markerType);
+        console.log(this.data.objectData.name + " gots tags: " + this.tags + " markerType : "+ this.data.locationData.markerType);
+        for (let i = 0; i < this.tags.length; i++) {
+          console.log("adding class with tag " + this.tags[i]);
+          this.el.classList.add(this.tags[i]);
+        }
       // }
     } else {
       console.log("this.data.tags is not null!");
@@ -2745,14 +2747,7 @@ AFRAME.registerComponent('mod_object', {
         }
       }   
     }, 2000);
-    // if (this.tags && this.tags.includes("loop")){
-          
-    //   var triggerAudioController = document.getElementById("triggerAudio");
-    //   if (triggerAudioController != null) {
-
-    //     triggerAudioController.components.trigger_audio_control.loopAndFollow(this.el.id, this.tags);
-    //   }
-    // }     
+     
     if (this.data.objectData.physics === "Navmesh Agent" || this.data.eventData.toLowerCase().includes("agent")) { 
       this.isNavAgent = true;
       this.navAgentController = this.el.components.nav_agent_controller;
@@ -2879,6 +2874,10 @@ AFRAME.registerComponent('mod_object', {
         }
         if (this.data.objectData.actions[a].actionType.toLowerCase() == "use") {
           // this.hasDropAction = true;
+        }
+        if (this.data.objectData.actions[a].actionType.toLowerCase() == "find") {
+          // this.hasDropAction = true;
+          this.findAction = this.data.objectData.actions[a];
         }
       }
     }
@@ -3450,7 +3449,7 @@ AFRAME.registerComponent('mod_object', {
 
       this.el.addEventListener("collidestart", (e) => {
         e.preventDefault();
-        let mod_obj_component = e.detail.targetEl.components.mod_object;
+        let targetModObjComponent = e.detail.targetEl.components.mod_object;
         // console.log("mod_physics collisoin with object with :" + this.el.id + " " + e.detail.targetEl.classList);
         if (this.data.isTrigger) { //
           console.log("TRIGGER HIT "  + this.el.id + " " + e.detail.targetEl.classList);
@@ -3465,18 +3464,19 @@ AFRAME.registerComponent('mod_object', {
           // console.log("NOT TRIGGER COLLIDED "  + this.el.object3D.name + " " + e.detail.targetEl.object3D.name + " has mod_object " + mod_obj_component);
           // if (this.el != e.detail.targetEl) {
             
-            if (mod_obj_component != null) {
-              console.log(this.data.objectData.name + "gotsa collision with " + mod_obj_component.data.objectData.name);
-              if (this.data.objectData.name != mod_obj_component.data.objectData.name) { //don't trigger yerself, but what if...?
+            if (targetModObjComponent != null) {
+              console.log(this.data.objectData.name + " gotsa collision with " + targetModObjComponent.data.objectData.name);
+              if (this.data.objectData.name != targetModObjComponent.data.objectData.name) { //don't trigger yerself, but what if...?
                 // console.log("actions: " + JSON.stringify(mod_obj_component.data.objectData.actions));
                 var triggerAudioController = document.getElementById("triggerAudio");
                 if (triggerAudioController != null) {
                   triggerAudioController.components.trigger_audio_control.playAudioAtPosition(this.el.object3D.position, window.playerPosition.distanceTo(this.el.object3D.position), ["hit, bounce"]);
                 }
-                if (mod_obj_component.data.objectData.actions) {
-                  for (let i = 0; i < mod_obj_component.data.objectData.actions.length; i++) {
-                    if (mod_obj_component.data.objectData.actions[i].actionType.toLowerCase() == "collide") {
-                      if (mod_obj_component.data.objectData.actions[i].sourceObjectMod.toLowerCase() == "remove") {
+                if (targetModObjComponent.data.objectData.actions) {
+                  for (let i = 0; i < targetModObjComponent.data.objectData.actions.length; i++) {
+                    console.log(this.data.objectData.name + "checking actions on target " + targetModObjComponent.data.objectData.name + " : " + targetModObjComponent.data.objectData.actions[i].actionName );
+                    if (targetModObjComponent.data.objectData.actions[i].actionType.toLowerCase() == "collide") {
+                      if (targetModObjComponent.data.objectData.actions[i].sourceObjectMod.toLowerCase() == "remove") {
                         let trailComponent = e.detail.targetEl.components.trail;
                         if (trailComponent) {
                           trailComponent.reset();
@@ -3487,7 +3487,7 @@ AFRAME.registerComponent('mod_object', {
                         // e.detail.targetEl.parentNode.removeChild(e.detail.targetEl);
 
                       }
-                      if (mod_obj_component.data.objectData.actions[i].sourceObjectMod.toLowerCase() == "replace object") {
+                      if (targetModObjComponent.data.objectData.actions[i].sourceObjectMod.toLowerCase() == "replace object") {
                         // console.log("tryna replace object...");
                         let trailComponent = e.detail.targetEl.components.trail;
                         if (trailComponent) {
@@ -3499,7 +3499,7 @@ AFRAME.registerComponent('mod_object', {
                         }
                         // e.detail.targetEl.parentNode.removeChild(e.detail.targetEl);
                         let objexEl = document.getElementById('sceneObjects');    
-                        let objectData = objexEl.components.mod_objex.returnObjectData(mod_obj_component.data.objectData.actions[i].objectID);
+                        let objectData = objexEl.components.mod_objex.returnObjectData(targetModObjComponent.data.objectData.actions[i].objectID);
                         // if (objectData == null) {
 
                         //   // objectData = objexEl.components.mod_objex.returnObjectData(mod_obj_component.data.objectData.actions[i].objectID); //try again, if it's not in the sceneobjectdata it will make a special request
@@ -3520,10 +3520,11 @@ AFRAME.registerComponent('mod_object', {
                           this.objEl.id = "obj" + objectData._id + "_" + this.locData.timestamp;
                           sceneEl.appendChild(this.objEl);
                         } else {
-                          console.log("caint find object "+ mod_obj_component.data.objectData.actions[i].objectID +", tryna fetch it..");
-                          FetchSceneInventoryObject(mod_obj_component.data.objectData.actions[i].objectID);
+                          console.log("caint find object "+ targetModObjComponent.data.objectData.actions[i].objectID +", tryna fetch it..");
+                          FetchSceneInventoryObject(targetModObjComponent.data.objectData.actions[i].objectID);
                         }
-                      } 
+                      }
+ 
                     }
                   }
                 }
@@ -3545,6 +3546,21 @@ AFRAME.registerComponent('mod_object', {
               //   document.getElementById(me).remove();
               // }
               
+            }
+            if (this.findAction) { //check if we hit something we're looking for
+              if (this.findAction.tags) {
+                for (let i = 0; i < this.findAction.tags.length; i++) {
+                  if (e.detail.targetEl.classList.contains(this.findAction.tags[i])) {
+                    console.log("I FOUND ONE!");
+                    if (this.navAgentController) {
+                      this.navAgentController.updateAgentState("pause"); //
+                    } else {
+                      this.navAgentController = this.el.components.nav_agent_controller;
+                    }
+                  }
+                  
+                }
+              }
             }
           // }
         }
@@ -3723,23 +3739,46 @@ AFRAME.registerComponent('mod_object', {
 
           if (this.isNavAgent) {
             if (this.navAgentController) {
-              if (this.idleClips.length) {
-                this.navAgentController.currentState = "pause";
-                this.navAgentController.agentAction();
-                var clip = this.idleClips[Math.floor(Math.random()*this.idleClips.length)];
-                this.el.setAttribute('animation-mixer', {
-                  "clip": clip.name,
-                  "loop": "repeat",
-                  "crossFadeDuration": .5
-                });
-                
+              
+              // if (this.idleClips.length) {
+              //   // this.navAgentController.currentState = "pause";
+               
+              //   var clip = this.idleClips[Math.floor(Math.random()*this.idleClips.length)];
+              //   this.el.setAttribute('animation-mixer', {
+              //     "clip": clip.name,
+              //     "loop": "repeat",
+              //     "crossFadeDuration": .1
+              //   });
+              //   this.navAgentController.updateAgentState("pause");
 
-              } else {
-                console.log("this.idleClips is empty!");
-              }
+              // } else {
+              //   console.log("this.idleClips is empty on " + this.el.id);
+              // }
             } else {
               this.navAgentController = this.el.components.nav_agent_controller;
             } 
+            if (this.findAction) {
+              
+              for (let i = 0; i < this.findAction.tags.length; i++) {
+                console.log("looking for objs with class " + this.findAction.tags[i]);
+                let targetObjects = document.getElementsByClassName(this.findAction.tags[i]);
+                if (targetObjects) {
+                  console.log("gots target objects " + targetObjects.length);
+                  for (let l = 0; l < targetObjects.length; l++) {
+                    let targetLoc = targetObjects[l].getAttribute("position");
+                    this.targetLocations.push(targetLoc);
+                  }
+                } else {
+                  console.log("didn't find no targetObjects");
+                }
+                
+              }
+              if (this.targetLocations.length) {
+                // this.navAgentController.seekTargetLocation();
+                this.navAgentController.updateAgentState("target"); //instead of waypoints
+              }
+            }
+
           }
           if (this.tags != undefined && this.tags != null && this.tags != "undefined") { //MAYBE SHOULD BE UNDER RAYHIT?
             console.log("tryna play audio with tags " + this.tags);
@@ -3780,18 +3819,18 @@ AFRAME.registerComponent('mod_object', {
       if (this.isNavAgent) {
         if (this.navAgentController) {
          
-          setTimeout(() => {
-            if (this.navAgentController.currentState == "pause") {
-            var clip = this.walkClips[Math.floor(Math.random()*this.walkClips.length)];
-            this.el.setAttribute('animation-mixer', {
-              "clip": clip.name,
-              "loop": "repeat",
-              "crossFadeDuration": .5
-            });
-            this.navAgentController.currentState = "random";
-            this.navAgentController.agentAction();
-            }
-          }, 5000);
+          // setTimeout(() => {
+          //   if (this.navAgentController.currentState == "pause") {
+          //   var clip = this.walkClips[Math.floor(Math.random()*this.walkClips.length)];
+          //   this.el.setAttribute('animation-mixer', {
+          //     "clip": clip.name,
+          //     "loop": "repeat",
+          //     "crossFadeDuration": .5
+          //   });
+          //   this.navAgentController.currentState = "random";
+          //   this.navAgentController.agentAction();
+          //   }
+          // }, 5000);
 
           
         } else {
@@ -3922,7 +3961,75 @@ AFRAME.registerComponent('mod_object', {
 
     });
   },
-  playWalkAnimation: function () { //to be used be external movement components, e.g. nav-agent 
+  playAnimation: function (animState) {
+    if (this.navAgentController) {
+    console.log("tryna play animState " + animState);
+     switch (animState) { 
+       case "random": 
+       if (this.walkClips.length > 0) {
+         var clip = this.walkClips[Math.floor(Math.random()*this.walkClips.length)];
+           this.el.setAttribute('animation-mixer', {
+             "clip": clip.name,
+             "loop": "repeat",
+             "crossFadeDuration": 1,
+             "timeScale": this.navAgentController.currentSpeed
+           });
+           this.el.addEventListener('animation-finished', function () { 
+             this.el.removeAttribute('animation-mixer');
+             var clip = this.walkClips[Math.floor(Math.random()*this.walkClips.length)];
+             this.el.setAttribute('animation-mixer', {
+               "clip": clip.name,
+               "loop": "repeat",
+               "crossFadeDuration": 1,
+               "timeScale": this.navAgentController.currentSpeed
+             });
+           });
+         } else {
+           console.log("no walk clips found!");
+         }
+       break;
+ 
+       case "pause": 
+       if (this.idleClips.length > 0) {
+         var clip = this.idleClips[Math.floor(Math.random()*this.idleClips.length)];
+           this.el.setAttribute('animation-mixer', {
+             "clip": clip.name,
+             "loop": "repeat",
+             "crossFadeDuration": 1,
+             "timeScale": this.navAgentController.currentSpeed
+           });
+           this.el.addEventListener('animation-finished', function () { 
+             this.el.removeAttribute('animation-mixer');
+             var clip = this.idleClips[Math.floor(Math.random()*this.idleClips.length)];
+             this.el.setAttribute('animation-mixer', {
+               "clip": clip.name,
+               "loop": "repeat",
+               "crossFadeDuration": 1,
+               "timeScale": this.navAgentController.currentSpeed
+             });
+           });
+         }  else {
+           console.log("no idle clips found!");
+         }
+       break;  
+       case "target": 
+       if (this.walkClips.length > 0) {
+         var clip = this.walkClips[Math.floor(Math.random()*this.walkClips.length)];
+           this.el.setAttribute('animation-mixer', {
+             "clip": clip.name,
+             "loop": "repeat",
+             "crossFadeDuration": 1
+             // "repetitions": Math.floor(Math.random()*2)
+             // "timeScale": .75 + Math.random()/2
+           });
+         }
+       break;
+     }
+    } else {
+      this.navAgentController = this.el.components.nav_agent_controller;
+    }
+   },
+  playWalkAnimation: function () { //deprecated, handled by playAnimation above
     let theEl = this.el;
     let clips = this.walkClips;  //to pass below the listeners..?
     console.log("tryna walk with walkclips " + this.walkClips.length );
@@ -3941,12 +4048,9 @@ AFRAME.registerComponent('mod_object', {
         theEl.removeAttribute('animation-mixer');
         var clip = clips[Math.floor(Math.random()*clips.length)];
         theEl.setAttribute('animation-mixer', {
-          // "clip": clips[danceIndex].name,
           "clip": clip.name,
           "loop": "repeat",
           "crossFadeDuration": 1
-          // "repetitions": Math.floor(Math.random()*2),
-          // "timeScale": .75 + Math.random()/2
         });
       });
     }
@@ -4666,6 +4770,10 @@ AFRAME.registerComponent('mod_model', {
       let mouthClips = [];
 
       this.walkClips = walkClips;
+      this.danceClips = danceClips;
+      this.idleClips = idleClips;
+      // this.walkClips = [];
+      this.mouthClips = mouthClips;
       
       let mixer = null;
       let camera = null;
@@ -6087,7 +6195,75 @@ AFRAME.registerComponent('mod_model', {
     //placeholder
 
   },
-  playWalkAnimation: function () { //to be used be external movement components, e.g. nav-agent 
+  playAnimation: function (animState) {
+    if (this.navAgentController) {
+    // console.log("tryna play animState " + animState);
+     switch (animState) { 
+       case "random": 
+       if (this.walkClips.length > 0) {
+         var clip = this.walkClips[Math.floor(Math.random()*this.walkClips.length)];
+           this.el.setAttribute('animation-mixer', {
+             "clip": clip.name,
+             "loop": "repeat",
+             "crossFadeDuration": 1,
+             "timeScale": this.navAgentController.currentSpeed
+           });
+           this.el.addEventListener('animation-finished', function () { 
+             this.el.removeAttribute('animation-mixer');
+             var clip = this.walkClips[Math.floor(Math.random()*this.walkClips.length)];
+             this.el.setAttribute('animation-mixer', {
+               "clip": clip.name,
+               "loop": "repeat",
+               "crossFadeDuration": 1,
+               "timeScale": this.navAgentController.currentSpeed
+             });
+           });
+         } else {
+           console.log("no walk clips found!");
+         }
+       break;
+ 
+       case "pause": 
+       if (this.idleClips.length > 0) {
+         var clip = this.idleClips[Math.floor(Math.random()*this.idleClips.length)];
+           this.el.setAttribute('animation-mixer', {
+             "clip": clip.name,
+             "loop": "repeat",
+             "crossFadeDuration": 1,
+             "timeScale": this.navAgentController.currentSpeed
+           });
+           this.el.addEventListener('animation-finished', function () { 
+             this.el.removeAttribute('animation-mixer');
+             var clip = this.idleClips[Math.floor(Math.random()*this.idleClips.length)];
+             this.el.setAttribute('animation-mixer', {
+               "clip": clip.name,
+               "loop": "repeat",
+               "crossFadeDuration": 1,
+               "timeScale": this.navAgentController.currentSpeed
+             });
+           });
+         }  else {
+           console.log("no idle clips found!");
+         }
+       break;  
+       case "target": 
+       if (this.walkClips.length > 0) {
+         var clip = this.walkClips[Math.floor(Math.random()*this.walkClips.length)];
+           this.el.setAttribute('animation-mixer', {
+             "clip": clip.name,
+             "loop": "repeat",
+             "crossFadeDuration": 1
+             // "repetitions": Math.floor(Math.random()*2)
+             // "timeScale": .75 + Math.random()/2
+           });
+         }
+       break;
+     }
+    } else {
+      this.navAgentController = this.el.components.nav_agent_controller;
+    }
+   },
+  playWalkAnimation: function () { //deprecated, handled by playAnimation above
     let theEl = this.el;
     let clips = this.walkClips;  //to pass below the listeners..?
     console.log("tryna walk with walkclips " + this.walkClips.length );
