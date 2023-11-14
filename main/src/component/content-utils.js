@@ -2727,7 +2727,12 @@ AFRAME.registerComponent('mod_object', {
         console.log(this.data.objectData.name + " gots tags: " + this.tags + " markerType : "+ this.data.locationData.markerType);
         for (let i = 0; i < this.tags.length; i++) {
           console.log("adding class with tag " + this.tags[i]);
-          this.el.classList.add(this.tags[i]);
+          if (this.tags[i].includes(" ")) {
+            console.log("cain't put space in classname : " + this.tags[i]);
+          } else {
+            this.el.classList.add(this.tags[i]);
+          }
+          
         }
       // }
     } else {
