@@ -543,9 +543,9 @@ webxr_router.get('/:_id', function (req, res) {
     enviromentScript = ""; //for aframe env component
     
     // let aframeScriptVersion = "<script src=\x22https://aframe.io/releases/1.3.0/aframe.min.js\x22></script>";
-    let aframeScriptVersion = "<script src=\x22https://cdn.jsdelivr.net/npm/aframe@1.4.2/dist/aframe-master.min.js\x22></script>";
-    
-    
+    // let aframeScriptVersion = "<script src=\x22https://cdn.jsdelivr.net/npm/aframe@1.4.2/dist/aframe-master.min.js\x22></script>";
+    let aframeScriptVersion = "<script src=\x22https://aframe.io/releases/1.5.0/aframe.min.js\x22></script>";
+
     let surfaceScatterScript = "";
     let locationData = "";
     let modelData = "";
@@ -1483,7 +1483,7 @@ webxr_router.get('/:_id', function (req, res) {
                                     
                                     // wasd = "extended_wasd_thirdperson=\x22fly: false; moveSpeed: "+sceneResponse.scenePlayer.playerSpeed+"; inputType: keyboard\x22 " + navConstraint;
                                     cameraRigEntity = "<a-entity "+lookcontrols+" follow-camera=\x22target: #player\x22>" +
-                                        "<a-entity camera position=\x220 5 7\x22 ></a-entity>" +
+                                        "<a-entity id=\x22thirdPersonCamera\x22 camera position=\x220 5 7\x22 ></a-entity>" +
                                     "</a-entity>"+
                                     "<a-entity id=\x22cameraRig\x22 initializer "+
                                 
@@ -1784,13 +1784,19 @@ webxr_router.get('/:_id', function (req, res) {
                                 // ground = "<a-circle rotation='-90 0 0' position='0 -1 0' width='100' height='100'></a-circle>";
                             }
                             if (sceneResponse.sceneWater != null) {
+                                console.log("water: " + JSON.stringify(sceneResponse.sceneWater));
                                 if (sceneResponse.sceneWater.name == "water2") {
-                                    console.log("water: " + JSON.stringify(sceneResponse.sceneWater)); //these use the escaped aframe shaders, not the eval'd non escaped mode
+                                    // console.log("water: " + JSON.stringify(sceneResponse.sceneWater)); //these use the escaped aframe shaders, not the eval'd non escaped mode
                                     ocean = "<a-plane position=\x220  "+sceneResponse.sceneWater.level+" 0\x22 width=\x22256\x22 height=\x22256\x22 rotation=\x22-90 180 -90\x22 segments-height=\x22100\x22 segments-width=\x22100\x22 "+skyboxEnvMap+" material=\x22color: "+sceneResponse.sceneColor3+"; shader:makewaves; uMap: #water; repeat: 500 500;\x22></a-plane>";
                                     imageAssets = imageAssets + "<img id=\x22water\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/pics/water2c.jpeg\x22 crossorigin=\x22anonymous\x22>";
                                 } else if (sceneResponse.sceneWater.name == "water1") {
                                     ocean = "<a-plane position=\x220 "+sceneResponse.sceneWater.level+" 0\x22 width=\x22256\x22 height=\x22256\x22 rotation=\x22-90 180 -90\x22 segments-height=\x2264\x22 segments-width=\x2264\x22 "+skyboxEnvMap+" material=\x22shader:makewaves_small; color: "+sceneResponse.sceneColor4+";uMap: #water2; repeat: 500 500; transparent: true\x22></a-plane>";
                                     imageAssets = imageAssets + "<img id=\x22water2\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/pics/water2.png\x22 crossorigin=\x22anonymous\x22>";
+                                } else if (sceneResponse.sceneWater.name == "water3") {
+                                    ocean = "<a-plane position=\x220 "+sceneResponse.sceneWater.level+" 0\x22 width=\x22256\x22 height=\x22256\x22 rotation=\x22-90 180 -90\x22 segments-height=\x2216\x22 segments-width=\x2216\x22 "+skyboxEnvMap+" material=\x22shader:makewaves_small; color: "+sceneResponse.sceneColor4+";uMap: #water; repeat: 50 50; transparent: false\x22></a-plane>";
+                                    imageAssets = imageAssets + "<img id=\x22water\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/pics/watertile3.png\x22 crossorigin=\x22anonymous\x22>";
+                                } else if (sceneResponse.sceneWater.name == "water4") {
+                                    ocean = "<a-ocean></a-ocean>";
                                 }
                             }
                             if (sceneResponse.sceneUseHeightmap != null && sceneResponse.sceneUseHeightmap) {
@@ -2592,7 +2598,7 @@ webxr_router.get('/:_id', function (req, res) {
                                                 // if (locMdl.eventData.toLowerCase().includes("show")) {
                                                 //     navmeshEntity = "<a-entity id=\x22nav_mesh\x22 nav_mesh=\x22show: true;\x22 gltf-model=\x22#" + m_assetID + "\x22></a-entity>";
                                                 // }
-                                                navmeshEntity = "<a-entity id=\x22nav-mesh\x22 nav-mesh nav_mesh_controller visible=\x22"+visible+"\x22 gltf-model=\x22#" + m_assetID + "\x22></a-entity>"; //maybe id=nav-mesh so simple navmesh can use it too?
+                                                navmeshEntity = "<a-entity id=\x22nav-mesh\x22 material=\x22visible: false\x22 nav-mesh nav_mesh_controller visible=\x22"+visible+"\x22 gltf-model=\x22#" + m_assetID + "\x22></a-entity>"; //maybe id=nav-mesh so simple navmesh can use it too?
                                                 // if (locMdl.eventData.toLowerCase().includes("show")) {
                                                 //     navmeshEntity = "<a-entity id=\x22nav-mesh\x22 nav-mesh gltf-model=\x22#" + m_assetID + "\x22></a-entity>";
                                                 // }

@@ -1571,7 +1571,12 @@ AFRAME.registerComponent('entity-callout', {
       
         // this.calloutText = calloutText;
         // calloutText.setAttribute('overlay');
-        calloutEntity.setAttribute("look-at", "#player");
+        // calloutEntity.setAttribute("look-at", "#player");
+        if (settings && settings.sceneCameraMode == "Third Person") {
+          calloutEntity.setAttribute("look-at", "#thirdPersonCamera");
+        } else {
+          calloutEntity.setAttribute("look-at", "#player");
+        }
         calloutEntity.setAttribute('visible', false);
         // calloutEntity.setAttribute("render-order", "hud");
         sceneEl.appendChild(calloutEntity);
@@ -1626,7 +1631,13 @@ AFRAME.registerComponent('model-callout', {
      
       // this.calloutText = calloutText;
       // calloutText.setAttribute('overlay');
-      calloutEntity.setAttribute("look-at", "#player");
+      // calloutEntity.setAttribute("look-at", "#player");
+      if (settings && settings.sceneCameraMode == "Third Person") {
+        calloutEntity.setAttribute("look-at", "#thirdPersonCamera");
+      } else {
+        calloutEntity.setAttribute("look-at", "#player");
+      }
+      
       calloutEntity.setAttribute('visible', false);
       // calloutEntity.setAttribute("render-order", "hud");
       sceneEl.appendChild(calloutEntity);
@@ -2074,7 +2085,12 @@ AFRAME.registerComponent('model-callout', {
         this.el.setAttribute("position", '0 0 0');
         // this.calloutText = calloutText;
         // calloutText.setAttribute('overlay');
-        calloutEntity.setAttribute("look-at", "#player");
+        // calloutEntity.setAttribute("look-at", "#player");
+        if (settings && settings.sceneCameraMode == "Third Person") {
+          calloutEntity.setAttribute("look-at", "#thirdPersonCamera");
+        } else {
+          calloutEntity.setAttribute("look-at", "#player");
+        }
         calloutEntity.setAttribute('visible', false);
         
         // calloutEntity.setAttribute("render-order", "hud");
@@ -2627,6 +2643,7 @@ AFRAME.registerComponent('mod_object', {
     this.idleClips = [];
     this.walkClips = [];
     this.mouthClips = [];
+    this.talkClips = [];
 
     this.triggerAudioController = document.getElementById("triggerAudio");
     this.triggerOn = false;
@@ -2756,8 +2773,14 @@ AFRAME.registerComponent('mod_object', {
     if (this.data.objectData.physics === "Navmesh Agent" || this.data.eventData.toLowerCase().includes("agent")) { 
       this.isNavAgent = true;
       this.navAgentController = this.el.components.nav_agent_controller;
-    } 
 
+    } 
+    this.el.sceneEl.addEventListener('youtubeToggle', function (event) { //things to trigger on this model if youtube is playing
+      console.log("GOTSA YOUTUBNE EVENT: " + event.detail.isPlaying);  
+      if (event.detail.isPlaying) {
+        // this.el.components.nav_agent_controller.updateAgentState("dance");
+      } 
+    });
     this.hasPickupAction = false;
     this.hasTriggerAction = false;
     this.hasThrowAction = false;
@@ -2788,7 +2811,13 @@ AFRAME.registerComponent('mod_object', {
         // this.calloutPanel.setAttribute("scale", ".125 .1 .125");
         // this.calloutPanel.setAttribute("material", {'color': 'black', 'roughness': 1});
         // this.calloutPanel.setAttribute("overlay");
-        this.calloutEntity.setAttribute("look-at", "#player");
+        // this.calloutEntity.setAttribute("look-at", "#player");
+        if (settings && settings.sceneCameraMode == "Third Person") {
+          this.calloutEntity.setAttribute("look-at", "#thirdPersonCamera");
+        } else {
+          this.calloutEntity.setAttribute("look-at", "#player");
+        }
+        
         this.calloutEntity.setAttribute('visible', false);
       
         // calloutEntity.setAttribute("render-order", "hud");
@@ -3169,6 +3198,10 @@ AFRAME.registerComponent('mod_object', {
                 walkIndex = i;
                 this.walkClips.push(clips[i]);
               }
+              if (clips[i].name.toLowerCase().includes("talk")) {
+                talkIndex = i;
+                this.talkClips.push(clips[i]);
+              }
               if (clips[i].name.toLowerCase().includes("dance")) { //etc..
                 danceIndex = i;
                 this.danceClips.push(clips[i]);
@@ -3309,7 +3342,13 @@ AFRAME.registerComponent('mod_object', {
             let bubble = document.createElement("a-entity");
             this.bubble = bubble;
             console.log("made a bubble!" + bubble);
-            bubble.setAttribute("look-at", "#player");
+            // bubble.setAttribute("look-at", "#player");
+            if (settings && settings.sceneCameraMode == "Third Person") {
+              bubble.setAttribute("look-at", "#thirdPersonCamera");
+            } else {
+              bubble.setAttribute("look-at", "#player");
+            }
+            
             bubble.classList.add("bubble");
             bubble.setAttribute("position", "2 2 0");
             bubble.setAttribute("rotation", "0 0 0"); 
@@ -3339,7 +3378,14 @@ AFRAME.registerComponent('mod_object', {
             // bubbleText.setAttribute("visible", false);
             bubbleText.setAttribute("position", "0 0 1.1");
             bubbleText.setAttribute("scale", ".1 .1 .1"); 
-            bubbleText.setAttribute("look-at", "#player");
+
+            
+            // bubbleText.setAttribute("look-at", "#player");
+            if (settings && settings.sceneCameraMode == "Third Person") {
+              bubbleText.setAttribute("look-at", "#thirdPersonCamera");
+            } else {
+              bubbleText.setAttribute("look-at", "#player");
+            }
             bubbleText.setAttribute("width", 3);
             bubbleText.setAttribute("height", 2);
             bubble.appendChild(bubbleText);
@@ -3437,8 +3483,7 @@ AFRAME.registerComponent('mod_object', {
               });        
             }
           } 
-          
-
+         
 
         }
     }); //end model-loaded listener
@@ -3552,21 +3597,21 @@ AFRAME.registerComponent('mod_object', {
               // }
               
             }
-            if (this.findAction) { //check if we hit something we're looking for
-              if (this.findAction.tags) {
-                for (let i = 0; i < this.findAction.tags.length; i++) {
-                  if (e.detail.targetEl.classList.contains(this.findAction.tags[i])) {
-                    console.log("I FOUND ONE!");
-                    if (this.navAgentController) {
-                      this.navAgentController.updateAgentState("pause"); //
-                    } else {
-                      this.navAgentController = this.el.components.nav_agent_controller;
-                    }
-                  }
-                  
-                }
-              }
-            }
+                  // if (this.findAction) { //check if we hit something we're looking for
+                  //   if (this.findAction.tags) {
+                  //     for (let i = 0; i < this.findAction.tags.length; i++) {
+                  //       if (e.detail.targetEl.classList.contains(this.findAction.tags[i])) {
+                  //         console.log("I FOUND ONE!");
+                  //         if (this.navAgentController) {
+                  //           this.navAgentController.updateAgentState("pause"); //
+                  //         } else {
+                  //           this.navAgentController = this.el.components.nav_agent_controller;
+                  //         }
+                  //       }
+                        
+                  //     }
+                  //   }
+                  // }
           // }
         }
       });
@@ -3743,23 +3788,12 @@ AFRAME.registerComponent('mod_object', {
           }
 
           if (this.isNavAgent) {
-            if (this.navAgentController) {
-              
-              // if (this.idleClips.length) {
-              //   // this.navAgentController.currentState = "pause";
-               
-              //   var clip = this.idleClips[Math.floor(Math.random()*this.idleClips.length)];
-              //   this.el.setAttribute('animation-mixer', {
-              //     "clip": clip.name,
-              //     "loop": "repeat",
-              //     "crossFadeDuration": .1
-              //   });
-              //   this.navAgentController.updateAgentState("pause");
+            if (this.navAgentController && this.navAgentController.currentState != "dialog") {
+              this.navAgentController.updateAgentState("greet player");
+              this.el.setAttribute("look-at-y", "#player");
 
-              // } else {
-              //   console.log("this.idleClips is empty on " + this.el.id);
-              // }
             } else {
+              if (!this.navAgentController)
               this.navAgentController = this.el.components.nav_agent_controller;
             } 
             if (this.findAction) {
@@ -3778,7 +3812,7 @@ AFRAME.registerComponent('mod_object', {
                 }
                 
               }
-              if (this.targetLocations.length) {
+              if (this.targetLocations.length && this.navAgentController && this.navAgentController.currentState != "dialog") {
                 // this.navAgentController.seekTargetLocation();
                 this.navAgentController.updateAgentState("target"); //instead of waypoints
               }
@@ -3849,7 +3883,7 @@ AFRAME.registerComponent('mod_object', {
     this.el.addEventListener('click', (e) => { 
       e.preventDefault();
       // let downtime = (Date.now() / 1000) - this.mouseDownStarttime;
-      // console.log("mousedown time "+ this.mouseDowntime + "  on object type: " + this.data.objectData.objtype + " actions " + JSON.stringify(this.data.objectData.actions) + " equipped " + this.data.isEquipped);
+      console.log("mousedown time "+ this.mouseDowntime + "  on object type: " + this.data.objectData.objtype + " actions " + JSON.stringify(this.data.objectData.actions) + " equipped " + this.data.isEquipped);
       if (!this.data.isEquipped) {
         this.dialogEl = document.getElementById('mod_dialog');
         
@@ -3887,7 +3921,18 @@ AFRAME.registerComponent('mod_object', {
               console.log("already triggered - make it a toggle!");
             }
           }
+          if (this.selectAction.actionResult.toLowerCase() == "prompt" || this.selectAction.actionResult.toLowerCase() == "dialog") {
+            if (this.isNavAgent) {
+              if (this.navAgentController.currentState == "dialog") {
+                this.navAgentController.updateAgentState("random");
+              } else {
+                this.navAgentController.updateAgentState("dialog");
+              }
+              
+            }
+          }
         }
+        
       } else { //if equipped
         if (this.hasThrowAction) {
           console.log("throw action " + JSON.stringify(this.throwAction));
@@ -3969,7 +4014,38 @@ AFRAME.registerComponent('mod_object', {
   playAnimation: function (animState) {
     if (this.navAgentController) {
     console.log("tryna play animState " + animState);
+      if (animState == "greet player") {
+        animState = "target";
+      } 
+      if (animState == "dialog") {
+        animState = "talk";
+      } 
      switch (animState) { 
+        case "talk": 
+        if (this.talkClips.length > 0) {
+          var clip = this.talkClips[Math.floor(Math.random()*this.talkClips.length)];
+            this.el.setAttribute('animation-mixer', {
+              "clip": clip.name,
+              "loop": "pingpong",
+              "repetitions": 3,
+              "crossFadeDuration": 1,
+              "timeScale": this.navAgentController.currentSpeed
+            });
+            this.el.addEventListener('animation-finished', () => { 
+              this.el.removeAttribute('animation-mixer');
+              var clip = this.talkClips[Math.floor(Math.random()*this.talkClips.length)];
+              this.el.setAttribute('animation-mixer', {
+                "clip": clip.name,
+                "loop": "pingpong",
+                "repetitions": 3,
+                "crossFadeDuration": 1,
+                "timeScale": this.navAgentController.returnRandomNumber(.75, 1.25)
+              });
+            });
+          } else {
+            console.log("no walk clips found!");
+          }
+        break;
        case "random": 
        if (this.walkClips.length > 0) {
          var clip = this.walkClips[Math.floor(Math.random()*this.walkClips.length)];
@@ -3979,7 +4055,7 @@ AFRAME.registerComponent('mod_object', {
              "crossFadeDuration": 1,
              "timeScale": this.navAgentController.currentSpeed
            });
-           this.el.addEventListener('animation-finished', function () { 
+           this.el.addEventListener('animation-finished', () => { 
              this.el.removeAttribute('animation-mixer');
              var clip = this.walkClips[Math.floor(Math.random()*this.walkClips.length)];
              this.el.setAttribute('animation-mixer', {
@@ -4003,14 +4079,14 @@ AFRAME.registerComponent('mod_object', {
              "crossFadeDuration": 1,
              "timeScale": this.navAgentController.currentSpeed
            });
-           this.el.addEventListener('animation-finished', function () { 
+           this.el.addEventListener('animation-finished', () => { 
              this.el.removeAttribute('animation-mixer');
              var clip = this.idleClips[Math.floor(Math.random()*this.idleClips.length)];
              this.el.setAttribute('animation-mixer', {
                "clip": clip.name,
                "loop": "repeat",
                "crossFadeDuration": 1,
-               "timeScale": this.navAgentController.currentSpeed
+               "timeScale": this.navAgentController.returnRandomNumber(.75, 1.25)
              });
            });
          }  else {
@@ -4028,6 +4104,29 @@ AFRAME.registerComponent('mod_object', {
              // "timeScale": .75 + Math.random()/2
            });
          }
+       break;
+       case "dance": 
+       if (this.danceClips.length > 0) {
+        var clip = this.danceClips[Math.floor(Math.random()*this.danceClips.length)];
+          this.el.setAttribute('animation-mixer', {
+            "clip": clip.name,
+            "loop": "repeat",
+            "crossFadeDuration": 1,
+            "timeScale": this.navAgentController.currentSpeed
+          });
+          this.el.addEventListener('animation-finished', () => { 
+            this.el.removeAttribute('animation-mixer');
+            var clip = this.danceClips[Math.floor(Math.random()*this.danceClips.length)];
+            this.el.setAttribute('animation-mixer', {
+              "clip": clip.name,
+              "loop": "repeat",
+              "crossFadeDuration": 1,
+              "timeScale": this.navAgentController.returnRandomNumber(.75, 1.25)
+            });
+          });
+        }  else {
+          console.log("no idle clips found!");
+        }
        break;
      }
     } else {
@@ -4861,9 +4960,16 @@ AFRAME.registerComponent('mod_model', {
           if (this.data.eventData.toLowerCase().includes("yonly")) {
             console.log("tryna set billboard yonly");
             this.el.setAttribute("look-at-y", "#player");
+
+            
           } else {
              
-            this.el.setAttribute("look-at", "#player");
+            // this.el.setAttribute("look-at", "#player");
+            if (settings && settings.sceneCameraMode == "Third Person") {
+              this.el.setAttribute("look-at", "#thirdPersonCamera");
+            } else {
+              this.el.setAttribute("look-at", "#player");
+            }
           }
         
         }
@@ -5207,6 +5313,7 @@ AFRAME.registerComponent('mod_model', {
                   
               }
               this.hasLocationCallout = true; //eg no background (thought or speech bubbgles)
+
             }
               
 
@@ -5353,7 +5460,10 @@ AFRAME.registerComponent('mod_model', {
                 child.position.set(0,0,0); //clear transforms so position below won't be offset
                 let theEye = document.createElement("a-entity");
                 theEye.setObject3D("Object3D", child);
+                
                 theEye.setAttribute("look-at", "#player");
+                
+                
                 this.el.appendChild(theEye); //set as child of DOM heirarchy, not just parent model
                 theEye.setAttribute("position", obj.worldToLocal(center)); //set position as local to 
                 // obj.updateMatrix();
@@ -5445,11 +5555,17 @@ AFRAME.registerComponent('mod_model', {
                 let calloutText = document.createElement("a-entity");
                 this.el.sceneEl.appendChild(calloutEntity);
                 calloutEntity.appendChild(calloutText);
-                calloutEntity.setAttribute("look-at", "#player");
+                // calloutEntity.setAttribute("look-at", "#player");
                 calloutEntity.setAttribute('visible', false);
 
                 calloutText.setAttribute("position", '0 0 .5'); //offset the child on z toward camera, to prevent overlap on model
-                calloutText.setAttribute("look-at", "#player");
+                if (settings && settings.sceneCameraMode == "Third Person") {
+                  calloutText.setAttribute("look-at", "#thirdPersonCamera");
+                  calloutEntity.setAttribute("look-at", "#thirdPersonCamera");
+                } else {
+                  calloutText.setAttribute("look-at", "#player");
+                  calloutEntity.setAttribute("look-at", "#player");
+                }
                 calloutText.setAttribute('troika-text', {
                   width: 2,
                   baseline: "bottom",
@@ -5529,11 +5645,19 @@ AFRAME.registerComponent('mod_model', {
                 let calloutText = document.createElement("a-entity");
                 this.el.sceneEl.appendChild(calloutEntity);
                 calloutEntity.appendChild(calloutText);
-                calloutEntity.setAttribute("look-at", "#player");
-                calloutEntity.setAttribute('visible', false);
+                
 
                 calloutText.setAttribute("position", '0 0 .5'); //offset the child on z toward camera, to prevent overlap on model
-                calloutText.setAttribute("look-at", "#player");
+                if (settings && settings.sceneCameraMode == "Third Person") {
+                  calloutText.setAttribute("look-at", "#thirdPersonCamera");
+                  calloutEntity.setAttribute("look-at", "#thirdPersonCamera");
+                } else {
+                  calloutText.setAttribute("look-at", "#player");
+                  calloutEntity.setAttribute("look-at", "#player");
+                }
+               
+                
+                calloutEntity.setAttribute('visible', false);
                 calloutText.setAttribute('troika-text', {
                   // width: 2,
                   baseline: "bottom",
@@ -5613,11 +5737,21 @@ AFRAME.registerComponent('mod_model', {
                 this.el.sceneEl.appendChild(calloutEntity);
                 calloutEntity.appendChild(calloutText);
 
-                calloutEntity.setAttribute("look-at", "#player");
+                // calloutEntity.setAttribute("look-at", "#player");
+                if (settings && settings.sceneCameraMode == "Third Person") {
+                  calloutEntity.setAttribute('look-at', '#thirdPersonCamera'); //toggle by eventData
+                } else {
+                  calloutEntity.setAttribute('look-at', '#player'); //first person camrig
+                }
                 calloutEntity.setAttribute('visible', false);
 
                 calloutText.setAttribute("position", '0 0 .5'); //offset the child on z toward camera, to prevent overlap on model
-                calloutText.setAttribute("look-at", "#player");
+                // calloutText.setAttribute("look-at", "#player");
+                if (settings && settings.sceneCameraMode == "Third Person") {
+                  calloutText.setAttribute('look-at', '#thirdPersonCamera'); //toggle by eventData
+                } else {
+                  calloutText.setAttribute('look-at', '#player'); //first person camrig
+                }
                 calloutText.setAttribute('troika-text', {
                   width: 2,
                   baseline: "bottom",
@@ -5727,7 +5861,12 @@ AFRAME.registerComponent('mod_model', {
           bubbleBackground = null;
           if (this.data.eventData.toLowerCase().includes("thought")) {
             this.hasCalloutBackground = true;
-            bubble.setAttribute("look-at", "#player");
+            // bubble.setAttribute("look-at", "#player");
+            if (settings && settings.sceneCameraMode == "Third Person") {
+              bubble.setAttribute('look-at', '#thirdPersonCamera'); //toggle by eventData
+            } else {
+              bubble.setAttribute('look-at', '#player'); //first person camrig
+            }
             console.log("ttryhana put a thought bubble on mod_model");
             bubbleBackground = document.createElement("a-entity");
             bubbleBackground.classList.add("bubbleBackground");
@@ -5752,7 +5891,12 @@ AFRAME.registerComponent('mod_model', {
           }
           if (this.data.eventData.toString().toLowerCase().includes("speech") || this.data.eventData.toString().toLowerCase().includes("talk")) {
             this.hasCalloutBackground = true;
-            bubble.setAttribute("look-at", "#player");
+            // bubble.setAttribute("look-at", "#player");
+            if (settings && settings.sceneCameraMode == "Third Person") {
+              bubble.setAttribute('look-at', '#thirdPersonCamera'); //toggle by eventData
+            } else {
+              bubble.setAttribute('look-at', '#player'); //first person camrig
+            }
             bubbleBackground = document.createElement("a-entity");
             bubbleBackground.classList.add("bubbleBackground");
             bubbleBackground.setAttribute("gltf-model", "#talkbubble"); 
@@ -5783,7 +5927,12 @@ AFRAME.registerComponent('mod_model', {
           // bubbleText.setAttribute("position", "0 0 0");
           // bubbleText.setAttribute("scale", ".1 .1 .1"); 
           bubble.appendChild(bubbleText);
-          bubbleText.setAttribute("look-at", "#player");
+          if (settings && settings.sceneCameraMode == "Third Person") {
+            bubbleText.setAttribute('look-at', '#thirdPersonCamera'); //toggle by eventData
+          } else {
+            bubbleText.setAttribute('look-at', '#player'); //first person camrig
+          }
+          // bubbleText.setAttribute("look-at", "#player");
           this.bubbleText = bubbleText;
           // bubbleText.setAttribute("width", 3);
           // bubbleText.setAttribute("height", 2);
@@ -6220,7 +6369,7 @@ AFRAME.registerComponent('mod_model', {
                "clip": clip.name,
                "loop": "repeat",
                "crossFadeDuration": 1,
-               "timeScale": this.navAgentController.currentSpeed
+               "timeScale": this.navAgentController.returnRandomNumber(.75, 1.25)
              });
            });
          } else {
@@ -6244,7 +6393,7 @@ AFRAME.registerComponent('mod_model', {
                "clip": clip.name,
                "loop": "repeat",
                "crossFadeDuration": 1,
-               "timeScale": this.navAgentController.currentSpeed
+               "timeScale": this.navAgentController.returnRandomNumber(.75, 1.25)
              });
            });
          }  else {
@@ -7466,8 +7615,12 @@ AFRAME.registerComponent('picture_groups_control', { //has all the picgroup data
           } else if (orientation.includes("Square")) {
             flyingPicEl.setAttribute('gltf-model', '#flatsquare');
           }
-         
-          flyingPicEl.setAttribute('look-at', '#player'); //toggle by eventData
+          if (settings && settings.sceneCameraMode == "Third Person") {
+            flyingPicEl.setAttribute('look-at', '#thirdPersonCamera'); //toggle by eventData
+          } else {
+            flyingPicEl.setAttribute('look-at', '#player'); //first person camrig
+          }
+
 
           flyingPicEl.setAttribute('mod_curve', {'init': true, 'speedFactor': .75, 'spreadFactor': 4, 'distance': -20, 'type': 'pictureGroup'}); //pass data in?
 

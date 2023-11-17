@@ -1479,7 +1479,7 @@ AFRAME.registerComponent('nav_mesh_controller', {
 		console.log("tryna createRandomWaypoints...");
 		// let testPositions = [];
 		let goodWaypointCount = 0;
-		for (let i = 0; i < 300; i++) {
+		for (let i = 0; i < 1000; i++) {
 			if (goodWaypointCount > 20) {
 				console.log("gots enough random waypoints...");
 				this.isReady = true;
@@ -1494,7 +1494,7 @@ AFRAME.registerComponent('nav_mesh_controller', {
 			let results = raycaster.intersectObject(this.el.getObject3D('mesh'), true);
 
 			if(results.length > 0) {
-				console.log("gotsa navmesh intersect: " + results.length, results[0].object.name, results[0].point.y);
+				console.log("gotsa navmesh intersect: " + results.length + " " +results[0].object.name + " " + goodWaypointCount );
 				testPosition.y = results[0].point.y; //snap y of waypoint to navmesh y
 				let waypointEl = document.createElement("a-box");
 				waypointEl.setAttribute('scale', '.1 .1 .1');
@@ -1580,6 +1580,8 @@ AFRAME.registerComponent('nav_agent_controller', {
 		this.navMeshController = null;
 		this.modObjectComponent = null;
 		this.nextWaypointIndex = 0;
+
+		this.targetLocation = new THREE.Vector3();
 	  	// Get waypoints in array
 		//   let raycaster = new THREE.Raycaster();
 		this.navMeshControllerEl = null;
@@ -1632,13 +1634,24 @@ AFRAME.registerComponent('nav_agent_controller', {
 				data.navStart=true;
 				// modObjectComponent.playWalkAnimation();
 				this.updateAgentState(this.currentState);
+				this.el.removeAttribute("look-at-y");
 
 			}
 			});
 	
 			/****************************************/
 			el.addEventListener('navigation-end', (e)=>{
-				this.updateAgentState(this.currentState);
+
+				if (this.currentState == "target" || this.currentState == "greet player") {
+					this.currentState = "pause";
+					console.log("nav end with target/greetplahyer");
+					this.el.setAttribute("look-at-y", "#player");
+					this.updateAgentState(this.currentState);
+				} else {
+					this.updateAgentState(this.currentState);
+				}
+				
+				
 			})
 	
 			/****************************************/
@@ -1689,33 +1702,38 @@ AFRAME.registerComponent('nav_agent_controller', {
 	validTargetPosition: function (testPosition) { //is agent starting from legit spot?
 		
 		let raycaster = new THREE.Raycaster();
-		raycaster.set(new THREE.Vector3(testPosition.x, testPosition.y + 3, testPosition.z), new THREE.Vector3(0, -1, 0.01));
+		raycaster.set(new THREE.Vector3(testPosition.x, testPosition.y + 5, testPosition.z), new THREE.Vector3(0, -1, 0.01));
 		let results = raycaster.intersectObject(this.navMeshControllerEl.getObject3D('mesh'), true);
 
 		if(results.length > 0) {
-			console.log("valid target position!");
-			return true;
+			console.log("valid target position! " + results[0].point.y);
+			// this.testPosition = {x: testPosition.x, y: results[0].point.y, z: testPosition.z}
+			testPosition.y = results[0].point.y; //snap y of waypoint to navmesh y
+				// let waypointEl = document.createElement("a-box");
+				// waypointEl.setAttribute('scale', '.1 .1 .1');
+				// waypointEl.setAttribute('position', testPosition);
+			return testPosition;
 		} else {
-			return false; //todo return closest...
+			return null; //todo return closest...
 		}
 	},
 	
-	seekTargetLocation: function() { //unused, now in the updateAgentState switch below
-		// console.log("trybna seekTargetLocations " + this.modObjectComponent.targetLocations.length);
-		if (this.modObjectComponent && this.modObjectComponent.targetLocations.length > 0) {
-			console.log()
-			let targetLocationIndex = Math.floor(Math.random()*this.modObjectComponent.targetLocations.length);
-			let targetLocation = this.modObjectComponent.targetLocations[targetLocationIndex];
-			console.log("tryna goto " + targetLocation);
-			this.el.setAttribute('nav-agent', {
-				active: true,
-				destination: targetLocation
-			});
-		} else {
-			this.modObjectComponent = this.el.components.mod_object;
-		}
+	// seekTargetLocation: function() { //unused, now in the updateAgentState switch below
+	// 	// console.log("trybna seekTargetLocations " + this.modObjectComponent.targetLocations.length);
+	// 	if (this.modObjectComponent && this.modObjectComponent.targetLocations.length > 0) {
+	// 		console.log()
+	// 		let targetLocationIndex = Math.floor(Math.random()*this.modObjectComponent.targetLocations.length);
+	// 		let targetLocation = this.modObjectComponent.targetLocations[targetLocationIndex];
+	// 		console.log("tryna goto " + targetLocation);
+	// 		this.el.setAttribute('nav-agent', {
+	// 			active: true,
+	// 			destination: targetLocation
+	// 		});
+	// 	} else {
+	// 		this.modObjectComponent = this.el.components.mod_object;
+	// 	}
 
-	},
+	// },
 	updateAgentState: function (state) {
 		// console.log("switching state to " + state);
 		this.previousState = this.currentState;
@@ -1727,7 +1745,7 @@ AFRAME.registerComponent('nav_agent_controller', {
 		} else {
 			this.modObjectComponent = this.el.components.mod_object;
 			if (this.modModelComponent) {
-				this.modModelComponent.playAnimation(this.currentState) 
+				this.modModelComponent.playAnimation(this.currentState);
 				this.agentAction();
 			} else {
 				this.modModelComponent = this.el.components.mod_model;
@@ -1743,6 +1761,7 @@ AFRAME.registerComponent('nav_agent_controller', {
 				switch (this.currentState) { //type is first level param for each route
 
 				case "patrol": 
+				this.el.removeAttribute("look-at-y");
 					if (this.nextWaypointIndex < goodWaypoints.length) {
 						this.nextWaypointIndex++;
 					} else {
@@ -1754,6 +1773,7 @@ AFRAME.registerComponent('nav_agent_controller', {
 					});
 				break;  
 				case "random": 
+				this.el.removeAttribute("look-at-y");
 					this.nextWaypointIndex = Math.floor(Math.random()*this.navMeshController.goodWaypoints.length); //random for now
 					this.el.setAttribute('nav-agent', {
 						active:true,
@@ -1763,24 +1783,31 @@ AFRAME.registerComponent('nav_agent_controller', {
 				break;  
 
 				case "pause":
-					if (this.modObjectComponent) {
 
-					}
+					this.el.setAttribute('nav-agent', {
+						active:false
+					});
+				break;
+
+				case "dance":
+
 					this.el.setAttribute('nav-agent', {
 						active:false
 					});
 				break;
 
 				case "target":
+					this.el.removeAttribute("look-at-y");
 					if (this.modObjectComponent && this.modObjectComponent.targetLocations.length > 0) {
 						// console.log()
 						let targetLocationIndex = Math.floor(Math.random()*this.modObjectComponent.targetLocations.length);
 						let targetLocation = this.modObjectComponent.targetLocations[targetLocationIndex];
-						if (this.validTargetPosition(targetLocation)) {
-							console.log("tryna goto " + targetLocation);
+						let snappedTargetLocation = this.validTargetPosition(targetLocation);
+						if (snappedTargetLocation) {z
+							console.log("tryna goto " + snappedTargetLocation);
 							this.el.setAttribute('nav-agent', {
 								active: true,
-								destination: targetLocation,
+								destination: snappedTargetLocation,
 								speed: this.currentSpeed + .5
 							});
 						} else {
@@ -1791,7 +1818,35 @@ AFRAME.registerComponent('nav_agent_controller', {
 						this.updateAgentState(this.previousState);
 					}
 				break;
-				}    
+
+				case "greet player":
+					this.el.removeAttribute("look-at-y");
+				let targetLocation = new THREE.Vector3();	
+				// let snappedTargetLocation = new THREE.Vector3();
+				viewportHolder = document.getElementById('viewportPlaceholder');
+				viewportHolder.object3D.getWorldPosition( targetLocation );
+				let snappedTargetLocation = this.validTargetPosition(targetLocation); //make sure target is on the navmesh
+					if (snappedTargetLocation) { //returns null if invalid
+						console.log("tryna goto " + snappedTargetLocation);
+						this.el.setAttribute('nav-agent', {
+							active: true,
+							destination: snappedTargetLocation,
+							speed: this.currentSpeed + .5
+						});
+						// this.el.setAttribute("look-at-y", "#player");
+					} else {
+						this.updateAgentState(this.previousState);
+					}	
+				break;
+
+
+				case "dialog":
+					// this.el.removeAttribute("look-at-y", "#player");
+					this.el.setAttribute('nav-agent', {
+						active:false
+					});
+				break;
+			}    
 				
 			} else {
 				console.log("cain't find navmensch controllern waypoints");	
@@ -1801,7 +1856,14 @@ AFRAME.registerComponent('nav_agent_controller', {
 		// this.previousState = this.currentState;
 		this.randomNumber = Math.random();
 		if (this.currentState == "pause") {
-			if (this.randomNumber > 0.5) {
+			if (this.randomNumber > 0.6) {
+				// console.log("paused " + this.randomNumber);
+				this.updateAgentState("random");
+				
+			}
+		}
+		if (this.currentState == "dance") {
+			if (this.randomNumber > 0.7) {
 				// console.log("paused " + this.randomNumber);
 				this.updateAgentState("random");
 				

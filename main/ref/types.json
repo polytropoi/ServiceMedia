@@ -610,6 +610,7 @@
     ],
     "actionresult" : [
         "None",
+        "Dialog",
         "Trigger Fx",
         "Trigger Audio",
         "Inventory",
