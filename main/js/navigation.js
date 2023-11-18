@@ -1803,7 +1803,7 @@ AFRAME.registerComponent('nav_agent_controller', {
 						let targetLocationIndex = Math.floor(Math.random()*this.modObjectComponent.targetLocations.length);
 						let targetLocation = this.modObjectComponent.targetLocations[targetLocationIndex];
 						let snappedTargetLocation = this.validTargetPosition(targetLocation);
-						if (snappedTargetLocation) {z
+						if (snappedTargetLocation) {
 							console.log("tryna goto " + snappedTargetLocation);
 							this.el.setAttribute('nav-agent', {
 								active: true,
