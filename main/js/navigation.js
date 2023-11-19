@@ -1585,8 +1585,9 @@ AFRAME.registerComponent('nav_agent_controller', {
 	  	// Get waypoints in array
 		//   let raycaster = new THREE.Raycaster();
 		this.navMeshControllerEl = null;
-		let interval = setInterval( () => { //make sure we gotsa navmesh and it's ready
-		let navMeshControllerEl = document.getElementById("nav-mesh");
+
+		let interval = setInterval( () => { //make sure navmesh and controller are ready
+			let navMeshControllerEl = document.getElementById("nav-mesh");
 			this.currentState = "random";
 			this.previousState = "random";
 

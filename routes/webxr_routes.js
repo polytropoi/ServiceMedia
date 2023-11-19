@@ -1261,7 +1261,7 @@ webxr_router.get('/:_id', function (req, res) {
                            
                             ARScript = "<script src=\x22./main/src/util/mindar/mindar-image.js\x22></script> <script src=\x22./main/src/util/mindar/mindar-image-aframe.js\x22></script>";
                             ARSceneArg = "mindar-image=\x22imageTargetSrc: "+arImageTargets[0]+";\x22 embedded color-space=\x22sRGB\x22"+
-                                " renderer=\x22colorManagement: true, physicallyCorrectLights\x22 vr-mode-ui=\x22enabled: false\x22 device-orientation-permission-ui=\x22enabled: false\x22";
+                                " renderer=\x22colorManagement: true, physicallyCorrectLights\x22 xr-mode-ui=\x22enabled: false\x22 device-orientation-permission-ui=\x22enabled: false\x22";
                             cameraRigEntity = "<a-entity mindar-image-target=\x22targetIndex: 0\x22>" +
                             "<a-gltf-model rotation=\x2290 0 0\x22 position=\x220 0 0.1\x22 scale=\x220.25 0.25 0.25\x22 src=\x22#gltfAsset1\x22>"+
                             "</a-entity>";
@@ -1275,7 +1275,7 @@ webxr_router.get('/:_id', function (req, res) {
                             locationScripts = "<script src=\x22../main/src/component/location-fu.js\x22></script>";
                             // locationScripts = "<script>window.onload = () => { navigator.geolocation.getCurrentPosition((position) => {"+ //put this where?
                             // "document.querySelector('a-text').setAttribute('"+geoEntity+"', `latitude: ${position.coords.latitude}; longitude: ${position.coords.longitude};`)});}</script>";
-                            ARSceneArg = "gps-position webxr=\x22referenceSpaceType: unbounded; requiredFeatures: unbounded;\x22 vr-mode-ui=\x22enabled: false\x22 arjs=\x22sourceType: webcam; debugUIEnabled: false;\x22";
+                            ARSceneArg = "gps-position webxr=\x22referenceSpaceType: unbounded; requiredFeatures: unbounded;\x22 xr-mode-ui=\x22enabled: false\x22 arjs=\x22sourceType: webcam; debugUIEnabled: false;\x22";
                            
                             cameraRigEntity = "<a-entity id=\x22player\x22 position=\x220 0 0\x22 camera pitch-roll-look-controls>"+ 
                                 "<a-entity class=\x22hiddenPlaceholders\x22 id=\x22equipPlaceholder\x22 geometry=\x22primitive: plane; height: 0.01; width: .01\x22 position=\x220 -.5 -.65\x22"+ //these seemed to need actual geometry to get a worldspace loc
@@ -4605,7 +4605,7 @@ webxr_router.get('/:_id', function (req, res) {
                         "<div class=\x22ar-container\x22>"+
                         "<a-scene mindar-image=\x22imageTargetSrc: "+arImageTargets[0]+";\x22 embedded color-space=\x22sRGB\x22"+    
                             // "<a-scene mindar-image=\x22imageTargetSrc: https://servicemedia.s3.amazonaws.com/users/5150540ab038969c24000008/pictures/targets/6185599f5b7b7950e4548144.mind;\x22 embedded color-space=\x22sRGB\x22"+
-                            " renderer=\x22colorManagement: true, physicallyCorrectLights\x22 vr-mode-ui=\x22enabled: false\x22 device-orientation-permission-ui=\x22enabled: false\x22>"+
+                            " renderer=\x22colorManagement: true, physicallyCorrectLights\x22 xr-mode-ui=\x22enabled: false\x22 device-orientation-permission-ui=\x22enabled: false\x22>"+
                             "<a-assets>"+
                             videoAsset +
                             gltfsAssets +    
@@ -4764,20 +4764,20 @@ webxr_router.get('/:_id', function (req, res) {
                         /////////AFRAME SCENE DECLARATION////////////////// 
                         let aScene = "<a-scene "+sceneBackground+" "+physicsInsert+" "+pool_target+" "+pool_launcher+" gesture-detector " + aframeRenderSettings + 
                         " reflection=\x22directionalLight:#real-light\x22 ar-hit-test=\x22target:.activeObjectRay; type:footprint; footprintDepth:0.1;\x22 ar-cursor raycaster=\x22objects: .activeObjexRay a-sphere\x22 "+
-                        // "screen-controls vr-mode-ui keyboard-shortcuts=\x22enterVR: false\x22" + magicWindow +   
-                        " vr-mode-ui keyboard-shortcuts=\x22enterVR: false\x22" +  //add screen-controls from initializer                      
+                        // "screen-controls xr-mode-ui keyboard-shortcuts=\x22enterVR: false\x22" + magicWindow +   
+                        " xr-mode-ui keyboard-shortcuts=\x22enterVR: false\x22" +  //add screen-controls from initializer                      
                         webxrFeatures + " shadow=\x22type: pcfsoft\x22 loading-screen=\x22dotsColor: white; backgroundColor: black; enabled: false\x22 embedded " + fogSettings + " "+networkedscene+" "+ARSceneArg+" listen-for-vr-mode>";
 
                         let mainDiv = "<div id=\x22mainDiv\x22 style=\x22width:100%; height:100%\x22>";
 
                         if (sceneResponse.sceneWebType == 'Mapbox') { //no, non-aframe version above - maybe later?
-                            aScene = "<a-scene loading-screen=\x22dotsColor: white; backgroundColor: black\x22 vr-mode-ui=\x22enabled: false\x22 keyboard-shortcuts=\x22enterVR: false\x22 device-orientation-permission-ui=\x22enabled: false\x22>";
+                            aScene = "<a-scene loading-screen=\x22dotsColor: white; backgroundColor: black\x22 xr-mode-ui=\x22enabled: false\x22 keyboard-shortcuts=\x22enterVR: false\x22 device-orientation-permission-ui=\x22enabled: false\x22>";
                             mainDiv = "<div id=\x22map\x22 class=\x22map\x22 style=\x22width:100%; height:100%\x22>"; //closed at end
                             joystickContainer = "";
                         }
                         if (sceneResponse.sceneWebType == 'AR Location Tracking') {
                             console.log("AR Location Tracking mdoe...");
-                            aScene = "<a-scene gps-position webxr=\x22referenceSpaceType: unbounded; requiredFeatures: unbounded;\x22 keyboard-shortcuts=\x22enterVR: false\x22 loading-screen=\x22dotsColor: white; backgroundColor: black\x22 vr-mode-ui=\x22enabled: false\x22 device-orientation-permission-ui=\x22enabled: false\x22>";
+                            aScene = "<a-scene gps-position webxr=\x22referenceSpaceType: unbounded; requiredFeatures: unbounded;\x22 keyboard-shortcuts=\x22enterVR: false\x22 loading-screen=\x22dotsColor: white; backgroundColor: black\x22 xr-mode-ui=\x22enabled: false\x22 device-orientation-permission-ui=\x22enabled: false\x22>";
                             // <a-scene gps-position webxr="referenceSpaceType: unbounded; requiredFeatures: unbounded;"></a-scene>
                             joystickContainer = "";
                   

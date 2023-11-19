@@ -3883,7 +3883,7 @@ AFRAME.registerComponent('mod_object', {
     this.el.addEventListener('click', (e) => { 
       e.preventDefault();
       // let downtime = (Date.now() / 1000) - this.mouseDownStarttime;
-      console.log("mousedown time "+ this.mouseDowntime + "  on object type: " + this.data.objectData.objtype + " actions " + JSON.stringify(this.data.objectData.actions) + " equipped " + this.data.isEquipped);
+      console.log("mousedown time "+ this.mouseDowntime + "  on mod_object type: " + this.data.objectData.objtype + " actions " + JSON.stringify(this.data.objectData.actions) + " equipped " + this.data.isEquipped);
       if (!this.data.isEquipped) {
         this.dialogEl = document.getElementById('mod_dialog');
         
@@ -4766,7 +4766,7 @@ AFRAME.registerComponent('mod_dialog', { //there should only be one of these, un
     }
     this.viewportHolder.object3D.getWorldPosition( this.cameraPosition );
     this.el.setAttribute('position', this.cameraPosition);
-    console.log("TRYNA SET POSITIONF RO MOD_DIALGO " + JSON.stringify(this.cameraPosition));
+    console.log("tryna set mod_dialog position " + JSON.stringify(this.cameraPosition));
     this.dialogText.setAttribute('value', panelString);
   },
   okButton: function () {
