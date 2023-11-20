@@ -558,7 +558,8 @@ AFRAME.registerComponent('mod-materials', {
               this.vidtexture.flipY = this.data.flipY; 
               // this.vidtexture.minFilter = THREE.LinearMipmapNearestFilter;
               // this.vidtexture.magFilter = THREE.LinearMipmapNearestFilter;
-              this.playmaterial = new THREE.MeshStandardMaterial( { map: this.vidtexture, side: THREE.DoubleSide, shader: THREE.FlatShading } ); 
+              // this.playmaterial = new THREE.MeshStandardMaterial( { map: this.vidtexture, side: THREE.DoubleSide, shader: THREE.FlatShading } ); 
+              this.playmaterial = new THREE.MeshBasicMaterial( { map: this.vidtexture } ); 
               
               // this.playmaterial = new THREE.MeshPhongMaterial({
               //   map: this.vidtexture,

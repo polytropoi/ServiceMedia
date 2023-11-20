@@ -4273,7 +4273,7 @@ webxr_router.get('/:_id', function (req, res) {
                     let arShadowPlane = "";
                     let handsTemplate = "";
                     // let aframeRenderSettings = "renderer=\x22antialias: true; logarithmicDepthBuffer: true; colorManagement: true; sortObjects: true; physicallyCorrectLights: true; alpha: true; maxCanvasWidth: 1920; maxCanvasHeight: 1920;\x22";
-                    let aframeRenderSettings = "renderer=\x22antialias: auto; logarithmicDepthBuffer: false; colorManagement: true; sortObjects: true; physicallyCorrectLights: true; alpha: true; maxCanvasWidth: 1920; maxCanvasHeight: 1920;\x22";
+                    let aframeRenderSettings = "renderer=\x22antialias: auto; exposure: 2; colorManagement: true; sortObjects: true; physicallyCorrectLights: true; maxCanvasWidth: 1920; maxCanvasHeight: 1920;\x22";
                    
                     if (arMode == "spawn") {
                         arHitTest = "<a-entity show-in-ar-mode visible=\x22false\x22 id=\x22reticleEntity\x22 gltf-model=\x22#reticle2\x22 scale=\x220.8 0.8 0.8\x22 ar-hit-test-spawn=\x22mode: "+arMode+"\x22></a-entity>\n"; //for ar spawning...
@@ -4764,8 +4764,8 @@ webxr_router.get('/:_id', function (req, res) {
                         /////////AFRAME SCENE DECLARATION////////////////// 
                         let aScene = "<a-scene "+sceneBackground+" "+physicsInsert+" "+pool_target+" "+pool_launcher+" gesture-detector " + aframeRenderSettings + 
                         " reflection=\x22directionalLight:#real-light\x22 ar-hit-test=\x22target:.activeObjectRay; type:footprint; footprintDepth:0.1;\x22 ar-cursor raycaster=\x22objects: .activeObjexRay a-sphere\x22 "+
-                        // "screen-controls xr-mode-ui keyboard-shortcuts=\x22enterVR: false\x22" + magicWindow +   
-                        " xr-mode-ui keyboard-shortcuts=\x22enterVR: false\x22" +  //add screen-controls from initializer                      
+                        "screen-controls xr-mode-ui=\x22enabled: true; enterVREnabled: true; enterAREnabled: true\x22 keyboard-shortcuts=\x22enterVR: false\x22" + magicWindow +   
+                        // " keyboard-shortcuts=\x22enterVR: false\x22" +  //add screen-controls from initializer                      
                         webxrFeatures + " shadow=\x22type: pcfsoft\x22 loading-screen=\x22dotsColor: white; backgroundColor: black; enabled: false\x22 embedded " + fogSettings + " "+networkedscene+" "+ARSceneArg+" listen-for-vr-mode>";
 
                         let mainDiv = "<div id=\x22mainDiv\x22 style=\x22width:100%; height:100%\x22>";
