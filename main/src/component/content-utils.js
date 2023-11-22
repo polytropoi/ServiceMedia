@@ -3520,7 +3520,7 @@ AFRAME.registerComponent('mod_object', {
                 // console.log("actions: " + JSON.stringify(mod_obj_component.data.objectData.actions));
                 var triggerAudioController = document.getElementById("triggerAudio");
                 if (triggerAudioController != null) {
-                  triggerAudioController.components.trigger_audio_control.playAudioAtPosition(this.el.object3D.position, window.playerPosition.distanceTo(this.el.object3D.position), ["hit, bounce"]);
+                  triggerAudioController.components.trigger_audio_control.playAudioAtPosition(this.el.object3D.position, window.playerPosition.distanceTo(this.el.object3D.position), ["magic"]);
                 }
                 if (targetModObjComponent.data.objectData.actions) {
                   for (let i = 0; i < targetModObjComponent.data.objectData.actions.length; i++) {

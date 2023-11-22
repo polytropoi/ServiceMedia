@@ -1494,7 +1494,7 @@ AFRAME.registerComponent('nav_mesh_controller', {
 			let results = raycaster.intersectObject(this.el.getObject3D('mesh'), true);
 
 			if(results.length > 0) {
-				console.log("gotsa navmesh intersect: " + results.length + " " +results[0].object.name + " " + goodWaypointCount );
+				// console.log("gotsa navmesh intersect: " + results.length + " " +results[0].object.name + " " + goodWaypointCount );
 				testPosition.y = results[0].point.y; //snap y of waypoint to navmesh y
 				let waypointEl = document.createElement("a-box");
 				waypointEl.setAttribute('scale', '.1 .1 .1');

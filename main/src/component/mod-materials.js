@@ -394,7 +394,7 @@ AFRAME.registerComponent('mod-materials', {
         // }
        
 
-          console.log("tryna setup video");
+          // console.log("tryna setup video");
           
           this.mesh = this.el.getObject3D('Object3D');
           this.screenMesh = null; 
@@ -559,7 +559,12 @@ AFRAME.registerComponent('mod-materials', {
               // this.vidtexture.minFilter = THREE.LinearMipmapNearestFilter;
               // this.vidtexture.magFilter = THREE.LinearMipmapNearestFilter;
               // this.playmaterial = new THREE.MeshStandardMaterial( { map: this.vidtexture, side: THREE.DoubleSide, shader: THREE.FlatShading } ); 
-              this.playmaterial = new THREE.MeshBasicMaterial( { map: this.vidtexture } ); 
+              if (this.data.isSkybox) {
+                this.playmaterial = new THREE.MeshBasicMaterial( { map: this.vidtexture, side: THREE.BackSide } ); 
+              } else {
+                this.playmaterial = new THREE.MeshBasicMaterial( { map: this.vidtexture } ); 
+              }
+              
               
               // this.playmaterial = new THREE.MeshPhongMaterial({
               //   map: this.vidtexture,
