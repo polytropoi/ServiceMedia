@@ -8086,6 +8086,26 @@ app.post('/return_audiogroups/', function(req, res) {
                 callback(null);
             }
         },
+        function(callback){ 
+            if (req.body.objectGroups != null && req.body.objectGroups.length > 0) {
+                const group_ids = req.body.objectGroups.map(item => { return ObjectID(item); });
+                db.groups.find({_id: {$in: group_ids}}, function(err, group_items) {
+                    if (err || !group_items) {
+                        console.log("error getting audiogroup items: " + err);
+                        callback(err);
+                    } else {
+                        // res.json(group_items);
+                        // console.log("returning audiogroup " + JSON.stringify(group_items));
+                        response.objectGroupItems = group_items;
+                        let groupdata = group_items[0].groupdata;
+                        groupItems.push.apply(groupItems, groupdata); //concat arrays
+                        callback(null);
+                    }
+                });
+            } else {
+                callback(null);
+            }
+        },
         function (callback) {
             // console.log("auido groupitems: " +JSON.stringify(groupItems));
             if (groupItems.length > 0) {
@@ -8529,7 +8549,7 @@ app.get('/usergroup/:p_id', requiredAuthentication, function(req, res) {
                                 var expiration = new Date();
                                 expiration.setMinutes(expiration.getMinutes() + 30);
                                 var baseName = path.basename(item_string_filename, (item_string_filename_ext));
-                                console.log("tryna jack in " + baseName + " to a group of " + group.type);
+                                console.log("tryna jack in audio " + baseName + " to a group of " + group.type);
                                 var mp3Name = baseName + '.mp3';
                                 var oggName = baseName + '.ogg';
                                 var pngName = baseName + '.png';
@@ -8577,7 +8597,7 @@ app.get('/usergroup/:p_id', requiredAuthentication, function(req, res) {
                                 var expiration = new Date();
                                 expiration.setMinutes(expiration.getMinutes() + 30);
                                 var baseName = path.basename(item_string_filename, (item_string_filename_ext));
-                                console.log("tryna jack in " + baseName + " to a group of " + group.type.toLowerCase());
+                                console.log("tryna jack in video " + baseName + " to a group of " + group.type.toLowerCase());
                                 var vidName = baseName + '.mp3';
                                 var urlVid = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + video_items[i].userID + "/video/" + video_items[i]._id + "/" + video_items[i]._id + "." + video_items[i].filename, Expires: 60000});
                                 video_items[i].vUrl = urlVid; //jack in teh signed urls into the object array

@@ -134,9 +134,18 @@ AFRAME.registerComponent('mod_physics', { //used by models, placeholders, instan
     
     } else {
       if (this.el.object3D) {
+        let modObjectComponent = this.el.components.mod_object;
+        if (!modObjectComponent) {
         this.el.setAttribute('ammo-body', {type: this.data.body, emitCollisionEvents: this.isTrigger});
         this.el.body.restitution = 10;
         this.el.setAttribute('ammo-shape', {type: 'mesh'});
+        } else {
+          setTimeout( () => { //wait a bit for static colliders to load...
+            this.el.setAttribute('ammo-body', {type: this.data.body, emitCollisionEvents: this.isTrigger});
+            this.el.body.restitution = 10;
+            this.el.setAttribute('ammo-shape', {type: 'mesh'});
+          }, 10000 * Math.random() );
+        }
       }
      
       
@@ -3883,7 +3892,7 @@ AFRAME.registerComponent('mod_tunnel', {
         this.geometry = new THREE.BufferGeometry().setFromPoints( this.curve.getPoints(70) );
 
         this.splineMesh = new THREE.Line(this.geometry, new THREE.LineBasicMaterial()); //another line to mod the vertexes
-        this.tubeGeometry = new THREE.TubeBufferGeometry(this.curve, 70, 10, 50, false);
+        this.tubeGeometry = new THREE.TubeGeometry(this.curve, 70, 10, 50, false);
         this.tubeMaterial = new THREE.MeshStandardMaterial({
           side: THREE.BackSide, // Since the camera will be inside the tube we need to reverse the faces
           map: this.texture, 

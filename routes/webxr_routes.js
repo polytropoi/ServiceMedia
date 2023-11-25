@@ -307,6 +307,7 @@ webxr_router.get('/:_id', function (req, res) {
     let scenePrimaryVolume = .8;
     let sceneAmbientVolume = .8;
     let sceneTriggerVolume = .8;
+    let objectAudioGroups = []; //audio groups attached to objex, not scene (i.e. primary, ambient, trigger)
     // let ambienturl = "";
     var mp3url = "";
     var oggurl = "";
@@ -438,6 +439,8 @@ webxr_router.get('/:_id', function (req, res) {
     let cameraEnvMap = "";
     // let cubeMapAsset = ""; //deprecated, all at runtime now..
     let contentUtils = "<script src=\x22../main/src/component/content-utils.js\x22 defer=\x22defer\x22></script>"; 
+    let modObjex = "<script src=\x22../main/src/component/mod_objex.js\x22 defer=\x22defer\x22></script>"; 
+    let modModels = "<script src=\x22../main/src/component/mod_models.js\x22 defer=\x22defer\x22></script>"; 
     let videosphereAsset = "";
     let textEntities = "";
     let attributionsTextEntity = "";
@@ -2074,7 +2077,7 @@ webxr_router.get('/:_id', function (req, res) {
                                     callback(null);
                                     //else if no keys?
                                 } else {
-                                    console.log('All files have been processed successfully skyboxEnvMap is ' + skyboxEnvMap);
+                                    // console.log('All files have been processed successfully skyboxEnvMap is ' + skyboxEnvMap);
          
                                     if (scenesKeyLocation && availableScenes != null && availableScenes != undefined && availableScenes.length > 0) {
                                     availableScenesEntity = "<a-entity scale=\x22.75 .75 .75\x22 look-at=\x22#player\x22 position=\x22"+scenesKeyLocation+"\x22>"+ 
@@ -2277,6 +2280,9 @@ webxr_router.get('/:_id', function (req, res) {
                     let objex = [];
                     let actionModels = [];
                     console.log("tryna get all sceneObjects " + JSON.stringify(sceneResponse.sceneObjects));
+
+                    // audioGroups
+
                     // if (sceneObjectLocations.length > 0) {  // objex have more properties, but are parsed/assigned by components (mod_objex, mod_object) after page load
                         // console.log("sceneObjectLocations " + JSON.stringify(sceneObjectLocations));
                         let objectIDs = []; //to prevent dupes in objex response below
@@ -2294,7 +2300,7 @@ webxr_router.get('/:_id', function (req, res) {
                                     async.waterfall ([
                                         function (cb) {
                                             if (objekt.actionIDs != undefined && objekt.actionIDs.length > 0) {
-                                                console.log("tryna add obj actions " + objekt.actionIDs);
+                                                // console.log("tryna add obj actions " + objekt.actionIDs);
                                                 const aids = objekt.actionIDs.map(item => {
                                                     return ObjectID(item);
                                                 });
@@ -2323,6 +2329,7 @@ webxr_router.get('/:_id', function (req, res) {
                                             }
                                         },
                                         function (cb) { //sprite sheets for object particle systems
+                                            // 
                                             if (objekt.particles != undefined && objekt.particles != null && objekt.particles != "None" ) {
                                                 if (objekt.particles.toString().includes("Fire")) {
                                                     imageAssets = imageAssets + "<img id=\x22fireanim1\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/pics/fireanim3.png\x22 crossorigin=\x22anonymous\x22></img>";
@@ -2333,6 +2340,10 @@ webxr_router.get('/:_id', function (req, res) {
                                                 if (objekt.particles.toString().includes("Smoke")) {
                                                     imageAssets = imageAssets + "<img id=\x22smoke1\x22 src=\x22http://servicemedia.s3.amazonaws.com/assets/pics/smokeanim2.png\x22 crossorigin=\x22anonymous\x22>";
                                                 }
+                                            }
+                                            if (objekt.audiogroupID && objekt.audiogroupID.length > 4) {
+                                                console.log("AUDIO OBJECT GROUP!!!! " + objekt.audiogroupID);
+                                                objectAudioGroups.push(objekt.audiogroupID);
                                             }
                                             cb(null);
                                         },
@@ -2490,7 +2501,7 @@ webxr_router.get('/:_id', function (req, res) {
                                 && sceneResponse.sceneModels.indexOf(locMdl.modelID) != -1) {
 
                                 // console.log("tryna set model id:  " + JSON.stringify(locMdl));
-                                console.log("gots a mod_model : " + locMdl.name);
+                                // console.log("gots a mod_model : " + locMdl.name);
                                 const m_id = ObjectID(locMdl.modelID);
                                 // 
                                 db.models.findOne({"_id": m_id}, function (err, asset) { 
@@ -3245,12 +3256,12 @@ webxr_router.get('/:_id', function (req, res) {
                         hasPrimaryAudioStream = true;
                         hasPrimaryAudio = false;
                     }
-                    // console.log("primaryAudioTitle: " + primaryAudioTitle); 
+                   
                     if (hasPrimaryAudioStream || hasPrimaryAudio) {
                         if (sceneResponse.scenePrimaryAudioTitle != null && sceneResponse.scenePrimaryAudioTitle != undefined && sceneResponse.scenePrimaryAudioTitle.length > 0) {
                             primaryAudioTitle = sceneResponse.scenePrimaryAudioTitle;    
                         } 
-                        console.log("primaryAudioTitle: " + primaryAudioTitle); 
+                        
                     }
                     if (sceneResponse.sceneAmbientAudioID != null && sceneResponse.sceneAmbientAudioID.length > 4) {
                         hasAmbientAudio = true;
@@ -3260,7 +3271,7 @@ webxr_router.get('/:_id', function (req, res) {
                     }
                     if (sceneResponse.scenePrimaryAudioTitle != null && sceneResponse.scenePrimaryAudioTitle != undefined && sceneResponse.scenePrimaryAudioTitle.length > 0) {
                         primaryAudioTitle = sceneResponse.scenePrimaryAudioTitle;
-                        console.log("primaryAudioTitle: " + primaryAudioTitle); 
+                       
                     }
                     if (sceneResponse.scenePrimaryVolume != null) {
                         scenePrimaryVolume = sceneResponse.scenePrimaryVolume;
@@ -4213,6 +4224,7 @@ webxr_router.get('/:_id', function (req, res) {
                     audioGroups.triggerGroups = sceneResponse.sceneTriggerAudioGroups;
                     audioGroups.ambientGroups = sceneResponse.sceneAmbientAudioGroups;
                     audioGroups.primaryGroups = sceneResponse.scenePrimaryAudioGroups;
+                    audioGroups.objectGroups = objectAudioGroups;
                     settings.audioGroups = audioGroups; 
                     settings.clearLocalMods = false;
                     settings.sceneVideoStreams = (sceneResponse.sceneVideoStreamUrls != undefined && sceneResponse.sceneVideoStreamUrls != null) ? sceneResponse.sceneVideoStreamUrls : [];
@@ -4234,7 +4246,7 @@ webxr_router.get('/:_id', function (req, res) {
                     if (sceneResponse.ambientAudioGroups != null && sceneResponse.ambientAudioGroups.length > 0) {
                         hasAmbientAudio = true;
                     }
-                    if (sceneResponse.primayAudioGroups != null && sceneResponse.primayAudioGroups.length > 0) {
+                    if (sceneResponse.primaryAudioGroups != null && sceneResponse.primaryAudioGroups.length > 0) {
                         hasPrimaryAudio = true;
                     }
 
@@ -4582,8 +4594,11 @@ webxr_router.get('/:_id', function (req, res) {
 
                         settingsData +
                         aframeScriptVersion + 
+                        modObjex +
+                        modModels +
                         extraScripts + 
                         contentUtils +
+                      
                         hlsScript +
 
                        
@@ -4873,6 +4888,9 @@ webxr_router.get('/:_id', function (req, res) {
                         // skyGradientScript +
                         ARScript +
                         // cameraEnvMap +
+                        modModels +
+                        modObjex +
+
                         contentUtils +
                         audioVizScript +
                         meshUtilsScript +

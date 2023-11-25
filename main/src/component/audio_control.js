@@ -1423,6 +1423,18 @@ let triggerPosition = "";
 //  // Clamp number between two values with the following line:
 // const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
 
+AFRAME.registerComponent('object_audio_control', { //set on mod_objects if it has an audiogroup
+    schema: {
+    url: {default: ''},
+    volume: {default: -40},
+    init: {default: ''}
+    // title: {default: ''}
+    },
+    
+    init: function () {
+        new Howl
+    }
+});
 
 AFRAME.registerComponent('trigger_audio_control', { //trigger audio on designated activeObjex
     schema: {
@@ -1463,6 +1475,12 @@ AFRAME.registerComponent('trigger_audio_control', { //trigger audio on designate
         this.loopHowl = null;
         this.id = 0;
         this.triggerSprite = "";
+
+        this.isReady = false;
+        setTimeout(() => {
+            this.isReady = true; //wait a while until initial collisions are over...    
+        }, 6000);
+
     },
     randomTriggerAudio: function () {
         if (this.audioGroupsEl != null) {
@@ -1484,12 +1502,12 @@ AFRAME.registerComponent('trigger_audio_control', { //trigger audio on designate
 
     playAudio: function() {
         this.audioGroupsEl = document.getElementById('audioGroupsEl');
-        if (this.audioGroupsEl != null) {
+        if (this.audioGroupsEl && this.isReady) {
             this.audioGroupsController = this.audioGroupsEl.components.audio_groups_control;
             let audioItem = this.audioGroupsController.returnRandomTriggerAudioID();
             triggerAudioHowl.src = audioItem.mp3url;
             // triggerAudioHowl.play();
-        }
+
         console.log(this.data.volume + "tryna play trigger audio" + this.normalizedVolume);
         // triggerPosition = this.el.object3D.position;
         // triggerAudioHowl.pos(triggerPosition);
@@ -1500,6 +1518,7 @@ AFRAME.registerComponent('trigger_audio_control', { //trigger audio on designate
         triggerAudioHowl.rate(rate);
         let id = triggerAudioHowl.play();
         triggerAudioHowl.pos(this.triggerPosition, id); 
+    }
 
     },
     playAudioAtPosition: function(pos, distance, tag, volmod) {
@@ -1511,7 +1530,7 @@ AFRAME.registerComponent('trigger_audio_control', { //trigger audio on designate
         let audioID = null;
         let audioIDs = [];
 
-        if (this.audioGroupsEl != null) { //if only a single trigger sound, it's hardwired to the triggerAudioHowl on server response
+        if (this.audioGroupsEl && this.isReady) { //if only a single trigger sound, it's hardwired to the triggerAudioHowl on server response
             this.audioGroupsController = this.audioGroupsEl.components.audio_groups_control;
             if (tag != null) {
                 let tags = tag.toString().split(',');
@@ -1577,7 +1596,7 @@ AFRAME.registerComponent('trigger_audio_control', { //trigger audio on designate
         let audioID = null;
         let audioIDs = [];
         let id = null;
-        if (this.audioGroupsEl != null) { //if only a single trigger sound, it's hardwired to the triggerAudioHowl on server response
+        if (this.audioGroupsEl  && this.isReady) { //if only a single trigger sound, it's hardwired to the triggerAudioHowl on server response
             this.audioGroupsController = this.audioGroupsEl.components.audio_groups_control;
             if (tag != null) {
                 let tags = tag.toString().split(',');
@@ -1698,7 +1717,7 @@ AFRAME.registerComponent('trigger_audio_control', { //trigger audio on designate
         this.audioGroupsEl = document.getElementById('audioGroupsEl');
         let audioID = null;
         let audioIDs = [];
-        if (this.audioGroupsEl != null) { //if only a single trigger sound, it's hardwired to the triggerAudioHowl on server response
+        if (this.audioGroupsEl && this.isReady) { //if only a single trigger sound, it's hardwired to the triggerAudioHowl on server response
             this.audioGroupsController = this.audioGroupsEl.components.audio_groups_control;
             if (tag != null) {
                 let tags = tag.toString().split(",");
@@ -1881,6 +1900,37 @@ AFRAME.registerComponent('audio_groups_control', { //element and component are a
             return null;
         }
        
+    },
+    returnRandomObjectAudioID: function (id) {
+        // console.log(JSON.stringify(this.data.audioGroupsData));
+        
+        let objectAudioGroup = this.data.audioGroupsData.objectAudioGroupItems[0];
+        return objectAudioGroup.items[Math.floor(Math.random()*objectAudioGroup.items.length)]; //pick a random entry from trigger ids
+    },
+    returnObjectAudioIDWithTag: function (id, tag) {
+        
+        if (tag && this.data.audioGroupsData) {
+            let triggerGroup = this.data.audioGroupsData.triggerGroupItems[0];
+            // console.log("looking for audio trigger with tag " + tag + " in files " + triggerGroup.items.length);
+            for (let i = 0; i < triggerGroup.items.length; i++) {
+                // console.log("looking for triggerGroup.item " + triggerGroup.items[i]);
+                for (let j = 0; j < this.data.audioGroupsData.audioItems.length; j++) {
+                    // console.log("Ccchekin trigger group item " +triggerGroup.items[i]+ " vs " + this.data.audioGroupsData.audioItems[j]._id);
+                    if (triggerGroup.items[i] == this.data.audioGroupsData.audioItems[j]._id) {
+                    
+                        // console.log("found audio item tags are " + this.data.audioGroupsData.audioItems[j].tags); //not ideal, maybe the groupitems can store tags? or cache them when loaded below?
+                        if (this.data.audioGroupsData.audioItems[j].tags && this.data.audioGroupsData.audioItems[j].tags.includes(tag)) {
+                            // console.log("tag match to " + tag);
+                            
+                            return triggerGroup.items[i];
+                        
+                        }
+                    }
+                }
+            }
+        } else {
+            return null;
+        }
     },
     returnRandomTriggerAudioID: function () {
         // console.log(JSON.stringify(this.data.audioGroupsData));
