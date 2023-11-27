@@ -1426,7 +1426,7 @@ AFRAME.registerComponent('ambient-child', { //objects with this component will f
 //  // Clamp number between two values with the following line:
 // const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
 
-AFRAME.registerComponent('object_audio_controller', { //set on mod_objects if it has an audiogroup
+AFRAME.registerComponent('object_audio_controller', { //set on mod_object(s) if it has an audiogroupID
     schema: {
     url: {default: ''},
     volume: {default: -40},
@@ -1439,37 +1439,62 @@ AFRAME.registerComponent('object_audio_controller', { //set on mod_objects if it
         this.audioGroupsController = null;
         this.audioGroupsEl = document.getElementById('audioGroupsEl');
         console.log("tryna init object_audio_controller " + this.data._id);
-        let audio
+        this.objectAudioHowl = null;
         if (this.audioGroupsEl) {
             this.audioGroupsController = this.audioGroupsEl.components.audio_groups_control;
-            if (this.audioGroupsController.audioGroupsDataIsReady) {
-                let audioItem = this.audioGroupsController.returnRandomObjectAudioItemID(this.data._id);
+            // if (this.audioGroupsController.audioGroupsDataIsReady) {
+            //     let audioItem = this.audioGroupsController.returnRandomObjectAudioItemID(this.data._id);
+            //     this.objectAudioHowl = new Howl({
+            //         src: [audioItem.URLogg, audioItem.URLmp3],
+            //         format: ["ogg", "mp3"]
+            //         // sprite: {trigger: [0, 5000]}
+            //     }); 
+            //     this.objectAudioHowl.play();
+            // } else {
+               
+            //     this.interval = setInterval(() => { //hrm...
+            //         if (this.audioGroupsController.audioGroupsDataIsReady) {
+            //           clearInterval(this.interval);
+            //           let audioID = this.audioGroupsController.returnRandomObjectAudioItemID(this.data._id);
+            //           let audioItem = this.audioGroupsController.returnAudioItem(audioID);
+            //             console.log(audioID + "obect_audio item " + JSON.stringify(audioItem));
+            //             this.objectAudioHowl = new Howl({
+            //                 src: [audioItem.URLogg, audioItem.URLmp3],
+            //                 format: ["ogg", "mp3"]
+            //                 // sprite: {trigger: [0, 5000]}
+            //             }); 
+            //             this.objectAudioHowl.play();
+            //         }
+            //     }, 1000);
+            // }
+            
+        } else {
+            console.log("caint find no object_audio data...");
+        }
+    },
+    playRandom: function() {
+        if (this.audioGroupsController.audioGroupsDataIsReady) {
+            let audioID = this.audioGroupsController.returnRandomObjectAudioItemID(this.data._id);
+            let audioItem = this.audioGroupsController.returnAudioItem(audioID);
+              console.log(audioID + "obect_audio item " + JSON.stringify(audioItem));
+              if (this.objectAudioHowl) {
+                if (!this.objectAudioHowl.playing()) {
+                    this.objectAudioHowl = new Howl({
+                        src: [audioItem.URLogg, audioItem.URLmp3],
+                        format: ["ogg", "mp3"]
+                        // sprite: {trigger: [0, 5000]}
+                    }); 
+                    this.objectAudioHowl.play();
+                } 
+                
+            } else {
                 this.objectAudioHowl = new Howl({
                     src: [audioItem.URLogg, audioItem.URLmp3],
                     format: ["ogg", "mp3"]
                     // sprite: {trigger: [0, 5000]}
                 }); 
                 this.objectAudioHowl.play();
-            } else {
-               
-                this.interval = setInterval(() => { //hrm...
-                    if (this.audioGroupsController.audioGroupsDataIsReady) {
-                      clearInterval(this.interval);
-                      let audioID = this.audioGroupsController.returnRandomObjectAudioItemID(this.data._id);
-                      let audioItem = this.audioGroupsController.returnAudioItem(audioID);
-                        console.log(audioID + "obect_audio item " + JSON.stringify(audioItem));
-                        this.objectAudioHowl = new Howl({
-                            src: [audioItem.URLogg, audioItem.URLmp3],
-                            format: ["ogg", "mp3"]
-                            // sprite: {trigger: [0, 5000]}
-                        }); 
-                        this.objectAudioHowl.play();
-                    }
-                }, 1000);
             }
-            
-        } else {
-            console.log("caint find no object_audio data...");
         }
     }
 });
@@ -1930,7 +1955,7 @@ AFRAME.registerComponent('audio_groups_control', { //element and component are a
     },
     returnAudioItem: function (id) {
         let index = -1;
-        console.log("tryna get audio item id " + id);
+        // console.log("tryna get audio item id " + id);
         if (id && this.data.audioGroupsData && this.data.audioGroupsData.audioItems) {
             for (var i = 0; i < this.data.audioGroupsData.audioItems.length; i++){
                 if (id == this.data.audioGroupsData.audioItems[i]._id) {
@@ -1940,7 +1965,7 @@ AFRAME.registerComponent('audio_groups_control', { //element and component are a
                 }
             }
         } else {
-            console.log("cain't find audioItems...");
+            console.log("cain't find audioItem with id " + id);
         }
         // console.log("tryna get audio index " + index);
         if (index != -1) {

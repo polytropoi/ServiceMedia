@@ -1677,10 +1677,19 @@ AFRAME.registerComponent('mod_object', {
                   this.navAgentController.updateAgentState("target"); //instead of waypoints
                 }
               }
+              if (this.data.objectData.audiogroupID && this.data.objectData.audiogroupID.length > 4) { //it's an objectID
+                if (this.objectAudioController) {
+                  console.log("tryna play random object_audio");
+                  this.objectAudioController.playRandom();
+                } else {
+                  this.objectAudioController = this.el.components.object_audio_controller;
+                }
+              }
+              
   
             }
             if (this.tags != undefined && this.tags != null && this.tags != "undefined") { //MAYBE SHOULD BE UNDER RAYHIT?
-              console.log("tryna play audio with tags " + this.tags);
+             
               // if (this.triggerAudioController != null) {
                 // let distance = window.playerPosition.distanceTo(this.hitpoint);
                 // this.triggerAudioController.components.trigger_audio_control.playAudioAtPosition(evt.detail.intersection.point, distance, this.tags, 1);//tagmangler needs an array, add vol mod 
@@ -1782,14 +1791,14 @@ AFRAME.registerComponent('mod_object', {
               }
             }
             if (this.selectAction.actionResult.toLowerCase() == "prompt" || this.selectAction.actionResult.toLowerCase() == "dialog") {
-              if (this.isNavAgent) {
+              if (this.isNavAgent && this.navAgentController) {
                 if (this.navAgentController.currentState == "dialog") {
                   this.navAgentController.updateAgentState("random");
                 } else {
                   this.navAgentController.updateAgentState("dialog");
-                  if (this.objectData.audiogroupID && this.objectData.audiogroupID.length > 4) {
-                    triggerAudioController
-                  }
+                  // if (this.data.objectData.audiogroupID && this.objectData.audiogroupID.length > 4) {
+                  //   triggerAudioController
+                  // }
                 }
                 
               }
