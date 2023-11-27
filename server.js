@@ -8095,7 +8095,7 @@ app.post('/return_audiogroups/', function(req, res) {
                         callback(err);
                     } else {
                         // res.json(group_items);
-                        // console.log("returning audiogroup " + JSON.stringify(group_items));
+                        console.log("returning audiogroup " + JSON.stringify(group_items));
                         response.objectGroupItems = group_items;
                         let groupdata = group_items[0].groupdata;
                         groupItems.push.apply(groupItems, groupdata); //concat arrays
@@ -8125,7 +8125,7 @@ app.post('/return_audiogroups/', function(req, res) {
             }
         },
         function (callback) {
-            // console.log("audio IDs: " + audio_IDs);
+            console.log("audio IDs: " + audio_IDs);
             const audio_ids = audio_IDs.map(item => { return ObjectID(item); });
             db.audio_items.find({'_id': { $in: audio_ids}}).toArray(function (err, audio_items) {
                 if (err || !audio_items) {

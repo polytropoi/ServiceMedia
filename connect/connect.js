@@ -206,7 +206,8 @@ $(function() {
       if (settings.skyboxID == "") {
          // skyboxEl.components.skybox_dynamic.nextSkybox();
       }
-      if (settings.audioGroups && settings.audioGroups.triggerGroups && settings.audioGroups.triggerGroups.length > 0 || 
+      if (settings.audioGroups && settings.audioGroups.objectGroups && settings.audioGroups.objectGroups.length > 0 || 
+         settings.audioGroups && settings.audioGroups.triggerGroups && settings.audioGroups.triggerGroups.length > 0 || 
          settings.audioGroups && settings.audioGroups.ambientGroups && settings.audioGroups.ambientGroups.length > 0 ||
          settings.audioGroups && settings.audioGroups.primaryGroups &&  settings.audioGroups.primaryGroups.length > 0) {
          // audioGroupsEl = document.getElementById('audioGroupsEl');

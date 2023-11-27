@@ -4,12 +4,17 @@ let stream = params.split("_")[0];
 let audiourl = params.split("_")[1];
 if (audiourl != null && audiourl.length)
 var hostname = (new URL(audiourl)).hostname;
+
+let triggerParams = document.querySelector(".triggerAudioParams").id;
+// const clampNumber = (num, a, b) => Math.max(Math.min(num, Math.max(a, b)), Math.min(a, b));
+let triggerPosition = "";
+
 // var hostname = 'servicemedia.net';
 let title = "";
 let listeners = 0;
 let bitrate = 0;
 
-var getJSON = function(url, callback) { //netradio details
+var getJSON = function(url, callback) { //netradio details //nm
     var xhr = new XMLHttpRequest();  
     xhr.open('POST', url, true);
     xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
@@ -286,7 +291,7 @@ AFRAME.registerComponent('primary_audio_player', {  //setup and controls for the
         }
      }
 
-});
+}); //end primary_audio_player 
 
 // console.log("params" +params+ "url " + audiourl + " stream " + stream);
 // if (audiourl != null) {
@@ -1411,9 +1416,7 @@ AFRAME.registerComponent('ambient-child', { //objects with this component will f
     }
     }); //end register
 
-    let triggerParams = document.querySelector(".triggerAudioParams").id;
-// const clampNumber = (num, a, b) => Math.max(Math.min(num, Math.max(a, b)), Math.min(a, b));
-let triggerPosition = "";
+
 
 // Number.prototype.clamp = function(min, max) {
 //     return Math.min(Math.max(this, min), max);
@@ -1423,16 +1426,51 @@ let triggerPosition = "";
 //  // Clamp number between two values with the following line:
 // const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
 
-AFRAME.registerComponent('object_audio_control', { //set on mod_objects if it has an audiogroup
+AFRAME.registerComponent('object_audio_controller', { //set on mod_objects if it has an audiogroup
     schema: {
     url: {default: ''},
     volume: {default: -40},
-    init: {default: ''}
+    init: {default: ''},
+    _id: {default: ''}
     // title: {default: ''}
     },
     
     init: function () {
-        new Howl
+        this.audioGroupsController = null;
+        this.audioGroupsEl = document.getElementById('audioGroupsEl');
+        console.log("tryna init object_audio_controller " + this.data._id);
+        let audio
+        if (this.audioGroupsEl) {
+            this.audioGroupsController = this.audioGroupsEl.components.audio_groups_control;
+            if (this.audioGroupsController.audioGroupsDataIsReady) {
+                let audioItem = this.audioGroupsController.returnRandomObjectAudioItemID(this.data._id);
+                this.objectAudioHowl = new Howl({
+                    src: [audioItem.URLogg, audioItem.URLmp3],
+                    format: ["ogg", "mp3"]
+                    // sprite: {trigger: [0, 5000]}
+                }); 
+                this.objectAudioHowl.play();
+            } else {
+               
+                this.interval = setInterval(() => { //hrm...
+                    if (this.audioGroupsController.audioGroupsDataIsReady) {
+                      clearInterval(this.interval);
+                      let audioID = this.audioGroupsController.returnRandomObjectAudioItemID(this.data._id);
+                      let audioItem = this.audioGroupsController.returnAudioItem(audioID);
+                        console.log(audioID + "obect_audio item " + JSON.stringify(audioItem));
+                        this.objectAudioHowl = new Howl({
+                            src: [audioItem.URLogg, audioItem.URLmp3],
+                            format: ["ogg", "mp3"]
+                            // sprite: {trigger: [0, 5000]}
+                        }); 
+                        this.objectAudioHowl.play();
+                    }
+                }, 1000);
+            }
+            
+        } else {
+            console.log("caint find no object_audio data...");
+        }
     }
 });
 
@@ -1784,8 +1822,12 @@ AFRAME.registerComponent('trigger_audio_control', { //trigger audio on designate
         }
     }
 }); //end register
+
+///////////////////////////////////////
+////////////////////////////////////////// - audio_groups_control 
+///////////////////////////////////////
     
-AFRAME.registerComponent('audio_groups_control', { //element and component are added if settings data (in connect.js) includes audio groups
+AFRAME.registerComponent('audio_groups_control', { //element and component are added if settings data (in connect.js) includes audio groups, except for objectAudioGroups
     schema: {
     init: {default: ''},
     // volume: {default: -40},
@@ -1797,11 +1839,14 @@ AFRAME.registerComponent('audio_groups_control', { //element and component are a
     },
     
     init: function () {
+        this.audioGroupsDataIsReady = false;
         this.data.audioGroupsData = null;
         console.log("settings.audiogroups: " + JSON.stringify(settings.audioGroups));
         this.data.triggerGroups = settings.audioGroups.triggerGroups;
         this.data.ambientGroups = settings.audioGroups.ambientGroups;
         this.data.primaryGroups = settings.audioGroups.primaryGroups;
+        this.data.objectGroups = settings.audioGroups.objectGroups;
+     
         this.LoadAudioGroups(settings.audioGroups);
 
     },
@@ -1809,12 +1854,14 @@ AFRAME.registerComponent('audio_groups_control', { //element and component are a
     SetAudioGroupsData: function (data) {
         // console.log("audiogroups data: " +JSON.stringify(data));
         this.data.audioGroupsData = data;
+        this.audioGroupsDataIsReady = true;
+        // console.log("objectGroups : " + JSON.stringify(this.data.audioGroupsData));
         this.attribEl = document.getElementById("attributionsEntity");
         this.audioAttribs = [];
         
         if (this.attribEl) {
             this.attribControl = this.attribEl.components.attributions_text_control;
-            if (this.attribControl) {
+            if (this.attribControl && this.data.audioGroupsData.audioItems) {
                 for (let i = 0; i < this.data.audioGroupsData.audioItems.length; i++) {
                     if (this.data.audioGroupsData.audioItems[i].sourceText != undefined && this.data.audioGroupsData.audioItems[i].sourceText != null) {
                        
@@ -1883,17 +1930,21 @@ AFRAME.registerComponent('audio_groups_control', { //element and component are a
     },
     returnAudioItem: function (id) {
         let index = -1;
-        // console.log("tryna get audio item id " + id);
-        if (this.data.audioGroupsData) {
+        console.log("tryna get audio item id " + id);
+        if (id && this.data.audioGroupsData && this.data.audioGroupsData.audioItems) {
             for (var i = 0; i < this.data.audioGroupsData.audioItems.length; i++){
                 if (id == this.data.audioGroupsData.audioItems[i]._id) {
                     index = i;
+
                     break;
                 }
             }
+        } else {
+            console.log("cain't find audioItems...");
         }
         // console.log("tryna get audio index " + index);
         if (index != -1) {
+            console.log("gotsa audio item from object_audio_group at index " + index);
             return this.data.audioGroupsData.audioItems[index];
             // return null;
         } else {
@@ -1901,15 +1952,24 @@ AFRAME.registerComponent('audio_groups_control', { //element and component are a
         }
        
     },
-    returnRandomObjectAudioID: function (id) {
-        // console.log(JSON.stringify(this.data.audioGroupsData));
+    returnRandomObjectAudioItemID: function (id) {
+        console.log("lloking for object_audiogroup id " +id );
         
-        let objectAudioGroup = this.data.audioGroupsData.objectAudioGroupItems[0];
-        return objectAudioGroup.items[Math.floor(Math.random()*objectAudioGroup.items.length)]; //pick a random entry from trigger ids
+        let index = this.data.audioGroupsData.objectGroups.indexOf(id);
+
+        if (index != -1) {
+            let objectAudioGroup = this.data.audioGroupsData.objectGroupItems[index];
+            console.log("object_audio group: " + JSON.stringify(objectAudioGroup));
+            return objectAudioGroup.items[Math.floor(Math.random()*objectAudioGroup.items.length)]; //pick a random entry from ids
+
+        } else {
+            return null;
+        }
+       
     },
     returnObjectAudioIDWithTag: function (id, tag) {
         
-        if (tag && this.data.audioGroupsData) {
+        if (tag && this.data.audioGroupsData) { //NO
             let triggerGroup = this.data.audioGroupsData.triggerGroupItems[0];
             // console.log("looking for audio trigger with tag " + tag + " in files " + triggerGroup.items.length);
             for (let i = 0; i < triggerGroup.items.length; i++) {
@@ -1940,7 +2000,7 @@ AFRAME.registerComponent('audio_groups_control', { //element and component are a
     },
     returnTriggerAudioIDWithTag: function (tag) {
         
-        if (tag && this.data.audioGroupsData) {
+        if (tag && this.data.audioGroupsData && this.data.audioGroupsData.triggerGroupItems) {
             let triggerGroup = this.data.audioGroupsData.triggerGroupItems[0];
             // console.log("looking for audio trigger with tag " + tag + " in files " + triggerGroup.items.length);
             for (let i = 0; i < triggerGroup.items.length; i++) {
@@ -1960,6 +2020,7 @@ AFRAME.registerComponent('audio_groups_control', { //element and component are a
                 }
             }
         } else {
+            console.log("trigger audio not found!");
             return null;
         }
     }

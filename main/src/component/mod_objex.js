@@ -517,7 +517,8 @@ AFRAME.registerComponent('mod_object', {
       this.up = new THREE.Vector3(0, 1, 0);
       this.line = null;
       this.equipHolder = document.getElementById("equipPlaceholder");
-      
+      this.objectAudioController = null;
+
       let cameraEl = document.querySelector('a-entity[camera]');  
       if (!cameraEl) {
           cameraEl = document.querySelector('a-camera');
@@ -532,7 +533,7 @@ AFRAME.registerComponent('mod_object', {
         }
         // this.camera = cameraEl.components.camera.camera;
       }
-  
+      
       if (JSON.stringify(this.data.eventData).includes("beat")) {
         console.log ("adding class beatmee");
         this.el.classList.add("beatme");
@@ -557,7 +558,7 @@ AFRAME.registerComponent('mod_object', {
             this.thirdPersonPlaceholder.setAttribute("gltf-model", this.data.objectData.modelURL); 
             let rot = {};
             rot.x = this.data.locationData.eulerx != undefined ? this.data.locationData.eulerx : 0;
-            rot.y = this.data.locationData.eulery != undefined ? this.data.locationData.eulery : 0;
+            rot.y = this.data.locationData.eulery != undefined ? this.data.locationData.eulery : 0; //TODO raycast and use normal for rotation, or lock y
             rot.z = this.data.locationData.eulerz != undefined ? this.data.locationData.eulerz : 0;
             this.thirdPersonPlaceholder.setAttribute("rotation", rot);
           } else {
@@ -565,7 +566,7 @@ AFRAME.registerComponent('mod_object', {
             this.thirdPersonPlaceholder.setAttribute("gltf-model", "#" +this.data.objectData.modelID); 
             let rot = {};
             rot.x = this.data.locationData.eulerx != undefined ? this.data.locationData.eulerx : 0;
-            rot.y = this.data.locationData.eulery != undefined ? this.data.locationData.eulery : 0;
+            rot.y = this.data.locationData.eulery != undefined ? this.data.locationData.eulery : 0; //""
             rot.z = this.data.locationData.eulerz != undefined ? this.data.locationData.eulerz : 0;
             this.thirdPersonPlaceholder.setAttribute("rotation", rot);
           }
@@ -612,16 +613,7 @@ AFRAME.registerComponent('mod_object', {
       if (this.data.objectData.triggerScale == undefined || this.data.objectData.triggerScale == null || this.data.objectData.triggerScale == "" || this.data.objectData.triggerScale == 0) {
         this.data.objectData.triggerScale = 1;
       } 
-      setTimeout(() => { //to make sure audio group data is loaded
-        if (this.tags && this.tags.includes("loop")){
-          console.log("tryna trigger mod_object loop");
-          var triggerAudioController = document.getElementById("triggerAudio");
-          if (triggerAudioController != null) {
-            
-            triggerAudioController.components.trigger_audio_control.loopAndFollow(this.el.id, this.tags, !this.hasTriggerAction); //don't autoplay if hastriggeraction
-          }
-        }   
-      }, 2000);
+
        
       if (this.data.objectData.physics === "Navmesh Agent" || this.data.eventData.toLowerCase().includes("agent")) { 
         this.isNavAgent = true;
@@ -769,22 +761,22 @@ AFRAME.registerComponent('mod_object', {
         }
       }
   
-      if (this.data.isEquipped) {
-  
+    if (this.data.isEquipped) {
+
         if (this.hasTriggerAction) {
-          this.el.setAttribute("raycaster", {"objects": ".target", "far": "50", "position": "0 -0.5 0", "rotation": "90 0 0"});
-          this.equippedRaycaster = this.el.components.raycaster;
+        this.el.setAttribute("raycaster", {"objects": ".target", "far": "50", "position": "0 -0.5 0", "rotation": "90 0 0"});
+        this.equippedRaycaster = this.el.components.raycaster;
         }
         if (this.hasShootAction || this.hasThrowAction) {
-          this.el.classList.add("activeObjexRay");
+        this.el.classList.add("activeObjexRay");
         }
         
-      
-  
-      } else {
+    
+
+    } else {
         this.el.classList.add("activeObjexRay");
-      }
-      if (this.data.removeAfter != "") { //cleanup if timeout set
+    }
+    if (this.data.removeAfter != "") { //cleanup if timeout set
         setTimeout( () => { 
           // this.el.visible = false;
           let trailComponent = this.el.components.trail;
@@ -800,13 +792,27 @@ AFRAME.registerComponent('mod_object', {
           
         }, 5000);
       }
-  
+    if (this.tags && this.tags.includes("loop")){
+        setTimeout(() => { //to make sure audio group data is loaded   
+            console.log("tryna trigger mod_object loop");
+            var triggerAudioController = document.getElementById("triggerAudio");
+            if (triggerAudioController != null) {
+                triggerAudioController.components.trigger_audio_control.loopAndFollow(this.el.id, this.tags, !this.hasTriggerAction); //don't autoplay if hastriggeraction
+            }   
+            }, 2000);
+        }
+    if (this.data.objectData.audiogroupID && this.data.objectData.audiogroupID.length > 4) { //it's an objectID
+        console.log("tryna set object_audio_controller id " + this.data.objectData.audiogroupID);
+        this.objectAudioController = this.el.setAttribute("object_audio_controller", {_id: this.data.objectData.audiogroupID});
+    }
+        
       let that = this;
   
   
       this.el.addEventListener('model-loaded', () => {
   
         console.log(this.data.objectData.name + " mod_object model-loaded");
+        
         
         let pos = {};
         pos.x = this.data.locationData.x;
@@ -1483,7 +1489,7 @@ AFRAME.registerComponent('mod_object', {
           if (this.intersection) {
             this.hitpoint = this.intersection.point;
             that.hitpoint = this.hitpoint;
-            console.log(that.data.objectData.name + " with tags " + this.tags);
+            // console.log(that.data.objectData.name + " with tags " + this.tags);
           }
       });
       this.el.addEventListener("raycaster-intersected-cleared", () => {
@@ -1498,8 +1504,8 @@ AFRAME.registerComponent('mod_object', {
       });
   
       this.el.addEventListener('mouseenter', (evt) => {
-        console.log("mouse enter mod_object "+ this.el.id);
-        // evt.preventDefault();
+        console.log("mouse enter mod_object name " + this.data.objectData.name + " id " + this.el.id);
+        evt.preventDefault();
         if (!this.data.isEquipped) {
           if (posRotReader != null) {
             this.playerPosRot = posRotReader.returnPosRot(); 
@@ -1509,12 +1515,11 @@ AFRAME.registerComponent('mod_object', {
             this.playerPosRot = posRotReader.returnPosRot(); 
             window.playerPosition = this.playerPosRot.pos; 
           }
-          // console.log(window.playerPosition);
+          
           if (!this.isSelected && evt.detail.intersection != null) {
             this.clientX = evt.clientX;
             this.clientY = evt.clientY;
-            console.log("tryna mouseover " + this.data.objectData.name);
-            // that.calloutToggle = !that.calloutToggle;
+            
   
             this.pos = evt.detail.intersection.point; //hitpoint on model
             let name = evt.detail.intersection.object.name;

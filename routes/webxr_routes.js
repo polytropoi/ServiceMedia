@@ -2341,11 +2341,26 @@ webxr_router.get('/:_id', function (req, res) {
                                                     imageAssets = imageAssets + "<img id=\x22smoke1\x22 src=\x22http://servicemedia.s3.amazonaws.com/assets/pics/smokeanim2.png\x22 crossorigin=\x22anonymous\x22>";
                                                 }
                                             }
+                                          
+                                            cb(null);
+                                        },
+                                        function (cb) {
                                             if (objekt.audiogroupID && objekt.audiogroupID.length > 4) {
                                                 console.log("AUDIO OBJECT GROUP!!!! " + objekt.audiogroupID);
                                                 objectAudioGroups.push(objekt.audiogroupID);
+                                                db.groups.findOne({_id: ObjectID(objekt.audiogroupID)}, function (err, group) {
+                                                    if (err || !group) {
+                                                        cb(null);
+                                                    } else {
+                                                        // for (let i = 0; i < group.length)
+                                                        requestedAudioItems.push(group.items);
+                                                        console.log("requestedAudioItems : " + requestedAudioItems);
+                                                        cb(null);
+                                                    }
+                                                });
+                                            } else {
+                                                cb(null);
                                             }
-                                            cb(null);
                                         },
                                         function(cb) {
                                          //get the model (needs array flexing!)
