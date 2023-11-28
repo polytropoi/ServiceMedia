@@ -183,7 +183,7 @@ AFRAME.registerComponent('mod_model', {
               // <a-entity class="cube" mixin="cube" position="1 5.265 -0.5" material="color: green"></a-entity>
             }
           } 
-          if (this.data.eventData.toLowerCase().includes("navmesh")) { //no, this is set on the server ~line 2586
+          if (this.data.eventData.toLowerCase().includes("navmesh")) { //no, this is set on the server (webxr_routes.js) ~line 2600
             // groundMod = "static-body=\x22shape: auto;\x22"; //no, it needs to wait for model-loaded
             if (settings.useNavmesh) {
               
@@ -448,8 +448,13 @@ AFRAME.registerComponent('mod_model', {
                 let skinnedMeshColliderEl = document.createElement("a-sphere"); //screw it, can't got the boundingbox fu to work...
                 skinnedMeshColliderEl.setAttribute("scale", ".5 1 .5"); //todo pass in scale
                 // skinnedMeshColliderEl.setObject3D(sphere);\
-                skinnedMeshColliderEl.setAttribute("material", {"color": "purple", "transparent": true, "opacity": 0.1});
-                skinnedMeshColliderEl.setAttribute("visible", false);
+                if (settings && settings.debugMode) {
+                  skinnedMeshColliderEl.setAttribute("material", {"color": "purple", "transparent": true, "opacity": 0.1});
+                } else {
+                  skinnedMeshColliderEl.setAttribute("visible", false);
+                }
+              
+                
                 // skinnedMeshColliderEl.setAttribute("opacity", "0.1");
                 skinnedMeshColliderEl.classList.add("activeObjexRay");
                 this.el.appendChild(skinnedMeshColliderEl);
@@ -563,6 +568,7 @@ AFRAME.registerComponent('mod_model', {
                 // let child = this.meshChildren[i].clone();
                 this.child = this.el.object3D.getObjectByName(this.meshChildren[i].name, true);
                 this.child.visible = false; //just hide named navmesh, they're loaded externally... 
+
   
               } else if (this.meshChildren[i].name.includes("collider")) { //for models just assume this is static
                 if (settings.usePhysicsType == "ammo") {

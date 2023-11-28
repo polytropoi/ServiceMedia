@@ -1536,8 +1536,8 @@ webxr_router.get('/:_id', function (req, res) {
                                     "<a-entity id=\x22cameraRig\x22 initializer "+
                                 
                                         " id=\x22mouseCursor\x22 cursor=\x22rayOrigin: mouse\x22 raycaster=\x22objects: .activeObjexRay\x22>"+
-                                        
-                                        "<a-entity id=\x22player\x22 "+wasd+" "+ physicsMod +" position=\x220 0 0\x22>"+
+                                        // "<a-entity id=\x22player\x22 "+wasd+" "+ physicsMod +" position=\x22"+playerPosition+"\x22>"+
+                                        "<a-entity id=\x22player\x22 position=\x22"+playerPosition+"\x22>"+
                                             "<a-entity id=\x22equipPlaceholder\x22 geometry=\x22primitive: box; height: .1; width: .1; depth: .1\x22 position=\x220 -.65 -.75\x22"+
                                             "material=\x22opacity: 0\x22></a-entity>"+
                                             "<a-entity id=\x22viewportPlaceholder\x22 geometry=\x22primitive: plane; height: 0.01; width: .01\x22 position=\x220 0 -1.5\x22"+
@@ -2602,18 +2602,8 @@ webxr_router.get('/:_id', function (req, res) {
                                             arMode = "spawn";
                                            
                                         }
-                                        if (locMdl.eventData.toLowerCase().includes("navmesh")) {
-                                            if (locMdl.eventData.toLowerCase().includes("simplenav")) {
-                                              
-                                                
-                                                // if (locMdl.eventData.toLowerCase().includes("ground")) { 
-                                                //     // groundMod = "static-body=\x22shape: auto;\x22"; //no, it needs to wait for model-loaded
-                                                // }
-                                                // navmeshAsset = "<a-asset-item id=\x22" + m_assetID + "\x22 src=\x22"+ modelURL +"\x22></a-asset-item>";
-                                                // navmeshEntity = "<a-entity "+groundMod+" id=\x22nav-mesh\x22 visible=\x22false\x22 gltf-model=\x22#" + m_assetID + "\x22></a-entity>";
-                                            }
-                                            
-                                            // else {
+                                        if (locMdl.eventData.toLowerCase().includes("navmesh")) { //use the same one for simple and pathfinding modes
+
                                                 let visible = false;
                                                 if (sceneResponse.sceneTags != null && (sceneResponse.sceneTags.includes('debug'))) {
                                                     visible = true;
@@ -2624,7 +2614,7 @@ webxr_router.get('/:_id', function (req, res) {
                                                 // if (locMdl.eventData.toLowerCase().includes("show")) {
                                                 //     navmeshEntity = "<a-entity id=\x22nav_mesh\x22 nav_mesh=\x22show: true;\x22 gltf-model=\x22#" + m_assetID + "\x22></a-entity>";
                                                 // }
-                                                navmeshEntity = "<a-entity id=\x22nav-mesh\x22 material=\x22visible: false\x22 nav-mesh nav_mesh_controller visible=\x22"+visible+"\x22 gltf-model=\x22#" + m_assetID + "\x22></a-entity>"; //maybe id=nav-mesh so simple navmesh can use it too?
+                                                navmeshEntity = "<a-entity id=\x22nav-mesh\x22 nav-mesh nav_mesh_controller visible=\x22"+visible+"\x22 gltf-model=\x22#" + m_assetID + "\x22></a-entity>"; //maybe id=nav-mesh so simple navmesh can use it too?
                                                 // if (locMdl.eventData.toLowerCase().includes("show")) {
                                                 //     navmeshEntity = "<a-entity id=\x22nav-mesh\x22 nav-mesh gltf-model=\x22#" + m_assetID + "\x22></a-entity>";
                                                 // }

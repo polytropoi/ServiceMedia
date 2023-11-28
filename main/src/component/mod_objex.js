@@ -124,7 +124,7 @@ AFRAME.registerComponent('mod_objex', {
               this.objectData =  this.returnObjectData(this.data.jsonLocationsData[j].objectID);
               console.log("gotsa object to spawn " + JSON.stringify(this.data.jsonLocationsData[j].locationTags));
               let objEl = document.createElement("a-entity");
-              objEl.setAttribute("mod_object", {'eventData': null, 'locationData': locationData, 'objectData': this.objectData, 'timestamp': this.data.jsonLocationsData[j].timestamp, 'tags': this.data.jsonLocationsData[j].locationTags});
+              objEl.setAttribute("mod_object", {'eventData': null, 'locationData': locationData, 'objectData': this.objectData, 'timestamp': this.data.jsonLocationsData[j].timestamp, 'tags': this.data.jsonLocationsData[j].locationTags, 'isSpawned': true});
               objEl.id = elIDString;
               sceneEl.appendChild(objEl);
               if (this.triggerAudioController != null) {
@@ -248,7 +248,7 @@ AFRAME.registerComponent('mod_objex', {
         this.locData.eulery = (this.objectData.eulery != undefined && this.objectData.eulery != "") ? this.objectData.eulery : 0;
         this.locData.eulerz = (this.objectData.eulerz != undefined && this.objectData.eulerz != "") ? this.objectData.eulerz : 0;
         this.locData.timestamp = Date.now();
-        this.objEl.setAttribute("mod_object", {'eventData': null, 'locationData': this.locData, 'objectData': this.objectData, 'isEquipped': true});
+        this.objEl.setAttribute("mod_object", {'eventData': null, 'locationData': this.locData, 'objectData': this.objectData, 'isEquipped': true, 'isSpawned': true});
         this.objEl.id = "obj" + this.objectData._id + "_" + this.locData.timestamp;
         this.objEl.classList.add('equipped');
         
@@ -285,7 +285,7 @@ AFRAME.registerComponent('mod_objex', {
         this.locData.y = this.dropPos.y;
         this.locData.z = this.dropPos.z;
         this.locData.timestamp = Date.now();
-        this.objEl.setAttribute("mod_object", {'eventData': null, 'locationData': this.locData, 'objectData': this.objectData});
+        this.objEl.setAttribute("mod_object", {'eventData': null, 'locationData': this.locData, 'objectData': this.objectData, 'isSpawned': true});
         this.objEl.id = "obj" + this.objectData._id + "_" + this.locData.timestamp;
         sceneEl.appendChild(this.objEl);
         // this.objEl.components.mod_object.applyForce();
@@ -318,7 +318,7 @@ AFRAME.registerComponent('mod_objex', {
           this.locData.timestamp = Date.now();
           this.objEl.setAttribute("position", this.dropPos);
           // this.objEl.setAttribute("mod_object", {'eventData': null, 'locationData': this.locData, 'objectData': this.objectData, 'applyForceToNewObject': true, 'forceFactor': downtime, 'removeAfter': "5"});
-          this.objEl.setAttribute("mod_object", {'eventData': null, 'locationData': this.locData, 'objectData': this.objectData, 'followPathNewObject': true, 'forceFactor': downtime, 'removeAfter': "5"});
+          this.objEl.setAttribute("mod_object", {'eventData': null, 'locationData': this.locData, 'objectData': this.objectData, 'followPathNewObject': true, 'forceFactor': downtime, 'removeAfter': "5", 'isSpawned': true});
           this.objEl.id = "obj" + this.objectData._id + "_" + this.locData.timestamp;
           sceneEl.append(this.objEl);
         }
@@ -336,7 +336,7 @@ AFRAME.registerComponent('mod_objex', {
         this.locData.y = this.dropPos.y;
         this.locData.z = this.dropPos.z;
         this.locData.timestamp = Date.now();
-        this.objEl.setAttribute("mod_object", {'eventData': null, 'locationData': this.locData, 'objectData': this.objectData, 'applyForceToNewObject': true, 'forceFactor': downtime, 'removeAfter': "5"});
+        this.objEl.setAttribute("mod_object", {'eventData': null, 'locationData': this.locData, 'objectData': this.objectData, 'applyForceToNewObject': true, 'forceFactor': downtime, 'removeAfter': "5", 'isSpawned': true});
         this.objEl.id = "obj" + this.objectData._id + "_" + this.locData.timestamp;
   
         sceneEl.appendChild(this.objEl);
@@ -407,6 +407,7 @@ AFRAME.registerComponent('mod_object', {
       eventData: {default: ''},
       markerType: {default: 'none'},
       isEquipped: {default: false},
+      isSpawned: {default: false},
       fromSceneInventory: {default: false},
       timestamp: {default: null},
       applyForceToNewObject: {default: false},
@@ -867,7 +868,8 @@ AFRAME.registerComponent('mod_object', {
             if (settings && settings.debugMode) {
               skinnedMeshColliderEl.setAttribute("material", {"color": "purple", "transparent": true, "opacity": 0.1});
             } else {
-              skinnedMeshColliderEl.setAttribute("material", {"transparent": true, "opacity": 0});
+              skinnedMeshColliderEl.setAttribute('visible', false);
+              // skinnedMeshColliderEl.setAttribute("material", {"transparent": true, "opacity": 0});
             }
             skinnedMeshColliderEl.classList.add("activeObjexRay");
             this.el.appendChild(skinnedMeshColliderEl);
@@ -911,38 +913,7 @@ AFRAME.registerComponent('mod_object', {
         if (this.data.followPathNewObject) {
           this.moveOnCurve(); //todo fix quats!
         }
-        if (this.data.objectData.physics != undefined && this.data.objectData.physics != null && this.data.objectData.physics.toLowerCase() != "none") {
-          console.log("tryna add physics to mod_objecty " + this.data.objectData.name + " is equipped " + this.data.isEquipped + " body " + this.data.objectData.physics);
-          //  setTimeout(function(){  
-            if (this.data.isEquipped) {
-              // this.el.setAttribute('ammo-body', {type: 'kinematic', linearDamping: .1, angularDamping: .1});
-            } else { //nm, switch to dynamic when fired if needed/
-              if (this.hasShootAction) {
-                // this.el.setAttribute('ammo-body', {type: this.data.objectData.physics.toLowerCase(), gravity: '0 -.1 0', angularFactor: '1 0 1', emitCollisionEvents: true, linearDamping: .1, angularDamping: 1}); //nope, shoot is not physical now
-                console.log("tryna shoot!");
-                this.el.setAttribute('ammo-body', {type: 'kinematic', emitCollisionEvents: true});
-                //this.el.body.restitution = .9;
-                this.el.setAttribute('trail', "");
-              } else if (this.hasThrowAction) {
-                console.log("tryna throw..");
-                  this.el.setAttribute('ammo-body', { type: this.data.objectData.physics.toLowerCase(), emitCollisionEvents: true, linearDamping: .1, angularDamping: .1 });
-                  // this.el.setAttribute('rotate-toward-velocity');
-                  // this.el.setAttribute('trail', "");
-                  // this.el.body.restitution = .9;
-                  this.el.setAttribute('trail', "");
-              } else if (this.data.objectData.physics.toLowerCase() == "navmesh agent") {
-                this.el.setAttribute('ammo-body', {type: 'kinematic', emitCollisionEvents: true });
-              } else {
-                setTimeout( () => { //wait a bit for static colliders to load...
-                  console.log("tryna set physics body "+ this.data.objectData.physics.toLowerCase());
-                  this.el.setAttribute('ammo-body', { type: this.data.objectData.physics.toLowerCase(), emitCollisionEvents: true });
-                }, 10000);
-               
-                //this.el.body.restitution = .9;
-              }
-  
-            }
-        }
+     
         if (this.loadAction != null) {
           if (this.loadAction.actionResult.toLowerCase() == "trigger fx") {
             let particleSpawner = document.getElementById('particleSpawner');
@@ -957,15 +928,7 @@ AFRAME.registerComponent('mod_object', {
             }
           }
         }
-          // this.el.setAttribute("aabb-collider", {objects: ".activeObjexRay"});
-  
-  
-          // // if (!this.isInitialized) {
-          //   if (this.data.eventData.includes("scatter")) {
-          //     // this.el.object3D.visible = false;
-          //     console.log("GOTSA SCATTER OBJEK@");
-          //   }
-          // this.oScale = oScale;
+
           this.bubble = null;
           this.bubbleText = null;
           this.isInitialized = true;
@@ -1014,7 +977,7 @@ AFRAME.registerComponent('mod_object', {
               // this.el.setAttribute('fireworks_spawner', {type: 'fireball'});
               this.hasAudioTrigger = true;
             }
-            if (this.data.eventData.toLowerCase().includes("agent")) { 
+            if (this.data.eventData.toLowerCase().includes("agent") || this.data.objectData.physics.includes("Navmesh Agent")) { 
               if (settings.useNavmesh) {
                 this.el.setAttribute("nav-agent", "");
                 this.el.setAttribute("nav_agent_controller", "");  
@@ -1344,7 +1307,54 @@ AFRAME.registerComponent('mod_object', {
                 });        
               }
             } 
-           
+            if (this.data.objectData.physics != undefined && this.data.objectData.physics != null && this.data.objectData.physics.toLowerCase() != "none") {
+              console.log("tryna add physics to mod_objecty " + this.data.objectData.name + " is equipped " + this.data.isEquipped + " body " + this.data.objectData.physics);
+              //  setTimeout(function(){  
+                if (this.data.isEquipped) {
+                  // this.el.setAttribute('ammo-body', {type: 'kinematic', linearDamping: .1, angularDamping: .1});
+                } else { //nm, switch to dynamic when fired if needed/
+                  if (this.hasShootAction) {
+                    if (this.data.isSpawned) { //if not part of scene init, no need to wait
+                      this.el.setAttribute('ammo-body', {type: 'kinematic', emitCollisionEvents: true});
+                      this.el.setAttribute('trail', "");
+                    } else {
+                      // this.el.setAttribute('ammo-body', {type: this.data.objectData.physics.toLowerCase(), gravity: '0 -.1 0', angularFactor: '1 0 1', emitCollisionEvents: true, linearDamping: .1, angularDamping: 1}); //nope, shoot is not physical now
+                      setTimeout( () => { //wait a bit for static colliders to load...
+                        console.log("tryna shoot!");
+                        this.el.setAttribute('ammo-body', {type: 'kinematic', emitCollisionEvents: true});
+                        //this.el.body.restitution = .9;
+                        
+                      }, 5000);
+                    }
+                  } else if (this.hasThrowAction) {
+                    console.log("tryna throw..");
+                    if (this.data.isSpawned) {
+                      this.el.setAttribute('ammo-body', { type: this.data.objectData.physics.toLowerCase(), emitCollisionEvents: true, linearDamping: .1, angularDamping: .1 });
+                      this.el.setAttribute('trail', "");
+
+                    } else {
+                      setTimeout( () => { //wait a bit for static colliders to load...
+                        this.el.setAttribute('ammo-body', { type: this.data.objectData.physics.toLowerCase(), emitCollisionEvents: true, linearDamping: .1, angularDamping: .1 });
+                        // this.el.setAttribute('rotate-toward-velocity');
+                        // this.el.setAttribute('trail', "");
+                        // this.el.body.restitution = .9;
+                       
+                      }, 5000);
+                    }
+                   
+                  } else if (this.data.objectData.physics.toLowerCase() == "navmesh agent") {
+                    this.el.setAttribute('ammo-body', {type: 'kinematic', emitCollisionEvents: true });
+                  } else {
+                    setTimeout( () => { //wait a bit for static colliders to load...
+                      console.log("tryna set physics body "+ this.data.objectData.physics.toLowerCase());
+                      this.el.setAttribute('ammo-body', { type: this.data.objectData.physics.toLowerCase(), emitCollisionEvents: true });
+                    }, 5000);
+                   
+                    //this.el.body.restitution = .9;
+                  }
+      
+                }
+            }
   
           }
       }); //end model-loaded listener
@@ -1427,7 +1437,7 @@ AFRAME.registerComponent('mod_object', {
                             this.locData.y = this.el.object3D.position.y;
                             this.locData.z = this.el.object3D.position.z;
                             this.locData.timestamp = Date.now();
-                            this.objEl.setAttribute("mod_object", {'locationData': this.locData, 'objectData': objectData});
+                            this.objEl.setAttribute("mod_object", {'locationData': this.locData, 'objectData': objectData, 'isSpawned': true});
                             this.objEl.id = "obj" + objectData._id + "_" + this.locData.timestamp;
                             sceneEl.appendChild(this.objEl);
                           } else {
@@ -2197,7 +2207,7 @@ AFRAME.registerComponent('mod_object', {
       let objectData = objexEl.components.mod_objex.returnObjectData(objectID);
       this.el.removeAttribute('gltf-model');
       let objEl = document.createElement("a-entity");
-      objEl.setAttribute("mod_object", {'locationData': this.data.locationData, 'objectData': objectData});
+      objEl.setAttribute("mod_object", {'locationData': this.data.locationData, 'objectData': objectData, 'isSpawned': true});
       objEl.id = "obj" + objectData._id + "_" + this.data.locationData.timestamp;
       sceneEl.appendChild(objEl);
       // this.el.setAttribute('gltf-model', '#' + modelID.toString());
