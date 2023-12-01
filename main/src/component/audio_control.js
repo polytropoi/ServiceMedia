@@ -1965,7 +1965,7 @@ AFRAME.registerComponent('audio_groups_control', { //element and component are a
                 }
             }
         } else {
-            console.log("cain't find audioItem with id " + id);
+            // console.log("cain't find audioItem with id " + id);
         }
         // console.log("tryna get audio index " + index);
         if (index != -1) {
@@ -2045,7 +2045,7 @@ AFRAME.registerComponent('audio_groups_control', { //element and component are a
                 }
             }
         } else {
-            console.log("trigger audio not found!");
+            // console.log("trigger audio not found!");
             return null;
         }
     }

@@ -1794,7 +1794,7 @@ AFRAME.registerComponent('model-callout', {
          iteration++
          if (iteration < 10) { 
             currentPos = element.getAttribute('position');
-            currentRot =  element.getAttribute('position');
+            currentRot =  element.getAttribute('rotation');
             var lerpedPos = {};
             // var lerpedRot = {};
             lerpedPos.x = lerp(currentPos.x, pos.x, .1).toFixed(2);

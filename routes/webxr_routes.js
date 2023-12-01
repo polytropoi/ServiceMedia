@@ -1052,18 +1052,10 @@ webxr_router.get('/:_id', function (req, res) {
 
                                 }
                                 if (sceneResponse.sceneLocations[i].markerType == "player") {
-                                    let yFix = sceneResponse.sceneLocations[i].y;
-                                    // if (sceneResponse.sceneWebXREnvironment != null && sceneResponse.sceneWebXREnvironment != "none" && sceneResponse.sceneWebXREnvironment != "") {
-                                    //     yFix = 0;
-                                    //     playerPosition = sceneResponse.sceneLocations[i].x + " " + yFix + " " + zFix;
-                                    //     console.log("player sceneWebXREnvironment position: " + playerPosition);
-                                    // } else if (sceneResponse.sceneGroundLevel != null && sceneResponse.sceneGroundLevel != undefined && sceneResponse.sceneGroundLevel != 0 && sceneResponse.sceneGroundLevel != "0") {
-                                    //     yFix = sceneResponse.sceneGroundLevel;
-                                    //     playerPosition = sceneResponse.sceneLocations[i].x + " " + yFix + " " + zFix;
-                                    //     console.log("player position: " + playerPosition);
-                                    // } else {
-                                        playerPosition = sceneResponse.sceneLocations[i].x + " " +  sceneResponse.sceneLocations[i].y + " " +  sceneResponse.sceneLocations[i].z;
-                                    // }
+                                    // let yFix = sceneResponse.sceneLocations[i].y;
+                                    
+                                    playerPosition = sceneResponse.sceneLocations[i].x + " " +  sceneResponse.sceneLocations[i].y + " " +  sceneResponse.sceneLocations[i].z;
+                                    
                                 }
                                 if (sceneResponse.sceneLocations[i].markerType == "text") {
                                     textLocation = sceneResponse.sceneLocations[i].x + " " + sceneResponse.sceneLocations[i].y + " " + zFix; //TODO - these must all be arrays, like sceneModelLocations above!
@@ -1565,18 +1557,19 @@ webxr_router.get('/:_id', function (req, res) {
                                     
                                    
                                     if (!useSuperHands && !useStarterKit) { //if not superhands or starterkit, use default oculus-touch controls + aframe hands 
-                                        let ammoHands = "";
-                                        let hapticsHands = ""; //grab?
-                                        if (usePhysicsType == "ammo") {
-                                            ammoHands = " ammo-body=\x22type: kinematic; emitCollisionEvents: true;\x22 ammo-shape=\x22type: sphere\x22 ";
-                                            hapticsHands = "haptics"
-                                        }
-                                        handEntities = "<a-entity id=\x22left-hand\x22 hand-tracking-grab-controls=\x22hand: left\x22 thumbstick-logging lefthand_xr_listener oculus-touch-controls=\x22hand: left\x22 "+blinkMod+" handModelStyle: lowPoly; color: #ffcccc\x22 "+hapticsHands+">"+
-                                        console + 
-                                        "<a-sphere color=\x22blue\x22 opacity=\x220.1\x22 radius=\x220.06\x22 "+ammoHands+" collision-listener-right></a-sphere></a-entity>" +
-                                        "<a-entity id=\x22right-hand\x22 hand-tracking-grab-controls=\x22hand: right\x22 oculus-touch-controls=\x22hand: right\x22 laser-controls=\x22hand: right;\x22 handModelStyle: lowPoly; color: #ffcccc\x22 raycaster=\x22objects: .activeObjexRay;\x22 grab "+hapticsHands+">"+
-                                        "<a-sphere color=\x22orange\x22 opacity=\x220.1\x22 radius=\x220.06\x22 "+ammoHands+" collision-listener-left></a-sphere>"+
-                                        "</a-entity>";
+                                    
+                                            let ammoHands = "";
+                                            let hapticsHands = ""; //grab?
+                                            if (usePhysicsType == "ammo") {
+                                                ammoHands = " ammo-body=\x22type: kinematic; emitCollisionEvents: true;\x22 ammo-shape=\x22type: sphere\x22 ";
+                                                hapticsHands = "haptics"
+                                            }
+                                            handEntities = "<a-entity id=\x22left-hand\x22 hand-tracking-grab-controls=\x22hand: left\x22 thumbstick-logging lefthand_xr_listener oculus-touch-controls=\x22hand: left\x22 "+blinkMod+" handModelStyle: lowPoly; color: #ffcccc\x22 "+hapticsHands+">"+
+                                            console + 
+                                            "<a-sphere color=\x22blue\x22 opacity=\x220.1\x22 radius=\x220.06\x22 "+ammoHands+" collision-listener-right></a-sphere></a-entity>" +
+                                            "<a-entity id=\x22right-hand\x22 hand-tracking-grab-controls=\x22hand: right\x22 oculus-touch-controls=\x22hand: right\x22 laser-controls=\x22hand: right;\x22 handModelStyle: lowPoly; color: #ffcccc\x22 raycaster=\x22objects: .activeObjexRay;\x22 grab "+hapticsHands+">"+
+                                            "<a-sphere color=\x22orange\x22 opacity=\x220.1\x22 radius=\x220.06\x22 "+ammoHands+" collision-listener-left></a-sphere>"+
+                                            "</a-entity>";
                                     
                                         // <a-entity id="right-hand" position="0.15 1.4 -0.4" oculus-touch-controls="hand: right;model:false" vive-controls="hand: right;model:false" vive-focus-controls="hand: right;model:false" windows-motion-controls="hand: right;model:false" haptics>
                                         // <a-sphere color="blue" radius="0.06" ammo-body="type: kinematic; emitCollisionEvents: true;" ammo-shape="type: sphere" collision-listener-right></a-sphere>
@@ -1595,9 +1588,10 @@ webxr_router.get('/:_id', function (req, res) {
                                     } 
                                     cameraRigEntity = "<a-entity id=\x22cameraRig\x22 initializer "+
                                         " id=\x22mouseCursor\x22 cursor=\x22rayOrigin: mouse\x22 raycaster=\x22objects: .activeObjexRay\x22 position=\x22"+playerPosition+"\x22>"+
+                                        // " id=\x22mouseCursor\x22 cursor=\x22rayOrigin: mouse\x22 raycaster=\x22objects: .activeObjexRay\x22 position=\x220 0 0\x22>"+
                                         // "<a-entity id=\x22player\x22 get_pos_rot networked=\x22template:#avatar-template;attachTemplateToLocal:false;\x22 "+spawnInCircle+" camera "+wasd+" look-controls=\x22hmdEnabled: false\x22 position=\x220 1.6 0\x22>" +     
                                         // "<a-entity id=\x22viewportPlaceholder\x22 position=\x220 0 -1\x22></entity>"+   
-                                        "<a-entity id=\x22player\x22 "+lookcontrols+" get_pos_rot camera=\x22near: .0001\x22 "+wasd+" "+ physicsMod +" position=\x220 0 0\x22>"+
+                                        "<a-entity id=\x22player\x22 "+lookcontrols+" get_pos_rot camera=\x22near: .1\x22 "+wasd+" "+ physicsMod +" position=\x220 0 0\x22>"+
                                             "<a-entity id=\x22equipPlaceholder\x22 geometry=\x22primitive: box; height: .1; width: .1; depth: .1;\x22 position=\x220 -.65 -.75\x22"+
                                             "material=\x22opacity: 0\x22></a-entity>"+
                                             "<a-entity id=\x22viewportPlaceholder\x22 geometry=\x22primitive: plane; height: 0.01; width: .01\x22 position=\x220 0 -1.5\x22"+
@@ -1620,7 +1614,7 @@ webxr_router.get('/:_id', function (req, res) {
                                         "<script src=\x22https://cdn.jsdelivr.net/npm/handy-work@3.1.10/build/handy-controls.min.js\x22></script>"+
                                         "<script src=\x22https://cdn.jsdelivr.net/npm/handy-work@3.1.10/build/magnet-helpers.min.js\x22></script>";
                                         // camera = "<a-entity id=\x22cameraRig\x22 simple-navmesh-constraint=\x22navmesh:.navmesh;fall:0.5;height:0;exclude:.navmesh-hole; movement-controls=\x22speed:0.15;camera:#head;\x22"+
-                                        if (useSimpleNavmesh) {
+                                        if (useSimpleNavmesh || useNavmesh) {
                                             // need id=\x22mouseCursor\x22?
                                             cameraRigEntity = "<a-entity id=\x22cameraRig\x22 position=\x22"+playerPosition+"\x22 initializer cursor=\x22rayOrigin: mouse\x22 simple-navmesh-constraint=\x22navmesh:#nav-mesh;fall:10; height:"+
                                             sceneResponse.scenePlayer.playerHeight+"\x22 raycaster=\x22objects: .activeObjexRay\x22  movement-controls=\x22speed:0.15;camera:#head;\x22"+
@@ -4291,6 +4285,7 @@ webxr_router.get('/:_id', function (req, res) {
                     let handsTemplate = "";
                     // let aframeRenderSettings = "renderer=\x22antialias: true; logarithmicDepthBuffer: true; colorManagement: true; sortObjects: true; physicallyCorrectLights: true; alpha: true; maxCanvasWidth: 1920; maxCanvasHeight: 1920;\x22";
                     let aframeRenderSettings = "renderer=\x22antialias: auto; exposure: 2; colorManagement: true; sortObjects: true; physicallyCorrectLights: true; maxCanvasWidth: 1920; maxCanvasHeight: 1920;\x22";
+                    // let aframeRenderSettings = "renderer=\x22exposure: 2\x22";
                    
                     if (arMode == "spawn") {
                         arHitTest = "<a-entity show-in-ar-mode visible=\x22false\x22 id=\x22reticleEntity\x22 gltf-model=\x22#reticle2\x22 scale=\x220.8 0.8 0.8\x22 ar-hit-test-spawn=\x22mode: "+arMode+"\x22></a-entity>\n"; //for ar spawning...

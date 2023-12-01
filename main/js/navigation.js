@@ -1487,7 +1487,7 @@ AFRAME.registerComponent('nav_mesh_controller', {
 			}
 			let testPosition = new THREE.Vector3();
 			testPosition.x = this.returnRandomNumber(-100, 100);
-			testPosition.y = 10;
+			testPosition.y = 100;
 			testPosition.z = this.returnRandomNumber(-100, 100);
 			let raycaster = new THREE.Raycaster();
 			raycaster.set(new THREE.Vector3(testPosition.x, testPosition.y, testPosition.z), new THREE.Vector3(0, -1, 0.01));
@@ -1526,7 +1526,7 @@ AFRAME.registerComponent('nav_mesh_controller', {
 			}
 			let testPosition = new THREE.Vector3();
 			testPosition.x = this.returnRandomNumber(-100, 100);
-			testPosition.y = 10;
+			testPosition.y = 50;
 			testPosition.z = this.returnRandomNumber(-100, 100);
 			let raycaster = new THREE.Raycaster();
 			raycaster.set(new THREE.Vector3(testPosition.x, testPosition.y, testPosition.z), new THREE.Vector3(0, -1, 0.01));
