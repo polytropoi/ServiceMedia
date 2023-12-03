@@ -1473,7 +1473,7 @@ AFRAME.registerComponent('object_audio_controller', { //set on mod_object(s) if 
         }
     },
     playRandom: function() {
-        if (this.audioGroupsController.audioGroupsDataIsReady) {
+        if (this.audioGroupsController.audioGroupsDataIsReady && this.data._id != '') {
             let audioID = this.audioGroupsController.returnRandomObjectAudioItemID(this.data._id);
             let audioItem = this.audioGroupsController.returnAudioItem(audioID);
               console.log(audioID + "obect_audio item " + JSON.stringify(audioItem));

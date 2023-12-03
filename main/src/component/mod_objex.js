@@ -519,6 +519,8 @@ AFRAME.registerComponent('mod_object', {
       this.line = null;
       this.equipHolder = document.getElementById("equipPlaceholder");
       this.objectAudioController = null;
+      this.hasBoneLook = false;
+      this.lookBone = null;
 
       let cameraEl = document.querySelector('a-entity[camera]');  
       if (!cameraEl) {
@@ -541,7 +543,7 @@ AFRAME.registerComponent('mod_object', {
         // this.el.addEventListener('beatme', e => console.log("beat" + e.detail.volume()));
         
       }
-  
+      
   
       this.el.setAttribute("shadow", {cast:true, receive:true});
   
@@ -933,6 +935,7 @@ AFRAME.registerComponent('mod_object', {
           this.bubbleText = null;
           this.isInitialized = true;
           this.meshChildren = [];
+          this.specialBones = [];
           let theEl = this.el;
           const obj = this.el.getObject3D('mesh');
           
@@ -976,6 +979,10 @@ AFRAME.registerComponent('mod_object', {
   
               // this.el.setAttribute('fireworks_spawner', {type: 'fireball'});
               this.hasAudioTrigger = true;
+            }
+            if (this.data.eventData.toLowerCase().includes("glow")) {
+
+              this.el.setAttribute("glow");
             }
             if (this.data.eventData.toLowerCase().includes("agent") || this.data.objectData.physics.includes("Navmesh Agent")) { 
               if (settings.useNavmesh) {
@@ -1060,11 +1067,15 @@ AFRAME.registerComponent('mod_object', {
             obj.traverse(node => { //spin through object heirarchy to sniff for special names, e.g. "eye"
               this.nodeName = node.name;
               node.frustumCulled = false; //just turn off for everything, objects are special...
-  
-              if (this.data.eventData.includes("eyelook") && this.nodeName.includes("eye")) { //must be set in eventData and as mesh name
+              console.log("object node: " + this.nodeName)
+              if (this.data.eventData.includes("eyelook") && this.nodeName.toLowerCase().includes("eye")) { //must be set in eventData and as mesh name
                 if (node instanceof THREE.Mesh) {
                 this.meshChildren.push(node);
                 console.log("gotsa eye!");
+                }
+                if (node instanceof THREE.Bone) {
+                  this.specialBones.push (node);
+                  console.log("gotdsa eyebone");
                 }
               }
              
@@ -1134,6 +1145,18 @@ AFRAME.registerComponent('mod_object', {
   
                 }
               }
+            }
+            for (let b = 0; b < this.specialBones.length; b++) {
+            
+              if (this.specialBones[b].name.toLowerCase().includes("eye")) {
+                this.hasBoneLook = true;
+                this.lookBone = this.specialBones[b];
+                // OOI.sphere.getWorldPosition( v0 );
+                // OOI.head.lookAt( v0 );
+                this.lookBone.lookAt(window.playerPosition);
+              }
+
+
             }
             // if (this.el.classList.contains('target') || this.data.markerType != "none") {
             // let hasBubble = false;
@@ -2333,6 +2356,9 @@ AFRAME.registerComponent('mod_object', {
     },
     tick: function () {
       
+      if (this.hasBoneLook && this.lookBone) {
+        this.lookBone.lookAt(window.playerPosition);
+      }
       if (this.pushForward && this.camera != null) {
         // console.log("tryna apply force shoot action " + this.hasShootAction);
         // this.lookVector.applyQuaternion(this.camera.quaternion);

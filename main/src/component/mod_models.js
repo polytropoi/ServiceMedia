@@ -1201,10 +1201,10 @@ AFRAME.registerComponent('mod_model', {
               }
             }
           });
-          console.log("MOD_MODEL markertype " + this.data.markerType +  " this.hasCallout " + this.hasCallout + " this.data.description " + this.data.description);
+          // console.log("MOD_MODEL markertype " + this.data.markerType +  " this.hasCallout " + this.hasCallout + " this.data.description " + this.data.description);
   
           this.el.addEventListener('mouseenter', (evt) =>  {
-            console.log("mouseovewr model " + this.el.id + this.hasLocationCallout + this.data.markerType + this.hasCallout + this.hasCalloutBackground + textData[textIndex]);
+            // console.log("mouseovewr model " + this.el.id + this.hasLocationCallout + this.data.markerType + this.hasCallout + this.hasCalloutBackground + textData[textIndex]);
             if (evt.detail.intersection != null && this.hitpoint != null) {
               if (this.calloutString == "") {
                 this.calloutString = textData[textIndex];

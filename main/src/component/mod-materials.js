@@ -1116,3 +1116,24 @@ AFRAME.registerComponent('trail', {
     this.system.killTrail(this.el.object3D);
   }
 });
+
+AFRAME.registerComponent('glow', {
+  schema: {
+    color: {default: '#ffffff', type: 'color'},
+    intensity: {default: 10.0}
+  },
+  init: function () {
+    this.el.addEventListener('object3dset', function () {
+      this.update();
+    }.bind(this));
+  },
+  update: function () {
+    var data = this.data;
+    this.el.object3D.traverse(function (node) {
+      if (node.isMesh) {
+        node.material.emissive.copy(new THREE.Color(data.color));
+        node.material.emissiveIntensity = data.intensity;
+      }
+    });
+  }
+});
