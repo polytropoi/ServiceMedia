@@ -1477,7 +1477,7 @@ AFRAME.registerComponent('object_audio_controller', { //set on mod_object(s) if 
             let audioID = this.audioGroupsController.returnRandomObjectAudioItemID(this.data._id);
             let audioItem = this.audioGroupsController.returnAudioItem(audioID);
               console.log(audioID + "obect_audio item " + JSON.stringify(audioItem));
-              if (this.objectAudioHowl) {
+              if (this.objectAudioHowl &&  audioItem) {
                 if (!this.objectAudioHowl.playing()) {
                     this.objectAudioHowl = new Howl({
                         src: [audioItem.URLogg, audioItem.URLmp3],
@@ -1485,18 +1485,20 @@ AFRAME.registerComponent('object_audio_controller', { //set on mod_object(s) if 
                         // sprite: {trigger: [0, 5000]}
                     }); 
                     this.objectAudioHowl.play();
-                } 
+                    } 
                 
-            } else {
-                this.objectAudioHowl = new Howl({
-                    src: [audioItem.URLogg, audioItem.URLmp3],
-                    format: ["ogg", "mp3"]
-                    // sprite: {trigger: [0, 5000]}
-                }); 
-                this.objectAudioHowl.play();
+                } else {
+                    if (audioItem) {
+                    this.objectAudioHowl = new Howl({
+                        src: [audioItem.URLogg, audioItem.URLmp3],
+                        format: ["ogg", "mp3"]
+                        // sprite: {trigger: [0, 5000]}
+                    }); 
+                    this.objectAudioHowl.play();
+                    }
+                }
             }
         }
-    }
 });
 
 AFRAME.registerComponent('trigger_audio_control', { //trigger audio on designated activeObjex

@@ -7,7 +7,8 @@ AFRAME.registerComponent('mod_model', {
         shader: {default: ''},
         color: {default: ''},
         tags: {default: null},
-        description: {default: ''}
+        description: {default: ''},
+        modelID: {default: ''}
         
       },
       init: function () {
@@ -71,7 +72,7 @@ AFRAME.registerComponent('mod_model', {
         
         this.calloutString = "";
         this.hitpoint = null;
-        console.log("MOD MODEL eventData : " + this.data.eventData);
+        // console.log("MOD MODEL eventData : " + this.data.eventData);
         this.hitpoint = new THREE.Vector3();
         this.tags = this.data.tags;
         this.font1 = "Acme.woff";
@@ -90,7 +91,7 @@ AFRAME.registerComponent('mod_model', {
           this.setShader(); //at the bottom
         }      
   
-        if (this.data.eventData.length > 1) {
+        if (this.data.eventData && this.data.eventData.length > 1) {
           // console.log("model eventData " + JSON.stringify(this.data.eventData));
           textData = this.data.eventData.split("~");//tilde delimiter splits string to array//maybe use description for text instead? 
   
@@ -198,10 +199,62 @@ AFRAME.registerComponent('mod_model', {
           }
           if (this.data.eventData.includes("scatter")) {
             this.el.object3D.visible = false;
-            // console.log("GOTSA SCATTER OBJEK@");
-  
-          }
-          if (this.data.eventData.includes("pickup")) { //USING PHYSX, needs useStarterKit = true!
+            let surface = document.getElementById("scatterSurface");
+
+            // console.log("tryna SCATTER (not instance) a model");
+            if (surface) {
+              let split = this.data.eventData.split("~");
+              let count = 10;
+              let scatterCount = 0;
+              if (split.length > 1) {
+                count = split[1];
+              }
+                  // for (let i = 0; i < count; i++) {
+              let interval = setInterval( () => {
+                for (let i = 0; i < 100; i++) {
+                  
+                  let testPosition = new THREE.Vector3();
+                  testPosition.x = this.returnRandomNumber(-100, 100);  
+                  testPosition.y = 100;
+                  testPosition.z = this.returnRandomNumber(-100, 100);
+                  let raycaster = new THREE.Raycaster();
+                  raycaster.set(new THREE.Vector3(testPosition.x, testPosition.y, testPosition.z), new THREE.Vector3(0, -1, 0));
+                  let results = raycaster.intersectObject(surface.getObject3D('mesh'), true);
+          
+                  if(results.length > 0) {
+                    
+                    console.log("gotsa testPosition for model " + this.data.modelID+ " intersect: " + results.length + " " +results[0].object.name + "scatterCount " + scatterCount + " vs count " + count );
+                    testPosition.y = results[0].point.y; //snap y of waypoint to navmesh y
+                    let scatteredEl = document.createElement("a-entity"); 
+                    scatteredEl.setAttribute("position", testPosition);
+                    scatteredEl.setAttribute("gltf-model", "#" + this.data.modelID);
+                    scatteredEl.setAttribute("mod_model", {'eventData': ''});
+                    let scale = this.returnRandomNumber(.25, 1.25);
+                    scatteredEl.setAttribute("scale", {x: scale, y:scale, z: scale})
+                    this.el.sceneEl.appendChild(scatteredEl);
+                    scatterCount++;
+                    if (scatterCount > count) {
+                      
+                      clearInterval(interval);
+                      break;
+                    } else {
+                      break;
+                    }
+                    
+                  } else {
+                    // console.log('bad testPosition');
+                    // waypoints.splice(i, 1);
+                  }
+                    // console.log("randomWaypoint : " + position);
+                  if (i == 100) {
+                    clearInterval(interval);
+                  }
+                }
+              }, 1000);
+              // }
+              }              
+            }
+            if (this.data.eventData.includes("pickup")) { //USING PHYSX, needs useStarterKit = true!
             this.el.setAttribute("data-pick-up");
             
             if (this.data.eventData.includes("magnet") || this.data.eventData.includes("snap")) {
@@ -1501,6 +1554,9 @@ AFRAME.registerComponent('mod_model', {
       });
      
     },  //END INIT mod_model
+    returnRandomNumber: function (min, max) {
+      return Math.random() * (max - min) + min;
+    },
     returnProperties: function () {
       //placeholder
   

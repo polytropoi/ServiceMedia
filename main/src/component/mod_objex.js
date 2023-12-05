@@ -1067,7 +1067,7 @@ AFRAME.registerComponent('mod_object', {
             obj.traverse(node => { //spin through object heirarchy to sniff for special names, e.g. "eye"
               this.nodeName = node.name;
               node.frustumCulled = false; //just turn off for everything, objects are special...
-              console.log("object node: " + this.nodeName)
+              // console.log("object node: " + this.nodeName)
               if (this.data.eventData.includes("eyelook") && this.nodeName.toLowerCase().includes("eye")) { //must be set in eventData and as mesh name
                 if (node instanceof THREE.Mesh) {
                 this.meshChildren.push(node);
@@ -2356,8 +2356,14 @@ AFRAME.registerComponent('mod_object', {
     },
     tick: function () {
       
-      if (this.hasBoneLook && this.lookBone) {
-        this.lookBone.lookAt(window.playerPosition);
+      if (this.lookBone) {
+        // if (window.playerPosition) {
+          // this.pp = {x: window.playerPosition.x, y: window.playerPosition.y, z: window.playerPosition.y };
+          // theEye.setAttribute("position", obj.worldToLocal(center));
+          this.lookBone.lookAt(this.lookBone.worldToLocal(window.playerPosition));
+          this.lookBone.rotation.set( this.lookBone.rotation.x, this.lookBone.rotation.y + Math.PI, this.lookBone.rotation.z );
+        // }
+
       }
       if (this.pushForward && this.camera != null) {
         // console.log("tryna apply force shoot action " + this.hasShootAction);

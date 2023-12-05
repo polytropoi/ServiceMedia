@@ -2798,14 +2798,14 @@ webxr_router.get('/:_id', function (req, res) {
                                                     entityType = "surface";
 
                                                 }
-                                                let modModel = "mod_model=\x22markerType: "+locMdl.markerType+"; tags: "+locMdl.locationTags+"; description:"+locMdl.description+"; eventData:"+locMdl.eventData+";\x22";
+                                                let modModel = "mod_model=\x22markerType: "+locMdl.markerType+"; tags: "+locMdl.locationTags+"; description:"+locMdl.description+"; eventData:"+locMdl.eventData+"; modelID:"+m_assetID+"\x22";
                                                 // let modMaterial = "";
                                                 if (locMdl.eventData.toLowerCase().includes("gallery")) {
                                                     // modModel = "mod_model_photo_gallery";  maybe later
                                                 }
 
-                                                //////////   DEFAULT not scatterd, normal placement
-                                                if (!locMdl.eventData.toLowerCase().includes("scatter")) { 
+                                                //////////   DEFAULT not instanced, normal placement
+                                                if (!locMdl.eventData.toLowerCase().includes("instance")) { 
                                                     let physicsMod = "";
                                                     let shape = 'hull';
                                                     let groundMod = "";
@@ -2863,7 +2863,7 @@ webxr_router.get('/:_id', function (req, res) {
 
                                                   //SCATTERING placement instancing + surface scattering
                                                 } else { 
-                                                    console.log("tryna scatter so0methings!@ " + locMdl.eventData.toLowerCase());
+                                                    console.log("tryna instance so0methings!@ " + locMdl.eventData.toLowerCase());
                                                     let instancing = "instanced_meshes_mod=\x22_id: "+locMdl.modelID+"; modelID: "+m_assetID+";\x22";
                                                     let interaction = "";
                                                     if (locMdl.eventData.toLowerCase().includes("everywhere")) {
