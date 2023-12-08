@@ -2280,7 +2280,7 @@ AFRAME.registerComponent('cloud_marker', {
     }
       
       this.phID = this.data.phID;
-      // console.log("cloudmarker phID " + this.phID); 
+      console.log("cloudmarker phID " + this.phID); 
 
       // if (this.data.model == null || this.data.model == '') {
       //   if (this.data.markerType.toLowerCase() == "mailbox") {
@@ -2315,7 +2315,7 @@ AFRAME.registerComponent('cloud_marker', {
         // } else if (this.storedVars.markerType.toLowerCase().includes("trigger")) {
         //   this.el.setAttribute('gltf-model', '#poi1');  
         //   // this.el.setAttribute("aabb-collider", {objects: ".activeObjexRay"});
-          if (this.storedVars.markerType.toLowerCase() == "mailbox") {
+        if (this.storedVars.markerType.toLowerCase() == "mailbox") {
             this.el.setAttribute('gltf-model', '#mailbox');
           } else {
             this.el.setAttribute('gltf-model', '#poi1');
@@ -2434,46 +2434,40 @@ AFRAME.registerComponent('cloud_marker', {
       
         // localStorage.setItem(this.phID, JSON.stringify(locItem)); 
       }
-    // if (this.data.markerType.toLowerCase() == "placeholder") {
-    //   this.el.setAttribute('gltf-model', '#savedplaceholder');
-    // } else if (this.data.markerType.toLowerCase() == "poi") {
-    //   this.el.setAttribute('gltf-model', '#poi1');
-    // } else if (this.data.markerType.toLowerCase().includes("trigger")) {
-    //   this.el.setAttribute('gltf-model', '#poi1');  
-    // } else if (this.data.markerType.toLowerCase() == "gate") {
-    //   this.el.setAttribute('gltf-model', '#poi1');
-    // } else if (this.data.markerType.toLowerCase() == "portal") {
-    //   this.el.setAttribute('gltf-model', '#poi1');
-    // } else if (this.data.markerType.toLowerCase() == "mailbox") {
-    //   this.el.setAttribute('gltf-model', '#mailbox');
-    // }
-    if (this.data.name == '') {
-      this.data.name = this.data.timestamp;
-    }
-    if (this.data.eventData.toLowerCase().includes('beat')) {
-      this.el.classList.add('beatme');
-    }
+      // if (this.data.markerType.toLowerCase() == "placeholder") {
+      //   this.el.setAttribute('gltf-model', '#savedplaceholder');
+      // } else if (this.data.markerType.toLowerCase() == "poi") {
+      //   this.el.setAttribute('gltf-model', '#poi1');
+      // } else if (this.data.markerType.toLowerCase().includes("trigger")) {
+      //   this.el.setAttribute('gltf-model', '#poi1');  
+      // } else if (this.data.markerType.toLowerCase() == "gate") {
+      //   this.el.setAttribute('gltf-model', '#poi1');
+      // } else if (this.data.markerType.toLowerCase() == "portal") {
+      //   this.el.setAttribute('gltf-model', '#poi1');
+      // } else if (this.data.markerType.toLowerCase() == "mailbox") {
+      //   this.el.setAttribute('gltf-model', '#mailbox');
+      // }
+      if (this.data.name == '') {
+        this.data.name = this.data.timestamp;
+      }
+      if (this.data.eventData.toLowerCase().includes('beat')) {
+        this.el.classList.add('beatme');
+      }
 
-   
-      // console.log("timestamp: " + this.data.timestamp+ " storedVars " + this.storedVars);
-    // // } else {
-    //   let position = this.viewportHolder.getAttribute('position');
-    //   this.data.timestamp = Math.round(Date.now() / 1000);
-    //   this.data.name = "location placeholder";
-    //   this.el.setAttribute('position', position);
-    // }
-    this.clientX = 0;
-    this.clientY = 0;
-    this.selectedAxis = null;
-    this.isSelected = false;
-    this.hitPosition = null;
-    this.mouseDownPos = new THREE.Vector2();
-    this.mousePos = new THREE.Vector2();
-    this.distance = 0;
-    // this.calloutText = calloutText;
-    // calloutText.setAttribute('overlay');
-    // gltf-model=\x22#square_panel\x22
-    if (!this.data.tags.includes("hide callout") && !this.data.tags.includes("hide callout")) {
+    
+
+      this.clientX = 0;
+      this.clientY = 0;
+      this.selectedAxis = null;
+      this.isSelected = false;
+      this.hitPosition = null;
+      this.mouseDownPos = new THREE.Vector2();
+      this.mousePos = new THREE.Vector2();
+      this.distance = 0;
+      // this.calloutText = calloutText;
+      // calloutText.setAttribute('overlay');
+      // gltf-model=\x22#square_panel\x22
+      if (!this.data.tags.includes("hide callout") && !this.data.tags.includes("hide callout")) {
       // this.calloutPanel.setAttribute("gltf-model", "#landscape_panel");
       // this.calloutPanel.setAttribute("scale", ".1 .075 .1");
       // this.calloutEntity.getObject3D("mesh").scale()

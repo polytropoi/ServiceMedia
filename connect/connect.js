@@ -30,6 +30,7 @@ let timeKeysData = {};
 let tkStarttimes = [];
 let sceneLocations = {locations: [], locationMods: []};
 let poiLocations = [];
+let cloudMarkers = [];
 let sceneModels = [];
 let sceneObjects = [];
 let localKeys = [];
@@ -61,32 +62,30 @@ let matrixClient = null;
 let mouseDownStarttime = 0;
 let mouseDowntime = 0;
 
-// var navMaersh = null;
 var token = document.getElementById("token").getAttribute("data-token"); 
 var localtoken = localStorage.getItem("smToken");
 let socketHost = "http://localhost:3000";
 // let socketHost = null;
 var socket = null; //the socket.io instance below
+let iDB = null; //indexedDB
+let storeTimekeys = null;
 
 
 $('a-entity').each(function() {  //external way of getting click duration for physics
 
-   // var timeout,
-   //     longtouch;
- 
    $(this).bind('mousedown', function() {
      mouseDownStarttime = Date.now() / 1000;
    });
    $(this).bind('mouseup', function() {
      mouseDowntime = (Date.now() / 1000) - mouseDownStarttime;
-   //   console.log(" mouseDowntime " +mouseDowntime);
+
    });
    $(this).bind('touchstart', function() {
       mouseDownStarttime = Date.now() / 1000;
     });
     $(this).bind('touchend', function() {
       mouseDowntime = (Date.now() / 1000) - mouseDownStarttime;
-      // console.log(" touchDowntime " +mouseDowntime);
+
     });
     $(this).bind('beforexrselect', e => {
       e.preventDefault();
@@ -94,28 +93,22 @@ $('a-entity').each(function() {  //external way of getting click duration for ph
  
  });
 
-
 /////////////////// main onload function below, populate settings, etc.
 $(function() { 
 
    player = document.getElementById("player");
 
 
-   // posRotReader = document.getElementById("player").components.get_pos_rot; 
-   // if (player != null) {
-   //    player.setAttribute("player_mover", "init");
-   // }
-   // let modelDataEl = document.getElementById('sceneModels');
-   // if (modelDataEl) {
-   //    let modelData = modelDataEl.getAttribute('data-models');
-   //    sceneModels = JSON.parse(atob(modelData)); //convert from base64
-   //    // console.log("sceneModels " + JSON.stringify(sceneModels));
-   //    for (let i = 0; i < sceneModels.length; i++) {
-   //       if (sceneModels[i].sourceText != undefined && sceneModels[i].sourceText != 'undefined' && sceneModels[i].sourceText != null && sceneModels[i].sourceText.length > 0) {
-   //          attributions.push("Name: " + sceneModels[i].name + " - Type: " + sceneModels[i].item_type + " - Source: " + sceneModels[i].sourceText);
-   //       }
-   //    }
-   // }
+   const request = indexedDB.open("SMXR");
+   request.onerror = (event) => {
+      console.error("Why didn't you allow my web app to use IndexedDB?!");
+   };
+   request.onsuccess = (event) => {
+      iDB = event.target.result;
+      // iDB.createObjectStore('timekeys', {keyPath: 'shortID'}); 
+      console.log("gotsa INDEXdb named " +iDB);
+   };
+
    console.log("last_page was " + localStorage.getItem("last_page") + " servertoken: "+ token + " localtoken: " + localtoken + " userdata.sceneOwner " + userData.sceneOwner);
    
    setTimeout(function () {
@@ -129,17 +122,6 @@ $(function() {
 
    }
 
-
-
-   // let modelDataEl = document.getElementById('sceneModels');
-   // let modelData = modelDataEl.getAttribute('data-models');
-   // sceneModels = JSON.parse(atob(modelData)); //convert from base64
-   // for (let i = 0; i < sceneModels.length; i++) {
-   //    if (sceneModels[i].sourceText != undefined && sceneModels[i].sourceText != 'undefined' && sceneModels[i].sourceText != null && sceneModels[i].sourceText.length > 0) {
-   //       attributions.push("Name: " + sceneModels[i].name + " - Type: " + sceneModels[i].item_type + " - Source: " + sceneModels[i].sourceText);
-   //    }
-   // }
-
    let settingsEl = document.getElementById('settingsDataElement'); //volume, color, etc...
    let theSettingsData = settingsEl.getAttribute('data-settings');
             // console.log("RAW LOCATIOND DATA " + theData);
@@ -151,13 +133,16 @@ $(function() {
    if (settings.sceneTimedEvents != undefined && settings.sceneTimedEvents != null) {
       timeKeysData = settings.sceneTimedEvents;
       localStorage.setItem(room + '_timeKeys', JSON.stringify(timeKeysData));
+
+
       console.log('cloud timekeysdata' + JSON.stringify(timeKeysData));
       timedEventsListenerMode = timeKeysData.listenTo;  
-   } else if (localStorage.getItem(room + "_timeKeys") != null) { //use local ve3rsion if saved
-      timeKeysData = JSON.parse(localStorage.getItem(room + "_timeKeys"));
-      console.log('local timeKeysData' + JSON.stringify(timeKeysData));
-      timedEventsListenerMode = timeKeysData.listenTo;  
-   }
+   } 
+   // else if (localStorage.getItem(room + "_timeKeys") != null) { //use local ve3rsion if saved
+   //    // timeKeysData = JSON.parse(localStorage.getItem(room + "_timeKeys"));
+   //    console.log('local timeKeysData' + JSON.stringify(timeKeysData));
+   //    timedEventsListenerMode = timeKeysData.listenTo;  
+   // }
 
    AddLocalMarkers();
    vidz = document.getElementsByTagName("video");
@@ -897,13 +882,13 @@ function AddLocalMarkers() {// new or modded markers not saved to cloud
                      prevbuttonEl.style.visibility = "visible";
                      poiLocations.push((cItem));
                   }
-               let phEl = document.getElementById(theKey);
+                  let phEl = document.getElementById(theKey);
 
                   if (phEl) {
-                  let cloud_marker = phEl.components.cloud_marker;
-                  if (cloud_marker) {
-                     console.log("LocalMods to CLoudMarkerz!");
-                  }
+                     let cloud_marker = phEl.components.cloud_marker;
+                     if (cloud_marker) {
+                        console.log("LocalMods to CLoudMarkerz!");
+                     }
                   }
                } else if (theKey.toString().includes('color')) {
                   // console.log("gots color " + theKey + " item " + theItem);
@@ -931,16 +916,24 @@ function AddLocalMarkers() {// new or modded markers not saved to cloud
                sceneLocations.locationMods = locationMods;
                console.log("updated locationmods " + JSON.stringify(sceneLocations.locationMods));
                // console.log("LOCATIONMODS: " + JSON.stringify(sceneLocations.locationMods));
-               // AddCloudMarkers(); //add the ones from admin
+               AddCloudMarkers(); //add the ones from admin
             }
          }
          // if (!gotsaMatch) {
          //    locationMods.push(cloudLocations[c]);
          // }
       } else {
-         // AddCloudMarkers(); 
+         AddCloudMarkers(); 
       }
    }
+}
+
+function AddCloudMarkers () {
+   if (cloudMarkers.length > 0) {
+      for (let i = 0; i < cloudMarkers.length; i++) {
+         sceneLocations.locationMods.push(cloudMarkers[i]);
+      }
+   } 
 }
 
 
@@ -1106,8 +1099,17 @@ if (sceneEl != null) {
                      nextbuttonEl.style.visibility = "visible";
                      prevbuttonEl.style.visibility = "visible";
                      poiLocations.push(this.data.jsonData[i]);
-
                   }
+                  if (this.data.jsonData[i].markerType.toLowerCase().includes("placeholder") ||
+                     this.data.jsonData[i].markerType.toLowerCase().includes("poi") ||
+                     this.data.jsonData[i].markerType.toLowerCase().includes("gate") || 
+                     this.data.jsonData[i].markerType.toLowerCase().includes("portal") || 
+                     this.data.jsonData[i].markerType.toLowerCase().includes("mailbox") || 
+                     this.data.jsonData[i].markerType.toLowerCase().includes("waypoint")) {
+                     cloudMarkers.push(this.data.jsonData[i]);
+                  
+                  }
+            
                }
             }
             // sceneLocations.locations.push(this.data.jsonData);
@@ -2679,7 +2681,7 @@ function PlayTimedEvent(timeKey) {
       GoToPrevious();
    } 
    if (timeKey.keytype == "Player Snap") {
-      // console.log("sceneLocations length is " + sceneLocations.locations.length);
+      console.log("tryna play a Player Snap event " + JSON.stringify(sceneLocations.locationMods));
       // if (sceneLocations.locations.ength > 0) {
       for (let s = 0; s < sceneLocations.locationMods.length; s++) {
       if (sceneLocations.locationMods[s].label != undefined && sceneLocations.locationMods[s].label != null) {
@@ -2687,9 +2689,10 @@ function PlayTimedEvent(timeKey) {
       } else if (sceneLocations.locationMods[s].name != undefined && sceneLocations.locationMods[s].name != null) {
          tempLabel =sceneLocations.locationMods[s].name;
       }
+      console.log("tryna match loc named " + JSON.stringify(sceneLocations.locationMods[s]) + " to  " + timeKey.keydata.toString());
       
          if (timeKey.keydata.toString() == tempLabel && (sceneLocations.locationMods[s].markerType == "placeholder" || sceneLocations.locationMods[s].markerType == "poi")) {
-         console.log("match loc named " + JSON.stringify(sceneLocations.locationMods[s]) + " to  " + timeKey.keydata.toString());
+         console.log("gots match loc named " + JSON.stringify(sceneLocations.locationMods[s]) + " to  " + timeKey.keydata.toString());
             posObj.x = sceneLocations.locationMods[s].x;
             posObj.y = sceneLocations.locationMods[s].y;
             posObj.z = sceneLocations.locationMods[s].z;

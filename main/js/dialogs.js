@@ -523,7 +523,16 @@ function ReturnLocationObjectSelect (phID) {
   if (objexEl != null) {
     sceneObjects = objexEl.components.mod_objex.returnObjexData();
     console.log("tryna return objects for phID " + phID);
-    let locationItem = JSON.parse(localStorage.getItem(phID));
+    let locationItem = JSON.parse(localStorage.getItem(phID)); //TODO switch to indexedDB
+    if (!locationItem) {
+      for (let i = 0; i < sceneLocations.locationMods.length; i++) {
+        if (sceneLocations.locationMods[i].phID == phID) {
+          locationItem = sceneLocations.locationMods[i].phID;
+          break;
+        }
+      }
+      console.log("looking for " + phID + " in " + JSON.stringify(sceneLocations));
+    }
     let objectSelect = "<option value=\x22"+phID+"~none\x22>none</option>";
     for (let i = 0; i < sceneObjects.length; i++) {
       // console.log("spinning through sceneObjects : " + 
@@ -574,11 +583,8 @@ function ReturnLocationMarkerTypeSelect (selected) {
 function ShowLocationModal(phID) {   
 
     let thisLocation = null;
-    // console.log("loaded and looking for " + phID);
-    let thisLocationString = localStorage.getItem(phID);
-    // console.log(thisLocationString);
-    if (thisLocationString != null) {
-      thisLocation = JSON.parse(thisLocationString);  
+    console.log("loaded and looking for " + phID);
+    if (phID.includes("cloudmarker")) {
       if (sceneLocations.locationMods != null && sceneLocations.locationMods.length > 0) {
         for (let i = 0; i < sceneLocations.locationMods.length; i++) {
           if (phID == sceneLocations.locationMods[i].phID) {
@@ -588,6 +594,25 @@ function ShowLocationModal(phID) {
               }
             if (thisLocation != null) {
               console.log(JSON.stringify(thisLocation));
+            }
+          }
+        }
+      }
+    } else {
+      let thisLocationString = localStorage.getItem(phID);
+      // console.log(thisLocationString);
+      if (thisLocationString != null) {
+        thisLocation = JSON.parse(thisLocationString);  
+        if (sceneLocations.locationMods != null && sceneLocations.locationMods.length > 0) {
+          for (let i = 0; i < sceneLocations.locationMods.length; i++) {
+            if (phID == sceneLocations.locationMods[i].phID) {
+              thisLocation = sceneLocations.locationMods[i];
+              if (thisLocation.scale == undefined || thisLocation.scale == "") {
+                    thisLocation.scale = 1;
+                }
+              if (thisLocation != null) {
+                console.log(JSON.stringify(thisLocation));
+              }
             }
           }
         }
