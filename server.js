@@ -8095,7 +8095,7 @@ app.post('/return_audiogroups/', function(req, res) {
                         callback(err);
                     } else {
                         // res.json(group_items);
-                        console.log("returning audiogroup " + JSON.stringify(group_items));
+                        // console.log("returning audiogroup " + JSON.stringify(group_items));
                         response.objectGroupItems = group_items;
                         let groupdata = group_items[0].groupdata;
                         groupItems.push.apply(groupItems, groupdata); //concat arrays
@@ -11792,6 +11792,8 @@ app.post('/add_scene_mods/:s_id', requiredAuthentication, admin, function (req, 
                             }
                         );
                         res.send("ok");
+                    } else {
+                        console.log("tryna add_scene_mnods, but you aint the scene owner!");
                     }
                 }
             });

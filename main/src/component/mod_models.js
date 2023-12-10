@@ -6,7 +6,7 @@ AFRAME.registerComponent('mod_model', {
         eventData: {default: ''},
         shader: {default: ''},
         color: {default: ''},
-        tags: {default: null},
+        tags: {default: ''},
         description: {default: ''},
         modelID: {default: ''}
         
@@ -381,7 +381,8 @@ AFRAME.registerComponent('mod_model', {
             if (clips != null) { 
               for (i = 0; i < clips.length; i++) { //get reference to all anims
                 hasAnims = true;
-                // console.log("model has animation: " + clips[i].name);
+                idleIndex = 0; //'whatever the default
+                console.log("mod_model named " + this.el.id + " has animation: " + clips[i].name);
                 
                 if (clips[i].name.includes("mouthopen")) {
                   moIndex = i;
@@ -1563,7 +1564,10 @@ AFRAME.registerComponent('mod_model', {
     },
     playAnimation: function (animState) {
       if (this.navAgentController) {
-      // console.log("tryna play animState " + animState);
+      console.log("tryna play animState " + animState);
+      if (animState == "greet") {
+        animState = "pause";
+      }
        switch (animState) { 
          case "random": 
          if (this.walkClips.length > 0) {

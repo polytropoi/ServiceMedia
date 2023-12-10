@@ -409,12 +409,12 @@ AFRAME.registerComponent('mod_object', {
       isEquipped: {default: false},
       isSpawned: {default: false},
       fromSceneInventory: {default: false},
-      timestamp: {default: null},
+      timestamp: {default: ''},
       applyForceToNewObject: {default: false},
       followPathNewObject: {default: false},
       forceFactor: {default: 1},
-      removeAfter: {default: ""},
-      tags: {default: null}
+      removeAfter: {default: ''},
+      tags: {default: ''}
     },
     init: function () {
       // console.log("mod_object data " + JSON.stringify(this.data.objectData.modelURL));
@@ -1005,7 +1005,7 @@ AFRAME.registerComponent('mod_object', {
             if (clips != null) { 
               for (i = 0; i < clips.length; i++) { //get reference to all anims
                 hasAnims = true;
-                // console.log("model has animation: " + clips[i].name);
+                console.log("mod_object " + this.data.objectData.name + " has animation: " + clips[i].name);
                 
                 if (clips[i].name.includes("mouthopen")) {
                   moIndex = i;
@@ -1054,10 +1054,10 @@ AFRAME.registerComponent('mod_object', {
                       });
                     }
                     if (idleIndex != -1) {
-                      theEl.setAttribute('animation-mixer', {
-                        "clip": clips[idleIndex].name,
-                        "loop": "repeat",
-                      });
+                      // theEl.setAttribute('animation-mixer', {
+                      //   "clip": clips[idleIndex].name,
+                      //   "loop": "repeat",
+                      // });
                     }
                   }
                 }
@@ -2055,7 +2055,7 @@ AFRAME.registerComponent('mod_object', {
         
         theEl.addEventListener('animation-finished', function () { 
           theEl.removeAttribute('animation-mixer');
-          var clip = clips[Math.floor(Math.random()*clips.length)];
+          var clip = clips[Math.floor(Math.random()*clips.length - 1)];
           theEl.setAttribute('animation-mixer', {
             "clip": clip.name,
             "loop": "repeat",

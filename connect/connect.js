@@ -495,6 +495,8 @@ function SaveModsToCloud() { //Save button on location modal
             ClearPlaceholders();
          } 
      };
+   } else {
+      console.log("you ain't the sceneOwner!");
    }
 }
 
@@ -787,9 +789,11 @@ function ReturnLocationTable () {
    if (sceneLocations.locationMods != null && sceneLocations.locationMods.length > 0) {
       let tablerows = "";
       for (let i = 0; i < sceneLocations.locationMods.length; i++) {
-         let localString = "";
+         let markerString = "";
          if (sceneLocations.locationMods[i].isLocal != null && sceneLocations.locationMods[i].isLocal === true) {
-            localString = "local "
+            markerString = "<span style=\x22color: pink; font-weight: bold;\x22>"+sceneLocations.locationMods[i].markerType+"</span>";
+         } else {
+            markerString = "<span style=\x22color: lime; font-weight: bold;\x22>"+sceneLocations.locationMods[i].markerType+"</span>";
          }
 
          if (sceneLocations.locationMods[i].markerType != undefined && (sceneLocations.locationMods[i].markerType.includes("picture") || sceneLocations.locationMods[i].markerType == "poi" 
@@ -797,8 +801,9 @@ function ReturnLocationTable () {
             || sceneLocations.locationMods[i].markerType == "mailbox" || sceneLocations.locationMods[i].markerType == "portal" || sceneLocations.locationMods[i].markerType == "gate") ) {
             let namelabel = (sceneLocations.locationMods[i].name != 'undefined' && sceneLocations.locationMods[i].name != undefined && sceneLocations.locationMods[i].name != null) ? sceneLocations.locationMods[i].name : sceneLocations.locationMods[i].label; 
             tablerows = tablerows + "<tr class=\x22clickableRow\x22 onclick=\x22LocationRowClick('"+sceneLocations.locationMods[i].phID+"')\x22><td>"+namelabel+"</td>"+
-            "<td>"+sceneLocations.locationMods[i].x+","+sceneLocations.locationMods[i].y+","+sceneLocations.locationMods[i].z+"</td><td>"+sceneLocations.locationMods[i].model+"</td><td>"+localString + sceneLocations.locationMods[i].markerType+"</td></tr>";
-            "<td>"+sceneLocations.locationMods[i].phID+"</td><td>"+localString + sceneLocations.locationMods[i].markerType+"</td></tr>";
+            "<td>"+sceneLocations.locationMods[i].x+","+sceneLocations.locationMods[i].y+","+sceneLocations.locationMods[i].z+"</td><td>"+sceneLocations.locationMods[i].model+"</td><td>"+ markerString+"</td></tr>";
+            // "<td>"+sceneLocations.locationMods[i].phID+"</td><td>"+localString + sceneLocations.locationMods[i].markerType+"</td></tr>";
+            // "<td>"+sceneLocations.locationMods[i].phID+"</td><td>"+markerString+"</td></tr>";
          }
       }
       return "<table id=\x22locations\x22><th>label</th><th>position</th><th>Asset</th><th>type</th>"+tablerows+"</table>";

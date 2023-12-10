@@ -383,7 +383,7 @@ webxr_router.get('/:_id', function (req, res) {
     // var gltfItems = [];
     var bucketFolder = "eloquentnoise.com";
     var playerPosition = "0 1.6 0";
-    var playerRotation = "0 180 0";
+    var playerRotation = "0 0 0";
     // var style = "<link rel=\x22stylesheet\x22 type=\x22text/css\x22 href=\x22../styles/embedded.css\x22>";
     let aframeEnvironment = "";
     let ambientLight = "<a-light type='ambient' intensity='.25'></a-light>";
@@ -541,7 +541,7 @@ webxr_router.get('/:_id', function (req, res) {
     // let aframeExtrasScript = "<script src=\x22../main/src/component/aframe-extras.min.js\x22></script>"; 
     // let aframeExtrasScript =<script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.0.0/dist/components/sphere-collider.min.js"></script>
     // <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.0.0/dist/aframe-extras.controls.min.js"></script>
-    let aframeExtrasScript = "<script src=\x22https://cdn.jsdelivr.net/npm/aframe-extras@7.1.0/dist/aframe-extras.min.js\x22></script>";
+    let aframeExtrasScript = "<script src=\x22https://cdn.jsdelivr.net/npm/aframe-extras@7.2.0/dist/aframe-extras.min.js\x22></script>";
     let logScripts = "";
     enviromentScript = ""; //for aframe env component
     
@@ -1055,6 +1055,10 @@ webxr_router.get('/:_id', function (req, res) {
                                     // let yFix = sceneResponse.sceneLocations[i].y;
                                     
                                     playerPosition = sceneResponse.sceneLocations[i].x + " " +  sceneResponse.sceneLocations[i].y + " " +  sceneResponse.sceneLocations[i].z;
+                                    if (sceneResponse.sceneLocations[i].eulerx && sceneResponse.sceneLocations[i].eulery && sceneResponse.sceneLocations[i].eulerz) {
+                                        playerRotation = sceneResponse.sceneLocations[i].eulerx + " " + sceneResponse.sceneLocations[i].eulery + " " + sceneResponse.sceneLocations[i].eulerz;
+                                    }
+                                    
                                     
                                 }
                                 if (sceneResponse.sceneLocations[i].markerType == "text") {
@@ -1485,7 +1489,7 @@ webxr_router.get('/:_id', function (req, res) {
                                         " id=\x22mouseCursor\x22 cursor=\x22rayOrigin: mouse\x22 raycaster=\x22objects: .activeObjexRay\x22>"+
                                         
                                        
-                                        "<a-entity get_pos_rot id=\x22player\x22 "+wasd+" "+ physicsMod +" position=\x22"+playerPosition+"\x22>"+
+                                        "<a-entity get_pos_rot id=\x22player\x22 "+wasd+" "+ physicsMod +" rotation=\x22"+playerRotation+"\x22 position=\x22"+playerPosition+"\x22>"+
                                             "<a-entity id=\x22equipPlaceholder\x22 geometry=\x22primitive: box; height: .1; width: .1; depth: .1\x22 position=\x220 -.65 -.75\x22"+
                                             "material=\x22opacity: 0\x22></a-entity>"+
                                             "<a-entity id=\x22viewportPlaceholder\x22 geometry=\x22primitive: plane; height: 0.01; width: .01\x22 position=\x220 0 -1.5\x22"+
@@ -1529,7 +1533,7 @@ webxr_router.get('/:_id', function (req, res) {
                                 
                                         " id=\x22mouseCursor\x22 cursor=\x22rayOrigin: mouse\x22 raycaster=\x22objects: .activeObjexRay\x22>"+
                                         // "<a-entity id=\x22player\x22 "+wasd+" "+ physicsMod +" position=\x22"+playerPosition+"\x22>"+
-                                        "<a-entity id=\x22player\x22 position=\x22"+playerPosition+"\x22>"+
+                                        "<a-entity id=\x22player\x22  rotation=\x22"+playerRotation+"\x22 position=\x22"+playerPosition+"\x22>"+
                                             "<a-entity id=\x22equipPlaceholder\x22 geometry=\x22primitive: box; height: .1; width: .1; depth: .1\x22 position=\x220 -.65 -.75\x22"+
                                             "material=\x22opacity: 0\x22></a-entity>"+
                                             "<a-entity id=\x22viewportPlaceholder\x22 geometry=\x22primitive: plane; height: 0.01; width: .01\x22 position=\x220 0 -1.5\x22"+
@@ -1587,7 +1591,7 @@ webxr_router.get('/:_id', function (req, res) {
                                         wasd = "extended_wasd_controls=\x22fly: false; moveSpeed: "+sceneResponse.scenePlayer.playerSpeed+"; inputType: keyboard\x22 simple-navmesh-constraint=\x22navmesh:#nav-mesh;fall:10; height: 1.6\x22";
                                     } 
                                     cameraRigEntity = "<a-entity id=\x22cameraRig\x22 initializer "+
-                                        " id=\x22mouseCursor\x22 cursor=\x22rayOrigin: mouse\x22 raycaster=\x22objects: .activeObjexRay\x22 position=\x22"+playerPosition+"\x22>"+
+                                        " id=\x22mouseCursor\x22 cursor=\x22rayOrigin: mouse\x22 raycaster=\x22objects: .activeObjexRay\x22 rotation=\x22"+playerRotation+"\x22 position=\x22"+playerPosition+"\x22>"+
                                         // " id=\x22mouseCursor\x22 cursor=\x22rayOrigin: mouse\x22 raycaster=\x22objects: .activeObjexRay\x22 position=\x220 0 0\x22>"+
                                         // "<a-entity id=\x22player\x22 get_pos_rot networked=\x22template:#avatar-template;attachTemplateToLocal:false;\x22 "+spawnInCircle+" camera "+wasd+" look-controls=\x22hmdEnabled: false\x22 position=\x220 1.6 0\x22>" +     
                                         // "<a-entity id=\x22viewportPlaceholder\x22 position=\x220 0 -1\x22></entity>"+   
@@ -1616,7 +1620,7 @@ webxr_router.get('/:_id', function (req, res) {
                                         // camera = "<a-entity id=\x22cameraRig\x22 simple-navmesh-constraint=\x22navmesh:.navmesh;fall:0.5;height:0;exclude:.navmesh-hole; movement-controls=\x22speed:0.15;camera:#head;\x22"+
                                         if (useSimpleNavmesh || useNavmesh) {
                                             // need id=\x22mouseCursor\x22?
-                                            cameraRigEntity = "<a-entity id=\x22cameraRig\x22 position=\x22"+playerPosition+"\x22 initializer cursor=\x22rayOrigin: mouse\x22 simple-navmesh-constraint=\x22navmesh:#nav-mesh;fall:10; height:"+
+                                            cameraRigEntity = "<a-entity id=\x22cameraRig\x22 rotation=\x22"+playerRotation+"\x22 position=\x22"+playerPosition+"\x22 initializer cursor=\x22rayOrigin: mouse\x22 simple-navmesh-constraint=\x22navmesh:#nav-mesh;fall:10; height:"+
                                             sceneResponse.scenePlayer.playerHeight+"\x22 raycaster=\x22objects: .activeObjexRay\x22  movement-controls=\x22speed:0.15;camera:#head;\x22"+
                                             "position=\x22-1 0 1\x22 rotation=\x220 45 0\x22 origin-on-ar-start> <a-entity id=\x22head\x22 camera=\x22near:0.01;\x22 look-controls=\x22pointerLockEnabled: false\x22 position=\x220 1.65 0\x22>"+
                                             "<a-entity id=player get_pos_rot></a-entity>"+
@@ -1625,7 +1629,7 @@ webxr_router.get('/:_id', function (req, res) {
                                             "</a-entity>"+ handEntities +"</a-entity>";
                                         } else { //no navmesh
                                             // need id=\x22mouseCursor\x22?
-                                            cameraRigEntity = "<a-entity id=\x22cameraRig\x22 initializer cursor=\x22rayOrigin: mouse\x22 raycaster=\x22objects: .activeObjexRay\x22 id=\x22cameraRig\x22 position=\x22"+
+                                            cameraRigEntity = "<a-entity id=\x22cameraRig\x22 initializer cursor=\x22rayOrigin: mouse\x22 raycaster=\x22objects: .activeObjexRay\x22 id=\x22cameraRig\x22 rotation=\x22"+playerRotation+"\x22 position=\x22"+
                                             playerPosition+"\x22 movement-controls=\x22speed:0.15;camera:#head;\x22"+
                                             "position=\x22-1 0 1\x22 rotation=\x220 45 0\x22 origin-on-ar-start> <a-entity id=\x22head\x22 camera=\x22near:0.01;\x22 look-controls=\x22pointerLockEnabled: false\x22 position=\x220 1.65 0\x22>"+
                                             "<a-entity id=player get_pos_rot></a-entity>"+ //el w/ id=player is always tracked for ranging
@@ -2340,7 +2344,7 @@ webxr_router.get('/:_id', function (req, res) {
                                         },
                                         function (cb) {
                                             if (objekt.audiogroupID && objekt.audiogroupID.length > 4) {
-                                                console.log("AUDIO OBJECT GROUP!!!! " + objekt.audiogroupID);
+                                                // console.log("AUDIO OBJECT GROUP!!!! " + objekt.audiogroupID);
                                                 objectAudioGroups.push(objekt.audiogroupID);
                                                 db.groups.findOne({_id: ObjectID(objekt.audiogroupID)}, function (err, group) {
                                                     if (err || !group) {
@@ -2348,7 +2352,7 @@ webxr_router.get('/:_id', function (req, res) {
                                                     } else {
                                                         // for (let i = 0; i < group.length)
                                                         requestedAudioItems.push(group.items);
-                                                        console.log("requestedAudioItems : " + requestedAudioItems);
+                                                        // console.log("requestedAudioItems : " + requestedAudioItems);
                                                         cb(null);
                                                     }
                                                 });
@@ -4838,8 +4842,8 @@ webxr_router.get('/:_id', function (req, res) {
                         "<script async src=\x22https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js\x22></script>"+
 
                         "<script type=\x22importmap\x22> {\x22imports\x22: {" +
-                            "\x22three\x22: \x22https://unpkg.com/three@0.147.1/build/three.module.js\x22,"+
-                            "\x22three/addons/\x22: \x22https://unpkg.com/browse/three@0.147.1/examples/jsm/\x22"+
+                            "\x22three\x22: \x22https://unpkg.com/three@0.158.0/build/three.module.js\x22,"+
+                            "\x22three/addons/\x22: \x22https://unpkg.com/browse/three@0.158.0/examples/jsm/\x22"+
                             "}"+
                         "}</script>"+
 

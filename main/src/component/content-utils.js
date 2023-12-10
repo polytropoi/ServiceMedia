@@ -2550,7 +2550,7 @@ AFRAME.registerComponent('skybox-env-map', {
 AFRAME.registerComponent('skybox_dynamic', {
   schema: {
     enabled: {default: false},
-    id: {default: null}
+    id: {default: ''}
     // sceneType: {default: 'defaut'}
     // path: {default: ''},
     // extension: {default: 'jpg'},
@@ -3708,7 +3708,7 @@ AFRAME.registerComponent('particle_mangler', { //nope, deprecated
     size: {default: "1"},
     blending:  {default: "2"},
     texture: {default: ""},
-    duration: {default: null}
+    duration: {default: ''}
     // skyParticles = "<a-entity scale='15 5 15' position='0 10 0' particle_mangler=\x22preset: dust; maxAge: 25; velocityValue: 0 -.01 0; direction: -.01; positionSpread: 30 15 30; opacity: .2; particleCount: 50; size: 1000; blending: 2; texture: https://realitymangler.com/assets/textures/cloud_lg.png; color: " + sceneResponse.sceneColor1 + "," + sceneResponse.sceneColor2 +"\x22></a-entity>";
 
     // color2: {default: ""}
@@ -3741,7 +3741,7 @@ AFRAME.registerComponent('particle_mangler', { //nope, deprecated
 AFRAME.registerComponent('youtube_player', {  //setup and controls for the 3d player
   schema: {
       color: {default: 'red'},
-      hitpoint: {default: null},
+      hitpoint: {default: ''},
       yt_id: {default: ""},
       duration: {default: 0},  
       volume: {default:80} //youtube vol wants 0-100

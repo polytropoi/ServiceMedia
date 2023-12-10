@@ -1,5 +1,6 @@
 
 import {MeshSurfaceSampler} from '/three/examples/jsm/math/MeshSurfaceSampler.js'; //can because "type=module" //no. 
+import { TransformControls } from '/three/examples/jsm/controls/TransformControls.js';
 
 // import { SVGLoader } from '/three/examples/jsm/loaders/SVGLoader.js'; // ref'd in import maps
 // import { Flow } from '/three/examples/jsm/modifiers/CurveModifier.js'; 
@@ -426,7 +427,7 @@ AFRAME.registerComponent('scatter_physics', { //scattered randomly (hemisphere),
     scaleFactor: {type: 'number', default: 1},
     interaction: {default: ''},
     tags: {default: ''},
-    triggerTag: {default: null}
+    triggerTag: {default: ''}
   },
   
   init: function () {
@@ -4602,6 +4603,11 @@ AFRAME.registerComponent('load_threesvg', {
     }
   });
 
+  AFRAME.registerComponent('transform_controls', {
+    init: function() {
+      this.control = new THREE.TransformControls(this.el.sceneEl.camera, this.el.sceneEl);
+    }
+  });
   AFRAME.registerComponent('loadcanvas', {
     init: function() {
       // this.canvas = document.getElementById("flying_canvas");
