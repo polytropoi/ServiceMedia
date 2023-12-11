@@ -197,6 +197,11 @@ AFRAME.registerComponent('mod_model', {
               this.el.setAttribute("mod_physics", {'model': 'agent', 'isTrigger': true});
             }
           }
+          if (this.data.eventData.toLowerCase().includes("transform")) { 
+
+              this.el.setAttribute("transform_controls", "");  
+
+          }
           if (this.data.eventData.includes("scatter")) {
             this.el.object3D.visible = false;
             let surface = document.getElementById("scatterSurface");
