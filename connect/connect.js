@@ -635,8 +635,8 @@ function ImportMods (event) {
    }
 }
 function SaveTimekeysToLocal () {
-   console.log(JSON.stringify(timeKeysData));
-   localStorage.setItem(room + "_timeKeys", JSON.stringify(timeKeysData));
+   // console.log(JSON.stringify(timeKeysData));
+   // localStorage.setItem(room + "_timeKeys", JSON.stringify(timeKeysData));
 }
 
 

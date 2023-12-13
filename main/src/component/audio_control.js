@@ -1072,7 +1072,7 @@ AFRAME.registerComponent('primary_audio_events', {
             // timekeys.listenTo = "primary audio";
             // console.log("timekeys: " + timekeys);
             // localStorage.setItem(room + "_timeKeys", JSON.stringify(timekeys)); 
-            localStorage.setItem(room + "_timeKeys", JSON.stringify(tkObject)); 
+            // localStorage.setItem(room + "_timeKeys", JSON.stringify(tkObject)); 
 
             // console.log(JSON.stringify(timekeys));
                 // setTimeout(() => {

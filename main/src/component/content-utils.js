@@ -3625,7 +3625,7 @@ AFRAME.registerComponent('video_groups_data', {
     tkObject.timekeys = vids[0].timekeys;
     // localStorage.setItem(room + "_timeKeys", JSON.stringify(vids[0].timekeys)); 
     timedEventsListenerMode = "Primary Video"
-    localStorage.setItem(room + "_timeKeys", JSON.stringify(tkObject)); 
+    // localStorage.setItem(room + "_timeKeys", JSON.stringify(tkObject)); 
     } else {
       timeKeysData = JSON.parse(vtk);
       
