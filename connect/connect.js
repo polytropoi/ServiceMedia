@@ -63,7 +63,7 @@ let mouseDownStarttime = 0;
 let mouseDowntime = 0;
 
 var token = document.getElementById("token").getAttribute("data-token"); 
-var localtoken = localStorage.getItem("smToken"); //goal is to make this the only localstorage, all others go to indexedDB...
+// var localtoken = localStorage.getItem("smToken"); //rem all localstorage!
 let socketHost = "http://localhost:3000";
 // let socketHost = null;
 var socket = null; //the socket.io instance below
