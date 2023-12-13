@@ -14829,7 +14829,7 @@ app.post('/update_scene/:_id', requiredAuthentication, function (req, res) {
 
     console.log("update_scene req.header: " + JSON.stringify(req.headers));
     console.log(req.params._id);
-    var lastUpdateTimestamp = new Date();
+    var lastUpdateTimestamp = Date.now();
     var o_id = ObjectID(req.body._id);   
     console.log('path requested : ' + req.body._id);
     db.scenes.findOne({ "_id" : o_id}, function(err, scene) {

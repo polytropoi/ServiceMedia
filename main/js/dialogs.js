@@ -64,53 +64,53 @@ let showCurves = false;
   // });
 
   $('#modalContent').on('change', '#locationModel', function(e) { //value has phID ~ modelID  (room~type~timestamp~modelID)
-    console.log('model ' + e.target.value);
+    console.log('model ' + e.target.value); 
     let locSplit = e.target.value.split("~"); 
     console.log("locSplit" + locSplit);
     // if (locSplit[1].length > 4) { //should be "none" if no model selected
       // let locSplit = e.target.value.split("~"); //split between localstorage key and modelID
-      let localStorageItem = JSON.parse(localStorage.getItem(locSplit[0]+"~"+locSplit[1]+"~"+locSplit[2])); //same obj structure as scene location item (mostly)
-      console.log("lookedup localstorage item " + JSON.stringify(localStorageItem));
-      let placeholderEl = document.getElementById(locSplit[0]+"~"+locSplit[1]+"~"+locSplit[2]);
-      if (localStorageItem != null && placeholderEl != null) {
-        if (locSplit[3] != "" && locSplit[3] != "" && locSplit[3] != "none") { //model id
-          for (let i = 0; i < sceneModels.length; i++) {
-            console.log(sceneModels[i]._id + " vs " + locSplit[3]);
-            if (sceneModels[i]._id == locSplit[3]) {
-              let locItemTemp = {modelID: sceneModels[i]._id, model: sceneModels[i].name};
-              let locItem = Object.assign(localStorageItem, locItemTemp); //funky object merge!
-              // locItem.modelID = sceneModels[i]._id;
-              // locItem.model = sceneModels[i].name;
-              if (locItem.scale == null || locItem.scale == undefined || locItem.scale == "") {
-                locItem.scale = 1;
-              }
-              console.log(JSON.stringify(locItem));
-              localStorage.setItem(locSplit[0]+"~"+locSplit[1]+"~"+locSplit[2], JSON.stringify(locItem));
-              console.log(localStorage.getItem(locSplit[0]+"~"+locSplit[1]+"~"+locSplit[2]));
+      // let localStorageItem = JSON.parse(localStorage.getItem(locSplit[0]+"~"+locSplit[1]+"~"+locSplit[2])); //same obj structure as scene location item (mostly)
+      // console.log("lookedup localstorage item " + JSON.stringify(localStorageItem));
+      // let placeholderEl = document.getElementById(locSplit[0]+"~"+locSplit[1]+"~"+locSplit[2]);
+      // if (localStorageItem != null && placeholderEl != null) {
+      //   if (locSplit[3] != "" && locSplit[3] != "" && locSplit[3] != "none") { //model id
+      //     for (let i = 0; i < sceneModels.length; i++) {
+      //       console.log(sceneModels[i]._id + " vs " + locSplit[3]);
+      //       if (sceneModels[i]._id == locSplit[3]) {
+      //         let locItemTemp = {modelID: sceneModels[i]._id, model: sceneModels[i].name};
+      //         let locItem = Object.assign(localStorageItem, locItemTemp); //funky object merge!
+      //         // locItem.modelID = sceneModels[i]._id;
+      //         // locItem.model = sceneModels[i].name;
+      //         if (locItem.scale == null || locItem.scale == undefined || locItem.scale == "") {
+      //           locItem.scale = 1;
+      //         }
+      //         console.log(JSON.stringify(locItem));
+      //         localStorage.setItem(locSplit[0]+"~"+locSplit[1]+"~"+locSplit[2], JSON.stringify(locItem));
+      //         console.log(localStorage.getItem(locSplit[0]+"~"+locSplit[1]+"~"+locSplit[2]));
 
 
-              console.log("placeholderEl" +placeholderEl);
-              let phComponent = placeholderEl.components.cloud_marker;
-              if (phComponent == null) {
-                phComponent = placeholderEl.components.local_marker;
-              }
-              if (phComponent != null) {
-                phComponent.loadModel(sceneModels[i]._id);
-              }
-              SaveModToLocal(locSplit[0]+"~"+locSplit[1]+"~"+locSplit[2]);
-            }
-          } 
-        } else {
-          let phComponent = placeholderEl.components.cloud_marker;
-          if (phComponent == null) {
-            phComponent = placeholderEl.components.local_marker;
-          }
-          if (phComponent != null) {
-            phComponent.loadModel("none");
-          }
-          SaveModToLocal(locSplit[0]+"~"+locSplit[1]+"~"+locSplit[2]);
-        }
-      } else {
+      //         console.log("placeholderEl" +placeholderEl);
+      //         let phComponent = placeholderEl.components.cloud_marker;
+      //         if (phComponent == null) {
+      //           phComponent = placeholderEl.components.local_marker;
+      //         }
+      //         if (phComponent != null) {
+      //           phComponent.loadModel(sceneModels[i]._id);
+      //         }
+      //         SaveModToLocal(locSplit[0]+"~"+locSplit[1]+"~"+locSplit[2]);
+      //       }
+      //     } 
+      //   } else {
+      //     let phComponent = placeholderEl.components.cloud_marker;
+      //     if (phComponent == null) {
+      //       phComponent = placeholderEl.components.local_marker;
+      //     }
+      //     if (phComponent != null) {
+      //       phComponent.loadModel("none");
+      //     }
+      //     SaveModToLocal(locSplit[0]+"~"+locSplit[1]+"~"+locSplit[2]);
+      //   }
+      // } else {
         let placeholderEl = document.getElementById(locSplit[0]);
         let phComponent = placeholderEl.components.cloud_marker;
         if (phComponent == null) {
@@ -119,66 +119,68 @@ let showCurves = false;
         if (phComponent != null) {
           phComponent.loadModel();
         }
-      }
+      // }
   });
 
-  $('#modalContent').on('change', '#locationObject', function(e) { //value has phID ~ objectID  (room~type~timestamp~objectID)
+  $('#modalContent').on('change', '#locationObject', function(e) { //value has phID ~ objectID  (room~type~timestamp~objectID) //no, now just timestamp~objectID
     console.log('object ' + e.target.value);
     let locSplit = e.target.value.split("~"); 
     console.log("locSplit" + locSplit);
     // if (locSplit[1].length > 4) { //should be "none" if no object selected
       // let locSplit = e.target.value.split("~"); //split between localstorage key and objectID
-      let localStorageItem = JSON.parse(localStorage.getItem(locSplit[0]+"~"+locSplit[1]+"~"+locSplit[2])); //same obj structure as scene location item (mostly)
-      console.log("lookedup localstorage item " + JSON.stringify(localStorageItem));
-      let placeholderEl = document.getElementById(locSplit[0]+"~"+locSplit[1]+"~"+locSplit[2]);
-      if (localStorageItem != null && placeholderEl != null) {
-        if (locSplit[3] != "" && locSplit[3] != "" && locSplit[3] != "none") { //object id
-          for (let i = 0; i < sceneObjects.length; i++) {
-            console.log(sceneObjects[i]._id + " vs " + locSplit[3]);
-            if (sceneObjects[i]._id == locSplit[3]) {
-              let locItemTemp = {objectID: sceneObjects[i]._id, objectName: sceneObjects[i].name};
-              let locItem = Object.assign(localStorageItem, locItemTemp); //funky object merge!
-              // locItem.modelID = sceneObjects[i]._id;
-              // locItem.model = sceneObjects[i].name;
-              if (locItem.scale == null || locItem.scale == undefined || locItem.scale == "") {
-                locItem.scale = 1;
-              }
-              console.log(JSON.stringify(locItem));
-              localStorage.setItem(locSplit[0]+"~"+locSplit[1]+"~"+locSplit[2], JSON.stringify(locItem));
-              console.log(localStorage.getItem(locSplit[0]+"~"+locSplit[1]+"~"+locSplit[2]));
+      // let localStorageItem = JSON.parse(localStorage.getItem(locSplit[0]+"~"+locSplit[1]+"~"+locSplit[2])); //same obj structure as scene location item (mostly)
+      
+      // console.log("lookedup localstorage item " + JSON.stringify(localStorageItem));
+      // let placeholderEl = document.getElementById(locSplit[0]+"~"+locSplit[1]+"~"+locSplit[2]);
+      // if (localStorageItem != null && placeholderEl != null) {
+      //   if (locSplit[3] != "" && locSplit[3] != "" && locSplit[3] != "none") { //object id
+      //     for (let i = 0; i < sceneObjects.length; i++) {
+      //       console.log(sceneObjects[i]._id + " vs " + locSplit[3]);
+      //       if (sceneObjects[i]._id == locSplit[3]) {
+      //         let locItemTemp = {objectID: sceneObjects[i]._id, objectName: sceneObjects[i].name};
+      //         let locItem = Object.assign(localStorageItem, locItemTemp); //funky object merge!
+      //         // locItem.modelID = sceneObjects[i]._id;
+      //         // locItem.model = sceneObjects[i].name;
+      //         if (locItem.scale == null || locItem.scale == undefined || locItem.scale == "") {
+      //           locItem.scale = 1;
+      //         }
+      //         console.log(JSON.stringify(locItem));
+      //         localStorage.setItem(locSplit[0]+"~"+locSplit[1]+"~"+locSplit[2], JSON.stringify(locItem));
+      //         console.log(localStorage.getItem(locSplit[0]+"~"+locSplit[1]+"~"+locSplit[2]));
 
 
-              console.log("placeholderEl" +placeholderEl);
-              let phComponent = placeholderEl.components.cloud_marker;
-              if (phComponent == null) {
+      //         console.log("placeholderEl" +placeholderEl);
+      //         let phComponent = placeholderEl.components.cloud_marker;
+      //         if (phComponent == null) {
+      //           phComponent = placeholderEl.components.local_marker;
+      //         }
+      //         if (phComponent != null) {
+      //           phComponent.loadObject(sceneObjects[i]._id);
+      //         }
+      //         SaveModToLocal(locSplit[0]+"~"+locSplit[1]+"~"+locSplit[2]);
+      //       }
+      //     } 
+      //   } else {
+      //     let phComponent = placeholderEl.components.cloud_marker;
+      //     if (phComponent == null) {
+      //       phComponent = placeholderEl.components.local_marker;
+      //     }
+      //     if (phComponent != null) {
+      //       phComponent.loadObject("none");
+      //     }
+      //     // SaveModToLocal(locSplit[0]+"~"+locSplit[1]+"~"+locSplit[2]);
+
+      //   }
+      // } else {
+            let placeholderEl = document.getElementById(locSplit[0]);
+            let phComponent = placeholderEl.components.cloud_marker;
+            if (phComponent == null) {
                 phComponent = placeholderEl.components.local_marker;
-              }
-              if (phComponent != null) {
-                phComponent.loadObject(sceneObjects[i]._id);
-              }
-              SaveModToLocal(locSplit[0]+"~"+locSplit[1]+"~"+locSplit[2]);
             }
-          } 
-        } else {
-          let phComponent = placeholderEl.components.cloud_marker;
-          if (phComponent == null) {
-            phComponent = placeholderEl.components.local_marker;
-          }
-          if (phComponent != null) {
-            phComponent.loadObject("none");
-          }
-          SaveModToLocal(locSplit[0]+"~"+locSplit[1]+"~"+locSplit[2]);
-        }
-      } else {
-        let placeholderEl = document.getElementById(locSplit[0]);
-        let phComponent = placeholderEl.components.cloud_marker;
-        if (phComponent == null) {
-            phComponent = placeholderEl.components.local_marker;
-        }
-        if (phComponent != null) {
-          phComponent.loadObject();
-        }
-      }
+            if (phComponent != null) {
+              // phComponent.loadObject();
+            }
+      // }
   });
   // $('#modalContent').on('change', '#locationObject', function(e) { //value has phID ~ objectID  (room~type~timestamp~objectID)
   //   console.log('model ' + e.target.value);
@@ -505,7 +507,14 @@ function ToggleLocationModalListeners () { //add/remove listeners for location m
 
 function ReturnLocationModelSelect (phID) {
     console.log("tryna return models for phID " + phID);
-   let locationItem = JSON.parse(localStorage.getItem(phID));
+  //  let locationItem = JSON.parse(localStorage.getItem(phID));
+    let locationItem = null;
+   for (let i = 0; i < sceneLocations.locations.length; i++) {
+      if (phID == sceneLocations.locations[i].timestamp) {
+        locationItem = sceneLocations.locations[i];
+      }
+   }
+
    let modelSelect = "<option value=\x22"+phID+"~none\x22>none</option>";
    for (let i = 0; i < sceneModels.length; i++) {
       // if (sceneModels[i].isPublic || !isGuest) { //maybe something else?
@@ -520,10 +529,17 @@ function ReturnLocationModelSelect (phID) {
 }
 function ReturnLocationObjectSelect (phID) {
   let objexEl = document.getElementById('sceneObjects');
+  let locationItem = null;
   if (objexEl != null) {
     sceneObjects = objexEl.components.mod_objex.returnObjexData();
     console.log("tryna return objects for phID " + phID);
-    let locationItem = JSON.parse(localStorage.getItem(phID)); //TODO switch to indexedDB
+
+    // let locationItem = JSON.parse(localStorage.getItem(phID)); //TODO switch to indexedDB
+    for (let i = 0; i < sceneLocations.locations.length; i++) {
+      if (phID == sceneLocations.locations[i].timestamp) {
+        locationItem = sceneLocations.locations[i];
+      }
+   }
     if (!locationItem) {
       for (let i = 0; i < sceneLocations.locationMods.length; i++) {
         if (sceneLocations.locationMods[i].phID == phID) {
@@ -547,11 +563,8 @@ function ReturnLocationObjectSelect (phID) {
         // }
     }
     return objectSelect;
-  // return objectSelect;
-  // } else {
-  //   return "";
-  // }
-}
+
+  }
 }
 
 
@@ -580,44 +593,53 @@ function ReturnLocationMarkerTypeSelect (selected) {
 }
 
 
-function ShowLocationModal(phID) {   
+function ShowLocationModal(timestamp) {   
 
     let thisLocation = null;
-    console.log("loaded and looking for " + phID);
-    if (phID.includes("cloudmarker")) {
-      if (sceneLocations.locationMods != null && sceneLocations.locationMods.length > 0) {
-        for (let i = 0; i < sceneLocations.locationMods.length; i++) {
-          if (phID == sceneLocations.locationMods[i].phID) {
-            thisLocation = sceneLocations.locationMods[i];
-            if (thisLocation.scale == undefined || thisLocation.scale == "") {
-                  thisLocation.scale = 1;
-              }
-            if (thisLocation != null) {
-              console.log(JSON.stringify(thisLocation));
-            }
-          }
-        }
-      }
-    } else {
-      let thisLocationString = localStorage.getItem(phID);
+    // console.log("loaded and looking for " + phID);
+    console.log("loaded and looking for " + timestamp);
+    phID = timestamp;
+    // if (phID.includes("cloudmarker")) {
+    //   if (sceneLocations.locationMods != null && sceneLocations.locationMods.length > 0) {
+    //     for (let i = 0; i < sceneLocations.locationMods.length; i++) {
+    //       if (phID == sceneLocations.locationMods[i].phID) {
+    //         thisLocation = sceneLocations.locationMods[i];
+    //         if (thisLocation.scale == undefined || thisLocation.scale == "") {
+    //               thisLocation.scale = 1;
+    //           }
+    //         if (thisLocation != null) {
+    //           console.log(JSON.stringify(thisLocation));
+    //         }
+    //       }
+    //     }
+    //   }
+    // } else {
+      // let thisLocationString = localStorage.getItem(phID);
+
       // console.log(thisLocationString);
-      if (thisLocationString != null) {
-        thisLocation = JSON.parse(thisLocationString);  
-        if (sceneLocations.locationMods != null && sceneLocations.locationMods.length > 0) {
-          for (let i = 0; i < sceneLocations.locationMods.length; i++) {
-            if (phID == sceneLocations.locationMods[i].phID) {
-              thisLocation = sceneLocations.locationMods[i];
-              if (thisLocation.scale == undefined || thisLocation.scale == "") {
-                    thisLocation.scale = 1;
-                }
-              if (thisLocation != null) {
-                console.log(JSON.stringify(thisLocation));
-              }
-            }
-          }
+      for (let i = 0; i < sceneLocations.locations.length; i++) {
+        if (timestamp == sceneLocations.locations[i].timestamp) {
+          thisLocation = sceneLocations.locations[i];
+          break;
         }
       }
-    }
+    //   if (thisLocationString != null) {
+    //     thisLocation = JSON.parse(thisLocationString);  
+    //     if (sceneLocations.locationMods != null && sceneLocations.locationMods.length > 0) {
+    //       for (let i = 0; i < sceneLocations.locationMods.length; i++) {
+    //         if (phID == sceneLocations.locationMods[i].phID) {
+    //           thisLocation = sceneLocations.locationMods[i];
+    //           if (thisLocation.scale == undefined || thisLocation.scale == "") {
+    //                 thisLocation.scale = 1;
+    //             }
+    //           if (thisLocation != null) {
+    //             console.log(JSON.stringify(thisLocation));
+    //           }
+    //         }
+    //       }
+    //     }
+    //   }
+    // // }
     let cloudSaveButton = "";
     if (thisLocation != null)  {
         let label = (thisLocation.name != null && thisLocation.name != undefined && thisLocation.name != 'undefined') ? thisLocation.name : "location";
@@ -631,7 +653,8 @@ function ShowLocationModal(phID) {
         "<div class=\x22row\x22>"+
         "<button class=\x22snapButton\x22 style=\x22float:left;\x22 onclick=\x22SnapLocation('"+phID+"')\x22>Snap</button>"+
         "<button class=\x22grabButton\x22 style=\x22float:left;\x22 onclick=\x22GrabLocation('"+phID+"')\x22>Grab</button>"+
-        "<button class=\x22goToButton\x22 style=\x22float:left;\x22 onclick=\x22GoToLocation('"+phID+"')\x22>GoTo</button>"+
+        // "<button class=\x22goToButton\x22 style=\x22float:left;\x22 onclick=\x22GoToLocation('"+phID+"')\x22>GoTo</button>"+
+        "<button class=\x22goToButton\x22 style=\x22float:left;\x22 onclick=\x22PlayerToLocation('"+thisLocation.x+ " " + thisLocation.y + " " + thisLocation.z +"')\x22>GoTo</button>"+
         // "<button class=\x22goToButton\x22 onclick=\x22PlayerToLocation('"+phID+"')\x22>GoTo</button>"+
         "<button class=\x22infoButton\x22 onclick=\x22SceneManglerModal('Locations')\x22>View All</button>"+
         "</div>"+
@@ -841,7 +864,7 @@ function ShowTimekeysModal() {    //nerp, now in scenemanglermodal
       "<div class=\x22row\x22>"+
 
       "<button class=\x22snapButton\x22 style=\x22float:left;\x22 onclick=\x22AddTimekey()\x22>Add Timed Event Key</button>"+
-      "<button class=\x22infoButton\x22 onclick=\x22SceneManglerModal('Tools')\x22>Tools</button>"+
+      "<button class=\x22infoButton\x22 onclick=\x22SceneManglerModal('Tools')\x22>Settings</button>"+
       "<button class=\x22saveButton\x22 onclick=\x22SaveTimekeysToLocal()\x22>Save (local)</button>"+
      
       // "<button class=\x22deleteButton\x22 onclick=\x22PlayPauseMedia()\x22>Play/Pause Media</button>"+
@@ -1002,38 +1025,43 @@ function ReturnCurrentPlayerLocation() {
 }
 function ReturnColorButtons () {
 
-    sceneColor1 = localStorage.getItem(room+"_sceneColor1");
-    sceneColor2 = localStorage.getItem(room+"_sceneColor2");
-    sceneColor3 = localStorage.getItem(room+"_sceneColor3");
-    sceneColor4 = localStorage.getItem(room+"_sceneColor4");
+    // sceneColor1 = localStorage.getItem(room+"_sceneColor1");
+    // sceneColor2 = localStorage.getItem(room+"_sceneColor2");
+    // sceneColor3 = localStorage.getItem(room+"_sceneColor3");
+    // sceneColor4 = localStorage.getItem(room+"_sceneColor4");
+
+    // sceneColor1 = null;
+    // sceneColor2 = localStorage.getItem(room+"_sceneColor2");
+    // sceneColor3 = localStorage.getItem(room+"_sceneColor3");
+    // sceneColor4 = localStorage.getItem(room+"_sceneColor4");
     
-    if (settings != null) {
-        if (sceneColor1 == null) {
-            sceneColor1 = settings.sceneColor1;
-        }
-        if (sceneColor2 == null) {
-            sceneColor2 = settings.sceneColor2;
-        }
-        if (sceneColor3 == null) {
-            sceneColor3 = settings.sceneColor3;
-        }
-        if (sceneColor4 == null) {
-            sceneColor4 = settings.sceneColor4;
-        }
-    }
+    // if (settings != null) {
+    //     if (sceneColor1 == null) {
+        //     sceneColor1 = settings.sceneColor1;
+        // // }
+        // // if (sceneColor2 == null) {
+        //     sceneColor2 = settings.sceneColor2;
+        // // }
+        // // if (sceneColor3 == null) {
+        //     sceneColor3 = settings.sceneColor3;
+        // // }
+        // // if (sceneColor4 == null) {
+        //     sceneColor4 = settings.sceneColor4;
+        // }
+    
 
     return "<hr><div class=\x22row\x22>"+
     "<label style=\x22margin: 10px;\x22 for=\x22sceneColor1\x22>Color 1</label>"+
-    "<input class=\x22inputColor\x22 type=\x22color\x22 id=\x22sceneColor1\x22 name=\x22sceneColor1\x22 oninput=\x22ColorMods(event, this.value)\x22 value=\x22"+sceneColor1+"\x22>"+
+    "<input class=\x22inputColor\x22 type=\x22color\x22 id=\x22sceneColor1\x22 name=\x22sceneColor1\x22 oninput=\x22ColorMods(event, this.value)\x22 value=\x22"+settings.sceneColor1+"\x22>"+
 
     "<label style=\x22margin: 10px;\x22 for=\x22sceneColor2\x22>Color 2</label>"+
-    "<input class=\x22inputColor\x22 type=\x22color\x22 id=\x22sceneColor2\x22 name=\x22sceneColor2\x22 oninput=\x22ColorMods(event, this.value)\x22 value=\x22"+sceneColor2+"\x22>"+
+    "<input class=\x22inputColor\x22 type=\x22color\x22 id=\x22sceneColor2\x22 name=\x22sceneColor2\x22 oninput=\x22ColorMods(event, this.value)\x22 value=\x22"+settings.sceneColor2+"\x22>"+
     
     "<label style=\x22margin: 10px;\x22 for=\x22sceneColor3\x22>Color 3</label>"+
-    "<input class=\x22inputColor\x22 type=\x22color\x22 id=\x22sceneColor3\x22 name=\x22sceneColor3\x22 oninput=\x22ColorMods(event, this.value)\x22 value=\x22"+sceneColor3+"\x22>"+
+    "<input class=\x22inputColor\x22 type=\x22color\x22 id=\x22sceneColor3\x22 name=\x22sceneColor3\x22 oninput=\x22ColorMods(event, this.value)\x22 value=\x22"+settings.sceneColor3+"\x22>"+
     
     "<label style=\x22margin: 10px;\x22 for=\x22sceneColor4\x22>Color 4</label>"+
-    "<input class=\x22inputColor\x22 type=\x22color\x22 id=\x22sceneColor4\x22 name=\x22sceneColor4\x22 oninput=\x22ColorMods(event, this.value)\x22 value=\x22"+sceneColor4+"\x22>"+
+    "<input class=\x22inputColor\x22 type=\x22color\x22 id=\x22sceneColor4\x22 name=\x22sceneColor4\x22 oninput=\x22ColorMods(event, this.value)\x22 value=\x22"+settings.sceneColor4+"\x22>"+
     "</div><br>";
 }
 
@@ -1044,7 +1072,7 @@ function ColorMods(event, value) {
         if (enviroEl != null) {
             enviroEl.setAttribute('environment', 'skyColor', value);  
         }
-        localStorage.setItem(room + "_sceneColor1", value);
+        // localStorage.setItem(room + "_sceneColor1", value);
         console.log("setting sceneCOlor1 to " + value);
         sceneColor1 = value;
     } else if (source.id == "sceneColor2") {
@@ -1053,14 +1081,14 @@ function ColorMods(event, value) {
             enviroEl.setAttribute('environment', 'horizonColor', value);
 
         }
-        localStorage.setItem(room + "_sceneColor2", value);
+        // localStorage.setItem(room + "_sceneColor2", value);
         sceneColor2 = value;
     } else if (source.id == "sceneColor3") {
         let enviroEl = document.getElementById('enviroEl');
         if (enviroEl != null) {
             enviroEl.setAttribute('environment', 'groundColor', value);
         }
-        localStorage.setItem(room + "_sceneColor3", value);
+        // localStorage.setItem(room + "_sceneColor3", value);
         sceneColor3 = value;
     } else if (source.id == "sceneColor4") {
         let enviroEl = document.getElementById('enviroEl');
@@ -1068,7 +1096,7 @@ function ColorMods(event, value) {
             enviroEl.setAttribute('environment', 'groundColor2', value);
             enviroEl.setAttribute('environment', 'dressingColor', value);
         }
-        localStorage.setItem(room + "_sceneColor4", value);
+        // localStorage.setItem(room + "_sceneColor4", value);
         sceneColor4 = value;
     }
  }
@@ -1308,7 +1336,7 @@ function SceneManglerModal(mode) {
     
     "<button class=\x22tablinks\x22 onclick=\x22TabMangler(event, 'Messages')\x22>Messages</button>"+
     "<button class=\x22tablinks\x22 onclick=\x22TabMangler(event, 'Inventory')\x22>Inventory</button>"+
-    "<button class=\x22tablinks\x22 onclick=\x22TabMangler(event, 'Tools')\x22>Tools</button>"+
+    "<button class=\x22tablinks\x22 onclick=\x22TabMangler(event, 'Tools')\x22>Settings</button>"+
     "<button class=\x22tablinks\x22 onclick=\x22TabMangler(event, 'Locations')\x22>Locations</button>"+
     "<button class=\x22tablinks\x22 onclick=\x22TabMangler(event, 'Events')\x22>Events</button>"+
     "<button class=\x22tablinks\x22 onclick=\x22TabMangler(event, 'About')\x22>About</button>"+

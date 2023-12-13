@@ -1032,10 +1032,11 @@ webxr_router.get('/:_id', function (req, res) {
                                         || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "poi" 
                                         || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "gate"
                                         || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "portal"  
+                                        || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "waypoint"  
                                         || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "mailbox") {
                                     //    locationPlaceholders.push(sceneResponse.sceneLocations[i].x + " " + sceneResponse.sceneLocations[i].y + " " + zFix);
                                         let tLoc = sceneResponse.sceneLocations[i];
-                                        tLoc.phID = sceneResponse.short_id+"~cloudmarker~"+sceneResponse.sceneLocations[i].timestamp;
+                                        tLoc.phID = sceneResponse.sceneLocations[i].timestamp; //just use location timestamp, ditch the "*_marker" stuff...
                                         // console.log("TRYNA SET PLACEHOLDER LOCATION : " + JSON.stringify(tLoc) );
                                         // sceneResponse.sceneLocations[i].phID = 
                                         if (!tLoc.markerObjScale) {
@@ -1591,11 +1592,12 @@ webxr_router.get('/:_id', function (req, res) {
                                         wasd = "extended_wasd_controls=\x22fly: false; moveSpeed: "+sceneResponse.scenePlayer.playerSpeed+"; inputType: keyboard\x22 simple-navmesh-constraint=\x22navmesh:#nav-mesh;fall:10; height: 1.6\x22";
                                     } 
                                     cameraRigEntity = "<a-entity id=\x22cameraRig\x22 initializer "+
-                                        " id=\x22mouseCursor\x22 cursor=\x22rayOrigin: mouse\x22 raycaster=\x22objects: .activeObjexRay\x22 rotation=\x22"+playerRotation+"\x22 position=\x22"+playerPosition+"\x22>"+
+                                        " id=\x22mouseCursor\x22 cursor=\x22rayOrigin: mouse\x22 raycaster=\x22objects: .activeObjexRay\x22>"+
+                                        // " id=\x22mouseCursor\x22 cursor=\x22rayOrigin: mouse\x22 raycaster=\x22objects: .activeObjexRay\x22 rotation=\x22"+playerRotation+"\x22 position=\x22"+playerPosition+"\x22>"+
                                         // " id=\x22mouseCursor\x22 cursor=\x22rayOrigin: mouse\x22 raycaster=\x22objects: .activeObjexRay\x22 position=\x220 0 0\x22>"+
                                         // "<a-entity id=\x22player\x22 get_pos_rot networked=\x22template:#avatar-template;attachTemplateToLocal:false;\x22 "+spawnInCircle+" camera "+wasd+" look-controls=\x22hmdEnabled: false\x22 position=\x220 1.6 0\x22>" +     
                                         // "<a-entity id=\x22viewportPlaceholder\x22 position=\x220 0 -1\x22></entity>"+   
-                                        "<a-entity id=\x22player\x22 "+lookcontrols+" get_pos_rot camera=\x22near: .1\x22 "+wasd+" "+ physicsMod +" position=\x220 0 0\x22>"+
+                                        "<a-entity id=\x22player\x22 "+lookcontrols+" get_pos_rot camera=\x22near: .1\x22 "+wasd+" "+ physicsMod +" rotation=\x22"+playerRotation+"\x22 position=\x22"+playerPosition+"\x22>"+
                                             "<a-entity id=\x22equipPlaceholder\x22 geometry=\x22primitive: box; height: .1; width: .1; depth: .1;\x22 position=\x220 -.65 -.75\x22"+
                                             "material=\x22opacity: 0\x22></a-entity>"+
                                             "<a-entity id=\x22viewportPlaceholder\x22 geometry=\x22primitive: plane; height: 0.01; width: .01\x22 position=\x220 0 -1.5\x22"+
@@ -1913,17 +1915,11 @@ webxr_router.get('/:_id', function (req, res) {
                         callback();
                     }
                 },
-                function (callback) {                
+                function (callback) { //DEPRECATED!//not yet...
                     if (locationPlaceholders.length > 0) {
                         for (let i = 0; i < locationPlaceholders.length; i++) {
-                            // console.log("gotsa placeholder at " + locationPlaceholders[i].x);
-                            // let physics = "mod_physics=\x22body: kinematic; isTrigger: true;\x22";
-                            let physics = "";
-                            // let gltf = "gltf-model=\x22#poi1\x22"
-                            // if (locationPlaceholders[i].markerType.toLowerCase().includes("trigger") || locationPlaceholders[i].markerType.toLowerCase().includes("gate") || locationPlaceholders[i].markerType.toLowerCase().includes("portal")) {
-                            //     physics = "mod_physics=\x22body: kinematic; isTrigger: true;\x22";
-                            // }
-                            placeholderEntities = placeholderEntities + "<a-entity id=\x22"+sceneResponse.short_id+"~cloudmarker~"+locationPlaceholders[i].timestamp+"\x22  "+physics+" class=\x22activeObjexGrab activeObjexRay envMap\x22 cloud_marker=\x22phID: "+
+                            //use the "cloud_marker" component for certain markertypes () TODO rename it to mod_location
+                            placeholderEntities = placeholderEntities + "<a-entity id=\x22"+locationPlaceholders[i].timestamp+"\x22 class=\x22activeObjexGrab activeObjexRay envMap\x22 cloud_marker=\x22phID: "+
                             locationPlaceholders[i].phID+"; scale: "+locationPlaceholders[i].markerObjScale+"; modelID: "+locationPlaceholders[i].modelID+"; model: "+
                             locationPlaceholders[i].model+"; markerType: "+locationPlaceholders[i].markerType+";  tags: "+locationPlaceholders[i].locationTags+"; isNew: false;name: "+
                             locationPlaceholders[i].name+";label: "+locationPlaceholders[i].label+";description: "+locationPlaceholders[i].description+";eventData: "+locationPlaceholders[i].eventData+";timestamp: "+locationPlaceholders[i].timestamp+";\x22 "+
@@ -2734,44 +2730,7 @@ webxr_router.get('/:_id', function (req, res) {
                                             console.log("face tracking asset at " + modelURL);
                                            
                                         } else if (sceneResponse.sceneWebType == "BabylonJS") { //hrm, maybe later
-                                            // gltfsAssets = gltfsAssets + "var lookCtrl = null;\nBABYLON.SceneLoader.ImportMesh('', '', \x22"+modelURL+"\x22, scene, function (meshes, particleSystems, skeletons) {"+
-                                            // "meshes[0].scaling = new BABYLON.Vector3("+scale+", "+scale+", "+scale+");\n"+
-                                            // "meshes[0].position = new BABYLON.Vector3("+locMdl.x+", "+locMdl.y+", "+locMdl.z+");\n"+
-                                            // "meshes[0].rotation = new BABYLON.Vector3("+rx+", "+ry+", "+rz+");\n"+
-                                           
-                                            // "for (var m = 0; m < meshes.length; m++){\n"+ //find mesh named eye
-                                            //     "console.log(meshes[m].material);\n"+
-                                            //     // "meshes[m].material.environmentTexture = new BABYLON.CubeTexture('', scene, undefined, undefined, "+JSON.stringify( cubeMapAsset)+");" +
-                                            //     "if (meshes[m].name.includes(\x22eyeball\x22)) {"+
-                                                   
-                                            //         "console.log(meshes[m].name);"+
-                                            //         "let characterMesh = meshes[m];"+
-                                            //         "for (var b = 0; b < skeletons[0].bones.length - 1; b++){\n"+ //then find bone named eye //NM, pointless - can't use bone with gltf :(
-                                                       
-                                            //             "if (skeletons[0].bones[b].name == \x22Eye\x22) {\n"+
-                                            //                 // "skeletons[0].bones.lookAt(mainCam.position);"+
-                                            //                 "console.log(skeletons[0].bones[b].name);\n"+
-                                            //                 "scene.beginAnimation(skeletons[0], 0, 100, true, 1.0);\n"+
-                                            //                 // "let lookCtrl = new BABYLON.BoneLookController(meshes[0], skeletons[0].bones[b], mainCam.position, {adjustYaw:Math.PI*.5, adjustPitch:Math.PI*.5, adjustRoll:Math.PI});\n"+
-                                            //                 "var skeleton = skeletons[0];\n"+
-                                            //                 "var time = 0;\n"+
-                                            //                 "var state = 'Initial';\n"+
-                                            //                 "var lastAppliedQuat = new BABYLON.Quaternion();\n"+
-                                            //                 "var stateTime = 0;\n"+
-                                            //                 "var timingFunc = (x) => Math.cos(x * Math.PI) * -0.5 + 0.5;\n"+
-                                            //                 // var cubeTex = new BABYLON.CubeTexture("", scene, );
-                                            //                 "scene.registerBeforeRender(function(){\n" +
-                                                            
-                                            //                "});\n"+
-                                                            
-                                            //             "}\n"+
-                                            //         "}\n"+
-                                            //         //  "lookCtrl = new BABYLON.BoneLookController(characterMesh, skeletons[0].bones[m], mainCam.position, {adjustYaw:Math.PI*.5, adjustPitch:Math.PI*.5, adjustRoll:Math.PI});\n"+
-                                            //     "}\n"+
-                                            // "}\n"+
-
-                                            // "});\n";
-
+                                            
 
                                         ///////////////////////////////// AFrame scene type below //////////////////////////
                                         } else { //aframe !!!
@@ -2949,7 +2908,7 @@ webxr_router.get('/:_id', function (req, res) {
                                         // let assetType = "usdz";
                                         // if (asset.type == "reality")
                                         // let modelURL = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + assetUserID + "/" + asset.item_type + "/" + asset.filename, Expires: 6000});
-                                        let modelURL = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, 'users/' + assetUserID + "/gltf/" + asset.filename, 6000);
+                                        let modelURL = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, 'users/' + assetUserID + "/usdz/" + asset.filename, 6000);
                                         console.log("non-gltf modelURL " + modelURL + " modelType " + asset.item_type);
                                         usdzFiles = modelURL;
                                         
@@ -2967,9 +2926,10 @@ webxr_router.get('/:_id', function (req, res) {
                                 })(); //end (async
                                     } 
                                 });
-                                } else {
-                                    callbackz();
-                                }
+                            } else { //no model, check for placeholders
+                                
+                                callbackz();
+                            }
                             // } else {
                             //     callbackz(); //if "noweb"
                             // }
@@ -4183,6 +4143,7 @@ webxr_router.get('/:_id', function (req, res) {
                     let settings = {};  //TODO move this lower down? 
 
                     settings._id = sceneResponse._id;
+                    settings.sceneLastUpdate = sceneResponse.sceneLastUpdate;
                     settings.sceneType = sceneResponse.sceneWebType;
                     settings.sceneTitle = sceneResponse.sceneTitle;
                     settings.sceneKeynote = sceneResponse.sceneKeynote;

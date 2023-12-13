@@ -63,12 +63,13 @@ let mouseDownStarttime = 0;
 let mouseDowntime = 0;
 
 var token = document.getElementById("token").getAttribute("data-token"); 
-var localtoken = localStorage.getItem("smToken");
+var localtoken = localStorage.getItem("smToken"); //goal is to make this the only localstorage, all others go to indexedDB...
 let socketHost = "http://localhost:3000";
 // let socketHost = null;
 var socket = null; //the socket.io instance below
-let iDB = null; //indexedDB
-let storeTimekeys = null;
+let cloudData = {};
+let localData = null;
+
 
 
 $('a-entity').each(function() {  //external way of getting click duration for physics
@@ -93,26 +94,77 @@ $('a-entity').each(function() {  //external way of getting click duration for ph
  
  });
 
+function InitIDB() {
+   console.log("tryna connect to SMXR indexeddb");
+   if (!('indexedDB' in window)) {
+      console.log("This browser doesn't support IndexedDB");
+      return;
+    }
+   const request = indexedDB.open("SMXR", 1);
+   request.onerror = (event) => {
+      console.error("could not connect to iDB " + event);
+      return "error"
+   };
+   request.onupgradeneeded = function () {
+      const db = request.result;
+      const store = db.createObjectStore("scenes", { keyPath: "shortID" });
+      store.createIndex("scene", ["scene"], { unique: true });
+    };
+    request.onsuccess = function () {
+      console.log("Database opened successfully");
+      const db = request.result;
+      const transaction = db.transaction("scenes", "readwrite");
+      const store = transaction.objectStore("scenes");
+      const loadTimeStamp = Date.now();
+      const lastSceneUpdate = null;
+      let scene = {};
+      scene.shortID = room; //with no tilde = the "official" cloud version
+      scene.sceneSettings = settings;
+      scene.sceneLocations = sceneLocations;
+      // scene.lastUpdate = loadTimeStamp;
+      store.put(scene); //write the "official" version
+      const idQuery = store.get(room);
+      idQuery.onsuccess = function () {
+         cloudData = idQuery.result;
+         // console.log("cloud date is date " + (cloudData.sceneSettings.sceneLastUpdate instanceof Date));
+         console.log('scene data from cloud lastupdated : ' + cloudData.sceneSettings.sceneLastUpdate);
+
+      };
+      //check if there are localmods
+      const modQuery = store.get(room + "~");
+      modQuery.onsuccess = function () {
+         if (modQuery.result) {
+            localData = modQuery.result;
+            console.log("scene localdata " + localData );
+         } else {
+            console.log("no localdata found!");
+         }
+      }
+      transaction.oncomplete = function () {
+        db.close();
+         InitLocalData();
+      };
+   };
+}
+// function GetTimekeys(db) {
+//    if (db) {
+
+//    }
+// }
+
 /////////////////// main onload function below, populate settings, etc.
 $(function() { 
 
    player = document.getElementById("player");
+   // player = document.getElementById("cameraRig");
+   let settingsEl = document.getElementById('settingsDataElement'); //volume, color, etc...
+   let theSettingsData = settingsEl.getAttribute('data-settings');
+   settings = JSON.parse(atob(theSettingsData)); 
 
-
-   const request = indexedDB.open("SMXR");
-   request.onerror = (event) => {
-      console.error("Why didn't you allow my web app to use IndexedDB?!");
-   };
-   request.onsuccess = (event) => {
-      iDB = event.target.result;
-      // iDB.createObjectStore('timekeys', {keyPath: 'shortID'}); 
-      console.log("gotsa INDEXdb named " +iDB);
-   };
-
-   console.log("last_page was " + localStorage.getItem("last_page") + " servertoken: "+ token + " localtoken: " + localtoken + " userdata.sceneOwner " + userData.sceneOwner);
+   // console.log("last_page was " + localStorage.getItem("last_page") + " servertoken: "+ token + " localtoken: " + localtoken + " userdata.sceneOwner " + userData.sceneOwner);
    
    setTimeout(function () {
-      localStorage.setItem("last_page", room);
+      // localStorage.setItem("last_page", room);
       tcheck(); //token auth
    }, 1000);
    if (typeof window.ethereum !== 'undefined') {
@@ -122,20 +174,20 @@ $(function() {
 
    }
 
-   let settingsEl = document.getElementById('settingsDataElement'); //volume, color, etc...
-   let theSettingsData = settingsEl.getAttribute('data-settings');
-            // console.log("RAW LOCATIOND DATA " + theData);
-   settings = JSON.parse(atob(theSettingsData)); //big pile of params
+
+   // console.log("RAW LOCATIOND DATA " + theData);
+   //big pile of params
    // let settingsAFrame = createElement("a-entity")
    // let audioGroupsEl = null;
    // console.log("settings " + JSON.stringify(settings));
 
    if (settings.sceneTimedEvents != undefined && settings.sceneTimedEvents != null) {
       timeKeysData = settings.sceneTimedEvents;
-      localStorage.setItem(room + '_timeKeys', JSON.stringify(timeKeysData));
+      console.log("timekeys Dqata: " + JSON.stringify(timeKeysData));
+      // localStorage.setItem(room + '_timeKeys', JSON.stringify(timeKeysData));
+      
 
-
-      console.log('cloud timekeysdata' + JSON.stringify(timeKeysData));
+      // console.log('cloud timekeysdata' + JSON.stringify(timeKeysData));
       timedEventsListenerMode = timeKeysData.listenTo;  
    } 
    // else if (localStorage.getItem(room + "_timeKeys") != null) { //use local ve3rsion if saved
@@ -144,7 +196,7 @@ $(function() {
    //    timedEventsListenerMode = timeKeysData.listenTo;  
    // }
 
-   AddLocalMarkers();
+   // AddLocalMarkers();
    vidz = document.getElementsByTagName("video");
    if (vidz != null && vidz.length > 0) { //either video or audio, not both...?
       videoEl = vidz[0];
@@ -177,7 +229,7 @@ $(function() {
             }
          }
       }
-      console.log("settings: " + JSON.stringify(settings));
+      // console.log("settings: " + JSON.stringify(settings));
       if (settings.skyboxIDs != null) {
          
          skyboxEl = document.createElement('a-entity');
@@ -616,7 +668,8 @@ function SaveModToLocal(locationKey) { //Save button on location modal (other se
       locItem.isLocal = true;
    }
    console.log("tryna savelocation "+locationKey+"  : " + JSON.stringify(locItem));
-   localStorage.setItem(locationKey, JSON.stringify(locItem));
+   // localStorage.setItem(locationKey, JSON.stringify(locItem));
+
    
    let theEl = document.getElementById(locationKey);
    if (theEl != null) {
@@ -629,7 +682,9 @@ function SaveModToLocal(locationKey) { //Save button on location modal (other se
       console.log("DINT FIND THE EL " + locationKey);
    }
    
-   AddLocalMarkers();
+   // AddLocalMarkers();
+   // InitIDB();
+   
    ShowHideDialogPanel();
    // SceneManglerModal('Locations');
 }
@@ -686,11 +741,23 @@ function GoToLocation(locationKey) {
 
          player.setAttribute('position', worldPos);
          console.log("target "+JSON.stringify(targetLocation)+ " vs. player " + JSON.stringify(player.getAttribute('position')));
-         window.playerPosition = worldPos;
+         // window.playerPosition = worldPos;
 
          // ShowHideDialogPanel(); 
       } 
    }
+}
+function PlayerToLocation(worldPos) {
+   // if (player == null) {
+   //    player = document.getElementById('player');
+   // }
+   // let worldPos = new THREE.Vector3();
+   //       // location.getWorldPosition(worldPos);
+   // worldPos = {'x': targetLocation.x, 'y': targetLocation.y + 1, 'z': targetLocation.z + 3};
+
+   player.setAttribute('position', worldPos);
+   // console.log("target "+JSON.stringify(targetLocation)+ " vs. player " + JSON.stringify(player.getAttribute('position')));
+   // window.playerPosition = worldPos;
 }
 
 function GoToNext() {
@@ -784,7 +851,7 @@ function GoToPrevious() {
    }
 }
 
-function ReturnLocationTable () {
+function ReturnLocationTableOLD () { //now it's all in indexedDB
    // console.log("LOCATIONMODS: " + JSON.stringify(sceneLocations.locationMods));
    if (sceneLocations.locationMods != null && sceneLocations.locationMods.length > 0) {
       let tablerows = "";
@@ -811,6 +878,36 @@ function ReturnLocationTable () {
       return null;
    }
 }
+
+function ReturnLocationTable () { //just show em all now!
+   // console.log("LOCATIONMODS: " + JSON.stringify(sceneLocations.locationMods));
+   // if (sceneLocations.locationMods != null && sceneLocations.locationMods.length > 0) {
+      let tablerows = "";
+      for (let i = 0; i < sceneLocations.locations.length; i++) {
+         let markerString = "";
+         if (sceneLocations.locations[i].isLocal != null && sceneLocations.locations[i].isLocal === true) {
+            markerString = "<span style=\x22color: pink; font-weight: bold;\x22>"+sceneLocations.locations[i].markerType+"</span>";
+         } else {
+            markerString = "<span style=\x22color: lime; font-weight: bold;\x22>"+sceneLocations.locations[i].markerType+"</span>";
+         }
+
+         // if (sceneLocations.locations[i].markerType != undefined && (sceneLocations.locations[i].markerType.includes("picture") || sceneLocations.locations[i].markerType == "poi" 
+         //    || sceneLocations.locations[i].markerType == "placeholder" || sceneLocations.locations[i].markerType.toLowerCase().includes("trigger") 
+         //    || sceneLocations.locations[i].markerType == "mailbox" || sceneLocations.locations[i].markerType == "portal" || sceneLocations.locations[i].markerType == "gate") ) {
+               
+            let namelabel = (sceneLocations.locations[i].name != 'undefined' && sceneLocations.locations[i].name != undefined && sceneLocations.locations[i].name != null) ? sceneLocations.locations[i].name : sceneLocations.locations[i].label; 
+            tablerows = tablerows + "<tr class=\x22clickableRow\x22 onclick=\x22LocationRowClick('"+sceneLocations.locations[i].timestamp+"')\x22><td>"+namelabel+"</td>"+
+            "<td>"+sceneLocations.locations[i].x+","+sceneLocations.locations[i].y+","+sceneLocations.locations[i].z+"</td><td>"+sceneLocations.locations[i].model+"</td><td>"+ markerString+"</td></tr>";
+            // "<td>"+sceneLocations.locationMods[i].phID+"</td><td>"+localString + sceneLocations.locationMods[i].markerType+"</td></tr>";
+            // "<td>"+sceneLocations.locationMods[i].phID+"</td><td>"+markerString+"</td></tr>";
+         // }
+      }
+      return "<table id=\x22locations\x22><th>label</th><th>position</th><th>Asset</th><th>type</th>"+tablerows+"</table>";
+   // } else {
+   //    return null;
+   // }
+}
+
 function LocationRowClick(data) {
    // // for (let i = 0; i < sceneLocations.locations)
    // let isCloud = true;
@@ -823,123 +920,157 @@ function LocationRowClick(data) {
    // ShowLocationModal(isCloud, data);
 }
 
-function AddLocalMarkers() {// new or modded markers not saved to cloud
-   console.log("tryna add local keys count " + localStorage.length);
-   let locationMods = []; //local scope for local mods 
-   if (settings) {
-      if (localStorage.length > 0 && (settings.sceneType == "Default" || settings.sceneType == "AFrame")) {
-         for (var i=0; i < localStorage.length; i++)  {
-            let theKey = localStorage.key(i);
+// InitIDB();
 
-            let gotsaMatch = false;
+function InitLocalData () {
 
-            if (theKey != null && theKey.toString().includes(room)) {
-               let theItem = localStorage.getItem(theKey);
-               // console.log("local key:" + theKey + " item " + theItem);
-               // console.log(theKey);
-               let keySplit = theKey.split("~"); //room is zero, timestamp is 2
-               localKeys.push(keySplit[2]);// use this to filter the unmodded ones in AddCloudMarkers below, and tell modded vs unmodded locs //nevermind
-               if (theKey.toString().includes("~localmarker~")) {
+   if (localData) { 
 
-                  // localKeys.push(keySplit[2]);
-                  
-                  // theItemObject = JSON.parse(theItem);
-                  // theItemObject.markerType = theItemObject.markerType + " (local)";
-                  console.log("localplaceholder key:" + theKey + " el " + document.getElementById(theKey));
-                  let phEl = document.getElementById(theKey);
-
-                  if (phEl == null) {
-                     // console.log("creating local el " + theKey);
-                     phEl = document.createElement('a-entity');   
-                     phEl.id = theKey;
-                     var sceneEl = document.querySelector('a-scene');
-                     phEl.setAttribute('skybox-env-map', '');
-                     phEl.setAttribute('local_marker', {'timestamp': keySplit[2]});
-                     sceneEl.appendChild(phEl);
-                  }
-                  if (theItem != null && sceneLocations.locations != null) {
-                     let theItemObject = JSON.parse(theItem);
-                     theItemObject.isLocal = true;
-                     locationMods.push(theItemObject);
-                     if (theItemObject.markerType == "poi") {
-                        let nextbuttonEl = document.getElementById('nextButton');
-                        let prevbuttonEl = document.getElementById('previousButton');
-                        nextbuttonEl.style.visibility = "visible";
-                        prevbuttonEl.style.visibility = "visible";
-                        poiLocations.push(theItemObject);
-                     }
-                  }
-               } else if (theKey.toString().includes("~cloudmarker~")) { //a cloudmarker, if modded by user, becomes a defacto "local" marker, unless/until admin saves to cloud
-                  let keySplit = theKey.split("~"); //room is zero, timestamp is 2
-               
-                  let cItem = JSON.parse(theItem);
-                  // cItem.isLocal = true;
-                  // console.log('cloudplaceholder ' + JSON.stringify(cItem) );
-                  // sceneLocations.locations.find(function(keySplit, index) { //kinda bad, what if 2 have same?
-                  // if(tk.keystarttime == tkStarttimes[i]) {
-                  //    return true;
-                  // }}
-                  locationMods.push(cItem);
-                  if (cItem.markerType == "poi") {
-                     let nextbuttonEl = document.getElementById('nextButton');
-                     let prevbuttonEl = document.getElementById('previousButton');
-                     nextbuttonEl.style.visibility = "visible";
-                     prevbuttonEl.style.visibility = "visible";
-                     poiLocations.push((cItem));
-                  }
-                  let phEl = document.getElementById(theKey);
-
-                  if (phEl) {
-                     let cloud_marker = phEl.components.cloud_marker;
-                     if (cloud_marker) {
-                        console.log("LocalMods to CLoudMarkerz!");
-                     }
-                  }
-               } else if (theKey.toString().includes('color')) {
-                  // console.log("gots color " + theKey + " item " + theItem);
+   } else {
+   
+      if (cloudData) {
+         console.log("gots cloud data: " + JSON.stringify(cloudData));
+         if (cloudData.sceneLocations.locations) {
+            for (let i = 0; i < cloudData.sceneLocations.locations.length; i++) {
+            // let theItemObject = JSON.parse(theItem);
+            // theItemObject.isLocal = true;
+            // locationMods.push(theItemObject);
+               if (cloudData.sceneLocations.locations[i].markerType == "poi") {
+                  let nextbuttonEl = document.getElementById('nextButton');
+                  let prevbuttonEl = document.getElementById('previousButton');
+                  nextbuttonEl.style.visibility = "visible";
+                  prevbuttonEl.style.visibility = "visible";
+                  poiLocations.push(cloudData.sceneLocations.locations[i]);
                }
-            
-
-               let enviroEl = document.getElementById('enviroEl'); //attached to aframe environment thing
-               if (enviroEl != null) {
-                  if (theKey.toString().includes("sceneColor1")) {  
-                        enviroEl.setAttribute('environment', 'skyColor', theItem);
-                     } else if (theKey.toString().includes("sceneColor2")) {
-                        console.log("theColror eky " + theKey + " " + theItem);
-                        enviroEl.setAttribute('environment', 'horizonColor', theItem);
-                     } else if (theKey.toString().includes("sceneColor3")) {
-                        enviroEl.setAttribute('environment', 'groundColor', theItem);
-                     } else if (theKey.toString().includes("sceneColor4")) {
-                        enviroEl.setAttribute('environment', 'groundColor2', theItem);
-                        enviroEl.setAttribute('environment', 'dressingColor', theItem);
-                  }
-               }
-            
-               // console.log("POILOCATIONS : "+ poiLocations.length);
-            }
-            if (localStorage.length - 1 === i) {
-               sceneLocations.locationMods = locationMods;
-               console.log("updated locationmods " + JSON.stringify(sceneLocations.locationMods));
-               // console.log("LOCATIONMODS: " + JSON.stringify(sceneLocations.locationMods));
-               AddCloudMarkers(); //add the ones from admin
             }
          }
-         // if (!gotsaMatch) {
-         //    locationMods.push(cloudLocations[c]);
-         // }
-      } else {
-         AddCloudMarkers(); 
       }
    }
 }
 
-function AddCloudMarkers () {
-   if (cloudMarkers.length > 0) {
-      for (let i = 0; i < cloudMarkers.length; i++) {
-         sceneLocations.locationMods.push(cloudMarkers[i]);
-      }
-   } 
-}
+// function AddLocalMarkersOLD() {// new or modded markers not saved to cloud // DEPRECATED for indexedDB version
+   
+//    console.log("tryna add local keys count " + localStorage.length);
+//    let locationMods = []; //local scope for local mods 
+//    if (settings == '') {
+//       if (localStorage.length > 0 && (settings.sceneType == "Default" || settings.sceneType == "AFrame")) {
+//          for (var i=0; i < localStorage.length; i++)  {
+//             let theKey = localStorage.key(i);
+
+//             let gotsaMatch = false;
+
+//             if (theKey != null && theKey.toString().includes(room)) {
+//                let theItem = localStorage.getItem(theKey);
+//                // console.log("local key:" + theKey + " item " + theItem);
+//                // console.log(theKey);
+//                let keySplit = theKey.split("~"); //room is zero, timestamp is 2
+//                localKeys.push(keySplit[2]);// use this to filter the unmodded ones in AddCloudMarkers below, and tell modded vs unmodded locs //nevermind
+//                if (theKey.toString().includes("~localmarker~")) {
+
+//                   // localKeys.push(keySplit[2]);
+                  
+//                   // theItemObject = JSON.parse(theItem);
+//                   // theItemObject.markerType = theItemObject.markerType + " (local)";
+//                   console.log("localplaceholder key:" + theKey + " el " + document.getElementById(theKey));
+//                   let phEl = document.getElementById(theKey);
+
+//                   if (phEl == null) {
+//                      // console.log("creating local el " + theKey);
+//                      phEl = document.createElement('a-entity');   
+//                      phEl.id = theKey;
+//                      var sceneEl = document.querySelector('a-scene');
+//                      phEl.setAttribute('skybox-env-map', '');
+//                      phEl.setAttribute('local_marker', {'timestamp': keySplit[2]});
+//                      sceneEl.appendChild(phEl);
+//                   }
+//                   if (theItem != null && sceneLocations.locations != null) {
+//                      let theItemObject = JSON.parse(theItem);
+//                      theItemObject.isLocal = true;
+//                      locationMods.push(theItemObject);
+//                      if (theItemObject.markerType == "poi") {
+//                         let nextbuttonEl = document.getElementById('nextButton');
+//                         let prevbuttonEl = document.getElementById('previousButton');
+//                         nextbuttonEl.style.visibility = "visible";
+//                         prevbuttonEl.style.visibility = "visible";
+//                         poiLocations.push(theItemObject);
+//                      }
+//                   }
+//                } else if (theKey.toString().includes("~cloudmarker~")) { //a cloudmarker, if modded by user, becomes a defacto "local" marker, unless/until admin saves to cloud
+//                   let keySplit = theKey.split("~"); //room is zero, timestamp is 2
+               
+//                   let cItem = JSON.parse(theItem);
+//                   // cItem.isLocal = true;
+//                   // console.log('cloudplaceholder ' + JSON.stringify(cItem) );
+//                   // sceneLocations.locations.find(function(keySplit, index) { //kinda bad, what if 2 have same?
+//                   // if(tk.keystarttime == tkStarttimes[i]) {
+//                   //    return true;
+//                   // }}
+//                   locationMods.push(cItem);
+//                   if (cItem.markerType == "poi") {
+//                      let nextbuttonEl = document.getElementById('nextButton');
+//                      let prevbuttonEl = document.getElementById('previousButton');
+//                      nextbuttonEl.style.visibility = "visible";
+//                      prevbuttonEl.style.visibility = "visible";
+//                      poiLocations.push((cItem));
+//                   }
+//                   let phEl = document.getElementById(theKey);
+
+//                   if (phEl) {
+//                      let cloud_marker = phEl.components.cloud_marker;
+//                      if (cloud_marker) {
+//                         console.log("LocalMods to CLoudMarkerz!");
+//                      }
+//                   }
+//                } else if (theKey.toString().includes('color')) {
+//                   // console.log("gots color " + theKey + " item " + theItem);
+//                }
+            
+
+//                let enviroEl = document.getElementById('enviroEl'); //attached to aframe environment thing
+//                if (enviroEl != null) {
+//                   if (theKey.toString().includes("sceneColor1")) {  
+//                         enviroEl.setAttribute('environment', 'skyColor', theItem);
+//                      } else if (theKey.toString().includes("sceneColor2")) {
+//                         console.log("theColror eky " + theKey + " " + theItem);
+//                         enviroEl.setAttribute('environment', 'horizonColor', theItem);
+//                      } else if (theKey.toString().includes("sceneColor3")) {
+//                         enviroEl.setAttribute('environment', 'groundColor', theItem);
+//                      } else if (theKey.toString().includes("sceneColor4")) {
+//                         enviroEl.setAttribute('environment', 'groundColor2', theItem);
+//                         enviroEl.setAttribute('environment', 'dressingColor', theItem);
+//                   }
+//                }
+            
+//                // console.log("POILOCATIONS : "+ poiLocations.length);
+//             }
+//             if (localStorage.length - 1 === i) {
+//                sceneLocations.locationMods = locationMods;
+//                console.log("updated locationmods " + JSON.stringify(sceneLocations.locationMods));
+//                // console.log("LOCATIONMODS: " + JSON.stringify(sceneLocations.locationMods));
+//                AddCloudMarkers(); //add the ones from admin
+//             }
+//          }
+//          // if (!gotsaMatch) {
+//          //    locationMods.push(cloudLocations[c]);
+//          // }
+//       } else {
+//          AddCloudMarkers(); 
+//       }
+//    }
+//    if (localData) {
+//       for (i = 0; i < localData.sceneLocations.locationMods.length; i++) {
+
+//       }
+//    }
+// }
+
+// function AddCloudMarkers () {
+//    if (cloudMarkers.length > 0) {
+//       for (let i = 0; i < cloudMarkers.length; i++) {
+//          sceneLocations.locationMods.push(cloudMarkers[i]);
+//       }
+//    } 
+// }
 
 
 function ClearPlaceholders() {
@@ -1071,15 +1202,9 @@ if (sceneEl != null) {
       initialized: {default: ''},
       jsonData: {default: ''},
       youtubePosition: {type: 'vec3', default: {x: 0, y: 1, z: -5}} 
-         // locData: {
-         //    parse: JSON.parse,
-         //    stringify: JSON.stringify
-         // }
+       
       },
       init: function() {
-      // let locData = this.data.locData;
-      //   console.log(JSON.stringify());
-      //       SetLocationData(locData);
 
             let theData = this.el.getAttribute('data-locations');
             // console.log("RAW LOCATIOND DATA " + theData);
@@ -1087,11 +1212,8 @@ if (sceneEl != null) {
             this.data.jsonData = JSON.parse(atob(theData)); //convert from base64
             
             for (let i = 0; i < this.data.jsonData.length; i++) {
-               // console.log(JSON.stringify(this.data.jsonData[i]));
+               sceneLocations.locations.push(this.data.jsonData[i]);
                if (this.data.jsonData[i].markerType != undefined) {
-                  
-               // SetLocationData(locations);
-                  sceneLocations.locations.push(this.data.jsonData[i]);
                   if (this.data.jsonData[i].markerType.toLowerCase().includes("youtube")) {
                      this.data.youtubePosition.x = this.data.jsonData[i].x;
                      this.data.youtubePosition.y = this.data.jsonData[i].y; 
@@ -1118,13 +1240,17 @@ if (sceneEl != null) {
                }
             }
             // sceneLocations.locations.push(this.data.jsonData);
-            AddLocalMarkers();
+            // AddLocalMarkers();
+            // InitLocalData();
+            InitIDB();
 
       }, 
       returnYouTubePosition: function() {
          return this.data.youtubePosition;
       }
    });
+
+
 }
 
 function ShowHideUI () {
@@ -2115,16 +2241,17 @@ function InitPrimarySlider() {
 // let modal = document.getElementById('modalContent');
 let primaryAudioSlider = document.getElementById("primaryAudioVolumeSlider");
    if (primaryAudioSlider != undefined) {
-      let storedPrimaryVolume = localStorage.getItem(room+"_primaryVolume");
-      if (storedPrimaryVolume != null) {
-         primaryAudioSlider.value = storedPrimaryVolume;
-      }
+      // let storedPrimaryVolume = localStorage.getItem(room+"_primaryVolume");
+      // if (storedPrimaryVolume != null) {
+      //    primaryAudioSlider.value = storedPrimaryVolume;
+      // }
+
       UpdatePrimaryAudioVolume(primaryAudioSlider.value);
       primaryAudioSlider.oninput = function() {
       // output.innerHTML = this.value;
       UpdatePrimaryAudioVolume(this.value);
       volumePrimary = this.value;
-      localStorage.setItem(room+"_primaryVolume", this.value);
+      // localStorage.setItem(room+"_primaryVolume", this.value);
       }
    }
 }
@@ -2132,15 +2259,15 @@ function InitAmbientSlider () {
    // let modal = document.getElementById('modalContent');
  let ambientAudioSlider = document.getElementById("ambientAudioVolumeSlider");
    if (ambientAudioSlider != null) {
-      let storedAmbientVolume = localStorage.getItem(room+"_ambientVolume");
-      if (storedAmbientVolume != null) {
-         ambientAudioSlider.value = storedAmbientVolume;
-      }
+      // let storedAmbientVolume = localStorage.getItem(room+"_ambientVolume");
+      // if (storedAmbientVolume != null) {
+      //    ambientAudioSlider.value = storedAmbientVolume;
+      // }
       // UpdateAmbientAudioVolume(ambientAudioSlider.value);
          ambientAudioSlider.oninput = function() {
          UpdateAmbientAudioVolume(this.value);
          volumeAmbient = this.value;
-         localStorage.setItem(room+"_ambientVolume", this.value);
+         // localStorage.setItem(room+"_ambientVolume", this.value);
       }
    }
 }
@@ -2148,15 +2275,15 @@ function InitTriggerSlider () {
    // let modal = document.getElementById('modalContent');
  let triggerAudioSlider = document.getElementById("triggerAudioVolumeSlider");
    if (triggerAudioSlider != null) {
-      let storedTriggerVolume = localStorage.getItem(room+"_triggerVolume");
-      if (storedTriggerVolume != null) {
-         triggerAudioSlider.value = storedTriggerVolume;
-      }
+      // let storedTriggerVolume = localStorage.getItem(room+"_triggerVolume");
+      // if (storedTriggerVolume != null) {
+      //    triggerAudioSlider.value = storedTriggerVolume;
+      // }
       UpdateTriggerAudioVolume(triggerAudioSlider.value);
       triggerAudioSlider.oninput = function() {
          volumeTrigger = this.value;
          UpdateTriggerAudioVolume(this.value);
-         localStorage.setItem(room+"_triggerVolume", this.value);
+         // localStorage.setItem(room+"_triggerVolume", this.value);
       } 
    }
 }
@@ -2176,7 +2303,7 @@ function UpdatePrimaryAudioVolume(newVolume) {
          primaryAudioController.modVolume(newVolume);
       }   
    }
-   localStorage.setItem(room+"_primaryVolume", newVolume);
+   // localStorage.setItem(room+"_primaryVolume", newVolume);
 }
 function UpdateAmbientAudioVolume(newVolume) {
    var ambientAudioController = document.getElementById("ambientAudio").components.ambient_audio_control; 
@@ -2360,7 +2487,7 @@ function SetVideoEventsData (type) {
    console.log("tryna SetVideoEventsData");
    tkStarttimes = []; //either audio or video, not both
    if (timeKeysData.timekeys == undefined || timeKeysData.timekeys == null) {
-     timeKeysData = JSON.parse(localStorage.getItem(room+ "_timeKeys")); 
+   //   timeKeysData = JSON.parse(localStorage.getItem(room+ "_timeKeys"));  TODO update the settings.timekeys
    } 
    
    
