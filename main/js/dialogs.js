@@ -63,54 +63,38 @@ let showCurves = false;
   //     }
   // });
 
-  $('#modalContent').on('change', '#locationModel', function(e) { //value has phID ~ modelID  (room~type~timestamp~modelID)
-    console.log('model ' + e.target.value); 
-    let locSplit = e.target.value.split("~"); 
-    console.log("locSplit" + locSplit);
-    // if (locSplit[1].length > 4) { //should be "none" if no model selected
-      // let locSplit = e.target.value.split("~"); //split between localstorage key and modelID
-      // let localStorageItem = JSON.parse(localStorage.getItem(locSplit[0]+"~"+locSplit[1]+"~"+locSplit[2])); //same obj structure as scene location item (mostly)
-      // console.log("lookedup localstorage item " + JSON.stringify(localStorageItem));
-      // let placeholderEl = document.getElementById(locSplit[0]+"~"+locSplit[1]+"~"+locSplit[2]);
-      // if (localStorageItem != null && placeholderEl != null) {
-      //   if (locSplit[3] != "" && locSplit[3] != "" && locSplit[3] != "none") { //model id
-      //     for (let i = 0; i < sceneModels.length; i++) {
-      //       console.log(sceneModels[i]._id + " vs " + locSplit[3]);
-      //       if (sceneModels[i]._id == locSplit[3]) {
-      //         let locItemTemp = {modelID: sceneModels[i]._id, model: sceneModels[i].name};
-      //         let locItem = Object.assign(localStorageItem, locItemTemp); //funky object merge!
-      //         // locItem.modelID = sceneModels[i]._id;
-      //         // locItem.model = sceneModels[i].name;
-      //         if (locItem.scale == null || locItem.scale == undefined || locItem.scale == "") {
-      //           locItem.scale = 1;
-      //         }
-      //         console.log(JSON.stringify(locItem));
-      //         localStorage.setItem(locSplit[0]+"~"+locSplit[1]+"~"+locSplit[2], JSON.stringify(locItem));
-      //         console.log(localStorage.getItem(locSplit[0]+"~"+locSplit[1]+"~"+locSplit[2]));
+  $('#modalContent').on('change', '#locationModel', function(e) { //value has phID ~ modelID  
+
+      let locSplit = e.target.value.split("~"); 
+      console.log("locSplit modelID : " + locSplit[1]);
+
+      if (locSplit[1] != "" && locSplit[1] != "" && locSplit[1] != "none") { //model id
+        for (let i = 0; i < sceneModels.length; i++) {
+          console.log(sceneModels[i]._id + " vs " + locSplit[1]);
+          if (sceneModels[i]._id == locSplit[1]) {
+            // let locItemTemp = {modelID: sceneModels[i]._id, model: sceneModels[i].name};  //? wtf
+            // let locItem = Object.assign(localStorageItem, locItemTemp); //funky object merge!
+            // // locItem.modelID = sceneModels[i]._id;
+            // // locItem.model = sceneModels[i].name;
+            // if (locItem.scale == null || locItem.scale == undefined || locItem.scale == "") {
+            //   locItem.scale = 1;
+            // }
+            console.log(JSON.stringify(locItem));
 
 
-      //         console.log("placeholderEl" +placeholderEl);
-      //         let phComponent = placeholderEl.components.cloud_marker;
-      //         if (phComponent == null) {
-      //           phComponent = placeholderEl.components.local_marker;
-      //         }
-      //         if (phComponent != null) {
-      //           phComponent.loadModel(sceneModels[i]._id);
-      //         }
-      //         SaveModToLocal(locSplit[0]+"~"+locSplit[1]+"~"+locSplit[2]);
-      //       }
-      //     } 
-      //   } else {
-      //     let phComponent = placeholderEl.components.cloud_marker;
-      //     if (phComponent == null) {
-      //       phComponent = placeholderEl.components.local_marker;
-      //     }
-      //     if (phComponent != null) {
-      //       phComponent.loadModel("none");
-      //     }
-      //     SaveModToLocal(locSplit[0]+"~"+locSplit[1]+"~"+locSplit[2]);
-      //   }
-      // } else {
+            console.log("placeholderEl" +placeholderEl); //also look up mod_model and mod_object
+            let phComponent = placeholderEl.components.cloud_marker;
+            if (phComponent == null) {
+              phComponent = placeholderEl.components.local_marker;
+            }
+            if (phComponent != null) {
+              phComponent.loadModel(sceneModels[i]._id);
+            }
+            SaveModToLocal(locSplit[0]+"~"+locSplit[1]+"~"+locSplit[2]);//no, needs to pass it or alt method...
+          }
+        } 
+       
+      } else {
         let placeholderEl = document.getElementById(locSplit[0]);
         let phComponent = placeholderEl.components.cloud_marker;
         if (phComponent == null) {
@@ -119,7 +103,7 @@ let showCurves = false;
         if (phComponent != null) {
           phComponent.loadModel();
         }
-      // }
+      }
   });
 
   $('#modalContent').on('change', '#locationObject', function(e) { //value has phID ~ objectID  (room~type~timestamp~objectID) //no, now just timestamp~objectID
@@ -572,14 +556,64 @@ function ReturnLocationMarkerTypeSelect (selected) {
 
     let types = "";
     const typesArray = [
-        "placeholder",
-        "poi",
-        "gate",
-        "portal",
-        "spawntrigger",
-        "trigger",
-        "picture",
-        "mailbox"];
+      "none",
+      "model",
+      "object",
+      "player",
+      "character",
+      "poi",
+      "waypoint",
+      "target",
+      "gate",
+      "portal",
+      "curve point",
+      "brownian path",
+      "brownian motion",
+      "follow curve",
+      "follow random path",
+      "tunnel",
+      "follow parametric curve",
+      "follow ambient",
+      "placeholder",
+      "available scenes key",
+      "audio",
+      "audiogroup",
+      "canvas fixed",
+      "canvas billboard",
+      "svg canvas fixed",
+      "svg canvas billboard",
+      "svg fixed",
+      "svg billboard",
+      "picture fixed",
+      "picture billboard",
+      "picturegroup",
+      "video",
+      // "video billboard",
+      "youtube",
+      // "youtube billboard",
+      "text",
+      "text billboard",
+      "textbook",
+      "picturebook",
+      "link",
+      "mailbox",
+      "pickup",
+      "drop",
+      "collectible",
+      "media",
+      "callout",
+      "availablescenes",
+      "track face",
+      "lerp",
+      "slerp",
+      "spawntrigger",
+      "trigger",
+      "collider",
+      "light",
+      "particlesystem",
+      "spawn",
+      "flyer",
+      "walker"];
     for (let i = 0; i < typesArray.length; i++) {
         if (typesArray[i] == selected) {
             types = types +
@@ -720,7 +754,7 @@ function ShowLocationModal(timestamp) {
         // "+that.data.timestamp+","+that.data.name+","+position.x+","+position.y+","+position.z+"
 
         // "<button class=\x22deleteButton\x22 onclick=\x22DeleteLocation('"+phID+"')\x22>Clear Mods</button>"+
-        "<button class=\x22saveButton\x22 onclick=\x22SaveModToLocal('"+phID+"')\x22>Save (local)</button>"+
+        "<button class=\x22saveButton\x22 onclick=\x22SaveModToLocal('"+phID+"')\x22>Save to Local</button>"+
         cloudSaveButton +
 
         // "<button class=\x22snapButton\x22 onclick=\x22SnapLocation('"+phID+"')\x22>Snap</button>"+
@@ -838,7 +872,7 @@ function AddTimekey() {
    tkObject.timekeys = tkTmp;
    // localStorage.setItem(room + "_timeKeys", JSON.stringify(vids[0].timekeys)); 
   //  timedEventsListenerMode = "Primary Video"
-   localStorage.setItem(room + "_timeKeys", JSON.stringify(tkObject)); 
+  //  localStorage.setItem(room + "_timeKeys", JSON.stringify(tkObject)); 
    SetPrimaryAudioEventsData();
    SceneManglerModal('Events');
   //  ShowHideDialogPanel();

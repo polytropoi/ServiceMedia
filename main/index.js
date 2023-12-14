@@ -1,4 +1,6 @@
-// copyright servicemedia.net 2022 all rights reserved
+// from https://github.com/polytropoi
+
+    // this single js file does the whole web admin interface:
     // 1. amirite checks authentication and pops some UI
     // 2. bigSwitch does "routing" and calls "controller" functions
     // 3. controller functions fetch json and generate html
@@ -10016,9 +10018,12 @@ function getAllPeople() {
         let types = "";
         const typesArray = [
         "none",
+        "model",
+        "object",
         "player",
         "character",
         "poi",
+        "waypoint",
         "target",
         "gate",
         "portal",

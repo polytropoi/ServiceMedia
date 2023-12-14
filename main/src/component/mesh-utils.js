@@ -4609,6 +4609,41 @@ AFRAME.registerComponent('load_threesvg', {
       control.attach(this.el.getObject3D('mesh'));
       // this.el.sceneEl.add();
       this.el.sceneEl.object3D.add( control);
+      this.object = this.el.getObject3D("mesh");
+      let that = this;
+      this.position = new THREE.Vector3();
+      this.quaternion = new THREE.Quaternion();
+      this.euler = new THREE.Euler();
+      this.scale = new THREE.Vector3();
+      this.rotation = new THREE.Vector3();
+      
+      this.mod_model_component = this.el.components.mod_model;
+      this.mod_object_component = this.el.components.mod_object
+      // control.addEventListener('objectChanged',  ( event ) => {
+      //   // this.el.getAttribute("position")
+      //   // console.log(this.el.getAttribute("position"));
+      //   this.object.getWorldPosition(this.position);
+      //   // this.el.setAttribute("position", this.position);
+      //   // console.log(this.position);
+      //   // this.el.getObject3D('mesh').position
+      // });
+      control.addEventListener('mouseUp',  ( event ) => {
+        // this.el.getAttribute("position")
+        // console.log(this.el.getAttribute("position"));
+        this.object.getWorldPosition(this.position);
+        this.object.getWorldQuaternion(this.quaternion);
+        this.euler.setFromQuaternion(this.quaternion);
+        this.object.getWorldScale(this.scale);
+        // this.rotation = this.object.rotation;
+        // this.el.setAttribute("position", this.position);
+        this.rotation.x = THREE.MathUtils.radToDeg(this.euler.x);
+        this.rotation.y = THREE.MathUtils.radToDeg(this.euler.y);
+        this.rotation.z = THREE.MathUtils.radToDeg(this.euler.z);
+        console.log(this.position, this.rotation, this.scale);
+        // this.el.getObject3D('mesh').position
+
+
+      });
       window.addEventListener( 'keydown', function ( event ) {
 
         switch ( event.keyCode ) {

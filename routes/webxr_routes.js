@@ -1032,7 +1032,8 @@ webxr_router.get('/:_id', function (req, res) {
                                         || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "poi" 
                                         || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "gate"
                                         || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "portal"  
-                                        || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "waypoint"  
+                                        || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "waypoint" 
+                                        || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "player"  
                                         || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "mailbox") {
                                     //    locationPlaceholders.push(sceneResponse.sceneLocations[i].x + " " + sceneResponse.sceneLocations[i].y + " " + zFix);
                                         let tLoc = sceneResponse.sceneLocations[i];
@@ -1611,7 +1612,7 @@ webxr_router.get('/:_id', function (req, res) {
                                         handEntities +
                                         "</a-entity></a-entity>";
 
-                                    if (useStarterKit) { //can't do starterkit + superhands!
+                                    if (useStarterKit) { //can't do starterkit + superhands! // maybe later...
                                         // physicsScripts = "<script src=\x22https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.0.0/dist/components/sphere-collider.min.js\x22></script>"+
                                         // "<script src=\x22https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.0.0/dist/aframe-extras.controls.min.js\x22></script>"+
                                         usePhysicsType = "physx";
@@ -1919,7 +1920,7 @@ webxr_router.get('/:_id', function (req, res) {
                     if (locationPlaceholders.length > 0) {
                         for (let i = 0; i < locationPlaceholders.length; i++) {
                             //use the "cloud_marker" component for certain markertypes () TODO rename it to mod_location
-                            placeholderEntities = placeholderEntities + "<a-entity id=\x22"+locationPlaceholders[i].timestamp+"\x22 class=\x22activeObjexGrab activeObjexRay envMap\x22 cloud_marker=\x22phID: "+
+                            placeholderEntities = placeholderEntities + "<a-entity id=\x22"+locationPlaceholders[i].timestamp+"\x22 class=\x22activeObjexGrab activeObjexRay envMap placeholders\x22 cloud_marker=\x22phID: "+
                             locationPlaceholders[i].phID+"; scale: "+locationPlaceholders[i].markerObjScale+"; modelID: "+locationPlaceholders[i].modelID+"; model: "+
                             locationPlaceholders[i].model+"; markerType: "+locationPlaceholders[i].markerType+";  tags: "+locationPlaceholders[i].locationTags+"; isNew: false;name: "+
                             locationPlaceholders[i].name+";label: "+locationPlaceholders[i].label+";description: "+locationPlaceholders[i].description+";eventData: "+locationPlaceholders[i].eventData+";timestamp: "+locationPlaceholders[i].timestamp+";\x22 "+
@@ -2754,7 +2755,8 @@ webxr_router.get('/:_id', function (req, res) {
                                                 // let yRot 
                                                 let scatterSurface = "";
                                                 let brownian = "";
-                                                let id = "gltf_" + m_assetID;
+                                                // let id = "gltf_" + m_assetID;  /////THIS CHANGE COULD BREAK THINGS??? don't think so, but....
+                                                let id = locMdl.timestamp;
                                                 if (locMdl.eventData.toLowerCase().includes("surface")) {
                                                     scatterSurface = "scatter-surface";
                                                     id = 'scatterSurface';

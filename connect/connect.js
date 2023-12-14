@@ -69,6 +69,7 @@ let socketHost = "http://localhost:3000";
 var socket = null; //the socket.io instance below
 let cloudData = {};
 let localData = null;
+let usingLocalData = false;
 
 
 
@@ -94,6 +95,7 @@ $('a-entity').each(function() {  //external way of getting click duration for ph
  
  });
 
+//////////////////////indexedDB functions...
 function InitIDB() {
    console.log("tryna connect to SMXR indexeddb");
    if (!('indexedDB' in window)) {
@@ -123,6 +125,21 @@ function InitIDB() {
       scene.sceneLocations = sceneLocations;
       // scene.lastUpdate = loadTimeStamp;
       store.put(scene); //write the "official" version
+      
+      //check if there are localmods
+      const modQuery = store.get(room + "~");
+      modQuery.onsuccess = function () {
+         if (modQuery.result) {
+            localData = modQuery.result;
+            console.log("scene localdata " + localData ); //use localData if present 
+            settings = localData.sceneSettings;
+            sceneLocations = localData.sceneLocations;
+            usingLocalData = true;
+         } else {
+            console.log("no localdata found!");
+         }
+      }
+      //set the reference version from cloud data
       const idQuery = store.get(room);
       idQuery.onsuccess = function () {
          cloudData = idQuery.result;
@@ -130,6 +147,42 @@ function InitIDB() {
          console.log('scene data from cloud lastupdated : ' + cloudData.sceneSettings.sceneLastUpdate);
 
       };
+      transaction.oncomplete = function () {
+        db.close();
+         InitLocalData();
+      };
+   };
+}
+function SaveLocalData() {  //persist mods an alt "~" version of the data
+   console.log("tryna connect to SMXR indexeddb");
+   if (!('indexedDB' in window)) {
+      console.log("This browser doesn't support IndexedDB");
+      return;
+    }
+   const request = indexedDB.open("SMXR", 1);
+   request.onerror = (event) => {
+      console.error("could not connect to iDB " + event);
+      return "error"
+   };
+   request.onupgradeneeded = function () {
+      const db = request.result;
+      const store = db.createObjectStore("scenes", { keyPath: "shortID" });
+      store.createIndex("scene", ["scene"], { unique: true });
+    };
+    request.onsuccess = function () {
+      console.log("Database opened successfully");
+      const db = request.result;
+      const transaction = db.transaction("scenes", "readwrite");
+      const store = transaction.objectStore("scenes");
+      const loadTimeStamp = Date.now();
+      const lastSceneUpdate = null;
+      let scene = {};
+      scene.shortID = room + "~"; //with tilde = the local version
+      scene.sceneSettings = settings;
+      scene.sceneLocations = sceneLocations;
+      scene.lastUpdate = loadTimeStamp;
+      store.put(scene); //write the local version
+
       //check if there are localmods
       const modQuery = store.get(room + "~");
       modQuery.onsuccess = function () {
@@ -142,10 +195,11 @@ function InitIDB() {
       }
       transaction.oncomplete = function () {
         db.close();
-         InitLocalData();
+         // InitLocalData();
       };
    };
-}
+   }
+
 // function GetTimekeys(db) {
 //    if (db) {
 
@@ -640,10 +694,10 @@ function SaveTimekeysToLocal () {
 }
 
 
-function SaveModToLocal(locationKey) { //Save button on location modal (other settings are auto saved to localstorage)
+function SaveModToLocal(locationKey) { //locationKey is now just timestamp of the location item, unique enough
    console.log("tryna save mod to local with key " + locationKey);
    let locItem = {};
-   let keySplit = locationKey.split("~");
+   // let keySplit = locationKey.split("~");
    locItem.x = document.getElementById('xpos').value;
    locItem.eulerx = document.getElementById('xrot').value.length > 0 ? document.getElementById('xrot').value : '0';
    locItem.y = document.getElementById('ypos').value;
@@ -656,28 +710,38 @@ function SaveModToLocal(locationKey) { //Save button on location modal (other se
    locItem.description = document.getElementById('locationDescription').value;
    locItem.markerType = document.getElementById('locationMarkerType').value;
    locItem.eventData = document.getElementById('locationEventData').value;
-   locItem.timestamp = keySplit[2];
+   locItem.timestamp = locationKey;
    locItem.scale = document.getElementById("modelScale").value;
    locItem.phID = locationKey.toString();
    locItem.type = "Worldspace";
-   locItem.modelID = document.getElementById('locationModel').value.split("~")[3]; //model select values have the phID (room~cloud/local~timestamp) plus modelid, so index 3 of split
+   
+   // locItem.modelID = document.getElementById('locationModel').value.split("~")[3]; //model select values have the phID (room~cloud/local~timestamp) plus modelid, so index 3 of split
+
+   locItem.modelID = document.getElementById('locationModel').value; //now just _id
    locItem.model = ReturnModelName(locItem.modelID);
-   locItem.objectID = document.getElementById('locationObject').value.split("~")[3]; //same as model
+
+   locItem.objectID = document.getElementById('locationObject').value; //same as model
    locItem.objectName = ReturnObjectName(locItem.objectID);
-   if (locationKey.toString().includes("local")) {
-      locItem.isLocal = true;
-   }
+   // if (locationKey.toString().includes("local")) {
+   //    locItem.isLocal = true;
+   // }
    console.log("tryna savelocation "+locationKey+"  : " + JSON.stringify(locItem));
    // localStorage.setItem(locationKey, JSON.stringify(locItem));
 
    
    let theEl = document.getElementById(locationKey);
    if (theEl != null) {
-      console.log("found the localstorage EL: " + localStorage.getItem(locationKey));
+      // console.log("found the localstorage EL: " + localStorage.getItem(locationKey));
       let scale = (locItem.scale != undefined && locItem.scale != null && locItem.scale != "") ? locItem.scale : 1;
       theEl.setAttribute('position', {x: locItem.x, y: locItem.y, z: locItem.z});
       theEl.setAttribute('rotation', {x: locItem.eulerx, y: locItem.eulery, z: locItem.eulerz});
       theEl.setAttribute('scale', {x: scale, y: scale, z: scale});
+      for (let i = 0; i < sceneLocations.locations.length; i++) {
+         if (locationKey == sceneLocations.locations[i].timestamp) {
+            sceneLocations.locations[i] = locItem; //replace the location item with updated properties
+            SaveLocalData(); //persist to localdb
+         }
+      }
    } else {
       console.log("DINT FIND THE EL " + locationKey);
    }
