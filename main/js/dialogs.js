@@ -651,12 +651,24 @@ function ShowLocationModal(timestamp) {
       // let thisLocationString = localStorage.getItem(phID);
 
       // console.log(thisLocationString);
+    if (localData.locations.length) {
+      console.log("looking for localData.locations");
+      for (let i = 0; i < localData.locations.length; i++) {
+        console.log(timestamp + " vs " + localData.locations[i].timestamp);
+        if (timestamp == localData.locations[i].timestamp) {
+          thisLocation = localData.locations[i];
+          console.log("gotsa location@! " + localData.locations[i].markerType);
+          break;
+        }
+      }
+    } else {
       for (let i = 0; i < sceneLocations.locations.length; i++) {
         if (timestamp == sceneLocations.locations[i].timestamp) {
           thisLocation = sceneLocations.locations[i];
           break;
         }
       }
+    }
     //   if (thisLocationString != null) {
     //     thisLocation = JSON.parse(thisLocationString);  
     //     if (sceneLocations.locationMods != null && sceneLocations.locationMods.length > 0) {
@@ -1086,16 +1098,16 @@ function ReturnColorButtons () {
 
     return "<hr><div class=\x22row\x22>"+
     "<label style=\x22margin: 10px;\x22 for=\x22sceneColor1\x22>Color 1</label>"+
-    "<input class=\x22inputColor\x22 type=\x22color\x22 id=\x22sceneColor1\x22 name=\x22sceneColor1\x22 oninput=\x22ColorMods(event, this.value)\x22 value=\x22"+settings.sceneColor1+"\x22>"+
+    "<input class=\x22inputColor\x22 type=\x22color\x22 id=\x22sceneColor1\x22 name=\x22sceneColor1\x22 oninput=\x22ColorMods(event, this.value)\x22 value=\x22"+sceneColor1+"\x22>"+
 
     "<label style=\x22margin: 10px;\x22 for=\x22sceneColor2\x22>Color 2</label>"+
-    "<input class=\x22inputColor\x22 type=\x22color\x22 id=\x22sceneColor2\x22 name=\x22sceneColor2\x22 oninput=\x22ColorMods(event, this.value)\x22 value=\x22"+settings.sceneColor2+"\x22>"+
+    "<input class=\x22inputColor\x22 type=\x22color\x22 id=\x22sceneColor2\x22 name=\x22sceneColor2\x22 oninput=\x22ColorMods(event, this.value)\x22 value=\x22"+sceneColor2+"\x22>"+
     
     "<label style=\x22margin: 10px;\x22 for=\x22sceneColor3\x22>Color 3</label>"+
-    "<input class=\x22inputColor\x22 type=\x22color\x22 id=\x22sceneColor3\x22 name=\x22sceneColor3\x22 oninput=\x22ColorMods(event, this.value)\x22 value=\x22"+settings.sceneColor3+"\x22>"+
+    "<input class=\x22inputColor\x22 type=\x22color\x22 id=\x22sceneColor3\x22 name=\x22sceneColor3\x22 oninput=\x22ColorMods(event, this.value)\x22 value=\x22"+sceneColor3+"\x22>"+
     
     "<label style=\x22margin: 10px;\x22 for=\x22sceneColor4\x22>Color 4</label>"+
-    "<input class=\x22inputColor\x22 type=\x22color\x22 id=\x22sceneColor4\x22 name=\x22sceneColor4\x22 oninput=\x22ColorMods(event, this.value)\x22 value=\x22"+settings.sceneColor4+"\x22>"+
+    "<input class=\x22inputColor\x22 type=\x22color\x22 id=\x22sceneColor4\x22 name=\x22sceneColor4\x22 oninput=\x22ColorMods(event, this.value)\x22 value=\x22"+sceneColor4+"\x22>"+
     "</div><br>";
 }
 
@@ -1109,6 +1121,7 @@ function ColorMods(event, value) {
         // localStorage.setItem(room + "_sceneColor1", value);
         console.log("setting sceneCOlor1 to " + value);
         sceneColor1 = value;
+        settings.sceneColor1 = value;
     } else if (source.id == "sceneColor2") {
         let enviroEl = document.getElementById('enviroEl');
         if (enviroEl != null) {
@@ -1117,6 +1130,7 @@ function ColorMods(event, value) {
         }
         // localStorage.setItem(room + "_sceneColor2", value);
         sceneColor2 = value;
+        settings.sceneColor1 = value;
     } else if (source.id == "sceneColor3") {
         let enviroEl = document.getElementById('enviroEl');
         if (enviroEl != null) {
@@ -1124,6 +1138,7 @@ function ColorMods(event, value) {
         }
         // localStorage.setItem(room + "_sceneColor3", value);
         sceneColor3 = value;
+        settings.sceneColor1 = value;
     } else if (source.id == "sceneColor4") {
         let enviroEl = document.getElementById('enviroEl');
         if (enviroEl != null) {
@@ -1132,6 +1147,7 @@ function ColorMods(event, value) {
         }
         // localStorage.setItem(room + "_sceneColor4", value);
         sceneColor4 = value;
+        settings.sceneColor1 = value;
     }
  }
 function GetUserInventory () {

@@ -1958,7 +1958,7 @@ webxr_router.get('/:_id', function (req, res) {
                             // console.log("13904 tryna get sceneObject: " + objID);
                             db.models.findOne({"_id": oo_id}, function (err, model) {
                                 if (err || !model) {
-                                    console.log("error getting model: " + objID); //todo - report? 
+                                    console.log("error getting model: " + objID); //todo - report? //TODO remove from sceneModels!
                                     callbackz();
                                 } else {
                                     // console.log("got user model:" + model._id);
@@ -4831,7 +4831,7 @@ webxr_router.get('/:_id', function (req, res) {
                         "<script src=\x22../main/vendor/howler/src/howler.spatial.js\x22></script>"+
                         hlsScript +
                         
-                        "<script src=\x22../main/js/navigation.js\x22></script>" + //includes navmesh components (simple and not), and extended_wasd_controls
+                        "<script type=\x22module\x22 src=\x22../main/js/navigation.js\x22></script>" + //includes navmesh components (simple and not), and extended_wasd_controls
                         // "<script src=\x22../main/ref/aframe/dist/networked-aframe.min.js\x22></script>" + 
                        
                         "<script src=\x22../main/vendor/aframe/aframe-blink-controls.min.js\x22></script>" +   //TODO - check if req comes from vr headset

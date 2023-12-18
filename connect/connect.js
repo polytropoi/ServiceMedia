@@ -67,9 +67,9 @@ var token = document.getElementById("token").getAttribute("data-token");
 let socketHost = "http://localhost:3000";
 // let socketHost = null;
 var socket = null; //the socket.io instance below
-let cloudData = {};
-let localData = null;
-let usingLocalData = false;
+// let cloudData = {};
+let localData = {locations:[], settings:{}};
+// let usingLocalData = false;
 
 
 
@@ -110,49 +110,96 @@ function InitIDB() {
    request.onupgradeneeded = function () {
       const db = request.result;
       const store = db.createObjectStore("scenes", { keyPath: "shortID" });
-      store.createIndex("scene", ["scene"], { unique: true });
+      store.createIndex("scene", ["scene"], { unique: true }); //multientry true?
     };
-    request.onsuccess = function () {
+   request.onsuccess = function () {
       console.log("Database opened successfully");
       const db = request.result;
       const transaction = db.transaction("scenes", "readwrite");
       const store = transaction.objectStore("scenes");
       const loadTimeStamp = Date.now();
       const lastSceneUpdate = null;
-      let scene = {};
-      scene.shortID = room; //with no tilde = the "official" cloud version
-      scene.sceneSettings = settings;
-      scene.sceneLocations = sceneLocations;
-      // scene.lastUpdate = loadTimeStamp;
-      store.put(scene); //write the "official" version
-      
-      //check if there are localmods
-      const modQuery = store.get(room + "~");
-      modQuery.onsuccess = function () {
-         if (modQuery.result) {
-            localData = modQuery.result;
-            console.log("scene localdata " + localData ); //use localData if present 
-            settings = localData.sceneSettings;
-            sceneLocations = localData.sceneLocations;
-            usingLocalData = true;
+     
+      //first check if there are localmods, version saved with tilde
+      // const modQuery = store.get(room + "~"); //nope
+      const modQuery = store.openCursor(room + "~"); //use cursor mode so it's iterable below
+      modQuery.onsuccess = function (e) {
+         var cursor = e.target.result;
+         if (cursor) {
+            for (let i = 0; i < cursor.value.locations.length; i++) {
+               // let loc = JSON.stringify(cursor.value.locations[i]);
+               // console.log("gots a localData location: " + loc);
+               localData.locations.push(cursor.value.locations[i]);
+               let rEl = document.getElementById(cursor.value.locations[i].timestamp);
+               if (rEl) {
+                  // console.log("gotsa element with id " + JSON.stringify(localData.locations[i]));
+                  // let obj = rEl.getObject3D('mesh');
+                  // obj.position.set({x: cursor.value.locations[i].x, y: cursor.value.locations[i].y, z: cursor.value.locations[i].z });
+                  // obj.rotation.set({x: cursor.value.locations[i].eulerx, y: cursor.value.locations[i].eulery, z: cursor.value.locations[i].eulerz });
+                  // obj.scale.set({x: cursor.value.locations[i].markerObjScale, y: cursor.value.locations[i].markerObjScale, z: cursor.value.locations[i].markerObjScale});
+                  rEl.setAttribute("position", {x: cursor.value.locations[i].x, y: cursor.value.locations[i].y, z: cursor.value.locations[i].z });
+                  rEl.setAttribute("rotation", {x: cursor.value.locations[i].eulerx, y: cursor.value.locations[i].eulery, z: cursor.value.locations[i].eulerz });
+                  rEl.setAttribute("scale", {x: cursor.value.locations[i].markerObjScale, y: cursor.value.locations[i].markerObjScale, z: cursor.value.locations[i].markerObjScale});
+               }
+            }
+            for (let key in cursor.value.settings) {
+               localData.settings[key] = cursor.value.settings[key]; //TODO apply each one?
+            }
+            cursor.continue(); 
+         
          } else {
-            console.log("no localdata found!");
+            console.log("cursor is done...");
          }
-      }
-      //set the reference version from cloud data
-      const idQuery = store.get(room);
-      idQuery.onsuccess = function () {
-         cloudData = idQuery.result;
-         // console.log("cloud date is date " + (cloudData.sceneSettings.sceneLastUpdate instanceof Date));
-         console.log('scene data from cloud lastupdated : ' + cloudData.sceneSettings.sceneLastUpdate);
 
+         transaction.oncomplete = function () {
+            db.close();
+            console.log("localdata : " + JSON.stringify(localData));
+          }
       };
+      request.oncomplete = function () {
+         // db.close(); 
+         // UpdateLocationData();
+      }
+   }
+}
+
+function SaveCloudData() { //do this after checking/loading any localData, just for reference (it's already set as global via location_data and settings)
+   console.log("tryna connect to SMXR indexeddb");
+   if (!('indexedDB' in window)) {
+      console.log("This browser doesn't support IndexedDB");
+      return;
+    }
+   const request = indexedDB.open("SMXR", 1);
+   request.onerror = (event) => {
+      console.error("could not connect to iDB " + event);
+      return "error"
+   };
+   request.onupgradeneeded = function () {
+      const db = request.result;
+      const store = db.createObjectStore("scenes", { keyPath: "shortID" });
+      store.createIndex("scene", ["scene"], { unique: true });
+    };
+    request.onsuccess = function () {
+      console.log("Saving local data, IDB opened successfully");
+      const db = request.result;
+      const transaction = db.transaction("scenes", "readwrite");
+      const store = transaction.objectStore("scenes");
+      const loadTimeStamp = Date.now();
+      const lastSceneUpdate = null;
+      let scene = {};
+      scene.shortID = room; //with tilde = the local version
+      scene.settings = settings;
+      scene.locations = sceneLocations.locations;
+      scene.lastUpdate = loadTimeStamp;
+      store.put(scene); //write the local version
       transaction.oncomplete = function () {
         db.close();
-         InitLocalData();
+        console.log("CloudData saved to IDB");
+         // InitLocalData();
       };
    };
 }
+
 function SaveLocalData() {  //persist mods an alt "~" version of the data
    console.log("tryna connect to SMXR indexeddb");
    if (!('indexedDB' in window)) {
@@ -170,7 +217,7 @@ function SaveLocalData() {  //persist mods an alt "~" version of the data
       store.createIndex("scene", ["scene"], { unique: true });
     };
     request.onsuccess = function () {
-      console.log("Database opened successfully");
+      console.log("Saving local data, IDB opened successfully");
       const db = request.result;
       const transaction = db.transaction("scenes", "readwrite");
       const store = transaction.objectStore("scenes");
@@ -178,23 +225,15 @@ function SaveLocalData() {  //persist mods an alt "~" version of the data
       const lastSceneUpdate = null;
       let scene = {};
       scene.shortID = room + "~"; //with tilde = the local version
-      scene.sceneSettings = settings;
-      scene.sceneLocations = sceneLocations;
+      scene.settings = settings;
+      scene.locations = sceneLocations.locations;
+      // scene.locations = JSON.parse(JSON.stringify(sceneLocations.locations));
       scene.lastUpdate = loadTimeStamp;
+      console.log("writing localdata " + JSON.stringify(scene));
       store.put(scene); //write the local version
-
-      //check if there are localmods
-      const modQuery = store.get(room + "~");
-      modQuery.onsuccess = function () {
-         if (modQuery.result) {
-            localData = modQuery.result;
-            console.log("scene localdata " + localData );
-         } else {
-            console.log("no localdata found!");
-         }
-      }
       transaction.oncomplete = function () {
         db.close();
+        console.log("localdata saved!");
          // InitLocalData();
       };
    };
@@ -208,18 +247,23 @@ function SaveLocalData() {  //persist mods an alt "~" version of the data
 
 /////////////////// main onload function below, populate settings, etc.
 $(function() { 
-
+   // InitIDB();
    player = document.getElementById("player");
    // player = document.getElementById("cameraRig");
    let settingsEl = document.getElementById('settingsDataElement'); //volume, color, etc...
    let theSettingsData = settingsEl.getAttribute('data-settings');
-   settings = JSON.parse(atob(theSettingsData)); 
-
+   // if (localData.settings) {
+   //    settings = localData.settings;
+   // } else {
+      settings = JSON.parse(atob(theSettingsData)); 
+   // }
    // console.log("last_page was " + localStorage.getItem("last_page") + " servertoken: "+ token + " localtoken: " + localtoken + " userdata.sceneOwner " + userData.sceneOwner);
    
    setTimeout(function () {
       // localStorage.setItem("last_page", room);
       tcheck(); //token auth
+
+      // InitIDB();
    }, 1000);
    if (typeof window.ethereum !== 'undefined') {
       console.log('MetaMask is installed!');
@@ -739,6 +783,7 @@ function SaveModToLocal(locationKey) { //locationKey is now just timestamp of th
       for (let i = 0; i < sceneLocations.locations.length; i++) {
          if (locationKey == sceneLocations.locations[i].timestamp) {
             sceneLocations.locations[i] = locItem; //replace the location item with updated properties
+            localData.locations[i] = locItem; //replace the location item with updated properties, to use if already has local mods
             SaveLocalData(); //persist to localdb
          }
       }
@@ -947,21 +992,21 @@ function ReturnLocationTable () { //just show em all now!
    // console.log("LOCATIONMODS: " + JSON.stringify(sceneLocations.locationMods));
    // if (sceneLocations.locationMods != null && sceneLocations.locationMods.length > 0) {
       let tablerows = "";
-      for (let i = 0; i < sceneLocations.locations.length; i++) {
+      for (let i = 0; i < localData.locations.length; i++) {
          let markerString = "";
-         if (sceneLocations.locations[i].isLocal != null && sceneLocations.locations[i].isLocal === true) {
-            markerString = "<span style=\x22color: pink; font-weight: bold;\x22>"+sceneLocations.locations[i].markerType+"</span>";
+         if (localData.locations[i].isLocal != null && localData.locations[i].isLocal === true) {
+            markerString = "<span style=\x22color: pink; font-weight: bold;\x22>"+localData.locations[i].markerType+"</span>";
          } else {
-            markerString = "<span style=\x22color: lime; font-weight: bold;\x22>"+sceneLocations.locations[i].markerType+"</span>";
+            markerString = "<span style=\x22color: lime; font-weight: bold;\x22>"+localData.locations[i].markerType+"</span>";
          }
 
-         // if (sceneLocations.locations[i].markerType != undefined && (sceneLocations.locations[i].markerType.includes("picture") || sceneLocations.locations[i].markerType == "poi" 
-         //    || sceneLocations.locations[i].markerType == "placeholder" || sceneLocations.locations[i].markerType.toLowerCase().includes("trigger") 
-         //    || sceneLocations.locations[i].markerType == "mailbox" || sceneLocations.locations[i].markerType == "portal" || sceneLocations.locations[i].markerType == "gate") ) {
+         // if (localData.locations[i].markerType != undefined && (localData.locations[i].markerType.includes("picture") || localData.locations[i].markerType == "poi" 
+         //    || localData.locations[i].markerType == "placeholder" || localData.locations[i].markerType.toLowerCase().includes("trigger") 
+         //    || localData.locations[i].markerType == "mailbox" || localData.locations[i].markerType == "portal" || localData.locations[i].markerType == "gate") ) {
                
-            let namelabel = (sceneLocations.locations[i].name != 'undefined' && sceneLocations.locations[i].name != undefined && sceneLocations.locations[i].name != null) ? sceneLocations.locations[i].name : sceneLocations.locations[i].label; 
-            tablerows = tablerows + "<tr class=\x22clickableRow\x22 onclick=\x22LocationRowClick('"+sceneLocations.locations[i].timestamp+"')\x22><td>"+namelabel+"</td>"+
-            "<td>"+sceneLocations.locations[i].x+","+sceneLocations.locations[i].y+","+sceneLocations.locations[i].z+"</td><td>"+sceneLocations.locations[i].model+"</td><td>"+ markerString+"</td></tr>";
+            let namelabel = (localData.locations[i].name != 'undefined' && localData.locations[i].name != undefined && localData.locations[i].name != null) ? localData.locations[i].name : localData.locations[i].label; 
+            tablerows = tablerows + "<tr class=\x22clickableRow\x22 onclick=\x22LocationRowClick('"+localData.locations[i].timestamp+"')\x22><td>"+namelabel+"</td>"+
+            "<td>"+localData.locations[i].x+","+localData.locations[i].y+","+localData.locations[i].z+"</td><td>"+localData.locations[i].model+"</td><td>"+ markerString+"</td></tr>";
             // "<td>"+sceneLocations.locationMods[i].phID+"</td><td>"+localString + sceneLocations.locationMods[i].markerType+"</td></tr>";
             // "<td>"+sceneLocations.locationMods[i].phID+"</td><td>"+markerString+"</td></tr>";
          // }
@@ -985,32 +1030,105 @@ function LocationRowClick(data) {
 }
 
 // InitIDB();
+function UpdateLocationData () { //maybe need to call an aframe component to do this?
+      // setTimeout(function () {
+      // if (Object.keys(localData).length > 0 ) {
+      // settings = Object.assign(localData.sceneSettings);
+      // sceneLocations = Object.assign(localData.sceneLocations);
+      // usingLocalData = true;
+      
+  
+      // console.log("gotsa element with id " + localData.locations[0].timestamp);
+      // this.locationDataEl = document.getElementById("locationData");
 
-function InitLocalData () {
+      // if (this.locationDataEl) {
+      //    this.locationDataEl.components.location_data.updateSceneLocationData();
+      // }
+      // for (let i = 0; length; i++) {
+      //    console.log("number " + i);
+      // }
+         // UpdateLocation(sceneLocations.locations[i]);
+         // if (localData.locations[i] != undefined) {
+         //    let ts = localData.locations[i].timestamp;
 
-   if (localData) { 
+         //    let rEl = document.getElementById(ts);
+         //    if (rEl) {
+         //       console.log("gotsa element with id " + JSON.stringify(localData.locations[i]));
+         //          // let obj = rEl.getObject3D('mesh');
+         //          // obj.position.set({x: sceneLocations.locations[i].x, y: sceneLocations.locations[i].y, z: sceneLocations.locations[i].z });
+         //          // obj.rotation.set({x: sceneLocations.locations[i].eulerx, y: sceneLocations.locations[i].eulery, z: sceneLocations.locations[i].eulerz });
+         //       //    // obj.scale.set({x: sceneLocations.locations[i].markerObjScale, y: sceneLocations.locations[i].markerObjScale, z: sceneLocations.locations[i].markerObjScale});
+         //       // rEl.setAttribute("position", {x: sceneLocations.locations[i].x, y: sceneLocations.locations[i].y, z: sceneLocations.locations[i].z });
+         //       // rEl.setAttribute("rotation", {x: sceneLocations.locations[i].eulerx, y: sceneLocations.locations[i].eulery, z: sceneLocations.locations[i].eulerz });
+         //       // rEl.setAttribute("scale", {x: sceneLocations.locations[i].markerObjScale, y: sceneLocations.locations[i].markerObjScale, z: sceneLocations.locations[i].markerObjScale});
+         //    }
+         // }
+      // }
 
-   } else {
-   
-      if (cloudData) {
-         console.log("gots cloud data: " + JSON.stringify(cloudData));
-         if (cloudData.sceneLocations.locations) {
-            for (let i = 0; i < cloudData.sceneLocations.locations.length; i++) {
-            // let theItemObject = JSON.parse(theItem);
-            // theItemObject.isLocal = true;
-            // locationMods.push(theItemObject);
-               if (cloudData.sceneLocations.locations[i].markerType == "poi") {
-                  let nextbuttonEl = document.getElementById('nextButton');
-                  let prevbuttonEl = document.getElementById('previousButton');
-                  nextbuttonEl.style.visibility = "visible";
-                  prevbuttonEl.style.visibility = "visible";
-                  poiLocations.push(cloudData.sceneLocations.locations[i]);
-               }
-            }
-         }
-      }
-   }
+      // console.log("gots sceneLocations.locations " + JSON.stringify(localData.sceneLocations.locations));
+      // for (let i = 0; localData.sceneLocations.locations.length; i++) {
+      //    // UpdateLocation(sceneLocations.locations[i]);
+      //    if (localData.sceneLocations.locations[i] != undefined) {
+      //       let ts = localData.sceneLocations.locations[i].timestamp.toString();
+      //       // let rEl = document.getElementById(ts);
+      //       // if (rEl) {
+      //          console.log("gotsa id " + ts + " " + JSON.stringify(localData.sceneLocations.locations[i]));
+      //             // let obj = rEl.getObject3D('mesh');
+      //             // obj.position.set({x: localData.sceneLocations.locations[i].x, y: localData.sceneLocations.locations[i].y, z: localData.sceneLocations.locations[i].z });
+      //             // obj.rotation.set({x: localData.sceneLocations.locations[i].eulerx, y: localData.sceneLocations.locations[i].eulery, z: localData.sceneLocations.locations[i].eulerz });
+      //             // obj.scale.set({x: localData.sceneLocations.locations[i].markerObjScale, y: localData.sceneLocations.locations[i].markerObjScale, z: localData.sceneLocations.locations[i].markerObjScale});
+      //          // rEl.setAttribute("position", {x: localData.sceneLocations.locations[i].x, y: localData.sceneLocations.locations[i].y, z: localData.sceneLocations.locations[i].z });
+      //          // rEl.setAttribute("rotation", {x: localData.sceneLocations.locations[i].eulerx, y: localData.sceneLocations.locations[i].eulery, z: localData.sceneLocations.locations[i].eulerz });
+      //          // rEl.setAttribute("scale", {x: localData.sceneLocations.locations[i].markerObjScale, y: localData.sceneLocations.locations[i].markerObjScale, z: localData.sceneLocations.locations[i].markerObjScale});
+      //       // }
+      //    }
+      // }
+
+
+   // }
+// }, 5000);
 }
+// function UpdateLocation(location) {
+//    console.log("upping location " + JSON.stringify(location));
+//    if (location) {
+//       console.log("looking for id : " +location.timestamp.toString());
+//       let rEl = document.getElementById(location.timestamp.toString());
+//       // if (rEl) {
+//       //    console.log("gotsa id " + sceneLocations.locations[i].timestamp);
+//       //    rEl.setAttribute("position", {x: location.x, y: location.y, z: location.z });
+//       //    rEl.setAttribute("rotation", {x: location.eulerx, y: location.eulery, z: location.eulerz });
+//       //    rEl.setAttribute("scale", {x: location.markerObjScale, y: location.markerObjScale, z: location.markerObjScale});
+//       // }
+//    } else {
+      
+//    }
+// }
+// function InitLocalData () {
+
+//    if (Object.keys(localData).length > 0) { 
+//       // UpdateLocationData();
+//       console.log(JSON.stringify(localData));
+//    } else {
+   
+//       if (cloudData) {
+//          console.log("gots cloud data: " + JSON.stringify(cloudData));
+//          if (cloudData.sceneLocations.locations) {
+//             for (let i = 0; i < cloudData.sceneLocations.locations.length; i++) {
+//             // let theItemObject = JSON.parse(theItem);
+//             // theItemObject.isLocal = true;
+//             // locationMods.push(theItemObject);
+//                if (cloudData.sceneLocations.locations[i].markerType == "poi") {
+//                   let nextbuttonEl = document.getElementById('nextButton');
+//                   let prevbuttonEl = document.getElementById('previousButton');
+//                   nextbuttonEl.style.visibility = "visible";
+//                   prevbuttonEl.style.visibility = "visible";
+//                   poiLocations.push(cloudData.sceneLocations.locations[i]);
+//                }
+//             }
+//          }
+//       }
+//    }
+// }
 
 // function AddLocalMarkersOLD() {// new or modded markers not saved to cloud // DEPRECATED for indexedDB version
    
@@ -1138,19 +1256,20 @@ function InitLocalData () {
 
 
 function ClearPlaceholders() {
-   localStorage.clear();
+   
+   // localStorage.clear();
 
-   for (var i=0; i < localStorage.length; i++)  {
+   // for (var i=0; i < localStorage.length; i++)  {
       
-      let theKey = localStorage.key(i);
-      if (theKey.includes(room)) {
-         localStorage.removeItem(theKey);
-         console.log("removed " + theKey);
-      }
-   }
-   setTimeout(function () {
-      window.location.reload();
-   }, 2000);
+   //    let theKey = localStorage.key(i);
+   //    if (theKey.includes(room)) {
+   //       localStorage.removeItem(theKey);
+   //       console.log("removed " + theKey);
+   //    }
+   // }
+   // setTimeout(function () {
+   //    window.location.reload();
+   // }, 2000);
    
 }
 function CreatePlaceholder () {
@@ -1261,6 +1380,7 @@ function tcheck () {
 }
 
 if (sceneEl != null) {
+
    AFRAME.registerComponent('location_data', {
       schema: {
       initialized: {default: ''},
@@ -1271,11 +1391,13 @@ if (sceneEl != null) {
       init: function() {
 
             let theData = this.el.getAttribute('data-locations');
-            // console.log("RAW LOCATIOND DATA " + theData);
+            console.log("location_data el" + this.el.id);
             let locations = [];
             this.data.jsonData = JSON.parse(atob(theData)); //convert from base64
-            
+            // this.rEl = null;
+            // if (localData != "") {
             for (let i = 0; i < this.data.jsonData.length; i++) {
+               
                sceneLocations.locations.push(this.data.jsonData[i]);
                if (this.data.jsonData[i].markerType != undefined) {
                   if (this.data.jsonData[i].markerType.toLowerCase().includes("youtube")) {
@@ -1302,15 +1424,43 @@ if (sceneEl != null) {
                   }
             
                }
+               if (i == this.data.jsonData.length - 1) {
+                  InitIDB();
+               }
             }
+         
+
             // sceneLocations.locations.push(this.data.jsonData);
             // AddLocalMarkers();
             // InitLocalData();
-            InitIDB();
 
       }, 
       returnYouTubePosition: function() {
          return this.data.youtubePosition;
+      },
+      updateSceneLocationData: function() {
+
+         let thedata = JSON.parse(JSON.stringify(localData.locations));
+      // let length = thedata.length;
+      console.log(thedata.length + " local sceneLocations " + JSON.stringify(thedata));
+      //    console.log(JSON.stringify(sceneLocations));
+         for (let i = 0; thedata.length; i++) {
+            // UpdateLocation(sceneLocations.locations[i]);
+            if (thedata[i] != undefined) {
+               let ts = sceneLocations.locations[i].phID;
+               let rEl = document.getElementById(ts);
+               if (rEl) {
+                  console.log("gotsa element with id " + JSON.stringify(thedata[i]));
+                     // let obj = rEl.getObject3D('mesh');
+                     // obj.position.set({x: sceneLocations.locations[i].x, y: sceneLocations.locations[i].y, z: sceneLocations.locations[i].z });
+                     // obj.rotation.set({x: sceneLocations.locations[i].eulerx, y: sceneLocations.locations[i].eulery, z: sceneLocations.locations[i].eulerz });
+                  //    // obj.scale.set({x: sceneLocations.locations[i].markerObjScale, y: sceneLocations.locations[i].markerObjScale, z: sceneLocations.locations[i].markerObjScale});
+                  // rEl.setAttribute("position", {x: sceneLocations.locations[i].x, y: sceneLocations.locations[i].y, z: sceneLocations.locations[i].z });
+               // rEl.setAttribute("rotation", {x: sceneLocations.locations[i].eulerx, y: sceneLocations.locations[i].eulery, z: sceneLocations.locations[i].eulerz });
+               // rEl.setAttribute("scale", {x: sceneLocations.locations[i].markerObjScale, y: sceneLocations.locations[i].markerObjScale, z: sceneLocations.locations[i].markerObjScale});
+               }
+            }
+         }
       }
    });
 

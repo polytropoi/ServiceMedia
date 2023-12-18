@@ -1,3 +1,4 @@
+// import { Pathfinding, PathfindingHelper, } from 'three-pathfinding';
 // import { Pathfinding } from '/three/pathfinding/three-pathfinding.umd.js';
 
 // 
@@ -1407,6 +1408,11 @@ AFRAME.registerComponent('nav_mesh_controller', {
 		this.waypoints = [];
 		this.waypoints = document.getElementsByClassName('waypoint');
 		this.mesh = null;
+		this.zone = "";
+		this.groupID = "";
+		this.pathfinding = this.el.sceneEl.systems.nav;
+		// this.pathfinder = new Pathfinding();
+		// this.helper = new PathfindingHelper();
 		this.el.addEventListener('model-loaded', () => {
 			// this.isReady = true;
 			console.log("Navmesh loaddded!!");
@@ -1415,6 +1421,13 @@ AFRAME.registerComponent('nav_mesh_controller', {
 				this.registerWaypoints();
 			} else {
 				this.mesh = this.el.getObject3D('mesh');
+
+				// console.time('createZone()');
+				// this.zone = this.pathfinder.createZone(this.mesh);
+				// console.timeEnd('createZone()');
+				// pathfinder.setZoneData( ZONE, zone );
+				// groupID = pathfinder.getGroup( ZONE, playerPosition );
+
 				// if (this.obj) {
 				// this.obj.traverse(node => { //spin through object heirarchy to sniff for special names, e.g. "eye"
 
@@ -1426,6 +1439,7 @@ AFRAME.registerComponent('nav_mesh_controller', {
 				// console.log("gotsa navmesh named " + JSON.stringify(this.mesh));
 				
 				this.createRandomWaypoints();
+				// this.randomWaypoints();
         //     this.navmeshIsActive = true;
         //     console.log(this.navmeshIsActive);
         // }, 5000);
@@ -1490,6 +1504,28 @@ AFRAME.registerComponent('nav_mesh_controller', {
 		} 
 	
 		
+	},
+	randomWaypoints: function () {
+			// 	this.pathfinding = this.el.sceneEl.systems.nav;
+			// THREE.Pathfinding = window.threePathfinding.Pathfinding;
+			// THREE.PathfindingHelper = threePathfinding.PathfindingHelper;
+			// const pathfinder = this.el.sceneEl.systems.nav;
+			// const helper = new THREE.PathfindingHelper();
+		// 	const pathfinder = new Pathfinding();
+		// const helper = new PathfindingHelper();
+		// 	const ZONE = 'level';
+		// 	const group = "a";
+		// 	const center = new THREE.Vector3(0,0,0);
+			// pathfinder.getRandomNode(ZONE,group,)
+
+		if (this.mesh) {
+			for (let i = 0; i < 20; i++) {
+				console.log("tryna get randomnode...");
+				console.log("randomNode: " + this.pathfinder.getRandomNode(this.zone,this.group,center,33));
+
+				
+			}
+		}
 	},
 	createRandomWaypoints: function () {
 
@@ -1606,7 +1642,7 @@ AFRAME.registerComponent('nav_agent_controller', {
 	  	// Get waypoints in array
 		//   let raycaster = new THREE.Raycaster();
 		this.navMeshControllerEl = null;
-
+		this.viewportHolder = document.getElementById('viewportPlaceholder');
 		let interval = setInterval( () => { //make sure navmesh and controller are ready
 			let navMeshControllerEl = document.getElementById("nav-mesh");
 			this.currentState = "random";
@@ -1845,8 +1881,8 @@ AFRAME.registerComponent('nav_agent_controller', {
 					this.el.removeAttribute("look-at-y");
 				let targetLocation = new THREE.Vector3();	
 				// let snappedTargetLocation = new THREE.Vector3();
-				viewportHolder = document.getElementById('viewportPlaceholder');
-				viewportHolder.object3D.getWorldPosition( targetLocation );
+				
+				this.viewportHolder.object3D.getWorldPosition( targetLocation );
 				let snappedTargetLocation = this.validTargetPosition(targetLocation); //make sure target is on the navmesh
 					if (snappedTargetLocation) { //returns null if invalid
 						console.log("tryna goto " + snappedTargetLocation);
@@ -1857,7 +1893,8 @@ AFRAME.registerComponent('nav_agent_controller', {
 						});
 						// this.el.setAttribute("look-at-y", "#player");
 					} else {
-						this.updateAgentState(this.previousState);
+						console.log("player greet position invalid, going random...");
+						this.updateAgentState("random");
 					}	
 				break;
 

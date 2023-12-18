@@ -161,10 +161,10 @@ AFRAME.registerComponent('initializer', { //adjust for device settings, and call
     var sceneEl = document.querySelector('a-scene');
     sceneEl.setAttribute("screen-controls", true);
     let type = this.data.sceneType;
-    let isIOS = DetectiOS();
+    // let isIOS = DetectiOS();
     let isMobile = AFRAME.utils.device.isMobile();
     let headsetConnected = AFRAME.utils.device.checkHeadsetConnected();
-    let isMacOS = (navigator.appVersion.indexOf('Mac') != -1);
+    // let isMacOS = (navigator.appVersion.indexOf('Mac') != -1);
     // this.data.settingsData = settings;
     // console.log("settings " + this.data.settingsData);
     // let ios = this.detectIOS();
@@ -193,7 +193,7 @@ AFRAME.registerComponent('initializer', { //adjust for device settings, and call
       PrimaryAudioInit();
       let js = document.getElementById('joystickContainer');
       // sceneEl.setAttribute('render-canvas');
-      if (window.mobileAndTabletCheck() || isMobile || isIOS) {
+      if (window.mobileAndTabletCheck() || isMobile ) {
         let vrButton = document.querySelector(".a-enter-vr-button");
         if (vrButton != null) {
           vrButton.style.display = 'none'; //to hell with cardboard/gearvr/daydream

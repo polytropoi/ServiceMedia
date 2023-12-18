@@ -17024,6 +17024,15 @@ function getAllPeople() {
         "<tbody>";
         var tableBody = "";
         for(var i = 0; i < arr.length; i++) {
+            let date = arr[i].sceneLastUpdate;
+            // let datetime = date.getTime();
+            if ( date.toString().includes("-")) {
+               
+                date = new Date(date).getTime();
+                console.log(date);
+            } else {
+                // date.toLocaleString()
+            }
             var android = arr[i].sceneAndroidOK ? 
             "<a href=\x22#\x22 class=\x22btn btn-success btn-circle \x22><i class=\x22fab fa-android\x22></i></a>" :
             "<a href=\x22#\x22 class=\x22btn btn-danger btn-circle \x22><i class=\x22fab fa-android \x22></i></a>";
@@ -17048,7 +17057,7 @@ function getAllPeople() {
             "</a> | <a href=\x22/unity/" + arr[i].short_id + "\x22 target=\x22_blank\x22>Unity</a></td>" +
             "<td>" + arr[i].sceneStickyness + "</td>" +
             "<td>" + arr[i].sceneShareWithPublic + "</td>" +
-            "<td>" + arr[i].sceneLastUpdate + "</td>" +
+            "<td>" + date + "</td>" +
             "<td>" + android + ios + windows + webgl + "</td>" +
             "</tr>";
         }
@@ -17175,7 +17184,7 @@ function getAllPeople() {
             "<td><a href=\x22/landing/" + arr[i].short_id + "\x22 target=\x22_blank\x22>" + arr[i].short_id + "</a></td>" +
             "<td>" + arr[i].sceneDomain + "</td>" +
             "<td>" + arr[i].sceneShareWithPublic + "</td>" +
-            "<td>" + arr[i].sceneLastUpdate + "</td>" +
+            "<td>" + new Date(arr[i].sceneLastUpdate).toLocaleString() + "</td>" +
             "<td>" + android + ios + windows + webgl +"</td>" +
             "</tr>";
         }
@@ -17194,7 +17203,7 @@ function getAllPeople() {
         var resultElement = document.getElementById('table1Data');
         resultElement.innerHTML = tableHead + tableBody + tableFoot;
         $('#dataTable1').DataTable(
-            {"order": [[ 4, "desc" ]]}
+            {"order": [[ 4, "asc" ]]}
         );
     })
     .catch(function (error) {

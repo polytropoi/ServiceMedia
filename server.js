@@ -8019,7 +8019,7 @@ app.get('/uservids/:u_id', requiredAuthentication, function(req, res) {
     });
 });
 app.post('/return_audiogroups/', function(req, res) {
-    console.log('tryna return audiogroups: ' + JSON.stringify(req.body));
+    // console.log('tryna return audiogroups: ' + JSON.stringify(req.body));
     let response = req.body;
     let groupItems = [];
     let audio_IDs = [];

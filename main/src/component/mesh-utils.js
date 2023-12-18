@@ -2,6 +2,8 @@
 import {MeshSurfaceSampler} from '/three/examples/jsm/math/MeshSurfaceSampler.js'; 
 import {TransformControls} from '/three/examples/jsm/controls/TransformControls.js';
 
+
+
 // import { SVGLoader } from '/three/examples/jsm/loaders/SVGLoader.js'; // ref'd in import maps
 // import { Flow } from '/three/examples/jsm/modifiers/CurveModifier.js'; 
 // import { Line2 } from '/three/examples/jsm/lines/Line2.js'; //hrm..
@@ -4616,9 +4618,15 @@ AFRAME.registerComponent('load_threesvg', {
       this.euler = new THREE.Euler();
       this.scale = new THREE.Vector3();
       this.rotation = new THREE.Vector3();
-      
-      this.mod_model_component = this.el.components.mod_model;
-      this.mod_object_component = this.el.components.mod_object
+
+      // this.targetEl = null;
+      // for (let i = 0; i < sceneLocations.locations.length; i++) {
+      //   if (this.el.id == sceneLocations.locations[i].timestamp) {
+
+      //   }
+      // }
+      // this.mod_model_component = this.el.components.mod_model;
+      // this.mod_object_component = this.el.components.mod_object
       // control.addEventListener('objectChanged',  ( event ) => {
       //   // this.el.getAttribute("position")
       //   // console.log(this.el.getAttribute("position"));
@@ -4640,8 +4648,21 @@ AFRAME.registerComponent('load_threesvg', {
         this.rotation.y = THREE.MathUtils.radToDeg(this.euler.y);
         this.rotation.z = THREE.MathUtils.radToDeg(this.euler.z);
         console.log(this.position, this.rotation, this.scale);
+        
         // this.el.getObject3D('mesh').position
-
+        for (let i = 0; i < sceneLocations.locations.length; i++) {
+          if (this.el.id == sceneLocations.locations[i].timestamp) {  
+            sceneLocations.locations[i].x = this.position.x.toFixed(2);
+            sceneLocations.locations[i].y = this.position.y.toFixed(2);
+            sceneLocations.locations[i].z = this.position.z.toFixed(2);
+            sceneLocations.locations[i].eulerx = this.rotation.x.toFixed(2);
+            sceneLocations.locations[i].eulery = this.rotation.y.toFixed(2);
+            sceneLocations.locations[i].eulerz = this.rotation.z.toFixed(2);
+            sceneLocations.locations[i].markerObjScale = this.scale.x.toFixed(2);
+            SaveLocalData();
+            break;
+          }
+        }
 
       });
       window.addEventListener( 'keydown', function ( event ) {
