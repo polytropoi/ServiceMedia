@@ -4742,12 +4742,12 @@ webxr_router.get('/:_id', function (req, res) {
                             joystickContainer = "";
                             joystickScript = "";
                         }
-                        let xrmode =  "xr-mode-ui=\x22XRMode: ar\x22";
+                        let xrmode =  "xr-mode-ui=\x22XRMode: xr\x22";
                         if (sceneResponse.sceneTags != null && (sceneResponse.sceneTags.includes('vrmode') || sceneResponse.sceneTags.includes('vr mode'))) {
                             xrmode =  "xr-mode-ui=\x22XRMode: vr\x22";
                         } 
-                        if (sceneResponse.sceneTags != null && (sceneResponse.sceneTags.includes('xrmode') || sceneResponse.sceneTags.includes('xr mode'))) {
-                            xrmode =  "xr-mode-ui=\x22XRMode: xr\x22";
+                        if (sceneResponse.sceneTags != null && (sceneResponse.sceneTags.includes('armode') || sceneResponse.sceneTags.includes('ar mode'))) {
+                            xrmode =  "xr-mode-ui=\x22XRMode: ar\x22";
                         }
 
                         /////////AFRAME SCENE DECLARATION////////////////// 
