@@ -238,13 +238,91 @@ function SaveLocalData() {  //persist mods an alt "~" version of the data
       };
    };
    }
+   function DeleteLocalSceneData() {  //persist mods an alt "~" version of the data
 
-// function GetTimekeys(db) {
-//    if (db) {
+      console.log("tryna connect to SMXR indexeddb");
+      if (!('indexedDB' in window)) {
+         console.log("This browser doesn't support IndexedDB");
+         return;
+      }
+      const request = indexedDB.open("SMXR", 1);
+      request.onerror = (event) => {
+         console.error("could not connect to iDB " + event);
+         return "error"
+      };
+      request.onupgradeneeded = function () {
+         const db = request.result;
+         const store = db.createObjectStore("scenes", { keyPath: "shortID" });
+         store.createIndex("scene", ["scene"], { unique: true });
+      };
+      request.onsuccess = function () {
+         console.log("tryna delete indexedDB localdata for this scene!");
+         const db = request.result;
+         const transaction = db.transaction("scenes", "readwrite");
 
-//    }
-// }
+         let deleterequest = transaction.objectStore("scenes").delete(room + "~");
+         deleterequest.onerror = function () {
+            console.log("cain't delete localdatas!?!?");
+         }
+      
+         // report that the data item has been deleted
+         transaction.oncomplete = () => {
+         console.log("sceneData deleted - reload to confirm!");
+         setTimeout(function () {
+            window.location.reload();
+         }, 2000);
 
+         };
+      };
+
+   //    $.confirm({
+   //       title: 'Confirm!',
+   //       content: 'Delete local changes to this scene?',
+   //       buttons: {
+   //           confirm: function () {
+   //             console.log("tryna connect to SMXR indexeddb");
+   //             if (!('indexedDB' in window)) {
+   //                console.log("This browser doesn't support IndexedDB");
+   //                return;
+   //             }
+   //             const request = indexedDB.open("SMXR", 1);
+   //             request.onerror = (event) => {
+   //                console.error("could not connect to iDB " + event);
+   //                return "error"
+   //             };
+   //             request.onupgradeneeded = function () {
+   //                const db = request.result;
+   //                const store = db.createObjectStore("scenes", { keyPath: "shortID" });
+   //                store.createIndex("scene", ["scene"], { unique: true });
+   //             };
+   //             request.onsuccess = function () {
+   //                console.log("tryna delete indexedDB localdata for this scene!");
+   //                const db = request.result;
+   //                const transaction = db.transaction("scenes", "readwrite");
+
+   //                let deleterequest = transaction.objectStore("scenes").delete(room + "~");
+   //                deleterequest.onerror = function () {
+   //                   console.log("cain't delete localdatas!?!?");
+   //                }
+               
+   //                // report that the data item has been deleted
+   //                transaction.oncomplete = () => {
+   //                console.log("sceneData deleted - reload to confirm!");
+   //                setTimeout(function () {
+   //                   window.location.reload();
+   //                }, 2000);
+
+   //                };
+   //             };
+   //           },
+   //           cancel: function () {
+   //               // $.alert('Canceled!');
+   //           },
+   //       }
+   //   });
+
+   }
+   
 /////////////////// main onload function below, populate settings, etc.
 $(function() { 
    // InitIDB();
@@ -740,7 +818,14 @@ function SaveTimekeysToLocal () {
 
 function SaveModToLocal(locationKey) { //locationKey is now just timestamp of the location item, unique enough
    console.log("tryna save mod to local with key " + locationKey);
+
    let locItem = {};
+   for (let i = 0; i < sceneLocations.locations.length; i++) {
+      if (sceneLocations.locations[i].timestamp == locationKey) {
+         locItem = sceneLocations.locations[i];
+      }
+   }
+   
    // let keySplit = locationKey.split("~");
    locItem.x = document.getElementById('xpos').value;
    locItem.eulerx = document.getElementById('xrot').value.length > 0 ? document.getElementById('xrot').value : '0';
@@ -755,16 +840,16 @@ function SaveModToLocal(locationKey) { //locationKey is now just timestamp of th
    locItem.markerType = document.getElementById('locationMarkerType').value;
    locItem.eventData = document.getElementById('locationEventData').value;
    locItem.timestamp = locationKey;
-   locItem.scale = document.getElementById("modelScale").value;
+   locItem.markerObjScale = document.getElementById("modelScale").value;
    locItem.phID = locationKey.toString();
    locItem.type = "Worldspace";
    
    // locItem.modelID = document.getElementById('locationModel').value.split("~")[3]; //model select values have the phID (room~cloud/local~timestamp) plus modelid, so index 3 of split
 
-   locItem.modelID = document.getElementById('locationModel').value; //now just _id
+   locItem.modelID = document.getElementById('locationModel').value; // model _id
    locItem.model = ReturnModelName(locItem.modelID);
 
-   locItem.objectID = document.getElementById('locationObject').value; //same as model
+   locItem.objectID = document.getElementById('locationObject').value; //object _id
    locItem.objectName = ReturnObjectName(locItem.objectID);
    // if (locationKey.toString().includes("local")) {
    //    locItem.isLocal = true;
@@ -776,14 +861,14 @@ function SaveModToLocal(locationKey) { //locationKey is now just timestamp of th
    let theEl = document.getElementById(locationKey);
    if (theEl != null) {
       // console.log("found the localstorage EL: " + localStorage.getItem(locationKey));
-      let scale = (locItem.scale != undefined && locItem.scale != null && locItem.scale != "") ? locItem.scale : 1;
+      let scale = (locItem.markerObjScale != undefined && locItem.markerObjScale != null && locItem.markerObjScale != "") ? locItem.markerObjScale : 1;
       theEl.setAttribute('position', {x: locItem.x, y: locItem.y, z: locItem.z});
       theEl.setAttribute('rotation', {x: locItem.eulerx, y: locItem.eulery, z: locItem.eulerz});
       theEl.setAttribute('scale', {x: scale, y: scale, z: scale});
       for (let i = 0; i < sceneLocations.locations.length; i++) {
          if (locationKey == sceneLocations.locations[i].timestamp) {
-            sceneLocations.locations[i] = locItem; //replace the location item with updated properties
-            localData.locations[i] = locItem; //replace the location item with updated properties, to use if already has local mods
+            sceneLocations.locations[i] = Object.assign(locItem); //replace the location item with updated properties
+            localData.locations[i] = Object.assign(locItem); //replace the location item with updated properties, to use if already has local mods
             SaveLocalData(); //persist to localdb
          }
       }
@@ -1253,7 +1338,6 @@ function UpdateLocationData () { //maybe need to call an aframe component to do 
 //       }
 //    } 
 // }
-
 
 function ClearPlaceholders() {
    

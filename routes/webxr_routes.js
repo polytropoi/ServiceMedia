@@ -4437,6 +4437,7 @@ webxr_router.get('/:_id', function (req, res) {
                         "<link href=\x22/css/webxr.css\x22 rel=\x22stylesheet\x22 type=\x22text/css\x22>" + 
                        
                         "<script src=\x22/main/vendor/jquery/jquery.min.js\x22></script>" +
+                        // "<script src=\x22/main/vendor/jquery-confirm/jquery-confirm.min.js\x22></script>" +
                         "<script src=\x22../main/js/dialogs.js\x22></script>" +
                         
                         "<script src=\x22/connect/connect.js\x22 defer=\x22defer\x22></script>" +
@@ -4511,6 +4512,7 @@ webxr_router.get('/:_id', function (req, res) {
                             "<div id=\x22sceneQuest\x22 style=\x22z-index: -20;\x22>"+sceneQuest+"</div>"+
                             "<div id=\x22theModal\x22 class=\x22modal\x22><div id=\x22modalContent\x22 class=\x22modal-content\x22></div></div>";
                             extraScripts = "<script src=\x22/main/vendor/jquery/jquery.min.js\x22></script>" +
+                            // "<script src=\x22/main/vendor/jquery-confirm/jquery-confirm.min.js\x22></script>" +
                             "<script src=\x22../main/js/dialogs.js\x22></script>"+
                             "<script src=\x22/connect/connect.js\x22 defer=\x22defer\x22></script>" +
                             geoScripts +
@@ -4556,6 +4558,7 @@ webxr_router.get('/:_id', function (req, res) {
                         "<link href=\x22/css/webxr.css\x22 rel=\x22stylesheet\x22 type=\x22text/css\x22>" + 
                        
                         "<script src=\x22/main/vendor/jquery/jquery.min.js\x22></script>" +
+                        // "<script src=\x22/main/vendor/jquery-confirm/jquery-confirm.min.js\x22></script>" +
                         "<script src=\x22/connect/connect.js\x22 defer=\x22defer\x22></script>" +
                        
 
@@ -4806,6 +4809,7 @@ webxr_router.get('/:_id', function (req, res) {
                         // "<meta name=\x22token\x22 content=\x22"+token+"\x22>"+
                         styleIncludes +
                         "<link href=\x22../main/vendor/fontawesome-free/css/all.css\x22 rel=\x22stylesheet\x22 type=\x22text/css\x22>" +
+                        // "<link rel=\x22stylesheet\x22 href=\x22/main/vendor/jquery-confirm/jquery-confirm.min.css\x22 rel=\x22stylesheet\x22>" +
                         "<link href=\x22/css/webxr.css\x22 rel=\x22stylesheet\x22 type=\x22text/css\x22>" +
 
                      
@@ -4819,6 +4823,7 @@ webxr_router.get('/:_id', function (req, res) {
                         "}</script>"+
 
                         "<script src=\x22/main/vendor/jquery/jquery.min.js\x22></script>" +
+                        //"<script src=\x22/main/vendor/jquery-confirm/jquery-confirm.min.js\x22></script>" +
                         
                         // "<script src=\x22../main/ref/aframe/dist/socket.io.slim.js\x22></script>" +
                        

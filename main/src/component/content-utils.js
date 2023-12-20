@@ -191,45 +191,45 @@ AFRAME.registerComponent('initializer', { //adjust for device settings, and call
       window.sceneType = type;
       // InitSceneHooks(type);
       PrimaryAudioInit();
-      let js = document.getElementById('joystickContainer');
+      // let js = document.getElementById('joystickContainer');
       // sceneEl.setAttribute('render-canvas');
-      if (window.mobileAndTabletCheck() || isMobile ) {
-        let vrButton = document.querySelector(".a-enter-vr-button");
-        if (vrButton != null) {
-          vrButton.style.display = 'none'; //to hell with cardboard/gearvr/daydream
-        }
-        // if (js != null) {
-        //   console.log("hiding joystick");
-        //   js.style.visibility = 'visible'; //light up joystick if mobile
-        // }
-        // sceneEl.setAttribute('screen-controls', 'enabled', true); 
-        // let ewasd = document.getElementById("player").components["extended_wasd_controls"];
-        // if (ewasd != null) {
-        //   ewasd.setJoystickInput(); // might do this in screen-controls component too, but np
-        // } else {
-        //   ewasd = 
-        // }
-      } else {
-        // let js = document.getElementById('joystickContainer');
-        // if (js != null) {
-        //   console.log("hiding joystick"); //really hide if not mobile
-        //   js.style.display = 'none';
-        // }
-      }
+      // if (window.mobileAndTabletCheck() || isMobile ) {
+      //     let vrButton = document.querySelector(".a-enter-vr-button");
+      //     if (vrButton != null) {
+      //       vrButton.style.display = 'none'; //to hell with cardboard/gearvr/daydream
+      //     }
+      //   // if (js != null) {
+      //   //   console.log("hiding joystick");
+      //   //   js.style.visibility = 'visible'; //light up joystick if mobile
+      //   // }
+      //   // sceneEl.setAttribute('screen-controls', 'enabled', true); 
+      //   // let ewasd = document.getElementById("player").components["extended_wasd_controls"];
+      //   // if (ewasd != null) {
+      //   //   ewasd.setJoystickInput(); // might do this in screen-controls component too, but np
+      //   // } else {
+      //   //   ewasd = 
+      //   // }
+      // } else {
+      //   // let js = document.getElementById('joystickContainer');
+      //   // if (js != null) {
+      //   //   console.log("hiding joystick"); //really hide if not mobile
+      //   //   js.style.display = 'none';
+      //   // }
+      // }
       let envEl = document.getElementById('enviroEl');
       if (envEl != null) {
         envEl.setAttribute('enviro_mods', 'enabled', true); //wait till env is init'd to put the mods
       }
-      if (!headsetConnected || isMacOS) {
-        let vrButton = document.querySelector(".a-enter-vr");
-        if (vrButton != null) {
-            console.log("hiding vr button");
-          vrButton.style.display = 'none'; //to hell with cardboard/gearvr/daydream
-          vrButton.style.visible = 'false';
-        } else {
-            console.log("din't found VRBUTTON");
-        }
-      }  
+      // if (!headsetConnected || isMacOS) {
+      //   let vrButton = document.querySelector(".a-enter-vr");
+      //   if (vrButton != null) {
+      //       console.log("hiding vr button");
+      //     vrButton.style.display = 'none'; //to hell with cardboard/gearvr/daydream
+      //     vrButton.style.visible = 'false';
+      //   } else {
+      //       console.log("din't found VRBUTTON");
+      //   }
+      // }  
       this.asky = document.getElementsByTagName('a-sky')[0];
       if (this.asky && settings) {
         console.log("tryna mod asky radius " + settings.sceneSkyRadius);

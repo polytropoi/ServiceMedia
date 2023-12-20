@@ -4618,7 +4618,10 @@ AFRAME.registerComponent('load_threesvg', {
       this.euler = new THREE.Euler();
       this.scale = new THREE.Vector3();
       this.rotation = new THREE.Vector3();
-
+      this.minMove = new THREE.Vector3( - 100, - 100, - 100 );
+      this.maxMove = new THREE.Vector3( 100, 100, 100 );
+      this.minScale = new THREE.Vector3( - 10, - 10, - 10 );
+      this.maxScale = new THREE.Vector3( 10, 10, 10 );
       // this.targetEl = null;
       // for (let i = 0; i < sceneLocations.locations.length; i++) {
       //   if (this.el.id == sceneLocations.locations[i].timestamp) {
@@ -4634,6 +4637,10 @@ AFRAME.registerComponent('load_threesvg', {
       //   // this.el.setAttribute("position", this.position);
       //   // console.log(this.position);
       //   // this.el.getObject3D('mesh').position
+      // });
+      // control.addEventListener('change',  ( event ) => { 
+      //   control.object.position.clamp(this.minMove, this.maxMove);
+      //   control.object.scale.clamp(this.minScale, this.maxScale);
       // });
       control.addEventListener('mouseUp',  ( event ) => {
         // this.el.getAttribute("position")

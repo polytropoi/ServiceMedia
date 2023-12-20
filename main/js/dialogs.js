@@ -692,17 +692,19 @@ function ShowLocationModal(timestamp) {
         // if (userData.sceneOwner != null) {
         //     cloudSaveButton = "<button class=\x22reallySaveButton\x22 onclick=\x22SaveModsToCloud('"+phID+"')\x22>Save (cloud)</button>";
         // }
-        let title = thisLocation.phID + " details";
+        console.log(JSON.stringify(thisLocation));
+        let phID = thisLocation.timestamp;
+        let title = label + " : " + thisLocation.timestamp;
         let content = "<span id='modalCloser' onclick=\x22ShowHideDialogPanel()\x22 class='close-modal'>&times;</span><div><h3>"+title+"</h3><hr>" + //populate modal
         // "<form>"+aa
         // "<table><tr>"
         "<div class=\x22row\x22>"+
-        "<button class=\x22snapButton\x22 style=\x22float:left;\x22 onclick=\x22SnapLocation('"+phID+"')\x22>Snap</button>"+
-        "<button class=\x22grabButton\x22 style=\x22float:left;\x22 onclick=\x22GrabLocation('"+phID+"')\x22>Grab</button>"+
+        "<button class=\x22snapButton\x22 style=\x22float:left;\x22 onclick=\x22SnapLocation('"+phID+"')\x22>Snap To Player</button>"+
+        "<button class=\x22grabButton\x22 style=\x22float:left;\x22 onclick=\x22GrabLocation('"+phID+"')\x22>Transform</button>"+
         // "<button class=\x22goToButton\x22 style=\x22float:left;\x22 onclick=\x22GoToLocation('"+phID+"')\x22>GoTo</button>"+
         "<button class=\x22goToButton\x22 style=\x22float:left;\x22 onclick=\x22PlayerToLocation('"+thisLocation.x+ " " + thisLocation.y + " " + thisLocation.z +"')\x22>GoTo</button>"+
         // "<button class=\x22goToButton\x22 onclick=\x22PlayerToLocation('"+phID+"')\x22>GoTo</button>"+
-        "<button class=\x22infoButton\x22 onclick=\x22SceneManglerModal('Locations')\x22>View All</button>"+
+        "<button class=\x22infoButton\x22 onclick=\x22SceneManglerModal('Locations')\x22>Back</button>"+
         "</div>"+
 
         "<div class=\x22row\x22><div class=\x22twocolumn\x22><label for=\x22locationName\x22>Location Name</label>"+
@@ -753,7 +755,7 @@ function ShowLocationModal(timestamp) {
         "<input class=\x22zfield\x22 type=\x22number\x22 id=\x22zrot\x22 value=\x22"+thisLocation.eulerz+"\x22></div></div>"+
 
         "<div class=\x22twocolumn\x22><label for=\x22modelScale\x22>Scale</label><br>"+
-        "<input class=\x22normalfield\x22 type=\x22number\x22 id=\x22modelScale\x22 value=\x22"+thisLocation.scale+"\x22></div>"+
+        "<input class=\x22normalfield\x22 type=\x22number\x22 id=\x22modelScale\x22 value=\x22"+thisLocation.markerObjScale+"\x22></div>"+
 
         "<div class=\x22twocolumn\x22><label for=\x22locationTags\x22>Tags</label>"+
         "<textarea type=\x22textarea\x22 placeholder=\x22\x22 id=\x22locationTags\x22>"+thisLocation.locationTags+"</textarea><br></div></div>"+
@@ -1490,7 +1492,7 @@ function SceneManglerModal(mode) {
     "<label style=\x22float: left;\x22 for=\x22file-upload\x22 class=\x22custom-file-upload\x22>Import Mods</label>"+
     "<input type=\x22file\x22 id=\x22file-upload\x22 accept=\x22.txt\x22 onchange=\x22ImportMods(event)\x22></input>"+
     "<button class=\x22deleteButton\x22 id=\x22ClearAllPlaceholdersButton\x22 onclick=\x22ClearPlaceholders()\x22>Clear All Mods</button>" +
-    "<button class=\x22deleteButton\x22 id=\x22ClearAllPlaceholdersButton\x22 onclick=\x22ClearPlaceholders()\x22>Clear Scene Mods</button>"+
+    "<button class=\x22deleteButton\x22 id=\x22ClearAllPlaceholdersButton\x22 onclick=\x22DeleteLocalSceneData()\x22>Clear Current Scene Mods</button>"+
     ownerButton +
       // "<div class=\x22twocolumn\x22><label for=\x22addpic\x22>Add Picture Asset</label><button class=\x22addButton\x22 id=\x22AddPicButton\x22 onclick=\x22AddPicture()\x22>Add</button>"+
       // "<button class=\x22uploadButton\x22 id=\x22UpoadPicButton\x22 onclick=\x22UploadPicture()\x22>Upload</button>"+
