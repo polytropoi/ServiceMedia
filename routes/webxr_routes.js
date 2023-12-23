@@ -332,7 +332,7 @@ webxr_router.get('/:_id', function (req, res) {
     let skyboxAsset = "";
     var skySettings = "";
     var fogSettings = "";
-    var shadowLight = "";
+    // var shadowLight = "";
     var hemiLight = "";
     var groundPlane = "";
     var ocean = "";
@@ -386,8 +386,8 @@ webxr_router.get('/:_id', function (req, res) {
     var playerRotation = "0 0 0";
     // var style = "<link rel=\x22stylesheet\x22 type=\x22text/css\x22 href=\x22../styles/embedded.css\x22>";
     let aframeEnvironment = "";
-    let ambientLight = "<a-light type='ambient' intensity='.25'></a-light>";
-    // let ambientLight = "";
+    // let ambientLight = "<a-light type='ambient' intensity='.25'></a-light>";
+    let ambientLight = "";
     let htmltext = "";
     let styleIncludes = "";
     // let sceneNextScene = "";
@@ -431,6 +431,7 @@ webxr_router.get('/:_id', function (req, res) {
     let matrixEntities = ""; //matrix.org comms
     // let parametricEntities = "";
     let lightEntities = "";
+
     let placeholderEntities = "";
     let proceduralEntities = "";
     // let placeholderEntities = "<a-entity id=\x22createPlaceholders\x22 create_placeholders></a-entity>";
@@ -1647,25 +1648,37 @@ webxr_router.get('/:_id', function (req, res) {
                             } //end AFrame scene variations
 
                             let webxrEnv = "default";
-
-                            if (sceneResponse.sceneWebXREnvironment != null && sceneResponse.sceneWebXREnvironment != "none" && sceneResponse.sceneWebXREnvironment != "") {
-                                webxrEnv = sceneResponse.sceneWebXREnvironment;
-                                
-                                // enviromentScript = "<script src=\x22../main/ref/aframe/dist/aframe_environment_component.min.js\x22></script>"; --ronment-component
-                                enviromentScript = "<script src=\x22../main/src/component/aframe-environment-component_m3.js\x22></script>";
-                                let ground = "";
+                            let shadow = "";
+                            let ground = "";
                                 let skycolor = "";
                                 let groundcolor = "";
                                 let groundcolor2 = "";
                                 let dressingcolor = "";
                                 let horizoncolor = "";
-                                let shadow = "shadow: false;";
                                 let fog = "";
                                 let tweakColors = "";
+                                let sunVector = "0 -.5 -.5";
+                                let intensity = "2";
+                            //default lights, 
+   
+                            if (sceneResponse.sceneWebXREnvironment != null && sceneResponse.sceneWebXREnvironment != "none" && sceneResponse.sceneWebXREnvironment != "") {
+                                webxrEnv = sceneResponse.sceneWebXREnvironment;
+                                
+                                // enviromentScript = "<script src=\x22../main/ref/aframe/dist/aframe_environment_component.min.js\x22></script>"; --ronment-component
+                                enviromentScript = "<script src=\x22../main/src/component/aframe-environment-component_m3.js\x22></script>";
+                                // let ground = "";
+                                // let skycolor = "";
+                                // let groundcolor = "";
+                                // let groundcolor2 = "";
+                                // let dressingcolor = "";
+                                // let horizoncolor = "";
+                                
+                                // let fog = "";
+                                // let tweakColors = "";
                                 if (webxrEnv == "none") {
                                     ground = "ground: none;"
-                                    hemiLight = "<a-light id=\x22hemi-light\x22 type=\x22hemisphere\x22 color=\x22" + sceneResponse.sceneColor1 + "\x22 groundColor=\x22" + sceneResponse.sceneColor2 + "\x22 intensity=\x22.5\x22 position\x220 0 0\x22>"+
-                                    "</a-light>";
+                                    // hemiLight = "<a-light id=\x22hemi-light\x22 type=\x22hemisphere\x22 color=\x22" + sceneResponse.sceneColor1 + "\x22 groundColor=\x22" + sceneResponse.sceneColor2 + "\x22 intensity=\x22.5\x22 position\x220 0 0\x22>"+
+                                    // "</a-light>";
                                 }
                                 if (sceneResponse.sceneUseFloorPlane && sceneResponse.sceneFloorplaneTexture == "none") {
                                     ground = "ground: none; dressing: none;"
@@ -1674,7 +1687,9 @@ webxr_router.get('/:_id', function (req, res) {
                                     ground = "ground: flat; dressing: none;"
                                 }
                                 if (sceneResponse.sceneUseDynamicShadows) {
-                                    shadow = "shadow: true; shadowSize: 10;"
+                                    shadow = "shadow: true; shadowSize: 25;"
+                                } else {
+                                    shadow = " shadow: false ";
                                 }
                                 if (sceneResponse.sceneTweakColors) {
                                     // tweakColors = "mod-colors"; //need to animate
@@ -1690,7 +1705,7 @@ webxr_router.get('/:_id', function (req, res) {
                                 if (sceneResponse.sceneColor2 != null && sceneResponse.sceneColor2.length > 3 && sceneResponse.sceneColorizeSky) {  
                                     horizoncolor = "horizonColor: " + sceneResponse.sceneColor2 + ";";
                                     groundcolor2 = "groundColor2: " + sceneResponse.sceneColor2 + ";";
-                                    ambientLight = "<a-light type='ambient' intensity='.5' color='" + sceneResponse.sceneColor2 + "'></a-light>";
+                                    // ambientLight = "<a-light type='ambient' intensity='.5' color='" + sceneResponse.sceneColor2 + "'></a-light>";
                                 } 
                                 if (sceneResponse.sceneColor3 != null && sceneResponse.sceneColor3.length > 3 && sceneResponse.sceneColorizeSky) { //TODO put that in
                                     groundcolor = "groundColor: " + sceneResponse.sceneColor3 + ";";
@@ -1705,11 +1720,25 @@ webxr_router.get('/:_id', function (req, res) {
                                 " playArea: 25; lighting: distant;\x22 hide-in-ar-mode "+tweakColors+"></a-entity>";
                                 // environment = "<a-entity environment=\x22preset: "+webxrEnv+"; "+fog+" "+shadow+" "+groundcolor+" "+dressingcolor+" "+groundcolor2+" "+skycolor+" "+horizoncolor+" playArea: 3; lightPosition: 0 2.15 0\x22 hide-in-ar-mode></a-entity>";
                             } else {
+                                if (sceneResponse.sceneUseDynamicShadows) {
+                                    shadow = " light=\x22castShadow: true\x22 shadow-camera-automatic=\x22.activeObjexRay\x22 ";
+                                }
+                                if (sceneResponse.sceneSunVector) {
+                                    sunVector = sceneResponse.sceneSunVector;
+                                }
+                                if (sceneResponse.sceneSunIntensity) {
+                                    intensity = sceneResponse.sceneSunIntensity;
+                                }
                                 // aframeEnvironment =  "<a-gradient-sky material=\x22shader: gradient; topColor: "+HexToRgbValues(sceneResponse.sceneColor1)+"; bottomColor: "+HexToRgbValues(sceneResponse.sceneColor2)+";\x22></a-gradient-sky>";
                                 skySettings =  "<a-sky id=\x22skyEl\x22 color=\x22" + sceneResponse.sceneColor1 + "\x22 mod_sky=\x22enabled: true; color: "+sceneResponse.sceneColor1+";\x22></a-sky>";
                                 // skySettings = "<a-entity id=\x22skyEl\x22 mod_sky=\x22enabled: true; color: "+sceneResponse.sceneColor1+";></a-entity>"; //just plain color if not using enviro component //todo gradient sky? sun/sky component?
-                                hemiLight = "<a-light id=\x22hemi-light\x22 type=\x22hemisphere\x22 color=\x22" + sceneResponse.sceneColor1 + "\x22 groundColor=\x22" + sceneResponse.sceneColor2 + "\x22 intensity=\x22.5\x22 position\x220 0 0\x22>"+
-                                    "</a-light>";
+                                // hemiLight = "<a-light id=\x22hemi-light\x22 type=\x22hemisphere\x22 color=\x22" + sceneResponse.sceneColor1 + "\x22 groundColor=\x22" + sceneResponse.sceneColor2 + "\x22 intensity=\x22.5\x22 position\x220 0 0\x22>"+
+                                    // "</a-light>";
+                                    
+                                    //default lights
+                                lightEntities = "<a-light visible=\x22true\x22 show-in-ar-mode id=\x22real-light\x22 type=\x22directional\x22 "+shadow+" position=\x221 1 1\x22 color=\x22"+sceneResponse.sceneColor1+"\x22 "+
+                                "groundColor=\x22"+sceneResponse.sceneColor2+"\x22 intensity=\x221.5\x22 target=\x22#directionaltarget\x22><a-entity id=\x22directionaltarget\x22 position=\x22"+sunVector+"\x22></a-entity></a-light>" +
+                                "<a-light type='ambient' color='" + sceneResponse.sceneColor2 + "'></a-light>";    
                             }
                             sceneResponse.scenePostcards = sceneData.scenePostcards;
                             if (sceneResponse.sceneColor1 != null && sceneResponse.sceneColor1.length > 3) {
@@ -1723,7 +1752,7 @@ webxr_router.get('/:_id', function (req, res) {
                                 // shadowLight = "<a-light type=\x22directional\x22 color=\x22" + sceneResponse.sceneColor1 + "\x22 groundColor=\x22" + 
                                 //sceneResponse.sceneColor2 + "\x22 intensity=\x22.75\x22 target=\x22.target\x22 castShadow=\x22true\x22 shadowMapHeight=\x221024\x22 shadowMapWidth=\x221024\x22 shadowCameraLeft=\x22-2\x22 shadowCameraRight=\x222\x22; shadowCameraBottom=\x22-2\x22; shadowCameraTop=\x222\x22; position\x22-1 4 4\x22>"+
                                 // "</a-light>";
-                                shadowLight = "<a-entity id=\x22shadow-light\x22 light=\x22type: directional; color:"+sceneResponse.sceneColor1+"; groundColor:"+sceneResponse.sceneColor2+"; castShadow: true; intensity: 0.4; shadowBias: -0.0015; shadowCameraFar: 1000; shadowMapHeight: 2048; shadowMapWidth: 2048;\x22 position=\x225 10 7\x22></a-entity>";
+                                // shadowLight = "<a-entity id=\x22shadow-light\x22 light=\x22type: directional; color:"+sceneResponse.sceneColor1+"; groundColor:"+sceneResponse.sceneColor2+"; castShadow: true; intensity: 1; shadowBias: -0.0015; shadowCameraFar: 1000; shadowMapHeight: 2048; shadowMapWidth: 2048;\x22 position=\x225 10 7\x22></a-entity>";
                             }
                             if (sceneResponse.sceneUseGlobalFog || sceneResponse.sceneUseSceneFog) {
                                 let fogDensity = sceneResponse.sceneGlobalFogDensity != null ? sceneResponse.sceneGlobalFogDensity : '.01';
@@ -4107,8 +4136,8 @@ webxr_router.get('/:_id', function (req, res) {
                                             // let envMap = sceneResponse.sceneUseDynCubeMap ? "convert-to-envmap" : "";
                                             skySettings = "<a-sky id=\x22a_sky\x22 crossorigin=\x22anonymous\x22 hide-in-ar-mode src=#sky></a-sky>";
                                             // aframeEnvironment = "";
-                                            hemiLight = "<a-light id=\x22hemi-light\x22 type=\x22hemisphere\x22 color=\x22" + sceneResponse.sceneColor1 + "\x22 groundColor=\x22" + sceneResponse.sceneColor2 + "\x22 intensity=\x221\x22 position\x220 0 0\x22>"+
-                                            "</a-light>";
+                                            // hemiLight = "<a-light id=\x22hemi-light\x22 type=\x22hemisphere\x22 color=\x22" + sceneResponse.sceneColor1 + "\x22 groundColor=\x22" + sceneResponse.sceneColor2 + "\x22 intensity=\x221\x22 position\x220 0 0\x22>"+
+                                            // "</a-light>";
                                         }
                                         callback(null);
                                     })();
@@ -4671,7 +4700,7 @@ webxr_router.get('/:_id', function (req, res) {
                         if (sceneResponse.sceneTags != null && sceneResponse.sceneTags.includes('parametric')) {
                             hasParametricCurve = true;
                             extraScripts = extraScripts + "<script src=\x22../main/js/parser.js\x22></script>"; 
-                            curveEntities = curveEntities + "<a-entity id=\x22p_path\x22 parametric_curve=\x22xyzFunctions: 30*cos(t), 3*cos(3*t) + 2, 30*sin(t);tRange: 0, -6.283;\x22></a-entity>"; //TODODO 
+                            curveEntities = curveEntities + "<a-entity id=\x22p_path\x22 parametric_curve=\x22xyzFunctions: 50*cos(t), 3*cos(3*t) + 20, 50*sin(t);tRange: 0, -6.283;\x22></a-entity>"; //TODODO 
                         }
                         // if (sceneResponse.sceneTags != null && sceneResponse.sceneTags.includes('hand')) {
                         //     extraScripts = extraScripts + "<script src=\x22https://cdn.jsdelivr.net/npm/handy-work@3.1.10/build/handy-controls.min.js\x22></script>"+
@@ -5045,7 +5074,7 @@ webxr_router.get('/:_id', function (req, res) {
 
                         matrixEntities +
                         // parametricEntities +
-                        "<a-light visible=\x22false\x22 show-in-ar-mode id=\x22real-light\x22 type=\x22directional\x22 position=\x221 1 1\x22 intensity=\x220.5\x22></a-light>" +
+                        // "<a-light visible=\x22true\x22 show-in-ar-mode id=\x22real-light\x22 type=\x22directional\x22 position=\x221 1 1\x22 color=\x22"+sceneResponse.sceneColor1+"\x22 intensity=\x22.75\x22></a-light>" +
                         placeholderEntities +
                         proceduralEntities +
                         loadLocations +
@@ -5059,8 +5088,8 @@ webxr_router.get('/:_id', function (req, res) {
                         arHitTest + 
                         
                         arShadowPlane +
-                        hemiLight +
-                        shadowLight +
+                        // hemiLight +
+                        // shadowLight +
                         // navmarsh +
                         loadAudioEvents +
                         "<a-entity id=\x22youtube_element\x22 youtube_element_aframe=\x22init: ''\x22></a-entity>"+

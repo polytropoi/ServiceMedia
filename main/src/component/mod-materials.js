@@ -560,9 +560,9 @@ AFRAME.registerComponent('mod-materials', {
               // this.vidtexture.magFilter = THREE.LinearMipmapNearestFilter;
               // this.playmaterial = new THREE.MeshStandardMaterial( { map: this.vidtexture, side: THREE.DoubleSide, shader: THREE.FlatShading } ); 
               if (this.data.isSkybox) {
-                this.playmaterial = new THREE.MeshBasicMaterial( { map: this.vidtexture, side: THREE.BackSide } ); 
+                this.playmaterial = new THREE.MeshBasicMaterial( { map: this.vidtexture, side: THREE.BackSide, shader: THREE.FlatShading } ); 
               } else {
-                this.playmaterial = new THREE.MeshBasicMaterial( { map: this.vidtexture } ); 
+                this.playmaterial = new THREE.MeshBasicMaterial( { map: this.vidtexture, shader: THREE.FlatShading } ); 
               }
               
               
