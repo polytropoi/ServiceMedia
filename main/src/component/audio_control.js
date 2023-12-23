@@ -97,7 +97,7 @@ AFRAME.registerComponent('primary_audio_player', {  //setup and controls for the
             this.loader = new THREE.TextureLoader();
             this.loader.crossOrigin = '';
             this.texture = this.loader.load(this.ref.src);
-            this.texture.encoding = THREE.sRGBEncoding; 
+            // this.texture.colorSpace = THREE.sRGBEncoding; 
             this.texture.flipY = false; 
             this.material = new THREE.MeshBasicMaterial( { map: this.texture, transparent: true } ); 
             // Go over the submeshes and modify materials we want.

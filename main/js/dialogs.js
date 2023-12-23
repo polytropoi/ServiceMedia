@@ -534,18 +534,20 @@ function ReturnLocationObjectSelect (phID) {
       console.log("looking for " + phID + " in " + JSON.stringify(sceneLocations));
     }
     let objectSelect = "<option value=\x22"+phID+"~none\x22>none</option>";
-    for (let i = 0; i < sceneObjects.length; i++) {
-      // console.log("spinning through sceneObjects : " + 
-        // if (sceneModels[i].isPublic || !isGuest) { //maybe something else?
-          if (locationItem.objectID != null && locationItem.objectID != undefined && locationItem.objectID == sceneObjects[i]._id) {
-            objectSelect = objectSelect + "<option value=\x22"+phID+"~"+sceneObjects[i]._id+"\x22 selected>" + sceneObjects[i].name + "</option>";
-          } else {
-            objectSelect = objectSelect + "<option value=\x22"+phID+"~"+sceneObjects[i]._id+"\x22>" + sceneObjects[i].name + "</option>";
-          }
-        // if (i == sceneObjects.length - 1) {
-        //   return objectSelect;
-        // }
-    }
+
+      for (let i = 0; i < sceneObjects.length; i++) {
+        // console.log("spinning through sceneObjects : " + 
+          // if (sceneModels[i].isPublic || !isGuest) { //maybe something else?
+            if (locationItem && locationItem.objectID != null && locationItem.objectID != undefined && locationItem.objectID == sceneObjects[i]._id) {
+              objectSelect = objectSelect + "<option value=\x22"+phID+"~"+sceneObjects[i]._id+"\x22 selected>" + sceneObjects[i].name + "</option>";
+            } else {
+              objectSelect = objectSelect + "<option value=\x22"+phID+"~"+sceneObjects[i]._id+"\x22>" + sceneObjects[i].name + "</option>";
+            }
+          // if (i == sceneObjects.length - 1) {
+          //   return objectSelect;
+          // }
+      }
+    
     return objectSelect;
 
   }
@@ -1644,7 +1646,9 @@ function ShowHideDialogPanel (htmlString) {
       theRenderCanvas = document.getElementById('renderCanvas');  //with render-canvas aframe component attached, see above
     // }
     showDialogPanel = !showDialogPanel;
+
     if (showDialogPanel) { 
+      console.log("showDialogPanel is true!");
       if (!dialogInitialized) {
         var modalCloser = document.getElementById("modalCloser"); //or the close button
         if (modalCloser != null) {
@@ -1714,7 +1718,7 @@ function ShowHideDialogPanel (htmlString) {
           theModal.style.zIndex = 100;
         } 
       } else {
-        console.log("tryna hide render panel");
+        console.log("showDialogPanel is false!");
         // ShowAll(); //everything hidden when modal is shown
         if (document.getElementById('renderCanvas') != null) {
         theRenderCanvas.setAttribute('visible', false);

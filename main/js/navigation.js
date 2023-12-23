@@ -508,7 +508,7 @@ AFRAME.registerComponent('extended_wasd_controls', {
 		}
 		else
 		{
-			if (this.data.inputType == "keyboard")
+			if (this.data.inputType == "keyboard" && !showDialogPanel)
 			{
 				// need to reset rotatePercent values
 				//   when querying which keys are currently pressed
@@ -563,7 +563,7 @@ AFRAME.registerComponent('extended_wasd_controls', {
 		let c = Math.cos(finalTurnAngle);
 		let s = Math.sin(finalTurnAngle);
 
-		if (this.data.inputType == "keyboard")
+		if (this.data.inputType == "keyboard" && !showDialogPanel)
 		{
 			// need to reset movePercent values
 			//   when querying which keys are currently pressed

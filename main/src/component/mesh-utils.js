@@ -1950,11 +1950,10 @@ AFRAME.registerComponent('local_marker', {
           }
         } else {
           //save to local if new
-          this.el.setAttribute('position', cameraPosition);
-          this.el.setAttribute('gltf-model', '#placeholder');
+          
           let locItem = {};
           locItem.x = cameraPosition.x.toFixed(2);
-          locItem.eulerx = 0;
+          locItem.eulerx = 0; //maybe get look vector?
           locItem.y = cameraPosition.y.toFixed(2);
           locItem.eulery = 0;
           locItem.z = cameraPosition.z.toFixed(2);
@@ -1969,10 +1968,15 @@ AFRAME.registerComponent('local_marker', {
           locItem.timestamp = this.timestamp;
           locItem.scale = 1;
           locItem.tags = '';
-          locItem.phID = this.phID;
-          console.log("tryna set localmarker with phID " + this.phID);
-          localStorage.setItem(this.phID, JSON.stringify(locItem));
-          AddLocalMarkers();
+          locItem.phID = this.timestamp;
+          this.el.setAttribute('position', cameraPosition);
+          this.el.setAttribute('gltf-model', '#placeholder');
+          this.el.id = locItem.timestamp;
+          console.log("tryna set localmarker with phID " + this.timestamp);
+          sceneLocations.locations.push(locItem);
+          SaveLocalData();
+          // localStorage.setItem(this.phID, JSON.stringify(locItem));
+          // AddLocalMarkers();
         }
     // });
     this.calloutToggle = false;
@@ -2093,9 +2097,9 @@ AFRAME.registerComponent('local_marker', {
           locItem.description = "";
           locItem.timestamp = that.data.timestamp;
           locItem.phID = that.phID;
-          storedVars = locItem;
+          // storedVars = locItem;
         }
-        localStorage.setItem(that.phID, JSON.stringify(storedVars));
+        // localStorage.setItem(that.phID, JSON.stringify(storedVars));
         // console.log("phID: " + that.phID + JSON.stringify(localStorage.getItem(that.phID)));
         // AddLocalMarkers();
         // console.log('get model ' + this.el.getAttribute('gltf-model'));
@@ -3001,13 +3005,18 @@ AFRAME.registerComponent('mod_particles', {
       // this.el.setAttribute("position", this.data.location);
     }
     if (this.data.type.toLowerCase() =="smoke") {
-      console.log("tryna light a smoke! " + JSON.stringify(this.data.location) + " scale " + this.data.scale );
-      this.el.setAttribute('sprite-particles', {enable: true, texture: '#smoke1', color: this.data.color, blending: 'additive', textureFrame: '6 5', textureLoop: '1', spawnRate: '1', lifeTime: '3', scale: this.data.scale.toString()});
+      if (document.getElementById("smoke1")) {  //bc error if this isn't added at load, maybe just get it now? 
+        console.log("tryna light a smoke! " + JSON.stringify(this.data.location) + " scale " + this.data.scale );
+        this.el.setAttribute('sprite-particles', {enable: true, texture: '#smoke1', color: this.data.color, blending: 'additive', textureFrame: '6 5', textureLoop: '1', spawnRate: '1', lifeTime: '3', scale: this.data.scale.toString()});
+      }
       // this.el.setAttribute("position", this.data.location);
     }
     if (this.data.type.toLowerCase() =="smoke/add") {
-      this.el.setAttribute('sprite-particles', {enable: true, texture: '#smoke1', color: 'lightblue', blending: 'additive', textureFrame: '6 5', textureLoop: '1', spawnRate: '1', lifeTime: '3', scale: '10'});
+      if (document.getElementById("smoke1")) { //bc error if this isn't added at load, maybe just get it now? 
+        this.el.setAttribute('sprite-particles', {enable: true, texture: '#smoke1', color: 'lightblue', blending: 'additive', textureFrame: '6 5', textureLoop: '1', spawnRate: '1', lifeTime: '3', scale: '10'});
+      }
     }
+
     if (this.data.type.toLowerCase() =="bang") {
       
       this.el.setAttribute('sprite-particles', {enable: true, duration: '1', texture: '#explosion1', color: 'black..white', blending: 'additive', textureFrame: '6 5', textureLoop: '1', spawnRate: '1', lifeTime: '1', opacity: '0,1,0', rotation: '0..360', scale: '10'});
@@ -4656,7 +4665,16 @@ AFRAME.registerComponent('load_threesvg', {
         this.rotation.z = THREE.MathUtils.radToDeg(this.euler.z);
         console.log(this.position, this.rotation, this.scale);
         
-        // this.el.getObject3D('mesh').position
+        // // this.el.getObject3D('mesh').position
+        // if (this.rotation.x == 180 || this.rotation.x == -180) {
+        //   this.rotation.x = 0;
+        // } 
+        // if (this.rotation.y == 180 || this.rotation.y == -180) {
+        //   this.rotation.z = 0;
+        // } 
+        // if (this.rotation.z == 180 || this.rotation.z == -180) {
+        //   this.rotation.z = 0;
+        // } 
         for (let i = 0; i < sceneLocations.locations.length; i++) {
           if (this.el.id == sceneLocations.locations[i].timestamp) {  
             sceneLocations.locations[i].x = this.position.x.toFixed(2);
