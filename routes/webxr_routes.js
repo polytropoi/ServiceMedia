@@ -1452,7 +1452,7 @@ webxr_router.get('/:_id', function (req, res) {
 
                                 //AFRAME CAMERA
                                 let blinkMod = "blink-controls=\x22cameraRig: #cameraRig\x22";
-                                if (useSimpleNavmesh) {
+                                if (useSimpleNavmesh || useNavmesh) {
                                     blinkMod = "blink-controls=\x22cameraRig: #cameraRig; collisionEntities: #nav-mesh;\x22"; //only one navmesh for now
                                     wasd = "extended_wasd_controls=\x22fly: false; moveSpeed: "+sceneResponse.scenePlayer.playerSpeed+"; inputType: keyboard\x22 simple-navmesh-constraint=\x22navmesh:#nav-mesh;fall:10; height:"+sceneResponse.scenePlayer.playerHeight+"\x22";
                                 }
@@ -1687,7 +1687,7 @@ webxr_router.get('/:_id', function (req, res) {
                                     ground = "ground: flat; dressing: none;"
                                 }
                                 if (sceneResponse.sceneUseDynamicShadows) {
-                                    shadow = "shadow: true; shadowSize: 25;"
+                                    shadow = "shadow: true; shadowSize: 10;"
                                 } else {
                                     shadow = " shadow: false ";
                                 }

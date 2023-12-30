@@ -69,7 +69,9 @@ let socketHost = "http://localhost:3000";
 var socket = null; //the socket.io instance below
 // let cloudData = {};
 let localData = {locations:[], settings:{}};
-// let usingLocalData = false;
+let locationTimestamps = [];
+let hasLocalData = false;
+let transformAll = false;
 
 
 
@@ -125,40 +127,102 @@ function InitIDB() {
       const modQuery = store.openCursor(room + "~"); //use cursor mode so it's iterable below
       modQuery.onsuccess = function (e) {
          var cursor = e.target.result;
-         if (cursor) {
-            for (let i = 0; i < cursor.value.locations.length; i++) {
-               // let loc = JSON.stringify(cursor.value.locations[i]);
-               // console.log("gots a localData location: " + loc);
-               localData.locations.push(cursor.value.locations[i]);
-               let rEl = document.getElementById(cursor.value.locations[i].timestamp);
-               if (rEl) {
-                  // console.log("gotsa element with id " + JSON.stringify(localData.locations[i]));
-                  // let obj = rEl.getObject3D('mesh');
-                  // obj.position.set({x: cursor.value.locations[i].x, y: cursor.value.locations[i].y, z: cursor.value.locations[i].z });
-                  // obj.rotation.set({x: cursor.value.locations[i].eulerx, y: cursor.value.locations[i].eulery, z: cursor.value.locations[i].eulerz });
-                  // obj.scale.set({x: cursor.value.locations[i].markerObjScale, y: cursor.value.locations[i].markerObjScale, z: cursor.value.locations[i].markerObjScale});
-                  rEl.setAttribute("position", {x: cursor.value.locations[i].x, y: cursor.value.locations[i].y, z: cursor.value.locations[i].z });
-                  rEl.setAttribute("rotation", {x: cursor.value.locations[i].eulerx, y: cursor.value.locations[i].eulery, z: cursor.value.locations[i].eulerz });
-                  rEl.setAttribute("scale", {x: cursor.value.locations[i].markerObjScale, y: cursor.value.locations[i].markerObjScale, z: cursor.value.locations[i].markerObjScale});
-               }
-            }
-            for (let key in cursor.value.settings) {
-               localData.settings[key] = cursor.value.settings[key]; //TODO apply each one?
-            }
-            cursor.continue(); 
-         
-         } else {
-            console.log("cursor is done...");
-         }
+         console.log("query for localData : " + e.target.result);
+         // if (e.target.result) {
+            if (cursor) {
+               hasLocalData = true;
+               // if (cursor.value.locations.length) {
+                  for (let i = 0; i < cursor.value.locations.length; i++) { //mod or create the scene elements
+                  // let loc = JSON.stringify(cursor.value.locations[i]);
+                  // console.log("gots a localData location: " + loc);
+                  // sceneLocations.locations = [];
+                  // localData.locations = [];
+                  localData.locations.push(cursor.value.locations[i]);
 
+                  let cloudEl = document.getElementById(cursor.value.locations[i].timestamp);
+                  if (cloudEl) { //prexisting elements (cloud_marker, mod_model, mod_object) already rendered onload
+                     // console.log("gotsa element with id " + JSON.stringify(localData.locations[i]));
+                     // let obj = cloudEl.getObject3D('mesh');
+                     // obj.position.set({x: cursor.value.locations[i].x, y: cursor.value.locations[i].y, z: cursor.value.locations[i].z });
+                     // obj.rotation.set({x: cursor.value.locations[i].eulerx, y: cursor.value.locations[i].eulery, z: cursor.value.locations[i].eulerz });
+                     // obj.scale.set({x: cursor.value.locations[i].markerObjScale, y: cursor.value.locations[i].markerObjScale, z: cursor.value.locations[i].markerObjScale});
+                     cloudEl.setAttribute("position", {x: cursor.value.locations[i].x, y: cursor.value.locations[i].y, z: cursor.value.locations[i].z });
+                     cloudEl.setAttribute("rotation", {x: cursor.value.locations[i].eulerx, y: cursor.value.locations[i].eulery, z: cursor.value.locations[i].eulerz });
+                     cloudEl.setAttribute("scale", {x: cursor.value.locations[i].markerObjScale, y: cursor.value.locations[i].markerObjScale, z: cursor.value.locations[i].markerObjScale});
+
+
+                  } else {//local-only elements, not saved to cloud yet
+                     let localEl = document.createElement("a-entity");
+                     sceneEl.appendChild(localEl);
+                     // let position = 
+                     localEl.setAttribute("position", {x: cursor.value.locations[i].x, y: cursor.value.locations[i].y, z: cursor.value.locations[i].z });
+                     localEl.setAttribute("rotation", {x: cursor.value.locations[i].eulerx, y: cursor.value.locations[i].eulery, z: cursor.value.locations[i].eulerz });
+                     localEl.setAttribute("scale", {x: cursor.value.locations[i].markerObjScale, y: cursor.value.locations[i].markerObjScale, z: cursor.value.locations[i].markerObjScale});
+                     //hrm, sniff for type and attach appropriate component...
+                     localEl.setAttribute("local_marker", {timestamp: cursor.value.locations[i].timestamp,
+                                                            name: cursor.value.locations[i].name, 
+                                                            tags: cursor.value.locations[i].tags, 
+                                                            eventData: cursor.value.locations[i].eventData, 
+                                                            markerType: cursor.value.locations[i].markerType,
+                                                            position: {x: cursor.value.locations[i].x, y: cursor.value.locations[i].y, z: cursor.value.locations[i].z},
+                                                            rotation: {x: cursor.value.locations[i].eulerx, y: cursor.value.locations[i].eulery, z: cursor.value.locations[i].eulerz },
+                                                            scale: {x: cursor.value.locations[i].markerObjScale, y: cursor.value.locations[i].markerObjScale, z: cursor.value.locations[i].markerObjScale}
+                                                         });
+                     localEl.id = cursor.value.locations[i].timestamp.toString();
+                  }
+                  locationTimestamps.push(cursor.value.locations[i].timestamp); //hrm
+               } 
+               // } else {
+               //    // console.log("no localdata found in IDB");
+               //    // for (let i = 0; i < sceneLocations.locations.length; i++) {
+               //    //     localData.locations.push(sceneLocations.locations[i]);
+               //    // }
+               // }
+               for (let key in cursor.value.settings) {
+                  localData.settings[key] = cursor.value.settings[key]; //TODO apply each one?
+                  // localData.locations[key] = 
+                  // localData[key] = cursor.value[key]; 
+               }
+               cursor.continue(); 
+               
+            } else {
+               console.log("cursor is done...or was empty");
+            }
+         // } else {
+         //    // console.log("query failed!");
+         // }
          transaction.oncomplete = function () {
             db.close();
-            console.log("localdata : " + JSON.stringify(localData));
+            // UpdateSceneLocations();]
+            if (!localData.locations.length) { //copy the cloudData if there was no localdb
+               console.log("copying localData.locations...");
+               for (let i = 0; i < sceneLocations.locations.length; i++) {
+                  localData.locations.push(sceneLocations.locations[i]);
+              }
+            }
+            console.log("COPIED LOCALDATA IS " + JSON.stringify(localData.locations));
           }
       };
+      modQuery.onerror = function () {
+         console.log("no localdata found in IDB, query error");
+         
+      }
       request.oncomplete = function () {
          // db.close(); 
          // UpdateLocationData();
+      }
+   }
+}
+function UpdateSceneLocations () {
+   // console.log("localdata : " + JSON.stringify(localData));
+   for (let i = 0; i < sceneLocations.locations.length; i++) {
+      let ts = locationTimestamps.indexOf(sceneLocations.locations[i].timestamp); //avoid having to doubleloop
+      console.log("checking locIDs " + sceneLocations.locations[i].timestamp + " index " + ts);
+      if (ts != -1) {
+         console.log("updating sceneLocation : " + JSON.stringify(sceneLocations.locations[i]) + " to " + JSON.stringify(localData.locations[ts]));
+         sceneLocations.locations.splice(i, 1, localData.locations[ts]);
+
+         console.log(JSON.stringify(sceneLocations.locations));
       }
    }
 }
@@ -225,8 +289,8 @@ function SaveLocalData() {  //persist mods an alt "~" version of the data
       const lastSceneUpdate = null;
       let scene = {};
       scene.shortID = room + "~"; //with tilde = the local version
-      scene.settings = settings;
-      scene.locations = sceneLocations.locations;
+      scene.settings = localData.settings;
+      scene.locations = localData.locations;
       // scene.locations = JSON.parse(JSON.stringify(sceneLocations.locations));
       scene.lastUpdate = loadTimeStamp;
       console.log("writing localdata " + JSON.stringify(scene));
@@ -234,6 +298,7 @@ function SaveLocalData() {  //persist mods an alt "~" version of the data
       transaction.oncomplete = function () {
         db.close();
         console.log("localdata saved!");
+        hasLocalData = true;
          // InitLocalData();
       };
    };
@@ -818,13 +883,9 @@ function SaveTimekeysToLocal () {
 
 function SaveModToLocal(locationKey) { //locationKey is now just timestamp of the location item, unique enough
    console.log("tryna save mod to local with key " + locationKey);
-
+   hasLocalData = true;
    let locItem = {};
-   for (let i = 0; i < sceneLocations.locations.length; i++) {
-      if (sceneLocations.locations[i].timestamp == locationKey) {
-         locItem = sceneLocations.locations[i];
-      }
-   }
+
    
    // let keySplit = locationKey.split("~");
    locItem.x = document.getElementById('xpos').value;
@@ -856,35 +917,100 @@ function SaveModToLocal(locationKey) { //locationKey is now just timestamp of th
    // }
    console.log("tryna savelocation "+locationKey+"  : " + JSON.stringify(locItem));
    // localStorage.setItem(locationKey, JSON.stringify(locItem));
-
-   
-   let theEl = document.getElementById(locationKey);
+   let hasLocal = false;
+   for (let i = 0; i < localData.locations.length; i++) {
+      console.log("chck : " + localData.locations[i].timestamp.toString() + " vs " +locationKey.toString());
+      if (localData.locations[i].timestamp.toString() == locationKey.toString() ) {
+         console.log("updating existing element "+locationKey+"  : " + JSON.stringify(locItem));
+         localData.locations[i] = Object.assign(locItem);
+         hasLocal = true;
+         SaveLocalData();
+         break;
+      }
+   }
+   let theEl = document.getElementById(locationKey.toString());
    if (theEl != null) {
-      // console.log("found the localstorage EL: " + localStorage.getItem(locationKey));
+      console.log("found the EL: " + locationKey);
       let scale = (locItem.markerObjScale != undefined && locItem.markerObjScale != null && locItem.markerObjScale != "") ? locItem.markerObjScale : 1;
       theEl.setAttribute('position', {x: locItem.x, y: locItem.y, z: locItem.z});
       theEl.setAttribute('rotation', {x: locItem.eulerx, y: locItem.eulery, z: locItem.eulerz});
       theEl.setAttribute('scale', {x: scale, y: scale, z: scale});
-      for (let i = 0; i < sceneLocations.locations.length; i++) {
-         if (locationKey == sceneLocations.locations[i].timestamp) {
-            sceneLocations.locations[i] = Object.assign(locItem); //replace the location item with updated properties
-            localData.locations[i] = Object.assign(locItem); //replace the location item with updated properties, to use if already has local mods
-            SaveLocalData(); //persist to localdb
-         }
-      }
+      // for (let i = 0; i < sceneLocations.locations.length; i++) {
+      //    if (locationKey.toString() == sceneLocations.locations[i].timestamp.toString()) {
+      //       sceneLocations.locations[i] = Object.assign(locItem); //replace the location item with updated properties
+      //       localData.locations[i] = Object.assign(locItem); //replace the location item with updated properties, to use if already has local mods
+      //       SaveLocalData(); //persist to localdb
+      //    }
+      // }
+
    } else {
       console.log("DINT FIND THE EL " + locationKey);
    }
+   // if (!hasLocal) {
+   //    for (let i = 0; i < sceneLocations.locations.length; i++) {
+   //       console.log("chck : " + sceneLocations.locations[i].timestamp.toString() + " vs " +locationKey.toString());
+   //       if (sceneLocations.locations[i].timestamp.toString() == locationKey.toString() ) {
+   //          console.log("updating existing element "+locationKey+"  : " + JSON.stringify(locItem));
+   //          localData.locations[i] = Object.assign(locItem);
+   //          // hasLocal = true;
+   //          SaveLocalData();
+   //          break;
+   //       }
+   //    }
+   // }
    
    // AddLocalMarkers();
    // InitIDB();
    
-   ShowHideDialogPanel();
-   // SceneManglerModal('Locations');
+   // ShowHideDialogPanel();
+   SceneManglerModal('Locations');
 }
 
 function GrabLocation(locationKey) {
    console.log("tryna grablocation : " +locationKey);  
+}
+
+function ToggleTransformLocation (locationKey) {
+   this.transformEl = document.getElementById(locationKey);
+   console.log("tryna transform a location " + locationKey);
+
+   // const transformEl = document.getElementsByClassName("transformControls")[0]; //there should be only one
+   if (transformEl) {
+      console.log("gotsa targetEl to remove transform_control");
+      let transform_controls_component = transformEl.components.transform_controls;
+      if (transform_controls_component) {
+         if (transform_controls_component.data.isAttached) {
+            transform_controls_component.detachTransformControls();
+         } else {
+            transform_controls_component.attachTransformControls();
+         }
+      } else {
+         this.transformEl.setAttribute("transform_controls", "");
+      }
+   }
+}
+function ToggleAllTransformControls () {
+   const moddables = document.getElementsByClassName("moddable");
+   if (!transformAll) {
+      for (var i=0; i<moddables.length; i++) {
+         let transform_controls_component = moddables[i].components.transform_controls;
+         if (transform_controls_component) {
+            transform_controls_component.attachTransformControls();
+         } else {
+            moddables[i].setAttribute("transform_controls", "");
+         }
+      }
+      transformAll = true;
+   } else {
+      for (var i=0; i<moddables.length; i++) {
+         let transform_controls_component = moddables[i].components.transform_controls;
+         if (transform_controls_component) {
+            transform_controls_component.detachTransformControls();
+         } 
+      }
+      transformAll = false;
+   }
+   ShowHideDialogPanel();
 }
 
 function SnapLocation(locationKey) { //snap selected object to player loc
@@ -1073,9 +1199,8 @@ function ReturnLocationTableOLD () { //now it's all in indexedDB
    }
 }
 
-function ReturnLocationTable () { //just show em all now!
-   // console.log("LOCATIONMODS: " + JSON.stringify(sceneLocations.locationMods));
-   // if (sceneLocations.locationMods != null && sceneLocations.locationMods.length > 0) {
+function ReturnLocationTableOLD2 () { //just show em all now!
+
       let tablerows = "";
       for (let i = 0; i < localData.locations.length; i++) {
          let markerString = "";
@@ -1092,14 +1217,41 @@ function ReturnLocationTable () { //just show em all now!
             let namelabel = (localData.locations[i].name != 'undefined' && localData.locations[i].name != undefined && localData.locations[i].name != null) ? localData.locations[i].name : localData.locations[i].label; 
             tablerows = tablerows + "<tr class=\x22clickableRow\x22 onclick=\x22LocationRowClick('"+localData.locations[i].timestamp+"')\x22><td>"+namelabel+"</td>"+
             "<td>"+localData.locations[i].x+","+localData.locations[i].y+","+localData.locations[i].z+"</td><td>"+localData.locations[i].model+"</td><td>"+ markerString+"</td></tr>";
-            // "<td>"+sceneLocations.locationMods[i].phID+"</td><td>"+localString + sceneLocations.locationMods[i].markerType+"</td></tr>";
-            // "<td>"+sceneLocations.locationMods[i].phID+"</td><td>"+markerString+"</td></tr>";
-         // }
       }
       return "<table id=\x22locations\x22><th>label</th><th>position</th><th>Asset</th><th>type</th>"+tablerows+"</table>";
-   // } else {
-   //    return null;
-   // }
+}
+
+function ReturnLocationTable () { //just show em all now!
+
+   let tablerows = "";
+
+   if (!localData.locations.length) {
+     
+      for (let i = 0; i < sceneLocations.locations.length; i++) {
+         let markerString = "";
+         if (sceneLocations.locations[i].isLocal != null && sceneLocations.locations[i].isLocal === true) {
+            markerString = "<span style=\x22color: pink; font-weight: bold;\x22>"+sceneLocations.locations[i].markerType+"</span>";
+         } else {
+            markerString = "<span style=\x22color: lime; font-weight: bold;\x22>"+sceneLocations.locations[i].markerType+"</span>";
+         }        
+         let namelabel = (sceneLocations.locations[i].name != 'undefined' && sceneLocations.locations[i].name != undefined && sceneLocations.locations[i].name != null) ? sceneLocations.locations[i].name : sceneLocations.locations[i].label; 
+         tablerows = tablerows + "<tr class=\x22clickableRow\x22 onclick=\x22LocationRowClick('"+sceneLocations.locations[i].timestamp+"')\x22><td>"+namelabel+"</td>"+
+         "<td>"+sceneLocations.locations[i].x+","+sceneLocations.locations[i].y+","+sceneLocations.locations[i].z+"</td><td>"+sceneLocations.locations[i].model+"</td><td>"+ markerString+"</td></tr>";
+      }
+   } else {
+      for (let i = 0; i < localData.locations.length; i++) {
+         let markerString = "";
+         if (localData.locations[i].isLocal != null && localData.locations[i].isLocal === true) {
+            markerString = "<span style=\x22color: pink; font-weight: bold;\x22>"+localData.locations[i].markerType+"</span>";
+         } else {
+            markerString = "<span style=\x22color: lime; font-weight: bold;\x22>"+localData.locations[i].markerType+"</span>";
+         }        
+         let namelabel = (localData.locations[i].name != 'undefined' && localData.locations[i].name != undefined && localData.locations[i].name != null) ? localData.locations[i].name : localData.locations[i].label; 
+         tablerows = tablerows + "<tr class=\x22clickableRow\x22 onclick=\x22LocationRowClick('"+localData.locations[i].timestamp+"')\x22><td>"+namelabel+"</td>"+
+         "<td>"+localData.locations[i].x+","+localData.locations[i].y+","+localData.locations[i].z+"</td><td>"+localData.locations[i].model+"</td><td>"+ markerString+"</td></tr>";
+      }
+   }
+   return "<table id=\x22locations\x22><th>label</th><th>position</th><th>Asset</th><th>type</th>"+tablerows+"</table>";
 }
 
 function LocationRowClick(data) {
@@ -1363,8 +1515,35 @@ function CreatePlaceholder () {
    let phEl = document.createElement('a-entity');
    var sceneEl = document.querySelector('a-scene');
    phEl.setAttribute('skybox-env-map', '');
-   phEl.setAttribute('local_marker', '');
+   let timestamp = Date.now();
+   timestamp = parseInt(timestamp);
+   let locItem = {};
+   locItem.x = cameraPosition.x.toFixed(2);
+   locItem.eulerx = 0; //maybe get look vector?
+   locItem.y = cameraPosition.y.toFixed(2);
+   locItem.eulery = 0;
+   locItem.z = cameraPosition.z.toFixed(2);
+   locItem.eulerz = 0;
+   locItem.type = "Worldspace";
+   locItem.label = 'local placeholder';
+   locItem.name = "local placeholder";
+   locItem.description = '';
+   locItem.markerType = "placeholder";
+   locItem.eventData = '';
+   locItem.isLocal = true;
+   locItem.timestamp = timestamp;
+   locItem.scale = 1;
+   locItem.tags = '';
+   locItem.phID = timestamp;
+   phEl.setAttribute('position', cameraPosition);
+   phEl.setAttribute('gltf-model', '#poi1');
+   phEl.id = locItem.timestamp;
+
+   // phEl.id 
    sceneEl.appendChild(phEl);
+   phEl.setAttribute('local_marker', 'timestamp', timestamp);
+   localData.locations.push(locItem);
+   SaveLocalData();
    ShowHideDialogPanel();
    
 }
@@ -1481,47 +1660,55 @@ if (sceneEl != null) {
             // this.rEl = null;
             // if (localData != "") {
             for (let i = 0; i < this.data.jsonData.length; i++) {
-               
-               sceneLocations.locations.push(this.data.jsonData[i]);
-               if (this.data.jsonData[i].markerType != undefined) {
-                  if (this.data.jsonData[i].markerType.toLowerCase().includes("youtube")) {
-                     this.data.youtubePosition.x = this.data.jsonData[i].x;
-                     this.data.youtubePosition.y = this.data.jsonData[i].y; 
-                     this.data.youtubePosition.z = this.data.jsonData[i].z;
+               let locItem = this.data.jsonData[i];
+               sceneLocations.locations.push(locItem);
+               // localData.locations.push(locItem);
+               if (locItem.markerType != undefined) {
+                  if (locItem.markerType.toLowerCase().includes("youtube")) {
+                     this.data.youtubePosition.x = locItem.x;
+                     this.data.youtubePosition.y = locItem.y; 
+                     this.data.youtubePosition.z = locItem.z;
                      // console.log("YOTUBE POSOTION: " +JSON.stringify(this.data.youtubePosition));
                   }
-                  if (this.data.jsonData[i].markerType.toLowerCase().includes("poi")) {
+                  if (locItem.markerType.toLowerCase().includes("poi")) {
                      let nextbuttonEl = document.getElementById('nextButton');
                      let prevbuttonEl = document.getElementById('previousButton');
                      nextbuttonEl.style.visibility = "visible";
                      prevbuttonEl.style.visibility = "visible";
-                     poiLocations.push(this.data.jsonData[i]);
+                     poiLocations.push(locItem);
                   }
-                  if (this.data.jsonData[i].markerType.toLowerCase().includes("placeholder") ||
-                     this.data.jsonData[i].markerType.toLowerCase().includes("poi") ||
-                     this.data.jsonData[i].markerType.toLowerCase().includes("gate") || 
-                     this.data.jsonData[i].markerType.toLowerCase().includes("portal") || 
-                     this.data.jsonData[i].markerType.toLowerCase().includes("mailbox") || 
-                     this.data.jsonData[i].markerType.toLowerCase().includes("waypoint")) {
-                     cloudMarkers.push(this.data.jsonData[i]);
+                  if (locItem.markerType.toLowerCase().includes("placeholder") ||
+                     locItem.markerType.toLowerCase().includes("poi") ||
+                     locItem.markerType.toLowerCase().includes("gate") || 
+                     locItem.markerType.toLowerCase().includes("portal") || 
+                     locItem.markerType.toLowerCase().includes("mailbox") || 
+                     locItem.markerType.toLowerCase().includes("waypoint")) {
+                     cloudMarkers.push(locItem);
                   
                   }
             
                }
                if (i == this.data.jsonData.length - 1) {
+                  // for (let key in settings) {
+                  //    localData.settings[key] = settings[key]; //TODO apply each one?
+                  //  }
+                  //  for (let i = 0; i < sceneLocations.locations.length; i++) {
+                  //    localData.locations.push(sceneLocations.locations[i]);
+                  //  }
                   InitIDB();
+
                }
             }
-         
-
             // sceneLocations.locations.push(this.data.jsonData);
             // AddLocalMarkers();
             // InitLocalData();
-
       }, 
       returnYouTubePosition: function() {
          return this.data.youtubePosition;
       },
+      // applyLocalDataToCloudElement: function (locationKey) {
+      //    for 
+      // },
       updateSceneLocationData: function() {
 
          let thedata = JSON.parse(JSON.stringify(localData.locations));

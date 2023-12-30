@@ -1837,16 +1837,19 @@ AFRAME.registerComponent('scatter-surface', {
 
 AFRAME.registerComponent('local_marker', {
   schema: {
-    eventData: {default: ''},
+    // eventData: {default: ''},
     selectedAxis: {default: 'all'},
     timestamp: {default: ''},
-    name: {default: 'localplaceholder'},
+    name: {default: 'local placeholder'},
     description: {default: ''},
     markerType: {default: 'placeholder'},
     eventData: {default: ''},
     isLocal: {default: true},
     isSelected: {default: false},
-    tags: {default: ''}
+    tags: {default: ''},
+    position: {default: ''},
+    rotation: {default: ''},
+    scale: {default: ''}
 
   },
   init: function () {
@@ -1910,83 +1913,114 @@ AFRAME.registerComponent('local_marker', {
     let theElement = this.el;
     // this.el.setAttribute('skybox-env-map');
     // 
-      this.phID = room + '~localmarker~' + this.timestamp; //"placeholder" id, for client side location mods
+    this.el.classList.add("moddable");
+      this.phID = this.timestamp; //"placeholder" id, for client side location mods
       this.el.id = this.phID;
       // this.el.addEventListener('model-loaded', () => {
       // console.log("looking for localplaceholder " + localStorage.getItem(this.phID));
-      this.storedVars = JSON.parse(localStorage.getItem(this.phID));
-        if (this.storedVars != null) {
-          if (this.storedVars.model == null || this.storedVars.model == undefined || this.storedVars.model == "none" || this.storedVars.model == "") {
-            console.log(this.phID + " storedVars " + JSON.stringify(this.storedVars));
-            if (this.storedVars.markerType.toLowerCase() == "placeholder") {
-              this.el.setAttribute('gltf-model', '#placeholder');
-            } else if (this.storedVars.markerType.toLowerCase() == "poi") {
-              this.el.setAttribute('gltf-model', '#poi1');
-            } else if (this.storedVars.markerType.toLowerCase() == "gate") {
-              this.el.setAttribute('gltf-model', '#poi1');
-            } else if (this.storedVars.markerType.toLowerCase() == "portal") {
-              this.el.setAttribute('gltf-model', '#poi1');
-            }
-             else if (this.storedVars.markerType.toLowerCase().includes("trigger")) {
-              this.el.setAttribute('gltf-model', '#poi1');  
-            } else if (this.storedVars.markerType.toLowerCase() == "mailbox") {
-              this.el.setAttribute('gltf-model', '#mailbox');
-            }
-            this.el.setAttribute('position', {x: this.storedVars.x, y: this.storedVars.y, z: this.storedVars.z});
-            this.el.setAttribute('rotation', {x: this.storedVars.eulerx, y: this.storedVars.eulery, z: this.storedVars.eulerz});
-            this.el.setAttribute('scale', {x: this.storedVars.scale, y: this.storedVars.scale, z: this.storedVars.scale });
-            // this.el.setAttribute('rotation', this.storedVars.eulerx+","+this.storedVars.eulery+","+this.storedVars.eulerz );
-          } else {
-            // console.log("sceneModels " + JSON.stringify(sceneModels));
-            for (let i = 0; i < sceneModels.length; i++) {
-              // console.log("sceneModel ID " + sceneModels[i]._id + " vs " + this.storedVars.modelID);
-              if (sceneModels[i]._id == this.storedVars.modelID) {
-                this.el.setAttribute('gltf-model', sceneModels[i].url);
-                this.el.setAttribute('position', {x: this.storedVars.x, y: this.storedVars.y, z: this.storedVars.z});
-                this.el.setAttribute('rotation', {x: this.storedVars.eulerx, y: this.storedVars.eulery, z: this.storedVars.eulerz});
-                this.el.setAttribute('scale', {x: this.storedVars.scale, y: this.storedVars.scale, z: this.storedVars.scale });
-              }
-            }
-          }
-        } else {
+      // this.storedVars = JSON.parse(localStorage.getItem(this.phID));
+      //   if (this.storedVars != null) {
+      //     if (this.storedVars.model == null || this.storedVars.model == undefined || this.storedVars.model == "none" || this.storedVars.model == "") {
+      //       console.log(this.phID + " storedVars " + JSON.stringify(this.storedVars));
+      //       if (this.storedVars.markerType.toLowerCase() == "placeholder") {
+      //         this.el.setAttribute('gltf-model', '#placeholder');
+      //       } else if (this.storedVars.markerType.toLowerCase() == "poi") {
+      //         this.el.setAttribute('gltf-model', '#poi1');
+      //       } else if (this.storedVars.markerType.toLowerCase() == "gate") {
+      //         this.el.setAttribute('gltf-model', '#poi1');
+      //       } else if (this.storedVars.markerType.toLowerCase() == "portal") {
+      //         this.el.setAttribute('gltf-model', '#poi1');
+      //       }
+      //        else if (this.storedVars.markerType.toLowerCase().includes("trigger")) {
+      //         this.el.setAttribute('gltf-model', '#poi1');  
+      //       } else if (this.storedVars.markerType.toLowerCase() == "mailbox") {
+      //         this.el.setAttribute('gltf-model', '#mailbox');
+      //       }
+      //       this.el.setAttribute('position', {x: this.storedVars.x, y: this.storedVars.y, z: this.storedVars.z});
+      //       this.el.setAttribute('rotation', {x: this.storedVars.eulerx, y: this.storedVars.eulery, z: this.storedVars.eulerz});
+      //       this.el.setAttribute('scale', {x: this.storedVars.scale, y: this.storedVars.scale, z: this.storedVars.scale });
+      //       // this.el.setAttribute('rotation', this.storedVars.eulerx+","+this.storedVars.eulery+","+this.storedVars.eulerz );
+      //     } else {
+      //       // console.log("sceneModels " + JSON.stringify(sceneModels));
+      //       for (let i = 0; i < sceneModels.length; i++) {
+      //         // console.log("sceneModel ID " + sceneModels[i]._id + " vs " + this.storedVars.modelID);
+      //         if (sceneModels[i]._id == this.storedVars.modelID) {
+      //           this.el.setAttribute('gltf-model', sceneModels[i].url);
+      //           this.el.setAttribute('position', {x: this.storedVars.x, y: this.storedVars.y, z: this.storedVars.z});
+      //           this.el.setAttribute('rotation', {x: this.storedVars.eulerx, y: this.storedVars.eulery, z: this.storedVars.eulerz});
+      //           this.el.setAttribute('scale', {x: this.storedVars.scale, y: this.storedVars.scale, z: this.storedVars.scale });
+      //         }
+      //       }
+      //     }
+      //   } else {
           //save to local if new
-          
-          let locItem = {};
-          locItem.x = cameraPosition.x.toFixed(2);
-          locItem.eulerx = 0; //maybe get look vector?
-          locItem.y = cameraPosition.y.toFixed(2);
-          locItem.eulery = 0;
-          locItem.z = cameraPosition.z.toFixed(2);
-          locItem.eulerz = 0;
-          locItem.type = "Worldspace";
-          locItem.label = 'local placeholder';
-          locItem.name = 'local placeholder ' + this.timestamp;
-          locItem.description = '';
-          locItem.markerType = "placeholder";
-          locItem.eventData = '';
-          locItem.isLocal = true;
-          locItem.timestamp = this.timestamp;
-          locItem.scale = 1;
-          locItem.tags = '';
-          locItem.phID = this.timestamp;
-          this.el.setAttribute('position', cameraPosition);
-          this.el.setAttribute('gltf-model', '#placeholder');
-          this.el.id = locItem.timestamp;
-          console.log("tryna set localmarker with phID " + this.timestamp);
-          sceneLocations.locations.push(locItem);
-          SaveLocalData();
+          if (this.data.position == '') {
+            // let locItem = {};
+            // locItem.x = cameraPosition.x.toFixed(2);
+            // locItem.eulerx = 0; //maybe get look vector?
+            // locItem.y = cameraPosition.y.toFixed(2);
+            // locItem.eulery = 0;
+            // locItem.z = cameraPosition.z.toFixed(2);
+            // locItem.eulerz = 0;
+            // locItem.type = "Worldspace";
+            // locItem.label = 'local placeholder';
+            // locItem.name = this.data.name;
+            // locItem.description = '';
+            // locItem.markerType = "placeholder";
+            // locItem.eventData = '';
+            // locItem.isLocal = true;
+            // locItem.timestamp = this.timestamp;
+            // locItem.scale = 1;
+            // locItem.tags = '';
+            // locItem.phID = this.timestamp;
+            this.el.setAttribute('position', cameraPosition);
+            this.el.setAttribute('gltf-model', '#poi1');
+            this.el.id = this.timestamp;
+            console.log("tryna set localmarker with phID " + this.timestamp);
+          } else {
+            // let locItem = {};
+            // locItem.x = this.data.position.x;
+            // locItem.eulerx = this.data.rotation.eulerx; //maybe get look vector?
+            // locItem.y = this.data.position.y;
+            // locItem.eulery = this.data.rotation.eulery;
+            // locItem.z = this.data.position.z;
+            // locItem.eulerz = this.data.rotation.eulerz;
+            // locItem.type = "Worldspace";
+            // locItem.label = 'local placeholder';
+            // locItem.name = this.data.name;
+            // locItem.description = '';
+            // locItem.markerType = this.data.markerType;
+            // locItem.eventData = this.data.eventData;
+            // locItem.isLocal = true;
+            // locItem.timestamp = this.data.timestamp;
+            // locItem.scale = 1;
+            // locItem.tags = '';
+            // locItem.phID = this.data.timestamp;
+            this.el.setAttribute('position', this.data.position);
+            this.el.setAttribute('rotation', this.data.rotation);
+            this.el.setAttribute('scale', this.data.scale);
+            this.el.setAttribute('gltf-model', '#poi1');
+            
+            this.el.id = this.data.timestamp;
+            console.log("tryna set localmarker with phID " + this.timestamp);
+          }
+          // sceneLocations.locations.push(locItem);
+          // localData.locations.push(locItem);
+          // SaveLocalData();
+          // this.el.classList.add("moddable");
+
           // localStorage.setItem(this.phID, JSON.stringify(locItem));
           // AddLocalMarkers();
-        }
+        // }
     // });
     this.calloutToggle = false;
     let that = this;
     // that.calloutEntity = this.calloutEntity;
     // that.calloutText = this.calloutText;
-    // this.el.addEventListener("model-loaded", (e) => {
-    //   e.preventDefault();
-    //   this.el.setAttribute("aabb_listener", true);
-    // });
+    this.el.addEventListener("model-loaded", (e) => {
+      e.preventDefault();
+      // this.el.setAttribute("transform_controls", ""); //check for tag?
+    });
     this.el.addEventListener('mouseenter', function (evt) {
       if (posRotReader != null) {
         this.playerPosRot = posRotReader.returnPosRot(); 
@@ -2003,7 +2037,7 @@ AFRAME.registerComponent('local_marker', {
         // document.getElementById("player").component.get_pos_rot.returnPosRot();
         this.clientX = evt.clientX;
         this.clientY = evt.clientY;
-        // console.log("tryna mouseover placeholder");
+        console.log("tryna mouseover placeholder");
         that.calloutToggle = !that.calloutToggle;
 
         let pos = evt.detail.intersection.point; //hitpoint on model
@@ -2177,7 +2211,7 @@ AFRAME.registerComponent('local_marker', {
       }
     } else { //if "none"
 
-      this.el.setAttribute("gltf-model", "https://servicemedia.s3.amazonaws.com/assets/models/placeholder.glb");
+      this.el.setAttribute("gltf-model", "#poi1");
     }
   },
   deselect: function () {
@@ -2288,7 +2322,7 @@ AFRAME.registerComponent('cloud_marker', {
       
       this.phID = this.data.phID;
       console.log("cloudmarker phID " + this.phID); 
-
+      this.el.classList.add("moddable");
       // if (this.data.model == null || this.data.model == '') {
       //   if (this.data.markerType.toLowerCase() == "mailbox") {
       //     this.el.setAttribute('gltf-model', '#mailbox');
@@ -2406,7 +2440,7 @@ AFRAME.registerComponent('cloud_marker', {
         console.log("this.data " + JSON.stringify(this.data));
         if (this.data.modelID == null || this.data.modelID == undefined || this.data.model == "" || this.data.model == "none" || this.data.model == "undefined") {
           if (this.data.markerType.toLowerCase() == "placeholder") {
-              this.el.setAttribute('gltf-model', '#savedplaceholder');
+              this.el.setAttribute('gltf-model', '#poi1');
             } else if (this.data.markerType.toLowerCase() == "poi") {
               this.el.setAttribute('gltf-model', '#poi1');
             } else if (this.data.markerType.toLowerCase().includes("trigger")) {
@@ -2890,14 +2924,15 @@ AFRAME.registerComponent('particle_spawner',
     
     if (parentID != null) { 
       let pparent = document.getElementById(parentID);
-      let obj = pparent.object3D;
-      let box = new THREE.Box3().setFromObject(obj); //bounding box for position
-      let center = new THREE.Vector3();
-      box.getCenter(center);
-      let pos =  obj.worldToLocal(center);
-      console.log("premod pos " + JSON.stringify(pos));
+          // let obj = pparent.object3D;
+          // let box = new THREE.Box3().setFromObject(obj); //bounding box for position
+          // let center = new THREE.Vector3();
+          // box.getCenter(center);
+          // let pos =  obj.worldToLocal(center);
+          let pos = new THREE.Vector3(0, 0, 0);
+          // console.log("premod pos " + JSON.stringify(pos));
       pparent.appendChild(this.particle);
-      this.particle.setAttribute("position", JSON.stringify(pos));
+      // this.particle.setAttribute("position", JSON.stringify(pos));
 
       if (yFudge != null) {
         let newPos = {};
@@ -2985,10 +3020,10 @@ AFRAME.registerComponent('mod_particles', {
     if (this.data.type.toLowerCase() =="candle") { //need to embed a location (light obj or empty named light), or find center point
       // this.el.setAttribute('scale', '.25 .25 .25');
       this.el.setAttribute('sprite-particles', {enable: true, texture: '#candle1', color: this.data.color, textureFrame: '8 8', textureLoop: '4', spawnRate: '1', lifeTime: '1', scale: this.data.scale.toString()});
-      this.el.setAttribute('light', {type: 'point', castShadow: true, color: this.data.color, intensity: 1, distance: 8, decay: 1});
-      this.lightAnimation(.5, 1);
+      this.el.setAttribute('light', {type: 'point', castShadow: true, color: this.data.color, intensity: 4, distance: 16, decay: 1});
+      this.lightAnimation(1.5, 2);
       this.el.addEventListener('animationcomplete', () => {
-          this.lightAnimation(.5, 1);
+          this.lightAnimation(1.5, 2);
       });
 
     }
@@ -4615,11 +4650,15 @@ AFRAME.registerComponent('load_threesvg', {
   });
 
   AFRAME.registerComponent('transform_controls', {
+    schema: {
+      isAttached: {default: true}
+    },
     init: function() {
-      let control = new TransformControls(this.el.sceneEl.camera, this.el.sceneEl);
-      control.attach(this.el.getObject3D('mesh'));
+      console.log("tryna attach transform controls to el " + this.el.id );
+      this.control = new TransformControls(this.el.sceneEl.camera, this.el.sceneEl);
+      this.control.attach(this.el.getObject3D('mesh'));
       // this.el.sceneEl.add();
-      this.el.sceneEl.object3D.add( control);
+      this.el.sceneEl.object3D.add( this.control);
       this.object = this.el.getObject3D("mesh");
       let that = this;
       this.position = new THREE.Vector3();
@@ -4639,7 +4678,7 @@ AFRAME.registerComponent('load_threesvg', {
       // }
       // this.mod_model_component = this.el.components.mod_model;
       // this.mod_object_component = this.el.components.mod_object
-      // control.addEventListener('objectChanged',  ( event ) => {
+      // this.control.addEventListener('objectChanged',  ( event ) => {
       //   // this.el.getAttribute("position")
       //   // console.log(this.el.getAttribute("position"));
       //   this.object.getWorldPosition(this.position);
@@ -4647,11 +4686,12 @@ AFRAME.registerComponent('load_threesvg', {
       //   // console.log(this.position);
       //   // this.el.getObject3D('mesh').position
       // });
-      // control.addEventListener('change',  ( event ) => { 
-      //   control.object.position.clamp(this.minMove, this.maxMove);
-      //   control.object.scale.clamp(this.minScale, this.maxScale);
+      // this.control.addEventListener('change',  ( event ) => { 
+      //   this.control.object.position.clamp(this.minMove, this.maxMove);
+      //   this.control.object.scale.clamp(this.minScale, this.maxScale);
       // });
-      control.addEventListener('mouseUp',  ( event ) => {
+      this.el.classList.add("transformControls");
+      this.control.addEventListener('mouseUp',  ( event ) => {
         // this.el.getAttribute("position")
         // console.log(this.el.getAttribute("position"));
         this.object.getWorldPosition(this.position);
@@ -4675,45 +4715,80 @@ AFRAME.registerComponent('load_threesvg', {
         // if (this.rotation.z == 180 || this.rotation.z == -180) {
         //   this.rotation.z = 0;
         // } 
-        for (let i = 0; i < sceneLocations.locations.length; i++) {
-          if (this.el.id == sceneLocations.locations[i].timestamp) {  
-            sceneLocations.locations[i].x = this.position.x.toFixed(2);
-            sceneLocations.locations[i].y = this.position.y.toFixed(2);
-            sceneLocations.locations[i].z = this.position.z.toFixed(2);
-            sceneLocations.locations[i].eulerx = this.rotation.x.toFixed(2);
-            sceneLocations.locations[i].eulery = this.rotation.y.toFixed(2);
-            sceneLocations.locations[i].eulerz = this.rotation.z.toFixed(2);
-            sceneLocations.locations[i].markerObjScale = this.scale.x.toFixed(2);
-            SaveLocalData();
-            break;
+        if (localData.locations.length > 0) { //no local changes yet
+          for (let i = 0; i < localData.locations.length; i++) {
+            if (this.el.id == localData.locations[i].timestamp) {  
+              localData.locations[i].x = this.position.x.toFixed(2);
+              localData.locations[i].y = this.position.y.toFixed(2);
+              localData.locations[i].z = this.position.z.toFixed(2);
+              localData.locations[i].eulerx = this.rotation.x.toFixed(2);
+              localData.locations[i].eulery = this.rotation.y.toFixed(2);
+              localData.locations[i].eulerz = this.rotation.z.toFixed(2);
+              localData.locations[i].markerObjScale = this.scale.x.toFixed(2);
+              SaveLocalData();
+              break;
+            }
           }
+        } else {
+          ///init localData if empty...
+          // for (let key in settings) {
+          //   localData.settings[key] = settings[key]; //TODO apply each one?
+          // }
+          // for (let i = 0; i < sceneLocations.locations.length; i++) {
+          //   localData.locations.push(sceneLocations.locations[i]);
+          // }
+          // let loc = {};
+          // loc.x = this.position.x.toFixed(2);
+          // loc.y = this.position.y.toFixed(2);
+          // loc.z = this.position.z.toFixed(2);
+          // loc.eulerx = this.rotation.x.toFixed(2);
+          // loc.eulery = this.rotation.y.toFixed(2);
+          // loc.eulerz = this.rotation.z.toFixed(2);
+          // loc.markerObjScale = this.scale.x.toFixed(2);
+          // loc.timestamp = this.el.id;
+          // localData.locations.push(loc);
+          for (let i = 0; i < sceneLocations.locations.length; i++) {
+            if (this.el.id == sceneLocations.locations[i].timestamp) {  
+              sceneLocations.locations[i].x = this.position.x.toFixed(2);
+              sceneLocations.locations[i].y = this.position.y.toFixed(2);
+              sceneLocations.locations[i].z = this.position.z.toFixed(2);
+              sceneLocations.locations[i].eulerx = this.rotation.x.toFixed(2);
+              sceneLocations.locations[i].eulery = this.rotation.y.toFixed(2);
+              sceneLocations.locations[i].eulerz = this.rotation.z.toFixed(2);
+              sceneLocations.locations[i].markerObjScale = this.scale.x.toFixed(2);
+              SaveLocalData();
+              break;
+            }
+          }
+          SaveLocalData();
+          
         }
 
       });
-      window.addEventListener( 'keydown', function ( event ) {
+      window.addEventListener( 'keydown',  ( event ) => {
 
         switch ( event.keyCode ) {
 
           case 81: // Q
-            control.setSpace( control.space === 'local' ? 'world' : 'local' );
+            this.control.setSpace( this.control.space === 'local' ? 'world' : 'local' );
             break;
 
           case 16: // Shift
-            control.setTranslationSnap( 100 );
-            control.setRotationSnap( THREE.MathUtils.degToRad( 15 ) );
-            control.setScaleSnap( 0.25 );
+            this.control.setTranslationSnap( 100 );
+            this.control.setRotationSnap( THREE.MathUtils.degToRad( 15 ) );
+            this.control.setScaleSnap( 0.25 );
             break;
 
           case 87: // W
-            control.setMode( 'translate' );
+            this.control.setMode( 'translate' );
             break;
 
           case 69: // E
-            control.setMode( 'rotate' );
+            this.control.setMode( 'rotate' );
             break;
 
           case 82: // R
-            control.setMode( 'scale' );
+            this.control.setMode( 'scale' );
             break;
 
           case 67: // C
@@ -4723,7 +4798,7 @@ AFRAME.registerComponent('load_threesvg', {
             currentCamera.position.copy( position );
 
             orbit.object = currentCamera;
-            control.camera = currentCamera;
+            this.control.camera = currentCamera;
 
             currentCamera.lookAt( orbit.target.x, orbit.target.y, orbit.target.z );
             onWindowResize();
@@ -4744,51 +4819,61 @@ AFRAME.registerComponent('load_threesvg', {
 
           case 187:
           case 107: // +, =, num+
-            control.setSize( control.size + 0.1 );
+            this.control.setSize( this.control.size + 0.1 );
             break;
 
           case 189:
           case 109: // -, _, num-
-            control.setSize( Math.max( control.size - 0.1, 0.1 ) );
+            this.control.setSize( Math.max( this.control.size - 0.1, 0.1 ) );
             break;
 
           case 88: // X
-            control.showX = ! control.showX;
+            this.control.showX = ! this.control.showX;
             break;
 
           case 89: // Y
-            control.showY = ! control.showY;
+            this.control.showY = ! this.control.showY;
             break;
 
           case 90: // Z
-            control.showZ = ! control.showZ;
+            this.control.showZ = ! this.control.showZ;
             break;
 
           case 32: // Spacebar
-            control.enabled = ! control.enabled;
+            this.control.enabled = ! this.control.enabled;
             break;
 
           case 27: // Esc
-            control.reset();
+            this.control.reset();
             break;
 
         }
 
       } );
 
-      window.addEventListener( 'keyup', function ( event ) {
+      window.addEventListener( 'keyup', ( event ) => {
 
         switch ( event.keyCode ) {
 
           case 16: // Shift
-            control.setTranslationSnap( null );
-            control.setRotationSnap( null );
-            control.setScaleSnap( null );
+            this.control.setTranslationSnap( null );
+            this.control.setRotationSnap( null );
+            this.control.setScaleSnap( null );
             break;
 
         }
 
       } );
+    },
+    detachTransformControls: function () {
+      console.log("tryna detach controls...");
+      this.control.detach();
+      this.data.isAttached = false;
+    },
+    attachTransformControls: function () {
+      console.log("tryna attach controls...");
+      this.control.attach(this.object);
+      this.data.isAttached = true;
     }
   });
   AFRAME.registerComponent('loadcanvas', {

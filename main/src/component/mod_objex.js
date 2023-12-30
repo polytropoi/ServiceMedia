@@ -73,7 +73,8 @@ AFRAME.registerComponent('mod_objex', {
                     let objEl = document.createElement("a-entity");
                     //set mod_object component:
                     objEl.setAttribute("mod_object", {'eventData': this.data.jsonLocationsData[i].eventData, 'locationData': this.data.jsonLocationsData[i], 'objectData': this.data.jsonObjectData[k]});
-                    objEl.id = "obj" + this.data.jsonLocationsData[i].objectID + "_" + this.data.jsonLocationsData[i].timestamp;
+                    // objEl.id = "obj" + this.data.jsonLocationsData[i].objectID + "_" + this.data.jsonLocationsData[i].timestamp;
+                    objEl.id = this.data.jsonLocationsData[i].timestamp; //only timestamp so locpickers can find it...other objtypes aren't moddable, i.e. spawned at runtime
                     this.el.sceneEl.appendChild(objEl);
                   }
                 }
@@ -250,6 +251,7 @@ AFRAME.registerComponent('mod_objex', {
         this.locData.timestamp = Date.now();
         this.objEl.setAttribute("mod_object", {'eventData': null, 'locationData': this.locData, 'objectData': this.objectData, 'isEquipped': true, 'isSpawned': true});
         this.objEl.id = "obj" + this.objectData._id + "_" + this.locData.timestamp;
+        
         this.objEl.classList.add('equipped');
         
         this.objEl.classList.add('activeObjexRay');
@@ -267,7 +269,8 @@ AFRAME.registerComponent('mod_objex', {
         this.locData.z = this.dropPos.z;
         this.locData.timestamp = Date.now();
         this.objEl.setAttribute("mod_object", {'eventData': null, 'locationData': this.locData, 'objectData': this.objectData});
-        this.objEl.id = "obj" + this.objectData._id + "_" + this.locData.timestamp;
+        // this.objEl.id = "obj" + this.objectData._id + "_" + this.locData.timestamp;
+        this.objEl.id = this.locData.timestamp;
         sceneEl.appendChild(this.objEl);
         // this.objEl.components.mod_object.applyForce();
   
@@ -544,7 +547,7 @@ AFRAME.registerComponent('mod_object', {
         
       }
       
-  
+      this.el.classList.add("moddable");
       this.el.setAttribute("shadow", {cast:true, receive:true});
   
       this.thirdPersonPlaceholder = null;
@@ -956,7 +959,8 @@ AFRAME.registerComponent('mod_object', {
             // }
   
             if (this.data.eventData.toLowerCase().includes("target")) {
-              this.el.id = "target_object";
+              // this.el.id = "target_object";
+              this.el.classList.add("target_object");
             }
             if (this.data.eventData.toLowerCase().includes("transparent")) {
               console.log("tryna set transparent");
@@ -1468,7 +1472,6 @@ AFRAME.registerComponent('mod_object', {
                             FetchSceneInventoryObject(targetModObjComponent.data.objectData.actions[i].objectID);
                           }
                         }
-   
                       }
                     }
                   }

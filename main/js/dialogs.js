@@ -65,10 +65,11 @@ let showCurves = false;
 
   $('#modalContent').on('change', '#locationModel', function(e) { //value has phID ~ modelID  
 
-      let locSplit = e.target.value.split("~"); 
-      console.log("locSplit modelID : " + locSplit[1]);
-
-      if (locSplit[1] != "" && locSplit[1] != "" && locSplit[1] != "none") { //model id
+    let locSplit = e.target.value.split("~"); 
+    console.log("locSplit modelID : " + locSplit[1]);
+    let placeholderEl = document.getElementById(locSplit[0]);
+    if (placeholderEl) {
+      if (placeHolderEl &&locSplit[1] != "" && locSplit[1] != "" && locSplit[1] != "none") { //model id
         for (let i = 0; i < sceneModels.length; i++) {
           console.log(sceneModels[i]._id + " vs " + locSplit[1]);
           if (sceneModels[i]._id == locSplit[1]) {
@@ -79,10 +80,10 @@ let showCurves = false;
             // if (locItem.scale == null || locItem.scale == undefined || locItem.scale == "") {
             //   locItem.scale = 1;
             // }
-            console.log(JSON.stringify(locItem));
+            // console.log(JSON.stringify(locItem));
 
 
-            console.log("placeholderEl" +placeholderEl); //also look up mod_model and mod_object
+            // console.log("placeholderEl" +placeholderEl); //also look up mod_model and mod_object
             let phComponent = placeholderEl.components.cloud_marker;
             if (phComponent == null) {
               phComponent = placeholderEl.components.local_marker;
@@ -90,10 +91,10 @@ let showCurves = false;
             if (phComponent != null) {
               phComponent.loadModel(sceneModels[i]._id);
             }
-            SaveModToLocal(locSplit[0]+"~"+locSplit[1]+"~"+locSplit[2]);//no, needs to pass it or alt method...
+            // SaveModToLocal(locSplit[0]);//no, needs to pass it or alt method...
           }
         } 
-       
+      
       } else {
         let placeholderEl = document.getElementById(locSplit[0]);
         let phComponent = placeholderEl.components.cloud_marker;
@@ -104,6 +105,7 @@ let showCurves = false;
           phComponent.loadModel();
         }
       }
+    }
   });
 
   $('#modalContent').on('change', '#locationObject', function(e) { //value has phID ~ objectID  (room~type~timestamp~objectID) //no, now just timestamp~objectID
@@ -653,20 +655,29 @@ function ShowLocationModal(timestamp) {
       // let thisLocationString = localStorage.getItem(phID);
 
       // console.log(thisLocationString);
+      // let theData = {};
+      // if (hasLocalData) {
+      //    theData = localData;
+      // } else {
+      //    theData = sceneLocations;
+      // }
+    console.log("local length " + localData.locations.length + " vs cloud length " + sceneLocations.locations.length);
     if (localData.locations.length) {
-      console.log("looking for localData.locations");
+      console.log("looking for localdata.locations");
       for (let i = 0; i < localData.locations.length; i++) {
         console.log(timestamp + " vs " + localData.locations[i].timestamp);
         if (timestamp == localData.locations[i].timestamp) {
           thisLocation = localData.locations[i];
-          console.log("gotsa location@! " + localData.locations[i].markerType);
+          console.log("gotsa local location@! " + localData.locations[i].markerType);
           break;
         }
       }
     } else {
       for (let i = 0; i < sceneLocations.locations.length; i++) {
+        console.log(timestamp + " vs " + sceneLocations.locations[i].timestamp);
         if (timestamp == sceneLocations.locations[i].timestamp) {
           thisLocation = sceneLocations.locations[i];
+          console.log("gotsa cloud location@! " + sceneLocations.locations[i].markerType);
           break;
         }
       }
@@ -701,8 +712,8 @@ function ShowLocationModal(timestamp) {
         // "<form>"+aa
         // "<table><tr>"
         "<div class=\x22row\x22>"+
-        "<button class=\x22snapButton\x22 style=\x22float:left;\x22 onclick=\x22SnapLocation('"+phID+"')\x22>Snap To Player</button>"+
-        "<button class=\x22grabButton\x22 style=\x22float:left;\x22 onclick=\x22GrabLocation('"+phID+"')\x22>Transform</button>"+
+        // "<button class=\x22snapButton\x22 style=\x22float:left;\x22 onclick=\x22SnapLocation('"+phID+"')\x22>Snap To Player</button>"+
+        "<button class=\x22grabButton\x22 style=\x22float:left;\x22 onclick=\x22ToggleTransformLocation('"+phID+"')\x22>Toggle Transform Controls</button>"+
         // "<button class=\x22goToButton\x22 style=\x22float:left;\x22 onclick=\x22GoToLocation('"+phID+"')\x22>GoTo</button>"+
         "<button class=\x22goToButton\x22 style=\x22float:left;\x22 onclick=\x22PlayerToLocation('"+thisLocation.x+ " " + thisLocation.y + " " + thisLocation.z +"')\x22>GoTo</button>"+
         // "<button class=\x22goToButton\x22 onclick=\x22PlayerToLocation('"+phID+"')\x22>GoTo</button>"+
@@ -1475,7 +1486,7 @@ function SceneManglerModal(mode) {
     "<div "+toolsDisplay+" id=\x22Tools\x22 class=\x22modalMain tabcontent\x22>"+
     // "<div class=\x22\x22>"+
     "<div class=\x22row\x22>"+
-    oculusButton +
+    // oculusButton +
       // "<button class=\x22saveButton\x22 id=\x22exportButton\x22 onclick=\x22ExportMods()\x22>Export Mods</button>"+
       // "<label for=\x22file-upload\x22 class=\x22custom-file-upload\x22>Import Mods</label>"+
       // "<input type=\x22file\x22 id=\x22file-upload\x22 accept=\x22.txt\x22 onchange=\x22ImportMods(event)\x22></input>"+
@@ -1493,8 +1504,8 @@ function SceneManglerModal(mode) {
     "<button style=\x22float: left;\x22 class=\x22saveButton\x22 id=\x22exportButton\x22 onclick=\x22ExportMods()\x22>Export Mods</button>"+
     "<label style=\x22float: left;\x22 for=\x22file-upload\x22 class=\x22custom-file-upload\x22>Import Mods</label>"+
     "<input type=\x22file\x22 id=\x22file-upload\x22 accept=\x22.txt\x22 onchange=\x22ImportMods(event)\x22></input>"+
-    "<button class=\x22deleteButton\x22 id=\x22ClearAllPlaceholdersButton\x22 onclick=\x22ClearPlaceholders()\x22>Clear All Mods</button>" +
-    "<button class=\x22deleteButton\x22 id=\x22ClearAllPlaceholdersButton\x22 onclick=\x22DeleteLocalSceneData()\x22>Clear Current Scene Mods</button>"+
+    // "<button class=\x22deleteButton\x22 id=\x22ClearAllPlaceholdersButton\x22 onclick=\x22ClearPlaceholders()\x22>Clear All Mods</button>" +
+    "<button class=\x22deleteButton\x22 id=\x22ClearAllPlaceholdersButton\x22 onclick=\x22DeleteLocalSceneData()\x22>Clear Scene Mods</button>"+
     ownerButton +
       // "<div class=\x22twocolumn\x22><label for=\x22addpic\x22>Add Picture Asset</label><button class=\x22addButton\x22 id=\x22AddPicButton\x22 onclick=\x22AddPicture()\x22>Add</button>"+
       // "<button class=\x22uploadButton\x22 id=\x22UpoadPicButton\x22 onclick=\x22UploadPicture()\x22>Upload</button>"+
@@ -1532,7 +1543,8 @@ function SceneManglerModal(mode) {
     "<button class=\x22goToButton\x22 id=\x22nextButton\x22 onclick=\x22GoToNext()\x22>GoTo Next</button>"+
     "<button class=\x22goToButton\x22 id=\x22prevButton\x22 onclick=\x22GoToPrevious()\x22>GoTo Previous</button>"+
     ReturnCurrentPlayerLocation() +
-      "<button style=\x22float:left\x22 class=\x22saveButton\x22 id=\x22CreatePlaceholderButton\x22 onclick=\x22CreatePlaceholder()\x22>New Local Placeholder</button>"+
+      "<button style=\x22float:left\x22 class=\x22saveButton\x22 id=\x22CreatePlaceholderButton\x22 onclick=\x22CreatePlaceholder()\x22>New Location</button>"+
+      "<button style=\x22float:left\x22 class=\x22snapButton\x22 id=\x22CreatePlaceholderButton\x22 onclick=\x22ToggleAllTransformControls()\x22>Toggle All Transform Controls</button>"+
       "<br><br><br><div>"+locationTable+"</div><br>"+
     "</div>"+     
 

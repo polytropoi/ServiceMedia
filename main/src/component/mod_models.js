@@ -103,7 +103,8 @@ AFRAME.registerComponent('mod_model', {
           
         }
   
-  
+        this.el.classList.add("moddable");
+        
         this.el.addEventListener('beatme', e => console.log("beat"));
         this.isInitialized = false; //to prevent model-loaded from retriggering when childrens are added to this parent
   
@@ -199,7 +200,8 @@ AFRAME.registerComponent('mod_model', {
           }
           if (this.data.eventData.toLowerCase().includes("transform")) { 
 
-              this.el.setAttribute("transform_controls", "");  
+              this.el.setAttribute("transform_controls", "");
+              this.el.classList.add("transform");  
 
           }
           if (this.data.eventData.includes("scatter")) {
