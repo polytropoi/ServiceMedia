@@ -159,6 +159,7 @@ function InitIDB() {
                      localEl.setAttribute("rotation", {x: cursor.value.locations[i].eulerx, y: cursor.value.locations[i].eulery, z: cursor.value.locations[i].eulerz });
                      localEl.setAttribute("scale", {x: cursor.value.locations[i].markerObjScale, y: cursor.value.locations[i].markerObjScale, z: cursor.value.locations[i].markerObjScale});
                      //hrm, sniff for type and attach appropriate component...
+                     // if (cursor.value.locations[i].markerType )
                      localEl.setAttribute("local_marker", {timestamp: cursor.value.locations[i].timestamp,
                                                             name: cursor.value.locations[i].name, 
                                                             tags: cursor.value.locations[i].tags, 
@@ -811,18 +812,20 @@ function download(filename, text) {
 function ExportMods () {
    let currentTimestamp = Math.round(Date.now() / 1000).toString();
    let mods = {};
-   mods.locationMods = sceneLocations.locationMods;
-   if (sceneColor1 != "" || sceneColor2 != "" || sceneColor3 != "" || sceneColor4 != "") { //defined globally above
+   // mods.locationMods = sceneLocations.locationMods;
+
+   // if (sceneColor1 != "" || sceneColor2 != "" || sceneColor3 != "" || sceneColor4 != "") { //defined globally above
       
-      mods.colorMods = {sceneColor1: sceneColor1, sceneColor2: sceneColor2, sceneColor3: sceneColor3, sceneColor4: sceneColor4};
-   }
-   if (volumePrimary != "" ||volumeAmbient != "" || volumeTrigger != "") {
-      mods.volumeMods = {volumePrimary: volumePrimary, volumeAmbient: volumeAmbient, volumeTrigger: volumeTrigger};
-   }
-   if (timeKeysData.timekeys != undefined) {
-      mods.timekeyMods = timeKeysData;
-   }
-   
+   //    mods.colorMods = {sceneColor1: sceneColor1, sceneColor2: sceneColor2, sceneColor3: sceneColor3, sceneColor4: sceneColor4};
+   // }
+   // if (volumePrimary != "" ||volumeAmbient != "" || volumeTrigger != "") {
+   //    mods.volumeMods = {volumePrimary: volumePrimary, volumeAmbient: volumeAmbient, volumeTrigger: volumeTrigger};
+   // }
+   // if (timeKeysData.timekeys != undefined) {
+   //    mods.timekeyMods = timeKeysData;
+   // }
+   mods.locations = localData.locations;
+   mods.settings = localData.settings;
    var encodedString = btoa(JSON.stringify(mods));
    download(room+"_mods_"+currentTimestamp+".txt", encodedString);
 }
@@ -1512,17 +1515,21 @@ function CreatePlaceholder () {
 
    // SettingsModal();
    console.log("tryna create place3holder");
+   let newPosition = new THREE.Vector3(); 
+   let viewportHolder = document.getElementById('viewportPlaceholder3');
+   viewportHolder.object3D.getWorldPosition( newPosition );
+   console.log("new position for placeholder " + JSON.stringify(newPosition));
    let phEl = document.createElement('a-entity');
    var sceneEl = document.querySelector('a-scene');
    phEl.setAttribute('skybox-env-map', '');
    let timestamp = Date.now();
    timestamp = parseInt(timestamp);
    let locItem = {};
-   locItem.x = cameraPosition.x.toFixed(2);
+   locItem.x = newPosition.x.toFixed(2);
    locItem.eulerx = 0; //maybe get look vector?
-   locItem.y = cameraPosition.y.toFixed(2);
+   locItem.y = newPosition.y.toFixed(2);
    locItem.eulery = 0;
-   locItem.z = cameraPosition.z.toFixed(2);
+   locItem.z = newPosition.z.toFixed(2);
    locItem.eulerz = 0;
    locItem.type = "Worldspace";
    locItem.label = 'local placeholder';
@@ -1530,19 +1537,20 @@ function CreatePlaceholder () {
    locItem.description = '';
    locItem.markerType = "placeholder";
    locItem.eventData = '';
-   locItem.isLocal = true;
+   locItem.isNew = true;
    locItem.timestamp = timestamp;
    locItem.scale = 1;
    locItem.tags = '';
    locItem.phID = timestamp;
-   phEl.setAttribute('position', cameraPosition);
+   localData.locations.push(locItem);
    phEl.setAttribute('gltf-model', '#poi1');
    phEl.id = locItem.timestamp;
 
    // phEl.id 
    sceneEl.appendChild(phEl);
-   phEl.setAttribute('local_marker', 'timestamp', timestamp);
-   localData.locations.push(locItem);
+   phEl.setAttribute('position', newPosition);
+   phEl.setAttribute('local_marker', {timestamp: timestamp, isNew: true, position: newPosition} );
+
    SaveLocalData();
    ShowHideDialogPanel();
    
