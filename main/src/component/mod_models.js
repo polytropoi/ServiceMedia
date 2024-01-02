@@ -96,7 +96,7 @@ AFRAME.registerComponent('mod_model', {
   
         if (this.data.eventData && this.data.eventData.length > 1) {
           // console.log("model eventData " + JSON.stringify(this.data.eventData));
-          textData = this.data.eventData.split("~");//tilde delimiter splits string to array//maybe use description for text instead? 
+          textData = this.data.description.split("~");//tilde delimiter splits string to array//maybe use description for text instead? 
   
         }
         if (JSON.stringify(this.data.eventData).includes("beat")) {
@@ -218,14 +218,18 @@ AFRAME.registerComponent('mod_model', {
             this.el.object3D.visible = false;
             let surface = document.getElementById("scatterSurface");
 
-            // console.log("tryna SCATTER (not instance) a model");
+            if (!surface) {
+              surface = document.getElementById("nav-mesh");
+            }
+            console.log("tryna SCATTER (not instance) a model");
             if (surface) {
+              // let tag = this.data.tags.indexOf
               let split = this.data.eventData.split("~");
               let count = 10;
               let scatterCount = 0;
-              if (split.length > 1) {
-                count = split[1];
-              }
+              // if (split.length > 1) {
+              //   count = split[1];
+              // }
                   // for (let i = 0; i < count; i++) {
               let interval = setInterval( () => {
                 for (let i = 0; i < 100; i++) {
@@ -240,16 +244,21 @@ AFRAME.registerComponent('mod_model', {
           
                   if(results.length > 0) {
                     
-                    console.log("gotsa testPosition for model " + this.data.modelID+ " intersect: " + results.length + " " +results[0].object.name + "scatterCount " + scatterCount + " vs count " + count );
+                    console.log("gotsa scatterPosition for model " + this.data.modelID+ " intersect: " + results.length + " " +results[0].object.name + "scatterCount " + scatterCount + " vs count " + count );
                     testPosition.y = results[0].point.y; //snap y of waypoint to navmesh y
                     let scatteredEl = document.createElement("a-entity"); 
                     scatteredEl.setAttribute("position", testPosition);
                     scatteredEl.setAttribute("gltf-model", "#" + this.data.modelID);
-                    scatteredEl.setAttribute("mod_model", {'eventData': ''});
-                    let scale = this.returnRandomNumber(.25, 1.25);
-                    scatteredEl.setAttribute("scale", {x: scale, y:scale, z: scale})
+                    let eventData = this.data.eventData.replace("scatter~", ""); //prevent infinite recursion!
+
+                    scatteredEl.setAttribute("mod_model", {eventData: eventData, markerType: this.data.markerType, description: this.data.description});
+                    if (this.data.markerType != "character") { //messes up navmeshing..
+                      let scale = this.returnRandomNumber(.25, 1.25);
+                      scatteredEl.setAttribute("scale", {x: scale, y:scale, z: scale})
+                     }
                     this.el.sceneEl.appendChild(scatteredEl);
                     scatterCount++;
+                    
                     if (scatterCount > count) {
                       
                       clearInterval(interval);
@@ -1590,7 +1599,7 @@ AFRAME.registerComponent('mod_model', {
     },
     playAnimation: function (animState) {
       if (this.navAgentController) {
-      console.log("tryna play animState " + animState);
+      // console.log("tryna play animState " + animState);
       if (animState == "greet") {
         animState = "pause";
       }
@@ -1615,7 +1624,7 @@ AFRAME.registerComponent('mod_model', {
                });
              });
            } else {
-             console.log("no walk clips found!");
+            //  console.log("no walk clips found!");
            }
          break;
    
@@ -1639,7 +1648,7 @@ AFRAME.registerComponent('mod_model', {
                });
              });
            }  else {
-             console.log("no idle clips found!");
+            //  console.log("no idle clips found!");
            }
          break;  
          case "target": 

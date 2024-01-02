@@ -73,6 +73,9 @@ let locationTimestamps = [];
 let hasLocalData = false;
 let transformAll = false;
 
+let currentLocalStorageUsed = null;
+let currentAvailableLocalStorageEstimage = null;
+
 
 
 $('a-entity').each(function() {  //external way of getting click duration for physics
@@ -393,6 +396,7 @@ function SaveLocalData() {  //persist mods an alt "~" version of the data
 /////////////////// main onload function below, populate settings, etc.
 $(function() { 
    // InitIDB();
+
    player = document.getElementById("player");
    // player = document.getElementById("cameraRig");
    let settingsEl = document.getElementById('settingsDataElement'); //volume, color, etc...
@@ -567,6 +571,15 @@ $(function() {
 
    sceneEl = document.querySelector('a-scene');
 
+   if (settings.allowMods) {
+      if ('storage' in navigator && 'estimate' in navigator.storage) {
+         navigator.storage.estimate().then(({usage, quota}) => {
+            currentLocalStorageUsed = usage;
+            currentAvailableLocalStorageEstimage = quota;
+         console.log(`Using ${usage} out of ${quota} bytes.`);
+         });
+      }
+   }
    // this.asky = document.getElementsByTagName('a-sky')[0];
    // if (this.asky && settings) {
    //   console.log("tryna mod asky radius " + settings.sceneSkyRadius);

@@ -2799,7 +2799,7 @@ webxr_router.get('/:_id', function (req, res) {
                                                 }
 
                                                 //////////   DEFAULT not instanced, normal placement
-                                                if (!locMdl.eventData.toLowerCase().includes("instance")) { 
+                                                if (!locMdl.eventData.toLowerCase().includes("instance")) {  //NOT "scatter" anymore, see mod_models
                                                     let physicsMod = "";
                                                     let shape = 'hull';
                                                     let groundMod = "";
@@ -2855,7 +2855,7 @@ webxr_router.get('/:_id', function (req, res) {
                                                         gltfModel = modelURL;
                                                     }
 
-                                                  //SCATTERING placement instancing + surface scattering
+                                                  //INSTANCING (cloned) placement instancing + surface scattering
                                                 } else { 
                                                     console.log("tryna instance so0methings!@ " + locMdl.eventData.toLowerCase());
                                                     let instancing = "instanced_meshes_mod=\x22_id: "+locMdl.modelID+"; modelID: "+m_assetID+";\x22";
@@ -4228,7 +4228,7 @@ webxr_router.get('/:_id', function (req, res) {
                     settings.playerStartPosition = playerPosition;
                     settings.debugMode = debugMode;
                     settings.allowMods = false;
-                    
+
                     if (sceneResponse.sceneTags != null && sceneResponse.sceneTags.includes("allow mods")) {
                         settings.allowMods = true;
                     }
