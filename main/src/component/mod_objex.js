@@ -74,7 +74,7 @@ AFRAME.registerComponent('mod_objex', {
                     //set mod_object component:
                     objEl.setAttribute("mod_object", {'eventData': this.data.jsonLocationsData[i].eventData, 'locationData': this.data.jsonLocationsData[i], 'objectData': this.data.jsonObjectData[k]});
                     // objEl.id = "obj" + this.data.jsonLocationsData[i].objectID + "_" + this.data.jsonLocationsData[i].timestamp;
-                    objEl.id = this.data.jsonLocationsData[i].timestamp; //only timestamp so locpickers can find it...other objtypes aren't moddable, i.e. spawned at runtime
+                    objEl.id = this.data.jsonLocationsData[i].timestamp; //only timestamp so locpickers can find it...other objtypes aren't allowMods, i.e. spawned at runtime
                     this.el.sceneEl.appendChild(objEl);
                   }
                 }
@@ -547,7 +547,7 @@ AFRAME.registerComponent('mod_object', {
         
       }
       
-      this.el.classList.add("moddable");
+      this.el.classList.add("allowMods");
       this.el.setAttribute("shadow", {cast:true, receive:true});
   
       this.thirdPersonPlaceholder = null;

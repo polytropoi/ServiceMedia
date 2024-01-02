@@ -12,7 +12,74 @@ var sceneEl = document.querySelector('a-scene');
 let timedEventsListenerMode = null;
 let showStats = false;
 let showCurves = false;
+let keydown = "";
 
+window.addEventListener( 'keydown',  ( event ) => {
+  console.log("keydown code " + event.keyCode);
+  switch ( event.keyCode ) {
+   
+    case 81: // Q
+
+      break;
+
+    case 16: // Shift
+      keydown = "Shift";
+      break;
+
+    case 87: // W
+
+      break;
+
+    case 69: // E
+     
+      break;
+
+    case 82: // R
+      
+      break;
+
+    case 67: // C
+     
+      break;
+
+    case 86: // V
+     
+      break;
+
+    case 187:
+    case 107: // +, =, num+
+     
+      break;
+
+    case 189:
+    case 109: // -, _, num-
+      
+      break;
+
+    case 88: // X
+      
+      break;
+
+    case 89: // Y
+      
+      break;
+
+    case 90: // Z
+      
+      break;
+
+    case 32: // Spacebar
+      
+      break;
+
+    case 27: // Esc
+      
+      break;
+  }
+});
+window.addEventListener( 'keyup',  ( event ) => {
+  keydown = "";
+});
 
   // $('#modalContent').on('change', '#locationModel', function(e) { //value has phID ~ modelID
   //     console.log('model ' + e.target.value);
@@ -713,7 +780,7 @@ function ShowLocationModal(timestamp) {
         // "<table><tr>"
         "<div class=\x22row\x22>"+
         // "<button class=\x22snapButton\x22 style=\x22float:left;\x22 onclick=\x22SnapLocation('"+phID+"')\x22>Snap To Player</button>"+
-        "<button class=\x22grabButton\x22 style=\x22float:left;\x22 onclick=\x22ToggleTransformLocation('"+phID+"')\x22>Toggle Transform Controls</button>"+
+        "<button class=\x22grabButton\x22 style=\x22float:left;\x22 onclick=\x22ToggleTransformControls('"+phID+"')\x22>Toggle Transform Controls</button>"+
         // "<button class=\x22goToButton\x22 style=\x22float:left;\x22 onclick=\x22GoToLocation('"+phID+"')\x22>GoTo</button>"+
         "<button class=\x22goToButton\x22 style=\x22float:left;\x22 onclick=\x22PlayerToLocation('"+thisLocation.x+ " " + thisLocation.y + " " + thisLocation.z +"')\x22>GoTo</button>"+
         // "<button class=\x22goToButton\x22 onclick=\x22PlayerToLocation('"+phID+"')\x22>GoTo</button>"+

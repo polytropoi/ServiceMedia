@@ -8,7 +8,9 @@ AFRAME.registerComponent('mod_model', {
         color: {default: ''},
         tags: {default: ''},
         description: {default: ''},
-        modelID: {default: ''}
+        modelID: {default: ''},
+        timestamp: {default: ''},
+        allowMods: {default: false}
         
       },
       init: function () {
@@ -77,6 +79,7 @@ AFRAME.registerComponent('mod_model', {
         this.tags = this.data.tags;
         this.font1 = "Acme.woff";
         this.font2 = "Acme.woff";
+        this.timestamp = this.data.timestamp;
         
         if (settings && settings.sceneFontWeb1) {
           this.font1 = settings.sceneFontWeb1;
@@ -102,9 +105,15 @@ AFRAME.registerComponent('mod_model', {
           // this.el.addEventListener('beatme', e => console.log("beat" + e.detail.volume()));
           
         }
-  
-        this.el.classList.add("moddable");
-        
+
+        if (this.data.eventData.toLowerCase().includes("allowmods")) {
+          this.data.allowMods = true;
+        }
+        if (this.data.allowMods) {
+          this.el.classList.add("allowMods");
+        }
+       
+
         this.el.addEventListener('beatme', e => console.log("beat"));
         this.isInitialized = false; //to prevent model-loaded from retriggering when childrens are added to this parent
   
@@ -128,6 +137,7 @@ AFRAME.registerComponent('mod_model', {
           }
         }
   
+        let that = this;
         ///////////////////////////////////////////////// model loaded event start /////////////////////////////
   
         ///////////////////////////////////////////////////////// -listeners......
@@ -1036,7 +1046,7 @@ AFRAME.registerComponent('mod_model', {
           this.position = null;
           // let hasBubble = false;
           // let theEl = this.element;
-          this.el.setAttribute('gesture-handler-add'); //ar mode only?
+          // this.el.setAttribute('gesture-handler-add'); //ar mode only?
           var sceneEl = document.querySelector('a-scene');
           let hasCallout = false;
           if (this.hasCallout || this.hasLocationCallout) {
@@ -1205,6 +1215,7 @@ AFRAME.registerComponent('mod_model', {
             
             this.el.addEventListener('click', function () {
   
+
               this.bubble = sceneEl.querySelector('.bubble');
               if (this.bubble) {
                 this.bubble.setAttribute('visible', false);
@@ -1263,7 +1274,15 @@ AFRAME.registerComponent('mod_model', {
             }
           });
           // console.log("MOD_MODEL markertype " + this.data.markerType +  " this.hasCallout " + this.hasCallout + " this.data.description " + this.data.description);
-  
+          this.el.addEventListener('mousedown', (evt) => {
+            if (that.timestamp != '' && settings.allowMods && this.data.allowMods) {
+              if (keydown != "Shift") {
+                ToggleTransformControls(that.timestamp);
+              } else {
+                ShowLocationModal(that.timestamp);
+              }      
+            }
+          });
           this.el.addEventListener('mouseenter', (evt) =>  {
             // console.log("mouseovewr model " + this.el.id + this.hasLocationCallout + this.data.markerType + this.hasCallout + this.hasCalloutBackground + textData[textIndex]);
             if (evt.detail.intersection != null && this.hitpoint != null) {

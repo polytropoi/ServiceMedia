@@ -141,6 +141,7 @@ function InitIDB() {
 
                   let cloudEl = document.getElementById(cursor.value.locations[i].timestamp);
                   if (cloudEl) { //prexisting elements (cloud_marker, mod_model, mod_object) already rendered onload
+                     //TODO get the component and update with mods, if any...
                      // console.log("gotsa element with id " + JSON.stringify(localData.locations[i]));
                      // let obj = cloudEl.getObject3D('mesh');
                      // obj.position.set({x: cursor.value.locations[i].x, y: cursor.value.locations[i].y, z: cursor.value.locations[i].z });
@@ -973,11 +974,12 @@ function GrabLocation(locationKey) {
    console.log("tryna grablocation : " +locationKey);  
 }
 
-function ToggleTransformLocation (locationKey) {
+function ToggleTransformControls (locationKey) {
    this.transformEl = document.getElementById(locationKey);
    console.log("tryna transform a location " + locationKey);
 
    // const transformEl = document.getElementsByClassName("transformControls")[0]; //there should be only one
+
    if (transformEl) {
       console.log("gotsa targetEl to remove transform_control");
       let transform_controls_component = transformEl.components.transform_controls;
@@ -993,7 +995,7 @@ function ToggleTransformLocation (locationKey) {
    }
 }
 function ToggleAllTransformControls () {
-   const moddables = document.getElementsByClassName("moddable");
+   const moddables = document.getElementsByClassName("allowMods");
    if (!transformAll) {
       for (var i=0; i<moddables.length; i++) {
          let transform_controls_component = moddables[i].components.transform_controls;
@@ -1697,19 +1699,13 @@ if (sceneEl != null) {
             
                }
                if (i == this.data.jsonData.length - 1) {
-                  // for (let key in settings) {
-                  //    localData.settings[key] = settings[key]; //TODO apply each one?
-                  //  }
-                  //  for (let i = 0; i < sceneLocations.locations.length; i++) {
-                  //    localData.locations.push(sceneLocations.locations[i]);
-                  //  }
-                  InitIDB();
 
+                  if (settings.allowMods) {
+                     InitIDB();
+                  }
                }
             }
-            // sceneLocations.locations.push(this.data.jsonData);
-            // AddLocalMarkers();
-            // InitLocalData();
+          
       }, 
       returnYouTubePosition: function() {
          return this.data.youtubePosition;
@@ -1730,13 +1726,13 @@ if (sceneEl != null) {
                let rEl = document.getElementById(ts);
                if (rEl) {
                   console.log("gotsa element with id " + JSON.stringify(thedata[i]));
-                     // let obj = rEl.getObject3D('mesh');
-                     // obj.position.set({x: sceneLocations.locations[i].x, y: sceneLocations.locations[i].y, z: sceneLocations.locations[i].z });
-                     // obj.rotation.set({x: sceneLocations.locations[i].eulerx, y: sceneLocations.locations[i].eulery, z: sceneLocations.locations[i].eulerz });
+                  // let obj = rEl.getObject3D('mesh');
+                  // obj.position.set({x: sceneLocations.locations[i].x, y: sceneLocations.locations[i].y, z: sceneLocations.locations[i].z });
+                  // obj.rotation.set({x: sceneLocations.locations[i].eulerx, y: sceneLocations.locations[i].eulery, z: sceneLocations.locations[i].eulerz });
                   //    // obj.scale.set({x: sceneLocations.locations[i].markerObjScale, y: sceneLocations.locations[i].markerObjScale, z: sceneLocations.locations[i].markerObjScale});
                   // rEl.setAttribute("position", {x: sceneLocations.locations[i].x, y: sceneLocations.locations[i].y, z: sceneLocations.locations[i].z });
-               // rEl.setAttribute("rotation", {x: sceneLocations.locations[i].eulerx, y: sceneLocations.locations[i].eulery, z: sceneLocations.locations[i].eulerz });
-               // rEl.setAttribute("scale", {x: sceneLocations.locations[i].markerObjScale, y: sceneLocations.locations[i].markerObjScale, z: sceneLocations.locations[i].markerObjScale});
+                  // rEl.setAttribute("rotation", {x: sceneLocations.locations[i].eulerx, y: sceneLocations.locations[i].eulery, z: sceneLocations.locations[i].eulerz });
+                  // rEl.setAttribute("scale", {x: sceneLocations.locations[i].markerObjScale, y: sceneLocations.locations[i].markerObjScale, z: sceneLocations.locations[i].markerObjScale});
                }
             }
          }

@@ -1867,18 +1867,18 @@ AFRAME.registerComponent('local_marker', {
     // });
     console.log("tryna init local_marker withg timestamp " + this.timestamp );
     // var posRotReader = document.getElementById("player").components.get_pos_rot; 
-    let isSelected = false;
+    // let isSelected = false;
     var sceneEl = document.querySelector('a-scene');
 
     this.calloutEntity = document.createElement("a-entity");
-    this.calloutPanel = document.createElement("a-entity");
-    this.calloutText = document.createElement("a-text");
+    // this.calloutPanel = document.createElement("a-entity");
+    this.calloutText = document.createElement("a-entity");
     this.viewportHolder = document.getElementById('viewportPlaceholder3');
     var cameraPosition = new THREE.Vector3(); 
     this.viewportHolder.object3D.getWorldPosition( cameraPosition );
-    this.calloutPanel.setAttribute("gltf-model", "#landscape_panel");
-    this.calloutPanel.setAttribute("scale", ".1 .075 .1");
-    this.calloutEntity.setAttribute("look-at", "#player");
+    // this.calloutPanel.setAttribute("gltf-model", "#landscape_panel");
+    // this.calloutPanel.setAttribute("scale", ".1 .075 .1");
+    // this.calloutEntity.setAttribute("look-at", "#player");
     this.calloutEntity.setAttribute('visible', false);
     this.selectedAxis = null;
     this.isSelected = false;
@@ -1894,94 +1894,40 @@ AFRAME.registerComponent('local_marker', {
     let thisEl = this.el;
     // calloutEntity.setAttribute("render-order", "hud");
     sceneEl.appendChild(this.calloutEntity);
-    this.calloutEntity.appendChild(this.calloutPanel);
+    // this.calloutEntity.appendChild(this.calloutPanel);
     this.calloutEntity.appendChild(this.calloutText);
     
-    this.calloutPanel.setAttribute("position", '0 0 1'); 
+    // this.calloutPanel.setAttribute("position", '0 0 1'); 
     this.calloutText.setAttribute("position", '0 0 1.25'); //offset the child on z toward camera, to prevent overlap on model
-    this.calloutText.setAttribute('text', {
-      width: .5,
-      baseline: "bottom",
-      align: "left",
-      font: "/fonts/Exo2Bold.fnt",
-      anchor: "center",
-      wrapCount: 12,
-      color: "white",
-      value: "wha"
-    });
-    this.calloutPanel.setAttribute("overlay");
+    // this.calloutText.setAttribute('text', {
+    //   width: .5,
+    //   baseline: "bottom",
+    //   align: "left",
+    //   font: "/fonts/Exo2Bold.fnt",
+    //   anchor: "center",
+    //   wrapCount: 12,
+    //   color: "white",
+    //   value: "wha"
+    // });
+    // this.calloutPanel.setAttribute("overlay");
+    this.calloutText = document.createElement("a-entity");
     this.calloutText.setAttribute("overlay");
     let theElement = this.el;
     // this.el.setAttribute('skybox-env-map');
     // 
-    this.el.classList.add("moddable");
+    this.el.classList.add("allowMods");
       this.phID = this.timestamp; //"placeholder" id, for client side location mods
       this.el.id = this.phID;
-      // this.el.addEventListener('model-loaded', () => {
-      // console.log("looking for localplaceholder " + localStorage.getItem(this.phID));
-      // this.storedVars = JSON.parse(localStorage.getItem(this.phID));
-      //   if (this.storedVars != null) {
-      //     if (this.storedVars.model == null || this.storedVars.model == undefined || this.storedVars.model == "none" || this.storedVars.model == "") {
-      //       console.log(this.phID + " storedVars " + JSON.stringify(this.storedVars));
-      //       if (this.storedVars.markerType.toLowerCase() == "placeholder") {
-      //         this.el.setAttribute('gltf-model', '#placeholder');
-      //       } else if (this.storedVars.markerType.toLowerCase() == "poi") {
-      //         this.el.setAttribute('gltf-model', '#poi1');
-      //       } else if (this.storedVars.markerType.toLowerCase() == "gate") {
-      //         this.el.setAttribute('gltf-model', '#poi1');
-      //       } else if (this.storedVars.markerType.toLowerCase() == "portal") {
-      //         this.el.setAttribute('gltf-model', '#poi1');
-      //       }
-      //        else if (this.storedVars.markerType.toLowerCase().includes("trigger")) {
-      //         this.el.setAttribute('gltf-model', '#poi1');  
-      //       } else if (this.storedVars.markerType.toLowerCase() == "mailbox") {
-      //         this.el.setAttribute('gltf-model', '#mailbox');
-      //       }
-      //       this.el.setAttribute('position', {x: this.storedVars.x, y: this.storedVars.y, z: this.storedVars.z});
-      //       this.el.setAttribute('rotation', {x: this.storedVars.eulerx, y: this.storedVars.eulery, z: this.storedVars.eulerz});
-      //       this.el.setAttribute('scale', {x: this.storedVars.scale, y: this.storedVars.scale, z: this.storedVars.scale });
-      //       // this.el.setAttribute('rotation', this.storedVars.eulerx+","+this.storedVars.eulery+","+this.storedVars.eulerz );
-      //     } else {
-      //       // console.log("sceneModels " + JSON.stringify(sceneModels));
-      //       for (let i = 0; i < sceneModels.length; i++) {
-      //         // console.log("sceneModel ID " + sceneModels[i]._id + " vs " + this.storedVars.modelID);
-      //         if (sceneModels[i]._id == this.storedVars.modelID) {
-      //           this.el.setAttribute('gltf-model', sceneModels[i].url);
-      //           this.el.setAttribute('position', {x: this.storedVars.x, y: this.storedVars.y, z: this.storedVars.z});
-      //           this.el.setAttribute('rotation', {x: this.storedVars.eulerx, y: this.storedVars.eulery, z: this.storedVars.eulerz});
-      //           this.el.setAttribute('scale', {x: this.storedVars.scale, y: this.storedVars.scale, z: this.storedVars.scale });
-      //         }
-      //       }
-      //     }
-      //   } else {
-          //save to local if new
-          // if (this.data.position == '') {
+     
           if (this.data.isNew) {  
-            // let locItem = {};
-            // locItem.x = cameraPosition.x.toFixed(2);
-            // locItem.eulerx = 0; //maybe get look vector?
-            // locItem.y = cameraPosition.y.toFixed(2);
-            // locItem.eulery = 0;
-            // locItem.z = cameraPosition.z.toFixed(2);
-            // locItem.eulerz = 0;
-            // locItem.type = "Worldspace";
-            // locItem.label = 'local placeholder';
-            // locItem.name = this.data.name;
-            // locItem.description = '';
-            // locItem.markerType = "placeholder";
-            // locItem.eventData = '';
-            // locItem.isLocal = true;
-            // locItem.timestamp = this.timestamp;
-            // locItem.scale = 1;
-            // locItem.tags = '';
-            // locItem.phID = this.timestamp;
+           
             this.el.setAttribute('position', this.data.position);
             // if (this.data.markerType != "none" && this.data.markerType != "player") {
             //   this.el.setAttribute('gltf-model', '#poi1');
             // }
             this.el.setAttribute('gltf-model', '#poi1');
             this.el.id = this.timestamp;
-            console.log("tryna set localmarker with phID " + this.timestamp);
+            console.log("tryna set new localmarker with phID " + this.timestamp);
              //check for tag?
           } else { //it's been saved to localData, w/ position
             // let locItem = {};
@@ -2013,27 +1959,62 @@ AFRAME.registerComponent('local_marker', {
             this.el.id = this.data.timestamp;
             console.log("tryna set localmarker with phID " + this.timestamp);
           }
-          // sceneLocations.locations.push(locItem);
-          // localData.locations.push(locItem);
-          // SaveLocalData();
-          // this.el.classList.add("moddable");
 
-          // localStorage.setItem(this.phID, JSON.stringify(locItem));
-          // AddLocalMarkers();
-        // }
-    // });
-    this.calloutToggle = false;
-    let that = this;
-    // that.calloutEntity = this.calloutEntity;
-    // that.calloutText = this.calloutText;
-    this.el.addEventListener("model-loaded", (e) => {
-      e.preventDefault();
-      if (this.data.isNew) {
-        this.el.setAttribute("transform_controls", "");
-      }
-      // this.el.setAttribute("transform_controls", ""); //check for tag?
-    });
-    this.el.addEventListener('mouseenter', function (evt) {
+
+          this.clientX = 0;
+          this.clientY = 0;
+          this.selectedAxis = null;
+          this.isSelected = false;
+          this.hitPosition = null;
+          this.mouseDownPos = new THREE.Vector2();
+          this.mousePos = new THREE.Vector2();
+          this.distance = 0;
+    
+          if (!this.data.tags.includes("hide callout") && !this.data.tags.includes("hide callout")) {
+         
+            this.calloutEntity.setAttribute("look-at", "#player");
+            this.calloutEntity.setAttribute('visible', false);
+          
+            sceneEl.appendChild(this.calloutEntity);
+            // this.calloutEntity.appendChild(this.calloutPanel);
+            this.calloutEntity.appendChild(this.calloutText);
+    
+            this.calloutText.setAttribute("position", '0 0 1.25'); //offset the child on z toward camera, to prevent overlap on model
+            this.font2 = "Acme.woff";
+    
+            if (settings && settings.sceneFontWeb1) {
+              this.font2 = settings.sceneFontWeb2;
+            }
+            this.calloutText.setAttribute('troika-text', {
+              // width: .5,
+              baseline: "bottom",
+              align: "left",
+              fontSize: .1,
+              font: "/fonts/web/"+ this.font2,
+              anchor: "center",
+              wrapCount: 12,
+              color: "white",
+              outlineColor: "black",
+              outlineWidth: "2%",
+              value: ""
+            });
+          }
+    
+        this.calloutText.setAttribute("overlay");
+        this.calloutToggle = false;
+        this.calloutToggle = false;
+        let that = this;
+        // that.calloutEntity = this.calloutEntity;
+        // that.calloutText = this.calloutText;
+        this.el.addEventListener("model-loaded", (e) => {
+          e.preventDefault();
+          if (this.data.isNew) {
+            this.el.setAttribute("transform_controls", "");
+          }
+          // this.el.setAttribute("transform_controls", ""); //check for tag?
+        });
+       this.el.addEventListener('mouseenter', function (evt) {
+
       // if (posRotReader != null) {
       //   this.playerPosRot = posRotReader.returnPosRot(); 
       //   window.playerPosition = this.playerPosRot.pos; 
@@ -2045,41 +2026,77 @@ AFRAME.registerComponent('local_marker', {
       //   }
       // }
       // console.log("playerPOsition  " + JSON.stringify(window.playerPosition));
+      // if (evt.detail.intersection) {
+      //   // document.getElementById("player").component.get_pos_rot.returnPosRot();
+      //   this.clientX = evt.clientX;
+      //   this.clientY = evt.clientY;
+      //   // console.log("tryna mouseover placeholder type " + this.data.markerType);
+      //   that.calloutToggle = !that.calloutToggle;
+
+      //   let pos = evt.detail.intersection.point; //hitpoint on model
+      //   let name = evt.detail.intersection.object.name;
+      //   that.hitPosition = pos;
+      //   if (player != null && window.playerPosition != null) { 
+      //   that.distance = window.playerPosition.distanceTo(pos);
+
+      //   that.rayhit(evt.detail.intersection.object.name, that.distance, evt.detail.intersection.point);
+
+      //     // that.selectedAxis = name;
+
+      //     let elPos = that.el.getAttribute('position');
+      //   // if (!name.includes("handle")) {
+      //     if (that.distance < 66) {
+      //       console.log("trna scale to distance :" + that.distance);
+      //       that.calloutEntity.setAttribute("position", pos);
+      //       that.calloutEntity.setAttribute('visible', true);
+      //       that.calloutEntity.setAttribute('scale', {x: that.distance * .25, y: that.distance * .25, z: that.distance * .25} );
+      //       let theLabel = that.data.label != undefined ? that.data.label : that.data.name;
+      //       let calloutString = theLabel;
+      //       if (that.calloutToggle) { //show pos every other time
+      //         // calloutString = "x : " + elPos.x.toFixed(2) + "\n" +"y : " + elPos.y.toFixed(2) + "\n" +"z : " + elPos.z.toFixed(2);
+      //         calloutString = that.data.description != '' ? that.data.description : theLabel;
+      //       }
+      //       that.calloutText.setAttribute("value", calloutString);
+      //     }
+      //     // }
+      //   }
+      // }  
+
       if (evt.detail.intersection) {
-        // document.getElementById("player").component.get_pos_rot.returnPosRot();
         this.clientX = evt.clientX;
         this.clientY = evt.clientY;
-        // console.log("tryna mouseover placeholder type " + this.data.markerType);
+        // console.log("tryna mouseover placeholder");
         that.calloutToggle = !that.calloutToggle;
-
         let pos = evt.detail.intersection.point; //hitpoint on model
-        let name = evt.detail.intersection.object.name;
         that.hitPosition = pos;
-        if (player != null && window.playerPosition != null) { 
+        let name = evt.detail.intersection.object.name;
         that.distance = window.playerPosition.distanceTo(pos);
-
         that.rayhit(evt.detail.intersection.object.name, that.distance, evt.detail.intersection.point);
+     
+        that.selectedAxis = name;
 
-          // that.selectedAxis = name;
-
-          let elPos = that.el.getAttribute('position');
-        // if (!name.includes("handle")) {
+        // let elPos = that.el.getAttribute('position');
+        // console.log(pos);
+        if (that.calloutEntity != null) {
+          console.log("tryna show the callout " + that.distance);
           if (that.distance < 66) {
-            console.log("trna scale to distance :" + that.distance);
-            that.calloutEntity.setAttribute("position", pos);
-            that.calloutEntity.setAttribute('visible', true);
-            that.calloutEntity.setAttribute('scale', {x: that.distance * .25, y: that.distance * .25, z: that.distance * .25} );
-            let theLabel = that.data.label != undefined ? that.data.label : that.data.name;
-            let calloutString = theLabel;
-            if (that.calloutToggle) { //show pos every other time
-              // calloutString = "x : " + elPos.x.toFixed(2) + "\n" +"y : " + elPos.y.toFixed(2) + "\n" +"z : " + elPos.z.toFixed(2);
-              calloutString = that.data.description != '' ? that.data.description : theLabel;
-            }
-            that.calloutText.setAttribute("value", calloutString);
+          that.calloutEntity.setAttribute("position", pos);
+          that.calloutEntity.setAttribute('visible', true);
+          that.calloutEntity.setAttribute('scale', {x: that.distance * .25, y: that.distance * .25, z: that.distance * .25} );
+          if (that.data.markerType == "poi" && !that.data.modelID) {
+            this.el.setAttribute('scale', {x: that.distance * .25, y: that.distance * .25, z: that.distance * .25} );
           }
-          // }
+         
+          let theLabel = that.data.name != undefined ? that.data.name : "";
+          let calloutString = theLabel;
+          if (that.calloutToggle) {
+            // calloutString = "x : " + elPos.x.toFixed(2) + "\n" +"y : " + elPos.y.toFixed(2) + "\n" +"z : " + elPos.z.toFixed(2);
+            calloutString = that.data.description != '' ? that.data.description : theLabel;
+          }
+          that.calloutText.setAttribute("troika-text", {value: calloutString});
+          }
         }
-      }  
+      }
     });
 
     this.el.addEventListener('mouseleave', function (evt) {
@@ -2091,14 +2108,11 @@ AFRAME.registerComponent('local_marker', {
     });
 
     this.el.addEventListener('mousedown', function (evt) {
-      // that.isSelected = true;
-      // isSelected = true;
-      // this.deselect();
-      // this.isSelected = true;
-      // let name = evt.detail.intersection.object.name;
-      // console.log(name);
-      // that.selectedAxis = name;
-
+      if (keydown != "Shift") {
+        ToggleTransformControls(that.timestamp);
+      } else {
+        ShowLocationModal(that.timestamp);
+      }
     });
     this.el.addEventListener('mouseup', function (evt) {
       console.log("tryna mouseup localmarker type " + that.data.markerType);
@@ -2316,7 +2330,7 @@ AFRAME.registerComponent('cloud_marker', {
     //let calloutString = this.data.calloutString;
     this.cursor = document.querySelector('[cursor]');
     this.calloutEntity = document.createElement("a-entity");
-    this.calloutPanel = document.createElement("a-entity");
+    // this.calloutPanel = document.createElement("a-entity");
     this.calloutText = document.createElement("a-entity");
     this.viewportHolder = document.getElementById("viewportPlaceholder3");
     let thisEl = this.el;
@@ -2331,99 +2345,16 @@ AFRAME.registerComponent('cloud_marker', {
     if (settings && settings.sceneFontWeb1) {
       this.font2 = settings.sceneFontWeb2;
     }
+    this.timestamp = this.data.timestamp;
       
       this.phID = this.data.phID;
       console.log("cloudmarker phID " + this.phID); 
-      this.el.classList.add("moddable");
-      // if (this.data.model == null || this.data.model == '') {
-      //   if (this.data.markerType.toLowerCase() == "mailbox") {
-      //     this.el.setAttribute('gltf-model', '#mailbox');
-      //   } else {
-      //     this.el.setAttribute('gltf-model', '#poi1');
-      //   }
-      // }
+
+
       if (this.data.allowMods) {
-        // this.storedVars = JSON.parse(localStorage.getItem(this.phID));
+        this.el.classList.add("allowMods");
       }
-      
-      if (this.storedVars != null) {
-      //   console.log(this.phID + " storedVars " + JSON.stringify(this.storedVars));
-        
-      //   this.el.setAttribute('position', {x: this.storedVars.x, y: this.storedVars.y, z: this.storedVars.z});
-      //   this.el.setAttribute('rotation', {x: this.storedVars.eulerx, y: this.storedVars.eulery, z: this.storedVars.eulerz});
-      //   this.el.setAttribute('scale', {x: this.storedVars.scale, y: this.storedVars.scale, z: this.storedVars.scale });
-      //   this.data.description = this.storedVars.description;
-
-
-      //   if (this.storedVars.modelID == null || this.storedVars.modelID == undefined || this.storedVars.model == "none" || this.storedVars.model == "undefined") {
-
-      //   // if (this.storedVars.markerType.toLowerCase() == "placeholder") { //hrm, should just be placeholders?
-      //   //   this.el.setAttribute('gltf-model', '#savedplaceholder');
-      //   // } else if (this.storedVars.markerType.toLowerCase() == "poi") {
-      //   //   this.el.setAttribute('gltf-model', '#poi1');
-      //   // } else if (this.storedVars.markerType.toLowerCase() == "gate") {
-      //   //   this.el.setAttribute('gltf-model', '#poi1');
-      //   // } else if (this.storedVars.markerType.toLowerCase() == "portal") {
-      //   //   this.el.setAttribute('gltf-model', '#poi1');
-      //   // } else if (this.storedVars.markerType.toLowerCase().includes("trigger")) {
-      //   //   this.el.setAttribute('gltf-model', '#poi1');  
-      //   //   // this.el.setAttribute("aabb-collider", {objects: ".activeObjexRay"});
-
-      //   if (this.storedVars.markerType.toLowerCase() == "mailbox") {
-      //       this.el.setAttribute('gltf-model', '#mailbox');
-      //     } else {
-      //       this.el.setAttribute('gltf-model', '#poi1');
-      //     }
-      //     // this.el.setAttribute('gltf-model', '#poi1');
-      //   } else {
-      //     for (let i = 0; i < sceneModels.length; i++) {
-      //       if (sceneModels[i]._id == this.storedVars.modelID) {
-      //         this.el.setAttribute("gltf-model", sceneModels[i].url); //TODO get an asset ID instead?
-      //         this.el.setAttribute('position', {x: this.storedVars.x, y: this.storedVars.y, z: this.storedVars.z});
-      //         this.el.setAttribute('rotation', {x: this.storedVars.eulerx, y: this.storedVars.eulery, z: this.storedVars.eulerz});
-      //         this.el.setAttribute('scale', {x: this.storedVars.scale, y: this.storedVars.scale, z: this.storedVars.scale });
-      //         // this.el.setAttribute('position')
-      //         console.log("tryna set locModel for cloudmarker " + this.storedVars.model);
-      //         break;
-      //       }
-      //     }
-      //   }
-        
-      //   // this.el.addEventListener('model-loaded', () => {
-          
-      //   // });
-        
-      //   // if (this.storedVars.modelID != null && this.storedVars.modelID != undefined && this.storedVars.model != "none") {
-      //     // for (let i = 0; i < sceneModels.length; i++) {
-      //     //   if (sceneModels[i]._id == this.storedVars.modelID) {
-      //     //     this.el.setAttribute("gltf-model", sceneModels[i].url); //TODO get an asset ID instead?
-      //     //     console.log("tryna set locModel for cloudmarker " + sceneModels[i].url);
-      //     //   }
-      //     // }
-      //   // } 
-      //   // this.el.addEventListener('model-loaded', (evt) => { //load placeholder model first (which is an a-asset) before calling external
-      //   //   if (this.storedVars.modelID != null && this.storedVars.modelID != undefined && this.storedVars.model != "none") {
-      //   //       for (let i = 0; i < sceneModels.length; i++) {
-      //   //         if (sceneModels[i]._id == this.storedVars.modelID) {
-      //   //           this.el.setAttribute("gltf-model", sceneModels[i].url); //TODO get an asset ID instead?
-      //   //           console.log("tryna set locModel for cloudmarker " + sceneModels[i].url);
-      //   //         }
-      //   //       }
-      //   //     }
-      //   // });
-
-      //   if (this.storedVars.scale != null && this.storedVars.scale != undefined && this.storedVars.scale != "none") {
-      //     this.storedVars.scale = 1;
-      //   }
-      //   this.data.label = this.storedVars.label;
-      //   this.data.name = this.storedVars.name;
-      //   this.data.markerType = this.storedVars.markerType;
-        
-      } else { ///////////////////////////////no mods or mods not allowed (default) //nope, no mas localstortage
-        
-        // else { //new ls key for cloud placeholder
-        // console.log(this.phID + " unstoredVars " + JSON.stringify(this.data));
-
+    
           let locItem = {};
           let position = this.el.getAttribute('position'); //
           let rotation = this.el.getAttribute('rotation');
@@ -2495,7 +2426,7 @@ AFRAME.registerComponent('cloud_marker', {
         }
       
         // localStorage.setItem(this.phID, JSON.stringify(locItem)); 
-      }
+      
       if (this.data.markerType.toLowerCase() == "player") {
         // console.log("playerobj")
         // this.el.setAttribute('gltf-model', '#poi1');
@@ -2531,55 +2462,39 @@ AFRAME.registerComponent('cloud_marker', {
       this.mouseDownPos = new THREE.Vector2();
       this.mousePos = new THREE.Vector2();
       this.distance = 0;
-      // this.calloutText = calloutText;
-      // calloutText.setAttribute('overlay');
-      // gltf-model=\x22#square_panel\x22
-      if (!this.data.tags.includes("hide callout") && !this.data.tags.includes("hide callout")) {
-      // this.calloutPanel.setAttribute("gltf-model", "#landscape_panel");
-      // this.calloutPanel.setAttribute("scale", ".1 .075 .1");
-      // this.calloutEntity.getObject3D("mesh").scale()
-      this.calloutEntity.setAttribute("look-at", "#player");
-      this.calloutEntity.setAttribute('visible', false);
-      // this.selectedAxis = null;
-      // this.isSelected = false;
-      // this.hitPosition = null;
-      // this.mouseDownPos = new THREE.Vector2();
-      // this.mousePos = new THREE.Vector2();
-      // this.distance = 0;
-      // calloutEntity.setAttribute("render-order", "hud");
-      sceneEl.appendChild(this.calloutEntity);
-      // this.calloutEntity.appendChild(this.calloutPanel);
-      this.calloutEntity.appendChild(this.calloutText);
-      // this.calloutPanel.setAttribute("position", '0 0 1'); 
-      // this.calloutPanel.setAttribute("overlay");
-      // this.calloutText.setAttribute("size", ".1 .1 .1");
-      this.calloutText.setAttribute("position", '0 0 1.25'); //offset the child on z toward camera, to prevent overlap on model
-      this.font2 = "Acme.woff";
 
-      if (settings && settings.sceneFontWeb1) {
-        this.font2 = settings.sceneFontWeb2;
-      }
-      this.calloutText.setAttribute('troika-text', {
-        // width: .5,
-        baseline: "bottom",
-        align: "left",
-        fontSize: .1,
-        font: "/fonts/web/"+ this.font2,
-        anchor: "center",
-        wrapCount: 12,
-        color: "white",
-        outlineColor: "black",
-        outlineWidth: "2%",
-        value: ""
-      });
+      if (!this.data.tags.includes("hide callout") && !this.data.tags.includes("hide callout")) {
+     
+        this.calloutEntity.setAttribute("look-at", "#player");
+        this.calloutEntity.setAttribute('visible', false);
+      
+        sceneEl.appendChild(this.calloutEntity);
+        // this.calloutEntity.appendChild(this.calloutPanel);
+        this.calloutEntity.appendChild(this.calloutText);
+
+        this.calloutText.setAttribute("position", '0 0 1.25'); //offset the child on z toward camera, to prevent overlap on model
+        this.font2 = "Acme.woff";
+
+        if (settings && settings.sceneFontWeb1) {
+          this.font2 = settings.sceneFontWeb2;
+        }
+        this.calloutText.setAttribute('troika-text', {
+          // width: .5,
+          baseline: "bottom",
+          align: "left",
+          fontSize: .1,
+          font: "/fonts/web/"+ this.font2,
+          anchor: "center",
+          wrapCount: 12,
+          color: "white",
+          outlineColor: "black",
+          outlineWidth: "2%",
+          value: ""
+        });
     }
-      // this.el.addEventListener("model-loaded", (e) => {
-      //   e.preventDefault();
-      //   this.el.setAttribute("aabb_listener", true);
-      // });
-      this.calloutText.setAttribute("overlay");
-    
-      this.calloutToggle = false;
+
+    this.calloutText.setAttribute("overlay");
+    this.calloutToggle = false;
 
     let that = this;
 
@@ -2612,7 +2527,7 @@ AFRAME.registerComponent('cloud_marker', {
           window.playerPosition = this.playerPosRot.pos; 
       }
   
-      if (!that.isSelected && evt.detail.intersection) {
+      if (evt.detail.intersection) {
         this.clientX = evt.clientX;
         this.clientY = evt.clientY;
         // console.log("tryna mouseover placeholder");
@@ -2658,31 +2573,11 @@ AFRAME.registerComponent('cloud_marker', {
 
     this.el.addEventListener('mousedown', function (evt) {
 
-      that.isSelected = true;
-      // that.hitPosition = evt.detail.intersection.point;
-
-      console.log("tryna mousedouwn" + this.mouseDownPos);
-      if (evt.detail.intersection.object != null) {
-        let name = evt.detail.intersection.object.name;
-        // console.log(name);
-        // if (name == "x_handle") {
-        //   that.selectedAxis = 'x';
-        // } else if (name == "y_handle") {
-        //   that.selectedAxis = 'y';
-        // } else if (name == "z_handles") {
-        //   that.selectedAxis = 'z';
-        // } else {
-        //   that.selectedAxis = 'all';
-        // }
-        that.selectedAxis = name;
-        // document.getElementById("player").component.get_pos_rot.returnPosRot();
-        if (window.playerPosition != null) {
-          // 
-          // console.log("intersection! " + this.intersection[ 0 ].instanceId + " distance " + window.playerPosition.distanceTo(this.intersection[0].point));
-          that.rayhit(evt.detail.intersection.object.name, window.playerPosition.distanceTo(evt.detail.intersection.point), evt.detail.intersection.point);
-        }
-      }
-      
+      if (keydown != "Shift") {
+        ToggleTransformControls(that.timestamp);
+      } else {
+        ShowLocationModal(that.timestamp);
+      }      
     });
     this.el.addEventListener('mouseup', function (evt) {
       console.log("mouseup cloudmarker ");
@@ -4683,6 +4578,7 @@ AFRAME.registerComponent('load_threesvg', {
       console.log("tryna attach transform controls to el " + this.el.id );
       this.control = new TransformControls(this.el.sceneEl.camera, this.el.sceneEl);
       this.control.attach(this.el.getObject3D('mesh'));
+      this.control.size = .5;
       // this.el.sceneEl.add();
       this.el.sceneEl.object3D.add( this.control);
       this.object = this.el.getObject3D("mesh");

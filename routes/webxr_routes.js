@@ -1952,7 +1952,7 @@ webxr_router.get('/:_id', function (req, res) {
                             placeholderEntities = placeholderEntities + "<a-entity id=\x22"+locationPlaceholders[i].timestamp+"\x22 class=\x22activeObjexGrab activeObjexRay envMap placeholders\x22 cloud_marker=\x22phID: "+
                             locationPlaceholders[i].phID+"; scale: "+locationPlaceholders[i].markerObjScale+"; modelID: "+locationPlaceholders[i].modelID+"; model: "+
                             locationPlaceholders[i].model+"; markerType: "+locationPlaceholders[i].markerType+";  tags: "+locationPlaceholders[i].locationTags+"; isNew: false;name: "+
-                            locationPlaceholders[i].name+";label: "+locationPlaceholders[i].label+";description: "+locationPlaceholders[i].description+";eventData: "+locationPlaceholders[i].eventData+";timestamp: "+locationPlaceholders[i].timestamp+";\x22 "+
+                            locationPlaceholders[i].name+";label: "+locationPlaceholders[i].label+";description: "+locationPlaceholders[i].description+";eventData: "+locationPlaceholders[i].eventData+"; timestamp: "+locationPlaceholders[i].timestamp+";\x22 "+
                             skyboxEnvMap+ " position=\x22"+locationPlaceholders[i].x+" "+locationPlaceholders[i].y+ " " +locationPlaceholders[i].z+"\x22 rotation=\x22"+locationPlaceholders[i].eulerx+" "+locationPlaceholders[i].eulery+ " " +locationPlaceholders[i].eulerz+"\x22></a-entity>";
                         }
                         callback();
@@ -2710,7 +2710,7 @@ webxr_router.get('/:_id', function (req, res) {
                                         // gltfsAssets = gltfsAssets + "<a-asset-item id=\x22" + m_assetID + "\x22 src=\x22"+ modelURL +"\x22></a-asset-item>";
                                         gltfsAssets = gltfsAssets + "<a-asset-item id=\x22" + locMdl.modelID + "\x22 src=\x22"+ modelURL +"\x22></a-asset-item>";
                                         gltfsEntities = gltfsEntities + "<a-entity class=\x22geo\x22 scale=\x22"+scale+" "+scale+" "+scale+"\x22 data-scale=\x22"+scale+"\x22 mod_model=\x22markerType: "+
-                                        locMdl.markerType+"; tags: "+locationTags+"; eventData:"+locMdl.eventData+"\x22 class=\x22gltf "+entityType+" "+ambientChild+" activeObjexGrab activeObjexRay\x22 shadow=\x22cast:true; receive:true\x22 "+geoEntity+"=\x22latitude: "+locMdl.latitude+
+                                        locMdl.markerType+"; timestamp: "+locMdl.timestamp+"; tags: "+locationTags+"; eventData:"+locMdl.eventData+"\x22 class=\x22gltf "+entityType+" "+ambientChild+" activeObjexGrab activeObjexRay\x22 shadow=\x22cast:true; receive:true\x22 "+geoEntity+"=\x22latitude: "+locMdl.latitude+
                                         // "; latitude: "+locMdl.longitude+";\x22 "+skyboxEnvMap+"  class=\x22gltf\x22 gltf-model=\x22#" + m_assetID + "\x22 "+objAnim+" "+cannedAnim+" scale=\x22"+scale+" "+scale+" "+scale+"\x22 rotation=\x22"+rotation+"\x22 >" + offsetPos+ "</a-entity>";
                                         "; longitude: "+locMdl.longitude+";\x22 "+skyboxEnvMap+" gltf-model=\x22#" + m_assetID + "\x22 "+objAnim+" "+cannedAnim+" rotation=\x22"+rotation+"\x22 >" + offsetPos+ "</a-entity>";
                                         
@@ -2792,7 +2792,7 @@ webxr_router.get('/:_id', function (req, res) {
                                                     entityType = "surface";
 
                                                 }
-                                                let modModel = "mod_model=\x22markerType: "+locMdl.markerType+"; tags: "+locMdl.locationTags+"; description:"+locMdl.description+"; eventData:"+locMdl.eventData+"; modelID:"+m_assetID+"\x22";
+                                                let modModel = "mod_model=\x22markerType: "+locMdl.markerType+"; timestamp: "+locMdl.timestamp+"; tags: "+locMdl.locationTags+"; description:"+locMdl.description+"; eventData:"+locMdl.eventData+"; modelID:"+m_assetID+"\x22";
                                                 // let modMaterial = "";
                                                 if (locMdl.eventData.toLowerCase().includes("gallery")) {
                                                     // modModel = "mod_model_photo_gallery";  maybe later
@@ -2823,7 +2823,7 @@ webxr_router.get('/:_id', function (req, res) {
                                                         if (locMdl.eventData.toLowerCase().includes("noise")) {
                                                             console.log("TRYNA PUT A SHADER@@");
                                                             // modMaterial = "material=\x22shader: noise;\x22";
-                                                            modModel = "mod_model=\x22markerType: "+locMdl.markerType+"; tags: "+locMdl.locationTags+"; eventData:"+locMdl.eventData+"; shader: noise\x22";
+                                                            modModel = "mod_model=\x22markerType: "+locMdl.markerType+"; timestamp: "+locMdl.timestamp+"; tags: "+locMdl.locationTags+"; eventData:"+locMdl.eventData+"; shader: noise\x22";
                                                             let vertexShader  = requireText('../main/src/shaders/noise1_vertex.glsl', require);
                                                             let fragmentShader = requireText('../main/src/shaders/noise1_fragment.glsl', require);
                                                             shaderScripts = "<script type=\x22x-shader/x-vertex\x22 id=\x22noise1_vertex\x22>"+vertexShader+"</script>"+
@@ -4227,7 +4227,11 @@ webxr_router.get('/:_id', function (req, res) {
                     settings.networking = sceneResponse.sceneNetworking;
                     settings.playerStartPosition = playerPosition;
                     settings.debugMode = debugMode;
-
+                    settings.allowMods = false;
+                    
+                    if (sceneResponse.sceneTags != null && sceneResponse.sceneTags.includes("allow mods")) {
+                        settings.allowMods = true;
+                    }
                     if (sceneResponse.sceneTags != null && sceneResponse.sceneTags.includes("show avatars")) {
                         settings.hideAvatars = false;
                     }
