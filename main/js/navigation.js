@@ -1576,8 +1576,8 @@ AFRAME.registerComponent('nav_mesh_controller', {
 		console.log("tryna createRandomWaypoints...");
 		// let testPositions = [];
 		let goodWaypointCount = 0;
-		for (let i = 0; i < 300; i++) {
-			if (goodWaypointCount > 20) {
+		for (let i = 0; i < 300; i++) { //300 tries
+			if (goodWaypointCount > 20) { //get 20
 				console.log("gots enough random waypoints...");
 				break;
 			}
@@ -1586,7 +1586,7 @@ AFRAME.registerComponent('nav_mesh_controller', {
 			testPosition.y = 50;
 			testPosition.z = this.returnRandomNumber(-100, 100);
 			let raycaster = new THREE.Raycaster();
-			raycaster.set(new THREE.Vector3(testPosition.x, testPosition.y, testPosition.z), new THREE.Vector3(0, -1, 0.01));
+			raycaster.set(new THREE.Vector3(testPosition.x, testPosition.y, testPosition.z), new THREE.Vector3(0, -1, 0.001));
 			let results = raycaster.intersectObject(this.el.getObject3D('mesh'), true);
 
 			if(results.length > 0) {
@@ -1676,11 +1676,12 @@ AFRAME.registerComponent('nav_agent_controller', {
 			}
 		});
 		el.addEventListener('navigation-end', (e)=>{
+			// console.log(JSON.stringify(e));
 			this.updateAgentState(this.currentState);
 		})
 		el.addEventListener('navigation-null', (e)=>{
 			console.log("Nav Null");
-			// this.actorAnimation(data.animations[0], 2.4);
+			
 		});		
 	} else {
 		let modObjectComponent = this.el.components.mod_object; //in content-utils.js

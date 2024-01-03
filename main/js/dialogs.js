@@ -283,6 +283,10 @@ window.addEventListener( 'keyup',  ( event ) => {
 
   $('#modalContent').on('change', '#locationMarkerType', function(e) {
       console.log('type ' + e.target.value);
+      if (e.target.value == "waypoint") {
+        
+      }
+      
   });
 
   $('#modalContent').on('change', '.tk_type', function(e) {
@@ -628,6 +632,7 @@ function ReturnLocationMarkerTypeSelect (selected) {
     let types = "";
     const typesArray = [
       "none",
+      "placeholder",
       "model",
       "object",
       "player",

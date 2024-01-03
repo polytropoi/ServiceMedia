@@ -1854,6 +1854,8 @@ AFRAME.registerComponent('local_marker', {
 
   },
   init: function () {
+    let waypointCount = 0;
+    let waypoints = [];
     this.timestamp = this.data.timestamp;
     if (this.timestamp == '') {
       this.timestamp = Math.round(Date.now() / 1000).toString();
@@ -1865,7 +1867,7 @@ AFRAME.registerComponent('local_marker', {
     //     event.target.components["aabb-collider"]["intersectedEls"].map(x => x.id)
     //   );
     // });
-    console.log("tryna init local_marker withg timestamp " + this.timestamp );
+    // console.log("tryna init local_marker withg timestamp " + this.timestamp );
     // var posRotReader = document.getElementById("player").components.get_pos_rot; 
     // let isSelected = false;
     var sceneEl = document.querySelector('a-scene');
@@ -1927,7 +1929,7 @@ AFRAME.registerComponent('local_marker', {
             // }
             this.el.setAttribute('gltf-model', '#poi1');
             this.el.id = this.timestamp;
-            console.log("tryna set new localmarker with phID " + this.timestamp);
+            console.log("tryna set new localmarker with phID " + this.timestamp + " and markerType " + this.data.markerType);
              //check for tag?
           } else { //it's been saved to localData, w/ position
             // let locItem = {};
@@ -1952,12 +1954,19 @@ AFRAME.registerComponent('local_marker', {
             this.el.setAttribute('rotation', this.data.rotation);
             this.el.setAttribute('scale', this.data.scale);
             if (this.data.markerType != "none" && this.data.markerType != "player") {
+              console.log("adding some geo to localmarker!")
               this.el.setAttribute('gltf-model', '#poi1');
             }
-           
+            if (this.data.markerType == "waypoint") {
+              this.el.classList.add("waypoint");
+              // if (this.data.name == 'local placeholder') {
+              //   waypointCount++;
+              //   this.data.name == 'local waypoint ' + waypointCount;
+              // }
+            } 
 
             this.el.id = this.data.timestamp;
-            console.log("tryna set localmarker with phID " + this.timestamp);
+            console.log("tryna set localmarker with phID " + this.timestamp + " and markerType " + this.data.markerType);
           }
 
 
@@ -2007,7 +2016,8 @@ AFRAME.registerComponent('local_marker', {
         // that.calloutEntity = this.calloutEntity;
         // that.calloutText = this.calloutText;
         this.el.addEventListener("model-loaded", (e) => {
-          e.preventDefault();
+          // e.preventDefault();
+          console.log("local_marker geo is loaded for markertype " + this.data.markerType);
           if (this.data.isNew) {
             this.el.setAttribute("transform_controls", "");
           }
@@ -2070,7 +2080,8 @@ AFRAME.registerComponent('local_marker', {
         let pos = evt.detail.intersection.point; //hitpoint on model
         that.hitPosition = pos;
         let name = evt.detail.intersection.object.name;
-        that.distance = window.playerPosition.distanceTo(pos);
+        // that.distance = window.playerPosition.distanceTo(pos);
+        that.distance = evt.detail.intersection.distance;
         that.rayhit(evt.detail.intersection.object.name, that.distance, evt.detail.intersection.point);
      
         that.selectedAxis = name;

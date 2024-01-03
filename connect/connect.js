@@ -134,59 +134,53 @@ function InitIDB() {
          // if (e.target.result) {
             if (cursor) {
                hasLocalData = true;
-               // if (cursor.value.locations.length) {
-                  for (let i = 0; i < cursor.value.locations.length; i++) { //mod or create the scene elements
-                  // let loc = JSON.stringify(cursor.value.locations[i]);
-                  // console.log("gots a localData location: " + loc);
-                  // sceneLocations.locations = [];
-                  // localData.locations = [];
-                  localData.locations.push(cursor.value.locations[i]);
 
-                  let cloudEl = document.getElementById(cursor.value.locations[i].timestamp);
-                  if (cloudEl) { //prexisting elements (cloud_marker, mod_model, mod_object) already rendered onload
-                     //TODO get the component and update with mods, if any...
-                     // console.log("gotsa element with id " + JSON.stringify(localData.locations[i]));
-                     // let obj = cloudEl.getObject3D('mesh');
-                     // obj.position.set({x: cursor.value.locations[i].x, y: cursor.value.locations[i].y, z: cursor.value.locations[i].z });
-                     // obj.rotation.set({x: cursor.value.locations[i].eulerx, y: cursor.value.locations[i].eulery, z: cursor.value.locations[i].eulerz });
-                     // obj.scale.set({x: cursor.value.locations[i].markerObjScale, y: cursor.value.locations[i].markerObjScale, z: cursor.value.locations[i].markerObjScale});
-                     cloudEl.setAttribute("position", {x: cursor.value.locations[i].x, y: cursor.value.locations[i].y, z: cursor.value.locations[i].z });
-                     cloudEl.setAttribute("rotation", {x: cursor.value.locations[i].eulerx, y: cursor.value.locations[i].eulery, z: cursor.value.locations[i].eulerz });
-                     cloudEl.setAttribute("scale", {x: cursor.value.locations[i].markerObjScale, y: cursor.value.locations[i].markerObjScale, z: cursor.value.locations[i].markerObjScale});
+               for (let i = 0; i < cursor.value.locations.length; i++) { //mod or create the scene elements
+               // let loc = JSON.stringify(cursor.value.locations[i]);
+               // console.log("gots a localData location: " + loc);
+               // sceneLocations.locations = [];
+               // localData.locations = [];
+               localData.locations.push(cursor.value.locations[i]);
+
+               let cloudEl = document.getElementById(cursor.value.locations[i].timestamp);
+               if (cloudEl) { //prexisting elements (cloud_marker, mod_model, mod_object) already rendered onload
+                  //TODO get the component and update with mods, if any...
+                  // console.log("gotsa element with id " + JSON.stringify(localData.locations[i]));
+                  // let obj = cloudEl.getObject3D('mesh');
+                  // obj.position.set({x: cursor.value.locations[i].x, y: cursor.value.locations[i].y, z: cursor.value.locations[i].z });
+                  // obj.rotation.set({x: cursor.value.locations[i].eulerx, y: cursor.value.locations[i].eulery, z: cursor.value.locations[i].eulerz });
+                  // obj.scale.set({x: cursor.value.locations[i].markerObjScale, y: cursor.value.locations[i].markerObjScale, z: cursor.value.locations[i].markerObjScale});
+                  cloudEl.setAttribute("position", {x: cursor.value.locations[i].x, y: cursor.value.locations[i].y, z: cursor.value.locations[i].z });
+                  cloudEl.setAttribute("rotation", {x: cursor.value.locations[i].eulerx, y: cursor.value.locations[i].eulery, z: cursor.value.locations[i].eulerz });
+                  cloudEl.setAttribute("scale", {x: cursor.value.locations[i].markerObjScale, y: cursor.value.locations[i].markerObjScale, z: cursor.value.locations[i].markerObjScale});
 
 
-                  } else {//local-only elements, not saved to cloud yet
-                     let localEl = document.createElement("a-entity");
-                     sceneEl.appendChild(localEl);
-                     // let position = 
-                     localEl.setAttribute("position", {x: cursor.value.locations[i].x, y: cursor.value.locations[i].y, z: cursor.value.locations[i].z });
-                     localEl.setAttribute("rotation", {x: cursor.value.locations[i].eulerx, y: cursor.value.locations[i].eulery, z: cursor.value.locations[i].eulerz });
-                     localEl.setAttribute("scale", {x: cursor.value.locations[i].markerObjScale, y: cursor.value.locations[i].markerObjScale, z: cursor.value.locations[i].markerObjScale});
-                     //hrm, sniff for type and attach appropriate component...
-                     // if (cursor.value.locations[i].markerType )
-                     localEl.setAttribute("local_marker", {timestamp: cursor.value.locations[i].timestamp,
-                                                            name: cursor.value.locations[i].name, 
-                                                            tags: cursor.value.locations[i].tags, 
-                                                            eventData: cursor.value.locations[i].eventData, 
-                                                            markerType: cursor.value.locations[i].markerType,
-                                                            position: {x: cursor.value.locations[i].x, y: cursor.value.locations[i].y, z: cursor.value.locations[i].z},
-                                                            rotation: {x: cursor.value.locations[i].eulerx, y: cursor.value.locations[i].eulery, z: cursor.value.locations[i].eulerz },
-                                                            scale: {x: cursor.value.locations[i].markerObjScale, y: cursor.value.locations[i].markerObjScale, z: cursor.value.locations[i].markerObjScale}
-                                                         });
-                     localEl.id = cursor.value.locations[i].timestamp.toString();
-                  }
-                  locationTimestamps.push(cursor.value.locations[i].timestamp); //hrm
+               } else {//local-only elements, not saved to cloud yet
+                  let localEl = document.createElement("a-entity");
+                  sceneEl.appendChild(localEl);
+                  // let position = 
+                  localEl.setAttribute("position", {x: cursor.value.locations[i].x, y: cursor.value.locations[i].y, z: cursor.value.locations[i].z });
+                  localEl.setAttribute("rotation", {x: cursor.value.locations[i].eulerx, y: cursor.value.locations[i].eulery, z: cursor.value.locations[i].eulerz });
+                  localEl.setAttribute("scale", {x: cursor.value.locations[i].markerObjScale, y: cursor.value.locations[i].markerObjScale, z: cursor.value.locations[i].markerObjScale});
+                  //hrm, sniff for type and attach appropriate component...
+                  // if (cursor.value.locations[i].markerType )
+                  localEl.setAttribute("local_marker", {timestamp: cursor.value.locations[i].timestamp,
+                                                         name: cursor.value.locations[i].name, 
+                                                         tags: cursor.value.locations[i].tags, 
+                                                         eventData: cursor.value.locations[i].eventData, 
+                                                         markerType: cursor.value.locations[i].markerType,
+                                                         position: {x: cursor.value.locations[i].x, y: cursor.value.locations[i].y, z: cursor.value.locations[i].z},
+                                                         rotation: {x: cursor.value.locations[i].eulerx, y: cursor.value.locations[i].eulery, z: cursor.value.locations[i].eulerz },
+                                                         scale: {x: cursor.value.locations[i].markerObjScale, y: cursor.value.locations[i].markerObjScale, z: cursor.value.locations[i].markerObjScale}
+                                                      });
+                  localEl.id = cursor.value.locations[i].timestamp.toString();
+               }
+               locationTimestamps.push(cursor.value.locations[i].timestamp); //hrm
                } 
-               // } else {
-               //    // console.log("no localdata found in IDB");
-               //    // for (let i = 0; i < sceneLocations.locations.length; i++) {
-               //    //     localData.locations.push(sceneLocations.locations[i]);
-               //    // }
-               // }
+              
                for (let key in cursor.value.settings) {
                   localData.settings[key] = cursor.value.settings[key]; //TODO apply each one?
-                  // localData.locations[key] = 
-                  // localData[key] = cursor.value[key]; 
+
                }
                cursor.continue(); 
                
@@ -921,6 +915,10 @@ function SaveModToLocal(locationKey) { //locationKey is now just timestamp of th
    locItem.markerObjScale = document.getElementById("modelScale").value;
    locItem.phID = locationKey.toString();
    locItem.type = "Worldspace";
+
+   if (locItem.markerType == "waypoint" && locItem.name == 'local placeholder') {
+      locItem.name = 'local waypoint';
+   }
    
    // locItem.modelID = document.getElementById('locationModel').value.split("~")[3]; //model select values have the phID (room~cloud/local~timestamp) plus modelid, so index 3 of split
 
