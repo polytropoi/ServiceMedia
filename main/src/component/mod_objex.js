@@ -524,6 +524,7 @@ AFRAME.registerComponent('mod_object', {
       this.objectAudioController = null;
       this.hasBoneLook = false;
       this.lookBone = null;
+      this.coolDown = false;
 
       let cameraEl = document.querySelector('a-entity[camera]');  
       if (!cameraEl) {
@@ -1683,7 +1684,8 @@ AFRAME.registerComponent('mod_object', {
               }
             }
   
-            if (this.isNavAgent) {
+            if (this.isNavAgent && !this.coolDown) {
+              this.coolDownTimer();
               if (this.navAgentController && this.navAgentController.currentState != "dialog") {
                 this.navAgentController.updateAgentState("greet player");
                 this.el.setAttribute("look-at-y", "#player");
@@ -1918,6 +1920,14 @@ AFRAME.registerComponent('mod_object', {
         }
   
       });
+    },
+    coolDownTimer: function () {
+      if (!this.coolDown) {
+        this.coolDown = true;
+        setTimeout( () => {
+          this.coolDown = false;
+        }, 5000);
+      }
     },
     playAnimation: function (animState) {
       if (this.navAgentController) {

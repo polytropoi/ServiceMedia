@@ -1545,12 +1545,12 @@ AFRAME.registerComponent('nav_mesh_controller', {
 			for (let i = 0; i < 1000; i++) {
 				if (goodWaypointCount > 10) {
 					console.log("RANDOM WAYPOINTS READY gots enough random waypoints...");
-					this.isReady = true;
-					break;
+					this.almostReady();
+					break;	
 				}
 				let testPosition = new THREE.Vector3();
 				testPosition.x = this.returnRandomNumber(-100, 100);
-				testPosition.y = 100;
+				testPosition.y = 50;
 				testPosition.z = this.returnRandomNumber(-100, 100);
 				let raycaster = new THREE.Raycaster();
 				raycaster.set(new THREE.Vector3(testPosition.x, testPosition.y, testPosition.z), new THREE.Vector3(0, -1, 0));
@@ -1559,7 +1559,7 @@ AFRAME.registerComponent('nav_mesh_controller', {
 				if(results.length > 0) {
 					// this.znormal = Math.abs(results[0].face.normal.z);
 					// if (this.znormal < .1) {
-						console.log(" gotsa good navmesh intersect face normal: " + this.znormal );
+						// console.log(" gotsa good navmesh intersect face normal: " + this.znormal );
 						testPosition.y = results[0].point.y.toFixed(2); //snap y of waypoint to navmesh y
 						testPosition.x = results[0].point.x.toFixed(2);
 						testPosition.z = results[0].point.z.toFixed(2);
@@ -1584,48 +1584,12 @@ AFRAME.registerComponent('nav_mesh_controller', {
 		// }, 5000);
 		
 	},
-	// createRandomNode: function () {
-
-	// 	console.log("tryna createRandomWaypoints...");
-	// 	// let testPositions = [];
-	// 	let goodWaypointCount = 0;
-	// 	for (let i = 0; i < 300; i++) { //300 tries
-	// 		if (goodWaypointCount > 20) { //get 20
-	// 			console.log("gots enough random waypoints...");
-	// 			break;
-	// 		}
-	// 		let testPosition = new THREE.Vector3();
-	// 		testPosition.x = this.returnRandomNumber(-100, 100);
-	// 		testPosition.y = 50;
-	// 		testPosition.z = this.returnRandomNumber(-100, 100);
-	// 		let raycaster = new THREE.Raycaster();
-	// 		raycaster.set(new THREE.Vector3(testPosition.x, testPosition.y, testPosition.z), new THREE.Vector3(0, -1, 0.001));
-	// 		let results = raycaster.intersectObject(this.el.getObject3D('mesh'), true);
-
-	// 		if(results.length > 0) {
-	// 			console.log("gotsa navmesh intersect: " + results.length, results[0].object.name, results[0].point.y);
-	// 			testPosition.y = results[0].point.y; //snap y of waypoint to navmesh y
-	// 			let waypointEl = document.createElement("a-box");
-	// 			waypointEl.setAttribute('scale', '.1 .1 .1');
-	// 			waypointEl.setAttribute('position', testPosition);
-	// 			this.el.sceneEl.appendChild(waypointEl);
-	// 			this.goodWaypoints.push(waypointEl);
-	// 			goodWaypointCount++;
-				
-	// 			// data.waypoints[i].
-	// 		} else {
-	// 			console.log('bad nav waypoint');
-	// 			// waypoints.splice(i, 1);
-	// 		}
-	// 			// console.log("randomWaypoint : " + position);
-			
-	// 	}
+	almostReady: function () {
+		setTimeout( () => {
+			this.isReady = true;
+		}, 3000);
 		
-	// },
-	registerAgents: function () {
-		//todo
 	}
-
 });
 
 AFRAME.registerComponent('nav_agent_controller', {
@@ -1761,30 +1725,38 @@ AFRAME.registerComponent('nav_agent_controller', {
 		
 		let testPosition = this.el.getAttribute("position");
 		let raycaster = new THREE.Raycaster();
-		raycaster.set(new THREE.Vector3(testPosition.x.toFixed(2), (testPosition.y + 10).toFixed(2), testPosition.z.toFixed(2)), new THREE.Vector3(0, -1, 0));
+		raycaster.set(new THREE.Vector3(testPosition.x, testPosition.y + 10, testPosition.z), new THREE.Vector3(0, -1, 0));
 		let results = raycaster.intersectObject(this.navMeshControllerEl.getObject3D('mesh'), true);
 
 		if(results.length > 0) {
-			// this.znormal = Math.abs(results[0].face.normal.z);
-			// if (this.znormal < 1) {
-			// 	console.log("good spot!");
-				this.updateAgentState("pause");
-			// } else {
-			// 	// let wpIndex = Math.floor(Math.random()*this.navMeshController.goodWaypoints.length); //snap to random waypoint if pos no good...
-			// 	// let position = this.navMeshController.goodWaypoints[wpIndex].getAttribute("position");
-			// 	// console.log('bad agent start point! moving to ' + position);
-			// 	console.log('bad spot! taking a break..');
-			// 	this.el.setAttribute("position", position);
-			// 	this.currentState = "pause";
-			// 	this.updateAgentState(this.currentState);
-			// }
+			this.znormal = Math.abs(results[0].face.normal.z);
+			if (this.znormal < 1) {
+				console.log("good spot!");
+				let testPosition = {};
+				testPosition.x = results[0].point.x.toFixed(2); //snap y of waypoint to navmesh y
+				testPosition.y = results[0].point.y.toFixed(2);
+				testPosition.z = results[0].point.z.toFixed(2); 
+				this.el.setAttribute("position", testPosition);
+				this.currentState = "pause";
+				this.updateAgentState(this.currentState);
+
+			} else {
+				let wpIndex = Math.floor(Math.random()*this.navMeshController.goodWaypoints.length); //snap to random waypoint if pos no good...
+				let position = this.navMeshController.goodWaypoints[wpIndex].getAttribute("position");
+				// console.log('bad agent start point! moving to ' + position);
+				console.log('bad spot! taking a break..');
+				this.el.setAttribute("position", position);
+				this.currentState = "pause";
+				this.updateAgentState(this.currentState);
+			}
 		} else {
 
 			let wpIndex = Math.floor(Math.random()*this.navMeshController.goodWaypoints.length); //snap to random waypoint if pos no good...
 			let position = this.navMeshController.goodWaypoints[wpIndex].getAttribute("position");
 			console.log('bad agent start point! moving to ' + position);
 			this.el.setAttribute("position", position);
-			this.updateAgentState("pause");
+			this.currentState = "pause";
+			this.updateAgentState(this.currentState);
 		}
 	},
 	validTargetPosition: function (testPosition) { //is agent starting from legit spot?
@@ -1846,6 +1818,16 @@ AFRAME.registerComponent('nav_agent_controller', {
 					this.modModelComponent = this.el.components.mod_model;
 					this.agentAction();
 				}
+			}
+		} else {
+			if (this.modObjectComponent) {
+				this.modObjectComponent.playAnimation(this.currentState);
+
+			} else {
+				this.modObjectComponent = this.el.components.mod_object;
+				if (this.modModelComponent) {
+					this.modModelComponent.playAnimation(this.currentState);
+				} 
 			}
 		}
 
