@@ -4227,10 +4227,22 @@ webxr_router.get('/:_id', function (req, res) {
                     settings.networking = sceneResponse.sceneNetworking;
                     settings.playerStartPosition = playerPosition;
                     settings.debugMode = debugMode;
+                    settings.scatterObjects = sceneResponse.sceneScatterObjects;
+                    settings.sceneScatterObjectLayers = sceneResponse.sceneScatterObjectLayers;
+                    settings.scatterMeshes = sceneResponse.sceneScatterMeshes;
+
+                    settings.sceneScatterMeshLayers = sceneResponse.sceneScatterMeshLayers;
                     settings.allowMods = false;
+                
 
                     if (sceneResponse.sceneTags != null && sceneResponse.sceneTags.includes("allow mods")) {
                         settings.allowMods = true;
+                    }
+                    if (sceneResponse.scatterObjects) {
+                        settings.sceneScatterObjectLayers = sceneResponse.sceneScatterObjectLayers;
+                    }
+                    if (sceneResponse.scatterMeshes) {
+                        settings.sceneScatterMeshLayers = sceneResponse.sceneScatterMeshLayers;
                     }
                     if (sceneResponse.sceneTags != null && sceneResponse.sceneTags.includes("show avatars")) {
                         settings.hideAvatars = false;

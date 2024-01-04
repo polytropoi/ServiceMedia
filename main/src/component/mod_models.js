@@ -80,7 +80,8 @@ AFRAME.registerComponent('mod_model', {
         this.font1 = "Acme.woff";
         this.font2 = "Acme.woff";
         this.timestamp = this.data.timestamp;
-        
+        this.isNavAgent = false;
+        this.navAgentController = null;
         if (settings && settings.sceneFontWeb1) {
           this.font1 = settings.sceneFontWeb1;
         }
@@ -136,7 +137,11 @@ AFRAME.registerComponent('mod_model', {
           
           }
         }
-  
+        if (this.data.eventData.toLowerCase().includes("agent")) { 
+          this.isNavAgent = true;
+          this.navAgentController = this.el.components.nav_agent_controller;
+    
+        } 
         let that = this;
         ///////////////////////////////////////////////// model loaded event start /////////////////////////////
   
@@ -203,7 +208,7 @@ AFRAME.registerComponent('mod_model', {
           }
           if (this.data.eventData.toLowerCase().includes("agent")) { 
             if (settings.useNavmesh) {
-              this.el.setAttribute("nav-agent", "");
+              // this.el.setAttribute("nav-agent", "");
               this.el.setAttribute("nav_agent_controller", "");  
               this.el.setAttribute("mod_physics", {'model': 'agent', 'isTrigger': true});
             }
@@ -249,9 +254,9 @@ AFRAME.registerComponent('mod_model', {
                     let scatteredEl = document.createElement("a-entity"); 
                     scatteredEl.setAttribute("position", testPosition);
                     scatteredEl.setAttribute("gltf-model", "#" + this.data.modelID);
-                    let eventData = this.data.eventData.replace("scatter~", ""); //prevent infinite recursion!
+                    let eventData = this.data.eventData.replace("scatter", ""); //prevent infinite recursion!
 
-                    scatteredEl.setAttribute("mod_model", {eventData: eventData, markerType: this.data.markerType, description: this.data.description});
+                    scatteredEl.setAttribute("mod_model", {eventData: eventData, markerType: this.data.markerType, description: this.data.description, modelID: this.data.modelID});
                     if (this.data.markerType != "character") { //messes up navmeshing..
                       let scale = this.returnRandomNumber(.25, 1.25);
                       scatteredEl.setAttribute("scale", {x: scale, y:scale, z: scale})
@@ -1460,6 +1465,47 @@ AFRAME.registerComponent('mod_model', {
   
               }
             
+            }
+            if (this.isNavAgent) {
+              if (this.navAgentController && this.navAgentController.currentState != "dialog") {
+                this.navAgentController.updateAgentState("greet player");
+                this.el.setAttribute("look-at-y", "#player");
+  
+              } else {
+                if (!this.navAgentController)
+                this.navAgentController = this.el.components.nav_agent_controller;
+              } 
+              if (this.findAction) {
+                
+                for (let i = 0; i < this.findAction.tags.length; i++) {
+                  console.log("looking for objs with class " + this.findAction.tags[i]);
+                  let targetObjects = document.getElementsByClassName(this.findAction.tags[i]);
+                  if (targetObjects) {
+                    console.log("gots target objects " + targetObjects.length);
+                    for (let l = 0; l < targetObjects.length; l++) {
+                      let targetLoc = targetObjects[l].getAttribute("position");
+                      this.targetLocations.push(targetLoc);
+                    }
+                  } else {
+                    console.log("didn't find no targetObjects");
+                  }
+                  
+                }
+                if (this.targetLocations.length && this.navAgentController && this.navAgentController.currentState != "dialog") {
+                  // this.navAgentController.seekTargetLocation();
+                  this.navAgentController.updateAgentState("target"); //instead of waypoints
+                }
+              }
+              // if (this.data.objectData.audiogroupID && this.data.objectData.audiogroupID.length > 4) { //it's an objectID
+              //   if (this.objectAudioController) {
+              //     console.log("tryna play random object_audio");
+              //     this.objectAudioController.playRandom();
+              //   } else {
+              //     this.objectAudioController = this.el.components.object_audio_controller;
+              //   }
+              // }
+              
+  
             }
           });
   

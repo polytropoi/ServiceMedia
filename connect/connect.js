@@ -156,24 +156,26 @@ function InitIDB() {
 
 
                } else {//local-only elements, not saved to cloud yet
-                  let localEl = document.createElement("a-entity");
-                  sceneEl.appendChild(localEl);
-                  // let position = 
-                  localEl.setAttribute("position", {x: cursor.value.locations[i].x, y: cursor.value.locations[i].y, z: cursor.value.locations[i].z });
-                  localEl.setAttribute("rotation", {x: cursor.value.locations[i].eulerx, y: cursor.value.locations[i].eulery, z: cursor.value.locations[i].eulerz });
-                  localEl.setAttribute("scale", {x: cursor.value.locations[i].markerObjScale, y: cursor.value.locations[i].markerObjScale, z: cursor.value.locations[i].markerObjScale});
-                  //hrm, sniff for type and attach appropriate component...
-                  // if (cursor.value.locations[i].markerType )
-                  localEl.setAttribute("local_marker", {timestamp: cursor.value.locations[i].timestamp,
-                                                         name: cursor.value.locations[i].name, 
-                                                         tags: cursor.value.locations[i].tags, 
-                                                         eventData: cursor.value.locations[i].eventData, 
-                                                         markerType: cursor.value.locations[i].markerType,
-                                                         position: {x: cursor.value.locations[i].x, y: cursor.value.locations[i].y, z: cursor.value.locations[i].z},
-                                                         rotation: {x: cursor.value.locations[i].eulerx, y: cursor.value.locations[i].eulery, z: cursor.value.locations[i].eulerz },
-                                                         scale: {x: cursor.value.locations[i].markerObjScale, y: cursor.value.locations[i].markerObjScale, z: cursor.value.locations[i].markerObjScale}
-                                                      });
-                  localEl.id = cursor.value.locations[i].timestamp.toString();
+                  setTimeout(function () { //prevent overload...
+                     let localEl = document.createElement("a-entity");
+                     sceneEl.appendChild(localEl);
+                     // let position = 
+                     localEl.setAttribute("position", {x: cursor.value.locations[i].x, y: cursor.value.locations[i].y, z: cursor.value.locations[i].z });
+                     localEl.setAttribute("rotation", {x: cursor.value.locations[i].eulerx, y: cursor.value.locations[i].eulery, z: cursor.value.locations[i].eulerz });
+                     localEl.setAttribute("scale", {x: cursor.value.locations[i].markerObjScale, y: cursor.value.locations[i].markerObjScale, z: cursor.value.locations[i].markerObjScale});
+                     //hrm, sniff for type and attach appropriate component...
+                     // if (cursor.value.locations[i].markerType )
+                     localEl.setAttribute("local_marker", {timestamp: cursor.value.locations[i].timestamp,
+                                                            name: cursor.value.locations[i].name, 
+                                                            tags: cursor.value.locations[i].tags, 
+                                                            eventData: cursor.value.locations[i].eventData, 
+                                                            markerType: cursor.value.locations[i].markerType,
+                                                            position: {x: cursor.value.locations[i].x, y: cursor.value.locations[i].y, z: cursor.value.locations[i].z},
+                                                            rotation: {x: cursor.value.locations[i].eulerx, y: cursor.value.locations[i].eulery, z: cursor.value.locations[i].eulerz },
+                                                            scale: {x: cursor.value.locations[i].markerObjScale, y: cursor.value.locations[i].markerObjScale, z: cursor.value.locations[i].markerObjScale}
+                                                         });
+                     localEl.id = cursor.value.locations[i].timestamp.toString();
+                  }, 100 * i);
                }
                locationTimestamps.push(cursor.value.locations[i].timestamp); //hrm
                } 
@@ -567,12 +569,15 @@ $(function() {
 
    if (settings.allowMods) {
       if ('storage' in navigator && 'estimate' in navigator.storage) {
-         navigator.storage.estimate().then(({usage, quota}) => {
+            navigator.storage.estimate().then(({usage, quota}) => {
             currentLocalStorageUsed = usage;
             currentAvailableLocalStorageEstimage = quota;
-         console.log(`Using ${usage} out of ${quota} bytes.`);
+            console.log(`Using ${usage} out of ${quota} bytes.`);
          });
       }
+   }
+   if (settings.sceneScatterObjectLayers) {
+      console.log("objectScatterLayers: " + JSON.stringify(settings.sceneScatterObjectLayers));
    }
    // this.asky = document.getElementsByTagName('a-sky')[0];
    // if (this.asky && settings) {
