@@ -250,7 +250,9 @@ AFRAME.registerComponent('mod_model', {
                   if(results.length > 0) {
                     
                     console.log("gotsa scatterPosition for model " + this.data.modelID+ " intersect: " + results.length + " " +results[0].object.name + "scatterCount " + scatterCount + " vs count " + count );
-                    testPosition.y = results[0].point.y; //snap y of waypoint to navmesh y
+                    testPosition.x = results[0].point.x.toFixed(2); //snap y of waypoint to navmesh y
+                    testPosition.y = results[0].point.y.toFixed(2);; //snap y of waypoint to navmesh y
+                    testPosition.z = results[0].point.z.toFixed(2);; //snap y of waypoint to navmesh y
                     let scatteredEl = document.createElement("a-entity"); 
                     scatteredEl.setAttribute("position", testPosition);
                     scatteredEl.setAttribute("gltf-model", "#" + this.data.modelID);
