@@ -1587,7 +1587,7 @@ AFRAME.registerComponent('nav_mesh_controller', {
 	almostReady: function () {
 		setTimeout( () => {
 			this.isReady = true;
-		}, 3000);
+		}, 1000);
 		
 	}
 });
@@ -1625,12 +1625,13 @@ AFRAME.registerComponent('nav_agent_controller', {
 		//   let raycaster = new THREE.Raycaster();
 		this.navMeshControllerEl = null;
 		this.viewportHolder = document.getElementById('viewportPlaceholder');
+		this.currentState = "pause";
+		this.previousState = "random";
+		this.currentSpeed = 1;
+		//////////loop to get navmesh
 		let interval = setInterval( () => { //make sure navmesh and controller are ready
-			let navMeshControllerEl = document.getElementById("nav-mesh");
-			this.currentState = "random";
-			this.previousState = "random";
+		let navMeshControllerEl = document.getElementById("nav-mesh");
 
-			this.currentSpeed = 1;
 			if (navMeshControllerEl) {
 				this.navMeshControllerEl = navMeshControllerEl;
 				this.navMeshController = navMeshControllerEl.components["nav_mesh_controller"];
@@ -1641,6 +1642,7 @@ AFRAME.registerComponent('nav_agent_controller', {
 						this.el.setAttribute("nav-agent", {active:false});
 						this.validStartPosition(); //make sure the agent is in a good starting spot
 						clearInterval(interval);
+
 					}
 				} 
 			}
@@ -1725,7 +1727,7 @@ AFRAME.registerComponent('nav_agent_controller', {
 		
 		let testPosition = this.el.getAttribute("position");
 		let raycaster = new THREE.Raycaster();
-		raycaster.set(new THREE.Vector3(testPosition.x, testPosition.y + 10, testPosition.z), new THREE.Vector3(0, -1, 0));
+		raycaster.set(new THREE.Vector3(testPosition.x, testPosition.y + 100, testPosition.z), new THREE.Vector3(0, -1, 0));
 		let results = raycaster.intersectObject(this.navMeshControllerEl.getObject3D('mesh'), true);
 
 		if(results.length > 0) {
@@ -1825,11 +1827,12 @@ AFRAME.registerComponent('nav_agent_controller', {
 
 			} else {
 				this.modObjectComponent = this.el.components.mod_object;
-				if (this.modModelComponent) {
-					this.modModelComponent.playAnimation(this.currentState);
+				if (this.modObjectComponent) {
+					this.modObjectComponent.playAnimation(this.currentState);
 				} 
 			}
 		}
+		// this.validStartPosition();
 
 	},
 	agentAction: function(){

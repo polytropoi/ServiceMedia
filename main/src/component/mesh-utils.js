@@ -1133,6 +1133,7 @@ AFRAME.registerComponent('instanced_surface_meshes', {
         console.log("tryna INSTANCE THE THIGNS");
         this.sampleGeos = [];
         this.sampleMats = [];
+        sObj.visible = false;
         sObj.traverse(node => {
         if (node.isMesh && node.material) {
             this.sampleGeometry = node.geometry;
@@ -1142,7 +1143,9 @@ AFRAME.registerComponent('instanced_surface_meshes', {
             
             }
           });
+
         if (!this.scatterFinished) {
+          
           this.surfaceLoaded(); //surface should be ready, if not it will reload samplegeos below
         }
       });
@@ -1233,6 +1236,7 @@ AFRAME.registerComponent('instanced_surface_meshes', {
   //   // }
   // },
   surfaceLoaded: function () {
+    
     console.log("instanced_surface_meshes.surfaceLoaded call");
         if (!this.surfaceMesh) {
           this.surfaces = document.getElementsByClassName("surface");
@@ -1261,7 +1265,7 @@ AFRAME.registerComponent('instanced_surface_meshes', {
           const sObj = this.el.getObject3D('mesh');
           if (sObj) {
           console.log("tryna INSTANCE THE THIGNS");
-          // sObj.visible = false;
+          sObj.visible = false;
           this.sampleGeos = [];
           this.sampleMats = [];
           sObj.traverse(node => {
@@ -1322,6 +1326,7 @@ AFRAME.registerComponent('instanced_surface_meshes', {
         // this.iMeshes = []; //nm
         console.log("tryna scatter!@ waterLeve " + waterLevel + " object with #meshes  "+ this.sampleGeos.length);
         var dummy = new THREE.Object3D();
+        dummy.visible = false;
         const count = this.data.count;
     
         const sampler = new MeshSurfaceSampler( this.surfaceMesh ) // noice!  
@@ -1350,69 +1355,72 @@ AFRAME.registerComponent('instanced_surface_meshes', {
             // this.iMeshes.push(iMesh);
             // if (m == this.sampleGeos.length - 1) {
               // console.log("trryna update tyhe matrix.. ")
-              let position = new THREE.Vector3();
+              let position = new THREE.Vector3(0,-20,0);
               let normal = new THREE.Vector3();
               this.count = 0;
               for (var i = 0; i < 100000; i++) {
-                if (this.count < count) {
+                if (this.count <= count) {
                 
                 // sampler.sample( position, normal ) //wtf?
-                sampler.sample( position );
-                
-                let scale = Math.random() * this.data.scaleFactor;
-                // console.log("scale " + scale);
-                if (position.y > waterLevel) { //loop through till all of them are above the 0
-                  this.count++;
-                  // console.log("instance pos " + JSON.stringify(position));
-                  dummy.position.set(  position.x, position.y + this.data.yMod, position.z );
-                  dummy.scale.set(scale,scale,scale);
-                  dummy.rotation.y = (Math.random() * 360 ) * Math.PI / 180;
-                  //   dummy.lookAt( _normal ); //use eventData? 
-                  dummy.updateMatrix();
+                if (i > 4) { 
+                  sampler.sample( position );
+                  
+                  let scale = Math.random() * this.data.scaleFactor;
+                  // console.log("scale " + scale);
+                  if (position.y > waterLevel) { //loop through till all of them are above the 0
+                    
+                    // console.log("instance pos " + JSON.stringify(position));
+                    dummy.position.set( position.x, position.y + this.data.yMod, position.z );
+                    dummy.scale.set(scale,scale,scale);
+                    dummy.rotation.y = (Math.random() * 360 ) * Math.PI / 180;
+                    //   dummy.lookAt( _normal ); //use eventData? 
+                    dummy.updateMatrix();
 
-                  iMesh_1.setMatrixAt( i, dummy.matrix ); //got fussy in a loop, 2 is enough..
-                  iMesh_1.frustumCulled = false; //too funky
-                  iMesh_1.instanceMatrix.needsUpdate = true;
-                  iMesh_1.userData = {"collide": true, "instanced": true, count: count};
-                  sceneEl.object3D.add(iMesh_1);
-                  this.iMesh = iMesh_1;
-                  this.iMesh_1 = iMesh_1;
-                  if (iMesh_2) {
-                    iMesh_2.setMatrixAt( i, dummy.matrix );
-                    iMesh_2.frustumCulled = false;
-                    iMesh_2.instanceMatrix.needsUpdate = true;
-                    iMesh_2.userData = {"collide": true, "instanced": true, count: count};
-                    sceneEl.object3D.add(iMesh_2);
-                    this.iMesh = iMesh_2;
-                    this.iMesh_2 = iMesh_2;
-                  }
-                  if (iMesh_3) {
-                    iMesh_3.setMatrixAt( i, dummy.matrix );
-                    iMesh_3.frustumCulled = false;
-                    iMesh_3.instanceMatrix.needsUpdate = true;
-                    iMesh_3.userData = {"collide": true, "instanced": true, count: count};
-                    sceneEl.object3D.add(iMesh_3);
-                    // this.iMesh = iMesh_3;
-                    this.iMesh_3 = iMesh_3;
-                  }
-                  if (iMesh_4) {
-                    iMesh_4.setMatrixAt( i, dummy.matrix );
-                    iMesh_4.frustumCulled = false;
-                    iMesh_4.instanceMatrix.needsUpdate = true;
-                    iMesh_4.userData = {"collide": true, "instanced": true, count: count};
-                    sceneEl.object3D.add(iMesh_4);
-                    this.iMesh_4 = iMesh_4;
-                  }
-
+                    iMesh_1.setMatrixAt( this.count, dummy.matrix ); //got fussy in a loop, 2 is enough..
+                    iMesh_1.frustumCulled = false; //too funky
+                    iMesh_1.instanceMatrix.needsUpdate = true;
+                    iMesh_1.userData = {"collide": true, "instanced": true, count: count};
+                    sceneEl.object3D.add(iMesh_1);
+                    this.iMesh = iMesh_1;
+                    this.iMesh_1 = iMesh_1;
+                    if (iMesh_2) {
+                      iMesh_2.setMatrixAt( this.count, dummy.matrix );
+                      iMesh_2.frustumCulled = false;
+                      iMesh_2.instanceMatrix.needsUpdate = true;
+                      iMesh_2.userData = {"collide": true, "instanced": true, count: count};
+                      sceneEl.object3D.add(iMesh_2);
+                      this.iMesh = iMesh_2;
+                      this.iMesh_2 = iMesh_2;
+                    }
+                    if (iMesh_3) {
+                      iMesh_3.setMatrixAt( this.count, dummy.matrix );
+                      iMesh_3.frustumCulled = false;
+                      iMesh_3.instanceMatrix.needsUpdate = true;
+                      iMesh_3.userData = {"collide": true, "instanced": true, count: count};
+                      sceneEl.object3D.add(iMesh_3);
+                      // this.iMesh = iMesh_3;
+                      this.iMesh_3 = iMesh_3;
+                    }
+                    if (iMesh_4) {
+                      iMesh_4.setMatrixAt( this.count, dummy.matrix );
+                      iMesh_4.frustumCulled = false;
+                      iMesh_4.instanceMatrix.needsUpdate = true;
+                      iMesh_4.userData = {"collide": true, "instanced": true, count: count};
+                      sceneEl.object3D.add(iMesh_4);
+                      this.iMesh_4 = iMesh_4;
+                    }
+                    this.count++;
+                    }
                   }
               } else {
                 console.log("breaking loop at " + i.toString());
                 //this.iMesh = iMesh_2; //maybe https://threejs.org/docs/index.html#examples/en/utils/BufferGeometryUtils.mergeBufferGeometries?
-
+                // remove(dummy);
                 break;
                 
               }
             }
+
         this.el.classList.add('activeObjexRay');
         this.initialized = true;
         // let oray = document.querySelector("[object_raycaster]");

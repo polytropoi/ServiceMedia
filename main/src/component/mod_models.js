@@ -251,8 +251,8 @@ AFRAME.registerComponent('mod_model', {
                     
                     console.log("gotsa scatterPosition for model " + this.data.modelID+ " intersect: " + results.length + " " +results[0].object.name + "scatterCount " + scatterCount + " vs count " + count );
                     testPosition.x = results[0].point.x.toFixed(2); //snap y of waypoint to navmesh y
-                    testPosition.y = results[0].point.y.toFixed(2);; //snap y of waypoint to navmesh y
-                    testPosition.z = results[0].point.z.toFixed(2);; //snap y of waypoint to navmesh y
+                    testPosition.y = results[0].point.y.toFixed(2); //snap y of waypoint to navmesh y
+                    testPosition.z = results[0].point.z.toFixed(2); //snap y of waypoint to navmesh y
                     let scatteredEl = document.createElement("a-entity"); 
                     scatteredEl.setAttribute("position", testPosition);
                     scatteredEl.setAttribute("gltf-model", "#" + this.data.modelID);
@@ -262,7 +262,7 @@ AFRAME.registerComponent('mod_model', {
                     if (this.data.markerType != "character") { //messes up navmeshing..
                       let scale = this.returnRandomNumber(.25, 1.25);
                       scatteredEl.setAttribute("scale", {x: scale, y:scale, z: scale})
-                     }
+                    }
                     this.el.sceneEl.appendChild(scatteredEl);
                     scatterCount++;
                     
@@ -278,17 +278,17 @@ AFRAME.registerComponent('mod_model', {
                     // console.log('bad testPosition');
                     // waypoints.splice(i, 1);
                   }
-                    // console.log("randomWaypoint : " + position);
+                  // console.log("randomWaypoint : " + position);
                   if (i == 100) {
                     clearInterval(interval);
                   }
                 }
-              }, 1000);
+              }, 2000);
               // }
               }              
             }
             if (this.data.eventData.includes("pickup")) { //USING PHYSX, needs useStarterKit = true!
-            this.el.setAttribute("data-pick-up");
+              this.el.setAttribute("data-pick-up");
             
             if (this.data.eventData.includes("magnet") || this.data.eventData.includes("snap")) {
               this.el.classList.add("magnet-left");
