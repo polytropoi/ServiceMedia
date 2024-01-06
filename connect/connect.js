@@ -124,9 +124,9 @@ function InitIDB() {
       const store = transaction.objectStore("scenes");
       const loadTimeStamp = Date.now();
       const lastSceneUpdate = null;
-     
+
       //first check if there are localmods, version saved with tilde
-      // const modQuery = store.get(room + "~"); //nope
+      // const modQuery = store.get(room + "~"); //nope, needs cursor
       const modQuery = store.openCursor(room + "~"); //use cursor mode so it's iterable below
       modQuery.onsuccess = function (e) {
          var cursor = e.target.result;
@@ -138,44 +138,31 @@ function InitIDB() {
                for (let i = 0; i < cursor.value.locations.length; i++) { //mod or create the scene elements
                // let loc = JSON.stringify(cursor.value.locations[i]);
                console.log("cursor " + i + " of " + cursor.value.locations.length);
-               // sceneLocations.locations = [];
-               // localData.locations = [];
                localData.locations.push(cursor.value.locations[i]);
 
                let cloudEl = document.getElementById(cursor.value.locations[i].timestamp);
                if (cloudEl) { //prexisting elements (cloud_marker, mod_model, mod_object) already rendered onload
-                  //TODO get the component and update with mods, if any...
-                  // console.log("gotsa element with id " + JSON.stringify(localData.locations[i]));
-                  // let obj = cloudEl.getObject3D('mesh');
-                  // obj.position.set({x: cursor.value.locations[i].x, y: cursor.value.locations[i].y, z: cursor.value.locations[i].z });
-                  // obj.rotation.set({x: cursor.value.locations[i].eulerx, y: cursor.value.locations[i].eulery, z: cursor.value.locations[i].eulerz });
-                  // obj.scale.set({x: cursor.value.locations[i].markerObjScale, y: cursor.value.locations[i].markerObjScale, z: cursor.value.locations[i].markerObjScale});
                   cloudEl.setAttribute("position", {x: cursor.value.locations[i].x, y: cursor.value.locations[i].y, z: cursor.value.locations[i].z });
                   cloudEl.setAttribute("rotation", {x: cursor.value.locations[i].eulerx, y: cursor.value.locations[i].eulery, z: cursor.value.locations[i].eulerz });
                   cloudEl.setAttribute("scale", {x: cursor.value.locations[i].markerObjScale, y: cursor.value.locations[i].markerObjScale, z: cursor.value.locations[i].markerObjScale});
-
-
                } else {//local-only elements, not saved to cloud yet
-                  // setTimeout(function () { //prevent overload...
-                     let localEl = document.createElement("a-entity");
-                     sceneEl.appendChild(localEl);
-                     // let position = 
-                     localEl.setAttribute("position", {x: cursor.value.locations[i].x, y: cursor.value.locations[i].y, z: cursor.value.locations[i].z });
-                     localEl.setAttribute("rotation", {x: cursor.value.locations[i].eulerx, y: cursor.value.locations[i].eulery, z: cursor.value.locations[i].eulerz });
-                     localEl.setAttribute("scale", {x: cursor.value.locations[i].markerObjScale, y: cursor.value.locations[i].markerObjScale, z: cursor.value.locations[i].markerObjScale});
-                     //hrm, sniff for type and attach appropriate component...
-                     // if (cursor.value.locations[i].markerType )
-                     localEl.setAttribute("local_marker", {timestamp: cursor.value.locations[i].timestamp,
-                                                            name: cursor.value.locations[i].name, 
-                                                            tags: cursor.value.locations[i].tags, 
-                                                            eventData: cursor.value.locations[i].eventData, 
-                                                            markerType: cursor.value.locations[i].markerType,
-                                                            position: {x: cursor.value.locations[i].x, y: cursor.value.locations[i].y, z: cursor.value.locations[i].z},
-                                                            rotation: {x: cursor.value.locations[i].eulerx, y: cursor.value.locations[i].eulery, z: cursor.value.locations[i].eulerz },
-                                                            scale: {x: cursor.value.locations[i].markerObjScale, y: cursor.value.locations[i].markerObjScale, z: cursor.value.locations[i].markerObjScale}
-                                                         });
-                     localEl.id = cursor.value.locations[i].timestamp.toString();
-                  // }, 100 * i);
+                  let localEl = document.createElement("a-entity");
+                  sceneEl.appendChild(localEl);
+
+                  localEl.setAttribute("position", {x: cursor.value.locations[i].x, y: cursor.value.locations[i].y, z: cursor.value.locations[i].z });
+                  localEl.setAttribute("rotation", {x: cursor.value.locations[i].eulerx, y: cursor.value.locations[i].eulery, z: cursor.value.locations[i].eulerz });
+                  localEl.setAttribute("scale", {x: cursor.value.locations[i].markerObjScale, y: cursor.value.locations[i].markerObjScale, z: cursor.value.locations[i].markerObjScale});
+                  
+                  localEl.setAttribute("local_marker", {timestamp: cursor.value.locations[i].timestamp,
+                                                         name: cursor.value.locations[i].name, 
+                                                         tags: cursor.value.locations[i].tags, 
+                                                         eventData: cursor.value.locations[i].eventData, 
+                                                         markerType: cursor.value.locations[i].markerType,
+                                                         position: {x: cursor.value.locations[i].x, y: cursor.value.locations[i].y, z: cursor.value.locations[i].z},
+                                                         rotation: {x: cursor.value.locations[i].eulerx, y: cursor.value.locations[i].eulery, z: cursor.value.locations[i].eulerz },
+                                                         scale: {x: cursor.value.locations[i].markerObjScale, y: cursor.value.locations[i].markerObjScale, z: cursor.value.locations[i].markerObjScale}
+                                                      });
+                  localEl.id = cursor.value.locations[i].timestamp.toString();
                }
                locationTimestamps.push(cursor.value.locations[i].timestamp); //hrm
                } 
@@ -189,21 +176,16 @@ function InitIDB() {
             } else {
                console.log("cursor is done...or was empty");
             }
-         // } else {
-         //    // console.log("query failed!");
-         // }
+
          transaction.oncomplete = function () {
             db.close();
-            // UpdateSceneLocations();]
-            if (localData.locations.length == 0) { //copy the cloudData if there was no localdb
-               console.log("copying localData.locations...");
-               for (let i = 0; i < sceneLocations.locations.length; i++) {
+
+               for (let i = 0; i < sceneLocations.locations.length; i++) { //top off the localdata with anything missing
                   if (locationTimestamps.indexOf(sceneLocations.locations[i].timestamp) == -1) {
-                     // localData.locations.push(sceneLocations.locations[i]);
+                     localData.locations.push(sceneLocations.locations[i]);
                   }
-                  // localData.locations.push(sceneLocations.locations[i]);
               }
-            }
+
             console.log("COPIED LOCALDATA locations length " + localData.locations.length);
           }
       };

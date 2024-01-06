@@ -221,22 +221,19 @@ AFRAME.registerComponent('mod_model', {
           }
           if (this.data.eventData.includes("scatter")) {
             this.el.object3D.visible = false;
-            let surface = document.getElementById("scatterSurface");
-
-            if (!surface) {
-              surface = document.getElementById("nav-mesh");
+            let surface = null;
+            let scatterSurface = document.getElementById("scatterSurface");
+            let navmesh = document.getElementById("nav-mesh");
+            if (navmesh) {
+              surface = navmesh;
+            } else if (scatterSurface) {
+              surface = scatterSurface;
             }
             console.log("tryna SCATTER (not instance) a model");
             if (surface) {
-              // let tag = this.data.tags.indexOf
-              let split = this.data.eventData.split("~");
+              let split = this.data.eventData.split("~"); //gonna switch to tags...
               let count = 10;
               let scatterCount = 0;
-              // if (split.length > 1) {
-              //   count = split[1];
-              // }
-                  // for (let i = 0; i < count; i++) {
-                    
               if (!this.isNavAgent) { //use waypoints for position below instead of raycasting if it's gonna nav
                 let interval = setInterval( () => {
                 for (let i = 0; i < 100; i++) {
@@ -286,40 +283,30 @@ AFRAME.registerComponent('mod_model', {
                 }, 2000);
               } else { //just use waypoints to start for chars, nav_agent_controller.data.snapToWaypoints set above
                 let scatterCount = 0;
-                // let navMeshControllerEl = document.getElementById("nav-mesh");
-                // let navMeshController = null;
+                
                 let interval = setInterval( () => {
-                //   if (!navMeshControllerEl) {
-                //     navMeshControllerEl = document.getElementById("nav-mesh");
-                //   } else {
-                //     navMeshController = navMeshControllerEl.components["nav_mesh_controller"];
-                   
-                //   }
+             
+                    let scatteredEl = document.createElement("a-entity"); 
+                    // scatteredEl.setAttribute("position", testPosition);
+                    scatteredEl.setAttribute("gltf-model", "#" + this.data.modelID);
+                    let eventData = this.data.eventData.replace("scatter", ""); //prevent infinite recursion!
 
-                //   if (navMeshController && navMeshController.data.isReady && navMeshController.data.goodWaypoints > 9)  {
-                      let scatteredEl = document.createElement("a-entity"); 
-                      // scatteredEl.setAttribute("position", testPosition);
-                      scatteredEl.setAttribute("gltf-model", "#" + this.data.modelID);
-                      let eventData = this.data.eventData.replace("scatter", ""); //prevent infinite recursion!
-  
-                      scatteredEl.setAttribute("mod_model", {eventData: eventData, markerType: this.data.markerType, description: this.data.description, modelID: this.data.modelID, tags: this.data.tags});
-                     
-                        let scale = this.returnRandomNumber(.25, 1.25);
-                        scatteredEl.setAttribute("scale", {x: scale, y:scale, z: scale})
-                     
-                      this.el.sceneEl.appendChild(scatteredEl);
-                      scatterCount++;
-                      if (scatterCount > count) {
-                        clearInterval(interval);
-                       
-                      } 
-                          
+                    scatteredEl.setAttribute("mod_model", {eventData: eventData, markerType: this.data.markerType, description: this.data.description, modelID: this.data.modelID, tags: this.data.tags});
+                    
+                      let scale = this.returnRandomNumber(.25, 1.25);
+                      scatteredEl.setAttribute("scale", {x: scale, y:scale, z: scale})
+                    
+                    this.el.sceneEl.appendChild(scatteredEl);
+                    scatterCount++;
+                    if (scatterCount > count) {
+                      clearInterval(interval);
+                      
+                    } 
+                        
+                    if (i == 100) {
+                      clearInterval(interval);
+                    }
 
-                      // console.log("randomWaypoint : " + position);
-                      // if (i == 100) {
-                      //   clearInterval(interval);
-                      // }
-                  // }
                 }, 2000);
               }
               

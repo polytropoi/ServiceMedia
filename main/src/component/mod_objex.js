@@ -198,10 +198,24 @@ AFRAME.registerComponent('mod_objex', {
         console.log("tryna add fetched obj " + obj._id)
         this.data.jsonObjectData.push(obj); 
       },
-      // addSceneInventoryObject (obj) {
-      //   console.log("tryna add fetched obj " + obj._id)
-      //   this.data.jsonObjectData.push(obj); 
-      // },
+      scatterObject: function (objectID) {
+        console.log("tryna set model to " + objectID);  
+        this.objectData = this.returnObjectData(objectID);
+        this.scatterPos = new THREE.Vector3();
+        this.objEl = document.createElement("a-entity");
+        // this.equipHolder = document.getElementById("equipPlaceholder");
+        // this.equipHolder.object3D.getWorldPosition( this.dropPos );
+        this.locData = {};
+        this.locData.x = this.scatterPos.x;
+        this.locData.y = this.scatterPos.y;
+        this.locData.z = this.scatterPos.z;
+        this.locData.timestamp = Date.now();
+        this.objEl.setAttribute("mod_object", {'eventData': null, 'locationData': this.locData, 'objectData': this.objectData, 'isSpawned': true});
+        this.objEl.id = "obj" + this.objectData._id + "_" + this.locData.timestamp;
+        sceneEl.appendChild(this.objEl);
+       
+      },
+      
       dropInventoryObject: function (inventoryID, action, inventoryObj) {
         let data = {};
         data.inScene = room;

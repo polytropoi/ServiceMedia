@@ -789,7 +789,7 @@ function ShowLocationModal(timestamp) {
         // "<button class=\x22goToButton\x22 style=\x22float:left;\x22 onclick=\x22GoToLocation('"+phID+"')\x22>GoTo</button>"+
         "<button class=\x22goToButton\x22 style=\x22float:left;\x22 onclick=\x22PlayerToLocation('"+thisLocation.x+ " " + thisLocation.y + " " + thisLocation.z +"')\x22>GoTo</button>"+
         // "<button class=\x22goToButton\x22 onclick=\x22PlayerToLocation('"+phID+"')\x22>GoTo</button>"+
-        "<button class=\x22infoButton\x22 onclick=\x22SceneManglerModal('Locations')\x22>Back</button>"+
+        "<button class=\x22infoButton\x22 onclick=\x22SceneManglerModal('Locations')\x22>Show All</button>"+
         "</div>"+
 
         "<div class=\x22row\x22><div class=\x22twocolumn\x22><label for=\x22locationName\x22>Location Name</label>"+
