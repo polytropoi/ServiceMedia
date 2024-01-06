@@ -627,12 +627,14 @@ AFRAME.registerComponent('mod_object', {
         this.navAgentController = this.el.components.nav_agent_controller;
   
       } 
-      this.el.sceneEl.addEventListener('youtubeToggle', function (event) { //things to trigger on this model if youtube is playing
-        console.log("GOTSA YOUTUBNE EVENT: " + event.detail.isPlaying);  
-        if (event.detail.isPlaying) {
-          // this.el.components.nav_agent_controller.updateAgentState("dance");
-        } 
-      });
+
+      // this.el.sceneEl.addEventListener('youtubeToggle', function (event) { //things to trigger on this model if youtube is playing
+      //   console.log("GOTSA YOUTUBNE EVENT: " + event.detail.isPlaying);  
+      //   if (event.detail.isPlaying) {
+      //     // this.el.components.nav_agent_controller.updateAgentState("dance");
+      //   } 
+      // });
+
       this.hasPickupAction = false;
       this.hasTriggerAction = false;
       this.hasThrowAction = false;
@@ -990,7 +992,7 @@ AFRAME.registerComponent('mod_object', {
               this.el.setAttribute("glow");
             }
             if (this.data.eventData.toLowerCase().includes("agent") || this.data.objectData.physics.includes("Navmesh Agent")) { 
-              if (settings.useNavmesh) {
+              if (settings.useNavmesh || settings.useSimpleNavmesh) {
                 // this.el.setAttribute("nav-agent", "");
                 this.el.setAttribute("nav_agent_controller", "");  
                 this.el.classList.add("nav_agent");

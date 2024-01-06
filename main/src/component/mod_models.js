@@ -209,7 +209,7 @@ AFRAME.registerComponent('mod_model', {
           if (this.data.eventData.toLowerCase().includes("agent")) { 
             if (settings.useNavmesh) {
               // this.el.setAttribute("nav-agent", "");
-              this.el.setAttribute("nav_agent_controller", "");  
+              this.el.setAttribute("nav_agent_controller", "snapToWaypoint", true);  
               this.el.setAttribute("mod_physics", {'model': 'agent', 'isTrigger': true});
             }
           }
@@ -236,9 +236,10 @@ AFRAME.registerComponent('mod_model', {
               //   count = split[1];
               // }
                   // for (let i = 0; i < count; i++) {
-              let interval = setInterval( () => {
+                    
+              if (!this.isNavAgent) { //use waypoints for position below instead of raycasting if it's gonna nav
+                let interval = setInterval( () => {
                 for (let i = 0; i < 100; i++) {
-                  
                   let testPosition = new THREE.Vector3();
                   testPosition.x = this.returnRandomNumber(-100, 100);  
                   testPosition.y = 100;
@@ -265,27 +266,64 @@ AFRAME.registerComponent('mod_model', {
                     }
                     this.el.sceneEl.appendChild(scatteredEl);
                     scatterCount++;
-                    
+
                     if (scatterCount > count) {
-                      
                       clearInterval(interval);
                       break;
+                      } else {
+                        break;
+                      }
+                        
                     } else {
-                      break;
+                      // console.log('bad testPosition');
+                      // waypoints.splice(i, 1);
                     }
-                    
-                  } else {
-                    // console.log('bad testPosition');
-                    // waypoints.splice(i, 1);
+                    // console.log("randomWaypoint : " + position);
+                    if (i == 100) {
+                      clearInterval(interval);
+                    }
                   }
-                  // console.log("randomWaypoint : " + position);
-                  if (i == 100) {
-                    clearInterval(interval);
-                  }
-                }
-              }, 2000);
-              // }
-              }              
+                }, 2000);
+              } else { //just use waypoints to start for chars, nav_agent_controller.data.snapToWaypoints set above
+                let scatterCount = 0;
+                // let navMeshControllerEl = document.getElementById("nav-mesh");
+                // let navMeshController = null;
+                let interval = setInterval( () => {
+                //   if (!navMeshControllerEl) {
+                //     navMeshControllerEl = document.getElementById("nav-mesh");
+                //   } else {
+                //     navMeshController = navMeshControllerEl.components["nav_mesh_controller"];
+                   
+                //   }
+
+                //   if (navMeshController && navMeshController.data.isReady && navMeshController.data.goodWaypoints > 9)  {
+                      let scatteredEl = document.createElement("a-entity"); 
+                      // scatteredEl.setAttribute("position", testPosition);
+                      scatteredEl.setAttribute("gltf-model", "#" + this.data.modelID);
+                      let eventData = this.data.eventData.replace("scatter", ""); //prevent infinite recursion!
+  
+                      scatteredEl.setAttribute("mod_model", {eventData: eventData, markerType: this.data.markerType, description: this.data.description, modelID: this.data.modelID, tags: this.data.tags});
+                     
+                        let scale = this.returnRandomNumber(.25, 1.25);
+                        scatteredEl.setAttribute("scale", {x: scale, y:scale, z: scale})
+                     
+                      this.el.sceneEl.appendChild(scatteredEl);
+                      scatterCount++;
+                      if (scatterCount > count) {
+                        clearInterval(interval);
+                       
+                      } 
+                          
+
+                      // console.log("randomWaypoint : " + position);
+                      // if (i == 100) {
+                      //   clearInterval(interval);
+                      // }
+                  // }
+                }, 2000);
+              }
+              
+              }//close if surface              
             }
             if (this.data.eventData.includes("pickup")) { //USING PHYSX, needs useStarterKit = true!
               this.el.setAttribute("data-pick-up");
@@ -1081,7 +1119,7 @@ AFRAME.registerComponent('mod_model', {
           if (hasCallout) {
             let bubble = document.createElement("a-entity");
             this.bubble = bubble;
-            console.log("made a bubble!" + this.data.eventData.toLowerCase());
+            // console.log("made a bubble!" + this.data.eventData.toLowerCase());
             let position = this.el.getAttribute("position")
             bubble.classList.add("bubble");
             // bubble.setAttribute("position", "2 2 0");

@@ -1886,9 +1886,7 @@ AFRAME.registerComponent('local_marker', {
     this.viewportHolder = document.getElementById('viewportPlaceholder3');
     var cameraPosition = new THREE.Vector3(); 
     this.viewportHolder.object3D.getWorldPosition( cameraPosition );
-    // this.calloutPanel.setAttribute("gltf-model", "#landscape_panel");
-    // this.calloutPanel.setAttribute("scale", ".1 .075 .1");
-    // this.calloutEntity.setAttribute("look-at", "#player");
+
     this.calloutEntity.setAttribute('visible', false);
     this.selectedAxis = null;
     this.isSelected = false;
@@ -1901,25 +1899,14 @@ AFRAME.registerComponent('local_marker', {
     this.el.classList.add('activeObjexGrab');
     this.clientX = 0;
     this.clientY = 0;
-    let thisEl = this.el;
-    // calloutEntity.setAttribute("render-order", "hud");
-    sceneEl.appendChild(this.calloutEntity);
-    // this.calloutEntity.appendChild(this.calloutPanel);
-    this.calloutEntity.appendChild(this.calloutText);
+
     
-    // this.calloutPanel.setAttribute("position", '0 0 1'); 
+    sceneEl.appendChild(this.calloutEntity);
+    
+    this.calloutEntity.appendChild(this.calloutText);
+
     this.calloutText.setAttribute("position", '0 0 1.25'); //offset the child on z toward camera, to prevent overlap on model
-    // this.calloutText.setAttribute('text', {
-    //   width: .5,
-    //   baseline: "bottom",
-    //   align: "left",
-    //   font: "/fonts/Exo2Bold.fnt",
-    //   anchor: "center",
-    //   wrapCount: 12,
-    //   color: "white",
-    //   value: "wha"
-    // });
-    // this.calloutPanel.setAttribute("overlay");
+
     this.calloutText = document.createElement("a-entity");
     this.calloutText.setAttribute("overlay");
     let theElement = this.el;
@@ -1929,7 +1916,7 @@ AFRAME.registerComponent('local_marker', {
       this.phID = this.timestamp; //"placeholder" id, for client side location mods
       this.el.id = this.phID;
      
-          if (this.data.isNew) {  
+          if (this.data.isNew) { //just created, not loaded from db
            
             this.el.setAttribute('position', this.data.position);
             // if (this.data.markerType != "none" && this.data.markerType != "player") {
@@ -1939,33 +1926,19 @@ AFRAME.registerComponent('local_marker', {
             this.el.id = this.timestamp;
             console.log("tryna set new localmarker with phID " + this.timestamp + " and markerType " + this.data.markerType);
              //check for tag?
-          } else { //it's been saved to localData, w/ position
-            // let locItem = {};
-            // locItem.x = this.data.position.x;
-            // locItem.eulerx = this.data.rotation.eulerx; //maybe get look vector?
-            // locItem.y = this.data.position.y;
-            // locItem.eulery = this.data.rotation.eulery;
-            // locItem.z = this.data.position.z;
-            // locItem.eulerz = this.data.rotation.eulerz;
-            // locItem.type = "Worldspace";
-            // locItem.label = 'local placeholder';
-            // locItem.name = this.data.name;
-            // locItem.description = '';
-            // locItem.markerType = this.data.markerType;
-            // locItem.eventData = this.data.eventData;
-            // locItem.isLocal = true;
-            // locItem.timestamp = this.data.timestamp;
-            // locItem.scale = 1;
-            // locItem.tags = '';
-            // locItem.phID = this.data.timestamp;
+          } else { //it's been saved to localDB, w/ position
+
             this.el.setAttribute('position', this.data.position);
             this.el.setAttribute('rotation', this.data.rotation);
             this.el.setAttribute('scale', this.data.scale);
-            if (this.data.markerType != "none" && this.data.markerType != "player") {
-              console.log("adding some geo to localmarker!")
-              this.el.setAttribute('gltf-model', '#poi1');
+            if (this.data.markerType != "none" && this.data.markerType != "player" && this.data.markerType != "waypoint") {
+              console.log("adding some geo to localmarker! " + this.data.markerType);
+              this.el.setAttribute("gltf-model", "#poi1");
+              
             }
             if (this.data.markerType == "waypoint") {
+              
+              // this.el.setAttribute("gltf-model", "#poi1");
               this.el.classList.add("waypoint");
               // if (this.data.name == 'local placeholder') {
               //   waypointCount++;
@@ -2009,7 +1982,6 @@ AFRAME.registerComponent('local_marker', {
               fontSize: .1,
               font: "/fonts/web/"+ this.font2,
               anchor: "center",
-              wrapCount: 12,
               color: "white",
               outlineColor: "black",
               outlineWidth: "2%",
@@ -2504,7 +2476,6 @@ AFRAME.registerComponent('cloud_marker', {
           fontSize: .1,
           font: "/fonts/web/"+ this.font2,
           anchor: "center",
-          wrapCount: 12,
           color: "white",
           outlineColor: "black",
           outlineWidth: "2%",
@@ -3423,7 +3394,6 @@ AFRAME.registerComponent("rotate-with-camera", { //unused
       font: "/fonts/web/" + font,
       fontSize: .3,
       anchor: "center",
-      wrapCount: 20,
       color: "white",
       value: "wha"
     });

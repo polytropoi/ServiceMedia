@@ -137,7 +137,7 @@ function InitIDB() {
 
                for (let i = 0; i < cursor.value.locations.length; i++) { //mod or create the scene elements
                // let loc = JSON.stringify(cursor.value.locations[i]);
-               // console.log("gots a localData location: " + loc);
+               console.log("cursor " + i + " of " + cursor.value.locations.length);
                // sceneLocations.locations = [];
                // localData.locations = [];
                localData.locations.push(cursor.value.locations[i]);
@@ -195,13 +195,16 @@ function InitIDB() {
          transaction.oncomplete = function () {
             db.close();
             // UpdateSceneLocations();]
-            if (!localData.locations.length) { //copy the cloudData if there was no localdb
+            if (localData.locations.length == 0) { //copy the cloudData if there was no localdb
                console.log("copying localData.locations...");
                for (let i = 0; i < sceneLocations.locations.length; i++) {
-                  localData.locations.push(sceneLocations.locations[i]);
+                  if (locationTimestamps.indexOf(sceneLocations.locations[i].timestamp) == -1) {
+                     // localData.locations.push(sceneLocations.locations[i]);
+                  }
+                  // localData.locations.push(sceneLocations.locations[i]);
               }
             }
-            console.log("COPIED LOCALDATA IS " + JSON.stringify(localData.locations));
+            console.log("COPIED LOCALDATA locations length " + localData.locations.length);
           }
       };
       modQuery.onerror = function () {
@@ -853,36 +856,51 @@ function ImportMods (event) {
       console.log(decodedString); 
       let mods = JSON.parse(decodedString);
 
-      if (mods != null && mods != undefined && mods.colorMods != null && mods.colorMods != undefined) {
-         localStorage.setItem(room + "_sceneColor1", mods.colorMods.sceneColor1);
-         localStorage.setItem(room + "_sceneColor2", mods.colorMods.sceneColor2);
-         localStorage.setItem(room + "_sceneColor3", mods.colorMods.sceneColor3);
-         localStorage.setItem(room + "_sceneColor4", mods.colorMods.sceneColor4);
-      }
-      if (mods != null && mods != undefined && mods.volumeMods != null && mods.volumeMods != undefined) {
+
+      // if (mods != null && mods != undefined && mods.colorMods != null && mods.colorMods != undefined) {
+      //    // localStorage.setItem(room + "_sceneColor1", mods.colorMods.sceneColor1);
+      //    // localStorage.setItem(room + "_sceneColor2", mods.colorMods.sceneColor2);
+      //    // localStorage.setItem(room + "_sceneColor3", mods.colorMods.sceneColor3);
+      //    // localStorage.setItem(room + "_sceneColor4", mods.colorMods.sceneColor4);
+      // }
+      if (mods != null && mods != undefined && mods.settings != {}) {
          
-         localStorage.setItem(room+"_primaryVolume", mods.volumeMods.volumePrimary);
-         localStorage.setItem(room+"_ambientVolume", mods.volumeMods.volumeAmbient);
-         localStorage.setItem(room+"_triggerVolume", mods.volumeMods.volumeTrigger);
+         // localStorage.setItem(room+"_primaryVolume", mods.volumeMods.volumePrimary);
+         // localStorage.setItem(room+"_ambientVolume", mods.volumeMods.volumeAmbient);
+         // localStorage.setItem(room+"_triggerVolume", mods.volumeMods.volumeTrigger);
       }
-      if (mods != null && mods != undefined && mods.locationMods != null && mods.locationMods.length > 0) {
-         for (let i = 0; i < mods.locationMods.length; i++) {
-            if (mods.locationMods[i].phID != null && mods.locationMods[i].phID.includes(room)) {
-               if (mods.locationMods[i].type == null || mods.locationMods[i].type == undefined) {
-                  mods.locationMods[i].type = "worldspace";
-               } 
-               localStorage.setItem(mods.locationMods[i].phID, JSON.stringify(mods.locationMods[i])); //main location data localstorage setting
-            }
-            if (mods.locationMods.length - 1 === i) {
-               window.location.reload();
+      if (mods != null && mods != undefined && mods.locations != null && mods.locations.length > 0) {
+         for (let i = 0; i < mods.locations.length; i++) {
+
+            if (localData.locations.length) {
+               if (locationTimestamps.indexOf(mods.locations[i].timestamp) != -1) { //update existing location if modded (maybe better to nuke localData first?)
+                  localData.locations[locationTimestamps.indexOf(mods.locations[i].timestamp)] = mods.locations[i];
+               } else {
+                  localData.locations.push(mods.locations[i]);
+               }
+            } else {
+               localData.locations.push(mods.locations[i]);
             }
          }
+
+         SaveLocalData();
+         // for (let i = 0; i < mods.locationMods.length; i++) {
+         //    if (mods.locationMods[i].phID != null && mods.locationMods[i].phID.includes(room)) {
+         //       if (mods.locationMods[i].type == null || mods.locationMods[i].type == undefined) {
+         //          mods.locationMods[i].type = "worldspace";
+         //       } 
+         //       localStorage.setItem(mods.locationMods[i].phID, JSON.stringify(mods.locationMods[i])); //main location data localstorage setting
+         //    }
+         //    if (mods.locationMods.length - 1 === i) {
+         //       window.location.reload();
+         //    }
+         // }
       } else {
          console.log("nomods");
-         window.location.reload();
+         // window.location.reload();
       }
       if (mods != null && mods != undefined && mods.timekeyMods != null) {
-         timeKeysData = mods.timekeyMods;
+         // timeKeysData = mods.timekeyMods;
       }
 
       };
@@ -920,7 +938,7 @@ function SaveModToLocal(locationKey) { //locationKey is now just timestamp of th
    locItem.markerObjScale = document.getElementById("modelScale").value;
    locItem.phID = locationKey.toString();
    locItem.type = "Worldspace";
-
+   locItem.isLocal = true;
    if (locItem.markerType == "waypoint" && locItem.name == 'local placeholder') {
       locItem.name = 'local waypoint';
    }
@@ -1263,7 +1281,7 @@ function ReturnLocationTable () { //just show em all now!
       for (let i = 0; i < localData.locations.length; i++) {
          let markerString = "";
          if (localData.locations[i].isLocal != null && localData.locations[i].isLocal === true) {
-            markerString = "<span style=\x22color: pink; font-weight: bold;\x22>"+localData.locations[i].markerType+"</span>";
+            markerString = "<span style=\x22color: orange; font-weight: bold;\x22>"+localData.locations[i].markerType+"</span>";
          } else {
             markerString = "<span style=\x22color: lime; font-weight: bold;\x22>"+localData.locations[i].markerType+"</span>";
          }        
