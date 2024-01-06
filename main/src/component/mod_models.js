@@ -10,7 +10,7 @@ AFRAME.registerComponent('mod_model', {
         description: {default: ''},
         modelID: {default: ''},
         timestamp: {default: ''},
-        allowMods: {default: false}
+        allowMods: {default: true}
         
       },
       init: function () {
@@ -1325,7 +1325,7 @@ AFRAME.registerComponent('mod_model', {
             }
           });
           this.el.addEventListener('mouseenter', (evt) =>  {
-            // console.log("mouseovewr model " + this.el.id + this.hasLocationCallout + this.data.markerType + this.hasCallout + this.hasCalloutBackground + textData[textIndex]);
+            console.log("mouseovewr model " + this.el.id + this.hasLocationCallout + this.data.markerType + this.hasCallout + this.hasCalloutBackground + textData[textIndex]);
             if (evt.detail.intersection != null && this.hitpoint != null) {
               if (this.calloutString == "") {
                 this.calloutString = textData[textIndex];

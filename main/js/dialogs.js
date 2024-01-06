@@ -633,24 +633,18 @@ function ReturnLocationMarkerTypeSelect (selected) {
     const typesArray = [
       "none",
       "placeholder",
-      "model",
-      "object",
-      "player",
-      "character",
       "poi",
       "waypoint",
+
+      "player",
+      "character",
+      "model",
+      "object",
       "target",
       "gate",
       "portal",
-      "curve point",
-      "brownian path",
-      "brownian motion",
-      "follow curve",
-      "follow random path",
-      "tunnel",
-      "follow parametric curve",
-      "follow ambient",
-      "placeholder",
+      
+
       "available scenes key",
       "audio",
       "audiogroup",
@@ -680,6 +674,14 @@ function ReturnLocationMarkerTypeSelect (selected) {
       "callout",
       "availablescenes",
       "track face",
+      "curve point",
+      "brownian path",
+      "brownian motion",
+      "follow curve",
+      "follow random path",
+      "tunnel",
+      "follow parametric curve",
+      "follow ambient",
       "lerp",
       "slerp",
       "spawntrigger",
@@ -1619,9 +1621,10 @@ function SceneManglerModal(mode) {
     "<button class=\x22goToButton\x22 id=\x22nextButton\x22 onclick=\x22GoToNext()\x22>GoTo Next</button>"+
     "<button class=\x22goToButton\x22 id=\x22prevButton\x22 onclick=\x22GoToPrevious()\x22>GoTo Previous</button>"+
     ReturnCurrentPlayerLocation() +
-      "<button style=\x22float:left\x22 class=\x22saveButton\x22 id=\x22CreatePlaceholderButton\x22 onclick=\x22CreatePlaceholder()\x22>New Location</button>"+
-      "<button style=\x22float:left\x22 class=\x22snapButton\x22 id=\x22CreatePlaceholderButton\x22 onclick=\x22ToggleAllTransformControls()\x22>Toggle All Transform Controls</button>"+
+      "<button style=\x22float:left\x22 class=\x22saveButton\x22 id=\x22CreatePlaceholderButton\x22 onclick=\x22CreatePlaceholder()\x22>Create New Location</button>"+
+     
       "<br><br><br><div>"+locationTable+"</div><br>"+
+      "<button style=\x22float:left\x22 class=\x22snapButton\x22 id=\x22CreatePlaceholderButton\x22 onclick=\x22ToggleAllTransformControls()\x22>Toggle All Transform Controls</button>"+
     "</div>"+     
 
 

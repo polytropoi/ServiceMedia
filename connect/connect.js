@@ -1034,7 +1034,7 @@ function ToggleAllTransformControls () {
       }
       transformAll = false;
    }
-   ShowHideDialogPanel();
+   // ShowHideDialogPanel();
 }
 
 function SnapLocation(locationKey) { //snap selected object to player loc

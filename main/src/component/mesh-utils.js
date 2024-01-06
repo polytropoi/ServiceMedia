@@ -2042,9 +2042,9 @@ AFRAME.registerComponent('local_marker', {
           that.calloutEntity.setAttribute("position", pos);
           that.calloutEntity.setAttribute('visible', true);
           that.calloutEntity.setAttribute('scale', {x: that.distance * .25, y: that.distance * .25, z: that.distance * .25} );
-          if (that.data.markerType == "poi" && !that.data.modelID) {
-            that.el.setAttribute('scale', {x: that.distance * .25, y: that.distance * .25, z: that.distance * .25} );
-          }
+          // if (that.data.markerType == "poi" && !that.data.modelID) {
+          //   // that.el.setAttribute('scale', {x: that.distance * .25, y: that.distance * .25, z: that.distance * .25} );
+          // }
          
           let theLabel = that.data.name != undefined ? that.data.name : "";
           let calloutString = theLabel;
@@ -2445,9 +2445,9 @@ AFRAME.registerComponent('cloud_marker', {
           that.calloutEntity.setAttribute("position", pos);
           that.calloutEntity.setAttribute('visible', true);
           that.calloutEntity.setAttribute('scale', {x: that.distance * .25, y: that.distance * .25, z: that.distance * .25} );
-          if (this.data.markerType == "poi" && !this.data.modelID) {
-            this.el.setAttribute('scale', {x: that.distance * .25, y: that.distance * .25, z: that.distance * .25} );
-          }
+          // if (this.data.markerType == "poi" && !this.data.modelID) {
+          //   this.el.setAttribute('scale', {x: that.distance * .25, y: that.distance * .25, z: that.distance * .25} );
+          // }
          
           let theLabel = that.data.name != undefined ? that.data.name : "";
           let calloutString = theLabel;
@@ -2479,35 +2479,37 @@ AFRAME.registerComponent('cloud_marker', {
     this.el.addEventListener('mouseup', function (evt) {
       console.log("mouseup cloudmarker ");
       // that.isSelected = false;
-      if (that.data.markerType.toLowerCase() == "placeholder") {
-        that.hitPosition = null;
-        if (this.mouseDownPos != undefined) {
-          this.mouseDownPos.x = 0;
-          this.mouseDownPos.y = 0;
-          this.selectedAxis = null;
-        }
-        // let keyName = "placeholder_" + this.data.timestamp;
-        let position = that.el.getAttribute("position");
-        console.log("tryna set position " + position + " for key " + that.phID);
-        let storedVars = JSON.parse(localStorage.getItem(that.phID));
-        if (storedVars != null) { //already modded this cloud placeholder
-          storedVars.x = position.x.toFixed(2);
-          storedVars.y = position.y.toFixed(2);
-          storedVars.z = position.z.toFixed(2);
-          that.data.name = storedVars.name;
-          console.log("modded storedvars " + JSON.stringify(storedVars));
-        } 
+      // if (that.data.markerType.toLowerCase() == "placeholder") {
+      //   that.hitPosition = null;
+      //   if (this.mouseDownPos != undefined) {
+      //     this.mouseDownPos.x = 0;
+      //     this.mouseDownPos.y = 0;
+      //     this.selectedAxis = null;
+      //   }
+      //   // let keyName = "placeholder_" + this.data.timestamp;
+      //   let position = that.el.getAttribute("position");
+      //   console.log("tryna set position " + position + " for key " + that.phID);
+      //   let storedVars = JSON.parse(localStorage.getItem(that.phID));
+      //   if (storedVars != null) { //already modded this cloud placeholder
+      //     storedVars.x = position.x.toFixed(2);
+      //     storedVars.y = position.y.toFixed(2);
+      //     storedVars.z = position.z.toFixed(2);
+      //     that.data.name = storedVars.name;
+      //     console.log("modded storedvars " + JSON.stringify(storedVars));
+      //   } 
 
-        localStorage.setItem(that.phID, JSON.stringify(storedVars));
-        if (that.isSelected && that.selectedAxis != null && !that.selectedAxis.includes("handle")) { //don't pop the dialog if just dragging
-          ShowLocationModal(that.phID); 
-        }
-        AddLocalMarkers();
-      } else if (that.data.markerType.toLowerCase() == "mailbox") {
+      //   localStorage.setItem(that.phID, JSON.stringify(storedVars));
+      //   if (that.isSelected && that.selectedAxis != null && !that.selectedAxis.includes("handle")) { //don't pop the dialog if just dragging
+      //     ShowLocationModal(that.phID); 
+      //   }
+      //   AddLocalMarkers();
+      // } else 
+      
+      if (that.data.markerType.toLowerCase() == "mailbox") {
         console.log('tryna sho0w messages modal');
         SceneManglerModal('Messages');
       }
-      that.deselect();
+      // that.deselect();
 
     });
                                                                      
