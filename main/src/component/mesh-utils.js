@@ -1857,27 +1857,24 @@ AFRAME.registerComponent('local_marker', {
     tags: {default: ''},
     position: {default: ''},
     rotation: {default: ''},
-    scale: {default: ''},
+    scale: {default: '1'},
     isNew: {default: false}
 
   },
   init: function () {
-    let waypointCount = 0;
-    let waypoints = [];
+   
     this.timestamp = this.data.timestamp;
     if (this.timestamp == '') {
       this.timestamp = Math.round(Date.now() / 1000).toString();
       this.data.timestamp = this.timestamp;
     }
-    // this.el.id = "placeholder_" + this.timestamp;
-    // this.el.addEventListener("hitstart", function(event) {   //maybe
-    //   console.log(
-    //     event.target.components["aabb-collider"]["intersectedEls"].map(x => x.id)
-    //   );
-    // });
-    // console.log("tryna init local_marker withg timestamp " + this.timestamp );
-    // var posRotReader = document.getElementById("player").components.get_pos_rot; 
-    // let isSelected = false;
+    
+    if (this.data.eventData.includes("navmesh")) {
+      return;
+    }
+    // this.scale = {x: this.data.scale.x, y: this.data.scale.y, z: this.data.scale.z};
+    this.scale = "1 1 1";
+
     var sceneEl = document.querySelector('a-scene');
 
     this.calloutEntity = document.createElement("a-entity");
@@ -1915,39 +1912,40 @@ AFRAME.registerComponent('local_marker', {
     this.el.classList.add("allowMods");
       this.phID = this.timestamp; //"placeholder" id, for client side location mods
       this.el.id = this.phID;
-     
+
           if (this.data.isNew) { //just created, not loaded from db
-           
+            this.el.setAttribute("gltf-model", "#poi1");
             this.el.setAttribute('position', this.data.position);
             // if (this.data.markerType != "none" && this.data.markerType != "player") {
             //   this.el.setAttribute('gltf-model', '#poi1');
             // }
-            this.el.setAttribute('gltf-model', '#poi1');
+            // this.el.setAttribute('gltf-model', '#poi1');
+            // this.el.setAttribute('scale', this.scale);
             this.el.id = this.timestamp;
-            console.log("tryna set new localmarker with phID " + this.timestamp + " and markerType " + this.data.markerType);
+            // console.log("tryna set new localmarker with phID " + this.timestamp + " and markerType " + this.data.markerType);
              //check for tag?
           } else { //it's been saved to localDB, w/ position
 
+            // this.el.setAttribute("gltf-model", "#poi1");
             this.el.setAttribute('position', this.data.position);
             this.el.setAttribute('rotation', this.data.rotation);
-            this.el.setAttribute('scale', this.data.scale);
-            if (this.data.markerType != "none" && this.data.markerType != "player" && this.data.markerType != "waypoint") {
-              console.log("adding some geo to localmarker! " + this.data.markerType);
+            this.el.setAttribute('scale', this.scale);
+            if (this.data.markerType == "none" || this.data.markerType == "player") {
+              //skip
+              
+            } else if (this.data.markerType == "waypoint") {
               this.el.setAttribute("gltf-model", "#poi1");
-              
-            }
-            if (this.data.markerType == "waypoint") {
-              
-              // this.el.setAttribute("gltf-model", "#poi1");
               this.el.classList.add("waypoint");
-              // if (this.data.name == 'local placeholder') {
-              //   waypointCount++;
-              //   this.data.name == 'local waypoint ' + waypointCount;
-              // }
-            } 
+            } else if (this.data.markerType == "mailbox") {
+              this.el.setAttribute("gltf-model", "#mailbox");
+              this.el.classList.add("mailbox");
+            } else {
+              this.el.setAttribute("gltf-model", "#poi1");
+            }
 
             this.el.id = this.data.timestamp;
             console.log("tryna set localmarker with phID " + this.timestamp + " and markerType " + this.data.markerType);
+            // this.waitAndLoad();
           }
 
 
@@ -1997,60 +1995,30 @@ AFRAME.registerComponent('local_marker', {
         // that.calloutText = this.calloutText;
         this.el.addEventListener("model-loaded", (e) => {
           // e.preventDefault();
+
           console.log("local_marker geo is loaded for markertype " + this.data.markerType);
           if (this.data.isNew) {
             this.el.setAttribute("transform_controls", "");
           }
+          this.el.setAttribute("visible", true);
+          const obj = this.el.getObject3D('mesh');
+        // Go over the submeshes and modify materials we want.
+            obj.traverse(node => {
+              if (node.isMesh && node.material) {
+                if (this.data.markerType == "waypoint") {
+                  node.material.color.set('lime');
+                } else if  (this.data.markerType == "placeholder") {
+                  node.material.color.set('yellow');
+                } else if  (this.data.markerType == "poi") {
+                  node.material.color.set('purple');
+                } 
+              }
+            });
+            this.el.setObject3D('mesh', obj);
           // this.el.setAttribute("transform_controls", ""); //check for tag?
         });
        this.el.addEventListener('mouseenter', function (evt) {
 
-      // if (posRotReader != null) {
-      //   this.playerPosRot = posRotReader.returnPosRot(); 
-      //   window.playerPosition = this.playerPosRot.pos; 
-      // } else {
-      //   posRotReader = document.getElementById("player").components.get_pos_rot; 
-      //   if (posRotReader) {
-      //     this.playerPosRot = posRotReader.returnPosRot(); 
-      //     window.playerPosition = this.playerPosRot.pos; 
-      //   }
-      // }
-      // console.log("playerPOsition  " + JSON.stringify(window.playerPosition));
-      // if (evt.detail.intersection) {
-      //   // document.getElementById("player").component.get_pos_rot.returnPosRot();
-      //   this.clientX = evt.clientX;
-      //   this.clientY = evt.clientY;
-      //   // console.log("tryna mouseover placeholder type " + this.data.markerType);
-      //   that.calloutToggle = !that.calloutToggle;
-
-      //   let pos = evt.detail.intersection.point; //hitpoint on model
-      //   let name = evt.detail.intersection.object.name;
-      //   that.hitPosition = pos;
-      //   if (player != null && window.playerPosition != null) { 
-      //   that.distance = window.playerPosition.distanceTo(pos);
-
-      //   that.rayhit(evt.detail.intersection.object.name, that.distance, evt.detail.intersection.point);
-
-      //     // that.selectedAxis = name;
-
-      //     let elPos = that.el.getAttribute('position');
-      //   // if (!name.includes("handle")) {
-      //     if (that.distance < 66) {
-      //       console.log("trna scale to distance :" + that.distance);
-      //       that.calloutEntity.setAttribute("position", pos);
-      //       that.calloutEntity.setAttribute('visible', true);
-      //       that.calloutEntity.setAttribute('scale', {x: that.distance * .25, y: that.distance * .25, z: that.distance * .25} );
-      //       let theLabel = that.data.label != undefined ? that.data.label : that.data.name;
-      //       let calloutString = theLabel;
-      //       if (that.calloutToggle) { //show pos every other time
-      //         // calloutString = "x : " + elPos.x.toFixed(2) + "\n" +"y : " + elPos.y.toFixed(2) + "\n" +"z : " + elPos.z.toFixed(2);
-      //         calloutString = that.data.description != '' ? that.data.description : theLabel;
-      //       }
-      //       that.calloutText.setAttribute("value", calloutString);
-      //     }
-      //     // }
-      //   }
-      // }  
 
       if (evt.detail.intersection) {
         this.clientX = evt.clientX;
@@ -2075,7 +2043,7 @@ AFRAME.registerComponent('local_marker', {
           that.calloutEntity.setAttribute('visible', true);
           that.calloutEntity.setAttribute('scale', {x: that.distance * .25, y: that.distance * .25, z: that.distance * .25} );
           if (that.data.markerType == "poi" && !that.data.modelID) {
-            this.el.setAttribute('scale', {x: that.distance * .25, y: that.distance * .25, z: that.distance * .25} );
+            that.el.setAttribute('scale', {x: that.distance * .25, y: that.distance * .25, z: that.distance * .25} );
           }
          
           let theLabel = that.data.name != undefined ? that.data.name : "";
@@ -2107,84 +2075,15 @@ AFRAME.registerComponent('local_marker', {
     });
     this.el.addEventListener('mouseup', function (evt) {
       console.log("tryna mouseup localmarker type " + that.data.markerType);
-      // that.isSelected = false;
 
-      // isSelected = false;
-      // if (that.data.markerType.toLowerCase() == "placeholder" ) {
-      //   that.hitPosition = null;
-        // if (this.mouseDownPos != undefined) {
-        //   this.mouseDownPos.x = 0;
-        //   this.mouseDownPos.y = 0;
-        //   this.selectedAxis = null;
-        // }
-        // let position = that.el.getAttribute("position");
-        // // console.log("position " + position);
-        // let storedVars = JSON.parse(localStorage.getItem(that.phID));
-        
-        // if (storedVars != null) { //already modded this cloud placeholder
-        //   storedVars.x = position.x.toFixed(2);
-        //   storedVars.y = position.y.toFixed(2);
-        //   storedVars.z = position.z.toFixed(2);
-        //   that.data.name = storedVars.name;
-        //   // if (storedVars.model != undefined && storedVars.model != "none") {
-        //   //   for (let i = 0; i < sceneModels.length; i++) {
-        //   //     if (sceneModels[i]._id == storedVars.modelID) {
-        //   //       this.el.setAttribute("gltf-model", sceneModels[i].url);
-        //   //     }
-        //   //   }
-        //   // }
-        // } else { //new ls key for cloud placeholder
-        //   let locItem = {};
-        //   locItem.x = position.x.toFixed(2);
-        //   // locItem.eulerx = document.getElementById('xrot').value;
-        //   locItem.y = position.y.toFixed(2);
-
-        //   locItem.z = position.z.toFixed(2);
-        //   locItem.type = "Worldspace";
-        //   locItem.label = "cloud placeholder";
-        //   locItem.name = "cloud placeholder " + that.data.timestamp;
-        //   locItem.markerType = "placeholder";
-        //   locItem.isLocal = true;
-        //   locItem.description = "";
-        //   locItem.timestamp = that.data.timestamp;
-        //   locItem.phID = that.phID;
-        //   // storedVars = locItem;
-        // }
-        // // localStorage.setItem(that.phID, JSON.stringify(storedVars));
-        // // console.log("phID: " + that.phID + JSON.stringify(localStorage.getItem(that.phID)));
-        // // AddLocalMarkers();
-        // // console.log('get model ' + this.el.getAttribute('gltf-model'));
-        // if (that.isSelected && that.selectedAxis != null && !that.selectedAxis.includes('handle')) {
-        //   console.log("tryna show locationModal " + that.data.timestamp);
-        //   ShowLocationModal(that.phID);
-        // }
-        // AddLocalMarkers();
       if (that.data.markerType.toLowerCase() == "mailbox") {
         console.log('tryna sho0w messages modal');
         SceneManglerModal('Messages');
       }
       // that.deselect(); 
     });
-    // this.el.addEventListener('dblclick', function (evt) {
-    //   // console.log("tryna mousedouwn");
-    //     console.log("tryna show locationModal " + that.data.timestamp);
-    //     ShowLocationModal(that.phID);
-      
-    // });
 
-    // this.el.addEventListener('click', function (evt) { //redundant?
-    //   let position = that.el.getAttribute('position');
-    //   // that.isSelected = false;
 
-    //   that.hitPosition = null;
-    //   that.mouseDownPos.x = 0;
-    //   that.mouseDownPos.y = 0;
-    //   that.selectedAxis = null;
-    // });
-    // sceneEl.addEventListener("mousemove", (event) =>{
-    //   	that.mousePos.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-	  //     that.mousePos.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
-    // });
   },
   loadObject: function (objectID) { //local object swap (maybe with child model...);
     console.log("tryna load modeID " + objectID);
@@ -2230,6 +2129,14 @@ AFRAME.registerComponent('local_marker', {
 
       this.el.setAttribute("gltf-model", "#poi1");
     }
+  },
+  waitAndLoad: function () {
+    let random = Math.random() * 1000;  
+    setTimeout( () => {
+      console.log("TRYNA WAIT AND LOAD THE TINEY MODEL>>>");
+      this.el.setAttribute("gltf-model", "#poi1");
+
+    }, random);
   },
   deselect: function () {
     this.isSelected = false;

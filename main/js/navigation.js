@@ -1430,7 +1430,7 @@ AFRAME.registerComponent('nav_mesh_controller', {
 				} else {
 					let interval = setInterval( () => { //might take a shake, for local mods especially
 					this.waypoints = document.getElementsByClassName('waypoint');
-					if (this.waypoints.length > 9) {
+					if (this.waypoints.length > 1) {
 						console.log("gots some waypoints length " + this.waypoints.length);
 						this.registerWaypoints();
 						clearInterval(interval);
@@ -1485,9 +1485,14 @@ AFRAME.registerComponent('nav_mesh_controller', {
 	},
 	registerWaypoints: function() {
 		// let waypoints = this.waypoints;
-		console.log("tryna registerWaypoints...");
+		console.log("tryna registerWaypoints..." + this.waypoints.length) ;
 		// let results = [];
+		let goodWaypointCount = 0;
 		for (let i = 0; i < this.waypoints.length; i++) {
+			if (goodWaypointCount > 1) {
+				console.log("gots 2+ defined goodwaypoints");
+				this.almostReady();
+			}
 
 				let position = this.waypoints[i].getAttribute('position');
 				var testLineMaterial = new THREE.LineBasicMaterial({ color: 0xFF0000 });
@@ -1513,15 +1518,16 @@ AFRAME.registerComponent('nav_mesh_controller', {
 				position.z = results[0].point.z.toFixed(2); //snap y of waypoint to navmesh y
 				this.waypoints[i].setAttribute('position', position);
 				this.goodWaypoints.push(this.waypoints[i]);
-				
+				goodWaypointCount++;
+				testLineMaterial.color.set("green");
 				// data.waypoints[i].
 			} else {
 				console.log('bad nav waypoint');
 				// waypoints.splice(i, 1);
 			}
-			if (i == this.waypoints.length - 1) {
-				this.isReady = true;
-			}
+			// if (i == this.waypoints.length - 1) {
+			// 	this.isReady = true;
+			// }
 		} 
 	
 		
@@ -1676,8 +1682,15 @@ AFRAME.registerComponent('nav_agent_controller', {
 			}
 		});
 		el.addEventListener('navigation-end', (e)=>{
-			// console.log(JSON.stringify(e));
-			this.updateAgentState(this.currentState);
+			if (this.currentState == "target" || this.currentState == "greet player") { //todo if enemy, keep coming!
+				this.currentState = "pause";
+				console.log("nav end with target/greetplahyer");
+				this.el.setAttribute("look-at-y", "#player");
+				this.updateAgentState(this.currentState);
+			} else {
+				this.updateAgentState(this.currentState);
+			}
+			
 		})
 		el.addEventListener('navigation-null', (e)=>{
 			console.log("Nav Null");
@@ -1824,7 +1837,7 @@ AFRAME.registerComponent('nav_agent_controller', {
 	// },
 	updateAgentState: function (state) {
 		// console.log("switching state to " + state);
-		if (this.navMeshController && this.navMeshController.goodWaypoints.length > 9 && this.navMeshController.isReady) {
+		if (this.navMeshController && this.navMeshController.goodWaypoints.length > 1 && this.navMeshController.isReady) {
 			this.previousState = this.currentState;
 
 			// if (state == "random") {
@@ -1861,7 +1874,7 @@ AFRAME.registerComponent('nav_agent_controller', {
 	},
 	agentAction: function(){
 		// console.log("tryna do agentAction with state " + this.currentState);
-			if (this.navMeshController && this.navMeshController.goodWaypoints.length > 9 && this.navMeshController.isReady) {
+			if (this.navMeshController && this.navMeshController.goodWaypoints.length > 1 && this.navMeshController.isReady) {
 				
 				switch (this.currentState) { //type is first level param for each route
 

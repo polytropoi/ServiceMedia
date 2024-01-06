@@ -156,7 +156,7 @@ function InitIDB() {
 
 
                } else {//local-only elements, not saved to cloud yet
-                  setTimeout(function () { //prevent overload...
+                  // setTimeout(function () { //prevent overload...
                      let localEl = document.createElement("a-entity");
                      sceneEl.appendChild(localEl);
                      // let position = 
@@ -175,7 +175,7 @@ function InitIDB() {
                                                             scale: {x: cursor.value.locations[i].markerObjScale, y: cursor.value.locations[i].markerObjScale, z: cursor.value.locations[i].markerObjScale}
                                                          });
                      localEl.id = cursor.value.locations[i].timestamp.toString();
-                  }, 100 * i);
+                  // }, 100 * i);
                }
                locationTimestamps.push(cursor.value.locations[i].timestamp); //hrm
                } 
@@ -942,6 +942,9 @@ function SaveModToLocal(locationKey) { //locationKey is now just timestamp of th
    if (locItem.markerType == "waypoint" && locItem.name == 'local placeholder') {
       locItem.name = 'local waypoint';
    }
+   if (locItem.markerType == "placeholder" && locItem.name == 'local waypoint') {
+      locItem.name = 'local placeholder';
+   }
    
    // locItem.modelID = document.getElementById('locationModel').value.split("~")[3]; //model select values have the phID (room~cloud/local~timestamp) plus modelid, so index 3 of split
 
@@ -1279,15 +1282,33 @@ function ReturnLocationTable () { //just show em all now!
       }
    } else {
       for (let i = 0; i < localData.locations.length; i++) {
-         let markerString = "";
-         if (localData.locations[i].isLocal != null && localData.locations[i].isLocal === true) {
-            markerString = "<span style=\x22color: orange; font-weight: bold;\x22>"+localData.locations[i].markerType+"</span>";
-         } else {
-            markerString = "<span style=\x22color: lime; font-weight: bold;\x22>"+localData.locations[i].markerType+"</span>";
-         }        
          let namelabel = (localData.locations[i].name != 'undefined' && localData.locations[i].name != undefined && localData.locations[i].name != null) ? localData.locations[i].name : localData.locations[i].label; 
-         tablerows = tablerows + "<tr class=\x22clickableRow\x22 onclick=\x22LocationRowClick('"+localData.locations[i].timestamp+"')\x22><td>"+namelabel+"</td>"+
-         "<td>"+localData.locations[i].x+","+localData.locations[i].y+","+localData.locations[i].z+"</td><td>"+localData.locations[i].model+"</td><td>"+ markerString+"</td></tr>";
+         let namestring = "<span style=\x22color: white; \x22>"+namelabel+"</span>";
+         if (localData.locations[i].isLocal != null && localData.locations[i].isLocal === true) {
+            namestring = "<span style=\x22color: pink; \x22>"+namelabel+"</span>";
+         }  
+
+         let markerString = "<span style=\x22color: white; font-weight: bold;\x22>"+localData.locations[i].markerType+"</span>";
+         if (localData.locations[i].markerType == "waypoint") {
+            markerString = "<span style=\x22color: lime; font-weight: bold;\x22>"+localData.locations[i].markerType+"</span>";
+         } else if (localData.locations[i].markerType == "poi") { 
+            markerString = "<span style=\x22color: purple; font-weight: bold;\x22>"+localData.locations[i].markerType+"</span>";
+         } else if (localData.locations[i].markerType == "placeholder") { 
+            markerString = "<span style=\x22color: yellow; font-weight: bold;\x22>"+localData.locations[i].markerType+"</span>";
+         }  
+
+         let mAsset = (localData.locations[i].model || localData.locations[i].model == undefined || localData.locations[i].model == 'undefined' || localData.locations[i].model == "none") ? localData.locations[i].model : null;
+         let oAsset = (localData.locations[i].objectName || localData.locations[i].objectName == undefined || localData.locations[i].objectName == 'undefined' || localData.locations[i].objectName == "none") ? localData.locations[i].objectName : null;
+         let asset = 'none';
+         if (mAsset) {
+            asset = mAsset;
+         }
+         if (oAsset) {
+            asset = oAsset;
+         }
+        
+         tablerows = tablerows + "<tr class=\x22clickableRow\x22 onclick=\x22LocationRowClick('"+localData.locations[i].timestamp+"')\x22><td>"+namestring+"</td>"+
+         "<td>"+localData.locations[i].x+","+localData.locations[i].y+","+localData.locations[i].z+"</td><td>"+asset+"</td><td>"+ markerString+"</td></tr>";
       }
    }
    return "<table id=\x22locations\x22><th>label</th><th>position</th><th>Asset</th><th>type</th>"+tablerows+"</table>";
@@ -1578,6 +1599,7 @@ function CreatePlaceholder () {
    locItem.scale = 1;
    locItem.tags = '';
    locItem.phID = timestamp;
+   locItem.isLocal = true;
    localData.locations.push(locItem);
    phEl.setAttribute('gltf-model', '#poi1');
    phEl.id = locItem.timestamp;

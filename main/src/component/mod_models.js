@@ -1369,7 +1369,7 @@ AFRAME.registerComponent('mod_model', {
              
               let distance = evt.detail.intersection.distance;
               this.distance = distance;
-              console.log("callout is " + this.calloutString + " distance " + distance);
+              // console.log("callout is " + this.calloutString + " distance " + distance);
               // if (distance) { //
   
               if (this.hasCalloutBackground && distance) { //eg thought or speech bubble
@@ -1449,7 +1449,7 @@ AFRAME.registerComponent('mod_model', {
   
               } else {
                 if (this.hasLocationCallout || this.data.markerType === "character") {
-                  console.log("mod_model not bubble callout is " + textData[textIndex]);
+                  // console.log("mod_model not bubble callout is " + textData[textIndex]);
                   distance = evt.detail.intersection.distance;
                     // this.bubble.setAttribute('position', pos);
                     this.bubble.setAttribute("visible", true);
