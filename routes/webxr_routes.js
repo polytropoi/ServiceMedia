@@ -4232,11 +4232,11 @@ webxr_router.get('/:_id', function (req, res) {
                     settings.scatterMeshes = sceneResponse.sceneScatterMeshes;
 
                     settings.sceneScatterMeshLayers = sceneResponse.sceneScatterMeshLayers;
-                    settings.allowMods = false;
+                    settings.allowMods = true;
                 
 
-                    if (sceneResponse.sceneTags != null && sceneResponse.sceneTags.includes("allow mods")) {
-                        settings.allowMods = true;
+                    if (sceneResponse.sceneTags != null && sceneResponse.sceneTags.includes("no mods")) {
+                        settings.allowMods = false;
                     }
                     if (sceneResponse.scatterObjects) {
                         settings.sceneScatterObjectLayers = sceneResponse.sceneScatterObjectLayers;
