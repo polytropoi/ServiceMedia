@@ -13,6 +13,7 @@ let timedEventsListenerMode = null;
 let showStats = false;
 let showCurves = false;
 let keydown = "";
+let selectedLocationTimestamp = "";
 
 window.addEventListener( 'keydown',  ( event ) => {
   console.log("keydown code " + event.keyCode);
@@ -282,7 +283,7 @@ window.addEventListener( 'keyup',  ( event ) => {
   // });
 
   $('#modalContent').on('change', '#locationMarkerType', function(e) {
-      console.log('type ' + e.target.value);
+      console.log('type ' + e.target.value + " id " + selectedLocationTimestamp);
       if (e.target.value == "waypoint") {
         
       }
@@ -708,6 +709,7 @@ function ReturnLocationMarkerTypeSelect (selected) {
 function ShowLocationModal(timestamp) {   
 
     let thisLocation = null;
+    selectedLocationTimestamp = timestamp;
     // console.log("loaded and looking for " + phID);
     console.log("loaded and looking for " + timestamp);
     phID = timestamp;

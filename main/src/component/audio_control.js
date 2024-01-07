@@ -417,7 +417,7 @@ AFRAME.registerComponent('primary_audio_player', {  //setup and controls for the
                 }, false);
 
                 el.addEventListener('click', function () {  
-
+                    console.log("streaming audio click");
                     if (!primaryAudioHowl.playing()) {
                         el.setAttribute('light', {
                             type: 'point',

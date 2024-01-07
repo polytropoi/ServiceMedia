@@ -4906,6 +4906,8 @@ webxr_router.get('/:_id', function (req, res) {
                        
                         "<script src=\x22../main/vendor/aframe/aframe-look-at-component.js\x22></script>"+
                         "<script src=\x22../main/vendor/aframe/aframe-layout-component.js\x22></script>"+
+                        "<script src=\x22../main/src/component/cloud-marker.js\x22></script>"+
+                        "<script src=\x22../main/src/component/local-marker.js\x22></script>"+
                         // "<script src=\x22../main/vendor/html2canvas/aframe-html-shader.min.js\x22></script>"+
                         primaryAudioScript +
                         ambientAudioScript +

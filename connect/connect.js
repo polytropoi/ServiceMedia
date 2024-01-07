@@ -12,7 +12,7 @@ var pics = [];
 var picsBuffer = [];
 var picArrayIndex = 0;
 var currentIndex = 0;
-let avatarName = document.querySelector(".avatarName").id; //make this actual uid?  
+let avatarNameEl = document.querySelector(".avatarName"); //make this actual uid?  
 // let avatarName = "";
 let playFrames = false;
 let isConnected = false;
@@ -382,17 +382,15 @@ function SaveLocalData() {  //persist mods an alt "~" version of the data
 /////////////////// main onload function below, populate settings, etc.
 $(function() { 
    // InitIDB();
+   if (avatarNameEl) {
+      avatarName = avatarNameEl.id;
+   }
 
    player = document.getElementById("player");
    // player = document.getElementById("cameraRig");
    let settingsEl = document.getElementById('settingsDataElement'); //volume, color, etc...
    let theSettingsData = settingsEl.getAttribute('data-settings');
-   // if (localData.settings) {
-   //    settings = localData.settings;
-   // } else {
-      settings = JSON.parse(atob(theSettingsData)); 
-   // }
-   // console.log("last_page was " + localStorage.getItem("last_page") + " servertoken: "+ token + " localtoken: " + localtoken + " userdata.sceneOwner " + userData.sceneOwner);
+   settings = JSON.parse(atob(theSettingsData)); //gets copied to localdata ifn mods are 'llowed
    
    setTimeout(function () {
       // localStorage.setItem("last_page", room);
@@ -402,7 +400,7 @@ $(function() {
    }, 1000);
    if (typeof window.ethereum !== 'undefined') {
       console.log('MetaMask is installed!');
-      ShowEnableEthereumButton();
+      ShowEnableEthereumButton();  //bullshit enabled!
    } else {
 
    }
