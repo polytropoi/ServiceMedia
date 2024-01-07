@@ -185,6 +185,11 @@ function InitIDB() {
                      localData.locations.push(sceneLocations.locations[i]);
                   }
               }
+              sceneColor1 = localData.settings.sceneColor1;
+              sceneColor2 = localData.settings.sceneColor2;
+              sceneColor3 = localData.settings.sceneColor3;
+              sceneColor4 = localData.settings.sceneColor4;
+              InitLocalColors();
 
             console.log("COPIED LOCALDATA locations length " + localData.locations.length);
           }
@@ -847,25 +852,19 @@ function ImportMods (event) {
       // }
       if (mods != null && mods != undefined && mods.settings != {}) {
          
-         // localStorage.setItem(room+"_primaryVolume", mods.volumeMods.volumePrimary);
-         // localStorage.setItem(room+"_ambientVolume", mods.volumeMods.volumeAmbient);
-         // localStorage.setItem(room+"_triggerVolume", mods.volumeMods.volumeTrigger);
+
       }
       if (mods != null && mods != undefined && mods.locations != null && mods.locations.length > 0) {
+         localData.locations = [];
+         console.log("localData.locations " + JSON.stringify(localData.locations));
          for (let i = 0; i < mods.locations.length; i++) {
-
-            if (localData.locations.length) {
-               if (locationTimestamps.indexOf(mods.locations[i].timestamp) != -1) { //update existing location if modded (maybe better to nuke localData first?)
-                  localData.locations[locationTimestamps.indexOf(mods.locations[i].timestamp)] = mods.locations[i];
-               } else {
-                  localData.locations.push(mods.locations[i]);
-               }
-            } else {
                localData.locations.push(mods.locations[i]);
-            }
          }
 
          SaveLocalData();
+         setTimeout(function () {
+            window.location.reload();
+         }, 2000);
          // for (let i = 0; i < mods.locationMods.length; i++) {
          //    if (mods.locationMods[i].phID != null && mods.locationMods[i].phID.includes(room)) {
          //       if (mods.locationMods[i].type == null || mods.locationMods[i].type == undefined) {

@@ -855,7 +855,7 @@ function ShowLocationModal(timestamp) {
         // "+that.data.timestamp+","+that.data.name+","+position.x+","+position.y+","+position.z+"
 
         // "<button class=\x22deleteButton\x22 onclick=\x22DeleteLocation('"+phID+"')\x22>Clear Mods</button>"+
-        "<button class=\x22saveButton\x22 onclick=\x22SaveModToLocal('"+phID+"')\x22>Save to Local</button>"+
+        "<button class=\x22addButton\x22 style=\x22float:right;\x22 onclick=\x22SaveModToLocal('"+phID+"')\x22>Save to Local</button>"+
         cloudSaveButton +
 
         // "<button class=\x22snapButton\x22 onclick=\x22SnapLocation('"+phID+"')\x22>Snap</button>"+
@@ -1200,6 +1200,21 @@ function ReturnColorButtons () {
     "</div><br>";
 }
 
+
+function InitLocalColors() {
+  let enviroEl = document.getElementById('enviroEl');
+  if (enviroEl != null) {
+      enviroEl.setAttribute('environment', {
+        groundColor: localData.settings.sceneColor3,
+        groundColor2: localData.settings.sceneColor4,
+        dressingColor: localData.settings.sceneColor4,
+        skyColor: localData.settings.sceneColor1,
+        horizonColor: localData.settings.sceneColor2
+      });
+  }
+
+}
+
 function ColorMods(event, value) {
     var source = event.target || event.srcElement;
     if (source.id == "sceneColor1") {
@@ -1210,7 +1225,7 @@ function ColorMods(event, value) {
         // localStorage.setItem(room + "_sceneColor1", value);
         console.log("setting sceneCOlor1 to " + value);
         sceneColor1 = value;
-        settings.sceneColor1 = value;
+        localData.settings.sceneColor1 = value;
     } else if (source.id == "sceneColor2") {
         let enviroEl = document.getElementById('enviroEl');
         if (enviroEl != null) {
@@ -1219,7 +1234,7 @@ function ColorMods(event, value) {
         }
         // localStorage.setItem(room + "_sceneColor2", value);
         sceneColor2 = value;
-        settings.sceneColor1 = value;
+        localData.settings.sceneColor2 = value;
     } else if (source.id == "sceneColor3") {
         let enviroEl = document.getElementById('enviroEl');
         if (enviroEl != null) {
@@ -1227,7 +1242,7 @@ function ColorMods(event, value) {
         }
         // localStorage.setItem(room + "_sceneColor3", value);
         sceneColor3 = value;
-        settings.sceneColor1 = value;
+        localData.settings.sceneColor3 = value;
     } else if (source.id == "sceneColor4") {
         let enviroEl = document.getElementById('enviroEl');
         if (enviroEl != null) {
@@ -1236,8 +1251,9 @@ function ColorMods(event, value) {
         }
         // localStorage.setItem(room + "_sceneColor4", value);
         sceneColor4 = value;
-        settings.sceneColor1 = value;
+        localData.settings.sceneColor4 = value;
     }
+    // SaveLocalData();
  }
 function GetUserInventory () {
   // let data = {};
@@ -1565,7 +1581,8 @@ function SceneManglerModal(mode) {
       // "<label for=\x22file-upload\x22 class=\x22custom-file-upload\x22>Import Mods</label>"+
       // "<input type=\x22file\x22 id=\x22file-upload\x22 accept=\x22.txt\x22 onchange=\x22ImportMods(event)\x22></input>"+
         // ownerButton +
-       
+        
+        "<button class=\x22addButton\x22 onclick=\x22SaveLocalData()\x22>Save to Local</button>"+
         "<label style=\x22float: left;\x22 for=\x22file-upload\x22 class=\x22custom-file-upload\x22>Import Mods</label>"+
         "<input type=\x22file\x22 id=\x22file-upload\x22 accept=\x22.txt\x22 onchange=\x22ImportMods(event)\x22></input>"+ 
         "<button style=\x22float: left;\x22 class=\x22saveButton\x22 id=\x22exportButton\x22 onclick=\x22ExportMods()\x22>Export Mods</button>"+   
