@@ -264,11 +264,11 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
   
       this.el.addEventListener('mousedown', function (evt) {
   
-        if (keydown != "Shift") {
-          ToggleTransformControls(that.timestamp);
-        } else {
-          ShowLocationModal(that.timestamp);
-        }      
+        if (keydown == "T") {
+            ToggleTransformControls(that.timestamp);
+          } else if (keydown == "Shift") {
+            ShowLocationModal(that.timestamp);
+          }    
       });
       this.el.addEventListener('mouseup', function (evt) {
         console.log("mouseup cloudmarker ");

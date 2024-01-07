@@ -1555,7 +1555,15 @@ AFRAME.registerComponent('mod_object', {
           that.playerPosRot = null;
   
       });
-  
+      this.el.addEventListener('mousedown', (evt) => {
+        if (this.timestamp != '' && settings.allowMods && this.data.allowMods) {
+          if (keydown == "T") {
+            ToggleTransformControls(this.timestamp);
+          } else if (keydown == "Shift") {
+            ShowLocationModal(this.timestamp);
+          } 
+        }
+      });
       this.el.addEventListener('mouseenter', (evt) => {
         console.log("mouse enter mod_object name " + this.data.objectData.name + " id " + this.el.id);
         evt.preventDefault();

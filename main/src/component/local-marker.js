@@ -96,9 +96,13 @@ AFRAME.registerComponent('local_marker', { //special items with local mods
               } else if (this.data.markerType == "mailbox") {
                 this.el.setAttribute("gltf-model", "#mailbox");
                 this.el.classList.add("mailbox");
+              } else if (this.data.markerType == "gate") {
+                this.el.setAttribute("gltf-model", "#gate2");
+                
               } else {
                 this.el.setAttribute("gltf-model", "#poi1");
-              }
+              } 
+             
   
               this.el.id = this.data.timestamp;
               console.log("tryna set localmarker with phID " + this.timestamp + " and markerType " + this.data.markerType);
@@ -172,6 +176,9 @@ AFRAME.registerComponent('local_marker', { //special items with local mods
                 }
               });
               this.el.setObject3D('mesh', obj);
+              if (this.data.markerType == "gate") {
+                this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"placeholder"});
+              }
             // this.el.setAttribute("transform_controls", ""); //check for tag?
           });
          this.el.addEventListener('mouseenter', function (evt) {
@@ -224,9 +231,9 @@ AFRAME.registerComponent('local_marker', { //special items with local mods
       });
   
       this.el.addEventListener('mousedown', function (evt) {
-        if (keydown != "Shift") {
+        if (keydown == "T") {
           ToggleTransformControls(that.timestamp);
-        } else {
+        } else if (keydown == "Shift") {
           ShowLocationModal(that.timestamp);
         }
       });
@@ -283,8 +290,12 @@ AFRAME.registerComponent('local_marker', { //special items with local mods
           }
         }
       } else { //if "none"
-  
-        this.el.setAttribute("gltf-model", "#poi1");
+        if (this.data.markerType == "poi" || this.data.markerType == "waypoint" || this.data.markerType == "placeholder") {
+            this.el.setAttribute("gltf-model", "#poi1");
+        } else if (this.data.markerType == "gate"){
+            this.el.setAttribute("gltf-model", "#gate2");
+        }
+        
       }
     },
     waitAndLoad: function () {

@@ -763,7 +763,7 @@ function SendAdminMessage() {
 
 }
 
-function SaveModsToCloud() { //Save button on location modal
+function SaveModdsToCloud() { //Save button on location modal
 
    if (userData.sceneOwner != null) {
       let mods = {};
@@ -918,11 +918,20 @@ function SaveModToLocal(locationKey) { //locationKey is now just timestamp of th
    locItem.phID = locationKey.toString();
    locItem.type = "Worldspace";
    locItem.isLocal = true;
-   if (locItem.markerType == "waypoint" && locItem.name == 'local placeholder') {
+   if (locItem.markerType == "waypoint" && locItem.name.includes('local ')) {
       locItem.name = 'local waypoint';
    }
-   if (locItem.markerType == "placeholder" && locItem.name == 'local waypoint') {
+   if (locItem.markerType == "placeholder" && locItem.name.includes('local ')) {
       locItem.name = 'local placeholder';
+   }
+   if (locItem.markerType == "poi" && locItem.name.includes('local ')) {
+      locItem.name = 'local poi';
+   }
+   if (locItem.markerType == "gate" && locItem.name.includes('local ')) {
+      locItem.name = 'local gate';
+   }
+   if (locItem.markerType == "mailbox" && locItem.name.includes('local ')) {
+      locItem.name = 'local mailbox';
    }
    
    // locItem.modelID = document.getElementById('locationModel').value.split("~")[3]; //model select values have the phID (room~cloud/local~timestamp) plus modelid, so index 3 of split

@@ -1317,11 +1317,11 @@ AFRAME.registerComponent('mod_model', {
           // console.log("MOD_MODEL markertype " + this.data.markerType +  " this.hasCallout " + this.hasCallout + " this.data.description " + this.data.description);
           this.el.addEventListener('mousedown', (evt) => {
             if (that.timestamp != '' && settings.allowMods && this.data.allowMods) {
-              if (keydown != "Shift") {
+              if (keydown == "T") {
                 ToggleTransformControls(that.timestamp);
-              } else {
+              } else if (keydown == "Shift") {
                 ShowLocationModal(that.timestamp);
-              }      
+              } 
             }
           });
           this.el.addEventListener('mouseenter', (evt) =>  {

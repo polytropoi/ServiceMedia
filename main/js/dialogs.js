@@ -27,6 +27,10 @@ window.addEventListener( 'keydown',  ( event ) => {
       keydown = "Shift";
       break;
 
+    case 84: // T
+      keydown = "T";
+    break;
+
     case 87: // W
 
       break;
@@ -284,9 +288,28 @@ window.addEventListener( 'keyup',  ( event ) => {
 
   $('#modalContent').on('change', '#locationMarkerType', function(e) {
       console.log('type ' + e.target.value + " id " + selectedLocationTimestamp);
-      if (e.target.value == "waypoint") {
+      let theEl = document.getElementById(selectedLocationTimestamp);
+      for (let i = 0; i < localData.locations.length; i++) { //elsewise 
+        if (localData.locations[i].timestamp == selectedLocationTimestamp) {
+          // if (e.target.value == "gate") {
+            if (!localData.locations[i].isLocal) {
+              localMarkerComponent = theEl.components.local_marker;
+              if (localMarkerComponent) {
+                localMarkerComponent.data.markerType = e.target.value;
+                localMarkerComponent.loadModel(); 
+              }
+            } else {
+              cloudMarkerComponent = theEl.components.cloud_marker;
+              if (cloudMarkerComponent) {
+                cloudMarkerComponent.data.markerType = e.target.value;
+                cloudMarkerComponent.loadModel(); 
+              }
+            }
         
+          // }
+        }
       }
+    
       
   });
 
@@ -1172,19 +1195,19 @@ function ReturnColorButtons () {
     // sceneColor3 = localStorage.getItem(room+"_sceneColor3");
     // sceneColor4 = localStorage.getItem(room+"_sceneColor4");
     
-    // if (settings != null) {
-    //     if (sceneColor1 == null) {
-        //     sceneColor1 = settings.sceneColor1;
-        // // }
-        // // if (sceneColor2 == null) {
-        //     sceneColor2 = settings.sceneColor2;
-        // // }
-        // // if (sceneColor3 == null) {
-        //     sceneColor3 = settings.sceneColor3;
-        // // }
-        // // if (sceneColor4 == null) {
-        //     sceneColor4 = settings.sceneColor4;
-        // }
+    if (settings != null) {
+
+        sceneColor1 = settings.sceneColor1;
+    // }
+    // if (sceneColor2 == null) {
+        sceneColor2 = settings.sceneColor2;
+    // }
+    // if (sceneColor3 == null) {
+        sceneColor3 = settings.sceneColor3;
+    // }
+    // if (sceneColor4 == null) {
+        sceneColor4 = settings.sceneColor4;
+    }
     
 
     return "<hr><div class=\x22row\x22>"+
@@ -1205,7 +1228,7 @@ function ReturnColorButtons () {
 
 function InitLocalColors() {
   let enviroEl = document.getElementById('enviroEl');
-  if (enviroEl != null) {
+  if (enviroEl != null && settings.allowMods) {
       enviroEl.setAttribute('environment', {
         groundColor: localData.settings.sceneColor3,
         groundColor2: localData.settings.sceneColor4,
@@ -1218,6 +1241,7 @@ function InitLocalColors() {
 }
 
 function ColorMods(event, value) {
+  console.log("colormods " + event.target + event.srcElement);
     var source = event.target || event.srcElement;
     if (source.id == "sceneColor1") {
         let enviroEl = document.getElementById('enviroEl');
