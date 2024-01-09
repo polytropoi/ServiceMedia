@@ -915,15 +915,15 @@ background-color: #000000;
         font-size: 14px;
       }
       .inputColor {
-        width: 50px;
+        width: 66px;
         /* padding: 10px; */
         /* margin: 10px; */
-        display: inline-block;
+        /* display: inline-block; */
         /* border: 2px solid rgb(0, 165, 22);
         background-color: #afe0b2; */
-        border-radius: 4px;
-        box-sizing: border-box;
-        font-size: 10px;
+        /* border-radius: 4px; */
+        /* box-sizing: border-box; */
+        /* font-size: 10px; */
       }
       
       /* input[type=number] {

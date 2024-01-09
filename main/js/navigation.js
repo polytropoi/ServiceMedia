@@ -1413,11 +1413,12 @@ AFRAME.registerComponent('nav_mesh_controller', {
 		this.pathfinding = this.el.sceneEl.systems.nav;
 		// this.pathfinder = new Pathfinding();
 		// this.helper = new PathfindingHelper();
+		// this.el.setAttribute
 		this.el.addEventListener('model-loaded', () => {
 			// this.isReady = true;
 			console.log("Navmesh loaddded!!");
 			this.mesh = this.el.getObject3D('mesh');
-
+			// this.mesh.visible = false;
 
 			if (settings.scatterObjects) {
 					console.log("scatter objeect layers " + JSON.stringify(settings.sceneScatterObjectLayers));

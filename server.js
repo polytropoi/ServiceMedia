@@ -11737,17 +11737,25 @@ app.post('/add_scene_mods/:s_id', requiredAuthentication, admin, function (req, 
                     if (!scene.sceneTags.includes("no mods")) { //needs a param!
                         if (scene.user_id == req.body.userData._id) { //just scene owner for now
 
-                            console.log("user match for modz with locations " + JSON.stringify(scene.sceneLocations) ); 
+                            console.log("user match for modz with colorMods " + JSON.stringify(req.body.colorMods) ); 
                             let query = {};
                             if (req.body.colorMods != null) {
                                 let sceneColor1 = req.body.colorMods.sceneColor1 != null ? req.body.colorMods.sceneColor1 : "";
                                 let sceneColor2 = req.body.colorMods.sceneColor2 != null ? req.body.colorMods.sceneColor2 : "";
                                 let sceneColor3 = req.body.colorMods.sceneColor3 != null ? req.body.colorMods.sceneColor3 : "";
                                 let sceneColor4 = req.body.colorMods.sceneColor4 != null ? req.body.colorMods.sceneColor4 : "";
-                                query.sceneColor1 = sceneColor1;
-                                query.sceneColor2 = sceneColor2;
-                                query.sceneColor3 = sceneColor3;    
-                                query.sceneColor4 = sceneColor4; 
+                                if (sceneColor1 != "") {
+                                    query.sceneColor1 = sceneColor1;
+                                }
+                                if (sceneColor2 != "") {
+                                    query.sceneColor2 = sceneColor2;
+                                }
+                                if (sceneColor3 != "") {
+                                    query.sceneColor3 = sceneColor3;
+                                }
+                                if (sceneColor4 != "") {
+                                    query.sceneColor4 = sceneColor4;
+                                }
                             }
                             if (req.body.volumeMods != null) {
                                 query.scenePrimaryVolume = req.body.volumeMods.volumePrimary != null ? req.body.volumeMods.volumePrimary : 0;
@@ -11758,9 +11766,14 @@ app.post('/add_scene_mods/:s_id', requiredAuthentication, admin, function (req, 
                                 
                                 for (let l = 0; l < req.body.locationMods.length; l++) {
                                     let isMatch = false;
-                                    delete req.body.locationMods[l].isNew;
+                                    // let name = req.body.locationMods[i].name;
+                                    delete req.body.locationMods[l].isNew; //going to the cloud don't need these
                                     delete req.body.locationMods[l].isLocal;
-
+                                    if (req.body.locationMods[l].name.toLowerCase().includes("local ")) {
+                                        let name = req.body.locationMods[l].name.toLowerCase().replace("local ", "");
+                                        req.body.locationMods[l].name = name;
+                                    }
+                                    
                                     for (let i = 0; i < scene.sceneLocations.length; i++) {
                                         if (req.body.locationMods[l].timestamp == scene.sceneLocations[i].timestamp) {
                                             isMatch = true;
@@ -11790,15 +11803,19 @@ app.post('/add_scene_mods/:s_id', requiredAuthentication, admin, function (req, 
                                     }
                                 }
                             } 
-                            if (req.body.timedEventMods != null) {
-                                console.log("tryna save timed events : " + JSON.stringify(req.body.timedEventMods));
-                                query.sceneTimedEvents = req.body.timedEventMods;
-                            }
+                            // if (req.body.timedEventMods != null) {
+                                console.log("tryna save timed events : " + JSON.stringify(query));
+                            //     query.sceneTimedEvents = req.body.timedEventMods;
+                            // }
                             // db.scenes.update({ '_id': scene._id },
                             //     { $set:
                             //         query
                             //     }
                             // );
+                            db.scenes.update(
+                                { 'short_id': req.params.s_id},
+                                { $set: query } 
+                            )
                             res.send("ok");
                         } else {
                             console.log("tryna add_scene_mnods, but you aint the scene owner!");

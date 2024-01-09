@@ -205,6 +205,10 @@ AFRAME.registerComponent('mod_model', {
             if (settings.useNavmesh) {
               
             }
+            if (!this.data.eventData.toLowerCase().includes("show")) {
+              this.el.object3D.visible = false;
+            }
+            
           }
           if (this.data.eventData.toLowerCase().includes("agent")) { 
             if (settings.useNavmesh) {
@@ -219,6 +223,11 @@ AFRAME.registerComponent('mod_model', {
               this.el.classList.add("transform");  
 
           }
+          if (this.data.eventData.toLowerCase().includes("transparent")) { 
+            this.el.setAttribute("visibility", false);
+            console.log("TRANSPARENT model!");
+          }
+
           if (this.data.eventData.includes("scatter")) {
             this.el.object3D.visible = false;
             let surface = null;

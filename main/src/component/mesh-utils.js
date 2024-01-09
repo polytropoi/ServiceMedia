@@ -1811,6 +1811,7 @@ AFRAME.registerComponent('scatter-surface', {
       event.preventDefault();
       console.log("SCATTER SURFACE LOADED");
       // that.el.emit('surfaceLoaded', true);
+      
       // setTimeout(function(){ that.el.emit('surfaceLoaded', true);   }, 2000);// put some fudge, wait a bit for scatter meshes to load before firing
       let imeshes = document.querySelectorAll("[instanced_surface_meshes]");
       console.log("gots imeshes " + imeshes);

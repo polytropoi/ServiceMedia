@@ -75,7 +75,8 @@ let transformAll = false;
 
 let currentLocalStorageUsed = null;
 let currentAvailableLocalStorageEstimage = null;
-
+let lastCloudUpdate = null;
+let lastLocalUpdate = null;
 
 
 $('a-entity').each(function() {  //external way of getting click duration for physics
@@ -87,13 +88,13 @@ $('a-entity').each(function() {  //external way of getting click duration for ph
      mouseDowntime = (Date.now() / 1000) - mouseDownStarttime;
 
    });
-   $(this).bind('touchstart', function() {
-      mouseDownStarttime = Date.now() / 1000;
-    });
-    $(this).bind('touchend', function() {
-      mouseDowntime = (Date.now() / 1000) - mouseDownStarttime;
+   // $(this).bind('touchstart', function() {
+   //    mouseDownStarttime = Date.now() / 1000;
+   //  });
+   //  $(this).bind('touchend', function() {
+   //    mouseDowntime = (Date.now() / 1000) - mouseDownStarttime;
 
-    });
+   //  });
     $(this).bind('beforexrselect', e => {
       e.preventDefault();
     });
@@ -122,7 +123,7 @@ function InitIDB() {
       const db = request.result;
       const transaction = db.transaction("scenes", "readwrite");
       const store = transaction.objectStore("scenes");
-      const loadTimeStamp = Date.now();
+      const saveTimeStamp = Date.now();
       const lastSceneUpdate = null;
 
       //first check if there are localmods, version saved with tilde
@@ -134,7 +135,7 @@ function InitIDB() {
          // if (e.target.result) {
             if (cursor) {
                hasLocalData = true;
-
+               localData.lastUpdate = cursor.value.lastUpdate;
                for (let i = 0; i < cursor.value.locations.length; i++) { //mod or create the scene elements
                // let loc = JSON.stringify(cursor.value.locations[i]);
                console.log("cursor " + i + " of " + cursor.value.locations.length);
@@ -153,7 +154,7 @@ function InitIDB() {
                   localEl.setAttribute("rotation", {x: cursor.value.locations[i].eulerx, y: cursor.value.locations[i].eulery, z: cursor.value.locations[i].eulerz });
                   localEl.setAttribute("scale", {x: cursor.value.locations[i].markerObjScale, y: cursor.value.locations[i].markerObjScale, z: cursor.value.locations[i].markerObjScale});
                   
-                  localEl.setAttribute("local_marker", {timestamp: cursor.value.locations[i].timestamp,
+                  localEl.setAttribute("local_marker", { timestamp: cursor.value.locations[i].timestamp,
                                                          name: cursor.value.locations[i].name, 
                                                          modelID: cursor.value.locations[i].modelID, 
                                                          objectID: cursor.value.locations[i].objectID, 
@@ -164,11 +165,11 @@ function InitIDB() {
                                                          rotation: {x: cursor.value.locations[i].eulerx, y: cursor.value.locations[i].eulery, z: cursor.value.locations[i].eulerz },
                                                          scale: {x: cursor.value.locations[i].markerObjScale, y: cursor.value.locations[i].markerObjScale, z: cursor.value.locations[i].markerObjScale}
                                                       });
-                  localEl.id = cursor.value.locations[i].timestamp.toString();
+                  localEl.id = cursor.value.locations[i].timestamp.toString(); //for lookups
                }
                locationTimestamps.push(cursor.value.locations[i].timestamp); //hrm
                } 
-              
+               
                for (let key in cursor.value.settings) {
                   localData.settings[key] = cursor.value.settings[key]; //TODO apply each one?
 
@@ -182,18 +183,31 @@ function InitIDB() {
          transaction.oncomplete = function () {
             db.close();
 
-               for (let i = 0; i < sceneLocations.locations.length; i++) { //top off the localdata with anything missing
-                  if (locationTimestamps.indexOf(sceneLocations.locations[i].timestamp) == -1) {
-                     localData.locations.push(sceneLocations.locations[i]);
+            for (let i = 0; i < sceneLocations.locations.length; i++) { //top off the localdata with anything missing
+               if (locationTimestamps.indexOf(sceneLocations.locations[i].timestamp) == -1) {
+                  localData.locations.push(sceneLocations.locations[i]);
+               }
+            }
+            sceneColor1 = localData.settings.sceneColor1;
+            sceneColor2 = localData.settings.sceneColor2;
+            sceneColor3 = localData.settings.sceneColor3;
+            sceneColor4 = localData.settings.sceneColor4;
+            InitLocalColors();
+            lastLocalUpdate = localData.lastUpdate;
+            // console.log("COPIED LOCALDATA locations length " + localData.locations.length + " " + JSON.stringify(localData) + " last cloud update " +  lastCloudUpdate + " vs last local update " + lastLocalUpdate);
+            if (lastCloudUpdate && lastLocalUpdate) {
+               if (lastCloudUpdate > lastLocalUpdate) {
+                  console.log("MIGHTY CLOUD MODS ABOUT TO STEP ON YOUR PUNY LOCAL MODS");
+                  this.dialogEl = document.getElementById('mod_dialog');
+                  if (this.dialogEl) {
+                     this.dialogEl.components.mod_dialog.showPanel("NOTICE: RECENT CLOUD MODS MUST STEP ON YOUR LOCAL MODS!", null, "recentCloudMods" ); //param 2 is objID when needed
                   }
-              }
-              sceneColor1 = localData.settings.sceneColor1;
-              sceneColor2 = localData.settings.sceneColor2;
-              sceneColor3 = localData.settings.sceneColor3;
-              sceneColor4 = localData.settings.sceneColor4;
-              InitLocalColors();
-
-            console.log("COPIED LOCALDATA locations length " + localData.locations.length);
+                  
+               } else {
+                  console.log("COPIED LOCALDATA locations length " + localData.locations.length + " " + JSON.stringify(localData) + " last cloud update " +  lastCloudUpdate + " vs last local update " + lastLocalUpdate);
+               }
+            }
+            
           }
       };
       modQuery.onerror = function () {
@@ -220,42 +234,42 @@ function UpdateSceneLocations () {
    }
 }
 
-function SaveCloudData() { //do this after checking/loading any localData, just for reference (it's already set as global via location_data and settings)
-   console.log("tryna connect to SMXR indexeddb");
-   if (!('indexedDB' in window)) {
-      console.log("This browser doesn't support IndexedDB");
-      return;
-    }
-   const request = indexedDB.open("SMXR", 1);
-   request.onerror = (event) => {
-      console.error("could not connect to iDB " + event);
-      return "error"
-   };
-   request.onupgradeneeded = function () {
-      const db = request.result;
-      const store = db.createObjectStore("scenes", { keyPath: "shortID" });
-      store.createIndex("scene", ["scene"], { unique: true });
-    };
-    request.onsuccess = function () {
-      console.log("Saving local data, IDB opened successfully");
-      const db = request.result;
-      const transaction = db.transaction("scenes", "readwrite");
-      const store = transaction.objectStore("scenes");
-      const loadTimeStamp = Date.now();
-      const lastSceneUpdate = null;
-      let scene = {};
-      scene.shortID = room; //with tilde = the local version
-      scene.settings = settings;
-      scene.locations = sceneLocations.locations;
-      scene.lastUpdate = loadTimeStamp;
-      store.put(scene); //write the local version
-      transaction.oncomplete = function () {
-        db.close();
-        console.log("CloudData saved to IDB");
-         // InitLocalData();
-      };
-   };
-}
+// function SaveCloudData() { //do this after checking/loading any localData, just for reference (it's already set as global via location_data and settings)//nah...
+//    console.log("tryna connect to SMXR indexeddb");
+//    if (!('indexedDB' in window)) {
+//       console.log("This browser doesn't support IndexedDB");
+//       return;
+//     }
+//    const request = indexedDB.open("SMXR", 1);
+//    request.onerror = (event) => {
+//       console.error("could not connect to iDB " + event);
+//       return "error"
+//    };
+//    request.onupgradeneeded = function () {
+//       const db = request.result;
+//       const store = db.createObjectStore("scenes", { keyPath: "shortID" });
+//       store.createIndex("scene", ["scene"], { unique: true });
+//     };
+//     request.onsuccess = function () {
+//       console.log("Saving local data, IDB opened successfully");
+//       const db = request.result;
+//       const transaction = db.transaction("scenes", "readwrite");
+//       const store = transaction.objectStore("scenes");
+//       const saveTimeStamp = Date.now();
+//       const lastSceneUpdate = null;
+//       let scene = {};
+//       scene.shortID = room; //with tilde = the local version
+//       scene.settings = settings;
+//       scene.locations = sceneLocations.locations;
+//       scene.lastUpdate = saveTimeStamp;
+//       store.put(scene); //write the local version
+//       transaction.oncomplete = function () {
+//         db.close();
+//         console.log("CloudData saved to IDB");
+//          // InitLocalData();
+//       };
+//    };
+// }
 
 function SaveLocalData() {  //persist mods an alt "~" version of the data
    console.log("tryna connect to SMXR indexeddb");
@@ -278,14 +292,14 @@ function SaveLocalData() {  //persist mods an alt "~" version of the data
       const db = request.result;
       const transaction = db.transaction("scenes", "readwrite");
       const store = transaction.objectStore("scenes");
-      const loadTimeStamp = Date.now();
-      const lastSceneUpdate = null;
+      const saveTimeStamp = Date.now();
+      // const lastSceneUpdate = null;
       let scene = {};
       scene.shortID = room + "~"; //with tilde = the local version
       scene.settings = localData.settings;
       scene.locations = localData.locations;
       // scene.locations = JSON.parse(JSON.stringify(sceneLocations.locations));
-      scene.lastUpdate = loadTimeStamp;
+      scene.lastUpdate = saveTimeStamp;
       console.log("writing localdata " + JSON.stringify(scene));
       store.put(scene); //write the local version
       transaction.oncomplete = function () {
@@ -393,7 +407,7 @@ $(function() {
    let settingsEl = document.getElementById('settingsDataElement'); //volume, color, etc...
    let theSettingsData = settingsEl.getAttribute('data-settings');
    settings = JSON.parse(atob(theSettingsData)); //gets copied to localdata ifn mods are 'llowed
-   
+   lastCloudUpdate = settings.sceneLastUpdate;
    setTimeout(function () {
       // localStorage.setItem("last_page", room);
       tcheck(); //token auth
@@ -569,6 +583,7 @@ $(function() {
    if (settings.sceneScatterObjectLayers) {
       console.log("objectScatterLayers: " + JSON.stringify(settings.sceneScatterObjectLayers));
    }
+
    // this.asky = document.getElementsByTagName('a-sky')[0];
    // if (this.asky && settings) {
    //   console.log("tryna mod asky radius " + settings.sceneSkyRadius);
@@ -790,7 +805,11 @@ function SaveModsToCloud() { //Save button on location modal
          // do something to response
          console.log(this.responseText);
          if (this.responseText == 'ok') {
-            // ClearPlaceholders();
+            // SaveLocalData();
+            DeleteLocalSceneData();
+            setTimeout(function () {
+               window.location.reload();
+            }, 2000);
          } 
       };
    } else {
@@ -1712,10 +1731,11 @@ if (sceneEl != null) {
 
             let theData = this.el.getAttribute('data-locations');
             console.log("location_data el" + this.el.id);
-            let locations = [];
+            // let locations = [];
             this.data.jsonData = JSON.parse(atob(theData)); //convert from base64
             // this.rEl = null;
             // if (localData != "") {
+
             for (let i = 0; i < this.data.jsonData.length; i++) {
                let locItem = this.data.jsonData[i];
                sceneLocations.locations.push(locItem);

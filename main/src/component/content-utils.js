@@ -2255,6 +2255,7 @@ AFRAME.registerComponent('mod_dialog', { //there should only be one of these, un
   this.noButtonMesh = null;
   this.okButtonMesh = null;
   this.objID = null;
+  this.messageType = null;
   this.meshObj = null;
   this.panelString = "";
   this.el.addEventListener('model-loaded', () => {  
@@ -2289,9 +2290,10 @@ AFRAME.registerComponent('mod_dialog', { //there should only be one of these, un
   // this.dial
   let that = this;
   },
-  showPanel: function (panelString, objectID) {
+  showPanel: function (panelString, objectID, messageType) {
 
     this.objID = objectID;
+    this.messageType = messageType;
     this.el.setAttribute("visible", true);
     this.dialogPanel.classList.add('activeObjexRay');
     if (this.meshObj != null) {
@@ -2317,19 +2319,28 @@ AFRAME.registerComponent('mod_dialog', { //there should only be one of these, un
     this.dialogPanel.classList.remove('activeObjexRay');
   },
   yesButton: function () {
-    console.log("yesbutton for " + this.objID);
-    // this.el.setAttribute("visible", false);
-    if (this.objID.includes("href~")) {
-      let urlSplit = this.objID.split("~");
-      // window.location.href = urlSplit[1];
-      window.open(urlSplit[1], "_blank");
-      this.el.setAttribute("visible", false);
-      this.dialogPanel.classList.remove('activeObjexRay');
+    if (this.objID) {
+      console.log("yesbutton for " + this.objID);
+      // this.el.setAttribute("visible", false);
+      if (this.objID.includes("href~")) {
+        let urlSplit = this.objID.split("~");
+        // window.location.href = urlSplit[1];
+        window.open(urlSplit[1], "_blank");
+        this.el.setAttribute("visible", false);
+        this.dialogPanel.classList.remove('activeObjexRay');
+      } else {
+        let objEl = document.getElementById(this.objID);
+        if (objEl != null) {
+          objEl.components.mod_object.activated();
+          // objEl.components.mod_object.hideObject();
+        }
+      }
     } else {
-      let objEl = document.getElementById(this.objID);
-      if (objEl != null) {
-        objEl.components.mod_object.activated();
-        // objEl.components.mod_object.hideObject();
+      if (this.messageType == "recentCloudMods") {
+        DeleteLocalSceneData();
+        setTimeout(function () {
+          window.location.reload();
+       }, 2000);
       }
     }
 

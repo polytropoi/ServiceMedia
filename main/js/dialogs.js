@@ -134,7 +134,22 @@ window.addEventListener( 'keyup',  ( event ) => {
   //       }
   //     }
   // });
-
+  $('#modalContent').on('input', '#sceneColor1', function(e) {
+    console.log("color 1 changed " + e.target.value);
+    ColorMods(e, e.target.value);
+  });
+  $('#modalContent').on('input', '#sceneColor2', function(e) {
+    console.log("color 2 changed " + e.target.value);
+    ColorMods(e, e.target.value);
+  });
+  $('#modalContent').on('input', '#sceneColor3', function(e) {
+    console.log("color 3 changed " + e.target.value);
+    ColorMods(e, e.target.value);
+  });
+  $('#modalContent').on('input', '#sceneColor4', function(e) {
+    console.log("color 4 changed " + e.target.value);
+    ColorMods(e, e.target.value);
+  });
   $('#modalContent').on('change', '#locationModel', function(e) { //value has timestamp ~ modelID //no, just just the modelID, get el id from global
     console.log("model changed " + e.target.value);
     // let locSplit = e.target.value.split("~"); 
@@ -176,18 +191,7 @@ window.addEventListener( 'keyup',  ( event ) => {
                 localMarkerComponent.data.modelID = uModelID;
                 localMarkerComponent.loadModel(uModelID); 
               }
-              
-            // } else {
-            //   if (modModelComponent) {
-            //     modModelComponent.data.modelID = uModelID;
-            //     modModelComponent.loadModel(); 
-            //   }
-            //   cloudMarkerComponent = locEl.components.cloud_marker;
-            //   if (cloudMarkerComponent) {
-            //     cloudMarkerComponent.data.modelID = uModelID;
-            //     cloudMarkerComponent.loadModel(); 
-            //   }
-            // }
+            
             break;
           }
         }  
@@ -1207,44 +1211,45 @@ function ReturnCurrentPlayerLocation() {
 }
 function ReturnColorButtons () {
 
-    // sceneColor1 = localStorage.getItem(room+"_sceneColor1");
-    // sceneColor2 = localStorage.getItem(room+"_sceneColor2");
-    // sceneColor3 = localStorage.getItem(room+"_sceneColor3");
-    // sceneColor4 = localStorage.getItem(room+"_sceneColor4");
-
-    // sceneColor1 = null;
-    // sceneColor2 = localStorage.getItem(room+"_sceneColor2");
-    // sceneColor3 = localStorage.getItem(room+"_sceneColor3");
-    // sceneColor4 = localStorage.getItem(room+"_sceneColor4");
-    
-    if (settings != null) {
-
-        sceneColor1 = settings.sceneColor1;
-    // }
-    // if (sceneColor2 == null) {
-        sceneColor2 = settings.sceneColor2;
-    // }
-    // if (sceneColor3 == null) {
-        sceneColor3 = settings.sceneColor3;
-    // }
-    // if (sceneColor4 == null) {
-        sceneColor4 = settings.sceneColor4;
+    if (localData.settings.sceneColor1) {
+      sceneColor1 = localData.settings.sceneColor1;
+      sceneColor2 = localData.settings.sceneColor2;
+      sceneColor3 = localData.settings.sceneColor3;
+      sceneColor4 = localData.settings.sceneColor4;
+    } else {
+      sceneColor1 = settings.sceneColor1;
+      sceneColor2 = settings.sceneColor2;
+      sceneColor3 = settings.sceneColor3;
+      sceneColor4 = settings.sceneColor4;
     }
-    
 
     return "<hr><div class=\x22row\x22>"+
     "<label style=\x22margin: 10px;\x22 for=\x22sceneColor1\x22>Color 1</label>"+
-    "<input class=\x22inputColor\x22 type=\x22color\x22 id=\x22sceneColor1\x22 name=\x22sceneColor1\x22 oninput=\x22ColorMods(event, this.value)\x22 value=\x22"+sceneColor1+"\x22>"+
+    "<input type=\x22color\x22 class=\x22inputColor\x22 id=\x22sceneColor1\x22 name=\x22sceneColor1\x22 value=\x22"+sceneColor1+"\x22>"+
 
     "<label style=\x22margin: 10px;\x22 for=\x22sceneColor2\x22>Color 2</label>"+
-    "<input class=\x22inputColor\x22 type=\x22color\x22 id=\x22sceneColor2\x22 name=\x22sceneColor2\x22 oninput=\x22ColorMods(event, this.value)\x22 value=\x22"+sceneColor2+"\x22>"+
+    "<input type=\x22color\x22 class=\x22inputColor\x22 id=\x22sceneColor2\x22 name=\x22sceneColor2\x22 value=\x22"+sceneColor2+"\x22>"+
     
     "<label style=\x22margin: 10px;\x22 for=\x22sceneColor3\x22>Color 3</label>"+
-    "<input class=\x22inputColor\x22 type=\x22color\x22 id=\x22sceneColor3\x22 name=\x22sceneColor3\x22 oninput=\x22ColorMods(event, this.value)\x22 value=\x22"+sceneColor3+"\x22>"+
+    "<input type=\x22color\x22 class=\x22inputColor\x22 id=\x22sceneColor3\x22 name=\x22sceneColor3\x22 value=\x22"+sceneColor3+"\x22>"+
     
     "<label style=\x22margin: 10px;\x22 for=\x22sceneColor4\x22>Color 4</label>"+
-    "<input class=\x22inputColor\x22 type=\x22color\x22 id=\x22sceneColor4\x22 name=\x22sceneColor4\x22 oninput=\x22ColorMods(event, this.value)\x22 value=\x22"+sceneColor4+"\x22>"+
+    "<input type=\x22color\x22 class=\x22inputColor\x22 id=\x22sceneColor4\x22 name=\x22sceneColor4\x22 value=\x22"+sceneColor4+"\x22>"+
     "</div><br>";
+    // return "<hr><div class=\x22row\x22>"+
+    // "<label style=\x22margin: 10px;\x22 for=\x22sceneColor1\x22>Color 1</label>"+
+    // "<input class=\x22inputColor\x22 type=\x22color\x22 id=\x22sceneColor1\x22 name=\x22sceneColor1\x22 oninput=\x22ColorMods(event, this.value)\x22 value=\x22"+sceneColor1+"\x22>"+
+
+    // "<label style=\x22margin: 10px;\x22 for=\x22sceneColor2\x22>Color 2</label>"+
+    // "<input class=\x22inputColor\x22 type=\x22color\x22 id=\x22sceneColor2\x22 name=\x22sceneColor2\x22 oninput=\x22ColorMods(event, this.value)\x22 value=\x22"+sceneColor2+"\x22>"+
+    
+    // "<label style=\x22margin: 10px;\x22 for=\x22sceneColor3\x22>Color 3</label>"+
+    // "<input class=\x22inputColor\x22 type=\x22color\x22 id=\x22sceneColor3\x22 name=\x22sceneColor3\x22 oninput=\x22ColorMods(event, this.value)\x22 value=\x22"+sceneColor3+"\x22>"+
+    
+    // "<label style=\x22margin: 10px;\x22 for=\x22sceneColor4\x22>Color 4</label>"+
+    // "<input class=\x22inputColor\x22 type=\x22color\x22 id=\x22sceneColor4\x22 name=\x22sceneColor4\x22 oninput=\x22ColorMods(event, this.value)\x22 value=\x22"+sceneColor4+"\x22>"+
+    // "</div><br>";
+
 }
 
 
@@ -1528,8 +1533,8 @@ function SceneManglerModal(mode) {
     let ownerButton = "";
     let sendAdminMessageButton = "";
     if (userData.sceneOwner == "indaehoose") {
-        ownerButton = "<button style=\x22float: right;\x22 class=\x22addButton\x22 id=\x22editButton\x22><a href=\x22../main/?type=scene&iid="+userData.sceneID+"\x22>Edit Scene</a></button>"+
-        "<button style=\x22float: right;\x22 class=\x22reallySaveButton\x22 onclick=\x22SaveModsToCloud()\x22>Save Mods To Cloud</button>";
+        ownerButton = "<button class=\x22addButton\x22 id=\x22editButton\x22><a href=\x22../main/?type=scene&iid="+userData.sceneID+"\x22>Edit Scene</a></button>"+
+        "<button style=\x22float: left;\x22 class=\x22reallySaveButton\x22 onclick=\x22SaveModsToCloud()\x22>Save to Cloud DB</button>";
         sendAdminMessageButton = "<button style=\x22float: left;\x22 class=\x22reallySaveButton\x22 onclick=\x22SendAdminMessage()\x22>Send Admin Message</button>";
     }
     let oculusButton = "<button style=\x22float: right;\x22 class=\x22addButton\x22 id=\x22oculusButton\x22><a href=\x22https://www.oculus.com/open_url/?url=https%3A%2F%2Fservicemedia.net/webxr/"+room+"\x22>Open on Oculus Quest</a></button>";
@@ -1539,7 +1544,7 @@ function SceneManglerModal(mode) {
     
     "<button class=\x22tablinks\x22 onclick=\x22TabMangler(event, 'Messages')\x22>Messages</button>"+
     "<button class=\x22tablinks\x22 onclick=\x22TabMangler(event, 'Inventory')\x22>Inventory</button>"+
-    "<button class=\x22tablinks\x22 onclick=\x22TabMangler(event, 'Tools')\x22>Settings</button>"+
+    "<button class=\x22tablinks\x22 onclick=\x22TabMangler(event, 'Tools')\x22>Tools</button>"+
     "<button class=\x22tablinks\x22 onclick=\x22TabMangler(event, 'Locations')\x22>Locations</button>"+
     "<button class=\x22tablinks\x22 onclick=\x22TabMangler(event, 'Events')\x22>Events</button>"+
     "<button class=\x22tablinks\x22 onclick=\x22TabMangler(event, 'About')\x22>About</button>"+
@@ -1630,10 +1635,11 @@ function SceneManglerModal(mode) {
       // "<input type=\x22file\x22 id=\x22file-upload\x22 accept=\x22.txt\x22 onchange=\x22ImportMods(event)\x22></input>"+
         // ownerButton +
         
-        "<button class=\x22addButton\x22 onclick=\x22SaveLocalData()\x22>Save to Local</button>"+
+       
         "<label style=\x22float: left;\x22 for=\x22file-upload\x22 class=\x22custom-file-upload\x22>Import Mods</label>"+
         "<input type=\x22file\x22 id=\x22file-upload\x22 accept=\x22.txt\x22 onchange=\x22ImportMods(event)\x22></input>"+ 
         "<button style=\x22float: left;\x22 class=\x22saveButton\x22 id=\x22exportButton\x22 onclick=\x22ExportMods()\x22>Export Mods</button>"+   
+        ownerButton +
       "<button style=\x22float: right;\x22 class=\x22goToButton\x22 id=\x22statsButton\x22 onclick=\x22ToggleStats()\x22>Show Stats</button>"+
       // "<button class=\x22goToButton\x22 id=\x22statsButton\x22 onclick=\x22ToggleStats()\x22>Show Raycasts</button>"+
       // "<button class=\x22goToButton\x22 id=\x22statsButton\x22 onclick=\x22ToggleStats()\x22>Show Colliders</button>"+
@@ -1649,7 +1655,7 @@ function SceneManglerModal(mode) {
     // "<input type=\x22file\x22 id=\x22file-upload\x22 accept=\x22.txt\x22 onchange=\x22ImportMods(event)\x22></input>"+
     // "<button class=\x22deleteButton\x22 id=\x22ClearAllPlaceholdersButton\x22 onclick=\x22ClearPlaceholders()\x22>Clear All Mods</button>" +
     "<button class=\x22deleteButton\x22 id=\x22ClearAllPlaceholdersButton\x22 onclick=\x22DeleteLocalSceneData()\x22>Clear Scene Mods</button>"+
-    ownerButton +
+    "<button style=\x22float: right;\x22 class=\x22addButton\x22 onclick=\x22SaveLocalData()\x22>Save to Local DB</button>"+
       // "<div class=\x22twocolumn\x22><label for=\x22addpic\x22>Add Picture Asset</label><button class=\x22addButton\x22 id=\x22AddPicButton\x22 onclick=\x22AddPicture()\x22>Add</button>"+
       // "<button class=\x22uploadButton\x22 id=\x22UpoadPicButton\x22 onclick=\x22UploadPicture()\x22>Upload</button>"+
       // "<input class=\x22addfield\x22 type=\x22text\x22 id=\x22addpic\x22 placeholder=\x22picture URL or IPFS\x22></div>"+
