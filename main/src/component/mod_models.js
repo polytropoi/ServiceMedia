@@ -1824,10 +1824,27 @@ AFRAME.registerComponent('mod_model', {
         }
       }
     },
-    returnHitDistance () {
+    returnHitDistance: function () {
       if (this.distance) {
         return this.distance;
       }
+    },
+    loadModel: function () {
+      console.log("tryna load modeID " + this.data.modelID);
+      // console.log("tryna load modeID " + modelID);
+      if (this.data.modelID != undefined && this.data.modelID != null & this.data.modelID != "none" && this.data.modelID != "") {  
+        for (let i = 0; i < sceneModels.length; i++) {
+          if (sceneModels[i]._id == this.data.modelID) {
+            this.el.setAttribute("gltf-model", sceneModels[i].url);
+            console.log("gotsa model match, updating..");
+            // this.el.
+            break;
+          }
+        }
+      } 
+      // } else {
+      //   this.el.setAttribute("gltf-model", "https://servicemedia.s3.amazonaws.com/assets/models/savedplaceholder.glb");
+      // }
     },
     tick: function () {
       if (this.shaderMaterial != null && this.hasUniforms != null) {

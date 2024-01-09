@@ -155,6 +155,8 @@ function InitIDB() {
                   
                   localEl.setAttribute("local_marker", {timestamp: cursor.value.locations[i].timestamp,
                                                          name: cursor.value.locations[i].name, 
+                                                         modelID: cursor.value.locations[i].modelID, 
+                                                         objectID: cursor.value.locations[i].objectID, 
                                                          tags: cursor.value.locations[i].tags, 
                                                          eventData: cursor.value.locations[i].eventData, 
                                                          markerType: cursor.value.locations[i].markerType,
@@ -760,25 +762,26 @@ function SendAdminMessage() {
          GoToNext();
       }
    }
-
 }
 
-function SaveModdsToCloud() { //Save button on location modal
+function SaveModsToCloud() { //Save button on location modal
 
    if (userData.sceneOwner != null) {
       let mods = {};
       mods.shortID = room;
       mods.userData = userData;
-      mods.locationMods = sceneLocations.locationMods;
-      if (sceneColor1 != "" || sceneColor2 != "" || sceneColor3 != "" || sceneColor4 != "") { //defined globally above
-         mods.colorMods = {sceneColor1: sceneColor1, sceneColor2: sceneColor2, sceneColor3: sceneColor3, sceneColor4: sceneColor4};
+      mods.locationMods = localData.locations;
+      // mods.colorMods = {};
+      if (localData.settings.sceneColor1 != "" || localData.settings.sceneColor2 != "" || localData.settings.sceneColor3 != "" || localData.settings.sceneColor4 != "") { //defined globally above
+         mods.colorMods = {sceneColor1: localData.settings.sceneColor1, sceneColor2: localData.settings.sceneColor2, sceneColor3: localData.settings.sceneColor3, sceneColor4: localData.settings.sceneColor4};
       }
       if (volumePrimary != "" ||volumeAmbient != "" || volumeTrigger != "") {
          mods.volumeMods = {volumePrimary: volumePrimary, volumeAmbient: volumeAmbient, volumeTrigger: volumeTrigger};
       }
-      mods.timedEventMods = timeKeysData;
-      var encodedString = btoa(JSON.stringify(mods));
-      console.log(encodedString);
+      mods.timedEventMods = localData.timeKeysData;
+      console.log(JSON.stringify(mods));
+      // var encodedString = btoa(JSON.stringify(mods));
+      // console.log(encodedString);
       var xhr = new XMLHttpRequest();
       xhr.open("POST", '/add_scene_mods/'+room, true);
       xhr.setRequestHeader('Content-Type', 'application/json');
@@ -787,9 +790,9 @@ function SaveModdsToCloud() { //Save button on location modal
          // do something to response
          console.log(this.responseText);
          if (this.responseText == 'ok') {
-            ClearPlaceholders();
+            // ClearPlaceholders();
          } 
-     };
+      };
    } else {
       console.log("you ain't the sceneOwner!");
    }

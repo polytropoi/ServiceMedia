@@ -11724,7 +11724,7 @@ app.post('/add_scene_mods/:s_id', requiredAuthentication, admin, function (req, 
     if (req.params.s_id == req.body.shortID) {
         
         // console.log(JSON.stringify(req.session.user) + " vs " + JSON.stringify(req.body.userData)); 
-        if (req.body.userData._id == req.session.user._id) {
+        if (req.body.userData._id == req.session.user._id) {    
             
             db.scenes.findOne({ "short_id": req.params.s_id}, function (err, scene) {
                 if (err || !scene) {
@@ -11734,66 +11734,77 @@ app.post('/add_scene_mods/:s_id', requiredAuthentication, admin, function (req, 
                     // console.log("mods for " +req.params.s_id + " " + JSON.stringify(req.body)); 
                     console.log("sceneowner: " + scene.userID);
                     let query = {};
-                    if (scene.user_id == req.body.userData._id) { //just scene owner for now
+                    if (!scene.sceneTags.includes("no mods")) { //needs a param!
+                        if (scene.user_id == req.body.userData._id) { //just scene owner for now
 
-                        console.log("user match for modz with locations " + JSON.stringify(scene.sceneLocations) ); 
-                        let query = {};
-                        if (req.body.colorMods != null) {
-                            let sceneColor1 = req.body.colorMods.sceneColor1 != null ? req.body.colorMods.sceneColor1 : "";
-                            let sceneColor2 = req.body.colorMods.sceneColor2 != null ? req.body.colorMods.sceneColor2 : "";
-                            let sceneColor3 = req.body.colorMods.sceneColor3 != null ? req.body.colorMods.sceneColor3 : "";
-                            let sceneColor4 = req.body.colorMods.sceneColor4 != null ? req.body.colorMods.sceneColor4 : "";
-                            query.sceneColor1 = sceneColor1;
-                            query.sceneColor2 = sceneColor2;
-                            query.sceneColor3 = sceneColor3;    
-                            query.sceneColor4 = sceneColor4; 
-                        }
-                        if (req.body.volumeMods != null) {
-                            query.scenePrimaryVolume = req.body.volumeMods.volumePrimary != null ? req.body.volumeMods.volumePrimary : 0;
-                            query.sceneAmbientVolume = req.body.volumeMods.volumeAmbient != null ? req.body.volumeMods.volumeAmbient : 0;
-                            query.sceneTriggerVolume = req.body.volumeMods.volumeTrigger != null ? req.body.volumeMods.volumeTrigger : 0;
-                        }
-                        if (req.body.locationMods != null) {
-                            for (let l = 0; l < req.body.locationMods.length; l++) {
-                                let isMatch = false;
-                                for (let i = 0; i < scene.sceneLocations.length; i++) {
-                                    if (req.body.locationMods[l].timestamp == scene.sceneLocations[i].timestamp) {
-                                        isMatch = true;
-                                        console.log("gotsa match with existing location! " + scene.sceneLocations[i].timestamp + " vs " + req.body.locationMods[l].timestamp);
-                                        let tsVar = null;
-                                        if (Number.isInteger(scene.sceneLocations[i].timestamp)) { // shit happens
-                                            tsVar = parseInt(req.body.locationMods[l].timestamp);
-                                        } else {
-                                            tsVar = req.body.locationMods[l].timestamp.toString();
+                            console.log("user match for modz with locations " + JSON.stringify(scene.sceneLocations) ); 
+                            let query = {};
+                            if (req.body.colorMods != null) {
+                                let sceneColor1 = req.body.colorMods.sceneColor1 != null ? req.body.colorMods.sceneColor1 : "";
+                                let sceneColor2 = req.body.colorMods.sceneColor2 != null ? req.body.colorMods.sceneColor2 : "";
+                                let sceneColor3 = req.body.colorMods.sceneColor3 != null ? req.body.colorMods.sceneColor3 : "";
+                                let sceneColor4 = req.body.colorMods.sceneColor4 != null ? req.body.colorMods.sceneColor4 : "";
+                                query.sceneColor1 = sceneColor1;
+                                query.sceneColor2 = sceneColor2;
+                                query.sceneColor3 = sceneColor3;    
+                                query.sceneColor4 = sceneColor4; 
+                            }
+                            if (req.body.volumeMods != null) {
+                                query.scenePrimaryVolume = req.body.volumeMods.volumePrimary != null ? req.body.volumeMods.volumePrimary : 0;
+                                query.sceneAmbientVolume = req.body.volumeMods.volumeAmbient != null ? req.body.volumeMods.volumeAmbient : 0;
+                                query.sceneTriggerVolume = req.body.volumeMods.volumeTrigger != null ? req.body.volumeMods.volumeTrigger : 0;
+                            }
+                            if (req.body.locationMods != null) {
+                                
+                                for (let l = 0; l < req.body.locationMods.length; l++) {
+                                    let isMatch = false;
+                                    delete req.body.locationMods[l].isNew;
+                                    delete req.body.locationMods[l].isLocal;
+
+                                    for (let i = 0; i < scene.sceneLocations.length; i++) {
+                                        if (req.body.locationMods[l].timestamp == scene.sceneLocations[i].timestamp) {
+                                            isMatch = true;
+                                            console.log("gotsa match with existing location! " + scene.sceneLocations[i].timestamp + " vs " + req.body.locationMods[l].timestamp);
+                                            let tsVar = null;
+                                            if (Number.isInteger(scene.sceneLocations[i].timestamp)) { // shit happens
+                                                tsVar = parseInt(req.body.locationMods[l].timestamp);
+                                            } else {
+                                                tsVar = req.body.locationMods[l].timestamp.toString();
+                                            }
+                                            if ((scene.sceneLocations[i].tags && scene.sceneLocations[i].tags.includes("no mods"))) {
+                                                console.log("mods not allowed for " + scene.sceneLocations[i].timestamp)
+                                            } else {
+                                                db.scenes.update(
+                                                    { 'short_id': req.params.s_id, 'sceneLocations.timestamp': tsVar}, //could either one, ugh
+                                                    { $set: { 'sceneLocations.$' : req.body.locationMods[l]} } //replaces whole object in array, uses positional $ operator https://docs.mongodb.com/manual/tutorial/update-documents/#Updating-The%24positionaloperator
+                                                )
+                                            }
                                         }
-                                        // console.log("timestamp is integer " + Number.isInteger(scene.sceneLocations[i].timestamp));
+                                    }
+                                    if (!isMatch) {
+                                        console.log("no match with existing location, must be new " + req.body.locationMods[l].timestamp);
                                         db.scenes.update(
-                                            { 'short_id': req.params.s_id, 'sceneLocations.timestamp': tsVar}, //could either one, ugh
-                                            // { 'short_id': req.params.s_id}, {'sceneLocations.timestamp': stringVar},  //could either one, ugh
-                                            { $set: { 'sceneLocations.$' : req.body.locationMods[l]} } //replaces whole object in array, uses positional $ operator https://docs.mongodb.com/manual/tutorial/update-documents/#Updating-The%24positionaloperator
+                                            { 'short_id': req.params.s_id},
+                                            { $push: { 'sceneLocations' : req.body.locationMods[l]} } 
                                         )
                                     }
                                 }
-                                if (!isMatch) {
-                                    db.scenes.update(
-                                        { 'short_id': req.params.s_id},
-                                        { $push: { 'sceneLocations' : req.body.locationMods[l]} } 
-                                    )
-                                }
+                            } 
+                            if (req.body.timedEventMods != null) {
+                                console.log("tryna save timed events : " + JSON.stringify(req.body.timedEventMods));
+                                query.sceneTimedEvents = req.body.timedEventMods;
                             }
-                        } 
-                        if (req.body.timedEventMods != null) {
-                            console.log("tryna save timed events : " + JSON.stringify(req.body.timedEventMods));
-                            query.sceneTimedEvents = req.body.timedEventMods;
+                            // db.scenes.update({ '_id': scene._id },
+                            //     { $set:
+                            //         query
+                            //     }
+                            // );
+                            res.send("ok");
+                        } else {
+                            console.log("tryna add_scene_mnods, but you aint the scene owner!");
                         }
-                        db.scenes.update({ '_id': scene._id },
-                            { $set:
-                                query
-                            }
-                        );
-                        res.send("ok");
                     } else {
-                        console.log("tryna add_scene_mnods, but you aint the scene owner!");
+                        console.log("scene mods are not allowed!");
                     }
                 }
             });

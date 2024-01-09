@@ -3,6 +3,7 @@
 AFRAME.registerComponent('local_marker', { //special items with local mods
     schema: {
       // eventData: {default: ''},
+      modelID: {default: 'none'},
       selectedAxis: {default: 'all'},
       timestamp: {default: ''},
       name: {default: 'local placeholder'},
@@ -84,24 +85,28 @@ AFRAME.registerComponent('local_marker', { //special items with local mods
             } else { //it's been saved to localDB, w/ position
   
               // this.el.setAttribute("gltf-model", "#poi1");
-              this.el.setAttribute('position', this.data.position);
-              this.el.setAttribute('rotation', this.data.rotation);
-              this.el.setAttribute('scale', this.scale);
-              if (this.data.markerType == "none" || this.data.markerType == "player") {
-                //skip
-                
-              } else if (this.data.markerType == "waypoint") {
-                this.el.setAttribute("gltf-model", "#poi1");
-                this.el.classList.add("waypoint");
-              } else if (this.data.markerType == "mailbox") {
-                this.el.setAttribute("gltf-model", "#mailbox");
-                this.el.classList.add("mailbox");
-              } else if (this.data.markerType == "gate") {
-                this.el.setAttribute("gltf-model", "#gate2");
-                
+              if (this.data.modelID != 'none') {
+                this.loadModel(this.data.modelID);
               } else {
-                this.el.setAttribute("gltf-model", "#poi1");
-              } 
+                this.el.setAttribute('position', this.data.position);
+                this.el.setAttribute('rotation', this.data.rotation);
+                this.el.setAttribute('scale', this.scale);
+                if (this.data.markerType == "none" || this.data.markerType == "player") {
+                    //skip
+                    
+                } else if (this.data.markerType == "waypoint") {
+                    this.el.setAttribute("gltf-model", "#poi1");
+                    this.el.classList.add("waypoint");
+                } else if (this.data.markerType == "mailbox") {
+                    this.el.setAttribute("gltf-model", "#mailbox");
+                    this.el.classList.add("mailbox");
+                } else if (this.data.markerType == "gate") {
+                    this.el.setAttribute("gltf-model", "#gate2");
+                    
+                } else {
+                    this.el.setAttribute("gltf-model", "#poi1");
+                } 
+            }
              
   
               this.el.id = this.data.timestamp;

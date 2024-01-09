@@ -82,13 +82,14 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
               } else if (this.data.markerType.toLowerCase().includes("trigger")) {
                 this.el.setAttribute('gltf-model', '#poi1');  
               } else if (this.data.markerType.toLowerCase() == "gate") {
-                this.el.setAttribute('gltf-model', '#poi1');
+                this.el.setAttribute('gltf-model', '#gate2');
               } else if (this.data.markerType.toLowerCase() == "portal") {
                 this.el.setAttribute('gltf-model', '#poi1');
               } else if (this.data.markerType.toLowerCase() == "mailbox") {
                 // console.log("TRYNA SET MODEL TO MAILBOX!")
                 this.el.setAttribute('gltf-model', '#mailbox');
               }
+
               //  else if (this.data.markerType.toLowerCase() == "player") {
               //   // console.log("playerobj")
               //   this.el.setAttribute('gltf-model', '#poi1');
@@ -194,6 +195,24 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
         evt.preventDefault();
         console.log("MODEL LOADED FOR CLOUDMARKER!!!" + this.el.id);
         this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"placeholder"});
+
+        const obj = this.el.getObject3D('mesh');
+          // Go over the submeshes and modify materials we want.
+              obj.traverse(node => {
+                if (node.isMesh && node.material) {
+                  if (this.data.markerType == "waypoint") {
+                    node.material.color.set('lime');
+                  } else if  (this.data.markerType == "placeholder") {
+                    node.material.color.set('yellow');
+                  } else if  (this.data.markerType == "poi") {
+                    node.material.color.set('purple');
+                  } 
+                }
+              });
+            //   this.el.setObject3D('mesh', obj);
+            //   if (this.data.markerType == "gate") {
+            //     this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"placeholder"});
+            //   }
         // this.el.setAttribute("ammo-body", {type: "kinematic"});
         // this.el.setAttribute('ammo-body', {type: 'kinematic', emitCollisionEvents: true});
       });
