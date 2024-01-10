@@ -4858,7 +4858,7 @@ webxr_router.get('/:_id', function (req, res) {
                         "<link href=\x22/css/webxr.css\x22 rel=\x22stylesheet\x22 type=\x22text/css\x22>" +
 
                      
-                   
+                       
                         "<script async src=\x22https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js\x22></script>"+
 
                         "<script type=\x22importmap\x22> {\x22imports\x22: {" +
@@ -4906,8 +4906,11 @@ webxr_router.get('/:_id', function (req, res) {
                        
                         "<script src=\x22../main/vendor/aframe/aframe-look-at-component.js\x22></script>"+
                         "<script src=\x22../main/vendor/aframe/aframe-layout-component.js\x22></script>"+
+                        
                         "<script src=\x22../main/src/component/cloud-marker.js\x22></script>"+
                         "<script src=\x22../main/src/component/local-marker.js\x22></script>"+
+                        "<script src=\x22../main/src/component/mod-materials.js\x22></script>"+
+                        "<script src=\x22../main/src/component/xr-utils.js\x22></script>"+
                         // "<script src=\x22../main/vendor/html2canvas/aframe-html-shader.min.js\x22></script>"+
                         primaryAudioScript +
                         ambientAudioScript +
@@ -4937,13 +4940,13 @@ webxr_router.get('/:_id', function (req, res) {
                         "<script src=\x22../main/src/component/aframe-sprite-particles-component.js\x22></script>"+
                         
 
-                        "<script src=\x22../main/src/component/mod-materials.js\x22></script>"+
+                       
 
                         // "<script src=\x22../main/src/component/aframe-gradientsky.min.js\x22></script>"+
-                        "<script src=\x22../main/src/component/xr-utils.js\x22></script>"+
+                        
                         "<script src=\x22../main/src/component/spawn-in-circle.js\x22></script>"+
 
-
+                        "<script src=\x22https://cdn.jsdelivr.net/npm/promise-polyfill@8/dist/polyfill.min.js\x22></script>"+
                         "</head>" +
                         "<body bgcolor=\x22black\x22>" +
                         

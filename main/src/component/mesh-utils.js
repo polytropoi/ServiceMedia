@@ -3,7 +3,6 @@ import {MeshSurfaceSampler} from '/three/examples/jsm/math/MeshSurfaceSampler.js
 import {TransformControls} from '/three/examples/jsm/controls/TransformControls.js';
 
 
-
 // import { SVGLoader } from '/three/examples/jsm/loaders/SVGLoader.js'; // ref'd in import maps
 // import { Flow } from '/three/examples/jsm/modifiers/CurveModifier.js'; 
 // import { Line2 } from '/three/examples/jsm/lines/Line2.js'; //hrm..
@@ -14,8 +13,6 @@ import {TransformControls} from '/three/examples/jsm/controls/TransformControls.
 if (typeof AFRAME === 'undefined') {
   throw new Error('Component attempted to register before AFRAME was available.');
 }
-
-
 
 AFRAME.registerComponent('mod_physics', { //used by models, placeholders, instanced meshes, not objects which manage physics settings in mod_object
   schema: {
@@ -52,24 +49,6 @@ AFRAME.registerComponent('mod_physics', { //used by models, placeholders, instan
     }
     this.isCooling = false;
 
-    // this.el.addEventListener('model-loaded', () => {   //unused
-    //   // if (this.el.object3D) {
-    //   // this.mesh = this.el.object3D('mesh');
-    //     if (this.model == "spawned") {
-    //       this.el.setAttribute('ammo-body', {type: 'dynamic', mass: 1, gravity: '0 0 0', linearSleepingThreshold: 0.1, emitCollisionEvents: this.isTrigger});
-    //       this.el.body.restitution = 10;
-    //       console.log("tryna load instance body");
-    //     }
-    //   // }
-    // });
-    // this.el.addEventListener('body-loaded', () => {  //unused
-    //   if (this.model == "spawned") {
-    //     this.el.setAttribute('ammo-shape', {type: 'sphere', fit: 'manual', sphereRadius: this.data.scaleFactor });
-    //     // this.el.setAttribute('ammo-shape', {type: 'sphere'});
-    //     console.log("tryna load ashape with trigger " + this.el.id);
-    //     this.randomPush();
-    //   }
-    // });
 
     if (this.model == "instance") { //i.e. adding to an instanced/spawned/pooled mesh...
       this.isTrigger = true; //cheat
@@ -92,7 +71,7 @@ AFRAME.registerComponent('mod_physics', { //used by models, placeholders, instan
           this.el.setAttribute('ammo-shape', {type: this.shape});
         
         console.log("tryna load ashape with trigger " + this.isTrigger);
-      // });
+      
     
     } else if (this.data.model == "placeholder") { //from cloudmarker, always kinematic
       this.isGhost = true;
@@ -100,40 +79,23 @@ AFRAME.registerComponent('mod_physics', { //used by models, placeholders, instan
 
       // console.log("truyna init mod_physics for id " + this.el.id + " model " + this.model +" isTrigger "+ this.isTrigger + " body " + this.data.body );
       this.el.setAttribute('ammo-body', {type: 'kinematic', emitCollisionEvents: this.isTrigger}); //placeholder model already loaded in mod_model
-      // this.el.addEventListener('body-loaded', () => {  
-        // if (this.isTrigger) {
-        //   console.log("TRIGGER LOADED");
-        //   this.el.setAttribute('ammo-shape', {type: "sphere"});
-        // } else {
+      
           this.el.setAttribute("ammo-shape", {type: "box"});
-          // this.el.body.type = 'kinematic';
-        // }
-        // this.el.body.setCollisionF
-        // console.log("ammo shape is " + JSON.stringify(this.el.getAttribute('ammo-shape')));
-        // this.isTrigger = this.data.isTrigger;
+       
         }
         console.log("tryna load placeholder  " + this.isTrigger);
-      // });
+
     
     } else if (this.data.model == "agent") { //must be kinematic, moves as nav-agent on navmesh
 
       if (settings.usePhysicsType == "ammo") {
       // console.log("truyna init mod_physics for id " + this.el.id + " model " + this.model +" isTrigger "+ this.isTrigger + " body " + this.data.body );
       this.el.setAttribute('ammo-body', {type: 'kinematic', emitCollisionEvents: this.isTrigger}); //placeholder model already loaded in mod_model
-      // this.el.addEventListener('body-loaded', () => {  
-        // if (this.isTrigger) {
-        //   console.log("TRIGGER LOADED");
-        //   this.el.setAttribute('ammo-shape', {type: "sphere"});
-        // } else {
+ 
           this.el.setAttribute("ammo-shape", {type: "box"});
-          // this.el.body.type = 'kinematic';
-        // }
-        // this.el.body.setCollisionF
-        // console.log("ammo shape is " + JSON.stringify(this.el.getAttribute('ammo-shape')));
-        // this.isTrigger = this.data.isTrigger;
+    
         }
         // console.log("tryna load agent  " + this.isTrigger);
-      // });
     
     } else {
       if (this.el.object3D) {
@@ -150,18 +112,15 @@ AFRAME.registerComponent('mod_physics', { //used by models, placeholders, instan
           }, 10000 * Math.random() );
         }
       }
-     
-      
     }
 
     
     this.el.addEventListener("collidestart", (e) => { //this is for models or triggers, not objects - TODO look up locationData for tags? 
-      // e.preventDefault();
+      e.preventDefault();
       // console.log("mod_physics collision on object  :" + this.el.id + " by " + e.detail.targetEl.id + " isTrigger " + this.isTrigger);
       if (this.isTrigger) { 
         // console.log("mod_physics TRIGGER collision "  + this.el.id + " " + e.detail.targetEl.id);
-        // e.detail.body.disableCollision = true;
-        // this.disableCollisionTemp(); //must turn it off or it blocks, no true "trigger" mode //or just use kinematic
+       
         let cloud_marker = e.target.components.cloud_marker; //closest trigger if multiple
         if (cloud_marker != null) { 
           if (e.detail.targetEl.id == "player") {
