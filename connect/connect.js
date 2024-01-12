@@ -147,7 +147,8 @@ function InitIDB() {
                   cloudEl.setAttribute("rotation", {x: cursor.value.locations[i].eulerx, y: cursor.value.locations[i].eulery, z: cursor.value.locations[i].eulerz });
                   cloudEl.setAttribute("scale", {x: cursor.value.locations[i].markerObjScale, y: cursor.value.locations[i].markerObjScale, z: cursor.value.locations[i].markerObjScale});
                   let cloudMarkerComponent = cloudEl.components.cloud_marker;
-                  if (cloudMarkerComponent) { 
+                  if (cloudMarkerComponent) {  //hrm, need to hit an method on this guy to override? not init'd yet...
+                     // console.log(cursor.value.locations[i].name + " cloud marker override " + cursor.value.locations[i].modelID);
                      cloudEl.setAttribute ("cloud_marker", { timestamp: cursor.value.locations[i].timestamp,
                                                 name: cursor.value.locations[i].name, 
                                                 modelID: cursor.value.locations[i].modelID, 
@@ -1349,7 +1350,7 @@ function ReturnLocationTable () { //just show em all now!
          "<td>"+localData.locations[i].x+","+localData.locations[i].y+","+localData.locations[i].z+"</td><td>"+asset+"</td><td>"+ markerString+"</td></tr>";
       }
    }
-   return "<table id=\x22locations\x22><th>label</th><th>position</th><th>Asset</th><th>type</th>"+tablerows+"</table>";
+   return "<table id=\x22locations\x22><th style=\x22color: black;\x22>Name</th><th style=\x22color: black;\x22>Position</th><th style=\x22color: black;\x22>Asset</th><th style=\x22color: black;\x22>Type</th>"+tablerows+"</table>";
 }
 
 function LocationRowClick(data) {

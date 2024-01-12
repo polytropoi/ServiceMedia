@@ -162,7 +162,7 @@ window.addEventListener( 'keyup',  ( event ) => {
       // if (locEl && locSplit[1] != undefined && locSplit[1] != "" && locSplit[1] != "none") { //model id
       if (locEl && uModelID != "" && uModelID != "none" && !uModelID.includes("primitive")) { //model id
         for (let i = 0; i < sceneModels.length; i++) {
-          console.log(sceneModels[i]._id + " vs " + locSplit[1]);
+          
           if (sceneModels[i]._id == uModelID) {
             uModelName = sceneModels[i].name; //really just need the name
             uModelID = sceneModels[i]._id;
@@ -938,7 +938,7 @@ function ShowLocationModal(timestamp) {
         // "+that.data.timestamp+","+that.data.name+","+position.x+","+position.y+","+position.z+"
 
         // "<button class=\x22deleteButton\x22 onclick=\x22DeleteLocation('"+phID+"')\x22>Clear Mods</button>"+
-        "<button class=\x22addButton\x22 style=\x22float:right;\x22 onclick=\x22SaveModToLocal('"+phID+"')\x22>Save to Local</button>"+
+        "<button class=\x22addButton\x22 style=\x22float:right;\x22 onclick=\x22SaveModToLocal('"+phID+"')\x22>Save to Local DB</button>"+
         cloudSaveButton +
 
         // "<button class=\x22snapButton\x22 onclick=\x22SnapLocation('"+phID+"')\x22>Snap</button>"+

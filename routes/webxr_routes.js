@@ -1948,7 +1948,7 @@ webxr_router.get('/:_id', function (req, res) {
                 function (callback) { //DEPRECATED!//not yet...
                     if (locationPlaceholders.length > 0) {
                         for (let i = 0; i < locationPlaceholders.length; i++) {
-                            //use the "cloud_marker" component for certain markertypes () TODO rename it to mod_location
+                            //use the "cloud_marker" component for certain markertypes () TODO rename it to mod_location // nope
                             placeholderEntities = placeholderEntities + "<a-entity id=\x22"+locationPlaceholders[i].timestamp+"\x22 class=\x22activeObjexGrab activeObjexRay envMap placeholders\x22 cloud_marker=\x22phID: "+
                             locationPlaceholders[i].phID+"; scale: "+locationPlaceholders[i].markerObjScale+"; modelID: "+locationPlaceholders[i].modelID+"; model: "+
                             locationPlaceholders[i].model+"; markerType: "+locationPlaceholders[i].markerType+";  tags: "+locationPlaceholders[i].locationTags+"; isNew: false;name: "+
@@ -4906,7 +4906,7 @@ webxr_router.get('/:_id', function (req, res) {
                        
                         "<script src=\x22../main/vendor/aframe/aframe-look-at-component.js\x22></script>"+
                         "<script src=\x22../main/vendor/aframe/aframe-layout-component.js\x22></script>"+
-                        
+
                         "<script src=\x22../main/src/component/cloud-marker.js\x22></script>"+
                         "<script src=\x22../main/src/component/local-marker.js\x22></script>"+
                         "<script src=\x22../main/src/component/mod-materials.js\x22></script>"+

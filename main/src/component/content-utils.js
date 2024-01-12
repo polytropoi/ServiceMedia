@@ -4626,10 +4626,19 @@ AFRAME.registerComponent('scene_greeting_dialog', {  //if "greeting" scenetag + 
         this.viewportHolder.object3D.getWorldPosition( loc );
         console.log("tryna set scene greeting at location " + JSON.stringify(loc));
         this.el.setAttribute("position", {x: loc.x, y: loc.y + .55, z: loc.z});
+        this.longTimer();
       }
     }, 3000);
   }
     
+  },
+  longTimer: function () {
+    setTimeout(() => {
+      if (this.behavior == 'hide') {
+        this.el.parentNode.removeChild(this.el);
+      }
+      
+    }, 10000);
   },
   setLocation: function () {
     
