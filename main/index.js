@@ -12216,9 +12216,7 @@ function getAllPeople() {
    
             var video = document.getElementById(elID);
             if (video != null && Hls.isSupported()) {
-                var hls = new Hls({
-                debug: true,
-                });
+                var hls = new Hls();
                 hls.loadSource(url);
                 hls.attachMedia(video);
                 hls.on(Hls.Events.MEDIA_ATTACHED, function () {
@@ -12552,18 +12550,18 @@ function getAllPeople() {
                         //     "<label for=\x22eulerz_" + locationID + "\x22>Rotation Z</label>" + 
                         //     "<input type=\x22number\x22 class=\x22form-control\x22 id=\x22eulerz_" + locationID + "\x22 placeholder=\x220\x22 value=\x22" + sceneLocations[i].eulerz + "\x22 >" +
                         // "</div>" +
-                        "<div class=\x22col form-group col-md-3\x22>" +
-                            "<label for=\x22label_" + locationID + "\x22>Label</label>" + 
-                            "<input type=\x22text\x22 class=\x22form-control locationLabel\x22 id=\x22label_" + locationID + "\x22 placeholder=\x220\x22 value=\x22" + label + "\x22 >" +
-                            // "<label for=\x22eventData_" + locationID + "\x22>Event Data</label>" + 
-                            // "<input type=\x22text\x22 class=\x22form-control locationEventData\x22 id=\x22eventData_" + locationID + "\x22 placeholder=\x220\x22 value=\x22" + sceneLocations[i].eventData + "\x22 >" +
-                            "<label for=\x22locationDescription_" + locationID + "\x22>Description</label>" + 
-                            "<input type=\x22text\x22 class=\x22form-control locationDescription\x22 id=\x22locationDescription_" + locationID + "\x22 value=\x22" + sceneLocations[i].description + "\x22 >" +
-                            // "<label for=\x22markerObjectScale_" + locationID + "\x22>Object Scale</label>" + 
-                            // "<input type=\x22number\x22 step=\x220.001\x22 class=\x22form-control locationObjectScale\x22 id=\x22scale_" + locationID + "\x22 placeholder=\x220\x22 value=\x22" + sceneLocations[i].markerObjScale + "\x22 >" +
-                            "<br><button type=\x22button\x22 class=\x22copySceneLocation btn btn-xs btn-info float-left\x22 id=\x22" + i + "\x22>Clone</button>"+
-                            "<button type=\x22button\x22 class=\x22remSceneLocation btn btn-xs btn-danger float-right\x22 id=\x22" + i + "\x22>Remove</button>"+
-                        "</div>" +
+                            // "<div class=\x22col form-group col-md-3\x22>" +
+                            //     "<label for=\x22label_" + locationID + "\x22>Label</label>" + 
+                            //     "<input type=\x22text\x22 class=\x22form-control locationLabel\x22 id=\x22label_" + locationID + "\x22 placeholder=\x220\x22 value=\x22" + label + "\x22 >" +
+                            //     // "<label for=\x22eventData_" + locationID + "\x22>Event Data</label>" + 
+                            //     // "<input type=\x22text\x22 class=\x22form-control locationEventData\x22 id=\x22eventData_" + locationID + "\x22 placeholder=\x220\x22 value=\x22" + sceneLocations[i].eventData + "\x22 >" +
+                            //     "<label for=\x22locationDescription_" + locationID + "\x22>Description</label>" + 
+                            //     "<input type=\x22text\x22 class=\x22form-control locationDescription\x22 id=\x22locationDescription_" + locationID + "\x22 value=\x22" + sceneLocations[i].description + "\x22 >" +
+                            //     // "<label for=\x22markerObjectScale_" + locationID + "\x22>Object Scale</label>" + 
+                            //     // "<input type=\x22number\x22 step=\x220.001\x22 class=\x22form-control locationObjectScale\x22 id=\x22scale_" + locationID + "\x22 placeholder=\x220\x22 value=\x22" + sceneLocations[i].markerObjScale + "\x22 >" +
+                            //     "<br><button type=\x22button\x22 class=\x22copySceneLocation btn btn-xs btn-info float-left\x22 id=\x22" + i + "\x22>Clone</button>"+
+                            //     "<button type=\x22button\x22 class=\x22remSceneLocation btn btn-xs btn-danger float-right\x22 id=\x22" + i + "\x22>Remove</button>"+
+                            // "</div>" +
 
                             // "<select style=\x22display: none;\x22 class=\x22locationObjectSelect form-control\x22 id=\x22locobjselect_" + locationID + "\x22>" +
                             // // "<option value=\x22\x22 disabled selected>Select:</option>" +
@@ -12583,28 +12581,55 @@ function getAllPeople() {
                             
                             // "<label for=\x22locationDescription_" + locationID + "\x22>Description</label>" + 
                             // "<input type=\x22text\x22 class=\x22form-control locationDescription\x22 id=\x22locationDescription_" + locationID + "\x22 value=\x22" + sceneLocations[i].description + "\x22 >" +
+                            "<label for=\x22label_" + locationID + "\x22>Label</label>" + 
+                            "<input type=\x22text\x22 class=\x22form-control locationLabel\x22 id=\x22label_" + locationID + "\x22 placeholder=\x220\x22 value=\x22" + label + "\x22 >" +
 
-                            "<label for=\x22eventData_" + locationID + "\x22>Event Data</label>" + 
-                            "<input type=\x22text\x22 class=\x22form-control locationEventData\x22 id=\x22eventData_" + locationID + "\x22 placeholder=\x220\x22 value=\x22" + sceneLocations[i].eventData + "\x22 >" +
-                            "<label for=\x22locationTags_" + locationID + "\x22>Tags</label>" + 
-                            "<input type=\x22text\x22 class=\x22form-control locationTags\x22 id=\x22locationTags_" + locationID + "\x22 value=\x22" + locationTags + "\x22 >" +
-
+                            // "<label for=\x22locationDescription_" + locationID + "\x22>Description</label>" + 
+                            // "<input type=\x22text\x22 class=\x22form-control locationDescription\x22 id=\x22locationDescription_" + locationID + "\x22 value=\x22" + sceneLocations[i].description + "\x22 >" +
+                                // "<label for=\x22eventData_" + locationID + "\x22>Event Data</label>" + 
+                                // "<input type=\x22text\x22 class=\x22form-control locationEventData\x22 id=\x22eventData_" + locationID + "\x22 placeholder=\x220\x22 value=\x22" + sceneLocations[i].eventData + "\x22 >" +
+                            // "<label for=\x22locationTags_" + locationID + "\x22>Tags</label>" + 
+                            // "<input type=\x22text\x22 class=\x22form-control locationTags\x22 id=\x22locationTags_" + locationID + "\x22 value=\x22" + locationTags + "\x22 >" +
+                            "<br><button type=\x22button\x22 class=\x22copySceneLocation btn btn-xs btn-info float-left\x22 id=\x22" + i + "\x22>Clone</button>"+
+                            "<button type=\x22button\x22 class=\x22remSceneLocation btn btn-xs btn-danger float-right\x22 id=\x22" + i + "\x22>Remove</button>"+
                             //TAGS
                             // "<br><button type=\x22button\x22 class=\x22remSceneLocation btn btn-xs btn-danger float-left\x22 id=\x22" + i + "\x22>Remove</button>"+
                             // "<button type=\x22button\x22 class=\x22copySceneLocation btn btn-xs btn-info float-right\x22 id=\x22" + i + "\x22>Clone</button>"+
                         "</div>" +
+                        "<div class=\x22col form-group col-md-3\x22>" +
+                            "<label for=\x22locationDescription_" + locationID + "\x22>Description</label>" + 
+                            "<input type=\x22text\x22 class=\x22form-control locationDescription\x22 id=\x22locationDescription_" + locationID + "\x22 value=\x22" + sceneLocations[i].description + "\x22 >" +
+                        // "<label for=\x22label_" + locationID + "\x22>Label</label>" + 
+                        //     "<input type=\x22text\x22 class=\x22form-control locationLabel\x22 id=\x22label_" + locationID + "\x22 placeholder=\x220\x22 value=\x22" + label + "\x22 >" +
+
+                            "<label for=\x22eventData_" + locationID + "\x22>Event Data</label>" + 
+                            "<input type=\x22text\x22 class=\x22form-control locationEventData\x22 id=\x22eventData_" + locationID + "\x22 placeholder=\x220\x22 value=\x22" + sceneLocations[i].eventData + "\x22 >" +
+                            // "<label for=\x22eventData_" + locationID + "\x22>Event Data</label>" + 
+                            // "<input type=\x22text\x22 class=\x22form-control locationEventData\x22 id=\x22eventData_" + locationID + "\x22 placeholder=\x220\x22 value=\x22" + sceneLocations[i].eventData + "\x22 >" +
+                                // "<label for=\x22locationDescription_" + locationID + "\x22>Description</label>" + 
+                                // "<input type=\x22text\x22 class=\x22form-control locationDescription\x22 id=\x22locationDescription_" + locationID + "\x22 value=\x22" + sceneLocations[i].description + "\x22 >" +
+                            // "<label for=\x22markerObjectScale_" + locationID + "\x22>Object Scale</label>" + 
+                            // "<input type=\x22number\x22 step=\x220.001\x22 class=\x22form-control locationObjectScale\x22 id=\x22scale_" + locationID + "\x22 placeholder=\x220\x22 value=\x22" + sceneLocations[i].markerObjScale + "\x22 >" +
+                            // "<br><button type=\x22button\x22 class=\x22copySceneLocation btn btn-xs btn-info float-left\x22 id=\x22" + i + "\x22>Clone</button>"+
+                            // "<button type=\x22button\x22 class=\x22remSceneLocation btn btn-xs btn-danger float-right\x22 id=\x22" + i + "\x22>Remove</button>"+
+
+                            "<label for=\x22locationTags_" + locationID + "\x22>Tags</label>" + 
+                            "<input type=\x22text\x22 class=\x22form-control locationTags\x22 id=\x22locationTags_" + locationID + "\x22 value=\x22" + locationTags + "\x22 >" +
+                        "</div>" +
+
+
                         // "<div class=\x22col form-group col-md-3\x22 id=\x22locationObjects_" + locationID + "\x22>" +
                        
                         // "</div>" +
-                        "<div class=\x22col form-group col-md-2\x22>"+
+                        "<div class=\x22col form-group col-md-3\x22>"+
                             "<div id=\x22selectLocationModel_" + locationID + "\x22>" +
                                 "<label for=\x22\x22>Location Model: </label>" + 
                                 "<select class=\x22form-control modelSelector\x22 id=\x22modelSelect_"+locationID+"\x22>" +
                                 "<option value=\x22\x22 disabled selected>Select : </option>" +
                                 "<option value=\x22none\x22>none</option>" +
-                                // "<option value=\x22cube\x22>cube</option>" +
-                                // "<option value=\x22sphere\x22>sphere</option>" +
-                                // "<option value=\x22cylinder\x22>cylinder</option>" +
+                                "<option value=\x22primitive_cube\x22>cube</option>" +
+                                "<option value=\x22primitive_sphere\x22>sphere</option>" +
+                                "<option value=\x22primitive_cylinder\x22>cylinder</option>" +
                                 "</select>" +
                             "</div>" +
                             "<div id=\x22selectLocationObject_" + locationID + "\x22>" +

@@ -85,8 +85,41 @@ AFRAME.registerComponent('local_marker', { //special items with local mods
             } else { //it's been saved to localDB, w/ position
   
               // this.el.setAttribute("gltf-model", "#poi1");
+              this.el.setAttribute('position', this.data.position);
+              this.el.setAttribute('rotation', this.data.rotation);
+              this.el.setAttribute('scale', this.scale);
               if (this.data.modelID != 'none') {
-                this.loadModel(this.data.modelID);
+                if (this.data.modelID.toString().includes("primitive")) {
+                    if (this.data.modelID.toString().includes("cube")) {
+                        this.el.setAttribute("geometry", {primitive: "box", width: 1, height: 1, depth: 1});
+                        
+                    } else if (this.data.modelID.toString().includes("sphere")) {
+                        this.el.setAttribute("geometry", {primitive: "sphere", radius: 1});
+                      
+                    } else if (this.data.modelID.toString().includes("cylinder")) {
+                        this.el.setAttribute("geometry", {primitive: "cylinder", height: 1, radius: .5});
+                       
+                    } else {
+                        
+                    }
+                    if (this.data.markerType.toLowerCase() == "placeholder") {
+                        this.el.setAttribute("material", {color: "yellow", transparent: true, opacity: .5});
+                    } else if (this.data.markerType.toLowerCase() == "poi") {
+                        this.el.setAttribute("material", {color: "purple", transparent: true, opacity: .5});
+                    } else if (this.data.markerType.toLowerCase().includes("trigger")) {
+                        this.el.setAttribute("material", {color: "lime", transparent: true, opacity: .5});
+                    } else if (this.data.markerType.toLowerCase() == "gate") {
+                        this.el.setAttribute("material", {color: "orange", transparent: true, opacity: .5});
+                    } else if (this.data.markerType.toLowerCase() == "portal") {
+                    
+                    } else if (this.data.markerType.toLowerCase() == "mailbox") {
+                    
+                    } else {
+                        
+                    }
+                } else {
+                    this.loadModel(this.data.modelID);
+                }
               } else {
                 this.el.setAttribute('position', this.data.position);
                 this.el.setAttribute('rotation', this.data.rotation);

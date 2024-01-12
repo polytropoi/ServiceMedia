@@ -31,6 +31,9 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
       this.objectElementID = null;
       this.font1 = "Acme.woff";
       this.font2 = "Acme.woff";
+
+        // this.scale = this.data.scale + " " + this.data.scale + " " + this.data.scale;
+    this.scale = "1 1 1";
       if (settings && settings.sceneFontWeb1) {
         this.font1 = settings.sceneFontWeb1;
       }
@@ -40,7 +43,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
       this.timestamp = this.data.timestamp;
         
         this.phID = this.data.phID;
-        console.log("cloudmarker phID " + this.phID); 
+        // console.log("cloudmarker phID " + this.phID); 
   
   
         if (this.data.allowMods) {
@@ -74,7 +77,12 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
           // }
           
           // console.log("this.data " + JSON.stringify(this.data));
-          if (this.data.modelID == null || this.data.modelID == undefined || this.data.model == "" || this.data.model == "none" || this.data.model == "undefined") {
+        //   this.el.setAttribute('position', this.data.position);
+        //   this.el.setAttribute('rotation', this.data.rotation);
+          console.log("CLOUDMARKER " + this.data.modelID + " " + this.data.name);
+          
+          if (!this.data.modelID || this.data.modelID == undefined || this.data.modelID == "" || this.data.modelID == "none" || this.data.modelID.toString().includes("primitive")) {
+        // if (this.data.modelID == null || this.data.modelID == undefined || this.data.model == "" || this.data.model == "none" || this.data.model == "undefined") {
             if (this.data.markerType.toLowerCase() == "placeholder") {
                 this.el.setAttribute('gltf-model', '#poi1');
               } else if (this.data.markerType.toLowerCase() == "poi") {
@@ -102,22 +110,53 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
           } else {
             
             if (this.data.modelID != "none") {
-              for (let i = 0; i < sceneModels.length; i++) {
-                if (sceneModels[i]._id == this.data.modelID) {
-                  this.el.setAttribute("gltf-model", sceneModels[i].url);
-                  // this.el.setAttribute('position', {x: this.data.x, y: this.data.y, z: this.data.z});
-                  // this.el.setAttribute('rotation', {x: this.data.eulerx, y: this.data.eulery, z: this.data.eulerz});
-                  this.el.setAttribute('scale', {x: this.data.scale, y: this.data.scale, z: this.data.scale });
-                  console.log("tryna set new locModel for cloudmarker " + this.data.model + " " + sceneModels[i].url);
-  
+                
+                if (this.data.modelID.toString().includes("primitive")) {
+                    this.el.removeAttribute("gltf-model");
+                    if (this.data.modelID.toString().includes("cube")) {
+                        this.el.setAttribute("geometry", {primitive: "box", width: 1, height: 1, depth: 1});
+                    } else if (this.data.modelID.toString().includes("sphere")) {
+                        this.el.setAttribute("geometry", {primitive: "sphere", radius: 1});
+                    } else if (this.data.modelID.toString().includes("cylinder")) {
+                        this.el.setAttribute("geometry", {primitive: "cylinder", height: 1, radius: .5});
+                    } else {
+
+                    }
+
+                    if (this.data.markerType.toLowerCase() == "placeholder") {
+                        this.el.setAttribute("material", {color: "yellow", transparent: true, opacity: .5});
+                    } else if (this.data.markerType.toLowerCase() == "poi") {
+                        this.el.setAttribute("material", {color: "purple", transparent: true, opacity: .5});
+                    } else if (this.data.markerType.toLowerCase().includes("trigger")) {
+                        this.el.setAttribute("material", {color: "lime", transparent: true, opacity: .5});
+                    } else if (this.data.markerType.toLowerCase() == "gate") {
+                        this.el.setAttribute("material", {color: "orange", transparent: true, opacity: .5});
+                    } else if (this.data.markerType.toLowerCase() == "portal") {
+                    
+                    } else if (this.data.markerType.toLowerCase() == "mailbox") {
+                    
+                    } else {
+                        
+                    }
+                } else {
+                    this.loadModel(this.data.modelID);
                 }
-              }
+            //   for (let i = 0; i < sceneModels.length; i++) {
+            //     if (sceneModels[i]._id == this.data.modelID) {
+            //       this.el.setAttribute("gltf-model", sceneModels[i].url);
+            //       // this.el.setAttribute('position', {x: this.data.x, y: this.data.y, z: this.data.z});
+            //       // this.el.setAttribute('rotation', {x: this.data.eulerx, y: this.data.eulery, z: this.data.eulerz});
+            //       this.el.setAttribute('scale', {x: this.data.scale, y: this.data.scale, z: this.data.scale });
+            //       console.log("tryna set new locModel for cloudmarker " + this.data.model + " " + sceneModels[i].url);
+  
+            //     }
+            //   }
             }
           }
           if (this.data.objectID != undefined && this.data.objectID != null && this.data.objectID != "none" && this.data.objectID != "") { //hrm, cloudmarker objex?
   
           }
-        
+          this.el.setAttribute('scale', this.scale);
           // localStorage.setItem(this.phID, JSON.stringify(locItem)); 
         
         if (this.data.markerType.toLowerCase() == "player") {
@@ -198,17 +237,17 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
 
         const obj = this.el.getObject3D('mesh');
           // Go over the submeshes and modify materials we want.
-              obj.traverse(node => {
-                if (node.isMesh && node.material) {
-                  if (this.data.markerType == "waypoint") {
-                    node.material.color.set('lime');
-                  } else if  (this.data.markerType == "placeholder") {
-                    node.material.color.set('yellow');
-                  } else if  (this.data.markerType == "poi") {
-                    node.material.color.set('purple');
-                  } 
-                }
-              });
+        obj.traverse(node => {
+            if (node.isMesh && node.material) {
+                if (this.data.markerType == "waypoint") {
+                node.material.color.set('lime');
+                } else if  (this.data.markerType == "placeholder") {
+                node.material.color.set('yellow');
+                } else if  (this.data.markerType == "poi") {
+                node.material.color.set('purple');
+                } 
+            }
+        });
             //   this.el.setObject3D('mesh', obj);
             //   if (this.data.markerType == "gate") {
             //     this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"placeholder"});

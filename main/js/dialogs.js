@@ -160,7 +160,7 @@ window.addEventListener( 'keyup',  ( event ) => {
     let uModelName = null;
     if (locEl) {
       // if (locEl && locSplit[1] != undefined && locSplit[1] != "" && locSplit[1] != "none") { //model id
-      if (locEl && uModelID != "" && uModelID != "none") { //model id
+      if (locEl && uModelID != "" && uModelID != "none" && !uModelID.includes("primitive")) { //model id
         for (let i = 0; i < sceneModels.length; i++) {
           console.log(sceneModels[i]._id + " vs " + locSplit[1]);
           if (sceneModels[i]._id == uModelID) {
@@ -169,6 +169,16 @@ window.addEventListener( 'keyup',  ( event ) => {
             break;  
           }    
         } 
+      } else {
+        if (uModelID.includes("primitive")) {
+          if (uModelID.includes("cube")) {
+            uModelName == "Cube";
+          } else if (uModelID.includes("sphere")) {
+            uModelName == "Sphere";
+          } else if (uModelID.includes("cylinder")) {
+            uModelName == "Cylinder";
+          }
+        }
       }
       if (uModelName) {
         for (let i = 0; i < localData.locations.length; i++) { 
@@ -619,6 +629,28 @@ function ReturnLocationModelSelect (phID) {
    }
 
    let modelSelect = "<option value=\x22none\x22>none</option>";
+                      
+    
+    if (locationItem.modelID && locationItem.modelID.toString().includes("primitive")) {
+      if (locationItem.modelID.toString().includes("cube")) {
+        modelSelect = modelSelect + "<option value=\x22primitive_cube\x22 selected>cube</option>"+
+                                    "<option value=\x22primitive_sphere\x22>sphere</option>"+ 
+                                    "<option value=\x22primitive_cylinder\x22>cylinder</option>";
+      } else if (locationItem.modelID.toString().includes("sphere")) {
+        modelSelect = modelSelect + "<option value=\x22primitive_cube\x22>cube</option>"+
+                                    "<option value=\x22primitive_sphere\x22 selected>sphere</option>"+ 
+                                    "<option value=\x22primitive_cylinder\x22>cylinder</option>";
+      } else if (locationItem.modelID.toString().includes("cylinder")) {
+        modelSelect = modelSelect + "<option value=\x22primitive_cube\x22>cube</option>"+
+                                    "<option value=\x22primitive_sphere\x22 selected>sphere</option>"+ 
+                                    "<option value=\x22primitive_cylinder\x22>cylinder</option>";
+      } 
+    } else {
+      modelSelect = modelSelect + "<option value=\x22primitive_cube\x22>cube</option>"+
+                                  "<option value=\x22primitive_sphere\x22>sphere</option>"+ 
+                                  "<option value=\x22primitive_cylinder\x22>cylinder</option>";
+    }
+
    for (let i = 0; i < sceneModels.length; i++) {
       // if (sceneModels[i].isPublic || !isGuest) { //maybe something else?
       console.log("locMdl: "  + locationItem.modelID + " vs " + sceneModels[i]._id);

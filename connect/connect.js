@@ -146,6 +146,20 @@ function InitIDB() {
                   cloudEl.setAttribute("position", {x: cursor.value.locations[i].x, y: cursor.value.locations[i].y, z: cursor.value.locations[i].z });
                   cloudEl.setAttribute("rotation", {x: cursor.value.locations[i].eulerx, y: cursor.value.locations[i].eulery, z: cursor.value.locations[i].eulerz });
                   cloudEl.setAttribute("scale", {x: cursor.value.locations[i].markerObjScale, y: cursor.value.locations[i].markerObjScale, z: cursor.value.locations[i].markerObjScale});
+                  let cloudMarkerComponent = cloudEl.components.cloud_marker;
+                  if (cloudMarkerComponent) { 
+                     cloudEl.setAttribute ("cloud_marker", { timestamp: cursor.value.locations[i].timestamp,
+                                                name: cursor.value.locations[i].name, 
+                                                modelID: cursor.value.locations[i].modelID, 
+                                                objectID: cursor.value.locations[i].objectID, 
+                                                tags: cursor.value.locations[i].tags, 
+                                                eventData: cursor.value.locations[i].eventData, 
+                                                markerType: cursor.value.locations[i].markerType,
+                                                // position: {x: cursor.value.locations[i].x, y: cursor.value.locations[i].y, z: cursor.value.locations[i].z},
+                                                // rotation: {x: cursor.value.locations[i].eulerx, y: cursor.value.locations[i].eulery, z: cursor.value.locations[i].eulerz },
+                                                scale: {x: cursor.value.locations[i].markerObjScale, y: cursor.value.locations[i].markerObjScale, z: cursor.value.locations[i].markerObjScale}
+                                             });
+                  }
                } else {//local-only elements, not saved to cloud yet
                   let localEl = document.createElement("a-entity");
                   sceneEl.appendChild(localEl);
@@ -542,9 +556,7 @@ $(function() {
       SetVideoEventsData();
       var video = document.getElementById('video');
       if (Hls.isSupported()) {
-        var hls = new Hls({
-          debug: true,
-        });
+        var hls = new Hls();
       //   hls.loadSource('/hls/' + vid);
         hls.loadSource(settings.sceneVideoStreams[0]);
         hls.attachMedia(video);
@@ -1302,12 +1314,28 @@ function ReturnLocationTable () { //just show em all now!
          if (localData.locations[i].markerType == "waypoint") {
             markerString = "<span style=\x22color: lime; font-weight: bold;\x22>"+localData.locations[i].markerType+"</span>";
          } else if (localData.locations[i].markerType == "poi") { 
-            markerString = "<span style=\x22color: purple; font-weight: bold;\x22>"+localData.locations[i].markerType+"</span>";
+            markerString = "<span style=\x22color: blueviolet; font-weight: bold;\x22>"+localData.locations[i].markerType+"</span>";
          } else if (localData.locations[i].markerType == "placeholder") { 
             markerString = "<span style=\x22color: yellow; font-weight: bold;\x22>"+localData.locations[i].markerType+"</span>";
-         }  
+         }  else if (localData.locations[i].markerType == "character") { 
+            markerString = "<span style=\x22color: blue; font-weight: bold;\x22>"+localData.locations[i].markerType+"</span>";
+         }  else if (localData.locations[i].markerType == "gate") { 
+            markerString = "<span style=\x22color: coral; font-weight: bold;\x22>"+localData.locations[i].markerType+"</span>";
+         } 
+
+         console.log("locMdl " +localData.locations[i].model + " " + localData.locations[i].modelID);
 
          let mAsset = (localData.locations[i].model || localData.locations[i].model == undefined || localData.locations[i].model == 'undefined' || localData.locations[i].model == "none") ? localData.locations[i].model : null;
+         if (localData.locations[i].modelID && localData.locations[i].modelID.toString().includes("primitive")) {
+            if (localData.locations[i].modelID.toString().includes("cube")) {
+               mAsset = "Cube";
+            }  else if (localData.locations[i].modelID.toString().includes("sphere")) {
+               mAsset = "sphere";
+            }  else if (localData.locations[i].modelID.toString().includes("cylinder")) {
+               mAsset = "Cylinder";
+            } 
+           
+         }
          let oAsset = (localData.locations[i].objectName || localData.locations[i].objectName == undefined || localData.locations[i].objectName == 'undefined' || localData.locations[i].objectName == "none") ? localData.locations[i].objectName : null;
          let asset = 'none';
          if (mAsset) {
