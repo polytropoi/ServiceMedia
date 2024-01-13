@@ -4483,7 +4483,7 @@ webxr_router.get('/:_id', function (req, res) {
                        
                         "<script src=\x22/main/vendor/jquery/jquery.min.js\x22></script>" +
                         // "<script src=\x22/main/vendor/jquery-confirm/jquery-confirm.min.js\x22></script>" +
-                        "<script src=\x22../main/js/dialogs.js\x22></script>" +
+                        // "<script src=\x22../main/js/dialogs.js\x22></script>" +
                         
                         "<script src=\x22/connect/connect.js\x22 defer=\x22defer\x22></script>" +
                        
@@ -4498,18 +4498,18 @@ webxr_router.get('/:_id', function (req, res) {
                         hlsScript +
                         // videoEntity +
                         videoGroupsEntity +
-                        "<center><div><br><br><div class=\x22header\x22>"+sceneResponse.sceneGreeting+ " " + sceneResponse.sceneQuest+"</div><video controls width='80%' height='10%' id='video'></video>"+
+                        "<center><div><br><br><div class=\x22header\x22>"+sceneResponse.sceneGreeting+ " - " + sceneResponse.sceneQuest+"</div><video controls width='80%' height='10%' id='video'></video>"+
                         "<div id=\x22sceneGreeting\x22 class=\x22linkfooter\x22>"+
-                        "<h4>Immersive Links:</h4><br>"+
-                        "<a href=\x22https://servicemedia.net/webxr/"+ sceneResponse.sceneNextScene + "\x22>WebXR link</a> | "+
-                        "<a href=\x22http://smxr.net/index.html?scene="+ sceneResponse.sceneNextScene + "\x22>Unity Web link</a> | "+
+                        "<h4><a href=\x22https://servicemedia.net/webxr/"+ sceneResponse.sceneNextScene + "\x22>Click Here to Enter Immersive Scene!</a></h4><br>"+
+                        // "<a href=\x22https://servicemedia.net/webxr/"+ sceneResponse.sceneNextScene + "\x22>WebXR link</a> | "+
+                        // "<a href=\x22http://smxr.net/index.html?scene="+ sceneResponse.sceneNextScene + "\x22>Unity Web link</a> | "+
                         // "<a href=\x22https://servicemedia.net/webxr/"+ sceneResponse.sceneNextScene + "\x22>App link</a>"+
                         // sceneResponse.sceneGreeting+ " " + sceneResponse.sceneQuest+"</div>" +
                         // "<div id=\x22sceneQuest\x22 class=\x22linkfooter\x22 style=\x22z-index: -20;\x22>"+sceneResponse.sceneQuest+"</div>" +
                         "</div></center>"+
                         audioSliders +
                         canvasOverlay +
-                        dialogButton +
+                        // dialogButton +
                         // "<div id=\x22sceneGreeting\x22 class=\x22linkfooter\x22 style=\x22z-index: -20;\x22>"+sceneResponse.sceneGreeting+"</div>" +
                         // "<div id=\x22sceneQuest\x22 class=\x22linkfooter\x22 style=\x22z-index: -20;\x22>"+sceneResponse.sceneQuest+"</div>" +
                         "<div id=\x22theModal\x22 class=\x22modal\x22><div id=\x22modalContent\x22 class=\x22modal-content\x22></div>";
@@ -4517,7 +4517,7 @@ webxr_router.get('/:_id', function (req, res) {
                        
                         "<div class=\x22smallfont\x22><span id=\x22users\x22></span></div>"+ 
                         "</body>\n" +
-                        socketScripts +
+                        // socketScripts +
                         // "<script>InitSceneHooks(\x22Model Viewer\x22)</script>";
                         "</html>";
                         console.log("Tryna do a Video Landing scene");

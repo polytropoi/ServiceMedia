@@ -3662,7 +3662,7 @@ landing_router.get('/:_id', function (req, res) {
                     } 
                    
                     
-                   if (sceneResponse.sceneWebType != "Video Landing Nevermind") {
+                   if (sceneResponse.sceneWebType != "Video Landinggggg") {
                         // if (!sceneGreeting || !sceneGreeting.length) {
                         //     sceneGreeting = "Welcome!";
                         // } 
@@ -3713,7 +3713,8 @@ landing_router.get('/:_id', function (req, res) {
                         }
 
                         // platformButtons = "";
-                        let platformButtons = "<a class=\x22mx-auto btn btn-xl btn-info \x22 href=\x22../webxr/"+ sceneResponse.short_id + "\x22>Enter WebXR Scene</a> ";
+                        let buttonLabel = sceneResponse.sceneWebType == "Video Landing" ? "Watch Video!" : "Enter WebXR Scene!"
+                        let platformButtons = "<a class=\x22mx-auto btn btn-xl btn-info \x22 href=\x22../webxr/"+ sceneResponse.short_id + "\x22>"+buttonLabel+"</a>";
                         if (sceneResponse.sceneShareWithSubscribers) {
                             if (isGuest) {
                                 platformButtons = "";
@@ -3787,8 +3788,8 @@ landing_router.get('/:_id', function (req, res) {
                         "<div class=\x22container px-4 px-lg-5 my-5\x22>"+
                             "<div class=\x22row gx-4 gx-lg-5 align-items-center\x22>"+
                                 "<div class=\x22col-md-6\x22>"+
-
-                                "<img class=\x22img-fluid\x22 src=\x22"+postcardImages[0]+"\x22 alt=\x22...\x22 />"+
+                                "<a href=\x22../webxr/"+ sceneResponse.short_id + "\x22>" +
+                                "<img class=\x22img-fluid\x22 src=\x22"+postcardImages[0]+"\x22 alt=\x22...\x22 /></a>"+
                                 audioHtml +
                                 // "<img class=\x22card-img-top mb-5 mb-md-0\x22 src=\x22"+postcard1+"\x22 alt=\x22...\x22 />"+
                                 "<p class=\x22lead\x22>"+sceneResponse.sceneDescription+"</p>"+
@@ -3819,7 +3820,7 @@ landing_router.get('/:_id', function (req, res) {
                                             //     "<i class=\x22bi-cart-fill me-1\x22></i>"+
                                             //     "Add to cart"+
                                             // "</button>"+
-                                        
+                                            "<a href=\x22http://"+ sceneResponse.sceneDomain + "\x22>More at "+sceneResponse.sceneDomain+"!</a>" +
 
                                     "</div>"+
                                 "</div>"+
@@ -3827,6 +3828,7 @@ landing_router.get('/:_id', function (req, res) {
                             "<div class=\x22row gx-4 gx-lg-5 align-items-center\x22>"+
                                 "<div class=\x22col-md-12\x22>"+
                                 "<hr>"+
+                                
                                 "<p class=\x22lead\x22>"+sceneResponse.sceneText+"</p>"+
                                 "</div>"+
                             "</div>"+
@@ -3931,7 +3933,7 @@ landing_router.get('/:_id', function (req, res) {
 
 
                         /////////AFRAME SCENE DECLARATION////////////////// 
-                        let aScene = "<a-scene "+sceneBackground+" "+physicsInsert+" "+pool_target+" "+pool_launcher+" gesture-detector renderer=\x22colorManagement: true\x22" +
+                        let aScene = "<a-scene "+sceneBackground+" renderer=\x22colorManagement: true\x22" +
                         "reflection=\x22directionalLight:#real-light\x22 ar-hit-test=\x22target:#target_object; type:footprint; footprintDepth:0.1;\x22 ar-cursor raycaster=\x22objects: .activeObjexRay\x22 "+
                         // "screen-controls vr-mode-ui keyboard-shortcuts=\x22enterVR: false\x22" + magicWindow +   
                         " vr-mode-ui keyboard-shortcuts=\x22enterVR: false\x22" +  //add screen-controls from initializer                      
