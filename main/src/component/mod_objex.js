@@ -246,7 +246,8 @@ AFRAME.registerComponent('mod_objex', {
       equipInventoryObject: function (objectID) {
         // console.log("tryna equip model " + objectID + " equipped " + this.data.equipped );  
         this.objectData = this.returnObjectData(objectID);
-        console.log("tryna equip model " + JSON.stringify(this.objectData));  
+        // console.log("tryna equip model " + JSON.stringify(this.objectData));  
+        console.log("tryna equip object " + this.el.id);
         this.dropPos = new THREE.Vector3();
         this.objEl = document.createElement("a-entity");
         this.equipHolder = document.getElementById("equipPlaceholder");
@@ -1814,7 +1815,7 @@ AFRAME.registerComponent('mod_object', {
       this.el.addEventListener('click', (e) => { 
         e.preventDefault();
         // let downtime = (Date.now() / 1000) - this.mouseDownStarttime;
-        console.log("mousedown time "+ this.mouseDowntime + "  on mod_object type: " + this.data.objectData.objtype + " actions " + JSON.stringify(this.data.objectData.actions) + " equipped " + this.data.isEquipped);
+        // console.log("mousedown time "+ this.mouseDowntime + "  on mod_object type: " + this.data.objectData.objtype + " actions " + JSON.stringify(this.data.objectData.actions) + " equipped " + this.data.isEquipped);
         if (!this.data.isEquipped) {
           this.dialogEl = document.getElementById('mod_dialog');
           

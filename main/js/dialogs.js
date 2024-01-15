@@ -151,7 +151,7 @@ window.addEventListener( 'keyup',  ( event ) => {
     ColorMods(e, e.target.value);
   });
   $('#modalContent').on('change', '#locationModel', function(e) { //value has timestamp ~ modelID //no, just just the modelID, get el id from global
-    console.log("model changed " + e.target.value);
+    console.log("model changed " + e.target.value + " for id " + selectedLocationTimestamp);
     // let locSplit = e.target.value.split("~"); 
     // console.log("locSplit modelID : " + locSplit[1]);
     
@@ -160,40 +160,40 @@ window.addEventListener( 'keyup',  ( event ) => {
     let uModelName = null;
     if (locEl) {
       // if (locEl && locSplit[1] != undefined && locSplit[1] != "" && locSplit[1] != "none") { //model id
-      if (locEl && uModelID != "" && uModelID != "none" && !uModelID.includes("primitive")) { //model id
-        for (let i = 0; i < sceneModels.length; i++) {
-          
-          if (sceneModels[i]._id == uModelID) {
-            uModelName = sceneModels[i].name; //really just need the name
-            uModelID = sceneModels[i]._id;
-            break;  
-          }    
-        } 
-      } else {
-        if (uModelID.includes("primitive")) {
+      let modModelComponent = locEl.components.mod_model;
+      let localMarkerComponent = locEl.components.local_marker;
+      let cloudMarkerComponent = locEl.components.cloud_marker;
+
+      if (uModelID && uModelID != "" && uModelID != "none") { //model id
+        if (uModelID.includes("primitive_")) { 
           if (uModelID.includes("cube")) {
-            uModelName == "Cube";
+            uModelName == "cube";
           } else if (uModelID.includes("sphere")) {
-            uModelName == "Sphere";
+            uModelName == "sphere";
           } else if (uModelID.includes("cylinder")) {
-            uModelName == "Cylinder";
+            uModelName == "cylinder";
           }
+
+        } else {
+          for (let i = 0; i < sceneModels.length; i++) {
+            if (sceneModels[i]._id == uModelID) {
+              uModelName = sceneModels[i].name; //really just need the name
+              // uModelID = sceneModels[i]._id;
+              break;  
+            }    
+          } 
         }
-      }
-      if (uModelName) {
         for (let i = 0; i < localData.locations.length; i++) { 
-          console.log(localData.locations[i].timestamp + " vs " + selectedLocationTimestamp);
+          // console.log(localData.locations[i].timestamp + " vs " + selectedLocationTimestamp);
           if (localData.locations[i].timestamp == selectedLocationTimestamp) {
             console.log("gotsa match "+ localData.locations[i].timestamp + " vs " + selectedLocationTimestamp);
             localData.locations[i].modelID = uModelID;
             localData.locations[i].model = uModelName;
-            let modModelComponent = locEl.components.mod_model;
-            let localMarkerComponent = locEl.components.local_marker;
-            let cloudMarkerComponent = locEl.components.cloud_marker;
+
             // if (!localData.locations[i].isLocal) {
               if (modModelComponent) {
                 modModelComponent.data.modelID = uModelID;
-                modModelComponent.loadModel(); 
+                modModelComponent.loadModel(uModelID); 
               } else if (cloudMarkerComponent) {
                 cloudMarkerComponent.data.modelID = uModelID;
                 cloudMarkerComponent.loadModel(uModelID); 
@@ -206,9 +206,59 @@ window.addEventListener( 'keyup',  ( event ) => {
           }
         }  
       }
-    } else {
-      console.log("cain't find that element!")
     }
+      // } else {
+      //   if (uModelID.includes("primitive")) {
+      //     if (uModelID.includes("cube")) {
+      //       uModelName == "cube";
+      //     } else if (uModelID.includes("sphere")) {
+      //       uModelName == "sphere";
+      //     } else if (uModelID.includes("cylinder")) {
+      //       uModelName == "cylinder";
+      //     }
+      //   }
+      // }
+      // if (uModelName) {
+
+      //   if (uModelID.includes("primitive_")) {
+      //     if (modModelComponent) {
+      //       modModelComponent.data.modelID = uModelID;
+      //       modModelComponent.loadModel(uModelID); 
+      //     } else if (cloudMarkerComponent) {
+      //       cloudMarkerComponent.data.modelID = uModelID;
+      //       cloudMarkerComponent.loadModel(uModelID); 
+      //     } else if (localMarkerComponent) {
+      //       localMarkerComponent.data.modelID = uModelID;
+      //       localMarkerComponent.loadModel(uModelID); 
+      //     }
+      //   } else {
+          // for (let i = 0; i < localData.locations.length; i++) { 
+          //   console.log(localData.locations[i].timestamp + " vs " + selectedLocationTimestamp);
+          //   if (localData.locations[i].timestamp == selectedLocationTimestamp) {
+          //     console.log("gotsa match "+ localData.locations[i].timestamp + " vs " + selectedLocationTimestamp);
+          //     localData.locations[i].modelID = uModelID;
+          //     localData.locations[i].model = uModelName;
+
+          //     // if (!localData.locations[i].isLocal) {
+          //       if (modModelComponent) {
+          //         modModelComponent.data.modelID = uModelID;
+          //         modModelComponent.loadModel(uModelID); 
+          //       } else if (cloudMarkerComponent) {
+          //         cloudMarkerComponent.data.modelID = uModelID;
+          //         cloudMarkerComponent.loadModel(uModelID); 
+          //       } else if (localMarkerComponent) {
+          //         localMarkerComponent.data.modelID = uModelID;
+          //         localMarkerComponent.loadModel(uModelID); 
+          //       }
+              
+          //     break;
+          //   }
+          // }  
+    //     }
+    //   }
+    // } else {
+    //   console.log("cain't find that element!")
+    // }
     
   });
 
@@ -642,8 +692,8 @@ function ReturnLocationModelSelect (phID) {
                                     "<option value=\x22primitive_cylinder\x22>cylinder</option>";
       } else if (locationItem.modelID.toString().includes("cylinder")) {
         modelSelect = modelSelect + "<option value=\x22primitive_cube\x22>cube</option>"+
-                                    "<option value=\x22primitive_sphere\x22 selected>sphere</option>"+ 
-                                    "<option value=\x22primitive_cylinder\x22>cylinder</option>";
+                                    "<option value=\x22primitive_sphere\x22>sphere</option>"+ 
+                                    "<option value=\x22primitive_cylinder\x22 selected>cylinder</option>";
       } 
     } else {
       modelSelect = modelSelect + "<option value=\x22primitive_cube\x22>cube</option>"+
@@ -671,7 +721,7 @@ function ReturnLocationObjectSelect (phID) {
   let locationItem = null;
   if (objexEl != null) {
     sceneObjects = objexEl.components.mod_objex.returnObjexData();
-    console.log("tryna return objects for phID " + phID);
+    // console.log("tryna return objects for phID " + phID);
 
     // let locationItem = JSON.parse(localStorage.getItem(phID)); //TODO switch to indexedDB
     for (let i = 0; i < sceneLocations.locations.length; i++) {
@@ -686,7 +736,7 @@ function ReturnLocationObjectSelect (phID) {
           break;
         }
       }
-      console.log("looking for " + phID + " in " + JSON.stringify(sceneLocations));
+      // console.log("looking for " + phID + " in " + JSON.stringify(sceneLocations));
     }
     let objectSelect = "<option value=\x22"+phID+"~none\x22>none</option>";
 
@@ -717,13 +767,16 @@ function ReturnLocationMarkerTypeSelect (selected) {
       "placeholder",
       "poi",
       "waypoint",
-
+      "trigger",
+      "target",
+      "gate",
+      "collider",
+      "light",
       "player",
       "character",
       "model",
       "object",
-      "target",
-      "gate",
+
       "portal",
       
 
@@ -767,9 +820,9 @@ function ReturnLocationMarkerTypeSelect (selected) {
       "lerp",
       "slerp",
       "spawntrigger",
-      "trigger",
-      "collider",
-      "light",
+      // "trigger",
+      // "collider",
+      // "light",
       "particlesystem",
       "spawn",
       "flyer",
@@ -822,7 +875,7 @@ function ShowLocationModal(timestamp) {
     if (localData.locations.length) {
       console.log("looking for localdata.locations");
       for (let i = 0; i < localData.locations.length; i++) {
-        console.log(timestamp + " vs " + localData.locations[i].timestamp);
+        // console.log(timestamp + " vs " + localData.locations[i].timestamp);
         if (timestamp == localData.locations[i].timestamp) {
           thisLocation = localData.locations[i];
           console.log("gotsa local location@! " + localData.locations[i].markerType);
@@ -1562,6 +1615,10 @@ function SceneManglerModal(mode) {
     if (locationTable == null) {
         locationTable = "no locations are available";
     }
+    let hasModsMessage = "<span  style=\x22float:right;\x22>No local mods found</span>";
+    if (hasLocalData) {
+      hasModsMessage = "<span style=\x22color:pink; float:right;\x22>Local mods found!</span>";
+    }
     let ownerButton = "";
     let sendAdminMessageButton = "";
     if (userData.sceneOwner == "indaehoose") {
@@ -1672,6 +1729,7 @@ function SceneManglerModal(mode) {
         "<input type=\x22file\x22 id=\x22file-upload\x22 accept=\x22.txt\x22 onchange=\x22ImportMods(event)\x22></input>"+ 
         "<button style=\x22float: left;\x22 class=\x22saveButton\x22 id=\x22exportButton\x22 onclick=\x22ExportMods()\x22>Export Mods</button>"+   
         ownerButton +
+        hasModsMessage +
       "<button style=\x22float: right;\x22 class=\x22goToButton\x22 id=\x22statsButton\x22 onclick=\x22ToggleStats()\x22>Show Stats</button>"+
       // "<button class=\x22goToButton\x22 id=\x22statsButton\x22 onclick=\x22ToggleStats()\x22>Show Raycasts</button>"+
       // "<button class=\x22goToButton\x22 id=\x22statsButton\x22 onclick=\x22ToggleStats()\x22>Show Colliders</button>"+
@@ -1721,9 +1779,11 @@ function SceneManglerModal(mode) {
     "<div "+locationsDisplay+" id=\x22Locations\x22 class=\x22modalMain tabcontent\x22>"+
 
 
+
     "<button class=\x22goToButton\x22 id=\x22nextButton\x22 onclick=\x22GoToNext()\x22>GoTo Next</button>"+
     "<button class=\x22goToButton\x22 id=\x22prevButton\x22 onclick=\x22GoToPrevious()\x22>GoTo Previous</button>"+
     ReturnCurrentPlayerLocation() +
+    hasModsMessage +
       "<button style=\x22float:left\x22 class=\x22saveButton\x22 id=\x22CreatePlaceholderButton\x22 onclick=\x22CreatePlaceholder()\x22>Create New Location</button>"+
      
       "<br><br><br><div>"+locationTable+"</div><br>"+

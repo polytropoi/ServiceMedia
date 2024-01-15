@@ -134,7 +134,7 @@ function InitIDB() {
          console.log("query for localData : " + e.target.result);
          // if (e.target.result) {
             if (cursor) {
-               hasLocalData = true;
+               
                localData.lastUpdate = cursor.value.lastUpdate;
                for (let i = 0; i < cursor.value.locations.length; i++) { //mod or create the scene elements
                // let loc = JSON.stringify(cursor.value.locations[i]);
@@ -148,20 +148,25 @@ function InitIDB() {
                   cloudEl.setAttribute("scale", {x: cursor.value.locations[i].markerObjScale, y: cursor.value.locations[i].markerObjScale, z: cursor.value.locations[i].markerObjScale});
                   let cloudMarkerComponent = cloudEl.components.cloud_marker;
                   if (cloudMarkerComponent) {  //hrm, need to hit an method on this guy to override? not init'd yet...
-                     // console.log(cursor.value.locations[i].name + " cloud marker override " + cursor.value.locations[i].modelID);
-                     cloudEl.setAttribute ("cloud_marker", { timestamp: cursor.value.locations[i].timestamp,
-                                                name: cursor.value.locations[i].name, 
-                                                modelID: cursor.value.locations[i].modelID, 
-                                                objectID: cursor.value.locations[i].objectID, 
-                                                tags: cursor.value.locations[i].tags, 
-                                                eventData: cursor.value.locations[i].eventData, 
-                                                markerType: cursor.value.locations[i].markerType,
-                                                // position: {x: cursor.value.locations[i].x, y: cursor.value.locations[i].y, z: cursor.value.locations[i].z},
-                                                // rotation: {x: cursor.value.locations[i].eulerx, y: cursor.value.locations[i].eulery, z: cursor.value.locations[i].eulerz },
-                                                scale: {x: cursor.value.locations[i].markerObjScale, y: cursor.value.locations[i].markerObjScale, z: cursor.value.locations[i].markerObjScale}
-                                             });
+                     console.log(cursor.value.locations[i].name + " cloud marker override " + cursor.value.locations[i].modelID);
+                     // cloudEl.setAttribute ("cloud_marker", { timestamp: cursor.value.locations[i].timestamp,
+                     //                            name: cursor.value.locations[i].name, 
+                     //                            modelID: cursor.value.locations[i].modelID, 
+                     //                            // model: cursor.value.locations[i].model,
+                     //                            // objectID: cursor.value.locations[i].objectID, 
+                     //                            // objectName: cursor.value.locations[i].objectName, 
+                     //                            tags: cursor.value.locations[i].locationTags, 
+                     //                            eventData: cursor.value.locations[i].eventData, 
+                     //                            markerType: cursor.value.locations[i].markerType,
+                     //                            // position: {x: cursor.value.locations[i].x, y: cursor.value.locations[i].y, z: cursor.value.locations[i].z},
+                     //                            // rotation: {x: cursor.value.locations[i].eulerx, y: cursor.value.locations[i].eulery, z: cursor.value.locations[i].eulerz },
+                     //                            scale: {x: cursor.value.locations[i].markerObjScale, y: cursor.value.locations[i].markerObjScale, z: cursor.value.locations[i].markerObjScale}
+                     //                         });
+
+                     cloudMarkerComponent.waitAndLoad(cursor.value.locations[i].name, cursor.value.locations[i].description, cursor.value.locations[i].locationTags, cursor.value.locations[i].eventData, cursor.value.locations[i].markerType, cursor.value.locations[i].markerObjScale, cursor.value.locations[i].modelID);   
                   }
                } else {//local-only elements, not saved to cloud yet
+                  hasLocalData = true;
                   let localEl = document.createElement("a-entity");
                   sceneEl.appendChild(localEl);
 
@@ -219,7 +224,7 @@ function InitIDB() {
                   }
                   
                } else {
-                  console.log("COPIED LOCALDATA locations length " + localData.locations.length + " " + JSON.stringify(localData) + " last cloud update " +  lastCloudUpdate + " vs last local update " + lastLocalUpdate);
+                  console.log("COPIED LOCALDATA locations length " + localData.locations.length + " last cloud update " +  lastCloudUpdate + " vs last local update " + lastLocalUpdate);
                }
             }
             
@@ -361,53 +366,6 @@ function SaveLocalData() {  //persist mods an alt "~" version of the data
 
          };
       };
-
-   //    $.confirm({
-   //       title: 'Confirm!',
-   //       content: 'Delete local changes to this scene?',
-   //       buttons: {
-   //           confirm: function () {
-   //             console.log("tryna connect to SMXR indexeddb");
-   //             if (!('indexedDB' in window)) {
-   //                console.log("This browser doesn't support IndexedDB");
-   //                return;
-   //             }
-   //             const request = indexedDB.open("SMXR", 1);
-   //             request.onerror = (event) => {
-   //                console.error("could not connect to iDB " + event);
-   //                return "error"
-   //             };
-   //             request.onupgradeneeded = function () {
-   //                const db = request.result;
-   //                const store = db.createObjectStore("scenes", { keyPath: "shortID" });
-   //                store.createIndex("scene", ["scene"], { unique: true });
-   //             };
-   //             request.onsuccess = function () {
-   //                console.log("tryna delete indexedDB localdata for this scene!");
-   //                const db = request.result;
-   //                const transaction = db.transaction("scenes", "readwrite");
-
-   //                let deleterequest = transaction.objectStore("scenes").delete(room + "~");
-   //                deleterequest.onerror = function () {
-   //                   console.log("cain't delete localdatas!?!?");
-   //                }
-               
-   //                // report that the data item has been deleted
-   //                transaction.oncomplete = () => {
-   //                console.log("sceneData deleted - reload to confirm!");
-   //                setTimeout(function () {
-   //                   window.location.reload();
-   //                }, 2000);
-
-   //                };
-   //             };
-   //           },
-   //           cancel: function () {
-   //               // $.alert('Canceled!');
-   //           },
-   //       }
-   //   });
-
    }
    
 /////////////////// main onload function below, populate settings, etc.
@@ -427,7 +385,6 @@ $(function() {
       // localStorage.setItem("last_page", room);
       tcheck(); //token auth
 
-      // InitIDB();
    }, 1000);
    if (typeof window.ethereum !== 'undefined') {
       console.log('MetaMask is installed!');
@@ -435,13 +392,6 @@ $(function() {
    } else {
 
    }
-
-
-   // console.log("RAW LOCATIOND DATA " + theData);
-   //big pile of params
-   // let settingsAFrame = createElement("a-entity")
-   // let audioGroupsEl = null;
-   // console.log("settings " + JSON.stringify(settings));
 
    if (settings.sceneTimedEvents != undefined && settings.sceneTimedEvents != null) {
       timeKeysData = settings.sceneTimedEvents;
@@ -754,9 +704,14 @@ function MediaTimeUpdate (fancyTimeString) {
       // });
 
 function ReturnModelName (_id) {
-   for (let i = 0; i < sceneModels.length; i++) {
-      if (sceneModels[i]._id == _id) {
-         return sceneModels[i].name;
+   if (_id.toString().includes("primitive_")) {
+      console.log("tryna return primitive name " + _id);
+      return _id.replace("primitive_", "");
+   } else {
+      for (let i = 0; i < sceneModels.length; i++) {
+         if (sceneModels[i]._id == _id) {
+            return sceneModels[i].name;
+         }
       }
    }
 }
@@ -943,33 +898,20 @@ function SaveModToLocal(locationKey) { //locationKey is now just timestamp of th
    locItem.z = document.getElementById('zpos').value;
    locItem.eulerz = document.getElementById('zrot').value.length > 0 ? document.getElementById('zrot').value : '0';
    // locItem.lat 
-   locItem.label = document.getElementById('locationName').value;
+   // locItem.label = document.getElementById('locationName').value;
    locItem.name = document.getElementById('locationName').value;
    locItem.description = document.getElementById('locationDescription').value;
    locItem.markerType = document.getElementById('locationMarkerType').value;
    locItem.eventData = document.getElementById('locationEventData').value;
    locItem.timestamp = locationKey;
    locItem.markerObjScale = document.getElementById("modelScale").value;
-   locItem.phID = locationKey.toString();
+   // locItem.phID = locationKey.toString();
    locItem.type = "Worldspace";
    locItem.isLocal = true;
-   if (locItem.markerType == "waypoint" && locItem.name.includes('local ')) {
-      locItem.name = 'local waypoint';
+   locItem.locationTags = document.getElementById("locationTags").value;
+   if (locItem.name.includes('local ')) {
+      locItem.name = 'local ' + locItem.markerType; //fix default names in case type changes
    }
-   if (locItem.markerType == "placeholder" && locItem.name.includes('local ')) {
-      locItem.name = 'local placeholder';
-   }
-   if (locItem.markerType == "poi" && locItem.name.includes('local ')) {
-      locItem.name = 'local poi';
-   }
-   if (locItem.markerType == "gate" && locItem.name.includes('local ')) {
-      locItem.name = 'local gate';
-   }
-   if (locItem.markerType == "mailbox" && locItem.name.includes('local ')) {
-      locItem.name = 'local mailbox';
-   }
-   
-   // locItem.modelID = document.getElementById('locationModel').value.split("~")[3]; //model select values have the phID (room~cloud/local~timestamp) plus modelid, so index 3 of split
 
    locItem.modelID = document.getElementById('locationModel').value; // model _id
    locItem.model = ReturnModelName(locItem.modelID);
@@ -986,7 +928,30 @@ function SaveModToLocal(locationKey) { //locationKey is now just timestamp of th
       console.log("chck : " + localData.locations[i].timestamp.toString() + " vs " +locationKey.toString());
       if (localData.locations[i].timestamp.toString() == locationKey.toString() ) {
          console.log("updating existing element "+locationKey+"  : " + JSON.stringify(locItem));
-         localData.locations[i] = Object.assign(locItem);
+         // localData.locations[i] = Object.assign(locItem); //merge?
+         locItem.x = document.getElementById('xpos').value;
+         localData.locations[i].eulerx = locItem.eulerx;
+         localData.locations[i].y = locItem.y;
+         localData.locations[i].eulery = locItem.eulery;
+         localData.locations[i].z = locItem.z;
+         localData.locations[i].eulerz = locItem.eulerz;
+            // locItem.lat/lng //TODO!
+         // localData.locations[i] = locItem.label;
+         localData.locations[i].name = locItem.name;
+         localData.locations[i].description = locItem.description;
+         localData.locations[i].markerType = locItem.markerType;
+         localData.locations[i].eventData = locItem.eventData;
+         localData.locations[i].timestamp = locItem.timestamp;
+         localData.locations[i].markerObjScale = locItem.markerObjScale;
+         // localData.locations[i] = locItem.phID;
+         localData.locations[i].type = locItem.type;
+         localData.locations[i].isLocal = locItem.isLocal;
+         localData.locations[i].locationTags = locItem.locationTags;
+         localData.locations[i].modelID = locItem.modelID;
+         localData.locations[i].model = locItem.model;
+         localData.locations[i].objectID = locItem.objectID;
+         localData.locations[i].objectName = locItem.objectName;
+
          hasLocal = true;
          SaveLocalData();
          break;
@@ -994,11 +959,29 @@ function SaveModToLocal(locationKey) { //locationKey is now just timestamp of th
    }
    let theEl = document.getElementById(locationKey.toString());
    if (theEl != null) {
-      console.log("found the EL: " + locationKey);
+      console.log("found the EL: " + locationKey + " locItem name " + locItem.name);
       let scale = (locItem.markerObjScale != undefined && locItem.markerObjScale != null && locItem.markerObjScale != "") ? locItem.markerObjScale : 1;
       theEl.setAttribute('position', {x: locItem.x, y: locItem.y, z: locItem.z});
       theEl.setAttribute('rotation', {x: locItem.eulerx, y: locItem.eulery, z: locItem.eulerz});
       theEl.setAttribute('scale', {x: scale, y: scale, z: scale});
+      let modModelComponent = theEl.components.mod_model;
+      let localMarkerComponent = theEl.components.local_marker;
+      let cloudMarkerComponent = theEl.components.cloud_marker;
+      if (modModelComponent) {
+         modModelComponent.data.modelID = locItem.modelID;
+         // modModelComponent.loadModel(locItem.modelID); 
+         modModelComponent.data.name = locItem.name;
+       } else if (cloudMarkerComponent) {
+         cloudMarkerComponent.data.modelID = locItem.modelID;
+         cloudMarkerComponent.data.name = locItem.name;
+         // cloudMarkerComponent.loadModel(locItem.modelID); 
+       } else if (localMarkerComponent) {
+         localMarkerComponent.data.modelID = locItem.modelID;
+         localMarkerComponent.data.name = locItem.name;
+         // localMarkerComponent.loadModel(locItem.modelID); 
+       }
+      //todo update models/objects and other properties...
+
       // for (let i = 0; i < sceneLocations.locations.length; i++) {
       //    if (locationKey.toString() == sceneLocations.locations[i].timestamp.toString()) {
       //       sceneLocations.locations[i] = Object.assign(locItem); //replace the location item with updated properties
@@ -1010,23 +993,7 @@ function SaveModToLocal(locationKey) { //locationKey is now just timestamp of th
    } else {
       console.log("DINT FIND THE EL " + locationKey);
    }
-   // if (!hasLocal) {
-   //    for (let i = 0; i < sceneLocations.locations.length; i++) {
-   //       console.log("chck : " + sceneLocations.locations[i].timestamp.toString() + " vs " +locationKey.toString());
-   //       if (sceneLocations.locations[i].timestamp.toString() == locationKey.toString() ) {
-   //          console.log("updating existing element "+locationKey+"  : " + JSON.stringify(locItem));
-   //          localData.locations[i] = Object.assign(locItem);
-   //          // hasLocal = true;
-   //          SaveLocalData();
-   //          break;
-   //       }
-   //    }
-   // }
-   
-   // AddLocalMarkers();
-   // InitIDB();
-   
-   // ShowHideDialogPanel();
+
    SceneManglerModal('Locations');
 }
 
@@ -1635,8 +1602,8 @@ function CreatePlaceholder () {
    locItem.eventData = '';
    locItem.isNew = true;
    locItem.timestamp = timestamp;
-   locItem.scale = 1;
-   locItem.tags = '';
+   locItem.markerObjScale = 1;
+   locItem.locationTags = '';
    locItem.phID = timestamp;
    locItem.isLocal = true;
    localData.locations.push(locItem);
@@ -1749,7 +1716,7 @@ function tcheck () {
 
 if (sceneEl != null) {
 
-   AFRAME.registerComponent('location_data', {
+   AFRAME.registerComponent('location_data', { //initial loading of "official" location data from cloud, embedded in server response
       schema: {
       initialized: {default: ''},
       jsonData: {default: ''},
@@ -3071,10 +3038,7 @@ function SetPrimaryAudioEventsData () {
 function SetVideoEventsData (type) { 
    console.log("tryna SetVideoEventsData");
    tkStarttimes = []; //either audio or video, not both
-   if (timeKeysData.timekeys == undefined || timeKeysData.timekeys == null) {
-   //   timeKeysData = JSON.parse(localStorage.getItem(room+ "_timeKeys"));  TODO update the settings.timekeys
-   } 
-   
+
    
    if (timeKeysData != undefined && timeKeysData != null && timeKeysData.timekeys != undefined && timeKeysData.timekeys.length > 0 ) {
      timeKeysData.timekeys.forEach(function (timekey) {

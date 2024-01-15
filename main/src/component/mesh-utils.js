@@ -4505,6 +4505,7 @@ AFRAME.registerComponent('load_threesvg', {
               localData.locations[i].eulery = this.rotation.y.toFixed(2);
               localData.locations[i].eulerz = this.rotation.z.toFixed(2);
               localData.locations[i].markerObjScale = this.scale.x.toFixed(2);
+              localData.locations[i].isLocal = true;
               SaveLocalData();
               break;
             }

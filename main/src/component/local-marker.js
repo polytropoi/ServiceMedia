@@ -129,7 +129,9 @@ AFRAME.registerComponent('local_marker', { //special items with local mods
                             // this.el.setAttribute("color", "purple");
                         } else if (this.data.markerType.toLowerCase().includes("trigger")) {
                             this.el.setAttribute("material", {color: "lime", transparent: true, opacity: .5});
+                            this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"placeholder"});
                             // this.el.setAttribute("color", "lime");
+                            
                         } else if (this.data.markerType.toLowerCase() == "gate") {
                             this.el.setAttribute("material", {color: "orange", transparent: true, opacity: .5});
                             // this.el.setAttribute("color", "orange");
@@ -144,7 +146,7 @@ AFRAME.registerComponent('local_marker', { //special items with local mods
                         this.loadModel(this.data.modelID);
                     }
                 }
-              }
+            }
             //   if ((!this.data.modelID || this.data.modelID == undefined || this.data.modelID == "" || this.data.modelID == "none") && !this.data.modelID.toString().includes("primitive")) {
             //   if (this.data.modelID != 'none') {
             //     if (this.data.modelID.toString().includes("primitive")) {
@@ -272,7 +274,7 @@ AFRAME.registerComponent('local_marker', { //special items with local mods
                 }
               });
               this.el.setObject3D('mesh', obj);
-              if (this.data.markerType == "gate") {
+              if (this.data.markerType == "gate" || this.data.markerType == "trigger") {
                 this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"placeholder"});
               }
             // this.el.setAttribute("transform_controls", ""); //check for tag?
@@ -297,7 +299,7 @@ AFRAME.registerComponent('local_marker', { //special items with local mods
           // let elPos = that.el.getAttribute('position');
           // console.log(pos);
           if (that.calloutEntity != null) {
-            console.log("tryna show the callout " + that.distance);
+            console.log(that.el.id + " local_marker callout distance " + that.distance);
             if (that.distance < 66) {
             that.calloutEntity.setAttribute("position", pos);
             that.calloutEntity.setAttribute('visible', true);
@@ -380,10 +382,46 @@ AFRAME.registerComponent('local_marker', { //special items with local mods
     loadModel: function (modelID) { //local model swap
       console.log("tryna load modeID " + modelID);
       if (modelID != undefined && modelID != null & modelID != "none" && modelID != "") {  
-        for (let i = 0; i < sceneModels.length; i++) {
-          if (sceneModels[i]._id == modelID) {
-            this.el.setAttribute('gltf-model', sceneModels[i].url);
-          }
+        if (modelID.toString().includes("primitive")) {
+            console.log("LOCALMARKER PRIMITIVE " + modelID);
+            if (modelID.toString().includes("cube")) {
+                this.el.setAttribute("geometry", {primitive: "box", width: this.data.scale, height: this.data.scale, depth: this.data.scale});
+            } else if (modelID.toString().includes("sphere")) {
+                this.el.setAttribute("geometry", {primitive: "sphere", radius: this.data.scale});
+            } else if (modelID.toString().includes("cylinder")) {
+                this.el.setAttribute("geometry", {primitive: "cylinder", height: this.data.scale, radius: this.data.scale * .5});
+            } else {
+
+            }
+            if (this.data.markerType.toLowerCase() == "placeholder") {
+                this.el.setAttribute("material", {color: "yellow", transparent: true, opacity: .5});
+            } else if (this.data.markerType.toLowerCase() == "poi") {
+                this.el.setAttribute("material", {color: "purple", transparent: true, opacity: .5});
+                // this.el.setAttribute("color", "purple");
+            } else if (this.data.markerType.toLowerCase() == "waypoint") {
+                this.el.setAttribute("material", {color: "green", transparent: true, opacity: .5});
+                // this.el.setAttribute("color", "purple");
+            } else if (this.data.markerType.toLowerCase().includes("trigger")) {
+                this.el.setAttribute("material", {color: "lime", transparent: true, opacity: .5});
+                this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"placeholder"});
+                // this.el.setAttribute("color", "lime");
+                
+            } else if (this.data.markerType.toLowerCase() == "gate") {
+                this.el.setAttribute("material", {color: "orange", transparent: true, opacity: .5});
+                // this.el.setAttribute("color", "orange");
+            } else if (this.data.markerType.toLowerCase() == "portal") {
+            
+            } else if (this.data.markerType.toLowerCase() == "mailbox") {
+            
+            } else {
+
+            }
+        } else {
+            for (let i = 0; i < sceneModels.length; i++) {
+            if (sceneModels[i]._id == modelID) {
+                this.el.setAttribute('gltf-model', sceneModels[i].url);
+            }
+            }
         }
       } else { //if "none"
         if (this.data.markerType == "poi" || this.data.markerType == "waypoint" || this.data.markerType == "placeholder") {
