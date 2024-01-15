@@ -18,7 +18,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
       allowMods: {default: false}
     },
     init: function () {
-      console.log("tryna set a cloudmarker with scale " + this.data.scale);
+    //   console.log("tryna set a cloudmarker with scale " + this.data.scale);
      var sceneEl = document.querySelector('a-scene'); 
       //let calloutString = this.data.calloutString;
       this.cursor = document.querySelector('[cursor]');
@@ -77,7 +77,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
         //   console.log("CLOUDMARKER " + this.data.modelID + " " + this.data.name);
           
           if ((!this.data.modelID || this.data.modelID == undefined || this.data.modelID == "" || this.data.modelID == "none") && !this.data.modelID.toString().includes("primitive")) {
-            console.log("CLOUDMARKER PLACEHOLDER GEO " + this.data.modelID);
+            // console.log("CLOUDMARKER PLACEHOLDER GEO " + this.data.modelID);
             if (this.data.markerType.toLowerCase() == "placeholder") {
                 this.el.setAttribute('gltf-model', '#poi1');
               } else if (this.data.markerType.toLowerCase() == "poi") {
@@ -94,8 +94,8 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
               }
           } else {
             if (this.data.modelID != "none") {
-                if (this.data.modelID.toString().includes("primitive")) {
-                    console.log("CLOUDMARKER PRIMITIVE " + this.data.modelID);
+                if (this.data.modelID.toString().includes("primitive")) {   
+                    // console.log("CLOUDMARKER PRIMITIVE " + this.data.modelID);
                     if (this.data.modelID.toString().includes("cube")) {
                         this.el.setAttribute("geometry", {primitive: "box", width: 1, height: 1, depth: 1});
                     } else if (this.data.modelID.toString().includes("sphere")) {
@@ -207,7 +207,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
   
       this.el.addEventListener('model-loaded', (evt) => { //load placeholder model first (which is an a-asset) before calling external
         evt.preventDefault();
-        console.log("MODEL LOADED FOR CLOUDMARKER!!!" + this.el.id);
+        console.log(this.data.modelID + " model-loaded for CLOUDMARKER " + this.el.id);
         this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"placeholder"});
 
         const obj = this.el.getObject3D('mesh');
@@ -404,8 +404,29 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
             this.loadModel(modelID);
         }, 2000);
     },
+    updateMaterials: function () {
+        console.log("tryna update material for markertype " + this.data.markerType);
+        if (this.data.markerType.toLowerCase() == "placeholder") {
+            this.el.setAttribute("material", {color: "yellow", transparent: true, opacity: .5});
+        } else if (this.data.markerType.toLowerCase() == "poi") {
+            this.el.setAttribute("material", {color: "purple", transparent: true, opacity: .5});
+        } else if (this.data.markerType.toLowerCase() == "waypoint") {
+            this.el.setAttribute("material", {color: "green", transparent: true, opacity: .5});
+            // this.el.setAttribute("color", "purple");
+        } else if (this.data.markerType.toLowerCase().includes("trigger")) {
+            this.el.setAttribute("material", {color: "lime", transparent: true, opacity: .5});
+        } else if (this.data.markerType.toLowerCase() == "gate") {
+            this.el.setAttribute("material", {color: "orange", transparent: true, opacity: .5});
+        } else if (this.data.markerType.toLowerCase() == "portal") {
+        
+        } else if (this.data.markerType.toLowerCase() == "mailbox") {
+        
+        } else {
+
+        }
+    },
     loadModel: function (modelID) {
-        console.log("CLOUDMARKER tryna load modelID " + modelID);
+        // console.log("CLOUDMARKER tryna load modelID " + modelID);
         this.el.removeAttribute("geometry");
         this.el.removeAttribute("gltf-model");
         if (modelID != undefined && modelID != null & modelID != "none" && modelID != "") {  
@@ -453,7 +474,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
           }
         } else { //if "none"
 
-            console.log("CLOUDMARKER tryna set default model " + modelID);
+            // console.log("CLOUDMARKER tryna set default model " + modelID);
             if (this.data.markerType == "poi" || this.data.markerType == "waypoint" || this.data.markerType == "placeholder") {
                 this.el.setAttribute("gltf-model", "#poi1");
             } else if (this.data.markerType == "gate"){

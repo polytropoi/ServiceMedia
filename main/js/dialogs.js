@@ -1745,7 +1745,7 @@ function SceneManglerModal(mode) {
     // "<input type=\x22file\x22 id=\x22file-upload\x22 accept=\x22.txt\x22 onchange=\x22ImportMods(event)\x22></input>"+
     // "<button class=\x22deleteButton\x22 id=\x22ClearAllPlaceholdersButton\x22 onclick=\x22ClearPlaceholders()\x22>Clear All Mods</button>" +
     "<button class=\x22deleteButton\x22 id=\x22ClearAllPlaceholdersButton\x22 onclick=\x22DeleteLocalSceneData()\x22>Clear Scene Mods</button>"+
-    "<button style=\x22float: right;\x22 class=\x22addButton\x22 onclick=\x22SaveLocalData()\x22>Save to Local DB</button>"+
+    "<button style=\x22float: right;\x22 class=\x22addButton\x22 onclick=\x22SaveLocalAndClose()\x22>Save to Local DB</button>"+
       // "<div class=\x22twocolumn\x22><label for=\x22addpic\x22>Add Picture Asset</label><button class=\x22addButton\x22 id=\x22AddPicButton\x22 onclick=\x22AddPicture()\x22>Add</button>"+
       // "<button class=\x22uploadButton\x22 id=\x22UpoadPicButton\x22 onclick=\x22UploadPicture()\x22>Upload</button>"+
       // "<input class=\x22addfield\x22 type=\x22text\x22 id=\x22addpic\x22 placeholder=\x22picture URL or IPFS\x22></div>"+
@@ -1848,7 +1848,10 @@ function SceneManglerModal(mode) {
     //  document.getElementById(mode).style.display = "block";
     //  document.getElementById('modalTitle').innerHTML = "<h3>Scene " + mode + "</h3>";
 }
-
+function SaveLocalAndClose() {
+  SaveLocalData();
+  ShowHideDialogPanel();
+}
 
 function ToggleStats () {
   // let sceneEl = document.querySelector('a-scene');

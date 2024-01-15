@@ -379,17 +379,40 @@ AFRAME.registerComponent('local_marker', { //special items with local mods
         }
       } 
     },
+    updateMaterials: function () {
+        if (this.data.markerType.toLowerCase() == "placeholder") {
+            this.el.setAttribute("material", {color: "yellow", transparent: true, opacity: .5});
+        } else if (this.data.markerType.toLowerCase() == "poi") {
+            this.el.setAttribute("material", {color: "purple", transparent: true, opacity: .5});
+        } else if (this.data.markerType.toLowerCase() == "waypoint") {
+            this.el.setAttribute("material", {color: "green", transparent: true, opacity: .5});
+            // this.el.setAttribute("color", "purple");
+        } else if (this.data.markerType.toLowerCase().includes("trigger")) {
+            this.el.setAttribute("material", {color: "lime", transparent: true, opacity: .5});
+        } else if (this.data.markerType.toLowerCase() == "gate") {
+            this.el.setAttribute("material", {color: "orange", transparent: true, opacity: .5});
+        } else if (this.data.markerType.toLowerCase() == "portal") {
+        
+        } else if (this.data.markerType.toLowerCase() == "mailbox") {
+        
+        } else {
+
+        }
+    },
     loadModel: function (modelID) { //local model swap
       console.log("tryna load modeID " + modelID);
+      this.el.removeAttribute("geometry");
+      this.el.removeAttribute("gltf-model");
       if (modelID != undefined && modelID != null & modelID != "none" && modelID != "") {  
         if (modelID.toString().includes("primitive")) {
             console.log("LOCALMARKER PRIMITIVE " + modelID);
             if (modelID.toString().includes("cube")) {
-                this.el.setAttribute("geometry", {primitive: "box", width: this.data.scale, height: this.data.scale, depth: this.data.scale});
+                this.el.setAttribute("geometry", {primitive: "box", width: 1, height: 1, depth: 1});
             } else if (modelID.toString().includes("sphere")) {
-                this.el.setAttribute("geometry", {primitive: "sphere", radius: this.data.scale});
+                this.el.setAttribute("geometry", {primitive: "sphere", radius: 1});
             } else if (modelID.toString().includes("cylinder")) {
-                this.el.setAttribute("geometry", {primitive: "cylinder", height: this.data.scale, radius: this.data.scale * .5});
+                // let radius = parseFloat(this.data.scale / 2);
+                this.el.setAttribute("geometry", {primitive: "cylinder", height: 1, radius: .5});
             } else {
 
             }

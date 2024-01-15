@@ -326,6 +326,7 @@ function SaveLocalData() {  //persist mods an alt "~" version of the data
         db.close();
         console.log("localdata saved!");
         hasLocalData = true;
+      //   ShowHideDialogPanel();
          // InitLocalData();
       };
    };
@@ -712,6 +713,7 @@ function ReturnModelName (_id) {
       for (let i = 0; i < sceneModels.length; i++) {
          if (sceneModels[i]._id == _id) {
             return sceneModels[i].name;
+            break;
          }
       }
    }
@@ -916,9 +918,15 @@ function SaveModToLocal(locationKey) { //locationKey is now just timestamp of th
 
    locItem.modelID = document.getElementById('locationModel').value; // model _id
    locItem.model = ReturnModelName(locItem.modelID);
+   if ((locItem.modelID || locItem.modelID != "" || locItem.modelID != undefined) && locItem.markerType == "none" || locItem.markerType == "" || locItem.markerType == undefined) {
+      locItem.markerType = "model";
+   }
 
    locItem.objectID = document.getElementById('locationObject').value; //object _id
    locItem.objectName = ReturnObjectName(locItem.objectID);
+   if ((locItem.objectID || locItem.objectID != "" || locItem.objectID != undefined) && locItem.markerType == "none" || locItem.markerType == "" || locItem.markerType == undefined) {
+      locItem.markerType = "object";
+   }
    // if (locationKey.toString().includes("local")) {
    //    locItem.isLocal = true;
    // }
@@ -970,16 +978,24 @@ function SaveModToLocal(locationKey) { //locationKey is now just timestamp of th
       let cloudMarkerComponent = theEl.components.cloud_marker;
       if (modModelComponent) {
          modModelComponent.data.modelID = locItem.modelID;
-         // modModelComponent.loadModel(locItem.modelID); 
+         
+         modModelComponent.loadModel(locItem.modelID); 
          modModelComponent.data.name = locItem.name;
+         // modModelComponent.updateMaterials();
        } else if (cloudMarkerComponent) {
          cloudMarkerComponent.data.modelID = locItem.modelID;
          cloudMarkerComponent.data.name = locItem.name;
-         // cloudMarkerComponent.loadModel(locItem.modelID); 
+         cloudMarkerComponent.data.markerType = locItem.markerType;
+         
+         cloudMarkerComponent.loadModel(locItem.modelID); 
+         cloudMarkerComponent.updateMaterials();
        } else if (localMarkerComponent) {
          localMarkerComponent.data.modelID = locItem.modelID;
          localMarkerComponent.data.name = locItem.name;
-         // localMarkerComponent.loadModel(locItem.modelID); 
+         localMarkerComponent.data.markerType = locItem.markerType;
+
+         localMarkerComponent.loadModel(locItem.modelID); 
+         localMarkerComponent.updateMaterials();
        }
       //todo update models/objects and other properties...
 
@@ -994,8 +1010,9 @@ function SaveModToLocal(locationKey) { //locationKey is now just timestamp of th
    } else {
       console.log("DINT FIND THE EL " + locationKey);
    }
-
-   SceneManglerModal('Locations');
+   ShowHideDialogPanel();
+   //if "L" key isdown?
+   // SceneManglerModal('Locations');
 }
 
 function GrabLocation(locationKey) {
@@ -1618,6 +1635,7 @@ function CreatePlaceholder () {
 
    SaveLocalData();
    ShowHideDialogPanel();
+
    
 }
 
