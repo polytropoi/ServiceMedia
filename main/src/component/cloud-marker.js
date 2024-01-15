@@ -503,7 +503,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
       }
     },
     physicsTriggerHit: function () {  
-      console.log("gotsa physics trigger hit!"); //maybe check the layer of colliding entity or something...
+    //   console.log("gotsa physics trigger hit!"); //maybe check the layer of colliding entity or something...
       var triggerAudioController = document.getElementById("triggerAudio");
       if (triggerAudioController != null) {
         triggerAudioController.components.trigger_audio_control.playAudioAtPosition(this.el.object3D.position, window.playerPosition.distanceTo(this.el.object3D.position), this.data.tags);

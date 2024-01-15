@@ -11769,7 +11769,7 @@ app.post('/add_scene_mods/:s_id', requiredAuthentication, admin, function (req, 
                                     // let name = req.body.locationMods[i].name;
                                     delete req.body.locationMods[l].isNew; //going to the cloud don't need these
                                     delete req.body.locationMods[l].isLocal;
-                                    if (req.body.locationMods[l].name.toLowerCase().includes("local ")) {
+                                    if (req.body.locationMods[l].name && req.body.locationMods[l].name.toLowerCase().includes("local ")) {
                                         let name = req.body.locationMods[l].name.toLowerCase().replace("local ", "");
                                         req.body.locationMods[l].name = name;
                                     }

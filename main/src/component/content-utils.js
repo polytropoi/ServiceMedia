@@ -2501,7 +2501,7 @@ AFRAME.registerComponent('skybox-env-map', {
         }
 
         if (this.texture != null) {
-          this.texture.encoding = THREE.sRGBEncoding;
+          // this.texture.colorSpace = THREE.sRGBEncoding;
           this.texture.mapping = THREE.EquirectangularReflectionMapping;
           this.texture.minFilter = this.texture.magFilter = THREE.LinearFilter;
 
@@ -4634,7 +4634,8 @@ AFRAME.registerComponent('scene_greeting_dialog', {  //if "greeting" scenetag + 
   },
   longTimer: function () {
     setTimeout(() => {
-      if (this.behavior == 'hide') {
+      if (this.behavior == 'hide' && this.el.parentNode) {
+
         this.el.parentNode.removeChild(this.el);
       }
       

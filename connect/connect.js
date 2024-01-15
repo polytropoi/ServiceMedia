@@ -533,6 +533,7 @@ $(function() {
    }
 
    sceneEl = document.querySelector('a-scene');
+   sceneEl.removeAttribute("keyboard-shortcuts"); //give me back the f key!
 
    if (settings.allowMods) {
       if ('storage' in navigator && 'estimate' in navigator.storage) {
@@ -1762,7 +1763,7 @@ if (sceneEl != null) {
             
                }
                if (i == this.data.jsonData.length - 1) {
-
+                  sceneEl.removeAttribute("keyboard-shortcuts");
                   if (settings.allowMods) {
                      InitIDB();
                   }

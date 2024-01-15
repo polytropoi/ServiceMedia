@@ -83,7 +83,7 @@ AFRAME.registerComponent('mod_physics', { //used by models, placeholders, instan
           this.el.setAttribute("ammo-shape", {type: "box"});
        
         }
-        console.log("tryna load placeholder  " + this.isTrigger);
+        // console.log("tryna load placeholder  " + this.isTrigger);
 
     
     } else if (this.data.model == "agent") { //must be kinematic, moves as nav-agent on navmesh
