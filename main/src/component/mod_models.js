@@ -2,7 +2,7 @@
 ////////////////////////// - MOD_MODEL - for "plain" models, these are written (elements + components + props) by the server into response as a-assets, as opposed to "Objects", see mod_objex.js
 AFRAME.registerComponent('mod_model', {
     schema: {
-        markerType: {default: "none"},
+        markerType: {default: 'none'},
         eventData: {default: ''},
         shader: {default: ''},
         color: {default: ''},
@@ -10,7 +10,8 @@ AFRAME.registerComponent('mod_model', {
         description: {default: ''},
         modelID: {default: ''},
         timestamp: {default: ''},
-        allowMods: {default: true}
+        allowMods: {default: true},
+        name: {default: ''}
         
       },
       init: function () {
@@ -1323,18 +1324,19 @@ AFRAME.registerComponent('mod_model', {
               }
             }
           });
-          // console.log("MOD_MODEL markertype " + this.data.markerType +  " this.hasCallout " + this.hasCallout + " this.data.description " + this.data.description);
+          // 
           this.el.addEventListener('mousedown', (evt) => {
-            if (that.timestamp != '' && settings.allowMods && this.data.allowMods) {
+            console.log("MOD_MODEL mousedown on markertype " + this.data.markerType +  " this.hasCallout " + this.hasCallout + " this.data.description " + this.data.description);
+            if (this.timestamp != '' && settings.allowMods && this.data.allowMods) {
               if (keydown == "T") {
-                ToggleTransformControls(that.timestamp);
+                ToggleTransformControls(this.timestamp);
               } else if (keydown == "Shift") {
-                ShowLocationModal(that.timestamp);
+                ShowLocationModal(this.timestamp);
               } 
-            }
+            }  
           });
           this.el.addEventListener('mouseenter', (evt) =>  {
-            console.log("mouseovewr model " + this.el.id + this.hasLocationCallout + this.data.markerType + this.hasCallout + this.hasCalloutBackground + textData[textIndex]);
+            console.log("MOD_MODEL mouseovewr model " + this.el.id + this.hasLocationCallout + this.data.markerType + this.hasCallout + this.hasCalloutBackground + textData[textIndex]);
             if (evt.detail.intersection != null && this.hitpoint != null) {
               if (this.calloutString == "") {
                 this.calloutString = textData[textIndex];
@@ -1839,18 +1841,65 @@ AFRAME.registerComponent('mod_model', {
       }
     },
     loadModel: function () {
+      let transform_controls_component = this.el.components.transform_controls;
+      if (transform_controls_component) {
+          if (transform_controls_component.data.isAttached) {
+              transform_controls_component.detachTransformControls();
+          }
+      }
+      this.el.removeAttribute("transform_controls");
+      this.el.removeAttribute("geometry");
+      this.el.removeAttribute("gltf-model");
       console.log("tryna load modeID " + this.data.modelID);
       // console.log("tryna load modeID " + modelID);
       if (this.data.modelID != undefined && this.data.modelID != null & this.data.modelID != "none" && this.data.modelID != "") {  
-        for (let i = 0; i < sceneModels.length; i++) {
-          if (sceneModels[i]._id == this.data.modelID) {
-            this.el.setAttribute("gltf-model", sceneModels[i].url);
-            console.log("gotsa model match, updating..");
-            // this.el.
-            break;
-          }
-        }
-      } 
+        // if (modelID != undefined && modelID != null & modelID != "none" && modelID != "") {  
+          if (this.data.modelID.toString().includes("primitive")) {
+              console.log("CLOUDMARKER PRIMITIVE " + this.data.modelID + " scale " + 1);
+              this.el.removeAttribute("geometry");
+              if (this.data.modelID.toString().includes("cube")) {
+                  this.el.setAttribute("geometry", {primitive: "box", width: 1, height: 1, depth: 1});
+              } else if (this.data.modelID.toString().includes("sphere")) {
+                  this.el.setAttribute("geometry", {primitive: "sphere", radius: 1});
+              } else if (this.data.modelID.toString().includes("cylinder")) {
+                  this.el.setAttribute("geometry", {primitive: "cylinder", height: 1, radius: 1 / 2});
+              } else {
+  
+              }
+              if (this.data.markerType.toLowerCase() == "placeholder") {
+                  this.el.setAttribute("material", {color: "yellow", transparent: true, opacity: .5});
+              } else if (this.data.markerType.toLowerCase() == "poi") {
+                  this.el.setAttribute("material", {color: "purple", transparent: true, opacity: .5});
+                  // this.el.setAttribute("color", "purple");
+              } else if (this.data.markerType.toLowerCase() == "waypoint") {
+                  this.el.setAttribute("material", {color: "green", transparent: true, opacity: .5});
+                  // this.el.setAttribute("color", "purple");
+              } else if (this.data.markerType.toLowerCase().includes("trigger")) {
+                  this.el.setAttribute("material", {color: "lime", transparent: true, opacity: .5});
+                  this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"placeholder"});
+                  // this.el.setAttribute("color", "lime");
+                  
+              } else if (this.data.markerType.toLowerCase() == "gate") {
+                  this.el.setAttribute("material", {color: "orange", transparent: true, opacity: .5});
+                  // this.el.setAttribute("color", "orange");
+              } else if (this.data.markerType.toLowerCase() == "portal") {
+              
+              } else if (this.data.markerType.toLowerCase() == "mailbox") {
+              
+              } else {
+  
+              }
+            } else {     
+              for (let i = 0; i < sceneModels.length; i++) {
+                if (sceneModels[i]._id == this.data.modelID) {
+                  this.el.setAttribute("gltf-model", sceneModels[i].url);
+                  console.log("gotsa model match, updating..");
+                  // this.el.
+                  break;
+                }
+              }
+            }
+        } 
       // } else {
       //   this.el.setAttribute("gltf-model", "https://servicemedia.s3.amazonaws.com/assets/models/savedplaceholder.glb");
       // }

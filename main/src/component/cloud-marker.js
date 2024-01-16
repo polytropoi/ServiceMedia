@@ -426,7 +426,13 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
         }
     },
     loadModel: function (modelID) {
-        // console.log("CLOUDMARKER tryna load modelID " + modelID);
+        let transform_controls_component = this.el.components.transform_controls;
+        if (transform_controls_component) {
+            if (transform_controls_component.data.isAttached) {
+                transform_controls_component.detachTransformControls();
+            }
+        }
+        this.el.removeAttribute("transform_controls");
         this.el.removeAttribute("geometry");
         this.el.removeAttribute("gltf-model");
         if (modelID != undefined && modelID != null & modelID != "none" && modelID != "") {  

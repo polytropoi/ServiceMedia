@@ -12571,8 +12571,10 @@ function getAllPeople() {
                             // "<div id=\x22locationObjects_" + locationID + "\x22></div>"
                         // "</div>" +
                         "<div class=\x22col form-group col-md-2\x22>" + 
-
-                            "<label for=\x22objtype_" + locationID + "\x22>Location Type</label>" + //type
+                            "<label for=\x22label_" + locationID + "\x22>Name</label>" + 
+                            "<input type=\x22text\x22 class=\x22form-control locationLabel\x22 id=\x22label_" + locationID + "\x22 placeholder=\x220\x22 value=\x22" + label + "\x22 >" +
+                            
+                            "<label for=\x22objtype_" + locationID + "\x22>Marker Type</label>" + //type
                             "<select class=\x22locationObjectTypeSelect form-control\x22 id=\x22locobjtypeselect_" + locationID + "\x22>" +
                             "<option value=\x22\x22 disabled selected>Select:</option>" +
                             returnObjectTypes(sceneLocations[i].markerType) +
@@ -12581,8 +12583,7 @@ function getAllPeople() {
                             
                             // "<label for=\x22locationDescription_" + locationID + "\x22>Description</label>" + 
                             // "<input type=\x22text\x22 class=\x22form-control locationDescription\x22 id=\x22locationDescription_" + locationID + "\x22 value=\x22" + sceneLocations[i].description + "\x22 >" +
-                            "<label for=\x22label_" + locationID + "\x22>Label</label>" + 
-                            "<input type=\x22text\x22 class=\x22form-control locationLabel\x22 id=\x22label_" + locationID + "\x22 placeholder=\x220\x22 value=\x22" + label + "\x22 >" +
+                           
 
                             // "<label for=\x22locationDescription_" + locationID + "\x22>Description</label>" + 
                             // "<input type=\x22text\x22 class=\x22form-control locationDescription\x22 id=\x22locationDescription_" + locationID + "\x22 value=\x22" + sceneLocations[i].description + "\x22 >" +
