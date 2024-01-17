@@ -1256,7 +1256,7 @@ AFRAME.registerComponent('mod_model', {
           const primaryAudioControlParams = primaryAudio.getAttribute('primary_audio_control');
   
        
-          if (primaryAudioControlParams.targetattach) { //set by sceneAttachPrimaryAudioToTarget or something like that...
+          if (primaryAudioControlParams.targetattach || this.data.markerType == "audio") { //set by sceneAttachPrimaryAudioToTarget or something like that...
             console.log("tryna target attach primary audio " + primaryAudioControlParams.targetattach);
   
             document.getElementById("primaryAudioParent").setAttribute("visible", false);
@@ -1839,6 +1839,18 @@ AFRAME.registerComponent('mod_model', {
       if (this.distance) {
         return this.distance;
       }
+    },
+    updateAndLoad: function (name, description, tags, eventData, markerType, scale, modelID) {
+      this.data.name = name;
+      this.data.description = description;
+      this.data.tags = tags;
+      this.data.eventData = eventData;
+      this.data.markerType = markerType;
+      this.data.scale = scale;
+      this.data.modelID = modelID;
+      // setTimeout(() => {
+          this.loadModel();
+      // }, 2000);
     },
     loadModel: function () {
       let transform_controls_component = this.el.components.transform_controls;

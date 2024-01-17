@@ -163,7 +163,12 @@ function InitIDB() {
                      //                            scale: {x: cursor.value.locations[i].markerObjScale, y: cursor.value.locations[i].markerObjScale, z: cursor.value.locations[i].markerObjScale}
                      //                         });
 
-                     cloudMarkerComponent.waitAndLoad(cursor.value.locations[i].name, cursor.value.locations[i].description, cursor.value.locations[i].locationTags, cursor.value.locations[i].eventData, cursor.value.locations[i].markerType, cursor.value.locations[i].markerObjScale, cursor.value.locations[i].modelID);   
+                     cloudMarkerComponent.updateAndLoad(cursor.value.locations[i].name, cursor.value.locations[i].description, cursor.value.locations[i].locationTags, cursor.value.locations[i].eventData, cursor.value.locations[i].markerType, cursor.value.locations[i].markerObjScale, cursor.value.locations[i].modelID);   
+                  } else {
+                     let modModelComponent = cloudEl.components.mod_model;
+                     if (modModelComponent) {
+                        modModelComponent.updateAndLoad(cursor.value.locations[i].name, cursor.value.locations[i].description, cursor.value.locations[i].locationTags, cursor.value.locations[i].eventData, cursor.value.locations[i].markerType, cursor.value.locations[i].markerObjScale, cursor.value.locations[i].modelID);
+                     }
                   }
                } else {//local-only elements, not saved to cloud yet
                   hasLocalData = true;
@@ -978,7 +983,8 @@ function SaveModToLocal(locationKey) { //locationKey is now just timestamp of th
       let cloudMarkerComponent = theEl.components.cloud_marker;
       if (modModelComponent) {
          modModelComponent.data.modelID = locItem.modelID;
-         
+         modModelComponent.data.eventData = locItem.eventData;
+         modModelComponent.data.tags = locItem.locationTags;
          modModelComponent.loadModel(locItem.modelID); 
          modModelComponent.data.name = locItem.name;
          // modModelComponent.updateMaterials();

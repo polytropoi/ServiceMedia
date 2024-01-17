@@ -12576,14 +12576,15 @@ function getAllPeople() {
                             // "<div id=\x22locationObjects_" + locationID + "\x22></div>"
                         // "</div>" +
                         "<div class=\x22col form-group col-md-2\x22>" + 
-                            "<label for=\x22label_" + locationID + "\x22>Name</label>" + 
-                            "<input type=\x22text\x22 class=\x22form-control locationLabel\x22 id=\x22label_" + locationID + "\x22 placeholder=\x220\x22 value=\x22" + label + "\x22 >" +
+                            
 
                             "<label for=\x22objtype_" + locationID + "\x22>Marker Type</label>" + //type
                             "<select class=\x22locationObjectTypeSelect form-control\x22 id=\x22locobjtypeselect_" + locationID + "\x22>" +
-                            "<option value=\x22\x22 disabled selected>Select:</option>" +
+                            "<option value=\x22none\x22 selected>none</option>" +
                             returnObjectTypes(sceneLocations[i].markerType) +
                             "</select>" +
+                            "<label for=\x22label_" + locationID + "\x22>Name</label>" + 
+                            "<input type=\x22text\x22 class=\x22form-control locationLabel\x22 id=\x22label_" + locationID + "\x22 placeholder=\x220\x22 value=\x22" + label + "\x22 >" +
                             // "<div id=\x22locationObjects_" + locationID + "\x22></div>"
                             
                             // "<label for=\x22locationDescription_" + locationID + "\x22>Description</label>" + 
@@ -12631,7 +12632,7 @@ function getAllPeople() {
                             "<div id=\x22selectLocationModel_" + locationID + "\x22>" +
                                 "<label for=\x22\x22>Location Model: </label>" + 
                                 "<select class=\x22form-control modelSelector\x22 id=\x22modelSelect_"+locationID+"\x22>" +
-                                "<option value=\x22\x22 disabled selected>Select : </option>" +
+                                "<option value=\x22none\x22 selected>none</option>" +
                                 "<option value=\x22none\x22>none</option>" +
                                 "<option value=\x22primitive_cube\x22>cube</option>" +
                                 "<option value=\x22primitive_sphere\x22>sphere</option>" +
@@ -12641,7 +12642,7 @@ function getAllPeople() {
                             "<div id=\x22selectLocationObject_" + locationID + "\x22>" +
                                 "<label for=\x22\x22>Location Object: </label>" + 
                                 "<select class=\x22form-control objectSelector\x22 id=\x22objectSelect_"+locationID+"\x22>" +
-                                "<option value=\x22\x22 disabled selected>Select : </option>" +
+                                "<option value=\x22none\x22 selected>none</option>" +
                                 "<option value=\x22none\x22> none</option>" +
                                 "</select>" +
                             "</div>" +

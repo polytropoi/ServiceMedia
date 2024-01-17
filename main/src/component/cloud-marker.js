@@ -392,7 +392,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
     remove: function () {
         console.log("removing something!");
     },
-    waitAndLoad: function (name, description, tags, eventData, markerType, scale, modelID) {
+    updateAndLoad: function (name, description, tags, eventData, markerType, scale, modelID) {
         this.data.name = name;
         this.data.description = description;
         this.data.tags = tags;
@@ -400,9 +400,9 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
         this.data.markerType = markerType;
         this.data.scale = scale;
         this.data.modelID = modelID;
-        setTimeout(() => {
+        // setTimeout(() => {
             this.loadModel(modelID);
-        }, 2000);
+        // }, 2000);
     },
     updateMaterials: function () {
         console.log("tryna update material for markertype " + this.data.markerType);
