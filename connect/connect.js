@@ -1318,7 +1318,7 @@ function ReturnLocationTable () { //just show em all now!
             }  else if (localData.locations[i].modelID.toString().includes("sphere")) {
                mAsset = "sphere";
             }  else if (localData.locations[i].modelID.toString().includes("cylinder")) {
-               mAsset = "Cylinder";
+               mAsset = "cylinder";
             } 
            
          }

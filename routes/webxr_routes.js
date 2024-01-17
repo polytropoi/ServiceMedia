@@ -523,6 +523,7 @@ webxr_router.get('/:_id', function (req, res) {
     // let navmarsh = "";
     let navmeshAsset = "";
     let navmeshEntity = "";
+    let surfaceEntity = "";
     let showTransport = false;
     let useNavmesh = false;
     let useSimpleNavmesh = false;
@@ -1026,6 +1027,14 @@ webxr_router.get('/:_id', function (req, res) {
                                     if (sceneResponse.sceneLocations[i].eventData != null && sceneResponse.sceneLocations[i].eventData.length > 4) {
                                         animationComponent = "<script src=\x22https://unpkg.com/aframe-animation-component@5.1.2/dist/aframe-animation-component.min.js\x22></script>"; //unused !NEEDS FIXING - this component could be added more than once
                                     }
+                                }
+                                if (sceneResponse.sceneLocations[i].markerType != undefined && sceneResponse.sceneLocations[i].markerType == "navmesh") { 
+                                    
+                                    sceneModelLocations.push(sceneResponse.sceneLocations[i]); // if no model will set a default below
+                                }
+                                if (sceneResponse.sceneLocations[i].markerType != undefined && sceneResponse.sceneLocations[i].markerType == "surface") { 
+                                    
+                                    sceneModelLocations.push(sceneResponse.sceneLocations[i]); // if no model will set a default below
                                 }
                                 if (sceneResponse.sceneLocations[i].markerType != undefined && sceneResponse.sceneLocations[i].type.toLowerCase() != 'geographic') { //cloudmarkers, special type allows local mods
                                     if (sceneResponse.sceneLocations[i].markerType.toLowerCase() == "placeholder" 
@@ -2528,8 +2537,8 @@ webxr_router.get('/:_id', function (req, res) {
                             // if ((locMdl.eventData != null && locMdl.eventData != undefined && locMdl.eventData.length > 1) && (!locMdl.eventData.includes("noweb"))) {
 
                             //filter out cloudmarker types
-                            // console.log(sceneResponse.sceneModels.indexOf(locMdl.modelID) + " index locMdl deets " + JSON.stringify(locMdl));
-                            if (locMdl.modelID != undefined && locMdl.modelID != "none" && locMdl.markerType != "placeholder"
+                            console.log(locMdl.modelID + " locname " + locMdl.name);
+                            if (locMdl.modelID != undefined && locMdl.modelID != "undefined" && locMdl.modelID != "none" && locMdl.modelID != "" && locMdl.markerType != "placeholder"
                                 && locMdl.markerType != "poi"
                                 && locMdl.markerType != "waypoint"                                
                                 && locMdl.markerType != "trigger"
@@ -2616,6 +2625,16 @@ webxr_router.get('/:_id', function (req, res) {
                                         }
                                         followCurve = "curve-follow=\x22curveData: #p_path; type: parametric_curve; reverse: "+reverse+"; duration: 64; loop: true;\x22";
                                     }
+                                    if (locMdl.markerType && locMdl.markerType == "navmesh") { //use the same one for simple and pathfinding modes
+
+                                        let visible = false;
+                                        if (sceneResponse.sceneTags != null && (sceneResponse.sceneTags.includes('debug'))) {
+                                            visible = true;
+                                        }
+                                        navmeshAsset = "<a-asset-item id=\x22" + m_assetID + "\x22 src=\x22"+ modelURL +"\x22></a-asset-item>";        
+                                        navmeshEntity = "<a-entity id=\x22nav-mesh\x22 nav-mesh nav_mesh_controller visible=\x22"+visible+"\x22 gltf-model=\x22#" + m_assetID + "\x22></a-entity>"; //simple navmesh uses it too!
+                                    }   
+
                                     if (locMdl.eventData != null && locMdl.eventData != undefined && locMdl.eventData.length > 1) { //eventData has info
                                         let groundMod = "";
                                         // console.log("!!!tryna setup animation " + r.eventData);
@@ -2632,17 +2651,8 @@ webxr_router.get('/:_id', function (req, res) {
                                                 if (sceneResponse.sceneTags != null && (sceneResponse.sceneTags.includes('debug'))) {
                                                     visible = true;
                                                 }
-                                                navmeshAsset = "<a-asset-item id=\x22" + m_assetID + "\x22 src=\x22"+ modelURL +"\x22></a-asset-item>";
-                                                // navmeshEntity = "<a-entity nav_mesh scale=\x22"+scale+" "+scale+" "+scale+"\x22> gltf-model=\x22#" + m_assetID + "\x22</a-entity>";
-                                                // navmeshEntity = "<a-entity id=\x22nav_mesh\x22 nav_mesh=\x22show: false;\x22 gltf-model=\x22#" + m_assetID + "\x22></a-entity>";
-                                                // if (locMdl.eventData.toLowerCase().includes("show")) {
-                                                //     navmeshEntity = "<a-entity id=\x22nav_mesh\x22 nav_mesh=\x22show: true;\x22 gltf-model=\x22#" + m_assetID + "\x22></a-entity>";
-                                                // }
+                                                navmeshAsset = "<a-asset-item id=\x22" + m_assetID + "\x22 src=\x22"+ modelURL +"\x22></a-asset-item>";        
                                                 navmeshEntity = "<a-entity id=\x22nav-mesh\x22 nav-mesh nav_mesh_controller visible=\x22"+visible+"\x22 gltf-model=\x22#" + m_assetID + "\x22></a-entity>"; //maybe id=nav-mesh so simple navmesh can use it too?
-                                                // if (locMdl.eventData.toLowerCase().includes("show")) {
-                                                //     navmeshEntity = "<a-entity id=\x22nav-mesh\x22 nav-mesh gltf-model=\x22#" + m_assetID + "\x22></a-entity>";
-                                                // }
-                                            
                                         }
                                         
                                         rightRot = !rightRot;
@@ -2699,8 +2709,11 @@ webxr_router.get('/:_id', function (req, res) {
                                         if (entityType == "poi") { //bc location-fu looks for this class to get gpsElements, so this causes dupes
                                             entityType = "model";
                                         }
-                                        if (locMdl.eventData.toLowerCase().includes("surface")) {
+                                        if (locMdl.markerType == "surface") {
                                             entityType = "surface";
+                                        }
+                                        if (locMdl.markerType == "navmesh") {
+                                            // entityType = "navmesh";
                                         }
 
                                     }
@@ -2786,7 +2799,7 @@ webxr_router.get('/:_id', function (req, res) {
                                                 let brownian = "";
                                                 // let id = "gltf_" + m_assetID;  /////THIS CHANGE COULD BREAK THINGS??? don't think so, but....
                                                 let id = locMdl.timestamp;
-                                                if (locMdl.eventData.toLowerCase().includes("surface")) {
+                                                if (locMdl.markerType == "surface" || locMdl.eventData.toLowerCase().includes("surface")) {
                                                     scatterSurface = "scatter-surface";
                                                     id = 'scatterSurface';
                                                     entityType = "surface";
@@ -2958,7 +2971,29 @@ webxr_router.get('/:_id', function (req, res) {
                                     } 
                                 });
                             } else { //no model, check for placeholders
-                                
+                                console.log("model with no model!!!! " + locMdl.markerType);
+                                if (locMdl.markerType == "navmesh") {
+                                    let visible = false;
+                                    if (sceneResponse.sceneTags != null && (sceneResponse.sceneTags.includes('debug'))) {
+                                        visible = true;
+                                    }
+                                    // navmeshAsset = "<a-asset-item id=\x22" + m_assetID + "\x22 src=\x22"+ modelURL +"\x22></a-asset-item>";
+                                    // geometry=\x22primitive: plane; height: 40; width: 40;\x22        
+                                    navmeshEntity = "<a-entity id=\x22nav-mesh\x22 nav-mesh nav_mesh_controller=\x22useDefault: true;\x22 visible=\x22"+visible+"\x22></a-entity>"; //use big circle if no defined navmesh
+                                }
+                                if (locMdl.markerType == "surface") {
+                                    let visible = false;
+                                    if (sceneResponse.sceneTags != null && (sceneResponse.sceneTags.includes('debug'))) {
+                                        visible = true;
+                                    }
+                                    // navmeshAsset = "<a-asset-item id=\x22" + m_assetID + "\x22 src=\x22"+ modelURL +"\x22></a-asset-item>";        
+                                    // scatterSurface = "scatter-surface";
+                                    // id = 'scatterSurface';
+                                    // entityType = "surface";
+                                    // navmeshEntity = navmeshEntity + "<a-entity class=\x22surface\x22 id=\x22scatterSurface\x22 scatter-surface-default geometry=\x22primitive: plane; height: 50; width: 50;\x22 visible=\x22"+visible+"\x22 position=\x220 .01 0\x22 rotation=\x22-90 0 0\x22></a-entity>"; //use big circle if no defined navmesh
+                                    surfaceEntity = "<a-entity class=\x22surface\x22 id=\x22scatterSurface\x22 scatter-surface-default rotation=\x22-90 0 0\x22 visible=\x22"+visible+"\x22></a-entity>"; //use big circle if no defined navmesh
+
+                                }
                                 callbackz();
                             }
                             // } else {
@@ -5088,6 +5123,7 @@ webxr_router.get('/:_id', function (req, res) {
                         pictureGroupsData +
                         videoGroupsEntity +
                         navmeshEntity +
+                        surfaceEntity +
                         networkingEntity +
                         locationEntity +
                         primaryAudioEntity +

@@ -1761,7 +1761,32 @@ AFRAME.registerComponent('instanced_meshes_mod2', {
 
 });
 // import { MeshSurfaceSampler } from '/three/examples/jsm/math/MeshSurfaceSampler.js'; //can because "type=module"
-
+AFRAME.registerComponent('scatter-surface-default', {
+  init: function () {
+    let that = this;
+    console.log("TRYNA LOAD SCATTER SURFACE");
+    let surfaceGeometry = new THREE.BoxGeometry( 100, .1, 100 ).toNonIndexed();
+    // let surfaceGeometry = new THREE.PlaneGeometry( 66, 66 ).toNonIndexed();
+    const surfaceMaterial = new THREE.MeshLambertMaterial( { opacity: .1, color: "aqua", wireframe: true } );
+    const surface = new THREE.Mesh( surfaceGeometry, surfaceMaterial );
+    // surface.rotation.z = -90;
+    this.el.setObject3D('mesh', surface);
+    
+    // this.el.addEventListener('model-loaded', (event) => {
+      // event.preventDefault();
+      console.log("SCATTER SURFACE LOADED");
+      // that.el.emit('surfaceLoaded', true);
+      
+      // setTimeout(function(){ that.el.emit('surfaceLoaded', true);   }, 2000);// put some fudge, wait a bit for scatter meshes to load before firing
+      let imeshes = document.querySelectorAll("[instanced_surface_meshes]");
+      console.log("gots SCATTER SURFACE imeshes " + imeshes);
+      for (let i = 0; i < imeshes.length; i++) {
+        console.log("imesh " + imeshes[i]);
+        imeshes[i].components.instanced_surface_meshes.surfaceLoaded();
+      }
+    // });
+  }
+});
 
 AFRAME.registerComponent('scatter-surface', {
   init: function () {
@@ -1773,12 +1798,11 @@ AFRAME.registerComponent('scatter-surface', {
       
       // setTimeout(function(){ that.el.emit('surfaceLoaded', true);   }, 2000);// put some fudge, wait a bit for scatter meshes to load before firing
       let imeshes = document.querySelectorAll("[instanced_surface_meshes]");
-      console.log("gots imeshes " + imeshes);
+      console.log("gots SCATTER SURFACE imeshes " + imeshes);
       for (let i = 0; i < imeshes.length; i++) {
         console.log("imesh " + imeshes[i]);
         imeshes[i].components.instanced_surface_meshes.surfaceLoaded();
       }
-    
     });
   }
 });

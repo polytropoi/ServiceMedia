@@ -1398,10 +1398,10 @@ AFRAME.registerComponent('waypoint-snap', {
 }); 
 AFRAME.registerComponent('nav_mesh_controller', {
 	schema:{
-		  waypoints:{type:'array', default:[]},
-		  debug: {default: false}
-
-	  },
+		waypoints:{type:'array', default:[]},
+		debug: {default: false},
+		useDefault: {default: false}
+	},
 	init: function() {
 		this.isReady = false;
 		this.goodWaypoints = [];
@@ -1414,33 +1414,43 @@ AFRAME.registerComponent('nav_mesh_controller', {
 		// this.pathfinder = new Pathfinding();
 		// this.helper = new PathfindingHelper();
 		// this.el.setAttribute
-		this.el.addEventListener('model-loaded', () => {
-			// this.isReady = true;
-			console.log("Navmesh loaddded!!");
+		if (this.data.useDefault) {
+			let navmeshGeometry = new THREE.BoxGeometry( 100, .1, 100 ).toNonIndexed();
+			// let surfaceGeometry = new THREE.PlaneGeometry( 66, 66 ).toNonIndexed();
+			const navmeshMaterial = new THREE.MeshLambertMaterial( { opacity: .1, color: "aqua", wireframe: true } );
+			const navmesh = new THREE.Mesh( navmeshGeometry, navmeshMaterial );
+			this.el.setObject3D('mesh', navmesh);
 			this.mesh = this.el.getObject3D('mesh');
-			// this.mesh.visible = false;
+			this.loadInit();
+		} else {
+			this.el.addEventListener('model-loaded', () => {
+				// this.isReady = true;
+				console.log("Navmesh loaddded!!");
+				this.mesh = this.el.getObject3D('mesh');
+				this.loadInit();
+				// this.mesh.visible = false;
 
-			if (settings.scatterObjects) {
-					console.log("scatter objeect layers " + JSON.stringify(settings.sceneScatterObjectLayers));
-					if (settings.sceneScatterObjectLayers.waypoints) {
-						this.createRandomWaypoints();
-					}
-			} else {
-				if (this.waypoints.length > 0) {
-					this.registerWaypoints();
-				} else {
-					let interval = setInterval( () => { //might take a shake, for local mods especially
-					this.waypoints = document.getElementsByClassName('waypoint');
-					if (this.waypoints.length > 1) {
-						console.log("gots some waypoints length " + this.waypoints.length);
-						this.registerWaypoints();
-						clearInterval(interval);
-					}
-				}, 1000);
-				}
-			} 
-		});
-
+				// if (settings.scatterObjects) {
+				// 	console.log("scatter objeect layers " + JSON.stringify(settings.sceneScatterObjectLayers));
+				// 	if (settings.sceneScatterObjectLayers.waypoints) {
+				// 		this.createRandomWaypoints();
+				// 	}
+				// } else {
+				// 	if (this.waypoints.length > 0) {
+				// 		this.registerWaypoints();
+				// 	} else {
+				// 		let interval = setInterval( () => { //might take a shake, for local mods especially
+				// 		this.waypoints = document.getElementsByClassName('waypoint');
+				// 		if (this.waypoints.length > 1) {
+				// 			console.log("gots some waypoints length " + this.waypoints.length);
+				// 			this.registerWaypoints();
+				// 			clearInterval(interval);
+				// 		}
+				// 	}, 1000);
+				// 	}
+				// } 
+			});
+		}
 				// console.time('createZone()');
 				// this.zone = this.pathfinder.createZone(this.mesh);
 				// console.timeEnd('createZone()');
@@ -1477,6 +1487,27 @@ AFRAME.registerComponent('nav_mesh_controller', {
 		// 	this.isReady = true;
 		// }
 		
+	},
+	loadInit: function () {
+		if (settings.scatterObjects) {
+			console.log("scatter objeect layers " + JSON.stringify(settings.sceneScatterObjectLayers));
+			if (settings.sceneScatterObjectLayers.waypoints) {
+				this.createRandomWaypoints();
+			}
+		} else {
+			if (this.waypoints.length > 0) {
+				this.registerWaypoints();
+			} else {
+				let interval = setInterval( () => { //might take a shake, for local mods especially
+				this.waypoints = document.getElementsByClassName('waypoint');
+				if (this.waypoints.length > 1) {
+					console.log("gots some waypoints length " + this.waypoints.length);
+					this.registerWaypoints();
+					clearInterval(interval);
+				}
+			}, 1000);
+			}
+		} 
 	},
 	amIReady: function () {
 		return this.isReady;
