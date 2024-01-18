@@ -95,6 +95,9 @@ AFRAME.registerComponent('local_marker', { //special items with local mods
                     this.el.setAttribute('gltf-model', '#poi1');
                   } else if (this.data.markerType.toLowerCase() == "poi") {
                     this.el.setAttribute('gltf-model', '#poi1');
+                  } else if (this.data.markerType.toLowerCase() == "waypoint") {
+                    this.el.setAttribute('gltf-model', '#poi1');
+                    this.el.classList.add("waypoint");
                   } else if (this.data.markerType.toLowerCase().includes("trigger")) {
                     this.el.setAttribute('gltf-model', '#poi1');  
                   } else if (this.data.markerType.toLowerCase() == "gate") {
@@ -126,6 +129,8 @@ AFRAME.registerComponent('local_marker', { //special items with local mods
                             // this.el.setAttribute("color", "purple");
                         } else if (this.data.markerType.toLowerCase() == "waypoint") {
                             this.el.setAttribute("material", {color: "green", transparent: true, opacity: .5});
+                            this.el.classList.add("waypoint");
+                            
                             // this.el.setAttribute("color", "purple");
                         } else if (this.data.markerType.toLowerCase().includes("trigger")) {
                             this.el.setAttribute("material", {color: "lime", transparent: true, opacity: .5});
@@ -409,6 +414,7 @@ AFRAME.registerComponent('local_marker', { //special items with local mods
                 transform_controls_component.detachTransformControls();
             }
         }
+        this.el.classList.remove("waypoint");
         this.el.removeAttribute("transform_controls");
         this.el.removeAttribute("geometry");
         this.el.removeAttribute("gltf-model");
@@ -432,6 +438,7 @@ AFRAME.registerComponent('local_marker', { //special items with local mods
                     // this.el.setAttribute("color", "purple");
                 } else if (this.data.markerType.toLowerCase() == "waypoint") {
                     this.el.setAttribute("material", {color: "green", transparent: true, opacity: .5});
+                    this.el.classList.add("waypoint");
                     // this.el.setAttribute("color", "purple");
                 } else if (this.data.markerType.toLowerCase().includes("trigger")) {
                     this.el.setAttribute("material", {color: "lime", transparent: true, opacity: .5});

@@ -1,5 +1,5 @@
 
-////////////////////////// - MOD_MODEL - for "plain" models, these are written (elements + components + props) by the server into response as a-assets, as opposed to "Objects", see mod_objex.js
+////////////////////////// - MOD_MODEL - for "plain" models, these are written (aframe elements + components + assets) by the server into response, as opposed to "Objects", see mod_objex.js
 AFRAME.registerComponent('mod_model', {
     schema: {
         markerType: {default: 'none'},
@@ -75,8 +75,12 @@ AFRAME.registerComponent('mod_model', {
         
         this.calloutString = "";
         this.hitpoint = null;
+
         // console.log("MOD MODEL eventData : " + this.data.eventData);
         this.hitpoint = new THREE.Vector3();
+        this.bubble = null;
+        this.bubbleText = null;
+        
         this.tags = this.data.tags;
         this.font1 = "Acme.woff";
         this.font2 = "Acme.woff";
@@ -143,6 +147,12 @@ AFRAME.registerComponent('mod_model', {
           this.navAgentController = this.el.components.nav_agent_controller;
     
         } 
+        if (this.data.eventData.toLowerCase().includes("callout")) {
+          // this.el.setAttribute("entity-callout", {'calloutString': this.data.description});
+          // this.el.classList.remove("activeObjexRay");
+          this.hasLocationCallout = true;
+          this.hasCallout = true;
+        }
         let that = this;
         ///////////////////////////////////////////////// model loaded event start /////////////////////////////
   
@@ -333,8 +343,8 @@ AFRAME.registerComponent('mod_model', {
   
           
           // this.oScale = oScale;
-          this.bubble = null;
-          this.bubbleText = null;
+          // this.bubble = null;
+          // this.bubbleText = null;
           this.isInitialized = true;
           this.meshChildren = [];
           let theEl = this.el;
@@ -386,12 +396,13 @@ AFRAME.registerComponent('mod_model', {
                 this.el.classList.add("target");
                 this.el.classList.remove("activeObjexRay");
             }
-            if (this.data.eventData.toLowerCase().includes("callout") && this.data.description && this.data.description != "") {
-              // this.el.setAttribute("entity-callout", {'calloutString': this.data.description});
-              this.hasLocationCallout = true;
-              this.hasCallout = true;
-            }
-  
+            // if (this.data.eventData.toLowerCase().includes("callout") && this.data.description && this.data.description != "") {
+            // if (this.data.eventData.toLowerCase().includes("callout")) {
+            //   // this.el.setAttribute("entity-callout", {'calloutString': this.data.description});
+            //   this.hasLocationCallout = true;
+            //   this.hasCallout = true;
+            // }
+            
   
             this.el.addEventListener('raycaster-intersected', e =>{  // raycaster-intersected
               this.raycaster = e.detail.el;
@@ -494,10 +505,10 @@ AFRAME.registerComponent('mod_model', {
                     //   theEl.setAttribute('animation-mixer', {
                     //     "loop": "repeat",
                     //   });
-                    // }
-                    if (idleIndex != -1) {
+                    // }  
+                    if (idleClips.length && idleIndex != -1) {
                       theEl.setAttribute('animation-mixer', {
-                        "clip": clips[idleIndex].name,
+                        "clip": idleClips[idleIndex].name,
                         "loop": "repeat",
                       });
                     }
@@ -1092,17 +1103,17 @@ AFRAME.registerComponent('mod_model', {
             }
         }
   
-        if (this.el.classList.contains('target') || this.data.markerType != "none" || this.hasCallout || this.hasLocationCallout) {
+        if (this.data.markerType == "target" || this.el.classList.contains('target') || this.hasCallout || this.hasLocationCallout) {
           let textIndex = 0;
           this.position = null;
           // let hasBubble = false;
           // let theEl = this.element;
           // this.el.setAttribute('gesture-handler-add'); //ar mode only?
           var sceneEl = document.querySelector('a-scene');
-          let hasCallout = false;
-          if (this.hasCallout || this.hasLocationCallout) {
-            hasCallout = true;
-          }
+          // let hasCallout = false;
+          // if (this.hasCallout || this.hasLocationCallout) {
+          //   hasCallout = true;
+          // }
           let calloutOn = false;
           if (!this.data.eventData.toLowerCase().includes("undefined") && this.data.eventData.toLowerCase().includes("main") && this.data.eventData.toLowerCase().includes("text")) {
             document.getElementById("mainTextToggle").setAttribute("visible", false);
@@ -1111,53 +1122,71 @@ AFRAME.registerComponent('mod_model', {
             textData = tdata.mainTextString.split("~");
             hasCallout = true;
           } else {
+            
             textData = this.data.description.split("~");
+            if (textData.length == 0) {
+              if (this.data.description != ''){
+                textData.push(this.data.description);
+              } else {
+                textData.push(this.data.name);
+              }
+            }
           }
-          if (hasCallout) {
-            let bubble = document.createElement("a-entity");
-            this.bubble = bubble;
-            // console.log("made a bubble!" + this.data.eventData.toLowerCase());
-            let position = this.el.getAttribute("position")
-            bubble.classList.add("bubble");
-            // bubble.setAttribute("position", "2 2 0");
-            // bubble.setAttribute("rotation", "0 0 0"); 
-            // bubble.setAttribute("scale", "2 2 2"); 
-            bubble.setAttribute("visible", false);
+          // if (this.hasCallout || this.hasLocationCallout) {
+            this.bubble = document.createElement("a-entity");
+            // this.bubble = bubble;
+            console.log(this.data.name + " made a bubble! " + this.data.eventData.toLowerCase());
+            // let position = this.el.getAttribute("position")
+            // this.bubble.classList.add(".bubble");
+            // this.bubble.setAttribute("position", "2 2 0");
+            // this.bubble.setAttribute("rotation", "0 0 0"); 
+            // this.bubble.setAttribute("scale", "2 2 2"); 
+            this.bubble.setAttribute("visible", false);
+                        // let bubbleText = document.createElement("a-text");
+            this.bubbleText = document.createElement("a-entity");
+
+            this.bubbleText.classList.add("bubbleText");
+            // bubbleText.setAttribute("visible", false);
+          
+            // bubbleText.setAttribute("scale", ".1 .1 .1"); 
+            this.bubble.appendChild(this.bubbleText);
+
             if (this.data.eventData.toLowerCase().includes('agent')) {
   
   
-              this.el.appendChild(bubble); //make it a child if
-              bubble.setAttribute("position", "0 1 0");
-              bubble.setAttribute("rotation", "0 0 0"); 
+              this.el.appendChild(this.bubble); //make it a child if
+              this.bubble.setAttribute("position", "0 1 0");
+              this.bubble.setAttribute("rotation", "0 0 0"); 
   
             } else {
-              sceneEl.appendChild(bubble); //or else put at top
-              bubble.setAttribute("position", "2 2 0");
-              bubble.setAttribute("rotation", "0 0 0"); 
+              sceneEl.appendChild(this.bubble); //or else put at top
+              this.bubble.setAttribute("position", "2 2 0");
+              this.bubble.setAttribute("rotation", "0 0 0"); 
             }
+            this.bubbleText.setAttribute("position", "0 0 -20");
             
-            bubbleBackground = null;
+            this.bubbleBackground = null;
             if (this.data.eventData.toLowerCase().includes("thought")) {
               this.hasCalloutBackground = true;
               // bubble.setAttribute("look-at", "#player");
               if (settings && settings.sceneCameraMode == "Third Person") {
-                bubble.setAttribute('look-at', '#thirdPersonCamera'); //toggle by eventData
+                this.bubble.setAttribute('look-at', '#thirdPersonCamera'); //toggle by eventData
               } else {
-                bubble.setAttribute('look-at', '#player'); //first person camrig
+                this.bubble.setAttribute('look-at', '#player'); //first person camrig
               }
               console.log("ttryhana put a thought bubble on mod_model");
-              bubbleBackground = document.createElement("a-entity");
-              bubbleBackground.classList.add("bubbleBackground");
-              bubbleBackground.setAttribute("gltf-model", "#thoughtbubble"); //just switch this for other callout types (speech and plain callout)
-              bubbleBackground.setAttribute("position", "0 0 1");
-              bubbleBackground.setAttribute("rotation", "0 0 0"); 
-              // bubbleBackground.setAttribute("scale", "-.1 .1 .1"); 
+              this.bubbleBackground = document.createElement("a-entity");
+              this.bubbleBackground.classList.add("bubbleBackground");
+              this.bubbleBackground.setAttribute("gltf-model", "#thoughtbubble"); //just switch this for other callout types (speech and plain callout)
+              this.bubbleBackground.setAttribute("position", "0 0 1");
+              this.bubbleBackground.setAttribute("rotation", "0 0 0"); 
+              // this.bubbleBackground.setAttribute("scale", "-.1 .1 .1"); 
               // bubble.setAttribute("material", {"color": "white", "blending": "additive", "transparent": false, "alphaTest": .5});
-              bubbleBackground.setAttribute("material", {"color": "white", "shader": "flat"}); //doh, doesn't work for gltfs... 
-              bubble.appendChild(bubbleBackground);
+              this.bubbleBackground.setAttribute("material", {"color": "white", "shader": "flat"}); //doh, doesn't work for gltfs... 
+              this.bubble.appendChild(this.bubbleBackground);
   
-              bubbleBackground.addEventListener('model-loaded', () => {
-                const bubbleObj = bubbleBackground.getObject3D('mesh');
+              this.bubbleBackground.addEventListener('model-loaded', () => {
+                const bubbleObj = this.bubbleBackground.getObject3D('mesh');
                 // var material = new THREE.MeshBasicMaterial({map: bubbleObj.material.map}); 
                 // material.color = "white";
                 bubbleObj.traverse(node => {
@@ -1171,22 +1200,22 @@ AFRAME.registerComponent('mod_model', {
               this.hasCalloutBackground = true;
               // bubble.setAttribute("look-at", "#player");
               if (settings && settings.sceneCameraMode == "Third Person") {
-                bubble.setAttribute('look-at', '#thirdPersonCamera'); //toggle by eventData
+                this.bubble.setAttribute('look-at', '#thirdPersonCamera'); //toggle by eventData
               } else {
-                bubble.setAttribute('look-at', '#player'); //first person camrig
+                this.bubble.setAttribute('look-at', '#player'); //first person camrig
               }
-              bubbleBackground = document.createElement("a-entity");
-              bubbleBackground.classList.add("bubbleBackground");
-              bubbleBackground.setAttribute("gltf-model", "#talkbubble"); 
-              bubbleBackground.setAttribute("position", "0 0 0");
-              bubbleBackground.setAttribute("rotation", "0 0 0"); 
-              // bubbleBackground.setAttribute("scale", "-.1 .1 .1"); 
+              this.bubbleBackground = document.createElement("a-entity");
+              this.bubbleBackground.classList.add("bubbleBackground");
+              this.bubbleBackground.setAttribute("gltf-model", "#talkbubble"); 
+              this.bubbleBackground.setAttribute("position", "0 0 0");
+              this.bubbleBackground.setAttribute("rotation", "0 0 0"); 
+              // this.bubbleBackground.setAttribute("scale", "-.1 .1 .1"); 
               // bubble.setAttribute("material", {"color": "white", "blending": "additive", "transparent": false, "alphaTest": .5});
-              bubbleBackground.setAttribute("material", {"color": "white", "shader": "flat"}); //doh, doesn't work for gltfs... 
-              bubble.appendChild(bubbleBackground);
+              this.bubbleBackground.setAttribute("material", {"color": "white", "shader": "flat"}); //doh, doesn't work for gltfs... 
+              this.bubble.appendChild(this.bubbleBackground);
   
-              bubbleBackground.addEventListener('model-loaded', () => {
-                const bubbleObj = bubbleBackground.getObject3D('mesh');
+              this.bubbleBackground.addEventListener('model-loaded', () => {
+                const bubbleObj = this.bubbleBackground.getObject3D('mesh');
                 // var material = new THREE.MeshBasicMaterial({map: bubbleObj.material.map}); 
                 // material.color = "white";
                 bubbleObj.traverse(node => {
@@ -1197,21 +1226,22 @@ AFRAME.registerComponent('mod_model', {
                 });
             }
             
-            // let bubbleText = document.createElement("a-text");
-            let bubbleText = document.createElement("a-entity");
+            // // let bubbleText = document.createElement("a-text");
+            // this.bubbleText = document.createElement("a-entity");
   
-            bubbleText.classList.add("bubbleText");
-            // bubbleText.setAttribute("visible", false);
-            // bubbleText.setAttribute("position", "0 0 0");
-            // bubbleText.setAttribute("scale", ".1 .1 .1"); 
-            bubble.appendChild(bubbleText);
+            // this.bubbleText.classList.add("bubbleText");
+            // // bubbleText.setAttribute("visible", false);
+           
+            // // bubbleText.setAttribute("scale", ".1 .1 .1"); 
+            // this.bubble.appendChild(this.bubbleText);
+            // this.bubbleText.setAttribute("position", "0 0 1");
             if (settings && settings.sceneCameraMode == "Third Person") {
-              bubbleText.setAttribute('look-at', '#thirdPersonCamera'); //toggle by eventData
+              this.bubble.setAttribute('look-at', '#thirdPersonCamera'); //toggle by eventData
             } else {
-              bubbleText.setAttribute('look-at', '#player'); //first person camrig
+              this.bubble.setAttribute('look-at', '#player'); //first person camrig
             }
             // bubbleText.setAttribute("look-at", "#player");
-            this.bubbleText = bubbleText;
+            // this.bubbleText = bubbleText;
             // bubbleText.setAttribute("width", 3);
             // bubbleText.setAttribute("height", 2);
             
@@ -1249,7 +1279,7 @@ AFRAME.registerComponent('mod_model', {
               }
             }, 2000);
             */
-          }
+          // }
   
           let primaryAudio = document.getElementById("primaryAudio");
           if (primaryAudio != null) {
@@ -1267,7 +1297,7 @@ AFRAME.registerComponent('mod_model', {
             this.el.addEventListener('click', function () {
   
 
-              this.bubble = sceneEl.querySelector('.bubble');
+              // this.bubble = sceneEl.querySelector('.bubble');
               if (this.bubble) {
                 this.bubble.setAttribute('visible', false);
               }
@@ -1336,20 +1366,30 @@ AFRAME.registerComponent('mod_model', {
             }  
           });
           this.el.addEventListener('mouseenter', (evt) =>  {
-            console.log("MOD_MODEL mouseovewr model " + this.el.id + this.hasLocationCallout + this.data.markerType + this.hasCallout + this.hasCalloutBackground + textData[textIndex]);
-            if (evt.detail.intersection != null && this.hitpoint != null) {
-              if (this.calloutString == "") {
+            // console.log("MOD_MODEL mouseovewr model " + this.el.id + this.hasLocationCallout + this.data.markerType + this.hasCallout + evt.detail);
+           
+            if (evt.detail.intersection != null) {
+              if (textData.length > 0) {
                 this.calloutString = textData[textIndex];
+              } else {
+                
+                this.calloutString = this.data.name;
               }
-              // if (hasCallout && !textData[textIndex].toLowerCase().includes("undefined")) {
-            if (this.hasCallout || hasCallout || this.hasLocationCallout) {
-               
+    
+              console.log("MOD_MODEL mouseover markerType " + this.data.markerType);
                 let pos = evt.detail.intersection.point; //hitpoint on model
                 // this.bubble.setAttribute('position', {"x": pos.x.toFixed(2), "y": pos.y.toFixed(2), "z": pos.z.toFixed(2)});
-                if (this.data.eventData.toLowerCase().includes("agent")) {
-                  this.bubble.setAttribute('position', '0 1 0');
-                } else {
-                  this.bubble.setAttribute('position', evt.detail.intersection.point);
+                if (this.bubble) {
+                  this.bubble.setAttribute('visible', true);
+                  if (this.data.eventData.toLowerCase().includes("agent")) {
+                    this.bubble.setAttribute('position', '0 1 0');
+                  } else {
+                    this.bubble.setAttribute('position', evt.detail.intersection.point);
+                    this.bubbleText.setAttribute('position', '0 0 .9');
+                    console.log("tryna show callout " + this.calloutString);
+                  }
+                }  else {
+                  console.log("this.bubble not found!");
                 }
                 
   
@@ -1357,31 +1397,15 @@ AFRAME.registerComponent('mod_model', {
                 if (settings && settings.sceneFontWeb2 && settings.sceneFontWeb2.length) {
                   this.font2 = settings.sceneFontWeb2;
                 }
-    
-              // if (pos.x != NaN) { //does it twice because matrix set, disregard if it returns NaN :( //fixed?
-              //   console.log("screen position: " + (pos.x/width).toFixed(1) + " " + (pos.y/height).toFixed(1)); //"viewport position"
-              // }
-              
-              
-              // this.distance = window.playerPosition.distanceTo( this.hitpoint );
              
               let distance = evt.detail.intersection.distance;
               this.distance = distance;
-              // console.log("callout is " + this.calloutString + " distance " + distance);
-              // if (distance) { //
   
               if (this.hasCalloutBackground && distance) { //eg thought or speech bubble
                 if (distance < 10) {
                   const min = .1;
                   const max = 1;
-  
                   calloutOn = true;
-                  this.bubble = sceneEl.querySelector('.bubble'); //TODO should not be a class, but a generated id
-                  this.bubbleText = sceneEl.querySelector('.bubbleText'); //same
-                  this.bubbleBackground = sceneEl.querySelector('.bubbleBackground'); //same
-      
-                 
-                  
                   this.bubble.setAttribute("visible", true);
                   this.bubbleText.setAttribute("visible", true);
       
@@ -1399,20 +1423,20 @@ AFRAME.registerComponent('mod_model', {
                   if ((pos.x/width) < .5) {
                     console.log("flip left");
                     if (this.bubbleBackground) {
-                      this.bubbleBackground.setAttribute("position", ".5 .2 .5");
+                      this.bubbleBackground.setAttribute("position", "1.5 .2 .5");
                       // this.bubbleBackground.setAttribute("scale", "-.2 .2 .2"); 
                       // this.bubbleBackground.setAttribute('scale', {x: distance * -.05, y: distance * .05, z: distance * .05} );
                       this.bubbleBackground.setAttribute('scale', {x: scaleFactor * -1, y: scaleFactor, z: scaleFactor} );
                     }
                     // this.bubbleText.setAttribute("scale", ".2 .2 .2"); 
-                    this.bubbleText.setAttribute("position", ".5 .2 .6");
+                    this.bubbleText.setAttribute("position", "1.5 .2 .6");
                     // this.bubbleText.setAttribute('scale', {x: distance * .05, y: distance * .05, z: distance * .05} );
                     this.bubbleText.setAttribute('scale', {x: scaleFactor, y: scaleFactor, z: scaleFactor} );
                   } else {
                   // if ((pos.x/width) > .5) {
                     console.log("flip right");
                     if (this.bubbleBackground) {
-                      this.bubbleBackground.setAttribute("position", "-.5 .2 .5");
+                      this.bubbleBackground.setAttribute("position", "-1.5 .2 .5");
                       // this.bubbleBackground.setAttribute('scale', {x: distance * .05, y: distance * .05, z: distance * .05} );
                       this.bubbleBackground.setAttribute('scale', {x: scaleFactor, y: scaleFactor, z: scaleFactor} );
                       // this.bubbleBackground.setAttribute("scale", ".2 .2 .2"); 
@@ -1421,9 +1445,9 @@ AFRAME.registerComponent('mod_model', {
                     // this.bubbleText.setAttribute("scale", ".2 .2 .2")
                     // this.bubbleText.setAttribute('scale', {x: distance * .05, y: distance * .05, z: distance * .05} );
                     this.bubbleText.setAttribute('scale', {x: scaleFactor, y: scaleFactor, z: scaleFactor} );
-                    this.bubbleText.setAttribute("position", "-.5 .2 .6");
+                    this.bubbleText.setAttribute("position", "-1.5 .2 .6");
                   }
-  
+                 
                   this.bubbleText.setAttribute('troika-text', {
                     baseline: "center",
                     align: "center",
@@ -1435,7 +1459,7 @@ AFRAME.registerComponent('mod_model', {
                     color: "black",
                     outlineColor: "white",
                     outlineWidth: "2%",
-                    value: textData[textIndex]
+                    value: this.calloutString
                   });
                 } else {
                   console.log("tryna show bubble!");
@@ -1443,8 +1467,6 @@ AFRAME.registerComponent('mod_model', {
                   this.bubbleBackground.setAttribute('scale', '1 1 1');
                   this.bubbleText.setAttribute('scale', '1 1 1' );
                 }
-    
-  
               } else {
                 if (this.hasLocationCallout || this.data.markerType === "character") {
                   // console.log("mod_model not bubble callout is " + textData[textIndex]);
@@ -1466,44 +1488,40 @@ AFRAME.registerComponent('mod_model', {
                     color: "white",
                     outlineColor: "black",
                     outlineWidth: "2%",
-                    value: textData[textIndex]
+                    value: this.calloutString
                   });
                 }
-    
-  
               }
-  
-  
               if (textIndex < textData.length - 1) {
                 textIndex++;
               } else {
                 textIndex = 0;
                 }
-              }
+            }
   
               // console.log("tryna play audiotrigger " + JSON.stringify(this.data.eventData));
-              if (this.data.tags != undefined && this.data.tags != null && this.data.tags != "undefined") {
-                console.log("tryna play audio with tags " + this.data.tags);
-                // if (this.triggerAudioController != null) {
-                //   this.triggerAudioController.components.trigger_audio_control.playAudio();
-                
-                  if (this.triggerAudioController != null) {
-                    let distance = window.playerPosition.distanceTo(evt.detail.intersection.point);
-                    this.triggerAudioController.components.trigger_audio_control.playAudioAtPosition(evt.detail.intersection.point, distance, this.data.tags, 1);//tagmangler needs an array, add vol mod 
-                  }
-                // }
-              }
-  
-              if (this.data.eventData && this.data.eventData.length && this.data.eventData.toLowerCase().includes("target")) {
-                  // this.el.setAttribute("targeting_raycaster", {'init': true}); //no
-                  this.el.classList.add("target");
-                  this.el.classList.remove("activeObjexRay");
-                
-          
-  
-              }
-            
+            if (this.data.tags != undefined && this.data.tags != null && this.data.tags != "undefined") {
+              console.log("tryna play audio with tags " + this.data.tags);
+              // if (this.triggerAudioController != null) {
+              //   this.triggerAudioController.components.trigger_audio_control.playAudio();
+              
+                if (this.triggerAudioController != null) {
+                  let distance = window.playerPosition.distanceTo(evt.detail.intersection.point);
+                  this.triggerAudioController.components.trigger_audio_control.playAudioAtPosition(evt.detail.intersection.point, distance, this.data.tags, 1);//tagmangler needs an array, add vol mod 
+                }
+              // }
             }
+
+            if (this.data.eventData && this.data.eventData.length && this.data.eventData.toLowerCase().includes("target")) {
+                // this.el.setAttribute("targeting_raycaster", {'init': true}); //no
+                this.el.classList.add("target");
+                this.el.classList.remove("activeObjexRay");
+              
+        
+
+            }
+            
+            // }
             if (this.isNavAgent) {
               if (this.navAgentController && this.navAgentController.currentState != "dialog") {
                 this.navAgentController.updateAgentState("greet player");

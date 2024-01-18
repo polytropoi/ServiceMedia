@@ -1216,135 +1216,135 @@ AFRAME.registerComponent('object_raycaster', {
     }())
   });
 
-//uses threejs pathfinding, from aframe-extras //?
-AFRAME.registerComponent('nav_mesh', { 
-    schema: {
-      initialized: {default: false},
-      show: {default: false}
-    },
-    init: function(){
-        // this.tick = AFRAME.utils.throttleTick(this.tick, 100, this);
-        this.navmesh = null;
-        console.log("tryna init navmesh + show " + this.data.show);
-        this.navmeshIsActive = true;
-        this.showMesh = false;
-        this.el.addEventListener('model-loaded', () => {
-            const obj = this.el.getObject3D('mesh');
+// //uses threejs pathfinding, from aframe-extras //? //nope, see nav_mesh_controller
+// AFRAME.registerComponent('nav_mesh', { 
+//     schema: {
+//       initialized: {default: false},
+//       show: {default: false}
+//     },
+//     init: function(){
+//         // this.tick = AFRAME.utils.throttleTick(this.tick, 100, this);
+//         this.navmesh = null;
+//         console.log("tryna init navmesh + show " + this.data.show);
+//         this.navmeshIsActive = false;
+//         this.showMesh = false;
+//         this.el.addEventListener('model-loaded', () => {
+//             const obj = this.el.getObject3D('mesh');
         
-            // _navmesh.material.visible = false;
-            if (!this.data.show) {
-                // obj.visible = false;
-            }
-            obj.traverse((node) => {
-                if (node.isMesh) this.navmesh = node;
-                this.initPathfinding();
-            });     
-        });
+//             // _navmesh.material.visible = false;
+//             if (!this.data.show) {
+//                 // obj.visible = false;
+//             }
+//             obj.traverse((node) => {
+//                 if (node.isMesh) this.navmesh = node;
+//                 this.initPathfinding();
+//             });     
+//         });
         
-    },
-    initPathfinding: function () {
-        THREE.Pathfinding = window.threePathfinding.Pathfinding;
-        THREE.PathfindingHelper = threePathfinding.PathfindingHelper;
-        const pathfinder = new THREE.Pathfinding();
-        const helper = new THREE.PathfindingHelper();
-        const ZONE = 'level';
+//     },
+//     initPathfinding: function () {
+//         THREE.Pathfinding = window.threePathfinding.Pathfinding;
+//         THREE.PathfindingHelper = threePathfinding.PathfindingHelper;
+//         const pathfinder = new THREE.Pathfinding();
+//         const helper = new THREE.PathfindingHelper();
+//         const ZONE = 'level';
   
-        if (this.navmesh != null) {
-            console.time('createZone()');
-            const zone = THREE.Pathfinding.createZone(this.navmesh.geometry);
-            console.timeEnd('createZone()');
-            pathfinder.setZoneData( ZONE, zone );
-            this.pathfinder = pathfinder;
-            this.helper = helper;
-            this.player = document.getElementById("player");
-            this.zone = ZONE;
-            this.lastPosition = null;
-            this.clamped = new THREE.Vector3();  
-            this.closestPlayerNode = null;
-            this.groupID = null;
-            this.distance = 0;
-            this.get_pos_rot = document.getElementById("player").components.get_pos_rot; 
-            this.posReader = null;
-            if (this.get_pos_rot != null) {
-                this.posReader = this.get_pos_rot.returnPos();
-            }
-        // this.resetNavmesh();
-            
-        }
-    },
-    stick: function () {
+//         if (this.navmesh != null) {
+//             console.time('createZone()');
+//             const zone = THREE.Pathfinding.createZone(this.navmesh.geometry);
+//             console.timeEnd('createZone()');
+//             pathfinder.setZoneData( ZONE, zone );
+//             this.pathfinder = pathfinder;
+//             this.helper = helper;
+//             this.player = document.getElementById("player");
+//             this.zone = ZONE;
+//             this.lastPosition = null;
+//             this.clamped = new THREE.Vector3();  
+//             this.closestPlayerNode = null;
+//             this.groupID = null;
+//             this.distance = 0;
+//             this.get_pos_rot = document.getElementById("player").components.get_pos_rot; 
+//             this.posReader = null;
+//             if (this.get_pos_rot != null) {
+//                 this.posReader = this.get_pos_rot.returnPos();
+//             }
+//         // this.resetNavmesh();
+// 		this.navmeshIsActive = true;
+//         }
+//     },
+//     stick: function () {
       
-        // console.log(this.navmeshIsActive + " this.distance " + this.distance);// + " " + JSON.stringify(this.lastPosition) + " " + this.posReader);
-        // if (this.navmeshIsActive) {
-            if (this.posReader != null && this.pathfinder != null) {
-                // console.log("tyrna tick" + JSON.stringify(this.lastPosition ));
+//         // console.log(this.navmeshIsActive + " this.distance " + this.distance);// + " " + JSON.stringify(this.lastPosition) + " " + this.posReader);
+//         // if (this.navmeshIsActive) {
+//             if (this.posReader != null && this.pathfinder != null) {
+//                 // console.log("tyrna tick" + JSON.stringify(this.lastPosition ));
                 
-                if (this.lastPosition != null && this.lastPosition.x != 0 && this.lastPosition .z != 0) {
-                this.helper.reset();
-                this.helper.setPlayerPosition(this.lastPosition);
-                this.groupID = this.pathfinder.getGroup( this.zone, this.lastPosition);
-                // this.lastPosition = null;
-                if (this.groupID != null && this.lastPosition != null) {
-                    this.closestPlayerNode = this.pathfinder.getClosestNode( this.lastPosition, this.zone, this.groupID );
-                        if (this.closestPlayerNode != null && this.lastPosition != null) {
-                        this.pathfinder.clampStep(this.lastPosition, this.posReader, this.closestPlayerNode, this.zone, this.groupID, this.clamped );
-                        this.clamped.y = (this.clamped.y + 1.6).toFixed(2);
-                        this.clamped.x = this.clamped.x.toFixed(2);
-                        this.clamped.z = this.clamped.z.toFixed(2);
+//                 if (this.lastPosition != null && this.lastPosition.x != 0 && this.lastPosition .z != 0) {
+//                 this.helper.reset();
+//                 this.helper.setPlayerPosition(this.lastPosition);
+//                 this.groupID = this.pathfinder.getGroup( this.zone, this.lastPosition);
+//                 // this.lastPosition = null;
+//                 if (this.groupID != null && this.lastPosition != null) {
+//                     this.closestPlayerNode = this.pathfinder.getClosestNode( this.lastPosition, this.zone, this.groupID );
+//                         if (this.closestPlayerNode != null && this.lastPosition != null) {
+//                         this.pathfinder.clampStep(this.lastPosition, this.posReader, this.closestPlayerNode, this.zone, this.groupID, this.clamped );
+//                         this.clamped.y = (this.clamped.y + 1.6).toFixed(2);
+//                         this.clamped.x = this.clamped.x.toFixed(2);
+//                         this.clamped.z = this.clamped.z.toFixed(2);
                         
-                        // console.log(JSON.stringify(window.playerPosition) + " vs clamped :" + JSON.stringify(this.clamped));
-                        // this.player.object3D.position.copy(this.clamped);
-                        if (this.lastPosition != null && this.clamped != null) {
-                            this.distance = this.lastPosition.distanceTo(this.clamped); 
-                            console.log(JSON.stringify(this.lastPosition) + " vs clamped :" + JSON.stringify(this.clamped) + 'distance: ' + this.distance);
+//                         // console.log(JSON.stringify(window.playerPosition) + " vs clamped :" + JSON.stringify(this.clamped));
+//                         // this.player.object3D.position.copy(this.clamped);
+//                         if (this.lastPosition != null && this.clamped != null) {
+//                             this.distance = this.lastPosition.distanceTo(this.clamped); 
+//                             console.log(JSON.stringify(this.lastPosition) + " vs clamped :" + JSON.stringify(this.clamped) + 'distance: ' + this.distance);
                             
-                            if (this.distance > .2) {
-                                this.player.components.player_mover.move('player', this.clamped, null, 0);
-                            } 
-                            if (this.distance > 2) {
-                                console.log("navmeshIsActive false");
-                                // that.navmeshIsActive = null;
-                                this.resetNavmesh(); //elsewise she gets lost...
+//                             if (this.distance > .2) {
+//                                 this.player.components.player_mover.move('player', this.clamped, null, 0);
+//                             } 
+//                             if (this.distance > 2) {
+//                                 console.log("navmeshIsActive false");
+//                                 // that.navmeshIsActive = null;
+//                                 this.resetNavmesh(); //elsewise she gets lost...
                                 
-                                // this.resetNavmesh();
-                                }
-                            }
-                        }
-                    }
-                    this.lastPosition = this.posReader;         
-                } else {
-                    this.lastPosition = this.posReader;
-                }
+//                                 // this.resetNavmesh();
+//                                 }
+//                             }
+//                         }
+//                     }
+//                     this.lastPosition = this.posReader;         
+//                 } else {
+//                     this.lastPosition = this.posReader;
+//                 }
             
-        } else { 
-            this.get_pos_rot = document.getElementById("player").components.get_pos_rot; 
-            if (this.get_pos_rot) {
-                this.posReader = this.get_pos_rot.returnPos();
-            }    
-        }
-    // }//navmeshisactive
-    },
-    resetNavmesh: function () {
-        // this.navmeshIsActive = false;
-        this.pasthfinder = null;
-        this.posReader = null;
-        this.lastPosition = null;
-        this.clamped = null;
-        this.distance = 0;
-        GoToNext();
-        this.initPathfinding();
-        // setTimeout(function () {
+//         } else { 
+//             this.get_pos_rot = document.getElementById("player").components.get_pos_rot; 
+//             if (this.get_pos_rot) {
+//                 this.posReader = this.get_pos_rot.returnPos();
+//             }    
+//         }
+//     // }//navmeshisactive
+//     },
+//     resetNavmesh: function () {
+//         // this.navmeshIsActive = false;
+//         this.pasthfinder = null;
+//         this.posReader = null;
+//         this.lastPosition = null;
+//         this.clamped = null;
+//         this.distance = 0;
+//         GoToNext();
+//         this.initPathfinding();
+//         // setTimeout(function () {
             
-        //     this.navmeshIsActive = true;
-        //     console.log(this.navmeshIsActive);
-        // }, 1000);
-    },
-    showHideNavmesh: function () {
-        this.showMesh = !this.showMesh;
-        this.el.getObject3D('mesh').visible = this.showMesh;
-    }
+//         //     this.navmeshIsActive = true;
+//         //     console.log(this.navmeshIsActive);
+//         // }, 1000);
+//     },
+//     showHideNavmesh: function () {
+//         this.showMesh = !this.showMesh;
+//         this.el.getObject3D('mesh').visible = this.showMesh;
+//     }
 
-});
+// });
 
 AFRAME.registerComponent('rotate_player_camera', { 
     schema: {
@@ -1495,17 +1495,19 @@ AFRAME.registerComponent('nav_mesh_controller', {
 				this.createRandomWaypoints();
 			}
 		} else {
-			if (this.waypoints.length > 0) {
+			this.waypoints = document.getElementsByClassName('waypoint');
+			if (this.waypoints.length > 2) {
+				console.log("TOTAL WAYPOINTS IS " + this.waypoints.length);
 				this.registerWaypoints();
 			} else {
 				let interval = setInterval( () => { //might take a shake, for local mods especially
 				this.waypoints = document.getElementsByClassName('waypoint');
-				if (this.waypoints.length > 1) {
+				if (this.waypoints.length > 2) {
 					console.log("gots some waypoints length " + this.waypoints.length);
 					this.registerWaypoints();
 					clearInterval(interval);
 				}
-			}, 1000);
+				}, 1000);
 			}
 		} 
 	},
@@ -1521,10 +1523,10 @@ AFRAME.registerComponent('nav_mesh_controller', {
 		// let results = [];
 		let goodWaypointCount = 0;
 		for (let i = 0; i < this.waypoints.length; i++) {
-			if (goodWaypointCount > 1) {
-				console.log("gots 2+ defined goodwaypoints");
-				this.almostReady();
-			}
+			// if (goodWaypointCount > 2) {
+			// 	console.log("gots 2+ defined goodwaypoints");
+			// 	this.almostReady();
+			// }
 
 				let position = this.waypoints[i].getAttribute('position');
 				var testLineMaterial = new THREE.LineBasicMaterial({ color: 0xFF0000 });
@@ -1557,9 +1559,10 @@ AFRAME.registerComponent('nav_mesh_controller', {
 				console.log('bad nav waypoint');
 				// waypoints.splice(i, 1);
 			}
-			// if (i == this.waypoints.length - 1) {
-			// 	this.isReady = true;
-			// }
+			if (i == this.waypoints.length - 1) {
+				console.log("gots 2+ defined goodwaypoints");
+				this.almostReady();
+			}
 		} 
 	
 		
@@ -1639,7 +1642,7 @@ AFRAME.registerComponent('nav_mesh_controller', {
 	almostReady: function () {
 		setTimeout( () => {
 			this.isReady = true;
-		}, 1000);
+		}, 4000);
 		
 	}
 });
@@ -1683,6 +1686,9 @@ AFRAME.registerComponent('nav_agent_controller', {
 		this.currentSpeed = 1;
 		//////////loop to get navmesh
 		let interval = setInterval( () => { //make sure navmesh and controller are ready
+		// this.el.setAttribute('nav-agent', {
+		// 	active:false
+		// });
 		let navMeshControllerEl = document.getElementById("nav-mesh");
 
 			if (navMeshControllerEl) {

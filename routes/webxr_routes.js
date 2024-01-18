@@ -1668,6 +1668,7 @@ webxr_router.get('/:_id', function (req, res) {
                                 let tweakColors = "";
                                 let sunVector = "0 -.5 -.5";
                                 let intensity = "2";
+                                let envLighting = "lighting: distant"; //default
                             //default lights, 
    
                             if (sceneResponse.sceneWebXREnvironment != null && sceneResponse.sceneWebXREnvironment != "none" && sceneResponse.sceneWebXREnvironment != "") {
@@ -1696,12 +1697,13 @@ webxr_router.get('/:_id', function (req, res) {
                                     ground = "ground: flat; dressing: none;"
                                 }
                                 if (sceneResponse.sceneUseDynamicShadows) {
-                                    shadow = "shadow: true; shadowSize: 10;"
+                                    shadow = "shadow: true; shadowSize: 50;"
                                 } else {
                                     shadow = " shadow: false ";
                                 }
                                 if (sceneResponse.sceneTweakColors) {
                                     // tweakColors = "mod-colors"; //need to animate
+                                    envLighting = "lighting: none";
                                 }
 
                                 if (sceneResponse.sceneUseGlobalFog || sceneResponse.sceneUseSceneFog) {
@@ -1726,11 +1728,12 @@ webxr_router.get('/:_id', function (req, res) {
                                 }      
                                 // "+ground+"
                                 aframeEnvironment = "<a-entity id=\x22enviroEl\x22 environment=\x22preset: "+webxrEnv+"; "+ground+" "+fog+" "+shadow+" "+groundcolor+" "+dressingcolor+" "+groundcolor2+" "+skycolor+" "+horizoncolor+
-                                " playArea: 25; lighting: distant;\x22 hide-in-ar-mode "+tweakColors+"></a-entity>";
+                                " playArea: 25; "+envLighting+";\x22 hide-in-ar-mode "+tweakColors+"></a-entity>";
                                 // environment = "<a-entity environment=\x22preset: "+webxrEnv+"; "+fog+" "+shadow+" "+groundcolor+" "+dressingcolor+" "+groundcolor2+" "+skycolor+" "+horizoncolor+" playArea: 3; lightPosition: 0 2.15 0\x22 hide-in-ar-mode></a-entity>";
                             } else {
                                 if (sceneResponse.sceneUseDynamicShadows) {
-                                    shadow = " light=\x22castShadow: true\x22 shadow-camera-automatic=\x22.activeObjexRay\x22 ";
+                                    // shadow = " light=\x22castShadow: true\x22 shadow-camera-automatic=\x22.activeObjexRay\x22 ";
+                                    shadow = " light=\x22castShadow: true\x22 ";
                                 }
                                 if (sceneResponse.sceneSunVector) {
                                     sunVector = sceneResponse.sceneSunVector;
@@ -1745,9 +1748,9 @@ webxr_router.get('/:_id', function (req, res) {
                                     // "</a-light>";
                                     
                                     //default lights
-                                lightEntities = "<a-light visible=\x22true\x22 show-in-ar-mode id=\x22real-light\x22 type=\x22directional\x22 "+shadow+" position=\x221 1 1\x22 color=\x22"+sceneResponse.sceneColor1+"\x22 "+
-                                "groundColor=\x22"+sceneResponse.sceneColor2+"\x22 intensity=\x221.5\x22 target=\x22#directionaltarget\x22><a-entity id=\x22directionaltarget\x22 position=\x22"+sunVector+"\x22></a-entity></a-light>" +
-                                "<a-light type='ambient' intensity=\x22.5\x22 color='" + sceneResponse.sceneColor2 + "'></a-light>";    
+                                    lightEntities = "<a-light visible=\x22true\x22 show-in-ar-mode id=\x22real-light\x22 type=\x22directional\x22 "+shadow+" position=\x221 1 1\x22 color=\x22"+sceneResponse.sceneColor1+"\x22 "+
+                                    "groundColor=\x22"+sceneResponse.sceneColor2+"\x22 intensity=\x22.5\x22 target=\x22#directionaltarget\x22><a-entity id=\x22directionaltarget\x22 position=\x22"+sunVector+"\x22></a-entity></a-light>" +
+                                    "<a-light type='ambient' intensity=\x22.1\x22 color='" + sceneResponse.sceneColor2 + "'></a-light>";    
                             }
                             sceneResponse.scenePostcards = sceneData.scenePostcards;
                             if (sceneResponse.sceneColor1 != null && sceneResponse.sceneColor1.length > 3) {
@@ -2723,7 +2726,7 @@ webxr_router.get('/:_id', function (req, res) {
                                         // gltfsAssets = gltfsAssets + "<a-asset-item id=\x22" + m_assetID + "\x22 src=\x22"+ modelURL +"\x22></a-asset-item>";
                                         gltfsAssets = gltfsAssets + "<a-asset-item id=\x22" + locMdl.modelID + "\x22 src=\x22"+ modelURL +"\x22></a-asset-item>";
                                         gltfsEntities = gltfsEntities + "<a-entity class=\x22geo\x22 scale=\x22"+scale+" "+scale+" "+scale+"\x22 data-scale=\x22"+scale+"\x22 mod_model=\x22markerType: "+
-                                        locMdl.markerType+"; timestamp: "+locMdl.timestamp+"; tags: "+locationTags+"; eventData:"+locMdl.eventData+"\x22 class=\x22gltf "+entityType+" "+ambientChild+" activeObjexGrab activeObjexRay\x22 shadow=\x22cast:true; receive:true\x22 "+geoEntity+"=\x22latitude: "+locMdl.latitude+
+                                        locMdl.markerType+"; timestamp: "+locMdl.timestamp+"; tags: "+locationTags+"; name:"+locMdl.name+"; eventData:"+locMdl.eventData+";\x22 class=\x22gltf "+entityType+" "+ambientChild+" activeObjexGrab activeObjexRay\x22 shadow=\x22cast:true; receive:true\x22 "+geoEntity+"=\x22latitude: "+locMdl.latitude+
                                         // "; latitude: "+locMdl.longitude+";\x22 "+skyboxEnvMap+"  class=\x22gltf\x22 gltf-model=\x22#" + m_assetID + "\x22 "+objAnim+" "+cannedAnim+" scale=\x22"+scale+" "+scale+" "+scale+"\x22 rotation=\x22"+rotation+"\x22 >" + offsetPos+ "</a-entity>";
                                         "; longitude: "+locMdl.longitude+";\x22 "+skyboxEnvMap+" gltf-model=\x22#" + m_assetID + "\x22 "+objAnim+" "+cannedAnim+" rotation=\x22"+rotation+"\x22 >" + offsetPos+ "</a-entity>";
                                         
@@ -2805,7 +2808,7 @@ webxr_router.get('/:_id', function (req, res) {
                                                     entityType = "surface";
 
                                                 }
-                                                let modModel = "mod_model=\x22markerType: "+locMdl.markerType+"; timestamp: "+locMdl.timestamp+"; tags: "+locMdl.locationTags+"; description:"+locMdl.description+"; eventData:"+locMdl.eventData+"; modelID:"+m_assetID+"\x22";
+                                                let modModel = "mod_model=\x22markerType: "+locMdl.markerType+"; timestamp: "+locMdl.timestamp+"; tags: "+locMdl.locationTags+"; name:"+locMdl.name+"; description:"+locMdl.description+"; eventData:"+locMdl.eventData+"; modelID:"+m_assetID+";\x22";
                                                 // let modMaterial = "";
                                                 if (locMdl.eventData.toLowerCase().includes("gallery")) {
                                                     // modModel = "mod_model_photo_gallery";  maybe later
@@ -2820,7 +2823,7 @@ webxr_router.get('/:_id', function (req, res) {
                                                     if (locMdl.eventData.toLowerCase().includes('physics')){ //ammo for now // no do it in mod_model (where model isloaded)
                                                     // let isTrigger = false;
                                                     
-                                                        if (locMdl.eventData.toLowerCase().includes('static')){
+                                                        if (locMdl.eventData.toLowerCase().includes('static')){ 
                                                             // physicsMod = "ammo-body=\x22type: static\x22 ammo-shape=\x22type: box\x22";
                                                             // physicsMod = "ammo-body=\x22type: static\x22 ammo-shape=\x22type: box\x22";
                                                             // physicsMod = "mod_physics=\x22body: static; shape: box; model: "+locMdl.name+"\x22"
@@ -2836,7 +2839,7 @@ webxr_router.get('/:_id', function (req, res) {
                                                         if (locMdl.eventData.toLowerCase().includes("noise")) {
                                                             console.log("TRYNA PUT A SHADER@@");
                                                             // modMaterial = "material=\x22shader: noise;\x22";
-                                                            modModel = "mod_model=\x22markerType: "+locMdl.markerType+"; timestamp: "+locMdl.timestamp+"; tags: "+locMdl.locationTags+"; eventData:"+locMdl.eventData+"; shader: noise\x22";
+                                                            modModel = "mod_model=\x22markerType: "+locMdl.markerType+"; timestamp: "+locMdl.timestamp+"; tags: "+locMdl.locationTags+"; name: "+locMdl.name+"; eventData:"+locMdl.eventData+"; shader: noise\x22";
                                                             let vertexShader  = requireText('../main/src/shaders/noise1_vertex.glsl', require);
                                                             let fragmentShader = requireText('../main/src/shaders/noise1_fragment.glsl', require);
                                                             shaderScripts = "<script type=\x22x-shader/x-vertex\x22 id=\x22noise1_vertex\x22>"+vertexShader+"</script>"+
@@ -4331,7 +4334,7 @@ webxr_router.get('/:_id', function (req, res) {
                     let arShadowPlane = "";
                     let handsTemplate = "";
                     // let aframeRenderSettings = "renderer=\x22antialias: true; logarithmicDepthBuffer: true; colorManagement: true; sortObjects: true; physicallyCorrectLights: true; alpha: true; maxCanvasWidth: 1920; maxCanvasHeight: 1920;\x22";
-                    let aframeRenderSettings = "renderer=\x22antialias: auto; exposure: 2; colorManagement: true; sortTransparentObjects: true; physicallyCorrectLights: true; maxCanvasWidth: 1920; maxCanvasHeight: 1920;\x22";
+                    let aframeRenderSettings = "renderer=\x22antialias: auto; exposure: .1; colorManagement: true; sortTransparentObjects: true; maxCanvasWidth: 1920; maxCanvasHeight: 1920;\x22";
                     // let aframeRenderSettings = "renderer=\x22exposure: 2\x22";
                    
                     if (arMode == "spawn") {
@@ -4497,19 +4500,19 @@ webxr_router.get('/:_id', function (req, res) {
                         // googleAnalytics +
                         
                         "<link rel=\x22icon\x22 href=\x22data:,\x22></link>"+
-                        "<meta charset='utf-8'/>" +
-                        "<meta name='viewport' content='width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0, shrink-to-fit=no'/>" +
-                        "<meta property='og:url' content='" + process.env.ROOT_HOST + "/webxr/" + sceneResponse.short_id + "' /> " +
-                        "<meta property='og:type' content='website' /> " +
-                        // "<meta property='og:image' content='" + postcard1 + "' /> " +
-                        "<meta property='og:image' content='" + postcard1 + "' /> " +
-                        "<meta property='og:image:height' content='1024' /> " +
-                        "<meta property='og:image:width' content='1024' /> " +
-                        "<meta property='og:title' content='" + sceneResponse.sceneTitle + "' /> " +
-                        "<meta property='og:description' content='" + sceneResponse.sceneDescription + "' /> " +
-                        "<meta property='name' content='modelviewer' /> " +
+                        "<meta charset=\x22utf-8\x22/>" +
+                        "<meta name=\x22viewport\x22 content=\x22width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0, shrink-to-fit=no\x22/>" +
+                        "<meta property=\x22og:url\x22 content=\x22" + process.env.ROOT_HOST + "/webxr/" + sceneResponse.short_id + "\x22 /> " +
+                        "<meta property=\x22og:type\x22 content=\x22website\x22 /> " +
+                        // "<meta property=\x22og:image\x22 content=\x22" + postcard1 + "\x22 /> " +
+                        "<meta property=\x22og:image\x22 content=\x22" + postcard1 + "\x22 /> " +
+                        "<meta property=\x22og:image:height\x22 content=\x221024\x22 /> " +
+                        "<meta property=\x22og:image:width\x22 content=\x221024\x22 /> " +
+                        "<meta property=\x22og:title\x22 content=\x22" + sceneResponse.sceneTitle + "\x22 /> " +
+                        "<meta property=\x22og:description\x22 content=\x22" + sceneResponse.sceneDescription + "\x22 /> " +
+                        "<meta property=\x22name\x22 content=\x22modelviewer\x22 /> " +
                         "<title>" + sceneResponse.sceneTitle + "</title>" +
-                        "<meta name='description' content='" + sceneResponse.sceneDescription + "'/>" +
+                        "<meta name=\x22description\x22 content=\x22" + sceneResponse.sceneDescription + "\x22/>" +
                         // "<meta name=\x22monetization\x22 content=\x22"+process.env.COIL_PAYMENT_POINTER+"\x22>" +
                         "<meta name=\x22mobile-web-app-capable\x22 content=\x22yes\x22>" +
                         "<meta name=\x22apple-mobile-web-app-capable\x22 content=\x22yes\x22>" +                        
@@ -4533,7 +4536,7 @@ webxr_router.get('/:_id', function (req, res) {
                         hlsScript +
                         // videoEntity +
                         videoGroupsEntity +
-                        "<center><div><br><br><div class=\x22header\x22>"+sceneResponse.sceneGreeting+ " - " + sceneResponse.sceneQuest+"</div><video controls width='80%' height='10%' id='video'></video>"+
+                        "<center><div><br><br><div class=\x22header\x22>"+sceneResponse.sceneGreeting+ " - " + sceneResponse.sceneQuest+"</div><video controls width=\x2280%\x22 height=\x2210%\x22 id=\x22video\x22></video>"+
                         "<div id=\x22sceneGreeting\x22 class=\x22linkfooter\x22>"+
                         "<h4><a href=\x22https://servicemedia.net/webxr/"+ sceneResponse.sceneNextScene + "\x22>Click Here to Enter Immersive Scene!</a></h4><br>"+
                         // "<a href=\x22https://servicemedia.net/webxr/"+ sceneResponse.sceneNextScene + "\x22>WebXR link</a> | "+

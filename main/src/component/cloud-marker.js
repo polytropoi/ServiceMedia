@@ -51,48 +51,51 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
           this.el.classList.add("allowMods");
         }
       
-            let locItem = {};
-            let position = this.el.getAttribute('position'); //
-            let rotation = this.el.getAttribute('rotation');
-            locItem.x = position.x.toFixed(2);
-            locItem.eulerx = rotation.x.toFixed(2);
-            locItem.y = position.y.toFixed(2);
-            locItem.eulery = rotation.y.toFixed(2);
-            locItem.z = position.z.toFixed(2);
-            locItem.eulerz = rotation.z.toFixed(2);
-            locItem.scale = this.data.scale;
-            locItem.type = "Worldspace";
-            locItem.name = this.data.name;
-            locItem.label = this.data.label;
-            locItem.eventData = this.data.eventData;
-            locItem.description = this.data.description;
-            locItem.timestamp = this.data.timestamp;
-            locItem.markerType = this.data.markerType;
-            locItem.modelID = this.data.modelID;
-            locItem.model = this.data.model;
-            locItem.objectID = this.data.objectID;
-            locItem.objName = this.data.objName;
-            locItem.phID = this.phID;
+        let locItem = {};
+        let position = this.el.getAttribute('position'); //
+        let rotation = this.el.getAttribute('rotation');
+        locItem.x = position.x.toFixed(2);
+        locItem.eulerx = rotation.x.toFixed(2);
+        locItem.y = position.y.toFixed(2);
+        locItem.eulery = rotation.y.toFixed(2);
+        locItem.z = position.z.toFixed(2);
+        locItem.eulerz = rotation.z.toFixed(2);
+        locItem.scale = this.data.scale;
+        locItem.type = "Worldspace";
+        locItem.name = this.data.name;
+        locItem.label = this.data.label;
+        locItem.eventData = this.data.eventData;
+        locItem.description = this.data.description;
+        locItem.timestamp = this.data.timestamp;
+        locItem.markerType = this.data.markerType;
+        locItem.modelID = this.data.modelID;
+        locItem.model = this.data.model;
+        locItem.objectID = this.data.objectID;
+        locItem.objName = this.data.objName;
+        locItem.phID = this.phID;
   
         //   console.log("CLOUDMARKER " + this.data.modelID + " " + this.data.name);
           
-          if ((!this.data.modelID || this.data.modelID == undefined || this.data.modelID == "" || this.data.modelID == "none") && !this.data.modelID.toString().includes("primitive")) {
+            if ((!this.data.modelID || this.data.modelID == undefined || this.data.modelID == "" || this.data.modelID == "none") && !this.data.modelID.toString().includes("primitive")) {
             // console.log("CLOUDMARKER PLACEHOLDER GEO " + this.data.modelID);
             if (this.data.markerType.toLowerCase() == "placeholder") {
                 this.el.setAttribute('gltf-model', '#poi1');
-              } else if (this.data.markerType.toLowerCase() == "poi") {
+                } else if (this.data.markerType.toLowerCase() == "poi") {
                 this.el.setAttribute('gltf-model', '#poi1');
-              } else if (this.data.markerType.toLowerCase().includes("trigger")) {
+                } else if (this.data.markerType.toLowerCase() == "waypoint") {
+                this.el.setAttribute('gltf-model', '#poi1');
+                this.el.classList.add("waypoint");
+                } else if (this.data.markerType.toLowerCase().includes("trigger")) {
                 this.el.setAttribute('gltf-model', '#poi1');  
-              } else if (this.data.markerType.toLowerCase() == "gate") {
+                } else if (this.data.markerType.toLowerCase() == "gate") {
                 this.el.setAttribute('gltf-model', '#gate2');
-              } else if (this.data.markerType.toLowerCase() == "portal") {
+                } else if (this.data.markerType.toLowerCase() == "portal") {
                 this.el.setAttribute('gltf-model', '#poi1');
-              } else if (this.data.markerType.toLowerCase() == "mailbox") {
+                } else if (this.data.markerType.toLowerCase() == "mailbox") {
                 // console.log("TRYNA SET MODEL TO MAILBOX!")
                 this.el.setAttribute('gltf-model', '#mailbox');
-              }
-          } else {
+                }
+            } else {
             if (this.data.modelID != "none") {
                 if (this.data.modelID.toString().includes("primitive")) {   
                     // console.log("CLOUDMARKER PRIMITIVE " + this.data.modelID);
@@ -111,6 +114,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                         this.el.setAttribute("material", {color: "purple", transparent: true, opacity: .5});
                     } else if (this.data.markerType.toLowerCase() == "waypoint") {
                         this.el.setAttribute("material", {color: "green", transparent: true, opacity: .5});
+                        this.el.classList.add("waypoint");
                         // this.el.setAttribute("color", "purple");
                     } else if (this.data.markerType.toLowerCase().includes("trigger")) {
                         this.el.setAttribute("material", {color: "lime", transparent: true, opacity: .5});
@@ -127,10 +131,10 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                     this.loadModel(this.data.modelID);
                 }
             }
-          }
-          if (this.data.objectID != undefined && this.data.objectID != null && this.data.objectID != "none" && this.data.objectID != "") { //hrm, cloudmarker objex?
-  
-          }
+        }
+            if (this.data.objectID != undefined && this.data.objectID != null && this.data.objectID != "none" && this.data.objectID != "") { //hrm, cloudmarker objex?
+
+        }
           this.el.setAttribute('scale', this.scale);
           // localStorage.setItem(this.phID, JSON.stringify(locItem)); 
         
@@ -159,8 +163,6 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
           this.el.classList.add('beatme');
         }
   
-      
-  
         this.clientX = 0;
         this.clientY = 0;
         this.selectedAxis = null;
@@ -172,20 +174,20 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
   
         if (!this.data.tags.includes("hide callout") && !this.data.tags.includes("hide callout")) {
        
-          this.calloutEntity.setAttribute("look-at", "#player");
-          this.calloutEntity.setAttribute('visible', false);
+            this.calloutEntity.setAttribute("look-at", "#player");
+            this.calloutEntity.setAttribute('visible', false);
         
-          sceneEl.appendChild(this.calloutEntity);
-          // this.calloutEntity.appendChild(this.calloutPanel);
-          this.calloutEntity.appendChild(this.calloutText);
-  
-          this.calloutText.setAttribute("position", '0 0 1.25'); //offset the child on z toward camera, to prevent overlap on model
-          this.font2 = "Acme.woff";
-  
-          if (settings && settings.sceneFontWeb1) {
-            this.font2 = settings.sceneFontWeb2;
-          }
-          this.calloutText.setAttribute('troika-text', {
+            sceneEl.appendChild(this.calloutEntity);
+            // this.calloutEntity.appendChild(this.calloutPanel);
+            this.calloutEntity.appendChild(this.calloutText);
+
+            this.calloutText.setAttribute("position", '0 0 1.25'); //offset the child on z toward camera, to prevent overlap on model
+            this.font2 = "Acme.woff";
+
+            if (settings && settings.sceneFontWeb1) {
+                this.font2 = settings.sceneFontWeb2;
+            }
+            this.calloutText.setAttribute('troika-text', {
             // width: .5,
             baseline: "bottom",
             align: "left",
@@ -196,8 +198,8 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
             outlineColor: "black",
             outlineWidth: "2%",
             value: ""
-          });
-      }
+            });
+        }
   
       this.calloutText.setAttribute("overlay");
       this.calloutToggle = false;
@@ -432,6 +434,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                 transform_controls_component.detachTransformControls();
             }
         }
+        this.el.classList.remove("waypoint");
         this.el.removeAttribute("transform_controls");
         this.el.removeAttribute("geometry");
         this.el.removeAttribute("gltf-model");
@@ -455,6 +458,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                   // this.el.setAttribute("color", "purple");
               } else if (this.data.markerType.toLowerCase() == "waypoint") {
                   this.el.setAttribute("material", {color: "green", transparent: true, opacity: .5});
+                  this.el.classList.add("waypoint");
                   // this.el.setAttribute("color", "purple");
               } else if (this.data.markerType.toLowerCase().includes("trigger")) {
                   this.el.setAttribute("material", {color: "lime", transparent: true, opacity: .5});
