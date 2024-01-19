@@ -1749,8 +1749,8 @@ webxr_router.get('/:_id', function (req, res) {
                                     
                                     //default lights
                                     lightEntities = "<a-light visible=\x22true\x22 show-in-ar-mode id=\x22real-light\x22 type=\x22directional\x22 "+shadow+" position=\x221 1 1\x22 color=\x22"+sceneResponse.sceneColor1+"\x22 "+
-                                    "groundColor=\x22"+sceneResponse.sceneColor2+"\x22 intensity=\x22.5\x22 target=\x22#directionaltarget\x22><a-entity id=\x22directionaltarget\x22 position=\x22"+sunVector+"\x22></a-entity></a-light>" +
-                                    "<a-light type='ambient' intensity=\x22.1\x22 color='" + sceneResponse.sceneColor2 + "'></a-light>";    
+                                    "groundColor=\x22"+sceneResponse.sceneColor2+"\x22 intensity=\x221.5\x22 target=\x22#directionaltarget\x22><a-entity id=\x22directionaltarget\x22 position=\x22"+sunVector+"\x22></a-entity></a-light>" +
+                                    "<a-light type='ambient' intensity=\x22.5\x22 color='" + sceneResponse.sceneColor2 + "'></a-light>";    
                             }
                             sceneResponse.scenePostcards = sceneData.scenePostcards;
                             if (sceneResponse.sceneColor1 != null && sceneResponse.sceneColor1.length > 3) {
@@ -4843,7 +4843,7 @@ webxr_router.get('/:_id', function (req, res) {
                         // "screen-controls xr-mode-ui=\x22enterVREnabled: true; enterAREnabled: true; XRMode: ar,vr\x22 " + magicWindow +   
                         // " keyboard-shortcuts=\x22enterVR: false\x22" +  //add screen-controls from initializer                      
                         // webxrFeatures + " shadow=\x22type: pcfsoft\x22 loading-screen=\x22dotsColor: white; backgroundColor: black; enabled: false\x22 embedded " + fogSettings + " "+networkedscene+" "+ARSceneArg+" listen-for-vr-mode>";
-                        webxrFeatures + " shadow=\x22type: pcfsoft\x22 loading-screen=\x22dotsColor: white; backgroundColor: black; enabled: false\x22 " + fogSettings + " "+networkedscene+" "+ARSceneArg+" listen-for-vr-mode>";
+                        webxrFeatures + " shadow loading-screen=\x22dotsColor: white; backgroundColor: black; enabled: false\x22 " + fogSettings + " "+networkedscene+" "+ARSceneArg+" listen-for-vr-mode>";
 
                         let mainDiv = "<div id=\x22mainDiv\x22 style=\x22width:100%; height:100%\x22>";
 

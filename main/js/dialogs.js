@@ -1002,7 +1002,8 @@ function ShowLocationModal(timestamp) {
 
         // "</form>"+
         "</div>";
-        ShowHideDialogPanel(content);
+        return content;
+        // ShowHideDialogPanel(content);
         // ToggleLocationModalListeners();
     }
 }
@@ -1644,6 +1645,7 @@ function SceneManglerModal(mode) {
     let inventoryDisplay = "";
     let messagesDisplay = "";
     let locationsDisplay = "";
+    let locationDisplay = "";
     let toolsDisplay = "";
     let eventsDisplay = "";
 
@@ -1665,7 +1667,10 @@ function SceneManglerModal(mode) {
     }    
     if (mode == "Locations") {
         locationsDisplay = "style=\x22display: block;\x22";
-    }    
+    }
+    if (mode == "Location") {
+        locationDisplay = "style=\x22display: block;\x22";
+    } 
     if (mode == "Tools") {
         toolsDisplay = "style=\x22display: block;\x22";
     }
@@ -1789,7 +1794,9 @@ function SceneManglerModal(mode) {
       "<br><br><br><div>"+locationTable+"</div><br>"+
       "<button style=\x22float:left\x22 class=\x22snapButton\x22 id=\x22CreatePlaceholderButton\x22 onclick=\x22ToggleAllTransformControls()\x22>Toggle All Transform Controls</button>"+
     "</div>"+     
-
+    "<div "+locationDisplay+" id=\x22Locations\x22 class=\x22modalMain tabcontent\x22>"+
+      ShowLocationModal(selectedLocationTimestamp);
+    "</div>"+     
 
     "<div "+eventsDisplay+"id=\x22Events\x22 class=\x22tabcontent\x22>"+
         
@@ -1839,8 +1846,14 @@ function SceneManglerModal(mode) {
      "</div>";
      showDialogPanel = false; //cause it's flipped
      ShowHideDialogPanel(content);
-     TabMangler(null, mode);
-
+     if (mode != "Location") {
+      TabMangler(null, mode);
+     } else {
+      document.getElementById('modalTitle').innerHTML = "<h3>Location Details</h3>";
+        // if (tagnameEl != null) {
+        //     tagnameEl.style.display = "block";
+        // }
+     }
      InitPrimarySlider();
      InitAmbientSlider();
      InitTriggerSlider();

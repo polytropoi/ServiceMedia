@@ -1340,7 +1340,9 @@ function LocationRowClick(data) {
    // }
    console.log("location row click: " + data);
    ShowHideDialogPanel();
-   ShowLocationModal(data);
+   // ShowLocationModal(data);
+   selectedLocationTimestamp = data;
+   SceneManglerModal('Location');
    // ShowLocationModal(isCloud, data);
 }
 
