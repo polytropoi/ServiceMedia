@@ -140,57 +140,45 @@ function InitIDB() {
                // let loc = JSON.stringify(cursor.value.locations[i]);
                console.log("cursor " + i + " of " + cursor.value.locations.length);
                localData.locations.push(cursor.value.locations[i]);
+               if (cursor.value.locations[i].isLocal != undefined && cursor.value.locations[i].isLocal) { //only update ones with local changes
+                  console.log(cursor.value.locations[i].name + " markerType " + cursor.value.locations[i].markerType + " isLocal!");
+                  let cloudEl = document.getElementById(cursor.value.locations[i].timestamp);
+                  if (cloudEl) { //prexisting elements (cloud_marker, mod_model, mod_object) already rendered onload
+                     cloudEl.setAttribute("position", {x: cursor.value.locations[i].x, y: cursor.value.locations[i].y, z: cursor.value.locations[i].z });
+                     cloudEl.setAttribute("rotation", {x: cursor.value.locations[i].eulerx, y: cursor.value.locations[i].eulery, z: cursor.value.locations[i].eulerz });
+                     cloudEl.setAttribute("scale", {x: cursor.value.locations[i].markerObjScale, y: cursor.value.locations[i].markerObjScale, z: cursor.value.locations[i].markerObjScale});
+                     let cloudMarkerComponent = cloudEl.components.cloud_marker;
+                     if (cloudMarkerComponent) {  
 
-               let cloudEl = document.getElementById(cursor.value.locations[i].timestamp);
-               if (cloudEl) { //prexisting elements (cloud_marker, mod_model, mod_object) already rendered onload
-                  cloudEl.setAttribute("position", {x: cursor.value.locations[i].x, y: cursor.value.locations[i].y, z: cursor.value.locations[i].z });
-                  cloudEl.setAttribute("rotation", {x: cursor.value.locations[i].eulerx, y: cursor.value.locations[i].eulery, z: cursor.value.locations[i].eulerz });
-                  cloudEl.setAttribute("scale", {x: cursor.value.locations[i].markerObjScale, y: cursor.value.locations[i].markerObjScale, z: cursor.value.locations[i].markerObjScale});
-                  let cloudMarkerComponent = cloudEl.components.cloud_marker;
-                  if (cloudMarkerComponent) {  //hrm, need to hit an method on this guy to override? not init'd yet...
-                     console.log(cursor.value.locations[i].name + " cloud marker override " + cursor.value.locations[i].modelID);
-                     // cloudEl.setAttribute ("cloud_marker", { timestamp: cursor.value.locations[i].timestamp,
-                     //                            name: cursor.value.locations[i].name, 
-                     //                            modelID: cursor.value.locations[i].modelID, 
-                     //                            // model: cursor.value.locations[i].model,
-                     //                            // objectID: cursor.value.locations[i].objectID, 
-                     //                            // objectName: cursor.value.locations[i].objectName, 
-                     //                            tags: cursor.value.locations[i].locationTags, 
-                     //                            eventData: cursor.value.locations[i].eventData, 
-                     //                            markerType: cursor.value.locations[i].markerType,
-                     //                            // position: {x: cursor.value.locations[i].x, y: cursor.value.locations[i].y, z: cursor.value.locations[i].z},
-                     //                            // rotation: {x: cursor.value.locations[i].eulerx, y: cursor.value.locations[i].eulery, z: cursor.value.locations[i].eulerz },
-                     //                            scale: {x: cursor.value.locations[i].markerObjScale, y: cursor.value.locations[i].markerObjScale, z: cursor.value.locations[i].markerObjScale}
-                     //                         });
-
-                     cloudMarkerComponent.updateAndLoad(cursor.value.locations[i].name, cursor.value.locations[i].description, cursor.value.locations[i].locationTags, cursor.value.locations[i].eventData, cursor.value.locations[i].markerType, cursor.value.locations[i].markerObjScale, cursor.value.locations[i].modelID);   
-                  } else {
-                     let modModelComponent = cloudEl.components.mod_model;
-                     if (modModelComponent) {
-                        modModelComponent.updateAndLoad(cursor.value.locations[i].name, cursor.value.locations[i].description, cursor.value.locations[i].locationTags, cursor.value.locations[i].eventData, cursor.value.locations[i].markerType, cursor.value.locations[i].markerObjScale, cursor.value.locations[i].modelID);
+                        cloudMarkerComponent.updateAndLoad(cursor.value.locations[i].name, cursor.value.locations[i].description, cursor.value.locations[i].locationTags, cursor.value.locations[i].eventData, cursor.value.locations[i].markerType, cursor.value.locations[i].markerObjScale, cursor.value.locations[i].modelID);   
+                     } else {
+                        let modModelComponent = cloudEl.components.mod_model;
+                        if (modModelComponent) {
+                           modModelComponent.updateAndLoad(cursor.value.locations[i].name, cursor.value.locations[i].description, cursor.value.locations[i].locationTags, cursor.value.locations[i].eventData, cursor.value.locations[i].markerType, cursor.value.locations[i].markerObjScale, cursor.value.locations[i].modelID);
+                        }
                      }
-                  }
-               } else {//local-only elements, not saved to cloud yet
-                  hasLocalData = true;
-                  let localEl = document.createElement("a-entity");
-                  sceneEl.appendChild(localEl);
+                  } else {//local-only elements, not saved to cloud yet
+                     hasLocalData = true;
+                     let localEl = document.createElement("a-entity");
+                     sceneEl.appendChild(localEl);
 
-                  localEl.setAttribute("position", {x: cursor.value.locations[i].x, y: cursor.value.locations[i].y, z: cursor.value.locations[i].z });
-                  localEl.setAttribute("rotation", {x: cursor.value.locations[i].eulerx, y: cursor.value.locations[i].eulery, z: cursor.value.locations[i].eulerz });
-                  localEl.setAttribute("scale", {x: cursor.value.locations[i].markerObjScale, y: cursor.value.locations[i].markerObjScale, z: cursor.value.locations[i].markerObjScale});
-                  
-                  localEl.setAttribute("local_marker", { timestamp: cursor.value.locations[i].timestamp,
-                                                         name: cursor.value.locations[i].name, 
-                                                         modelID: cursor.value.locations[i].modelID, 
-                                                         objectID: cursor.value.locations[i].objectID, 
-                                                         tags: cursor.value.locations[i].tags, 
-                                                         eventData: cursor.value.locations[i].eventData, 
-                                                         markerType: cursor.value.locations[i].markerType,
-                                                         position: {x: cursor.value.locations[i].x, y: cursor.value.locations[i].y, z: cursor.value.locations[i].z},
-                                                         rotation: {x: cursor.value.locations[i].eulerx, y: cursor.value.locations[i].eulery, z: cursor.value.locations[i].eulerz },
-                                                         scale: {x: cursor.value.locations[i].markerObjScale, y: cursor.value.locations[i].markerObjScale, z: cursor.value.locations[i].markerObjScale}
-                                                      });
-                  localEl.id = cursor.value.locations[i].timestamp.toString(); //for lookups
+                     localEl.setAttribute("position", {x: cursor.value.locations[i].x, y: cursor.value.locations[i].y, z: cursor.value.locations[i].z });
+                     localEl.setAttribute("rotation", {x: cursor.value.locations[i].eulerx, y: cursor.value.locations[i].eulery, z: cursor.value.locations[i].eulerz });
+                     localEl.setAttribute("scale", {x: cursor.value.locations[i].markerObjScale, y: cursor.value.locations[i].markerObjScale, z: cursor.value.locations[i].markerObjScale});
+                     
+                     localEl.setAttribute("local_marker", { timestamp: cursor.value.locations[i].timestamp,
+                                                            name: cursor.value.locations[i].name, 
+                                                            modelID: cursor.value.locations[i].modelID, 
+                                                            objectID: cursor.value.locations[i].objectID, 
+                                                            tags: cursor.value.locations[i].tags, 
+                                                            eventData: cursor.value.locations[i].eventData, 
+                                                            markerType: cursor.value.locations[i].markerType,
+                                                            position: {x: cursor.value.locations[i].x, y: cursor.value.locations[i].y, z: cursor.value.locations[i].z},
+                                                            rotation: {x: cursor.value.locations[i].eulerx, y: cursor.value.locations[i].eulery, z: cursor.value.locations[i].eulerz },
+                                                            scale: {x: cursor.value.locations[i].markerObjScale, y: cursor.value.locations[i].markerObjScale, z: cursor.value.locations[i].markerObjScale}
+                                                         });
+                     localEl.id = cursor.value.locations[i].timestamp.toString(); //for lookups
+                  }
                }
                locationTimestamps.push(cursor.value.locations[i].timestamp); //hrm
                } 
