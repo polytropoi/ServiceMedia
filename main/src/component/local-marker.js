@@ -107,7 +107,10 @@ AFRAME.registerComponent('local_marker', { //special items with local mods
                   } else if (this.data.markerType.toLowerCase() == "mailbox") {
                     // console.log("TRYNA SET MODEL TO MAILBOX!")
                     this.el.setAttribute('gltf-model', '#mailbox');
-                  }
+                  } else if (this.data.markerType == "3D text") {
+                    console.log("tryna set 3D text!");
+                    this.el.setAttribute("text-geometry", {value: this.data.description, font: '#optimerBoldFont'});
+                    }
               } else {
                 if (this.data.modelID != "none") {
                     if (this.data.modelID.toString().includes("primitive")) {
@@ -337,7 +340,10 @@ AFRAME.registerComponent('local_marker', { //special items with local mods
         if (keydown == "T") {
           ToggleTransformControls(that.timestamp);
         } else if (keydown == "Shift") {
-          ShowLocationModal(that.timestamp);
+        //   ShowLocationModal(that.timestamp);
+            selectedLocationTimestamp = that.timestamp;
+            // ShowLocationModal(that.timestamp);
+            SceneManglerModal('Location');
         }
       });
       this.el.addEventListener('mouseup', function (evt) {
@@ -467,6 +473,9 @@ AFRAME.registerComponent('local_marker', { //special items with local mods
             this.el.setAttribute("gltf-model", "#poi1");
         } else if (this.data.markerType == "gate"){
             this.el.setAttribute("gltf-model", "#gate2");
+        } else if (this.data.markerType == "3D text") {
+            console.log("tryna set 3D text!");
+            this.el.setAttribute("text-geometry", {value: this.data.description, font: '#optimerBoldFont'});
         }
         
       }

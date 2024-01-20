@@ -489,6 +489,7 @@ webxr_router.get('/:_id', function (req, res) {
     let isGuest = true;
     let socketScripts = "";
     let navmeshScripts = "";
+    let threeDeeTextComponent = "";
     let hasSynth = false;
     let hasPrimaryAudio = false;
     let hasPrimaryAudioStream = false;
@@ -1044,6 +1045,7 @@ webxr_router.get('/:_id', function (req, res) {
                                         || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "portal"  
                                         || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "waypoint" 
                                         || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "player"  
+                                        || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "3D text"  
                                         || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "mailbox") {
                                     //    locationPlaceholders.push(sceneResponse.sceneLocations[i].x + " " + sceneResponse.sceneLocations[i].y + " " + zFix);
                                         let tLoc = sceneResponse.sceneLocations[i];
@@ -1062,6 +1064,11 @@ webxr_router.get('/:_id', function (req, res) {
                                         locationPlaceholders.push(tLoc);
                                     }
 
+                                }
+                                if (sceneResponse.sceneLocations[i].markerType == "3D text") {
+                                    threeDeeTextComponent = "<script src=\x22../main/src/component/aframe-text-geometry-component.min.js\x22></script>"; //TODO - these must all be arrays, like sceneModelLocations above!
+                                    // threeDeeTextComponent = "<script src=\x22https://unpkg.com/aframe-text-geometry-component@0.5.2/dist/aframe-text-geometry-component.min.js\x22></script>";
+                                    externalAssets = externalAssets + "<a-asset-item id=\x22optimerBoldFont\x22 src=\x22https://rawgit.com/mrdoob/three.js/dev/examples/fonts/optimer_bold.typeface.json\x22></a-asset-item>";
                                 }
                                 if (sceneResponse.sceneLocations[i].markerType == "player") {
                                     // let yFix = sceneResponse.sceneLocations[i].y;
@@ -5011,7 +5018,7 @@ webxr_router.get('/:_id', function (req, res) {
                         "<script src=\x22../main/js/dialogs.js\x22></script>"+
 
                         "<div id=\x22ar_overlay\x22><span id=\x22ar_message\x22></span></div>"+                        
-                    
+                        threeDeeTextComponent +
                         aScene +
                         "<div id=\x22overlay\x22></div>"+
                         // skySettings +
@@ -5208,6 +5215,7 @@ webxr_router.get('/:_id', function (req, res) {
                         socketScripts +
                         navmeshScripts +
                         shaderScripts +
+                        
 
                         "<script>\n"+ //TODO base64 this like the others, and only when a key marker is set
                             // "var avatarName = \x22" + avatarName + "\x22;\n" +

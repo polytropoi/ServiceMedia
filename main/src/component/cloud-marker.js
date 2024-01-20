@@ -43,7 +43,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
       }
       this.timestamp = this.data.timestamp;
         
-        this.phID = this.data.phID;
+        this.phID = this.data.phID; //nm
         // console.log("cloudmarker phID " + this.phID); 
   
   
@@ -94,7 +94,12 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                 } else if (this.data.markerType.toLowerCase() == "mailbox") {
                 // console.log("TRYNA SET MODEL TO MAILBOX!")
                 this.el.setAttribute('gltf-model', '#mailbox');
+                } else if (this.data.markerType == "3D text") {
+                    console.log("tryna set 3D text!");
+                    this.el.setAttribute("text_geometry", {value: this.data.description, font: '#optimerBoldFont'});
                 }
+
+
             } else {
             if (this.data.modelID != "none") {
                 if (this.data.modelID.toString().includes("primitive")) {   
@@ -303,9 +308,11 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
   
         if (keydown == "T") {
             ToggleTransformControls(that.timestamp);
-          } else if (keydown == "Shift") {
-            ShowLocationModal(that.timestamp);
-          }    
+        } else if (keydown == "Shift") {
+            selectedLocationTimestamp = that.timestamp;
+            // ShowLocationModal(that.timestamp);
+            SceneManglerModal('Location');
+        }    
       });
       this.el.addEventListener('mouseup', function (evt) {
         console.log("mouseup cloudmarker ");
@@ -512,6 +519,9 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                 this.el.setAttribute("material", {color: "aqua", transparent: true, opacity: .5});
             } else if (this.data.markerType.toLowerCase() == "mailbox") {
                 this.el.setAttribute("gltf-model", "#mailbox");
+            } else if (this.data.markerType == "3D text") {
+                console.log("tryna set 3D text!");
+                this.el.setAttribute("text-geometry", {value: this.data.description, font: '#optimerBoldFont'});
             }
             // if (this.data.markerType == "poi" || this.data.markerType == "waypoint" ||
             //  this.data.markerType == "placeholder" || this.data.markerType == "trigger" || this.data.markerType == "trigger") {

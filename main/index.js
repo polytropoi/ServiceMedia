@@ -10018,6 +10018,7 @@ function getAllPeople() {
         let types = "";
         const typesArray = [
         "none",
+        "placeholder",
         "model",
         "object",
         "player",
@@ -10040,16 +10041,11 @@ function getAllPeople() {
         "tunnel",
         "follow parametric curve",
         "follow ambient",
-        "placeholder",
+
 
         "audio",
         "audiogroup",
-        "canvas fixed",
-        "canvas billboard",
-        "svg canvas fixed",
-        "svg canvas billboard",
-        "svg fixed",
-        "svg billboard",
+        
         "picture fixed",
         "picture billboard",
         "picturegroup",
@@ -10057,6 +10053,7 @@ function getAllPeople() {
         // "video billboard",
         "youtube",
         // "youtube billboard",
+        "3D text",
         "text",
         "text billboard",
         "textbook",
@@ -10067,6 +10064,12 @@ function getAllPeople() {
         "drop",
         "collectible",
         "media",
+        "canvas fixed",
+        "canvas billboard",
+        "svg canvas fixed",
+        "svg canvas billboard",
+        "svg fixed",
+        "svg billboard",
         "callout",
         "availablescenes",
         "track face",

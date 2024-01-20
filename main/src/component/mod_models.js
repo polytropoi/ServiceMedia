@@ -1361,7 +1361,10 @@ AFRAME.registerComponent('mod_model', {
               if (keydown == "T") {
                 ToggleTransformControls(this.timestamp);
               } else if (keydown == "Shift") {
-                ShowLocationModal(this.timestamp);
+                // ShowLocationModal(this.timestamp);
+                selectedLocationTimestamp = this.timestamp;
+                // ShowLocationModal(that.timestamp);
+                SceneManglerModal('Location');
               } 
             }  
           });

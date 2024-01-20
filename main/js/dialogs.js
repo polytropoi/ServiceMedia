@@ -770,25 +770,23 @@ function ReturnLocationMarkerTypeSelect (selected) {
       "trigger",
       "target",
       "gate",
+      "portal",
       "collider",
       "light",
       "player",
       "character",
       "model",
       "object",
+      "surface",
+      "navmesh",
 
-      "portal",
+
       
 
       "available scenes key",
       "audio",
       "audiogroup",
-      "canvas fixed",
-      "canvas billboard",
-      "svg canvas fixed",
-      "svg canvas billboard",
-      "svg fixed",
-      "svg billboard",
+      
       "picture fixed",
       "picture billboard",
       "picturegroup",
@@ -796,6 +794,7 @@ function ReturnLocationMarkerTypeSelect (selected) {
       // "video billboard",
       "youtube",
       // "youtube billboard",
+      "3D text",
       "text",
       "text billboard",
       "textbook",
@@ -806,6 +805,12 @@ function ReturnLocationMarkerTypeSelect (selected) {
       "drop",
       "collectible",
       "media",
+      "canvas fixed",
+      "canvas billboard",
+      "svg canvas fixed",
+      "svg canvas billboard",
+      "svg fixed",
+      "svg billboard",
       "callout",
       "availablescenes",
       "track face",
@@ -840,7 +845,7 @@ function ReturnLocationMarkerTypeSelect (selected) {
 }
 
 
-function ShowLocationModal(timestamp) {   
+function ShowLocationModal(timestamp) {  
 
     let thisLocation = null;
     selectedLocationTimestamp = timestamp;
@@ -1641,24 +1646,23 @@ function SceneManglerModal(mode) {
 
     "</div>";
     let welcomeDisplay = "";
-    let questsDisplay = "";
+    // let questsDisplay = "";
     let inventoryDisplay = "";
     let messagesDisplay = "";
     let locationsDisplay = "";
     let locationDisplay = "";
     let toolsDisplay = "";
     let eventsDisplay = "";
+    let aboutDisplay = "";
 
     if (userData.isGuest) {
 
     }
     
-    if (mode == "Welcome") { //add quest here
+    if (mode == "Welcome") { 
         welcomeDisplay = "style=\x22display: block;\x22";
     }
-    if (mode == "Quests") {
-        questsDisplay = "style=\x22display: block;\x22";
-    }
+
     if (mode == "Inventory") {
         inventoryDisplay = "style=\x22display: block;\x22";
     }
@@ -1677,22 +1681,25 @@ function SceneManglerModal(mode) {
     if (mode == "Events") {
         eventsDisplay = "style=\x22display: block;\x22";
     }
+    if (mode == "About") {
+      aboutDisplay = "style=\x22display: block;\x22";
+    }
 
     // let users = document.getElementById('users').htmlContent;
     let content = "<span id='modalCloser' onclick=\x22ShowHideDialogPanel()\x22 class='close-modal'>&times;</span>" +
                 "<div><span id=\x22modalTitle\x22><h3>Scene Mangler</h3></span>" + //populate modal
     tabs+
-    "<div "+welcomeDisplay+" id=\x22Welcome\x22 class=\x22modalMain tabcontent\x22>" +
+    "<div "+welcomeDisplay+" id=\x22Welcome\x22 class=\x22modalMain tabcontent\x22>" + ////////////////////WELCOME
       "<div><p>" + greeting + "</p></div>"+
       "<div><p>" + quest + "</p></div>"+
     "</div>"+    
     // "<div "+questsDisplay+" id=\x22Quests\x22 class=\x22modalMain tabcontent\x22>"+
     //   "<div><p>" + quest + "</p></div>"+
     // "</div>"+
-    "<div "+inventoryDisplay+" id=\x22Inventory\x22 class=\x22modalMain tabcontent\x22>"+
+    "<div "+inventoryDisplay+" id=\x22Inventory\x22 class=\x22modalMain tabcontent\x22>"+ /////////////////////INVENTORY
       "<div id=\x22inventory_display\x22><p>"+inventory+"</p></div>"+
     "</div>"+
-    "<div "+messagesDisplay+" id=\x22Messages\x22 class=\x22modalMain tabcontent\x22>"+
+    "<div "+messagesDisplay+" id=\x22Messages\x22 class=\x22modalMain tabcontent\x22>"+ /////////////////////MESSAGES
       // "<form id=\x22form\x22 id=\x22chat_form\x22>"+
       // "<span style=\x22float: left;\x22><h4>Message:</h4></span><span style=\x22float: left;\x22 id=\x22users\x22>"+stringRoomUsers+"</span>"+
       "<div id=\x22emailContainer\x22 style=\x22display: none;\x22><input class=\x22email_input\x22 id=\x22email_input\x22  type=\x22email\x22 placeholder=\x22Email to invite\x22></input>"+
@@ -1720,7 +1727,7 @@ function SceneManglerModal(mode) {
     //   "<br><br><br><div>"+locationTable+"</div><br>"+
     // "</div>"+     
 
-    "<div "+toolsDisplay+" id=\x22Tools\x22 class=\x22modalMain tabcontent\x22>"+
+    "<div "+toolsDisplay+" id=\x22Tools\x22 class=\x22modalMain tabcontent\x22>"+ /////////////////TOOLS
     // "<div class=\x22\x22>"+
     "<div class=\x22row\x22>"+
     // oculusButton +
@@ -1781,9 +1788,7 @@ function SceneManglerModal(mode) {
     "</div>"+
 
     
-    "<div "+locationsDisplay+" id=\x22Locations\x22 class=\x22modalMain tabcontent\x22>"+
-
-
+    "<div "+locationsDisplay+" id=\x22Locations\x22 class=\x22modalMain tabcontent\x22>"+ /////////////LOCATIONS TABLE
 
     "<button class=\x22goToButton\x22 id=\x22nextButton\x22 onclick=\x22GoToNext()\x22>GoTo Next</button>"+
     "<button class=\x22goToButton\x22 id=\x22prevButton\x22 onclick=\x22GoToPrevious()\x22>GoTo Previous</button>"+
@@ -1794,11 +1799,9 @@ function SceneManglerModal(mode) {
       "<br><br><br><div>"+locationTable+"</div><br>"+
       "<button style=\x22float:left\x22 class=\x22snapButton\x22 id=\x22CreatePlaceholderButton\x22 onclick=\x22ToggleAllTransformControls()\x22>Toggle All Transform Controls</button>"+
     "</div>"+     
-    "<div "+locationDisplay+" id=\x22Locations\x22 class=\x22modalMain tabcontent\x22>"+
-      ShowLocationModal(selectedLocationTimestamp);
-    "</div>"+     
 
-    "<div "+eventsDisplay+"id=\x22Events\x22 class=\x22tabcontent\x22>"+
+
+    "<div "+eventsDisplay+" id=\x22Events\x22 class=\x22tabcontent\x22>"+ 
         
       // let content = "<span id='modalCloser' onclick=\x22ShowHideDialogPanel()\x22 class='close-modal'>&times;</span><div><h3>Timed Events</h3><hr>" + //populate modal
 
@@ -1835,13 +1838,18 @@ function SceneManglerModal(mode) {
 
     "</div>"+
     
-    "<div id=\x22About\x22 class=\x22modalMain tabcontent\x22>"+
+    "<div "+aboutDisplay+" id=\x22About\x22 class=\x22modalMain tabcontent\x22>"+
         // "<p>"
         "<div>Use WASD keys to move, R to rise, F to fall. <br><br>Attributions: <br>"+
         ReturnAttributions()+
         "</div>"+
         "<p> This scene is powered by the <a href=\x22https://servicemedia.net\x22>ServiceMedia Network</a></p>"+
     "</div>"+
+
+    "<div "+locationDisplay+" id=\x22Location\x22 class=\x22modalMain tabcontent\x22>"+ ///////////////////LOCATION SINGLE
+        ShowLocationModal(selectedLocationTimestamp);
+    "</div>"+     
+
      
      "</div>";
      showDialogPanel = false; //cause it's flipped
