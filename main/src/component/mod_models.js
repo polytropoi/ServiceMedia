@@ -88,6 +88,10 @@ AFRAME.registerComponent('mod_model', {
         this.timestamp = this.data.timestamp;
         this.isNavAgent = false;
         this.navAgentController = null;
+        this.scale = 1;
+        if (this.data.scale != NaN && this.data.scale != undefined && this.data.scale && this.data.scale != '' &&  this.data.scale != 'undefined') {
+          this.scale = this.data.scale;
+        }
         if (settings && settings.sceneFontWeb1) {
           this.font1 = settings.sceneFontWeb1;
         }
@@ -252,11 +256,11 @@ AFRAME.registerComponent('mod_model', {
             } else if (scatterSurface) {
               surface = scatterSurface;
             }
-            console.log("tryna SCATTER (not instance) a model");
+            console.log("tryna SCATTER (not instance) a model " + navmesh + "  " + scatterSurface);
             if (surface) {
               let count = 10;
               let split = this.data.eventData.split("~"); //gonna switch to tags...
-              if (split.length > 0) {
+              if (split.length > 1) {
                 if (parseInt(split[1]) != NaN) {
                   count = parseInt(split[1]);
                 }
@@ -277,7 +281,7 @@ AFRAME.registerComponent('mod_model', {
           
                   if(results.length > 0) {
                     
-                    console.log("gotsa scatterPosition for model " + this.data.modelID+ " intersect: " + results.length + " " +results[0].object.name + "scatterCount " + scatterCount + " vs count " + count );
+                    console.log("gotsa scatterPosition for model " + this.data.modelID+ " intersect: " + results.length + " " +results[0].object.name + "scatterCount " + scatterCount + " vs count " + count +  " scale " + this.scale);
                     testPosition.x = results[0].point.x.toFixed(2); //snap y of waypoint to navmesh y
                     testPosition.y = results[0].point.y.toFixed(2); //snap y of waypoint to navmesh y
                     testPosition.z = results[0].point.z.toFixed(2); //snap y of waypoint to navmesh y
@@ -287,9 +291,11 @@ AFRAME.registerComponent('mod_model', {
                     let eventData = this.data.eventData.replace("scatter", ""); //prevent infinite recursion!
 
                     scatteredEl.setAttribute("mod_model", {eventData: eventData, markerType: this.data.markerType, description: this.data.description, modelID: this.data.modelID});
+                    scatteredEl.setAttribute("shadow", {cast: true, receive: true});
+                    scatteredEl.classList.add("envMap");
                     // if (this.data.markerType != "character") { //messes up navmeshing..
                       let scale = this.returnRandomNumber(.5, 1.5);
-                      scatteredEl.setAttribute("scale", {x: this.data.scale * scale, y: this.data.scale * scale, z: this.data.scale * scale});
+                      scatteredEl.setAttribute("scale", {x: this.scale * scale, y: this.scale * scale, z: this.scale * scale});
                       // scatteredEl.setAttribute("scale", {x: scale, y:scale, z: scale})
 
                     // }
