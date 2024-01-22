@@ -371,6 +371,7 @@ window.addEventListener( 'keyup',  ( event ) => {
   $('#modalContent').on('change', '#locationMarkerType', function(e) {
       console.log('type ' + e.target.value + " id " + selectedLocationTimestamp);
       let theEl = document.getElementById(selectedLocationTimestamp);
+      if (theEl) {
       for (let i = 0; i < localData.locations.length; i++) { //elsewise 
         if (localData.locations[i].timestamp == selectedLocationTimestamp) {
           // if (e.target.value == "gate") {
@@ -391,6 +392,9 @@ window.addEventListener( 'keyup',  ( event ) => {
           // }
         }
       }
+    } else {
+      console.log("Didn't find theEl!");
+    }
     
       
   });
