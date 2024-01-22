@@ -923,16 +923,17 @@ function ShowLocationModal(timestamp) {
         console.log(JSON.stringify(thisLocation));
         let phID = thisLocation.timestamp;
         let title = label + " : " + thisLocation.timestamp;
-        let content = "<span id='modalCloser' onclick=\x22ShowHideDialogPanel()\x22 class='close-modal'>&times;</span><div><h3>"+title+"</h3><hr>" + //populate modal
+        // let content = "<span id='modalCloser' onclick=\x22ShowHideDialogPanel()\x22 class='close-modal'>&times;</span><div><h3>"+title+"</h3><hr>" + //populate modal
+        let content = "<div><h3>"+title+"</h3><hr>" + //populate modal
         // "<form>"+aa
         // "<table><tr>"
         "<div class=\x22row\x22>"+
-        // "<button class=\x22snapButton\x22 style=\x22float:left;\x22 onclick=\x22SnapLocation('"+phID+"')\x22>Snap To Player</button>"+
-        "<button class=\x22grabButton\x22 style=\x22float:left;\x22 onclick=\x22ToggleTransformControls('"+phID+"')\x22>Toggle Transform Controls</button>"+
-        // "<button class=\x22goToButton\x22 style=\x22float:left;\x22 onclick=\x22GoToLocation('"+phID+"')\x22>GoTo</button>"+
+        "<button class=\x22snapButton\x22 style=\x22float:left;\x22 onclick=\x22SnapLocation('"+phID+"')\x22>SnapTo</button>"+
+        // "<button class=\x22grabButton\x22 style=\x22float:left;\x22 onclick=\x22ToggleTransformControls('"+phID+"')\x22>Toggle Transform Controls</button>"+
+        // "<button class=\x22goToButton\x22 style=\x22float:left;\x22 onclick=\x22GoToLocation('"+phID+"')\x22>Go To</button>"+
         "<button class=\x22goToButton\x22 style=\x22float:left;\x22 onclick=\x22PlayerToLocation('"+thisLocation.x+ " " + thisLocation.y + " " + thisLocation.z +"')\x22>GoTo</button>"+
         // "<button class=\x22goToButton\x22 onclick=\x22PlayerToLocation('"+phID+"')\x22>GoTo</button>"+
-        "<button class=\x22infoButton\x22 onclick=\x22SceneManglerModal('Locations')\x22>Show All</button>"+
+        // "<button class=\x22infoButton\x22 onclick=\x22SceneManglerModal('Locations')\x22>Location</button>"+
         "</div>"+
 
         "<div class=\x22row\x22><div class=\x22twocolumn\x22><label for=\x22locationName\x22>Location Name</label>"+
@@ -1697,7 +1698,16 @@ function SceneManglerModal(mode) {
     //   "<div><p>" + quest + "</p></div>"+
     // "</div>"+
     "<div "+inventoryDisplay+" id=\x22Inventory\x22 class=\x22modalMain tabcontent\x22>"+ /////////////////////INVENTORY
-      "<div id=\x22inventory_display\x22><p>"+inventory+"</p></div>"+
+      "<div id=\x22inventory_display\x22><p>"+inventory+"</p></div><hr>"+
+
+      // "Local Assets: <br> <br><div><label for=\x22file\x22 class=\x22form-label\x22>Select a file</label><input type=\x22submit\x22 value=\x22Save to Local DB\x22 class=\x22addButton floatRight\x22></div>"+
+      // accept=\x22.txt\x22 onchange=\x22ImportMods(event)
+      "<label style=\x22float: left;\x22 for=\x22file-upload\x22 class=\x22custom-file-upload\x22>Import File</label>"+
+      "<input type=\x22file\x22 id=\x22file-upload\x22 accept=\x22.glb\x22 onchange=\x22ImportFile(event)\x22>"+ 
+      // "<div class=\x22floatRight\x22><input class=\x22custom-file-upload\x22 type=\x22file\x22 id=\x22file\x22></input></div>" +
+      "<div>Local Assets aup in hea!</div>"+
+      "<div><hr> <br><input type=\x22button\x22 value=\x22Clear files from Local DB\x22 id=\x22clear-button\x22 class=\x22deleteButton\x22></input></div>"+
+
     "</div>"+
     "<div "+messagesDisplay+" id=\x22Messages\x22 class=\x22modalMain tabcontent\x22>"+ /////////////////////MESSAGES
       // "<form id=\x22form\x22 id=\x22chat_form\x22>"+
@@ -1735,10 +1745,9 @@ function SceneManglerModal(mode) {
       // "<label for=\x22file-upload\x22 class=\x22custom-file-upload\x22>Import Mods</label>"+
       // "<input type=\x22file\x22 id=\x22file-upload\x22 accept=\x22.txt\x22 onchange=\x22ImportMods(event)\x22></input>"+
         // ownerButton +
-        
-       
-        "<label style=\x22float: left;\x22 for=\x22file-upload\x22 class=\x22custom-file-upload\x22>Import Mods</label>"+
-        "<input type=\x22file\x22 id=\x22file-upload\x22 accept=\x22.txt\x22 onchange=\x22ImportMods(event)\x22></input>"+ 
+        "<label style=\x22float: left;\x22 for=\x22file-upload2\x22 class=\x22custom-file-upload\x22>Import Mods</label>"+
+        "<input type=\x22file\x22 id=\x22file-upload2\x22 accept=\x22.txt\x22 onchange=\x22ImportMods(event)\x22>"+ 
+
         "<button style=\x22float: left;\x22 class=\x22saveButton\x22 id=\x22exportButton\x22 onclick=\x22ExportMods()\x22>Export Mods</button>"+   
         ownerButton +
         hasModsMessage +
@@ -1765,7 +1774,12 @@ function SceneManglerModal(mode) {
       // "<div class=\x22twocolumn\x22><label for=\x22addmodel\x22>Add Model Asset (*.glb)</label><button class=\x22addButton\x22 id=\x22AddModelButton\x22 onclick=\x22AddModel()\x22>Add</button>"+
       // "<button class=\x22uploadButton\x22 id=\x22UploadModelButton\x22 onclick=\x22UploadModel()\x22>Upload</button>"+
       // "<input class=\x22addfield\x22 type=\x22text\x22 id=\x22addmodel\x22 placeholder=\x22*.glb model URL or IPFS\x22></div>"+
-      // // "</div>"+
+      // "<form id=\x22file-form\x22>" +
+        // "<label for=\x22file\x22 style=\x22float: right;\x22 class=\x22\x22>Select a file</label><input class=\x22custom-file-upload\x22 type=\x22file\x22 id=\x22file\x22>" +
+        //     "<div><input type=\x22submit\x22 value=\x22Add to Local DB\x22 class=\x22addButton\x22><input type=\x22button\x22 value=\x22Clear\x22 id=\x22clear-button\x22 class=\x22deleteButton\x22></div>" +
+          // "</form>" +
+      
+      // "</div>"+
 
       // "<div class=\x22twocolumn\x22><label for=\x22addmodel\x22>Add Primary Audio</label><button class=\x22addButton\x22 id=\x22AddModelButton\x22 onclick=\x22AddModel()\x22>Add</button>"+
       // "<button class=\x22uploadButton\x22 id=\x22UploadModelButton\x22 onclick=\x22UploadModel()\x22>Upload</button>"+

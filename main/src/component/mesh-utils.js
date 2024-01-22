@@ -2824,10 +2824,10 @@ AFRAME.registerComponent('mod_particles', {
     if (this.data.type.toLowerCase() =="candle") { //need to embed a location (light obj or empty named light), or find center point
       // this.el.setAttribute('scale', '.25 .25 .25');
       this.el.setAttribute('sprite-particles', {enable: true, texture: '#candle1', color: this.data.color, textureFrame: '8 8', textureLoop: '4', spawnRate: '1', lifeTime: '1', scale: this.data.scale.toString()});
-      this.el.setAttribute('light', {type: 'point', castShadow: true, color: this.data.color, intensity: 4, distance: 16, decay: 1});
-      this.lightAnimation(1.5, 2);
+      this.el.setAttribute('light', {type: 'point', castShadow: true, color: this.data.color, intensity: 1, distance: 8, decay: 2});
+      this.lightAnimation(.5, 1.5);
       this.el.addEventListener('animationcomplete', () => {
-          this.lightAnimation(1.5, 2);
+          this.lightAnimation(.5, 1.5);
       });
 
     }

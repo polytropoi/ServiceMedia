@@ -836,21 +836,31 @@ background-color: #000000;
     }
     input[type="file"] {
       display: none;
+      /* border: 1px solid #77ab71;
+      border-radius: 4px;
+      box-sizing: border-box;
+      font-size: 14px; */
+    }
+    .floatRight {
+      float: right;
+    }
+    .floatLeft {
+      float: left;
     }
 
     .custom-file-upload {
-      float: right;
-    /* width: 120px; */
-    background-color: #3b8388;
-    color: white;
-    padding: 10px 10px;
-    margin: 10px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 12px;
-    font-weight: bold;
-  }
+        /* float: right; */
+      /* width: 120px; */
+      background-color: #3b8388;
+      color: white;
+      padding: 10px 10px;
+      margin: 10px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: bold;
+    }
     input[type=text], select {
         width: 95%;
         padding: 10px;

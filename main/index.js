@@ -524,7 +524,7 @@
         // console.log(THREE.Cache);
     }
 
-    function NsetAframeScene() {
+    function setAframeScene() {
         // THREE.Cache.clear();
         clearThreeJSCache();
 
@@ -1225,7 +1225,7 @@
                 // "</a-cubemap>" +
             "</a-assets>" + 
             "<a-entity position='0 4 0' gltf-model='#glb' skybox-env-map shadow='receive: true'></a-entity>" +
-            "<a-light type='hemisphere'></a-light>"+
+            "<a-light type='ambient'></a-light>"+
             "<a-light type='directional' 'castShadow=true' position='1 11 1'></a-light>"+
             // "<a-light type='ambient'></a-light>"+
             "</a-scene></div>";
@@ -15108,6 +15108,7 @@ function getAllPeople() {
                     $('#sceneUseDynamicSky').bootstrapToggle('on');
                 }
                 $('#sceneUseDynamicShadows').bootstrapToggle();
+                console.log("sceneUseDynamicShadows " + response.data.sceneUseDynamicShadows);
                 if (response.data.sceneUseDynamicShadows) {
                     $('#sceneUseDynamicShadows').bootstrapToggle('on');
                 }

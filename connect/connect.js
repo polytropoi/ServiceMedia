@@ -361,7 +361,16 @@ function SaveLocalData() {  //persist mods an alt "~" version of the data
          };
       };
    }
+
+// var input = document.getElementsByTagName('input')[0]; ?
+
+// input.onclick = function () {
+//    this.value = null;
+// };
    
+// input.onchange = function () {
+//    console.log(this.value);
+// };   
 /////////////////// main onload function below, populate settings, etc.
 $(function() { 
    // InitIDB();

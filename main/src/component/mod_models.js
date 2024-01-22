@@ -11,7 +11,8 @@ AFRAME.registerComponent('mod_model', {
         modelID: {default: ''},
         timestamp: {default: ''},
         allowMods: {default: true},
-        name: {default: ''}
+        name: {default: ''},
+        scale: {default: 1}
         
       },
       init: function () {
@@ -221,10 +222,10 @@ AFRAME.registerComponent('mod_model', {
             }
             
           }
-          if (this.data.eventData.toLowerCase().includes("agent")) { 
+          if (this.data.eventData.toLowerCase().includes("agent") || this.data.markerType == "character" || this.data.tags.includes("agent")) { 
             if (settings.useNavmesh) {
               // this.el.setAttribute("nav-agent", "");
-              this.el.setAttribute("nav_agent_controller", "snapToWaypoint", true);  
+              this.el.setAttribute("nav_agent_controller", "snapToWaypoint", false);  
               this.el.setAttribute("mod_physics", {'model': 'agent', 'isTrigger': true});
             }
           }
@@ -240,7 +241,9 @@ AFRAME.registerComponent('mod_model', {
           }
 
           if (this.data.eventData.includes("scatter")) {
-            this.el.object3D.visible = false;
+            
+            // this.el.object3D.visible = false;
+            let initPos = this.el.getAttribute("position");
             let surface = null;
             let scatterSurface = document.getElementById("scatterSurface");
             let navmesh = document.getElementById("nav-mesh");
@@ -251,10 +254,17 @@ AFRAME.registerComponent('mod_model', {
             }
             console.log("tryna SCATTER (not instance) a model");
             if (surface) {
-              let split = this.data.eventData.split("~"); //gonna switch to tags...
               let count = 10;
+              let split = this.data.eventData.split("~"); //gonna switch to tags...
+              if (split.length > 0) {
+                if (parseInt(split[1]) != NaN) {
+                  count = parseInt(split[1]);
+                }
+                
+              }
+              console.log("TRYNA SCATTER MOD_MODEL with count " + count);
               let scatterCount = 0;
-              if (!this.isNavAgent) { //use waypoints for position below instead of raycasting if it's gonna nav
+              // if (!this.isNavAgent) { //use waypoints for position below instead of raycasting if it's gonna nav
                 let interval = setInterval( () => {
                 for (let i = 0; i < 100; i++) {
                   let testPosition = new THREE.Vector3();
@@ -277,10 +287,12 @@ AFRAME.registerComponent('mod_model', {
                     let eventData = this.data.eventData.replace("scatter", ""); //prevent infinite recursion!
 
                     scatteredEl.setAttribute("mod_model", {eventData: eventData, markerType: this.data.markerType, description: this.data.description, modelID: this.data.modelID});
-                    if (this.data.markerType != "character") { //messes up navmeshing..
-                      let scale = this.returnRandomNumber(.25, 1.25);
-                      scatteredEl.setAttribute("scale", {x: scale, y:scale, z: scale})
-                    }
+                    // if (this.data.markerType != "character") { //messes up navmeshing..
+                      let scale = this.returnRandomNumber(.5, 1.5);
+                      scatteredEl.setAttribute("scale", {x: this.data.scale * scale, y: this.data.scale * scale, z: this.data.scale * scale});
+                      // scatteredEl.setAttribute("scale", {x: scale, y:scale, z: scale})
+
+                    // }
                     this.el.sceneEl.appendChild(scatteredEl);
                     scatterCount++;
 
@@ -292,7 +304,7 @@ AFRAME.registerComponent('mod_model', {
                       }
                         
                     } else {
-                      // console.log('bad testPosition');
+                      console.log('bad testPosition ' + JSON.stringify(testPosition));
                       // waypoints.splice(i, 1);
                     }
                     // console.log("randomWaypoint : " + position);
@@ -301,34 +313,35 @@ AFRAME.registerComponent('mod_model', {
                     }
                   }
                 }, 2000);
-              } else { //just use waypoints to start for chars, nav_agent_controller.data.snapToWaypoints set above
-                let scatterCount = 0;
+              // }
+              // } else { //just use waypoints to start for chars, nav_agent_controller.data.snapToWaypoints set above
+              //   let scatterCount = 0;
                 
-                let interval = setInterval( () => {
+              //   let interval = setInterval( () => {
              
-                    let scatteredEl = document.createElement("a-entity"); 
-                    // scatteredEl.setAttribute("position", testPosition);
-                    scatteredEl.setAttribute("gltf-model", "#" + this.data.modelID);
-                    let eventData = this.data.eventData.replace("scatter", ""); //prevent infinite recursion!
+              //       let scatteredEl = document.createElement("a-entity"); 
+              //       // scatteredEl.setAttribute("position", "-500 0 0");
+              //       scatteredEl.setAttribute("gltf-model", "#" + this.data.modelID);
+              //       let eventData = this.data.eventData.replace("scatter", ""); //prevent infinite recursion!
 
-                    scatteredEl.setAttribute("mod_model", {eventData: eventData, markerType: this.data.markerType, description: this.data.description, modelID: this.data.modelID, tags: this.data.tags});
+              //       scatteredEl.setAttribute("mod_model", {eventData: eventData, markerType: this.data.markerType, description: this.data.description, modelID: this.data.modelID, tags: this.data.tags});
                     
-                      let scale = this.returnRandomNumber(.25, 1.25);
-                      scatteredEl.setAttribute("scale", {x: scale, y:scale, z: scale})
+              //         let scale = this.returnRandomNumber(.5, 1.5);
+              //         scatteredEl.setAttribute("scale", {x: this.data.scale * scale, y: this.data.scale * scale, z: this.data.scale * scale});
                     
-                    this.el.sceneEl.appendChild(scatteredEl);
-                    scatterCount++;
-                    if (scatterCount > count) {
-                      clearInterval(interval);
+              //       this.el.sceneEl.appendChild(scatteredEl);
+              //       scatterCount++;
+              //       if (scatterCount > count) {
+              //         clearInterval(interval);
                       
-                    } 
+              //       } 
                         
-                    if (i == 100) {
-                      clearInterval(interval);
-                    }
+              //       if (i == 100) {
+              //         clearInterval(interval);
+              //       }
 
-                }, 2000);
-              }
+              //   }, 2000);
+              // }
               
               }//close if surface              
             }

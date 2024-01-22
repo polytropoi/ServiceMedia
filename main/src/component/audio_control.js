@@ -721,7 +721,7 @@ AFRAME.registerComponent('primary_audio_player', {  //setup and controls for the
             } else {
                 this.primaryAudioHowl.seek(0);
             }
-            if (!this.primaryAudioHowl.playing()) {
+            if (this.mainTransportSlider && !this.primaryAudioHowl.playing()) {
                 this.mainTransportSlider.value = ((this.currentTime + 10) / this.duration * 100).toFixed(1);
             }
             //     console.log("tryna play");
@@ -742,7 +742,7 @@ AFRAME.registerComponent('primary_audio_player', {  //setup and controls for the
             } else {
                 this.primaryAudioHowl.seek(this.duration - 10);
             }
-            if (!this.primaryAudioHowl.playing()) {
+            if (this.mainTransportSlider && !this.primaryAudioHowl.playing()) {
                 this.mainTransportSlider.value = ((this.currentTime + 10) / this.duration * 100).toFixed(1);
             }
             // if (!this.primaryAudioHowl.playing()) {
