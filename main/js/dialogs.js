@@ -1633,7 +1633,7 @@ function SceneManglerModal(mode) {
     let ownerButton = "";
     let sendAdminMessageButton = "";
     if (userData.sceneOwner == "indaehoose") {
-        ownerButton = "<button class=\x22addButton\x22 id=\x22editButton\x22><a href=\x22../main/?type=scene&iid="+userData.sceneID+"\x22>Edit Scene</a></button>"+
+        ownerButton = "<button class=\x22addButton\x22 id=\x22editButton\x22 onclick=\x22window.location='../main/?type=scene&iid="+userData.sceneID+"';\x22></button>"+
         "<button style=\x22float: left;\x22 class=\x22reallySaveButton\x22 onclick=\x22SaveModsToCloud()\x22>Save to Cloud DB</button>";
         sendAdminMessageButton = "<button style=\x22float: left;\x22 class=\x22reallySaveButton\x22 onclick=\x22SendAdminMessage()\x22>Send Admin Message</button>";
     }

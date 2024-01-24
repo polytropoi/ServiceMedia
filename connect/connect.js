@@ -1225,55 +1225,55 @@ function GoToPrevious() {
    }
 }
 
-function ReturnLocationTableOLD () { //now it's all in indexedDB
-   // console.log("LOCATIONMODS: " + JSON.stringify(sceneLocations.locationMods));
-   if (sceneLocations.locationMods != null && sceneLocations.locationMods.length > 0) {
-      let tablerows = "";
-      for (let i = 0; i < sceneLocations.locationMods.length; i++) {
-         let markerString = "";
-         if (sceneLocations.locationMods[i].isLocal != null && sceneLocations.locationMods[i].isLocal === true) {
-            markerString = "<span style=\x22color: pink; font-weight: bold;\x22>"+sceneLocations.locationMods[i].markerType+"</span>";
-         } else {
-            markerString = "<span style=\x22color: lime; font-weight: bold;\x22>"+sceneLocations.locationMods[i].markerType+"</span>";
-         }
+// function ReturnLocationTableOLD () { //now it's all in indexedDB
+//    // console.log("LOCATIONMODS: " + JSON.stringify(sceneLocations.locationMods));
+//    if (sceneLocations.locationMods != null && sceneLocations.locationMods.length > 0) {
+//       let tablerows = "";
+//       for (let i = 0; i < sceneLocations.locationMods.length; i++) {
+//          let markerString = "";
+//          if (sceneLocations.locationMods[i].isLocal != null && sceneLocations.locationMods[i].isLocal === true) {
+//             markerString = "<span style=\x22color: pink; font-weight: bold;\x22>"+sceneLocations.locationMods[i].markerType+"</span>";
+//          } else {
+//             markerString = "<span style=\x22color: lime; font-weight: bold;\x22>"+sceneLocations.locationMods[i].markerType+"</span>";
+//          }
 
-         if (sceneLocations.locationMods[i].markerType != undefined && (sceneLocations.locationMods[i].markerType.includes("picture") || sceneLocations.locationMods[i].markerType == "poi" 
-            || sceneLocations.locationMods[i].markerType == "placeholder" || sceneLocations.locationMods[i].markerType.toLowerCase().includes("trigger") 
-            || sceneLocations.locationMods[i].markerType == "mailbox" || sceneLocations.locationMods[i].markerType == "portal" || sceneLocations.locationMods[i].markerType == "gate") ) {
-            let namelabel = (sceneLocations.locationMods[i].name != 'undefined' && sceneLocations.locationMods[i].name != undefined && sceneLocations.locationMods[i].name != null) ? sceneLocations.locationMods[i].name : sceneLocations.locationMods[i].label; 
-            tablerows = tablerows + "<tr class=\x22clickableRow\x22 onclick=\x22LocationRowClick('"+sceneLocations.locationMods[i].phID+"')\x22><td>"+namelabel+"</td>"+
-            "<td>"+sceneLocations.locationMods[i].x+","+sceneLocations.locationMods[i].y+","+sceneLocations.locationMods[i].z+"</td><td>"+sceneLocations.locationMods[i].model+"</td><td>"+ markerString+"</td></tr>";
-            // "<td>"+sceneLocations.locationMods[i].phID+"</td><td>"+localString + sceneLocations.locationMods[i].markerType+"</td></tr>";
-            // "<td>"+sceneLocations.locationMods[i].phID+"</td><td>"+markerString+"</td></tr>";
-         }
-      }
-      return "<table id=\x22locations\x22><th>label</th><th>position</th><th>Asset</th><th>type</th>"+tablerows+"</table>";
-   } else {
-      return null;
-   }
-}
+//          if (sceneLocations.locationMods[i].markerType != undefined && (sceneLocations.locationMods[i].markerType.includes("picture") || sceneLocations.locationMods[i].markerType == "poi" 
+//             || sceneLocations.locationMods[i].markerType == "placeholder" || sceneLocations.locationMods[i].markerType.toLowerCase().includes("trigger") 
+//             || sceneLocations.locationMods[i].markerType == "mailbox" || sceneLocations.locationMods[i].markerType == "portal" || sceneLocations.locationMods[i].markerType == "gate") ) {
+//             let namelabel = (sceneLocations.locationMods[i].name != 'undefined' && sceneLocations.locationMods[i].name != undefined && sceneLocations.locationMods[i].name != null) ? sceneLocations.locationMods[i].name : sceneLocations.locationMods[i].label; 
+//             tablerows = tablerows + "<tr class=\x22clickableRow\x22 onclick=\x22LocationRowClick('"+sceneLocations.locationMods[i].phID+"')\x22><td>"+namelabel+"</td>"+
+//             "<td>"+sceneLocations.locationMods[i].x+","+sceneLocations.locationMods[i].y+","+sceneLocations.locationMods[i].z+"</td><td>"+sceneLocations.locationMods[i].model+"</td><td>"+ markerString+"</td></tr>";
+//             // "<td>"+sceneLocations.locationMods[i].phID+"</td><td>"+localString + sceneLocations.locationMods[i].markerType+"</td></tr>";
+//             // "<td>"+sceneLocations.locationMods[i].phID+"</td><td>"+markerString+"</td></tr>";
+//          }
+//       }
+//       return "<table id=\x22locations\x22><th>label</th><th>position</th><th>Asset</th><th>type</th>"+tablerows+"</table>";
+//    } else {
+//       return null;
+//    }
+// }
 
-function ReturnLocationTableOLD2 () { //just show em all now!
+// function ReturnLocationTableOLD2 () { //just show em all now!
 
-      let tablerows = "";
-      for (let i = 0; i < localData.locations.length; i++) {
-         let markerString = "";
-         if (localData.locations[i].isLocal != null && localData.locations[i].isLocal === true) {
-            markerString = "<span style=\x22color: pink; font-weight: bold;\x22>"+localData.locations[i].markerType+"</span>";
-         } else {
-            markerString = "<span style=\x22color: lime; font-weight: bold;\x22>"+localData.locations[i].markerType+"</span>";
-         }
+//       let tablerows = "";
+//       for (let i = 0; i < localData.locations.length; i++) {
+//          let markerString = "";
+//          if (localData.locations[i].isLocal != null && localData.locations[i].isLocal === true) {
+//             markerString = "<span style=\x22color: pink; font-weight: bold;\x22>"+localData.locations[i].markerType+"</span>";
+//          } else {
+//             markerString = "<span style=\x22color: lime; font-weight: bold;\x22>"+localData.locations[i].markerType+"</span>";
+//          }
 
-         // if (localData.locations[i].markerType != undefined && (localData.locations[i].markerType.includes("picture") || localData.locations[i].markerType == "poi" 
-         //    || localData.locations[i].markerType == "placeholder" || localData.locations[i].markerType.toLowerCase().includes("trigger") 
-         //    || localData.locations[i].markerType == "mailbox" || localData.locations[i].markerType == "portal" || localData.locations[i].markerType == "gate") ) {
+//          // if (localData.locations[i].markerType != undefined && (localData.locations[i].markerType.includes("picture") || localData.locations[i].markerType == "poi" 
+//          //    || localData.locations[i].markerType == "placeholder" || localData.locations[i].markerType.toLowerCase().includes("trigger") 
+//          //    || localData.locations[i].markerType == "mailbox" || localData.locations[i].markerType == "portal" || localData.locations[i].markerType == "gate") ) {
                
-            let namelabel = (localData.locations[i].name != 'undefined' && localData.locations[i].name != undefined && localData.locations[i].name != null) ? localData.locations[i].name : localData.locations[i].label; 
-            tablerows = tablerows + "<tr class=\x22clickableRow\x22 onclick=\x22LocationRowClick('"+localData.locations[i].timestamp+"')\x22><td>"+namelabel+"</td>"+
-            "<td>"+localData.locations[i].x+","+localData.locations[i].y+","+localData.locations[i].z+"</td><td>"+localData.locations[i].model+"</td><td>"+ markerString+"</td></tr>";
-      }
-      return "<table id=\x22locations\x22><th>label</th><th>position</th><th>Asset</th><th>type</th>"+tablerows+"</table>";
-}
+//             let namelabel = (localData.locations[i].name != 'undefined' && localData.locations[i].name != undefined && localData.locations[i].name != null) ? localData.locations[i].name : localData.locations[i].label; 
+//             tablerows = tablerows + "<tr class=\x22clickableRow\x22 onclick=\x22LocationRowClick('"+localData.locations[i].timestamp+"')\x22><td>"+namelabel+"</td>"+
+//             "<td>"+localData.locations[i].x+","+localData.locations[i].y+","+localData.locations[i].z+"</td><td>"+localData.locations[i].model+"</td><td>"+ markerString+"</td></tr>";
+//       }
+//       return "<table id=\x22locations\x22><th>label</th><th>position</th><th>Asset</th><th>type</th>"+tablerows+"</table>";
+// }
 
 function ReturnLocationTable () { //just show em all now!
 
@@ -1343,11 +1343,7 @@ function ReturnLocationTable () { //just show em all now!
 }
 
 function LocationRowClick(data) {
-   // // for (let i = 0; i < sceneLocations.locations)
-   // let isCloud = true;
-   // if (localKeys.indexOf(data) != -1) {
-   //    isCloud = false; //if local key matches, it's local
-   // }
+  
    console.log("location row click: " + data);
    ShowHideDialogPanel();
    // ShowLocationModal(data);
@@ -1356,251 +1352,10 @@ function LocationRowClick(data) {
    // ShowLocationModal(isCloud, data);
 }
 
-// InitIDB();
-function UpdateLocationData () { //maybe need to call an aframe component to do this?
-      // setTimeout(function () {
-      // if (Object.keys(localData).length > 0 ) {
-      // settings = Object.assign(localData.sceneSettings);
-      // sceneLocations = Object.assign(localData.sceneLocations);
-      // usingLocalData = true;
-      
-  
-      // console.log("gotsa element with id " + localData.locations[0].timestamp);
-      // this.locationDataEl = document.getElementById("locationData");
-
-      // if (this.locationDataEl) {
-      //    this.locationDataEl.components.location_data.updateSceneLocationData();
-      // }
-      // for (let i = 0; length; i++) {
-      //    console.log("number " + i);
-      // }
-         // UpdateLocation(sceneLocations.locations[i]);
-         // if (localData.locations[i] != undefined) {
-         //    let ts = localData.locations[i].timestamp;
-
-         //    let rEl = document.getElementById(ts);
-         //    if (rEl) {
-         //       console.log("gotsa element with id " + JSON.stringify(localData.locations[i]));
-         //          // let obj = rEl.getObject3D('mesh');
-         //          // obj.position.set({x: sceneLocations.locations[i].x, y: sceneLocations.locations[i].y, z: sceneLocations.locations[i].z });
-         //          // obj.rotation.set({x: sceneLocations.locations[i].eulerx, y: sceneLocations.locations[i].eulery, z: sceneLocations.locations[i].eulerz });
-         //       //    // obj.scale.set({x: sceneLocations.locations[i].markerObjScale, y: sceneLocations.locations[i].markerObjScale, z: sceneLocations.locations[i].markerObjScale});
-         //       // rEl.setAttribute("position", {x: sceneLocations.locations[i].x, y: sceneLocations.locations[i].y, z: sceneLocations.locations[i].z });
-         //       // rEl.setAttribute("rotation", {x: sceneLocations.locations[i].eulerx, y: sceneLocations.locations[i].eulery, z: sceneLocations.locations[i].eulerz });
-         //       // rEl.setAttribute("scale", {x: sceneLocations.locations[i].markerObjScale, y: sceneLocations.locations[i].markerObjScale, z: sceneLocations.locations[i].markerObjScale});
-         //    }
-         // }
-      // }
-
-      // console.log("gots sceneLocations.locations " + JSON.stringify(localData.sceneLocations.locations));
-      // for (let i = 0; localData.sceneLocations.locations.length; i++) {
-      //    // UpdateLocation(sceneLocations.locations[i]);
-      //    if (localData.sceneLocations.locations[i] != undefined) {
-      //       let ts = localData.sceneLocations.locations[i].timestamp.toString();
-      //       // let rEl = document.getElementById(ts);
-      //       // if (rEl) {
-      //          console.log("gotsa id " + ts + " " + JSON.stringify(localData.sceneLocations.locations[i]));
-      //             // let obj = rEl.getObject3D('mesh');
-      //             // obj.position.set({x: localData.sceneLocations.locations[i].x, y: localData.sceneLocations.locations[i].y, z: localData.sceneLocations.locations[i].z });
-      //             // obj.rotation.set({x: localData.sceneLocations.locations[i].eulerx, y: localData.sceneLocations.locations[i].eulery, z: localData.sceneLocations.locations[i].eulerz });
-      //             // obj.scale.set({x: localData.sceneLocations.locations[i].markerObjScale, y: localData.sceneLocations.locations[i].markerObjScale, z: localData.sceneLocations.locations[i].markerObjScale});
-      //          // rEl.setAttribute("position", {x: localData.sceneLocations.locations[i].x, y: localData.sceneLocations.locations[i].y, z: localData.sceneLocations.locations[i].z });
-      //          // rEl.setAttribute("rotation", {x: localData.sceneLocations.locations[i].eulerx, y: localData.sceneLocations.locations[i].eulery, z: localData.sceneLocations.locations[i].eulerz });
-      //          // rEl.setAttribute("scale", {x: localData.sceneLocations.locations[i].markerObjScale, y: localData.sceneLocations.locations[i].markerObjScale, z: localData.sceneLocations.locations[i].markerObjScale});
-      //       // }
-      //    }
-      // }
 
 
-   // }
-// }, 5000);
-}
-// function UpdateLocation(location) {
-//    console.log("upping location " + JSON.stringify(location));
-//    if (location) {
-//       console.log("looking for id : " +location.timestamp.toString());
-//       let rEl = document.getElementById(location.timestamp.toString());
-//       // if (rEl) {
-//       //    console.log("gotsa id " + sceneLocations.locations[i].timestamp);
-//       //    rEl.setAttribute("position", {x: location.x, y: location.y, z: location.z });
-//       //    rEl.setAttribute("rotation", {x: location.eulerx, y: location.eulery, z: location.eulerz });
-//       //    rEl.setAttribute("scale", {x: location.markerObjScale, y: location.markerObjScale, z: location.markerObjScale});
-//       // }
-//    } else {
-      
-//    }
-// }
-// function InitLocalData () {
+function CreatePlaceholder () { //New Location button
 
-//    if (Object.keys(localData).length > 0) { 
-//       // UpdateLocationData();
-//       console.log(JSON.stringify(localData));
-//    } else {
-   
-//       if (cloudData) {
-//          console.log("gots cloud data: " + JSON.stringify(cloudData));
-//          if (cloudData.sceneLocations.locations) {
-//             for (let i = 0; i < cloudData.sceneLocations.locations.length; i++) {
-//             // let theItemObject = JSON.parse(theItem);
-//             // theItemObject.isLocal = true;
-//             // locationMods.push(theItemObject);
-//                if (cloudData.sceneLocations.locations[i].markerType == "poi") {
-//                   let nextbuttonEl = document.getElementById('nextButton');
-//                   let prevbuttonEl = document.getElementById('previousButton');
-//                   nextbuttonEl.style.visibility = "visible";
-//                   prevbuttonEl.style.visibility = "visible";
-//                   poiLocations.push(cloudData.sceneLocations.locations[i]);
-//                }
-//             }
-//          }
-//       }
-//    }
-// }
-
-// function AddLocalMarkersOLD() {// new or modded markers not saved to cloud // DEPRECATED for indexedDB version
-   
-//    console.log("tryna add local keys count " + localStorage.length);
-//    let locationMods = []; //local scope for local mods 
-//    if (settings == '') {
-//       if (localStorage.length > 0 && (settings.sceneType == "Default" || settings.sceneType == "AFrame")) {
-//          for (var i=0; i < localStorage.length; i++)  {
-//             let theKey = localStorage.key(i);
-
-//             let gotsaMatch = false;
-
-//             if (theKey != null && theKey.toString().includes(room)) {
-//                let theItem = localStorage.getItem(theKey);
-//                // console.log("local key:" + theKey + " item " + theItem);
-//                // console.log(theKey);
-//                let keySplit = theKey.split("~"); //room is zero, timestamp is 2
-//                localKeys.push(keySplit[2]);// use this to filter the unmodded ones in AddCloudMarkers below, and tell modded vs unmodded locs //nevermind
-//                if (theKey.toString().includes("~localmarker~")) {
-
-//                   // localKeys.push(keySplit[2]);
-                  
-//                   // theItemObject = JSON.parse(theItem);
-//                   // theItemObject.markerType = theItemObject.markerType + " (local)";
-//                   console.log("localplaceholder key:" + theKey + " el " + document.getElementById(theKey));
-//                   let phEl = document.getElementById(theKey);
-
-//                   if (phEl == null) {
-//                      // console.log("creating local el " + theKey);
-//                      phEl = document.createElement('a-entity');   
-//                      phEl.id = theKey;
-//                      var sceneEl = document.querySelector('a-scene');
-//                      phEl.setAttribute('skybox-env-map', '');
-//                      phEl.setAttribute('local_marker', {'timestamp': keySplit[2]});
-//                      sceneEl.appendChild(phEl);
-//                   }
-//                   if (theItem != null && sceneLocations.locations != null) {
-//                      let theItemObject = JSON.parse(theItem);
-//                      theItemObject.isLocal = true;
-//                      locationMods.push(theItemObject);
-//                      if (theItemObject.markerType == "poi") {
-//                         let nextbuttonEl = document.getElementById('nextButton');
-//                         let prevbuttonEl = document.getElementById('previousButton');
-//                         nextbuttonEl.style.visibility = "visible";
-//                         prevbuttonEl.style.visibility = "visible";
-//                         poiLocations.push(theItemObject);
-//                      }
-//                   }
-//                } else if (theKey.toString().includes("~cloudmarker~")) { //a cloudmarker, if modded by user, becomes a defacto "local" marker, unless/until admin saves to cloud
-//                   let keySplit = theKey.split("~"); //room is zero, timestamp is 2
-               
-//                   let cItem = JSON.parse(theItem);
-//                   // cItem.isLocal = true;
-//                   // console.log('cloudplaceholder ' + JSON.stringify(cItem) );
-//                   // sceneLocations.locations.find(function(keySplit, index) { //kinda bad, what if 2 have same?
-//                   // if(tk.keystarttime == tkStarttimes[i]) {
-//                   //    return true;
-//                   // }}
-//                   locationMods.push(cItem);
-//                   if (cItem.markerType == "poi") {
-//                      let nextbuttonEl = document.getElementById('nextButton');
-//                      let prevbuttonEl = document.getElementById('previousButton');
-//                      nextbuttonEl.style.visibility = "visible";
-//                      prevbuttonEl.style.visibility = "visible";
-//                      poiLocations.push((cItem));
-//                   }
-//                   let phEl = document.getElementById(theKey);
-
-//                   if (phEl) {
-//                      let cloud_marker = phEl.components.cloud_marker;
-//                      if (cloud_marker) {
-//                         console.log("LocalMods to CLoudMarkerz!");
-//                      }
-//                   }
-//                } else if (theKey.toString().includes('color')) {
-//                   // console.log("gots color " + theKey + " item " + theItem);
-//                }
-            
-
-//                let enviroEl = document.getElementById('enviroEl'); //attached to aframe environment thing
-//                if (enviroEl != null) {
-//                   if (theKey.toString().includes("sceneColor1")) {  
-//                         enviroEl.setAttribute('environment', 'skyColor', theItem);
-//                      } else if (theKey.toString().includes("sceneColor2")) {
-//                         console.log("theColror eky " + theKey + " " + theItem);
-//                         enviroEl.setAttribute('environment', 'horizonColor', theItem);
-//                      } else if (theKey.toString().includes("sceneColor3")) {
-//                         enviroEl.setAttribute('environment', 'groundColor', theItem);
-//                      } else if (theKey.toString().includes("sceneColor4")) {
-//                         enviroEl.setAttribute('environment', 'groundColor2', theItem);
-//                         enviroEl.setAttribute('environment', 'dressingColor', theItem);
-//                   }
-//                }
-            
-//                // console.log("POILOCATIONS : "+ poiLocations.length);
-//             }
-//             if (localStorage.length - 1 === i) {
-//                sceneLocations.locationMods = locationMods;
-//                console.log("updated locationmods " + JSON.stringify(sceneLocations.locationMods));
-//                // console.log("LOCATIONMODS: " + JSON.stringify(sceneLocations.locationMods));
-//                AddCloudMarkers(); //add the ones from admin
-//             }
-//          }
-//          // if (!gotsaMatch) {
-//          //    locationMods.push(cloudLocations[c]);
-//          // }
-//       } else {
-//          AddCloudMarkers(); 
-//       }
-//    }
-//    if (localData) {
-//       for (i = 0; i < localData.sceneLocations.locationMods.length; i++) {
-
-//       }
-//    }
-// }
-
-// function AddCloudMarkers () {
-//    if (cloudMarkers.length > 0) {
-//       for (let i = 0; i < cloudMarkers.length; i++) {
-//          sceneLocations.locationMods.push(cloudMarkers[i]);
-//       }
-//    } 
-// }
-
-function ClearPlaceholders() {
-   
-   // localStorage.clear();
-
-   // for (var i=0; i < localStorage.length; i++)  {
-      
-   //    let theKey = localStorage.key(i);
-   //    if (theKey.includes(room)) {
-   //       localStorage.removeItem(theKey);
-   //       console.log("removed " + theKey);
-   //    }
-   // }
-   // setTimeout(function () {
-   //    window.location.reload();
-   // }, 2000);
-   
-}
-function CreatePlaceholder () {
-
-   // SettingsModal();
    console.log("tryna create place3holder");
    let newPosition = new THREE.Vector3(); 
    let viewportHolder = document.getElementById('viewportPlaceholder3');
@@ -3387,24 +3142,24 @@ function PlayTimedEvent(timeKey) {
       GoToPrevious();
    } 
    if (timeKey.keytype == "Player Snap") {
-      console.log("tryna play a Player Snap event " + JSON.stringify(sceneLocations.locationMods));
+      console.log("tryna play a Player Snap event " + JSON.stringify(sceneLocations.locations));
       // if (sceneLocations.locations.ength > 0) {
-      for (let s = 0; s < sceneLocations.locationMods.length; s++) {
-      if (sceneLocations.locationMods[s].label != undefined && sceneLocations.locationMods[s].label != null) {
-         tempLabel = sceneLocations.locationMods[s].label;
-      } else if (sceneLocations.locationMods[s].name != undefined && sceneLocations.locationMods[s].name != null) {
-         tempLabel =sceneLocations.locationMods[s].name;
+      for (let s = 0; s < sceneLocations.locations.length; s++) {
+      if (sceneLocations.locations[s].label != undefined && sceneLocations.locations[s].label != null) {
+         tempLabel = sceneLocations.locations[s].label;
+      } else if (sceneLocations.locations[s].name != undefined && sceneLocations.locations[s].name != null) {
+         tempLabel =sceneLocations.locations[s].name;
       }
-      console.log("tryna match loc named " + JSON.stringify(sceneLocations.locationMods[s]) + " to  " + timeKey.keydata.toString());
+      console.log("tryna match loc named " + JSON.stringify(sceneLocations.locations[s]) + " to  " + timeKey.keydata.toString());
       
-         if (timeKey.keydata.toString() == tempLabel && (sceneLocations.locationMods[s].markerType == "placeholder" || sceneLocations.locationMods[s].markerType == "poi")) {
-         console.log("gots match loc named " + JSON.stringify(sceneLocations.locationMods[s]) + " to  " + timeKey.keydata.toString());
-            posObj.x = sceneLocations.locationMods[s].x;
-            posObj.y = sceneLocations.locationMods[s].y;
-            posObj.z = sceneLocations.locationMods[s].z;
-            rotObj.x = sceneLocations.locationMods[s].eulerx != null ? sceneLocations.locationMods[s].eulerx : 0;
-            rotObj.y = sceneLocations.locationMods[s].eulery != null ? sceneLocations.locationMods[s].eulery : 0;
-            rotObj.z = sceneLocations.locationMods[s].eulerz != null ? sceneLocations.locationMods[s].eulerz : 0;
+         if (timeKey.keydata.toString() == tempLabel && (sceneLocations.locations[s].markerType == "placeholder" || sceneLocations.locations[s].markerType == "poi")) {
+         console.log("gots match loc named " + JSON.stringify(sceneLocations.locations[s]) + " to  " + timeKey.keydata.toString());
+            posObj.x = sceneLocations.locations[s].x;
+            posObj.y = sceneLocations.locations[s].y;
+            posObj.z = sceneLocations.locations[s].z;
+            rotObj.x = sceneLocations.locations[s].eulerx != null ? sceneLocations.locations[s].eulerx : 0;
+            rotObj.y = sceneLocations.locations[s].eulery != null ? sceneLocations.locations[s].eulery : 0;
+            rotObj.z = sceneLocations.locations[s].eulerz != null ? sceneLocations.locations[s].eulerz : 0;
             // console.log(JSON.stringify(timeKey) + " tryna fire event Player Snap to " + JSON.stringify(sceneLocations.locations[s]));
             player.components.player_mover.move('player', posObj, rotObj, 0); //
 
@@ -3418,24 +3173,24 @@ function PlayTimedEvent(timeKey) {
     // if (sceneLocations.locations.ength > 0) {
       //  console.log("event: " + JSON.stringify(timeKey));
       console.log("trynba lerp to " + timeKey.keydata.toString());
-       for (let s = 0; s < sceneLocations.locationMods.length; s++) {
-         // if (sceneLocations.locationMods[s].label != undefined && sceneLocations.locationMods[s].label != null) {
-         //    tempLabel = sceneLocations.locationMods[s].label;
+       for (let s = 0; s < sceneLocations.locations.length; s++) {
+         // if (sceneLocations.locations[s].label != undefined && sceneLocations.locations[s].label != null) {
+         //    tempLabel = sceneLocations.locations[s].label;
          // } else 
-         if (sceneLocations.locationMods[s].name != undefined && sceneLocations.locationMods[s].name != null) {
-            tempLabel = sceneLocations.locationMods[s].name;
+         if (sceneLocations.locations[s].name != undefined && sceneLocations.locations[s].name != null) {
+            tempLabel = sceneLocations.locations[s].name;
          }
 
-         if (timeKey.keydata.toString() == tempLabel && (sceneLocations.locationMods[s].markerType == "placeholder" || sceneLocations.locationMods[s].markerType == "poi")) {
-            console.log("match loc named " + JSON.stringify(sceneLocations.locationMods[s]) + " to  " + timeKey.keydata.toString());
+         if (timeKey.keydata.toString() == tempLabel && (sceneLocations.locations[s].markerType == "placeholder" || sceneLocations.locations[s].markerType == "poi")) {
+            console.log("match loc named " + JSON.stringify(sceneLocations.locations[s]) + " to  " + timeKey.keydata.toString());
              // posObj = {};
              // rotObj = {};
-             posObj.x = sceneLocations.locationMods[s].x;
-             posObj.y = sceneLocations.locationMods[s].y;
-             posObj.z = sceneLocations.locationMods[s].z;
-             rotObj.x = sceneLocations.locationMods[s].eulerx != null ? sceneLocations.locationMods[s].eulerx : 0;
-             rotObj.y = sceneLocations.locationMods[s].eulery != null ? sceneLocations.locationMods[s].eulery : 0;
-             rotObj.z = sceneLocations.locationMods[s].eulerz != null ? sceneLocations.locationMods[s].eulerz : 0;
+             posObj.x = sceneLocations.locations[s].x;
+             posObj.y = sceneLocations.locations[s].y;
+             posObj.z = sceneLocations.locations[s].z;
+             rotObj.x = sceneLocations.locations[s].eulerx != null ? sceneLocations.locations[s].eulerx : 0;
+             rotObj.y = sceneLocations.locations[s].eulery != null ? sceneLocations.locations[s].eulery : 0;
+             rotObj.z = sceneLocations.locations[s].eulerz != null ? sceneLocations.locations[s].eulerz : 0;
              // document.getElementById("player").setAttribute("position", sceneLocations.locations[s].x + " " + sceneLocations.locations[s].y + " " + sceneLocations.locations[s].z);         
              duration = timeKey.keyduration;
              // console.log(JSON.stringify(timeKey) + " vs " + videoEl.currentTime + " tryna fire event Player lerp to " + JSON.stringify(posObj));

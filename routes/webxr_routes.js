@@ -1045,7 +1045,8 @@ webxr_router.get('/:_id', function (req, res) {
                                         || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "portal"  
                                         || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "waypoint" 
                                         || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "player"  
-                                        || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "3D text"  
+                                        || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "3D text" 
+                                        || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "light"  
                                         || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "mailbox") {
                                     //    locationPlaceholders.push(sceneResponse.sceneLocations[i].x + " " + sceneResponse.sceneLocations[i].y + " " + zFix);
                                         let tLoc = sceneResponse.sceneLocations[i];
@@ -1946,7 +1947,8 @@ webxr_router.get('/:_id', function (req, res) {
                                     color = locationLights[i].data;
                                 }
                             }
-                            lightEntities = lightEntities + "<a-light "+mods+" color=\x22" + color + "\x22 position=\x22"+locationLights[i].loc+"\x22 distance=\x22"+distance+"\x22 intensity='1' type='point'></a-light>";
+                            //move to cloud_marker for modding...
+                            // lightEntities = lightEntities + "<a-light "+mods+" color=\x22" + color + "\x22 position=\x22"+locationLights[i].loc+"\x22 distance=\x22"+distance+"\x22 intensity='1' type='point'></a-light>";
                         }
                         callback();
                     } else {
@@ -2373,7 +2375,7 @@ webxr_router.get('/:_id', function (req, res) {
                                         },
                                         function (cb) { //sprite sheets for object particle systems
                                             // 
-                                            if (objekt.particles != undefined && objekt.particles != null && objekt.particles != "None" ) {
+                                            if (objekt.particles != undefined && objekt.particles != null && objekt.particles != "None" ) { //maybe a "use flames" tag?
                                                 if (objekt.particles.toString().includes("Fire")) {
                                                     imageAssets = imageAssets + "<img id=\x22fireanim1\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/pics/fireanim3.png\x22 crossorigin=\x22anonymous\x22></img>";
                                                 }
@@ -4278,6 +4280,7 @@ webxr_router.get('/:_id', function (req, res) {
 
                     settings.sceneScatterMeshLayers = sceneResponse.sceneScatterMeshLayers;
                     settings.allowMods = true;
+                    settings.sceneTags = sceneResponse.sceneTags;
                 
 
                     if (sceneResponse.sceneTags != null && sceneResponse.sceneTags.includes("no mods")) {
@@ -5093,6 +5096,10 @@ webxr_router.get('/:_id', function (req, res) {
                         "<a-asset-item id=\x22reticle2\x22 response-type=\x22arraybuffer\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/reticle2.glb\x22></a-asset-item>\n"+
                         "<a-mixin id=\x22bar\x22 geometry=\x22primitive: box\x22 material=\x22color: black\x22 scale-y-color=\x22from: 10 60 10; to: 180 255 180; maxScale: 15\x22></a-mixin>\n"+
                         videosphereAsset +
+
+                        "<img id=\x22fireanim1\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/pics/fireanim3.png\x22 crossorigin=\x22anonymous\x22></img>"+
+                        "<img id=\x22candle1\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/pics/candle_flame_8x8.png\x22 crossorigin=\x22anonymous\x22></img>"+
+                        "<img id=\x22smoke1\x22 src=\x22http://servicemedia.s3.amazonaws.com/assets/pics/smokeanim2.png\x22 crossorigin=\x22anonymous\x22>"+
                         // videoAsset + 
                         imageAssets +
 

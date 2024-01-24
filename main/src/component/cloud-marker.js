@@ -95,8 +95,25 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                 // console.log("TRYNA SET MODEL TO MAILBOX!")
                 this.el.setAttribute('gltf-model', '#mailbox');
                 } else if (this.data.markerType == "3D text") {
-                    console.log("tryna set 3D text!");
-                    this.el.setAttribute("text_geometry", {value: this.data.description, font: '#optimerBoldFont'});
+                  console.log("tryna set 3D text!");
+                  this.el.setAttribute("text_geometry", {value: this.data.description, font: '#optimerBoldFont'});
+                } else if (this.data.markerType == "light") {
+                    console.log("tryna set a light!");
+                    if (!this.data.tags.includes("hide gizmo") || (settings.sceneTags && settings.sceneTags.includes("hide gizmos"))) {
+                    this.el.setAttribute("geometry", {primitive: "sphere", radius: .5});
+                    // this.el.setAttribute("light", {type: "point", intensity: .5, distance: 3, castShadow: true, decay: 1, color: "yellow"});
+                    // this.el.setAttribute("mod_flicker", {type: "candle"});
+                    this.el.setAttribute("material", {color: "yellow", wireframe: true});
+                    } 
+                    if (this.data.tags.includes("candle")) {
+                      this.el.setAttribute("mod_particles", {type: "candle", color: "yellow", scale: this.data.scale, addLight: true});
+                    } else {
+                      this.el.setAttribute("light", {type: "point", intensity: .5, distance: 3, castShadow: true, decay: 1, color: "yellow"});
+                    }
+                    if (this.data.tags.includes("flicker")) {
+                      this.el.setAttribute("mod_flicker", {type: "candle"});
+                    }
+                   
                 }
 
 
@@ -129,6 +146,8 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                     
                     } else if (this.data.markerType.toLowerCase() == "mailbox") {
                     
+                    } else if (this.data.markerType.toLowerCase() == "light") {
+                        this.el.setAttribute("material", {color: "yellow", wireframe: true});
                     } else {
 
                     }
@@ -274,7 +293,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
   
           // let elPos = that.el.getAttribute('position');
           // console.log(pos);
-          if (!name.includes("handle") && that.calloutEntity != null) {
+          if (!name.includes("handle") && that.calloutEntity != null && this.data.markerType != "light") { // umm...
     
             if (that.distance < 66) {
             that.calloutEntity.setAttribute("position", pos);
@@ -425,9 +444,11 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
         } else if (this.data.markerType.toLowerCase().includes("trigger")) {
             this.el.setAttribute("material", {color: "lime", transparent: true, opacity: .5});
         } else if (this.data.markerType.toLowerCase() == "gate") {
-            this.el.setAttribute("material", {color: "orange", transparent: true, opacity: .5});
+          this.el.setAttribute("material", {color: "orange", transparent: true, opacity: .5});
+        } else if (this.data.markerType.toLowerCase() == "light") {
+          this.el.setAttribute("material", {color: "yellow", wireframe: true, transparent: true, opacity: .5});
         } else if (this.data.markerType.toLowerCase() == "portal") {
-        
+            
         } else if (this.data.markerType.toLowerCase() == "mailbox") {
         
         } else {
@@ -522,6 +543,10 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
             } else if (this.data.markerType == "3D text") {
                 console.log("tryna set 3D text!");
                 this.el.setAttribute("text-geometry", {value: this.data.description, font: '#optimerBoldFont'});
+            }  else if (this.data.markerType == "light") {
+                console.log("tryna set 3D text!");
+                this.el.setAttribute("geometry", {primitive: "sphere", radius: .2});
+                this.el.setAttribute("material", {color: "yellow", wireframe: true, transparent: true, opacity: .5});
             }
             // if (this.data.markerType == "poi" || this.data.markerType == "waypoint" ||
             //  this.data.markerType == "placeholder" || this.data.markerType == "trigger" || this.data.markerType == "trigger") {

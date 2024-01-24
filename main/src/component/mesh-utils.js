@@ -2797,10 +2797,11 @@ AFRAME.registerComponent('mod_particles', {
     location: {type: 'string', default: null},
     type: {type: 'string', default: 'sparkler'},
     lifetime: {type: 'number', default: 0},
-    scale: {type: 'number', default: 1},
+    // scale: {type: 'number', default: 1},
     yFudge: {type: 'number', default: 0},
     color: {type: 'string', default: 'lightblue'},
-    scale: {type: 'number', default: 10}
+    scale: {type: 'number', default: 10},
+    addLight: {default: true}
 
   },
   init: function() {
@@ -2823,12 +2824,16 @@ AFRAME.registerComponent('mod_particles', {
     // }
     if (this.data.type.toLowerCase() =="candle") { //need to embed a location (light obj or empty named light), or find center point
       // this.el.setAttribute('scale', '.25 .25 .25');
+      console.log("tryna add candle!");
       this.el.setAttribute('sprite-particles', {enable: true, texture: '#candle1', color: this.data.color, textureFrame: '8 8', textureLoop: '4', spawnRate: '1', lifeTime: '1', scale: this.data.scale.toString()});
-      this.el.setAttribute('light', {type: 'point', castShadow: true, color: this.data.color, intensity: 1, distance: 8, decay: 2});
-      this.lightAnimation(.5, 1.5);
-      this.el.addEventListener('animationcomplete', () => {
-          this.lightAnimation(.5, 1.5);
-      });
+
+      if (this.data.addLight) {
+        this.el.setAttribute('light', {type: 'point', castShadow: true, color: this.data.color, intensity: .5, distance: 2, decay: 1});
+        this.lightAnimation(.25, 1);
+        this.el.addEventListener('animationcomplete', () => {
+            this.lightAnimation(.25, 1);
+        });
+      }
 
     }
         
@@ -2836,16 +2841,18 @@ AFRAME.registerComponent('mod_particles', {
       // this.el.setAttribute('scale', '.25 .25 .25');
       console.log("tryna light a fire! "  + JSON.stringify(this.data.location) + " scale " + this.data.scale);
       this.el.setAttribute('sprite-particles', {enable: true, texture: '#fireanim1', color: this.data.color, blending: 'additive', textureFrame: '6 6', textureLoop: '3', spawnRate: '2', lifeTime: '1.1', scale: this.data.scale.toString()});
-      this.el.setAttribute('light', {type: 'point', castShadow: true, color: this.data.color, intensity: .75, distance: 15, decay: 4});
-      this.lightAnimation(.7, 1.5);
-      this.el.addEventListener('animationcomplete', () => {
-          this.lightAnimation(.7, 1.5);
-      });
+      if (this.data.addLight) {
+        this.el.setAttribute('light', {type: 'point', castShadow: true, color: this.data.color, intensity: .75, distance: 15, decay: 4});
+        this.lightAnimation(.7, 1.5);
+        this.el.addEventListener('animationcomplete', () => {
+            this.lightAnimation(.7, 1.5);
+        });
+      }
       // this.el.setAttribute("position", this.data.location);
     }
     if (this.data.type.toLowerCase() =="smoke") {
       if (document.getElementById("smoke1")) {  //bc error if this isn't added at load, maybe just get it now? 
-        console.log("tryna light a smoke! " + JSON.stringify(this.data.location) + " scale " + this.data.scale );
+        console.log("tryna add smoke! " + JSON.stringify(this.data.location) + " scale " + this.data.scale );
         this.el.setAttribute('sprite-particles', {enable: true, texture: '#smoke1', color: this.data.color, blending: 'additive', textureFrame: '6 5', textureLoop: '1', spawnRate: '1', lifeTime: '3', scale: this.data.scale.toString()});
       }
       // this.el.setAttribute("position", this.data.location);
@@ -4519,6 +4526,9 @@ AFRAME.registerComponent('load_threesvg', {
         // if (this.rotation.z == 180 || this.rotation.z == -180) {
         //   this.rotation.z = 0;
         // } 
+        
+       
+        // this.object.position.set(0, 0, 0);
         if (localData.locations.length > 0) { //no local changes yet
           for (let i = 0; i < localData.locations.length; i++) {
             if (this.el.id == localData.locations[i].timestamp) {  
@@ -4530,7 +4540,9 @@ AFRAME.registerComponent('load_threesvg', {
               localData.locations[i].eulerz = this.rotation.z.toFixed(2);
               localData.locations[i].markerObjScale = this.scale.x.toFixed(2);
               localData.locations[i].isLocal = true;
+              // this.el.setAttribute("position", this.position);
               SaveLocalData();
+              
               break;
             }
           }
@@ -4561,6 +4573,7 @@ AFRAME.registerComponent('load_threesvg', {
               sceneLocations.locations[i].eulery = this.rotation.y.toFixed(2);
               sceneLocations.locations[i].eulerz = this.rotation.z.toFixed(2);
               sceneLocations.locations[i].markerObjScale = this.scale.x.toFixed(2);
+              // this.el.setAttribute("position", this.position);
               SaveLocalData();
               break;
             }
