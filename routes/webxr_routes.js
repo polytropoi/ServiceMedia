@@ -1501,7 +1501,7 @@ webxr_router.get('/:_id', function (req, res) {
                                     }
                                     
                                     // wasd = "extended_wasd_thirdperson=\x22fly: false; moveSpeed: "+sceneResponse.scenePlayer.playerSpeed+"; inputType: keyboard\x22 " + navConstraint;
-                                    cameraRigEntity = "<a-entity "+lookcontrols+" follow-camera=\x22target: #player\x22>" +
+                                    cameraRigEntity = "<a-entity id=\x22lookControls\x22 "+lookcontrols+" follow-camera=\x22target: #player\x22>" +
                                         "<a-entity id=\x22thirdPersonCamera\x22 camera position=\x220 5 7\x22 ></a-entity>" +
                                     "</a-entity>"+
                                     "<a-entity id=\x22cameraRig\x22 initializer "+
@@ -1547,13 +1547,13 @@ webxr_router.get('/:_id', function (req, res) {
                                     // wasd = "extended_wasd_controls=\x22flyEnabled: false; moveSpeed: 4; inputType: keyboard\x22";
                                     // wasd = "extended_wasd_thirdperson=\x22fly: false; moveSpeed: "+sceneResponse.scenePlayer.playerSpeed+"; inputType: keyboard\x22 simple-navmesh-constraint=\x22navmesh:#nav-mesh;fall:10; height: 0\x22";
                                     cameraRigEntity = "<a-entity "+lookcontrols+" follow-camera=\x22target: #player\x22>" +
-                                        "<a-entity camera position=\x220 0 0\x22 ></a-entity>" +
+                                        "<a-entity camera rotation=\x22"+playerRotation+"\x22 position=\x22"+playerPosition+"\x22 ></a-entity>" +
                                     "</a-entity>"+
                                     "<a-entity id=\x22cameraRig\x22 initializer "+
                                 
                                         " id=\x22mouseCursor\x22 cursor=\x22rayOrigin: mouse\x22 raycaster=\x22objects: .activeObjexRay\x22>"+
                                         // "<a-entity id=\x22player\x22 "+wasd+" "+ physicsMod +" position=\x22"+playerPosition+"\x22>"+
-                                        "<a-entity id=\x22player\x22  rotation=\x22"+playerRotation+"\x22 position=\x22"+playerPosition+"\x22>"+
+                                        "<a-entity id=\x22player\x22 >"+
                                             "<a-entity id=\x22equipPlaceholder\x22 geometry=\x22primitive: box; height: .1; width: .1; depth: .1\x22 position=\x220 -.65 -.75\x22"+
                                             "material=\x22opacity: 0\x22></a-entity>"+
                                             "<a-entity id=\x22viewportPlaceholder\x22 geometry=\x22primitive: plane; height: 0.01; width: .01\x22 position=\x220 0 -1.5\x22"+
@@ -1615,7 +1615,8 @@ webxr_router.get('/:_id', function (req, res) {
                                         // " id=\x22mouseCursor\x22 cursor=\x22rayOrigin: mouse\x22 raycaster=\x22objects: .activeObjexRay\x22 rotation=\x22"+playerRotation+"\x22 position=\x22"+playerPosition+"\x22>"+
                                         // " id=\x22mouseCursor\x22 cursor=\x22rayOrigin: mouse\x22 raycaster=\x22objects: .activeObjexRay\x22 position=\x220 0 0\x22>"+
                                         // "<a-entity id=\x22player\x22 get_pos_rot networked=\x22template:#avatar-template;attachTemplateToLocal:false;\x22 "+spawnInCircle+" camera "+wasd+" look-controls=\x22hmdEnabled: false\x22 position=\x220 1.6 0\x22>" +     
-                                        // "<a-entity id=\x22viewportPlaceholder\x22 position=\x220 0 -1\x22></entity>"+   
+                                        // "<a-entity id=\x22viewportPlaceholder\x22 position=\x220 0 -1\x22></entity>"+  
+                                        //obb-collider=\x22size: 1 1 1\x22 
                                         "<a-entity id=\x22player\x22 "+lookcontrols+" get_pos_rot camera=\x22near: .1\x22 "+wasd+" "+ physicsMod +" rotation=\x22"+playerRotation+"\x22 position=\x22"+playerPosition+"\x22>"+
                                             "<a-entity id=\x22equipPlaceholder\x22 geometry=\x22primitive: box; height: .1; width: .1; depth: .1;\x22 position=\x220 -.65 -.75\x22"+
                                             "material=\x22opacity: 0\x22></a-entity>"+

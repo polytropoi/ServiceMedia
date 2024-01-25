@@ -724,7 +724,7 @@ function ReturnLocationObjectSelect (phID) {
   let objexEl = document.getElementById('sceneObjects');
   let locationItem = null;
   if (objexEl != null) {
-    sceneObjects = objexEl.components.mod_objex.returnObjexData();
+    // sceneObjects = objexEl.components.mod_objex.returnObjexData(); //!
     // console.log("tryna return objects for phID " + phID);
 
     // let locationItem = JSON.parse(localStorage.getItem(phID)); //TODO switch to indexedDB

@@ -79,18 +79,19 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
             if ((!this.data.modelID || this.data.modelID == undefined || this.data.modelID == "" || this.data.modelID == "none") && !this.data.modelID.toString().includes("primitive")) {
             // console.log("CLOUDMARKER PLACEHOLDER GEO " + this.data.modelID);
             if (this.data.markerType.toLowerCase() == "placeholder") {
-                this.el.setAttribute('gltf-model', '#poi1');
+                  this.el.setAttribute('gltf-model', '#poi1');
                 } else if (this.data.markerType.toLowerCase() == "poi") {
-                this.el.setAttribute('gltf-model', '#poi1');
+                  this.el.setAttribute('gltf-model', '#poi1');
                 } else if (this.data.markerType.toLowerCase() == "waypoint") {
-                this.el.setAttribute('gltf-model', '#poi1');
-                this.el.classList.add("waypoint");
+                  this.el.setAttribute('gltf-model', '#poi1');
+                  this.el.classList.add("waypoint");
                 } else if (this.data.markerType.toLowerCase().includes("trigger")) {
-                this.el.setAttribute('gltf-model', '#poi1');  
+                  this.el.setAttribute('gltf-model', '#poi1');  
                 } else if (this.data.markerType.toLowerCase() == "gate") {
-               
-                this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"placeholder"});
-                this.el.setAttribute('gltf-model', '#gate2');
+                  // this.el.setAttribute("obb-collider", {size: '1 1 1'});
+
+                  this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"placeholder"});
+                  this.el.setAttribute('gltf-model', '#gate2');
                 } else if (this.data.markerType.toLowerCase() == "portal") {
                 this.el.setAttribute('gltf-model', '#poi1');
                 } else if (this.data.markerType.toLowerCase() == "mailbox") {
@@ -121,47 +122,48 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                 }
 
 
-            } else {
+          } else {
             if (this.data.modelID != "none") {
-                if (this.data.modelID.toString().includes("primitive")) {   
-                    // console.log("CLOUDMARKER PRIMITIVE " + this.data.modelID);
-                    if (this.data.modelID.toString().includes("cube")) {
-                        this.el.setAttribute("geometry", {primitive: "box", width: 1, height: 1, depth: 1});
-                    } else if (this.data.modelID.toString().includes("sphere")) {
-                        this.el.setAttribute("geometry", {primitive: "sphere", radius: 1});
-                    } else if (this.data.modelID.toString().includes("cylinder")) {
-                        this.el.setAttribute("geometry", {primitive: "cylinder", height: 1, radius: .5});
-                    } else {
-
-                    }
-                    if (this.data.markerType.toLowerCase() == "placeholder") {
-                        this.el.setAttribute("material", {color: "yellow", transparent: true, opacity: .5});
-                    } else if (this.data.markerType.toLowerCase() == "poi") {
-                        this.el.setAttribute("material", {color: "purple", transparent: true, opacity: .5});
-                    } else if (this.data.markerType.toLowerCase() == "waypoint") {
-                        this.el.setAttribute("material", {color: "green", transparent: true, opacity: .5});
-                        this.el.classList.add("waypoint");
-                        // this.el.setAttribute("color", "purple");
-                    } else if (this.data.markerType.toLowerCase().includes("trigger")) {
-                        this.el.setAttribute("material", {color: "lime", transparent: true, opacity: .5});
-                    } else if (this.data.markerType.toLowerCase() == "gate") {
-                        this.el.setAttribute("material", {color: "orange", transparent: true, opacity: .5});
-                        this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"placeholder"});
-                    } else if (this.data.markerType.toLowerCase() == "portal") {
-                    
-                    } else if (this.data.markerType.toLowerCase() == "mailbox") {
-                    
-                    } else if (this.data.markerType.toLowerCase() == "light") {
-                        this.el.setAttribute("material", {color: "yellow", wireframe: true});
-                    } else {
-
-                    }
+              if (this.data.modelID.toString().includes("primitive")) {   
+                // console.log("CLOUDMARKER PRIMITIVE " + this.data.modelID);
+                if (this.data.modelID.toString().includes("cube")) {
+                    this.el.setAttribute("geometry", {primitive: "box", width: 1, height: 1, depth: 1});
+                } else if (this.data.modelID.toString().includes("sphere")) {
+                    this.el.setAttribute("geometry", {primitive: "sphere", radius: 1});
+                } else if (this.data.modelID.toString().includes("cylinder")) {
+                    this.el.setAttribute("geometry", {primitive: "cylinder", height: 1, radius: .5});
                 } else {
-                    this.loadModel(this.data.modelID);
+
                 }
+                if (this.data.markerType.toLowerCase() == "placeholder") {
+                    this.el.setAttribute("material", {color: "yellow", transparent: true, opacity: .5});
+                } else if (this.data.markerType.toLowerCase() == "poi") {
+                    this.el.setAttribute("material", {color: "purple", transparent: true, opacity: .5});
+                } else if (this.data.markerType.toLowerCase() == "waypoint") {
+                    this.el.setAttribute("material", {color: "green", transparent: true, opacity: .5});
+                    this.el.classList.add("waypoint");
+                    // this.el.setAttribute("color", "purple");
+                } else if (this.data.markerType.toLowerCase().includes("trigger")) {
+                    this.el.setAttribute("material", {color: "lime", transparent: true, opacity: .5});
+                } else if (this.data.markerType.toLowerCase() == "gate") {
+                    this.el.setAttribute("material", {color: "orange", transparent: true, opacity: .5});
+                    this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"placeholder"});
+                    // this.el.setAttribute("obb-collider", {size: '1 1 1'});
+                } else if (this.data.markerType.toLowerCase() == "portal") {
+                
+                } else if (this.data.markerType.toLowerCase() == "mailbox") {
+                
+                } else if (this.data.markerType.toLowerCase() == "light") {
+                    this.el.setAttribute("material", {color: "yellow", wireframe: true});
+                } else {
+
+                }
+              } else {
+                  this.loadModel(this.data.modelID);
+              }
             }
         }
-            if (this.data.objectID != undefined && this.data.objectID != null && this.data.objectID != "none" && this.data.objectID != "") { //hrm, cloudmarker objex?
+        if (this.data.objectID != undefined && this.data.objectID != null && this.data.objectID != "none" && this.data.objectID != "") { //hrm, cloudmarker objex?
 
         }
           this.el.setAttribute('scale', this.scale);
@@ -234,7 +236,12 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
       this.calloutToggle = false;
   
       let that = this;
-  
+      // this.el.addEventListener('obbcollisionstarted	', (evt) => {
+      //     this.obbHit(evt);
+      // });
+      // this.el.addEventListener('obbcollisionended	', (evt) => {
+      //     this.obbHit(evt);
+      // });
   
       this.el.addEventListener('model-loaded', (evt) => { //load placeholder model first (which is an a-asset) before calling external
         evt.preventDefault();
@@ -361,6 +368,32 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
         that.mouseDownPos.y = 0;
         that.selectedAxis = null;
         // that.mousePos = null;
+        if (that.data.markerType == "gate") {
+          if (evt.detail.intersection.distance > 1 && evt.detail.intersection.distance < 15) {
+          this.dialogEl = document.getElementById('mod_dialog');
+          if (this.dialogEl) {
+            let ascenesEl = document.getElementById("availableScenesControl");
+            if (ascenesEl) {
+              let asControl = ascenesEl.components.available_scenes_control;
+              if (asControl) {
+                if (asControl) {
+                  let scene = asControl.returnRandomScene();
+                  let url = "/webxr/" + scene.sceneKey;
+                  // window.location.href = url; 
+                  this.dialogEl.components.mod_dialog.showPanel("Enter the gate to " + scene.sceneTitle +" ?", "href~"+ url, "gatePass" ); //param 2 is objID when needed
+                  console.log("bad " + evt.detail.intersection.distance);
+                  WaitAndHideDialogPanel(4000);
+                }
+              }
+            }
+          }
+        } else {
+          console.log("bad " + evt.detail.intersection.distance);
+        }
+      } else if (that.data.markerType == "poi") {
+        GoToLocation(that.data.timestamp);
+      }
+
   
       });
       sceneEl.addEventListener("mousemove", (event) =>{
@@ -576,6 +609,9 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
       this.isSelected = false;
       console.log("cloudmarker this.isSelected " + this.isSelected);
     },
+    obbHit: function (evt) {
+      console.log("obbHit!! " + evt.detail.withEl );
+    },
     playerTriggerHit: function () { //this uses AABB collider//nope, all physics now...
       console.log("gotsa player trigger hit on type " + this.data.markerType); 
       var triggerAudioController = document.getElementById("triggerAudio");
@@ -599,7 +635,8 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
           if (ascenesEl) {
             let asControl = ascenesEl.components.available_scenes_control;
             if (asControl) {
-              let url = "/webxr/" + asControl.returnRandomScene();
+              let scene = asControl.returnRandomScene();
+              let url = "/webxr/" + scene.sceneKey;
               window.location.href = url; 
               
             }

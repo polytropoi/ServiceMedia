@@ -213,7 +213,7 @@ function InitIDB() {
                   console.log("MIGHTY CLOUD MODS ABOUT TO STEP ON YOUR PUNY LOCAL MODS");
                   this.dialogEl = document.getElementById('mod_dialog');
                   if (this.dialogEl) {
-                     this.dialogEl.components.mod_dialog.showPanel("NOTICE: RECENT CLOUD MODS MUST STEP ON YOUR LOCAL MODS!", null, "recentCloudMods" ); //param 2 is objID when needed
+                     this.dialogEl.components.mod_dialog.showPanel("WARNING: RECENT CLOUD MODS MUST STEP ON YOUR LOCAL MODS!", null, "recentCloudMods" ); //param 2 is objID when needed
                   }
                   
                } else {
@@ -1115,6 +1115,18 @@ function GoToLocation(locationKey) {
 
          player.setAttribute('position', worldPos);
          console.log("target "+JSON.stringify(targetLocation)+ " vs. player " + JSON.stringify(player.getAttribute('position')));
+
+            //  var cameraEl = document.getElementById('player'); //hrm
+            // player.setAttribute('look-controls', {enabled: false});
+            // player.setAttribute("look-at", targetEl);
+            //    setTimeout(function (){
+            //       // player.object3D.updateMatrix();    
+            //       player.removeAttribute("look-at");
+            //       player.setAttribute('look-controls', {enabled: true});
+            //    }, 1000);
+
+         // cameraEl.removeAttribute("look-at");
+         // cameraEl.setAttribute('look-controls', {enabled: true});
          // window.playerPosition = worldPos;
 
          // ShowHideDialogPanel(); 
@@ -1543,10 +1555,10 @@ if (sceneEl != null) {
                }
                if (i == this.data.jsonData.length - 1) {
                   sceneEl.removeAttribute("keyboard-shortcuts");
-                  if (settings.allowMods) {
+                  // if (settings.allowMods) {
                      this.waitAndInitLocalDB();             
                      // InitIDB();
-                  }
+                  // }
                }
             }
           
@@ -1555,9 +1567,11 @@ if (sceneEl != null) {
          return this.data.youtubePosition;
       },
       waitAndInitLocalDB: function () {
-         // setTimeout( function() {
-            InitIDB();
-         // }, 4000);
+         setTimeout( function() {
+            if (settings && settings.allowMods) {
+               InitIDB();
+            }
+         }, 3000);
       },
       // applyLocalDataToCloudElement: function (locationKey) {
       //    for 

@@ -365,6 +365,30 @@ AFRAME.registerComponent('local_marker', { //special items with local mods
             selectedLocationTimestamp = that.timestamp;
             // ShowLocationModal(that.timestamp);
             SceneManglerModal('Location');
+        } else {
+          if (that.data.markerType == "gate") {
+            if (evt.detail.intersection.distance > 1 && evt.detail.intersection.distance < 15) {
+              this.dialogEl = document.getElementById('mod_dialog');
+              if (this.dialogEl) {
+                let ascenesEl = document.getElementById("availableScenesControl");
+                if (ascenesEl) {
+                  let asControl = ascenesEl.components.available_scenes_control;
+                  if (asControl) {
+                    let scene = asControl.returnRandomScene();
+                    let url = "/webxr/" + scene.sceneKey;
+                    // window.location.href = url; 
+                    this.dialogEl.components.mod_dialog.showPanel("Enter the gate to " + scene.sceneTitle +" ?", "href~"+ url, "gatePass" ); //param 2 is objID when needed
+                    console.log("good " + evt.detail.intersection.distance);
+                    WaitAndHideDialogPanel(4000);
+                  }
+                }
+              }
+            } else {
+              console.log("bad " + evt.detail.intersection.distance);
+            }
+          }  else if (that.data.markerType == "poi") {
+            GoToLocation(that.data.timestamp);
+          }
         }
       });
       this.el.addEventListener('mouseup', function (evt) {

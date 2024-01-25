@@ -1481,7 +1481,7 @@ AFRAME.registerComponent('available_scenes_control', {
       if (this.scenesArray && this.scenesArray.length > 0) {
         let index = Math.floor(Math.random() * this.scenesArray.length);
         console.log ("tryna get available scene " + index  + " " + JSON.stringify(this.scenesArray[index]));
-        return this.scenesArray[index].sceneKey;
+        return this.scenesArray[index];
       }
     }
 });
@@ -2334,8 +2334,8 @@ AFRAME.registerComponent('mod_dialog', { //there should only be one of these, un
       // this.el.setAttribute("visible", false);
       if (this.objID.includes("href~")) {
         let urlSplit = this.objID.split("~");
-        // window.location.href = urlSplit[1];
-        window.open(urlSplit[1], "_blank");
+        window.location.href = urlSplit[1];
+        // window.open(urlSplit[1], "_blank");
         this.el.setAttribute("visible", false);
         this.dialogPanel.classList.remove('activeObjexRay');
       } else {
@@ -2346,7 +2346,7 @@ AFRAME.registerComponent('mod_dialog', { //there should only be one of these, un
         }
       }
     } else {
-      if (this.messageType == "recentCloudMods") {
+      if (this.messageType == "recentCloudMods") { //warning dialog when cloud timestamp more recent than local
         DeleteLocalSceneData();
         setTimeout(function () {
           window.location.reload();
