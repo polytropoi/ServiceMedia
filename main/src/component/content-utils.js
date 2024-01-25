@@ -1286,7 +1286,7 @@ AFRAME.registerComponent('toggle-attributions-text', {
 
 let availableScenesIndex = 0;
 let scenesArray = [];
-AFRAME.registerComponent('available-scenes-control', {
+AFRAME.registerComponent('available_scenes_control', {
   schema: {
     jsonData: {
       parse: JSON.parse,
@@ -1296,7 +1296,7 @@ AFRAME.registerComponent('available-scenes-control', {
     init: function () {
       this.textureArray = [];
       const data = this.data;
-      scenesArray = this.data.jsonData.availableScenes; 
+      let scenesArray = this.data.jsonData.availableScenes; 
       // console.log(JSON.stringify(scenesArray));
       let availableScenePicEl = document.getElementById("availableScenePic");
       let nextButton = document.getElementById("availableScenesNextButton");
@@ -1475,6 +1475,14 @@ AFRAME.registerComponent('available-scenes-control', {
         });
         });
       }
+      this.scenesArray = scenesArray;
+    },
+    returnRandomScene: function () {
+      if (this.scenesArray && this.scenesArray.length > 0) {
+        let index = Math.floor(Math.random() * this.scenesArray.length);
+        console.log ("tryna get available scene " + index  + " " + JSON.stringify(this.scenesArray[index]));
+        return this.scenesArray[index].sceneKey;
+      }
     }
 });
 AFRAME.registerComponent('toggle-available-scenes', {
@@ -1520,7 +1528,7 @@ AFRAME.registerComponent('toggle-available-scenes', {
         if (!scenesPanelEl.getAttribute('visible')){
           
           scenesPanelEl.setAttribute('visible', true);
-          // // console.log(scenesPanelEl.getAttribute('available-scenes-control', jsonData.availableScenes));
+          // // console.log(scenesPanelEl.getAttribute('available_scenes_control', jsonData.availableScenes));
           // // console.log(scenesArray);
           // var scene = scenesArray[Math.floor(Math.random() * scenesArray.length)];
           let sceneHref = "/webxr/" + scenesArray[0].sceneKey;
@@ -1534,7 +1542,9 @@ AFRAME.registerComponent('toggle-available-scenes', {
         }
 
       });
-  },
+
+  }
+
   // applyEnvMap: function () {
   //   const mesh = this.el.getObject3D('mesh');
 

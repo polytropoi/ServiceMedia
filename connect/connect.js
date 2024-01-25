@@ -1544,7 +1544,8 @@ if (sceneEl != null) {
                if (i == this.data.jsonData.length - 1) {
                   sceneEl.removeAttribute("keyboard-shortcuts");
                   if (settings.allowMods) {
-                     InitIDB();
+                     this.waitAndInitLocalDB();             
+                     // InitIDB();
                   }
                }
             }
@@ -1552,6 +1553,11 @@ if (sceneEl != null) {
       }, 
       returnYouTubePosition: function() {
          return this.data.youtubePosition;
+      },
+      waitAndInitLocalDB: function () {
+         // setTimeout( function() {
+            InitIDB();
+         // }, 4000);
       },
       // applyLocalDataToCloudElement: function (locationKey) {
       //    for 

@@ -16,7 +16,7 @@ AFRAME.registerComponent('local_marker', { //special items with local mods
       tags: {default: ''},
       position: {default: ''},
       rotation: {default: ''},
-      scale: {default: '1'},
+      scale: {default: 1},
       isNew: {default: false}
   
     },
@@ -102,6 +102,7 @@ AFRAME.registerComponent('local_marker', { //special items with local mods
                     this.el.setAttribute('gltf-model', '#poi1');  
                   } else if (this.data.markerType.toLowerCase() == "gate") {
                     this.el.setAttribute('gltf-model', '#gate2');
+                    this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"placeholder"});
                   } else if (this.data.markerType.toLowerCase() == "portal") {
                     this.el.setAttribute('gltf-model', '#poi1');
                   } else if (this.data.markerType.toLowerCase() == "mailbox") {
@@ -110,7 +111,26 @@ AFRAME.registerComponent('local_marker', { //special items with local mods
                   } else if (this.data.markerType == "3D text") {
                     console.log("tryna set 3D text!");
                     this.el.setAttribute("text-geometry", {value: this.data.description, font: '#optimerBoldFont'});
-                    }
+                  } else if (this.data.markerType == "light") {
+                      console.log("tryna set a light!");
+                      if (!this.data.tags.includes("hide gizmo") || (settings.sceneTags && settings.sceneTags.includes("hide gizmos"))) {
+                      this.el.setAttribute("geometry", {primitive: "sphere", radius: .5});
+                      // this.el.setAttribute("light", {type: "point", intensity: .5, distance: 3, castShadow: true, decay: 1, color: "yellow"});
+                      // this.el.setAttribute("mod_flicker", {type: "candle"});
+                      this.el.setAttribute("material", {color: "yellow", wireframe: true});
+                      } 
+                      if (this.data.tags.includes("candle")) {
+                        this.el.setAttribute("mod_particles", {type: "candle", color: "yellow", scale: this.data.scale, addLight: true});
+                      } else if (this.data.tags.includes("fire")) {
+                        this.el.setAttribute("mod_particles", {type: "fire", color: "yellow", scale: this.data.scale, addLight: true});
+                      } else {
+                        this.el.setAttribute("light", {type: "point", intensity: .5, distance: this.data.scale, castShadow: true, decay: this.data.scale / 2, color: "yellow"});
+                      }
+                      if (this.data.tags.includes("flicker")) {
+                        this.el.setAttribute("mod_flicker", {type: "candle"});
+                      }
+                     
+                  }
               } else {
                 if (this.data.modelID != "none") {
                     if (this.data.modelID.toString().includes("primitive")) {
@@ -142,6 +162,7 @@ AFRAME.registerComponent('local_marker', { //special items with local mods
                             
                         } else if (this.data.markerType.toLowerCase() == "gate") {
                             this.el.setAttribute("material", {color: "orange", transparent: true, opacity: .5});
+                            this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"placeholder"});
                             // this.el.setAttribute("color", "orange");
                         } else if (this.data.markerType.toLowerCase() == "portal") {
                         
@@ -421,6 +442,7 @@ AFRAME.registerComponent('local_marker', { //special items with local mods
             }
         }
         this.el.classList.remove("waypoint");
+        this.el.classList.remove("gizmo");
         this.el.removeAttribute("transform_controls");
         this.el.removeAttribute("geometry");
         this.el.removeAttribute("gltf-model");
@@ -453,6 +475,7 @@ AFRAME.registerComponent('local_marker', { //special items with local mods
                     
                 } else if (this.data.markerType.toLowerCase() == "gate") {
                     this.el.setAttribute("material", {color: "orange", transparent: true, opacity: .5});
+                    this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"placeholder"});
                     // this.el.setAttribute("color", "orange");
                 } else if (this.data.markerType.toLowerCase() == "portal") {
                 
@@ -476,7 +499,26 @@ AFRAME.registerComponent('local_marker', { //special items with local mods
         } else if (this.data.markerType == "3D text") {
             console.log("tryna set 3D text!");
             this.el.setAttribute("text-geometry", {value: this.data.description, font: '#optimerBoldFont'});
-        }
+        } else if (this.data.markerType == "light") {
+          console.log("tryna set a light!");
+          if (!this.data.tags.includes("hide gizmo") || (settings.sceneTags && settings.sceneTags.includes("hide gizmos"))) {
+          this.el.setAttribute("geometry", {primitive: "sphere", radius: .5});
+          // this.el.setAttribute("light", {type: "point", intensity: .5, distance: 3, castShadow: true, decay: 1, color: "yellow"});
+          // this.el.setAttribute("mod_flicker", {type: "candle"});
+          this.el.setAttribute("material", {color: "yellow", wireframe: true});
+          } 
+          if (this.data.tags.includes("candle")) {
+            this.el.setAttribute("mod_particles", {type: "candle", color: "yellow", scale: this.data.scale, addLight: true});
+          } else if (this.data.tags.includes("fire")) {
+            this.el.setAttribute("mod_particles", {type: "fire", color: "yellow", scale: this.data.scale, addLight: true});
+          } else {
+            this.el.setAttribute("light", {type: "point", intensity: .5, distance: 3, castShadow: true, decay: 1, color: "yellow"});
+          }
+          if (this.data.tags.includes("flicker")) {
+            this.el.setAttribute("mod_flicker", {type: "candle"});
+          }
+         
+      } 
         
       }
     },

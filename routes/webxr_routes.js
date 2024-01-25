@@ -1676,6 +1676,7 @@ webxr_router.get('/:_id', function (req, res) {
                                 let tweakColors = "";
                                 let sunVector = "0 -.5 -.5";
                                 let intensity = "2";
+                                
                                 let envLighting = "lighting: distant"; //default
                             //default lights, 
    
@@ -1711,7 +1712,11 @@ webxr_router.get('/:_id', function (req, res) {
                                 }
                                 if (sceneResponse.sceneTweakColors) {
                                     // tweakColors = "mod-colors"; //need to animate
+                                    // envLighting = "lighting: none";
+                                }
+                                if (!sceneResponse.sceneUseDynamicSky) {
                                     envLighting = "lighting: none";
+                                    
                                 }
 
                                 if (sceneResponse.sceneUseGlobalFog || sceneResponse.sceneUseSceneFog) {
@@ -1739,26 +1744,30 @@ webxr_router.get('/:_id', function (req, res) {
                                 " playArea: 25; "+envLighting+";\x22 hide-in-ar-mode "+tweakColors+"></a-entity>";
                                 // environment = "<a-entity environment=\x22preset: "+webxrEnv+"; "+fog+" "+shadow+" "+groundcolor+" "+dressingcolor+" "+groundcolor2+" "+skycolor+" "+horizoncolor+" playArea: 3; lightPosition: 0 2.15 0\x22 hide-in-ar-mode></a-entity>";
                             } else {
-                                if (sceneResponse.sceneUseDynamicShadows) {
-                                    // shadow = " light=\x22castShadow: true\x22 shadow-camera-automatic=\x22.activeObjexRay\x22 ";
-                                    shadow = " light=\x22castShadow: true\x22 ";
-                                }
-                                if (sceneResponse.sceneSunVector) {
-                                    sunVector = sceneResponse.sceneSunVector;
-                                }
-                                if (sceneResponse.sceneSunIntensity) {
-                                    intensity = sceneResponse.sceneSunIntensity;
-                                }
-                                // aframeEnvironment =  "<a-gradient-sky material=\x22shader: gradient; topColor: "+HexToRgbValues(sceneResponse.sceneColor1)+"; bottomColor: "+HexToRgbValues(sceneResponse.sceneColor2)+";\x22></a-gradient-sky>";
-                                skySettings =  "<a-sky id=\x22skyEl\x22 color=\x22" + sceneResponse.sceneColor1 + "\x22 mod_sky=\x22enabled: true; color: "+sceneResponse.sceneColor1+";\x22></a-sky>";
-                                // skySettings = "<a-entity id=\x22skyEl\x22 mod_sky=\x22enabled: true; color: "+sceneResponse.sceneColor1+";></a-entity>"; //just plain color if not using enviro component //todo gradient sky? sun/sky component?
-                                // hemiLight = "<a-light id=\x22hemi-light\x22 type=\x22hemisphere\x22 color=\x22" + sceneResponse.sceneColor1 + "\x22 groundColor=\x22" + sceneResponse.sceneColor2 + "\x22 intensity=\x22.5\x22 position\x220 0 0\x22>"+
-                                    // "</a-light>";
-                                    
-                                    //default lights
+                                if (sceneResponse.sceneUseDynamicSky) {
+  
+                                    if (sceneResponse.sceneUseDynamicShadows) {
+                                        // shadow = " light=\x22castShadow: true\x22 shadow-camera-automatic=\x22.activeObjexRay\x22 ";
+                                        shadow = " light=\x22castShadow: true\x22 ";
+                                    }
+
+                                    if (sceneResponse.sceneSunVector) {
+                                        sunVector = sceneResponse.sceneSunVector;
+                                    }
+                                    if (sceneResponse.sceneSunIntensity) {
+                                        intensity = sceneResponse.sceneSunIntensity;
+                                    }
+                                    // aframeEnvironment =  "<a-gradient-sky material=\x22shader: gradient; topColor: "+HexToRgbValues(sceneResponse.sceneColor1)+"; bottomColor: "+HexToRgbValues(sceneResponse.sceneColor2)+";\x22></a-gradient-sky>";
+                                    skySettings =  "<a-sky id=\x22skyEl\x22 color=\x22" + sceneResponse.sceneColor1 + "\x22 mod_sky=\x22enabled: true; color: "+sceneResponse.sceneColor1+";\x22></a-sky>";
+                                    // skySettings = "<a-entity id=\x22skyEl\x22 mod_sky=\x22enabled: true; color: "+sceneResponse.sceneColor1+";></a-entity>"; //just plain color if not using enviro component //todo gradient sky? sun/sky component?
+                                    // hemiLight = "<a-light id=\x22hemi-light\x22 type=\x22hemisphere\x22 color=\x22" + sceneResponse.sceneColor1 + "\x22 groundColor=\x22" + sceneResponse.sceneColor2 + "\x22 intensity=\x22.5\x22 position\x220 0 0\x22>"+
+                                        // "</a-light>";
+                                        
+                                        //default lights
                                     lightEntities = "<a-light visible=\x22true\x22 show-in-ar-mode id=\x22real-light\x22 type=\x22directional\x22 "+shadow+" position=\x221 1 1\x22 color=\x22"+sceneResponse.sceneColor1+"\x22 "+
                                     "groundColor=\x22"+sceneResponse.sceneColor2+"\x22 intensity=\x221.5\x22 target=\x22#directionaltarget\x22><a-entity id=\x22directionaltarget\x22 position=\x22"+sunVector+"\x22></a-entity></a-light>" +
                                     "<a-light type='ambient' intensity=\x22.5\x22 color='" + sceneResponse.sceneColor2 + "'></a-light>";    
+                                }
                             }
                             sceneResponse.scenePostcards = sceneData.scenePostcards;
                             if (sceneResponse.sceneColor1 != null && sceneResponse.sceneColor1.length > 3) {
@@ -1926,35 +1935,35 @@ webxr_router.get('/:_id', function (req, res) {
                         callback();
                     }
                 },
-                function (callback) {
-                    if (locationLights.length > 0) {
-                        for (let i = 0; i < locationLights.length; i++) {
-                            let color = "";
-                            let distance = 10;
-                            let mods = "";
-                            console.log("gotsa light with data: " + locationLights[i].data);
-                            if (locationLights[i].data != null && locationLights[i].data.length > 0) {
-                                if (locationLights[i].data.indexOf("~") != -1) {
-                                    let split = locationLights[i].data.split("~");
-                                    color = split[0];
-                                    distance = split[1];
-                                    if (split.length > 2) {
-                                        if (split[2].toLowerCase().includes("flicker")) {
-                                            mods = " mod_flicker ";
-                                        }
-                                    }
-                                } else {
-                                    color = locationLights[i].data;
-                                }
-                            }
-                            //move to cloud_marker for modding...
-                            // lightEntities = lightEntities + "<a-light "+mods+" color=\x22" + color + "\x22 position=\x22"+locationLights[i].loc+"\x22 distance=\x22"+distance+"\x22 intensity='1' type='point'></a-light>";
-                        }
-                        callback();
-                    } else {
-                        callback();
-                    }
-                },
+                // function (callback) {
+                //     if (locationLights.length > 0) {
+                //         for (let i = 0; i < locationLights.length; i++) {
+                //             let color = "";
+                //             let distance = 10;
+                //             let mods = "";
+                //             console.log("gotsa light with data: " + locationLights[i].data);
+                //             if (locationLights[i].data != null && locationLights[i].data.length > 0) {
+                //                 if (locationLights[i].data.indexOf("~") != -1) {
+                //                     let split = locationLights[i].data.split("~");
+                //                     color = split[0];
+                //                     distance = split[1];
+                //                     if (split.length > 2) {
+                //                         if (split[2].toLowerCase().includes("flicker")) {
+                //                             mods = " mod_flicker ";
+                //                         }
+                //                     }
+                //                 } else {
+                //                     color = locationLights[i].data;
+                //                 }
+                //             }
+                //             //move to cloud_marker for modding...
+                //             // lightEntities = lightEntities + "<a-light "+mods+" color=\x22" + color + "\x22 position=\x22"+locationLights[i].loc+"\x22 distance=\x22"+distance+"\x22 intensity='1' type='point'></a-light>";
+                //         }
+                //         callback();
+                //     } else {
+                //         callback();
+                //     }
+                // },
                 function (callback) {
                     if (curvePoints.length > 0) {
                         for (let i = 0; i < curvePoints.length; i++) {
@@ -2124,7 +2133,8 @@ webxr_router.get('/:_id', function (req, res) {
                                 } else {
                                     // console.log('All files have been processed successfully skyboxEnvMap is ' + skyboxEnvMap);
          
-                                    if (scenesKeyLocation && availableScenes != null && availableScenes != undefined && availableScenes.length > 0) {
+                                    // if (scenesKeyLocation && availableScenes != null && availableScenes != undefined && availableScenes.length > 0) {
+                                    if (availableScenes != null && availableScenes != undefined && availableScenes.length > 0) { //need it for random gates, etc...
                                     availableScenesEntity = "<a-entity scale=\x22.75 .75 .75\x22 look-at=\x22#player\x22 position=\x22"+scenesKeyLocation+"\x22>"+ 
                                     "<a-entity position=\x220 -2.5 0\x22 scale=\x22.75  .75 .75\x22 id=\x22availableScenesControl\x22 class=\x22envMap activeObjexRay\x22 toggle-available-scenes "+skyboxEnvMap+" gltf-model=\x22#key\x22></a-entity>"+
                                     "<a-entity id=\x22availableScenesPanel\x22 visible='false' position=\x220 -1 0\x22>"+
@@ -2144,7 +2154,7 @@ webxr_router.get('/:_id', function (req, res) {
                                     loadAvailableScenes = "ready(function(){\n" + //TODO base64 this stuff like the others...very
                                     "let ascontrol = document.getElementById(\x22availableScenesControl\x22);\n"+
                                     
-                                    "ascontrol.setAttribute(\x22available-scenes-control\x22, \x22jsonData\x22, "+JSON.stringify(JSON.stringify(availableScenesResponse))+");\n"+ //double stringify! yes, it's needed
+                                    "ascontrol.setAttribute(\x22available_scenes_control\x22, \x22jsonData\x22, "+JSON.stringify(JSON.stringify(availableScenesResponse))+");\n"+ //double stringify! yes, it's needed
                                     "});";
                                     callback();
                                     } else {
@@ -4282,7 +4292,7 @@ webxr_router.get('/:_id', function (req, res) {
                     settings.allowMods = true;
                     settings.sceneTags = sceneResponse.sceneTags;
                 
-
+                    // settings.debug = settings.debugMode.length > 0;
                     if (sceneResponse.sceneTags != null && sceneResponse.sceneTags.includes("no mods")) {
                         settings.allowMods = false;
                     }
@@ -4801,6 +4811,8 @@ webxr_router.get('/:_id', function (req, res) {
                         let sceneShadows = "shadow=\x22enabled: false\x22";
                         let physicsInsert = "";
                         let physicsDummy = "";
+                        let defaultLights = "";
+                        
                         if (physicsScripts.length > 0) { //default is ammo
                             // physicsInsert = "physics=\x22driver: ammo; debug: true; gravity: -9.8; debugDrawMode: 0;\x22";
                             physicsInsert = "physics=\x22driver: ammo; debug: "+debugMode+"; debugDrawMode: 1;\x22";
@@ -4849,6 +4861,9 @@ webxr_router.get('/:_id', function (req, res) {
                         if (sceneResponse.sceneUseDynamicShadows) {
                             sceneShadows = "shadow=\x22type: pcfsoft\x22";
                         } 
+                        if (!sceneResponse.sceneUseDynamicSky) {
+                            defaultLights = "light=\x22defaultLightsEnabled: false;\x22";
+                        }
                         /////////AFRAME SCENE DECLARATION////////////////// 
                         let aScene = "<a-scene "+sceneBackground+" "+physicsInsert+" "+pool_target+" "+pool_launcher+" gesture-detector " + aframeRenderSettings + 
                         " reflection=\x22directionalLight:#real-light\x22 "+sceneShadows+" ar-hit-test=\x22target:.activeObjectRay; type:footprint; footprintDepth:0.1;\x22 ar-cursor raycaster=\x22objects: .activeObjexRay a-sphere\x22 "+
@@ -4856,7 +4871,7 @@ webxr_router.get('/:_id', function (req, res) {
                         // "screen-controls xr-mode-ui=\x22enterVREnabled: true; enterAREnabled: true; XRMode: ar,vr\x22 " + magicWindow +   
                         // " keyboard-shortcuts=\x22enterVR: false\x22" +  //add screen-controls from initializer                      
                         // webxrFeatures + " shadow=\x22type: pcfsoft\x22 loading-screen=\x22dotsColor: white; backgroundColor: black; enabled: false\x22 embedded " + fogSettings + " "+networkedscene+" "+ARSceneArg+" listen-for-vr-mode>";
-                        webxrFeatures + " shadow loading-screen=\x22dotsColor: white; backgroundColor: black; enabled: false\x22 " + fogSettings + " "+networkedscene+" "+ARSceneArg+" listen-for-vr-mode>";
+                        webxrFeatures + " shadow loading-screen=\x22dotsColor: white; backgroundColor: black; enabled: false\x22 " + fogSettings + " "+networkedscene+" "+ARSceneArg+" listen-for-vr-mode " + defaultLights +">";
 
                         let mainDiv = "<div id=\x22mainDiv\x22 style=\x22width:100%; height:100%\x22>";
 

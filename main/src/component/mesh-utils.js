@@ -80,7 +80,7 @@ AFRAME.registerComponent('mod_physics', { //used by models, placeholders, instan
       // console.log("truyna init mod_physics for id " + this.el.id + " model " + this.model +" isTrigger "+ this.isTrigger + " body " + this.data.body );
       this.el.setAttribute('ammo-body', {type: 'kinematic', emitCollisionEvents: this.isTrigger}); //placeholder model already loaded in mod_model
       
-          this.el.setAttribute("ammo-shape", {type: "box"});
+          this.el.setAttribute("ammo-shape", {type: 'sphere', fit: 'manual', sphereRadius: this.data.scaleFactor, offset: '0 .5 0'});
        
         }
         // console.log("tryna load placeholder  " + this.isTrigger);
@@ -2824,8 +2824,9 @@ AFRAME.registerComponent('mod_particles', {
     // }
     if (this.data.type.toLowerCase() =="candle") { //need to embed a location (light obj or empty named light), or find center point
       // this.el.setAttribute('scale', '.25 .25 .25');
+      let pSize = this.data.scale;
       console.log("tryna add candle!");
-      this.el.setAttribute('sprite-particles', {enable: true, texture: '#candle1', color: this.data.color, textureFrame: '8 8', textureLoop: '4', spawnRate: '1', lifeTime: '1', scale: this.data.scale.toString()});
+      this.el.setAttribute('sprite-particles', {enable: true, texture: '#candle1', color: this.data.color, textureFrame: '8 8', textureLoop: '4', spawnRate: '1', lifeTime: '1', scale: pSize.toString()});
 
       if (this.data.addLight) {
         this.el.setAttribute('light', {type: 'point', castShadow: true, color: this.data.color, intensity: .5, distance: 2, decay: 1});
@@ -2840,9 +2841,10 @@ AFRAME.registerComponent('mod_particles', {
     if (this.data.type.toLowerCase() =="fire") {
       // this.el.setAttribute('scale', '.25 .25 .25');
       console.log("tryna light a fire! "  + JSON.stringify(this.data.location) + " scale " + this.data.scale);
-      this.el.setAttribute('sprite-particles', {enable: true, texture: '#fireanim1', color: this.data.color, blending: 'additive', textureFrame: '6 6', textureLoop: '3', spawnRate: '2', lifeTime: '1.1', scale: this.data.scale.toString()});
+      let pSize = this.data.scale * 20;
+      this.el.setAttribute('sprite-particles', {enable: true, texture: '#fireanim1', color: this.data.color, blending: 'additive', textureFrame: '6 6', textureLoop: '3', spawnRate: '2', lifeTime: '1.1', scale: pSize.toString()});
       if (this.data.addLight) {
-        this.el.setAttribute('light', {type: 'point', castShadow: true, color: this.data.color, intensity: .75, distance: 15, decay: 4});
+        this.el.setAttribute('light', {type: 'point', castShadow: true, color: this.data.color, intensity: .75, distance: this.data.scale * 10, decay: this.data.scale * 5});
         this.lightAnimation(.7, 1.5);
         this.el.addEventListener('animationcomplete', () => {
             this.lightAnimation(.7, 1.5);

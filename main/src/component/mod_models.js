@@ -167,7 +167,7 @@ AFRAME.registerComponent('mod_model', {
         if (!this.isInitialized) {
   
   
-          if (this.data.eventData.includes("physics")) {
+          if (this.data.eventData && this.data.eventData.includes("physics")) {
             if (settings.usePhysicsType == "ammo") {
               if (this.data.eventData.includes("static")) {
               // this.el.object3D.visible = false;
@@ -202,7 +202,7 @@ AFRAME.registerComponent('mod_model', {
               }
             }
           }
-          if (this.data.eventData.toLowerCase().includes("ground")) { 
+          if (this.data.eventData && this.data.eventData.toLowerCase().includes("ground")) { 
             // groundMod = "static-body=\x22shape: auto;\x22"; //no, it needs to wait for model-loaded
             if (settings.usePhysicsType == "cannon") {
               console.log("tryna useSuperHands and set the ground static-body");
@@ -216,149 +216,46 @@ AFRAME.registerComponent('mod_model', {
               // <a-entity class="cube" mixin="cube" position="1 5.265 -0.5" material="color: green"></a-entity>
             }
           } 
-          if (this.data.eventData.toLowerCase().includes("navmesh")) { //no, this is set on the server (webxr_routes.js) ~line 2600
+          if (this.data.eventData && this.data.eventData.toLowerCase().includes("navmesh")) { //no, this is set on the server (webxr_routes.js) ~line 2600
             // groundMod = "static-body=\x22shape: auto;\x22"; //no, it needs to wait for model-loaded
             if (settings.useNavmesh) {
               
             }
-            if (!this.data.eventData.toLowerCase().includes("show")) {
+            if (this.data.eventData && !this.data.eventData.toLowerCase().includes("show")) {
               this.el.object3D.visible = false;
             }
             
           }
-          if (this.data.eventData.toLowerCase().includes("agent") || this.data.markerType == "character" || this.data.tags.includes("agent")) { 
+          if (this.data.eventData && this.data.eventData.toLowerCase().includes("agent") || this.data.markerType == "character" || this.data.tags.includes("agent")) { 
             if (settings.useNavmesh) {
               // this.el.setAttribute("nav-agent", "");
               this.el.setAttribute("nav_agent_controller", "snapToWaypoint", false);  
               this.el.setAttribute("mod_physics", {'model': 'agent', 'isTrigger': true});
             }
           }
-          if (this.data.eventData.toLowerCase().includes("transform")) { 
+          if (this.data.eventData && this.data.eventData.toLowerCase().includes("transform")) { 
 
               this.el.setAttribute("transform_controls", "");
               this.el.classList.add("transform");  
 
           }
-          if (this.data.eventData.toLowerCase().includes("transparent")) { 
+          if (this.data.eventData && this.data.eventData.toLowerCase().includes("transparent")) { 
             this.el.setAttribute("visibility", false);
             console.log("TRANSPARENT model!");
           }
 
-          if (this.data.eventData.includes("scatter")) {
-            
-            // this.el.object3D.visible = false;
-            let initPos = this.el.getAttribute("position");
-            let surface = null;
-            let scatterSurface = document.getElementById("scatterSurface");
-            let navmesh = document.getElementById("nav-mesh");
-            if (navmesh) {
-              surface = navmesh;
-            } else if (scatterSurface) {
-              surface = scatterSurface;
-            }
-            console.log("tryna SCATTER (not instance) a model " + navmesh + "  " + scatterSurface);
-            if (surface) {
-              let count = 10;
-              let split = this.data.eventData.split("~"); //gonna switch to tags...
-              if (split.length > 1) {
-                if (parseInt(split[1]) != NaN) {
-                  count = parseInt(split[1]);
-                }
-                
-              }
-              console.log("TRYNA SCATTER MOD_MODEL with count " + count);
-              let scatterCount = 0;
-              // if (!this.isNavAgent) { //use waypoints for position below instead of raycasting if it's gonna nav
-                let interval = setInterval( () => {
-                for (let i = 0; i < 100; i++) {
-                  let testPosition = new THREE.Vector3();
-                  testPosition.x = this.returnRandomNumber(-100, 100);  
-                  testPosition.y = 100;
-                  testPosition.z = this.returnRandomNumber(-100, 100);
-                  let raycaster = new THREE.Raycaster();
-                  raycaster.set(new THREE.Vector3(testPosition.x, testPosition.y, testPosition.z), new THREE.Vector3(0, -1, 0));
-                  let results = raycaster.intersectObject(surface.getObject3D('mesh'), true);
-          
-                  if(results.length > 0) {
-                    
-                    console.log("gotsa scatterPosition for model " + this.data.modelID+ " intersect: " + results.length + " " +results[0].object.name + "scatterCount " + scatterCount + " vs count " + count +  " scale " + this.scale);
-                    testPosition.x = results[0].point.x.toFixed(2); //snap y of waypoint to navmesh y
-                    testPosition.y = results[0].point.y.toFixed(2); //snap y of waypoint to navmesh y
-                    testPosition.z = results[0].point.z.toFixed(2); //snap y of waypoint to navmesh y
-                    let scatteredEl = document.createElement("a-entity"); 
-                    scatteredEl.setAttribute("position", testPosition);
-                    scatteredEl.setAttribute("gltf-model", "#" + this.data.modelID);
-                    let eventData = this.data.eventData.replace("scatter", ""); //prevent infinite recursion!
-
-                    scatteredEl.setAttribute("mod_model", {eventData: eventData, markerType: this.data.markerType, description: this.data.description, modelID: this.data.modelID});
-                    scatteredEl.setAttribute("shadow", {cast: true, receive: true});
-                    scatteredEl.classList.add("envMap");
-                    // if (this.data.markerType != "character") { //messes up navmeshing..
-                      let scale = this.returnRandomNumber(.5, 1.5);
-                      scatteredEl.setAttribute("scale", {x: this.scale * scale, y: this.scale * scale, z: this.scale * scale});
-                      // scatteredEl.setAttribute("scale", {x: scale, y:scale, z: scale})
-
-                    // }
-                    this.el.sceneEl.appendChild(scatteredEl);
-                    scatterCount++;
-
-                    if (scatterCount > count) {
-                      clearInterval(interval);
-                      break;
-                      } else {
-                        break;
-                      }
-                        
-                    } else {
-                      console.log('bad testPosition ' + JSON.stringify(testPosition));
-                      // waypoints.splice(i, 1);
-                    }
-                    // console.log("randomWaypoint : " + position);
-                    if (i == 100) {
-                      clearInterval(interval);
-                    }
-                  }
-                }, 2000);
-              // }
-              // } else { //just use waypoints to start for chars, nav_agent_controller.data.snapToWaypoints set above
-              //   let scatterCount = 0;
-                
-              //   let interval = setInterval( () => {
-             
-              //       let scatteredEl = document.createElement("a-entity"); 
-              //       // scatteredEl.setAttribute("position", "-500 0 0");
-              //       scatteredEl.setAttribute("gltf-model", "#" + this.data.modelID);
-              //       let eventData = this.data.eventData.replace("scatter", ""); //prevent infinite recursion!
-
-              //       scatteredEl.setAttribute("mod_model", {eventData: eventData, markerType: this.data.markerType, description: this.data.description, modelID: this.data.modelID, tags: this.data.tags});
-                    
-              //         let scale = this.returnRandomNumber(.5, 1.5);
-              //         scatteredEl.setAttribute("scale", {x: this.data.scale * scale, y: this.data.scale * scale, z: this.data.scale * scale});
-                    
-              //       this.el.sceneEl.appendChild(scatteredEl);
-              //       scatterCount++;
-              //       if (scatterCount > count) {
-              //         clearInterval(interval);
-                      
-              //       } 
-                        
-              //       if (i == 100) {
-              //         clearInterval(interval);
-              //       }
-
-              //   }, 2000);
-              // }
-              
-              }//close if surface              
-            }
-            if (this.data.eventData.includes("pickup")) { //USING PHYSX, needs useStarterKit = true!
-              this.el.setAttribute("data-pick-up");
-            
-            if (this.data.eventData.includes("magnet") || this.data.eventData.includes("snap")) {
-              this.el.classList.add("magnet-left");
-              this.el.classList.add("magnet-right");
-            }
+          if (this.data.eventData && this.data.eventData.includes("scatter")) {
+            this.scatterMe();
+                             
           }
+          if (this.data.eventData && this.data.eventData.includes("pickup")) { //USING PHYSX, needs useStarterKit = true!
+            this.el.setAttribute("data-pick-up");
+          
+          if (this.data.eventData && this.data.eventData.includes("magnet") || this.data.eventData.includes("snap")) {
+            this.el.classList.add("magnet-left");
+            this.el.classList.add("magnet-right");
+          }
+        }
   
           
           // this.oScale = oScale;
@@ -1879,6 +1776,83 @@ AFRAME.registerComponent('mod_model', {
       if (this.distance) {
         return this.distance;
       }
+    },
+    scatterMe: function () {
+      // this.el.object3D.visible = false;
+      let initPos = this.el.getAttribute("position");
+      let surface = null;
+      let scatterSurface = document.getElementById("scatterSurface");
+      let navmesh = document.getElementById("nav-mesh");
+      if (navmesh) {
+        surface = navmesh;
+      } else if (scatterSurface) {
+        surface = scatterSurface;
+      }
+      console.log("tryna SCATTER (not instance) a model " + navmesh + "  " + scatterSurface);
+      if (surface) {
+        let count = 10;
+        let split = this.data.eventData.split("~"); //gonna switch to tags...
+        if (split.length > 1) {
+          if (parseInt(split[1]) != NaN) {
+            count = parseInt(split[1]);
+          }
+          
+        }
+      console.log("TRYNA SCATTER MOD_MODEL with count " + count);
+      let scatterCount = 0;
+      // if (!this.isNavAgent) { //use waypoints for position below instead of raycasting if it's gonna nav
+        let interval = setInterval( () => {
+        for (let i = 0; i < 100; i++) {
+          let testPosition = new THREE.Vector3();
+          testPosition.x = this.returnRandomNumber(-100, 100);  
+          testPosition.y = 100;
+          testPosition.z = this.returnRandomNumber(-100, 100);
+          let raycaster = new THREE.Raycaster();
+          raycaster.set(new THREE.Vector3(testPosition.x, testPosition.y, testPosition.z), new THREE.Vector3(0, -1, 0));
+          let results = raycaster.intersectObject(surface.getObject3D('mesh'), true);
+  
+          if(results.length > 0) {
+            
+            console.log("gotsa scatterPosition for model " + this.data.modelID+ " intersect: " + results.length + " " +results[0].object.name + "scatterCount " + scatterCount + " vs count " + count +  " scale " + this.scale);
+            testPosition.x = results[0].point.x.toFixed(2); //snap y of waypoint to navmesh y
+            testPosition.y = results[0].point.y.toFixed(2); //snap y of waypoint to navmesh y
+            testPosition.z = results[0].point.z.toFixed(2); //snap y of waypoint to navmesh y
+            let scatteredEl = document.createElement("a-entity"); 
+            scatteredEl.setAttribute("position", testPosition);
+            scatteredEl.setAttribute("gltf-model", "#" + this.data.modelID);
+            let eventData = this.data.eventData.replace("scatter", ""); //prevent infinite recursion!
+
+            scatteredEl.setAttribute("mod_model", {eventData: eventData, markerType: this.data.markerType, description: this.data.description, modelID: this.data.modelID});
+            scatteredEl.setAttribute("shadow", {cast: true, receive: true});
+            scatteredEl.classList.add("envMap");
+            // if (this.data.markerType != "character") { //messes up navmeshing..
+              let scale = this.returnRandomNumber(.5, 1.5);
+              scatteredEl.setAttribute("scale", {x: this.scale * scale, y: this.scale * scale, z: this.scale * scale});
+              // scatteredEl.setAttribute("scale", {x: scale, y:scale, z: scale})
+
+            // }
+            this.el.sceneEl.appendChild(scatteredEl);
+            scatterCount++;
+
+            if (scatterCount > count) {
+              clearInterval(interval);
+              break;
+              } else {
+                break;
+              }
+                
+            } else {
+              console.log('bad testPosition ' + JSON.stringify(testPosition));
+              // waypoints.splice(i, 1);
+            }
+            // console.log("randomWaypoint : " + position);
+            if (i == 100) {
+              clearInterval(interval);
+            }
+          }
+        }, 2000);
+      }
+      
     },
     updateAndLoad: function (name, description, tags, eventData, markerType, scale, modelID) {
       this.data.name = name;

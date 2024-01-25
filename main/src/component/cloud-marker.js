@@ -88,6 +88,8 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                 } else if (this.data.markerType.toLowerCase().includes("trigger")) {
                 this.el.setAttribute('gltf-model', '#poi1');  
                 } else if (this.data.markerType.toLowerCase() == "gate") {
+               
+                this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"placeholder"});
                 this.el.setAttribute('gltf-model', '#gate2');
                 } else if (this.data.markerType.toLowerCase() == "portal") {
                 this.el.setAttribute('gltf-model', '#poi1');
@@ -99,7 +101,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                   this.el.setAttribute("text_geometry", {value: this.data.description, font: '#optimerBoldFont'});
                 } else if (this.data.markerType == "light") {
                     console.log("tryna set a light!");
-                    if (!this.data.tags.includes("hide gizmo") || (settings.sceneTags && settings.sceneTags.includes("hide gizmos"))) {
+                    if (!this.data.tags.includes("hide gizmo") || (settings && settings.sceneTags && settings.sceneTags.includes("hide gizmos"))) {
                     this.el.setAttribute("geometry", {primitive: "sphere", radius: .5});
                     // this.el.setAttribute("light", {type: "point", intensity: .5, distance: 3, castShadow: true, decay: 1, color: "yellow"});
                     // this.el.setAttribute("mod_flicker", {type: "candle"});
@@ -107,6 +109,8 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                     } 
                     if (this.data.tags.includes("candle")) {
                       this.el.setAttribute("mod_particles", {type: "candle", color: "yellow", scale: this.data.scale, addLight: true});
+                    } else if (this.data.tags.includes("fire")) {
+                      this.el.setAttribute("mod_particles", {type: "fire", color: "yellow", scale: this.data.scale, addLight: true});
                     } else {
                       this.el.setAttribute("light", {type: "point", intensity: .5, distance: 3, castShadow: true, decay: 1, color: "yellow"});
                     }
@@ -142,6 +146,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                         this.el.setAttribute("material", {color: "lime", transparent: true, opacity: .5});
                     } else if (this.data.markerType.toLowerCase() == "gate") {
                         this.el.setAttribute("material", {color: "orange", transparent: true, opacity: .5});
+                        this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"placeholder"});
                     } else if (this.data.markerType.toLowerCase() == "portal") {
                     
                     } else if (this.data.markerType.toLowerCase() == "mailbox") {
@@ -249,34 +254,11 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                 } 
             }
         });
-            //   this.el.setObject3D('mesh', obj);
-            //   if (this.data.markerType == "gate") {
-            //     this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"placeholder"});
-            //   }
-        // this.el.setAttribute("ammo-body", {type: "kinematic"});
-        // this.el.setAttribute('ammo-body', {type: 'kinematic', emitCollisionEvents: true});
+
       });
-  
-      // this.el.addEventListener('body-loaded', (evt) => { //load placeholder model first (which is an a-asset) before calling external
-      //   evt.preventDefault();
-      //   console.log("boduy LOADED FOR CLOUDMARKER!!!");
-      //   // this.el.setAttribute("mod_physics", {body: "kinematic", shape: "sphere", isTrigger: true, model:"placeholder"});
-      //   // this.el.setAttribute("ammo-body", {type: "kinematic"});
-      //   this.el.setAttribute("ammo-shape", {type: "sphere", fit: "all"});
-  
-      // });
-     
+       
       this.el.addEventListener('mouseenter', (evt) => {
         
-        // if (posRotReader != null) {
-        //   this.playerPosRot = posRotReader.returnPosRot(); 
-        //   window.playerPosition = this.playerPosRot.pos; 
-        // } else {
-        //     posRotReader = document.getElementById("player").components.get_pos_rot; 
-        //     this.playerPosRot = posRotReader.returnPosRot(); 
-        //     window.playerPosition = this.playerPosRot.pos; 
-        // }
-    
         if (evt.detail.intersection) {
           this.clientX = evt.clientX;
           this.clientY = evt.clientY;
@@ -495,6 +477,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                   
               } else if (this.data.markerType.toLowerCase() == "gate") {
                   this.el.setAttribute("material", {color: "orange", transparent: true, opacity: .5});
+                  this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"placeholder"});
                   // this.el.setAttribute("color", "orange");
               } else if (this.data.markerType.toLowerCase() == "portal") {
               
@@ -532,8 +515,10 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                 // this.el.setAttribute("color", "lime");
                 
             } else if (this.data.markerType.toLowerCase() == "gate") {
+              this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"placeholder"});
                 this.el.setAttribute("gltf-model", "#gate2");
                 this.el.setAttribute("material", {color: "orange", transparent: true, opacity: .5});
+               
                 // this.el.setAttribute("color", "orange");
             } else if (this.data.markerType.toLowerCase() == "portal") {
                 this.el.setAttribute("gltf-model", "#poi1");
@@ -543,11 +528,26 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
             } else if (this.data.markerType == "3D text") {
                 console.log("tryna set 3D text!");
                 this.el.setAttribute("text-geometry", {value: this.data.description, font: '#optimerBoldFont'});
-            }  else if (this.data.markerType == "light") {
-                console.log("tryna set 3D text!");
-                this.el.setAttribute("geometry", {primitive: "sphere", radius: .2});
-                this.el.setAttribute("material", {color: "yellow", wireframe: true, transparent: true, opacity: .5});
-            }
+            } else if (this.data.markerType == "light") {
+              console.log("tryna set a light!");
+              if (!this.data.tags.includes("hide gizmo") || (settings.sceneTags && settings.sceneTags.includes("hide gizmos"))) {
+              this.el.setAttribute("geometry", {primitive: "sphere", radius: .5});
+              // this.el.setAttribute("light", {type: "point", intensity: .5, distance: 3, castShadow: true, decay: 1, color: "yellow"});
+              // this.el.setAttribute("mod_flicker", {type: "candle"});
+              this.el.setAttribute("material", {color: "yellow", wireframe: true});
+              } 
+              if (this.data.tags.includes("candle")) {
+                this.el.setAttribute("mod_particles", {type: "candle", color: "yellow", scale: this.data.scale, addLight: true});
+              } else if (this.data.tags.includes("fire")) {
+                this.el.setAttribute("mod_particles", {type: "fire", color: "yellow", scale: this.data.scale, addLight: true});
+              } else {
+                this.el.setAttribute("light", {type: "point", intensity: .5, distance: 3, castShadow: true, decay: 1, color: "yellow"});
+              }
+              if (this.data.tags.includes("flicker")) {
+                this.el.setAttribute("mod_flicker", {type: "candle"});
+              }
+             
+          }
             // if (this.data.markerType == "poi" || this.data.markerType == "waypoint" ||
             //  this.data.markerType == "placeholder" || this.data.markerType == "trigger" || this.data.markerType == "trigger") {
             //     this.el.setAttribute("gltf-model", "#poi1");
@@ -594,6 +594,16 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
         if (this.data.eventData != null && this.data.eventData != "") {
           let url = "/webxr/" + this.data.eventData;
           window.location.href = url;
+        } else {
+          let ascenesEl = document.getElementById("availableScenesControl");
+          if (ascenesEl) {
+            let asControl = ascenesEl.components.available_scenes_control;
+            if (asControl) {
+              let url = "/webxr/" + asControl.returnRandomScene();
+              window.location.href = url; 
+              
+            }
+          }
         }
       }
     },

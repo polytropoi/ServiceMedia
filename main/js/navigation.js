@@ -1533,24 +1533,15 @@ AFRAME.registerComponent('nav_mesh_controller', {
 		console.log("tryna registerWaypoints..." + this.waypoints.length) ;
 		// let results = [];
 		let goodWaypointCount = 0;
+		
+		let raycaster = new THREE.Raycaster();
+		let position = new THREE.Vector3();
 		for (let i = 0; i < this.waypoints.length; i++) {
 			// if (goodWaypointCount > 2) {
 			// 	console.log("gots 2+ defined goodwaypoints");
 			// 	this.almostReady();
 			// }
-
-				let position = this.waypoints[i].getAttribute('position');
-				var testLineMaterial = new THREE.LineBasicMaterial({ color: 0xFF0000 });
-				var points = [];
-				points.push(new THREE.Vector3(position.x, position.y + 10, position.z));
-				points.push(new THREE.Vector3(position.x, position.y - 10, position.z));
-				var geometry = new THREE.BufferGeometry().setFromPoints(points);
-				var line = new THREE.Line(geometry, testLineMaterial);
-
-			// if (this.data.debug) {
-				this.el.sceneEl.object3D.add(line);
-			// }
-			let raycaster = new THREE.Raycaster();
+			position = this.waypoints[i].getAttribute('position');
 			raycaster.set(new THREE.Vector3(position.x, position.y + 50, position.z), new THREE.Vector3(0, -1, 0)); //a little off so it don't hit a vertex instead of face (?)
 			// var intersects = raycaster.intersectObject(navElObj);
 			let results = raycaster.intersectObject(this.el.getObject3D('mesh'), true);
@@ -1564,7 +1555,18 @@ AFRAME.registerComponent('nav_mesh_controller', {
 				this.waypoints[i].setAttribute('position', position);
 				this.goodWaypoints.push(this.waypoints[i]);
 				goodWaypointCount++;
-				testLineMaterial.color.set("green");
+
+				if (settings & settings.debugMode) {
+					
+					var testLineMaterial = new THREE.LineBasicMaterial({ color: 0xFF0000 });
+					var points = [];
+					points.push(new THREE.Vector3(position.x, position.y + 10, position.z));
+					points.push(new THREE.Vector3(position.x, position.y - 10, position.z));
+					var geometry = new THREE.BufferGeometry().setFromPoints(points);
+					var line = new THREE.Line(geometry, testLineMaterial);
+					this.el.sceneEl.object3D.add(line);
+				}
+				// testLineMaterial.color.set("green");
 				// data.waypoints[i].
 			} else {
 				console.log('bad nav waypoint');
@@ -1608,17 +1610,20 @@ AFRAME.registerComponent('nav_mesh_controller', {
 			
 			if (this.mesh) {
 			// this.mesh.updateMatrixWorld();
+			let raycaster = new THREE.Raycaster();
+			let testPosition = new THREE.Vector3();
 			for (let i = 0; i < 1000; i++) {
 				if (goodWaypointCount > 10) {
 					console.log("RANDOM WAYPOINTS READY gots enough random waypoints...");
 					this.almostReady();
 					break;	
 				}
-				let testPosition = new THREE.Vector3();
+				
+				
 				testPosition.x = this.returnRandomNumber(-100, 100);
 				testPosition.y = 50;
 				testPosition.z = this.returnRandomNumber(-100, 100);
-				let raycaster = new THREE.Raycaster();
+				
 				raycaster.set(new THREE.Vector3(testPosition.x, testPosition.y, testPosition.z), new THREE.Vector3(0, -1, 0));
 				let results = raycaster.intersectObject(this.mesh, true);
 // console.log("gotsa navmesh intersect: " + results.length + " " +results[0].object.name + " " + goodWaypointCount );
@@ -1636,6 +1641,19 @@ AFRAME.registerComponent('nav_mesh_controller', {
 						
 						this.goodWaypoints.push(waypointEl);
 						goodWaypointCount++;
+
+						// let position = this.waypoints[i].getAttribute('position');
+						
+					if (settings & settings.debugMode) {
+						var testLineMaterial = new THREE.LineBasicMaterial({ color: 0xFF0000 });
+						var points = [];
+						points.push(new THREE.Vector3(testPosition.x, testPosition.y + 10, testPosition.z));
+						points.push(new THREE.Vector3(testPosition.x, testPosition.y - 10, testPosition.z));
+						var geometry = new THREE.BufferGeometry().setFromPoints(points);
+						var line = new THREE.Line(geometry, testLineMaterial);
+
+						this.el.sceneEl.object3D.add(line);
+					}
 					// }
 					// data.waypoints[i].
 				} else {
