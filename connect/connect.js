@@ -170,7 +170,7 @@ function InitIDB() {
                                                             name: cursor.value.locations[i].name, 
                                                             modelID: cursor.value.locations[i].modelID, 
                                                             objectID: cursor.value.locations[i].objectID, 
-                                                            tags: cursor.value.locations[i].tags, 
+                                                            tags: cursor.value.locations[i].locationTags, 
                                                             eventData: cursor.value.locations[i].eventData, 
                                                             markerType: cursor.value.locations[i].markerType,
                                                             position: {x: cursor.value.locations[i].x, y: cursor.value.locations[i].y, z: cursor.value.locations[i].z},

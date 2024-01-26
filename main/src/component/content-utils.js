@@ -2300,7 +2300,7 @@ AFRAME.registerComponent('mod_dialog', { //there should only be one of these, un
   // this.dial
   let that = this;
   },
-  showPanel: function (panelString, objectID, messageType) {
+  showPanel: function (panelString, objectID, messageType, duration) {
 
     this.objID = objectID;
     this.messageType = messageType;
@@ -2323,6 +2323,9 @@ AFRAME.registerComponent('mod_dialog', { //there should only be one of these, un
     this.el.setAttribute('position', this.cameraPosition);
     console.log("tryna set mod_dialog position " + JSON.stringify(this.cameraPosition));
     this.dialogText.setAttribute('value', panelString);
+    if (duration > 0) {
+      this.waitAndHide(duration);
+    }
   },
   okButton: function () {
     this.el.setAttribute("visible", false);
@@ -2379,7 +2382,7 @@ AFRAME.registerComponent('mod_dialog', { //there should only be one of these, un
         }
       });
     }
-    WaitAndHideDialogPanel(2000);
+    this.waitAndHide(2000);
       // setTimeout(function () {
       //   this.el.components.mod_dialog.hidePanel();
       // }, 3000);
@@ -2399,18 +2402,26 @@ AFRAME.registerComponent('mod_dialog', { //there should only be one of these, un
         }
       });
     }
-    WaitAndHideDialogPanel(2000);
+    this.waitAndHide(2000);
+  }, 
+  waitAndHide: function (duration) {
+    if (this.el.getAttribute("visible") == true) {
+      setTimeout(() =>{ dialog.setAttribute("visible", false);
+      panel.classList.remove('activeObjexRay');
+      }, duration);
+    }
   }
 });
-function WaitAndHideDialogPanel (time) {
-  let dialog = document.getElementById("mod_dialog");
-  let panel = document.getElementById("mod_dialog_panel");
-  // if (dialog.getAttribute("visibility") == visible) {
-    setTimeout(() =>{ dialog.setAttribute("visible", false);
-    panel.classList.remove('activeObjexRay');
-    }, time);
-  // }
-}
+
+// function WaitAndHideDialogPanel (time) {
+//   let dialog = document.getElementById("mod_dialog");
+//   let panel = document.getElementById("mod_dialog_panel");
+//   if (dialog.getAttribute("visible") == true) {
+//     setTimeout(() =>{ dialog.setAttribute("visible", false);
+//     panel.classList.remove('activeObjexRay');
+//     }, time);
+//   }
+// }
 
 
 AFRAME.registerComponent('video_transport', { //alt for testing perf

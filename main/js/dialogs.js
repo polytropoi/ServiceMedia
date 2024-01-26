@@ -1186,10 +1186,13 @@ function PlayPauseMedia () {
     if (timedEventsListenerMode.toLowerCase() == "primary audio") {
       // PlayPausePrimaryAudio();
       // if (primaryAudio)
-      var primaryAudioController = document.getElementById("primaryAudio").components.primary_audio_control; 
-      if (primaryAudioController) {
-        let isPlaying = primaryAudioController.playPauseToggle(); //returns a bool 
-        return isPlaying;
+      var primaryAudioControllerEl = document.getElementById("primaryAudio")
+      if (primaryAudioControllerEl) {
+        let primaryAudioController = primaryAudioControllerEl.components.primary_audio_control; 
+        if (primaryAudioController) {
+          let isPlaying = primaryAudioController.playPauseToggle(); //returns a bool 
+          return isPlaying;
+        }
       }
       
     } else if (timedEventsListenerMode.toLowerCase() == "primary video") {
@@ -1441,7 +1444,7 @@ function GetUserInventory () {
               console.log("uniques : " + JSON.stringify(uniqueItems) + " counts : " + JSON.stringify(itemCounts) + " names : " + JSON.stringify(itemNames));
               for (let u = 0; u < uniqueItems.length; u++) {
                 let buttonNameString = itemNames[uniqueItems[u]] + " (" + itemCounts[uniqueItems[u]]+ ")";
-                console.log("buttonNameStirng: " + buttonNameString);
+                // console.log("buttonNameStirng: " + buttonNameString);
                 response = response + "<button class=\x22btnInventory\x22 onclick=\x22ShowInventoryItem('"+uniqueItems[u]+"')\x22>"+buttonNameString+"</button>";
                 inventoryDisplayEl.innerHTML = response;
               }
@@ -1633,7 +1636,7 @@ function SceneManglerModal(mode) {
     let ownerButton = "";
     let sendAdminMessageButton = "";
     if (userData.sceneOwner == "indaehoose") {
-        ownerButton = "<button class=\x22addButton\x22 id=\x22editButton\x22 onclick=\x22window.location='../main/?type=scene&iid="+userData.sceneID+"';\x22></button>"+
+        ownerButton = "<button class=\x22addButton\x22 id=\x22editButton\x22 onclick=\x22window.location='../main/?type=scene&iid="+userData.sceneID+"';\x22>Edit Scene</button>"+
         "<button style=\x22float: left;\x22 class=\x22reallySaveButton\x22 onclick=\x22SaveModsToCloud()\x22>Save to Cloud DB</button>";
         sendAdminMessageButton = "<button style=\x22float: left;\x22 class=\x22reallySaveButton\x22 onclick=\x22SendAdminMessage()\x22>Send Admin Message</button>";
     }

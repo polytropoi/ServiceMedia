@@ -16,7 +16,7 @@ AFRAME.registerComponent('local_marker', { //special items with local mods
       tags: {default: ''},
       position: {default: ''},
       rotation: {default: ''},
-      scale: {default: 1},
+      scale: {default: '1'},
       isNew: {default: false}
   
     },
@@ -112,23 +112,62 @@ AFRAME.registerComponent('local_marker', { //special items with local mods
                     console.log("tryna set 3D text!");
                     this.el.setAttribute("text-geometry", {value: this.data.description, font: '#optimerBoldFont'});
                   } else if (this.data.markerType == "light") {
-                      console.log("tryna set a light!");
-                      if (!this.data.tags.includes("hide gizmo") || (settings.sceneTags && settings.sceneTags.includes("hide gizmos"))) {
-                      this.el.setAttribute("geometry", {primitive: "sphere", radius: .5});
-                      // this.el.setAttribute("light", {type: "point", intensity: .5, distance: 3, castShadow: true, decay: 1, color: "yellow"});
-                      // this.el.setAttribute("mod_flicker", {type: "candle"});
-                      this.el.setAttribute("material", {color: "yellow", wireframe: true});
+                    console.log("tryna set a light!");
+                    // let color = "yellow";
+                    let color1 = "yellow";
+                    let color2 = "white";
+                    let intensity = 1.25;
+                    let duration = 1500;
+                    if (settings && settings.sceneColor3) {
+                      color1 = settings.sceneColor3;
+                    }
+                    if (settings && settings.sceneColor4) {
+                      color2 = settings.sceneColor4;
+                    }
+                    if (this.data.tags && (this.data.tags.includes("this") || this.data.tags.includes("event"))) {
+                      color1 = this.data.eventData;
+                    }
+                    if (this.data.tags && (this.data.tags.includes("dim"))) {
+                      intensity = .5;
+                    }
+                    if (this.data.tags && (this.data.tags.includes("bright"))) {
+                      intensity = 2;
+                    }
+                    if (this.data.tags && (this.data.tags.includes("very bright"))) {
+                      intensity = 4;
+                    }
+                    if (this.data.tags && (this.data.tags.includes("slow"))) {
+                      duration = 5000;
+                    }
+                    if (this.data.tags && (this.data.tags.includes("fast"))) {
+                      duration = 500;
+                    }
+                    if (!this.data.tags.includes("hide gizmo") || (settings.sceneTags && settings.sceneTags.includes("hide gizmos"))) {
+                    this.el.setAttribute("geometry", {primitive: "sphere", radius: .5});
+                    // this.el.setAttribute("light", {type: "point", intensity: .5, distance: 3, castShadow: true, decay: 1, color: "yellow"});
+                    // this.el.setAttribute("mod_flicker", {type: "candle"});
+                    this.el.setAttribute("material", {color: color1, wireframe: true});
+                    } 
+                    if (this.data.tags.includes("candle")) {
+                      this.el.setAttribute("mod_particles", {type: "candle", color: color1, scale: this.data.scale, addLight: true});
+                    } else if (this.data.tags.includes("fire")) {
+                      this.el.setAttribute("mod_particles", {type: "fire", color: color1, scale: this.data.scale, addLight: true});
+                    } else {
+                      
+                      this.el.setAttribute("light", {type: "point", intensity: intensity, distance: this.data.scale * 4, castShadow: true, decay: this.data.scale / 2, color: color2});
+                      if (this.data.tags && this.data.tags.includes("anim") && this.data.tags.includes("color")) {
+                        console.log("LOCAL_MARKER LIGHT " + color1 + color2 + duration);
+                        this.el.setAttribute("animation__color", {property: 'light.color', from: color1, to: color2, dur: duration, easing: 'easeInOutSine', loop: true, dir: 'alternate', autoplay: true});
                       } 
-                      if (this.data.tags.includes("candle")) {
-                        this.el.setAttribute("mod_particles", {type: "candle", color: "yellow", scale: this.data.scale, addLight: true});
-                      } else if (this.data.tags.includes("fire")) {
-                        this.el.setAttribute("mod_particles", {type: "fire", color: "yellow", scale: this.data.scale, addLight: true});
-                      } else {
-                        this.el.setAttribute("light", {type: "point", intensity: .5, distance: this.data.scale, castShadow: true, decay: this.data.scale / 2, color: "yellow"});
-                      }
-                      if (this.data.tags.includes("flicker")) {
-                        this.el.setAttribute("mod_flicker", {type: "candle"});
-                      }
+                      if (this.data.tags && this.data.tags.includes("anim") && this.data.tags.includes("intensity")) {
+      
+                        this.el.setAttribute("animation__intensity", {property: 'light.intensity', from: intensity - intensity/2, to: intensity + intensity/2, dur: duration, easing: 'easeInOutSine', loop: true, dir: 'alternate', autoplay: true});
+                      } 
+                            
+                    }
+                    if (this.data.tags.includes("flicker")) {
+                      this.el.setAttribute("mod_flicker", {type: "candle"});
+                    }
                      
                   }
               } else {
@@ -377,9 +416,9 @@ AFRAME.registerComponent('local_marker', { //special items with local mods
                     let scene = asControl.returnRandomScene();
                     let url = "/webxr/" + scene.sceneKey;
                     // window.location.href = url; 
-                    this.dialogEl.components.mod_dialog.showPanel("Enter the gate to " + scene.sceneTitle +" ?", "href~"+ url, "gatePass" ); //param 2 is objID when needed
+                    this.dialogEl.components.mod_dialog.showPanel("Enter the gate to " + scene.sceneTitle +" ?", "href~"+ url, "gatePass", 5000 ); 
                     console.log("good " + evt.detail.intersection.distance);
-                    WaitAndHideDialogPanel(4000);
+                    // WaitAndHideDialogPanel(4000);
                   }
                 }
               }
@@ -525,18 +564,56 @@ AFRAME.registerComponent('local_marker', { //special items with local mods
             this.el.setAttribute("text-geometry", {value: this.data.description, font: '#optimerBoldFont'});
         } else if (this.data.markerType == "light") {
           console.log("tryna set a light!");
+          // let color = "yellow";
+          let color1 = "yellow";
+          let color2 = "white";
+          let intensity = 1.25;
+          let duration = 1500;
+          if (settings && settings.sceneColor3) {
+            color1 = settings.sceneColor3;
+          }
+          if (settings && settings.sceneColor4) {
+            color2 = settings.sceneColor4;
+          }
+          if (this.data.tags && (this.data.tags.includes("this") || this.data.tags.includes("event"))) {
+            color1 = this.data.eventData;
+          }
+          if (this.data.tags && (this.data.tags.includes("dim"))) {
+            intensity = .5;
+          }
+          if (this.data.tags && (this.data.tags.includes("bright"))) {
+            intensity = 2;
+          }
+          if (this.data.tags && (this.data.tags.includes("very bright"))) {
+            intensity = 4;
+          }
+          if (this.data.tags && (this.data.tags.includes("slow"))) {
+            duration = 5000;
+          }
+          if (this.data.tags && (this.data.tags.includes("fast"))) {
+            duration = 500;
+          }
           if (!this.data.tags.includes("hide gizmo") || (settings.sceneTags && settings.sceneTags.includes("hide gizmos"))) {
           this.el.setAttribute("geometry", {primitive: "sphere", radius: .5});
           // this.el.setAttribute("light", {type: "point", intensity: .5, distance: 3, castShadow: true, decay: 1, color: "yellow"});
           // this.el.setAttribute("mod_flicker", {type: "candle"});
-          this.el.setAttribute("material", {color: "yellow", wireframe: true});
+          this.el.setAttribute("material", {color: color1, wireframe: true});
           } 
           if (this.data.tags.includes("candle")) {
-            this.el.setAttribute("mod_particles", {type: "candle", color: "yellow", scale: this.data.scale, addLight: true});
+            this.el.setAttribute("mod_particles", {type: "candle", color: color1, scale: this.data.scale, addLight: true});
           } else if (this.data.tags.includes("fire")) {
-            this.el.setAttribute("mod_particles", {type: "fire", color: "yellow", scale: this.data.scale, addLight: true});
+            this.el.setAttribute("mod_particles", {type: "fire", color: color1, scale: this.data.scale, addLight: true});
           } else {
-            this.el.setAttribute("light", {type: "point", intensity: .5, distance: 3, castShadow: true, decay: 1, color: "yellow"});
+            
+            this.el.setAttribute("light", {type: "point", intensity: intensity, distance: this.data.scale * 4, castShadow: true, decay: this.data.scale / 2, color: color2});
+            if (this.data.tags && this.data.tags.includes("anim") && this.data.tags.includes("color")) {
+              this.el.setAttribute("animation__color", {property: 'light.color', from: color1, to: color2, dur: duration, easing: 'easeInOutSine', loop: true, dir: 'alternate', autoplay: true});
+            } 
+            if (this.data.tags && this.data.tags.includes("anim") && this.data.tags.includes("intensity")) {
+
+              this.el.setAttribute("animation__intensity", {property: 'light.intensity', from: intensity - intensity/2, to: intensity + intensity/2, dur: duration, easing: 'easeInOutSine', loop: true, dir: 'alternate', autoplay: true});
+            } 
+                  
           }
           if (this.data.tags.includes("flicker")) {
             this.el.setAttribute("mod_flicker", {type: "candle"});

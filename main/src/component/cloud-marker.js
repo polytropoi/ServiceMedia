@@ -101,24 +101,61 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                   console.log("tryna set 3D text!");
                   this.el.setAttribute("text_geometry", {value: this.data.description, font: '#optimerBoldFont'});
                 } else if (this.data.markerType == "light") {
-                    console.log("tryna set a light!");
-                    if (!this.data.tags.includes("hide gizmo") || (settings && settings.sceneTags && settings.sceneTags.includes("hide gizmos"))) {
-                    this.el.setAttribute("geometry", {primitive: "sphere", radius: .5});
-                    // this.el.setAttribute("light", {type: "point", intensity: .5, distance: 3, castShadow: true, decay: 1, color: "yellow"});
-                    // this.el.setAttribute("mod_flicker", {type: "candle"});
-                    this.el.setAttribute("material", {color: "yellow", wireframe: true});
+                  console.log("tryna set a light!");
+                  // let color = "yellow";
+                  let color1 = "yellow";
+                  let color2 = "white";
+                  let intensity = 1.25;
+                  let duration = 1500;
+                  if (settings && settings.sceneColor3) {
+                    color1 = settings.sceneColor3;
+                  }
+                  if (settings && settings.sceneColor4) {
+                    color2 = settings.sceneColor4;
+                  }
+                  if (this.data.tags && (this.data.tags.includes("this") || this.data.tags.includes("event"))) {
+                    color1 = this.data.eventData;
+                  }
+                  if (this.data.tags && (this.data.tags.includes("dim"))) {
+                    intensity = .5;
+                  }
+                  if (this.data.tags && (this.data.tags.includes("bright"))) {
+                    intensity = 2;
+                  }
+                  if (this.data.tags && (this.data.tags.includes("very bright"))) {
+                    intensity = 4;
+                  }
+                  if (this.data.tags && (this.data.tags.includes("slow"))) {
+                    duration = 5000;
+                  }
+                  if (this.data.tags && (this.data.tags.includes("fast"))) {
+                    duration = 500;
+                  }
+                  if (!this.data.tags.includes("hide gizmo") || (settings && settings.sceneTags && settings.sceneTags.includes("hide gizmos"))) {
+                  this.el.setAttribute("geometry", {primitive: "sphere", radius: .5});
+                  // this.el.setAttribute("light", {type: "point", intensity: .5, distance: 3, castShadow: true, decay: 1, color: "yellow"});
+                  // this.el.setAttribute("mod_flicker", {type: "candle"});
+                  this.el.setAttribute("material", {color: color1, wireframe: true});
+                  } 
+                  if (this.data.tags.includes("candle")) {
+                    this.el.setAttribute("mod_particles", {type: "candle", color: color1, scale: this.data.scale, addLight: true});
+                  } else if (this.data.tags.includes("fire")) {
+                    this.el.setAttribute("mod_particles", {type: "fire", color: color1, scale: this.data.scale, addLight: true});
+                  } else {
+                    
+                    this.el.setAttribute("light", {type: "point", intensity: intensity, distance: this.data.scale * 4, castShadow: true, decay: this.data.scale / 2, color: color2});
+                    if (this.data.tags && this.data.tags.includes("anim") && this.data.tags.includes("color")) {
+                      this.el.setAttribute("animation__color", {property: 'light.color', from: color1, to: color2, dur: duration, easing: 'easeInOutSine', loop: true, dir: 'alternate', autoplay: true});
                     } 
-                    if (this.data.tags.includes("candle")) {
-                      this.el.setAttribute("mod_particles", {type: "candle", color: "yellow", scale: this.data.scale, addLight: true});
-                    } else if (this.data.tags.includes("fire")) {
-                      this.el.setAttribute("mod_particles", {type: "fire", color: "yellow", scale: this.data.scale, addLight: true});
-                    } else {
-                      this.el.setAttribute("light", {type: "point", intensity: .5, distance: 3, castShadow: true, decay: 1, color: "yellow"});
-                    }
-                    if (this.data.tags.includes("flicker")) {
-                      this.el.setAttribute("mod_flicker", {type: "candle"});
-                    }
-                   
+                    if (this.data.tags && this.data.tags.includes("anim") && this.data.tags.includes("intensity")) {
+    
+                      this.el.setAttribute("animation__intensity", {property: 'light.intensity', from: intensity - intensity/2, to: intensity + intensity/2, dur: duration, easing: 'easeInOutSine', loop: true, dir: 'alternate', autoplay: true});
+                    } 
+                          
+                  }
+                  if (this.data.tags.includes("flicker")) {
+                    this.el.setAttribute("mod_flicker", {type: "candle"});
+                  }
                 }
 
 
@@ -323,7 +360,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
         }    
       });
       this.el.addEventListener('mouseup', function (evt) {
-        console.log("mouseup cloudmarker ");
+        console.log("mouseup cloudmarker "+ that.data.markerType);
         // that.isSelected = false;
         // if (that.data.markerType.toLowerCase() == "placeholder") {
         //   that.hitPosition = null;
@@ -369,7 +406,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
         that.selectedAxis = null;
         // that.mousePos = null;
         if (that.data.markerType == "gate") {
-          if (evt.detail.intersection.distance > 1 && evt.detail.intersection.distance < 15) {
+          if (evt.detail.intersection.distance > 1 && evt.detail.intersection.distance < 20) {
           this.dialogEl = document.getElementById('mod_dialog');
           if (this.dialogEl) {
             let ascenesEl = document.getElementById("availableScenesControl");
@@ -380,9 +417,9 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                   let scene = asControl.returnRandomScene();
                   let url = "/webxr/" + scene.sceneKey;
                   // window.location.href = url; 
-                  this.dialogEl.components.mod_dialog.showPanel("Enter the gate to " + scene.sceneTitle +" ?", "href~"+ url, "gatePass" ); //param 2 is objID when needed
-                  console.log("bad " + evt.detail.intersection.distance);
-                  WaitAndHideDialogPanel(4000);
+                  this.dialogEl.components.mod_dialog.showPanel("Go to " + scene.sceneTitle +" ?", "href~"+ url, "gatePass", 5000 ); //param 2 is objID when needed
+                  console.log("good " + evt.detail.intersection.distance);
+                  // WaitAndHideDialogPanel(4000);
                 }
               }
             }
@@ -563,18 +600,56 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                 this.el.setAttribute("text-geometry", {value: this.data.description, font: '#optimerBoldFont'});
             } else if (this.data.markerType == "light") {
               console.log("tryna set a light!");
+              // let color = "yellow";
+              let color1 = "yellow";
+              let color2 = "white";
+              let intensity = 1.25;
+              let duration = 1500;
+              if (settings && settings.sceneColor3) {
+                color1 = settings.sceneColor3;
+              }
+              if (settings && settings.sceneColor4) {
+                color2 = settings.sceneColor4;
+              }
+              if (this.data.tags && (this.data.tags.includes("this") || this.data.tags.includes("event"))) {
+                color1 = this.data.eventData;
+              }
+              if (this.data.tags && (this.data.tags.includes("dim"))) {
+                intensity = .5;
+              }
+              if (this.data.tags && (this.data.tags.includes("bright"))) {
+                intensity = 2;
+              }
+              if (this.data.tags && (this.data.tags.includes("very bright"))) {
+                intensity = 4;
+              }
+              if (this.data.tags && (this.data.tags.includes("slow"))) {
+                duration = 5000;
+              }
+              if (this.data.tags && (this.data.tags.includes("fast"))) {
+                duration = 500;
+              }
               if (!this.data.tags.includes("hide gizmo") || (settings.sceneTags && settings.sceneTags.includes("hide gizmos"))) {
               this.el.setAttribute("geometry", {primitive: "sphere", radius: .5});
               // this.el.setAttribute("light", {type: "point", intensity: .5, distance: 3, castShadow: true, decay: 1, color: "yellow"});
               // this.el.setAttribute("mod_flicker", {type: "candle"});
-              this.el.setAttribute("material", {color: "yellow", wireframe: true});
+              this.el.setAttribute("material", {color: color1, wireframe: true});
               } 
               if (this.data.tags.includes("candle")) {
-                this.el.setAttribute("mod_particles", {type: "candle", color: "yellow", scale: this.data.scale, addLight: true});
+                this.el.setAttribute("mod_particles", {type: "candle", color: color1, scale: this.data.scale, addLight: true});
               } else if (this.data.tags.includes("fire")) {
-                this.el.setAttribute("mod_particles", {type: "fire", color: "yellow", scale: this.data.scale, addLight: true});
+                this.el.setAttribute("mod_particles", {type: "fire", color: color1, scale: this.data.scale, addLight: true});
               } else {
-                this.el.setAttribute("light", {type: "point", intensity: .5, distance: 3, castShadow: true, decay: 1, color: "yellow"});
+                
+                this.el.setAttribute("light", {type: "point", intensity: intensity, distance: this.data.scale * 4, castShadow: true, decay: this.data.scale / 2, color: color2});
+                if (this.data.tags && this.data.tags.includes("anim") && this.data.tags.includes("color")) {
+                  this.el.setAttribute("animation__color", {property: 'light.color', from: color1, to: color2, dur: duration, easing: 'easeInOutSine', loop: true, dir: 'alternate', autoplay: true});
+                } 
+                if (this.data.tags && this.data.tags.includes("anim") && this.data.tags.includes("intensity")) {
+
+                  this.el.setAttribute("animation__intensity", {property: 'light.intensity', from: intensity - intensity/2, to: intensity + intensity/2, dur: duration, easing: 'easeInOutSine', loop: true, dir: 'alternate', autoplay: true});
+                } 
+                      
               }
               if (this.data.tags.includes("flicker")) {
                 this.el.setAttribute("mod_flicker", {type: "candle"});
