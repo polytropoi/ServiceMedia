@@ -422,7 +422,9 @@ AFRAME.registerComponent('mod_model', {
                     //     "loop": "repeat",
                     //   });
                     // }  
-                    if (idleClips.length && idleIndex != -1) {
+                    
+                    if (idleClips.length) {
+                      idleIndex = Math.floor(Math.random() * idleClips.length);
                       theEl.setAttribute('animation-mixer', {
                         "clip": idleClips[idleIndex].name,
                         "loop": "repeat",
