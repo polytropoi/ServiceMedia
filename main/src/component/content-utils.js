@@ -2283,7 +2283,7 @@ AFRAME.registerComponent('mod_dialog', { //there should only be one of these, un
     });
     this.el.addEventListener('click', (evt) => {
       let name = evt.detail.intersection.object.name;
-      // console.log(name);
+      console.log(name);
       if (name.includes('yesbutton')) {
         this.yesButton();
       }
@@ -2294,14 +2294,20 @@ AFRAME.registerComponent('mod_dialog', { //there should only be one of these, un
         this.okButton();
       }
     });
+
+    this.el.addEventListener('mouseenter', (evt) => {
+      let name = evt.detail.intersection.object.name;
+      console.log(name);
+    });
+
   });
   
-  
+
   // this.dial
   let that = this;
   },
   showPanel: function (panelString, objectID, messageType, duration) {
-
+    
     this.objID = objectID;
     this.messageType = messageType;
     this.el.setAttribute("visible", true);
@@ -2406,8 +2412,9 @@ AFRAME.registerComponent('mod_dialog', { //there should only be one of these, un
   }, 
   waitAndHide: function (duration) {
     if (this.el.getAttribute("visible") == true) {
-      setTimeout(() =>{ this.el.setAttribute("visible", false);
-      this.dialogPanel.classList.remove('activeObjexRay');
+      setTimeout(() =>{ 
+        // this.el.setAttribute("visible", false);
+        // this.dialogPanel.classList.remove('activeObjexRay');
       }, duration);
     }
   }

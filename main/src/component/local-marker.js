@@ -405,8 +405,14 @@ AFRAME.registerComponent('local_marker', { //special items with local mods
             // ShowLocationModal(that.timestamp);
             SceneManglerModal('Location');
         } else {
-          
-          if (that.data.markerType == "gate") {
+          let transform_controls_component = that.el.components.transform_controls;
+          if (transform_controls_component) {
+              if (transform_controls_component.data.isAttached) {
+                  // transform_controls_component.detachTransformControls();
+                  return; //don't do stuff below if transform enabled
+              }
+          }
+          if (that.data.markerType == "gate" && !that.data.isNew) {
             if (evt.detail.intersection.distance > 1 && evt.detail.intersection.distance < 15) {
               this.dialogEl = document.getElementById('mod_dialog');
               if (this.dialogEl) {

@@ -352,12 +352,46 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
       this.el.addEventListener('mousedown', function (evt) {
   
         if (keydown == "T") {
-            ToggleTransformControls(that.timestamp);
+          ToggleTransformControls(that.timestamp);
         } else if (keydown == "Shift") {
             selectedLocationTimestamp = that.timestamp;
             // ShowLocationModal(that.timestamp);
             SceneManglerModal('Location');
-        }    
+        } else { 
+          let transform_controls_component = that.el.components.transform_controls;
+          if (transform_controls_component) {
+              if (transform_controls_component.data.isAttached) {
+                  // transform_controls_component.detachTransformControls();
+                  return; //don't do stuff below if transform enabled
+              }
+          }
+          if (that.data.markerType == "gate") {
+            if (evt.detail.intersection.distance > 1 && evt.detail.intersection.distance < 20) {
+            this.dialogEl = document.getElementById('mod_dialog');
+            if (this.dialogEl) {
+              let ascenesEl = document.getElementById("availableScenesControl");
+              if (ascenesEl) {
+                let asControl = ascenesEl.components.available_scenes_control;
+                if (asControl) {
+                  if (asControl) {
+                    let scene = asControl.returnRandomScene();
+                    let url = "/webxr/" + scene.sceneKey;
+                    // window.location.href = url; 
+                    this.dialogEl.components.mod_dialog.showPanel("Go to " + scene.sceneTitle +" ?", "href~"+ url, "gatePass", 5000 ); //param 2 is objID when needed
+                    console.log("good " + evt.detail.intersection.distance);
+                    // WaitAndHideDialogPanel(4000);
+                  }
+                }
+              }
+            }
+            } else {
+              console.log("bad " + evt.detail.intersection.distance);
+            }
+          
+          } else if (that.data.markerType == "poi") {
+            GoToLocation(that.data.timestamp);
+          }
+        }
       });
       this.el.addEventListener('mouseup', function (evt) {
         console.log("mouseup cloudmarker "+ that.data.markerType);
@@ -399,37 +433,47 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
       this.el.addEventListener('click', function (evt) {
         // console.log("tryna mousedouwn");
   
-        // that.isSelected = false;
-        that.hitPosition = null;
-        that.mouseDownPos.x = 0;
-        that.mouseDownPos.y = 0;
-        that.selectedAxis = null;
+        // // that.isSelected = false;
+        // that.hitPosition = null;
+        // that.mouseDownPos.x = 0;
+        // that.mouseDownPos.y = 0;
+        // that.selectedAxis = null;
+
         // that.mousePos = null;
-        if (that.data.markerType == "gate") {
-          if (evt.detail.intersection.distance > 1 && evt.detail.intersection.distance < 20) {
-          this.dialogEl = document.getElementById('mod_dialog');
-          if (this.dialogEl) {
-            let ascenesEl = document.getElementById("availableScenesControl");
-            if (ascenesEl) {
-              let asControl = ascenesEl.components.available_scenes_control;
-              if (asControl) {
-                if (asControl) {
-                  let scene = asControl.returnRandomScene();
-                  let url = "/webxr/" + scene.sceneKey;
-                  // window.location.href = url; 
-                  this.dialogEl.components.mod_dialog.showPanel("Go to " + scene.sceneTitle +" ?", "href~"+ url, "gatePass", 5000 ); //param 2 is objID when needed
-                  console.log("good " + evt.detail.intersection.distance);
-                  // WaitAndHideDialogPanel(4000);
-                }
-              }
-            }
-          }
-        } else {
-          console.log("bad " + evt.detail.intersection.distance);
-        }
-      } else if (that.data.markerType == "poi") {
-        GoToLocation(that.data.timestamp);
-      }
+        // if (keydown == "T") {
+        //     ToggleTransformControls(that.timestamp);
+        // } else if (keydown == "Shift") {
+        //     selectedLocationTimestamp = that.timestamp;
+        //     // ShowLocationModal(that.timestamp);
+        //     SceneManglerModal('Location');
+        // } else { 
+        //   if (that.data.markerType == "gate") {
+        //     if (evt.detail.intersection.distance > 1 && evt.detail.intersection.distance < 20) {
+        //     this.dialogEl = document.getElementById('mod_dialog');
+        //     if (this.dialogEl) {
+        //       let ascenesEl = document.getElementById("availableScenesControl");
+        //       if (ascenesEl) {
+        //         let asControl = ascenesEl.components.available_scenes_control;
+        //         if (asControl) {
+        //           if (asControl) {
+        //             let scene = asControl.returnRandomScene();
+        //             let url = "/webxr/" + scene.sceneKey;
+        //             // window.location.href = url; 
+        //             this.dialogEl.components.mod_dialog.showPanel("Go to " + scene.sceneTitle +" ?", "href~"+ url, "gatePass", 5000 ); //param 2 is objID when needed
+        //             console.log("good " + evt.detail.intersection.distance);
+        //             // WaitAndHideDialogPanel(4000);
+        //           }
+        //         }
+        //       }
+        //     }
+        //     } else {
+        //       console.log("bad " + evt.detail.intersection.distance);
+        //     }
+          
+        //   } else if (that.data.markerType == "poi") {
+        //     GoToLocation(that.data.timestamp);
+        //   }
+        // }
 
   
       });
