@@ -2406,8 +2406,8 @@ AFRAME.registerComponent('mod_dialog', { //there should only be one of these, un
   }, 
   waitAndHide: function (duration) {
     if (this.el.getAttribute("visible") == true) {
-      setTimeout(() =>{ dialog.setAttribute("visible", false);
-      panel.classList.remove('activeObjexRay');
+      setTimeout(() =>{ this.el.setAttribute("visible", false);
+      this.dialogPanel.classList.remove('activeObjexRay');
       }, duration);
     }
   }

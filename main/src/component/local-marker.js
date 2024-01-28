@@ -405,6 +405,7 @@ AFRAME.registerComponent('local_marker', { //special items with local mods
             // ShowLocationModal(that.timestamp);
             SceneManglerModal('Location');
         } else {
+          
           if (that.data.markerType == "gate") {
             if (evt.detail.intersection.distance > 1 && evt.detail.intersection.distance < 15) {
               this.dialogEl = document.getElementById('mod_dialog');
