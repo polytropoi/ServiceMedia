@@ -2327,7 +2327,7 @@ AFRAME.registerComponent('mod_dialog', { //there should only be one of these, un
     }
     this.viewportHolder.object3D.getWorldPosition( this.cameraPosition );
     this.el.setAttribute('position', this.cameraPosition);
-    console.log("tryna set mod_dialog position " + JSON.stringify(this.cameraPosition));
+    console.log("tryna set mod_dialog position " + JSON.stringify(this.cameraPosition) + " duration " + duration);
     this.dialogText.setAttribute('value', panelString);
     if (duration > 0) {
       this.waitAndHide(duration);
@@ -2411,10 +2411,12 @@ AFRAME.registerComponent('mod_dialog', { //there should only be one of these, un
     this.waitAndHide(2000);
   }, 
   waitAndHide: function (duration) {
+    console.log("tryna wait and hide");
     if (this.el.getAttribute("visible") == true) {
+      console.log("tryna wait and hide for " + duration);
       setTimeout(() =>{ 
-        // this.el.setAttribute("visible", false);
-        // this.dialogPanel.classList.remove('activeObjexRay');
+        this.el.setAttribute("visible", false);
+        this.dialogPanel.classList.remove('activeObjexRay');
       }, duration);
     }
   }

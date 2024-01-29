@@ -77,10 +77,25 @@ AFRAME.registerComponent('mod_physics', { //used by models, placeholders, instan
       this.isGhost = true;
       if (settings && settings.usePhysicsType == "ammo") {
 
-      // console.log("truyna init mod_physics for id " + this.el.id + " model " + this.model +" isTrigger "+ this.isTrigger + " body " + this.data.body );
-      this.el.setAttribute('ammo-body', {type: 'kinematic', emitCollisionEvents: this.isTrigger}); //placeholder model already loaded in mod_model
+      console.log("truyna init mod_physics for id " + this.el.id + " model " + this.model +" isTrigger "+ this.isTrigger + " body " + this.data.body + " scalefactor " + this.data.scaleFactor );
+      this.el.setAttribute('ammo-body', {type: 'kinematic', emitCollisionEvents: this.isTrigger}); //placeholder model already loaded in mod_mode//nope, markers can have meshes
       
           this.el.setAttribute("ammo-shape", {type: 'sphere', fit: 'manual', sphereRadius: this.data.scaleFactor, offset: '0 .5 0'});
+       
+        } else {
+          console.log("caint fine no physics settings!@ " + settings.usePhysicsType);
+        }
+        // console.log("tryna load placeholder  " + this.isTrigger);
+
+    
+    } else if (this.data.model == "mesh") { //from cloudmarker, always kinematic
+      this.isGhost = true;
+      if (settings && settings.usePhysicsType == "ammo") {
+
+      console.log("truyna init mod_physics for id " + this.el.id + " model " + this.model +" isTrigger "+ this.isTrigger + " body " + this.data.body + " scalefactor " + this.data.scaleFactor );
+      this.el.setAttribute('ammo-body', {type: 'kinematic', emitCollisionEvents: this.isTrigger}); //placeholder model already loaded in mod_mode//nope, markers can have meshes
+          let offset = '0 '+this.data.scaleFactor+' 0';
+          this.el.setAttribute("ammo-shape", {type: 'sphere', fit: 'manual', sphereRadius: this.data.scaleFactor * 2, offset: offset});
        
         }
         // console.log("tryna load placeholder  " + this.isTrigger);

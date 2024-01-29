@@ -1370,7 +1370,7 @@ function CreatePlaceholder () { //New Location button
 
    console.log("tryna create place3holder");
    let newPosition = new THREE.Vector3(); 
-   let viewportHolder = document.getElementById('viewportPlaceholder3');
+   let viewportHolder = document.getElementById('viewportPlaceholder');
    viewportHolder.object3D.getWorldPosition( newPosition );
    console.log("new position for placeholder " + JSON.stringify(newPosition));
    let phEl = document.createElement('a-entity');

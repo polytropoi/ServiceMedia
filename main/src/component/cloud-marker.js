@@ -197,7 +197,16 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                 }
               } else {
                   this.loadModel(this.data.modelID);
+                  if (this.data.markerType.toLowerCase() == "gate" || this.data.markerType.toLowerCase().includes("trigger")) {
+                    
+                    // this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"placeholder"});
+                    
+                  }
+                  
               }
+            }
+            if (this.data.tags.includes("hide gizmo")) {
+              this.el.object3D.visible = false;
             }
         }
         if (this.data.objectID != undefined && this.data.objectID != null && this.data.objectID != "none" && this.data.objectID != "") { //hrm, cloudmarker objex?
@@ -283,22 +292,25 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
       this.el.addEventListener('model-loaded', (evt) => { //load placeholder model first (which is an a-asset) before calling external
         evt.preventDefault();
         console.log(this.data.modelID + " model-loaded for CLOUDMARKER " + this.el.id);
-        this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"placeholder"});
+        if (this.data.modelID && this.data.modelID != '' & this.data.modelID != 'none') {
+          this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"mesh", scaleFactor: this.data.scale});
+        } else {
+          this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"placeholder", scaleFactor: this.data.scale});
 
-        const obj = this.el.getObject3D('mesh');
-          // Go over the submeshes and modify materials we want.
-        obj.traverse(node => {
-            if (node.isMesh && node.material) {
-                if (this.data.markerType == "waypoint") {
-                node.material.color.set('lime');
-                } else if  (this.data.markerType == "placeholder") {
-                node.material.color.set('yellow');
-                } else if  (this.data.markerType == "poi") {
-                node.material.color.set('purple');
-                } 
-            }
-        });
-
+          const obj = this.el.getObject3D('mesh');
+            // Go over the submeshes and modify materials we want.
+          obj.traverse(node => {
+              if (node.isMesh && node.material) {
+                  if (this.data.markerType == "waypoint") {
+                  node.material.color.set('lime');
+                  } else if  (this.data.markerType == "placeholder") {
+                  node.material.color.set('yellow');
+                  } else if  (this.data.markerType == "poi") {
+                  node.material.color.set('purple');
+                  } 
+              }
+          });
+        }
       });
        
       this.el.addEventListener('mouseenter', (evt) => {
@@ -307,36 +319,36 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
           this.clientX = evt.clientX;
           this.clientY = evt.clientY;
           // console.log("tryna mouseover placeholder");
-          that.calloutToggle = !that.calloutToggle;
+          this.calloutToggle = !this.calloutToggle;
           let pos = evt.detail.intersection.point; //hitpoint on model
-          that.hitPosition = pos;
+          this.hitPosition = pos;
           let name = evt.detail.intersection.object.name;
-        //   that.distance = window.playerPosition.distanceTo(pos);
-            that.distance = evt.detail.intersection.distance;
-          that.rayhit(evt.detail.intersection.object.name, that.distance, evt.detail.intersection.point);
+        //   this.distance = window.playerPosition.distanceTo(pos);
+            this.distance = evt.detail.intersection.distance;
+          this.rayhit(evt.detail.intersection.object.name, this.distance, evt.detail.intersection.point);
        
-          that.selectedAxis = name;
+          this.selectedAxis = name;
   
-          // let elPos = that.el.getAttribute('position');
+          // let elPos = this.el.getAttribute('position');
           // console.log(pos);
-          if (!name.includes("handle") && that.calloutEntity != null && this.data.markerType != "light") { // umm...
+          if (!name.includes("handle") && this.calloutEntity != null && this.data.markerType != "light") { // umm...
     
-            if (that.distance < 66) {
-            that.calloutEntity.setAttribute("position", pos);
-            that.calloutEntity.setAttribute('visible', true);
-            that.calloutEntity.setAttribute('scale', {x: that.distance * .25, y: that.distance * .25, z: that.distance * .25} );
+            if (this.distance < 66) {
+            this.calloutEntity.setAttribute("position", pos);
+            this.calloutEntity.setAttribute('visible', true);
+            this.calloutEntity.setAttribute('scale', {x: this.distance * .25, y: this.distance * .25, z: this.distance * .25} );
             // if (this.data.markerType == "poi" && !this.data.modelID) {
-            //   this.el.setAttribute('scale', {x: that.distance * .25, y: that.distance * .25, z: that.distance * .25} );
+            //   this.el.setAttribute('scale', {x: this.distance * .25, y: this.distance * .25, z: this.distance * .25} );
             // }
            
             let theLabel = this.data.name != undefined ? this.data.name : "";
             let calloutString = theLabel;
-            console.log("tryna show the callout " + that.distance + " " + calloutString);
-            // if (that.calloutToggle) {
+            console.log("tryna show the callout " + this.distance + " " + calloutString);
+            // if (this.calloutToggle) {
             //   // calloutString = "x : " + elPos.x.toFixed(2) + "\n" +"y : " + elPos.y.toFixed(2) + "\n" +"z : " + elPos.z.toFixed(2);
             //   calloutString = this.data.description != '' ? this.data.description : theLabel;
             // }
-            that.calloutText.setAttribute("troika-text", {value: calloutString});
+            this.calloutText.setAttribute("troika-text", {value: calloutString});
           }
         }
         }
@@ -604,11 +616,16 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
               for (let i = 0; i < sceneModels.length; i++) {
               if (sceneModels[i]._id == modelID) {
                   this.el.setAttribute('gltf-model', sceneModels[i].url);
+                  if (this.data.markerType.toLowerCase() == "gate") {
+                    // this.el.setAttribute("material", {color: "orange", transparent: true, opacity: .5});
+                    // this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"placeholder"});
+                    
+                  }
+                  break;
               }
               }
           }
         } else { //if "none"
-
             // console.log("CLOUDMARKER tryna set default model " + modelID);
             if (this.data.markerType.toLowerCase() == "placeholder") {
                 this.el.setAttribute("gltf-model", "#poi1");
@@ -625,14 +642,14 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
             } else if (this.data.markerType.toLowerCase().includes("trigger")) {
                 this.el.setAttribute("gltf-model", "#poi1");
                 this.el.setAttribute("material", {color: "lime", transparent: true, opacity: .5});
-                this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"placeholder"});
+                this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"placeholder", scaleFactor: this.data.scale});
                 // this.el.setAttribute("color", "lime");
                 
             } else if (this.data.markerType.toLowerCase() == "gate") {
-              this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"placeholder"});
+              
                 this.el.setAttribute("gltf-model", "#gate2");
                 this.el.setAttribute("material", {color: "orange", transparent: true, opacity: .5});
-               
+                this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"placeholder", scaleFactor: this.data.scale});
                 // this.el.setAttribute("color", "orange");
             } else if (this.data.markerType.toLowerCase() == "portal") {
                 this.el.setAttribute("gltf-model", "#poi1");
@@ -697,32 +714,13 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
               }
               if (this.data.tags.includes("flicker")) {
                 this.el.setAttribute("mod_flicker", {type: "candle"});
-              }
-             
+              }    
           }
-            // if (this.data.markerType == "poi" || this.data.markerType == "waypoint" ||
-            //  this.data.markerType == "placeholder" || this.data.markerType == "trigger" || this.data.markerType == "trigger") {
-            //     this.el.setAttribute("gltf-model", "#poi1");
-            // } else if (this.data.markerType == "gate"){
-            //     console.log("tryna set a default gate");
-            //     this.el.setAttribute("gltf-model", "#gate2");
-            // } else if (this.data.markerType == "mailbox"){
-            //     this.el.setAttribute("gltf-model", "#mailbox");
-            // }
-          
+
         }
-    //   console.log("tryna load modeID " + modelID);
-    //   // console.log("tryna load modeID " + modelID);
-    //   if (modelID != undefined && modelID != null & modelID != "none" && modelID != "") {  
-    //     for (let i = 0; i < sceneModels.length; i++) {
-    //       if (sceneModels[i]._id == modelID) {
-    //         this.el.setAttribute("gltf-model", sceneModels[i].url);
-    //         // this.el.
-    //       }
-    //     }
-    //   } else {
-    //     this.el.setAttribute("gltf-model", "https://servicemedia.s3.amazonaws.com/assets/models/savedplaceholder.glb");
-    //   }
+        if (this.data.tags.includes("hide gizmo")) {
+          this.el.object3D.visible = false;
+        }
     },
     deselect: function () {
       this.isSelected = false;
