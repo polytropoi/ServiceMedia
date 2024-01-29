@@ -2825,7 +2825,7 @@ AFRAME.registerComponent('mod_particles', {
     this.position = new THREE.Vector3();
 
     if (this.data.scale == null || this.data.scale == 0) {
-      this.data.scale = 1;
+      this.data.scale = 10;
     }
     // if (this.data.parentID != null) {
     //   this.el.parentElement.object3D.getWorldPosition(this.position);
@@ -2856,10 +2856,10 @@ AFRAME.registerComponent('mod_particles', {
     if (this.data.type.toLowerCase() =="fire") {
       // this.el.setAttribute('scale', '.25 .25 .25');
       console.log("tryna light a fire! "  + JSON.stringify(this.data.location) + " scale " + this.data.scale);
-      let pSize = this.data.scale * 20;
+      let pSize = this.data.scale * 2;
       this.el.setAttribute('sprite-particles', {enable: true, texture: '#fireanim1', color: this.data.color, blending: 'additive', textureFrame: '6 6', textureLoop: '3', spawnRate: '2', lifeTime: '1.1', scale: pSize.toString()});
       if (this.data.addLight) {
-        this.el.setAttribute('light', {type: 'point', castShadow: true, color: this.data.color, intensity: .75, distance: this.data.scale * 10, decay: this.data.scale * 5});
+        this.el.setAttribute('light', {type: 'point', castShadow: true, color: this.data.color, intensity: 1, distance: this.data.scale * 4, decay: this.data.scale * 2});
         this.lightAnimation(.7, 1.5);
         this.el.addEventListener('animationcomplete', () => {
             this.lightAnimation(.7, 1.5);

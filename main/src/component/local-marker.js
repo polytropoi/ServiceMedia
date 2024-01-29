@@ -666,6 +666,8 @@ AFRAME.registerComponent('local_marker', { //special items with local mods
         this.el.removeAttribute("transform_controls");
         this.el.removeAttribute("geometry");
         this.el.removeAttribute("gltf-model");
+        this.el.removeAttribute("mod_particles");
+        this.el.removeAttribute("light");
         if (modelID != undefined && modelID != null & modelID != "none" && modelID != "") {  
           if (modelID.toString().includes("primitive")) {
               console.log("CLOUDMARKER PRIMITIVE " + modelID + " scale " + 1);
