@@ -83,7 +83,7 @@ AFRAME.registerComponent('mod_physics', { //used by models, placeholders, instan
           this.el.setAttribute("ammo-shape", {type: 'sphere', fit: 'manual', sphereRadius: this.data.scaleFactor, offset: '0 .5 0'});
        
         } else {
-          console.log("caint fine no physics settings!@ " + settings.usePhysicsType);
+          console.log("caint fine no physics settings!@ ");
         }
         // console.log("tryna load placeholder  " + this.isTrigger);
 

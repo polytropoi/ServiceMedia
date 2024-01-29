@@ -530,7 +530,7 @@ webxr_router.get('/:_id', function (req, res) {
     let useSimpleNavmesh = false;
     let useStarterKit = false;  //load the libs as from https://github.com/AdaRoseCannon/aframe-xr-boilerplate - movement controls, simple navmesh, handy work, physx etc.
     let useSuperHands = false;  //or instead load the superhands stuff https://github.com/c-frame/aframe-super-hands-component
-    let usePhysicsType = "";
+    let usePhysicsType = "none";
     let showDialog = false;
     let showSceneManglerButtons = false;
     let ethereumButton = "";
@@ -4296,10 +4296,14 @@ webxr_router.get('/:_id', function (req, res) {
                     settings.sceneScatterMeshLayers = sceneResponse.sceneScatterMeshLayers;
                     settings.allowMods = true;
                     settings.sceneTags = sceneResponse.sceneTags;
+                    settings.hideGizmos = false;
                 
                     // settings.debug = settings.debugMode.length > 0;
                     if (sceneResponse.sceneTags != null && sceneResponse.sceneTags.includes("no mods")) {
                         settings.allowMods = false;
+                    }
+                    if (sceneResponse.sceneTags != null && sceneResponse.sceneTags.includes("hide gizmos")) {
+                        settings.hideGizmos = true;
                     }
                     if (sceneResponse.scatterObjects) {
                         settings.sceneScatterObjectLayers = sceneResponse.sceneScatterObjectLayers;

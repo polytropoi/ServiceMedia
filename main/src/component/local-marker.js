@@ -142,8 +142,8 @@ AFRAME.registerComponent('local_marker', { //special items with local mods
                     if (this.data.tags && (this.data.tags.includes("fast"))) {
                       duration = 500;
                     }
-                    if (!this.data.tags.includes("hide gizmo") || (settings.sceneTags && settings.sceneTags.includes("hide gizmos"))) {
-                    this.el.setAttribute("geometry", {primitive: "sphere", radius: .5});
+                    if (!this.data.tags.includes("hide gizmo") && (settings && !settings.hideGizmos)) {
+                    this.el.setAttribute("geometry", {primitive: "sphere", radius: this.data.scale * .1});
                     // this.el.setAttribute("light", {type: "point", intensity: .5, distance: 3, castShadow: true, decay: 1, color: "yellow"});
                     // this.el.setAttribute("mod_flicker", {type: "candle"});
                     this.el.setAttribute("material", {color: color1, wireframe: true});
@@ -169,6 +169,12 @@ AFRAME.registerComponent('local_marker', { //special items with local mods
                       this.el.setAttribute("mod_flicker", {type: "candle"});
                     }
                      
+                  }
+                  if (this.data.tags.includes("hide gizmo") || (settings && settings.hideGizmos)) {
+                    if (this.data.markerType != "mailbox" && this.data.markerType != "light") {
+                      this.el.object3D.visible = false;
+                    }
+                    
                   }
               } else {
                 if (this.data.modelID != "none") {
@@ -212,11 +218,18 @@ AFRAME.registerComponent('local_marker', { //special items with local mods
                         } else {
     
                         }
+                        if (this.data.tags.includes("hide gizmo") || (settings && settings.hideGizmos)) {
+                          if (this.data.markerType != "mailbox" && this.data.markerType != "light") {
+                            this.el.object3D.visible = false;
+                          }
+                        }
                     } else {
                         this.loadModel(this.data.modelID);
                     }
-                    if (this.data.tags.includes("hide gizmo")) {
-                      this.el.object3D.visible = false;
+                    if (this.data.tags.includes("hide gizmo") || (settings && settings.hideGizmos)) {
+                      if (this.data.markerType != "mailbox" && this.data.markerType != "light") {
+                        this.el.object3D.visible = false;
+                      }
                     }
                 }
             }
@@ -691,6 +704,12 @@ AFRAME.registerComponent('local_marker', { //special items with local mods
               } else {
 
               }
+              if (this.data.tags.includes("hide gizmo") || (settings && settings.hideGizmos)) {
+                if (this.data.markerType != "mailbox" && this.data.markerType != "light") {
+                  this.el.object3D.visible = false;
+                }
+                
+              }
           } else {
               for (let i = 0; i < sceneModels.length; i++) {
               if (sceneModels[i]._id == modelID) {
@@ -769,11 +788,11 @@ AFRAME.registerComponent('local_marker', { //special items with local mods
               if (this.data.tags && (this.data.tags.includes("fast"))) {
                 duration = 500;
               }
-              if (!this.data.tags.includes("hide gizmo") || (settings.sceneTags && settings.sceneTags.includes("hide gizmos"))) {
-              this.el.setAttribute("geometry", {primitive: "sphere", radius: .5});
-              // this.el.setAttribute("light", {type: "point", intensity: .5, distance: 3, castShadow: true, decay: 1, color: "yellow"});
-              // this.el.setAttribute("mod_flicker", {type: "candle"});
-              this.el.setAttribute("material", {color: color1, wireframe: true});
+              if (!this.data.tags.includes("hide gizmo") && (settings && !settings.hideGizmos)) {
+                this.el.setAttribute("geometry", {primitive: "sphere", radius: this.data.scale * .1}); //light gizmo is different bc particles
+                // this.el.setAttribute("light", {type: "point", intensity: .5, distance: 3, castShadow: true, decay: 1, color: "yellow"});
+                // this.el.setAttribute("mod_flicker", {type: "candle"});
+                this.el.setAttribute("material", {color: color1, wireframe: true});
               } 
               if (this.data.tags.includes("candle")) {
                 this.el.setAttribute("mod_particles", {type: "candle", color: color1, scale: this.data.scale, addLight: true});
@@ -795,11 +814,14 @@ AFRAME.registerComponent('local_marker', { //special items with local mods
                 this.el.setAttribute("mod_flicker", {type: "candle"});
               }    
           }
+          if (this.data.tags.includes("hide gizmo") || (settings && settings.hideGizmos)) {
+            if (this.data.markerType != "mailbox" && this.data.markerType != "light") {
+              this.el.object3D.visible = false;
+            }
+            
+          }
+        }
 
-        }
-        if (this.data.tags.includes("hide gizmo")) {
-          this.el.object3D.visible = false;
-        }
     },
     waitAndLoad: function () {
       let random = Math.random() * 1000;  
