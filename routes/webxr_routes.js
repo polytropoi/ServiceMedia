@@ -1668,11 +1668,11 @@ webxr_router.get('/:_id', function (req, res) {
                             let webxrEnv = "default";
                             let shadow = "";
                             let ground = "";
-                                let skycolor = "";
-                                let groundcolor = "";
-                                let groundcolor2 = "";
-                                let dressingcolor = "";
-                                let horizoncolor = "";
+                                let skycolor = sceneResponse.sceneColor1;
+                                let groundcolor = sceneResponse.sceneColor3;
+                                let groundcolor2 = sceneResponse.sceneColor4;
+                                let dressingcolor = sceneResponse.sceneColor4;
+                                let horizoncolor = sceneResponse.sceneColor2;
                                 let fog = "";
                                 let tweakColors = "";
                                 let sunVector = "0 -.5 -.5";
@@ -1721,10 +1721,10 @@ webxr_router.get('/:_id', function (req, res) {
                                 }
 
                                 if (sceneResponse.sceneUseGlobalFog || sceneResponse.sceneUseSceneFog) {
-                                    fogSettings = "fog=\x22type: exponential; density:" +sceneResponse.sceneGlobalFogDensity+ "; near: 1; far: 50; color: " +sceneResponse.sceneColor1 + "\x22";
+                                    fogSettings = "fog=\x22type: exponential; density:" +sceneResponse.sceneGlobalFogDensity+ "; near: 1; far: 50; color: " +sceneResponse.sceneColor2 + "\x22";
                                     fog = "fog: " +sceneResponse.sceneGlobalFogDensity+ ";";
                                 }
-                                if (sceneResponse.sceneColor1 != null && sceneResponse.sceneColor1.length > 3) {
+                                if (sceneResponse.sceneColor1 != null && sceneResponse.sceneColor1.length > 3 && sceneResponse.sceneColorizeSky) {
                                     skycolor = "skyColor: " + sceneResponse.sceneColor1 + ";";
                                 }
                                 if (sceneResponse.sceneColor2 != null && sceneResponse.sceneColor2.length > 3 && sceneResponse.sceneColorizeSky) {  
@@ -1742,7 +1742,7 @@ webxr_router.get('/:_id', function (req, res) {
                                 }      
                                 // "+ground+"
                                 aframeEnvironment = "<a-entity id=\x22enviroEl\x22 environment=\x22preset: "+webxrEnv+"; "+ground+" "+fog+" "+shadow+" "+groundcolor+" "+dressingcolor+" "+groundcolor2+" "+skycolor+" "+horizoncolor+
-                                " playArea: 25; "+envLighting+";\x22 hide-in-ar-mode "+tweakColors+"></a-entity>";
+                                " playArea: 25; "+envLighting+";\x22 groundYScale: 10; hide-in-ar-mode "+tweakColors+"></a-entity>";
                                 // environment = "<a-entity environment=\x22preset: "+webxrEnv+"; "+fog+" "+shadow+" "+groundcolor+" "+dressingcolor+" "+groundcolor2+" "+skycolor+" "+horizoncolor+" playArea: 3; lightPosition: 0 2.15 0\x22 hide-in-ar-mode></a-entity>";
                             } else {
                                 if (sceneResponse.sceneUseDynamicSky) {
@@ -4579,7 +4579,7 @@ webxr_router.get('/:_id', function (req, res) {
                         // dialogButton +
                         // "<div id=\x22sceneGreeting\x22 class=\x22linkfooter\x22 style=\x22z-index: -20;\x22>"+sceneResponse.sceneGreeting+"</div>" +
                         // "<div id=\x22sceneQuest\x22 class=\x22linkfooter\x22 style=\x22z-index: -20;\x22>"+sceneResponse.sceneQuest+"</div>" +
-                        "<div id=\x22theModal\x22 class=\x22modal\x22><div id=\x22modalContent\x22 class=\x22modal-content\x22></div>";
+                        "<div id=\x22theModal\x22 class=\x22modal\x22 ><div id=\x22modalContent\x22 class=\x22modal-content\x22></div>";
                         attributionsTextEntity +
                        
                         "<div class=\x22smallfont\x22><span id=\x22users\x22></span></div>"+ 
@@ -4902,7 +4902,7 @@ webxr_router.get('/:_id', function (req, res) {
                             uid = req.session.user._id;
                         }
                         var token=jwt.sign({userId:uid,shortID:sceneResponse.short_id},process.env.JWT_SECRET, { expiresIn: '1h' });  
-                        let modal = "<div id=\x22theModal\x22 class=\x22modal\x22><div id=\x22modalContent\x22 class=\x22modal-content\x22></div></div>";
+                        let modal = "<div id=\x22theModal\x22 class=\x22modal\x22><div id=\x22modalContent\x22 tabindex=\x22-1\x22 role=\x22dialog\x22 aria-labelledby=\x22modalContent\x22 class=\x22modal-content\x22></div></div>";
                         htmltext = "<html>" +
                         "<!doctype html>"+
                         "<html lang=\x22en\x22>"+

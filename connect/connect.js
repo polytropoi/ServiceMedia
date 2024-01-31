@@ -201,10 +201,10 @@ function InitIDB() {
                   localData.locations.push(sceneLocations.locations[i]);
                }
             }
-            sceneColor1 = localData.settings.sceneColor1;
-            sceneColor2 = localData.settings.sceneColor2;
-            sceneColor3 = localData.settings.sceneColor3;
-            sceneColor4 = localData.settings.sceneColor4;
+            // settings.sceneColor1 = localData.settings.sceneColor1;
+            // settings.sceneColor2 = localData.settings.sceneColor2;
+            // settings.sceneColor3 = localData.settings.sceneColor3;
+            // settings.sceneColor4 = localData.settings.sceneColor4;
             InitLocalColors();
             lastLocalUpdate = localData.lastUpdate;
             // console.log("COPIED LOCALDATA locations length " + localData.locations.length + " " + JSON.stringify(localData) + " last cloud update " +  lastCloudUpdate + " vs last local update " + lastLocalUpdate);
@@ -844,7 +844,19 @@ function ImportMods (event) {
       //    // localStorage.setItem(room + "_sceneColor4", mods.colorMods.sceneColor4);
       // }
       if (mods != null && mods != undefined && mods.settings != {}) {
-         
+         if (mods.settings.sceneColor1) {
+            localData.settings.sceneColor1 = mods.settings.sceneColor1;
+         }
+         if (mods.settings.sceneColor2) {
+            localData.settings.sceneColor2 = mods.settings.sceneColor2;
+         }
+         if (mods.settings.sceneColor3) {
+            localData.settings.sceneColor3 = mods.settings.sceneColor3;
+         }
+         if (mods.settings.sceneColor4) {
+            localData.settings.sceneColor4 = mods.settings.sceneColor4;
+         }
+         // InitLocalColors();
 
       }
       if (mods != null && mods != undefined && mods.locations != null && mods.locations.length > 0) {

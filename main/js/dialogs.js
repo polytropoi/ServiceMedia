@@ -14,6 +14,11 @@ let showStats = false;
 let showCurves = false;
 let keydown = "";
 let selectedLocationTimestamp = "";
+let colorInput_1 = null;
+let colorInput_2 = null;
+let colorInput_3 = null;
+let colorInput_4 = null;
+
 
 window.addEventListener( 'keydown',  ( event ) => {
   console.log("keydown code " + event.keyCode);
@@ -134,22 +139,60 @@ window.addEventListener( 'keyup',  ( event ) => {
   //       }
   //     }
   // });
-  $('#modalContent').on('input', '#sceneColor1', function(e) {
+  $('#modalContent').on('click', '#importModsButton', function(e) {
+    // console.log("color 1 changed " + e.target.value);
+    document.querySelector("#importMods").showPicker();
+  });
+
+  $('#modalContent').on('change', '#importMods', function(e) {
+    console.log("importMods change event! " + e.target.value);
+    ImportMods(e);
+  });
+  $('#modalContent').on('click', '#importFileButton', function(e) {
+    // console.log("color 1 changed " + e.target.value);
+    document.querySelector("#importFile").showPicker();
+  });
+
+  $('#modalContent').on('change', '#importFile', function(e) {
+    console.log("importFile change event! " + e.target.value);
+    ImportFile(e);
+  });
+
+  $('#modalContent').on('click', '#sceneColor1', function(e) {
+    // console.log("color 1 changed " + e.target.value);
+    document.querySelector("#sceneColor1").showPicker();
+  });
+
+  $('#modalContent').on('click', '#sceneColor2', function(e) {
+    document.querySelector("#sceneColor2").showPicker();
+  });
+  $('#modalContent').on('click', '#sceneColor3', function(e) {
+    document.querySelector("#sceneColor3").showPicker();
+  });
+  $('#modalContent').on('click', '#sceneColor4', function(e) {
+    document.querySelector("#sceneColor4").showPicker();
+  });
+
+  $('#modalContent').on('change', '#sceneColor1', function(e) {
     console.log("color 1 changed " + e.target.value);
     ColorMods(e, e.target.value);
   });
-  $('#modalContent').on('input', '#sceneColor2', function(e) {
+
+  $('#modalContent').on('change', '#sceneColor2', function(e) {
     console.log("color 2 changed " + e.target.value);
     ColorMods(e, e.target.value);
   });
-  $('#modalContent').on('input', '#sceneColor3', function(e) {
+  $('#modalContent').on('change', '#sceneColor3', function(e) {
     console.log("color 3 changed " + e.target.value);
     ColorMods(e, e.target.value);
+    
   });
-  $('#modalContent').on('input', '#sceneColor4', function(e) {
+  $('#modalContent').on('change', '#sceneColor4', function(e) {
     console.log("color 4 changed " + e.target.value);
     ColorMods(e, e.target.value);
   });
+
+
   $('#modalContent').on('change', '#locationModel', function(e) { //value has timestamp ~ modelID //no, just just the modelID, get el id from global
     console.log("model changed " + e.target.value + " for id " + selectedLocationTimestamp);
     // let locSplit = e.target.value.split("~"); 
@@ -1308,33 +1351,35 @@ function ToggleTimeKeyUIListeners () {
 function ReturnCurrentPlayerLocation() {
   return "<div>Current Location : "+JSON.stringify(window.playerPosition)+"</div>";
 }
-function ReturnColorButtons () {
+// function ReturnColorButtons () { //nm
 
-    if (localData.settings.sceneColor1) {
-      sceneColor1 = localData.settings.sceneColor1;
-      sceneColor2 = localData.settings.sceneColor2;
-      sceneColor3 = localData.settings.sceneColor3;
-      sceneColor4 = localData.settings.sceneColor4;
-    } else {
-      sceneColor1 = settings.sceneColor1;
-      sceneColor2 = settings.sceneColor2;
-      sceneColor3 = settings.sceneColor3;
-      sceneColor4 = settings.sceneColor4;
-    }
 
-    return "<hr><div class=\x22row\x22>"+
-    "<label style=\x22margin: 10px;\x22 for=\x22sceneColor1\x22>Color 1</label>"+
-    "<input type=\x22color\x22 class=\x22inputColor\x22 id=\x22sceneColor1\x22 name=\x22sceneColor1\x22 value=\x22"+sceneColor1+"\x22>"+
 
-    "<label style=\x22margin: 10px;\x22 for=\x22sceneColor2\x22>Color 2</label>"+
-    "<input type=\x22color\x22 class=\x22inputColor\x22 id=\x22sceneColor2\x22 name=\x22sceneColor2\x22 value=\x22"+sceneColor2+"\x22>"+
+//     if (localData.settings.sceneColor1) {
+//       sceneColor1 = localData.settings.sceneColor1;
+//       sceneColor2 = localData.settings.sceneColor2;
+//       sceneColor3 = localData.settings.sceneColor3;
+//       sceneColor4 = localData.settings.sceneColor4;
+//     } else {
+//       sceneColor1 = settings.sceneColor1;
+//       sceneColor2 = settings.sceneColor2;
+//       sceneColor3 = settings.sceneColor3;
+//       sceneColor4 = settings.sceneColor4;
+//     }
+
+    // return "<hr><div class=\x22row\x22>"+
+    // "<label style=\x22margin: 10px;\x22 for=\x22sceneColor1\x22>Color 1</label>"+
+    // "<input type=\x22color\x22 class=\x22inputColor\x22 id=\x22sceneColor1\x22 name=\x22sceneColor1\x22 value=\x22"+sceneColor1+"\x22>"+
+
+    // "<label style=\x22margin: 10px;\x22 for=\x22sceneColor2\x22>Color 2</label>"+
+    // "<input type=\x22color\x22 class=\x22inputColor\x22 id=\x22sceneColor2\x22 name=\x22sceneColor2\x22 value=\x22"+sceneColor2+"\x22>"+
     
-    "<label style=\x22margin: 10px;\x22 for=\x22sceneColor3\x22>Color 3</label>"+
-    "<input type=\x22color\x22 class=\x22inputColor\x22 id=\x22sceneColor3\x22 name=\x22sceneColor3\x22 value=\x22"+sceneColor3+"\x22>"+
+    // "<label style=\x22margin: 10px;\x22 for=\x22sceneColor3\x22>Color 3</label>"+
+    // "<input type=\x22color\x22 class=\x22inputColor\x22 id=\x22sceneColor3\x22 name=\x22sceneColor3\x22 value=\x22"+sceneColor3+"\x22>"+
     
-    "<label style=\x22margin: 10px;\x22 for=\x22sceneColor4\x22>Color 4</label>"+
-    "<input type=\x22color\x22 class=\x22inputColor\x22 id=\x22sceneColor4\x22 name=\x22sceneColor4\x22 value=\x22"+sceneColor4+"\x22>"+
-    "</div><br>";
+    // "<label style=\x22margin: 10px;\x22 for=\x22sceneColor4\x22>Color 4</label>"+
+    // "<input type=\x22color\x22 class=\x22inputColor\x22 id=\x22sceneColor4\x22 name=\x22sceneColor4\x22 value=\x22"+sceneColor4+"\x22>"+
+    // "</div><br>";
     // return "<hr><div class=\x22row\x22>"+
     // "<label style=\x22margin: 10px;\x22 for=\x22sceneColor1\x22>Color 1</label>"+
     // "<input class=\x22inputColor\x22 type=\x22color\x22 id=\x22sceneColor1\x22 name=\x22sceneColor1\x22 oninput=\x22ColorMods(event, this.value)\x22 value=\x22"+sceneColor1+"\x22>"+
@@ -1349,10 +1394,11 @@ function ReturnColorButtons () {
     // "<input class=\x22inputColor\x22 type=\x22color\x22 id=\x22sceneColor4\x22 name=\x22sceneColor4\x22 oninput=\x22ColorMods(event, this.value)\x22 value=\x22"+sceneColor4+"\x22>"+
     // "</div><br>";
 
-}
+// }
 
 
 function InitLocalColors() {
+  console.log("tryna InitLocalColors " + JSON.stringify(localData.settings));
   let enviroEl = document.getElementById('enviroEl');
   if (enviroEl != null && settings.allowMods) {
       enviroEl.setAttribute('environment', {
@@ -1364,18 +1410,20 @@ function InitLocalColors() {
       });
   }
 
+
+
 }
 
 function ColorMods(event, value) {
-  console.log("colormods " + event.target + event.srcElement);
-    var source = event.target || event.srcElement;
+  console.log("colormods " + event.target);
+    var source = event.target;
     if (source.id == "sceneColor1") {
         let enviroEl = document.getElementById('enviroEl');
         if (enviroEl != null) {
-            enviroEl.setAttribute('environment', 'skyColor', value);  
+          console.log("setting sceneCOlor1 to " + value);
+          enviroEl.setAttribute('environment', {skyColor: value.toString()});  
         }
         // localStorage.setItem(room + "_sceneColor1", value);
-        console.log("setting sceneCOlor1 to " + value);
         sceneColor1 = value;
         localData.settings.sceneColor1 = value;
     } else if (source.id == "sceneColor2") {
@@ -1612,10 +1660,71 @@ function ShowInventoryItem(objectID) {
 
   
 }
+// function ClearInputs () { //hrm/// nah
+
+//   var inputs = document.getElementsByTagName('input');
+
+//   for (let i = 0; i < inputs.length; i++) {
+//     inputs[i].onclick = function () {
+//       this.value = null;
+//     };
+      
+//     inputs[i].onchange = function () {
+//       console.log("input changed "+ this.value);
+//     };
+
+//   }
+// }
+// window.addEventListener("load", InitColorInputs, false);
+// function InitColorInputs() {
+//   if (!colorInput_1) {
+//     colorInput_1 = document.querySelector("#sceneColor1");
+//     if (colorInput_1) {
+//       console.log("ADDING COLOR PICKER EVENT LISTENER>...0");
+//       colorInput_1.addEventListener("click", ColorUpdate, false);
+//       colorInput_1.addEventListener("input", ColorUpdate, false);
+//     }
+  
+//   }
+//   // colorPicker1.addEventListener("change", updateAll, false);
+//   // colorPicker.select();
+// }
+// function ColorUpdate (event) {
+//   console.log("event color " + event.target.value);
+//   event.target.value = null;
+// }
 
 function SceneManglerModal(mode) {
 
+    // ClearInputs();
 
+    if (localData.settings.sceneColor1) {
+      settings.sceneColor1 = localData.settings.sceneColor1;
+    } else {
+      localData.settings.sceneColor1 = settings.sceneColor1;
+    }
+    if (localData.settings.sceneColor2) {
+      settings.sceneColor2 = localData.settings.sceneColor1;
+    } else {
+      localData.settings.sceneColor2 = settings.sceneColor2;
+    }
+    if (localData.settings.sceneColor3) {
+      settings.sceneColor3 = localData.settings.sceneColor3;
+    } else {
+      localData.settings.sceneColor3 = settings.sceneColor3;
+    }
+    if (localData.settings.sceneColor4) {
+      settings.sceneColor4 = localData.settings.sceneColor4;
+    } else {
+      localData.settings.sceneColor4 = settings.sceneColor4;
+    }
+    
+    sceneColor1 = settings.sceneColor1;
+    sceneColor2 = settings.sceneColor2;
+    sceneColor3 = settings.sceneColor3;
+    sceneColor4 = settings.sceneColor4;
+    // }
+    // InitColorInputs();
     console.log(JSON.stringify(userData));
     // let userName = userData.userName;
     // if (userName != null)
@@ -1709,8 +1818,9 @@ function SceneManglerModal(mode) {
 
       // "Local Assets: <br> <br><div><label for=\x22file\x22 class=\x22form-label\x22>Select a file</label><input type=\x22submit\x22 value=\x22Save to Local DB\x22 class=\x22addButton floatRight\x22></div>"+
       // accept=\x22.txt\x22 onchange=\x22ImportMods(event)
-      "<label style=\x22float: left;\x22 for=\x22file-upload\x22 class=\x22custom-file-upload\x22>Import File</label>"+
-      "<input type=\x22file\x22 id=\x22file-upload\x22 accept=\x22.glb\x22 onchange=\x22ImportFile(event)\x22>"+ 
+      // "<label style=\x22float: left;\x22 for=\x22file-upload\x22 class=\x22custom-file-upload\x22>Import File</label>"+
+      "<button style=\x22float: left;\x22 class=\x22infoButton\x22 id=\x22importFileButton\x22>Import File</button>"+  
+      "<input type=\x22file\x22 id=\x22importFile\x22>"+ 
       // "<div class=\x22floatRight\x22><input class=\x22custom-file-upload\x22 type=\x22file\x22 id=\x22file\x22></input></div>" +
       "<div>Local Assets aup in hea!</div>"+
       "<div><hr> <br><input type=\x22button\x22 value=\x22Clear files from Local DB\x22 id=\x22clear-button\x22 class=\x22deleteButton\x22></input></div>"+
@@ -1752,9 +1862,10 @@ function SceneManglerModal(mode) {
       // "<label for=\x22file-upload\x22 class=\x22custom-file-upload\x22>Import Mods</label>"+
       // "<input type=\x22file\x22 id=\x22file-upload\x22 accept=\x22.txt\x22 onchange=\x22ImportMods(event)\x22></input>"+
         // ownerButton +
-        "<label style=\x22float: left;\x22 for=\x22file-upload2\x22 class=\x22custom-file-upload\x22>Import Mods</label>"+
-        "<input type=\x22file\x22 id=\x22file-upload2\x22 accept=\x22.txt\x22 onchange=\x22ImportMods(event)\x22>"+ 
-
+        // "<label style=\x22float: left;\x22 for=\x22importMods\x22 class=\x22custom-file-upload\x22>Import Mods</label>"+
+        // "<input type=\x22file\x22 id=\x22file-upload2\x22 accept=\x22.txt\x22 onchange=\x22ImportMods(event)\x22>"+ 
+        "<input type=\x22file\x22 id=\x22importMods\x22 accept=\x22.txt\x22>"+ 
+        "<button style=\x22float: left;\x22 class=\x22infoButton\x22 id=\x22importModsButton\x22>Import Mods</button>"+  
         "<button style=\x22float: left;\x22 class=\x22saveButton\x22 id=\x22exportButton\x22 onclick=\x22ExportMods()\x22>Export Mods</button>"+   
         ownerButton +
         hasModsMessage +
@@ -1765,8 +1876,20 @@ function SceneManglerModal(mode) {
     "</div><hr>"+
     // "<button class=\x22addButton\x22 id=\x22TimekeysButton\x22 onclick=\x22ShowTimekeysModal()\x22>Edit Timekeys</button>"+
     audioSliders +
-    ReturnColorButtons() +
+    // ReturnColorButtons() +
+    "<hr><div class=\x22row\x22>"+
+    "<label style=\x22margin: 10px;\x22 for=\x22sceneColor1\x22>Color 1</label>"+
+    "<input type=\x22color\x22 class=\x22inputColor\x22 id=\x22sceneColor1\x22 name=\x22sceneColor1\x22 value=\x22"+sceneColor1+"\x22>"+
 
+    "<label style=\x22margin: 10px;\x22 for=\x22sceneColor2\x22>Color 2</label>"+
+    "<input type=\x22color\x22 class=\x22inputColor\x22 id=\x22sceneColor2\x22 name=\x22sceneColor2\x22 value=\x22"+sceneColor2+"\x22>"+
+    
+    "<label style=\x22margin: 10px;\x22 for=\x22sceneColor3\x22>Color 3</label>"+
+    "<input type=\x22color\x22 class=\x22inputColor\x22 id=\x22sceneColor3\x22 name=\x22sceneColor3\x22 value=\x22"+sceneColor3+"\x22>"+
+    
+    "<label style=\x22margin: 10px;\x22 for=\x22sceneColor4\x22>Color 4</label>"+
+    "<input type=\x22color\x22 class=\x22inputColor\x22 id=\x22sceneColor4\x22 name=\x22sceneColor4\x22 value=\x22"+sceneColor4+"\x22>"+
+    "</div><br>"+
     "<hr><div class=\x22row\x22>"+
     // "<button style=\x22float: left;\x22 class=\x22saveButton\x22 id=\x22exportButton\x22 onclick=\x22ExportMods()\x22>Export Mods</button>"+
     // "<label style=\x22float: left;\x22 for=\x22file-upload\x22 class=\x22custom-file-upload\x22>Import Mods</label>"+
@@ -1862,6 +1985,9 @@ function SceneManglerModal(mode) {
     "<div "+aboutDisplay+" id=\x22About\x22 class=\x22modalMain tabcontent\x22>"+
         // "<p>"
         "<div>Use WASD keys to move, R to rise, F to fall. <br><br>Attributions: <br>"+
+        "<div>Hold Shift key + click to modify elements, or T key + click for transform control mode<br>"+
+        "<div>In transform control mode: W translate | E rotate | R scale | X toggle X | Y toggle Y | Z toggle Z<br>"+
+       
         ReturnAttributions()+
         "</div>"+
         "<p> This scene is powered by the <a href=\x22https://servicemedia.net\x22>ServiceMedia Network</a></p>"+
@@ -1873,6 +1999,27 @@ function SceneManglerModal(mode) {
 
      
      "</div>";
+    // $('#modalContent').on('input', '#sceneColor1', function(e) {
+    //   console.log("color 1 changed " + e.target.value);
+    //   ColorMods(e, e.target.value);
+    //   this.value = null;
+    // });
+
+    // $('#modalContent').on('input', '#sceneColor2', function(e) {
+    //   console.log("color 2 changed " + e.target.value);
+    //   ColorMods(e, e.target.value);
+    //   this.value = null;
+    // });
+    // $('#modalContent').on('input', '#sceneColor3', function(e) {
+    //   console.log("color 3 changed " + e.target.value);
+    //   ColorMods(e, e.target.value);
+    //   this.value = null;
+    // });
+    // $('#modalContent').on('input', '#sceneColor4', function(e) {
+    //   console.log("color 4 changed " + e.target.value);
+    //   ColorMods(e, e.target.value);
+    //   this.value = null;
+    // });
      showDialogPanel = false; //cause it's flipped
      ShowHideDialogPanel(content);
      if (mode != "Location") {

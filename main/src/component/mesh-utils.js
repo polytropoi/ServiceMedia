@@ -2844,10 +2844,10 @@ AFRAME.registerComponent('mod_particles', {
       this.el.setAttribute('sprite-particles', {enable: true, texture: '#candle1', color: this.data.color, textureFrame: '8 8', textureLoop: '4', spawnRate: '1', lifeTime: '1', scale: pSize.toString()});
 
       if (this.data.addLight) {
-        this.el.setAttribute('light', {type: 'point', castShadow: true, color: this.data.color, intensity: .5, distance: 2, decay: 1});
-        this.lightAnimation(.25, 1);
+        this.el.setAttribute('light', {type: 'point', castShadow: true, color: this.data.color, intensity: .5, distance: pSize * 2, decay: pSize});
+        this.lightAnimation(.5, 1.5);
         this.el.addEventListener('animationcomplete', () => {
-            this.lightAnimation(.25, 1);
+            this.lightAnimation(.5, 1.5);
         });
       }
 
@@ -2856,7 +2856,7 @@ AFRAME.registerComponent('mod_particles', {
     if (this.data.type.toLowerCase() =="fire") {
       // this.el.setAttribute('scale', '.25 .25 .25');
       console.log("tryna light a fire! "  + JSON.stringify(this.data.location) + " scale " + this.data.scale);
-      let pSize = this.data.scale * 2;
+      let pSize = this.data.scale * 4;
       this.el.setAttribute('sprite-particles', {enable: true, texture: '#fireanim1', color: this.data.color, blending: 'additive', textureFrame: '6 6', textureLoop: '3', spawnRate: '2', lifeTime: '1.1', scale: pSize.toString()});
       if (this.data.addLight) {
         this.el.setAttribute('light', {type: 'point', castShadow: true, color: this.data.color, intensity: 1, distance: this.data.scale * 4, decay: this.data.scale * 2});
