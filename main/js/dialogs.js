@@ -897,7 +897,7 @@ function ShowLocationModal(timestamp) {
     let thisLocation = null;
     selectedLocationTimestamp = timestamp;
     // console.log("loaded and looking for " + phID);
-    console.log("loaded and looking for " + timestamp);
+    console.log("ShowLocationModal looking for " + timestamp);
     phID = timestamp;
     // if (phID.includes("cloudmarker")) {
     //   if (sceneLocations.locationMods != null && sceneLocations.locationMods.length > 0) {
@@ -967,7 +967,7 @@ function ShowLocationModal(timestamp) {
         // if (userData.sceneOwner != null) {
         //     cloudSaveButton = "<button class=\x22reallySaveButton\x22 onclick=\x22SaveModsToCloud('"+phID+"')\x22>Save (cloud)</button>";
         // }
-        console.log(JSON.stringify(thisLocation));
+       
         let phID = thisLocation.timestamp;
         let title = label + " : " + thisLocation.timestamp;
         // let content = "<span id='modalCloser' onclick=\x22ShowHideDialogPanel()\x22 class='close-modal'>&times;</span><div><h3>"+title+"</h3><hr>" + //populate modal
@@ -989,7 +989,7 @@ function ShowLocationModal(timestamp) {
 
         "<div class=\x22twocolumn\x22><label for=\x22locationMarkerType\x22>Location Type</label>"+
         "<select id=\x22locationMarkerType\x22 name=\x22locationMarkerType\x22>"+
-        ReturnLocationMarkerTypeSelect(thisLocation.markerType) +
+        ReturnLocationMarkerTypeSelect(thisLocation.markerType) + 
         // "<option value=\x22placeholder\x22>placeholder</option>"+
         // "<option value=\x22poi\x22>poi</option>"+
         // "<option value=\x22callout\x22>callout</option>"+
@@ -1055,6 +1055,7 @@ function ShowLocationModal(timestamp) {
 
         // "</form>"+
         "</div>";
+        console.log(content);
         return content;
         // ShowHideDialogPanel(content);
         // ToggleLocationModalListeners();
@@ -1984,17 +1985,18 @@ function SceneManglerModal(mode) {
     
     "<div "+aboutDisplay+" id=\x22About\x22 class=\x22modalMain tabcontent\x22>"+
         // "<p>"
-        "<div>Use WASD keys to move, R to rise, F to fall. <br><br>Attributions: <br>"+
-        "<div>Hold Shift key + click to modify elements, or T key + click for transform control mode<br>"+
-        "<div>In transform control mode: W translate | E rotate | R scale | X toggle X | Y toggle Y | Z toggle Z<br>"+
-       
+        "<div>Use WASD keys to move, R to rise, F to fall.<br>"+
+        "Hold Shift key + click to modify elements, or T key + click for transform control mode<br>"+
+        "In transform control mode: W translate | E rotate | R scale | X toggle X | Y toggle Y | Z toggle Z<br></div><br>"+
+        "Attributions:" + 
         ReturnAttributions()+
-        "</div>"+
+        // "</div>"+
         "<p> This scene is powered by the <a href=\x22https://servicemedia.net\x22>ServiceMedia Network</a></p>"+
     "</div>"+
 
     "<div "+locationDisplay+" id=\x22Location\x22 class=\x22modalMain tabcontent\x22>"+ ///////////////////LOCATION SINGLE
-        ShowLocationModal(selectedLocationTimestamp);
+        "<div>test</div>"+
+        ShowLocationModal(selectedLocationTimestamp) +
     "</div>"+     
 
      

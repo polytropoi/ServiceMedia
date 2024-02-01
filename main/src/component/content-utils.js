@@ -2268,7 +2268,17 @@ AFRAME.registerComponent('mod_dialog', { //there should only be one of these, un
   this.messageType = null;
   this.meshObj = null;
   this.panelString = "";
+
+  this.font2 = "Acme.woff";
+
+  if (settings && settings.sceneFontWeb2) {
+      this.font2 = settings.sceneFontWeb2;
+  }
+
   this.el.addEventListener('model-loaded', () => {  
+    if (settings && settings.sceneFontWeb2) {
+        this.font2 = settings.sceneFontWeb2;
+    }
     this.viewportHolder = document.getElementById('viewportPlaceholder'); 
     // this.viewportHolder.object3D.getWorldPosition( this.cameraPosition );
     this.el.setAttribute('position', {x: 0, y:-1000, z:0}); //it's invisible, but set it out of the way so it don't block
@@ -2328,7 +2338,20 @@ AFRAME.registerComponent('mod_dialog', { //there should only be one of these, un
     this.viewportHolder.object3D.getWorldPosition( this.cameraPosition );
     this.el.setAttribute('position', this.cameraPosition);
     console.log("tryna set mod_dialog position " + JSON.stringify(this.cameraPosition) + " duration " + duration);
-    this.dialogText.setAttribute('value', panelString);
+    // this.dialogText.setAttribute('value', panelString);
+    this.dialogText.setAttribute('troika-text', {
+      maxWidth: .9,
+      baseline: "bottom",
+      align: "left",
+      fontSize: .05,
+      font: "/fonts/web/"+ this.font2,
+      anchor: "center",
+      color: "white",
+      outlineColor: "black",
+      outlineWidth: "2%",
+      value: panelString
+      });
+
     if (duration > 0) {
       this.waitAndHide(duration);
     }
@@ -2374,7 +2397,19 @@ AFRAME.registerComponent('mod_dialog', { //there should only be one of these, un
     console.log("tryna confirmResponse " + response);
     this.panelString = response;
     this.el.setAttribute("visible", true);
-    this.dialogText.setAttribute('value', this.panelString);  
+    // this.dialogText.setAttribute('value', this.panelString);  
+    this.dialogText.setAttribute('troika-text', {
+      maxWidth: .9,
+      baseline: "bottom",
+      align: "left",
+      fontSize: .05,
+      font: "/fonts/web/"+ this.font2,
+      anchor: "center",
+      color: "white",
+      outlineColor: "black",
+      outlineWidth: "2%",
+      value: this.panelString
+      });
     if (this.meshObj != null) {
       this.meshObj.traverse(node => {
         if (node.name.toLowerCase().includes('okbutton')) {
@@ -2394,7 +2429,20 @@ AFRAME.registerComponent('mod_dialog', { //there should only be one of these, un
       // }, 3000);
   }, 
   repeatResponse: function () {
-    this.dialogText.setAttribute('value', this.panelString);  
+    // this.dialogText.setAttribute('value', this.panelString);  
+    this.dialogText.setAttribute('troika-text', {
+      maxWidth: .9,
+      baseline: "bottom",
+      align: "left",
+      fontSize: .05,
+      font: "/fonts/web/"+ this.font2,
+      anchor: "center",
+      color: "white",
+      outlineColor: "black",
+      outlineWidth: "2%",
+      value: this.panelString
+      });
+
     if (this.meshObj != null) {
       this.meshObj.traverse(node => {
         if (node.name.toLowerCase().includes('okbutton')) {
