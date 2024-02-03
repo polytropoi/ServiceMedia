@@ -93,6 +93,9 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                   this.el.setAttribute('gltf-model', '#gate2');
                   this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"placeholder", scaleFactor: this.data.scale});
                   
+                } else if (this.data.markerType.toLowerCase() == "link") {
+                  this.el.setAttribute("gltf-model", "#links");
+                  this.el.setAttribute("material", {color: "aqua", transparent: true, opacity: .5});
                 } else if (this.data.markerType.toLowerCase() == "portal") {
                 this.el.setAttribute('gltf-model', '#poi1');
                 } else if (this.data.markerType.toLowerCase() == "mailbox") {
@@ -185,6 +188,8 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                     this.el.setAttribute("material", {color: "green", transparent: true, opacity: .5});
                     this.el.classList.add("waypoint");
                     // this.el.setAttribute("color", "purple");
+                } else if (this.data.markerType.toLowerCase().includes("link")) {
+                  this.el.setAttribute("material", {color: "Gold", transparent: true, opacity: .5});
                 } else if (this.data.markerType.toLowerCase().includes("trigger")) {
                     this.el.setAttribute("material", {color: "lime", transparent: true, opacity: .5});
                 } else if (this.data.markerType.toLowerCase() == "gate") {
@@ -384,6 +389,17 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                   return; //don't do stuff below if transform enabled
               }
           }
+          if (that.data.markerType == "link" && !that.data.isNew) {
+            if (that.data.eventData.includes("href~")) {
+
+                let urlSplit = that.data.eventData.split("~");
+                let url = urlSplit[1];
+                this.dialogEl = document.getElementById('mod_dialog');
+                if (this.dialogEl) {
+                  this.dialogEl.components.mod_dialog.showPanel("Open " + url +" in new window?", that.data.eventData, "linkOpen", 10000 ); 
+                }
+              } 
+          }
           if (that.data.markerType == "gate") {
             if (evt.detail.intersection.distance > 1 && evt.detail.intersection.distance < 20) {
             this.dialogEl = document.getElementById('mod_dialog');
@@ -556,8 +572,10 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
         } else if (this.data.markerType.toLowerCase() == "waypoint") {
             this.el.setAttribute("material", {color: "green", transparent: true, opacity: .5});
             // this.el.setAttribute("color", "purple");
+        } else if (this.data.markerType.toLowerCase() == "link") {
+          this.el.setAttribute("material", {color: "Gold", transparent: true, opacity: .5});
         } else if (this.data.markerType.toLowerCase().includes("trigger")) {
-            this.el.setAttribute("material", {color: "lime", transparent: true, opacity: .5});
+          this.el.setAttribute("material", {color: "lime", transparent: true, opacity: .5});
         } else if (this.data.markerType.toLowerCase() == "gate") {
           this.el.setAttribute("material", {color: "orange", transparent: true, opacity: .5});
         } else if (this.data.markerType.toLowerCase() == "light") {
@@ -665,6 +683,9 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                 this.el.setAttribute("material", {color: "orange", transparent: true, opacity: .5});
                 this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"placeholder", scaleFactor: this.data.scale});
                 // this.el.setAttribute("color", "orange");
+            } else if (this.data.markerType.toLowerCase() == "link") {
+              this.el.setAttribute("gltf-model", "#links");
+              this.el.setAttribute("material", {color: "aqua", transparent: true, opacity: .5});
             } else if (this.data.markerType.toLowerCase() == "portal") {
                 this.el.setAttribute("gltf-model", "#poi1");
                 this.el.setAttribute("material", {color: "aqua", transparent: true, opacity: .5});
@@ -736,6 +757,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
             }
           }
         }
+        this.updateMaterials();
 
     },
     deselect: function () {

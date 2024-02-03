@@ -1807,7 +1807,7 @@ AFRAME.registerComponent('mod_model', {
         for (let i = 0; i < 100; i++) {
           let testPosition = new THREE.Vector3();
           testPosition.x = this.returnRandomNumber(-100, 100);  
-          testPosition.y = 100;
+          testPosition.y = 50;
           testPosition.z = this.returnRandomNumber(-100, 100);
           let raycaster = new THREE.Raycaster();
           raycaster.set(new THREE.Vector3(testPosition.x, testPosition.y, testPosition.z), new THREE.Vector3(0, -1, 0));

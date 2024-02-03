@@ -105,6 +105,9 @@ AFRAME.registerComponent('local_marker', { //special items with local mods
                     // this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"placeholder"});
                   } else if (this.data.markerType.toLowerCase() == "portal") {
                     this.el.setAttribute('gltf-model', '#poi1');
+                  } else if (this.data.markerType.toLowerCase() == "link") {
+                    this.el.setAttribute('gltf-model', '#links');
+                    
                   } else if (this.data.markerType.toLowerCase() == "mailbox") {
                     // console.log("TRYNA SET MODEL TO MAILBOX!")
                     this.el.setAttribute('gltf-model', '#mailbox');
@@ -207,9 +210,14 @@ AFRAME.registerComponent('local_marker', { //special items with local mods
                             
                         } else if (this.data.markerType == "gate") {
 
-                          console.log("gotsa gate truyna set mod_physics...");
+                          // console.log("gotsa gate truyna set mod_physics...");
                             this.el.setAttribute("material", {color: "orange", transparent: true, opacity: .5});
                             this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"placeholder", scaleFactor: 1});
+                            // this.el.setAttribute("color", "orange");
+                        } else if (this.data.markerType == "link") {
+                          // console.log("gotsa gate truyna set mod_physics...");
+                            this.el.setAttribute("material", {color: "Gold", transparent: true, opacity: .5});
+                            // this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"placeholder", scaleFactor: 1});
                             // this.el.setAttribute("color", "orange");
                         } else if (this.data.markerType == "portal") {
                         
@@ -439,6 +447,17 @@ AFRAME.registerComponent('local_marker', { //special items with local mods
                   return; //don't do stuff below if transform enabled
               }
           }
+          if (that.data.markerType == "link" && !that.data.isNew) {
+            if (that.data.eventData.includes("href~")) {
+
+                let urlSplit = that.data.eventData.split("~");
+                let url = urlSplit[1];
+                this.dialogEl = document.getElementById('mod_dialog');
+                if (this.dialogEl) {
+                  this.dialogEl.components.mod_dialog.showPanel("Open " + url +" in new window?", that.data.eventData, "linkOpen", 10000 ); 
+                }
+              } 
+          }
           if (that.data.markerType == "gate" && !that.data.isNew) {
             if (evt.detail.intersection.distance > 1 && evt.detail.intersection.distance < 15) {
               this.dialogEl = document.getElementById('mod_dialog');
@@ -512,7 +531,9 @@ AFRAME.registerComponent('local_marker', { //special items with local mods
         if (this.data.markerType.toLowerCase() == "placeholder") {
             this.el.setAttribute("material", {color: "yellow", transparent: true, opacity: .5});
         } else if (this.data.markerType.toLowerCase() == "poi") {
-            this.el.setAttribute("material", {color: "purple", transparent: true, opacity: .5});
+          this.el.setAttribute("material", {color: "purple", transparent: true, opacity: .5});
+        } else if (this.data.markerType.toLowerCase() == "link") {
+            this.el.setAttribute("material", {color: "Gold", transparent: true, opacity: .5});
         } else if (this.data.markerType.toLowerCase() == "waypoint") {
             this.el.setAttribute("material", {color: "green", transparent: true, opacity: .5});
             // this.el.setAttribute("color", "purple");
@@ -752,7 +773,10 @@ AFRAME.registerComponent('local_marker', { //special items with local mods
                 this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"placeholder", scaleFactor: this.data.scale});
                 // this.el.setAttribute("color", "orange");
             } else if (this.data.markerType.toLowerCase() == "portal") {
-                this.el.setAttribute("gltf-model", "#poi1");
+              this.el.setAttribute("gltf-model", "#poi1");
+              this.el.setAttribute("material", {color: "aqua", transparent: true, opacity: .5});
+            } else if (this.data.markerType.toLowerCase() == "link") {
+                this.el.setAttribute("gltf-model", "#links");
                 this.el.setAttribute("material", {color: "aqua", transparent: true, opacity: .5});
             } else if (this.data.markerType.toLowerCase() == "mailbox") {
                 this.el.setAttribute("gltf-model", "#mailbox");
@@ -823,6 +847,7 @@ AFRAME.registerComponent('local_marker', { //special items with local mods
             
           }
         }
+        this.updateMaterials();
 
     },
     waitAndLoad: function () {

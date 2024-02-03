@@ -1040,6 +1040,7 @@ webxr_router.get('/:_id', function (req, res) {
                                 if (sceneResponse.sceneLocations[i].markerType != undefined && sceneResponse.sceneLocations[i].type.toLowerCase() != 'geographic') { //cloudmarkers, special type allows local mods
                                     if (sceneResponse.sceneLocations[i].markerType.toLowerCase() == "placeholder" 
                                         || sceneResponse.sceneLocations[i].markerType.toLowerCase().includes("trigger") 
+                                        || sceneResponse.sceneLocations[i].markerType.toLowerCase().includes("collider") 
                                         || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "poi" 
                                         || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "gate"
                                         || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "portal"  
@@ -1047,6 +1048,7 @@ webxr_router.get('/:_id', function (req, res) {
                                         || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "player"  
                                         || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "3D text" 
                                         || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "light"  
+                                        || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "link"  
                                         || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "mailbox") {
                                     //    locationPlaceholders.push(sceneResponse.sceneLocations[i].x + " " + sceneResponse.sceneLocations[i].y + " " + zFix);
                                         let tLoc = sceneResponse.sceneLocations[i];

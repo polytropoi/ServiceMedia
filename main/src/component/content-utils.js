@@ -2365,11 +2365,19 @@ AFRAME.registerComponent('mod_dialog', { //there should only be one of these, un
       console.log("yesbutton for " + this.objID);
       // this.el.setAttribute("visible", false);
       if (this.objID.includes("href~")) {
-        let urlSplit = this.objID.split("~");
-        window.location.href = urlSplit[1];
-        // window.open(urlSplit[1], "_blank");
-        this.el.setAttribute("visible", false);
-        this.dialogPanel.classList.remove('activeObjexRay');
+        if (this.messageType == "gatePass") {
+          let urlSplit = this.objID.split("~");
+          window.location.href = urlSplit[1];
+          // window.open(urlSplit[1], "_blank");
+          this.el.setAttribute("visible", false);
+          this.dialogPanel.classList.remove('activeObjexRay');
+        } else if (this.messageType == "linkOpen") {
+          let urlSplit = this.objID.split("~");
+          // window.location.href = urlSplit[1];
+          window.open(urlSplit[1], "_blank");
+          this.el.setAttribute("visible", false);
+          this.dialogPanel.classList.remove('activeObjexRay');
+        }
       } else {
         let objEl = document.getElementById(this.objID);
         if (objEl != null) {
