@@ -4627,28 +4627,28 @@ AFRAME.registerComponent('load_threesvg', {
             break;
 
           case 67: // C
-            const position = currentCamera.position.clone();
+            // const position = currentCamera.position.clone();
 
-            currentCamera = currentCamera.isPerspectiveCamera ? cameraOrtho : cameraPersp;
-            currentCamera.position.copy( position );
+            // currentCamera = currentCamera.isPerspectiveCamera ? cameraOrtho : cameraPersp;
+            // currentCamera.position.copy( position );
 
-            orbit.object = currentCamera;
-            this.control.camera = currentCamera;
+            // orbit.object = currentCamera;
+            // this.control.camera = currentCamera;
 
-            currentCamera.lookAt( orbit.target.x, orbit.target.y, orbit.target.z );
-            onWindowResize();
+            // currentCamera.lookAt( orbit.target.x, orbit.target.y, orbit.target.z );
+            // onWindowResize();
             break;
 
           case 86: // V
-            const randomFoV = Math.random() + 0.1;
-            const randomZoom = Math.random() + 0.1;
+            // const randomFoV = Math.random() + 0.1;
+            // const randomZoom = Math.random() + 0.1;
 
-            cameraPersp.fov = randomFoV * 160;
-            cameraOrtho.bottom = - randomFoV * 500;
-            cameraOrtho.top = randomFoV * 500;
+            // cameraPersp.fov = randomFoV * 160;
+            // cameraOrtho.bottom = - randomFoV * 500;
+            // cameraOrtho.top = randomFoV * 500;
 
-            cameraPersp.zoom = randomZoom * 5;
-            cameraOrtho.zoom = randomZoom * 5;
+            // cameraPersp.zoom = randomZoom * 5;
+            // cameraOrtho.zoom = randomZoom * 5;
             onWindowResize();
             break;
 

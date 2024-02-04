@@ -16,7 +16,7 @@ AFRAME.registerComponent('local_marker', { //special items with local mods
       tags: {default: ''},
       position: {default: ''},
       rotation: {default: ''},
-      scale: {default: '1'},
+      scale: {default: 1},
       isNew: {default: false}
   
     },
@@ -32,7 +32,7 @@ AFRAME.registerComponent('local_marker', { //special items with local mods
         return;
       }
       // this.scale = {x: this.data.scale.x, y: this.data.scale.y, z: this.data.scale.z};
-      this.scale = "1 1 1";
+      this.scale = this.data.scale.toString() + " " + this.data.scale.toString() + " " + this.data.scale.toString();
   
       var sceneEl = document.querySelector('a-scene');
   
@@ -74,7 +74,9 @@ AFRAME.registerComponent('local_marker', { //special items with local mods
   
             if (this.data.isNew) { //just created, not loaded from db
               this.el.setAttribute("gltf-model", "#poi1");
-              this.el.setAttribute('position', this.data.position);
+              // this.el.setAttribute('position', this.data.position);
+              this.el.object3D.position.set(this.data.position);
+              // this.el.object3D.rotation.set(this.data.rotation):
               // if (this.data.markerType != "none" && this.data.markerType != "player") {
               //   this.el.setAttribute('gltf-model', '#poi1');
               // }
@@ -84,11 +86,13 @@ AFRAME.registerComponent('local_marker', { //special items with local mods
               // console.log("tryna set new localmarker with phID " + this.timestamp + " and markerType " + this.data.markerType);
                //check for tag?
             } else { //it's been saved to localDB, w/ position
-  
+              // this.el.setAttribute('scale', this.scale);
               // this.el.setAttribute("gltf-model", "#poi1");
-              this.el.setAttribute('position', this.data.position);
-              this.el.setAttribute('rotation', this.data.rotation);
-              this.el.setAttribute('scale', this.scale);
+              // this.el.setAttribute('position', this.data.position);
+              // this.el.setAttribute('rotation', this.data.rotation);
+              this.el.object3D.position.set(this.data.position);
+              this.el.object3D.rotation.set(this.data.rotation);
+              
               if ((!this.data.modelID || this.data.modelID == undefined || this.data.modelID == "" || this.data.modelID == "none") && !this.data.modelID.toString().includes("primitive")) {
 
                 if (this.data.markerType.toLowerCase() == "placeholder") {
@@ -240,6 +244,7 @@ AFRAME.registerComponent('local_marker', { //special items with local mods
                       }
                     }
                 }
+                
             }
             //   if ((!this.data.modelID || this.data.modelID == undefined || this.data.modelID == "" || this.data.modelID == "none") && !this.data.modelID.toString().includes("primitive")) {
             //   if (this.data.modelID != 'none') {
@@ -691,7 +696,7 @@ AFRAME.registerComponent('local_marker', { //special items with local mods
         this.el.removeAttribute("light");
         if (modelID != undefined && modelID != null & modelID != "none" && modelID != "") {  
           if (modelID.toString().includes("primitive")) {
-              console.log("CLOUDMARKER PRIMITIVE " + modelID + " scale " + 1);
+              console.log("LOCALMARKER PRIMITIVE " + modelID + " scale " + 1);
               this.el.removeAttribute("geometry");
               if (modelID.toString().includes("cube")) {
                   this.el.setAttribute("geometry", {primitive: "box", width: 1, height: 1, depth: 1});
@@ -699,9 +704,8 @@ AFRAME.registerComponent('local_marker', { //special items with local mods
                   this.el.setAttribute("geometry", {primitive: "sphere", radius: 1});
               } else if (modelID.toString().includes("cylinder")) {
                   this.el.setAttribute("geometry", {primitive: "cylinder", height: 1, radius: 1 / 2});
-              } else {
-
               }
+
               if (this.data.markerType.toLowerCase() == "placeholder") {
                   this.el.setAttribute("material", {color: "yellow", transparent: true, opacity: .5});
               } else if (this.data.markerType.toLowerCase() == "poi") {
@@ -733,6 +737,7 @@ AFRAME.registerComponent('local_marker', { //special items with local mods
                 }
                 
               }
+              this.updateMaterials();
           } else {
               for (let i = 0; i < sceneModels.length; i++) {
               if (sceneModels[i]._id == modelID) {

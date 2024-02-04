@@ -817,6 +817,7 @@ function ReturnLocationMarkerTypeSelect (selected) {
       "trigger",
       "target",
       "gate",
+      "link",
       "portal",
       "collider",
       "light",
@@ -846,7 +847,7 @@ function ReturnLocationMarkerTypeSelect (selected) {
       "text billboard",
       "textbook",
       "picturebook",
-      "link",
+      
       "mailbox",
       "pickup",
       "drop",
@@ -1055,7 +1056,7 @@ function ShowLocationModal(timestamp) {
 
         // "</form>"+
         "</div>";
-        console.log(content);
+        // console.log(content);
         return content;
         // ShowHideDialogPanel(content);
         // ToggleLocationModalListeners();
@@ -1995,7 +1996,7 @@ function SceneManglerModal(mode) {
     "</div>"+
 
     "<div "+locationDisplay+" id=\x22Location\x22 class=\x22modalMain tabcontent\x22>"+ ///////////////////LOCATION SINGLE
-        "<div>test</div>"+
+        // "<div>test</div>"+
         ShowLocationModal(selectedLocationTimestamp) +
     "</div>"+     
 

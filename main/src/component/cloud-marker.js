@@ -33,7 +33,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
       this.font1 = "Acme.woff";
       this.font2 = "Acme.woff";
 
-    this.scale = this.data.scale + " " + this.data.scale + " " + this.data.scale;
+    this.scale = this.data.scale.toString() + " " + this.data.scale.toString() + " " + this.data.scale.toString();
     // this.scale = "1 1 1";
       if (settings && settings.sceneFontWeb1) {
         this.font1 = settings.sceneFontWeb1;
@@ -224,7 +224,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
         if (this.data.objectID != undefined && this.data.objectID != null && this.data.objectID != "none" && this.data.objectID != "") { //hrm, cloudmarker objex?
 
         }
-          this.el.setAttribute('scale', this.scale);
+        this.el.setAttribute('scale', this.scale);
           // localStorage.setItem(this.phID, JSON.stringify(locItem)); 
         
         if (this.data.markerType.toLowerCase() == "player") {
