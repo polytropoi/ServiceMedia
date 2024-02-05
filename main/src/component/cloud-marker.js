@@ -14,6 +14,14 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
       objectID: {default: ''},
       model: {default: ''},
       scale: {default: 1},
+        // position: {default: ''},
+      xpos: {type: 'number', default: 0}, //for modding...
+      ypos: {type: 'number', default: 0},
+      zpos: {type: 'number', default: 0},
+
+      xrot: {type: 'number', default: 0},//in degrees, trans to radians below
+      yrot: {type: 'number', default: 0},
+      zrot: {type: 'number', default: 0},
       description: {default: ''},
       allowMods: {default: false}
     },
@@ -51,28 +59,28 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
           this.el.classList.add("allowMods");
         }
       
-        let locItem = {};
-        let position = this.el.getAttribute('position'); //
-        let rotation = this.el.getAttribute('rotation');
-        locItem.x = position.x.toFixed(2);
-        locItem.eulerx = rotation.x.toFixed(2);
-        locItem.y = position.y.toFixed(2);
-        locItem.eulery = rotation.y.toFixed(2);
-        locItem.z = position.z.toFixed(2);
-        locItem.eulerz = rotation.z.toFixed(2);
-        locItem.scale = this.data.scale;
-        locItem.type = "Worldspace";
-        locItem.name = this.data.name;
-        locItem.label = this.data.label;
-        locItem.eventData = this.data.eventData;
-        locItem.description = this.data.description;
-        locItem.timestamp = this.data.timestamp;
-        locItem.markerType = this.data.markerType;
-        locItem.modelID = this.data.modelID;
-        locItem.model = this.data.model;
-        locItem.objectID = this.data.objectID;
-        locItem.objName = this.data.objName;
-        locItem.phID = this.phID;
+        // let locItem = {};
+        // // let position = this.el.getAttribute('position'); //
+        // // let rotation = this.el.getAttribute('rotation');
+        // locItem.x = position.x.toFixed(2);
+        // locItem.eulerx = rotation.x.toFixed(2);
+        // locItem.y = position.y.toFixed(2);
+        // locItem.eulery = rotation.y.toFixed(2);
+        // locItem.z = position.z.toFixed(2);
+        // locItem.eulerz = rotation.z.toFixed(2);
+        // locItem.scale = this.data.scale;
+        // locItem.type = "Worldspace";
+        // locItem.name = this.data.name;
+        // locItem.label = this.data.label;
+        // locItem.eventData = this.data.eventData;
+        // locItem.description = this.data.description;
+        // locItem.timestamp = this.data.timestamp;
+        // locItem.markerType = this.data.markerType;
+        // locItem.modelID = this.data.modelID;
+        // locItem.model = this.data.model;
+        // locItem.objectID = this.data.objectID;
+        // locItem.objName = this.data.objName;
+        // locItem.phID = this.phID;
   
         //   console.log("CLOUDMARKER " + this.data.modelID + " " + this.data.name);
           
@@ -401,7 +409,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
               } 
           }
           if (that.data.markerType == "gate") {
-            if (evt.detail.intersection.distance > 1 && evt.detail.intersection.distance < 20) {
+            if (evt.detail.intersection && evt.detail.intersection.distance > 1 && evt.detail.intersection.distance < 20) {
             this.dialogEl = document.getElementById('mod_dialog');
             if (this.dialogEl) {
               let ascenesEl = document.getElementById("availableScenesControl");
@@ -551,7 +559,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
     remove: function () {
         console.log("removing something!");
     },
-    updateAndLoad: function (name, description, tags, eventData, markerType, scale, modelID) {
+    updateAndLoad: function (name, description, tags, eventData, markerType, scale, xpos, ypos, zpos, xrot, yrot, zrot, modelID) {
         this.data.name = name;
         this.data.description = description;
         this.data.tags = tags;
@@ -559,6 +567,12 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
         this.data.markerType = markerType;
         this.data.scale = scale;
         this.data.modelID = modelID;
+        this.data.xpos = xpos;
+        this.data.ypos = ypos;
+        this.data.zpos = zpos;
+        this.data.xrot = xrot;
+        this.data.yrot = yrot;
+        this.data.zrot = zrot;
         // setTimeout(() => {
             this.loadModel(modelID);
         // }, 2000);
@@ -758,6 +772,16 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
           }
         }
         this.updateMaterials();
+        // this.updateMaterials();
+        let scale = parseFloat(this.data.scale);
+        console.log("localmarker with + " + this.data.scale + " pos " + this.data.xpos + this.data.ypos + this.data.zpos + " rot " + this.data.xrot + this.data.yrot + this.data.zrot);
+        this.el.object3D.scale.set(scale,scale,scale);
+        this.el.object3D.position.set(this.data.xpos, this.data.ypos, this.data.zpos);
+        // this.el.object3D.rotation.set(THREE.MathUtils.degToRad(this.data.xrot), THREE.MathUtils.degToRad(this.data.xrot), THREE.MathUtils.degToRad(this.data.xrot));
+        this.el.setAttribute("rotation", this.data.xrot + " " + this.data.yrot + " " +this.data.zrot);
+        // this.el.object3D.rotation.x += Math.PI;
+        
+        this.el.object3D.updateMatrix(); 
 
     },
     deselect: function () {

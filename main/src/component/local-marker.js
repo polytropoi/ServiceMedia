@@ -1,6 +1,6 @@
 
 
-AFRAME.registerComponent('local_marker', { //special items with local mods
+AFRAME.registerComponent('local_marker', { //special items with local mods, not saved to cloud yet
     schema: {
       // eventData: {default: ''},
       modelID: {default: 'none'},
@@ -14,8 +14,16 @@ AFRAME.registerComponent('local_marker', { //special items with local mods
       isLocal: {default: true},
       isSelected: {default: false},
       tags: {default: ''},
-      position: {default: ''},
-      rotation: {default: ''},
+      // position: {default: ''},
+      xpos: {type: 'number', default: 0},
+      ypos: {type: 'number', default: 0},
+      zpos: {type: 'number', default: 0},
+
+      xrot: {type: 'number', default: 0},//in degrees, trans to radians below
+      yrot: {type: 'number', default: 0},
+      zrot: {type: 'number', default: 0},
+      // rotation: {default: ''},
+
       scale: {default: 1},
       isNew: {default: false}
   
@@ -31,8 +39,10 @@ AFRAME.registerComponent('local_marker', { //special items with local mods
       if (this.data.eventData.includes("navmesh")) {
         return;
       }
+      // this.position = new THREE.Vector3(xpos, ypos, zpos);
       // this.scale = {x: this.data.scale.x, y: this.data.scale.y, z: this.data.scale.z};
-      this.scale = this.data.scale.toString() + " " + this.data.scale.toString() + " " + this.data.scale.toString();
+      // this.scale = new THREE.Vector3(this.data.scale, this.data.scale, this.data.scale);
+      // this.threeScale = 
   
       var sceneEl = document.querySelector('a-scene');
   
@@ -75,7 +85,7 @@ AFRAME.registerComponent('local_marker', { //special items with local mods
             if (this.data.isNew) { //just created, not loaded from db
               this.el.setAttribute("gltf-model", "#poi1");
               // this.el.setAttribute('position', this.data.position);
-              this.el.object3D.position.set(this.data.position);
+              // this.el.object3D.position.set(this.data.position);
               // this.el.object3D.rotation.set(this.data.rotation):
               // if (this.data.markerType != "none" && this.data.markerType != "player") {
               //   this.el.setAttribute('gltf-model', '#poi1');
@@ -83,15 +93,22 @@ AFRAME.registerComponent('local_marker', { //special items with local mods
               // this.el.setAttribute('gltf-model', '#poi1');
               // this.el.setAttribute('scale', this.scale);
               this.el.id = this.timestamp;
-              // console.log("tryna set new localmarker with phID " + this.timestamp + " and markerType " + this.data.markerType);
+              // console.log("tryna set new localmarker with phID " + this.timestamp + " and markerType " + this.data.markerType );
                //check for tag?
             } else { //it's been saved to localDB, w/ position
               // this.el.setAttribute('scale', this.scale);
               // this.el.setAttribute("gltf-model", "#poi1");
               // this.el.setAttribute('position', this.data.position);
               // this.el.setAttribute('rotation', this.data.rotation);
-              this.el.object3D.position.set(this.data.position);
-              this.el.object3D.rotation.set(this.data.rotation);
+              // let scale = parseFloat(this.data.scale);
+              // console.log("localmarker with + " + this.data.scale + " rot " + this.data.xrot + this.data.yrot + this.data.zrot);
+              // this.el.object3D.position.set(this.data.xpos, this.data.ypos, this.data.zpos);
+              // this.el.object3D.rotation.set(THREE.MathUtils.degToRad(this.data.xrot), THREE.MathUtils.degToRad(this.data.xrot), THREE.MathUtils.degToRad(this.data.xrot));
+              // // this.el.object3D.rotation.x += Math.PI;
+              // this.el.object3D.scale.set(scale,scale,scale);
+              // this.el.object3D.updateMatrix(); 
+              // this.el.object3D.position.set({x: parseFloat(this.data.position.x), y: parseFloat(this.data.position.y), z: parseFloat(this.data.position.z)});
+              // this.el.object3D.rotation.set(this.data.rotation);
               
               if ((!this.data.modelID || this.data.modelID == undefined || this.data.modelID == "" || this.data.modelID == "none") && !this.data.modelID.toString().includes("primitive")) {
 
@@ -244,6 +261,15 @@ AFRAME.registerComponent('local_marker', { //special items with local mods
                       }
                     }
                 }
+                let scale = parseFloat(this.data.scale);
+                console.log("localmarker with + " + this.data.scale + " rot " + this.data.xrot + this.data.yrot + this.data.zrot);
+                this.el.object3D.scale.set(scale,scale,scale);
+                this.el.object3D.position.set(this.data.xpos, this.data.ypos, this.data.zpos);
+                // this.el.object3D.rotation.set(THREE.MathUtils.degToRad(this.data.xrot), THREE.MathUtils.degToRad(this.data.xrot), THREE.MathUtils.degToRad(this.data.xrot));
+                this.el.setAttribute("rotation", this.data.xrot + " " + this.data.yrot + " " +this.data.zrot);
+                // this.el.object3D.rotation.x += Math.PI;
+               
+                // this.el.object3D.updateMatrix(); 
                 
             }
             //   if ((!this.data.modelID || this.data.modelID == undefined || this.data.modelID == "" || this.data.modelID == "none") && !this.data.modelID.toString().includes("primitive")) {
@@ -354,7 +380,7 @@ AFRAME.registerComponent('local_marker', { //special items with local mods
       
         this.el.addEventListener("model-loaded", (e) => {
             // e.preventDefault();
-  
+
             console.log("local_marker geo is loaded for markertype " + this.data.markerType);
             if (this.data.isNew) {
               this.el.setAttribute("transform_controls", "");
@@ -383,6 +409,10 @@ AFRAME.registerComponent('local_marker', { //special items with local mods
                   this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"placeholder", scaleFactor: this.data.scale});
                 }
               }
+              
+              // console.log(this.data.position);
+              // this.el.object3D.position.set({x: parseFloat(this.data.position.x), y: parseFloat(this.data.position.y), z: parseFloat(this.data.position.z)});
+              // this.el.object3D.rotation.set(this.data.rotation);
             // this.el.setAttribute("transform_controls", ""); //check for tag?
         });
 
@@ -853,6 +883,15 @@ AFRAME.registerComponent('local_marker', { //special items with local mods
           }
         }
         this.updateMaterials();
+        let scale = parseFloat(this.data.scale);
+        console.log("localmarker with + " + this.data.scale + " rot " + this.data.xrot + this.data.yrot + this.data.zrot);
+        this.el.object3D.scale.set(scale,scale,scale);
+        this.el.object3D.position.set(this.data.xpos, this.data.ypos, this.data.zpos);
+        // this.el.object3D.rotation.set(THREE.MathUtils.degToRad(this.data.xrot), THREE.MathUtils.degToRad(this.data.xrot), THREE.MathUtils.degToRad(this.data.xrot));
+        this.el.setAttribute("rotation", this.data.xrot + " " + this.data.yrot + " " +this.data.zrot);
+        // this.el.object3D.rotation.x += Math.PI;
+        
+        this.el.object3D.updateMatrix(); 
 
     },
     waitAndLoad: function () {

@@ -141,7 +141,7 @@ function InitIDB() {
                console.log("cursor " + i + " of " + cursor.value.locations.length);
                localData.locations.push(cursor.value.locations[i]);
                if (cursor.value.locations[i].isLocal != undefined && cursor.value.locations[i].isLocal) { //only update ones with local changes
-                  console.log(cursor.value.locations[i].name + " markerType " + cursor.value.locations[i].markerType + " isLocal!");
+                  console.log(cursor.value.locations[i].name + " markerType " + cursor.value.locations[i].markerType + " isLocal!" + " rot " + cursor.value.locations[i].eulerx + cursor.value.locations[i].eulerz + cursor.value.locations[i].eulerz );
                   let cloudEl = document.getElementById(cursor.value.locations[i].timestamp);
                   if (cloudEl) { //prexisting elements (cloud_marker, mod_model, mod_object) already rendered onload
                      cloudEl.setAttribute("position", {x: cursor.value.locations[i].x, y: cursor.value.locations[i].y, z: cursor.value.locations[i].z });
@@ -150,7 +150,20 @@ function InitIDB() {
                      let cloudMarkerComponent = cloudEl.components.cloud_marker;
                      if (cloudMarkerComponent) {  
 
-                        cloudMarkerComponent.updateAndLoad(cursor.value.locations[i].name, cursor.value.locations[i].description, cursor.value.locations[i].locationTags, cursor.value.locations[i].eventData, cursor.value.locations[i].markerType, cursor.value.locations[i].markerObjScale, cursor.value.locations[i].modelID);   
+                        cloudMarkerComponent.updateAndLoad(cursor.value.locations[i].name, 
+                                                         cursor.value.locations[i].description, 
+                                                         cursor.value.locations[i].locationTags, 
+                                                         cursor.value.locations[i].eventData, 
+                                                         cursor.value.locations[i].markerType, 
+                                                         cursor.value.locations[i].markerObjScale, 
+                                                         cursor.value.locations[i].x, 
+                                                         cursor.value.locations[i].y, 
+                                                         cursor.value.locations[i].z, 
+                                                         cursor.value.locations[i].eulerx, 
+                                                         cursor.value.locations[i].eulery, 
+                                                         cursor.value.locations[i].eulerz, 
+
+                                                         cursor.value.locations[i].modelID);   
                      } else {
                         let modModelComponent = cloudEl.components.mod_model;
                         if (modModelComponent) {
@@ -173,9 +186,16 @@ function InitIDB() {
                                                             tags: cursor.value.locations[i].locationTags, 
                                                             eventData: cursor.value.locations[i].eventData, 
                                                             markerType: cursor.value.locations[i].markerType,
-                                                            position: {x: cursor.value.locations[i].x, y: cursor.value.locations[i].y, z: cursor.value.locations[i].z},
-                                                            rotation: {x: cursor.value.locations[i].eulerx, y: cursor.value.locations[i].eulery, z: cursor.value.locations[i].eulerz },
-                                                            scale: {x: cursor.value.locations[i].markerObjScale, y: cursor.value.locations[i].markerObjScale, z: cursor.value.locations[i].markerObjScale}
+                                                            // position: cursor.value.locations[i].x +","+ cursor.value.locations[i].y+","+cursor.value.locations[i].z,
+                                                            xpos: cursor.value.locations[i].x,
+                                                            ypos: cursor.value.locations[i].y,
+                                                            zpos: cursor.value.locations[i].z,
+                                                            xrot: cursor.value.locations[i].eulerx,
+                                                            yrot: cursor.value.locations[i].eulery,
+                                                            zrot: cursor.value.locations[i].eulerz,
+                                                            // rotation: cursor.value.locations[i].eulerx+","+cursor.value.locations[i].eulery +","+ cursor.value.locations[i].eulerz,
+                                                            // scale: {x: cursor.value.locations[i].markerObjScale, y: cursor.value.locations[i].markerObjScale, z: cursor.value.locations[i].markerObjScale} derp
+                                                            scale: cursor.value.locations[i].markerObjScale
                                                          });
                      localEl.id = cursor.value.locations[i].timestamp.toString(); //for lookups
                   }
@@ -905,7 +925,6 @@ function SaveModToLocal(locationKey) { //locationKey is now just timestamp of th
    console.log("tryna save mod to local with key " + locationKey);
    hasLocalData = true;
    let locItem = {};
-
    
    // let keySplit = locationKey.split("~");
    locItem.x = document.getElementById('xpos').value;
@@ -952,7 +971,8 @@ function SaveModToLocal(locationKey) { //locationKey is now just timestamp of th
       if (localData.locations[i].timestamp.toString() == locationKey.toString() ) {
          console.log("updating existing element "+locationKey+"  : " + JSON.stringify(locItem));
          // localData.locations[i] = Object.assign(locItem); //merge?
-         locItem.x = document.getElementById('xpos').value;
+         // locItem.x = document.getElementById('xpos').value;
+         localData.locations[i].x = locItem.x;
          localData.locations[i].eulerx = locItem.eulerx;
          localData.locations[i].y = locItem.y;
          localData.locations[i].eulery = locItem.eulery;
@@ -976,55 +996,112 @@ function SaveModToLocal(locationKey) { //locationKey is now just timestamp of th
          localData.locations[i].objectName = locItem.objectName;
 
          hasLocal = true;
-         SaveLocalData();
-         break;
+         let theEl = document.getElementById(locationKey.toString());
+         if (theEl != null) {
+            console.log("found the EL: " + locationKey + " locItem name " + locItem.name);
+            let scale = (locItem.markerObjScale != undefined && locItem.markerObjScale != null && locItem.markerObjScale != "") ? locItem.markerObjScale : 1;
+            // theEl.setAttribute('position', {x: locItem.x, y: locItem.y, z: locItem.z});
+            // theEl.setAttribute('rotation', {x: locItem.eulerx, y: locItem.eulery, z: locItem.eulerz});
+            // theEl.setAttribute('scale', {x: scale, y: scale, z: scale});
+            let modModelComponent = theEl.components.mod_model;
+            let localMarkerComponent = theEl.components.local_marker;
+            let cloudMarkerComponent = theEl.components.cloud_marker;
+            if (modModelComponent) {
+               modModelComponent.data.modelID = locItem.modelID;
+               modModelComponent.data.eventData = locItem.eventData;
+               modModelComponent.data.tags = locItem.locationTags;
+               modModelComponent.loadModel(locItem.modelID); 
+               modModelComponent.data.name = locItem.name;
+               
+               // modModelComponent.updateMaterials();
+            } else if (cloudMarkerComponent) {
+               cloudMarkerComponent.data.modelID = locItem.modelID;
+               cloudMarkerComponent.data.name = locItem.name;
+               cloudMarkerComponent.data.markerType = locItem.markerType;
+               cloudMarkerComponent.data.xpos = locItem.x;
+               cloudMarkerComponent.data.ypos = locItem.y;
+               cloudMarkerComponent.data.zpos = locItem.z;
+               cloudMarkerComponent.data.xrot = locItem.eulerx;
+               cloudMarkerComponent.data.yrot = locItem.eulery;
+               cloudMarkerComponent.data.zrot = locItem.eulerz;
+               cloudMarkerComponent.data.scale = locItem.markerObjScale;
+               cloudMarkerComponent.loadModel(locItem.modelID); 
+               cloudMarkerComponent.updateMaterials();
+            } else if (localMarkerComponent) {
+               localMarkerComponent.data.modelID = locItem.modelID;
+               localMarkerComponent.data.name = locItem.name;
+               localMarkerComponent.data.markerType = locItem.markerType;
+               localMarkerComponent.data.xpos = locItem.x;
+               localMarkerComponent.data.ypos = locItem.y;
+               localMarkerComponent.data.zpos = locItem.z;
+               localMarkerComponent.data.xrot = locItem.eulerx;
+               localMarkerComponent.data.yrot = locItem.eulery;
+               localMarkerComponent.data.zrot = locItem.eulerz;
+               localMarkerComponent.data.scale = locItem.markerObjScale;
+               localMarkerComponent.loadModel(locItem.modelID); 
+               localMarkerComponent.updateMaterials();
+
+            }
+            SaveLocalData();
+            break;
+         } else {
+            // SaveLocalData();
+            console.log("DINT FIND THE EL " + locationKey);
+            break;
+            
+         }
+
       }
    }
-   let theEl = document.getElementById(locationKey.toString());
-   if (theEl != null) {
-      console.log("found the EL: " + locationKey + " locItem name " + locItem.name);
-      let scale = (locItem.markerObjScale != undefined && locItem.markerObjScale != null && locItem.markerObjScale != "") ? locItem.markerObjScale : 1;
-      theEl.setAttribute('position', {x: locItem.x, y: locItem.y, z: locItem.z});
-      theEl.setAttribute('rotation', {x: locItem.eulerx, y: locItem.eulery, z: locItem.eulerz});
-      theEl.setAttribute('scale', {x: scale, y: scale, z: scale});
-      let modModelComponent = theEl.components.mod_model;
-      let localMarkerComponent = theEl.components.local_marker;
-      let cloudMarkerComponent = theEl.components.cloud_marker;
-      if (modModelComponent) {
-         modModelComponent.data.modelID = locItem.modelID;
-         modModelComponent.data.eventData = locItem.eventData;
-         modModelComponent.data.tags = locItem.locationTags;
-         modModelComponent.loadModel(locItem.modelID); 
-         modModelComponent.data.name = locItem.name;
-         // modModelComponent.updateMaterials();
-       } else if (cloudMarkerComponent) {
-         cloudMarkerComponent.data.modelID = locItem.modelID;
-         cloudMarkerComponent.data.name = locItem.name;
-         cloudMarkerComponent.data.markerType = locItem.markerType;
+   // let theEl = document.getElementById(locationKey.toString());
+   // if (theEl != null) {
+   //    console.log("found the EL: " + locationKey + " locItem name " + locItem.name);
+   //    let scale = (locItem.markerObjScale != undefined && locItem.markerObjScale != null && locItem.markerObjScale != "") ? locItem.markerObjScale : 1;
+   //    // theEl.setAttribute('position', {x: locItem.x, y: locItem.y, z: locItem.z});
+   //    // theEl.setAttribute('rotation', {x: locItem.eulerx, y: locItem.eulery, z: locItem.eulerz});
+   //    // theEl.setAttribute('scale', {x: scale, y: scale, z: scale});
+   //    let modModelComponent = theEl.components.mod_model;
+   //    let localMarkerComponent = theEl.components.local_marker;
+   //    let cloudMarkerComponent = theEl.components.cloud_marker;
+   //    if (modModelComponent) {
+   //       modModelComponent.data.modelID = locItem.modelID;
+   //       modModelComponent.data.eventData = locItem.eventData;
+   //       modModelComponent.data.tags = locItem.locationTags;
+   //       modModelComponent.loadModel(locItem.modelID); 
+   //       modModelComponent.data.name = locItem.name;
          
-         cloudMarkerComponent.loadModel(locItem.modelID); 
-         cloudMarkerComponent.updateMaterials();
-       } else if (localMarkerComponent) {
-         localMarkerComponent.data.modelID = locItem.modelID;
-         localMarkerComponent.data.name = locItem.name;
-         localMarkerComponent.data.markerType = locItem.markerType;
-
-         localMarkerComponent.loadModel(locItem.modelID); 
-         localMarkerComponent.updateMaterials();
-       }
-      //todo update models/objects and other properties...
-
-      // for (let i = 0; i < sceneLocations.locations.length; i++) {
-      //    if (locationKey.toString() == sceneLocations.locations[i].timestamp.toString()) {
-      //       sceneLocations.locations[i] = Object.assign(locItem); //replace the location item with updated properties
-      //       localData.locations[i] = Object.assign(locItem); //replace the location item with updated properties, to use if already has local mods
-      //       SaveLocalData(); //persist to localdb
-      //    }
-      // }
-
-   } else {
-      console.log("DINT FIND THE EL " + locationKey);
-   }
+   //       // modModelComponent.updateMaterials();
+   //     } else if (cloudMarkerComponent) {
+   //       cloudMarkerComponent.data.modelID = locItem.modelID;
+   //       cloudMarkerComponent.data.name = locItem.name;
+   //       cloudMarkerComponent.data.markerType = locItem.markerType;
+   //       cloudMarkerComponent.data.xpos = locItem.xpos;
+   //       cloudMarkerComponent.data.ypos = locItem.ypos;
+   //       cloudMarkerComponent.data.zpos = locItem.zpos;
+   //       cloudMarkerComponent.data.xrot = locItem.xrot;
+   //       cloudMarkerComponent.data.yrot = locItem.yrot;
+   //       cloudMarkerComponent.data.zrot = locItem.zrot;
+   //       cloudMarkerComponent.data.scale = locItem.markerObjScale;
+   //       cloudMarkerComponent.loadModel(locItem.modelID); 
+   //       cloudMarkerComponent.updateMaterials();
+   //     } else if (localMarkerComponent) {
+   //       localMarkerComponent.data.modelID = locItem.modelID;
+   //       localMarkerComponent.data.name = locItem.name;
+   //       localMarkerComponent.data.markerType = locItem.markerType;
+   //       localMarkerComponent.data.xpos = locItem.xpos;
+   //       localMarkerComponent.data.ypos = locItem.ypos;
+   //       localMarkerComponent.data.zpos = locItem.zpos;
+   //       localMarkerComponent.data.xrot = locItem.xrot;
+   //       localMarkerComponent.data.yrot = locItem.yrot;
+   //       localMarkerComponent.data.zrot = locItem.zrot;
+   //       localMarkerComponent.data.scale = locItem.markerObjScale;
+   //       localMarkerComponent.loadModel(locItem.modelID); 
+   //       localMarkerComponent.updateMaterials();
+         
+   //     }
+   // } else {
+   //    console.log("DINT FIND THE EL " + locationKey);
+   // }
    ShowHideDialogPanel();
    //if "L" key isdown?
    // SceneManglerModal('Locations');

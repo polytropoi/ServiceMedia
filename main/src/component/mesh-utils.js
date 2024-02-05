@@ -4522,16 +4522,19 @@ AFRAME.registerComponent('load_threesvg', {
       this.control.addEventListener('mouseUp',  ( event ) => {
         // this.el.getAttribute("position")
         // console.log(this.el.getAttribute("position"));
+        this.object.updateMatrix();
         this.object.getWorldPosition(this.position);
-        this.object.getWorldQuaternion(this.quaternion);
-        this.euler.setFromQuaternion(this.quaternion);
-        this.object.getWorldScale(this.scale);
+        // this.object.getWorldQuaternion(this.quaternion);
+        this.euler = this.object.rotation;
+        // this.euler.setFromQuaternion(this.quaternion);
+
+        this.object.getWorldScale(this.scale); //TODO use all coords, not just 1
         // this.rotation = this.object.rotation;
         // this.el.setAttribute("position", this.position);
         this.rotation.x = THREE.MathUtils.radToDeg(this.euler.x);
         this.rotation.y = THREE.MathUtils.radToDeg(this.euler.y);
         this.rotation.z = THREE.MathUtils.radToDeg(this.euler.z);
-        console.log(this.position, this.rotation, this.scale);
+        console.log("transforms to : "+ JSON.stringify(this.position) + JSON.stringify(this.rotation) + JSON.stringify(this.scale));
         
         // // this.el.getObject3D('mesh').position
         // if (this.rotation.x == 180 || this.rotation.x == -180) {
@@ -4546,7 +4549,7 @@ AFRAME.registerComponent('load_threesvg', {
         
        
         // this.object.position.set(0, 0, 0);
-        if (localData.locations.length > 0) { //no local changes yet
+        if (localData.locations.length > 0) { 
           for (let i = 0; i < localData.locations.length; i++) {
             if (this.el.id == localData.locations[i].timestamp) {  
               localData.locations[i].x = this.position.x.toFixed(2);
@@ -4557,6 +4560,14 @@ AFRAME.registerComponent('load_threesvg', {
               localData.locations[i].eulerz = this.rotation.z.toFixed(2);
               localData.locations[i].markerObjScale = this.scale.x.toFixed(2);
               localData.locations[i].isLocal = true;
+              console.log("saving location data: " + JSON.stringify(localData.locations[i]));
+              // document.getElementById('xpos').value = this.position.x.toFixed(2);
+              // document.getElementById('ypos').value = this.position.y.toFixed(2);
+              // document.getElementById('zpos').value = this.position.z.toFixed(2);
+              // document.getElementById('xrot').value = this.rotation.x.toFixed(2);
+              // document.getElementById('yrot').value = this.rotation.x.toFixed(2);
+              // document.getElementById('zrot').value = this.rotation.x.toFixed(2);
+              // document.getElementById('modelScale').value = this.scale.x.toFixed(2);
               // this.el.setAttribute("position", this.position);
               SaveLocalData();
               
@@ -4590,12 +4601,19 @@ AFRAME.registerComponent('load_threesvg', {
               sceneLocations.locations[i].eulery = this.rotation.y.toFixed(2);
               sceneLocations.locations[i].eulerz = this.rotation.z.toFixed(2);
               sceneLocations.locations[i].markerObjScale = this.scale.x.toFixed(2);
+              // document.getElementById('xpos').value = this.position.x.toFixed(2);
+              // document.getElementById('ypos').value = this.position.y.toFixed(2);
+              // document.getElementById('zpos').value = this.position.z.toFixed(2);
+              // document.getElementById('xrot').value = this.rotation.x.toFixed(2);
+              // document.getElementById('yrot').value = this.rotation.x.toFixed(2);
+              // document.getElementById('zrot').value = this.rotation.x.toFixed(2);
+              // document.getElementById('modelScale').value = this.scale.x.toFixed(2);
               // this.el.setAttribute("position", this.position);
               SaveLocalData();
               break;
             }
           }
-          SaveLocalData();
+          // SaveLocalData();
           
         }
 
