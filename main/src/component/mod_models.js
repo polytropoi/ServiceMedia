@@ -12,7 +12,14 @@ AFRAME.registerComponent('mod_model', {
         timestamp: {default: ''},
         allowMods: {default: true},
         name: {default: ''},
-        scale: {default: 1}
+        scale: {default: 1},
+        xpos: {type: 'number', default: 0}, //used for modding
+        ypos: {type: 'number', default: 0},
+        zpos: {type: 'number', default: 0},
+  
+        xrot: {type: 'number', default: 0},//in degrees, trans to radians below
+        yrot: {type: 'number', default: 0},
+        zrot: {type: 'number', default: 0}
         
       },
       init: function () {
@@ -1856,17 +1863,23 @@ AFRAME.registerComponent('mod_model', {
       }
       
     },
-    updateAndLoad: function (name, description, tags, eventData, markerType, scale, modelID) {
-      this.data.name = name;
-      this.data.description = description;
-      this.data.tags = tags;
-      this.data.eventData = eventData;
-      this.data.markerType = markerType;
-      this.data.scale = scale;
-      this.data.modelID = modelID;
-      // setTimeout(() => {
-          this.loadModel();
-      // }, 2000);
+    updateAndLoad: function (name, description, tags, eventData, markerType, scale, xpos, ypos, zpos, xrot, yrot, zrot, modelID) {
+        this.data.name = name;
+        this.data.description = description;
+        this.data.tags = tags;
+        this.data.eventData = eventData;
+        this.data.markerType = markerType;
+        this.data.scale = scale;
+        this.data.modelID = modelID;
+        this.data.xpos = xpos;
+        this.data.ypos = ypos;
+        this.data.zpos = zpos;
+        this.data.xrot = xrot;
+        this.data.yrot = yrot;
+        this.data.zrot = zrot;
+        // setTimeout(() => {
+            this.loadModel();
+        // }, 2000);
     },
     loadModel: function () {
       let transform_controls_component = this.el.components.transform_controls;
@@ -1928,6 +1941,16 @@ AFRAME.registerComponent('mod_model', {
               }
             }
         } 
+        // this.updateMaterials();
+        let scale = parseFloat(this.data.scale);
+        console.log("localmarker with + " + this.data.scale + " pos " + this.data.xpos + this.data.ypos + this.data.zpos + " rot " + this.data.xrot + this.data.yrot + this.data.zrot);
+        this.el.object3D.scale.set(scale,scale,scale);
+        this.el.object3D.position.set(this.data.xpos, this.data.ypos, this.data.zpos);
+        // this.el.object3D.rotation.set(THREE.MathUtils.degToRad(this.data.xrot), THREE.MathUtils.degToRad(this.data.xrot), THREE.MathUtils.degToRad(this.data.xrot));
+        this.el.setAttribute("rotation", this.data.xrot + " " + this.data.yrot + " " +this.data.zrot);
+        // this.el.object3D.rotation.x += Math.PI;
+        
+        this.el.object3D.updateMatrix(); 
       // } else {
       //   this.el.setAttribute("gltf-model", "https://servicemedia.s3.amazonaws.com/assets/models/savedplaceholder.glb");
       // }

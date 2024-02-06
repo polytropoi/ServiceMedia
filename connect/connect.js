@@ -167,7 +167,19 @@ function InitIDB() {
                      } else {
                         let modModelComponent = cloudEl.components.mod_model;
                         if (modModelComponent) {
-                           modModelComponent.updateAndLoad(cursor.value.locations[i].name, cursor.value.locations[i].description, cursor.value.locations[i].locationTags, cursor.value.locations[i].eventData, cursor.value.locations[i].markerType, cursor.value.locations[i].markerObjScale, cursor.value.locations[i].modelID);
+                           modModelComponent.updateAndLoad(cursor.value.locations[i].name, 
+                                                         cursor.value.locations[i].description, 
+                                                         cursor.value.locations[i].locationTags, 
+                                                         cursor.value.locations[i].eventData, 
+                                                         cursor.value.locations[i].markerType, 
+                                                         cursor.value.locations[i].markerObjScale, 
+                                                         cursor.value.locations[i].x, 
+                                                         cursor.value.locations[i].y, 
+                                                         cursor.value.locations[i].z, 
+                                                         cursor.value.locations[i].eulerx, 
+                                                         cursor.value.locations[i].eulery, 
+                                                         cursor.value.locations[i].eulerz, 
+                                                         cursor.value.locations[i].modelID);
                         }
                      }
                   } else {//local-only elements, not saved to cloud yet
@@ -175,9 +187,9 @@ function InitIDB() {
                      let localEl = document.createElement("a-entity");
                      sceneEl.appendChild(localEl);
 
-                     // localEl.setAttribute("position", {x: cursor.value.locations[i].x, y: cursor.value.locations[i].y, z: cursor.value.locations[i].z });
-                     // localEl.setAttribute("rotation", {x: cursor.value.locations[i].eulerx, y: cursor.value.locations[i].eulery, z: cursor.value.locations[i].eulerz });
-                     // localEl.setAttribute("scale", {x: cursor.value.locations[i].markerObjScale, y: cursor.value.locations[i].markerObjScale, z: cursor.value.locations[i].markerObjScale});
+                     localEl.setAttribute("position", {x: cursor.value.locations[i].x, y: cursor.value.locations[i].y, z: cursor.value.locations[i].z });
+                     localEl.setAttribute("rotation", {x: cursor.value.locations[i].eulerx, y: cursor.value.locations[i].eulery, z: cursor.value.locations[i].eulerz });
+                     localEl.setAttribute("scale", {x: cursor.value.locations[i].markerObjScale, y: cursor.value.locations[i].markerObjScale, z: cursor.value.locations[i].markerObjScale});
                      
                      localEl.setAttribute("local_marker", { timestamp: cursor.value.locations[i].timestamp,
                                                             name: cursor.value.locations[i].name, 
@@ -205,7 +217,7 @@ function InitIDB() {
                
                for (let key in cursor.value.settings) {
                   localData.settings[key] = cursor.value.settings[key]; //TODO apply each one?
-
+                  settings[key] = cursor.value.settings[key];
                }
                cursor.continue(); 
                
@@ -1010,8 +1022,17 @@ function SaveModToLocal(locationKey) { //locationKey is now just timestamp of th
                modModelComponent.data.modelID = locItem.modelID;
                modModelComponent.data.eventData = locItem.eventData;
                modModelComponent.data.tags = locItem.locationTags;
-               modModelComponent.loadModel(locItem.modelID); 
+               // modModelComponent.loadModel(locItem.modelID); 
                modModelComponent.data.name = locItem.name;
+               modModelComponent.data.markerType = locItem.markerType;
+               modModelComponent.data.xpos = locItem.x;
+               modModelComponent.data.ypos = locItem.y;
+               modModelComponent.data.zpos = locItem.z;
+               modModelComponent.data.xrot = locItem.eulerx;
+               modModelComponent.data.yrot = locItem.eulery;
+               modModelComponent.data.zrot = locItem.eulerz;
+               modModelComponent.data.scale = locItem.markerObjScale;
+               modModelComponent.loadModel(locItem.modelID); 
                
                // modModelComponent.updateMaterials();
             } else if (cloudMarkerComponent) {

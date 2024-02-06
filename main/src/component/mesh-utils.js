@@ -2732,14 +2732,14 @@ AFRAME.registerComponent('particle_spawner',
 	// },
   spawnParticles: function (location, type, lifetime, parentID, yFudge, pColor, pScale) {
     
-    console.log("particle_spawner mod_particles location data: " + JSON.stringify(location) + " scale " + pScale);
+ 
     this.particle = document.createElement("a-entity");
     if (pScale == NaN || pScale == null || pScale == undefined) {
       pScale = 10;
     } else {
       pScale = pScale * 10;
     } 
-  
+    console.log("particle_spawner mod_particles location data: " + JSON.stringify(location) + " scale " + pScale);
     
     if (parentID != null) { 
       let pparent = document.getElementById(parentID);
@@ -2814,7 +2814,7 @@ AFRAME.registerComponent('mod_particles', {
     lifetime: {type: 'number', default: 0},
     // scale: {type: 'number', default: 1},
     yFudge: {type: 'number', default: 0},
-    color: {type: 'string', default: 'lightblue'},
+    color: {type: 'string', default: 'orange'},
     scale: {type: 'number', default: 10},
     addLight: {default: true},
     intensity: {default: 1}
@@ -2822,7 +2822,7 @@ AFRAME.registerComponent('mod_particles', {
   },
   init: function() {
     // let particleAttributes = {};
-    console.log("mod_particles data: " + this.data.scale);
+    console.log("mod_particles data: " + this.data.scale + " color " + this.data.color);
     this.position = new THREE.Vector3();
 
     if (this.data.scale == null || this.data.scale == 0) {
@@ -2857,16 +2857,16 @@ AFRAME.registerComponent('mod_particles', {
     if (this.data.type.toLowerCase() =="fire") {
       // this.el.setAttribute('scale', '.25 .25 .25');
       // console.log("tryna light a fire! "  + JSON.stringify(this.data.location) + " scale " + this.data.scale);
-      let pSize = this.data.scale * 16;
+      let pSize = this.data.scale * 20;
       this.el.setAttribute('sprite-particles', {enable: true, texture: '#fireanim1', color: this.data.color, blending: 'additive', textureFrame: '6 6', textureLoop: '3', spawnRate: '2', lifeTime: '1.1', scale: pSize.toString()});
       if (this.data.addLight) {
-        this.distanceFactor = this.data.scale * 5;
+        this.distanceFactor = this.data.scale * 3;
         this.decayFactor = this.data.scale * .1;
         console.log("tryna light a fire! " + this.distanceFactor + " " +  this.decayFactor);
-        this.el.setAttribute('light', {type: 'point', castShadow: true, color: this.data.color, intensity: this.data.intensity * 3, distance: this.distanceFactor, decay: 1});
-          this.lightAnimation(this.data.intensity * .5, this.data.intensity * 3);
+        this.el.setAttribute('light', {type: 'point', castShadow: true, color: this.data.color, intensity: this.data.intensity * 2, distance: this.distanceFactor, decay: 1});
+          this.lightAnimation(this.data.intensity * .5, this.data.intensity * 2);
         this.el.addEventListener('animationcomplete', () => {
-            this.lightAnimation(this.data.intensity * .5, this.data.intensity * 3);
+            this.lightAnimation(this.data.intensity * .5, this.data.intensity * 2);
         });
       }
       // this.el.setAttribute("position", this.data.location);

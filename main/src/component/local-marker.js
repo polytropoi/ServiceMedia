@@ -494,7 +494,7 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
               } 
           }
           if (that.data.markerType == "gate" && !that.data.isNew) {
-            if (evt.detail.intersection.distance > 1 && evt.detail.intersection.distance < 15) {
+            if (evt.detail.intersection && evt.detail.intersection.distance > 1 && evt.detail.intersection.distance < 15) {
               this.dialogEl = document.getElementById('mod_dialog');
               if (this.dialogEl) {
                 let ascenesEl = document.getElementById("availableScenesControl");
@@ -511,7 +511,7 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
                 }
               }
             } else {
-              console.log("bad " + evt.detail.intersection.distance);
+              console.log("bad distance");
             }
           }  else if (that.data.markerType == "poi") {
             GoToLocation(that.data.timestamp);
