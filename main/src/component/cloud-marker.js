@@ -135,7 +135,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                     intensity = 2;
                   }
                   if (this.data.tags && (this.data.tags.includes("very bright"))) {
-                    intensity = 4;
+                    intensity = 5;
                   }
                   if (this.data.tags && (this.data.tags.includes("slow"))) {
                     duration = 5000;
@@ -152,7 +152,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                   if (this.data.tags.includes("candle")) {
                     this.el.setAttribute("mod_particles", {type: "candle", color: color1, scale: this.data.scale, addLight: true});
                   } else if (this.data.tags.includes("fire")) {
-                    this.el.setAttribute("mod_particles", {type: "fire", color: color1, scale: this.data.scale, addLight: true});
+                    this.el.setAttribute("mod_particles", {type: "fire", color: color1, scale: this.data.scale, addLight: true, intensity: intensity});
                   } else {
                     
                     this.el.setAttribute("light", {type: "point", intensity: intensity, distance: this.data.scale * 4, castShadow: true, decay: this.data.scale / 2, color: color2});
@@ -408,7 +408,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                 }
               } 
           }
-          if (that.data.markerType == "gate") {
+          if (that.data.markerType == "gate" && !that.data.tags.includes("no prompt")) {
             if (evt.detail.intersection && evt.detail.intersection.distance > 1 && evt.detail.intersection.distance < 20) {
             this.dialogEl = document.getElementById('mod_dialog');
             if (this.dialogEl) {

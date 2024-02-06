@@ -2808,15 +2808,16 @@ AFRAME.registerComponent('mod_flicker', {
 
 AFRAME.registerComponent('mod_particles', {
   schema: {
-    parentID: {type: 'string', default: null},
-    location: {type: 'string', default: null},
+    parentID: {type: 'string', default: ''},
+    location: {type: 'string', default: ''},
     type: {type: 'string', default: 'sparkler'},
     lifetime: {type: 'number', default: 0},
     // scale: {type: 'number', default: 1},
     yFudge: {type: 'number', default: 0},
     color: {type: 'string', default: 'lightblue'},
     scale: {type: 'number', default: 10},
-    addLight: {default: true}
+    addLight: {default: true},
+    intensity: {default: 1}
 
   },
   init: function() {
@@ -2855,14 +2856,17 @@ AFRAME.registerComponent('mod_particles', {
         
     if (this.data.type.toLowerCase() =="fire") {
       // this.el.setAttribute('scale', '.25 .25 .25');
-      console.log("tryna light a fire! "  + JSON.stringify(this.data.location) + " scale " + this.data.scale);
-      let pSize = this.data.scale * 4;
+      // console.log("tryna light a fire! "  + JSON.stringify(this.data.location) + " scale " + this.data.scale);
+      let pSize = this.data.scale * 16;
       this.el.setAttribute('sprite-particles', {enable: true, texture: '#fireanim1', color: this.data.color, blending: 'additive', textureFrame: '6 6', textureLoop: '3', spawnRate: '2', lifeTime: '1.1', scale: pSize.toString()});
       if (this.data.addLight) {
-        this.el.setAttribute('light', {type: 'point', castShadow: true, color: this.data.color, intensity: 1, distance: this.data.scale * 4, decay: this.data.scale * 2});
-        this.lightAnimation(.7, 1.5);
+        this.distanceFactor = this.data.scale * 5;
+        this.decayFactor = this.data.scale * .1;
+        console.log("tryna light a fire! " + this.distanceFactor + " " +  this.decayFactor);
+        this.el.setAttribute('light', {type: 'point', castShadow: true, color: this.data.color, intensity: this.data.intensity * 3, distance: this.distanceFactor, decay: 1});
+          this.lightAnimation(this.data.intensity * .5, this.data.intensity * 3);
         this.el.addEventListener('animationcomplete', () => {
-            this.lightAnimation(.7, 1.5);
+            this.lightAnimation(this.data.intensity * .5, this.data.intensity * 3);
         });
       }
       // this.el.setAttribute("position", this.data.location);
@@ -2892,16 +2896,19 @@ AFRAME.registerComponent('mod_particles', {
   lightAnimation: function (min, max){
     this.intensityMin = min;
     this.intensityMax = max;
+    
     let duration = Math.random() * 600;
     let intensity = randomUniform(this.intensityMin, this.intensityMax);
+    let halfMax = max / 2;
+    // console.log("tryna animate w/ intensity " + intensity);
     // if (intensity < this.intensityMin) {
     //   intensity = this.intensityMin;
     // }
     // console.log("inteisity is " + intensity + " dur " + duration);
-    let animation = "property: light.intensity; from: 0.5; to: "+intensity+"; dur: "+duration+"; dir: alternate;";
+    let animation = "property: light.intensity; from: "+halfMax+"; to: "+intensity+"; dur: "+duration+"; dir: alternate;";
     // console.log(intensity);
     // updating the animation component with the .setAttribute function
-    this.el.setAttribute('animation', animation)
+    this.el.setAttribute('animation', animation);
   }
 
 });
