@@ -1499,7 +1499,7 @@ AFRAME.registerComponent('instanced_surface_meshes', {
         }
     
         if ( this.intersection != null && this.intersection.length > 0) {
-          console.log("gotsaz intersection!" + this.intersection[0].instanceId);
+          // console.log("gotsaz intersection!" + this.intersection[0].instanceId);
           // if (window.playerPosition != null && window.playerPosition != undefined && this.intersection[0].point != undefined && this.intersection[0].point != null ) {
           if (this.intersection[0].point != undefined && this.intersection[0].point != null ) {
             if (this.instanceId != this.intersection[0].instanceId) {

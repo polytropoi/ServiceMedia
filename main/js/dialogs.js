@@ -767,24 +767,30 @@ function ReturnLocationObjectSelect (phID) {
   let objexEl = document.getElementById('sceneObjects');
   let locationItem = null;
   if (objexEl != null) {
-    // sceneObjects = objexEl.components.mod_objex.returnObjexData(); //!
-    // console.log("tryna return objects for phID " + phID);
-
-    // let locationItem = JSON.parse(localStorage.getItem(phID)); //TODO switch to indexedDB
-    for (let i = 0; i < sceneLocations.locations.length; i++) {
-      if (phID == sceneLocations.locations[i].timestamp) {
-        locationItem = sceneLocations.locations[i];
+    for (let i = 0; i < localData.locations.length; i++) {
+      if (phID == localData.locations[i].timestamp) {
+        console.log("gotsa location object for objectSelect " + JSON.stringify(sceneObjects) );
+        locationItem = localData.locations[i];
       }
    }
-    if (!locationItem) {
-      for (let i = 0; i < sceneLocations.locationMods.length; i++) {
-        if (sceneLocations.locationMods[i].phID == phID) {
-          locationItem = sceneLocations.locationMods[i].phID;
-          break;
-        }
-      }
-      // console.log("looking for " + phID + " in " + JSON.stringify(sceneLocations));
-    }
+    sceneObjects = objexEl.components.mod_objex.returnObjexData(); //!
+    // console.log("tryna return objects for phID " + phID);
+
+  //   // let locationItem = JSON.parse(localStorage.getItem(phID)); //TODO switch to indexedDB
+  //   for (let i = 0; i < sceneLocations.locations.length; i++) {
+  //     if (phID == sceneLocations.locations[i].timestamp) {
+  //       locationItem = sceneLocations.locations[i];
+  //     }
+  //  }
+  //   if (!locationItem) {
+  //     for (let i = 0; i < sceneLocations.locationMods.length; i++) {
+  //       if (sceneLocations.locationMods[i].phID == phID) {
+  //         locationItem = sceneLocations.locationMods[i].phID;
+  //         break;
+  //       }
+  //     }
+  //     // console.log("looking for " + phID + " in " + JSON.stringify(sceneLocations));
+  //   }
     let objectSelect = "<option value=\x22"+phID+"~none\x22>none</option>";
 
       for (let i = 0; i < sceneObjects.length; i++) {

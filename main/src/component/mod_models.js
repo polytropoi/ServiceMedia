@@ -78,7 +78,7 @@ AFRAME.registerComponent('mod_model', {
         this.hasAudioTrigger = false;
         this.particlesEl = null;
         this.hasCallout = false; //i.e. child mesh name(s) have appended "~callout" 
-        this.hasLocationCallout = false; //i.e. "callout" in location.eventData
+        this.hasLocationCallout = false; //i.e. "callout" in location.eventData or tags
         this.hasCalloutBackground = false;
         
         this.calloutString = "";
@@ -159,7 +159,7 @@ AFRAME.registerComponent('mod_model', {
           this.navAgentController = this.el.components.nav_agent_controller;
     
         } 
-        if (this.data.eventData.toLowerCase().includes("callout")) {
+        if (this.data.tags.includes("callout") || this.data.eventData.toLowerCase().includes("callout")) {
           // this.el.setAttribute("entity-callout", {'calloutString': this.data.description});
           // this.el.classList.remove("activeObjexRay");
           this.hasLocationCallout = true;
@@ -1091,7 +1091,8 @@ AFRAME.registerComponent('mod_model', {
             this.bubbleText.setAttribute("position", "0 0 -20");
             
             this.bubbleBackground = null;
-            if (this.data.eventData.toLowerCase().includes("thought")) {
+            if (this.data.eventData.toLowerCase().includes("thought")
+              || this.data.tags.includes("thought")) {
               this.hasCalloutBackground = true;
               // bubble.setAttribute("look-at", "#player");
               if (settings && settings.sceneCameraMode == "Third Person") {
@@ -1121,7 +1122,10 @@ AFRAME.registerComponent('mod_model', {
                   });
                 });
             }
-            if (this.data.eventData.toString().toLowerCase().includes("speech") || this.data.eventData.toString().toLowerCase().includes("talk")) {
+            if (this.data.eventData.toString().toLowerCase().includes("speech") 
+              || this.data.eventData.toString().toLowerCase().includes("talk")
+              || this.data.tags.includes("talk")
+              || this.data.tags.includes("speech")) {
               this.hasCalloutBackground = true;
               // bubble.setAttribute("look-at", "#player");
               if (settings && settings.sceneCameraMode == "Third Person") {
@@ -1294,7 +1298,7 @@ AFRAME.registerComponent('mod_model', {
             }  
           });
           this.el.addEventListener('mouseenter', (evt) =>  {
-            // console.log("MOD_MODEL mouseovewr model " + this.el.id + this.hasLocationCallout + this.data.markerType + this.hasCallout + evt.detail);
+            console.log("MOD_MODEL mouseovewr model " + this.el.id + this.hasLocationCallout + this.data.markerType + this.hasCallout + evt.detail);
            
             if (evt.detail.intersection != null) {
               if (textData.length > 0) {
@@ -1309,12 +1313,14 @@ AFRAME.registerComponent('mod_model', {
                 // this.bubble.setAttribute('position', {"x": pos.x.toFixed(2), "y": pos.y.toFixed(2), "z": pos.z.toFixed(2)});
                 if (this.bubble) {
                   this.bubble.setAttribute('visible', true);
+                  this.bubbleText.setAttribute('visible', true);
+                  let scalerange = this.data.scale;
                   if (this.data.eventData.toLowerCase().includes("agent")) {
-                    this.bubble.setAttribute('position', '0 1 0');
+                    this.bubble.setAttribute('position', '0 1 ' + scalerange.toString());
                   } else {
                     this.bubble.setAttribute('position', evt.detail.intersection.point);
-                    this.bubbleText.setAttribute('position', '0 0 .9');
-                    console.log("tryna show callout " + this.calloutString);
+                    this.bubbleText.setAttribute('position', '0 .5 ' + scalerange.toString());
+                    console.log("tryna show callout " + scalerange + " " + this.calloutString);
                   }
                 }  else {
                   console.log("this.bubble not found!");
@@ -1330,9 +1336,9 @@ AFRAME.registerComponent('mod_model', {
               this.distance = distance;
   
               if (this.hasCalloutBackground && distance) { //eg thought or speech bubble
-                if (distance < 10) {
-                  const min = .1;
-                  const max = 1;
+                if (distance > 2 && distance < 15) {
+                  const min = .05;
+                  const max = .5;
                   calloutOn = true;
                   this.bubble.setAttribute("visible", true);
                   this.bubbleText.setAttribute("visible", true);
@@ -1351,13 +1357,13 @@ AFRAME.registerComponent('mod_model', {
                   if ((pos.x/width) < .5) {
                     console.log("flip left");
                     if (this.bubbleBackground) {
-                      this.bubbleBackground.setAttribute("position", "1.5 .2 .5");
+                      this.bubbleBackground.setAttribute("position", "1.5 .2 .75");
                       // this.bubbleBackground.setAttribute("scale", "-.2 .2 .2"); 
                       // this.bubbleBackground.setAttribute('scale', {x: distance * -.05, y: distance * .05, z: distance * .05} );
                       this.bubbleBackground.setAttribute('scale', {x: scaleFactor * -1, y: scaleFactor, z: scaleFactor} );
                     }
                     // this.bubbleText.setAttribute("scale", ".2 .2 .2"); 
-                    this.bubbleText.setAttribute("position", "1.5 .2 .6");
+                    this.bubbleText.setAttribute("position", "1.5 .2 .86");
                     // this.bubbleText.setAttribute('scale', {x: distance * .05, y: distance * .05, z: distance * .05} );
                     this.bubbleText.setAttribute('scale', {x: scaleFactor, y: scaleFactor, z: scaleFactor} );
                   } else {
@@ -1405,7 +1411,9 @@ AFRAME.registerComponent('mod_model', {
                     this.bubbleText.setAttribute('scale', {x: distance * .1, y: distance * .1, z: distance * .1} );
                   // this.bubbleText.setAttribute('scale', {x: distance * .04, y: distance * .04, z: distance * .04} );
                   // this.bubbleText.setAttribute("position", "-.5 .2 .51");
-                  this.bubbleText.setAttribute("position", "0 .75 -.5"); //
+                  let scalerange = parseFloat(this.data.scale) * 1.5;
+                  console.log("showing callout with z offset " + scalerange.toString());
+                  this.bubbleText.setAttribute('position', '0 .75 ' + scalerange.toString()); //
                   this.bubbleText.setAttribute('troika-text', {
                     baseline: "bottom",
                     align: "center",
@@ -1433,8 +1441,8 @@ AFRAME.registerComponent('mod_model', {
               // if (this.triggerAudioController != null) {
               //   this.triggerAudioController.components.trigger_audio_control.playAudio();
               
-                if (this.triggerAudioController != null) {
-                  let distance = window.playerPosition.distanceTo(evt.detail.intersection.point);
+                if (evt.detail.intersection && this.triggerAudioController) {
+                  let distance = evt.detail.intersection.distance;
                   this.triggerAudioController.components.trigger_audio_control.playAudioAtPosition(evt.detail.intersection.point, distance, this.data.tags, 1);//tagmangler needs an array, add vol mod 
                 }
               // }
@@ -1831,7 +1839,7 @@ AFRAME.registerComponent('mod_model', {
             scatteredEl.setAttribute("gltf-model", "#" + this.data.modelID);
             let eventData = this.data.eventData.replace("scatter", ""); //prevent infinite recursion!
 
-            scatteredEl.setAttribute("mod_model", {eventData: eventData, markerType: this.data.markerType, description: this.data.description, modelID: this.data.modelID});
+            scatteredEl.setAttribute("mod_model", {eventData: eventData, markerType: this.data.markerType, tags: this.data.tags, description: this.data.description, modelID: this.data.modelID});
             scatteredEl.setAttribute("shadow", {cast: true, receive: true});
             scatteredEl.classList.add("envMap");
             // if (this.data.markerType != "character") { //messes up navmeshing..

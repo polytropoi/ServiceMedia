@@ -115,6 +115,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                 } else if (this.data.markerType == "light") {
                   console.log("tryna set a light!");
                   // let color = "yellow";
+                  this.el.classList.remove("activeObjexRay"); //too much clutter, no need on a cloud light
                   let color1 = "yellow";
                   let color2 = "white";
                   let intensity = 1.25;
@@ -143,7 +144,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                   if (this.data.tags && (this.data.tags.includes("fast"))) {
                     duration = 500;
                   }
-                  if (!this.data.tags.includes("hide gizmo") && (settings && !settings.hideGizmos)) { //ain't not hiding!
+                  if (this.data.tags.includes("show gizmo") && (settings && !settings.hideGizmos)) { //ain't not hiding!
                     this.el.setAttribute("geometry", {primitive: "sphere", radius: this.data.scale * .1});
                     // this.el.setAttribute("light", {type: "point", intensity: .5, distance: 3, castShadow: true, decay: 1, color: "yellow"});
                     // this.el.setAttribute("mod_flicker", {type: "candle"});
@@ -209,7 +210,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                 } else if (this.data.markerType.toLowerCase() == "mailbox") {
                 
                 } else if (this.data.markerType.toLowerCase() == "light") {
-                    this.el.setAttribute("material", {color: "yellow", wireframe: true});
+                    // this.el.setAttribute("material", {color: "yellow", wireframe: true});
                 } else {
 
                 }
@@ -238,7 +239,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
         if (this.data.markerType.toLowerCase() == "player") {
           // console.log("playerobj")
           // this.el.setAttribute('gltf-model', '#poi1');
-          this.el.classList.remove("activeObjectRay");
+          this.el.classList.remove("activeObjexRay");
         }
         // if (this.data.markerType.toLowerCase() == "placeholder") {
         //   this.el.setAttribute('gltf-model', '#savedplaceholder');
@@ -331,6 +332,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
               }
           });
         }
+        this.el.setAttribute('scale', this.scale);
       });
        
       this.el.addEventListener('mouseenter', (evt) => {
@@ -412,6 +414,10 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
             if (evt.detail.intersection && evt.detail.intersection.distance > 1 && evt.detail.intersection.distance < 20) {
             this.dialogEl = document.getElementById('mod_dialog');
             if (this.dialogEl) {
+              if (that.data.eventData && that.data.eventData.length > 2) {
+                let url = "/webxr/" + that.data.eventData;
+                this.dialogEl.components.mod_dialog.showPanel("Enter the gate ?", "href~"+ url, "gatePass", 5000 );
+              } else {
               let ascenesEl = document.getElementById("availableScenesControl");
               if (ascenesEl) {
                 let asControl = ascenesEl.components.available_scenes_control;
@@ -423,6 +429,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                     this.dialogEl.components.mod_dialog.showPanel("Go to " + scene.sceneTitle +" ?", "href~"+ url, "gatePass", 5000 ); //param 2 is objID when needed
                     console.log("good " + evt.detail.intersection.distance);
                     // WaitAndHideDialogPanel(4000);
+                    }
                   }
                 }
               }
@@ -739,7 +746,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
               if (this.data.tags && (this.data.tags.includes("fast"))) {
                 duration = 500;
               }
-              if (!this.data.tags.includes("hide gizmo") && (settings && !settings.hideGizmos)) {
+              if (this.data.tags.includes("show gizmo") && (settings && !settings.hideGizmos)) {
                 this.el.setAttribute("geometry", {primitive: "sphere", radius: this.data.scale * .1});
                 // this.el.setAttribute("light", {type: "point", intensity: .5, distance: 3, castShadow: true, decay: 1, color: "yellow"});
                 // this.el.setAttribute("mod_flicker", {type: "candle"});
@@ -774,7 +781,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
         this.updateMaterials();
         // this.updateMaterials();
         let scale = parseFloat(this.data.scale);
-        console.log("localmarker with + " + this.data.scale + " pos " + this.data.xpos + this.data.ypos + this.data.zpos + " rot " + this.data.xrot + this.data.yrot + this.data.zrot);
+        console.log(this.data.name + " localmarker with + " + this.data.scale + " pos " + this.data.xpos + this.data.ypos + this.data.zpos + " rot " + this.data.xrot + this.data.yrot + this.data.zrot);
         this.el.object3D.scale.set(scale,scale,scale);
         this.el.object3D.position.set(this.data.xpos, this.data.ypos, this.data.zpos);
         // this.el.object3D.rotation.set(THREE.MathUtils.degToRad(this.data.xrot), THREE.MathUtils.degToRad(this.data.xrot), THREE.MathUtils.degToRad(this.data.xrot));
