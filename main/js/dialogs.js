@@ -232,7 +232,8 @@ window.addEventListener( 'keyup',  ( event ) => {
             console.log("gotsa match "+ localData.locations[i].timestamp + " vs " + selectedLocationTimestamp);
             localData.locations[i].modelID = uModelID;
             localData.locations[i].model = uModelName;
-
+            localData.locations[i].objectID = "none";
+            localData.locations[i].objectName = "";
             // if (!localData.locations[i].isLocal) {
               if (modModelComponent) {
                 modModelComponent.data.modelID = uModelID;
@@ -250,120 +251,60 @@ window.addEventListener( 'keyup',  ( event ) => {
         }  
       }
     }
-      // } else {
-      //   if (uModelID.includes("primitive")) {
-      //     if (uModelID.includes("cube")) {
-      //       uModelName == "cube";
-      //     } else if (uModelID.includes("sphere")) {
-      //       uModelName == "sphere";
-      //     } else if (uModelID.includes("cylinder")) {
-      //       uModelName == "cylinder";
-      //     }
-      //   }
-      // }
-      // if (uModelName) {
-
-      //   if (uModelID.includes("primitive_")) {
-      //     if (modModelComponent) {
-      //       modModelComponent.data.modelID = uModelID;
-      //       modModelComponent.loadModel(uModelID); 
-      //     } else if (cloudMarkerComponent) {
-      //       cloudMarkerComponent.data.modelID = uModelID;
-      //       cloudMarkerComponent.loadModel(uModelID); 
-      //     } else if (localMarkerComponent) {
-      //       localMarkerComponent.data.modelID = uModelID;
-      //       localMarkerComponent.loadModel(uModelID); 
-      //     }
-      //   } else {
-          // for (let i = 0; i < localData.locations.length; i++) { 
-          //   console.log(localData.locations[i].timestamp + " vs " + selectedLocationTimestamp);
-          //   if (localData.locations[i].timestamp == selectedLocationTimestamp) {
-          //     console.log("gotsa match "+ localData.locations[i].timestamp + " vs " + selectedLocationTimestamp);
-          //     localData.locations[i].modelID = uModelID;
-          //     localData.locations[i].model = uModelName;
-
-          //     // if (!localData.locations[i].isLocal) {
-          //       if (modModelComponent) {
-          //         modModelComponent.data.modelID = uModelID;
-          //         modModelComponent.loadModel(uModelID); 
-          //       } else if (cloudMarkerComponent) {
-          //         cloudMarkerComponent.data.modelID = uModelID;
-          //         cloudMarkerComponent.loadModel(uModelID); 
-          //       } else if (localMarkerComponent) {
-          //         localMarkerComponent.data.modelID = uModelID;
-          //         localMarkerComponent.loadModel(uModelID); 
-          //       }
-              
-          //     break;
-          //   }
-          // }  
-    //     }
-    //   }
-    // } else {
-    //   console.log("cain't find that element!")
-    // }
-    
+      
   });
 
   $('#modalContent').on('change', '#locationObject', function(e) { //value has phID ~ objectID  (room~type~timestamp~objectID) //no, now just timestamp~objectID
-    console.log('object ' + e.target.value);
-    let locSplit = e.target.value.split("~"); 
-    console.log("locSplit" + locSplit);
-    // if (locSplit[1].length > 4) { //should be "none" if no object selected
-      // let locSplit = e.target.value.split("~"); //split between localstorage key and objectID
-      // let localStorageItem = JSON.parse(localStorage.getItem(locSplit[0]+"~"+locSplit[1]+"~"+locSplit[2])); //same obj structure as scene location item (mostly)
+    console.log("model changed " + e.target.value + " for id " + selectedLocationTimestamp);
+    // let locSplit = e.target.value.split("~"); 
+    // console.log("locSplit modelID : " + locSplit[1]);
+    
+    let locEl = document.getElementById(selectedLocationTimestamp);
+    let uObjectID = e.target.value;
+    let uObjectName = null;
+    if (locEl) {
+      // if (locEl && locSplit[1] != undefined && locSplit[1] != "" && locSplit[1] != "none") { //model id
+      let modModelComponent = locEl.components.mod_model;
+      let localMarkerComponent = locEl.components.local_marker;
+      let cloudMarkerComponent = locEl.components.cloud_marker;
+
+          for (let i = 0; i < sceneObjects.length; i++) {
+            if (sceneObjects[i]._id == uObjectID) {
+              uObjectName = sceneObjects[i].name; //really just need the name
+ 
+              break;  
+            }    
+          } 
+        // }
+        for (let i = 0; i < localData.locations.length; i++) { 
+          // console.log(localData.locations[i].timestamp + " vs " + selectedLocationTimestamp);
+          if (localData.locations[i].timestamp == selectedLocationTimestamp) {
+            console.log("gotsa match "+ localData.locations[i].timestamp + " vs " + selectedLocationTimestamp);
+            localData.locations[i].objectID = uObjectID;
+            localData.locations[i].objectName = uObjectName;
+            localData.locations[i].modelID = "none";
+            localData.locations[i].model = "";
+
+            // if (!localData.locations[i].isLocal) {
+              if (modModelComponent) { //remove?  disable? hrm...
+                // modModelComponent.data.modelID = uModelID;
+                // modModelComponent.loadModel(uModelID); 
+              } else if (cloudMarkerComponent) {
+                cloudMarkerComponent.data.modelID = "none";
+                cloudMarkerComponent.data.objectID = uObjectID;
+                cloudMarkerComponent.loadObject(uObjectID); 
+              } else if (localMarkerComponent) {
+                localMarkerComponent.data.modelID = "none";
+                localMarkerComponent.data.objectID = uObjectID;
+                localMarkerComponent.loadObject(uObjectID); 
+              }
+            
+            break;
+          }
+        }  
+      }
+    
       
-      // console.log("lookedup localstorage item " + JSON.stringify(localStorageItem));
-      // let placeholderEl = document.getElementById(locSplit[0]+"~"+locSplit[1]+"~"+locSplit[2]);
-      // if (localStorageItem != null && placeholderEl != null) {
-      //   if (locSplit[3] != "" && locSplit[3] != "" && locSplit[3] != "none") { //object id
-      //     for (let i = 0; i < sceneObjects.length; i++) {
-      //       console.log(sceneObjects[i]._id + " vs " + locSplit[3]);
-      //       if (sceneObjects[i]._id == locSplit[3]) {
-      //         let locItemTemp = {objectID: sceneObjects[i]._id, objectName: sceneObjects[i].name};
-      //         let locItem = Object.assign(localStorageItem, locItemTemp); //funky object merge!
-      //         // locItem.modelID = sceneObjects[i]._id;
-      //         // locItem.model = sceneObjects[i].name;
-      //         if (locItem.scale == null || locItem.scale == undefined || locItem.scale == "") {
-      //           locItem.scale = 1;
-      //         }
-      //         console.log(JSON.stringify(locItem));
-      //         localStorage.setItem(locSplit[0]+"~"+locSplit[1]+"~"+locSplit[2], JSON.stringify(locItem));
-      //         console.log(localStorage.getItem(locSplit[0]+"~"+locSplit[1]+"~"+locSplit[2]));
-
-
-      //         console.log("placeholderEl" +placeholderEl);
-      //         let phComponent = placeholderEl.components.cloud_marker;
-      //         if (phComponent == null) {
-      //           phComponent = placeholderEl.components.local_marker;
-      //         }
-      //         if (phComponent != null) {
-      //           phComponent.loadObject(sceneObjects[i]._id);
-      //         }
-      //         SaveModToLocal(locSplit[0]+"~"+locSplit[1]+"~"+locSplit[2]);
-      //       }
-      //     } 
-      //   } else {
-      //     let phComponent = placeholderEl.components.cloud_marker;
-      //     if (phComponent == null) {
-      //       phComponent = placeholderEl.components.local_marker;
-      //     }
-      //     if (phComponent != null) {
-      //       phComponent.loadObject("none");
-      //     }
-      //     // SaveModToLocal(locSplit[0]+"~"+locSplit[1]+"~"+locSplit[2]);
-
-      //   }
-      // } else {
-            let placeholderEl = document.getElementById(locSplit[0]);
-            let phComponent = placeholderEl.components.cloud_marker;
-            if (phComponent == null) {
-                phComponent = placeholderEl.components.local_marker;
-            }
-            if (phComponent != null) {
-              // phComponent.loadObject();
-            }
-      // }
   });
   // $('#modalContent').on('change', '#locationObject', function(e) { //value has phID ~ objectID  (room~type~timestamp~objectID)
   //   console.log('model ' + e.target.value);

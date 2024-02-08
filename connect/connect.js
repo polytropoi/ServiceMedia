@@ -963,15 +963,15 @@ function SaveModToLocal(locationKey) { //locationKey is now just timestamp of th
 
    locItem.modelID = document.getElementById('locationModel').value; // model _id
    locItem.model = ReturnModelName(locItem.modelID);
-   if ((locItem.modelID || locItem.modelID != "" || locItem.modelID != undefined) && locItem.markerType == "none" || locItem.markerType == "" || locItem.markerType == undefined) {
-      locItem.markerType = "model";
-   }
+   // if ((locItem.modelID || locItem.modelID != "" || locItem.modelID != undefined) && locItem.markerType == "none" || locItem.markerType == "" || locItem.markerType == undefined) {
+   //    locItem.markerType = "model";
+   // }
 
    locItem.objectID = document.getElementById('locationObject').value; //object _id
    locItem.objectName = ReturnObjectName(locItem.objectID);
-   if ((locItem.objectID || locItem.objectID != "" || locItem.objectID != undefined) && locItem.markerType == "none" || locItem.markerType == "" || locItem.markerType == undefined) {
-      locItem.markerType = "object";
-   }
+   // if ((locItem.objectID || locItem.objectID != "" || locItem.objectID != undefined) && locItem.markerType == "none" || locItem.markerType == "" || locItem.markerType == undefined) {
+   //    locItem.markerType = "object";
+   // }
    // if (locationKey.toString().includes("local")) {
    //    locItem.isLocal = true;
    // }

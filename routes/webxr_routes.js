@@ -1794,11 +1794,26 @@ webxr_router.get('/:_id', function (req, res) {
                             if (sceneResponse.sceneSkyParticles != undefined && sceneResponse.sceneSkyParticles != null && sceneResponse.sceneSkyParticles != "None") { 
                                 if (sceneResponse.sceneSkyParticles.toLowerCase() == "dust") {
                                     // skyParticles = "<a-entity scale='2 2 2' position='0 3 0' particle_mangler particle-system=\x22preset: dust; particleCount: 3000; texture: https://realitymangler.com/assets/textures/smokeparticle2.png; color: " + sceneResponse.sceneColor1 + "," + sceneResponse.sceneColor2 +"\x22></a-entity>";
-                                    skyParticles = "<a-entity scale=\x2220 20 20\x22 position=\x220 5 0\x22 sprite-particles=\x22texture: #sparkle1; blending: additive; color: black..white;  position: 0 0 0; velocity: -.01 -.025 -.01 .. .01 .025 .01; rotation: 0,360; spawnRate: 500; lifeTime: 2..4; scale: .25,.75; opacity: 1\x22></a-entity>";
+                                    // skyParticles = "<a-entity scale=\x2220 10 20\x22 position=\x220 5 0\x22 spe-particles=\x22texture: #sparkle1; blending: additive; color: black..white; position: -10 -1 -10..10 1 10; radialVelocity: 1..2 spawnRate: 500; lifeTime: 2..4; scale: .25,.75; opacity: 1\x22></a-entity>";
+                                    // skyParticles = "<a-entity scale=\x2220 10 20\x22 position=\x220 5 0\x22 spe-particles=\x22texture: #sparkle1; particle-count: 300; max-age: 3; distribution: sphere; color: #888; color-spread: 1 1 1, 0 0 0; size: 20,10,20\x22></a-entity>";
+                                    // skyParticles = "<a-entity position=\x222 2 -4\x22 spe-particles=\x22"+
+                                    //     "texture: #sparkle1 "+
+                                    //     "particle-count: 200; "+
+                                    //     "max-age: 3; "+
+                                    //     "blending: additive; "+
+                                    //     "distribution: sphere; "+
+                                    //     "velocity: 0.04; "+
+                                    //     "velocity-spread: 0.03; "+
+                                    //     "radius: 0.01; "+
+                                    //     "color: #FF4400, #FF1100, #FF0000, #880000; "+
+                                    //     "opacity: 0.1; "+
+                                    //     "size: 3, 3, 3, 0\x22></a-entity>";
+                                    // spe-particles="texture: assets/blob.png; particle-count: 300; max-age: 3; distribution: sphere; color: #888; color-spread: 1 1 1, 0 0 0; size: 0,2,0"
+                                    
                                     imageAssets = imageAssets + "<img id=\x22sparkle1\x22 src=\x22http://servicemedia.s3.amazonaws.com/assets/pics/sparkle.png\x22 crossorigin=\x22anonymous\x22>";
                                 } else if (sceneResponse.sceneSkyParticles.toLowerCase() == "rain") {
                                     // skyParticles = "<a-entity scale='2 2 2' position='0 3 0' particle_mangler particle-system=\x22preset: rain; particleCount: 3000; texture: https://realitymangler.com/assets/textures/raindrop2.png; color: " + sceneResponse.sceneColor1 + "," + sceneResponse.sceneColor2 +"\x22></a-entity>";
-                                    skyParticles = "<a-entity scale=\x2220 10 20\x22 position=\x220 5 0\x22 sprite-particles=\x22texture: #raindrop; blending: additive; color: " +sceneResponse.sceneColor2 + "; position: -1 1 -1..1 1 1; spawnRate: 1000; velocity: 0 -1 0; lifeTime: 4; scale: .05,.1; opacity: .8\x22></a-entity>";
+                                    skyParticles = "<a-entity scale=\x2220 10 20\x22 position=\x220 5 0\x22 sprite-particles=\x22texture: #raindrop; blending: additive; color: " +sceneResponse.sceneColor2 + "; position: -1 1 -1..1 1 1; spawnRate: 1000; lifeTime: 4; scale: .05,.1; opacity: .8\x22></a-entity>";
                                     imageAssets = imageAssets + "<img id=\x22raindrop2\x22 src=\x22http://servicemedia.s3.amazonaws.com/assets/pics/raindrop2.png\x22 crossorigin=\x22anonymous\x22>";
                                 } else if (sceneResponse.sceneSkyParticles.toLowerCase() == "rain/fog") {
                                     // skyParticles = "<a-entity scale='2 2 2' position='0 3 0' particle_mangler particle-system=\x22preset: rain; particleCount: 3000; texture: https://realitymangler.com/assets/textures/raindrop2.png; color: " + sceneResponse.sceneColor1 + "," + sceneResponse.sceneColor2 +"\x22></a-entity>";
@@ -5017,6 +5032,7 @@ webxr_router.get('/:_id', function (req, res) {
                         // "<script src=\x22../main/src/component/aframe-spe-particles-component.js\x22></script>"+
                         // "<script src=\x22../main/src/component/aframe-spritesheet-animation.js\x22></script>"+
                         "<script src=\x22../main/src/component/aframe-sprite-particles-component.js\x22></script>"+
+                        "<script src=\x22../main/src/component/aframe-spe-particles-component.js\x22></script>"+
                         
 
                        

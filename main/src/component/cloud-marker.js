@@ -144,20 +144,41 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                   if (this.data.tags && (this.data.tags.includes("fast"))) {
                     duration = 500;
                   }
-                  if (this.data.tags.includes("show gizmo") && (settings && !settings.hideGizmos)) { //ain't not hiding!
+                  if (this.data.tags.includes("show gizmo")) { //ain't not hiding!
                     this.el.setAttribute("geometry", {primitive: "sphere", radius: this.data.scale * .1});
                     // this.el.setAttribute("light", {type: "point", intensity: .5, distance: 3, castShadow: true, decay: 1, color: "yellow"});
                     // this.el.setAttribute("mod_flicker", {type: "candle"});
-                    this.el.setAttribute("material", {color: color1, wireframe: true});
+                    this.el.setAttribute("material", {color: "yellow", wireframe: true});
                   } 
                   if (this.data.tags.includes("candle")) {
                     this.el.setAttribute("mod_particles", {type: "candle", color: color1, scale: this.data.scale, addLight: true});
                   } else if (this.data.tags.includes("fire")) {
                     this.el.setAttribute("mod_particles", {type: "fire", color: color1, scale: this.data.scale, addLight: true, intensity: intensity});
                   } else {
-                    
-                    this.el.setAttribute("light", {type: "point", intensity: intensity, distance: this.data.scale * 4, castShadow: true, decay: this.data.scale / 2, color: color2});
-                    if (this.data.tags && this.data.tags.includes("anim") && this.data.tags.includes("color")) {
+                    let markerLightShadow = true;
+                    let lighttype = "point";
+                    if (this.data.tags.includes("spot")) {
+                      lighttype = "spot";
+                      markerLightShadow = false;
+                    } 
+                    if (this.data.tags.includes("ambient")) {
+                      lighttype = "ambient";
+                      markerLightShadow = false;
+                    }
+                    if (this.data.tags.includes("ambient")) {
+                      lighttype = "ambient";
+                      markerLightShadow = false;
+                    }
+                    if (this.data.tags.includes("color"))  {
+                      if (this.data.eventData.includes("~")) {
+                        color1 = this.data.eventData.split("~")[0];
+                        color2 = this.data.eventData.split("~")[1];
+                      } else {
+                        color1 = this.data.eventData;
+                      }
+                    }
+                    this.el.setAttribute("light", {type: lighttype, intensity: intensity, distance: this.data.scale * 4, castShadow: markerLightShadow, decay: this.data.scale / 2, color: color1});
+                    if (this.data.tags && this.data.tags.includes("anim")) {
                       this.el.setAttribute("animation__color", {property: 'light.color', from: color1, to: color2, dur: duration, easing: 'easeInOutSine', loop: true, dir: 'alternate', autoplay: true});
                     } 
                     if (this.data.tags && this.data.tags.includes("anim") && this.data.tags.includes("intensity")) {
@@ -353,7 +374,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
   
           // let elPos = this.el.getAttribute('position');
           // console.log(pos);
-          if (!name.includes("handle") && this.calloutEntity != null && this.data.markerType != "light") { // umm...
+          if (!name.includes("handle") && this.calloutEntity != null && (this.data.markerType != "light" && this.data.markerType != "waypoint")) { // umm...
     
             if (this.distance < 66) {
             this.calloutEntity.setAttribute("position", pos);
@@ -746,20 +767,38 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
               if (this.data.tags && (this.data.tags.includes("fast"))) {
                 duration = 500;
               }
-              if (this.data.tags.includes("show gizmo") && (settings && !settings.hideGizmos)) {
+              if (this.data.tags.includes("show gizmo")) {
                 this.el.setAttribute("geometry", {primitive: "sphere", radius: this.data.scale * .1});
                 // this.el.setAttribute("light", {type: "point", intensity: .5, distance: 3, castShadow: true, decay: 1, color: "yellow"});
                 // this.el.setAttribute("mod_flicker", {type: "candle"});
-                this.el.setAttribute("material", {color: color1, wireframe: true});
+                this.el.setAttribute("material", {color: "yellow", wireframe: true});
               } 
               if (this.data.tags.includes("candle")) {
                 this.el.setAttribute("mod_particles", {type: "candle", color: color1, scale: this.data.scale, addLight: true});
               } else if (this.data.tags.includes("fire")) {
                 this.el.setAttribute("mod_particles", {type: "fire", color: color1, scale: this.data.scale, addLight: true, intensity: intensity});
               } else {
-                
-                this.el.setAttribute("light", {type: "point", intensity: intensity, distance: this.data.scale * 4, castShadow: true, decay: this.data.scale / 2, color: color2});
-                if (this.data.tags && this.data.tags.includes("anim") && this.data.tags.includes("color")) {
+                if (this.data.tags.includes("color"))  {
+                  if (this.data.eventData.includes("~")) {
+                    color1 = this.data.eventData.split("~")[0];
+                    color2 = this.data.eventData.split("~")[1];
+                    console.log("pickup colors " + color1 + color2)
+                  } else {
+                    color1 = this.data.eventData;
+                  }
+                }
+                let markerLightShadow = true;
+                let lighttype = "point";
+                if (this.data.tags.includes("spot")) {
+                  lighttype = "spot";
+                  markerLightShadow = false;
+                } 
+                if (this.data.tags.includes("ambient")) {
+                  lighttype = "ambient";
+                  markerLightShadow = false;
+                }
+                this.el.setAttribute("light", {type: lighttype, intensity: intensity, distance: this.data.scale * 4, castShadow: markerLightShadow, decay: this.data.scale / 2, color: color1});
+                if (this.data.tags && this.data.tags.includes("anim")) {
                   this.el.setAttribute("animation__color", {property: 'light.color', from: color1, to: color2, dur: duration, easing: 'easeInOutSine', loop: true, dir: 'alternate', autoplay: true});
                 } 
                 if (this.data.tags && this.data.tags.includes("anim") && this.data.tags.includes("intensity")) {
