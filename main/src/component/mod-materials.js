@@ -1137,3 +1137,770 @@ AFRAME.registerComponent('glow', {
     });
   }
 });
+
+/**
+	Plays a spritesheet-based animation.
+	Author: Lee Stemkoski
+*/
+AFRAME.registerComponent('spritesheet-animation', {
+
+	schema: 
+	{
+  		rows: {type: 'number', default: 1},
+  		columns: {type: 'number', default: 1},
+
+  		// set these values to play a (consecutive) subset of frames from spritesheet
+		firstFrameIndex: {type: 'number', default: 0},
+		lastFrameIndex: {type: 'number', default: -1}, // index is inclusive
+
+		// goes from top-left to bottom-right.
+		frameDuration: {type: 'number', default: 1}, // seconds to display each frame
+  		loop: {type: 'boolean', default: true},
+	},
+
+	init: function()
+	{
+		this.repeatX = 1 / this.data.columns;
+		this.repeatY = 1 / this.data.rows;
+
+		if (this.data.lastFrameIndex == -1) // indicates value not set; default to full sheet
+			this.data.lastFrameIndex = this.data.columns * this.data.rows - 1;
+
+		this.mesh = this.el.getObject3D("mesh");
+
+		this.frameTimer = 0;
+		this.currentFrameIndex = this.data.firstFrameIndex;
+		this.animationFinished = false;
+	},
+	
+	tick: function (time, timeDelta) 
+	{
+		// return if animation finished.
+		if (this.animationFinished)
+			return;
+
+		this.frameTimer += timeDelta / 1000;
+
+		while (this.frameTimer > this.data.frameDuration)
+		{
+			this.currentFrameIndex += 1;
+			this.frameTimer -= this.data.frameDuration;
+
+			if (this.currentFrameIndex > this.data.lastFrameIndex)
+			{
+				if (this.data.loop)
+				{
+					this.currentFrameIndex = this.data.firstFrameIndex;
+				}
+				else
+				{
+					this.animationFinished = true;
+					return;
+				}
+			}
+		}
+
+		let rowNumber = Math.floor(this.currentFrameIndex / this.data.columns);
+		let columnNumber = this.currentFrameIndex % this.data.columns;
+		
+		let offsetY = (this.data.rows - rowNumber - 1) / this.data.rows;
+		let offsetX = columnNumber / this.data.columns;
+
+		if ( this.mesh.material.map )
+		{
+			this.mesh.material.map.repeat.set(this.repeatX, this.repeatY);
+			this.mesh.material.map.offset.set(offsetX, offsetY);
+		}
+	}
+});
+//from  https://github.com/mrdoob/three.js/blob/master/examples/webgl_points_sprites.html
+AFRAME.registerComponent('sky_particles', {
+
+	schema: 
+	{
+    type: {default: 'dust'},
+    size: {type: 'number', default: 1},
+  		rows: {type: 'number', default: 1},
+  		columns: {type: 'number', default: 1},
+
+  		// set these values to play a (consecutive) subset of frames from spritesheet
+		firstFrameIndex: {type: 'number', default: 0},
+		lastFrameIndex: {type: 'number', default: -1}, // index is inclusive
+
+		// goes from top-left to bottom-right.
+		frameDuration: {type: 'number', default: 1}, // seconds to display each frame
+  		loop: {type: 'boolean', default: true},
+      src: {type: 'string', default: ''}
+
+	},
+  //   vertexShader:`
+  //   v attribute vec2 offset;
+
+  //   varying vec2 vOffset;
+    
+  //   void main() {
+    
+  //       vOffset = offset;
+    
+  //       gl_PointSize = 25.0;
+    
+  //       gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+    
+  //   }
+  // `,
+
+  // fragmentShader:`
+    
+  // uniform sampler2D spriteSheet;
+  // uniform vec2 repeat;
+
+  // varying vec2 vOffset;
+
+  // void main() {
+
+  //     vec2 uv = vec2( gl_PointCoord.x, 1.0 - gl_PointCoord.y );
+
+  //     vec4 tex = texture2D( spriteSheet, uv * repeat + vOffset );
+      
+  //     if ( tex.a < 0.5 ) discard;
+
+  //     gl_FragColor = tex;
+
+  // }
+  // `,
+ 
+  init: function () {
+    const vertices = [];
+    this.vectors = []
+    let amount = 100;
+    if (this.data.type == "rain" || this.data.type == "dust") {
+      amount = 4000;
+    } 
+
+     
+    for (let i = 0; i < amount; i++) {
+      const x = THREE.MathUtils.randFloatSpread(200);
+      const y =THREE.MathUtils.randFloat(1,20);
+      const z = THREE.MathUtils.randFloatSpread(200);
+      vertices.push(x, y, z);
+      const vertex = new THREE.Vector3(x, y, z);
+
+      vertex.rotationAxis = new THREE.Vector3(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1);
+      vertex.rotationAxis.normalize();
+      vertex.rotationSpeed = Math.random() * 0.001;
+      this.vectors.push(vertex);
+
+    }
+    if (this.data.type == 'dust') {
+      this.data.size = .25;
+    }
+
+
+
+    // create a geometry from the points
+    this.geometry = new THREE.BufferGeometry();
+    this.geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+    var colors = [];
+    var color = new THREE.Color();
+    
+    
+    var colorList = ['skyblue', 'navy', 'blue'];
+    if (settings && settings.sceneColor2 && settings.sceneColor3 && settings.sceneColor4 ) {
+      colorList = [settings.sceneColor2, settings.sceneColor3, settings.sceneColor4];
+    }
+    for (let i = 0; i < this.geometry.attributes.position.count; i++) {
+      color.set(colorList[THREE.MathUtils.randInt(0, colorList.length - 1)]);
+      color.toArray(colors, i * 3);
+    }
+    this.geometry.setAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+    // small grey points material
+    const textureLoader = new THREE.TextureLoader();
+
+				const assignSRGB = ( texture ) => {
+
+					texture.colorSpace = THREE.SRGBColorSpace;
+
+				};
+
+				const sprite1 = textureLoader.load( this.data.src, assignSRGB );
+    const material = new THREE.PointsMaterial({ size: this.data.size, map: sprite1, blending: THREE.AdditiveBlending, depthTest: false, transparent: true, vertexColors: true });
+    // const material = new THREE.PointsMaterial( { size: 2, vertexColors: true, blending: THREE.AdditiveBlending, transparent: true } );
+    // materials[ i ] = new THREE.PointsMaterial( { size: size, map: sprite, blending: THREE.AdditiveBlending, depthTest: false, transparent: true } );
+    // material.color.setHSL( color[ .1 ], color[ .2 ], color[ .3 ], THREE.SRGBColorSpace );
+    // setObject3D sets the points under the name 'cloud'
+    this.points = new THREE.Points(this.geometry, material);
+    this.el.setObject3D("cloud", this.points);
+    // this.el.object3D.rotation.x = Math.random() * 6;
+    // this.el.object3D.rotation.y = Math.random() * 6;
+    // this.el.object3D.rotation.z = Math.random() * 6;
+    if (this.data.type == "rain") {
+      this.el.object3D.position.x = 50;
+      this.el.object3D.position.y = 0;
+      this.el.object3D.position.z = -50;
+    } else {
+      this.el.object3D.position.x = 0;
+      this.el.object3D.position.y = 0;
+      this.el.object3D.position.z = 0;
+    }
+  
+    // particles.rotation.x = Math.random() * 6;
+    // particles.rotation.y = Math.random() * 6;
+    // particles.rotation.z = Math.random() * 6;
+    // this.el.setAttribute("animation", )
+    const posAttribute = this.points.geometry.getAttribute('position');
+              this.posArray = posAttribute.array;
+  },
+  tick: function (time) {
+    // const time = Date.now() * 0.005;
+ 
+    if (this.posArray) {
+				// this.el.object3D.rotation.x = 0.000001 * time;
+        if (this.data.type == 'dust') {
+          this.el.object3D.rotation.y = Math.sin(0.00002 * time);
+          this.el.object3D.rotation.z = Math.sin(0.00001 * time);
+
+        } else if (this.data.type == 'rain') {
+          
+          // this.points.geometry.getAttribute('position');
+          // var geometry = ps.geometry;
+          // const positions = this.points.geometry.attributes.position.array;
+          // console.log("Positions length is " + positions.length);
+          const posAttribute = this.points.geometry.getAttribute('position');
+          positions = posAttribute.array;
+          for (let i = 0; i < positions.length; i++) {
+            if (positions[ i + 1 ] < -1) {
+              // console.log('positoin ' + positions[i + 1]);
+              // positions[ i + 1 ] = 30;
+              positions[ i ] = THREE.MathUtils.randFloatSpread(200);
+              positions[ i + 1 ] = THREE.MathUtils.randFloat(0,20);
+              positions[ i + 2 ] = THREE.MathUtils.randFloatSpread(200);
+
+            } else {
+              positions[ i + 1 ] = positions[ i + 1 ] - .1;
+            }
+            
+          }
+        } else if (this.data.type == 'snow') {
+          
+          // this.points.geometry.getAttribute('position');
+          // var geometry = ps.geometry;
+          // const positions = this.points.geometry.attributes.position.array;
+          // console.log("Positions length is " + positions.length);
+          const posAttribute = this.points.geometry.getAttribute('position');
+          positions = posAttribute.array;
+          for (let i = 0; i < positions.length; i++) {
+            if (positions[ i + 1 ] < -1) {
+              // console.log('positoin ' + positions[i + 1]);
+              // positions[ i + 1 ] = 30;
+              positions[ i ] = THREE.MathUtils.randFloatSpread(200);
+              positions[ i + 1 ] = THREE.MathUtils.randFloat(0,20);
+              positions[ i + 2 ] = THREE.MathUtils.randFloatSpread(200);
+
+            } else {
+              positions[ i + 1 ] = positions[ i + 1 ] - .01;
+            }
+            
+          }
+        } else if (this.data.type == "smoke") {
+          this.el.object3D.rotation.y = Math.sin(0.00001 * time);
+        }
+          // this.points.forEach(function(v){
+          //     v.y = ( Math.sin( (v.x/2+step) * Math.PI*2 )
+          //           + Math.cos( (v.z/2+step*2) * Math.PI )
+          //           + Math.sin( (v.x+v.y+step*2) / 4*Math.PI ) ) / 2;
+          // });
+        
+        //   for (let i = 0; i <  this.posArray.length; i++) {
+        //     // if (i == 0) {
+        //     //   console.log(this.posArray[i]);
+        //     // }                
+        //         // ps[i] = vector.x;
+
+        //         this.posArray[i + 1] -= 1;
+        //         // ps[i + 2] = vector.z;
+        //       }
+        // }
+      }
+				// const geometry = this.el.getObject3D('mesh');
+				// const attributes = this.points.geometry.attributes;
+        // for (let i = 0; i < attributes.position.count; i++) {
+        //   console.log(attributes[i]);
+
+        // }
+
+              // const posAttribute = this.points.geometry.getAttribute('position');
+              // const ps = posAttribute.array;
+            
+              // // const updateParticles = () => {
+              //   // loop over vectors and animate around sphere
+              //   for (let i = 0; i < this.vectors.length; i++) {
+              //     const vector = this.vectors[i];
+              //     vector.applyAxisAngle(vector.rotationAxis, vector.rotationSpeed);
+            
+              //     ps[i] = vector.x;
+              //     ps[i + 1] = vector.y;
+              //     ps[i + 2] = vector.z;
+              //   }
+              //   // this.points.rotation.y = Math.sin(time * .0001);
+              //   this.points.geometry.attributes.position.needsUpdate = true;
+        // }
+				// for ( let i = 0; i < attributes.size.array.length; i ++ ) {
+
+				// 	attributes.size.array[ i ] = 14 + 13 * Math.sin( 0.1 * i + time );
+
+				// }
+
+				this.points.geometry.attributes.position.needsUpdate = true;
+  },
+ 	ninit: function()	{
+    let camera, scene, renderer, stats, parameters;
+			let mouseX = 0, mouseY = 0;
+
+			let windowHalfX = window.innerWidth / 2;
+			let windowHalfY = window.innerHeight / 2;
+
+			const materials = [];
+      const geometry = new THREE.BufferGeometry();
+				const vertices = [];
+
+				const textureLoader = new THREE.TextureLoader();
+
+				const assignSRGB = ( texture ) => {
+
+					texture.colorSpace = THREE.SRGBColorSpace;
+
+				};
+
+
+				const sprite1 = textureLoader.load( 'http://servicemedia.s3.amazonaws.com/assets/pics/sparkle.png', assignSRGB );
+				const sprite2 = textureLoader.load( 'http://servicemedia.s3.amazonaws.com/assets/pics/sparkle.png', assignSRGB );
+				const sprite3 = textureLoader.load( 'http://servicemedia.s3.amazonaws.com/assets/pics/sparkle.png', assignSRGB );
+				const sprite4 = textureLoader.load( 'http://servicemedia.s3.amazonaws.com/assets/pics/sparkle.png', assignSRGB );
+				const sprite5 = textureLoader.load( 'http://servicemedia.s3.amazonaws.com/assets/pics/sparkle.png', assignSRGB );
+
+				for ( let i = 0; i < 10000; i ++ ) {
+
+					const x = Math.random() * 2000 - 1000;
+					const y = Math.random() * 2000 - 1000;
+					const z = Math.random() * 2000 - 1000;
+
+					vertices.push( x, y, z );
+
+				}
+
+				geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
+
+				parameters = [
+					[[ 1.0, 0.2, 0.5 ], sprite2, 20 ],
+					[[ 0.95, 0.1, 0.5 ], sprite3, 15 ],
+					[[ 0.90, 0.05, 0.5 ], sprite1, 10 ],
+					[[ 0.85, 0, 0.5 ], sprite5, 8 ],
+					[[ 0.80, 0, 0.5 ], sprite4, 5 ]
+				];
+
+				for ( let i = 0; i < parameters.length; i ++ ) {
+
+					const color = parameters[ i ][ 0 ];
+					const sprite = parameters[ i ][ 1 ];
+					const size = parameters[ i ][ 2 ];
+
+					materials[ i ] = new THREE.PointsMaterial( { size: size, map: sprite, blending: THREE.AdditiveBlending, depthTest: false, transparent: true } );
+					materials[ i ].color.setHSL( color[ 0 ], color[ 1 ], color[ 2 ], THREE.SRGBColorSpace );
+
+					const particles = new THREE.Points( geometry, materials[ i ] );
+
+					particles.rotation.x = Math.random() * 6;
+					particles.rotation.y = Math.random() * 6;
+					particles.rotation.z = Math.random() * 6;
+
+					this.el.setObject3D( "cloud", particles );
+
+				}
+        
+        
+      
+  }
+});
+
+//from  https://github.com/dmarcos/aframe-fx
+AFRAME.registerComponent('sprite-animation', {
+  schema: {
+    spriteWidth: {default: 256},
+    spriteHeight: {default: 256},
+    duration: {default: 1000}
+  },
+  vertexShader:`
+    varying vec2 vUv;
+
+    void main() {
+      vUv = uv;
+      gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+    }
+  `,
+
+  fragmentShader:`
+    varying vec2 vUv;
+    uniform sampler2D uMap;
+    uniform float uSpriteIndex;
+    uniform float uSpriteWidth;
+    uniform float uSpriteHeight;
+
+    void main() {
+      float u = uSpriteIndex * uSpriteWidth;
+      u = u - floor(u);
+      float v = floor(uSpriteIndex * uSpriteWidth);
+      v = v * uSpriteHeight;
+      vec2 uv = vec2(u + vUv.x * uSpriteWidth, 1.0 - (v + uSpriteHeight - vUv.y * uSpriteHeight));
+
+      gl_FragColor = texture2D(uMap, uv);
+    }`,
+
+  init: function () {
+    var mesh;
+    this.initGeometry();
+    this.initShader();
+
+    mesh = new THREE.Mesh(this.geometry, this.shader);
+    this.el.setObject3D('mesh', mesh);
+  },
+
+  initGeometry: function () {
+    var geometry = this.geometry = new THREE.BufferGeometry();
+    var vertexCoordinateSize = 3; // 3 floats to represent x,y,z coordinates.
+    var uvCoordinateSize = 2; // 2 float to represent u,v coordinates.
+    var quadSize = 0.8;
+    var quadHalfSize = quadSize / 2.0;
+    var wireframeSystem = this.el.sceneEl.systems.wireframe;
+
+    var positions = [
+      -quadHalfSize, -quadHalfSize, 0.0, // bottom-left
+       quadHalfSize, -quadHalfSize, 0.0, // bottom-right
+      -quadHalfSize, quadHalfSize, 0.0, // top-left
+       quadHalfSize, quadHalfSize, 0.0  // top-right
+    ];
+
+    var uvs = [
+      0, 0,
+      1, 0,
+      0, 1,
+      1, 1,
+    ];
+
+    // Counter-clockwise triangle winding.
+    geometry.setIndex([
+      3, 2, 0, // top-left triangle.
+      0, 1, 3  // bottom-right triangle.
+    ]);
+
+    geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, vertexCoordinateSize));
+    geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, uvCoordinateSize));
+
+    wireframeSystem.unindexBufferGeometry(geometry);
+    wireframeSystem.calculateBarycenters(geometry);
+  },
+
+  initShader: function() {
+    var self = this;
+    var uniforms = {
+      uMap: {type: 't', value: null},
+      uSpriteIndex: {type: 'f', value: 0},
+      uSpriteWidth: {type: 'f', value: 0},
+      uSpriteHeight: {type: 'f', value: 0}
+    };
+    var shader = this.shader = new THREE.ShaderMaterial({
+      uniforms: uniforms,
+      vertexShader: this.vertexShader,
+      fragmentShader: this.fragmentShader,
+      transparent: true
+    });
+
+    var textureLoader = new THREE.TextureLoader();
+    textureLoader.load('assets/explosion.png', function (texture) {
+      var spriteHeight = self.data.spriteHeight;
+      var spriteWidth = self.data.spriteWidth;
+      var imageWidth = texture.image.width;
+      var imageHeight = texture.image.height;
+      shader.uniforms.uSpriteWidth.value = spriteWidth / imageWidth;
+      shader.uniforms.uSpriteHeight.value = spriteHeight / imageHeight;
+      shader.uniforms.uMap.value = texture;
+
+      texture.wrapS = texture.wrapT = THREE.ClampToEdgeWrapping;
+      texture.magFilfer = THREE.NearestFilter;
+    });
+  },
+
+  tick: function (time) {
+    var startTime = this.startTime = this.startTime || time;
+    var elapsedTime = time - this.startTime;
+    var duration = this.data.duration;
+    if (elapsedTime > duration) {
+      elapsedTime = 0;
+      this.startTime = time;
+    }
+    var spriteIndex = Math.floor((elapsedTime / duration) * 64);
+    this.shader.uniforms.uSpriteIndex.value = spriteIndex;
+  }
+});
+
+AFRAME.registerComponent('particle-system-instanced', {
+  schema: {
+    particleRate: {default: 50},
+    particlesNumber: {default: 1000},
+    particleSize: {default: 0.1},
+    particleSpeed: {default: 0.005},
+    particleLifeTime: {default: 1000},
+    src: {type: 'map'}
+  },
+  vertexShader:`
+    attribute float visible;
+    varying vec2 vUv;
+    varying float vVisible;
+
+    void main() {
+      vUv = uv;
+      vVisible = visible;
+      vec4 mvPosition = instanceMatrix * vec4( position, 1.0 );
+      vec4 modelViewPosition = modelViewMatrix * mvPosition;
+      gl_Position = projectionMatrix * modelViewPosition;
+    }
+  `,
+
+  fragmentShader:`
+    varying float vVisible;
+    varying vec2 vUv;
+    uniform sampler2D uMap;
+
+    void main() {
+      if (vVisible == 1.0) {
+        gl_FragColor = texture2D(uMap, vUv);
+      } else {
+        discard;
+      }
+
+    }`,
+//   vertexShader:`
+//   precision highp float;
+//   uniform mat4 modelViewMatrix;
+//   uniform mat4 projectionMatrix;
+//   uniform float time;
+
+//   attribute vec3 position;
+//   attribute vec2 uv;
+//   attribute vec3 translate;
+
+//   varying vec2 vUv;
+//   varying float vScale;
+
+//   void main() {
+
+//     vec4 mvPosition = modelViewMatrix * vec4( translate, 1.0 );
+//     vec3 trTime = vec3(translate.x + time,translate.y + time,translate.z + time);
+//     float scale =  sin( trTime.x * 2.1 ) + sin( trTime.y * 3.2 ) + sin( trTime.z * 4.3 );
+//     vScale = scale;
+//     scale = scale * 10.0 + 10.0;
+//     mvPosition.xyz += position * scale;
+//     vUv = uv;
+//     gl_Position = projectionMatrix * mvPosition;
+
+//   }
+// `,
+
+// fragmentShader:`
+// precision highp float;
+
+// uniform sampler2D map;
+
+// varying vec2 vUv;
+// varying float vScale;
+
+// // HSL to RGB Convertion helpers
+// vec3 HUEtoRGB(float H){
+//   H = mod(H,1.0);
+//   float R = abs(H * 6.0 - 3.0) - 1.0;
+//   float G = 2.0 - abs(H * 6.0 - 2.0);
+//   float B = 2.0 - abs(H * 6.0 - 4.0);
+//   return clamp(vec3(R,G,B),0.0,1.0);
+// }
+
+// vec3 HSLtoRGB(vec3 HSL){
+//   vec3 RGB = HUEtoRGB(HSL.x);
+//   float C = (1.0 - abs(2.0 * HSL.z - 1.0)) * HSL.y;
+//   return (RGB - 0.5) * C + HSL.z;
+// }
+
+// void main() {
+//   vec4 diffuseColor = texture2D( map, vUv );
+//   gl_FragColor = vec4( diffuseColor.xyz * HSLtoRGB(vec3(vScale/5.0, 1.0, 0.5)), diffuseColor.w );
+
+//   if ( diffuseColor.w < 0.5 ) discard;
+// }`,
+
+  init: function () {
+    var positionX;
+    var positionY;
+    var positionZ;
+    var sign;
+    var particlesNumber = this.data.particlesNumber;
+
+    var geometry = this.initQuadGeometry();
+    // var shader = this.initQuadShader();
+    // geometry.setAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+  
+    const textureLoader = new THREE.TextureLoader();
+
+				const assignSRGB = ( texture ) => {
+
+					texture.colorSpace = THREE.SRGBColorSpace;
+
+				};
+
+				const sprite1 = textureLoader.load( 'http://servicemedia.s3.amazonaws.com/assets/pics/sparkle.png', assignSRGB );
+    // const material = new THREE.PointsMaterial({ size: this.data.size, map: sprite1, blending: THREE.AdditiveBlending, transparent: true, vertexColors: true });
+    const material = new THREE.SpriteMaterial( { map: sprite1, color: 0xffffff } );
+    var mesh = this.instancedMesh = new THREE.InstancedMesh(geometry, material, particlesNumber);
+
+    this.particlesInfo = [];
+    for (var i = 0; i < particlesNumber; i++) {
+      sign = Math.floor(Math.random() * 2) === 0 ? 1 : -1;
+      positionX = sign * Math.random();
+      sign = Math.floor(Math.random() * 2) === 0 ? 1 : -1;
+      positionY = sign * Math.random();
+      positionZ = 0.6 * Math.random();
+      this.addParticle(positionX / 2, 1, -positionZ);
+    }
+
+    this.el.setObject3D('particleInstanced', mesh);
+    console.log("tryna init particle-system-instanced with map " + this.data.src);
+  },
+
+  addParticle: function(x, y, z) {
+    var mesh;
+    var particleInfo = {};
+    var sign = Math.floor(Math.random() * 2) === 0 ? 1 : -1;
+
+    particleInfo.object3D = new THREE.Object3D();
+    particleInfo.object3D.position.set(x, y, z);
+    particleInfo.xPosition = x;
+    particleInfo.xSpeed = sign * Math.random() * 0.0003;
+    particleInfo.lifeTime = 0;
+    this.particlesInfo.push(particleInfo);
+  },
+
+  initQuadGeometry: function () {
+    var geometry = new THREE.BufferGeometry();
+    var vertexCoordinateSize = 3; // 3 floats to represent x,y,z coordinates.
+
+    var quadSize = this.data.particleSize;
+    var quadHalfSize = quadSize / 2.0;
+
+    var uvCoordinateSize = 2; // 2 float to represent u,v coordinates.
+    // No indexed
+    var positions = [
+      // Top left triangle
+      quadHalfSize, quadHalfSize, 0.0,
+      -quadHalfSize, quadHalfSize, 0.0,
+      -quadHalfSize, -quadHalfSize, 0.0,
+      // Bottom right triangle
+      -quadHalfSize, -quadHalfSize, 0.0,
+      quadHalfSize, -quadHalfSize, 0.0,
+      quadHalfSize, quadHalfSize, 0.0
+    ];
+
+    var uvs = [
+      1, 1,
+      0, 1,
+      0, 0,
+
+      0, 0,
+      1, 0,
+      1, 1,
+    ];
+
+    var visible = Array(this.data.particlesNumber).fill(0.0);
+
+    var visibleAttribute = this.visibleAttribute = new THREE.InstancedBufferAttribute(new Float32Array(visible), 1);
+
+    geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, vertexCoordinateSize));
+    geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, uvCoordinateSize));
+    geometry.setAttribute('visible', visibleAttribute);
+    return geometry;
+  },
+
+  tick: function (time, delta) {
+    var geometry;
+    var positions;
+    var particleInfo;
+    var particleSpeed = this.data.particleSpeed;
+
+    this.lastParticleDelta = this.lastParticleDelta || 0;
+    this.lastParticleDelta += delta;
+    for (var i = 0; i < this.particlesInfo.length; i++) {
+      particleInfo = this.particlesInfo[i];
+      particleInfo.particleLifeTime -= delta;
+
+      // Reset and hide particle.
+      if (particleInfo.particleLifeTime < 0) {
+        particleInfo.particleLifeTime = 0;
+        this.el.emit('particleended');
+        this.visibleAttribute.setX(i, 0.0);
+      }
+
+      particleInfo.object3D.position.y -= particleSpeed;
+      particleInfo.object3D.position.x += particleInfo.xSpeed;
+      particleInfo.object3D.updateMatrix();
+      this.instancedMesh.setMatrixAt(i, particleInfo.object3D.matrix);
+    }
+
+    // Emit a new particle
+    if (this.lastParticleDelta > this.data.particleRate) {
+      for (var i = 0; i < this.particlesInfo.length; i++) {
+        particleInfo = this.particlesInfo[i];
+
+        // Skip if the particle is in use.
+        if (particleInfo.particleLifeTime) { continue; }
+
+        particleInfo.particleLifeTime = this.data.particleLifeTime;
+        particleInfo.object3D.position.y = 1;
+        particleInfo.object3D.position.x = particleInfo.xPosition;
+        particleInfo.object3D.updateMatrix();
+
+        this.visibleAttribute.setX(i, 1.0);
+        this.el.emit('particlestarted');
+        this.instancedMesh.setMatrixAt(i, particleInfo.object3D.matrix);
+        break;
+      }
+      this.lastParticleDelta = 0;
+    }
+
+    this.instancedMesh.instanceMatrix.needsUpdate = true;
+    this.visibleAttribute.needsUpdate = true;
+  }
+
+  // update: function (oldData) {
+  //   if (oldData.src !== this.data.src) { this.loadTextureImage(); }
+  // },
+
+  // loadTextureImage: function () {
+  //   var src = this.data.src;
+  //   var self = this;
+  //   this.el.sceneEl.systems.material.loadTexture(src, {src: src}, function textureLoaded (texture) {
+  //     self.el.sceneEl.renderer.initTexture(texture);
+  //     texture.wrapS = texture.wrapT = THREE.ClampToEdgeWrapping;
+  //     texture.magFilfer = THREE.LinearFilter;
+  //     self.shader.uniforms.uMap.value = texture;
+  //   });
+  // },
+
+  // initQuadShader: function() {
+  //   var uniforms = {
+  //     uMap: {type: 't', value: null}
+  //   };
+  //   var shader = this.shader = new THREE.ShaderMaterial({
+  //     uniforms: uniforms,
+  //     vertexShader: this.vertexShader,
+  //     fragmentShader: this.fragmentShader,
+  //     transparent: true
+  //   });
+  //   return shader;
+  // }
+});

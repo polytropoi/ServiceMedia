@@ -293,7 +293,11 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
   
         if (!this.data.tags.includes("hide callout") && !this.data.tags.includes("hide callout")) {
        
-            this.calloutEntity.setAttribute("look-at", "#player");
+            if (settings && settings.sceneCameraMode == "Third Person") {
+              this.calloutEntity.setAttribute("look-at", "#thirdPersonCamera");
+            } else {
+              this.calloutEntity.setAttribute("look-at", "#player");
+            }
             this.calloutEntity.setAttribute('visible', false);
         
             sceneEl.appendChild(this.calloutEntity);

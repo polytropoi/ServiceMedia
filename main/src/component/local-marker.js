@@ -363,7 +363,11 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
       
             if (!this.data.tags.includes("hide callout") && !this.data.tags.includes("hide callout")) {
            
-              this.calloutEntity.setAttribute("look-at", "#player");
+              if (settings && settings.sceneCameraMode == "Third Person") {
+                this.calloutEntity.setAttribute("look-at", "#thirdPersonCamera");
+              } else {
+                this.calloutEntity.setAttribute("look-at", "#player");
+              }
               this.calloutEntity.setAttribute('visible', false);
             
               sceneEl.appendChild(this.calloutEntity);

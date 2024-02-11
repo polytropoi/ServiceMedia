@@ -2283,7 +2283,11 @@ AFRAME.registerComponent('mod_dialog', { //there should only be one of these, un
     // this.viewportHolder.object3D.getWorldPosition( this.cameraPosition );
     this.el.setAttribute('position', {x: 0, y:-1000, z:0}); //it's invisible, but set it out of the way so it don't block
     // console.log("TRYNA SET POSITIONF RO MOD_DIALGO " + JSON.stringify(this.cameraPosition));
-    
+    if (settings && settings.sceneCameraMode == "Third Person") {
+      this.el.setAttribute("look-at", "#thirdPersonCamera");
+    } else {
+      this.el.setAttribute("look-at", "#player");
+    }
     // this.meshObj = this.dialogPanel.getObject3D('mesh');
     this.meshObj = this.dialogPanel.getObject3D('mesh');
     this.meshObj.traverse(node => {
@@ -2317,7 +2321,7 @@ AFRAME.registerComponent('mod_dialog', { //there should only be one of these, un
   let that = this;
   },
   showPanel: function (panelString, objectID, messageType, duration) {
-    
+
     this.objID = objectID;
     this.messageType = messageType;
     this.el.setAttribute("visible", true);
