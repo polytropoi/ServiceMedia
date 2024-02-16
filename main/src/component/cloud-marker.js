@@ -659,7 +659,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
        
     },
     updateMaterials: function () {
-      if (this.data.tags.includes("color")) {
+      if (this.data.tags && this.data.tags.includes("color")) {
         this.el.setAttribute("material", {color: this.data.eventData.toLowerCase(), transparent: true, opacity: .5});
       } else {
         console.log("tryna update material for markertype " + this.data.markerType);
@@ -761,9 +761,11 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                 }
               }
               if (this.data.markerType == "navmesh" || this.data.markerType == "surface") {
-                if (!this.data.tags.includes("show")) {
+                if (this.data.tags.includes("show")) {
+                  this.el.object3D.visible = true;
+                } else {
                   this.el.object3D.visible = false;
-                } 
+                }
               }
           } else {
               for (let i = 0; i < sceneModels.length; i++) {
@@ -893,7 +895,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                 this.el.setAttribute("mod_flicker", {type: "candle"});
               }    
           }
-          if (this.data.tags.includes("hide gizmo") || (settings && settings.hideGizmos)) {
+          if (this.data.tags && this.data.tags.includes("hide gizmo") || (settings && settings.hideGizmos)) {
             if (this.data.markerType != "mailbox" && this.data.markerType != "light") {
               this.el.object3D.visible = false;
             }
@@ -916,7 +918,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
         
         this.el.object3D.updateMatrix(); 
 
-        if (this.data.tags.includes("hide gizmo") || (settings && settings.hideGizmos)) {
+        if (this.data.tags && this.data.tags.includes("hide gizmo") || (settings && settings.hideGizmos)) {
           if (this.data.markerType != "mailbox" && this.data.markerType != "light") {
             this.el.object3D.visible = false;
           }

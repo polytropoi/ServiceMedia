@@ -186,7 +186,12 @@ function InitIDB() {
                      hasLocalData = true;
                      let localEl = document.createElement("a-entity");
                      sceneEl.appendChild(localEl);
-
+                     if (cursor.value.locations[i].markerType == "player") {
+                        if (settings.playerPositions) {
+                           settings.playerPositions.push(cursor.value.locations[i].x + " " + cursor.value.locations[i].y + " " + cursor.value.locations[i].z);
+                        }
+                     }
+                    
                      localEl.setAttribute("position", {x: cursor.value.locations[i].x, y: cursor.value.locations[i].y, z: cursor.value.locations[i].z });
                      localEl.setAttribute("rotation", {x: cursor.value.locations[i].eulerx, y: cursor.value.locations[i].eulery, z: cursor.value.locations[i].eulerz });
                      localEl.setAttribute("scale", {x: cursor.value.locations[i].markerObjScale, y: cursor.value.locations[i].markerObjScale, z: cursor.value.locations[i].markerObjScale});
@@ -258,6 +263,12 @@ function InitIDB() {
                objexEl.components.mod_objex.updateModdedObjects();
             }
              //eventdata should have the name of a location with spawn markertype
+             if (settings.playerPositions.length) {
+               console.log("gots PLAYERPOSITIONS " + settings.playerPositions);
+               if (settings.playerPositions.length) {
+                  PlayerToLocation(settings.playerPositions[Math.floor(Math.random() * settings.playerPositions.length)]);
+              }
+            }
           }
       };
       modQuery.onerror = function () {
@@ -583,10 +594,12 @@ $(function() {
             console.log(`Using ${usage} out of ${quota} bytes.`);
          });
       }
+
    }
    if (settings.sceneScatterObjectLayers) {
-      console.log("objectScatterLayers: " + JSON.stringify(settings.sceneScatterObjectLayers));
+      // console.log("objectScatterLayers: " + JSON.stringify(settings.sceneScatterObjectLayers));
    }
+
 
    // this.asky = document.getElementsByTagName('a-sky')[0];
    // if (this.asky && settings) {

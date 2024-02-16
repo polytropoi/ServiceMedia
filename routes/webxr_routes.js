@@ -383,6 +383,7 @@ webxr_router.get('/:_id', function (req, res) {
     // var gltfItems = [];
     var bucketFolder = "eloquentnoise.com";
     var playerPosition = "0 1.6 0";
+    let playerPositions = [];
     var playerRotation = "0 0 0";
     // var style = "<link rel=\x22stylesheet\x22 type=\x22text/css\x22 href=\x22../styles/embedded.css\x22>";
     let aframeEnvironment = "";
@@ -1081,6 +1082,7 @@ webxr_router.get('/:_id', function (req, res) {
                                     if (sceneResponse.sceneLocations[i].eulerx && sceneResponse.sceneLocations[i].eulery && sceneResponse.sceneLocations[i].eulerz) {
                                         playerRotation = sceneResponse.sceneLocations[i].eulerx + " " + sceneResponse.sceneLocations[i].eulery + " " + sceneResponse.sceneLocations[i].eulerz;
                                     }
+                                    playerPositions.push(playerPosition);
                                     
                                     
                                 }
@@ -1484,7 +1486,9 @@ webxr_router.get('/:_id', function (req, res) {
                                     
                                 // } 
                                 // let follower = "";
-
+                                if (playerPositions.length) {
+                                    playerPosition = playerPositions[Math.floor(Math.random() * playerPositions.length)];
+                                }
                                 ////////////////////////// - THIRD PERSON CAMERA SETUP - //////////////////////////////
                                 if (sceneResponse.sceneCameraMode != undefined && sceneResponse.sceneCameraMode.toLowerCase().includes("third person")) {
                                     let lookcontrols = "look-controls=\x22magicWindowTrackingEnabled: false; reverseTouchDrag: true\x22";
@@ -1502,7 +1506,7 @@ webxr_router.get('/:_id', function (req, res) {
                                         // wasd = "extended_wasd_thirdperson=\x22fly: false; moveSpeed: "+sceneResponse.scenePlayer.playerSpeed+"; inputType: keyboard constrainToNavMesh: true; enabled: true; speed:0.2;\x22";
                                         wasd = "extended_wasd_thirdperson=\x22fly: false; moveSpeed: "+sceneResponse.scenePlayer.playerSpeed+"; inputType: keyboard\x22 simple-navmesh-constraint=\x22navmesh:#nav-mesh;fall:10; height: 0\x22";
                                     }
-                                    
+                                   
                                     // wasd = "extended_wasd_thirdperson=\x22fly: false; moveSpeed: "+sceneResponse.scenePlayer.playerSpeed+"; inputType: keyboard\x22 " + navConstraint;
                                     cameraRigEntity = "<a-entity id=\x22lookControls\x22 "+lookcontrols+" follow-camera=\x22target: #player\x22>" +
                                         "<a-entity id=\x22thirdPersonCamera\x22 camera position=\x220 5 7\x22 >" +
@@ -4322,6 +4326,7 @@ webxr_router.get('/:_id', function (req, res) {
                     settings.socketHost = process.env.SOCKET_HOST;
                     settings.networking = sceneResponse.sceneNetworking;
                     settings.playerStartPosition = playerPosition;
+                    settings.playerPositions = playerPositions;
                     settings.debugMode = debugMode;
                     settings.scatterObjects = sceneResponse.sceneScatterObjects;
                     settings.sceneScatterObjectLayers = sceneResponse.sceneScatterObjectLayers;
