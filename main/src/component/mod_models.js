@@ -223,15 +223,14 @@ AFRAME.registerComponent('mod_model', {
               // <a-entity class="cube" mixin="cube" position="1 5.265 -0.5" material="color: green"></a-entity>
             }
           } 
-          if (this.data.eventData && this.data.eventData.toLowerCase().includes("navmesh")) { //no, this is set on the server (webxr_routes.js) ~line 2600
-            // groundMod = "static-body=\x22shape: auto;\x22"; //no, it needs to wait for model-loaded
-            if (settings.useNavmesh) {
-              
-            }
-            if (this.data.eventData && !this.data.eventData.toLowerCase().includes("show")) {
+          if (this.data.markerType == "navmesh" 
+            || this.data.markerType == "surface" 
+            || (this.data.eventData && this.data.eventData.toLowerCase().includes("surface"))
+            || (this.data.eventData && this.data.eventData.toLowerCase().includes("navmesh"))) { //no, this is set on the server (webxr_routes.js) ~line 2600
               this.el.object3D.visible = false;
+            if ((this.data.tags && this.data.tags.includes("show")) || (this.data.eventData && this.data.eventData.toLowerCase().includes("show"))) {
+              this.el.object3D.visible = true;
             }
-            
           }
           if (this.data.eventData && this.data.eventData.toLowerCase().includes("agent") || this.data.markerType == "character" || this.data.tags.includes("agent")) { 
             if (settings.useNavmesh) {

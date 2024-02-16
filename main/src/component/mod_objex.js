@@ -31,7 +31,7 @@ AFRAME.registerComponent('mod_objex', {
         this.data.jsonObjectData = JSON.parse(atob(theData)); //object items with model references
         this.data.jsonLocationsData = JSON.parse(atob(theLocData)); //scene locations with object references
         // console.log("objxe datas" + JSON.stringify(this.data.jsonObjectData));
-        // console.log("objxe location datas" + JSON.stringify(this.data.jsonLocationsData));
+        console.log("objxe location datas" + JSON.stringify(this.data.jsonLocationsData));
         console.log(this.data.jsonLocationsData.length + " locations for " + this.data.jsonObjectData.length);
   
         this.triggerAudioController = document.getElementById("triggerAudio");
@@ -72,10 +72,12 @@ AFRAME.registerComponent('mod_objex', {
                     console.log("location/object match " + this.data.jsonLocationsData[i].objectID + " modelID " + this.data.jsonObjectData[k].modelID);
                     let objEl = document.createElement("a-entity");
                     //set mod_object component:
-                    objEl.setAttribute("mod_object", {'eventData': this.data.jsonLocationsData[i].eventData, 'locationData': this.data.jsonLocationsData[i], 'objectData': this.data.jsonObjectData[k]});
-                    // objEl.id = "obj" + this.data.jsonLocationsData[i].objectID + "_" + this.data.jsonLocationsData[i].timestamp;
-                    objEl.id = this.data.jsonLocationsData[i].timestamp; //only timestamp so locpickers can find it...other objtypes aren't allowMods, i.e. spawned at runtime
-                    this.el.sceneEl.appendChild(objEl);
+                    // if (this.checkForLocalObjectMods(this.data.jsonLocationsData[i].timestamp)) {
+                      objEl.setAttribute("mod_object", {'eventData': this.data.jsonLocationsData[i].eventData, 'locationData': this.data.jsonLocationsData[i], 'objectData': this.data.jsonObjectData[k]});
+                      // objEl.id = "obj" + this.data.jsonLocationsData[i].objectID + "_" + this.data.jsonLocationsData[i].timestamp;
+                      objEl.id = this.data.jsonLocationsData[i].timestamp; //only timestamp so locpickers can find it...other objtypes aren't allowMods, i.e. spawned at runtime
+                      this.el.sceneEl.appendChild(objEl);
+                    // }
                   }
                 }
               } 
@@ -83,6 +85,55 @@ AFRAME.registerComponent('mod_objex', {
           }
         }
         let that = this;
+      },
+      updateModdedObjects: function () {
+        console.log("tryna updateModdedObjects");
+        if (localData.locations.length) {
+          for (let i = 0; i < localData.locations.length; i++) {
+              if (localData.locations[i].markerType == "object") {
+                for (let j = 0; j < this.data.jsonLocationsData.length; j++ ) {
+                  // console.log(localData.locations[i].timestamp +  ' ' + this.data.jsonLocationsData[j].timestamp);
+                  if (localData.locations[i].timestamp == this.data.jsonLocationsData[j].timestamp) {
+                    // console.log("gotsa objectID match with localdata! " );
+                    if (localData.locations[i].objectID != this.data.jsonLocationsData[j].objectID) {
+                      let objEl = document.getElementById(this.data.jsonLocationsData[j].timestamp);
+                        if (objEl) {
+                          console.log("gotsa objectID match with localdata! ");
+                          objEl.removeAttribute("transform_controls");
+                          objEl.removeAttribute("geometry");
+                          objEl.removeAttribute("gltf-model");
+                          objEl.removeAttribute("mod_object");
+
+                          objEl.removeAttribute("ammo-body");
+                          objEl.removeAttribute("ammo-shape");
+                          objEl.removeAttribute("mod_physics");
+                          objEl.removeAttribute("mod_particles");
+                          objEl.removeAttribute("light");
+                          objEl.setAttribute("mod_object", {'eventData': localData.locations[i].eventData, 'locationData': localData.locations[i], 'objectData': this.returnObjectData(localData.locations[i].objectID)});
+                        }
+                      }
+                  }
+                }
+            }
+          }
+        } 
+      },
+      checkForLocalObjectMods: function (timestamp) { //to do return modded object if needed //nah, just mod them if needed w/updateModdedObjects above
+        if (localData.locations.length) {
+          for (let i = 0; i < localData.locations.length; i++) {
+            console.log("checking for none objectID vs " + localData.locations[i]);
+            if (localData.locations[i].timestamp == timestamp) {
+              console.log("cmatchs objectID " + localData.locations[i].objectID);
+              if (localData.locations[i].objectID != "none") {
+                return true;
+              } else {
+                return false;
+              }
+            }
+          }
+        } else {
+          return true;
+        }
       },
       addSceneInventoryObjects: function(inventory_items) { //
         let oIDs = [];
@@ -198,6 +249,8 @@ AFRAME.registerComponent('mod_objex', {
         console.log("tryna add fetched obj " + obj._id)
         this.data.jsonObjectData.push(obj); 
       },
+
+      
       scatterObject: function (objectID) {
         console.log("tryna set model to " + objectID);  
         this.objectData = this.returnObjectData(objectID);
@@ -885,7 +938,7 @@ AFRAME.registerComponent('mod_object', {
           if (this.data.objectData.objtype === "Character") { 
             // const vector = new THREE.Vector3();
             
-            let skinnedMeshColliderEl = document.createElement("a-sphere"); //screw it, can't got the boundingbox fu to work...
+            let skinnedMeshColliderEl = document.createElement("a-sphere"); // can't got the boundingbox to work...
             skinnedMeshColliderEl.setAttribute("scale", ".5 1 .5"); //todo pass in scale
             // skinnedMeshColliderEl.setObject3D(sphere);
             if (settings && settings.debugMode) {
@@ -1269,39 +1322,7 @@ AFRAME.registerComponent('mod_object', {
                     node.material.needsUpdate = true
                   });
                 });
-                /*
-              setInterval(function(){ //get "viewport" position (normalized screen coords)
-                if (calloutOn) {
-                let pos = new THREE.Vector3();
-                pos = pos.setFromMatrixPosition(obj.matrixWorld); //world pos of model, kindof
-                // worldPos = pos;
-                pos.project(camera);
-                var width = window.innerWidth, height = window.innerHeight; 
-                let widthHalf = width / 2;
-                let heightHalf = height / 2;
-                pos.x = (pos.x * widthHalf) + widthHalf;
-                pos.y = - (pos.y * heightHalf) + heightHalf;
-                pos.z = 0;
-                // if (pos.x != NaN) { //does it twice because matrix set, disregard if it returns NaN :( //fixed?
-                //   console.log("screen position: " + (pos.x/width).toFixed(1) + " " + (pos.y/height).toFixed(1)); //"viewport position"
-                // }
-                if ((pos.x/width) < .45) {
-                  console.log("flip left");
-                  bubbleBackground.setAttribute("position", "4 2 1");
-                  bubbleBackground.setAttribute("scale", "-.1 .1 .1"); 
-                  bubbleText.setAttribute("position", "4 2 1.1");
-                } 
-                if ((pos.x/width) > .55) {
-                  console.log("flip right");
-                  bubbleBackground.setAttribute("position", "-4 2 1");
-                  bubbleBackground.setAttribute("scale", ".1 .1 .1"); 
-                  bubbleText.setAttribute("position", "-4 2 1.1");
-                }
-  
-                }
-              }, 2000);
-              */
-              // }
+               
             }
   
             let primaryAudio = document.getElementById("primaryAudio");
@@ -1317,20 +1338,14 @@ AFRAME.registerComponent('mod_object', {
               primaryAudio.emit('targetattach', {targetEntity: this.el}, true);
               primaryAudioHowl.pos(this.el.object3D.position.x, this.el.object3D.position.y, this.el.object3D.position.z);
               
-              this.el.addEventListener('click', function () {
+              this.el.addEventListener('click', function () { //um, this makes 2!  bad... move all this to other click event!
   
                 this.bubble = sceneEl.querySelector('.bubble');
                 if (this.bubble) {
                   this.bubble.setAttribute('visible', false);
                 }
                 calloutOn = false;
-                // this.bubbleText = theEl.querySelector('.bubbleText');
-                // this.bubble = sceneEl.querySelector('.bubble');
-                // this.bubbleText = sceneEl.querySelector('.bubbleText');
-                // if (hasCallout) {
-                //   this.bubble.setAttribute("visible", false);
-                //   this.bubbleText.setAttribute("visible", false);
-                // }
+               
                 if (!primaryAudioHowl.playing()) {
                     primaryAudioHowl.play();
                     console.log('...tryna play...');
@@ -1405,8 +1420,13 @@ AFRAME.registerComponent('mod_object', {
       }); //end model-loaded listener
   
       this.el.addEventListener('body-loaded', () => {  //body-loaded event = physics ready on obj
-        console.log("loaded mod_object physics body now applying shape: : " + this.data.objectData.collidertype.toLowerCase());
-        this.el.setAttribute('ammo-shape', {type: this.data.objectData.collidertype.toLowerCase()});
+        // console.log("loaded mod_object physics body now applying shape: : " + JSON.stringify(this.data.objectData));
+      // if (this.data.objectData.objectID && this.data.objectData.objectID != "none") {
+        let yoffset = '0';
+        if (this.data.objectData.yPosFudge) {
+          yoffset = this.data.objectData.yPosFudge;
+        }
+        this.el.setAttribute('ammo-shape', {type: this.data.objectData.collidertype.toLowerCase(), offset: '0 '+yoffset+' 0'});
         // console.log("ammo shape is " + JSON.stringify(that.el.getAttribute('ammo-shape')));
         if (this.data.applyForceToNewObject) {
           // this.el.setAttribute("aabb-collider", {objects: ".activeObjexRay"});
@@ -1528,9 +1548,11 @@ AFRAME.registerComponent('mod_object', {
                     //   }
                     // }
             // }
-          }
-        });
-      
+            }
+          });
+        // } else { 
+        //   console.log("object not found or set to none!");
+        // }
       }); //end body-loaded listener
   
       
@@ -1557,13 +1579,13 @@ AFRAME.registerComponent('mod_object', {
   
       });
       this.el.addEventListener('mousedown', (evt) => {
-        if (this.timestamp != '' && settings.allowMods && this.data.allowMods) {
-          if (keydown == "T") {
-            ToggleTransformControls(this.timestamp);
-          } else if (keydown == "Shift") {
-            ShowLocationModal(this.timestamp);
-          } 
-        }
+        // if (this.timestamp != '' && settings.allowMods && this.data.allowMods) {
+        //   if (keydown == "T") {
+        //     ToggleTransformControls(this.timestamp);
+        //   } else if (keydown == "Shift") {
+        //     ShowLocationModal(this.timestamp);
+        //   } 
+        // }
       });
       this.el.addEventListener('mouseenter', (evt) => {
         console.log("mouse enter mod_object name " + this.data.objectData.name + " id " + this.el.id);
@@ -1816,134 +1838,149 @@ AFRAME.registerComponent('mod_object', {
         e.preventDefault();
         // let downtime = (Date.now() / 1000) - this.mouseDownStarttime;
         // console.log("mousedown time "+ this.mouseDowntime + "  on mod_object type: " + this.data.objectData.objtype + " actions " + JSON.stringify(this.data.objectData.actions) + " equipped " + this.data.isEquipped);
-        if (!this.data.isEquipped) {
-          this.dialogEl = document.getElementById('mod_dialog');
-          
-          if (this.data.objectData.objtype.toLowerCase() == "pickup" || this.hasPickupAction) {
-            // this.el.setAttribute('visible', false);
-            if (this.data.objectData.prompttext != undefined && this.data.objectData.prompttext != null && this.data.objectData.prompttext != "") {
-              if (this.data.objectData.prompttext.includes('~')) {
-                this.promptSplit = this.data.objectData.prompttext.split('~'); 
+        if (keydown == "T") {
+          ToggleTransformControls(this.data.timestamp);
+        } else if (keydown == "Shift") {
+        //   ShowLocationModal(that.timestamp);
+            selectedLocationTimestamp = this.data.timestamp;
+            // ShowLocationModal(that.timestamp);
+            SceneManglerModal('Location');
+        } else {
+          let transform_controls_component = this.el.components.transform_controls;
+          if (transform_controls_component) {
+              if (transform_controls_component.data.isAttached) {
+                  // transform_controls_component.detachTransformControls();
+                  return; //don't do stuff below if transform enabled
               }
-              // this.el.components.mod_synth.medTrigger();
-              this.dialogEl.components.mod_dialog.showPanel("Pick up " + this.data.objectData.name + "?\n\n" + this.promptSplit[Math.floor(Math.random()*this.promptSplit.length)], this.el.id );
-            } else {
-              this.dialogEl.components.mod_dialog.showPanel("Pick up " + this.data.objectData.name + "?", this.el.id );
-            }
-            
           }
-          if (this.selectAction) {
-            console.log("select action " + JSON.stringify(this.selectAction));
-            if (this.selectAction.actionResult.toLowerCase() == "trigger fx") {
-              if (!this.isTriggered) {
-                // var worldPosition = new THREE.Vector3();
-                // this.el.object3D.getWorldPosition(worldPosition);
-                this.isTriggered = true;
-                let particleSpawner = document.getElementById('particleSpawner');
-                if (particleSpawner != null) {
-                  var worldPosition = new THREE.Vector3();
-                  this.el.object3D.getWorldPosition(worldPosition);
-                  if (this.data.objectData.yPosFudge != null && this.data.objectData.yPosFudge != "") {
-                    worldPosition.y += this.data.objectData.yPosFudge;
-                  }
-                  console.log("triggering fx at " + JSON.stringify(worldPosition) + " plus" + this.data.objectData.yPosFudge);
-                  particleSpawner.components.particle_spawner.spawnParticles(worldPosition, this.data.objectData.particles, 5, null, this.data.objectData.yPosFudge, this.data.objectData.color1, this.data.objectData.triggerScale);
+          if (!this.data.isEquipped) {
+            this.dialogEl = document.getElementById('mod_dialog');
+            
+            if (this.data.objectData.objtype.toLowerCase() == "pickup" || this.hasPickupAction) {
+              // this.el.setAttribute('visible', false);
+              if (this.data.objectData.prompttext != undefined && this.data.objectData.prompttext != null && this.data.objectData.prompttext != "") {
+                if (this.data.objectData.prompttext.includes('~')) {
+                  this.promptSplit = this.data.objectData.prompttext.split('~'); 
                 }
+                // this.el.components.mod_synth.medTrigger();
+                this.dialogEl.components.mod_dialog.showPanel("Pick up " + this.data.objectData.name + "?\n\n" + this.promptSplit[Math.floor(Math.random()*this.promptSplit.length)], this.el.id );
               } else {
-                console.log("already triggered - make it a toggle!");
+                this.dialogEl.components.mod_dialog.showPanel("Pick up " + this.data.objectData.name + "?", this.el.id );
               }
+              
             }
-            if (this.selectAction.actionResult.toLowerCase() == "prompt" || this.selectAction.actionResult.toLowerCase() == "dialog") {
-              if (this.isNavAgent && this.navAgentController) {
-                if (this.navAgentController.currentState == "dialog") {
-                  this.navAgentController.updateAgentState("random");
-                } else {
-                  this.navAgentController.updateAgentState("dialog");
-                  // if (this.data.objectData.audiogroupID && this.objectData.audiogroupID.length > 4) {
-                  //   triggerAudioController
-                  // }
-                }
-                
-              }
-            }
-          }
-          
-        } else { //if equipped
-          if (this.hasThrowAction) {
-            console.log("throw action " + JSON.stringify(this.throwAction));
-            if (this.throwAction.sourceObjectMod.toLowerCase() == "persist") { //transfer to scene inventory
-              this.el.object3D.visible = false;
-              DropInventoryItem(this.data.objectData._id); //just drop for now...throw/shoot/swing next!
-              setTimeout(() => {
-                this.el.object3D.visible = true;
-              }, 3000);
-            } else if (this.throwAction.sourceObjectMod.toLowerCase() == "remove") {
-              if (this.mouseDowntime <= 0) {
-                this.mouseDowntime = 1;
-              }
-              this.objexEl.components.mod_objex.throwObject(this.data.objectData._id, this.mouseDowntime, "5");
-            }
-            if (this.triggerAudioController != null) {
-              this.triggerAudioController.components.trigger_audio_control.playAudioAtPosition(this.hitpoint, this.distance, ["throw"], .5);//tagmangler needs an array
-            }
-          }
-          if (this.hasShootAction) {
-            console.log("shoot action " + JSON.stringify(this.shootAction));
-            // if (this.shootAction.sourceObjectMod.toLowerCase() == "persist") { //transfer to scene inventory
-            //   this.el.object3D.visible = false;
-            //   DropInventoryItem(this.data.objectData._id); //just drop for now...throw/shoot/swing next!
-            //   setTimeout(() => {
-            //     this.el.object3D.visible = true;
-            //   }, 3000);
-            // } else if (this.throwAction.sourceObjectMod.toLowerCase() == "remove") {
-            //   if (this.mouseDowntime <= 0) {
-            //     this.mouseDowntime = 1;
-            //   }
-            //   this.objexEl.components.mod_objex.shootObject(this.data.objectData._id, this.mouseDowntime, "5");
-            // }
-            if (this.triggerAudioController != null) {
-              this.triggerAudioController.components.trigger_audio_control.playAudioAtPosition(this.hitpoint, this.distance, ["shoot"], .5);//tagmangler needs an array, add vol mod 
-            }
-            this.el.object3D.visible = false;
-            this.el.classList.remove("activeObjexRay");
-            setTimeout(() => {
-              this.el.object3D.visible = true;
-              this.el.classList.add("activeObjexRay");
-            }, 3000);
-            this.objexEl.components.mod_objex.shootObject(this.data.objectData._id);
-            // this.applyForce();
-            
-          } 
-          if (this.hasTriggerAction) {
-  
-          }
-          if (this.selectAction) {
-            console.log("select action " + JSON.stringify(this.selectAction));
-            if (this.selectAction.actionResult.toLowerCase() == "trigger fx") { //e.g. light a torch
-              if (!this.isTriggered) {
-                this.isTriggered = true;
-                let particleSpawner = document.getElementById('particleSpawner');
-                if (particleSpawner != null) {
-                  this.loc = this.el.getAttribute('position');
-                  if (this.data.objectData.yPosFudge != null && this.data.objectData.yPosFudge != "") {
+            if (this.selectAction) {
+              console.log("select action " + JSON.stringify(this.selectAction));
+              if (this.selectAction.actionResult.toLowerCase() == "trigger fx") {
+                if (!this.isTriggered) {
+                  // var worldPosition = new THREE.Vector3();
+                  // this.el.object3D.getWorldPosition(worldPosition);
+                  this.isTriggered = true;
+                  let particleSpawner = document.getElementById('particleSpawner');
+                  if (particleSpawner != null) {
                     var worldPosition = new THREE.Vector3();
                     this.el.object3D.getWorldPosition(worldPosition);
-                    console.log("this.loc.y " + worldPosition + " plus" + this.data.objectData.yPosFudge);
-                    worldPosition.y += this.data.objectData.yPosFudge;
+                    if (this.data.objectData.yPosFudge != null && this.data.objectData.yPosFudge != "") {
+                      worldPosition.y += this.data.objectData.yPosFudge;
+                    }
+                    console.log("triggering fx at " + JSON.stringify(worldPosition) + " plus" + this.data.objectData.yPosFudge);
+                    particleSpawner.components.particle_spawner.spawnParticles(worldPosition, this.data.objectData.particles, 5, null, this.data.objectData.yPosFudge, this.data.objectData.color1, this.data.objectData.triggerScale);
                   }
-                  let particle_spawner = particleSpawner.components.particle_spawner;
-                  if (particle_spawner != null) {
-                    particleSpawner.components.particle_spawner.spawnParticles(worldPosition, this.data.objectData.particles, 5, this.el.id, this.data.objectData.yPosFudge, this.data.objectData.color1, this.data.objectData.triggerScale);
+                } else {
+                  console.log("already triggered - make it a toggle!");
+                }
+              }
+              if (this.selectAction.actionResult.toLowerCase() == "prompt" || this.selectAction.actionResult.toLowerCase() == "dialog") {
+                if (this.isNavAgent && this.navAgentController) {
+                  if (this.navAgentController.currentState == "dialog") {
+                    this.navAgentController.updateAgentState("random");
+                  } else {
+                    this.navAgentController.updateAgentState("dialog");
+                    // if (this.data.objectData.audiogroupID && this.objectData.audiogroupID.length > 4) {
+                    //   triggerAudioController
+                    // }
                   }
                   
                 }
-              } else {
-                console.log("already triggered - make it a toggle!");
               }
             }
-          }       
+            
+          } else { //if equipped
+            if (this.hasThrowAction) {
+              console.log("throw action " + JSON.stringify(this.throwAction));
+              if (this.throwAction.sourceObjectMod.toLowerCase() == "persist") { //transfer to scene inventory
+                this.el.object3D.visible = false;
+                DropInventoryItem(this.data.objectData._id); //just drop for now...throw/shoot/swing next!
+                setTimeout(() => {
+                  this.el.object3D.visible = true;
+                }, 3000);
+              } else if (this.throwAction.sourceObjectMod.toLowerCase() == "remove") {
+                if (this.mouseDowntime <= 0) {
+                  this.mouseDowntime = 1;
+                }
+                this.objexEl.components.mod_objex.throwObject(this.data.objectData._id, this.mouseDowntime, "5");
+              }
+              if (this.triggerAudioController != null) {
+                this.triggerAudioController.components.trigger_audio_control.playAudioAtPosition(this.hitpoint, this.distance, ["throw"], .5);//tagmangler needs an array
+              }
+            }
+            if (this.hasShootAction) {
+              console.log("shoot action " + JSON.stringify(this.shootAction));
+              // if (this.shootAction.sourceObjectMod.toLowerCase() == "persist") { //transfer to scene inventory
+              //   this.el.object3D.visible = false;
+              //   DropInventoryItem(this.data.objectData._id); //just drop for now...throw/shoot/swing next!
+              //   setTimeout(() => {
+              //     this.el.object3D.visible = true;
+              //   }, 3000);
+              // } else if (this.throwAction.sourceObjectMod.toLowerCase() == "remove") {
+              //   if (this.mouseDowntime <= 0) {
+              //     this.mouseDowntime = 1;
+              //   }
+              //   this.objexEl.components.mod_objex.shootObject(this.data.objectData._id, this.mouseDowntime, "5");
+              // }
+              if (this.triggerAudioController != null) {
+                this.triggerAudioController.components.trigger_audio_control.playAudioAtPosition(this.hitpoint, this.distance, ["shoot"], .5);//tagmangler needs an array, add vol mod 
+              }
+              this.el.object3D.visible = false;
+              this.el.classList.remove("activeObjexRay");
+              setTimeout(() => {
+                this.el.object3D.visible = true;
+                this.el.classList.add("activeObjexRay");
+              }, 3000);
+              this.objexEl.components.mod_objex.shootObject(this.data.objectData._id);
+              // this.applyForce();
+              
+            } 
+            if (this.hasTriggerAction) {
+    
+            }
+            if (this.selectAction) {
+              console.log("select action " + JSON.stringify(this.selectAction));
+              if (this.selectAction.actionResult.toLowerCase() == "trigger fx") { //e.g. light a torch
+                if (!this.isTriggered) {
+                  this.isTriggered = true;
+                  let particleSpawner = document.getElementById('particleSpawner');
+                  if (particleSpawner != null) {
+                    this.loc = this.el.getAttribute('position');
+                    if (this.data.objectData.yPosFudge != null && this.data.objectData.yPosFudge != "") {
+                      var worldPosition = new THREE.Vector3();
+                      this.el.object3D.getWorldPosition(worldPosition);
+                      console.log("this.loc.y " + worldPosition + " plus" + this.data.objectData.yPosFudge);
+                      worldPosition.y += this.data.objectData.yPosFudge;
+                    }
+                    let particle_spawner = particleSpawner.components.particle_spawner;
+                    if (particle_spawner != null) {
+                      particleSpawner.components.particle_spawner.spawnParticles(worldPosition, this.data.objectData.particles, 5, this.el.id, this.data.objectData.yPosFudge, this.data.objectData.color1, this.data.objectData.triggerScale);
+                    }
+                    
+                  }
+                } else {
+                  console.log("already triggered - make it a toggle!");
+                }
+              }
+            }       
+          }
         }
-  
       });
     },
     coolDownTimer: function () {

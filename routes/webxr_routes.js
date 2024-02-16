@@ -1038,7 +1038,8 @@ webxr_router.get('/:_id', function (req, res) {
                                     sceneModelLocations.push(sceneResponse.sceneLocations[i]); // if no model will set a default below
                                 }
                                 if (sceneResponse.sceneLocations[i].markerType != undefined && sceneResponse.sceneLocations[i].type.toLowerCase() != 'geographic') { //cloudmarkers, special type allows local mods
-                                    if (sceneResponse.sceneLocations[i].markerType.toLowerCase() == "placeholder" 
+                                    if (sceneResponse.sceneLocations[i].markerType.toLowerCase() == "none" 
+                                        || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "placeholder" 
                                         || sceneResponse.sceneLocations[i].markerType.toLowerCase().includes("trigger") 
                                         || sceneResponse.sceneLocations[i].markerType.toLowerCase().includes("collider") 
                                         || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "poi" 
@@ -1712,7 +1713,7 @@ webxr_router.get('/:_id', function (req, res) {
                                     ground = "ground: flat; dressing: none;"
                                 }
                                 if (sceneResponse.sceneUseDynamicShadows) {
-                                    shadow = "shadow: true; shadowSize: 25;"
+                                    shadow = "shadow: true; shadowSize: 10;"
                                 } else {
                                     shadow = " shadow: false ";
                                 }

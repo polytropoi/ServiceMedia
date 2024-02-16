@@ -109,7 +109,13 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
               // this.el.object3D.updateMatrix(); 
               // this.el.object3D.position.set({x: parseFloat(this.data.position.x), y: parseFloat(this.data.position.y), z: parseFloat(this.data.position.z)});
               // this.el.object3D.rotation.set(this.data.rotation);
-              
+              if (this.data.markerType == "collider") {
+                this.data.modelID = "primitive_cube";
+              } 
+
+              if (this.data.markerType == "object" && this.data.objectID.length > 8) {
+                this.loadObject(this.data.objectID);
+              } 
               if ((!this.data.modelID || this.data.modelID == undefined || this.data.modelID == "" || this.data.modelID == "none") && !this.data.modelID.toString().includes("primitive")) {
 
                 if (this.data.markerType.toLowerCase() == "placeholder") {
@@ -121,6 +127,8 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
                     this.el.classList.add("waypoint");
                   } else if (this.data.markerType.toLowerCase().includes("trigger")) {
                     this.el.setAttribute('gltf-model', '#poi1');  
+                  } else if (this.data.markerType.toLowerCase().includes("collider")) {
+                    // this.el.setAttribute("geometry", {primitive: "box", width: 1, height: 1, depth: 1});
                   } else if (this.data.markerType.toLowerCase() == "gate") {
                     this.el.setAttribute('gltf-model', '#gate2');
                     // this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"placeholder"});
@@ -248,6 +256,12 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
                             this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"placeholder", scaleFactor: 1});
                             // this.el.setAttribute("color", "lime");
                             
+                        } else if (this.data.markerType.includes("collider")) {
+                          this.el.setAttribute("material", {color: "tomato", transparent: true, opacity: .5});
+
+                          this.el.setAttribute("mod_physics", {body: "static", isTrigger: false, model:"collider", scaleFactor: 1});
+                          // this.el.setAttribute("color", "lime");
+                          
                         } else if (this.data.markerType == "gate") {
 
                           // console.log("gotsa gate truyna set mod_physics...");
@@ -542,7 +556,7 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
         }
       });
       this.el.addEventListener('mouseup', function (evt) {
-        console.log("tryna mouseup localmarker type " + that.data.markerType);
+        console.log(" mouseup localmarker type " + that.data.markerType);
   
         if (that.data.markerType.toLowerCase() == "mailbox") {
           console.log('tryna sho0w messages modal');
@@ -554,7 +568,7 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
   
     },
     loadObject: function (objectID) { //local object swap (maybe with child model...);
-      console.log("tryna load modeID " + objectID);
+      console.log("tryna load OBJECT ID " + objectID);
       if (objectID != undefined && objectID != null & objectID != "none" && objectID != "") {  
         for (let i = 0; i < sceneObjects.length; i++) {
           if (sceneObjects[i]._id == objectID) {
@@ -586,6 +600,9 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
       } 
     },
     updateMaterials: function () {
+      if (this.data.tags.includes("color")) {
+        this.el.setAttribute("material", {color: this.data.eventData.toLowerCase(), transparent: true, opacity: .5});
+      } else {
         if (this.data.markerType.toLowerCase() == "placeholder") {
             this.el.setAttribute("material", {color: "yellow", transparent: true, opacity: .5});
         } else if (this.data.markerType.toLowerCase() == "poi") {
@@ -595,8 +612,10 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
         } else if (this.data.markerType.toLowerCase() == "waypoint") {
             this.el.setAttribute("material", {color: "green", transparent: true, opacity: .5});
             // this.el.setAttribute("color", "purple");
-        } else if (this.data.markerType.toLowerCase().includes("trigger")) {
+          } else if (this.data.markerType.toLowerCase().includes("trigger")) {
             this.el.setAttribute("material", {color: "lime", transparent: true, opacity: .5});
+        } else if (this.data.markerType.toLowerCase().includes("collider")) {
+          this.el.setAttribute("material", {color: "tomato", transparent: true, opacity: .5});
         } else if (this.data.markerType.toLowerCase() == "gate") {
             this.el.setAttribute("material", {color: "orange", transparent: true, opacity: .5});
         } else if (this.data.markerType.toLowerCase() == "portal") {
@@ -606,6 +625,7 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
         } else {
 
         }
+      }
     },
     // loadModell: function (modelID) { //local model swap
     //     console.log("tryna load modeID " + modelID);
@@ -747,6 +767,11 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
         this.el.removeAttribute("gltf-model");
         this.el.removeAttribute("mod_particles");
         this.el.removeAttribute("light");
+
+        if (this.data.markerType == "collider") {
+          this.data.modelID = "primitive_cube";
+        } 
+        
         if (modelID != undefined && modelID != null & modelID != "none" && modelID != "") {  
           if (modelID.toString().includes("primitive")) {
               console.log("LOCALMARKER PRIMITIVE " + modelID + " scale " + 1);
@@ -773,6 +798,11 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
                   this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"placeholder", scaleFactor: this.data.scale});
                   // this.el.setAttribute("color", "lime");
                   
+              } else if (this.data.markerType.includes("collider")) {
+                this.el.setAttribute("material", {color: "tomato", transparent: true, opacity: .5});
+                this.el.setAttribute("mod_physics", {body: "static", isTrigger: false, model:"collider", scaleFactor: this.data.scale});
+                // this.el.setAttribute("color", "lime");
+                
               } else if (this.data.markerType.toLowerCase() == "gate") {
                   this.el.setAttribute("material", {color: "orange", transparent: true, opacity: .5});
                   this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"placeholder", scaleFactor: this.data.scale});

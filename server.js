@@ -2948,7 +2948,7 @@ app.get('/inventory/:_id', requiredAuthentication, usercheck, function (req, res
 });
 
 app.get('/user_inventory/:_id', requiredAuthentication, function(req, res){
-    if (req.params._id != undefined && req.params._id != null) {
+    if (req.params._id != undefined && req.params._id != null && ObjectID.isValid(req.params._id)) { 
         var u_id = ObjectID(req.params._id);
         db.inventory_items.find({"userID": u_id}, function (err, items){
             if (err || !items) {
@@ -11787,8 +11787,9 @@ app.post('/add_scene_mods/:s_id', requiredAuthentication, admin, function (req, 
                                             if ((scene.sceneLocations[i].tags && scene.sceneLocations[i].tags.includes("no mods"))) {
                                                 console.log("mods not allowed for " + scene.sceneLocations[i].timestamp)
                                             } else {
+                                                console.log("tryna update location item " + JSON.stringify(req.body.locationMods[l]));
                                                 db.scenes.update(
-                                                    { 'short_id': req.params.s_id, 'sceneLocations.timestamp': tsVar}, //could either one, ugh
+                                                    { 'short_id': req.params.s_id, 'sceneLocations.timestamp': tsVar}, 
                                                     { $set: { 'sceneLocations.$' : req.body.locationMods[l]} } //replaces whole object in array, uses positional $ operator https://docs.mongodb.com/manual/tutorial/update-documents/#Updating-The%24positionaloperator
                                                 )
                                             }
@@ -11804,7 +11805,7 @@ app.post('/add_scene_mods/:s_id', requiredAuthentication, admin, function (req, 
                                 }
                             } 
                             // if (req.body.timedEventMods != null) {
-                                console.log("tryna save timed events : " + JSON.stringify(query));
+                                // console.log("tryna save timed events : " + JSON.stringify(query));
                             //     query.sceneTimedEvents = req.body.timedEventMods;
                             // }
                             // db.scenes.update({ '_id': scene._id },

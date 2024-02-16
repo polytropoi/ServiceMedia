@@ -162,8 +162,8 @@ function InitIDB() {
                                                          cursor.value.locations[i].eulerx, 
                                                          cursor.value.locations[i].eulery, 
                                                          cursor.value.locations[i].eulerz, 
-
-                                                         cursor.value.locations[i].modelID);   
+                                                         cursor.value.locations[i].modelID,
+                                                         cursor.value.locations[i].objectID);   
                      } else {
                         let modModelComponent = cloudEl.components.mod_model;
                         if (modModelComponent) {
@@ -207,7 +207,7 @@ function InitIDB() {
                                                             zrot: cursor.value.locations[i].eulerz,
                                                             // rotation: cursor.value.locations[i].eulerx+","+cursor.value.locations[i].eulery +","+ cursor.value.locations[i].eulerz,
                                                             // scale: {x: cursor.value.locations[i].markerObjScale, y: cursor.value.locations[i].markerObjScale, z: cursor.value.locations[i].markerObjScale} derp
-                                                            scale: cursor.value.locations[i].markerObjScale
+                                                            scale: cursor.value.locations[i].markerObjScale,
                                                          });
                      localEl.id = cursor.value.locations[i].timestamp.toString(); //for lookups
                   }
@@ -238,6 +238,7 @@ function InitIDB() {
             // settings.sceneColor3 = localData.settings.sceneColor3;
             // settings.sceneColor4 = localData.settings.sceneColor4;
             InitLocalColors();
+
             lastLocalUpdate = localData.lastUpdate;
             // console.log("COPIED LOCALDATA locations length " + localData.locations.length + " " + JSON.stringify(localData) + " last cloud update " +  lastCloudUpdate + " vs last local update " + lastLocalUpdate);
             if (lastCloudUpdate && lastLocalUpdate) {
@@ -252,7 +253,11 @@ function InitIDB() {
                   console.log("COPIED LOCALDATA locations length " + localData.locations.length + " last cloud update " +  lastCloudUpdate + " vs last local update " + lastLocalUpdate);
                }
             }
-            
+            let objexEl = document.getElementById('sceneObjects');    
+            if (objexEl) {
+               objexEl.components.mod_objex.updateModdedObjects();
+            }
+             //eventdata should have the name of a location with spawn markertype
           }
       };
       modQuery.onerror = function () {
@@ -951,10 +956,13 @@ function SaveModToLocal(locationKey) { //locationKey is now just timestamp of th
    locItem.description = document.getElementById('locationDescription').value;
    locItem.markerType = document.getElementById('locationMarkerType').value;
    locItem.eventData = document.getElementById('locationEventData').value;
+   locItem.locationTarget = document.getElementById('locationTarget').value;
    locItem.timestamp = locationKey;
    locItem.markerObjScale = document.getElementById("modelScale").value;
+
    // locItem.phID = locationKey.toString();
    locItem.type = "Worldspace";
+
    locItem.isLocal = true;
    locItem.locationTags = document.getElementById("locationTags").value;
    if (locItem.name.includes('local ')) {
@@ -969,6 +977,7 @@ function SaveModToLocal(locationKey) { //locationKey is now just timestamp of th
 
    locItem.objectID = document.getElementById('locationObject').value; //object _id
    locItem.objectName = ReturnObjectName(locItem.objectID);
+
    // if ((locItem.objectID || locItem.objectID != "" || locItem.objectID != undefined) && locItem.markerType == "none" || locItem.markerType == "" || locItem.markerType == undefined) {
    //    locItem.markerType = "object";
    // }
@@ -1006,6 +1015,7 @@ function SaveModToLocal(locationKey) { //locationKey is now just timestamp of th
          localData.locations[i].model = locItem.model;
          localData.locations[i].objectID = locItem.objectID;
          localData.locations[i].objectName = locItem.objectName;
+         localData.locations[i].targetLocation = locItem.targetLocation;
 
          hasLocal = true;
          let theEl = document.getElementById(locationKey.toString());
@@ -1032,6 +1042,7 @@ function SaveModToLocal(locationKey) { //locationKey is now just timestamp of th
                modModelComponent.data.yrot = locItem.eulery;
                modModelComponent.data.zrot = locItem.eulerz;
                modModelComponent.data.scale = locItem.markerObjScale;
+               modModelComponent.data.tags = locItem.locationTags;
                modModelComponent.loadModel(locItem.modelID); 
                
                // modModelComponent.updateMaterials();
@@ -1046,6 +1057,7 @@ function SaveModToLocal(locationKey) { //locationKey is now just timestamp of th
                cloudMarkerComponent.data.yrot = locItem.eulery;
                cloudMarkerComponent.data.zrot = locItem.eulerz;
                cloudMarkerComponent.data.scale = locItem.markerObjScale;
+               cloudMarkerComponent.data.tags = locItem.locationTags;
                cloudMarkerComponent.loadModel(locItem.modelID); 
                cloudMarkerComponent.updateMaterials();
             } else if (localMarkerComponent) {
@@ -1059,6 +1071,8 @@ function SaveModToLocal(locationKey) { //locationKey is now just timestamp of th
                localMarkerComponent.data.yrot = locItem.eulery;
                localMarkerComponent.data.zrot = locItem.eulerz;
                localMarkerComponent.data.scale = locItem.markerObjScale;
+               localMarkerComponent.data.tags = locItem.locationTags;
+               
                localMarkerComponent.loadModel(locItem.modelID); 
                localMarkerComponent.updateMaterials();
 
@@ -1420,6 +1434,7 @@ function ReturnLocationTable () { //just show em all now!
          let namestring = "<span style=\x22color: white; \x22>"+namelabel+"</span>";
          if (localData.locations[i].isLocal != null && localData.locations[i].isLocal === true) {
             namestring = "<span style=\x22color: pink; \x22>"+namelabel+"</span>";
+            hasLocalData = true;
          }  
 
          let markerString = "<span style=\x22color: white; font-weight: bold;\x22>"+localData.locations[i].markerType+"</span>";
@@ -1433,6 +1448,16 @@ function ReturnLocationTable () { //just show em all now!
             markerString = "<span style=\x22color: blue; font-weight: bold;\x22>"+localData.locations[i].markerType+"</span>";
          }  else if (localData.locations[i].markerType == "gate") { 
             markerString = "<span style=\x22color: coral; font-weight: bold;\x22>"+localData.locations[i].markerType+"</span>";
+         } else if (localData.locations[i].markerType == "object") { 
+            markerString = "<span style=\x22color: salmon; font-weight: bold;\x22>"+localData.locations[i].markerType+"</span>";
+         } else if (localData.locations[i].markerType == "trigger") { 
+            markerString = "<span style=\x22color: silver; font-weight: bold;\x22>"+localData.locations[i].markerType+"</span>";
+         } else if (localData.locations[i].markerType == "collider") { 
+            markerString = "<span style=\x22color: firebrick; font-weight: bold;\x22>"+localData.locations[i].markerType+"</span>";
+         } else if (localData.locations[i].markerType == "navmesh") { 
+            markerString = "<span style=\x22color: skyblue; font-weight: bold;\x22>"+localData.locations[i].markerType+"</span>";
+         } else if (localData.locations[i].markerType == "light") { 
+            markerString = "<span style=\x22color: palegoldenrod; font-weight: bold;\x22>"+localData.locations[i].markerType+"</span>";
          } 
 
          console.log("locMdl " +localData.locations[i].model + " " + localData.locations[i].modelID);

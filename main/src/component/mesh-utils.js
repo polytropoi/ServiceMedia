@@ -14,7 +14,7 @@ if (typeof AFRAME === 'undefined') {
   throw new Error('Component attempted to register before AFRAME was available.');
 }
 
-AFRAME.registerComponent('mod_physics', { //used by models, placeholders, instanced meshes, not objects which manage physics settings in mod_object
+AFRAME.registerComponent('mod_physics', { //used by models, placeholders, instanced meshes, but NOT objects which manage physics settings in mod_object
   schema: {
     model: {default: ''},
     scaleFactor: {type: 'number', default: 1},
@@ -29,9 +29,13 @@ AFRAME.registerComponent('mod_physics', { //used by models, placeholders, instan
     tags: {default: []},
     attractorID: {default: ''},
     attractorLocation: {default: ''},
-    cooldownTime: {default: 2.0}
+    cooldownTime: {default: 2.0},
+    offsetx: {default: 0},
+    offsety: {default: 0},
+    offsetz: {default: 0},
   },
   init() {
+    this.offset = this.data.offsetx + " " + this.data.offsety + " " + this.data.offsetz;
     this.isTrigger = this.data.isTrigger;
     this.model = this.data.model;
     this.body = this.data.body;
@@ -80,7 +84,7 @@ AFRAME.registerComponent('mod_physics', { //used by models, placeholders, instan
       console.log("truyna init mod_physics for id " + this.el.id + " model " + this.model +" isTrigger "+ this.isTrigger + " body " + this.data.body + " scalefactor " + this.data.scaleFactor );
       this.el.setAttribute('ammo-body', {type: 'kinematic', emitCollisionEvents: this.isTrigger}); //placeholder model already loaded in mod_mode//nope, markers can have meshes
       
-          this.el.setAttribute("ammo-shape", {type: 'sphere', fit: 'manual', sphereRadius: this.data.scaleFactor, offset: '0 .5 0'});
+          this.el.setAttribute("ammo-shape", {type: 'sphere', fit: 'manual', sphereRadius: this.data.scaleFactor * .5, offset: '0 .5 0'});
        
         } else {
           console.log("caint fine no physics settings!@ ");
@@ -100,19 +104,28 @@ AFRAME.registerComponent('mod_physics', { //used by models, placeholders, instan
         }
         // console.log("tryna load placeholder  " + this.isTrigger);
 
-    
-    } else if (this.data.model == "agent") { //must be kinematic, moves as nav-agent on navmesh
+      } else if (this.data.model == "agent") { //must be kinematic, moves as nav-agent on navmesh
 
-      if (settings && settings.usePhysicsType == "ammo") {
-      // console.log("truyna init mod_physics for id " + this.el.id + " model " + this.model +" isTrigger "+ this.isTrigger + " body " + this.data.body );
-      this.el.setAttribute('ammo-body', {type: 'kinematic', emitCollisionEvents: this.isTrigger}); //placeholder model already loaded in mod_model
- 
+        if (settings && settings.usePhysicsType == "ammo") {
+          // console.log("truyna init mod_physics for id " + this.el.id + " model " + this.model +" isTrigger "+ this.isTrigger + " body " + this.data.body );
+          this.el.setAttribute('ammo-body', {type: 'kinematic', emitCollisionEvents: this.isTrigger}); //placeholder model already loaded in mod_model
           this.el.setAttribute("ammo-shape", {type: "box"});
-    
         }
-        // console.log("tryna load agent  " + this.isTrigger);
-    
-    } else {
+          // console.log("tryna load agent  " + this.isTrigger);
+      
+      }  else if (this.data.model == "collider") { //must be kinematic, moves as nav-agent on navmesh
+
+        if (settings && settings.usePhysicsType == "ammo") {
+          console.log("statoc mod_physics for id " + this.el.id + " model " + this.model +" isTrigger "+ this.isTrigger + " body " + this.data.body );
+          this.el.setAttribute('ammo-body', {type: 'static', emitCollisionEvents: this.isTrigger}); 
+          // const scalefactor = this.data.scaleFactor + ' ' +
+          this.el.setAttribute('ammo-shape', {type: 'box', fit: 'manual', halfExtents: '1 1 1' });
+          // this.el.setAttribute('ammo-shape', {type: 'box'});
+      
+        }
+          // console.log("tryna load agent  " + this.isTrigger);
+      
+      } else {
       if (this.el.object3D) {
         let modObjectComponent = this.el.components.mod_object;
         if (!modObjectComponent) {
