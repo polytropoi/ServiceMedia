@@ -2367,8 +2367,11 @@ AFRAME.registerComponent('mod_object', {
       //   alphaToCoverage: true,
       // } );
       this.geometry = new THREE.BufferGeometry().setFromPoints( this.points );
-      this.line = new THREE.Line( this.geometry, this.material );
-      this.el.sceneEl.object3D.add( this.line );
+      if (settings && settings.debugMode) {
+        this.line = new THREE.Line( this.geometry, this.material );
+        this.el.sceneEl.object3D.add( this.line );
+      }
+
       this.followPath = true;
     },
     applyForce: function () {
@@ -2494,12 +2497,10 @@ AFRAME.registerComponent('mod_object', {
           } else {
           this.currentPos = this.curve.getPoint(this.posIndex / 100);
           this.currentTan = this.curve.getTangent(this.posIndex / 100).normalize();
-          // this.el.object3D.getWorldDirection(this.currentRot);
-          // this.el.object3D.rotation.set(this.currentRot);
-          // console.log("tryna set positionn to" + JSON.stringify(this.currentPos));
+         
           this.el.object3D.position.copy(this.currentPos);
-  
-          this.el.object3D.lookAt(this.curve.getPoint(99/100).negate());
+          this.equipHolder.object3D.getWorldQuaternion(this.el.object3D.quaternion);
+         
   
         } 
       }
