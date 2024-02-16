@@ -4831,4 +4831,95 @@ AFRAME.registerComponent('load_threesvg', {
     // }
     
   });
+//from https://dk-dust.glitch.me/
+  AFRAME.registerComponent("dust", {
+    init: function () {
+      console.log("init");
+      this.dist = 50.0;
 
+      // Create a particle system
+      this.particleCount = 2500;
+      const positions = new Float32Array(this.particleCount * 3);
+      const velocities = new Float32Array(this.particleCount * 3);
+
+      const rv = 0.01;
+
+      for (let i = 0; i < this.particleCount; i++) {
+        // const x = Math.random() * 10 - 5;
+        // const y = Math.random() * 10 - 5;
+        // const z = Math.random() * 10 - 5;
+        const x = THREE.MathUtils.randFloatSpread(75);
+        const y =THREE.MathUtils.randFloat(1,20);
+        const z = THREE.MathUtils.randFloatSpread(75);
+        positions[i * 3] = x;
+        positions[i * 3 + 1] = y;
+        positions[i * 3 + 2] = z;
+        velocities[i * 3] = Math.random() * rv - rv / 2;
+        velocities[i * 3 + 1] = Math.random() * rv - rv / 2;
+        velocities[i * 3 + 2] = Math.random() * rv - rv / 2;
+      }
+
+      this.particleGeometry = new THREE.BufferGeometry();
+      this.particleGeometry.setAttribute(
+        "position",
+        new THREE.BufferAttribute(positions, 3)
+      );
+      this.particleGeometry.setAttribute(
+        "velocity",
+        new THREE.BufferAttribute(velocities, 3)
+      );
+      var colors = [];
+      var color = new THREE.Color();
+      var colorList = ['skyblue', 'navy', 'blue'];
+      if (settings && settings.sceneColor2 && settings.sceneColor3 && settings.sceneColor4 ) {
+        colorList = [settings.sceneColor2, settings.sceneColor3, settings.sceneColor4];
+      }
+      for (let i = 0; i < this.particleGeometry.attributes.position.count; i++) {
+        color.set(colorList[THREE.MathUtils.randInt(0, colorList.length - 1)]);
+        color.toArray(colors, i * 3);
+      }
+      this.particleGeometry.setAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+      // const particleMaterial = new THREE.PointsMaterial({
+      //   map: new THREE.TextureLoader().load(
+      //     "http://servicemedia.s3.amazonaws.com/assets/pics/sparkle.png"
+      //   ),
+      //   opacity: 0.9,
+      //   transparent: true,
+      //   color: 0xffffff,
+      //   size: 0.5,
+      // });
+      const material = new THREE.PointsMaterial({ size: .25, map: new THREE.TextureLoader().load("http://servicemedia.s3.amazonaws.com/assets/pics/sparkle.png"), 
+                                                opacity: 0.5, blending: THREE.AdditiveBlending, depthTest: false, transparent: true, vertexColors: true });
+      this.particleSystem = new THREE.Points(
+        this.particleGeometry,
+        material
+      );
+      this.el.setObject3D("mesh", this.particleSystem);
+    },
+
+    tick: function (t, dt) {
+      // Move particles
+      const positionsArray =
+        this.particleGeometry.attributes.position.array;
+      const velocityArray = this.particleGeometry.attributes.velocity.array;
+      for (let i = 0; i < this.particleCount; i++) {
+        positionsArray[i * 3] += velocityArray[i * 3];
+        positionsArray[i * 3 + 1] += velocityArray[i * 3 + 1];
+        positionsArray[i * 3 + 2] += velocityArray[i * 3 + 2];
+
+        // Wrap particles around when they go beyond a certain range
+        if (positionsArray[i * 3] > this.dist) positionsArray[i * 3] = -this.dist;
+        if (positionsArray[i * 3 + 1] > this.dist)
+          positionsArray[i * 3 + 1] = -this.dist;
+        if (positionsArray[i * 3 + 2] > this.dist)
+          positionsArray[i * 3 + 2] = -this.dist;
+        if (positionsArray[i * 3] < -this.dist) positionsArray[i * 3] = this.dist;
+        if (positionsArray[i * 3 + 1] < -this.dist)
+          positionsArray[i * 3 + 1] = this.dist;
+        if (positionsArray[i * 3 + 2] < -this.dist)
+          positionsArray[i * 3 + 2] = this.dist;
+      }
+
+      this.particleGeometry.attributes.position.needsUpdate = true;
+    },
+  });

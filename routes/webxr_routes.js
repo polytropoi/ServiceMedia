@@ -1817,7 +1817,8 @@ webxr_router.get('/:_id', function (req, res) {
                                     //     "opacity: 0.1; "+
                                     //     "size: 3, 3, 3, 0\x22></a-entity>";
                                     // spe-particles="texture: assets/blob.png; particle-count: 300; max-age: 3; distribution: sphere; color: #888; color-spread: 1 1 1, 0 0 0; size: 0,2,0"
-                                    skyParticles = "<a-entity position=\x220 5 0\x22 sky_particles=\x22size: .1; type: dust; src: http://servicemedia.s3.amazonaws.com/assets/pics/sparkle.png\x22></a-entity>";
+                                    // skyParticles = "<a-entity position=\x220 5 0\x22 sky_particles=\x22size: .1; type: dust; src: http://servicemedia.s3.amazonaws.com/assets/pics/sparkle.png\x22></a-entity>";
+                                    skyParticles = "<a-entity position=\x220 0 0\x22 dust></a-entity>";
 
                                     imageAssets = imageAssets + "<img id=\x22sparkle1\x22 src=\x22http://servicemedia.s3.amazonaws.com/assets/pics/sparkle.png\x22 crossorigin=\x22anonymous\x22>";
                                 } else if (sceneResponse.sceneSkyParticles.toLowerCase() == "rain") {
