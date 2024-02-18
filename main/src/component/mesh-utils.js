@@ -4579,7 +4579,11 @@ AFRAME.registerComponent('load_threesvg', {
               localData.locations[i].eulery = this.rotation.y.toFixed(2);
               localData.locations[i].eulerz = this.rotation.z.toFixed(2);
               localData.locations[i].markerObjScale = this.scale.x.toFixed(2);
+              localData.locations[i].xscale = this.scale.x.toFixed(2);
+              localData.locations[i].yscale = this.scale.y.toFixed(2);  
+              localData.locations[i].zscale = this.scale.z.toFixed(2);
               localData.locations[i].isLocal = true;
+
               console.log("saving location data: " + JSON.stringify(localData.locations[i]));
               // document.getElementById('xpos').value = this.position.x.toFixed(2);
               // document.getElementById('ypos').value = this.position.y.toFixed(2);

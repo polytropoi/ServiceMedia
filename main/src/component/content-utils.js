@@ -1670,14 +1670,16 @@ AFRAME.registerComponent('model-callout', {
       });
       this.el.addEventListener('mouseenter', function (evt) {
         // this.modelHitDistance = this.modParent.returnHitDistance();
-        this.modelHitDistance = evt.detail.intersection.distance;
-        console.log("hit distance is " + evt.detail.intersection.distance);
-        
-        // console.log("hit distance is " + JSON.stringify(this.modelHitDistance));
-        calloutEntity.setAttribute('visible', true);
-        let pos = evt.detail.intersection.point; //hitpoint on model
-        calloutEntity.setAttribute("position", pos);
-        calloutEntity.setAttribute("scale", {"x": this.modelHitDistance * .1, "y": this.modelHitDistance * .1, "z": this.modelHitDistance * .1})
+        if (evt.detail.intersection) {
+          this.modelHitDistance = evt.detail.intersection.distance;
+          console.log("hit distance is " + evt.detail.intersection.distance);
+          
+          // console.log("hit distance is " + JSON.stringify(this.modelHitDistance));
+          calloutEntity.setAttribute('visible', true);
+          let pos = evt.detail.intersection.point; //hitpoint on model
+          calloutEntity.setAttribute("position", pos);
+          calloutEntity.setAttribute("scale", {"x": this.modelHitDistance * .1, "y": this.modelHitDistance * .1, "z": this.modelHitDistance * .1});
+        }
         // calloutText.updateMatrixWorld();
       });
       this.el.addEventListener('mouseleave', function (evt) {

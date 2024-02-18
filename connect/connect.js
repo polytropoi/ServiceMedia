@@ -194,7 +194,7 @@ function InitIDB() {
                     
                      localEl.setAttribute("position", {x: cursor.value.locations[i].x, y: cursor.value.locations[i].y, z: cursor.value.locations[i].z });
                      localEl.setAttribute("rotation", {x: cursor.value.locations[i].eulerx, y: cursor.value.locations[i].eulery, z: cursor.value.locations[i].eulerz });
-                     localEl.setAttribute("scale", {x: cursor.value.locations[i].markerObjScale, y: cursor.value.locations[i].markerObjScale, z: cursor.value.locations[i].markerObjScale});
+                     // localEl.setAttribute("scale", {x: cursor.value.locations[i].markerObjScale, y: cursor.value.locations[i].markerObjScale, z: cursor.value.locations[i].markerObjScale});
                      
                      localEl.setAttribute("local_marker", { timestamp: cursor.value.locations[i].timestamp,
                                                             name: cursor.value.locations[i].name, 
@@ -210,6 +210,9 @@ function InitIDB() {
                                                             xrot: cursor.value.locations[i].eulerx,
                                                             yrot: cursor.value.locations[i].eulery,
                                                             zrot: cursor.value.locations[i].eulerz,
+                                                            xscale: cursor.value.locations[i].xscale,
+                                                            yscale: cursor.value.locations[i].yscale,
+                                                            zscale: cursor.value.locations[i].zscale,
                                                             // rotation: cursor.value.locations[i].eulerx+","+cursor.value.locations[i].eulery +","+ cursor.value.locations[i].eulerz,
                                                             // scale: {x: cursor.value.locations[i].markerObjScale, y: cursor.value.locations[i].markerObjScale, z: cursor.value.locations[i].markerObjScale} derp
                                                             scale: cursor.value.locations[i].markerObjScale,
@@ -337,7 +340,7 @@ function SaveLocalData() {  //persist mods an alt "~" version of the data
    if (!('indexedDB' in window)) {
       console.log("This browser doesn't support IndexedDB");
       return;
-    }
+   }
    const request = indexedDB.open("SMXR", 1);
    request.onerror = (event) => {
       console.error("could not connect to iDB " + event);
@@ -563,8 +566,8 @@ $(function() {
         hls.loadSource(settings.sceneVideoStreams[0]);
         hls.attachMedia(video);
         hls.on(Hls.Events.MEDIA_ATTACHED, function () {
-          // video.muted = true;
-          video.play();
+            // video.muted = true;
+            video.play();
         });
       }
       // hls.js is not supported on platforms that do not have Media Source Extensions (MSE) enabled.
@@ -652,11 +655,11 @@ function GetMatrixData() {
 
                }
             } 
-           
+         
          }
          // matrixMeshEl.components.matrix_meshes.loadRoomData(data);
       }
-      });
+   });
    // }
 }
 

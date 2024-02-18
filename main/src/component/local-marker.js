@@ -22,9 +22,14 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
       xrot: {type: 'number', default: 0},//in degrees, trans to radians below
       yrot: {type: 'number', default: 0},
       zrot: {type: 'number', default: 0},
-      // rotation: {default: ''},
 
-      scale: {default: 1},
+      // rotation: {default: ''},
+      xscale: {type: 'number', default: 0},
+      yscale: {type: 'number', default: 0},
+      zscale: {type: 'number', default: 0},
+
+      scale: {type: 'number', default: 1},
+
       isNew: {default: false}
   
     },
@@ -43,7 +48,30 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
       // this.scale = {x: this.data.scale.x, y: this.data.scale.y, z: this.data.scale.z};
       // this.scale = new THREE.Vector3(this.data.scale, this.data.scale, this.data.scale);
       // this.threeScale = 
-  
+      // this.scalex = 1;
+      // this.scaley = 1;
+      // this.scalez = 1;
+      // this.scaleNonUniform = new THREE.Vector3();
+      // let scaleSplit = null;
+      // if (this.data.scale.toString().includes(',')) {
+      //   scaleSplit = this.data.scale.split(',');
+      //   if (scaleSplit.lengh == 3) {
+      //     this.scalex = parseFloat(scaleSplit[0]).toFixed(2);
+      //     this.scaley = parseFloat(scaleSplit[1]).toFixed(2);
+      //     this.scalez = parseFloat(scaleSplit[2]).toFixed(2);
+      //     this.scaleNonUniform.x = this.scalex;
+      //     this.scaleNonUniform.y = this.scaley;
+      //     this.scaleNonUniform.z = this.scalez;
+      //   }
+      // }
+
+      this.scaleVector = new THREE.Vector3(this.data.scale,this.data.scale,this.data.scale); 
+      if (this.data.xscale) {
+        this.scaleVector.x = this.data.xscale;
+        this.scaleVector.y = this.data.yscale;
+        this.scaleVector.z = this.data.zscale;
+      }
+
       var sceneEl = document.querySelector('a-scene');
   
       this.calloutEntity = document.createElement("a-entity");
@@ -294,9 +322,20 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
                       }
                     }
                 }
-                let scale = parseFloat(this.data.scale);
+                // let scale = parseFloat(this.data.scale);
                 console.log("localmarker with + " + this.data.scale + " rot " + this.data.xrot + this.data.yrot + this.data.zrot);
-                this.el.object3D.scale.set(scale,scale,scale);
+                // if (this.data.xscale) {
+                //   this.el.object3D.scale.set(this.data.xscale,this.data.yscale,this.data.zscale);
+                // } else {
+                //   this.el.object3D.scale.set(this.data.scale,this.data.scale,this.data.scale);
+                // }
+                if (this.data.xscale) {
+                  this.scaleVector.x = this.data.xscale;
+                  this.scaleVector.y = this.data.yscale;
+                  this.scaleVector.z = this.data.zscale;
+                }
+                // this.el.object3D.scale.set(this.scaleVector);
+                this.el.setAttribute("scale", this.scaleVector.x + " " + this.scaleVector.y + " " +this.scaleVector.z);
                 this.el.object3D.position.set(this.data.xpos, this.data.ypos, this.data.zpos);
                 // this.el.object3D.rotation.set(THREE.MathUtils.degToRad(this.data.xrot), THREE.MathUtils.degToRad(this.data.xrot), THREE.MathUtils.degToRad(this.data.xrot));
                 this.el.setAttribute("rotation", this.data.xrot + " " + this.data.yrot + " " +this.data.zrot);
@@ -945,9 +984,17 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
           }
         }
         this.updateMaterials();
+
         let scale = parseFloat(this.data.scale);
+        
         console.log("localmarker with + " + this.data.scale + " rot " + this.data.xrot + this.data.yrot + this.data.zrot);
-        this.el.object3D.scale.set(scale,scale,scale);
+        if (this.data.xscale) {
+          this.scaleVector.x = this.data.xscale;
+          this.scaleVector.y = this.data.yscale;
+          this.scaleVector.z = this.data.zscale;
+        }
+        this.el.object3D.scale.set(this.scaleVector);
+        
         this.el.object3D.position.set(this.data.xpos, this.data.ypos, this.data.zpos);
         // this.el.object3D.rotation.set(THREE.MathUtils.degToRad(this.data.xrot), THREE.MathUtils.degToRad(this.data.xrot), THREE.MathUtils.degToRad(this.data.xrot));
         this.el.setAttribute("rotation", this.data.xrot + " " + this.data.yrot + " " +this.data.zrot);
