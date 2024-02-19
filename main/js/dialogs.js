@@ -1435,7 +1435,7 @@ function ReturnCurrentPlayerLocation() {
 function InitLocalColors() {
   console.log("tryna InitLocalColors " + JSON.stringify(localData.settings));
   let enviroEl = document.getElementById('enviroEl');
-  if (enviroEl != null && settings.allowMods && localData.settings.sceneColor1 != "#000000") {
+  if (enviroEl != null && settings.allowMods && localData.settings.sceneColor1) {
       enviroEl.setAttribute('environment', {
         groundColor: localData.settings.sceneColor3,
         groundColor2: localData.settings.sceneColor4,

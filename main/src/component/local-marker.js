@@ -24,9 +24,9 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
       zrot: {type: 'number', default: 0},
 
       // rotation: {default: ''},
-      xscale: {type: 'number', default: 0},
-      yscale: {type: 'number', default: 0},
-      zscale: {type: 'number', default: 0},
+      xscale: {type: 'number', default: 1},
+      yscale: {type: 'number', default: 1},
+      zscale: {type: 'number', default: 1},
 
       scale: {type: 'number', default: 1},
 
@@ -66,7 +66,7 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
       // }
 
       this.scaleVector = new THREE.Vector3(this.data.scale,this.data.scale,this.data.scale); 
-      if (this.data.xscale) {
+      if (this.data.xscale) { //well, yeah
         this.scaleVector.x = this.data.xscale;
         this.scaleVector.y = this.data.yscale;
         this.scaleVector.z = this.data.zscale;
@@ -142,7 +142,7 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
               } 
 
               if (this.data.markerType == "object" && this.data.objectID.length > 8) {
-                this.loadObject(this.data.objectID);
+                this.loadObject(this.data.objectID); //off in the woods...
               } 
               if ((!this.data.modelID || this.data.modelID == undefined || this.data.modelID == "" || this.data.modelID == "none") && !this.data.modelID.toString().includes("primitive")) {
 

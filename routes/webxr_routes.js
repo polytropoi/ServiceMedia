@@ -1547,7 +1547,7 @@ webxr_router.get('/:_id', function (req, res) {
                                     joystickScript = "<script src=\x22https://cdn.jsdelivr.net/gh/diarmidmackenzie/superframe@fix-orbit-controls/components/orbit-controls/dist/aframe-orbit-controls.min.js\x22></script>";
                                 
                                 ///////////////// - Fixed camera - /////////////////
-                                } else if (sceneResponse.sceneCameraMode != undefined && sceneResponse.sceneCameraMode.toLowerCase().includes("fixed")) { //hrm..
+                                } else if (sceneResponse.sceneCameraMode != undefined && sceneResponse.sceneCameraMode.toLowerCase() == "fixed rotate") { //hrm..
                                     let lookcontrols = "look-controls=\x22magicWindowTrackingEnabled: false; reverseTouchDrag: true\x22";
                                     if (sceneResponse.sceneTags != null && (sceneResponse.sceneTags.includes('magicwindow') || sceneResponse.sceneTags.includes('magic window'))) {
                                         lookcontrols = "look-controls=\x22reverseTouchDrag: true\x22"; // because magicwinders enabled by default
@@ -1577,6 +1577,37 @@ webxr_router.get('/:_id', function (req, res) {
                                        
                                        
                                         "</a-entity></a-entity>";
+                                } else if (sceneResponse.sceneCameraMode != undefined && sceneResponse.sceneCameraMode.toLowerCase() == "fixed") { //hrm..
+                                            let lookcontrols = "look-controls=\x22magicWindowTrackingEnabled: false; reverseTouchDrag: true\x22";
+                                            if (sceneResponse.sceneTags != null && (sceneResponse.sceneTags.includes('magicwindow') || sceneResponse.sceneTags.includes('magic window'))) {
+                                                lookcontrols = "look-controls=\x22reverseTouchDrag: true\x22"; // because magicwinders enabled by default
+                                            }
+                                            wasd = "";
+                                            // wasd = "wasd-controls=\x22fly: true; acceleration: "+sceneResponse.scenePlayer.playerSpeed+"\x22 simple-navmesh-constraint=\x22navmesh:#nav-mesh;fall:10; height:0;\x22";
+                                            // wasd = "extended_wasd_controls=\x22flyEnabled: false; moveSpeed: 4; inputType: keyboard\x22";
+                                            // wasd = "extended_wasd_thirdperson=\x22fly: false; moveSpeed: "+sceneResponse.scenePlayer.playerSpeed+"; inputType: keyboard\x22 simple-navmesh-constraint=\x22navmesh:#nav-mesh;fall:10; height: 0\x22";
+                                                // cameraRigEntity = "<a-entity "+lookcontrols+" follow-camera=\x22target: #player\x22>" +
+                                                //     "<a-entity camera rotation=\x22"+playerRotation+"\x22 position=\x22"+playerPosition+"\x22 ></a-entity>" +
+                                                // "</a-entity>"+
+                                            cameraRigEntity = "<a-entity camera position=\x22"+playerPosition+"\x22></a-entity>"+
+                                            "<a-entity id=\x22cameraRig\x22 initializer "+
+                                        
+                                                " id=\x22mouseCursor\x22 cursor=\x22rayOrigin: mouse\x22 raycaster=\x22objects: .activeObjexRay\x22>"+
+                                                // "<a-entity id=\x22player\x22 "+wasd+" "+ physicsMod +" position=\x22"+playerPosition+"\x22>"+
+                                                "<a-entity id=\x22player\x22 >"+
+                                                    "<a-entity id=\x22equipPlaceholder\x22 geometry=\x22primitive: box; height: .1; width: .1; depth: .1\x22 position=\x220 -.65 -.75\x22"+
+                                                    "material=\x22opacity: 0\x22></a-entity>"+
+                                                    "<a-entity id=\x22viewportPlaceholder\x22 geometry=\x22primitive: plane; height: 0.01; width: .01\x22 position=\x220 0 -1.5\x22"+
+                                                    "material=\x22opacity: 0\x22></a-entity>"+
+                                                    "<a-entity id=\x22viewportPlaceholder3\x22 geometry=\x22primitive: plane; height: 0.01; width: .01\x22 position=\x220 0 -3\x22"+
+                                                    "material=\x22opacity: 0\x22></a-entity>"+
+                                                    "<a-entity id=\x22thirdPersonPlaceholder\x22 position=\x220 0 0\x22></a-entity>"+
+                                                    "<a-entity id=\x22playCaster\x22 position=\x220 .5 .5\x22></a-entity>"+
+                                                    // "<a-sphere visible=\x22true\x22 scale=\x220.45 0.5 0.4\x22 random-color></a-sphere>"+
+                                                "</a-entity>"+
+                                               
+                                               
+                                                "</a-entity></a-entity>";
 
                                 ///////////////// - First Person camera - /////////////////        
                                 } else { 
@@ -1696,15 +1727,15 @@ webxr_router.get('/:_id', function (req, res) {
                                 
                                 // enviromentScript = "<script src=\x22../main/ref/aframe/dist/aframe_environment_component.min.js\x22></script>"; --ronment-component
                                 enviromentScript = "<script src=\x22../main/src/component/aframe-environment-component_m3.js\x22></script>";
-                                // let ground = "";
-                                // let skycolor = "";
-                                // let groundcolor = "";
-                                // let groundcolor2 = "";
-                                // let dressingcolor = "";
-                                // let horizoncolor = "";
+                                let ground = "";
+                                let skycolor = "";
+                                let groundcolor = "";
+                                let groundcolor2 = "";
+                                let dressingcolor = "";
+                                let horizoncolor = "";
                                 
-                                // let fog = "";
-                                // let tweakColors = "";
+                                let fog = "";
+                                let tweakColors = "";
                                 if (webxrEnv == "none") {
                                     ground = "ground: none;"
                                     // hemiLight = "<a-light id=\x22hemi-light\x22 type=\x22hemisphere\x22 color=\x22" + sceneResponse.sceneColor1 + "\x22 groundColor=\x22" + sceneResponse.sceneColor2 + "\x22 intensity=\x22.5\x22 position\x220 0 0\x22>"+
@@ -2014,7 +2045,7 @@ webxr_router.get('/:_id', function (req, res) {
                         callback();
                     }
                 },
-                function (callback) { //DEPRECATED!//not yet... still used for "cloud_markers", vs "local_markers"
+                function (callback) { //DEPRECATED!//not yet... still used for "cloud_markers", vs "local_markers" 
                     if (locationPlaceholders.length > 0) {
                         for (let i = 0; i < locationPlaceholders.length; i++) {
                             //use the "cloud_marker" component for certain markertypes () TODO rename it to mod_location // nope
@@ -2022,9 +2053,13 @@ webxr_router.get('/:_id', function (req, res) {
                             if (locationPlaceholders[i].markerObjScale && locationPlaceholders[i].markerObjScale != 0 && locationPlaceholders[i].markerObjScale != "") {
                                 scale = locationPlaceholders[i].markerObjScale;
                             }
+                            const xscale = locationPlaceholders[i].xscale != null ? locationPlaceholders[i].xscale : scale;
+                            const yscale = locationPlaceholders[i].yscale != null ? locationPlaceholders[i].yscale : scale;
+                            const zscale = locationPlaceholders[i].zscale != null ? locationPlaceholders[i].zscale : scale;   
                             placeholderEntities = placeholderEntities + "<a-entity id=\x22"+locationPlaceholders[i].timestamp+"\x22 class=\x22activeObjexGrab activeObjexRay envMap placeholders\x22 cloud_marker=\x22phID: "+
                             locationPlaceholders[i].phID+"; scale: "+scale+"; xpos: "+locationPlaceholders[i].x+"; ypos: "+locationPlaceholders[i].y+"; zpos: "+locationPlaceholders[i].z+";" +
-                            "xrot: "+locationPlaceholders[i].eulerx+"; yrot: "+locationPlaceholders[i].eulery+"; zrot: "+locationPlaceholders[i].eulerz+"; modelID: "+locationPlaceholders[i].modelID+"; model: "+
+                            "xrot: "+locationPlaceholders[i].eulerx+"; yrot: "+locationPlaceholders[i].eulery+"; zrot: "+locationPlaceholders[i].eulerz+"; "+
+                            "xscale: "+xscale+"; yscale: "+yscale+"; zscale: "+zscale+"; modelID: "+locationPlaceholders[i].modelID+"; model: "+
                             locationPlaceholders[i].model+"; markerType: "+locationPlaceholders[i].markerType+";  tags: "+locationPlaceholders[i].locationTags+"; isNew: false; name: "+
                             locationPlaceholders[i].name+"; description: "+locationPlaceholders[i].description+";eventData: "+locationPlaceholders[i].eventData+"; timestamp: "+locationPlaceholders[i].timestamp+";\x22 "+
                             skyboxEnvMap+ " position=\x22"+locationPlaceholders[i].x+" "+locationPlaceholders[i].y+ " " +locationPlaceholders[i].z+"\x22 rotation=\x22"+locationPlaceholders[i].eulerx+" "+locationPlaceholders[i].eulery+ " " +locationPlaceholders[i].eulerz+"\x22></a-entity>";

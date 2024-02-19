@@ -22,6 +22,10 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
       xrot: {type: 'number', default: 0},//in degrees, trans to radians below
       yrot: {type: 'number', default: 0},
       zrot: {type: 'number', default: 0},
+        // rotation: {default: ''},
+      xscale: {type: 'number', default: 1},
+      yscale: {type: 'number', default: 1},
+      zscale: {type: 'number', default: 1},
       description: {default: ''},
       allowMods: {default: false}
     },
@@ -41,7 +45,14 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
       this.font1 = "Acme.woff";
       this.font2 = "Acme.woff";
 
-    this.scale = this.data.scale.toString() + " " + this.data.scale.toString() + " " + this.data.scale.toString();
+    // this.scale = this.data.scale.toString() + " " + this.data.scale.toString() + " " + this.data.scale.toString();
+    this.scaleVector = new THREE.Vector3(this.data.scale,this.data.scale,this.data.scale); 
+    // if (this.data.xscale) { //well, yeah
+      this.scaleVector.x = this.data.xscale;
+      this.scaleVector.y = this.data.yscale;
+      this.scaleVector.z = this.data.zscale;
+    // }
+
     // this.scale = "1 1 1";
       if (settings && settings.sceneFontWeb1) {
         this.font1 = settings.sceneFontWeb1;
@@ -82,7 +93,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
         // locItem.objName = this.data.objName;
         // locItem.phID = this.phID;
   
-        //   console.log("CLOUDMARKER " + this.data.modelID + " " + this.data.name);
+          console.log("CLOUDMARKER " + this.data.modelID + " " + this.data.xscale + " " + this.data.yscale  + " " + this.data.zscale );
 
           
             if ((!this.data.modelID || this.data.modelID == undefined || this.data.modelID == "" || this.data.modelID == "none") && !this.data.modelID.toString().includes("primitive")) {
@@ -251,6 +262,26 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                   // }
                   
               }
+              // if (this.data.xscale) {
+              //   this.scaleVector.x = this.data.xscale;
+              //   this.scaleVector.y = this.data.yscale;
+              //   this.scaleVector.z = this.data.zscale;
+              // }
+                // this.el.object3D.scale.set(this.scaleVector);
+              // this.el.setAttribute("scale", this.scaleVector.x + " " + this.scaleVector.y + " " +this.scaleVector.z);
+              // this.el.object3D.position.set(this.data.xpos, this.data.ypos, this.data.zpos);
+              // // this.el.object3D.rotation.set(THREE.MathUtils.degToRad(this.data.xrot), THREE.MathUtils.degToRad(this.data.xrot), THREE.MathUtils.degToRad(this.data.xrot));
+              // this.el.setAttribute("rotation", this.data.xrot + " " + this.data.yrot + " " +this.data.zrot);
+              // console.log("TRYNA SCALE TO " + this.data.xscale + " " + this.data.yscale + " " + this.data.zscale);
+              // if (this.data.xscale) {
+              //   this.scaleVector.x = this.data.xscale;
+              //   this.scaleVector.y = this.data.yscale;
+              //   this.scaleVector.z = this.data.zscale;
+              // }
+              this.el.setAttribute("scale", this.data.xscale + " " + this.data.yscale + " " + this.data.zscale);
+              this.el.object3D.position.set(this.data.xpos, this.data.ypos, this.data.zpos);
+              // this.el.object3D.rotation.set(THREE.MathUtils.degToRad(this.data.xrot), THREE.MathUtils.degToRad(this.data.xrot), THREE.MathUtils.degToRad(this.data.xrot));
+              this.el.setAttribute("rotation", this.data.xrot + " " + this.data.yrot + " " +this.data.zrot);
             }
             if (this.data.tags.includes("hide gizmo") || (settings && settings.hideGizmos)) {
               if (this.data.markerType != "mailbox" && this.data.markerType != "light") {
@@ -266,7 +297,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
         if (this.data.objectID != undefined && this.data.objectID != null && this.data.objectID != "none" && this.data.objectID != "") { //hrm, cloudmarker objex?
 
         }
-        this.el.setAttribute('scale', this.scale);
+        // this.el.setAttribute('scale', this.scale);
           // localStorage.setItem(this.phID, JSON.stringify(locItem)); 
         
         if (this.data.markerType.toLowerCase() == "player") {
@@ -371,7 +402,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
             });
           }
         }
-        this.el.setAttribute('scale', this.scale);
+        // this.el.setAttribute('scale', this.scale);
       });
        
       this.el.addEventListener('mouseenter', (evt) => {
@@ -395,7 +426,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
   
           // let elPos = this.el.getAttribute('position');
           // console.log(pos);
-          if (!this.data.tags.includes("hide callout") && this.calloutEntity != null && this.data.markerType != "light") { // umm...
+          if (this.data.tags && !this.data.tags.includes("hide callout") && this.calloutEntity != null && this.data.markerType != "light") { // umm...
     
             if (this.distance < 66) {
             this.calloutEntity.setAttribute("position", pos);
@@ -636,7 +667,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
     remove: function () {
         console.log("removing something!");
     },
-    updateAndLoad: function (name, description, tags, eventData, markerType, scale, xpos, ypos, zpos, xrot, yrot, zrot, modelID, objectID) {
+    updateAndLoad: function (name, description, tags, eventData, markerType, scale, xpos, ypos, zpos, xrot, yrot, zrot, xscale, yscale, zscale, modelID, objectID) {
         this.data.name = name;
         this.data.description = description;
         this.data.tags = tags;
@@ -650,6 +681,10 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
         this.data.xrot = xrot;
         this.data.yrot = yrot;
         this.data.zrot = zrot;
+        this.data.xscale = xscale;
+        this.data.yscale = yscale;
+        this.data.zscale = zscale;
+        console.log("tryna scale to " + xscale + " " + yscale+ " " + zscale);
         // setTimeout(() => {
         if (this.data.markerType == "object" && objectID.length > 8) {
           this.loadObject(objectID);
@@ -895,6 +930,8 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                 this.el.setAttribute("mod_flicker", {type: "candle"});
               }    
           }
+         
+
           if (this.data.tags && this.data.tags.includes("hide gizmo") || (settings && settings.hideGizmos)) {
             if (this.data.markerType != "mailbox" && this.data.markerType != "light") {
               this.el.object3D.visible = false;
@@ -907,14 +944,28 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
           }
         }
         this.updateMaterials();
-        // this.updateMaterials();
-        let scale = parseFloat(this.data.scale);
-        console.log(this.data.name + " localmarker with + " + this.data.scale + " pos " + this.data.xpos + this.data.ypos + this.data.zpos + " rot " + this.data.xrot + this.data.yrot + this.data.zrot);
-        this.el.object3D.scale.set(scale,scale,scale);
+        // // this.updateMaterials();
+        // let scale = parseFloat(this.data.scale);
+        // console.log(this.data.name + " localmarker with + " + this.data.scale + " pos " + this.data.xpos + this.data.ypos + this.data.zpos + " rot " + this.data.xrot + this.data.yrot + this.data.zrot);
+        // this.el.object3D.scale.set(scale,scale,scale);
+        // this.el.object3D.position.set(this.data.xpos, this.data.ypos, this.data.zpos);
+        // // this.el.object3D.rotation.set(THREE.MathUtils.degToRad(this.data.xrot), THREE.MathUtils.degToRad(this.data.xrot), THREE.MathUtils.degToRad(this.data.xrot));
+        // this.el.setAttribute("rotation", this.data.xrot + " " + this.data.yrot + " " +this.data.zrot);
+        // this.el.object3D.rotation.x += Math.PI;
+
+        console.log("TRYNA SCALE TO " + this.data.xscale + " " + this.data.yscale + " " + this.data.zscale);
+        // if (this.data.xscale) {
+          this.scaleVector.x = this.data.xscale;
+          this.scaleVector.y = this.data.yscale;
+          this.scaleVector.z = this.data.zscale;
+        // }
+        this.el.setAttribute("scale", this.data.xscale + " " + this.data.yscale + " " + this.data.zscale);
         this.el.object3D.position.set(this.data.xpos, this.data.ypos, this.data.zpos);
         // this.el.object3D.rotation.set(THREE.MathUtils.degToRad(this.data.xrot), THREE.MathUtils.degToRad(this.data.xrot), THREE.MathUtils.degToRad(this.data.xrot));
         this.el.setAttribute("rotation", this.data.xrot + " " + this.data.yrot + " " +this.data.zrot);
         // this.el.object3D.rotation.x += Math.PI;
+        
+        // this.el.object3D.updateMatrix(); 
         
         this.el.object3D.updateMatrix(); 
 

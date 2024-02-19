@@ -471,7 +471,7 @@ AFRAME.registerComponent('mod_model', {
                 if (node instanceof THREE.Mesh) {
                 this.meshChildren.push(node);
   
-                console.log("gotsa callout!");
+                // console.log("gotsa callout!");
                 
                 }
               }
@@ -520,7 +520,7 @@ AFRAME.registerComponent('mod_model', {
                 // console.log("character node name " + node.name);
                 if (node instanceof THREE.Mesh) {
                   // 
-                  console.log("character node mesh name " + node.name);
+                  // console.log("character node mesh name " + node.name);
                   // const box = new THREE.Box3();
                     node.frustumCulled = false;
                     
@@ -1297,7 +1297,7 @@ AFRAME.registerComponent('mod_model', {
             }  
           });
           this.el.addEventListener('mouseenter', (evt) =>  {
-            console.log("MOD_MODEL mouseovewr model " + this.el.id + this.hasLocationCallout + this.data.markerType + this.hasCallout + evt.detail);
+            // console.log("MOD_MODEL mouseovewr model " + this.el.id + this.hasLocationCallout + this.data.markerType + this.hasCallout + evt.detail);
            
             if (evt.detail.intersection != null) {
               if (textData.length > 0) {

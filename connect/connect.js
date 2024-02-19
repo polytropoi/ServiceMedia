@@ -141,12 +141,13 @@ function InitIDB() {
                console.log("cursor " + i + " of " + cursor.value.locations.length);
                localData.locations.push(cursor.value.locations[i]);
                if (cursor.value.locations[i].isLocal != undefined && cursor.value.locations[i].isLocal) { //only update ones with local changes
-                  console.log(cursor.value.locations[i].name + " markerType " + cursor.value.locations[i].markerType + " isLocal!" + " rot " + cursor.value.locations[i].eulerx + cursor.value.locations[i].eulerz + cursor.value.locations[i].eulerz );
+                  console.log(cursor.value.locations[i].name + " markerType " + cursor.value.locations[i].markerType + " isLocal!" + " scale " + cursor.value.locations[i].xscale + cursor.value.locations[i].yscale + cursor.value.locations[i].zscale );
                   let cloudEl = document.getElementById(cursor.value.locations[i].timestamp);
                   if (cloudEl) { //prexisting elements (cloud_marker, mod_model, mod_object) already rendered onload
                      cloudEl.setAttribute("position", {x: cursor.value.locations[i].x, y: cursor.value.locations[i].y, z: cursor.value.locations[i].z });
                      cloudEl.setAttribute("rotation", {x: cursor.value.locations[i].eulerx, y: cursor.value.locations[i].eulery, z: cursor.value.locations[i].eulerz });
-                     cloudEl.setAttribute("scale", {x: cursor.value.locations[i].markerObjScale, y: cursor.value.locations[i].markerObjScale, z: cursor.value.locations[i].markerObjScale});
+                     // cloudEl.setAttribute("scale", {x: cursor.value.locations[i].markerObjScale, y: cursor.value.locations[i].markerObjScale, z: cursor.value.locations[i].markerObjScale});
+                     cloudEl.setAttribute("scale", {x: cursor.value.locations[i].xscale, y: cursor.value.locations[i].yscale, z: cursor.value.locations[i].zscale});
                      let cloudMarkerComponent = cloudEl.components.cloud_marker;
                      if (cloudMarkerComponent) {  
 
@@ -162,6 +163,9 @@ function InitIDB() {
                                                          cursor.value.locations[i].eulerx, 
                                                          cursor.value.locations[i].eulery, 
                                                          cursor.value.locations[i].eulerz, 
+                                                         cursor.value.locations[i].xscale,
+                                                         cursor.value.locations[i].yscale,
+                                                         cursor.value.locations[i].zscale,
                                                          cursor.value.locations[i].modelID,
                                                          cursor.value.locations[i].objectID);   
                      } else {
@@ -266,7 +270,7 @@ function InitIDB() {
                objexEl.components.mod_objex.updateModdedObjects();
             }
              //eventdata should have the name of a location with spawn markertype
-             if (settings.playerPositions.length) {
+             if (settings.playerPositions.length > 1) {
                console.log("gots PLAYERPOSITIONS " + settings.playerPositions);
                if (settings.playerPositions.length) {
                   PlayerToLocation(settings.playerPositions[Math.floor(Math.random() * settings.playerPositions.length)]);
@@ -812,6 +816,17 @@ function SaveModsToCloud() { //Save button on location modal
       mods.shortID = room;
       mods.userData = userData;
       mods.locationMods = localData.locations;
+      for (let i = 0; i < mods.locationMods.length; i++) { //pop the properties for non-uniform scaling...
+         if (mods.locationMods[i].xscale == null) {
+            mods.locationMods[i].xscale = mods.locationMods[i].markerObjScale;
+         }
+         if (mods.locationMods[i].yscale == null) {
+            mods.locationMods[i].yscale = mods.locationMods[i].markerObjScale;
+         }
+         if (mods.locationMods[i].zscale == null) {
+            mods.locationMods[i].zscale = mods.locationMods[i].markerObjScale;
+         }
+      }
       // mods.colorMods = {};
       if (localData.settings.sceneColor1 != "" || localData.settings.sceneColor2 != "" || localData.settings.sceneColor3 != "" || localData.settings.sceneColor4 != "") { //defined globally above
          mods.colorMods = {sceneColor1: localData.settings.sceneColor1, sceneColor2: localData.settings.sceneColor2, sceneColor3: localData.settings.sceneColor3, sceneColor4: localData.settings.sceneColor4};
@@ -821,6 +836,7 @@ function SaveModsToCloud() { //Save button on location modal
       }
       mods.timedEventMods = localData.timeKeysData;
       console.log(JSON.stringify(mods));
+
       // var encodedString = btoa(JSON.stringify(mods));
       // console.log(encodedString);
       var xhr = new XMLHttpRequest();
