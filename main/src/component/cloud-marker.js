@@ -413,7 +413,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
         if (evt.detail.intersection) {
           this.clientX = evt.clientX;
           this.clientY = evt.clientY;
-          // console.log("tryna mouseover placeholder");
+          console.log("mousenter cloudmarker " +  this.data.name + this.data.tags);
           this.calloutToggle = !this.calloutToggle;
           let pos = evt.detail.intersection.point; //hitpoint on model
           this.hitPosition = pos;
@@ -423,11 +423,17 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
           this.rayhit(evt.detail.intersection.object.name, this.distance, evt.detail.intersection.point);
        
           this.selectedAxis = name;
-  
+          
           // let elPos = this.el.getAttribute('position');
           // console.log(pos);
-          if (this.data.tags && !this.data.tags.includes("hide callout") && this.calloutEntity != null && this.data.markerType != "light") { // umm...
-    
+          let hideCallout = false;
+          if (this.data.tags) {
+            if (this.data.tags.includes("hide callout")) {
+              hideCallout = true;
+            }
+          }
+          if (!hideCallout && this.calloutEntity != null && this.data.markerType != "light") { // umm...
+            console.log("tryna show the callout " + this.distance);
             if (this.distance < 66) {
             this.calloutEntity.setAttribute("position", pos);
             this.calloutEntity.setAttribute('visible', true);
@@ -438,7 +444,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
            
             let theLabel = this.data.name != undefined ? this.data.name : "";
             let calloutString = theLabel;
-            console.log("tryna show the callout " + this.distance + " " + calloutString);
+            
             // if (this.calloutToggle) {
             //   // calloutString = "x : " + elPos.x.toFixed(2) + "\n" +"y : " + elPos.y.toFixed(2) + "\n" +"z : " + elPos.z.toFixed(2);
             //   calloutString = this.data.description != '' ? this.data.description : theLabel;
