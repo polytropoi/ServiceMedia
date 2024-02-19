@@ -975,6 +975,7 @@ function SaveModToLocal(locationKey) { //locationKey is now just timestamp of th
    hasLocalData = true;
    let locItem = {};
    
+   
    // let keySplit = locationKey.split("~");
    locItem.x = document.getElementById('xpos').value;
    locItem.eulerx = document.getElementById('xrot').value.length > 0 ? document.getElementById('xrot').value : '0';
@@ -1022,7 +1023,7 @@ function SaveModToLocal(locationKey) { //locationKey is now just timestamp of th
    for (let i = 0; i < localData.locations.length; i++) {
       console.log("chck : " + localData.locations[i].timestamp.toString() + " vs " +locationKey.toString());
       if (localData.locations[i].timestamp.toString() == locationKey.toString() ) {
-         console.log("updating existing element "+locationKey+"  : " + JSON.stringify(locItem));
+        
          // localData.locations[i] = Object.assign(locItem); //merge?
          // locItem.x = document.getElementById('xpos').value;
          localData.locations[i].x = locItem.x;
@@ -1052,7 +1053,19 @@ function SaveModToLocal(locationKey) { //locationKey is now just timestamp of th
          hasLocal = true;
          let theEl = document.getElementById(locationKey.toString());
          if (theEl != null) {
-            console.log("found the EL: " + locationKey + " locItem name " + locItem.name);
+            
+            //get loc props from object...
+
+            let o3D = theEl.object3D;
+            let o3DScale = new THREE.Vector3();
+            o3D.getWorldScale(o3DScale);
+            console.log("found the EL: " + locationKey + " locItem name " + locItem.name + " scale " + JSON.stringify(o3DScale));
+            localData.locations[i].xscale = o3DScale.x;
+            localData.locations[i].yscale = o3DScale.y;
+            localData.locations[i].zscale = o3DScale.z;
+            locItem.xscale = o3DScale.x;
+            locItem.yscale = o3DScale.y;
+            locItem.zscale = o3DScale.z;
             let scale = (locItem.markerObjScale != undefined && locItem.markerObjScale != null && locItem.markerObjScale != "") ? locItem.markerObjScale : 1;
             // theEl.setAttribute('position', {x: locItem.x, y: locItem.y, z: locItem.z});
             // theEl.setAttribute('rotation', {x: locItem.eulerx, y: locItem.eulery, z: locItem.eulerz});
@@ -1073,6 +1086,9 @@ function SaveModToLocal(locationKey) { //locationKey is now just timestamp of th
                modModelComponent.data.xrot = locItem.eulerx;
                modModelComponent.data.yrot = locItem.eulery;
                modModelComponent.data.zrot = locItem.eulerz;
+               modModelComponent.data.xscale = locItem.xscale;
+               modModelComponent.data.yscale = locItem.yscale;
+               modModelComponent.data.zscale = locItem.zscale;
                modModelComponent.data.scale = locItem.markerObjScale;
                modModelComponent.data.tags = locItem.locationTags;
                modModelComponent.loadModel(locItem.modelID); 
@@ -1088,6 +1104,9 @@ function SaveModToLocal(locationKey) { //locationKey is now just timestamp of th
                cloudMarkerComponent.data.xrot = locItem.eulerx;
                cloudMarkerComponent.data.yrot = locItem.eulery;
                cloudMarkerComponent.data.zrot = locItem.eulerz;
+               cloudMarkerComponent.data.xscale = locItem.xscale;
+               cloudMarkerComponent.data.yscale = locItem.yscale;
+               cloudMarkerComponent.data.zscale = locItem.zscale;
                cloudMarkerComponent.data.scale = locItem.markerObjScale;
                cloudMarkerComponent.data.tags = locItem.locationTags;
                cloudMarkerComponent.loadModel(locItem.modelID); 
@@ -1102,6 +1121,9 @@ function SaveModToLocal(locationKey) { //locationKey is now just timestamp of th
                localMarkerComponent.data.xrot = locItem.eulerx;
                localMarkerComponent.data.yrot = locItem.eulery;
                localMarkerComponent.data.zrot = locItem.eulerz;
+               localMarkerComponent.data.xscale = locItem.xscale;
+               localMarkerComponent.data.yscale = locItem.yscale;
+               localMarkerComponent.data.zscale = locItem.zscale;
                localMarkerComponent.data.scale = locItem.markerObjScale;
                localMarkerComponent.data.tags = locItem.locationTags;
                
@@ -1109,8 +1131,11 @@ function SaveModToLocal(locationKey) { //locationKey is now just timestamp of th
                localMarkerComponent.updateMaterials();
 
             }
+            console.log("updating existing element "+locationKey+"  : " + JSON.stringify(locItem));
             SaveLocalData();
+            
             break;
+            
          } else {
             // SaveLocalData();
             console.log("DINT FIND THE EL " + locationKey);
@@ -1571,7 +1596,7 @@ function CreatePlaceholder () { //New Location button
    // phEl.id 
    sceneEl.appendChild(phEl);
    phEl.setAttribute('position', newPosition);
-   phEl.setAttribute('local_marker', {timestamp: timestamp, isNew: true, position: newPosition} );
+   phEl.setAttribute('local_marker', {timestamp: timestamp, isNew: true, xpos: locItem.x, ypos: locItem.y, zpos: locItem.z} );
 
    SaveLocalData();
    ShowHideDialogPanel();

@@ -417,12 +417,12 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
           this.calloutToggle = !this.calloutToggle;
           let pos = evt.detail.intersection.point; //hitpoint on model
           this.hitPosition = pos;
-          let name = evt.detail.intersection.object.name;
+          // let name = evt.detail.intersection.object.name;
         //   this.distance = window.playerPosition.distanceTo(pos);
             this.distance = evt.detail.intersection.distance;
           this.rayhit(evt.detail.intersection.object.name, this.distance, evt.detail.intersection.point);
        
-          this.selectedAxis = name;
+          // this.selectedAxis = name;
           
           // let elPos = this.el.getAttribute('position');
           // console.log(pos);
@@ -438,17 +438,9 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
             this.calloutEntity.setAttribute("position", pos);
             this.calloutEntity.setAttribute('visible', true);
             this.calloutEntity.setAttribute('scale', {x: this.distance * .25, y: this.distance * .25, z: this.distance * .25} );
-            // if (this.data.markerType == "poi" && !this.data.modelID) {
-            //   this.el.setAttribute('scale', {x: this.distance * .25, y: this.distance * .25, z: this.distance * .25} );
-            // }
-           
+              
             let theLabel = this.data.name != undefined ? this.data.name : "";
             let calloutString = theLabel;
-            
-            // if (this.calloutToggle) {
-            //   // calloutString = "x : " + elPos.x.toFixed(2) + "\n" +"y : " + elPos.y.toFixed(2) + "\n" +"z : " + elPos.z.toFixed(2);
-            //   calloutString = this.data.description != '' ? this.data.description : theLabel;
-            // }
             this.calloutText.setAttribute("troika-text", {value: calloutString});
           }
         }
@@ -481,7 +473,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                   return; //don't do stuff below if transform enabled
               }
           }
-          if (that.data.markerType == "link" && !that.data.isNew) {
+          if (that.data.markerType == "link") {
             if (that.data.eventData.includes("href~")) {
 
                 let urlSplit = that.data.eventData.split("~");

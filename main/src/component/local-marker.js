@@ -65,12 +65,12 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
       //   }
       // }
 
-      this.scaleVector = new THREE.Vector3(this.data.scale,this.data.scale,this.data.scale); 
-      if (this.data.xscale) { //well, yeah
-        this.scaleVector.x = this.data.xscale;
-        this.scaleVector.y = this.data.yscale;
-        this.scaleVector.z = this.data.zscale;
-      }
+      // this.scaleVector = new THREE.Vector3(this.data.scale,this.data.scale,this.data.scale); 
+      // if (this.data.xscale) { //well, yeah
+      //   this.scaleVector.x = this.data.xscale;
+      //   this.scaleVector.y = this.data.yscale;
+      //   this.scaleVector.z = this.data.zscale;
+      // }
 
       var sceneEl = document.querySelector('a-scene');
   
@@ -287,7 +287,7 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
                         } else if (this.data.markerType.includes("collider")) {
                           this.el.setAttribute("material", {color: "tomato", transparent: true, opacity: .5});
 
-                          this.el.setAttribute("mod_physics", {body: "static", isTrigger: false, model:"collider", scaleFactor: 1});
+                          // this.el.setAttribute("mod_physics", {body: "static", isTrigger: false, model:"collider", scaleFactor: 1});
                           // this.el.setAttribute("color", "lime");
                           
                         } else if (this.data.markerType == "gate") {
@@ -324,24 +324,14 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
                 }
                 // let scale = parseFloat(this.data.scale);
                 console.log("localmarker with + " + this.data.scale + " rot " + this.data.xrot + this.data.yrot + this.data.zrot);
-                // if (this.data.xscale) {
-                //   this.el.object3D.scale.set(this.data.xscale,this.data.yscale,this.data.zscale);
-                // } else {
-                //   this.el.object3D.scale.set(this.data.scale,this.data.scale,this.data.scale);
-                // }
-                if (this.data.xscale) {
-                  this.scaleVector.x = this.data.xscale;
-                  this.scaleVector.y = this.data.yscale;
-                  this.scaleVector.z = this.data.zscale;
-                }
-                // this.el.object3D.scale.set(this.scaleVector);
-                this.el.setAttribute("scale", this.scaleVector.x + " " + this.scaleVector.y + " " +this.scaleVector.z);
+              
+                this.el.object3D.scale.set(this.data.xscale, this.data.yscale, this.data.zscale);
                 this.el.object3D.position.set(this.data.xpos, this.data.ypos, this.data.zpos);
                 // this.el.object3D.rotation.set(THREE.MathUtils.degToRad(this.data.xrot), THREE.MathUtils.degToRad(this.data.xrot), THREE.MathUtils.degToRad(this.data.xrot));
                 this.el.setAttribute("rotation", this.data.xrot + " " + this.data.yrot + " " +this.data.zrot);
-                // this.el.object3D.rotation.x += Math.PI;
-               
-                // this.el.object3D.updateMatrix(); 
+                if (this.data.markerType == "collider") {
+                  this.el.setAttribute("mod_physics", {body: "static", isTrigger: false, model:"collider", scaleFactor: this.data.scale});
+                }
                 
             }
             //   if ((!this.data.modelID || this.data.modelID == undefined || this.data.modelID == "" || this.data.modelID == "none") && !this.data.modelID.toString().includes("primitive")) {
@@ -414,7 +404,7 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
             this.mousePos = new THREE.Vector2();
             this.distance = 0;
       
-            if (!this.data.tags.includes("hide callout") && !this.data.tags.includes("hide callout")) {
+            // if (this.data.tags && !this.data.tags.includes("hide callout")) {
            
               if (settings && settings.sceneCameraMode == "Third Person") {
                 this.calloutEntity.setAttribute("look-at", "#thirdPersonCamera");
@@ -445,7 +435,7 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
                 outlineWidth: "2%",
                 value: ""
               });
-            }
+            // }
       
           this.calloutText.setAttribute("overlay");
           this.calloutToggle = false;
@@ -493,7 +483,7 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
         });
 
 
-        this.el.addEventListener('mouseenter', function (evt) {
+        this.el.addEventListener('mouseenter', (evt) => {
   
   
         if (evt.detail.intersection) {
@@ -513,7 +503,7 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
           // let elPos = that.el.getAttribute('position');
           // console.log(pos);
           if (that.calloutEntity != null) {
-            console.log(that.el.id + " local_marker callout distance " + that.distance);
+           
             if (that.distance < 66) {
             that.calloutEntity.setAttribute("position", pos);
             that.calloutEntity.setAttribute('visible', true);
@@ -524,11 +514,24 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
            
             let theLabel = that.data.name != undefined ? that.data.name : "";
             let calloutString = theLabel;
-            if (that.calloutToggle) {
-              // calloutString = "x : " + elPos.x.toFixed(2) + "\n" +"y : " + elPos.y.toFixed(2) + "\n" +"z : " + elPos.z.toFixed(2);
-              calloutString = that.data.description != '' ? that.data.description : theLabel;
-            }
-            that.calloutText.setAttribute("troika-text", {value: calloutString});
+            // if (that.calloutToggle) {
+              console.log(that.el.id + " local_marker callout distance " + that.distance + " " + that.data.name );
+            //   // calloutString = "x : " + elPos.x.toFixed(2) + "\n" +"y : " + elPos.y.toFixed(2) + "\n" +"z : " + elPos.z.toFixed(2);
+            //   calloutString = that.data.description != '' ? that.data.description : theLabel;
+            // }
+            // this.calloutText.setAttribute('troika-text', {value: calloutString});
+            this.calloutText.setAttribute('troika-text', {
+              // width: .5,
+              baseline: "bottom",
+              align: "left",
+              fontSize: .1,
+              font: "/fonts/web/"+ this.font2,
+              anchor: "center",
+              color: "white",
+              outlineColor: "black",
+              outlineWidth: "2%",
+              value: that.data.name
+            });
             }
           }
         }
@@ -837,9 +840,12 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
                   this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"placeholder", scaleFactor: this.data.scale});
                   // this.el.setAttribute("color", "lime");
                   
+              } else if (this.data.markerType.toLowerCase() == "link") {
+                this.el.setAttribute("gltf-model", "#links");
+                this.el.setAttribute("material", {color: "aqua", transparent: true, opacity: .5});
               } else if (this.data.markerType.includes("collider")) {
                 this.el.setAttribute("material", {color: "tomato", transparent: true, opacity: .5});
-                this.el.setAttribute("mod_physics", {body: "static", isTrigger: false, model:"collider", scaleFactor: this.data.scale});
+                // this.el.setAttribute("mod_physics", {body: "static", isTrigger: false, model:"collider", scaleFactor: this.data.scale});
                 // this.el.setAttribute("color", "lime");
                 
               } else if (this.data.markerType.toLowerCase() == "gate") {
@@ -893,6 +899,13 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
                 this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"placeholder", scaleFactor: this.data.scale});
                 // this.el.setAttribute("color", "lime");
                 
+            } else if (this.data.markerType.toLowerCase().includes("collider")) {
+              // this.el.setAttribute("gltf-model", "#poi1");
+              this.el.setAttribute("geometry", {primitive: "box", width: this.data.xscale, height: this.data.yscale, depth: this.data.zscale});
+              this.el.setAttribute("material", {color: "tomato", transparent: true, opacity: .5});
+              
+              // this.el.setAttribute("color", "lime");
+              
             } else if (this.data.markerType.toLowerCase() == "gate") {
               
                 this.el.setAttribute("gltf-model", "#gate2");
@@ -985,15 +998,15 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
         }
         this.updateMaterials();
 
-        let scale = parseFloat(this.data.scale);
+        // let scale = parseFloat(this.data.scale);
         
         console.log("localmarker with + " + this.data.scale + " rot " + this.data.xrot + this.data.yrot + this.data.zrot);
-        if (this.data.xscale) {
-          this.scaleVector.x = this.data.xscale;
-          this.scaleVector.y = this.data.yscale;
-          this.scaleVector.z = this.data.zscale;
-        }
-        this.el.object3D.scale.set(this.scaleVector);
+        // if (this.data.xscale) {
+        //   this.scaleVector.x = this.data.xscale;
+        //   this.scaleVector.y = this.data.yscale;
+        //   this.scaleVector.z = this.data.zscale;
+        // }
+        this.el.object3D.scale.set(this.data.xscale, this.data.yscale, this.data.zscale);
         
         this.el.object3D.position.set(this.data.xpos, this.data.ypos, this.data.zpos);
         // this.el.object3D.rotation.set(THREE.MathUtils.degToRad(this.data.xrot), THREE.MathUtils.degToRad(this.data.xrot), THREE.MathUtils.degToRad(this.data.xrot));
@@ -1001,6 +1014,10 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
         // this.el.object3D.rotation.x += Math.PI;
         
         this.el.object3D.updateMatrix(); 
+        if (this.data.markerType == "collider") {
+          this.el.setAttribute("mod_physics", {body: "static", isTrigger: true, model:"collider", scaleFactor: this.data.scale});
+        }
+        
 
     },
     waitAndLoad: function () {

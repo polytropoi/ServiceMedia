@@ -33,6 +33,9 @@ AFRAME.registerComponent('mod_physics', { //used by models, placeholders, instan
     offsetx: {default: 0},
     offsety: {default: 0},
     offsetz: {default: 0},
+    xscale: {default: 1},
+    yscale: {default: 1},
+    zscale: {default: 1},
   },
   init() {
     this.offset = this.data.offsetx + " " + this.data.offsety + " " + this.data.offsetz;
@@ -113,13 +116,18 @@ AFRAME.registerComponent('mod_physics', { //used by models, placeholders, instan
         }
           // console.log("tryna load agent  " + this.isTrigger);
       
-      }  else if (this.data.model == "collider") { //must be kinematic, moves as nav-agent on navmesh
+      }  else if (this.data.model == "collider") { //static geo for worldbuilding, needs nonu scaling..
 
         if (settings && settings.usePhysicsType == "ammo") {
+          
           console.log("statoc mod_physics for id " + this.el.id + " model " + this.model +" isTrigger "+ this.isTrigger + " body " + this.data.body );
-          this.el.setAttribute('ammo-body', {type: 'static', emitCollisionEvents: this.isTrigger}); 
+          setTimeout(() => {
+            this.el.setAttribute('ammo-body', {type: 'static', emitCollisionEvents: this.isTrigger}); 
+            this.el.setAttribute("ammo-shape", {type: "box"});
+          }, 1000);
+         
           // const scalefactor = this.data.scaleFactor + ' ' +
-          this.el.setAttribute('ammo-shape', {type: 'box', fit: 'manual', halfExtents: '1 1 1' });
+          // this.el.setAttribute('ammo-shape', {type: 'box', fit: 'manual', halfExtents: '1 1 1' });
           // this.el.setAttribute('ammo-shape', {type: 'box'});
       
         }
@@ -141,6 +149,15 @@ AFRAME.registerComponent('mod_physics', { //used by models, placeholders, instan
         }
       }
     }
+
+    this.el.addEventListener('body-loaded', () => {  
+
+      if (this.data.model == "collider") {
+        this.el.setAttribute('ammo-shape', {type: "box"});
+        console.log("ammo shape is " + JSON.stringify(this.el.getAttribute('ammo-shape')));
+      }
+    });
+
 
     
     this.el.addEventListener("collidestart", (e) => { //this is for models or triggers, not objects - TODO look up locationData for tags? 
