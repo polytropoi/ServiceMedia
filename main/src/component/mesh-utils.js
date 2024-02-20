@@ -1371,7 +1371,7 @@ AFRAME.registerComponent('instanced_surface_meshes', {
                   
                   let scale = Math.random() * this.data.scaleFactor;
                   // console.log("scale " + scale);
-                  if (position.y > waterLevel) { //loop through till all of them are above the 0
+                  if (position.y > waterLevel && (Math.abs(position.x) > 10 && Math.abs(position.z) > 10)) { //loop through till all of them are above the 0, and outside the center play area
                     
                     // console.log("instance pos " + JSON.stringify(position));
                     dummy.position.set( position.x, position.y + this.data.yMod, position.z );

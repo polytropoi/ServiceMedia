@@ -773,7 +773,7 @@ function ReturnLocationModelSelect (phID) {
    let modelSelect = "<option value=\x22none\x22>none</option>";
                       
     
-    if (locationItem.modelID && locationItem.modelID.toString().includes("primitive")) {
+    if (locationItem && locationItem.modelID && locationItem.modelID.toString().includes("primitive")) {
       if (locationItem.modelID.toString().includes("cube")) {
         modelSelect = modelSelect + "<option value=\x22primitive_cube\x22 selected>cube</option>"+
                                     "<option value=\x22primitive_sphere\x22>sphere</option>"+ 
@@ -884,6 +884,7 @@ function ReturnLocationMarkerTypeSelect (selected) {
       "object",
       "surface",
       "navmesh",
+      "floorplane",
 
 
       
@@ -1010,74 +1011,92 @@ function ShowLocationModal(timestamp) {
         // "<button class=\x22infoButton\x22 onclick=\x22SceneManglerModal('Locations')\x22>Location</button>"+
         "</div>"+
 
-        "<div class=\x22row\x22><div class=\x22twocolumn\x22><label for=\x22locationName\x22>Location Name</label>"+
+        "<div class=\x22row\x22><div class=\x22threecolumn\x22><label for=\x22locationName\x22>Location Name</label>"+
         "<input class=\x22normalfield\x22 type=\x22text\x22 id=\x22locationName\x22 value=\x22"+label+"\x22></div>"+
 
-
-        "<div class=\x22twocolumn\x22><label for=\x22locationMarkerType\x22>Location Type</label>"+
-        "<select id=\x22locationMarkerType\x22 name=\x22locationMarkerType\x22>"+
-        ReturnLocationMarkerTypeSelect(thisLocation.markerType) + 
-        // "<option value=\x22placeholder\x22>placeholder</option>"+
-        // "<option value=\x22poi\x22>poi</option>"+
-        // "<option value=\x22callout\x22>callout</option>"+
-        // "<option value=\x22mailbox\x22>mailbox</option>"+
-        "</select></div></div>"+
-
-        
-        "<div class=\x22row\x22><div class=\x22twocolumn\x22><label for=\x22locationModel\x22>Location Model</label>"+
+        "<div class=\x22threecolumn\x22><label for=\x22locationModel\x22>Location Model</label>"+
         "<select id=\x22locationModel\x22 name=\x22locationModel\x22>"+
         // "<option value=\x22placeholder\x22>none</option>"+
         ReturnLocationModelSelect(phID) + //phID = scene shortID ~ cloud/localmarker ~ timestamp
         "</select></div>"+
 
 
-        "<div class=\x22row\x22><div class=\x22twocolumn\x22><label for=\x22locationObject\x22>Location Object</label>"+
+        "<div class=\x22threecolumn\x22><label for=\x22locationObject\x22>Location Object</label>"+
         "<select id=\x22locationObject\x22 name=\x22locationObject\x22 "+disabled+">"+
         // "<option value=\x22placeholder\x22>none</option>"+
         ReturnLocationObjectSelect(phID) + //phID = scene shortID ~ cloud/localmarker ~ timestamp
+        "</select></div></div>"+
+
+
+
+        "<div class=\x22row\x22><div class=\x22threecolumn\x22><label for=\x22locationMarkerType\x22>Location Type</label>"+
+        "<select id=\x22locationMarkerType\x22 name=\x22locationMarkerType\x22>"+
+        ReturnLocationMarkerTypeSelect(thisLocation.markerType) + 
+        // "<option value=\x22placeholder\x22>placeholder</option>"+
+        // "<option value=\x22poi\x22>poi</option>"+
+        // "<option value=\x22callout\x22>callout</option>"+
+        // "<option value=\x22mailbox\x22>mailbox</option>"+
         "</select></div>"+
 
+        "<div class=\x22threecolumn\x22><label for=\x22locationDescription\x22>Description</label>"+
+        "<textarea type=\x22textarea\x22 id=\x22locationDescription\x22>"+thisLocation.description+"</textarea><br></div>"+
+
+        "<div class=\x22threecolumn\x22><label for=\x22locationEventData\x22>Event Data</label>"+
+        "<textarea type=\x22textarea\x22 id=\x22locationEventData\x22>"+thisLocation.eventData+"</textarea><br></div></div>"+
         // "</div>"+
 
-        "<div class=\x22row\x22><div class=\x22twocolumn\x22><label for=\x22xpos\x22>X Position</label>"+
+        "<div class=\x22row\x22><div class=\x22threecolumn\x22><label for=\x22xpos\x22>X Position</label>"+
         "<input class=\x22xfield\x22 type=\x22number\x22 id=\x22xpos\x22 value=\x22"+thisLocation.x+"\x22></div>"+
 
-        "<div class=\x22twocolumn\x22><label for=\x22xrot\x22>X Rotation</label>"+
-        "<input class=\x22xfield\x22 type=\x22number\x22 id=\x22xrot\x22 value=\x22"+thisLocation.eulerx+"\x22></div></div>"+
-
-        "<div class=\x22twocolumn\x22><label for=\x22ypos\x22>Y Position</label>"+
+        "<div class=\x22threecolumn\x22><label for=\x22ypos\x22>Y Position</label>"+
         "<input class=\x22yfield\x22 type=\x22number\x22 id=\x22ypos\x22 value=\x22"+thisLocation.y+"\x22></div>"+
 
-        "<div class=\x22row\x22><div class=\x22twocolumn\x22><label for=\x22yrot\x22>Y Rotation</label>"+
-        "<input class=\x22yfield\x22 type=\x22number\x22 id=\x22yrot\x22 value=\x22"+thisLocation.eulery+"\x22></div></div>"+
+        "<div class=\x22threecolumn\x22><label for=\x22zpos\x22>Z Position</label>"+
+        "<input class=\x22zfield\x22 type=\x22number\x22 id=\x22zpos\x22 value=\x22"+thisLocation.z+"\x22></div></div>"+
 
+        "<div class=\x22row\x22><div class=\x22threecolumn\x22><label for=\x22xrot\x22>X Rotation</label>"+
+        "<input class=\x22xfield\x22 type=\x22number\x22 id=\x22xrot\x22 value=\x22"+thisLocation.eulerx+"\x22></div>"+
 
-        "<div class=\x22row\x22><div class=\x22twocolumn\x22><label for=\x22zpos\x22>Z Position</label>"+
-        "<input class=\x22zfield\x22 type=\x22number\x22 id=\x22zpos\x22 value=\x22"+thisLocation.z+"\x22></div>"+
+        "<div class=\x22threecolumn\x22><label for=\x22yrot\x22>Y Rotation</label>"+
+        "<input class=\x22yfield\x22 type=\x22number\x22 id=\x22yrot\x22 value=\x22"+thisLocation.eulery+"\x22></div>"+
 
-        "<div class=\x22twocolumn\x22><label for=\x22zrot\x22>Z Rotation</label>"+
+        "<div class=\x22threecolumn\x22><label for=\x22zrot\x22>Z Rotation</label>"+
         "<input class=\x22zfield\x22 type=\x22number\x22 id=\x22zrot\x22 value=\x22"+thisLocation.eulerz+"\x22></div></div>"+
 
-        "<div class=\x22twocolumn\x22><label for=\x22modelScale\x22>Scale</label><br>"+
-        "<input class=\x22normalfield\x22 type=\x22number\x22 id=\x22modelScale\x22 value=\x22"+thisLocation.markerObjScale+"\x22></div>"+
+        "<div class=\x22row\x22><div class=\x22threecolumn\x22><label for=\x22xscale\x22>X Scale</label>"+
+        "<input class=\x22xfield\x22 type=\x22number\x22 id=\x22xscale\x22 value=\x22"+thisLocation.xscale+"\x22></div>"+
+        "<div class=\x22threecolumn\x22><label for=\x22yscale\x22>Y Scale</label>"+
+        "<input class=\x22yfield\x22 type=\x22number\x22 id=\x22yscale\x22 value=\x22"+thisLocation.yscale+"\x22></div>"+
+        "<div class=\x22threecolumn\x22><label for=\x22zscale\x22>Z Scale</label>"+
+        "<input class=\x22zfield\x22 type=\x22number\x22 id=\x22zscale\x22 value=\x22"+thisLocation.zscale+"\x22></div></div>"+
 
-        "<div class=\x22twocolumn\x22><label for=\x22locationTags\x22>Tags</label>"+
-        "<textarea type=\x22textarea\x22 placeholder=\x22\x22 id=\x22locationTags\x22>"+thisLocation.locationTags+"</textarea><br></div></div>"+
 
-        "<div class=\x22twocolumn\x22><label for=\x22locationDescription\x22>Description</label>"+
-        "<textarea type=\x22textarea\x22 id=\x22locationDescription\x22>"+thisLocation.description+"</textarea><br></div>"+
+        // "<div class=\x22row\x22><div class=\x22threecolumn\x22><label for=\x22modelScale\x22>Scale</label><br>"+
+        // "<input class=\x22normalfield\x22 type=\x22number\x22 id=\x22modelScale\x22 value=\x22"+thisLocation.markerObjScale+"\x22></div>"+
+
+
+        // "<div class=\x22threecolumn\x22><label for=\x22locationDescription\x22>Description</label>"+
+        // "<textarea type=\x22textarea\x22 id=\x22locationDescription\x22>"+thisLocation.description+"</textarea><br></div>"+
 
 
         
-        "<div class=\x22twocolumn\x22><label for=\x22locationEventData\x22>Event Data</label>"+
-        "<textarea type=\x22textarea\x22 id=\x22locationEventData\x22>"+thisLocation.eventData+"</textarea><br></div>"+
+        // "<div class=\x22threecolumn\x22><label for=\x22locationEventData\x22>Event Data</label>"+
+        // "<textarea type=\x22textarea\x22 id=\x22locationEventData\x22>"+thisLocation.eventData+"</textarea><br></div>"+
         // "+that.data.timestamp+","+that.data.name+","+position.x+","+position.y+","+position.z+"
         // ReturnOtherLocations();
-        "<div class=\x22twocolumn\x22><label for=\x22locationTarget\x22>Target Location</label>"+
+
+        "<div class=\x22row\x22><div class=\x22threecolumn\x22><label for=\x22locationTarget\x22>Target Location</label>"+
         "<select id=\x22locationTarget\x22 name=\x22locationTarget\x22>"+
         ReturnOtherLocations(thisLocation.locationTarget) +
-        "</select></div></div>"+
+        "</select></div>"+
+
+        "<div class=\x22threecolumn\x22><label for=\x22locationTags\x22>Tags</label>"+
+        "<textarea type=\x22textarea\x22 placeholder=\x22\x22 id=\x22locationTags\x22>"+thisLocation.locationTags+"</textarea><br></div></div>"+
+        
         // "<button class=\x22deleteButton\x22 onclick=\x22DeleteLocation('"+phID+"')\x22>Clear Mods</button>"+
+
+
+
         "<button class=\x22addButton\x22 style=\x22float:right;\x22 onclick=\x22SaveModToLocal('"+phID+"')\x22>Save to Local DB</button>"+
         cloudSaveButton +
 
@@ -1849,7 +1868,7 @@ function SceneManglerModal(mode) {
     //   "<div><p>" + quest + "</p></div>"+
     // "</div>"+
     "<div "+inventoryDisplay+" id=\x22Inventory\x22 class=\x22modalMain tabcontent\x22>"+ /////////////////////INVENTORY
-      "<div id=\x22inventory_display\x22><p>"+inventory+"</p></div><hr>"+
+      "<div id=\x22inventory_display\x22><p>"+inventory+"</p></div><hr><br>"+
 
       // "Local Assets: <br> <br><div><label for=\x22file\x22 class=\x22form-label\x22>Select a file</label><input type=\x22submit\x22 value=\x22Save to Local DB\x22 class=\x22addButton floatRight\x22></div>"+
       // accept=\x22.txt\x22 onchange=\x22ImportMods(event)
@@ -1857,7 +1876,7 @@ function SceneManglerModal(mode) {
       "<button style=\x22float: left;\x22 class=\x22infoButton\x22 id=\x22importFileButton\x22>Import File</button>"+  
       "<input type=\x22file\x22 id=\x22importFile\x22>"+ 
       // "<div class=\x22floatRight\x22><input class=\x22custom-file-upload\x22 type=\x22file\x22 id=\x22file\x22></input></div>" +
-      "<div>Local Assets aup in hea!</div>"+
+      "<div>Local Assets here, eventually...</div>"+
       "<div><hr> <br><input type=\x22button\x22 value=\x22Clear files from Local DB\x22 id=\x22clear-button\x22 class=\x22deleteButton\x22></input></div>"+
 
     "</div>"+

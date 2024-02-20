@@ -140,6 +140,9 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
               if (this.data.markerType == "collider") {
                 this.data.modelID = "primitive_cube";
               } 
+              if (this.data.markerType == "floor") {
+                this.data.modelID = "primitive_plane";
+              } 
 
               if (this.data.markerType == "object" && this.data.objectID.length > 8) {
                 this.loadObject(this.data.objectID); //off in the woods...
@@ -265,8 +268,8 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
                             this.el.setAttribute("geometry", {primitive: "sphere", radius: 1});
                         } else if (this.data.modelID.toString().includes("cylinder")) {
                             this.el.setAttribute("geometry", {primitive: "cylinder", height: 1, radius: .5});
-                        } else {
-    
+                        } else if (this.data.modelID.toString().includes("plane")) {
+                          this.el.setAttribute("geometry", {primitive: "plane", height: 1, width: 1});
                         }
                         if (this.data.markerType == "placeholder") {
                             this.el.setAttribute("material", {color: "yellow", transparent: true, opacity: .5});
@@ -286,9 +289,6 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
                             
                         } else if (this.data.markerType.includes("collider")) {
                           this.el.setAttribute("material", {color: "tomato", transparent: true, opacity: .5});
-
-                          // this.el.setAttribute("mod_physics", {body: "static", isTrigger: false, model:"collider", scaleFactor: 1});
-                          // this.el.setAttribute("color", "lime");
                           
                         } else if (this.data.markerType == "gate") {
 

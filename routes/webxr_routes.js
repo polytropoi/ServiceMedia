@@ -1912,8 +1912,8 @@ webxr_router.get('/:_id', function (req, res) {
                                 
                             }
                             if (sceneResponse.sceneUseFloorPlane) {
-                                groundPlane = "<a-plane rotation='-90 0 0' position='0 -5 0' width='100' height='100' color=\x22" + sceneResponse.sceneColor2+ "\x22></a-plane>"; //deprecated for environment component
-                                // ground = "<a-circle rotation='-90 0 0' position='0 -1 0' width='100' height='100'></a-circle>";
+                                groundPlane = "<a-plane rotation='-90 0 0' visible=\x22false\x22 position='0 0 0' width='100' height='100' mod_physics=\x22type: static; model: collider;\x22 color=\x22" + sceneResponse.sceneColor2+ "\x22></a-plane>"; //deprecated for environment component
+                                
                             }
                             if (sceneResponse.sceneWater != null) {
                                 console.log("water: " + JSON.stringify(sceneResponse.sceneWater));
@@ -5251,6 +5251,7 @@ webxr_router.get('/:_id', function (req, res) {
                         ambientAudioEntity + 
                         triggerAudioEntity +
                         lightEntities +
+                        groundPlane +
 
                         matrixEntities +
                         // parametricEntities +

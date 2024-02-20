@@ -434,7 +434,7 @@ a {
     font-family: Trebuchet MS, Helvetica, sans-serif;
     font-size:2vw;
     color:rgb(212, 255, 131);
-  }
+}
 .backmask {
 width: 100%;
 height: 100%;
@@ -1223,9 +1223,14 @@ background-color: #000000;
 
 
       /* Create three equal columns that float next to each other */
-.twocolumn {
+  .twocolumn {
+      float: left;
+      width: 50%;
+    }
+ 
+  .threecolumn {
     float: left;
-    width: 50%;
+    width: 33%;
   }
   
   /* Clear floats after the columns */
@@ -1239,6 +1244,9 @@ background-color: #000000;
   /* Responsive layout - makes the three columns stack on top of each other instead of next to each other on smaller screens (600px wide or less) */
   @media screen and (max-width: 600px) {
     .twocolumn {
+      width: 100%;
+    }
+    .threecolumn {
       width: 100%;
     }
   }
