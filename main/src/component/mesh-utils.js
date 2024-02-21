@@ -111,8 +111,9 @@ AFRAME.registerComponent('mod_physics', { //used by models, placeholders, instan
 
         if (settings && settings.usePhysicsType == "ammo") {
           // console.log("truyna init mod_physics for id " + this.el.id + " model " + this.model +" isTrigger "+ this.isTrigger + " body " + this.data.body );
+          let offset = '0 '+this.data.scaleFactor * .25+' 0';
           this.el.setAttribute('ammo-body', {type: 'kinematic', emitCollisionEvents: this.isTrigger}); //placeholder model already loaded in mod_model
-          this.el.setAttribute("ammo-shape", {type: "box"});
+          this.el.setAttribute("ammo-shape", {type: "box", fit: "manual", halfExtents: this.data.scaleFactor * .5+ " " + this.data.scaleFactor * .5 + " " + this.data.scaleFactor * .5, offset: offset, margin: .1});
         }
           // console.log("tryna load agent  " + this.isTrigger);
       
@@ -233,7 +234,7 @@ AFRAME.registerComponent('mod_physics', { //used by models, placeholders, instan
             var triggerAudioController = document.getElementById("triggerAudio");
             if (triggerAudioController != null) {
               // console.log("mod_physics TRIGGER collision "  + this.el.id + " " + e.detail.targetEl.id);
-              triggerAudioController.components.trigger_audio_control.playSingleAtPosition(e.detail.targetEl.object3D.position, window.playerPosition.distanceTo(e.detail.targetEl.object3D.position), ["laugh"], .7);
+              triggerAudioController.components.trigger_audio_control.playSingleAtPosition(e.detail.targetEl.object3D.position, window.playerPosition.distanceTo(e.detail.targetEl.object3D.position), ["greeting"], .7);
               setTimeout( () => {
                 this.isCooling = false;
               }, 5000);

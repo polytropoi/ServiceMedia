@@ -991,7 +991,9 @@ function SaveModToLocal(locationKey) { //locationKey is now just timestamp of th
    locItem.eventData = document.getElementById('locationEventData').value;
    locItem.locationTarget = document.getElementById('locationTarget').value;
    locItem.timestamp = locationKey;
-   locItem.markerObjScale = document.getElementById("modelScale").value;
+   locItem.xscale = document.getElementById("xscale").value;
+   locItem.yscale = document.getElementById("yscale").value;
+   locItem.zscale = document.getElementById("zscale").value;
 
    // locItem.phID = locationKey.toString();
    locItem.type = "Worldspace";
@@ -1028,10 +1030,14 @@ function SaveModToLocal(locationKey) { //locationKey is now just timestamp of th
          // locItem.x = document.getElementById('xpos').value;
          localData.locations[i].x = locItem.x;
          localData.locations[i].eulerx = locItem.eulerx;
+         localData.locations[i].xscale = locItem.xscale;
          localData.locations[i].y = locItem.y;
          localData.locations[i].eulery = locItem.eulery;
+         localData.locations[i].yscale = locItem.yscale;
          localData.locations[i].z = locItem.z;
          localData.locations[i].eulerz = locItem.eulerz;
+         localData.locations[i].zscale = locItem.zscale;
+
             // locItem.lat/lng //TODO!
          // localData.locations[i] = locItem.label;
          localData.locations[i].name = locItem.name;
@@ -1039,7 +1045,7 @@ function SaveModToLocal(locationKey) { //locationKey is now just timestamp of th
          localData.locations[i].markerType = locItem.markerType;
          localData.locations[i].eventData = locItem.eventData;
          localData.locations[i].timestamp = locItem.timestamp;
-         localData.locations[i].markerObjScale = locItem.markerObjScale;
+         // localData.locations[i].markerObjScale = locItem.markerObjScale;
          // localData.locations[i] = locItem.phID;
          localData.locations[i].type = locItem.type;
          localData.locations[i].isLocal = locItem.isLocal;

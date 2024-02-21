@@ -1590,7 +1590,7 @@ AFRAME.registerComponent('trigger_audio_control', { //trigger audio on designate
         
         if (triggerAudioHowl != null && tag != undefined && tag != null && tag != "") {
         // this.modVolume(1);
-        // console.log("tryna play trigger audio with tag " + tag);
+        console.log("tryna play trigger audio with tag " + tag);
         this.audioGroupsEl = document.getElementById('audioGroupsEl');
         let audioID = null;
         let audioIDs = [];
@@ -1600,7 +1600,7 @@ AFRAME.registerComponent('trigger_audio_control', { //trigger audio on designate
             if (tag != null) {
                 let tags = tag.toString().split(',');
                 for (let i = 0; i < tags.length; i++) {
-                    // console.log("looking fo rtag " + tag[i]);
+                    console.log("looking fo rtag " + tag[i]);
                     audioID = this.audioGroupsController.returnTriggerAudioIDWithTag(tags[i]);
                     // } else {
                     //     // audioID = this.audioGroupsController.returnRandomTriggerAudioID(); 
@@ -1689,28 +1689,8 @@ AFRAME.registerComponent('trigger_audio_control', { //trigger audio on designate
                                 format: "ogg",
                                 // sprite: {trigger: [0, 5000]}
                             }); 
-                            // this.triggerAudioHowl._sprite.
-                            // this.triggerSprite = "trigger";
-                        // }
-                            // triggerAudioHowl.src = this.audioItem.URLogg;
-                            // triggerAudioHowl.format = "ogg";
-                        // } else {
-                            // console.log(triggerAudioHowl.src);
-                            // triggerAudioHowl.format = "ogg";
-                        // }
-                        // triggerAudioHowl.src = this.audioItem.URLogg;
-                        // at = ["ogg", "mp3"];
-
-                        // triggerAudioHowl.src = [audioItem.URLogg, audioItem.URLmp3];
-                            // triggerAudioHowl.load();
-                            // triggerAudioHowl.volume(1);
-                        // }
-                        // if (!id) {
-
-                        // }
-                        // id = 
-                        // const rate = clamp(Math.random() + .25, .75, 1.25); //fudge pitch a bit slower or faster
-                        const rate = clamp(Math.random() + .5, .5, 1.5);
+  
+                        const rate = clamp(Math.random() + .5, .5, 1.5); //fudge pitch a bit slower or faster
                         this.triggerAudioHowl.rate(rate);
 
 
@@ -1957,7 +1937,7 @@ AFRAME.registerComponent('audio_groups_control', { //element and component are a
     },
     returnAudioItem: function (id) {
         let index = -1;
-        // console.log("tryna get audio item id " + id);
+        console.log("tryna get audio item id " + id);
         if (id && this.data.audioGroupsData && this.data.audioGroupsData.audioItems) {
             for (var i = 0; i < this.data.audioGroupsData.audioItems.length; i++){
                 if (id == this.data.audioGroupsData.audioItems[i]._id) {
@@ -2025,27 +2005,35 @@ AFRAME.registerComponent('audio_groups_control', { //element and component are a
         let triggerGroup = this.data.audioGroupsData.triggerGroupItems[0];
         return triggerGroup.items[Math.floor(Math.random()*triggerGroup.items.length)]; //pick a random entry from trigger ids
     },
-    returnTriggerAudioIDWithTag: function (tag) {
+    returnTriggerAudioIDWithTag: function (tag) { //find an audio item in audiogroup with specified tag
         
         if (tag && this.data.audioGroupsData && this.data.audioGroupsData.triggerGroupItems) {
             let triggerGroup = this.data.audioGroupsData.triggerGroupItems[0];
             // console.log("looking for audio trigger with tag " + tag + " in files " + triggerGroup.items.length);
+            let matchingItems = [];
             for (let i = 0; i < triggerGroup.items.length; i++) {
                 // console.log("looking for triggerGroup.item " + triggerGroup.items[i]);
                 for (let j = 0; j < this.data.audioGroupsData.audioItems.length; j++) {
                     // console.log("Ccchekin trigger group item " +triggerGroup.items[i]+ " vs " + this.data.audioGroupsData.audioItems[j]._id);
                     if (triggerGroup.items[i] == this.data.audioGroupsData.audioItems[j]._id) {
-                    
                         // console.log("found audio item tags are " + this.data.audioGroupsData.audioItems[j].tags); //not ideal, maybe the groupitems can store tags? or cache them when loaded below?
                         if (this.data.audioGroupsData.audioItems[j].tags && this.data.audioGroupsData.audioItems[j].tags.includes(tag)) {
                             // console.log("tag match to " + tag);
-                            
-                            return triggerGroup.items[i];
-                        
+                            // return triggerGroup.items[i];
+                            matchingItems.push(triggerGroup.items[i]);
                         }
                     }
                 }
+                if (i == triggerGroup.items.length - 1) {
+                    if (matchingItems.length) {
+                        return matchingItems[Math.floor(Math.random()*matchingItems.length)];
+                    } else {
+                        return null;
+                    }
+                   
+                }
             }
+
         } else {
             // console.log("trigger audio not found!");
             return null;

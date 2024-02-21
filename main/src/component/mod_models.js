@@ -235,8 +235,12 @@ AFRAME.registerComponent('mod_model', {
           if (this.data.eventData && this.data.eventData.toLowerCase().includes("agent") || this.data.markerType == "character" || this.data.tags.includes("agent")) { 
             if (settings.useNavmesh) {
               // this.el.setAttribute("nav-agent", "");
+              let scalefactor = this.data.markerObjScale;
+              if (this.data.xscale == this.data.yscale == this.data.zscale) {
+                scalefactor = this.data.xscale;
+              } 
               this.el.setAttribute("nav_agent_controller", "snapToWaypoint", false);  
-              this.el.setAttribute("mod_physics", {'model': 'agent', 'isTrigger': true});
+              this.el.setAttribute("mod_physics", {'model': 'agent', 'isTrigger': true, scaleFactor: this.data.scale, xscale: this.data.xscale, yscale: this.data.yscale, zscale: this.data.zscale});
             }
           }
           if (this.data.eventData && this.data.eventData.toLowerCase().includes("transform")) { 
@@ -1814,7 +1818,7 @@ AFRAME.registerComponent('mod_model', {
           }
           
         }
-      console.log("TRYNA SCATTER MOD_MODEL with count " + count);
+      console.log("TRYNA SCATTER MOD_MODEL with count " + count + " ypos " + this.data.ypos);
       let scatterCount = 0;
       // if (!this.isNavAgent) { //use waypoints for position below instead of raycasting if it's gonna nav
         let interval = setInterval( () => {
@@ -1828,21 +1832,21 @@ AFRAME.registerComponent('mod_model', {
           let results = raycaster.intersectObject(surface.getObject3D('mesh'), true);
   
           if(results.length > 0) {
-            
+            let scale = this.returnRandomNumber(.5, 1.5);
             console.log("gotsa scatterPosition for model " + this.data.modelID+ " intersect: " + results.length + " " +results[0].object.name + "scatterCount " + scatterCount + " vs count " + count +  " scale " + this.scale);
             testPosition.x = results[0].point.x.toFixed(2); //snap y of waypoint to navmesh y
-            testPosition.y = results[0].point.y.toFixed(2); //snap y of waypoint to navmesh y
+            testPosition.y = results[0].point.y.toFixed(2) + this.data.ypos; //snap y of waypoint to navmesh y
             testPosition.z = results[0].point.z.toFixed(2); //snap y of waypoint to navmesh y
             let scatteredEl = document.createElement("a-entity"); 
             scatteredEl.setAttribute("position", testPosition);
             scatteredEl.setAttribute("gltf-model", "#" + this.data.modelID);
             let eventData = this.data.eventData.replace("scatter", ""); //prevent infinite recursion!
 
-            scatteredEl.setAttribute("mod_model", {eventData: eventData, markerType: this.data.markerType, tags: this.data.tags, description: this.data.description, modelID: this.data.modelID});
+            scatteredEl.setAttribute("mod_model", {eventData: eventData, markerType: this.data.markerType, scale: this.scale * scale, ypos: this.data.ypos, tags: this.data.tags, description: this.data.description, modelID: this.data.modelID});
             scatteredEl.setAttribute("shadow", {cast: true, receive: true});
             scatteredEl.classList.add("envMap");
             // if (this.data.markerType != "character") { //messes up navmeshing..
-              let scale = this.returnRandomNumber(.5, 1.5);
+              
               scatteredEl.setAttribute("scale", {x: this.scale * scale, y: this.scale * scale, z: this.scale * scale});
               // scatteredEl.setAttribute("scale", {x: scale, y:scale, z: scale})
 
