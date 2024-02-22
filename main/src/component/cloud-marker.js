@@ -321,7 +321,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
         if (this.data.name == '') {
           this.data.name = this.data.timestamp;
         }
-        if (this.data.eventData.toLowerCase().includes('beat')) {
+        if (this.data.tags.toLowerCase().includes("beat") || this.data.eventData.toLowerCase().includes('beat')) {
           this.el.classList.add('beatme');
         }
   
@@ -509,7 +509,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
               }
             }
             } else {
-              console.log("bad " + evt.detail.intersection.distance);
+              console.log("bad distance ");
             }
           
           } else if (that.data.markerType == "poi") {

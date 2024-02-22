@@ -1937,7 +1937,7 @@ AFRAME.registerComponent('audio_groups_control', { //element and component are a
     },
     returnAudioItem: function (id) {
         let index = -1;
-        console.log("tryna get audio item id " + id);
+        // console.log("tryna get audio item id " + id);
         if (id && this.data.audioGroupsData && this.data.audioGroupsData.audioItems) {
             for (var i = 0; i < this.data.audioGroupsData.audioItems.length; i++){
                 if (id == this.data.audioGroupsData.audioItems[i]._id) {
@@ -1951,7 +1951,7 @@ AFRAME.registerComponent('audio_groups_control', { //element and component are a
         }
         // console.log("tryna get audio index " + index);
         if (index != -1) {
-            console.log("gotsa audio item from object_audio_group at index " + index);
+            // console.log("gotsa audio item from object_audio_group at index " + index);
             return this.data.audioGroupsData.audioItems[index];
             // return null;
         } else {

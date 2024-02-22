@@ -117,12 +117,15 @@ AFRAME.registerComponent('mod_model', {
           textData = this.data.description.split("~");//tilde delimiter splits string to array//maybe use description for text instead? 
   
         }
-        if (JSON.stringify(this.data.eventData).includes("beat")) {
-          console.log ("adding class beatmee");
-          this.el.classList.add("beatme");
-          // this.el.addEventListener('beatme', e => console.log("beat" + e.detail.volume()));
-          
+        if (this.data.tags.toLowerCase().includes('beat') || this.data.eventData.toLowerCase().includes('beat')) {
+          this.el.classList.add('beatme');
         }
+        // if (JSON.stringify(this.data.eventData).includes("beat")) {
+        //   console.log ("adding class beatmee");
+        //   this.el.classList.add("beatme");
+        //   // this.el.addEventListener('beatme', e => console.log("beat" + e.detail.volume()));
+          
+        // }
 
         if (this.data.eventData.toLowerCase().includes("allowmods")) {
           this.data.allowMods = true;
@@ -165,6 +168,7 @@ AFRAME.registerComponent('mod_model', {
           this.hasLocationCallout = true;
           this.hasCallout = true;
         }
+        this.oScale = new THREE.Vector3();
         let that = this;
         ///////////////////////////////////////////////// model loaded event start /////////////////////////////
   
@@ -173,7 +177,8 @@ AFRAME.registerComponent('mod_model', {
         this.el.addEventListener('model-loaded', () => { // - model-loaded
         if (!this.isInitialized) {
   
-  
+          
+          this.el.object3D.getWorldScale(this.oScale);
           if (this.data.eventData && this.data.eventData.includes("physics")) {
             if (settings.usePhysicsType == "ammo") {
               if (this.data.eventData.includes("static")) {
@@ -1739,17 +1744,19 @@ AFRAME.registerComponent('mod_model', {
       }
     },
     beat: function (volume, duration) {
-      console.log("tryna beat " + this.el.id + " " + volume);
-      if (this.data.eventData.toLowerCase().includes("beat")) {
-        let oScale = this.el.getAttribute('data-scale');
-        oScale = parseFloat(oScale);
+     
+      if (this.data.tags.toLowerCase().includes("beat")) {
+        // let oScale = this.el.getAttribute('data-scale');
+        // console.log("tryna beat " + this.el.id + " " + volume);
+
+        // oScale = parseFloat(oScale);
         volume = volume.toFixed(2) * .1;
         let scale = {};
-          scale.x = oScale + volume;
-          scale.y = oScale + volume;
-          scale.z = oScale + volume;
+          scale.x = this.oScale.x + volume;
+          scale.y = this.oScale.y + volume;
+          scale.z = this.oScale.z + volume;
           this.el.setAttribute('scale', scale);
-          this.el.setAttribute('animation', 'property: scale; to: '+oScale+' '+oScale+' '+oScale+'; dur: '+duration+'; startEvents: beatRecover; easing: easeInOutQuad');
+          this.el.setAttribute('animation', 'property: scale; to: '+this.oScale.x+' '+this.oScale.y+' '+this.oScale.z+'; dur: '+duration+'; startEvents: beatRecover; easing: easeInOutQuad');
           this.el.emit('beatRecover');
   
       }
