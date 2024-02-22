@@ -1315,20 +1315,26 @@ AFRAME.registerComponent('mod_model', {
                 
                 this.calloutString = this.data.name;
               }
-    
-              console.log("MOD_MODEL mouseover markerType " + this.data.markerType);
+              let min = this.data.scale * .05;
+              let max = 22;
+              let distance = evt.detail.intersection.distance;
+              this.distance = distance;
+              console.log("MOD_MODEL mouseover markerType " + this.data.markerType + " scale " + this.data.scale);
                 let pos = evt.detail.intersection.point; //hitpoint on model
+                // let scalerange = (this.data.scale * .1) + (distance * .5);
+                let scalerange = clamp(((distance * .2) / 2), min, max);
                 // this.bubble.setAttribute('position', {"x": pos.x.toFixed(2), "y": pos.y.toFixed(2), "z": pos.z.toFixed(2)});
                 if (this.bubble) {
                   this.bubble.setAttribute('visible', true);
                   this.bubbleText.setAttribute('visible', true);
-                  let scalerange = this.data.scale;
+                  
+                  // let scalerange = Math.min(Math.max(parseFloat(this.data.scale) / 2, .1), 20);
                   if (this.data.eventData.toLowerCase().includes("agent")) {
                     this.bubble.setAttribute('position', '0 1 ' + scalerange.toString());
                   } else {
                     this.bubble.setAttribute('position', evt.detail.intersection.point);
                     this.bubbleText.setAttribute('position', '0 .5 ' + scalerange.toString());
-                    console.log("tryna show callout " + scalerange + " " + this.calloutString);
+                    console.log("tryna show callout " + scalerange.toString() + " " + this.calloutString);
                   }
                 }  else {
                   console.log("this.bubble not found!");
@@ -1340,13 +1346,12 @@ AFRAME.registerComponent('mod_model', {
                   this.font2 = settings.sceneFontWeb2;
                 }
              
-              let distance = evt.detail.intersection.distance;
-              this.distance = distance;
+
   
               if (this.hasCalloutBackground && distance) { //eg thought or speech bubble
-                if (distance > 2 && distance < 15) {
+                if (distance > 1 && distance < 15) {
                   const min = .05;
-                  const max = .5;
+                  const max = .6;
                   calloutOn = true;
                   this.bubble.setAttribute("visible", true);
                   this.bubbleText.setAttribute("visible", true);
@@ -1360,14 +1365,13 @@ AFRAME.registerComponent('mod_model', {
                   pos.y = - (pos.y * heightHalf) + heightHalf;
                   pos.z = 0;
   
-                  let scaleFactor = clamp(distance * .1, min, max);
+                  let scaleFactor = clamp(((distance * .2) / 2), min, max);
                   console.log( " distance " +  distance + " scalefactro " + scaleFactor);
                   if ((pos.x/width) < .5) {
                     console.log("flip left");
                     if (this.bubbleBackground) {
                       this.bubbleBackground.setAttribute("position", "1.5 .2 .75");
-                      // this.bubbleBackground.setAttribute("scale", "-.2 .2 .2"); 
-                      // this.bubbleBackground.setAttribute('scale', {x: distance * -.05, y: distance * .05, z: distance * .05} );
+                      
                       this.bubbleBackground.setAttribute('scale', {x: scaleFactor * -1, y: scaleFactor, z: scaleFactor} );
                     }
                     // this.bubbleText.setAttribute("scale", ".2 .2 .2"); 
@@ -1384,8 +1388,7 @@ AFRAME.registerComponent('mod_model', {
                       // this.bubbleBackground.setAttribute("scale", ".2 .2 .2"); 
   
                     }
-                    // this.bubbleText.setAttribute("scale", ".2 .2 .2")
-                    // this.bubbleText.setAttribute('scale', {x: distance * .05, y: distance * .05, z: distance * .05} );
+                    
                     this.bubbleText.setAttribute('scale', {x: scaleFactor, y: scaleFactor, z: scaleFactor} );
                     this.bubbleText.setAttribute("position", "-1.5 .2 .6");
                   }
@@ -1413,13 +1416,16 @@ AFRAME.registerComponent('mod_model', {
                 if (this.hasLocationCallout || this.data.markerType === "character") {
                   // console.log("mod_model not bubble callout is " + textData[textIndex]);
                   distance = evt.detail.intersection.distance;
+                  let scalefactor = (distance * .1) / 2; 
                     // this.bubble.setAttribute('position', pos);
                     this.bubble.setAttribute("visible", true);
                     this.bubbleText.setAttribute("visible", true);
-                    this.bubbleText.setAttribute('scale', {x: distance * .1, y: distance * .1, z: distance * .1} );
+                    this.bubbleText.setAttribute('scale', {x: scalefactor, y: scalefactor, z: scalefactor} );
                   // this.bubbleText.setAttribute('scale', {x: distance * .04, y: distance * .04, z: distance * .04} );
                   // this.bubbleText.setAttribute("position", "-.5 .2 .51");
-                  let scalerange = parseFloat(this.data.scale) * 1.5;
+                  // let scalerange = Math.max(parseFloat(this.data.scale), 3);
+                  // let scalerange = Math.min(Math.max(parseFloat(this.data.scale), .1), 20);
+                  let scalerange = 1 + this.data.scale / 2;
                   console.log("showing callout with z offset " + scalerange.toString());
                   this.bubbleText.setAttribute('position', '0 .75 ' + scalerange.toString()); //
                   this.bubbleText.setAttribute('troika-text', {
@@ -1445,7 +1451,7 @@ AFRAME.registerComponent('mod_model', {
   
               // console.log("tryna play audiotrigger " + JSON.stringify(this.data.eventData));
             if (this.data.tags != undefined && this.data.tags != null && this.data.tags != "undefined") {
-              console.log("tryna play audio with tags " + this.data.tags);
+              // console.log("tryna play audio with tags " + this.data.tags);
               // if (this.triggerAudioController != null) {
               //   this.triggerAudioController.components.trigger_audio_control.playAudio();
               

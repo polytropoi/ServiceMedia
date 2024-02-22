@@ -2880,7 +2880,9 @@ webxr_router.get('/:_id', function (req, res) {
                                         } else { //aframe !!!
                                             // let zFix = parseFloat(locMdl.z) * -1; //fix to match unity //nm, modded unity client
                                             let zFix = parseFloat(locMdl.z); //nope
-
+                                            if (!locMdl.markerObjScale || locMdl.markerObjScale == undefined || locMdl.markerObjScale == "") {
+                                                locMdl.markerObjScale = 1;
+                                            }
                                             if (locMdl.eventData.toLowerCase().includes("navmesh")) { //use for pathfinding
                                                 
                                                
@@ -2904,6 +2906,7 @@ webxr_router.get('/:_id', function (req, res) {
                                                     scatterSurface = "scatter-surface";
                                                     id = 'scatterSurface';
                                                     entityType = "surface";
+
 
                                                 }
                                                 let modModel = "mod_model=\x22markerType: "+locMdl.markerType+"; xpos:"+locMdl.x+"; ypos:"+locMdl.y+"; zpos:"+locMdl.z+"; timestamp: "+locMdl.timestamp+"; tags: "+locMdl.locationTags+"; scale:"+locMdl.markerObjScale+"; name:"+locMdl.name+"; description:"+locMdl.description+"; eventData:"+locMdl.eventData+"; modelID:"+m_assetID+";\x22";
