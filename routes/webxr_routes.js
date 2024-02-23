@@ -561,6 +561,7 @@ webxr_router.get('/:_id', function (req, res) {
     let joystickContainer  = "";
     let arImageTargets = [];
     let sceneUnityWebDomain = "http://smxr.net";
+    let activityPubScripts = "";
 
 
     
@@ -4405,6 +4406,10 @@ webxr_router.get('/:_id', function (req, res) {
                     if (sceneResponse.primaryAudioGroups != null && sceneResponse.primaryAudioGroups.length > 0) {
                         hasPrimaryAudio = true;
                     }
+                    if (sceneResponse.sceneTags != null && sceneResponse.sceneTags.includes("immers-space")) {
+                        activityPubScripts = "<script type=\x22module\x22 src=\x22https://cdn.jsdelivr.net/npm/immers-client/dist/destination.bundle.js\x22></script>";
+                    }
+
 
                     // settings.sceneAmbientAudioGroups = sceneResponse.sceneAmbientAudioGroups;
                     // settings.scenePrimaryAudioGroups = sceneResponse.scenePrimaryAudioGroups;
@@ -5333,7 +5338,7 @@ webxr_router.get('/:_id', function (req, res) {
                         socketScripts +
                         navmeshScripts +
                         shaderScripts +
-                        
+                        activityPubScripts +
 
                         "<script>\n"+ //TODO base64 this like the others, and only when a key marker is set
                             // "var avatarName = \x22" + avatarName + "\x22;\n" +

@@ -451,7 +451,7 @@ $(function() {
 
    }
 
-   if (settings.sceneTimedEvents != undefined && settings.sceneTimedEvents != null) {
+   if (settings && settings.sceneTimedEvents != undefined && settings.sceneTimedEvents != null) {
       timeKeysData = settings.sceneTimedEvents;
       console.log("timekeys Dqata: " + JSON.stringify(timeKeysData));
       // localStorage.setItem(room + '_timeKeys', JSON.stringify(timeKeysData));
@@ -2875,7 +2875,8 @@ function UpdateTriggerAudioVolume(newVolume) {
 
 function SetPrimaryAudioEventsData () {
 
-   timeKeysData = JSON.parse(localStorage.getItem(room+ "_timeKeys"));
+   // timeKeysData = JSON.parse(localStorage.getItem(room+ "_timeKeys"));
+   timekeysData = settings.sceneTimedEvents;
    console.log("setting primary audio events data! " + JSON.stringify(timeKeysData));
    tkStarttimes = [];
    if (timeKeysData != undefined && timeKeysData != null && timeKeysData.timekeys != undefined && timeKeysData.timekeys.length > 0 )
@@ -3066,7 +3067,7 @@ let loopIntervals = [];
 ////////////////////////////////////// main method for timed events listening to all the things.../////////////////////////
 
 function TimedEventListener () { 
- console.log("TimedEventsListener" + timedEventsListenerMode );
+ console.log("TimedEventsListener" + timedEventsListenerMode + JSON.stringify(timeKeysData) );
  // let primaryAudioTime = 0;
  timeKeysIndex = 0;
  let timekey = 0;

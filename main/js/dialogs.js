@@ -716,6 +716,9 @@ function TabMangler(evt, tagName) {
     if (tagName === "Inventory") {
       GetUserInventory();
     }
+    if (tagName === "Events") {
+      ReturnTimeKeys();
+    }
     var i, tabcontent, tablinks;
     tabcontent = document.getElementsByClassName("tabcontent");
     for (i = 0; i < tabcontent.length; i++) {
@@ -1335,6 +1338,11 @@ function PlayPauseMedia () {
 
 function ReturnTimeKeys() { 
   // if (timeKeysData != null) {
+    console.log(JSON.stringify(settings.sceneTimedEvents));
+    if (settings && settings.sceneTimedEvents) {
+      timeKeysData = settings.sceneTimedEvents;
+      timedEventsListenerMode = timeKeysData.listenTo; 
+    }
     if (timeKeysData != null && timeKeysData.timekeys != undefined && timeKeysData.timekeys != null && timeKeysData.timekeys.length > 0) {
       tkStarttimes.sort((a, b) => parseFloat(a.keystarttime) - parseFloat(b.keystarttime));
       timeKeysData.timekeys.sort((a, b) => parseFloat(a.keystarttime) - parseFloat(b.keystarttime));
@@ -1779,7 +1787,7 @@ function SceneManglerModal(mode) {
     sceneColor4 = settings.sceneColor4;
     // }
     // InitColorInputs();
-    console.log(JSON.stringify(userData));
+
     // let userName = userData.userName;
     // if (userName != null)
     let greeting = document.getElementById('sceneGreeting').innerHTML;
@@ -1851,6 +1859,7 @@ function SceneManglerModal(mode) {
     }
     if (mode == "Events") {
         eventsDisplay = "style=\x22display: block;\x22";
+        ReturnTimeKeys();
     }
     if (mode == "About") {
       aboutDisplay = "style=\x22display: block;\x22";

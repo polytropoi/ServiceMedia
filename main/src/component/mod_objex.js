@@ -1432,20 +1432,20 @@ AFRAME.registerComponent('mod_object', {
           // this.el.setAttribute("aabb-collider", {objects: ".activeObjexRay"});
           this.applyForce();
         }
-  
-        this.el.addEventListener("collidestart", (e) => {
+      });
+      this.el.addEventListener("collidestart", (e) => {
           e.preventDefault();
           let targetModObjComponent = e.detail.targetEl.components.mod_object;
           // console.log("mod_physics collisoin with object with :" + this.el.id + " " + e.detail.targetEl.classList);
-          if (this.data.isTrigger) { //
-            console.log("TRIGGER HIT "  + this.el.id + " " + e.detail.targetEl.classList);
+          // if (this.data.isTrigger) { //
+            console.log("physics collision HIT "  + this.el.id + " " + e.detail.targetEl.classList);
             // e.detail.body.disableCollision = true;
-            this.disableCollisionTemp(); //must turn it off or it blocks, no true "trigger" mode afaik (unlike cannonjs!) //um, no just use kinematic type...
+            // this.disableCollisionTemp(); //must turn it off or it blocks, no true "trigger" mode afaik (unlike cannonjs!) //um, no just use kinematic type...
             var triggerAudioController = document.getElementById("triggerAudio");
             if (triggerAudioController != null) {
               triggerAudioController.components.trigger_audio_control.playAudioAtPosition(this.hitpoint, this.distance, ["hit"]);
             }
-          } else {
+          // } else {
             // console.log("COLLIDER HIT "  + this.el.id + " vs " + e.detail.targetEl.id);
             // console.log("NOT TRIGGER COLLIDED "  + this.el.object3D.name + " " + e.detail.targetEl.object3D.name + " has mod_object " + mod_obj_component);
             // if (this.el != e.detail.targetEl) {
@@ -1548,12 +1548,12 @@ AFRAME.registerComponent('mod_object', {
                     //   }
                     // }
             // }
-            }
+            // }
           });
         // } else { 
         //   console.log("object not found or set to none!");
         // }
-      }); //end body-loaded listener
+ //end body-loaded listener
   
       
   
@@ -1721,7 +1721,7 @@ AFRAME.registerComponent('mod_object', {
                   calloutString = this.calloutLabelSplit[this.calloutLabelIndex];
                 }
   
-              this.calloutText.setAttribute("troika-text", {value: calloutString});
+                this.calloutText.setAttribute("troika-text", {value: calloutString});
               } else {
                 console.log("mod_object no callout " + this.calloutEntity + " " + this.distance);
               }
