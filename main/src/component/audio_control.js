@@ -1588,9 +1588,9 @@ AFRAME.registerComponent('trigger_audio_control', { //trigger audio on designate
     },
     playAudioAtPosition: function(pos, distance, tag, volmod) {
         
-        if (triggerAudioHowl != null && tag != undefined && tag != null && tag != undefined && tag != "" && pos != null) {
+        if (triggerAudioHowl != null && tag != undefined && tag != null && tag != undefined && tag != 'undefined' && tag != "" && pos != null) {
         // this.modVolume(1);
-        console.log("tryna play trigger audio with tag " + tag + " at pos " + JSON.stringify(pos));
+        // console.log("tryna play trigger audio with tag " + tag + " at pos " + JSON.stringify(pos));
         this.audioGroupsEl = document.getElementById('audioGroupsEl');
         let audioID = null;
         let audioIDs = [];
@@ -1643,7 +1643,7 @@ AFRAME.registerComponent('trigger_audio_control', { //trigger audio on designate
                         //     triggerAudioHowl.play();
                         // }
                         
-                        console.log("tryna play trigger at volume " + volume + " distance " + distance + " id " + this.id); //calling id here is needed
+                        // console.log("tryna play trigger at volume " + volume + " distance " + distance + " id " + this.id); //calling id here is needed
                         triggerAudioHowl.pos(pos.x / 100, pos.y / 100, pos.z / 100, this.id);  //HOLY SHIT howler needs small values for position, * .01
                         break;
                         }

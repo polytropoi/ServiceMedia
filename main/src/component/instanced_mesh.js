@@ -913,6 +913,9 @@ AFRAME.registerComponent('instanced-mesh-member', {
 
   attachEventListeners: function() {
     this.el.addEventListener('object3DUpdated', this.listeners.object3DUpdated, false);
+    this.el.addEventListener("collidestart", (e) => {
+      console.log("gotsa collision with instanced mesh member!");
+    });
   },
 
   remove: function() {

@@ -13,7 +13,8 @@
 	 * Version 2012-03-09
 	 * 
 	 * Modified by AdaRoseCannon 2022-14-07 for AFrame
-	 *
+	 * Modified by polytropoi 2023 for interactivity
+	 * 
 	 * This code was placed in the public domain by its original author,
 	 * Stefan Gustavson. You may use it as you see fit, but
 	 * attribution is appreciated.

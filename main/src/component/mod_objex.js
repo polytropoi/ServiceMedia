@@ -427,7 +427,7 @@ AFRAME.registerComponent('mod_objex', {
       xhr.send(JSON.stringify(data));
       xhr.onload = function () {
         // do something to response
-        // console.log("fetched obj resp: " +this.responseText);
+        console.log("fetched obj resp: " +this.responseText);
         let response = JSON.parse(this.responseText);
         // console.log("gotsome objex: " + response.objex.length);
         if (response.objex.length > 0) {
@@ -570,6 +570,7 @@ AFRAME.registerComponent('mod_object', {
       this.mouthClips = [];
       this.talkClips = [];
   
+      this.objexEl = document.getElementById('sceneObjects'); 
       this.triggerAudioController = document.getElementById("triggerAudio");
       this.triggerOn = false;
       this.driveable = false;
@@ -1368,7 +1369,7 @@ AFRAME.registerComponent('mod_object', {
               }
             } 
             if (this.data.objectData.physics != undefined && this.data.objectData.physics != null && this.data.objectData.physics.toLowerCase() != "none") {
-              console.log("tryna add physics to mod_objecty " + this.data.objectData.name + " is equipped " + this.data.isEquipped + " body " + this.data.objectData.physics);
+              console.log("tryna add physics to new mod_object " + this.data.objectData.name + " is equipped " + this.data.isEquipped + " body " + this.data.objectData.physics);
               //  setTimeout(function(){  
                 if (this.data.isEquipped) {
                   // this.el.setAttribute('ammo-body', {type: 'kinematic', linearDamping: .1, angularDamping: .1});
@@ -1434,35 +1435,58 @@ AFRAME.registerComponent('mod_object', {
         }
       });
       this.el.addEventListener("collidestart", (e) => {
-          e.preventDefault();
-          let targetModObjComponent = e.detail.targetEl.components.mod_object;
+          // e.preventDefault();
+          // let targetModObjComponent = e.detail.targetEl.components.mod_object;
           // console.log("mod_physics collisoin with object with :" + this.el.id + " " + e.detail.targetEl.classList);
           // if (this.data.isTrigger) { //
-            console.log("physics collision HIT me "  + this.data.name + " " + e.detail.targetEl.id);
-            // e.detail.body.disableCollision = true;
-            // this.disableCollisionTemp(); //must turn it off or it blocks, no true "trigger" mode afaik (unlike cannonjs!) //um, no just use kinematic type...
-            var triggerAudioController = document.getElementById("triggerAudio");
-            if (triggerAudioController != null) {
-              triggerAudioController.components.trigger_audio_control.playAudioAtPosition(this.hitpoint, this.distance, ["hit"]);
+         
+
+            console.log("physics collision HIT me "  + this.data.objectData.name + " other id " + e.detail.targetEl.id);
+                       
+            if (this.triggerAudioController != null) {
+              console.log("tryna play trigger audio hit");
+              this.triggerAudioController.components.trigger_audio_control.playAudioAtPosition(this.hitpoint, this.distance, ["hit"]);
             }
-          // } else {
-            // console.log("COLLIDER HIT "  + this.el.id + " vs " + e.detail.targetEl.id);
-            // console.log("NOT TRIGGER COLLIDED "  + this.el.object3D.name + " " + e.detail.targetEl.object3D.name + " has mod_object " + mod_obj_component);
-            // if (this.el != e.detail.targetEl) {
-              
+
+              let targetModObjComponent = e.detail.targetEl.components.mod_object;
               if (targetModObjComponent != null) {
                 console.log(this.data.objectData.name + " gotsa collision with " + targetModObjComponent.data.objectData.name);
                 if (this.data.objectData.name != targetModObjComponent.data.objectData.name) { //don't trigger yerself, but what if...?
                   // console.log("actions: " + JSON.stringify(mod_obj_component.data.objectData.actions));
-                  var triggerAudioController = document.getElementById("triggerAudio");
-                  if (triggerAudioController != null) {
-                    triggerAudioController.components.trigger_audio_control.playAudioAtPosition(this.el.object3D.position, window.playerPosition.distanceTo(this.el.object3D.position), ["magic"]);
+                  // var this.triggerAudioController = document.getElementById("triggerAudio");
+                  if (this.triggerAudioController != null) {
+                    this.triggerAudioController.components.trigger_audio_control.playAudioAtPosition(this.el.object3D.position, window.playerPosition.distanceTo(this.el.object3D.position), ["magic"]);
                   }
                   if (targetModObjComponent.data.objectData.actions) {
                     for (let i = 0; i < targetModObjComponent.data.objectData.actions.length; i++) {
-                      console.log(this.data.objectData.name + "checking actions on target " + targetModObjComponent.data.objectData.name + " : " + targetModObjComponent.data.objectData.actions[i].actionName );
+                      console.log(this.data.objectData.name + "checking actions on target " + targetModObjComponent.data.objectData.name + " : " + targetModObjComponent.data.objectData.actions[i].actionName + " actionType " + targetModObjComponent.data.objectData.actions[i].actionType.toLowerCase());
                       if (targetModObjComponent.data.objectData.actions[i].actionType.toLowerCase() == "collide") {
-                        if (targetModObjComponent.data.objectData.actions[i].sourceObjectMod.toLowerCase() == "remove") {
+                        console.log("gotsa collide action");
+                        //spawn new object on collision 
+                        if (targetModObjComponent.data.objectData.actions[i].sourceObjectMod.toLowerCase() == "add object") { 
+                          let trailComponent = e.detail.targetEl.components.trail;
+                          if (trailComponent) {
+                            trailComponent.reset();
+                          }
+                          let objectData = this.objexEl.components.mod_objex.returnObjectData(targetModObjComponent.data.objectData.actions[i].objectID);
+                          if (objectData != null) {
+                            console.log("tryna replace object with " + JSON.stringify(objectData));
+                            this.objEl = document.createElement("a-entity");
+                            this.locData = {};
+                            this.locData.x = this.el.object3D.position.x;
+                            this.locData.y = this.el.object3D.position.y;
+                            this.locData.z = this.el.object3D.position.z;
+                            this.locData.timestamp = Date.now();
+                            this.objEl.setAttribute("mod_object", {'locationData': this.locData, 'objectData': objectData, 'isSpawned': true});
+                            this.objEl.id = "obj" + objectData._id + "_" + this.locData.timestamp;
+                            sceneEl.appendChild(this.objEl);
+                          } else {
+                            console.log("caint find object "+ targetModObjComponent.data.objectData.actions[i].objectID +", tryna fetch it..");
+                            FetchSceneInventoryObject(targetModObjComponent.data.objectData.actions[i].objectID);
+                          }
+                        }
+                        //remove on collision
+                        if (targetModObjComponent.data.objectData.actions[i].sourceObjectMod.toLowerCase() == "remove") { 
                           let trailComponent = e.detail.targetEl.components.trail;
                           if (trailComponent) {
                             trailComponent.reset();
@@ -1470,31 +1494,24 @@ AFRAME.registerComponent('mod_object', {
                           if (e.detail.targetEl.parentNode) {
                             e.detail.targetEl.parentNode.removeChild(e.detail.targetEl);
                           }
-                          // e.detail.targetEl.parentNode.removeChild(e.detail.targetEl);
-  
                         }
-                        if (targetModObjComponent.data.objectData.actions[i].sourceObjectMod.toLowerCase() == "replace object") {
-                          // console.log("tryna replace object...");
+
+                        //remove and add a new something
+                        if (targetModObjComponent.data.objectData.actions[i].sourceObjectMod.toLowerCase() == "replace object") { 
+                          console.log("tryna replace object...");
                           let trailComponent = e.detail.targetEl.components.trail;
                           if (trailComponent) {
                             trailComponent.kill();
-                            // e.detail.targetEl.removeAttribute("trail");
                           }
-                          if (e.detail.targetEl.parentNode) {
-                            e.detail.targetEl.parentNode.removeChild(e.detail.targetEl);
-                          }
-                          // e.detail.targetEl.parentNode.removeChild(e.detail.targetEl);
-                          let objexEl = document.getElementById('sceneObjects');    
-                          let objectData = objexEl.components.mod_objex.returnObjectData(targetModObjComponent.data.objectData.actions[i].objectID);
-                          // if (objectData == null) {
-  
-                          //   // objectData = objexEl.components.mod_objex.returnObjectData(mod_obj_component.data.objectData.actions[i].objectID); //try again, if it's not in the sceneobjectdata it will make a special request
-                          // }
+                          let objectData = this.objexEl.components.mod_objex.returnObjectData(targetModObjComponent.data.objectData.actions[i].objectID);
                           if (objectData != null) {
+                            
+                            if (e.detail.targetEl.parentNode) {
+                              e.detail.targetEl.parentNode.removeChild(e.detail.targetEl);
+                            }
+
                             console.log("tryna replace object with " + JSON.stringify(objectData));
-                            // this.objectData = this.returnObjectData(mod_obj_component.data.objectData.actions[i].objectID);
   
-                            // this.dropPos = new THREE.Vector3();
                             this.objEl = document.createElement("a-entity");
   
                             this.locData = {};
@@ -1775,10 +1792,6 @@ AFRAME.registerComponent('mod_object', {
             }
             if (this.tags != undefined && this.tags != null && this.tags != "undefined") { //MAYBE SHOULD BE UNDER RAYHIT?
              
-              // if (this.triggerAudioController != null) {
-                // let distance = window.playerPosition.distanceTo(this.hitpoint);
-                // this.triggerAudioController.components.trigger_audio_control.playAudioAtPosition(evt.detail.intersection.point, distance, this.tags, 1);//tagmangler needs an array, add vol mod 
-                // this.triggerAudioController.components.trigger_audio_control.playAudioAtPosition(this.pos, this.distance, this.tags, 1);
                 if (moIndex != -1) { //moIndex = "mouthopen"
                   this.el.setAttribute('animation-mixer', {
                     "clip": clips[moIndex].name,
