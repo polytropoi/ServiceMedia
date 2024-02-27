@@ -237,7 +237,7 @@ AFRAME.registerComponent('mod_model', {
               this.el.object3D.visible = true;
             }
           }
-          if (this.data.eventData && this.data.eventData.toLowerCase().includes("agent") || this.data.markerType == "character" || this.data.tags.includes("agent")) { 
+          if ((this.data.eventData && this.data.eventData.toLowerCase().includes("agent")) || this.data.markerType == "character" || this.data.tags.includes("agent")) { 
             if (settings.useNavmesh) {
               // this.el.setAttribute("nav-agent", "");
               let scalefactor = this.data.markerObjScale;
@@ -407,6 +407,10 @@ AFRAME.registerComponent('mod_model', {
                   idleClips.push(clips[i]);
                 }
                 if (clips[i].name.toLowerCase().includes("take 001")) {
+                  idleIndex = i;
+                  idleClips.push(clips[i]);
+                }
+                if (clips[i].name.toLowerCase().includes("default")) {
                   idleIndex = i;
                   idleClips.push(clips[i]);
                 }

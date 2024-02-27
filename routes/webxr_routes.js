@@ -674,7 +674,7 @@ webxr_router.get('/:_id', function (req, res) {
                             debugMode = true;
                         }
                         if (sceneData.sceneTags[i].toLowerCase().includes("timer")) { //uses css font @import... //no! 
-                             proceduralEntities = proceduralEntities + "<a-plane live_canvas=\x22src:#flying_canvas\x22 id=\x22flying_info_canvas\x22 material=\x22shader: flat; transparent: true;\x22look-at=\x22#player\x22 width=\x221\x22 height=\x221\x22 position=\x220 1.5 -1\x22></a-plane>";
+                            //  proceduralEntities = proceduralEntities + "<a-plane live_canvas=\x22src:#flying_canvas\x22 id=\x22flying_info_canvas\x22 material=\x22shader: flat; transparent: true;\x22look-at=\x22#player\x22 width=\x221\x22 height=\x221\x22 position=\x220 1.5 -1\x22></a-plane>";
 
                         }
                         if (sceneData.sceneTags[i].toLowerCase().includes("stats")) {
@@ -3243,13 +3243,15 @@ webxr_router.get('/:_id', function (req, res) {
                     
                                                 sceneTextItemData = sceneTextItemData + "<canvas class=\x22canvasItem\x22 id=\x22svg_canvas_"+textID+"\x22 style=\x22text-align:center;\x22 width=\x221024\x22 height=\x221024\x22></canvas>"+
                                                 "<div style=\x22visibility: hidden\x22 class=\x22svgItem\x22 id=\x22svg_item_"+textID+"\x22 data-attribute=\x22"+text_item._id+"\x22>"+text_item.textstring+"</div>"; //text string is an svg
+                                                
+                                                // proceduralEntities = proceduralEntities + " <a-plane loadsvg=\x22id:"+textID+"; description: "+sceneTextLocations[i].description+"; eventdata: "+sceneTextLocations[i].eventData+"; tags:  "+sceneTextLocations[i].locationTags+"\x22 id=\x22svg_"+sceneTextLocations[i].timestamp+
+                                                // "\x22 look-at=\x22#player\x22 width=\x22"+scale+"\x22 height=\x22"+scale+"\x22 position=\x22"+sceneTextLocations[i].x + " " + sceneTextLocations[i].y + " " + sceneTextLocations[i].z+"\x22></a-plane>";
+                                                
                                                 proceduralEntities = proceduralEntities + " <a-plane loadsvg=\x22id:"+textID+"; description: "+sceneTextLocations[i].description+"; eventdata: "+sceneTextLocations[i].eventData+"; tags:  "+sceneTextLocations[i].locationTags+"\x22 id=\x22svg_"+sceneTextLocations[i].timestamp+
                                                 "\x22 look-at=\x22#player\x22 width=\x22"+scale+"\x22 height=\x22"+scale+"\x22 position=\x22"+sceneTextLocations[i].x + " " + sceneTextLocations[i].y + " " + sceneTextLocations[i].z+"\x22></a-plane>";
                                             }
-
-                                            }
-                                        });
-                                    // }
+                                        }
+                                    });
                                 } else if (sceneTextLocations[i].markerType == "svg billboard") {
                                    console.log("tryna get svg billboard " + textID);
                                     if (validator.isMongoId(textID)) {

@@ -1438,7 +1438,7 @@ AFRAME.registerComponent('mod_object', {
           let targetModObjComponent = e.detail.targetEl.components.mod_object;
           // console.log("mod_physics collisoin with object with :" + this.el.id + " " + e.detail.targetEl.classList);
           // if (this.data.isTrigger) { //
-            console.log("physics collision HIT "  + this.el.id + " " + e.detail.targetEl.classList);
+            console.log("physics collision HIT me "  + this.data.name + " " + e.detail.targetEl.id);
             // e.detail.body.disableCollision = true;
             // this.disableCollisionTemp(); //must turn it off or it blocks, no true "trigger" mode afaik (unlike cannonjs!) //um, no just use kinematic type...
             var triggerAudioController = document.getElementById("triggerAudio");

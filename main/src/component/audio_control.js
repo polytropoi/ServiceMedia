@@ -1588,9 +1588,9 @@ AFRAME.registerComponent('trigger_audio_control', { //trigger audio on designate
     },
     playAudioAtPosition: function(pos, distance, tag, volmod) {
         
-        if (triggerAudioHowl != null && tag != undefined && tag != null && tag != "") {
+        if (triggerAudioHowl != null && tag != undefined && tag != null && tag != undefined && tag != "" && pos != null) {
         // this.modVolume(1);
-        // console.log("tryna play trigger audio with tag " + tag);
+        console.log("tryna play trigger audio with tag " + tag + " at pos " + JSON.stringify(pos));
         this.audioGroupsEl = document.getElementById('audioGroupsEl');
         let audioID = null;
         let audioIDs = [];

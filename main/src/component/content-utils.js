@@ -4527,6 +4527,8 @@ AFRAME.registerComponent('scene_greeting_dialog', {  //if "greeting" scenetag + 
   },
   init: function () {
     this.isInitialized = false;
+    this.viewportHolder = document.getElementById('viewportPlaceholder3');
+    this.location = new THREE.Vector3();
     let interval = setInterval(() => { //hrm...
       if (settings && settings.sceneFontWeb1) {
         clearInterval(interval);
@@ -4599,6 +4601,8 @@ AFRAME.registerComponent('scene_greeting_dialog', {  //if "greeting" scenetag + 
         this.el.appendChild(this.startButtonTextEl);
         this.startButtonBackgroundEl.setAttribute("position", " 0 -1 -.01");
         this.startButtonTextEl.setAttribute("position", " 0 -1 0");
+        this.startButtonTextEl.setAttribute("scale", ".5 .5 .5");
+            this.startButtonBackgroundEl.setAttribute("scale", ".5 .5 .5");
         this.startButtonMaterial = new THREE.MeshStandardMaterial( { 'color': this.textBackgroundColor, 'transparent': true, 'opacity': .85 } ); 
         // todo switch bg
         // this.startButtonBackgroundEl.setAttribute('geometry', {'primitive': 'plane', 'width': '1.5', 'height': '.75'});
@@ -4652,8 +4656,13 @@ AFRAME.registerComponent('scene_greeting_dialog', {  //if "greeting" scenetag + 
           console.log("TRYNA HIDE DIALOG! " + this.behavior);
           if (this.behavior == 'hide') {
             // this.el.setAttribute("visible", false);
+            // this.startButtonTextEl.setAttribute("scale", ".2 .2 .2");
+            // this.startButtonBackgroundEl.setAttribute("scale", ".2 .2 .2");
             console.log("TRYNA HIDE DIALOG! " + this.data.behavior);
-            this.el.parentNode.removeChild(this.el);
+            this.greetingEl.setAttribute("troika-text", {
+              value: ""
+            });
+            // this.el.parentNode.removeChild(this.el);
             // this.el.parent.remove(this.el);
           }
           // console.log("tryna start! playing " + PlayPauseMedia());
@@ -4713,11 +4722,11 @@ AFRAME.registerComponent('scene_greeting_dialog', {  //if "greeting" scenetag + 
         this.font = settings.sceneFontWeb1;
 
       
-        let loc = new THREE.Vector3();
+
         this.viewportHolder = document.getElementById('viewportPlaceholder3');
-        this.viewportHolder.object3D.getWorldPosition( loc );
-        console.log("tryna set scene greeting at location " + JSON.stringify(loc));
-        this.el.setAttribute("position", {x: loc.x, y: loc.y + .55, z: loc.z});
+        this.viewportHolder.object3D.getWorldPosition( this.location );
+        console.log("tryna set scene greeting at location " + JSON.stringify(this.location));
+        this.el.setAttribute("position", {x: this.location.x, y: this.location.y + .55, z: this.location.z});
         this.longTimer();
       }
     }, 3000);
@@ -4728,13 +4737,20 @@ AFRAME.registerComponent('scene_greeting_dialog', {  //if "greeting" scenetag + 
     setTimeout(() => {
       if (this.behavior == 'hide' && this.el.parentNode) {
 
-        this.el.parentNode.removeChild(this.el);
+        // this.el.parentNode.removeChild(this.el);
+        // 
+        this.greetingEl.setAttribute("troika-text", {
+          value: ""
+        });
+
       }
       
     }, 10000);
   },
   setLocation: function () {
-    
+    this.viewportHolder.object3D.getWorldPosition( this.location );
+    console.log("tryna set scene greeting at location " + JSON.stringify(this.location));
+    this.el.setAttribute("position", {x: this.location.x, y: this.location.y + .55, z: this.location.z});
   },
   modGreeting: function () {
 

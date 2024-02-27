@@ -3092,7 +3092,7 @@ function TimedEventListener () {
             
                let primaryAudioTime = primaryAudioHowl.seek();
                
-               if (primaryAudioTime != 0 && primaryAudioTime < .2) { //needs fudge?
+               if (primaryAudioTime != 0 && primaryAudioTime < .2) { //fudge in case
                   timeKeysIndex = 0; 
                   console.log("resetting timekeysindex!");
                }
@@ -3264,7 +3264,8 @@ function LoopTimedEvent(keyType, duration) {
       }
    }, duration);
    loopIntervals.push(theInterval);
-}  
+}  //end loop event
+
 function PlayTimedEvent(timeKey) {
  console.log("tryna play timed event: " + JSON.stringify(timeKey));
 
@@ -3345,6 +3346,7 @@ function PlayTimedEvent(timeKey) {
          let dialogComponent = greetingDialogEl.components.scene_greeting_dialog;
          if (dialogComponent) {
             console.log("tryna modGreeting " + timeKey.keydata);
+            dialogComponent.setLocation();
             dialogComponent.modQuest(timeKey.keydata);
          } else {
             console.log("caint find no dangblurn dialog component!");
