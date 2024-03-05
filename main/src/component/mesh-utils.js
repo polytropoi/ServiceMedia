@@ -162,9 +162,9 @@ AFRAME.registerComponent('mod_physics', { //used by models, placeholders, instan
 
     
     this.el.addEventListener("collidestart", (e) => { //this is for models or triggers, not objects - TODO look up locationData for tags? 
-      e.preventDefault();
-      // console.log("mod_physics collision on object  :" + this.el.id + " by " + e.detail.targetEl.id + " isTrigger " + this.isTrigger);
-      if (this.isTrigger) { 
+      // e.preventDefault();
+      console.log("mod_physics collision on model me  :" + this.el.id + " by " + e.detail.targetEl.id);
+      // if (this.isTrigger) { 
         // console.log("mod_physics TRIGGER collision "  + this.el.id + " " + e.detail.targetEl.id);
        
         let cloud_marker = e.target.components.cloud_marker; //closest trigger if multiple
@@ -184,6 +184,22 @@ AFRAME.registerComponent('mod_physics', { //used by models, placeholders, instan
               }
             // } else {
             
+          }
+        }
+        if (e.detail.targetEl.id.includes("obj")) {
+          if (!this.isCooling) {
+            this.isCooling = true;
+          var triggerAudioController = document.getElementById("triggerAudio");
+          if (triggerAudioController != null) { 
+             
+              console.log("mod_physics collision me "  + this.el.id + " with " + e.detail.targetEl.id);
+              triggerAudioController.components.trigger_audio_control.playSingleAtPosition(e.detail.targetEl.object3D.position, window.playerPosition.distanceTo(e.detail.targetEl.object3D.position), ["bang"], .7);
+             
+              
+              setTimeout( () => {
+                this.isCooling = false;
+              }, 5000);
+            } 
           }
         }
         if (e.detail.targetEl.id.includes("ball")) {
@@ -270,17 +286,17 @@ AFRAME.registerComponent('mod_physics', { //used by models, placeholders, instan
           // this.el.material.color.setHex("#000000".replace(/0/g,function(){return (~~(Math.random()*16)).toString(16);}));
         }
 
-      // let mod_obj_component = e.detail.targetEl.components.mod_object;
-      // if (mod_obj_component != null) {
-      //   // console.log(this.el.id + " gotsa collision with " + mod_obj_component.data.objectData.name);
-      //   if (mod_obj_component.data.objectData.tags != undefined && mod_obj_component.data.objectData.tags != null) {
-      //     var triggerAudioController = document.getElementById("triggerAudio");
-      //     if (triggerAudioController != null) {
-      //       triggerAudioController.components.trigger_audio_control.playAudioAtPosition(e.detail.targetEl.object3D.position, window.playerPosition.distanceTo(e.detail.targetEl.object3D.position), mod_obj_component.data.objectData.tags);
-      //     }
-      //   }
+        // let mod_obj_component = e.detail.targetEl.components.mod_object;
+        // if (mod_obj_component != null) {
+        //   // console.log(this.el.id + " gotsa collision with " + mod_obj_component.data.objectData.name);
+        //   if (mod_obj_component.data.objectData.tags != undefined && mod_obj_component.data.objectData.tags != null) {
+        //     var triggerAudioController = document.getElementById("triggerAudio");
+        //     if (triggerAudioController != null) {
+        //       triggerAudioController.components.trigger_audio_control.playAudioAtPosition(e.detail.targetEl.object3D.position, window.playerPosition.distanceTo(e.detail.targetEl.object3D.position), mod_obj_component.data.objectData.tags);
+        //     }
+        //   }
         
-      }
+      // }
       if (this.isGhost) {
         this.el.setAttribute('ammo-body', {disableCollision: true});
         this.disableCollisionTemp();
@@ -528,8 +544,8 @@ AFRAME.registerComponent('spawned_object', { //cooked on the fly...
     });
 
     this.el.addEventListener("collidestart", (e) => { 
-      e.preventDefault();
-      // console.log("mod_physics collision on object  :" + this.el.id + " by " + e.detail.targetEl.id + " isTrigger " + this.isTrigger);
+      // e.preventDefault();
+      console.log("collision on spawned object  :" + this.el.id + " by " + e.detail.targetEl.id + " isTrigger " + this.isTrigger);
       if (this.isTrigger) { 
       
         if (e.detail.targetEl.id.includes("wall")) {
@@ -541,7 +557,10 @@ AFRAME.registerComponent('spawned_object', { //cooked on the fly...
           // }
           this.randomPush();
 
-        }        
+        } 
+        if (e.detail.targetEl.id.includes("obj")) {
+
+        }       
       }
       
     });
@@ -641,7 +660,7 @@ AFRAME.registerComponent('spawned_object', { //cooked on the fly...
     }
 });
 
-AFRAME.registerComponent('instanced_meshes_sphere_physics', { //scattered randomly in sphere, using instanced-mesh component, but can't get the colliders to fit... :(
+AFRAME.registerComponent('instanced_meshes_sphere_physics', { //scattered randomly in sphere, NOT INSTANCED...
   schema: {
     type: {default: 'instance'},
     _id: {default: ''},

@@ -1862,6 +1862,7 @@ AFRAME.registerComponent('mod_model', {
             scatteredEl.setAttribute("mod_model", {eventData: eventData, markerType: this.data.markerType, scale: this.scale * scale, ypos: this.data.ypos, tags: this.data.tags, description: this.data.description, modelID: this.data.modelID});
             scatteredEl.setAttribute("shadow", {cast: true, receive: true});
             scatteredEl.classList.add("envMap");
+            scatteredEl.id = "scattered_" + i.toString();
             // if (this.data.markerType != "character") { //messes up navmeshing..
               
               scatteredEl.setAttribute("scale", {x: this.scale * scale, y: this.scale * scale, z: this.scale * scale});

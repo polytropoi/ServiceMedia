@@ -27,7 +27,8 @@ AFRAME.registerComponent('mod_objex', {
         let theLocData = this.el.getAttribute('data-objex-locations');
         this.sceneInventoryItems = null; //might be loaded after init, called from mod_scene_inventory component, if not part of the scene
         this.fromSceneInventory = false;
-  
+        this.equipHolder = document.getElementById("equipPlaceholder");
+        this.equippedObject = this.equipHolder.querySelector('.equipped');
         this.data.jsonObjectData = JSON.parse(atob(theData)); //object items with model references
         this.data.jsonLocationsData = JSON.parse(atob(theLocData)); //scene locations with object references
         // console.log("objxe datas" + JSON.stringify(this.data.jsonObjectData));
@@ -249,10 +250,10 @@ AFRAME.registerComponent('mod_objex', {
         console.log("tryna add fetched obj " + obj._id)
         this.data.jsonObjectData.push(obj); 
       },
-
+      
       
       scatterObject: function (objectID) {
-        console.log("tryna set model to " + objectID);  
+        console.log("tryna scatter mod_object " + objectID);  
         this.objectData = this.returnObjectData(objectID);
         this.scatterPos = new THREE.Vector3();
         this.objEl = document.createElement("a-entity");
@@ -266,7 +267,7 @@ AFRAME.registerComponent('mod_objex', {
         this.objEl.setAttribute("mod_object", {'eventData': null, 'locationData': this.locData, 'objectData': this.objectData, 'isSpawned': true});
         this.objEl.id = "obj" + this.objectData._id + "_" + this.locData.timestamp;
         sceneEl.appendChild(this.objEl);
-       
+             
       },
       
       dropInventoryObject: function (inventoryID, action, inventoryObj) {
@@ -369,8 +370,7 @@ AFRAME.registerComponent('mod_objex', {
         this.dropPos = new THREE.Vector3();
         this.dropRot = new THREE.Quaternion();
         this.objEl = document.createElement("a-entity");
-        this.equipHolder = document.getElementById("equipPlaceholder");
-        this.equippedObject = this.equipHolder.querySelector('.equipped');
+
         if (this.equippedObject != null) {
           this.equippedObject.object3D.getWorldPosition(this.dropPos);
         }
@@ -610,6 +610,11 @@ AFRAME.registerComponent('mod_object', {
         // this.camera = cameraEl.components.camera.camera;
       }
       
+      if (this.data.eventData.includes("scatter")) {
+        this.scatterMe();
+        return;
+      }
+
       if (JSON.stringify(this.data.eventData).includes("beat")) {
         console.log ("adding class beatmee");
         this.el.classList.add("beatme");
@@ -617,6 +622,7 @@ AFRAME.registerComponent('mod_object', {
         
       }
       
+
       this.el.classList.add("allowMods");
       this.el.setAttribute("shadow", {cast:true, receive:true});
   
@@ -935,8 +941,8 @@ AFRAME.registerComponent('mod_object', {
               THREE.MathUtils.degToRad(rot.z)
             );
           }
-          console.log("OBJTYPE IS : " +this.data.objectData.objtype);
-          if (this.data.objectData.objtype === "Character") { 
+          // console.log("OBJTYPE IS : " +this.data.objectData.objtype);
+          if (this.data.objectData.objtype.toLowerCase() === "character") { 
             // const vector = new THREE.Vector3();
             
             let skinnedMeshColliderEl = document.createElement("a-sphere"); // can't got the boundingbox to work...
@@ -1060,7 +1066,7 @@ AFRAME.registerComponent('mod_object', {
 
               this.el.setAttribute("glow");
             }
-            if (this.data.eventData.toLowerCase().includes("agent") || this.data.objectData.physics.includes("Navmesh Agent")) { 
+            if (this.data.markerType.toLowerCase().includes("character") || this.data.eventData.toLowerCase().includes("agent") || this.data.objectData.physics.includes("Navmesh Agent")) { 
               if (settings.useNavmesh || settings.useSimpleNavmesh) {
                 // this.el.setAttribute("nav-agent", "");
                 this.el.setAttribute("nav_agent_controller", "");  
@@ -1080,8 +1086,8 @@ AFRAME.registerComponent('mod_object', {
   
             if (clips != null) { 
               for (i = 0; i < clips.length; i++) { //get reference to all anims
-                hasAnims = true;
-                // console.log("mod_object " + this.data.objectData.name + " has animation: " + clips[i].name);
+                hasAnims = true
+                console.log("mod_object " + this.data.objectData.name + " has animation: " + clips[i].name);
                 
                 if (clips[i].name.includes("mouthopen")) {
                   moIndex = i;
@@ -1090,12 +1096,21 @@ AFRAME.registerComponent('mod_object', {
                 // if (clips[i].name.includes("mouthopen")) {
                 //   moIndex = i;
                 // }
+                
                 if (clips[i].name.toLowerCase().includes("mixamo")) {
                   console.log("gotsa mixamo idle anim");
                   idleIndex = i;
                   this.idleClips.push(clips[i]);
                 }
                 if (clips[i].name.toLowerCase().includes("take 001")) {
+                  idleIndex = i;
+                  this.idleClips.push(clips[i]);
+                }
+                if (clips[i].name.toLowerCase().includes("default")) {
+                  idleIndex = i;
+                  this.idleClips.push(clips[i]);
+                }
+                if (clips[i].name.toLowerCase().includes("armatureaction")) {
                   idleIndex = i;
                   this.idleClips.push(clips[i]);
                 }
@@ -1605,7 +1620,7 @@ AFRAME.registerComponent('mod_object', {
         // }
       });
       this.el.addEventListener('mouseenter', (evt) => {
-        console.log("mouse enter mod_object name " + this.data.objectData.name + " id " + this.el.id);
+        console.log("mouse enter mod_object name " + this.data.objectData.name + " id " + this.el.id + " " + this.data.markerType + " " + this.data.objectData.objtype);
         evt.preventDefault();
         if (!this.data.isEquipped) {
           if (posRotReader != null) {
@@ -1954,13 +1969,15 @@ AFRAME.registerComponent('mod_object', {
               if (this.triggerAudioController != null) {
                 this.triggerAudioController.components.trigger_audio_control.playAudioAtPosition(this.hitpoint, this.distance, ["shoot"], .5);//tagmangler needs an array, add vol mod 
               }
-              this.el.object3D.visible = false;
+              // this.el.object3D.visible = false;
               this.el.classList.remove("activeObjexRay");
-              setTimeout(() => {
-                this.el.object3D.visible = true;
-                this.el.classList.add("activeObjexRay");
-              }, 3000);
+            
               this.objexEl.components.mod_objex.shootObject(this.data.objectData._id);
+              // this.restoreEquipped;
+              setTimeout(() => {
+                // this.el.object3D.visible = true;
+                this.el.classList.add("activeObjexRay");
+              }, 1000);
               // this.applyForce();
               
             } 
@@ -2059,7 +2076,7 @@ AFRAME.registerComponent('mod_object', {
                });
              });
            } else {
-             console.log("no walk clips found!");
+            //  console.log("no walk clips found!");
            }
          break;
    
@@ -2603,6 +2620,95 @@ AFRAME.registerComponent('mod_object', {
           this.el.emit('beatRecover');
   
       }
-    }
+    },
+    scatterMe: function () {
+      // this.el.object3D.visible = false;
+      // let initPos = this.el.getAttribute("position");
+      let surface = null;
+      let scatterSurface = document.getElementById("scatterSurface");
+      let navmesh = document.getElementById("nav-mesh");
+      if (navmesh) {
+        surface = navmesh;
+      } else if (scatterSurface) {
+        surface = scatterSurface;
+      }
+      console.log("tryna SCATTER (not instance) a object " + navmesh + "  " + scatterSurface);
+      if (surface) {
+        let count = 10;
+        let split = this.data.eventData.split("~"); //gonna switch to tags...
+        if (split.length > 1) {
+          if (parseInt(split[1]) != NaN) {
+            count = parseInt(split[1]);
+          }
+          
+        }
+        console.log("TRYNA SCATTER MOD_OBJECT with count " + count + " ypos " + this.data.ypos);
+        let scatterCount = 0;
+        // if (!this.isNavAgent) { //use waypoints for position below instead of raycasting if it's gonna nav
+        let interval = setInterval( () => {
+        for (let i = 0; i < 100; i++) {
+          let testPosition = new THREE.Vector3();
+          testPosition.x = this.returnRandomNumber(-100, 100);  
+          testPosition.y = 50;
+          testPosition.z = this.returnRandomNumber(-100, 100);
+          let raycaster = new THREE.Raycaster();
+          raycaster.set(new THREE.Vector3(testPosition.x, testPosition.y, testPosition.z), new THREE.Vector3(0, -1, 0));
+          let results = raycaster.intersectObject(surface.getObject3D('mesh'), true);
+  
+          if(results.length > 0) {
+            let scale = this.returnRandomNumber(.5, 1.5);
+            console.log("gotsa scatterPosition for object " + this.data.objectData.objectID + " intersect: " + results.length + " " +results[0].object.name + "scatterCount " + scatterCount + " vs count " + count +  " scale " + this.scale);
+            testPosition.x = results[0].point.x.toFixed(2); //snap y of waypoint to navmesh y
+            testPosition.y = results[0].point.y.toFixed(2) + this.data.ypos; //snap y of waypoint to navmesh y
+            testPosition.z = results[0].point.z.toFixed(2); //snap y of waypoint to navmesh y
+            let scatteredEl = document.createElement("a-entity"); 
+            scatteredEl.setAttribute("position", testPosition);
+            scatteredEl.setAttribute("gltf-model", "#" + this.data.modelID);
+            let eventData = this.data.eventData.replace("scatter", ""); //prevent infinite recursion!
+            let location = {};
+            location.x = testPosition.x;
+            location.y = testPosition.y;
+            location.z = testPosition.z;
+            location.eulerx = 0;
+            location.eulery = 0;
+            location.eulerz = 0;
+            
+            scatteredEl.setAttribute("mod_object", {eventData: eventData, markerType: this.data.markerType, scale: this.scale * scale, ypos: this.data.ypos, tags: this.data.tags, 
+                                                    description: this.data.description, locationData: location, objectData: this.data.objectData});
+            scatteredEl.setAttribute("shadow", {cast: true, receive: true});
+            scatteredEl.classList.add("envMap");
+            scatteredEl.id = "scattered_" + i.toString();
+            // if (this.data.markerType != "character") { //messes up navmeshing..
+              
+              scatteredEl.setAttribute("scale", {x: this.scale * scale, y: this.scale * scale, z: this.scale * scale});
+              // scatteredEl.setAttribute("scale", {x: scale, y:scale, z: scale})
+
+            // }
+            this.el.sceneEl.appendChild(scatteredEl);
+            scatterCount++;
+
+            if (scatterCount > count) {
+              clearInterval(interval);
+              break;
+              } else {
+                break;
+              }
+                
+            } else {
+              console.log('bad testPosition ' + JSON.stringify(testPosition));
+              // waypoints.splice(i, 1);
+            }
+            // console.log("randomWaypoint : " + position);
+            if (i == 100) {
+              clearInterval(interval);
+            }
+          }
+        }, 2000);
+      }
+      
+    },
+    returnRandomNumber: function (min, max) {
+      return Math.random() * (max - min) + min;
+    },
    
   }); ///////////////////////// MOD_OBJECT END
