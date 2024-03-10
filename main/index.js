@@ -3808,6 +3808,7 @@
                             "<option>Highlight</option>" +
                             "<option>Select</option>" +
                             "<option>Collide</option>" +
+                            "<option>Kill</option>" +
                             "<option>Find</option>" +
                             "<option>Consume</option>" +
                             "<option>Pickup</option>" +

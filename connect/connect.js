@@ -183,6 +183,9 @@ function InitIDB() {
                                                          cursor.value.locations[i].eulerx, 
                                                          cursor.value.locations[i].eulery, 
                                                          cursor.value.locations[i].eulerz, 
+                                                         cursor.value.locations[i].xscale,
+                                                         cursor.value.locations[i].yscale,
+                                                         cursor.value.locations[i].zscale,
                                                          cursor.value.locations[i].modelID);
                         }
                      }

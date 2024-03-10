@@ -4658,6 +4658,8 @@ AFRAME.registerComponent('scene_greeting_dialog', {  //if "greeting" scenetag + 
             // this.el.setAttribute("visible", false);
             // this.startButtonTextEl.setAttribute("scale", ".2 .2 .2");
             // this.startButtonBackgroundEl.setAttribute("scale", ".2 .2 .2");
+            this.startButtonTextEl.setAttribute("visible", false);
+            this.startButtonBackgroundEl.setAttribute("visible", false);
             console.log("TRYNA HIDE DIALOG! " + this.data.behavior);
             this.greetingEl.setAttribute("troika-text", {
               value: ""
@@ -4681,11 +4683,11 @@ AFRAME.registerComponent('scene_greeting_dialog', {  //if "greeting" scenetag + 
       this.greetingEl.setAttribute("position", "0 1 0");
 
       this.questEl = null;
-      if (this.data.questText.length) {
+      // if (this.data.questText.length) {
         this.questEl = document.createElement("a-entity");
         this.el.appendChild(this.questEl);
         this.questEl.setAttribute("position", "0 0 0");
-      }
+      // }
 
       this.greetingEl.setAttribute("troika-text", {
         fontSize: .6,
@@ -4756,7 +4758,10 @@ AFRAME.registerComponent('scene_greeting_dialog', {  //if "greeting" scenetag + 
 
   },
   modQuest: function (text) {
+    this.startButtonBackgroundEl.setAttribute("visible", false);
+    this.startButtonTextEl.setAttribute("visible", false);
     if (this.questEl) {
+
       this.questEl.setAttribute("troika-text", {
         fontSize: .2,
         maxWidth: 5,
@@ -4770,8 +4775,30 @@ AFRAME.registerComponent('scene_greeting_dialog', {  //if "greeting" scenetag + 
     }
 
   },
-  hideButton: function () {
+  ShowMessageAndHide: function (text, time) {
+    this.startButtonBackgroundEl.setAttribute("visible", false);
+    this.startButtonTextEl.setAttribute("visible", false);
+    if (this.questEl) {
 
+      this.questEl.setAttribute("troika-text", {
+        fontSize: .2,
+        maxWidth: 5,
+        align: "center",
+        font: "/fonts/web/" + this.font2,
+        strokeWidth: '1%',
+        color: this.fillColor,
+        strokeColor: this.outlineColor,
+        value: text
+      });
+      this.hideMessage(time);
+    }
+
+
+  },
+  hideMessage: function (time) {
+    setTimeout(() => {
+      this.questEl.setAttribute("troika-text", {value: ""});
+    }, time);
   }
 
 });

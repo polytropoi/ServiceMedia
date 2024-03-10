@@ -19,8 +19,11 @@ AFRAME.registerComponent('mod_model', {
   
         xrot: {type: 'number', default: 0},//in degrees, trans to radians below
         yrot: {type: 'number', default: 0},
-        zrot: {type: 'number', default: 0}
-        
+        zrot: {type: 'number', default: 0},
+
+        xscale: {type: 'number', default: 0}, //like the others...
+        yscale: {type: 'number', default: 0},
+        zscale: {type: 'number', default: 0},
       },
       init: function () {
         
@@ -168,6 +171,7 @@ AFRAME.registerComponent('mod_model', {
           this.hasLocationCallout = true;
           this.hasCallout = true;
         }
+       
         this.oScale = new THREE.Vector3();
         let that = this;
         ///////////////////////////////////////////////// model loaded event start /////////////////////////////
@@ -179,6 +183,9 @@ AFRAME.registerComponent('mod_model', {
   
           
           this.el.object3D.getWorldScale(this.oScale);
+          if (this.data.tags.includes("hide") || this.data.tags.includes("invisible") || this.data.tags.includes("transparent")) {
+            this.el.object3D.visible = false;
+          }
           if (this.data.eventData && this.data.eventData.includes("physics")) {
             if (settings.usePhysicsType == "ammo") {
               if (this.data.eventData.includes("static")) {

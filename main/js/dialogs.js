@@ -177,7 +177,6 @@ window.addEventListener( 'keyup',  ( event ) => {
     console.log("color 1 changed " + e.target.value);
     ColorMods(e, e.target.value);
   });
-
   $('#modalContent').on('change', '#sceneColor2', function(e) {
     console.log("color 2 changed " + e.target.value);
     ColorMods(e, e.target.value);
@@ -190,6 +189,19 @@ window.addEventListener( 'keyup',  ( event ) => {
   $('#modalContent').on('change', '#sceneColor4', function(e) {
     console.log("color 4 changed " + e.target.value);
     ColorMods(e, e.target.value);
+  });
+
+  $('#modalContent').on('change', '#xscale', function(e) {
+    console.log("xscale changed " + e.target.value);
+
+  });
+  $('#modalContent').on('change', '#yscale', function(e) {
+    console.log("yscale changed " + e.target.value);
+
+  });
+  $('#modalContent').on('change', '#zscale', function(e) {
+    console.log("zscale changed " + e.target.value);
+   
   });
 
   $('#modalContent').on('change', '#locationTarget', function(e) { //value has timestamp ~ modelID //no, just just the modelID, get el id from global
@@ -239,38 +251,11 @@ window.addEventListener( 'keyup',  ( event ) => {
       let localMarkerComponent = locEl.components.local_marker;
       let cloudMarkerComponent = locEl.components.cloud_marker;
 
-      // if (uModelID && uModelID != "" && uModelID != "none") { //model id
-      //   if (uModelID.includes("primitive_")) { 
-      //     if (uModelID.includes("cube")) {
-      //       uModelName == "cube";
-      //     } else if (uModelID.includes("sphere")) {
-      //       uModelName == "sphere";
-      //     } else if (uModelID.includes("cylinder")) {
-      //       uModelName == "cylinder";
-      //     }
 
-      //   } else {
-      //     for (let i = 0; i < sceneModels.length; i++) {
-      //       if (sceneModels[i]._id == uModelID) {
-      //         uModelName = sceneModels[i].name; //really just need the name
-      //         // uModelID = sceneModels[i]._id;
-      //         break;  
-      //       }    
-      //     } 
-      //   }
         for (let i = 0; i < localData.locations.length; i++) { 
           // console.log(localData.locations[i].timestamp + " vs " + selectedLocationTimestamp);
           if (localData.locations[i].timestamp == selectedLocationTimestamp) {
-            // console.log("gotsa match "+ localData.locations[i].timestamp + " vs " + selectedLocationTimestamp);
-            // localData.locations[i].modelID = uModelID;
-            // localData.locations[i].model = uModelName;
-            // localData.locations[i].objectID = "none";
-            // localData.locations[i].objectName = "";
-            // if (localData.locations[i].markerType.toLowerCase() == 'none') {
-            //   localData.locations[i].markerType == 'model';
-            //   document.getElementById("locationMarkerType").value = "model";
-            // }
-            // if (!localData.locations[i].isLocal) {
+            
               if (modModelComponent) {
                 modModelComponent.data.tags = localTags;
                 // modModelComponent.loadModel(uModelID); 

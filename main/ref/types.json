@@ -571,6 +571,7 @@
         "Send Email",
         "OnLoad",
         "Collide",
+        "Kill",
         "Find",
         "Pickup",
         "Drop",

@@ -224,6 +224,15 @@ AFRAME.registerComponent('mod_objex', {
           }
         }
       },
+      returnObjectExists: function(objectID) {
+        let resp =  false;
+        for (let i = 0; i < this.data.jsonObjectData.length; i++) {
+          if (objectID == this.data.jsonObjectData[i]._id) {
+            resp = true;
+          }
+        }
+        return resp;
+      },
       returnObjectData: function(objectID) {
         console.log('tryna return object data for ' +objectID);
         // let hasObj = false;
@@ -416,7 +425,10 @@ AFRAME.registerComponent('mod_objex', {
   });
   
   function FetchSceneInventoryObject(oID) { //add a single scene inventory object, e.g. child object spawn that isn't in initial collection, but don't init everything
-    let objexEl = document.getElementById('sceneObjects');    
+    let objexEl = document.getElementById('sceneObjects');   
+
+    if (objexEl && !objexEl.components.mod_objex.returnObjectExists(oID)) {
+ 
     // if (oIDs.length > 0) {
       // objexEl.components.mod_objex.dropObject(data.inventoryObj.objectID);
       let data = {};
@@ -434,6 +446,9 @@ AFRAME.registerComponent('mod_objex', {
             objexEl.components.mod_objex.addFetchedObject(response.objex[0]); //add to scene object collection, so don't have to fetch again
         } 
       }
+    } else {
+      console.log("already have that object...");
+    }
   }
   
   function FetchSceneInventoryObjex(oIDs) { //fetch scene inventory objects, i.e. stuff dropped by users, at start to populate scene
@@ -518,6 +533,7 @@ AFRAME.registerComponent('mod_object', {
       this.loadAction = null;
       this.highlightAction = null;
       this.collideAction = null;
+      this.killAction = null;
       this.findAction = null;
       this.synth = null;
       this.hasSynth = false;
@@ -525,7 +541,8 @@ AFRAME.registerComponent('mod_object', {
       this.pushForward = false;
       this.followPath = false;
       this.targetLocations = [];
-  
+      this.currentDamage = 0; //in objectData.hitpoints
+      
       this.lookVector = new THREE.Vector3( 0, 0, -1 );
       // this.startPoint = new THREE.Vector3();
       // this.tempVector = new THREE.Vector3();
@@ -550,7 +567,7 @@ AFRAME.registerComponent('mod_object', {
       this.el.sceneEl.object3D.add(this.lineObject);
       this.curve = null;
       this.isTriggered = false;
-  
+      this.isDead = false;
   
   
       this.textIndex = 0;
@@ -718,17 +735,21 @@ AFRAME.registerComponent('mod_object', {
       // if ((this.tags != null && !this.tags.includes("thoughtbubble")) && !this.tags.includes("hide callout")) { //TODO implement Callout Options!
       
       // if (!this.tags.includes("hide callout")) { //TODO implement Callout Options!
-        if (this.data.objectData.callouttext != undefined && this.data.objectData.callouttext != null && this.data.objectData.callouttext.length > 0) {
-          if (this.data.objectData.callouttext.includes('~')) {
-            this.calloutLabelSplit = this.data.objectData.callouttext.split('~'); 
-            this.textData = this.calloutLabelSplit;
-          }
+          // if (this.data.objectData.callouttext != undefined && this.data.objectData.callouttext != null && this.data.objectData.callouttext.length > 0) {
+          //   this.hasCallout = true;
+          // }
+        if (this.data.objectData.callouttext.includes('~')) {
+          this.calloutLabelSplit = this.data.objectData.callouttext.split('~'); 
+          this.textData = this.calloutLabelSplit;
+        } else {
+          this.textData = this.data.objectData.callouttext;
+        }
           console.log(this.data.objectData.name + "callouttext " + this.data.objectData.callouttext );
           this.calloutEntity = document.createElement("a-entity");
          
           this.calloutText = document.createElement("a-entity");
                   // this.calloutEntity.appendChild(this.calloutPanel);
-            this.calloutEntity.appendChild(this.calloutText);
+          this.calloutEntity.appendChild(this.calloutText);
           this.calloutEntity.id = "objCalloutEntity_" + this.data.objectData._id;
         
           this.calloutText.id = "objCalloutText_" + this.data.objectData._id;
@@ -752,7 +773,8 @@ AFRAME.registerComponent('mod_object', {
           // calloutEntity.setAttribute("render-order", "hud");
           if (this.isNavAgent) {
             this.el.appendChild(this.calloutEntity);
-            this.calloutEntity.setAttribute("position", "0 1 0");
+            let y = this.data.objectData.yAxisFudge + 2;
+            this.calloutEntity.setAttribute("position", "0 "+y+" 0");
           } else {
             this.el.sceneEl.appendChild(this.calloutEntity);
           }
@@ -778,7 +800,7 @@ AFRAME.registerComponent('mod_object', {
             value: ""
           });
           this.calloutText.setAttribute("overlay");
-        } 
+        // } 
       // }
       // if (this.data.objectData.synthNotes != undefined && this.data.objectData.synthNotes != null && this.data.objectData.synthNotes.length > 0) {
       if (this.data.objectData.tonejsPatch1 != undefined && this.data.objectData.tonejsPatch1 != null) {  
@@ -788,7 +810,11 @@ AFRAME.registerComponent('mod_object', {
       }
      
       if (this.data.objectData.actions != undefined && this.data.objectData.actions.length > 0) {
+      
         for (let a = 0; a < this.data.objectData.actions.length; a++) {
+          if (this.data.objectData.actions[a].objectID && this.data.objectData.actions[a].objectID.length > 8 ) {
+            FetchSceneInventoryObject(this.data.objectData.actions[a].objectID);
+          }
             // console.log("action: " + JSON.stringify(this.data.objectData.actions[a].actionType));
           if (this.data.objectData.actions[a].actionType.toLowerCase() == "onload") {
             // this.hasSelectAction = true;
@@ -805,6 +831,10 @@ AFRAME.registerComponent('mod_object', {
           if (this.data.objectData.actions[a].actionType.toLowerCase() == "collide") {
             this.hasCollideAction = true;
             this.collideAction = this.data.objectData.actions[a];
+          }
+          if (this.data.objectData.actions[a].actionType.toLowerCase() == "kill") { 
+            this.hasKillAction = true;
+            this.killAction = this.data.objectData.actions[a];
           }
           if (this.data.objectData.actions[a].actionType.toLowerCase() == "pickup") {
             this.hasPickupAction = true;
@@ -946,7 +976,12 @@ AFRAME.registerComponent('mod_object', {
             // const vector = new THREE.Vector3();
             
             let skinnedMeshColliderEl = document.createElement("a-sphere"); // can't got the boundingbox to work...
-            skinnedMeshColliderEl.setAttribute("scale", ".5 1 .5"); //todo pass in scale
+            let cscale = ".5 1 .5";
+            if (this.data.objectData.colliderScale && this.data.objectData.colliderScale != "") {
+              cscale = this.data.objectData.colliderScale * .5 + " " + this.data.objectData.colliderScale + " " + this.data.objectData.colliderScale * .5;
+            }
+            
+            skinnedMeshColliderEl.setAttribute("scale", cscale); //todo pass in scale
             // skinnedMeshColliderEl.setObject3D(sphere);
             if (settings && settings.debugMode) {
               skinnedMeshColliderEl.setAttribute("material", {"color": "purple", "transparent": true, "opacity": 0.1});
@@ -1259,6 +1294,10 @@ AFRAME.registerComponent('mod_object', {
             let eventData = this.data.eventData;
             /// SHOULD INSTEAD LOOK AT THE OBJECT TEXT PROPS?!?
             // if (this.tags != null && this.tags.includes("thoughtbubble") && !this.data.eventData.toLowerCase().includes("undefined") && this.data.eventData.toLowerCase().includes("main") && this.data.eventData.toLowerCase().includes("text")) {
+            if (this.data.objectData.callouttext != undefined && this.data.objectData.callouttext != null && this.data.objectData.callouttext.length > 0) {
+              this.hasCallout = true;
+            }
+            
             if (this.data.eventData.toLowerCase().includes("main") && this.data.eventData.toLowerCase().includes("text")) {
               document.getElementById("mainTextToggle").setAttribute("visible", false);
               this.data.eventData = document.getElementById("mainText").getAttribute("main-text-control", "mainTextString"); 
@@ -1384,7 +1423,8 @@ AFRAME.registerComponent('mod_object', {
               }
             } 
             if (this.data.objectData.physics != undefined && this.data.objectData.physics != null && this.data.objectData.physics.toLowerCase() != "none") {
-              console.log("tryna add physics to new mod_object " + this.data.objectData.name + " is equipped " + this.data.isEquipped + " body " + this.data.objectData.physics);
+              console.log("tryna add physics to new mod_object " + this.data.objectData.name + " is equipped " + this.data.isEquipped + " body " +
+                                        this.data.objectData.physics + " hasShoot " + this.hasShootAction + " hasThrow " + this.hasThrowAction);
               //  setTimeout(function(){  
                 if (this.data.isEquipped) {
                   // this.el.setAttribute('ammo-body', {type: 'kinematic', linearDamping: .1, angularDamping: .1});
@@ -1403,28 +1443,67 @@ AFRAME.registerComponent('mod_object', {
                       }, 5000);
                     }
                   } else if (this.hasThrowAction) {
-                    console.log("tryna throw..");
-                    if (this.data.isSpawned) {
-                      this.el.setAttribute('ammo-body', { type: this.data.objectData.physics.toLowerCase(), emitCollisionEvents: true, linearDamping: .1, angularDamping: .1 });
-                      this.el.setAttribute('trail', "");
+                    console.log("spawned object hasThrowAction!");
+                    // if (this.data.isSpawned) {
+                    //   this.el.setAttribute('ammo-body', { type: this.data.objectData.physics.toLowerCase(), emitCollisionEvents: true, linearDamping: .1, angularDamping: .1 });
+                    //   this.el.setAttribute('trail', "");
 
-                    } else {
-                      setTimeout( () => { //wait a bit for static colliders to load...
-                        this.el.setAttribute('ammo-body', { type: this.data.objectData.physics.toLowerCase(), emitCollisionEvents: true, linearDamping: .1, angularDamping: .1 });
-                        // this.el.setAttribute('rotate-toward-velocity');
-                        // this.el.setAttribute('trail', "");
-                        // this.el.body.restitution = .9;
+                    // } else {
+                       //wait a bit for static colliders to load...
+                      //  gravity: '0 0 0 ', 
+                        this.el.setAttribute('ammo-body', {type: this.data.objectData.physics.toLowerCase(), emitCollisionEvents: true, linearDamping: .1, angularDamping: .1});
+                        
+                        let yfudge = '0 1 0';
+                        if (this.data.objectData.yPosFudge) {
+                          yfudge = '0 ' + this.data.objectData.yPosFudge + ' 0';
+                        }
+                        // let halfExtents = '1 1 1';
+                        let halfExtents = {};
+                        halfExtents.x = 1;
+                        halfExtents.y = 1;
+                        halfExtents.z = 1;
+
+                        let offset = {};
+                        offset.x = 0;
+                        offset.y = 1;
+                        offset.z = 0;
+
+                        if (this.data.objectData.colliderScale && this.data.objectData.colliderScale != 0 && this.data.objectData.colliderScale != "") {
+                          if (this.data.objectData.collidertype == "box") {
+                          // halfExtents = this.data.objectData.colliderScale + " " + this.data.objectData.colliderScale + " " + this.data.objectData.colliderScale;
+                          this.el.setAttribute('ammo-shape', {type: this.data.objectData.collidertype.toLowerCase(), fit: 'manual', halfExtents: halfExtents, offset: offset});
+                          } 
+                          if (this.data.objectData.collidertype == "sphere") {
+                            this.el.setAttribute('ammo-shape', {type: 'sphere', fit: 'manual', sphereRadius: this.data.colliderScale, offset: yfudge});
+                          }
+                        } else {
+                          console.log("no collider scale, using default...");
+                          this.el.setAttribute('ammo-shape', {type: this.data.objectData.collidertype.toLowerCase(), halfExtents: halfExtents, offset: offset});
+                        }
                        
-                      }, 5000);
-                    }
+                        console.log("ammo shape is " + JSON.stringify(that.el.getAttribute('ammo-shape')) + " applyForce " + this.data.applyForceToNewObject);
+                        if (this.data.applyForceToNewObject) {
+                          // this.el.setAttribute("aabb-collider", {objects: ".activeObjexRay"});
+                          this.applyForce();
+                          this.el.setAttribute('trail', "");
+                        } else {
+                          // setTimeout( () => {
+                          //   this.el.setAttribute('ammo-body', {disableSimulation: false});
+                          // }, 4000);
+                        }
+                        // this.el.setAttribute('rotate-toward-velocity');
+                       
+                        // this.el.body.restitution = .9;
+
+                    // }
                    
                   } else if (this.data.objectData.physics.toLowerCase() == "navmesh agent") {
                     this.el.setAttribute('ammo-body', {type: 'kinematic', emitCollisionEvents: true });
                   } else {
                     setTimeout( () => { //wait a bit for static colliders to load...
-                      console.log("tryna set physics body "+ this.data.objectData.physics.toLowerCase());
+                      console.log("tryna set physics body with timeout "+ this.data.objectData.physics.toLowerCase());
                       this.el.setAttribute('ammo-body', { type: this.data.objectData.physics.toLowerCase(), emitCollisionEvents: true });
-                    }, 5000);
+                    }, 2000);
                    
                     //this.el.body.restitution = .9;
                   }
@@ -1438,33 +1517,44 @@ AFRAME.registerComponent('mod_object', {
       this.el.addEventListener('body-loaded', () => {  //body-loaded event = physics ready on obj
         // console.log("loaded mod_object physics body now applying shape: : " + JSON.stringify(this.data.objectData));
       // if (this.data.objectData.objectID && this.data.objectData.objectID != "none") {
-        let yoffset = '0';
+        let yfudge = '0 1 0';
         if (this.data.objectData.yPosFudge) {
-          yoffset = this.data.objectData.yPosFudge;
+          yfudge = '0 ' + this.data.objectData.yPosFudge + ' 0';
         }
-        this.el.setAttribute('ammo-shape', {type: this.data.objectData.collidertype.toLowerCase(), offset: '0 '+yoffset+' 0'});
+        let halfExtents = '1 1 1';
+        if (this.data.objectData.colliderScale) {
+          if (this.data.objectData.collidertype == "box") {
+          halfExtents = this.data.objectData.colliderScale + " " + this.data.objectData.colliderScale + " " + this.data.objectData.colliderScale;
+          this.el.setAttribute('ammo-shape', {type: this.data.objectData.collidertype.toLowerCase(), fit: 'manual', halfExtents: halfExtents, offset: yfudge});
+          } 
+          if (this.data.objectData.collidertype == "sphere") {
+            this.el.setAttribute('ammo-shape', {type: 'sphere', fit: 'manual', sphereRadius: this.data.colliderScale, offset: yfudge});
+          }
+        } else {
+          this.el.setAttribute('ammo-shape', {type: this.data.objectData.collidertype.toLowerCase(), offset: yfudge});
+        }
+       
         // console.log("ammo shape is " + JSON.stringify(that.el.getAttribute('ammo-shape')));
         if (this.data.applyForceToNewObject) {
           // this.el.setAttribute("aabb-collider", {objects: ".activeObjexRay"});
           this.applyForce();
         }
-      });
+      }); //end body-loaded listener
+
       this.el.addEventListener("collidestart", (e) => {
           // e.preventDefault();
-          // let targetModObjComponent = e.detail.targetEl.components.mod_object;
-          // console.log("mod_physics collisoin with object with :" + this.el.id + " " + e.detail.targetEl.classList);
-          // if (this.data.isTrigger) { //
-         
-
-            console.log("physics collision HIT me "  + this.data.objectData.name + " other id " + e.detail.targetEl.id);
+        if (!this.isDead && e.detail.targetEl) {
+            // console.log("physics collision HIT me "  + this.data.objectData.name + " other id " + e.detail.targetEl.id);
                        
+            this.hitpoint = e.detail.targetEl.object3D.position;
+            this.distance = window.playerPosition.distanceTo(this.hitpoint);
             if (this.triggerAudioController != null) {
-              console.log("tryna play trigger audio hit");
+              // console.log("tryna play trigger audio hit");
               this.triggerAudioController.components.trigger_audio_control.playAudioAtPosition(this.hitpoint, this.distance, ["hit"]);
             }
 
-              let targetModObjComponent = e.detail.targetEl.components.mod_object;
-              if (targetModObjComponent != null) {
+            let targetModObjComponent = e.detail.targetEl.components.mod_object;
+            if (targetModObjComponent != null) {
                 console.log(this.data.objectData.name + " gotsa collision with " + targetModObjComponent.data.objectData.name);
                 if (this.data.objectData.name != targetModObjComponent.data.objectData.name) { //don't trigger yerself, but what if...?
                   // console.log("actions: " + JSON.stringify(mod_obj_component.data.objectData.actions));
@@ -1472,9 +1562,123 @@ AFRAME.registerComponent('mod_object', {
                   if (this.triggerAudioController != null) {
                     this.triggerAudioController.components.trigger_audio_control.playAudioAtPosition(this.el.object3D.position, window.playerPosition.distanceTo(this.el.object3D.position), ["magic"]);
                   }
+                  console.log(this.data.objectData.name  + " hit by other object : " + JSON.stringify(targetModObjComponent.data.objectData));
+                  if (targetModObjComponent.data.objectData.objtype == "Weapon") {
+                    if (targetModObjComponent.data.objectData.operator == "Damage" && targetModObjComponent.data.objectData.hitpoints) {
+                     
+                      if (this.calloutEntity != null) {
+                        
+                        this.currentDamage = this.currentDamage + parseFloat(targetModObjComponent.data.objectData.hitpoints);
+                        console.log("DAMAGE hitpoints " + targetModObjComponent.data.objectData.hitpoints + " distance " + this.distance + " damage " + this.currentDamage +  " of " + targetModObjComponent.data.objectData.hitpoints);
+                        if (this.currentDamage < this.data.objectData.hitpoints) {
+                          this.showCallout("Hit -" + targetModObjComponent.data.objectData.hitpoints + "\n" + this.currentDamage + " / " +this.data.objectData.hitpoints, this.hitpoint, this.distance);
+                        } else {
+                          this.isDead = true;
+                          this.showCallout("I AM DEAD NOW!", this.hitpoint, this.distance);
+                          let greetingDialogEl = document.getElementById("sceneGreetingDialog");
+                          if (greetingDialogEl) {
+                            let dialogComponent = greetingDialogEl.components.scene_greeting_dialog;
+                            if (dialogComponent) {
+                                // console.log("tryna");
+                                dialogComponent.setLocation();
+                                dialogComponent.ShowMessageAndHide("You killed a " + this.data.objectData.name + "!", 2000);
+                            } else {
+                                console.log("caint find no dangblurn dialog component!");
+                            }
+                          }
+                          if (this.killAction) {
+                            // console.log("gotsa kill action " + JSON.stringify(this.killAction));
+                            // if (this.killAction.objectID != null && this.killAction.objectID.length > 8) {
+                            //   FetchSceneInventoryObject(this.killAction.objectID);
+                            //   console.log("gotsa kill action with object " + this.killAction.objectID);
+                            // }
+                            if (this.killAction.actionResult.toLowerCase() == "trigger fx") {
+                              if (!this.isTriggered) {
+                                this.isTriggered = true;
+                                let particleSpawner = document.getElementById('particleSpawner');
+                                if (particleSpawner != null) {
+                                  var worldPosition = new THREE.Vector3();
+                                  this.el.object3D.getWorldPosition(worldPosition);
+                                  if (this.data.objectData.yPosFudge != null && this.data.objectData.yPosFudge != "") {
+                                    worldPosition.y += this.data.objectData.yPosFudge;
+                                  }
+                                  console.log("triggering fx at " + JSON.stringify(worldPosition) + " plus" + this.data.objectData.yPosFudge);
+                                  particleSpawner.components.particle_spawner.spawnParticles(worldPosition, this.data.objectData.particles, 5, null, this.data.objectData.yPosFudge, this.data.objectData.color1, this.data.objectData.triggerScale);
+                                }
+                              } else {
+                                console.log("already triggered - make it a toggle!");
+                              }
+                            }
+                            if (this.killAction.actionResult.toLowerCase() == "spawn") {
+                              if (!this.isTriggered) {
+                                this.isTriggered = true;
+
+                                  let objectData = this.objexEl.components.mod_objex.returnObjectData(this.killAction.objectID);
+                                  if (objectData == null) {
+                                    objectData = this.objexEl.components.mod_objex.returnObjectData(this.killAction.objectID);
+                                  }
+                                  if (objectData != null) {
+                                    console.log("killed object spawning object with " + JSON.stringify(objectData));
+                                    this.objEl = document.createElement("a-entity");
+                                    this.locData = {};
+                                    this.locData.x = this.el.object3D.position.x;
+                                    this.locData.y = this.el.object3D.position.y + 1;
+                                    this.locData.z = this.el.object3D.position.z;
+                                    this.locData.timestamp = Date.now();
+                                    this.objEl.setAttribute("mod_object", {'locationData': this.locData, 'objectData': objectData, 'isSpawned': true});
+                                    this.objEl.id = "obj" + objectData._id + "_" + this.locData.timestamp;
+                                    sceneEl.appendChild(this.objEl);
+                                  } else {
+                                    console.log("caint find object "+ this.killAction.objectID +", tryna fetch it..");
+                                    FetchSceneInventoryObject(this.killAction.objectID);
+                                    objectData = this.objexEl.components.mod_objex.returnObjectData(this.killAction.objectID);
+                                   
+                                    console.log("killed object spawning object with " + JSON.stringify(objectData));
+                                    this.objEl = document.createElement("a-entity");
+                                    this.locData = {};
+                                    this.locData.x = this.el.object3D.position.x;
+                                    this.locData.y = this.el.object3D.position.y + 1;
+                                    this.locData.z = this.el.object3D.position.z;
+                                    this.locData.timestamp = Date.now();
+                                    this.objEl.setAttribute("mod_object", {'locationData': this.locData, 'objectData': objectData, 'isSpawned': true});
+                                    this.objEl.id = "obj" + objectData._id + "_" + this.locData.timestamp;
+                                    sceneEl.appendChild(this.objEl);
+                                  }
+                                }
+                            } else {
+                              console.log("already triggered - make it a toggle!");
+                            }
+
+                            this.el.classList.remove('activeObjexRay');
+                            this.el.removeAttribute('ammo-shape');
+                            this.el.removeAttribute('ammo-body');
+                            this.el.parentNode.removeChild(this.el);
+                          } //end kill action
+
+
+                        } //end if is dead
+                        if (this.selectAction && (this.selectAction.actionResult.toLowerCase() == "prompt" || this.selectAction.actionResult.toLowerCase() == "dialog")) {
+                          if (this.isNavAgent && this.navAgentController) {
+                            if (this.navAgentController.currentState == "dialog") {
+                              this.navAgentController.updateAgentState("random");
+                            } else {
+                              this.navAgentController.updateAgentState("dialog");
+                              
+                              }
+                              
+                            }
+                        }
+                        }
+                      }
+                    }
+                  }
                   if (targetModObjComponent.data.objectData.actions) {
+
                     for (let i = 0; i < targetModObjComponent.data.objectData.actions.length; i++) {
                       console.log(this.data.objectData.name + "checking actions on target " + targetModObjComponent.data.objectData.name + " : " + targetModObjComponent.data.objectData.actions[i].actionName + " actionType " + targetModObjComponent.data.objectData.actions[i].actionType.toLowerCase());
+                      if (targetModObjComponent.data.objectData.actions[i].objectID) {
+                        FetchSceneInventoryObject(targetModObjComponent.data.objectData.actions[i].objectID);
+                      }
                       if (targetModObjComponent.data.objectData.actions[i].actionType.toLowerCase() == "collide") {
                         console.log("gotsa collide action");
                         //spawn new object on collision 
@@ -1546,46 +1750,20 @@ AFRAME.registerComponent('mod_object', {
                     }
                   }
                 }
-              }
-              if (this.hasShootAction && e.detail.targetEl.id != "player") {
-                console.log("tryna cleanup!")
-                this.el.sceneEl.object3D.remove(this.line);
-               
-                let trailComponent = this.el.components.trail;
-                if (trailComponent) {
-                  trailComponent.kill();
-                  // this.el.removeAttribute("trail");
+                if (this.hasShootAction && e.detail.targetEl.id != "player") {
+                  console.log("tryna cleanup!")
+                  this.el.sceneEl.object3D.remove(this.line);
+                  
+                  let trailComponent = this.el.components.trail;
+                  if (trailComponent) {
+                    trailComponent.kill();
+                    // this.el.removeAttribute("trail");
+                  }
                 }
-                // if (this.el.parentNode) {
-                //   this.el.parentNode.removeChild(this.el);
-                // } else {
-                //   let me = this.el.id;
-                //   document.getElementById(me).remove();
-                // }
-                
               }
-                    // if (this.findAction) { //check if we hit something we're looking for
-                    //   if (this.findAction.tags) {
-                    //     for (let i = 0; i < this.findAction.tags.length; i++) {
-                    //       if (e.detail.targetEl.classList.contains(this.findAction.tags[i])) {
-                    //         console.log("I FOUND ONE!");
-                    //         if (this.navAgentController) {
-                    //           this.navAgentController.updateAgentState("pause"); //
-                    //         } else {
-                    //           this.navAgentController = this.el.components.nav_agent_controller;
-                    //         }
-                    //       }
-                          
-                    //     }
-                    //   }
-                    // }
-            // }
-            // }
-          });
-        // } else { 
-        //   console.log("object not found or set to none!");
-        // }
- //end body-loaded listener
+        });// end collidestart
+     
+ 
   
       
   
@@ -1645,7 +1823,7 @@ AFRAME.registerComponent('mod_object', {
             // console.log("distance  " + this.distance);
             this.rayhit(evt.detail.intersection.object.name, this.distance, evt.detail.intersection.point);
   
-              this.selectedAxis = name;
+            this.selectedAxis = name;
             ////////TODO - wire in to Hightlight Options / Callout Options in Object view
             if (this.tags != null && this.tags.includes("thoughtbubble")) {
               calloutOn = true;
@@ -1658,11 +1836,7 @@ AFRAME.registerComponent('mod_object', {
               let pos = evt.detail.intersection.point; //hitpoint on model
               this.bubble.setAttribute('position', pos);
               this.bubbleText.setAttribute("visible", true);
-              // this.bubbleText.setAttribute('position', pos);
-  
-              // let pos = new THREE.Vector3();
-              // pos = pos.setFromMatrixPosition(obj.matrixWorld); //world pos of model, kindof
-              // worldPos = pos;
+
               let camera = AFRAME.scenes[0].camera; 
               pos.project(camera);
               var width = window.innerWidth, height = window.innerHeight; 
@@ -1671,10 +1845,7 @@ AFRAME.registerComponent('mod_object', {
               pos.x = (pos.x * widthHalf) + widthHalf;
               pos.y = - (pos.y * heightHalf) + heightHalf;
               pos.z = 0;
-              // if (pos.x != NaN) { //does it twice because matrix set, disregard if it returns NaN :( //fixed?
-              //   console.log("screen position: " + (pos.x/width).toFixed(1) + " " + (pos.y/height).toFixed(1)); //"viewport position"
-              // }
-  
+             
               if ((pos.x/width) < .45) {
                 console.log("flip left");
                 this.bubbleBackground.setAttribute("position", ".5 .2 .5");
@@ -1731,8 +1902,9 @@ AFRAME.registerComponent('mod_object', {
   
               // let elPos = this.el.getAttribute('position');
               if (this.calloutEntity != null && this.distance < 20) {
-                this.calloutEntity.setAttribute('visible', false);
-                console.log("trna scale to distance :" + this.distance);
+                // this.calloutEntity.setAttribute('visible', false);
+                let calloutString = this.data.objectData.callouttext;
+                console.log("mod_object callout w distance :" + this.distance + " " + calloutString + " isNavAgent " + this.isNavAgent);
              
                 
                 this.calloutEntity.setAttribute('visible', true);
@@ -1740,19 +1912,28 @@ AFRAME.registerComponent('mod_object', {
                 if (!this.isNavAgent) {
                   this.calloutEntity.setAttribute("position", this.pos);
                 } else {
-                  this.calloutEntity.setAttribute("position", "0 2 0");
+                  let y = '0 1 0';
+
+                  if (this.data.objectData.yPosFudge) {
+                    y = '0 ' + (parseFloat(this.data.objectData.yPosFudge) + 1) + ' 0';
+                  }
+                  console.log('tryna fudge y '+ y);
+
+                  this.calloutEntity.setAttribute('position', y);
+                  // this.calloutEntity.setAttribute("position", "0 3 0");
                 }
-                let theLabel = this.data.objectData.labeltext;
-                let calloutString = theLabel;
-                if (this.calloutLabelSplit.length > 0) {
+               
+                // let calloutString = theLabel;
+                this.calloutLabelSplit = calloutString.split("~");
+                if (this.calloutLabelSplit.length > 1) {
                   if (this.calloutLabelIndex < this.calloutLabelSplit.length - 1) {
                     this.calloutLabelIndex++;
                   } else {
                     this.calloutLabelIndex = 0;
                   }
                   calloutString = this.calloutLabelSplit[this.calloutLabelIndex];
-                }
-  
+                } 
+                
                 this.calloutText.setAttribute("troika-text", {value: calloutString});
               } else {
                 console.log("mod_object no callout " + this.calloutEntity + " " + this.distance);
@@ -2012,6 +2193,188 @@ AFRAME.registerComponent('mod_object', {
           }
         }
       });
+    },
+    showCallout: function (calloutString, hitpoint, distance) {
+      console.log("tryna show obj callout" + calloutString);
+      // for (var i in evt.detail.targetEl){
+      //   console.log(i);
+      //   for (var key in evt.detail.targetEl[i]){
+      //       console.log( key + ": " + evt.detail.targetEl[i][key]);
+      //   }
+      // }
+      this.calloutText.setAttribute("visible", true);
+      this.calloutText.setAttribute("troika-text", {value: calloutString});
+      this.pos = hitpoint;
+      this.distance = distance;
+      
+            if (this.tags != null && this.tags.includes("thoughtbubble")) {
+              calloutOn = true;
+  
+              this.bubble = sceneEl.querySelector('.bubble');
+              this.bubbleText = sceneEl.querySelector('.bubbleText');
+              this.bubbleBackground = sceneEl.querySelector('.bubbleBackground');
+              
+              this.bubble.setAttribute("visible", true);
+              let pos = evt.detail.collision.point; //hitpoint on model
+              this.bubble.setAttribute('position', pos);
+              this.bubbleText.setAttribute("visible", true);
+
+              let camera = AFRAME.scenes[0].camera; 
+              pos.project(camera);
+              var width = window.innerWidth, height = window.innerHeight; 
+              let widthHalf = width / 2;
+              let heightHalf = height / 2;
+              pos.x = (pos.x * widthHalf) + widthHalf;
+              pos.y = - (pos.y * heightHalf) + heightHalf;
+              pos.z = 0;
+             
+              if ((pos.x/width) < .45) {
+                console.log("flip left");
+                this.bubbleBackground.setAttribute("position", ".5 .2 .5");
+                this.bubbleBackground.setAttribute("scale", "-.2 .2 .2"); 
+                // this.bubbleBackground.setAttribute('scale', {x: this.distance * -.25, y: this.distance * .25, z: this.distance * .25} );
+                this.bubbleText.setAttribute("scale", ".2 .2 .2"); 
+                this.bubbleText.setAttribute("position", ".5 .2 .55");
+              } 
+              if ((pos.x/width) > .55) {
+                console.log("flip right");
+                this.bubbleBackground.setAttribute("position", "-.5 .2 .5");
+                this.bubbleBackground.setAttribute("scale", ".2 .2 .2"); 
+                // this.bubbleBackground.setAttribute('scale', {x: this.distance * -.25, y: this.distance * .25, z: this.distance * .25} );
+                this.bubbleText.setAttribute("scale", ".2 .2 .2")
+                this.bubbleText.setAttribute("position", "-.5 .2 .55");
+              }
+              let font = "Acme.woff";
+              if (settings && settings.sceneFontWeb2 && settings.sceneFontWeb2.length) {
+                font = settings.sceneFontWeb2;
+              }
+              this.bubbleText.setAttribute('troika-text', {
+                baseline: "bottom",
+                align: "center",
+                font: "/fonts/web/" + font,
+                fontSize: .2,
+                anchor: "center",
+                // wrapCount: 20,
+                color: "black",
+                value: this.textData[this.textIndex]
+  
+              });
+  
+              if (this.textIndex < this.textData.length - 1) {
+                this.textIndex++;
+              } else {
+                this.textIndex = 0;
+              }
+            } else { //"normal" callout 
+             
+              if (this.calloutEntity != null && this.distance < 20) {
+                // this.calloutEntity.setAttribute('visible', false);
+                // let calloutString = this.data.objectData.callouttext;
+                console.log("mod_object callout w distance :" + this.distance + " " + calloutString);
+             
+                
+                this.calloutEntity.setAttribute('visible', true);
+                this.calloutEntity.setAttribute('scale', {x: this.distance * .5, y: this.distance * .5, z: this.distance * .5} );
+                if (!this.isNavAgent) {
+                  this.calloutEntity.setAttribute("position", this.pos);
+                } else {
+                  let y = '0 1 0';
+
+                  if (this.data.objectData.yPosFudge) {
+                    y = '0 ' + (parseFloat(this.data.objectData.yPosFudge) + 1) + ' 0';
+                  }
+                  console.log('tryna fudge y '+ y);
+                  this.calloutEntity.setAttribute("position", y);
+                }
+               
+                // let calloutString = theLabel;
+                this.calloutLabelSplit = calloutString.split("~");
+                if (this.calloutLabelSplit.length > 1) {
+                  if (this.calloutLabelIndex < this.calloutLabelSplit.length - 1) {
+                    this.calloutLabelIndex++;
+                  } else {
+                    this.calloutLabelIndex = 0;
+                  }
+                  calloutString = this.calloutLabelSplit[this.calloutLabelIndex];
+                } 
+  
+                this.calloutText.setAttribute("troika-text", {
+                                              value: calloutString,
+                                              color: "red",
+                                              outlineColor: "white",
+                                              outlineWidth: "2%",
+                                              });
+              } else {
+                console.log("mod_object no callout " + this.calloutEntity + " " + this.distance);
+              }
+  
+              if (this.hasHighlightAction) {
+  
+              }
+            }
+  
+            if (this.isNavAgent && !this.coolDown) {
+              this.coolDownTimer();
+              if (this.navAgentController && this.navAgentController.currentState != "dialog") {
+                this.navAgentController.updateAgentState("greet player");
+                this.el.setAttribute("look-at-y", "#player");
+  
+              } else {
+                if (!this.navAgentController)
+                this.navAgentController = this.el.components.nav_agent_controller;
+              } 
+              if (this.findAction) {
+                
+                for (let i = 0; i < this.findAction.tags.length; i++) {
+                  console.log("looking for objs with class " + this.findAction.tags[i]);
+                  let targetObjects = document.getElementsByClassName(this.findAction.tags[i]);
+                  if (targetObjects) {
+                    console.log("gots target objects " + targetObjects.length);
+                    for (let l = 0; l < targetObjects.length; l++) {
+                      let targetLoc = targetObjects[l].getAttribute("position");
+                      this.targetLocations.push(targetLoc);
+                    }
+                  } else {
+                    console.log("didn't find no targetObjects");
+                  }
+                  
+                }
+                if (this.targetLocations.length && this.navAgentController && this.navAgentController.currentState != "dialog") {
+                  // this.navAgentController.seekTargetLocation();
+                  this.navAgentController.updateAgentState("target"); //instead of waypoints
+                }
+              }
+              if (this.data.objectData.audiogroupID && this.data.objectData.audiogroupID.length > 4) { //it's an objectID
+                if (this.objectAudioController) {
+                  console.log("tryna play random object_audio");
+                  this.objectAudioController.playRandom();
+                } else {
+                  this.objectAudioController = this.el.components.object_audio_controller;
+                }
+              }
+              
+  
+            }
+            if (this.tags != undefined && this.tags != null && this.tags != "undefined") { //MAYBE SHOULD BE UNDER RAYHIT?
+             
+                    // if (moIndex && moIndex != -1) { //moIndex = "mouthopen"
+                    //   this.el.setAttribute('animation-mixer', {
+                    //     "clip": clips[moIndex].name,
+                    //     "loop": "repeat",
+                    //     "repetitions": 10,
+                    //     "timeScale": 2
+                    //   });
+                    //   this.el.addEventListener('animation-finished', (e) => { 
+                    //     this.el.removeAttribute('animation-mixer');
+                    //   });
+                    // }
+              // }
+            }
+          // }     
+        // }
+      setTimeout(() => {
+        this.calloutText.setAttribute("visible", false);
+      }, 2000);
     },
     coolDownTimer: function () {
       if (!this.coolDown) {
