@@ -1546,15 +1546,15 @@ AFRAME.registerComponent('mod_object', {
         if (!this.isDead && e.detail.targetEl) {
             // console.log("physics collision HIT me "  + this.data.objectData.name + " other id " + e.detail.targetEl.id);
                        
-            this.hitpoint = e.detail.targetEl.object3D.position;
-            this.distance = window.playerPosition.distanceTo(this.hitpoint);
-            if (this.triggerAudioController != null) {
-              // console.log("tryna play trigger audio hit");
-              this.triggerAudioController.components.trigger_audio_control.playAudioAtPosition(this.hitpoint, this.distance, ["hit"]);
-            }
+          this.hitpoint = e.detail.targetEl.object3D.position;
+          this.distance = window.playerPosition.distanceTo(this.hitpoint);
+          if (this.triggerAudioController != null) {
+            // console.log("tryna play trigger audio hit");
+            this.triggerAudioController.components.trigger_audio_control.playAudioAtPosition(this.hitpoint, this.distance, ["hit"]);
+          }
 
-            let targetModObjComponent = e.detail.targetEl.components.mod_object;
-            if (targetModObjComponent != null) {
+          let targetModObjComponent = e.detail.targetEl.components.mod_object;
+          if (targetModObjComponent != null) {
                 console.log(this.data.objectData.name + " gotsa collision with " + targetModObjComponent.data.objectData.name);
                 if (this.data.objectData.name != targetModObjComponent.data.objectData.name) { //don't trigger yerself, but what if...?
                   // console.log("actions: " + JSON.stringify(mod_obj_component.data.objectData.actions));
@@ -1563,7 +1563,8 @@ AFRAME.registerComponent('mod_object', {
                     this.triggerAudioController.components.trigger_audio_control.playAudioAtPosition(this.el.object3D.position, window.playerPosition.distanceTo(this.el.object3D.position), ["magic"]);
                   }
                   console.log(this.data.objectData.name  + " hit by other object : " + JSON.stringify(targetModObjComponent.data.objectData));
-                  if (targetModObjComponent.data.objectData.objtype == "Weapon") {
+
+                  if (targetModObjComponent.data.objectData.objtype == "Weapon" && this.data.objectData.quality.toLowerCase() != "indestructible") {
                     if (targetModObjComponent.data.objectData.operator == "Damage" && targetModObjComponent.data.objectData.hitpoints) {
                      
                       if (this.calloutEntity != null) {
@@ -1574,14 +1575,14 @@ AFRAME.registerComponent('mod_object', {
                           this.showCallout("Hit -" + targetModObjComponent.data.objectData.hitpoints + "\n" + this.currentDamage + " / " +this.data.objectData.hitpoints, this.hitpoint, this.distance);
                         } else {
                           this.isDead = true;
-                          this.showCallout("I AM DEAD NOW!", this.hitpoint, this.distance);
+                          // this.showCallout("I AM DEAD NOW!", this.hitpoint, this.distance);
                           let greetingDialogEl = document.getElementById("sceneGreetingDialog");
                           if (greetingDialogEl) {
                             let dialogComponent = greetingDialogEl.components.scene_greeting_dialog;
                             if (dialogComponent) {
                                 // console.log("tryna");
                                 dialogComponent.setLocation();
-                                dialogComponent.ShowMessageAndHide("You killed a " + this.data.objectData.name + "!", 2000);
+                                dialogComponent.ShowMessageAndHide("You destroyed a " + this.data.objectData.name + "!", 2000);
                             } else {
                                 console.log("caint find no dangblurn dialog component!");
                             }
@@ -1648,7 +1649,6 @@ AFRAME.registerComponent('mod_object', {
                             } else {
                               console.log("already triggered - make it a toggle!");
                             }
-
                             this.el.classList.remove('activeObjexRay');
                             this.el.removeAttribute('ammo-shape');
                             this.el.removeAttribute('ammo-body');
@@ -1667,10 +1667,12 @@ AFRAME.registerComponent('mod_object', {
                               }
                               
                             }
-                        }
+                          }
                         }
                       }
                     }
+                  } else {
+                    console.log("stop hitting yourself!");
                   }
                   if (targetModObjComponent.data.objectData.actions) {
 
@@ -1749,7 +1751,14 @@ AFRAME.registerComponent('mod_object', {
                       }
                     }
                   }
+                  if (this.data.objectData.eventtype.toLowerCase() == "destroy self") {
+                    this.el.classList.remove('activeObjexRay');
+                    this.el.removeAttribute('ammo-shape');
+                    this.el.removeAttribute('ammo-body');
+                    this.el.parentNode.removeChild(this.el);
+                  }
                 }
+               
                 if (this.hasShootAction && e.detail.targetEl.id != "player") {
                   console.log("tryna cleanup!")
                   this.el.sceneEl.object3D.remove(this.line);
