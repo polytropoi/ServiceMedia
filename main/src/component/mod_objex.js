@@ -52,28 +52,23 @@ AFRAME.registerComponent('mod_objex', {
         }
   
         for (let i = 0; i < this.data.jsonLocationsData.length; i++) {
+          // let equippable = "";
           for (let k = 0; k < this.data.jsonObjectData.length; k++) {
             if (this.data.jsonLocationsData[i].objectID != undefined && this.data.jsonLocationsData[i].objectID != null && this.data.jsonLocationsData[i].objectID == this.data.jsonObjectData[k]._id) {
               // console.log("location/object match " + this.data.jsonLocationsData[i].objectID);
               
               if (this.data.jsonObjectData[k].modelID != undefined && this.data.jsonObjectData[k].modelID != null) {
-              //  console.log ("JSONOBJECTDATA" + this.data.jsonObjectData[k].eventData);
-                if (this.data.jsonLocationsData[i].eventData != undefined && this.data.jsonLocationsData[i].eventData.toLowerCase().includes("equip")) {
+            
+                if (this.data.jsonLocationsData[i].eventData != undefined && this.data.jsonLocationsData[i].eventData.toLowerCase().includes("equipped")) { 
+                 
+                  EquipDefaultItem(this.data.jsonLocationsData[i].objectID); //in dialogs.js (?)
                   
-                  // EquipDefaultItem(this.data.jsonLocationsData[i].objectID); //in dialogs.js
-                  EquipDefaultItem(this.data.jsonLocationsData[i].objectID); //in dialogs.js
-                  
-                  // console.log("tryna equip with location/object match " + this.data.jsonLocationsData[i].objectID + " modelID " + this.data.jsonObjectData[k].modelID);
-                  // let objEl = document.createElement("a-entity");
-                  // objEl.setAttribute("mod_object", {'locationData': this.data.jsonLocationsData[i], 'objectData': this.data.jsonObjectData[k], 'equipped': true});
-                  // objEl.id = "obj" + this.data.jsonLocationsData[i].objectID + "_" + this.data.jsonLocationsData[i].timestamp;
-                  // sceneEl.appendChild(objEl);
                 } else {
                   if (!this.data.jsonLocationsData[i].markerType.toLowerCase().includes('spawn')) { //either spawn or spawntrigger types require interaction //now in cloudmarker, deprecate
                     console.log("location/object match " + this.data.jsonLocationsData[i].objectID + " modelID " + this.data.jsonObjectData[k].modelID);
+                   
                     let objEl = document.createElement("a-entity");
-                    //set mod_object component:
-                    // if (this.checkForLocalObjectMods(this.data.jsonLocationsData[i].timestamp)) {
+                   
                       objEl.setAttribute("mod_object", {'eventData': this.data.jsonLocationsData[i].eventData, 'locationData': this.data.jsonLocationsData[i], 'objectData': this.data.jsonObjectData[k]});
                       // objEl.id = "obj" + this.data.jsonLocationsData[i].objectID + "_" + this.data.jsonLocationsData[i].timestamp;
                       objEl.id = this.data.jsonLocationsData[i].timestamp; //only timestamp so locpickers can find it...other objtypes aren't allowMods, i.e. spawned at runtime
@@ -234,14 +229,14 @@ AFRAME.registerComponent('mod_objex', {
         return resp;
       },
       returnObjectData: function(objectID) {
-        console.log('tryna return object data for ' +objectID);
+        // console.log('tryna return object data for ' +objectID);
         // let hasObj = false;
         let objek = null;
         if (this.data.jsonObjectData.length > 0) {
           for (let i = 0; i < this.data.jsonObjectData.length; i++) {
-            console.log('tryna match object data for ' +objectID + " vs " + this.data.jsonObjectData[i]._id);
+            // console.log('tryna match object data for ' +objectID + " vs " + this.data.jsonObjectData[i]._id);
             if (this.data.jsonObjectData[i]._id == objectID) {
-              console.log('gotsa objectID match to return data');
+              console.log('gotsa objectID match to return data ' + objectID);
               // hasObj = true;
               objek = this.data.jsonObjectData[i];
             }
@@ -260,7 +255,6 @@ AFRAME.registerComponent('mod_objex', {
         this.data.jsonObjectData.push(obj); 
       },
       
-      
       scatterObject: function (objectID) {
         console.log("tryna scatter mod_object " + objectID);  
         this.objectData = this.returnObjectData(objectID);
@@ -278,6 +272,24 @@ AFRAME.registerComponent('mod_objex', {
         sceneEl.appendChild(this.objEl);
              
       },
+      
+      // dropObject: function (objectID, location) { //not from inventory, e.g. switching equips //nm already has!
+      //   console.log("tryna scatter mod_object " + objectID);  
+      //   this.objectData = this.returnObjectData(objectID);
+      //   this.scatterPos = new THREE.Vector3();
+      //   this.objEl = document.createElement("a-entity");
+      //   // this.equipHolder = document.getElementById("equipPlaceholder");
+      //   // this.equipHolder.object3D.getWorldPosition( this.dropPos );
+      //   this.locData = {};
+      //   this.locData.x = this.location.x;
+      //   this.locData.y = this.location.y;
+      //   this.locData.z = this.scatterPos.z;
+      //   this.locData.timestamp = Date.now();
+      //   this.objEl.setAttribute("mod_object", {'eventData': null, 'locationData': this.locData, 'objectData': this.objectData, 'isSpawned': true});
+      //   this.objEl.id = "obj" + this.objectData._id + "_" + this.locData.timestamp;
+      //   sceneEl.appendChild(this.objEl);
+             
+      // },
       
       dropInventoryObject: function (inventoryID, action, inventoryObj) {
         let data = {};
@@ -355,7 +367,7 @@ AFRAME.registerComponent('mod_objex', {
         // this.el.setAttribute('gltf-model', '#' + modelID.toString());
       },
       dropObject: function (objectID) {
-        console.log("tryna set model to " + objectID);  
+        console.log("tryna dropObject " + objectID);  
         this.objectData = this.returnObjectData(objectID);
         this.dropPos = new THREE.Vector3();
         this.objEl = document.createElement("a-entity");
@@ -493,6 +505,7 @@ AFRAME.registerComponent('mod_object', {
       eventData: {default: ''},
       markerType: {default: 'none'},
       isEquipped: {default: false},
+      isEquippable: {default: false},
       isSpawned: {default: false},
       fromSceneInventory: {default: false},
       timestamp: {default: ''},
@@ -706,12 +719,24 @@ AFRAME.registerComponent('mod_object', {
           }
         // }
       } else {
-        console.log("this.data.tags is not null!");
-  
+        console.log("this.data.tags is not null " + this.tags);
+        // if (this.tags.toLowerCase().includes("equippable")) {
+        //   this.data.isEquippable = true;
+        // } else if (this.tags.toLowerCase().includes("equipped")) {
+        //   this.data.isEquipped = true;
+        // } 
+      }
+      if (this.data.locationData && this.data.locationData.locationTags != undefined  && this.data.locationData.locationTags != 'undefined' && this.data.locationData.locationTags.length > 0) {
+          if (this.data.locationData.locationTags.toLowerCase().includes("equippable")) {
+            this.data.isEquippable = true;
+          } else if (this.data.locationData.locationTags.toLowerCase().includes("equipped")) {
+            this.data.isEquipped = true;
+          } 
       }
       if (this.data.objectData.triggerScale == undefined || this.data.objectData.triggerScale == null || this.data.objectData.triggerScale == "" || this.data.objectData.triggerScale == 0) {
         this.data.objectData.triggerScale = 1;
       } 
+
 
        
       if (this.data.objectData.physics === "Navmesh Agent" || this.data.eventData.toLowerCase().includes("agent")) { 
@@ -744,7 +769,7 @@ AFRAME.registerComponent('mod_object', {
         } else {
           this.textData = this.data.objectData.callouttext;
         }
-          console.log(this.data.objectData.name + "callouttext " + this.data.objectData.callouttext );
+          // console.log(this.data.objectData.name + "callouttext " + this.data.objectData.callouttext );
           this.calloutEntity = document.createElement("a-entity");
          
           this.calloutText = document.createElement("a-entity");
@@ -925,7 +950,7 @@ AFRAME.registerComponent('mod_object', {
   
       this.el.addEventListener('model-loaded', () => {
   
-        console.log(this.data.objectData.name + " mod_object model-loaded");
+        console.log(this.data.objectData.name + " mod_object model-loaded" +" pos: "+ JSON.stringify(this.data.locationData));
         
         
         let pos = {};
@@ -936,21 +961,21 @@ AFRAME.registerComponent('mod_object', {
         rot.x = this.data.locationData.eulerx != undefined ? this.data.locationData.eulerx : 0;
         rot.y = this.data.locationData.eulery != undefined ? this.data.locationData.eulery : 0;
         rot.z = this.data.locationData.eulerz != undefined ? this.data.locationData.eulerz : 0;
-        let scale = {x: 1, y: 1, z: 1};
-        if (this.data.locationData.markerObjScale != undefined && this.data.locationData.markerObjScale != null && this.data.locationData.markerObjScale != "" && this.data.locationData.markerObjScale != 0) {
-        scale.x = this.data.locationData.markerObjScale != undefined ? this.data.locationData.markerObjScale : 1;
-        scale.y = this.data.locationData.markerObjScale != undefined ? this.data.locationData.markerObjScale : 1;
-        scale.z = this.data.locationData.markerObjScale != undefined ? this.data.locationData.markerObjScale : 1;
-        } else if (this.data.objectData.objScale != undefined && this.data.objectData.objScale != null && this.data.objectData.objScale != "" && this.data.objectData.objScale != 0 ) {
-          scale.x = this.data.objectData.objScale;
-          scale.y = this.data.objectData.objScale;
-          scale.z = this.data.objectData.objScale;
-        } else {
-          this.data.objectData.objScale = 1;
-        }
+        let scale = {x: this.data.xscale, y: this.data.yscale, z: this.data.zscale};
+        // if (this.data.locationData.markerObjScale != undefined && this.data.locationData.markerObjScale != null && this.data.locationData.markerObjScale != "" && this.data.locationData.markerObjScale != 0) {
+        // scale.x = this.data.locationData.markerObjScale != undefined ? this.data.locationData.markerObjScale : 1;
+        // scale.y = this.data.locationData.markerObjScale != undefined ? this.data.locationData.markerObjScale : 1;
+        // scale.z = this.data.locationData.markerObjScale != undefined ? this.data.locationData.markerObjScale : 1;
+        // if (this.data.objectData.objScale != undefined && this.data.objectData.objScale != null && this.data.objectData.objScale != "" && this.data.objectData.objScale != 0 ) {
+        //   scale.x = this.data.objectData.objScale;
+        //   scale.y = this.data.objectData.objScale;
+        //   scale.z = this.data.objectData.objScale;
+        // } else {
+        //   this.data.objectData.objScale = 1;
+        // }
    
         if (!this.data.isEquipped) {
-          console.log("setting object pos/rot to " + JSON.stringify(rot));
+          console.log("setting object pos/rot to " + JSON.stringify(pos) + " hasShootAction " + this.hasShootAction + " equippable " + this.data.isEquippable);
           if (this.modelParent != null) {
             console.log("not equipped, has modelparent ");
             this.modelParent.setAttribute("position", pos);
@@ -962,6 +987,10 @@ AFRAME.registerComponent('mod_object', {
               // this.el.object3D.rotation = rot;
             if (!this.hasShootAction) {
               this.el.setAttribute("position", pos);
+            } else {
+              if (this.data.isEquippable) {
+                this.el.setAttribute("position", pos);
+              }
             }
             
             // that.el.setAttribute("rotation", rot);
@@ -1424,7 +1453,7 @@ AFRAME.registerComponent('mod_object', {
             } 
             if (this.data.objectData.physics != undefined && this.data.objectData.physics != null && this.data.objectData.physics.toLowerCase() != "none") {
               console.log("tryna add physics to new mod_object " + this.data.objectData.name + " is equipped " + this.data.isEquipped + " body " +
-                                        this.data.objectData.physics + " hasShoot " + this.hasShootAction + " hasThrow " + this.hasThrowAction);
+                                        this.data.objectData.physics + " hasShoot " + this.hasShootAction + " hasThrow " + this.hasThrowAction + " isSpawned " + this.data.isSpawned);
               //  setTimeout(function(){  
                 if (this.data.isEquipped) {
                   // this.el.setAttribute('ammo-body', {type: 'kinematic', linearDamping: .1, angularDamping: .1});
@@ -1444,13 +1473,14 @@ AFRAME.registerComponent('mod_object', {
                     }
                   } else if (this.hasThrowAction) {
                     console.log("spawned object hasThrowAction!");
-                    // if (this.data.isSpawned) {
-                    //   this.el.setAttribute('ammo-body', { type: this.data.objectData.physics.toLowerCase(), emitCollisionEvents: true, linearDamping: .1, angularDamping: .1 });
-                    //   this.el.setAttribute('trail', "");
+                    if (this.data.isSpawned) {
+                      this.el.setAttribute('ammo-body', { type: this.data.objectData.physics.toLowerCase(), emitCollisionEvents: true, linearDamping: .1, angularDamping: .1 });
+                      this.el.setAttribute('trail', "");
 
-                    // } else {
+                    } else {
                        //wait a bit for static colliders to load...
                       //  gravity: '0 0 0 ', 
+                      setTimeout( () => {
                         this.el.setAttribute('ammo-body', {type: this.data.objectData.physics.toLowerCase(), emitCollisionEvents: true, linearDamping: .1, angularDamping: .1});
                         
                         let yfudge = '0 1 0';
@@ -1467,35 +1497,40 @@ AFRAME.registerComponent('mod_object', {
                         offset.x = 0;
                         offset.y = 1;
                         offset.z = 0;
-
+                        let colliderScale = 1;
                         if (this.data.objectData.colliderScale && this.data.objectData.colliderScale != 0 && this.data.objectData.colliderScale != "") {
-                          if (this.data.objectData.collidertype == "box") {
+                          colliderScale = this.data.objectData.colliderScale;
+                        }
+                        if (this.data.objectData.collidertype.toLowerCase() == "box") {
                           // halfExtents = this.data.objectData.colliderScale + " " + this.data.objectData.colliderScale + " " + this.data.objectData.colliderScale;
                           this.el.setAttribute('ammo-shape', {type: this.data.objectData.collidertype.toLowerCase(), fit: 'manual', halfExtents: halfExtents, offset: offset});
-                          } 
-                          if (this.data.objectData.collidertype == "sphere") {
-                            this.el.setAttribute('ammo-shape', {type: 'sphere', fit: 'manual', sphereRadius: this.data.colliderScale, offset: yfudge});
-                          }
+                        } 
+                        if (this.data.objectData.collidertype.toLowerCase() == "sphere") {
+                          this.el.setAttribute('ammo-shape', {type: 'sphere', fit: 'manual', sphereRadius: colliderScale, offset: yfudge});
+                          
                         } else {
                           console.log("no collider scale, using default...");
                           this.el.setAttribute('ammo-shape', {type: this.data.objectData.collidertype.toLowerCase(), halfExtents: halfExtents, offset: offset});
                         }
                        
                         console.log("ammo shape is " + JSON.stringify(that.el.getAttribute('ammo-shape')) + " applyForce " + this.data.applyForceToNewObject);
-                        if (this.data.applyForceToNewObject) {
-                          // this.el.setAttribute("aabb-collider", {objects: ".activeObjexRay"});
-                          this.applyForce();
-                          this.el.setAttribute('trail', "");
-                        } else {
+                      
+                        // } else {
                           // setTimeout( () => {
-                          //   this.el.setAttribute('ammo-body', {disableSimulation: false});
-                          // }, 4000);
-                        }
+                            // this.el.setAttribute('ammo-body', {disableSimulation: false});
+                      }, 4000);
+                    }
+                      if (this.data.applyForceToNewObject) {
+                        // this.el.setAttribute("aabb-collider", {objects: ".activeObjexRay"});
+                        this.applyForce();
+                        this.el.setAttribute('trail', "");
+                      }
+                        // }
                         // this.el.setAttribute('rotate-toward-velocity');
                        
                         // this.el.body.restitution = .9;
 
-                    // }
+                  // }
                    
                   } else if (this.data.objectData.physics.toLowerCase() == "navmesh agent") {
                     this.el.setAttribute('ammo-body', {type: 'kinematic', emitCollisionEvents: true });
@@ -1548,15 +1583,17 @@ AFRAME.registerComponent('mod_object', {
                        
           this.hitpoint = e.detail.targetEl.object3D.position;
           this.distance = window.playerPosition.distanceTo(this.hitpoint);
-          if (this.triggerAudioController != null) {
-            // console.log("tryna play trigger audio hit");
-            this.triggerAudioController.components.trigger_audio_control.playAudioAtPosition(this.hitpoint, this.distance, ["hit"]);
-          }
+        
 
           let targetModObjComponent = e.detail.targetEl.components.mod_object;
           if (targetModObjComponent != null) {
                 console.log(this.data.objectData.name + " gotsa collision with " + targetModObjComponent.data.objectData.name);
                 if (this.data.objectData.name != targetModObjComponent.data.objectData.name) { //don't trigger yerself, but what if...?
+
+                  if (this.triggerAudioController != null) {
+                    // console.log("tryna play trigger audio hit");
+                    this.triggerAudioController.components.trigger_audio_control.playAudioAtPosition(this.hitpoint, this.distance, ["hit"]);
+                  }
                   // console.log("actions: " + JSON.stringify(mod_obj_component.data.objectData.actions));
                   // var this.triggerAudioController = document.getElementById("triggerAudio");
                   if (this.triggerAudioController != null) {
@@ -1626,7 +1663,7 @@ AFRAME.registerComponent('mod_object', {
                                     this.locData.y = this.el.object3D.position.y + 1;
                                     this.locData.z = this.el.object3D.position.z;
                                     this.locData.timestamp = Date.now();
-                                    this.objEl.setAttribute("mod_object", {'locationData': this.locData, 'objectData': objectData, 'isSpawned': true});
+                                    this.objEl.setAttribute("mod_object", {'locationData': this.locData, 'objectData': objectData, 'isSpawned': false});
                                     this.objEl.id = "obj" + objectData._id + "_" + this.locData.timestamp;
                                     sceneEl.appendChild(this.objEl);
                                   } else {
@@ -1641,7 +1678,7 @@ AFRAME.registerComponent('mod_object', {
                                     this.locData.y = this.el.object3D.position.y + 1;
                                     this.locData.z = this.el.object3D.position.z;
                                     this.locData.timestamp = Date.now();
-                                    this.objEl.setAttribute("mod_object", {'locationData': this.locData, 'objectData': objectData, 'isSpawned': true});
+                                    this.objEl.setAttribute("mod_object", {'locationData': this.locData, 'objectData': objectData, 'isSpawned': false});
                                     this.objEl.id = "obj" + objectData._id + "_" + this.locData.timestamp;
                                     sceneEl.appendChild(this.objEl);
                                   }
@@ -1698,7 +1735,7 @@ AFRAME.registerComponent('mod_object', {
                             this.locData.y = this.el.object3D.position.y;
                             this.locData.z = this.el.object3D.position.z;
                             this.locData.timestamp = Date.now();
-                            this.objEl.setAttribute("mod_object", {'locationData': this.locData, 'objectData': objectData, 'isSpawned': true});
+                            this.objEl.setAttribute("mod_object", {'locationData': this.locData, 'objectData': objectData, 'isSpawned': false});
                             this.objEl.id = "obj" + objectData._id + "_" + this.locData.timestamp;
                             sceneEl.appendChild(this.objEl);
                           } else {
@@ -1740,7 +1777,7 @@ AFRAME.registerComponent('mod_object', {
                             this.locData.y = this.el.object3D.position.y;
                             this.locData.z = this.el.object3D.position.z;
                             this.locData.timestamp = Date.now();
-                            this.objEl.setAttribute("mod_object", {'locationData': this.locData, 'objectData': objectData, 'isSpawned': true});
+                            this.objEl.setAttribute("mod_object", {'locationData': this.locData, 'objectData': objectData, 'isSpawned': false});
                             this.objEl.id = "obj" + objectData._id + "_" + this.locData.timestamp;
                             sceneEl.appendChild(this.objEl);
                           } else {
@@ -1760,7 +1797,7 @@ AFRAME.registerComponent('mod_object', {
                 }
                
                 if (this.hasShootAction && e.detail.targetEl.id != "player") {
-                  console.log("tryna cleanup!")
+                  // console.log("tryna cleanup!")
                   this.el.sceneEl.object3D.remove(this.line);
                   
                   let trailComponent = this.el.components.trail;
@@ -1913,7 +1950,7 @@ AFRAME.registerComponent('mod_object', {
               if (this.calloutEntity != null && this.distance < 20) {
                 // this.calloutEntity.setAttribute('visible', false);
                 let calloutString = this.data.objectData.callouttext;
-                console.log("mod_object callout w distance :" + this.distance + " " + calloutString + " isNavAgent " + this.isNavAgent);
+                console.log("mod_object callout " + calloutString + " w distance :" + this.distance + " isNavAgent " + this.isNavAgent);
              
                 
                 this.calloutEntity.setAttribute('visible', true);
@@ -1926,7 +1963,7 @@ AFRAME.registerComponent('mod_object', {
                   if (this.data.objectData.yPosFudge) {
                     y = '0 ' + (parseFloat(this.data.objectData.yPosFudge) + 1) + ' 0';
                   }
-                  console.log('tryna fudge y '+ y);
+                  // console.log('tryna fudge y '+ y);
 
                   this.calloutEntity.setAttribute('position', y);
                   // this.calloutEntity.setAttribute("position", "0 3 0");
@@ -2055,7 +2092,8 @@ AFRAME.registerComponent('mod_object', {
       this.el.addEventListener('click', (e) => { 
         e.preventDefault();
         // let downtime = (Date.now() / 1000) - this.mouseDownStarttime;
-        // console.log("mousedown time "+ this.mouseDowntime + "  on mod_object type: " + this.data.objectData.objtype + " actions " + JSON.stringify(this.data.objectData.actions) + " equipped " + this.data.isEquipped);
+        console.log("mousedown time "+ this.mouseDowntime + "  on mod_object type: " + this.data.objectData.objtype + " hasEquip " + this.hasEquipAction + " hasPickup " + this.hasPickupAction + 
+                    " equipped " + this.data.isEquipped);
         if (keydown == "T") {
           ToggleTransformControls(this.data.timestamp);
         } else if (keydown == "Shift") {
@@ -2074,16 +2112,35 @@ AFRAME.registerComponent('mod_object', {
           if (!this.data.isEquipped) {
             this.dialogEl = document.getElementById('mod_dialog');
             
+            if (this.hasEquipAction) {
+              // this.el.setAttribute('visible', false);
+              if (this.data.isEquippable) { //locationTags includes "equippable", so it skips inventory...
+                this.promptSplit = [];
+                if (this.data.objectData.prompttext != undefined && this.data.objectData.prompttext != null && this.data.objectData.prompttext != "") {
+                  if (this.data.objectData.prompttext.includes('~')) {
+                    this.promptSplit = this.data.objectData.prompttext.split('~'); 
+                  } else {
+                    this.promptSplit.push(this.data.objectData.prompttext);
+                  }
+                  // this.el.components.mod_synth.medTrigger();
+                  this.dialogEl.components.mod_dialog.showPanel("Equip " + this.data.objectData.name + "?\n\n" + this.promptSplit[Math.floor(Math.random()*this.promptSplit.length)], this.el.id, "equipMe", 3333 );
+                } else {
+                  this.dialogEl.components.mod_dialog.showPanel("Equip " + this.data.objectData.name + "?", this.el.id, "equipMe", 3333 );
+                }
+              }
+            } 
             if (this.data.objectData.objtype.toLowerCase() == "pickup" || this.hasPickupAction) {
               // this.el.setAttribute('visible', false);
-              if (this.data.objectData.prompttext != undefined && this.data.objectData.prompttext != null && this.data.objectData.prompttext != "") {
-                if (this.data.objectData.prompttext.includes('~')) {
-                  this.promptSplit = this.data.objectData.prompttext.split('~'); 
+              if (!this.data.isEquippable) { //i.e. does not skip inventory
+                if (this.data.objectData.prompttext != undefined && this.data.objectData.prompttext != null && this.data.objectData.prompttext != "") {
+                  if (this.data.objectData.prompttext.includes('~')) {
+                    this.promptSplit = this.data.objectData.prompttext.split('~'); 
+                  }
+                  // this.el.components.mod_synth.medTrigger();
+                  this.dialogEl.components.mod_dialog.showPanel("Pick up " + this.data.objectData.name + "?\n\n" + this.promptSplit[Math.floor(Math.random()*this.promptSplit.length)], this.el.id );
+                } else {
+                  this.dialogEl.components.mod_dialog.showPanel("Pick up " + this.data.objectData.name + "?", this.el.id );
                 }
-                // this.el.components.mod_synth.medTrigger();
-                this.dialogEl.components.mod_dialog.showPanel("Pick up " + this.data.objectData.name + "?\n\n" + this.promptSplit[Math.floor(Math.random()*this.promptSplit.length)], this.el.id );
-              } else {
-                this.dialogEl.components.mod_dialog.showPanel("Pick up " + this.data.objectData.name + "?", this.el.id );
               }
               
             }

@@ -2322,7 +2322,7 @@ AFRAME.registerComponent('mod_dialog', { //there should only be one of these, un
   // this.dial
   let that = this;
   },
-  showPanel: function (panelString, objectID, messageType, duration) {
+  showPanel: function (panelString, objectID, messageType, duration) { //objectID = referenced elementID
 
     this.objID = objectID;
     this.messageType = messageType;
@@ -2343,7 +2343,7 @@ AFRAME.registerComponent('mod_dialog', { //there should only be one of these, un
     }
     this.viewportHolder.object3D.getWorldPosition( this.cameraPosition );
     this.el.setAttribute('position', this.cameraPosition);
-    console.log("tryna set mod_dialog position " + JSON.stringify(this.cameraPosition) + " duration " + duration);
+    console.log("tryna set mod_dialog position " + JSON.stringify(this.cameraPosition) + " messageType " + messageType +  " duration " + duration);
     // this.dialogText.setAttribute('value', panelString);
     this.dialogText.setAttribute('troika-text', {
       maxWidth: .9,
@@ -2383,11 +2383,27 @@ AFRAME.registerComponent('mod_dialog', { //there should only be one of these, un
           window.open(urlSplit[1], "_blank");
           this.el.setAttribute("visible", false);
           this.dialogPanel.classList.remove('activeObjexRay');
-        }
+        } 
       } else {
+        this.el.setAttribute("visible", false);
+        this.dialogPanel.classList.remove('activeObjexRay');
         let objEl = document.getElementById(this.objID);
         if (objEl != null) {
           objEl.components.mod_object.activated();
+          if (this.messageType == "equipMe") {
+            if (objEl.components.mod_object) {
+              let equipObjID = objEl.components.mod_object.data.objectData._id;
+              console.log("tryna equipMe objID" + equipObjID);
+              DequipAndDropItem();
+             
+              objEl.removeAttribute('ammo-shape');
+              objEl.removeAttribute('ammo-body');
+              objEl.parentNode.removeChild(objEl);
+              EquipDefaultItem(equipObjID);
+            } else {
+              console.log("din't fine no equipMe element");
+            }
+          }
           // objEl.components.mod_object.hideObject();
         }
       }
@@ -2396,7 +2412,7 @@ AFRAME.registerComponent('mod_dialog', { //there should only be one of these, un
         DeleteLocalSceneData();
         setTimeout(function () {
           window.location.reload();
-       }, 2000);
+        }, 2000);
       }
     }
 
@@ -4593,6 +4609,40 @@ AFRAME.registerComponent('scene_greeting_dialog', {  //if "greeting" scenetag + 
       //     this.el.setAttribute("visible", false);
       //   });
       // }
+      this.greetingEl = document.createElement("a-entity");
+      this.el.appendChild(this.greetingEl);
+      this.greetingEl.setAttribute("position", "0 1 0");
+
+      this.questEl = null;
+      // if (this.data.questText.length) {
+        this.questEl = document.createElement("a-entity");
+        this.el.appendChild(this.questEl);
+        this.questEl.setAttribute("position", "0 0 0");
+      // }
+
+      this.greetingEl.setAttribute("troika-text", {
+        fontSize: .6,
+        maxWidth: 5,
+        align: "center",
+        font: "/fonts/web/" + this.font,
+        lineHeight: .85,
+        strokeWidth: '1%',
+        color: this.fillColor,
+        strokeColor: this.outlineColor,
+        value: this.data.greetingText
+      });
+      if (this.questEl) {
+        this.questEl.setAttribute("troika-text", {
+          fontSize: .2,
+          maxWidth: 5,
+          align: "center",
+          font: "/fonts/web/" + this.font2,
+          strokeWidth: '1%',
+          color: this.fillColor,
+          strokeColor: this.outlineColor,
+          value: this.data.questText
+        });
+      }
 
       if (this.data.startButton) {
         this.startButtonBackgroundEl = document.createElement("a-entity");
@@ -4658,10 +4708,14 @@ AFRAME.registerComponent('scene_greeting_dialog', {  //if "greeting" scenetag + 
             // this.el.setAttribute("visible", false);
             // this.startButtonTextEl.setAttribute("scale", ".2 .2 .2");
             // this.startButtonBackgroundEl.setAttribute("scale", ".2 .2 .2");
+
             this.startButtonTextEl.setAttribute("visible", false);
             this.startButtonBackgroundEl.setAttribute("visible", false);
             console.log("TRYNA HIDE DIALOG! " + this.data.behavior);
             this.greetingEl.setAttribute("troika-text", {
+              value: ""
+            });
+            this.questEl.setAttribute("troika-text", {
               value: ""
             });
             // this.el.parentNode.removeChild(this.el);
@@ -4678,40 +4732,7 @@ AFRAME.registerComponent('scene_greeting_dialog', {  //if "greeting" scenetag + 
       // }
     
 
-      this.greetingEl = document.createElement("a-entity");
-      this.el.appendChild(this.greetingEl);
-      this.greetingEl.setAttribute("position", "0 1 0");
 
-      this.questEl = null;
-      // if (this.data.questText.length) {
-        this.questEl = document.createElement("a-entity");
-        this.el.appendChild(this.questEl);
-        this.questEl.setAttribute("position", "0 0 0");
-      // }
-
-      this.greetingEl.setAttribute("troika-text", {
-        fontSize: .6,
-        maxWidth: 5,
-        align: "center",
-        font: "/fonts/web/" + this.font,
-        lineHeight: .85,
-        strokeWidth: '1%',
-        color: this.fillColor,
-        strokeColor: this.outlineColor,
-        value: this.data.greetingText
-      });
-      if (this.questEl) {
-        this.questEl.setAttribute("troika-text", {
-          fontSize: .2,
-          maxWidth: 5,
-          align: "center",
-          font: "/fonts/web/" + this.font2,
-          strokeWidth: '1%',
-          color: this.fillColor,
-          strokeColor: this.outlineColor,
-          value: this.data.questText
-        });
-      }
 
    
     // this.viewportHolder = document.getElementById('viewportPlaceholder3');

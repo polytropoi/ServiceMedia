@@ -1591,6 +1591,25 @@ function DropInventoryItem(objectID) {
     }
   }
 }
+
+function DequipAndDropItem () {
+  console.log("tryna dequip");
+  let objexEl = document.getElementById('sceneObjects');
+  if (objexEl != null) {
+      
+    document.querySelectorAll('.equipped').forEach(function(el) {
+      let objectID = el.components.mod_object.data.objectData._id;
+
+      el.removeAttribute("ammo-shape");
+      el.removeAttribute("ammo-nody");
+      el.parentNode.removeChild(el);
+      objexEl.components.mod_objex.dropObject(objectID);
+      
+    });
+  }
+  // ShowHideDialogPanel();
+}
+
 function DequipInventoryItem () {
   console.log("tryna dequip");
 
@@ -1599,6 +1618,7 @@ function DequipInventoryItem () {
   });
   ShowHideDialogPanel();
 }
+
 function EquipDefaultItem (objectID) {
   console.log("tryna equip " + objectID);
   let action = null;

@@ -1261,10 +1261,10 @@ AFRAME.registerComponent('instanced_surface_meshes', {
   // },
   surfaceLoaded: function () {
     
-    console.log("instanced_surface_meshes.surfaceLoaded call");
+    // console.log("instanced_surface_meshes.surfaceLoaded call");
         if (!this.surfaceMesh) {
           this.surfaces = document.getElementsByClassName("surface");
-          console.log("surfaces found " + this.surfaces.length);
+          // console.log("surfaces found " + this.surfaces.length);
           if (this.surfaces.length > 0) {
             this.surface = this.surfaces[0];
             if (this.surface.getObject3D('mesh') != null) {
@@ -1272,7 +1272,7 @@ AFRAME.registerComponent('instanced_surface_meshes', {
                 if (node.isMesh) {
                   this.surfaceMesh = node;    
                   if (this.sampleGeos.length) {
-                    console.log("gots samplegeos");
+                    // console.log("gots samplegeos");
                     this.scatterMeshes();
     
                   } else {
@@ -1858,14 +1858,14 @@ AFRAME.registerComponent('scatter-surface', {
     let that = this;
     this.el.addEventListener('model-loaded', (event) => {
       event.preventDefault();
-      console.log("SCATTER SURFACE LOADED");
+      // console.log("SCATTER SURFACE LOADED");
       // that.el.emit('surfaceLoaded', true);
       
       // setTimeout(function(){ that.el.emit('surfaceLoaded', true);   }, 2000);// put some fudge, wait a bit for scatter meshes to load before firing
       let imeshes = document.querySelectorAll("[instanced_surface_meshes]");
-      console.log("gots SCATTER SURFACE imeshes " + imeshes);
+      // console.log("gots SCATTER SURFACE imeshes " + imeshes);
       for (let i = 0; i < imeshes.length; i++) {
-        console.log("imesh " + imeshes[i]);
+        // console.log("imesh " + imeshes[i]);
         imeshes[i].components.instanced_surface_meshes.surfaceLoaded();
       }
     });
