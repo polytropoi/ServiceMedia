@@ -163,7 +163,7 @@ AFRAME.registerComponent('mod_physics', { //used by models, placeholders, instan
     
     this.el.addEventListener("collidestart", (e) => { //this is for models or triggers, not objects - TODO look up locationData for tags? 
       // e.preventDefault();
-      console.log("mod_physics collision on model me  :" + this.el.id + " by " + e.detail.targetEl.id);
+      // console.log("mod_physics collision on model me  :" + this.el.id + " by " + e.detail.targetEl.id);
       // if (this.isTrigger) { 
         // console.log("mod_physics TRIGGER collision "  + this.el.id + " " + e.detail.targetEl.id);
        
@@ -1173,13 +1173,7 @@ AFRAME.registerComponent('instanced_surface_meshes', {
           this.surfaceLoaded(); //surface should be ready, if not it will reload samplegeos below
         }
       });
-    let that = this; //hrrmm..
-    // let surfaceEl = document.getElementById('scatterSurface');   
-    // surfaceEl.addEventListener('surfaceLoaded', () => { //no, now scatter-surface calls surfaceLoaded below when surface is ready
-    //   console.log("SURFACE EVENT LOADEDD");
-  
-    //   this.surface(this.sampleGeos, this.sampleMats);
-    // });
+
 
     this.thirdPersonPlaceholder = document.getElementById("playCaster"); //hrm, should rename
     this.useMatrix = false;
@@ -1224,41 +1218,7 @@ AFRAME.registerComponent('instanced_surface_meshes', {
       }
     }); 
   },
-  // loadScatterModel: function () { //unused now...
-  //   if (!this.sampleGeos.length) {
-  //     // console.log("tryna get scatter model id" + this.data._id);
-  //     // const scatterModel = document.getElementById(this.data._id);
-  //     // if (scatterModel != null) {
-
-  //     // this.el.addEventListener('model-loaded', (event) => {
-  //     //     event.preventDefault();;
-  //       const sObj = this.el.getObject3D('mesh');
-  //       if (sObj) {
-  //       console.log("tryna INSTANCE THE THIGNS");
-  //       this.sampleGeos = [];
-  //       this.sampleMats = [];
-  //       sObj.traverse(node => {
-  //         if (node.isMesh && node.material) {
-  //             this.sampleGeometry = node.geometry;
-  //             this.sampleGeos.push(this.sampleGeometry);
-  //             this.sampleMaterial = node.material;
-  //             this.sampleMats.push(this.sampleMaterial);
-              
-  //             }
-  //           // });
-
-  //         });
-  //         this.surfaceLoaded();
-  //       }
-
-  //     } else {
-  //       this.surfaceLoaded();
-  //     }
-  //   // }
-  //   // } else {
-  //   //   this.surfaceLoaded();
-  //   // }
-  // },
+  
   surfaceLoaded: function () {
     
     // console.log("instanced_surface_meshes.surfaceLoaded call");
@@ -1285,7 +1245,6 @@ AFRAME.registerComponent('instanced_surface_meshes', {
         } else {
           if (!this.sampleGeos.length) {
           console.log("tryna reload samplegeos");
-
           const sObj = this.el.getObject3D('mesh');
           if (sObj) {
           console.log("tryna INSTANCE THE THIGNS");
@@ -1313,29 +1272,6 @@ AFRAME.registerComponent('instanced_surface_meshes', {
       }
   },
 
-  // setSurface: function() { //unused now...
-   
-  //     if (this.surface) {
-  //       // this.surface = this.surfaces[0];
-    
-  //       if (this.surface.getObject3D('mesh') != null) {
-  //         this.surface.getObject3D('mesh').traverse(node => {
-  //           if (node.isMesh) {
-  //             this.surfaceMesh = node;    
-  //             if (this.sampleGeos.length) {
-  //               console.log("gots samplegeos");
-  //               this.scatterMeshes();
-
-  //             } else {
-  //               console.log("no samplegeos");
-  //               this.loadScatterModel();
-  //             }
-  //           }
-  //         });
-  //       }
-  //     } 
-   
-  //   },
     scatterMeshes: function () {
       if (!this.scatterFinished && this.surfaceMesh && this.sampleGeos.length) {
         this.scatterFinished = true;
@@ -1344,41 +1280,33 @@ AFRAME.registerComponent('instanced_surface_meshes', {
         if (settings) {
           waterLevel = settings.sceneWaterLevel;
         }
-        // this.surfaceMesh
-      // this.surface.setAttribute("activeObjexRay");
-        // console.log('surfacemesh name ' + this.surfaceMesh);
-        // this.iMeshes = []; //nm
-        console.log("tryna scatter!@ waterLeve " + waterLevel + " object with #meshes  "+ this.sampleGeos.length);
+
+        // console.log("tryna scatter!@ waterLeve " + waterLevel + " object with #meshes  "+ this.sampleGeos.length);
         var dummy = new THREE.Object3D();
         dummy.visible = false;
         const count = this.data.count;
     
         const sampler = new MeshSurfaceSampler( this.surfaceMesh ) // noice!  
         .build();
-          // for (let m = 0; m < this.sampleGeos.length; m++) {
-            // console.log("tryna scatter sample geo # " + m.toString());
-            // let userData = {"collide": true, "instanced": true, count: count};
-            let iMesh_1 = new THREE.InstancedMesh(this.sampleGeos[0], this.sampleMats[0], count);
+
+            let iMesh_1 = new THREE.InstancedMesh(this.sampleGeos[0], this.sampleMats[0], count); //todo as array
 
             let iMesh_2 = null;
             if (this.sampleGeos.length == 2) {
               iMesh_2 = new THREE.InstancedMesh(this.sampleGeos[1], this.sampleMats[1], count);
-              // iMesh_1.userData = userData;
+             
             }
             let iMesh_3 = null;
             if (this.sampleGeos.length == 3) {
               iMesh_3 = new THREE.InstancedMesh(this.sampleGeos[2], this.sampleMats[2], count);
-              // iMesh_1.userData = userData;
+             
             }
             let iMesh_4 = null;
             if (this.sampleGeos.length == 4) {
               iMesh_4 = new THREE.InstancedMesh(this.sampleGeos[3], this.sampleMats[3], count);
-              // iMesh_1.userData = userData;
+             
             }
           
-            // this.iMeshes.push(iMesh);
-            // if (m == this.sampleGeos.length - 1) {
-              // console.log("trryna update tyhe matrix.. ")
               let position = new THREE.Vector3(0,-20,0);
               let normal = new THREE.Vector3();
               this.count = 0;
@@ -1400,7 +1328,7 @@ AFRAME.registerComponent('instanced_surface_meshes', {
                     //   dummy.lookAt( _normal ); //use eventData? 
                     dummy.updateMatrix();
 
-                    iMesh_1.setMatrixAt( this.count, dummy.matrix ); //got fussy in a loop, 2 is enough..
+                    iMesh_1.setMatrixAt( this.count, dummy.matrix ); //got fussy in a loop, 2 is enough..or lets say 4
                     iMesh_1.frustumCulled = false; //too funky
                     iMesh_1.instanceMatrix.needsUpdate = true;
                     iMesh_1.userData = {"collide": true, "instanced": true, count: count};
@@ -1438,8 +1366,7 @@ AFRAME.registerComponent('instanced_surface_meshes', {
                   }
               } else {
                 console.log("breaking loop at " + i.toString());
-                //this.iMesh = iMesh_2; //maybe https://threejs.org/docs/index.html#examples/en/utils/BufferGeometryUtils.mergeBufferGeometries?
-                // remove(dummy);
+
                 break;
                 
               }
@@ -1447,28 +1374,9 @@ AFRAME.registerComponent('instanced_surface_meshes', {
 
         this.el.classList.add('activeObjexRay');
         this.initialized = true;
-        // let oray = document.querySelector("[object_raycaster]");
-        // if (oray) {
-        //   oray.components.object_raycaster.registerObjects();
-        // } else {
-        //   console.log("CaintFINd no oRay");
-        // }
-        // function resampleParticle ( i ) {
 
-        //   sampler.sample( _position, _normal );
-        //   _normal.add( _position );
-  
-        //   dummy.position.copy( _position );
-        //   dummy.scale.set( scales[ i ], scales[ i ], scales[ i ] );
-        //   dummy.lookAt( _normal );
-        //   dummy.updateMatrix();
-  
-        //   stemMesh.setMatrixAt( i, dummy.matrix );
-        //   blossomMesh.setMatrixAt( i, dummy.matrix );
-  
-        // }
       } else {
-        console.log(this.scatterFinished + " " + this.surfaceMesh + " " + this.sampleGeos.length);
+        // console.log(this.scatterFinished + " " + this.surfaceMesh + " " + this.sampleGeos.length);
         //this.loadScatterModel();
       }
 
@@ -1549,18 +1457,14 @@ AFRAME.registerComponent('instanced_surface_meshes', {
         }
     
         if ( this.intersection != null && this.intersection.length > 0) {
-          // console.log("gotsaz intersection!" + this.intersection[0].instanceId);
-          // if (window.playerPosition != null && window.playerPosition != undefined && this.intersection[0].point != undefined && this.intersection[0].point != null ) {
+          // console.log("gotsa intersection!" + this.intersection[0].instanceId);
+       
           if (this.intersection[0].point != undefined && this.intersection[0].point != null ) {
             if (this.instanceId != this.intersection[0].instanceId) {
               this.instanceId = this.intersection[ 0 ].instanceId;
               
               console.log(this.data.tags + " " + this.instanceId);
 
-              // this.iMesh.setColorAt( this.instanceId, this.highlightColor.setHex( Math.random() * 0xffffff ) );
-              // this.iMesh.instanceColor.needsUpdate = true;
-              // console.log('windowplayerposition ' + JSON.stringify(window.playerPosition));
-              // if (this.data.tags != undefined && window.playerPosition != undefined && window.playerPosition) {
               if (this.data.tags != undefined && this.data.tags.length) {  
                 // this.distance = window.playerPosition.distanceTo(this.intersection[0].point);
                 this.distance = this.raycaster.ray.origin.distanceTo( this.intersection[0].point );
@@ -1595,10 +1499,7 @@ AFRAME.registerComponent('instanced_surface_meshes', {
       }
       if (this.matrixMeshComponent != null) {
         this.matrixMeshComponent.showRoomData(this.instanceId, distance, hitpoint);
-      }
-
-      
-
+      }     
       
     },
     instance_clicked: function (id) {
@@ -1622,8 +1523,6 @@ AFRAME.registerComponent('instanced_surface_meshes', {
           }
       }
     }
-
-
 });
 
 AFRAME.registerComponent('instanced_meshes_mod', { //click to spawn?

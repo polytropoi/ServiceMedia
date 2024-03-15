@@ -69,7 +69,7 @@ AFRAME.registerComponent('mod_objex', {
                    
                     let objEl = document.createElement("a-entity");
                    
-                      objEl.setAttribute("mod_object", {'eventData': this.data.jsonLocationsData[i].eventData, 'locationData': this.data.jsonLocationsData[i], 'objectData': this.data.jsonObjectData[k]});
+                      objEl.setAttribute("mod_object", {'tags': this.data.jsonLocationsData[i].locationTags, 'eventData': this.data.jsonLocationsData[i].eventData, 'locationData': this.data.jsonLocationsData[i], 'objectData': this.data.jsonObjectData[k]});
                       // objEl.id = "obj" + this.data.jsonLocationsData[i].objectID + "_" + this.data.jsonLocationsData[i].timestamp;
                       objEl.id = this.data.jsonLocationsData[i].timestamp; //only timestamp so locpickers can find it...other objtypes aren't allowMods, i.e. spawned at runtime
                       this.el.sceneEl.appendChild(objEl);
@@ -451,7 +451,7 @@ AFRAME.registerComponent('mod_objex', {
       xhr.send(JSON.stringify(data));
       xhr.onload = function () {
         // do something to response
-        console.log("fetched obj resp: " +this.responseText);
+        // console.log("fetched obj resp: " +this.responseText);
         let response = JSON.parse(this.responseText);
         // console.log("gotsome objex: " + response.objex.length);
         if (response.objex.length > 0) {
@@ -732,7 +732,14 @@ AFRAME.registerComponent('mod_object', {
           } else if (this.data.locationData.locationTags.toLowerCase().includes("equipped")) {
             this.data.isEquipped = true;
           } 
-      }
+      } 
+      if (this.data.tags && this.data.tags != undefined  && this.data.tags != 'undefined' && this.data.tags.length > 0) {
+        if (this.data.tags.toLowerCase().includes("equippable")) {
+          this.data.isEquippable = true;
+        } else if (this.data.tags.toLowerCase().includes("equipped")) {
+          this.data.isEquipped = true;
+        } 
+      } 
       if (this.data.objectData.triggerScale == undefined || this.data.objectData.triggerScale == null || this.data.objectData.triggerScale == "" || this.data.objectData.triggerScale == 0) {
         this.data.objectData.triggerScale = 1;
       } 
@@ -1465,9 +1472,8 @@ AFRAME.registerComponent('mod_object', {
                     } else {
                       // this.el.setAttribute('ammo-body', {type: this.data.objectData.physics.toLowerCase(), gravity: '0 -.1 0', angularFactor: '1 0 1', emitCollisionEvents: true, linearDamping: .1, angularDamping: 1}); //nope, shoot is not physical now
                       setTimeout( () => { //wait a bit for static colliders to load...
-                        console.log("tryna shoot!");
+                        
                         this.el.setAttribute('ammo-body', {type: 'kinematic', emitCollisionEvents: true});
-                        //this.el.body.restitution = .9;
                         
                       }, 5000);
                     }
@@ -1587,7 +1593,7 @@ AFRAME.registerComponent('mod_object', {
 
           let targetModObjComponent = e.detail.targetEl.components.mod_object;
           if (targetModObjComponent != null) {
-                console.log(this.data.objectData.name + " gotsa collision with " + targetModObjComponent.data.objectData.name);
+                // console.log(this.data.objectData.name + " gotsa collision with " + targetModObjComponent.data.objectData.name);
                 if (this.data.objectData.name != targetModObjComponent.data.objectData.name) { //don't trigger yerself, but what if...?
 
                   if (this.triggerAudioController != null) {
@@ -1599,7 +1605,7 @@ AFRAME.registerComponent('mod_object', {
                   if (this.triggerAudioController != null) {
                     this.triggerAudioController.components.trigger_audio_control.playAudioAtPosition(this.el.object3D.position, window.playerPosition.distanceTo(this.el.object3D.position), ["magic"]);
                   }
-                  console.log(this.data.objectData.name  + " hit by other object : " + JSON.stringify(targetModObjComponent.data.objectData));
+                  // console.log(this.data.objectData.name  + " hit by other object : " + JSON.stringify(targetModObjComponent.data.objectData));
 
                   if (targetModObjComponent.data.objectData.objtype == "Weapon" && this.data.objectData.quality.toLowerCase() != "indestructible") {
                     if (targetModObjComponent.data.objectData.operator == "Damage" && targetModObjComponent.data.objectData.hitpoints) {
@@ -1714,7 +1720,7 @@ AFRAME.registerComponent('mod_object', {
                   if (targetModObjComponent.data.objectData.actions) {
 
                     for (let i = 0; i < targetModObjComponent.data.objectData.actions.length; i++) {
-                      console.log(this.data.objectData.name + "checking actions on target " + targetModObjComponent.data.objectData.name + " : " + targetModObjComponent.data.objectData.actions[i].actionName + " actionType " + targetModObjComponent.data.objectData.actions[i].actionType.toLowerCase());
+                      // console.log(this.data.objectData.name + "checking actions on target " + targetModObjComponent.data.objectData.name + " : " + targetModObjComponent.data.objectData.actions[i].actionName + " actionType " + targetModObjComponent.data.objectData.actions[i].actionType.toLowerCase());
                       if (targetModObjComponent.data.objectData.actions[i].objectID) {
                         FetchSceneInventoryObject(targetModObjComponent.data.objectData.actions[i].objectID);
                       }
@@ -2092,8 +2098,8 @@ AFRAME.registerComponent('mod_object', {
       this.el.addEventListener('click', (e) => { 
         e.preventDefault();
         // let downtime = (Date.now() / 1000) - this.mouseDownStarttime;
-        console.log("mousedown time "+ this.mouseDowntime + "  on mod_object type: " + this.data.objectData.objtype + " hasEquip " + this.hasEquipAction + " hasPickup " + this.hasPickupAction + 
-                    " equipped " + this.data.isEquipped);
+        console.log("mousedown on " +this.el.id+ " time "+ this.mouseDowntime + "  on mod_object type: " + this.data.objectData.objtype + " hasEquip " + this.hasEquipAction + " hasPickup " + this.hasPickupAction + 
+                    " equipped " + this.data.isEquipped + " equippable " + this.data.isEquippable);
         if (keydown == "T") {
           ToggleTransformControls(this.data.timestamp);
         } else if (keydown == "Shift") {
@@ -2123,9 +2129,9 @@ AFRAME.registerComponent('mod_object', {
                     this.promptSplit.push(this.data.objectData.prompttext);
                   }
                   // this.el.components.mod_synth.medTrigger();
-                  this.dialogEl.components.mod_dialog.showPanel("Equip " + this.data.objectData.name + "?\n\n" + this.promptSplit[Math.floor(Math.random()*this.promptSplit.length)], this.el.id, "equipMe", 3333 );
+                  this.dialogEl.components.mod_dialog.showPanel("Equip " + this.data.objectData.name + "?\n\n" + this.promptSplit[Math.floor(Math.random()*this.promptSplit.length)], this.data.objectData._id, "equipMe", 3333, this.el.id );
                 } else {
-                  this.dialogEl.components.mod_dialog.showPanel("Equip " + this.data.objectData.name + "?", this.el.id, "equipMe", 3333 );
+                  this.dialogEl.components.mod_dialog.showPanel("Equip " + this.data.objectData.name + "?", this.data.objectData._id, "equipMe", 3333, this.el.id );
                 }
               }
             } 
@@ -2136,10 +2142,10 @@ AFRAME.registerComponent('mod_object', {
                   if (this.data.objectData.prompttext.includes('~')) {
                     this.promptSplit = this.data.objectData.prompttext.split('~'); 
                   }
-                  // this.el.components.mod_synth.medTrigger();
-                  this.dialogEl.components.mod_dialog.showPanel("Pick up " + this.data.objectData.name + "?\n\n" + this.promptSplit[Math.floor(Math.random()*this.promptSplit.length)], this.el.id );
+                  //this calls back to Pickup method from .activated (?), but it doesn't have to, could just pass object _id as above
+                  this.dialogEl.components.mod_dialog.showPanel("Pick up " + this.data.objectData.name + "?\n\n" + this.promptSplit[Math.floor(Math.random()*this.promptSplit.length)], this.el.id, "pickMeUp", 5000, this.el.id );
                 } else {
-                  this.dialogEl.components.mod_dialog.showPanel("Pick up " + this.data.objectData.name + "?", this.el.id );
+                  this.dialogEl.components.mod_dialog.showPanel("Pick up " + this.data.objectData.name + "?", this.el.id, "pickMeUp", 5000, this.el.id );
                 }
               }
               
@@ -3061,7 +3067,7 @@ AFRAME.registerComponent('mod_object', {
       } else if (scatterSurface) {
         surface = scatterSurface;
       }
-      console.log("tryna SCATTER (not instance) a object " + navmesh + "  " + scatterSurface);
+      // console.log("tryna SCATTER (not instance) a object " + navmesh + "  " + scatterSurface);
       if (surface) {
         let count = 10;
         let split = this.data.eventData.split("~"); //gonna switch to tags...
@@ -3071,11 +3077,12 @@ AFRAME.registerComponent('mod_object', {
           }
           
         }
-        console.log("TRYNA SCATTER MOD_OBJECT with count " + count + " ypos " + this.data.ypos);
+        // console.log("TRYNA SCATTER MOD_OBJECT with count " + count + " ypos " + this.data.ypos);
         let scatterCount = 0;
         // if (!this.isNavAgent) { //use waypoints for position below instead of raycasting if it's gonna nav
         let interval = setInterval( () => {
         for (let i = 0; i < 100; i++) {
+
           let testPosition = new THREE.Vector3();
           testPosition.x = this.returnRandomNumber(-100, 100);  
           testPosition.y = 50;
@@ -3085,6 +3092,7 @@ AFRAME.registerComponent('mod_object', {
           let results = raycaster.intersectObject(surface.getObject3D('mesh'), true);
   
           if(results.length > 0) {
+            scatterCount++;
             let scale = this.returnRandomNumber(.5, 1.5);
             console.log("gotsa scatterPosition for object " + this.data.objectData.objectID + " intersect: " + results.length + " " +results[0].object.name + "scatterCount " + scatterCount + " vs count " + count +  " scale " + this.scale);
             testPosition.x = results[0].point.x.toFixed(2); //snap y of waypoint to navmesh y
@@ -3103,10 +3111,10 @@ AFRAME.registerComponent('mod_object', {
             location.eulerz = 0;
             
             scatteredEl.setAttribute("mod_object", {eventData: eventData, markerType: this.data.markerType, scale: this.scale * scale, ypos: this.data.ypos, tags: this.data.tags, 
-                                                    description: this.data.description, locationData: location, objectData: this.data.objectData});
+                                                    description: this.data.description, locationData: location, objectData: this.data.objectData, isEquippable: this.data.isEquippable});
             scatteredEl.setAttribute("shadow", {cast: true, receive: true});
             scatteredEl.classList.add("envMap");
-            scatteredEl.id = "scattered_" + i.toString();
+            scatteredEl.id = this.data.objectData._id + "_scattered_" + scatterCount;
             // if (this.data.markerType != "character") { //messes up navmeshing..
               
               scatteredEl.setAttribute("scale", {x: this.scale * scale, y: this.scale * scale, z: this.scale * scale});
@@ -3114,7 +3122,7 @@ AFRAME.registerComponent('mod_object', {
 
             // }
             this.el.sceneEl.appendChild(scatteredEl);
-            scatterCount++;
+            
 
             if (scatterCount > count) {
               clearInterval(interval);

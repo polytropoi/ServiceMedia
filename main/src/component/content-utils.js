@@ -2299,7 +2299,7 @@ AFRAME.registerComponent('mod_dialog', { //there should only be one of these, un
     });
     this.el.addEventListener('click', (evt) => {
       let name = evt.detail.intersection.object.name;
-      console.log(name);
+      // console.log(name);
       if (name.includes('yesbutton')) {
         this.yesButton();
       }
@@ -2311,21 +2311,22 @@ AFRAME.registerComponent('mod_dialog', { //there should only be one of these, un
       }
     });
 
-    this.el.addEventListener('mouseenter', (evt) => {
-      let name = evt.detail.intersection.object.name;
-      console.log(name);
-    });
+    // this.el.addEventListener('mouseenter', (evt) => {
+    //   let name = evt.detail.intersection.object.name;
+    //   console.log(name);
+    // });
 
   });
   
 
   // this.dial
-  let that = this;
+  // let that = this;
   },
-  showPanel: function (panelString, objectID, messageType, duration) { //objectID = referenced elementID
+  showPanel: function (panelString, objectID, messageType, duration, sourceElementID) { //objectID = referenced elementID
 
     this.objID = objectID;
     this.messageType = messageType;
+    this.sourceElementID = sourceElementID;
     this.el.setAttribute("visible", true);
     this.dialogPanel.classList.add('activeObjexRay');
     if (this.meshObj != null) {
@@ -2343,7 +2344,7 @@ AFRAME.registerComponent('mod_dialog', { //there should only be one of these, un
     }
     this.viewportHolder.object3D.getWorldPosition( this.cameraPosition );
     this.el.setAttribute('position', this.cameraPosition);
-    console.log("tryna set mod_dialog position " + JSON.stringify(this.cameraPosition) + " messageType " + messageType +  " duration " + duration);
+    console.log("tryna set mod_dialog string " +panelString+ " at position " + JSON.stringify(this.cameraPosition) + " messageType " + messageType +  " duration " + duration+  " sourceEl " + sourceElementID);
     // this.dialogText.setAttribute('value', panelString);
     this.dialogText.setAttribute('troika-text', {
       maxWidth: .9,
@@ -2387,26 +2388,34 @@ AFRAME.registerComponent('mod_dialog', { //there should only be one of these, un
       } else {
         this.el.setAttribute("visible", false);
         this.dialogPanel.classList.remove('activeObjexRay');
-        let objEl = document.getElementById(this.objID);
-        if (objEl != null) {
-          objEl.components.mod_object.activated();
+        // let objEl = document.getElementById(this.objID);
+        // if (objEl != null) {
+          // objEl.components.mod_object.activated();
           if (this.messageType == "equipMe") {
-            if (objEl.components.mod_object) {
-              let equipObjID = objEl.components.mod_object.data.objectData._id;
-              console.log("tryna equipMe objID" + equipObjID);
+            // if (objEl.components.mod_object) {
+              // let equipObjID = objEl.components.mod_object.data.objectData._id;
+              // console.log("tryna equipMe objID " + equipObjID);
               DequipAndDropItem();
-             
-              objEl.removeAttribute('ammo-shape');
-              objEl.removeAttribute('ammo-body');
-              objEl.parentNode.removeChild(objEl);
-              EquipDefaultItem(equipObjID);
-            } else {
-              console.log("din't fine no equipMe element");
+              let objEl = document.getElementById(this.sourceElementID);
+              if (objEl) {
+                objEl.removeAttribute('ammo-shape');
+                objEl.removeAttribute('ammo-body');
+                objEl.parentNode.removeChild(objEl);
+              }
+
+              EquipDefaultItem(this.objID);
+            // } else {
+            //   console.log("din't fine no equipMe element");
+            // }
+          } else if (this.messageType == "pickMeUp") {
+            let objEl = document.getElementById(this.objID); //here it's the elementID
+            if (objEl != null) {
+              objEl.components.mod_object.activated(); //hrm... what other actions?
             }
           }
           // objEl.components.mod_object.hideObject();
         }
-      }
+      // }
     } else {
       if (this.messageType == "recentCloudMods") { //warning dialog when cloud timestamp more recent than local
         DeleteLocalSceneData();
@@ -2489,9 +2498,9 @@ AFRAME.registerComponent('mod_dialog', { //there should only be one of these, un
     this.waitAndHide(2000);
   }, 
   waitAndHide: function (duration) {
-    console.log("tryna wait and hide");
+    // console.log("tryna wait and hide");
     if (this.el.getAttribute("visible") == true) {
-      console.log("tryna wait and hide for " + duration);
+      // console.log("tryna wait and hide for " + duration);
       setTimeout(() =>{ 
         this.el.setAttribute("visible", false);
         this.dialogPanel.classList.remove('activeObjexRay');
