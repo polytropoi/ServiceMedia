@@ -951,7 +951,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
         // this.el.setAttribute("rotation", this.data.xrot + " " + this.data.yrot + " " +this.data.zrot);
         // this.el.object3D.rotation.x += Math.PI;
 
-        console.log("TRYNA SCALE TO " + this.data.xscale + " " + this.data.yscale + " " + this.data.zscale);
+        // console.log("TRYNA SCALE TO " + this.data.xscale + " " + this.data.yscale + " " + this.data.zscale);
         // if (this.data.xscale) {
           this.scaleVector.x = this.data.xscale;
           this.scaleVector.y = this.data.yscale;

@@ -646,7 +646,7 @@ function GetMatrixData() {
          matrixMeshComponent = matrixMeshEl.components.matrix_meshes;
          if (matrixMeshComponent != null) {  
             let length = data.chunk.length;
-            let trimToLength = 5000;
+            let trimToLength = 99;
             let trimmedLength = length - trimToLength;
             let trimmedIndexes = [];
             let randomIndex = 0;
@@ -658,6 +658,7 @@ function GetMatrixData() {
                if (i === trimmedLength - 1) {
                   //sweeeet...
                   // matrixMeshComponent.loadRoomData(data.chunk.splice(trimmedIndexes, 1)); 
+
                   matrixMeshComponent.loadRoomData(data);   
 
                }

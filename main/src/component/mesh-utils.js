@@ -1148,7 +1148,7 @@ AFRAME.registerComponent('instanced_surface_meshes', {
       this.iMesh_3 = null;
       this.iMesh_4 = null;
 
-      console.log("model this.data._id " + this.data._id + " tryna instance " + this.data.count);
+      console.log("instanced_surface_meshes model _id " + this.data._id + " tryna instance " + this.data.count);
       // this.el.setAttribute("visible",false);
       this.el.addEventListener('model-loaded', (event) => {
         event.preventDefault();;
@@ -2384,13 +2384,15 @@ AFRAME.registerComponent("rotate-with-camera", { //unused
     
     this.matrixCalloutText.setAttribute('troika-text', {
       width: .5,
+      outlineColor: "black",
+      outlineWidth: "2%",
       baseline: "bottom",
       align: "left",
       font: "/fonts/web/" + font,
-      fontSize: .3,
+      fontSize: .2,
       anchor: "center",
       color: "white",
-      value: "wha"
+      value: ""
     });
     this.matrixCalloutPanel.setAttribute('overlay');
     this.matrixCalloutText.setAttribute('overlay');
@@ -2400,7 +2402,7 @@ AFRAME.registerComponent("rotate-with-camera", { //unused
   
     this.roomData = roomData.chunk;
     this.roomData.sort((a, b) => (a.num_joined_members < b.num_joined_members) ? 1 : -1);
-    // console.log("gots " + this.roomData.length + " rooms from matrix.org :" + JSON.stringify(this.roomData));
+    console.log("gots " + this.roomData.length + " rooms from matrix.org :" + JSON.stringify(this.roomData));
 
     // for (let i = 0; i < this.roomData.length; i++) {
     //   // console.log(this.roomData[i].name);
@@ -2413,7 +2415,7 @@ AFRAME.registerComponent("rotate-with-camera", { //unused
       // console.log(instanceID + " " + distance + " " + JSON.stringify(hitpoint));
       // hitpoint = JSON.parse(hitpoint);
       let x = hitpoint.x;
-      let y = hitpoint.y;
+      let y = hitpoint.y + .5;
       let z = hitpoint.z;
       this.matrixCalloutEntity.setAttribute("position", {"x": x, "y": y, "z": z});
       this.matrixCalloutPanel.setAttribute('visible', true);
@@ -2428,7 +2430,10 @@ AFRAME.registerComponent("rotate-with-camera", { //unused
       } else {
         GetMatrixData();
       }
-      this.matrixCalloutText.setAttribute("value", roomName);
+      // this.matrixCalloutText.setAttribute("value", roomName);
+      this.matrixCalloutText.setAttribute('troika-text', {
+        value: roomName
+      });
       this.matrixCalloutText.setAttribute("overlay");
     }
   },
@@ -2440,13 +2445,13 @@ AFRAME.registerComponent("rotate-with-camera", { //unused
       if (!this.dialogEl) {
         this.dialogEl = document.getElementById('mod_dialog');
       } 
-      this.dialogEl.components.mod_dialog.showPanel("Join the matrix room " + this.roomData[instanceID].name + "?", "href~https://matrix.to/#/" + this.roomData[instanceID].room_id );
+      this.dialogEl.components.mod_dialog.showPanel("Join the matrix room " + this.roomData[instanceID].name + "?", "href~https://matrix.to/#/" + this.roomData[instanceID].room_id, "linkOpen", 5000, "#" );
     } else {
       if (!this.roomData) {
         GetMatrixData(); //in connect.js
       }
     }
-  },
+  }
  });
 
  /* 
