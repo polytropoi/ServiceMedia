@@ -1889,7 +1889,7 @@ webxr_router.get('/:_id', function (req, res) {
                                     // skyParticles = "<a-entity position=\x220 3 0\x22 scale=\x222 2 2\x22 mod_particles=\x22type: smoke\x22></a-entity>";
                                     skyParticles = "<a-entity scale=\x2220 20 20\x22 position=\x220 20 0\x22 sprite-particles=\x22texture: #explosion1; textureFrame: 8 8; blending: additive; color: black..white;"+
                                     " position: -1 -1 -1..1 1 1; velocity: -.1 -.05 -.1 .. .1 .05 .1; spawnRate: 20; lifeTime: 1; scale: 50,200; opacity: 0,1,0; rotation: 0..360\x22></a-entity>";
-                                    imageAssets = imageAssets + "<img id=\x22explosion1\x22 src=\x22http://servicemedia.s3.amazonaws.com/assets/pics/explosion1.png\x22 crossorigin=\x22anonymous\x22>";
+                                    // imageAssets = imageAssets + "<img id=\x22explosion1\x22 src=\x22http://servicemedia.s3.amazonaws.com/assets/pics/explosion1.png\x22 crossorigin=\x22anonymous\x22>";
                                 } else if (sceneResponse.sceneSkyParticles.toLowerCase() == "fireworks") {
                                     
                                     skyParticles = "<a-entity scale=\x2240 10 40\x22 position=\x220 40 0\x22 sprite-particles=\x22texture: #fireworksanim1; textureFrame: 5 5; blending: additive; color: black..white;"+
@@ -2714,7 +2714,7 @@ webxr_router.get('/:_id', function (req, res) {
 
                                         }
                                         //TODO use scene image with proper type/tag 
-                                        imageAssets = imageAssets + "<img id=\x22explosion1\x22 src=\x22http://servicemedia.s3.amazonaws.com/assets/pics/explosion1.png\x22 crossorigin=\x22anonymous\x22>";
+                                        // imageAssets = imageAssets + "<img id=\x22explosion1\x22 src=\x22http://servicemedia.s3.amazonaws.com/assets/pics/explosion1.png\x22 crossorigin=\x22anonymous\x22>";
                                     }
                                     if (locMdl.markerType == "follow random path") {
                                         // followCurve = "follow-path=\x22incrementBy:0.001; throttleTo:1\x22";
@@ -3033,7 +3033,7 @@ webxr_router.get('/:_id', function (req, res) {
                                                     }
                                                     let modelString = "gltf-model=\x22#" + m_assetID + "\x22";
                                                     //todo, check for scene image with spritesheet type / tag
-                                                    imageAssets = imageAssets + "<img id=\x22explosion1\x22 src=\x22http://servicemedia.s3.amazonaws.com/assets/pics/explosion1.png\x22 crossorigin=\x22anonymous\x22>"; //for particles
+                                                    // imageAssets = imageAssets + "<img id=\x22explosion1\x22 src=\x22http://servicemedia.s3.amazonaws.com/assets/pics/explosion1.png\x22 crossorigin=\x22anonymous\x22>"; //for particles
                                                     
                                                     gltfsEntities = gltfsEntities + "<a-entity id=\x22"+id+"\x22 "+modelString+" "+instancing+" class=\x22"+entityType+
                                                     " activeObjexGrab activeObjexRay\x22 shadow=\x22cast:true; receive:true\x22 "+skyboxEnvMap+
@@ -5210,6 +5210,7 @@ webxr_router.get('/:_id', function (req, res) {
                         "<img id=\x22fireanim1\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/pics/fireanim3.png\x22 crossorigin=\x22anonymous\x22></img>"+
                         "<img id=\x22candle1\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/pics/candle_flame_8x8.png\x22 crossorigin=\x22anonymous\x22></img>"+
                         "<img id=\x22smoke1\x22 src=\x22http://servicemedia.s3.amazonaws.com/assets/pics/smokeanim2.png\x22 crossorigin=\x22anonymous\x22>"+
+                        "<img id=\x22explosion1\x22 src=\x22http://servicemedia.s3.amazonaws.com/assets/pics/explosion1.png\x22 crossorigin=\x22anonymous\x22>"+
                         // videoAsset + 
                         imageAssets +
 

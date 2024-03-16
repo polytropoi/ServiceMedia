@@ -1692,10 +1692,29 @@ AFRAME.registerComponent('mod_object', {
                             } else {
                               console.log("already triggered - make it a toggle!");
                             }
-                            this.el.classList.remove('activeObjexRay');
-                            this.el.removeAttribute('ammo-shape');
-                            this.el.removeAttribute('ammo-body');
-                            this.el.parentNode.removeChild(this.el);
+                            //well, just do death particles everywhere for now...
+                              this.particlesEl = null;
+                              this.particlesEl = document.createElement("a-entity");
+                              // this.particlesEl.setAttribute("mod_particles", {"enabled": false});
+                              this.el.sceneEl.appendChild(this.particlesEl); //hrm...
+                              this.particlesEl.setAttribute("position", this.el.object3D.position);
+                              this.particlesEl.setAttribute('sprite-particles', {
+                                enable: true, 
+                                texture: '#smoke1', 
+                                color: settings.sceneColor3+".."+settings.sceneColor4, 
+                                blending: 'additive', 
+                                textureFrame: '6 5', 
+                                textureLoop: '1', 
+                                spawnRate: '1', 
+                                lifeTime: '3', 
+                                scale: '100,1000'});
+                              this.particlesEl.setAttribute('sprite-particles', {"duration": 3});
+                              // }
+
+                              this.el.classList.remove('activeObjexRay');
+                              this.el.removeAttribute('ammo-shape');
+                              this.el.removeAttribute('ammo-body');
+                              this.el.parentNode.removeChild(this.el); //actually kill it
                           } //end kill action
 
 
