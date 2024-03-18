@@ -1983,7 +1983,7 @@ AFRAME.registerComponent('mod_object', {
                 if (!this.isNavAgent) {
                   this.calloutEntity.setAttribute("position", this.pos);
                 } else {
-                  let y = '0 1 0';
+                  let y = '0 2 0';
 
                   if (this.data.objectData.yPosFudge) {
                     y = '0 ' + (parseFloat(this.data.objectData.yPosFudge) + 1) + ' 0';

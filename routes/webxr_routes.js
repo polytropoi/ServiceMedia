@@ -1850,7 +1850,7 @@ webxr_router.get('/:_id', function (req, res) {
                                     //     "size: 3, 3, 3, 0\x22></a-entity>";
                                     // spe-particles="texture: assets/blob.png; particle-count: 300; max-age: 3; distribution: sphere; color: #888; color-spread: 1 1 1, 0 0 0; size: 0,2,0"
                                     // skyParticles = "<a-entity position=\x220 5 0\x22 sky_particles=\x22size: .1; type: dust; src: http://servicemedia.s3.amazonaws.com/assets/pics/sparkle.png\x22></a-entity>";
-                                    skyParticles = "<a-entity position=\x220 0 0\x22 dust></a-entity>";
+                                    skyParticles = "<a-entity position=\x220 0 0\x22 sky_particle_points=\x22type: dust\x22></a-entity>";
 
                                     imageAssets = imageAssets + "<img id=\x22sparkle1\x22 src=\x22http://servicemedia.s3.amazonaws.com/assets/pics/sparkle.png\x22 crossorigin=\x22anonymous\x22>";
                                 } else if (sceneResponse.sceneSkyParticles.toLowerCase() == "rain") {
@@ -1881,9 +1881,11 @@ webxr_router.get('/:_id', function (req, res) {
                                     // particle-system-instanced="particleSize: 0.03; src: #particleSnowflake; particleSpeed: 0.002; particleLifeTime: 20000" position='0 0.2 0'
                                     imageAssets = imageAssets + "<img id=\x22snowflake\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/pics/snowflake.png\x22 crossorigin=\x22anonymous\x22>";
                                 } else if (sceneResponse.sceneSkyParticles.toLowerCase() == "smoke") {
-                                    skyParticles = "<a-entity position=\x220 0 0\x22 rotation=\x220 0 0\x22 scale=\x2220 20 20\x22><a-entity sprite-particles=\x22texture: #cloud1; color: " +sceneResponse.sceneColor2 + "; position: 0 0 -1..0 0 1; velocity: -.05 -.025 -.05 .. .05 .025 .05; spawnRate: 10; lifeTime: 20; scale: 100; opacity: 0,.3,0; rotation: 0..360\x22></a-entity></a-entity>";
+                                    // skyParticles = "<a-entity position=\x220 0 0\x22 rotation=\x220 0 0\x22 scale=\x2220 20 20\x22><a-entity sprite-particles=\x22texture: #cloud1; color: " +sceneResponse.sceneColor2 + "; position: 0 0 -1..0 0 1; velocity: -.05 -.025 -.05 .. .05 .025 .05; spawnRate: 10; lifeTime: 20; scale: 100; opacity: 0,.3,0; rotation: 0..360\x22></a-entity></a-entity>";
                                     // skyParticles = "<a-entity position=\x220 0 0\x22 rotation=\x220 0 0\x22 scale=\x221 1 1\x22 ><a-entiry sky_particles=\x22type: smoke; size: 20; src: http://servicemedia.s3.amazonaws.com/assets/pics/cloud_lg.png\x22></a-entity></a-entity>";
+                                    skyParticles = "<a-entity position=\x220 0 0\x22 sky_particle_points=\x22type: smoke\x22></a-entity>";
                                     imageAssets = imageAssets + "<img id=\x22cloud1\x22 src=\x22http://servicemedia.s3.amazonaws.com/assets/pics/cloud_lg.png\x22 crossorigin=\x22anonymous\x22>";
+                                
                                 } else if (sceneResponse.sceneSkyParticles.toLowerCase() == "explosions") {
                                     // skyParticles = "<a-entity scale='15 5 15' position='0 0 0' particle_mangler particle-system=\x22preset: dust; maxAge: 10; velocityValue: 0 -.01 0; direction: -.01; positionSpread: 15 15 15; opacity: .15; particleCount: 25; size: 300; blending: 2; texture: https://realitymangler.com/assets/textures/cloud_sm.png; color: " + sceneResponse.sceneColor1 + "," + sceneResponse.sceneColor2 +"\x22></a-entity>";
                                     // skyParticles = "<a-entity position=\x220 3 0\x22 scale=\x222 2 2\x22 mod_particles=\x22type: smoke\x22></a-entity>";
@@ -1900,7 +1902,9 @@ webxr_router.get('/:_id', function (req, res) {
                                     imageAssets = imageAssets + "<img id=\x22fireworksanim1\x22 src=\x22http://servicemedia.s3.amazonaws.com/assets/pics/fireworks_sheet.png\x22 crossorigin=\x22anonymous\x22>";
                                 } else if (sceneResponse.sceneSkyParticles.toLowerCase() == "fog") {
                                     // skyParticles = "<a-entity scale='15 5 15' position='0 5 0' particle_mangler particle-system=\x22preset: dust; maxAge: 25; velocityValue: 0 -.01 0; direction: -.01; positionSpread: 15 2 15; opacity: .25; particleCount: 50; size: 500; blending: 2; texture: https://realitymangler.com/assets/textures/cloud_lg.png; color: " + sceneResponse.sceneColor1 + "," + sceneResponse.sceneColor2 +"\x22></a-entity>";
-                                    skyParticles = "<a-entity scale=\x2250 10 50\x22 position=\x220 10 0\x22 sprite-particles=\x22texture: #cloud1; color: " +sceneResponse.sceneColor2 + "; position: -1 -1 -1..1 1 1; velocity: -.05 -.025 -.05 .. .05 .025 .05; spawnRate: 5; lifeTime: 20; scale: 100,200; opacity: 0,.3,0; rotation: 0..360\x22></a-entity>";
+                                    // skyParticles = "<a-entity scale=\x2250 10 50\x22 position=\x220 10 0\x22 sprite-particles=\x22texture: #cloud1; color: " +sceneResponse.sceneColor2 + "; position: -1 -1 -1..1 1 1; velocity: -.05 -.025 -.05 .. .05 .025 .05; spawnRate: 5; lifeTime: 20; scale: 100,200; opacity: 0,.3,0; rotation: 0..360\x22></a-entity>";
+                                    // imageAssets = imageAssets + "<img id=\x22cloud1\x22 src=\x22http://servicemedia.s3.amazonaws.com/assets/pics/cloud_lg.png\x22 crossorigin=\x22anonymous\x22>";
+                                    skyParticles = "<a-entity position=\x220 0 0\x22 sky_particle_points=\x22type: fog\x22></a-entity>";
                                     imageAssets = imageAssets + "<img id=\x22cloud1\x22 src=\x22http://servicemedia.s3.amazonaws.com/assets/pics/cloud_lg.png\x22 crossorigin=\x22anonymous\x22>";
                                 } else if (sceneResponse.sceneSkyParticles.toLowerCase() == "fog/add") {
                                     skyParticles = "<a-entity scale=\x2250 10 50\x22 position=\x220 10 0\x22 sprite-particles=\x22texture: #cloud1; blending: additive; color: " +sceneResponse.sceneColor2 + "; position: -1 -1 -1..1 1 1; velocity: -.05 -.025 -.05 .. .05 .025 .05; spawnRate: 5; lifeTime: 20; scale: 100,200; opacity: 0,.3,0; rotation: 0..360\x22></a-entity>";

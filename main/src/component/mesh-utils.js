@@ -1532,7 +1532,7 @@ AFRAME.registerComponent('instanced_surface_meshes', {
         var triggerAudioController = document.getElementById("triggerAudio");
           if (triggerAudioController != null) {
             triggerAudioController.components.trigger_audio_control.playAudioAtPosition(this.hitpoint, this.distance, this.data.tags);
-            }
+          }s
           // this.iMesh.position.set(id, 0, 0, -100);
           if (this.useMatrix) {
             let matrixMeshEl = document.getElementById("matrix_meshes");
@@ -3920,8 +3920,12 @@ AFRAME.registerComponent('load_threesvg', {
     // }
     
   });
-//from https://dk-dust.glitch.me/
-  AFRAME.registerComponent("dust", {
+//modded from https://dk-dust.glitch.me/
+  AFRAME.registerComponent("sky_particle_points", {
+    schema: {
+      type: { default: "dust"},
+      sprite: {default: ""}
+    },
     init: function () {
       console.log("init");
       this.dist = 50.0;
@@ -3932,13 +3936,16 @@ AFRAME.registerComponent('load_threesvg', {
       const velocities = new Float32Array(this.particleCount * 3);
 
       const rv = 0.01;
+      this.size = .25;
+      this.src = null;
+
 
       for (let i = 0; i < this.particleCount; i++) {
         // const x = Math.random() * 10 - 5;
         // const y = Math.random() * 10 - 5;
         // const z = Math.random() * 10 - 5;
         const x = THREE.MathUtils.randFloatSpread(75);
-        const y =THREE.MathUtils.randFloat(1,20);
+        const y =THREE.MathUtils.randFloat(-10,30);
         const z = THREE.MathUtils.randFloatSpread(75);
         positions[i * 3] = x;
         positions[i * 3 + 1] = y;
@@ -3977,11 +3984,35 @@ AFRAME.registerComponent('load_threesvg', {
       //   color: 0xffffff,
       //   size: 0.5,
       // });
-      const material = new THREE.PointsMaterial({ size: .25, map: new THREE.TextureLoader().load("http://servicemedia.s3.amazonaws.com/assets/pics/sparkle.png"), 
-                                                opacity: 0.5, blending: THREE.AdditiveBlending, depthTest: false, transparent: true, vertexColors: true });
+      // 
+      // "http://servicemedia.s3.amazonaws.com/assets/pics/sparkle.png"
+      
+      if (this.data.type == "dust") {
+        this.src = document.getElementById("sparkle1").src;
+        this.material = new THREE.PointsMaterial({ size: this.size, map: new THREE.TextureLoader().load(this.src), 
+          opacity: 0.5, blending: THREE.AdditiveBlending, depthTest: false, transparent: true, vertexColors: true });
+      }
+      if (this.data.type == "smoke") {
+        this.src = document.getElementById("cloud1").src;
+        this.particleCount = 200;
+        this.size = 20;
+        this.dist = 100;
+        this.material = new THREE.PointsMaterial({ size: this.size, map: new THREE.TextureLoader().load(this.src), 
+          opacity: 0.1, blending: THREE.NormalBlending, depthTest: false, transparent: true, vertexColors: true });
+      } 
+      if (this.data.type == "fog") {
+        this.src = document.getElementById("cloud1").src;
+        this.particleCount = 100;
+        this.size = 30;
+        this.dist = 150;
+        this.material = new THREE.PointsMaterial({ size: this.size, map: new THREE.TextureLoader().load(this.src), 
+          opacity: 0.025, blending: THREE.NormalBlending, depthTest: false, transparent: true, vertexColors: true });
+      } 
+
+     
       this.particleSystem = new THREE.Points(
         this.particleGeometry,
-        material
+        this.material
       );
       this.el.setObject3D("mesh", this.particleSystem);
     },
