@@ -32,8 +32,8 @@ AFRAME.registerComponent('mod_objex', {
         this.data.jsonObjectData = JSON.parse(atob(theData)); //object items with model references
         this.data.jsonLocationsData = JSON.parse(atob(theLocData)); //scene locations with object references
         // console.log("objxe datas" + JSON.stringify(this.data.jsonObjectData));
-        console.log("objxe location datas" + JSON.stringify(this.data.jsonLocationsData));
-        console.log(this.data.jsonLocationsData.length + " locations for " + this.data.jsonObjectData.length);
+        // console.log("objxe location datas" + JSON.stringify(this.data.jsonLocationsData));
+        console.log(this.data.jsonLocationsData.length + "mod_object locations for " + this.data.jsonObjectData.length + " objex");
   
         this.triggerAudioController = document.getElementById("triggerAudio");
         this.camera = null;

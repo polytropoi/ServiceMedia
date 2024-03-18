@@ -56,6 +56,7 @@ let attributions = [];
 let uiVisible = true;
 let pauseLoops = false;
 let matrixClient = null;
+let matrixRoomsData = null;
 // let vidz = null;
 // let videoEl = null;
 
@@ -635,40 +636,61 @@ function GetMatrixData() {
    if (!matrixClient) {
       matrixClient = matrixcs.createClient("https://matrix.org");
    }
-   matrixClient.publicRooms(function (err, data) { //this pulls a ton of data, so I randomly trim out all but 1000 elements below
-      if (err) {
-         console.error("err %s", JSON.stringify(err));
-         return;
-      }
-      console.log("Congratulations! The matrix client got " + data.chunk.length + " rooms.");
+   if (!matrixRoomsData) {
+      matrixClient.publicRooms(function (err, data) { //pulls 100 random rooms
+         if (err) {
+            console.error("err %s", JSON.stringify(err));
+            return;
+         }
+         matrixRoomsData = data;
+         console.log("Congratulations! The matrix client got " + data.chunk.length + " rooms.");
+         let matrixMeshEl = document.getElementById("matrix_meshes");
+         if (matrixMeshEl != null) {
+            matrixMeshComponent = matrixMeshEl.components.matrix_meshes;
+            if (matrixMeshComponent != null) {  
+               let length = data.chunk.length;
+               let trimToLength = 99;
+               let trimmedLength = length - trimToLength;
+               let trimmedIndexes = [];
+               let randomIndex = 0;
+               for (let i = 0; i < trimmedLength; i++) {
+                  randomIndex = Math.floor(Math.random()*data.chunk.length);
+                  // console.log("pushing randomIndex " + randomIndex);
+                  // trimmedIndexes.push(randomIndex);
+                  data.chunk.splice(randomIndex, 1)
+                  if (i === trimmedLength - 1) {
+                     //sweeeet...
+                     // matrixMeshComponent.loadRoomData(data.chunk.splice(trimmedIndexes, 1)); 
+                     matrixMeshComponent.loadRoomData(data);   
+                  }
+               } 
+            }
+         }
+      });
+   } else {
       let matrixMeshEl = document.getElementById("matrix_meshes");
       if (matrixMeshEl != null) {
          matrixMeshComponent = matrixMeshEl.components.matrix_meshes;
          if (matrixMeshComponent != null) {  
-            let length = data.chunk.length;
+            let length = matrixRoomsData.chunk.length;
             let trimToLength = 99;
             let trimmedLength = length - trimToLength;
             let trimmedIndexes = [];
             let randomIndex = 0;
             for (let i = 0; i < trimmedLength; i++) {
-               randomIndex = Math.floor(Math.random()*data.chunk.length);
+               randomIndex = Math.floor(Math.random()*matrixRoomsData.chunk.length);
                // console.log("pushing randomIndex " + randomIndex);
                // trimmedIndexes.push(randomIndex);
-               data.chunk.splice(randomIndex, 1)
+               matrixRoomsData.chunk.splice(randomIndex, 1)
                if (i === trimmedLength - 1) {
                   //sweeeet...
                   // matrixMeshComponent.loadRoomData(data.chunk.splice(trimmedIndexes, 1)); 
-
-                  matrixMeshComponent.loadRoomData(data);   
-
+                  matrixMeshComponent.loadRoomData(matrixRoomsData);   
                }
             } 
-         
          }
-         // matrixMeshEl.components.matrix_meshes.loadRoomData(data);
       }
-   });
-   // }
+   }
 }
 
 function MediaTimeUpdate (fancyTimeString) {

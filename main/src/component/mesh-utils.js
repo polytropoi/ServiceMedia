@@ -785,6 +785,7 @@ AFRAME.registerComponent('instanced_meshes_sphere', { //scattered randomly in sp
   this.thirdPersonPlaceholder = document.getElementById("playCaster"); 
   this.useMatrix = false;
   this.matrixMeshComponent = null;
+  this.isInitialized = false;
   if (settings.useMatrix) {
     this.useMatrix = true;
   }
@@ -999,9 +1000,10 @@ AFRAME.registerComponent('instanced_meshes_sphere', { //scattered randomly in sp
     },
     rayhit: function (hitID, distance, hitpoint) {
       console.log(hitID + " beez hit!");
-      if (this.hitID != hitID) {
+      if (this.hitID != hitID || !this.isInitialized) {
         
         this.intersection = null;
+        this.isInitialized = true;
         // this.raycaster = null;
         
         this.hitID = hitID;
@@ -1217,6 +1219,19 @@ AFRAME.registerComponent('instanced_surface_meshes', {
         this.instance_clicked(this.instanceId); 
       }
     }); 
+
+    if (this.useMatrix) {
+      let matrixMeshEl = document.getElementById("matrix_meshes");
+      if (matrixMeshEl != null) {
+        this.matrixMeshComponent = matrixMeshEl.components.matrix_meshes;
+        if (this.matrixMeshComponent != null && this.intersection != null) {
+          this.matrixMeshComponent.selectRoomData(this.instanceId);
+        }
+      } else {
+        matrixMeshEl = document.getElementById("matrix_meshes");
+      }
+    }
+    
   },
   
   surfaceLoaded: function () {  //called from scatter-surface when loaded
@@ -1457,21 +1472,21 @@ AFRAME.registerComponent('instanced_surface_meshes', {
         }
     
         if ( this.intersection != null && this.intersection.length > 0) {
-          // console.log("gotsa intersection!" + this.intersection[0].instanceId);
-       
+          console.log("gotsa intersection!" + this.intersection[0].instanceId + " this.instanceId ");
+          // if (!this.isInitialized) {
+          //   this.instanceId = this.intersection[ 0 ].instanceId;
+          // }
           if (this.intersection[0].point != undefined && this.intersection[0].point != null ) {
-            if (this.instanceId != this.intersection[0].instanceId) {
+            if (this.instanceId != this.intersection[0].instanceId || !this.isInitialized) {
               this.instanceId = this.intersection[ 0 ].instanceId;
-              
+              this.isInitialized = true;
               console.log(this.data.tags + " " + this.instanceId);
-
-              if (this.data.tags != undefined && this.data.tags.length) {  
+              // if (this.data.tags != undefined && this.data.tags.length) {  
                 // this.distance = window.playerPosition.distanceTo(this.intersection[0].point);
                 this.distance = this.raycaster.ray.origin.distanceTo( this.intersection[0].point );
                 this.hitpoint = this.intersection[0].point;
                 this.rayhit(this.instanceId, this.distance, this.hitpoint); 
-              }
-
+              // }
             }
           }
 
@@ -1499,11 +1514,18 @@ AFRAME.registerComponent('instanced_surface_meshes', {
       }
       if (this.matrixMeshComponent != null) {
         this.matrixMeshComponent.showRoomData(this.instanceId, distance, hitpoint);
-      }     
-      
+        } else {
+          let matrixMeshEl = document.getElementById("matrix_meshes");
+          if (matrixMeshEl != null) {
+            this.matrixMeshComponent = matrixMeshEl.components.matrix_meshes;
+            if (this.matrixMeshComponent != null && this.intersection != null) {
+              this.matrixMeshComponent.selectRoomData(this.instanceId);
+            }
+          }
+        }    
     },
     instance_clicked: function (id) {
-      console.log(id);  
+      console.log("clicked instance: "+ id);  
       if (id != null && id != this.lastClickedID && this.intersection != null && this.data.tags != 'undefined') {
         this.lastClickedID = id; //bc double triggering....ugh
         console.log(this.data.tags + " clicked id " + id);
