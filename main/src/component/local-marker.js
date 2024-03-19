@@ -206,16 +206,17 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
                     if (this.data.tags && (this.data.tags.includes("fast"))) {
                       duration = 500;
                     }
-                    if (this.data.tags.includes("show gizmo")) {
-                    this.el.setAttribute("geometry", {primitive: "sphere", radius: this.data.scale * .1});
-                    // this.el.setAttribute("light", {type: "point", intensity: .5, distance: 3, castShadow: true, decay: 1, color: "yellow"});
-                    // this.el.setAttribute("mod_flicker", {type: "candle"});
-                    this.el.setAttribute("material", {color: "yellow", wireframe: true});
+                    if (!this.data.tags.includes("hide")) {
+                      this.radius = this.data.xscale * .05;
+                      this.el.setAttribute("geometry", {primitive: "sphere", radius: this.radius});
+                      // this.el.setAttribute("light", {type: "point", intensity: .5, distance: 3, castShadow: true, decay: 1, color: "yellow"});
+                      // this.el.setAttribute("mod_flicker", {type: "candle"});
+                      this.el.setAttribute("material", {color: "yellow", wireframe: true});
                     } 
                     if (this.data.tags.includes("candle")) {
-                      this.el.setAttribute("mod_particles", {type: "candle", color: color1, scale: this.data.scale, addLight: true});
+                      this.el.setAttribute("mod_particles", {type: "candle", color: color1, scale: this.data.xscale, addLight: true});
                     } else if (this.data.tags.includes("fire")) {
-                      this.el.setAttribute("mod_particles", {type: "fire", color: color1, scale: this.data.scale, addLight: true});
+                      this.el.setAttribute("mod_particles", {type: "fire", color: color1, scale: this.data.xscale, addLight: true});
                     } else {
                       if (this.data.tags.includes("color"))  {
                         if (this.data.eventData.includes("~")) {
@@ -797,6 +798,10 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
     //   }
     // },
     loadModel: function (modelID) {
+      if (!modelID) {
+        modelID = this.data.modelID;
+      }
+      console.log("localMarker loadmodel " + modelID);
         let transform_controls_component = this.el.components.transform_controls;
         if (transform_controls_component) {
             if (transform_controls_component.data.isAttached) {
@@ -954,16 +959,17 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
               if (this.data.tags && (this.data.tags.includes("fast"))) {
                 duration = 500;
               }
-              if (this.data.tags.includes("show gizmo")) {
-                this.el.setAttribute("geometry", {primitive: "sphere", radius: this.data.scale * .1}); //light gizmo is different bc particles
+              if (!this.data.tags.includes("hide")) {
+                this.radius = this.data.xscale * .05;
+                this.el.setAttribute("geometry", {primitive: "sphere", radius: this.radius}); //light gizmo is different bc particles
                 // this.el.setAttribute("light", {type: "point", intensity: .5, distance: 3, castShadow: true, decay: 1, color: "yellow"});
                 // this.el.setAttribute("mod_flicker", {type: "candle"});
                 this.el.setAttribute("material", {color: "yellow", wireframe: true});
               } 
               if (this.data.tags.includes("candle")) {
-                this.el.setAttribute("mod_particles", {type: "candle", color: color1, scale: this.data.scale, addLight: true});
+                this.el.setAttribute("mod_particles", {type: "candle", color: color1, scale: this.data.xscale, addLight: true});
               } else if (this.data.tags.includes("fire")) {
-                this.el.setAttribute("mod_particles", {type: "fire", color: color1, scale: this.data.scale, addLight: true});
+                this.el.setAttribute("mod_particles", {type: "fire", color: color1, scale: this.data.xscale, addLight: true});
               } else {
                 let markerLightShadow = true;
                 let lighttype = "point";
@@ -1000,13 +1006,14 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
 
         // let scale = parseFloat(this.data.scale);
         
-        console.log("localmarker with + " + this.data.scale + " rot " + this.data.xrot + this.data.yrot + this.data.zrot);
+        console.log("localmarker with scale + " + this.data.xscale +" "+ this.data.yscale +" "+ this.data.zscale + " rot " + this.data.xrot + this.data.yrot + this.data.zrot);
         // if (this.data.xscale) {
         //   this.scaleVector.x = this.data.xscale;
         //   this.scaleVector.y = this.data.yscale;
         //   this.scaleVector.z = this.data.zscale;
         // }
-        this.el.object3D.scale.set(this.data.xscale, this.data.yscale, this.data.zscale);
+        // this.el.object3D.scale.set(this.data.xscale, this.data.yscale, this.data.zscale);
+        this.el.setAttribute("scale", this.data.xscale +" "+ this.data.yscale +" "+ this.data.zscale )
         
         this.el.object3D.position.set(this.data.xpos, this.data.ypos, this.data.zpos);
         // this.el.object3D.rotation.set(THREE.MathUtils.degToRad(this.data.xrot), THREE.MathUtils.degToRad(this.data.xrot), THREE.MathUtils.degToRad(this.data.xrot));

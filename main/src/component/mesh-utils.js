@@ -1382,6 +1382,12 @@ AFRAME.registerComponent('instanced_surface_meshes', {
               } else {
                 console.log("breaking loop at " + i.toString());
 
+                if (this.data.tags.includes("random color")) {
+
+                  // this.iMesh.setColorAt( this.instanceId, this.highlightColor.setHex( Math.random() * 0xffffff ) );
+                  // this.iMesh.instanceColor.needsUpdate = true;
+                }
+
                 break;
                 
               }
@@ -1938,7 +1944,20 @@ AFRAME.registerComponent('mod_particles', {
       this.el.setAttribute('sprite-particles', {enable: true, texture: '#candle1', color: this.data.color, textureFrame: '8 8', textureLoop: '4', spawnRate: '1', lifeTime: '1', scale: pSize.toString()});
 
       if (this.data.addLight) {
-        this.el.setAttribute('light', {type: 'point', castShadow: true, color: this.data.color, intensity: .5, distance: pSize * 2, decay: pSize});
+        this.el.setAttribute('light', {type: 'point', 
+        castShadow: true, 
+        color: this.data.color, 
+        intensity: .5, 
+        distance: pSize * 2, 
+        decay: pSize,
+        shadowCameraVisible: false,
+        shadowBias: -0.001,
+        shadowMapHeight:2048, 
+        shadowMapWidth:2048,
+        shadowCameraLeft: -50,
+        shadowCameraRight: 50,
+        shadowCameraBottom: -50, 
+        shadowCameraTop: 50 });
         this.lightAnimation(.5, 1.5);
         this.el.addEventListener('animationcomplete', () => {
             this.lightAnimation(.5, 1.5);
@@ -1956,7 +1975,21 @@ AFRAME.registerComponent('mod_particles', {
         this.distanceFactor = this.data.scale * 3;
         this.decayFactor = this.data.scale * .1;
         console.log("tryna light a fire! " + this.distanceFactor + " " +  this.decayFactor);
-        this.el.setAttribute('light', {type: 'point', castShadow: true, color: this.data.color, intensity: this.data.intensity * 2, distance: this.distanceFactor, decay: 1});
+        this.el.setAttribute('light', {
+        type: 'point', 
+        castShadow: true, 
+        color: this.data.color, 
+        intensity: this.data.intensity * 2, 
+        distance: this.distanceFactor, 
+        decay: 1,
+        shadowCameraVisible: false,
+        shadowBias: -0.001,
+        shadowMapHeight:2048, 
+        shadowMapWidth:2048,
+        shadowCameraLeft: -50,
+        shadowCameraRight: 50,
+        shadowCameraBottom: -50, 
+        shadowCameraTop: 50 });
           this.lightAnimation(this.data.intensity * .5, this.data.intensity * 2);
         this.el.addEventListener('animationcomplete', () => {
             this.lightAnimation(this.data.intensity * .5, this.data.intensity * 2);
@@ -3928,15 +3961,28 @@ AFRAME.registerComponent('load_threesvg', {
     },
     init: function () {
       console.log("init");
-      this.dist = 50.0;
+      this.dist = 100.0;
 
       // Create a particle system
-      this.particleCount = 2500;
+      this.particleCount = 10;
+
+      this.rv = .01;
+      if (this.data.type == "dust") {
+        this.particleCount = 2000;
+        this.rv = .01;
+      }
+      if (this.data.type == "smoke") {
+        this.particleCount = 200;
+        this.rv = .03;
+      } 
+      if (this.data.type == "fog") {
+        this.particleCount = 100;
+        this.rv = .05;
+      } 
       const positions = new Float32Array(this.particleCount * 3);
       const velocities = new Float32Array(this.particleCount * 3);
 
-      const rv = 0.01;
-      this.size = .25;
+      this.size = .15;
       this.src = null;
 
 
@@ -3944,15 +3990,15 @@ AFRAME.registerComponent('load_threesvg', {
         // const x = Math.random() * 10 - 5;
         // const y = Math.random() * 10 - 5;
         // const z = Math.random() * 10 - 5;
-        const x = THREE.MathUtils.randFloatSpread(75);
+        const x = THREE.MathUtils.randFloatSpread(this.dist);
         const y =THREE.MathUtils.randFloat(-10,30);
-        const z = THREE.MathUtils.randFloatSpread(75);
+        const z = THREE.MathUtils.randFloatSpread(this.dist);
         positions[i * 3] = x;
         positions[i * 3 + 1] = y;
         positions[i * 3 + 2] = z;
-        velocities[i * 3] = Math.random() * rv - rv / 2;
-        velocities[i * 3 + 1] = Math.random() * rv - rv / 2;
-        velocities[i * 3 + 2] = Math.random() * rv - rv / 2;
+        velocities[i * 3] = Math.random() * this.rv - this.rv / 2;
+        velocities[i * 3 + 1] = Math.random() * this.rv - this.rv / 2;
+        velocities[i * 3 + 2] = Math.random() * this.rv - this.rv / 2;
       }
 
       this.particleGeometry = new THREE.BufferGeometry();
@@ -3968,7 +4014,7 @@ AFRAME.registerComponent('load_threesvg', {
       var color = new THREE.Color();
       var colorList = ['skyblue', 'navy', 'blue'];
       if (settings && settings.sceneColor2 && settings.sceneColor3 && settings.sceneColor4 ) {
-        colorList = [settings.sceneColor2, settings.sceneColor3, settings.sceneColor4];
+        colorList = [settings.sceneColor3, settings.sceneColor4, settings.sceneColor2];
       }
       for (let i = 0; i < this.particleGeometry.attributes.position.count; i++) {
         color.set(colorList[THREE.MathUtils.randInt(0, colorList.length - 1)]);
@@ -3994,19 +4040,19 @@ AFRAME.registerComponent('load_threesvg', {
       }
       if (this.data.type == "smoke") {
         this.src = document.getElementById("cloud1").src;
-        this.particleCount = 200;
+        // this.particleCount = 200;
         this.size = 20;
-        this.dist = 100;
+        // this.dist = 200;
         this.material = new THREE.PointsMaterial({ size: this.size, map: new THREE.TextureLoader().load(this.src), 
-          opacity: 0.1, blending: THREE.NormalBlending, depthTest: false, transparent: true, vertexColors: true });
+          opacity: 0.05, blending: THREE.NormalBlending, depthTest: false, transparent: true, vertexColors: true });
       } 
       if (this.data.type == "fog") {
         this.src = document.getElementById("cloud1").src;
-        this.particleCount = 100;
-        this.size = 30;
-        this.dist = 150;
+        // this.particleCount = 100;
+        this.size = 50;
+        // this.dist = 250;
         this.material = new THREE.PointsMaterial({ size: this.size, map: new THREE.TextureLoader().load(this.src), 
-          opacity: 0.025, blending: THREE.NormalBlending, depthTest: false, transparent: true, vertexColors: true });
+          opacity: 0.1, blending: THREE.AdditiveBlending, depthTest: false, transparent: true, vertexColors: true });
       } 
 
      

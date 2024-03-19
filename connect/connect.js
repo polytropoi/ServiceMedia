@@ -142,7 +142,8 @@ function InitIDB() {
                console.log("cursor " + i + " of " + cursor.value.locations.length);
                localData.locations.push(cursor.value.locations[i]);
                if (cursor.value.locations[i].isLocal != undefined && cursor.value.locations[i].isLocal) { //only update ones with local changes
-                  console.log(cursor.value.locations[i].name + " markerType " + cursor.value.locations[i].markerType + " isLocal!" + " scale " + cursor.value.locations[i].xscale + cursor.value.locations[i].yscale + cursor.value.locations[i].zscale );
+                  // console.log(cursor.value.locations[i].name + " markerType " + cursor.value.locations[i].markerType + " isLocal!" + " scale " + cursor.value.locations[i].xscale + cursor.value.locations[i].yscale + cursor.value.locations[i].zscale );
+                  console.log("IDB cloudmarker name " + cursor.value.locations[i].name + " markerType " + cursor.value.locations[i].markerType + " isLocal!" + " modelID " + cursor.value.locations[i].modelID);
                   let cloudEl = document.getElementById(cursor.value.locations[i].timestamp);
                   if (cloudEl) { //prexisting elements (cloud_marker, mod_model, mod_object) already rendered onload
                      cloudEl.setAttribute("position", {x: cursor.value.locations[i].x, y: cursor.value.locations[i].y, z: cursor.value.locations[i].z });
@@ -177,7 +178,7 @@ function InitIDB() {
                                                          cursor.value.locations[i].locationTags, 
                                                          cursor.value.locations[i].eventData, 
                                                          cursor.value.locations[i].markerType, 
-                                                         cursor.value.locations[i].markerObjScale, 
+                                                         // cursor.value.locations[i].markerObjScale, 
                                                          cursor.value.locations[i].x, 
                                                          cursor.value.locations[i].y, 
                                                          cursor.value.locations[i].z, 
@@ -1088,16 +1089,19 @@ function SaveModToLocal(locationKey) { //locationKey is now just timestamp of th
             
             //get loc props from object...
 
-            let o3D = theEl.object3D;
-            let o3DScale = new THREE.Vector3();
-            o3D.getWorldScale(o3DScale);
-            console.log("found the EL: " + locationKey + " locItem name " + locItem.name + " scale " + JSON.stringify(o3DScale));
-            localData.locations[i].xscale = o3DScale.x;
-            localData.locations[i].yscale = o3DScale.y;
-            localData.locations[i].zscale = o3DScale.z;
-            locItem.xscale = o3DScale.x;
-            locItem.yscale = o3DScale.y;
-            locItem.zscale = o3DScale.z;
+            // let o3D = theEl.object3D;
+            // let o3DScale = theEl.object3D.scale;
+            let o3DScale = theEl.getAttribute("scale");
+            // let o3DScale = new THREE.Vector3();
+            // o3D.getWorldScale(o3DScale);
+            
+            console.log("found the EL: " + locationKey + " locItem name " + locItem.name + " scale " + locItem.xscale + " " + locItem.yscale + " " +  locItem.zscale );
+            // localData.locations[i].xscale = o3DScale.x;
+            // localData.locations[i].yscale = o3DScale.y;
+            // localData.locations[i].zscale = o3DScale.z;
+            // locItem.xscale = o3DScale.x;
+            // locItem.yscale = o3DScale.y;
+            // locItem.zscale = o3DScale.z;
             let scale = (locItem.markerObjScale != undefined && locItem.markerObjScale != null && locItem.markerObjScale != "") ? locItem.markerObjScale : 1;
             // theEl.setAttribute('position', {x: locItem.x, y: locItem.y, z: locItem.z});
             // theEl.setAttribute('rotation', {x: locItem.eulerx, y: locItem.eulery, z: locItem.eulerz});
@@ -1105,7 +1109,9 @@ function SaveModToLocal(locationKey) { //locationKey is now just timestamp of th
             let modModelComponent = theEl.components.mod_model;
             let localMarkerComponent = theEl.components.local_marker;
             let cloudMarkerComponent = theEl.components.cloud_marker;
+            let type = "";
             if (modModelComponent) {
+               type = "modModelComponent";
                modModelComponent.data.modelID = locItem.modelID;
                modModelComponent.data.eventData = locItem.eventData;
                modModelComponent.data.tags = locItem.locationTags;
@@ -1127,6 +1133,7 @@ function SaveModToLocal(locationKey) { //locationKey is now just timestamp of th
                
                // modModelComponent.updateMaterials();
             } else if (cloudMarkerComponent) {
+               type = "cloudMarkerComponent";
                cloudMarkerComponent.data.modelID = locItem.modelID;
                cloudMarkerComponent.data.name = locItem.name;
                cloudMarkerComponent.data.markerType = locItem.markerType;
@@ -1141,9 +1148,10 @@ function SaveModToLocal(locationKey) { //locationKey is now just timestamp of th
                cloudMarkerComponent.data.zscale = locItem.zscale;
                cloudMarkerComponent.data.scale = locItem.markerObjScale;
                cloudMarkerComponent.data.tags = locItem.locationTags;
-               cloudMarkerComponent.loadModel(locItem.modelID); 
+               cloudMarkerComponent.loadModel(); 
                cloudMarkerComponent.updateMaterials();
             } else if (localMarkerComponent) {
+               type = "localMarkerComponent";
                localMarkerComponent.data.modelID = locItem.modelID;
                localMarkerComponent.data.name = locItem.name;
                localMarkerComponent.data.markerType = locItem.markerType;
@@ -1159,11 +1167,11 @@ function SaveModToLocal(locationKey) { //locationKey is now just timestamp of th
                localMarkerComponent.data.scale = locItem.markerObjScale;
                localMarkerComponent.data.tags = locItem.locationTags;
                
-               localMarkerComponent.loadModel(locItem.modelID); 
+               localMarkerComponent.loadModel(); 
                localMarkerComponent.updateMaterials();
 
             }
-            console.log("updating existing element "+locationKey+"  : " + JSON.stringify(locItem));
+            console.log("updating existing element " + type + " " + locationKey+ " : " + JSON.stringify(locItem));
             SaveLocalData();
             
             break;

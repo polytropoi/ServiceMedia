@@ -40,17 +40,18 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
       this.viewportHolder = document.getElementById("viewportPlaceholder3");
       let thisEl = this.el;
       this.isSelected = false;
+      this.data.scale = this.data.xscale;
     //   this.data.scale = (this.data.scale != undefined && this.data.scale != 'undefined' && this.data.scale != null) ? this.data.scale : 1;
       this.objectElementID = null;
       this.font1 = "Acme.woff";
       this.font2 = "Acme.woff";
-
-    // this.scale = this.data.scale.toString() + " " + this.data.scale.toString() + " " + this.data.scale.toString();
-    this.scaleVector = new THREE.Vector3(this.data.scale,this.data.scale,this.data.scale); 
-    // if (this.data.xscale) { //well, yeah
-      this.scaleVector.x = this.data.xscale;
-      this.scaleVector.y = this.data.yscale;
-      this.scaleVector.z = this.data.zscale;
+      this.data.scale = this.data.xscale;
+    // // this.scale = this.data.scale.toString() + " " + this.data.scale.toString() + " " + this.data.scale.toString();
+    // this.scaleVector = new THREE.Vector3(this.data.scale,this.data.scale,this.data.scale); 
+    // // if (this.data.xscale) { //well, yeah
+    //   this.scaleVector.x = this.data.xscale;
+    //   this.scaleVector.y = this.data.yscale;
+    //   this.scaleVector.z = this.data.zscale;
     // }
 
     // this.scale = "1 1 1";
@@ -93,7 +94,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
         // locItem.objName = this.data.objName;
         // locItem.phID = this.phID;
   
-          console.log("CLOUDMARKER " + this.data.modelID + " " + this.data.xscale + " " + this.data.yscale  + " " + this.data.zscale );
+          console.log("CLOUDMARKER " + this.data.name + " " + this.data.xscale + " " + this.data.yscale  + " " + this.data.zscale );
 
           
             if ((!this.data.modelID || this.data.modelID == undefined || this.data.modelID == "" || this.data.modelID == "none") && !this.data.modelID.toString().includes("primitive")) {
@@ -159,16 +160,17 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                   if (this.data.tags && (this.data.tags.includes("fast"))) {
                     duration = 500;
                   }
-                  if (this.data.tags.includes("show gizmo")) { //ain't not hiding!
-                    this.el.setAttribute("geometry", {primitive: "sphere", radius: this.data.scale * .1});
+                  if (!this.data.tags.includes("hide")) {
+                    this.radius = this.data.xscale * .05;
+                    this.el.setAttribute("geometry", {primitive: "sphere", radius: this.radius});
                     // this.el.setAttribute("light", {type: "point", intensity: .5, distance: 3, castShadow: true, decay: 1, color: "yellow"});
                     // this.el.setAttribute("mod_flicker", {type: "candle"});
                     this.el.setAttribute("material", {color: "yellow", wireframe: true});
                   } 
                   if (this.data.tags.includes("candle")) {
-                    this.el.setAttribute("mod_particles", {type: "candle", color: color1, scale: this.data.scale, addLight: true});
+                    this.el.setAttribute("mod_particles", {type: "candle", color: color1, scale: this.data.xscale, addLight: true});
                   } else if (this.data.tags.includes("fire")) {
-                    this.el.setAttribute("mod_particles", {type: "fire", color: color1, scale: this.data.scale, addLight: true, intensity: intensity});
+                    this.el.setAttribute("mod_particles", {type: "fire", color: color1, scale: this.data.xscale, addLight: true, intensity: intensity});
                   } else {
                     let markerLightShadow = true;
                     let lighttype = "point";
@@ -192,7 +194,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                         color1 = this.data.eventData;
                       }
                     }
-                    this.el.setAttribute("light", {type: lighttype, intensity: intensity, distance: this.data.scale * 4, castShadow: markerLightShadow, decay: this.data.scale / 2, color: color1});
+                    this.el.setAttribute("light", {type: lighttype, intensity: intensity, distance: this.data.xscale * 4, castShadow: markerLightShadow, decay: this.data.xscale / 2, color: color1});
                     if (this.data.tags && this.data.tags.includes("anim")) {
                       this.el.setAttribute("animation__color", {property: 'light.color', from: color1, to: color2, dur: duration, easing: 'easeInOutSine', loop: true, dir: 'alternate', autoplay: true});
                     } 
@@ -380,7 +382,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
   
       this.el.addEventListener('model-loaded', (evt) => { //load placeholder model first (which is an a-asset) before calling external
         evt.preventDefault();
-        console.log(this.data.modelID + " model-loaded for CLOUDMARKER " + this.el.id);
+        console.log(this.data.modelID + " model-loaded for CLOUDMARKER " + this.data.name);
         if (this.data.markerType != "object") {
           if (this.data.modelID && this.data.modelID != '' & this.data.modelID != 'none') {
             this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"mesh", scaleFactor: this.data.scale});
@@ -729,7 +731,10 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
       }
     },
     loadModel: function (modelID) {
-
+        console.log("tryna load model " + modelID);
+        if (!modelID) {
+          modelID = this.data.modelID;
+        }
         let transform_controls_component = this.el.components.transform_controls;
         if (transform_controls_component) {
             if (transform_controls_component.data.isAttached) {
@@ -814,7 +819,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
               }
           }
         } else { //if "none"
-            // console.log("CLOUDMARKER tryna set default model " + modelID);
+            console.log("CLOUDMARKER tryna set default model " + modelID);
             if (this.data.markerType.toLowerCase() == "placeholder") {
                 this.el.setAttribute("gltf-model", "#poi1");
                 this.el.setAttribute("material", {color: "yellow", transparent: true, opacity: .5});
@@ -837,7 +842,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                 this.el.setAttribute("material", {color: "salmon", transparent: true, opacity: .5});
                                 
             } else if (this.data.markerType.toLowerCase() == "gate") {
-              
+                console.log("tryna set gate gltf model on cloudmarker " + this.el.id);
                 this.el.setAttribute("gltf-model", "#gate2");
                 this.el.setAttribute("material", {color: "orange", transparent: true, opacity: .5});
                 this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"placeholder", scaleFactor: this.data.scale});
@@ -891,9 +896,9 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                 this.el.setAttribute("material", {color: "yellow", wireframe: true});
               } 
               if (this.data.tags.includes("candle")) {
-                this.el.setAttribute("mod_particles", {type: "candle", color: color1, scale: this.data.scale, addLight: true});
+                this.el.setAttribute("mod_particles", {type: "candle", color: color1, scale: this.data.xscale, addLight: true});
               } else if (this.data.tags.includes("fire")) {
-                this.el.setAttribute("mod_particles", {type: "fire", color: color1, scale: this.data.scale, addLight: true, intensity: intensity});
+                this.el.setAttribute("mod_particles", {type: "fire", color: color1, scale: this.data.xscale, addLight: true, intensity: intensity});
               } else {
                 if (this.data.tags.includes("color"))  {
                   if (this.data.eventData.includes("~")) {
@@ -914,7 +919,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                   lighttype = "ambient";
                   markerLightShadow = false;
                 }
-                this.el.setAttribute("light", {type: lighttype, intensity: intensity, distance: this.data.scale * 4, castShadow: markerLightShadow, decay: this.data.scale / 2, color: color1});
+                this.el.setAttribute("light", {type: lighttype, intensity: intensity, distance: this.data.xscale * 4, castShadow: markerLightShadow, decay: this.data.xscale / 2, color: color1});
                 if (this.data.tags && this.data.tags.includes("anim")) {
                   this.el.setAttribute("animation__color", {property: 'light.color', from: color1, to: color2, dur: duration, easing: 'easeInOutSine', loop: true, dir: 'alternate', autoplay: true});
                 } 
@@ -952,10 +957,10 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
         // this.el.object3D.rotation.x += Math.PI;
 
         // console.log("TRYNA SCALE TO " + this.data.xscale + " " + this.data.yscale + " " + this.data.zscale);
-        // if (this.data.xscale) {
-          this.scaleVector.x = this.data.xscale;
-          this.scaleVector.y = this.data.yscale;
-          this.scaleVector.z = this.data.zscale;
+        // // if (this.data.xscale) {
+        //   this.scaleVector.x = this.data.xscale;
+        //   this.scaleVector.y = this.data.yscale;
+        //   this.scaleVector.z = this.data.zscale;
         // }
         this.el.setAttribute("scale", this.data.xscale + " " + this.data.yscale + " " + this.data.zscale);
         this.el.object3D.position.set(this.data.xpos, this.data.ypos, this.data.zpos);
@@ -1060,7 +1065,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
       if (this.data.eventData.toLowerCase().includes("beat")) {
         // let oScale = this.el.getAttribute('data-scale');
         // oScale = parseFloat(oScale);
-        let oScale = this.data.scale;
+        let oScale = this.data.yscale;
         volume = volume.toFixed(2) * .2;
         let scale = {};
           scale.x = oScale + volume;

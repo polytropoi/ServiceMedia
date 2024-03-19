@@ -971,6 +971,15 @@ function ShowLocationModal(timestamp) {
  
     let cloudSaveButton = "";
     if (thisLocation != null)  {
+        if (!thisLocation.xscale || thisLocation.xscale == 0 || thisLocation.xscale == "") {
+          thisLocation.xscale = 1;
+        } 
+        if (!thisLocation.yscale || thisLocation.yscale == 0 || thisLocation.yscale == "") {
+          thisLocation.yscale = 1;
+        } 
+        if (!thisLocation.zscale || thisLocation.zscale == 0 || thisLocation.zscale == "") {
+          thisLocation.zscale = 1;
+        }
         let label = (thisLocation.name != null && thisLocation.name != undefined && thisLocation.name != 'undefined') ? thisLocation.name : "location";
         // if (userData.sceneOwner != null) {
         //     cloudSaveButton = "<button class=\x22reallySaveButton\x22 onclick=\x22SaveModsToCloud('"+phID+"')\x22>Save (cloud)</button>";

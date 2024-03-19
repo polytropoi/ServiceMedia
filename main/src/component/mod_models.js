@@ -1899,20 +1899,26 @@ AFRAME.registerComponent('mod_model', {
       }
       
     },
-    updateAndLoad: function (name, description, tags, eventData, markerType, scale, xpos, ypos, zpos, xrot, yrot, zrot, modelID) {
+    updateAndLoad: function (name, description, tags, eventData, markerType, xpos, ypos, zpos, xrot, yrot, zrot, xscale, yscale, zscale, modelID) {
         this.data.name = name;
         this.data.description = description;
         this.data.tags = tags;
         this.data.eventData = eventData;
         this.data.markerType = markerType;
-        this.data.scale = scale;
-        this.data.modelID = modelID;
+        // this.data.scale = scale;
+        this.data.xscale = xscale;
+        this.data.yscale = yscale;
+        this.data.zscale = zscale;
+
+       
         this.data.xpos = xpos;
         this.data.ypos = ypos;
         this.data.zpos = zpos;
         this.data.xrot = xrot;
         this.data.yrot = yrot;
         this.data.zrot = zrot;
+        this.data.modelID = modelID;
+        console.log("update and load " + this.data.name + " " + this.data.modelID)
         // setTimeout(() => {
             this.loadModel();
         // }, 2000);
@@ -1978,9 +1984,10 @@ AFRAME.registerComponent('mod_model', {
             }
         } 
         // this.updateMaterials();
-        let scale = parseFloat(this.data.scale);
-        console.log("localmarker with + " + this.data.scale + " pos " + this.data.xpos + this.data.ypos + this.data.zpos + " rot " + this.data.xrot + this.data.yrot + this.data.zrot);
-        this.el.object3D.scale.set(scale,scale,scale);
+        // let scale = parseFloat(this.data.scale);
+        // console.log("localmarker with + " + this.data.scale + " pos " + this.data.xpos + this.data.ypos + this.data.zpos + " rot " + this.data.xrot + this.data.yrot + this.data.zrot);
+        this.el.object3D.scale.set(this.data.xscale,this.data.yscale,this.data.zscale);
+
         this.el.object3D.position.set(this.data.xpos, this.data.ypos, this.data.zpos);
         // this.el.object3D.rotation.set(THREE.MathUtils.degToRad(this.data.xrot), THREE.MathUtils.degToRad(this.data.xrot), THREE.MathUtils.degToRad(this.data.xrot));
         this.el.setAttribute("rotation", this.data.xrot + " " + this.data.yrot + " " +this.data.zrot);
