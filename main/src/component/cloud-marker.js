@@ -819,7 +819,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
               }
           }
         } else { //if "none"
-            console.log("CLOUDMARKER tryna set default model " + modelID);
+            console.log("CLOUDMARKER type " + this.data.markerType+ " tryna set default model " + modelID);
             if (this.data.markerType.toLowerCase() == "placeholder") {
                 this.el.setAttribute("gltf-model", "#poi1");
                 this.el.setAttribute("material", {color: "yellow", transparent: true, opacity: .5});

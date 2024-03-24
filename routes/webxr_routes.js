@@ -806,10 +806,16 @@ webxr_router.get('/:_id', function (req, res) {
                 // socketScripts = "<script src=\x22/connect/connect.js\x22 defer=\x22defer\x22></script>" +
                 // "<script src=\x22/main/vendor/jquery/jquery.min.js\x22></script>" +
                 // socketScripts = "<script src=\x22https://strr.us/socket.io/socket.io.js\x22></script>";
+                // if (socketHost != null && socketHost != "NONE") {
+                //     socketScripts = "<script src=\x22/socket.io/socket.io.js\x22></script>"; //TODO naf, etc..
+                // }
                 if (socketHost != null && socketHost != "NONE") {
-                    socketScripts = "<script src=\x22/socket.io/socket.io.js\x22></script>"; //TODO naf, etc..
+                    if (sceneData.sceneNetworking == "SocketIO") {
+                        socketScripts = "<script src=\x22/socket.io/socket.io.js\x22></script>"; //TODO naf, etc..
+                    } else if (sceneData.sceneNetworking == "WebRTC") {
+                        socketScripts = "<script src=\x22https://cdn.jsdelivr.net/npm/livekit-client/dist/livekit-client.umd.min.js\x22></script>";
+                    }
                 }
-                
                 // "<script src=\x22/main/vendor/jscookie/js.cookie.min.js\x22></script>" +
                     
                 // TODO - backstretch include var!

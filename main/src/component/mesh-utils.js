@@ -1150,6 +1150,7 @@ AFRAME.registerComponent('instanced_surface_meshes', {
       this.iMesh_3 = null;
       this.iMesh_4 = null;
 
+      this.highlightColor = new THREE.Color();
       console.log("instanced_surface_meshes model _id " + this.data._id + " tryna instance " + this.data.count);
       // this.el.setAttribute("visible",false);
       this.el.addEventListener('model-loaded', (event) => {
@@ -1383,7 +1384,11 @@ AFRAME.registerComponent('instanced_surface_meshes', {
                 console.log("breaking loop at " + i.toString());
 
                 if (this.data.tags.includes("random color")) {
-
+                  for (let i = 0; i < this.count; i++) {
+                    // this.color = this.highlightColor.setHex( Math.random() * 0xffffff );
+                    iMesh_1.setColorAt( i, this.highlightColor.setHex( Math.random() * 0xffffff ));
+                    iMesh_1.instanceColor.needsUpdate = true;
+                  }
                   // this.iMesh.setColorAt( this.instanceId, this.highlightColor.setHex( Math.random() * 0xffffff ) );
                   // this.iMesh.instanceColor.needsUpdate = true;
                 }

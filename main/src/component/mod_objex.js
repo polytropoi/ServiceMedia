@@ -1501,11 +1501,15 @@ AFRAME.registerComponent('mod_object', {
 
                         let offset = {};
                         offset.x = 0;
-                        offset.y = 1;
+                        offset.y = 0;
                         offset.z = 0;
                         let colliderScale = 1;
                         if (this.data.objectData.colliderScale && this.data.objectData.colliderScale != 0 && this.data.objectData.colliderScale != "") {
                           colliderScale = this.data.objectData.colliderScale;
+                          halfExtents.x = colliderScale;
+                          halfExtents.y = colliderScale;
+                          halfExtents.z = colliderScale;
+                          offset.y = colliderScale;
                         }
                         if (this.data.objectData.collidertype.toLowerCase() == "box") {
                           // halfExtents = this.data.objectData.colliderScale + " " + this.data.objectData.colliderScale + " " + this.data.objectData.colliderScale;

@@ -149,7 +149,7 @@ window.addEventListener( 'keyup',  ( event ) => {
     ImportMods(e);
   });
   $('#modalContent').on('click', '#importFileButton', function(e) {
-    // console.log("color 1 changed " + e.target.value);
+    console.log("importFileButton clicked " + e.target.value);
     document.querySelector("#importFile").showPicker();
   });
 

@@ -66,6 +66,7 @@ let mouseDowntime = 0;
 var token = document.getElementById("token").getAttribute("data-token"); 
 // var localtoken = localStorage.getItem("smToken"); //rem all localstorage!
 let socketHost = "http://localhost:3000";
+let liveKitHost = "http://localhost:8000";
 // let socketHost = null;
 var socket = null; //the socket.io instance below
 // let cloudData = {};
@@ -556,6 +557,9 @@ $(function() {
          socketHost = settings.socketHost;
          InitSocket();
       }
+   } else if (settings.networking == 'WebRTC') {
+      console.log("TRYNA INIT LIVEKIT");
+      InitLiveKit();
    }
 
    let sceneGreetingDialogEl = document.getElementById("sceneGreetingDialog");
@@ -2054,6 +2058,66 @@ function getParameterByName(name, url) {
 function RandomHexColor() {
    return  "#000000".replace(/0/g,function(){return (~~(Math.random()*16)).toString(16);});
 }
+async function InitLiveKit() {
+   const room = new LivekitClient.Room();
+   // let url = "wss://smxr-m9z9nvrk.livekit.cloud";
+   let url = liveKitHost;
+   let token = settings.liveKitToken;
+   // let token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTEwNjI0OTIsImlzcyI6IkFQSVp6a1VvY1hMeWIyViIsIm5iZiI6MTcxMTA2MTU5Miwic3ViIjoicG9seXRyb3BvaSIsInZpZGVvIjp7ImNhblB1Ymxpc2giOnRydWUsImNhblB1Ymxpc2hEYXRhIjp0cnVlLCJjYW5TdWJzY3JpYmUiOnRydWUsInJvb20iOiJ0ZXN0cm9vbTJiIiwicm9vbUpvaW4iOnRydWV9fQ.sn9b33OYbM2TTRYNx3eznWrasgnLJCI02NeAhkr-Rc4";
+   // call this some time before actually connecting to speed up the actual connection
+   room.prepareConnection(url, token);
+   room
+   .on(LivekitClient.RoomEvent.TrackSubscribed, handleTrackSubscribed)
+   .on(LivekitClient.RoomEvent.TrackUnsubscribed, handleTrackUnsubscribed)
+   .on(LivekitClient.Participant.ActiveSpeakersChanged, handleActiveSpeakerChange)
+   .on(LivekitClient.RoomEvent.Disconnected, handleDisconnect)
+   .on(LivekitClient.RoomEvent.LocalTrackUnpublished, handleLocalTrackUnpublished);
+   await room.connect(url, token);
+   console.log('connected to livekit room ' + room.name);
+   // publish local camera and mic tracks
+   await room.localParticipant.enableCameraAndMicrophone();
+
+}
+function handleTrackSubscribed(
+  track,
+  publication,
+  participant,
+) {
+   console.log("gotsa livekit track subscription " + track.kind);
+  if (track.kind === Track.Kind.Video || track.kind === Track.Kind.Audio) {
+    // attach it to a new HTMLVideoElement or HTMLAudioElement
+
+    const element = track.attach();
+    parentElement.appendChild(element);
+  }
+}
+
+function handleTrackUnsubscribed(
+  track,
+  publication,
+  participant,
+) {
+  // remove tracks from all attached elements
+  track.detach();
+}
+
+function handleLocalTrackUnpublished(
+  publication,
+  participant,
+) {
+  // when local tracks are ended, update UI to remove them from rendering
+  publication.track.detach();
+}
+
+function handleActiveSpeakerChange(speakers) {
+  // show UI indicators when participant is speaking
+}
+
+function handleDisconnect() {
+  console.log('disconnected from room');
+}
+
+
 
 function InitSocket () {
 if (settings && !socket) {

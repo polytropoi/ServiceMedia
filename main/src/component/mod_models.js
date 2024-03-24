@@ -455,6 +455,11 @@ AFRAME.registerComponent('mod_model', {
                         "clip": idleClips[idleIndex].name,
                         "loop": "repeat",
                       });
+                    } else if (danceClips.length) {
+                      theEl.setAttribute('animation-mixer', {
+                        "clip": danceClips[0].name,
+                        "loop": "repeat",
+                      });
                     }
                   }
                 }

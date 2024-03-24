@@ -655,7 +655,7 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
         } else if (this.data.markerType.toLowerCase() == "waypoint") {
             this.el.setAttribute("material", {color: "green", transparent: true, opacity: .5});
             // this.el.setAttribute("color", "purple");
-          } else if (this.data.markerType.toLowerCase().includes("trigger")) {
+        } else if (this.data.markerType.toLowerCase().includes("trigger")) {
             this.el.setAttribute("material", {color: "lime", transparent: true, opacity: .5});
         } else if (this.data.markerType.toLowerCase().includes("collider")) {
           this.el.setAttribute("material", {color: "tomato", transparent: true, opacity: .5});
