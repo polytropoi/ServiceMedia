@@ -3,7 +3,7 @@
 const storeName = 'localFiles';
 const storeKey = 'fileName';
 const dbVersion = 1;
-let db = null;
+let filedb = null;
 
 // IndexedDB Methods
 const initIndexedDb = (dbName, stores) => {
@@ -12,16 +12,24 @@ const initIndexedDb = (dbName, stores) => {
 		request.onerror = (event) => {
 			reject(event.target.error);
 		};
-		request.onsuccess = (event) => {
-			resolve(event.target.result);
-		};
+		
 		request.onupgradeneeded = (event) => {
+			const filestore = filedb.createObjectStore(storeName, { keyPath: storeKey });
+			filestore.createIndex(storeName, [storeName], { unique: true }); //multientry true?
 			stores.forEach((store) => {
-				const objectStore = event.target.result.createObjectStore(store.name, {
-					keyPath: store.keyPath,
+				const objectStore = event.target.result.createObjectStore(storeName, {
+					keyPath: storeKey,
 				});
-				objectStore.createIndex(store.keyPath, store.keyPath, { unique: true });
+				objectStore.createIndex(storeKey, storeKey, { unique: true });
+				console.log("creagting store " + store);
 			});
+		};
+		request.onsuccess = (event) => {
+			console.log("connected with SMXR for localfiles!");
+			// const transaction = event.target.result.transaction(storeName, "readwrite");
+			// const store = transaction.objectStore(storeName);
+			resolve(event.target.result);
+
 		};
 	});
 };
@@ -81,6 +89,7 @@ const handleSearch = async (ev) => {
  */
 const handleSubmit = async (ev) => {
 	ev.preventDefault();
+	console.log("tryna handle sumbit");
 	const file = await getFileFromInput();
 	const store = db.transaction(storeName, 'readwrite').objectStore(storeName);
 	store.add(file);
@@ -98,10 +107,10 @@ const handleSubmit = async (ev) => {
  */
 const getFileFromInput = () => {
 	return new Promise((resolve, reject) => {
-		const file = document.getElementById('file').files[0];
+		const file = document.getElementById('importFile').files[0];
 		const reader = new FileReader();
 		reader.onload = (event) => {
-			document.getElementById('file').value = '';
+			document.getElementById('importFile').value = '';
 			resolve({
 				[storeKey]: file.name,
 				type: file.type,
@@ -182,28 +191,30 @@ const renderGalleryColumn = (cursor) => {
  * @desc Gets the current storage quota
  * @returns {Promise<{totalQuota: string, usedQuota: string, freeQuota: string}>}
  */
-const getStorageQuotaText = async () => {
-	const estimate = await navigator.storage.estimate();
-	const totalQuota = +(estimate.quota || 0);
-	const usedQuota = +(estimate.usage || 0);
-	const freeQuota = totalQuota - usedQuota;
-	return {
-		totalQuota: formatAsByteString(totalQuota),
-		usedQuota: formatAsByteString(usedQuota),
-		freeQuota: formatAsByteString(freeQuota)
-	};
-};
+// const getStorageQuotaText = async () => {
+// 	const estimate = await navigator.storage.estimate();
+// 	const totalQuota = +(estimate.quota || 0);
+// 	const usedQuota = +(estimate.usage || 0);
+// 	const freeQuota = totalQuota - usedQuota;
+// // 
+// 	return {
+// 		totalQuota: formatAsByteString(totalQuota),
+// 		usedQuota: formatAsByteString(usedQuota),
+// 		freeQuota: formatAsByteString(freeQuota)
+// 	};
+// };
 
-/**
- * @desc Renders the storage quota info in the DOM
- * @returns {Promise<void>}
- */
-const renderStorageQuotaInfo = async () => {
-	const { totalQuota, usedQuota, freeQuota } = await getStorageQuotaText();
-	document.getElementById('storage-total').textContent = totalQuota;
-	document.getElementById('storage-used').textContent = usedQuota;
-	document.getElementById('storage-free').textContent = freeQuota;
-}
+// /**
+//  * @desc Renders the storage quota info in the DOM
+//  * @returns {Promise<void>}
+//  */
+// const renderStorageQuotaInfo = async () => {
+// 	const { totalQuota, usedQuota, freeQuota } = await getStorageQuotaText();
+
+// 	document.getElementById('storage-total').textContent = totalQuota;
+// 	document.getElementById('storage-used').textContent = usedQuota;
+// 	document.getElementById('storage-free').textContent = freeQuota;
+// }
 
 // Util functions
 const formatAsByteString = (bytes) => {
@@ -216,19 +227,28 @@ const formatAsByteString = (bytes) => {
 
 
 // Init event listeners
-document.querySelector('#file-form')?.addEventListener('submit', handleSubmit);
+// document.querySelector('#file-form')?.addEventListener('click', handleSubmit);
 document.querySelector('#search-form')?.addEventListener('submit', handleSearch);
 document.querySelector('#clear-button')?.addEventListener('click', clearEntriesFromIndexedDb);
 
-window.addEventListener('load', async () => {
-	/** Uncomment the following code to enable user's persistent storage settings */
-	// const requestPermission = await navigator.storage.persisted();
-	// const persistent = await navigator.storage.persist();
-	// if (persistent && requestPermission) {
-	db = await initIndexedDb('my-db', [{ name: storeName, keyPath: storeKey }]);
-	renderAvailableImagesFromDb();
+// // window.addEventListener('load', async () => {
+// $(async () => { 
+// 	/** Uncomment the following code to enable user's persistent storage settings */
+// 	// const requestPermission = await navigator.storage.persisted();
+// 	// const persistent = await navigator.storage.persist();
+// 	// if (persistent && requestPermission) {
+// 		console.log("tryna init localfiles db");
+// 	db = await initIndexedDb('SMXR', [{ name: storeName, keyPath: storeKey }]);
+// 	renderAvailableImagesFromDb();
+// 	await renderStorageQuotaInfo();
+// 	// } else {
+// 	// 	console.warn('Persistence is not supported');
+// 	// }
+// });
+
+const InitLocalFiles = async () => {
+	filedb = await initIndexedDb('SMXR', [{ name: storeName, keyPath: storeKey }]);
+	// renderAvailableImagesFromDb();
 	await renderStorageQuotaInfo();
-	// } else {
-	// 	console.warn('Persistence is not supported');
-	// }
-});
+
+}

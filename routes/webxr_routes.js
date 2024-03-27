@@ -4557,6 +4557,7 @@ webxr_router.get('/:_id', function (req, res) {
 
                             "<link href=\x22../main/vendor/fontawesome-free/css/all.css\x22 rel=\x22stylesheet\x22 type=\x22text/css\x22>" +
                             "<link href=\x22/css/modelviewer.css\x22 rel=\x22stylesheet\x22 type=\x22text/css\x22>" + 
+                            // "<link rel=\x22stylesheet\x22 type=\x22text/css\x22 href=\x22https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css\x22>"+
                             "<link href=\x22/css/webxr.css\x22 rel=\x22stylesheet\x22 type=\x22text/css\x22>" + 
                             "<script type=\x22module\x22 src=\x22https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js\x22></script>"+
                             extraScripts + 
@@ -4646,9 +4647,9 @@ webxr_router.get('/:_id', function (req, res) {
                         "<script src=\x22/main/vendor/jquery/jquery.min.js\x22></script>" +
                         // "<script src=\x22/main/vendor/jquery-confirm/jquery-confirm.min.js\x22></script>" +
                         // "<script src=\x22../main/js/dialogs.js\x22></script>" +
-                        
+                        "<script src=\x22/connect/indexedDb.js\x22></script>" +
                         "<script src=\x22/connect/connect.js\x22 defer=\x22defer\x22></script>" +
-                       
+                        
                         "</head>\n" +
                         "<body "+bgstyle+">" +
                         "<div class=\x22avatarName\x22 id="+avatarName+"></div>"+
@@ -4721,6 +4722,7 @@ webxr_router.get('/:_id', function (req, res) {
                             extraScripts = "<script src=\x22/main/vendor/jquery/jquery.min.js\x22></script>" +
                             // "<script src=\x22/main/vendor/jquery-confirm/jquery-confirm.min.js\x22></script>" +
                             "<script src=\x22../main/js/dialogs.js\x22></script>"+
+                            "<script src=\x22/connect/indexedDb.js\x22></script>" +
                             "<script src=\x22/connect/connect.js\x22 defer=\x22defer\x22></script>" +
                             geoScripts +
                             locationScripts +
@@ -4766,6 +4768,7 @@ webxr_router.get('/:_id', function (req, res) {
                        
                         "<script src=\x22/main/vendor/jquery/jquery.min.js\x22></script>" +
                         // "<script src=\x22/main/vendor/jquery-confirm/jquery-confirm.min.js\x22></script>" +
+                        "<script src=\x22/connect/indexedDb.js\x22></script>" +
                         "<script src=\x22/connect/connect.js\x22 defer=\x22defer\x22></script>" +
                        
 
@@ -5042,7 +5045,7 @@ webxr_router.get('/:_id', function (req, res) {
                         //"<script src=\x22/main/vendor/jquery-confirm/jquery-confirm.min.js\x22></script>" +
                         
                         // "<script src=\x22../main/ref/aframe/dist/socket.io.slim.js\x22></script>" +
-                       
+                        "<script src=\x22/connect/indexedDb.js\x22></script>" +
                         "<script src=\x22/connect/connect.js\x22 defer=\x22defer\x22></script>" +
                         // "<script src=\x22/connect/files.js\x22 defer=\x22defer\x22></script>" +
                         
@@ -5110,6 +5113,7 @@ webxr_router.get('/:_id', function (req, res) {
                         // "<script src=\x22../main/src/component/aframe-spritesheet-animation.js\x22></script>"+
                         "<script src=\x22../main/src/component/aframe-sprite-particles-component.js\x22></script>"+
                         // "<script src=\x22../main/src/component/aframe-spe-particles-component.js\x22></script>"+
+                        "<script type=\x22module\x22 src=\x22https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js\x22></script>"+
                         
 
                        
@@ -5352,6 +5356,11 @@ webxr_router.get('/:_id', function (req, res) {
                         navmeshScripts +
                         shaderScripts +
                         activityPubScripts +
+                        // "<script>\x22\x22</script>\n"+
+                        
+                        // "<script> src=\x22https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js\x22</script>\n"+
+                        // "<script src=\x22/connect/files.js\x22></script>\n"+ //handles localFiles in indexedDB
+                        
 
                         "<script>\n"+ //TODO base64 this like the others, and only when a key marker is set
                             // "var avatarName = \x22" + avatarName + "\x22;\n" +

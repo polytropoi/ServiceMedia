@@ -85,60 +85,14 @@ window.addEventListener( 'keydown',  ( event ) => {
     case 27: // Esc
       
       break;
-  }
-});
-window.addEventListener( 'keyup',  ( event ) => {
-  keydown = "";
-});
+    }
+  });
 
-  // $('#modalContent').on('change', '#locationModel', function(e) { //value has phID ~ modelID
-  //     console.log('model ' + e.target.value);
-  //     let locSplit = e.target.value.split("~"); 
-  //     console.log("locSplit" + locSplit);
-  //     if (locSplit[1].length > 4) { //should be "none" if no model selected
-  //       let locSplit = e.target.value.split("~"); //split between localstorage key and modelID
-  //       let localStorageItem = JSON.parse(localStorage.getItem(locSplit[0]));
-  //       console.log("localstorage item " + JSON.stringify(localStorageItem));
-  //       if (localStorageItem != null) {
-  //         for (let i = 0; i < sceneModels.length; i++) {
-  //           if (sceneModels[i]._id == locSplit[1]) {
-  //             let locItemTemp = {modelID: sceneModels[i]._id, model: sceneModels[i].name};
-  //             let locItem = Object.assign(localStorageItem, locItemTemp); //funky object merge!
-  //             // locItem.modelID = sceneModels[i]._id;
-  //             // locItem.model = sceneModels[i].name;
-  //             if (locItem.scale == null || locItem.scale == undefined || locItem.scale == "") {
-  //               locItem.scale = 1;
-  //             }
-  //             console.log(JSON.stringify(locItem));
-  //             localStorage.setItem(locSplit[0], JSON.stringify(locItem));
-  //             console.log(localStorage.getItem(locSplit[0]));
-  //             let placeholderEl = document.getElementById(locSplit[0]);
+  window.addEventListener( 'keyup',  ( event ) => {
+    keydown = "";
+  });
 
-  //             console.log("placeholderEl" +placeholderEl);
-  //             let phComponent = placeholderEl.components.cloud_marker;
-  //             if (phComponent == null) {
-  //               phComponent = placeholderEl.components.local_marker;
-  //             }
-  //             if (phComponent != null) {
-  //               phComponent.loadModel(sceneModels[i]._id);
-  //             }
-  //             SaveModToLocal(locSplit[0]);
-  //           }
-  //         }
-  //       }
-  //     } else {
-  //       // let locSplit = e.target.value.split("~"); //split between localstorage key and modelID
-  //       let localStorageItem = JSON.parse(localStorage.getItem(locSplit[0]));
-  //       let placeholderEl = document.getElementById(locSplit[0]);
-  //       let phComponent = placeholderEl.components.cloud_marker;
-  //       if (phComponent == null) {
-  //           phComponent = placeholderEl.components.local_marker;
-  //       }
-  //       if (phComponent != null) {
-  //         phComponent.loadModel();
-  //       }
-  //     }
-  // });
+  
   $('#modalContent').on('click', '#importModsButton', function(e) {
     // console.log("color 1 changed " + e.target.value);
     document.querySelector("#importMods").showPicker();
@@ -155,7 +109,21 @@ window.addEventListener( 'keyup',  ( event ) => {
 
   $('#modalContent').on('change', '#importFile', function(e) {
     console.log("importFile change event! " + e.target.value);
-    ImportFile(e);
+    // ImportFile(e);
+    // handleSubmit(e);
+    let string = e.target.value;
+    let name = string.substring(12);
+
+    document.getElementById('selectedFileName').innerHTML = "selected file name: " + name;
+    document.getElementById('saveSelectedFileButton').style.visibility = "visible";
+  });
+  $('#modalContent').on('click', '#saveSelectedFileButton', function(e) {
+    console.log("importFileButton clicked " + e.target.value);
+    // document.querySelector("#importFile").showPicker();
+    // handleSubmit(e);
+    ConvertAndSaveLocalFile();
+    document.getElementById('selectedFileName').innerHTML = "";
+    document.getElementById('saveSelectedFileButton').style.visibility = "hidden";
   });
 
   $('#modalContent').on('click', '#sceneColor1', function(e) {
@@ -394,51 +362,7 @@ window.addEventListener( 'keyup',  ( event ) => {
     
       
   });
-  // $('#modalContent').on('change', '#locationObject', function(e) { //value has phID ~ objectID  (room~type~timestamp~objectID)
-  //   console.log('model ' + e.target.value);
-  //   let locSplit = e.target.value.split("~"); 
-  //   console.log("locSplit" + locSplit);
-  //   if (locSplit[1].length > 0) { //should be "none" if no object selected
-  //     let locSplit = e.target.value.split("~"); //split between localstorage key and objectID
-  //     let localStorageItem = JSON.parse(localStorage.getItem(locSplit[0]+"~"+locSplit[1]+"~"+locSplit[2]));
-  //     console.log("localstorage item " + JSON.stringify(localStorageItem));
-  //     if (localStorageItem != null) {
-  //       for (let i = 0; i < sceneObjects.length; i++) {
-  //         console.log(sceneObjects[i]._id + " vs " + locSplit[3]);
-  //         if (sceneObjects[i]._id == locSplit[3]) {
-  //           let locItemTemp = {objectID: sceneObjects[i]._id, objName: sceneObjects[i].name};
-  //           let locItem = Object.assign(localStorageItem, locItemTemp); //funky object merge!
-  //           if (locItem.scale == null || locItem.scale == undefined || locItem.scale == "") {
-  //             locItem.scale = 1;
-  //           }
-  //           console.log(JSON.stringify(locItem));
-  //           localStorage.setItem(locSplit[0]+"~"+locSplit[1]+"~"+locSplit[2], JSON.stringify(locItem));
-  //           console.log(localStorage.getItem(locSplit[0]+"~"+locSplit[1]+"~"+locSplit[2]));
-  //           let placeholderEl = document.getElementById(locSplit[0]+"~"+locSplit[1]+"~"+locSplit[2]); //get this element with this id
-  //           console.log("placeholderEl" +placeholderEl); 
-  //           let phComponent = placeholderEl.components.cloud_marker; //check for cloud or local marker component
-  //           if (phComponent == null) {
-  //             phComponent = placeholderEl.components.local_marker;
-  //           }
-  //           if (phComponent != null) {
-  //             phComponent.loadObject(sceneObjects[i]._id);
-  //           }
-  //           SaveModToLocal(locSplit[0]+"~"+locSplit[1]+"~"+locSplit[2]);
-  //         }
-  //       }
-  //     }
-  //     } else {
 
-  //       let placeholderEl = document.getElementById(locSplit[0]);
-  //       let phComponent = placeholderEl.components.cloud_marker;
-  //       if (phComponent == null) {
-  //           phComponent = placeholderEl.components.local_marker;
-  //       }
-  //       if (phComponent != null) {
-  //         phComponent.loadObject();
-  //       }
-  //     }
-  // });
 
   $('#modalContent').on('change', '#locationMarkerType', function(e) {
       console.log('type ' + e.target.value + " id " + selectedLocationTimestamp);
@@ -699,7 +623,8 @@ function PlayButton() {
 function TabMangler(evt, tagName) {
     console.log("tryna switch to " + tagName);
     if (tagName === "Inventory") {
-      GetUserInventory();
+      // GetUserInventory();
+      // GetLocalFiles();
     }
     if (tagName === "Events") {
       ReturnTimeKeys();
@@ -1571,6 +1496,8 @@ function GetUserInventory () {
   } else {
     inventoryDisplayEl.innerHTML = "You must be <a href=\x22../main/login.html\x22>logged in</a> to access your inventory <button class=\x22uploadButton \x22 style=\x22float: right;\x22 onclick=\x22DequipInventoryItem()\x22>Dequip</button>";
   }
+  DisplayLocalFiles();
+  
 }
 
 function DropInventoryItem(objectID) {
@@ -1858,6 +1785,7 @@ function SceneManglerModal(mode) {
 
     if (mode == "Inventory") {
         inventoryDisplay = "style=\x22display: block;\x22";
+
     }
     if (mode == "Messages") {
         messagesDisplay = "style=\x22display: block;\x22";
@@ -1880,6 +1808,7 @@ function SceneManglerModal(mode) {
     }
 
     // let users = document.getElementById('users').htmlContent;
+    
     let content = "<span id='modalCloser' onclick=\x22ShowHideDialogPanel()\x22 class='close-modal'>&times;</span>" +
                 "<div><span id=\x22modalTitle\x22><h3>Scene Mangler</h3></span>" + //populate modal
     tabs+
@@ -1896,11 +1825,19 @@ function SceneManglerModal(mode) {
       // "Local Assets: <br> <br><div><label for=\x22file\x22 class=\x22form-label\x22>Select a file</label><input type=\x22submit\x22 value=\x22Save to Local DB\x22 class=\x22addButton floatRight\x22></div>"+
       // accept=\x22.txt\x22 onchange=\x22ImportMods(event)
       // "<label style=\x22float: left;\x22 for=\x22file-upload\x22 class=\x22custom-file-upload\x22>Import File</label>"+
-      "<button style=\x22float: left;\x22 class=\x22infoButton\x22 id=\x22importFileButton\x22>Import File</button>"+  
-      "<input type=\x22file\x22 id=\x22importFile\x22>"+ 
+      // "<h2>Local Files</h2>"+
+          //  " <p>Note: These values are estimates calculated with Javascript.</p>" +
+           "<p>Add files for this scene to your local browser database</p>" +
+          "<button style=\x22float: left;\x22 class=\x22infoButton\x22 id=\x22importFileButton\x22>Select Local File</button>"+  
+          
+          "<button style=\x22float: left; visibility: hidden\x22 class=\x22saveButton\x22 id=\x22saveSelectedFileButton\x22>Add File to Local Database</button>"+  
+          "<br><span id=\x22selectedFileName\x22>no file selected...</span>"+
+          "<input type=\x22file\x22 id=\x22importFile\x22 >"+ 
       // "<div class=\x22floatRight\x22><input class=\x22custom-file-upload\x22 type=\x22file\x22 id=\x22file\x22></input></div>" +
-      "<div>Local Assets here, eventually...</div>"+
-      "<div><hr> <br><input type=\x22button\x22 value=\x22Clear files from Local DB\x22 id=\x22clear-button\x22 class=\x22deleteButton\x22></input></div>"+
+      "<br><br><br><div class=\x22flex-container\x22 id=\x22localFilesContainer\x22></div>"+
+      "<br><p>This browser has a storage quota of <b id=\x22storage-total\x22>0</b> <br>It currently uses <b id=\x22storage-used\x22>0</b> <br> and has around <b id=\x22storage-free\x22>0</b> free </p>" +
+      // "<div><hr> <br><input type=\x22button\x22 value=\x22Clear files from Local DB\x22 id=\x22clear-button\x22 class=\x22deleteButton\x22></input></div>"+
+
 
     "</div>"+
     "<div "+messagesDisplay+" id=\x22Messages\x22 class=\x22modalMain tabcontent\x22>"+ /////////////////////MESSAGES
@@ -1972,8 +1909,8 @@ function SceneManglerModal(mode) {
     // "<label style=\x22float: left;\x22 for=\x22file-upload\x22 class=\x22custom-file-upload\x22>Import Mods</label>"+
     // "<input type=\x22file\x22 id=\x22file-upload\x22 accept=\x22.txt\x22 onchange=\x22ImportMods(event)\x22></input>"+
     // "<button class=\x22deleteButton\x22 id=\x22ClearAllPlaceholdersButton\x22 onclick=\x22ClearPlaceholders()\x22>Clear All Mods</button>" +
-    "<button class=\x22deleteButton\x22 id=\x22ClearAllPlaceholdersButton\x22 onclick=\x22DeleteLocalSceneData()\x22>Clear Scene Mods</button>"+
-    "<button style=\x22float: right;\x22 class=\x22addButton\x22 onclick=\x22SaveLocalAndClose()\x22>Save to Local DB</button>"+
+    "<button class=\x22deleteButton\x22 id=\x22ClearAllPlaceholdersButton\x22 onclick=\x22DeleteLocalSceneData()\x22>Delete Local Scene Data</button>"+
+    "<button style=\x22float: right;\x22 class=\x22addButton\x22 onclick=\x22SaveLocalAndClose()\x22>Save Local Scene Data</button>"+
       // "<div class=\x22twocolumn\x22><label for=\x22addpic\x22>Add Picture Asset</label><button class=\x22addButton\x22 id=\x22AddPicButton\x22 onclick=\x22AddPicture()\x22>Add</button>"+
       // "<button class=\x22uploadButton\x22 id=\x22UpoadPicButton\x22 onclick=\x22UploadPicture()\x22>Upload</button>"+
       // "<input class=\x22addfield\x22 type=\x22text\x22 id=\x22addpic\x22 placeholder=\x22picture URL or IPFS\x22></div>"+
@@ -2098,6 +2035,7 @@ function SceneManglerModal(mode) {
     //   ColorMods(e, e.target.value);
     //   this.value = null;
     // });
+
      showDialogPanel = false; //cause it's flipped
      ShowHideDialogPanel(content);
      if (mode != "Location") {
@@ -2112,8 +2050,19 @@ function SceneManglerModal(mode) {
      InitAmbientSlider();
      InitTriggerSlider();
      GetUserInventory();
+     InitLocalFiles();
+    //  GetLocalFiles();
+
     //  document.getElementById(mode).style.display = "block";
     //  document.getElementById('modalTitle').innerHTML = "<h3>Scene " + mode + "</h3>";
+}
+function GetLocalFiles() {
+  // console.log("tryna load local files");
+  // $('#localfiles').load("/connect/files.html", function() {
+  //   // alert( "Load was performed." );
+   
+    
+  // });
 }
 function SaveLocalAndClose() {
   SaveLocalData();
@@ -2706,4 +2655,133 @@ var PlayDialogLoop = function(arr) {
         await delayedLog(item);
     }
     console.log('Done!');
+    }
+
+
+    function DisplayLocalFiles() {
+      const galleryContainer = document.getElementById('localFilesContainer');
+      console.log("tryna display local files");
+      if (galleryContainer) {
+        galleryContainer.innerHTML = '';
+        for (const file in localData.localFiles) {
+          let type = "image";
+          let ext = localData.localFiles[file].name.split('.');
+          ext = ext[ext.length - 1];
+          console.log("gotsa file: "+ JSON.stringify(file));
+        // let key = Object.keys(file);
+        //   console.log("object name for file is " + key[0]);
+        if (ext == "jpg" || ext == "png" || ext == "glb") {
+          if (ext == "glb") {
+            type = "gltf model";
+            const imageBuffer = localData.localFiles[file].data;
+            const imageBlobb = new Blob([imageBuffer]);
+            const card = document.createElement('div');
+            card.classList.add('card');
+          
+            const cardBody = document.createElement('div');
+            cardBody.classList.add('card-body');
+          
+            const image = document.createElement('model-viewer');
+            
+            // image.setAttribute("touch-action", "pan-y");
+            
+            image.classList.add('card-img-top');
+            // image.setAttribute("camera-controls");
+          
+
+            const title = document.createElement('div');
+            title.classList.add('card-title');
+            title.innerText = "name: " + localData.localFiles[file].name + "\nsize: " + formatAsByteString(parseInt(localData.localFiles[file].size))  + "\ntype: " + type;
+          
+          
+            const deleteButton = document.createElement('button');
+            deleteButton.classList.add('btn', 'btn-danger');
+            deleteButton.innerText = 'Delete';
+            deleteButton.addEventListener('click', () => {
+              deleteImageFromIndexedDb(localData.localFiles[file].name);
+            });
+            const addToSceneButton = document.createElement('button');
+            addToSceneButton.classList.add('btn', 'btn-danger');
+            addToSceneButton.innerText = 'Add to Scene';
+            addToSceneButton.addEventListener('click', () => {
+              addToScene(localData.localFiles[file].name);
+            });
+            
+          
+            cardBody.appendChild(title);
+            // cardBody.appendChild(subTitle);
+            // cardBody.appendChild(text)
+            cardBody.appendChild(deleteButton);
+            cardBody.appendChild(addToSceneButton);
+            card.appendChild(image);
+            card.appendChild(cardBody);
+            // col.appendChild(card);
+          
+            galleryContainer.appendChild(card);
+            image.src = URL.createObjectURL(imageBlobb);
+            image.setAttribute("camera-controls", "");
+            image.setAttribute("auto-rotate", "");
+            image.setAttribute("touch-action", "pan-y");
+          } else {
+            const imageBuffer = localData.localFiles[file].data;
+            const imageBlobb = new Blob([imageBuffer]);
+          
+            // const col = document.createElement('div');
+            // col.classList.add('col-12', 'col-md-6', 'col-lg-4');
+            // col.classList.add('galleryContainer');
+          
+            const card = document.createElement('div');
+            card.classList.add('card');
+          
+            const cardBody = document.createElement('div');
+            cardBody.classList.add('card-body');
+          
+            const image = document.createElement('img');
+            image.src = URL.createObjectURL(imageBlobb);
+            image.classList.add('card-img-top');
+          
+
+            const title = document.createElement('div');
+            title.classList.add('card-title');
+            title.innerText = "name: " + localData.localFiles[file].name + "\nsize: " + formatAsByteString(parseInt(localData.localFiles[file].size)) + "\ntype: " + localData.localFiles[file].type;
+          
+            // const subTitle = document.createElement('h6');
+            // subTitle.classList.add('card-subtitle');
+            // subTitle.innerText = formatAsByteString(+localData.localFiles[file].size)
+          
+            // const text = document.createElement('p');
+            // text.classList.add('card-text');
+            // text.innerText = localData.localFiles[file].name;
+          
+            const deleteButton = document.createElement('button');
+            deleteButton.classList.add('btn', 'btn-danger');
+            deleteButton.innerText = 'Delete';
+            deleteButton.addEventListener('click', () => {
+              deleteImageFromIndexedDb(localData.localFiles[file].name);
+            })
+            const addToSceneButton = document.createElement('button');
+            addToSceneButton.classList.add('btn', 'btn-danger');
+            addToSceneButton.innerText = 'Add to Scene';
+            addToSceneButton.addEventListener('click', () => {
+              addToScene(localData.localFiles[file].name);
+            });
+            
+            cardBody.appendChild(title);
+            // cardBody.appendChild(subTitle);
+            // cardBody.appendChild(text)
+            cardBody.appendChild(deleteButton);
+            cardBody.appendChild(addToSceneButton);
+            card.appendChild(image);
+            card.appendChild(cardBody);
+            // col.appendChild(card);
+          
+            galleryContainer.appendChild(card);
+          }
+        } else {
+          console.log("invalid file type!");
+        }
+      }
+    } else {
+      console.log("can't find container!");
+    }
     }
