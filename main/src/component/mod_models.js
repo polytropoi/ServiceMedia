@@ -2,6 +2,7 @@
 ////////////////////////// - MOD_MODEL - for "plain" models, these are written (aframe elements + components + assets) by the server into response, as opposed to "Objects", see mod_objex.js
 AFRAME.registerComponent('mod_model', {
     schema: {
+        // localFileName: {}
         markerType: {default: 'none'},
         eventData: {default: ''},
         shader: {default: ''},

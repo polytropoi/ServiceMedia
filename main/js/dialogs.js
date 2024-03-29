@@ -719,6 +719,13 @@ function ReturnLocationModelSelect (phID) {
          }
       // }
    }
+   for (let key in localData.localFiles) {
+      let ext = localData.localFiles[key].name.split('.');
+      ext = ext[ext.length - 1];
+      if (ext == "glb") {
+        modelSelect = modelSelect + "<option value=\x22local_"+localData.localFiles[key].name+"\x22 >local_" + localData.localFiles[key].name + "</option>";
+      }  
+    }
    return modelSelect;
 }
 function ReturnLocationObjectSelect (phID) {
@@ -2056,14 +2063,14 @@ function SceneManglerModal(mode) {
     //  document.getElementById(mode).style.display = "block";
     //  document.getElementById('modalTitle').innerHTML = "<h3>Scene " + mode + "</h3>";
 }
-function GetLocalFiles() {
-  // console.log("tryna load local files");
-  // $('#localfiles').load("/connect/files.html", function() {
-  //   // alert( "Load was performed." );
+// function GetLocalFiles() {
+//   // console.log("tryna load local files");
+//   // $('#localfiles').load("/connect/files.html", function() {
+//   //   // alert( "Load was performed." );
    
     
-  // });
-}
+//   // });
+// }
 function SaveLocalAndClose() {
   SaveLocalData();
   ShowHideDialogPanel();
@@ -2698,7 +2705,7 @@ var PlayDialogLoop = function(arr) {
             deleteButton.classList.add('btn', 'btn-danger');
             deleteButton.innerText = 'Delete';
             deleteButton.addEventListener('click', () => {
-              deleteImageFromIndexedDb(localData.localFiles[file].name);
+              DeleteFile(localData.localFiles[file].name);
             });
             const addToSceneButton = document.createElement('button');
             addToSceneButton.classList.add('btn', 'btn-danger');
@@ -2757,13 +2764,13 @@ var PlayDialogLoop = function(arr) {
             deleteButton.classList.add('btn', 'btn-danger');
             deleteButton.innerText = 'Delete';
             deleteButton.addEventListener('click', () => {
-              deleteImageFromIndexedDb(localData.localFiles[file].name);
+              DeleteFile(localData.localFiles[file].name);
             })
             const addToSceneButton = document.createElement('button');
             addToSceneButton.classList.add('btn', 'btn-danger');
             addToSceneButton.innerText = 'Add to Scene';
             addToSceneButton.addEventListener('click', () => {
-              addToScene(localData.localFiles[file].name);
+              AddFileToScene(localData.localFiles[file].name);
             });
             
             cardBody.appendChild(title);

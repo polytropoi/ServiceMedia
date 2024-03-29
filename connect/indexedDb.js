@@ -219,12 +219,7 @@ function InitIDB() {
                localData.locations.push(sceneLocations.locations[i]);
             }
          }
-         // settings.sceneColor1 = localData.settings.sceneColor1;
-         // settings.sceneColor2 = localData.settings.sceneColor2;
-         // settings.sceneColor3 = localData.settings.sceneColor3;
-         // settings.sceneColor4 = localData.settings.sceneColor4;
          InitLocalColors();
-
          lastLocalUpdate = localData.lastUpdate;
          // console.log("COPIED LOCALDATA locations length " + localData.locations.length + " " + JSON.stringify(localData) + " last cloud update " +  lastCloudUpdate + " vs last local update " + lastLocalUpdate);
          if (lastCloudUpdate && lastLocalUpdate) {
@@ -286,6 +281,7 @@ function InitIDB() {
        scene.shortID = room + "~"; //with tilde = the local version
        scene.settings = localData.settings;
        scene.locations = localData.locations;
+       scene.localFiles = localData.localFiles;
       //  scene.localFiles = localData.localfiles;
        // scene.locations = JSON.parse(JSON.stringify(sceneLocations.locations));
        scene.lastUpdate = saveTimeStamp;
@@ -408,51 +404,44 @@ function InitIDB() {
          store.createIndex("scene", ["scene"], { unique: true });
       };
       request.onsuccess = function () {
-         console.log("tryna delete indexedDB localdata for this scene!");
+         console.log("tryna delete filename " + filename);
          const db = request.result;
          const transaction = db.transaction("scenes", "readwrite");
+         const store = transaction.objectStore("scenes");
+         const modQuery = store.openCursor(room + "~"); //use cursor mode so it's iterable below
+         //  const fileQuery = filestore.openCursor();
+         modQuery.onsuccess = function (e) {
+            var cursor = e.target.result;
+            if(cursor){
+            // console.log(cursor.value);
+               let updateData = cursor.value;
+               console.log("tryna delete " + JSON.stringify(updateData.localFiles[filename]));
+               delete updateData.localFiles[filename];
+               const request = cursor.update(updateData);
+               request.onsuccess = () => {
+                  console.log("she's gone! woot!");
+                  localData.localFiles = updateData.localFiles;
+               };
 
-         let deleterequest = transaction.objectStore("scenes").delete(room + "~");
-         deleterequest.onerror = function () {
-            console.log("cain't delete localdatas!?!?");
-         }
-      
-         // report that the data item has been deleted
-         transaction.oncomplete = () => {
-         console.log("sceneData deleted - reload to confirm!");
-         setTimeout(function () {
-            window.location.reload();
-         }, 2000);
-
+               cursor.continue();
+               // }
+            } else { 
+               console.log("fin mise a jour");
+            }
          };
-      };
+         modQuery.onerror = function () {
+            console.log("no localdata found in IDB, query error");
+            
+         }
+         transaction.oncomplete = function () {
+            db.close();
+            console.log("file hopefully deleted, db closed!");
+            DisplayLocalFiles();
+         }
+      }
    }
 
-     // Form functions
 
-// /**
-//  * @desc Gets the file from the input field and adds it to the IndexedDB
-//  * @param {Event} ev
-//  * @returns {Promise<void>}
-//  */
-// const handleSubmit = async (ev) => {
-// 	ev.preventDefault();
-// 	console.log("tryna handle sumbit");
-// 	const file = await getFileFromInput();
-// 	const store = db.transaction(storeName, 'readwrite').objectStore(storeName);
-// 	store.add(file);
-
-// 	store.transaction.oncomplete = () => {
-// 		clearGalleryImages();
-// 		renderAvailableImagesFromDb();
-// 		renderStorageQuotaInfo();
-// 	};
-// };
-
-/**
- * @desc Gets the file from the input field
- * @returns {Promise<object>}
- */
 const getFileFromInput = () => {
 	return new Promise((resolve, reject) => {
 		const file = document.getElementById('importFile').files[0];

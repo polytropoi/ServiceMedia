@@ -731,10 +731,11 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
       }
     },
     loadModel: function (modelID) {
-        console.log("tryna load model " + modelID);
+        
         if (!modelID) {
           modelID = this.data.modelID;
         }
+        console.log("tryna load model " + modelID);
         let transform_controls_component = this.el.components.transform_controls;
         if (transform_controls_component) {
             if (transform_controls_component.data.isAttached) {
@@ -806,17 +807,36 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                 }
               }
           } else {
+            if (modelID.includes("local_")) {
+              modelID = modelID.substring(6);
+              
+              for (const key in localData.localFiles) {
+                console.log("tryna get localModel " + modelID + " object " + localData.localFiles[key].name);
+                if (localData.localFiles[key].name == modelID) {
+                  
+                  const modelBuffer = localData.localFiles[key].data;
+                  const modelBlob = new Blob([modelBuffer]);
+                  // image.src = URL.createObjectURL(imageBlobb);
+                  this.el.setAttribute('gltf-model', URL.createObjectURL(modelBlob));
+                }
+              }
+             
+              
+            
+
+            } else {
               for (let i = 0; i < sceneModels.length; i++) {
-              if (sceneModels[i]._id == modelID) {
-                  this.el.setAttribute('gltf-model', sceneModels[i].url);
-                  if (this.data.markerType.toLowerCase() == "gate") {
-                    // this.el.setAttribute("material", {color: "orange", transparent: true, opacity: .5});
-                    // this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"placeholder"});
-                    
-                  }
-                  break;
+                if (sceneModels[i]._id == modelID) {
+                    this.el.setAttribute('gltf-model', sceneModels[i].url);
+                    if (this.data.markerType.toLowerCase() == "gate") {
+                      // this.el.setAttribute("material", {color: "orange", transparent: true, opacity: .5});
+                      // this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"placeholder"});
+                      
+                    }
+                    break;
+                }
               }
-              }
+            }
           }
         } else { //if "none"
             console.log("CLOUDMARKER type " + this.data.markerType+ " tryna set default model " + modelID);

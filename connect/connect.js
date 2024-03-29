@@ -1101,7 +1101,7 @@ function SaveModToLocal(locationKey) { //locationKey is now just timestamp of th
             // let o3DScale = new THREE.Vector3();
             // o3D.getWorldScale(o3DScale);
             
-            console.log("found the EL: " + locationKey + " locItem name " + locItem.name + " scale " + locItem.xscale + " " + locItem.yscale + " " +  locItem.zscale );
+            console.log("found the EL: " + locationKey + " locItem name " + locItem.name + " scale " + locItem.xscale + " " + locItem.yscale + " " +  locItem.zscale + " modelID " + locItem.modelID );
             // localData.locations[i].xscale = o3DScale.x;
             // localData.locations[i].yscale = o3DScale.y;
             // localData.locations[i].zscale = o3DScale.z;
@@ -1646,9 +1646,51 @@ function CreatePlaceholder () { //New Location button
 
    SaveLocalData();
    ShowHideDialogPanel();
-
-   
 }
+
+// function AddFileToScene (filename, type) { //New Location button
+//       console.log("tryna create place3holder");
+//       let newPosition = new THREE.Vector3(); 
+//       let viewportHolder = document.getElementById('viewportPlaceholder');
+//       viewportHolder.object3D.getWorldPosition( newPosition );
+//       console.log("new position for placeholder " + JSON.stringify(newPosition));
+//       let phEl = document.createElement('a-entity');
+//       var sceneEl = document.querySelector('a-scene');
+//       phEl.setAttribute('skybox-env-map', '');
+//       let timestamp = Date.now();
+//       timestamp = parseInt(timestamp);
+//       if (type == "model") {
+//       let locItem = {};
+//       locItem.x = newPosition.x.toFixed(2);
+//       locItem.eulerx = 0; //maybe get look vector?
+//       locItem.y = newPosition.y.toFixed(2);
+//       locItem.eulery = 0;
+//       locItem.z = newPosition.z.toFixed(2);
+//       locItem.eulerz = 0;
+//       locItem.type = "Worldspace";
+//       locItem.label = 'local placeholder';
+//       locItem.name = "local placeholder";
+//       locItem.description = '';
+//       locItem.markerType = "model";
+//       locItem.eventData = '';
+//       locItem.isNew = true;
+//       locItem.timestamp = timestamp;
+//       locItem.markerObjScale = 1;
+//       locItem.locationTags = '';
+//       locItem.phID = timestamp;
+//       locItem.isLocal = true;
+//       localData.locations.push(locItem);
+//       phEl.setAttribute('gltf-model', '#poi1');
+//       phEl.id = locItem.timestamp;
+
+//       // phEl.id 
+//       sceneEl.appendChild(phEl);
+//       phEl.setAttribute('position', newPosition);
+//       phEl.setAttribute('local_marker', {timestamp: timestamp, isNew: true, xpos: locItem.x, ypos: locItem.y, zpos: locItem.z} );
+//    }
+//    SaveLocalData();
+//    ShowHideDialogPanel();
+// }
 
 async function ConnectToEthereum() {
    const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
