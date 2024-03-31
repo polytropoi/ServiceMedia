@@ -667,6 +667,10 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
     remove: function () {
         console.log("removing something!");
     },
+    loadLocalFile: function () {
+      console.log("really tryna loadLocalFile " + this.data.modelID);
+      this.loadModel();
+    },
     updateAndLoad: function (name, description, tags, eventData, markerType, scale, xpos, ypos, zpos, xrot, yrot, zrot, xscale, yscale, zscale, modelID, objectID) {
         this.data.name = name;
         this.data.description = description;
@@ -735,7 +739,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
         if (!modelID) {
           modelID = this.data.modelID;
         }
-        console.log("tryna load model " + modelID);
+        console.log("tryna load cloudmarker model " + modelID);
         let transform_controls_component = this.el.components.transform_controls;
         if (transform_controls_component) {
             if (transform_controls_component.data.isAttached) {
@@ -808,8 +812,9 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
               }
           } else {
             if (modelID.includes("local_")) {
+              this.el.classList.add("hasLocalFile");
               modelID = modelID.substring(6);
-              
+              console.log("CLOUDMARKER SHOUDL HAVE MODELID " + modelID + " from localFiles " + JSON.stringify(localData.localFiles));
               for (const key in localData.localFiles) {
                 console.log("tryna get localModel " + modelID + " object " + localData.localFiles[key].name);
                 if (localData.localFiles[key].name == modelID) {
@@ -820,10 +825,6 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                   this.el.setAttribute('gltf-model', URL.createObjectURL(modelBlob));
                 }
               }
-             
-              
-            
-
             } else {
               for (let i = 0; i < sceneModels.length; i++) {
                 if (sceneModels[i]._id == modelID) {
@@ -831,7 +832,6 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                     if (this.data.markerType.toLowerCase() == "gate") {
                       // this.el.setAttribute("material", {color: "orange", transparent: true, opacity: .5});
                       // this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"placeholder"});
-                      
                     }
                     break;
                 }

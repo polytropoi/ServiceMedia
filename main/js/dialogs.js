@@ -267,6 +267,8 @@ window.addEventListener( 'keydown',  ( event ) => {
             uModelName == "cylinder";
           }
 
+        } else if ((uModelID.includes("local_"))) {
+          // uModelName == uModelID.substring(6)
         } else {
           for (let i = 0; i < sceneModels.length; i++) {
             if (sceneModels[i]._id == uModelID) {
@@ -279,7 +281,7 @@ window.addEventListener( 'keydown',  ( event ) => {
         for (let i = 0; i < localData.locations.length; i++) { 
           // console.log(localData.locations[i].timestamp + " vs " + selectedLocationTimestamp);
           if (localData.locations[i].timestamp == selectedLocationTimestamp) {
-            console.log("gotsa match "+ localData.locations[i].timestamp + " vs " + selectedLocationTimestamp);
+            console.log(uModelID + " gotsa match "+ localData.locations[i].timestamp + " vs " + selectedLocationTimestamp);
             localData.locations[i].modelID = uModelID;
             localData.locations[i].model = uModelName;
             localData.locations[i].objectID = "none";
@@ -659,27 +661,32 @@ function TabMangler(evt, tagName) {
     
   }
 
-function ToggleLocationModalListeners () { //add/remove listeners for location modal ui //nm
-  locationModalIsOn = !locationModalIsOn;
-  if (locationModalIsOn) {
-    let locMdlSelectEl = document.getElementById("locationModel");
-    locMdlSelectEl.addEventListener('change', function(e) {
-        console.log(e.value);
-    });
-    let locMarkerTypeSelectEl = document.getElementById("locationMarkerType");
-    locMarkerTypeSelectEl.addEventListener('change', function(e) {
-        console.log(e.value);
-    });
-  }
-}
+// function ToggleLocationModalListeners () { //add/remove listeners for location modal ui //nm
+//   locationModalIsOn = !locationModalIsOn;
+//   if (locationModalIsOn) {
+//     let locMdlSelectEl = document.getElementById("locationModel");
+//     locMdlSelectEl.addEventListener('change', function(e) {
+//         console.log(e.value);
+//     });
+//     let locMarkerTypeSelectEl = document.getElementById("locationMarkerType");
+//     locMarkerTypeSelectEl.addEventListener('change', function(e) {
+//         console.log(e.value);
+//     });
+//   }
+// }
 
-function ReturnLocationModelSelect (phID) {
+function ReturnLocationModelSelect () {
+
+    let phID = selectedLocationTimestamp;
     console.log("tryna return models for phID " + phID);
   //  let locationItem = JSON.parse(localStorage.getItem(phID));
     let locationItem = null;
+
    for (let i = 0; i < localData.locations.length; i++) {
+      console.log("checking phID " + phID +  " vs " + localData.locations[i].timestamp );
       if (phID == localData.locations[i].timestamp) {
         locationItem = localData.locations[i];
+        console.log("gotsa matching location item " + localData.locations[i].modelID);
       }
    }
 
@@ -723,8 +730,15 @@ function ReturnLocationModelSelect (phID) {
       let ext = localData.localFiles[key].name.split('.');
       ext = ext[ext.length - 1];
       if (ext == "glb") {
-        modelSelect = modelSelect + "<option value=\x22local_"+localData.localFiles[key].name+"\x22 >local_" + localData.localFiles[key].name + "</option>";
+        console.log("gotsa glb " + localData.localFiles[key].name + " tryna match with " +locationItem.modelID);
+        if (locationItem != null && locationItem.modelID == "local_" + localData.localFiles[key].name) {
+          modelSelect = modelSelect + "<option value=\x22local_"+localData.localFiles[key].name+"\x22 selected>local_" + localData.localFiles[key].name + "</option>";
+        } else {
+          modelSelect = modelSelect + "<option value=\x22local_"+localData.localFiles[key].name+"\x22 >local_" + localData.localFiles[key].name + "</option>";
+        }
+        
       }  
+
     }
    return modelSelect;
 }
@@ -2128,7 +2142,7 @@ function ShowHideDialogPanel (htmlString) {
     showDialogPanel = !showDialogPanel;
 
     if (showDialogPanel) { 
-      console.log("showDialogPanel is true!");
+      // console.log("showDialogPanel is true!");
       if (!dialogInitialized) {
         var modalCloser = document.getElementById("modalCloser"); //or the close button
         if (modalCloser != null) {
@@ -2680,19 +2694,19 @@ var PlayDialogLoop = function(arr) {
         if (ext == "jpg" || ext == "png" || ext == "glb") {
           if (ext == "glb") {
             type = "gltf model";
-            const imageBuffer = localData.localFiles[file].data;
-            const imageBlobb = new Blob([imageBuffer]);
+            const modelBuffer = localData.localFiles[file].data;
+            const modelBlob = new Blob([modelBuffer]);
             const card = document.createElement('div');
             card.classList.add('card');
           
             const cardBody = document.createElement('div');
             cardBody.classList.add('card-body');
           
-            const image = document.createElement('model-viewer');
+            const modelViewer = document.createElement('model-viewer');
             
             // image.setAttribute("touch-action", "pan-y");
             
-            image.classList.add('card-img-top');
+            modelViewer.classList.add('card-img-top');
             // image.setAttribute("camera-controls");
           
 
@@ -2720,15 +2734,15 @@ var PlayDialogLoop = function(arr) {
             // cardBody.appendChild(text)
             cardBody.appendChild(deleteButton);
             cardBody.appendChild(addToSceneButton);
-            card.appendChild(image);
+            card.appendChild(modelViewer);
             card.appendChild(cardBody);
             // col.appendChild(card);
           
             galleryContainer.appendChild(card);
-            image.src = URL.createObjectURL(imageBlobb);
-            image.setAttribute("camera-controls", "");
-            image.setAttribute("auto-rotate", "");
-            image.setAttribute("touch-action", "pan-y");
+            modelViewer.src = URL.createObjectURL(modelBlob);
+            modelViewer.setAttribute("camera-controls", "");
+            modelViewer.setAttribute("auto-rotate", "");
+            modelViewer.setAttribute("touch-action", "pan-y");
           } else {
             const imageBuffer = localData.localFiles[file].data;
             const imageBlobb = new Blob([imageBuffer]);

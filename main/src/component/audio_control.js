@@ -1556,7 +1556,7 @@ AFRAME.registerComponent('trigger_audio_control', { //trigger audio on designate
 
     },
     modVolume: function(newVolume) { //from slider in canvasOverlay
-        console.log("tryna mod trigger Volume to " + newVolume);
+        // console.log("tryna mod trigger Volume to " + newVolume);
        
         this.normalizedVolume = ((newVolume - -80) * 100) / (20 - -80) * .01;
         // console.log("normalizedVolume is " + normalizedVolume);

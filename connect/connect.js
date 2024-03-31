@@ -801,6 +801,8 @@ function ReturnModelName (_id) {
    if (_id.toString().includes("primitive_")) {
       console.log("tryna return primitive name " + _id);
       return _id.replace("primitive_", "");
+   } else if (_id.toString().includes("local_")) {
+      return _id.replace("local_", "");
    } else {
       for (let i = 0; i < sceneModels.length; i++) {
          if (sceneModels[i]._id == _id) {
@@ -906,10 +908,71 @@ function download(filename, text) {
        pom.click();
    }
 }
+// from https://gist.github.com/jonleighton/958841
+function arrayBufferToBase64(arrayBuffer) { //works for large files too?
+   var base64    = ''
+   var encodings = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
+ 
+   var bytes         = new Uint8Array(arrayBuffer)
+   var byteLength    = bytes.byteLength
+   var byteRemainder = byteLength % 3
+   var mainLength    = byteLength - byteRemainder
+ 
+   var a, b, c, d
+   var chunk
+ 
+   // Main loop deals with bytes in chunks of 3
+   for (var i = 0; i < mainLength; i = i + 3) {
+     // Combine the three bytes into a single integer
+     chunk = (bytes[i] << 16) | (bytes[i + 1] << 8) | bytes[i + 2]
+ 
+     // Use bitmasks to extract 6-bit segments from the triplet
+     a = (chunk & 16515072) >> 18 // 16515072 = (2^6 - 1) << 18
+     b = (chunk & 258048)   >> 12 // 258048   = (2^6 - 1) << 12
+     c = (chunk & 4032)     >>  6 // 4032     = (2^6 - 1) << 6
+     d = chunk & 63               // 63       = 2^6 - 1
+ 
+     // Convert the raw binary segments to the appropriate ASCII encoding
+     base64 += encodings[a] + encodings[b] + encodings[c] + encodings[d]
+   }
+ 
+   // Deal with the remaining bytes and padding
+   if (byteRemainder == 1) {
+     chunk = bytes[mainLength]
+ 
+     a = (chunk & 252) >> 2 // 252 = (2^6 - 1) << 2
+ 
+     // Set the 4 least significant bits to zero
+     b = (chunk & 3)   << 4 // 3   = 2^2 - 1
+ 
+     base64 += encodings[a] + encodings[b] + '=='
+   } else if (byteRemainder == 2) {
+     chunk = (bytes[mainLength] << 8) | bytes[mainLength + 1]
+ 
+     a = (chunk & 64512) >> 10 // 64512 = (2^6 - 1) << 10
+     b = (chunk & 1008)  >>  4 // 1008  = (2^6 - 1) << 4
+ 
+     // Set the 2 least significant bits to zero
+     c = (chunk & 15)    <<  2 // 15    = 2^4 - 1
+ 
+     base64 += encodings[a] + encodings[b] + encodings[c] + '='
+   }
+   
+   return base64
+ }
 
+ function base64ToArrayBuffer(base64) {
+   var binaryString = atob(base64);
+   var bytes = new Uint8Array(binaryString.length);
+   for (var i = 0; i < binaryString.length; i++) {
+       bytes[i] = binaryString.charCodeAt(i);
+   }
+   return bytes.buffer;
+}
 function ExportMods () {
    let currentTimestamp = Math.round(Date.now() / 1000).toString();
    let mods = {};
+   // mods.localFiles = localData.localFiles;
    // mods.locationMods = sceneLocations.locationMods;
 
    // if (sceneColor1 != "" || sceneColor2 != "" || sceneColor3 != "" || sceneColor4 != "") { //defined globally above
@@ -924,6 +987,11 @@ function ExportMods () {
    // }
    mods.locations = localData.locations;
    mods.settings = localData.settings;
+   mods.localFiles = localData.localFiles;
+   for (let key in mods.localFiles) {
+      mods.localFiles[key].data = arrayBufferToBase64(localData.localFiles[key].data);
+   }
+   console.log(JSON.stringify(mods.localFiles));
    var encodedString = btoa(JSON.stringify(mods));
    download(room+"_mods_"+currentTimestamp+".txt", encodedString);
 }
@@ -937,14 +1005,12 @@ function ImportMods (event) {
       var decodedString = atob(event.target.result);
       console.log(decodedString); 
       let mods = JSON.parse(decodedString);
+      for (let key in mods.localFiles) {
+         localData.localFiles[key] = mods.localFiles[key];
+         localData.localFiles[key].data = base64ToArrayBuffer(mods.localFiles[key].data);
+         console.log(localData.localFiles[key].data);
+      }
 
-
-      // if (mods != null && mods != undefined && mods.colorMods != null && mods.colorMods != undefined) {
-      //    // localStorage.setItem(room + "_sceneColor1", mods.colorMods.sceneColor1);
-      //    // localStorage.setItem(room + "_sceneColor2", mods.colorMods.sceneColor2);
-      //    // localStorage.setItem(room + "_sceneColor3", mods.colorMods.sceneColor3);
-      //    // localStorage.setItem(room + "_sceneColor4", mods.colorMods.sceneColor4);
-      // }
       if (mods != null && mods != undefined && mods.settings != {}) {
          if (mods.settings.sceneColor1) {
             localData.settings.sceneColor1 = mods.settings.sceneColor1;
@@ -968,10 +1034,7 @@ function ImportMods (event) {
                localData.locations.push(mods.locations[i]);
          }
 
-         SaveLocalData();
-         setTimeout(function () {
-            window.location.reload();
-         }, 2000);
+
          // for (let i = 0; i < mods.locationMods.length; i++) {
          //    if (mods.locationMods[i].phID != null && mods.locationMods[i].phID.includes(room)) {
          //       if (mods.locationMods[i].type == null || mods.locationMods[i].type == undefined) {
@@ -983,16 +1046,32 @@ function ImportMods (event) {
          //       window.location.reload();
          //    }
          // }
-      } else {
-         console.log("nomods");
-         // window.location.reload();
-      }
+      } 
+
       if (mods != null && mods != undefined && mods.timekeyMods != null) {
          // timeKeysData = mods.timekeyMods;
       }
+      console.log("mods.localFiles :" + Object.keys(mods.localFiles));
+      // if (mods != null && mods != undefined && mods.localFiles != null && Object.keys(mods.localFiles).length > 0) {
+      //    // localData.localFiles = mods.localFiles;
 
+      //    SaveLocalData();
+      //    // setTimeout(function () {
+      //    //    window.location.reload();
+      //    // }, 2000);
+      // } else {
+      //    // SaveLocalData();
+      //    // // setTimeout(function () {
+      //    // //    window.location.reload();
+      //    // // }, 2000);
+      // }
+      SaveLocalData();
+      setTimeout(function () {
+         window.location.reload();
+      }, 3000);
       };
       reader.readAsText(selectedFile);
+    
    } else {
       console.log("wrong room!")
    }
@@ -1563,7 +1642,7 @@ function ReturnLocationTable () { //just show em all now!
             markerString = "<span style=\x22color: palegoldenrod; font-weight: bold;\x22>"+localData.locations[i].markerType+"</span>";
          } 
 
-         console.log("locMdl " +localData.locations[i].model + " " + localData.locations[i].modelID);
+         // console.log("locMdl " +localData.locations[i].model + " " + localData.locations[i].modelID);
 
          let mAsset = (localData.locations[i].model || localData.locations[i].model == undefined || localData.locations[i].model == 'undefined' || localData.locations[i].model == "none") ? localData.locations[i].model : null;
          if (localData.locations[i].modelID && localData.locations[i].modelID.toString().includes("primitive")) {
