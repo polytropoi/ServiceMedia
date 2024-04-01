@@ -110,7 +110,7 @@ function InitIDB() {
                               settings.playerPositions.push(cursor.value.locations[i].x + " " + cursor.value.locations[i].y + " " + cursor.value.locations[i].z);
                            }
                         }
-                        if (cursor.value.locations[i].modelID.includes("local_")) {
+                        if (cursor.value.locations[i].modelID && cursor.value.locations[i].modelID.includes("local_")) {
                            localEl.classList.add("hasLocalFile");
                         }
                         localEl.setAttribute("position", {x: cursor.value.locations[i].x, y: cursor.value.locations[i].y, z: cursor.value.locations[i].z });
