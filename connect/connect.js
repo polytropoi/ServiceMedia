@@ -844,7 +844,7 @@ function SendAdminMessage() {
    }
 }
 
-function SaveModsToCloud() { //Save button on location modal
+function SaveModsToCloud() { //Save button on location modal, writes local mods upstairs..
 
    if (userData.sceneOwner != null) {
       let mods = {};
@@ -872,6 +872,7 @@ function SaveModsToCloud() { //Save button on location modal
       mods.timedEventMods = localData.timeKeysData;
       console.log(JSON.stringify(mods));
 
+      mods.localFiles = localData.localFiles;
       // var encodedString = btoa(JSON.stringify(mods));
       // console.log(encodedString);
       var xhr = new XMLHttpRequest();
@@ -989,7 +990,7 @@ function ExportMods () {
    mods.settings = localData.settings;
    mods.localFiles = localData.localFiles;
    for (let key in mods.localFiles) {
-      mods.localFiles[key].data = arrayBufferToBase64(localData.localFiles[key].data);
+      mods.localFiles[key].data = arrayBufferToBase64(localData.localFiles[key].data); //might need to async...
    }
    console.log(JSON.stringify(mods.localFiles));
    var encodedString = btoa(JSON.stringify(mods));
@@ -1034,39 +1035,15 @@ function ImportMods (event) {
                localData.locations.push(mods.locations[i]);
          }
 
-
-         // for (let i = 0; i < mods.locationMods.length; i++) {
-         //    if (mods.locationMods[i].phID != null && mods.locationMods[i].phID.includes(room)) {
-         //       if (mods.locationMods[i].type == null || mods.locationMods[i].type == undefined) {
-         //          mods.locationMods[i].type = "worldspace";
-         //       } 
-         //       localStorage.setItem(mods.locationMods[i].phID, JSON.stringify(mods.locationMods[i])); //main location data localstorage setting
-         //    }
-         //    if (mods.locationMods.length - 1 === i) {
-         //       window.location.reload();
-         //    }
-         // }
       } 
 
       if (mods != null && mods != undefined && mods.timekeyMods != null) {
          // timeKeysData = mods.timekeyMods;
       }
       console.log("mods.localFiles :" + Object.keys(mods.localFiles));
-      // if (mods != null && mods != undefined && mods.localFiles != null && Object.keys(mods.localFiles).length > 0) {
-      //    // localData.localFiles = mods.localFiles;
 
-      //    SaveLocalData();
-      //    // setTimeout(function () {
-      //    //    window.location.reload();
-      //    // }, 2000);
-      // } else {
-      //    // SaveLocalData();
-      //    // // setTimeout(function () {
-      //    // //    window.location.reload();
-      //    // // }, 2000);
-      // }
       SaveLocalData();
-      setTimeout(function () {
+      setTimeout(function () { //hrm, maybe just don't and prompt user to reload?
          window.location.reload();
       }, 3000);
       };

@@ -12532,6 +12532,10 @@ function getAllPeople() {
                     let eX = sceneLocations[i].eulerx;
                     let eY = sceneLocations[i].eulery;
                     let eZ = sceneLocations[i].eulerz;
+
+                    let sX = sceneLocations[i].xscale;
+                    let sY = sceneLocations[i].yscale;
+                    let sZ = sceneLocations[i].zscale;
                     // eX = parseFloat(eX) != null ? parseFloat(eX) : 0; //hrm...
                     // eY = parseFloat(eY) != null ? parseFloat(eY) : 0;
                     // eX = parseFloat(eZ) != null ? parseFloat(eZ) : 0;
@@ -12543,6 +12547,14 @@ function getAllPeople() {
                     "<input type=\x22number\x22 step=\x220.01\x22 class=\x22form-control locationObjectRotY\x22 id=\x22eulery_" + locationID + "\x22 placeholder=\x220\x22 value=\x22" + eY + "\x22 >" +
                     "<label for=\x22eulerz_" + locationID + "\x22>Z Rot</label>" + 
                     "<input type=\x22number\x22 step=\x220.01\x22 class=\x22form-control locationObjectRotZ\x22 id=\x22eulerz_" + locationID + "\x22 placeholder=\x220\x22 value=\x22" + eZ + "\x22 ></div>";
+
+                    let scales = ""+                        
+                    "<div class=\x22col form-group col-md-1\x22><label for=\x22xscale_" + locationID + "\x22>X Scale</label>" + 
+                    "<input type=\x22number\x22 step=\x220.01\x22 class=\x22form-control locationObjectXScale\x22 id=\x22xscale_" + locationID + "\x22 placeholder=\x221\x22 value=\x22" + sX + "\x22 >" +
+                    "<label for=\x22yscale_" + locationID + "\x22>Y Scale</label>" + 
+                    "<input type=\x22number\x22 step=\x220.01\x22 class=\x22form-control locationObjectYScale\x22 id=\x22yscale_" + locationID + "\x22 placeholder=\x221\x22 value=\x22" + sY + "\x22 >" +
+                    "<label for=\x22zscale_" + locationID + "\x22>Z Scale</label>" + 
+                    "<input type=\x22number\x22 step=\x220.01\x22 class=\x22form-control locationObjectZScale\x22 id=\x22zscale_" + locationID + "\x22 placeholder=\x221\x22 value=\x22" + sZ + "\x22 ></div>";
                
                     locationFormElements = ""+
                     // "<div class=\x22row\x22>" + 
@@ -12601,6 +12613,13 @@ function getAllPeople() {
                                 // "<input type=\x22text\x22 class=\x22form-control locationEventData\x22 id=\x22eventData_" + locationID + "\x22 placeholder=\x220\x22 value=\x22" + sceneLocations[i].eventData + "\x22 >" +
                             // "<label for=\x22locationTags_" + locationID + "\x22>Tags</label>" + 
                             // "<input type=\x22text\x22 class=\x22form-control locationTags\x22 id=\x22locationTags_" + locationID + "\x22 value=\x22" + locationTags + "\x22 >" +
+                            "<div id=\x22selectTargetLocation_" + locationID + "\x22>" +
+                                "<label for=\x22\x22>Target Location: </label>" + 
+                                "<select class=\x22form-control targetLocationSelector\x22 id=\x22targetLocationSelect_"+locationID+"\x22>" +
+                                "<option value=\x22none\x22 selected>none</option>" +
+                                "<option value=\x22none\x22> none</option>" +
+                                "</select>" +
+                            "</div>" +
                             "<br><button type=\x22button\x22 class=\x22copySceneLocation btn btn-xs btn-info float-left\x22 id=\x22" + i + "\x22>Clone</button>"+
                             "<button type=\x22button\x22 class=\x22remSceneLocation btn btn-xs btn-danger float-right\x22 id=\x22" + i + "\x22>Remove</button>"+
                             //TAGS
@@ -12650,8 +12669,15 @@ function getAllPeople() {
                                 "<option value=\x22none\x22> none</option>" +
                                 "</select>" +
                             "</div>" +
-                            "<label for=\x22markerObjectScale_" + locationID + "\x22>Object Scale</label>" + 
-                            "<input type=\x22number\x22 step=\x220.001\x22 class=\x22form-control locationObjectScale\x22 id=\x22scale_" + locationID + "\x22 placeholder=\x220\x22 value=\x22" + sceneLocations[i].markerObjScale + "\x22 >" +
+                            "<div id=\x22selectLocationPicture_" + locationID + "\x22>" +
+                                "<label for=\x22\x22>Location Picture: </label>" + 
+                                "<select class=\x22form-control pictureSelector\x22 id=\x22pictureSelect_"+locationID+"\x22>" +
+                                "<option value=\x22none\x22 selected>none</option>" +
+                                "<option value=\x22none\x22> none</option>" +
+                                "</select>" +
+                            "</div>" +
+                            // "<label for=\x22markerObjectScale_" + locationID + "\x22>Object Scale</label>" + 
+                            // "<input type=\x22number\x22 step=\x220.001\x22 class=\x22form-control locationObjectScale\x22 id=\x22scale_" + locationID + "\x22 placeholder=\x220\x22 value=\x22" + sceneLocations[i].markerObjScale + "\x22 >" +
                         "</div>";
                         // "<div class=\x22col form-group col-md-3\x22>"+
                         //     // "<button type=\x22button\x22 class=\x22remSceneLocation btn btn-xs btn-danger float-left\x22 id=\x22" + i + "\x22>Remove</button>"+
@@ -12787,7 +12813,8 @@ function getAllPeople() {
                         locationFormElements +
                         location +
                         rotations + 
-                        locationMap +
+                        scales +
+                        // locationMap +
 
                     "</div>";
                     }
@@ -16200,6 +16227,30 @@ function getAllPeople() {
                                 console.log("location obj set " + $(this).find('option:selected').text());
                                 if (sceneLocations[s].objectName == null || sceneLocations[s].objectName == undefined) {
                                     sceneLocations[s].objectName = 'none';
+                                }
+                            }
+                        }
+                    });
+                    $(document).on('change', '.pictureSelector', function() {
+                        for (let s = 0; s < sceneLocations.length; s++) {   
+                            let locid = this.id.split("_")[1];
+                            if (locid == sceneLocations[s].timestamp || this.id == sceneLocations[s].timestamp) {
+                                sceneLocations[s].locationPicture = $(this).find('option:selected').text();
+                                console.log("location picture set " + $(this).find('option:selected').text());
+                                if (sceneLocations[s].locationPicture == null || sceneLocations[s].locationPicture == undefined) {
+                                    sceneLocations[s].locationPicture = 'none';
+                                }
+                            }
+                        }
+                    });
+                    $(document).on('change', '.targetLocationSelector', function() {
+                        for (let s = 0; s < sceneLocations.length; s++) {   
+                            let locid = this.id.split("_")[1];
+                            if (locid == sceneLocations[s].timestamp || this.id == sceneLocations[s].timestamp) {
+                                sceneLocations[s].locationTarget = $(this).find('option:selected').text();
+                                console.log("location target set " + $(this).find('option:selected').text());
+                                if (sceneLocations[s].locationTarget == null || sceneLocations[s].locationTarget == undefined) {
+                                    sceneLocations[s].locationTarget = 'none';
                                 }
                             }
                         }

@@ -3225,7 +3225,7 @@ AFRAME.registerComponent('picture_groups_control', { //has all the picgroup data
             this.texture.flipY = false; 
             this.material = new THREE.MeshBasicMaterial( { map: texture, transparent: true} ); 
             squareMesh.traverse(node => { 
-              console.log("gotsa obj + mat");
+              // console.log("gotsa obj + mat");
               node.material = this.material;
             });
           },

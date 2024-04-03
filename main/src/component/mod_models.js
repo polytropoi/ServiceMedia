@@ -10,6 +10,7 @@ AFRAME.registerComponent('mod_model', {
         tags: {default: ''},
         description: {default: ''},
         modelID: {default: ''},
+        modelName: {default: ''},
         timestamp: {default: ''},
         allowMods: {default: true},
         name: {default: ''},
@@ -22,55 +23,16 @@ AFRAME.registerComponent('mod_model', {
         yrot: {type: 'number', default: 0},
         zrot: {type: 'number', default: 0},
 
-        xscale: {type: 'number', default: 0}, //like the others...
-        yscale: {type: 'number', default: 0},
-        zscale: {type: 'number', default: 0},
+        xscale: {type: 'number', default: 1}, //like the others...
+        yscale: {type: 'number', default: 1},
+        zscale: {type: 'number', default: 1},
       },
       init: function () {
         
-        let textData = [];
-        let moIndex = -1;
-        let idleIndex = -1;
-        let danceIndex = -1;
-        let walkIndex = -1;
-        let runIndex = -1;
-        let clips = null;
-        let danceClips = [];
-        let idleClips = [];
-        let walkClips = [];
-        let mouthClips = [];
-  
-        this.walkClips = walkClips;
-        this.danceClips = danceClips;
-        this.idleClips = idleClips;
-        // this.walkClips = [];
-        this.mouthClips = mouthClips;
-        
-        let mixer = null;
-        let camera = null;
-        let picGroupArray = ""; //maybe pic gallery should be an different component, or part of pic group control?
-        let pictexture = null;
-        let picmaterial = null;
-        let spics = [];
-        let spicsIndex = 0;
-        let hpics = [];
-        let hpicsIndex = 0;
-        let vpics = [];
-        let vpicsIndex = 0;
-        let svids = [];
-        let svidsIndex = 0;
-        let hvids = [];
-        let hvidsIndex = 0;
-        let evids = []; //equirect/skybox
-        let evidsIndex = 0;
-  
-        let vvids = [];
-        let audios = [];
-        let vvidsIndex = 0;
-  
-        let colliders = [];
+       
         this.sceneEl = document.querySelector('a-scene');
-        let oScale = 1;
+        // let oScale = 1;
+        this.oScale = new THREE.Vector3();
         this.shaderMaterial = null;
         this.hasUniforms = false;
         this.start = Date.now();
@@ -116,11 +78,14 @@ AFRAME.registerComponent('mod_model', {
           this.setShader(); //at the bottom
         }      
   
-        if (this.data.eventData && this.data.eventData.length > 1) {
-          // console.log("model eventData " + JSON.stringify(this.data.eventData));
-          textData = this.data.description.split("~");//tilde delimiter splits string to array//maybe use description for text instead? 
-  
-        }
+        // if (this.data.description && this.data.description.length > 1) {
+        //   // console.log("model eventData " + JSON.stringify(this.data.eventData));
+        //   if (this.data.description.includes("~")) {
+        //   textData = this.data.description.split("~");//tilde delimiter splits string to array//maybe use description for text instead? 
+        //   } else {
+        //     textData.push(this.data.description);
+        //   }
+        // }
         if (this.data.tags.toLowerCase().includes('beat') || this.data.eventData.toLowerCase().includes('beat')) {
           this.el.classList.add('beatme');
         }
@@ -130,7 +95,9 @@ AFRAME.registerComponent('mod_model', {
         //   // this.el.addEventListener('beatme', e => console.log("beat" + e.detail.volume()));
           
         // }
-
+        if (!this.data.tags.toLowerCase().includes('no mods') || !this.data.tags.toLowerCase().includes('no mods')) {
+          this.data.allowMods = true;
+        }
         if (this.data.eventData.toLowerCase().includes("allowmods")) {
           this.data.allowMods = true;
         }
@@ -173,21 +140,77 @@ AFRAME.registerComponent('mod_model', {
           this.hasCallout = true;
         }
        
-        this.oScale = new THREE.Vector3();
+
         let that = this;
         ///////////////////////////////////////////////// model loaded event start /////////////////////////////
   
         ///////////////////////////////////////////////////////// -listeners......
                 
         this.el.addEventListener('model-loaded', () => { // - model-loaded
-        if (!this.isInitialized) {
+          this.setModelProperties();
   
-          
+        }); //end of model-loaded
+     
+    },  //END INIT mod_model
+    setModelProperties: function () {
+      let textData = [];
+      let moIndex = -1;
+      let idleIndex = -1;
+      let danceIndex = -1;
+      let walkIndex = -1;
+      let runIndex = -1;
+      let clips = null;
+      let danceClips = [];
+      let idleClips = [];
+      let walkClips = [];
+      let mouthClips = [];
+
+      this.walkClips = walkClips;
+      this.danceClips = danceClips;
+      this.idleClips = idleClips;
+      // this.walkClips = [];
+      this.mouthClips = mouthClips;
+      
+      let mixer = null;
+      let camera = null;
+      let picGroupArray = ""; //maybe pic gallery should be an different component, or part of pic group control?
+      let pictexture = null;
+      let picmaterial = null;
+      let spics = [];
+      let spicsIndex = 0;
+      let hpics = [];
+      let hpicsIndex = 0;
+      let vpics = [];
+      let vpicsIndex = 0;
+      let svids = [];
+      let svidsIndex = 0;
+      let hvids = [];
+      let hvidsIndex = 0;
+      let evids = []; //equirect/skybox
+      let evidsIndex = 0;
+
+      let vvids = [];
+      let audios = [];
+      let vvidsIndex = 0;
+
+      let colliders = [];
+        // if (!this.isInitialized) {
+
+          console.log("mod_model with + " + this.data.xscale + " " + this.data.yscale + " " + this.data.zscale + " pos " + this.data.xpos + this.data.ypos + this.data.zpos + " rot " + this.data.xrot + this.data.yrot + this.data.zrot);
+          this.el.object3D.scale.set(this.data.xscale,this.data.yscale,this.data.zscale);
           this.el.object3D.getWorldScale(this.oScale);
           if (this.data.tags.includes("hide") || this.data.tags.includes("invisible") || this.data.tags.includes("transparent")) {
             this.el.object3D.visible = false;
           }
-          if (this.data.eventData && this.data.eventData.includes("physics")) {
+          if (this.data.description && this.data.description.length > 1) {
+            // console.log("model eventData " + JSON.stringify(this.data.eventData));
+            if (this.data.description.includes("~")) {
+            textData = this.data.description.split("~");//tilde delimiter splits string to array//maybe use description for text instead? 
+            } else {
+              textData.push(this.data.description);
+            }
+          }
+          if ((this.data.eventData && this.data.eventData.includes("physics")) || (this.data.tags && this.data.tags.includes("physics"))) {
             if (settings.usePhysicsType == "ammo") {
               if (this.data.eventData.includes("static")) {
               // this.el.object3D.visible = false;
@@ -272,14 +295,14 @@ AFRAME.registerComponent('mod_model', {
                              
           }
           if (this.data.eventData && this.data.eventData.includes("pickup")) { //USING PHYSX, needs useStarterKit = true!
-            this.el.setAttribute("data-pick-up");
-          
-          if (this.data.eventData && this.data.eventData.includes("magnet") || this.data.eventData.includes("snap")) {
-            this.el.classList.add("magnet-left");
-            this.el.classList.add("magnet-right");
+              this.el.setAttribute("data-pick-up");
+            
+            if (this.data.eventData && this.data.eventData.includes("magnet") || this.data.eventData.includes("snap")) {
+              this.el.classList.add("magnet-left");
+              this.el.classList.add("magnet-right");
+            }
           }
-        }
-  
+    
           
           // this.oScale = oScale;
           // this.bubble = null;
@@ -437,27 +460,17 @@ AFRAME.registerComponent('mod_model', {
                 }
                 if (i == clips.length - 1) {
                     if (hasAnims) {
-                      console.log("model has anims " + this.data.eventData + " idelIndex " + idleIndex);
-                    // if (this.data.eventData.includes("loop_all_anims")) {
-                    //   theEl.setAttribute('animation-mixer', {
-                    //     "clip": clips[0].name,
-                    //     "loop": "repeat",
-                    //   });
-                    // }
-                    // if (this.data.eventData.includes("loop_dance_anims")) {
-                    //   theEl.setAttribute('animation-mixer', {
-                    //     "loop": "repeat",
-                    //   });
-                    // }  
-                    
+                      console.log("model has anims " + idleClips.length + " idelIndex " + idleIndex);
+                                     
                     if (idleClips.length) {
                       idleIndex = Math.floor(Math.random() * idleClips.length);
-                      theEl.setAttribute('animation-mixer', {
+                      console.log("tryna play idle " + idleIndex);
+                      this.el.setAttribute('animation-mixer', {
                         "clip": idleClips[idleIndex].name,
                         "loop": "repeat",
                       });
                     } else if (danceClips.length) {
-                      theEl.setAttribute('animation-mixer', {
+                      this.el.setAttribute('animation-mixer', {
                         "clip": danceClips[0].name,
                         "loop": "repeat",
                       });
@@ -1051,7 +1064,7 @@ AFRAME.registerComponent('mod_model', {
                 }
               }
             }
-        }
+        // }
   
         if (this.data.markerType == "target" || this.el.classList.contains('target') || this.hasCallout || this.hasLocationCallout) {
           let textIndex = 0;
@@ -1311,7 +1324,7 @@ AFRAME.registerComponent('mod_model', {
           // 
           this.el.addEventListener('mousedown', (evt) => {
             console.log("MOD_MODEL mousedown on markertype " + this.data.markerType +  " this.hasCallout " + this.hasCallout + " this.data.description " + this.data.description);
-            if (this.timestamp != '' && settings.allowMods && this.data.allowMods) {
+            if (this.timestamp != '' && this.data.allowMods) {
               if (keydown == "T") {
                 ToggleTransformControls(this.timestamp);
               } else if (keydown == "Shift") {
@@ -1323,7 +1336,7 @@ AFRAME.registerComponent('mod_model', {
             }  
           });
           this.el.addEventListener('mouseenter', (evt) =>  {
-            // console.log("MOD_MODEL mouseovewr model " + this.el.id + this.hasLocationCallout + this.data.markerType + this.hasCallout + evt.detail);
+            console.log("MOD_MODEL mouseovewr model " + this.data.model + this.hasLocationCallout + this.data.markerType + this.hasCallout + evt.detail);
            
             if (evt.detail.intersection != null) {
               if (textData.length > 0) {
@@ -1532,9 +1545,9 @@ AFRAME.registerComponent('mod_model', {
             }
           });
   
-        }
+          }
        
-        document.querySelector('a-scene').addEventListener('youtubeToggle', function (event) { //things to trigger on this model if youtube is playing
+          document.querySelector('a-scene').addEventListener('youtubeToggle', function (event) { //things to trigger on this model if youtube is playing
           console.log("GOTSA YOUTUBNE EVENT: " + event.detail.isPlaying);  
           if (event.detail.isPlaying) {
             if (danceIndex != -1) { //moIndex = "mouthopen"
@@ -1582,12 +1595,12 @@ AFRAME.registerComponent('mod_model', {
                   "loop": "repeat",
                   "crossFadeDuration": 1,
                   "repetitions": Math.floor(Math.random()*2),
-                  "timeScale": .75 + Math.random()/2
+                    "timeScale": .75 + Math.random()/2
+                  });
                 });
-              });
+              }
             }
-          }
-        });
+          });
   
           document.querySelector('a-scene').addEventListener('primaryAudioToggle', function () {  //things to trigger on this model if primary audio is playing
           // console.log("primaryAudioToggle!");
@@ -1654,11 +1667,8 @@ AFRAME.registerComponent('mod_model', {
               }
           });
   
-        }
-  
-      });
-     
-    },  //END INIT mod_model
+        } //end if target or callout
+    },
     returnRandomNumber: function (min, max) {
       return Math.random() * (max - min) + min;
     },
@@ -1872,7 +1882,7 @@ AFRAME.registerComponent('mod_model', {
             scatteredEl.setAttribute("gltf-model", "#" + this.data.modelID);
             let eventData = this.data.eventData.replace("scatter", ""); //prevent infinite recursion!
 
-            scatteredEl.setAttribute("mod_model", {eventData: eventData, markerType: this.data.markerType, scale: this.scale * scale, ypos: this.data.ypos, tags: this.data.tags, description: this.data.description, modelID: this.data.modelID});
+            scatteredEl.setAttribute("mod_model", {eventData: eventData, markerType: this.data.markerType, xscale: this.data.xscale * scale, yscale: this.data.yscale * scale, zscale: this.data.zscale * scale, ypos: this.data.ypos, tags: this.data.tags, description: this.data.description, modelID: this.data.modelID});
             scatteredEl.setAttribute("shadow", {cast: true, receive: true});
             scatteredEl.classList.add("envMap");
             scatteredEl.id = this.data.modelID+ "_scattered_" + i.toString();
@@ -1924,7 +1934,7 @@ AFRAME.registerComponent('mod_model', {
         this.data.yrot = yrot;
         this.data.zrot = zrot;
         this.data.modelID = modelID;
-        console.log("update and load " + this.data.name + " " + this.data.modelID)
+        console.log("mod_model updateAndLoad values" + this.data.name + " " +  this.data.xscale + " " + this.data.yscale + this.data.zscale); 
         // setTimeout(() => {
             this.loadModel();
         // }, 2000);
@@ -1939,7 +1949,10 @@ AFRAME.registerComponent('mod_model', {
       this.el.removeAttribute("transform_controls");
       this.el.removeAttribute("geometry");
       this.el.removeAttribute("gltf-model");
+      this.el.removeAttribute("animation-mixer");
+      this.isInitialized = false;
       console.log("tryna load modeID " + this.data.modelID);
+
       // console.log("tryna load modeID " + modelID);
       if (this.data.modelID != undefined && this.data.modelID != null & this.data.modelID != "none" && this.data.modelID != "") {  
         // if (modelID != undefined && modelID != null & modelID != "none" && modelID != "") {  
@@ -1989,17 +2002,17 @@ AFRAME.registerComponent('mod_model', {
               }
             }
         } 
-        // this.updateMaterials();
-        // let scale = parseFloat(this.data.scale);
-        // console.log("localmarker with + " + this.data.scale + " pos " + this.data.xpos + this.data.ypos + this.data.zpos + " rot " + this.data.xrot + this.data.yrot + this.data.zrot);
-        this.el.object3D.scale.set(this.data.xscale,this.data.yscale,this.data.zscale);
 
-        this.el.object3D.position.set(this.data.xpos, this.data.ypos, this.data.zpos);
-        // this.el.object3D.rotation.set(THREE.MathUtils.degToRad(this.data.xrot), THREE.MathUtils.degToRad(this.data.xrot), THREE.MathUtils.degToRad(this.data.xrot));
-        this.el.setAttribute("rotation", this.data.xrot + " " + this.data.yrot + " " +this.data.zrot);
-        // this.el.object3D.rotation.x += Math.PI;
+          console.log("mod_model with + " + this.data.xscale + " " + this.data.yscale + " " + this.data.zscale + " pos " + this.data.xpos + this.data.ypos + this.data.zpos + " rot " + this.data.xrot + this.data.yrot + this.data.zrot);
+          this.el.object3D.scale.set(this.data.xscale,this.data.yscale,this.data.zscale);
+
+          this.el.object3D.position.set(this.data.xpos, this.data.ypos, this.data.zpos);
+
+          this.el.setAttribute("rotation", this.data.xrot + " " + this.data.yrot + " " +this.data.zrot);
         
-        this.el.object3D.updateMatrix(); 
+          this.el.object3D.updateMatrix(); 
+        
+        this.setModelProperties();
       // } else {
       //   this.el.setAttribute("gltf-model", "https://servicemedia.s3.amazonaws.com/assets/models/savedplaceholder.glb");
       // }

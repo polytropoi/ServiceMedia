@@ -1158,7 +1158,7 @@ AFRAME.registerComponent('mod_object', {
             if (clips != null) { 
               for (i = 0; i < clips.length; i++) { //get reference to all anims
                 hasAnims = true
-                console.log("mod_object " + this.data.objectData.name + " has animation: " + clips[i].name);
+                // console.log("mod_object " + this.data.objectData.name + " has animation: " + clips[i].name);
                 
                 if (clips[i].name.includes("mouthopen")) {
                   moIndex = i;

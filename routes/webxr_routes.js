@@ -415,7 +415,7 @@ webxr_router.get('/:_id', function (req, res) {
     // let skyGradientScript = "";
     let textLocation = "";
     // let pictureLocation = "";
-    let picturegroupLocation = "-4 2 3";
+    let picturegroupLocation = "-4 -100 3";
     let scenesKeyLocation = null;
     let audioLocation = "-3 1.7 -4";
     let videoLocation = "10 2 15";
@@ -2894,6 +2894,15 @@ webxr_router.get('/:_id', function (req, res) {
                                             if (!locMdl.markerObjScale || locMdl.markerObjScale == undefined || locMdl.markerObjScale == "") {
                                                 locMdl.markerObjScale = 1;
                                             }
+                                            if (!locMdl.xscale || locMdl.xscale == undefined || locMdl.xscale == "") {
+                                                locMdl.xscale = locMdl.markerObjScale;
+                                            }
+                                            if (!locMdl.yscale || locMdl.yscale == undefined || locMdl.yscale == "") {
+                                                locMdl.yscale = locMdl.markerObjScale;
+                                            }
+                                            if (!locMdl.zscale || locMdl.zscale == undefined || locMdl.zscale == "") {
+                                                locMdl.zscale = locMdl.markerObjScale;
+                                            }
                                             if (locMdl.eventData.toLowerCase().includes("navmesh")) { //use for pathfinding
                                                 
                                                
@@ -2917,10 +2926,9 @@ webxr_router.get('/:_id', function (req, res) {
                                                     scatterSurface = "scatter-surface";
                                                     id = 'scatterSurface';
                                                     entityType = "surface";
-
-
                                                 }
-                                                let modModel = "mod_model=\x22markerType: "+locMdl.markerType+"; xpos:"+locMdl.x+"; ypos:"+locMdl.y+"; zpos:"+locMdl.z+"; timestamp: "+locMdl.timestamp+"; tags: "+locMdl.locationTags+"; scale:"+locMdl.markerObjScale+"; name:"+locMdl.name+"; description:"+locMdl.description+"; eventData:"+locMdl.eventData+"; modelID:"+m_assetID+";\x22";
+
+                                                let modModel = "mod_model=\x22markerType: "+locMdl.markerType+"; xscale:"+locMdl.xscale+"; yscale:"+locMdl.yscale+"; zscale:"+locMdl.zscale+"; xpos:"+locMdl.x+"; ypos:"+locMdl.y+"; zpos:"+locMdl.z+"; timestamp: "+locMdl.timestamp+"; tags: "+locMdl.locationTags+"; scale:"+locMdl.markerObjScale+"; name:"+locMdl.name+"; description:"+locMdl.description+"; eventData:"+locMdl.eventData+"; modelID:"+m_assetID+";\x22";
                                                 // let modMaterial = "";
                                                 if (locMdl.eventData.toLowerCase().includes("gallery")) {
                                                     // modModel = "mod_model_photo_gallery";  maybe later
@@ -4076,6 +4084,7 @@ webxr_router.get('/:_id', function (req, res) {
                 },
                 function (callback) {  //places scene pics (not in a group)
                     // var postcards = [];
+                    let scatterPics = sceneResponse.sceneTags.includes("scatter pics");
                     // console.log("sceneResponse.scenePictures: " + JSON.stringify(sceneResponse.scenePictures));
                     if (sceneResponse.scenePictures != null && sceneResponse.scenePictures.length > 0) {
                         var index = 0;

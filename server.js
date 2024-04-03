@@ -11737,92 +11737,214 @@ app.post('/add_scene_mods/:s_id', requiredAuthentication, admin, function (req, 
                     if (!scene.sceneTags.includes("no mods")) { //needs a param!
                         if (scene.user_id == req.body.userData._id) { //just scene owner for now
 
-                            console.log("user match for modz with colorMods " + JSON.stringify(req.body.colorMods) ); 
-                            let query = {};
-                            if (req.body.colorMods != null) {
-                                let sceneColor1 = req.body.colorMods.sceneColor1 != null ? req.body.colorMods.sceneColor1 : "";
-                                let sceneColor2 = req.body.colorMods.sceneColor2 != null ? req.body.colorMods.sceneColor2 : "";
-                                let sceneColor3 = req.body.colorMods.sceneColor3 != null ? req.body.colorMods.sceneColor3 : "";
-                                let sceneColor4 = req.body.colorMods.sceneColor4 != null ? req.body.colorMods.sceneColor4 : "";
-                                if (sceneColor1 != "") {
-                                    query.sceneColor1 = sceneColor1;
+                        // console.log("user match for modz with colorMods " + JSON.stringify(req.body.colorMods) ); 
+                        let query = {};
+                        let newFiles = []; 
+
+                        async.waterfall([
+
+                            function (callback) { 
+                                if (req.body.localFiles != null) {
+                                    console.log("tryna save localfiles: " + JSON.stringify(req.body.localFiles));
+                                    newfile = {};
+
+                                    async.each (req.body.localFiles, function (file, callbackz) {
+                                        let timestamp = Math.round(Date.now() / 1000);
+                                        console.log("gotsa file " + JSON.stringify(file));
+                                        if (getExtension(file.name) == ".glb") { //should sniff the thing instead, but...
+                                            s3.putObject({ Bucket: process.env.S3_ROOT_BUCKET_NAME, 
+                                                            Key: 'users/' + 
+                                                            scene.userID + "/gltf/" + timestamp + "_" + file.name, 
+                                                            Body: file.data }, 
+                                            function (error, data) {
+                                                if (error) {
+                                                    console.log("error uploading to s3! " + error);
+                                                    callbackz (error);
+                                                } else {
+                                                    console.log('uploaded ' + data);
+                                                    db.models.save({
+                                                        userID : req.session.user._id.toString(),
+                                                        username : req.session.user.userName,
+                                                        name : timestamp + "_" + file.name,
+                                                        filename : file.name,
+                                                        item_type : 'glb',
+                                                        tags: [],
+                                                        item_status: "private",
+                                                        otimestamp : timestamp,
+                                                        ofilesize : file.size },
+                                                    function (err, saved) {
+                                                        if ( err || !saved ) {
+                                                            console.log('glb not saved..');
+                                                            callbackz (err);
+                                                        } else {
+                                                            console.log("glb saved with id " + saved._id)
+                                                            newfile.name = file.name;
+                                                            newfile._id = saved._id;
+                                                            newFiles.push(newfile);
+                                                            callbackz(null);
+                                                        }
+                                                    });
+                                                }
+                                            });
+                                        } else if (getExtension(file.name) == "jpg") {
+ 
+                                        } else {
+                                            console.log("caint do that kinda file right now...");
+                                            callback("bad file type");
+                                        }
+                                    }, function(err) {
+                                        if (err) {
+                                            console.log('A file failed to process');
+                                            callback(err);
+                                        } else {
+                                            console.log('scene mod files have been processed successfully');
+                                            callback(null);
+                                        }    
+                                    });
+                                    // callback(null);
+                                } else {
+                                    // callback("scene mods oops");
+                                    callback(null);
                                 }
-                                if (sceneColor2 != "") {
-                                    query.sceneColor2 = sceneColor2;
-                                }
-                                if (sceneColor3 != "") {
-                                    query.sceneColor3 = sceneColor3;
-                                }
-                                if (sceneColor4 != "") {
-                                    query.sceneColor4 = sceneColor4;
-                                }
-                            }
-                            if (req.body.volumeMods != null) {
-                                query.scenePrimaryVolume = req.body.volumeMods.volumePrimary != null ? req.body.volumeMods.volumePrimary : 0;
-                                query.sceneAmbientVolume = req.body.volumeMods.volumeAmbient != null ? req.body.volumeMods.volumeAmbient : 0;
-                                query.sceneTriggerVolume = req.body.volumeMods.volumeTrigger != null ? req.body.volumeMods.volumeTrigger : 0;
-                            }
-                            if (req.body.locationMods != null) {
+                            }, 
+                            // function(err) {
+                                   
+                            //         if (err) {
+                            //             console.log('A file failed to process');
+                            //             callbackz(err);
+                            //         } else {
+                            //             console.log('All files have been processed successfully');
+                            //             scoresResponse.topscores = topscores;
+                            //             callback(null);
+                            //         }
+                            //     }
                                 
-                                for (let l = 0; l < req.body.locationMods.length; l++) {
-                                    let isMatch = false;
-                                    // let name = req.body.locationMods[i].name;
-                                    delete req.body.locationMods[l].isNew; //going to the cloud don't need these
-                                    delete req.body.locationMods[l].isLocal;
-                                    if (req.body.locationMods[l].name && req.body.locationMods[l].name.toLowerCase().includes("local ")) {
-                                        let name = req.body.locationMods[l].name.toLowerCase().replace("local ", "");
-                                        req.body.locationMods[l].name = name;
+                            
+                            // },  
+                            function (callback) { 
+                                if (req.body.colorMods != null) {
+                                    let sceneColor1 = req.body.colorMods.sceneColor1 != null ? req.body.colorMods.sceneColor1 : "";
+                                    let sceneColor2 = req.body.colorMods.sceneColor2 != null ? req.body.colorMods.sceneColor2 : "";
+                                    let sceneColor3 = req.body.colorMods.sceneColor3 != null ? req.body.colorMods.sceneColor3 : "";
+                                    let sceneColor4 = req.body.colorMods.sceneColor4 != null ? req.body.colorMods.sceneColor4 : "";
+                                    if (sceneColor1 != "") {
+                                        query.sceneColor1 = sceneColor1;
                                     }
-                                    
-                                    for (let i = 0; i < scene.sceneLocations.length; i++) {
-                                        if (req.body.locationMods[l].timestamp == scene.sceneLocations[i].timestamp) {
-                                            isMatch = true;
-                                            console.log("gotsa match with existing location! " + scene.sceneLocations[i].timestamp + " vs " + req.body.locationMods[l].timestamp);
-                                            let tsVar = null;
-                                            if (Number.isInteger(scene.sceneLocations[i].timestamp)) { // shit happens
-                                                tsVar = parseInt(req.body.locationMods[l].timestamp);
-                                            } else {
-                                                tsVar = req.body.locationMods[l].timestamp.toString();
-                                            }
-                                            if ((scene.sceneLocations[i].tags && scene.sceneLocations[i].tags.includes("no mods"))) {
-                                                console.log("mods not allowed for " + scene.sceneLocations[i].timestamp)
-                                            } else {
-                                                console.log("tryna update location item " + JSON.stringify(req.body.locationMods[l]));
-                                                db.scenes.update(
-                                                    { 'short_id': req.params.s_id, 'sceneLocations.timestamp': tsVar}, 
-                                                    { $set: { 'sceneLocations.$' : req.body.locationMods[l]} } //replaces whole object in array, uses positional $ operator https://docs.mongodb.com/manual/tutorial/update-documents/#Updating-The%24positionaloperator
-                                                )
+                                    if (sceneColor2 != "") {
+                                        query.sceneColor2 = sceneColor2;
+                                    }
+                                    if (sceneColor3 != "") {
+                                        query.sceneColor3 = sceneColor3;
+                                    }
+                                    if (sceneColor4 != "") {
+                                        query.sceneColor4 = sceneColor4;
+                                    }
+                                }
+                                if (req.body.volumeMods != null) {
+                                    query.scenePrimaryVolume = req.body.volumeMods.volumePrimary != null ? req.body.volumeMods.volumePrimary : 0;
+                                    query.sceneAmbientVolume = req.body.volumeMods.volumeAmbient != null ? req.body.volumeMods.volumeAmbient : 0;
+                                    query.sceneTriggerVolume = req.body.volumeMods.volumeTrigger != null ? req.body.volumeMods.volumeTrigger : 0;
+                                }
+                                callback(null);
+                            },
+                            function (callback) {
+                                if (req.body.locationMods != null) {
+                                     
+                                    for (let l = 0; l < req.body.locationMods.length; l++) {
+                                        let isMatch = false;
+                                        // let name = req.body.locationMods[i].name;
+                                        delete req.body.locationMods[l].isNew; //going to the cloud don't need these
+                                        delete req.body.locationMods[l].isLocal;
+                                        if (req.body.locationMods[l].name && req.body.locationMods[l].name.toLowerCase().includes("local ")) {
+                                            let name = req.body.locationMods[l].name.toLowerCase().replace("local ", "");
+                                            req.body.locationMods[l].name = name;
+                                        }
+                                        console.log("new files? " + req.body.locationMods[l].modelID + " V " + JSON.stringify(newFiles));
+                                        if (newFiles.includes(req.body.locationMods[l].modelID)) {
+                                            for (let i = 0; i < newFiles.length; i++) {
+                                                if (newFiles[i].name == req.body.locationMods[l].modelID) { //reassign modelID w/ new DB _id
+                                                    req.body.locationMods[l].modelID = newFiles[i]._id;
+                                                }
                                             }
                                         }
+                                        for (let i = 0; i < scene.sceneLocations.length; i++) { //TODO check if it's actually been modded?
+                                            if (req.body.locationMods[l].timestamp == scene.sceneLocations[i].timestamp) {
+                                                isMatch = true;
+                                                // console.log("gotsa match with existing location! " + scene.sceneLocations[i].timestamp + " vs " + req.body.locationMods[l].timestamp);
+                                                let tsVar = null;
+                                                if (Number.isInteger(scene.sceneLocations[i].timestamp)) { // shit happens
+                                                    tsVar = parseInt(req.body.locationMods[l].timestamp);
+                                                } else {
+                                                    tsVar = req.body.locationMods[l].timestamp.toString();
+                                                }
+                                                if ((scene.sceneLocations[i].tags && scene.sceneLocations[i].tags.includes("no mods"))) {
+                                                    console.log("mods not allowed for " + scene.sceneLocations[i].timestamp)
+                                                } else {
+                                                    // console.log("tryna update location item " + JSON.stringify(req.body.locationMods[l]));
+                                                    db.scenes.update(
+                                                        { 'short_id': req.params.s_id, 'sceneLocations.timestamp': tsVar}, 
+                                                        { $set: { 'sceneLocations.$' : req.body.locationMods[l]}} //replaces whole object in array, uses positional $ operator https://docs.mongodb.com/manual/tutorial/update-documents/#Updating-The%24positionaloperator
+                                                    );
+                                                }
+                                            }
+                                        }
+                                        if (!isMatch) {
+                                            console.log("no match with existing location, must be new " + req.body.locationMods[l].timestamp);
+                                            delete req.body.locationMods[l].isNew; //going to the cloud don't need these
+                                            delete req.body.locationMods[l].isLocal;
+                                            if (req.body.locationMods[l].name && req.body.locationMods[l].name.toLowerCase().includes("local ")) {
+                                                let name = req.body.locationMods[l].name.toLowerCase().replace("local ", "");
+                                                req.body.locationMods[l].name = name;
+                                            }
+                                            console.log("new files? " + req.body.locationMods[l].modelID + " V " + JSON.stringify(newFiles));
+                                            if (newFiles.includes(req.body.locationMods[l].modelID)) {
+                                                for (let i = 0; i < newFiles.length; i++) {
+                                                    if (newFiles[i].name == req.body.locationMods[l].modelID) { //reassign modelID w/ new DB _id
+                                                        req.body.locationMods[l].modelID = newFiles[i]._id;
+                                                    }
+                                                }
+                                            }
+                                            db.scenes.update(
+                                                { 'short_id': req.params.s_id},
+                                                { $push: { 'sceneLocations' : req.body.locationMods[l]} } 
+                                            )
+                                        }
                                     }
-                                    if (!isMatch) {
-                                        console.log("no match with existing location, must be new " + req.body.locationMods[l].timestamp);
-                                        db.scenes.update(
-                                            { 'short_id': req.params.s_id},
-                                            { $push: { 'sceneLocations' : req.body.locationMods[l]} } 
-                                        )
-                                    }
-                                }
-                            } 
+                                } 
+                                callback(null);
+                            }
+    
+                            ], //end of async.waterfall
+                            function (err, result) { // #last function, close async
+                            if (!err) {
+                                
+                                res.send("ok");
+                                // 
+                            } else {
+                                console.log("error saving scene mods : " + err );
+                                res.send(err);
+                            }
+                            });
                             // if (req.body.timedEventMods != null) {
                                 // console.log("tryna save timed events : " + JSON.stringify(query));
                             //     query.sceneTimedEvents = req.body.timedEventMods;
                             // }
-                            // db.scenes.update({ '_id': scene._id },
-                            //     { $set:
-                            //         query
-                            //     }
-                            // );
-                            db.scenes.update(
-                                { 'short_id': req.params.s_id},
-                                { $set: query } 
-                            )
-                            res.send("ok");
+
+                            // db.scenes.update(
+                            //     { 'short_id': req.params.s_id},
+                            //     { $set: query } 
+                            // )
+
+                            // res.send("ok");
+
+
                         } else {
                             console.log("tryna add_scene_mnods, but you aint the scene owner!");
+                            res.send("must be scene owner!!");
                         }
                     } else {
                         console.log("scene mods are not allowed!");
+                        res.send("mods not allowed for this");
                     }
                 }
             });
@@ -12806,7 +12928,7 @@ app.get('/uscene/:user_id/:scene_id',  requiredAuthentication, uscene, function 
                         var primaryOID = ObjectID.isValid(sceneData[0].scenePrimaryAudioID) ? ObjectID(sceneData[0].scenePrimaryAudioID) : "";
                         requestedAudioItems = [ triggerOID, ambientOID, primaryOID];
                         sceneResponse = sceneData[0];
-                        console.log("sceneScatterOffset is " + sceneResponse.sceneScatterOffset);
+                        // console.log("sceneScatterOffset is " + sceneResponse.sceneScatterOffset);
                         callback(null);
                     }
                 });
