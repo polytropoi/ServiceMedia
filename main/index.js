@@ -12347,7 +12347,8 @@ function getAllPeople() {
             let sceneVideos = (response.data.sceneVideos != undefined && response.data.sceneVideos != null) ? response.data.sceneVideos : ""; //ids
             let sceneTextItems = (response.data.sceneTextItems != undefined && response.data.sceneTextItems != null) ? response.data.sceneTextItems : ""; //ids
             let textItems = (response.data.textItems != undefined && response.data.textItems != null) ? response.data.textItems : ""; //ids
-            let pictures = (response.data.pictures != undefined && response.data.pictures != null) ? response.data.pictures : ""; 
+            let pictures = (response.data.pictures != undefined && response.data.pictures != null) ? response.data.pictures : ""; //single pics
+
             let sceneObjects = (response.data.sceneObjects != undefined && response.data.sceneObjects != null) ? response.data.sceneObjects : ""; //munged on server for request
             let sceneObjex = (response.data.sceneObjex != undefined && response.data.sceneObjex != null) ? response.data.sceneObjex : ""; //munged on server for request
             let sceneTargetObject = (response.data.sceneTargetObject != undefined && response.data.sceneTargetObject != null) ? response.data.sceneTargetObject : "";
@@ -12362,6 +12363,7 @@ function getAllPeople() {
             let vidGroupButtons = "";
             let objGroupButtons = "";
             let gltfSelect = "";
+            let allPix = [];
             let zone = new Date().toLocaleTimeString('en-us',{timeZoneName:'short'}).split(' ')[2];
 
             // console.log(sceneModelz);
@@ -12394,6 +12396,7 @@ function getAllPeople() {
                         console.log("checking for scenePictureGroups VS " + JSON.stringify(response.data.sceneGroups[j]) )
                         if (response.data.sceneGroups[j].type.toLowerCase().includes("picture") && response.data.scenePictureGroups[i] == response.data.sceneGroups[j]._id) {
                             // picGroups.push(response.data.sceneGroups[j]);
+                            console.log("pictureGroup " + JSON.stringify(response.data.sceneGroups[j]));
                             picGroupButtons = picGroupButtons + "<div class=\x22btn btn-dark btn-sm float-right\x22><a style=\x22color:white;\x22 target=\x22_blank\x22 role=\x22button\x22" +
                             "href=\x22index.html?type=group&iid="+response.data.sceneGroups[j]._id+"\x22>" +
                             "pic group:<strong> " +response.data.sceneGroups[j].name + 
@@ -12453,7 +12456,8 @@ function getAllPeople() {
                         "</div>" +
                     "</div>";
                     }
-                }    
+                }
+
             // let sceneTextItems = "";
             let text_items = "";
             if (textItems != null && textItems != undefined && textItems.length > 0 ) {

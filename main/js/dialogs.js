@@ -114,8 +114,12 @@ window.addEventListener( 'keydown',  ( event ) => {
     let string = e.target.value;
     let name = string.substring(12);
 
-    document.getElementById('selectedFileName').innerHTML = "selected file name: " + name;
-    document.getElementById('saveSelectedFileButton').style.visibility = "visible";
+    if (getExtension(name) == ".glb" || getExtension(name) == ".jpg") {
+      document.getElementById('selectedFileName').innerHTML = "selected file name: " + name;
+      document.getElementById('saveSelectedFileButton').style.visibility = "visible";
+    } else {
+      document.getElementById('selectedFileName').innerHTML = "invalid file type - only .glb and .jpg currently suppported";
+    }
   });
   $('#modalContent').on('click', '#saveSelectedFileButton', function(e) {
     console.log("importFileButton clicked " + e.target.value);

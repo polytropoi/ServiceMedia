@@ -292,6 +292,7 @@ webxr_router.get('/:_id', function (req, res) {
     var sceneResponse = {};
     var requestedPictureItems = [];
     var requestedPictureGroups = [];
+    let allPictures = [];
     var requestedVideoGroups = [];
     var requestedAudioItems = [];
     var requestedVideoItems = [];
@@ -900,6 +901,7 @@ webxr_router.get('/:_id', function (req, res) {
                                 // console.log("scenePIcture " + picture);
                                 var p_id = ObjectID(picture); //convert to binary to search by _id beloiw
                                 requestedPictureItems.push(p_id); //populate array
+
                             });
                         }
                         
@@ -4007,14 +4009,17 @@ webxr_router.get('/:_id', function (req, res) {
                                     } else {
                                         async.each(images, function(image, cbimage) { //jack in a signed url for each
                                             (async () => {
+                                                // allPictures.push(image);
                                                 if (image.orientation != null && image.orientation != undefined && image.orientation.toLowerCase() == "equirectangular") { 
                                                     skyboxIDs.push(image._id);
                                                     // image.url = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + image.userID + "/pictures/originals/" + image._id + ".original." + image.filename, Expires: 6000});
                                                     image.url = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, 'users/' + image.userID + "/pictures/originals/" + image._id + ".original." + image.filename, 6000);
+                                                    allPictures.push(image);
                                                     cbimage();
                                                 } else {
                                                     // image.url = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + image.userID + "/pictures/" + image._id + ".standard." + image.filename, Expires: 6000}); //i.e. 1024
                                                     image.url = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, 'users/' + image.userID + "/pictures/" + image._id + ".standard." + image.filename, 6000);
+                                                    allPictures.push(image);
                                                     cbimage();
                                                 }
                                             })();
@@ -4084,7 +4089,7 @@ webxr_router.get('/:_id', function (req, res) {
                 },
                 function (callback) {  //places scene pics (not in a group)
                     // var postcards = [];
-                    let scatterPics = sceneResponse.sceneTags.includes("scatter pics");
+                    let scatterPics = false;
                     // console.log("sceneResponse.scenePictures: " + JSON.stringify(sceneResponse.scenePictures));
                     if (sceneResponse.scenePictures != null && sceneResponse.scenePictures.length > 0) {
                         var index = 0;
@@ -4100,6 +4105,7 @@ webxr_router.get('/:_id', function (req, res) {
                                         callbackz();
                                     } else {
                                         // console.log("gotsa picture_item " + JSON.stringify(picture_item));
+                                        
                                         (async () => {
 
                                             var version = ".standard.";
@@ -4160,8 +4166,9 @@ webxr_router.get('/:_id', function (req, res) {
                                                 console.log("GOTSA TILEABLE PIC! " + tilepicUrl);
                                             }
                                             // image1url = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, 'users/' + picture_item.userID + "/pictures/" + picture_item._id + ".standard." + picture_item.filename, 6000);
-                                            picArray.push(image1url);
-                                            
+                                            // picArray.push(image1url);
+                                            picture_item.url = image1url;
+                                            allPictures.push(picture_item);
                                             imageAssets = imageAssets + "<img id=\x22smimage" + index + "\x22 crossorigin=\x22anonymous\x22 src='" + image1url + "'>";
                                             let caption = "";
                                             if (picture_item.captionUpper != null && picture_item.captionUpper != undefined) {
@@ -4171,7 +4178,7 @@ webxr_router.get('/:_id', function (req, res) {
                                             let actionCall = "";
                                             let link = "";
                                             let lookat = " look-at=\x22#player\x22 ";
-                                            console.log("picLocations taken: " + picLocationsPlaced);
+                                            // console.log("picLocations taken: " + picLocationsPlaced);
                                             
                                             if (picIndex < locationPictures.length) {
                                                 position = locationPictures[picIndex].loc;
@@ -4184,7 +4191,11 @@ webxr_router.get('/:_id', function (req, res) {
 
                                                 }
                                                 picIndex++;
-                                            } 
+                                            } else {
+                                                if (sceneResponse.sceneTags.includes("scatter pics")) {
+                                                    scatterPics = true; //use cooked positions above, not assigned locations
+                                                }
+                                            }
                                         
                                             if (picture_item.linkType != undefined && picture_item.linkType.toLowerCase() != "none") {
                                                 if (picture_item.linkType == "NFT") { //never mind, these are old image target fu

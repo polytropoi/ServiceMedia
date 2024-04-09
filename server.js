@@ -11742,70 +11742,88 @@ app.post('/add_scene_mods/:s_id', requiredAuthentication, admin, function (req, 
                         let newFiles = []; 
 
                         async.waterfall([
-
                             function (callback) { 
                                 if (req.body.localFiles != null) {
-                                    console.log("tryna save localfiles: " + JSON.stringify(req.body.localFiles));
+                                    // console.log("tryna save localfiles: " + JSON.stringify(req.body.localFiles));
                                     newfile = {};
 
                                     async.each (req.body.localFiles, function (file, callbackz) {
                                         let timestamp = Math.round(Date.now() / 1000);
-                                        console.log("gotsa file " + JSON.stringify(file));
-                                        if (getExtension(file.name) == ".glb") { //should sniff the thing instead, but...
-                                            s3.putObject({ Bucket: process.env.S3_ROOT_BUCKET_NAME, 
-                                                            Key: 'users/' + 
-                                                            scene.userID + "/gltf/" + timestamp + "_" + file.name, 
-                                                            Body: file.data }, 
-                                            function (error, data) {
-                                                if (error) {
-                                                    console.log("error uploading to s3! " + error);
-                                                    callbackz (error);
-                                                } else {
-                                                    console.log('uploaded ' + data);
-                                                    db.models.save({
-                                                        userID : req.session.user._id.toString(),
-                                                        username : req.session.user.userName,
-                                                        name : timestamp + "_" + file.name,
-                                                        filename : file.name,
-                                                        item_type : 'glb',
-                                                        tags: [],
-                                                        item_status: "private",
-                                                        otimestamp : timestamp,
-                                                        ofilesize : file.size },
-                                                    function (err, saved) {
-                                                        if ( err || !saved ) {
-                                                            console.log('glb not saved..');
-                                                            callbackz (err);
+                                        console.log("gotsa uploaded localfile " + file.name);
+                                        // (async () => {
+                                            let buffer = Buffer.from(file.data, 'base64');
+                                            
+                                            if (getExtension(file.name) == ".glb") { //should sniff the thing instead, but...
+                                                // let buff = Buffer.from(file.data, 'base64');
+                                                let awskey = 'users/' + req.session.user._id.toString() + '/gltf/' + timestamp + '_' + file.name;
+                                                let params = { Bucket: process.env.S3_ROOT_BUCKET_NAME, 
+                                                    Key: awskey, 
+                                                    // ContentEncoding: 'base64',
+                                                    ContentType: 'application/octet-stream',
+                                                    Body: buffer};
+                                                    console.log("tryna upload w/key " + awskey);
+                   
+                                                    s3.upload(params, function(err, data) {
+                                                        if (err) {
+
+                                                          console.log("Error uploading data. ", err);
+                                                          callbackz(err)
                                                         } else {
-                                                            console.log("glb saved with id " + saved._id)
-                                                            newfile.name = file.name;
-                                                            newfile._id = saved._id;
-                                                            newFiles.push(newfile);
-                                                            callbackz(null);
+                                                          console.log("Success uploading data " + JSON.stringify(data));
+                                                          console.log('uploaded ' + file.name);
+                                                          db.models.save({
+                                                              userID : req.session.user._id.toString(),
+                                                              username : req.session.user.userName,
+                                                              name : timestamp + "_" + file.name,
+                                                              filename : timestamp + "_" + file.name,
+                                                              item_type : 'glb',
+                                                              tags: [],
+                                                              item_status: "private",
+                                                              otimestamp : timestamp,
+                                                              ofilesize : file.size },
+                                                                function (err, saved) {
+                                                                    if ( err || !saved ) {
+                                                                        console.log('glb not saved..');
+                                                                        callbackz (err);
+                                                                    } else {
+                                                                        console.log("glb saved with id " + saved._id)
+                                                                        newfile.name = file.name;
+                                                                        newfile._id = saved._id;
+                                                                        newFiles.push(newfile);
+                                                                        callbackz();
+                                                                    }
+                                                            });
                                                         }
                                                     });
+    
+                                                 
+                                                    
+                                                } else if (getExtension(file.name) == "jpg") {
+                                                    callbackz("bad file type");
+                                                } else {
+                                                    console.log("caint do that kinda file right now...");
+                                                    callbackz("bad file type");
                                                 }
+                                            
+                                            },  function(err) {
+                                                if (err) {
+                                                    console.log('A file failed to process');
+                                                    callback(err);
+                                                } else {
+                                                    console.log('scene mod files have been processed successfully');
+                                                    callback(null);
+                                                }
+                                            
+                                                
                                             });
-                                        } else if (getExtension(file.name) == "jpg") {
- 
-                                        } else {
-                                            console.log("caint do that kinda file right now...");
-                                            callback("bad file type");
-                                        }
-                                    }, function(err) {
-                                        if (err) {
-                                            console.log('A file failed to process');
-                                            callback(err);
-                                        } else {
-                                            console.log('scene mod files have been processed successfully');
-                                            callback(null);
-                                        }    
-                                    });
-                                    // callback(null);
-                                } else {
-                                    // callback("scene mods oops");
-                                    callback(null);
                                 }
+                                // // }
+                                //     // callback(null);
+                                // } else {
+                                //     // callback("scene mods oops");
+                                //     callback(null);
+                                // }
+
                             }, 
                             // function(err) {
                                    

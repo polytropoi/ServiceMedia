@@ -495,12 +495,17 @@ const getFileFromInput = () => {
 };
 
 const ConvertAndSaveLocalFile = async () => {
-   let file = await getFileFromInput()
-   SaveLocalFile(file);
-	// filedb = await initIndexedDb('SMXR', [{ name: storeName, keyPath: storeKey }]);
-	// renderAvailableImagesFromDb();
+   let file = await getFileFromInput();
+   if (getExtension(file.name) == ".glb" || getExtension(file.name) == ".jpg") {
+      console.log("tryna save a local file " + file.name);
+      SaveLocalFile(file);
+      // filedb = await initIndexedDb('SMXR', [{ name: storeName, keyPath: storeKey }]);
+      // renderAvailableImagesFromDb();
 
-	await renderStorageQuotaInfo();
+      await renderStorageQuotaInfo();
+   } else {
+      console.log("only .glb or .jpg files currently supported");
+   }
 
 }
 const InitLocalFiles = async () => {
