@@ -2102,7 +2102,7 @@ webxr_router.get('/:_id', function (req, res) {
             
                 function (callback) {
                     var modelz = [];
-                //    console.log("sceneModels : " + JSON.stringify(sceneResponse.sceneModels));
+                   console.log("sceneModels : " + JSON.stringify(sceneResponse.sceneModels));
                     if (sceneResponse.sceneModels != null) {
                         async.each (sceneResponse.sceneModels, function (objID, callbackz) { //nested async-ery!
                             var oo_id = ObjectID(objID);
@@ -2112,7 +2112,7 @@ webxr_router.get('/:_id', function (req, res) {
                                     console.log("error getting model: " + objID); //todo - report? //TODO remove from sceneModels!
                                     callbackz();
                                 } else {
-                                    // console.log("got user model:" + model._id);
+                                    console.log("got user model:" + model.filename);
                                     if (minioClient) {
 
                                         minioClient.presignedGetObject(process.env.S3_ROOT_BUCKET_NAME, 'users/' + model.userID + "/gltf/" + model.filename, 6000, function(err, presignedUrl) { //use callback version here, can't await?
@@ -2128,7 +2128,9 @@ webxr_router.get('/:_id', function (req, res) {
                                     } else { 
                                         let url = s3.getSignedUrl('getObject', {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: 'users/' + model.userID + "/gltf/" + model.filename, Expires: 6000});
                                         model.url = url;
+                                        console.log("pushing model " + JSON.stringify(model))
                                         modelz.push(model);
+
                                         callbackz();
                                     }
                                 }
@@ -2663,7 +2665,7 @@ webxr_router.get('/:_id', function (req, res) {
                                 && sceneResponse.sceneModels.indexOf(locMdl.modelID) != -1) {
 
                                 // console.log("tryna set model id:  " + JSON.stringify(locMdl));
-                                // console.log("gots a mod_model : " + locMdl.name);
+                                console.log("gots a mod_model : " + locMdl.name);
                                 const m_id = ObjectID(locMdl.modelID);
                                 // 
                                 db.models.findOne({"_id": m_id}, function (err, asset) { 

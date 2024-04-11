@@ -9524,7 +9524,7 @@ app.get('/userpic/:p_id', requiredAuthentication, function(req, res) {
             var expiration = new Date();
             expiration.setMinutes(expiration.getMinutes() + 30);
             var baseName = path.basename(item_string_filename, (item_string_filename_ext));
-            console.log(baseName);
+            console.log("user pic basename: " + baseName);
             var thumbName = 'thumb.' + baseName + item_string_filename_ext;
             var halfName = 'half.' + baseName + item_string_filename_ext;
             var standardName = 'standard.' + baseName + item_string_filename_ext;
@@ -9575,19 +9575,30 @@ app.get('/userpic/:p_id', requiredAuthentication, function(req, res) {
                     } else {
                         console.log("found that orig pic");
                         urlOriginal = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/originals/" + picture_item._id + "." + originalName, Expires: 6000}); 
-                        picture_item.URLthumb = urlThumb; //jack in teh signed urls into the object array
-                        picture_item.URLhalf = urlHalf;
-                        picture_item.URLstandard = urlStandard;
-                        picture_item.URLoriginal = urlOriginal;
-                        picture_item.URLtarget = urlTarget;
-                        // console.log("urlTarget " + urlTarget);
-                        if (picture_item.orientation != null && picture_item.orientation != undefined && picture_item.orientation.toLowerCase() == "equirectangular") {
-                            //return cubemaps?  
-                            res.json(picture_item);
-
-                        } else {
-                            res.json(picture_item);
-                        }
+                        var params = {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + "." + standardName};
+                        s3.headObject(params, function(err, data) { //uploaded localfiles haven't been resized yet, only .original. has been saved
+                            if (err) {
+                                picture_item.URLthumb = "missing"; //jack in teh signed urls into the object array
+                                picture_item.URLhalf = "missing";
+                                picture_item.URLstandard = "missing";
+                                picture_item.URLoriginal = urlOriginal;
+                                picture_item.URLtarget = "missing";
+                                // console.log("urlTarget " + urlTarget);
+                   
+                                res.json(picture_item);
+                            } else {
+                                picture_item.URLthumb = urlThumb; //jack in teh signed urls into the object array
+                                picture_item.URLhalf = urlHalf;
+                                picture_item.URLstandard = urlStandard;
+                                picture_item.URLoriginal = urlOriginal;
+                                picture_item.URLtarget = urlTarget;
+                                // console.log("urlTarget " + urlTarget);
+                   
+                                res.json(picture_item);
+                            }
+                            
+                        });
+                        
                     }
                     });
                 }
@@ -11744,78 +11755,131 @@ app.post('/add_scene_mods/:s_id', requiredAuthentication, admin, function (req, 
                         async.waterfall([
                             function (callback) { 
                                 if (req.body.localFiles != null) {
-                                    // console.log("tryna save localfiles: " + JSON.stringify(req.body.localFiles));
-                                    newfile = {};
+                                // console.log("tryna save localfiles: " + JSON.stringify(req.body.localFiles));
+                                newfile = {};
 
-                                    async.each (req.body.localFiles, function (file, callbackz) {
-                                        let timestamp = Math.round(Date.now() / 1000);
-                                        console.log("gotsa uploaded localfile " + file.name);
-                                        // (async () => {
-                                            let buffer = Buffer.from(file.data, 'base64');
-                                            
-                                            if (getExtension(file.name) == ".glb") { //should sniff the thing instead, but...
-                                                // let buff = Buffer.from(file.data, 'base64');
-                                                let awskey = 'users/' + req.session.user._id.toString() + '/gltf/' + timestamp + '_' + file.name;
-                                                let params = { Bucket: process.env.S3_ROOT_BUCKET_NAME, 
-                                                    Key: awskey, 
-                                                    // ContentEncoding: 'base64',
-                                                    ContentType: 'application/octet-stream',
-                                                    Body: buffer};
-                                                    console.log("tryna upload w/key " + awskey);
-                   
-                                                    s3.upload(params, function(err, data) {
-                                                        if (err) {
-
-                                                          console.log("Error uploading data. ", err);
-                                                          callbackz(err)
-                                                        } else {
-                                                          console.log("Success uploading data " + JSON.stringify(data));
-                                                          console.log('uploaded ' + file.name);
-                                                          db.models.save({
-                                                              userID : req.session.user._id.toString(),
-                                                              username : req.session.user.userName,
-                                                              name : timestamp + "_" + file.name,
-                                                              filename : timestamp + "_" + file.name,
-                                                              item_type : 'glb',
-                                                              tags: [],
-                                                              item_status: "private",
-                                                              otimestamp : timestamp,
-                                                              ofilesize : file.size },
-                                                                function (err, saved) {
-                                                                    if ( err || !saved ) {
-                                                                        console.log('glb not saved..');
-                                                                        callbackz (err);
-                                                                    } else {
-                                                                        console.log("glb saved with id " + saved._id)
-                                                                        newfile.name = file.name;
-                                                                        newfile._id = saved._id;
-                                                                        newFiles.push(newfile);
-                                                                        callbackz();
-                                                                    }
-                                                            });
-                                                        }
-                                                    });
-    
-                                                 
-                                                    
-                                                } else if (getExtension(file.name) == "jpg") {
-                                                    callbackz("bad file type");
-                                                } else {
-                                                    console.log("caint do that kinda file right now...");
-                                                    callbackz("bad file type");
-                                                }
-                                            
-                                            },  function(err) {
+                                async.each (req.body.localFiles, function (file, callbackz) {
+                                    let timestamp = Math.round(Date.now() / 1000);
+                                    console.log("gotsa uploaded localfile " + file.name);
+                                    // (async () => {
+                                    let buffer = Buffer.from(file.data, 'base64');
+                                    
+                                    if (getExtension(file.name) == ".glb") { //should sniff the thing instead, but...
+                                        // let buff = Buffer.from(file.data, 'base64');
+                                        let awskey = 'users/' + req.session.user._id.toString() + '/gltf/' + timestamp + '_' + file.name;
+                                        let params = { Bucket: process.env.S3_ROOT_BUCKET_NAME, 
+                                            Key: awskey, 
+                                            // ContentEncoding: 'base64',
+                                            ContentType: 'application/octet-stream',
+                                            Body: buffer};
+                                            console.log("tryna upload w/key " + awskey);
+            
+                                            s3.upload(params, function(err, data) { //upload model
                                                 if (err) {
-                                                    console.log('A file failed to process');
-                                                    callback(err);
+
+                                                    console.log("Error uploading data. ", err);
+                                                    callbackz(err)
                                                 } else {
-                                                    console.log('scene mod files have been processed successfully');
-                                                    callback(null);
+                                                    console.log("Success uploading data " + JSON.stringify(data));
+                                                    console.log('uploaded ' + file.name);
+                                                    db.models.save({ //add to models collection
+                                                        userID : req.session.user._id.toString(),
+                                                        username : req.session.user.userName,
+                                                        name : timestamp + "_" + file.name,
+                                                        filename : timestamp + "_" + file.name,
+                                                        item_type : 'glb',
+                                                        tags: [],
+                                                        item_status: "private",
+                                                        otimestamp : timestamp,
+                                                        ofilesize : file.size },
+                                                        function (err, saved) {
+                                                            if ( err || !saved ) {
+                                                                console.log('glb not saved..');
+                                                                callbackz (err);
+                                                            } else {
+                                                                console.log("glb saved with id " + saved._id)
+                                                                newfile.name = file.name.replace("local_","");
+                                                                
+                                                                newfile._id = saved._id;
+                                                                newFiles.push(newfile);
+                                                                var s_id = ObjectID(scene._id);   
+                                                                var sceneModels = (scene.sceneModels != undefined && scene.sceneModels != null && scene.sceneModels.length > 0) ? scene.sceneModels : new Array();
+                                                                // console.log("XXX sceneModels: " + JSON.stringify(sceneModels));
+                                                                sceneModels.push(saved._id);
+                                                                db.scenes.update({ "_id": s_id }, { $set: {sceneModels: sceneModels}}); //add model to scene
+                                                                callbackz();
+                                                            }
+                                                    });
                                                 }
-                                            
-                                                
                                             });
+                                            
+                                        } else if (getExtension(file.name) == ".jpg" || getExtension(file.name) == ".png") { 
+                                            let hasAlpha = false;
+                                            if (getExtension(file.name) == ".png") {
+                                                hasAlpha = true;
+                                            }
+
+                                            db.image_items.save({ //do the db first for this one, bc we needs the _id for naming pattern below(really?)
+                                                type : "fromLocalFile",
+                                                userID : req.session.user._id.toString(),
+                                                userName : req.session.user.userName,
+                                                title : file.name,
+                                                filename : file.name,
+                                                item_type : 'picture',
+                                                tags: [],
+                                                item_status: "private",
+                                                hasAlphaChannel: hasAlpha,
+                                                otimestamp : timestamp,
+                                                ofilesize : file.size },
+                                                // function (err, saved) {
+                                                function (err, saved) {
+                                                    if ( err || !saved ) {
+                                                        console.log('glb not saved..');
+                                                        callbackz (err);
+                                                    } else {
+                                                        console.log("jpg saved with id " + saved._id)
+                                                        newfile.name = file.name;
+                                                        newfile.name.replace("local_","");
+                                                        newfile._id = saved._id;
+                                                        newFiles.push(newfile);
+                                                        let awskey = 'users/' + req.session.user._id.toString() + '/pictures/originals/' + saved._id + '.original.' + file.name;
+
+                                                        let params = { Bucket: process.env.S3_ROOT_BUCKET_NAME, 
+                                                            Key: awskey, 
+                                                            // ContentEncoding: 'base64',
+                                                            ContentType: 'application/octet-stream',
+                                                            Body: buffer};
+                                                            s3.upload(params, function(err, data) { //upload
+                                                                if (err) {
+        
+                                                                    console.log("Error uploading data. ", err);
+                                                                    callbackz(err)
+                                                                } else {
+                                                                    console.log("Success uploading data " + JSON.stringify(data));
+                                                                    console.log('uploaded ' + file.name);
+                                                                    callbackz();
+                                                                }
+                                                            });
+                                                    }
+                                                });
+                                                
+
+                                        } else {
+                                            console.log("caint do that kinda file right now...");
+                                            callbackz("bad file type");
+                                        }
+                                    
+                                    },  function(err) {
+                                        if (err) {
+                                            console.log('A file failed to process');
+                                            callback(err);
+                                        } else {
+                                            console.log('scene mod files have been processed successfully');
+                                            callback(null);
+                                        }
+                                    
+                                        
+                                    });
                                 }
                                 // // }
                                 //     // callback(null);
@@ -11836,8 +11900,6 @@ app.post('/add_scene_mods/:s_id', requiredAuthentication, admin, function (req, 
                             //             callback(null);
                             //         }
                             //     }
-                                
-                            
                             // },  
                             function (callback) { 
                                 if (req.body.colorMods != null) {
@@ -11877,10 +11939,11 @@ app.post('/add_scene_mods/:s_id', requiredAuthentication, admin, function (req, 
                                             let name = req.body.locationMods[l].name.toLowerCase().replace("local ", "");
                                             req.body.locationMods[l].name = name;
                                         }
-                                        console.log("new files? " + req.body.locationMods[l].modelID + " V " + JSON.stringify(newFiles));
-                                        if (newFiles.includes(req.body.locationMods[l].modelID)) {
+                                        console.log("has newfile? " + req.body.locationMods[l].modelID + " Vs " + JSON.stringify(newFiles));
+                                        if (req.body.locationMods[l].modelID) {
                                             for (let i = 0; i < newFiles.length; i++) {
-                                                if (newFiles[i].name == req.body.locationMods[l].modelID) { //reassign modelID w/ new DB _id
+                                                if (newFiles[i].name == req.body.locationMods[l].modelID.replace("local_", "")) { //reassign modelID w/ new DB _id
+                                                    console.log("gotsa newfile match! " + newFiles[i].name);
                                                     req.body.locationMods[l].modelID = newFiles[i]._id;
                                                 }
                                             }
@@ -11914,10 +11977,11 @@ app.post('/add_scene_mods/:s_id', requiredAuthentication, admin, function (req, 
                                                 let name = req.body.locationMods[l].name.toLowerCase().replace("local ", "");
                                                 req.body.locationMods[l].name = name;
                                             }
-                                            console.log("new files? " + req.body.locationMods[l].modelID + " V " + JSON.stringify(newFiles));
+                                            console.log("new loc new files? " + req.body.locationMods[l].modelID + " V " + JSON.stringify(newFiles));
                                             if (newFiles.includes(req.body.locationMods[l].modelID)) {
                                                 for (let i = 0; i < newFiles.length; i++) {
-                                                    if (newFiles[i].name == req.body.locationMods[l].modelID) { //reassign modelID w/ new DB _id
+                                                    if (newFiles[i].name == req.body.locationMods[l].modelID.replace("local_","")) { //reassign modelID w/ new DB _id
+                                                        console.log("gotsa match new loc new model!");
                                                         req.body.locationMods[l].modelID = newFiles[i]._id;
                                                     }
                                                 }
@@ -12027,9 +12091,7 @@ app.post('/add_scene_model/', requiredAuthentication, function (req, res) {
         if (err || !scene) {
             console.log("error getting sceneert 4 obj: " + err);
         } else {
-
             if (scene.sceneModels != null && scene.sceneModels.indexOf(req.body.model_id) > -1) {
-                //In the array!
                 res.send("duplicate models not allowed!")
             } else {
                 db.models.findOne({ "_id": p_id}, function (err, model) {
@@ -13235,17 +13297,22 @@ app.get('/uscene/:user_id/:scene_id',  requiredAuthentication, uscene, function 
                 var modelz = [];
 //                console.log("sceneObjects : " + JSON.stringify(sceneResponse.sceneObjects));
                 if (sceneResponse.sceneModels != null) {
-                    async.each (sceneResponse.sceneModels, function (objID, callbackz) { //nested async-ery!
+                    async.each (sceneResponse.sceneModels, function (objID, callbackz) { 
                         var oo_id = ObjectID(objID);
                         console.log("7798 tryna get sceneModels: " + objID);
                         db.models.findOne({"_id": oo_id}, function (err, model) {
                             if (err || !model) {
                                 console.log("error getting model: " + err);
+                                let model = {};
+                                model.url = "missing"; //so it's deletable from scene view
+                                model._id = objID; 
+                                modelz.push(model);
                                 callbackz();
                             } else {
                                 // console.log("got user models:" + JSON.stringify(models));
                                 let url = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + model.userID + "/gltf/" + model.filename, Expires: 6000});
                                 model.url = url;
+                                console.log("pushing to sceneModelz " + JSON.stringify(model));
                                 modelz.push(model);
                                 callbackz();
                             }
@@ -17405,7 +17472,7 @@ app.post('/delete_picture/', requiredAuthentication, function (req, res){ //TODO
     var o_id = ObjectID(pic_id);   
 
     db.image_items.find({ "_id" : o_id}, function(err, pic_item) {
-        if (err || !pic_item) {
+        if (err || !pic_item || pic_item[0].filename == undefined) {
             console.log("error getting picture item: " + err);
         } else {
             var item_string_filename = pic_item[0].filename;

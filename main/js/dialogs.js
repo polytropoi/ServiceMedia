@@ -807,6 +807,8 @@ function ReturnLocationMarkerTypeSelect (selected) {
     const typesArray = [
       "none",
       "placeholder",
+      "model",
+      "object",
       "poi",
       "waypoint",
       "trigger",
@@ -818,8 +820,7 @@ function ReturnLocationMarkerTypeSelect (selected) {
       "light",
       "player",
       "character",
-      "model",
-      "object",
+     
       "surface",
       "navmesh",
       "floorplane",

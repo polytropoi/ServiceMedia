@@ -15356,21 +15356,36 @@ function getAllPeople() {
                         if (sceneModelz != null && sceneModelz != undefined && sceneModelz.length > 0) {
 
                             // console.log(JSON.stringify(sceneModelz));
+                            // let validModelReference = false;
                             for (let h = 0; h < sceneLocations.length; h++) {
-                                const y = document.getElementById("modelSelect_" + sceneLocations[h].timestamp);
-                                for (let j = 0; j < sceneModelz.length; j++) {
-                                    // console.log(sceneModelz[j].name);
-                                    if (sceneModelz[j].name != undefined) {
-                                    var option = document.createElement("option"); 
-                                    option.text = sceneModelz[j].name;
-                                    option.value = sceneModelz[j]._id;
-                                    if (sceneModelz[j].name == sceneLocations[h].model) {
-                                        option.selected = true;
-                                    } 
-                                    y.add(option);
+                                if (sceneModels.includes(sceneLocations[h].modelID)) { //they might gets deleted!
+                                    const y = document.getElementById("modelSelect_" + sceneLocations[h].timestamp);
+                                    for (let j = 0; j < sceneModelz.length; j++) {
+                                        console.log("sceneModel:  "+ sceneModelz[j].name +" vs "+ sceneLocations[h].model);
+                                        if (sceneModelz[j].name != undefined) { //why name instead of _id?
+                                        var option = document.createElement("option"); 
+                                        option.text = sceneModelz[j].name;
+                                        option.value = sceneModelz[j]._id;
+                                        if (sceneModelz[j].name == sceneLocations[h].model) {
+                                            option.selected = true;
+                                            // validModelReference = true;
+                                        } 
+                                        y.add(option);
+                                        }
                                     }
+                                } else {
+                                    console.log(sceneLocations[h].model + " not found!");
+                                    sceneLocations[h].modelID = "none";
+                                    sceneLocations[h].model = "none";
+
                                 }
+                                // if (h == sceneLocations.length - 1) {
+                                //     if (!validModelReference) {
+                                //         console.log("invalid model reference!");
+                                //     } 
+                                // }
                             }
+                            
                         }
                     // })
                     // .then(function() { //populate objex from db
