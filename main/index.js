@@ -15355,30 +15355,34 @@ function getAllPeople() {
                     let reloadOnSubmit = false;
                         if (sceneModelz != null && sceneModelz != undefined && sceneModelz.length > 0) {
 
-                            // console.log(JSON.stringify(sceneModelz));
+                            console.log("sceneModelz: " + JSON.stringify(sceneModelz) +" vs "+ JSON.stringify(sceneModels));
                             // let validModelReference = false;
                             for (let h = 0; h < sceneLocations.length; h++) {
-                                if (sceneModels.includes(sceneLocations[h].modelID)) { //they might gets deleted!
+                                console.log("gotsa location for modelSelector : " + JSON.stringify(sceneLocations[h]));
+                                // if (sceneModels.includes(sceneLocations[h].modelID)) { //they might gets deleted!
+                                // let modelID = sceneLocations[h].modelID;
+                                // let idIndex = sceneModels.indexOf(modelID);
+                                // if (idIndex != -1) {
                                     const y = document.getElementById("modelSelect_" + sceneLocations[h].timestamp);
                                     for (let j = 0; j < sceneModelz.length; j++) {
                                         console.log("sceneModel:  "+ sceneModelz[j].name +" vs "+ sceneLocations[h].model);
-                                        if (sceneModelz[j].name != undefined) { //why name instead of _id?
+                                        if (sceneModelz[j]._id != undefined) { //why name instead of _id?
                                         var option = document.createElement("option"); 
                                         option.text = sceneModelz[j].name;
                                         option.value = sceneModelz[j]._id;
-                                        if (sceneModelz[j].name == sceneLocations[h].model) {
+                                        if (sceneModelz[j]._id == sceneLocations[h].modelID) {
                                             option.selected = true;
                                             // validModelReference = true;
                                         } 
                                         y.add(option);
                                         }
                                     }
-                                } else {
-                                    console.log(sceneLocations[h].model + " not found!");
-                                    sceneLocations[h].modelID = "none";
-                                    sceneLocations[h].model = "none";
+                                // } else {
+                                //     console.log(sceneLocations[h].modelID + " not found!");
+                                //     // sceneLocations[h].modelID = "none";
+                                //     // sceneLocations[h].model = "none";
 
-                                }
+                                // }
                                 // if (h == sceneLocations.length - 1) {
                                 //     if (!validModelReference) {
                                 //         console.log("invalid model reference!");

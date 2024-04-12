@@ -1060,6 +1060,9 @@ webxr_router.get('/:_id', function (req, res) {
                                         || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "3D text" 
                                         || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "light"  
                                         || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "link"  
+                                         
+                                        || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "picture"  
+                                        || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "picture group"  
                                         || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "mailbox") {
                                     //    locationPlaceholders.push(sceneResponse.sceneLocations[i].x + " " + sceneResponse.sceneLocations[i].y + " " + zFix);
                                         let tLoc = sceneResponse.sceneLocations[i];

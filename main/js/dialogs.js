@@ -2730,7 +2730,8 @@ var PlayDialogLoop = function(arr) {
             addToSceneButton.classList.add('btn', 'btn-danger');
             addToSceneButton.innerText = 'Add to Scene';
             addToSceneButton.addEventListener('click', () => {
-              addToScene(localData.localFiles[file].name);
+              // addToScene(localData.localFiles[file].name);
+              CreatePlaceholder("local_" + localData.localFiles[file].name, 'model');
             });
             
           
@@ -2789,7 +2790,7 @@ var PlayDialogLoop = function(arr) {
             addToSceneButton.classList.add('btn', 'btn-danger');
             addToSceneButton.innerText = 'Add to Scene';
             addToSceneButton.addEventListener('click', () => {
-              AddFileToScene(localData.localFiles[file].name);
+              CreatePlaceholder("local_" + localData.localFiles[file].name, 'picture');
             });
             
             cardBody.appendChild(title);

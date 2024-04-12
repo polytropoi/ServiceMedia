@@ -1355,8 +1355,17 @@ function LocationRowClick(data) {
 
 
 
-function CreatePlaceholder () { //New Location button
-
+function CreatePlaceholder (filename, type) { //New Location button, also addToScene button for localfiles
+   console.log("trynsa createPlaceholder with file " + filename + " type " + type);
+   let markertype = "placeholder";
+   let modelID = "none";
+   let mediaID = "none";
+   if (filename && type) {
+      markertype = type;
+      if (type == "model") {
+         modelID = filename;
+      }
+   }
    console.log("tryna create place3holder");
    let newPosition = new THREE.Vector3(); 
    let viewportHolder = document.getElementById('viewportPlaceholder');
@@ -1375,26 +1384,30 @@ function CreatePlaceholder () { //New Location button
    locItem.z = newPosition.z.toFixed(2);
    locItem.eulerz = 0;
    locItem.type = "Worldspace";
-   locItem.label = 'local placeholder';
-   locItem.name = "local placeholder";
+   locItem.label = 'local ' + markertype;
+   locItem.name =  'local ' + markertype;
    locItem.description = '';
-   locItem.markerType = "placeholder";
+   locItem.markerType = markertype;
    locItem.eventData = '';
    locItem.isNew = true;
    locItem.timestamp = timestamp;
-   locItem.markerObjScale = 1;
+   locItem.xscale = 1;
+   locItem.yscale = 1;
+   locItem.zscale = 1;
    locItem.locationTags = '';
    locItem.phID = timestamp;
+   locItem.modelID = modelID;
    locItem.isLocal = true;
    localData.locations.push(locItem);
-   phEl.setAttribute('gltf-model', '#poi1');
+   if (markertype == "placeholder") {
+      phEl.setAttribute('gltf-model', '#poi1');
+   }
+   
    phEl.id = locItem.timestamp;
-
    // phEl.id 
    sceneEl.appendChild(phEl);
    phEl.setAttribute('position', newPosition);
-   phEl.setAttribute('local_marker', {timestamp: timestamp, isNew: true, xpos: locItem.x, ypos: locItem.y, zpos: locItem.z} );
-
+   phEl.setAttribute('local_marker', {markerType: locItem.markerType, timestamp: timestamp, isNew: true, xpos: locItem.x, ypos: locItem.y, zpos: locItem.z, modelID: locItem.modelID} );
    SaveLocalData();
    ShowHideDialogPanel();
 }
