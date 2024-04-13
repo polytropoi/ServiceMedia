@@ -13,6 +13,8 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
       modelID: {default: ''},
       objectID: {default: ''},
       model: {default: ''},
+      mediaID: {default: ''},
+      mediaName: {default: ''},
       scale: {default: 1},
         // position: {default: ''},
       xpos: {type: 'number', default: 0}, //for modding...
@@ -733,6 +735,9 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
 
         }
       }
+    },
+    loadMedia: function () {
+      console.log("tryna load mediaID "+ this.data.mediaID)
     },
     loadModel: function (modelID) {
         

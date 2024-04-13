@@ -900,7 +900,7 @@ webxr_router.get('/:_id', function (req, res) {
                             sceneResponse.scenePictures.forEach(function (picture) {
                                 // console.log("scenePIcture " + picture);
                                 var p_id = ObjectID(picture); //convert to binary to search by _id beloiw
-                                requestedPictureItems.push(p_id); //populate array
+                                requestedPictureItems.push(p_id); //populate array //hrm, unused atm...
 
                             });
                         }

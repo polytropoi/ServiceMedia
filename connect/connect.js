@@ -778,6 +778,7 @@ function SaveModToLocal(locationKey) { //locationKey is now just timestamp of th
    locItem.xscale = document.getElementById("xscale").value;
    locItem.yscale = document.getElementById("yscale").value;
    locItem.zscale = document.getElementById("zscale").value;
+   locItem.mediaID = document.getElementById("locationMedia").value;
 
    // locItem.phID = locationKey.toString();
    locItem.type = "Worldspace";
@@ -839,7 +840,7 @@ function SaveModToLocal(locationKey) { //locationKey is now just timestamp of th
          localData.locations[i].objectID = locItem.objectID;
          localData.locations[i].objectName = locItem.objectName;
          localData.locations[i].targetLocation = locItem.targetLocation;
-
+         localData.locations[i].mediaID = locItem.mediaID;
          hasLocal = true;
          let theEl = document.getElementById(locationKey.toString());
          if (theEl != null) {

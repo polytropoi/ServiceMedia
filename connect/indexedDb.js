@@ -545,7 +545,7 @@ const renderStorageQuotaInfo = async () => {
 
 // Util functions
 const formatAsByteString = (bytes) => {
-   console.log("tryna format " + bytes);
+   // console.log("tryna format " + bytes);
 	const oneGigabyte = 1024 * 1024 * 1024;
 	const oneMegabyte = 1024 * 1024;
 	const oneKilobyte = 1024;

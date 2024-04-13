@@ -3,6 +3,7 @@
 AFRAME.registerComponent('local_marker', { //special items with local mods, not saved to cloud yet
     schema: {
       // eventData: {default: ''},
+      mediaID: {default: 'none'},
       modelID: {default: 'none'},
       objectID: {default: 'none'},
       selectedAxis: {default: 'all'},
@@ -776,6 +777,9 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
         
     //   }
     // },
+    loadMedia: function () {
+      console.log("tryna load mediaID "+ this.data.mediaID)
+    },
     loadLocalFile: function () {
       console.log("really tryna loadLocalFile " + this.data.modelID);
       this.loadModel();

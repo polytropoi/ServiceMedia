@@ -12673,8 +12673,8 @@ function getAllPeople() {
                                 "<option value=\x22none\x22> none</option>" +
                                 "</select>" +
                             "</div>" +
-                            "<div id=\x22selectLocationPicture_" + locationID + "\x22>" +
-                                "<label for=\x22\x22>Location Picture: </label>" + 
+                            "<div id=\x22selectLocationMedia_" + locationID + "\x22>" +
+                                "<label for=\x22\x22>Location Media: </label>" + 
                                 "<select class=\x22form-control pictureSelector\x22 id=\x22pictureSelect_"+locationID+"\x22>" +
                                 "<option value=\x22none\x22 selected>none</option>" +
                                 "<option value=\x22none\x22> none</option>" +
@@ -16254,14 +16254,16 @@ function getAllPeople() {
                             }
                         }
                     });
-                    $(document).on('change', '.pictureSelector', function() {
+                    $(document).on('change', '.mediaSelector', function() { //depends on markertype
                         for (let s = 0; s < sceneLocations.length; s++) {   
                             let locid = this.id.split("_")[1];
                             if (locid == sceneLocations[s].timestamp || this.id == sceneLocations[s].timestamp) {
-                                sceneLocations[s].locationPicture = $(this).find('option:selected').text();
+                                sceneLocations[s].mediaName = $(this).find('option:selected').text();
+                                sceneLocations[s].mediaID = this.value;
                                 console.log("location picture set " + $(this).find('option:selected').text());
-                                if (sceneLocations[s].locationPicture == null || sceneLocations[s].locationPicture == undefined) {
-                                    sceneLocations[s].locationPicture = 'none';
+                                if (sceneLocations[s].mediaID == null || sceneLocations[s].mediaID == undefined) {
+                                    // sceneLocations[s].mediaID = '';
+                                    // sceneLocations[s].mediaName = '';
                                 }
                             }
                         }

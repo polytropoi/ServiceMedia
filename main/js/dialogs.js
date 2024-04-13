@@ -401,6 +401,33 @@ window.addEventListener( 'keydown',  ( event ) => {
       console.log("Didn't find theEl!");
     } 
   });
+  
+  $('#modalContent').on('change', '#locationMedia', function(e) {
+    console.log('type ' + e.target.value + " id " + selectedLocationTimestamp);
+    let theEl = document.getElementById(selectedLocationTimestamp);
+    if (theEl) {
+    for (let i = 0; i < localData.locations.length; i++) { //elsewise 
+      if (localData.locations[i].timestamp == selectedLocationTimestamp) {
+        if (!localData.locations[i].isLocal) {
+          localMarkerComponent = theEl.components.local_marker;
+          if (localMarkerComponent) {
+            localMarkerComponent.data.mediaID = e.target.value;
+            localMarkerComponent.loadMedia(); 
+          }
+        } else {
+          cloudMarkerComponent = theEl.components.cloud_marker;
+          if (cloudMarkerComponent) {
+            cloudMarkerComponent.data.mediaID = e.target.value;
+            console.log("loadMedia cloudmarker " +cloudMarkerComponent.data.mediaID);
+            cloudMarkerComponent.loadMedia(); 
+          }
+        }
+      }
+    }
+  } else {
+    console.log("Didn't find theEl!");
+  } 
+});
 
   $('#modalContent').on('change', '.tk_type', function(e) {
       console.log('type ' + e.target.value + " id " + e.target.id);
@@ -678,21 +705,34 @@ function TabMangler(evt, tagName) {
 //     });
 //   }
 // }
+function ReturnLocationItem () {
+  let phID = selectedLocationTimestamp;
+  let locationItem = null;
+  for (let i = 0; i < localData.locations.length; i++) {
+    console.log("checking phID " + phID +  " vs " + localData.locations[i].timestamp );
+    if (phID == localData.locations[i].timestamp) {
+      locationItem = localData.locations[i];
+      console.log("gotsa matching location item " + localData.locations[i].modelID);
+      return locationItem;
+      
+    }
+  }
+}
 
 function ReturnLocationModelSelect () {
 
     let phID = selectedLocationTimestamp;
     console.log("tryna return models for phID " + phID);
   //  let locationItem = JSON.parse(localStorage.getItem(phID));
-    let locationItem = null;
+    let locationItem = ReturnLocationItem();
 
-   for (let i = 0; i < localData.locations.length; i++) {
-      console.log("checking phID " + phID +  " vs " + localData.locations[i].timestamp );
-      if (phID == localData.locations[i].timestamp) {
-        locationItem = localData.locations[i];
-        console.log("gotsa matching location item " + localData.locations[i].modelID);
-      }
-   }
+  //  for (let i = 0; i < localData.locations.length; i++) {
+  //     console.log("checking phID " + phID +  " vs " + localData.locations[i].timestamp );
+  //     if (phID == localData.locations[i].timestamp) {
+  //       locationItem = localData.locations[i];
+  //       console.log("gotsa matching location item " + localData.locations[i].modelID);
+  //     }
+  //  }
 
    let modelSelect = "<option value=\x22none\x22>none</option>";
                       
@@ -785,6 +825,8 @@ function ReturnLocationObjectSelect (phID) {
   }
 }
 function ReturnOtherLocations (selected) {
+  let phID = selectedLocationTimestamp;
+  console.log("tryna return media for element " + phID);
   let locs = "<option value=\x22none\x22 selected>none</option>";
   for (let i = 0; i < localData.locations.length; i++) {
     if (localData.locations[i].timestamp != selectedLocationTimestamp) {
@@ -799,6 +841,34 @@ function ReturnOtherLocations (selected) {
     }
   }
   
+}
+function ReturnMediaSelections (mediaID, mtype) {
+  let phID = selectedLocationTimestamp;
+  let locationItem = ReturnLocationItem();
+  console.log("tryna return media " + mtype + " for element " + phID);
+  let mediaSelect = "<option value=\x22none\x22 selected>none</option>";
+  if (mtype && mtype == "picture fixed") {
+    if (mediaID) {
+
+    } else {
+      console.log("no picture media ID");
+    }
+
+      for (let key in localData.localFiles) {
+        let ext = localData.localFiles[key].name.split('.');
+        ext = ext[ext.length - 1];
+        if (ext == "jpg" || ext == "png") {
+          console.log("gotsa jpg " + localData.localFiles[key].name + " tryna match with " +locationItem.mediaID);
+          if (locationItem != null && locationItem.mediaID == "local_" + localData.localFiles[key].name) {
+            mediaSelect = mediaSelect + "<option value=\x22local_"+localData.localFiles[key].name+"\x22 selected>local_" + localData.localFiles[key].name + "</option>";
+          } else {
+            mediaSelect = mediaSelect + "<option value=\x22local_"+localData.localFiles[key].name+"\x22 >local_" + localData.localFiles[key].name + "</option>";
+          }
+        }  
+      }
+
+    return mediaSelect;
+  }
 }
 
 function ReturnLocationMarkerTypeSelect (selected) {
@@ -1036,6 +1106,11 @@ function ShowLocationModal(timestamp) {
         "<div class=\x22row\x22><div class=\x22threecolumn\x22><label for=\x22locationTarget\x22>Target Location</label>"+
         "<select id=\x22locationTarget\x22 name=\x22locationTarget\x22>"+
         ReturnOtherLocations(thisLocation.locationTarget) +
+        "</select></div>"+
+
+        "<div class=\x22threecolumn\x22><label for=\x22locationTarget\x22>Location Media</label>"+
+        "<select id=\x22locationMedia\x22 name=\x22locationMedia\x22>"+
+        ReturnMediaSelections(thisLocation.mediaID, thisLocation.markerType) +
         "</select></div>"+
 
         "<div class=\x22threecolumn\x22><label for=\x22locationTags\x22>Tags</label>"+
