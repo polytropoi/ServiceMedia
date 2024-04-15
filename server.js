@@ -11902,6 +11902,7 @@ app.post('/add_scene_mods/:s_id', requiredAuthentication, admin, function (req, 
                             //     }
                             // },  
                             function (callback) { 
+                                console.log("saving color mods " + JSON.stringify(req.body.colorMods));
                                 if (req.body.colorMods != null) {
                                     let sceneColor1 = req.body.colorMods.sceneColor1 != null ? req.body.colorMods.sceneColor1 : "";
                                     let sceneColor2 = req.body.colorMods.sceneColor2 != null ? req.body.colorMods.sceneColor2 : "";
@@ -11909,6 +11910,7 @@ app.post('/add_scene_mods/:s_id', requiredAuthentication, admin, function (req, 
                                     let sceneColor4 = req.body.colorMods.sceneColor4 != null ? req.body.colorMods.sceneColor4 : "";
                                     if (sceneColor1 != "") {
                                         query.sceneColor1 = sceneColor1;
+                                        console.log("query is " + query.sceneColor1);
                                     }
                                     if (sceneColor2 != "") {
                                         query.sceneColor2 = sceneColor2;
@@ -11925,6 +11927,7 @@ app.post('/add_scene_mods/:s_id', requiredAuthentication, admin, function (req, 
                                     query.sceneAmbientVolume = req.body.volumeMods.volumeAmbient != null ? req.body.volumeMods.volumeAmbient : 0;
                                     query.sceneTriggerVolume = req.body.volumeMods.volumeTrigger != null ? req.body.volumeMods.volumeTrigger : 0;
                                 }
+                                
                                 callback(null);
                             },
                             function (callback) {
@@ -11999,7 +12002,10 @@ app.post('/add_scene_mods/:s_id', requiredAuthentication, admin, function (req, 
                             ], //end of async.waterfall
                             function (err, result) { // #last function, close async
                             if (!err) {
-                                
+                                 db.scenes.update(
+                                { 'short_id': req.params.s_id},
+                                    { $set: query } 
+                                )
                                 res.send("ok");
                                 // 
                             } else {
@@ -12012,10 +12018,7 @@ app.post('/add_scene_mods/:s_id', requiredAuthentication, admin, function (req, 
                             //     query.sceneTimedEvents = req.body.timedEventMods;
                             // }
 
-                            // db.scenes.update(
-                            //     { 'short_id': req.params.s_id},
-                            //     { $set: query } 
-                            // )
+                           
 
                             // res.send("ok");
 

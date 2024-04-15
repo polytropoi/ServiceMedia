@@ -35,7 +35,9 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
   
     },
     init: function () {
-     
+      
+
+
       this.timestamp = this.data.timestamp;
       if (this.timestamp == '') {
         this.timestamp = Math.round(Date.now() / 1000).toString();
@@ -426,8 +428,8 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
           // that.calloutText = this.calloutText;
       
         this.el.addEventListener("model-loaded", (e) => {
-            // e.preventDefault();
-
+            // e.preventDefault();  
+            this.el.removeAttribute("animation-mixer");
             console.log("local_marker geo is loaded for markertype " + this.data.markerType);
             if (this.data.isNew && this.data.modelID == 'none' && this.data.markerType == "placeholder") {
               this.el.setAttribute("transform_controls", "");
@@ -457,10 +459,15 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
                 }
               }
               
-              // console.log(this.data.position);
-              // this.el.object3D.position.set({x: parseFloat(this.data.position.x), y: parseFloat(this.data.position.y), z: parseFloat(this.data.position.z)});
-              // this.el.object3D.rotation.set(this.data.rotation);
-            // this.el.setAttribute("transform_controls", ""); //check for tag?
+              let clips = obj.animations;
+              if (clips != null && clips.length) { 
+                this.el.setAttribute('animation-mixer', {
+                  "clip": clips[Math.floor(Math.random()*clips.length)].name,
+                  "loop": "repeat",
+                });
+              }
+
+
         });
 
 
@@ -590,6 +597,7 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
   
   
     },
+   
     loadObject: function (objectID) { //local object swap (maybe with child model...);
       console.log("tryna load OBJECT ID " + objectID);
       if (objectID != undefined && objectID != null & objectID != "none" && objectID != "") {  
@@ -799,6 +807,7 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
         this.el.removeAttribute("transform_controls");
         this.el.removeAttribute("geometry");
         this.el.removeAttribute("gltf-model");
+        this.el.removeAttribute("animation-mixer");
         this.el.removeAttribute("mod_particles");
         this.el.removeAttribute("light");
 
@@ -1026,6 +1035,20 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
         this.el.object3D.updateMatrix(); 
         if (this.data.markerType == "collider") {
           this.el.setAttribute("mod_physics", {body: "static", isTrigger: true, model:"collider", scaleFactor: this.data.scale});
+        }
+
+
+        let clips = this.el.object3D.animations;
+
+        if (clips != null && clips.length) { 
+          let clips = obj.animations;
+          if (clips != null && clips.length) { 
+            this.el.setAttribute('animation-mixer', {
+              "clip": clips[Math.floor(Math.random()*clips.length)].name,
+              "loop": "repeat",
+            });
+          }
+
         }
         
 

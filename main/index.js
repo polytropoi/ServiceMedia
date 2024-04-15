@@ -12330,10 +12330,10 @@ function getAllPeople() {
             let sceneGroundLevel = response.data.sceneGroundLevel != undefined ? response.data.sceneGroundLevel : 0;
             let sceneHeightmap = response.data.sceneHeightmap != undefined ? response.data.sceneHeightmap : {};
             let sceneScatterOffset = response.data.sceneScatterOffset != null ? response.data.sceneScatterOffset : "";
-            let sceneColor1 = response.data.sceneColor1 != undefined ? response.data.sceneColor1 : ""; 
-            let sceneColor2 = response.data.sceneColor2 != undefined ? response.data.sceneColor2 : ""; 
-            let sceneColor3 = response.data.sceneColor3 != undefined ? response.data.sceneColor3 : ""; 
-            let sceneColor4 = response.data.sceneColor4 != undefined ? response.data.sceneColor4 : ""; 
+            let sceneColor1 = response.data.sceneColor1 != undefined ? response.data.sceneColor1 : '#808080';
+            let sceneColor2 = response.data.sceneColor2 != undefined ? response.data.sceneColor2 : '#808080';
+            let sceneColor3 = response.data.sceneColor3 != undefined ? response.data.sceneColor3 : '#808080';
+            let sceneColor4 = response.data.sceneColor4 != undefined ? response.data.sceneColor4 : '#808080';
             let sceneColor1Alt = response.data.sceneColor1Alt != undefined ? response.data.sceneColor1Alt : ""; 
             let sceneColor2Alt = response.data.sceneColor2Alt != undefined ? response.data.sceneColor2Alt : ""; 
             let sceneColor3Alt = response.data.sceneColor3Alt != undefined ? response.data.sceneColor3Alt : ""; 

@@ -384,14 +384,23 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
   
       this.el.addEventListener('model-loaded', (evt) => { //load placeholder model first (which is an a-asset) before calling external
         evt.preventDefault();
+        this.el.removeAttribute("animation-mixer");
         console.log(this.data.modelID + " model-loaded for CLOUDMARKER " + this.data.name);
         if (this.data.markerType != "object") {
+          const obj = this.el.getObject3D('mesh');
           if (this.data.modelID && this.data.modelID != '' & this.data.modelID != 'none') {
             this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"mesh", scaleFactor: this.data.scale});
+            let clips = obj.animations;
+            if (clips != null && clips.length) { 
+              this.el.setAttribute('animation-mixer', {
+                "clip": clips[Math.floor(Math.random()*clips.length)].name,
+                "loop": "repeat",
+              });
+            }
           } else {
             this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"placeholder", scaleFactor: this.data.scale});
 
-            const obj = this.el.getObject3D('mesh');
+            
               // Go over the submeshes and modify materials we want.
             obj.traverse(node => {
               if (node.isMesh && node.material) {
@@ -405,8 +414,9 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
               }
             });
           }
+
         }
-        // this.el.setAttribute('scale', this.scale);
+
       });
        
       this.el.addEventListener('mouseenter', (evt) => {
@@ -736,8 +746,35 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
         }
       }
     },
-    loadMedia: function () {
-      console.log("tryna load mediaID "+ this.data.mediaID)
+    loadMedia: function (mediaID) {
+      if (!mediaID) {
+        mediaID = this.data.mediaID;
+      }
+      console.log("tryna load mediaID "+ this.data.mediaID);
+      if (this.data.markerType.toLowerCase().includes("picture")) {
+        if (mediaID.includes("local_")) {
+          this.el.classList.add("hasLocalFile");
+          mediaID = mediaID.substring(6);
+          console.log("CLOUDMARKER SHOUDL HAVE MediaID " + mediaID + " from localFiles " + localData.localFiles[mediaID]);
+          for (const key in localData.localFiles) {
+            console.log("tryna get localMedia named " + mediaID + " vs " + localData.localFiles[key].name);
+            if (localData.localFiles[key].name == mediaID) {
+              
+              const picBuffer = localData.localFiles[key].data;
+              const picBlob = new Blob([picBuffer]);
+
+              console.log(URL.createObjectURL(picBlob));
+            }
+          }
+        } else {
+          for (let i = 0; i < scenePictures.length; i++) {
+            if (scenePictures[i]._id == modelID) {
+              console.log("loadmedia locationpic :" + scenePictures[i].url);
+
+            }
+          }
+        }
+      }
     },
     loadModel: function (modelID) {
         
@@ -757,6 +794,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
         this.el.removeAttribute("gltf-model");
         this.el.removeAttribute("mod_object");
         this.el.removeAttribute("mod_particles");
+        this.el.removeAttribute("animation-mixer");
         this.el.removeAttribute("light");
         if (this.data.markerType == "collider") {
           this.data.modelID = "primitive_cube";
@@ -1007,6 +1045,13 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
           } 
         } else {
           this.el.object3D.visible = true;
+        }
+        let clips = this.el.object3D.animations;
+        if (clips != null && clips.length) { 
+          this.el.setAttribute('animation-mixer', {
+            "clip": clips[Math.floor(Math.random()*clips.length)].name,
+            "loop": "repeat",
+          });
         }
 
     },

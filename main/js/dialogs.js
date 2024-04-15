@@ -406,28 +406,28 @@ window.addEventListener( 'keydown',  ( event ) => {
     console.log('type ' + e.target.value + " id " + selectedLocationTimestamp);
     let theEl = document.getElementById(selectedLocationTimestamp);
     if (theEl) {
-    for (let i = 0; i < localData.locations.length; i++) { //elsewise 
-      if (localData.locations[i].timestamp == selectedLocationTimestamp) {
-        if (!localData.locations[i].isLocal) {
-          localMarkerComponent = theEl.components.local_marker;
-          if (localMarkerComponent) {
-            localMarkerComponent.data.mediaID = e.target.value;
-            localMarkerComponent.loadMedia(); 
-          }
-        } else {
-          cloudMarkerComponent = theEl.components.cloud_marker;
-          if (cloudMarkerComponent) {
-            cloudMarkerComponent.data.mediaID = e.target.value;
-            console.log("loadMedia cloudmarker " +cloudMarkerComponent.data.mediaID);
-            cloudMarkerComponent.loadMedia(); 
+      for (let i = 0; i < localData.locations.length; i++) { //elsewise 
+        if (localData.locations[i].timestamp == selectedLocationTimestamp) { 
+          if (!localData.locations[i].isLocal) { //mods to local only
+            localMarkerComponent = theEl.components.local_marker;
+            if (localMarkerComponent) {
+              localMarkerComponent.data.mediaID = e.target.value;
+              localMarkerComponent.loadMedia(); 
+            }
+          } else {
+            cloudMarkerComponent = theEl.components.cloud_marker; //mods to location that been saved to cloud
+            if (cloudMarkerComponent) {
+              cloudMarkerComponent.data.mediaID = e.target.value;
+              console.log("loadMedia cloudmarker " +cloudMarkerComponent.data.mediaID);
+              cloudMarkerComponent.loadMedia(); 
+            }
           }
         }
       }
-    }
-  } else {
-    console.log("Didn't find theEl!");
-  } 
-});
+    } else {
+      console.log("Didn't find theEl!");
+    } 
+  });
 
   $('#modalContent').on('change', '.tk_type', function(e) {
       console.log('type ' + e.target.value + " id " + e.target.id);
@@ -674,6 +674,7 @@ function TabMangler(evt, tagName) {
     let tagnameEl = document.getElementById(tagName);
     let mtitleEl = document.getElementById('modalTitle');
     if (tagnameEl != null) {
+        console.log("tryna enable tagnameEl " + tagnameEl.id);
         tagnameEl.style.display = "block";
     }
     // document.getElementById(tagName).style.display = "block";
@@ -871,6 +872,23 @@ function ReturnMediaSelections (mediaID, mtype) {
   }
 }
 
+function ReturnAFrameEnviromentSelect (selected) {
+  if (!selected) {
+    selected = 'none';
+  }
+  let types = "";
+  const typesArray = ['none', 'default', 'contact', 'egypt', 'checkerboard', 'forest', 'goaland', 'yavapai', 'goldmine', 'threetowers', 'poison', 'arches', 'tron', 'japan', 'dream', 'volcano', 'starry', 'osiris', 'moon'];
+  for (let i = 0; i < typesArray.length; i++) {
+      if (typesArray[i] == selected) {
+          types = types +
+          "<option selected>" + typesArray[i] + "</option>";
+      } else {
+          types = types +
+          "<option>" + typesArray[i] + "</option>";
+      }
+  }
+  return types;
+}
 function ReturnLocationMarkerTypeSelect (selected) {
 
     let types = "";
@@ -890,7 +908,6 @@ function ReturnLocationMarkerTypeSelect (selected) {
       "light",
       "player",
       "character",
-     
       "surface",
       "navmesh",
       "floorplane",
@@ -1050,10 +1067,6 @@ function ShowLocationModal(timestamp) {
         "<div class=\x22row\x22><div class=\x22threecolumn\x22><label for=\x22locationMarkerType\x22>Location Type</label>"+
         "<select id=\x22locationMarkerType\x22 name=\x22locationMarkerType\x22>"+
         ReturnLocationMarkerTypeSelect(thisLocation.markerType) + 
-        // "<option value=\x22placeholder\x22>placeholder</option>"+
-        // "<option value=\x22poi\x22>poi</option>"+
-        // "<option value=\x22callout\x22>callout</option>"+
-        // "<option value=\x22mailbox\x22>mailbox</option>"+
         "</select></div>"+
 
         "<div class=\x22threecolumn\x22><label for=\x22locationDescription\x22>Description</label>"+
@@ -1827,6 +1840,8 @@ function SceneManglerModal(mode) {
     sceneColor2 = settings.sceneColor2;
     sceneColor3 = settings.sceneColor3;
     sceneColor4 = settings.sceneColor4;
+    // sceneEnvironmentSettings = settings.sceneEnvironmentSettings;
+    sceneEnvironmentSettings = 'none';
     // }
     // InitColorInputs();
 
@@ -1988,6 +2003,10 @@ function SceneManglerModal(mode) {
       // "<button class=\x22goToButton\x22 id=\x22statsButton\x22 onclick=\x22ToggleStats()\x22>Show Raycasts</button>"+
       // "<button class=\x22goToButton\x22 id=\x22statsButton\x22 onclick=\x22ToggleStats()\x22>Show Colliders</button>"+
       // "<button class=\x22uploadButton\x22 id=\x22curvesButton\x22 onclick=\x22ToggleShowCurves()\x22>Show Curves</button>"+
+      // "<div class=\x22row\x22><div class=\x22threecolumn\x22><label for=\x22sceneEnvironmentSettings\x22>Location Type</label>"+
+      // "<select id=\x22sceneEnvironmentSettings\x22 name=\x22sceneEnvironmentSettings\x22>"+
+      // ReturnAFrameEnviromentSelect(sceneEnvironmentSettings) + 
+      // "</select></div>"+
     "</div><hr>"+
     // "<button class=\x22addButton\x22 id=\x22TimekeysButton\x22 onclick=\x22ShowTimekeysModal()\x22>Edit Timekeys</button>"+
     audioSliders +
@@ -2004,7 +2023,13 @@ function SceneManglerModal(mode) {
     
     "<label style=\x22margin: 10px;\x22 for=\x22sceneColor4\x22>Color 4</label>"+
     "<input type=\x22color\x22 class=\x22inputColor\x22 id=\x22sceneColor4\x22 name=\x22sceneColor4\x22 value=\x22"+sceneColor4+"\x22>"+
+
+
     "</div><br>"+
+    "<div class=\x22row\x22><div class=\x22threecolumn\x22><label for=\x22sceneEnvironmentSettings\x22>Environment Preset</label>"+
+    "<select id=\x22sceneEnvironmentSettings\x22 name=\x22sceneEnvironmentSettings\x22>"+
+    ReturnAFrameEnviromentSelect(sceneEnvironmentSettings) + 
+    "</select></div></div><br><br><br>"+
     "<hr><div class=\x22row\x22>"+
     // "<button style=\x22float: left;\x22 class=\x22saveButton\x22 id=\x22exportButton\x22 onclick=\x22ExportMods()\x22>Export Mods</button>"+
     // "<label style=\x22float: left;\x22 for=\x22file-upload\x22 class=\x22custom-file-upload\x22>Import Mods</label>"+
