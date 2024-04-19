@@ -55,9 +55,11 @@ function InitIDB() {
                         cloudEl.setAttribute("scale", {x: cursor.value.locations[i].xscale, y: cursor.value.locations[i].yscale, z: cursor.value.locations[i].zscale});
                         let cloudMarkerComponent = cloudEl.components.cloud_marker;
                         if (cloudMarkerComponent) {  
-                           if (cursor.value.locations[i].modelID.includes("local_")) {
-                              cloudEl.classList.add("hasLocalFile");
-                              console.log("cursor hasLocalFile: "+ JSON.stringify(cursor.value.locations[i]));
+                           if (
+                              (cursor.value.locations[i].mediaID && cursor.value.locations[i].mediaID.includes("local_") || 
+                              (cursor.value.locations[i].modelID && cursor.value.locations[i].modelID.includes("local_")))) {
+                                 cloudEl.classList.add("hasLocalFile");
+                                 console.log("cursor hasLocalFile: "+ JSON.stringify(cursor.value.locations[i]));
                            }
                            cloudMarkerComponent.updateAndLoad(cursor.value.locations[i].name, 
                                                             cursor.value.locations[i].description, 
@@ -75,12 +77,14 @@ function InitIDB() {
                                                             cursor.value.locations[i].yscale,
                                                             cursor.value.locations[i].zscale,
                                                             cursor.value.locations[i].modelID,
-                                                            cursor.value.locations[i].objectID);   
+                                                            cursor.value.locations[i].objectID,
+                                                            cursor.value.locations[i].mediaID );   
 
                         } else {
                            let modModelComponent = cloudEl.components.mod_model;
                            if (modModelComponent) {
-                              if (cursor.value.locations[i].modelID.includes("local_")) {
+                              if (
+                                 cursor.value.locations[i].modelID.includes("local_")) {
                                  cloudEl.classList.add("hasLocalFile");
                               }
                               modModelComponent.updateAndLoad(cursor.value.locations[i].name, //passing in params to function, order matters!
@@ -110,8 +114,9 @@ function InitIDB() {
                               settings.playerPositions.push(cursor.value.locations[i].x + " " + cursor.value.locations[i].y + " " + cursor.value.locations[i].z);
                            }
                         }
-                        if (cursor.value.locations[i].modelID && cursor.value.locations[i].modelID.includes("local_")) {
-                           localEl.classList.add("hasLocalFile");
+                        if ( (cursor.value.locations[i].mediaID && cursor.value.locations[i].mediaID.includes("local_") || 
+                             (cursor.value.locations[i].modelID && cursor.value.locations[i].modelID.includes("local_")))) {
+                                 localEl.classList.add("hasLocalFile");
                         }
                         localEl.setAttribute("position", {x: cursor.value.locations[i].x, y: cursor.value.locations[i].y, z: cursor.value.locations[i].z });
                         localEl.setAttribute("rotation", {x: cursor.value.locations[i].eulerx, y: cursor.value.locations[i].eulery, z: cursor.value.locations[i].eulerz });
@@ -121,6 +126,7 @@ function InitIDB() {
                                                                name: cursor.value.locations[i].name, 
                                                                modelID: cursor.value.locations[i].modelID, 
                                                                objectID: cursor.value.locations[i].objectID, 
+                                                               mediaID: cursor.value.locations[i].mediaID, 
                                                                tags: cursor.value.locations[i].locationTags, 
                                                                eventData: cursor.value.locations[i].eventData, 
                                                                markerType: cursor.value.locations[i].markerType,

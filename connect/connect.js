@@ -1365,6 +1365,8 @@ function CreatePlaceholder (filename, type) { //New Location button, also addToS
       markertype = type;
       if (type == "model") {
          modelID = filename;
+      } else if (type == "picture") {
+         mediaID = filename;
       }
    }
    console.log("tryna create place3holder");
@@ -1398,6 +1400,7 @@ function CreatePlaceholder (filename, type) { //New Location button, also addToS
    locItem.locationTags = '';
    locItem.phID = timestamp;
    locItem.modelID = modelID;
+   locItem.mediaID = mediaID;
    locItem.isLocal = true;
    localData.locations.push(locItem);
    if (markertype == "placeholder") {
@@ -1408,7 +1411,14 @@ function CreatePlaceholder (filename, type) { //New Location button, also addToS
    // phEl.id 
    sceneEl.appendChild(phEl);
    phEl.setAttribute('position', newPosition);
-   phEl.setAttribute('local_marker', {markerType: locItem.markerType, timestamp: timestamp, isNew: true, xpos: locItem.x, ypos: locItem.y, zpos: locItem.z, modelID: locItem.modelID} );
+   phEl.setAttribute('local_marker', {markerType: locItem.markerType, 
+                                       timestamp: timestamp, 
+                                       isNew: true, 
+                                       xpos: locItem.x, 
+                                       ypos: locItem.y, 
+                                       zpos: locItem.z, 
+                                       mediaID: locItem.mediaID, 
+                                       modelID: locItem.modelID} );
    SaveLocalData();
    ShowHideDialogPanel();
 }

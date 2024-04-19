@@ -710,7 +710,7 @@ function ReturnLocationItem () {
   let phID = selectedLocationTimestamp;
   let locationItem = null;
   for (let i = 0; i < localData.locations.length; i++) {
-    console.log("checking phID " + phID +  " vs " + localData.locations[i].timestamp );
+    // console.log("checking phID " + phID +  " vs " + localData.locations[i].timestamp );
     if (phID == localData.locations[i].timestamp) {
       locationItem = localData.locations[i];
       console.log("gotsa matching location item " + localData.locations[i].modelID);
@@ -848,13 +848,18 @@ function ReturnMediaSelections (mediaID, mtype) {
   let locationItem = ReturnLocationItem();
   console.log("tryna return media " + mtype + " for element " + phID);
   let mediaSelect = "<option value=\x22none\x22 selected>none</option>";
-  if (mtype && mtype == "picture fixed") {
+  if (mtype && mtype == "picture") {
     if (mediaID) {
 
     } else {
       console.log("no picture media ID");
     }
-
+    let scenePictureItems = null;
+    let scenePicDataEl = document.getElementById("scenePictureData");
+    if (scenePicDataEl) {
+      scenePictureItems = scenePicDataEl.components.scene_pictures_control.returnScenePictureItems();
+    }
+  
       for (let key in localData.localFiles) {
         let ext = localData.localFiles[key].name.split('.');
         ext = ext[ext.length - 1];
@@ -867,6 +872,18 @@ function ReturnMediaSelections (mediaID, mtype) {
           }
         }  
       }
+      if (scenePictureItems) {
+        for (let i = 0; i < scenePictureItems.length; i++) {
+          console.log("scenePicture:  "+ JSON.stringify(scenePictureItems[i]));
+          if (locationItem != null && locationItem.mediaID == scenePictureItems[i]._id) {
+            mediaSelect = mediaSelect + "<option value=\x22"+scenePictureItems[i]._id+"\x22 selected>" + scenePictureItems[i].filename + "</option>";
+          } else {
+            mediaSelect = mediaSelect + "<option value=\x22"+scenePictureItems[i]._id+"\x22 >" + scenePictureItems[i].filename + "</option>";
+          }
+
+        }
+      }
+     
 
     return mediaSelect;
   }
@@ -918,9 +935,9 @@ function ReturnLocationMarkerTypeSelect (selected) {
       "available scenes key",
       "audio",
       "audiogroup",
-      
-      "picture fixed",
-      "picture billboard",
+      "picture",
+      // "picture fixed",
+      // "picture billboard",
       "picturegroup",
       "video",
       // "video billboard",

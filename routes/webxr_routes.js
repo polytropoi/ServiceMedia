@@ -292,7 +292,7 @@ webxr_router.get('/:_id', function (req, res) {
     var sceneResponse = {};
     var requestedPictureItems = [];
     var requestedPictureGroups = [];
-    let allPictures = [];
+    let scenePictureItems = [];
     var requestedVideoGroups = [];
     var requestedAudioItems = [];
     var requestedVideoItems = [];
@@ -479,6 +479,7 @@ webxr_router.get('/:_id', function (req, res) {
     let availableScenesEntity = "";
     let pictureGroupsEntity = "";
     let pictureGroupsData = "";
+    let scenePictureData = "";
     let audioGroupsEntity = "";
     let audioGroupsData = "";
     let videoGroupsEntity = "";
@@ -2075,6 +2076,7 @@ webxr_router.get('/:_id', function (req, res) {
                             placeholderEntities = placeholderEntities + "<a-entity id=\x22"+locationPlaceholders[i].timestamp+"\x22 class=\x22activeObjexGrab activeObjexRay envMap placeholders\x22 cloud_marker=\x22phID: "+
                             locationPlaceholders[i].phID+"; scale: "+scale+"; xpos: "+locationPlaceholders[i].x+"; ypos: "+locationPlaceholders[i].y+"; zpos: "+locationPlaceholders[i].z+";" +
                             "xrot: "+locationPlaceholders[i].eulerx+"; yrot: "+locationPlaceholders[i].eulery+"; zrot: "+locationPlaceholders[i].eulerz+"; "+
+                            "mediaID: "+locationPlaceholders[i].mediaID+"; mediaName: "+locationPlaceholders[i].mediaName+"; "+
                             "xscale: "+xscale+"; yscale: "+yscale+"; zscale: "+zscale+"; modelID: "+locationPlaceholders[i].modelID+"; model: "+
                             locationPlaceholders[i].model+"; markerType: "+locationPlaceholders[i].markerType+";  tags: "+locationPlaceholders[i].locationTags+"; isNew: false; name: "+
                             locationPlaceholders[i].name+"; description: "+locationPlaceholders[i].description+";eventData: "+locationPlaceholders[i].eventData+"; timestamp: "+locationPlaceholders[i].timestamp+";\x22 "+
@@ -4015,17 +4017,17 @@ webxr_router.get('/:_id', function (req, res) {
                                     } else {
                                         async.each(images, function(image, cbimage) { //jack in a signed url for each
                                             (async () => {
-                                                // allPictures.push(image);
+                                                // scenePictureItems.push(image);
                                                 if (image.orientation != null && image.orientation != undefined && image.orientation.toLowerCase() == "equirectangular") { 
                                                     skyboxIDs.push(image._id);
                                                     // image.url = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + image.userID + "/pictures/originals/" + image._id + ".original." + image.filename, Expires: 6000});
                                                     image.url = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, 'users/' + image.userID + "/pictures/originals/" + image._id + ".original." + image.filename, 6000);
-                                                    allPictures.push(image);
+                                                    scenePictureItems.push(image);
                                                     cbimage();
                                                 } else {
                                                     // image.url = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + image.userID + "/pictures/" + image._id + ".standard." + image.filename, Expires: 6000}); //i.e. 1024
                                                     image.url = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, 'users/' + image.userID + "/pictures/" + image._id + ".standard." + image.filename, 6000);
-                                                    allPictures.push(image);
+                                                    scenePictureItems.push(image);
                                                     cbimage();
                                                 }
                                             })();
@@ -4174,7 +4176,7 @@ webxr_router.get('/:_id', function (req, res) {
                                             // image1url = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, 'users/' + picture_item.userID + "/pictures/" + picture_item._id + ".standard." + picture_item.filename, 6000);
                                             // picArray.push(image1url);
                                             picture_item.url = image1url;
-                                            allPictures.push(picture_item);
+                                            scenePictureItems.push(picture_item);
                                             imageAssets = imageAssets + "<img id=\x22smimage" + index + "\x22 crossorigin=\x22anonymous\x22 src='" + image1url + "'>";
                                             let caption = "";
                                             if (picture_item.captionUpper != null && picture_item.captionUpper != undefined) {
@@ -4186,7 +4188,7 @@ webxr_router.get('/:_id', function (req, res) {
                                             let lookat = " look-at=\x22#player\x22 ";
                                             // console.log("picLocations taken: " + picLocationsPlaced);
                                             
-                                            if (picIndex < locationPictures.length) {
+                                            if (picIndex < locationPictures.length) { //now picture types use scene_pictures_control see below
                                                 position = locationPictures[picIndex].loc;
                                                 rotation = locationPictures[picIndex].rot;
                                                 if (locationPictures[picIndex].type.includes("fixed")) {
@@ -4223,7 +4225,7 @@ webxr_router.get('/:_id', function (req, res) {
                                                 " position=\x22"+position+"\x22 rotation=\x22"+rotation+"\x22 visible='true'>"+caption+"</a-entity>";
                                             } else {
                                                 // if (picture_item.linkType != undefined && picture_item.orientation != "equirectangular" && picture_item.orientation != "Equirectangular") {
-                                                if (picture_item.orientation != "equirectangular" && picture_item.orientation != "Equirectangular") {  //what if linkType is undefined?
+                                                if (picture_item.orientation != "equirectangular" && picture_item.orientation != "Equirectangular" && scatterPics) {  //what if linkType is undefined?
 
                                                     if (picture_item.orientation == "portrait" || picture_item.orientation == "Portrait") {
                                                         //console.log("gotsa portrait!");
@@ -4258,6 +4260,8 @@ webxr_router.get('/:_id', function (req, res) {
                                     callback(null);
                                 } else {
                                     //console.log('All pictures processed successfully');
+                                    var buff = Buffer.from(JSON.stringify(scenePictureItems)).toString("base64");
+                                    scenePictureData = "<a-entity scene_pictures_control id=\x22scenePictureData\x22 data-scene-pictures='"+buff+"'></a-entity>";
                                     callback(null);
                                 }
                             });
@@ -5293,6 +5297,7 @@ webxr_router.get('/:_id', function (req, res) {
                         availableScenesEntity +
                         pictureGroupsEntity +
                         pictureGroupsData +
+                        scenePictureData +
                         videoGroupsEntity +
                         navmeshEntity +
                         surfaceEntity +

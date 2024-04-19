@@ -51,6 +51,35 @@ AFRAME.registerComponent('mod-materials', {
     }
   });
 
+  AFRAME.registerComponent('mod_picture', {
+    schema: {
+      url: {default: ''}
+      // index: {default: ''}
+      },
+      init: function () {
+        let data = this.data;
+
+        this.el.addEventListener('model-loaded', () => {
+          console.log("tryna load media w/ url " + this.data.url);
+          const obj = this.el.getObject3D('mesh');
+          // const ref = document.querySelector("#smimage"+data.index);
+          console.log("tryna set texture..." + this.data.url);
+  
+          var texture = new THREE.TextureLoader().load(this.data.url);
+          texture.encoding = THREE.sRGBEncoding; 
+          // UVs use the convention that (0, 0) corresponds to the upper left corner of a texture.
+          texture.flipY = false; 
+          // immediately use the texture for material creation
+          var material = new THREE.MeshBasicMaterial( { map: texture } ); 
+          // Go over the submeshes and modify materials we want.
+          obj.traverse(node => {
+              node.material = material;
+            });
+          });
+        // }
+      }
+    });
+
   AFRAME.registerComponent('poi-map-materials', {
     schema: {
       // url: {default: ''},

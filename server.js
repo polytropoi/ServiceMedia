@@ -11842,6 +11842,8 @@ app.post('/add_scene_mods/:s_id', requiredAuthentication, admin, function (req, 
                                                         newfile.name.replace("local_","");
                                                         newfile._id = saved._id;
                                                         newFiles.push(newfile);
+                                                       
+
                                                         let awskey = 'users/' + req.session.user._id.toString() + '/pictures/originals/' + saved._id + '.original.' + file.name;
 
                                                         let params = { Bucket: process.env.S3_ROOT_BUCKET_NAME, 
@@ -11850,20 +11852,36 @@ app.post('/add_scene_mods/:s_id', requiredAuthentication, admin, function (req, 
                                                             ContentType: 'application/octet-stream',
                                                             Body: buffer};
                                                             s3.upload(params, function(err, data) { //upload
-                                                                if (err) {
-        
-                                                                    console.log("Error uploading data. ", err);
-                                                                    callbackz(err)
-                                                                } else {
-                                                                    console.log("Success uploading data " + JSON.stringify(data));
-                                                                    console.log('uploaded ' + file.name);
+                                                            if (err) {
+                                                                console.log("Error uploading data. ", err);
+                                                                callbackz(err)
+                                                            } else {
+                                                                console.log("Success uploading data " + JSON.stringify(data));
+                                                                console.log('uploaded ' + file.name);
+                                                                // callbackz();
+                                                                // console.log("tryna push pic to GS " + groupType);
+                                                                var token=jwt.sign({userId:req.session.user._id},process.env.JWT_SECRET);
+                                                                const options = {
+                                                                    headers: {'X-Access-Token': token}
+                                                                    };
+                                                                axios.get(process.env.GS_HOST + "/resize_uploaded_picture/"+saved._id, options)
+                                                                .then((response) => {
+                                                                    console.log("grabAndSqueeze response: " + response.status);
+                                                                    var s_id = ObjectID(scene._id);   
+                                                                    var scenePictures = (scene.scenePictures != undefined && scene.scenePictures != null && scene.scenePictures.length > 0) ? scene.scenePictures : new Array();
+                                                                    // console.log("XXX sceneModels: " + JSON.stringify(sceneModels));
+                                                                    scenePictures.push(saved._id);
+                                                                    db.scenes.update({ "_id": s_id }, { $set: {scenePictures: scenePictures}}); //add pictureID to scene
                                                                     callbackz();
-                                                                }
-                                                            });
+                                                                })                                                     
+                                                                .catch(function (error) {
+                                                                    callbackz(error);
+                                                                });
+                                                            }
+
+                                                        });
                                                     }
                                                 });
-                                                
-
                                         } else {
                                             console.log("caint do that kinda file right now...");
                                             callbackz("bad file type");
@@ -11943,11 +11961,23 @@ app.post('/add_scene_mods/:s_id', requiredAuthentication, admin, function (req, 
                                             req.body.locationMods[l].name = name;
                                         }
                                         console.log("has newfile? " + req.body.locationMods[l].modelID + " Vs " + JSON.stringify(newFiles));
-                                        if (req.body.locationMods[l].modelID) {
+                                        if (req.body.locationMods[l].modelID && req.body.locationMods[l].modelID.length) {
                                             for (let i = 0; i < newFiles.length; i++) {
                                                 if (newFiles[i].name == req.body.locationMods[l].modelID.replace("local_", "")) { //reassign modelID w/ new DB _id
-                                                    console.log("gotsa newfile match! " + newFiles[i].name);
+                                                    console.log("gotsa new model file match! " + newFiles[i].name);
                                                     req.body.locationMods[l].modelID = newFiles[i]._id;
+                                                    req.body.locationMods[l].model = newFiles[i].name;
+
+                                                }
+                                            }
+                                        }
+                                        if (req.body.locationMods[l].mediaID && req.body.locationMods[l].mediaID.length) {
+                                            for (let i = 0; i < newFiles.length; i++) {
+                                                if (newFiles[i].name == req.body.locationMods[l].mediaID.replace("local_", "")) { //reassign modelID w/ new DB _id
+                                                    console.log("gotsa new media file match! " + newFiles[i].name);
+                                                    req.body.locationMods[l].mediaID = newFiles[i]._id;
+                                                    req.body.locationMods[l].mediaName = newFiles[i].name;
+
                                                 }
                                             }
                                         }

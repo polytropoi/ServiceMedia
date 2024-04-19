@@ -375,7 +375,11 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
               this.el.id = this.data.timestamp;
               console.log("tryna set localmarker with phID " + this.timestamp + " and markerType " + this.data.markerType);
               // this.waitAndLoad();
-            }
+              if (this.data.markerType == "picture" && this.data.mediaID && this.data.media != "none") {
+                this.loadMedia();
+
+              }
+          }
   
   
             this.clientX = 0;
@@ -465,6 +469,48 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
                   "clip": clips[Math.floor(Math.random()*clips.length)].name,
                   "loop": "repeat",
                 });
+              }
+
+              if (this.data.markerType.toLowerCase().includes("picture")) {
+                console.log("mediaID " + this.data.mediaID);
+                if (this.data.mediaID && this.data.mediaID.includes("local_")) {
+                  this.el.classList.add("hasLocalFile");
+                  let mediaID = this.data.mediaID.substring(6);
+                  console.log("CLOUDMARKER SHOUDL HAVE MediaID " + mediaID + " from localFiles " + localData.localFiles[mediaID]);
+                  for (const key in localData.localFiles) {
+                    console.log("tryna get localMedia named " + mediaID + " vs " + localData.localFiles[key].name);
+                    if (localData.localFiles[key].name == mediaID) {
+                      
+                      const picBuffer = localData.localFiles[key].data;
+                      const picBlob = new Blob([picBuffer]);
+                      picUrl = URL.createObjectURL(picBlob);
+                      const obj = this.el.getObject3D('mesh');
+                      
+                      var texture = new THREE.TextureLoader().load(picUrl);
+                      texture.encoding = THREE.sRGBEncoding; 
+                      // UVs use the convention that (0, 0) corresponds to the upper left corner of a texture.
+                      texture.flipY = false; 
+                      // immediately use the texture for material creation
+                      var material = new THREE.MeshBasicMaterial( { map: texture } ); 
+                      // Go over the submeshes and modify materials we want.
+                      obj.traverse(node => {
+                      node.material = material;
+                      
+                      if (!this.data.tags.includes("fixed")) {
+                        this.el.setAttribute("look-at", "#player");
+                      }
+                    });
+                    }
+                  }
+                } else {
+                  for (let i = 0; i < scenePictures.length; i++) {
+                    if (scenePictures[i]._id == modelID) {
+                      console.log("loadmedia locationpic :" + scenePictures[i].url);
+                      picUrl = scenePictures[i].url;
+                      //hrm, check agains #smimages?
+                    }
+                  }
+                }
               }
 
 
@@ -785,12 +831,30 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
         
     //   }
     // },
-    loadMedia: function () {
-      console.log("tryna load mediaID "+ this.data.mediaID)
+    loadMedia: function (mediaID) {
+      if (!mediaID) {
+        mediaID = this.data.mediaID;
+      } else {
+        this.data.mediaID = mediaID;
+      }
+      this.el.removeAttribute("transform_controls");
+      this.el.removeAttribute("geometry");
+      this.el.removeAttribute("gltf-model");
+      console.log("tryna load mediaID "+ this.data.mediaID);
+      // let picUrl = null;
+      if (this.data.markerType.toLowerCase().includes("picture")) {
+        this.el.setAttribute('gltf-model', '#flatsquare');
+
+       
+      }
     },
-    loadLocalFile: function () {
-      console.log("really tryna loadLocalFile " + this.data.modelID);
-      this.loadModel();
+    loadLocalFile: function () { //change to loadLocalModel...
+      if (this.data.modelID && this.data.modelID != "none") {
+        console.log("really tryna loadLocalFile " + this.data.modelID);
+        this.loadModel();
+      } else if (this.data.mediaID && this.data.mediaID != "none") {
+        this.loadMedia();
+      }
     },
     loadModel: function (modelID) {
       if (!modelID) {

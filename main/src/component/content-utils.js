@@ -3104,6 +3104,38 @@ AFRAME.registerComponent('picture_group', {
   init: function () {
   }
 });
+AFRAME.registerComponent('scene_pictures_control', { //has all the picgroup data
+  schema: {
+    // jsonData: {
+    //   parse: JSON.parse,
+    //   stringify: JSON.stringify
+    //   }
+    jsonData: {default: []}
+    },
+    init: function () {
+      let scenePicturesArray = [];
+    
+      
+      this.loader = new THREE.TextureLoader();
+  
+      let theData = this.el.getAttribute('data-scene-pictures');
+      this.data.jsonData = JSON.parse(atob(theData)); 
+
+    },
+    returnScenePictureItems: function () {
+      console.log("returning scenePictures " + JSON.stringify(this.data.jsonData));
+      return this.data.jsonData;
+    },
+    returnPictureData: function (mediaID) {
+      for (let i = 0; i < this.data.jsonData.length; i++) {
+        if (mediaID == this.data.jsonData[i]._id) {
+          return this.data.jsonData[i];
+        }
+      }
+    }
+  
+    
+  });
 
 AFRAME.registerComponent('picture_groups_control', { //has all the picgroup data
   schema: {

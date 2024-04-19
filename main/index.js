@@ -10046,9 +10046,9 @@ function getAllPeople() {
 
         "audio",
         "audiogroup",
-        
-        "picture fixed",
-        "picture billboard",
+        "picture",
+        // "picture fixed",
+        // "picture billboard",
         "picturegroup",
         "video",
         // "video billboard",
@@ -12675,7 +12675,7 @@ function getAllPeople() {
                             "</div>" +
                             "<div id=\x22selectLocationMedia_" + locationID + "\x22>" +
                                 "<label for=\x22\x22>Location Media: </label>" + 
-                                "<select class=\x22form-control pictureSelector\x22 id=\x22pictureSelect_"+locationID+"\x22>" +
+                                "<select class=\x22form-control mediaSelector\x22 id=\x22mediaSelect_"+locationID+"\x22>" +
                                 "<option value=\x22none\x22 selected>none</option>" +
                                 "<option value=\x22none\x22> none</option>" +
                                 "</select>" +
@@ -15358,7 +15358,7 @@ function getAllPeople() {
                             console.log("sceneModelz: " + JSON.stringify(sceneModelz) +" vs "+ JSON.stringify(sceneModels));
                             // let validModelReference = false;
                             for (let h = 0; h < sceneLocations.length; h++) {
-                                console.log("gotsa location for modelSelector : " + JSON.stringify(sceneLocations[h]));
+                                // console.log("gotsa location for modelSelector : " + JSON.stringify(sceneLocations[h]));
                                 // if (sceneModels.includes(sceneLocations[h].modelID)) { //they might gets deleted!
                                 // let modelID = sceneLocations[h].modelID;
                                 // let idIndex = sceneModels.indexOf(modelID);
@@ -15415,7 +15415,31 @@ function getAllPeople() {
                                 }
                             }
                         }
-  
+                        if (pictures != null && pictures != undefined && pictures.length > 0) { //TODO refactor this to scenePictureItems or something..
+
+                            // console.log(JSON.stringify(sceneObjex));
+                            for (let k = 0; k < sceneLocations.length; k++) {
+                                if (sceneLocations[k].markerType == "picture") {
+                                    console.log ("gotsa picture with mediaID : "+ sceneLocations[k].mediaID);
+                                    const z = document.getElementById("mediaSelect_" + sceneLocations[k].timestamp);
+                                    for (let l = 0; l < pictures.length; l++) {
+                                        // console.log(sceneModelz[j].name);
+                                        if (pictures[l]._id != undefined && pictures[l].orientation != "Equirectangular") {
+                                            // console.log(sceneObjex[l]._id + " vs " + sceneLocations[k].objectID);
+                                            
+                                            var option = document.createElement("option"); 
+                                            option.text = pictures[l].filename;
+                                            option.value = pictures[l]._id;
+                                        
+                                        if (pictures[l]._id == sceneLocations[k].mediaID) {
+                                            option.selected = true;
+                                        } 
+                                        z.add(option);
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     //asset bundle crap
                     /*
                     axios.get('/get_userassets/' + userid)
@@ -16258,12 +16282,15 @@ function getAllPeople() {
                         for (let s = 0; s < sceneLocations.length; s++) {   
                             let locid = this.id.split("_")[1];
                             if (locid == sceneLocations[s].timestamp || this.id == sceneLocations[s].timestamp) {
-                                sceneLocations[s].mediaName = $(this).find('option:selected').text();
-                                sceneLocations[s].mediaID = this.value;
-                                console.log("location picture set " + $(this).find('option:selected').text());
-                                if (sceneLocations[s].mediaID == null || sceneLocations[s].mediaID == undefined) {
-                                    // sceneLocations[s].mediaID = '';
-                                    // sceneLocations[s].mediaName = '';
+                                if (sceneLocations[s].markerType == "picture") {
+
+                                    sceneLocations[s].mediaName = $(this).find('option:selected').text();
+                                    sceneLocations[s].mediaID = this.value;
+                                    console.log("location media set " + $(this).find('option:selected').text());
+                                    if (sceneLocations[s].mediaID == null || sceneLocations[s].mediaID == undefined) {
+                                        // sceneLocations[s].mediaID = '';
+                                        // sceneLocations[s].mediaName = '';
+                                    }
                                 }
                             }
                         }
