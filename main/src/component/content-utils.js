@@ -4581,6 +4581,7 @@ AFRAME.registerComponent('scene_greeting_dialog', {  //if "greeting" scenetag + 
     hideClick: {default: false},
     startButton: {default: true},
     startText: {default: "Start"}
+
   },
   init: function () {
     this.isInitialized = false;
@@ -4592,6 +4593,9 @@ AFRAME.registerComponent('scene_greeting_dialog', {  //if "greeting" scenetag + 
         this.initMe();
       }
     }, 1000);
+    // document.addEventListener("DOMContentLoaded", (e) => {
+      // this.initMe();
+    // });
   },
   // dependencies: ['raycaster'],
   initMe: function () {
@@ -4781,8 +4785,8 @@ AFRAME.registerComponent('scene_greeting_dialog', {  //if "greeting" scenetag + 
     // this.el.setAttribute("look-at", "#player");
     // this.el.setAttribute("position", {x: loc.x, y: loc.y + 1, z: loc.z});
 
-    setTimeout(() => { //wait to settle player position, maybe DOMLoaded event? 
-      if (settings && settings.sceneFontWeb1) {
+    // setTimeout(() => { //wait to settle player position, maybe DOMLoaded event? 
+    //   if (settings && settings.sceneFontWeb1) {
         this.font = settings.sceneFontWeb1;
 
       
@@ -4791,21 +4795,23 @@ AFRAME.registerComponent('scene_greeting_dialog', {  //if "greeting" scenetag + 
         this.viewportHolder.object3D.getWorldPosition( this.location );
         console.log("tryna set scene greeting at location " + JSON.stringify(this.location));
         this.el.setAttribute("position", {x: this.location.x, y: this.location.y + .55, z: this.location.z});
-        this.longTimer();
+        if (this.data.behavior == "hide") {
+          this.longTimer();
+        }
       }
-    }, 3000);
-  }
+    // }, 3000);
+  // }
     
   },
   longTimer: function () {
     setTimeout(() => {
       if (this.behavior == 'hide' && this.el.parentNode) {
 
-        // this.el.parentNode.removeChild(this.el);
+        this.el.parentNode.removeChild(this.el);
         // 
-        this.greetingEl.setAttribute("troika-text", {
-          value: ""
-        });
+        // this.greetingEl.setAttribute("troika-text", {
+        //   value: ""
+        // });
 
       }
       

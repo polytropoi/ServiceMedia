@@ -252,13 +252,7 @@ $(function() {
       InitLiveKit();
    }
 
-   let sceneGreetingDialogEl = document.getElementById("sceneGreetingDialog");
-   if (sceneGreetingDialogEl) {
-      let sgdialogComponent = sceneGreetingDialogEl.components.scene_greeting_dialog;
-      if (sgdialogComponent) {
-         sgdialogComponent.initMe();
-      }
-   }
+
 
    if (settings.sceneType == "Video Landing" && settings.sceneVideoStreams && settings.sceneVideoStreams.length) {
       SetVideoEventsData();
@@ -326,6 +320,15 @@ $(function() {
    //     }
    //   }
    // }
+   let sceneGreetingDialogEl = document.getElementById("sceneGreetingDialog");
+   if (sceneGreetingDialogEl) {
+
+      let sgdialogComponent = sceneGreetingDialogEl.components.scene_greeting_dialog;
+      if (sgdialogComponent) {
+         console.log("tryna initMe sceneGreeting");
+         sgdialogComponent.initMe();
+      }
+   }
 });
 function GetMatrixData() {
    if (!matrixClient) {

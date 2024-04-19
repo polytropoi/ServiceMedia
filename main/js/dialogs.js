@@ -875,12 +875,13 @@ function ReturnMediaSelections (mediaID, mtype) {
       if (scenePictureItems) {
         for (let i = 0; i < scenePictureItems.length; i++) {
           console.log("scenePicture:  "+ JSON.stringify(scenePictureItems[i]));
-          if (locationItem != null && locationItem.mediaID == scenePictureItems[i]._id) {
-            mediaSelect = mediaSelect + "<option value=\x22"+scenePictureItems[i]._id+"\x22 selected>" + scenePictureItems[i].filename + "</option>";
-          } else {
-            mediaSelect = mediaSelect + "<option value=\x22"+scenePictureItems[i]._id+"\x22 >" + scenePictureItems[i].filename + "</option>";
+          if (scenePictureItems[i].orientation != "Equirectangular") {
+            if (locationItem != null && locationItem.mediaID == scenePictureItems[i]._id) {
+              mediaSelect = mediaSelect + "<option value=\x22"+scenePictureItems[i]._id+"\x22 selected>" + scenePictureItems[i].filename + "</option>";
+            } else {
+              mediaSelect = mediaSelect + "<option value=\x22"+scenePictureItems[i]._id+"\x22 >" + scenePictureItems[i].filename + "</option>";
+            }
           }
-
         }
       }
      

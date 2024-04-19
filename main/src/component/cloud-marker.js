@@ -1,4 +1,3 @@
-
 AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
     schema: {
       phID: {default: ''}, // now just uses location timestamp
@@ -33,6 +32,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
     },
     init: function () {
     //   console.log("tryna set a cloudmarker with scale " + this.data.scale);
+      
      var sceneEl = document.querySelector('a-scene'); 
       //let calloutString = this.data.calloutString;
       this.cursor = document.querySelector('[cursor]');
@@ -40,14 +40,14 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
       // this.calloutPanel = document.createElement("a-entity");
       this.calloutText = document.createElement("a-entity");
       this.viewportHolder = document.getElementById("viewportPlaceholder3");
-      let thisEl = this.el;
+
       this.isSelected = false;
-      this.data.scale = this.data.xscale;
-    //   this.data.scale = (this.data.scale != undefined && this.data.scale != 'undefined' && this.data.scale != null) ? this.data.scale : 1;
+
       this.objectElementID = null;
       this.font1 = "Acme.woff";
       this.font2 = "Acme.woff";
       this.data.scale = this.data.xscale;
+      this.picData = null;
     // // this.scale = this.data.scale.toString() + " " + this.data.scale.toString() + " " + this.data.scale.toString();
     // this.scaleVector = new THREE.Vector3(this.data.scale,this.data.scale,this.data.scale); 
     // // if (this.data.xscale) { //well, yeah
@@ -382,14 +382,14 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
       //     this.obbHit(evt);
       // });
       if (this.data.markerType == "picture" && this.data.mediaID && this.data.media != "none") {
-        this.loadMedia();
+        this.loadMedia(); 
 
       }
   
       this.el.addEventListener('model-loaded', (evt) => { //load placeholder model first (which is an a-asset) before calling external
         evt.preventDefault();
         this.el.removeAttribute("animation-mixer");
-        console.log(this.data.modelID + " model-loaded for CLOUDMARKER " + this.data.name);
+        console.log(this.data.modelID + " model-loaded for CLOUDMARKER " + this.data.markerType);
         if (this.data.markerType != "object") {
           const obj = this.el.getObject3D('mesh');
           if (this.data.modelID && this.data.modelID != '' & this.data.modelID != 'none') {
@@ -421,7 +421,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
 
         }
 
-        if (this.data.markerType.toLowerCase().includes("picture")) {
+        if (this.data.markerType == "picture") {
           console.log("mediaID " + this.data.mediaID);
           if (this.data.mediaID && this.data.mediaID.includes("local_")) {
             this.el.classList.add("hasLocalFile");
@@ -444,24 +444,35 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                 var material = new THREE.MeshBasicMaterial( { map: texture } ); 
                 // Go over the submeshes and modify materials we want.
                 obj.traverse(node => {
-                node.material = material;
-                
-                if (!this.data.tags.includes("fixed")) {
-                  this.el.setAttribute("look-at", "#player");
-                }
-              });
+                  node.material = material;
+                  
+                  if (!this.data.tags.includes("fixed")) {
+                    this.el.setAttribute("look-at", "#player");
+                  }
+                });
               }
             }
           } else {
-            for (let i = 0; i < scenePictures.length; i++) {
-              if (scenePictures[i]._id == modelID) {
-                console.log("loadmedia locationpic :" + scenePictures[i].url);
-                picUrl = scenePictures[i].url;
-                //hrm, check agains #smimages?
+            console.log('tryna load picData : '+this.picData);
+            if (this.picData) {
+              const obj = this.el.getObject3D('mesh');
+                
+                var texture = new THREE.TextureLoader().load(this.picData.url);
+                texture.encoding = THREE.sRGBEncoding; 
+                // UVs use the convention that (0, 0) corresponds to the upper left corner of a texture.
+                texture.flipY = false; 
+                // immediately use the texture for material creation
+                var material = new THREE.MeshBasicMaterial( { map: texture } ); 
+                // Go over the submeshes and modify materials we want.
+                obj.traverse(node => {
+                  node.material = material;
+                  if (!this.data.tags.includes("fixed")) {
+                    this.el.setAttribute("look-at", "#player");
+                  }
+                });
               }
             }
           }
-        }
 
       });
        
@@ -750,7 +761,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
         this.loadMedia();
       }
     },
-    updateAndLoad: function (name, description, tags, eventData, markerType, scale, xpos, ypos, zpos, xrot, yrot, zrot, xscale, yscale, zscale, modelID, objectID) {
+    updateAndLoad: function (name, description, tags, eventData, markerType, scale, xpos, ypos, zpos, xrot, yrot, zrot, xscale, yscale, zscale, modelID, objectID, mediaID) {
         this.data.name = name;
         this.data.description = description;
         this.data.tags = tags;
@@ -767,6 +778,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
         this.data.xscale = xscale;
         this.data.yscale = yscale;
         this.data.zscale = zscale;
+        this.data.mediaID = mediaID;
         console.log("tryna scale to " + xscale + " " + yscale+ " " + zscale);
         // setTimeout(() => {
         if (this.data.markerType == "object" && objectID.length > 8) {
@@ -774,6 +786,9 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
         } 
       // else {
         this.loadModel(modelID);
+        if (mediaID && mediaID != "none") {
+          this.loadMedia(mediaID);
+        }
        
     },
     updateMaterials: function () {
@@ -817,7 +832,10 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
       if (!mediaID) {
         mediaID = this.data.mediaID;
       }
-      console.log("tryna load mediaID "+ this.data.mediaID);
+      this.el.removeAttribute("transform_controls");
+      this.el.removeAttribute("geometry");
+      this.el.removeAttribute("gltf-model");
+      console.log("tryna load mediaID "+ this.data.mediaID +" for markerType "+ this.data.markerType);
       if (this.data.markerType.toLowerCase().includes("picture")) {
         if (mediaID.includes("local_")) {
           this.el.classList.add("hasLocalFile");
@@ -835,10 +853,21 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
           }
         } else {
 
-          let scenePicDataEl = document.getElementById("scenePictureData");
+          const scenePicDataEl = document.getElementById("scenePictureData");
           if (scenePicDataEl) {
-            picData = scenePicDataEl.components.scene_pictures_control.returnPictureData(mediaID);
-            console.log("picData :  " + JSON.stringify(picData));
+            this.picData = scenePicDataEl.components.scene_pictures_control.returnPictureData(mediaID);
+            console.log("picData :  " + JSON.stringify(this.picData));
+            if (this.picData) {
+              if (!this.picData.orientation || this.picData.orientation == "Landscape") {
+                this.el.setAttribute('gltf-model', '#landscape_panel'); // model-loaded pics this up and loads 
+              } else if (this.picData.orientation == "Portrait") {
+                this.el.setAttribute('gltf-model', '#portrait_panel');
+              } else if (this.picData.orientation == "Square") {
+
+              } else if (this.picData.orientation == "Circle") {
+
+              }
+            }
           }
           // for (let i = 0; i < scenePictures.length; i++) {
           //   if (scenePictures[i]._id == modelID) {
@@ -848,6 +877,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
           // }
         }
       }
+      this.el.setAttribute("scale", this.data.xscale + " " + this.data.yscale + " " + this.data.zscale);
     },
     loadModel: function (modelID) {
         
