@@ -67,7 +67,7 @@ window.addEventListener( 'keydown',  ( event ) => {
       break;
 
     case 88: // X
-      
+      keydown = "X";
       break;
 
     case 89: // Y
@@ -92,7 +92,64 @@ window.addEventListener( 'keydown',  ( event ) => {
     keydown = "";
   });
 
+  AFRAME.registerComponent('location_picker', {
+    init: function () {
+      console.log("tryna set location_picker raycaster");
+      this.tick = AFRAME.utils.throttleTick(this.tick, 300, this);
+      this.sceneEl = document.querySelector('a-scene');
+      this.raycaster = new THREE.Raycaster();
+      this.locationPicked = null;
+      this.picking = false;
+      this.pickerEl = document.createElement("a-entity");
+      this.pickerEl.id = "picker";
+      this.el.sceneEl.appendChild(this.pickerEl);
+      this.pickerEl.setAttribute('gltf-model', '#poi1');
+      this.pickerEl.setAttribute("material", {color: "purple", transparent: true, opacity: .5});
+      this.pickerEl.style.visibility = "hidden";
+        window.addEventListener('mouseup', (e) => {
+        e.preventDefault();
+        if (keydown == "X" && this.locationPicked && !this.picking) {
+          this.picking = true;
+          this.pickerEl.style.visibility = "hidden";
+          console.log("gotsa locationPicked "+ this.locationPicked);
+          // keydown = 
+          CreateLocation(null, "poi", this.locationPicked);
+          this.reset();
+        }
+        }); 
+    },
+    reset: function () {
+      setTimeout(() =>  {
+        this.picking = false;
+      }, 1000);
+    },
+    tick: function () {
   
+      if (!this.raycaster || this.raycaster == null || this.raycaster == undefined || keydown != "X") {
+        this.pickerEl.style.visibility = "hidden";
+        // return;
+      } else {
+        // console.log("tryna sert raycaster " + keydown);
+        // if (keydown == "x") 
+        this.raycaster.setFromCamera( mouse, AFRAME.scenes[0].camera ); 
+        // this.intersection = this.raycaster.intersectObject( this.el.sceneEl.children );
+        const intersects = this.raycaster.intersectObjects( this.sceneEl.object3D.children );
+  
+        if (intersects.length && !this.picking) {
+          this.locationPicked = intersects[0].point;
+          this.pickerEl.style.visibility = "visible";
+          this.pickerEl.setAttribute("position", this.locationPicked);
+          console.log("this.locationPicked " + JSON.stringify(this.locationPicked));
+
+        } else {
+          this.locationPicked = null;
+          this.pickerEl.style.visibility = "hidden";
+        }
+      }
+    }
+  });
+
+
   $('#modalContent').on('click', '#importModsButton', function(e) {
     // console.log("color 1 changed " + e.target.value);
     document.querySelector("#importMods").showPicker();
@@ -2849,7 +2906,7 @@ var PlayDialogLoop = function(arr) {
             addToSceneButton.innerText = 'Add to Scene';
             addToSceneButton.addEventListener('click', () => {
               // addToScene(localData.localFiles[file].name);
-              CreatePlaceholder("local_" + localData.localFiles[file].name, 'model');
+              CreateLocation("local_" + localData.localFiles[file].name, 'model');
             });
             
           
@@ -2908,7 +2965,7 @@ var PlayDialogLoop = function(arr) {
             addToSceneButton.classList.add('btn', 'btn-danger');
             addToSceneButton.innerText = 'Add to Scene';
             addToSceneButton.addEventListener('click', () => {
-              CreatePlaceholder("local_" + localData.localFiles[file].name, 'picture');
+              CreateLocation("local_" + localData.localFiles[file].name, 'picture');
             });
             
             cardBody.appendChild(title);

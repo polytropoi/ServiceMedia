@@ -858,13 +858,14 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
             this.picData = scenePicDataEl.components.scene_pictures_control.returnPictureData(mediaID);
             console.log("picData :  " + JSON.stringify(this.picData));
             if (this.picData) {
-              if (!this.picData.orientation || this.picData.orientation == "Landscape") {
+              
+              if (!this.picData.orientation || this.picData.orientation == "Landscape" || this.data.tags.toLowerCase().includes("landscape")) {
                 this.el.setAttribute('gltf-model', '#landscape_panel'); // model-loaded pics this up and loads 
-              } else if (this.picData.orientation == "Portrait") {
+              } else if (this.picData.orientation == "Portrait" || this.data.tags.toLowerCase().includes("portrait")) {
                 this.el.setAttribute('gltf-model', '#portrait_panel');
-              } else if (this.picData.orientation == "Square") {
+              } else if (this.picData.orientation == "Square" || this.data.tags.toLowerCase().includes("square")) {
 
-              } else if (this.picData.orientation == "Circle") {
+              } else if (this.picData.orientation == "Circle" || this.data.tags.toLowerCase().includes("circle")) {
 
               }
             }

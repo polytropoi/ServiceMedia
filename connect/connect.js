@@ -758,7 +758,8 @@ function SaveTimekeysToLocal () {
 
 
 function SaveModToLocal(locationKey) { //locationKey is now just timestamp of the location item, unique enough
-   console.log("tryna save mod to local with key " + locationKey);
+   let name = document.getElementById('locationName').value;
+   console.log("tryna save mod to local with key " + locationKey + " named " +name);
    hasLocalData = true;
    let locItem = {};
    
@@ -772,7 +773,7 @@ function SaveModToLocal(locationKey) { //locationKey is now just timestamp of th
    locItem.eulerz = document.getElementById('zrot').value.length > 0 ? document.getElementById('zrot').value : '0';
    // locItem.lat 
    // locItem.label = document.getElementById('locationName').value;
-   locItem.name = document.getElementById('locationName').value;
+   locItem.name = name;
    locItem.description = document.getElementById('locationDescription').value;
    locItem.markerType = document.getElementById('locationMarkerType').value;
    locItem.eventData = document.getElementById('locationEventData').value;
@@ -896,6 +897,7 @@ function SaveModToLocal(locationKey) { //locationKey is now just timestamp of th
             } else if (cloudMarkerComponent) {
                type = "cloudMarkerComponent";
                cloudMarkerComponent.data.modelID = locItem.modelID;
+               cloudMarkerComponent.data.modelID = locItem.mediaID;
                cloudMarkerComponent.data.name = locItem.name;
                cloudMarkerComponent.data.markerType = locItem.markerType;
                cloudMarkerComponent.data.xpos = locItem.x;
@@ -909,11 +911,14 @@ function SaveModToLocal(locationKey) { //locationKey is now just timestamp of th
                cloudMarkerComponent.data.zscale = locItem.zscale;
                cloudMarkerComponent.data.scale = locItem.markerObjScale;
                cloudMarkerComponent.data.tags = locItem.locationTags;
+               
                cloudMarkerComponent.loadModel(); 
                cloudMarkerComponent.updateMaterials();
+               cloudMarkerComponent.loadMedia(); 
             } else if (localMarkerComponent) {
                type = "localMarkerComponent";
                localMarkerComponent.data.modelID = locItem.modelID;
+               localMarkerComponent.data.modelID = locItem.mediaID;
                localMarkerComponent.data.name = locItem.name;
                localMarkerComponent.data.markerType = locItem.markerType;
                localMarkerComponent.data.xpos = locItem.x;
@@ -930,6 +935,7 @@ function SaveModToLocal(locationKey) { //locationKey is now just timestamp of th
                
                localMarkerComponent.loadModel(); 
                localMarkerComponent.updateMaterials();
+               localMarkerComponent.loadMedia(); 
 
             }
             console.log("updating existing element " + type + " " + locationKey+ " : " + JSON.stringify(locItem));
@@ -1157,6 +1163,7 @@ function GoToNext() {
          console.log(poiLocations[currentLocationIndex].phID);
       // if (sceneLocations.locationMods[currentLocationIndex].markerType.toLowerCase() == 'poi') {
          GoToLocation(poiLocations[currentLocationIndex].phID);
+         document.getElementById("footerText").innerHTML = poiLocations[currentLocationIndex].name;
          // }
       }
       if (skyboxEl != null) {
@@ -1202,8 +1209,9 @@ function GoToPrevious() {
          } else {
             currentLocationIndex = poiLocations.length - 1;
          }
-        
+         
          GoToLocation(poiLocations[currentLocationIndex].phID);
+         document.getElementById("footerText").innerHTML = poiLocations[currentLocationIndex].name;
          // }
       }
       if (skyboxEl != null) {
@@ -1359,9 +1367,10 @@ function LocationRowClick(data) {
 
 
 
-function CreatePlaceholder (filename, type) { //New Location button, also addToScene button for localfiles
-   console.log("trynsa createPlaceholder with file " + filename + " type " + type);
+function CreateLocation (filename, type, position) { //New Location button, also addToScene button for localfiles
+   console.log("trynsa createlocation with file " + filename + " type " + type);
    let markertype = "placeholder";
+   
    let modelID = "none";
    let mediaID = "none";
    if (filename && type) {
@@ -1372,10 +1381,18 @@ function CreatePlaceholder (filename, type) { //New Location button, also addToS
          mediaID = filename;
       }
    }
+   if (type && position) {
+      markertype = type;
+   }
    console.log("tryna create place3holder");
    let newPosition = new THREE.Vector3(); 
-   let viewportHolder = document.getElementById('viewportPlaceholder');
-   viewportHolder.object3D.getWorldPosition( newPosition );
+   if (!position) {
+      let viewportHolder = document.getElementById('viewportPlaceholder');
+      viewportHolder.object3D.getWorldPosition( newPosition );
+   } else {
+      newPosition = position;
+   }  
+
    console.log("new position for placeholder " + JSON.stringify(newPosition));
    let phEl = document.createElement('a-entity');
    var sceneEl = document.querySelector('a-scene');
@@ -1408,8 +1425,9 @@ function CreatePlaceholder (filename, type) { //New Location button, also addToS
    localData.locations.push(locItem);
    if (markertype == "placeholder") {
       phEl.setAttribute('gltf-model', '#poi1');
+      // ShowHideDialogPanel();
    }
-   
+   poiLocations.push(locItem);
    phEl.id = locItem.timestamp;
    // phEl.id 
    sceneEl.appendChild(phEl);
@@ -1422,8 +1440,16 @@ function CreatePlaceholder (filename, type) { //New Location button, also addToS
                                        zpos: locItem.z, 
                                        mediaID: locItem.mediaID, 
                                        modelID: locItem.modelID} );
+
    SaveLocalData();
-   ShowHideDialogPanel();
+   if (locItem.markerType == "placeholder") { //i.e. from location panel Create Location button
+      ShowHideDialogPanel();
+   }
+   let nextbuttonEl = document.getElementById('nextButton');
+   let prevbuttonEl = document.getElementById('previousButton');
+   nextbuttonEl.style.visibility = "visible";
+   prevbuttonEl.style.visibility = "visible";
+   
 }
 
 // function AddFileToScene (filename, type) { //New Location button

@@ -135,6 +135,11 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
                     this.el.setAttribute('gltf-model', '#poi1');
                   } else if (this.data.markerType.toLowerCase() == "poi") {
                     this.el.setAttribute('gltf-model', '#poi1');
+                    let nextbuttonEl = document.getElementById('nextButton');
+                    let prevbuttonEl = document.getElementById('previousButton');
+                    nextbuttonEl.style.visibility = "visible";
+                    prevbuttonEl.style.visibility = "visible";
+                    
                   } else if (this.data.markerType.toLowerCase() == "waypoint") {
                     this.el.setAttribute('gltf-model', '#poi1');
                     this.el.classList.add("waypoint");
@@ -259,6 +264,7 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
                             // this.el.setAttribute("color", "yellow");
                         } else if (this.data.markerType == "poi") {
                             this.el.setAttribute("material", {color: "purple", transparent: true, opacity: .5});
+                            
                             // this.el.setAttribute("color", "purple");
                         } else if (this.data.markerType == "waypoint") {
                             this.el.setAttribute("material", {color: "green", transparent: true, opacity: .5});
@@ -512,6 +518,11 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
                   }
                 }
               }
+              let nextbuttonEl = document.getElementById('nextButton');
+              let prevbuttonEl = document.getElementById('previousButton');
+              nextbuttonEl.style.visibility = "visible";
+              prevbuttonEl.style.visibility = "visible";
+              
 
 
         });

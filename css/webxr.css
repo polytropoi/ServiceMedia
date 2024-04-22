@@ -179,6 +179,22 @@ body {
 .next-button {
   position: absolute; left: 0; right: -264; bottom:30px; margin-left: auto; margin-right: auto; width: 64px; height: 64px; color:white; opacity:0.75;z-index:100;
 }
+.footer-text {
+  position: absolute; 
+  left: 0; 
+  right: 0; 
+  bottom:50px; 
+  width: 128px; 
+  height: 64px;
+  text-align: center;
+  margin-left: auto; 
+  margin-right: auto; 
+  color:white; 
+  opacity:0.75;z-index:100;
+  font-family: Source Sans Pro, Helvetica Neue, Helvetica, Arial, sans-serif;
+  font-size: 20px;
+
+}
 .previous-button {
   position: absolute; left: -200; right: 0; bottom:30px; margin-left: auto; margin-right: auto; width: 64px; height: 64px; color:white; opacity:0.75;z-index:100;
 

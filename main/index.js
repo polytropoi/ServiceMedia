@@ -524,7 +524,7 @@
         // console.log(THREE.Cache);
     }
 
-    function setAframeScene() {
+    function setAframeScene() { //deprecated, used to show on dashboard
         // THREE.Cache.clear();
         clearThreeJSCache();
 

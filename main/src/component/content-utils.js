@@ -158,18 +158,19 @@ AFRAME.registerComponent('initializer', { //adjust for device settings, and call
     sceneType: {default: 'aframe'}
   },
   init: function () {
+    
     var sceneEl = document.querySelector('a-scene');
     sceneEl.setAttribute("screen-controls", true);
     let type = this.data.sceneType;
     // let isIOS = DetectiOS();
     let isMobile = AFRAME.utils.device.isMobile();
     let headsetConnected = AFRAME.utils.device.checkHeadsetConnected();
+
     // let isMacOS = (navigator.appVersion.indexOf('Mac') != -1);
     // this.data.settingsData = settings;
     // console.log("settings " + this.data.settingsData);
     // let ios = this.detectIOS();
     // console.log("scene TYpe is " + type + " is IOS " + ios);
-
 
     // let iOS = iOS();
     // if (!AFRAME.utils.device.isMobile() && !AFRAME.utils.device.checkHeadsetConnected()) {
@@ -191,45 +192,12 @@ AFRAME.registerComponent('initializer', { //adjust for device settings, and call
       window.sceneType = type;
       // InitSceneHooks(type);
       PrimaryAudioInit();
-      // let js = document.getElementById('joystickContainer');
-      // sceneEl.setAttribute('render-canvas');
-      // if (window.mobileAndTabletCheck() || isMobile ) {
-      //     let vrButton = document.querySelector(".a-enter-vr-button");
-      //     if (vrButton != null) {
-      //       vrButton.style.display = 'none'; //to hell with cardboard/gearvr/daydream
-      //     }
-      //   // if (js != null) {
-      //   //   console.log("hiding joystick");
-      //   //   js.style.visibility = 'visible'; //light up joystick if mobile
-      //   // }
-      //   // sceneEl.setAttribute('screen-controls', 'enabled', true); 
-      //   // let ewasd = document.getElementById("player").components["extended_wasd_controls"];
-      //   // if (ewasd != null) {
-      //   //   ewasd.setJoystickInput(); // might do this in screen-controls component too, but np
-      //   // } else {
-      //   //   ewasd = 
-      //   // }
-      // } else {
-      //   // let js = document.getElementById('joystickContainer');
-      //   // if (js != null) {
-      //   //   console.log("hiding joystick"); //really hide if not mobile
-      //   //   js.style.display = 'none';
-      //   // }
-      // }
+    
       let envEl = document.getElementById('enviroEl');
       if (envEl != null) {
         envEl.setAttribute('enviro_mods', 'enabled', true); //wait till env is init'd to put the mods
       }
-      // if (!headsetConnected || isMacOS) {
-      //   let vrButton = document.querySelector(".a-enter-vr");
-      //   if (vrButton != null) {
-      //       console.log("hiding vr button");
-      //     vrButton.style.display = 'none'; //to hell with cardboard/gearvr/daydream
-      //     vrButton.style.visible = 'false';
-      //   } else {
-      //       console.log("din't found VRBUTTON");
-      //   }
-      // }  
+     
       this.asky = document.getElementsByTagName('a-sky')[0];
       if (this.asky && settings) {
         console.log("tryna mod asky radius " + settings.sceneSkyRadius);
@@ -250,22 +218,34 @@ AFRAME.registerComponent('initializer', { //adjust for device settings, and call
           }
         }
       }
+
+   }); //end loaded
+
+
+  // this.el.addEventListener('mouseenter', (evt) => {
+  //   evt.preventDefault();
+
+  //   if (keydown == "X") {
       
-   
-      // ////// test aabb collisions
-      // document.addEventListener("DOMContentLoaded", function() {
-      //   document.querySelectorAll("a-entity").forEach(function(entity) {
-      //     // entity.addEventListener("hitstart", function(event) {
-      //     //   console.log(
-      //     //     event.target.id,
-      //     //     "collided with",
-      //     //     event.target.components["aabb-collider"]["intersectedEls"].map(x => x.id)
-      //     //   );
-      //     // });
-      //   });
-      // });
+  //   if (evt.detail.intersection) {
      
-   });
+     
+  //     let pos = evt.detail.intersection.point; //hitpoint on model
+  //     this.hitPosition = pos;
+
+  //     this.distance = evt.detail.intersection.distance;
+  //     this.rayhit(evt.detail.intersection.object.name, this.distance, evt.detail.intersection.point);
+   
+  //     // this.selectedAxis = name;
+      
+  //     // let elPos = this.el.getAttribute('position');
+  //     // console.log(pos);
+
+  //     }
+  //   }
+  // });
+
+  this.el.setAttribute("location_picker", "init");
    if (this.data.usdz != '') {
      ShowARButton(this.data.usdz);
    }
@@ -297,9 +277,19 @@ AFRAME.registerComponent('initializer', { //adjust for device settings, and call
     } else {
       showCurvesEl.setAttribute("visible", false);
     }
-  }
+  },
+
+  // tick: function () {
+  //   if (keydown == "X") {
+        
+  //   }
+    
+  // }
+  
 
 }); //end initializer
+
+
 
 AFRAME.registerComponent('disable-magicwindow', {
   init: function () {

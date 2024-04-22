@@ -118,6 +118,9 @@ function InitIDB() {
                              (cursor.value.locations[i].modelID && cursor.value.locations[i].modelID.includes("local_")))) {
                                  localEl.classList.add("hasLocalFile");
                         }
+                        if (cursor.value.locations[i].markerType == "poi") {
+                           poiLocations.push(cursor.value.locations[i]);
+                        }
                         localEl.setAttribute("position", {x: cursor.value.locations[i].x, y: cursor.value.locations[i].y, z: cursor.value.locations[i].z });
                         localEl.setAttribute("rotation", {x: cursor.value.locations[i].eulerx, y: cursor.value.locations[i].eulery, z: cursor.value.locations[i].eulerz });
                         // localEl.setAttribute("scale", {x: cursor.value.locations[i].markerObjScale, y: cursor.value.locations[i].markerObjScale, z: cursor.value.locations[i].markerObjScale});
