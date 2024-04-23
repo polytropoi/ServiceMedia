@@ -104,8 +104,11 @@ window.addEventListener( 'keydown',  ( event ) => {
       this.pickerEl.id = "picker";
       this.el.sceneEl.appendChild(this.pickerEl);
       this.pickerEl.setAttribute('gltf-model', '#poi1');
-      this.pickerEl.setAttribute("material", {color: "purple", transparent: true, opacity: .5});
-      this.pickerEl.style.visibility = "hidden";
+      this.el.addEventListener('model-loaded', (e) => {
+        this.pickerEl.setAttribute("material", {color: "purple", transparent: true, opacity: .5});
+        this.pickerEl.style.visibility = "hidden";
+      });
+   
         window.addEventListener('mouseup', (e) => {
         e.preventDefault();
         if (keydown == "X" && this.locationPicked && !this.picking) {
@@ -2055,7 +2058,7 @@ function SceneManglerModal(mode) {
     // "<button class=\x22goToButton\x22 id=\x22nextButton\x22 onclick=\x22GoToNext()\x22>GoTo Next</button>"+
     // "<button class=\x22goToButton\x22 id=\x22prevButton\x22 onclick=\x22GoToPrevious()\x22>GoTo Previous</button>"+
     
-    //   "<button style=\x22float:left\x22 class=\x22saveButton\x22 id=\x22CreatePlaceholderButton\x22 onclick=\x22CreatePlaceholder()\x22>New Local Placeholder</button>"+
+    //   "<button style=\x22float:left\x22 class=\x22saveButton\x22 id=\x22CreateLocationButton\x22 onclick=\x22CreateLocation()\x22>New Local Placeholder</button>"+
     //   "<br><br><br><div>"+locationTable+"</div><br>"+
     // "</div>"+     
 
@@ -2153,10 +2156,10 @@ function SceneManglerModal(mode) {
     "<button class=\x22goToButton\x22 id=\x22prevButton\x22 onclick=\x22GoToPrevious()\x22>GoTo Previous</button>"+
     ReturnCurrentPlayerLocation() +
     hasModsMessage +
-      "<button style=\x22float:left\x22 class=\x22saveButton\x22 id=\x22CreatePlaceholderButton\x22 onclick=\x22CreatePlaceholder()\x22>Create New Location</button>"+
+      "<button style=\x22float:left\x22 class=\x22saveButton\x22 id=\x22CreateLocationButton\x22 onclick=\x22CreateLocation()\x22>Create New Location</button>"+
      
       "<br><br><br><div>"+locationTable+"</div><br>"+
-      "<button style=\x22float:left\x22 class=\x22snapButton\x22 id=\x22CreatePlaceholderButton\x22 onclick=\x22ToggleAllTransformControls()\x22>Toggle All Transform Controls</button>"+
+      "<button style=\x22float:left\x22 class=\x22snapButton\x22 id=\x22CreateLocationButton\x22 onclick=\x22ToggleAllTransformControls()\x22>Toggle All Transform Controls</button>"+
     "</div>"+     
 
 

@@ -329,6 +329,13 @@ $(function() {
          sgdialogComponent.initMe();
       }
    }
+   // console.log(" playerpositions " + JSON.stringify(settings.playerPositions));
+   // if (settings.playerPositions.length > 1) {
+   //    console.log("gots PLAYERPOSITIONS " + settings.playerPositions);
+   //    if (settings.playerPositions.length) {
+   //       PlayerToLocation(settings.playerPositions[Math.floor(Math.random() * settings.playerPositions.length)]);
+   //    }
+   // }
 });
 function GetMatrixData() {
    if (!matrixClient) {
@@ -688,7 +695,7 @@ function ExportMods () {
    for (let key in mods.localFiles) {
       mods.localFiles[key].data = arrayBufferToBase64(localData.localFiles[key].data); //might need to async...
    }
-   console.log(JSON.stringify(mods.localFiles));
+   // console.log(JSON.stringify(mods.localFiles));
    var encodedString = btoa(JSON.stringify(mods));
    download(room+"_mods_"+currentTimestamp+".txt", encodedString);
 }
@@ -706,7 +713,7 @@ function ImportMods (event) {
       for (let key in mods.localFiles) { //should probably async somehow..
          localData.localFiles[key] = mods.localFiles[key];
          localData.localFiles[key].data = base64ToArrayBuffer(mods.localFiles[key].data); //convert imported base64 to array buffer
-         console.log(localData.localFiles[key].data);
+         console.log("back to array buffer : " + localData.localFiles[key].name);
 
       }
 
@@ -918,7 +925,7 @@ function SaveModToLocal(locationKey) { //locationKey is now just timestamp of th
             } else if (localMarkerComponent) {
                type = "localMarkerComponent";
                localMarkerComponent.data.modelID = locItem.modelID;
-               localMarkerComponent.data.modelID = locItem.mediaID;
+               localMarkerComponent.data.mediaID = locItem.mediaID;
                localMarkerComponent.data.name = locItem.name;
                localMarkerComponent.data.markerType = locItem.markerType;
                localMarkerComponent.data.xpos = locItem.x;
@@ -1128,7 +1135,7 @@ function PlayerToLocation(worldPos) {
    // let worldPos = new THREE.Vector3();
    //       // location.getWorldPosition(worldPos);
    // worldPos = {'x': targetLocation.x, 'y': targetLocation.y + 1, 'z': targetLocation.z + 3};
-
+   console.log("tryna set PlayerToLocation " + JSON.stringify(worldPos));
    player.setAttribute('position', worldPos);
    // console.log("target "+JSON.stringify(targetLocation)+ " vs. player " + JSON.stringify(player.getAttribute('position')));
    // window.playerPosition = worldPos;

@@ -1543,7 +1543,7 @@ AFRAME.registerComponent('instanced_surface_meshes', {
         var triggerAudioController = document.getElementById("triggerAudio");
           if (triggerAudioController != null) {
             triggerAudioController.components.trigger_audio_control.playAudioAtPosition(this.hitpoint, this.distance, this.data.tags);
-          }s
+          }
           // this.iMesh.position.set(id, 0, 0, -100);
           if (this.useMatrix) {
             let matrixMeshEl = document.getElementById("matrix_meshes");

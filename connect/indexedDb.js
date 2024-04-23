@@ -1,6 +1,7 @@
 
 //////////////////////indexedDB functions...
 function InitIDB() {
+   let playerPosMods = [];
     console.log("tryna connect to SMXR indexeddb");
     if (!('indexedDB' in window)) {
        console.log("This browser doesn't support IndexedDB");
@@ -26,7 +27,7 @@ function InitIDB() {
       //  const filestore = transaction.objectStore("localFiles");
        const saveTimeStamp = Date.now();
        const lastSceneUpdate = null;
- 
+
        //first check if there are localmods, version saved with tilde
        // const modQuery = store.get(room + "~"); //nope, needs cursor
        const modQuery = store.openCursor(room + "~"); //use cursor mode so it's iterable below
@@ -44,6 +45,16 @@ function InitIDB() {
                   // let loc = JSON.stringify(cursor.value.locations[i]);
                   console.log("cursor " + i + " of " + cursor.value.locations.length);
                   localData.locations.push(cursor.value.locations[i]);
+                  if (cursor.value.locations[i].markerType == "player") {
+                     playerPosMods.push(cursor.value.locations[i].x + " " + cursor.value.locations[i].y + " " + cursor.value.locations[i].z);
+                     console.log("PLayerPosMods :" + JSON.stringify(playerPosMods));
+                     // if (settings.playerPositions) {
+                     //    settings.playerPositions.push(cursor.value.locations[i].x + " " + cursor.value.locations[i].y + " " + cursor.value.locations[i].z);
+                     // } else {
+                     //    settings.playerPositions = [];
+                     //    settings.playerPositions.push(cursor.value.locations[i].x + " " + cursor.value.locations[i].y + " " + cursor.value.locations[i].z);
+                     // }
+                  }
                   if (cursor.value.locations[i].isLocal != undefined && cursor.value.locations[i].isLocal) { //only update ones with local changes
                      // console.log(cursor.value.locations[i].name + " markerType " + cursor.value.locations[i].markerType + " isLocal!" + " scale " + cursor.value.locations[i].xscale + cursor.value.locations[i].yscale + cursor.value.locations[i].zscale );
                      console.log("IDB cloudmarker name " + cursor.value.locations[i].name + " markerType " + cursor.value.locations[i].markerType + " isLocal!" + " modelID " + cursor.value.locations[i].modelID);
@@ -109,11 +120,14 @@ function InitIDB() {
                         hasLocalData = true;
                         let localEl = document.createElement("a-entity");
                         sceneEl.appendChild(localEl);
-                        if (cursor.value.locations[i].markerType == "player") {
-                           if (settings.playerPositions) {
-                              settings.playerPositions.push(cursor.value.locations[i].x + " " + cursor.value.locations[i].y + " " + cursor.value.locations[i].z);
-                           }
-                        }
+                        // if (cursor.value.locations[i].markerType == "player") {
+                        //    if (settings.playerPositions) {
+                        //       settings.playerPositions.push(cursor.value.locations[i].x + " " + cursor.value.locations[i].y + " " + cursor.value.locations[i].z);
+                        //    } else {
+                        //       settings.playerPositions = [];
+                        //       settings.playerPositions.push(cursor.value.locations[i].x + " " + cursor.value.locations[i].y + " " + cursor.value.locations[i].z);
+                        //    }
+                        // }
                         if ( (cursor.value.locations[i].mediaID && cursor.value.locations[i].mediaID.includes("local_") || 
                              (cursor.value.locations[i].modelID && cursor.value.locations[i].modelID.includes("local_")))) {
                                  localEl.classList.add("hasLocalFile");
@@ -258,10 +272,10 @@ function InitIDB() {
             objexEl.components.mod_objex.updateModdedObjects();
          }
           //eventdata should have the name of a location with spawn markertype
-          if (settings.playerPositions.length > 1) {
-            console.log("gots PLAYERPOSITIONS " + settings.playerPositions);
-            if (settings.playerPositions.length) {
-               PlayerToLocation(settings.playerPositions[Math.floor(Math.random() * settings.playerPositions.length)]);
+         if (playerPosMods.length) {
+            console.log("gots PLAYERPOSITIONS " + playerPosMods);
+            if (playerPosMods.length) {
+               PlayerToLocation(playerPosMods[Math.floor(Math.random() * playerPosMods.length)]);
            }
          }
          
@@ -290,6 +304,7 @@ function InitIDB() {
        request.oncomplete = function () {
           // db.close(); 
           // UpdateLocationData();
+
        }
     }
  }

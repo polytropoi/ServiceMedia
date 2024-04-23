@@ -474,6 +474,11 @@ AFRAME.registerComponent('mod_model', {
                         "clip": danceClips[0].name,
                         "loop": "repeat",
                       });
+                    } else if (clips.length) {
+                      this.el.setAttribute('animation-mixer', {
+                        "clip": clips[0].name,
+                        "loop": "repeat",
+                      });
                     }
                   }
                 }
@@ -1336,7 +1341,7 @@ AFRAME.registerComponent('mod_model', {
             }  
           });
           this.el.addEventListener('mouseenter', (evt) =>  {
-            console.log("MOD_MODEL mouseovewr model " + this.data.model + this.hasLocationCallout + this.data.markerType + this.hasCallout + evt.detail);
+            console.log("MOD_MODEL mouseovewr model " + this.data.modelName + this.hasLocationCallout + this.data.markerType + this.hasCallout + evt.detail);
            
             if (evt.detail.intersection != null) {
               if (textData.length > 0) {
@@ -1349,7 +1354,7 @@ AFRAME.registerComponent('mod_model', {
               let max = 22;
               let distance = evt.detail.intersection.distance;
               this.distance = distance;
-              console.log("MOD_MODEL mouseover markerType " + this.data.markerType + " scale " + this.data.scale);
+              // console.log("MOD_MODEL mouseover markerType " + this.data.markerType + " scale " + this.data.scale);
                 let pos = evt.detail.intersection.point; //hitpoint on model
                 // let scalerange = (this.data.scale * .1) + (distance * .5);
                 let scalerange = clamp(((distance * .2) / 2), min, max);

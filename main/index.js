@@ -12496,7 +12496,7 @@ function getAllPeople() {
                 }
             let sceneLocs = "";    
                 if (sceneLocations != null && sceneLocations != undefined && sceneLocations.length > 0 ) {
-                console.log("sceneKLocattionz " + JSON.stringify(sceneLocations));
+                console.log(sceneLocations.length + " sceneLocations " + JSON.stringify(sceneLocations));
                 sceneLocations.reverse();
                 for (let i = 0; i < sceneLocations.length; i++) {
                     let locationMap = "";
@@ -12649,6 +12649,7 @@ function getAllPeople() {
 
                             "<label for=\x22locationTags_" + locationID + "\x22>Tags</label>" + 
                             "<input type=\x22text\x22 class=\x22form-control locationTags\x22 id=\x22locationTags_" + locationID + "\x22 value=\x22" + locationTags + "\x22 >" +
+                            "<br><span> location id: "+ locationID +"</span>" +
                         "</div>" +
 
 
@@ -16334,6 +16335,15 @@ function getAllPeople() {
                             }
                         }
                     });
+                    $(document).on('change', '.locationObjectZ', function() {
+                        for (let s = 0; s < sceneLocations.length; s++) {   
+                            let locid = this.id.split("_")[1];
+                            if (locid == sceneLocations[s].timestamp || this.id == sceneLocations[s].timestamp) {
+                                sceneLocations[s].z = this.value;
+                                // console.log("location x set " + sceneLocations[s].z);
+                            }
+                        }
+                    });
                     $(document).on('change', '.locationObjGeoElevation', function() {
                         for (let s = 0; s < sceneLocations.length; s++) {   
                             let locid = this.id.split("_")[1];
@@ -16361,15 +16371,7 @@ function getAllPeople() {
                             }
                         }
                     });
-                    $(document).on('change', '.locationObjectZ', function() {
-                        for (let s = 0; s < sceneLocations.length; s++) {   
-                            let locid = this.id.split("_")[1];
-                            if (locid == sceneLocations[s].timestamp || this.id == sceneLocations[s].timestamp) {
-                                sceneLocations[s].z = this.value;
-                                // console.log("location x set " + sceneLocations[s].z);
-                            }
-                        }
-                    });
+
                     $(document).on('change', '.locationObjectRotX', function() {
                         // console.log("eulerx changed to " + this.value);
                         for (let s = 0; s < sceneLocations.length; s++) {   
@@ -16395,6 +16397,36 @@ function getAllPeople() {
                             let locid = this.id.split("_")[1];
                             if (locid == sceneLocations[s].timestamp || this.id == sceneLocations[s].timestamp) {
                                 sceneLocations[s].eulerz = this.value;
+                                console.log("rotation z set " + sceneLocations[s].eulerz);
+                            }
+                        }
+                    });
+                    $(document).on('change', '.locationObjectZScale', function() {
+                        console.log("scalez changed to " + this.value);
+                        for (let s = 0; s < sceneLocations.length; s++) {   
+                            let locid = this.id.split("_")[1];
+                            if (locid == sceneLocations[s].timestamp || this.id == sceneLocations[s].timestamp) {
+                                sceneLocations[s].zscale = this.value;
+                                console.log("rotation z set " + sceneLocations[s].eulerz);
+                            }
+                        }
+                    });
+                    $(document).on('change', '.locationObjectYScale', function() {
+                        console.log("scaley changed to " + this.value);
+                        for (let s = 0; s < sceneLocations.length; s++) {   
+                            let locid = this.id.split("_")[1];
+                            if (locid == sceneLocations[s].timestamp || this.id == sceneLocations[s].timestamp) {
+                                sceneLocations[s].yscale = this.value;
+                                console.log("rotation z set " + sceneLocations[s].eulerz);
+                            }
+                        }
+                    });
+                    $(document).on('change', '.locationObjectXScale', function() {
+                        console.log("scalex changed to " + this.value);
+                        for (let s = 0; s < sceneLocations.length; s++) {   
+                            let locid = this.id.split("_")[1];
+                            if (locid == sceneLocations[s].timestamp || this.id == sceneLocations[s].timestamp) {
+                                sceneLocations[s].xscale = this.value;
                                 console.log("rotation z set " + sceneLocations[s].eulerz);
                             }
                         }

@@ -436,7 +436,7 @@ webxr_router.get('/:_id', function (req, res) {
 
     let placeholderEntities = "";
     let proceduralEntities = "";
-    // let placeholderEntities = "<a-entity id=\x22createPlaceholders\x22 create_placeholders></a-entity>";
+
     let calloutEntities = "";
     let carLocation = "";
     let cameraEnvMap = "";
@@ -2658,7 +2658,7 @@ webxr_router.get('/:_id', function (req, res) {
                             // if ((locMdl.eventData != null && locMdl.eventData != undefined && locMdl.eventData.length > 1) && (!locMdl.eventData.includes("noweb"))) {
 
                             //filter out cloudmarker types
-                            console.log(locMdl.modelID + " locname " + locMdl.name);
+                            console.log(locMdl.modelID + " locname " + locMdl.name + " timestamp " + locMdl.timestamp);
                             if (locMdl.modelID != undefined && locMdl.modelID != "undefined" && locMdl.modelID != "none" && locMdl.modelID != "" && locMdl.markerType != "placeholder"
                                 && locMdl.markerType != "poi"
                                 && locMdl.markerType != "waypoint"                                
@@ -2853,51 +2853,51 @@ webxr_router.get('/:_id', function (req, res) {
                                     } else { ///NOT positioned by lat/lng
                                        
                                         //// scene type filters...
-                                        if (sceneResponse.sceneWebType == "ThreeJS") { //three
-                                            if (sceneResponse.sceneFaceTracking ) {
-                                                console.log("face tracking asset at " + modelURL);
-                                                gltfsAssets = {};
-                                                gltfsAssets.modelURL = modelURL;
-                                                gltfsAssets.offsetX = locMdl.x;
-                                                gltfsAssets.offsetY = locMdl.y;
-                                                gltfsAssets.scale = scale;
-                                            } else {
-                                                gltfsAssets = gltfsAssets +
-                                                "loader.load(\n"+
-                                                "\x22"+modelURL+"\x22,\n"+
-                                                // called when the resource is loaded
-                                                "function ( gltf ) {\n"+
-                                                    "scene.add( gltf.scene );\n"+
+                                        // if (sceneResponse.sceneWebType == "ThreeJS") { //three
+                                            // if (sceneResponse.sceneFaceTracking ) {
+                                            //     console.log("face tracking asset at " + modelURL);
+                                            //     gltfsAssets = {};
+                                            //     gltfsAssets.modelURL = modelURL;
+                                            //     gltfsAssets.offsetX = locMdl.x;
+                                            //     gltfsAssets.offsetY = locMdl.y;
+                                            //     gltfsAssets.scale = scale;
+                                            // } else {
+                                            //     gltfsAssets = gltfsAssets +
+                                            //     "loader.load(\n"+
+                                            //     "\x22"+modelURL+"\x22,\n"+
+                                            //     // called when the resource is loaded
+                                            //     "function ( gltf ) {\n"+
+                                            //         "scene.add( gltf.scene );\n"+
                                                  
-                                                    "if (!gltf.scene) return;\n" +
-                                                    "gltf.scene.traverse(function (node) {\n" +
-                                                        "if (node.material && 'envMap' in node.material) {\n" +
-                                                        "node.material.envMap = envMap;\n" +
-                                                        "node.material.envMap.intensity = 1;\n" +
-                                                        "node.material.needsUpdate = true;\n" +
-                                                        "}\n" +
-                                                    "});\n" +
-                                                    "gltf.scene.position.set("+locMdl.x+", "+locMdl.y+", "+locMdl.z+");\n"+
-                                                    "gltf.scene.rotation.set("+rx+", "+ry+", "+rz+");\n"+
-                                                    "gltf.scene.scale.set("+scale+", "+scale+", "+scale+");\n"+
-                                                "},\n"+
-                                                // called while loading is progressing
-                                                "function ( xhr ) {\n"+
-                                                    "console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );\n"+
-                                                    "},\n"+
-                                                // called when loading has errors
-                                                "function ( error ) {\n"+
-                                                    "console.log( 'An error happened' );\n"+
-                                                    "}\n"+
-                                                ");\n";
-                                            }
-                                            console.log("face tracking asset at " + modelURL);
+                                            //         "if (!gltf.scene) return;\n" +
+                                            //         "gltf.scene.traverse(function (node) {\n" +
+                                            //             "if (node.material && 'envMap' in node.material) {\n" +
+                                            //             "node.material.envMap = envMap;\n" +
+                                            //             "node.material.envMap.intensity = 1;\n" +
+                                            //             "node.material.needsUpdate = true;\n" +
+                                            //             "}\n" +
+                                            //         "});\n" +
+                                            //         "gltf.scene.position.set("+locMdl.x+", "+locMdl.y+", "+locMdl.z+");\n"+
+                                            //         "gltf.scene.rotation.set("+rx+", "+ry+", "+rz+");\n"+
+                                            //         "gltf.scene.scale.set("+scale+", "+scale+", "+scale+");\n"+
+                                            //     "},\n"+
+                                            //     // called while loading is progressing
+                                            //     "function ( xhr ) {\n"+
+                                            //         "console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );\n"+
+                                            //         "},\n"+
+                                            //     // called when loading has errors
+                                            //     "function ( error ) {\n"+
+                                            //         "console.log( 'An error happened' );\n"+
+                                            //         "}\n"+
+                                            //     ");\n";
+                                            // }
+                                            // console.log("face tracking asset at " + modelURL);
                                            
-                                        } else if (sceneResponse.sceneWebType == "BabylonJS") { //hrm, maybe later
+                                        // } else if (sceneResponse.sceneWebType == "BabylonJS") { //hrm, maybe later
                                             
 
                                         ///////////////////////////////// AFrame scene type below //////////////////////////
-                                        } else { //aframe !!!
+                                        // } else { //aframe !!!
                                             // let zFix = parseFloat(locMdl.z) * -1; //fix to match unity //nm, modded unity client
                                             let zFix = parseFloat(locMdl.z); //nope
                                             if (!locMdl.markerObjScale || locMdl.markerObjScale == undefined || locMdl.markerObjScale == "") {
@@ -2937,7 +2937,7 @@ webxr_router.get('/:_id', function (req, res) {
                                                     entityType = "surface";
                                                 }
 
-                                                let modModel = "mod_model=\x22markerType: "+locMdl.markerType+"; xscale:"+locMdl.xscale+"; yscale:"+locMdl.yscale+"; zscale:"+locMdl.zscale+"; xpos:"+locMdl.x+"; ypos:"+locMdl.y+"; zpos:"+locMdl.z+"; timestamp: "+locMdl.timestamp+"; tags: "+locMdl.locationTags+"; scale:"+locMdl.markerObjScale+"; name:"+locMdl.name+"; description:"+locMdl.description+"; eventData:"+locMdl.eventData+"; modelID:"+m_assetID+";\x22";
+                                                let modModel = "mod_model=\x22markerType: "+locMdl.markerType+"; modelName: "+locMdl.model+"; xscale:"+locMdl.xscale+"; yscale:"+locMdl.yscale+"; zscale:"+locMdl.zscale+"; xpos:"+locMdl.x+"; ypos:"+locMdl.y+"; zpos:"+locMdl.z+"; timestamp: "+locMdl.timestamp+"; tags: "+locMdl.locationTags+"; scale:"+locMdl.markerObjScale+"; name:"+locMdl.name+"; description:"+locMdl.description+"; eventData:"+locMdl.eventData+"; modelID:"+m_assetID+";\x22";
                                                 // let modMaterial = "";
                                                 if (locMdl.eventData.toLowerCase().includes("gallery")) {
                                                     // modModel = "mod_model_photo_gallery";  maybe later
@@ -2992,7 +2992,7 @@ webxr_router.get('/:_id', function (req, res) {
                                                             gltfModel = modelURL;
                                                         }
                                                         
-                                                    } else { //DEFAULT entity conf (don't use brownian)
+                                                    } else { //DEFAULT entity conf (doesn't use brownian)
                                                         gltfsEntities = gltfsEntities + "<a-entity id=\x22"+id+"\x22 "+followCurve+" "+physicsMod+" "+modelParent+" "+scatterSurface+" "+modModel+" class=\x22envMap gltf "+entityType+" "+ambientChild+
                                                         " activeObjexGrab activeObjexRay\x22 shadow=\x22cast:true; receive:true\x22 "+skyboxEnvMap+" gltf-model=\x22#" + m_assetID + "\x22 "+objAnim+" "+cannedAnim+
                                                         // " position=\x22"+locMdl.x+" "+locMdl.y+" "+zFix+"\x22 scale=\x22"+scale+" "+scale+" "+scale+"\x22 rotation=\x22"+rotation+"\x22 >" + offsetPos+ "</a-entity>";  //rem rotation bc navmesh donutlike
@@ -3074,7 +3074,7 @@ webxr_router.get('/:_id', function (req, res) {
                                                    
                                                 }
                                             }
-                                        }
+                                        // }
                                         callbackz();
                                         }
                                     } else { //if not item_type "glb", either usdz or reality //TODO select on location view?
@@ -3796,9 +3796,9 @@ webxr_router.get('/:_id', function (req, res) {
                             windowsIcon = "<a href=\x22servicemedia://scene?" + sceneResponse.short_id + "\x22><span class=\x22windows_yes\x22>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></a>";
                             hasApp = true;
                         } 
-                        if (hasApp) {
-                            appButtons = getAppLink + androidIcon +"&nbsp;&nbsp;"+ windowsIcon  +"&nbsp;&nbsp;"+ iosIcon + "&nbsp;&nbsp;<a href=\x22servicemedia://scene?" + sceneResponse.short_id + "\x22 class=\x22btn\x22 type=\x22button\x22>App Link</a><br><hr>"; 
-                        }
+                        // if (hasApp) {
+                        //     appButtons = getAppLink + androidIcon +"&nbsp;&nbsp;"+ windowsIcon  +"&nbsp;&nbsp;"+ iosIcon + "&nbsp;&nbsp;<a href=\x22servicemedia://scene?" + sceneResponse.short_id + "\x22 class=\x22btn\x22 type=\x22button\x22>App Link</a><br><hr>"; 
+                        // }
                         if (sceneResponse.sceneYouTubeIDs != null && sceneResponse.sceneYouTubeIDs.length > 0) {
                             // yotubes = sceneResponse.sceneYouTubeIDs;
                             let youtubeVolume = sceneResponse.sceneMediaAudioVolume != undefined ? sceneResponse.sceneMediaAudioVolume : 80;
@@ -3865,7 +3865,7 @@ webxr_router.get('/:_id', function (req, res) {
                         
                         "<div class=\x22smallfont\x22><span id=\x22users\x22></span></div>"+ 
                       
-                        "<div>"+
+                        "<div><hr>"+
                         "<div style=\x22float:right; margin: 5px 10px 5px; 0px;\x22 onclick=\x22SceneManglerModal('Events')\x22><i class=\x22fas fa-stopwatch \x22></i></div>"+
                         "<div style=\x22float:right; margin: 5px 10px 5px; 0px;\x22 onclick=\x22SceneManglerModal('Locations')\x22><i class=\x22fas fa-globe \x22></i></div>"+
                         "<div style=\x22float:right; margin: 5px 10px 5px; 0px;\x22 onclick=\x22SceneManglerModal('Tools')\x22><i class=\x22fas fa-tools \x22></i></div>"+
