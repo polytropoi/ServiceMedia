@@ -89,7 +89,8 @@ window.addEventListener( 'keydown',  ( event ) => {
   });
 
   window.addEventListener( 'keyup',  ( event ) => {
-    keydown = "";
+    keydown = "*";
+    console.log("keyup " + keydown);
   });
 
   AFRAME.registerComponent('location_picker', {
@@ -106,19 +107,24 @@ window.addEventListener( 'keydown',  ( event ) => {
       this.pickerEl.setAttribute('gltf-model', '#poi1');
       this.el.addEventListener('model-loaded', (e) => {
         this.pickerEl.setAttribute("material", {color: "purple", transparent: true, opacity: .5});
-        this.pickerEl.style.visibility = "hidden";
+        // this.pickerEl.style.visibility = "hidden";
+        this.pickerEl.object3D.visible = false;
       });
    
-        window.addEventListener('mouseup', (e) => {
+        window.addEventListener('mouseup', (e) => { 
         e.preventDefault();
         if (keydown == "X" && this.locationPicked && !this.picking) {
-          this.picking = true;
-          this.pickerEl.style.visibility = "hidden";
-          console.log("gotsa locationPicked "+ this.locationPicked);
-          // keydown = 
-          CreateLocation(null, "poi", this.locationPicked);
-          this.reset();
-        }
+            this.picking = true;
+            // this.pickerEl.style.visibility = "hidden";
+            this.pickerEl.object3D.visible = false;
+            console.log("gotsa locationPicked "+ this.locationPicked);
+            // keydown = 
+            CreateLocation(null, "poi", this.locationPicked);
+            this.reset();
+          } else {
+            // this.pickerEl.style.visibility = "hidden";
+            this.pickerEl.object3D.visible = false;
+          }
         }); 
     },
     reset: function () {
@@ -129,7 +135,9 @@ window.addEventListener( 'keydown',  ( event ) => {
     tick: function () {
   
       if (!this.raycaster || this.raycaster == null || this.raycaster == undefined || keydown != "X") {
-        this.pickerEl.style.visibility = "hidden";
+        // this.pickerEl.style.visibility = "hidden";
+        this.pickerEl.object3D.visible = false;
+
         // return;
       } else {
         // console.log("tryna sert raycaster " + keydown);
@@ -140,13 +148,15 @@ window.addEventListener( 'keydown',  ( event ) => {
   
         if (intersects.length && !this.picking) {
           this.locationPicked = intersects[0].point;
-          this.pickerEl.style.visibility = "visible";
+          // this.pickerEl.style.visibility = "visible";
+          this.pickerEl.object3D.visible = true;
           this.pickerEl.setAttribute("position", this.locationPicked);
           console.log("this.locationPicked " + JSON.stringify(this.locationPicked));
 
         } else {
           this.locationPicked = null;
-          this.pickerEl.style.visibility = "hidden";
+          // this.pickerEl.style.visibility = "hidden";
+          this.pickerEl.object3D.visible = false;
         }
       }
     }

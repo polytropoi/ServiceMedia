@@ -764,7 +764,7 @@ function SaveTimekeysToLocal () {
 }
 
 
-function SaveModToLocal(locationKey) { //locationKey is now just timestamp of the location item, unique enough
+function SaveModToLocal(locationKey) { //locationKey is now just timestamp of the location item and element id, unique enough
    let name = document.getElementById('locationName').value;
    console.log("tryna save mod to local with key " + locationKey + " named " +name);
    hasLocalData = true;
@@ -821,7 +821,7 @@ function SaveModToLocal(locationKey) { //locationKey is now just timestamp of th
    for (let i = 0; i < localData.locations.length; i++) {
       console.log("chck : " + localData.locations[i].timestamp.toString() + " vs " +locationKey.toString());
       if (localData.locations[i].timestamp.toString() == locationKey.toString() ) {
-        
+         console.log("gotsa match for localData.locations " + locationKey.toString() + " modelID " +locItem.modelID);
          // localData.locations[i] = Object.assign(locItem); //merge?
          // locItem.x = document.getElementById('xpos').value;
          localData.locations[i].x = locItem.x;
@@ -860,7 +860,7 @@ function SaveModToLocal(locationKey) { //locationKey is now just timestamp of th
 
             // let o3D = theEl.object3D;
             // let o3DScale = theEl.object3D.scale;
-            let o3DScale = theEl.getAttribute("scale");
+            // let o3DScale = theEl.getAttribute("scale");
             // let o3DScale = new THREE.Vector3();
             // o3D.getWorldScale(o3DScale);
             
@@ -871,7 +871,7 @@ function SaveModToLocal(locationKey) { //locationKey is now just timestamp of th
             // locItem.xscale = o3DScale.x;
             // locItem.yscale = o3DScale.y;
             // locItem.zscale = o3DScale.z;
-            let scale = (locItem.markerObjScale != undefined && locItem.markerObjScale != null && locItem.markerObjScale != "") ? locItem.markerObjScale : 1;
+            // let scale = (locItem.markerObjScale != undefined && locItem.markerObjScale != null && locItem.markerObjScale != "") ? locItem.markerObjScale : 1;
             // theEl.setAttribute('position', {x: locItem.x, y: locItem.y, z: locItem.z});
             // theEl.setAttribute('rotation', {x: locItem.eulerx, y: locItem.eulery, z: locItem.eulerz});
             // theEl.setAttribute('scale', {x: scale, y: scale, z: scale});
@@ -919,9 +919,10 @@ function SaveModToLocal(locationKey) { //locationKey is now just timestamp of th
                cloudMarkerComponent.data.scale = locItem.markerObjScale;
                cloudMarkerComponent.data.tags = locItem.locationTags;
                
-               cloudMarkerComponent.loadModel(); 
+               cloudMarkerComponent.loadModel(locItem.modelID); 
                cloudMarkerComponent.updateMaterials();
-               cloudMarkerComponent.loadMedia(); 
+               cloudMarkerComponent.loadMedia(locItem.mediaID);
+                
             } else if (localMarkerComponent) {
                type = "localMarkerComponent";
                localMarkerComponent.data.modelID = locItem.modelID;
@@ -939,10 +940,10 @@ function SaveModToLocal(locationKey) { //locationKey is now just timestamp of th
                localMarkerComponent.data.zscale = locItem.zscale;
                localMarkerComponent.data.scale = locItem.markerObjScale;
                localMarkerComponent.data.tags = locItem.locationTags;
-               
-               localMarkerComponent.loadModel(); 
+              
+               localMarkerComponent.loadModel(locItem.modelID); 
                localMarkerComponent.updateMaterials();
-               localMarkerComponent.loadMedia(); 
+               localMarkerComponent.loadMedia(locItem.mediaID); 
 
             }
             console.log("updating existing element " + type + " " + locationKey+ " : " + JSON.stringify(locItem));
@@ -1388,10 +1389,10 @@ function CreateLocation (filename, type, position) { //New Location button, also
          mediaID = filename;
       }
    }
-   if (type && position) {
+   if (type) {
       markertype = type;
    }
-   console.log("tryna create place3holder");
+   console.log("tryna create new location type " + markertype);
    let newPosition = new THREE.Vector3(); 
    if (!position) {
       let viewportHolder = document.getElementById('viewportPlaceholder');
