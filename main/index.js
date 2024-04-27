@@ -669,9 +669,11 @@
                 triggerAudio = response.data.audio[a];
             }
         }
-        if (response.data.sceneWebXREnvironment != null && response.data.sceneWebXREnvironment != "") {
-            environment = response.data.sceneWebXREnvironment;
+        if (response.data.sceneEnvironmentPreset != null && response.data.sceneEnvironmentPreset != "") {
+            environment = response.data.sceneEnvironmentPreset;
             console.log("environment: " + environment);
+        } else if (response.data.sceneWebXREnvironment != null && response.data.sceneWebXREnvironment != "") {
+            environment = response.data.sceneWebXREnvironment;
         }
         // assets = assets + "<img id=\x22thumbMountains\x22 crossorigin=\x22anonymous\x22 src=\x22https://realitymangler.com/assets/547389e8cac0642460000004.half.DoorsMedieval0134_L.jpg\x22>";
         let aframe = "<div class=\x22row\x22>" +
@@ -14527,14 +14529,18 @@ function getAllPeople() {
                                 //     "<input class=\x22\x22 type=\x22checkbox\x22  id=\x22sceneRenderFloorPlane\x22 data-toggle=\x22toggle\x22 data-size=\x22sm\x22 data-on=\x22<i class='fas fa-check'></i>\x22 data-off=\x22<i class='fas fa-times'></i>\x22 data-onstyle=\x22success\x22 data-offstyle=\x22danger\x22></div>" +
                                 // "</div>" +
                                 "<div class=\x22col form-group col-md-2\x22>" +
-                                    "<label for=\x22sceneFloorplaneTexture\x22>Floorplane Texture</label>" +
+                                    "<label for=\x22sceneFloorplaneTexture\x22>Ground </label>" +
                                     "<select class=\x22form-control\x22 id=\x22sceneFloorplaneTexture\x22 >" +
                                     "<option value=\x22\x22 disabled selected>Select:</option>" +
                                     "<option>none</option>" +
-                                    "<option>Flat</option>" +
-                                    "<option>Grid</option>" +
-                                    "<option>Concrete</option>" +
-                                    "<option>Dirt</option>" +
+                                    "<option>flat</option>" +
+                                    "<option>canyon</option>" +
+                                    "<option>spikes</option>" +
+                                    "<option>noise</option>" +
+                                    // hills, canyon, spikes, spikes
+                                    // "<option>Grid</option>" +
+                                    // "<option>Concrete</option>" +
+                                    // "<option>Dirt</option>" +
 
                                     "</select>" +
                                 "</div>" +  
@@ -14608,8 +14614,8 @@ function getAllPeople() {
                             // "</div>" +  
                             // "<div class=\x22form-row\x22>" +  
                                 "<div class=\x22col form-group col-md-3\x22>" +
-                                    "<label for=\x22sceneWebXREnvironment\x22>WebXR Environment</label>" +
-                                    "<select class=\x22form-control\x22 id=\x22sceneWebXREnvironment\x22 >" +
+                                    "<label for=\x22sceneEnvironmentPreset\x22>Environment Preset</label>" +
+                                    "<select class=\x22form-control\x22 id=\x22sceneEnvironmentPreset\x22 >" +
                                     "<option value=\x22\x22 disabled selected>Select Environment : </option>" +
                                     "<option>none</option>" +
                                     "<option>default</option>" +
@@ -15000,7 +15006,12 @@ function getAllPeople() {
                 $("#sceneAmbientSequence2Transpose").val(response.data.sceneAmbientSequence2Transpose);
                 $("#sceneTriggerSequence1Transpose").val(response.data.sceneTriggerSequence1Transpose);
                 $("#sceneTriggerSequence2Transpose").val(response.data.sceneTriggerSequence2Transpose);
-                $("#sceneWebXREnvironment").val(response.data.sceneWebXREnvironment);  //aframe enviro component
+                if (response.data.sceneEnvironmentPreset) {
+                    $("#sceneEnvironmentPreset").val(response.data.sceneEnvironmentPreset);
+                } else if (response.data.sceneWebXREnvironment) { //old nom
+                    $("#sceneEnvironmentPreset").val(response.data.sceneWebXREnvironment);
+                }
+                // $("#sceneEnvironmentPreset").val(response.data.sceneEnvironmentPreset);  //aframe enviro component
                 $("#sceneFloorplaneTexture").val(response.data.sceneFloorplaneTexture);
                 $("#sceneHeightmapSelect").val(heightmapName);
                 let listenTo = response.data.sceneTimedEvents && response.data.sceneTimedEvents.listenTo != undefined ? response.data.sceneTimedEvents.listenTo : "None";
@@ -16811,7 +16822,7 @@ function getAllPeople() {
                         let sceneAmbientPatch2 = document.getElementById("sceneAmbientPatch2").value; 
                         let sceneTriggerPatch1 = document.getElementById("sceneTriggerPatch1").value; 
                         let sceneTriggerPatch2 = document.getElementById("sceneTriggerPatch2").value; 
-                        let sceneWebXREnvironment = document.getElementById("sceneWebXREnvironment").value; 
+                        let sceneEnvironmentPreset = document.getElementById("sceneEnvironmentPreset").value; 
                         if (sceneAssetBundleNameSelect != "") {
                             sceneAssetBundleName = sceneAssetBundleNameSelect;
                         }
@@ -17048,7 +17059,7 @@ function getAllPeople() {
                             sceneAmbientPatch2: sceneAmbientPatch2,
                             sceneTriggerPatch1: sceneTriggerPatch1,
                             sceneTriggerPatch2: sceneTriggerPatch2,
-                            sceneWebXREnvironment: sceneWebXREnvironment,
+                            sceneEnvironmentPreset: sceneEnvironmentPreset,
                             sceneLocations: sceneLocations,
                             sceneTimedEvents: sceneTimedEvents
                         };

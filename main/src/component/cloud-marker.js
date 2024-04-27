@@ -880,6 +880,9 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
       }
       this.el.setAttribute("scale", this.data.xscale + " " + this.data.yscale + " " + this.data.zscale);
     },
+    removeModel: function () {
+      this.el.removeObject3D('mesh');
+    },
     loadModel: function (modelID) {
         
         if (!modelID) {
@@ -892,14 +895,18 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                 transform_controls_component.detachTransformControls();
             }
         }
+
         this.el.classList.remove("waypoint");
         this.el.removeAttribute("transform_controls");
         this.el.removeAttribute("geometry");
         this.el.removeAttribute("gltf-model");
+
         this.el.removeAttribute("mod_object");
         this.el.removeAttribute("mod_particles");
         this.el.removeAttribute("animation-mixer");
         this.el.removeAttribute("light");
+        this.el.removeAttribute("material");
+        this.removeModel();
         if (this.data.markerType == "collider") {
           this.data.modelID = "primitive_cube";
         } 
@@ -917,6 +924,8 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
               } else {
   
               }
+              console.log("loaded cloudmarker geometry " + this.el.getAttribute("geometry"));
+              this.el.setAttribute("scale", this.data.xscale + " " + this.data.yscale + " " + this.data.zscale);
             }
               if (this.data.markerType.toLowerCase() == "placeholder") {
                   this.el.setAttribute("material", {color: "yellow", transparent: true, opacity: .5});
@@ -985,6 +994,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
               }
             }
           }
+          
         } else { //if "none"
             console.log("CLOUDMARKER type " + this.data.markerType+ " tryna set default model " + modelID);
             if (this.data.markerType.toLowerCase() == "placeholder") {

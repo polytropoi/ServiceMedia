@@ -2927,14 +2927,25 @@ AFRAME.registerComponent('mod_sky', { //
 
 AFRAME.registerComponent('enviro_mods', { //tweak properties of environment component at runtime
   schema: {
-    enabled: {default: true}
+    enabled: {default: true},
+    preset: {default: ''}
   }, 
   init: function () {
+    console.log('tryna init enviro_mods');
     this.enviroDressing = document.querySelector('.environmentDressing');
     this.enviroEl = document.getElementById('enviroEl');
     // this.skyEl = document.getElementById('a_sky');
     this.isLerping = false;
     this.isTweaking = false;
+    if (this.data.preset != '') {
+      this.loadPreset(this.data.preset);
+    }
+
+  },
+  loadPreset: function(preset) {
+    if (this.enviroEl) {
+      this.enviroEl.setAttribute("environment", {'preset': preset});
+    }
   },
   beat: function () {
     scale = {};

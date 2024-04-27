@@ -300,6 +300,13 @@ $(function() {
       // console.log("objectScatterLayers: " + JSON.stringify(settings.sceneScatterObjectLayers));
    }
 
+   if (settings.sceneEnvironmentPreset) {
+      let envEl = document.getElementById('enviroEl');
+      if (envEl) {
+         envEl.setAttribute('enviro_mods', 'preset', settings.sceneEnvironmentPreset);
+         // envEl.components.enviro_mods.loadPreset("moon");
+      }
+   }
 
    // this.asky = document.getElementsByTagName('a-sky')[0];
    // if (this.asky && settings) {

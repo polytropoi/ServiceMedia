@@ -1734,9 +1734,11 @@ webxr_router.get('/:_id', function (req, res) {
                                 
                                 let envLighting = "lighting: distant"; //default
                             //default lights, 
-   
-                            if (sceneResponse.sceneWebXREnvironment != null && sceneResponse.sceneWebXREnvironment != "none" && sceneResponse.sceneWebXREnvironment != "") {
-                                webxrEnv = sceneResponse.sceneWebXREnvironment;
+                            if (!sceneResponse.sceneEnvironmentPreset && sceneResponse.sceneWebXREnvironment) {
+                                sceneResponse.sceneEnvironmentPreset = sceneResponse.sceneWebXREnvironment; //the old setting is still out there!
+                            }
+                            if (sceneResponse.sceneEnvironmentPreset != null && sceneResponse.sceneEnvironmentPreset != "none" && sceneResponse.sceneEnvironmentPreset != "" ) {
+                                webxrEnv = sceneResponse.sceneEnvironmentPreset;
                                 
                                 // enviromentScript = "<script src=\x22../main/ref/aframe/dist/aframe_environment_component.min.js\x22></script>"; --ronment-component
                                 enviromentScript = "<script src=\x22../main/src/component/aframe-environment-component_m3.js\x22></script>";
@@ -1795,8 +1797,9 @@ webxr_router.get('/:_id', function (req, res) {
                                     groundcolor2 = "groundColor2: " + sceneResponse.sceneColor4 + ";";
                                 }      
                                 // "+ground+"
-                                aframeEnvironment = "<a-entity id=\x22enviroEl\x22 environment=\x22preset: "+webxrEnv+"; "+ground+" "+fog+" "+shadow+" "+groundcolor+" "+dressingcolor+" "+groundcolor2+" "+skycolor+" "+horizoncolor+
-                                " playArea: 25; "+envLighting+";\x22 groundYScale: 10; hide-in-ar-mode "+tweakColors+"></a-entity>";
+                                aframeEnvironment = "<a-entity id=\x22enviroEl\x22 environment=\x22preset: "+webxrEnv+"; ground: hills; groundYScale: 5; "+ground+" "+fog+" "+shadow+" "+groundcolor+" "+dressingcolor+" "+groundcolor2+" "+skycolor+" "+horizoncolor+
+                                " "+envLighting+";\x22 hide-in-ar-mode "+tweakColors+"></a-entity>";
+
                                 // environment = "<a-entity environment=\x22preset: "+webxrEnv+"; "+fog+" "+shadow+" "+groundcolor+" "+dressingcolor+" "+groundcolor2+" "+skycolor+" "+horizoncolor+" playArea: 3; lightPosition: 0 2.15 0\x22 hide-in-ar-mode></a-entity>";
                             } else {
                                 if (sceneResponse.sceneUseDynamicSky) {
@@ -4418,6 +4421,7 @@ webxr_router.get('/:_id', function (req, res) {
                     settings.allowMods = true;
                     settings.sceneTags = sceneResponse.sceneTags;
                     settings.hideGizmos = false;
+                    settings.sceneEnvironmentPreset = sceneResponse.sceneEnvironmentPreset;
                 
                     // settings.debug = settings.debugMode.length > 0;
                     if (sceneResponse.sceneTags != null && sceneResponse.sceneTags.includes("no mods")) {

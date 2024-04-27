@@ -11945,6 +11945,9 @@ app.post('/add_scene_mods/:s_id', requiredAuthentication, admin, function (req, 
                                     query.sceneAmbientVolume = req.body.volumeMods.volumeAmbient != null ? req.body.volumeMods.volumeAmbient : 0;
                                     query.sceneTriggerVolume = req.body.volumeMods.volumeTrigger != null ? req.body.volumeMods.volumeTrigger : 0;
                                 }
+                                if (req.body.sceneEnvironmentPreset != null) {
+                                    query.sceneEnvironmentPreset = req.body.sceneEnvironmentPreset;
+                                }
                                 
                                 callback(null);
                             },
@@ -14926,7 +14929,7 @@ app.post('/clone_scene', requiredAuthentication, function (req,res) {
                     sceneUseTerrain : scene.sceneUseTerrain != null ? scene.sceneUseTerrain : false,
                     sceneUseHeightmap : scene.sceneUseHeightmap != null ? scene.sceneUseHeightmap : false,
                     sceneHeightmap : scene.sceneHeightmap,
-                    sceneWebXREnvironment : scene.sceneWebXREnvironment != null ? scene.sceneWebXREnvironment : "",
+                    sceneEnvironmentPreset : scene.sceneEnvironmentPreset != null ? scene.sceneEnvironmentPreset : "",
                     sceneTime : scene.sceneTime,
                     sceneTimeSpeed : scene.sceneTimeSpeed,
                     sceneWeather : scene.sceneWeather,
@@ -15219,7 +15222,7 @@ app.post('/update_scene/:_id', requiredAuthentication, function (req, res) {
                 sceneUseTerrain : req.body.sceneUseTerrain != null ? req.body.sceneUseTerrain : false,
                 sceneUseHeightmap : req.body.sceneUseHeightmap != null ? req.body.sceneUseHeightmap : false,
                 sceneHeightmap : req.body.sceneHeightmap,
-                sceneWebXREnvironment : req.body.sceneWebXREnvironment != null ? req.body.sceneWebXREnvironment : "",
+                sceneEnvironmentPreset : req.body.sceneEnvironmentPreset != null ? req.body.sceneEnvironmentPreset : "",
                 // sceneUseSimpleWater : req.body.sceneUseSimpleWater != null ? req.body.sceneUseSimpleWater : false,
                 // sceneUseOcean : req.body.sceneUseOcean != null ? req.body.sceneUseOcean : false,
                 // sceneUseFancyWater : req.body.sceneUseFancyWater != null ? req.body.sceneUseFancyWater : false,

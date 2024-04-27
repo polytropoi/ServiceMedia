@@ -316,7 +316,18 @@ window.addEventListener( 'keydown',  ( event ) => {
     // }
       
   });
-
+  $('#modalContent').on('change', '#sceneEnvironmentPreset', function(e) { 
+    console.log("tryna change enviro preset to  " + e.target.value);
+    let envEl = document.getElementById('enviroEl');
+    if (envEl) {
+      envEl.removeAttribute('enviro_mods');
+       envEl.setAttribute('enviro_mods', 'preset', e.target.value);
+       settings.sceneEnvironmentPreset = e.target.value;
+       localData.settings.sceneEnvironmentPreset = e.target.value;
+       // envEl.components.enviro_mods.loadPreset("moon");
+    }
+  
+  });
   $('#modalContent').on('change', '#locationModel', function(e) { //value has timestamp ~ modelID //no, just just the modelID, get el id from global
     console.log("model changed " + e.target.value + " for id " + selectedLocationTimestamp);
     // let locSplit = e.target.value.split("~"); 
@@ -960,10 +971,12 @@ function ReturnMediaSelections (mediaID, mtype) {
   }
 }
 
-function ReturnAFrameEnviromentSelect (selected) {
-  if (!selected) {
-    selected = 'none';
-  }
+function ReturnSceneEnviromentPreset (selected) {
+
+  // if (!selected) {
+  //   selected = 'none';
+  // }
+  console.log("tryna return scene enviro preset selected " + selected);
   let types = "";
   const typesArray = ['none', 'default', 'contact', 'egypt', 'checkerboard', 'forest', 'goaland', 'yavapai', 'goldmine', 'threetowers', 'poison', 'arches', 'tron', 'japan', 'dream', 'volcano', 'starry', 'osiris', 'moon'];
   for (let i = 0; i < typesArray.length; i++) {
@@ -1583,6 +1596,7 @@ function ReturnCurrentPlayerLocation() {
 function InitLocalColors() {
   console.log("tryna InitLocalColors " + JSON.stringify(localData.settings));
   let enviroEl = document.getElementById('enviroEl');
+
   if (enviroEl != null && settings.allowMods && localData.settings.sceneColor1) {
       enviroEl.setAttribute('environment', {
         groundColor: localData.settings.sceneColor3,
@@ -1591,6 +1605,9 @@ function InitLocalColors() {
         skyColor: localData.settings.sceneColor1,
         horizonColor: localData.settings.sceneColor2
       });
+  }
+  if (enviroEl != null && settings.allowMods && localData.settings.sceneEnvironmentPreset) {
+    enviroEl.setAttribute('environment', 'preset', localData.settings.sceneEnvironmentPreset);
   }
 
 
@@ -1928,8 +1945,8 @@ function SceneManglerModal(mode) {
     sceneColor2 = settings.sceneColor2;
     sceneColor3 = settings.sceneColor3;
     sceneColor4 = settings.sceneColor4;
-    // sceneEnvironmentSettings = settings.sceneEnvironmentSettings;
-    sceneEnvironmentSettings = 'none';
+    sceneEnvironmentPreset = settings.sceneEnvironmentPreset;
+    // sceneEnvironmentPreset = 'none';
     // }
     // InitColorInputs();
 
@@ -2091,9 +2108,9 @@ function SceneManglerModal(mode) {
       // "<button class=\x22goToButton\x22 id=\x22statsButton\x22 onclick=\x22ToggleStats()\x22>Show Raycasts</button>"+
       // "<button class=\x22goToButton\x22 id=\x22statsButton\x22 onclick=\x22ToggleStats()\x22>Show Colliders</button>"+
       // "<button class=\x22uploadButton\x22 id=\x22curvesButton\x22 onclick=\x22ToggleShowCurves()\x22>Show Curves</button>"+
-      // "<div class=\x22row\x22><div class=\x22threecolumn\x22><label for=\x22sceneEnvironmentSettings\x22>Location Type</label>"+
-      // "<select id=\x22sceneEnvironmentSettings\x22 name=\x22sceneEnvironmentSettings\x22>"+
-      // ReturnAFrameEnviromentSelect(sceneEnvironmentSettings) + 
+      // "<div class=\x22row\x22><div class=\x22threecolumn\x22><label for=\x22sceneEnvironmentPreset\x22>Location Type</label>"+
+      // "<select id=\x22sceneEnvironmentPreset\x22 name=\x22sceneEnvironmentPreset\x22>"+
+      // ReturnAFrameEnviromentSelect(sceneEnvironmentPreset) + 
       // "</select></div>"+
     "</div><hr>"+
     // "<button class=\x22addButton\x22 id=\x22TimekeysButton\x22 onclick=\x22ShowTimekeysModal()\x22>Edit Timekeys</button>"+
@@ -2114,9 +2131,9 @@ function SceneManglerModal(mode) {
 
 
     "</div><br>"+
-    "<div class=\x22row\x22><div class=\x22threecolumn\x22><label for=\x22sceneEnvironmentSettings\x22>Environment Preset</label>"+
-    "<select id=\x22sceneEnvironmentSettings\x22 name=\x22sceneEnvironmentSettings\x22>"+
-    ReturnAFrameEnviromentSelect(sceneEnvironmentSettings) + 
+    "<div class=\x22row\x22><div class=\x22threecolumn\x22><label for=\x22sceneEnvironmentPreset\x22>Environment Preset</label>"+
+    "<select id=\x22sceneEnvironmentPreset\x22 name=\x22sceneEnvironmentPreset\x22>"+
+    ReturnSceneEnviromentPreset(sceneEnvironmentPreset) + 
     "</select></div></div><br><br><br>"+
     "<hr><div class=\x22row\x22>"+
     // "<button style=\x22float: left;\x22 class=\x22saveButton\x22 id=\x22exportButton\x22 onclick=\x22ExportMods()\x22>Export Mods</button>"+

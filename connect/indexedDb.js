@@ -2,6 +2,7 @@
 //////////////////////indexedDB functions...
 function InitIDB() {
    let playerPosMods = [];
+   // let localSettings = {};
     console.log("tryna connect to SMXR indexeddb");
     if (!('indexedDB' in window)) {
        console.log("This browser doesn't support IndexedDB");
@@ -48,12 +49,7 @@ function InitIDB() {
                   if (cursor.value.locations[i].markerType == "player") {
                      playerPosMods.push(cursor.value.locations[i].x + " " + cursor.value.locations[i].y + " " + cursor.value.locations[i].z);
                      console.log("PLayerPosMods :" + JSON.stringify(playerPosMods));
-                     // if (settings.playerPositions) {
-                     //    settings.playerPositions.push(cursor.value.locations[i].x + " " + cursor.value.locations[i].y + " " + cursor.value.locations[i].z);
-                     // } else {
-                     //    settings.playerPositions = [];
-                     //    settings.playerPositions.push(cursor.value.locations[i].x + " " + cursor.value.locations[i].y + " " + cursor.value.locations[i].z);
-                     // }
+                  
                   }
                   if (cursor.value.locations[i].isLocal != undefined && cursor.value.locations[i].isLocal) { //only update ones with local changes
                      // console.log(cursor.value.locations[i].name + " markerType " + cursor.value.locations[i].markerType + " isLocal!" + " scale " + cursor.value.locations[i].xscale + cursor.value.locations[i].yscale + cursor.value.locations[i].zscale );
@@ -120,14 +116,7 @@ function InitIDB() {
                         hasLocalData = true;
                         let localEl = document.createElement("a-entity");
                         sceneEl.appendChild(localEl);
-                        // if (cursor.value.locations[i].markerType == "player") {
-                        //    if (settings.playerPositions) {
-                        //       settings.playerPositions.push(cursor.value.locations[i].x + " " + cursor.value.locations[i].y + " " + cursor.value.locations[i].z);
-                        //    } else {
-                        //       settings.playerPositions = [];
-                        //       settings.playerPositions.push(cursor.value.locations[i].x + " " + cursor.value.locations[i].y + " " + cursor.value.locations[i].z);
-                        //    }
-                        // }
+                      
                         if ( (cursor.value.locations[i].mediaID && cursor.value.locations[i].mediaID.includes("local_") || 
                              (cursor.value.locations[i].modelID && cursor.value.locations[i].modelID.includes("local_")))) {
                                  localEl.classList.add("hasLocalFile");
@@ -171,7 +160,16 @@ function InitIDB() {
                if (cursor.value.settings) {
                   for (let key in cursor.value.settings) {
                      localData.settings[key] = cursor.value.settings[key]; //TODO apply each one?
+                     
                      settings[key] = cursor.value.settings[key];
+                     console.log("localdata settings key " + key);
+                     if (key == "sceneEnvironmentPreset") {
+                        let value = cursor.value.settings[key];
+                        settings.sceneEnvironmentPreset = value;
+                        console.log("local enviro: " + settings.sceneEnvironmentPreset);
+                     }
+                     // localSettings[key] = cursor.value.settings[key];
+
                   }
                }
                //localfiles loop
@@ -277,6 +275,16 @@ function InitIDB() {
             if (playerPosMods.length) {
                PlayerToLocation(playerPosMods[Math.floor(Math.random() * playerPosMods.length)]);
            }
+         }
+         if (localData.settings) {
+
+            // settings.sceneEnvironmentPreset = localData.settings.sceneEnvironmentPreset;
+            console.log("resetting the environment preset to " + settings.sceneEnvironmentPreset)
+            let envEl = document.getElementById('enviroEl');
+            if (envEl) {
+               envEl.setAttribute('enviro_mods', 'preset', settings.sceneEnvironmentPreset);
+               // envEl.components.enviro_mods.loadPreset("moon");
+            }
          }
          
          let localFileEls = document.querySelectorAll(".hasLocalFile");
