@@ -11946,6 +11946,7 @@ app.post('/add_scene_mods/:s_id', requiredAuthentication, admin, function (req, 
                                     query.sceneTriggerVolume = req.body.volumeMods.volumeTrigger != null ? req.body.volumeMods.volumeTrigger : 0;
                                 }
                                 if (req.body.sceneEnvironmentPreset != null) {
+                                    console.log("enviro preset " + req.body.sceneEnvironmentPreset);
                                     query.sceneEnvironmentPreset = req.body.sceneEnvironmentPreset;
                                 }
                                 
@@ -12006,6 +12007,7 @@ app.post('/add_scene_mods/:s_id', requiredAuthentication, admin, function (req, 
                                             }
                                         }
                                         if (!isMatch) {
+                                            let timestamp = Math.round(Date.now() / 1000);
                                             console.log("no match with existing location, must be new " + req.body.locationMods[l].timestamp);
                                             delete req.body.locationMods[l].isNew; //going to the cloud don't need these
                                             delete req.body.locationMods[l].isLocal;

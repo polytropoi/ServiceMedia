@@ -580,6 +580,7 @@ function SaveModsToCloud() { //Save button on location modal, writes local mods 
          mods.volumeMods = {volumePrimary: volumePrimary, volumeAmbient: volumeAmbient, volumeTrigger: volumeTrigger};
       }
       mods.timedEventMods = localData.timeKeysData;
+      mods.sceneEnvironmentPreset = localData.settings.sceneEnvironmentPreset;
       // console.log(JSON.stringify(mods));
 
       
