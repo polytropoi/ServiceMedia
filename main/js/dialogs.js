@@ -908,7 +908,7 @@ function ReturnLocationObjectSelect (phID) {
 }
 function ReturnOtherLocations (selected) {
   let phID = selectedLocationTimestamp;
-  console.log("tryna return media for element " + phID);
+  // console.log("tryna return media for element " + phID);
   let locs = "<option value=\x22none\x22 selected>none</option>";
   for (let i = 0; i < localData.locations.length; i++) {
     if (localData.locations[i].timestamp != selectedLocationTimestamp) {

@@ -924,7 +924,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
               } else {
   
               }
-              console.log("loaded cloudmarker geometry " + this.el.getAttribute("geometry"));
+              console.log("loaded cloudmarker geometry " + this.el.getAttribute("geometry", "primitive"));
               this.el.setAttribute("scale", this.data.xscale + " " + this.data.yscale + " " + this.data.zscale);
             }
               if (this.data.markerType.toLowerCase() == "placeholder") {
@@ -966,6 +966,9 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                   this.el.object3D.visible = false;
                 }
               }
+              this.el.setAttribute("scale", this.data.xscale + " " + this.data.yscale + " " + this.data.zscale);
+              this.el.object3D.position.set(this.data.xpos, this.data.ypos, this.data.zpos);
+              this.el.setAttribute("rotation", this.data.xrot + " " + this.data.yrot + " " +this.data.zrot);
           } else {
             if (modelID.includes("local_")) {
               this.el.classList.add("hasLocalFile");
@@ -1141,8 +1144,9 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
         // }
         this.el.setAttribute("scale", this.data.xscale + " " + this.data.yscale + " " + this.data.zscale);
         this.el.object3D.position.set(this.data.xpos, this.data.ypos, this.data.zpos);
-        // this.el.object3D.rotation.set(THREE.MathUtils.degToRad(this.data.xrot), THREE.MathUtils.degToRad(this.data.xrot), THREE.MathUtils.degToRad(this.data.xrot));
         this.el.setAttribute("rotation", this.data.xrot + " " + this.data.yrot + " " +this.data.zrot);
+
+                // this.el.object3D.rotation.set(THREE.MathUtils.degToRad(this.data.xrot), THREE.MathUtils.degToRad(this.data.xrot), THREE.MathUtils.degToRad(this.data.xrot));
         // this.el.object3D.rotation.x += Math.PI;
         
         // this.el.object3D.updateMatrix(); 

@@ -14535,6 +14535,7 @@ function getAllPeople() {
                                     "<option value=\x22\x22 disabled selected>Select:</option>" +
                                     "<option>none</option>" +
                                     "<option>flat</option>" +
+                                    "<option>hills</option>" +
                                     "<option>canyon</option>" +
                                     "<option>spikes</option>" +
                                     "<option>noise</option>" +

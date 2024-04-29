@@ -1742,7 +1742,8 @@ webxr_router.get('/:_id', function (req, res) {
                                 
                                 // enviromentScript = "<script src=\x22../main/ref/aframe/dist/aframe_environment_component.min.js\x22></script>"; --ronment-component
                                 enviromentScript = "<script src=\x22../main/src/component/aframe-environment-component_m3.js\x22></script>";
-                                let ground = "";
+                                let ground = "hills";
+                                let dressing = "";
                                 let skycolor = "";
                                 let groundcolor = "";
                                 let groundcolor2 = "";
@@ -1756,11 +1757,17 @@ webxr_router.get('/:_id', function (req, res) {
                                     // hemiLight = "<a-light id=\x22hemi-light\x22 type=\x22hemisphere\x22 color=\x22" + sceneResponse.sceneColor1 + "\x22 groundColor=\x22" + sceneResponse.sceneColor2 + "\x22 intensity=\x22.5\x22 position\x220 0 0\x22>"+
                                     // "</a-light>";
                                 }
-                                if (sceneResponse.sceneUseFloorPlane && sceneResponse.sceneFloorplaneTexture == "none") {
-                                    ground = "ground: none; dressing: none;"
+                                if (sceneResponse.sceneTags && sceneResponse.sceneTags.includes('no dressing')) {
+                                    dressing = "dressing: none;"
                                 }
-                                if (sceneResponse.sceneUseFloorPlane && sceneResponse.sceneFloorplaneTexture != null && sceneResponse.sceneFloorplaneTexture.toLowerCase() == "flat") {
+                                if (sceneResponse.sceneUseFloorPlane && sceneResponse.sceneFloorplaneTexture.toLowerCase() == "none") {
+                                    ground = "ground: none;"
+                                    dressing = "dressing: none;"
+                                } else if (sceneResponse.sceneUseFloorPlane && sceneResponse.sceneFloorplaneTexture != null && sceneResponse.sceneFloorplaneTexture.toLowerCase() == "flat") {
                                     ground = "ground: flat; dressing: none;"
+                                    dressing = "dressing: none;"
+                                } else if  (sceneResponse.sceneFloorplaneTexture != null && sceneResponse.sceneFloorplaneTexture.length > 3) {
+                                    ground = "ground: " + sceneResponse.sceneFloorplaneTexture.toLowerCase() +"; "; //needs refactor to...?
                                 }
                                 if (sceneResponse.sceneUseDynamicShadows) {
                                     shadow = "shadow: true; shadowSize: 10;"
@@ -1796,8 +1803,12 @@ webxr_router.get('/:_id', function (req, res) {
                                     dressingcolor = "dressingColor: " + sceneResponse.sceneColor4 + ";";
                                     groundcolor2 = "groundColor2: " + sceneResponse.sceneColor4 + ";";
                                 }      
+                                // if (sceneResponse.sceneFloorplaneTexture != "none") {
+
+                                // }
+
                                 // "+ground+"
-                                aframeEnvironment = "<a-entity id=\x22enviroEl\x22 environment=\x22preset: "+webxrEnv+"; ground: hills; groundYScale: 5; "+ground+" "+fog+" "+shadow+" "+groundcolor+" "+dressingcolor+" "+groundcolor2+" "+skycolor+" "+horizoncolor+
+                                aframeEnvironment = "<a-entity id=\x22enviroEl\x22 environment=\x22preset: "+webxrEnv+"; groundYScale: 5; playArea: 1.5; "+ground+" "+dressing+" "+fog+" "+shadow+" "+groundcolor+" "+dressingcolor+" "+groundcolor2+" "+skycolor+" "+horizoncolor+
                                 " "+envLighting+";\x22 hide-in-ar-mode "+tweakColors+"></a-entity>";
 
                                 // environment = "<a-entity environment=\x22preset: "+webxrEnv+"; "+fog+" "+shadow+" "+groundcolor+" "+dressingcolor+" "+groundcolor2+" "+skycolor+" "+horizoncolor+" playArea: 3; lightPosition: 0 2.15 0\x22 hide-in-ar-mode></a-entity>";
@@ -2951,7 +2962,7 @@ webxr_router.get('/:_id', function (req, res) {
                                                     let physicsMod = "";
                                                     let shape = 'hull';
                                                     let groundMod = "";
-
+                                                    
                                                     if (locMdl.eventData.toLowerCase().includes('physics')){ //ammo for now // no do it in mod_model (where model isloaded)
                                                     // let isTrigger = false;
                                                     
@@ -2979,6 +2990,7 @@ webxr_router.get('/:_id', function (req, res) {
                                                         }
                                                     }
                                                     if (locMdl.markerType == "brownian path" || locMdl.markerType == "brownian motion") {
+                                                        scale = locMdl.yscale != null ? locMdl.yscale : 1;
                                                         if (locMdl.markerType == "brownian path") {
 
                                                             brownian = "brownian-path=\x22lineEnd:100000;lineStep:100;count:33;object:#thing-to-clone;positionVariance:88 33 86;spaceVectorOffset:101.1,100,100.2,101.2,100,100.3;rotationFollowsAxis:x;speed:0.01;\x22";
@@ -3008,6 +3020,7 @@ webxr_router.get('/:_id', function (req, res) {
                                                     console.log("tryna instance so0methings!@ " + locMdl.eventData.toLowerCase());
                                                     let instancing = "instanced_meshes_mod=\x22_id: "+locMdl.modelID+"; modelID: "+m_assetID+";\x22";
                                                     let interaction = "";
+                                                    scale = locMdl.yscale != null ? locMdl.yscale : 1;
                                                     if (locMdl.eventData.toLowerCase().includes("everywhere")) {
                                                         
                                                         if (locMdl.eventData.toLowerCase().includes('growpop')) {
@@ -4223,7 +4236,7 @@ webxr_router.get('/:_id', function (req, res) {
                                             
 
                                             }
-                                            if (picture_item.hasAlphaChannel) {
+                                            if (picture_item.hasAlphaChannel && scatterPics) {
                                                 imageEntities = imageEntities + "<a-entity "+link+""+lookat+" geometry=\x22primitive: plane; height: 10; width: 10\x22 material=\x22shader: flat; transparent: true; src: #smimage" + index + "; alphaTest: 0.5;\x22"+
                                                 " position=\x22"+position+"\x22 rotation=\x22"+rotation+"\x22 visible='true'>"+caption+"</a-entity>";
                                             } else {
