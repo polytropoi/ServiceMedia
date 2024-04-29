@@ -4452,9 +4452,9 @@ webxr_router.get('/:_id', function (req, res) {
                     if (sceneResponse.primaryAudioGroups != null && sceneResponse.primaryAudioGroups.length > 0) {
                         hasPrimaryAudio = true;
                     }
-                    if (sceneResponse.sceneTags != null && sceneResponse.sceneTags.includes("immers-space")) {
-                        activityPubScripts = "<script type=\x22module\x22 src=\x22https://cdn.jsdelivr.net/npm/immers-client/dist/destination.bundle.js\x22></script>";
-                    }
+                    // if (sceneResponse.sceneTags != null && sceneResponse.sceneTags.includes("immers-space")) { //
+                    //     activityPubScripts = "<script type=\x22module\x22 src=\x22https://cdn.jsdelivr.net/npm/immers-client/dist/destination.bundle.js\x22></script>";
+                    // }
 
 
                     // settings.sceneAmbientAudioGroups = sceneResponse.sceneAmbientAudioGroups;

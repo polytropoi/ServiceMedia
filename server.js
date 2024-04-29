@@ -140,7 +140,8 @@ var store = new MongoDBStore({ //store session cookies in a separate db with dif
 //    app.use(router);
     app.use(cookieParser());
 //    app.use(bodyParser());
-    app.use(bodyParser.json({ "limit": "10mb", extended: true }));
+    // app.use(bodyParser.json({ "limit": "100mb", extended: true }));
+    app.use(bodyParser.json({ "limit": "150mb", extended: true })); //set this to route specific somehow, for add_scene_mods?
     app.use(bodyParser.urlencoded({ extended: false }));
     // app.use(autoReap);
 

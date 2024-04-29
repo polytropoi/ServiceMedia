@@ -184,11 +184,11 @@ window.addEventListener( 'keydown',  ( event ) => {
     let string = e.target.value;
     let name = string.substring(12);
 
-    if (getExtension(name) == ".glb" || getExtension(name) == ".jpg") {
+    if (getExtension(name) == ".glb" || getExtension(name) == ".jpg" || getExtension(name) == ".png") {
       document.getElementById('selectedFileName').innerHTML = "selected file name: " + name;
       document.getElementById('saveSelectedFileButton').style.visibility = "visible";
     } else {
-      document.getElementById('selectedFileName').innerHTML = "invalid file type - only .glb and .jpg currently suppported";
+      document.getElementById('selectedFileName').innerHTML = "invalid file type - only .glb, .jpg and .png currently suppported";
     }
   });
   $('#modalContent').on('click', '#saveSelectedFileButton', function(e) {
