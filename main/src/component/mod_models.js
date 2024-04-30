@@ -196,7 +196,7 @@ AFRAME.registerComponent('mod_model', {
       let colliders = [];
         // if (!this.isInitialized) {
 
-          console.log("mod_model with + " + this.data.xscale + " " + this.data.yscale + " " + this.data.zscale + " pos " + this.data.xpos + this.data.ypos + this.data.zpos + " rot " + this.data.xrot + this.data.yrot + this.data.zrot);
+          console.log("mod_model " + this.data.modelName + " " + this.data.xscale + " " + this.data.yscale + " " + this.data.zscale + " pos " + this.data.xpos + this.data.ypos + this.data.zpos + " rot " + this.data.xrot + this.data.yrot + this.data.zrot);
           this.el.object3D.scale.set(this.data.xscale,this.data.yscale,this.data.zscale);
           this.el.object3D.getWorldScale(this.oScale);
           if (this.data.tags.includes("hide") || this.data.tags.includes("invisible") || this.data.tags.includes("transparent")) {

@@ -513,7 +513,10 @@ AFRAME.registerComponent('mod_object', {
       followPathNewObject: {default: false},
       forceFactor: {default: 1},
       removeAfter: {default: ''},
-      tags: {default: ''}
+      tags: {default: ''},
+      xscale: {type: 'number', default: 1}, //like the others...
+      yscale: {type: 'number', default: 1},
+      zscale: {type: 'number', default: 1},
     },
     init: function () {
       // console.log("mod_object data " + JSON.stringify(this.data.objectData.modelURL));
@@ -959,7 +962,9 @@ AFRAME.registerComponent('mod_object', {
   
         console.log(this.data.objectData.name + " mod_object model-loaded" +" pos: "+ JSON.stringify(this.data.locationData));
         
-        
+        this.data.xscale = this.data.locationData.xscale != null ? this.data.locationData.xscale : 1;
+        this.data.yscale = this.data.locationData.yscale != null ? this.data.locationData.yscale : 1;
+        this.data.zscale = this.data.locationData.zscale != null ? this.data.locationData.zscale : 1;
         let pos = {};
         pos.x = this.data.locationData.x;
         pos.y = this.data.locationData.y;          
@@ -988,7 +993,7 @@ AFRAME.registerComponent('mod_object', {
             this.modelParent.setAttribute("position", pos);
             this.modelParent.setAttribute("rotation", rot);
           } else {
-              // console.log("not equipped, no modelparent " + JSON.stringify(rot));
+              console.log("not equipped, no modelparent mod_object scale " + JSON.stringify(scale));
               this.el.setAttribute("scale", scale);
               // this.el.object3D.position = pos;
               // this.el.object3D.rotation = rot;
