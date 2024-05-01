@@ -794,9 +794,11 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
     updateMaterials: function () {
       if (this.data.tags && this.data.tags.includes("color")) {
         this.el.setAttribute("material", {color: this.data.eventData.toLowerCase(), transparent: true, opacity: .5});
-      } else {
+      } else if (this.data.modelID.toLowerCase().includes("primitive")) {
+        this.el.removeAttribute("material");
         console.log("tryna update material for markertype " + this.data.markerType);
         if (this.data.markerType.toLowerCase() == "placeholder") {
+          
             this.el.setAttribute("material", {color: "yellow", transparent: true, opacity: .5});
         } else if (this.data.markerType.toLowerCase() == "poi") {
             this.el.setAttribute("material", {color: "purple", transparent: true, opacity: .5});
@@ -832,53 +834,55 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
       if (!mediaID) {
         mediaID = this.data.mediaID;
       }
-      this.el.removeAttribute("transform_controls");
-      this.el.removeAttribute("geometry");
-      this.el.removeAttribute("gltf-model");
-      console.log("tryna load mediaID "+ this.data.mediaID +" for markerType "+ this.data.markerType);
-      if (this.data.markerType.toLowerCase().includes("picture")) {
-        if (mediaID.includes("local_")) {
-          this.el.classList.add("hasLocalFile");
-          mediaID = mediaID.substring(6);
-          console.log("CLOUDMARKER SHOUDL HAVE MediaID " + mediaID + " from localFiles " + localData.localFiles[mediaID]);
-          for (const key in localData.localFiles) {
-            console.log("tryna get localMedia named " + mediaID + " vs " + localData.localFiles[key].name);
-            if (localData.localFiles[key].name == mediaID) {
-              
-              const picBuffer = localData.localFiles[key].data;
-              const picBlob = new Blob([picBuffer]);
+      if (this.data.markerType == "picture") { //or...
+        this.el.removeAttribute("transform_controls");
+        this.el.removeAttribute("geometry");
+        this.el.removeAttribute("gltf-model");
+        console.log("tryna load mediaID "+ this.data.mediaID +" for markerType "+ this.data.markerType);
+        if (this.data.markerType.toLowerCase().includes("picture")) {
+          if (mediaID.includes("local_")) {
+            this.el.classList.add("hasLocalFile");
+            mediaID = mediaID.substring(6);
+            console.log("CLOUDMARKER SHOUDL HAVE MediaID " + mediaID + " from localFiles " + localData.localFiles[mediaID]);
+            for (const key in localData.localFiles) {
+              console.log("tryna get localMedia named " + mediaID + " vs " + localData.localFiles[key].name);
+              if (localData.localFiles[key].name == mediaID) {
+                
+                const picBuffer = localData.localFiles[key].data;
+                const picBlob = new Blob([picBuffer]);
 
-              console.log(URL.createObjectURL(picBlob));
-            }
-          }
-        } else {
-
-          const scenePicDataEl = document.getElementById("scenePictureData");
-          if (scenePicDataEl) {
-            this.picData = scenePicDataEl.components.scene_pictures_control.returnPictureData(mediaID);
-            console.log("picData :  " + JSON.stringify(this.picData));
-            if (this.picData) {
-              
-              if (!this.picData.orientation || this.picData.orientation == "Landscape" || this.data.tags.toLowerCase().includes("landscape")) {
-                this.el.setAttribute('gltf-model', '#landscape_panel'); // model-loaded pics this up and loads 
-              } else if (this.picData.orientation == "Portrait" || this.data.tags.toLowerCase().includes("portrait")) {
-                this.el.setAttribute('gltf-model', '#portrait_panel');
-              } else if (this.picData.orientation == "Square" || this.data.tags.toLowerCase().includes("square")) {
-
-              } else if (this.picData.orientation == "Circle" || this.data.tags.toLowerCase().includes("circle")) {
-
+                console.log(URL.createObjectURL(picBlob));
               }
             }
-          }
-          // for (let i = 0; i < scenePictures.length; i++) {
-          //   if (scenePictures[i]._id == modelID) {
-          //     console.log("loadmedia locationpic :" + scenePictures[i].url);
+          } else {
 
-          //   }
-          // }
+            const scenePicDataEl = document.getElementById("scenePictureData");
+            if (scenePicDataEl) {
+              this.picData = scenePicDataEl.components.scene_pictures_control.returnPictureData(mediaID);
+              console.log("picData :  " + JSON.stringify(this.picData));
+              if (this.picData) {
+                
+                if (!this.picData.orientation || this.picData.orientation == "Landscape" || this.data.tags.toLowerCase().includes("landscape")) {
+                  this.el.setAttribute('gltf-model', '#landscape_panel'); // model-loaded pics this up and loads 
+                } else if (this.picData.orientation == "Portrait" || this.data.tags.toLowerCase().includes("portrait")) {
+                  this.el.setAttribute('gltf-model', '#portrait_panel');
+                } else if (this.picData.orientation == "Square" || this.data.tags.toLowerCase().includes("square")) {
+
+                } else if (this.picData.orientation == "Circle" || this.data.tags.toLowerCase().includes("circle")) {
+
+                }
+              }
+            }
+            // for (let i = 0; i < scenePictures.length; i++) {
+            //   if (scenePictures[i]._id == modelID) {
+            //     console.log("loadmedia locationpic :" + scenePictures[i].url);
+
+            //   }
+            // }
+          }
         }
+        this.el.setAttribute("scale", this.data.xscale + " " + this.data.yscale + " " + this.data.zscale);
       }
-      this.el.setAttribute("scale", this.data.xscale + " " + this.data.yscale + " " + this.data.zscale);
     },
     removeModel: function () {
       this.el.removeObject3D('mesh');
@@ -911,21 +915,25 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
           this.data.modelID = "primitive_cube";
         } 
         if (modelID != undefined && modelID != null & modelID != "none" && modelID != "") {  
+          this.el.setAttribute("scale", this.data.xscale + " " + this.data.yscale + " " + this.data.zscale);
           if (modelID.toString().includes("primitive")) {
             if (!this.data.tags.includes("hide gizmo")) {
-              console.log("CLOUDMARKER PRIMITIVE " + modelID + " scale " + 1);
-              
+             
+
               if (modelID.toString().includes("cube")) {
                   this.el.setAttribute("geometry", {primitive: "box", width: 1, height: 1, depth: 1});
+                  console.log("CLOUDMARKER PRIMITIVE box " + modelID +" scale " + this.data.xscale + " " + this.data.yscale + " " + this.data.zscale);
               } else if (modelID.toString().includes("sphere")) {
                   this.el.setAttribute("geometry", {primitive: "sphere", radius: 1});
+                  console.log("CLOUDMARKER PRIMITIVE sphere " + modelID +" scale " + this.data.xscale + " " + this.data.yscale + " " + this.data.zscale);
               } else if (modelID.toString().includes("cylinder")) {
                   this.el.setAttribute("geometry", {primitive: "cylinder", height: 1, radius: 1 / 2});
+                  console.log("CLOUDMARKER PRIMITIVE sphere " + modelID +" scale " + this.data.xscale + " " + this.data.yscale + " " + this.data.zscale);
               } else {
   
               }
               console.log("loaded cloudmarker geometry " + this.el.getAttribute("geometry", "primitive"));
-              this.el.setAttribute("scale", this.data.xscale + " " + this.data.yscale + " " + this.data.zscale);
+
             }
               if (this.data.markerType.toLowerCase() == "placeholder") {
                   this.el.setAttribute("material", {color: "yellow", transparent: true, opacity: .5});

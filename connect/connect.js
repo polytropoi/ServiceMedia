@@ -133,7 +133,15 @@ $(function() {
    // player = document.getElementById("cameraRig");
    let settingsEl = document.getElementById('settingsDataElement'); //volume, color, etc...
    let theSettingsData = settingsEl.getAttribute('data-settings');
+
    settings = JSON.parse(atob(theSettingsData)); //gets copied to localdata ifn mods are 'llowed
+   
+   let timedEventsEl = document.getElementById('timedEventsDataElement'); //volume, color, etc...
+   if (timedEventsEl) {
+      let theTimedEventsData = timedEventsEl.getAttribute('data-timedevents');
+      timeKeysData =  JSON.parse(atob(theTimedEventsData));
+      console.log("timekeys Data1: " + JSON.stringify(timeKeysData));
+   }
    lastCloudUpdate = settings.sceneLastUpdate;
    setTimeout(function () {
       // localStorage.setItem("last_page", room);
@@ -147,15 +155,16 @@ $(function() {
 
    }
 
-   if (settings && settings.sceneTimedEvents != undefined && settings.sceneTimedEvents != null) {
-      timeKeysData = settings.sceneTimedEvents;
-      console.log("timekeys Dqata: " + JSON.stringify(timeKeysData));
-      // localStorage.setItem(room + '_timeKeys', JSON.stringify(timeKeysData));
-      
-
-      // console.log('cloud timekeysdata' + JSON.stringify(timeKeysData));
-      timedEventsListenerMode = timeKeysData.listenTo;  
-   } 
+   // if (settings && settings.sceneTimedEvents != undefined && settings.sceneTimedEvents != null) {
+   //    timeKeysData = settings.sceneTimedEvents;
+   //    console.log("timekeys Dqata2: " + JSON.stringify(timeKeysData));
+   //    // localStorage.setItem(room + '_timeKeys', JSON.stringify(timeKeysData));
+   //    // console.log('cloud timekeysdata' + JSON.stringify(timeKeysData));
+   //    timedEventsListenerMode = timeKeysData.listenTo;  
+   // } 
+   // if (timedEvents) {
+   //    timeKeysData = timedEvents;
+   // }
    // else if (localStorage.getItem(room + "_timeKeys") != null) { //use local ve3rsion if saved
    //    // timeKeysData = JSON.parse(localStorage.getItem(room + "_timeKeys"));
    //    console.log('local timeKeysData' + JSON.stringify(timeKeysData));

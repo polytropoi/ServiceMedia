@@ -454,6 +454,7 @@ webxr_router.get('/:_id', function (req, res) {
     let trackMarker = false;
     let joystickScript = "";
     let settingsData = "";
+    let sceneTimedEventsData = "";
     let carScript = "";
     let networkingEntity = "";
     let locationEntity = "";
@@ -3685,15 +3686,16 @@ webxr_router.get('/:_id', function (req, res) {
                               
 
                             } else {
-                                if (preloadVideo) {
+                                //hrm, now most vids are hls, don't really need this...
+                                // if (preloadVideo) {
                                 
-                                    videoAsset = "<video id=\x22video1\x22 crossOrigin=\x22anonymous\x22>"+vidSrc+"</video>";
-                                } else {
-                                    videoAsset = "<video autoplay muted loop=\x22true\x22 webkit-playsinline playsinline id=\x22video1\x22 crossOrigin=\x22anonymous\x22></video>"; 
-                                }
+                                //     videoAsset = "<video id=\x22video1\x22 crossOrigin=\x22anonymous\x22>"+vidSrc+"</video>";
+                                // } else {
+                                //     videoAsset = "<video autoplay muted loop=\x22true\x22 webkit-playsinline playsinline id=\x22video1\x22 crossOrigin=\x22anonymous\x22></video>"; 
+                                // }
 
-                                videoEntity = "<a-entity "+videoParent+" class=\x22activeObjexGrab activeObjexRay\x22 vid_materials=\x22url: "+vidUrl+"\x22 gltf-model=\x22#movieplayer2.glb\x22 position=\x22"+videoLocation+"\x22 rotation=\x22"+videoRotation+"\x22 width='10' height='6'><a-text id=\x22videoText\x22 align=\x22center\x22 rotation=\x220 0 0\x22 position=\x22-.5 -1 1\x22 wrapCount=\x2240\x22 value=\x22Click to Play Video\x22></a-text>" +
-                                "</a-entity>";
+                                // videoEntity = "<a-entity "+videoParent+" class=\x22activeObjexGrab activeObjexRay\x22 vid_materials=\x22url: "+vidUrl+"\x22 gltf-model=\x22#movieplayer2.glb\x22 position=\x22"+videoLocation+"\x22 rotation=\x22"+videoRotation+"\x22 width='10' height='6'><a-text id=\x22videoText\x22 align=\x22center\x22 rotation=\x220 0 0\x22 position=\x22-.5 -1 1\x22 wrapCount=\x2240\x22 value=\x22Click to Play Video\x22></a-text>" +
+                                // "</a-entity>";
                             }
 
                             callback(null);
@@ -4399,7 +4401,7 @@ webxr_router.get('/:_id', function (req, res) {
                     settings.volumePrimary = sceneResponse.scenePrimaryVolume;
                     settings.volumeAmbient = sceneResponse.sceneAmbientVolume;
                     settings.volumeTrigger = sceneResponse.sceneTriggerVolume; 
-                    settings.sceneTimedEvents = sceneResponse.sceneTimedEvents; //could be big!?
+                    // settings.sceneTimedEvents = sceneResponse.sceneTimedEvents; //could be big!?
                     settings.skyboxIDs = skyboxIDs;
                     settings.skyboxID = skyboxID;
                     settings.skyboxURL = skyboxUrl;
@@ -4474,6 +4476,11 @@ webxr_router.get('/:_id', function (req, res) {
                     // settings.scenePrimaryAudioGroups = sceneResponse.scenePrimaryAudioGroups;
                     var sbuff = Buffer.from(JSON.stringify(settings)).toString("base64");
                     settingsData = "<div id=\x22settingsDataElement\x22 data-settings=\x22"+sbuff+"\x22></div>";
+
+                    if (sceneResponse.sceneTimedEvents) {
+                        var tebuff = Buffer.from(JSON.stringify(sceneResponse.sceneTimedEvents)).toString("base64");
+                        sceneTimedEventsData = "<div id=\x22timedEventsDataElement\x22 data-timedevents=\x22"+tebuff+"\x22></div>";
+                    }
                     // settingsDataEntity = "<a-entity id=\x22settingsDataEntity\x22 data-settings=\x22"+sbuff+"\x22></a-entity>"; ? maybe
 
                     let grabMix = "<a-mixin id=\x22grabmix\x22" + //mixin for grabbable objex
@@ -4702,6 +4709,7 @@ webxr_router.get('/:_id', function (req, res) {
                         "<div class=\x22avatarName\x22 id="+avatarName+"></div>"+
                         "<div id=\x22token\x22 data-token=\x22"+token+"\x22></div>\n"+
                         settingsData +
+                        sceneTimedEventsData +
                         // aframeScriptVersion + 
                         // extraScripts + 
                         // contentUtils +
@@ -4820,6 +4828,7 @@ webxr_router.get('/:_id', function (req, res) {
                        
 
                         settingsData +
+                        sceneTimedEventsData +
                         aframeScriptVersion + 
                         modObjex +
                         modModels +
@@ -4959,8 +4968,6 @@ webxr_router.get('/:_id', function (req, res) {
                             modelAssets = modelAssets + "<a-asset-item id=\x22flat_round_rect\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/flatroundrect.glb\x22></a-asset-item>\n";
                         }
                         
-
-
                         // console.log("scenne greeting is " + sceneGreeting);
                         let sceneShadows = "shadow=\x22enabled: false\x22";
                         let physicsInsert = "";
@@ -4979,14 +4986,7 @@ webxr_router.get('/:_id', function (req, res) {
                         }
                         if (useStarterKit) { //uses PHYSX, not ammo.js as above
                             physicsInsert = " physx=\x22debug: true; autoLoad: true; delay: 1000; wasmUrl: https://cdn.jsdelivr.net/gh/c-frame/physx@v0.1.0/wasm/physx.release.wasm; useDefaultScene: false;\x22 ";
-                        //     webxr="overlayElement:#dom-overlay;"
-                        //     background="color:skyblue;"
-                        //     reflection="directionalLight:#dirlight;"
-                        // renderer="alpha:true;physicallyCorrectLights:true;colorManagement:true;exposure:2;toneMapping:ACESFilmic;"
-                        //     ar-hit-test="target:#my-ar-objects;type:footprint;footprintDepth:0.2;"
-                        //     shadow="type: pcfsoft"
-                        //     gltf-model="dracoDecoderPath: https://www.gstatic.com/draco/versioned/decoders/1.5.6/;"
-                        // ar-cursor raycaster="objects: #my-ar-objects a-sphere"
+                         
                         }
                         if (useSuperHands) {
                             physicsInsert = " physics=\x22debug: "+debugMode+"; debugDrawMode: 1;\x22";
@@ -5182,6 +5182,7 @@ webxr_router.get('/:_id', function (req, res) {
                         "<div class=\x22ambientAudioParams\x22 id="+ambientUrl+"></div>"+
                         "<div class=\x22triggerAudioParams\x22 id="+triggerUrl+"></div>"+
                         settingsData +
+                        sceneTimedEventsData +
                         // "<div class=\x22attributionParams\x22 id="+JSON.stringify(attributions)+"></div>"+
                         "<div class=\x22avatarName\x22 id="+avatarName+"></div>"+
 

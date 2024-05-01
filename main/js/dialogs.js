@@ -1339,7 +1339,9 @@ function AddTimekey() {
   newTimekey.keytype = "Beat Mid";
   newTimekey.keydata = "";
   newTimekey.keylabel = "New Timed Event";
+  
   let tkTmp = [];
+
   if (timeKeysData == null) {
     timeKeysData = {};
     timeKeysData.timekeys = [];
@@ -1352,9 +1354,11 @@ function AddTimekey() {
   let tkObject = {};
    tkObject.listenTo = timedEventsListenerMode;
    tkObject.timekeys = tkTmp;
+    console.log("timekeys: " + JSON.stringify(timeKeysData));
    // localStorage.setItem(room + "_timeKeys", JSON.stringify(vids[0].timekeys)); 
   //  timedEventsListenerMode = "Primary Video"
   //  localStorage.setItem(room + "_timeKeys", JSON.stringify(tkObject)); 
+  localData.timedEvents = tkObject;
    SetPrimaryAudioEventsData();
    SceneManglerModal('Events');
   //  ShowHideDialogPanel();
@@ -1472,11 +1476,15 @@ function PlayPauseMedia () {
 
 function ReturnTimeKeys() { 
   // if (timeKeysData != null) {
-    console.log(JSON.stringify(settings.sceneTimedEvents));
-    if (settings && settings.sceneTimedEvents) {
+    // console.log("timedEvents:  " +JSON.stringify(timeKeysData));
+    if (localData.timedEvents) {
+      timeKeysData = localData.timedEvents;
+      timedEventsListenerMode = timeKeysData.listenTo; 
+    } else if (settings && settings.sceneTimedEvents) {
       timeKeysData = settings.sceneTimedEvents;
       timedEventsListenerMode = timeKeysData.listenTo; 
     }
+    console.log("timedEvents:  " +JSON.stringify(timeKeysData));
     if (timeKeysData != null && timeKeysData.timekeys != undefined && timeKeysData.timekeys != null && timeKeysData.timekeys.length > 0) {
       tkStarttimes.sort((a, b) => parseFloat(a.keystarttime) - parseFloat(b.keystarttime));
       timeKeysData.timekeys.sort((a, b) => parseFloat(a.keystarttime) - parseFloat(b.keystarttime));
@@ -2229,8 +2237,8 @@ function SceneManglerModal(mode) {
     
     "<div "+aboutDisplay+" id=\x22About\x22 class=\x22modalMain tabcontent\x22>"+
         // "<p>"
-        "<div>Use WASD keys to move, R to rise, F to fall.<br>"+
-        "Hold Shift key + click to modify elements, or T key + click for transform control mode<br>"+
+        "<div>Use WASD keys to move, R to rise, F to fall. Click + drag to look<br>"+
+        "Hold Shift key + click to modify elements, X key + click to create location, or T key + click for transform control mode<br>"+
         "In transform control mode: W translate | E rotate | R scale | X toggle X | Y toggle Y | Z toggle Z<br></div><br>"+
         "Attributions:" + 
         ReturnAttributions()+
