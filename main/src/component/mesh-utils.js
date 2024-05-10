@@ -271,6 +271,7 @@ AFRAME.registerComponent('mod_physics', { //used by models, placeholders, instan
           // this.el.material.color.setHex("#000000".replace(/0/g,function(){return (~~(Math.random()*16)).toString(16);}));
         }
         if (this.el.id.toLowerCase().includes("wall")) {
+          console.log("wall hit " + e.detail.targetEl.id);
           var triggerAudioController = document.getElementById("triggerAudio");
           if (triggerAudioController != null && this.model == "spawned") {
             console.log("mod_physics TRIGGER collision "  + this.el.id + " " + e.detail.targetEl.id);
@@ -311,6 +312,7 @@ AFRAME.registerComponent('mod_physics', { //used by models, placeholders, instan
   
   },
   forwardPush: function () {
+    console.log("forwardPush on " + this.el.id);
     const velocity = new Ammo.btVector3(0, 0, -10);
     this.el.body.setLinearVelocity(velocity);
    
@@ -337,6 +339,7 @@ AFRAME.registerComponent('mod_physics', { //used by models, placeholders, instan
      if (this.isReady) {
         if (this.attractor) {
           // const delta = clock.getDelta();
+          console.log("forwardPush on " + this.el.id);
           this.rotationMatrix.lookAt( this.attractor, this.mesh.position, this.mesh.up );
           this.targetQuaternion.setFromRotationMatrix( this.rotationMatrix );
           if ( ! this.mesh.quaternion.equals( this.targetQuaternion ) ) {

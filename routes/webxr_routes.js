@@ -1388,7 +1388,7 @@ webxr_router.get('/:_id', function (req, res) {
                                             
                             } else { //"sceneWebType == "Default or AFrame"
                                 
-                                joystickContainer = "<div id=\x22joystickContainer\x22 class=\x22JoystickRegionUI\x22 style=\x22z-index: 100; visibility: hidden\x22>" + //initialized in navigation / content-utils
+                                joystickContainer = "<div id=\x22joystickContainer\x22 class=\x22JoystickRegionUI\x22 style=\x22z-index: 1000; visibility: hidden\x22>" + //initialized in navigation / content-utils
                                 "<div class=\x22JoystickButtonUI\x22 style=\x22width: 128px; opacity:0.50;\x22>" +
                                     "<img src=\x22/css/joystick-base.png\x22/>" +
                                     "<div id=\x22joystickEl\x22 style=\x22position: absolute; left:32px; top:32px;\x22>" +

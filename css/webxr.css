@@ -1293,7 +1293,7 @@ background-color: #000000;
  {
 
    border: 0px solid yellow;
-    position: absolute; left: 0; right: 0; bottom:8px; margin-left: auto; margin-right: auto; width: 128px; height: 128px; color:white; z-index:100;
+    position: absolute; left: 0; right: 0; bottom:32px; margin-left: auto; margin-right: auto; width: 128px; height: 128px; color:rgba(255, 255, 255, 0.664); z-index:1000;
    /* position: absolute;  */
     /* display: flex;
     flex-direction: column;
