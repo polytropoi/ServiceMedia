@@ -834,7 +834,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
       if (!mediaID) {
         mediaID = this.data.mediaID;
       }
-      if (this.data.markerType == "picture") { //or...
+      // if (this.data.markerType == "picture") { 
         this.el.removeAttribute("transform_controls");
         this.el.removeAttribute("geometry");
         this.el.removeAttribute("gltf-model");
@@ -873,16 +873,31 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                 }
               }
             }
-            // for (let i = 0; i < scenePictures.length; i++) {
-            //   if (scenePictures[i]._id == modelID) {
-            //     console.log("loadmedia locationpic :" + scenePictures[i].url);
+          }
+        } else if (this.data.markerType == "text") {
+          if (mediaID.includes("local_")) {
+            this.el.classList.add("hasLocalFile");
+            mediaID = mediaID.substring(6);
+            console.log("CLOUDMARKER SHOUDL HAVE MediaID " + mediaID + " from localFiles " + localData.localFiles[mediaID]);
+            for (const key in localData.localFiles) {
+              console.log("tryna get localMedia named " + mediaID + " vs " + localData.localFiles[key].name);
+              if (localData.localFiles[key].name == mediaID) {
+                
+                //load text itme
+              }
+            }
+          } else {
 
-            //   }
-            // }
+            const sceneTextItemDataEl = document.getElementById("sceneTextItemData");
+            if (sceneTextItemDataEl) {
+              this.textData = scenePicDataEl.components.scene_text_control.returnTextData(mediaID); //like this for text items.,..
+              console.log("textData :  " + JSON.stringify(this.textData));
+
+            }
           }
         }
         this.el.setAttribute("scale", this.data.xscale + " " + this.data.yscale + " " + this.data.zscale);
-      }
+      // }
     },
     removeModel: function () {
       this.el.removeObject3D('mesh');

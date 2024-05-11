@@ -1341,7 +1341,7 @@ AFRAME.registerComponent('mod_model', {
             }  
           });
           this.el.addEventListener('mouseenter', (evt) =>  {
-            console.log("MOD_MODEL mouseovewr model " + this.data.modelName + this.hasLocationCallout + this.data.markerType + this.hasCallout + evt.detail);
+            console.log("MOD_MODEL mouseovewr model " + this.data.modelName + " " + this.hasLocationCallout + " " + this.data.markerType + " " + this.hasCallout + " " + evt.detail);
            
             if (evt.detail.intersection != null) {
               if (textData.length > 0) {
@@ -1369,7 +1369,7 @@ AFRAME.registerComponent('mod_model', {
                   } else {
                     this.bubble.setAttribute('position', evt.detail.intersection.point);
                     this.bubbleText.setAttribute('position', '0 .5 ' + scalerange.toString());
-                    console.log("tryna show callout " + scalerange.toString() + " " + this.calloutString);
+                    // console.log("tryna show callout " + scalerange.toString() + " " + this.calloutString);
                   }
                 }  else {
                   console.log("this.bubble not found!");

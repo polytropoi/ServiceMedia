@@ -150,7 +150,7 @@ AFRAME.registerComponent('mod_objex', {
             }
           }
         }
-        console.log("need to fetch to pop scene inventory: " + oIDs);
+        console.log("need to fetch inventory: " + oIDs);
         FetchSceneInventoryObjex(oIDs); //do fetch in external function, below, bc ajax response can't get to component scope if it's here (?)
       
       },
@@ -207,7 +207,7 @@ AFRAME.registerComponent('mod_objex', {
                   locationData.z = Math.floor(Math.random() * 50);
                 }
                 let objEl = document.createElement("a-entity");
-                objEl.setAttribute("mod_object", {'eventData': null, 'locationData': locationData, 'objectData': this.data.jsonObjectData[j], 'inventoryData': this.sceneInventoryItems[i], 'fromSceneInventory': this.fromSceneInventory, 'timestamp': timestamp});
+                objEl.setAttribute("mod_object", {'eventData': null, 'locationData': locationData, 'objectData': this.data.jsonObjectData[j], 'inventoryData': this.sceneInventoryItems[i], 'fromSceneInventory': true, 'timestamp': timestamp, 'isSpawned': false});
                 // objEl.setAttribute("mod_object", {'locationData': locationData, 'objectData': this.data.jsonObjectData[j], 'inventoryData': this.sceneInventoryItems[i], 'timestamp': timestamp});
                 objEl.id = "obj" + this.data.jsonObjectData[j]._id + "_" + timestamp;
                 sceneEl.appendChild(objEl);
@@ -1463,7 +1463,7 @@ AFRAME.registerComponent('mod_object', {
                 });        
               }
             } 
-            if (this.data.objectData.physics != undefined && this.data.objectData.physics != null && this.data.objectData.physics.toLowerCase() != "none") {
+            if (this.data.objectData.physics != undefined && this.data.objectData.physics != null && this.data.objectData.physics.toLowerCase() != "none" && !this.data.fromSceneInventory) {
               console.log("tryna add physics to new mod_object " + this.data.objectData.name + " is equipped " + this.data.isEquipped + " body " +
                                         this.data.objectData.physics + " hasShoot " + this.hasShootAction + " hasThrow " + this.hasThrowAction + " isSpawned " + this.data.isSpawned);
               //  setTimeout(function(){  
@@ -2742,7 +2742,7 @@ AFRAME.registerComponent('mod_object', {
      
     },
   
-    activated: function () {
+    activated: function () { //i.e. ready for action!
      
       console.log("this.isActivated " + this.isActivated + " + hasPickupAction " + this.hasPickupAction + " for " + this.el.id);
       if (!this.isActivated) { 

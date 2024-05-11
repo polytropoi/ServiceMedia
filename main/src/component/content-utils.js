@@ -745,8 +745,9 @@ AFRAME.registerComponent('main-text-control', {
     schema: {
         // font: {default: ""},
         mainTextString: {default: ''},
-        mode: {default: ""},
-        jsonData: {default: ""}
+        mode: {default: ''},
+        jsonData: {default: ''},
+        font: {default: ''}
       },
       init: function () {
         let theData = this.el.getAttribute('data-maintext');

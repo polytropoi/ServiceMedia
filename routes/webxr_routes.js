@@ -1060,6 +1060,7 @@ webxr_router.get('/:_id', function (req, res) {
                                         || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "waypoint" 
                                         || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "player"  
                                         || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "3D text" 
+                                        || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "text" 
                                         || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "light"  
                                         || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "link"  
                                          
@@ -1100,7 +1101,7 @@ webxr_router.get('/:_id', function (req, res) {
                                     
                                     
                                 }
-                                if (sceneResponse.sceneLocations[i].markerType == "text") {
+                                if (sceneResponse.sceneLocations[i].markerType == "text" && sceneResponse.sceneLocations[i].locationTags && sceneResponse.sceneLocations[i].locationTags.includes("main")) {
                                     textLocation = sceneResponse.sceneLocations[i].x + " " + sceneResponse.sceneLocations[i].y + " " + zFix; //TODO - these must all be arrays, like sceneModelLocations above!
                                 }
                                 if (sceneResponse.sceneLocations[i].markerType == "video") {
@@ -3281,16 +3282,13 @@ webxr_router.get('/:_id', function (req, res) {
                                             if (text_item.type == "SVG Document") {
                                                 // console.log("gots svgItem : " + JSON.stringify(text_item));
                                                 let scale = 1;
-                                                if (sceneTextLocations[i].markerObjScale && sceneTextLocations[i].markerObjScale != "" && sceneTextLocations[i].markerObjScale != 0) {
-                                                    scale = sceneTextLocations[i].markerObjScale;
-                                                }
+                                                // if (sceneTextLocations[i].markerObjScale && sceneTextLocations[i].markerObjScale != "" && sceneTextLocations[i].markerObjScale != 0) {
+                                                //     scale = sceneTextLocations[i].markerObjScale;
+                                                // }
                     
                                                 sceneTextItemData = sceneTextItemData + "<canvas class=\x22canvasItem\x22 id=\x22svg_canvas_"+textID+"\x22 style=\x22text-align:center;\x22 width=\x221024\x22 height=\x221024\x22></canvas>"+
                                                 "<div style=\x22visibility: hidden\x22 class=\x22svgItem\x22 id=\x22svg_item_"+textID+"\x22 data-attribute=\x22"+text_item._id+"\x22>"+text_item.textstring+"</div>"; //text string is an svg
-                                                
-                                                // proceduralEntities = proceduralEntities + " <a-plane loadsvg=\x22id:"+textID+"; description: "+sceneTextLocations[i].description+"; eventdata: "+sceneTextLocations[i].eventData+"; tags:  "+sceneTextLocations[i].locationTags+"\x22 id=\x22svg_"+sceneTextLocations[i].timestamp+
-                                                // "\x22 look-at=\x22#player\x22 width=\x22"+scale+"\x22 height=\x22"+scale+"\x22 position=\x22"+sceneTextLocations[i].x + " " + sceneTextLocations[i].y + " " + sceneTextLocations[i].z+"\x22></a-plane>";
-                                                
+
                                                 proceduralEntities = proceduralEntities + " <a-plane loadsvg=\x22id:"+textID+"; description: "+sceneTextLocations[i].description+"; eventdata: "+sceneTextLocations[i].eventData+"; tags:  "+sceneTextLocations[i].locationTags+"\x22 id=\x22svg_"+sceneTextLocations[i].timestamp+
                                                 "\x22 look-at=\x22#player\x22 width=\x22"+scale+"\x22 height=\x22"+scale+"\x22 position=\x22"+sceneTextLocations[i].x + " " + sceneTextLocations[i].y + " " + sceneTextLocations[i].z+"\x22></a-plane>";
                                             }
@@ -3311,9 +3309,9 @@ webxr_router.get('/:_id', function (req, res) {
                                             if (text_item.type == "SVG Document") {
                                                 // console.log("gots svgItem : " + JSON.stringify(text_item));
                                                 let scale = 1;
-                                                if (sceneTextLocations[i].markerObjScale && sceneTextLocations[i].markerObjScale != "" && sceneTextLocations[i].markerObjScale != 0) {
-                                                    scale = sceneTextLocations[i].markerObjScale;
-                                                }
+                                                // if (sceneTextLocations[i].markerObjScale && sceneTextLocations[i].markerObjScale != "" && sceneTextLocations[i].markerObjScale != 0) {
+                                                //     scale = sceneTextLocations[i].markerObjScale;
+                                                // }
                                                 // sceneTextItemData = sceneTextItemData + "<div style=\x22visibility: hidden\x22 class=\x22svgItem\x22 id=\x22svg_item_"+textID+"\x22 data-attribute=\x22"+text_item._id+"\x22>"+text_item.textstring+"</div>";
                                                 proceduralEntities = proceduralEntities + " <a-entity load_threesvg=\x22id:"+textID+"; description: "+sceneTextLocations[i].description+"; eventdata: "+sceneTextLocations[i].eventData+"; tags:  "+sceneTextLocations[i].locationTags+"\x22 id=\x22svg_"+sceneTextLocations[i].timestamp+
                                                 "\x22 look-at=\x22#player\x22 width=\x22"+scale+"\x22 height=\x22"+scale+"\x22 position=\x22"+sceneTextLocations[i].x + " " + sceneTextLocations[i].y + " " + sceneTextLocations[i].z+"\x22></a-entity>";

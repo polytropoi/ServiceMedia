@@ -13115,7 +13115,7 @@ app.get('/uscene/:user_id/:scene_id',  requiredAuthentication, uscene, function 
                     moids = sceneResponse.sceneTextItems.map(convertStringToObjectID);
                     db.text_items.find({_id: {$in: moids }}, function (err, text_items){
                         if (err || !text_items) {
-                            console.log("error getting video items: " + err);
+                            console.log("error getting text items: " + err);
                             callback(null);
                         } else {
                             sceneResponse.textItems = text_items;

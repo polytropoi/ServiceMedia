@@ -15456,6 +15456,31 @@ function getAllPeople() {
                                 }
                             }
                         }
+                        if (sceneTextItems != null && sceneTextItems != undefined && sceneTextItems.length > 0) { //TODO refactor this to scenePictureItems or something..
+
+                            console.log("textitems: " +JSON.stringify(textItems));
+                            for (let k = 0; k < sceneLocations.length; k++) {
+                                if (sceneLocations[k].markerType == "text") {
+                                    console.log ("gotsa text location with mediaID : "+ sceneLocations[k].mediaID);
+                                    const z = document.getElementById("mediaSelect_" + sceneLocations[k].timestamp);
+                                    for (let l = 0; l < textItems.length; l++) {
+                                        console.log(textItems[l].title);
+                                        if (textItems[l]._id != undefined) {
+                                            // console.log(sceneObjex[l]._id + " vs " + sceneLocations[k].objectID);
+                                            
+                                            var option = document.createElement("option"); 
+                                            option.text = textItems[l].title;
+                                            option.value = textItems[l]._id;
+                                        
+                                        if (textItems[l]._id == sceneLocations[k].mediaID) {
+                                            option.selected = true;
+                                        } 
+                                        z.add(option);
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     //asset bundle crap
                     /*
                     axios.get('/get_userassets/' + userid)
@@ -16298,7 +16323,7 @@ function getAllPeople() {
                         for (let s = 0; s < sceneLocations.length; s++) {   
                             let locid = this.id.split("_")[1];
                             if (locid == sceneLocations[s].timestamp || this.id == sceneLocations[s].timestamp) {
-                                if (sceneLocations[s].markerType == "picture") {
+                                if (sceneLocations[s].markerType == "picture" || sceneLocations[s].markerType == "text") { //todo model, vid?
 
                                     sceneLocations[s].mediaName = $(this).find('option:selected').text();
                                     sceneLocations[s].mediaID = this.value;
