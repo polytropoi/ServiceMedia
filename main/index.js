@@ -15458,7 +15458,7 @@ function getAllPeople() {
                         }
                         if (sceneTextItems != null && sceneTextItems != undefined && sceneTextItems.length > 0) { //TODO refactor this to scenePictureItems or something..
 
-                            console.log("textitems: " +JSON.stringify(textItems));
+                            // console.log("textitems: " +JSON.stringify(textItems));
                             for (let k = 0; k < sceneLocations.length; k++) {
                                 if (sceneLocations[k].markerType == "text") {
                                     console.log ("gotsa text location with mediaID : "+ sceneLocations[k].mediaID);

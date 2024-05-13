@@ -481,15 +481,14 @@ webxr_router.get('/:_id', function (req, res) {
     let pictureGroupsEntity = "";
     let pictureGroupsData = "";
     let scenePictureData = "";
-    let audioGroupsEntity = "";
-    let audioGroupsData = "";
+    let sceneTextData = "";
+   
     let videoGroupsEntity = "";
     let videoElements = "";
     let hlsScript = "";
     // let loadPictureGroups = "";
     let tilepicUrl = "";
-    let availableScenesInclude = "";
-    let restrictToLocation = false;
+   
     let isGuest = true;
     let socketScripts = "";
     let navmeshScripts = "";
@@ -1098,11 +1097,13 @@ webxr_router.get('/:_id', function (req, res) {
                                         playerRotation = sceneResponse.sceneLocations[i].eulerx + " " + sceneResponse.sceneLocations[i].eulery + " " + sceneResponse.sceneLocations[i].eulerz;
                                     }
                                     playerPositions.push(playerPosition);
-                                    
-                                    
                                 }
-                                if (sceneResponse.sceneLocations[i].markerType == "text" && sceneResponse.sceneLocations[i].locationTags && sceneResponse.sceneLocations[i].locationTags.includes("main")) {
-                                    textLocation = sceneResponse.sceneLocations[i].x + " " + sceneResponse.sceneLocations[i].y + " " + zFix; //TODO - these must all be arrays, like sceneModelLocations above!
+                                if (sceneResponse.sceneLocations[i].markerType == "text") {
+                                    if (sceneResponse.sceneLocations[i].locationTags && sceneResponse.sceneLocations[i].locationTags.includes("main")) {
+                                       textLocation = sceneResponse.sceneLocations[i].x + " " + sceneResponse.sceneLocations[i].y + " " + zFix; //single location that will use main text
+                                    } else if (sceneResponse.sceneLocations[i].mediaID && sceneResponse.sceneLocations[i].mediaID.length > 6) {
+                                        console.log("text mediaID is " + sceneResponse.sceneLocations[i].mediaID);
+                                    }
                                 }
                                 if (sceneResponse.sceneLocations[i].markerType == "video") {
                                     hlsScript = "<script src=\x22../main/js/hls.min.js\x22></script>";//v 1.0.6 
@@ -2683,6 +2684,7 @@ webxr_router.get('/:_id', function (req, res) {
                                 && locMdl.markerType != "gate"
                                 && locMdl.markerType != "mailbox"
                                 && locMdl.markerType != "portal" 
+                                && locMdl.markerType != "text" 
                                 && sceneResponse.sceneModels.indexOf(locMdl.modelID) != -1) {
 
                                 // console.log("tryna set model id:  " + JSON.stringify(locMdl));
@@ -2870,44 +2872,7 @@ webxr_router.get('/:_id', function (req, res) {
                                        
                                         //// scene type filters...
                                         // if (sceneResponse.sceneWebType == "ThreeJS") { //three
-                                            // if (sceneResponse.sceneFaceTracking ) {
-                                            //     console.log("face tracking asset at " + modelURL);
-                                            //     gltfsAssets = {};
-                                            //     gltfsAssets.modelURL = modelURL;
-                                            //     gltfsAssets.offsetX = locMdl.x;
-                                            //     gltfsAssets.offsetY = locMdl.y;
-                                            //     gltfsAssets.scale = scale;
-                                            // } else {
-                                            //     gltfsAssets = gltfsAssets +
-                                            //     "loader.load(\n"+
-                                            //     "\x22"+modelURL+"\x22,\n"+
-                                            //     // called when the resource is loaded
-                                            //     "function ( gltf ) {\n"+
-                                            //         "scene.add( gltf.scene );\n"+
-                                                 
-                                            //         "if (!gltf.scene) return;\n" +
-                                            //         "gltf.scene.traverse(function (node) {\n" +
-                                            //             "if (node.material && 'envMap' in node.material) {\n" +
-                                            //             "node.material.envMap = envMap;\n" +
-                                            //             "node.material.envMap.intensity = 1;\n" +
-                                            //             "node.material.needsUpdate = true;\n" +
-                                            //             "}\n" +
-                                            //         "});\n" +
-                                            //         "gltf.scene.position.set("+locMdl.x+", "+locMdl.y+", "+locMdl.z+");\n"+
-                                            //         "gltf.scene.rotation.set("+rx+", "+ry+", "+rz+");\n"+
-                                            //         "gltf.scene.scale.set("+scale+", "+scale+", "+scale+");\n"+
-                                            //     "},\n"+
-                                            //     // called while loading is progressing
-                                            //     "function ( xhr ) {\n"+
-                                            //         "console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );\n"+
-                                            //         "},\n"+
-                                            //     // called when loading has errors
-                                            //     "function ( error ) {\n"+
-                                            //         "console.log( 'An error happened' );\n"+
-                                            //         "}\n"+
-                                            //     ");\n";
-                                            // }
-                                            // console.log("face tracking asset at " + modelURL);
+                                         
                                            
                                         // } else if (sceneResponse.sceneWebType == "BabylonJS") { //hrm, maybe later
                                             
@@ -2965,7 +2930,7 @@ webxr_router.get('/:_id', function (req, res) {
                                                     let shape = 'hull';
                                                     let groundMod = "";
                                                     
-                                                    if (locMdl.eventData.toLowerCase().includes('physics')){ //ammo for now // no do it in mod_model (where model isloaded)
+                                                    if (locMdl.eventData.toLowerCase().includes('physics')){ //ammo for now // no add in mod_model (where model isloaded)
                                                     // let isTrigger = false;
                                                     
                                                         if (locMdl.eventData.toLowerCase().includes('static')){ 
@@ -3247,21 +3212,12 @@ webxr_router.get('/:_id', function (req, res) {
                     if (sceneResponse.sceneTextItems != null && sceneResponse.sceneTextItems != undefined && sceneResponse.sceneTextItems != "") {
 
 
-                        if (sceneResponse.sceneWebType != "HTML from Text Item") { //if it's not just a regular html page
-                            for (let i = 0; i < sceneTextLocations.length; i++) {  //TODO ASYNC
+                        if (sceneResponse.sceneWebType != "HTML from Text Item") { //if it's not just a regular html page...
+                            for (let i = 0; i < sceneTextLocations.length; i++) {  //TODO ASYNC//nah
 
                             console.log("cheking sceneLocation " + JSON.stringify(sceneTextLocations[i]));
-                            // sceneTextItemData = "<div id=\x22sceneTextItems\x22 data-attribute=\x22"+sceneResponse.sceneTextItems+"\x22></div>"; 
-                            // dialogButton = "<div class=\x22dialog_button\x22 style=\x22float: left; margin: 10px 10px;\x22 onclick=\x22SceneManglerModal('Welcome')\x22><i class=\x22fas fa-info-circle fa-2x\x22></i></div>";
-                            
-                            //hrm...dunno....
-                                // if (!sceneResponse.sceneTextUseModals) {
-                                //     //renderPanel = "<a-entity visible=\x22false\x22 render_canvas id=\x22renderCanvas\x22 look-at=\x22#player\x22 geometry=\x22primitive: plane; width:1; height:1;\x22 scale=\x221 1 1\x22 position=\x220 3.5 -.25\x22 material=\x22shader: html; transparent: true; width:1024; height:1024; fps: 10; target: #renderPanel;\x22></a-entity>\n";
-                                //     renderPanel = "<a-entity use-textitem-modals></a-entity>\n";
-                                // } else {
-                                //     renderPanel = "<a-entity use-textitem-modals></a-entity>\n";
-                                // }
-                            
+                            sceneTextData = "<a-entity scene_text_control id=\x22sceneTextData\x22 data-attribute=\x22"+sceneResponse.sceneTextItems+"\x22></a-entity>"; //this does a fetch clientside using the IDs in data-attribute
+
                             let textID = sceneTextLocations[i].description; //check desc for id, if not then event data
                             if (!textID || textID.length < 5) {
                                 textID = sceneTextLocations[i].eventData;
@@ -3282,10 +3238,7 @@ webxr_router.get('/:_id', function (req, res) {
                                             if (text_item.type == "SVG Document") {
                                                 // console.log("gots svgItem : " + JSON.stringify(text_item));
                                                 let scale = 1;
-                                                // if (sceneTextLocations[i].markerObjScale && sceneTextLocations[i].markerObjScale != "" && sceneTextLocations[i].markerObjScale != 0) {
-                                                //     scale = sceneTextLocations[i].markerObjScale;
-                                                // }
-                    
+
                                                 sceneTextItemData = sceneTextItemData + "<canvas class=\x22canvasItem\x22 id=\x22svg_canvas_"+textID+"\x22 style=\x22text-align:center;\x22 width=\x221024\x22 height=\x221024\x22></canvas>"+
                                                 "<div style=\x22visibility: hidden\x22 class=\x22svgItem\x22 id=\x22svg_item_"+textID+"\x22 data-attribute=\x22"+text_item._id+"\x22>"+text_item.textstring+"</div>"; //text string is an svg
 
@@ -3320,7 +3273,9 @@ webxr_router.get('/:_id', function (req, res) {
                                             }
                                         });
                                     } 
-                                } 
+                                } else { //just "plain" text for now...//TODO markup? urdf? //nm do it clientside
+                                   
+                                }
                             }
                         } 
                         callback();
@@ -5314,6 +5269,7 @@ webxr_router.get('/:_id', function (req, res) {
                         pictureGroupsEntity +
                         pictureGroupsData +
                         scenePictureData +
+                        sceneTextData + 
                         videoGroupsEntity +
                         navmeshEntity +
                         surfaceEntity +

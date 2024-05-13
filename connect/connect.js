@@ -33,6 +33,7 @@ let poiLocations = [];
 let cloudMarkers = [];
 let sceneModels = [];
 let sceneObjects = [];
+let sceneTextItems = [];
 let localKeys = [];
 let sceneColor1 = '#808080';
 let sceneColor2 = '#808080';
@@ -235,6 +236,9 @@ $(function() {
          audioGroupsEl.setAttribute("audio_groups_control", {init: ''});
          sceneEl.appendChild(audioGroupsEl);
       }
+   } else {
+      console.log("not aframe or default scenetype!");
+      GetTextItems(); //only for plain pages or text adventure, scene_text_control fetches for aframe
    }
    if (settings.useMatrix) {
       console.log("Loading browser MATRIX sdk!!!");
@@ -345,14 +349,11 @@ $(function() {
          sgdialogComponent.initMe();
       }
    }
-   // console.log(" playerpositions " + JSON.stringify(settings.playerPositions));
-   // if (settings.playerPositions.length > 1) {
-   //    console.log("gots PLAYERPOSITIONS " + settings.playerPositions);
-   //    if (settings.playerPositions.length) {
-   //       PlayerToLocation(settings.playerPositions[Math.floor(Math.random() * settings.playerPositions.length)]);
-   //    }
-   // }
-});
+
+  
+
+}); //end onload
+
 function GetMatrixData() {
    if (!matrixClient) {
       matrixClient = matrixcs.createClient("https://matrix.org");
@@ -1365,6 +1366,9 @@ function ReturnLocationTable () { //just show em all now!
            
          }
          let oAsset = (localData.locations[i].objectName || localData.locations[i].objectName == undefined || localData.locations[i].objectName == 'undefined' || localData.locations[i].objectName == "none") ? localData.locations[i].objectName : null;
+         let lAsset = (localData.locations[i].filename || localData.locations[i].filename == undefined || localData.locations[i].filename == 'undefined' || localData.locations[i].filename == "none") ? localData.locations[i].filename : null;
+         let fAsset = (localData.locations[i].title || localData.locations[i].title == undefined || localData.locations[i].title == 'undefined' || localData.locations[i].title == "none") ? localData.locations[i].title : null;
+
          let asset = 'none';
          if (mAsset) {
             asset = mAsset;
@@ -1372,7 +1376,12 @@ function ReturnLocationTable () { //just show em all now!
          if (oAsset) {
             asset = oAsset;
          }
-        
+         if (lAsset) {
+            asset = lAsset;
+         }
+         if (fAsset) {
+            asset = fAsset;
+         }
          tablerows = tablerows + "<tr class=\x22clickableRow\x22 onclick=\x22LocationRowClick('"+localData.locations[i].timestamp+"')\x22><td>"+namestring+"</td>"+
          "<td>"+localData.locations[i].x+","+localData.locations[i].y+","+localData.locations[i].z+"</td><td>"+asset+"</td><td>"+ markerString+"</td></tr>";
       }

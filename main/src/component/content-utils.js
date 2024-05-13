@@ -741,6 +741,149 @@ AFRAME.registerComponent('play-on-vrdisplayactivate-or-enter-vr', { //play video
 
 // });
 
+AFRAME.registerComponent('scene_text_display', {
+  schema: {
+      // font: {default: ""},
+      mainTextString: {default: ''},
+      mode: {default: ''},
+      jsonData: {default: ''},
+      font: {default: ''}
+    },
+    init: function () {
+      let theData = this.el.getAttribute('data-maintext');
+      console.log("maintext font " + this.data.font);
+      this.data.jsonData = JSON.parse(atob(theData)); //convert from base64
+      // console.log(this.data.jsonData);
+      this.data.mainTextString = this.data.jsonData;
+      let textArray = [];
+      let index = 0;  
+      let nextButton = document.getElementById("nextMainText");
+      let previousButton = document.getElementById("previousMainText");
+      let mainTextHeader = document.getElementById("mainTextHeader");
+
+      if (this.data.mainTextString != undefined) {
+          // console.log("maintext " + this.data.mainTextString);
+          
+          if (this.data.mode == "Paged" && this.data.mainTextString.length > 400) { //pagination!
+            // console.log(this.data.mainTextString);
+            let indexes = [];  //array for split indexes;
+            let lastIndex = 0;
+            let wordSplit = this.data.mainTextString.split(" ");
+            for (let i = 0; i < this.data.mainTextString.length - 1; i++) {
+              if (i == 400 + lastIndex) {
+                lastIndex = this.data.mainTextString.indexOf(' ', i); //get closest space to char count
+                indexes.push(lastIndex);
+              }
+            }
+            for (let s = 0; s < indexes.length; s++) {
+              if (s == 0) {
+                let enc = this.data.mainTextString.substring(0, indexes[s]);
+                textArray.push(this.data.mainTextString.substring(0, indexes[s]));
+                textArray.push(enc);
+                
+              } else {
+                // let chunk = encodeURI(this.data.mainTextString.substring(indexes[s], indexes[s+1]));
+              let chunk = this.data.mainTextString.substring(indexes[s], indexes[s+1]);
+              // console.log("tryna push chunck: " + chunk);
+              textArray.push(chunk);
+              }
+            }
+
+          } else { //if mode == "split"
+            textArray = this.data.mainTextString.split("~"); //TODO scroll
+          }      
+
+          this.textArray = textArray;
+
+          this.font = "Acme.woff";
+
+          if (settings && settings.sceneFontWeb1) {
+            this.font = settings.sceneFontWeb1;
+          }
+          document.querySelector("#mainText").setAttribute('troika-text', {
+            value: this.textArray[0],
+            font: '../fonts/web/' + this.font,
+            lineHeight: 1,
+            baseline: "top",
+                anchor: "left",
+            maxWidth: 10,
+            fontSize: .6,
+            color: 'white',
+           
+            strokeColor: 'black',
+            strokeWidth: '1%'
+
+          });
+
+          let uiMaterial = new THREE.MeshStandardMaterial( { color: '#63B671' } ); 
+          if (this.textArray.length > 1) {
+            mainTextHeader.setAttribute('visible', true);
+
+              mainTextHeader.setAttribute('troika-text', {
+                baseline: "top",
+                anchor: "right",
+                value: "page 1 of " + textArray.length,
+                font: '../fonts/web/' + this.font,
+                lineHeight: .85,
+                maxWidth: 10,
+                fontSize: .3,
+                color: 'white'
+            });
+            nextButton.setAttribute('visible', true);
+            previousButton.setAttribute('visible', true);
+           
+            nextButton.addEventListener('model-loaded', () => {
+              const obj = nextButton.getObject3D('mesh');
+              obj.traverse(node => {
+                node.material = uiMaterial;
+                });
+              });
+            previousButton.addEventListener('model-loaded', () => {
+              const obj = previousButton.getObject3D('mesh');
+              obj.traverse(node => {
+                node.material = uiMaterial;
+              });
+            });  
+
+              nextButton.addEventListener('click', function () {
+                  if (textArray.length > index + 1) {
+                      index++;
+                  } else {
+                      index = 0;
+                  }
+
+                  document.querySelector("#mainText").setAttribute('troika-text', {
+
+                      value: textArray[index]
+                  });
+                  mainTextHeader.setAttribute('troika-text', {
+
+                    value: "page "+(index+1)+" of " + textArray.length
+                  });
+              });
+
+              previousButton.addEventListener('click', function () {
+                if (index > 0) {
+                    index--;
+                } else {
+                    index = textArray.length - 1;
+                }
+                // console.log(textArray[index]);
+                document.querySelector("#mainText").setAttribute('troika-text', {
+                  // baseline: "top",
+                  // align: "left",
+                    value: textArray[index]
+                });
+                mainTextHeader.setAttribute('troika-text', {
+
+                  value: "page "+(index+1)+" of " + textArray.length
+              });
+          });
+        }
+      }
+  }
+});
+
 AFRAME.registerComponent('main-text-control', {
     schema: {
         // font: {default: ""},
@@ -788,32 +931,18 @@ AFRAME.registerComponent('main-text-control', {
                 textArray.push(chunk);
                 }
               }
-            // }
 
             } else { //if mode == "split"
               textArray = this.data.mainTextString.split("~"); //TODO scroll
             }      
-            
-            // console.log(JSON.stringify(textArray));
 
-            
             this.textArray = textArray;
-            // tArray.length = this.textArray.length;
-
-            // document.querySelector("#mainText").setAttribute('text', {
-            //     baseline: "top",
-            //     align: "left",
-            //     value: this.textArray[0]
-            // });
 
             this.font = "Acme.woff";
 
             if (settings && settings.sceneFontWeb1) {
               this.font = settings.sceneFontWeb1;
             }
-            // if (settings && settings.sceneFontWeb1) {
-            //   this.font2 = settings.sceneFontWeb2;
-            // }
             document.querySelector("#mainText").setAttribute('troika-text', {
               value: this.textArray[0],
               font: '../fonts/web/' + this.font,
@@ -823,26 +952,16 @@ AFRAME.registerComponent('main-text-control', {
               maxWidth: 10,
               fontSize: .6,
               color: 'white',
-              // fillOpacity: 5,
-              // outlineColor: 'white',
-              // outlineWidth: '1%',
-              // outlineBlur: .25,
+             
               strokeColor: 'black',
               strokeWidth: '1%'
 
             });
-            // troika-text=\x22value: Hello World!; 
-            // font: ../fonts/web/MountainsOfChristmasBold.woff; lineHeight: .85; maxWidth: 10; fontSize: 6; color: white; fillOpacity: .5;  outlineColor: white; outlineWidth: 1%; outlineBlur: .25; strokeColor: red; strokeWidth: 1%;\x22
 
-            // console.log("mainTextString: " + textArray[0]);
             let uiMaterial = new THREE.MeshStandardMaterial( { color: '#63B671' } ); 
             if (this.textArray.length > 1) {
               mainTextHeader.setAttribute('visible', true);
-                // mainTextHeader.setAttribute('text', {
-                //     baseline: "top",
-                //     align: "left",
-                //     value: "page 1 of " + textArray.length 
-                // });
+
                 mainTextHeader.setAttribute('troika-text', {
                   baseline: "top",
                   anchor: "right",
@@ -875,15 +994,13 @@ AFRAME.registerComponent('main-text-control', {
                     } else {
                         index = 0;
                     }
-                    // console.log(textArray[index]);
+
                     document.querySelector("#mainText").setAttribute('troika-text', {
-                      // baseline: "top",
-                      // align: "left",
+
                         value: textArray[index]
                     });
                     mainTextHeader.setAttribute('troika-text', {
-                      // baseline: "top",
-                      // align: "left",
+
                       value: "page "+(index+1)+" of " + textArray.length
                     });
                 });
@@ -901,12 +1018,11 @@ AFRAME.registerComponent('main-text-control', {
                       value: textArray[index]
                   });
                   mainTextHeader.setAttribute('troika-text', {
-                    // baseline: "top",
-                    // align: "left",
+
                     value: "page "+(index+1)+" of " + textArray.length
-                  });
-              });
-            }
+                });
+            });
+          }
         }
     }
 });
@@ -3075,28 +3191,194 @@ AFRAME.registerComponent('mod-colors', {
     }, 2000);
   },
 
-  // randomColor: function () {
-  // var x = Math.floor(Math.random() * 256);
-  //     var y = Math.floor(Math.random() * 256);
-  //     var z = Math.floor(Math.random() * 256);
-  //     return bgColor = "rgb(" + x + "," + y + "," + z + ")";
-  //   }
-
-
 });
-AFRAME.registerComponent('text-items-control', {
-  schema: {
-    jsonData: {
-      parse: JSON.parse,
-      stringify: JSON.stringify
-      }
-    },
-
+AFRAME.registerComponent('location_picker', { //TODO toggle on if needed, off by default..
   init: function () {
-    console.log(JSON.stringify(jsonData));
+    console.log("tryna set location_picker raycaster");
+    this.tick = AFRAME.utils.throttleTick(this.tick, 300, this);
+    this.sceneEl = document.querySelector('a-scene');
+    this.raycaster = new THREE.Raycaster();
+    this.locationPicked = null;
+    this.picking = false;
+    this.pickerEl = document.createElement("a-entity");
+    this.pickerEl.id = "picker";
+    this.el.sceneEl.appendChild(this.pickerEl);
+    this.pickerEl.setAttribute('gltf-model', '#poi1');
+    this.el.addEventListener('model-loaded', (e) => {
+      this.pickerEl.setAttribute("material", {color: "purple", transparent: true, opacity: .5});
+      // this.pickerEl.style.visibility = "hidden";
+      this.pickerEl.object3D.visible = false;
+    });
+ 
+      window.addEventListener('mouseup', (e) => { 
+      e.preventDefault();
+      if (keydown == "X" && this.locationPicked && !this.picking) {
+          this.picking = true;
+          // this.pickerEl.style.visibility = "hidden";
+          this.pickerEl.object3D.visible = false;
+          console.log("gotsa locationPicked "+ this.locationPicked);
+          // keydown = 
+          CreateLocation(null, "poi", this.locationPicked);
+          this.reset();
+        } else {
+          // this.pickerEl.style.visibility = "hidden";
+          this.pickerEl.object3D.visible = false;
+        }
+      }); 
+  },
+  reset: function () {
+    setTimeout(() =>  {
+      this.picking = false;
+    }, 1000);
+  },
+  tick: function () {
+
+    if (!this.raycaster || this.raycaster == null || this.raycaster == undefined || keydown != "X") {
+      // this.pickerEl.style.visibility = "hidden";
+      this.pickerEl.object3D.visible = false;
+
+      // return;
+    } else {
+      // console.log("tryna sert raycaster " + keydown);
+      // if (keydown == "x") 
+      this.raycaster.setFromCamera( mouse, AFRAME.scenes[0].camera ); 
+      // this.intersection = this.raycaster.intersectObject( this.el.sceneEl.children );
+      const intersects = this.raycaster.intersectObjects( this.sceneEl.object3D.children );
+
+      if (intersects.length && !this.picking) {
+        this.locationPicked = intersects[0].point;
+        // this.pickerEl.style.visibility = "visible";
+        this.pickerEl.object3D.visible = true;
+        this.pickerEl.setAttribute("position", this.locationPicked);
+        console.log("this.locationPicked " + JSON.stringify(this.locationPicked));
+
+      } else {
+        this.locationPicked = null;
+        // this.pickerEl.style.visibility = "hidden";
+        this.pickerEl.object3D.visible = false;
+      }
+    }
+  }
+});
+
+AFRAME.registerComponent('scene_text_control', { //hold the parsed text data
+  schema: {
+    jsonData: {default: ''} //fetched not fed
+    },
+    init: function () {
+      this.textIDs = [];
+      let textIDs = this.el.getAttribute("data-attribute");
+      console.log("TEXtITEMS AHOY!" + textIDs + " length " + textIDs.length);
+      // let tempArray = []; 
+      if (!textIDs.indexOf(",") == -1) { //make sure to send request with an array
+        this.textIDs[0] = textIDs;
+      } else {
+        this.textIDs = textIDs.split(",");
+      }
+      this.textDataArray = [];
+      this.fetchTextData(this.textIDs);
+      this.textItems = null;
+    },
+    //xhr
+    fetchTextData: function (data) {
+      // this.textData = [];
+      if (data.length > 0) {
+        this.textData = JSON.stringify({
+          textIDs: data //just send the ids
+        }),
+$.ajax({
+        url: "/scene_text_items",
+        type: 'POST',
+        contentType: "application/json; charset=utf-8",
+        dataType: "json",
+        data: JSON.stringify({
+              textIDs: this.textIDs //just send the ids
+            }),
+          success: function( data, textStatus, xhr ){
+              // console.log(JSON.parse(data[i].textstring));
+              // let arr = [];
+              sceneTextItems = [];
+              for (let i = 0; i < data.length; i++) { //check for text type?
+                console.log(data[i]);
+                sceneTextItems.push(data[i]); //textstring should be a valid json, from defined template//not, just an array of objex saved in global
+
+              }
+              // // this.data.jsonData = data;
+              // console.log("textdata: " + JSON.stringify(this.textData));
+             //this.loadTextData(data);
+            // return data;
+            
+          },
+          error: function( xhr, textStatus, errorThrown ){
+              console.log( "error fetching text: " + xhr.responseText );
+              // return null;
+              // $('#theForm').html( 'Sorry, something went wrong: \n' + xhr.responseText);
+              // Cookies.remove('_id');
+          }
+        });
+        // this.textData = response;
+        // console.log("textdata: "+ JSON.stringify(data));
+        // var xhr = new XMLHttpRequest();
+        // xhr.open("POST", '/scene_text_items/', true);
+        // xhr.setRequestHeader('Content-Type', 'application/json');
+        // xhr.send(this.textData);
+        // xhr.onload = function () {
+        //   // do something to response
+        //   console.log("textdata " + this.responseText);
+        //   this.loadTextData(this.responseText);
+
+        // };
+        // this.loadTextData(response);
+        // if (response) {
+
+        //   console.log("textdata" + JSON.stringify(response));
+        //   for (let i = 0; i < response.length; i++) { //check for text type?
+        //         console.log(response[i]);
+        //         this.textDataArray.push(response[i]); //textstring should be a valid json, from defined template//not, just an array of objex saved in global
+
+        //       }
+        //       console.log("textdata " + JSON.stringify(this.textDataArray));
+        // } else {
+
+        // }
+      // }
+      // this.data.jsonData = fetchTextData(data);
+      // if (this.textItems) {
+        setTimeout(() =>{
+          this.loadTextData();
+        }, 3000);
+       
+      // }
+      }
+  },
+  loadTextData: function (data) {
+    console.log("loadingTextData " + JSON.stringify(sceneTextItems));
+    // this.textItems = data;
+  },
+  returnTextData: function (mediaID) {
+      for (let i = 0; i < this.data.jsonData.length; i++) {
+        if (mediaID == this.data.jsonData[i]._id) {
+          return this.data.jsonData[i];
+        }
+      }
     }
 });
 
+
+
+function fetchTextData (textIDs) {
+  var xhr = new XMLHttpRequest();
+  xhr.open("POST", '/scene_text_items/', true);
+  xhr.setRequestHeader('Content-Type', 'application/json');
+  xhr.send(JSON.stringify({textIDs: textIDs}));
+  xhr.onload = function () {
+    // do something to response
+    console.log("textdata " + this.responseText);
+    // this.loadTextData(this.responseText);
+    return this.responseText;
+  };
+}
+ 
 AFRAME.registerComponent('picture_group', { 
   schema: {
     mode: {default: 'flying'}
@@ -3106,7 +3388,8 @@ AFRAME.registerComponent('picture_group', {
   init: function () {
   }
 });
-AFRAME.registerComponent('scene_pictures_control', { //has all the picgroup data
+
+AFRAME.registerComponent('scene_pictures_control', { //hold the parsed picture data
   schema: {
     // jsonData: {
     //   parse: JSON.parse,
@@ -3135,8 +3418,6 @@ AFRAME.registerComponent('scene_pictures_control', { //has all the picgroup data
         }
       }
     }
-  
-    
   });
 
 AFRAME.registerComponent('picture_groups_control', { //has all the picgroup data

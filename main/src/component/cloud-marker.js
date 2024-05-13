@@ -880,17 +880,17 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
             mediaID = mediaID.substring(6);
             console.log("CLOUDMARKER SHOUDL HAVE MediaID " + mediaID + " from localFiles " + localData.localFiles[mediaID]);
             for (const key in localData.localFiles) {
-              console.log("tryna get localMedia named " + mediaID + " vs " + localData.localFiles[key].name);
+              console.log("tryna get localMedia text named " + mediaID + " vs " + localData.localFiles[key].name);
               if (localData.localFiles[key].name == mediaID) {
                 
                 //load text itme
               }
             }
           } else {
-
-            const sceneTextItemDataEl = document.getElementById("sceneTextItemData");
-            if (sceneTextItemDataEl) {
-              this.textData = scenePicDataEl.components.scene_text_control.returnTextData(mediaID); //like this for text items.,..
+            console.log("text CLOUDMARKER mediaID " + mediaID );
+            const sceneTextDataEl = document.getElementById("sceneTextData");
+            if (sceneTextDataEl) {
+              this.textData = sceneTextDataEl.components.scene_text_control.returnTextData(mediaID); //fah, it's already a global...hrm...
               console.log("textData :  " + JSON.stringify(this.textData));
 
             }

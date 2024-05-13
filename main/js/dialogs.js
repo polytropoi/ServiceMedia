@@ -1,6 +1,6 @@
 let showDialogPanel = false;
 let dialogInitialized = false;
-let textItemArray = null;
+// let textItemArray = [];
 let userInventory = null;
 let renderPanel = null;
 let useModals = true;
@@ -93,74 +93,74 @@ window.addEventListener( 'keydown',  ( event ) => {
     console.log("keyup " + keydown);
   });
 
-  AFRAME.registerComponent('location_picker', {
-    init: function () {
-      console.log("tryna set location_picker raycaster");
-      this.tick = AFRAME.utils.throttleTick(this.tick, 300, this);
-      this.sceneEl = document.querySelector('a-scene');
-      this.raycaster = new THREE.Raycaster();
-      this.locationPicked = null;
-      this.picking = false;
-      this.pickerEl = document.createElement("a-entity");
-      this.pickerEl.id = "picker";
-      this.el.sceneEl.appendChild(this.pickerEl);
-      this.pickerEl.setAttribute('gltf-model', '#poi1');
-      this.el.addEventListener('model-loaded', (e) => {
-        this.pickerEl.setAttribute("material", {color: "purple", transparent: true, opacity: .5});
-        // this.pickerEl.style.visibility = "hidden";
-        this.pickerEl.object3D.visible = false;
-      });
+  // AFRAME.registerComponent('location_picker', {
+  //   init: function () {
+  //     console.log("tryna set location_picker raycaster");
+  //     this.tick = AFRAME.utils.throttleTick(this.tick, 300, this);
+  //     this.sceneEl = document.querySelector('a-scene');
+  //     this.raycaster = new THREE.Raycaster();
+  //     this.locationPicked = null;
+  //     this.picking = false;
+  //     this.pickerEl = document.createElement("a-entity");
+  //     this.pickerEl.id = "picker";
+  //     this.el.sceneEl.appendChild(this.pickerEl);
+  //     this.pickerEl.setAttribute('gltf-model', '#poi1');
+  //     this.el.addEventListener('model-loaded', (e) => {
+  //       this.pickerEl.setAttribute("material", {color: "purple", transparent: true, opacity: .5});
+  //       // this.pickerEl.style.visibility = "hidden";
+  //       this.pickerEl.object3D.visible = false;
+  //     });
    
-        window.addEventListener('mouseup', (e) => { 
-        e.preventDefault();
-        if (keydown == "X" && this.locationPicked && !this.picking) {
-            this.picking = true;
-            // this.pickerEl.style.visibility = "hidden";
-            this.pickerEl.object3D.visible = false;
-            console.log("gotsa locationPicked "+ this.locationPicked);
-            // keydown = 
-            CreateLocation(null, "poi", this.locationPicked);
-            this.reset();
-          } else {
-            // this.pickerEl.style.visibility = "hidden";
-            this.pickerEl.object3D.visible = false;
-          }
-        }); 
-    },
-    reset: function () {
-      setTimeout(() =>  {
-        this.picking = false;
-      }, 1000);
-    },
-    tick: function () {
+  //       window.addEventListener('mouseup', (e) => { 
+  //       e.preventDefault();
+  //       if (keydown == "X" && this.locationPicked && !this.picking) {
+  //           this.picking = true;
+  //           // this.pickerEl.style.visibility = "hidden";
+  //           this.pickerEl.object3D.visible = false;
+  //           console.log("gotsa locationPicked "+ this.locationPicked);
+  //           // keydown = 
+  //           CreateLocation(null, "poi", this.locationPicked);
+  //           this.reset();
+  //         } else {
+  //           // this.pickerEl.style.visibility = "hidden";
+  //           this.pickerEl.object3D.visible = false;
+  //         }
+  //       }); 
+  //   },
+  //   reset: function () {
+  //     setTimeout(() =>  {
+  //       this.picking = false;
+  //     }, 1000);
+  //   },
+  //   tick: function () {
   
-      if (!this.raycaster || this.raycaster == null || this.raycaster == undefined || keydown != "X") {
-        // this.pickerEl.style.visibility = "hidden";
-        this.pickerEl.object3D.visible = false;
+  //     if (!this.raycaster || this.raycaster == null || this.raycaster == undefined || keydown != "X") {
+  //       // this.pickerEl.style.visibility = "hidden";
+  //       this.pickerEl.object3D.visible = false;
 
-        // return;
-      } else {
-        // console.log("tryna sert raycaster " + keydown);
-        // if (keydown == "x") 
-        this.raycaster.setFromCamera( mouse, AFRAME.scenes[0].camera ); 
-        // this.intersection = this.raycaster.intersectObject( this.el.sceneEl.children );
-        const intersects = this.raycaster.intersectObjects( this.sceneEl.object3D.children );
+  //       // return;
+  //     } else {
+  //       // console.log("tryna sert raycaster " + keydown);
+  //       // if (keydown == "x") 
+  //       this.raycaster.setFromCamera( mouse, AFRAME.scenes[0].camera ); 
+  //       // this.intersection = this.raycaster.intersectObject( this.el.sceneEl.children );
+  //       const intersects = this.raycaster.intersectObjects( this.sceneEl.object3D.children );
   
-        if (intersects.length && !this.picking) {
-          this.locationPicked = intersects[0].point;
-          // this.pickerEl.style.visibility = "visible";
-          this.pickerEl.object3D.visible = true;
-          this.pickerEl.setAttribute("position", this.locationPicked);
-          console.log("this.locationPicked " + JSON.stringify(this.locationPicked));
+  //       if (intersects.length && !this.picking) {
+  //         this.locationPicked = intersects[0].point;
+  //         // this.pickerEl.style.visibility = "visible";
+  //         this.pickerEl.object3D.visible = true;
+  //         this.pickerEl.setAttribute("position", this.locationPicked);
+  //         console.log("this.locationPicked " + JSON.stringify(this.locationPicked));
 
-        } else {
-          this.locationPicked = null;
-          // this.pickerEl.style.visibility = "hidden";
-          this.pickerEl.object3D.visible = false;
-        }
-      }
-    }
-  });
+  //       } else {
+  //         this.locationPicked = null;
+  //         // this.pickerEl.style.visibility = "hidden";
+  //         this.pickerEl.object3D.visible = false;
+  //       }
+  //     }
+  //   }
+  // });
 
 
   $('#modalContent').on('click', '#importModsButton', function(e) {
@@ -576,142 +576,6 @@ window.addEventListener( 'keydown',  ( event ) => {
   });
 
 
-  // console.log("gotsa AFRAME SCENE"); //uses the html2canvas shader, rem for now, cool but too much of a pain... 
-  /*
-  AFRAME.registerComponent('render_canvas', {  //setup for the html2canvas
-    schema: {
-      initialized: {default: false},
-      hello: {default: ''}
-    },
-    init: function(){
-      var sceneEl = document.querySelector('a-scene');
-      if (theRenderCanvas == null) {
-        theRenderCanvas = this.el;
-      }
-      elementID = 'renderPanel';
-
-      var triggerAudioController = document.getElementById("triggerAudio");
-      let closeButton = document.createElement("a-entity");
-      closeButton.setAttribute('gltf-model', '#square1');
-      closeButton.addEventListener('model-loaded', () => {
-
-        const obj1 = closeButton.getObject3D('mesh');
-        var texture1 = new THREE.TextureLoader().load('https://servicemedia.s3.amazonaws.com/assets/pics/close_button2.png');
-        texture1.encoding = THREE.sRGBEncoding; 
-        texture1.flipY = false; 
-        var material = new THREE.MeshBasicMaterial( { map: texture1, transparent: true } ); 
-        obj1.traverse(node => {
-            node.material = material;
-
-          });
-        closeButton.addEventListener('mouseover', function () {
-          if (triggerAudioController != null) {
-            triggerAudioController.components.trigger_audio_control.playAudio();
-          }
-        });
-        closeButton.addEventListener('mousedown', function () {
-          ShowHideDialogPanel();
-        });
-        closeButton.classList.add("activeObjexRay");  
-        
-        });
-        closeButton.setAttribute("scale", '.05 .05 .05');
-        this.el.appendChild(closeButton); 
-        closeButton.setAttribute('position', '.465 .465 .05');
-
-        let yesButton = document.createElement("a-entity");
-        yesButton.setAttribute('gltf-model', '#rectangle1');
-        yesButton.addEventListener('model-loaded', () => {
-
-        const obj2 = yesButton.getObject3D('mesh');
-        var texture2 = new THREE.TextureLoader().load('https://servicemedia.s3.amazonaws.com/assets/pics/yes_button1.png');
-        texture2.encoding = THREE.sRGBEncoding; 
-        texture2.flipY = false; 
-        var material = new THREE.MeshBasicMaterial( { map: texture2, transparent: true } ); 
-        obj2.traverse(node => {
-            node.material = material;
-          });
-        });
-        yesButton.setAttribute("scale", '.075 .075 .075');
-        this.el.appendChild(yesButton); 
-        yesButton.setAttribute('position', '.235 -.250 .1');
-        // yesButton.setAttribute('basic-link', {href:  });
-
-        let noButton = document.createElement("a-entity");
-        noButton.setAttribute('gltf-model', '#rectangle1');
-        noButton.addEventListener('model-loaded', () => {
-          const obj3 = noButton.getObject3D('mesh');
-          var texture3 = new THREE.TextureLoader().load('https://servicemedia.s3.amazonaws.com/assets/pics/no_button1.png');
-          texture3.encoding = THREE.sRGBEncoding; 
-          texture3.flipY = false; 
-          var material = new THREE.MeshBasicMaterial( { map: texture3, transparent: true } ); 
-          obj3.traverse(node => {
-              node.material = material;
-              // console.log("tryna setup CLOSE BUTTON MATERIAL");
-            });
-          noButton.addEventListener('mouseover', function () {
-
-            if (triggerAudioController != null) {
-              triggerAudioController.components.trigger_audio_control.playAudio();
-            }
-          });
-          noButton.addEventListener('mousedown', function () {
-            ShowHideDialogPanel();
-          });
-        });
-        noButton.setAttribute("scale", '.075 .075 .075');
-        this.el.appendChild(noButton); 
-        noButton.setAttribute('position', '-.235 -.250 .1');
-        noButton.classList.add("activeObjexRay");  
-        this.onClick = this.onClick.bind(this);
-    },
-    play: function () {
-      window.addEventListener('click', this.onClick);
-    },
-    pause: function () {
-      window.removeEventListener('click', this.onClick);
-    },
-    onClick: function (evt) {
-      // console.log("tryna set focus ");
-      // this.el.focus();
-    },
-    updatePosition: function () {
-
-      var cameraEl = document.getElementById('viewportPlaceholder'); //much easier!
-      // var posRotReader = document.getElementById("player").components.get_pos_rot; 
-      // var posRotObj = posRotReader.returnPosRot();
-      // let cameraPosition = posRotObj.pos;
-      // let cameraRotation = posRotObj.rot;
-      // var cameraPosition = cameraEl.getAttribute('position');
-      var cameraPosition = new THREE.Vector3(); 
-
-      cameraEl.object3D.getWorldPosition( cameraPosition );
-      console.log("cameraPositrion " + JSON.stringify(cameraPosition));
-      // let newPos = {};
-      // newPos.x = cameraPosition.x;
-      // newPos.y = cameraPosition.y + .08;
-      // newPos.z = cameraPosition.z - 1.15;
-
-      this.el.setAttribute('position', cameraPosition);
-    }
-  });
-*/
-  // AFRAME.registerComponent('use-textitem-modals', {
-    
-  //   init: function(){
-      
-  //   }
-  // });
-
-  // AFRAME.registerComponent('mailbox', {
-  //   init: function() {
-
-  //   }
-  // });
-
-// } //sceneEl != null close
-// }); //onload close
-
 var HideMobileKeyboard = function() {
 	document.activeElement.blur();
 	$("input").blur();
@@ -965,8 +829,27 @@ function ReturnMediaSelections (mediaID, mtype) {
           }
         }
       }
-     
-
+    return mediaSelect;
+  } else if (mtype && mtype == "text") {
+    if (mediaID) {
+      // let sceneTextItems = null;
+      // let sceneTextDataEl = document.getElementById("sceneTextData");
+      // if (sceneTextDataEl) {
+      //   sceneTextItems = sceneTextDataEl.components.scene_text_control.returnSceneTextItems();
+      // }
+      if (sceneTextItems) {
+        for (let i = 0; i < sceneTextItems.length; i++) {
+          console.log("sceneTextItem:  "+ JSON.stringify(sceneTextItems[i]));
+          
+            if (locationItem != null && locationItem.mediaID == sceneTextItems[i]._id) {
+              mediaSelect = mediaSelect + "<option value=\x22"+sceneTextItems[i]._id+"\x22 selected>" + sceneTextItems[i].title + "</option>";
+            } else {
+              mediaSelect = mediaSelect + "<option value=\x22"+sceneTextItems[i]._id+"\x22 >" + sceneTextItems[i].title + "</option>";
+            }
+          
+        }
+      }
+    } 
     return mediaSelect;
   }
 }
@@ -2649,8 +2532,10 @@ function playSound(){
 }
 
 // 
-var GetTextItems = function() {
-  let textIDs = document.getElementById("sceneTextItems").getAttribute("data-attribute");
+var GetTextItems = function() { //make a different method for aframe? 
+
+  let textDataEl = document.getElementById("sceneTextData");
+  let textIDs = textDataEl.getAttribute("data-attribute");
   console.log("TEXtITEMS AHOY!" + textIDs + " length " + textIDs.length);
   let tempArray = []; 
   if (!textIDs.indexOf(",") == -1) { //make sure to send request with an array
