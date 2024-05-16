@@ -744,53 +744,94 @@ AFRAME.registerComponent('play-on-vrdisplayactivate-or-enter-vr', { //play video
 AFRAME.registerComponent('scene_text_display', {
   schema: {
       // font: {default: ""},
-      mainTextString: {default: ''},
-      mode: {default: ''},
+      title: {default: ''},
+      textString: {default: ''},
+      mode: {default: 'paged'},
+      scale: {default: 1},
       jsonData: {default: ''},
       font: {default: ''}
     },
     init: function () {
-      let theData = this.el.getAttribute('data-maintext');
-      console.log("maintext font " + this.data.font);
-      this.data.jsonData = JSON.parse(atob(theData)); //convert from base64
-      // console.log(this.data.jsonData);
-      this.data.mainTextString = this.data.jsonData;
+      // let theData = this.el.getAttribute('data-maintext');
+      this.isVisible = true;
+      console.log("scene_text_display " + this.data.textString);
+      // this.data.jsonData = JSON.parse(atob(theData)); //convert from base64
+      // // console.log(this.data.jsonData);
+      // this.data.textString = this.data.jsonData;
       let textArray = [];
       let index = 0;  
-      let nextButton = document.getElementById("nextMainText");
-      let previousButton = document.getElementById("previousMainText");
-      let mainTextHeader = document.getElementById("mainTextHeader");
+      // let nextButton = document.getElementById("nextMainText");
+      // let previousButton = document.getElementById("previousMainText");
+      // let textHeader = document.getElementById("textHeader");
+      let nextButton = document.createElement("a-entity");
+      let previousButton = document.createElement("a-entity");
+      let textHeader = document.createElement("a-entity");
+      let textTitle = document.createElement("a-entity");
+      let textBody = document.createElement("a-entity");
+      let textBackground = document.createElement("a-entity");
+      let textContainer = document.createElement("a-entity");
 
-      if (this.data.mainTextString != undefined) {
-          // console.log("maintext " + this.data.mainTextString);
-          
-          if (this.data.mode == "Paged" && this.data.mainTextString.length > 400) { //pagination!
-            // console.log(this.data.mainTextString);
+      this.el.sceneEl.appendChild(textContainer);
+      // textContainer.setAttribute('position', this.el.getAttribute("position"))
+      textContainer.appendChild(nextButton);
+      textContainer.appendChild(previousButton);
+      textContainer.appendChild(textHeader);
+      textContainer.appendChild(textTitle);
+      textContainer.appendChild(textBody);
+      textContainer.appendChild(textBackground);
+
+      // textContainer.setAttribute("position", {x: 0, y: 0, z: -.1});
+      textContainer.setAttribute('position', this.el.getAttribute("position"));
+      textContainer.setAttribute('scale', {x: this.data.scale, y: this.data.scale, z: this.data.scale})
+      textTitle.setAttribute("position", {x: -4.25, y: 7, z: 0});
+      textHeader.setAttribute("position", {x: 4.25, y: 7, z: 0});
+      textBody.setAttribute("position", {x: -4, y: 6.5, z: 0});
+      textBackground.setAttribute("position", {x: 0, y: -.25, z: -.1});
+      previousButton.setAttribute("position", {x: -1, y: .25  , z: .1});
+      nextButton.setAttribute("position", {x: 1, y: .25, z: .1});
+      textBackground.setAttribute("gltf-model", "#textbackground");
+      nextButton.setAttribute("gltf-model", "#next_button");
+      previousButton.setAttribute("gltf-model", "#previous_button");
+      textBackground.setAttribute("scale", {x: 2.25, y: 2.25, z: 2.25});
+      nextButton.setAttribute("scale", {x: .2, y: .2, z: .2});
+      previousButton.setAttribute("scale", {x: .2, y: .2, z: .2});
+      nextButton.classList.add("activeObjexRay");
+      previousButton.classList.add("activeObjexRay");
+      textContainer.setAttribute("look-at-y", "#player");
+      // textContainer.setAttribute
+
+      if (this.data.textString != undefined) {
+          // console.log("maintext " + this.data.textString);
+          console.log(this.data.mode + " string length : "+ this.data.textString.length);
+          if (this.data.mode.toLowerCase() == "paged" && this.data.textString.length > 700) { //pagination!
+            console.log("string length : "+ this.data.textString);
             let indexes = [];  //array for split indexes;
             let lastIndex = 0;
-            let wordSplit = this.data.mainTextString.split(" ");
-            for (let i = 0; i < this.data.mainTextString.length - 1; i++) {
-              if (i == 400 + lastIndex) {
-                lastIndex = this.data.mainTextString.indexOf(' ', i); //get closest space to char count
+            let wordSplit = this.data.textString.split(" ");
+            for (let i = 0; i < this.data.textString.length - 1; i++) {
+              if (i == 700 + lastIndex) {
+                lastIndex = this.data.textString.indexOf(' ', i); //get closest space to char count
                 indexes.push(lastIndex);
               }
             }
             for (let s = 0; s < indexes.length; s++) {
               if (s == 0) {
-                let enc = this.data.mainTextString.substring(0, indexes[s]);
-                textArray.push(this.data.mainTextString.substring(0, indexes[s]));
+                let enc = this.data.textString.substring(0, indexes[s]);
+                // textArray.push(this.data.textString.substring(0, indexes[s]));
                 textArray.push(enc);
+                console.log("textArray[0] " + textArray[s]);
                 
               } else {
-                // let chunk = encodeURI(this.data.mainTextString.substring(indexes[s], indexes[s+1]));
-              let chunk = this.data.mainTextString.substring(indexes[s], indexes[s+1]);
+                // let chunk = encodeURI(this.data.textString.substring(indexes[s], indexes[s+1]));
+              let chunk = this.data.textString.substring(indexes[s], indexes[s+1]);
               // console.log("tryna push chunck: " + chunk);
               textArray.push(chunk);
+              console.log("textArray " + s + " " + textArray[s]);
               }
             }
 
           } else { //if mode == "split"
-            textArray = this.data.mainTextString.split("~"); //TODO scroll
+            textArray = this.data.textString.split("~"); //TODO scroll
           }      
 
           this.textArray = textArray;
@@ -800,34 +841,46 @@ AFRAME.registerComponent('scene_text_display', {
           if (settings && settings.sceneFontWeb1) {
             this.font = settings.sceneFontWeb1;
           }
-          document.querySelector("#mainText").setAttribute('troika-text', {
+          textBody.setAttribute('troika-text', {
             value: this.textArray[0],
             font: '../fonts/web/' + this.font,
-            lineHeight: 1,
+            lineHeight: 1.5,
             baseline: "top",
                 anchor: "left",
-            maxWidth: 10,
-            fontSize: .6,
-            color: 'white',
+            maxWidth: 8.25,
+            fontSize: .3,
+            color: 'black'
            
-            strokeColor: 'black',
-            strokeWidth: '1%'
+            // strokeColor: 'white',
+            // strokeWidth: '1%'
 
           });
 
-          let uiMaterial = new THREE.MeshStandardMaterial( { color: '#63B671' } ); 
+          let uiMaterial = new THREE.MeshStandardMaterial({ color: 'black' }); 
           if (this.textArray.length > 1) {
-            mainTextHeader.setAttribute('visible', true);
+            textHeader.setAttribute('visible', true);
 
-              mainTextHeader.setAttribute('troika-text', {
+              textHeader.setAttribute('troika-text', {
                 baseline: "top",
                 anchor: "right",
                 value: "page 1 of " + textArray.length,
                 font: '../fonts/web/' + this.font,
                 lineHeight: .85,
-                maxWidth: 10,
-                fontSize: .3,
-                color: 'white'
+                maxWidth: 2,
+                fontSize: .2,
+                color: 'black'
+            });
+            textTitle.setAttribute('visible', true);
+
+            textTitle.setAttribute('troika-text', {
+              baseline: "top",
+              anchor: "left",
+              value: this.data.title,
+              font: '../fonts/web/' + this.font,
+              lineHeight: .85,
+              maxWidth: 7,
+              fontSize: .2,
+              color: 'black'
             });
             nextButton.setAttribute('visible', true);
             previousButton.setAttribute('visible', true);
@@ -844,43 +897,60 @@ AFRAME.registerComponent('scene_text_display', {
                 node.material = uiMaterial;
               });
             });  
-
-              nextButton.addEventListener('click', function () {
+            nextButton.addEventListener('click', function (e) {
+              // preventDefault(e);
+              e.stopPropagation();
+              console.log('tryna click index ' + index);
                   if (textArray.length > index + 1) {
                       index++;
                   } else {
                       index = 0;
                   }
-
-                  document.querySelector("#mainText").setAttribute('troika-text', {
-
+                  textBody.setAttribute('troika-text', {
                       value: textArray[index]
                   });
-                  mainTextHeader.setAttribute('troika-text', {
-
+                  textHeader.setAttribute('troika-text', {
                     value: "page "+(index+1)+" of " + textArray.length
                   });
               });
 
-              previousButton.addEventListener('click', function () {
+              previousButton.addEventListener('click', function (e) {
+                e.stopPropagation();
                 if (index > 0) {
                     index--;
                 } else {
                     index = textArray.length - 1;
                 }
                 // console.log(textArray[index]);
-                document.querySelector("#mainText").setAttribute('troika-text', {
+                textBody.setAttribute('troika-text', {
                   // baseline: "top",
                   // align: "left",
                     value: textArray[index]
                 });
-                mainTextHeader.setAttribute('troika-text', {
+                textHeader.setAttribute('troika-text', {
 
                   value: "page "+(index+1)+" of " + textArray.length
               });
           });
         }
       }
+      this.nextButton = nextButton;
+      this.previousButton = previousButton;
+      this.textBody = textBody;
+      this.textHeader = textHeader;
+      this.textTitle = textTitle;
+      this.textBackground = textBackground;
+  },
+  toggleVisibility: function () {
+
+    this.isVisible = !this.isVisible;
+    console.log("isVisible " + this.isVisible);
+    this.nextButton.object3D.visible = this.isVisible;
+    this.previousButton.object3D.visible = this.isVisible;
+    this.textBody.object3D.visible = this.isVisible;
+    this.textTitle.object3D.visible = this.isVisible;
+    this.textBackground.object3D.visible = this.isVisible;
+    this.textHeader.object3D.visible = this.isVisible;
   }
 });
 

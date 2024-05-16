@@ -788,6 +788,31 @@ function ReturnOtherLocations (selected) {
   }
   
 }
+function ReturnMediaNames (mediaID, mtype) { //set this up to show asset names in location table view
+  for (let key in localData.localFiles) {
+    let ext = localData.localFiles[key].name.split('.');
+    ext = ext[ext.length - 1];
+    if (ext == "jpg" || ext == "png") {
+      console.log("gotsa jpg " + localData.localFiles[key].name + " tryna match with " +locationItem.mediaID);
+      if (locationItem != null && locationItem.mediaID == "local_" + localData.localFiles[key].name) {
+        mediaSelect = mediaSelect + "<option value=\x22local_"+localData.localFiles[key].name+"\x22 selected>local_" + localData.localFiles[key].name + "</option>";
+      } 
+    }  
+  }
+  if (scenePictureItems) {
+    for (let i = 0; i < scenePictureItems.length; i++) {
+      console.log("scenePicture:  "+ JSON.stringify(scenePictureItems[i]));
+      if (scenePictureItems[i].orientation != "Equirectangular") {
+        if (locationItem != null && locationItem.mediaID == scenePictureItems[i]._id) {
+          mediaSelect = mediaSelect + "<option value=\x22"+scenePictureItems[i]._id+"\x22 selected>" + scenePictureItems[i].filename + "</option>";
+        } else {
+          mediaSelect = mediaSelect + "<option value=\x22"+scenePictureItems[i]._id+"\x22 >" + scenePictureItems[i].filename + "</option>";
+        }
+      }
+    }
+  }
+
+}
 function ReturnMediaSelections (mediaID, mtype) {
   let phID = selectedLocationTimestamp;
   let locationItem = ReturnLocationItem();
@@ -839,7 +864,7 @@ function ReturnMediaSelections (mediaID, mtype) {
       // }
       if (sceneTextItems) {
         for (let i = 0; i < sceneTextItems.length; i++) {
-          console.log("sceneTextItem:  "+ JSON.stringify(sceneTextItems[i]));
+          // console.log("sceneTextItem:  "+ JSON.stringify(sceneTextItems[i]));
           
             if (locationItem != null && locationItem.mediaID == sceneTextItems[i]._id) {
               mediaSelect = mediaSelect + "<option value=\x22"+sceneTextItems[i]._id+"\x22 selected>" + sceneTextItems[i].title + "</option>";
@@ -1810,7 +1835,7 @@ function ShowInventoryItem(objectID) {
 function SceneManglerModal(mode) {
 
     // ClearInputs();
-
+    console.log("opening SceneManglerModal with location " + selectedLocationTimestamp);
     if (localData.settings.sceneColor1) {
       settings.sceneColor1 = localData.settings.sceneColor1;
     } else {

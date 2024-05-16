@@ -63,8 +63,11 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
       if (settings && settings.sceneFontWeb1) {
         this.font2 = settings.sceneFontWeb2;
       }
-      this.timestamp = this.data.timestamp;
-        
+      if (this.data.timestamp != '') {
+        this.timestamp = this.data.timestamp;
+      } else {
+        this.timestamp = this.el.id
+      }
       this.phID = this.data.phID; //nm
       // console.log("cloudmarker phID " + this.phID); 
       if (this.data.allowMods) {
@@ -122,6 +125,10 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                 } else if (this.data.markerType.toLowerCase() == "link") {
                   this.el.setAttribute("gltf-model", "#links");
                   this.el.setAttribute("material", {color: "aqua", transparent: true, opacity: .5});
+                } else if (this.data.markerType.toLowerCase() == "text") {
+                  this.el.setAttribute("gltf-model", "#texticon");
+                  this.el.setAttribute("material", {color: "black", transparent: true, opacity: .5});
+                
                 } else if (this.data.markerType.toLowerCase() == "portal") {
                   this.el.setAttribute('gltf-model', '#poi1');
                 } else if (this.data.markerType.toLowerCase() == "mailbox") {
@@ -525,15 +532,16 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
         that.calloutEntity.setAttribute('visible', false);
       });
   
-      this.el.addEventListener('mousedown', function (evt) { 
-        
+      this.el.addEventListener('mousedown', (evt) => { 
+        // evt.stopPropogation();
         // if (that.data.markerType == "object") {
         //   return;
         // }
+        console.log("click on " + this.data.name + " keydown " + keydown + this.timestamp);
         if (keydown == "T") {
-          ToggleTransformControls(that.timestamp);
+          ToggleTransformControls(this.timestamp);
         } else if (keydown == "Shift") {
-            selectedLocationTimestamp = that.timestamp;
+            selectedLocationTimestamp = this.timestamp;
             // ShowLocationModal(that.timestamp);
             SceneManglerModal('Location');
         } else { 
@@ -554,6 +562,34 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                   this.dialogEl.components.mod_dialog.showPanel("Open " + url +" in new window?", that.data.eventData, "linkOpen", 10000 ); 
                 }
               } 
+          }
+          if (this.data.markerType == "text") {
+            let textString = this.data.description;
+            let textTitle = this.data.name;
+            if (this.data.mediaID && sceneTextItems.length) {
+              for (let i = 0; i < sceneTextItems.length; i++) {                
+                if (this.data.mediaID == sceneTextItems[i]._id) {  
+                  textString = sceneTextItems[i].textstring;
+                  textTitle = sceneTextItems[i].title;
+                  // console.log("gotsa textstring " + textString);
+                  break;
+                }
+              }
+              
+            }
+            let mode = "paged";
+            if (textString.includes("~")) {
+              mode = "paged";
+            }
+            // console.log("textString " + textString);
+            let textDisplayComponent = this.el.components.scene_text_display;
+            if (!textDisplayComponent) {
+              this.el.setAttribute("scene_text_display", {"textString": textString, "mode": mode, "title": textTitle, "scale": this.data.yscale});
+            } else {
+              console.log("tryna toggle vis for textdata");
+              textDisplayComponent.toggleVisibility();
+            }
+            
           }
           if (that.data.markerType == "gate" && !that.data.tags.includes("no prompt")) {
             if (evt.detail.intersection && evt.detail.intersection.distance > 1 && evt.detail.intersection.distance < 20) {
@@ -677,7 +713,14 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
             that.mousePos.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
           // console.log(that.mouse);
       })
-  
+      if (this.data.tags.includes("billboard")) {
+        if (this.data.tags.includes("yonly")) {
+          this.el.setAttribute("look-at-y", "#player");
+        } else {
+          this.el.setAttribute("look-at", "#player");
+        }
+        
+      }
     },
     loadObject: function (objectID) { //local object swap (maybe with child model...);
       console.log("tryna load object id " + objectID);
@@ -807,7 +850,11 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
             // this.el.setAttribute("color", "purple");
         } else if (this.data.markerType.toLowerCase() == "link") {
           this.el.setAttribute("material", {color: "gold", transparent: true, opacity: .5});
-        } else if (this.data.markerType.toLowerCase().includes("trigger")) {
+        } else if (this.data.markerType.toLowerCase() == "text") {
+          // this.el.setAttribute("gltf-model", "#texticon");
+          this.el.setAttribute("material", {color: "black", transparent: true, opacity: .5});
+        
+        }else if (this.data.markerType.toLowerCase().includes("trigger")) {
           this.el.setAttribute("material", {color: "lime", transparent: true, opacity: .5});
         } else if (this.data.markerType.toLowerCase().includes("object")) {
           this.el.setAttribute("material", {color: "tomato", transparent: true, opacity: .5});
@@ -1053,6 +1100,10 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
             } else if (this.data.markerType.toLowerCase() == "link") {
               this.el.setAttribute("gltf-model", "#links");
               this.el.setAttribute("material", {color: "aqua", transparent: true, opacity: .5});
+            } else if (this.data.markerType.toLowerCase() == "text") {
+              this.el.setAttribute("gltf-model", "#texticon");
+              this.el.setAttribute("material", {color: "black", transparent: true, opacity: .5});
+            
             } else if (this.data.markerType.toLowerCase() == "portal") {
                 this.el.setAttribute("gltf-model", "#poi1");
                 this.el.setAttribute("material", {color: "aqua", transparent: true, opacity: .5});

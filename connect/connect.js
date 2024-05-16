@@ -925,6 +925,7 @@ function SaveModToLocal(locationKey) { //locationKey is now just timestamp of th
                cloudMarkerComponent.data.modelID = locItem.mediaID;
                cloudMarkerComponent.data.name = locItem.name;
                cloudMarkerComponent.data.markerType = locItem.markerType;
+               cloudMarkerComponent.data.description = locItem.description;
                cloudMarkerComponent.data.xpos = locItem.x;
                cloudMarkerComponent.data.ypos = locItem.y;
                cloudMarkerComponent.data.zpos = locItem.z;
@@ -947,6 +948,7 @@ function SaveModToLocal(locationKey) { //locationKey is now just timestamp of th
                localMarkerComponent.data.mediaID = locItem.mediaID;
                localMarkerComponent.data.name = locItem.name;
                localMarkerComponent.data.markerType = locItem.markerType;
+               localMarkerComponent.data.description = locItem.description;
                localMarkerComponent.data.xpos = locItem.x;
                localMarkerComponent.data.ypos = locItem.y;
                localMarkerComponent.data.zpos = locItem.z;

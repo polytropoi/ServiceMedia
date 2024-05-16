@@ -136,6 +136,7 @@ function InitIDB() {
                                                                tags: cursor.value.locations[i].locationTags, 
                                                                eventData: cursor.value.locations[i].eventData, 
                                                                markerType: cursor.value.locations[i].markerType,
+                                                               description: cursor.value.locations[i].description,
                                                                // position: cursor.value.locations[i].x +","+ cursor.value.locations[i].y+","+cursor.value.locations[i].z,
                                                                xpos: cursor.value.locations[i].x,
                                                                ypos: cursor.value.locations[i].y,

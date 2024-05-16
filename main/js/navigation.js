@@ -1846,7 +1846,7 @@ AFRAME.registerComponent('nav_agent_controller', {
 				if(results.length > 0) {
 					this.znormal = Math.abs(results[0].face.normal.z);
 					if (this.znormal < 1) {
-						console.log("good spot!");
+						// console.log("good spot!");
 						let testPosition = {};
 						testPosition.x = results[0].point.x.toFixed(2); //snap y of waypoint to navmesh y
 						testPosition.y = results[0].point.y.toFixed(2);

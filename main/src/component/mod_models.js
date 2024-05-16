@@ -1102,15 +1102,9 @@ AFRAME.registerComponent('mod_model', {
           }
           // if (this.hasCallout || this.hasLocationCallout) {
             this.bubble = document.createElement("a-entity");
-            // this.bubble = bubble;
-            console.log(this.data.name + " made a bubble! " + this.data.eventData.toLowerCase());
-            // let position = this.el.getAttribute("position")
-            // this.bubble.classList.add(".bubble");
-            // this.bubble.setAttribute("position", "2 2 0");
-            // this.bubble.setAttribute("rotation", "0 0 0"); 
-            // this.bubble.setAttribute("scale", "2 2 2"); 
+
             this.bubble.setAttribute("visible", false);
-                        // let bubbleText = document.createElement("a-text");
+                        
             this.bubbleText = document.createElement("a-entity");
 
             this.bubbleText.classList.add("bubbleText");

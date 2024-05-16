@@ -155,6 +155,10 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
                   } else if (this.data.markerType.toLowerCase() == "link") {
                     this.el.setAttribute('gltf-model', '#links');
                     
+                  } else if (this.data.markerType.toLowerCase() == "text") {
+                    this.el.setAttribute("gltf-model", "#texticon");
+                    this.el.setAttribute("material", {color: "black", transparent: true, opacity: .5});
+                  
                   } else if (this.data.markerType.toLowerCase() == "mailbox") {
                     // console.log("TRYNA SET MODEL TO MAILBOX!")
                     this.el.setAttribute('gltf-model', '#mailbox');
@@ -290,6 +294,10 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
                             this.el.setAttribute("material", {color: "Gold", transparent: true, opacity: .5});
                             // this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"placeholder", scaleFactor: 1});
                             // this.el.setAttribute("color", "orange");
+                        } else if (this.data.markerType.toLowerCase() == "text") {
+                          this.el.setAttribute("gltf-model", "#texticon");
+                          this.el.setAttribute("material", {color: "black", transparent: true, opacity: .5});
+                        
                         } else if (this.data.markerType == "portal") {
                         
                         } else if (this.data.markerType == "mailbox") {
@@ -590,34 +598,60 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
         // }
       });
   
-      this.el.addEventListener('mousedown', function (evt) {
+      this.el.addEventListener('mousedown', (evt) => {
         if (keydown == "T") {
-          ToggleTransformControls(that.timestamp);
+          ToggleTransformControls(this.timestamp);
         } else if (keydown == "Shift") {
-        //   ShowLocationModal(that.timestamp);
-            selectedLocationTimestamp = that.timestamp;
-            // ShowLocationModal(that.timestamp);
+        //   ShowLocationModal(this.timestamp);
+            selectedLocationTimestamp = this.timestamp;
+            // ShowLocationModal(this.timestamp);
             SceneManglerModal('Location');
         } else {
-          let transform_controls_component = that.el.components.transform_controls;
+          let transform_controls_component = this.el.components.transform_controls;
           if (transform_controls_component) {
               if (transform_controls_component.data.isAttached) {
                   // transform_controls_component.detachTransformControls();
                   return; //don't do stuff below if transform enabled
               }
           }
-          if (that.data.markerType == "link" && !that.data.isNew) {
-            if (that.data.eventData.includes("href~")) {
+          if (this.data.markerType == "link" && !this.data.isNew) {
+            if (this.data.eventData.includes("href~")) {
 
-                let urlSplit = that.data.eventData.split("~");
+                let urlSplit = this.data.eventData.split("~");
                 let url = urlSplit[1];
                 this.dialogEl = document.getElementById('mod_dialog');
                 if (this.dialogEl) {
-                  this.dialogEl.components.mod_dialog.showPanel("Open " + url +" in new window?", that.data.eventData, "linkOpen", 10000 ); 
+                  this.dialogEl.components.mod_dialog.showPanel("Open " + url +" in new window?", this.data.eventData, "linkOpen", 10000 ); 
                 }
               } 
           }
-          if (that.data.markerType == "gate" && !that.data.isNew) {
+          if (this.data.markerType == "text") {
+            let textString = this.data.description;
+            if (this.data.mediaID && sceneTextItems.length) {
+              for (let i = 0; i < sceneTextItems.length; i++) {                
+                if (this.data.mediaID == sceneTextItems._id) {  
+                  textString = sceneTextItems.textstring;
+                  console.log("gotsa textstring " + textString);
+                  break;
+                }
+              }
+              
+            }
+            let mode = "plain";
+            if (textString.includes("~")) {
+              mode = "paged";
+            }
+            console.log("textString " + textString);
+            let textDisplayComponent = this.el.components.scene_text_display;
+            if (!textDisplayComponent) {
+              this.el.setAttribute("scene_text_display", {"textString": textString, "mode": mode});
+            } else {
+              console.log("tryna toggle vis for textdata");
+              textDisplayComponent.toggleVisibility();
+            }
+            
+          }
+          if (this.data.markerType == "gate" && !this.data.isNew) {
             if (evt.detail.intersection && evt.detail.intersection.distance > 1 && evt.detail.intersection.distance < 15) {
               this.dialogEl = document.getElementById('mod_dialog');
               if (this.dialogEl) {
@@ -637,8 +671,8 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
             } else {
               console.log("bad distance");
             }
-          }  else if (that.data.markerType == "poi") {
-            GoToLocation(that.data.timestamp);
+          }  else if (this.data.markerType == "poi") {
+            GoToLocation(this.data.timestamp);
           }
         }
       });
@@ -651,9 +685,16 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
         }
         // that.deselect(); 
       });
+      if (this.data.tags.includes("billboard")) {
+        if (this.data.tags.includes("yonly")) {
+          this.el.setAttribute("look-at-y", "#player");
+        } else {
+          this.el.setAttribute("look-at", "#player");
+        }
+        
+      }
   
-  
-    },
+    }, //end init
    
     loadObject: function (objectID) { //local object swap (maybe with child model...);
       console.log("tryna load OBJECT ID " + objectID);
@@ -919,7 +960,11 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
               } else if (this.data.markerType.toLowerCase() == "link") {
                 this.el.setAttribute("gltf-model", "#links");
                 this.el.setAttribute("material", {color: "aqua", transparent: true, opacity: .5});
-              } else if (this.data.markerType.includes("collider")) {
+              } else if (this.data.markerType.toLowerCase() == "text") {
+               
+                this.el.setAttribute("material", {color: "black", transparent: true, opacity: .5});
+              
+              }else if (this.data.markerType.includes("collider")) {
                 this.el.setAttribute("material", {color: "tomato", transparent: true, opacity: .5});
                 // this.el.setAttribute("mod_physics", {body: "static", isTrigger: false, model:"collider", scaleFactor: this.data.scale});
                 // this.el.setAttribute("color", "lime");
@@ -1010,6 +1055,10 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
             } else if (this.data.markerType.toLowerCase() == "link") {
                 this.el.setAttribute("gltf-model", "#links");
                 this.el.setAttribute("material", {color: "aqua", transparent: true, opacity: .5});
+            }  else if (this.data.markerType.toLowerCase() == "text") {
+              this.el.setAttribute("gltf-model", "#texticon");
+              this.el.setAttribute("material", {color: "black", transparent: true, opacity: .5});
+            
             } else if (this.data.markerType.toLowerCase() == "mailbox") {
                 this.el.setAttribute("gltf-model", "#mailbox");
             } else if (this.data.markerType == "3D text") {
