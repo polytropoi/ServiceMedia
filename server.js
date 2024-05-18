@@ -14553,6 +14553,7 @@ app.post('/newscene', requiredAuthentication, admin, function (req, res) {
     newScene.user_id = req.session.user._id.toString();
     newScene.userName = req.session.user.userName;
     newScene.otimestamp = Math.round(Date.now() / 1000);
+    newScene.sceneLocations = [];
     db.scenes.save(newScene, function (err, saved) {
         if ( err || !saved ) {
             console.log('scene not saved..');

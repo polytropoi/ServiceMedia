@@ -3163,6 +3163,7 @@
                             "<div id=\x22audioEvents\x22 class=\x22col form-group col-md-12\x22></div>" + //audioEvents
                         "</div>" + 
                         "<button type=\x22button\x22 class=\x22btn btn-sm btn-danger float-left\x22 onclick=\x22deleteItem('audio','" + item_id + "')\x22>Delete Audio</button>" +
+                        "<button id=\x22clearTimekeys\x22 type=\x22button\x22 class=\x22btn btn-sm btn-info float-right\x22>Clear Timekeys</button>" +
                     "</form>" +
                     "</div>" +
                     "</div>" +
@@ -3371,13 +3372,23 @@
                         $("#tagDisplay").empty();
                         $("#tagDisplay").html(html);
                     });
+                    $(document).on('click','#clearTimekeys',function(e){
+                        e.preventDefault();  
+                        timekeys = [];
+                        $("#audioEvents").empty();
+                        $("#audioEvents").html(ReturnTimeKeys(timekeys));
+                        // for (let i = 0; i < timekeys.length; i++) {
+                        //     $("#tk_type_" + i).val(timekeys[i].keytype).change();
+                        // }
+
+                    }); 
                     $(document).on('click','#newAudioEvent',function(e){
                         e.preventDefault();  
                         let newTimeKey = {
-                            keytype: "",
+                            keytype: "Beat",
                             keystarttime: currentTime.toFixed(2),
-                            keyduration: 5,
-                            keydata: ""
+                            keyduration: .1,
+                            keydata: "none"
                             }
                         timekeys.push(newTimeKey);
                         $("#audioEvents").empty();
@@ -3652,9 +3663,9 @@
                         { "value": -300, "item": "Nadir" },
                     ],
 
-                  };
-                  console.log("jsonTemplate is " + JSON.stringify(json));
-                  return JSON.stringify(json, undefined, 4);
+                };
+                console.log("jsonTemplate is " + JSON.stringify(json));
+                return JSON.stringify(json, undefined, 4);
             } else if (template == 'Question/Multichoice') {
                 let json = {
                     "question": 'question text here',
@@ -12355,7 +12366,7 @@ function getAllPeople() {
             let sceneObjects = (response.data.sceneObjects != undefined && response.data.sceneObjects != null) ? response.data.sceneObjects : ""; //munged on server for request
             let sceneObjex = (response.data.sceneObjex != undefined && response.data.sceneObjex != null) ? response.data.sceneObjex : ""; //munged on server for request
             let sceneTargetObject = (response.data.sceneTargetObject != undefined && response.data.sceneTargetObject != null) ? response.data.sceneTargetObject : "";
-            let sceneLocations = (response.data.sceneLocations != undefined && response.data.sceneLocations != null) ? response.data.sceneLocations : "";
+            let sceneLocations = (response.data.sceneLocations != undefined && response.data.sceneLocations != null && response.data.sceneLocations != "") ? response.data.sceneLocations : [];
             let sceneObjexGroups = (response.data.sceneObjexGroups != undefined && response.data.sceneObjexGroups != null) ? response.data.sceneObjexGroups : "";
             let sceneModelz = (response.data.sceneModelz != undefined && response.data.sceneModelz != null) ? response.data.sceneModelz : ""; //munged on server for request
             let sceneModels = (response.data.sceneModels != undefined && response.data.sceneModels != null) ? response.data.sceneModels : ""; //IDs only, add/remove to update
@@ -12826,7 +12837,9 @@ function getAllPeople() {
 
                     "</div>";
                     }
-                }    
+                } else {
+                    sceneLocations = [];
+                }
             let sceneVids = "";
                 if (response.data.sceneVideoItems != null && response.data.sceneVideoItems != undefined && response.data.sceneVideoItems.length > 0 ) {
                 // console.log("tryna fetch vids " + JSON.stringify(response.data.videos));
@@ -15369,6 +15382,7 @@ function getAllPeople() {
                 ////////////////////////////////////////////////
                 $(function() { 
                     let reloadOnSubmit = false;
+                        // console.log("sceneLocations " + JSON.stringify(sceneLocations));
                         if (sceneModelz != null && sceneModelz != undefined && sceneModelz.length > 0) {
 
                             console.log("sceneModelz: " + JSON.stringify(sceneModelz) +" vs "+ JSON.stringify(sceneModels));
@@ -16915,6 +16929,9 @@ function getAllPeople() {
                         ///////////////////////////
                         //////////////////////////
                         // alert("sceneScatterOFfset " + sceneScatterOffset);
+                        if (!sceneLocations) {
+                            sceneLocations = [];
+                        }
                         let data = {
                             _id : response.data._id,
                             pictures: pictures,

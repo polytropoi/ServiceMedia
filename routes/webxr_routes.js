@@ -913,7 +913,8 @@ webxr_router.get('/:_id', function (req, res) {
                             youtubes = sceneResponse.sceneYouTubeIDs;
                         }
                         ////LOCATION FU
-                        if (sceneResponse.sceneLocations != null && sceneResponse.sceneLocations.length > 0) {
+                        // if (sceneResponse.sceneLocations != null && sceneResponse.sceneLocations.length > 0) {
+                        if (sceneResponse.sceneLocations != null) {
                             
                             if (sceneResponse.sceneWebType == "AR Location Tracking") { //NOOPE
                                 // geoEntity = 'gps-entity-place'; //default = 'geo-location'
@@ -1278,7 +1279,11 @@ webxr_router.get('/:_id', function (req, res) {
                             loadLocations = "<a-entity location_data id=\x22locationData\x22 data-locations='"+buff+"'></a-entity>";
                             //SET CAMERA VAR BELOW, DEPENDING ON SCENETYPE
 
-                        } if (sceneData.sceneWebType == 'Camera Background') {
+                        } else {
+                            var buff = Buffer.from(JSON.stringify([])).toString("base64");
+                            loadLocations = "<a-entity location_data id=\x22locationData\x22 data-locations='"+buff+"'></a-entity>";
+                        } 
+                        if (sceneData.sceneWebType == 'Camera Background') {
                             sceneBackground = " background=\x22transparent: true\x22 ";
                             
 

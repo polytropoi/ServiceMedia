@@ -570,6 +570,7 @@ function SaveModsToCloud() { //Save button on location modal, writes local mods 
       for (let key in mods.localFiles) {
          mods.localFiles[key].data = arrayBufferToBase64(localData.localFiles[key].data); //might need to async...
       }
+      
       mods.locationMods = localData.locations;
       for (let i = 0; i < mods.locationMods.length; i++) { //pop the properties for non-uniform scaling...
          if (mods.locationMods[i].xscale == null) {
@@ -1404,7 +1405,7 @@ function LocationRowClick(data) {
 
 
 function CreateLocation (filename, type, position) { //New Location button, also addToScene button for localfiles
-   console.log("trynsa createlocation with file " + filename + " type " + type);
+   console.log("trynsa createlocation with file " + filename + " type " + type + " localData is " + JSON.stringify(localData));
    let markertype = "placeholder";
    
    let modelID = "none";
@@ -1458,7 +1459,16 @@ function CreateLocation (filename, type, position) { //New Location button, also
    locItem.modelID = modelID;
    locItem.mediaID = mediaID;
    locItem.isLocal = true;
-   localData.locations.push(locItem);
+   if (!localData) {
+      localData = {};
+   }
+   if (!localData.locations) {
+      localData.locations = [];
+      localData.locations.push(locItem);
+   } else {
+      localData.locations.push(locItem);
+   }
+   
    if (markertype == "placeholder") {
       phEl.setAttribute('gltf-model', '#poi1');
       // ShowHideDialogPanel();
@@ -1643,7 +1653,7 @@ if (sceneEl != null) {
             this.data.jsonData = JSON.parse(atob(theData)); //convert from base64
             // this.rEl = null;
             // if (localData != "") {
-
+            if (this.data.jsonData.length) {
             for (let i = 0; i < this.data.jsonData.length; i++) {
                let locItem = this.data.jsonData[i];
                sceneLocations.locations.push(locItem);
@@ -1681,6 +1691,9 @@ if (sceneEl != null) {
                   // }
                }
             }
+         } else {
+            InitIDB();
+         }
           
       }, 
       returnYouTubePosition: function() {

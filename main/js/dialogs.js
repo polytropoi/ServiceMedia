@@ -537,10 +537,10 @@ window.addEventListener( 'keydown',  ( event ) => {
       }
     }
   });
-  $('#modalContent').on('change', '.tk_label', function(e) {
+  $('#modalContent').on('change', '.tk_tags', function(e) {
     console.log('type ' + e.target.value + " id " + e.target.id);
     for (let i = 0; i < timeKeysData.timekeys.length; i++) {
-      if (e.target.id == "tk_label_" + i) {
+      if (e.target.id == "tk_tags_" + i) {
           timeKeysData.timekeys[i].keylabel = e.target.value;
           console.log(JSON.stringify(timeKeysData.timekeys[i]));
       }
@@ -1404,7 +1404,7 @@ function ReturnTimeKeys() {
       "<th style=\x22color: white;\x22>Duration</th>"+
       "<th style=\x22color: white;\x22>Type</th>"+
       "<th style=\x22color: white;\x22>Data</th>"+
-      "<th style=\x22color: white;\x22>Label</th>"+
+      "<th style=\x22color: white;\x22>Tags</th>"+
       "<th></th>"+
       "</tr>"+
       "</thead>"+
@@ -1440,7 +1440,7 @@ function ReturnTimeKeys() {
           "</td>" +
           
           "<td><input type=\x22text\x22 class=\x22tk_data form-control\x22 id=\x22tk_data_" + i + "\x22 value=\x22" + theTimekey.keydata + "\x22></td>" +
-          "<td><input type=\x22text\x22 class=\x22tk_label form-control\x22 id=\x22tk_label_" + i + "\x22 value=\x22" + theTimekey.keylabel + "\x22></td>" +
+          "<td><input type=\x22text\x22 class=\x22tk_tags form-control\x22 id=\x22tk_tags_" + i + "\x22 value=\x22" + theTimekey.keylabel + "\x22></td>" +
           // "<td><button class=\x22btn btn-xs btn-info\x22>Update</button><button class=\x22btn btn-xs btn-danger\x22>Remove</button></td>" +
           "<td><button class=\x22tk_rm btn btn-sm btn-danger\x22 id=\x22tk_rm_"+ i +"\x22>Remove</button></td>" +
           "</tr>";
