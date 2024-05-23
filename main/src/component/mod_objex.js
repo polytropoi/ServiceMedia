@@ -28,7 +28,10 @@ AFRAME.registerComponent('mod_objex', {
         this.sceneInventoryItems = null; //might be loaded after init, called from mod_scene_inventory component, if not part of the scene
         this.fromSceneInventory = false;
         this.equipHolder = document.getElementById("equipPlaceholder");
-        this.equippedObject = this.equipHolder.querySelector('.equipped');
+        if (this.equipHolder) {
+          this.equippedObject = this.equipHolder.querySelector('.equipped');
+        }
+       
         this.data.jsonObjectData = JSON.parse(atob(theData)); //object items with model references
         this.data.jsonLocationsData = JSON.parse(atob(theLocData)); //scene locations with object references
         // console.log("objxe datas" + JSON.stringify(this.data.jsonObjectData));

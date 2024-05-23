@@ -198,7 +198,7 @@ $(function() {
       if (modelDataEl) {
          let modelData = modelDataEl.getAttribute('data-models');
          sceneModels = JSON.parse(atob(modelData)); //convert from base64
-         console.log("sceneModels " + JSON.stringify(sceneModels));
+         // console.log("sceneModels " + JSON.stringify(sceneModels));
          for (let i = 0; i < sceneModels.length; i++) {
             if (sceneModels[i].sourceText != undefined && sceneModels[i].sourceText != 'undefined' && sceneModels[i].sourceText != null && sceneModels[i].sourceText.length > 0) {
                attributions.push("Name: " + sceneModels[i].name + " - Type: " + sceneModels[i].item_type + " - Source: " + sceneModels[i].sourceText);

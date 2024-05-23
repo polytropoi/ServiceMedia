@@ -2472,7 +2472,7 @@ AFRAME.registerComponent("rotate-with-camera", { //unused
     // }
   },
   showRoomData(instanceID, distance, hitpoint) {
-    // console.log(JSON.stringify(this.data.roomData[instanceID]));
+    console.log(JSON.stringify(this.data.roomData[instanceID]));
 
     if (hitpoint != undefined) {
       // console.log(instanceID + " " + distance + " " + JSON.stringify(hitpoint));
@@ -2526,9 +2526,10 @@ AFRAME.registerComponent('parametric_curve', {
   {
   // data for curves defined by parametric functions
   xyzFunctions: { type: "array", default: ["cos(t)", "0.1 * t", "sin(t)"] },
-  tRange: 	  { type: "array", default: [0, 10], 
-          parse: function(value) // convert array of strings to array of floats
-          { return value.split(",").map( parseFloat ); } },
+  // tRange: 	  { type: "array", default: [0, 10], 
+  //               parse: function(value) // convert array of strings to array of floats
+  //               { return value.split(",").map( parseFloat ); } },
+  tRange: 	  { type: "array", default: [0, 10]}
   },
   
   eval: function(t)
@@ -2540,6 +2541,7 @@ AFRAME.registerComponent('parametric_curve', {
   {
     console.log("tryna do some sketchy eval stuff for parametric curve...");
   // convert strings to functions
+  // this.trangeData = 
   let parser = new Parser();
   let xF = parser.parse(this.data.xyzFunctions[0]);
   let yF = parser.parse(this.data.xyzFunctions[1]);
@@ -2553,8 +2555,11 @@ AFRAME.registerComponent('parametric_curve', {
       zF.evaluate( {t: tValue} ) 
     );
   }
-}
 
+},
+  tRangeData: function (index) {
+    return parseFloat(this.data.tRange[index]);
+  }
 });
 /* 
 	Note: compatible with aframe-parametric-curve and aframe-compass-curve components
@@ -2601,8 +2606,10 @@ AFRAME.registerComponent("curve-follow",
 
 
 		let f    = curveComponent.eval;
-		let tMin = curveComponent.data.tRange[0];
-		let tMax = curveComponent.data.tRange[1];
+		// let tMin = curveComponent.data.tRange[0];
+		// let tMax = curveComponent.data.tRange[1];
+    let tMin = curveComponent.tRangeData(0);
+		let tMax = curveComponent.tRangeData(1);
 
 		this.path = function ( u ) 
 		{

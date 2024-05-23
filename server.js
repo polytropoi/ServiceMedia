@@ -13352,7 +13352,7 @@ app.get('/uscene/:user_id/:scene_id',  requiredAuthentication, uscene, function 
                                 // console.log("got user models:" + JSON.stringify(models));
                                 let url = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + model.userID + "/gltf/" + model.filename, Expires: 6000});
                                 model.url = url;
-                                console.log("pushing to sceneModelz " + JSON.stringify(model));
+                                console.log("scene update route pushing to sceneModelz " + model._id);
                                 modelz.push(model);
                                 callbackz();
                             }

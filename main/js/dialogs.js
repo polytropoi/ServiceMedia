@@ -2560,20 +2560,21 @@ function playSound(){
 var GetTextItems = function() { //make a different method for aframe? 
 
   let textDataEl = document.getElementById("sceneTextData");
-  let textIDs = textDataEl.getAttribute("data-attribute");
-  console.log("TEXtITEMS AHOY!" + textIDs + " length " + textIDs.length);
-  let tempArray = []; 
-  if (!textIDs.indexOf(",") == -1) { //make sure to send request with an array
-    tempArray[0] = textIDs;
-  } else {
-    tempArray = textIDs.split(",");
-  }
-  var posting = $.ajax({
-    url: "/scene_text_items",
-    type: 'POST',
-    contentType: "application/json; charset=utf-8",
-    dataType: "json",
-    data: JSON.stringify({
+  if (textDataEl) {
+    let textIDs = textDataEl.getAttribute("data-attribute");
+    console.log("TEXtITEMS AHOY!" + textIDs + " length " + textIDs.length);
+    let tempArray = []; 
+    if (!textIDs.indexOf(",") == -1) { //make sure to send request with an array
+      tempArray[0] = textIDs;
+    } else {
+      tempArray = textIDs.split(",");
+    }
+    var posting = $.ajax({
+      url: "/scene_text_items",
+      type: 'POST',
+      contentType: "application/json; charset=utf-8",
+      dataType: "json",
+      data: JSON.stringify({
             // uname: uName,
             // upass: uPass
             // param2: $('#textbox2').val()
@@ -2605,6 +2606,7 @@ var GetTextItems = function() { //make a different method for aframe?
             // Cookies.remove('_id');
             }
         });
+  }
 }
 
 var StartTeletypeMessage = function (theArray) {

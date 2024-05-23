@@ -1486,34 +1486,37 @@ let availableScenesIndex = 0;
 let scenesArray = [];
 AFRAME.registerComponent('available_scenes_control', {
   schema: {
-    jsonData: {
-      parse: JSON.parse,
-      stringify: JSON.stringify
-      }
+    jsonData: {default: ""}
     },
     init: function () {
+
+      let theData = this.el.getAttribute('data-availablescenes');
+      // console.log("attributions data" + theData);
+      
+      this.data.jsonData = JSON.parse(atob(theData)); //convert from base64
       this.textureArray = [];
-      const data = this.data;
+      // const data = this.data;
       let scenesArray = this.data.jsonData.availableScenes; 
-      // console.log(JSON.stringify(scenesArray));
+      console.log("availablescenes: " + JSON.stringify(scenesArray));
       let availableScenePicEl = document.getElementById("availableScenePic");
       let nextButton = document.getElementById("availableScenesNextButton");
       let previousButton = document.getElementById("availableScenesPreviousButton");
-      for (let i = 1; i < 7; i++) {
-        this.envmapEl = document.querySelector("#envmap_" + i);
-        if (this.envmapEl) {
-        this.path = this.envmapEl.getAttribute("src");
-        // console.log("envMap path " + this.path);
-        this.textureArray.push(this.path);
-        }
-      }
-      this.texture = new THREE.CubeTextureLoader().load(this.textureArray);
-      this.texture.format = THREE[data.format];
 
-      let uiMaterial = new THREE.MeshStandardMaterial( { color: 'gold' } ); 
-      uiMaterial.envMap = this.texture;        
-      uiMaterial.envMap.intensity = .5;
-      uiMaterial.needsUpdate = true;
+      // for (let i = 1; i < 7; i++) {
+      //   this.envmapEl = document.querySelector("#envmap_" + i);
+      //   if (this.envmapEl) {
+      //   this.path = this.envmapEl.getAttribute("src");
+      //   // console.log("envMap path " + this.path);
+      //   this.textureArray.push(this.path);
+      //   }
+      // }
+      // this.texture = new THREE.CubeTextureLoader().load(this.textureArray);
+      // this.texture.format = THREE[data.format];
+
+      let uiMaterial = new THREE.MeshStandardMaterial( { color: 'gold' } );   
+      // uiMaterial.envMap = this.texture;        
+      // uiMaterial.envMap.intensity = .5;
+      // uiMaterial.needsUpdate = true;
 
       availableScenesIndex = 0;  
       if (scenesArray != undefined && scenesArray.length > 0) {        

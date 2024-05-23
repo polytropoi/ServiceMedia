@@ -547,13 +547,15 @@ webxr_router.get('/:_id', function (req, res) {
     // let aframeExtrasScript = "<script src=\x22../main/src/component/aframe-extras.min.js\x22></script>"; 
     // let aframeExtrasScript =<script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.0.0/dist/components/sphere-collider.min.js"></script>
     // <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.0.0/dist/aframe-extras.controls.min.js"></script>
-    let aframeExtrasScript = "<script src=\x22https://cdn.jsdelivr.net/npm/aframe-extras@7.2.0/dist/aframe-extras.min.js\x22 defer=\x22defer\x22></script>";
+    // let aframeExtrasScript = "<script src=\x22https://cdn.jsdelivr.net/npm/aframe-extras@7.2.0/dist/aframe-extras.min.js\x22 defer=\x22defer\x22></script>";
+    let aframeExtrasScript = "<script src=\x22https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.4.0/dist/aframe-extras.min.js\x22 defer=\x22defer\x22></script>";
+    
     let logScripts = "";
     enviromentScript = ""; //for aframe env component
     
     // let aframeScriptVersion = "<script src=\x22https://aframe.io/releases/1.3.0/aframe.min.js\x22></script>";
     // let aframeScriptVersion = "<script src=\x22https://cdn.jsdelivr.net/npm/aframe@1.4.2/dist/aframe-master.min.js\x22></script>";
-    let aframeScriptVersion = "<script src=\x22https://aframe.io/releases/1.5.0/aframe.min.js\x22></script>";
+    let aframeScriptVersion = "<script src=\x22https://aframe.io/releases/1.6.0/aframe.min.js\x22></script>";
 
     let surfaceScatterScript = "";
     let locationData = "";
@@ -1668,6 +1670,10 @@ webxr_router.get('/:_id', function (req, res) {
                                     
                                     //////////////////////////////////// FP cameraRig
                                     // cameraRigEntity = "<a-entity id=\x22cameraRig\x22 "+movementControls+" initializer "+
+                                    if (!sceneResponse.scenePlayer) {
+                                        sceneResponse.scenePlayer = {};
+                                        sceneResponse.scenePlayer.playerSpeed = 2;
+                                    }
                                     wasd = "extended_wasd_controls=\x22fly: false; moveSpeed: "+sceneResponse.scenePlayer.playerSpeed+"; inputType: keyboard\x22";
                                     if (useSimpleNavmesh || useNavmesh) {
                                         wasd = "extended_wasd_controls=\x22fly: false; moveSpeed: "+sceneResponse.scenePlayer.playerSpeed+"; inputType: keyboard\x22 simple-navmesh-constraint=\x22navmesh:#nav-mesh;fall:10; height: 1.6\x22";
@@ -2163,7 +2169,7 @@ webxr_router.get('/:_id', function (req, res) {
                                     } else { 
                                         let url = s3.getSignedUrl('getObject', {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: 'users/' + model.userID + "/gltf/" + model.filename, Expires: 6000});
                                         model.url = url;
-                                        console.log("pushing model " + JSON.stringify(model))
+                                        // console.log("pushing model " + JSON.stringify(model))
                                         modelz.push(model);
 
                                         callbackz();
@@ -2260,12 +2266,13 @@ webxr_router.get('/:_id', function (req, res) {
                                     callback(null);
                                     //else if no keys?
                                 } else {
-                                    // console.log('All files have been processed successfully skyboxEnvMap is ' + skyboxEnvMap);
-         
+
+                                    var buff = Buffer.from(JSON.stringify(availableScenesResponse)).toString("base64");
+                                    modelData = "<div id=\x22sceneModels\x22 data-models='"+buff+"'></div>";
                                     // if (scenesKeyLocation && availableScenes != null && availableScenes != undefined && availableScenes.length > 0) {
                                     if (availableScenes != null && availableScenes != undefined && availableScenes.length > 0) { //need it for random gates, etc...
                                     availableScenesEntity = "<a-entity scale=\x22.75 .75 .75\x22 look-at=\x22#player\x22 position=\x22"+scenesKeyLocation+"\x22>"+ 
-                                    "<a-entity position=\x220 -2.5 0\x22 scale=\x22.75  .75 .75\x22 id=\x22availableScenesControl\x22 class=\x22envMap activeObjexRay\x22 toggle-available-scenes "+skyboxEnvMap+" gltf-model=\x22#key\x22></a-entity>"+
+                                    "<a-entity available_scenes_control position=\x220 -2.5 0\x22 scale=\x22.75  .75 .75\x22 id=\x22availableScenesControl\x22 data-availablescenes='"+buff+"' class=\x22envMap activeObjexRay\x22 toggle-available-scenes "+skyboxEnvMap+" gltf-model=\x22#key\x22></a-entity>"+
                                     "<a-entity id=\x22availableScenesPanel\x22 visible='false' position=\x220 -1 0\x22>"+
                                     "<a-entity id=\x22availableScenesHeaderText\x22 geometry=\x22primitive: plane; width: 3.25; height: 1\x22 position=\x220 1.75 0\x22 material=\x22color: grey; transparent: true; opacity: 0.0\x22" +
                                     "text=\x22value:; wrap-count: 35;\x22></a-entity>" +
@@ -2280,11 +2287,11 @@ webxr_router.get('/:_id', function (req, res) {
 
                                     modelAssets = modelAssets + "<a-asset-item id=\x22widelandscape_panel\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/panel5b.glb\x22></a-asset-item>\n";
                                     
-                                    loadAvailableScenes = "ready(function(){\n" + //TODO base64 this stuff like the others...very
-                                    "let ascontrol = document.getElementById(\x22availableScenesControl\x22);\n"+
+                                    // loadAvailableScenes = "ready(function(){\n" + //TODO base64 this stuff like the others...very
+                                    // "let ascontrol = document.getElementById(\x22availableScenesControl\x22);\n"+
                                     
-                                    "ascontrol.setAttribute(\x22available_scenes_control\x22, \x22jsonData\x22, "+JSON.stringify(JSON.stringify(availableScenesResponse))+");\n"+ //double stringify! yes, it's needed
-                                    "});";
+                                    // "ascontrol.setAttribute(\x22available_scenes_control\x22, \x22jsonData\x22, "+JSON.stringify(JSON.stringify(availableScenesResponse))+");\n"+ //double stringify! yes, it's needed
+                                    // "});";
                                     callback();
                                     } else {
                                         callback();
@@ -2690,6 +2697,7 @@ webxr_router.get('/:_id', function (req, res) {
                             //filter out cloudmarker types
                             console.log(locMdl.modelID + " locname " + locMdl.name + " timestamp " + locMdl.timestamp + " markerType " + locMdl.markerType + " sceneModels " + JSON.stringify(sceneResponse.sceneModels));
                             if (locMdl.modelID != undefined && locMdl.modelID != "undefined" && locMdl.modelID != "none" && locMdl.modelID != "" && locMdl.markerType != "placeholder"
+                            && ObjectID.isValid(locMdl.modelID)
                                 && locMdl.markerType != "poi"
                                 && locMdl.markerType != "waypoint"                                
                                 && locMdl.markerType != "trigger"
@@ -2697,6 +2705,7 @@ webxr_router.get('/:_id', function (req, res) {
                                 && locMdl.markerType != "gate"
                                 && locMdl.markerType != "mailbox"
                                 && locMdl.markerType != "portal" 
+                                && locMdl.markerType != "collider"
                                 && locMdl.markerType != "text") { 
                                 // && JSON.stringify(sceneResponse.sceneModels).includes(locMdl.modelID.toString())) {
 
@@ -4475,7 +4484,8 @@ webxr_router.get('/:_id', function (req, res) {
                     console.log("sceneWebType: "+ sceneResponse.sceneWebType);
                     if (sceneResponse.sceneWebType == undefined || sceneResponse.sceneWebType.toLowerCase() == "default" || sceneResponse.sceneWebType.toLowerCase() == "aframe") { 
                         // webxrFeatures = "webxr=\x22optionalFeatures: hit-test, local-floor\x22"; //otherwise hit-test breaks everythign!
-                        webxrFeatures = "webxr=\x22requiredFeatures: hit-test, local-floor; optionalFeatures: dom-overlay, unbounded; overlayElement: #ar_overlay;\x22 "; //otherwise hit-test breaks everythign!
+                        // webxrFeatures = "webxr=\x22requiredFeatures: hit-test,local-floor; optionalFeatures: dom-overlay,unbounded; overlayElement: #ar_overlay;\x22 "; //otherwise hit-test breaks everythign!
+                        
                         // arHitTest = "ar-hit-test-spawn=\x22mode: "+arMode+"\x22";
                         // arShadowPlane = "<a-plane show-in-ar-mode id="shadow-plane" material="shader:shadow" shadow="cast:false;" visible=\x22false\x22 height=\x2210\x22 width=\x2210\x22 rotation=\x22-90 0 0\x22 shadow=\x22receive:true\x22 ar-shadows=\x22opacity: 0.3\x22 static-body=\x22shape: none\x22 shape__main=\x22shape: box; halfExtents: 100 100 0.125; offset: 0 0 -0.125\x22>" +
                         arShadowPlane = "<a-plane show-in-ar-mode visible=\x22false\x22 id=\x22shadow-plane\x22 material=\x22shader:shadow\x22 shadow=\x22cast:false;\x22 follow-shadow=\x22.activeObjexRay\x22 height=\x2233\x22 width=\x2233\x22 rotation=\x22-90 0 0\x22>" +
@@ -5368,15 +5378,15 @@ webxr_router.get('/:_id', function (req, res) {
                         // "<script src=\x22/connect/files.js\x22></script>\n"+ //handles localFiles in indexedDB
                         
 
-                        "<script>\n"+ //TODO base64 this like the others, and only when a key marker is set
-                            // "var avatarName = \x22" + avatarName + "\x22;\n" +
-                            // "let globalStateObject = {};"
-                           "function ready(f){/in/.test(document.readyState)?setTimeout('ready('+f+')',9):f()}\n"+
-                            //    loadAttributions +
-                               loadAvailableScenes +
-                            // loadPictureGroups +
+                    //     "<script>\n"+ //TODO base64 this like the others, and only when a key marker is set
+                    //         // "var avatarName = \x22" + avatarName + "\x22;\n" +
+                    //         // "let globalStateObject = {};"
+                    //        "function ready(f){/in/.test(document.readyState)?setTimeout('ready('+f+')',9):f()}\n"+
+                    //         //    loadAttributions +
+                    //            loadAvailableScenes +
+                    //         // loadPictureGroups +
                             
-                       "</script>\n"+
+                    //    "</script>\n"+
                     
                         sceneManglerButtons +
                        
