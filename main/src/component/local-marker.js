@@ -629,8 +629,8 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
             let textString = this.data.description;
             if (this.data.mediaID && sceneTextItems.length) {
               for (let i = 0; i < sceneTextItems.length; i++) {                
-                if (this.data.mediaID == sceneTextItems._id) {  
-                  textString = sceneTextItems.textstring;
+                if (this.data.mediaID == sceneTextItems[i]._id) {  
+                  textString = sceneTextItems[i].textstring;
                   console.log("gotsa textstring " + textString);
                   break;
                 }
@@ -638,9 +638,9 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
               
             }
             let mode = "plain";
-            if (textString.includes("~")) {
-              mode = "paged";
-            }
+            // if (textString.includes("~")) {
+            //   mode = "paged"; //no, split!
+            // }
             console.log("textString " + textString);
             let textDisplayComponent = this.el.components.scene_text_display;
             if (!textDisplayComponent) {
@@ -754,6 +754,14 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
         } else {
 
         }
+      }
+      if (this.data.tags.includes("billboard")) {
+        if (this.data.tags.includes("yonly")) {
+          this.el.setAttribute("look-at-y", "#player");
+        } else {
+          this.el.setAttribute("look-at", "#player");
+        }
+        
       }
     },
     // loadModell: function (modelID) { //local model swap

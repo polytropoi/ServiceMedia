@@ -48,15 +48,15 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
       this.font2 = "Acme.woff";
       this.data.scale = this.data.xscale;
       this.picData = null;
-    // // this.scale = this.data.scale.toString() + " " + this.data.scale.toString() + " " + this.data.scale.toString();
-    // this.scaleVector = new THREE.Vector3(this.data.scale,this.data.scale,this.data.scale); 
-    // // if (this.data.xscale) { //well, yeah
-    //   this.scaleVector.x = this.data.xscale;
-    //   this.scaleVector.y = this.data.yscale;
-    //   this.scaleVector.z = this.data.zscale;
-    // }
+      // // this.scale = this.data.scale.toString() + " " + this.data.scale.toString() + " " + this.data.scale.toString();
+      // this.scaleVector = new THREE.Vector3(this.data.scale,this.data.scale,this.data.scale); 
+      // // if (this.data.xscale) { //well, yeah
+      //   this.scaleVector.x = this.data.xscale;
+      //   this.scaleVector.y = this.data.yscale;
+      //   this.scaleVector.z = this.data.zscale;
+      // }
 
-    // this.scale = "1 1 1";
+      // this.scale = "1 1 1";
       if (settings && settings.sceneFontWeb1) {
         this.font1 = settings.sceneFontWeb1;
       }
@@ -566,28 +566,34 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
           if (this.data.markerType == "text") {
             let textString = this.data.description;
             let textTitle = this.data.name;
+            let textMode = "paged";
+            if (this.data.tags.includes("split")) {
+              textMode = "split";
+            }
             if (this.data.mediaID && sceneTextItems.length) {
               for (let i = 0; i < sceneTextItems.length; i++) {                
                 if (this.data.mediaID == sceneTextItems[i]._id) {  
                   textString = sceneTextItems[i].textstring;
                   textTitle = sceneTextItems[i].title;
-                  // console.log("gotsa textstring " + textString);
+                  textMode = sceneTextItems[i].mode;
+                  console.log("gotsa textstring " + JSON.stringify(sceneTextItems[i]));
                   break;
                 }
               }
               
             }
-            let mode = "paged";
-            if (textString.includes("~")) {
-              mode = "paged";
-            }
+            // let mode = "paged";
+            // if (textString.includes("~")) {
+            //   mode = "split";
+            // }
             // console.log("textString " + textString);
             let textDisplayComponent = this.el.components.scene_text_display;
             if (!textDisplayComponent) {
-              this.el.setAttribute("scene_text_display", {"textString": textString, "mode": mode, "title": textTitle, "scale": this.data.yscale});
+              this.el.setAttribute("scene_text_display", {"textString": textString, "mode": textMode, "title": textTitle, "scale": this.data.yscale});
             } else {
               console.log("tryna toggle vis for textdata");
               textDisplayComponent.toggleVisibility();
+              this.el.setAttribute("scene_text_display", {"textString": textString, "mode": textMode, "title": textTitle, "scale": this.data.yscale});
             }
             
           }
@@ -721,7 +727,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
         }
         
       }
-    },
+    },//end init()
     loadObject: function (objectID) { //local object swap (maybe with child model...);
       console.log("tryna load object id " + objectID);
       if (objectID != undefined && objectID != null & objectID != "none" && objectID != "") {  
@@ -822,7 +828,8 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
         this.data.yscale = yscale;
         this.data.zscale = zscale;
         this.data.mediaID = mediaID;
-        console.log("tryna scale to " + xscale + " " + yscale+ " " + zscale);
+        // console.log("tryna scale to " + xscale + " " + yscale+ " " + zscale);
+        console.log("cloudmarker updateAndLoad tags " + this.data.tags);
         // setTimeout(() => {
         if (this.data.markerType == "object" && objectID.length > 8) {
           this.loadObject(objectID);
@@ -831,6 +838,14 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
         this.loadModel(modelID);
         if (mediaID && mediaID != "none") {
           this.loadMedia(mediaID);
+        }
+        if (this.data.tags.includes("billboard")) {
+          if (this.data.tags.includes("yonly")) {
+            this.el.setAttribute("look-at-y", "#player");
+          } else {
+            this.el.setAttribute("look-at", "#player");
+          }
+          
         }
        
     },

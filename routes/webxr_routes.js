@@ -1791,9 +1791,13 @@ webxr_router.get('/:_id', function (req, res) {
                                     
                                 }
 
-                                if (sceneResponse.sceneUseGlobalFog || sceneResponse.sceneUseSceneFog) {
-                                    fogSettings = "fog=\x22type: exponential; density:" +sceneResponse.sceneGlobalFogDensity+ "; near: 1; far: 50; color: " +sceneResponse.sceneColor2 + "\x22";
+                                if (sceneResponse.sceneUseSceneFog) {
+                                    let fogDistance = sceneResponse.sceneSkyRadius / 2 
+                                    fogSettings = "fog=\x22type: exponential; density:" +sceneResponse.sceneGlobalFogDensity+ "; near: 1; far: "+fogDistance+"; color: " +sceneResponse.sceneColor2 + "\x22";
                                     fog = "fog: " +sceneResponse.sceneGlobalFogDensity+ ";";
+                                } else {
+                                    fogSettings = "";
+                                    fog = "";
                                 }
                                 if (sceneResponse.sceneColor1 != null && sceneResponse.sceneColor1.length > 3 && sceneResponse.sceneColorizeSky) {
                                     skycolor = "skyColor: " + sceneResponse.sceneColor1 + ";";
@@ -1834,8 +1838,9 @@ webxr_router.get('/:_id', function (req, res) {
                                     if (sceneResponse.sceneSunIntensity) {
                                         intensity = sceneResponse.sceneSunIntensity;
                                     }
+                                    let skyRad = parseInt(sceneResponse.sceneSkyRadius) - 10;
                                     // aframeEnvironment =  "<a-gradient-sky material=\x22shader: gradient; topColor: "+HexToRgbValues(sceneResponse.sceneColor1)+"; bottomColor: "+HexToRgbValues(sceneResponse.sceneColor2)+";\x22></a-gradient-sky>";
-                                    skySettings =  "<a-sky id=\x22skyEl\x22 color=\x22" + sceneResponse.sceneColor1 + "\x22 mod_sky=\x22enabled: true; color: "+sceneResponse.sceneColor1+";\x22></a-sky>";
+                                    skySettings =  "<a-sky id=\x22skyEl\x22 color=\x22" + sceneResponse.sceneColor1 + "\x22 radius=\x22" + skyRad + "\x22 mod_sky=\x22enabled: true; color: "+sceneResponse.sceneColor1+";\x22></a-sky>";
                                     // skySettings = "<a-entity id=\x22skyEl\x22 mod_sky=\x22enabled: true; color: "+sceneResponse.sceneColor1+";></a-entity>"; //just plain color if not using enviro component //todo gradient sky? sun/sky component?
                                     // hemiLight = "<a-light id=\x22hemi-light\x22 type=\x22hemisphere\x22 color=\x22" + sceneResponse.sceneColor1 + "\x22 groundColor=\x22" + sceneResponse.sceneColor2 + "\x22 intensity=\x22.5\x22 position\x220 0 0\x22>"+
                                         // "</a-light>";
@@ -1848,8 +1853,7 @@ webxr_router.get('/:_id', function (req, res) {
                             }
                             sceneResponse.scenePostcards = sceneData.scenePostcards;
                             if (sceneResponse.sceneColor1 != null && sceneResponse.sceneColor1.length > 3) {
-                                // skySettings = "<a-sky hide-in-ar-mode color='" + sceneResponse.sceneColor1 + "'></a-sky>"; //overwritten below if there's a skybox texture
-                                // environment = "<a-entity environment=\x22preset: "+webxrEnv+"; skyColor: " + sceneResponse.sceneColor1 + "; lighting: none; shadow: none; lightPosition: 0 2.15 0\x22 hide-in-ar-mode></a-entity>";
+                               //
                             } 
                             if (sceneResponse.sceneColor1 != null && sceneResponse.sceneColor1.length > 3 && sceneResponse.sceneColor2 != null && sceneResponse.sceneColor2.length > 3)   {
 
@@ -1860,9 +1864,13 @@ webxr_router.get('/:_id', function (req, res) {
                                 // "</a-light>";
                                 // shadowLight = "<a-entity id=\x22shadow-light\x22 light=\x22type: directional; color:"+sceneResponse.sceneColor1+"; groundColor:"+sceneResponse.sceneColor2+"; castShadow: true; intensity: 1; shadowBias: -0.0015; shadowCameraFar: 1000; shadowMapHeight: 2048; shadowMapWidth: 2048;\x22 position=\x225 10 7\x22></a-entity>";
                             }
-                            if (sceneResponse.sceneUseGlobalFog || sceneResponse.sceneUseSceneFog) {
+                            if (sceneResponse.sceneUseSceneFog) {
+
                                 let fogDensity = sceneResponse.sceneGlobalFogDensity != null ? sceneResponse.sceneGlobalFogDensity : '.01';
-                                fogSettings = "fog=\x22type: exponential; density:"+fogDensity+"; near: 1; far: 150; color: " +sceneResponse.sceneColor1 + "\x22";
+                                let skyRadius = parseInt(sceneResponse.sceneSkyRadius + 100);
+                                fogSettings = "fog=\x22type: exponential; density:"+fogDensity+"; near: 1; far: "+skyRadius+"; color: " +sceneResponse.sceneColor1 + "\x22";
+                            } else {
+                                fogSettings = "";
                             }
                             
                             if (sceneResponse.sceneSkyParticles != undefined && sceneResponse.sceneSkyParticles != null && sceneResponse.sceneSkyParticles != "None") { 
@@ -2680,7 +2688,7 @@ webxr_router.get('/:_id', function (req, res) {
                             // if ((locMdl.eventData != null && locMdl.eventData != undefined && locMdl.eventData.length > 1) && (!locMdl.eventData.includes("noweb"))) {
 
                             //filter out cloudmarker types
-                            console.log(locMdl.modelID + " locname " + locMdl.name + " timestamp " + locMdl.timestamp);
+                            console.log(locMdl.modelID + " locname " + locMdl.name + " timestamp " + locMdl.timestamp + " markerType " + locMdl.markerType + " sceneModels " + JSON.stringify(sceneResponse.sceneModels));
                             if (locMdl.modelID != undefined && locMdl.modelID != "undefined" && locMdl.modelID != "none" && locMdl.modelID != "" && locMdl.markerType != "placeholder"
                                 && locMdl.markerType != "poi"
                                 && locMdl.markerType != "waypoint"                                
@@ -2689,8 +2697,8 @@ webxr_router.get('/:_id', function (req, res) {
                                 && locMdl.markerType != "gate"
                                 && locMdl.markerType != "mailbox"
                                 && locMdl.markerType != "portal" 
-                                && locMdl.markerType != "text" 
-                                && sceneResponse.sceneModels.indexOf(locMdl.modelID) != -1) {
+                                && locMdl.markerType != "text") { 
+                                // && JSON.stringify(sceneResponse.sceneModels).includes(locMdl.modelID.toString())) {
 
                                 // console.log("tryna set model id:  " + JSON.stringify(locMdl));
                                 console.log("gots a mod_model : " + locMdl.name);
@@ -4099,7 +4107,7 @@ webxr_router.get('/:_id', function (req, res) {
                                                     // console
                                                     skyboxID = picID;
                                                     version = ".original.";
-                                                    fogSettings = "";
+                                                    // fogSettings = "";
                                                     skyboxIDs.push(picID);
                                                     // convertEquirectToCubemap = "<script src=\x22../main/ref/aframe/dist/equirect-to-cubemap.js\x22></script>";
                                                 }
@@ -4270,22 +4278,24 @@ webxr_router.get('/:_id', function (req, res) {
                                 callback(null);
                             } else {
                                 let theKey = 'users/' + picture_item.userID + '/pictures/originals/' + picture_item._id + '.original.' + picture_item.filename; //TODO cook smaller equirect versions?
-                                //console.log("theKey " + theKey);
-                                // const params = {
-                                //     Bucket: 'servicemedia', 
-                                //     Key: theKey
-                                // };
-                                // s3.headObject(params, function(err, data) { //some old skyboxen aren't saved with .original. in filename, check for that
+                                console.log("theKey " + theKey);
+                                const params = {
+                                    Bucket: process.env.S3_ROOT_BUCKET_NAME, 
+                                    Key: theKey
+                                };
+                                s3.headObject(params, function(err, data) { //some old skyboxen aren't saved with .original. in filename, check for that
                                     
-                                //     if (err) {
-                                    //   console.log("din't find skybox: " + err, err.stack);
-
-                                    // theKey = 'users/' + picture_item.userID + '/pictures/originals/' + picture_item.filename;
-                                    // let skyboxUrl = s3.getSignedUrl('getObject', {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: theKey, Expires: 6000});
+                                    if (err) {
+                                        console.log("din't find skybox: " + err, err.stack);
+                                        theKey = 'users/' + picture_item.userID + '/pictures/originals/' + picture_item.filename;
+                                    }
+                               
+                                // let skyboxUrl = s3.getSignedUrl('getObject', {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: theKey, Expires: 6000});
                                     (async () => {
-                                        let skyboxUrl = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, theKey, 6000);
-                                        // console.log("skyboxURL is " + skyboxUrl);
+                                        skyboxUrl = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, theKey, 6000);
+                                        console.log("skyboxURL is " + skyboxUrl);
                                         skyboxAsset = "<img id=\x22sky\x22 crossorigin=\x22anonymous\x22 src='" + skyboxUrl + "'>";
+
                                         if (sceneResponse.sceneUseSkybox) {
                                             // theKey = 'users/' + picture_item.userID + '/pictures/originals/' + picture_item.filename;
                                             // skyboxUrl = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: theKey, Expires: 6000});
@@ -4299,28 +4309,8 @@ webxr_router.get('/:_id', function (req, res) {
                                         }
                                         callback(null);
                                     })();
-                                    // } else {
-                                        //console.log("found skybox at " + theKey);
-                                            // skyboxUrl = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: theKey, Expires: 6000});
-                                            // skyboxAsset = "<img id=\x22sky\x22 crossorigin=\x22\anonymous\x22 src='" + skyboxUrl + "'>";
 
-                                            // if (sceneResponse.sceneUseSkybox) {
-                                            //     // skyboxUrl = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: theKey, Expires: 6000});
-                                            //     // skyboxAsset = "<img id=\x22sky\x22 crossorigin=\x22\anonymous\x22 src='" + skyboxUrl + "'>";
-                                            //     // let envMap = sceneResponse.sceneUseDynCubeMap ? "convert-to-envmap" : "";
-                                            //     // skySettings = "<a-sky hide-in-ar-mode "+envMap+" src=#sky></a-sky>";
-                                            //     skySettings = "<a-sky crossorigin=\x22anonymous\x22 id=\x22skybox\x22 hide-in-ar-mode src=#sky></a-sky>";
-                                            //     // if (sceneResponse.sceneUseSkybox) { //turn off env component entirely if 
-                                            //     //     aframeEnvironment = "";
-                                            //     // } else {
-                                            //     // }
-                                            //     hemiLight = "<a-light type=\x22hemisphere\x22 color=\x22" + sceneResponse.sceneColor1 + "\x22 groundColor=\x22" + sceneResponse.sceneColor2 + "\x22 intensity=\x221\x22 position\x220 0 0\x22>"+
-                                            //     "</a-light>";
-                                            // }
-                                            // callback(null);
-                                    // }
-                                // });
-                            
+                                });
                             }
                         });
                     } else {
@@ -4340,7 +4330,11 @@ webxr_router.get('/:_id', function (req, res) {
                     settings.sceneEventStart = sceneResponse.sceneEventStart;
                     settings.sceneEventEnd = sceneResponse.sceneEventEnd;
                     settings.hideAvatars = true;
+                    settings.sceneUseFog = sceneResponse.sceneUseSceneFog != undefined ? sceneResponse.sceneUseSceneFog : false;
+                    settings.sceneUseSkybox = sceneResponse.sceneUseSkybox;
                     settings.sceneSkyRadius = sceneResponse.sceneSkyRadius != undefined ? sceneResponse.sceneSkyRadius : 202;
+                    settings.sceneFogDensity = sceneResponse.sceneGlobalFogDensity != undefined ? sceneResponse.sceneGlobalFogDensity : 0;
+                    settings.sceneGroundLevel = sceneResponse.sceneGroundLevel;
                     settings.sceneFontWeb1 = sceneResponse.sceneFontWeb1;
                     settings.sceneFontWeb2 = sceneResponse.sceneFontWeb2;
                     settings.sceneFontWeb3 = sceneResponse.sceneFontWeb3;

@@ -14650,6 +14650,7 @@ function getAllPeople() {
                                     "<option>volcano</option>" +
                                     "<option>starry</option>" +
                                     "<option>osiris</option>" +
+                                    "<option>moon</option>" +
                                     "</select>" +
                                 "</div>" +
                                 // "<div class=\x22col form-group col-md-1\x22>" +

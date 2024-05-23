@@ -206,7 +206,7 @@ $(function() {
          }
       }
       // console.log("settings: " + JSON.stringify(settings));
-      if (settings.skyboxIDs != null) {
+      if (settings.skyboxIDs != null && settings.skyboxIDs.length > 0) {
          
          skyboxEl = document.createElement('a-entity');
          sceneEl = document.querySelector('a-scene');

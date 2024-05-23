@@ -193,31 +193,51 @@ AFRAME.registerComponent('initializer', { //adjust for device settings, and call
       // InitSceneHooks(type);
       PrimaryAudioInit();
     
-      let envEl = document.getElementById('enviroEl');
+      let envEl = document.getElementById('enviroEl'); 
       if (envEl != null) {
         envEl.setAttribute('enviro_mods', 'enabled', true); //wait till env is init'd to put the mods
       }
      
-      this.asky = document.getElementsByTagName('a-sky')[0];
-      if (this.asky && settings) {
-        console.log("tryna mod asky radius " + settings.sceneSkyRadius);
+      this.asky = document.getElementsByTagName('a-sky'); //do all this biz in enviro_mods?
+
+      if (this.asky.length && settings) {
+        for (let i = 0; i < this.asky.length; i++) {
+
+
+        console.log("tryna mod a-sky radius " + settings.sceneSkyRadius);
         // this.asky1 = this.askies[0];
-        this.asky.setAttribute("radius", settings.sceneSkyRadius);
-        this.asky.setAttribute('theta-length', 180);
-        let skybox = document.getElementById("skybox");
-        if (skybox) {
-          let skyrad = settings.sceneSkyRadius - 2;
-          console.log("tryna mod asky radius " + skyrad);
-          skybox.setAttribute("radius", skyrad); //in case using reflection and enviro is on..
-        } else {
-          let skyboxD = document.getElementById("skybox_dynamic");
-          if (skyboxD) {
-            let skyradD = settings.sceneSkyRadius - 5;
-            console.log("tryna mod asky radius " + skyradD);
-            skyboxD.setAttribute("radius", skyradD); //in case using reflection and enviro is on..
+        this.asky[i].setAttribute("radius", parseInt(settings.sceneSkyRadius) + (i * 10));
+        this.asky[i].setAttribute('theta-length', 180);
+        if (settings.sceneUseSkybox) {
+          if (this.asky[i].classList.contains("environment")) { 
+            // this.asky[i].visible = false;
+            console.log("tryna remove redundant a-sky");
+            // this.asky[i].remove();
+            
           }
         }
-      }
+        if (settings.sceneGroundLevel != 0) {
+          // let enviroEl = document.getElementById("enviroEl");
+          // if (enviroEl) {
+            this.asky[i].setAttribute("position", {x: 0, y: settings.sceneGroundLevel * -1, z: 0});
+          // }
+        }
+        // let skybox = document.getElementById("skyEl");
+        // if (this.asky[i].id == "skyEl") {
+        //   let skyrad = settings.sceneSkyRadius - 10;
+        //   console.log("tryna mod a-sky skyEl radius " + skyrad);
+        //   // skybox.setAttribute("radius", skyrad); //in case using reflection and enviro is on..
+        //   this.asky[i].setAttribute("radius", parseInt(settings.sceneSkyRadius) + 1 );
+        // } else {
+        //   let skyboxD = document.getElementById("skybox_dynamic");
+        //   if (skyboxD) {
+        //     let skyradD = settings.sceneSkyRadius + 5;
+        //     console.log("tryna mod asky radius " + skyradD);
+        //     skyboxD.setAttribute("radius", skyradD); //in case using reflection and enviro is on..
+        //     }
+          }
+        }
+      // }
 
    }); //end loaded
 
@@ -832,14 +852,15 @@ AFRAME.registerComponent('scene_text_display', {
 
           } else { //if mode == "split"
             textArray = this.data.textString.split("~"); //TODO scroll
+
           }      
 
           this.textArray = textArray;
 
           this.font = "Acme.woff";
 
-          if (settings && settings.sceneFontWeb1) {
-            this.font = settings.sceneFontWeb1;
+          if (settings && settings.sceneFontWeb2) {
+            this.font = settings.sceneFontWeb2;
           }
           textBody.setAttribute('troika-text', {
             value: this.textArray[0],
@@ -2874,7 +2895,7 @@ AFRAME.registerComponent('skybox_dynamic', {
       this.skyboxData = picGroupMangler.components.picture_groups_control.returnSkyboxData(this.data.id);
       // console.log(JSON.stringify(this.skyboxData));
     } else {
-      // this.singleSkybox(); //maybe tryna do this before models are loaded, is the problem..
+      this.singleSkybox(); //maybe tryna do this before models are loaded, is the problem..
     }
 
   },
@@ -2895,7 +2916,7 @@ AFRAME.registerComponent('skybox_dynamic', {
     // this.applyEnvMap();
     if (this.skyEl != null) {
       // this.skyEl.remove();
-      this.skyEl.setAttribute('visible', false);
+      // this.skyEl.setAttribute('visible', false);
       }
   },
   nextSkybox: function () {
@@ -3120,6 +3141,7 @@ AFRAME.registerComponent('enviro_mods', { //tweak properties of environment comp
   init: function () {
     console.log('tryna init enviro_mods');
     this.enviroDressing = document.querySelector('.environmentDressing');
+    this.enviroGround = document.querySelector('.environmentGround');
     this.enviroEl = document.getElementById('enviroEl');
     // this.skyEl = document.getElementById('a_sky');
     this.isLerping = false;
@@ -3127,12 +3149,28 @@ AFRAME.registerComponent('enviro_mods', { //tweak properties of environment comp
     if (this.data.preset != '') {
       this.loadPreset(this.data.preset);
     }
+    if (this.enviroGround && settings.sceneGroundLevel != 0) {
+      // this.enviroGround.setAttribute("position", {x: 0, y: settings.sceneGroundLevel, z: 0});
+    }
+    
 
   },
   loadPreset: function(preset) {
-    if (this.enviroEl) {
-      this.enviroEl.setAttribute("environment", {'preset': preset});
+    console.log("tryna set enviro to " + preset + " fogDensity " + settings.sceneFogDensity );
+    let fogDensity = 0;
+    if (settings.sceneFogDensity) {
+      fogDensity = settings.sceneFogDensity;
+
     }
+    if (!settings.sceneUseFog || fogDensity == 0) {
+      this.el.sceneEl.removeAttribute("fog");
+    } else {
+      if (this.enviroEl) {
+
+        this.enviroEl.setAttribute("environment", {'preset': preset, 'fog': fogDensity});
+      }
+    }
+   
   },
   beat: function () {
     scale = {};
@@ -4991,7 +5029,9 @@ AFRAME.registerComponent('scene_greeting_dialog', {  //if "greeting" scenetag + 
       if (settings && settings.sceneTextBackgroundColor) {
         this.textBackgroundColor = settings.sceneTextBackgroundColor;
       }
-
+      if (settings.sceneCameraMode == "Third Person") {
+        this.el.setAttribute("scale", {x: 3, y: 3, z: 3});
+      }
 
       // if (this.data.background) {
         // if (this.data.background != "rectangle") {
