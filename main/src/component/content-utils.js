@@ -1497,7 +1497,7 @@ AFRAME.registerComponent('available_scenes_control', {
       this.textureArray = [];
       // const data = this.data;
       let scenesArray = this.data.jsonData.availableScenes; 
-      console.log("availablescenes: " + JSON.stringify(scenesArray));
+      // console.log("availablescenes: " + JSON.stringify(scenesArray));
       let availableScenePicEl = document.getElementById("availableScenePic");
       let nextButton = document.getElementById("availableScenesNextButton");
       let previousButton = document.getElementById("availableScenesPreviousButton");

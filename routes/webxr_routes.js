@@ -2268,7 +2268,7 @@ webxr_router.get('/:_id', function (req, res) {
                                 } else {
 
                                     var buff = Buffer.from(JSON.stringify(availableScenesResponse)).toString("base64");
-                                    modelData = "<div id=\x22sceneModels\x22 data-models='"+buff+"'></div>";
+                                    // modelData = "<div id=\x22sceneModels\x22 data-models='"+buff+"'></div>";
                                     // if (scenesKeyLocation && availableScenes != null && availableScenes != undefined && availableScenes.length > 0) {
                                     if (availableScenes != null && availableScenes != undefined && availableScenes.length > 0) { //need it for random gates, etc...
                                     availableScenesEntity = "<a-entity scale=\x22.75 .75 .75\x22 look-at=\x22#player\x22 position=\x22"+scenesKeyLocation+"\x22>"+ 
@@ -4484,7 +4484,7 @@ webxr_router.get('/:_id', function (req, res) {
                     console.log("sceneWebType: "+ sceneResponse.sceneWebType);
                     if (sceneResponse.sceneWebType == undefined || sceneResponse.sceneWebType.toLowerCase() == "default" || sceneResponse.sceneWebType.toLowerCase() == "aframe") { 
                         // webxrFeatures = "webxr=\x22optionalFeatures: hit-test, local-floor\x22"; //otherwise hit-test breaks everythign!
-                        // webxrFeatures = "webxr=\x22requiredFeatures: hit-test,local-floor; optionalFeatures: dom-overlay,unbounded; overlayElement: #ar_overlay;\x22 "; //otherwise hit-test breaks everythign!
+                        webxrFeatures = "webxr=\x22requiredFeatures: hit-test,local-floor; optionalFeatures: dom-overlay,unbounded; overlayElement: #ar_overlay;\x22 "; //otherwise hit-test breaks everythign!
                         
                         // arHitTest = "ar-hit-test-spawn=\x22mode: "+arMode+"\x22";
                         // arShadowPlane = "<a-plane show-in-ar-mode id="shadow-plane" material="shader:shadow" shadow="cast:false;" visible=\x22false\x22 height=\x2210\x22 width=\x2210\x22 rotation=\x22-90 0 0\x22 shadow=\x22receive:true\x22 ar-shadows=\x22opacity: 0.3\x22 static-body=\x22shape: none\x22 shape__main=\x22shape: box; halfExtents: 100 100 0.125; offset: 0 0 -0.125\x22>" +
@@ -5046,7 +5046,7 @@ webxr_router.get('/:_id', function (req, res) {
 
                         "<script type=\x22importmap\x22> {\x22imports\x22: {" +
                             "\x22three\x22: \x22https://unpkg.com/three@0.158.0/build/three.module.js\x22,"+
-                            "\x22three/addons/\x22: \x22https://unpkg.com/browse/three@0.158.0/examples/jsm/\x22"+
+                            "\x22three/addons/\x22: \x22https://unpkg.com/browse/three@0.164.0/examples/jsm/\x22"+
                             "}"+
                         "}</script>"+
 
@@ -5122,7 +5122,7 @@ webxr_router.get('/:_id', function (req, res) {
                         // "<script src=\x22../main/src/component/aframe-spritesheet-animation.js\x22></script>"+
                         "<script src=\x22../main/src/component/aframe-sprite-particles-component.js\x22></script>"+
                         // "<script src=\x22../main/src/component/aframe-spe-particles-component.js\x22></script>"+
-                        "<script type=\x22module\x22 src=\x22https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js\x22></script>"+
+                        // "<script type=\x22module\x22 src=\x22https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js\x22></script>"+
                         
 
                        

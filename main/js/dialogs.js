@@ -2832,8 +2832,16 @@ var PlayDialogLoop = function(arr) {
             const cardBody = document.createElement('div');
             cardBody.classList.add('card-body');
           
-            const modelViewer = document.createElement('model-viewer');
+            // const modelViewer = document.createElement('model_viewer');
+            const modelViewer = document.createElement('a-scene');
+            modelViewer.setAttribute('embedded', '');
+            modelViewer.setAttribute('xr-mode-ui', {'enabled': false});
+            modelViewer.style.width = '300px';
+            modelViewer.style.height = '200px';
             
+            const model = document.createElement("a-entity");
+            // modelViewer.setAttribute("webxr", {});
+            // modelViewer.setAttribute("a-scene", "embedded");
             // image.setAttribute("touch-action", "pan-y");
             
             modelViewer.classList.add('card-img-top');
@@ -2859,21 +2867,26 @@ var PlayDialogLoop = function(arr) {
               CreateLocation("local_" + localData.localFiles[file].name, 'model');
             });
             
-          
+
             cardBody.appendChild(title);
             // cardBody.appendChild(subTitle);
             // cardBody.appendChild(text)
             cardBody.appendChild(deleteButton);
             cardBody.appendChild(addToSceneButton);
+            modelViewer.appendChild(model);
             card.appendChild(modelViewer);
             card.appendChild(cardBody);
+            
             // col.appendChild(card);
           
             galleryContainer.appendChild(card);
-            modelViewer.src = URL.createObjectURL(modelBlob);
-            modelViewer.setAttribute("camera-controls", "");
-            modelViewer.setAttribute("auto-rotate", "");
-            modelViewer.setAttribute("touch-action", "pan-y");
+            model.setAttribute("gltf-model", URL.createObjectURL(modelBlob));
+            model.setAttribute("position", "0 1 -1");
+            // modelViewer.src = URL.createObjectURL(modelBlob);
+            // model.setAttribute("model_viewer", {"gltfModel": URL.createObjectURL(modelBlob)});
+            // modelViewer.setAttribute("camera-controls", "");
+            // modelViewer.setAttribute("auto-rotate", "");
+            // modelViewer.setAttribute("touch-action", "pan-y");
           } else {
             const imageBuffer = localData.localFiles[file].data;
             const imageBlobb = new Blob([imageBuffer]);
