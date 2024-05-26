@@ -1446,6 +1446,29 @@
             }
         }
         if (sourcetype == "scene") {
+            if (itemtype == "modelgroup") {
+                let data = { 
+                    scene_id : sourceID,
+                    group_id: itemID,
+                    grouptype: 'model'
+                };
+                axios.post('/add_scene_group', data, headers)
+                .then(function (response) {
+                    console.log(response);
+                    if (response.data.includes("updated")) {
+                        // window.history.back();
+                        window.location = "index.html?type=scene&iid="+sourceID;
+                    } else {
+                        $("#topAlert").html(response.data);
+                        $("#topAlert").show();
+                    }
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+            }
+        }
+        if (sourcetype == "scene") {
             if (itemtype == "object") {
                 let data = { 
                     scene_id : sourceID,
@@ -8883,6 +8906,11 @@ function showGroup() {
                 select = true;
                 $("#table1Title").html("Groups");
                 $("#pageTitle").html("Select Scene Group" + itemid);
+            }
+            if (mode == "modelgroup") {
+                select = true;
+                $("#table1Title").html("Groups");
+                $("#pageTitle").html("Select Model Group" + itemid);
             }
             arr.sort(function(a, b) { //sort groupdata by index #
                 // console.log("a.type vs b.type " + a.type + " " + b.type);

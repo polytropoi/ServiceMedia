@@ -4965,7 +4965,8 @@ app.post('/process_staging_files', requiredAuthentication, function (req, res) {
                         } else if (groupType == ".mp4" || groupType == ".webm" || groupType == ".mov" || groupType == ".mpg" || groupType == ".MTS") {
                             group.type = "video";
                             group.name = "video " + ts;
-                        } else {
+                        } 
+                        // else {
                             // callbk(null); caught in db save below?  
                         if (group.type != undefined && group.type != null) {
                             db.groups.save(group, function (err, saved) {
@@ -4983,7 +4984,7 @@ app.post('/process_staging_files', requiredAuthentication, function (req, res) {
                             } else {
                                 callbk(null);
                             }
-                        }
+                        // }
                     } else { //no group if only one
                         callbk(null);
                     }

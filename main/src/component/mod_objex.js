@@ -35,7 +35,7 @@ AFRAME.registerComponent('mod_objex', {
         this.data.jsonObjectData = JSON.parse(atob(theData)); //object items with model references
         this.data.jsonLocationsData = JSON.parse(atob(theLocData)); //scene locations with object references
         // console.log("objxe datas" + JSON.stringify(this.data.jsonObjectData));
-        // console.log("objxe location datas" + JSON.stringify(this.data.jsonLocationsData));
+        console.log("objxe location datas" + JSON.stringify(this.data.jsonLocationsData));
         console.log(this.data.jsonLocationsData.length + "mod_object locations for " + this.data.jsonObjectData.length + " objex");
   
         this.triggerAudioController = document.getElementById("triggerAudio");
@@ -68,11 +68,24 @@ AFRAME.registerComponent('mod_objex', {
                   
                 } else {
                   if (!this.data.jsonLocationsData[i].markerType.toLowerCase().includes('spawn')) { //either spawn or spawntrigger types require interaction //now in cloudmarker, deprecate
-                    console.log("location/object match " + this.data.jsonLocationsData[i].objectID + " modelID " + this.data.jsonObjectData[k].modelID);
+                    console.log(this.data.jsonLocationsData[i].name + " mod_objecct locationData " + JSON.stringify(this.data.jsonLocationsData[i]));
                    
                     let objEl = document.createElement("a-entity");
                    
-                      objEl.setAttribute("mod_object", {'tags': this.data.jsonLocationsData[i].locationTags, 'eventData': this.data.jsonLocationsData[i].eventData, 'locationData': this.data.jsonLocationsData[i], 'objectData': this.data.jsonObjectData[k]});
+                      objEl.setAttribute("mod_object", {'tags': this.data.jsonLocationsData[i].locationTags, 
+                                                        'eventData': this.data.jsonLocationsData[i].eventData, 
+                                                        'locationData': this.data.jsonLocationsData[i], 
+                                                        'objectData': this.data.jsonObjectData[k],
+                                                        'xscale': this.data.jsonLocationsData[i].xscale,
+                                                        'yscale': this.data.jsonLocationsData[i].yscale,
+                                                        'zscale': this.data.jsonLocationsData[i].zscale,
+                                                        'xpos': this.data.jsonLocationsData[i].x,
+                                                        'ypos': this.data.jsonLocationsData[i].y,
+                                                        'zpos': this.data.jsonLocationsData[i].z,
+                                                        'xrot': this.data.jsonLocationsData[i].eulerx,
+                                                        'yrot': this.data.jsonLocationsData[i].eulery,
+                                                        'zrot': this.data.jsonLocationsData[i].eulerz,
+                                                        });
                       // objEl.id = "obj" + this.data.jsonLocationsData[i].objectID + "_" + this.data.jsonLocationsData[i].timestamp;
                       objEl.id = this.data.jsonLocationsData[i].timestamp; //only timestamp so locpickers can find it...other objtypes aren't allowMods, i.e. spawned at runtime
                       this.el.sceneEl.appendChild(objEl);
@@ -258,23 +271,23 @@ AFRAME.registerComponent('mod_objex', {
         this.data.jsonObjectData.push(obj); 
       },
       
-      scatterObject: function (objectID) {
-        console.log("tryna scatter mod_object " + objectID);  
-        this.objectData = this.returnObjectData(objectID);
-        this.scatterPos = new THREE.Vector3();
-        this.objEl = document.createElement("a-entity");
-        // this.equipHolder = document.getElementById("equipPlaceholder");
-        // this.equipHolder.object3D.getWorldPosition( this.dropPos );
-        this.locData = {};
-        this.locData.x = this.scatterPos.x;
-        this.locData.y = this.scatterPos.y;
-        this.locData.z = this.scatterPos.z;
-        this.locData.timestamp = Date.now();
-        this.objEl.setAttribute("mod_object", {'eventData': null, 'locationData': this.locData, 'objectData': this.objectData, 'isSpawned': true});
-        this.objEl.id = "obj" + this.objectData._id + "_" + this.locData.timestamp;
-        sceneEl.appendChild(this.objEl);
+      // scatterObject: function (objectID) { //um, nope
+      //   console.log("tryna scatter mod_object " + objectID);  
+      //   this.objectData = this.returnObjectData(objectID);
+      //   this.scatterPos = new THREE.Vector3();
+      //   this.objEl = document.createElement("a-entity");
+      //   // this.equipHolder = document.getElementById("equipPlaceholder");
+      //   // this.equipHolder.object3D.getWorldPosition( this.dropPos );
+      //   this.locData = {};
+      //   this.locData.x = this.scatterPos.x;
+      //   this.locData.y = this.scatterPos.y;
+      //   this.locData.z = this.scatterPos.z;
+      //   this.locData.timestamp = Date.now();
+      //   this.objEl.setAttribute("mod_object", {'eventData': null, 'locationData': this.locData, 'objectData': this.objectData, 'isSpawned': true});
+      //   this.objEl.id = "obj" + this.objectData._id + "_" + this.locData.timestamp;
+      //   sceneEl.appendChild(this.objEl);
              
-      },
+      // },
       
       // dropObject: function (objectID, location) { //not from inventory, e.g. switching equips //nm already has!
       //   console.log("tryna scatter mod_object " + objectID);  
@@ -517,6 +530,14 @@ AFRAME.registerComponent('mod_object', {
       forceFactor: {default: 1},
       removeAfter: {default: ''},
       tags: {default: ''},
+      xpos: {type: 'number', default: 0}, //used for modding
+      ypos: {type: 'number', default: 0},
+      zpos: {type: 'number', default: 0},
+
+      xrot: {type: 'number', default: 0},//in degrees, trans to radians below
+      yrot: {type: 'number', default: 0},
+      zrot: {type: 'number', default: 0},
+
       xscale: {type: 'number', default: 1}, //like the others...
       yscale: {type: 'number', default: 1},
       zscale: {type: 'number', default: 1},
@@ -655,7 +676,6 @@ AFRAME.registerComponent('mod_object', {
         console.log ("adding class beatmee");
         this.el.classList.add("beatme");
         // this.el.addEventListener('beatme', e => console.log("beat" + e.detail.volume()));
-        
       }
       
 
@@ -776,7 +796,7 @@ AFRAME.registerComponent('mod_object', {
           // if (this.data.objectData.callouttext != undefined && this.data.objectData.callouttext != null && this.data.objectData.callouttext.length > 0) {
           //   this.hasCallout = true;
           // }
-        if (this.data.objectData.callouttext.includes('~')) {
+        if (this.data.objectData.callouttext && this.data.objectData.callouttext.includes('~')) {
           this.calloutLabelSplit = this.data.objectData.callouttext.split('~'); 
           this.textData = this.calloutLabelSplit;
         } else {
@@ -963,7 +983,7 @@ AFRAME.registerComponent('mod_object', {
   
       this.el.addEventListener('model-loaded', () => {
   
-        console.log(this.data.objectData.name + " mod_object model-loaded" +" pos: "+ JSON.stringify(this.data.locationData));
+        console.log(this.data.objectData.name + " mod_object model-loaded pos: "+ JSON.stringify(this.data.locationData));
         
         this.data.xscale = this.data.locationData.xscale != null ? this.data.locationData.xscale : 1;
         this.data.yscale = this.data.locationData.yscale != null ? this.data.locationData.yscale : 1;
@@ -990,13 +1010,13 @@ AFRAME.registerComponent('mod_object', {
         // }
    
         if (!this.data.isEquipped) {
-          console.log("setting object pos/rot to " + JSON.stringify(pos) + " hasShootAction " + this.hasShootAction + " equippable " + this.data.isEquippable);
+          console.log(this.data.objectData.name + " setting object pos to " + JSON.stringify(pos) + " hasShootAction " + this.hasShootAction + " equippable " + this.data.isEquippable);
           if (this.modelParent != null) {
-            console.log("not equipped, has modelparent ");
+            console.log(this.data.objectData.name + " not equipped, has modelparent ");
             this.modelParent.setAttribute("position", pos);
             this.modelParent.setAttribute("rotation", rot);
           } else {
-              console.log("not equipped, no modelparent mod_object scale " + JSON.stringify(scale));
+              console.log(this.data.objectData.name + " not equipped, no modelparent mod_object scale " + JSON.stringify(scale));
               this.el.setAttribute("scale", scale);
               // this.el.object3D.position = pos;
               // this.el.object3D.rotation = rot;
@@ -1145,7 +1165,8 @@ AFRAME.registerComponent('mod_object', {
 
               this.el.setAttribute("glow");
             }
-            if (this.data.markerType.toLowerCase().includes("character") || this.data.eventData.toLowerCase().includes("agent") || this.data.objectData.physics.includes("Navmesh Agent")) { 
+            if (this.data.markerType.toLowerCase().includes("character") || this.data.eventData.toLowerCase().includes("agent") || 
+              (this.data.objectData.physics && this.data.objectData.physics.includes("Navmesh Agent"))) { 
               if (settings.useNavmesh || settings.useSimpleNavmesh) {
                 // this.el.setAttribute("nav-agent", "");
                 this.el.setAttribute("nav_agent_controller", "");  
@@ -3140,15 +3161,18 @@ AFRAME.registerComponent('mod_object', {
             location.eulerx = 0;
             location.eulery = 0;
             location.eulerz = 0;
-            
-            scatteredEl.setAttribute("mod_object", {eventData: eventData, markerType: this.data.markerType, scale: this.scale * scale, ypos: this.data.ypos, tags: this.data.tags, 
+            location.xscale = this.data.xscale * scale;
+            location.yscale = this.data.yscale * scale;
+            location.zscale = this.data.zscale * scale;
+            console.log("scattered scale " + scale + " " + JSON.stringify(location));
+            scatteredEl.setAttribute("mod_object", {eventData: eventData, markerType: this.data.markerType, xscale: location.xscale * scale, yscale: location.yscale * scale, zscale: location.zscale * scale, ypos: this.data.ypos, tags: this.data.tags, 
                                                     description: this.data.description, locationData: location, objectData: this.data.objectData, isEquippable: this.data.isEquippable});
             scatteredEl.setAttribute("shadow", {cast: true, receive: true});
             scatteredEl.classList.add("envMap");
             scatteredEl.id = this.data.objectData._id + "_scattered_" + scatterCount;
             // if (this.data.markerType != "character") { //messes up navmeshing..
               
-              scatteredEl.setAttribute("scale", {x: this.scale * scale, y: this.scale * scale, z: this.scale * scale});
+              // scatteredEl.setAttribute("scale", {x: this.data.xscale * scale, y: this.data.yscale * scale, z: this.data.zscale * scale});
               // scatteredEl.setAttribute("scale", {x: scale, y:scale, z: scale})
 
             // }
