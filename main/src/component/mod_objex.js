@@ -651,7 +651,7 @@ AFRAME.registerComponent('mod_object', {
       this.hasBoneLook = false;
       this.lookBone = null;
       this.coolDown = false;
-
+      this.oScale = new THREE.Vector3();
       let cameraEl = document.querySelector('a-entity[camera]');  
       if (!cameraEl) {
           cameraEl = document.querySelector('a-camera');
@@ -676,6 +676,8 @@ AFRAME.registerComponent('mod_object', {
         console.log ("adding class beatmee");
         this.el.classList.add("beatme");
         // this.el.addEventListener('beatme', e => console.log("beat" + e.detail.volume()));
+      } else if (this.data.tags.includes("beat")) {
+        this.el.classList.add("beatme");
       }
       
 
@@ -985,7 +987,7 @@ AFRAME.registerComponent('mod_object', {
       this.el.addEventListener('model-loaded', () => {
   
         console.log(this.data.objectData.name + " mod_object model-loaded pos: "+ JSON.stringify(this.data.locationData));
-        
+
         this.data.xscale = this.data.locationData.xscale != null ? this.data.locationData.xscale : 1;
         this.data.yscale = this.data.locationData.yscale != null ? this.data.locationData.yscale : 1;
         this.data.zscale = this.data.locationData.zscale != null ? this.data.locationData.zscale : 1;
@@ -1587,6 +1589,7 @@ AFRAME.registerComponent('mod_object', {
             }
   
           }
+          this.el.object3D.getWorldScale(this.oScale);
       }); //end model-loaded listener
   
       this.el.addEventListener('body-loaded', () => {  //body-loaded event = physics ready on obj
@@ -3159,19 +3162,19 @@ AFRAME.registerComponent('mod_object', {
     },
     beat: function (volume, duration) {
       console.log("tryna beat " + this.el.id + " " + volume);
-      if (this.data.eventData.toLowerCase().includes("beat")) {
-        let oScale = this.el.getAttribute('data-scale');
-        oScale = parseFloat(oScale);
+      // if (this.data.eventData.toLowerCase().includes("beat")) {
+        // let oScale = this.el.getAttribute('scale');
+        // oScale = parseFloat(oScale);
         volume = volume.toFixed(2) * .1;
         let scale = {};
-          scale.x = oScale + volume;
-          scale.y = oScale + volume;
-          scale.z = oScale + volume;
+          scale.x = this.oScale.x + volume;
+          scale.y = this.oScale.y + volume;
+          scale.z = this.oScale.z + volume;
           this.el.setAttribute('scale', scale);
-          this.el.setAttribute('animation', 'property: scale; to: '+oScale+' '+oScale+' '+oScale+'; dur: '+duration+'; startEvents: beatRecover; easing: easeInOutQuad');
+          this.el.setAttribute('animation', 'property: scale; to: '+this.oScale.x+' '+this.oScale.y+' '+this.oScale.z+'; dur: '+duration+'; startEvents: beatRecover; easing: easeInOutQuad');
           this.el.emit('beatRecover');
   
-      }
+      // }
     },
     scatterMe: function () {
       // this.el.object3D.visible = false;
