@@ -3211,7 +3211,10 @@ function LoopTimedEvent(keyType, duration) {
             }
             if (envEl != null) {
                // console.log("beat volume " + volume);
-               envEl.components.enviro_mods.beat(.5);
+               if (!settings.sceneUseSkybox) {
+                  envEl.components.enviro_mods.beat(.5);
+               }
+               
             }
          }
          if (keyType.toLowerCase().includes("random time")) {
@@ -3331,7 +3334,7 @@ function PlayTimedEvent(timeKey) {
       } else if (timedEventsListenerMode != null && timedEventsListenerMode.toLowerCase() == 'youtube') {
          let youtube_player = document.getElementById("youtubePlayer").components.youtube_player;
          if (youtube_player) {
-            youtube_player.gotoTime(timeKey.keydata);
+            youtube_player.goToTime(timeKey.keydata);
          }
       }
    }

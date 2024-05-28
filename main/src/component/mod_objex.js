@@ -803,61 +803,62 @@ AFRAME.registerComponent('mod_object', {
           this.textData = this.data.objectData.callouttext;
         }
           // console.log(this.data.objectData.name + "callouttext " + this.data.objectData.callouttext );
-          this.calloutEntity = document.createElement("a-entity");
-         
-          this.calloutText = document.createElement("a-entity");
-                  // this.calloutEntity.appendChild(this.calloutPanel);
-          this.calloutEntity.appendChild(this.calloutText);
-          this.calloutEntity.id = "objCalloutEntity_" + this.data.objectData._id;
+          // this.calloutEntity = document.createElement("a-entity");
         
-          this.calloutText.id = "objCalloutText_" + this.data.objectData._id;
+          // this.calloutText = document.createElement("a-entity");
+          //         // this.calloutEntity.appendChild(this.calloutPanel);
+          // this.calloutEntity.appendChild(this.calloutText);
+          // this.calloutEntity.id = "objCalloutEntity_" + this.el._id;
+        
+          // this.calloutText.id = "objCalloutText_" + this.el._id;
             
-          // TODO flex with sceneTextBackground
-          // this.calloutPanel.id = "objCalloutPanel_" + this.data.objectData._id;
-          // this.calloutPanel = document.createElement("a-entity"); 
-          // this.calloutPanel.setAttribute("gltf-model", "#landscape_panel");
-          // this.calloutPanel.setAttribute("scale", ".125 .1 .125");
-          // this.calloutPanel.setAttribute("material", {'color': 'black', 'roughness': 1});
-          // this.calloutPanel.setAttribute("overlay");
-          // this.calloutEntity.setAttribute("look-at", "#player");
-          if (settings && settings.sceneCameraMode == "Third Person") {
-            this.calloutEntity.setAttribute("look-at", "#thirdPersonCamera");
-          } else {
-            this.calloutEntity.setAttribute("look-at", "#player");
-          }
+          // // TODO flex with sceneTextBackground
+          // // this.calloutPanel.id = "objCalloutPanel_" + this.data.objectData._id;
+          // // this.calloutPanel = document.createElement("a-entity"); 
+          // // this.calloutPanel.setAttribute("gltf-model", "#landscape_panel");
+          // // this.calloutPanel.setAttribute("scale", ".125 .1 .125");
+          // // this.calloutPanel.setAttribute("material", {'color': 'black', 'roughness': 1});
+          // // this.calloutPanel.setAttribute("overlay");
+          // // this.calloutEntity.setAttribute("look-at", "#player");
+          // if (settings && settings.sceneCameraMode == "Third Person") {
+          //   this.calloutEntity.setAttribute("look-at", "#thirdPersonCamera");
+          // } else {
+          //   this.calloutEntity.setAttribute("look-at", "#player");
+          // }
           
-          this.calloutEntity.setAttribute('visible', false);
+          // this.calloutEntity.setAttribute('visible', false);
         
-          // calloutEntity.setAttribute("render-order", "hud");
-          if (this.isNavAgent) {
-            this.el.appendChild(this.calloutEntity);
-            let y = this.data.objectData.yAxisFudge + 2;
-            this.calloutEntity.setAttribute("position", "0 "+y+" 0");
-          } else {
-            this.el.sceneEl.appendChild(this.calloutEntity);
-          }
+          // // calloutEntity.setAttribute("render-order", "hud");
+          // // if (this.isNavAgent || this.data.markerType == "Character") {
+          //   this.el.appendChild(this.calloutEntity);
+          //   let y = this.data.objectData.yAxisFudge + 1;
+          //   this.calloutEntity.setAttribute("position", "0 "+y+" 1");
+          // // } 
+          // // else {
+          // //   this.el.sceneEl.appendChild(this.calloutEntity);
+          // // }
   
   
-          let font = "Acme.woff"; 
-          if (settings && settings.sceneFontWeb2 && settings.sceneFontWeb2.length) {
-            font = settings.sceneFontWeb2;
-          }
-          // this.calloutPanel.setAttribute("position", '0 0 1'); 
-          if (!this.isNavAgent) {
-            this.calloutText.setAttribute("position", '0 0 1.25'); //offset the child on z toward camera, to prevent overlap on model
-          }
-          this.calloutText.setAttribute('troika-text', {
-            fontSize: .1,
-            baseline: "bottom",
-            align: "left",
-            font: "/fonts/web/" + font,
-            anchor: "center",
-            color: "white",
-            outlineColor: "black",
-            outlineWidth: "2%",
-            value: ""
-          });
-          this.calloutText.setAttribute("overlay");
+          // let font = "Acme.woff"; 
+          // if (settings && settings.sceneFontWeb2 && settings.sceneFontWeb2.length) {
+          //   font = settings.sceneFontWeb2;
+          // }
+          // // this.calloutPanel.setAttribute("position", '0 0 1'); 
+          // if (!this.isNavAgent) {
+          //   this.calloutText.setAttribute("position", '0 0 1.25'); //offset the child on z toward camera, to prevent overlap on model
+          // }
+          // this.calloutText.setAttribute('troika-text', {
+          //   fontSize: .1,
+          //   baseline: "bottom",
+          //   align: "left",
+          //   font: "/fonts/web/" + font,
+          //   anchor: "center",
+          //   color: "white",
+          //   outlineColor: "black",
+          //   outlineWidth: "2%",
+          //   value: ""
+          // });
+          // this.calloutText.setAttribute("overlay");
         // } 
       // }
       // if (this.data.objectData.synthNotes != undefined && this.data.objectData.synthNotes != null && this.data.objectData.synthNotes.length > 0) {
@@ -2006,10 +2007,10 @@ AFRAME.registerComponent('mod_object', {
               //   this.selectedAxis = name;
   
               // let elPos = this.el.getAttribute('position');
-              if (this.calloutEntity != null && this.distance < 20) {
+              if (this.calloutEntity != null) {
                 // this.calloutEntity.setAttribute('visible', false);
                 let calloutString = this.data.objectData.callouttext;
-                console.log("mod_object callout " + calloutString + " w distance :" + this.distance + " isNavAgent " + this.isNavAgent);
+                console.log("mod_object callout " + calloutString + " w distance :" + this.distance + " isNavAgent " + this.isNavAgent + " pos " + JSON.stringify(this.pos));
              
                 
                 this.calloutEntity.setAttribute('visible', true);
@@ -2318,7 +2319,62 @@ AFRAME.registerComponent('mod_object', {
           }
         }
       });
-    },
+      this.calloutEntity = document.createElement("a-entity");
+        
+          this.calloutText = document.createElement("a-entity");
+                  // this.calloutEntity.appendChild(this.calloutPanel);
+          this.calloutEntity.appendChild(this.calloutText);
+          this.calloutEntity.id = "objCalloutEntity_" + this.el._id;
+        
+          this.calloutText.id = "objCalloutText_" + this.el._id;
+            
+          // TODO flex with sceneTextBackground
+          // this.calloutPanel.id = "objCalloutPanel_" + this.data.objectData._id;
+          // this.calloutPanel = document.createElement("a-entity"); 
+          // this.calloutPanel.setAttribute("gltf-model", "#landscape_panel");
+          // this.calloutPanel.setAttribute("scale", ".125 .1 .125");
+          // this.calloutPanel.setAttribute("material", {'color': 'black', 'roughness': 1});
+          // this.calloutPanel.setAttribute("overlay");
+          // this.calloutEntity.setAttribute("look-at", "#player");
+          if (settings && settings.sceneCameraMode == "Third Person") {
+            this.calloutEntity.setAttribute("look-at", "#thirdPersonCamera");
+          } else {
+            this.calloutEntity.setAttribute("look-at", "#player");
+          }
+          
+          this.calloutEntity.setAttribute('visible', false);
+        
+          // calloutEntity.setAttribute("render-order", "hud");
+          if (this.isNavAgent || this.data.markerType == "Character") {
+            this.el.appendChild(this.calloutEntity);
+            let y = this.data.objectData.yAxisFudge + 1;
+            this.calloutEntity.setAttribute("position", "0 "+y+" 1");
+          } else {
+            this.el.sceneEl.appendChild(this.calloutEntity);
+          }
+  
+  
+          let font = "Acme.woff"; 
+          if (settings && settings.sceneFontWeb2 && settings.sceneFontWeb2.length) {
+            font = settings.sceneFontWeb2;
+          }
+          // this.calloutPanel.setAttribute("position", '0 0 1'); 
+          if (!this.isNavAgent) {
+            this.calloutText.setAttribute("position", '0 0 1.25'); //offset the child on z toward camera, to prevent overlap on model
+          }
+          this.calloutText.setAttribute('troika-text', {
+            fontSize: .1,
+            baseline: "bottom",
+            align: "left",
+            font: "/fonts/web/" + font,
+            anchor: "center",
+            color: "white",
+            outlineColor: "black",
+            outlineWidth: "2%",
+            value: ""
+          });
+          this.calloutText.setAttribute("overlay");
+    }, //end init
     showCallout: function (calloutString, hitpoint, distance) {
       console.log("tryna show obj callout" + calloutString);
       // for (var i in evt.detail.targetEl){
@@ -2402,22 +2458,22 @@ AFRAME.registerComponent('mod_object', {
                 
                 this.calloutEntity.setAttribute('visible', true);
                 if (this.distance) {
-                  this.calloutEntity.setAttribute('scale', {x: this.distance * .5, y: this.distance * .5, z: this.distance * .5} );
+                  this.calloutEntity.setAttribute('scale', {x: this.distance * .25, y: this.distance * .25, z: this.distance * .25} );
                 } 
                
                 if (!this.isNavAgent) {
                   this.calloutEntity.setAttribute("position", this.pos);
                 } else {
-                  let y = '0 1 0';
-
-                  if (this.data.objectData.yPosFudge) {
-                    y = '0 ' + (parseFloat(this.data.objectData.yPosFudge) + .1) + ' 1';
-                  }
+                  let calloutpos = '0 1 1';
+                  // let scaleval = ' 1'
+                  // if (this.data.objectData.yPosFudge) {
+                  //   calloutpos = '0 ' + (parseFloat(this.data.objectData.yPosFudge) + 1) + ' 1';
+                  // }
                   if (this.data.yscale) {
-                    y = '0 ' + (parseFloat(this.data.yscale) + .1) + ' 1';
+                    calloutpos = '0 ' + (parseFloat(this.data.yscale) + 1) + ' ' + parseFloat(this.data.yscale);
                   }
-                  console.log('tryna fudge y '+ y);
-                  this.calloutEntity.setAttribute("position", y);
+                  console.log('tryna fudge y '+ calloutpos);
+                  this.calloutEntity.setAttribute("position", calloutpos);
                 }
                
                 // let calloutString = theLabel;
@@ -2430,7 +2486,7 @@ AFRAME.registerComponent('mod_object', {
                   }
                   calloutString = this.calloutLabelSplit[this.calloutLabelIndex];
                 } 
-  
+                console.log("mod_object normal callout " + calloutString);
                 this.calloutText.setAttribute("troika-text", {
                                               value: calloutString,
                                               color: "red",

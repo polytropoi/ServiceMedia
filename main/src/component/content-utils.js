@@ -4666,6 +4666,9 @@ AFRAME.registerComponent('youtube_player', {  //setup and controls for the 3d pl
     
     youtubePlayer.seekTo(randomTimeValue, true);
   },
+  goToTime: function(time) {
+    youtubePlayer.seekTo(time, true);
+  },
   tick: function() {
       if (!this.raycaster) {
          return;
