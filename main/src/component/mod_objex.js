@@ -1618,7 +1618,7 @@ AFRAME.registerComponent('mod_object', {
       this.el.addEventListener("collidestart", (e) => {
           // e.preventDefault();
         if (!this.isDead && e.detail.targetEl) {
-            // console.log("physics collision HIT me "  + this.data.objectData.name + " other id " + e.detail.targetEl.id);
+            console.log("physics collision HIT me "  + this.data.objectData.name + " other id " + e.detail.targetEl.id);
                        
           this.hitpoint = e.detail.targetEl.object3D.position;
           this.distance = window.playerPosition.distanceTo(this.hitpoint);
@@ -1626,7 +1626,8 @@ AFRAME.registerComponent('mod_object', {
 
           let targetModObjComponent = e.detail.targetEl.components.mod_object;
           if (targetModObjComponent != null) {
-                // console.log(this.data.objectData.name + " gotsa collision with " + targetModObjComponent.data.objectData.name);
+                console.log(this.data.objectData.name + " gotsa collision with " + targetModObjComponent.data.objectData.name + 
+                " type " + targetModObjComponent.data.objectData.objtype + " hitpoints " + targetModObjComponent.data.objectData.hitpoints);
                 if (this.data.objectData.name != targetModObjComponent.data.objectData.name) { //don't trigger yerself, but what if...?
 
                   if (this.triggerAudioController != null) {
@@ -2326,12 +2327,13 @@ AFRAME.registerComponent('mod_object', {
       //       console.log( key + ": " + evt.detail.targetEl[i][key]);
       //   }
       // }
+      this.calloutEntity.setAttribute("visible", true);
       this.calloutText.setAttribute("visible", true);
       this.calloutText.setAttribute("troika-text", {value: calloutString});
       this.pos = hitpoint;
       this.distance = distance;
       
-            if (this.tags != null && this.tags.includes("thoughtbubble")) {
+            if (this.tags != null && this.tags.includes("thoughtbubble")) { //or objectData.calloutType!
               calloutOn = true;
   
               this.bubble = sceneEl.querySelector('.bubble');
@@ -2391,21 +2393,28 @@ AFRAME.registerComponent('mod_object', {
               }
             } else { //"normal" callout 
              
-              if (this.calloutEntity != null && this.distance < 20) {
+              // if (this.calloutEntity != null && this.distance < 100) {
+              if (this.calloutEntity != null) {  
                 // this.calloutEntity.setAttribute('visible', false);
                 // let calloutString = this.data.objectData.callouttext;
                 console.log("mod_object callout w distance :" + this.distance + " " + calloutString);
              
                 
                 this.calloutEntity.setAttribute('visible', true);
-                this.calloutEntity.setAttribute('scale', {x: this.distance * .5, y: this.distance * .5, z: this.distance * .5} );
+                if (this.distance) {
+                  this.calloutEntity.setAttribute('scale', {x: this.distance * .5, y: this.distance * .5, z: this.distance * .5} );
+                } 
+               
                 if (!this.isNavAgent) {
                   this.calloutEntity.setAttribute("position", this.pos);
                 } else {
                   let y = '0 1 0';
 
                   if (this.data.objectData.yPosFudge) {
-                    y = '0 ' + (parseFloat(this.data.objectData.yPosFudge) + 1) + ' 0';
+                    y = '0 ' + (parseFloat(this.data.objectData.yPosFudge) + .1) + ' 1';
+                  }
+                  if (this.data.yscale) {
+                    y = '0 ' + (parseFloat(this.data.yscale) + .1) + ' 1';
                   }
                   console.log('tryna fudge y '+ y);
                   this.calloutEntity.setAttribute("position", y);
@@ -2496,16 +2505,16 @@ AFRAME.registerComponent('mod_object', {
             }
           // }     
         // }
-      setTimeout(() => {
-        this.calloutText.setAttribute("visible", false);
-      }, 2000);
+      // setTimeout(() => {
+      //   this.calloutText.setAttribute("visible", false);
+      // }, 1000);
     },
     coolDownTimer: function () {
       if (!this.coolDown) {
         this.coolDown = true;
         setTimeout( () => {
           this.coolDown = false;
-        }, 5000);
+        }, 1000);
       }
     },
     playAnimation: function (animState) {
@@ -3133,6 +3142,10 @@ AFRAME.registerComponent('mod_object', {
         let scatterCount = 0;
         // if (!this.isNavAgent) { //use waypoints for position below instead of raycasting if it's gonna nav
         let interval = setInterval( () => {
+        let yMod = 1;
+        if (this.data.locationData.y) {
+          yMod = parseFloat(this.data.locationData.y);
+        }
         for (let i = 0; i < 100; i++) {
 
           let testPosition = new THREE.Vector3();
@@ -3142,13 +3155,13 @@ AFRAME.registerComponent('mod_object', {
           let raycaster = new THREE.Raycaster();
           raycaster.set(new THREE.Vector3(testPosition.x, testPosition.y, testPosition.z), new THREE.Vector3(0, -1, 0));
           let results = raycaster.intersectObject(surface.getObject3D('mesh'), true);
-  
+          
           if(results.length > 0) {
             scatterCount++;
             let scale = this.returnRandomNumber(.5, 1.5);
             console.log("gotsa scatterPosition for object " + this.data.objectData.objectID + " intersect: " + results.length + " " +results[0].object.name + "scatterCount " + scatterCount + " vs count " + count +  " scale " + this.scale);
             testPosition.x = results[0].point.x.toFixed(2); //snap y of waypoint to navmesh y
-            testPosition.y = results[0].point.y.toFixed(2) + this.data.ypos; //snap y of waypoint to navmesh y
+            testPosition.y = results[0].point.y; //snap y of waypoint to navmesh y
             testPosition.z = results[0].point.z.toFixed(2); //snap y of waypoint to navmesh y
             let scatteredEl = document.createElement("a-entity"); 
             scatteredEl.setAttribute("position", testPosition);
@@ -3156,7 +3169,7 @@ AFRAME.registerComponent('mod_object', {
             let eventData = this.data.eventData.replace("scatter", ""); //prevent infinite recursion!
             let location = {};
             location.x = testPosition.x;
-            location.y = testPosition.y;
+            location.y = yMod + testPosition.y;
             location.z = testPosition.z;
             location.eulerx = 0;
             location.eulery = 0;
@@ -3164,8 +3177,8 @@ AFRAME.registerComponent('mod_object', {
             location.xscale = this.data.xscale * scale;
             location.yscale = this.data.yscale * scale;
             location.zscale = this.data.zscale * scale;
-            console.log("scattered scale " + scale + " " + JSON.stringify(location));
-            scatteredEl.setAttribute("mod_object", {eventData: eventData, markerType: this.data.markerType, xscale: location.xscale * scale, yscale: location.yscale * scale, zscale: location.zscale * scale, ypos: this.data.ypos, tags: this.data.tags, 
+            console.log("scattered scale " + scale + " ymod " + yMod + " test.y " + testPosition.y  + " location.y " + location.y + " location " + JSON.stringify(location));
+            scatteredEl.setAttribute("mod_object", {eventData: eventData, markerType: this.data.markerType, xscale: location.xscale * scale, yscale: location.yscale * scale, zscale: location.zscale * scale, ypos: location.y, tags: this.data.tags, 
                                                     description: this.data.description, locationData: location, objectData: this.data.objectData, isEquippable: this.data.isEquippable});
             scatteredEl.setAttribute("shadow", {cast: true, receive: true});
             scatteredEl.classList.add("envMap");
