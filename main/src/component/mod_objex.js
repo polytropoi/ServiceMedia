@@ -2514,7 +2514,7 @@ AFRAME.registerComponent('mod_object', {
         this.coolDown = true;
         setTimeout( () => {
           this.coolDown = false;
-        }, 1000);
+        }, 2000);
       }
     },
     playAnimation: function (animState) {
