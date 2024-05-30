@@ -222,6 +222,7 @@ AFRAME.registerComponent('initializer', { //adjust for device settings, and call
             this.asky[i].setAttribute("position", {x: 0, y: settings.sceneGroundLevel * -1, z: 0});
           // }
         }
+
         // let skybox = document.getElementById("skyEl");
         // if (this.asky[i].id == "skyEl") {
         //   let skyrad = settings.sceneSkyRadius - 10;
@@ -237,6 +238,7 @@ AFRAME.registerComponent('initializer', { //adjust for device settings, and call
         //     }
           }
         }
+        // sceneEl.setAttribute('obb-collider', {'showColliders': true});
       // }
 
    }); //end loaded
