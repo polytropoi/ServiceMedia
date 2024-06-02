@@ -1411,16 +1411,17 @@ function CreateLocation (filename, type, position) { //New Location button, also
    let modelID = "none";
    let mediaID = "none";
    if (filename && type) {
-      markertype = type;
+      // markertype = type;
       if (type == "model") {
          modelID = filename;
       } else if (type == "picture") {
          mediaID = filename;
       }
    }
-   if (type) {
-      markertype = type;
-   }
+   // if (type) {
+   //    markertype = type;
+   // }
+   
    console.log("tryna create new location type " + markertype);
    let newPosition = new THREE.Vector3(); 
    if (!position) {
@@ -1433,6 +1434,7 @@ function CreateLocation (filename, type, position) { //New Location button, also
    console.log("new position for placeholder " + JSON.stringify(newPosition));
    let phEl = document.createElement('a-entity');
    var sceneEl = document.querySelectorAll('a-scene')[0];
+   
    phEl.setAttribute('skybox-env-map', '');
    let timestamp = Date.now();
    timestamp = parseInt(timestamp);
@@ -1469,14 +1471,19 @@ function CreateLocation (filename, type, position) { //New Location button, also
       localData.locations.push(locItem);
    }
    
-   if (markertype == "placeholder") {
-      phEl.setAttribute('gltf-model', '#poi1');
-      // ShowHideDialogPanel();
-   }
+   // if (markertype == "placeholder") {
+   //    if (filename) {
+
+   //    } else {
+   //       phEl.setAttribute('gltf-model', '#poi1');
+   //    }
+   // }
+   SaveLocalData();
    poiLocations.push(locItem);
-   phEl.id = locItem.timestamp;
+   // phEl.id = locItem.timestamp;
    // phEl.id 
-   sceneEl.appendChild(phEl);
+
+
    phEl.setAttribute('position', newPosition);
    phEl.setAttribute('local_marker', {markerType: locItem.markerType, 
                                        timestamp: timestamp, 
@@ -1484,17 +1491,27 @@ function CreateLocation (filename, type, position) { //New Location button, also
                                        xpos: locItem.x, 
                                        ypos: locItem.y, 
                                        zpos: locItem.z, 
+                                       xscale: locItem.xscale,
+                                       yscale: locItem.yscale,
+                                       zscale: locItem.zscale,
                                        mediaID: locItem.mediaID, 
                                        modelID: locItem.modelID} );
 
-   SaveLocalData();
-   if (locItem.markerType == "placeholder") { //i.e. from location panel Create Location button
+   sceneEl.appendChild(phEl);
+   if (locItem.markerType == "placeholder") { //i.e. from location panel Create Location button... or a model...
       ShowHideDialogPanel();
    }
    let nextbuttonEl = document.getElementById('nextButton');
    let prevbuttonEl = document.getElementById('previousButton');
    nextbuttonEl.style.visibility = "visible";
    prevbuttonEl.style.visibility = "visible";
+
+
+   if (locItem.modelID) {
+      // phEl.components.local_marker.loadModel(locItem.modelID);
+      window.location.reload();
+   }
+
    
 }
 
@@ -3258,6 +3275,17 @@ function LoopTimedEvent(keyType, duration) {
             } else if (skyEl != null) {
                
                skyEl.components.mod_sky.colorlerp();
+            }
+         }
+         if (keyType.toLowerCase().includes("picture next")) {
+            let picGroupMangler = document.getElementById("pictureGroupsData");
+
+            if (picGroupMangler != null && picGroupMangler != undefined && picGroupMangler.components.picture_groups_control) {
+            console.log("picture next event!");
+               document.querySelector("#pictureGroupPanel").setAttribute('visible', true);
+              picGroupMangler.components.picture_groups_control.toggleOnPicGroup();
+              picGroupMangler.components.picture_groups_control.NextButtonClick();
+              // console.log(JSON.stringify(this.skyboxData));
             }
          }
       } else {

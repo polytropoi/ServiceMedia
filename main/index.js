@@ -2994,8 +2994,10 @@
                     "<option>Play Anim</option>" +
                     "<option>Pause</option>" +
                     "<option>Delay</option>" +
+                    "<option>Picture Next</option>" +
+                    "<option>Picture Index</option>" +
                     "<option>text</option>" +
-                    "<option>picture</option>" +
+                    // "<option>picture</option>" +
                     "<option>Spawn Particles</option>" +
                     "<option>Spawn Object</option>" +
                     "<option>Activity Start</option>" +

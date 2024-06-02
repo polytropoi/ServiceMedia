@@ -2823,6 +2823,7 @@ var PlayDialogLoop = function(arr) {
         //   console.log("object name for file is " + key[0]);
         if (ext == "jpg" || ext == "png" || ext == "glb") {
           if (ext == "glb") {
+            // console.log("gotsa file: GLB " + localData.localFiles[file].data);
             type = "gltf model";
             const modelBuffer = localData.localFiles[file].data;
             const modelBlob = new Blob([modelBuffer]);
@@ -2881,7 +2882,7 @@ var PlayDialogLoop = function(arr) {
           
             galleryContainer.appendChild(card);
             model.setAttribute("gltf-model", URL.createObjectURL(modelBlob));
-            model.setAttribute("position", "0 1 -1");
+            model.setAttribute("position", "0 1 -2");
             // modelViewer.src = URL.createObjectURL(modelBlob);
             // model.setAttribute("model_viewer", {"gltfModel": URL.createObjectURL(modelBlob)});
             // modelViewer.setAttribute("camera-controls", "");
@@ -2949,4 +2950,27 @@ var PlayDialogLoop = function(arr) {
     } else {
       console.log("can't find container!");
     }
+    }
+
+    function dropHandler(ev) {
+      console.log("File(s) dropped");
+    
+      // Prevent default behavior (Prevent file from being opened)
+      ev.preventDefault();
+    
+      if (ev.dataTransfer.items) {
+        // Use DataTransferItemList interface to access the file(s)
+        [...ev.dataTransfer.items].forEach((item, i) => {
+          // If dropped items aren't files, reject them
+          if (item.kind === "file") {
+            const file = item.getAsFile();
+            console.log(`… file[${i}].name = ${file.name}`);
+          }
+        });
+      } else {
+        // Use DataTransfer interface to access the file(s)
+        [...ev.dataTransfer.files].forEach((file, i) => {
+          console.log(`… file[${i}].name = ${file.name}`);
+        });
+      }
     }

@@ -39,11 +39,12 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
 
 
       this.timestamp = this.data.timestamp;
+
       if (this.timestamp == '') {
         this.timestamp = Math.round(Date.now() / 1000).toString();
         this.data.timestamp = this.timestamp;
       }
-      
+      this.el.id = this.timestamp;
       if (this.data.eventData.includes("navmesh")) {
         return;
       }
@@ -112,7 +113,7 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
       this.el.classList.add("allowMods");
         this.phID = this.timestamp; //"placeholder" id, for client side location mods
         this.el.id = this.phID;
-  
+      console.log("new localmarker with modelID " + this.data.modelID);
             if (this.data.isNew && this.data.modelID == 'none' && this.data.markerType == 'placeholder') { //Create new location button, no local file
               this.el.setAttribute("gltf-model", "#poi1");
               this.el.id = this.timestamp;
@@ -322,7 +323,7 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
                 // let scale = parseFloat(this.data.scale);
                 console.log("localmarker with + " + this.data.scale + " rot " + this.data.xrot + this.data.yrot + this.data.zrot);
               
-                this.el.object3D.scale.set(this.data.xscale, this.data.yscale, this.data.zscale);
+                // this.el.object3D.scale.set(this.data.xscale, this.data.yscale, this.data.zscale);
                 this.el.object3D.position.set(this.data.xpos, this.data.ypos, this.data.zpos);
                 // this.el.object3D.rotation.set(THREE.MathUtils.degToRad(this.data.xrot), THREE.MathUtils.degToRad(this.data.xrot), THREE.MathUtils.degToRad(this.data.xrot));
                 this.el.setAttribute("rotation", this.data.xrot + " " + this.data.yrot + " " +this.data.zrot);
@@ -386,7 +387,7 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
             // }
              
   
-              this.el.id = this.data.timestamp;
+
               console.log("tryna set localmarker with phID " + this.timestamp + " and markerType " + this.data.markerType);
               // this.waitAndLoad();
               if (this.data.markerType == "picture" && this.data.mediaID && this.data.media != "none") {
@@ -448,27 +449,27 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
         this.el.addEventListener("model-loaded", (e) => {
             // e.preventDefault();  
             this.el.removeAttribute("animation-mixer");
-            console.log("local_marker geo is loaded for markertype " + this.data.markerType);
-            if (this.data.isNew && this.data.modelID == 'none' && this.data.markerType == "placeholder") {
-              this.el.setAttribute("transform_controls", "");
-            } else {
-              
-            }
-            this.el.setAttribute("visible", true);
+          
+
+            // this.el.setAttribute("visible", true);
             const obj = this.el.getObject3D('mesh');
           // Go over the submeshes and modify materials we want.
+          console.log("local_marker geo is loaded for markertype " + this.data.markerType + " obj "+ this.data.modelID);
               obj.traverse(node => {
                 if (node.isMesh && node.material) {
                   if (this.data.markerType == "waypoint") {
                     node.material.color.set('lime');
                   } else if  (this.data.markerType == "placeholder") {
-                    node.material.color.set('yellow');
+                    if (!this.data.modelID.includes("local")) {
+                      node.material.color.set('yellow');
+                    }
+                   
                   } else if  (this.data.markerType == "poi") {
                     node.material.color.set('purple');
                   } 
                 }
               });
-              this.el.setObject3D('mesh', obj);
+              // this.el.setObject3D('mesh', obj);
               if (this.data.markerType == "gate" || this.data.markerType == "trigger") {
                 if (this.data.modelID && this.data.modelID != '' & this.data.modelID != 'none') {
                   this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"mesh", scaleFactor: this.data.scale});
@@ -476,7 +477,9 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
                   this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"placeholder", scaleFactor: this.data.scale});
                 }
               }
-              
+              if (this.data.isNew && this.data.modelID == 'none' && this.data.markerType == "placeholder") {
+                this.el.setAttribute("transform_controls", "");
+              } 
               let clips = obj.animations;
               if (clips != null && clips.length) { 
                 this.el.setAttribute('animation-mixer', {
@@ -733,7 +736,10 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
         this.el.setAttribute("material", {color: this.data.eventData.toLowerCase(), transparent: true, opacity: .5});
       } else {
         if (this.data.markerType.toLowerCase() == "placeholder") {
+          if (!this.data.modelID.includes("local")) {
             this.el.setAttribute("material", {color: "yellow", transparent: true, opacity: .5});
+          }
+            
         } else if (this.data.markerType.toLowerCase() == "poi") {
           this.el.setAttribute("material", {color: "purple", transparent: true, opacity: .5});
         } else if (this.data.markerType.toLowerCase() == "link") {
@@ -952,7 +958,10 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
               }
 
               if (this.data.markerType.toLowerCase() == "placeholder") {
+                if (!modelID.includes("local")) {
                   this.el.setAttribute("material", {color: "yellow", transparent: true, opacity: .5});
+                }
+                  
               } else if (this.data.markerType.toLowerCase() == "poi") {
                   this.el.setAttribute("material", {color: "purple", transparent: true, opacity: .5});
                   // this.el.setAttribute("color", "purple");
@@ -1002,11 +1011,17 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
                   for (const key in localData.localFiles) {
                     console.log("tryna get localModel " + modelID + " object " + localData.localFiles[key].name);
                     if (localData.localFiles[key].name == modelID) {
-                      
                       const modelBuffer = localData.localFiles[key].data;
+                      
+                     
                       const modelBlob = new Blob([modelBuffer]);
                       // image.src = URL.createObjectURL(imageBlobb);
-                      this.el.setAttribute('gltf-model', URL.createObjectURL(modelBlob));
+                      const url = URL.createObjectURL(modelBlob);
+                      console.log("gotsa localfile " + modelID +  + " object " + localData.localFiles[key].name + " data " + url);
+                      setTimeout(() => {
+                        this.el.setAttribute('gltf-model', url);
+                      })
+                     
                     }
                   }
                 } else {
