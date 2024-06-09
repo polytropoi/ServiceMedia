@@ -1498,21 +1498,18 @@ function CreateLocation (filename, type, position) { //New Location button, also
                                        modelID: locItem.modelID} );
 
    sceneEl.appendChild(phEl);
-   if (locItem.markerType == "placeholder") { //i.e. from location panel Create Location button... or a model...
-      ShowHideDialogPanel();
-   }
+   // if (locItem.markerType == "placeholder") { //i.e. from location panel Create Location button... or a model...
+   //    ShowHideDialogPanel();
+   // }
    let nextbuttonEl = document.getElementById('nextButton');
    let prevbuttonEl = document.getElementById('previousButton');
    nextbuttonEl.style.visibility = "visible";
    prevbuttonEl.style.visibility = "visible";
 
-
-   if (locItem.modelID) {
+   if (locItem.modelID != "none" ) {
       // phEl.components.local_marker.loadModel(locItem.modelID);
       window.location.reload();
    }
-
-   
 }
 
 // function AddFileToScene (filename, type) { //New Location button
@@ -3286,6 +3283,19 @@ function LoopTimedEvent(keyType, duration) {
               picGroupMangler.components.picture_groups_control.toggleOnPicGroup();
               picGroupMangler.components.picture_groups_control.NextButtonClick();
               // console.log(JSON.stringify(this.skyboxData));
+            }
+            let picGroupEls = document.querySelectorAll(".picgroup");
+            for (let i = 0; i < picGroupEls.length; i++) {
+               let cloudmarker = picGroupEls[i].components.cloud_marker;
+               if (cloudmarker) {
+
+               } else {
+                  let localmarker = picGroupEls[i].components.local_marker;
+                  if (localmarker) {
+                     localmarker.loadMedia();
+                  }
+               }
+               
             }
          }
       } else {

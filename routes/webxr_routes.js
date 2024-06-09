@@ -1084,6 +1084,12 @@ webxr_router.get('/:_id', function (req, res) {
                                         // tLoc.markerObjScale = (parseFloat(tLoc.markerObjScale) != undefined && parseFloat(tLoc.markerObjScale) != null) ? parseFloat(tLoc.markerObjScale) : 1;
                                         // console.log("TRYNA SET PLACEHOLDER LOCATION : " + JSON.stringify(tLoc) );
                                         locationPlaceholders.push(tLoc);
+                                        if (sceneResponse.sceneLocations[i].markerType.toLowerCase() == "picture group") {
+                                            if (sceneResponse.sceneLocations[i].modelID == "none") {
+                                                sceneResponse.hideCameraIcon = true;
+                                            }
+                                        }
+
                                     }
 
                                 }
@@ -1159,7 +1165,7 @@ webxr_router.get('/:_id', function (req, res) {
                                 if (sceneResponse.sceneLocations[i].markerType != undefined && sceneResponse.sceneLocations[i].markerType.toLowerCase().includes('picture')) {
                                     pictureLocation = sceneResponse.sceneLocations[i].x + " " + sceneResponse.sceneLocations[i].y + " " + zFix;
                                 }
-                                if (sceneResponse.sceneLocations[i].markerType == "picturegroup") {
+                                if (sceneResponse.sceneLocations[i].markerType == "picture group") {
                                     
                                     picturegroupLocation = sceneResponse.sceneLocations[i].x + " " + sceneResponse.sceneLocations[i].y + " " + zFix;
                                     console.log("gotsa picture geroup " + picturegroupLocation);
@@ -4050,6 +4056,7 @@ webxr_router.get('/:_id', function (req, res) {
                                 } else {
                                     console.log('All pictureGroups processed successfully');
                                     // pictureGroupsEntity = "<a-entity scale=\x22.75 .75 .75\x22 look-at=\x22#player\x22 position=\x22-4 2 -3\x22>"+ 
+                                    
                                     pictureGroupsEntity = "<a-entity scale=\x22.75 .75 .75\x22 look-at=\x22#player\x22 position=\x22"+picturegroupLocation+"\x22>"+ 
                                     "<a-entity position=\x220 -2.5 0\x22 scale=\x22.75  .75 .75\x22 id=\x22pictureGroupsControl\x22 class=\x22envMap activeObjexRay\x22 "+skyboxEnvMap+" toggle-picture-group gltf-model=\x22#camera_icon\x22></a-entity>"+
                                     "<a-entity id=\x22pictureGroupPanel\x22 visible=\x22false\x22 position=\x220 -1 0\x22>"+

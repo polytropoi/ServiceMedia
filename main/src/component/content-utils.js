@@ -4099,6 +4099,11 @@ AFRAME.registerComponent('picture_groups_control', { //has all the picgroup data
     returnRandomPicture: function () {
       let randomIndex = Math.floor(Math.random() * this.picGroupArray[this.picGroupArrayIndex].images.length);
       return this.picGroupArray[this.picGroupArrayIndex].images[randomIndex].url;
+    },
+    returnRandomPictureItem: function () {
+      let randomIndex = Math.floor(Math.random() * this.picGroupArray[this.picGroupArrayIndex].images.length);
+      console.log("treyna returnRandomPictureItem " + randomIndex);
+      return this.picGroupArray[this.picGroupArrayIndex].images[randomIndex];
     }
 });
 

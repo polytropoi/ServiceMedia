@@ -448,7 +448,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                 // UVs use the convention that (0, 0) corresponds to the upper left corner of a texture.
                 texture.flipY = false; 
                 // immediately use the texture for material creation
-                var material = new THREE.MeshBasicMaterial( { map: texture } ); 
+                var material = new THREE.MeshStandardMaterial( { map: texture, envMapIntensity: .1, flatShading: true } ); 
                 // Go over the submeshes and modify materials we want.
                 obj.traverse(node => {
                   node.material = material;
@@ -469,7 +469,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                 // UVs use the convention that (0, 0) corresponds to the upper left corner of a texture.
                 texture.flipY = false; 
                 // immediately use the texture for material creation
-                var material = new THREE.MeshBasicMaterial( { map: texture } ); 
+                var material = new THREE.MeshStandardMaterial( { map: texture, envMapIntensity: .1, flatShading: true } );  
                 // Go over the submeshes and modify materials we want.
                 obj.traverse(node => {
                   node.material = material;
@@ -785,23 +785,23 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
     remove: function () {
         console.log("removing something!");
     },
-    loadMedia: function (mediaID) {
-      if (!mediaID) {
-        mediaID = this.data.mediaID;
-      } else {
-        this.data.mediaID = mediaID;
-      }
-      this.el.removeAttribute("transform_controls");
-      this.el.removeAttribute("geometry");
-      this.el.removeAttribute("gltf-model");
-      console.log("tryna load mediaID "+ this.data.mediaID);
-      // let picUrl = null;
-      if (this.data.markerType.toLowerCase().includes("picture")) {
-        this.el.setAttribute('gltf-model', '#flatsquare');
+    // loadMedia: function (mediaID) {
+    //   if (!mediaID) {
+    //     mediaID = this.data.mediaID;
+    //   } else {
+    //     this.data.mediaID = mediaID;
+    //   }
+    //   this.el.removeAttribute("transform_controls");
+    //   this.el.removeAttribute("geometry");
+    //   this.el.removeAttribute("gltf-model");
+    //   console.log("tryna load mediaID "+ this.data.mediaID);
+    //   // let picUrl = null;
+    //   if (this.data.markerType.toLowerCase().includes("picture")) {
+    //     this.el.setAttribute('gltf-model', '#flatsquare');
 
        
-      }
-    },
+    //   }
+    // },
     loadLocalFile: function () { //change to loadLocalModel...
       if (this.data.modelID && this.data.modelID != "none") {
         console.log("really tryna loadLocalFile " + this.data.modelID);
@@ -810,6 +810,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
         this.loadMedia();
       }
     },
+    //when there's a local change
     updateAndLoad: function (name, description, tags, eventData, markerType, scale, xpos, ypos, zpos, xrot, yrot, zrot, xscale, yscale, zscale, modelID, objectID, mediaID) {
         this.data.name = name;
         this.data.description = description;
@@ -902,6 +903,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
         this.el.removeAttribute("gltf-model");
         console.log("tryna load mediaID "+ this.data.mediaID +" for markerType "+ this.data.markerType);
         if (this.data.markerType.toLowerCase().includes("picture")) {
+          this.el.removeAttribute('envMap');
           if (mediaID.includes("local_")) {
             this.el.classList.add("hasLocalFile");
             mediaID = mediaID.substring(6);
@@ -929,7 +931,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                 } else if (this.picData.orientation == "Portrait" || this.data.tags.toLowerCase().includes("portrait")) {
                   this.el.setAttribute('gltf-model', '#portrait_panel');
                 } else if (this.picData.orientation == "Square" || this.data.tags.toLowerCase().includes("square")) {
-
+                  this.el.setAttribute('gltf-model', '#square_panel');
                 } else if (this.picData.orientation == "Circle" || this.data.tags.toLowerCase().includes("circle")) {
 
                 }

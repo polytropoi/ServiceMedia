@@ -10093,7 +10093,7 @@ function getAllPeople() {
         "picture",
         // "picture fixed",
         // "picture billboard",
-        "picturegroup",
+        "picture group",
         "video",
         // "video billboard",
         "youtube",
