@@ -416,7 +416,7 @@ webxr_router.get('/:_id', function (req, res) {
     // let skyGradientScript = "";
     let textLocation = "";
     // let pictureLocation = "";
-    let picturegroupLocation = "-4 -100 3";
+    let picturegroupLocation = "-15 2 -10";
     let scenesKeyLocation = null;
     let audioLocation = "-3 1.7 -4";
     let videoLocation = "10 2 15";
@@ -1085,9 +1085,9 @@ webxr_router.get('/:_id', function (req, res) {
                                         // console.log("TRYNA SET PLACEHOLDER LOCATION : " + JSON.stringify(tLoc) );
                                         locationPlaceholders.push(tLoc);
                                         if (sceneResponse.sceneLocations[i].markerType.toLowerCase() == "picture group") {
-                                            if (sceneResponse.sceneLocations[i].modelID == "none") {
-                                                sceneResponse.hideCameraIcon = true;
-                                            }
+                                            // if (sceneResponse.sceneLocations[i].modelID == "none") {
+                                            //     sceneResponse.hideCameraIcon = true;
+                                            // }
                                         }
 
                                     }
@@ -1166,9 +1166,14 @@ webxr_router.get('/:_id', function (req, res) {
                                     pictureLocation = sceneResponse.sceneLocations[i].x + " " + sceneResponse.sceneLocations[i].y + " " + zFix;
                                 }
                                 if (sceneResponse.sceneLocations[i].markerType == "picture group") {
-                                    
-                                    picturegroupLocation = sceneResponse.sceneLocations[i].x + " " + sceneResponse.sceneLocations[i].y + " " + zFix;
-                                    console.log("gotsa picture geroup " + picturegroupLocation);
+                                    if (sceneResponse.sceneLocations[i].tags && 
+                                        (sceneResponse.sceneLocations[i].tags.includes("camera") ||  
+                                        sceneResponse.sceneLocations[i].tags.includes("default") ||
+                                        sceneResponse.sceneLocations[i].tags.includes("icon")
+                                        )) {
+                                        picturegroupLocation = sceneResponse.sceneLocations[i].x + " " + sceneResponse.sceneLocations[i].y + " " + zFix;
+                                        console.log("gotsa picture geroup " + picturegroupLocation);
+                                    }
                                 }
                                 if (sceneResponse.sceneLocations[i].markerType == "available scenes key") { 
                                     
@@ -4056,7 +4061,7 @@ webxr_router.get('/:_id', function (req, res) {
                                 } else {
                                     console.log('All pictureGroups processed successfully');
                                     // pictureGroupsEntity = "<a-entity scale=\x22.75 .75 .75\x22 look-at=\x22#player\x22 position=\x22-4 2 -3\x22>"+ 
-                                    
+                                    if (picturegroupLocation != "") {
                                     pictureGroupsEntity = "<a-entity scale=\x22.75 .75 .75\x22 look-at=\x22#player\x22 position=\x22"+picturegroupLocation+"\x22>"+ 
                                     "<a-entity position=\x220 -2.5 0\x22 scale=\x22.75  .75 .75\x22 id=\x22pictureGroupsControl\x22 class=\x22envMap activeObjexRay\x22 "+skyboxEnvMap+" toggle-picture-group gltf-model=\x22#camera_icon\x22></a-entity>"+
                                     "<a-entity id=\x22pictureGroupPanel\x22 visible=\x22false\x22 position=\x220 -1 0\x22>"+
@@ -4077,7 +4082,7 @@ webxr_router.get('/:_id', function (req, res) {
                                     "<a-entity visible='true' class=\x22envMap activeObjexRay\x22 id=\x22pictureGroupNextButton\x22 gltf-model=\x22#next_button\x22 scale=\x22.5 .5 .5\x22 position=\x222.25 -.75 0\x22></a-entity>" +
                                     "<a-entity visible='true' class=\x22envMap activeObjexRay\x22 id=\x22pictureGroupPreviousButton\x22 gltf-model=\x22#previous_button\x22 scale=\x22.5 .5 .5\x22 position=\x22-2.25  -.75 0\x22></a-entity>" +
                                     "</a-entity></a-entity>";
-                                   
+                                    }
                                     var buff = Buffer.from(JSON.stringify(requestedPictureGroups)).toString("base64");
                                     pictureGroupsData = "<a-entity picture_groups_control id=\x22pictureGroupsData\x22 data-picture-groups='"+buff+"'></a-entity>"; //to be picked up by aframe, but data is in data-attribute
                                     modelAssets = modelAssets + "<a-asset-item id=\x22portrait_panel\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/flatrect2_portrait.glb\x22></a-asset-item>\n" +
@@ -4235,7 +4240,7 @@ webxr_router.get('/:_id', function (req, res) {
                                                     } else if (picture_item.orientation == "square" || picture_item.orientation == "Square") {
                                                         imageEntities = imageEntities + "<a-entity "+link+""+lookat+"  mod-materials=\x22index:"+index+"\x22 gltf-model=\x22#square_panel\x22 scale=\x223 3 3\x22 material=\x22shader: flat; src: #smimage" + index + "; alphaTest: 0.5;\x22"+
                                                         " position=\x22"+position+"\x22 rotation=\x22"+rotation+"\x22 visible='true'>"+caption+"</a-entity>";
-                                                        modelAssets = modelAssets + "<a-asset-item id=\x22square_panel\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/panelsquare1.glb\x22></a-asset-item>\n";
+                                                        // modelAssets = modelAssets + "<a-asset-item id=\x22square_panel\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/panelsquare1.glb\x22></a-asset-item>\n";
                                                     } else if (picture_item.orientation == "circle" || picture_item.orientation == "Circle") {
                                                         imageEntities = imageEntities + "<a-entity "+link+""+lookat+"  mod-materials=\x22index:"+index+"\x22 gltf-model=\x22#circle_panel\x22 material=\x22shader: flat; src: #smimage" + index + "; alphaTest: 0.5;\x22"+
                                                         " position=\x22"+position+"\x22 rotation=\x22"+rotation+"\x22 visible='true'>"+caption+"</a-entity>";
@@ -5197,7 +5202,7 @@ webxr_router.get('/:_id', function (req, res) {
                         // "<a-asset-item id=\x22flat_round_rect\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/flatroundrect.glb\x22></a-asset-item>\n"+
                         // "<a-asset-item id=\x22flatrect2\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/flatrect2.glb\x22></a-asset-item>\n"+
                         "<a-asset-item id=\x22flatsquare\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/flatsquare.glb\x22></a-asset-item>\n"+
-                        "<a-asset-item id=\x22landscape_panel\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/landscape_panel7.glb\x22></a-asset-item>\n"+
+                        "<a-asset-item id=\x22landscape_panel\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/landscape_panel8.glb\x22></a-asset-item>\n"+
                         // "<a-asset-item id=\x22widelandscape_panel\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/panel5b.glb\x22></a-asset-item>\n"+
                         "<a-asset-item id=\x22dialog_panel\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/dialogpanel2.glb\x22></a-asset-item>\n"+
                         // "<a-asset-item id=\x22backpanel_horiz1\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/backpanel_horiz1.glb\x22></a-asset-item>\n"+

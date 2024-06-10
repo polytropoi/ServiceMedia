@@ -3279,9 +3279,9 @@ function LoopTimedEvent(keyType, duration) {
 
             if (picGroupMangler != null && picGroupMangler != undefined && picGroupMangler.components.picture_groups_control) {
             console.log("picture next event!");
-               document.querySelector("#pictureGroupPanel").setAttribute('visible', true);
-              picGroupMangler.components.picture_groups_control.toggleOnPicGroup();
-              picGroupMangler.components.picture_groups_control.NextButtonClick();
+            //    document.querySelector("#pictureGroupPanel").setAttribute('visible', true);
+            //   picGroupMangler.components.picture_groups_control.toggleOnPicGroup();
+            //   picGroupMangler.components.picture_groups_control.NextButtonClick();
               // console.log(JSON.stringify(this.skyboxData));
             }
             let picGroupEls = document.querySelectorAll(".picgroup");
