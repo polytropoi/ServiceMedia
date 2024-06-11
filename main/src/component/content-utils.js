@@ -3320,7 +3320,7 @@ AFRAME.registerComponent('location_picker', { //TODO toggle on if needed, off by
     this.el.addEventListener('model-loaded', (e) => {
       this.pickerEl.setAttribute("material", {color: "purple", transparent: true, opacity: .5});
       // this.pickerEl.style.visibility = "hidden";
-      this.pickerEl.object3D.visible = false;
+      // this.pickerEl.object3D.visible = false;
     });
  
       window.addEventListener('mouseup', (e) => { 
@@ -3342,13 +3342,14 @@ AFRAME.registerComponent('location_picker', { //TODO toggle on if needed, off by
   reset: function () {
     setTimeout(() =>  {
       this.picking = false;
+      this.pickerEl.object3D.visible = true;
     }, 1000);
   },
   tick: function () {
 
     if (!this.raycaster || this.raycaster == null || this.raycaster == undefined || keydown != "X") {
       // this.pickerEl.style.visibility = "hidden";
-      this.pickerEl.object3D.visible = false;
+      // this.pickerEl.object3D.visible = false;
 
       // return;
     } else {
@@ -3361,14 +3362,14 @@ AFRAME.registerComponent('location_picker', { //TODO toggle on if needed, off by
       if (intersects.length && !this.picking) {
         this.locationPicked = intersects[0].point;
         // this.pickerEl.style.visibility = "visible";
-        this.pickerEl.object3D.visible = true;
+        // this.pickerEl.object3D.visible = true;
         this.pickerEl.setAttribute("position", this.locationPicked);
         console.log("this.locationPicked " + JSON.stringify(this.locationPicked));
 
       } else {
         this.locationPicked = null;
         // this.pickerEl.style.visibility = "hidden";
-        this.pickerEl.object3D.visible = false;
+        // this.pickerEl.object3D.visible = false;
       }
     }
   }
