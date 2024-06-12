@@ -3574,6 +3574,9 @@ AFRAME.registerComponent('picture_groups_control', { //has all the picgroup data
     this.squareMesh = null;
     this.texture = null;
     this.material = null;
+    // if (settings && !settings.showCameraIcon) {
+    //   this.el.setAttribute('visible', false);
+    // }
     if (this.data.jsonData != null && this.data.jsonData.length > 0) {
       // this.pictureGroupPicEl = document.getElementById("pictureGroupPicLandscape"); 
       // this.pictureGroupPicEl = pictureGroupPicEl;

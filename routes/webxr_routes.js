@@ -674,6 +674,11 @@ webxr_router.get('/:_id', function (req, res) {
                 function (callback) {
                 if (sceneData.sceneTags != null) {        
                     for (let i = 0; i < sceneData.sceneTags.length; i++) { //not ideal, but it's temporary... //no it isn't
+                        if (sceneData.sceneTags[i].toLowerCase().includes("show camera")) {
+                            sceneResponse.showCameraIcon = true;
+                        } else {
+                            sceneResponse.showCameraIcon = false;
+                        }
                         if (sceneData.sceneTags[i].toLowerCase().includes("debug")) {
                             debugMode = true;
                         }
@@ -1171,6 +1176,7 @@ webxr_router.get('/:_id', function (req, res) {
                                         sceneResponse.sceneLocations[i].tags.includes("default") ||
                                         sceneResponse.sceneLocations[i].tags.includes("icon")
                                         )) {
+                                        sceneResponse.showCameraIcon = true;
                                         picturegroupLocation = sceneResponse.sceneLocations[i].x + " " + sceneResponse.sceneLocations[i].y + " " + zFix;
                                         console.log("gotsa picture geroup " + picturegroupLocation);
                                     }
@@ -4062,7 +4068,8 @@ webxr_router.get('/:_id', function (req, res) {
                                     console.log('All pictureGroups processed successfully');
                                     // pictureGroupsEntity = "<a-entity scale=\x22.75 .75 .75\x22 look-at=\x22#player\x22 position=\x22-4 2 -3\x22>"+ 
                                     if (picturegroupLocation != "") {
-                                    pictureGroupsEntity = "<a-entity scale=\x22.75 .75 .75\x22 look-at=\x22#player\x22 position=\x22"+picturegroupLocation+"\x22>"+ 
+                                    
+                                    pictureGroupsEntity = "<a-entity scale=\x22.75 .75 .75\x22 id=\x22picGroupParent\x22 look-at=\x22#player\x22 position=\x22"+picturegroupLocation+"\x22>"+ 
                                     "<a-entity position=\x220 -2.5 0\x22 scale=\x22.75  .75 .75\x22 id=\x22pictureGroupsControl\x22 class=\x22envMap activeObjexRay\x22 "+skyboxEnvMap+" toggle-picture-group gltf-model=\x22#camera_icon\x22></a-entity>"+
                                     "<a-entity id=\x22pictureGroupPanel\x22 visible=\x22false\x22 position=\x220 -1 0\x22>"+
                                     // "<a-entity id=\x22pictureGroupHeaderText\x22 geometry=\x22primitive: plane; width: 3.25; height: 1\x22 position=\x220 1.75 0\x22 material=\x22color: grey; transparent: true; opacity: 0.0\x22" +
@@ -4410,6 +4417,7 @@ webxr_router.get('/:_id', function (req, res) {
                     settings.sceneTags = sceneResponse.sceneTags;
                     settings.hideGizmos = false;
                     settings.sceneEnvironmentPreset = sceneResponse.sceneEnvironmentPreset;
+                    settings.showCameraIcon = sceneResponse.showCameraIcon; //for picture group mgr
                 
                     // settings.debug = settings.debugMode.length > 0;
                     if (sceneResponse.sceneTags != null && sceneResponse.sceneTags.includes("no mods")) {

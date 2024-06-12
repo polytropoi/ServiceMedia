@@ -388,9 +388,12 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
       // this.el.addEventListener('obbcollisionended	', (evt) => {
       //     this.obbHit(evt);
       // });
-      if (this.data.markerType == "picture" && this.data.mediaID && this.data.media != "none") {
-        this.loadMedia(); 
+      if (this.data.markerType.toLowerCase().includes("picture")) {
+        this.loadMedia(); //if tags == etc...
 
+      }
+      if (this.data.markerType == "picture group") {
+        this.el.classList.add("picgroup");
       }
   
       this.el.addEventListener('model-loaded', (evt) => { //load placeholder model first (which is an a-asset) before calling external
@@ -427,59 +430,62 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
           }
 
         }
+        if (this.data.markerType.toLowerCase().includes("picture")) {
+          this.loadPicture();
+         }
 
-        if (this.data.markerType == "picture") {
-          console.log("mediaID " + this.data.mediaID);
-          if (this.data.mediaID && this.data.mediaID.includes("local_")) {
-            this.el.classList.add("hasLocalFile");
-            let mediaID = this.data.mediaID.substring(6);
-            console.log("CLOUDMARKER SHOUDL HAVE MediaID " + mediaID + " from localFiles " + localData.localFiles[mediaID]);
-            for (const key in localData.localFiles) {
-              console.log("tryna get localMedia named " + mediaID + " vs " + localData.localFiles[key].name);
-              if (localData.localFiles[key].name == mediaID) {
+        // if (this.data.markerType == "picture") {
+        //   console.log("mediaID " + this.data.mediaID);
+        //   if (this.data.mediaID && this.data.mediaID.includes("local_")) {
+        //     this.el.classList.add("hasLocalFile");
+        //     let mediaID = this.data.mediaID.substring(6);
+        //     console.log("CLOUDMARKER SHOUDL HAVE MediaID " + mediaID + " from localFiles " + localData.localFiles[mediaID]);
+        //     for (const key in localData.localFiles) {
+        //       console.log("tryna get localMedia named " + mediaID + " vs " + localData.localFiles[key].name);
+        //       if (localData.localFiles[key].name == mediaID) {
                 
-                const picBuffer = localData.localFiles[key].data;
-                const picBlob = new Blob([picBuffer]);
-                picUrl = URL.createObjectURL(picBlob);
-                const obj = this.el.getObject3D('mesh');
+        //         const picBuffer = localData.localFiles[key].data;
+        //         const picBlob = new Blob([picBuffer]);
+        //         picUrl = URL.createObjectURL(picBlob);
+        //         const obj = this.el.getObject3D('mesh');
                 
-                var texture = new THREE.TextureLoader().load(picUrl);
-                texture.encoding = THREE.sRGBEncoding; 
-                // UVs use the convention that (0, 0) corresponds to the upper left corner of a texture.
-                texture.flipY = false; 
-                // immediately use the texture for material creation
-                var material = new THREE.MeshStandardMaterial( { map: texture, envMapIntensity: .1, flatShading: true } ); 
-                // Go over the submeshes and modify materials we want.
-                obj.traverse(node => {
-                  node.material = material;
+        //         var texture = new THREE.TextureLoader().load(picUrl);
+        //         texture.encoding = THREE.sRGBEncoding; 
+        //         // UVs use the convention that (0, 0) corresponds to the upper left corner of a texture.
+        //         texture.flipY = false; 
+        //         // immediately use the texture for material creation
+        //         var material = new THREE.MeshStandardMaterial( { map: texture, envMapIntensity: .1, flatShading: true } ); 
+        //         // Go over the submeshes and modify materials we want.
+        //         obj.traverse(node => {
+        //           node.material = material;
                   
-                  if (!this.data.tags.includes("fixed")) {
-                    this.el.setAttribute("look-at", "#player");
-                  }
-                });
-              }
-            }
-          } else {
-            console.log('tryna load picData : '+this.picData);
-            if (this.picData) {
-              const obj = this.el.getObject3D('mesh');
+        //           if (!this.data.tags.includes("fixed")) {
+        //             this.el.setAttribute("look-at", "#player");
+        //           }
+        //         });
+        //       }
+        //     }
+        //   } else {
+        //     console.log('tryna load picData : '+this.picData);
+        //     if (this.picData) {
+        //       const obj = this.el.getObject3D('mesh');
                 
-                var texture = new THREE.TextureLoader().load(this.picData.url);
-                texture.encoding = THREE.sRGBEncoding; 
-                // UVs use the convention that (0, 0) corresponds to the upper left corner of a texture.
-                texture.flipY = false; 
-                // immediately use the texture for material creation
-                var material = new THREE.MeshStandardMaterial( { map: texture, envMapIntensity: .1, flatShading: true } );  
-                // Go over the submeshes and modify materials we want.
-                obj.traverse(node => {
-                  node.material = material;
-                  if (!this.data.tags.includes("fixed")) {
-                    this.el.setAttribute("look-at", "#player");
-                  }
-                });
-              }
-            }
-          }
+        //         var texture = new THREE.TextureLoader().load(this.picData.url);
+        //         texture.encoding = THREE.sRGBEncoding; 
+        //         // UVs use the convention that (0, 0) corresponds to the upper left corner of a texture.
+        //         texture.flipY = false; 
+        //         // immediately use the texture for material creation
+        //         var material = new THREE.MeshStandardMaterial( { map: texture, envMapIntensity: .1, flatShading: true } );  
+        //         // Go over the submeshes and modify materials we want.
+        //         obj.traverse(node => {
+        //           node.material = material;
+        //           if (!this.data.tags.includes("fixed")) {
+        //             this.el.setAttribute("look-at", "#player");
+        //           }
+        //         });
+        //       }
+        //     }
+        //   }
 
       });
        
@@ -596,6 +602,11 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
               this.el.setAttribute("scene_text_display", {"textString": textString, "mode": textMode, "title": textTitle, "scale": this.data.yscale});
             }
             
+          }
+          if (this.data.markerType == "picture group") {
+            // if (this.data.tags.includes("random")){
+              this.loadMedia();
+            // }
           }
           if (that.data.markerType == "gate" && !that.data.tags.includes("no prompt")) {
             if (evt.detail.intersection && evt.detail.intersection.distance > 1 && evt.detail.intersection.distance < 20) {
@@ -839,8 +850,10 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
         this.loadModel(modelID);
         if (mediaID && mediaID != "none") {
           this.loadMedia(mediaID);
+        } else if (markerType.includes("picture")) {
+          this.loadMedia();
         }
-        if (this.data.tags.includes("billboard")) {
+        if (this.data.tags && this.data.tags.includes("billboard")) {
           if (this.data.tags.includes("yonly")) {
             this.el.setAttribute("look-at-y", "#player");
           } else {
@@ -853,7 +866,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
     updateMaterials: function () {
       if (this.data.tags && this.data.tags.includes("color")) {
         this.el.setAttribute("material", {color: this.data.eventData.toLowerCase(), transparent: true, opacity: .5});
-      } else if (this.data.modelID.toLowerCase().includes("primitive")) {
+      } else if (this.data.modelID && this.data.modelID.toLowerCase().includes("primitive")) {
         this.el.removeAttribute("material");
         console.log("tryna update material for markertype " + this.data.markerType);
         if (this.data.markerType.toLowerCase() == "placeholder") {
@@ -893,6 +906,65 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
         }
       }
     },
+    loadPicture: function () { //called from model-loaded event
+      // if (!mediaID) {
+      //   mediaID = this.data.mediaID;
+      // }
+      // if (this.data.markerType == "picture") {
+
+        console.log("mediaID " + this.data.mediaID);
+        if (this.data.mediaID && this.data.mediaID.includes("local_")) {
+          this.el.classList.add("hasLocalFile");
+          let mediaID = this.data.mediaID.substring(6);
+          console.log("CLOUDMARKER SHOUDL HAVE MediaID " + mediaID + " from localFiles " + localData.localFiles[mediaID]);
+          for (const key in localData.localFiles) {
+            console.log("tryna get localMedia named " + mediaID + " vs " + localData.localFiles[key].name);
+            if (localData.localFiles[key].name == mediaID) {
+              
+              const picBuffer = localData.localFiles[key].data;
+              const picBlob = new Blob([picBuffer]);
+              picUrl = URL.createObjectURL(picBlob);
+              const obj = this.el.getObject3D('mesh');
+              
+              var texture = new THREE.TextureLoader().load(picUrl);
+              texture.encoding = THREE.sRGBEncoding; 
+              // UVs use the convention that (0, 0) corresponds to the upper left corner of a texture.
+              texture.flipY = false; 
+              // immediately use the texture for material creation
+              var material = new THREE.MeshStandardMaterial( { map: texture, envMapIntensity: .1 } ); 
+              // Go over the submeshes and modify materials we want.
+              obj.traverse(node => {
+                node.material = material;
+                
+                if (!this.data.tags.includes("fixed")) {
+                  this.el.setAttribute("look-at", "#player");
+                }
+              });
+            }
+          }
+        } else {
+          console.log('tryna load picData : '+this.picData);
+          if (this.picData) {
+            const obj = this.el.getObject3D('mesh');
+              
+              var texture = new THREE.TextureLoader().load(this.picData.url);
+              texture.encoding = THREE.sRGBEncoding; 
+              // UVs use the convention that (0, 0) corresponds to the upper left corner of a texture.
+              texture.flipY = false; 
+              // immediately use the texture for material creation
+              var material = new THREE.MeshStandardMaterial( { map: texture, envMapIntensity: .1} );  
+              // Go over the submeshes and modify materials we want.
+              obj.traverse(node => {
+                node.material = material;
+                if (!this.data.tags.includes("fixed")) {
+                  this.el.setAttribute("look-at", "#player");
+                }
+              });
+            }
+          }
+      // }
+
+    },
     loadMedia: function (mediaID) {
       if (!mediaID) {
         mediaID = this.data.mediaID;
@@ -902,6 +974,42 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
         this.el.removeAttribute("geometry");
         this.el.removeAttribute("gltf-model");
         console.log("tryna load mediaID "+ this.data.mediaID +" for markerType "+ this.data.markerType);
+        // if (this.data.markerType.toLowerCase().includes("picture")) {
+        //   this.el.removeAttribute('envMap');
+        //   if (mediaID.includes("local_")) {
+        //     this.el.classList.add("hasLocalFile");
+        //     mediaID = mediaID.substring(6);
+        //     console.log("CLOUDMARKER SHOUDL HAVE MediaID " + mediaID + " from localFiles " + localData.localFiles[mediaID]);
+        //     for (const key in localData.localFiles) {
+        //       console.log("tryna get localMedia named " + mediaID + " vs " + localData.localFiles[key].name);
+        //       if (localData.localFiles[key].name == mediaID) {
+                
+        //         const picBuffer = localData.localFiles[key].data;
+        //         const picBlob = new Blob([picBuffer]);
+
+        //         console.log(URL.createObjectURL(picBlob));
+        //       }
+        //     }
+        //   } else {
+
+        //     const scenePicDataEl = document.getElementById("scenePictureData");
+        //     if (scenePicDataEl) {
+        //       this.picData = scenePicDataEl.components.scene_pictures_control.returnPictureData(mediaID);
+        //       console.log("picData :  " + JSON.stringify(this.picData));
+        //       if (this.picData) {
+                
+        //         if (!this.picData.orientation || this.picData.orientation == "Landscape" || this.data.tags.toLowerCase().includes("landscape")) {
+        //           this.el.setAttribute('gltf-model', '#landscape_panel'); // model-loaded pics this up and loads 
+        //         } else if (this.picData.orientation == "Portrait" || this.data.tags.toLowerCase().includes("portrait")) {
+        //           this.el.setAttribute('gltf-model', '#portrait_panel');
+        //         } else if (this.picData.orientation == "Square" || this.data.tags.toLowerCase().includes("square")) {
+        //           this.el.setAttribute('gltf-model', '#square_panel');
+        //         } else if (this.picData.orientation == "Circle" || this.data.tags.toLowerCase().includes("circle")) {
+
+        //         }
+        //       }
+        //     }
+        //   }
         if (this.data.markerType.toLowerCase().includes("picture")) {
           this.el.removeAttribute('envMap');
           if (mediaID.includes("local_")) {
@@ -919,25 +1027,47 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
               }
             }
           } else {
-
-            const scenePicDataEl = document.getElementById("scenePictureData");
-            if (scenePicDataEl) {
-              this.picData = scenePicDataEl.components.scene_pictures_control.returnPictureData(mediaID);
-              console.log("picData :  " + JSON.stringify(this.picData));
-              if (this.picData) {
-                
-                if (!this.picData.orientation || this.picData.orientation == "Landscape" || this.data.tags.toLowerCase().includes("landscape")) {
-                  this.el.setAttribute('gltf-model', '#landscape_panel'); // model-loaded pics this up and loads 
-                } else if (this.picData.orientation == "Portrait" || this.data.tags.toLowerCase().includes("portrait")) {
-                  this.el.setAttribute('gltf-model', '#portrait_panel');
-                } else if (this.picData.orientation == "Square" || this.data.tags.toLowerCase().includes("square")) {
-                  this.el.setAttribute('gltf-model', '#square_panel');
-                } else if (this.picData.orientation == "Circle" || this.data.tags.toLowerCase().includes("circle")) {
-
+            console.log("NOT local picture item" + this.data.markerType);
+            this.picData = null;
+              if (this.data.markerType == 'picture group') {
+                const picGroupsControlEl = document.getElementById("pictureGroupsData");
+                if (picGroupsControlEl) {
+                  this.picData = picGroupsControlEl.components.picture_groups_control.returnRandomPictureItem();
+                  console.log("gotsaa picturegroupsdata item" + JSON.stringify(this.picData));
+                  if (this.picData) { //first get the proper geometry, then call the loadPicture from the model-loaded event above to ensure there's something to paint
+                    if (!this.picData.orientation || this.picData.orientation == "Landscape" || this.data.tags.toLowerCase().includes("landscape")) {
+                      this.el.setAttribute('gltf-model', '#landscape_panel'); 
+                    } else if (this.picData.orientation == "Portrait" || this.data.tags.toLowerCase().includes("portrait")) {
+                      this.el.setAttribute('gltf-model', '#portrait_panel');
+                    } else if (this.picData.orientation == "Square" || this.data.tags.toLowerCase().includes("square")) {
+                      this.el.setAttribute('gltf-model', '#square_panel');
+                    } else if (this.picData.orientation == "Circle" || this.data.tags.toLowerCase().includes("circle")) {
+    
+                    }
+                  }
+                } else {
+                  console.log("no picturegroupsdata element!");
+                }
+              } else {
+                const scenePicDataEl = document.getElementById("scenePictureData");
+                if (scenePicDataEl) {
+                  this.picData = scenePicDataEl.components.scene_pictures_control.returnPictureData(mediaID);
+                  if (this.picData) { //first get the proper geometry, then call the loadPicture from the model-loaded event above to ensure there's something to paint
+                    if (!this.picData.orientation || this.picData.orientation == "Landscape" || this.data.tags.toLowerCase().includes("landscape")) {
+                      this.el.setAttribute('gltf-model', '#landscape_panel'); 
+                    } else if (this.picData.orientation == "Portrait" || this.data.tags.toLowerCase().includes("portrait")) {
+                      this.el.setAttribute('gltf-model', '#portrait_panel');
+                    } else if (this.picData.orientation == "Square" || this.data.tags.toLowerCase().includes("square")) {
+                      this.el.setAttribute('gltf-model', '#square_panel');
+                    } else if (this.picData.orientation == "Circle" || this.data.tags.toLowerCase().includes("circle")) {
+    
+                    }
+                  }
+                  console.log("gotsaa scenepicturesdata item " + JSON.stringify(this.picData));
                 }
               }
+
             }
-          }
         } else if (this.data.markerType == "text") {
           if (mediaID.includes("local_")) {
             this.el.classList.add("hasLocalFile");

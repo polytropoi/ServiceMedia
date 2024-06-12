@@ -350,6 +350,16 @@ $(function() {
       }
    }
 
+   let picGroupIconEl = document.getElementById('picGroupParent');
+   if (picGroupIconEl) {
+      if (settings.showCameraIcon) {
+         
+      } else {
+         picGroupIconEl.setAttribute("visible", false);
+      }
+   }
+   // } 
+
   
 
 }); //end onload

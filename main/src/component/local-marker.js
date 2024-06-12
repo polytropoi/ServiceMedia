@@ -394,6 +394,7 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
           // that.calloutEntity = this.calloutEntity;
           // that.calloutText = this.calloutText;
       
+          ///////////MODEL LOADED EVENT
         this.el.addEventListener("model-loaded", (e) => {
             // e.preventDefault();  
             this.el.removeAttribute("animation-mixer");
