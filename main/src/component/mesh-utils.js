@@ -1,8 +1,13 @@
 
-import {MeshSurfaceSampler} from '/three/examples/jsm/math/MeshSurfaceSampler.js'; 
-import {TransformControls} from '/three/examples/jsm/controls/TransformControls.js';
+// import {MeshSurfaceSampler} from '/three/examples/jsm/math/MeshSurfaceSampler.js'; 
+// import {TransformControls} from '/three/examples/jsm/controls/TransformControls.js';
 
 
+// import {MeshSurfaceSampler} from 'three/addons/math/MeshSurfaceSampler.js'; 
+// import {TransformControls} from 'three/addons/controls/TransformControls.js';
+// import * as THREE from 'three';
+import { TransformControls } from 'three/addons/controls/TransformControls.js';
+import { MeshSurfaceSampler } from 'three/addons/math/MeshSurfaceSampler.js';
 // import { SVGLoader } from '/three/examples/jsm/loaders/SVGLoader.js'; // ref'd in import maps
 // import { Flow } from '/three/examples/jsm/modifiers/CurveModifier.js'; 
 // import { Line2 } from '/three/examples/jsm/lines/Line2.js'; //hrm..
@@ -672,7 +677,7 @@ AFRAME.registerComponent('instanced_meshes_sphere_physics', { //scattered random
     scaleFactor: {default: 10},
     interaction: {default: ''},
     tags: {default: ''},
-    triggerTag: {default: null}
+    triggerTag: {default: ''}
   },
   init: function () {
     this.count = 0;
@@ -746,7 +751,7 @@ AFRAME.registerComponent('instanced_meshes_sphere', { //scattered randomly in sp
     scaleFactor: {default: 10},
     interaction: {default: ''},
     tags: {default: ''},
-    triggerTag: {default: null}
+    triggerTag: {default: ''}
   },
   init: function () {
     console.log("tryna init instanced_meshes_sphere");
@@ -1770,6 +1775,7 @@ AFRAME.registerComponent('scatter-surface-default', { //cook one up on the fly i
     const surfaceMaterial = new THREE.MeshLambertMaterial( { opacity: .1, color: "aqua", wireframe: true } );
     const surface = new THREE.Mesh( surfaceGeometry, surfaceMaterial );
     // surface.rotation.z = -90;
+
     this.el.setObject3D('mesh', surface);
     
     // this.el.addEventListener('model-loaded', (event) => {

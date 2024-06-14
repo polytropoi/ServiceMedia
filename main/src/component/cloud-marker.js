@@ -956,7 +956,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
               // Go over the submeshes and modify materials we want.
               obj.traverse(node => {
                 node.material = material;
-                if (!this.data.tags.includes("fixed")) {
+                if (this.data.tags && !this.data.tags.includes("fixed")) {
                   this.el.setAttribute("look-at", "#player");
                 }
               });
@@ -966,7 +966,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
 
     },
     loadMedia: function (mediaID) {
-      if (!mediaID) {
+      if (mediaID == undefined || mediaID == null) {
         mediaID = this.data.mediaID;
       }
       // if (this.data.markerType == "picture") { 
@@ -1012,7 +1012,8 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
         //   }
         if (this.data.markerType.toLowerCase().includes("picture")) {
           this.el.removeAttribute('envMap');
-          if (mediaID.includes("local_")) {
+          console.log("mediaID is " + mediaID);
+          if (mediaID != undefined && mediaID != null && mediaID.includes("local_")) {
             this.el.classList.add("hasLocalFile");
             mediaID = mediaID.substring(6);
             console.log("CLOUDMARKER SHOUDL HAVE MediaID " + mediaID + " from localFiles " + localData.localFiles[mediaID]);
@@ -1035,7 +1036,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                   this.picData = picGroupsControlEl.components.picture_groups_control.returnRandomPictureItem();
                   console.log("gotsaa picturegroupsdata item" + JSON.stringify(this.picData));
                   if (this.picData) { //first get the proper geometry, then call the loadPicture from the model-loaded event above to ensure there's something to paint
-                    if (!this.picData.orientation || this.picData.orientation == "Landscape" || this.data.tags.toLowerCase().includes("landscape")) {
+                    if (!this.picData.orientation || this.picData.orientation == "Landscape" || this.data.tags && this.data.tags.includes("landscape")) {
                       this.el.setAttribute('gltf-model', '#landscape_panel'); 
                     } else if (this.picData.orientation == "Portrait" || this.data.tags.toLowerCase().includes("portrait")) {
                       this.el.setAttribute('gltf-model', '#portrait_panel');

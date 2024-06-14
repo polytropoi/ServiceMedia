@@ -3342,7 +3342,7 @@ AFRAME.registerComponent('location_picker', { //TODO toggle on if needed, off by
   reset: function () {
     setTimeout(() =>  {
       this.picking = false;
-      this.pickerEl.object3D.visible = true;
+      // this.pickerEl.object3D.visible = true;
     }, 1000);
   },
   tick: function () {
@@ -3362,7 +3362,10 @@ AFRAME.registerComponent('location_picker', { //TODO toggle on if needed, off by
       if (intersects.length && !this.picking) {
         this.locationPicked = intersects[0].point;
         // this.pickerEl.style.visibility = "visible";
-        // this.pickerEl.object3D.visible = true;
+        if (!this.pickerEl.object3D.visible) {
+          this.pickerEl.object3D.visible = true;
+        }
+        
         this.pickerEl.setAttribute("position", this.locationPicked);
         console.log("this.locationPicked " + JSON.stringify(this.locationPicked));
 

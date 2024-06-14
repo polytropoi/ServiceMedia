@@ -710,11 +710,11 @@ webxr_router.get('/:_id', function (req, res) {
                             instancingEntity = "";
                         } 
 
-                        if (sceneData.sceneTags[i].toLowerCase().includes("aabb") || sceneData.sceneTags[i].toLowerCase().includes("collision")) {
-                            // console.log("GOTS SCENE TAG: " + sceneData.sceneTags[i]);
-                            // showTransport = true;
-                            meshUtilsScript = meshUtilsScript + "<script src=\x22../main/src/component/aframe-aabb-collider-component.min.js\x22></script>"; //imports MeshSurfaceScatter
-                        } 
+                        // if (sceneData.sceneTags[i].toLowerCase().includes("aabb") || sceneData.sceneTags[i].toLowerCase().includes("collision")) {
+                        //     // console.log("GOTS SCENE TAG: " + sceneData.sceneTags[i]);
+                        //     // showTransport = true;
+                        //     meshUtilsScript = meshUtilsScript + "<script src=\x22../main/src/component/aframe-aabb-collider-component.min.js\x22></script>"; //imports MeshSurfaceScatter
+                        // } 
                         if (sceneData.sceneTags[i] == "instancing demo") {
                             
                             // instancingEntity = "<a-entity instanced_meshes_sphere_physics></a-entity>";
@@ -5065,10 +5065,20 @@ webxr_router.get('/:_id', function (req, res) {
                         "<script async src=\x22https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js\x22></script>"+
 
                         "<script type=\x22importmap\x22> {\x22imports\x22: {" +
-                            "\x22three\x22: \x22https://unpkg.com/three@0.158.0/build/three.module.js\x22,"+
-                            "\x22three/addons/\x22: \x22https://unpkg.com/browse/three@0.164.0/examples/jsm/\x22"+
+                            // "\x22three\x22: \x22https://unpkg.com/three@0.158.0/build/three.module.js\x22,"+
+                            // "\x22three\x22: \x22https://unpkg.com/three@0.164.0/build/three.module.js\x22,"+
+                            // "\x22three/addons/\x22: \x22https://unpkg.com/browse/three@0.164.0/examples/jsm/\x22"+
+                            "\x22three\x22: \x22https://cdn.jsdelivr.net/npm/three@0.164.0/build/three.module.js\x22,"+
+                            "\x22three/addons/\x22: \x22https://cdn.jsdelivr.net/npm/three@0.164.0/examples/jsm/\x22"+
+                            // "\x22MeshSurfaceSampler\x22: \x22https://unpkg.com/browse/three@0.164.0/examples/jsm/math/MeshSurfaceSampler.js\x22,"+
+                            // "\x22TransformControls\x22: \x22https://unpkg.com/browse/three@0.164.0/examples/jsm/controls/TransformControls.js\x22"+
                             "}"+
                         "}</script>"+
+                        // "<script type=\x22module\x22>"+
+                        //     "import * as THREE from \x22three\x22;"+
+                        //     "import {MeshSurfaceSampler} from \x22three/addons/math/MeshSurfaceSampler.js\x22;"+
+                        //     "import {TransformControls} from \x22three/addons/controls/TransformControls.js\x22;"+
+                        // "</script>"+
 
                         "<script src=\x22/main/vendor/jquery/jquery.min.js\x22></script>" +
                         //"<script src=\x22/main/vendor/jquery-confirm/jquery-confirm.min.js\x22></script>" +

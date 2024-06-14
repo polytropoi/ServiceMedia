@@ -83,7 +83,7 @@ window.addEventListener( 'keydown',  ( event ) => {
       break;
 
     case 27: // Esc
-      
+      ShowHideDialogPanel();
       break;
     }
   });

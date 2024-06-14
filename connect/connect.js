@@ -1056,15 +1056,18 @@ function ToggleTransformControls (locationKey) {
    // const transformEl = document.getElementsByClassName("transformControls")[0]; //there should be only one
 
    if (transformEl) {
-      console.log("gotsa targetEl to remove transform_control");
+      console.log("gotsa transformEl for transform_control");
       let transform_controls_component = transformEl.components.transform_controls;
       if (transform_controls_component) {
          if (transform_controls_component.data.isAttached) {
             transform_controls_component.detachTransformControls();
+            console.log("tryna detach transform_control");
          } else {
             transform_controls_component.attachTransformControls();
+            console.log("tryna detach transform_control");
          }
       } else {
+         console.log("tryna setattrribue transform_controls");
          this.transformEl.setAttribute("transform_controls", "");
       }
    }
@@ -3298,7 +3301,7 @@ function LoopTimedEvent(keyType, duration) {
             for (let i = 0; i < picGroupEls.length; i++) {
                let cloudmarker = picGroupEls[i].components.cloud_marker;
                if (cloudmarker) {
-
+                  cloudmarker.loadMedia();
                } else {
                   let localmarker = picGroupEls[i].components.local_marker;
                   if (localmarker) {
