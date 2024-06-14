@@ -1303,22 +1303,22 @@ webxr_router.get('/:_id', function (req, res) {
                             loadLocations = "<a-entity location_data id=\x22locationData\x22 data-locations='"+buff+"'></a-entity>";
                         } 
                         if (sceneData.sceneWebType == 'Camera Background') {
-                            sceneBackground = " background=\x22transparent: true\x22 ";
+                            // sceneBackground = " background=\x22transparent: true\x22 ";
                             
 
-                            ARScript = "<script src=\x22/main/ref/aframe/dist/aframe-ar.js\x22></script>";
-                            ARSceneArg = "arjs=\x22sourceType: webcam\x22";   
+                            // ARScript = "<script src=\x22/main/ref/aframe/dist/aframe-ar.js\x22></script>";
+                            // ARSceneArg = "arjs=\x22sourceType: webcam\x22";   
                             
-                            // camera = "<a-entity cursor raycaster=\x22far: 20; interval: 1000; objects: .activeObjexRay\x22></a-entity>" +
-                            // "<a-entity camera></a-entity>";
-                            cameraRigEntity = "<a-entity id=\x22cameraRig\x22 initializer position=\x22"+playerPosition+"\x22>"+
-                            "<a-entity id=\x22mouseCursor\x22 cursor=\x22rayOrigin: mouse\x22 raycaster=\x22objects: .activeObjexRay\x22></a-entity>"+
-                            // "<a-entity id=\x22player\x22 get_pos_rot networked=\x22template:#avatar-template;attachTemplateToLocal:false;\x22 "+spawnInCircle+" camera "+wasd+" look-controls=\x22hmdEnabled: false\x22 position=\x220 1.6 0\x22>" +     
-                            "<a-entity id=\x22player\x22 get_pos_rot=\x22init: true;\x22 camera "+wasd+" look-controls=\x22hmdEnabled: false\x22 position=\x220 1.6 0\x22>" +     
-                            "</a-entity>"+
-                            // "<a-entity networked=\x22template:#hand-template\x22 "+blink_controls+" oculus-touch-controls=\x22hand: left\x22 laser-controls=\x22hand: left;\x22 handModelStyle: lowPoly; color: #ffcccc\x22 raycaster=\x22objects: .activeObjexRay;\x22></a-entity>" +
-                            // "<a-entity networked=\x22template:#hand-template\x22 oculus-touch-controls=\x22hand: right\x22 id=\x22right-hand\x22 hand-controls=\x22hand: right; handModelStyle: lowPoly; color: #ffcccc\x22 aabb-collider=\x22objects: .activeObjexGrab;\x22 grab></a-entity>"+
-                            "</a-entity>";
+                            // // camera = "<a-entity cursor raycaster=\x22far: 20; interval: 1000; objects: .activeObjexRay\x22></a-entity>" +
+                            // // "<a-entity camera></a-entity>";
+                            // cameraRigEntity = "<a-entity id=\x22cameraRig\x22 initializer position=\x22"+playerPosition+"\x22>"+
+                            // "<a-entity id=\x22mouseCursor\x22 cursor=\x22rayOrigin: mouse\x22 raycaster=\x22objects: .activeObjexRay\x22></a-entity>"+
+                            // // "<a-entity id=\x22player\x22 get_pos_rot networked=\x22template:#avatar-template;attachTemplateToLocal:false;\x22 "+spawnInCircle+" camera "+wasd+" look-controls=\x22hmdEnabled: false\x22 position=\x220 1.6 0\x22>" +     
+                            // "<a-entity id=\x22player\x22 get_pos_rot=\x22init: true;\x22 camera "+wasd+" look-controls=\x22hmdEnabled: false\x22 position=\x220 1.6 0\x22>" +     
+                            // "</a-entity>"+
+                            // // "<a-entity networked=\x22template:#hand-template\x22 "+blink_controls+" oculus-touch-controls=\x22hand: left\x22 laser-controls=\x22hand: left;\x22 handModelStyle: lowPoly; color: #ffcccc\x22 raycaster=\x22objects: .activeObjexRay;\x22></a-entity>" +
+                            // // "<a-entity networked=\x22template:#hand-template\x22 oculus-touch-controls=\x22hand: right\x22 id=\x22right-hand\x22 hand-controls=\x22hand: right; handModelStyle: lowPoly; color: #ffcccc\x22 aabb-collider=\x22objects: .activeObjexGrab;\x22 grab></a-entity>"+
+                            // "</a-entity>";
 
                         } else if (sceneData.sceneWebType == 'AR Image Tracking') { //not really, set below...
                             
@@ -1331,9 +1331,9 @@ webxr_router.get('/:_id', function (req, res) {
                             "</a-entity>";
                           
                         } else if (sceneData.sceneWebType == 'AR Location Tracking') {
-                            // ARScript = "<script src=\x22/main/js/geolocator.js\x22></script><script src=\x22/main/ref/aframe/dist/aframe-ar.js\x22></script>";
+                            
                             geoScripts = "<script async src=\x22https://get.geojs.io/v1/ip/geo.js\x22></script><script src=\x22/main/js/geolocator.js\x22></script>";
-                            // ARScript = "<script src=\x22/main/ref/aframe/dist/aframe-ar.js\x22></script>";
+                            
                             ARScript = "<script src=\x22https://raw.githack.com/MediaComem/LBAR.js/main/dist/lbar-v0.2.min.js\x22></script>";
 
                             locationScripts = "<script src=\x22../main/src/component/location-fu.js\x22></script>";
