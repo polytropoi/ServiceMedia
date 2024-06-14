@@ -1419,6 +1419,7 @@ function LocationRowClick(data) {
 
 function CreateLocation (filename, type, position) { //New Location button, also addToScene button for localfiles
    console.log("trynsa createlocation with file " + filename + " type " + type + " localData is " + JSON.stringify(localData));
+   let timestamp = null;
    let markertype = "placeholder";
    
    let modelID = "none";
@@ -1449,7 +1450,7 @@ function CreateLocation (filename, type, position) { //New Location button, also
    var sceneEl = document.querySelectorAll('a-scene')[0];
    
    phEl.setAttribute('skybox-env-map', '');
-   let timestamp = Date.now();
+   timestamp = Date.now();
    timestamp = parseInt(timestamp);
    let locItem = {};
    locItem.x = newPosition.x.toFixed(2);

@@ -427,7 +427,7 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
                 }
               }
               if (this.data.isNew && this.data.modelID == 'none' && this.data.markerType == "placeholder") {
-                this.el.setAttribute("transform_controls", "");
+                // this.el.setAttribute("transform_controls", "");
               } 
               let clips = obj.animations;
               if (clips != null && clips.length) { 

@@ -12009,11 +12009,11 @@ app.post('/add_scene_mods/:s_id', requiredAuthentication, admin, function (req, 
                                             }
                                         }
                                         if (!isMatch) {
-                                            let timestamp = Math.round(Date.now() / 1000);
-                                            console.log("no match with existing location, must be new " + req.body.locationMods[l].timestamp);
+                                            // let timestamp = Math.round(Date.now() / 1000);
+                                            // console.log("no match with existing location, must be new " + req.body.locationMods[l].timestamp);
                                             delete req.body.locationMods[l].isNew; //going to the cloud don't need these
                                             delete req.body.locationMods[l].isLocal;
-                                            req.body.locationMods[l].timestamp = timestamp;
+                                            // req.body.locationMods[l].timestamp = timestamp;
                                             if (req.body.locationMods[l].name && req.body.locationMods[l].name.toLowerCase().includes("local ")) {
                                                 let name = req.body.locationMods[l].name.toLowerCase().replace("local ", "");
                                                 req.body.locationMods[l].name = name;

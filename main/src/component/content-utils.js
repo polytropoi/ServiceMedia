@@ -185,7 +185,7 @@ AFRAME.registerComponent('initializer', { //adjust for device settings, and call
     // sceneEl.fog = new THREE.Fog(fogColor, 0.25, 4);
     // sceneEl.setAttribute('stats', '');
     // sceneEl.setAttribute("screen-controls", {'isMobile': isMobile});
-    sceneEl.addEventListener('loaded', function () { //for sure?
+    sceneEl.addEventListener('loaded', () => { //for sure?
       // console.log("aframe init with isMobile "  + isMobile + " isIOS " + isIOS + " isMacOS " + isMacOS + " headsetConnected " + headsetConnected);
 
       // console.log("three is" + THREE.path);
@@ -240,7 +240,10 @@ AFRAME.registerComponent('initializer', { //adjust for device settings, and call
         }
         // sceneEl.setAttribute('obb-collider', {'showColliders': true});
       // }
-
+      // if (settings && settings.allowMods && (settings.sceneTags && settings.sceneTags.includes("no picker"))) {
+        this.el.setAttribute("location_picker", "init");
+      // }
+      
    }); //end loaded
 
 
@@ -267,7 +270,7 @@ AFRAME.registerComponent('initializer', { //adjust for device settings, and call
   //   }
   // });
 
-  this.el.setAttribute("location_picker", "init");
+
    if (this.data.usdz != '') {
      ShowARButton(this.data.usdz);
    }
@@ -3325,13 +3328,16 @@ AFRAME.registerComponent('location_picker', { //TODO toggle on if needed, off by
  
       window.addEventListener('mouseup', (e) => { 
       e.preventDefault();
-      if (keydown == "X" && this.locationPicked && !this.picking) {
+      if (keydown == "X" && !this.picking) {
           this.picking = true;
           // this.pickerEl.style.visibility = "hidden";
           this.pickerEl.object3D.visible = false;
           console.log("gotsa locationPicked "+ this.locationPicked);
           // keydown = 
-          CreateLocation(null, "poi", this.locationPicked);
+          if (this.locationPicked) {
+            CreateLocation(null, "poi", this.locationPicked);
+          }
+          
           this.reset();
         } else {
           // this.pickerEl.style.visibility = "hidden";
@@ -3348,6 +3354,9 @@ AFRAME.registerComponent('location_picker', { //TODO toggle on if needed, off by
   tick: function () {
 
     if (!this.raycaster || this.raycaster == null || this.raycaster == undefined || keydown != "X") {
+      if (this.pickerEl.object3D.visible) {
+        this.pickerEl.object3D.visible = false;
+      }
       // this.pickerEl.style.visibility = "hidden";
       // this.pickerEl.object3D.visible = false;
 
@@ -3371,6 +3380,9 @@ AFRAME.registerComponent('location_picker', { //TODO toggle on if needed, off by
 
       } else {
         this.locationPicked = null;
+        if (this.pickerEl.object3D.visible) {
+          this.pickerEl.object3D.visible = false;
+        }
         // this.pickerEl.style.visibility = "hidden";
         // this.pickerEl.object3D.visible = false;
       }
