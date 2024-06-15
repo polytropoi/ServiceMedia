@@ -297,8 +297,10 @@ $(function() {
    }
 
    sceneEl = document.querySelector('a-scene');
-   sceneEl.removeAttribute("keyboard-shortcuts"); //give me back the f key!
-
+   if (sceneEl) {
+      sceneEl.removeAttribute("keyboard-shortcuts"); //give me back the f key!
+   }
+  
    if (settings.allowMods) {
       if ('storage' in navigator && 'estimate' in navigator.storage) {
             navigator.storage.estimate().then(({usage, quota}) => {
