@@ -580,7 +580,10 @@ function SaveModsToCloud() { //Save button on location modal, writes local mods 
 
       mods.localFiles = localData.localFiles; 
       for (let key in mods.localFiles) {
-         mods.localFiles[key].data = arrayBufferToBase64(localData.localFiles[key].data); //might need to async...
+         if (localData.localFiles[key].data) {
+            mods.localFiles[key].data = arrayBufferToBase64(localData.localFiles[key].data); //might need to async...
+         }
+         
       }
       
       mods.locationMods = localData.locations;
@@ -608,11 +611,14 @@ function SaveModsToCloud() { //Save button on location modal, writes local mods 
 
       
       // var encodedString = btoa(JSON.stringify(mods));
-      // console.log(encodedString);
+      
       var xhr = new XMLHttpRequest();
       xhr.open("POST", '/add_scene_mods/'+room, true);
       xhr.setRequestHeader('Content-Type', 'application/json');
-      xhr.send(JSON.stringify(mods));
+      // xhr.send(JSON.stringify(mods));
+      let modString = JSON.stringify(mods);
+      console.log(modString);
+      xhr.send(modString);
       xhr.onload = function () {
          // do something to response
          console.log(this.responseText);
