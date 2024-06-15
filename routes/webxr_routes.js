@@ -1771,7 +1771,7 @@ webxr_router.get('/:_id', function (req, res) {
                             if (sceneResponse.sceneEnvironmentPreset != null && sceneResponse.sceneEnvironmentPreset != "none" && sceneResponse.sceneEnvironmentPreset != "" ) {
                                 webxrEnv = sceneResponse.sceneEnvironmentPreset;
                                 
-                                // enviromentScript = "<script src=\x22../main/ref/aframe/dist/aframe_environment_component.min.js\x22></script>"; --ronment-component
+                                
                                 enviromentScript = "<script src=\x22../main/src/component/aframe-environment-component_m3.js\x22></script>";
                                 let ground = "hills";
                                 let dressing = "";
@@ -2026,8 +2026,7 @@ webxr_router.get('/:_id', function (req, res) {
                                 // console.log("tryna get [ObjectID(sceneData.scenePrimaryAudioID)]" + ObjectID(sceneData.scenePrimaryAudioID));
                                 requestedAudioItems.push(ObjectID(sceneData.scenePrimaryAudioID));
                                 if (sceneData.scenePrimaryAudioVisualizer) {
-                                    // audioVizScript = "<script src=\x22../main/ref/aframe/dist/aframe-audioanalyser-component.js\x22></script>"; 
-                                    // audioVizEntity = "<a-entity id=\x22audiovizzler\x22 position=\x22"+audioLocation+"\x22 audioanalyser=\x22smoothingTimeConstant: 0.9\x22 audioanalyser-levels-scale=\x22max: 50; multiplier: 0.06\x22 entity-generator=\x22mixin: bar; num: 256\x22 layout=\x22type: circle; radius: 10\x22 rotation=\x220 180 0\x22></a-entity>";
+                                    
                                     audioVizEntity = "<a-entity id=\x22audiovizzler\x22 position=\x22"+audioLocation+"\x22 data-audio-analyzer=\x22true\x22 data-beat=\x22true\x22></a-entity>";
                                     // primaryAudioParams = primaryAudioParams + " data-audiovizzler=\x22beat\x22 ";
                                 }
@@ -4137,7 +4136,7 @@ webxr_router.get('/:_id', function (req, res) {
                                                     version = ".original.";
                                                     // fogSettings = "";
                                                     skyboxIDs.push(picID);
-                                                    // convertEquirectToCubemap = "<script src=\x22../main/ref/aframe/dist/equirect-to-cubemap.js\x22></script>";
+                                                    
                                                 }
                                             }
                                         
@@ -4591,7 +4590,8 @@ webxr_router.get('/:_id', function (req, res) {
                             
 
 
-                            "<link href=\x22../main/vendor/fontawesome-free/css/all.css\x22 rel=\x22stylesheet\x22 type=\x22text/css\x22>" +
+                            // "<link href=\x22../main/vendor/fontawesome-free/css/all.css\x22 rel=\x22stylesheet\x22 type=\x22text/css\x22>" +
+                            "<link href=\x22https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css\x22 rel=\x22stylesheet\x22 type=\x22text/css\x22>" +
                             "<link href=\x22/css/modelviewer.css\x22 rel=\x22stylesheet\x22 type=\x22text/css\x22>" + 
                             // "<link rel=\x22stylesheet\x22 type=\x22text/css\x22 href=\x22https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css\x22>"+
                             "<link href=\x22/css/webxr.css\x22 rel=\x22stylesheet\x22 type=\x22text/css\x22>" + 
@@ -4677,7 +4677,7 @@ webxr_router.get('/:_id', function (req, res) {
                         // "<meta name=\x22monetization\x22 content=\x22"+process.env.COIL_PAYMENT_POINTER+"\x22>" +
                         "<meta name=\x22mobile-web-app-capable\x22 content=\x22yes\x22>" +
                         "<meta name=\x22apple-mobile-web-app-capable\x22 content=\x22yes\x22>" +                        
-                        "<link href=\x22../main/vendor/fontawesome-free/css/all.css\x22 rel=\x22stylesheet\x22 type=\x22text/css\x22>" +
+                        "<link href=\x22https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css\x22 rel=\x22stylesheet\x22 type=\x22text/css\x22>" +
                         "<link href=\x22/css/webxr.css\x22 rel=\x22stylesheet\x22 type=\x22text/css\x22>" + 
                        
                         "<script src=\x22/main/vendor/jquery/jquery.min.js\x22></script>" +
@@ -4800,7 +4800,7 @@ webxr_router.get('/:_id', function (req, res) {
                         // "<meta name=\x22monetization\x22 content=\x22"+process.env.COIL_PAYMENT_POINTER+"\x22>" +
                         "<meta name=\x22mobile-web-app-capable\x22 content=\x22yes\x22>" +
                         "<meta name=\x22apple-mobile-web-app-capable\x22 content=\x22yes\x22>" +                        
-                        "<link href=\x22../main/vendor/fontawesome-free/css/all.css\x22 rel=\x22stylesheet\x22 type=\x22text/css\x22>" +
+                        "<link href=\x22https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css\x22 rel=\x22stylesheet\x22 type=\x22text/css\x22>" +
                         "<link href=\x22/css/webxr.css\x22 rel=\x22stylesheet\x22 type=\x22text/css\x22>" + 
                        
                         "<script src=\x22/main/vendor/jquery/jquery.min.js\x22></script>" +
@@ -5056,7 +5056,7 @@ webxr_router.get('/:_id', function (req, res) {
                         "<meta name=\x22apple-mobile-web-app-capable\x22 content=\x22yes\x22>" +
                         // "<meta name=\x22token\x22 content=\x22"+token+"\x22>"+
                         styleIncludes +
-                        "<link href=\x22../main/vendor/fontawesome-free/css/all.css\x22 rel=\x22stylesheet\x22 type=\x22text/css\x22>" +
+                        "<link href=\x22https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css\x22 rel=\x22stylesheet\x22 type=\x22text/css\x22>" +
                         // "<link rel=\x22stylesheet\x22 href=\x22/main/vendor/jquery-confirm/jquery-confirm.min.css\x22 rel=\x22stylesheet\x22>" +
                         "<link href=\x22/css/webxr.css\x22 rel=\x22stylesheet\x22 type=\x22text/css\x22>" +
 

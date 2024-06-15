@@ -1170,22 +1170,7 @@ landing_router.get('/:_id', function (req, res) {
                             //SET CAMERA VAR BELOW, DEPENDING ON SCENETYPE
 
                         } if (sceneData.sceneWebType == 'Camera Background') {
-                            // sceneBackground = " background=\x22transparent: true\x22 ";
-                            
-
-                            // ARScript = "<script src=\x22/main/ref/aframe/dist/aframe-ar.js\x22></script>";
-                            // ARSceneArg = "arjs=\x22sourceType: webcam\x22";   
-                            
-                            // // camera = "<a-entity cursor raycaster=\x22far: 20; interval: 1000; objects: .activeObjexRay\x22></a-entity>" +
-                            // // "<a-entity camera></a-entity>";
-                            // camera = "<a-entity id=\x22cameraRig\x22 initializer position=\x22"+playerPosition+"\x22>"+
-                            // "<a-entity id=\x22mouseCursor\x22 cursor=\x22rayOrigin: mouse\x22 raycaster=\x22objects: .activeObjexRay\x22></a-entity>"+
-                            // // "<a-entity id=\x22player\x22 get_pos_rot networked=\x22template:#avatar-template;attachTemplateToLocal:false;\x22 "+spawnInCircle+" camera "+wasd+" look-controls=\x22hmdEnabled: false\x22 position=\x220 1.6 0\x22>" +     
-                            // "<a-entity id=\x22player\x22 get_pos_rot=\x22init: true;\x22 camera "+wasd+" look-controls=\x22hmdEnabled: false\x22 position=\x220 1.6 0\x22>" +     
-                            // "</a-entity>"+
-                            // // "<a-entity networked=\x22template:#hand-template\x22 "+blink_controls+" oculus-touch-controls=\x22hand: left\x22 laser-controls=\x22hand: left;\x22 handModelStyle: lowPoly; color: #ffcccc\x22 raycaster=\x22objects: .activeObjexRay;\x22></a-entity>" +
-                            // // "<a-entity networked=\x22template:#hand-template\x22 oculus-touch-controls=\x22hand: right\x22 id=\x22right-hand\x22 hand-controls=\x22hand: right; handModelStyle: lowPoly; color: #ffcccc\x22 aabb-collider=\x22objects: .activeObjexGrab;\x22 grab></a-entity>"+
-                            // "</a-entity>";
+                         
 
                         
                                             
@@ -1292,8 +1277,7 @@ landing_router.get('/:_id', function (req, res) {
                                 // console.log("tryna get [ObjectID(sceneData.scenePrimaryAudioID)]" + ObjectID(sceneData.scenePrimaryAudioID));
                                 requestedAudioItems.push(ObjectID(sceneData.scenePrimaryAudioID));
                                 if (sceneData.scenePrimaryAudioVisualizer) {
-                                    // audioVizScript = "<script src=\x22../main/ref/aframe/dist/aframe-audioanalyser-component.js\x22></script>"; 
-                                    // audioVizEntity = "<a-entity id=\x22audiovizzler\x22 position=\x22"+audioLocation+"\x22 audioanalyser=\x22smoothingTimeConstant: 0.9\x22 audioanalyser-levels-scale=\x22max: 50; multiplier: 0.06\x22 entity-generator=\x22mixin: bar; num: 256\x22 layout=\x22type: circle; radius: 10\x22 rotation=\x220 180 0\x22></a-entity>";
+                                    
                                     audioVizEntity = "<a-entity id=\x22audiovizzler\x22 position=\x22"+audioLocation+"\x22 data-audio-analyzer=\x22true\x22 data-beat=\x22true\x22></a-entity>";
                                     // primaryAudioParams = primaryAudioParams + " data-audiovizzler=\x22beat\x22 ";
                                 }
@@ -3761,7 +3745,7 @@ landing_router.get('/:_id', function (req, res) {
                         // "<meta name=\x22monetization\x22 content=\x22"+process.env.COIL_PAYMENT_POINTER+"\x22>" +
                         "<meta name=\x22mobile-web-app-capable\x22 content=\x22yes\x22>" +
                         "<meta name=\x22apple-mobile-web-app-capable\x22 content=\x22yes\x22>" +                        
-                        "<link href=\x22../main/vendor/fontawesome-free/css/all.css\x22 rel=\x22stylesheet\x22 type=\x22text/css\x22>" +
+                        "<link href=\x22https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css\x22 rel=\x22stylesheet\x22 type=\x22text/css\x22>" +
                         // "<link href=\x22/css/webxr.css\x22 rel=\x22stylesheet\x22 type=\x22text/css\x22>" + 
                         // "<link href=\x22https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css\x22 rel=\x22stylesheet\x22 integrity=\x22sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN\x22 crossorigin=\x22anonymous\x22></link>"+
                         "<link href=\x22https://cdn.jsdelivr.net/npm/bootswatch@5.3.1/dist/"+styleTheme.toLowerCase()+"/bootstrap.min.css\x22 rel=\x22stylesheet\x22 crossorigin=\x22anonymous\x22></link>"+
@@ -3974,7 +3958,7 @@ landing_router.get('/:_id', function (req, res) {
                         "<meta name=\x22apple-mobile-web-app-capable\x22 content=\x22yes\x22>" +
                         // "<meta name=\x22token\x22 content=\x22"+token+"\x22>"+
                         styleIncludes +
-                        "<link href=\x22../main/vendor/fontawesome-free/css/all.css\x22 rel=\x22stylesheet\x22 type=\x22text/css\x22>" +
+                        "<link href=\x22https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css\x22 rel=\x22stylesheet\x22 type=\x22text/css\x22>" +
                         "<link href=\x22/css/webxr.css\x22 rel=\x22stylesheet\x22 type=\x22text/css\x22>" +
 
                      
