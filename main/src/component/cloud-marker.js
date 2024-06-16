@@ -523,9 +523,20 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
             this.calloutEntity.setAttribute('visible', true);
             this.calloutEntity.setAttribute('scale', {x: this.distance * .25, y: this.distance * .25, z: this.distance * .25} );
               
-            let theLabel = this.data.name != undefined ? this.data.name : "";
-            let calloutString = theLabel;
-            this.calloutText.setAttribute("troika-text", {value: calloutString});
+            if (this.data.tags.toLowerCase().includes("description")) {
+              if (this.data.description.includes("~")) {
+                let cSplit = this.data.description.split("~");
+                this.calloutText.setAttribute("troika-text", {value: cSplit[(Math.floor(Math.random()*cSplit.length))]}); //or increment index...
+              } else {
+                this.calloutText.setAttribute("troika-text", {value: this.data.description});
+              }
+             
+            } else {
+              let theLabel = this.data.name != undefined ? this.data.name : "";
+              let calloutString = theLabel;
+              this.calloutText.setAttribute("troika-text", {value: calloutString});
+            }
+
           }
         }
         }

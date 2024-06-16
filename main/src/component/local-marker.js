@@ -581,18 +581,32 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
             //   calloutString = that.data.description != '' ? that.data.description : theLabel;
             // }
             // this.calloutText.setAttribute('troika-text', {value: calloutString});
-            this.calloutText.setAttribute('troika-text', {
-              // width: .5,
-              baseline: "bottom",
-              align: "left",
-              fontSize: .1,
-              font: "/fonts/web/"+ this.font2,
-              anchor: "center",
-              color: "white",
-              outlineColor: "black",
-              outlineWidth: "2%",
-              value: that.data.name
-            });
+                  // this.calloutText.setAttribute('troika-text', {
+                  //   // width: .5,
+                  //   baseline: "bottom",
+                  //   align: "left",
+                  //   fontSize: .1,
+                  //   font: "/fonts/web/"+ this.font2,
+                  //   anchor: "center",
+                  //   color: "white",
+                  //   outlineColor: "black",
+                  //   outlineWidth: "2%",
+                  //   value: that.data.name
+                  // });
+            if (this.data.tags.toLowerCase().includes("description")) {
+              if (this.data.description.includes("~")) {
+                let cSplit = this.data.description.split("~");
+                this.calloutText.setAttribute("troika-text", {value: cSplit[(Math.floor(Math.random()*cSplit.length))]}); //or increment index...
+              } else {
+                this.calloutText.setAttribute("troika-text", {value: this.data.description});
+              }
+             
+            } else {
+              let theLabel = this.data.name != undefined ? this.data.name : "";
+              let calloutString = theLabel;
+              this.calloutText.setAttribute("troika-text", {value: calloutString});
+            }
+
             }
           }
         }

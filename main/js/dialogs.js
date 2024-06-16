@@ -93,6 +93,14 @@ window.addEventListener( 'keydown',  ( event ) => {
     console.log("keyup " + keydown);
   });
 
+  function clearSelection() {
+    if (window.getSelection) {
+      window.getSelection().removeAllRanges();
+    } else if (document.selection) {
+      document.selection.empty();
+    }
+  }
+
   // AFRAME.registerComponent('location_picker', {
   //   init: function () {
   //     console.log("tryna set location_picker raycaster");
@@ -987,7 +995,7 @@ function ReturnLocationMarkerTypeSelect (selected) {
 
 
 function ShowLocationModal(timestamp) {  
-
+    clearSelection();
     let thisLocation = null;
     selectedLocationTimestamp = timestamp;
     // console.log("loaded and looking for " + phID);
