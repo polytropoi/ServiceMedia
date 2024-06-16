@@ -1406,11 +1406,11 @@ function ReturnLocationTable () { //just show em all now!
          if (fAsset) {
             asset = fAsset;
          }
-         tablerows = tablerows + "<tr class=\x22clickableRow\x22 onclick=\x22LocationRowClick('"+localData.locations[i].timestamp+"')\x22><td>"+namestring+"</td>"+
+         tablerows = tablerows + "<tr class=\x22clickableRow\x22 onclick=\x22LocationRowClick('"+localData.locations[i].timestamp+"')\x22><td>"+namestring+"</td><td>"+localData.locations[i].timestamp+"</td>"+
          "<td>"+localData.locations[i].x+","+localData.locations[i].y+","+localData.locations[i].z+"</td><td>"+asset+"</td><td>"+ markerString+"</td></tr>";
       }
    }
-   return "<table id=\x22locations\x22><th style=\x22color: black;\x22>Name</th><th style=\x22color: black;\x22>Position</th><th style=\x22color: black;\x22>Asset</th><th style=\x22color: black;\x22>Type</th>"+tablerows+"</table>";
+   return "<table id=\x22locations\x22><th style=\x22color: black;\x22>Name</th><th style=\x22color: black;\x22>ID</th><th style=\x22color: black;\x22>Position</th><th style=\x22color: black;\x22>Asset</th><th style=\x22color: black;\x22>Type</th>"+tablerows+"</table>";
 }
 
 function LocationRowClick(data) {
