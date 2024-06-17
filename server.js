@@ -14273,10 +14273,12 @@ app.get('/publicscenes', function (req, res) { //deprecated, see available scene
 
         } else {
             console.log("gots " + scenes.length + "publicscenes...");
+            
             async.each(scenes,
                 // 2nd param is the function that each item is passed to
                 function (scene, callback) {
                     if (scene.scenePostcards != null && scene.scenePostcards.length > 0 && scene.scenePostcards[0] != undefined) {
+                        
                         postcardIndex = getRandomInt(0, scene.scenePostcards.length - 1);
                         var oo_id = ObjectID(scene.scenePostcards[postcardIndex]); //TODO randomize? or ensure latest?  or use assigned default?
                         db.image_items.findOne({"_id": oo_id}, function (err, picture_item) {

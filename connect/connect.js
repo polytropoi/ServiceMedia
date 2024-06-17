@@ -1728,7 +1728,9 @@ if (sceneEl != null) {
                }
             }
          } else {
+            if (!AFRAME.utils.device.isMobile()) {
             InitIDB();
+            }
          }
           
       }, 
@@ -1737,7 +1739,7 @@ if (sceneEl != null) {
       },
       waitAndInitLocalDB: function () {
          setTimeout( function() {
-            if (settings && settings.allowMods) {
+            if (settings && settings.allowMods && !AFRAME.utils.device.isMobile()) {
                InitIDB();
             }
          }, 3000);
