@@ -1123,8 +1123,8 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
 
         this.el.classList.remove("waypoint");
         this.el.removeAttribute("transform_controls");
-        this.el.removeAttribute("geometry");
-        this.el.removeAttribute("gltf-model");
+        // this.el.removeAttribute("geometry");
+        // this.el.removeAttribute("gltf-model");
 
         this.el.removeAttribute("mod_object");
         this.el.removeAttribute("mod_particles");

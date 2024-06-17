@@ -1365,7 +1365,8 @@ AFRAME.registerComponent('window-replace', {
 AFRAME.registerComponent('collision-listener-right', {
   init: function() {
   this.el.addEventListener('collidestart', function(e) {
-  document.querySelector('#right-hand').components.haptics.pulse(1, 150)
+    if (document.querySelector('#right-hand').components.haptics)
+      document.querySelector('#right-hand').components.haptics.pulse(1, 150)
   
   })
   }
@@ -1373,7 +1374,8 @@ AFRAME.registerComponent('collision-listener-right', {
   AFRAME.registerComponent('collision-listener-left', {
   init: function() {
   this.el.addEventListener('collidestart', function(e) {
-  document.querySelector('#left-hand').components.haptics.pulse(1, 150)
+    if (document.querySelector('#left-hand').components.haptics)
+      document.querySelector('#left-hand').components.haptics.pulse(1, 150)
   })
   }
   });

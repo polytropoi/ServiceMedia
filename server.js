@@ -14255,8 +14255,17 @@ app.get('/available_domain_scenes/:domain/:user_id/:platform_id',  requiredAuthe
         }
     );
 });
+const shuffleArray = ([...arr]) => {
+    let m = arr.length;
+    while (m) {
+      const i = Math.floor(Math.random() * m--);
+      [arr[m], arr[i]] = [arr[i], arr[m]];
+    }
+    return arr;
+  };
+  
 
-
+  const sampleScenes = ([...arr], n = 1) => shuffleArray(arr).slice(0, n);
 
 app.get('/publicscenes', function (req, res) { //deprecated, see available scenes above...
     console.log("host is " + req.get('host'));
@@ -14267,18 +14276,39 @@ app.get('/publicscenes', function (req, res) { //deprecated, see available scene
     availableScenesResponse.availableScenes = availableScenes;
 
     // query = {$and: [{ "sceneDomain": req.params.domain}, {sceneShareWithPublic: true }, { [platformString]: true}]};
-    db.scenes.find({$and: [{sceneShareWithPublic: true}, {sceneStickyness: {$lt: 4}}]}, function (err, scenes) {
+    //limit?
+    db.scenes.find({$and: [{sceneShareWithPublic: true}, {sceneStickyness: {$lt: 4}}]}).toArray( function (err, scenes) {
+    // db.scenes.aggregate({$and: [{sceneShareWithPublic: true}, {sceneStickyness: {$lt: 4}}, {$sample : {size : 15}}]}, function (err, scenes) {
         if (err || !scenes) {
             console.log("cain't get no publicscenes... " + err);
 
         } else {
-            console.log("gots " + scenes.length + "publicscenes...");
-            
-            async.each(scenes,
+
+            // let scenesPicked = [];
+            let count = 0;
+            // console.log("gots " + scenes.length + "publicscenes...");
+            // for (let i = 0; i < scenes.length; i++) {
+            //    let randScene = Math.floor(Math.random() * scenes.length);
+            //    if (scenesPicked.indexOf(randScene) == -1) {
+            //     scenesPicked.push(randScene);
+            //     count++;
+            //    } 
+            //    if (count > 15) {
+            //     break;
+            //    }
+            // }
+            // scenes = scenes.sort((a, b) => 0.5 - Math.random());
+            // let count = 0;
+            // let max = 15;
+            // scenes = sampleScenes(scenes, 15);
+            async.each(sampleScenes(scenes, 20),
                 // 2nd param is the function that each item is passed to
+
                 function (scene, callback) {
+
                     if (scene.scenePostcards != null && scene.scenePostcards.length > 0 && scene.scenePostcards[0] != undefined) {
-                        
+                        console.log("count is " + count);
+                        count++;
                         postcardIndex = getRandomInt(0, scene.scenePostcards.length - 1);
                         var oo_id = ObjectID(scene.scenePostcards[postcardIndex]); //TODO randomize? or ensure latest?  or use assigned default?
                         db.image_items.findOne({"_id": oo_id}, function (err, picture_item) {
@@ -14313,7 +14343,6 @@ app.get('/publicscenes', function (req, res) { //deprecated, see available scene
                                             sceneKey: scene.short_id,
                                             sceneDescription: scene.sceneDescription,
                                             sceneStatus: scene.sceneShareWithPublic ? "public" : "private",
-        //                                  sceneOwner: scene.userName,
                                             sceneOwner: tempOwnerName,
                                             scenePostcardHalf: urlHalf,
                                             scenePostcardQuarter: urlQuarter

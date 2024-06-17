@@ -198,7 +198,7 @@ $(function() {
       if (modelDataEl) {
          let modelData = modelDataEl.getAttribute('data-models');
          sceneModels = JSON.parse(atob(modelData)); //convert from base64
-         console.log("sceneModels " + JSON.stringify(sceneModels));
+         // console.log("sceneModels " + JSON.stringify(sceneModels));
          for (let i = 0; i < sceneModels.length; i++) {
             if (sceneModels[i].sourceText != undefined && sceneModels[i].sourceText != 'undefined' && sceneModels[i].sourceText != null && sceneModels[i].sourceText.length > 0) {
                attributions.push("Name: " + sceneModels[i].name + " - Type: " + sceneModels[i].item_type + " - Source: " + sceneModels[i].sourceText);
@@ -244,16 +244,16 @@ $(function() {
       console.log("Loading browser MATRIX sdk!!!");
       GetMatrixData();
    }
-   if (settings.clearLocalMods) { //??????
-      for (var i=0; i < localStorage.length; i++)  {
+   // if (settings.clearLocalMods) { //??????
+   //    for (var i=0; i < localStorage.length; i++)  {
       
-         let theKey = localStorage.key(i);
-         if (theKey.includes(room) && theKey.includes("localmarker")) {
-            localStorage.removeItem(theKey);
-            console.log("removed " + theKey);
-         }
-      }
-   }
+   //       let theKey = localStorage.key(i);
+   //       if (theKey.includes(room) && theKey.includes("localmarker")) {
+   //          localStorage.removeItem(theKey);
+   //          console.log("removed " + theKey);
+   //       }
+   //    }
+   // }
 
    if (settings.networking == 'SocketIO' && settings.socketHost) {
       if (settings.socketHost.length > 6) { //i.e. not "none" or empty
@@ -302,13 +302,14 @@ $(function() {
    }
   
    if (settings.allowMods) {
-      if ('storage' in navigator && 'estimate' in navigator.storage) {
-            navigator.storage.estimate().then(({usage, quota}) => {
-            currentLocalStorageUsed = usage;
-            currentAvailableLocalStorageEstimage = quota;
-            console.log(`Using ${usage} out of ${quota} bytes.`);
-         });
-      }
+      //do this in dialog.js if not mobile
+      // if ('storage' in navigator && 'estimate' in navigator.storage) {
+      //       navigator.storage.estimate().then(({usage, quota}) => {
+      //       currentLocalStorageUsed = usage;
+      //       currentAvailableLocalStorageEstimage = quota;
+      //       console.log(`Using ${usage} out of ${quota} bytes.`);
+      //    });
+      // }
 
    }
    if (settings.sceneScatterObjectLayers) {
