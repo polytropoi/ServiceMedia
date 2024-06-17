@@ -5001,14 +5001,20 @@ webxr_router.get('/:_id', function (req, res) {
                             defaultLights = "light=\x22defaultLightsEnabled: false;\x22";
                         }
                         /////////AFRAME SCENE DECLARATION////////////////// 
+                        // let aScene = "<a-scene "+sceneBackground+" "+physicsInsert+" "+pool_target+" "+pool_launcher+" gesture-detector " + aframeRenderSettings + 
+                        // " reflection=\x22directionalLight:#real-light\x22 "+sceneShadows+" ar-hit-test=\x22target:.activeObjectRay; type:footprint; footprintDepth:0.1;\x22 ar-cursor raycaster=\x22objects: .activeObjexRay a-sphere\x22 "+
+                        // "screen-controls shadow " + xrmode + " " + magicWindow + " " +  
+                        // webxrFeatures + " loading-screen=\x22dotsColor: white; backgroundColor: black; enabled: false\x22 " + fogSettings + " "+networkedscene+" "+ARSceneArg+" listen-for-vr-mode " + defaultLights +">";
+
                         let aScene = "<a-scene "+sceneBackground+" "+physicsInsert+" "+pool_target+" "+pool_launcher+" gesture-detector " + aframeRenderSettings + 
-                        " reflection=\x22directionalLight:#real-light\x22 "+sceneShadows+" ar-hit-test=\x22target:.activeObjectRay; type:footprint; footprintDepth:0.1;\x22 ar-cursor raycaster=\x22objects: .activeObjexRay a-sphere\x22 "+
-                        "screen-controls " + xrmode + " " + magicWindow +   
-                        // "screen-controls xr-mode-ui=\x22enterVREnabled: true; enterAREnabled: true; XRMode: ar,vr\x22 " + magicWindow +   
+                        " reflection=\x22directionalLight:#real-light\x22 "+sceneShadows+" raycaster=\x22objects: .activeObjexRay a-sphere\x22 "+
+                        "screen-controls shadow " + xrmode + " " + magicWindow + " " +  
+                        webxrFeatures + " loading-screen=\x22dotsColor: white; backgroundColor: black; enabled: false\x22 " + fogSettings + " "+networkedscene+" "+ARSceneArg+" listen-for-vr-mode " + defaultLights +">";
+
+                           // "screen-controls xr-mode-ui=\x22enterVREnabled: true; enterAREnabled: true; XRMode: ar,vr\x22 " + magicWindow +   
                         // " keyboard-shortcuts=\x22enterVR: false\x22" +  //add screen-controls from initializer                      
                         // webxrFeatures + " shadow=\x22type: pcfsoft\x22 loading-screen=\x22dotsColor: white; backgroundColor: black; enabled: false\x22 embedded " + fogSettings + " "+networkedscene+" "+ARSceneArg+" listen-for-vr-mode>";
-                        webxrFeatures + " shadow loading-screen=\x22dotsColor: white; backgroundColor: black; enabled: false\x22 " + fogSettings + " "+networkedscene+" "+ARSceneArg+" listen-for-vr-mode " + defaultLights +">";
-
+                        
                         let mainDiv = "<div id=\x22mainDiv\x22 style=\x22width:100%; height:100%\x22>";
 
                         if (sceneResponse.sceneWebType == 'Mapbox') { //no, non-aframe version above - maybe later?
