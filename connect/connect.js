@@ -156,23 +156,6 @@ $(function() {
 
    }
 
-   // if (settings && settings.sceneTimedEvents != undefined && settings.sceneTimedEvents != null) {
-   //    timeKeysData = settings.sceneTimedEvents;
-   //    console.log("timekeys Dqata2: " + JSON.stringify(timeKeysData));
-   //    // localStorage.setItem(room + '_timeKeys', JSON.stringify(timeKeysData));
-   //    // console.log('cloud timekeysdata' + JSON.stringify(timeKeysData));
-   //    timedEventsListenerMode = timeKeysData.listenTo;  
-   // } 
-   // if (timedEvents) {
-   //    timeKeysData = timedEvents;
-   // }
-   // else if (localStorage.getItem(room + "_timeKeys") != null) { //use local ve3rsion if saved
-   //    // timeKeysData = JSON.parse(localStorage.getItem(room + "_timeKeys"));
-   //    console.log('local timeKeysData' + JSON.stringify(timeKeysData));
-   //    timedEventsListenerMode = timeKeysData.listenTo;  
-   // }
-
-   // AddLocalMarkers();
    vidz = document.getElementsByTagName("video");
    if (vidz != null && vidz.length > 0) { //either video or audio, not both...?
       videoEl = vidz[0];
@@ -1000,55 +983,7 @@ function SaveModToLocal(locationKey) { //locationKey is now just timestamp of th
 
       }
    }
-   // let theEl = document.getElementById(locationKey.toString());
-   // if (theEl != null) {
-   //    console.log("found the EL: " + locationKey + " locItem name " + locItem.name);
-   //    let scale = (locItem.markerObjScale != undefined && locItem.markerObjScale != null && locItem.markerObjScale != "") ? locItem.markerObjScale : 1;
-   //    // theEl.setAttribute('position', {x: locItem.x, y: locItem.y, z: locItem.z});
-   //    // theEl.setAttribute('rotation', {x: locItem.eulerx, y: locItem.eulery, z: locItem.eulerz});
-   //    // theEl.setAttribute('scale', {x: scale, y: scale, z: scale});
-   //    let modModelComponent = theEl.components.mod_model;
-   //    let localMarkerComponent = theEl.components.local_marker;
-   //    let cloudMarkerComponent = theEl.components.cloud_marker;
-   //    if (modModelComponent) {
-   //       modModelComponent.data.modelID = locItem.modelID;
-   //       modModelComponent.data.eventData = locItem.eventData;
-   //       modModelComponent.data.tags = locItem.locationTags;
-   //       modModelComponent.loadModel(locItem.modelID); 
-   //       modModelComponent.data.name = locItem.name;
-         
-   //       // modModelComponent.updateMaterials();
-   //     } else if (cloudMarkerComponent) {
-   //       cloudMarkerComponent.data.modelID = locItem.modelID;
-   //       cloudMarkerComponent.data.name = locItem.name;
-   //       cloudMarkerComponent.data.markerType = locItem.markerType;
-   //       cloudMarkerComponent.data.xpos = locItem.xpos;
-   //       cloudMarkerComponent.data.ypos = locItem.ypos;
-   //       cloudMarkerComponent.data.zpos = locItem.zpos;
-   //       cloudMarkerComponent.data.xrot = locItem.xrot;
-   //       cloudMarkerComponent.data.yrot = locItem.yrot;
-   //       cloudMarkerComponent.data.zrot = locItem.zrot;
-   //       cloudMarkerComponent.data.scale = locItem.markerObjScale;
-   //       cloudMarkerComponent.loadModel(locItem.modelID); 
-   //       cloudMarkerComponent.updateMaterials();
-   //     } else if (localMarkerComponent) {
-   //       localMarkerComponent.data.modelID = locItem.modelID;
-   //       localMarkerComponent.data.name = locItem.name;
-   //       localMarkerComponent.data.markerType = locItem.markerType;
-   //       localMarkerComponent.data.xpos = locItem.xpos;
-   //       localMarkerComponent.data.ypos = locItem.ypos;
-   //       localMarkerComponent.data.zpos = locItem.zpos;
-   //       localMarkerComponent.data.xrot = locItem.xrot;
-   //       localMarkerComponent.data.yrot = locItem.yrot;
-   //       localMarkerComponent.data.zrot = locItem.zrot;
-   //       localMarkerComponent.data.scale = locItem.markerObjScale;
-   //       localMarkerComponent.loadModel(locItem.modelID); 
-   //       localMarkerComponent.updateMaterials();
-         
-   //     }
-   // } else {
-   //    console.log("DINT FIND THE EL " + locationKey);
-   // }
+   
    ShowHideDialogPanel();
    //if "L" key isdown?
    // SceneManglerModal('Locations');
@@ -1277,56 +1212,6 @@ function GoToPrevious() {
       }
    }
 }
-
-// function ReturnLocationTableOLD () { //now it's all in indexedDB
-//    // console.log("LOCATIONMODS: " + JSON.stringify(sceneLocations.locationMods));
-//    if (sceneLocations.locationMods != null && sceneLocations.locationMods.length > 0) {
-//       let tablerows = "";
-//       for (let i = 0; i < sceneLocations.locationMods.length; i++) {
-//          let markerString = "";
-//          if (sceneLocations.locationMods[i].isLocal != null && sceneLocations.locationMods[i].isLocal === true) {
-//             markerString = "<span style=\x22color: pink; font-weight: bold;\x22>"+sceneLocations.locationMods[i].markerType+"</span>";
-//          } else {
-//             markerString = "<span style=\x22color: lime; font-weight: bold;\x22>"+sceneLocations.locationMods[i].markerType+"</span>";
-//          }
-
-//          if (sceneLocations.locationMods[i].markerType != undefined && (sceneLocations.locationMods[i].markerType.includes("picture") || sceneLocations.locationMods[i].markerType == "poi" 
-//             || sceneLocations.locationMods[i].markerType == "placeholder" || sceneLocations.locationMods[i].markerType.toLowerCase().includes("trigger") 
-//             || sceneLocations.locationMods[i].markerType == "mailbox" || sceneLocations.locationMods[i].markerType == "portal" || sceneLocations.locationMods[i].markerType == "gate") ) {
-//             let namelabel = (sceneLocations.locationMods[i].name != 'undefined' && sceneLocations.locationMods[i].name != undefined && sceneLocations.locationMods[i].name != null) ? sceneLocations.locationMods[i].name : sceneLocations.locationMods[i].label; 
-//             tablerows = tablerows + "<tr class=\x22clickableRow\x22 onclick=\x22LocationRowClick('"+sceneLocations.locationMods[i].phID+"')\x22><td>"+namelabel+"</td>"+
-//             "<td>"+sceneLocations.locationMods[i].x+","+sceneLocations.locationMods[i].y+","+sceneLocations.locationMods[i].z+"</td><td>"+sceneLocations.locationMods[i].model+"</td><td>"+ markerString+"</td></tr>";
-//             // "<td>"+sceneLocations.locationMods[i].phID+"</td><td>"+localString + sceneLocations.locationMods[i].markerType+"</td></tr>";
-//             // "<td>"+sceneLocations.locationMods[i].phID+"</td><td>"+markerString+"</td></tr>";
-//          }
-//       }
-//       return "<table id=\x22locations\x22><th>label</th><th>position</th><th>Asset</th><th>type</th>"+tablerows+"</table>";
-//    } else {
-//       return null;
-//    }
-// }
-
-// function ReturnLocationTableOLD2 () { //just show em all now!
-
-//       let tablerows = "";
-//       for (let i = 0; i < localData.locations.length; i++) {
-//          let markerString = "";
-//          if (localData.locations[i].isLocal != null && localData.locations[i].isLocal === true) {
-//             markerString = "<span style=\x22color: pink; font-weight: bold;\x22>"+localData.locations[i].markerType+"</span>";
-//          } else {
-//             markerString = "<span style=\x22color: lime; font-weight: bold;\x22>"+localData.locations[i].markerType+"</span>";
-//          }
-
-//          // if (localData.locations[i].markerType != undefined && (localData.locations[i].markerType.includes("picture") || localData.locations[i].markerType == "poi" 
-//          //    || localData.locations[i].markerType == "placeholder" || localData.locations[i].markerType.toLowerCase().includes("trigger") 
-//          //    || localData.locations[i].markerType == "mailbox" || localData.locations[i].markerType == "portal" || localData.locations[i].markerType == "gate") ) {
-               
-//             let namelabel = (localData.locations[i].name != 'undefined' && localData.locations[i].name != undefined && localData.locations[i].name != null) ? localData.locations[i].name : localData.locations[i].label; 
-//             tablerows = tablerows + "<tr class=\x22clickableRow\x22 onclick=\x22LocationRowClick('"+localData.locations[i].timestamp+"')\x22><td>"+namelabel+"</td>"+
-//             "<td>"+localData.locations[i].x+","+localData.locations[i].y+","+localData.locations[i].z+"</td><td>"+localData.locations[i].model+"</td><td>"+ markerString+"</td></tr>";
-//       }
-//       return "<table id=\x22locations\x22><th>label</th><th>position</th><th>Asset</th><th>type</th>"+tablerows+"</table>";
-// }
 
 function ReturnLocationTable () { //just show em all now!
 
@@ -1945,17 +1830,7 @@ $(window).on("backstretch.before", function (e, instance, index) {
    // };
 });
 
-// $(window).on("backstretch.after", function (e, instance, index) { //never mind, seemed like a good idea...
-//    var number = Math.min(Math.max(parseInt(pics.length), 1), 20); //limit to 20 frames for speed calc 
-//      let newDuration = 1000 + (10000 - (number * 500));
-//      console.log("newDuration is " + newDuration);
-//    // console.log("played frame " + index + " of " + instance.images.length);
-//    currentIndex = index;
-//    if (index == instance.images.length - 1) {
-//      $.backstretch("destroy", true);
-//      $.backstretch(pics, {duration: newDuration, fade: 250});
-//    }
-//  });
+
 $(window).on("backstretch.after", function (e, instance, index) {
    if (playFrames) {
       console.log("played frame " + index + " of " + instance.images.length);

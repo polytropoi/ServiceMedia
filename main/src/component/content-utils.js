@@ -2151,6 +2151,7 @@ AFRAME.registerComponent('model-callout', {
     schema: {
       // eltype: {default: "avatar"} // no, make it hands/nohands
       // journeyLengthData: {default: 0}
+      lookAtElID: {default: ''}
       
     },
     // let journeyLengthT = 0;
