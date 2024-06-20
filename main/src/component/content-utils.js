@@ -1895,7 +1895,7 @@ AFRAME.registerComponent('model-callout', {
     }
   });
 
-  //reusable lerping function for position/rotation, by #id
+  //reusable lerping function for position/rotation, by #id, used eg for avatar movement
   AFRAME.registerComponent('mover', {
     schema: {
       eltype: {default: "avatar"} // no, make it hands/nohands
@@ -2168,6 +2168,7 @@ AFRAME.registerComponent('model-callout', {
       this.model;
       this.interval = null;
       this.intervals = [];
+      this.timeDelta = .01;
     },
     move: (function (id, pos, rot, duration) { //called directly from connect.js 
       // console.log("pos " + JSON.stringify(pos));
@@ -2197,6 +2198,8 @@ AFRAME.registerComponent('model-callout', {
       oPosition.x = currentPos.x;
       oPosition.y = currentPos.y;
       oPosition.z = currentPos.x;
+      
+
       if (duration == 0) { //Player Snap
         if (rot != null) {
           console.log("tryna snap to " + JSON.stringify(rot));
@@ -2226,6 +2229,7 @@ AFRAME.registerComponent('model-callout', {
           this.currentPos = currentPos;
           // lastLerpedPos = currentPos;
           element.setAttribute('wasd-controls-enabled', false);
+          let that = this;
           this.interval = setInterval(function() {
           iteration++
           if (iteration < (10 * duration)) { 
@@ -2237,12 +2241,17 @@ AFRAME.registerComponent('model-callout', {
               // lerpedPos.y = lerp(currentPos.y, pos.y, .1 - (.1 / (durationAll - iteration))).toFixed(2);
               // lerpedPos.z = lerp(currentPos.z, pos.z, .1 - (.1 / (durationAll - iteration))).toFixed(2);
               //               // var lerpedRot = {};
-                            // lerpedPos.x = lerp((currentPos.x / iteration) - currentPos.x, pos.x, .1);
-                            // lerpedPos.y = lerp((currentPos.y / iteration) - currentPos.y, pos.y, .1);
-                            // lerpedPos.z = lerp((currentPos.z / iteration) - currentPos.z, pos.z, .1);
-                            lerpedPos.x = lerp(currentPos.x, pos.x, (.02 * iteration)/durationAll);
-                          lerpedPos.y = lerp(currentPos.y, pos.y, (.02 * iteration)/durationAll);
-                            lerpedPos.z = lerp(currentPos.z, pos.z,  (.02 * iteration)/durationAll);
+              // lerpedPos.x = lerp((currentPos.x / iteration) - currentPos.x, pos.x, .1);
+              // lerpedPos.y = lerp((currentPos.y / iteration) - currentPos.y, pos.y, .1);
+              // lerpedPos.z = lerp((currentPos.z / iteration) - currentPos.z, pos.z, .1);
+
+              lerpedPos.x = lerp(currentPos.x, pos.x, (.02 * iteration)/durationAll);
+              lerpedPos.y = lerp(currentPos.y, pos.y, (.02 * iteration)/durationAll);
+              lerpedPos.z = lerp(currentPos.z, pos.z,  (.02 * iteration)/durationAll);
+              console.log(that.timeDelta);
+              // lerpedPos.x = lerp(currentPos.x, pos.x, (this.timeDelta * .01 * iteration)/durationAll);
+              // lerpedPos.y = lerp(currentPos.y, pos.y, (this.timeDelta * .01 * iteration)/durationAll);
+              // lerpedPos.z = lerp(currentPos.z, pos.z,  (this.timeDelta * .01 * iteration)/durationAll);
               element.setAttribute('rotation', rot);
               element.setAttribute('position', lerpedPos);
               //  console.log("tryna lerp to " + lerpedPos.x + " " + lerpedPos.y + " " + lerpedPos.z + " iteration " + (durationAll - iteration));
@@ -2254,7 +2263,11 @@ AFRAME.registerComponent('model-callout', {
           }, 100);
           this.intervals.push(this.interval);
         }
-        })
+        }),
+        tick: function (timeDelta) {
+          this.timeDelta = timeDelta / 1000;
+
+        }
   });
     
 

@@ -6,7 +6,7 @@ function getScenes() {
   	resultElement.innerHTML = '';
 	axios.get('publicscenes')
   .then(function (response) {
-    // console.log(JSON.stringify(response));
+    console.log(JSON.stringify(response));
 	resultElement.innerHTML = generateSuccessHTMLOutput(response);
   })
   .catch(function (error) {

@@ -345,7 +345,10 @@ function InitIDB() {
        scene.shortID = room + "~"; //with tilde = the local version
        scene.settings = localData.settings;
        scene.locations = localData.locations;
+       
        scene.localFiles = localData.localFiles;
+       
+       scene.timedEvents = localData.timedEvents;
       //  scene.localFiles = localData.localfiles;
        // scene.locations = JSON.parse(JSON.stringify(sceneLocations.locations));
        scene.lastUpdate = saveTimeStamp;

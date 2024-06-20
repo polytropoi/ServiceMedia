@@ -1342,9 +1342,10 @@ AFRAME.registerComponent('ambient_audio_control', { //ambient file will loop and
             // ambientPosition = this.el.object3D.position; //for spatialization, it's moving based on animation
             this.distance = this.el.object3D.position.distanceTo(this.cam.object3D.position);
             // console.log("ambientDistance: " + this.distance);
+        if (this.distance) {
            const rate = clampNumber(1 - (this.distance/100), .25, 1.25);
            ambientAudioHowl.rate(rate + .1);
-           
+        }
             ambientAudioHowl.pos(this.el.object3D.position.x, this.el.object3D.position.y, this.el.object3D.position.z);
             // console.log("rate: " + rate);
             // if (this.ambientChild != null) {

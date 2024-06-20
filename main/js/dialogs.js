@@ -549,7 +549,7 @@ window.addEventListener( 'keydown',  ( event ) => {
     console.log('type ' + e.target.value + " id " + e.target.id);
     for (let i = 0; i < timeKeysData.timekeys.length; i++) {
       if (e.target.id == "tk_tags_" + i) {
-          timeKeysData.timekeys[i].keylabel = e.target.value;
+          timeKeysData.timekeys[i].keytags = e.target.value;
           console.log(JSON.stringify(timeKeysData.timekeys[i]));
       }
     }
@@ -1257,7 +1257,7 @@ function AddTimekey() {
   newTimekey.keyduration = 5.0;
   newTimekey.keytype = "Beat Mid";
   newTimekey.keydata = "";
-  newTimekey.keylabel = "New Timed Event";
+  newTimekey.keytags = "New Timed Event";
   
   let tkTmp = [];
 
@@ -1435,7 +1435,7 @@ function ReturnTimeKeys() {
           // });
           // } 
           let theLabel = "";
-          if (theTimekey != null && theTimekey.keylabel != undefined && theTimekey.keylabel != null) {
+          if (theTimekey != null && theTimekey.keytags != undefined && theTimekey.keytags != null) {
             theLabel = theTimekey.label;
           }
           tableBody = tableBody +
@@ -1451,7 +1451,7 @@ function ReturnTimeKeys() {
           "</td>" +
           
           "<td><input type=\x22text\x22 class=\x22tk_data form-control\x22 id=\x22tk_data_" + i + "\x22 value=\x22" + theTimekey.keydata + "\x22></td>" +
-          "<td><input type=\x22text\x22 class=\x22tk_tags form-control\x22 id=\x22tk_tags_" + i + "\x22 value=\x22" + theTimekey.keylabel + "\x22></td>" +
+          "<td><input type=\x22text\x22 class=\x22tk_tags form-control\x22 id=\x22tk_tags_" + i + "\x22 value=\x22" + theTimekey.keytags + "\x22></td>" +
           // "<td><button class=\x22btn btn-xs btn-info\x22>Update</button><button class=\x22btn btn-xs btn-danger\x22>Remove</button></td>" +
           "<td><button class=\x22tk_rm btn btn-sm btn-danger\x22 id=\x22tk_rm_"+ i +"\x22>Remove</button></td>" +
           "</tr>";
