@@ -55,6 +55,7 @@ function generateSuccessHTMLOutput(response) {
             "<div class=\x22card-body\x22>"+
               "<p class=\x22card-text\x22><strong>"+shuffledArray[i].sceneTitle+"</strong></p>"+
               "<p class=\x22card-text\x22>"+shuffledArray[i].sceneDescription+"</p>"+
+              "<p class=\x22card-text\x22><a href=\x22http://"+shuffledArray[i].sceneDomain+"\x22>"+shuffledArray[i].sceneDomain+"</a></p>"+
               "<div class=\x22d-flex justify-content-between align-items-center\x22>"+
                 "<div class=\x22btn-group\x22>"+
                   "<a href=\x22https://smxr.net/landing/" +  shuffledArray[i].sceneKey + "\x22 target=\x22_blank\x22 type=\x22button\x22 class=\x22btn btn-sm btn-outline-secondary\x22>Landing</a>"+

@@ -2229,8 +2229,8 @@ AFRAME.registerComponent('model-callout', {
           this.currentPos = currentPos;
           // lastLerpedPos = currentPos;
           element.setAttribute('wasd-controls-enabled', false);
-          let that = this;
-          this.interval = setInterval(function() {
+          // let that = this;
+          this.interval = setInterval(() => {
           iteration++
           if (iteration < (10 * duration)) { 
               // currentPos = element.getAttribute('position');
@@ -2248,11 +2248,11 @@ AFRAME.registerComponent('model-callout', {
               lerpedPos.x = lerp(currentPos.x, pos.x, (.02 * iteration)/durationAll);
               lerpedPos.y = lerp(currentPos.y, pos.y, (.02 * iteration)/durationAll);
               lerpedPos.z = lerp(currentPos.z, pos.z,  (.02 * iteration)/durationAll);
-              console.log(that.timeDelta);
+              console.log(this.timeDelta);
               // lerpedPos.x = lerp(currentPos.x, pos.x, (this.timeDelta * .01 * iteration)/durationAll);
               // lerpedPos.y = lerp(currentPos.y, pos.y, (this.timeDelta * .01 * iteration)/durationAll);
               // lerpedPos.z = lerp(currentPos.z, pos.z,  (this.timeDelta * .01 * iteration)/durationAll);
-              element.setAttribute('rotation', rot);
+              // element.setAttribute('rotation', rot);
               element.setAttribute('position', lerpedPos);
               //  console.log("tryna lerp to " + lerpedPos.x + " " + lerpedPos.y + " " + lerpedPos.z + " iteration " + (durationAll - iteration));
               // lastLerpedPos = lerpedPos;
