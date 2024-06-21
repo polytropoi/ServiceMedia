@@ -2169,6 +2169,7 @@ AFRAME.registerComponent('model-callout', {
       this.interval = null;
       this.intervals = [];
       this.timeDelta = .01;
+      this.isLerping = false;
     },
     move: (function (id, pos, rot, duration) { //called directly from connect.js 
       // console.log("pos " + JSON.stringify(pos));
@@ -2187,6 +2188,7 @@ AFRAME.registerComponent('model-callout', {
       var targetRot = new THREE.Vector3();
       var currentPos = element.getAttribute('position');
       var currentRot = element.getAttribute('rotation');
+
 
       var lastLerpedPos = {};
       // element.setAttribute('rotation', rot); //fuckit!
@@ -2214,58 +2216,48 @@ AFRAME.registerComponent('model-callout', {
             duration = 1;
           }
 
-          // for (let d = 0; d < durationAll; d++) {
-          //   var lerpedPos = {};
-          //   // var lerpedRot = {};
-          //   // lerpedPos.x = lerp(currentPos.x, pos.x, .1 - (.1 / (durationAll - iteration))).toFixed(2);
-          //   // lerpedPos.y = lerp(currentPos.y, pos.y, .1 - (.1 / (durationAll - iteration))).toFixed(2);
-          //   // lerpedPos.z = lerp(currentPos.z, pos.z, .1 - (.1 / (durationAll - iteration))).toFixed(2);
-          //   //               // var lerpedRot = {};
-          //                 lerpedPos.x = lerp(currentPos.x, pos.x, .1).toFixed(2);
-          //                 lerpedPos.y = lerp(currentPos.y, pos.y, .1).toFixed(2);
-          //                 lerpedPos.z = lerp(currentPos.z, pos.z, .1).toFixed(2);
-          // }
-          var durationAll = duration * 10;
+          let durationAll = duration * 10;
           this.currentPos = currentPos;
           // lastLerpedPos = currentPos;
           element.setAttribute('wasd-controls-enabled', false);
           // let that = this;
           this.interval = setInterval(() => {
+          this.isLerping = true;
           iteration++
-          if (iteration < (10 * duration)) { 
-              // currentPos = element.getAttribute('position');
-              // currentRot =  element.getAttribute('position');
+          if (iteration < durationAll) { 
               var lerpedPos = {};
-              // var lerpedRot = {};
-              // lerpedPos.x = lerp(currentPos.x, pos.x, .1 - (.1 / (durationAll - iteration))).toFixed(2);
-              // lerpedPos.y = lerp(currentPos.y, pos.y, .1 - (.1 / (durationAll - iteration))).toFixed(2);
-              // lerpedPos.z = lerp(currentPos.z, pos.z, .1 - (.1 / (durationAll - iteration))).toFixed(2);
-              //               // var lerpedRot = {};
-              // lerpedPos.x = lerp((currentPos.x / iteration) - currentPos.x, pos.x, .1);
-              // lerpedPos.y = lerp((currentPos.y / iteration) - currentPos.y, pos.y, .1);
-              // lerpedPos.z = lerp((currentPos.z / iteration) - currentPos.z, pos.z, .1);
-
-              lerpedPos.x = lerp(currentPos.x, pos.x, (.02 * iteration)/durationAll);
-              lerpedPos.y = lerp(currentPos.y, pos.y, (.02 * iteration)/durationAll);
-              lerpedPos.z = lerp(currentPos.z, pos.z,  (.02 * iteration)/durationAll);
-              console.log(this.timeDelta);
-              // lerpedPos.x = lerp(currentPos.x, pos.x, (this.timeDelta * .01 * iteration)/durationAll);
-              // lerpedPos.y = lerp(currentPos.y, pos.y, (this.timeDelta * .01 * iteration)/durationAll);
-              // lerpedPos.z = lerp(currentPos.z, pos.z,  (this.timeDelta * .01 * iteration)/durationAll);
-              // element.setAttribute('rotation', rot);
+              lerpedPos.x = lerp(currentPos.x, pos.x, (this.timeDelta * iteration)/durationAll);
+              lerpedPos.y = lerp(currentPos.y, pos.y, (this.timeDelta * iteration)/durationAll);
+              lerpedPos.z = lerp(currentPos.z, pos.z,  (this.timeDelta * iteration)/durationAll);
               element.setAttribute('position', lerpedPos);
-              //  console.log("tryna lerp to " + lerpedPos.x + " " + lerpedPos.y + " " + lerpedPos.z + " iteration " + (durationAll - iteration));
-              // lastLerpedPos = lerpedPos;
-
+          
           } else {
               clearInterval(this.interval);
+              this.isLerping = false;
           }
           }, 100);
           this.intervals.push(this.interval);
         }
         }),
-        tick: function (timeDelta) {
-          this.timeDelta = timeDelta / 1000;
+        lookAt : function (duration, targetElID) { //no slerp yet!?
+          if (!duration) {
+            duration = 1;
+          } else {
+            duration = duration * 1000;
+          }
+          element.setAttribute('look-controls', {enabled: false});
+          element.setAttribute("look-at", "targetElID");
+          setTimeout(function () {
+            element.setAttribute('look-controls', {enabled: true});
+            element.removeAttribute("look-at");
+          }, duration);
+        
+        },
+        tick: function (time, timeDelta) {
+          if (this.isLerping) {
+            this.timeDelta = timeDelta / 1000;
+          }
+         
 
         }
   });
