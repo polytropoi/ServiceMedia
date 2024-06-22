@@ -5238,11 +5238,11 @@ AFRAME.registerComponent('scene_greeting_dialog', {  //if "greeting" scenetag + 
     setTimeout(() => {
       if (this.behavior == 'hide' && this.el.parentNode) {
 
-        this.el.parentNode.removeChild(this.el);
+        // this.el.parentNode.removeChild(this.el);
         // 
-        // this.greetingEl.setAttribute("troika-text", {
-        //   value: ""
-        // });
+        this.greetingEl.setAttribute("troika-text", {
+          value: ""
+        });
 
       }
       

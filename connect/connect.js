@@ -2802,148 +2802,6 @@ function SetPrimaryAudioEventsData () {
 
 }
 
-// function SetVideoEventsData (eventsData) { 
-//    console.log("SetVideoEventsData()");
-//    if (eventsData != undefined) {
-//       timekeys = []; //either audio or video, not both
-//       timeKeysData = eventsData;
-
-//       timeKeysData.forEach(function (timekey) {
-//          console.log("timekey " + timekey.keystarttime);
-//          timekeys.push(parseFloat(timekey.keystarttime).toFixed(2));
-//    });
-//    timekeys.sort(function(a, b){
-//          return a - b;
-//       });
-//    console.log("timekeys: " + timekeys);
-//    if (timekeys.length > 0) {
-//       TimedEventsListener();
-//       }
-//    }
-//   // console.log(primaryAudioHowl.seek() + " tryna SetPrimaryAudioEventsData" + json);
-// }
-
-// function TimedEventsListenerOld () {
-//    console.log("TimedEventsListener for timekeys: " + JSON.stringify(timeKeysData));
-//    let primaryAudioTime = 0;
-//    let timeKeysIndex = 0;
-//    let timekey = 0;
-//    let vidz = document.getElementsByTagName("video");
-//    let primaryAudioEl = document.querySelector('#primaryAudio');
-//    let hasPrimaryAudio = false;
-//    let videoEl = null;
-
-//    // console.log("MODAL STATS " + modalStats);
-//    // let vidz = document.getElementsByTagName("video");
-//    if (vidz != null && vidz.length > 0) { //either video or audio, not both...?
-//      videoEl = vidz[0];
-//      console.log("videoEl " + videoEl.id);
-//    }
-//    if (primaryAudioEl != null) {
-//      hasPrimaryAudio = true;
-//    }
-//    // if (vidz != null && vidz.length > 0) { //either video or audio, not both...?
-//    //   videoEl = vidz[0];
-//    // }
-   
-//    let interval = setInterval(function () {
-//       timekey = parseFloat(tkStarttimes[timeKeysIndex]);
-//       // console.log(timekey);
-//    if (timekey != NaN) {
-//       // console.log(timekey);
-//       if (hasPrimaryAudio) {
-//          if (primaryAudioHowl != null && primaryAudioHowl != undefined && primaryAudioHowl.playing()) {
-//          primaryAudioTime = primaryAudioHowl.seek();
-//          // primaryAudioTime = primaryAudioTime.toFixed(2);
-//          // timekey = parseFloat(timekeys[timeKeysIndex]);
-//          // console.log("currentAUDIOTIme " + primaryAudioTime + " vs timekey " + timekey);
-//             if (primaryAudioTime <= timekey) {
-//                   // console.log(primaryAudioTime + "less than " + timekeys[timeKeysIndex]);
-//                   //just waiting...
-//                } else {
-//                      if (timeKeysIndex < tkStarttimes.length) {
-//                         PlayTimedEvent(timeKeysData.timekeys[timeKeysIndex]);
-//                         timeKeysIndex++;
-//                      } else {
-//                         console.log("end");
-//                         clearInterval(interval);
-//                      }
-//                }
-
-//             }
-//       } else if (videoEl != null && !videoEl.paused && timekey > 0){
-         
-//       } else {
-         
-//       }
-//    }
-//    }, 50);
-// }
-
-// function PlayAudioEvent(timeKey) {
-//    console.log("event: " + JSON.stringify(timeKey));  
-//    // // let timekey = JSON.parse(timeKey);
-//    // console.log("event: " + timeKey.keytype);
-//    var player = document.getElementById("player");
-//    player.setAttribute("player_mover", "init");
-//    let duration = 1;
-//    let posObj = {};
-//    let rotObj = {};
-//       if (timeKey.keytype.includes('beat')) {
-         
-
-//       } 
-//       if (timeKey.keytype == "Player Snap") {
-//          // console.log("sceneLocations length is " + sceneLocations.locations.length);
-//       // if (sceneLocations.locations.ength > 0) {
-//          for (let s = 0; s < sceneLocations.locations.length; s++) {
-//             // posObj = {};
-//             // rotObj = {};
-
-//             // console.log(timeKey.keydata.toString() + " vs " + sceneLocations.locations[s].label.toString());
-//             if (sceneLocations.locations[s].label != undefined && timeKey.keydata.toString() == sceneLocations.locations[s].label.toString() && sceneLocations.locations[s].markerType == "poi") {
-//                posObj.x = sceneLocations.locations[s].x;
-//                posObj.y = sceneLocations.locations[s].y;
-//                posObj.z = sceneLocations.locations[s].z;
-//                rotObj.x = sceneLocations.locations[s].eulerx != null ? sceneLocations.locations[s].eulerx : 0;
-//                rotObj.y = sceneLocations.locations[s].eulery != null ? sceneLocations.locations[s].eulery : 0;
-//                rotObj.z = sceneLocations.locations[s].eulerz != null ? sceneLocations.locations[s].eulerz : 0;
-//                console.log(JSON.stringify(timeKey) + " tryna fire event Player Snap to " + JSON.stringify(sceneLocations.locations[s]));
-//                player.components.player_mover.move('player', posObj, rotObj, 0); //
-//                // document.getElementById("player").setAttribute("position", sceneLocations.locations[s].x + " " + sceneLocations.locations[s].y + " " + sceneLocations.locations[s].z);
-//                // document.getElementById("player").setAttribute("rotation", sceneLocations.locations[s].eulerx + " " + sceneLocations.locations[s].eulery + " " + sceneLocations.locations[s].eulerz);
-//             } else {
-//                // console.log("label not found");
-//             }
-//          }
-//       } 
-//       if (timeKey.keytype == "Player Lerp") {
-//          console.log("sceneLocations length is " + sceneLocations.locations.length);
-//       // if (sceneLocations.locations.ength > 0) {
-//          // console.log("event: " + JSON.stringify(timeKey));
-//          for (let s = 0; s < sceneLocations.locations.length; s++) {
-//             // console.log(timeKey.keydata + " vs " + JSON.stringify(sceneLocations.locations[s]));
-//             if (sceneLocations.locations[s].label != undefined && timeKey.keydata.toString() == sceneLocations.locations[s].label.toString() && sceneLocations.locations[s].markerType == "poi") {
-//                // posObj = {};
-//                // rotObj = {};
-//                posObj.x = sceneLocations.locations[s].x;
-//                posObj.y = sceneLocations.locations[s].y;
-//                posObj.z = sceneLocations.locations[s].z;
-//                rotObj.x = sceneLocations.locations[s].eulerx != null ? sceneLocations.locations[s].eulerx : 0;
-//                rotObj.y = sceneLocations.locations[s].eulery != null ? sceneLocations.locations[s].eulery : 0;
-//                rotObj.z = sceneLocations.locations[s].eulerz != null ? sceneLocations.locations[s].eulerz : 0;
-//                // document.getElementById("player").setAttribute("position", sceneLocations.locations[s].x + " " + sceneLocations.locations[s].y + " " + sceneLocations.locations[s].z);         
-//                duration = timeKey.keyduration;
-//                // console.log(JSON.stringify(timeKey) + " vs " + videoEl.currentTime + " tryna fire event Player lerp to " + JSON.stringify(posObj));
-//                player.components.player_mover.move('player', posObj, rotObj, duration);
-//             } else {
-//                // console.log("label not found");
-//             }
-//          }
-//       } 
-// }
-
-
 function SetVideoEventsData (type) { 
    console.log("tryna SetVideoEventsData");
    tkStarttimes = []; //either audio or video, not both
@@ -3280,7 +3138,36 @@ function PlayTimedEvent(timeKey) {
          }
       }
    }
-   if (timeKey.keytype.toLowerCase().includes("text")) {
+   if (timeKey.keytype.toLowerCase().includes("text show")) {
+      console.log("tryna text show ");
+      let greetingDialogEl = document.getElementById("sceneGreetingDialog");
+      if (greetingDialogEl) {
+         let dialogComponent = greetingDialogEl.components.scene_greeting_dialog;
+         if (dialogComponent) {
+            console.log("tryna modGreeting " + timeKey.keydata);
+            dialogComponent.setLocation();
+            dialogComponent.modQuest(timeKey.keydata);
+         } else {
+            console.log("caint find no dangblurn dialog component!");
+         }
+      } else {
+         console.log("sceneGreetingDialog element missing!");
+      }
+   }
+   if (timeKey.keytype.toLowerCase().includes("text index")) {
+      let greetingDialogEl = document.getElementById("sceneGreetingDialog");
+      if (greetingDialogEl) {
+         let dialogComponent = greetingDialogEl.components.scene_greeting_dialog;
+         if (dialogComponent) {
+            console.log("tryna modGreeting " + timeKey.keydata);
+            dialogComponent.setLocation();
+            dialogComponent.modQuest(timeKey.keydata);
+         } else {
+            console.log("caint find no dangblurn dialog component!");
+         }
+      }
+   }
+   if (timeKey.keytype.toLowerCase().includes("text next")) {
       let greetingDialogEl = document.getElementById("sceneGreetingDialog");
       if (greetingDialogEl) {
          let dialogComponent = greetingDialogEl.components.scene_greeting_dialog;

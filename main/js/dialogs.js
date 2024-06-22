@@ -1179,11 +1179,16 @@ function ReturnTimedEventSelectors (selectedType) {
         "Picture Next",
         "Picture Random",
         "Picture Index",
+        "Text Next",
+        "Text Show",
+        "Text Index",
         "Clear Loops",
         "Player Snap",
         "Player Lerp",
+        "Player Look",
         "Target Snap",
         "Target Lerp",
+        "Target Look",
         "Color Lerp",
         "Color Tweak"];
     for (let i = 0; i < typesArray.length; i++) {

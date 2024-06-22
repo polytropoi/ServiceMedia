@@ -2989,14 +2989,19 @@
                     "<option>Color Tweak</option>" +
                     "<option>Player Snap</option>" +
                     "<option>Player Lerp</option>" +
+                    "<option>Player Look</option>" +
                     "<option>Target Snap</option>" +
                     "<option>Target Lerp</option>" +
+                    "<option>Target Look</option>" +    
                     "<option>Play Anim</option>" +
                     "<option>Pause</option>" +
                     "<option>Delay</option>" +
                     "<option>Picture Next</option>" +
                     "<option>Picture Index</option>" +
-                    "<option>text</option>" +
+                    "<option>Text Show</option>" +
+                    "<option>Text Index</option>" +
+                    "<option>Text Next</option>" +
+
                     // "<option>picture</option>" +
                     "<option>Spawn Particles</option>" +
                     "<option>Spawn Object</option>" +
