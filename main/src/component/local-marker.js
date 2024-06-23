@@ -835,23 +835,21 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
           if (this.picData) {
             const obj = this.el.getObject3D('mesh');
               
-              var texture = new THREE.TextureLoader().load(this.picData.url);
-              texture.encoding = THREE.sRGBEncoding; 
-              // UVs use the convention that (0, 0) corresponds to the upper left corner of a texture.
-              texture.flipY = false; 
-              // immediately use the texture for material creation
-              var material = new THREE.MeshStandardMaterial( { map: texture, envMapIntensity: .1} );  
-              // Go over the submeshes and modify materials we want.
-              obj.traverse(node => {
-                node.material = material;
-                if (!this.data.tags.includes("fixed")) {
-                  this.el.setAttribute("look-at", "#player");
-                }
-              });
-            }
+            var texture = new THREE.TextureLoader().load(this.picData.url);
+            texture.encoding = THREE.sRGBEncoding; 
+            // UVs use the convention that (0, 0) corresponds to the upper left corner of a texture.
+            texture.flipY = false; 
+            // immediately use the texture for material creation
+            var material = new THREE.MeshStandardMaterial( { map: texture, envMapIntensity: .1, transparent: this.picData.hasAlphaChannel} );  
+            // Go over the submeshes and modify materials we want.
+            obj.traverse(node => {
+              node.material = material;
+              if (!this.data.tags.includes("fixed")) {
+                this.el.setAttribute("look-at", "#player");
+              }
+            });
           }
-      // }
-
+        }
     },
     loadMedia: function (mediaID) {
       if (!mediaID) {

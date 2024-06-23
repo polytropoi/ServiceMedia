@@ -1260,9 +1260,9 @@ function AddTimekey() {
   let newTimekey = {};
   newTimekey.keystarttime = currentTime;
   newTimekey.keyduration = 5.0;
-  newTimekey.keytype = "Beat Mid";
+  newTimekey.keytype = "Beat";
   newTimekey.keydata = "";
-  newTimekey.keytags = "New Timed Event";
+  newTimekey.keytags = "";
   
   let tkTmp = [];
 
@@ -1280,9 +1280,10 @@ function AddTimekey() {
    tkObject.timekeys = tkTmp;
     console.log("timekeys: " + JSON.stringify(timeKeysData));
    // localStorage.setItem(room + "_timeKeys", JSON.stringify(vids[0].timekeys)); 
-  //  timedEventsListenerMode = "Primary Video"
-  //  localStorage.setItem(room + "_timeKeys", JSON.stringify(tkObject)); 
-  localData.timedEvents = tkObject;
+    //  timedEventsListenerMode = "Primary Video"
+    //  localStorage.setItem(room + "_timeKeys", JSON.stringify(tkObject)); 
+    localData.timedEvents = tkObject;
+    console.log("localdata.timedevents " + JSON.stringify(localData.timedEvents));
    SetPrimaryAudioEventsData();
    SceneManglerModal('Events');
   //  ShowHideDialogPanel();
@@ -1302,7 +1303,6 @@ function ShowTimekeysModal() {    //nerp, now in scenemanglermodal
 
   if (tkStarttimes != null)  {
      
-
       let content = "<span id='modalCloser' onclick=\x22ShowHideDialogPanel()\x22 class='close-modal'>&times;</span><div><h3>Timed Events</h3><hr>" + //populate modal
 
       "<div class=\x22row\x22>"+

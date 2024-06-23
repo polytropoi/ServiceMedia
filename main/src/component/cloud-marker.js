@@ -942,7 +942,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
               // UVs use the convention that (0, 0) corresponds to the upper left corner of a texture.
               texture.flipY = false; 
               // immediately use the texture for material creation
-              var material = new THREE.MeshStandardMaterial( { map: texture, envMapIntensity: .1 } ); 
+              var material = new THREE.MeshStandardMaterial( { map: texture, envMapIntensity: .1, transparent: this.picData.hasAlphaChannel} );  
               // Go over the submeshes and modify materials we want.
               obj.traverse(node => {
                 node.material = material;

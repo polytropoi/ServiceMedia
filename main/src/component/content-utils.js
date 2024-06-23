@@ -5243,6 +5243,9 @@ AFRAME.registerComponent('scene_greeting_dialog', {  //if "greeting" scenetag + 
         this.greetingEl.setAttribute("troika-text", {
           value: ""
         });
+        this.questEl.setAttribute("troika-text", {
+          value: ""
+        });
 
       }
       
@@ -5262,8 +5265,8 @@ AFRAME.registerComponent('scene_greeting_dialog', {  //if "greeting" scenetag + 
     if (this.questEl) {
 
       this.questEl.setAttribute("troika-text", {
-        fontSize: .2,
-        maxWidth: 5,
+        fontSize: .4,
+        maxWidth: 8,
         align: "center",
         font: "/fonts/web/" + this.font2,
         strokeWidth: '1%',
