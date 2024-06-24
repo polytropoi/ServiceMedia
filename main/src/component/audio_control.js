@@ -1542,6 +1542,7 @@ AFRAME.registerComponent('trigger_audio_control', { //trigger audio on designate
         this.id = 0;
         this.triggerSprite = "";
 
+        this.instanceID = -1;
         this.isReady = false;
         setTimeout(() => {
             this.isReady = true; //wait a while until initial collisions are over...    
@@ -1564,7 +1565,10 @@ AFRAME.registerComponent('trigger_audio_control', { //trigger audio on designate
         console.log("tryna mod trigger Volume to " + this.normalizedVolume);
         triggerAudioHowl.volume(this.normalizedVolume);
     },
-
+    stopTriggerAudio: function() { //from slider in canvasOverlay
+        console.log("tryna stop trigger audio!");
+        this.id = triggerAudioHowl.stop();
+    },
 
     playAudio: function() {
         this.audioGroupsEl = document.getElementById('audioGroupsEl');
@@ -1652,6 +1656,78 @@ AFRAME.registerComponent('trigger_audio_control', { //trigger audio on designate
                 }
             }
         }
+    },
+    playInstanceAudioAtPosition: function(instanceID, pos, distance, tag, volmod) {
+        // (!triggerAudioHowl.playing() && (instanceID != this.instanceID)) &&
+
+        if (triggerAudioHowl != null && (instanceID != this.instanceID) && tag != undefined && tag != null && tag != undefined && tag != 'undefined' && tag != "" && pos != null) {
+            // this.modVolume(1);
+
+            console.log("tryna play instance trigger audio " + instanceID + " with this.id " + this.id);
+            this.instanceID = instanceID;
+            this.audioGroupsEl = document.getElementById('audioGroupsEl');
+            let audioID = null;
+            let audioIDs = [];
+
+            if (this.audioGroupsEl && this.isReady) { //if only a single trigger sound, it's hardwired to the triggerAudioHowl on server response
+            this.audioGroupsController = this.audioGroupsEl.components.audio_groups_control;
+            if (tag != null) {
+                let tags = tag.toString().split(',');
+                for (let i = 0; i < tags.length; i++) {
+                    // console.log("looking fo rtag " + tag[i]);
+                    audioID = this.audioGroupsController.returnTriggerAudioIDWithTag(tags[i]);
+                    // } else {
+                    //     // audioID = this.audioGroupsController.returnRandomTriggerAudioID(); 
+                    // }
+                    //TODO - follow index sequence, use tags?
+                    console.log("tag "+ tags[i] + " tryna get audioID " + audioID);
+                    this.audioItem = this.audioGroupsController.returnAudioItem(audioID);
+
+                    if (this.audioItem != null) {
+                        console.log("gotsa audioItem with tag "+tags[i]+ ", tryna set trigger to src " + this.audioItem.URLogg);
+                        // this.id = triggerAudioHowl.stop();
+                        triggerAudioHowl = null;
+                        triggerAudioHowl = new Howl({
+                            src: [this.audioItem.URLogg, this.audioItem.URLmp3],
+                            format: ["ogg", "mp3"]
+                        });
+                        // triggerAudioHowl.format = ["ogg", "mp3"];
+                        // triggerAudioHowl.src = [audioItem.URLogg, audioItem.URLmp3];
+
+                        triggerAudioHowl.load();
+                        // triggerAudioHowl.play();
+
+                        //umm, maybe split the diff with this.data.volume (scene setting) and the distance driven volume below?
+                        let volume = Math.min(Math.max(0, 1000 - (distance * 25)), 1000) * .001; //clamp between 0-1
+                        // let volume = clamp(100 - distance) * .01; //hrm..
+                        if (volume < .1) {
+                            volume = .1;
+                        }
+                        if (this.data.volmod != null) {
+                            volume = volume * this.data.volmod;
+                        }
+                        triggerAudioHowl.volume(volume);
+                        
+                            
+                        const clamp = (num, a, b) => Math.max(Math.min(num, Math.max(a, b)), Math.min(a, b));
+                        const rate = clamp(Math.random() + .25, .75, 1.25); //fudge pitch a bit slower or faster
+                        triggerAudioHowl.rate(rate);
+                        // console.log("tryna play at hitpoint " + pos);
+                        // if (this.id == 0) {
+                            this.id = triggerAudioHowl.play();
+                        // } else {
+                        //     triggerAudioHowl.play();
+                        // }
+                        
+                        // console.log("tryna play trigger at volume " + volume + " distance " + distance + " id " + this.id); //calling id here is needed
+                        triggerAudioHowl.pos(pos.x / 100, pos.y / 100, pos.z / 100, this.id);  //HOLY SHIT howler needs small values for position, * .01
+                        break;
+                        }
+                    }
+                }
+            }
+        }
+
     },
     playSingleAtPosition: function(pos, distance, tag, volmod) {
         

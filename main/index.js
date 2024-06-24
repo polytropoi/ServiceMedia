@@ -3001,6 +3001,7 @@
                     "<option>Text Show</option>" +
                     "<option>Text Index</option>" +
                     "<option>Text Next</option>" +
+                    "<option>Stop Trigger Audio</option>" +
 
                     // "<option>picture</option>" +
                     "<option>Spawn Particles</option>" +

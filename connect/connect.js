@@ -2787,7 +2787,7 @@ function SetPrimaryAudioEventsData () {
 
    // timeKeysData = JSON.parse(localStorage.getItem(room+ "_timeKeys"));
    timekeysData = settings.sceneTimedEvents;
-   console.log("setting primary audio events data! " + JSON.stringify(timeKeysData));
+   // console.log("setting primary audio events data! " + JSON.stringify(timeKeysData));
    tkStarttimes = [];
    if (timeKeysData != undefined && timeKeysData != null && timeKeysData.timekeys != undefined && timeKeysData.timekeys.length > 0 )
       timeKeysData.timekeys.forEach(function (timekey) {
@@ -2835,7 +2835,7 @@ let loopIntervals = [];
 ////////////////////////////////////// main method for timed events listening to all the things.../////////////////////////
 
 function TimedEventListener () { 
- console.log("TimedEventsListener" + timedEventsListenerMode + JSON.stringify(timeKeysData) );
+//  console.log("TimedEventsListener" + timedEventsListenerMode + JSON.stringify(timeKeysData) );
  // let primaryAudioTime = 0;
  timeKeysIndex = 0;
  let timekey = 0;
@@ -3088,6 +3088,12 @@ function PlayTimedEvent(timeKey) {
       if (primaryAudioEl != null) {
          // console.log("beat volume " + volume);
          primaryAudioEl.components.primary_audio_control.timekey_beat(.5);
+      }
+   }
+   if (timeKey.keytype.toLowerCase().includes("stop trigger audio")) {
+      var triggerAudioController = document.getElementById("triggerAudio");
+      if (triggerAudioController != null) {
+        triggerAudioController.components.trigger_audio_control.stopTriggerAudio();
       }
    }
    if (timeKey.keytype.toLowerCase().includes("random time")) {

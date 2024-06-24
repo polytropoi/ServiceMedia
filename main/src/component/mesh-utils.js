@@ -1524,7 +1524,7 @@ AFRAME.registerComponent('instanced_surface_meshes', {
         console.log("new hit " + hitID + " " + distance + " " + JSON.stringify(hitpoint) + " interaction:" + this.data.interaction + " eventData " + this.data.eventData.toLowerCase());
         var triggerAudioController = document.getElementById("triggerAudio");
         if (triggerAudioController != null) {
-          triggerAudioController.components.trigger_audio_control.playAudioAtPosition(hitpoint, distance, this.data.tags);
+          triggerAudioController.components.trigger_audio_control.playInstanceAudioAtPosition(this.instanceId, hitpoint, distance, this.data.tags);
         }
         if (this.data.tags && this.data.tags.toLowerCase().includes("kill")) {
           this.particlesEl.setAttribute("position", hitpoint);
