@@ -3220,11 +3220,12 @@ AFRAME.registerComponent('enviro_mods', { //tweak properties of environment comp
   colortweak: function () {
     console.log("colortweak");
     this.enviroEl.setAttribute('environment', {
-      // groundColor: "#000000".replace(/0/g,function(){return (~~(Math.random()*16)).toString(16);}),
-      // groundColor2: "#000000".replace(/0/g,function(){return (~~(Math.random()*16)).toString(16);}),
-      // dressingColor: "#000000".replace(/0/g,function(){return (~~(Math.random()*16)).toString(16);}),
+      groundColor: "#000000".replace(/0/g,function(){return (~~(Math.random()*16)).toString(16);}),
+      groundColor2: "#000000".replace(/0/g,function(){return (~~(Math.random()*16)).toString(16);}),
+      dressingColor: "#000000".replace(/0/g,function(){return (~~(Math.random()*16)).toString(16);}),
       skyColor: "#000000".replace(/0/g,function(){return (~~(Math.random()*16)).toString(16);}),
-      horizonColor: "#000000".replace(/0/g,function(){return (~~(Math.random()*16)).toString(16);})
+      horizonColor: "#000000".replace(/0/g,function(){return (~~(Math.random()*16)).toString(16);}),
+      fogColor: "#000000".replace(/0/g,function(){return (~~(Math.random()*16)).toString(16);})
     });
     // this.enviroEl.setAttribute('environment', {
     //   groundColor: settings.sceneColor3,
@@ -5275,6 +5276,10 @@ AFRAME.registerComponent('scene_greeting_dialog', {  //if "greeting" scenetag + 
         value: text
       });
     }
+    this.greetingEl.setAttribute("troika-text", {
+      value: ""
+    });
+
 
   },
   ShowMessageAndHide: function (text, time) {

@@ -1929,15 +1929,15 @@ AFRAME.registerComponent('mod_particles', {
     yFudge: {type: 'number', default: 0},
     color: {type: 'string', default: 'orange'},
     scale: {type: 'number', default: 10},
-    addLight: {default: true},
-    intensity: {default: 1}
+    addLight: {type: 'boolean', default: true},
+    intensity: {type: 'number', default: 1}
 
   },
   init: function() {
     // let particleAttributes = {};
     console.log("mod_particles data: " + this.data.scale + " color " + this.data.color);
     this.position = new THREE.Vector3();
-
+    this.intensity = this.data.intensity;
     if (this.data.scale == null || this.data.scale == 0) {
       this.data.scale = 10;
     }
@@ -1993,7 +1993,7 @@ AFRAME.registerComponent('mod_particles', {
         type: 'point', 
         castShadow: true, 
         color: this.data.color, 
-        intensity: this.data.intensity * 2, 
+        intensity: this.intensity * 2, 
         distance: this.distanceFactor, 
         decay: 1,
         shadowCameraVisible: false,
@@ -2004,9 +2004,9 @@ AFRAME.registerComponent('mod_particles', {
         shadowCameraRight: 50,
         shadowCameraBottom: -50, 
         shadowCameraTop: 50 });
-          this.lightAnimation(this.data.intensity * .5, this.data.intensity * 2);
+          this.lightAnimation(this.intensity * .5, this.intensity * 2);
         this.el.addEventListener('animationcomplete', () => {
-            this.lightAnimation(this.data.intensity * .5, this.data.intensity * 2);
+            this.lightAnimation(this.intensity * .5, this.intensity * 2);
         });
       }
       // this.el.setAttribute("position", this.data.location);
