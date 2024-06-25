@@ -890,7 +890,11 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
                     } else if (this.picData.orientation == "Portrait" || this.data.tags.toLowerCase().includes("portrait")) {
                       this.el.setAttribute('gltf-model', '#portrait_panel');
                     } else if (this.picData.orientation == "Square" || this.data.tags.toLowerCase().includes("square")) {
-                      this.el.setAttribute('gltf-model', '#square_panel');
+                      if (this.picData.hasAlphaChannel) {
+                        this.el.setAttribute('gltf-model', '#square_panel_plain');
+                      } else {
+                        this.el.setAttribute('gltf-model', '#square_panel');
+                      }
                     } else if (this.picData.orientation == "Circle" || this.data.tags.toLowerCase().includes("circle")) {
     
                     }
@@ -908,7 +912,11 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
                     } else if (this.picData.orientation == "Portrait" || this.data.tags.toLowerCase().includes("portrait")) {
                       this.el.setAttribute('gltf-model', '#portrait_panel');
                     } else if (this.picData.orientation == "Square" || this.data.tags.toLowerCase().includes("square")) {
-                      this.el.setAttribute('gltf-model', '#square_panel');
+                      if (this.picData.hasAlphaChannel) {
+                        this.el.setAttribute('gltf-model', '#square_panel_plain');
+                      } else {
+                        this.el.setAttribute('gltf-model', '#square_panel');
+                      }
                     } else if (this.picData.orientation == "Circle" || this.data.tags.toLowerCase().includes("circle")) {
     
                     }

@@ -985,42 +985,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
         this.el.removeAttribute("geometry");
         this.el.removeAttribute("gltf-model");
         console.log("tryna load mediaID "+ this.data.mediaID +" for markerType "+ this.data.markerType);
-        // if (this.data.markerType.toLowerCase().includes("picture")) {
-        //   this.el.removeAttribute('envMap');
-        //   if (mediaID.includes("local_")) {
-        //     this.el.classList.add("hasLocalFile");
-        //     mediaID = mediaID.substring(6);
-        //     console.log("CLOUDMARKER SHOUDL HAVE MediaID " + mediaID + " from localFiles " + localData.localFiles[mediaID]);
-        //     for (const key in localData.localFiles) {
-        //       console.log("tryna get localMedia named " + mediaID + " vs " + localData.localFiles[key].name);
-        //       if (localData.localFiles[key].name == mediaID) {
-                
-        //         const picBuffer = localData.localFiles[key].data;
-        //         const picBlob = new Blob([picBuffer]);
-
-        //         console.log(URL.createObjectURL(picBlob));
-        //       }
-        //     }
-        //   } else {
-
-        //     const scenePicDataEl = document.getElementById("scenePictureData");
-        //     if (scenePicDataEl) {
-        //       this.picData = scenePicDataEl.components.scene_pictures_control.returnPictureData(mediaID);
-        //       console.log("picData :  " + JSON.stringify(this.picData));
-        //       if (this.picData) {
-                
-        //         if (!this.picData.orientation || this.picData.orientation == "Landscape" || this.data.tags.toLowerCase().includes("landscape")) {
-        //           this.el.setAttribute('gltf-model', '#landscape_panel'); // model-loaded pics this up and loads 
-        //         } else if (this.picData.orientation == "Portrait" || this.data.tags.toLowerCase().includes("portrait")) {
-        //           this.el.setAttribute('gltf-model', '#portrait_panel');
-        //         } else if (this.picData.orientation == "Square" || this.data.tags.toLowerCase().includes("square")) {
-        //           this.el.setAttribute('gltf-model', '#square_panel');
-        //         } else if (this.picData.orientation == "Circle" || this.data.tags.toLowerCase().includes("circle")) {
-
-        //         }
-        //       }
-        //     }
-        //   }
+   
         if (this.data.markerType.toLowerCase().includes("picture")) {
           this.el.removeAttribute('envMap');
           console.log("mediaID is " + mediaID);
@@ -1052,7 +1017,12 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                     } else if (this.picData.orientation == "Portrait" || this.data.tags.toLowerCase().includes("portrait")) {
                       this.el.setAttribute('gltf-model', '#portrait_panel');
                     } else if (this.picData.orientation == "Square" || this.data.tags.toLowerCase().includes("square")) {
-                      this.el.setAttribute('gltf-model', '#square_panel');
+                      if (this.picData.hasAlphaChannel) {
+                        this.el.setAttribute('gltf-model', '#square_panel_plain');
+                      } else {
+                        this.el.setAttribute('gltf-model', '#square_panel');
+                      }
+                      
                     } else if (this.picData.orientation == "Circle" || this.data.tags.toLowerCase().includes("circle")) {
     
                     }
@@ -1070,7 +1040,11 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                     } else if (this.picData.orientation == "Portrait" || this.data.tags.toLowerCase().includes("portrait")) {
                       this.el.setAttribute('gltf-model', '#portrait_panel');
                     } else if (this.picData.orientation == "Square" || this.data.tags.toLowerCase().includes("square")) {
-                      this.el.setAttribute('gltf-model', '#square_panel');
+                      if (this.picData.hasAlphaChannel) {
+                        this.el.setAttribute('gltf-model', '#square_panel_plain');
+                      } else {
+                        this.el.setAttribute('gltf-model', '#square_panel');
+                      }
                     } else if (this.picData.orientation == "Circle" || this.data.tags.toLowerCase().includes("circle")) {
     
                     }
