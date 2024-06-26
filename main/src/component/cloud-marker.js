@@ -171,7 +171,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                   }
                   if (!this.data.tags.includes("hide")) {
                     this.radius = this.data.xscale * .05;
-                    this.el.setAttribute("geometry", {primitive: "sphere", radius: this.radius});
+                    this.el.setAttribute("geometry", {"primitive": "sphere", "radius": this.radius});
                     // this.el.setAttribute("light", {type: "point", intensity: .5, distance: 3, castShadow: true, decay: 1, color: "yellow"});
                     // this.el.setAttribute("mod_flicker", {type: "candle"});
                     this.el.setAttribute("material", {color: "yellow", wireframe: true});
@@ -228,11 +228,11 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
               if (this.data.modelID.toString().includes("primitive")) {   
                 console.log("CLOUDMARKER PRIMITIVE " + this.data.modelID);
                 if (this.data.modelID.toString().includes("cube")) {
-                    this.el.setAttribute("geometry", {primitive: "box", width: 1, height: 1, depth: 1});
+                    this.el.setAttribute("geometry", {"primitive": "box", "width": 1, "height": 1, "depth": 1});
                 } else if (this.data.modelID.toString().includes("sphere")) {
-                    this.el.setAttribute("geometry", {primitive: "sphere", radius: 1});
+                    this.el.setAttribute("geometry", {"primitive": "sphere", "radius": 1});
                 } else if (this.data.modelID.toString().includes("cylinder")) {
-                    this.el.setAttribute("geometry", {primitive: "cylinder", height: 1, radius: .5});
+                    this.el.setAttribute("geometry", {"primitive": "cylinder", "height": 1, "radius": .5});
                 } else {
 
                 }
@@ -981,102 +981,103 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
         mediaID = this.data.mediaID;
       }
       // if (this.data.markerType == "picture") { 
-        this.el.removeAttribute("transform_controls");
-        this.el.removeAttribute("geometry");
-        this.el.removeAttribute("gltf-model");
-        console.log("tryna load mediaID "+ this.data.mediaID +" for markerType "+ this.data.markerType);
-   
-        if (this.data.markerType.toLowerCase().includes("picture")) {
-          this.el.removeAttribute('envMap');
-          console.log("mediaID is " + mediaID);
-          if (mediaID != undefined && mediaID != null && mediaID.includes("local_")) {
-            this.el.classList.add("hasLocalFile");
-            mediaID = mediaID.substring(6);
-            console.log("CLOUDMARKER SHOUDL HAVE MediaID " + mediaID + " from localFiles " + localData.localFiles[mediaID]);
-            for (const key in localData.localFiles) {
-              console.log("tryna get localMedia named " + mediaID + " vs " + localData.localFiles[key].name);
-              if (localData.localFiles[key].name == mediaID) {
-                
-                const picBuffer = localData.localFiles[key].data;
-                const picBlob = new Blob([picBuffer]);
+      this.el.removeAttribute("transform_controls");
+      // this.el.removeAttribute("geometry");
+      // this.el.removeAttribute("gltf-model");
+      console.log("tryna load mediaID "+ this.data.mediaID +" for markerType "+ this.data.markerType);
+  
+      if (this.data.markerType.toLowerCase().includes("picture")) {
+        this.el.removeAttribute('envMap');
+        console.log("mediaID is " + mediaID);
+        if (mediaID != undefined && mediaID != null && mediaID.includes("local_")) {
+          this.el.classList.add("hasLocalFile");
+          mediaID = mediaID.substring(6);
+          console.log("CLOUDMARKER SHOUDL HAVE MediaID " + mediaID + " from localFiles " + localData.localFiles[mediaID]);
+          for (const key in localData.localFiles) {
+            console.log("tryna get localMedia named " + mediaID + " vs " + localData.localFiles[key].name);
+            if (localData.localFiles[key].name == mediaID) {
+              
+              const picBuffer = localData.localFiles[key].data;
+              const picBlob = new Blob([picBuffer]);
 
-                console.log(URL.createObjectURL(picBlob));
-              }
+              console.log(URL.createObjectURL(picBlob));
             }
-          } else {
-            console.log("NOT local picture item" + this.data.markerType);
-            this.picData = null;
-              if (this.data.markerType == 'picture group') {
-                const picGroupsControlEl = document.getElementById("pictureGroupsData");
-                if (picGroupsControlEl) {
-                  this.picData = picGroupsControlEl.components.picture_groups_control.returnRandomPictureItem();
-                  console.log("gotsaa picturegroupsdata item" + JSON.stringify(this.picData));
-                  if (this.picData) { //first get the proper geometry, then call the loadPicture from the model-loaded event above to ensure there's something to paint
-                    if (!this.picData.orientation || this.picData.orientation == "Landscape" || this.data.tags && this.data.tags.includes("landscape")) {
-                      this.el.setAttribute('gltf-model', '#landscape_panel'); 
-                    } else if (this.picData.orientation == "Portrait" || this.data.tags.toLowerCase().includes("portrait")) {
-                      this.el.setAttribute('gltf-model', '#portrait_panel');
-                    } else if (this.picData.orientation == "Square" || this.data.tags.toLowerCase().includes("square")) {
-                      if (this.picData.hasAlphaChannel) {
-                        this.el.setAttribute('gltf-model', '#square_panel_plain');
-                      } else {
-                        this.el.setAttribute('gltf-model', '#square_panel');
-                      }
-                      
-                    } else if (this.picData.orientation == "Circle" || this.data.tags.toLowerCase().includes("circle")) {
-    
-                    }
+          }
+        } else {
+          console.log("NOT local picture item" + this.data.markerType);
+          this.picData = null;
+          if (this.data.markerType == 'picture group') {
+            const picGroupsControlEl = document.getElementById("pictureGroupsData");
+            if (picGroupsControlEl) {
+              this.picData = picGroupsControlEl.components.picture_groups_control.returnRandomPictureItem();
+              console.log("gotsaa picturegroupsdata item" + JSON.stringify(this.picData));
+              if (this.picData) { //first get the proper geometry, then call the loadPicture from the model-loaded event above to ensure there's something to paint
+                if (!this.picData.orientation || this.picData.orientation == "Landscape" || this.data.tags && this.data.tags.includes("landscape")) {
+                  this.el.setAttribute('gltf-model', '#landscape_panel'); 
+                } else if (this.picData.orientation == "Portrait" || this.data.tags.toLowerCase().includes("portrait")) {
+                  this.el.setAttribute('gltf-model', '#portrait_panel');
+                } else if (this.picData.orientation == "Square" || this.data.tags.toLowerCase().includes("square")) {
+                  if (this.picData.hasAlphaChannel) {
+                    this.el.setAttribute('gltf-model', '#square_panel_plain');
+                  } else {
+                    this.el.setAttribute('gltf-model', '#square_panel');
+                    this.el.setAttribute('material', {'transparent': true, 'opacity': 0});
                   }
-                } else {
-                  console.log("no picturegroupsdata element!");
-                }
-              } else {
-                const scenePicDataEl = document.getElementById("scenePictureData");
-                if (scenePicDataEl) {
-                  this.picData = scenePicDataEl.components.scene_pictures_control.returnPictureData(mediaID);
-                  if (this.picData) { //first get the proper geometry, then call the loadPicture from the model-loaded event above to ensure there's something to paint
-                    if (!this.picData.orientation || this.picData.orientation == "Landscape" || this.data.tags.toLowerCase().includes("landscape")) {
-                      this.el.setAttribute('gltf-model', '#landscape_panel'); 
-                    } else if (this.picData.orientation == "Portrait" || this.data.tags.toLowerCase().includes("portrait")) {
-                      this.el.setAttribute('gltf-model', '#portrait_panel');
-                    } else if (this.picData.orientation == "Square" || this.data.tags.toLowerCase().includes("square")) {
-                      if (this.picData.hasAlphaChannel) {
-                        this.el.setAttribute('gltf-model', '#square_panel_plain');
-                      } else {
-                        this.el.setAttribute('gltf-model', '#square_panel');
-                      }
-                    } else if (this.picData.orientation == "Circle" || this.data.tags.toLowerCase().includes("circle")) {
-    
-                    }
-                  }
-                  console.log("gotsaa scenepicturesdata item " + JSON.stringify(this.picData));
+                  
+                } else if (this.picData.orientation == "Circle" || this.data.tags.toLowerCase().includes("circle")) {
+
                 }
               }
-
-            }
-        } else if (this.data.markerType == "text") {
-          if (mediaID.includes("local_")) {
-            this.el.classList.add("hasLocalFile");
-            mediaID = mediaID.substring(6);
-            console.log("CLOUDMARKER SHOUDL HAVE MediaID " + mediaID + " from localFiles " + localData.localFiles[mediaID]);
-            for (const key in localData.localFiles) {
-              console.log("tryna get localMedia text named " + mediaID + " vs " + localData.localFiles[key].name);
-              if (localData.localFiles[key].name == mediaID) {
-                
-                //load text itme
-              }
+            } else {
+              console.log("no picturegroupsdata element!");
             }
           } else {
-            console.log("text CLOUDMARKER mediaID " + mediaID );
-            const sceneTextDataEl = document.getElementById("sceneTextData");
-            if (sceneTextDataEl) {
-              this.textData = sceneTextDataEl.components.scene_text_control.returnTextData(mediaID); //fah, it's already a global...hrm...
-              console.log("textData :  " + JSON.stringify(this.textData));
+            const scenePicDataEl = document.getElementById("scenePictureData");
+            if (scenePicDataEl) {
+              this.picData = scenePicDataEl.components.scene_pictures_control.returnPictureData(mediaID);
+              if (this.picData) { //first get the proper geometry, then call the loadPicture from the model-loaded event above to ensure there's something to paint
+                if (!this.picData.orientation || this.picData.orientation == "Landscape" || this.data.tags.toLowerCase().includes("landscape")) {
+                  this.el.setAttribute('gltf-model', '#landscape_panel'); 
+                } else if (this.picData.orientation == "Portrait" || this.data.tags.toLowerCase().includes("portrait")) {
+                  this.el.setAttribute('gltf-model', '#portrait_panel');
+                } else if (this.picData.orientation == "Square" || this.data.tags.toLowerCase().includes("square")) {
+                  if (this.picData.hasAlphaChannel) {
+                    this.el.setAttribute('gltf-model', '#square_panel_plain');
+                  } else {
+                    this.el.setAttribute('gltf-model', '#square_panel');
+                    this.el.setAttribute('material', {'transparent': true, 'opacity': 0});
+                  }
+                } else if (this.picData.orientation == "Circle" || this.data.tags.toLowerCase().includes("circle")) {
 
+                }
+              }
+              console.log("gotsaa scenepicturesdata item " + JSON.stringify(this.picData));
             }
           }
         }
-        this.el.setAttribute("scale", this.data.xscale + " " + this.data.yscale + " " + this.data.zscale);
+      } else if (this.data.markerType == "text") {
+        if (mediaID.includes("local_")) {
+          this.el.classList.add("hasLocalFile");
+          mediaID = mediaID.substring(6);
+          console.log("CLOUDMARKER SHOUDL HAVE MediaID " + mediaID + " from localFiles " + localData.localFiles[mediaID]);
+          for (const key in localData.localFiles) {
+            console.log("tryna get localMedia text named " + mediaID + " vs " + localData.localFiles[key].name);
+            if (localData.localFiles[key].name == mediaID) {
+              
+              //load text itme
+            }
+          }
+        } else {
+          console.log("text CLOUDMARKER mediaID " + mediaID );
+          const sceneTextDataEl = document.getElementById("sceneTextData");
+          if (sceneTextDataEl) {
+            this.textData = sceneTextDataEl.components.scene_text_control.returnTextData(mediaID); //fah, it's already a global...hrm...
+            console.log("textData :  " + JSON.stringify(this.textData));
+
+          }
+        }
+      }
+      this.el.setAttribute("scale", this.data.xscale + " " + this.data.yscale + " " + this.data.zscale);
       // }
     },
     removeModel: function () {
@@ -1116,13 +1117,13 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
              
 
               if (modelID.toString().includes("cube")) {
-                  this.el.setAttribute("geometry", {primitive: "box", width: 1, height: 1, depth: 1});
+                  this.el.setAttribute("geometry", {"primitive": "box", "width": 1, "height": 1, "depth": 1});
                   console.log("CLOUDMARKER PRIMITIVE box " + modelID +" scale " + this.data.xscale + " " + this.data.yscale + " " + this.data.zscale);
               } else if (modelID.toString().includes("sphere")) {
-                  this.el.setAttribute("geometry", {primitive: "sphere", radius: 1});
+                  this.el.setAttribute("geometry", {"primitive": "sphere", "radius": 1});
                   console.log("CLOUDMARKER PRIMITIVE sphere " + modelID +" scale " + this.data.xscale + " " + this.data.yscale + " " + this.data.zscale);
               } else if (modelID.toString().includes("cylinder")) {
-                  this.el.setAttribute("geometry", {primitive: "cylinder", height: 1, radius: 1 / 2});
+                  this.el.setAttribute("geometry", {"primitive": "cylinder", "height": 1, "radius": 1 / 2});
                   console.log("CLOUDMARKER PRIMITIVE sphere " + modelID +" scale " + this.data.xscale + " " + this.data.yscale + " " + this.data.zscale);
               } else {
   
@@ -1277,7 +1278,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                 duration = 500;
               }
               if (this.data.tags.includes("show gizmo")) {
-                this.el.setAttribute("geometry", {primitive: "sphere", radius: this.data.scale * .1});
+                this.el.setAttribute("geometry", {"primitive": "sphere", "radius": this.data.scale * .1});
                 // this.el.setAttribute("light", {type: "point", intensity: .5, distance: 3, castShadow: true, decay: 1, color: "yellow"});
                 // this.el.setAttribute("mod_flicker", {type: "candle"});
                 this.el.setAttribute("material", {color: "yellow", wireframe: true});
@@ -1477,18 +1478,18 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
       //   this.hitID = hitID;
         // console.log("new hit " + hitID + " " + distance + " " + JSON.stringify(hitpoint));
         distance = window.playerPosition.distanceTo(hitpoint);
-        console.log("new hit " + hitID + " " + distance + " " + JSON.stringify(hitpoint));
-        if (this.data.eventData.toLowerCase().includes("audiotrigger")) {
+        console.log("cloudmarker hit " + hitID + " " + distance + " " + JSON.stringify(hitpoint));
+        if (this.data.tags && this.data.tags.length && !this.data.tags.toLowerCase().includes("no trigger")) {
           console.log("gotsa audio trigger hit");
           var triggerAudioControllerEl = document.getElementById("triggerAudio");
           
           if (triggerAudioControllerEl != null) {
-            console.log("gotsa audio trigger controller el");
+            // console.log("gotsa audio trigger controller el");
             let triggerAudioController = triggerAudioControllerEl.components.trigger_audio_control;
             if (triggerAudioController  != null) {
               console.log("gotsa audio trigger controller " + distance);
-              let triggertags = this.data.tags != null && this.data.tags != "" ? this.data.tags : "click";
-              triggerAudioController.playAudioAtPosition(hitpoint, distance, triggertags);
+              // let triggertags = this.data.tags != null && this.data.tags != "" ? this.data.tags : "click";
+              triggerAudioController.playAudioAtPosition(hitpoint, distance, this.data.tags);
             }
            
           }

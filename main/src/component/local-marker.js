@@ -200,7 +200,7 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
                     }
                     if (!this.data.tags.includes("hide")) {
                       this.radius = this.data.xscale * .05;
-                      this.el.setAttribute("geometry", {primitive: "sphere", radius: this.radius});
+                      this.el.setAttribute("geometry", {"primitive": "sphere", "radius": this.radius});
                       // this.el.setAttribute("light", {type: "point", intensity: .5, distance: 3, castShadow: true, decay: 1, color: "yellow"});
                       // this.el.setAttribute("mod_flicker", {type: "candle"});
                       this.el.setAttribute("material", {color: "yellow", wireframe: true});
@@ -256,13 +256,13 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
                     if (this.data.modelID.toString().includes("primitive")) {
                         console.log("LOCALMARKER PRIMITIVE " + this.data.modelID);
                         if (this.data.modelID.toString().includes("cube")) {
-                            this.el.setAttribute("geometry", {primitive: "box", width: 1, height: 1, depth: 1});
+                            this.el.setAttribute("geometry", {"primitive": "box", "width": 1, "height": 1, "depth": 1});
                         } else if (this.data.modelID.toString().includes("sphere")) {
-                            this.el.setAttribute("geometry", {primitive: "sphere", radius: 1});
+                            this.el.setAttribute("geometry", {"primitive": "sphere", "radius": 1});
                         } else if (this.data.modelID.toString().includes("cylinder")) {
-                            this.el.setAttribute("geometry", {primitive: "cylinder", height: 1, radius: .5});
+                            this.el.setAttribute("geometry", {"primitive": "cylinder", "height": 1, "radius": .5});
                         } else if (this.data.modelID.toString().includes("plane")) {
-                          this.el.setAttribute("geometry", {primitive: "plane", height: 1, width: 1});
+                          this.el.setAttribute("geometry", {"primitive": "plane", "height": 1, "width": 1});
                         }
                         if (this.data.markerType == "placeholder") {
                             this.el.setAttribute("material", {color: "yellow", transparent: true, opacity: .5});
@@ -857,8 +857,8 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
       }
       // if (this.data.markerType == "picture") { 
         this.el.removeAttribute("transform_controls");
-        this.el.removeAttribute("geometry");
-        this.el.removeAttribute("gltf-model");
+        // this.el.removeAttribute("geometry");
+        // this.el.removeAttribute("gltf-model");
         console.log("tryna load mediaID "+ this.data.mediaID +" for markerType "+ this.data.markerType);
         if (this.data.markerType.toLowerCase().includes("picture")) {
           this.el.removeAttribute('envMap');
@@ -1313,11 +1313,11 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
       //   this.hitID = hitID;
         // console.log("new hit " + hitID + " " + distance + " " + JSON.stringify(hitpoint));
         // distance = window.playerPosition.distanceTo(hitpoint);
-        console.log("new hit " + hitID + " " + distance + " " + JSON.stringify(hitpoint));
-        if (this.data.eventData.toLowerCase().includes("audiotrigger")) {
+        console.log("new hit " + hitID + " " + distance + " " + JSON.stringify(hitpoint) + " tags " + this.data.tags);
+        if (this.data.tags && this.data.tags.length && !this.data.tags.toLowerCase().includes("no trigger")) {
           var triggerAudioController = document.getElementById("triggerAudio");
           if (triggerAudioController != null) {
-            triggerAudioController.components.trigger_audio_control.playAudioAtPosition(hitpoint, distance, this.data.triggerTag);
+            triggerAudioController.components.trigger_audio_control.playAudioAtPosition(hitpoint, distance, this.data.tags);
           }
         }
       }

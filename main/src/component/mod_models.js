@@ -1959,11 +1959,11 @@ AFRAME.registerComponent('mod_model', {
               console.log("CLOUDMARKER PRIMITIVE " + this.data.modelID + " scale " + 1);
               this.el.removeAttribute("geometry");
               if (this.data.modelID.toString().includes("cube")) {
-                  this.el.setAttribute("geometry", {primitive: "box", width: 1, height: 1, depth: 1});
+                  this.el.setAttribute("geometry", {"primitive": "box", "width": 1, "height": 1, "depth": 1});
               } else if (this.data.modelID.toString().includes("sphere")) {
-                  this.el.setAttribute("geometry", {primitive: "sphere", radius: 1});
+                  this.el.setAttribute("geometry", {"primitive": "sphere", "radius": 1});
               } else if (this.data.modelID.toString().includes("cylinder")) {
-                  this.el.setAttribute("geometry", {primitive: "cylinder", height: 1, radius: 1 / 2});
+                  this.el.setAttribute("geometry", {"primitive": "cylinder", "height": 1, "radius": 1});
               } else {
   
               }

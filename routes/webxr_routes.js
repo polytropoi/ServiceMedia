@@ -1669,11 +1669,13 @@ webxr_router.get('/:_id', function (req, res) {
                                                 ammoHands = " ammo-body=\x22type: kinematic; emitCollisionEvents: true;\x22 ammo-shape=\x22type: sphere\x22 ";
                                                 hapticsHands = "haptics"
                                             }
-                                            handEntities = "<a-entity id=\x22left-hand\x22 hand-tracking-grab-controls=\x22hand: left\x22 thumbstick-logging lefthand_xr_listener oculus-touch-controls=\x22hand: left\x22 "+blinkMod+" handModelStyle: lowPoly; color: #ffcccc\x22 "+hapticsHands+">"+
-                                            console + 
+                                            handEntities = "<a-entity id=\x22left-hand\x22 hand-tracking-grab-controls=\x22hand: left\x22 thumbstick-logging lefthand_xr_listener oculus-touch-controls=\x22hand: left\x22 "+blinkMod+" handModelStyle: lowPoly; color: #ffcccc\x22 >"+
+                                            // console + 
                                             // "<a-sphere color=\x22blue\x22 opacity=\x220.1\x22 radius=\x220.06\x22 "+ammoHands+" collision-listener-right></a-sphere></a-entity>" +
                                             "<a-sphere color=\x22blue\x22 opacity=\x220.1\x22 radius=\x220.06\x22 "+ammoHands+"></a-sphere></a-entity>" +
-                                            "<a-entity id=\x22right-hand\x22 hand-tracking-grab-controls=\x22hand: right\x22 oculus-touch-controls=\x22hand: right\x22 laser-controls=\x22hand: right;\x22 handModelStyle: lowPoly; color: #ffcccc\x22 raycaster=\x22objects: .activeObjexRay;\x22 grab "+hapticsHands+">"+
+                                            // "<a-entity id=\x22right-hand\x22 hand-tracking-grab-controls=\x22hand: right\x22 oculus-touch-controls=\x22hand: right\x22 laser-controls=\x22hand: right;\x22 handModelStyle: lowPoly; color: #ffcccc\x22 raycaster=\x22objects: .activeObjexRay;\x22 grab "+hapticsHands+">"+
+                                            "<a-entity id=\x22right-hand\x22 oculus-touch-controls=\x22hand: right\x22 laser-controls=\x22hand: right;\x22 handModelStyle: lowPoly; color: #ffcccc\x22 raycaster=\x22objects: .activeObjexRay;\x22 grab >"+
+
                                             "<a-sphere color=\x22orange\x22 opacity=\x220.1\x22 radius=\x220.06\x22 "+ammoHands+"></a-sphere>"+
                                             "</a-entity>";
                                     

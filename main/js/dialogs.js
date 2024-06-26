@@ -1409,7 +1409,7 @@ function ReturnTimeKeys() {
       timeKeysData = settings.sceneTimedEvents;
       timedEventsListenerMode = timeKeysData.listenTo; 
     }
-    console.log("timedEvents:  " +JSON.stringify(timeKeysData));
+    // console.log("timedEvents:  " +JSON.stringify(timeKeysData));
     if (timeKeysData != null && timeKeysData.timekeys != undefined && timeKeysData.timekeys != null && timeKeysData.timekeys.length > 0) {
       tkStarttimes.sort((a, b) => parseFloat(a.keystarttime) - parseFloat(b.keystarttime));
       timeKeysData.timekeys.sort((a, b) => parseFloat(a.keystarttime) - parseFloat(b.keystarttime));
@@ -1622,7 +1622,7 @@ function GetUserInventory () {
               itemCounts[inventoryObjs.inventoryItems[i].objectID] = itemCounts[inventoryObjs.inventoryItems[i].objectID] + 1;
             }
             if ( i == inventoryObjs.inventoryItems.length - 1 ) {
-              console.log("uniques : " + JSON.stringify(uniqueItems) + " counts : " + JSON.stringify(itemCounts) + " names : " + JSON.stringify(itemNames));
+              console.log("unique items in player inventory: " + JSON.stringify(uniqueItems) + " counts : " + JSON.stringify(itemCounts) + " names : " + JSON.stringify(itemNames));
               for (let u = 0; u < uniqueItems.length; u++) {
                 let buttonNameString = itemNames[uniqueItems[u]] + " (" + itemCounts[uniqueItems[u]]+ ")";
                 // console.log("buttonNameStirng: " + buttonNameString);
