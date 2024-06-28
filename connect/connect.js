@@ -24,7 +24,7 @@ let lastRotation = "";
 let cameraPosition = {"x" : 0, "y": 0, "z": 0};
 let cameraRotation = {"x" : 0, "y": 0, "z": 0};
 var sceneEl = document.querySelector('a-scene');
-let skyboxEl = document.getElementById('skybox');
+let skyboxEl = document.getElementById('a_sky');
 let posRotRunning = false;
 let timeKeysData = {};
 let tkStarttimes = [];
@@ -191,11 +191,11 @@ $(function() {
       // console.log("settings: " + JSON.stringify(settings));
       if (settings.skyboxIDs != null && settings.skyboxIDs.length > 0) {
          
-         skyboxEl = document.createElement('a-entity');
-         sceneEl = document.querySelector('a-scene');
-         skyboxEl.setAttribute('skybox_dynamic', {enabled: true, id: settings.skyboxIDs[0]});
-         skyboxEl.id = 'skybox_dynamic';
-         sceneEl.appendChild(skyboxEl);
+         // skyboxEl = document.createElement('a-entity');
+         // sceneEl = document.querySelector('a-scene');
+         // skyboxEl.setAttribute('skybox_dynamic', {enabled: true, id: settings.skyboxIDs[0]});
+         // skyboxEl.id = 'skybox_dynamic';
+         // sceneEl.appendChild(skyboxEl);
          
       }
    
@@ -2987,9 +2987,9 @@ function LoopTimedEvent(keyType, duration) {
             }
             if (envEl != null) {
                // console.log("beat volume " + volume);
-               if (!settings.sceneUseSkybox) {
+               // if (!settings.sceneUseSkybox) {
                   envEl.components.enviro_mods.beat(.5);
-               }
+               // }
                
             }
          }

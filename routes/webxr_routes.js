@@ -4332,7 +4332,7 @@ webxr_router.get('/:_id', function (req, res) {
                                             // skyboxAsset = "<img id=\x22sky\x22 crossorigin=\x22anonymous\x22 src='" + skyboxUrl + "'>";
                                         
                                             // let envMap = sceneResponse.sceneUseDynCubeMap ? "convert-to-envmap" : "";
-                                            skySettings = "<a-sky id=\x22a_sky\x22 crossorigin=\x22anonymous\x22 hide-in-ar-mode src=#sky></a-sky>";
+                                            skySettings = "<a-sky id=\x22a_sky\x22 crossorigin=\x22anonymous\x22 hide-in-ar-mode skybox_dynamic></a-sky>";
                                             // aframeEnvironment = "";
                                             // hemiLight = "<a-light id=\x22hemi-light\x22 type=\x22hemisphere\x22 color=\x22" + sceneResponse.sceneColor1 + "\x22 groundColor=\x22" + sceneResponse.sceneColor2 + "\x22 intensity=\x221\x22 position\x220 0 0\x22>"+
                                             // "</a-light>";
@@ -5230,6 +5230,7 @@ webxr_router.get('/:_id', function (req, res) {
                         // "<a-asset-item id=\x22flatrect2\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/flatrect2.glb\x22></a-asset-item>\n"+
                         "<a-asset-item id=\x22flatsquare\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/flatsquare.glb\x22></a-asset-item>\n"+
                         "<a-asset-item id=\x22landscape_panel\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/landscape_panel8.glb\x22></a-asset-item>\n"+
+                        "<a-asset-item id=\x22landscape_panel_wide\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/wide_landscape_panel8.glb\x22></a-asset-item>\n"+
                         // "<a-asset-item id=\x22widelandscape_panel\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/panel5b.glb\x22></a-asset-item>\n"+
                         "<a-asset-item id=\x22dialog_panel\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/dialogpanel2.glb\x22></a-asset-item>\n"+
                         // "<a-asset-item id=\x22backpanel_horiz1\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/backpanel_horiz1.glb\x22></a-asset-item>\n"+

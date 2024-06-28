@@ -1189,7 +1189,7 @@ function ReturnTimedEventSelectors (selectedType) {
         "Target Snap",
         "Target Lerp",
         "Target Look",
-        "Stop Trigger Audio" +
+        "Stop Trigger Audio",
         "Color Lerp",
         "Color Tweak"];
     for (let i = 0; i < typesArray.length; i++) {

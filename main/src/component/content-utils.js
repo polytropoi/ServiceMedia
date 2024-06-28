@@ -2908,10 +2908,26 @@ AFRAME.registerComponent('skybox_dynamic', {
     if (picGroupMangler != null && picGroupMangler != undefined && picGroupMangler.components.picture_groups_control) {
       this.skyboxData = picGroupMangler.components.picture_groups_control.returnSkyboxData(this.data.id);
       // console.log(JSON.stringify(this.skyboxData));
+      this.nextSkybox();
     } else {
+      // this.skyboxData = picGroupMangler.components.picture_groups_control.returnSkyboxData(this.data.id);
+      // this.nextSkybox();
       this.singleSkybox(); //maybe tryna do this before models are loaded, is the problem..
     }
 
+  },
+  initMe: function () {
+    let picGroupMangler = document.getElementById("pictureGroupsData");
+
+    if (picGroupMangler != null && picGroupMangler != undefined && picGroupMangler.components.picture_groups_control) {
+      this.skyboxData = picGroupMangler.components.picture_groups_control.returnSkyboxData(settings.skyboxIDs[0]);
+      // console.log(JSON.stringify(this.skyboxData));
+      this.nextSkybox();
+    } else {
+      // this.skyboxData = picGroupMangler.components.picture_groups_control.returnSkyboxData(settings.skyboxIDs[0]);
+      // this.nextSkybox();
+      this.singleSkybox(); //maybe tryna do this before models are loaded, is the problem..
+    }
   },
   singleSkybox: function () {
 
@@ -2919,13 +2935,13 @@ AFRAME.registerComponent('skybox_dynamic', {
     console.log("skyboxURL : " + settings.skyboxURL);
 
    this.texture = new THREE.TextureLoader().load(settings.skyboxURL);
-    this.texture.encoding = THREE.sRGBEncoding;
+    this.texture.colorSpace = THREE.SRGBColorSpace;
     this.texture.mapping = THREE.EquirectangularReflectionMapping;
     this.texture.minFilter = this.texture.magFilter = THREE.LinearFilter;
     // if (window.sceneType != undefined && !window.sceneType.toLower().includes('ar')) {
-      this.el.sceneEl.object3D.background = this.texture;
+      // this.el.sceneEl.object3D.background = this.texture;
     // }
-    
+    this.el.setAttribute("src", settings.skyboxURL);
     // this.texture = this.texture;
     // this.applyEnvMap();
     if (this.skyEl != null) {
@@ -2940,23 +2956,27 @@ AFRAME.registerComponent('skybox_dynamic', {
         this.skyboxIndex++;
       } else {
         this.skyboxIndex = 0;
-      }  
-    // let skyEl = document.getElementById('skybox');
-    // skyEl.setAttribute('visible', false);
-    // skyEl.remove();
-    
-    console.log(this.skyboxData.images[this.skyboxIndex].url);
-    this.texture = new THREE.TextureLoader().load(this.skyboxData.images[this.skyboxIndex].url);
-    this.texture.encoding = THREE.sRGBEncoding;
-    this.texture.mapping = THREE.EquirectangularReflectionMapping;
-    this.texture.minFilter = this.texture.magFilter = THREE.LinearFilter;
-    this.el.sceneEl.object3D.background = this.texture;
-    // this.texture = this.texture;
-    this.applyEnvMap();
-    if (this.skyEl != null) {
-      // this.skyEl.remove();
-      this.skyEl.setAttribute('visible', false);
       }
+    console.log("skybod index : " + this.skyboxIndex + " url " + this.skyboxData.images[this.skyboxIndex].url);
+    const mesh = this.el.object3DMap.mesh;
+    const loader = new THREE.TextureLoader();
+    // load a resource
+    loader.load(
+      // resource URL
+      this.skyboxData.images[this.skyboxIndex].url,
+      function ( texture ) {
+        if (mesh) {
+          texture.colorSpace = THREE.SRGBColorSpace;
+          mesh.material.map = texture;
+          mesh.material.needsUpdate = true;
+          }
+      },
+      undefined,
+      function ( err ) {
+        console.error( 'skybox texture load error happened.' );
+      }
+    );
+    this.applyEnvMap();
     }
   },
   previousSkybox: function () {
@@ -2967,20 +2987,40 @@ AFRAME.registerComponent('skybox_dynamic', {
     } else {
       this.skyboxIndex  = this.skyboxData.images.length - 1;
     }  
-    // let skyEl = document.getElementById('skybox');
-    // skyEl.setAttribute('visible', false);
-    console.log(this.skyboxData.images[this.skyboxIndex].url);
-    this.texture = new THREE.TextureLoader().load(this.skyboxData.images[this.skyboxIndex].url);
-    this.texture.encoding = THREE.sRGBEncoding;
-    this.texture.mapping = THREE.EquirectangularReflectionMapping;
-    this.texture.minFilter = this.texture.magFilter = THREE.LinearFilter;
-    this.el.sceneEl.object3D.background = this.texture;
-    // this.texture = this.texture;
-    this.applyEnvMap();
-    if (this.skyEl != null) {
-      // this.skyEl.remove();
-      this.skyEl.setAttribute('visible', false);
+    // let askyEl = document.getElementById('a_sky');
+    // askyEl.setAttribute("a-sky", {"src": this.skyboxData.images[this.skyboxIndex].url});
+    // // skyEl.setAttribute('visible', false);
+    // console.log(this.skyboxData.images[this.skyboxIndex].url);
+    // this.texture = new THREE.TextureLoader().load(this.skyboxData.images[this.skyboxIndex].url);
+    // this.texture.encoding = THREE.sRGBEncoding;
+    // this.texture.mapping = THREE.EquirectangularReflectionMapping;
+    // this.texture.minFilter = this.texture.magFilter = THREE.LinearFilter;
+    // this.el.sceneEl.object3D.background = this.texture;
+    // // this.texture = this.texture;
+    // this.applyEnvMap();
+    // if (this.skyEl != null) {
+    //   // this.skyEl.remove();
+    //   this.skyEl.setAttribute('visible', false);
+    //   }
+    const mesh = this.el.object3DMap.mesh;
+    const loader = new THREE.TextureLoader();
+    // load a resource
+    loader.load(
+      // resource URL
+      this.skyboxData.images[this.skyboxIndex].url,
+      function ( texture ) {
+        if (mesh) {
+          texture.colorSpace = THREE.SRGBColorSpace;
+          mesh.material.map = texture;
+          mesh.material.needsUpdate = true;
+          }
+      },
+      undefined, //proogreeess no has
+      function ( err ) {
+        console.error( 'skybox texture load error happened.' );
       }
+    );
+    this.applyEnvMap();
     }
   },
   applyEnvMap: function () {
@@ -3001,7 +3041,7 @@ AFRAME.registerComponent('skybox_dynamic', {
         // if (node.material) {
           console.log("tryna set envmap on " + node.material.name);
             node.material.envMap = envMap;
-            node.material.envMap.intensity = .5;
+            // node.material.envMap.intensity = .5;
             node.material.needsUpdate = true;
             }
           });
@@ -3202,7 +3242,7 @@ AFRAME.registerComponent('enviro_mods', { //tweak properties of environment comp
     scale3.y = v * .5;
     scale3.z = v * .5;
     // console.log("beat event volume " + v);
-    this.el.setAttribute('scale', scale);
+    // this.el.setAttribute('scale', scale);
     
     if (this.enviroDressing != null) {
         
@@ -3211,10 +3251,7 @@ AFRAME.registerComponent('enviro_mods', { //tweak properties of environment comp
         this.enviroDressing.emit('beatRecover');
 
     }
-    // this.colorbeat();
-    // this.el.setAttribute('animation', 'property: scale; to: 1 1 1; dur: 250; startEvents: beatRecover');
-    // // enviroDressing.setAttribute('animation', 'property: scale; to: 1 1 1; dur: 250; startEvents: beatRecover');
-    // this.el.emit('beatRecover');
+
 
   },
   colortweak: function () {
@@ -3253,29 +3290,12 @@ AFRAME.registerComponent('enviro_mods', { //tweak properties of environment comp
         console.log("TRYNA mod enviro with COLOR LOERP " + duration);
         this.enviroEl.setAttribute('animation__1', 'property: environment.skyColor; from: '+settings.sceneColor1+'; to: '+settings.sceneColor1Alt+'; dur: '+duration+'; loop: true; dir: alternate; pauseEvents: pauseColors; resumeEvents: resumeColors;');
         this.enviroEl.setAttribute('animation__2', 'property: environment.horizonColor; from: '+settings.sceneColor2+'; to: '+settings.sceneColor2Alt+'; dur: '+duration+'; loop: true; dir: alternate; pauseEvents: pauseColors; resumeEvents: resumeColors;');
-        // this.enviroEl.setAttribute('animation__2', 'property: environment.groundColor; from: '+settings.sceneColor3+'; to: '+settings.sceneColor3Alt+'; dur: '+duration+'; loop: true; dir: alternate; pauseEvents: pauseColors; resumeEvents: resumeColors;');
-        // this.enviroEl.setAttribute('animation__3', 'property: environment.groundColor2; from: '+settings.sceneColor4+'; to: '+settings.sceneColor4Alt+'; dur: '+duration+'; loop: true; dir: alternate; pauseEvents: pauseColors; resumeEvents: resumeColors;');
-        // this.enviroEl.setAttribute('animation__4', 'property: environment.dressingColor; from: '+settings.sceneColor4+'; to: '+settings.sceneColor4Alt+'; dur: '+duration+'; loop: true; dir: alternate;  pauseEvents: pauseColors; resumeEvents: resumeColors;');
-              // this.el.emit('colorRecover');
-
-      } else {
-        // if (this.skyEl) {
-        //   this.skyEl.setAttribute('animation', 'property: color; to: '+settings.sceneColor1Alt+'; dur: '+duration+'; loop: true; dir: alternate');
-        // // this.skyEl.setAttribute('animation__1', 'property: environment.horizonColor; to: '+settings.sceneColor2Alt+'; dur: '+duration+'; loop: true; dir: alternate');
-        // // this.skyEl.setAttribute('animation__2', 'property: environment.groundColor; to: '+settings.sceneColor3Alt+'; dur: '+duration+'; loop: true; dir: alternate');
-        // // this.skyEl.setAttribute('animation__3', 'property: environment.groundColor2; to: '+settings.sceneColor4Alt+'; dur: '+duration+'; loop: true; dir: alternate');
-        // // this.skyEl.setAttribute('animation__4', 'property: environment.dressingColor; to: '+settings.sceneColor4Alt+'; dur: '+duration+'; loop: true; dir: alternate');
-        // }
-      }
-      // this.el.emit('colorTo');
-      // setTimeout(function () { 
-        // this.enviroEl.setAttribute('animation_5', 'property: environment.groundColor; to: '+settings.sceneColor3+'; dur: 2500; delay: 2500');
-        // this.enviroEl.setAttribute('animation_6', 'property: environment.groundColor2; to: '+settings.sceneColor4+'; dur: 2500; delay: 2500');
-        // this.enviroEl.setAttribute('animation_7', 'property: environment.dressingColor; to: '+settings.sceneColor4+'; dur: 2500; delay: 2500');
-        // this.enviroEl.setAttribute('animation_8', 'property: environment.skyColor; to: '+settings.sceneColor1+'; dur: 2500; delay: 2500');
-        // this.enviroEl.setAttribute('animation_9', 'property: environment.horizonColor; to: '+settings.sceneColor2+'; dur: 2500; delay: 2500');
-      // }, 2500);
-      }
+        this.enviroEl.setAttribute('animation__3', 'property: environment.groundColor; from: '+settings.sceneColor3+'; to: '+settings.sceneColor3Alt+'; dur: '+duration+'; loop: true; dir: alternate; pauseEvents: pauseColors; resumeEvents: resumeColors;');
+        this.enviroEl.setAttribute('animation__4', 'property: environment.groundColor2; from: '+settings.sceneColor4+'; to: '+settings.sceneColor4Alt+'; dur: '+duration+'; loop: true; dir: alternate; pauseEvents: pauseColors; resumeEvents: resumeColors;');
+        this.enviroEl.setAttribute('animation__5', 'property: environment.dressingColor; from: '+settings.sceneColor4+'; to: '+settings.sceneColor4Alt+'; dur: '+duration+'; loop: true; dir: alternate; pauseEvents: pauseColors; resumeEvents: resumeColors;');
+        
+      } 
+    }
 
   }
 
@@ -3606,6 +3626,12 @@ AFRAME.registerComponent('picture_groups_control', { //has all the picgroup data
 
       let orientation = this.picGroupArray[this.picGroupArrayIndex].images[0].orientation;
 
+      if (orientation.toLowerCase() == "equirectangular") {
+        let skyEl = document.getElementById("a_sky");
+        if (skyEl) {
+          skyEl.components.skybox_dynamic.initMe();
+        }
+      }
       this.setPanelVisibility(orientation);
 
 
