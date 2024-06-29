@@ -3068,6 +3068,10 @@ function PlayTimedEvent(timeKey) {
  console.log("tryna play timed event: " + JSON.stringify(timeKey));
 
  let duration = 1;
+ if (timeKey.keyduration) {
+   duration = timeKey.keyduration * 1000;
+ }
+
  let posObj = {};
  let rotObj = {};
  let tempLabel = "";
@@ -3195,6 +3199,24 @@ function PlayTimedEvent(timeKey) {
    if (timeKey.keytype == "Previous") {
       GoToPrevious();
    } 
+   if (timeKey.keytype == "Player Look") {
+      let tkElID = document.getElementById(timeKey.keydata.toString());
+      if (tkElID) {
+         posObj = tkElID.getAttribute("position");
+         player.components.player_mover.lookAt(duration, "#" +CSS.escape(timeKey.keydata.toString()));
+      } else {
+         console.log("caint find el " + timeKey.keydata);
+         for (let s = 0; s < sceneLocations.locations.length; s++) {
+            if (timeKey.keydata.toString() == sceneLocations.locations[s].name) {
+               tkElID = document.getElementById(sceneLocations.locations[s].timestamp);
+               if (tkElID) {
+                  posObj = tkElID.getAttribute("position");
+                  player.components.player_mover.lookAt(duration, "#" +CSS.escape(timeKey.keydata.toString())); // bc ids aren't supporsed to have leading number! ok then...
+               }
+            }
+         }  
+      }
+   } 
    if (timeKey.keytype == "Player Snap") {
       console.log("tryna play a Player Snap event " + timeKey.keydata.toString());
     
@@ -3216,23 +3238,23 @@ function PlayTimedEvent(timeKey) {
       }
    } 
    if (timeKey.keytype == "Player Lerp") {
-   console.log("trynba lerp to " + timeKey.keydata.toString());
-   let tkElID = document.getElementById(timeKey.keydata.toString());
-   // duration = timeKey.keyduration;
-   if (tkElID) {
-      posObj = tkElID.getAttribute("position");
-      player.components.player_mover.move('player', posObj, rotObj, timeKey.keyduration, "#" +CSS.escape(timeKey.keydata.toString())); // bc ids aren't supporsed to have leading number! ok then...
-   } else {
-      console.log("caint find timeKey.keyData el " + timeKey.keydata);
-      for (let s = 0; s < sceneLocations.locations.length; s++) {
-         if (timeKey.keydata.toString() == sceneLocations.locations[s].name) {
-            tkElID = document.getElementById(sceneLocations.locations[s].timestamp);
-            if (tkElID) {
-               posObj = tkElID.getAttribute("position");
-               player.components.player_mover.move('player', posObj, rotObj, timeKey.keyduration, "#" +CSS.escape(timeKey.keydata.toString())); // bc ids aren't supporsed to have leading number! ok then...
+      console.log("trynba lerp to " + timeKey.keydata.toString());
+      let tkElID = document.getElementById(timeKey.keydata.toString());
+      // duration = timeKey.keyduration;
+      if (tkElID) {
+         posObj = tkElID.getAttribute("position");
+         player.components.player_mover.move('player', posObj, rotObj, timeKey.keyduration, "#" +CSS.escape(timeKey.keydata.toString())); // bc ids aren't supporsed to have leading number! ok then...
+      } else {
+         console.log("caint find timeKey.keyData el " + timeKey.keydata);
+         for (let s = 0; s < sceneLocations.locations.length; s++) {
+            if (timeKey.keydata.toString() == sceneLocations.locations[s].name) {
+               tkElID = document.getElementById(sceneLocations.locations[s].timestamp);
+               if (tkElID) {
+                  posObj = tkElID.getAttribute("position");
+                  player.components.player_mover.move('player', posObj, rotObj, timeKey.keyduration, "#" +CSS.escape(timeKey.keydata.toString())); // bc ids aren't supporsed to have leading number! ok then...
+               }
             }
          }
       }
-   }
    } 
 }

@@ -2240,17 +2240,15 @@ AFRAME.registerComponent('model-callout', {
         }
         }),
         lookAt : function (duration, targetElID) { //no slerp yet!?
-          if (!duration) {
-            duration = 1;
-          } else {
-            duration = duration * 1000;
-          }
+          var element = document.getElementById("player");
+          
+          console.log("tryna lookat for " + duration);
           element.setAttribute('look-controls', {enabled: false});
-          element.setAttribute("look-at", "targetElID");
+          element.setAttribute("look-at", targetElID);
           setTimeout(function () {
             element.setAttribute('look-controls', {enabled: true});
             element.removeAttribute("look-at");
-          }, duration);
+          }, parseInt(duration));
         
         },
         tick: function (time, timeDelta) {
@@ -3459,11 +3457,7 @@ $.ajax({
                 sceneTextItems.push(data[i]); //textstring should be a valid json, from defined template//not, just an array of objex saved in global
 
               }
-              // // this.data.jsonData = data;
-              // console.log("textdata: " + JSON.stringify(this.textData));
-             //this.loadTextData(data);
-            // return data;
-            
+
           },
           error: function( xhr, textStatus, errorThrown ){
               console.log( "error fetching text: " + xhr.responseText );
