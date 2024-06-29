@@ -3453,7 +3453,7 @@ $.ajax({
               // let arr = [];
               sceneTextItems = [];
               for (let i = 0; i < data.length; i++) { //check for text type?
-                console.log(data[i]);
+                console.log("sceneTextItem : " +data[i]);
                 sceneTextItems.push(data[i]); //textstring should be a valid json, from defined template//not, just an array of objex saved in global
 
               }
@@ -3502,7 +3502,7 @@ $.ajax({
       }
   },
   loadTextData: function (data) {
-    console.log("loadingTextData " + JSON.stringify(sceneTextItems));
+    console.log("loading sceneTextItems " + JSON.stringify(sceneTextItems));
     // this.textItems = data;
   },
   returnTextData: function (mediaID) {

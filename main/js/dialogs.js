@@ -824,7 +824,7 @@ function ReturnMediaNames (mediaID, mtype) { //set this up to show asset names i
 function ReturnMediaSelections (mediaID, mtype) {
   let phID = selectedLocationTimestamp;
   let locationItem = ReturnLocationItem();
-  console.log("tryna return media " + mtype + " for element " + phID);
+  console.log("tryna return media " + mediaID + " of type " + mtype + " for element " + phID);
   let mediaSelect = "<option value=\x22none\x22 selected>none</option>";
   if (mtype && mtype == "picture") {
     if (mediaID) {
@@ -872,7 +872,7 @@ function ReturnMediaSelections (mediaID, mtype) {
       // }
       if (sceneTextItems) {
         for (let i = 0; i < sceneTextItems.length; i++) {
-          // console.log("sceneTextItem:  "+ JSON.stringify(sceneTextItems[i]));
+          console.log("sceneTextItem:  "+ JSON.stringify(sceneTextItems[i]));
           
             if (locationItem != null && locationItem.mediaID == sceneTextItems[i]._id) {
               mediaSelect = mediaSelect + "<option value=\x22"+sceneTextItems[i]._id+"\x22 selected>" + sceneTextItems[i].title + "</option>";

@@ -8127,7 +8127,7 @@ app.post('/return_audiogroups/', function(req, res) {
             }
         },
         function (callback) {
-            console.log("audio IDs: " + audio_IDs);
+            // console.log("audio IDs: " + audio_IDs);
             const audio_ids = audio_IDs.map(item => { return ObjectID(item); });
             db.audio_items.find({'_id': { $in: audio_ids}}).toArray(function (err, audio_items) {
                 if (err || !audio_items) {
@@ -11605,7 +11605,7 @@ app.post('/add_scene_group/', requiredAuthentication, function (req, res) {
     let s_id = ObjectID(req.body.scene_id);   
     let g_id = ObjectID(req.body.group_id);   
     // let audiotype
-    console.log('tryna add a scene pic : ' + req.body);
+    // console.log('tryna add a scene pic : ' + req.body);
 
     db.scenes.findOne({ "_id": s_id}, function (err, scene) {
         if (err || !scene) {

@@ -1989,7 +1989,7 @@ webxr_router.get('/:_id', function (req, res) {
                                 
                             }
                             if (sceneResponse.sceneWater != null) {
-                                console.log("water: " + JSON.stringify(sceneResponse.sceneWater));
+                                // console.log("water: " + JSON.stringify(sceneResponse.sceneWater));
                                 if (sceneResponse.sceneWater.name == "water2") {
                                     // console.log("water: " + JSON.stringify(sceneResponse.sceneWater)); //these use the escaped aframe shaders, not the eval'd non escaped mode
                                     ocean = "<a-plane position=\x220  "+sceneResponse.sceneWater.level+" 0\x22 width=\x22256\x22 height=\x22256\x22 rotation=\x22-90 180 -90\x22 segments-height=\x22100\x22 segments-width=\x22100\x22 "+skyboxEnvMap+" material=\x22color: "+sceneResponse.sceneColor3+"; shader:makewaves; uMap: #water; repeat: 500 500;\x22></a-plane>";
@@ -2172,7 +2172,7 @@ webxr_router.get('/:_id', function (req, res) {
                                     console.log("error getting model: " + objID); //todo - report? //TODO remove from sceneModels!
                                     callbackz();
                                 } else {
-                                    console.log("got user model:" + model.filename);
+                                    // console.log("got user model:" + model.filename);
                                     if (minioClient) {
 
                                         minioClient.presignedGetObject(process.env.S3_ROOT_BUCKET_NAME, 'users/' + model.userID + "/gltf/" + model.filename, 6000, function(err, presignedUrl) { //use callback version here, can't await?
@@ -3127,7 +3127,7 @@ webxr_router.get('/:_id', function (req, res) {
                                     } 
                                 });
                             } else { //no model, check for placeholders
-                                console.log("model with no model!!!! " + locMdl.markerType);
+                                // console.log("model with no model!!!! " + locMdl.markerType);
                                 if (locMdl.markerType == "navmesh") {
                                     let visible = false;
                                     if (sceneResponse.sceneTags != null && (sceneResponse.sceneTags.includes('debug'))) {
@@ -3252,12 +3252,12 @@ webxr_router.get('/:_id', function (req, res) {
                     //hrm, get a list of text locations and spin through these...
                     if (sceneResponse.sceneTextItems != null && sceneResponse.sceneTextItems != undefined && sceneResponse.sceneTextItems != "") {
 
+                        sceneTextData = "<a-entity scene_text_control id=\x22sceneTextData\x22 data-attribute=\x22"+sceneResponse.sceneTextItems+"\x22></a-entity>"; //this does a fetch clientside using the IDs in data-attribute
 
                         if (sceneResponse.sceneWebType != "HTML from Text Item") { //if it's not just a regular html page...
                             for (let i = 0; i < sceneTextLocations.length; i++) {  //TODO ASYNC//nah
 
-                            console.log("cheking sceneLocation " + JSON.stringify(sceneTextLocations[i]));
-                            sceneTextData = "<a-entity scene_text_control id=\x22sceneTextData\x22 data-attribute=\x22"+sceneResponse.sceneTextItems+"\x22></a-entity>"; //this does a fetch clientside using the IDs in data-attribute
+                            // console.log("cheking textItemLocations " + JSON.stringify(sceneTextLocations[i]));
 
                             let textID = sceneTextLocations[i].description; //check desc for id, if not then event data
                             if (!textID || textID.length < 5) {
@@ -3383,7 +3383,7 @@ webxr_router.get('/:_id', function (req, res) {
                                 mp3url = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, 'users/' + audio_items[i].userID + "/audio/" + audio_items[i]._id + "." + mp3Name, 6000);
                                 oggurl = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, 'users/' + audio_items[i].userID + "/audio/" + audio_items[i]._id + "." + oggName, 6000);
                                 pngurl = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, 'users/' + audio_items[i].userID + "/audio/" + audio_items[i]._id + "." + pngName, 6000);
-                                console.log("primary audio url is " + mp3url);
+                                // console.log("primary audio url is " + mp3url);
                                 primaryAudioWaveform = pngurl;
                                 pAudioWaveform = "<img id=\x22primaryAudioWaveform\x22 crossorigin=\x22anonymous\x22 src=\x22"+primaryAudioWaveform+"\x22>";
                             }
@@ -4308,7 +4308,7 @@ webxr_router.get('/:_id', function (req, res) {
                                 callback(null);
                             } else {
                                 let theKey = 'users/' + picture_item.userID + '/pictures/originals/' + picture_item._id + '.original.' + picture_item.filename; //TODO cook smaller equirect versions?
-                                console.log("theKey " + theKey);
+                                // console.log("theKey " + theKey);
                                 const params = {
                                     Bucket: process.env.S3_ROOT_BUCKET_NAME, 
                                     Key: theKey
@@ -4323,7 +4323,7 @@ webxr_router.get('/:_id', function (req, res) {
                                 // let skyboxUrl = s3.getSignedUrl('getObject', {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: theKey, Expires: 6000});
                                     (async () => {
                                         skyboxUrl = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, theKey, 6000);
-                                        console.log("skyboxURL is " + skyboxUrl);
+                                        // console.log("skyboxURL is " + skyboxUrl);
                                         skyboxAsset = "<img id=\x22sky\x22 crossorigin=\x22anonymous\x22 src='" + skyboxUrl + "'>";
 
                                         if (sceneResponse.sceneUseSkybox) {
