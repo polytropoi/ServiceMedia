@@ -3449,56 +3449,21 @@ $.ajax({
               textIDs: this.textIDs //just send the ids
             }),
           success: function( data, textStatus, xhr ){
-              // console.log(JSON.parse(data[i].textstring));
-              // let arr = [];
+
               sceneTextItems = [];
               for (let i = 0; i < data.length; i++) { //check for text type?
                 console.log("sceneTextItem : " +data[i]);
                 sceneTextItems.push(data[i]); //textstring should be a valid json, from defined template//not, just an array of objex saved in global
-
               }
-
           },
           error: function( xhr, textStatus, errorThrown ){
               console.log( "error fetching text: " + xhr.responseText );
-              // return null;
-              // $('#theForm').html( 'Sorry, something went wrong: \n' + xhr.responseText);
-              // Cookies.remove('_id');
           }
         });
-        // this.textData = response;
-        // console.log("textdata: "+ JSON.stringify(data));
-        // var xhr = new XMLHttpRequest();
-        // xhr.open("POST", '/scene_text_items/', true);
-        // xhr.setRequestHeader('Content-Type', 'application/json');
-        // xhr.send(this.textData);
-        // xhr.onload = function () {
-        //   // do something to response
-        //   console.log("textdata " + this.responseText);
-        //   this.loadTextData(this.responseText);
-
-        // };
-        // this.loadTextData(response);
-        // if (response) {
-
-        //   console.log("textdata" + JSON.stringify(response));
-        //   for (let i = 0; i < response.length; i++) { //check for text type?
-        //         console.log(response[i]);
-        //         this.textDataArray.push(response[i]); //textstring should be a valid json, from defined template//not, just an array of objex saved in global
-
-        //       }
-        //       console.log("textdata " + JSON.stringify(this.textDataArray));
-        // } else {
-
-        // }
-      // }
-      // this.data.jsonData = fetchTextData(data);
-      // if (this.textItems) {
+      
         setTimeout(() =>{
           this.loadTextData();
         }, 3000);
-       
-      // }
       }
   },
   loadTextData: function (data) {

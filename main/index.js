@@ -15422,7 +15422,7 @@ function getAllPeople() {
                         // console.log("sceneLocations " + JSON.stringify(sceneLocations));
                         if (sceneModelz != null && sceneModelz != undefined && sceneModelz.length > 0) {
 
-                            console.log("sceneModelz: " + JSON.stringify(sceneModelz) +" vs "+ JSON.stringify(sceneModels));
+                            console.log("sceneModelz: " + JSON.stringify(sceneModelz) +" ________vs________ "+ JSON.stringify(sceneModels));
                             // let validModelReference = false;
                             for (let h = 0; h < sceneLocations.length; h++) {
                                 // console.log("gotsa location for modelSelector : " + JSON.stringify(sceneLocations[h]));
@@ -15431,6 +15431,18 @@ function getAllPeople() {
                                 // let idIndex = sceneModels.indexOf(modelID);
                                 // if (idIndex != -1) {
                                     const y = document.getElementById("modelSelect_" + sceneLocations[h].timestamp);
+                                    let modelMatch = false;
+                                    if (sceneLocations[h].modelID != "none" || sceneLocations[h].modelID != "" && !sceneLocations[h].modelID.includes("primitive")) {
+                                        if (JSON.stringify(sceneModels).includes(sceneLocations[h].modelID)) {
+                                            console.log("model found " + sceneLocations[h].modelID + " " + sceneLocations[h].model );
+                                        } else {
+                                           console.log("model NOT FOUND " + sceneLocations[h].modelID + " " + sceneLocations[h].model );
+                                            sceneLocations[h].modelID = "none"; //
+                                            sceneLocations[h].model = "none";
+                                                
+                                            // }
+                                        }
+                                    }
                                     for (let j = 0; j < sceneModelz.length; j++) {
                                         // console.log("sceneModel:  "+ sceneModelz[j].name +" vs "+ sceneLocations[h].model);
                                         if (sceneModelz[j]._id != undefined) { //why name instead of _id?
