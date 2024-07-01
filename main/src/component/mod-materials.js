@@ -354,8 +354,8 @@ AFRAME.registerComponent('mod-materials', {
        
         // this.id = "primary_video";  //hrm, could be multiples...
         this.cmTexture = new THREE.CubeTextureLoader().load(this.textureArray); //?
-        // this.cmTexture.format = THREE.RGBFormat;
-        // this.cmTexture.colorSpace = THREE.SRGBColorSpace;
+        this.cmTexture.format = THREE.RGBFormat; //not RGBA
+        this.cmTexture.colorSpace = THREE.SRGBColorSpace;
         // let video = document.getElementById(this.data.id);
         // this.video = null;
         this.video = document.getElementById(this.data.id);
@@ -550,8 +550,8 @@ AFRAME.registerComponent('mod-materials', {
               this.vidtexture = new THREE.VideoTexture( this.video );
               this.vidtexture.flipY = this.data.flipY; 
               this.vidtexture.colorSpace = THREE.SRGBColorSpace;
-              this.vidtexture.minFilter = THREE.LinearMipmapNearestFilter;
-              this.vidtexture.magFilter = THREE.LinearMipmapNearestFilter;
+              // this.vidtexture.minFilter = THREE.LinearMipmapNearestFilter;
+              // this.vidtexture.magFilter = THREE.LinearMipmapNearestFilter;
               // this.playmaterial = new THREE.MeshStandardMaterial( { map: this.vidtexture, side: THREE.DoubleSide, shader: THREE.FlatShading } ); 
               if (this.data.isSkybox) {
                 this.playmaterial = new THREE.MeshBasicMaterial( { map: this.vidtexture, side: THREE.BackSide, shader: THREE.FlatShading } ); 
