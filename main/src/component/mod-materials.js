@@ -329,22 +329,7 @@ AFRAME.registerComponent('mod-materials', {
           }
         }
     }
-  // function playPromise(video) {
-  //   var playPromise = video.play();
-  //   if (playPromise !== undefined) {
-  //         playPromise.then(_ => {
-  //           // Automatic playback started!
-  //           // Show playing UI.
-  //           // We can now safely pause video...
-  //           video.pause();
-  //         })
-  //         .catch(error => {
-  //           // Auto-play was prevented
-  //           // Show paused UI.
-  //           console.log("error " +error)
-  //         });
-  //       }
-  //   }
+
     //////////////////////////// - VID MATERIALS EMBED
 
     AFRAME.registerComponent('vid_materials_embed', { 
@@ -366,16 +351,11 @@ AFRAME.registerComponent('mod-materials', {
         /// ------------- cubemaap fu
         this.textureArray = [];
         this.el.classList.add("activeObjexRay");
-        // for (let i = 1; i < 7; i++) {
-        //   this.envmapEl = document.querySelector("#envmap_" + i);
-        //   if (this.envmapEl) {
-        //   this.path = this.envmapEl.getAttribute("src");
-        //   this.textureArray.push(this.path);
-        //   }
-        // }
+       
         // this.id = "primary_video";  //hrm, could be multiples...
-        this.cmTexture = new THREE.CubeTextureLoader().load(this.textureArray);
-        this.cmTexture.format = THREE.RGBFormat;
+        this.cmTexture = new THREE.CubeTextureLoader().load(this.textureArray); //?
+        // this.cmTexture.format = THREE.RGBFormat;
+        // this.cmTexture.colorSpace = THREE.SRGBColorSpace;
         // let video = document.getElementById(this.data.id);
         // this.video = null;
         this.video = document.getElementById(this.data.id);
@@ -388,18 +368,10 @@ AFRAME.registerComponent('mod-materials', {
           this.data.videoTitle = settings.sceneTitle;
         }
         if (Hls != undefined && Hls.isSupported()) {
-          // console.log("hls supported!");
-          // var hls = new Hls();
-          // this.hls = hls;
-          // this.hls.loadSource(m3u8);
-          // this.hls.attachMedia(this.video);
-          // if (Hls.isSupported()) {
-            // var video = document.getElementById('video');
+         
             var hls = new Hls();
             hls.attachMedia(this.video);
             
-            // bind them together
-            // hls.attachMedia(video);
             hls.on(Hls.Events.MEDIA_ATTACHED, function () {
               console.log('video and hls.js are now bound together !');
               hls.loadSource(m3u8);
@@ -415,15 +387,7 @@ AFRAME.registerComponent('mod-materials', {
           this.video.src = m3u8;
         }
         
-
-        // this.hls.on(Hls.Events.MANIFEST_PARSED,function() {}
-        // pauseVideo(this.video);
-        // if (!this.data.isSkybox) {
           this.el.classList.add("video_embed");
-        // }
-       
-
-          // console.log("tryna setup video");
           
           this.mesh = this.el.getObject3D('Object3D');
           this.screenMesh = null; 
@@ -585,8 +549,9 @@ AFRAME.registerComponent('mod-materials', {
 
               this.vidtexture = new THREE.VideoTexture( this.video );
               this.vidtexture.flipY = this.data.flipY; 
-              // this.vidtexture.minFilter = THREE.LinearMipmapNearestFilter;
-              // this.vidtexture.magFilter = THREE.LinearMipmapNearestFilter;
+              this.vidtexture.colorSpace = THREE.SRGBColorSpace;
+              this.vidtexture.minFilter = THREE.LinearMipmapNearestFilter;
+              this.vidtexture.magFilter = THREE.LinearMipmapNearestFilter;
               // this.playmaterial = new THREE.MeshStandardMaterial( { map: this.vidtexture, side: THREE.DoubleSide, shader: THREE.FlatShading } ); 
               if (this.data.isSkybox) {
                 this.playmaterial = new THREE.MeshBasicMaterial( { map: this.vidtexture, side: THREE.BackSide, shader: THREE.FlatShading } ); 
@@ -594,23 +559,13 @@ AFRAME.registerComponent('mod-materials', {
                 this.playmaterial = new THREE.MeshBasicMaterial( { map: this.vidtexture, shader: THREE.FlatShading } ); 
               }
               
-              
-              // this.playmaterial = new THREE.MeshPhongMaterial({
-              //   map: this.vidtexture,
-              //   // emissiveMap: this.vidtexture,
-              //   side: THREE.FrontSide
-              //   // emissive: 0xffffff,
-              //   // emissiveIntensity: .1
-              // });
 
               console.log("tryna bind vid material to mesh");
 
               // this.playmaterial.generateMipmaps = true;   
               this.playmaterial.map.needsUpdate = true;   
               this.playmaterial.needsUpdate = true;
-              // } else {
-              //   console.log("this.video not ready!");
-              // }
+
 
               if (this.screenMesh != null) {
                 this.screenMesh.material = this.playmaterial;
@@ -1351,7 +1306,7 @@ AFRAME.registerComponent('sky_particles', {
 
 				};
 
-				const sprite1 = textureLoader.load( this.data.src, assignSRGB );
+    const sprite1 = textureLoader.load( this.data.src, assignSRGB );
     const material = new THREE.PointsMaterial({ size: this.data.size, map: sprite1, blending: THREE.AdditiveBlending, depthTest: false, transparent: true, vertexColors: true });
     // const material = new THREE.PointsMaterial( { size: 2, vertexColors: true, blending: THREE.AdditiveBlending, transparent: true } );
     // materials[ i ] = new THREE.PointsMaterial( { size: size, map: sprite, blending: THREE.AdditiveBlending, depthTest: false, transparent: true } );
