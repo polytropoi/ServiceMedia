@@ -2912,7 +2912,7 @@ AFRAME.registerComponent('skybox_dynamic', {
       // this.nextSkybox();
       this.singleSkybox(); //maybe tryna do this before models are loaded, is the problem..
     }
-
+    // let that = this;
   },
   initMe: function () {
     let picGroupMangler = document.getElementById("pictureGroupsData");
@@ -2930,7 +2930,7 @@ AFRAME.registerComponent('skybox_dynamic', {
   singleSkybox: function () {
 
     // const ref = document.getElementById("sky");
-    console.log("skyboxURL : " + settings.skyboxURL);
+    console.log("single skyboxURL : " + settings.skyboxURL);
 
    this.texture = new THREE.TextureLoader().load(settings.skyboxURL);
     this.texture.colorSpace = THREE.SRGBColorSpace;
@@ -2948,6 +2948,7 @@ AFRAME.registerComponent('skybox_dynamic', {
       }
   },
   nextSkybox: function () {
+    
     console.log("tryna get next skybox");
     if (this.skyboxData != null && this.skyboxData != undefined) {
       if (this.skyboxIndex < this.skyboxData.images.length - 1) {
@@ -2964,9 +2965,31 @@ AFRAME.registerComponent('skybox_dynamic', {
       this.skyboxData.images[this.skyboxIndex].url,
       function ( texture ) {
         if (mesh) {
+          
           texture.colorSpace = THREE.SRGBColorSpace;
+          texture.mapping = THREE.EquirectangularReflectionMapping;
           mesh.material.map = texture;
           mesh.material.needsUpdate = true;
+          //apply new envmap to appropriate geos
+          let envMapObjex = document.getElementsByClassName('envMap');
+          console.log("envMap elements " + envMapObjex.length);
+          if (envMapObjex != null) {
+            this.mesh = null;
+            for (let i = 0; i < envMapObjex.length; i++) {
+              // console.log("envMap element " + i + " " + envMapObjex.id);
+            this.mesh = envMapObjex[i].getObject3D('mesh');
+            if (this.mesh != null) {
+              this.mesh.traverse(function (node) {
+              if (node.material && 'envMap' in node.material) {
+              // if (node.material) {
+                console.log("tryna set envmap on " + node.material.name);
+                  node.material.envMap = texture;
+                  // node.material.needsUpdate = true;
+                  }
+                });
+              }
+            }
+          }
           }
       },
       undefined,
@@ -2974,6 +2997,7 @@ AFRAME.registerComponent('skybox_dynamic', {
         console.error( 'skybox texture load error happened.' );
       }
     );
+    
     this.applyEnvMap();
     }
   },
@@ -3008,25 +3032,34 @@ AFRAME.registerComponent('skybox_dynamic', {
       this.skyboxData.images[this.skyboxIndex].url,
       function ( texture ) {
         if (mesh) {
+          // this.texture = texture;
           texture.colorSpace = THREE.SRGBColorSpace;
+          texture.mapping = THREE.EquirectangularReflectionMapping;
           mesh.material.map = texture;
           mesh.material.needsUpdate = true;
+          applyEnvMap(texture);
           }
+          
       },
       undefined, //proogreeess no has
       function ( err ) {
         console.error( 'skybox texture load error happened.' );
       }
     );
-    this.applyEnvMap();
+
     }
   },
   applyEnvMap: function () {
     console.log("tryna applyEnvMap");
-    const envMap = this.texture;  
+    // const envMap = this.texture;  
+    // envMap.mapping = THREE.EquirectangularReflectionMapping;
     let envMapObjex = document.getElementsByClassName('envMap');
-    console.log("envMap elements " + envMapObjex.length);
+    console.log("envMap elements " + envMapObjex.length + " with this.texture " + this.texture);
     if (envMapObjex != null) {
+      // this.texture = new THREE.TextureLoader().load(this.skyboxData.images[this.skyboxIndex].url);
+      // this.texture.colorSpace = THREE.SRGBColorSpace;
+      // this.texture.mapping = THREE.EquirectangularReflectionMapping;
+      // this.texture.minFilter = this.texture.magFilter = THREE.LinearFilter;
       this.mesh = null;
       for (let i = 0; i < envMapObjex.length; i++) {
         // console.log("envMap element " + i + " " + envMapObjex.id);
@@ -3038,7 +3071,7 @@ AFRAME.registerComponent('skybox_dynamic', {
         if (node.material && 'envMap' in node.material) {
         // if (node.material) {
           console.log("tryna set envmap on " + node.material.name);
-            node.material.envMap = envMap;
+            node.material.envMap = this.texture;
             // node.material.envMap.intensity = .5;
             node.material.needsUpdate = true;
             }
@@ -3052,6 +3085,33 @@ AFRAME.registerComponent('skybox_dynamic', {
     return this.texture;
   }
 });
+
+// function applyEnvMap(envMap) {
+//   // const envMap = texture;  
+//   // envMap.mapping = THREE.EquirectangularReflectionMapping;
+//   let envMapObjex = document.getElementsByClassName('envMap');
+//   console.log("envMap elements " + envMapObjex.length + " with this.texture " + envMap);
+//   if (envMap && envMapObjex != null) {
+//     this.mesh = null;
+//     for (let i = 0; i < envMapObjex.length; i++) {
+//       // console.log("envMap element " + i + " " + envMapObjex.id);
+//       this.mesh = envMapObjex[i].getObject3D('mesh');
+
+//     if (this.mesh != null) {
+//       this.mesh.traverse(function (node) {
+
+//       if (node.material && 'envMap' in node.material) {
+//       // if (node.material) {
+//         console.log("tryna set envmap on " + node.material.name);
+//           node.material.envMap = envMap;
+//           // node.material.envMap.intensity = .5;
+//           node.material.needsUpdate = true;
+//           }
+//         });
+//       }
+//     }
+//   }
+// }
 
 AFRAME.registerComponent('mod_background', { //nosky bg mods
   schema: {
@@ -3585,7 +3645,7 @@ AFRAME.registerComponent('picture_groups_control', { //has all the picgroup data
 
       let orientation = this.picGroupArray[this.picGroupArrayIndex].images[0].orientation;
 
-      if (orientation.toLowerCase() == "equirectangular") {
+      if (orientation && orientation == "Equirectangular") {
         let skyEl = document.getElementById("a_sky");
         if (skyEl) {
           skyEl.components.skybox_dynamic.initMe();

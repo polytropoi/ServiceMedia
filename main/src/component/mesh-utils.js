@@ -2793,17 +2793,46 @@ AFRAME.registerComponent('mod_curve', {
     this.speedMod = this.data.speedFactor;
 
     this.viewportLocation = new THREE.Vector3();
+    this.position = new THREE.Vector3();
     this.viewportHolder = document.getElementById('viewportPlaceholder');
     this.viewportHolder.object3D.getWorldPosition( this.viewportLocation );
+    this.el.object3D.getWorldPosition( this.position );
+    // this.position = this.el.getAttribute("position");
 
     for (var i = 0; i < 5; i += 1) {
       if (this.data.origin == 'world zero') {
         this.points.push(new THREE.Vector3(0, 0, this.data.distance * (i / 4)));
       } else if (this.data.origin == 'viewport') {
         this.points.push(new THREE.Vector3(this.viewportLocation * (i / 4)));
+      } else if (this.data.origin == 'random') {
+        let x = ( Math.random() - 0.5 ) * 30;
+        let y = ( Math.random() - 0.5 ) * 5;
+        let z = ( Math.random() - 0.5 ) * 30;
+        this.points.push(new THREE.Vector3(x, y, z));
+        if (i == 4) {
+          this.points.push(this.points[0]);
+        }
+      } else if (this.data.origin == 'location') {
+        // this.data.orientToCurve = true;
+        if (i == 0) {
+          this.points.push(this.position);
+        } else {
+          let x = this.position.x + (this.data.spreadFactor * Math.random());
+          let y = this.position.y + (this.data.spreadFactor/4 * Math.random());
+          let z = this.position.z + (this.data.spreadFactor * Math.random());
+          this.points.push(new THREE.Vector3(x, y, z));
+          // if (i == 3) {
+          //   this.points.push(this.points[0]);
+          // }
+        }
       }
     }
+
+    console.log("curve points " + JSON.stringify(this.points));
     this.curve = new THREE.CatmullRomCurve3(this.points);
+    if (this.data.isClosed) {
+      this.curve.closed = true;
+    }
     this.c_points = this.curve.getPoints( 50 );
     this.c_geometry = new THREE.BufferGeometry().setFromPoints( this.c_points );
     this.c_material = new THREE.LineBasicMaterial( { color: 0x4287f5 } );
@@ -2818,8 +2847,8 @@ AFRAME.registerComponent('mod_curve', {
     this.curveLine.geometry.attributes.position.needsUpdate = true;
     this.speedmod = Math.random() * (2 - .5) + .5;
     if (this.fraction == 0) {
-      this.curve.points[0].x =Math.ceil(Math.random() * this.data.spreadFactor) * (Math.round(Math.random()) ? 1 : -1);
-      this.curve.points[0].y =Math.ceil(Math.random() * this.data.spreadFactor) * (Math.round(Math.random()) ? 1 : -1);
+      // this.curve.points[0].x =Math.ceil(Math.random() * this.data.spreadFactor) * (Math.round(Math.random()) ? 1 : -1);
+      // this.curve.points[0].y =Math.ceil(Math.random() * this.data.spreadFactor) * (Math.round(Math.random()) ? 1 : -1);
       this.curve.points[1].x =-Math.ceil(Math.random() * this.data.spreadFactor) * (Math.round(Math.random()) ? 1 : -1);
       this.curve.points[1].y =-Math.ceil(Math.random() * this.data.spreadFactor) * (Math.round(Math.random()) ? 1 : -1);
       this.curve.points[2].x =Math.ceil(Math.random() * this.data.spreadFactor) * (Math.round(Math.random()) ? 1 : -1);

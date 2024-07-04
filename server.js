@@ -11969,7 +11969,7 @@ app.post('/add_scene_mods/:s_id', requiredAuthentication, admin, function (req, 
                                         console.log("has newfile? " + req.body.locationMods[l].modelID + " Vs " + JSON.stringify(newFiles));
                                         if (req.body.locationMods[l].modelID && req.body.locationMods[l].modelID.length) {
                                             for (let i = 0; i < newFiles.length; i++) {
-                                                if (newFiles[i].name == req.body.locationMods[l].modelID.replace("local_", "")) { //reassign modelID w/ new DB _id
+                                                if (req.body.locationMods[l].modelID && req.body.locationMods[l].modelID.length && (newFiles[i].name == req.body.locationMods[l].modelID.replace("local_", ""))) { //reassign modelID w/ new DB _id
                                                     console.log("gotsa new model file match! " + newFiles[i].name);
                                                     req.body.locationMods[l].modelID = newFiles[i]._id;
                                                     req.body.locationMods[l].model = newFiles[i].name;

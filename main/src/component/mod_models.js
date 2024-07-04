@@ -140,7 +140,9 @@ AFRAME.registerComponent('mod_model', {
           this.hasCallout = true;
         }
        
-
+        if (this.data.tags && this.data.tags.includes("follow curve")) {
+          this.el.setAttribute("mod_curve", {"origin": "location", "isClosed": true, "spreadFactor": 2})
+        }
         let that = this;
         ///////////////////////////////////////////////// model loaded event start /////////////////////////////
   

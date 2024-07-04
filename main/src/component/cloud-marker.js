@@ -48,15 +48,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
       this.font2 = "Acme.woff";
       this.data.scale = this.data.xscale;
       this.picData = null;
-      // // this.scale = this.data.scale.toString() + " " + this.data.scale.toString() + " " + this.data.scale.toString();
-      // this.scaleVector = new THREE.Vector3(this.data.scale,this.data.scale,this.data.scale); 
-      // // if (this.data.xscale) { //well, yeah
-      //   this.scaleVector.x = this.data.xscale;
-      //   this.scaleVector.y = this.data.yscale;
-      //   this.scaleVector.z = this.data.zscale;
-      // }
-
-      // this.scale = "1 1 1";
+     
       if (settings && settings.sceneFontWeb1) {
         this.font1 = settings.sceneFontWeb1;
       }
@@ -76,28 +68,9 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
       if (this.data.markerType == "collider") {
         this.data.modelID = "primitive_cube";
       } 
-        // let locItem = {};
-        // // let position = this.el.getAttribute('position'); //
-        // // let rotation = this.el.getAttribute('rotation');
-        // locItem.x = position.x.toFixed(2);
-        // locItem.eulerx = rotation.x.toFixed(2);
-        // locItem.y = position.y.toFixed(2);
-        // locItem.eulery = rotation.y.toFixed(2);
-        // locItem.z = position.z.toFixed(2);
-        // locItem.eulerz = rotation.z.toFixed(2);
-        // locItem.scale = this.data.scale;
-        // locItem.type = "Worldspace";
-        // locItem.name = this.data.name;
-        // locItem.label = this.data.label;
-        // locItem.eventData = this.data.eventData;
-        // locItem.description = this.data.description;
-        // locItem.timestamp = this.data.timestamp;
-        // locItem.markerType = this.data.markerType;
-        // locItem.modelID = this.data.modelID;
-        // locItem.model = this.data.model;
-        // locItem.objectID = this.data.objectID;
-        // locItem.objName = this.data.objName;
-        // locItem.phID = this.phID;
+      if (this.data.tags && this.data.tags.includes("follow curve")) {
+        this.el.setAttribute("mod_curve", {"origin": "location", "isClosed": true, "spreadFactor": 2})
+      }
   
           console.log("CLOUDMARKER " + this.data.markerType + " " + this.data.mediaID );
 
@@ -335,7 +308,8 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
         if (this.data.tags.toLowerCase().includes("beat") || this.data.eventData.toLowerCase().includes('beat')) {
           this.el.classList.add('beatme');
         }
-  
+
+
         this.clientX = 0;
         this.clientY = 0;
         this.selectedAxis = null;

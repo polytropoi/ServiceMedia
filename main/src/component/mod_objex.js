@@ -775,6 +775,9 @@ AFRAME.registerComponent('mod_object', {
         } else if (this.data.tags.toLowerCase().includes("equipped")) {
           this.data.isEquipped = true;
         } 
+        if (this.data.tags && this.data.tags.includes("follow curve")) {
+          this.el.setAttribute("mod_curve", {"origin": "location", "isClosed": true, "spreadFactor": 2})
+        }
       } 
       if (this.data.objectData.triggerScale == undefined || this.data.objectData.triggerScale == null || this.data.objectData.triggerScale == "" || this.data.objectData.triggerScale == 0) {
         this.data.objectData.triggerScale = 1;
