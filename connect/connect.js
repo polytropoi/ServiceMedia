@@ -508,7 +508,7 @@ function SaveModsToCloud() { //Save button on location modal, writes local mods 
       if (volumePrimary != "" ||volumeAmbient != "" || volumeTrigger != "") {
          mods.volumeMods = {volumePrimary: volumePrimary, volumeAmbient: volumeAmbient, volumeTrigger: volumeTrigger};
       }
-      mods.timedEventMods = localData.timeKeysData;
+      mods.timedEventMods = localData.timedEvents;
       mods.sceneEnvironmentPreset = localData.settings.sceneEnvironmentPreset;
       // console.log(JSON.stringify(mods));
 
@@ -626,9 +626,9 @@ function ExportMods () {
    // if (volumePrimary != "" ||volumeAmbient != "" || volumeTrigger != "") {
    //    mods.volumeMods = {volumePrimary: volumePrimary, volumeAmbient: volumeAmbient, volumeTrigger: volumeTrigger};
    // }
-   // if (timeKeysData.timekeys != undefined) {
-   //    mods.timekeyMods = timeKeysData;
-   // }
+   if (timeKeysData.timekeys != undefined) {
+      mods.timedEvents = timeKeysData;
+   }
    mods.locations = localData.locations;
    mods.settings = localData.settings;
    mods.localFiles = localData.localFiles;
@@ -683,7 +683,7 @@ function ImportMods (event) {
       } 
 
       if (mods != null && mods != undefined && mods.timekeyMods != null) {
-         // timeKeysData = mods.timekeyMods;
+         timeKeysData = mods.timedEvents;
       }
       console.log("mods.localFiles :" + Object.keys(mods.localFiles));
 
@@ -699,7 +699,9 @@ function ImportMods (event) {
    }
 }
 function SaveTimekeysToLocal () {
-   // console.log(JSON.stringify(timeKeysData));
+   console.log(JSON.stringify(timeKeysData));
+   localData.timedEvents = timeKeysData;
+   SaveLocalData();
    // localStorage.setItem(room + "_timeKeys", JSON.stringify(timeKeysData));
 }
 

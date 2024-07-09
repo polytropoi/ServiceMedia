@@ -154,7 +154,7 @@ function InitIDB() {
                         localEl.id = cursor.value.locations[i].timestamp.toString(); //for lookups
                         }
                      }
-                     locationTimestamps.push(cursor.value.locations[i].timestamp); //hrm
+                     locationTimestamps.push(cursor.value.locations[i].timestamp); //hrm, for ref
                   } //end locations loop
                }
                //settings loop
@@ -181,7 +181,16 @@ function InitIDB() {
                      // localData.localFiles[key].data;
                      // settings[key] = cursor.value.localFiles[key];
                   }  
-
+               }
+               if (cursor.value.timedEvents) {
+                  console.log("localdata timedEvents " + JSON.stringify(cursor.value.timedEvents));
+                  timeKeysData = cursor.value.timedEvents;
+                  // for (let key in cursor.value.timedEvents) {
+                  //    localData.localFiles[key] = cursor.value.localFiles[key]; 
+                  //    console.log("localfiles " + localData.localFiles[key].data);
+                  //    // localData.localFiles[key].data;
+                  //    // settings[key] = cursor.value.localFiles[key];
+                  // }  
                }
 
                cursor.continue(); 
