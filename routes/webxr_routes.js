@@ -2714,7 +2714,7 @@ webxr_router.get('/:_id', function (req, res) {
                             // if ((locMdl.eventData != null && locMdl.eventData != undefined && locMdl.eventData.length > 1) && (!locMdl.eventData.includes("noweb"))) {
 
                             //filter out cloudmarker types
-                            console.log(locMdl.modelID + " locname " + locMdl.name + " timestamp " + locMdl.timestamp + " markerType " + locMdl.markerType + " sceneModels " + JSON.stringify(sceneResponse.sceneModels));
+                            // console.log(locMdl.modelID + " locname " + locMdl.name + " timestamp " + locMdl.timestamp + " markerType " + locMdl.markerType + " sceneModels " + JSON.stringify(sceneResponse.sceneModels));
                             if (locMdl.modelID != undefined && locMdl.modelID != "undefined" && locMdl.modelID != "none" && locMdl.modelID != "" && locMdl.markerType != "placeholder"
                             && ObjectID.isValid(locMdl.modelID)
                                 && locMdl.markerType != "poi"
@@ -2729,7 +2729,7 @@ webxr_router.get('/:_id', function (req, res) {
                                 // && JSON.stringify(sceneResponse.sceneModels).includes(locMdl.modelID.toString())) {
 
                                 // console.log("tryna set model id:  " + JSON.stringify(locMdl));
-                                console.log("gots a mod_model : " + locMdl.name);
+                                // console.log("gots a mod_model : " + locMdl.name);
                                 const m_id = ObjectID(locMdl.modelID);
                                 // 
                                 db.models.findOne({"_id": m_id}, function (err, asset) { 

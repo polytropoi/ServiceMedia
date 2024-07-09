@@ -2170,6 +2170,8 @@ AFRAME.registerComponent('model-callout', {
       this.intervals = [];
       this.timeDelta = .01;
       this.isLerping = false;
+
+
     },
     move: (function (id, pos, rot, duration) { //called directly from connect.js 
       // console.log("pos " + JSON.stringify(pos));
@@ -2240,16 +2242,17 @@ AFRAME.registerComponent('model-callout', {
         }
         }),
         lookAt : function (duration, targetElID) { //no slerp yet!?
-          var element = document.getElementById("player");
-          
+
+        let element = document.getElementById("player");
           console.log("tryna lookat for " + duration);
-          element.setAttribute('look-controls', {enabled: false});
-          element.setAttribute("look-at", targetElID);
+        element.setAttribute('look-controls', {enabled: false});
+        element.setAttribute("look-at", targetElID);
+        if (duration != 0) {
           setTimeout(function () {
             element.setAttribute('look-controls', {enabled: true});
             element.removeAttribute("look-at");
           }, parseInt(duration));
-        
+        }
         },
         tick: function (time, timeDelta) {
           if (this.isLerping) {
@@ -2972,7 +2975,7 @@ AFRAME.registerComponent('skybox_dynamic', {
           mesh.material.needsUpdate = true;
           //apply new envmap to appropriate geos
           let envMapObjex = document.getElementsByClassName('envMap');
-          console.log("envMap elements " + envMapObjex.length);
+          // console.log("envMap elements " + envMapObjex.length);
           if (envMapObjex != null) {
             this.mesh = null;
             for (let i = 0; i < envMapObjex.length; i++) {
@@ -2982,7 +2985,7 @@ AFRAME.registerComponent('skybox_dynamic', {
               this.mesh.traverse(function (node) {
               if (node.material && 'envMap' in node.material) {
               // if (node.material) {
-                console.log("tryna set envmap on " + node.material.name);
+                // console.log("tryna set envmap on " + node.material.name);
                   node.material.envMap = texture;
                   // node.material.needsUpdate = true;
                   }
@@ -3054,7 +3057,7 @@ AFRAME.registerComponent('skybox_dynamic', {
     // const envMap = this.texture;  
     // envMap.mapping = THREE.EquirectangularReflectionMapping;
     let envMapObjex = document.getElementsByClassName('envMap');
-    console.log("envMap elements " + envMapObjex.length + " with this.texture " + this.texture);
+    // console.log("envMap elements " + envMapObjex.length + " with this.texture " + this.texture);
     if (envMapObjex != null) {
       // this.texture = new THREE.TextureLoader().load(this.skyboxData.images[this.skyboxIndex].url);
       // this.texture.colorSpace = THREE.SRGBColorSpace;
@@ -3070,7 +3073,7 @@ AFRAME.registerComponent('skybox_dynamic', {
 
         if (node.material && 'envMap' in node.material) {
         // if (node.material) {
-          console.log("tryna set envmap on " + node.material.name);
+          // console.log("tryna set envmap on " + node.material.name);
             node.material.envMap = this.texture;
             // node.material.envMap.intensity = .5;
             node.material.needsUpdate = true;

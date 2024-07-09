@@ -426,88 +426,7 @@ function MediaTimeUpdate (fancyTimeString) {
       }
       
    }
-// function AddTimekey() {
-//    let newTimekey = {};
-//    newTimekey.keystarttime = currentTime;
-//    newTimekey.keyduration = 5.0;
-//    newTimekey.keytype = "Beat Mid";
-//    newTimekey.keydata = "";
-//    newTimekey.keylabel = "New Timed Event";
-//    let tkTmp = [];
-//    if (timeKeysData.timekeys != undefined) {
-//       tkTmp = timeKeysData.timekeys;
-//    }
-//    tkTmp.push(newTimekey);
-//    // timeKeysData.timekeys = tkTmp;
-//    let tkObject = {};
-//     tkObject.listenTo = timedEventsListenerMode;
-//     tkObject.timekeys = tkTmp;
-//     // localStorage.setItem(room + "_timeKeys", JSON.stringify(vids[0].timekeys)); 
-//    //  timedEventsListenerMode = "Primary Video"
-//     localStorage.setItem(room + "_timeKeys", JSON.stringify(tkObject)); 
-//    ShowTimekeysModal();
-//  }
-
-      // $('#modalContent').on('change', '#locationModel', function(e) { //value has phID ~ modelID
-      //    console.log('model ' + e.target.value);
-      //    let locSplit = e.target.value.split("~"); 
-      //    if (locSplit[1].length > 4) { //should be "none" if no model selected
-      //       let locSplit = e.target.value.split("~"); //split between localstorage key and modelID
-      //       let localStorageItem = JSON.parse(localStorage.getItem(locSplit[0]));
-      //       if (localStorageItem != null) {
-      //          for (let i = 0; i < sceneModels.length; i++) {
-      //             if (sceneModels[i]._id == locSplit[1]) {
-      //                let locItemTemp = {modelID: sceneModels[i]._id, model: sceneModels[i].name};
-      //                let locItem = Object.assign(localStorageItem, locItemTemp); //funky object merge!
-      //                // locItem.modelID = sceneModels[i]._id;
-      //                // locItem.model = sceneModels[i].name;
-      //                if (locItem.scale == null || locItem.scale == undefined || locItem.scale == "") {
-      //                   locItem.scale = 1;
-      //                }
-      //                console.log(JSON.stringify(locItem));
-      //                localStorage.setItem(locSplit[0], JSON.stringify(locItem));
-      //                console.log(localStorage.getItem(locSplit[0]));
-      //                let placeholderEl = document.getElementById(locSplit[0]);
-
-      //                console.log("placeholderEl" +placeholderEl);
-      //                let phComponent = placeholderEl.components.cloud_marker;
-      //                if (phComponent == null) {
-      //                   phComponent = placeholderEl.components.local_marker;
-      //                }
-      //                if (phComponent != null) {
-      //                   phComponent.loadModel(sceneModels[i]._id);
-      //                }
-      //             }
-      //          }
-      //       }
-      //    } else {
-      //       // let locSplit = e.target.value.split("~"); //split between localstorage key and modelID
-      //       let localStorageItem = JSON.parse(localStorage.getItem(locSplit[0]));
-      //       let placeholderEl = document.getElementById(locSplit[0]);
-      //       let phComponent = placeholderEl.components.cloud_marker;
-      //       if (phComponent == null) {
-      //          phComponent = placeholderEl.components.local_marker;
-      //       }
-      //       if (phComponent != null) {
-      //          phComponent.loadModel("none");
-      //       }
-      //    }
-      // });
-
-      // $('#modalContent').on('change', '#locationMarkerType', function(e) {
-      //    console.log('type ' + e.target.value);
-      // });
-
-      // $('#modalContent').on('change', '.tk_type', function(e) {
-      //    console.log('type ' + e.target.value + " id " + e.target.id);
-      //    for (let i = 0; i < timeKeysData.length; i++) {
-      //       if (e.target.id == "tk_type_" + i) {
-      //          timeKeysData[i].keytype = e.target.value;
-      //          console.log(JSON.stringify(timeKeysData[i]));
-      //       }
-      //    }
-      // });
-
+   
 function ReturnModelName (_id) {
    if (_id.toString().includes("primitive_")) {
       console.log("tryna return primitive name " + _id);
@@ -2952,7 +2871,7 @@ function ClearIntervals () {
 
 
 
-function LoopTimedEvent(keyType, duration) {
+function LoopTimedEvent(keyType, duration, keydata, keytags) {
    
    duration = parseFloat(duration).toFixed(2) * 1000;
    // console.log("tryna looop " + keyType  + " " +duration);
@@ -3057,6 +2976,27 @@ function LoopTimedEvent(keyType, duration) {
                
             }
          }
+         if (keyType == "Player Look") {
+
+            if (keytags && keytags.length && keytags != "undefined") {
+              //otherwise check the tags against classes
+               console.log("checking tags for Player Look timedevent " + keytags);
+               let theQuery = "." + keytags;
+               let taggedEls = document.querySelectorAll(theQuery);  //need to split!
+               let randomIndex = Math.floor(Math.random()*taggedEls.length);
+               
+               if (taggedEls[randomIndex] && taggedEls[randomIndex].id) {
+                  console.log("tryna get random index " + randomIndex +" of taggedEls "+ taggedEls.length + " id "+ taggedEls[randomIndex].id) ;
+                  player.components.player_mover.lookAt(0, "#" +CSS.escape(taggedEls[randomIndex].id));
+               }
+               
+               // for (let i = 0; i < taggedEls.length; i++) {
+
+               // }
+               
+            }
+
+         } 
       } else {
          console.log("loops are paused");
       }
@@ -3076,7 +3016,7 @@ function PlayTimedEvent(timeKey) {
  let rotObj = {};
  let tempLabel = "";
    if (timeKey.keydata.toLowerCase().includes('loop')) {
-      LoopTimedEvent(timeKey.keytype, timeKey.keyduration);
+      LoopTimedEvent(timeKey.keytype, timeKey.keyduration, timeKey.keydata, timeKey.keytags);
       // return null;
       if (timeKey.keytype.toLowerCase().includes("color lerp")) {
          console.log("tryna beat loop");
@@ -3200,11 +3140,17 @@ function PlayTimedEvent(timeKey) {
       GoToPrevious();
    } 
    if (timeKey.keytype == "Player Look") {
-      let tkElID = document.getElementById(timeKey.keydata.toString());
-      if (tkElID) {
+      let tkElID = null;
+      if (timeKey.keydata) {
+         tkElID = document.getElementById(timeKey.keydata.toString());
+      }
+      if (tkElID) { //has a specific element ID (timestamp)
          posObj = tkElID.getAttribute("position");
          player.components.player_mover.lookAt(duration, "#" +CSS.escape(timeKey.keydata.toString()));
-      } else {
+      } else if (timeKey.tags && timeKey.keytags.length) { //otherwise check the tags against classes
+         console.log("checking tags for Player Look timedevent " + timeKey.keytags);
+         
+      } else { //try to match element name
          console.log("caint find el " + timeKey.keydata);
          for (let s = 0; s < sceneLocations.locations.length; s++) {
             if (timeKey.keydata.toString() == sceneLocations.locations[s].name) {

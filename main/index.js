@@ -2962,6 +2962,7 @@
             "<th>Duration</th>"+
             "<th>Type</th>"+
             "<th>Data</th>"+
+            "<th>Tags</th>"+
             "<th></th>"+
             "<th></th>"+
             "</tr>"+
@@ -3011,6 +3012,7 @@
                     "</select>" +
                 "</td>" +
                 "<td><input type=\x22text\x22 class=\x22tk_data form-control\x22 id=\x22tk_data_" + i + "\x22 value=\x22" + timekeys[i].keydata + "\x22></td>" +
+                "<td><input type=\x22text\x22 class=\x22tk_tags form-control\x22 id=\x22tk_tags_" + i + "\x22 value=\x22" + timekeys[i].keytags + "\x22></td>" +
                 "<td><i class=\x22fas fa-search-plus\x22></i></td>" +
                 // "<td><button class=\x22btn btn-xs btn-info\x22>Update</button><button class=\x22btn btn-xs btn-danger\x22>Remove</button></td>" +
                 "<td><button class=\x22remTimeKey btn btn-sm btn-danger\x22 id=\x22tk_rm_"+ i +"\x22>Remove</button></td>" +
@@ -3358,6 +3360,14 @@
                             }
                         }
                     });
+                    $(document).on('change', '.tk_tags', function() {
+                        console.log(this.id + " value " + this.value);
+                        for (let i = 0; i < timekeys.length; i++) {
+                            if (this.id == "tk_tags_" + i) {
+                                timekeys[i].keytags = this.value;
+                            }
+                        }
+                    });
                     $(document).on('click','#playAudio',function(e){
                         e.preventDefault();
                         if (wavesurfer.isPlaying()) {
@@ -3419,7 +3429,8 @@
                             keytype: "Beat",
                             keystarttime: currentTime.toFixed(2),
                             keyduration: .1,
-                            keydata: "none"
+                            keydata: "none",
+                            keytags: ""
                             }
                         timekeys.push(newTimeKey);
                         $("#audioEvents").empty();
@@ -6838,6 +6849,14 @@
                     for (let i = 0; i < timekeys.length; i++) {
                         if (this.id == "tk_data_" + i) {
                             timekeys[i].keydata = this.value;
+                        }
+                    }
+                });
+                $(document).on('change', '.tk_tags', function() {
+                    console.log(this.id + " value " + this.value);
+                    for (let i = 0; i < timekeys.length; i++) {
+                        if (this.id == "tk_tags_" + i) {
+                            timekeys[i].keytags = this.value;
                         }
                     }
                 });
@@ -16615,7 +16634,8 @@ function getAllPeople() {
                             keytype: "",
                             keystarttime: 0,
                             keyduration: 5,
-                            keydata: ""
+                            keydata: "",
+                            keytags: ""
                             }
                         if (timekeys == null) {
                             timekeys = [];
@@ -16704,6 +16724,14 @@ function getAllPeople() {
                         for (let i = 0; i < timekeys.length; i++) {
                             if (this.id == "tk_data_" + i) {
                                 timekeys[i].keydata = this.value;
+                            }
+                        }
+                    });
+                    $(document).on('change', '.tk_tags', function() {
+                        console.log(this.id + " value " + this.value);
+                        for (let i = 0; i < timekeys.length; i++) {
+                            if (this.id == "tk_tags_" + i) {
+                                timekeys[i].keytags = this.value;
                             }
                         }
                     });
