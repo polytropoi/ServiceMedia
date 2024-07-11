@@ -80,6 +80,8 @@ let currentLocalStorageUsed = null;
 let currentAvailableLocalStorageEstimage = null;
 let lastCloudUpdate = null;
 let lastLocalUpdate = null;
+let allowCameraLock = true;
+const camLockButton = document.getElementById("camLockToggleButton");
 
 
 $('a-entity').each(function() {  //external way of getting click duration for physics
@@ -271,6 +273,17 @@ $(function() {
       //   video.addEventListener('canplay', function () {
       //     video.play();
       //   });
+      }
+   }
+
+   if (settings.sceneTags && settings.sceneTags.includes("show camera lock")) {
+      const camLockButton = document.getElementById("camLockToggleButton");
+      
+      if (camLockButton) {
+         camLockButton.style.visibility = "visible";
+         camLockButton.addEventListener('click', () => {
+            ToggleCameraLock();
+         });
       }
    }
 
@@ -1300,18 +1313,8 @@ function CreateLocation (filename, type, position) { //New Location button, also
       localData.locations.push(locItem);
    }
    
-   // if (markertype == "placeholder") {
-   //    if (filename) {
-
-   //    } else {
-   //       phEl.setAttribute('gltf-model', '#poi1');
-   //    }
-   // }
    SaveLocalData();
    poiLocations.push(locItem);
-   // phEl.id = locItem.timestamp;
-   // phEl.id 
-
 
    phEl.setAttribute('position', newPosition);
    phEl.setAttribute('local_marker', {markerType: locItem.markerType, 
@@ -1327,9 +1330,7 @@ function CreateLocation (filename, type, position) { //New Location button, also
                                        modelID: locItem.modelID} );
 
    sceneEl.appendChild(phEl);
-   // if (locItem.markerType == "placeholder") { //i.e. from location panel Create Location button... or a model...
-   //    ShowHideDialogPanel();
-   // }
+
    let nextbuttonEl = document.getElementById('nextButton');
    let prevbuttonEl = document.getElementById('previousButton');
    nextbuttonEl.style.visibility = "visible";
@@ -1341,51 +1342,31 @@ function CreateLocation (filename, type, position) { //New Location button, also
    }
 }
 
-// function AddFileToScene (filename, type) { //New Location button
-//       console.log("tryna create place3holder");
-//       let newPosition = new THREE.Vector3(); 
-//       let viewportHolder = document.getElementById('viewportPlaceholder');
-//       viewportHolder.object3D.getWorldPosition( newPosition );
-//       console.log("new position for placeholder " + JSON.stringify(newPosition));
-//       let phEl = document.createElement('a-entity');
-//       var sceneEl = document.querySelector('a-scene');
-//       phEl.setAttribute('skybox-env-map', '');
-//       let timestamp = Date.now();
-//       timestamp = parseInt(timestamp);
-//       if (type == "model") {
-//       let locItem = {};
-//       locItem.x = newPosition.x.toFixed(2);
-//       locItem.eulerx = 0; //maybe get look vector?
-//       locItem.y = newPosition.y.toFixed(2);
-//       locItem.eulery = 0;
-//       locItem.z = newPosition.z.toFixed(2);
-//       locItem.eulerz = 0;
-//       locItem.type = "Worldspace";
-//       locItem.label = 'local placeholder';
-//       locItem.name = "local placeholder";
-//       locItem.description = '';
-//       locItem.markerType = "model";
-//       locItem.eventData = '';
-//       locItem.isNew = true;
-//       locItem.timestamp = timestamp;
-//       locItem.markerObjScale = 1;
-//       locItem.locationTags = '';
-//       locItem.phID = timestamp;
-//       locItem.isLocal = true;
-//       localData.locations.push(locItem);
-//       phEl.setAttribute('gltf-model', '#poi1');
-//       phEl.id = locItem.timestamp;
+function ToggleCameraLock () {
+   
+   if (camLockButton) {
+      allowCameraLock = !allowCameraLock;
+      if (allowCameraLock) {
+         console.log("allowCameraLock " + allowCameraLock);
+         camLockButton.classList.add("camlock_button_locked");
+         camLockButton.classList.remove("camlock_button_unlocked");
+         let icon = camLockButton.getElementsByTagName('i')[0];
+         icon.className = '';
+         icon.classList.add("fa-solid", "fa-lock", "fa-2x");
 
-//       // phEl.id 
-//       sceneEl.appendChild(phEl);
-//       phEl.setAttribute('position', newPosition);
-//       phEl.setAttribute('local_marker', {timestamp: timestamp, isNew: true, xpos: locItem.x, ypos: locItem.y, zpos: locItem.z} );
-//    }
-//    SaveLocalData();
-//    ShowHideDialogPanel();
-// }
+      } else {
+         console.log("allowCameraLock " + allowCameraLock);
+         camLockButton.classList.add("camlock_button_unlocked");
+         camLockButton.classList.remove("camlock_button_locked");
+         let icon = camLockButton.getElementsByTagName('i')[0];
+         icon.className = '';
+         icon.classList.add("fa-solid", "fa-lock-open", "fa-2x");
+      }
+   }
+}
 
-async function ConnectToEthereum() {
+
+async function ConnectToEthereum() { //whatever..
    const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
    const account = accounts[0];
    if (account != null) {
@@ -1407,22 +1388,6 @@ async function ShowEnableEthereumButton ()  {
       });
    }
 }
-// function amirite () {
-//    if (cookie != null && cookie._id != null) {
-//    console.log("gotsa cookie: " + cookie._id );
-//    $.get( "/ami-rite/" + cookie._id, function( data ) {
-//       // console.log("amirite : " + JSON.stringify(data.apps));
-//       if (data == 0) {
-//          console.log("nope");
-//       } else {
-//          console.log("urp");
-//       }
-//    });
-//    } else {
-//       // window.location.href = './login.html';
-//       console.log("nocookie");
-//    }
-// }
 
 function tcheck () {
    let pin = getParameterByName('p');
@@ -2982,6 +2947,7 @@ function LoopTimedEvent(keyType, duration, keydata, keytags) {
 
             if (keytags && keytags.length && keytags != "undefined") {
               //otherwise check the tags against classes
+              camLockButton
                console.log("checking tags for Player Look timedevent " + keytags);
                let theQuery = "." + keytags;
                let taggedEls = document.querySelectorAll(theQuery);  //need to split!

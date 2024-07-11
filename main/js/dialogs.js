@@ -84,6 +84,7 @@ window.addEventListener( 'keydown',  ( event ) => {
 
     case 27: // Esc
       ShowHideDialogPanel();
+      allowCameraLock = !allowCameraLock;
       break;
     }
   });

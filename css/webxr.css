@@ -68,14 +68,32 @@ body {
 }.dialog_button:xr-overlay {
     display: initial;
 }
-.ethereum_button {
+.camlock_button_locked {
     z-index: 100;
     position: absolute;
     /* display: inline-block; */
-    top: 5px;
-    right: 100px;
-    color: rgb(255, 252, 100);
+    top: 50px;
+    right: 20px;
+    color: rgb(255, 100, 100);
     opacity:.75;
+}
+.camlock_button_unlocked {
+  z-index: 100;
+  position: absolute;
+  /* display: inline-block; */
+  top: 50px;
+  right: 20px;
+  color: rgb(100, 255, 123);
+  opacity:.75;
+}
+.ethereum_button {
+  z-index: 100;
+  position: absolute;
+  /* display: inline-block; */
+  top: 5px;
+  right: 100px;
+  color: rgb(255, 252, 100);
+  opacity:.75;
 }
 .transport_buttons {
     z-index: 10;
@@ -582,6 +600,7 @@ background-color: #000000;
     font-size: 13px;
     color: rgb(250, 246, 186);
 }
+
 .tooltip {
     position: relative;
     display: inline-block;

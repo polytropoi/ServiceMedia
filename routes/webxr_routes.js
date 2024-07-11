@@ -537,6 +537,7 @@ webxr_router.get('/:_id', function (req, res) {
     let showDialog = false;
     let showSceneManglerButtons = false;
     let ethereumButton = "";
+    let cameraLockButton = "";
     let youtubeContent = "";
     let youtubeEntity = "";
     let instancingEntity = "";
@@ -764,6 +765,9 @@ webxr_router.get('/:_id', function (req, res) {
                         }
                         if (sceneData.sceneTags[i] == "show ethereum") {
                             ethereumButton = "<div class=\x22ethereum_button\x22 id=\x22ethereumButton\x22 style=\x22margin: 10px 10px;\x22><i class=\x22fab fa-ethereum fa-2x\x22></i></div>";
+                        }
+                        if (sceneData.sceneTags[i] == "show camera lock") {
+                            cameraLockButton = "<div class=\x22camlock_button_locked\x22 id=\x22camLockToggleButton\x22 style=\x22margin: 10px 10px;\x22><i class=\x22fa-solid fa-lock fa-2x\x22></i></div>";
                         }
                         if (sceneData.sceneTags[i].includes("synth")) {
                             synthScripts = "<script src=\x22../main/src/synth/Tone.js\x22></script><script src=\x22../main/js/synth.js\x22></script>";
@@ -5408,6 +5412,7 @@ webxr_router.get('/:_id', function (req, res) {
                         locationButton+
                         dialogButton+
                         ethereumButton+ 
+                        cameraLockButton +
                         transportButtons+ 
 
                         socketScripts +

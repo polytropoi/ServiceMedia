@@ -2205,7 +2205,7 @@ AFRAME.registerComponent('model-callout', {
       
 
       if (duration == 0) { //Player Snap
-        if (rot != null) {
+        if (rot != null && allowCameraLock) {
           console.log("tryna snap to " + JSON.stringify(rot));
           element.setAttribute('rotation', rot);
         }
@@ -2214,53 +2214,60 @@ AFRAME.registerComponent('model-callout', {
 
       } else { //Player Lerp
         // console.log("duration is " + duration);
+        if (allowCameraLock) {
           if (!duration) {
             duration = 1;
           }
-
           let durationAll = duration * 10;
           this.currentPos = currentPos;
           // lastLerpedPos = currentPos;
           element.setAttribute('wasd-controls-enabled', false);
           // let that = this;
           this.interval = setInterval(() => {
-          this.isLerping = true;
-          iteration++
-          if (iteration < durationAll) { 
+            this.isLerping = true;
+            iteration++
+            if (iteration < durationAll) { 
               var lerpedPos = {};
               lerpedPos.x = lerp(currentPos.x, pos.x, (this.timeDelta * iteration)/durationAll);
               lerpedPos.y = lerp(currentPos.y, pos.y, (this.timeDelta * iteration)/durationAll);
               lerpedPos.z = lerp(currentPos.z, pos.z,  (this.timeDelta * iteration)/durationAll);
               element.setAttribute('position', lerpedPos);
           
-          } else {
+            } else {
               clearInterval(this.interval);
               this.isLerping = false;
-          }
+            } 
           }, 100);
-          this.intervals.push(this.interval);
-        }
-        }),
-        lookAt : function (duration, targetElID) { //no slerp yet!?
-
-        let element = document.getElementById("player");
-          console.log("tryna lookat for " + duration);
-        element.setAttribute('look-controls', {enabled: false});
-        element.setAttribute("look-at", targetElID);
-        if (duration != 0) {
-          setTimeout(function () {
-            element.setAttribute('look-controls', {enabled: true});
-            element.removeAttribute("look-at");
-          }, parseInt(duration));
-        }
-        },
-        tick: function (time, timeDelta) {
-          if (this.isLerping) {
-            this.timeDelta = timeDelta / 1000;
+              this.intervals.push(this.interval);
           }
-         
-
         }
+      }),
+      lookAt : function (duration, targetElID) { //no slerp yet!?
+        console.log("tryna look at " + targetElID + " allowCameraLock " + allowCameraLock); 
+        let element = document.getElementById("player");
+        if (allowCameraLock) { //declared connect.js
+          
+            console.log("tryna lookat for " + duration);
+          element.setAttribute('look-controls', {enabled: false});
+          element.setAttribute("look-at", targetElID);
+          if (duration != 0) {
+            setTimeout(function () {
+              element.setAttribute('look-controls', {enabled: true});
+              element.removeAttribute("look-at");
+            }, parseInt(duration));
+          }
+        } else {
+          element.setAttribute('look-controls', {enabled: true});
+          element.removeAttribute("look-at");
+        }
+      },
+      tick: function (time, timeDelta) {
+        if (this.isLerping) {
+          this.timeDelta = timeDelta / 1000;
+        }
+        
+
+      }
   });
     
 
