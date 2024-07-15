@@ -870,7 +870,7 @@ AFRAME.registerComponent('mod_model', {
                       // onLoad callback
                       function ( texture ) { 
                         this.pictexture = texture;
-                        this.pictexture.encoding = THREE.sRGBEncoding; 
+                        this.pictexture.colorSpace = THREE.SRGBColorSpace;
                         this.pictexture.flipY = true; 
                         this.picmaterial = new THREE.MeshBasicMaterial( { map: this.pictexture } ); 
                           
@@ -962,7 +962,7 @@ AFRAME.registerComponent('mod_model', {
                       // onLoad callback
                       function ( texture ) { 
                         this.pictexture = texture;
-                        this.pictexture.encoding = THREE.sRGBEncoding; 
+                        this.pictexture.colorSpace = THREE.SRGBColorSpace;
                         this.pictexture.flipY = true; 
                         this.picmaterial = new THREE.MeshBasicMaterial( { map: this.pictexture } ); 
                           
@@ -1052,7 +1052,7 @@ AFRAME.registerComponent('mod_model', {
                       // onLoad callback
                       function ( texture ) { 
                         this.pictexture = texture;
-                        this.pictexture.encoding = THREE.sRGBEncoding; 
+                        this.pictexture.colorSpace = THREE.SRGBColorSpace;
                         this.pictexture.flipY = true; 
                         this.picmaterial = new THREE.MeshBasicMaterial( { map: this.pictexture } ); 
                           
@@ -1799,6 +1799,7 @@ AFRAME.registerComponent('mod_model', {
       if (this.data.shader != '') {
       if (this.data.shader == "noise") {
         this.texture = new THREE.TextureLoader().load('https://realitymangler.com/assets/textures/watertile3.png');
+        this.texture.colorSpace = THREE.SRGBColorSpace;
         this.shaderMaterial = new THREE.ShaderMaterial( {
           uniforms: {
             tExplosion: {

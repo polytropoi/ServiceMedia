@@ -1253,7 +1253,7 @@ function CreateLocation (filename, type, position) { //New Location button, also
    let modelID = "none";
    let mediaID = "none";
    if (filename && type) {
-      // markertype = type;
+      markertype = type;
       if (type == "model") {
          modelID = filename;
       } else if (type == "picture") {

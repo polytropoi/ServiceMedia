@@ -849,11 +849,12 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
         this.data.zscale = zscale;
         this.data.mediaID = mediaID;
         // console.log("tryna scale to " + xscale + " " + yscale+ " " + zscale);
-        console.log("cloudmarker updateAndLoad tags " + this.data.tags);
+        console.log("cloudmarker updateAndLoad tags " + this.data.tags + " markertype " + markerType + " mediaID " + mediaID);
         // setTimeout(() => {
         if (this.data.markerType == "object" && objectID.length > 8) {
           this.loadObject(objectID);
         } 
+
       // else {
         this.loadModel(modelID);
         if (mediaID && mediaID != "none") {
@@ -935,39 +936,49 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
               const obj = this.el.getObject3D('mesh');
               
               var texture = new THREE.TextureLoader().load(picUrl);
-              texture.encoding = THREE.sRGBEncoding; 
+              texture.colorSpace = THREE.SRGBColorSpace;
               // UVs use the convention that (0, 0) corresponds to the upper left corner of a texture.
               texture.flipY = false; 
               // immediately use the texture for material creation
-              var material = new THREE.MeshStandardMaterial( { map: texture, envMapIntensity: .1, transparent: this.picData.hasAlphaChannel} );  
+              var material = new THREE.MeshStandardMaterial( { map: texture, transparent: this.picData.hasAlphaChannel, envMapIntensity: .1 } );  
               // Go over the submeshes and modify materials we want.
+              material.needsUpdate = true;
               obj.traverse(node => {
                 node.material = material;
                 
-                if (!this.data.tags.includes("fixed")) {
-                  this.el.setAttribute("look-at", "#player");
-                }
+
               });
+              if (!this.data.tags.includes("fixed")) {
+                this.el.setAttribute("look-at", "#player");
+              } else {
+                this.el.removeAttribute("look-at");
+              }
             }
           }
         } else {
-          console.log('tryna load picData : '+this.picData);
+
           if (this.picData) {
             const obj = this.el.getObject3D('mesh');
-              
-              var texture = new THREE.TextureLoader().load(this.picData.url);
-              texture.encoding = THREE.sRGBEncoding; 
-              // UVs use the convention that (0, 0) corresponds to the upper left corner of a texture.
-              texture.flipY = false; 
-              // immediately use the texture for material creation
-              var material = new THREE.MeshStandardMaterial( { map: texture, envMapIntensity: .1} );  
-              // Go over the submeshes and modify materials we want.
-              obj.traverse(node => {
-                node.material = material;
-                if (this.data.tags && !this.data.tags.includes("fixed")) {
+              if (obj) {
+                console.log('gotsa mesh to show picData : '+ obj.name);
+                var texture = new THREE.TextureLoader().load(this.picData.url);
+                texture.colorSpace = THREE.SRGBColorSpace;
+                // UVs use the convention that (0, 0) corresponds to the upper left corner of a texture.
+                texture.flipY = false; 
+                // immediately use the texture for material creation
+                var material = new THREE.MeshStandardMaterial( { map: texture, transparent: this.picData.hasAlphaChannel, envMapIntensity: .1} );  
+                // Go over the submeshes and modify materials we want.
+                material.needsUpdate = true;
+                obj.traverse(node => {
+                  node.material = material;
+                  
+                });
+                if (!this.data.tags.includes("fixed")) {
                   this.el.setAttribute("look-at", "#player");
+                } else {
+                  this.el.removeAttribute("look-at");
                 }
-              });
+              }
             }
           }
       // }
@@ -980,10 +991,11 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
       // if (this.data.markerType == "picture") { 
       this.el.removeAttribute("transform_controls");
       // this.el.removeAttribute("geometry");
-      // this.el.removeAttribute("gltf-model");
+
       console.log("tryna load mediaID "+ this.data.mediaID +" for markerType "+ this.data.markerType);
   
       if (this.data.markerType.toLowerCase().includes("picture")) {
+        this.el.removeAttribute("gltf-model");
         this.el.removeAttribute('envMap');
         console.log("mediaID is " + mediaID);
         if (mediaID != undefined && mediaID != null && mediaID.includes("local_")) {
@@ -993,60 +1005,149 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
           for (const key in localData.localFiles) {
             console.log("tryna get localMedia named " + mediaID + " vs " + localData.localFiles[key].name);
             if (localData.localFiles[key].name == mediaID) {
-              
-              const picBuffer = localData.localFiles[key].data;
-              const picBlob = new Blob([picBuffer]);
-
-              console.log(URL.createObjectURL(picBlob));
+                
+              let orientation = 'Landscape';
+              if (this.data.tags.toLowerCase().includes("landscape")) {
+                orientation = "Landscape";
+              } else if (this.data.tags.toLowerCase().includes("portrait")) {
+                orientation = "Portrait";
+              } else if (this.data.tags.toLowerCase().includes("square")) {
+                orientation = "Square";
+              } 
+              console.log("gotsaa local picture item " + this.data.markerType +" tags "+ this.data.tags + " orientation " + orientation);  
+              if (orientation == "Landscape") {
+                this.el.setAttribute('gltf-model', '#landscape_panel'); 
+                this.loadPicture();
+              } else if (orientation == "Portrait") {
+                this.el.setAttribute('gltf-model', '#portrait_panel');
+                this.loadPicture();
+              } else if (orientation == "Square") {
+                console.log("SQUARE TAG FFS!");
+                if (this.picData.hasAlphaChannel) {
+                  this.el.setAttribute('gltf-model', '#square_panel_plain');
+                  this.loadPicture();
+                } else {
+                  this.el.setAttribute('gltf-model', '#square_panel');
+                  this.el.setAttribute('material', {'transparent': true, 'opacity': 0});
+                  this.loadPicture();
+                }
+              } 
             }
           }
         } else {
-          console.log("NOT local picture item" + this.data.markerType);
+          console.log("NOT local picture item " + this.data.markerType +" tags "+ this.data.tags);
           this.picData = null;
           if (this.data.markerType == 'picture group') {
             const picGroupsControlEl = document.getElementById("pictureGroupsData");
             if (picGroupsControlEl) {
+              
               this.picData = picGroupsControlEl.components.picture_groups_control.returnRandomPictureItem();
-              console.log("gotsaa picturegroupsdata item" + JSON.stringify(this.picData));
               if (this.picData) { //first get the proper geometry, then call the loadPicture from the model-loaded event above to ensure there's something to paint
-                if (!this.picData.orientation || this.picData.orientation == "Landscape" || this.data.tags && this.data.tags.includes("landscape")) {
+                // if (!this.picData.orientation) {
+                let orientation = this.picData.orientation ? this.picData.orientation : "Landscape";
+                  if (this.data.tags.toLowerCase().includes("landscape")) {
+                    orientation = "Landscape";
+                  } else if (this.data.tags.toLowerCase().includes("portrait")) {
+                    orientation = "Portrait";
+                  } else if (this.data.tags.toLowerCase().includes("square")) {
+                    orientation = "Square";
+                  } 
+                console.log("gotsaa picturegroupsdata item " + this.data.markerType +" tags "+ this.data.tags + " orientation " + orientation);  
+                if (orientation == "Landscape") {
                   this.el.setAttribute('gltf-model', '#landscape_panel'); 
-                } else if (this.picData.orientation == "Portrait" || this.data.tags.toLowerCase().includes("portrait")) {
+                  this.loadPicture();
+                } else if (orientation == "Portrait") {
                   this.el.setAttribute('gltf-model', '#portrait_panel');
-                } else if (this.picData.orientation == "Square" || this.data.tags.toLowerCase().includes("square")) {
+                  this.loadPicture();
+                } else if (orientation == "Square") {
+                  console.log("SQUARE TAG FFS!");
                   if (this.picData.hasAlphaChannel) {
                     this.el.setAttribute('gltf-model', '#square_panel_plain');
+                    this.loadPicture();
                   } else {
                     this.el.setAttribute('gltf-model', '#square_panel');
                     this.el.setAttribute('material', {'transparent': true, 'opacity': 0});
+                    this.loadPicture();
                   }
-                  
                 } else if (this.picData.orientation == "Circle" || this.data.tags.toLowerCase().includes("circle")) {
 
                 }
+
               }
+              // if (!this.picData.orientation) {
+              //   if (this.data.tags.toLowerCase().includes("landscape")) {
+              //     this.picData.orientation = "Landscape";
+              //   } else if (this.data.tags.toLowerCase().includes("portrait")) {
+              //     this.picData.orientation = "Portrait";
+              //   } else if (this.data.tags.toLowerCase().includes("square")) {
+              //     this.picData.orientation = "Square";
+              //   } else {
+              //     this.picData.orientation = "Landscape";
+              //   }
+              // }
+              // console.log("gotsaa picturegroupsdata item" +  this.picData.orientation);
+              // if (this.picData) { //first get the proper geometry, then call the loadPicture from the model-loaded event above to ensure there's something to paint
+              //   if (!this.picData.orientation || this.picData.orientation == "Landscape" || this.data.tags && this.data.tags.includes("landscape")) {
+              //     this.el.setAttribute('gltf-model', '#landscape_panel'); 
+              //     this.loadPicture();
+              //   } else if (this.picData.orientation == "Portrait" || this.data.tags.toLowerCase().includes("portrait")) {
+              //     this.el.setAttribute('gltf-model', '#portrait_panel');
+              //     this.loadPicture();
+              //   } else if (this.picData.orientation == "Square" || this.data.tags.toLowerCase().includes("square")) {
+              //     if (this.picData.hasAlphaChannel) {
+              //       this.el.setAttribute('gltf-model', '#square_panel_plain');
+              //       this.loadPicture();
+              //     } else {
+              //       console.log("tryna load picData.orientation " + this.picData.orientation);
+              //       this.el.setAttribute('gltf-model', '#square_panel');
+              //       this.el.setAttribute('material', {'transparent': true, 'opacity': 0});
+              //       this.loadPicture();
+              //     }
+                  
+              //   } else if (this.picData.orientation == "Circle" || this.data.tags.toLowerCase().includes("circle")) {
+
+              //   }
+
+              // }
             } else {
               console.log("no picturegroupsdata element!");
             }
           } else {
             const scenePicDataEl = document.getElementById("scenePictureData");
+            
             if (scenePicDataEl) {
               this.picData = scenePicDataEl.components.scene_pictures_control.returnPictureData(mediaID);
               if (this.picData) { //first get the proper geometry, then call the loadPicture from the model-loaded event above to ensure there's something to paint
-                if (!this.picData.orientation || this.picData.orientation == "Landscape" || this.data.tags.toLowerCase().includes("landscape")) {
+                // if (!this.picData.orientation) {
+                let orientation = this.picData.orientation;
+                  if (this.data.tags.toLowerCase().includes("landscape")) {
+                    orientation = "Landscape";
+                  } else if (this.data.tags.toLowerCase().includes("portrait")) {
+                    orientation = "Portrait";
+                  } else if (this.data.tags.toLowerCase().includes("square")) {
+                    orientation = "Square";
+                  } 
+                console.log("gotsaa picturegroupsdata item " + this.data.markerType +" tags "+ this.data.tags + " orientation " + orientation);  
+                if (orientation == "Landscape") {
                   this.el.setAttribute('gltf-model', '#landscape_panel'); 
-                } else if (this.picData.orientation == "Portrait" || this.data.tags.toLowerCase().includes("portrait")) {
+                  this.loadPicture();
+                } else if (orientation == "Portrait") {
                   this.el.setAttribute('gltf-model', '#portrait_panel');
-                } else if (this.picData.orientation == "Square" || this.data.tags.toLowerCase().includes("square")) {
+                  this.loadPicture();
+                } else if (orientation == "Square") {
+                  console.log("SQUARE TAG FFS!");
                   if (this.picData.hasAlphaChannel) {
                     this.el.setAttribute('gltf-model', '#square_panel_plain');
+                    this.loadPicture();
                   } else {
                     this.el.setAttribute('gltf-model', '#square_panel');
                     this.el.setAttribute('material', {'transparent': true, 'opacity': 0});
+                    this.loadPicture();
                   }
                 } else if (this.picData.orientation == "Circle" || this.data.tags.toLowerCase().includes("circle")) {
 
                 }
+
               }
               console.log("gotsaa scenepicturesdata item " + JSON.stringify(this.picData));
             }
