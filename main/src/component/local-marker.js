@@ -181,6 +181,8 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
                   let color2 = "white";
                   let intensity = 1.25;
                   let duration = 1500;
+                  let decay = 1; //this.data.xscale / 2
+                  
                   if (settings && settings.sceneColor3) {
                     color1 = settings.sceneColor3;
                   }
@@ -206,13 +208,7 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
                   if (this.data.tags && (this.data.tags.includes("fast"))) {
                     duration = 500;
                   }
-                  if (!this.data.tags.includes("hide")) {
-                    this.radius = this.data.xscale * .05;
-                    this.el.setAttribute("geometry", {"primitive": "sphere", "radius": this.radius});
-                    // this.el.setAttribute("light", {type: "point", intensity: .5, distance: 3, castShadow: true, decay: 1, color: "yellow"});
-                    // this.el.setAttribute("mod_flicker", {type: "candle"});
-                    this.el.setAttribute("material", {color: "yellow", wireframe: true});
-                  } 
+                   
                   if (this.data.tags.includes("candle")) {
                     this.el.setAttribute("mod_particles", {type: "candle", color: color1, scale: this.data.xscale, addLight: true});
                   } else if (this.data.tags.includes("fire")) {
@@ -237,7 +233,7 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
                       markerLightShadow = false;
 
                     }
-                    this.el.setAttribute("light", {type: lighttype, intensity: intensity, distance: this.data.scale * 4, castShadow: markerLightShadow, decay: this.data.scale / 2, color: color2});
+                    this.el.setAttribute("light", {type: lighttype, intensity: intensity, distance: this.data.xscale * 4, castShadow: markerLightShadow, decay: decay, color: color2});
                     if (this.data.tags && this.data.tags.includes("anim") && this.data.tags.includes("color")) {
                       console.log("LOCAL_MARKER LIGHT " + color1 + color2 + duration);
                       this.el.setAttribute("animation__color", {property: 'light.color', from: color1, to: color2, dur: duration, easing: 'easeInOutSine', loop: true, dir: 'alternate', autoplay: true});
@@ -251,7 +247,16 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
                   if (this.data.tags.includes("flicker")) {
                     this.el.setAttribute("mod_flicker", {type: "candle"});
                   }
+                  this.loadModel();
+                  // this.el.
                     
+                }
+                if (!this.data.tags.includes("hide")) {
+                  this.radius = this.data.xscale * .05;
+                  this.el.setAttribute("geometry", {"primitive": "sphere", "radius": this.radius});
+                  // this.el.setAttribute("light", {type: "point", intensity: .5, distance: 3, castShadow: true, decay: 1, color: "yellow"});
+                  // this.el.setAttribute("mod_flicker", {type: "candle"});
+                  this.el.setAttribute("material", {color: color1, wireframe: true});
                 }
                 if (this.data.tags.includes("hide gizmo") || (settings && settings.hideGizmos)) {
                   if (this.data.markerType != "mailbox" && this.data.markerType != "light") {
@@ -1145,12 +1150,14 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
               let color2 = "white";
               let intensity = 1.25;
               let duration = 1500;
+              let decay = 1; //this.data.xscale / 2
               if (settings && settings.sceneColor3) {
                 color1 = settings.sceneColor3;
               }
               if (settings && settings.sceneColor4) {
                 color2 = settings.sceneColor4;
               }
+              
               if (this.data.tags && (this.data.tags.includes("this") || this.data.tags.includes("event"))) {
                 color1 = this.data.eventData;
               }
@@ -1181,17 +1188,37 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
               } else if (this.data.tags.includes("fire")) {
                 this.el.setAttribute("mod_particles", {type: "fire", color: color1, scale: this.data.xscale, addLight: true});
               } else {
-                let markerLightShadow = true;
+                // let markerLightShadow = true;
+                // let lighttype = "point";
+                //     if (this.data.tags.includes("spot")) {
+                //       lighttype = "spot";
+                //       markerLightShadow = false;
+                //     } 
+                //     if (this.data.tags.includes("ambient")) {
+                //       lighttype = "ambient";
+                //       markerLightShadow = false;
+                //     }
+                if (this.data.tags.includes("color"))  {
+                  if (this.data.eventData.includes("~")) {
+                    color1 = this.data.eventData.split("~")[0];
+                    color2 = this.data.eventData.split("~")[1];
+                  } else {
+                    color1 = this.data.eventData;
+                  }
+                }
                 let lighttype = "point";
-                    if (this.data.tags.includes("spot")) {
-                      lighttype = "spot";
-                      markerLightShadow = false;
-                    } 
-                    if (this.data.tags.includes("ambient")) {
-                      lighttype = "ambient";
-                      markerLightShadow = false;
-                    }
-                this.el.setAttribute("light", {type: lighttype, intensity: intensity, distance: this.data.scale * 4, castShadow: markerLightShadow, decay: this.data.scale / 2, color: color2});
+                let markerLightShadow = true;
+                if (this.data.tags.includes("spot")) {
+                  lighttype = "spot";
+                  markerLightShadow = false;
+                } 
+                if (this.data.tags.includes("ambient")) {
+                  lighttype = "ambient";
+                  markerLightShadow = false;
+
+                }
+                this.el.setAttribute("light", {type: lighttype, intensity: intensity, distance: this.data.xscale * 4, castShadow: markerLightShadow, decay: decay, color: color1});
+                // this.el.setAttribute("animation__intensity", {property: 'light.position', from: intensity - intensity/2, to: intensity + intensity/2, dur: duration, easing: 'easeInOutSine', loop: false, autoplay: true});
                 if (this.data.tags && this.data.tags.includes("anim") && this.data.tags.includes("color")) {
                   this.el.setAttribute("animation__color", {property: 'light.color', from: color1, to: color2, dur: duration, easing: 'easeInOutSine', loop: true, dir: 'alternate', autoplay: true});
                 } 
@@ -1204,6 +1231,7 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
               if (this.data.tags.includes("flicker")) {
                 this.el.setAttribute("mod_flicker", {type: "candle"});
               }    
+              // this.el.clight.position = xpos, ypos, zpos;
           }
           if (this.data.tags.includes("hide gizmo") || (settings && settings.hideGizmos)) {
             if (this.data.markerType != "mailbox" && this.data.markerType != "light") {

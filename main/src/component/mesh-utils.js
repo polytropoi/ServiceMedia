@@ -3735,7 +3735,7 @@ AFRAME.registerComponent('load_threesvg', {
         //   this.rotation.z = 0;
         // } 
         
-       
+
         // this.object.position.set(0, 0, 0);
         if (localData.locations.length > 0) { 
           for (let i = 0; i < localData.locations.length; i++) {
@@ -3760,7 +3760,16 @@ AFRAME.registerComponent('load_threesvg', {
               // document.getElementById('yrot').value = this.rotation.x.toFixed(2);
               // document.getElementById('zrot').value = this.rotation.x.toFixed(2);
               // document.getElementById('modelScale').value = this.scale.x.toFixed(2);
-              // this.el.setAttribute("position", this.position);
+              
+              if (this.el.components.local_marker) {
+                this.el.components.local_marker.loadModel();
+                this.el.setAttribute("position", {x: this.position.x, y: this.position.y, z: this.position.z});
+
+              } else if (this.el.components.cloud_marker) {
+                // this.el.components.cloud_marker.loadModel();
+                // this.el.setAttribute("position", {x: this.position.x, y: this.position.y, z: this.position.z});
+              }
+
               SaveLocalData();
               
               break;

@@ -1611,7 +1611,7 @@ AFRAME.registerComponent('trigger_audio_control', { //trigger audio on designate
                     //     // audioID = this.audioGroupsController.returnRandomTriggerAudioID(); 
                     // }
                     //TODO - follow index sequence, use tags?
-                    console.log("tag "+ tags[i] + " tryna get audioID " + audioID);
+                    // console.log("tag "+ tags[i] + " tryna get audioID " + audioID);
                     this.audioItem = this.audioGroupsController.returnAudioItem(audioID);
 
                     if (this.audioItem != null) {
