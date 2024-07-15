@@ -1267,7 +1267,11 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
               if (settings && settings.sceneColor4) {
                 color2 = settings.sceneColor4;
               }
-              
+              if (!this.data.tags.includes("hide")) {
+                this.radius = this.data.xscale * .05;
+                this.el.setAttribute("geometry", {"primitive": "sphere", "radius": this.radius});
+                this.el.setAttribute("material", {color: color1, wireframe: true});
+              }
               if (this.data.tags && (this.data.tags.includes("this") || this.data.tags.includes("event"))) {
                 color1 = this.data.eventData;
               }

@@ -112,11 +112,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                   this.el.setAttribute("text_geometry", {value: this.data.description, font: '#optimerBoldFont'});
                 } else if (this.data.markerType == "light") {
                   console.log("tryna set a light!");
-                  if (!this.data.tags.includes("hide")) {
-                    this.radius = this.data.xscale * .05;
-                    this.el.setAttribute("geometry", {"primitive": "sphere", "radius": this.radius});
-                    this.el.setAttribute("material", {color: color1, wireframe: true});
-                  } 
+
                   // let color = "yellow";
                   // this.el.classList.remove("activeObjexRay"); //too much clutter, no need on a cloud light
                   
@@ -132,6 +128,11 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                       color1 = this.data.eventData;
                     }
                   }
+                  if (!this.data.tags.includes("hide")) {
+                    this.radius = this.data.xscale * .05;
+                    this.el.setAttribute("geometry", {"primitive": "sphere", "radius": this.radius});
+                    this.el.setAttribute("material", {color: color1, wireframe: true});
+                  } 
                   let lighttype = "point";
                   let markerLightShadow = true;
                   if (this.data.tags.includes("spot")) {
@@ -1252,11 +1253,11 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
               } else if (this.data.markerType.toLowerCase() == "portal") {
               
               } else if (this.data.markerType.toLowerCase() == "light") {
-                if (!this.data.tags.includes("hide")) {
-                  this.radius = this.data.xscale * .05;
-                  this.el.setAttribute("geometry", {"primitive": "sphere", "radius": this.radius});
-                  this.el.setAttribute("material", {color: color1, wireframe: true});
-                }
+                // if (!this.data.tags.includes("hide")) {
+                //   this.radius = this.data.xscale * .05;
+                //   this.el.setAttribute("geometry", {"primitive": "sphere", "radius": this.radius});
+                //   this.el.setAttribute("material", {color: color1, wireframe: true});
+                // }
               } else {
   
               }
@@ -1351,11 +1352,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                 this.el.setAttribute("text-geometry", {value: this.data.description, font: '#optimerBoldFont'});
             } else if (this.data.markerType == "light") {
               console.log("tryna set a light!");
-              if (!this.data.tags.includes("hide")) {
-                this.radius = this.data.xscale * .05;
-                this.el.setAttribute("geometry", {"primitive": "sphere", "radius": this.radius});
-                this.el.setAttribute("material", {color: color1, wireframe: true});
-              }
+
               // let color = "yellow";
               let color1 = "yellow";
               let color2 = "white";
@@ -1369,6 +1366,11 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
               }
               if (this.data.tags && (this.data.tags.includes("this") || this.data.tags.includes("event"))) {
                 color1 = this.data.eventData;
+              }
+              if (!this.data.tags.includes("hide")) {
+                this.radius = this.data.xscale * .05;
+                this.el.setAttribute("geometry", {"primitive": "sphere", "radius": this.radius});
+                this.el.setAttribute("material", {color: color1, wireframe: true});
               }
               if (this.data.tags && (this.data.tags.includes("dim"))) {
                 intensity = .5;
