@@ -77,6 +77,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
           
             if ((!this.data.modelID || this.data.modelID == undefined || this.data.modelID == "" || this.data.modelID == "none") && !this.data.modelID.toString().includes("primitive")) {
             // console.log("CLOUDMARKER PLACEHOLDER GEO " + this.data.modelID);
+
                 if (this.data.markerType.toLowerCase() == "placeholder") {
                   this.el.setAttribute('gltf-model', '#poi1');
                 } else if (this.data.markerType.toLowerCase() == "poi") {
@@ -85,15 +86,18 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                   this.el.setAttribute('gltf-model', '#poi1');
                   this.el.classList.add("waypoint");
                 } else if (this.data.markerType.toLowerCase().includes("trigger")) {
-                  this.el.setAttribute('gltf-model', '#poi1');  
-                  this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"placeholder", scaleFactor: this.data.scale});
+                  this.el.setAttribute("geometry", {"primitive": "box", "width": 1, "height": 1, "depth": 1});
+                  this.el.setAttribute("material", {color: "lime", transparent: true, opacity: .5});
+                  // this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"box", scaleFactor: this.data.scale});
+                  // this.el.setAttribute("obb-collider", {size: '1 1 1'});
                 } else if (this.data.markerType.toLowerCase().includes("object")) {
-                  this.el.setAttribute('gltf-model', '#poi1');  
+                  // this.el.setAttribute('gltf-model', '#poi1');  
                   
                 } else if (this.data.markerType.toLowerCase() == "gate") {
                   // this.el.setAttribute("obb-collider", {size: '1 1 1'});
                   this.el.setAttribute('gltf-model', '#gate2');
-                  this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"placeholder", scaleFactor: this.data.scale});
+                  // this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"placeholder", scaleFactor: this.data.scale});
+                  this.el.setAttribute("obb-collider", {size: '1 1 1'});
                   
                 } else if (this.data.markerType.toLowerCase() == "link") {
                   this.el.setAttribute("gltf-model", "#links");
@@ -380,12 +384,13 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
       this.calloutToggle = false;
   
       let that = this;
-      // this.el.addEventListener('obbcollisionstarted	', (evt) => {
-      //     this.obbHit(evt);
-      // });
-      // this.el.addEventListener('obbcollisionended	', (evt) => {
-      //     this.obbHit(evt);
-      // });
+
+      this.el.addEventListener('obbcollisionstarted	', (evt) => {
+          this.obbHit(evt);
+      });
+      this.el.addEventListener('obbcollisionended	', (evt) => {
+          this.obbHit(evt);
+      });
       if (this.data.markerType.toLowerCase().includes("picture")) {
         this.loadMedia(); //if tags == etc...
 
@@ -397,6 +402,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
       this.el.addEventListener('model-loaded', (evt) => { //load placeholder model first (which is an a-asset) before calling external
         evt.preventDefault();
         this.el.removeAttribute("animation-mixer");
+        this.el.setAttribute("obb-collider", {'size': '1 1 1'});
         console.log(this.data.modelID + " model-loaded for CLOUDMARKER " + this.data.markerType);
         if (this.data.markerType != "object") {
           const obj = this.el.getObject3D('mesh');
@@ -850,7 +856,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
         this.data.zscale = zscale;
         this.data.mediaID = mediaID;
         // console.log("tryna scale to " + xscale + " " + yscale+ " " + zscale);
-        console.log("cloudmarker updateAndLoad tags " + this.data.tags + " markertype " + markerType + " mediaID " + mediaID);
+        console.log("cloudmarker updateAndLoad tags " + this.data.tags + " markertype " + markerType + " mediaID " + mediaID + " modelID " + modelID);
         // setTimeout(() => {
         if (this.data.markerType == "object" && objectID.length > 8) {
           this.loadObject(objectID);
@@ -877,7 +883,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
       if (this.data.tags && this.data.tags.includes("color")) {
         this.el.setAttribute("material", {color: this.data.eventData.toLowerCase(), transparent: true, opacity: .5});
       } else if (this.data.modelID && this.data.modelID.toLowerCase().includes("primitive")) {
-        this.el.removeAttribute("material");
+        // this.el.removeAttribute("material");
         console.log("tryna update material for markertype " + this.data.markerType);
         if (this.data.markerType.toLowerCase() == "placeholder") {
           
@@ -893,11 +899,11 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
           // this.el.setAttribute("gltf-model", "#texticon");
           this.el.setAttribute("material", {color: "black", transparent: true, opacity: .5});
         
-        }else if (this.data.markerType.toLowerCase().includes("trigger")) {
+        }else if (this.data.markerType.toLowerCase() == "trigger") {
           this.el.setAttribute("material", {color: "lime", transparent: true, opacity: .5});
-        } else if (this.data.markerType.toLowerCase().includes("object")) {
+        } else if (this.data.markerType.toLowerCase() == "object") {
           this.el.setAttribute("material", {color: "tomato", transparent: true, opacity: .5});
-        } else if (this.data.markerType.toLowerCase().includes("collider")) {
+        } else if (this.data.markerType.toLowerCase() == "collider") {
 
             this.el.setAttribute("material", {color: "firebrick", transparent: true, opacity: .5});
             
@@ -1197,7 +1203,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
 
         this.el.classList.remove("waypoint");
         this.el.removeAttribute("transform_controls");
-        // this.el.removeAttribute("geometry");
+        // 
         // this.el.removeAttribute("gltf-model");
 
         this.el.removeAttribute("mod_object");
@@ -1205,29 +1211,32 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
         this.el.removeAttribute("animation-mixer");
         this.el.removeAttribute("light");
         this.el.removeAttribute("material");
-        this.removeModel();
+        this.el.removeAttribute("obb-collider");
+        // this.removeModel();
         if (this.data.markerType == "collider") {
           this.data.modelID = "primitive_cube";
         } 
         if (modelID != undefined && modelID != null & modelID != "none" && modelID != "") {  
           this.el.setAttribute("scale", this.data.xscale + " " + this.data.yscale + " " + this.data.zscale);
           if (modelID.toString().includes("primitive")) {
+            // this.el.removeAttribute("geometry");
             if (!this.data.tags.includes("hide gizmo")) {
              
 
               if (modelID.toString().includes("cube")) {
                   this.el.setAttribute("geometry", {"primitive": "box", "width": 1, "height": 1, "depth": 1});
-                  console.log("CLOUDMARKER PRIMITIVE box " + modelID +" scale " + this.data.xscale + " " + this.data.yscale + " " + this.data.zscale);
+                  console.log("CLOUDMARKER PRIMITIVE box " + modelID +" scale " + this.data.xscale * 1.5 + " " + this.data.yscale  * 1.5+ " " + this.data.zscale * 1.5);
+                  this.el.setAttribute("obb-collider", {'size': this.data.xscale * 1.5 + ' ' + this.data.yscale  * 1.5+ ' ' + this.data.zscale * 1.5});
               } else if (modelID.toString().includes("sphere")) {
                   this.el.setAttribute("geometry", {"primitive": "sphere", "radius": 1});
                   console.log("CLOUDMARKER PRIMITIVE sphere " + modelID +" scale " + this.data.xscale + " " + this.data.yscale + " " + this.data.zscale);
               } else if (modelID.toString().includes("cylinder")) {
                   this.el.setAttribute("geometry", {"primitive": "cylinder", "height": 1, "radius": 1 / 2});
-                  console.log("CLOUDMARKER PRIMITIVE sphere " + modelID +" scale " + this.data.xscale + " " + this.data.yscale + " " + this.data.zscale);
+                  console.log("CLOUDMARKER PRIMITIVE cylinder " + modelID +" scale " + this.data.xscale + " " + this.data.yscale + " " + this.data.zscale);
               } else {
   
               }
-              console.log("loaded cloudmarker geometry " + this.el.getAttribute("geometry", "primitive"));
+              console.log("loaded cloudmarker primitive geometry " + modelID);
 
             }
               if (this.data.markerType.toLowerCase() == "placeholder") {
@@ -1240,7 +1249,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                   this.el.classList.add("waypoint");
                   // this.el.setAttribute("color", "purple");
               } else if (this.data.markerType.toLowerCase().includes("trigger")) {
-                this.el.setAttribute("material", {color: "lime", transparent: true, opacity: .5});
+                // this.el.setAttribute("material", {color: "lime", transparent: true, opacity: .5});
             
               } else if (this.data.markerType.toLowerCase().includes("collider")) {
                 this.el.setAttribute("material", {color: "firebrick", transparent: true, opacity: .5});
@@ -1478,6 +1487,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
         
         this.el.object3D.updateMatrix(); 
 
+        this.el.setAttribute("obb-collider", {'size': '1 1 1'});
         if (this.data.tags && this.data.tags.includes("hide gizmo") || (settings && settings.hideGizmos)) {
           if (this.data.markerType != "mailbox" && this.data.markerType != "light") {
             this.el.object3D.visible = false;

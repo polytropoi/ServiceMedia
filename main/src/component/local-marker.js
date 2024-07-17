@@ -152,7 +152,8 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
                   this.el.setAttribute('gltf-model', '#poi1');
                   this.el.classList.add("waypoint");
                 } else if (this.data.markerType.toLowerCase().includes("trigger")) {
-                  this.el.setAttribute('gltf-model', '#poi1');  
+                  // this.el.setAttribute('gltf-model', '#poi1');  
+                  this.el.setAttribute("geometry", {"primitive": "box", "width": 1, "height": 1, "depth": 1});
                 } else if (this.data.markerType.toLowerCase().includes("collider")) {
                   // this.el.setAttribute("geometry", {primitive: "box", width: 1, height: 1, depth: 1});
                 } else if (this.data.markerType.toLowerCase() == "gate") {
@@ -1220,7 +1221,7 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
                 this.el.setAttribute("material", {color: "green", transparent: true, opacity: .5});
                 // this.el.setAttribute("color", "purple");
             } else if (this.data.markerType.toLowerCase().includes("trigger")) {
-                this.el.setAttribute("gltf-model", "#poi1");
+              this.el.setAttribute("geometry", {"primitive": "box", "width": 1, "height": 1, "depth": 1});
                 this.el.setAttribute("material", {color: "lime", transparent: true, opacity: .5});
                 this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"placeholder", scaleFactor: this.data.scale});
                 // this.el.setAttribute("color", "lime");

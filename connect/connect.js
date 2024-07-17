@@ -287,6 +287,10 @@ $(function() {
       }
    }
 
+   // if (settings.sceneTags && settings.sceneTags.includes("debug")) {
+   //    sceneEl.setAttribute('obb-collider', {'showColliders': true});
+   // }
+
    let primaryAudioEventData = document.getElementById("audioEventsData");
    if (primaryAudioEventData) {
       SetPrimaryAudioEventsData();

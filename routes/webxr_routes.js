@@ -4879,6 +4879,8 @@ webxr_router.get('/:_id', function (req, res) {
                         let joystick = "joystick=\x22useNavmesh: false\x22";
                         let extraScripts = "";
                         let hasParametricCurve = false;
+                        let obbDebug = ""; //to show obb colliders, physics collider debug set elsewhere...
+                        
                         // if (useNavmesh) {
                         //     // navmeshScripts = "<script src=\x22../three/pathfinding/three-pathfinding.umd.js\x22></script>";
                         //     // "<script src=\x22../main/vendor/aframe/movement-controls.js\x22></script>";
@@ -4916,9 +4918,9 @@ webxr_router.get('/:_id', function (req, res) {
                         if (sceneResponse.sceneTags != null && sceneResponse.sceneTags.includes("hide overlay")) {
                             canvasOverlay = "";
                         }   
-                        // if (sceneResponse.sceneTags != null && sceneResponse.sceneTags.includes("no socket")) {
-                        //     socketScripts = "";
-                        // }   
+                        if (sceneResponse.sceneTags != null && sceneResponse.sceneTags.includes('debug')) { //see matrix.org
+                           obbDebug = "obb-collider=\x22showColliders: true\x22";
+                        }
                         if (sceneResponse.sceneTags != null && sceneResponse.sceneTags.includes('matrix')) { //see matrix.org
                             extraScripts = extraScripts + "<script src=\x22../main/js/browser-matrix.min.js\x22></script>"; 
                             matrixEntities = "<a-entity id=\x22matrix_meshes\x22 matrix_meshes=\x22init: true\x22></a-entity>";
@@ -5013,9 +5015,9 @@ webxr_router.get('/:_id', function (req, res) {
                         // "screen-controls shadow " + xrmode + " " + magicWindow + " " +  
                         // webxrFeatures + " loading-screen=\x22dotsColor: white; backgroundColor: black; enabled: false\x22 " + fogSettings + " "+networkedscene+" "+ARSceneArg+" listen-for-vr-mode " + defaultLights +">";
 
-                        let aScene = "<a-scene "+sceneBackground+" "+physicsInsert+" "+pool_target+" "+pool_launcher+" gesture-detector " + aframeRenderSettings + 
+                        let aScene = "<a-scene "+sceneBackground+" "+physicsInsert+" "+pool_target+" "+pool_launcher+" gesture-detector " + aframeRenderSettings +
                         " reflection=\x22directionalLight:#real-light\x22 "+sceneShadows+" raycaster=\x22objects: .activeObjexRay a-sphere\x22 "+
-                        "screen-controls shadow " + xrmode + " " + magicWindow + " " +  
+                        "screen-controls shadow " + xrmode + " " + magicWindow + " " + obbDebug + " " +
                         webxrFeatures + " loading-screen=\x22dotsColor: white; backgroundColor: black; enabled: false\x22 " + fogSettings + " "+networkedscene+" "+ARSceneArg+" listen-for-vr-mode " + defaultLights +">";
 
                            // "screen-controls xr-mode-ui=\x22enterVREnabled: true; enterAREnabled: true; XRMode: ar,vr\x22 " + magicWindow +   

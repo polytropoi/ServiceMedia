@@ -238,7 +238,8 @@ AFRAME.registerComponent('initializer', { //adjust for device settings, and call
         //     }
           }
         }
-        // sceneEl.setAttribute('obb-collider', {'showColliders': true});
+
+        
       // }
       // if (settings && settings.allowMods && (settings.sceneTags && settings.sceneTags.includes("no picker"))) {
         this.el.setAttribute("location_picker", "init");

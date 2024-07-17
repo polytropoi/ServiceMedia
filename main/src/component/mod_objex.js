@@ -1506,6 +1506,7 @@ AFRAME.registerComponent('mod_object', {
                                         this.data.objectData.physics + " hasShoot " + this.hasShootAction + " hasThrow " + this.hasThrowAction + " isSpawned " + this.data.isSpawned);
               //  setTimeout(function(){  
                 if (this.data.isEquipped) {
+                  this.el.setAttribute('obb-collider', {'size': '.25 .25 .25'});
                   // this.el.setAttribute('ammo-body', {type: 'kinematic', linearDamping: .1, angularDamping: .1});
                 } else { //nm, switch to dynamic when fired if needed/
                   if (this.hasShootAction) {
@@ -1526,6 +1527,7 @@ AFRAME.registerComponent('mod_object', {
                     if (this.data.isSpawned) {
                       this.el.setAttribute('ammo-body', { type: this.data.objectData.physics.toLowerCase(), emitCollisionEvents: true, linearDamping: .1, angularDamping: .1 });
                       this.el.setAttribute('trail', "");
+                      
 
                     } else {
                        //wait a bit for static colliders to load...
@@ -1578,6 +1580,7 @@ AFRAME.registerComponent('mod_object', {
                         // this.el.setAttribute("aabb-collider", {objects: ".activeObjexRay"});
                         this.applyForce();
                         this.el.setAttribute('trail', "");
+                        this.el.setAttribute('obb-collider', {'size': this.data.xscale * 1.5 + ' ' + this.data.yscale * 1.5 + ' ' +this.data.zscale * 1.5});
                       }
                         // }
                         // this.el.setAttribute('rotate-toward-velocity');
@@ -1603,15 +1606,15 @@ AFRAME.registerComponent('mod_object', {
           }
           this.el.object3D.getWorldScale(this.oScale);
           // 
-          setTimeout(()=>{
+          // setTimeout(()=>{
             // this.el.setAttribute('obb-collider', {'size': this.oScale.x + ' ' + this.oScale.y + ' ' +this.oScale.z});
             
             this.el.setAttribute('obb-collider', {'size': this.data.xscale * 1.5 + ' ' + this.data.yscale * 1.5 + ' ' +this.data.zscale * 1.5});
 
             // this.el.setAttribute('obb-collider', {'size': this.data.objectData.colliderScale.toString() + " " + this.data.objectData.colliderScale.toString() + " " + this.data.objectData.colliderScale.toString()});
             // this.el.setAttribute('obb-collider', '');
-            console.log("setting obb-collider " + this.data.xscale  + ' ' + this.data.yscale + ' ' +this.data.zscale );
-          }, 5000);
+            // console.log("setting obb-collider " + this.data.xscale  + ' ' + this.data.yscale + ' ' +this.data.zscale );
+          // }, 3000);
           this.showCallout('', '0 2 2', 10);
       }); //end model-loaded listener
   
@@ -1892,15 +1895,13 @@ AFRAME.registerComponent('mod_object', {
           }
       });
 
-      this.el.addEventListener("collidestart_", (e) => {
+      this.el.addEventListener("collidestart_nope", (e) => { //dep'd for obb collision above, but maybe...
           // e.preventDefault();
         if (!this.isDead && e.detail.targetEl) {  
             console.log("physics collision HIT me "  + this.data.objectData.name + " other id " + e.detail.targetEl.id);
                        
           this.hitpoint = e.detail.targetEl.object3D.position;
           this.distance = window.playerPosition.distanceTo(this.hitpoint);
-        
-
           let targetModObjComponent = e.detail.targetEl.components.mod_object;
           if (targetModObjComponent != null) {
                 console.log(this.data.objectData.name + " gotsa collision with " + targetModObjComponent.data.objectData.name + 
@@ -3527,7 +3528,7 @@ AFRAME.registerComponent('mod_object', {
             scatteredEl.classList.add("envMap");
             scatteredEl.id = this.data.objectData._id + "_scattered_" + scatterCount;
             // if (this.data.markerType != "character") { //messes up navmeshing..
-            // this.el.setAttribute('obb-collider', 'showColliders', true);
+            // this.el.setAttribute('obb-collider');
               // scatteredEl.setAttribute("scale", {x: this.data.xscale * scale, y: this.data.yscale * scale, z: this.data.zscale * scale});
               // scatteredEl.setAttribute("scale", {x: scale, y:scale, z: scale})
 

@@ -255,7 +255,7 @@ window.addEventListener( 'keydown',  ( event ) => {
    
   });
 
-  $('#modalContent').on('change', '#locationTarget', function(e) { //value has timestamp ~ modelID //no, just just the modelID, get el id from global
+  $('#modalContent').on('change', '#locationTarget', function(e) { 
     console.log("locationTarget changed " + e.target.value + " for id " + selectedLocationTimestamp);
     let locEl = document.getElementById(selectedLocationTimestamp);
  
@@ -288,7 +288,7 @@ window.addEventListener( 'keydown',  ( event ) => {
       
   });
 
-  $('#modalContent').on('change', '#locationTags', function(e) { //value has timestamp ~ modelID //no, just just the modelID, get el id from global
+  $('#modalContent').on('change', '#locationTags', function(e) { 
     console.log("model changed " + e.target.value + " for id " + selectedLocationTimestamp);
     // let locSplit = e.target.value.split("~"); 
     // console.log("locSplit modelID : " + locSplit[1]);
