@@ -223,28 +223,17 @@ AFRAME.registerComponent('initializer', { //adjust for device settings, and call
           // }
         }
 
-        // let skybox = document.getElementById("skyEl");
-        // if (this.asky[i].id == "skyEl") {
-        //   let skyrad = settings.sceneSkyRadius - 10;
-        //   console.log("tryna mod a-sky skyEl radius " + skyrad);
-        //   // skybox.setAttribute("radius", skyrad); //in case using reflection and enviro is on..
-        //   this.asky[i].setAttribute("radius", parseInt(settings.sceneSkyRadius) + 1 );
-        // } else {
-        //   let skyboxD = document.getElementById("skybox_dynamic");
-        //   if (skyboxD) {
-        //     let skyradD = settings.sceneSkyRadius + 5;
-        //     console.log("tryna mod asky radius " + skyradD);
-        //     skyboxD.setAttribute("radius", skyradD); //in case using reflection and enviro is on..
-        //     }
           }
         }
 
         
       // }
-      // if (settings && settings.allowMods && (settings.sceneTags && settings.sceneTags.includes("no picker"))) {
+      if (settings && settings.allowMods) {
         this.el.setAttribute("location_picker", "init");
-      // }
-      
+      }
+      // this.el.addEventListener('obbcollisionstarted	', (evt) => {
+      //   console.log("obb player hit : " + evt.target.withEl.id);
+      // });
    }); //end loaded
 
 
@@ -315,7 +304,26 @@ AFRAME.registerComponent('initializer', { //adjust for device settings, and call
 
 }); //end initializer
 
+// AFRAME.registerComponent('obb-collision', {
+//   init: function () {
+//     document.body.addEventListener('obbcollisionstarted	', (evt) => {
+//       console.log("obb player hit start: " + evt.target.withEl.id);
+//     });
+//     document.body.addEventListener('obbcollisionended	', (evt) => {
+//       console.log("obb player hit end: " + evt.target.withEl.id);
+//     });
+//   }
+// });
 
+
+AFRAME.registerComponent("obb-listener", {
+  init: function () {
+    let that = this;
+    this.el.addEventListener("obbcollisionstarted", function (e) {
+      console.log(that.el.id +  " hit " + e.detail.withEl.id); 
+    });
+  }
+});  
 
 AFRAME.registerComponent('disable-magicwindow', {
   init: function () {
@@ -509,24 +517,31 @@ AFRAME.registerComponent('get_pos_rot', { //ATTACHED TO PLAYER BELOW CAMERA RIG,
     this.last = new THREE.Vector3();
     this.posRotObj = {};
   
-    this.el.addEventListener("hitstart", function(event) {  //we're attached to the same player element that has the aabb-collider component, so listening here for player trigger hits
-      // var source = event.originalTarget;
-      console.log(
-        "player TRIGGER event from " + event.target.components["aabb-collider"]["closestIntersectedEl"].id
-          // "TRIGGER event from " + source.id
-        // event.srcElement.id
-      );
-      //local and cloud marker types have triggers, gates, portals, placeholders
-      let cloud_marker = event.target.components["aabb-collider"]["closestIntersectedEl"].components.cloud_marker; //closest trigger if multiple
-      if (cloud_marker != null) { 
-        cloud_marker.playerTriggerHit(); //tell the trigger that player has hit!
-      } else {
-        let local_marker = event.target.components["aabb-collider"]["closestIntersectedEl"].components.local_marker; //closest trigger if multiple
-        if (local_marker != null) { 
-          local_marker.playerTriggerHit(); //tell the trigger that player has hit!
-        }
-      }
+    // this.el.addEventListener("hitstart_nope", function(event) {  //we're attached to the same player element that has the aabb-collider component, so listening here for player trigger hits
+    //   // var source = event.originalTarget;
+    //   console.log(
+    //     "player TRIGGER event from " + event.target.components["aabb-collider"]["closestIntersectedEl"].id
+    //       // "TRIGGER event from " + source.id
+    //     // event.srcElement.id
+    //   );
+    //   //local and cloud marker types have triggers, gates, portals, placeholders
+    //   let cloud_marker = event.target.components["aabb-collider"]["closestIntersectedEl"].components.cloud_marker; //closest trigger if multiple
+    //   if (cloud_marker != null) { 
+    //     cloud_marker.playerTriggerHit(); //tell the trigger that player has hit!
+    //   } else {
+    //     let local_marker = event.target.components["aabb-collider"]["closestIntersectedEl"].components.local_marker; //closest trigger if multiple
+    //     if (local_marker != null) { 
+    //       local_marker.playerTriggerHit(); //tell the trigger that player has hit!
+    //     }
+    //   }
+    // });
+
+    this.el.addEventListener('obbcollisionstarted	', (evt) => {
+        console.log("obb player hit : " + evt.target.withEl.id);
     });
+  // this.el.addEventListener('obbcollisionended	', (evt) => {
+  //     this.obbHit(evt);
+  // });
     
   },
   returnPos: function () {

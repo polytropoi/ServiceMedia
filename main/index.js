@@ -15451,7 +15451,10 @@ function getAllPeople() {
                                 // if (idIndex != -1) {
                                     const y = document.getElementById("modelSelect_" + sceneLocations[h].timestamp);
                                     let modelMatch = false;
-                                    if (sceneLocations[h].modelID != "none" || sceneLocations[h].modelID != "" && !sceneLocations[h].modelID.includes("primitive")) {
+                                    if (sceneLocations[h].modelID && (sceneLocations[h].modelID != "none" || sceneLocations[h].modelID != "") 
+                                        && sceneLocations[h].modelID != "primitive_cube"
+                                        && sceneLocations[h].modelID != "primitive_sphere"
+                                        && sceneLocations[h].modelID != "primitive_cylinder") {
                                         if (JSON.stringify(sceneModels).includes(sceneLocations[h].modelID)) {
                                             console.log("model found " + sceneLocations[h].modelID + " " + sceneLocations[h].model );
                                         } else {
@@ -15475,6 +15478,29 @@ function getAllPeople() {
                                         y.add(option);
                                         }
                                     }
+                                    let cubeOption = document.createElement("option"); 
+                                    let sphereOption = document.createElement("option"); 
+                                    let cylOption = document.createElement("option"); 
+                                    cubeOption.text = "cube";
+                                    cubeOption.value = "primitive_cube";
+                                    sphereOption.text = "sphere";
+                                    sphereOption.value = "primitive_sphere";
+                                    cylOption.text = "cylinder";
+                                    cylOption.value = "primitive_cylinder";
+                                    if (sceneLocations[h].modelID == "primitive_cube") {
+                                        cubeOption.selected = true;
+                                    } 
+                                    if (sceneLocations[h].modelID == "primitive_sphere") {
+                                        sphereOption.selected = true;
+                                    } 
+                                    if (sceneLocations[h].modelID == "primitive_cylinder") {
+                                        cylOption.selected = true;
+                                    } 
+                                    y.add(cubeOption);
+                                    y.add(sphereOption);
+                                    y.add(cylOption);
+
+
                                 // } else {
                                 //     console.log(sceneLocations[h].modelID + " not found!");
                                 //     // sceneLocations[h].modelID = "none";

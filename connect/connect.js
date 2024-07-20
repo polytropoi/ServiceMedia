@@ -82,7 +82,7 @@ let lastCloudUpdate = null;
 let lastLocalUpdate = null;
 let allowCameraLock = true;
 const camLockButton = document.getElementById("camLockToggleButton");
-
+let intersections = [];
 
 $('a-entity').each(function() {  //external way of getting click duration for physics
 
@@ -363,7 +363,40 @@ $(function() {
    }
    // } 
 
-  
+   document.body.addEventListener("obbcollisionstarted", function (e) {
+      if (e.detail) {
+         // console.log(e.detail.withEl.id); 
+         if ((e.detail.withEl.id.toString() == "player") || (e.detail.withEl.components && (e.detail.withEl.components.cloud_marker || e.detail.withEl.components.local_marker))) {
+            let index = intersections.indexOf(e.detail.withEl.id);
+            if (index == -1) {
+               intersections.push(e.detail.withEl.id);
+               console.log("obb collision start with " + e.detail.withEl.id + " intersect index " + index + " " + intersections);
+               if (intersections.indexOf("player") != -1) {
+                  for (let i = 0; i < intersections.length; i++) {
+                     if (intersections[i] != "player") {
+                        let el = document.getElementById(intersections[i]);
+                        if (el) {
+                           if (el.components.cloud_marker) {
+                              el.components.cloud_marker.playerTriggerHit();
+                           } else if (el.components.local_marker) {
+                              el.components.local_marker.playerTriggerHit();
+                           }
+                        }
+                     }
+                  }
+               }
+           }  
+         }
+      }
+      
+      
+    });
+    document.body.addEventListener("obbcollisionended", function (e) {
+      // console.log("collision end " + e.detail.withEl.id); 
+      let index = intersections.indexOf(e.detail.withEl.id);
+      intersections.splice(index, 1);
+      console.log("obb collision end with " + e.detail.withEl.id + " intersect index " + index + " " + intersections);
+    }); 
 
 }); //end onload
 
@@ -1191,7 +1224,7 @@ function ReturnLocationTable () { //just show em all now!
          } else if (localData.locations[i].markerType == "object") { 
             markerString = "<span style=\x22color: salmon; font-weight: bold;\x22>"+localData.locations[i].markerType+"</span>";
          } else if (localData.locations[i].markerType == "trigger") { 
-            markerString = "<span style=\x22color: silver; font-weight: bold;\x22>"+localData.locations[i].markerType+"</span>";
+            markerString = "<span style=\x22color: LightSalmon; font-weight: bold;\x22>"+localData.locations[i].markerType+"</span>";
          } else if (localData.locations[i].markerType == "collider") { 
             markerString = "<span style=\x22color: firebrick; font-weight: bold;\x22>"+localData.locations[i].markerType+"</span>";
          } else if (localData.locations[i].markerType == "navmesh") { 

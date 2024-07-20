@@ -154,6 +154,7 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
                 } else if (this.data.markerType.toLowerCase().includes("trigger")) {
                   // this.el.setAttribute('gltf-model', '#poi1');  
                   this.el.setAttribute("geometry", {"primitive": "box", "width": 1, "height": 1, "depth": 1});
+                  
                 } else if (this.data.markerType.toLowerCase().includes("collider")) {
                   // this.el.setAttribute("geometry", {primitive: "box", width: 1, height: 1, depth: 1});
                 } else if (this.data.markerType.toLowerCase() == "gate") {
@@ -253,7 +254,13 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
                   if (this.data.tags.includes("flicker")) {
                     this.el.setAttribute("mod_flicker", {type: "candle"});
                   }
-                  this.loadModel();
+
+                  if (this.data.tags.includes("hide gizmo") || (settings && settings.hideGizmos)) {
+                    if (this.data.markerType != "mailbox" && this.data.markerType != "light") {
+                      this.el.removeAttribute("geometry");
+                    }
+                  }
+                  // this.loadModel();
                   // this.el.
                     
                 }
@@ -262,7 +269,6 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
                   if (this.data.markerType != "mailbox" && this.data.markerType != "light") {
                     this.el.object3D.visible = false;
                   }
-                  
                 }
               } else {
                 if (this.data.modelID != "none") {
@@ -559,7 +565,9 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
 
         this.el.addEventListener('mouseenter', (evt) => {
   
-  
+          if (this.data.tags && this.data.tags.toLowerCase().includes("no select")) {
+            return;
+          }
         if (evt.detail.intersection) {
           this.clientX = evt.clientX;
           this.clientY = evt.clientY;
@@ -1407,6 +1415,9 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
     },
     playerTriggerHit: function () { //might use AABB collider or physics
       console.log("gotsa player trigger hit on local marker with type " + this.data.markerType.toLowerCase()); 
+      if (this.data.markerType == "trigger" && this.data.tags && this.data.tags.toLowerCase().includes("no enter")) {
+        return;
+      }
         if (this.data.markerType.toLowerCase() == "spawntrigger") {
   
             let objexEl = document.getElementById('sceneObjects');    

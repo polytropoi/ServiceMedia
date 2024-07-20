@@ -1702,14 +1702,14 @@ webxr_router.get('/:_id', function (req, res) {
                                     if (useSimpleNavmesh || useNavmesh) {
                                         wasd = "extended_wasd_controls=\x22fly: false; moveSpeed: "+sceneResponse.scenePlayer.playerSpeed+"; inputType: keyboard\x22 simple-navmesh-constraint=\x22navmesh:#nav-mesh;fall:10; height: 1.6\x22";
                                     } 
-                                    cameraRigEntity = "<a-entity id=\x22cameraRig\x22 initializer "+
+                                    cameraRigEntity = "<a-entity id=\x22cameraRig\x22 initializer"+
                                         " id=\x22mouseCursor\x22 cursor=\x22rayOrigin: mouse\x22 raycaster=\x22objects: .activeObjexRay\x22>"+
                                         // " id=\x22mouseCursor\x22 cursor=\x22rayOrigin: mouse\x22 raycaster=\x22objects: .activeObjexRay\x22 rotation=\x22"+playerRotation+"\x22 position=\x22"+playerPosition+"\x22>"+
                                         // " id=\x22mouseCursor\x22 cursor=\x22rayOrigin: mouse\x22 raycaster=\x22objects: .activeObjexRay\x22 position=\x220 0 0\x22>"+
                                         // "<a-entity id=\x22player\x22 get_pos_rot networked=\x22template:#avatar-template;attachTemplateToLocal:false;\x22 "+spawnInCircle+" camera "+wasd+" look-controls=\x22hmdEnabled: false\x22 position=\x220 1.6 0\x22>" +     
                                         // "<a-entity id=\x22viewportPlaceholder\x22 position=\x220 0 -1\x22></entity>"+  
                                         //obb-collider=\x22size: 1 1 1\x22 
-                                        "<a-entity id=\x22player\x22 "+lookcontrols+" get_pos_rot camera=\x22near: .1\x22 "+wasd+" "+ physicsMod +" rotation=\x22"+playerRotation+"\x22 position=\x22"+playerPosition+"\x22>"+
+                                        "<a-entity id=\x22player\x22 "+lookcontrols+" get_pos_rot obb-collider=\x22size: 1 1 1\x22 camera=\x22near: .1\x22 "+wasd+" "+ physicsMod +" rotation=\x22"+playerRotation+"\x22 position=\x22"+playerPosition+"\x22>"+
                                             "<a-entity id=\x22equipPlaceholder\x22 geometry=\x22primitive: box; height: .1; width: .1; depth: .1;\x22 position=\x220 -.65 -.75\x22"+
                                             "material=\x22opacity: 0\x22></a-entity>"+
                                             "<a-entity id=\x22viewportPlaceholder\x22 geometry=\x22primitive: plane; height: 0.01; width: .01\x22 position=\x220 0 -1.5\x22"+
@@ -2126,15 +2126,19 @@ webxr_router.get('/:_id', function (req, res) {
                         for (let i = 0; i < locationPlaceholders.length; i++) {
                             //use the "cloud_marker" component for certain markertypes () TODO rename it to mod_location // nope
                             let scale = 1;
+                            let rot = 0;
                             if (locationPlaceholders[i].markerObjScale && locationPlaceholders[i].markerObjScale != 0 && locationPlaceholders[i].markerObjScale != "") {
                                 scale = locationPlaceholders[i].markerObjScale;
                             }
                             const xscale = locationPlaceholders[i].xscale != null ? locationPlaceholders[i].xscale : scale;
                             const yscale = locationPlaceholders[i].yscale != null ? locationPlaceholders[i].yscale : scale;
                             const zscale = locationPlaceholders[i].zscale != null ? locationPlaceholders[i].zscale : scale;   
-                            placeholderEntities = placeholderEntities + "<a-entity id=\x22"+locationPlaceholders[i].timestamp+"\x22 class=\x22activeObjexGrab activeObjexRay envMap placeholders\x22 cloud_marker=\x22phID: "+
+                            const xrot = locationPlaceholders[i].eulerx != null ? locationPlaceholders[i].xscale : rot;
+                            const yrot = locationPlaceholders[i].eulery != null ? locationPlaceholders[i].yscale : rot;
+                            const zrot = locationPlaceholders[i].eulerz != null ? locationPlaceholders[i].zscale : rot;
+                            placeholderEntities = placeholderEntities + "<a-entity id=\x22"+locationPlaceholders[i].timestamp+"\x22 class=\x22activeObjexGrab activeObjexRay envMap placeholders\x22 obb-listener cloud_marker=\x22phID: "+
                             locationPlaceholders[i].phID+"; scale: "+scale+"; xpos: "+locationPlaceholders[i].x+"; ypos: "+locationPlaceholders[i].y+"; zpos: "+locationPlaceholders[i].z+";" +
-                            "xrot: "+locationPlaceholders[i].eulerx+"; yrot: "+locationPlaceholders[i].eulery+"; zrot: "+locationPlaceholders[i].eulerz+"; "+
+                            "xrot: "+xrot+"; yrot: "+yrot+"; zrot: "+zrot+"; "+
                             "mediaID: "+locationPlaceholders[i].mediaID+"; mediaName: "+locationPlaceholders[i].mediaName+"; "+
                             "xscale: "+xscale+"; yscale: "+yscale+"; zscale: "+zscale+"; modelID: "+locationPlaceholders[i].modelID+"; model: "+
                             locationPlaceholders[i].model+"; markerType: "+locationPlaceholders[i].markerType+";  tags: "+locationPlaceholders[i].locationTags+"; isNew: false; name: "+
@@ -4218,7 +4222,7 @@ webxr_router.get('/:_id', function (req, res) {
                                                 }
                                                 picIndex++;
                                             } else {
-                                                if (sceneResponse.sceneTags.includes("scatter pics")) {
+                                                if (sceneResponse.sceneTags && sceneResponse.sceneTags.includes("scatter pics")) {
                                                     scatterPics = true; //use cooked positions above, not assigned locations
                                                 }
                                             }
@@ -4989,7 +4993,8 @@ webxr_router.get('/:_id', function (req, res) {
                             //"<a-sphere follow-path=\x22incrementBy:0.001; throttleTo:1\x22 position=\x220 10.25 -5\x22 radius=\x221.25\x22 color=\x22#EF2D5E\x22></a-sphere>";
                         }
                          
-                        let magicWindow = " disable-magicwindow device-orientation-permission-ui=\x22enabled: false\x22 "; //by default use the joystick...
+                        // let magicWindow = " disable-magicwindow device-orientation-permission-ui=\x22enabled: false\x22 "; //by default use the joystick...
+                        let magicWindow = " disable-magicwindow "; 
                         if (sceneResponse.sceneTags != null && (sceneResponse.sceneTags.includes('magicwindow') || sceneResponse.sceneTags.includes('magic window'))) {
                             magicWindow = "";
                             joystick = "";

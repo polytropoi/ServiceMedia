@@ -144,12 +144,12 @@ AFRAME.registerComponent('mod_physics', { //used by models, placeholders, instan
         let modObjectComponent = this.el.components.mod_object;
         if (!modObjectComponent) {
         this.el.setAttribute('ammo-body', {type: this.data.body, emitCollisionEvents: this.isTrigger});
-        this.el.body.restitution = 10;
+        // this.el.body.restitution = 10;
         this.el.setAttribute('ammo-shape', {type: 'mesh'});
         } else {
           setTimeout( () => { //wait a bit for static colliders to load...
             this.el.setAttribute('ammo-body', {type: this.data.body, emitCollisionEvents: this.isTrigger});
-            this.el.body.restitution = 10;
+            // this.el.body.restitution = 10;
             this.el.setAttribute('ammo-shape', {type: 'mesh'});
           }, 10000 * Math.random() );
         }

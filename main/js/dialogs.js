@@ -918,11 +918,12 @@ function ReturnLocationMarkerTypeSelect (selected) {
       "poi",
       "waypoint",
       "trigger",
+      "collider",
       "target",
       "gate",
       "link",
       "portal",
-      "collider",
+
       "light",
       "player",
       "character",
