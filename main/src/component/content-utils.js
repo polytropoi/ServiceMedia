@@ -316,14 +316,14 @@ AFRAME.registerComponent('initializer', { //adjust for device settings, and call
 // });
 
 
-AFRAME.registerComponent("obb-listener", {
-  init: function () {
-    let that = this;
-    this.el.addEventListener("obbcollisionstarted", function (e) {
-      console.log(that.el.id +  " hit " + e.detail.withEl.id); 
-    });
-  }
-});  
+// AFRAME.registerComponent("obb-listener", {
+//   init: function () {
+//     let that = this;
+//     this.el.addEventListener("obbcollisionstarted", function (e) {
+//       console.log(that.el.id +  " hit " + e.detail.withEl.id); 
+//     });
+//   }
+// });  
 
 AFRAME.registerComponent('disable-magicwindow', {
   init: function () {
@@ -536,9 +536,9 @@ AFRAME.registerComponent('get_pos_rot', { //ATTACHED TO PLAYER BELOW CAMERA RIG,
     //   }
     // });
 
-    this.el.addEventListener('obbcollisionstarted	', (evt) => {
-        console.log("obb player hit : " + evt.target.withEl.id);
-    });
+    // this.el.addEventListener('obbcollisionstarted	', (evt) => {
+    //     console.log("obb player hit : " + evt.target.withEl.id);
+    // });
   // this.el.addEventListener('obbcollisionended	', (evt) => {
   //     this.obbHit(evt);
   // });

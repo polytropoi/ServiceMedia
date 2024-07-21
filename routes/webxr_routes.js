@@ -1061,8 +1061,8 @@ webxr_router.get('/:_id', function (req, res) {
                                     sceneModelLocations.push(sceneResponse.sceneLocations[i]); // if no model will set a default below
                                 }
                                 if (sceneResponse.sceneLocations[i].markerType != undefined && sceneResponse.sceneLocations[i].type.toLowerCase() != 'geographic') { //cloudmarkers, special type allows local mods
-                                    if (sceneResponse.sceneLocations[i].markerType.toLowerCase() == "none" 
-                                        || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "placeholder" 
+                                    if (//sceneResponse.sceneLocations[i].markerType.toLowerCase() == "none" 
+                                        sceneResponse.sceneLocations[i].markerType.toLowerCase() == "placeholder" 
                                         || sceneResponse.sceneLocations[i].markerType.toLowerCase().includes("trigger") 
                                         || sceneResponse.sceneLocations[i].markerType.toLowerCase().includes("collider") 
                                         || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "poi" 
@@ -1702,7 +1702,7 @@ webxr_router.get('/:_id', function (req, res) {
                                     if (useSimpleNavmesh || useNavmesh) {
                                         wasd = "extended_wasd_controls=\x22fly: false; moveSpeed: "+sceneResponse.scenePlayer.playerSpeed+"; inputType: keyboard\x22 simple-navmesh-constraint=\x22navmesh:#nav-mesh;fall:10; height: 1.6\x22";
                                     } 
-                                    cameraRigEntity = "<a-entity id=\x22cameraRig\x22 initializer"+
+                                    cameraRigEntity = "<a-entity id=\x22cameraRig\x22 initializer "+
                                         " id=\x22mouseCursor\x22 cursor=\x22rayOrigin: mouse\x22 raycaster=\x22objects: .activeObjexRay\x22>"+
                                         // " id=\x22mouseCursor\x22 cursor=\x22rayOrigin: mouse\x22 raycaster=\x22objects: .activeObjexRay\x22 rotation=\x22"+playerRotation+"\x22 position=\x22"+playerPosition+"\x22>"+
                                         // " id=\x22mouseCursor\x22 cursor=\x22rayOrigin: mouse\x22 raycaster=\x22objects: .activeObjexRay\x22 position=\x220 0 0\x22>"+
@@ -2136,7 +2136,7 @@ webxr_router.get('/:_id', function (req, res) {
                             const xrot = locationPlaceholders[i].eulerx != null ? locationPlaceholders[i].xscale : rot;
                             const yrot = locationPlaceholders[i].eulery != null ? locationPlaceholders[i].yscale : rot;
                             const zrot = locationPlaceholders[i].eulerz != null ? locationPlaceholders[i].zscale : rot;
-                            placeholderEntities = placeholderEntities + "<a-entity id=\x22"+locationPlaceholders[i].timestamp+"\x22 class=\x22activeObjexGrab activeObjexRay envMap placeholders\x22 obb-listener cloud_marker=\x22phID: "+
+                            placeholderEntities = placeholderEntities + "<a-entity id=\x22"+locationPlaceholders[i].timestamp+"\x22 class=\x22activeObjexGrab activeObjexRay envMap placeholders\x22 cloud_marker=\x22phID: "+
                             locationPlaceholders[i].phID+"; scale: "+scale+"; xpos: "+locationPlaceholders[i].x+"; ypos: "+locationPlaceholders[i].y+"; zpos: "+locationPlaceholders[i].z+";" +
                             "xrot: "+xrot+"; yrot: "+yrot+"; zrot: "+zrot+"; "+
                             "mediaID: "+locationPlaceholders[i].mediaID+"; mediaName: "+locationPlaceholders[i].mediaName+"; "+
@@ -4993,8 +4993,9 @@ webxr_router.get('/:_id', function (req, res) {
                             //"<a-sphere follow-path=\x22incrementBy:0.001; throttleTo:1\x22 position=\x220 10.25 -5\x22 radius=\x221.25\x22 color=\x22#EF2D5E\x22></a-sphere>";
                         }
                          
-                        // let magicWindow = " disable-magicwindow device-orientation-permission-ui=\x22enabled: false\x22 "; //by default use the joystick...
-                        let magicWindow = " disable-magicwindow "; 
+                        let magicWindow = " disable-magicwindow device-orientation-permission-ui=\x22enabled: false\x22 "; //by default use the joystick...
+                        // let magicWindow = " disable-magicwindow "; 
+
                         if (sceneResponse.sceneTags != null && (sceneResponse.sceneTags.includes('magicwindow') || sceneResponse.sceneTags.includes('magic window'))) {
                             magicWindow = "";
                             joystick = "";
