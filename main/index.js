@@ -10129,6 +10129,7 @@ function getAllPeople() {
         "textbook",
         "picturebook",
         "link",
+        "weblink",
 
         "pickup",
         "drop",

@@ -66,9 +66,9 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
       if (this.data.allowMods) {
         this.el.classList.add("allowMods");
       }
-      if (this.data.markerType == "collider") {
-        this.data.modelID = "primitive_cube";
-      } 
+      // if (this.data.markerType == "collider") {
+      //   this.data.modelID = "primitive_cube";
+      // } 
       
       if (this.data.tags && this.data.tags.includes("follow curve")) {
         this.el.setAttribute("mod_curve", {"origin": "location", "isClosed": true, "spreadFactor": 2})
@@ -92,9 +92,9 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                 } else if (this.data.markerType.toLowerCase() == "waypoint") {
                   this.el.setAttribute('gltf-model', '#poi1');
                   this.el.classList.add("waypoint");
-                } else if (this.data.markerType.toLowerCase() == "trigger") {
-                  // this.el.setAttribute('gltf-model', '#poi1');
-                  this.el.setAttribute("geometry", {"primitive": "box", "width": this.data.xscale, "height": this.data.yscale, "depth": this.data.zscale});
+                } else if (this.data.markerType == "trigger" || this.data.markerType == "spawntrigger") { //spawntrigger deprecated
+                  this.el.setAttribute('gltf-model', '#poi1');
+                  // this.el.setAttribute("geometry", {"primitive": "box", "width": this.data.xscale, "height": this.data.yscale, "depth": this.data.zscale});
                  
                   this.el.setAttribute("material", {color: "LightSalmon", transparent: true, opacity: .5});
                   this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"box", scaleFactor: this.data.scale});
@@ -264,7 +264,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                     // this.el.setAttribute("color", "purple");
                 } else if (this.data.markerType.toLowerCase().includes("link")) {
                   this.el.setAttribute("material", {color: "gold", transparent: true, opacity: .5});
-                } else if (this.data.markerType.toLowerCase().includes("trigger")) {
+                } else if (this.data.markerType.toLowerCase() ==  "trigger" || this.data.markerType == "spawntrigger") {
                     this.el.setAttribute("material", {color: "LightSalmon", transparent: true, opacity: .5});
                     // this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"placeholder"});
                     this.el.setAttribute("obb-collider", {size: this.data.xscale * 1.5 + " " + this.data.yscale * 1.5 + " " + this.data.zscale * 1.5});
@@ -1474,7 +1474,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
     },
     playerTriggerHit: function () { //this uses AABB collider//nope, all physics now...//nope, either obb or physics, depending
       console.log("gotsa player trigger hit on type " + this.data.markerType); 
-      if (this.data.markerType == "trigger" && this.data.tags && this.data.tags.toLowerCase().includes("no enter")) {
+      if (this.data.markerType == "trigger" && this.data.tags && this.data.tags.toLowerCase().includes("no enter")) { //disable the player contact of trigger
         return;
       }
       var triggerAudioController = document.getElementById("triggerAudio");
@@ -1484,10 +1484,24 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
         }
         
       }  
-      if (this.data.markerType.toLowerCase() == "spawntrigger") {
-  
+      if (this.data.markerType.toLowerCase() == "spawntrigger" || //deprecated, will just use trigger + tags + datas
+        (this.data.markerType.toLowerCase() == "trigger" && (this.data.tags && this.data.tags.includes("spawn"))) ) {
+          console.log("gotsa spawn trigger !" + this.data.markerType + this.data.eventData); 
+          if (this.data.eventData && this.data.eventData.length > 3) {
             let objexEl = document.getElementById('sceneObjects');    
-            objexEl.components.mod_objex.spawnObject(this.data.eventData); //eventdata should have the name of a location with spawn markertype
+            if (objexEl) {
+              let modObjex = objexEl.components.mod_objex;
+              if (modObjex) {
+                modObjex.spawnObject(this.data.eventData); //eventdata should have the name of a location with spawn markertype
+              }
+            } else {
+              console.log("can't find objexEl!");
+            }
+          
+          } else if (this.data.locationTarget) {
+
+          }
+            
       }
       if (this.data.markerType.toLowerCase() == "gate") {
         if (this.data.eventData != null && this.data.eventData != "") {

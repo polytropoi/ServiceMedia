@@ -1074,7 +1074,7 @@ webxr_router.get('/:_id', function (req, res) {
                                         || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "text" 
                                         || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "light"  
                                         || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "link"  
-                                         
+                                        // || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "weblink" 
                                         || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "picture"  
                                         || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "picture group"  
                                         || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "mailbox") {
@@ -1197,6 +1197,15 @@ webxr_router.get('/:_id', function (req, res) {
                                     }
                                 }
                                 if (sceneResponse.sceneLocations[i].markerType == "link") {
+                                    // console.log("pushing link location " + JSON.stringify(sceneResponse.sceneLocations[i]));
+                                    // let weblinkLocation = {};
+                                    // weblinkLocation = sceneResponse.sceneLocations[i];
+                                    // weblinkLocation.loc = sceneResponse.sceneLocations[i].x + " " + sceneResponse.sceneLocations[i].y + " " + zFix;
+                                    // weblinkLocation.data = sceneResponse.sceneLocations[i].eventData;
+                                    // sceneWeblinkLocations.push(weblinkLocation);
+
+                                }
+                                if (sceneResponse.sceneLocations[i].markerType == "weblink") {
                                     // console.log("pushing link location " + JSON.stringify(sceneResponse.sceneLocations[i]));
                                     let weblinkLocation = {};
                                     weblinkLocation = sceneResponse.sceneLocations[i];
