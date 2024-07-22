@@ -14,7 +14,9 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
       model: {default: ''},
       mediaID: {default: ''},
       mediaName: {default: ''},
+      targetElements: {default: ''}, //array -> csv
       scale: {default: 1},
+      
         // position: {default: ''},
       xpos: {type: 'number', default: 0}, //for modding...
       ypos: {type: 'number', default: 0},
@@ -32,6 +34,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
     },
     dependencies: ['geometry', 'material'],
     init: function () {
+      this.coolDown = false;
     //   console.log("tryna set a cloudmarker with scale " + this.data.scale);
     
      var sceneEl = document.querySelector('a-scene'); 
@@ -805,7 +808,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
       }
     },
     //when there's a local change
-    updateAndLoad: function (name, description, tags, eventData, markerType, scale, xpos, ypos, zpos, xrot, yrot, zrot, xscale, yscale, zscale, modelID, objectID, mediaID) {
+    updateAndLoad: function (name, description, tags, eventData, markerType, scale, xpos, ypos, zpos, xrot, yrot, zrot, xscale, yscale, zscale, modelID, objectID, mediaID, locationTargets) {
         this.data.name = name;
         this.data.description = description;
         this.data.tags = tags;
@@ -822,7 +825,8 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
         this.data.xscale = xscale;
         this.data.yscale = yscale;
         this.data.zscale = zscale;
-        this.data.mediaID = mediaID;
+        this.data.mediaID = mediaID
+        this.data.targetElements = locationTargets;
         // console.log("tryna scale to " + xscale + " " + yscale+ " " + zscale);
         console.log("cloudmarker updateAndLoad tags " + this.data.tags + " markertype " + markerType + " mediaID " + mediaID + " modelID " + modelID);
         // setTimeout(() => {
@@ -1501,7 +1505,33 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
           } else if (this.data.locationTarget) {
 
           }
-            
+      }
+      if (this.data.tags && this.data.tags.length && this.data.tags.toLowerCase().includes("toggle")) {
+        console.log( "tryna toggle somethin..." + this.data.targetElements); 
+        if (this.data.targetElements != '') {
+          for (let i = 0; i < this.data.targetElements.length; i++) {
+            let targetEl = document.getElementById(this.data.targetElements[i].toString());
+            if (targetEl && !this.coolDown) {
+              // let isVisible = targetEl.dataset.isVisible;
+              // targetEl.dataset.isVisible = !targetEl.dataset.isVisible;
+              console.log( targetEl.id + " element isVisible : " + targetEl.dataset.isvisible); 
+              if (targetEl.dataset.isvisible == "no") {
+                this.coolDown = true;
+                
+                targetEl.setAttribute("visible", true)
+                targetEl.dataset.isvisible = "yes";
+                console.log("set to visible " + targetEl.dataset.isvisible);
+              } else {
+                this.cooldown = true;
+                
+                targetEl.setAttribute("visible", false);
+                targetEl.dataset.isvisible = "no";
+                console.log("set to visible " + targetEl.dataset.isvisible);
+              }
+              this.coolDownTimer();
+            }
+          }
+        }
       }
       if (this.data.markerType.toLowerCase() == "gate") {
         if (this.data.eventData != null && this.data.eventData != "") {
@@ -1574,6 +1604,18 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
   
       }
     },
+    coolDownTimer: function () {
+      // if (!this.coolDown) {
+      //   this.coolDown = true;
+        
+        setTimeout( () => {
+          this.coolDown = false;
+          // this.calloutText.setAttribute("troika-text", {
+          //   value: "",
+          // });
+        }, 2000);
+      // }
+    },
     rayhit: function (hitID, distance, hitpoint) {
       // if (this.hitID != hitID) {
       //   this.hitID = hitID;
@@ -1596,6 +1638,36 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
               triggerAudioController.playAudioAtPosition(hitpoint, distance, this.data.tags);
             }
            
+          }
+        }
+        if (this.data.tags && this.data.tags.length && this.data.tags.toLowerCase().includes("toggle")) {
+          console.log( "tryna toggle somethin..." + this.data.targetElements + " length"); 
+          if (this.data.targetElements != '') {
+
+            for (let i = 0; i < this.data.targetElements.length; i++) {
+              let targetEl = document.getElementById(this.data.targetElements[i].toString());
+              if (targetEl) {
+                // let isVisible = targetEl.dataset.isVisible;
+                // targetEl.dataset.isVisible = !targetEl.dataset.isVisible;
+                console.log( targetEl.id + " element isVisible : " + targetEl.dataset.isvisible); 
+                if (targetEl.dataset.isvisible == "no") {
+                  // this.coolDown = true;
+                  
+                  targetEl.setAttribute("visible", true)
+                  targetEl.dataset.isvisible = true;
+                  console.log("set to visible " + targetEl.dataset.isvisible);
+                } else {
+                  // this.cooldown = true;
+                  
+                  targetEl.setAttribute("visible", false);
+                  targetEl.dataset.isvisible = "no";
+                  console.log("set to visible " + targetEl.dataset.isvisible);
+                }
+              
+                
+              }
+            }
+            // this.coolDownTimer();
           }
         }
       }

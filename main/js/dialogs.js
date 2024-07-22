@@ -255,35 +255,43 @@ window.addEventListener( 'keydown',  ( event ) => {
    
   });
 
-  $('#modalContent').on('change', '#locationTarget', function(e) { 
-    console.log("locationTarget changed " + e.target.value + " for id " + selectedLocationTimestamp);
+  $('#modalContent').on('change', '#locationTargets', function(e) { 
+    console.log("locationTargets changed " + e.target.value + " for id " + selectedLocationTimestamp);
     let locEl = document.getElementById(selectedLocationTimestamp);
  
     if (locEl) {
     let modModelComponent = locEl.components.mod_model;
     let localMarkerComponent = locEl.components.local_marker;
     let cloudMarkerComponent = locEl.components.cloud_marker;
-    for (let i = 0; i < localData.locations.length; i++) { 
-      // console.log(localData.locations[i].timestamp + " vs " + selectedLocationTimestamp);
-      if (localData.locations[i].timestamp == selectedLocationTimestamp) {
+    let selected = Array.from(document.getElementById('locationTargets').options).filter(function (option) {
+      return option.selected;
+    }).map(function (option) {
+      return option.value;
+    });
+    console.log("selected " + selected);
+    // for (let s = 0; s < selected.length; s++) {
+      for (let i = 0; i < localData.locations.length; i++) { 
+        // console.log(localData.locations[i].timestamp + " vs " + selectedLocationTimestamp);
+        if (localData.locations[i].timestamp == selectedLocationTimestamp) {
 
-        localData.locations[i].locationTarget = e.target.value;
-      
-        // if (!localData.locations[i].isLocal) {
-          if (modModelComponent) { //not for objex, which have their own action system?
-            modModelComponent.data.locationTarget = e.target.value;
+          localData.locations[i].locationTargets = selected;
+          console.log("setting locationTarget to " + selected);
+          // if (!localData.locations[i].isLocal) {
+            if (modModelComponent) { //not for objex, which have their own action system?
+              modModelComponent.data.targetElements = selected;
 
-          } else if (cloudMarkerComponent) {
-            cloudMarkerComponent.data.locationTarget = e.target.value;
+            } else if (cloudMarkerComponent) {
+              cloudMarkerComponent.data.targetElement = selected;
 
-          } else if (localMarkerComponent) {
-            localMarkerComponent.data.locationTarget = e.target.value;
+            } else if (localMarkerComponent) {
+              localMarkerComponent.data.targetElement = selected;
 
-          }
-        
-        break;
+            }
+          
+          break;
+        }
       }
-    }  
+    // }  
   }
       
   });
@@ -714,8 +722,9 @@ function ReturnLocationModelSelect () {
 
    for (let i = 0; i < sceneModels.length; i++) {
       // if (sceneModels[i].isPublic || !isGuest) { //maybe something else?
-      console.log("locMdl: "  + locationItem.modelID + " vs " + sceneModels[i]._id);
+
          if (locationItem != null && locationItem.modelID == sceneModels[i]._id) {
+          console.log("locMdl: "  + locationItem.modelID + " vs " + sceneModels[i]._id);
             // modelSelect = modelSelect + "<option value=\x22"+phID+"~"+sceneModels[i]._id+"\x22 selected>" + sceneModels[i].name + "</option>";
             modelSelect = modelSelect + "<option value=\x22"+sceneModels[i]._id+"\x22 selected>" + sceneModels[i].name + "</option>";
             console.log("locMdl selected: "  + locationItem.modelID + " vs " + sceneModels[i]._id);
@@ -781,15 +790,17 @@ function ReturnLocationObjectSelect (phID) {
 }
 function ReturnOtherLocations (selected) {
   let phID = selectedLocationTimestamp;
-  // console.log("tryna return media for element " + phID);
+  console.log("selected options for locationTargets " + selected);
   let locs = "<option value=\x22none\x22 selected>none</option>";
   for (let i = 0; i < localData.locations.length; i++) {
     if (localData.locations[i].timestamp != selectedLocationTimestamp) {
       // locArray.push
-      if (localData.locations[i].timestamp == selected) {
+      if (selected.includes(localData.locations[i].timestamp.toString())) {
         locs = locs + "<option value=\x22"+localData.locations[i].timestamp+"\x22 selected>"+localData.locations[i].name+"</option>";
+      } else {
+        locs = locs + "<option value=\x22"+localData.locations[i].timestamp+"\x22>"+localData.locations[i].name+"</option>";
       }
-      locs = locs + "<option value=\x22"+localData.locations[i].timestamp+"\x22>"+localData.locations[i].name+"</option>";
+     
     }
     if (i == localData.locations.length - 1) {
       return locs;
@@ -1041,8 +1052,8 @@ function ShowLocationModal(timestamp) {
         // if (userData.sceneOwner != null) {
         //     cloudSaveButton = "<button class=\x22reallySaveButton\x22 onclick=\x22SaveModsToCloud('"+phID+"')\x22>Save (cloud)</button>";
         // }
-        if (!thisLocation.locationTarget) {
-          thisLocation.locationTarget = "none";
+        if (!thisLocation.locationTargets) {
+          thisLocation.locationTargets = "none";
         }
         
         let disabled = "disabled";
@@ -1135,12 +1146,12 @@ function ShowLocationModal(timestamp) {
         // "+that.data.timestamp+","+that.data.name+","+position.x+","+position.y+","+position.z+"
         // ReturnOtherLocations();
 
-        "<div class=\x22row\x22><div class=\x22threecolumn\x22><label for=\x22locationTarget\x22>Target Location</label>"+
-        "<select id=\x22locationTarget\x22 name=\x22locationTarget\x22>"+
-        ReturnOtherLocations(thisLocation.locationTarget) +
+        "<div class=\x22row\x22><div class=\x22threecolumn\x22><label for=\x22locationTargets\x22>Target Location(s)</label>"+
+        "<select id=\x22locationTargets\x22 name=\x22locationTargets\x22 multiple size=\x223\x22>"+
+        ReturnOtherLocations(thisLocation.locationTargets) +
         "</select></div>"+
 
-        "<div class=\x22threecolumn\x22><label for=\x22locationTarget\x22>Location Media</label>"+
+        "<div class=\x22threecolumn\x22><label for=\x22locationMedia\x22>Location Media</label>"+
         "<select id=\x22locationMedia\x22 name=\x22locationMedia\x22>"+
         ReturnMediaSelections(thisLocation.mediaID, thisLocation.markerType) +
         "</select></div>"+
@@ -2830,7 +2841,7 @@ var PlayDialogLoop = function(arr) {
 
     function DisplayLocalFiles() {
       const galleryContainer = document.getElementById('localFilesContainer');
-      console.log("tryna display local files");
+      // console.log("tryna display local files");
       if (galleryContainer) {
         galleryContainer.innerHTML = '';
         for (const file in localData.localFiles) {

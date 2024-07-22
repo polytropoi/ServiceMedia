@@ -85,7 +85,8 @@ function InitIDB() {
                                                             cursor.value.locations[i].zscale,
                                                             cursor.value.locations[i].modelID,
                                                             cursor.value.locations[i].objectID,
-                                                            cursor.value.locations[i].mediaID );   
+                                                            cursor.value.locations[i].mediaID,
+                                                            cursor.value.locations[i].locationTargets );   
 
                         } else {
                            let modModelComponent = cloudEl.components.mod_model;
@@ -109,7 +110,7 @@ function InitIDB() {
                                                             cursor.value.locations[i].xscale,
                                                             cursor.value.locations[i].yscale,
                                                             cursor.value.locations[i].zscale,
-                                                            cursor.value.locations[i].modelID);
+                                                            cursor.value.locations[i].modelID   );
                            }
                         }
                      } else {//local-only elements, not saved to cloud yet
