@@ -330,8 +330,66 @@ AFRAME.registerComponent('mod-materials', {
         }
     }
 
-    //////////////////////////// - VID MATERIALS EMBED
+  //////////////////////////// - WEBCAM MATERIALS EMBED (e.g. local mediadevices)
+    AFRAME.registerComponent('webcam_materials_embed', { 
+      init: function () {
 
+        this.el.classList.add("video_embed");
+       
+        this.loadWebcam();
+      },
+      loadWebcam: function () {
+        navigator.mediaDevices
+        .enumerateDevices()
+        .then((devices) => {
+          if (devices.length) {
+            devices.forEach((device) => {
+              console.log(`${device.kind}: ${device.label} id = ${device.deviceId}`);
+            });
+            navigator.mediaDevices.getUserMedia({audio: false, video: true})
+            .then(stream => {
+              let $video = document.querySelector('video');
+              $video.srcObject = stream
+              $video.onloadedmetadata = () => {
+                $video.play()
+                this.loadTexture();        
+              }
+            })
+          } else {
+            console.log("no devices found!");
+          }
+         
+        })
+        .catch((err) => {
+          console.error(`${err.name}: ${err.message}`);
+        });
+  
+       
+      },
+      loadTexture: function () {
+        this.video = document.getElementById(this.data.id);  
+        this.mesh = this.el.getObject3D('Object3D');
+        this.screenMesh = null;
+        this.mesh.traverse(node => {
+          // if (node instanceof THREE.Mesh) 
+            if ((node.name.toLowerCase().includes("screen") || node.name.toLowerCase().includes("hvid")) && node.material) {
+              this.screenMesh = node; 
+
+              console.log("gotsa screen mesh");
+            }
+        });
+
+        this.vidtexture = new THREE.VideoTexture( this.video );
+        this.vidtexture.flipY = this.data.flipY; 
+        this.vidtexture.colorSpace = THREE.SRGBColorSpace;
+        this.playmaterial = new THREE.MeshBasicMaterial( { map: this.vidtexture, shader: THREE.FlatShading } ); 
+        if (this.screenMesh != null) {
+          this.screenMesh.material = this.playmaterial;
+          this.isInitialized = true;
+        }
+      }
+    })
+    //////////////////////////// - VID MATERIALS EMBED (e.g. streaming)
     AFRAME.registerComponent('vid_materials_embed', { 
       schema: {
         videoTitle: {default: ''},
@@ -359,6 +417,7 @@ AFRAME.registerComponent('mod-materials', {
         // let video = document.getElementById(this.data.id);
         // this.video = null;
         this.video = document.getElementById(this.data.id);
+
 
         // primaryVideo = video;
         let m3u8 = '/hls/'+this.data.id;

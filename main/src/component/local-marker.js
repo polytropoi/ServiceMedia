@@ -777,6 +777,7 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
       } 
     },
     updateMaterials: function () {
+
       if (this.data.tags.includes("color")) {
         this.el.setAttribute("material", {color: this.data.eventData.toLowerCase(), transparent: true, opacity: .5});
       } else {
@@ -818,6 +819,11 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
           this.el.setAttribute("look-at", "#player");
         }
         
+      }
+      if (this.data.tags.includes("webcam")) {
+        this.el.removeAttribute("material");
+        console.log("tryna set webcam material");;
+        this.el.setAttribute("material", {src: '#webcam'});
       }
     },
     loadPicture: function () { //called from model-loaded event
@@ -1123,7 +1129,7 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
         if (modelID != undefined && modelID != null & modelID != "none" && modelID != "") {   
           if (modelID.toString().includes("primitive")) {
               console.log("LOCALMARKER PRIMITIVE " + modelID + " scale " + 1);
-              this.el.removeAttribute("geometry");
+              // this.el.removeAttribute("geometry");
               if (modelID.toString().includes("cube")) {
                   this.el.setAttribute("geometry", {primitive: "box", width: 1, height: 1, depth: 1});
               } else if (modelID.toString().includes("sphere")) {

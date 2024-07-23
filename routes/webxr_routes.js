@@ -445,6 +445,7 @@ webxr_router.get('/:_id', function (req, res) {
     let modObjex = "<script src=\x22../main/src/component/mod_objex.js\x22 defer=\x22defer\x22></script>"; 
     let modModels = "<script src=\x22../main/src/component/mod_models.js\x22 defer=\x22defer\x22></script>"; 
     let videosphereAsset = "";
+    let webcamAsset = "";
     let textEntities = "";
     let attributionsTextEntity = "";
     let audioVizScript = "";
@@ -680,8 +681,11 @@ webxr_router.get('/:_id', function (req, res) {
                         } else {
                             sceneResponse.showCameraIcon = false;
                         }
-                        if (sceneData.sceneTags[i].toLowerCase().includes("debug")) {
+                        if (sceneData.sceneTags[i].toLowerCase().includes("debug")) {   
                             debugMode = true;
+                        }
+                        if (sceneData.sceneTags[i].toLowerCase().includes("webcam")) {
+                            webcamAsset = "<video id=\x22webcam\x22 src=\x22''\x22 playsinline></video>";
                         }
                         if (sceneData.sceneTags[i].toLowerCase().includes("timer")) { //uses css font @import... //no! 
                             //  proceduralEntities = proceduralEntities + "<a-plane live_canvas=\x22src:#flying_canvas\x22 id=\x22flying_info_canvas\x22 material=\x22shader: flat; transparent: true;\x22look-at=\x22#player\x22 width=\x221\x22 height=\x221\x22 position=\x220 1.5 -1\x22></a-plane>";
@@ -5295,6 +5299,7 @@ webxr_router.get('/:_id', function (req, res) {
                         "<a-asset-item id=\x22reticle2\x22 response-type=\x22arraybuffer\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/reticle2.glb\x22></a-asset-item>\n"+
                         "<a-mixin id=\x22bar\x22 geometry=\x22primitive: box\x22 material=\x22color: black\x22 scale-y-color=\x22from: 10 60 10; to: 180 255 180; maxScale: 15\x22></a-mixin>\n"+
                         videosphereAsset +
+                        webcamAsset +
 
                         "<img id=\x22fireanim1\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/pics/fireanim3.png\x22 crossorigin=\x22anonymous\x22></img>"+
                         "<img id=\x22candle1\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/pics/candle_flame_8x8.png\x22 crossorigin=\x22anonymous\x22></img>"+

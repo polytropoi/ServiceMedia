@@ -757,25 +757,47 @@ AFRAME.registerComponent('mod_model', {
               } else if((this.meshChildren[i].name.toString().includes("hvid") || this.meshChildren[i].name.toString() == "hvid") && hvids.length > 0) {
                 // console.log("video data " + JSON.stringify(hvids[hvidsIndex]));
                 this.mesh = this.meshChildren[i]; //mesh, not object3d type
-                
-                this.child = this.el.object3D.getObjectByName(this.meshChildren[i].name, true); //object3d
-                    this.vid_href = hvids[hvidsIndex].url;
-                    let vProps = {};
-                    vProps.url = this.vid_href;
-                    vProps.index = hvidsIndex;
-                    vProps.id = hvids[hvidsIndex]._id;
-                    vProps.meshname = this.meshChildren[i].name;
-                    vProps.videoTitle = hvids[hvidsIndex].title;
-                    vProps.eventData = this.data.eventData;
-                    this.childEnt = document.createElement('a-entity'); 
-                    this.el.appendChild(this.childEnt);
-                    // this.clone = this.child.clone();
-                    this.childEnt.setObject3D("Object3D", this.child);
-                    this.childEnt.setAttribute("vid_materials_embed", vProps);
-                    this.childEnt.id = "primary_video";
-                    this.childEnt.classList.add("activeObjexRay");
-                    // this.child.remove();
-                    hvidsIndex++;
+                if (this.data.tags.includes("webcam")) {
+                  this.child = this.el.object3D.getObjectByName(this.meshChildren[i].name, true); //object3d
+                  // this.vid_href = hvids[hvidsIndex].url;
+                  let vProps = {};
+                  // vProps.url = this.vid_href;
+                  vProps.index = hvidsIndex;
+                  vProps.id = hvids[hvidsIndex]._id;
+                  vProps.meshname = this.meshChildren[i].name;
+                  vProps.videoTitle = "webcam";
+                  vProps.eventData = this.data.eventData;
+                 
+                  this.childEnt = document.createElement('a-entity'); 
+                  this.el.appendChild(this.childEnt);
+                  // this.clone = this.child.clone();
+                  this.childEnt.setObject3D("Object3D", this.child);
+                  this.childEnt.setAttribute("webcam_materials_embed", vProps);
+                  this.childEnt.id = "webcam_video";
+                  this.childEnt.classList.add("activeObjexRay");
+                  // this.child.remove();
+                  hvidsIndex++;
+                } else { //streaming vids
+                  this.child = this.el.object3D.getObjectByName(this.meshChildren[i].name, true); //object3d
+                  this.vid_href = hvids[hvidsIndex].url;
+                  let vProps = {};
+                  vProps.url = this.vid_href;
+                  vProps.index = hvidsIndex;
+                  vProps.id = hvids[hvidsIndex]._id;
+                  vProps.meshname = this.meshChildren[i].name;
+                  vProps.videoTitle = hvids[hvidsIndex].title;
+                  vProps.eventData = this.data.eventData;
+                  vProps.tags = this.data.tags;
+                  this.childEnt = document.createElement('a-entity'); 
+                  this.el.appendChild(this.childEnt);
+                  // this.clone = this.child.clone();
+                  this.childEnt.setObject3D("Object3D", this.child);
+                  this.childEnt.setAttribute("vid_materials_embed", vProps);
+                  this.childEnt.id = "primary_video";
+                  this.childEnt.classList.add("activeObjexRay");
+                  // this.child.remove();
+                  hvidsIndex++;
+                }
                 // }
               }  else if((this.meshChildren[i].name.toString().includes("svid") || this.meshChildren[i].name.toString() == "svid") && svids.length > 0) {
                   // console.log("video data " + JSON.stringify(svids[svidsIndex]));

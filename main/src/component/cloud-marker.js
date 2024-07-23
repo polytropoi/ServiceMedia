@@ -895,6 +895,39 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
 
         }
       }
+      if (this.data.tags.includes("webcam")) {
+        console.log("tryna set webcam material");;
+        this.loadWebcam();
+        this.el.setAttribute("material", {src: '#webcam'});
+      }
+    },
+    loadWebcam: function () {
+      navigator.mediaDevices
+      .enumerateDevices()
+      .then((devices) => {
+        if (devices.length) {
+          devices.forEach((device) => {
+            console.log(`${device.kind}: ${device.label} id = ${device.deviceId}`);
+          });
+          navigator.mediaDevices.getUserMedia({audio: false, video: true})
+          .then(stream => {
+            let $video = document.querySelector('video');
+            $video.srcObject = stream
+            $video.onloadedmetadata = () => {
+              $video.play()
+              
+            }
+          })
+        } else {
+          console.log("no devices found!");
+        }
+       
+      })
+      .catch((err) => {
+        console.error(`${err.name}: ${err.message}`);
+      });
+
+     
     },
     loadPicture: function () { //called from model-loaded event
       // if (!mediaID) {
@@ -903,7 +936,11 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
       // if (this.data.markerType == "picture") {
 
         console.log("mediaID " + this.data.mediaID);
-        if (this.data.mediaID && this.data.mediaID.includes("local_")) {
+        if (this.data.tags.includes("webcam")) {
+          this.loadWebcam();
+          console.log("tryna set webcam material");
+          this.el.setAttribute("material", {src: '#webcam'});
+        } else if (this.data.mediaID && this.data.mediaID.includes("local_")) {
           this.el.classList.add("hasLocalFile");
           let mediaID = this.data.mediaID.substring(6);
           console.log("CLOUDMARKER SHOUDL HAVE MediaID " + mediaID + " from localFiles " + localData.localFiles[mediaID]);

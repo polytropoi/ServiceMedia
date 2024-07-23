@@ -231,6 +231,14 @@ AFRAME.registerComponent('initializer', { //adjust for device settings, and call
       if (settings && settings.allowMods) {
         this.el.setAttribute("location_picker", "init");
       }
+      if (settings && settings.sceneTags && settings.sceneTags.includes("webcam")) {
+        // let webcamObj = document.createElement("a-box");
+        // // webcamObj.setAttribute("scale", "2 1 2")
+        // webcamObj.setAttribute("position", "-5 5 0");
+        // webcamObj.setAttribute("material", {src: '#webcam'})
+
+        // this.el.sceneEl.appendChild(webcamObj);
+      }
       // this.el.addEventListener('obbcollisionstarted	', (evt) => {
       //   console.log("obb player hit : " + evt.target.withEl.id);
       // });

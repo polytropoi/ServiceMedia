@@ -287,9 +287,16 @@ $(function() {
       }
    }
 
-   // if (settings.sceneTags && settings.sceneTags.includes("debug")) {
-   //    sceneEl.setAttribute('obb-collider', {'showColliders': true});
-   // }
+   if (settings.sceneTags && settings.sceneTags.includes("webcam")) {
+      navigator.mediaDevices.getUserMedia({audio: false, video: true})
+      .then(stream => {
+        let $video = document.querySelector('video');
+        $video.srcObject = stream
+        $video.onloadedmetadata = () => {
+          $video.play()
+        }
+      })
+   }
 
    let primaryAudioEventData = document.getElementById("audioEventsData");
    if (primaryAudioEventData) {
