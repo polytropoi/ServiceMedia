@@ -469,6 +469,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
         if (this.data.tags && this.data.tags.toLowerCase().includes("no select")) {
           return;
         }
+        // this.targetMods();
         if (evt.detail.intersection) {
           this.clientX = evt.clientX;
           this.clientY = evt.clientY;
@@ -1196,6 +1197,9 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
           this.el.setAttribute("scale", this.data.xscale + " " + this.data.yscale + " " + this.data.zscale);
           if (modelID.toString().includes("primitive")) {
             this.el.removeAttribute("geometry");
+            this.el.removeAttribute("gltf-model");
+
+
             if (!this.data.tags.includes("hide gizmo")) {
               if (modelID.toString().includes("cube")) {
                   this.el.setAttribute("geometry", {"primitive": "box", "width": this.data.xscale, "height": this.data.yscale, "depth": this.data.zscale});
@@ -1486,7 +1490,6 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
         if (window.playerPosition && this.el.object3D) {
           triggerAudioController.components.trigger_audio_control.playAudioAtPosition(this.el.object3D.position, window.playerPosition.distanceTo(this.el.object3D.position), this.data.tags);
         }
-        
       }  
       if (this.data.markerType.toLowerCase() == "spawntrigger" || //deprecated, will just use trigger + tags + datas
         (this.data.markerType.toLowerCase() == "trigger" && (this.data.tags && this.data.tags.includes("spawn"))) ) {
@@ -1506,33 +1509,34 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
 
           }
       }
-      if (this.data.tags && this.data.tags.length && this.data.tags.toLowerCase().includes("toggle")) {
-        console.log( "tryna toggle somethin..." + this.data.targetElements); 
-        if (this.data.targetElements != '') {
-          for (let i = 0; i < this.data.targetElements.length; i++) {
-            let targetEl = document.getElementById(this.data.targetElements[i].toString());
-            if (targetEl && !this.coolDown) {
-              // let isVisible = targetEl.dataset.isVisible;
-              // targetEl.dataset.isVisible = !targetEl.dataset.isVisible;
-              console.log( targetEl.id + " element isVisible : " + targetEl.dataset.isvisible); 
-              if (targetEl.dataset.isvisible == "no") {
-                this.coolDown = true;
+      this.targetMods();
+      // if (this.data.tags && this.data.tags.length && this.data.tags.toLowerCase().includes("toggle")) {
+      //   console.log( "tryna toggle somethin..." + this.data.targetElements); 
+      //   if (this.data.targetElements != '') {
+      //     for (let i = 0; i < this.data.targetElements.length; i++) {
+      //       let targetEl = document.getElementById(this.data.targetElements[i].toString());
+      //       if (targetEl && !this.coolDown) {
+      //         // let isVisible = targetEl.dataset.isVisible;
+      //         // targetEl.dataset.isVisible = !targetEl.dataset.isVisible;
+      //         console.log( targetEl.id + " element isVisible : " + targetEl.dataset.isvisible); 
+      //         if (targetEl.dataset.isvisible == "no") {
+      //           this.coolDown = true;
                 
-                targetEl.setAttribute("visible", true)
-                targetEl.dataset.isvisible = "yes";
-                console.log("set to visible " + targetEl.dataset.isvisible);
-              } else {
-                this.cooldown = true;
+      //           targetEl.setAttribute("visible", true)
+      //           targetEl.dataset.isvisible = "yes";
+      //           console.log("set to visible " + targetEl.dataset.isvisible);
+      //         } else {
+      //           this.cooldown = true;
                 
-                targetEl.setAttribute("visible", false);
-                targetEl.dataset.isvisible = "no";
-                console.log("set to visible " + targetEl.dataset.isvisible);
-              }
-              this.coolDownTimer();
-            }
-          }
-        }
-      }
+      //           targetEl.setAttribute("visible", false);
+      //           targetEl.dataset.isvisible = "no";
+      //           console.log("set to visible " + targetEl.dataset.isvisible);
+      //         }
+      //         this.coolDownTimer();
+      //       }
+      //     }
+      //   }
+      // }
       if (this.data.markerType.toLowerCase() == "gate") {
         if (this.data.eventData != null && this.data.eventData != "") {
           let url = "/webxr/" + this.data.eventData;
@@ -1616,6 +1620,71 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
         }, 2000);
       // }
     },
+    targetMods: function() {
+      console.log("chek targetElements " + this.data.targetElements);
+      if (this.data.targetElements != '' && this.data.targetElements != []) {
+        if (this.data.tags && this.data.tags.length && this.data.tags.toLowerCase().includes("toggle target")) {
+          console.log( "tryna toggle somethin..." + this.data.targetElements + " length"); 
+
+
+            for (let i = 0; i < this.data.targetElements.length; i++) {
+              let targetEl = document.getElementById(this.data.targetElements[i].toString());
+              if (targetEl) {
+                // let isVisible = targetEl.dataset.isVisible;
+                // targetEl.dataset.isVisible = !targetEl.dataset.isVisible;
+                console.log( targetEl.id + " element isVisible : " + targetEl.dataset.isvisible); 
+                if (targetEl.dataset.isvisible == "no") {
+                  // this.coolDown = true;
+                  
+                  targetEl.setAttribute("visible", true)
+                  targetEl.dataset.isvisible = true;
+                  targetEl.classList.add("activeObjexRay");
+                  console.log("set to visible " + targetEl.dataset.isvisible);
+                } else {
+                  // this.cooldown = true;
+                  
+                  targetEl.setAttribute("visible", false);
+                  targetEl.dataset.isvisible = "no";
+                  targetEl.classList.remove("activeObjexRay");
+                  console.log("set to visible " + targetEl.dataset.isvisible);
+                }
+              }
+            
+            // this.coolDownTimer();
+          }
+        }
+        if (this.data.tags && this.data.tags.length && this.data.tags.toLowerCase().includes("show target")) {
+          console.log( "tryna show somethins..." + this.data.targetElements + " length"); 
+          if (this.data.targetElements != '') {
+            for (let i = 0; i < this.data.targetElements.length; i++) {
+              let targetEl = document.getElementById(this.data.targetElements[i].toString());
+              if (targetEl) {
+                  targetEl.setAttribute("visible", true);
+                  targetEl.classList.add("activeObjexRay");
+                  targetEl.dataset.isvisible = true;
+                  console.log("show target set to visible " + targetEl.dataset.isvisible);
+              }
+            }
+            // this.coolDownTimer();
+          }
+        }
+        if (this.data.tags && this.data.tags.length && this.data.tags.toLowerCase().includes("hide target")) {
+          console.log( "tryna hide somethin..." + this.data.targetElements + " length"); 
+          if (this.data.targetElements != '') {
+            for (let i = 0; i < this.data.targetElements.length; i++) {
+              let targetEl = document.getElementById(this.data.targetElements[i].toString());
+              if (targetEl) {
+                  targetEl.setAttribute("visible", false);
+                  targetEl.classList.remove("activeObjexRay");
+                  targetEl.dataset.isvisible = false;
+                  console.log("hide target set to visible " + targetEl.dataset.isvisible);
+              }
+            }
+            // this.coolDownTimer();
+          }
+        }
+      }
+    },
     rayhit: function (hitID, distance, hitpoint) {
       // if (this.hitID != hitID) {
       //   this.hitID = hitID;
@@ -1639,37 +1708,9 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
             }
            
           }
+          this.targetMods();
         }
-        if (this.data.tags && this.data.tags.length && this.data.tags.toLowerCase().includes("toggle")) {
-          console.log( "tryna toggle somethin..." + this.data.targetElements + " length"); 
-          if (this.data.targetElements != '') {
-
-            for (let i = 0; i < this.data.targetElements.length; i++) {
-              let targetEl = document.getElementById(this.data.targetElements[i].toString());
-              if (targetEl) {
-                // let isVisible = targetEl.dataset.isVisible;
-                // targetEl.dataset.isVisible = !targetEl.dataset.isVisible;
-                console.log( targetEl.id + " element isVisible : " + targetEl.dataset.isvisible); 
-                if (targetEl.dataset.isvisible == "no") {
-                  // this.coolDown = true;
-                  
-                  targetEl.setAttribute("visible", true)
-                  targetEl.dataset.isvisible = true;
-                  console.log("set to visible " + targetEl.dataset.isvisible);
-                } else {
-                  // this.cooldown = true;
-                  
-                  targetEl.setAttribute("visible", false);
-                  targetEl.dataset.isvisible = "no";
-                  console.log("set to visible " + targetEl.dataset.isvisible);
-                }
-              
-                
-              }
-            }
-            // this.coolDownTimer();
-          }
-        }
+        
       }
   
   }); //////// end cloud_marker /////////////////////

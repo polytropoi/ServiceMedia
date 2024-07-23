@@ -579,7 +579,7 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
           // that.distance = window.playerPosition.distanceTo(pos);
           that.distance = evt.detail.intersection.distance;
           that.rayhit(evt.detail.intersection.object.name, that.distance, evt.detail.intersection.point);
-       
+          // that.targetMods()
           that.selectedAxis = name;
   
           // let elPos = that.el.getAttribute('position');
@@ -1418,6 +1418,7 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
       if (this.data.markerType == "trigger" && this.data.tags && this.data.tags.toLowerCase().includes("no enter")) {
         return;
       }
+      this.targetMods();
         if (this.data.markerType.toLowerCase() == "spawntrigger") {
   
             let objexEl = document.getElementById('sceneObjects');    
@@ -1475,6 +1476,71 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
       //   }
       // } 
     },
+    targetMods: function () {
+      if (this.data.targetElements != '' && this.data.targetElements != []) {
+        if (this.data.tags && this.data.tags.length && this.data.tags.toLowerCase().includes("toggle target")) {
+          console.log( "tryna toggle somethin..." + this.data.targetElements + " length"); 
+          if (this.data.targetElements != '') {
+
+            for (let i = 0; i < this.data.targetElements.length; i++) {
+              let targetEl = document.getElementById(this.data.targetElements[i].toString());
+              if (targetEl) {
+                // let isVisible = targetEl.dataset.isVisible;
+                // targetEl.dataset.isVisible = !targetEl.dataset.isVisible;
+                console.log( targetEl.id + " element isVisible : " + targetEl.dataset.isvisible); 
+                if (targetEl.dataset.isvisible == "no") {
+                  // this.coolDown = true;
+                  
+                  targetEl.setAttribute("visible", true)
+                  targetEl.dataset.isvisible = true;
+                  targetEl.classList.add("activeObjexRay");
+                  console.log("set to visible " + targetEl.dataset.isvisible);
+                } else {
+                  // this.cooldown = true;
+                  
+                  targetEl.setAttribute("visible", false);
+                  targetEl.dataset.isvisible = "no";
+                  targetEl.classList.remove("activeObjexRay");
+                  console.log("set to visible " + targetEl.dataset.isvisible);
+                }
+              }
+            }
+            // this.coolDownTimer();
+          // }
+        }
+        if (this.data.tags && this.data.tags.length && this.data.tags.toLowerCase().includes("show target")) {
+          console.log( "tryna show somethins..." + this.data.targetElements + " length"); 
+          if (this.data.targetElements != '') {
+            for (let i = 0; i < this.data.targetElements.length; i++) {
+              let targetEl = document.getElementById(this.data.targetElements[i].toString());
+              if (targetEl) {
+                  targetEl.setAttribute("visible", true);
+                  targetEl.classList.add("activeObjexRay");
+                  targetEl.dataset.isvisible = true;
+                  console.log("show target set to visible " + targetEl.dataset.isvisible);
+              }
+            }
+            // this.coolDownTimer();
+          }
+        }
+        if (this.data.tags && this.data.tags.length && this.data.tags.toLowerCase().includes("hide target")) {
+          console.log( "tryna hide somethin..." + this.data.targetElements + " length"); 
+          if (this.data.targetElements != '') {
+            for (let i = 0; i < this.data.targetElements.length; i++) {
+              let targetEl = document.getElementById(this.data.targetElements[i].toString());
+              if (targetEl) {
+                  targetEl.setAttribute("visible", false);
+                  targetEl.classList.remove("activeObjexRay");
+                  targetEl.dataset.isvisible = false;
+                  console.log("hide target set to visible " + targetEl.dataset.isvisible);
+              }
+            }
+            // this.coolDownTimer();
+            }
+          }
+        }
+      }
+    },
     rayhit: function (hitID, distance, hitpoint) {
       // if (this.hitID != hitID) {
       //   this.hitID = hitID;
@@ -1487,6 +1553,9 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
             triggerAudioController.components.trigger_audio_control.playAudioAtPosition(hitpoint, distance, this.data.tags);
           }
         }
+        this.targetMods();
+      
+        
       }
   
   });

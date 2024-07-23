@@ -941,7 +941,7 @@ function SaveModToLocal(locationKey) { //locationKey is now just timestamp of th
                localMarkerComponent.data.zscale = locItem.zscale;
                localMarkerComponent.data.scale = locItem.markerObjScale;
                localMarkerComponent.data.tags = locItem.locationTags;
-               cloudMarkerComponent.data.locationTargets = locItem.locationTargets;
+               localMarkerComponent.data.locationTargets = locItem.locationTargets;
               
                localMarkerComponent.loadModel(locItem.modelID); 
                localMarkerComponent.updateMaterials();
