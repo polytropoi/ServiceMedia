@@ -623,7 +623,10 @@ AFRAME.registerComponent('mod_model', {
                 svids = svids.sort(() => Math.random() - 0.5);  
                 
               } else {
-                console.log("caint fine no video_groups_control");
+                console.log("caint fine no video_groups_control w/ tags " + this.data.tags );
+                if (this.data.tags.includes("webcam")) {
+                  hvids.push("webcam");
+                }
               }
             }
             if (hasAudioPositions) {
@@ -635,8 +638,7 @@ AFRAME.registerComponent('mod_model', {
                 for (let x = 0; x < audioGroupArray[0].audios.length; x++) {
                   audios.push(audioGroupArray[0].audios[x]);
                 }
-                  // hvids = hvids.sort(() => Math.random() - 0.5);  //schweet
-                  // vvids = vvids.sort(() => Math.random() - 0.5);  
+                 
               } else {
                 console.log("caint fine no audioo_groups_control");
               }
@@ -748,14 +750,19 @@ AFRAME.registerComponent('mod_model', {
                   this.el.appendChild(calloutChild);
                   // });
                 }
-              } else if(this.meshChildren[i].name.includes("haudio") && hvids.length > 0) {
+              } else if (this.meshChildren[i].name.includes("haudio") && hvids.length > 0) {
                 // console.log("video data " + JSON.stringify(hvids[hvidsIndex]));
                 this.mesh = this.meshChildren[i]; //mesh, not object3d type
                 
                 // }
               
-              } else if((this.meshChildren[i].name.toString().includes("hvid") || this.meshChildren[i].name.toString() == "hvid") && hvids.length > 0) {
+              }  else if (this.meshChildren[i].name.includes("screen") && hvids.length > 0) {
                 // console.log("video data " + JSON.stringify(hvids[hvidsIndex]));
+                // this.mesh = this.meshChildren[i]; //mesh, not object3d type
+                
+                
+              } else if((this.meshChildren[i].name.toString().includes("hvid") || this.meshChildren[i].name.toString() == "hvid") && hvids.length > 0) {
+                console.log("video data " + JSON.stringify(hvids[hvidsIndex]));
                 this.mesh = this.meshChildren[i]; //mesh, not object3d type
                 if (this.data.tags.includes("webcam")) {
                   this.child = this.el.object3D.getObjectByName(this.meshChildren[i].name, true); //object3d
@@ -1095,7 +1102,9 @@ AFRAME.registerComponent('mod_model', {
             }
         // }
   
-        if (this.data.markerType == "target" || this.el.classList.contains('target') || this.hasCallout || this.hasLocationCallout) {
+        // if (this.data.markerType == "target" || this.el.classList.contains('target') 
+        //     || this.hasCallout || this.hasLocationCallout || this.data.tags.includes('select')) {
+        if (!this.data.tags.includes("no select")) {
           let textIndex = 0;
           this.position = null;
           // let hasBubble = false;

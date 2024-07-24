@@ -1078,7 +1078,7 @@ webxr_router.get('/:_id', function (req, res) {
                                         || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "text" 
                                         || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "light"  
                                         || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "link"  
-                                        // || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "weblink" 
+                                        // || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "model" 
                                         || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "picture"  
                                         || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "picture group"  
                                         || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "mailbox") {

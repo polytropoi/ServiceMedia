@@ -335,7 +335,7 @@ AFRAME.registerComponent('mod-materials', {
       init: function () {
 
         this.el.classList.add("video_embed");
-       
+       console.log("webcam_material_embed init");
         this.loadWebcam();
       },
       loadWebcam: function () {
@@ -344,7 +344,7 @@ AFRAME.registerComponent('mod-materials', {
         .then((devices) => {
           if (devices.length) {
             devices.forEach((device) => {
-              console.log(`${device.kind}: ${device.label} id = ${device.deviceId}`);
+              console.log("webcam device" + `${device.kind}: ${device.label} id = ${device.deviceId}`);
             });
             navigator.mediaDevices.getUserMedia({audio: false, video: true})
             .then(stream => {
@@ -367,7 +367,7 @@ AFRAME.registerComponent('mod-materials', {
        
       },
       loadTexture: function () {
-        this.video = document.getElementById(this.data.id);  
+        this.video = document.getElementById("webcam");  
         this.mesh = this.el.getObject3D('Object3D');
         this.screenMesh = null;
         this.mesh.traverse(node => {
@@ -380,7 +380,7 @@ AFRAME.registerComponent('mod-materials', {
         });
 
         this.vidtexture = new THREE.VideoTexture( this.video );
-        this.vidtexture.flipY = this.data.flipY; 
+        // this.vidtexture.flipY = this.data.flipY; 
         this.vidtexture.colorSpace = THREE.SRGBColorSpace;
         this.playmaterial = new THREE.MeshBasicMaterial( { map: this.vidtexture, shader: THREE.FlatShading } ); 
         if (this.screenMesh != null) {
