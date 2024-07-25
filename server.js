@@ -142,7 +142,7 @@ var store = new MongoDBStore({ //store session cookies in a separate db with dif
 //    app.use(bodyParser());
     // app.use(bodyParser.json({ "limit": "100mb", extended: true }));
     app.use(bodyParser.json({ "limit": "150mb", extended: true })); //set this to route specific somehow, for add_scene_mods?
-    app.use(bodyParser.urlencoded({ extended: false }));
+    app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }));
     // app.use(autoReap);
 
     var maxItems = 1000;

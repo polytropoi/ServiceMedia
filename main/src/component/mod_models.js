@@ -1972,7 +1972,16 @@ AFRAME.registerComponent('mod_model', {
             this.loadModel();
         // }, 2000);
     },
-    loadModel: function () {
+    loadLocalFile: function () { //change to loadLocalModel...
+      if (this.data.modelID && this.data.modelID != "none") {
+        console.log("really tryna loadLocalFile " + this.data.modelID);
+        this.loadModel();
+      }
+    },
+    loadModel: function (modelID) {
+      if (!modelID) {
+        modelID = this.data.modelID;
+      }
       let transform_controls_component = this.el.components.transform_controls;
       if (transform_controls_component) {
           if (transform_controls_component.data.isAttached) {
@@ -2025,6 +2034,21 @@ AFRAME.registerComponent('mod_model', {
   
               }
             } else {     
+              if (modelID.includes("local_")) {
+                this.el.classList.add("hasLocalFile");
+                modelID = modelID.substring(6);
+                console.log("mod_modal local modelID " + modelID + " from localFiles " + JSON.stringify(localData.localFiles));
+                for (const key in localData.localFiles) {
+                  console.log("tryna get localModel " + modelID + " object " + localData.localFiles[key].name);
+                  if (localData.localFiles[key].name == modelID) {
+                    
+                    const modelBuffer = localData.localFiles[key].data;
+                    const modelBlob = new Blob([modelBuffer]);
+                    // image.src = URL.createObjectURL(imageBlobb);
+                    this.el.setAttribute('gltf-model', URL.createObjectURL(modelBlob));
+                  }
+                }
+              } else {
               for (let i = 0; i < sceneModels.length; i++) {
                 if (sceneModels[i]._id == this.data.modelID) {
                   this.el.setAttribute("gltf-model", sceneModels[i].url);
@@ -2034,6 +2058,7 @@ AFRAME.registerComponent('mod_model', {
                 }
               }
             }
+          }
         } 
 
           console.log("mod_model with + " + this.data.xscale + " " + this.data.yscale + " " + this.data.zscale + " pos " + this.data.xpos + this.data.ypos + this.data.zpos + " rot " + this.data.xrot + this.data.yrot + this.data.zrot);
