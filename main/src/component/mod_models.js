@@ -315,7 +315,7 @@ AFRAME.registerComponent('mod_model', {
           const obj = this.el.getObject3D('mesh');
           
   
-          if (obj) {
+        if (obj) {
             if (this.data.shader != "") {
               console.log("gotsa shader " + this.data.shader);
              
@@ -489,6 +489,7 @@ AFRAME.registerComponent('mod_model', {
             }
             obj.traverse(node => { //spin through object heirarchy to sniff for special names, e.g. "eye"
               this.nodeName = node.name;
+              console.log("checking mod_model " + this.el.id +  " for special names " + node.name);
               if (this.nodeName.includes("collider")) { //must be set in eventData and as mesh name 
                 if (node instanceof THREE.Mesh) {
                 this.meshChildren.push(node);
@@ -529,12 +530,12 @@ AFRAME.registerComponent('mod_model', {
                   // console.log(this.nodeName);
                 }
               }
-              if (this.nodeName.toLowerCase().includes("hvid") || this.nodeName.toLowerCase().includes("vvid") || this.nodeName.toLowerCase().includes("svid")|| this.nodeName.toLowerCase().includes("evid")) { 
+              if (this.nodeName.toLowerCase().includes("screen") || this.nodeName.toLowerCase().includes("hvid") || this.nodeName.toLowerCase().includes("vvid") || this.nodeName.toLowerCase().includes("svid")|| this.nodeName.toLowerCase().includes("evid")) { 
                 // if (node instanceof THREE.Mesh) {
                   this.meshChildren.push(node);
                     hasVidPositions = true;
                   // console.log("gotsa picpanel!");
-                  // console.log(this.nodeName);
+                  console.log("gotsa special video data " + this.nodeName);
                 // }
               }
               if (this.nodeName.toLowerCase().includes("haudio") || this.nodeName.toLowerCase().includes("vaudio")) { 
@@ -756,21 +757,22 @@ AFRAME.registerComponent('mod_model', {
                 
                 // }
               
-              }  else if (this.meshChildren[i].name.includes("screen") && hvids.length > 0) {
-                // console.log("video data " + JSON.stringify(hvids[hvidsIndex]));
-                // this.mesh = this.meshChildren[i]; //mesh, not object3d type
+              // }  else if (this.meshChildren[i].name.includes("screen") && hvids.length > 0) {
+              //   // console.log("video data " + JSON.stringify(hvids[hvidsIndex]));
+              //   // this.mesh = this.meshChildren[i]; //mesh, not object3d type
                 
                 
-              } else if((this.meshChildren[i].name.toString().includes("hvid") || this.meshChildren[i].name.toString() == "hvid") && hvids.length > 0) {
-                console.log("video data " + JSON.stringify(hvids[hvidsIndex]));
+              } else if ((this.meshChildren[i].name.toString().includes("hvid") || this.meshChildren[i].name.toString() == "hvid" ||
+                                  this.meshChildren[i].name.includes("screen") || this.meshChildren[i].name.toString() == "screen") && hvids.length > 0) {
+                console.log(this.meshChildren[i].name + " tryna map video data " + JSON.stringify(hvids));
                 this.mesh = this.meshChildren[i]; //mesh, not object3d type
                 if (this.data.tags.includes("webcam")) {
                   this.child = this.el.object3D.getObjectByName(this.meshChildren[i].name, true); //object3d
                   // this.vid_href = hvids[hvidsIndex].url;
                   let vProps = {};
                   // vProps.url = this.vid_href;
-                  vProps.index = hvidsIndex;
-                  vProps.id = hvids[hvidsIndex]._id;
+                  // vProps.index = hvidsIndex;
+                  // vProps.id = hvids[hvidsIndex]._id;
                   vProps.meshname = this.meshChildren[i].name;
                   vProps.videoTitle = "webcam";
                   vProps.eventData = this.data.eventData;
@@ -783,7 +785,7 @@ AFRAME.registerComponent('mod_model', {
                   this.childEnt.id = "webcam_video";
                   this.childEnt.classList.add("activeObjexRay");
                   // this.child.remove();
-                  hvidsIndex++;
+                  // hvidsIndex++;
                 } else { //streaming vids
                   this.child = this.el.object3D.getObjectByName(this.meshChildren[i].name, true); //object3d
                   this.vid_href = hvids[hvidsIndex].url;
