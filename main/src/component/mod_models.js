@@ -489,7 +489,7 @@ AFRAME.registerComponent('mod_model', {
             }
             obj.traverse(node => { //spin through object heirarchy to sniff for special names, e.g. "eye"
               this.nodeName = node.name;
-              console.log("checking mod_model " + this.el.id +  " for special names " + node.name);
+              // console.log("checking mod_model " + this.el.id +  " for special names " + node.name);
               if (this.nodeName.includes("collider")) { //must be set in eventData and as mesh name 
                 if (node instanceof THREE.Mesh) {
                 this.meshChildren.push(node);
@@ -1358,7 +1358,7 @@ AFRAME.registerComponent('mod_model', {
           // 
           this.el.addEventListener('mousedown', (evt) => {
             console.log("MOD_MODEL mousedown on markertype " + this.data.markerType +  " this.hasCallout " + this.hasCallout + " this.data.description " + this.data.description);
-            if (this.timestamp != '' && this.data.allowMods) {
+            if (this.timestamp != '' && this.data.allowMods && this.data.tags.includes("moddable")) {
               if (keydown == "T") {
                 ToggleTransformControls(this.timestamp);
               } else if (keydown == "Shift") {

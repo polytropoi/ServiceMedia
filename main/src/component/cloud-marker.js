@@ -87,7 +87,11 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
               && !this.data.modelID != "primitive_cylinder") {
             // console.log("CLOUDMARKER PLACEHOLDER GEO " + this.data.modelID);
             console.log("CLOUDMARKER " + this.data.markerType + " " + this.data.modelID );
-
+                if (this.data.markerType.toLowerCase() == "player") {
+                  this.el.removeAttribute("geometry");
+                  this.el.setAttribute('gltf-model', '#poi1');
+                  this.el.setAttribute("material", {color: "blue", transparent: true, opacity: .5});
+                }
                 if (this.data.markerType.toLowerCase() == "placeholder") {
                   this.el.setAttribute('gltf-model', '#poi1');
                 } else if (this.data.markerType.toLowerCase() == "poi") {
@@ -336,7 +340,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
         if (this.data.markerType.toLowerCase() == "player") {
           // console.log("playerobj")
           // this.el.setAttribute('gltf-model', '#poi1');
-          this.el.classList.remove("activeObjexRay");
+          // this.el.classList.remove("activeObjexRay");
         }
         // if (this.data.markerType.toLowerCase() == "placeholder") {
         //   this.el.setAttribute('gltf-model', '#savedplaceholder');
@@ -1329,10 +1333,15 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                 }
               }
             }
-          }
+          } 
           
         } else { //if "none"
             console.log("CLOUDMARKER type " + this.data.markerType+ " tryna set default model " + modelID);
+            if (this.data.markerType.toLowerCase() == "player") {
+              this.el.removeAttribute("geometry");
+              this.el.setAttribute('gltf-model', '#poi1');
+              this.el.setAttribute("material", {color: "blue", transparent: true, opacity: .5});
+            }
             if (this.data.markerType.toLowerCase() == "placeholder") {
                 this.el.setAttribute("gltf-model", "#poi1");
                 this.el.setAttribute("material", {color: "yellow", transparent: true, opacity: .5});
