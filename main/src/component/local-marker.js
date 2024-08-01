@@ -15,6 +15,7 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
       isLocal: {default: true},
       isSelected: {default: false},
       tags: {default: ''},
+      targetElements: {default: []}, //array -> csv
       // position: {default: ''},
       xpos: {type: 'number', default: 0},
       ypos: {type: 'number', default: 0},

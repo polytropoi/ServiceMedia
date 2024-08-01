@@ -3763,7 +3763,7 @@ AFRAME.registerComponent('load_threesvg', {
               
               if (this.el.components.local_marker) {
                 this.el.components.local_marker.loadModel();
-                this.el.setAttribute("position", {x: this.position.x, y: this.position.y, z: this.position.z});
+                // this.el.setAttribute("position", {x: this.position.x, y: this.position.y, z: this.position.z});
 
               } else if (this.el.components.cloud_marker) {
                 // this.el.components.cloud_marker.loadModel();

@@ -1227,60 +1227,13 @@ AFRAME.registerComponent('mod_model', {
                 });
             }
             
-            // // let bubbleText = document.createElement("a-text");
-            // this.bubbleText = document.createElement("a-entity");
-  
-            // this.bubbleText.classList.add("bubbleText");
-            // // bubbleText.setAttribute("visible", false);
-           
-            // // bubbleText.setAttribute("scale", ".1 .1 .1"); 
-            // this.bubble.appendChild(this.bubbleText);
-            // this.bubbleText.setAttribute("position", "0 0 1");
+          
             if (settings && settings.sceneCameraMode == "Third Person") {
               this.bubble.setAttribute('look-at', '#thirdPersonCamera'); //toggle by eventData
             } else {
               this.bubble.setAttribute('look-at', '#player'); //first person camrig
             }
-            // bubbleText.setAttribute("look-at", "#player");
-            // this.bubbleText = bubbleText;
-            // bubbleText.setAttribute("width", 3);
-            // bubbleText.setAttribute("height", 2);
             
-            
-  
-              /*
-            setInterval(function(){ //get "viewport" position (normalized screen coords)
-              if (calloutOn) {
-              let pos = new THREE.Vector3();
-              pos = pos.setFromMatrixPosition(obj.matrixWorld); //world pos of model, kindof
-              // worldPos = pos;
-              pos.project(camera);
-              var width = window.innerWidth, height = window.innerHeight; 
-              let widthHalf = width / 2;
-              let heightHalf = height / 2;
-              pos.x = (pos.x * widthHalf) + widthHalf;
-              pos.y = - (pos.y * heightHalf) + heightHalf;
-              pos.z = 0;
-              // if (pos.x != NaN) { //does it twice because matrix set, disregard if it returns NaN :( //fixed?
-              //   console.log("screen position: " + (pos.x/width).toFixed(1) + " " + (pos.y/height).toFixed(1)); //"viewport position"
-              // }
-              if ((pos.x/width) < .45) {
-                console.log("flip left");
-                bubbleBackground.setAttribute("position", "4 2 1");
-                bubbleBackground.setAttribute("scale", "-.1 .1 .1"); 
-                bubbleText.setAttribute("position", "4 2 1.1");
-              } 
-              if ((pos.x/width) > .55) {
-                console.log("flip right");
-                bubbleBackground.setAttribute("position", "-4 2 1");
-                bubbleBackground.setAttribute("scale", ".1 .1 .1"); 
-                bubbleText.setAttribute("position", "-4 2 1.1");
-              }
-  
-              }
-            }, 2000);
-            */
-          // }
   
           let primaryAudio = document.getElementById("primaryAudio");
           if (primaryAudio != null) {
@@ -1338,248 +1291,254 @@ AFRAME.registerComponent('mod_model', {
             // this.el.setAttribute("geometry", {primitive: "box", height: 1, width: 1});
             
           }
-          this.el.addEventListener('mouseleave', (e) => { 
-            e.preventDefault();
-            // console.log("tryna mouseexit");
-            if (!this.data.isEquipped) {
-              if (this.calloutEntity != null) {
-                this.calloutEntity.setAttribute('visible', false);
-              }
-              // this.bubble = sceneEl.querySelector('.bubble');
-              if (this.bubble) {
-                this.bubble.setAttribute('visible', false);
-                // if (this.bubbleBackground) {
-                //   this.bubbleBackground.setAttribute('scale', '1 1 1');
-                // }
-                //   this.bubbleText.setAttribute('scale', '1 1 1' );
-              }
-            }
-          });
-          // 
-          this.el.addEventListener('mousedown', (evt) => {
-            console.log("MOD_MODEL mousedown on markertype " + this.data.markerType +  " this.hasCallout " + this.hasCallout + " this.data.description " + this.data.description);
-            if (this.timestamp != '' && this.data.allowMods && this.data.tags.includes("moddable")) {
-              if (keydown == "T") {
-                ToggleTransformControls(this.timestamp);
-              } else if (keydown == "Shift") {
-                // ShowLocationModal(this.timestamp);
-                selectedLocationTimestamp = this.timestamp;
-                // ShowLocationModal(that.timestamp);
-                SceneManglerModal('Location');
-              } 
-            }  
-          });
-          this.el.addEventListener('mouseenter', (evt) =>  {
-            console.log("MOD_MODEL mouseovewr model " + this.data.modelName + " " + this.hasLocationCallout + " " + this.data.markerType + " " + this.hasCallout + " " + evt.detail);
-           
-            if (evt.detail.intersection != null) {
-              if (textData.length > 0) {
-                this.calloutString = textData[textIndex];
-              } else {
-                
-                this.calloutString = this.data.name;
-              }
-              let min = this.data.scale * .05;
-              let max = 22;
-              let distance = evt.detail.intersection.distance;
-              this.distance = distance;
-              // console.log("MOD_MODEL mouseover markerType " + this.data.markerType + " scale " + this.data.scale);
-                let pos = evt.detail.intersection.point; //hitpoint on model
-                // let scalerange = (this.data.scale * .1) + (distance * .5);
-                let scalerange = clamp(((distance * .2) / 2), min, max);
-                // this.bubble.setAttribute('position', {"x": pos.x.toFixed(2), "y": pos.y.toFixed(2), "z": pos.z.toFixed(2)});
-                if (this.bubble) {
-                  this.bubble.setAttribute('visible', true);
-                  this.bubbleText.setAttribute('visible', true);
-                  
-                  // let scalerange = Math.min(Math.max(parseFloat(this.data.scale) / 2, .1), 20);
-                  if (this.data.eventData.toLowerCase().includes("agent")) {
-                    this.bubble.setAttribute('position', '0 1 ' + scalerange.toString());
-                  } else {
-                    this.bubble.setAttribute('position', evt.detail.intersection.point);
-                    this.bubbleText.setAttribute('position', '0 .5 ' + scalerange.toString());
-                    // console.log("tryna show callout " + scalerange.toString() + " " + this.calloutString);
-                  }
-                }  else {
-                  console.log("this.bubble not found!");
-                }
-                
-  
-                this.font2 = "Acme.woff";
-                if (settings && settings.sceneFontWeb2 && settings.sceneFontWeb2.length) {
-                  this.font2 = settings.sceneFontWeb2;
-                }
-             
 
-  
-              if (this.hasCalloutBackground && distance) { //eg thought or speech bubble
-                if (distance > 1 && distance < 15) {
-                  const min = .05;
-                  const max = .6;
-                  calloutOn = true;
-                  this.bubble.setAttribute("visible", true);
-                  this.bubbleText.setAttribute("visible", true);
-      
-                  let camera = AFRAME.scenes[0].camera; 
-                  pos.project(camera);
-                  var width = window.innerWidth, height = window.innerHeight; 
-                  let widthHalf = width / 2;
-                  let heightHalf = height / 2;
-                  pos.x = (pos.x * widthHalf) + widthHalf;
-                  pos.y = - (pos.y * heightHalf) + heightHalf;
-                  pos.z = 0;
-  
-                  let scaleFactor = clamp(((distance * .2) / 2), min, max);
-                  console.log( " distance " +  distance + " scalefactro " + scaleFactor);
-                  if ((pos.x/width) < .5) {
-                    console.log("flip left");
-                    if (this.bubbleBackground) {
-                      this.bubbleBackground.setAttribute("position", "1.5 .2 .75");
-                      
-                      this.bubbleBackground.setAttribute('scale', {x: scaleFactor * -1, y: scaleFactor, z: scaleFactor} );
-                    }
-                    // this.bubbleText.setAttribute("scale", ".2 .2 .2"); 
-                    this.bubbleText.setAttribute("position", "1.5 .2 .86");
-                    // this.bubbleText.setAttribute('scale', {x: distance * .05, y: distance * .05, z: distance * .05} );
-                    this.bubbleText.setAttribute('scale', {x: scaleFactor, y: scaleFactor, z: scaleFactor} );
-                  } else {
-                  // if ((pos.x/width) > .5) {
-                    console.log("flip right");
-                    if (this.bubbleBackground) {
-                      this.bubbleBackground.setAttribute("position", "-1.5 .2 .5");
-                      // this.bubbleBackground.setAttribute('scale', {x: distance * .05, y: distance * .05, z: distance * .05} );
-                      this.bubbleBackground.setAttribute('scale', {x: scaleFactor, y: scaleFactor, z: scaleFactor} );
-                      // this.bubbleBackground.setAttribute("scale", ".2 .2 .2"); 
-  
-                    }
-                    
-                    this.bubbleText.setAttribute('scale', {x: scaleFactor, y: scaleFactor, z: scaleFactor} );
-                    this.bubbleText.setAttribute("position", "-1.5 .2 .6");
-                  }
-                 
-                  this.bubbleText.setAttribute('troika-text', {
-                    baseline: "center",
-                    align: "center",
-                    font: "/fonts/web/" + this.font2,
-                    anchor: "center",
-                    // wrapCount: 20,
-                    maxWidth: 3,
-                    fontSize: .3,
-                    color: "black",
-                    outlineColor: "white",
-                    outlineWidth: "2%",
-                    value: this.calloutString
-                  });
-                } else {
-                  console.log("tryna show bubble!");
-                  this.bubble.setAttribute("visible", false);
-                  this.bubbleBackground.setAttribute('scale', '1 1 1');
-                  this.bubbleText.setAttribute('scale', '1 1 1' );
+          if (this.data.tags.includes("active") || this.data.tags.includes("moddable")) { //a way to turn off events for just models
+ 
+            this.el.addEventListener('mouseleave', (e) => { 
+              e.preventDefault();
+              // console.log("tryna mouseexit");
+              if (!this.data.isEquipped) {
+                if (this.calloutEntity != null) {
+                  this.calloutEntity.setAttribute('visible', false);
                 }
-              } else {
-                if (this.hasLocationCallout || this.data.markerType === "character") {
-                  // console.log("mod_model not bubble callout is " + textData[textIndex]);
-                  distance = evt.detail.intersection.distance;
-                  let scalefactor = (distance * .1) / 2; 
-                    // this.bubble.setAttribute('position', pos);
+                // this.bubble = sceneEl.querySelector('.bubble');
+                if (this.bubble) {
+                  this.bubble.setAttribute('visible', false);
+                  // if (this.bubbleBackground) {
+                  //   this.bubbleBackground.setAttribute('scale', '1 1 1');
+                  // }
+                  //   this.bubbleText.setAttribute('scale', '1 1 1' );
+                }
+              }
+            });
+            // 
+
+            this.el.addEventListener('mousedown', (evt) => {
+              console.log("MOD_MODEL mousedown on markertype " + this.data.markerType +  " this.hasCallout " + this.hasCallout + " this.data.description " + this.data.description + " tags " + this.data.tags);
+              if (this.timestamp != '' && this.data.allowMods && !this.data.tags.includes("static")) {
+                if (keydown == "T") {
+                  ToggleTransformControls(this.timestamp);
+                } else if (keydown == "Shift") {
+                  // ShowLocationModal(this.timestamp);
+                  selectedLocationTimestamp = this.timestamp;
+                  // ShowLocationModal(that.timestamp);
+                  SceneManglerModal('Location');
+                } 
+              }  
+            });
+            this.el.addEventListener('mouseenter', (evt) =>  {
+
+              console.log("MOD_MODEL mouseovewr model " + this.data.modelName + " " + this.hasLocationCallout + " " + this.data.markerType + " " + this.hasCallout + " " + evt.detail);
+            
+              if (evt.detail.intersection != null && !this.data.tags.includes("static")) {
+                if (textData.length > 0) {
+                  this.calloutString = textData[textIndex];
+                } else {
+                  
+                  this.calloutString = this.data.name;
+                }
+                let min = this.data.scale * .05;
+                let max = 22;
+                let distance = evt.detail.intersection.distance;
+                this.distance = distance;
+                // console.log("MOD_MODEL mouseover markerType " + this.data.markerType + " scale " + this.data.scale);
+                  let pos = evt.detail.intersection.point; //hitpoint on model
+                  // let scalerange = (this.data.scale * .1) + (distance * .5);
+                  let scalerange = clamp(((distance * .2) / 2), min, max);
+                  // this.bubble.setAttribute('position', {"x": pos.x.toFixed(2), "y": pos.y.toFixed(2), "z": pos.z.toFixed(2)});
+                  if (this.bubble) {
+                    this.bubble.setAttribute('visible', true);
+                    this.bubbleText.setAttribute('visible', true);
+                    
+                    // let scalerange = Math.min(Math.max(parseFloat(this.data.scale) / 2, .1), 20);
+                    if (this.data.eventData.toLowerCase().includes("agent")) {
+                      this.bubble.setAttribute('position', '0 1 ' + scalerange.toString());
+                    } else {
+                      this.bubble.setAttribute('position', evt.detail.intersection.point);
+                      this.bubbleText.setAttribute('position', '0 .5 ' + scalerange.toString());
+                      // console.log("tryna show callout " + scalerange.toString() + " " + this.calloutString);
+                    }
+                  }  else {
+                    console.log("this.bubble not found!");
+                  }
+                  
+    
+                  this.font2 = "Acme.woff";
+                  if (settings && settings.sceneFontWeb2 && settings.sceneFontWeb2.length) {
+                    this.font2 = settings.sceneFontWeb2;
+                  }
+              
+
+    
+                if (this.hasCalloutBackground && distance) { //eg thought or speech bubble
+                  if (distance > 1 && distance < 15) {
+                    const min = .05;
+                    const max = .6;
+                    calloutOn = true;
                     this.bubble.setAttribute("visible", true);
                     this.bubbleText.setAttribute("visible", true);
-                    this.bubbleText.setAttribute('scale', {x: scalefactor, y: scalefactor, z: scalefactor} );
-                  // this.bubbleText.setAttribute('scale', {x: distance * .04, y: distance * .04, z: distance * .04} );
-                  // this.bubbleText.setAttribute("position", "-.5 .2 .51");
-                  // let scalerange = Math.max(parseFloat(this.data.scale), 3);
-                  // let scalerange = Math.min(Math.max(parseFloat(this.data.scale), .1), 20);
-                  let scalerange = 1 + this.data.scale / 2;
-                  console.log("showing callout with z offset " + scalerange.toString());
-                  this.bubbleText.setAttribute('position', '0 .75 ' + scalerange.toString()); //
-                  this.bubbleText.setAttribute('troika-text', {
-                    baseline: "bottom",
-                    align: "center",
-                    font: "/fonts/web/" + this.font2,
-                    anchor: "center",
-                    // wrapCount: .2,
-                    fontSize: .3,
-                    color: "white",
-                    outlineColor: "black",
-                    outlineWidth: "2%",
-                    value: this.calloutString
-                  });
-                }
-              }
-              if (textIndex < textData.length - 1) {
-                textIndex++;
-              } else {
-                textIndex = 0;
-                }
-            }
-  
-              // console.log("tryna play audiotrigger " + JSON.stringify(this.data.eventData));
-            if (this.data.tags != undefined && this.data.tags != null && this.data.tags != "undefined") {
-              // console.log("tryna play audio with tags " + this.data.tags);
-              // if (this.triggerAudioController != null) {
-              //   this.triggerAudioController.components.trigger_audio_control.playAudio();
-              
-                if (evt.detail.intersection && this.triggerAudioController) {
-                  let distance = evt.detail.intersection.distance;
-                  this.triggerAudioController.components.trigger_audio_control.playAudioAtPosition(evt.detail.intersection.point, distance, this.data.tags, 1);//tagmangler needs an array, add vol mod 
-                }
-              // }
-            }
-
-            if (this.data.eventData && this.data.eventData.length && this.data.eventData.toLowerCase().includes("target")) {
-                // this.el.setAttribute("targeting_raycaster", {'init': true}); //no
-                this.el.classList.add("target");
-                this.el.classList.remove("activeObjexRay");
-              
         
-
-            }
-            
-            // }
-            if (this.isNavAgent) {
-              if (this.navAgentController && this.navAgentController.currentState != "dialog") {
-                this.navAgentController.updateAgentState("greet player");
-                this.el.setAttribute("look-at-y", "#player");
-  
-              } else {
-                if (!this.navAgentController)
-                this.navAgentController = this.el.components.nav_agent_controller;
-              } 
-              if (this.findAction) {
-                
-                for (let i = 0; i < this.findAction.tags.length; i++) {
-                  console.log("looking for objs with class " + this.findAction.tags[i]);
-                  let targetObjects = document.getElementsByClassName(this.findAction.tags[i]);
-                  if (targetObjects) {
-                    console.log("gots target objects " + targetObjects.length);
-                    for (let l = 0; l < targetObjects.length; l++) {
-                      let targetLoc = targetObjects[l].getAttribute("position");
-                      this.targetLocations.push(targetLoc);
+                    let camera = AFRAME.scenes[0].camera; 
+                    pos.project(camera);
+                    var width = window.innerWidth, height = window.innerHeight; 
+                    let widthHalf = width / 2;
+                    let heightHalf = height / 2;
+                    pos.x = (pos.x * widthHalf) + widthHalf;
+                    pos.y = - (pos.y * heightHalf) + heightHalf;
+                    pos.z = 0;
+    
+                    let scaleFactor = clamp(((distance * .2) / 2), min, max);
+                    console.log( " distance " +  distance + " scalefactro " + scaleFactor);
+                    if ((pos.x/width) < .5) {
+                      console.log("flip left");
+                      if (this.bubbleBackground) {
+                        this.bubbleBackground.setAttribute("position", "1.5 .2 .75");
+                        
+                        this.bubbleBackground.setAttribute('scale', {x: scaleFactor * -1, y: scaleFactor, z: scaleFactor} );
+                      }
+                      // this.bubbleText.setAttribute("scale", ".2 .2 .2"); 
+                      this.bubbleText.setAttribute("position", "1.5 .2 .86");
+                      // this.bubbleText.setAttribute('scale', {x: distance * .05, y: distance * .05, z: distance * .05} );
+                      this.bubbleText.setAttribute('scale', {x: scaleFactor, y: scaleFactor, z: scaleFactor} );
+                    } else {
+                    // if ((pos.x/width) > .5) {
+                      console.log("flip right");
+                      if (this.bubbleBackground) {
+                        this.bubbleBackground.setAttribute("position", "-1.5 .2 .5");
+                        // this.bubbleBackground.setAttribute('scale', {x: distance * .05, y: distance * .05, z: distance * .05} );
+                        this.bubbleBackground.setAttribute('scale', {x: scaleFactor, y: scaleFactor, z: scaleFactor} );
+                        // this.bubbleBackground.setAttribute("scale", ".2 .2 .2"); 
+    
+                      }
+                      
+                      this.bubbleText.setAttribute('scale', {x: scaleFactor, y: scaleFactor, z: scaleFactor} );
+                      this.bubbleText.setAttribute("position", "-1.5 .2 .6");
                     }
-                  } else {
-                    console.log("didn't find no targetObjects");
-                  }
                   
+                    this.bubbleText.setAttribute('troika-text', {
+                      baseline: "center",
+                      align: "center",
+                      font: "/fonts/web/" + this.font2,
+                      anchor: "center",
+                      // wrapCount: 20,
+                      maxWidth: 3,
+                      fontSize: .3,
+                      color: "black",
+                      outlineColor: "white",
+                      outlineWidth: "2%",
+                      value: this.calloutString
+                    });
+                  } else {
+                    console.log("tryna show bubble!");
+                    this.bubble.setAttribute("visible", false);
+                    this.bubbleBackground.setAttribute('scale', '1 1 1');
+                    this.bubbleText.setAttribute('scale', '1 1 1' );
+                  }
+                } else {
+                  if (this.hasLocationCallout || this.data.markerType === "character") {
+                    // console.log("mod_model not bubble callout is " + textData[textIndex]);
+                    distance = evt.detail.intersection.distance;
+                    let scalefactor = (distance * .1) / 2; 
+                      // this.bubble.setAttribute('position', pos);
+                      this.bubble.setAttribute("visible", true);
+                      this.bubbleText.setAttribute("visible", true);
+                      this.bubbleText.setAttribute('scale', {x: scalefactor, y: scalefactor, z: scalefactor} );
+                    // this.bubbleText.setAttribute('scale', {x: distance * .04, y: distance * .04, z: distance * .04} );
+                    // this.bubbleText.setAttribute("position", "-.5 .2 .51");
+                    // let scalerange = Math.max(parseFloat(this.data.scale), 3);
+                    // let scalerange = Math.min(Math.max(parseFloat(this.data.scale), .1), 20);
+                    let scalerange = 1 + this.data.scale / 2;
+                    console.log("showing callout with z offset " + scalerange.toString());
+                    this.bubbleText.setAttribute('position', '0 .75 ' + scalerange.toString()); //
+                    this.bubbleText.setAttribute('troika-text', {
+                      baseline: "bottom",
+                      align: "center",
+                      font: "/fonts/web/" + this.font2,
+                      anchor: "center",
+                      // wrapCount: .2,
+                      fontSize: .3,
+                      color: "white",
+                      outlineColor: "black",
+                      outlineWidth: "2%",
+                      value: this.calloutString
+                    });
+                  }
                 }
-                if (this.targetLocations.length && this.navAgentController && this.navAgentController.currentState != "dialog") {
-                  // this.navAgentController.seekTargetLocation();
-                  this.navAgentController.updateAgentState("target"); //instead of waypoints
-                }
+                if (textIndex < textData.length - 1) {
+                  textIndex++;
+                } else {
+                  textIndex = 0;
+                  }
               }
-              // if (this.data.objectData.audiogroupID && this.data.objectData.audiogroupID.length > 4) { //it's an objectID
-              //   if (this.objectAudioController) {
-              //     console.log("tryna play random object_audio");
-              //     this.objectAudioController.playRandom();
-              //   } else {
-              //     this.objectAudioController = this.el.components.object_audio_controller;
-              //   }
-              // }
+    
+                // console.log("tryna play audiotrigger " + JSON.stringify(this.data.eventData));
+              if (this.data.tags != undefined && this.data.tags != null && this.data.tags != "undefined") {
+                // console.log("tryna play audio with tags " + this.data.tags);
+                // if (this.triggerAudioController != null) {
+                //   this.triggerAudioController.components.trigger_audio_control.playAudio();
+                
+                  if (evt.detail.intersection && this.triggerAudioController) {
+                    let distance = evt.detail.intersection.distance;
+                    this.triggerAudioController.components.trigger_audio_control.playAudioAtPosition(evt.detail.intersection.point, distance, this.data.tags, 1);//tagmangler needs an array, add vol mod 
+                  }
+                // }
+              }
+
+              if (this.data.eventData && this.data.eventData.length && this.data.eventData.toLowerCase().includes("target")) {
+                  // this.el.setAttribute("targeting_raycaster", {'init': true}); //no
+                  this.el.classList.add("target");
+                  this.el.classList.remove("activeObjexRay");
+                
+          
+
+              }
               
+              // }
+              if (this.isNavAgent) {
+                if (this.navAgentController && this.navAgentController.currentState != "dialog") {
+                  this.navAgentController.updateAgentState("greet player");
+                  this.el.setAttribute("look-at-y", "#player");
+    
+                } else {
+                  if (!this.navAgentController)
+                  this.navAgentController = this.el.components.nav_agent_controller;
+                } 
+                if (this.findAction) {
+                  
+                  for (let i = 0; i < this.findAction.tags.length; i++) {
+                    console.log("looking for objs with class " + this.findAction.tags[i]);
+                    let targetObjects = document.getElementsByClassName(this.findAction.tags[i]);
+                    if (targetObjects) {
+                      console.log("gots target objects " + targetObjects.length);
+                      for (let l = 0; l < targetObjects.length; l++) {
+                        let targetLoc = targetObjects[l].getAttribute("position");
+                        this.targetLocations.push(targetLoc);
+                      }
+                    } else {
+                      console.log("didn't find no targetObjects");
+                    }
+                    
+                  }
+                  if (this.targetLocations.length && this.navAgentController && this.navAgentController.currentState != "dialog") {
+                    // this.navAgentController.seekTargetLocation();
+                    this.navAgentController.updateAgentState("target"); //instead of waypoints
+                  }
+                }
+                // if (this.data.objectData.audiogroupID && this.data.objectData.audiogroupID.length > 4) { //it's an objectID
+                //   if (this.objectAudioController) {
+                //     console.log("tryna play random object_audio");
+                //     this.objectAudioController.playRandom();
+                //   } else {
+                //     this.objectAudioController = this.el.components.object_audio_controller;
+                //   }
+                // }
+                
+    
+              }
+            });
+        } //if not static tag
   
-            }
-          });
-  
-          }
+        }
        
           document.querySelector('a-scene').addEventListener('youtubeToggle', function (event) { //things to trigger on this model if youtube is playing
           console.log("GOTSA YOUTUBNE EVENT: " + event.detail.isPlaying);  

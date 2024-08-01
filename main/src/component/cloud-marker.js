@@ -14,7 +14,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
       model: {default: ''},
       mediaID: {default: ''},
       mediaName: {default: ''},
-      targetElements: {default: ''}, //array -> csv
+      targetElements: {default: []}, //array -> csv
       scale: {default: 1},
       
         // position: {default: ''},
