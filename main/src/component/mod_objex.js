@@ -2828,21 +2828,21 @@ AFRAME.registerComponent('mod_object', {
             }
 
 
-            if (this.tags != undefined && this.tags != null && this.tags != "undefined") { //MAYBE SHOULD BE UNDER RAYHIT?
-             
-                    // if (moIndex && moIndex != -1) { //moIndex = "mouthopen"
-                    //   this.el.setAttribute('animation-mixer', {
-                    //     "clip": clips[moIndex].name,
-                    //     "loop": "repeat",
-                    //     "repetitions": 10,
-                    //     "timeScale": 2
-                    //   });
-                    //   this.el.addEventListener('animation-finished', (e) => { 
-                    //     this.el.removeAttribute('animation-mixer');
-                    //   });
-                    // }
+      if (this.tags != undefined && this.tags != null && this.tags != "undefined") { //MAYBE SHOULD BE UNDER RAYHIT?
+        
+              // if (moIndex && moIndex != -1) { //moIndex = "mouthopen"
+              //   this.el.setAttribute('animation-mixer', {
+              //     "clip": clips[moIndex].name,
+              //     "loop": "repeat",
+              //     "repetitions": 10,
+              //     "timeScale": 2
+              //   });
+              //   this.el.addEventListener('animation-finished', (e) => { 
+              //     this.el.removeAttribute('animation-mixer');
+              //   });
               // }
-            }
+        // }
+      }
           // }     
         // }
       // setTimeout(() => {

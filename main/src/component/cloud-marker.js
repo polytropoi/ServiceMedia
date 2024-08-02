@@ -32,7 +32,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
       description: {default: ''},
       allowMods: {default: false}
     },
-    dependencies: ['geometry', 'material'],
+    // dependencies: ['geometry', 'material'],
     init: function () {
       this.coolDown = false;
     //   console.log("tryna set a cloudmarker with scale " + this.data.scale);
@@ -79,7 +79,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
 
   
           console.log("CLOUDMARKER " + this.data.markerType + " " + this.data.modelID );
-
+          // this.el.removeAttribute("geometry");
           
           if ((!this.data.modelID || this.data.modelID == undefined || this.data.modelID == "" || this.data.modelID == "none") 
               && !this.data.modelID != "primitive_cube"
@@ -88,7 +88,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
             // console.log("CLOUDMARKER PLACEHOLDER GEO " + this.data.modelID);
             console.log("CLOUDMARKER " + this.data.markerType + " " + this.data.modelID );
                 if (this.data.markerType.toLowerCase() == "player") {
-                  this.el.removeAttribute("geometry");
+                  // this.el.removeAttribute("geometry");
                   this.el.setAttribute('gltf-model', '#poi1');
                   this.el.setAttribute("material", {color: "blue", transparent: true, opacity: .5});
                 }
@@ -338,9 +338,9 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
           // localStorage.setItem(this.phID, JSON.stringify(locItem)); 
         
         if (this.data.markerType.toLowerCase() == "player") {
-          // console.log("playerobj")
-          // this.el.setAttribute('gltf-model', '#poi1');
-          // this.el.classList.remove("activeObjexRay");
+          this.el.setAttribute('gltf-model', '#poi1');
+          this.el.setAttribute("material", {color: "blue", transparent: true, opacity: .5});
+          this.el.classList.remove("activeObjexRay"); //bc it blocks player interaction when spawned inside
         }
         // if (this.data.markerType.toLowerCase() == "placeholder") {
         //   this.el.setAttribute('gltf-model', '#savedplaceholder');
