@@ -783,8 +783,8 @@ function SaveModToLocal(locationKey) { //locationKey is now just timestamp of th
    locItem.description = document.getElementById('locationDescription').value;
    locItem.markerType = document.getElementById('locationMarkerType').value;
    locItem.eventData = document.getElementById('locationEventData').value;
-   // locItem.locationTargets = document.getElementById('locationTargets').value; //nope only gets one
-   locItem.locationTargets = Array.from(document.getElementById('locationTargets').options).filter(function (option) {
+   // locItem.targetElements = document.getElementById('targetElements').value; //nope only gets one
+   locItem.targetElements = Array.from(document.getElementById('targetElements').options).filter(function (option) {
       return option.selected;
     }).map(function (option) {
       return option.value;
@@ -820,7 +820,7 @@ function SaveModToLocal(locationKey) { //locationKey is now just timestamp of th
    //    locItem.isLocal = true;
    // }
    // console.log("tryna savelocation "+locationKey+"  : " + JSON.stringify(locItem));
-   console.log("tryna savelocation "+locationKey+"  : " + locItem.locationTargets);
+   console.log("tryna savelocation "+locationKey+"  : " + locItem.targetElements);
    // localStorage.setItem(locationKey, JSON.stringify(locItem));
    let hasLocal = false;
    for (let i = 0; i < localData.locations.length; i++) {
@@ -855,7 +855,7 @@ function SaveModToLocal(locationKey) { //locationKey is now just timestamp of th
          localData.locations[i].model = locItem.model;
          localData.locations[i].objectID = locItem.objectID;
          localData.locations[i].objectName = locItem.objectName;
-         localData.locations[i].locationTargets = locItem.locationTargets;
+         localData.locations[i].targetElements = locItem.targetElements;
          localData.locations[i].mediaID = locItem.mediaID;
          hasLocal = true;
          let theEl = document.getElementById(locationKey.toString());
@@ -924,7 +924,7 @@ function SaveModToLocal(locationKey) { //locationKey is now just timestamp of th
                cloudMarkerComponent.data.zscale = locItem.zscale;
                cloudMarkerComponent.data.scale = locItem.markerObjScale;
                cloudMarkerComponent.data.tags = locItem.locationTags;
-               cloudMarkerComponent.data.locationTargets = locItem.locationTargets;
+               cloudMarkerComponent.data.targetElements = locItem.targetElements;
                
                cloudMarkerComponent.loadModel(locItem.modelID); 
                cloudMarkerComponent.updateMaterials();
@@ -948,7 +948,7 @@ function SaveModToLocal(locationKey) { //locationKey is now just timestamp of th
                localMarkerComponent.data.zscale = locItem.zscale;
                localMarkerComponent.data.scale = locItem.markerObjScale;
                localMarkerComponent.data.tags = locItem.locationTags;
-               localMarkerComponent.data.locationTargets = locItem.locationTargets;
+               localMarkerComponent.data.targetElements = locItem.targetElements;
               
                localMarkerComponent.loadModel(locItem.modelID); 
                localMarkerComponent.updateMaterials();

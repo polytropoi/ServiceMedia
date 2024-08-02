@@ -86,7 +86,7 @@ function InitIDB() {
                                                             cursor.value.locations[i].modelID,
                                                             cursor.value.locations[i].objectID,
                                                             cursor.value.locations[i].mediaID,
-                                                            cursor.value.locations[i].locationTargets );   
+                                                            cursor.value.locations[i].targetElements );   
 
                         } else {
                            let modModelComponent = cloudEl.components.mod_model;
@@ -151,6 +151,7 @@ function InitIDB() {
                                                                // rotation: cursor.value.locations[i].eulerx+","+cursor.value.locations[i].eulery +","+ cursor.value.locations[i].eulerz,
                                                                // scale: {x: cursor.value.locations[i].markerObjScale, y: cursor.value.locations[i].markerObjScale, z: cursor.value.locations[i].markerObjScale} derp
                                                                scale: cursor.value.locations[i].markerObjScale,
+                                                               targetElements: cursor.value.locations[i].targetElements
                                                             });
                         localEl.id = cursor.value.locations[i].timestamp.toString(); //for lookups
                         }

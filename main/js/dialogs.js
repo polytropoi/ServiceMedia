@@ -255,15 +255,15 @@ window.addEventListener( 'keydown',  ( event ) => {
    
   });
 
-  $('#modalContent').on('change', '#locationTargets', function(e) { 
-    console.log("locationTargets changed " + e.target.value + " for id " + selectedLocationTimestamp);
+  $('#modalContent').on('change', '#targetElements', function(e) { 
+    console.log("targetElements changed " + e.target.value + " for id " + selectedLocationTimestamp);
     let locEl = document.getElementById(selectedLocationTimestamp);
  
     if (locEl) {
     let modModelComponent = locEl.components.mod_model;
     let localMarkerComponent = locEl.components.local_marker;
     let cloudMarkerComponent = locEl.components.cloud_marker;
-    let selected = Array.from(document.getElementById('locationTargets').options).filter(function (option) {
+    let selected = Array.from(document.getElementById('targetElements').options).filter(function (option) {
       return option.selected;
     }).map(function (option) {
       return option.value;
@@ -274,17 +274,17 @@ window.addEventListener( 'keydown',  ( event ) => {
         // console.log(localData.locations[i].timestamp + " vs " + selectedLocationTimestamp);
         if (localData.locations[i].timestamp == selectedLocationTimestamp) {
 
-          localData.locations[i].locationTargets = selected;
+          localData.locations[i].targetElements = selected;
           console.log("setting locationTarget to " + selected);
           // if (!localData.locations[i].isLocal) {
             if (modModelComponent) { //not for objex, which have their own action system?
               modModelComponent.data.targetElements = selected;
 
             } else if (cloudMarkerComponent) {
-              cloudMarkerComponent.data.targetElement = selected;
+              cloudMarkerComponent.data.targetElements = selected;
 
             } else if (localMarkerComponent) {
-              localMarkerComponent.data.targetElement = selected;
+              localMarkerComponent.data.targetElements = selected;
 
             }
           
@@ -790,7 +790,7 @@ function ReturnLocationObjectSelect (phID) {
 }
 function ReturnOtherLocations (selected) {
   let phID = selectedLocationTimestamp;
-  console.log("selected options for locationTargets " + selected);
+  console.log("selected options for targetElements " + selected);
   let locs = "<option value=\x22none\x22 selected>none</option>";
   for (let i = 0; i < localData.locations.length; i++) {
     if (localData.locations[i].timestamp != selectedLocationTimestamp) {
@@ -1053,8 +1053,8 @@ function ShowLocationModal(timestamp) {
         // if (userData.sceneOwner != null) {
         //     cloudSaveButton = "<button class=\x22reallySaveButton\x22 onclick=\x22SaveModsToCloud('"+phID+"')\x22>Save (cloud)</button>";
         // }
-        if (!thisLocation.locationTargets) {
-          thisLocation.locationTargets = "none";
+        if (!thisLocation.targetElements) {
+          thisLocation.targetElements = "none";
         }
         
         let disabled = "disabled";
@@ -1147,10 +1147,10 @@ function ShowLocationModal(timestamp) {
         // "+that.data.timestamp+","+that.data.name+","+position.x+","+position.y+","+position.z+"
         // ReturnOtherLocations();
 
-        "<div class=\x22row\x22><div class=\x22threecolumn\x22><label for=\x22locationTargets\x22>Target Location(s)</label>"+
-        "<select id=\x22locationTargets\x22 name=\x22locationTargets\x22 multiple size=\x223\x22>"+
-        ReturnOtherLocations(thisLocation.locationTargets) +
-        "</select></div>"+
+        "<div class=\x22row\x22><div class=\x22threecolumn\x22><label for=\x22targetElements\x22>Target Location(s)</label>"+
+        "<select id=\x22targetElements\x22 name=\x22targetElements\x22 multiple size=\x223\x22>"+
+        ReturnOtherLocations(thisLocation.targetElements) +
+        "</select>"+thisLocation.targetElements+"</div>"+
 
         "<div class=\x22threecolumn\x22><label for=\x22locationMedia\x22>Location Media</label>"+
         "<select id=\x22locationMedia\x22 name=\x22locationMedia\x22>"+

@@ -813,7 +813,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
       }
     },
     //when there's a local change
-    updateAndLoad: function (name, description, tags, eventData, markerType, scale, xpos, ypos, zpos, xrot, yrot, zrot, xscale, yscale, zscale, modelID, objectID, mediaID, locationTargets) {
+    updateAndLoad: function (name, description, tags, eventData, markerType, scale, xpos, ypos, zpos, xrot, yrot, zrot, xscale, yscale, zscale, modelID, objectID, mediaID, targetElements) {
         this.data.name = name;
         this.data.description = description;
         this.data.tags = tags;
@@ -831,7 +831,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
         this.data.yscale = yscale;
         this.data.zscale = zscale;
         this.data.mediaID = mediaID
-        this.data.targetElements = locationTargets;
+        this.data.targetElements = targetElements;
         // console.log("tryna scale to " + xscale + " " + yscale+ " " + zscale);
         console.log("cloudmarker updateAndLoad tags " + this.data.tags + " markertype " + markerType + " mediaID " + mediaID + " modelID " + modelID);
         // setTimeout(() => {
