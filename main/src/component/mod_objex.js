@@ -67,7 +67,7 @@ AFRAME.registerComponent('mod_objex', {
                   EquipDefaultItem(this.data.jsonLocationsData[i].objectID); //in dialogs.js (?)
                   
                 } else {
-                  if (!this.data.jsonLocationsData[i].markerType.toLowerCase().includes('spawn')) { //either spawn or spawntrigger types require interaction //now in cloudmarker, deprecate
+                  if (!this.data.jsonLocationsData[i].markerType.toLowerCase().includes('spawn')) { //either spawn or spawntrigger types require interaction //now in cloudmarker, deprecate //no, still need this mode
                     console.log(this.data.jsonLocationsData[i].name + " mod_objecct locationData " + JSON.stringify(this.data.jsonLocationsData[i]));
                    
                     let objEl = document.createElement("a-entity");
@@ -171,6 +171,38 @@ AFRAME.registerComponent('mod_objex', {
       
       },
       spawnObject: function (locationName) { //uses name (label) property of location to reference the object to spawn, called from a spawntrigger, using that location's eventData which should have the name... hrm.
+        console.log("tryna spawn object with location name : "+ locationName);
+        for (let j = 0; j < this.data.jsonLocationsData.length; j++) {
+          let tmpName = this.data.jsonLocationsData[j].name;
+          if (tmpName == 'undefined' || tmpName == null) { //some old ones only have a "label" property. sigh
+            tmpName = this.data.jsonLocationsData[j].label != null ? this.data.jsonLocationsData[j].label : "";
+          }
+          if (tmpName == locationName) {
+            let elIDString = "obj" + this.data.jsonLocationsData[j].objectID + "_" + this.data.jsonLocationsData[j].timestamp; //um..
+            let elID = document.getElementById(elIDString);
+            if (!elID) { //only one for now... TODO count maxperscene?  check inventory?
+              let locationData  = {};
+              locationData.x = this.data.jsonLocationsData[j].x;
+              locationData.y = this.data.jsonLocationsData[j].y;
+              locationData.z = this.data.jsonLocationsData[j].z;
+              this.objectData =  this.returnObjectData(this.data.jsonLocationsData[j].objectID);
+              console.log("gotsa object to spawn " + JSON.stringify(this.data.jsonLocationsData[j].locationTags));
+              let objEl = document.createElement("a-entity");
+              objEl.setAttribute("mod_object", {'eventData': null, 'locationData': locationData, 'objectData': this.objectData, 'timestamp': this.data.jsonLocationsData[j].timestamp, 'tags': this.data.jsonLocationsData[j].locationTags, 'isSpawned': true});
+              objEl.id = elIDString;
+              sceneEl.appendChild(objEl);
+              if (this.triggerAudioController != null) {
+                let distance = window.playerPosition.distanceTo(locationData);
+                console.log(distance + " distance to spawn lo9c " + locationData);
+                this.triggerAudioController.components.trigger_audio_control.playAudioAtPosition(locationData, distance, ["spawn"], 1);//tagmangler needs an array, add vol mod 
+              }
+            } else {
+              console.log("already spawned one of thoose...");
+            }
+          }
+        }
+      },
+      spawnObjectID: function (objectID) { //uses name (label) property of location to reference the object to spawn, called from a spawntrigger, using that location's eventData which should have the name... hrm.
         console.log("tryna spawn object with location name : "+ locationName);
         for (let j = 0; j < this.data.jsonLocationsData.length; j++) {
           let tmpName = this.data.jsonLocationsData[j].name;
@@ -768,6 +800,12 @@ AFRAME.registerComponent('mod_object', {
           } else if (this.data.locationData.locationTags.toLowerCase().includes("equipped")) {
             this.data.isEquipped = true;
           } 
+          if ( this.data.locationData.locationTags.toLowerCase().includes("hide me")) { 
+              this.el.setAttribute("visible", false);
+              this.el.classList.remove("activeObjexRay");
+              this.el.dataset.isvisible = false;
+              console.log("mod_object tryna hide myself set to visible " + this.el.dataset.isvisible);
+          }
       } 
       if (this.data.tags && this.data.tags != undefined  && this.data.tags != 'undefined' && this.data.tags.length > 0) {
         if (this.data.tags.toLowerCase().includes("equippable")) {
@@ -956,11 +994,9 @@ AFRAME.registerComponent('mod_object', {
         if (this.hasShootAction || this.hasThrowAction) {
         this.el.classList.add("activeObjexRay");
         }
-        
-    
-
     } else {
         this.el.classList.add("activeObjexRay");
+        
     }
     if (this.data.removeAfter != "") { //cleanup if timeout set
         setTimeout( () => { 
@@ -2650,6 +2686,18 @@ AFRAME.registerComponent('mod_object', {
             value: ""
           });
           this.calloutText.setAttribute("overlay");
+
+          if (this.data.locationData && this.data.locationData.locationTags != undefined  && this.data.locationData.locationTags != 'undefined' && this.data.locationData.locationTags.length > 0) {
+            if ( this.data.locationData.locationTags.toLowerCase().includes("hide me")) { 
+                this.el.setAttribute("visible", false);
+                this.el.classList.remove("activeObjexRay");
+                this.el.dataset.isvisible = false;
+                console.log("mod_object tryna hide myself set to visible " + this.el.dataset.isvisible);
+            }
+        } 
+
+
+
     }, //end init
     showCallout: function (calloutString, hitpoint, distance) {
       console.log("tryna show obj callout" + calloutString);

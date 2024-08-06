@@ -1852,9 +1852,9 @@ AFRAME.registerComponent('particle_spawner',
     } else {
       pScale = pScale * 10;
     } 
-    console.log("particle_spawner mod_particles location data: " + JSON.stringify(location) + " scale " + pScale);
+    console.log("particle_spawner mod_particles location data: " + JSON.stringify(location) + " scale " + pScale + " parentID " + parentID );
     
-    if (parentID != null) { 
+    if (parentID != null && parentID != '') { 
       let pparent = document.getElementById(parentID);
           // let obj = pparent.object3D;
           // let box = new THREE.Box3().setFromObject(obj); //bounding box for position

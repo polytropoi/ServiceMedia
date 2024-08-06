@@ -439,7 +439,7 @@ window.addEventListener( 'keydown',  ( event ) => {
           // console.log(localData.locations[i].timestamp + " vs " + selectedLocationTimestamp);
           if (localData.locations[i].timestamp == selectedLocationTimestamp) {
             console.log("gotsa match "+ localData.locations[i].timestamp + " vs " + selectedLocationTimestamp);
-            if (localData.locations[i].markerType == "object") {
+            if (localData.locations[i].markerType == "object" || localData.locations[i].markerType == "spawn" || localData.locations[i].markerType == "character") {
             localData.locations[i].objectID = uObjectID;
             localData.locations[i].objectName = uObjectName;
             localData.locations[i].modelID = "none";
@@ -927,6 +927,7 @@ function ReturnLocationMarkerTypeSelect (selected) {
       "placeholder",
       "model",
       "object",
+      "spawn",
       "poi",
       "waypoint",
       "trigger",
@@ -987,12 +988,12 @@ function ReturnLocationMarkerTypeSelect (selected) {
       "follow ambient",
       "lerp",
       "slerp",
-      "spawntrigger",
+      // "spawntrigger",
       // "trigger",
       // "collider",
       // "light",
       "particlesystem",
-      "spawn",
+
       "flyer",
       "walker"];
     for (let i = 0; i < typesArray.length; i++) {

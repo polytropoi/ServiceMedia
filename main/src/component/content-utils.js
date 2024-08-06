@@ -229,7 +229,7 @@ AFRAME.registerComponent('initializer', { //adjust for device settings, and call
         
       // }
       if (settings && settings.allowMods) {
-        this.el.setAttribute("location_picker", "init");
+        this.el.setAttribute("location_picker", {'enabled': true});
       }
       if (settings && settings.sceneTags && settings.sceneTags.includes("webcam")) {
         // let webcamObj = document.createElement("a-box");
@@ -3428,6 +3428,9 @@ AFRAME.registerComponent('mod-colors', {
 
 });
 AFRAME.registerComponent('location_picker', { //TODO toggle on if needed, off by default..
+  schema: {
+    enabled: {default: false},
+  },
   init: function () {
     console.log("tryna set location_picker raycaster");
     this.tick = AFRAME.utils.throttleTick(this.tick, 300, this);

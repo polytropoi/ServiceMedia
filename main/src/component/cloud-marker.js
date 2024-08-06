@@ -30,7 +30,8 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
       yscale: {type: 'number', default: 1},
       zscale: {type: 'number', default: 1},
       description: {default: ''},
-      allowMods: {default: false}
+      allowMods: {default: false},
+      hasSpawned: {default: false}
     },
     // dependencies: ['geometry', 'material'],
     init: function () {
@@ -73,7 +74,8 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
       //   this.data.modelID = "primitive_cube";
       // } 
       
-      if (this.data.tags && this.data.tags.includes("follow curve")) {
+      if ((this.data.tags && this.data.tags.toLowerCase().includes("follow curve")) || this.data.markerType == "follow curve" ) {
+        console.log("tryna add mod_curve");
         this.el.setAttribute("mod_curve", {"origin": "location", "isClosed": true, "spreadFactor": 2})
       }
 
@@ -91,6 +93,11 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                   // this.el.removeAttribute("geometry");
                   this.el.setAttribute('gltf-model', '#poi1');
                   this.el.setAttribute("material", {color: "blue", transparent: true, opacity: .5});
+                }
+                if (this.data.markerType.toLowerCase() == "spawn") {
+                  // this.el.removeAttribute("geometry");
+                  this.el.setAttribute('gltf-model', '#poi1');
+                  this.el.setAttribute("material", {color: "orange", transparent: true, opacity: .5});
                 }
                 if (this.data.markerType.toLowerCase() == "placeholder") {
                   this.el.setAttribute('gltf-model', '#poi1');
@@ -731,6 +738,14 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
       }
     },//end init()
     loadObject: function (objectID) { //local object swap (maybe with child model...);
+      if (this.data.hasSpawned && !this.data.tags.includes("multi")) {
+        return;
+      }
+      this.data.hasSpawned = true;
+      console.log("tryna load object id " + this.data.objectID);
+      if (!objectID) {
+        objectID = this.data.objectID;
+      }
       console.log("tryna load object id " + objectID);
       if (objectID != undefined && objectID != null & objectID != "none" && objectID != "") {  
         // sceneObjects = objexEl.components.mod_objex.returnObjexData(); //!
@@ -763,9 +778,12 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                 let objEl = document.createElement("a-entity");
                 
                 objEl.setAttribute("mod_object", {'locationData': this.locData, 'objectData': this.objectData});
+                objEl.id = Date.now();
+                sceneEl.appendChild(objEl);
+
+
                 // objEl.id = "obj" + objectData._id + "_" + this.locData.timestamp;
                 // this.objectElementID = objEl.id; 
-                sceneEl.appendChild(objEl);
                 // let objEl = document.createElement("a-entity");
                 // let modObjectComponent = this.el.components.mod_object;
                 // if (!modObjectComponent) {
@@ -1537,24 +1555,18 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
           triggerAudioController.components.trigger_audio_control.playAudioAtPosition(this.el.object3D.position, window.playerPosition.distanceTo(this.el.object3D.position), this.data.tags);
         }
       }  
-      if (this.data.markerType.toLowerCase() == "spawntrigger" || //deprecated, will just use trigger + tags + datas
-        (this.data.markerType.toLowerCase() == "trigger" && (this.data.tags && this.data.tags.includes("spawn"))) ) {
-          console.log("gotsa spawn trigger !" + this.data.markerType + this.data.eventData); 
-          if (this.data.eventData && this.data.eventData.length > 3) {
-            let objexEl = document.getElementById('sceneObjects');    
-            if (objexEl) {
-              let modObjex = objexEl.components.mod_objex;
-              if (modObjex) {
-                modObjex.spawnObject(this.data.eventData); //eventdata should have the name of a location with spawn markertype
-              }
-            } else {
-              console.log("can't find objexEl!");
-            }
-          
-          } else if (this.data.locationTarget) {
-
-          }
-      }
+      // if (this.data.markerType.toLowerCase() == "spawntrigger" || //deprecated, will just use trigger + tags + datas
+      //   (this.data.markerType.toLowerCase() == "trigger" && (this.data.tags && this.data.tags.includes("spawn target"))) ) {  
+      //     console.log("gotsa spawn trigger !" + this.data.markerType + this.data.eventData); 
+        
+      //     if (this.data.targetElements) {
+      //       let targetEl = document.getElementById(this.data.targetElements[0]);
+      //       let cloudMarker = targetEl.components.cloud_marker;
+      //       if (cloudMarker) {
+      //         cloudMarker.loadObject();
+      //       }
+      //     }
+      // }
       this.targetMods();
       // if (this.data.tags && this.data.tags.length && this.data.tags.toLowerCase().includes("toggle")) {
       //   console.log( "tryna toggle somethin..." + this.data.targetElements); 
@@ -1715,6 +1727,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
           }
         }
         if (this.data.tags && this.data.tags.length && this.data.tags.toLowerCase().includes("hide target")) {
+          
           console.log( "tryna hide somethin..." + this.data.targetElements + " length"); 
           if (this.data.targetElements != '') {
             for (let i = 0; i < this.data.targetElements.length; i++) {
@@ -1724,6 +1737,22 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                   targetEl.classList.remove("activeObjexRay");
                   targetEl.dataset.isvisible = false;
                   console.log("hide target set to visible " + targetEl.dataset.isvisible);
+              }
+            }
+            // this.coolDownTimer();
+          }
+        }
+        if (this.data.tags && this.data.tags.length && this.data.tags.toLowerCase().includes("spawn target")) { //could be an object
+          
+          console.log( "tryna hide somethin..." + this.data.targetElements + " length"); 
+          if (this.data.targetElements != '') {
+            for (let i = 0; i < this.data.targetElements.length; i++) {
+              let targetEl = document.getElementById(this.data.targetElements[i].toString());
+              if (targetEl) {
+                let cloudMarker = targetEl.components.cloud_marker;
+                if (cloudMarker) {
+                  cloudMarker.loadObject();
+                }
               }
             }
             // this.coolDownTimer();
