@@ -12564,10 +12564,32 @@ function getAllPeople() {
                     "</div>";
                     }
                 }
+            // returnTargetElements = sceneLocations 
+            // $("select").on("focus", function() {
+            //     $("select").addClass("expanded");
+            //  });
+             
+            //  $("select").on("blur", function() {
+            //      $("select").removeClass("expanded");
+                 
+            //      // Scroll back the select to the top. Not pretty, but still better than landing between two actual values.
+            //      $("select").scrollTop(0);
+                 
+            //      // Clear selected values
+            //      $(".selected-target-values").html('');
+                 
+            //      // Print selected values with space between them
+            //      $("select option:selected").each(function(){
+            //             $(".selected-values").append($(this).val() + " ") 
+            //      });
+                
+            //  });
+            
             let sceneLocs = "";    
                 if (sceneLocations != null && sceneLocations != undefined && sceneLocations.length > 0 ) {
                 console.log(sceneLocations.length + " sceneLocations " + JSON.stringify(sceneLocations));
                 sceneLocations.reverse();
+                
                 for (let i = 0; i < sceneLocations.length; i++) {
                     let locationMap = "";
                     let location = "";
@@ -12687,13 +12709,16 @@ function getAllPeople() {
                                 // "<input type=\x22text\x22 class=\x22form-control locationEventData\x22 id=\x22eventData_" + locationID + "\x22 placeholder=\x220\x22 value=\x22" + sceneLocations[i].eventData + "\x22 >" +
                             // "<label for=\x22locationTags_" + locationID + "\x22>Tags</label>" + 
                             // "<input type=\x22text\x22 class=\x22form-control locationTags\x22 id=\x22locationTags_" + locationID + "\x22 value=\x22" + locationTags + "\x22 >" +
-                            "<div id=\x22selectTargetLocation_" + locationID + "\x22>" +
-                                "<label for=\x22\x22>Target Location: </label>" + 
-                                "<select class=\x22form-control targetLocationSelector\x22 id=\x22targetLocationSelect_"+locationID+"\x22>" +
+                            "<div id=\x22selectTargetLocation_" + locationID + "\x22 class=\x22dropdown-wrapper\x22>" +
+                                "<label for=\x22\x22>Target Location(s): </label>" + 
+                                "<select class=\x22form-control targetElementsSelector drop-down-view\x22 id=\x22targetLocationSelect_"+locationID+"\x22 multiple style=\x22height: 50px;\x22>" +
                                 "<option value=\x22none\x22 selected>none</option>" +
                                 "<option value=\x22none\x22> none</option>" +
                                 "</select>" +
+                                // "Selected: " + sceneLocations[i].targetElements +
                             "</div>" +
+                            // "<div> Selected values: <span class=\x22selected-target-values\x22></span></div>" +
+                           
                             "<br><button type=\x22button\x22 class=\x22copySceneLocation btn btn-xs btn-info float-left\x22 id=\x22" + i + "\x22>Clone</button>"+
                             "<button type=\x22button\x22 class=\x22remSceneLocation btn btn-xs btn-danger float-right\x22 id=\x22" + i + "\x22>Remove</button>"+
                             //TAGS
@@ -12719,7 +12744,8 @@ function getAllPeople() {
 
                             "<label for=\x22locationTags_" + locationID + "\x22>Tags</label>" + 
                             "<input type=\x22text\x22 class=\x22form-control locationTags\x22 id=\x22locationTags_" + locationID + "\x22 value=\x22" + locationTags + "\x22 >" +
-                            "<br><span> location id: "+ locationID +"</span>" +
+                            
+                            "<br><span>selected targets: "+ sceneLocations[i].targetElements +"</span>" +
                         "</div>" +
 
 
@@ -12753,7 +12779,8 @@ function getAllPeople() {
                             "</div>" +
                             // "<label for=\x22markerObjectScale_" + locationID + "\x22>Object Scale</label>" + 
                             // "<input type=\x22number\x22 step=\x220.001\x22 class=\x22form-control locationObjectScale\x22 id=\x22scale_" + locationID + "\x22 placeholder=\x220\x22 value=\x22" + sceneLocations[i].markerObjScale + "\x22 >" +
-                        "</div>";
+                        "<br><span> location id: "+ locationID +"</span>" +
+                            "</div>";
                         // "<div class=\x22col form-group col-md-3\x22>"+
                         //     // "<button type=\x22button\x22 class=\x22remSceneLocation btn btn-xs btn-danger float-left\x22 id=\x22" + i + "\x22>Remove</button>"+
                         //     // "<button type=\x22button\x22 class=\x22copySceneLocation btn btn-xs btn-info float-right\x22 id=\x22" + i + "\x22>Copy</button>"+
@@ -15439,6 +15466,26 @@ function getAllPeople() {
                 ////////////////////////////////////////////////
                 $(function() { 
                     let reloadOnSubmit = false;
+                       
+                            for (let l = 0; l < sceneLocations.length; l++) {
+                                // console.log(sceneModelz[j].name);
+
+                                const z = document.getElementById("targetLocationSelect_" + sceneLocations[l].timestamp);
+                                // if (sceneLocations[l].id != undefined) {
+                                    // console.log(sceneObjex[l]._id + " vs " + sceneLocations[k].objectID);
+                                    for (let l = 0; l < sceneLocations.length; l++) {
+                                        var option = document.createElement("option"); 
+                                        option.text = sceneLocations[l].name;
+                                        option.value = sceneLocations[l].timestamp;
+                                    
+                                    if (sceneLocations[l].targetElements && sceneLocations[l].targetElements.includes(sceneLocations[l].timestamp)) {
+                                        option.selected = true;
+                                        console.log("gotsa targetElement selectd " + sceneLocations[l].timestamp);
+                                    } 
+                                    z.add(option);
+                                }
+                                // }
+                            }
                         // console.log("sceneLocations " + JSON.stringify(sceneLocations));
                         if (sceneModelz != null && sceneModelz != undefined && sceneModelz.length > 0) {
 
@@ -16445,14 +16492,14 @@ function getAllPeople() {
                             }
                         }
                     });
-                    $(document).on('change', '.targetLocationSelector', function() {
+                    $(document).on('change', '.targetElementsSelector', function() {
                         for (let s = 0; s < sceneLocations.length; s++) {   
                             let locid = this.id.split("_")[1];
                             if (locid == sceneLocations[s].timestamp || this.id == sceneLocations[s].timestamp) {
-                                sceneLocations[s].locationTarget = $(this).find('option:selected').text();
+                                sceneLocations[s].targetElements = $(this).find('option:selected').text();
                                 console.log("location target set " + $(this).find('option:selected').text());
-                                if (sceneLocations[s].locationTarget == null || sceneLocations[s].locationTarget == undefined) {
-                                    sceneLocations[s].locationTarget = 'none';
+                                if (sceneLocations[s].targetElements == null || sceneLocations[s].targetElements == undefined) {
+                                    sceneLocations[s].targetElements = 'none';
                                 }
                             }
                         }
