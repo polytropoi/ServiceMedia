@@ -16,6 +16,7 @@ let videoEl = null;
 var primaryAudioMangler = null; 
 let youtubeTime = 0;
 let youtubeDuration = 0;
+let youtubeData = {};
 
 
 
@@ -312,26 +313,7 @@ AFRAME.registerComponent('initializer', { //adjust for device settings, and call
 
 }); //end initializer
 
-// AFRAME.registerComponent('obb-collision', {
-//   init: function () {
-//     document.body.addEventListener('obbcollisionstarted	', (evt) => {
-//       console.log("obb player hit start: " + evt.target.withEl.id);
-//     });
-//     document.body.addEventListener('obbcollisionended	', (evt) => {
-//       console.log("obb player hit end: " + evt.target.withEl.id);
-//     });
-//   }
-// });
 
-
-// AFRAME.registerComponent("obb-listener", {
-//   init: function () {
-//     let that = this;
-//     this.el.addEventListener("obbcollisionstarted", function (e) {
-//       console.log(that.el.id +  " hit " + e.detail.withEl.id); 
-//     });
-//   }
-// });  
 
 AFRAME.registerComponent('disable-magicwindow', {
   init: function () {
@@ -344,47 +326,6 @@ AFRAME.registerComponent('disable-magicwindow', {
   }
 });
 
-// function 
-// AFRAME.registerComponent('css3d-youtube', {
-//   init: function () {
-//     console.log("css3d data :  " + this.el.getAttribute("id") + " " + this.el.getAttribute("data-attribute"));
-//     let renderer = new THREE.CSS3DRenderer();
-// 				renderer.setSize( window.innerWidth, window.innerHeight );
-//         let container = document.createElement('div');
-//         renderer.traverse(node => {
-//           console.log(node);
-//           if (node == 'domElement') {
-//             // container.appendChild( node );
-//           }
-//         });
-// 				const group = new THREE.Group();
-// 				group.add( new YouTubeElement( this.el.getAttribute("data-attribute"), 0, 0, 240, 0 ) );
-// 				// group.add( new Element( 'Y2-xZ-1HE-Q', 240, 0, 0, Math.PI / 2 ) );
-// 				// group.add( new Element( 'IrydklNpcFI', 0, 0, - 240, Math.PI ) );
-// 				// group.add( new Element( '9ubytEsCaS0', - 240, 0, 0, - Math.PI / 2 ) );
-// 				this.el.sceneEl.add( group );
-//   }
-// });
-
-// AFRAME.registerComponent('locationdata', {
-//   schema: {
-//     initialized: {default: ''},
-//     locData: {
-//       parse: JSON.parse,
-//       stringify: JSON.stringify
-//     }
-//   },
-//   init: function() {
-//     let locData = this.data.locData;
-//       // console.log("location data " + JSON.stringify(locData));
-//     //   document.querySelector('a-scene').addEventListener('loaded', function () { //for sure?
-//     //     console.log("AFRAME Init");
-//         SetLocationData(locData);
-//     //  });
-      
-//       // this.el.setAttribute("primary_audio_control", "timekeys", this.timekeys);
-//   }
-// });
 
 
 AFRAME.registerComponent('parent-to', { //used with old ar.js...
@@ -404,10 +345,7 @@ AFRAME.registerComponent('parent-to', { //used with old ar.js...
           this.el.position = marker.position;
           marker.appendChild(this.el);
 
-          // var target = document.querySelector('a-marker-camera');
-          // marker.appendChild(this.el);
-          // this.el.setAttribute("scale", ".3 .3 .3");
-          // this.el.setAttribute("rotation", "90 0 0");
+
           let vidmat = this.el.components.vid_materials;
           if (vidmat) {
             console.log("tryna flip vidmat");
@@ -415,9 +353,7 @@ AFRAME.registerComponent('parent-to', { //used with old ar.js...
             this.el.setAttribute("scale", ".3 .3 .3");
             this.el.setAttribute("rotation", "90 0 0");
           }
-          // this.el.setAttribute("position", {x:0, y:1, z:0});
-          // this.el.setAttribute("position", marker.getAttribute("position"));
-          // this.el.setAttribute("rotation", marker.getAttribute("rotation"));
+
             console.log("tryna parent " + this.el + " to " + this.data.tracking + " at position " + JSON.stringify(marker.getAttribute("position")));
             // var target = document.querySelector('.target');
         } else {
@@ -428,17 +364,13 @@ AFRAME.registerComponent('parent-to', { //used with old ar.js...
             this.el.position = marker.position;
             marker.appendChild(this.el);
   
-            // var target = document.querySelector('a-marker-camera');
-            // marker.appendChild(this.el);
-            // this.el.setAttribute("scale", ".3 .3 .3");
+
             this.el.setAttribute("rotation", "90 0 0");
             let vidmat = this.el.components.vid_materials;
             if (vidmat) {
               vidmat.flipY = true;
             }
-            // this.el.setAttribute("position", {x:0, y:1, z:0});
-            // this.el.setAttribute("position", marker.getAttribute("position"));
-            // this.el.setAttribute("rotation", marker.getAttribute("rotation"));
+
               console.log("tryna parent " + this.el + " to " + this.data.tracking + " at position " + JSON.stringify(marker.getAttribute("position")));
               // var target = document.querySelector('.target');
           }
@@ -478,40 +410,7 @@ function roundToTwo(num) {
   return +(Math.round(num + "e+2")  + "e-2");
 }
 
-AFRAME.registerComponent('pos-rot-reader', { //no, deprecated - get_pos_rot instead
-  init: function () {
-    // Set up the tick throttling.
-    this.tick = AFRAME.utils.throttleTick(this.tick, 250, this);
-    this.cp = new THREE.Vector3();
-    this.cr = new THREE.Vector3();
-    var entity = this.el;
-  },
-  tick: function (t, dt) {
-    // // Run on an interval.
-    // if (t - this.time < 1000) { return; } 
-    // this.time = t;
-    // Calculate a position.
 
-    if (cameraPosition != null && cameraPosition != undefined) { //declared in connect.js
-      // this.cp = this.el.getAttribute('position');
-      this.el.object3D.getWorldPosition(this.cp)
-      // entity.object3D.getWorldPosition(this.cp);
-      // this.cp.x = roundToTwo(this.cp.x);
-      // this.cp.y = roundToTwo(this.cp.y);
-      // this.cp.z = roundToTwo(this.cp.z);
-      cameraPosition.x = roundToTwo(this.cp.x);
-      cameraPosition.y = roundToTwo(this.cp.y);
-      cameraPosition.z = roundToTwo(this.cp.z);
-    }
-    if (cameraRotation != null && cameraPosition != undefined) { //declared in connect.js
-      this.cr = this.el.getAttribute('rotation');
-      cameraRotation.x = roundToTwo(this.cr.x);
-      cameraRotation.y = roundToTwo(this.cr.y);
-      cameraRotation.z = roundToTwo(this.cr.z);
-    }
-    // console.log(JSON.stringify(cameraPosition) +  " " + JSON.stringify(cameraRotation));
-  }
-});
 AFRAME.registerComponent('get_pos_rot', { //ATTACHED TO PLAYER BELOW CAMERA RIG, returns pos/rot on request
   schema: {
     trackables: {default: ''},
@@ -4814,6 +4713,7 @@ let youtube_player = null; //3d version
 let youtubePlayer = null; //spawned by embed api
 let youtubeIsPlaying = false;
 let youtubeState = "";
+let youtubeTitleEl = "";
 
 function onYouTubeIframeAPIReady () { //must be global, called when youtube embed api is loaded
   let youtubeEl = document.getElementById("youtubeElement");
@@ -4835,6 +4735,7 @@ function onYouTubeIframeAPIReady () { //must be global, called when youtube embe
    
 
     youtube_player = document.getElementById("youtubePlayer").components.youtube_player;
+    youtubeTitleEl = document.getElementById("youtubeTitle");
     // https://stackoverflow.com/questions/55724586/youtube-iframe-without-allow-presentation
     // youtubePlayer.h.attributes.sandbox.value = "allow-same-origin allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox allow-presentation";
   }
@@ -4861,6 +4762,12 @@ function onYouTubeIframeAPIReady () { //must be global, called when youtube embe
     // if (youtube_player != null) {
     //     youtube_player.player_status_update("ready");
     // }
+    youtubeData = youtubePlayer.getVideoData();
+    if (youtubeData && youtubeTitleEl) {
+      console.log("gots youtubedata for " + JSON.stringify(youtubeData));
+      // let titlestring = youtubeData.author + "\n" + youtubeData.title;
+      youtubeTitleEl.setAttribute('text', {'value': youtubeData.author + "\n" + youtubeData.title});
+    }
     if (timedEventsListenerMode != null && timedEventsListenerMode.toLowerCase() == 'youtube') {
       SetVideoEventsData();
     }
@@ -4937,6 +4844,9 @@ function onYouTubeIframeAPIReady () { //must be global, called when youtube embe
         youtubeIsPlaying = true;
         youtubeTime = youtubePlayer.getCurrentTime();
         youtubeDuration = youtubePlayer.getDuration();
+
+
+        console.log("youtube getVideoData " + JSON.stringify(youtubeData));
         // youtubePlayer(youtubeIsPlaying);
         let time = 0;
         // let statsDiv = document.getElementById("transportStats");
