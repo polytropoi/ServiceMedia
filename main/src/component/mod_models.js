@@ -1335,8 +1335,9 @@ AFRAME.registerComponent('mod_model', {
             
           }
 
-          if (this.data.tags.includes("active") || this.data.tags.includes("moddable")) { //a way to turn off events for just models
- 
+          // if (this.data.tags.includes("active") || this.data.tags.includes("moddable")) { //a way to turn off events for just models
+          if (!this.data.tags.includes("static")) { //a way to turn off events for just models
+
             this.el.addEventListener('mouseleave', (e) => { 
               e.preventDefault();
               // console.log("tryna mouseexit");

@@ -159,6 +159,7 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
               } else if (this.data.markerType.toLowerCase().includes("trigger")) {
                 // this.el.setAttribute('gltf-model', '#poi1');  
                 this.el.setAttribute("geometry", {"primitive": "box", "width": 1, "height": 1, "depth": 1});
+                this.el.setAttribute("obb-collider", {size: this.data.xscale * 1.5 + " " + this.data.yscale * 1.5 + " " + this.data.zscale * 1.5});
                 
               } else if (this.data.markerType.toLowerCase().includes("collider")) {
                 // this.el.setAttribute("geometry", {primitive: "box", width: 1, height: 1, depth: 1});
@@ -167,6 +168,7 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
                 // this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"placeholder"});
               } else if (this.data.markerType.toLowerCase() == "portal") {
                 this.el.setAttribute('gltf-model', '#poi1');
+                this.el.setAttribute("obb-collider", {size: this.data.xscale * 1.5 + " " + this.data.yscale * 1.5 + " " + this.data.zscale * 1.5});
               } else if (this.data.markerType.toLowerCase() == "link") {
                 this.el.setAttribute('gltf-model', '#links');
                 
@@ -302,7 +304,8 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
                             // this.el.setAttribute("color", "purple");
                         } else if (this.data.markerType.includes("trigger")) {
                             this.el.setAttribute("material", {color: "lime", transparent: true, opacity: .5});
-                            this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"placeholder", scaleFactor: 1});
+                            // this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"placeholder", scaleFactor: 1});
+                            this.el.setAttribute("obb-collider", {size: this.data.xscale * 1.5 + " " + this.data.yscale * 1.5 + " " + this.data.zscale * 1.5});
                             // this.el.setAttribute("color", "lime");
                             
                         } else if (this.data.markerType.includes("collider")) {
@@ -324,7 +327,8 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
                           this.el.setAttribute("material", {color: "black", transparent: true, opacity: .5});
                         
                         } else if (this.data.markerType == "portal") {
-                        
+                          this.el.setAttribute("material", {color: "aqua", transparent: true, opacity: .5});
+                          this.el.setAttribute("obb-collider", {size: this.data.xscale * 1.5 + " " + this.data.yscale * 1.5 + " " + this.data.zscale * 1.5});
                         } else if (this.data.markerType == "mailbox") {
                         
                         } else {
@@ -445,9 +449,12 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
               // this.el.setObject3D('mesh', obj);
               if (this.data.markerType == "gate" || this.data.markerType == "trigger") {
                 if (this.data.modelID && this.data.modelID != '' & this.data.modelID != 'none') {
-                  this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"mesh", scaleFactor: this.data.scale});
+                  // this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"mesh", scaleFactor: this.data.scale});
+                  // this.el.setAttribute("material", {color: "aqua", transparent: true, opacity: .5});
+                  this.el.setAttribute("obb-collider", {size: this.data.xscale * 1.5 + " " + this.data.yscale * 1.5 + " " + this.data.zscale * 1.5});
                 } else {
-                  this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"placeholder", scaleFactor: this.data.scale});
+                  // this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"placeholder", scaleFactor: this.data.scale});
+                  this.el.setAttribute("obb-collider", {size: this.data.xscale * 1.5 + " " + this.data.yscale * 1.5 + " " + this.data.zscale * 1.5});
                 }
               }
               if (this.data.isNew && this.data.modelID == 'none' && this.data.markerType == "placeholder") {
@@ -809,7 +816,7 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
           } else if (this.data.markerType.toLowerCase() == "gate") {
               this.el.setAttribute("material", {color: "orange", transparent: true, opacity: .5});
           } else if (this.data.markerType.toLowerCase() == "portal") {
-          
+            this.el.setAttribute("material", {color: "aqua", transparent: true, opacity: .5});
           } else if (this.data.markerType.toLowerCase() == "mailbox") {
           
           } else {
@@ -1157,9 +1164,9 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
                   // this.el.setAttribute("color", "purple");
               } else if (this.data.markerType.toLowerCase().includes("trigger")) {
                   this.el.setAttribute("material", {color: "lime", transparent: true, opacity: .5});
-                  this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"placeholder", scaleFactor: this.data.scale});
+                  // this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"placeholder", scaleFactor: this.data.scale});
                   // this.el.setAttribute("color", "lime");
-                  
+                  this.el.setAttribute("obb-collider", {size: this.data.xscale * 1.5 + " " + this.data.yscale * 1.5 + " " + this.data.zscale * 1.5});
               } else if (this.data.markerType.toLowerCase() == "link") {
                 this.el.setAttribute("gltf-model", "#links");
                 this.el.setAttribute("material", {color: "aqua", transparent: true, opacity: .5});
@@ -1174,10 +1181,12 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
                 
               } else if (this.data.markerType.toLowerCase() == "gate") {
                   this.el.setAttribute("material", {color: "orange", transparent: true, opacity: .5});
-                  this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"placeholder", scaleFactor: this.data.scale});
+                  // this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"placeholder", scaleFactor: this.data.scale});
+                  this.el.setAttribute("obb-collider", {size: this.data.xscale * 1.5 + " " + this.data.yscale * 1.5 + " " + this.data.zscale * 1.5});
                   // this.el.setAttribute("color", "orange");
               } else if (this.data.markerType.toLowerCase() == "portal") {
-              
+                this.el.setAttribute("material", {color: "lime", transparent: true, opacity: .5});
+                this.el.setAttribute("obb-collider", {size: this.data.xscale * 1.5 + " " + this.data.yscale * 1.5 + " " + this.data.zscale * 1.5});
               } else if (this.data.markerType.toLowerCase() == "mailbox") {
               
               } else {
@@ -1246,7 +1255,8 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
             } else if (this.data.markerType.toLowerCase().includes("trigger")) {
               this.el.setAttribute("geometry", {"primitive": "box", "width": 1, "height": 1, "depth": 1});
                 this.el.setAttribute("material", {color: "lime", transparent: true, opacity: .5});
-                this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"placeholder", scaleFactor: this.data.scale});
+                // this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"placeholder", scaleFactor: this.data.scale});
+                this.el.setAttribute("obb-collider", {size: this.data.xscale * 1.5 + " " + this.data.yscale * 1.5 + " " + this.data.zscale * 1.5});
                 // this.el.setAttribute("color", "lime");
                 
             } else if (this.data.markerType.toLowerCase().includes("collider")) {
@@ -1260,7 +1270,8 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
               
                 this.el.setAttribute("gltf-model", "#gate2");
                 this.el.setAttribute("material", {color: "orange", transparent: true, opacity: .5});
-                this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"placeholder", scaleFactor: this.data.scale});
+                // this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"placeholder", scaleFactor: this.data.scale});
+                this.el.setAttribute("obb-collider", {size: this.data.xscale * 1.5 + " " + this.data.yscale * 1.5 + " " + this.data.zscale * 1.5});
                 // this.el.setAttribute("color", "orange");
             } else if (this.data.markerType.toLowerCase() == "portal") {
               this.el.setAttribute("gltf-model", "#poi1");
@@ -1491,11 +1502,27 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
       //   }
       // } 
     },
-    targetMods: function () {
+    targetMods: function() {
+      console.log("chek targetElements " + this.data.targetElements);
       if (this.data.targetElements != '' && this.data.targetElements != []) {
+        if (this.data.markerType == "portal") {
+          console.log( "tryna show somethins..." + this.data.targetElements + " length"); 
+          if (this.data.targetElements != '') {
+          for (let i = 0; i < this.data.targetElements.length; i++) {
+              if (this.data.targetElements[i] != "none") {
+                let targetEl = document.getElementById(this.data.targetElements[i].toString());
+                if (targetEl) {
+                    console.log("tryna portal to " + targetEl);
+                    GoToLocation(targetEl.id);
+                }
+                break;
+              }
+            }
+          }
+        }
         if (this.data.tags && this.data.tags.length && this.data.tags.toLowerCase().includes("toggle target")) {
           console.log( "tryna toggle somethin..." + this.data.targetElements + " length"); 
-          if (this.data.targetElements != '') {
+
 
             for (let i = 0; i < this.data.targetElements.length; i++) {
               let targetEl = document.getElementById(this.data.targetElements[i].toString());
@@ -1519,9 +1546,9 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
                   console.log("set to visible " + targetEl.dataset.isvisible);
                 }
               }
-            }
+            
             // this.coolDownTimer();
-          // }
+          }
         }
         if (this.data.tags && this.data.tags.length && this.data.tags.toLowerCase().includes("show target")) {
           console.log( "tryna show somethins..." + this.data.targetElements + " length"); 
@@ -1539,6 +1566,7 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
           }
         }
         if (this.data.tags && this.data.tags.length && this.data.tags.toLowerCase().includes("hide target")) {
+          
           console.log( "tryna hide somethin..." + this.data.targetElements + " length"); 
           if (this.data.targetElements != '') {
             for (let i = 0; i < this.data.targetElements.length; i++) {
@@ -1551,11 +1579,91 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
               }
             }
             // this.coolDownTimer();
+          }
+        }
+        if (this.data.tags && this.data.tags.length && this.data.tags.toLowerCase().includes("spawn target")) { //could be an object
+          
+          console.log( "tryna hide somethin..." + this.data.targetElements + " length"); 
+          if (this.data.targetElements != '') {
+            for (let i = 0; i < this.data.targetElements.length; i++) {
+              let targetEl = document.getElementById(this.data.targetElements[i].toString());
+              if (targetEl) {
+                let cloudMarker = targetEl.components.cloud_marker;
+                if (cloudMarker) {
+                  cloudMarker.loadObject();
+                }
+              }
             }
+            // this.coolDownTimer();
           }
         }
       }
     },
+    // targetMods: function () {
+    //   if (this.data.targetElements != '' && this.data.targetElements != []) {
+    //     if (this.data.tags && this.data.tags.length && this.data.tags.toLowerCase().includes("toggle target")) {
+    //       console.log( "tryna toggle somethin..." + this.data.targetElements + " length"); 
+    //       if (this.data.targetElements != '') {
+
+    //         for (let i = 0; i < this.data.targetElements.length; i++) {
+    //           let targetEl = document.getElementById(this.data.targetElements[i].toString());
+    //           if (targetEl) {
+    //             // let isVisible = targetEl.dataset.isVisible;
+    //             // targetEl.dataset.isVisible = !targetEl.dataset.isVisible;
+    //             console.log( targetEl.id + " element isVisible : " + targetEl.dataset.isvisible); 
+    //             if (targetEl.dataset.isvisible == "no") {
+    //               // this.coolDown = true;
+                  
+    //               targetEl.setAttribute("visible", true)
+    //               targetEl.dataset.isvisible = true;
+    //               targetEl.classList.add("activeObjexRay");
+    //               console.log("set to visible " + targetEl.dataset.isvisible);
+    //             } else {
+    //               // this.cooldown = true;
+                  
+    //               targetEl.setAttribute("visible", false);
+    //               targetEl.dataset.isvisible = "no";
+    //               targetEl.classList.remove("activeObjexRay");
+    //               console.log("set to visible " + targetEl.dataset.isvisible);
+    //             }
+    //           }
+    //         }
+    //         // this.coolDownTimer();
+    //       // }
+    //     }
+    //     if (this.data.tags && this.data.tags.length && this.data.tags.toLowerCase().includes("show target")) {
+    //       console.log( "tryna show somethins..." + this.data.targetElements + " length"); 
+    //       if (this.data.targetElements != '') {
+    //         for (let i = 0; i < this.data.targetElements.length; i++) {
+    //           let targetEl = document.getElementById(this.data.targetElements[i].toString());
+    //           if (targetEl) {
+    //               targetEl.setAttribute("visible", true);
+    //               targetEl.classList.add("activeObjexRay");
+    //               targetEl.dataset.isvisible = true;
+    //               console.log("show target set to visible " + targetEl.dataset.isvisible);
+    //           }
+    //         }
+    //         // this.coolDownTimer();
+    //       }
+    //     }
+    //     if (this.data.tags && this.data.tags.length && this.data.tags.toLowerCase().includes("hide target")) {
+    //       console.log( "tryna hide somethin..." + this.data.targetElements + " length"); 
+    //       if (this.data.targetElements != '') {
+    //         for (let i = 0; i < this.data.targetElements.length; i++) {
+    //           let targetEl = document.getElementById(this.data.targetElements[i].toString());
+    //           if (targetEl) {
+    //               targetEl.setAttribute("visible", false);
+    //               targetEl.classList.remove("activeObjexRay");
+    //               targetEl.dataset.isvisible = false;
+    //               console.log("hide target set to visible " + targetEl.dataset.isvisible);
+    //           }
+    //         }
+    //         // this.coolDownTimer();
+    //         }
+    //       }
+    //     }
+    //   }
+    // },
     rayhit: function (hitID, distance, hitpoint) {
       // if (this.hitID != hitID) {
       //   this.hitID = hitID;
@@ -1568,7 +1676,10 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
             triggerAudioController.components.trigger_audio_control.playAudioAtPosition(hitpoint, distance, this.data.tags);
           }
         }
-        this.targetMods();
+        if (this.data.markerType != "portal") { //portal needs playertriggerhit, not just mouseenter
+          this.targetMods();
+        }
+        
       
         
       }

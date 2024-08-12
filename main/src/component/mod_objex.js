@@ -1163,6 +1163,7 @@ AFRAME.registerComponent('mod_object', {
 
           this.bubble = null;
           this.bubbleText = null;
+          this.bubbleBackground = null;
           this.isInitialized = true;
           this.meshChildren = [];
           this.specialBones = [];
@@ -1176,14 +1177,7 @@ AFRAME.registerComponent('mod_object', {
               // this.recursivelySetChildrenShader(obj);
   
             }
-            // let dynSkybox = document.getElementById('')
-            // for (let e = 0; e < textData.length; e++) {
-            //   if (textData[e].toLowerCase().includes("refract")){
-            //     console.log("tryna set refraction");
-            //     obj.material.refractionRatio = .9;
-            //     obj.material.reflectivity = .5;
-            //   }
-            // }
+
   
             if (this.data.eventData.toLowerCase().includes("target")) {
               // this.el.id = "target_object";
@@ -1462,6 +1456,7 @@ AFRAME.registerComponent('mod_object', {
               // bubble.setAttribute("material", {"color": "white", "blending": "additive", "transparent": false, "alphaTest": .5});
               bubbleBackground.setAttribute("material", {"color": "white", "shader": "flat"}); //doh, doesn't work for gltfs... 
               bubble.appendChild(bubbleBackground);
+              this.bubbleBackground = bubbleBackground;
   
               
               let bubbleText = document.createElement("a-entity");
@@ -1651,7 +1646,7 @@ AFRAME.registerComponent('mod_object', {
             // this.el.setAttribute('obb-collider', '');
             // console.log("setting obb-collider " + this.data.xscale  + ' ' + this.data.yscale + ' ' +this.data.zscale );
           // }, 3000);
-          this.showCallout('', '0 2 2', 10);
+          // this.showCallout('', '0 2 2', 10);
       }); //end model-loaded listener
   
       this.el.addEventListener('body-loaded', () => {  //body-loaded event = physics ready on obj
@@ -2213,7 +2208,7 @@ AFRAME.registerComponent('mod_object', {
         // }
       });
       this.el.addEventListener('mouseenter', (evt) => {
-        console.log("mouse enter mod_object name " + this.data.objectData.name + " id " + this.el.id + " " + this.data.markerType + " " + this.data.objectData.objtype);
+        console.log("mouse enter mod_object name " + this.data.objectData.name + " id " + this.el.id + " " + this.data.markerType + " " + this.data.objectData.objtype + " this.textData " + this.textData);
         evt.preventDefault();
         if (!this.data.isEquipped) {
           if (posRotReader != null) {
@@ -2228,7 +2223,8 @@ AFRAME.registerComponent('mod_object', {
           if (!this.isSelected && evt.detail.intersection != null) {
             this.clientX = evt.clientX;
             this.clientY = evt.clientY;
-            
+
+            let calloutText = this.textData[this.textIndex];
   
             this.pos = evt.detail.intersection.point; //hitpoint on model
             let name = evt.detail.intersection.object.name;
@@ -2240,12 +2236,12 @@ AFRAME.registerComponent('mod_object', {
   
             this.selectedAxis = name;
             ////////TODO - wire in to Hightlight Options / Callout Options in Object view
-            if (this.tags != null && this.tags.includes("thoughtbubble")) {
+            if (this.tags != null && this.tags.includes("thoughtbubble") && this.bubbleBackground) {
               calloutOn = true;
   
-              this.bubble = sceneEl.querySelector('.bubble');
-              this.bubbleText = sceneEl.querySelector('.bubbleText');
-              this.bubbleBackground = sceneEl.querySelector('.bubbleBackground');
+              // this.bubble = sceneEl.querySelector('.bubble');
+              // this.bubbleText = sceneEl.querySelector('.bubbleText');
+              // this.bubbleBackground = sceneEl.querySelector('.bubbleBackground');
               
               this.bubble.setAttribute("visible", true);
               let pos = evt.detail.intersection.point; //hitpoint on model
@@ -2281,6 +2277,7 @@ AFRAME.registerComponent('mod_object', {
               if (settings && settings.sceneFontWeb2 && settings.sceneFontWeb2.length) {
                 font = settings.sceneFontWeb2;
               }
+              console.log("tryna show callout text " + calloutText);
               this.bubbleText.setAttribute('troika-text', {
                 baseline: "bottom",
                 align: "center",
@@ -2289,7 +2286,8 @@ AFRAME.registerComponent('mod_object', {
                 anchor: "center",
                 // wrapCount: 20,
                 color: "black",
-                value: this.textData[this.textIndex]
+                value: calloutText
+                // value: "HEY WTF HEY WTF HEY WTF HEY WTF HEY WTF HEY WTF HEY WTF HEY WTF HEY WTF HEY WTF HEY WTF HEY WTF HEY WTF HEY WTF HEY WTF HEY WTF HEY WTF HEY WTF "
   
               });
   
@@ -2723,35 +2721,36 @@ AFRAME.registerComponent('mod_object', {
               this.bubbleBackground = sceneEl.querySelector('.bubbleBackground');
               
               this.bubble.setAttribute("visible", true);
-              let pos = evt.detail.collision.point; //hitpoint on model
+              // let pos = evt.detail.collision.point; //hitpoint on model
+              let pos = hitpoint; //hitpoint on model
               this.bubble.setAttribute('position', pos);
               this.bubbleText.setAttribute("visible", true);
 
-              let camera = AFRAME.scenes[0].camera; 
-              pos.project(camera);
-              var width = window.innerWidth, height = window.innerHeight; 
-              let widthHalf = width / 2;
-              let heightHalf = height / 2;
-              pos.x = (pos.x * widthHalf) + widthHalf;
-              pos.y = - (pos.y * heightHalf) + heightHalf;
-              pos.z = 0;
+              // let camera = AFRAME.scenes[0].camera; 
+              // pos.project(camera);
+              // var width = window.innerWidth, height = window.innerHeight; 
+              // let widthHalf = width / 2;
+              // let heightHalf = height / 2;
+              // pos.x = (pos.x * widthHalf) + widthHalf;
+              // pos.y = - (pos.y * heightHalf) + heightHalf;
+              // pos.z = 0;
              
-              if ((pos.x/width) < .45) {
-                console.log("flip left");
-                this.bubbleBackground.setAttribute("position", ".5 .2 .5");
-                this.bubbleBackground.setAttribute("scale", "-.2 .2 .2"); 
-                // this.bubbleBackground.setAttribute('scale', {x: this.distance * -.25, y: this.distance * .25, z: this.distance * .25} );
-                this.bubbleText.setAttribute("scale", ".2 .2 .2"); 
-                this.bubbleText.setAttribute("position", ".5 .2 .55");
-              } 
-              if ((pos.x/width) > .55) {
-                console.log("flip right");
-                this.bubbleBackground.setAttribute("position", "-.5 .2 .5");
-                this.bubbleBackground.setAttribute("scale", ".2 .2 .2"); 
-                // this.bubbleBackground.setAttribute('scale', {x: this.distance * -.25, y: this.distance * .25, z: this.distance * .25} );
-                this.bubbleText.setAttribute("scale", ".2 .2 .2")
-                this.bubbleText.setAttribute("position", "-.5 .2 .55");
-              }
+              // if ((pos.x/width) < .45) {
+              //   console.log("flip left");
+              //   this.bubbleBackground.setAttribute("position", ".5 .2 .5");
+              //   this.bubbleBackground.setAttribute("scale", "-.2 .2 .2"); 
+              //   // this.bubbleBackground.setAttribute('scale', {x: this.distance * -.25, y: this.distance * .25, z: this.distance * .25} );
+              //   this.bubbleText.setAttribute("scale", ".2 .2 .2"); 
+              //   this.bubbleText.setAttribute("position", ".5 .2 .55");
+              // } 
+              // if ((pos.x/width) > .55) {
+              //   console.log("flip right");
+              //   this.bubbleBackground.setAttribute("position", "-.5 .2 .5");
+              //   this.bubbleBackground.setAttribute("scale", ".2 .2 .2"); 
+              //   // this.bubbleBackground.setAttribute('scale', {x: this.distance * -.25, y: this.distance * .25, z: this.distance * .25} );
+              //   this.bubbleText.setAttribute("scale", ".2 .2 .2")
+              //   this.bubbleText.setAttribute("position", "-.5 .2 .55");
+              // }
               let font = "Acme.woff";
               if (settings && settings.sceneFontWeb2 && settings.sceneFontWeb2.length) {
                 font = settings.sceneFontWeb2;

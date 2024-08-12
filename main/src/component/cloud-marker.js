@@ -133,6 +133,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                 
                 } else if (this.data.markerType.toLowerCase() == "portal") {
                   this.el.setAttribute('gltf-model', '#poi1');
+                  this.el.setAttribute("obb-collider", {size: this.data.xscale * 1.5 + " " + this.data.yscale * 1.5 + " " + this.data.zscale * 1.5});
                 } else if (this.data.markerType.toLowerCase() == "mailbox") {
                   // console.log("TRYNA SET MODEL TO MAILBOX!")
                   this.el.setAttribute('gltf-model', '#mailbox');
@@ -291,7 +292,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                     this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"placeholder"});
                    
                 } else if (this.data.markerType.toLowerCase() == "portal") {
-                
+                  this.el.setAttribute("obb-collider", {size: this.data.xscale * 1.5 + " " + this.data.yscale * 1.5 + " " + this.data.zscale * 1.5});
                 } else if (this.data.markerType.toLowerCase() == "mailbox") {
                 
                 } else if (this.data.markerType.toLowerCase() == "light") {
@@ -319,7 +320,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
               this.el.setAttribute("rotation", this.data.xrot + " " + this.data.yrot + " " +this.data.zrot);
              
             } else {
-              if (this.data.markerType == "trigger") {
+              if (this.data.markerType == "trigger" || this.data.markerType == "portal") {
                 this.el.setAttribute('geometry', {primitive: 'box', width: this.data.xscale, height: this.data.yscale, depth: this.data.zscale});
                   
                 this.el.setAttribute("obb-collider", {size: this.data.xscale * 1.5 + " " + this.data.yscale * 1.5 + " " + this.data.zscale * 1.5});
@@ -1298,7 +1299,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                 this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"placeholder"});
                 // this.el.setAttribute("color", "orange");
             } else if (this.data.markerType.toLowerCase() == "portal") {
-            
+              this.el.setAttribute("obb-collider");
             } else if (this.data.markerType.toLowerCase() == "light") {
               // if (!this.data.tags.includes("hide")) {
               //   this.radius = this.data.xscale * .05;
@@ -1681,6 +1682,22 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
     targetMods: function() {
       console.log("chek targetElements " + this.data.targetElements);
       if (this.data.targetElements != '' && this.data.targetElements != []) {
+
+        if (this.data.markerType == "portal") {
+          console.log( "tryna show somethins..." + this.data.targetElements + " length"); 
+          if (this.data.targetElements != '') {
+          for (let i = 0; i < this.data.targetElements.length; i++) {
+              if (this.data.targetElements[i] != "none") {
+                let targetEl = document.getElementById(this.data.targetElements[i].toString());
+                if (targetEl) {
+                    console.log("tryna portal to " + targetEl);
+                    GoToLocation(targetEl.id);
+                }
+                break;
+              }
+            }
+          }
+        }
         if (this.data.tags && this.data.tags.length && this.data.tags.toLowerCase().includes("toggle target")) {
           console.log( "tryna toggle somethin..." + this.data.targetElements + " length"); 
 
@@ -1783,7 +1800,9 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
             }
            
           }
+        if (this.data.markerType != "portal") { //portal needs playertriggerhit, not just mouseenter
           this.targetMods();
+        }
         }
         
       }
