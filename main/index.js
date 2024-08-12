@@ -17613,10 +17613,10 @@ function getAllPeople() {
             //     // apikey = "<div>API Key : " + response.data.apikey + "</div>";
             // }
             if (response.data.authLevel.toLowerCase().includes("domain_admin")) {
-                showTraffic();
+                showTraffic(null, 90);
             } else if (response.data.authLevel.toLowerCase().includes("admin")) {
                 if (domains) {
-                    showTraffic(domains);
+                    showTraffic(domains, 90);
                 }
                 
             }
@@ -17690,13 +17690,20 @@ function getAllPeople() {
             window.open(x_value, '_blank');
         }
     }
-    function showTraffic(appdomain) { //arg if not domain_admin
+    function showTraffic(appdomain, days) { //arg if not domain_admin
         
         console.log("appdomain " + appdomain);
         let data = {};
         if (appdomain) {
             data.appdomain = appdomain;
         }
+        if (days && days != 0) {
+            let now = Date.now();
+            let startpoint = now - (84600 * 1000 * days);
+            console.log("startpoint is " + startpoint + " before " + now );
+            data.startpoint = startpoint;
+        }
+
         axios.post('/return_traffic/', data)
         .then(function (response) {
             let trafficCount = response.data.length;
@@ -17734,7 +17741,7 @@ function getAllPeople() {
                         for (let s = 0; s < showCountNumber; s++) {
                             if (tArr[t].timestamp >= dateStart.addDays(s) & tArr[t].timestamp <= dateStart.addDays(s + 1)) {
                                 dayCounts[s] = dayCounts[s] + 1; 
-                                console.log("Day " + s + " " + dayCounts[s]);
+                                // console.log("Day " + s + " " + dayCounts[s]);
                             } 
                         }
                         // totalCount++;

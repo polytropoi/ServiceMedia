@@ -1598,20 +1598,31 @@ app.post("/return_traffic_old", requiredAuthentication, function (req, res) {
 
 app.post("/return_traffic", requiredAuthentication, function (req, res) {    
     // let trafficDataMod = [];
+    console.log("return traffic data " + JSON.stringify(req.body));
     let query = {};
-    if (req.body.appdomain) {
-        query.appdomain = req.body.appdomain.toString();
-    }
-    // console.log("tryna quyery for " + JSON.stringify(query));
-    db.traffic.find(query, function (err, trafficdata) {
-        if (err || !trafficdata) {
-            res.send(err);
+    if (req.body.startpoint) {
+
+        if (req.body.appdomain) {
+            query = {$and: [{timestamp: {$gt : req.body.startpoint }}, {appdomain : req.body.appdomain.toString()}]};
         } else {
-            console.log("all trafffic length: "+ trafficdata.length);
-                res.json(trafficdata);
+            if (req.data.startpoint != 0) {
+                query = {timestamp: {$gt : req.body.startpoint }};
             }
-            
-        });
+        }
+    
+        // console.log("tryna quyery for " + JSON.stringify(query));
+        db.traffic.find(query, function (err, trafficdata) {
+            if (err || !trafficdata) {
+                res.send(err);
+            } else {
+                // console.log("all trafffic length: "+ trafficdata.length);
+                    res.json(trafficdata);
+                }
+                
+            });
+    } else {
+        console.log("no start point!")
+    }
     // })
 });
 
