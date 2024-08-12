@@ -1600,13 +1600,16 @@ app.post("/return_traffic", requiredAuthentication, function (req, res) {
     // let trafficDataMod = [];
     console.log("return traffic data " + JSON.stringify(req.body));
     let query = {};
+    let startpoint = req.body.startpoint;
+    let appdomain = req.body.appdomain != null ? req.body.appdomain.toString() : null;
     if (req.body.startpoint) {
 
-        if (req.body.appdomain) {
-            query = {$and: [{timestamp: {$gt : req.body.startpoint }}, {appdomain : req.body.appdomain.toString()}]};
+        if (appdomain) {
+            query = {$and: [{timestamp: {$gt : startpoint }}, {appdomain : appdomain}, {hostname : {$ne : "localhost"}}]};
         } else {
-            if (req.data.startpoint != 0) {
-                query = {timestamp: {$gt : req.body.startpoint }};
+            if (startpoint != 0) {
+                // query = {timestamp: {$gt : startpoint }};
+                query = {$and: [{timestamp: {$gt : startpoint }}, {hostname : {$ne : "localhost"}}]};
             }
         }
     

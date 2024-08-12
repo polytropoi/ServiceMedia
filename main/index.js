@@ -17716,6 +17716,7 @@ function getAllPeople() {
             console.log(dateStartSplit);
             let dateStart = new Date( dateStartSplit[0], dateStartSplit[1] - 1, dateStartSplit[2]);
             console.log(dateStart);
+
             let dateEnd = new Date(tArr[tArr.length - 1].timestamp);
             let numberOfDays = (dateEnd - dateStart) / (1000 * 3600 * 24);
             
@@ -17727,7 +17728,7 @@ function getAllPeople() {
                 showCountNumber = 1;
             }
 
-            console.log("numberOfDays is "+ numberOfDays + " = " + showCountNumber);
+            console.log("numberOfDays is "+ numberOfDays + " = " + showCountNumber + " latest " + JSON.stringify(tArr[tArr.length - 1]));
             // dayLabels.push(dateStart.toLocaleDateString());
 
             for (let i = 0; i < showCountNumber; i++) { //prime the pump
