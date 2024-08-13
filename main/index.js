@@ -17895,14 +17895,10 @@ function getAllPeople() {
                 },
                 onClick: linkBarClickEvent
             }
-            });
-        
-        
+            });    
         });
-
-
-
     }
+
     function createAPIKey (uid) {
         let data = {userID: uid};
         // let config = { headers: { appid: appid,

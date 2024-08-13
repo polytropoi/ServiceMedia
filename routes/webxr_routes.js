@@ -430,7 +430,7 @@ webxr_router.get('/:_id', function (req, res) {
     let locationPictures = [];
     let curvePoints = [];
     let curveEntities = "";
-    let matrixEntities = ""; //matrix.org comms
+    let extraEntities = ""; //matrix.org comms
     // let parametricEntities = "";
     let lightEntities = "";
 
@@ -4680,7 +4680,8 @@ webxr_router.get('/:_id', function (req, res) {
                             // "<script src=\x22/main/vendor/jquery-confirm/jquery-confirm.min.js\x22></script>" +
                             "<script src=\x22../main/js/dialogs.js\x22></script>"+
                             "<script src=\x22/connect/indexedDb.js\x22></script>" +
-                            "<script src=\x22/connect/connect.js\x22 defer=\x22defer\x22></script>" +
+                            "<script src=\x22/connect/traffic.js\x22></script>" +
+                            
                             geoScripts +
                             locationScripts +
                             locationData +
@@ -4692,8 +4693,9 @@ webxr_router.get('/:_id', function (req, res) {
                         }
                         if (sceneResponse.sceneTags != null && sceneResponse.sceneTags.includes('matrix')) {
                             extraScripts = extraScripts + "<script src=\x22../main/js/browser-matrix.min.js\x22></script>"; 
-                            matrixEntities = "<a-entity matrix_meshes=\x22init: true\x22></a-entity>";
+                            extraEntities = "<a-entity matrix_meshes=\x22init: true\x22></a-entity>";
                         }
+                      
                         htmltext = "<!DOCTYPE html>\n" +
                         "<head> " +
                         "<meta name=\x22viewport\x22 content=\x22width=device-width, initial-scale=1\x22 />"+
@@ -4836,7 +4838,7 @@ webxr_router.get('/:_id', function (req, res) {
                         }
                         if (sceneResponse.sceneTags != null && sceneResponse.sceneTags.includes('matrix')) { //see matrix.org
                             extraScripts = extraScripts + "<script src=\x22../main/js/browser-matrix.min.js\x22></script>"; 
-                            matrixEntities = "<a-entity id=\x22matrix_meshes\x22 matrix_meshes=\x22init: true\x22></a-entity>";
+                            extraEntities = "<a-entity id=\x22matrix_meshes\x22 matrix_meshes=\x22init: true\x22></a-entity>";
                         }
                         if (sceneResponse.sceneTags != null && sceneResponse.sceneTags.includes('parametric')) {
                             hasParametricCurve = true;
@@ -4848,6 +4850,10 @@ webxr_router.get('/:_id', function (req, res) {
                         //     "<script src=\x22https://cdn.jsdelivr.net/npm/handy-work@3.1.10/build/magnet-helpers.min.js\x22></script>";
                         //     // "<script src=\x22https://cdn.jsdelivr.net/npm/aframe-htmlmesh@2.0.1/build/aframe-html.min.js\\x22></script>";
                         // }
+                        if (sceneResponse.sceneTags != null && sceneResponse.sceneTags.includes('traffic')) {
+                            extraScripts = extraScripts + "<script src=\x22/connect/traffic.js\x22 ></script><script src=\x22/main/src/util/axios.js\x22></script>"; 
+                            extraEntities = extraEntities + "<a-entity id=\x22traffic_data\x22 traffic_data_viz=\x22init: true\x22></a-entity>";
+                        }
                         let sceneQuest = "";
                         if (sceneResponse.sceneQuest != null && sceneResponse.sceneQuest != undefined && sceneResponse.sceneQuest != "") {
                             sceneQuest = sceneResponse.sceneQuest;
@@ -5256,7 +5262,7 @@ webxr_router.get('/:_id', function (req, res) {
                         lightEntities +
                         groundPlane +
 
-                        matrixEntities +
+                        extraEntities +
                         // parametricEntities +
                         // "<a-light visible=\x22true\x22 show-in-ar-mode id=\x22real-light\x22 type=\x22directional\x22 position=\x221 1 1\x22 color=\x22"+sceneResponse.sceneColor1+"\x22 intensity=\x22.75\x22></a-light>" +
                         placeholderEntities +

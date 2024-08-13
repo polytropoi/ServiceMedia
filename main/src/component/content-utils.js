@@ -240,6 +240,12 @@ AFRAME.registerComponent('initializer', { //adjust for device settings, and call
 
         // this.el.sceneEl.appendChild(webcamObj);
       }
+      if (settings && settings.sceneTags && settings.sceneTags.includes("traffic")) {
+        let datamgr = document.getElementById("traffic_data");
+        if (datamgr) {
+          datamgr.components.traffic_data_viz.initMe();
+        }
+      }
       // this.el.addEventListener('obbcollisionstarted	', (evt) => {
       //   console.log("obb player hit : " + evt.target.withEl.id);
       // });

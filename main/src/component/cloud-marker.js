@@ -315,7 +315,9 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                 this.data.zrot = 0;
               }
               this.el.setAttribute("scale", this.data.xscale + " " + this.data.yscale + " " + this.data.zscale);
-              this.el.object3D.position.set(this.data.xpos, this.data.ypos, this.data.zpos);
+              if (!this.data.tags.includes("no pos")) {
+                this.el.object3D.position.set(this.data.xpos, this.data.ypos, this.data.zpos);
+              }
               // this.el.object3D.rotation.set(THREE.MathUtils.degToRad(this.data.xrot), THREE.MathUtils.degToRad(this.data.xrot), THREE.MathUtils.degToRad(this.data.xrot));
               this.el.setAttribute("rotation", this.data.xrot + " " + this.data.yrot + " " +this.data.zrot);
              
@@ -1323,7 +1325,10 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
               }
             }
             this.el.setAttribute("scale", this.data.xscale + " " + this.data.yscale + " " + this.data.zscale);
-            this.el.object3D.position.set(this.data.xpos, this.data.ypos, this.data.zpos);
+            if (!this.data.tags.includes("no pos")) {
+              this.el.object3D.position.set(this.data.xpos, this.data.ypos, this.data.zpos);
+            }
+            
             this.el.setAttribute("rotation", this.data.xrot + " " + this.data.yrot + " " +this.data.zrot);
           } else {
             if (modelID.includes("local_")) {
@@ -1510,7 +1515,9 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
         this.updateMaterials();
 
         this.el.setAttribute("scale", this.data.xscale + " " + this.data.yscale + " " + this.data.zscale);
-        this.el.object3D.position.set(this.data.xpos, this.data.ypos, this.data.zpos);
+        if (!this.data.tags.includes("no pos")) { //eg use layout
+          this.el.object3D.position.set(this.data.xpos, this.data.ypos, this.data.zpos);
+        }
         this.el.setAttribute("rotation", this.data.xrot + " " + this.data.yrot + " " +this.data.zrot);
 
 

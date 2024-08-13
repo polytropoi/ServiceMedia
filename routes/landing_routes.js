@@ -410,7 +410,7 @@ landing_router.get('/:_id', function (req, res) {
     let locationPictures = [];
     let curvePoints = [];
     let curveEntities = "";
-    let matrixEntities = ""; //matrix.org comms
+    let extraEntities = ""; //matrix.org comms
     // let parametricEntities = "";
     let lightEntities = "";
     let placeholderEntities = "";
@@ -3881,7 +3881,7 @@ landing_router.get('/:_id', function (req, res) {
                         // }   
                         if (sceneResponse.sceneTags != null && sceneResponse.sceneTags.includes('matrix')) { //see matrix.org
                             extraScripts = extraScripts + "<script src=\x22../main/js/browser-matrix.min.js\x22></script>"; 
-                            matrixEntities = "<a-entity id=\x22matrix_meshes\x22 matrix_meshes=\x22init: true\x22></a-entity>";
+                            extraEntities = "<a-entity id=\x22matrix_meshes\x22 matrix_meshes=\x22init: true\x22></a-entity>";
                         }
                         if (sceneResponse.sceneTags != null && sceneResponse.sceneTags.includes('parametric')) {
                             hasParametricCurve = true;
@@ -4128,7 +4128,7 @@ landing_router.get('/:_id', function (req, res) {
                         triggerAudioEntity +
                         lightEntities +
 
-                        matrixEntities +
+                        extraEntities +
                         // parametricEntities +
                         "<a-light visible=\x22false\x22 show-in-ar-mode id=\x22real-light\x22 type=\x22directional\x22 position=\x221 1 1\x22 intensity=\x220.5\x22></a-light>" +
                         placeholderEntities +

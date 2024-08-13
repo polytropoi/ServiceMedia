@@ -2413,6 +2413,71 @@ AFRAME.registerComponent("rotate-with-camera", { //unused
      },
  });
 
+ AFRAME.registerComponent('traffic_data_viz', { //display traffic data somehow...
+
+  schema: {
+    init: {default: false},
+  },
+  init() {
+    this.trafficData = {};
+  },
+  initMe() {
+    // if (settings)
+    getTraffic("realitymangler.com", 100); //calls back to trafficData() below...
+    // console.log("trafficdata " + trafficData);
+  },
+  traffic_data: function (data) {
+    this.trafficData = data;
+    let timestamp = Date.now();
+    let parentEl = document.createElement("a-entity");
+
+    this.el.sceneEl.appendChild(parentEl);
+
+    console.log("this.trafficData " + JSON.stringify(this.trafficData));
+    for (let i = 0; i < this.trafficData.dayLabels.length; i++) {
+      let dayEl = document.createElement("a-entity");
+      
+      let offset = {};
+      offset.x = parseInt(i);
+      offset.y = 1;
+      offset.z = 0;
+      console.log("tryna offset " + JSON.stringify(offset));
+      
+      // dayEl.setAttribute("position", offset);                        
+      console.log("tryna set day marker timestamp " + timestamp + i + " day " + this.trafficData.dayLabels[i] + " value " + this.trafficData.dayCounts[i]);
+
+      dayEl.setAttribute("cloud_marker", { timestamp: "day" + timestamp + i,
+        name: this.trafficData.dayLabels[i] + " - " + this.trafficData.dayCounts[i], 
+        modelID: 'primitive cube', 
+        // objectID: cursor.value.locations[i].objectID, 
+        // mediaID: cursor.value.locations[i].mediaID, 
+        tags: "no pos", 
+        eventData: this.trafficData.dayLabels[i], 
+        markerType: 'poi',
+        description: 'traffic total for this day',
+        // position: cursor.value.locations[i].x +","+ cursor.value.locations[i].y+","+cursor.value.locations[i].z,
+        // xpos: 1,
+        // ypos: 0,
+        // zpos: i,
+        // xrot: cursor.value.locations[i].eulerx,
+        // yrot: cursor.value.locations[i].eulery,
+        // zrot: cursor.value.locations[i].eulerz,
+        xscale: 1,
+        yscale: this.trafficData.dayCounts[i] * .1,
+        zscale: 1,
+        // // rotation: cursor.value.locations[i].eulerx+","+cursor.value.locations[i].eulery +","+ cursor.value.locations[i].eulerz,
+        // // scale: {x: cursor.value.locations[i].markerObjScale, y: cursor.value.locations[i].markerObjScale, z: cursor.value.locations[i].markerObjScale} derp
+        // scale: cursor.value.locations[i].markerObjScale,
+        // targetElements: cursor.value.locations[i].targetElements
+     });
+     dayEl.classList.add("activeObjexRay");
+     parentEl.appendChild(dayEl);
+
+    }
+    parentEl.setAttribute('layout', {'type': 'circle', 'radius': 25, 'plane': 'xz'});
+  }
+  });
+
  AFRAME.registerComponent('matrix_meshes', { //test method for matrix rooms
 
   schema: {

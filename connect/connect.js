@@ -84,47 +84,7 @@ let allowCameraLock = true;
 const camLockButton = document.getElementById("camLockToggleButton");
 let intersections = [];
 
-$('a-entity').each(function() {  //external way of getting click duration for physics
 
-   $(this).bind('mousedown', function() {
-     mouseDownStarttime = Date.now() / 1000;
-   });
-   $(this).bind('mouseup', function() {
-     mouseDowntime = (Date.now() / 1000) - mouseDownStarttime; 
-
-   });
-   // $(this).bind('touchstart', function() {
-   //    mouseDownStarttime = Date.now() / 1000;
-   //  });
-   //  $(this).bind('touchend', function() {
-   //    mouseDowntime = (Date.now() / 1000) - mouseDownStarttime;
-
-   //  });
-    $(this).bind('beforexrselect', e => {
-      e.preventDefault();
-    });
- 
- });
-
-function UpdateSceneLocations () {
-   // console.log("localdata : " + JSON.stringify(localData));
-   for (let i = 0; i < sceneLocations.locations.length; i++) {
-      let ts = locationTimestamps.indexOf(sceneLocations.locations[i].timestamp); //avoid having to doubleloop
-      console.log("checking locIDs " + sceneLocations.locations[i].timestamp + " index " + ts);
-      if (ts != -1) {
-         console.log("updating sceneLocation : " + JSON.stringify(sceneLocations.locations[i]) + " to " + JSON.stringify(localData.locations[ts]));
-         sceneLocations.locations.splice(i, 1, localData.locations[ts]);
-
-         console.log(JSON.stringify(sceneLocations.locations));
-      }
-   }
-}
-
-function getExtension(filename) {
-   // console.log("tryna get extension of " + filename);
-   var i = filename.lastIndexOf('.');
-   return (i < 0) ? '' : filename.substr(i);
-}
 /////////////////// main onload function below, populate settings, etc.
 $(function() { 
    // InitIDB();
@@ -404,8 +364,49 @@ $(function() {
       intersections.splice(index, 1);
       console.log("obb collision end with " + e.detail.withEl.id + " intersect index " + index + " " + intersections);
     }); 
-
+    
 }); //end onload
+$('a-entity').each(function() {  //external way of getting click duration for physics
+
+   $(this).bind('mousedown', function() {
+     mouseDownStarttime = Date.now() / 1000;
+   });
+   $(this).bind('mouseup', function() {
+     mouseDowntime = (Date.now() / 1000) - mouseDownStarttime; 
+
+   });
+   // $(this).bind('touchstart', function() {
+   //    mouseDownStarttime = Date.now() / 1000;
+   //  });
+   //  $(this).bind('touchend', function() {
+   //    mouseDowntime = (Date.now() / 1000) - mouseDownStarttime;
+
+   //  });
+    $(this).bind('beforexrselect', e => {
+      e.preventDefault();
+    });
+ 
+ });
+
+function UpdateSceneLocations () {
+   // console.log("localdata : " + JSON.stringify(localData));
+   for (let i = 0; i < sceneLocations.locations.length; i++) {
+      let ts = locationTimestamps.indexOf(sceneLocations.locations[i].timestamp); //avoid having to doubleloop
+      console.log("checking locIDs " + sceneLocations.locations[i].timestamp + " index " + ts);
+      if (ts != -1) {
+         console.log("updating sceneLocation : " + JSON.stringify(sceneLocations.locations[i]) + " to " + JSON.stringify(localData.locations[ts]));
+         sceneLocations.locations.splice(i, 1, localData.locations[ts]);
+
+         console.log(JSON.stringify(sceneLocations.locations));
+      }
+   }
+}
+
+function getExtension(filename) {
+   // console.log("tryna get extension of " + filename);
+   var i = filename.lastIndexOf('.');
+   return (i < 0) ? '' : filename.substr(i);
+}
 
 function GetMatrixData() {
    if (!matrixClient) {
