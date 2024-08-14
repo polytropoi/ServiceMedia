@@ -16,7 +16,7 @@ function groupReducer(obj, prop) {
   
 }
 
-function getTraffic(appdomain, days) { //arg if not domain_admin
+function getTraffic(appdomain, days, id) { //arg if not domain_admin
         
     console.log("appdomain " + appdomain);
     let data = {};
@@ -25,7 +25,7 @@ function getTraffic(appdomain, days) { //arg if not domain_admin
     }
     if (days && days != 0) {
         let now = Date.now();
-        let startpoint = now - (84600 * 1000 * days);
+        let startpoint = now - (84600 * 1000 * days); 
         console.log("startpoint is " + startpoint + " before " + now );
         data.startpoint = startpoint;
     }
@@ -107,7 +107,7 @@ function getTraffic(appdomain, days) { //arg if not domain_admin
         urlCounts.sort(({count:a}, {count:b}) => b-a);
 
                 // Bar Chart Example
-        var ctx2 = document.getElementById("topPages");
+        // var ctx2 = document.getElementById("topPages");
         let toppagesLabels = [];
         let toppagesCounts = [];
         let showNumber = urlCounts.length < 8 ? urlCounts.length : 10;
@@ -120,7 +120,8 @@ function getTraffic(appdomain, days) { //arg if not domain_admin
         resp.toppagesLabels = toppagesLabels;
         // console.log("trafficdata " + JSON.stringify(resp));
         
-        let trafficDataEl = document.getElementById("traffic_data");
+        let markerID = id != null ? id : "traffic_data"; //id may be passed in for "dataviz" markertype, otherwise component set on server from scene tag "traffic"
+        let trafficDataEl = document.getElementById(markerID);
         if (trafficDataEl) {
             let trafficViz = trafficDataEl.components.traffic_data_viz
             if (trafficViz) {
@@ -128,10 +129,7 @@ function getTraffic(appdomain, days) { //arg if not domain_admin
             } else {
                 console.log("no traffic viz component!");
             }
-
-        }
+        } 
         // return JSON.stringify(resp);    
-
-
     });
 }

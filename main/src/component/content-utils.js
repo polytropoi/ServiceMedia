@@ -243,7 +243,8 @@ AFRAME.registerComponent('initializer', { //adjust for device settings, and call
       if (settings && settings.sceneTags && settings.sceneTags.includes("traffic")) {
         let datamgr = document.getElementById("traffic_data");
         if (datamgr) {
-          datamgr.components.traffic_data_viz.initMe();
+
+          datamgr.components.traffic_data_viz.initMe(settings.sceneDomain);
         }
       }
       // this.el.addEventListener('obbcollisionstarted	', (evt) => {

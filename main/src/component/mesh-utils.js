@@ -2417,21 +2417,32 @@ AFRAME.registerComponent("rotate-with-camera", { //unused
 
   schema: {
     init: {default: false},
+    mode: {default: ""},
+    type: {default: "line"},
+    size: {default: 20},
+    modelID: {default: "primitive cube"}
   },
   init() {
     this.trafficData = {};
+    if (this.data.mode != "") {
+      if (settings && settings.sceneDomain) {
+        this.initMe(settings.sceneDomain);
+      }
+    }
   },
-  initMe() {
+  initMe(domain) {
     // if (settings)
-    getTraffic("realitymangler.com", 100); //calls back to trafficData() below...
+    getTraffic(domain, 100, this.el.id); //calls back to trafficData() below...
     // console.log("trafficdata " + trafficData);
   },
   traffic_data: function (data) {
     this.trafficData = data;
     let timestamp = Date.now();
-    let parentEl = document.createElement("a-entity");
-
-    this.el.sceneEl.appendChild(parentEl);
+    // let parentEl = document.createElement("a-entity");
+    let parentEl = this.el;
+    // parentEl.id = "_" + Date.now();
+    // parentEl.
+    // this.el.sceneEl.appendChild(parentEl);
 
     console.log("this.trafficData " + JSON.stringify(this.trafficData));
     for (let i = 0; i < this.trafficData.dayLabels.length; i++) {
@@ -2448,7 +2459,7 @@ AFRAME.registerComponent("rotate-with-camera", { //unused
 
       dayEl.setAttribute("cloud_marker", { timestamp: "day" + timestamp + i,
         name: this.trafficData.dayLabels[i] + " - " + this.trafficData.dayCounts[i], 
-        modelID: 'primitive cube', 
+        modelID: "primitive cube", 
         // objectID: cursor.value.locations[i].objectID, 
         // mediaID: cursor.value.locations[i].mediaID, 
         tags: "no pos", 
@@ -2474,7 +2485,13 @@ AFRAME.registerComponent("rotate-with-camera", { //unused
      parentEl.appendChild(dayEl);
 
     }
-    parentEl.setAttribute('layout', {'type': 'circle', 'radius': 25, 'plane': 'xz'});
+    if (this.data.type == "circle") {
+      parentEl.setAttribute('layout', {'type': 'circle', 'radius': this.data.size, 'plane': 'xz'});
+    } else if (this.data.type == "line") {
+      parentEl.setAttribute('layout', {'type': 'line', 'align': 'center', 'plane': 'xz'});
+    } 
+    
+
   }
   });
 

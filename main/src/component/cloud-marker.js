@@ -73,12 +73,21 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
       // if (this.data.markerType == "collider") {
       //   this.data.modelID = "primitive_cube";
       // } 
-      
+      if (this.data.markerType == "dataviz") {
+        console.log("tryna add traffic_data_viz");
+        let size = 20;
+        let type = "line";
+        if (this.data.tags.includes("circle")) {
+          type = "circle"
+        }
+
+        // if (this.data.)
+        this.el.setAttribute("traffic_data_viz", {mode: "marker", type: type, size: size});
+      }
       if ((this.data.tags && this.data.tags.toLowerCase().includes("follow curve")) || this.data.markerType == "follow curve" ) {
         console.log("tryna add mod_curve");
         this.el.setAttribute("mod_curve", {"origin": "location", "isClosed": true, "spreadFactor": 2})
       }
-
   
           console.log("CLOUDMARKER " + this.data.markerType + " " + this.data.modelID );
           // this.el.removeAttribute("geometry");
@@ -483,6 +492,9 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
         if (this.data.tags && this.data.tags.toLowerCase().includes("no select")) {
           return;
         }
+        // if (this.data.markerType == "dataviz") {
+          evt.stopPropagation();
+        // }
         // this.targetMods();
         if (evt.detail.intersection) {
           this.clientX = evt.clientX;
@@ -639,6 +651,10 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
           
           } else if (that.data.markerType == "poi") {
             GoToLocation(that.data.timestamp);
+          }
+
+          if (this.data.markerType == "trigger" && this.data.tags.includes("click only")) { //like a "button"
+            this.targetMods();
           }
         }
       });
@@ -1575,7 +1591,10 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
       //       }
       //     }
       // }
-      this.targetMods();
+      if (!this.data.tags.includes("click only")) { //portal needs playertriggerhit, not just mouseenter
+        this.targetMods();
+      }
+
       // if (this.data.tags && this.data.tags.length && this.data.tags.toLowerCase().includes("toggle")) {
       //   console.log( "tryna toggle somethin..." + this.data.targetElements); 
       //   if (this.data.targetElements != '') {
@@ -1807,7 +1826,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
             }
            
           }
-        if (this.data.markerType != "portal") { //portal needs playertriggerhit, not just mouseenter
+        if (this.data.markerType != "portal" && !this.data.tags.includes("click only")) { //portal needs playertriggerhit, not just mouseenter
           this.targetMods();
         }
         }

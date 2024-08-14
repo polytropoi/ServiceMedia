@@ -1065,6 +1065,11 @@ webxr_router.get('/:_id', function (req, res) {
                                     
                                     sceneModelLocations.push(sceneResponse.sceneLocations[i]); // if no model will set a default below
                                 }
+                                if (sceneResponse.sceneLocations[i].markerType != undefined && sceneResponse.sceneLocations[i].markerType == "dataviz") { 
+                                    if (sceneResponse.sceneLocations[i].tags.includes("traffic")) {
+                                        
+                                    }
+                                }
                                 if (sceneResponse.sceneLocations[i].markerType != undefined && sceneResponse.sceneLocations[i].type.toLowerCase() != 'geographic') { //cloudmarkers, special type allows local mods
                                     if (//sceneResponse.sceneLocations[i].markerType.toLowerCase() == "none" 
                                         sceneResponse.sceneLocations[i].markerType.toLowerCase() == "placeholder" 
@@ -1080,7 +1085,7 @@ webxr_router.get('/:_id', function (req, res) {
                                         || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "text" 
                                         || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "light"  
                                         || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "link"  
-                                        // || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "model" 
+                                        || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "dataviz" 
                                         || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "picture"  
                                         || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "picture group"  
                                         || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "mailbox") {
@@ -4271,6 +4276,7 @@ webxr_router.get('/:_id', function (req, res) {
                     settings._id = sceneResponse._id;
                     settings.sceneLastUpdate = sceneResponse.sceneLastUpdate;
                     settings.sceneType = sceneResponse.sceneWebType;
+                    settings.sceneDomain = sceneResponse.sceneDomain;
                     settings.sceneTitle = sceneResponse.sceneTitle;
                     settings.sceneKeynote = sceneResponse.sceneKeynote;
                     settings.sceneDescription = sceneResponse.sceneDescription;
@@ -4852,7 +4858,7 @@ webxr_router.get('/:_id', function (req, res) {
                         // }
                         if (sceneResponse.sceneTags != null && sceneResponse.sceneTags.includes('traffic')) {
                             extraScripts = extraScripts + "<script src=\x22/connect/traffic.js\x22 ></script><script src=\x22/main/src/util/axios.js\x22></script>"; 
-                            extraEntities = extraEntities + "<a-entity id=\x22traffic_data\x22 traffic_data_viz=\x22init: true\x22></a-entity>";
+                            // extraEntities = extraEntities + "<a-entity id=\x22traffic_data\x22 traffic_data_viz=\x22init: true\x22></a-entity>";
                         }
                         let sceneQuest = "";
                         if (sceneResponse.sceneQuest != null && sceneResponse.sceneQuest != undefined && sceneResponse.sceneQuest != "") {

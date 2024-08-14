@@ -10102,6 +10102,7 @@ function getAllPeople() {
         "light",
         "surface",
         "navmesh",
+        "dataviz",
         "available scenes key",
         "curve point",
         "brownian path",

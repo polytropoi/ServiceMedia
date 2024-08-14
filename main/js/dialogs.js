@@ -943,7 +943,7 @@ function ReturnLocationMarkerTypeSelect (selected) {
       "surface",
       "navmesh",
       "floorplane",
-
+      "dataviz",
 
       
 
