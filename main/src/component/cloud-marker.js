@@ -77,12 +77,16 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
         console.log("tryna add traffic_data_viz");
         let size = 20;
         let type = "line";
+        let source = "day totals";
         if (this.data.tags.includes("circle")) {
           type = "circle"
         }
+        if (this.data.tags.includes("top pages")) {
+          source = "top pages"
+        }
 
         // if (this.data.)
-        this.el.setAttribute("traffic_data_viz", {mode: "marker", type: type, size: size});
+        this.el.setAttribute("traffic_data_viz", {mode: "marker", type: type, size: size, source: source});
       }
       if ((this.data.tags && this.data.tags.toLowerCase().includes("follow curve")) || this.data.markerType == "follow curve" ) {
         console.log("tryna add mod_curve");

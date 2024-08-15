@@ -5022,6 +5022,8 @@ AFRAME.registerComponent('scene_greeting_dialog', {  //if "greeting" scenetag + 
         this.initMe();
       }
     }, 1000);
+    this.startButtonBackgroundEl = null;
+    this.startButtonTextEl = null;
     // document.addEventListener("DOMContentLoaded", (e) => {
       // this.initMe();
     // });
@@ -5240,6 +5242,8 @@ AFRAME.registerComponent('scene_greeting_dialog', {  //if "greeting" scenetag + 
 
         // this.el.parentNode.removeChild(this.el);
         // 
+        this.startButtonTextEl.setAttribute("visible", false);
+        this.startButtonBackgroundEl.setAttribute("visible", false);
         this.greetingEl.setAttribute("troika-text", {
           value: ""
         });

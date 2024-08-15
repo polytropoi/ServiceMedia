@@ -2420,7 +2420,9 @@ AFRAME.registerComponent("rotate-with-camera", { //unused
     mode: {default: ""},
     type: {default: "line"},
     size: {default: 20},
-    modelID: {default: "primitive cube"}
+    modelID: {default: "primitive cube"},
+    source: {default: "day totals"}
+
   },
   init() {
     this.trafficData = {};
@@ -2445,53 +2447,71 @@ AFRAME.registerComponent("rotate-with-camera", { //unused
     // this.el.sceneEl.appendChild(parentEl);
 
     console.log("this.trafficData " + JSON.stringify(this.trafficData));
-    for (let i = 0; i < this.trafficData.dayLabels.length; i++) {
-      let dayEl = document.createElement("a-entity");
-      
-      let offset = {};
-      offset.x = parseInt(i);
-      offset.y = 1;
-      offset.z = 0;
-      console.log("tryna offset " + JSON.stringify(offset));
-      
-      // dayEl.setAttribute("position", offset);                        
-      console.log("tryna set day marker timestamp " + timestamp + i + " day " + this.trafficData.dayLabels[i] + " value " + this.trafficData.dayCounts[i]);
+    if (this.data.source == "day totals") {
+      for (let i = 0; i < this.trafficData.dayLabels.length; i++) { 
+        let dayEl = document.createElement("a-entity");
+        let offset = {};
+        offset.x = parseInt(i);
+        offset.y = 1;
+        offset.z = 0;
+        // console.log("tryna offset " + JSON.stringify(offset));
+        
+        // dayEl.setAttribute("position", offset);                        
+        // console.log("tryna set day marker timestamp " + timestamp + i + " day " + this.trafficData.dayLabels[i] + " value " + this.trafficData.dayCounts[i]);
 
-      dayEl.setAttribute("cloud_marker", { timestamp: "day" + timestamp + i,
-        name: this.trafficData.dayLabels[i] + " - " + this.trafficData.dayCounts[i], 
-        modelID: "primitive cube", 
-        // objectID: cursor.value.locations[i].objectID, 
-        // mediaID: cursor.value.locations[i].mediaID, 
-        tags: "no pos", 
-        eventData: this.trafficData.dayLabels[i], 
-        markerType: 'poi',
-        description: 'traffic total for this day',
-        // position: cursor.value.locations[i].x +","+ cursor.value.locations[i].y+","+cursor.value.locations[i].z,
-        // xpos: 1,
-        // ypos: 0,
-        // zpos: i,
-        // xrot: cursor.value.locations[i].eulerx,
-        // yrot: cursor.value.locations[i].eulery,
-        // zrot: cursor.value.locations[i].eulerz,
-        xscale: 1,
-        yscale: this.trafficData.dayCounts[i] * .1,
-        zscale: 1,
-        // // rotation: cursor.value.locations[i].eulerx+","+cursor.value.locations[i].eulery +","+ cursor.value.locations[i].eulerz,
-        // // scale: {x: cursor.value.locations[i].markerObjScale, y: cursor.value.locations[i].markerObjScale, z: cursor.value.locations[i].markerObjScale} derp
-        // scale: cursor.value.locations[i].markerObjScale,
-        // targetElements: cursor.value.locations[i].targetElements
-     });
-     dayEl.classList.add("activeObjexRay");
-     parentEl.appendChild(dayEl);
+        dayEl.setAttribute("cloud_marker", { timestamp: "day" + timestamp + i,
+          name: this.trafficData.dayLabels[i] + " - " + this.trafficData.dayCounts[i], 
+          modelID: this.data.modelID, 
+          tags: "no pos", 
+          eventData: this.trafficData.dayLabels[i], 
+          markerType: 'poi',
+          description: 'traffic total for this day',
+          xscale: 1,
+          yscale: this.trafficData.dayCounts[i] * .1,
+          zscale: 1,
+      });
+      dayEl.classList.add("activeObjexRay");
+      parentEl.appendChild(dayEl);
 
+      }
+      if (this.data.type == "circle") {
+        parentEl.setAttribute('layout', {'type': 'circle', 'radius': this.data.size, 'plane': 'xz'});
+      } else if (this.data.type == "line") {
+        parentEl.setAttribute('layout', {'type': 'line', 'align': 'center', 'plane': 'xz'});
+      } 
+    } else if (this.data.source == "top pages") {
+      for (let i = 0; i < this.trafficData.toppagesLabels.length; i++) { 
+        let tpEl = document.createElement("a-entity");
+        let offset = {};
+        offset.x = parseInt(i);
+        offset.y = 1;
+        offset.z = -1;
+        console.log("tryna offset " + JSON.stringify(offset));
+        
+        // dayEl.setAttribute("position", offset);                        
+        // console.log("tryna set top page marker timestamp " + timestamp + i + " day " + this.trafficData.toppagesLabels[i] + " value " + this.trafficData.toppagesCounts[i]);
+
+        tpEl.setAttribute("cloud_marker", { timestamp: "day" + timestamp + i,
+          name: this.trafficData.toppagesLabels[i] + " - " + this.trafficData.toppagesCounts[i], 
+          modelID: this.data.modelID, 
+          tags: "no pos", 
+          eventData: 'href~' +this.trafficData.toppagesLabels[i], 
+          markerType: 'link',
+          description: 'traffic total for this day',
+          xscale: 1,
+          yscale: this.trafficData.toppagesCounts[i] * .01,
+          zscale: 1,
+      });
+      tpEl.classList.add("activeObjexRay");
+      parentEl.appendChild(tpEl);
+
+      }
+      if (this.data.type == "circle") {
+        parentEl.setAttribute('layout', {'type': 'circle', 'radius': this.data.size, 'angle': 180, 'plane': 'xz'});
+      } else if (this.data.type == "line") {
+        parentEl.setAttribute('layout', {'type': 'line', 'align': 'center', 'plane': 'xz'});
+      } 
     }
-    if (this.data.type == "circle") {
-      parentEl.setAttribute('layout', {'type': 'circle', 'radius': this.data.size, 'plane': 'xz'});
-    } else if (this.data.type == "line") {
-      parentEl.setAttribute('layout', {'type': 'line', 'align': 'center', 'plane': 'xz'});
-    } 
-    
-
   }
   });
 
