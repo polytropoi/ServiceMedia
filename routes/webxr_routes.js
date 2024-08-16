@@ -1779,14 +1779,14 @@ webxr_router.get('/:_id', function (req, res) {
 
                             let webxrEnv = "default";
                             let shadow = "";
-                            let ground = "";
-                                let skycolor = sceneResponse.sceneColor1;
-                                let groundcolor = sceneResponse.sceneColor3;
-                                let groundcolor2 = sceneResponse.sceneColor4;
-                                let dressingcolor = sceneResponse.sceneColor4;
-                                let horizoncolor = sceneResponse.sceneColor2;
-                                let fog = "";
-                                let tweakColors = "";
+                            // let ground = "";
+                            //     let skycolor = sceneResponse.sceneColor1;
+                            //     let groundcolor = sceneResponse.sceneColor3;
+                            //     let groundcolor2 = sceneResponse.sceneColor4;
+                            //     let dressingcolor = sceneResponse.sceneColor4;
+                            //     let horizoncolor = sceneResponse.sceneColor2;
+                            //     let fog = "";
+                            //     let tweakColors = "";
                                 let sunVector = "0 -.5 -.5";
                                 let intensity = "2";
                                 
@@ -1854,7 +1854,7 @@ webxr_router.get('/:_id', function (req, res) {
                                 }
                                 if (sceneResponse.sceneColor2 != null && sceneResponse.sceneColor2.length > 3 && sceneResponse.sceneColorizeSky) {  
                                     horizoncolor = "horizonColor: " + sceneResponse.sceneColor2 + ";";
-                                    groundcolor2 = "groundColor2: " + sceneResponse.sceneColor2 + ";";
+                                    // groundcolor2 = "groundColor2: " + sceneResponse.sceneColor2 + ";";
                                     // ambientLight = "<a-light type='ambient' intensity='.5' color='" + sceneResponse.sceneColor2 + "'></a-light>";
                                 } 
                                 if (sceneResponse.sceneColor3 != null && sceneResponse.sceneColor3.length > 3 && sceneResponse.sceneColorizeSky) { //TODO put that in
@@ -1870,7 +1870,7 @@ webxr_router.get('/:_id', function (req, res) {
                                 // }
 
                                 // "+ground+"
-                                aframeEnvironment = "<a-entity id=\x22enviroEl\x22 environment=\x22preset: "+webxrEnv+"; groundYScale: 5; playArea: 1.5; "+ground+" "+dressing+" "+fog+" "+shadow+" "+groundcolor+" "+dressingcolor+" "+groundcolor2+" "+skycolor+" "+horizoncolor+
+                                aframeEnvironment = "<a-entity id=\x22enviroEl\x22 environment=\x22preset: "+webxrEnv+"; groundYScale: 5; playArea: 1.5; "+ground+" "+groundcolor+" "+groundcolor2+" "+dressing+" "+fog+" "+shadow+" "+dressingcolor+" "+skycolor+" "+horizoncolor+
                                 " "+envLighting+";\x22 hide-in-ar-mode "+tweakColors+"></a-entity>";
 
                                 // environment = "<a-entity environment=\x22preset: "+webxrEnv+"; "+fog+" "+shadow+" "+groundcolor+" "+dressingcolor+" "+groundcolor2+" "+skycolor+" "+horizoncolor+" playArea: 3; lightPosition: 0 2.15 0\x22 hide-in-ar-mode></a-entity>";

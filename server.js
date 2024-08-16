@@ -9832,7 +9832,7 @@ app.post('/scene_inventory_objex_old', function(req, res) {
                             callbackz(err);
                             } else {
                                 (async () => {
-                                    console.log("got objj model:" + model._id);
+                                    console.log("got objjj model:" + model._id);
                                     // let url = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + model.userID + "/gltf/" + model.filename, Expires: 6000});
                                     let url = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, 'users/' + model.userID + "/gltf/" + model.filename, 6000);
                                     obj_item.modelURL = url;
@@ -9947,7 +9947,7 @@ app.post('/scene_inventory_objex/', function(req, res) {
                                 callback(err);
                                 } else {
                                     (async () => {
-                                        console.log("got objj model:" + JSON.stringify(model));
+                                        console.log("got obj_j model:" + JSON.stringify(model));
                                         // let url = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + model.userID + "/gltf/" + model.filename, Expires: 6000});
                                         let url = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, 'users/' + model.userID + "/gltf/" + model.filename, 6000);
                                         obj_item.modelURL = url;
