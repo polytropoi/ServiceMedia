@@ -2064,9 +2064,7 @@ AFRAME.registerComponent('mod_object', {
                               this.navAgentController.updateAgentState("random");
                             } else {
                               this.navAgentController.updateAgentState("dialog");
-                              
                               }
-                              
                             }
                           }
                         }

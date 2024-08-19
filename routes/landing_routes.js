@@ -3285,33 +3285,33 @@ landing_router.get('/:_id', function (req, res) {
                                 } else {
                                     console.log('All pictureGroups processed successfully');
                                     // pictureGroupsEntity = "<a-entity scale=\x22.75 .75 .75\x22 look-at=\x22#player\x22 position=\x22-4 2 -3\x22>"+ 
-                                    pictureGroupsEntity = "<a-entity scale=\x22.75 .75 .75\x22 look-at=\x22#player\x22 position=\x22"+picturegroupLocation+"\x22>"+ 
-                                    "<a-entity position=\x220 -2.5 0\x22 scale=\x22.75  .75 .75\x22 id=\x22pictureGroupsControl\x22 class=\x22envMap activeObjexRay\x22 "+skyboxEnvMap+" toggle-picture-group gltf-model=\x22#camera_icon\x22></a-entity>"+
-                                    "<a-entity id=\x22pictureGroupPanel\x22 visible=\x22false\x22 position=\x220 -1 0\x22>"+
-                                    // "<a-entity id=\x22pictureGroupHeaderText\x22 geometry=\x22primitive: plane; width: 3.25; height: 1\x22 position=\x220 1.75 0\x22 material=\x22color: grey; transparent: true; opacity: 0.0\x22" +
-                                    // "text=\x22value:; wrap-count: 35;\x22></a-entity>" +
+                                    // pictureGroupsEntity = "<a-entity scale=\x22.75 .75 .75\x22 look-at=\x22#player\x22 position=\x22"+picturegroupLocation+"\x22>"+ 
+                                    // "<a-entity position=\x220 -2.5 0\x22 scale=\x22.75  .75 .75\x22 id=\x22pictureGroupsControl\x22 class=\x22envMap activeObjexRay\x22 "+skyboxEnvMap+" toggle-picture-group gltf-model=\x22#camera_icon\x22></a-entity>"+
+                                    // "<a-entity id=\x22pictureGroupPanel\x22 visible=\x22false\x22 position=\x220 -1 0\x22>"+
+                                    // // "<a-entity id=\x22pictureGroupHeaderText\x22 geometry=\x22primitive: plane; width: 3.25; height: 1\x22 position=\x220 1.75 0\x22 material=\x22color: grey; transparent: true; opacity: 0.0\x22" +
+                                    // // "text=\x22value:; wrap-count: 35;\x22></a-entity>" +
                                     
-                                    "<a-entity id=\x22pictureGroupPicLandscape\x22 visible=\x22true\x22 position=\x220 2.25 -.1\x22 gltf-model=\x22#flatrect2\x22 scale=\x224 4 4\x22 material=\x22shader: flat; alphaTest: 0.5;\x22"+
-                                    "rotation='0 0 0'></a-entity>"+
-                                    "<a-entity id=\x22pictureGroupPicPortrait\x22 visible=\x22false\x22 position=\x220 3.25 -.1\x22 gltf-model=\x22#portrait_panel\x22 scale=\x224 4 4\x22 material=\x22shader: flat; alphaTest: 0.5;\x22"+
-                                    "rotation='0 0 0'></a-entity>"+
-                                    "<a-entity id=\x22pictureGroupPicSquare\x22 visible=\x22false\x22 position=\x220 2.25 -.1\x22 gltf-model=\x22#flatsquare\x22 scale=\x224 4 4\x22 material=\x22shader: flat; alphaTest: 0.5;\x22"+
-                                    "rotation='0 0 0'></a-entity>"+
-                                    "<a-entity id=\x22pictureGroupPicCircle\x22 visible=\x22false\x22 position=\x220 2.25 -.1\x22 gltf-model=\x22#flatcircle\x22 scale=\x224 4 4\x22 material=\x22shader: flat; alphaTest: 0.5;\x22"+
-                                    "rotation='0 0 0'></a-entity>"+
-                                    // "<a-entity gltf-model=\x22#square_panel\x22 scale=\x222.25 2.25 2.25\x22 position=\x220 2.1 -.25\x22></a-entity>" +
-                                    "<a-entity visible='true' class=\x22envMap activeObjexRay\x22 id=\x22pictureGroupFlyButton\x22 gltf-model=\x22#next_button\x22 scale=\x22.25 .25 .25\x22 position=\x223.25 -.75 0\x22></a-entity>" +
-                                    "<a-entity visible='true' class=\x22envMap activeObjexRay\x22 id=\x22pictureGroupLayoutButton\x22 gltf-model=\x22#previous_button\x22 scale=\x22.25 .25 .25\x22 position=\x22-3.25 -.75 0\x22></a-entity>" +
-                                    "<a-entity visible='true' class=\x22envMap activeObjexRay\x22 id=\x22pictureGroupNextButton\x22 gltf-model=\x22#next_button\x22 scale=\x22.5 .5 .5\x22 position=\x222.25 -.75 0\x22></a-entity>" +
-                                    "<a-entity visible='true' class=\x22envMap activeObjexRay\x22 id=\x22pictureGroupPreviousButton\x22 gltf-model=\x22#previous_button\x22 scale=\x22.5 .5 .5\x22 position=\x22-2.25  -.75 0\x22></a-entity>" +
-                                    "</a-entity></a-entity>";
+                                    // "<a-entity id=\x22pictureGroupPicLandscape\x22 visible=\x22true\x22 position=\x220 2.25 -.1\x22 gltf-model=\x22#flatrect2\x22 scale=\x224 4 4\x22 material=\x22shader: flat; alphaTest: 0.5;\x22"+
+                                    // "rotation='0 0 0'></a-entity>"+
+                                    // "<a-entity id=\x22pictureGroupPicPortrait\x22 visible=\x22false\x22 position=\x220 3.25 -.1\x22 gltf-model=\x22#portrait_panel\x22 scale=\x224 4 4\x22 material=\x22shader: flat; alphaTest: 0.5;\x22"+
+                                    // "rotation='0 0 0'></a-entity>"+
+                                    // "<a-entity id=\x22pictureGroupPicSquare\x22 visible=\x22false\x22 position=\x220 2.25 -.1\x22 gltf-model=\x22#flatsquare\x22 scale=\x224 4 4\x22 material=\x22shader: flat; alphaTest: 0.5;\x22"+
+                                    // "rotation='0 0 0'></a-entity>"+
+                                    // "<a-entity id=\x22pictureGroupPicCircle\x22 visible=\x22false\x22 position=\x220 2.25 -.1\x22 gltf-model=\x22#flatcircle\x22 scale=\x224 4 4\x22 material=\x22shader: flat; alphaTest: 0.5;\x22"+
+                                    // "rotation='0 0 0'></a-entity>"+
+                                    // // "<a-entity gltf-model=\x22#square_panel\x22 scale=\x222.25 2.25 2.25\x22 position=\x220 2.1 -.25\x22></a-entity>" +
+                                    // "<a-entity visible='true' class=\x22envMap activeObjexRay\x22 id=\x22pictureGroupFlyButton\x22 gltf-model=\x22#next_button\x22 scale=\x22.25 .25 .25\x22 position=\x223.25 -.75 0\x22></a-entity>" +
+                                    // "<a-entity visible='true' class=\x22envMap activeObjexRay\x22 id=\x22pictureGroupLayoutButton\x22 gltf-model=\x22#previous_button\x22 scale=\x22.25 .25 .25\x22 position=\x22-3.25 -.75 0\x22></a-entity>" +
+                                    // "<a-entity visible='true' class=\x22envMap activeObjexRay\x22 id=\x22pictureGroupNextButton\x22 gltf-model=\x22#next_button\x22 scale=\x22.5 .5 .5\x22 position=\x222.25 -.75 0\x22></a-entity>" +
+                                    // "<a-entity visible='true' class=\x22envMap activeObjexRay\x22 id=\x22pictureGroupPreviousButton\x22 gltf-model=\x22#previous_button\x22 scale=\x22.5 .5 .5\x22 position=\x22-2.25  -.75 0\x22></a-entity>" +
+                                    // "</a-entity></a-entity>";
                                    
                                     var buff = Buffer.from(JSON.stringify(requestedPictureGroups)).toString("base64");
-                                    pictureGroupsData = "<a-entity picture_groups_control id=\x22pictureGroupsData\x22 data-picture-groups='"+buff+"'></a-entity>"; //to be picked up by aframe, but data is in data-attribute
-                                    modelAssets = modelAssets + "<a-asset-item id=\x22portrait_panel\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/flatrect2_portrait.glb\x22></a-asset-item>\n" +
-                                    "<a-asset-item id=\x22flatrect2\x22 crossorigin=\x22anonymous\x22 id=\x22flatrect2\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/flatrect2.glb\x22></a-asset-item>"+
-                                    "\n<a-asset-item id=\x22camera_icon\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/camera1.glb\x22></a-asset-item>\n";
-                                    "});";
+                                    pictureGroupsData = "<div id=\x22pictureGroupsData\x22 data-picture-groups='"+buff+"'></a-entity>"; //to be picked up by aframe, but data is in data-attribute
+                                    // modelAssets = modelAssets + "<a-asset-item id=\x22portrait_panel\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/flatrect2_portrait.glb\x22></a-asset-item>\n" +
+                                    // "<a-asset-item id=\x22flatrect2\x22 crossorigin=\x22anonymous\x22 id=\x22flatrect2\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/flatrect2.glb\x22></a-asset-item>"+
+                                    // "\n<a-asset-item id=\x22camera_icon\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/camera1.glb\x22></a-asset-item>\n";
+                                    // "});";
                                     callback(null);
                                 }
                             });
@@ -3550,6 +3550,7 @@ landing_router.get('/:_id', function (req, res) {
 
                     settings._id = sceneResponse._id;
                     settings.sceneType = "landing";
+                    settings.sceneTags = sceneResponse.sceneTags;
                     settings.sceneTitle = sceneResponse.sceneTitle;
                     settings.sceneKeynote = sceneResponse.sceneKeynote;
                     settings.sceneDescription = sceneResponse.sceneDescription;
@@ -3618,7 +3619,7 @@ landing_router.get('/:_id', function (req, res) {
                     settingsData = "<div id=\x22settingsDataElement\x22 data-settings=\x22"+sbuff+"\x22></div>";
                     // settingsDataEntity = "<a-entity id=\x22settingsDataEntity\x22 data-settings=\x22"+sbuff+"\x22></a-entity>"; ? maybe
 
-                    
+                    let picGroups = "";
                     let sceneGreeting = sceneResponse.sceneDescription;
                     if (sceneResponse.sceneGreeting != null && sceneResponse.sceneGreeting != undefined && sceneResponse.sceneGreeting != "") {
                         sceneGreeting = sceneResponse.sceneGreeting;
@@ -3653,7 +3654,15 @@ landing_router.get('/:_id', function (req, res) {
                         // let hasTile = false;
                         // let bgstyle = "style=\x22height:100%; width:100%; overflow:auto; background-color: "+sceneResponse.sceneColor1+";\x22"
 
-                        let availableScenesHTML = "";
+                        if (sceneResponse.sceneTags.includes("landing pics")) {
+                            // if (requestedPictureGroups) {
+                                
+                                // picGroups = JSON.stringify(requestedPictureGroups);
+                                // pictureGroupsData = "<div id=\x22pictureGroupsData\x22 data-picture-groups='"+buff+"'></div>"; 
+                                // console.log(pictureGroupsData);
+                            // }
+                        }
+                        let availableScenesHTML = ""; 
                         let bgstyle = "style=\x22height:100%; width:100%; overflow:auto;\x22";
                         let sceneAccess = "Access Open to Public"
                         // if (sceneResponse.sceneShareWithSubscribers) {
@@ -3816,13 +3825,19 @@ landing_router.get('/:_id', function (req, res) {
                                 "<p class=\x22lead\x22>"+sceneResponse.sceneText+"</p>"+
                                 "</div>"+
                             "</div>"+
-                                "<div class=\x22row gx-4 gx-lg-5 align-items-center\x22>"+
+                            "<div class=\x22row gx-4 gx-lg-5 align-items-center\x22>"+
+                                "<div id=\x22picGroupsContainer\x22 class=\x22col-md-12\x22>"+
+                                // picGroups +
+                                "</div>"+
+                            "</div>"+
+                            "<div class=\x22row gx-4 gx-lg-5 align-items-center\x22>"+
                                 "<div class=\x22col-md-12\x22>"+
                                 availableScenesHTML +
                                 "</div>"+
                             "</div>"+
                         "</div>"+
-                    // "</section>"+
+                        pictureGroupsData +
+                        // "</section>"+
 
 
 
@@ -3854,371 +3869,9 @@ landing_router.get('/:_id', function (req, res) {
 
                     
                     } else { /////////////////////////////////////////////////////////------------- Default / AFrame response below ------------------------------
-                        // let joystick = "joystick=\x22useNavmesh: false\x22";
-                        let extraScripts = "";
-    
-                        
-                        if (!showTransport) {
-                            transportButtons = "";
-                        }
-                        if (!showDialog) {
-                            dialogButton = "";
-                        }
-                        if (!showSceneManglerButtons) {
-                            sceneManglerButtons = "";
-                        }
-                        if (locationPictures.length == 0) { //in no pic locations, use circle layout
-                            // imageEntities = "<a-entity id=\x22imageEntitiesParent\x22 position='0 3.5 0' rotation=\x2290 0 33\x22 layout=\x22type: circle; radius: 20\x22>"+imageEntities+"</a-entity>\n";
-                        }
-                        if (sceneResponse.sceneUseDynCubeMap) {
-                            skyboxEnvMap = "skybox-env-map";   
-                        }
-                        if (sceneResponse.sceneTags != null && sceneResponse.sceneTags.includes("hide overlay")) {
-                            canvasOverlay = "";
-                        }   
-                        // if (sceneResponse.sceneTags != null && sceneResponse.sceneTags.includes("no socket")) {
-                        //     socketScripts = "";
-                        // }   
-                        if (sceneResponse.sceneTags != null && sceneResponse.sceneTags.includes('matrix')) { //see matrix.org
-                            extraScripts = extraScripts + "<script src=\x22../main/js/browser-matrix.min.js\x22></script>"; 
-                            extraEntities = "<a-entity id=\x22matrix_meshes\x22 matrix_meshes=\x22init: true\x22></a-entity>";
-                        }
-                        if (sceneResponse.sceneTags != null && sceneResponse.sceneTags.includes('parametric')) {
-                            hasParametricCurve = true;
-                            extraScripts = extraScripts + "<script src=\x22../main/js/parser.js\x22></script>"; 
-                            curveEntities = curveEntities + "<a-entity id=\x22p_path\x22 parametric_curve=\x22xyzFunctions: 30*cos(t), 3*cos(3*t) + 2, 30*sin(t);tRange: 0, -6.283;\x22></a-entity>"; //TODODO 
-                        }
-
-                        let sceneQuest = "";
-                        if (sceneResponse.sceneQuest != null && sceneResponse.sceneQuest != undefined && sceneResponse.sceneQuest != "") {
-                            sceneQuest = sceneResponse.sceneQuest;
-                        }
-
-                        let sceneGreeting = sceneResponse.sceneDescription;
-                       
-
-                        if (sceneResponse.sceneGreeting != null && sceneResponse.sceneGreeting != undefined && sceneResponse.sceneGreeting != "") {
-                            sceneGreeting = sceneResponse.sceneGreeting;
-
-                            if (sceneResponse.sceneTags.includes("greeting")) {
-                                console.log("greeting is " + sceneResponse.sceneGreeting);
-                                textEntities = textEntities + "<a-entity id=\x22sceneGreetingDialog\x22 class=\x22activeObjexRay\x22 look-at=\x22#player\x22 scene_greeting_dialog=\x22fillColor : "+sceneResponse.sceneFontFillColor+
-                                "; outlineColor : "+sceneResponse.sceneFontOutlineColor+"; backgroundColor : "+sceneResponse.sceneTextBackgroundColor+"; font1 : "+sceneResponse.sceneFontWeb1+"; font2 : "+sceneResponse.sceneFontWeb2+"; greetingText : "+sceneResponse.sceneGreeting+"; questText : "+sceneQuest+";\x22></a-entity>";
-                            }
-                            if (sceneResponse.sceneTags.includes("greeting hide")) {
-                                console.log("greeting is " + sceneResponse.sceneGreeting);
-                                textEntities = textEntities + "<a-entity id=\x22sceneGreetingDialog\x22 class=\x22activeObjexRay\x22 look-at=\x22#player\x22 scene_greeting_dialog=\x22behavior: hide; fillColor : "+sceneResponse.sceneFontFillColor+
-                                "; outlineColor : "+sceneResponse.sceneFontOutlineColor+"; backgroundColor : "+sceneResponse.sceneTextBackgroundColor+"; font1 : "+sceneResponse.sceneFontWeb1+"; font2 : "+sceneResponse.sceneFontWeb2+"; greetingText : "+sceneResponse.sceneGreeting+"; questText : "+sceneQuest+";\x22></a-entity>";
-                            }
-                            // modelAssets = modelAssets + "<a-asset-item id=\x22flat_round_rect\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/flatroundrect.glb\x22></a-asset-item>\n";
-                        }
-                        
-
-
-
-                        /////////AFRAME SCENE DECLARATION////////////////// 
-                        let aScene = "<a-scene "+sceneBackground+" renderer=\x22colorManagement: true\x22" +
-                        "reflection=\x22directionalLight:#real-light\x22 ar-hit-test=\x22target:#target_object; type:footprint; footprintDepth:0.1;\x22 ar-cursor raycaster=\x22objects: .activeObjexRay\x22 "+
-                        // "screen-controls vr-mode-ui keyboard-shortcuts=\x22enterVR: false\x22" + magicWindow +   
-                        " vr-mode-ui keyboard-shortcuts=\x22enterVR: false\x22" +  //add screen-controls from initializer                      
-                        webxrFeatures + " shadow=\x22type: pcfsoft\x22 loading-screen=\x22dotsColor: white; backgroundColor: black; enabled: false\x22 embedded " + aframeRenderSettings + " " + fogSettings + " "+networkedscene+" "+ARSceneArg+" listen-for-vr-mode>";
-
-                        let mainDiv = "<div id=\x22mainDiv\x22 style=\x22width:100%; height:100%\x22>";
-
-                        
-                        let uid = "0000000000000";
-                        if (req.session.user) {
-                            uid = req.session.user._id;
-                        }
-                        var token=jwt.sign({userId:uid,shortID:sceneResponse.short_id},process.env.JWT_SECRET, { expiresIn: '1h' });  
-                        let modal = "<div id=\x22theModal\x22 class=\x22modal\x22><div id=\x22modalContent\x22 class=\x22modal-content\x22></div></div>";
-                        htmltext = "<html>" +
-                        "<!doctype html>"+
-                        "<html lang=\x22en\x22>"+
-                        "<head> " +
-                        "<meta charset=\x22utf-8\x22/>" +
-                        // googleAnalytics +
-
-                        // googleAdSense + //naw, nm
-                        // "<link rel=\x22icon\x22 href=\x22data:\x22></link>"+
-                        "<meta charset=\x22utf-8\x22/>" +
-                        "<meta name=\x22viewport\x22 content=\x22width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0, shrink-to-fit=no\x22/>" +
-                        "<meta property=\x22og:url\x22 content=\x22" + process.env.ROOT_HOST + "/webxr/" + sceneResponse.short_id + "\x22 /> " +
-                        "<meta property=\x22og:type\x22 content=\x22website\x22 /> " +
-                        // "<meta property=\x22og:image\x22 content=\x22" + postcard1 + "\x22 /> " +
-                        "<meta property=\x22og:image\x22 content=\x22" + postcard1 + "\x22 /> " +
-                        "<meta property=\x22og:image:height\x22 content=\x221024\x22 /> " +
-                        "<meta property=\x22og:image:width\x22 content=\x221024\x22 /> " +
-                        "<meta property=\x22og:title\x22 content=\x22" + sceneResponse.sceneTitle + "\x22 /> " +
-                        "<meta property=\x22og:description\x22 content=\x22" + sceneResponse.sceneDescription + "\x22 /> " +
-                        "<title>" + sceneResponse.sceneTitle + "</title>" +
-                        "<meta name=\x22description\x22 content=\x22" + sceneResponse.sceneDescription + "\x22/>" +
-                        // "<meta name=\x22monetization\x22 content=\x22$ilp.uphold.com/EMJQj4qKRxdF\x22>" +
-                        "<meta name=\x22mobile-web-app-capable\x22 content=\x22yes\x22>" +
-                        "<meta name=\x22apple-mobile-web-app-capable\x22 content=\x22yes\x22>" +
-                        // "<meta name=\x22token\x22 content=\x22"+token+"\x22>"+
-                        styleIncludes +
-                        "<link href=\x22https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css\x22 rel=\x22stylesheet\x22 type=\x22text/css\x22>" +
-                        "<link href=\x22/css/webxr.css\x22 rel=\x22stylesheet\x22 type=\x22text/css\x22>" +
-
-                     
-                   
-                        "<script async src=\x22https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js\x22></script>"+
-                        "<script type=\x22importmap\x22> {\x22imports\x22: {" +
-                            "\x22three\x22: \x22https://unpkg.com/three@0.147.0/build/three.module.js\x22,"+
-                            "\x22three/addons/\x22: \x22https://unpkg.com/browse/three@0.147.0/examples/jsm/\x22"+
-                            "}"+
-                        "}</script>"+
-
-                        "<script src=\x22/main/vendor/jquery/jquery.min.js\x22></script>" +
-                        
-                        // "<script src=\x22../main/ref/aframe/dist/socket.io.slim.js\x22></script>" +
-                       
-                        // "<script src=\x22/connect/connect.js\x22 defer=\x22defer\x22></script>" +
-                
-                        
-                        aframeScriptVersion +
-                        "<script src=\x22../main/src/component/aframe-troika-text.min.js\x22 defer=\x22defer\x22></script>"+
-                        physicsScripts +
-                        logScripts +
-                        aframeExtrasScript +
-                        extraScripts +
+                        // na, it's the landing page...
                        
                        
-                        
-
-                        "<script src=\x22../main/vendor/howler/src/howler.core.js\x22></script>"+
-                        "<script src=\x22../main/vendor/howler/src/howler.spatial.js\x22></script>"+
-                        hlsScript +
-                        
-                        "<script src=\x22../main/js/navigation.js\x22></script>" + //includes navmesh components (simple and not), and extended_wasd_controls
-                        // "<script src=\x22../main/ref/aframe/dist/networked-aframe.min.js\x22></script>" + 
-                       
-                        "<script src=\x22../main/vendor/aframe/aframe-blink-controls.min.js\x22></script>" +   //TODO - check if req comes from vr headset
-                       
-                        
-                        enviromentScript +
-                       
-                       
-                        joystickScript +
-
-
-                        // "<script src=\x22../main/src/shaders/terrain.js\x22></script>"+
-                       
-                        "<script src=\x22../main/vendor/aframe/aframe-look-at-component.js\x22></script>"+
-                        "<script src=\x22../main/vendor/aframe/aframe-layout-component.js\x22></script>"+
-                        // "<script src=\x22../main/vendor/html2canvas/aframe-html-shader.min.js\x22></script>"+
-                        primaryAudioScript +
-                        ambientAudioScript +
-                        triggerAudioScript +
-                        // skyGradientScript +
-                        ARScript +
-                        // cameraEnvMap +
-                        contentUtils +
-                        audioVizScript +
-                        meshUtilsScript +
-                        synthScripts +
-                        surfaceScatterScript +
-                        brownianScript +
-                        // "<script src=\x22../main/src/util/quaternion.js\x22></script>"+
-                        // "<script src=\x22../main/vendor/trackedlibs/aabb-collider.js\x22></script>"+
-
-                        // "<script src=\x22../main/src/component/three-mesh-ui.min.js\x22></script>"+
-                        "<script src=\x22../main/src/component/aframe-makewaves-shader.js\x22></script>"+
-                        "<script src=\x22../main/src/shaders/noise.js\x22></script>"+
-
-                        // "<script src=\x22../main/vendor/aframe/aframe-particle-system-component.min.js\x22></script>"+
-                        // "<script src=\x22../main/src/component/aframe-spe-particles-component.js\x22></script>"+
-                        // "<script src=\x22../main/src/component/aframe-spritesheet-animation.js\x22></script>"+
-                        "<script src=\x22../main/src/component/aframe-sprite-particles-component.js\x22></script>"+
-                        
-
-                        "<script src=\x22../main/src/component/mod-materials.js\x22></script>"+
-
-                        // "<script src=\x22../main/src/component/aframe-gradientsky.min.js\x22></script>"+
-                        // "<script src=\x22../main/src/component/ar-utils.js\x22></script>"+
-                        // "<script src=\x22../main/src/component/spawn-in-circle.js\x22></script>"+
-
-
-                        "</head>" +
-                        "<body bgcolor=\x22black\x22>" +
-                        
-                        modal +
-                        
-                        // "<div id=\x22"+mainDivID+"\x22 class=\x22"mainDivClass"\x22 style=\x22width:100%; height:100%\x22>"+
-                        mainDiv + //main Div wrapper, different for map
-
-                        "<div class=\x22primaryAudioParams\x22 "+primaryAudioParams+" id="+streamPrimaryAudio+ "_" +oggurl+"></div>"+  //TODO Fix!  concatting the id is stupid, use data-attributes
-                        "<div class=\x22ambientAudioParams\x22 id="+ambientUrl+"></div>"+
-                        "<div class=\x22triggerAudioParams\x22 id="+triggerUrl+"></div>"+
-                        settingsData +
-                        // "<div class=\x22attributionParams\x22 id="+JSON.stringify(attributions)+"></div>"+
-                        "<div class=\x22avatarName\x22 id="+avatarName+"></div>"+
-
-                        audioControl +
-                        // "<script> function screenCap() {console.log(\x22tryna screenCap()\x22); document.querySelector('a-scene').components.screenshot.capture('perspective')};"+    
-                        // "</script>"+
-                        containers +
-                        locationScripts +
-                        locationData +
-                        geoScripts +
-                        "<script src=\x22../main/js/dialogs.js\x22></script>"+
-
-                        "<div id=\x22ar_overlay\x22><span id=\x22ar_message\x22></span></div>"+                        
-                    
-                        aScene +
-                        "<div id=\x22overlay\x22></div>"+
-                        // skySettings +
-                        aframeEnvironment +
-                        ambientLight + 
-                        camera +
-                        // ARMarker +
-                        ocean +
-                        terrain +
-                        // ground +
-
-                        skySettings +
-                       
-                        ////////////////ASSETS/////////////
-                        // "<a-assets timeout=\x222000\x22>" +
-                        "<a-assets>" +
-                       
-                        
-                        imageAssets +
-
-
-
-                        weblinkAssets +
-                        gltfsAssets +
-                        videoAsset +
-                        
-                        grabMix +
-                        skyboxAsset +
-                        // cubeMapAsset +
-                        navmeshAsset +
-                        // "<canvas crossorigin=\x22anonymous\x22 id=\x22flying_canvas\x22 width=\x221024\x22 height=\x221024\x22></canvas>"+
-                        "</a-assets>\n"+
-
-                        //////////////ENTITIES////////////////////
-
-                        curveEntities +
-                        // physicsDummy + 
-                        renderPanel +
-
-                        weblinkEntities +
-                        // "</a-entity>\n"+
-                        gltfsEntities + 
-                        skyParticles +
-                        imageEntities +
-                        // targetObjectEntity +
-                        geoEntities +
-                        videoEntity +
-                        youtubeEntity +
-                        textEntities +
-                        attributionsTextEntity +
-                        availableScenesEntity +
-                        pictureGroupsEntity +
-                        pictureGroupsData +
-                        videoGroupsEntity +
-                        navmeshEntity +
-                        networkingEntity +
-                        locationEntity +
-                        primaryAudioEntity +
-                        ambientAudioEntity + 
-                        triggerAudioEntity +
-                        lightEntities +
-
-                        extraEntities +
-                        // parametricEntities +
-                        "<a-light visible=\x22false\x22 show-in-ar-mode id=\x22real-light\x22 type=\x22directional\x22 position=\x221 1 1\x22 intensity=\x220.5\x22></a-light>" +
-                        placeholderEntities +
-                        proceduralEntities +
-                        loadLocations +
-                        "<a-entity id=\x22createAvatars\x22 create_avatars></a-entity>"+
-                        "<a-entity id=\x22particleSpawner\x22 particle_spawner></a-entity>"+
-                        // "<a-plane loadsvg_blob id=\x22flying_dialog\x22 material=\x22shader: flat; transparent: true; opacity .5; src: #flying_canvas;\x22 look-at=\x22#player\x22 width=\x221\x22 height=\x221\x22 position=\x220 1.5 -1\x22></a-plane>"+
-                        // "<a-plane live_canvas=\x22src:#flying_canvas\x22 id=\x22flying_info_canvas\x22 material=\x22shader: flat; transparent: true;\x22look-at=\x22#player\x22 width=\x221\x22 height=\x221\x22 position=\x220 1.5 -1\x22></a-plane>"+
-
-                        audioVizEntity +
-                        instancingEntity +
-                        arHitTest + 
-                        
-                        arShadowPlane +
-                        hemiLight +
-                        shadowLight +
-                        // navmarsh +
-                        loadAudioEvents +
-                        "<a-entity id=\x22youtube_element\x22 youtube_element_aframe=\x22init: ''\x22></a-entity>"+
-                        // "<a-entity id=\x22audioGroupsEl\x22 audio_groups_control=\x22init: ''\x22></a-entity>"+
-
-                        "<a-entity id=\x22mod_dialog\x22 visible=\x22false\x22 look-at=\x22#player\x22 mod_dialog=\x22mode: 'confirm'\x22>"+
-                            "<a-text id=\x22mod_dialog_text\x22 align=\x22left\x22 wrap-count=\x2230\x22 width=\x22.8\x22 position=\x22-.35 .15 .05\x22 value=\x22Are you sure you want to pick up the extra spicy meatball?\n\nThis could bring very strongbad wrongness for you!\x22></a-text>"+
-                            "<a-entity id=\x22mod_dialog_panel\x22 class=\x22gltf activeObjexRay\x22 gltf-model=\x22#dialog_panel\x22></a-entity>" +
-                        "</a-entity>" + //end dialog
-                        modelData +
-                        objectData +
-                        inventoryData +
-
-                        "</a-scene>\n"+ ///////////////////////----- CLOSE AFRAME SCENE !
-                        "</div>\n"+
-                         
-                        
-
-                        sceneTextItemData +
-                        "<div id=\x22geopanel\x22 class=\x22geopanel\x22><span></span></div>\n"+
-                        "<div id=\x22sceneGreeting\x22 style=\x22z-index: -20;\x22>"+sceneGreeting+"</div>"+
-                        "<div id=\x22sceneQuest\x22 style=\x22z-index: -20;\x22>"+sceneQuest+"</div>"+
-                        "<div class=\x22backmask\x22 style=\x22position: fixed; left: 0; top: 0; z-index: -5; overflow: hidden\x22></div>"+ //to hide lower elements
-                        "<div class=\x22render_panel\x22 style=\x22position: fixed; left: 0; top: 0; z-index: -50; overflow: hidden margin: auto\x22 id=\x22renderPanel\x22></div>"+
-                        "<div class=\x22augpanel\x22><p></p></div>\n"+
-                       
-                        joystickContainer +
-                        screenOverlay + //socket picture
-                        canvasOverlay + //drop down side panel
-                        audioSliders +
-                        mapOverlay + 
-                        adSquareOverlay +
-                        "<div class=\x22next-button\x22 id=\x22nextButton\x22 style=\x22visibility: hidden\x22 onclick=\x22GoToNext()\x22><i class=\x22fas fa-arrow-circle-right fa-2x\x22></i></div>"+
-                        "<div class=\x22previous-button\x22 id=\x22previousButton\x22 style=\x22visibility: hidden\x22 onclick=\x22GoToPrevious()\x22><i class=\x22fas fa-arrow-circle-left fa-2x\x22></i></div>"+
-                        "<a href=\x22''\x22 target=\x22_blank\x22 class=\x22ar-buttoon\x22>AR</a>" + //?
-                        
-                        
-                        
-                        //AR COMPONENTS
-                        //This plane is only visible in AR and follows the given target to provide it with shadows.
-                            // "<a-light id=\x22dirlight\x22 auto-shadow-cam intensity=\x220.7\x22 light=\x22castShadow:true;type:directional\x22 position=\x2210 10 10\x22></a-light>"+ //ar light detection
-                            // "<a-entity material=\x22shader:shadow; depthWrite:false; opacity:0.9;\x22 visible=\x22false\x22 geometry=\x22primitive:shadow-plane;\x22 shadow=\x22cast:false;receive:true;\x22" +
-                            // " ar-shadow-helper=\x22target:#ar_target_object;light:#dirlight;\x22></a-entity>"+
-                            // "<a-entity id=\x22ar_target_object\x22></a-entity>"+  //make ar objects the children of this?
-
-                        "<div id=\x22token\x22 data-token=\x22"+token+"\x22>\n"+
-                        
-                        // "<div style=\x22float: left; margin: 10px 10px;\x22 onclick=\x22screenCap()\x22><i class=\x22fas fa-camera  fa-2x\x22></i></div>\n"+ 
-                        locationButton+
-                        dialogButton+
-                        ethereumButton+ 
-                        transportButtons+ 
-
-                        socketScripts +
-                        navmeshScripts +
-                        shaderScripts +
-
-                        "<script>\n"+ //TODO base64 this like the others, and only when a key marker is set
-                            // "var avatarName = \x22" + avatarName + "\x22;\n" +
-                            // "let globalStateObject = {};"
-                           "function ready(f){/in/.test(document.readyState)?setTimeout('ready('+f+')',9):f()}\n"+
-                            //    loadAttributions +
-                               loadAvailableScenes +
-                            // loadPictureGroups +
-                            
-                       "</script>\n"+
-                    
-                        sceneManglerButtons +
-                       
-                        videoElements +
-                        // youtubeContent +
-                        "</body>" +
-                    "</html>";
                     }
                     callback(null);
                 }

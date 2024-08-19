@@ -184,6 +184,25 @@ $(function() {
    } else {
       console.log("not aframe or default scenetype!");
       GetTextItems(); //only for plain pages or text adventure, scene_text_control fetches for aframe
+      if (settings.sceneType == "landing") {
+         if (settings.sceneTags && settings.sceneTags.includes("landing pics")) {
+            let picGroupMgr = document.getElementById("pictureGroupsData");
+            if (picGroupMgr) {
+               let theData = picGroupMgr.getAttribute('data-picture-groups');
+               let theJSONData = JSON.parse(atob(theData)); //convert from base64
+               console.log(JSON.stringify(theJSONData[0].images));
+               let picResp = "";
+               for (let i = 0; i < theJSONData[0].images.length; i++) { //todo ++ groups
+                  picResp = picResp + "<a href=\x22"+theJSONData[0].images[i].url+"\x22 target=\x22_blank\x22><img src=\x22"+theJSONData[0].images[i].url+"\x22 class=\x22cropped1 image-fluid\x22 style=\x22object-fit: cover;\x22 width=\x22512\x22 height=\x22256\x22></a>";
+               }
+
+               let picGroupsContainer = document.getElementById("picGroupsContainer");
+               if (picGroupsContainer) {
+                  picGroupsContainer.innerHTML = picResp;
+               }
+            }
+         }
+      }
    }
    if (settings.useMatrix) {
       console.log("Loading browser MATRIX sdk!!!");
