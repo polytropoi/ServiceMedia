@@ -359,91 +359,91 @@ AFRAME.registerComponent('mod_physics', { //used by models, placeholders, instan
 
 
 
-AFRAME.registerComponent('dynamic-ball', {
+// AFRAME.registerComponent('dynamic-ball', {
 
-  schema: {
-      physics: {type: 'string'}, // physx or ammo.
-      yKill: {type: 'number', default: -10}
-  },
+//   schema: {
+//       physics: {type: 'string'}, // physx or ammo.
+//       yKill: {type: 'number', default: -10}
+//   },
 
-  init() {
-      const el = this.el
-      el.setAttribute('instanced-mesh-member', 'mesh:#ball-mesh; memberMesh: true')
+//   init() {
+//       const el = this.el
+//       el.setAttribute('instanced-mesh-member', 'mesh:#ball-mesh; memberMesh: true')
 
-      if (this.data.physics === "ammo") {
-        el.setAttribute('ammo-body', 'type:dynamic')
-        // Explicitly specifying a shape is more efficient than auto-fitting.
-        el.setAttribute('ammo-shape', 'type:sphere; fit:manual; sphereRadius: 0.3')
-    }
-    else if (this.data.physics === "cannon") {
-        // necessary to explicitly specify sphere radius, as async call to 
-        // set radius attribute on el may not have completed yet, and Cannon uses
-        // the default radius of 1.
-        // This is seen when recycling balls (deleting and recreating them).
-        el.setAttribute('dynamic-body', 'shape: sphere; sphereRadius: 0.3')
-    }
-    else {
-        el.setAttribute('physx-body', 'type:dynamic')
-    }
-  },
+//       if (this.data.physics === "ammo") {
+//         el.setAttribute('ammo-body', 'type:dynamic')
+//         // Explicitly specifying a shape is more efficient than auto-fitting.
+//         el.setAttribute('ammo-shape', 'type:sphere; fit:manual; sphereRadius: 0.3')
+//     }
+//     else if (this.data.physics === "cannon") {
+//         // necessary to explicitly specify sphere radius, as async call to 
+//         // set radius attribute on el may not have completed yet, and Cannon uses
+//         // the default radius of 1.
+//         // This is seen when recycling balls (deleting and recreating them).
+//         el.setAttribute('dynamic-body', 'shape: sphere; sphereRadius: 0.3')
+//     }
+//     else {
+//         el.setAttribute('physx-body', 'type:dynamic')
+//     }
+//   },
 
-  tick() {
-      if (this.el.object3D.position.y < this.data.yKill) {
-          this.el.emit("recycle")
-      }
-  }
-})
+//   tick() {
+//       if (this.el.object3D.position.y < this.data.yKill) {
+//           this.el.emit("recycle")
+//       }
+//   }
+// })
 //from https://github.com/diarmidmackenzie/instanced-mesh/blob/main/tests/components/pinboard.js
-AFRAME.registerComponent('ball-recycler', {
+// AFRAME.registerComponent('ball-recycler', {
 
-  schema: {
-      physics: {type: 'string'}, // physx, ammo or cannon.
-      ballCount: {type: 'number', default: 10},
-      width: {type: 'number', default: 8}, // width of spawn field
-      depth: {type: 'number', default: 8}, // depth of spawn field (after initial spawn balls always spawned at far depth)
-      yKill: {type: 'number', default: -10}
-  },
+//   schema: {
+//       physics: {type: 'string'}, // physx, ammo or cannon.
+//       ballCount: {type: 'number', default: 10},
+//       width: {type: 'number', default: 8}, // width of spawn field
+//       depth: {type: 'number', default: 8}, // depth of spawn field (after initial spawn balls always spawned at far depth)
+//       yKill: {type: 'number', default: -10}
+//   },
 
-  init() {
+//   init() {
 
-      this.recycleBall = this.recycleBall.bind(this);
-      this.ballCount = 0;
-      // at start of day, spawn balls 
-      for (let ii = 0; ii < this.data.ballCount; ii++) {
+//       this.recycleBall = this.recycleBall.bind(this);
+//       this.ballCount = 0;
+//       // at start of day, spawn balls 
+//       for (let ii = 0; ii < this.data.ballCount; ii++) {
 
-          this.createBall(false)
-      }
-  },
+//           this.createBall(false)
+//       }
+//   },
 
-  createBall(recycled) {
+//   createBall(recycled) {
 
-      const { height, depth, width } = this.data
-      const pos = this.el.object3D.position
+//       const { height, depth, width } = this.data
+//       const pos = this.el.object3D.position
       
-      const ball = document.createElement('a-entity')
-      ball.id = 'ball-'+this.ballCount;
-      this.ballCount++
+//       const ball = document.createElement('a-entity')
+//       ball.id = 'ball-'+this.ballCount;
+//       this.ballCount++
           
-      ball.setAttribute('dynamic-ball', {yKill: this.data.yKill,
-                                         physics: this.data.physics})
-      let x = pos.x + Math.random() * width - width / 2
-      let z = recycled ? (pos.z -depth / 2) : (pos.z + Math.random() * depth - depth / 2)
-      ball.object3D.position.set(x, pos.y, z)
-      this.el.sceneEl.appendChild(ball)
+//       ball.setAttribute('dynamic-ball', {yKill: this.data.yKill,
+//                                          physics: this.data.physics})
+//       let x = pos.x + Math.random() * width - width / 2
+//       let z = recycled ? (pos.z -depth / 2) : (pos.z + Math.random() * depth - depth / 2)
+//       ball.object3D.position.set(x, pos.y, z)
+//       this.el.sceneEl.appendChild(ball)
 
-      ball.addEventListener('recycle', this.recycleBall);
+//       ball.addEventListener('recycle', this.recycleBall);
 
-  },
+//   },
 
-  recycleBall(evt) {
+//   recycleBall(evt) {
 
-      const ball = evt.target
+//       const ball = evt.target
 
-      ball.parentNode.removeChild(ball);
-      this.createBall(true)
+//       ball.parentNode.removeChild(ball);
+//       this.createBall(true)
 
-  }
-})
+//   }
+// })
 
 function randomNumber(min, max) {
   return Math.random() * (max - min) + min;
@@ -1159,7 +1159,7 @@ AFRAME.registerComponent('instanced_surface_meshes', {
       this.iMesh_4 = null;
 
       this.highlightColor = new THREE.Color();
-      console.log("instanced_surface_meshes model _id " + this.data._id + " tryna instance " + this.data.count);
+      console.log("instanced_surface_meshes model _id " + this.data._id + " tryna instance " + this.data.count + " with tags " + this.data.tagss);
       // this.el.setAttribute("visible",false);
       this.el.addEventListener('model-loaded', (event) => {
         event.preventDefault();;
@@ -1407,6 +1407,10 @@ AFRAME.registerComponent('instanced_surface_meshes', {
             }
 
         this.el.classList.add('activeObjexRay');
+        if (this.data.tags.includes("grass")) {
+          console.log("tryna set grass shader!");
+          this.el.setAttribute("wavy_shader", "");
+        }
         this.initialized = true;
 
       } else {
@@ -1449,7 +1453,7 @@ AFRAME.registerComponent('instanced_surface_meshes', {
             rotation: '0..360', 
             scale: '100,500'
           });
-      this.particlesEl.setAttribute('sprite-particles', {"duration": .1}); //resets after changing duration, so interrupts loop :*
+        this.particlesEl.setAttribute('sprite-particles', {"duration": .1}); //resets after changing duration, so interrupts loop :*
       }
 
     },
@@ -1491,7 +1495,7 @@ AFRAME.registerComponent('instanced_surface_meshes', {
         }
     
         if ( this.intersection != null && this.intersection.length > 0) {
-          console.log("gotsa intersection!" + this.intersection[0].instanceId + " this.instanceId ");
+          // console.log("gotsa intersection!" + this.intersection[0].instanceId + " this.instanceId ");
           // if (!this.isInitialized) {
           //   this.instanceId = this.intersection[ 0 ].instanceId;
           // }

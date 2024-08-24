@@ -496,6 +496,9 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
         if (this.data.tags && this.data.tags.toLowerCase().includes("no select")) {
           return;
         }
+        if (this.data.markerType == "spawn") {
+          this.el.classList.remove("activeObjexRay"); //don't block the spawned object!
+        }
         // if (this.data.markerType == "dataviz") {
           evt.stopPropagation();
         // }
@@ -1298,6 +1301,9 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
   
               }
               console.log("loaded cloudmarker primitive geometry " + modelID);
+            } else {
+              this.el.classList.remove("activeObjexRay");
+
             }
             if (this.data.markerType.toLowerCase() == "placeholder") {
                 this.el.setAttribute("material", {color: "yellow", transparent: true, opacity: .5});
@@ -1336,6 +1342,8 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
               if (this.data.markerType != "mailbox" && this.data.markerType != "light") {
                 this.el.object3D.visible = false;
               }
+              this.el.classList.remove("activeObjexRay");
+              
             }
             if (this.data.markerType == "navmesh" || this.data.markerType == "surface") {
               if (this.data.tags.includes("show")) {
@@ -1525,6 +1533,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
               console.log("tryna hide gizmo");
               this.el.object3D.visible = false;
             }
+            this.el.classList.remove("activeObjexRay");
           }
           if (this.data.markerType == "navmesh"  || this.data.markerType == "surface" ) {
             if (!this.data.tags.includes("show")) {
@@ -1549,6 +1558,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
           if (this.data.markerType != "mailbox" && this.data.markerType != "light") {
             this.el.object3D.visible = false;
           }
+          this.el.classList.remove("activeObjexRay");
         } else if (this.data.markerType == "navmesh" || this.data.markerType == "surface") {
           if (!this.data.tags.includes("show")) {
             this.el.object3D.visible = false;
@@ -1759,7 +1769,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
           }
         }
         if (this.data.tags && this.data.tags.length && this.data.tags.toLowerCase().includes("show target")) {
-          console.log( "tryna show somethins..." + this.data.targetElements + " length"); 
+          console.log( "tryna show target..." + this.data.targetElements + " length"); 
           if (this.data.targetElements != '') {
             for (let i = 0; i < this.data.targetElements.length; i++) {
               let targetEl = document.getElementById(this.data.targetElements[i].toString());
@@ -1775,7 +1785,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
         }
         if (this.data.tags && this.data.tags.length && this.data.tags.toLowerCase().includes("hide target")) {
           
-          console.log( "tryna hide somethin..." + this.data.targetElements + " length"); 
+          console.log( "tryna hide target..." + this.data.targetElements + " length"); 
           if (this.data.targetElements != '') {
             for (let i = 0; i < this.data.targetElements.length; i++) {
               let targetEl = document.getElementById(this.data.targetElements[i].toString());
@@ -1789,9 +1799,9 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
             // this.coolDownTimer();
           }
         }
-        if (this.data.tags && this.data.tags.length && this.data.tags.toLowerCase().includes("spawn target")) { //could be an object
+        if (this.data.tags && this.data.tags.length && this.data.tags.toLowerCase().includes("spawn target")) { //could be an object  
           
-          console.log( "tryna hide somethin..." + this.data.targetElements + " length"); 
+          console.log( "tryna swawn target " + this.data.targetElements); 
           if (this.data.targetElements != '') {
             for (let i = 0; i < this.data.targetElements.length; i++) {
               let targetEl = document.getElementById(this.data.targetElements[i].toString());

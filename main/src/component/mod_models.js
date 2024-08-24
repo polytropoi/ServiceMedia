@@ -139,6 +139,9 @@ AFRAME.registerComponent('mod_model', {
           this.hasLocationCallout = true;
           this.hasCallout = true;
         }
+        if (this.data.markerType == "navmesh" || this.data.markerType == "surface") {
+          this.el.classList.remove("activeObjexRay");
+        } 
        
         if (this.data.tags && this.data.tags.includes("follow curve")) {
           this.el.setAttribute("mod_curve", {"origin": "location", "isClosed": true, "spreadFactor": 2})

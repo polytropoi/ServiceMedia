@@ -1,9 +1,16 @@
 <html>
   <head>
     <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+    <script src="/main/src/component/aframe-surface-scatter.js"></script>
+    <script src="/main/src/component/aframe-wavy-shader.js"></script>
   </head>
   <body>
     <a-scene>
+      <a-assets>
+				<a-asset-item id="grass" src="grass.glb"></a-asset-item>
+
+			</a-assets>
+
       <a-box position="-1 0.5 -3" rotation="0 45 0" color="#4CC3D9"></a-box>
       <a-sphere position="0 1.25 -5" radius="1.25" color="#EF2D5E"></a-sphere>
       <a-cylinder
@@ -19,6 +26,11 @@
         height="4"
         color="#7BC8A4"
       ></a-plane>
+
+      <a-sphere radius="0.4" data-radius="0.4" position="0 0.5 -1" opacity="1" animation="dur: 3000; property: object3D.position.x; from: -1; to: 1; loop: true; dir: alternate; easing: easeInOutQuad;" class="pushgrass"></a-sphere>
+			<a-circle radius="12" rotation="-90 0 0" material="shader:flat;color:#30266b;" surface-scatter__tree="object:#tree;count:15;scale:1 1 1;scaleJitter:0.3 0.3 0.3;rotationJitter:1 360 1;uniformJitter:false;" surface-scatter__grass="object:#decoration;count:3200;scale:3 3 3;scaleJitter:1 1 1;uniformJitter:true;"></a-circle>
+			<a-gltf-model id="decoration" wavy-shader=".pushgrass" src="#grass" visible="false"></a-gltf-model>
+      
       <a-sky color="#ECECEC"></a-sky>
     </a-scene>
   </body>

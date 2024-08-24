@@ -711,8 +711,12 @@ webxr_router.get('/:_id', function (req, res) {
                         if (sceneData.sceneTags[i].toLowerCase().includes("instancing")) {
                             // console.log("GOTS SCENE TAG: " + sceneData.sceneTags[i]);
                             // showTransport = true;
-                            meshUtilsScript = "<script type=\x22module\x22 src=\x22../main/src/component/instanced_mesh.js\x22></script><script type=\x22module\x22 src=\x22../main/src/component/mesh-utils.js\x22></script>"; //imports MeshSurfaceScatter
+                            // meshUtilsScript = "<script type=\x22module\x22 src=\x22../main/src/component/instanced_mesh.js\x22></script><script type=\x22module\x22 src=\x22../main/src/component/instanced_mesh.js\x22></script><script type=\x22module\x22 src=\x22../main/src/component/mesh-utils.js\x22></script>"; //imports MeshSurfaceScatter
+                            
+                            meshUtilsScript = "<script type=\x22module\x22 src=\x22../main/src/component/mesh-utils.js\x22></script>"; //imports MeshSurfaceScatter
+
                             instancingEntity = "";
+
                         } 
 
                         // if (sceneData.sceneTags[i].toLowerCase().includes("aabb") || sceneData.sceneTags[i].toLowerCase().includes("collision")) {
@@ -724,13 +728,13 @@ webxr_router.get('/:_id', function (req, res) {
                             
                             // instancingEntity = "<a-entity instanced_meshes_sphere_physics></a-entity>";
                         }
-                        if (sceneData.sceneTags[i] == "pinball") {
+                        // if (sceneData.sceneTags[i] == "pinball") {
                             
-                            // instancingEntity =  "<a-entity id=\x22pinboard\x22 pinboard=\x22physics: ammo; height:20; width: 20\x22 position = \x220 0 -20\x22 rotation = \x2245 0 0\x22>" +
-                            //                     "<a-box id=\x22pin-mesh\x22 color=\x22black\x22 width=\x220.1\x22 depth=\x220.1\x22 height=\x221\x22 instanced-mesh=\x22capacity: 500\x22></a-box></a-entity>" +
-                            instancingEntity = "<a-sphere id=\x22ball-mesh\x22 radius=\x221\x22 color=\x22yellow\x22 instanced-mesh=\x22capacity: 100; updateMode: auto\x22></a-sphere>" +
-                            "<a-entity id=\x22ball-recycler\x22 ball-recycler=\x22physics: ammo; ballCount: 10; width: 30; depth: 15; yKill: -30\x22 position=\x220 20 -25\x22></a-entity>";
-                        } 
+                        //     // instancingEntity =  "<a-entity id=\x22pinboard\x22 pinboard=\x22physics: ammo; height:20; width: 20\x22 position = \x220 0 -20\x22 rotation = \x2245 0 0\x22>" +
+                        //     //                     "<a-box id=\x22pin-mesh\x22 color=\x22black\x22 width=\x220.1\x22 depth=\x220.1\x22 height=\x221\x22 instanced-mesh=\x22capacity: 500\x22></a-box></a-entity>" +
+                        //     instancingEntity = "<a-sphere id=\x22ball-mesh\x22 radius=\x221\x22 color=\x22yellow\x22 instanced-mesh=\x22capacity: 100; updateMode: auto\x22></a-sphere>" +
+                        //     "<a-entity id=\x22ball-recycler\x22 ball-recycler=\x22physics: ammo; ballCount: 10; width: 30; depth: 15; yKill: -30\x22 position=\x220 20 -25\x22></a-entity>";
+                        // } 
 
                         if (sceneData.sceneTags[i] == "show transport") {
                             // console.log("GOTS SCENE TAG: " + sceneData.sceneTags[i]);
@@ -2016,7 +2020,7 @@ webxr_router.get('/:_id', function (req, res) {
                                 // console.log("water: " + JSON.stringify(sceneResponse.sceneWater));
                                 if (sceneResponse.sceneWater.name == "water2") {
                                     // console.log("water: " + JSON.stringify(sceneResponse.sceneWater)); //these use the escaped aframe shaders, not the eval'd non escaped mode
-                                    ocean = "<a-plane position=\x220  "+sceneResponse.sceneWater.level+" 0\x22 width=\x22256\x22 height=\x22256\x22 rotation=\x22-90 180 -90\x22 segments-height=\x22100\x22 segments-width=\x22100\x22 "+skyboxEnvMap+" material=\x22color: "+sceneResponse.sceneColor3+"; shader:makewaves; uMap: #water; repeat: 500 500;\x22></a-plane>";
+                                    ocean = "<a-plane position=\x220  "+sceneResponse.sceneWater.level+" 0\x22 width=\x22300\x22 height=\x22300\x22 rotation=\x22-90 180 -90\x22 segments-height=\x22100\x22 segments-width=\x22100\x22 "+skyboxEnvMap+" material=\x22color: "+sceneResponse.sceneColor3+"; shader:makewaves; uMap: #water; repeat: 500 500;\x22></a-plane>";
                                     imageAssets = imageAssets + "<img id=\x22water\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/pics/water2c.jpeg\x22 crossorigin=\x22anonymous\x22>";
                                 } else if (sceneResponse.sceneWater.name == "water1") {
                                     ocean = "<a-plane position=\x220 "+sceneResponse.sceneWater.level+" 0\x22 width=\x22256\x22 height=\x22256\x22 rotation=\x22-90 180 -90\x22 segments-height=\x2264\x22 segments-width=\x2264\x22 "+skyboxEnvMap+" material=\x22shader:makewaves_small; color: "+sceneResponse.sceneColor4+";uMap: #water2; repeat: 500 500; transparent: true\x22></a-plane>";
@@ -2967,8 +2971,8 @@ webxr_router.get('/:_id', function (req, res) {
                                                     }
                                                     
                                                     // console.log("locMdl is " + JSON.stringify(locMdl));
-                                                    if (locMdl.eventData.toLowerCase().includes("grass")) {
-                                                        instancing = "instanced_surface_meshes=\x22_id: "+locMdl.modelID+"; modelID: "+m_assetID+"; yMod: "+locMdl.y+"; count: 3000; scaleFactor: 6\x22";
+                                                    if (locMdl.eventData.toLowerCase().includes("grass") || (locMdl.tags && locMdl.tags.includes("grass")) ) {
+                                                        instancing = "instanced_surface_meshes=\x22_id: "+locMdl.modelID+"; tags: grass; modelID: "+m_assetID+"; yMod: "+locMdl.y+"; count: 3000; scaleFactor: "+scale+"\x22";
                                                     } else if (locMdl.eventData.toLowerCase().includes("plants")) {
                                                         instancing = "instanced_surface_meshes=\x22_id: "+locMdl.modelID+"; modelID: "+m_assetID+"; yMod: "+locMdl.y+"; count: 500; scaleFactor: 8\x22";
                                                     } else if (locMdl.eventData.toLowerCase().includes("shrooms")) {
@@ -2992,16 +2996,16 @@ webxr_router.get('/:_id', function (req, res) {
                                                                 // instancing = " instanced-mesh=\x22capacity:100; updateMode: 'auto'; positioning: 'world'\x22 "; //scatter everywhere, e.g. in the sky..
                                                                 instancingEntity = instancingEntity + "<a-entity scatter_physics=\x22_id: "+locMdl.modelID+"; count: "+split[1]+"; scaleFactor: "+scale+"; modelID: "+m_assetID+"; "+interaction+" tags: "+locMdl.locationTags+"\x22></a-entity>";
                                                             }
-                                                            if (locMdl.eventData.toLowerCase().includes("instances")) {
-                                                                //TODO use model primatives
-                                                                instancingEntity = instancingEntity + "<a-sphere id=\x22i-mesh-sphere\x22 "+skyboxEnvMap+" radius=\x221\x22 material=\x22roughness: .2; color: blue; opacity: .5; transparent: true;\x22 instanced-mesh=\x22capacity: "+split[1]+"; updateMode: auto\x22></a-sphere>" +
-                                                                "<a-entity instanced_meshes_sphere_physics=\x22_id: "+locMdl.modelID+"; count: "+split[1]+"; modelID: "+m_assetID+"; "+interaction+" tags: "+locMdl.locationTags+"\x22></a-entity>";
-                                                            }
-                                                            if (locMdl.eventData.toLowerCase().includes("atomic")) {
-                                                                //TODO use model primatives
-                                                                instancingEntity = instancingEntity + "<a-sphere id=\x22i-mesh-sphere\x22 "+skyboxEnvMap+" radius=\x221\x22 material=\x22roughness: .2; color: blue; opacity: .5; transparent: true;\x22 instanced-mesh=\x22capacity: "+split[1]+"; updateMode: auto\x22></a-sphere>" +
-                                                                "<a-entity instanced_meshes_sphere_physics=\x22_id: "+locMdl.modelID+"; count: "+split[1]+"; modelID: "+m_assetID+"; "+interaction+" tags: "+locMdl.locationTags+"\x22></a-entity>";
-                                                            }
+                                                            // if (locMdl.eventData.toLowerCase().includes("instances")) {
+                                                            //     //TODO use model primatives
+                                                            //     instancingEntity = instancingEntity + "<a-sphere id=\x22i-mesh-sphere\x22 "+skyboxEnvMap+" radius=\x221\x22 material=\x22roughness: .2; color: blue; opacity: .5; transparent: true;\x22 instanced-mesh=\x22capacity: "+split[1]+"; updateMode: auto\x22></a-sphere>" +
+                                                            //     "<a-entity instanced_meshes_sphere_physics=\x22_id: "+locMdl.modelID+"; count: "+split[1]+"; modelID: "+m_assetID+"; "+interaction+" tags: "+locMdl.locationTags+"\x22></a-entity>";
+                                                            // }
+                                                            // if (locMdl.eventData.toLowerCase().includes("atomic")) {
+                                                            //     //TODO use model primatives
+                                                            //     instancingEntity = instancingEntity + "<a-sphere id=\x22i-mesh-sphere\x22 "+skyboxEnvMap+" radius=\x221\x22 material=\x22roughness: .2; color: blue; opacity: .5; transparent: true;\x22 instanced-mesh=\x22capacity: "+split[1]+"; updateMode: auto\x22></a-sphere>" +
+                                                            //     "<a-entity instanced_meshes_sphere_physics=\x22_id: "+locMdl.modelID+"; count: "+split[1]+"; modelID: "+m_assetID+"; "+interaction+" tags: "+locMdl.locationTags+"\x22></a-entity>";
+                                                            // }
                                                         }
                                                     }
                                                     let modelString = "gltf-model=\x22#" + m_assetID + "\x22";
@@ -5086,7 +5090,8 @@ webxr_router.get('/:_id', function (req, res) {
                         // "<script src=\x22../main/vendor/trackedlibs/aabb-collider.js\x22></script>"+
 
                         // "<script src=\x22../main/src/component/three-mesh-ui.min.js\x22></script>"+
-                        "<script src=\x22../main/src/component/aframe-makewaves-shader.js\x22></script>"+
+                        "<script src=\x22../main/src/shaders/aframe/aframe-makewaves-shader.js\x22></script>"+
+                        "<script src=\x22/main/src/shaders/aframe/aframe-wavy-shader.js\x22></script>"+
                         "<script src=\x22../main/src/shaders/noise.js\x22></script>"+
 
                         // "<script src=\x22../main/vendor/aframe/aframe-particle-system-component.min.js\x22></script>"+
