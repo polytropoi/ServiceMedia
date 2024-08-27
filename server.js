@@ -13354,7 +13354,7 @@ app.get('/uscene/:user_id/:scene_id',  requiredAuthentication, uscene, function 
                 if (sceneResponse.sceneModels != null) {
                     async.each (sceneResponse.sceneModels, function (objID, callbackz) { 
                         var oo_id = ObjectID(objID);
-                        console.log("7798 tryna get sceneModels: " + objID);
+                        // console.log("7798 tryna get sceneModels: " + objID);
                         db.models.findOne({"_id": oo_id}, function (err, model) {
                             if (err || !model) {
                                 console.log("error getting model: " + err);
@@ -13367,7 +13367,7 @@ app.get('/uscene/:user_id/:scene_id',  requiredAuthentication, uscene, function 
                                 // console.log("got user models:" + JSON.stringify(models));
                                 let url = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + model.userID + "/gltf/" + model.filename, Expires: 6000});
                                 model.url = url;
-                                console.log("scene update route pushing to sceneModelz " + model._id);
+                                // console.log("scene update route pushing to sceneModelz " + model._id);
                                 modelz.push(model);
                                 callbackz();
                             }

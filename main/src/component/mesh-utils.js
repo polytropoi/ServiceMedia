@@ -3868,7 +3868,7 @@ AFRAME.registerComponent('load_threesvg', {
               // document.getElementById('modelScale').value = this.scale.x.toFixed(2);
               
               if (this.el.components.local_marker) {
-                this.el.components.local_marker.loadModel();
+                // this.el.components.local_marker.loadModel();
                 // this.el.setAttribute("position", {x: this.position.x, y: this.position.y, z: this.position.z});
 
               } else if (this.el.components.cloud_marker) {

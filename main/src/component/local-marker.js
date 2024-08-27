@@ -1393,7 +1393,7 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
 
         // let scale = parseFloat(this.data.scale);
         
-        console.log("localmarker with scale + " + this.data.xscale +" "+ this.data.yscale +" "+ this.data.zscale + " rot " + this.data.xrot + this.data.yrot + this.data.zrot);
+        console.log("localmarker with scale + " + this.data.xscale +" "+ this.data.yscale +" "+ this.data.zscale + " rot " + this.data.xrot + this.data.yrot + this.data.zrot + " pos " + this.data.xpos + this.data.ypos + this.data.zpos);
         // if (this.data.xscale) {
         //   this.scaleVector.x = this.data.xscale;
         //   this.scaleVector.y = this.data.yscale;
