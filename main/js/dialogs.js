@@ -981,6 +981,7 @@ function ReturnLocationMarkerTypeSelect (selected) {
       "curve point",
       "brownian path",
       "brownian motion",
+      "curve point",
       "follow curve",
       "follow random path",
       "tunnel",

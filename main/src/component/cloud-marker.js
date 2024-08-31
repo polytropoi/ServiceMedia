@@ -92,6 +92,9 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
         console.log("tryna add mod_curve");
         this.el.setAttribute("mod_curve", {"origin": "location", "isClosed": true, "spreadFactor": 2})
       }
+      if (this.data.tags && this.data.tags.toLowerCase().includes("curve point")) {
+        this.el.classList.add("curvepoint");
+      }
   
           console.log("CLOUDMARKER " + this.data.markerType + " " + this.data.modelID );
           // this.el.removeAttribute("geometry");
@@ -897,6 +900,9 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
             this.el.setAttribute("look-at", "#player");
           }
           
+        }
+        if (this.data.tags && this.data.tags.toLowerCase().includes("curve point")) {
+          this.el.classList.add("curvepoint");
         }
        
     },

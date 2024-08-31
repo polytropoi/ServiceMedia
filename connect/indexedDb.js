@@ -68,6 +68,9 @@ function InitIDB() {
                                  cloudEl.classList.add("hasLocalFile");
                                  console.log("cursor hasLocalFile: "+ JSON.stringify(cursor.value.locations[i]));
                            }
+                           if (cursor.value.locations[i].locationTags.includes("curve point")) {
+                              cloudEl.classList.add("curvepoint");
+                           }
                            cloudMarkerComponent.updateAndLoad(cursor.value.locations[i].name, 
                                                             cursor.value.locations[i].description, 
                                                             cursor.value.locations[i].locationTags, 
@@ -154,6 +157,9 @@ function InitIDB() {
                                                                targetElements: cursor.value.locations[i].targetElements
                                                             });
                         localEl.id = cursor.value.locations[i].timestamp.toString(); //for lookups
+                        if (cursor.value.locations[i].locationTags.includes("curve point")) {
+                           localEl.classList.add("curvepoint");
+                        }
                         }
                      }
                      locationTimestamps.push(cursor.value.locations[i].timestamp); //hrm, for ref
@@ -263,6 +269,7 @@ function InitIDB() {
             }
          }
          InitLocalColors();
+         InitCurves();
          lastLocalUpdate = localData.lastUpdate;
          // console.log("COPIED LOCALDATA locations length " + localData.locations.length + " " + JSON.stringify(localData) + " last cloud update " +  lastCloudUpdate + " vs last local update " + lastLocalUpdate);
          if (lastCloudUpdate && lastLocalUpdate) {

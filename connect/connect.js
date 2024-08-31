@@ -309,7 +309,9 @@ $(function() {
          // envEl.components.enviro_mods.loadPreset("moon");
       }
    }
+   // if (settings.sceneCameraMode && settings.sceneCameraMode == "Follow Path" || settings.sceneTags && settings.sceneTags.includes("curve")) {
 
+   // }
    // this.asky = document.getElementsByTagName('a-sky')[0];
    // if (this.asky && settings) {
    //   console.log("tryna mod asky radius " + settings.sceneSkyRadius);
@@ -374,8 +376,6 @@ $(function() {
            }  
          }
       }
-      
-      
     });
     document.body.addEventListener("obbcollisionended", function (e) {
       // console.log("collision end " + e.detail.withEl.id); 
@@ -2610,6 +2610,25 @@ function UpdateContentBox() { //nm for now
    // }
 }
 
+function InitCurves() {
+   let curvePointEls = document.querySelectorAll(".curvepoint");
+   if (curvePointEls.length) {
+      let curvePoints = [];
+      for (let i = 0; i < curvePointEls.length; i++) {
+         curvePoints.push(curvePointEls[i].getAttribute('position'));
+      }
+      console.log("gots curvepoints " + JSON.stringify(curvePoints));
+      let curveEl = document.createElement("a-entity");
+      var scene = document.querySelector('a-scene');
+      scene.appendChild(curveEl);
+      curveEl.setAttribute("position", "0 0 0");
+      curveEl.setAttribute("mod_curve", {"useCurvePoints": true, "curvePoints": curvePoints});
+
+   } else {
+      console.log("din't find no curvepoints");
+   }
+}
+
 function InitContentBox () {
    console.log("tryna InitContentBox");
    var coll = document.getElementsByClassName("collapsible");
@@ -2785,6 +2804,8 @@ function SetVideoEventsData (type) {
 function SetYoutubeEventsData() {
 
 }
+
+
 
 let timeKeysIndex = 0;
 let listenerInterval = null;
@@ -3019,7 +3040,7 @@ function LoopTimedEvent(keyType, duration, keydata, keytags) {
 
             if (keytags && keytags.length && keytags != "undefined") {
               //otherwise check the tags against classes
-              camLockButton
+            //   camLockButton
                console.log("checking tags for Player Look timedevent " + keytags);
                let theQuery = "." + keytags;
                let taggedEls = document.querySelectorAll(theQuery);  //need to split!

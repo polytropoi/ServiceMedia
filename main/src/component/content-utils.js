@@ -250,6 +250,18 @@ AFRAME.registerComponent('initializer', { //adjust for device settings, and call
       // this.el.addEventListener('obbcollisionstarted	', (evt) => {
       //   console.log("obb player hit : " + evt.target.withEl.id);
       // });
+
+      // let curvePointEls = document.querySelectorAll(".curvepoint");
+      // if (curvePointEls.length) {
+      //    let curvePoints = [];
+      //    for (let i = 0; i < curvePointEls.length; i++) {
+      //       curvePoints.push(curvePointEls.getAttribute(position));
+      //    }
+      //    console.log("gots curvepoints " + JSON.stringify(curvePoints));
+      // } else {
+      //    console.log("din't find no curvepoints");
+      // }
+      InitCurves();
    }); //end loaded
 
 

@@ -2189,7 +2189,65 @@ AFRAME.registerComponent("rotate-with-camera", { //unused
      }
  
  });
- 
+ AFRAME.registerComponent('scroll_control', {
+  schema: {
+        curve: {default: '[curve]'},
+  },
+  init() {
+    console.log("init scroll_control")
+    this.curve = document.querySelector(this.data.curve);
+    document.addEventListener('scroll', (e) => {
+      this.onscroll()
+    })
+  },
+  onscroll() {
+    const newPos = this.curve.components['curve'].curve.getPoint(this._get_scroll_percentage())
+    console.log(this._get_scroll_percentage())
+    this.el.setAttribute('position', newPos);
+  },
+ /**
+   * Get current browser viewpane heigtht
+   */
+  _get_window_height: function() {
+      return window.innerHeight || 
+             document.documentElement.clientHeight ||
+             document.body.clientHeight || 0;
+  },
+
+  /**
+   * Get current absolute window scroll position
+   */
+  _get_window_Yscroll() {
+      return window.pageYOffset || 
+             document.body.scrollTop ||
+             document.documentElement.scrollTop || 0;
+  },
+
+  /**
+   * Get current absolute document height
+   */
+  _get_doc_height() {
+      return Math.max(
+          document.body.scrollHeight || 0, 
+          document.documentElement.scrollHeight || 0,
+          document.body.offsetHeight || 0, 
+          document.documentElement.offsetHeight || 0,
+          document.body.clientHeight || 0, 
+          document.documentElement.clientHeight || 0
+      );
+  },
+
+  /**
+   * Get current vertical scroll percentage
+   */
+  _get_scroll_percentage() {
+      return (
+          (this._get_window_Yscroll() ) / this._get_doc_height()
+          // (this._get_window_Yscroll() + this._get_window_height()) / this._get_doc_height()
+      ) /** 100;*/
+  },
+});
+
  AFRAME.registerComponent('curve', {
  
      //dependencies: ['curve-point'],
@@ -2878,7 +2936,9 @@ AFRAME.registerComponent('mod_curve', {
     spreadFactor: {default: 4},
     distance: {default: -100},
     type: {default: 'model'},
-    origin: {default: 'world zero'}
+    origin: {default: 'world zero'},
+    useCurvePoints: {default: false},
+    curvePoints: {default: []}
   },
 
   init: function () {
@@ -2902,51 +2962,77 @@ AFRAME.registerComponent('mod_curve', {
     this.position = new THREE.Vector3();
     this.viewportHolder = document.getElementById('viewportPlaceholder');
     this.viewportHolder.object3D.getWorldPosition( this.viewportLocation );
-    this.el.object3D.getWorldPosition( this.position );
+    this.objectOnCurve = this.el.object3D;
+    if (settings && settings.sceneCameraMode == "Follow Path" && this.data.useCurvePoints) {
+      this.objectOnCurve = document.getElementById("player").object3D;
+      
+    }
+    // this.el.object3D.getWorldPosition( this.position );
+    this.objectOnCurve.getWorldPosition( this.position );
     // this.position = this.el.getAttribute("position");
-
-    for (var i = 0; i < 5; i += 1) {
-      if (this.data.origin == 'world zero') {
-        this.points.push(new THREE.Vector3(0, 0, this.data.distance * (i / 4)));
-      } else if (this.data.origin == 'viewport') {
-        this.points.push(new THREE.Vector3(this.viewportLocation * (i / 4)));
-      } else if (this.data.origin == 'random') {
-        let x = ( Math.random() - 0.5 ) * 30;
-        let y = ( Math.random() - 0.5 ) * 5;
-        let z = ( Math.random() - 0.5 ) * 30;
-        this.points.push(new THREE.Vector3(x, y, z));
-        if (i == 4) {
-          this.points.push(this.points[0]);
-        }
-      } else if (this.data.origin == 'location') {
-        // this.data.orientToCurve = true;
-        if (i == 0) {
-          this.points.push(this.position);
-        } else {
-          let x = this.position.x + (this.data.spreadFactor * Math.random());
-          let y = this.position.y + (this.data.spreadFactor/4 * Math.random());
-          let z = this.position.z + (this.data.spreadFactor * Math.random());
+    if (!this.data.useCurvePoints) {
+      for (var i = 0; i < 5; i += 1) {
+        if (this.data.origin == 'world zero') {
+          this.points.push(new THREE.Vector3(0, 0, this.data.distance * (i / 4)));
+        } else if (this.data.origin == 'viewport') {
+          this.points.push(new THREE.Vector3(this.viewportLocation * (i / 4)));
+        } else if (this.data.origin == 'random') {
+          let x = ( Math.random() - 0.5 ) * 30;
+          let y = ( Math.random() - 0.5 ) * 5;
+          let z = ( Math.random() - 0.5 ) * 30;
           this.points.push(new THREE.Vector3(x, y, z));
-          // if (i == 3) {
-          //   this.points.push(this.points[0]);
-          // }
+          if (i == 4) {
+            this.points.push(this.points[0]);
+          }
+        } else if (this.data.origin == 'location') {
+          // this.data.orientToCurve = true;
+          if (i == 0) {
+            this.points.push(this.position);
+          } else {
+            let x = this.position.x + (this.data.spreadFactor * Math.random());
+            let y = this.position.y + (this.data.spreadFactor/4 * Math.random());
+            let z = this.position.z + (this.data.spreadFactor * Math.random());
+            this.points.push(new THREE.Vector3(x, y, z));
+            // if (i == 3) { 
+            //   this.points.push(this.points[0]);
+            // }
+          }
         }
       }
+    } if (this.data.curvePoints.length) {
+      // this.el.setAttribute("position", "0 0 0");
+      // this.points = this.data.curvePoints;
+      for (let i = 0; i < this.data.curvePoints.length; i++) {
+        let x = parseFloat(this.data.curvePoints[i].x);
+        let y = parseFloat(this.data.curvePoints[i].y);
+        let z = parseFloat(this.data.curvePoints[i].z);
+        this.points.push(new THREE.Vector3(x,y,z));
+      }
+    } else {
+      console.log("mod_curve gots no curvepoints");
     }
 
-    console.log("curve points " + JSON.stringify(this.points));
-    this.curve = new THREE.CatmullRomCurve3(this.points);
-    if (this.data.isClosed) {
-      this.curve.closed = true;
-    }
-    this.c_points = this.curve.getPoints( 50 );
-    this.c_geometry = new THREE.BufferGeometry().setFromPoints( this.c_points );
-    this.c_material = new THREE.LineBasicMaterial( { color: 0x4287f5 } );
-    this.curveLine = new THREE.Line( this.c_geometry, this.c_material ); //this one stays a curve
+    if (this.points) {
+      console.log("curve points " + JSON.stringify(this.points));
+      this.curve = new THREE.CatmullRomCurve3(this.points);
+      if (this.data.isClosed) {
+        this.curve.closed = true;
+      }
+      this.c_points = this.curve.getPoints( 50 );
 
-    setTimeout( () => {
-      this.isReady = true;
-    }, 10000 * Math.random() );
+      this.c_geometry = new THREE.BufferGeometry().setFromPoints( this.c_points );
+      this.c_material = new THREE.LineBasicMaterial( { color: 0x4287f5 } );
+      this.curveLine = new THREE.Line( this.c_geometry, this.c_material ); //this one stays a curve
+
+
+      this.el.sceneEl.object3D.add(this.curveLine);
+      setTimeout( () => {
+        this.isReady = true;
+        // if (this.data.useCurvePoints) {
+        //   this.el.object3D.add(this.curveLine);
+        // }
+      }, 2000 * Math.random() );
+    }
   },
   updateCurve: function() {
 
@@ -2959,8 +3045,10 @@ AFRAME.registerComponent('mod_curve', {
       this.curve.points[1].y =-Math.ceil(Math.random() * this.data.spreadFactor) * (Math.round(Math.random()) ? 1 : -1);
       this.curve.points[2].x =Math.ceil(Math.random() * this.data.spreadFactor) * (Math.round(Math.random()) ? 1 : -1);
       this.curve.points[2].y =Math.ceil(Math.random() * this.data.spreadFactor) * (Math.round(Math.random()) ? 1 : -1);
-      this.curve.points[3].x =-Math.ceil(Math.random() * this.data.spreadFactor) * (Math.round(Math.random()) ? 1 : -1);
-      this.curve.points[3].y =-Math.ceil(Math.random() * this.data.spreadFactor) * (Math.round(Math.random()) ? 1 : -1);
+      if (this.curve.points.length > 3) {
+        this.curve.points[3].x =-Math.ceil(Math.random() * this.data.spreadFactor) * (Math.round(Math.random()) ? 1 : -1);
+        this.curve.points[3].y =-Math.ceil(Math.random() * this.data.spreadFactor) * (Math.round(Math.random()) ? 1 : -1);
+      }
     }
     this.fraction += 0.001 * this.speedMod;
     if ( this.fraction > 1) {
@@ -2968,17 +3056,21 @@ AFRAME.registerComponent('mod_curve', {
 
       //normal.set( 0, 1, 0 );
     }
-    
-    this.el.object3D.position.copy( this.curve.getPoint( 1 - this.fraction ) ); //or just the fraction to go backwards       
+
+    // this.el.object3D.position.copy( this.curve.getPoint( 1 - this.fraction ) ); //or just the fraction to go backwards       
+    this.objectOnCurve.position.copy( this.curve.getPoint( 1 - this.fraction ) ); //or just the fraction to go backwards       
+
     this.tangent = this.curve.getTangent( this.fraction );
     // this.normal = this.curve.getNormal( this.fraction );
     this.axis.crossVectors( this.normal, this.tangent ).normalize( );
     
       //radians = Math.acos( normal.dot( tangent ) );	
       //char.quaternion.setFromAxisAngle( axis, radians );
-      
+    this.c_points = this.curve.getPoints( 50 );
+    this.c_geometry = new THREE.BufferGeometry().setFromPoints(this.c_points);  
     if (this.data.orientToCurve) {
-      this.el.object3D.quaternion.setFromAxisAngle( this.axis, Math.PI / 2 );
+      // this.el.object3D.quaternion.setFromAxisAngle( this.axis, Math.PI / 2 );
+      this.objectOnCurve.quaternion.setFromAxisAngle( this.axis, Math.PI / 2 );
     }
   },
   reset: function () {
@@ -2996,7 +3088,10 @@ AFRAME.registerComponent('mod_curve', {
     if (this.curve && this.curveLine && this.isReady) {
       // console.log("modding speernd " + this.speed);
       // this.tubeMaterial.map.offset.x += this.speed;
-      this.updateCurve();
+      if (!this.data.useCurvePoints) {
+        this.updateCurve();
+      }
+      
     }  
   }
 
