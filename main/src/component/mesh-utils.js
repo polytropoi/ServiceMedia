@@ -2938,14 +2938,15 @@ AFRAME.registerComponent('mod_curve', {
     type: {default: 'model'},
     origin: {default: 'world zero'},
     useCurvePoints: {default: false},
-    curvePoints: {default: []}
+    curvePoints: {default: []},
+    modCurve: {default: false}
   },
 
   init: function () {
 
     this.loaded = false;
 
-    console.log("tryna make a mod_curve");
+    // console.log("tryna make a mod_curve");
 
     this.newPosition = null;
     this.tangent = null;
@@ -2962,13 +2963,24 @@ AFRAME.registerComponent('mod_curve', {
     this.position = new THREE.Vector3();
     this.viewportHolder = document.getElementById('viewportPlaceholder');
     this.viewportHolder.object3D.getWorldPosition( this.viewportLocation );
-    this.objectOnCurve = this.el.object3D;
-    if (settings && settings.sceneCameraMode == "Follow Path" && this.data.useCurvePoints) {
-      this.objectOnCurve = document.getElementById("player").object3D;
-      
+    this.objectOnCurve = null;
+    this.showCurveLine = false;
+    if (settings && settings.sceneTags.includes("debug")) {
+      this.showCurveLine = true;
+    }
+    if ((settings && settings.sceneCameraMode == "Follow Path") && this.data.useCurvePoints) {
+      console.log("tryna set mod_curve with useCurvePoints " + this.data.useCurvePoints);
+      const playerEl =  document.getElementById("player");
+      // playerEl.setAttribute("position", this.data.curvePoints[0]);
+     
+      this.objectOnCurve = playerEl.object3D;
+      // this.objectOnCurve.position.copy( this.data.curvePoints[0] );s
+    } else {
+      this.objectOnCurve = this.el.object3D;
+      this.objectOnCurve.getWorldPosition( this.position );
     }
     // this.el.object3D.getWorldPosition( this.position );
-    this.objectOnCurve.getWorldPosition( this.position );
+
     // this.position = this.el.getAttribute("position");
     if (!this.data.useCurvePoints) {
       for (var i = 0; i < 5; i += 1) {
@@ -2999,55 +3011,62 @@ AFRAME.registerComponent('mod_curve', {
           }
         }
       }
-    } if (this.data.curvePoints.length) {
+    } else if (this.data.curvePoints.length) {
       // this.el.setAttribute("position", "0 0 0");
       // this.points = this.data.curvePoints;
+      this.data.curvePoints.sort((a, b) => a.index - b.index);
       for (let i = 0; i < this.data.curvePoints.length; i++) {
-        let x = parseFloat(this.data.curvePoints[i].x);
-        let y = parseFloat(this.data.curvePoints[i].y);
-        let z = parseFloat(this.data.curvePoints[i].z);
+        let x = parseFloat(this.data.curvePoints[i].position.x);
+        let y = parseFloat(this.data.curvePoints[i].position.y);
+        let z = parseFloat(this.data.curvePoints[i].position.z);
         this.points.push(new THREE.Vector3(x,y,z));
       }
+      
+      // this.objectOnCurve.position.copy( this.points[0] );
     } else {
       console.log("mod_curve gots no curvepoints");
     }
 
-    if (this.points) {
+    if (this.points.length) {
       console.log("curve points " + JSON.stringify(this.points));
       this.curve = new THREE.CatmullRomCurve3(this.points);
       if (this.data.isClosed) {
         this.curve.closed = true;
       }
-      this.c_points = this.curve.getPoints( 50 );
-
-      this.c_geometry = new THREE.BufferGeometry().setFromPoints( this.c_points );
-      this.c_material = new THREE.LineBasicMaterial( { color: 0x4287f5 } );
-      this.curveLine = new THREE.Line( this.c_geometry, this.c_material ); //this one stays a curve
 
 
-      this.el.sceneEl.object3D.add(this.curveLine);
+        this.c_points = this.curve.getPoints( 50 );
+        this.c_geometry = new THREE.BufferGeometry().setFromPoints( this.c_points );
+        this.c_material = new THREE.LineBasicMaterial( { color: 0x4287f5 } );
+        this.curveLine = new THREE.Line( this.c_geometry, this.c_material ); //this one stays a curve
+
+        if (this.showCurveLine) {
+        this.el.sceneEl.object3D.add(this.curveLine);
+      }
       setTimeout( () => {
         this.isReady = true;
         // if (this.data.useCurvePoints) {
         //   this.el.object3D.add(this.curveLine);
         // }
-      }, 2000 * Math.random() );
+      }, 4000 * Math.random() );
     }
   },
   updateCurve: function() {
 
-    this.curveLine.geometry.attributes.position.needsUpdate = true;
-    this.speedmod = Math.random() * (2 - .5) + .5;
-    if (this.fraction == 0) {
-      // this.curve.points[0].x =Math.ceil(Math.random() * this.data.spreadFactor) * (Math.round(Math.random()) ? 1 : -1);
-      // this.curve.points[0].y =Math.ceil(Math.random() * this.data.spreadFactor) * (Math.round(Math.random()) ? 1 : -1);
-      this.curve.points[1].x =-Math.ceil(Math.random() * this.data.spreadFactor) * (Math.round(Math.random()) ? 1 : -1);
-      this.curve.points[1].y =-Math.ceil(Math.random() * this.data.spreadFactor) * (Math.round(Math.random()) ? 1 : -1);
-      this.curve.points[2].x =Math.ceil(Math.random() * this.data.spreadFactor) * (Math.round(Math.random()) ? 1 : -1);
-      this.curve.points[2].y =Math.ceil(Math.random() * this.data.spreadFactor) * (Math.round(Math.random()) ? 1 : -1);
-      if (this.curve.points.length > 3) {
-        this.curve.points[3].x =-Math.ceil(Math.random() * this.data.spreadFactor) * (Math.round(Math.random()) ? 1 : -1);
-        this.curve.points[3].y =-Math.ceil(Math.random() * this.data.spreadFactor) * (Math.round(Math.random()) ? 1 : -1);
+    if (!this.data.useCurvePoints) {
+      this.curveLine.geometry.attributes.position.needsUpdate = true;
+      this.speedmod = Math.random() * (2 - .5) + .5;
+      if (this.fraction == 0) {
+        // this.curve.points[0].x =Math.ceil(Math.random() * this.data.spreadFactor) * (Math.round(Math.random()) ? 1 : -1);
+        // this.curve.points[0].y =Math.ceil(Math.random() * this.data.spreadFactor) * (Math.round(Math.random()) ? 1 : -1);
+        this.curve.points[1].x =-Math.ceil(Math.random() * this.data.spreadFactor) * (Math.round(Math.random()) ? 1 : -1);
+        this.curve.points[1].y =-Math.ceil(Math.random() * this.data.spreadFactor) * (Math.round(Math.random()) ? 1 : -1);
+        this.curve.points[2].x =Math.ceil(Math.random() * this.data.spreadFactor) * (Math.round(Math.random()) ? 1 : -1);
+        this.curve.points[2].y =Math.ceil(Math.random() * this.data.spreadFactor) * (Math.round(Math.random()) ? 1 : -1);
+        if (this.curve.points.length > 3) {
+          this.curve.points[3].x =-Math.ceil(Math.random() * this.data.spreadFactor) * (Math.round(Math.random()) ? 1 : -1);
+          this.curve.points[3].y =-Math.ceil(Math.random() * this.data.spreadFactor) * (Math.round(Math.random()) ? 1 : -1);
+        }
       }
     }
     this.fraction += 0.001 * this.speedMod;
@@ -3064,10 +3083,10 @@ AFRAME.registerComponent('mod_curve', {
     // this.normal = this.curve.getNormal( this.fraction );
     this.axis.crossVectors( this.normal, this.tangent ).normalize( );
     
-      //radians = Math.acos( normal.dot( tangent ) );	
+      //radians = Math.acos( normal.dot( tangent ) ); 
       //char.quaternion.setFromAxisAngle( axis, radians );
-    this.c_points = this.curve.getPoints( 50 );
-    this.c_geometry = new THREE.BufferGeometry().setFromPoints(this.c_points);  
+    // this.c_points = this.curve.getPoints( 50 );
+    // this.c_geometry = new THREE.BufferGeometry().setFromPoints(this.c_points);  
     if (this.data.orientToCurve) {
       // this.el.object3D.quaternion.setFromAxisAngle( this.axis, Math.PI / 2 );
       this.objectOnCurve.quaternion.setFromAxisAngle( this.axis, Math.PI / 2 );
@@ -3088,9 +3107,9 @@ AFRAME.registerComponent('mod_curve', {
     if (this.curve && this.curveLine && this.isReady) {
       // console.log("modding speernd " + this.speed);
       // this.tubeMaterial.map.offset.x += this.speed;
-      if (!this.data.useCurvePoints) {
+      // if (!this.data.useCurvePoints) {
         this.updateCurve();
-      }
+      // }
       
     }  
   }

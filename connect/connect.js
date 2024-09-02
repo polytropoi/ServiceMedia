@@ -2614,15 +2614,46 @@ function InitCurves() {
    let curvePointEls = document.querySelectorAll(".curvepoint");
    if (curvePointEls.length) {
       let curvePoints = [];
+
       for (let i = 0; i < curvePointEls.length; i++) {
-         curvePoints.push(curvePointEls[i].getAttribute('position'));
+         let curvePointWithIndex = {};
+         curvePointWithIndex.position = curvePointEls[i].getAttribute('position');
+         let cloudMarkerComponent = curvePointEls[i].components.cloud_marker; //check for indexes at location.desc
+         if (cloudMarkerComponent) {
+           
+            if (parseInt(cloudMarkerComponent.data.description)) {
+               console.log("curvepoint index is " + parseInt(cloudMarkerComponent.data.description));
+               curvePointWithIndex.index = parseInt(cloudMarkerComponent.data.description);
+               curvePoints.push(curvePointWithIndex);
+            } else {
+               console.log(" curvepoint index is " + i);
+               curvePointWithIndex.index = i; //todo get from component
+               curvePoints.push(curvePointWithIndex);
+            }
+         } else {
+            let localMarkerComponent = curvePointEls[i].components.local_marker;
+            if (parseInt(localMarkerComponent.description)) {
+               console.log("local curvepoint index is " + parseInt(localMarkerComponent.data.description));
+               curvePointWithIndex.index = parseInt(localMarkerComponent.data.description);
+               curvePoints.push(curvePointWithIndex);
+            } else {
+               console.log("local curvepoint index is " + i);
+               curvePointWithIndex.index = i; //todo get from component
+               curvePoints.push(curvePointWithIndex);
+            }
+         }
+         
+         if (i == curvePointEls.length - 1) {
+            console.log("gots curvepoints " + JSON.stringify(curvePoints));
+            let curveEl = document.createElement("a-entity");
+            var scene = document.querySelector('a-scene');
+            scene.appendChild(curveEl);
+            curveEl.setAttribute("position", "0 0 0");
+            curveEl.setAttribute("mod_curve", {"useCurvePoints": true, "curvePoints": curvePoints});
+         }
+
       }
-      console.log("gots curvepoints " + JSON.stringify(curvePoints));
-      let curveEl = document.createElement("a-entity");
-      var scene = document.querySelector('a-scene');
-      scene.appendChild(curveEl);
-      curveEl.setAttribute("position", "0 0 0");
-      curveEl.setAttribute("mod_curve", {"useCurvePoints": true, "curvePoints": curvePoints});
+     
 
    } else {
       console.log("din't find no curvepoints");
