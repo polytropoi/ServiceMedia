@@ -2965,15 +2965,21 @@ AFRAME.registerComponent('mod_curve', {
     this.viewportHolder.object3D.getWorldPosition( this.viewportLocation );
     this.objectOnCurve = null;
     this.showCurveLine = false;
+    this.modCurve = false;
+    this.followCurve = false;
     if (settings && settings.sceneTags.includes("debug")) {
       this.showCurveLine = true;
     }
     if ((settings && settings.sceneCameraMode == "Follow Path") && this.data.useCurvePoints) {
-      console.log("tryna set mod_curve with useCurvePoints " + this.data.useCurvePoints);
+      console.log("tryna set mod_curve with useCurvePoints " + this.data.useCurvePoints + " speed " + settings.playerSpeed);
       const playerEl =  document.getElementById("player");
+      if (settings.playerSpeed) {
+        this.speedMod = settings.playerSpeed;
+      }
       // playerEl.setAttribute("position", this.data.curvePoints[0]);
      
       this.objectOnCurve = playerEl.object3D;
+      this.followCurve = true;
       // this.objectOnCurve.position.copy( this.data.curvePoints[0] );s
     } else {
       this.objectOnCurve = this.el.object3D;
@@ -3045,9 +3051,7 @@ AFRAME.registerComponent('mod_curve', {
       }
       setTimeout( () => {
         this.isReady = true;
-        // if (this.data.useCurvePoints) {
-        //   this.el.object3D.add(this.curveLine);
-        // }
+       
       }, 4000 * Math.random() );
     }
   },
@@ -3055,7 +3059,7 @@ AFRAME.registerComponent('mod_curve', {
 
     if (!this.data.useCurvePoints) {
       this.curveLine.geometry.attributes.position.needsUpdate = true;
-      this.speedmod = Math.random() * (2 - .5) + .5;
+      // this.speedmod = Math.random() * (2 - .5) + .5;
       if (this.fraction == 0) {
         // this.curve.points[0].x =Math.ceil(Math.random() * this.data.spreadFactor) * (Math.round(Math.random()) ? 1 : -1);
         // this.curve.points[0].y =Math.ceil(Math.random() * this.data.spreadFactor) * (Math.round(Math.random()) ? 1 : -1);
@@ -3075,7 +3079,7 @@ AFRAME.registerComponent('mod_curve', {
 
       //normal.set( 0, 1, 0 );
     }
-
+    // console.log(this.el.id + " " + this.fraction);
     // this.el.object3D.position.copy( this.curve.getPoint( 1 - this.fraction ) ); //or just the fraction to go backwards       
     this.objectOnCurve.position.copy( this.curve.getPoint( 1 - this.fraction ) ); //or just the fraction to go backwards       
 
@@ -3252,7 +3256,7 @@ AFRAME.registerComponent('mod_tunnel', {
         if (this.data.scrollDirection == 'y') {
           this.tubeMaterial.map.offset.y += this.speed;
         }
-        // this.updateCurve();
+
       }
     }
 });
@@ -3355,7 +3359,7 @@ AFRAME.registerComponent('mod_line', {
     //   }
     // },
     // from https://github.com/Mamboleoo/InfiniteTubes/blob/master/js/demo6.js
-    updateCurve: function() {
+    updateLine: function() {
       // console.log("tyrha updateCurve");
       // this.splineVerts = this.splineMesh.geometry.attributes.position.array;
       // this.splineVerts_o = this.splineMesh_o.geometry.attributes.position.array;
@@ -3445,7 +3449,7 @@ AFRAME.registerComponent('mod_line', {
       if (this.curveLine && this.data.showLine) {
         // console.log("modding speernd " + this.speed);
         // this.tubeMaterial.map.offset.x += this.speed;
-        this.updateCurve();
+        this.updateLine();
       }
     }
 });

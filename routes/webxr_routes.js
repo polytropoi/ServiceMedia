@@ -1092,6 +1092,7 @@ webxr_router.get('/:_id', function (req, res) {
                                         || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "dataviz" 
                                         || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "picture"  
                                         || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "picture group"  
+                                        || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "curve point"  
                                         || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "mailbox") {
                                     //    locationPlaceholders.push(sceneResponse.sceneLocations[i].x + " " + sceneResponse.sceneLocations[i].y + " " + zFix);
                                         let tLoc = sceneResponse.sceneLocations[i];
@@ -4242,7 +4243,7 @@ webxr_router.get('/:_id', function (req, res) {
                                 s3.headObject(params, function(err, data) { //some old skyboxen aren't saved with .original. in filename, check for that
                                     
                                     if (err) {
-                                        console.log("din't find skybox: " + err, err.stack);
+                                        // console.log("din't find skybox: " + err);
                                         theKey = 'users/' + picture_item.userID + '/pictures/originals/' + picture_item.filename;
                                     }
                                
@@ -4336,6 +4337,8 @@ webxr_router.get('/:_id', function (req, res) {
                     settings.networking = sceneResponse.sceneNetworking;
                     settings.playerStartPosition = playerPosition;
                     settings.playerPositions = playerPositions;
+                    settings.playerSpeed = sceneResponse.scenePlayer.playerSpeed;
+                    settings.playerHeight = sceneResponse.scenePlayer.playerHeight;
                     settings.debugMode = debugMode;
                     settings.scatterObjects = sceneResponse.sceneScatterObjects;
                     settings.sceneScatterObjectLayers = sceneResponse.sceneScatterObjectLayers;

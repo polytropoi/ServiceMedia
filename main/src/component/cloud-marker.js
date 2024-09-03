@@ -92,7 +92,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
         console.log("tryna add mod_curve");
         this.el.setAttribute("mod_curve", {"origin": "location", "isClosed": true, "spreadFactor": 2})
       }
-      if (this.data.tags && this.data.tags.toLowerCase().includes("curve point")) {
+      if (this.data.tags && this.data.tags.toLowerCase().includes("curve point") || this.data.markerType == "curve point") {
         this.el.classList.add("curvepoint");
       }
   
@@ -122,6 +122,9 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                 } else if (this.data.markerType.toLowerCase() == "waypoint") {
                   this.el.setAttribute('gltf-model', '#poi1');
                   this.el.classList.add("waypoint");
+                } else if (this.data.markerType.toLowerCase() == "curve point") {
+                  this.el.setAttribute('gltf-model', '#poi1');
+                  // this.el.classList.add("curve point");
                 } else if (this.data.markerType == "trigger" || this.data.markerType == "spawntrigger") { //spawntrigger deprecated
                   this.el.setAttribute('gltf-model', '#poi1');
                   // this.el.setAttribute("geometry", {"primitive": "box", "width": this.data.xscale, "height": this.data.yscale, "depth": this.data.zscale});
@@ -309,8 +312,8 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                    
                 } else if (this.data.markerType.toLowerCase() == "portal") {
                   this.el.setAttribute("obb-collider", {size: this.data.xscale * 1.5 + " " + this.data.yscale * 1.5 + " " + this.data.zscale * 1.5});
-                } else if (this.data.markerType.toLowerCase() == "mailbox") {
-                
+                } else if (this.data.markerType.toLowerCase() == "curve point") {
+                  this.el.setAttribute("material", {color: "blue", transparent: true, opacity: .5});
                 } else if (this.data.markerType.toLowerCase() == "light") {
                     // this.el.setAttribute("material", {color: "yellow", wireframe: true});
                 } else {
@@ -901,7 +904,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
           }
           
         }
-        if (this.data.tags && this.data.tags.toLowerCase().includes("curve point")) {
+        if (this.data.tags && this.data.tags.toLowerCase().includes("curve point") || this.data.markerType == "curve point") {
           this.el.classList.add("curvepoint");
         }
        
@@ -943,8 +946,8 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
           this.el.setAttribute("material", {color: "yellow", wireframe: true, transparent: true, opacity: .5});
         } else if (this.data.markerType.toLowerCase() == "portal") {
             
-        } else if (this.data.markerType.toLowerCase() == "mailbox") {
-        
+        } else if (this.data.markerType.toLowerCase() == "curve point") {
+          this.el.setAttribute("material", {color: "blue", transparent: true, opacity: .5});
         } else {
 
         }
@@ -1320,6 +1323,9 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                 this.el.setAttribute("material", {color: "green", transparent: true, opacity: .5});
                 this.el.classList.add("waypoint");
                 // this.el.setAttribute("color", "purple");
+            } else if (this.data.markerType.toLowerCase() == "curve point") {
+              // this.el.setAttribute("gltf-model", "#poi1");
+              this.el.setAttribute("material", {color: "blue", transparent: true, opacity: .5});
             } else if (this.data.markerType == "trigger") {
               this.el.setAttribute("material", {color: "LightSalmon", transparent: true, opacity: .5});
               this.el.setAttribute("obb-collider");
@@ -1412,6 +1418,9 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                 this.el.setAttribute("gltf-model", "#poi1");
                 this.el.setAttribute("material", {color: "green", transparent: true, opacity: .5});
                 // this.el.setAttribute("color", "purple");
+            } else if (this.data.markerType.toLowerCase() == "curve point") {
+              this.el.setAttribute("gltf-model", "#poi1");
+              this.el.setAttribute("material", {color: "blue", transparent: true, opacity: .5});
             } else if (this.data.markerType.toLowerCase ==  "trigger") {
               // this.el.setAttribute("gltf-model", "#poi1");
               this.el.setAttribute("obb-collider", {size: '1 1 1'});

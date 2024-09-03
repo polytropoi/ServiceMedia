@@ -269,7 +269,7 @@ function InitIDB() {
             }
          }
          InitLocalColors();
-         InitCurves();
+         // InitCurves();
          lastLocalUpdate = localData.lastUpdate;
          // console.log("COPIED LOCALDATA locations length " + localData.locations.length + " " + JSON.stringify(localData) + " last cloud update " +  lastCloudUpdate + " vs last local update " + lastLocalUpdate);
          if (lastCloudUpdate && lastLocalUpdate) {

@@ -2611,6 +2611,7 @@ function UpdateContentBox() { //nm for now
 }
 
 function InitCurves() {
+   console.log("tryna InitCurves()");
    let curvePointEls = document.querySelectorAll(".curvepoint");
    if (curvePointEls.length) {
       let curvePoints = [];
@@ -2621,7 +2622,7 @@ function InitCurves() {
          let cloudMarkerComponent = curvePointEls[i].components.cloud_marker; //check for indexes at location.desc
          if (cloudMarkerComponent) {
            
-            if (parseInt(cloudMarkerComponent.data.description)) {
+            if (parseInt(cloudMarkerComponent.data.description)) {//hrm, use tags or eventData?
                console.log("curvepoint index is " + parseInt(cloudMarkerComponent.data.description));
                curvePointWithIndex.index = parseInt(cloudMarkerComponent.data.description);
                curvePoints.push(curvePointWithIndex);
@@ -2649,7 +2650,7 @@ function InitCurves() {
             var scene = document.querySelector('a-scene');
             scene.appendChild(curveEl);
             curveEl.setAttribute("position", "0 0 0");
-            curveEl.setAttribute("mod_curve", {"useCurvePoints": true, "curvePoints": curvePoints});
+            curveEl.setAttribute("mod_curve", {"useCurvePoints": true, "curvePoints": curvePoints, "isClosed": true});
          }
 
       }

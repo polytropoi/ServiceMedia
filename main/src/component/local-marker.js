@@ -137,7 +137,9 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
             if (this.data.tags && this.data.tags.includes("follow curve")) {
               this.el.setAttribute("mod_curve", {"origin": "location", "isClosed": true, "spreadFactor": 2})
             }
-
+            if (this.data.tags && this.data.tags.toLowerCase().includes("curve point") || this.data.markerType == "curve point") {
+              this.el.classList.add("curvepoint");
+            }
             if ((!this.data.modelID || this.data.modelID == undefined || this.data.modelID == "" || this.data.modelID == "none") && !this.data.modelID.toString().includes("primitive")) {
 
               if (this.data.markerType.toLowerCase() == "player") {
@@ -156,6 +158,9 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
               } else if (this.data.markerType.toLowerCase() == "waypoint") {
                 this.el.setAttribute('gltf-model', '#poi1');
                 this.el.classList.add("waypoint");
+              } else if (this.data.markerType.toLowerCase() == "curve point") {
+                this.el.setAttribute("gltf-model", "#poi1");
+                this.el.setAttribute("material", {color: "blue", transparent: true, opacity: .5});
               } else if (this.data.markerType.toLowerCase().includes("trigger")) {
                 // this.el.setAttribute('gltf-model', '#poi1');  
                 this.el.setAttribute("geometry", {"primitive": "box", "width": 1, "height": 1, "depth": 1});
@@ -329,8 +334,8 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
                         } else if (this.data.markerType == "portal") {
                           this.el.setAttribute("material", {color: "aqua", transparent: true, opacity: .5});
                           this.el.setAttribute("obb-collider", {size: this.data.xscale * 1.5 + " " + this.data.yscale * 1.5 + " " + this.data.zscale * 1.5});
-                        } else if (this.data.markerType == "mailbox") {
-                        
+                        }  else if (this.data.markerType.toLowerCase() == "curve point") {
+                          this.el.setAttribute("material", {color: "blue", transparent: true, opacity: .5});
                         } else {
     
                         }
@@ -817,8 +822,8 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
               this.el.setAttribute("material", {color: "orange", transparent: true, opacity: .5});
           } else if (this.data.markerType.toLowerCase() == "portal") {
             this.el.setAttribute("material", {color: "aqua", transparent: true, opacity: .5});
-          } else if (this.data.markerType.toLowerCase() == "mailbox") {
-          
+          } else if (this.data.markerType.toLowerCase() == "curve point") {
+            this.el.setAttribute("material", {color: "blue", transparent: true, opacity: .5});
           } else {
 
           }
@@ -1162,6 +1167,9 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
                   this.el.setAttribute("material", {color: "green", transparent: true, opacity: .5});
                   this.el.classList.add("waypoint");
                   // this.el.setAttribute("color", "purple");
+              } else if (this.data.markerType.toLowerCase() == "curve point") {
+                // this.el.setAttribute("gltf-model", "#poi1");
+                this.el.setAttribute("material", {color: "blue", transparent: true, opacity: .5});
               } else if (this.data.markerType.toLowerCase().includes("trigger")) {
                   this.el.setAttribute("material", {color: "lime", transparent: true, opacity: .5});
                   // this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"placeholder", scaleFactor: this.data.scale});
@@ -1252,6 +1260,9 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
                 this.el.setAttribute("gltf-model", "#poi1");
                 this.el.setAttribute("material", {color: "green", transparent: true, opacity: .5});
                 // this.el.setAttribute("color", "purple");
+            } else if (this.data.markerType.toLowerCase() == "curve point") {
+              this.el.setAttribute("gltf-model", "#poi1");
+              this.el.setAttribute("material", {color: "blue", transparent: true, opacity: .5});
             } else if (this.data.markerType.toLowerCase().includes("trigger")) {
               this.el.setAttribute("geometry", {"primitive": "box", "width": 1, "height": 1, "depth": 1});
                 this.el.setAttribute("material", {color: "lime", transparent: true, opacity: .5});
