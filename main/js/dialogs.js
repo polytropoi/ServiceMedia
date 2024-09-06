@@ -79,12 +79,19 @@ window.addEventListener( 'keydown',  ( event ) => {
       break;
 
     case 32: // Spacebar
-      
+      let curveDriver = document.getElementById("cameraCurve");
+      if (curveDriver) {
+        let modCurveComponent = curveDriver.components.mod_curve;
+        if (modCurveComponent) {
+          modCurveComponent.toggleMove();
+        }
+      }
       break;
 
     case 27: // Esc
       ShowHideDialogPanel();
       allowCameraLock = !allowCameraLock;
+
       break;
     }
   });
@@ -93,6 +100,46 @@ window.addEventListener( 'keydown',  ( event ) => {
     keydown = "*";
     console.log("keyup " + keydown);
   });
+
+  window.addEventListener("wheel", event => {
+    const delta = Math.sign(event.deltaY);
+    console.info(delta);
+    let curveDriver = document.getElementById("cameraCurve");
+        if (curveDriver) {
+          let modCurveComponent = curveDriver.components.mod_curve;
+          if (modCurveComponent) {
+            modCurveComponent.scrollMove(delta);
+          }
+        }
+    
+  
+  });
+
+  // let lastKnownScrollPosition = 0;
+  // let ticking = false;
+
+  // function doSomething(scrollPos) {
+  //   let curveDriver = document.getElementById("cameraCurve");
+  //     if (curveDriver) {
+  //       let modCurveComponent = curveDriver.components.mod_curve;
+  //       if (modCurveComponent) {
+  //         modCurveComponent.scrollMove(2);
+  //       }
+  //     }
+  // }
+
+  // window.addEventListener("scroll", (event) => {
+  //   lastKnownScrollPosition = window.scrollY;
+  //   console.log("scroll event!");
+  //   if (!ticking) {
+  //     window.requestAnimationFrame(() => {
+  //       doSomething(lastKnownScrollPosition);
+  //       ticking = false;
+  //     });
+
+  //     ticking = true;
+  //   }
+  // });
 
   function clearSelection() {
     if (window.getSelection) {

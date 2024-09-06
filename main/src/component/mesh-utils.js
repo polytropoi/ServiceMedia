@@ -2939,7 +2939,9 @@ AFRAME.registerComponent('mod_curve', {
     origin: {default: 'world zero'},
     useCurvePoints: {default: false},
     curvePoints: {default: []},
-    modCurve: {default: false}
+    modCurve: {default: false},
+    lookAtNext: {default: false}
+    // closeLoop: {default: false}
   },
 
   init: function () {
@@ -2967,19 +2969,23 @@ AFRAME.registerComponent('mod_curve', {
     this.showCurveLine = false;
     this.modCurve = false;
     this.followCurve = false;
+    this.currentPoint = 0;
+    // this.lookAtNext = false;
+
     if (settings && settings.sceneTags.includes("debug")) {
       this.showCurveLine = true;
     }
     if ((settings && settings.sceneCameraMode == "Follow Path") && this.data.useCurvePoints) {
-      console.log("tryna set mod_curve with useCurvePoints " + this.data.useCurvePoints + " speed " + settings.playerSpeed);
+      console.log("tryna set mod_curve with useCurvePoints " + this.data.useCurvePoints + " speed " + settings.playerSpeed + " lookat nextg " + this.data.lookAtNext + " isclosed " + this.data.isClosed);
       const playerEl =  document.getElementById("player");
       if (settings.playerSpeed) {
-        this.speedMod = settings.playerSpeed;
+        this.speedMod = settings.playerSpeed / 6;
       }
       // playerEl.setAttribute("position", this.data.curvePoints[0]);
      
       this.objectOnCurve = playerEl.object3D;
       this.followCurve = true;
+      this.el.id = "cameraCurve";
       // this.objectOnCurve.position.copy( this.data.curvePoints[0] );s
     } else {
       this.objectOnCurve = this.el.object3D;
@@ -3049,10 +3055,40 @@ AFRAME.registerComponent('mod_curve', {
         if (this.showCurveLine) {
         this.el.sceneEl.object3D.add(this.curveLine);
       }
-      setTimeout( () => {
-        this.isReady = true;
-       
-      }, 4000 * Math.random() );
+      if (!this.data.useCurvePoints) {
+        setTimeout( () => {
+          this.isReady = true;
+        
+        }, 4000 * Math.random() );
+      }
+    }
+    // this.el.addEventListener( 'keydown',  ( event ) => {
+    //   console.log("keydown code " + event.keyCode);
+    //   if (event.keyCode == 32) {
+    //     this.toggleMove();
+    //   }
+    // });
+  },
+  toggleMove: function() {
+    this.isReady = !this.isReady;
+  },
+  scrollMove: function(scrollMod) {
+    console.log("tryna scrollMove " + scrollMod)
+    this.fraction += scrollMod * .01;
+    if ( this.fraction > 1 || this.fraction < 0) {
+      this.fraction = 0;
+    }
+    if (this.data.useCurvePoints) {
+      this.currentPoint = Math.floor(this.fraction / (1 / this.points.length));
+      // console.log(this.currentPoint);
+      
+      this.objectOnCurve.position.copy( this.curve.getPoint( this.fraction ) ); //follow ascending index of points       
+      if (this.data.lookAtNext) {
+        this.objectOnCurve.lookAt(this.points[this.currentPoint]);
+      }
+      
+    } else {
+      this.objectOnCurve.position.copy( this.curve.getPoint( 1 - this.fraction ) ); //or just the fraction to go backwards       
     }
   },
   updateCurve: function() {
@@ -3074,14 +3110,26 @@ AFRAME.registerComponent('mod_curve', {
       }
     }
     this.fraction += 0.001 * this.speedMod;
-    if ( this.fraction > 1) {
+    if ( this.fraction > 1 || this.fraction < 0) {
       this.fraction = 0;
 
       //normal.set( 0, 1, 0 );
     }
     // console.log(this.el.id + " " + this.fraction);
     // this.el.object3D.position.copy( this.curve.getPoint( 1 - this.fraction ) ); //or just the fraction to go backwards       
-    this.objectOnCurve.position.copy( this.curve.getPoint( 1 - this.fraction ) ); //or just the fraction to go backwards       
+    if (this.data.useCurvePoints) {
+      this.currentPoint = Math.floor(this.fraction / (1 / this.points.length));
+      // console.log(this.currentPoint);
+      
+      this.objectOnCurve.position.copy( this.curve.getPoint( this.fraction ) ); //follow ascending index of points       
+      if (this.data.lookAtNext) {
+        this.objectOnCurve.lookAt(this.points[this.currentPoint]);
+      }
+      
+    } else {
+      this.objectOnCurve.position.copy( this.curve.getPoint( 1 - this.fraction ) ); //or just the fraction to go backwards       
+    }
+   
 
     this.tangent = this.curve.getTangent( this.fraction );
     // this.normal = this.curve.getNormal( this.fraction );
@@ -3094,6 +3142,8 @@ AFRAME.registerComponent('mod_curve', {
     if (this.data.orientToCurve) {
       // this.el.object3D.quaternion.setFromAxisAngle( this.axis, Math.PI / 2 );
       this.objectOnCurve.quaternion.setFromAxisAngle( this.axis, Math.PI / 2 );
+    } else if (this.data.useCurvePoints) {
+
     }
   },
   reset: function () {

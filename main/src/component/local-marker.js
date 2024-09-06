@@ -716,6 +716,27 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
               this.loadMedia();
             // }
           }
+          if (this.data.markerType == "audio") {
+              if (!primaryAudioHowl.playing()) {
+                primaryAudioHowl.play();
+                console.log('...tryna play...');
+                if (moIndex != -1) { //moIndex = "mouthopen"
+                  theEl.setAttribute('animation-mixer', {
+                    "clip": clips[moIndex].name,
+                    "loop": "repeat",
+                    "repetitions": 10,
+                    "timeScale": 2
+                  });
+                  theEl.addEventListener('animation-finished', function () { //clunky but whatever - this is the "recommended way" ?!?
+                    theEl.removeAttribute('animation-mixer');
+                  });
+                }
+              } else {
+                    primaryAudioHowl.pause();
+                    console.log('...tryna pause...');
+              }
+            
+          }
           if (this.data.markerType == "gate" && !this.data.isNew) {
             if (evt.detail.intersection && evt.detail.intersection.distance > 1 && evt.detail.intersection.distance < 15) {
               this.dialogEl = document.getElementById('mod_dialog');
@@ -993,33 +1014,7 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
                 } else if (this.picData.orientation == "Circle" || this.data.tags.toLowerCase().includes("circle")) {
 
                 }
-                  // if (!this.picData.orientation) {
-                  //   if (this.data.tags.toLowerCase().includes("landscape")) {
-                  //     this.picData.orientation = "Landscape";
-                  //   } else if (this.data.tags.toLowerCase().includes("portrait")) {
-                  //     this.picData.orientation = "Portrait";
-                  //   } else if (this.data.tags.toLowerCase().includes("square")) {
-                  //     this.picData.orientation = "Square";
-                  //   } else {
-                  //     this.picData.orientation = "Landscape";
-                  //   }
-                  // }
-                  // console.log("gotsaa picturegroupsdata item" + JSON.stringify(this.picData));
-                  // if (this.picData) { //first get the proper geometry, then call the loadPicture from the model-loaded event above to ensure there's something to paint
-                  //   if (!this.picData.orientation || this.picData.orientation == "Landscape" || this.data.tags.toLowerCase().includes("landscape")) {
-                  //     this.el.setAttribute('gltf-model', '#landscape_panel'); 
-                  //   } else if (this.picData.orientation == "Portrait" || this.data.tags.toLowerCase().includes("portrait")) {
-                  //     this.el.setAttribute('gltf-model', '#portrait_panel');
-                  //   } else if (this.picData.orientation == "Square" || this.data.tags.toLowerCase().includes("square")) {
-                  //     if (this.picData.hasAlphaChannel) {
-                  //       this.el.setAttribute('gltf-model', '#square_panel_plain');
-                  //     } else {
-                  //       this.el.setAttribute('gltf-model', '#square_panel');
-                  //     }
-                  //   } else if (this.picData.orientation == "Circle" || this.data.tags.toLowerCase().includes("circle")) {
-    
-                  //   }
-                  // }
+               
                 } else {
                   console.log("no picturegroupsdata element!");
                 }
@@ -1055,32 +1050,7 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
                 } else if (this.picData.orientation == "Circle" || this.data.tags.toLowerCase().includes("circle")) {
 
                 }
-                  // if (!this.picData.orientation) {
-                  //   if (this.data.tags.toLowerCase().includes("landscape")) {
-                  //     this.picData.orientation = "Landscape";
-                  //   } else if (this.data.tags.toLowerCase().includes("portrait")) {
-                  //     this.picData.orientation = "Portrait";
-                  //   } else if (this.data.tags.toLowerCase().includes("square")) {
-                  //     this.picData.orientation = "Square";
-                  //   } else {
-                  //     this.picData.orientation = "Landscape";
-                  //   }
-                  // }
-                  // if (this.picData) { //first get the proper geometry, then call the loadPicture from the model-loaded event above to ensure there's something to paint
-                  //   if (!this.picData.orientation || this.picData.orientation == "Landscape" || this.data.tags.toLowerCase().includes("landscape")) {
-                  //     this.el.setAttribute('gltf-model', '#landscape_panel'); 
-                  //   } else if (this.picData.orientation == "Portrait" || this.data.tags.toLowerCase().includes("portrait")) {
-                  //     this.el.setAttribute('gltf-model', '#portrait_panel');
-                  //   } else if (this.picData.orientation == "Square" || this.data.tags.toLowerCase().includes("square")) {
-                  //     if (this.picData.hasAlphaChannel) {
-                  //       this.el.setAttribute('gltf-model', '#square_panel_plain');
-                  //     } else {
-                  //       this.el.setAttribute('gltf-model', '#square_panel');
-                  //     }
-                  //   } else if (this.picData.orientation == "Circle" || this.data.tags.toLowerCase().includes("circle")) {
-    
-                  //   }
-                  // }
+
                   console.log("gotsaa scenepicturesdata item " + JSON.stringify(this.picData));
                 }
               }
@@ -1091,7 +1061,7 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
           if (mediaID.includes("local_")) {
             this.el.classList.add("hasLocalFile");
             mediaID = mediaID.substring(6);
-            console.log("CLOUDMARKER SHOUDL HAVE MediaID " + mediaID + " from localFiles " + localData.localFiles[mediaID]);
+            console.log("localmarker SHOUDL HAVE MediaID " + mediaID + " from localFiles " + localData.localFiles[mediaID]);
             for (const key in localData.localFiles) {
               console.log("tryna get localMedia text named " + mediaID + " vs " + localData.localFiles[key].name);
               if (localData.localFiles[key].name == mediaID) {
@@ -1100,7 +1070,27 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
               }
             }
           } else {
-            console.log("text CLOUDMARKER mediaID " + mediaID );
+            console.log("text localmarker mediaID " + mediaID );
+            const sceneTextDataEl = document.getElementById("sceneTextData");
+            if (sceneTextDataEl) {
+              this.textData = sceneTextDataEl.components.scene_text_control.returnTextData(mediaID); //fah, it's already a global...hrm...
+              console.log("textData :  " + JSON.stringify(this.textData));
+
+            }
+          }
+        } else if (this.data.markerType == "audio") {
+          if (mediaID.includes("local_")) {
+            this.el.classList.add("hasLocalFile");
+            mediaID = mediaID.substring(6);
+            console.log("localmarker SHOUDL HAVE MediaID " + mediaID + " from localFiles " + localData.localFiles[mediaID]);
+            for (const key in localData.localFiles) {
+              console.log("tryna get localMedia audio named " + mediaID + " vs " + localData.localFiles[key].name);
+              if (localData.localFiles[key].name == mediaID) {
+             
+              }
+            }
+          } else {
+            console.log("text localmarker mediaID " + mediaID );
             const sceneTextDataEl = document.getElementById("sceneTextData");
             if (sceneTextDataEl) {
               this.textData = sceneTextDataEl.components.scene_text_control.returnTextData(mediaID); //fah, it's already a global...hrm...
@@ -1109,6 +1099,7 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
             }
           }
         }
+        
         this.el.setAttribute("scale", this.data.xscale + " " + this.data.yscale + " " + this.data.zscale);
       // }
     },

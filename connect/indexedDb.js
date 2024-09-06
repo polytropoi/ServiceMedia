@@ -68,7 +68,7 @@ function InitIDB() {
                                  cloudEl.classList.add("hasLocalFile");
                                  console.log("cursor hasLocalFile: "+ JSON.stringify(cursor.value.locations[i]));
                            }
-                           if (cursor.value.locations[i].locationTags.includes("curve point")) {
+                           if (cursor.value.locations[i].locationTags && cursor.value.locations[i].locationTags.includes("curve point")) {
                               cloudEl.classList.add("curvepoint");
                            }
                            cloudMarkerComponent.updateAndLoad(cursor.value.locations[i].name, 

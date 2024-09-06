@@ -53,6 +53,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
       this.font2 = "Acme.woff";
       this.data.scale = this.data.xscale;
       this.picData = null;
+      this.primaryAudioMangler = null;
      
       if (settings && settings.sceneFontWeb1) {
         this.font1 = settings.sceneFontWeb1;
@@ -94,6 +95,12 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
       }
       if (this.data.tags && this.data.tags.toLowerCase().includes("curve point") || this.data.markerType == "curve point") {
         this.el.classList.add("curvepoint");
+      }
+      if (this.data.markerType == "audio" ) {
+        let primaryAudioEl = document.querySelector('#primaryAudio');
+        if (primaryAudioEl != null) {
+          this.primaryAudioMangler = document.getElementById("primaryAudio").components.primary_audio_control;
+        }
       }
   
           console.log("CLOUDMARKER " + this.data.markerType + " " + this.data.modelID );
@@ -146,6 +153,9 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                 } else if (this.data.markerType.toLowerCase() == "link") {
                   this.el.setAttribute("gltf-model", "#links");
                   this.el.setAttribute("material", {color: "aqua", transparent: true, opacity: .5});
+                } else if (this.data.markerType.toLowerCase() == "audio") {
+                  this.el.setAttribute("gltf-model", "#poi");
+                  this.el.setAttribute("material", {color: "pink", transparent: true, opacity: .5});
                 } else if (this.data.markerType.toLowerCase() == "text") {
                   this.el.setAttribute("gltf-model", "#texticon");
                   this.el.setAttribute("material", {color: "black", transparent: true, opacity: .5});
@@ -538,7 +548,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
             this.calloutEntity.setAttribute('visible', true);
             this.calloutEntity.setAttribute('scale', {x: this.distance * .25, y: this.distance * .25, z: this.distance * .25} );
               
-            if (this.data.tags.toLowerCase().includes("description")) {
+            if (this.data.tags && this.data.tags.toLowerCase().includes("description")) {
               if (this.data.description.includes("~")) {
                 let cSplit = this.data.description.split("~");
                 this.calloutText.setAttribute("troika-text", {value: cSplit[(Math.floor(Math.random()*cSplit.length))]}); //or increment index...
@@ -666,6 +676,11 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
             GoToLocation(that.data.timestamp);
           }
 
+          if (this.data.markerType == "audio") {
+            if (primaryAudioMangler != null) {
+              primaryAudioMangler.playPauseToggle();
+            }
+          }
           if (this.data.markerType == "trigger" && this.data.tags.includes("click only")) { //like a "button"
             this.targetMods();
           }
@@ -948,11 +963,13 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
             
         } else if (this.data.markerType.toLowerCase() == "curve point") {
           this.el.setAttribute("material", {color: "blue", transparent: true, opacity: .5});
+        } else if (this.data.markerType.toLowerCase() == "audio") {
+          this.el.setAttribute("material", {color: "blue", transparent: true, opacity: .5});
         } else {
 
         }
       }
-      if (this.data.tags.includes("webcam")) {
+      if (this.data.tags && this.data.tags.includes("webcam")) {
         console.log("tryna set webcam material");;
         this.loadWebcam();
         this.el.setAttribute("material", {src: '#webcam'});
@@ -1294,7 +1311,9 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
             this.el.removeAttribute("gltf-model");
 
 
-            if (!this.data.tags.includes("hide gizmo")) {
+            // if (this.data.tags && this.data.tags.includes("hide gizmo")) {
+            //   this.el.classList.remove("activeObjexRay");
+            // } else {
               if (modelID.toString().includes("cube")) {
                   this.el.setAttribute("geometry", {"primitive": "box", "width": this.data.xscale, "height": this.data.yscale, "depth": this.data.zscale});
                   console.log("CLOUDMARKER PRIMITIVE box " + modelID +" scale " + this.data.xscale * 1.5 + " " + this.data.yscale  * 1.5+ " " + this.data.zscale * 1.5);
@@ -1310,10 +1329,8 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
   
               }
               console.log("loaded cloudmarker primitive geometry " + modelID);
-            } else {
-              this.el.classList.remove("activeObjexRay");
+            // }
 
-            }
             if (this.data.markerType.toLowerCase() == "placeholder") {
                 this.el.setAttribute("material", {color: "yellow", transparent: true, opacity: .5});
             } else if (this.data.markerType.toLowerCase() == "poi") {
@@ -1350,7 +1367,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
 
             }
             
-            if (this.data.tags.includes("hide gizmo") || (settings && settings.hideGizmos)) {
+            if (this.data.tags && this.data.tags.includes("hide gizmo") || (settings && settings.hideGizmos)) {
               if (this.data.markerType != "mailbox" && this.data.markerType != "light") {
                 this.el.object3D.visible = false;
               }
@@ -1365,7 +1382,8 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
               }
             }
             this.el.setAttribute("scale", this.data.xscale + " " + this.data.yscale + " " + this.data.zscale);
-            if (!this.data.tags.includes("no pos")) {
+
+            if (this.data.tags && !this.data.tags.includes("no pos")) {
               this.el.object3D.position.set(this.data.xpos, this.data.ypos, this.data.zpos);
             }
             
@@ -1559,7 +1577,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
         this.updateMaterials();
 
         this.el.setAttribute("scale", this.data.xscale + " " + this.data.yscale + " " + this.data.zscale);
-        if (!this.data.tags.includes("no pos")) { //eg use layout
+        if (this.data.tags && !this.data.tags.includes("no pos")) { //eg use layout
           this.el.object3D.position.set(this.data.xpos, this.data.ypos, this.data.zpos);
         }
         this.el.setAttribute("rotation", this.data.xrot + " " + this.data.yrot + " " +this.data.zrot);

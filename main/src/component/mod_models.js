@@ -1326,7 +1326,7 @@ AFRAME.registerComponent('mod_model', {
                 } else {
                       primaryAudioHowl.pause();
                       console.log('...tryna pause...');
-                  }
+                }
               });        
             }
           } else {

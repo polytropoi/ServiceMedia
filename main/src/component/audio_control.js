@@ -537,7 +537,7 @@ AFRAME.registerComponent('primary_audio_player', {  //setup and controls for the
             var el = this.el;  
             var defaultColor = 'blue';
             this.primaryAudioText = document.querySelector("#primaryAudioText");
-            this.primaryAudioParent = document.querySelector("#primaryAudioParent");
+            this.primaryAudioParent = document.querySelector(".primaryAudioParent");
             this.primaryAudioPlayerObject = document.getElementById("primaryAudioPlayer");
             this.primary_audio_player = this.primaryAudioPlayerObject.components.primary_audio_player;
             this.isPlaying = false;

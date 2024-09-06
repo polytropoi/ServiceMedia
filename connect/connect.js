@@ -98,7 +98,7 @@ $(function() {
    let theSettingsData = settingsEl.getAttribute('data-settings');
 
    settings = JSON.parse(atob(theSettingsData)); //gets copied to localdata ifn mods are 'llowed
-   
+   console.log("Settings : " + JSON.stringify(settings));
    let timedEventsEl = document.getElementById('timedEventsDataElement'); //volume, color, etc...
    if (timedEventsEl) {
       let theTimedEventsData = timedEventsEl.getAttribute('data-timedevents');
@@ -305,7 +305,7 @@ $(function() {
    if (settings.sceneEnvironmentPreset) {
       let envEl = document.getElementById('enviroEl');
       if (envEl) {
-         envEl.setAttribute('enviro_mods', 'preset', settings.sceneEnvironmentPreset);
+         // envEl.setAttribute('enviro_mods', 'preset', settings.sceneEnvironmentPreset);
          // envEl.components.enviro_mods.loadPreset("moon");
       }
    }
@@ -2615,7 +2615,16 @@ function InitCurves() {
    let curvePointEls = document.querySelectorAll(".curvepoint");
    if (curvePointEls.length) {
       let curvePoints = [];
-
+      let lookAtNext = false;
+      if (settings.sceneTags.includes("lookat next")) {
+         lookAtNext = true;
+         console.log("setting lookAtNext to "+ lookAtNext);
+      }
+      let closeLoop = false;
+      if (settings.sceneTags.includes("close loop")) {
+         closeLoop = true;
+         console.log("setting closeLoop to "+ closeLoop);
+      }
       for (let i = 0; i < curvePointEls.length; i++) {
          let curvePointWithIndex = {};
          curvePointWithIndex.position = curvePointEls[i].getAttribute('position');
@@ -2645,12 +2654,13 @@ function InitCurves() {
          }
          
          if (i == curvePointEls.length - 1) {
-            console.log("gots curvepoints " + JSON.stringify(curvePoints));
+            console.log("gots curvepoints " + JSON.stringify(curvePoints) + " with sceneTags " + settings.sceneTags );
             let curveEl = document.createElement("a-entity");
             var scene = document.querySelector('a-scene');
             scene.appendChild(curveEl);
             curveEl.setAttribute("position", "0 0 0");
-            curveEl.setAttribute("mod_curve", {"useCurvePoints": true, "curvePoints": curvePoints, "isClosed": true});
+           
+            curveEl.setAttribute("mod_curve", {"useCurvePoints": true, "curvePoints": curvePoints, "isClosed": closeLoop, "lookAtNext": lookAtNext });
          }
 
       }

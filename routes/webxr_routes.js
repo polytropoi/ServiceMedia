@@ -1091,7 +1091,9 @@ webxr_router.get('/:_id', function (req, res) {
                                         || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "link"  
                                         || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "dataviz" 
                                         || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "picture"  
-                                        || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "picture group"  
+                                        || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "picture group"
+                                        || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "audio"
+                                          
                                         || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "curve point"  
                                         || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "mailbox") {
                                     //    locationPlaceholders.push(sceneResponse.sceneLocations[i].x + " " + sceneResponse.sceneLocations[i].y + " " + zFix);
@@ -1805,7 +1807,7 @@ webxr_router.get('/:_id', function (req, res) {
                                 
                                 
                                 enviromentScript = "<script src=\x22../main/src/component/aframe-environment-component_m3.js\x22></script>";
-                                let ground = "hills";
+                                let ground = "ground: hills;";
                                 let dressing = "";
                                 let skycolor = "";
                                 let groundcolor = "";
@@ -2652,6 +2654,7 @@ webxr_router.get('/:_id', function (req, res) {
                                 && locMdl.markerType != "mailbox"
                                 && locMdl.markerType != "portal" 
                                 && locMdl.markerType != "collider"
+                                && locMdl.markerType != "audio"
                                 && locMdl.markerType != "text") { 
                                 // && JSON.stringify(sceneResponse.sceneModels).includes(locMdl.modelID.toString())) {
 
@@ -3470,7 +3473,7 @@ webxr_router.get('/:_id', function (req, res) {
                         primaryAudioEntity = "<a-entity id=\x22primaryAudioParent\x22 look-at=\x22#player\x22 position=\x22"+audioLocation+"\x22>"+ //parent
                         "<a-entity id=\x22primaryAudioText\x22 geometry=\x22primitive: plane; width: 1; height: .5\x22 position=\x220 .5 2.5\x22 material=\x22color: grey; transparent: true; opacity: 0.0\x22"+
                         "text=\x22value:Click to play;\x22></a-entity>"+
-                        "<a-entity gltf-model=\x22#landscape_panel\x22 scale=\x220.075 0.05 0.05\x22 position=\x220 .5 2.4\x22 material=\x22color: black; transparent: true; opacity: 0.1\x22></a-entity>" +
+                        "<a-entity gltf-model=\x22#landscape_panel\x22 scale=\x22.2 .1 .1\x22 position=\x220 .5 2.4\x22 material=\x22color: black; transparent: true; opacity: 0.1\x22></a-entity>" +
                         "<a-entity id=\x22primaryAudio\x22 mixin=\x22grabmix\x22 class=\x22activeObjexGrab activeObjexRay\x22 entity-callout=\x22calloutString: 'play/pause'\x22 primary_audio_control=\x22oggurl: "+oggurl+"; mp3url: "+mp3url+"; volume: "+scenePrimaryVolume+"; autoplay: "+sceneResponse.sceneAutoplayPrimaryAudio+";"+
                         "title: "+primaryAudioTitle+"\x22  geometry=\x22primitive: sphere; radius: .25;\x22 material=\x22shader: noise;\x22 position=\x220 0 2.6\x22></a-entity></a-entity>";
                         if (sceneResponse.scenePrimaryAudioTriggerEvents) { //maybe pass a do not listen?
