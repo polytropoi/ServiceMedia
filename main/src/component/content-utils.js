@@ -261,7 +261,7 @@ AFRAME.registerComponent('initializer', { //adjust for device settings, and call
       // } else {
       //    console.log("din't find no curvepoints");
       // }
-      InitCurves();
+      // InitCurves();
    }); //end loaded
 
 
@@ -5211,6 +5211,15 @@ AFRAME.registerComponent('scene_greeting_dialog', {  //if "greeting" scenetag + 
             // this.el.parentNode.removeChild(this.el);
             // this.el.parent.remove(this.el);
           }
+          // if (settings && (settings.sceneCameraMode == "Follow Path" || settings.sceneTags.includes("follow path") || settings.sceneTags.includes("follow curve"))) {
+            let curveDriver = document.getElementById("cameraCurve");
+            if (curveDriver) {
+              let modCurveComponent = curveDriver.components.mod_curve;
+              if (modCurveComponent) {
+                modCurveComponent.toggleMove();
+              }
+            }
+          // }
           // console.log("tryna start! playing " + PlayPauseMedia());
           
           // this.startButtonBackgroundEl.setAttribute("visible", false);

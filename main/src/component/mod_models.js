@@ -1361,8 +1361,9 @@ AFRAME.registerComponent('mod_model', {
             // 
 
             this.el.addEventListener('mousedown', (evt) => {
-              console.log("MOD_MODEL mousedown on markertype " + this.data.markerType +  " this.hasCallout " + this.hasCallout + " this.data.description " + this.data.description + " tags " + this.data.tags);
+             
               if (this.timestamp != '' && this.data.allowMods && !this.data.tags.includes("static")) {
+                console.log("MOD_MODEL mousedown on markertype " + this.data.markerType +  " this.hasCallout " + this.hasCallout + " this.data.description " + this.data.description + " tags " + this.data.tags);
                 if (keydown == "T") {
                   ToggleTransformControls(this.timestamp);
                 } else if (keydown == "Shift") {
@@ -1375,9 +1376,10 @@ AFRAME.registerComponent('mod_model', {
             });
             this.el.addEventListener('mouseenter', (evt) =>  {
 
-              console.log("MOD_MODEL mouseovewr model " + this.data.modelName + " " + this.hasLocationCallout + " " + this.data.markerType + " " + this.hasCallout + " " + evt.detail);
+              
             
               if (evt.detail.intersection != null && !this.data.tags.includes("static")) {
+                console.log("MOD_MODEL mouseovewr model " + this.data.modelName + " " + this.hasLocationCallout + " " + this.data.markerType + " " + this.hasCallout + " " + evt.detail);
                 if (textData.length > 0) {
                   this.calloutString = textData[textIndex];
                 } else {

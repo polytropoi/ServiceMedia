@@ -1093,7 +1093,7 @@ webxr_router.get('/:_id', function (req, res) {
                                         || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "picture"  
                                         || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "picture group"
                                         || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "audio"
-                                          
+                                        || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "curve"    
                                         || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "curve point"  
                                         || sceneResponse.sceneLocations[i].markerType.toLowerCase() == "mailbox") {
                                     //    locationPlaceholders.push(sceneResponse.sceneLocations[i].x + " " + sceneResponse.sceneLocations[i].y + " " + zFix);

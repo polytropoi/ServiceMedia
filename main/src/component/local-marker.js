@@ -130,6 +130,9 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
             if (this.data.markerType == "floor") {
               this.data.modelID = "primitive_plane";
             } 
+            if (this.data.markerType == "curve") {
+              this.el.setAttribute("mod_curve", "init");
+            } 
 
             if (this.data.markerType == "object" && this.data.objectID.length > 8) {
               this.loadObject(this.data.objectID); //off in the woods...

@@ -2940,7 +2940,8 @@ AFRAME.registerComponent('mod_curve', {
     useCurvePoints: {default: false},
     curvePoints: {default: []},
     modCurve: {default: false},
-    lookAtNext: {default: false}
+    lookAtNext: {default: false},
+    tweakCurve: {default: false}
     // closeLoop: {default: false}
   },
 
@@ -2975,7 +2976,7 @@ AFRAME.registerComponent('mod_curve', {
     if (settings && settings.sceneTags.includes("debug")) {
       this.showCurveLine = true;
     }
-    if ((settings && settings.sceneCameraMode == "Follow Path") && this.data.useCurvePoints) {
+    if ((settings && (settings.sceneCameraMode == "Follow Path" || settings.sceneTags.includes("follow path") || settings.sceneTags.includes("follow curve"))) && this.data.useCurvePoints) {
       console.log("tryna set mod_curve with useCurvePoints " + this.data.useCurvePoints + " speed " + settings.playerSpeed + " lookat nextg " + this.data.lookAtNext + " isclosed " + this.data.isClosed);
       const playerEl =  document.getElementById("player");
       if (settings.playerSpeed) {
@@ -3070,7 +3071,9 @@ AFRAME.registerComponent('mod_curve', {
     // });
   },
   toggleMove: function() {
+    
     this.isReady = !this.isReady;
+    console.log("tryna toggleMove isReady " + this.isReady);
   },
   scrollMove: function(scrollMod) {
     console.log("tryna scrollMove " + scrollMod)

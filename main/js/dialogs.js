@@ -86,6 +86,7 @@ window.addEventListener( 'keydown',  ( event ) => {
           modCurveComponent.toggleMove();
         }
       }
+      PlayPauseMedia();
       break;
 
     case 27: // Esc
@@ -390,8 +391,15 @@ window.addEventListener( 'keydown',  ( event ) => {
        localData.settings.sceneEnvironmentPreset = e.target.value;
        // envEl.components.enviro_mods.loadPreset("moon");
     }
-  
   });
+  
+  $('#modalContent').on('change', '#sceneTagsField', function(e) { //nothing...?
+    console.log("tryna change sceneTags to  " + e);
+    localData.settings.sceneTags = e.target.value;
+    console.log("tryna change sceneTags to  " + localData.settings.sceneTags);
+       // envEl.components.enviro_mods.loadPreset("moon");
+  });
+
   $('#modalContent').on('change', '#locationModel', function(e) { //value has timestamp ~ modelID //no, just just the modelID, get el id from global
     console.log("model changed " + e.target.value + " for id " + selectedLocationTimestamp);
     // let locSplit = e.target.value.split("~"); 
@@ -978,6 +986,7 @@ function ReturnLocationMarkerTypeSelect (selected) {
       "poi",
       "waypoint",
       "curve point",
+      "curve",
       "trigger",
       "collider",
       "target",
@@ -1398,12 +1407,12 @@ function ShowTimekeysModal() {    //nerp, now in scenemanglermodal
 }
 let isPlaying = false;
 
-document.addEventListener('keyup', event => {
-  if (event.code === 'Space') {
-    console.log('Space pressed');
-    PlayPauseMedia();
-  }
-});
+// document.addEventListener('keyup', event => {
+//   if (event.code === 'Space') {
+//     console.log('Space pressed');
+//     PlayPauseMedia();
+//   }
+// });
 
 function PlayPauseMedia () {
   
@@ -1543,50 +1552,7 @@ function ToggleTimeKeyUIListeners () {
 function ReturnCurrentPlayerLocation() {
   return "<div>Current Location : "+JSON.stringify(window.playerPosition)+"</div>";
 }
-// function ReturnColorButtons () { //nm
 
-
-
-//     if (localData.settings.sceneColor1) {
-//       sceneColor1 = localData.settings.sceneColor1;
-//       sceneColor2 = localData.settings.sceneColor2;
-//       sceneColor3 = localData.settings.sceneColor3;
-//       sceneColor4 = localData.settings.sceneColor4;
-//     } else {
-//       sceneColor1 = settings.sceneColor1;
-//       sceneColor2 = settings.sceneColor2;
-//       sceneColor3 = settings.sceneColor3;
-//       sceneColor4 = settings.sceneColor4;
-//     }
-
-    // return "<hr><div class=\x22row\x22>"+
-    // "<label style=\x22margin: 10px;\x22 for=\x22sceneColor1\x22>Color 1</label>"+
-    // "<input type=\x22color\x22 class=\x22inputColor\x22 id=\x22sceneColor1\x22 name=\x22sceneColor1\x22 value=\x22"+sceneColor1+"\x22>"+
-
-    // "<label style=\x22margin: 10px;\x22 for=\x22sceneColor2\x22>Color 2</label>"+
-    // "<input type=\x22color\x22 class=\x22inputColor\x22 id=\x22sceneColor2\x22 name=\x22sceneColor2\x22 value=\x22"+sceneColor2+"\x22>"+
-    
-    // "<label style=\x22margin: 10px;\x22 for=\x22sceneColor3\x22>Color 3</label>"+
-    // "<input type=\x22color\x22 class=\x22inputColor\x22 id=\x22sceneColor3\x22 name=\x22sceneColor3\x22 value=\x22"+sceneColor3+"\x22>"+
-    
-    // "<label style=\x22margin: 10px;\x22 for=\x22sceneColor4\x22>Color 4</label>"+
-    // "<input type=\x22color\x22 class=\x22inputColor\x22 id=\x22sceneColor4\x22 name=\x22sceneColor4\x22 value=\x22"+sceneColor4+"\x22>"+
-    // "</div><br>";
-    // return "<hr><div class=\x22row\x22>"+
-    // "<label style=\x22margin: 10px;\x22 for=\x22sceneColor1\x22>Color 1</label>"+
-    // "<input class=\x22inputColor\x22 type=\x22color\x22 id=\x22sceneColor1\x22 name=\x22sceneColor1\x22 oninput=\x22ColorMods(event, this.value)\x22 value=\x22"+sceneColor1+"\x22>"+
-
-    // "<label style=\x22margin: 10px;\x22 for=\x22sceneColor2\x22>Color 2</label>"+
-    // "<input class=\x22inputColor\x22 type=\x22color\x22 id=\x22sceneColor2\x22 name=\x22sceneColor2\x22 oninput=\x22ColorMods(event, this.value)\x22 value=\x22"+sceneColor2+"\x22>"+
-    
-    // "<label style=\x22margin: 10px;\x22 for=\x22sceneColor3\x22>Color 3</label>"+
-    // "<input class=\x22inputColor\x22 type=\x22color\x22 id=\x22sceneColor3\x22 name=\x22sceneColor3\x22 oninput=\x22ColorMods(event, this.value)\x22 value=\x22"+sceneColor3+"\x22>"+
-    
-    // "<label style=\x22margin: 10px;\x22 for=\x22sceneColor4\x22>Color 4</label>"+
-    // "<input class=\x22inputColor\x22 type=\x22color\x22 id=\x22sceneColor4\x22 name=\x22sceneColor4\x22 oninput=\x22ColorMods(event, this.value)\x22 value=\x22"+sceneColor4+"\x22>"+
-    // "</div><br>";
-
-// }
 
 
 function InitLocalColors() {
@@ -2112,7 +2078,7 @@ function SceneManglerModal(mode) {
     // "<button class=\x22addButton\x22 id=\x22TimekeysButton\x22 onclick=\x22ShowTimekeysModal()\x22>Edit Timekeys</button>"+
     audioSliders +
     // ReturnColorButtons() +
-    "<hr><div class=\x22row\x22>"+
+    "<hr><div class=\x22row\x22><div class=\x22threecolumn\x22>"+
     "<label style=\x22margin: 10px;\x22 for=\x22sceneColor1\x22>Color 1</label>"+
     "<input type=\x22color\x22 class=\x22inputColor\x22 id=\x22sceneColor1\x22 name=\x22sceneColor1\x22 value=\x22"+sceneColor1+"\x22>"+
 
@@ -2126,50 +2092,25 @@ function SceneManglerModal(mode) {
     "<input type=\x22color\x22 class=\x22inputColor\x22 id=\x22sceneColor4\x22 name=\x22sceneColor4\x22 value=\x22"+sceneColor4+"\x22>"+
 
 
-    "</div><br>"+
-    "<div class=\x22row\x22><div class=\x22threecolumn\x22><label for=\x22sceneEnvironmentPreset\x22>Environment Preset</label>"+
+    "</div>"+
+    // "<div class=\x22row\x22>
+    "<div class=\x22threecolumn\x22 width=\x22100px\x22><label for=\x22sceneEnvironmentPreset\x22>Environment Preset</label>"+
     "<select id=\x22sceneEnvironmentPreset\x22 name=\x22sceneEnvironmentPreset\x22>"+
     ReturnSceneEnviromentPreset(sceneEnvironmentPreset) + 
-    "</select></div></div><br><br><br>"+
+    "</select></div>"+
+
+    "<div class=\x22threecolumn\x22><label for=\x22sceneTagsField\x22>SceneTags</label>"+
+    "<input type=\x22text\x22 id=\x22sceneTagsField\x22 name=\x22sceneTagsField\x22 value=\x22"+settings.sceneTags+"\x22>"+
+
+    "</div></div>"+
+
     "<hr><div class=\x22row\x22>"+
-    // "<button style=\x22float: left;\x22 class=\x22saveButton\x22 id=\x22exportButton\x22 onclick=\x22ExportMods()\x22>Export Mods</button>"+
-    // "<label style=\x22float: left;\x22 for=\x22file-upload\x22 class=\x22custom-file-upload\x22>Import Mods</label>"+
-    // "<input type=\x22file\x22 id=\x22file-upload\x22 accept=\x22.txt\x22 onchange=\x22ImportMods(event)\x22></input>"+
-    // "<button class=\x22deleteButton\x22 id=\x22ClearAllPlaceholdersButton\x22 onclick=\x22ClearPlaceholders()\x22>Clear All Mods</button>" +
+
     "<button class=\x22deleteButton\x22 id=\x22ClearAllPlaceholdersButton\x22 onclick=\x22DeleteLocalSceneData()\x22>Delete Local Scene Data</button>"+
     "<button style=\x22float: right;\x22 class=\x22addButton\x22 onclick=\x22SaveLocalAndClose()\x22>Save Local Scene Data</button>"+
-      // "<div class=\x22twocolumn\x22><label for=\x22addpic\x22>Add Picture Asset</label><button class=\x22addButton\x22 id=\x22AddPicButton\x22 onclick=\x22AddPicture()\x22>Add</button>"+
-      // "<button class=\x22uploadButton\x22 id=\x22UpoadPicButton\x22 onclick=\x22UploadPicture()\x22>Upload</button>"+
-      // "<input class=\x22addfield\x22 type=\x22text\x22 id=\x22addpic\x22 placeholder=\x22picture URL or IPFS\x22></div>"+
 
-      // "<div class=\x22twocolumn\x22><label for=\x22addmodel\x22>Add Model Asset (*.glb)</label><button class=\x22addButton\x22 id=\x22AddModelButton\x22 onclick=\x22AddModel()\x22>Add</button>"+
-      // "<button class=\x22uploadButton\x22 id=\x22UploadModelButton\x22 onclick=\x22UploadModel()\x22>Upload</button>"+
-      // "<input class=\x22addfield\x22 type=\x22text\x22 id=\x22addmodel\x22 placeholder=\x22*.glb model URL or IPFS\x22></div>"+
-      // "<form id=\x22file-form\x22>" +
-        // "<label for=\x22file\x22 style=\x22float: right;\x22 class=\x22\x22>Select a file</label><input class=\x22custom-file-upload\x22 type=\x22file\x22 id=\x22file\x22>" +
-        //     "<div><input type=\x22submit\x22 value=\x22Add to Local DB\x22 class=\x22addButton\x22><input type=\x22button\x22 value=\x22Clear\x22 id=\x22clear-button\x22 class=\x22deleteButton\x22></div>" +
-          // "</form>" +
-      
-      // "</div>"+
-
-      // "<div class=\x22twocolumn\x22><label for=\x22addmodel\x22>Add Primary Audio</label><button class=\x22addButton\x22 id=\x22AddModelButton\x22 onclick=\x22AddModel()\x22>Add</button>"+
-      // "<button class=\x22uploadButton\x22 id=\x22UploadModelButton\x22 onclick=\x22UploadModel()\x22>Upload</button>"+
-      // "<input class=\x22addfield\x22 type=\x22text\x22 id=\x22addmodel\x22 placeholder=\x22audio URL or IPFS\x22></div>"+
-      // // "</div>"+
-      // "<div class=\x22twocolumn\x22><label for=\x22addmodel\x22>Add Asset (*.usdz)</label><button class=\x22addButton\x22 id=\x22AddModelButton\x22 onclick=\x22AddModel()\x22>Add</button>"+
-      // "<button class=\x22uploadButton\x22 id=\x22UploadModelButton\x22 onclick=\x22UploadModel()\x22>Upload</button>"+
-      // "<input class=\x22addfield\x22 type=\x22text\x22 id=\x22addmodel\x22 placeholder=\x22*.usdz URL or IPFS\x22></div>"+
-
-      // "<div class=\x22twocolumn\x22><label for=\x22addmodel\x22>Add Ambient Audio</label><button class=\x22addButton\x22 id=\x22AddModelButton\x22 onclick=\x22AddModel()\x22>Add</button>"+
-      // "<button class=\x22uploadButton\x22 id=\x22UploadModelButton\x22 onclick=\x22UploadModel()\x22>Upload</button>"+
-      // "<input class=\x22addfield\x22 type=\x22text\x22 id=\x22addmodel\x22 placeholder=\x22audio URL or IPFS\x22></div>"+
-
-      // "<div class=\x22twocolumn\x22><label for=\x22addmodel\x22>Add Trigger Audio</label><button class=\x22addButton\x22 id=\x22AddModelButton\x22 onclick=\x22AddModel()\x22>Add</button>"+
-      // "<button class=\x22uploadButton\x22 id=\x22UploadModelButton\x22 onclick=\x22UploadModel()\x22>Upload</button>"+
-      // "<input class=\x22addfield\x22 type=\x22text\x22 id=\x22addmodel\x22 placeholder=\x22audio URL or IPFS\x22></div>"+
-      // "<br>"+
     "</div>"+
-    // "<br><br><br><button class=\x22deleteButton\x22 id=\x22ClearAllPlaceholdersButton\x22 onclick=\x22ClearPlaceholders()\x22>Clear All Mods</button>"+
+
     "</div>"+
 
     
@@ -2293,7 +2234,7 @@ function SceneManglerModal(mode) {
 // }
 function SaveLocalAndClose() {
   SaveLocalData();
-  ShowHideDialogPanel();
+  // ShowHideDialogPanel();
 }
 
 function ToggleStats () {

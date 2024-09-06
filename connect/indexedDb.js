@@ -177,6 +177,11 @@ function InitIDB() {
                         settings.sceneEnvironmentPreset = value;
                         console.log("local enviro: " + settings.sceneEnvironmentPreset);
                      }
+                     if (key == "sceneTags") {
+                        let value = cursor.value.settings[key];
+                        settings.sceneTags = value;
+                        console.log("local sceneTags: " + settings.sceneTags);
+                     }
                      // localSettings[key] = cursor.value.settings[key];
 
                   }
@@ -269,7 +274,7 @@ function InitIDB() {
             }
          }
          InitLocalColors();
-         // InitCurves();
+         InitCurves();
          lastLocalUpdate = localData.lastUpdate;
          // console.log("COPIED LOCALDATA locations length " + localData.locations.length + " " + JSON.stringify(localData) + " last cloud update " +  lastCloudUpdate + " vs last local update " + lastLocalUpdate);
          if (lastCloudUpdate && lastLocalUpdate) {
