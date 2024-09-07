@@ -2611,7 +2611,7 @@ function UpdateContentBox() { //nm for now
 }
 
 function InitCurves() {
-   console.log("tryna InitCurves() " + JSON.stringify(localData.settings.sceneTags));
+   console.log("tryna InitCurves() " + JSON.stringify(settings.sceneTags));
    let curvePointEls = document.querySelectorAll(".curvepoint");
    if (curvePointEls.length) {
       let curvePoints = [];
@@ -2645,7 +2645,7 @@ function InitCurves() {
          }
          
          if (i == curvePointEls.length - 1) {
-            console.log("gots curvepoints " + JSON.stringify(curvePoints) + " with sceneTags " + JSON.stringify(localData.settings.sceneTags) );
+            console.log("gots curvepoints " + JSON.stringify(curvePoints) + " with sceneTags " + JSON.stringify(settings.sceneTags) );
             let curveEl = document.createElement("a-entity");
             var scene = document.querySelector('a-scene');
             scene.appendChild(curveEl);
@@ -2659,7 +2659,7 @@ function InitCurves() {
                console.log("setting lookAtNext to " + lookAt);
             }
             let closeLoop = false;
-            if (localData.settings.sceneTags.includes("close loop") || localData.settings.sceneTags.includes("closed") || localData.settings.sceneTags.includes("close curve") || localData.settings.sceneTags.includes("close path")) {
+            if (settings.sceneTag && (settings.sceneTags.includes("close loop") || settings.sceneTags.includes("closed") || settings.sceneTags.includes("close curve") || settings.sceneTags.includes("close path"))) {
                closeLoop = true;
                console.log("setting closeLoop to "+ closeLoop);
             }
