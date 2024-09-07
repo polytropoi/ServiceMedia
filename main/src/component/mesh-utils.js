@@ -2940,7 +2940,7 @@ AFRAME.registerComponent('mod_curve', {
     useCurvePoints: {default: false},
     curvePoints: {default: []},
     modCurve: {default: false},
-    lookAtNext: {default: false},
+    lookAt: {default: ''},
     tweakCurve: {default: false}
     // closeLoop: {default: false}
   },
@@ -2977,7 +2977,7 @@ AFRAME.registerComponent('mod_curve', {
       this.showCurveLine = true;
     }
     if ((settings && (settings.sceneCameraMode == "Follow Path" || settings.sceneTags.includes("follow path") || settings.sceneTags.includes("follow curve"))) && this.data.useCurvePoints) {
-      console.log("tryna set mod_curve with useCurvePoints " + this.data.useCurvePoints + " speed " + settings.playerSpeed + " lookat nextg " + this.data.lookAtNext + " isclosed " + this.data.isClosed);
+      console.log("tryna set mod_curve with useCurvePoints " + this.data.useCurvePoints + " speed " + settings.playerSpeed + " lookat nextg " + this.data.lookAt + " isclosed " + this.data.isClosed);
       const playerEl =  document.getElementById("player");
       if (settings.playerSpeed) {
         this.speedMod = settings.playerSpeed / 6;
@@ -3086,8 +3086,12 @@ AFRAME.registerComponent('mod_curve', {
       // console.log(this.currentPoint);
       
       this.objectOnCurve.position.copy( this.curve.getPoint( this.fraction ) ); //follow ascending index of points       
-      if (this.data.lookAtNext) {
-        this.objectOnCurve.lookAt(this.points[this.currentPoint]);
+      if (this.data.lookAt != '') {
+        if (this.data.lookAt == 'next') {
+          this.objectOnCurve.lookAt(this.points[this.currentPoint]);
+        } else if (this.data.lookAt == 'ahead') {
+          this.objectOnCurve.lookAt(this.curve.getPoint( this.fraction - .1));
+        }
       }
       
     } else {
@@ -3100,8 +3104,8 @@ AFRAME.registerComponent('mod_curve', {
       this.curveLine.geometry.attributes.position.needsUpdate = true;
       // this.speedmod = Math.random() * (2 - .5) + .5;
       if (this.fraction == 0) {
-        // this.curve.points[0].x =Math.ceil(Math.random() * this.data.spreadFactor) * (Math.round(Math.random()) ? 1 : -1);
-        // this.curve.points[0].y =Math.ceil(Math.random() * this.data.spreadFactor) * (Math.round(Math.random()) ? 1 : -1);
+        this.curve.points[0].x =Math.ceil(Math.random() * this.data.spreadFactor) * (Math.round(Math.random()) ? 1 : -1);
+        this.curve.points[0].y =Math.ceil(Math.random() * this.data.spreadFactor) * (Math.round(Math.random()) ? 1 : -1);
         this.curve.points[1].x =-Math.ceil(Math.random() * this.data.spreadFactor) * (Math.round(Math.random()) ? 1 : -1);
         this.curve.points[1].y =-Math.ceil(Math.random() * this.data.spreadFactor) * (Math.round(Math.random()) ? 1 : -1);
         this.curve.points[2].x =Math.ceil(Math.random() * this.data.spreadFactor) * (Math.round(Math.random()) ? 1 : -1);
@@ -3125,8 +3129,12 @@ AFRAME.registerComponent('mod_curve', {
       // console.log(this.currentPoint);
       
       this.objectOnCurve.position.copy( this.curve.getPoint( this.fraction ) ); //follow ascending index of points       
-      if (this.data.lookAtNext) {
-        this.objectOnCurve.lookAt(this.points[this.currentPoint]);
+      if (this.data.lookAt != '') {
+        if (this.data.lookAt == 'next') {
+          this.objectOnCurve.lookAt(this.points[this.currentPoint]);
+        } else if (this.data.lookAt == 'ahead') {
+          this.objectOnCurve.lookAt(this.curve.getPoint( this.fraction - .1));
+        }
       }
       
     } else {

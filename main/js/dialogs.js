@@ -392,10 +392,17 @@ window.addEventListener( 'keydown',  ( event ) => {
        // envEl.components.enviro_mods.loadPreset("moon");
     }
   });
-  
+  function TrimString(string) {
+    return string.trim();
+  }
   $('#modalContent').on('change', '#sceneTagsField', function(e) { //nothing...?
     console.log("tryna change sceneTags to  " + e);
-    localData.settings.sceneTags = e.target.value;
+    let tags = e.target.value.split(",");
+    // for (let i = 0; i < tags.length; i++) {
+
+    // }
+    tags.map(TrimString);
+    localData.settings.sceneTags = tags;
     console.log("tryna change sceneTags to  " + localData.settings.sceneTags);
        // envEl.components.enviro_mods.loadPreset("moon");
   });

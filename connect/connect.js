@@ -2611,20 +2611,11 @@ function UpdateContentBox() { //nm for now
 }
 
 function InitCurves() {
-   console.log("tryna InitCurves()");
+   console.log("tryna InitCurves() " + JSON.stringify(localData.settings.sceneTags));
    let curvePointEls = document.querySelectorAll(".curvepoint");
    if (curvePointEls.length) {
       let curvePoints = [];
-      let lookAtNext = false;
-      if (settings.sceneTags.includes("lookat next")) {
-         lookAtNext = true;
-         console.log("setting lookAtNext to "+ lookAtNext);
-      }
-      let closeLoop = false;
-      if (settings.sceneTags.includes("close loop")) {
-         closeLoop = true;
-         console.log("setting closeLoop to "+ closeLoop);
-      }
+     
       for (let i = 0; i < curvePointEls.length; i++) {
          let curvePointWithIndex = {};
          curvePointWithIndex.position = curvePointEls[i].getAttribute('position');
@@ -2654,13 +2645,25 @@ function InitCurves() {
          }
          
          if (i == curvePointEls.length - 1) {
-            console.log("gots curvepoints " + JSON.stringify(curvePoints) + " with sceneTags " + settings.sceneTags );
+            console.log("gots curvepoints " + JSON.stringify(curvePoints) + " with sceneTags " + JSON.stringify(localData.settings.sceneTags) );
             let curveEl = document.createElement("a-entity");
             var scene = document.querySelector('a-scene');
             scene.appendChild(curveEl);
             curveEl.setAttribute("position", "0 0 0");
-           
-            curveEl.setAttribute("mod_curve", {"useCurvePoints": true, "curvePoints": curvePoints, "isClosed": closeLoop, "lookAtNext": lookAtNext });
+            let lookAt = "";
+            if (settings.sceneTags.includes("look next") || settings.sceneTags.includes("lookat next")) {
+               lookAt = "next";
+               console.log("setting lookAtNext to "+ lookAt);
+            } else if (settings.sceneTags.includes("look ahead")) {
+               lookAt = "ahead";
+               console.log("setting lookAtNext to " + lookAt);
+            }
+            let closeLoop = false;
+            if (localData.settings.sceneTags.includes("close loop") || localData.settings.sceneTags.includes("closed") || localData.settings.sceneTags.includes("close curve") || localData.settings.sceneTags.includes("close path")) {
+               closeLoop = true;
+               console.log("setting closeLoop to "+ closeLoop);
+            }
+            curveEl.setAttribute("mod_curve", {"useCurvePoints": true, "curvePoints": curvePoints, "isClosed": closeLoop, "lookAt": lookAt });
          }
 
       }

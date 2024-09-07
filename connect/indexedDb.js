@@ -177,11 +177,17 @@ function InitIDB() {
                         settings.sceneEnvironmentPreset = value;
                         console.log("local enviro: " + settings.sceneEnvironmentPreset);
                      }
-                     if (key == "sceneTags") {
-                        let value = cursor.value.settings[key];
-                        settings.sceneTags = value;
-                        console.log("local sceneTags: " + settings.sceneTags);
-                     }
+                     // if (key == "sceneTags") {
+                     //    let value = cursor.value.settings[key];
+                        
+                     //    // let theSceneTags = [];
+                     //    let tagSplit = value.split(",");
+
+                     //    settings.sceneTags = tagSplit;
+                        
+                     //    console.log("local sceneTags: " + settings.sceneTags.length);
+
+                     // } 
                      // localSettings[key] = cursor.value.settings[key];
 
                   }
@@ -341,6 +347,9 @@ function InitIDB() {
     }
  }
 
+ function TrimString(string) {
+   return string.trim();
+ }
  function SaveLocalData() {  //persist mods an alt "~" version of the data
     console.log("tryna connect to SMXR indexeddb");
     if (!('indexedDB' in window)) {
@@ -366,6 +375,14 @@ function InitIDB() {
        // const lastSceneUpdate = null;
        let scene = {};
        scene.shortID = room + "~"; //with tilde = the local version
+         for (let i = 0; i < localData.settings.sceneTags.length; i++) {
+            localData.settings.sceneTags[i] = localData.settings.sceneTags[i].trim();
+            console.log(localData.settings.sceneTags[i]);
+         }
+      //  let tags = localData.settings.sceneTags.map(TrimString);
+      // localData.settings.sceneTags.forEach(item => console.log(item));
+      // console.log(localData.settings.sceneTags.length);
+      //  localData.settings.sceneTags = tags;
        scene.settings = localData.settings;
        scene.locations = localData.locations;
        
