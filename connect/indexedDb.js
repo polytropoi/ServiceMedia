@@ -375,14 +375,13 @@ function InitIDB() {
        // const lastSceneUpdate = null;
        let scene = {};
        scene.shortID = room + "~"; //with tilde = the local version
-         for (let i = 0; i < localData.settings.sceneTags.length; i++) {
-            localData.settings.sceneTags[i] = localData.settings.sceneTags[i].trim();
-            console.log(localData.settings.sceneTags[i]);
+         if (localData.settings && localData.settings.sceneTags) {
+            for (let i = 0; i < localData.settings.sceneTags.length; i++) {
+               localData.settings.sceneTags[i] = localData.settings.sceneTags[i].trim();
+               console.log("localData.settings.sceneTag + " +localData.settings.sceneTags[i]);
+            }
          }
-      //  let tags = localData.settings.sceneTags.map(TrimString);
-      // localData.settings.sceneTags.forEach(item => console.log(item));
-      // console.log(localData.settings.sceneTags.length);
-      //  localData.settings.sceneTags = tags;
+
        scene.settings = localData.settings;
        scene.locations = localData.locations;
        

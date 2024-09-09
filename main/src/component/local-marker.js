@@ -788,6 +788,7 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
     loadObject: function (objectID) { //local object swap (maybe with child model...);
       console.log("tryna load OBJECT ID " + objectID);
       if (objectID != undefined && objectID != null & objectID != "none" && objectID != "") {  
+        this.el.classList.remove("activeObjexRay");
         for (let i = 0; i < sceneObjects.length; i++) {
           if (sceneObjects[i]._id == objectID) {
             // this.el.setAttribute('gltf-model', sceneObjects[i].url);

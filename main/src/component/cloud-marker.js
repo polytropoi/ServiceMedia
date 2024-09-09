@@ -509,14 +509,16 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
        
       this.el.addEventListener('mouseenter', (evt) => {
         evt.preventDefault();
+        evt.stopPropagation();
         if (this.data.tags && this.data.tags.toLowerCase().includes("no select")) {
           return;
         }
-        if (this.data.markerType == "spawn") {
-          this.el.classList.remove("activeObjexRay"); //don't block the spawned object!
-        }
+        // if (this.data.markerType == "spawn") {
+        //   if (this.data.tags)
+        //   this.el.classList.remove("activeObjexRay"); //don't block the spawned object!
+        // }
         // if (this.data.markerType == "dataviz") {
-          evt.stopPropagation();
+
         // }
         // this.targetMods();
         if (evt.detail.intersection) {
@@ -793,6 +795,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
       if (!objectID) {
         objectID = this.data.objectID;
       }
+      this.el.classList.remove("activeObjexRay");
       console.log("tryna load object id " + objectID);
       if (objectID != undefined && objectID != null & objectID != "none" && objectID != "") {  
         // sceneObjects = objexEl.components.mod_objex.returnObjexData(); //!
