@@ -1931,9 +1931,9 @@ function SceneManglerModal(mode) {
     if (locationTable == null) {
         locationTable = "no locations are available";
     }
-    let hasModsMessage = "<span  style=\x22float:right;\x22>No local mods found</span>";
+    let hasModsMessage = "<span id=\x22modMessage\x22 style=\x22float:right;\x22>No local mods found</span>";
     if (hasLocalData) {
-      hasModsMessage = "<span style=\x22color:pink; float:right;\x22>Local mods found!</span>";
+      hasModsMessage = "<span id=\x22modMessage\x22 style=\x22color:pink; float:right;\x22>Local mods found!</span>";
     }
     let ownerButton = "";
     let sendAdminMessageButton = "";

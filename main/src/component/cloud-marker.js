@@ -798,11 +798,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
       this.el.classList.remove("activeObjexRay");
       console.log("tryna load object id " + objectID);
       if (objectID != undefined && objectID != null & objectID != "none" && objectID != "") {  
-        // sceneObjects = objexEl.components.mod_objex.returnObjexData(); //!
-        // for (let i = 0; i < sceneObjects.length; i++) {
-        //   console.log(sceneObjects[i]._id +" vs "+ objectID);
-        //   if (sceneObjects[i]._id == objectID) {
-            // this.el.setAttribute('gltf-model', sceneObjects[i].url);
+       
             
             let objexEl = document.getElementById('sceneObjects');    
             if (objexEl) { 
@@ -811,15 +807,11 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                 console.log("gots objectdata for " + this.objectData.name);
                 // let position = that.el.getAttribute("position");
                 this.locData = {};
-                // this.locData.x = this.el.object3D.position.x;
-                // this.locData.y = this.el.object3D.position.y;
-                // this.locData.z = this.el.object3D.position.z;
+
                 this.locData.x = this.data.xpos;
                 this.locData.y = this.data.ypos;
                 this.locData.z = this.data.zpos;
-                // this.locData.eulerx = THREE.MathUtils.radToDeg(this.el.object3D.rotation.x);
-                // this.locData.eulery = THREE.MathUtils.radToDeg(this.el.object3D.rotation.y);
-                // this.locData.eulerz = THREE.MathUtils.radToDeg(this.el.object3D.rotation.z);
+
                 this.locData.eulerx = this.data.xrot;
                 this.locData.eulery = this.data.yrot;
                 this.locData.eulerz = this.data.zrot;
@@ -832,20 +824,6 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                 sceneEl.appendChild(objEl);
 
 
-                // objEl.id = "obj" + objectData._id + "_" + this.locData.timestamp;
-                // this.objectElementID = objEl.id; 
-                // let objEl = document.createElement("a-entity");
-                // let modObjectComponent = this.el.components.mod_object;
-                // if (!modObjectComponent) {
-                // this.el.setAttribute("mod_object", {'locationData': this.locData, 'objectData': this.objectData, 'timestamp': this.data.timestamp});
-                // let modObjectComponent = this.el.components.mod_object;
-                // // if (modObjectComponent) {
-                //   modObjectComponent.loadObject();
-                // }
-                // }
-               
-                // objEl.id = "obj" + objectData._id + "_" + this.locData.timestamp;
-                // sceneEl.appendChild(objEl);
               }
             }
         //   }
@@ -855,23 +833,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
     remove: function () {
         console.log("removing something!");
     },
-    // loadMedia: function (mediaID) {
-    //   if (!mediaID) {
-    //     mediaID = this.data.mediaID;
-    //   } else {
-    //     this.data.mediaID = mediaID;
-    //   }
-    //   this.el.removeAttribute("transform_controls");
-    //   this.el.removeAttribute("geometry");
-    //   this.el.removeAttribute("gltf-model");
-    //   console.log("tryna load mediaID "+ this.data.mediaID);
-    //   // let picUrl = null;
-    //   if (this.data.markerType.toLowerCase().includes("picture")) {
-    //     this.el.setAttribute('gltf-model', '#flatsquare');
 
-       
-    //   }
-    // },
     loadLocalFile: function () { //change to loadLocalModel...
       if (this.data.modelID && this.data.modelID != "none") {
         console.log("really tryna loadLocalFile " + this.data.modelID);

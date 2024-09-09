@@ -748,6 +748,15 @@ function ImportMods (event) {
             localData.settings.sceneColor4 = mods.settings.sceneColor4;
          }
          // InitLocalColors();
+         if (mods.settings.sceneTags) {
+            console.log("gots mods sceneTags " + JSON.stringify(mods.settings.sceneTags));
+            for (let i = 0; i < mods.settings.sceneTags.length; i++) {
+               mods.settings.sceneTags[i] = mods.settings.sceneTags[i].trim();
+               console.log("mods.settings.sceneTag + " +mods.settings.sceneTags[i]);
+            }
+            localData.settings.sceneTags = mods.settings.sceneTags;
+
+         }
 
       }
       if (mods != null && mods != undefined && mods.locations != null && mods.locations.length > 0) {
@@ -1144,7 +1153,7 @@ function GoToNext() {
       FlyToMapPosition(lbData.split("_")[0],lbData.split("_")[1], false);
     
    } else {
-      // console.log(JSON.stringify(sceneLocations) + " charlie " + JSON.stringify(poiLocations));
+      // console.log("currentLocationIndex " +  currentLocationIndex  +" poiLocations"  + JSON.stringify(poiLocations));
       if (sceneLocations != null && poiLocations.length > 0) { 
          if (currentLocationIndex < poiLocations.length - 1) {
             currentLocationIndex++;
@@ -1152,9 +1161,9 @@ function GoToNext() {
             currentLocationIndex = 0;
             
          }
-         console.log(poiLocations[currentLocationIndex].phID);
+         console.log("currentLocationIndex " +  currentLocationIndex  + " " + poiLocations[currentLocationIndex]);
       // if (sceneLocations.locationMods[currentLocationIndex].markerType.toLowerCase() == 'poi') {
-         GoToLocation(poiLocations[currentLocationIndex].phID);
+         GoToLocation(poiLocations[currentLocationIndex].timestamp);
          document.getElementById("footerText").innerHTML = poiLocations[currentLocationIndex].name;
          // }
       }

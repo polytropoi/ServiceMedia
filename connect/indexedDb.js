@@ -350,6 +350,7 @@ function InitIDB() {
  function TrimString(string) {
    return string.trim();
  }
+
  function SaveLocalData() {  //persist mods an alt "~" version of the data
     console.log("tryna connect to SMXR indexeddb");
     if (!('indexedDB' in window)) {
@@ -380,6 +381,7 @@ function InitIDB() {
                localData.settings.sceneTags[i] = localData.settings.sceneTags[i].trim();
                console.log("localData.settings.sceneTag + " +localData.settings.sceneTags[i]);
             }
+            document.getElementById("sceneTagsField").value = localData.settings.sceneTags;
          }
 
        scene.settings = localData.settings;
@@ -399,8 +401,13 @@ function InitIDB() {
          hasLocalData = true;
        //   ShowHideDialogPanel();
           // InitLocalData();
+         let mSpan = document.getElementById("modMessage");
+         if (mSpan) {
+            mSpan.innerText = "Mods Saved to Local Database!";
+         }
        };
     };
+    
     }
 
    function SaveLocalFile(file) {  //save files to local db
