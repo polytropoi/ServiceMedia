@@ -79,14 +79,19 @@ window.addEventListener( 'keydown',  ( event ) => {
       break;
 
     case 32: // Spacebar
+      
       let curveDriver = document.getElementById("cameraCurve");
-      if (curveDriver) {
+      if (curveDriver && settings && timedEventsListenerMode ) {
         let modCurveComponent = curveDriver.components.mod_curve;
         if (modCurveComponent) {
-          modCurveComponent.toggleMove();
+          modCurveComponent.toggleMove(PlayPauseMedia());
+          // PlayPauseMedia();
         }
+      } else { //media called from modCurve to sync playback to curve mvmt
+         if (settings && (settings.sceneCameraMode != "Follow Path" || (settings.sceneTags && !settings.sceneTags.includes("follow")))) {
+          PlayPauseMedia();
+         }
       }
-      PlayPauseMedia();
       break;
 
     case 27: // Esc
@@ -1422,7 +1427,7 @@ let isPlaying = false;
 // });
 
 function PlayPauseMedia () {
-  
+
   console.log("PlayPauseMedia listening to " + timedEventsListenerMode);
   if (timedEventsListenerMode != null) {
     if (timedEventsListenerMode.toLowerCase() == "primary audio") {

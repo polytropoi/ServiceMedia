@@ -36,6 +36,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
     // dependencies: ['geometry', 'material'],
     init: function () {
       this.coolDown = false;
+      this.calloutIndex = 0;
     //   console.log("tryna set a cloudmarker with scale " + this.data.scale);
     
      var sceneEl = document.querySelector('a-scene'); 
@@ -102,6 +103,9 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
           this.primaryAudioMangler = document.getElementById("primaryAudio").components.primary_audio_control;
         }
       }
+      if (this.data.markerType == "player" ) {
+        this.el.classList.remove("activeObjexRay");
+      }
   
           console.log("CLOUDMARKER " + this.data.markerType + " " + this.data.modelID );
           // this.el.removeAttribute("geometry");
@@ -115,7 +119,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                 if (this.data.markerType.toLowerCase() == "player") {
                   // this.el.removeAttribute("geometry");
                   this.el.setAttribute('gltf-model', '#poi1');
-                  this.el.setAttribute("material", {color: "blue", transparent: true, opacity: .5});
+                  this.el.setAttribute("material", {color: "lime", transparent: true, opacity: .5});
                 }
                 if (this.data.markerType.toLowerCase() == "spawn") {
                   // this.el.removeAttribute("geometry");
@@ -378,7 +382,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
         
         if (this.data.markerType.toLowerCase() == "player") {
           this.el.setAttribute('gltf-model', '#poi1');
-          this.el.setAttribute("material", {color: "blue", transparent: true, opacity: .5});
+          this.el.setAttribute("material", {color: "lime", transparent: true, opacity: .5});
           this.el.classList.remove("activeObjexRay"); //bc it blocks player interaction when spawned inside
         }
         // if (this.data.markerType.toLowerCase() == "placeholder") {
@@ -550,12 +554,20 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
             this.calloutEntity.setAttribute('visible', true);
             this.calloutEntity.setAttribute('scale', {x: this.distance * .25, y: this.distance * .25, z: this.distance * .25} );
               
-            if (this.data.tags && this.data.tags.toLowerCase().includes("description")) {
+            // if (this.data.tags && this.data.tags.toLowerCase().includes("description")) {
+            if (this.data.description && this.data.description != "") {
               if (this.data.description.includes("~")) {
                 let cSplit = this.data.description.split("~");
                 this.calloutText.setAttribute("troika-text", {value: cSplit[(Math.floor(Math.random()*cSplit.length))]}); //or increment index...
               } else {
-                this.calloutText.setAttribute("troika-text", {value: this.data.description});
+                if (this.calloutIndex > 0) {
+                  this.calloutText.setAttribute("troika-text", {value: this.data.description});
+                  this.calloutIndex = 0;
+                } else {
+                  this.calloutText.setAttribute("troika-text", {value: this.data.name});
+                  this.calloutIndex++;
+                }
+                
               }
              
             } else {
@@ -1387,7 +1399,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
             if (this.data.markerType.toLowerCase() == "player") {
               this.el.removeAttribute("geometry");
               this.el.setAttribute('gltf-model', '#poi1');
-              this.el.setAttribute("material", {color: "blue", transparent: true, opacity: .5});
+              this.el.setAttribute("material", {color: "lime", transparent: true, opacity: .5});
             }
             if (this.data.markerType.toLowerCase() == "placeholder") {
                 this.el.setAttribute("gltf-model", "#poi1");

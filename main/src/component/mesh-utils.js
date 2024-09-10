@@ -3070,10 +3070,19 @@ AFRAME.registerComponent('mod_curve', {
     //   }
     // });
   },
-  toggleMove: function() {
+  toggleMove: function(play) {
     
-    this.isReady = !this.isReady;
-    console.log("tryna toggleMove isReady " + this.isReady);
+    if (this.curve && this.curveLine) {
+      if (play) {
+        this.isReady = play;
+      } else {
+        this.isReady = !this.isReady;
+      }
+    }
+    // console.log("tryna toggleMove isReady " + this.isReady );
+    // if (this.curve && this.curveLine && this.isReady && timedEventsListenerMode) {
+    //   PlayPauseMedia();
+    // }
   },
   scrollMove: function(scrollMod) {
     console.log("tryna scrollMove " + scrollMod)
@@ -3133,7 +3142,10 @@ AFRAME.registerComponent('mod_curve', {
         if (this.data.lookAt == 'next') {
           this.objectOnCurve.lookAt(this.points[this.currentPoint]);
         } else if (this.data.lookAt == 'ahead') {
-          this.objectOnCurve.lookAt(this.curve.getPoint( this.fraction - .1));
+          if (this.fraction > .11) {
+            this.objectOnCurve.lookAt(this.curve.getPoint( this.fraction - .1));
+          }
+         
         }
       }
       
@@ -4038,21 +4050,12 @@ AFRAME.registerComponent('load_threesvg', {
               localData.locations[i].isLocal = true;
 
               console.log("saving location data: " + JSON.stringify(localData.locations[i]));
-              // document.getElementById('xpos').value = this.position.x.toFixed(2);
-              // document.getElementById('ypos').value = this.position.y.toFixed(2);
-              // document.getElementById('zpos').value = this.position.z.toFixed(2);
-              // document.getElementById('xrot').value = this.rotation.x.toFixed(2);
-              // document.getElementById('yrot').value = this.rotation.x.toFixed(2);
-              // document.getElementById('zrot').value = this.rotation.x.toFixed(2);
-              // document.getElementById('modelScale').value = this.scale.x.toFixed(2);
+           
               
               if (this.el.components.local_marker) {
-                // this.el.components.local_marker.loadModel();
-                // this.el.setAttribute("position", {x: this.position.x, y: this.position.y, z: this.position.z});
-
+              
               } else if (this.el.components.cloud_marker) {
-                // this.el.components.cloud_marker.loadModel();
-                // this.el.setAttribute("position", {x: this.position.x, y: this.position.y, z: this.position.z});
+               
               }
 
               SaveLocalData();
@@ -4061,23 +4064,7 @@ AFRAME.registerComponent('load_threesvg', {
             }
           }
         } else {
-          ///init localData if empty...
-          // for (let key in settings) {
-          //   localData.settings[key] = settings[key]; //TODO apply each one?
-          // }
-          // for (let i = 0; i < sceneLocations.locations.length; i++) {
-          //   localData.locations.push(sceneLocations.locations[i]);
-          // }
-          // let loc = {};
-          // loc.x = this.position.x.toFixed(2);
-          // loc.y = this.position.y.toFixed(2);
-          // loc.z = this.position.z.toFixed(2);
-          // loc.eulerx = this.rotation.x.toFixed(2);
-          // loc.eulery = this.rotation.y.toFixed(2);
-          // loc.eulerz = this.rotation.z.toFixed(2);
-          // loc.markerObjScale = this.scale.x.toFixed(2);
-          // loc.timestamp = this.el.id;
-          // localData.locations.push(loc);
+          
           for (let i = 0; i < sceneLocations.locations.length; i++) {
             if (this.el.id == sceneLocations.locations[i].timestamp) {  
               sceneLocations.locations[i].x = this.position.x.toFixed(2);
@@ -4087,19 +4074,15 @@ AFRAME.registerComponent('load_threesvg', {
               sceneLocations.locations[i].eulery = this.rotation.y.toFixed(2);
               sceneLocations.locations[i].eulerz = this.rotation.z.toFixed(2);
               sceneLocations.locations[i].markerObjScale = this.scale.x.toFixed(2);
-              // document.getElementById('xpos').value = this.position.x.toFixed(2);
-              // document.getElementById('ypos').value = this.position.y.toFixed(2);
-              // document.getElementById('zpos').value = this.position.z.toFixed(2);
-              // document.getElementById('xrot').value = this.rotation.x.toFixed(2);
-              // document.getElementById('yrot').value = this.rotation.x.toFixed(2);
-              // document.getElementById('zrot').value = this.rotation.x.toFixed(2);
-              // document.getElementById('modelScale').value = this.scale.x.toFixed(2);
-              // this.el.setAttribute("position", this.position);
+              sceneLocations.locations[i].xscale = this.scale.x.toFixed(2);
+              sceneLocations.locations[i].yscale = this.scale.y.toFixed(2);  
+              sceneLocations.locations[i].zscale = this.scale.z.toFixed(2);
+             
               SaveLocalData();
               break;
             }
           }
-          // SaveLocalData();
+          
           
         }
 

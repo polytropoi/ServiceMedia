@@ -85,7 +85,7 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
       this.viewportHolder = document.getElementById('viewportPlaceholder3');
       var cameraPosition = new THREE.Vector3(); 
       this.viewportHolder.object3D.getWorldPosition( cameraPosition );
-  
+      this.calloutIndex = 0;
       this.calloutEntity.setAttribute('visible', false);
       this.selectedAxis = null;
       this.isSelected = false;
@@ -634,12 +634,20 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
                   //   outlineWidth: "2%",
                   //   value: that.data.name
                   // });
-            if (this.data.tags.toLowerCase().includes("description")) {
+            // if (this.data.tags.toLowerCase().includes("description")) {
+            if (this.data.description && this.data.description != "") {
               if (this.data.description.includes("~")) {
                 let cSplit = this.data.description.split("~");
                 this.calloutText.setAttribute("troika-text", {value: cSplit[(Math.floor(Math.random()*cSplit.length))]}); //or increment index...
               } else {
-                this.calloutText.setAttribute("troika-text", {value: this.data.description});
+                if (this.calloutIndex > 0) {
+                  this.calloutText.setAttribute("troika-text", {value: this.data.description});
+                  this.calloutIndex = 0;
+                } else {
+                  this.calloutText.setAttribute("troika-text", {value: this.data.name});
+                  this.calloutIndex++;
+                }
+               
               }
              
             } else {

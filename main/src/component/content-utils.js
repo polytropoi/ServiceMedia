@@ -5216,7 +5216,7 @@ AFRAME.registerComponent('scene_greeting_dialog', {  //if "greeting" scenetag + 
             if (curveDriver) {
               let modCurveComponent = curveDriver.components.mod_curve;
               if (modCurveComponent) {
-                modCurveComponent.toggleMove();
+                modCurveComponent.toggleMove(true);
               }
             }
           // }

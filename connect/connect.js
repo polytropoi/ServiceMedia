@@ -1262,7 +1262,7 @@ function ReturnLocationTable () { //just show em all now!
          } else if (localData.locations[i].markerType == "placeholder") { 
             markerString = "<span style=\x22color: yellow; font-weight: bold;\x22>"+localData.locations[i].markerType+"</span>";
          }  else if (localData.locations[i].markerType == "character") { 
-            markerString = "<span style=\x22color: blue; font-weight: bold;\x22>"+localData.locations[i].markerType+"</span>";
+            markerString = "<span style=\x22color: aqua; font-weight: bold;\x22>"+localData.locations[i].markerType+"</span>";
          }  else if (localData.locations[i].markerType == "gate") { 
             markerString = "<span style=\x22color: coral; font-weight: bold;\x22>"+localData.locations[i].markerType+"</span>";
          } else if (localData.locations[i].markerType == "object") { 
@@ -1275,6 +1275,10 @@ function ReturnLocationTable () { //just show em all now!
             markerString = "<span style=\x22color: skyblue; font-weight: bold;\x22>"+localData.locations[i].markerType+"</span>";
          } else if (localData.locations[i].markerType == "light") { 
             markerString = "<span style=\x22color: palegoldenrod; font-weight: bold;\x22>"+localData.locations[i].markerType+"</span>";
+         } else if (localData.locations[i].markerType == "curve point") { 
+            markerString = "<span style=\x22color: blue; font-weight: bold;\x22>"+localData.locations[i].markerType+"</span>";
+         } else if (localData.locations[i].markerType == "player") { 
+            markerString = "<span style=\x22color: lime; font-weight: bold;\x22>"+localData.locations[i].markerType+"</span>";
          } 
 
          // console.log("locMdl " +localData.locations[i].model + " " + localData.locations[i].modelID);
@@ -2668,7 +2672,7 @@ function InitCurves() {
                console.log("setting lookAtNext to " + lookAt);
             }
             let closeLoop = false;
-            if (settings.sceneTag && (settings.sceneTags.includes("close loop") || settings.sceneTags.includes("closed") || settings.sceneTags.includes("close curve") || settings.sceneTags.includes("close path"))) {
+            if (settings.sceneTags && (settings.sceneTags.includes("close loop") || settings.sceneTags.includes("closed") || settings.sceneTags.includes("close curve") || settings.sceneTags.includes("close path"))) {
                closeLoop = true;
                console.log("setting closeLoop to "+ closeLoop);
             }
@@ -3143,6 +3147,16 @@ function PlayTimedEvent(timeKey) {
          }
       }
    }
+   if (timeKey.keytype.toLowerCase().includes("Player Follow Path")) {
+      let curveDriver = document.getElementById("cameraCurve");
+      if (curveDriver && settings && timedEventsListenerMode ) {
+        let modCurveComponent = curveDriver.components.mod_curve;
+        if (modCurveComponent) {
+          modCurveComponent.toggleMove(true);
+          // PlayPauseMedia();
+        }
+      }
+   }
    if (timeKey.keytype.toLowerCase().includes("beat")) {
       if (primaryAudioEl != null) {
          // console.log("beat volume " + volume);
@@ -3155,6 +3169,7 @@ function PlayTimedEvent(timeKey) {
         triggerAudioController.components.trigger_audio_control.stopTriggerAudio();
       }
    }
+
    if (timeKey.keytype.toLowerCase().includes("random time")) {
       if (timedEventsListenerMode != null && timedEventsListenerMode.toLowerCase() == 'primary audio') {
          if (primaryAudioEl != null) {
