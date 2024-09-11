@@ -1394,7 +1394,7 @@ function ShowTimekeysModal() {    //nerp, now in scenemanglermodal
 
       "<button class=\x22snapButton\x22 style=\x22float:left;\x22 onclick=\x22AddTimekey()\x22>Add Timed Event Key</button>"+
       "<button class=\x22infoButton\x22 onclick=\x22SceneManglerModal('Tools')\x22>Settings</button>"+
-      "<button class=\x22saveButton\x22 onclick=\x22SaveTimekeysToLocal()\x22>Save (local)</button>"+
+      "<button class=\x22saveButton\x22 onclick=\x22SaveTimekeysToLocal()\x22>Save to Local Database</button>"+
      
       // "<button class=\x22deleteButton\x22 onclick=\x22PlayPauseMedia()\x22>Play/Pause Media</button>"+
       "<div class=\x22transport_buttons\x22><div class=\x22previous_button\x22 style=\x22float: left; margin: 10px 10px;\x22 onclick=\x22PreviousButton()\x22><i class=\x22fas fa-step-backward fa-2x\x22></i></div>"+
@@ -1952,9 +1952,9 @@ function SceneManglerModal(mode) {
     "<button class=\x22tablinks\x22 onclick=\x22TabMangler(event, 'Welcome')\x22>Welcome</button>"+
     // "<button class=\x22tablinks\x22 onclick=\x22TabMangler(event, 'Quests')\x22>Quests</button>"+
     
-    "<button class=\x22tablinks\x22 onclick=\x22TabMangler(event, 'Messages')\x22>Messages</button>"+
-    "<button class=\x22tablinks\x22 onclick=\x22TabMangler(event, 'Inventory')\x22>Inventory</button>"+
-    "<button class=\x22tablinks\x22 onclick=\x22TabMangler(event, 'Tools')\x22>Tools</button>"+
+    "<button class=\x22tablinks\x22 onclick=\x22TabMangler(event, 'Messages')\x22>Messaging</button>"+
+    "<button class=\x22tablinks\x22 onclick=\x22TabMangler(event, 'Inventory')\x22>Assets</button>"+
+    "<button class=\x22tablinks\x22 onclick=\x22TabMangler(event, 'Tools')\x22>Settings</button>"+
     "<button class=\x22tablinks\x22 onclick=\x22TabMangler(event, 'Locations')\x22>Locations</button>"+
     "<button class=\x22tablinks\x22 onclick=\x22TabMangler(event, 'Events')\x22>Events</button>"+
     "<button class=\x22tablinks\x22 onclick=\x22TabMangler(event, 'About')\x22>About</button>"+

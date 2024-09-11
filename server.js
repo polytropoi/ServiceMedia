@@ -11968,6 +11968,14 @@ app.post('/add_scene_mods/:s_id', requiredAuthentication, admin, function (req, 
                                 
                                 callback(null);
                             },
+                            function (callback) { 
+                                console.log("saving sceneTags mods " + JSON.stringify(req.body.sceneTags));
+                                if (req.body.sceneTags != null) {
+                                    query.sceneTags = req.body.sceneTags;
+                                    console.log("query is " + query.sceneColor1);
+                                    }
+                                callback(null);
+                            },
                             function (callback) {
                                 if (req.body.locationMods != null) {
                                      

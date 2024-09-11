@@ -2938,7 +2938,7 @@ AFRAME.registerComponent('mod_curve', {
     type: {default: 'model'},
     origin: {default: 'world zero'},
     useCurvePoints: {default: false},
-    curvePoints: {default: []},
+    curvePoints: {default: []}, //array of positions from .curvepoints
     modCurve: {default: false},
     lookAt: {default: ''},
     tweakCurve: {default: false}
@@ -2995,7 +2995,7 @@ AFRAME.registerComponent('mod_curve', {
     // this.el.object3D.getWorldPosition( this.position );
 
     // this.position = this.el.getAttribute("position");
-    if (!this.data.useCurvePoints) {
+    if (!this.data.useCurvePoints) { //just 4 points for automated moves
       for (var i = 0; i < 5; i += 1) {
         if (this.data.origin == 'world zero') {
           this.points.push(new THREE.Vector3(0, 0, this.data.distance * (i / 4)));

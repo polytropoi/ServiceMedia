@@ -587,6 +587,7 @@ function SaveModsToCloud() { //Save button on location modal, writes local mods 
       }
       mods.timedEventMods = localData.timedEvents;
       mods.sceneEnvironmentPreset = localData.settings.sceneEnvironmentPreset;
+      mods.sceneTags = localData.settings.sceneTags;
       // console.log(JSON.stringify(mods));
 
       
@@ -999,7 +1000,7 @@ function SaveModToLocal(locationKey) { //locationKey is now just timestamp of th
       }
    }
    
-   ShowHideDialogPanel();
+   // ShowHideDialogPanel();
    //if "L" key isdown?
    // SceneManglerModal('Locations');
 }
