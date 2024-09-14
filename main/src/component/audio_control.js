@@ -493,6 +493,38 @@ AFRAME.registerComponent('primary_audio_player', {  //setup and controls for the
                     this.el.emit('primaryAudioToggle', true);
                     this.isPlaying = false;
                 }
+            },
+            timekey_beat: function(vol) {
+            
+                scale = {};
+                let v = 25;
+                scale.x = v * .05;
+                scale.y = v * .05;
+                scale.z = v * .05;
+                
+                scale2 = {};
+                scale2.x = 1;
+                scale2.y = v * .1;
+                scale2.z = 1;
+                scale3 = {};
+                scale3.x = v * .5;
+                scale3.y = v * .5;
+                scale3.z = v * .5;
+                console.log("beat event volume " + v);
+                this.el.setAttribute('scale', scale);
+                
+                if (this.enviroDressing != null) {
+                    
+                    this.enviroDressing.setAttribute('scale', scale2 );
+                    this.enviroDressing.setAttribute('animation', 'property: scale; to: 1 1 1; dur: 250; startEvents: beatRecover');
+                    this.enviroDressing.emit('beatRecover');
+    
+                }
+    
+                this.el.setAttribute('animation', 'property: scale; to: 1 1 1; dur: 250; startEvents: beatRecover');
+                // enviroDressing.setAttribute('animation', 'property: scale; to: 1 1 1; dur: 250; startEvents: beatRecover');
+                this.el.emit('beatRecover');
+                // this.el.emit('beatRecover2');
             }
         });
     } else { //normal mode, not streaming, so can use webaudio api

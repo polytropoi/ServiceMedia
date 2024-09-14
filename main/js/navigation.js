@@ -1770,13 +1770,13 @@ AFRAME.registerComponent('nav_agent_controller', {
 			this.modObjectComponent = modModelComponent;
 			// this.updateAgentState(this.currentState);
 			el.addEventListener('navigation-start', (e)=>{
-			if(!data.navStart){
-				data.navStart=true;
-				// modObjectComponent.playWalkAnimation();
-				this.updateAgentState(this.currentState);
-				this.el.removeAttribute("look-at-y");
+				if(!data.navStart){
+					data.navStart=true;
+					// modObjectComponent.playWalkAnimation();
+					this.updateAgentState(this.currentState);
+					this.el.removeAttribute("look-at-y");
 
-			}
+				}
 			});
 	
 			/****************************************/

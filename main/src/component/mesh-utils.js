@@ -2971,6 +2971,7 @@ AFRAME.registerComponent('mod_curve', {
     this.modCurve = false;
     this.followCurve = false;
     this.currentPoint = 0;
+    this.moveToPointIndex = -1;
     // this.lookAtNext = false;
 
     if (settings && settings.sceneTags.includes("debug")) {
@@ -3084,6 +3085,11 @@ AFRAME.registerComponent('mod_curve', {
     //   PlayPauseMedia();
     // }
   },
+  moveToNext: function() {
+
+    this.moveToPointIndex = this.currentPoint + 1;
+
+  },
   scrollMove: function(scrollMod) {
     console.log("tryna scrollMove " + scrollMod)
     this.fraction += scrollMod * .01;
@@ -3093,7 +3099,6 @@ AFRAME.registerComponent('mod_curve', {
     if (this.data.useCurvePoints) {
       this.currentPoint = Math.floor(this.fraction / (1 / this.points.length));
       // console.log(this.currentPoint);
-      
       this.objectOnCurve.position.copy( this.curve.getPoint( this.fraction ) ); //follow ascending index of points       
       if (this.data.lookAt != '') {
         if (this.data.lookAt == 'next') {
@@ -3102,7 +3107,6 @@ AFRAME.registerComponent('mod_curve', {
           this.objectOnCurve.lookAt(this.curve.getPoint( this.fraction - .1));
         }
       }
-      
     } else {
       this.objectOnCurve.position.copy( this.curve.getPoint( 1 - this.fraction ) ); //or just the fraction to go backwards       
     }
@@ -3128,26 +3132,29 @@ AFRAME.registerComponent('mod_curve', {
     this.fraction += 0.001 * this.speedMod;
     if ( this.fraction > 1 || this.fraction < 0) {
       this.fraction = 0;
-
-      //normal.set( 0, 1, 0 );
     }
     // console.log(this.el.id + " " + this.fraction);
     // this.el.object3D.position.copy( this.curve.getPoint( 1 - this.fraction ) ); //or just the fraction to go backwards       
     if (this.data.useCurvePoints) {
       this.currentPoint = Math.floor(this.fraction / (1 / this.points.length));
       // console.log(this.currentPoint);
-      
-      this.objectOnCurve.position.copy( this.curve.getPoint( this.fraction ) ); //follow ascending index of points       
-      if (this.data.lookAt != '') {
-        if (this.data.lookAt == 'next') {
-          this.objectOnCurve.lookAt(this.points[this.currentPoint]);
-        } else if (this.data.lookAt == 'ahead') {
-          if (this.fraction > .11) {
-            this.objectOnCurve.lookAt(this.curve.getPoint( this.fraction - .1));
+      // if (this.moveToPointIndex != -1) {
+        if (this.currentPoint == this.moveToPointIndex) {
+          this.isReady = false;
+        } 
+        this.objectOnCurve.position.copy( this.curve.getPoint( this.fraction ) ); //follow ascending index of points       
+        if (this.data.lookAt != '') {
+          if (this.data.lookAt == 'next') {
+            this.objectOnCurve.lookAt(this.points[this.currentPoint]);
+          } else if (this.data.lookAt == 'ahead') {
+            if (this.fraction > .11) {
+              this.objectOnCurve.lookAt(this.curve.getPoint( this.fraction - .1));
+            }
+          
           }
-         
         }
-      }
+        // }
+      
       
     } else {
       this.objectOnCurve.position.copy( this.curve.getPoint( 1 - this.fraction ) ); //or just the fraction to go backwards       

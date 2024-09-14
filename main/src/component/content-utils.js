@@ -5028,10 +5028,20 @@ AFRAME.registerComponent('scene_greeting_dialog', {  //if "greeting" scenetag + 
     this.isInitialized = false;
     this.viewportHolder = document.getElementById('viewportPlaceholder3');
     this.location = new THREE.Vector3();
+    
     let interval = setInterval(() => { //hrm...
       if (settings && settings.sceneFontWeb1) {
-        clearInterval(interval);
-        this.initMe();
+        if (settings.sceneTags && settings.sceneTags.includes("follow")) {
+          let curveDriver = document.getElementById("cameraCurve");
+          if (curveDriver) { //wait for curves to load if neededs
+            clearInterval(interval);
+            this.initMe();
+          }
+        } else {
+          clearInterval(interval);
+          this.initMe();
+        }
+       
       }
     }, 1000);
     this.startButtonBackgroundEl = null;
@@ -5133,7 +5143,7 @@ AFRAME.registerComponent('scene_greeting_dialog', {  //if "greeting" scenetag + 
           value: this.data.questText
         });
       }
-
+      
       if (this.data.startButton) {
         this.startButtonBackgroundEl = document.createElement("a-entity");
         this.startButtonTextEl = document.createElement("a-entity");
@@ -5212,6 +5222,7 @@ AFRAME.registerComponent('scene_greeting_dialog', {  //if "greeting" scenetag + 
             // this.el.parent.remove(this.el);
           }
           // if (settings && (settings.sceneCameraMode == "Follow Path" || settings.sceneTags.includes("follow path") || settings.sceneTags.includes("follow curve"))) {
+
             let curveDriver = document.getElementById("cameraCurve");
             if (curveDriver) {
               let modCurveComponent = curveDriver.components.mod_curve;
@@ -5253,9 +5264,7 @@ AFRAME.registerComponent('scene_greeting_dialog', {  //if "greeting" scenetag + 
           this.longTimer();
         }
       }
-    // }, 3000);
-  // }
-    
+
   },
   longTimer: function () {
     setTimeout(() => {

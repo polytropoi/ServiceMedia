@@ -1155,6 +1155,16 @@ function GoToNext() {
     
    } else {
       // console.log("currentLocationIndex " +  currentLocationIndex  +" poiLocations"  + JSON.stringify(poiLocations));
+      if (localData.settings.sceneTags && localData.settings.sceneTags.includes("follow path")) {
+         let curveDriver = document.getElementById("cameraCurve");
+      if (curveDriver && settings && timedEventsListenerMode ) {
+        let modCurveComponent = curveDriver.components.mod_curve;
+        if (modCurveComponent) {
+          modCurveComponent.moveToNext();
+          // PlayPauseMedia();
+        }
+      }
+      }
       if (sceneLocations != null && poiLocations.length > 0) { 
          if (currentLocationIndex < poiLocations.length - 1) {
             currentLocationIndex++;
@@ -3005,7 +3015,7 @@ function LoopTimedEvent(keyType, duration, keydata, keytags) {
             GoToNext();
          } 
          if (keyType.toLowerCase().includes("beat")) {
-            console.log("beat loop " + duration);
+            // console.log("beat loop " + duration);
             if (beatElements != null) {
                // console.log("beat objex " + beatElements.length)
                
@@ -3125,7 +3135,7 @@ function LoopTimedEvent(keyType, duration, keydata, keytags) {
 }  //end loop event
 
 function PlayTimedEvent(timeKey) {
- console.log("tryna play timed event: " + JSON.stringify(timeKey));
+//  console.log("tryna play timed event: " + JSON.stringify(timeKey));
 
  let duration = 1;
  if (timeKey.keyduration) {

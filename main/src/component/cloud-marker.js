@@ -115,7 +115,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
               && !this.data.modelID != "primitive_sphere"
               && !this.data.modelID != "primitive_cylinder") {
             // console.log("CLOUDMARKER PLACEHOLDER GEO " + this.data.modelID);
-            console.log("CLOUDMARKER " + this.data.markerType + " " + this.data.modelID );
+            // console.log("CLOUDMARKER " + this.data.markerType + " " + this.data.modelID );
                 if (this.data.markerType.toLowerCase() == "player") {
                   // this.el.removeAttribute("geometry");
                   this.el.setAttribute('gltf-model', '#poi1');
