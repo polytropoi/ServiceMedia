@@ -318,8 +318,13 @@ AFRAME.registerComponent('primary_audio_player', {  //setup and controls for the
                 var el = this.el;  
                 var defaultColor = 'blue';
                 this.primaryAudioText = document.querySelector("#primaryAudioText");
-                this.isPlaying = false;
+                this.tryingToPlay = false;
                 this.cam = document.querySelector("[camera]"); 
+                this.tick = AFRAME.utils.throttleTick(this.tick, 500, this);
+                this.primaryAudioEntity = document.createElement("a-entity");
+                // this.calloutPanel = document.createElement("a-entity");
+                this.primaryAudioText = document.createElement("a-entity");
+                this.isInitialized = false;
                 // this.pPos = this.cam.object3D.position; //for spatialization
                 // Howler.pos(this.pPos.x, this.pPos.y, this.pPos.z);
                 // let waveform = document.querySelector("#primaryAudioWaveformImageEntity");
@@ -359,7 +364,7 @@ AFRAME.registerComponent('primary_audio_player', {  //setup and controls for the
                 document.querySelector("#primaryAudioText").setAttribute('text', {
                     // width: 4, 
                     align: "center",
-                    value: data.title
+                    value: data.title + "\nready"
                 });
                 console.log("PRIMARY AUDIO AUTOPLAY is " + this.data.autoplay );
                 if (this.data.autoplay) {
@@ -416,61 +421,120 @@ AFRAME.registerComponent('primary_audio_player', {  //setup and controls for the
                     console.log("beat volume " + volume);
                 }, false);
 
-                el.addEventListener('click', function () {  
+                el.addEventListener('click', () => {  
                     console.log("streaming audio click");
-                    if (!primaryAudioHowl.playing()) {
-                        el.setAttribute('light', {
-                            type: 'point',
-                            distance: 30,
-                            intensity: 1.0,
-                            color: 'green'
-                        }, true);
-                        // duration = primaryAudioHowl.duration().toFixed(2);
+                    this.tryingToPlay = !this.tryingToPlay;
+                    if (this.tryingToPlay) {
                         primaryAudioHowl.play();
-                        el.emit('primaryAudioToggle', {isPlaying : true}, true);
-                        primaryAudioHowl.volume(normalizedVolume);
-                        console.log('...tryna play...');
-                        // primaryAudioHowl.pos(0, 1.6, -1);
-                        this.isPlaying = true;
-                        el.setAttribute('material', 'color', 'green');
-
                     } else {
-                        // if (this.isPlaying) {
-                        el.setAttribute('light', {
-                            type: 'point',
-                            distance: 30,
-                            intensity: 1.0,
-                            color: 'red'
-                        }, true);
-                            // if (primaryAudioHowl != null) {
-                            primaryAudioHowl.pause();
-                            this.isPlaying = false;
-                            console.log('...tryna pause...');
-                            el.setAttribute('material', 'color', 'red');
-                            el.emit('primaryAudioToggle', true);
-                            // }
-                        // }
+                        primaryAudioHowl.pause();
                     }
+                    
+                    if (!this.isInitialized) {
+                        SceneManglerModal("Welcome", true); //second param is autohide, to prime the pump
+                        this.isInitialized = true;
+                    }
+                    
+                    this.updateStatus();
+                    // if (!primaryAudioHowl.playing()) {
+                    //     el.setAttribute('light', {
+                    //         type: 'point',
+                    //         distance: 30,
+                    //         intensity: 1.0,
+                    //         color: 'blue'
+                    //     }, true);
+                    //     // duration = primaryAudioHowl.duration().toFixed(2);
+                    //     primaryAudioHowl.play();
+                    //     // if (!primaryAudioHowl.playing()) {
+                    //         // el.emit('primaryAudioToggle', {isPlaying : true}, true);
+                    //         primaryAudioHowl.volume(normalizedVolume);
+                    //         console.log('...tryna play...');
+                    //         document.querySelector("#primaryAudioText").setAttribute('text', {
+                    //             // width: 4, 
+                    //             align: "center",
+                    //             value: "loading..."
+                    //         });
+                    //         // primaryAudioHowl.pos(0, 1.6, -1);
+                    //         // this.tryingToPlay = true;
+                    //         el.setAttribute('material', 'color', 'blue');
+                    //     // // } else {
+                    //     //     document.querySelector("#primaryAudioText").setAttribute('text', {
+                    //     //         // width: 4, 
+                    //     //         align: "center",
+                    //     //         value: data.title
+                    //     //     });
+                    //     //     // primaryAudioHowl.pos(0, 1.6, -1);
+                    //     //     // this.tryingToPlay = true;
+                    //     //     el.setAttribute('material', 'color', 'green');
+                    //     // }
+
+                    // } else {
+                    //     // if (this.tryingToPlay) {
+                    //     el.setAttribute('light', {
+                    //         type: 'point',
+                    //         distance: 30,
+                    //         intensity: 1.0,
+                    //         color: 'red'
+                    //     }, true);
+                    //         // if (primaryAudioHowl != null) {
+                    //     primaryAudioHowl.pause();
+                    //     this.tryingToPlay = false;
+                    //     console.log('...tryna pause...');
+                    //     el.setAttribute('material', 'color', 'red');
+                    //     el.emit('primaryAudioToggle', true);
+                    //     document.querySelector("#primaryAudioText").setAttribute('text', {
+                    //         // width: 4, 
+                    //         align: "center",
+                    //         value: data.title
+                    //     });
+                    // }
                 });        
-                el.addEventListener('mouseleave', function () {
-                    el.setAttribute('color', defaultColor);
-                });
+                // el.addEventListener('mouseleave', function () {
+                //     el.setAttribute('color', defaultColor);
+                // });
             },
+            // updateStatus: function () {
+            //     if (primaryAudioHowl.isPlaying()) {
+            //         el.setAttribute('light', {
+            //             type: 'point',
+            //             distance: 30,
+            //             intensity: 1.0,
+            //             color: 'red'
+            //         }, true);
+            //             // if (primaryAudioHowl != null) {
+            //         primaryAudioHowl.pause();
+            //         this.tryingToPlay = false;
+            //         console.log('...tryna pause...');
+            //         el.setAttribute('material', 'color', 'red');
+            //         el.emit('primaryAudioToggle', true);
+            //         document.querySelector("#primaryAudioText").setAttribute('text', {
+            //             // width: 4, 
+            //             align: "center",
+            //             value: data.title
+            //         });
+            //     }
+            // },
             playPauseToggle: function() {
+                console.log("playPauseToggle " + this.tryingToPlay);
                 if (!primaryAudioHowl.playing()) {
                     console.log("tryna play");
+                    
                     primaryAudioHowl.play();
+                    if (!this.isInitialized) {
+                        SceneManglerModal("Welcome", true); //second param is autohide, to prime the pump
+                        this.isInitialized = true;
+                    }
                     this.el.emit('primaryAudioToggle', {isPlaying : true}, true);
-                    this.isPlaying = true;
-                    this.el.setAttribute('material', 'color', 'green');
+                    this.tryingToPlay = true;
+                    // this.el.setAttribute('material', 'color', 'green');
                     PauseIntervals(false);
                     return true;
                 } else {    
                     console.log("tryna pause");
                     primaryAudioHowl.pause();
                     this.el.emit('primaryAudioToggle', {isPlaying : false}, true);
-                    this.isPlaying = false;
-                    this.el.setAttribute('material', 'color', 'red');
+                    this.tryingToPlay = false;
+                    // this.el.setAttribute('material', 'color', 'red');
                     PauseIntervals(true);
                     return false;
                 
@@ -483,15 +547,65 @@ AFRAME.registerComponent('primary_audio_player', {  //setup and controls for the
                 console.log("normalizedVolume is " + normalizedVolume);
                 primaryAudioHowl.volume(normalizedVolume);
             },
+            updateStatus: function () {
+                // console.log("tryna updateStatus to " + isPlaying);
+                // if (isPlaying) {
+                if (this.tryingToPlay) {
+                    if (primaryAudioHowl.playing()) { //if it's really playing
+                    this.el.setAttribute('material', 'color', 'green');
+                    this.el.setAttribute('light', {
+                        type: 'point',
+                        distance: 30,
+                        intensity: 1.0,
+                        color: 'green'
+                    }, true);
+                        document.querySelector("#primaryAudioText").setAttribute('text', {
+                            // width: 4, 
+                            align: "center",
+                            value: this.data.title + "\nplaying"
+                        });
+                        // this.tryingToPlay = true;
+                    } else { //or just trying to play
+                        this.el.setAttribute('material', 'color', 'orange');
+                        this.el.setAttribute('light', {
+                            type: 'point',
+                            distance: 30,
+                            intensity: 1.0,
+                            color: 'blue'
+                        }, true);
+                        document.querySelector("#primaryAudioText").setAttribute('text', {
+                            // width: 4, 
+                            align: "center",
+                            value: this.data.title + "\nloading"
+                        });
+                        // this.tryingToPlay = false;
+                    }
+                // }
+                } else {
+                    this.el.setAttribute('material', 'color', 'blue');
+                    this.el.setAttribute('light', {
+                        type: 'point',
+                        distance: 30,
+                        intensity: 1.0,
+                        color: 'red'
+                    }, true);
+                    document.querySelector("#primaryAudioText").setAttribute('text', {
+                        // width: 4, 
+                        align: "center",
+                        value: this.data.title + "\nready"
+                    });
+                    // this.tryingToPlay = true;
+                }
+            },
             playPause: function() {
-                if (!this.isPlaying) {
+                if (!this.tryingToPlay) {
                     primaryAudioHowl.play();
                     this.el.emit('primaryAudioToggle', true);
-                    this.isPlaying = true;
+                    // this.tryingToPlay = true;
                 } else {
                     primaryAudioHowl.pause();
                     this.el.emit('primaryAudioToggle', true);
-                    this.isPlaying = false;
+                    // this.tryingToPlay = false;
                 }
             },
             timekey_beat: function(vol) {
@@ -525,19 +639,27 @@ AFRAME.registerComponent('primary_audio_player', {  //setup and controls for the
                 // enviroDressing.setAttribute('animation', 'property: scale; to: 1 1 1; dur: 250; startEvents: beatRecover');
                 this.el.emit('beatRecover');
                 // this.el.emit('beatRecover2');
+            },
+            tick: function() {
+                this.updateStatus();
+                // console.log(this.tryingToPlay);
+                // if (primaryAudioHowl) {
+                    // if (!this.isPlaying) {
+                        // if (primaryAudioHowl.playing()) {
+                        //     this.updateStatus(true);
+                        // } else {
+                        //     this.updateStatus(false);
+                        // }
+                    // } else {
+                    //     // if (!primaryAudioHowl.playing()) {
+                    //         this.isPlaying = false;
+                    //     }
+                    // }
+                // }
             }
         });
     } else { //normal mode, not streaming, so can use webaudio api
-        // let primaryAudioHowl = new Howl({ //use howler audio mangler
-        //     src: audiourl, //use ogg for looping
-        //     // loop: true,
-        //     html5: true,
-        //     volume: 1.0
-        // });
-        // primaryAudioHowl.load();
-        // duration = primaryAudioHowl.duration();
-        // let primaryAudioTimeKeys = [];
-        
+             
         AFRAME.registerComponent('primary_audio_control', { //register for not-streaming
         schema: {
         audioID: {default: ''},

@@ -2905,7 +2905,9 @@ function TimedEventListener () {
             //    timeKeysIndex = 0;
             // }
             if (primaryAudioHowl != undefined && primaryAudioHowl != null && primaryAudioHowl.playing()) {
-            
+               
+               // primaryAudioEl.components.primary_audio_control.updateStatus(true);
+
                let primaryAudioTime = primaryAudioHowl.seek();
                
                if (primaryAudioTime != 0 && primaryAudioTime < .2) { //fudge in case

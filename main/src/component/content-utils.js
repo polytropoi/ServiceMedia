@@ -4909,7 +4909,8 @@ function onYouTubeIframeAPIReady () { //must be global, called when youtube embe
   }
 
 function TransportPlayButton () {
-  // console.log("youtubePlayer " + JSON.stringify(youtubePlayer));
+  // console.log("TransportPlayButton clcik! " + JSON.stringify(youtubePlayer));
+  console.log("TransportPlayButton clcik! " + primaryAudioMangler);
   if (youtubePlayer != null) {
     if (!youtubeIsPlaying) {
       console.log("tryna play youtube");
