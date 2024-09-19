@@ -2688,6 +2688,7 @@ function InitCurves() {
                console.log("setting closeLoop to "+ closeLoop);
             }
             curveEl.setAttribute("mod_curve", {"useCurvePoints": true, "curvePoints": curvePoints, "isClosed": closeLoop, "lookAt": lookAt });
+            
          }
 
       }

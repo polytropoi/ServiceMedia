@@ -2925,6 +2925,101 @@ AFRAME.registerComponent('mod_random_path', {
   }
 
 });
+AFRAME.registerComponent('world_transport_buttons', {
+  schema: {
+    init: {default: ''},
+  },
+  init: function () {
+    console.log("tryna set world_transport_buttons");
+    let viewportHolder = document.getElementById("viewportPlaceholder");
+    this.worldButtons = document.createElement("a-entity");
+
+    this.previousButton = document.createElement("a-entity");
+    
+    this.nextButton = document.createElement("a-entity");
+    this.flyButton = document.createElement("a-entity");
+    this.camlockButton = document.createElement("a-entity");
+    this.playButton = document.createElement("a-entity");
+    if (viewportHolder) {
+      viewportHolder.appendChild(this.worldButtons);
+    }
+
+    this.previousButton.setAttribute("position", "-.4 -.75 0");
+    this.previousButton.setAttribute("geometry", {"primitive": "plane", "height": .1, "width": .1});
+    this.previousButton.setAttribute("material", {shader: "flat", src: "#p_button", transparent: true});
+
+    this.flyButton.setAttribute("position", "-.2 -.75 0");
+    this.flyButton.setAttribute("geometry", {"primitive": "plane", "height": .1, "width": .1});
+    this.flyButton.setAttribute("material", {shader: "flat", src: "#fly_button", transparent: true});
+
+    this.playButton.setAttribute("position", "0 -.75 0");
+    this.playButton.setAttribute("geometry", {"primitive": "plane", "height": .1, "width": .1});
+    this.playButton.setAttribute("material", {shader: "flat", src: "#play_button", transparent: true});
+
+    this.camlockButton.setAttribute("position", ".2 -.75 0");
+    this.camlockButton.setAttribute("geometry", {"primitive": "plane", "height": .1, "width": .1});
+    this.camlockButton.setAttribute("material", {shader: "flat", src: "#camlock_button", transparent: true});
+
+    this.nextButton.setAttribute("position", ".4 -.75 0");
+    this.nextButton.setAttribute("geometry", {"primitive": "plane", "height": .1, "width": .1});
+    this.nextButton.setAttribute("material", {shader: "flat", src: "#n_button", transparent: true});
+    // this.previousButtonMaterial = new THREE.MeshBasicMaterial( { map: "#p_button", transparent: true } ); 
+    this.worldButtons.appendChild(this.previousButton);
+    this.worldButtons.appendChild(this.playButton);
+    this.worldButtons.appendChild(this.flyButton);
+    this.worldButtons.appendChild(this.camlockButton);
+    this.worldButtons.appendChild(this.nextButton);
+
+    this.previousButton.classList.add("activeObjexRay");
+    this.nextButton.classList.add("activeObjexRay");
+    this.playButton.classList.add("activeObjexRay");
+    this.flyButton.classList.add("activeObjexRay");
+    this.camlockButton.classList.add("activeObjexRay");
+
+    this.worldButtons.setAttribute("rotation", "-25 0 0");
+    this.addListeners();
+
+    let nextbuttonEl = document.getElementById('nextButton');
+    let prevbuttonEl = document.getElementById('previousButton');
+    nextbuttonEl.style.visibility = "hidden";
+    prevbuttonEl.style.visibility = "hidden";
+
+  },
+  addListeners: function () {
+    this.previousButton.addEventListener('mouseenter', function (evt) {
+      console.log("previousButton mouseenter");
+    });
+    this.nextButton.addEventListener('mouseenter', function (evt) {
+      console.log("nextButton mouseenter");
+    });
+    this.playButton.addEventListener('mouseenter', function (evt) {
+      console.log("playButton mouseenter");
+    });
+    this.flyButton.addEventListener('mouseenter', function (evt) {
+      console.log("flyButton mouseenter");
+    });
+    this.camlockButton.addEventListener('mouseenter', function (evt) {
+      console.log("camlockButton mouseenter");
+    });
+
+    this.previousButton.addEventListener('click', function (evt) {
+      console.log("previousButton click");
+    });
+    this.nextButton.addEventListener('click', function (evt) {
+      console.log("nextButton click");
+    });
+    this.playButton.addEventListener('click', function (evt) {
+      console.log("playButton click");
+    });
+    this.flyButton.addEventListener('click', function (evt) {
+      console.log("flyButton click");
+    });
+    this.camlockButton.addEventListener('click', function (evt) {
+      console.log("camlockButton click");
+    });
+  }  
+   
+});
 
 AFRAME.registerComponent('mod_curve', {
   schema: {
@@ -2988,6 +3083,7 @@ AFRAME.registerComponent('mod_curve', {
       this.objectOnCurve = playerEl.object3D;
       this.followCurve = true;
       this.el.id = "cameraCurve";
+      this.el.setAttribute("world_transport_buttons", {"init": "ok"});
       // this.objectOnCurve.position.copy( this.data.curvePoints[0] );s
     } else {
       this.objectOnCurve = this.el.object3D;

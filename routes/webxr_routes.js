@@ -1740,7 +1740,9 @@ webxr_router.get('/:_id', function (req, res) {
                                             "<a-entity id=\x22equipPlaceholder\x22 geometry=\x22primitive: box; height: .1; width: .1; depth: .1;\x22 position=\x220 -.65 -.75\x22"+
                                             "material=\x22opacity: 0\x22></a-entity>"+
                                             "<a-entity id=\x22viewportPlaceholder\x22 geometry=\x22primitive: plane; height: 0.01; width: .01\x22 position=\x220 0 -1.5\x22"+
-                                            "material=\x22opacity: 0\x22></a-entity>"+
+                                            "material=\x22opacity: 0\x22>"+
+                                            
+                                            "</a-entity>"+
                                             "<a-entity id=\x22viewportPlaceholder3\x22 geometry=\x22primitive: plane; height: 0.01; width: .01\x22 position=\x220 0 -3\x22"+
                                             "material=\x22opacity: 0\x22></a-entity>"+
                                             // "<a-entity id=\x22viewportPlaceholderFar\x22 visible=\x22false\x22 geometry=\x22primitive: plane; height: 0.01; width: .01\x22 position=\x220 0 -30\x22"+
@@ -5222,6 +5224,12 @@ webxr_router.get('/:_id', function (req, res) {
                         "<a-mixin id=\x22bar\x22 geometry=\x22primitive: box\x22 material=\x22color: black\x22 scale-y-color=\x22from: 10 60 10; to: 180 255 180; maxScale: 15\x22></a-mixin>\n"+
                         videosphereAsset +
                         webcamAsset +
+
+                        "<img id=\x22n_button\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/pics/next_button_128.png\x22 crossorigin=\x22anonymous\x22>"+
+                        "<img id=\x22p_button\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/pics/previous_button_128.png\x22 crossorigin=\x22anonymous\x22>"+
+                        "<img id=\x22fly_button\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/pics/fly_button_128.png\x22 crossorigin=\x22anonymous\x22>"+
+                        "<img id=\x22camlock_button\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/pics/camlock_button_128.png\x22 crossorigin=\x22anonymous\x22>"+
+                        "<img id=\x22play_button\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/pics/play_button_128.png\x22 crossorigin=\x22anonymous\x22>"+
 
                         "<img id=\x22fireanim1\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/pics/fireanim3.png\x22 crossorigin=\x22anonymous\x22></img>"+
                         "<img id=\x22candle1\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/pics/candle_flame_8x8.png\x22 crossorigin=\x22anonymous\x22></img>"+
