@@ -2931,7 +2931,7 @@ AFRAME.registerComponent('world_transport_buttons', {
   },
   init: function () {
     console.log("tryna set world_transport_buttons");
-    let viewportHolder = document.getElementById("viewportPlaceholder");
+    let viewportHolder = document.getElementById("viewportPlaceholder3");
     this.worldButtons = document.createElement("a-entity");
 
     this.previousButton = document.createElement("a-entity");
@@ -2944,24 +2944,24 @@ AFRAME.registerComponent('world_transport_buttons', {
       viewportHolder.appendChild(this.worldButtons);
     }
 
-    this.previousButton.setAttribute("position", "-.4 -.75 0");
-    this.previousButton.setAttribute("geometry", {"primitive": "plane", "height": .1, "width": .1});
+    this.previousButton.setAttribute("position", "-.5 -1 1");
+    this.previousButton.setAttribute("geometry", {"primitive": "plane", "height": .2, "width": .2});
     this.previousButton.setAttribute("material", {shader: "flat", src: "#p_button", transparent: true});
 
-    this.flyButton.setAttribute("position", "-.2 -.75 0");
-    this.flyButton.setAttribute("geometry", {"primitive": "plane", "height": .1, "width": .1});
+    this.flyButton.setAttribute("position", "-.25 -1 1");
+    this.flyButton.setAttribute("geometry", {"primitive": "plane", "height": .2, "width": .2});
     this.flyButton.setAttribute("material", {shader: "flat", src: "#fly_button", transparent: true});
 
-    this.playButton.setAttribute("position", "0 -.75 0");
-    this.playButton.setAttribute("geometry", {"primitive": "plane", "height": .1, "width": .1});
+    this.playButton.setAttribute("position", "0 -1 1");
+    this.playButton.setAttribute("geometry", {"primitive": "plane", "height": .25, "width": .25});
     this.playButton.setAttribute("material", {shader: "flat", src: "#play_button", transparent: true});
 
-    this.camlockButton.setAttribute("position", ".2 -.75 0");
-    this.camlockButton.setAttribute("geometry", {"primitive": "plane", "height": .1, "width": .1});
+    this.camlockButton.setAttribute("position", ".25 -1 1");
+    this.camlockButton.setAttribute("geometry", {"primitive": "plane", "height": .2, "width": .2});
     this.camlockButton.setAttribute("material", {shader: "flat", src: "#camlock_button", transparent: true});
 
-    this.nextButton.setAttribute("position", ".4 -.75 0");
-    this.nextButton.setAttribute("geometry", {"primitive": "plane", "height": .1, "width": .1});
+    this.nextButton.setAttribute("position", ".5 -1 1");
+    this.nextButton.setAttribute("geometry", {"primitive": "plane", "height": .2, "width": .2});
     this.nextButton.setAttribute("material", {shader: "flat", src: "#n_button", transparent: true});
     // this.previousButtonMaterial = new THREE.MeshBasicMaterial( { map: "#p_button", transparent: true } ); 
     this.worldButtons.appendChild(this.previousButton);
@@ -2976,7 +2976,7 @@ AFRAME.registerComponent('world_transport_buttons', {
     this.flyButton.classList.add("activeObjexRay");
     this.camlockButton.classList.add("activeObjexRay");
 
-    this.worldButtons.setAttribute("rotation", "-25 0 0");
+    // this.worldButtons.setAttribute("rotation", "-15 0 0");
     this.addListeners();
 
     let nextbuttonEl = document.getElementById('nextButton');
@@ -2987,38 +2987,78 @@ AFRAME.registerComponent('world_transport_buttons', {
   },
   addListeners: function () {
     this.previousButton.addEventListener('mouseenter', function (evt) {
+      evt.stopPropagation();
+      evt.preventDefault();
       console.log("previousButton mouseenter");
+      
     });
     this.nextButton.addEventListener('mouseenter', function (evt) {
+      evt.stopPropagation();
+      evt.preventDefault();
       console.log("nextButton mouseenter");
     });
     this.playButton.addEventListener('mouseenter', function (evt) {
-      console.log("playButton mouseenter");
+      evt.preventDefault();
+      evt.stopPropagation();
+      // console.log("playButton mouseenter");
     });
     this.flyButton.addEventListener('mouseenter', function (evt) {
-      console.log("flyButton mouseenter");
+      evt.preventDefault();
+      evt.stopPropagation();
+      // console.log("flyButton mouseenter");
     });
     this.camlockButton.addEventListener('mouseenter', function (evt) {
-      console.log("camlockButton mouseenter");
+      evt.preventDefault();
+      evt.stopPropagation();
+      // console.log("camlockButton mouseenter");
     });
 
-    this.previousButton.addEventListener('click', function (evt) {
+    this.previousButton.addEventListener('mousedown', function (evt) {
+      evt.preventDefault();
+      evt.stopPropagation();
+
       console.log("previousButton click");
+      GoToPrevious();
+      
     });
-    this.nextButton.addEventListener('click', function (evt) {
+    this.nextButton.addEventListener('mousedown', function (evt) {
+      evt.preventDefault();
+      evt.stopPropagation();
       console.log("nextButton click");
+      GoToNext();
     });
-    this.playButton.addEventListener('click', function (evt) {
+    this.playButton.addEventListener('mousedown', function (evt) {
+      evt.preventDefault();
+      evt.stopPropagation();
       console.log("playButton click");
+      PlayPauseMedia();
     });
-    this.flyButton.addEventListener('click', function (evt) {
+    this.flyButton.addEventListener('mousedown', function (evt) {
+      evt.preventDefault();
+      evt.stopPropagation();
       console.log("flyButton click");
+      let curveDriver = document.getElementById("cameraCurve");
+      if (curveDriver) {
+        let modCurveComponent = curveDriver.components.mod_curve;
+        if (modCurveComponent) {
+          modCurveComponent.toggleMove();
+        }
+      }
     });
-    this.camlockButton.addEventListener('click', function (evt) {
+    this.camlockButton.addEventListener('mousedown', function (evt) {
+      evt.preventDefault();
+      evt.stopPropagation();
       console.log("camlockButton click");
+      let curveDriver = document.getElementById("cameraCurve");
+      if (curveDriver && settings && timedEventsListenerMode ) {
+        let modCurveComponent = curveDriver.components.mod_curve;
+        if (modCurveComponent) {
+          modCurveComponent.toggleLookAt();
+          // PlayPauseMedia();
+        }
+      }
     });
   }  
-   
 });
 
 AFRAME.registerComponent('mod_curve', {
@@ -3035,7 +3075,7 @@ AFRAME.registerComponent('mod_curve', {
     useCurvePoints: {default: false},
     curvePoints: {default: []}, //array of positions from .curvepoints
     modCurve: {default: false},
-    lookAt: {default: ''},
+    lookAt: {default: 'ahead'},
     tweakCurve: {default: false}
     // closeLoop: {default: false}
   },
@@ -3043,7 +3083,8 @@ AFRAME.registerComponent('mod_curve', {
   init: function () {
 
     this.loaded = false;
-
+    this.isLooking = false;
+    this.isReady = null;
     // console.log("tryna make a mod_curve");
 
     this.newPosition = null;
@@ -3167,13 +3208,25 @@ AFRAME.registerComponent('mod_curve', {
     //   }
     // });
   },
+  toggleLookAt: function(look) {
+    if (this.curve && this.curveLine) {
+      if (look != null) {
+        this.isLooking = look;
+      } else {
+        this.isLooking = !this.isLooking;
+      }
+    }
+  },
   toggleMove: function(play) {
     
+    
     if (this.curve && this.curveLine) {
-      if (play) {
+      if (play != null) {
         this.isReady = play;
+        console.log("tryna toggleMove " + play);
       } else {
         this.isReady = !this.isReady;
+        console.log("tryna toggleMove " + this.isReady);
       }
     }
     // console.log("tryna toggleMove isReady " + this.isReady );
@@ -3239,7 +3292,7 @@ AFRAME.registerComponent('mod_curve', {
           this.isReady = false;
         } 
         this.objectOnCurve.position.copy( this.curve.getPoint( this.fraction ) ); //follow ascending index of points       
-        if (this.data.lookAt != '') {
+        if (this.isLooking != '') {
           if (this.data.lookAt == 'next') {
             this.objectOnCurve.lookAt(this.points[this.currentPoint]);
           } else if (this.data.lookAt == 'ahead') {

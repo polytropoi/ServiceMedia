@@ -100,11 +100,13 @@ window.addEventListener( 'keydown',  ( event ) => {
 
       break;
     }
+    // event.clearEvents();
   });
 
   window.addEventListener( 'keyup',  ( event ) => {
     keydown = "*";
     console.log("keyup " + keydown);
+
   });
 
   window.addEventListener("wheel", event => {
