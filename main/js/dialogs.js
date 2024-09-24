@@ -1137,7 +1137,7 @@ function ShowLocationModal(timestamp) {
         let phID = thisLocation.timestamp;
         let title = label + " : " + thisLocation.timestamp;
         // let content = "<span id='modalCloser' onclick=\x22ShowHideDialogPanel()\x22 class='close-modal'>&times;</span><div><h3>"+title+"</h3><hr>" + //populate modal
-        let content = "<div><h3>"+title+"</h3><hr>" + //populate modal
+        let content = "<div><div><h3>"+title+"</h3><span id=\x22detailModMessage\x22 style=\x22float:right; color:pink; margin: auto\x22></span></div><hr>" + //populate modal
         // "<form>"+aa
         // "<table><tr>"
         "<div class=\x22row\x22>"+

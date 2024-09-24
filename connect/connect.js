@@ -30,7 +30,8 @@ let timeKeysData = {};
 let tkStarttimes = [];
 let sceneLocations = {locations: [], locationMods: []};
 let poiLocations = [];
-let cloudMarkers = [];
+let curveLocations = [];
+let cloudMarkers = []; //???? unused>?
 let sceneModels = [];
 let sceneObjects = [];
 let sceneTextItems = [];
@@ -1154,29 +1155,65 @@ function GoToNext() {
       FlyToMapPosition(lbData.split("_")[0],lbData.split("_")[1], false);
     
    } else {
-      // console.log("currentLocationIndex " +  currentLocationIndex  +" poiLocations"  + JSON.stringify(poiLocations));
-      if (localData.settings.sceneTags && localData.settings.sceneTags.includes("follow path")) {
+     
          let curveDriver = document.getElementById("cameraCurve");
-      if (curveDriver && settings && timedEventsListenerMode ) {
-        let modCurveComponent = curveDriver.components.mod_curve;
-        if (modCurveComponent) {
-          modCurveComponent.moveToNext();
-          // PlayPauseMedia();
-        }
-      }
-      }
-      if (sceneLocations != null && poiLocations.length > 0) { 
-         if (currentLocationIndex < poiLocations.length - 1) {
-            currentLocationIndex++;
+         if (curveDriver && settings && timedEventsListenerMode ) {
+
+            if (sceneLocations != null && curveLocations.length > 0) { 
+               if (currentLocationIndex < curveLocations.length - 1) {
+                  currentLocationIndex++;
+               } else {
+                  currentLocationIndex = 0;
+                  
+               }
+               
+               if (localData.locations) {
+                  for (i = 0; i < localData.locations.length; i++) {
+                     if (localData.locations[i].timestamp == curveLocations[currentLocationIndex].timestamp) {
+                        curveLocations[currentLocationIndex] = localData.locations[i];
+                        console.log("curve currentLocationIndex " +  currentLocationIndex  +" curveLocations"  + JSON.stringify(curveLocations[currentLocationIndex]));
+                        GoToLocation(curveLocations[currentLocationIndex].timestamp);
+                        if (curveLocations[currentLocationIndex].targetElements && curveLocations[currentLocationIndex].targetElements.length) {
+                           let modCurveComponent = curveDriver.components.mod_curve;
+                           if (modCurveComponent) {
+                              // // let lookAtPosition = new THREE.Vector3();
+                              // lookAtPosition.x = parseFloat(localData.locations[i].x);
+                              // lookAtPosition.y = parseFloat(localData.locations[i].y);
+                              // lookAtPosition.z = parseFloat(localData.locations[i].z);
+                              let lookPos = document.getElementById(curveLocations[currentLocationIndex].targetElements[0]).getAttribute("position")
+                              // console.log("tryna lookat " + JSON.stringify(lookAtPosition));
+                              // modCurveComponent.lookAt(parseFloat(localData.locations[i].x), parseFloat(localData.locations[i].y), parseFloat(localData.locations[i].z));
+                              modCurveComponent.lookAt(lookPos.x, lookPos.y, lookPos.z);
+                              break;
+                           }
+                        }
+                     }
+                  }
+               }
+               
+            // hasCurve = true;
+            // if (curveLocations.)
+            // let modCurveComponent = curveDriver.components.mod_curve;
+            // if (modCurveComponent) {
+            //    modCurveComponent.moveToNext();
+            // }
+            //    // PlayPauseMedia();
+            }
          } else {
-            currentLocationIndex = 0;
-            
+            console.log("currentLocationIndex " +  currentLocationIndex  +" poiLocations"  + JSON.stringify(poiLocations));
+            if (sceneLocations != null && poiLocations.length > 0) { 
+               if (currentLocationIndex < poiLocations.length - 1) {
+                  currentLocationIndex++;
+               } else {
+                  currentLocationIndex = 0;
+                  
+               }
+            console.log("currentLocationIndex " +  currentLocationIndex  + " " + JSON.stringify(poiLocations));
+            GoToLocation(poiLocations[currentLocationIndex].timestamp);
+            document.getElementById("footerText").innerHTML = poiLocations[currentLocationIndex].name;
+
          }
-         console.log("currentLocationIndex " +  currentLocationIndex  + " " + poiLocations[currentLocationIndex]);
-      // if (sceneLocations.locationMods[currentLocationIndex].markerType.toLowerCase() == 'poi') {
-         GoToLocation(poiLocations[currentLocationIndex].timestamp);
-         document.getElementById("footerText").innerHTML = poiLocations[currentLocationIndex].name;
-         // }
+
       }
       if (skyboxEl != null) {
          skyboxEl.components.skybox_dynamic.nextSkybox();
@@ -1215,6 +1252,18 @@ function GoToPrevious() {
       FlyToMapPosition(lbData.split("_")[0],lbData.split("_")[1], false);
     
    } else {
+      let hasCurve = false;
+      if (localData.settings.sceneTags && localData.settings.sceneTags.includes("follow path")) {
+         let curveDriver = document.getElementById("cameraCurve");
+         if (curveDriver && settings && timedEventsListenerMode ) {
+            hasCurve = true;
+         let modCurveComponent = curveDriver.components.mod_curve;
+            if (modCurveComponent) {
+               modCurveComponent.moveToNext();
+               // PlayPauseMedia();
+            }
+         }
+      }
       if (sceneLocations != null && poiLocations.length > 0) {
          if (currentLocationIndex > 0) {
             currentLocationIndex--;
@@ -1223,8 +1272,10 @@ function GoToPrevious() {
          }
          
          GoToLocation(poiLocations[currentLocationIndex].phID);
-         document.getElementById("footerText").innerHTML = poiLocations[currentLocationIndex].name;
-         // }
+         let curveDriver = document.getElementById("cameraCurve");
+         if (!curveDriver) {
+            document.getElementById("footerText").innerHTML = poiLocations[currentLocationIndex].name;
+         }// }
       }
       if (skyboxEl != null) {
          skyboxEl.components.skybox_dynamic.previousSkybox();
@@ -1569,15 +1620,23 @@ if (sceneEl != null) {
                      this.data.youtubePosition.z = locItem.z;
                      // console.log("YOTUBE POSOTION: " +JSON.stringify(this.data.youtubePosition));
                   }
-                  if (locItem.markerType.toLowerCase().includes("poi")) {
+                  if (locItem.markerType == "poi") {
                      let nextbuttonEl = document.getElementById('nextButton');
                      let prevbuttonEl = document.getElementById('previousButton');
                      nextbuttonEl.style.visibility = "visible";
                      prevbuttonEl.style.visibility = "visible";
                      poiLocations.push(locItem);
                   }
+                  if (locItem.markerType == "curve point") {
+                     // let nextbuttonEl = document.getElementById('nextButton');
+                     // let prevbuttonEl = document.getElementById('previousButton');
+                     // nextbuttonEl.style.visibility = "visible";
+                     // prevbuttonEl.style.visibility = "visible";
+                     curveLocations.push(locItem);
+                  }
                   if (locItem.markerType.toLowerCase().includes("placeholder") ||
                      locItem.markerType.toLowerCase().includes("poi") ||
+                     // locItem.markerType.toLowerCase().includes("poi") ||
                      locItem.markerType.toLowerCase().includes("gate") || 
                      locItem.markerType.toLowerCase().includes("portal") || 
                      locItem.markerType.toLowerCase().includes("mailbox") || 
@@ -1590,14 +1649,17 @@ if (sceneEl != null) {
                if (i == this.data.jsonData.length - 1) {
                   sceneEl.removeAttribute("keyboard-shortcuts");
                   // if (settings.allowMods) {
-                     this.waitAndInitLocalDB();             
+                     this.waitAndInitLocalDB();     
+                     console.log("poiLocations " + JSON.stringify(poiLocations));        
                      // InitIDB();
                   // }
                }
             }
          } else {
             if (!AFRAME.utils.device.isMobile()) {
-            InitIDB();
+               InitIDB();
+            } else {
+               InitCurves(); //this is called from InitDB above if not mobile
             }
          }
           
@@ -2658,7 +2720,7 @@ function InitCurves() {
          } else {
             let localMarkerComponent = curvePointEls[i].components.local_marker;
             if (parseInt(localMarkerComponent.description)) {
-               console.log("local curvepoint index is " + parseInt(localMarkerComponent.data.description));
+               console.log("local curvepoint index is " + parseInt(localMarkerComponent.data.description)); //kinda sad
                curvePointWithIndex.index = parseInt(localMarkerComponent.data.description);
                curvePoints.push(curvePointWithIndex);
             } else {

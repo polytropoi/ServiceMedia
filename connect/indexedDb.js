@@ -128,6 +128,9 @@ function InitIDB() {
                         if (cursor.value.locations[i].markerType == "poi") {
                            poiLocations.push(cursor.value.locations[i]);
                         }
+                        if (cursor.value.locations[i].markerType == "curve point") {
+                           curveLocations.push(cursor.value.locations[i]);
+                        }
                         localEl.setAttribute("position", {x: cursor.value.locations[i].x, y: cursor.value.locations[i].y, z: cursor.value.locations[i].z });
                         localEl.setAttribute("rotation", {x: cursor.value.locations[i].eulerx, y: cursor.value.locations[i].eulery, z: cursor.value.locations[i].eulerz });
                         // localEl.setAttribute("scale", {x: cursor.value.locations[i].markerObjScale, y: cursor.value.locations[i].markerObjScale, z: cursor.value.locations[i].markerObjScale});
@@ -406,6 +409,10 @@ function InitIDB() {
          if (mSpan) {
             mSpan.innerText = "Mods Saved to Local Database!";
          }
+         let dSpan = document.getElementById("detailModMessage");
+         if (dSpan) {
+            dSpan.innerText = "Mods Saved to Local Database!";
+         }
        };
     };
     
@@ -456,9 +463,9 @@ function InitIDB() {
            db.close();
            console.log("localdata saved!");
            hasLocalData = true;
-         //   ShowHideDialogPanel();
-            // InitLocalData();
-         DisplayLocalFiles(); //in dialogs.js
+            //   ShowHideDialogPanel();
+               // InitLocalData();
+            DisplayLocalFiles(); //in dialogs.js
          };
       };
    }
@@ -572,8 +579,7 @@ const getFileFromInput = () => {
 		reader.onerror = (event) => {
 			reject(event.target.error);
 		};
-		reader.readAsArrayBuffer(file);
-
+		reader.readAsArrayBuffer(file); //this actually converts blob to arraybuffer
 	});
 };
 

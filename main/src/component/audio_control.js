@@ -436,58 +436,7 @@ AFRAME.registerComponent('primary_audio_player', {  //setup and controls for the
                     }
                     
                     this.updateStatus();
-                    // if (!primaryAudioHowl.playing()) {
-                    //     el.setAttribute('light', {
-                    //         type: 'point',
-                    //         distance: 30,
-                    //         intensity: 1.0,
-                    //         color: 'blue'
-                    //     }, true);
-                    //     // duration = primaryAudioHowl.duration().toFixed(2);
-                    //     primaryAudioHowl.play();
-                    //     // if (!primaryAudioHowl.playing()) {
-                    //         // el.emit('primaryAudioToggle', {isPlaying : true}, true);
-                    //         primaryAudioHowl.volume(normalizedVolume);
-                    //         console.log('...tryna play...');
-                    //         document.querySelector("#primaryAudioText").setAttribute('text', {
-                    //             // width: 4, 
-                    //             align: "center",
-                    //             value: "loading..."
-                    //         });
-                    //         // primaryAudioHowl.pos(0, 1.6, -1);
-                    //         // this.tryingToPlay = true;
-                    //         el.setAttribute('material', 'color', 'blue');
-                    //     // // } else {
-                    //     //     document.querySelector("#primaryAudioText").setAttribute('text', {
-                    //     //         // width: 4, 
-                    //     //         align: "center",
-                    //     //         value: data.title
-                    //     //     });
-                    //     //     // primaryAudioHowl.pos(0, 1.6, -1);
-                    //     //     // this.tryingToPlay = true;
-                    //     //     el.setAttribute('material', 'color', 'green');
-                    //     // }
-
-                    // } else {
-                    //     // if (this.tryingToPlay) {
-                    //     el.setAttribute('light', {
-                    //         type: 'point',
-                    //         distance: 30,
-                    //         intensity: 1.0,
-                    //         color: 'red'
-                    //     }, true);
-                    //         // if (primaryAudioHowl != null) {
-                    //     primaryAudioHowl.pause();
-                    //     this.tryingToPlay = false;
-                    //     console.log('...tryna pause...');
-                    //     el.setAttribute('material', 'color', 'red');
-                    //     el.emit('primaryAudioToggle', true);
-                    //     document.querySelector("#primaryAudioText").setAttribute('text', {
-                    //         // width: 4, 
-                    //         align: "center",
-                    //         value: data.title
-                    //     });
-                    // }
+                    
                 });        
                 // el.addEventListener('mouseleave', function () {
                 //     el.setAttribute('color', defaultColor);

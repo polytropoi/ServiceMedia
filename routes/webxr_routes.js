@@ -2162,9 +2162,9 @@ webxr_router.get('/:_id', function (req, res) {
                             const xscale = locationPlaceholders[i].xscale != null ? locationPlaceholders[i].xscale : scale;
                             const yscale = locationPlaceholders[i].yscale != null ? locationPlaceholders[i].yscale : scale;
                             const zscale = locationPlaceholders[i].zscale != null ? locationPlaceholders[i].zscale : scale;   
-                            const xrot = locationPlaceholders[i].eulerx != null ? locationPlaceholders[i].xscale : rot;
-                            const yrot = locationPlaceholders[i].eulery != null ? locationPlaceholders[i].yscale : rot;
-                            const zrot = locationPlaceholders[i].eulerz != null ? locationPlaceholders[i].zscale : rot;
+                            const xrot = locationPlaceholders[i].eulerx != null ? locationPlaceholders[i].eulerx : rot;
+                            const yrot = locationPlaceholders[i].eulery != null ? locationPlaceholders[i].eulery : rot;
+                            const zrot = locationPlaceholders[i].eulerz != null ? locationPlaceholders[i].eulerz : rot;
                             placeholderEntities = placeholderEntities + "<a-entity data-isvisible=\x22yes\x22 id=\x22"+locationPlaceholders[i].timestamp+"\x22 class=\x22activeObjexGrab activeObjexRay envMap "+
                             "placeholders\x22 cloud_marker=\x22phID: "+locationPlaceholders[i].phID+"; scale: "+scale+"; xpos: "+locationPlaceholders[i].x+"; ypos: "+locationPlaceholders[i].y+"; zpos: "+locationPlaceholders[i].z+";" +
                             "xrot: "+xrot+"; yrot: "+yrot+"; zrot: "+zrot+"; targetElements: "+locationPlaceholders[i].targetElements+"; " +

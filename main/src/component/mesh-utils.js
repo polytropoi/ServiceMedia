@@ -2944,24 +2944,24 @@ AFRAME.registerComponent('world_transport_buttons', {
       viewportHolder.appendChild(this.worldButtons);
     }
 
-    this.previousButton.setAttribute("position", "-.5 -1 1");
-    this.previousButton.setAttribute("geometry", {"primitive": "plane", "height": .2, "width": .2});
+    this.previousButton.setAttribute("position", "-.3 -.35 2");
+    this.previousButton.setAttribute("geometry", {"primitive": "plane", "height": .1, "width": .1});
     this.previousButton.setAttribute("material", {shader: "flat", src: "#p_button", transparent: true});
 
-    this.flyButton.setAttribute("position", "-.25 -1 1");
-    this.flyButton.setAttribute("geometry", {"primitive": "plane", "height": .2, "width": .2});
+    this.flyButton.setAttribute("position", "-.15 -.35 2");
+    this.flyButton.setAttribute("geometry", {"primitive": "plane", "height": .1, "width": .1});
     this.flyButton.setAttribute("material", {shader: "flat", src: "#fly_button", transparent: true});
 
-    this.playButton.setAttribute("position", "0 -1 1");
-    this.playButton.setAttribute("geometry", {"primitive": "plane", "height": .25, "width": .25});
+    this.playButton.setAttribute("position", "0 -.35 2");
+    this.playButton.setAttribute("geometry", {"primitive": "plane", "height": .125, "width": .125});
     this.playButton.setAttribute("material", {shader: "flat", src: "#play_button", transparent: true});
 
-    this.camlockButton.setAttribute("position", ".25 -1 1");
-    this.camlockButton.setAttribute("geometry", {"primitive": "plane", "height": .2, "width": .2});
+    this.camlockButton.setAttribute("position", ".15 -.35 2");
+    this.camlockButton.setAttribute("geometry", {"primitive": "plane", "height": .1, "width": .1});
     this.camlockButton.setAttribute("material", {shader: "flat", src: "#camlock_button", transparent: true});
 
-    this.nextButton.setAttribute("position", ".5 -1 1");
-    this.nextButton.setAttribute("geometry", {"primitive": "plane", "height": .2, "width": .2});
+    this.nextButton.setAttribute("position", ".3 -.35 2");
+    this.nextButton.setAttribute("geometry", {"primitive": "plane", "height": .1, "width": .1});
     this.nextButton.setAttribute("material", {shader: "flat", src: "#n_button", transparent: true});
     // this.previousButtonMaterial = new THREE.MeshBasicMaterial( { map: "#p_button", transparent: true } ); 
     this.worldButtons.appendChild(this.previousButton);
@@ -2986,32 +2986,32 @@ AFRAME.registerComponent('world_transport_buttons', {
 
   },
   addListeners: function () {
-    this.previousButton.addEventListener('mouseenter', function (evt) {
-      evt.stopPropagation();
-      evt.preventDefault();
-      console.log("previousButton mouseenter");
+    // this.previousButton.addEventListener('mouseenter', function (evt) {
+    //   evt.stopPropagation();
+    //   evt.preventDefault();
+    //   console.log("previousButton mouseenter");
       
-    });
-    this.nextButton.addEventListener('mouseenter', function (evt) {
-      evt.stopPropagation();
-      evt.preventDefault();
-      console.log("nextButton mouseenter");
-    });
-    this.playButton.addEventListener('mouseenter', function (evt) {
-      evt.preventDefault();
-      evt.stopPropagation();
-      // console.log("playButton mouseenter");
-    });
-    this.flyButton.addEventListener('mouseenter', function (evt) {
-      evt.preventDefault();
-      evt.stopPropagation();
-      // console.log("flyButton mouseenter");
-    });
-    this.camlockButton.addEventListener('mouseenter', function (evt) {
-      evt.preventDefault();
-      evt.stopPropagation();
-      // console.log("camlockButton mouseenter");
-    });
+    // });
+    // this.nextButton.addEventListener('mouseenter', function (evt) {
+    //   evt.stopPropagation();
+    //   evt.preventDefault();
+    //   console.log("nextButton mouseenter");
+    // });
+    // this.playButton.addEventListener('mouseenter', function (evt) {
+    //   evt.preventDefault();
+    //   evt.stopPropagation();
+    //   // console.log("playButton mouseenter");
+    // });
+    // this.flyButton.addEventListener('mouseenter', function (evt) {
+    //   evt.preventDefault();
+    //   evt.stopPropagation();
+    //   // console.log("flyButton mouseenter");
+    // });
+    // this.camlockButton.addEventListener('mouseenter', function (evt) {
+    //   evt.preventDefault();
+    //   evt.stopPropagation();
+    //   // console.log("camlockButton mouseenter");
+    // });
 
     this.previousButton.addEventListener('mousedown', function (evt) {
       evt.preventDefault();
@@ -3108,6 +3108,7 @@ AFRAME.registerComponent('mod_curve', {
     this.followCurve = false;
     this.currentPoint = 0;
     this.moveToPointIndex = -1;
+    this.lookVector = new THREE.Vector3();
     // this.lookAtNext = false;
 
     if (settings && settings.sceneTags.includes("debug")) {
@@ -3184,14 +3185,12 @@ AFRAME.registerComponent('mod_curve', {
       if (this.data.isClosed) {
         this.curve.closed = true;
       }
-
-
         this.c_points = this.curve.getPoints( 50 );
         this.c_geometry = new THREE.BufferGeometry().setFromPoints( this.c_points );
         this.c_material = new THREE.LineBasicMaterial( { color: 0x4287f5 } );
         this.curveLine = new THREE.Line( this.c_geometry, this.c_material ); //this one stays a curve
 
-        if (this.showCurveLine) {
+      if (this.showCurveLine) {
         this.el.sceneEl.object3D.add(this.curveLine);
       }
       if (!this.data.useCurvePoints) {
@@ -3237,7 +3236,7 @@ AFRAME.registerComponent('mod_curve', {
   moveToNext: function() {
 
     this.moveToPointIndex = this.currentPoint + 1;
-
+    console.log("tryna moveToNext point # " + this.moveToPointIndex );
   },
   scrollMove: function(scrollMod) {
     console.log("tryna scrollMove " + scrollMod)
@@ -3259,6 +3258,25 @@ AFRAME.registerComponent('mod_curve', {
     } else {
       this.objectOnCurve.position.copy( this.curve.getPoint( 1 - this.fraction ) ); //or just the fraction to go backwards       
     }
+  },
+  lookAt: function (x,y,z) {
+    if (!x) {
+      this.isLooking = false;
+    } else {
+      if (this.objectOnCurve) {
+        console.log("tryna lookat " + x + " " + y + " " + z);
+        this.lookVector.x = x;
+        this.lookVector.y = y;
+        this.lookVector.z = z;
+        this.isLooking = true;
+        this.updateCurve();
+        // this.isReady = true; 
+        // this.objectOnCurve.lookAt(x,y,z);
+      } else {
+        console.log("no objectOnCurve!");
+      }
+    }
+    
   },
   updateCurve: function() {
 
@@ -3292,14 +3310,20 @@ AFRAME.registerComponent('mod_curve', {
           this.isReady = false;
         } 
         this.objectOnCurve.position.copy( this.curve.getPoint( this.fraction ) ); //follow ascending index of points       
+        
         if (this.isLooking != '') {
-          if (this.data.lookAt == 'next') {
-            this.objectOnCurve.lookAt(this.points[this.currentPoint]);
-          } else if (this.data.lookAt == 'ahead') {
-            if (this.fraction > .11) {
-              this.objectOnCurve.lookAt(this.curve.getPoint( this.fraction - .1));
+          if (this.lookVector.x != 0 && this.lookVector.z != 0) {
+            console.log("tryna lookat " + JSON.stringify(this.lookVector));
+            this.objectOnCurve.lookAt(this.lookVector);
+          } else {
+            if (this.data.lookAt == 'next') {
+              this.objectOnCurve.lookAt(this.points[this.currentPoint]);
+            } else if (this.data.lookAt == 'ahead') {
+              if (this.fraction > .11) {
+                this.objectOnCurve.lookAt(this.curve.getPoint( this.fraction - .1));
+              }
+            
             }
-          
           }
         }
         // }
