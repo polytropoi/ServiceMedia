@@ -1173,17 +1173,22 @@ function GoToNext() {
                         curveLocations[currentLocationIndex] = localData.locations[i];
                         console.log("curve currentLocationIndex " +  currentLocationIndex  +" curveLocations"  + JSON.stringify(curveLocations[currentLocationIndex]));
                         GoToLocation(curveLocations[currentLocationIndex].timestamp);
-                        if (curveLocations[currentLocationIndex].targetElements && curveLocations[currentLocationIndex].targetElements.length) {
+                        if (curveLocations[currentLocationIndex].targetElements && curveLocations[currentLocationIndex].targetElements.length > 0) {
                            let modCurveComponent = curveDriver.components.mod_curve;
                            if (modCurveComponent) {
                               // // let lookAtPosition = new THREE.Vector3();
                               // lookAtPosition.x = parseFloat(localData.locations[i].x);
                               // lookAtPosition.y = parseFloat(localData.locations[i].y);
                               // lookAtPosition.z = parseFloat(localData.locations[i].z);
-                              let lookPos = document.getElementById(curveLocations[currentLocationIndex].targetElements[0]).getAttribute("position")
+                              let curvePointEl = document.getElementById(curveLocations[currentLocationIndex].targetElements[0]);
+                              if (curvePointEl) {
+                                 let lookPos = curvePointEl.getAttribute("position");
+                                 modCurveComponent.lookAt(lookPos.x, lookPos.y, lookPos.z);
+                              }
+                              
                               // console.log("tryna lookat " + JSON.stringify(lookAtPosition));
                               // modCurveComponent.lookAt(parseFloat(localData.locations[i].x), parseFloat(localData.locations[i].y), parseFloat(localData.locations[i].z));
-                              modCurveComponent.lookAt(lookPos.x, lookPos.y, lookPos.z);
+                              
                               break;
                            }
                         }

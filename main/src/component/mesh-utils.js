@@ -2944,25 +2944,26 @@ AFRAME.registerComponent('world_transport_buttons', {
       viewportHolder.appendChild(this.worldButtons);
     }
 
-    this.previousButton.setAttribute("position", "-.3 -.35 2");
-    this.previousButton.setAttribute("geometry", {"primitive": "plane", "height": .1, "width": .1});
+    this.previousButton.setAttribute("position", "-.5 -.85 0");
+    this.previousButton.setAttribute("geometry", {"primitive": "plane", "height": .2, "width": .2});
     this.previousButton.setAttribute("material", {shader: "flat", src: "#p_button", transparent: true});
-
-    this.flyButton.setAttribute("position", "-.15 -.35 2");
-    this.flyButton.setAttribute("geometry", {"primitive": "plane", "height": .1, "width": .1});
+    this.previousButton.setAttribute("overlay", "");
+    this.flyButton.setAttribute("position", "-.25 -.85 0");
+    this.flyButton.setAttribute("geometry", {"primitive": "plane", "height": .2, "width": .2});
     this.flyButton.setAttribute("material", {shader: "flat", src: "#fly_button", transparent: true});
-
-    this.playButton.setAttribute("position", "0 -.35 2");
-    this.playButton.setAttribute("geometry", {"primitive": "plane", "height": .125, "width": .125});
+    this.flyButton.setAttribute("overlay", "");
+    this.playButton.setAttribute("position", "0 -.85 0");
+    this.playButton.setAttribute("geometry", {"primitive": "plane", "height": .225, "width": .225});
     this.playButton.setAttribute("material", {shader: "flat", src: "#play_button", transparent: true});
-
-    this.camlockButton.setAttribute("position", ".15 -.35 2");
-    this.camlockButton.setAttribute("geometry", {"primitive": "plane", "height": .1, "width": .1});
+    this.playButton.setAttribute("overlay", "");
+    this.camlockButton.setAttribute("position", ".25 -.85 0");
+    this.camlockButton.setAttribute("geometry", {"primitive": "plane", "height": .2, "width": .2});
     this.camlockButton.setAttribute("material", {shader: "flat", src: "#camlock_button", transparent: true});
-
-    this.nextButton.setAttribute("position", ".3 -.35 2");
-    this.nextButton.setAttribute("geometry", {"primitive": "plane", "height": .1, "width": .1});
+    this.camlockButton.setAttribute("overlay", "");
+    this.nextButton.setAttribute("position", ".5 -.85 0");
+    this.nextButton.setAttribute("geometry", {"primitive": "plane", "height": .2, "width": .2});
     this.nextButton.setAttribute("material", {shader: "flat", src: "#n_button", transparent: true});
+    this.nextButton.setAttribute("overlay", "");
     // this.previousButtonMaterial = new THREE.MeshBasicMaterial( { map: "#p_button", transparent: true } ); 
     this.worldButtons.appendChild(this.previousButton);
     this.worldButtons.appendChild(this.playButton);
