@@ -2102,7 +2102,7 @@ AFRAME.registerComponent('mod_model', {
     },
     rayhit: function (id, distance, hitpoint) {
   
-      if (this.data.eventData && this.data.eventData.length && this.data.eventData.toLowerCase().includes("target")) {        
+      if (isFiring && this.data.eventData && this.data.eventData.length && this.data.eventData.toLowerCase().includes("target")) {        
         if (this.particlesEl) {
           
             console.log("gotsa rayhit on id " + this.el.id + " eventdata " + this.data.eventData + " at " + JSON.stringify(hitpoint) + " tags" + this.data.tags);

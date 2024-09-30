@@ -3590,6 +3590,7 @@ AFRAME.registerComponent('mod_line', {
       window.addEventListener('mousedown', (e) => {
         e.preventDefault();
         this.data.showLine = true;
+        isFiring = true;
         if (this.triggerAudioController) {
           this.triggerAudioController.components.trigger_audio_control.loopToggle(true);
           this.triggerAudioController.components.trigger_audio_control.modLoop("rate", this.modValue);
@@ -3598,6 +3599,7 @@ AFRAME.registerComponent('mod_line', {
       window.addEventListener('mouseup', (e) => {
         e.preventDefault();
         this.data.showLine = false;
+        isFiring = false;
         if (this.triggerAudioController) {
           this.triggerAudioController.components.trigger_audio_control.modLoop("rate", 0);
           this.triggerAudioController.components.trigger_audio_control.loopToggle(false);

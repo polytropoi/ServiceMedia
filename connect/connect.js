@@ -64,7 +64,7 @@ let matrixRoomsData = null;
 
 let mouseDownStarttime = 0;
 let mouseDowntime = 0;
-
+let isFiring = false;
 var token = document.getElementById("token").getAttribute("data-token"); 
 // var localtoken = localStorage.getItem("smToken"); //rem all localstorage!
 let socketHost = "http://localhost:3000";
@@ -1175,7 +1175,7 @@ function GoToNext() {
                         GoToLocation(curveLocations[currentLocationIndex].timestamp);
                         if (curveLocations[currentLocationIndex].targetElements && curveLocations[currentLocationIndex].targetElements.length > 0) {
                            let modCurveComponent = curveDriver.components.mod_curve;
-                           if (modCurveComponent) {
+                           if (modCurveComponent && curveLocations[currentLocationIndex].targetElements[0] != "none") {
                               // // let lookAtPosition = new THREE.Vector3();
                               // lookAtPosition.x = parseFloat(localData.locations[i].x);
                               // lookAtPosition.y = parseFloat(localData.locations[i].y);
