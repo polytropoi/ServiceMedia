@@ -357,7 +357,7 @@ AFRAME.registerComponent('mod_model', {
               this.hasAudioTrigger = true;
             }
             
-            if (this.data.eventData.toLowerCase().includes("target")) {
+            if (this.data.eventData.toLowerCase().includes("target") || this.data.tags.toLowerCase().includes("target")) {
                 this.particlesEl = document.createElement("a-entity");
                 this.el.sceneEl.appendChild(this.particlesEl); //hrm...
                 this.el.classList.add("target");
@@ -2102,7 +2102,8 @@ AFRAME.registerComponent('mod_model', {
     },
     rayhit: function (id, distance, hitpoint) {
   
-      if (isFiring && this.data.eventData && this.data.eventData.length && this.data.eventData.toLowerCase().includes("target")) {        
+      if (isFiring && (this.data.eventData && this.data.eventData.length && this.data.eventData.toLowerCase().includes("target")) || 
+          this.data.tags && this.data.tags.length && this.data.tags.toLowerCase().includes("target")) {        
         if (this.particlesEl) {
           
             console.log("gotsa rayhit on id " + this.el.id + " eventdata " + this.data.eventData + " at " + JSON.stringify(hitpoint) + " tags" + this.data.tags);

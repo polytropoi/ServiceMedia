@@ -3623,7 +3623,7 @@ AFRAME.registerComponent('mod_line', {
       // this.splineMesh.geometry.attributes.position.needsUpdate = true;
 
       this.equipHolder.object3D.getWorldPosition(this.positionMe);  //actually it's id "playCaster"
-      this.equipHolder.object3D.getWorldDirection(this.directionMe).negate();
+      this.equipHolder.object3D.getWorldDirection(this.directionMe).negate().normalize();
 
       // this.points[0].copy(this.positionMe);
       // this.points[0].copy( (this.positionMe ).add( this.directionMe.multiplyScalar( 1 )) );
