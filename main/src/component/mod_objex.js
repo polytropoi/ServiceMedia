@@ -986,13 +986,17 @@ AFRAME.registerComponent('mod_object', {
       }
   
     if (this.data.isEquipped) {
-
         if (this.hasTriggerAction) {
         this.el.setAttribute("raycaster", {"objects": ".target", "far": "50", "position": "0 -0.5 0", "rotation": "90 0 0"});
         this.equippedRaycaster = this.el.components.raycaster;
+        this.triggerAudioController = document.getElementById("triggerAudio");
+        console.log("triggerAudio loop "+ this.tags);
+        if (this.triggerAudioController != null) {
+            this.triggerAudioController.components.trigger_audio_control.loopAndFollow(this.el.id, this.tags, false); //don't autoplay if hastriggeraction
+        } 
         }
         if (this.hasShootAction || this.hasThrowAction) {
-        this.el.classList.add("activeObjexRay");
+          this.el.classList.add("activeObjexRay");
         }
     } else {
         this.el.classList.add("activeObjexRay");
@@ -1014,14 +1018,15 @@ AFRAME.registerComponent('mod_object', {
           
         }, 5000);
       }
-    if (this.tags && this.tags.includes("loop")){
+    if (this.data.tags && this.data.tags.includes("loop")){
+      console.log("tryna audio trigger mod_object loop");
         setTimeout(() => { //to make sure audio group data is loaded   
-            console.log("tryna trigger mod_object loop");
+
             var triggerAudioController = document.getElementById("triggerAudio");
             if (triggerAudioController != null) {
                 triggerAudioController.components.trigger_audio_control.loopAndFollow(this.el.id, this.tags, !this.hasTriggerAction); //don't autoplay if hastriggeraction
             }   
-            }, 2000);
+            }, 3000);
         }
     if (this.data.objectData.audiogroupID && this.data.objectData.audiogroupID.length > 4) { //it's an objectID
         console.log("tryna set object_audio_controller id " + this.data.objectData.audiogroupID);
@@ -1136,10 +1141,21 @@ AFRAME.registerComponent('mod_object', {
           // this.lineEl.setAttribute("mod_line", {"init": true});
           // this.lineEl.setAttribute("position", pos);
           if (this.hasTriggerAction) {
-            this.el.setAttribute("mod_line", {"init": true});
+            this.el.setAttribute("mod_line", {"init": true, "tags": this.data.tags});
           }
   
-  
+
+          if (this.hasTriggerAction) {
+            this.triggerAudioController = document.getElementById("triggerAudio");
+            console.log("triggerAudio loop "+ this.tags);
+          if (this.triggerAudioController != null) {
+              this.triggerAudioController.components.trigger_audio_control.loopAndFollow(this.el.id, this.tags, false); //don't autoplay if hastriggeraction
+          } 
+          }
+          if (this.hasShootAction || this.hasThrowAction) {
+            this.el.classList.add("activeObjexRay");
+          }
+      
   
         }
         if (this.data.followPathNewObject) {

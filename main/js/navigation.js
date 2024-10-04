@@ -1827,6 +1827,18 @@ AFRAME.registerComponent('nav_agent_controller', {
 	returnRandomNumber: function (min, max) {
 		return Math.random() * (max - min) + min;
 	},
+	randomStartPosition: function () {
+		if (this.el.sceneEl.systems.nav && this.navMeshController && this.navMeshController.isReady && this.navMeshController.goodWaypoints.length > 2) {
+
+				let wpIndex = Math.floor(Math.random()*this.navMeshController.goodWaypoints.length); //snap to random waypoint if pos no good...
+				let position = this.navMeshController.goodWaypoints[wpIndex].getAttribute("position");
+				console.log('bad agent start point! moving to ' + JSON.stringify(position));
+				this.el.setAttribute("position", position);
+				this.currentState = "pause";
+				this.el.setAttribute("nav-agent", {active:false});
+				this.updateAgentState(this.currentState);
+			}
+	},
 	validStartPosition: function () { //is navigation starting from a legit spot?
 		
 		if (this.el.sceneEl.systems.nav && this.navMeshController && this.navMeshController.isReady && this.navMeshController.goodWaypoints.length > 2) {

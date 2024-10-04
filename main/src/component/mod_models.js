@@ -61,6 +61,7 @@ AFRAME.registerComponent('mod_model', {
         this.timestamp = this.data.timestamp;
         this.isNavAgent = false;
         this.navAgentController = null;
+        // this.surface = null;
         this.scale = 1;
         if (this.data.scale != NaN && this.data.scale != undefined && this.data.scale && this.data.scale != '' &&  this.data.scale != 'undefined') {
           this.scale = this.data.scale;
@@ -1880,6 +1881,42 @@ AFRAME.registerComponent('mod_model', {
         return this.distance;
       }
     },
+    resetPositionAndScale () {
+      let surface = null;
+      let scatterSurface = document.getElementById("scatterSurface");
+      let navmesh = document.getElementById("nav-mesh");
+      if (navmesh) {
+        surface = navmesh;
+      } else if (scatterSurface) {
+        surface = scatterSurface;
+      }
+      if (surface) {
+        let testPosition = new THREE.Vector3();
+        testPosition.x = this.returnRandomNumber(-100, 100);  
+        testPosition.y = 50;
+        testPosition.z = this.returnRandomNumber(-100, 100);
+        let raycaster = new THREE.Raycaster();
+        raycaster.set(new THREE.Vector3(testPosition.x, testPosition.y, testPosition.z), new THREE.Vector3(0, -1, 0));
+        let results = raycaster.intersectObject(surface.getObject3D('mesh'), true);
+        if(results.length > 0) {
+          let scale = this.returnRandomNumber(.5, 1.5);
+          // console.log("gotsa scatterPosition for model " + this.data.modelID+ " intersect: " + results.length + " " +results[0].object.name + "scatterCount " + scatterCount + " vs count " + count +  " scale " + this.scale);
+          testPosition.x = results[0].point.x.toFixed(2); //snap y of waypoint to navmesh y
+          testPosition.y = results[0].point.y.toFixed(2) + this.data.ypos; //snap y of waypoint to navmesh y
+          testPosition.z = results[0].point.z.toFixed(2); //snap y of way
+
+          // updateAgentState
+          // return testPosition;
+                        this.el.object3D.position.set(testPosition);
+              this.el.object3D.scale.set(this.data.xscale, this.data.yscale, this.data.zscale);
+        } else {
+          // return null;
+        }
+      } else {
+        // return null;
+      }
+
+    },
     scatterMe: function () {
       // this.el.object3D.visible = false;
       let initPos = this.el.getAttribute("position");
@@ -1893,6 +1930,7 @@ AFRAME.registerComponent('mod_model', {
       }
       console.log("tryna SCATTER (not instance) a model " + navmesh + "  " + scatterSurface);
       if (surface) {
+        this.surface = surface;
         let count = 10;
         let split = this.data.eventData.split("~"); //gonna switch to tags...
         if (split.length > 1) {
@@ -2127,7 +2165,35 @@ AFRAME.registerComponent('mod_model', {
           // this.particlesEl.setAttribute('sprite-particles', {"enable": false});
           this.particlesEl.setAttribute('sprite-particles', {"duration": .5});
           
-          this.el.object3D.scale.set(0, 0, 0);
+          
+          if (this.navAgentController) {
+            this.navAgentController.updateAgentState("pause"); 
+            this.navAgentController.randomStartPosition();
+          } else {
+            this.el.object3D.scale.set(0, 0, 0);
+          }
+          // this.resetPositionAndScale();
+          //scatter and rehydrate?
+
+            // let testPosition = new THREE.Vector3();
+            // testPosition.x = this.returnRandomNumber(-100, 100);  
+            // testPosition.y = 50;
+            // testPosition.z = this.returnRandomNumber(-100, 100);
+            // let raycaster = new THREE.Raycaster();
+            // raycaster.set(new THREE.Vector3(testPosition.x, testPosition.y, testPosition.z), new THREE.Vector3(0, -1, 0));
+            // let results = raycaster.intersectObject(surface.getObject3D('mesh'), true);
+    
+            // if(results.length > 0) {
+            //   let scale = this.returnRandomNumber(.5, 1.5);
+            //   // console.log("gotsa scatterPosition for model " + this.data.modelID+ " intersect: " + results.length + " " +results[0].object.name + "scatterCount " + scatterCount + " vs count " + count +  " scale " + this.scale);
+            //   testPosition.x = results[0].point.x.toFixed(2); //snap y of waypoint to navmesh y
+            //   testPosition.y = results[0].point.y.toFixed(2) + this.data.ypos; //snap y of waypoint to navmesh y
+            //   testPosition.z = results[0].point.z.toFixed(2); //snap y of waypoint to navmesh y
+
+              // this.el.object3D.position.set(this.getSurfacePosition());
+              // this.el.object3D.scale.set(this.data.xscale, this.data.yscale, this.data.zscale);
+            // }
+
           // this.el.object3D.scale.y = 0;
           // this.el.object3D.scale.z = 0;
           this.mod_curve = this.el.components.mod_curve;

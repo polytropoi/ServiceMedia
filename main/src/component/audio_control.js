@@ -1698,7 +1698,7 @@ AFRAME.registerComponent('trigger_audio_control', { //trigger audio on designate
         
         if (triggerAudioHowl != null && tag != undefined && tag != null && tag != undefined && tag != 'undefined' && tag != "" && pos != null) {
         // this.modVolume(1);
-        // console.log("tryna play trigger audio with tag " + tag + " at pos " + JSON.stringify(pos));
+        console.log("tryna play trigger audio with tag " + tag + " at pos " + JSON.stringify(pos) + this.audioGroupsEl + this.isReady);
         this.audioGroupsEl = document.getElementById('audioGroupsEl');
         let audioID = null;
         let audioIDs = [];
@@ -1708,8 +1708,8 @@ AFRAME.registerComponent('trigger_audio_control', { //trigger audio on designate
             if (tag != null) {
                 let tags = tag.toString().split(',');
                 for (let i = 0; i < tags.length; i++) {
-                    // console.log("looking fo rtag " + tag[i]);
-                    audioID = this.audioGroupsController.returnTriggerAudioIDWithTag(tags[i]);
+                    console.log("looking fo rtag " + tags[i].trim());
+                    audioID = this.audioGroupsController.returnTriggerAudioIDWithTag(tags[i].trim());
                     // } else {
                     //     // audioID = this.audioGroupsController.returnRandomTriggerAudioID(); 
                     // }
@@ -1926,6 +1926,7 @@ AFRAME.registerComponent('trigger_audio_control', { //trigger audio on designate
     // }
     },
     loopToggle: function (pause) {
+        console.log("loopToggle " + pause);
         if (this.loopHowl) {
             if (!pause) {
                 this.loopHowl.pause();
@@ -1933,10 +1934,13 @@ AFRAME.registerComponent('trigger_audio_control', { //trigger audio on designate
                 this.loopHowl.play();
             }
         }
+        // } else {
+        //     loopAndFollow()
+        // }
     },
     loopAndFollow: function(targetID, tag, autoPlay) {
-
-        if (triggerAudioHowl != null && tag != undefined && tag != null && tag != "") {
+        // console.log("tryna loopAndFollow trigger audio with tag " + tag + " for targetID " + targetID);
+        if (tag != undefined && tag != null && tag != "") {
             console.log("tryna loopAndFollow trigger audio with tag " + tag + " for targetID " + targetID);
         // this.modVolume(1);
         this.audioGroupsEl = document.getElementById('audioGroupsEl');
@@ -1984,9 +1988,11 @@ AFRAME.registerComponent('trigger_audio_control', { //trigger audio on designate
                             volume = volume * this.data.volmod;
                         }
                         this.loopHowl.volume(volume);
-                        this.targetEl = document.getElementById(targetID);
-                        this.targetPosition = new THREE.Vector3();
-                        this.targetEl.object3D.getWorldPosition(this.targetPosition);
+                        if (targetID) {
+                            this.targetEl = document.getElementById(targetID);
+                            this.targetPosition = new THREE.Vector3();
+                            this.targetEl.object3D.getWorldPosition(this.targetPosition);
+                        }
                             // const clamp = (num, a, b) => Math.max(Math.min(num, Math.max(a, b)), Math.min(a, b));
                             // const rate = clamp(Math.random() + .25, .75, 1.25); //fudge pitch a bit slower or faster
                             // triggerAudioHowl.rate(rate);
