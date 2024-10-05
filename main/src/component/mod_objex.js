@@ -963,6 +963,7 @@ AFRAME.registerComponent('mod_object', {
             // this.throwAction = this.data.objectData.actions[a];
             // this.el.setAttribute("equipped_object_control", {init: true});
             
+            
           }
   
           if (this.data.objectData.actions[a].actionType.toLowerCase() == "shoot") {
@@ -994,7 +995,29 @@ AFRAME.registerComponent('mod_object', {
         if (this.triggerAudioController != null) {
             this.triggerAudioController.components.trigger_audio_control.loopAndFollow(this.el.id, this.tags, false); //don't autoplay if hastriggeraction
         } 
-        }
+        window.addEventListener('mousedown', (e) => {
+          e.preventDefault();
+          //if mod_line
+          let modLine = this.el.components.mod_line;
+          if (modLine) {
+            modLine.toggleShowLine(true);
+            this.triggerAudioController = document.getElementById("triggerAudio");
+            console.log("triggerAudio loop "+ this.data.tags);
+            if (this.triggerAudioController != null) {
+                this.triggerAudioController.components.trigger_audio_control.loopAndFollow(this.el.id, this.data.tags, false); //don't autoplay if hastriggeraction
+            } 
+          }
+        });
+        window.addEventListener('mouseup', (e) => {
+          e.preventDefault();
+          let modLine = this.el.components.mod_line;
+          if (modLine) {
+            modLine.toggleShowLine(false);
+          }
+          
+        }); 
+        
+      }
         if (this.hasShootAction || this.hasThrowAction) {
           this.el.classList.add("activeObjexRay");
         }
@@ -3438,8 +3461,9 @@ AFRAME.registerComponent('mod_object', {
   
       if (this.data.isEquipped) {
        
-        this.equipHolder.object3D.getWorldPosition(this.positionMe);  //actually it's id "playCaster"
-        this.equipHolder.object3D.getWorldDirection(this.directionMe).negate();
+        // this.equipHolder.object3D.getWorldPosition(this.positionMe);  //actually it's id "playCaster" //na done it mod_line now...
+        // this.equipHolder.object3D.getWorldDirection(this.directionMe).negate();
+        
         // if (this.lineEl) {
         //   // this.lineEl.components.mod_line.updateCurve(this.positionMe, this.directionMe);
         // }

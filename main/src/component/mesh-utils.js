@@ -3587,6 +3587,9 @@ AFRAME.registerComponent('mod_line', {
       this.el.sceneEl.object3D.add(this.objectToCurve);
       this.triggerAudioController = document.getElementById("triggerAudio");
       this.modValue = 0;
+
+      ///////externalizze it...
+      /*
       window.addEventListener('mousedown', (e) => {
         e.preventDefault();
         this.data.showLine = true;
@@ -3609,15 +3612,30 @@ AFRAME.registerComponent('mod_line', {
         this.curveLine.visible = false;
         this.objectToCurve.visible = false;
       }); 
+      */
 
     },
-    // toggleLine(showLine) {
-    //   if (showLine == ) {
-    //     this.data.showLine = true;
-    //   } else {
-    //     this.data.showLine = false;
-    //   }
-    // },
+    toggleShowLine(showLine) {
+      if (showLine == true ) {
+        this.data.showLine = true;
+        isFiring = true;
+        if (this.triggerAudioController) {
+          this.triggerAudioController.components.trigger_audio_control.loopToggle(true);
+          this.triggerAudioController.components.trigger_audio_control.modLoop("rate", this.modValue);
+        }
+        this.curveLine.visible = true;
+        this.objectToCurve.visible = true;
+      } else {
+        this.data.showLine = false;
+        isFiring = false;
+        if (this.triggerAudioController) {
+          this.triggerAudioController.components.trigger_audio_control.modLoop("rate", 0);
+          this.triggerAudioController.components.trigger_audio_control.loopToggle(false);
+        }
+        this.curveLine.visible = false;
+        this.objectToCurve.visible = false;
+      }
+    },
     // from https://github.com/Mamboleoo/InfiniteTubes/blob/master/js/demo6.js
     updateLine: function() {
       // console.log("tyrha updateCurve");
