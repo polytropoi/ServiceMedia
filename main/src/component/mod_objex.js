@@ -757,8 +757,8 @@ AFRAME.registerComponent('mod_object', {
       }
   
         
-      if (this.tags == null) {
-        // console.log(this.data.objectData.name + "this.data.tags is null! loctags: " + this.data.locationData.locationTags + " objtags: " + this.data.objectData.tags);
+      // if (this.tags == null && this.tags != "" && this.tags.length > 0) {
+        console.log(this.data.objectData.name + "this.data.tags is null! loctags: " + this.data.locationData.tags + " objtags: " + this.data.objectData.tags);
         this.tags = [];
         if (this.data.locationData && this.data.locationData.locationTags != undefined  && this.data.locationData.locationTags != 'undefined' && this.data.locationData.locationTags.length > 0) {
           // console.log(this.data.objectData.name + " gotsome location tags: " + this.data.locationData.locationTags);
@@ -781,14 +781,14 @@ AFRAME.registerComponent('mod_object', {
             
           }
         // }
-      } else {
-        console.log("this.data.tags is not null " + this.tags);
-        // if (this.tags.toLowerCase().includes("equippable")) {
-        //   this.data.isEquippable = true;
-        // } else if (this.tags.toLowerCase().includes("equipped")) {
-        //   this.data.isEquipped = true;
-        // } 
-      }
+      // } else {
+      //   console.log("this.data.tags is not null " + this.tags);
+      //   // if (this.tags.toLowerCase().includes("equippable")) {
+      //   //   this.data.isEquippable = true;
+      //   // } else if (this.tags.toLowerCase().includes("equipped")) {
+      //   //   this.data.isEquipped = true;
+      //   // } 
+      // }
       if (this.data.objectData.tags) {
         if (this.data.objectData.tags.includes("equippable")) {
           this.data.isEquippable = true;
@@ -994,6 +994,7 @@ AFRAME.registerComponent('mod_object', {
         console.log("triggerAudio loop "+ this.tags);
         if (this.triggerAudioController != null) {
             this.triggerAudioController.components.trigger_audio_control.loopAndFollow(this.el.id, this.tags, false); //don't autoplay if hastriggeraction
+            // this.triggerAudioController.components.trigger_audio_control.loopToggle(true);
         } 
         window.addEventListener('mousedown', (e) => {
           e.preventDefault();
@@ -1002,9 +1003,13 @@ AFRAME.registerComponent('mod_object', {
           if (modLine) {
             modLine.toggleShowLine(true);
             this.triggerAudioController = document.getElementById("triggerAudio");
-            console.log("triggerAudio loop "+ this.data.tags);
+            console.log("triggerAudio loop "+ this.tags);
             if (this.triggerAudioController != null) {
-                this.triggerAudioController.components.trigger_audio_control.loopAndFollow(this.el.id, this.data.tags, false); //don't autoplay if hastriggeraction
+              if (!this.triggerAudioController.components.trigger_audio_control.loopHowl) {
+                this.triggerAudioController.components.trigger_audio_control.loopAndFollow(this.el.id, this.tags, false); //don't autoplay if hastriggeraction
+              }
+              this.triggerAudioController.components.trigger_audio_control.loopToggle(true);
+                // this.triggerAudioController.components.trigger_audio_control.loopAndFollow(this.el.id, this.tags, false); //don't autoplay if hastriggeraction
             } 
           }
         });
@@ -1013,6 +1018,12 @@ AFRAME.registerComponent('mod_object', {
           let modLine = this.el.components.mod_line;
           if (modLine) {
             modLine.toggleShowLine(false);
+            this.triggerAudioController = document.getElementById("triggerAudio");
+            console.log("triggerAudio loop "+ this.tags);
+            if (this.triggerAudioController != null) {
+              this.triggerAudioController.components.trigger_audio_control.loopToggle(false);
+                // this.triggerAudioController.components.trigger_audio_control.loopAndFollow(this.el.id, this.tags, false); //don't autoplay if hastriggeraction
+            } 
           }
           
         }); 

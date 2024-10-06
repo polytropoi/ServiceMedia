@@ -1938,6 +1938,9 @@ AFRAME.registerComponent('trigger_audio_control', { //trigger audio on designate
         //     loopAndFollow()
         // }
     },
+    loopWhileFiring: function(targetID, tag) {
+
+    },
     loopAndFollow: function(targetID, tag, autoPlay) {
         // console.log("tryna loopAndFollow trigger audio with tag " + tag + " for targetID " + targetID);
         if (tag != undefined && tag != null && tag != "") {

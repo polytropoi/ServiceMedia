@@ -3521,7 +3521,8 @@ AFRAME.registerComponent('mod_line', {
     init: {default: false},
     tags: {default: ''},
     originID: {default: ''},
-    showLine: {default: false}
+    showLine: {default: false},
+    lineWiggle: {default: true}
   },
   init: function () {
       this.positionMe = new THREE.Vector3();
@@ -3645,7 +3646,7 @@ AFRAME.registerComponent('mod_line', {
       // this.splineMesh.geometry.attributes.position.needsUpdate = true;
 
       this.equipHolder.object3D.getWorldPosition(this.positionMe);  //actually it's id "playCaster"
-      this.equipHolder.object3D.getWorldDirection(this.directionMe).negate().normalize();
+      this.equipHolder.object3D.getWorldDirection(this.directionMe).negate();
 
       // this.points[0].copy(this.positionMe);
       // this.points[0].copy( (this.positionMe ).add( this.directionMe.multiplyScalar( 1 )) );
@@ -3688,21 +3689,24 @@ AFRAME.registerComponent('mod_line', {
         // if (this.data.showLine) {
           this.fraction = 0;
 
-          this.pointsCopy[1].x += Math.round(Math.random()) * (Math.round(Math.random()) ? 1 : -1);
-          this.pointsCopy[1].y += Math.round(Math.random()) * (Math.round(Math.random()) ? 1 : -1);
-          this.pointsCopy[1].z += Math.round(Math.random()) * (Math.round(Math.random()) ? 1 : -1);
-          this.pointsCopy[2].x += Math.round(Math.random()) * (Math.round(Math.random()) ? 1 : -1);
-          this.pointsCopy[2].y += Math.round(Math.random()) * (Math.round(Math.random()) ? 1 : -1);
-          this.pointsCopy[2].z += Math.round(Math.random()) * (Math.round(Math.random()) ? 1 : -1);
-          this.pointsCopy[3].x += Math.round(Math.random()) * (Math.round(Math.random()) ? 1 : -1);
-          this.pointsCopy[3].y += Math.round(Math.random()) * (Math.round(Math.random()) ? 1 : -1);
-          this.pointsCopy[3].z += Math.round(Math.random()) * (Math.round(Math.random()) ? 1 : -1);
+          if (this.data.lineWiggle) {
+            //modify curve positions for wiggle
+            this.pointsCopy[1].x += Math.round(Math.random()) * (Math.round(Math.random()) ? 1 : -1);
+            this.pointsCopy[1].y += Math.round(Math.random()) * (Math.round(Math.random()) ? 1 : -1);
+            this.pointsCopy[1].z += Math.round(Math.random()) * (Math.round(Math.random()) ? 1 : -1);
+            this.pointsCopy[2].x += Math.round(Math.random()) * (Math.round(Math.random()) ? 1 : -1);
+            this.pointsCopy[2].y += Math.round(Math.random()) * (Math.round(Math.random()) ? 1 : -1);
+            this.pointsCopy[2].z += Math.round(Math.random()) * (Math.round(Math.random()) ? 1 : -1);
+            this.pointsCopy[3].x += Math.round(Math.random()) * (Math.round(Math.random()) ? 1 : -1);
+            this.pointsCopy[3].y += Math.round(Math.random()) * (Math.round(Math.random()) ? 1 : -1);
+            this.pointsCopy[3].z += Math.round(Math.random()) * (Math.round(Math.random()) ? 1 : -1);
+          }
+            this.points[0].lerpVectors(this.pointsTemp[0], this.pointsCopy[0], 0.1); 
 
-          this.points[0].lerpVectors(this.pointsTemp[0], this.pointsCopy[0], 0.1); 
-          this.points[1].lerpVectors(this.pointsTemp[1], this.pointsCopy[1], 0.1); 
-          this.points[2].lerpVectors(this.pointsTemp[2], this.pointsCopy[2], 0.1); 
-          this.points[3].lerpVectors(this.pointsTemp[3], this.pointsCopy[3], 0.1);
-        // } 
+            this.points[1].lerpVectors(this.pointsTemp[1], this.pointsCopy[1], 0.1); 
+            this.points[2].lerpVectors(this.pointsTemp[2], this.pointsCopy[2], 0.1); 
+            this.points[3].lerpVectors(this.pointsTemp[3], this.pointsCopy[3], 0.1);
+          
        
       }
 
