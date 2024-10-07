@@ -1608,7 +1608,7 @@ if (sceneEl != null) {
       init: function() {
 
             let theData = this.el.getAttribute('data-locations');
-            console.log("location_data el" + this.el.id);
+            // console.log("location_data el" + this.el.id);
             // let locations = [];
             this.data.jsonData = JSON.parse(atob(theData)); //convert from base64
             // this.rEl = null;

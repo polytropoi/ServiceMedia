@@ -2140,11 +2140,11 @@ AFRAME.registerComponent('mod_model', {
     },
     rayhit: function (id, distance, hitpoint) {
   
-      if (isFiring && (this.data.eventData && this.data.eventData.length && this.data.eventData.toLowerCase().includes("target")) || 
-          this.data.tags && this.data.tags.length && this.data.tags.toLowerCase().includes("target")) {        
+      if (window.isFiring == true && ((this.data.eventData && this.data.eventData.length && this.data.eventData.toLowerCase().includes("target")) || 
+          this.data.tags && this.data.tags.length && this.data.tags.toLowerCase().includes("target"))) {        
         if (this.particlesEl) {
           
-            console.log("gotsa rayhit on id " + this.el.id + " eventdata " + this.data.eventData + " at " + JSON.stringify(hitpoint) + " tags" + this.data.tags);
+            console.log(window.isFiring + " gotsa rayhit on id " + this.el.id + " eventdata " + this.data.eventData + " at " + JSON.stringify(hitpoint) + " tags" + this.data.tags);
             
             this.particlesEl.setAttribute("position", {"x": hitpoint.x, "y": hitpoint.y,"z": hitpoint.z});
             // this.particlesEl.object3D.position.set(hitpoint.x, hitpoint.y, hitpoint.z);

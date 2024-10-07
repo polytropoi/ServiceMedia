@@ -3594,7 +3594,7 @@ AFRAME.registerComponent('mod_line', {
       window.addEventListener('mousedown', (e) => {
         e.preventDefault();
         this.data.showLine = true;
-        isFiring = true;
+        window.isFiring = true;
         if (this.triggerAudioController) {
           this.triggerAudioController.components.trigger_audio_control.loopToggle(true);
           this.triggerAudioController.components.trigger_audio_control.modLoop("rate", this.modValue);
@@ -3605,7 +3605,7 @@ AFRAME.registerComponent('mod_line', {
       window.addEventListener('mouseup', (e) => {
         e.preventDefault();
         this.data.showLine = false;
-        isFiring = false;
+        window.isFiring = false;
         if (this.triggerAudioController) {
           this.triggerAudioController.components.trigger_audio_control.modLoop("rate", 0);
           this.triggerAudioController.components.trigger_audio_control.loopToggle(false);
@@ -3619,7 +3619,7 @@ AFRAME.registerComponent('mod_line', {
     toggleShowLine(showLine) {
       if (showLine == true ) {
         this.data.showLine = true;
-        isFiring = true;
+        window.isFiring = true;
         if (this.triggerAudioController) {
           this.triggerAudioController.components.trigger_audio_control.loopToggle(true);
           this.triggerAudioController.components.trigger_audio_control.modLoop("rate", this.modValue);
@@ -3628,7 +3628,7 @@ AFRAME.registerComponent('mod_line', {
         this.objectToCurve.visible = true;
       } else {
         this.data.showLine = false;
-        isFiring = false;
+        window.isFiring = false;
         if (this.triggerAudioController) {
           this.triggerAudioController.components.trigger_audio_control.modLoop("rate", 0);
           this.triggerAudioController.components.trigger_audio_control.loopToggle(false);

@@ -64,7 +64,9 @@ AFRAME.registerComponent('mod_objex', {
             
                 if (this.data.jsonLocationsData[i].eventData != undefined && this.data.jsonLocationsData[i].eventData.toLowerCase().includes("equipped")) { 
                  
-                  EquipDefaultItem(this.data.jsonLocationsData[i].objectID); //in dialogs.js (?)
+                  // EquipDefaultItem(this.data.jsonLocationsData[i].objectID); //in dialogs.js (?)
+                  console.log(this.data.jsonLocationsData[i].name + " equipped mod_objecct locationData " + JSON.stringify(this.data.jsonLocationsData[i]));
+                  this.equipInventoryObject(this.data.jsonLocationsData[i].objectID, this.data.jsonLocationsData[i].locationTags, this.data.jsonLocationsData[i].eventData  );
                   
                 } else {
                   if (!this.data.jsonLocationsData[i].markerType.toLowerCase().includes('spawn')) { //either spawn or spawntrigger types require interaction //now in cloudmarker, deprecate //no, still need this mode
@@ -72,7 +74,7 @@ AFRAME.registerComponent('mod_objex', {
                    
                     let objEl = document.createElement("a-entity");
                    
-                      objEl.setAttribute("mod_object", {'tags': this.data.jsonLocationsData[i].locationTags, 
+                      objEl.setAttribute("mod_object", {'tags': this.data.jsonLocationsData[i].tags, 
                                                         'eventData': this.data.jsonLocationsData[i].eventData, 
                                                         'locationData': this.data.jsonLocationsData[i], 
                                                         'objectData': this.data.jsonObjectData[k],
@@ -366,11 +368,11 @@ AFRAME.registerComponent('mod_objex', {
          Drop(data);
         }
       },
-      equipInventoryObject: function (objectID) {
-        // console.log("tryna equip model " + objectID + " equipped " + this.data.equipped );  
+      equipInventoryObject: function (objectID, tags, eventData) {
+        console.log("tryna equip  " + objectID  + " equipped " + this.data.equipped + " tags " + tags + " eventData " + eventData);  
         this.objectData = this.returnObjectData(objectID);
         // console.log("tryna equip model " + JSON.stringify(this.objectData));  
-        console.log("tryna equip object " + this.el.id);
+        // console.log("tryna equip object " + this.el.id);
         this.dropPos = new THREE.Vector3();
         this.objEl = document.createElement("a-entity");
         this.equipHolder = document.getElementById("equipPlaceholder");
@@ -382,6 +384,8 @@ AFRAME.registerComponent('mod_objex', {
         this.locData.x = 0;
         this.locData.y = 0;
         this.locData.z = 0;
+        this.locData.locationTags = tags;
+        this.locData.eventData = eventData;
         this.locData.markerObjScale = (this.objectData.objScale != undefined && this.objectData.objScale != "") ? this.objectData.objScale : 1; //these come from objectData, not locData
         this.locData.eulerx = (this.objectData.eulerx != undefined && this.objectData.eulerx != "") ? this.objectData.eulerx : 0;
         this.locData.eulery = (this.objectData.eulery != undefined && this.objectData.eulery != "") ? this.objectData.eulery : 0;
@@ -561,7 +565,7 @@ AFRAME.registerComponent('mod_object', {
       followPathNewObject: {default: false},
       forceFactor: {default: 1},
       removeAfter: {default: ''},
-      tags: {default: ''},
+      // tags: {default: ''},
       xpos: {type: 'number', default: 0}, //used for modding
       ypos: {type: 'number', default: 0},
       zpos: {type: 'number', default: 0},
@@ -667,7 +671,7 @@ AFRAME.registerComponent('mod_object', {
       this.modelParent = null;
   
       this.camera = null;
-      this.tags = this.data.tags;
+      this.tags = [];
       this.isNavAgent = false;
       this.navAgentController = null;
       // this.raycaster = null;
@@ -707,14 +711,6 @@ AFRAME.registerComponent('mod_object', {
         return;
       }
 
-      if (JSON.stringify(this.data.eventData).includes("beat")) {
-        console.log ("adding class beatmee");
-        this.el.classList.add("beatme");
-        // this.el.addEventListener('beatme', e => console.log("beat" + e.detail.volume()));
-      } else if (this.data.tags.includes("beat")) {
-        this.el.classList.add("beatme");
-      }
-      
 
       this.el.classList.add("allowMods");
       this.el.setAttribute("shadow", {cast:true, receive:true});
@@ -758,8 +754,8 @@ AFRAME.registerComponent('mod_object', {
   
         
       // if (this.tags == null && this.tags != "" && this.tags.length > 0) {
-        console.log(this.data.objectData.name + "this.data.tags is null! loctags: " + this.data.locationData.tags + " objtags: " + this.data.objectData.tags);
-        this.tags = [];
+        console.log(this.data.objectData.name + "this.data.locationData: " + JSON.stringify(this.data.locationData) + " objectData: " + JSON.stringify(this.data.objectData));
+        // this.tags = [];  
         if (this.data.locationData && this.data.locationData.locationTags != undefined  && this.data.locationData.locationTags != 'undefined' && this.data.locationData.locationTags.length > 0) {
           // console.log(this.data.objectData.name + " gotsome location tags: " + this.data.locationData.locationTags);
           this.tags = this.data.locationData.locationTags;
@@ -919,6 +915,14 @@ AFRAME.registerComponent('mod_object', {
   
       }
      
+      if (JSON.stringify(this.data.eventData).includes("beat")) {
+        console.log ("adding class beatmee");
+        this.el.classList.add("beatme");
+        // this.el.addEventListener('beatme', e => console.log("beat" + e.detail.volume()));
+      } else if (this.tags.includes("beat")) {
+        this.el.classList.add("beatme");
+      }
+      
       if (this.data.objectData.actions != undefined && this.data.objectData.actions.length > 0) {
       
         for (let a = 0; a < this.data.objectData.actions.length; a++) {
@@ -1003,15 +1007,16 @@ AFRAME.registerComponent('mod_object', {
           if (modLine) {
             modLine.toggleShowLine(true);
             this.triggerAudioController = document.getElementById("triggerAudio");
-            console.log("triggerAudio loop "+ this.tags);
+            console.log("equipped triggerAudio "+ this.tags);
             if (this.triggerAudioController != null) {
-              if (!this.triggerAudioController.components.trigger_audio_control.loopHowl) {
+              if (!this.triggerAudioController.components.trigger_audio_control.hasLoopHowl()) {
                 this.triggerAudioController.components.trigger_audio_control.loopAndFollow(this.el.id, this.tags, false); //don't autoplay if hastriggeraction
               }
               this.triggerAudioController.components.trigger_audio_control.loopToggle(true);
                 // this.triggerAudioController.components.trigger_audio_control.loopAndFollow(this.el.id, this.tags, false); //don't autoplay if hastriggeraction
             } 
           }
+          window.isFiring = true;
         });
         window.addEventListener('mouseup', (e) => {
           e.preventDefault();
@@ -1019,13 +1024,13 @@ AFRAME.registerComponent('mod_object', {
           if (modLine) {
             modLine.toggleShowLine(false);
             this.triggerAudioController = document.getElementById("triggerAudio");
-            console.log("triggerAudio loop "+ this.tags);
+            console.log("equipped triggerAudio "+ this.tags);
             if (this.triggerAudioController != null) {
               this.triggerAudioController.components.trigger_audio_control.loopToggle(false);
                 // this.triggerAudioController.components.trigger_audio_control.loopAndFollow(this.el.id, this.tags, false); //don't autoplay if hastriggeraction
             } 
           }
-          
+          window.isFiring = false;
         }); 
         
       }

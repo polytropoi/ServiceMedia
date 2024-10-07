@@ -1938,6 +1938,13 @@ AFRAME.registerComponent('trigger_audio_control', { //trigger audio on designate
         //     loopAndFollow()
         // }
     },
+    hasLoopHowl: function () {
+        if (this.loopHowl) {
+            return true;
+        } else {
+            return false;
+        }
+    },
     loopWhileFiring: function(targetID, tag) {
 
     },
