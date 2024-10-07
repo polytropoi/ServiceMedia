@@ -61,6 +61,7 @@ AFRAME.registerComponent('mod_model', {
         this.timestamp = this.data.timestamp;
         this.isNavAgent = false;
         this.navAgentController = null;
+        this.isTarget = false;
         // this.surface = null;
         this.scale = 1;
         if (this.data.scale != NaN && this.data.scale != undefined && this.data.scale && this.data.scale != '' &&  this.data.scale != 'undefined') {
@@ -78,7 +79,10 @@ AFRAME.registerComponent('mod_model', {
           // setShader(this.data.shader);
           this.setShader(); //at the bottom
         }      
-  
+        if ((this.data.eventData && this.data.eventData.length && this.data.eventData.toLowerCase().includes("target")) || 
+        this.data.tags && this.data.tags.length && this.data.tags.toLowerCase().includes("target")) {
+          this.isTarget = true;
+        }
         // if (this.data.description && this.data.description.length > 1) {
         //   // console.log("model eventData " + JSON.stringify(this.data.eventData));
         //   if (this.data.description.includes("~")) {
@@ -1537,10 +1541,7 @@ AFRAME.registerComponent('mod_model', {
               if (this.data.eventData && this.data.eventData.length && this.data.eventData.toLowerCase().includes("target")) {
                   // this.el.setAttribute("targeting_raycaster", {'init': true}); //no
                   this.el.classList.add("target");
-                  this.el.classList.remove("activeObjexRay");
-                
-          
-
+                  // this.el.classList.remove("activeObjexRay");
               }
               
               // }
@@ -2140,8 +2141,7 @@ AFRAME.registerComponent('mod_model', {
     },
     rayhit: function (id, distance, hitpoint) {
   
-      if (window.isFiring == true && ((this.data.eventData && this.data.eventData.length && this.data.eventData.toLowerCase().includes("target")) || 
-          this.data.tags && this.data.tags.length && this.data.tags.toLowerCase().includes("target"))) {        
+      if (window.isFiring == true && this.isTarget) {        
         if (this.particlesEl) {
           
             console.log(window.isFiring + " gotsa rayhit on id " + this.el.id + " eventdata " + this.data.eventData + " at " + JSON.stringify(hitpoint) + " tags" + this.data.tags);
@@ -2172,30 +2172,21 @@ AFRAME.registerComponent('mod_model', {
           } else {
             this.el.object3D.scale.set(0, 0, 0);
           }
-          // this.resetPositionAndScale();
-          //scatter and rehydrate?
-
-            // let testPosition = new THREE.Vector3();
-            // testPosition.x = this.returnRandomNumber(-100, 100);  
-            // testPosition.y = 50;
-            // testPosition.z = this.returnRandomNumber(-100, 100);
-            // let raycaster = new THREE.Raycaster();
-            // raycaster.set(new THREE.Vector3(testPosition.x, testPosition.y, testPosition.z), new THREE.Vector3(0, -1, 0));
-            // let results = raycaster.intersectObject(surface.getObject3D('mesh'), true);
-    
-            // if(results.length > 0) {
-            //   let scale = this.returnRandomNumber(.5, 1.5);
-            //   // console.log("gotsa scatterPosition for model " + this.data.modelID+ " intersect: " + results.length + " " +results[0].object.name + "scatterCount " + scatterCount + " vs count " + count +  " scale " + this.scale);
-            //   testPosition.x = results[0].point.x.toFixed(2); //snap y of waypoint to navmesh y
-            //   testPosition.y = results[0].point.y.toFixed(2) + this.data.ypos; //snap y of waypoint to navmesh y
-            //   testPosition.z = results[0].point.z.toFixed(2); //snap y of waypoint to navmesh y
-
-              // this.el.object3D.position.set(this.getSurfacePosition());
-              // this.el.object3D.scale.set(this.data.xscale, this.data.yscale, this.data.zscale);
-            // }
-
-          // this.el.object3D.scale.y = 0;
-          // this.el.object3D.scale.z = 0;
+          if (this.triggerAudioController != null && !this.data.isEquipped && this.tags) {
+            this.triggerAudioController.components.trigger_audio_control.playAudioAtPosition(hitpoint, distance, this.tags);
+          }
+      
+          if (this.hasSynth) {
+            if (this.el.components.mod_synth != null && this.data.objectData.tonejsPatch1 != undefined && this.data.objectData.tonejsPatch1 != null) {
+              // this.el.components.mod_synth.trigger(distance);
+              if (this.data.objectData.tonejsPatch1 == "Metal") {
+                this.el.components.mod_synth.metalHitDistance(distance);
+              } else if (this.data.objectData.tonejsPatch1 == "AM Synth") {
+                this.el.components.mod_synth.amHitDistance(distance);
+              }
+              
+            }
+          }
           this.mod_curve = this.el.components.mod_curve;
           if (this.mod_curve) {
             this.mod_curve.reset();
@@ -2204,21 +2195,23 @@ AFRAME.registerComponent('mod_model', {
           this.particlesEl = document.createElement("a-entity");
           this.el.sceneEl.appendChild(this.particlesEl); //hrm...
         }
-      }
-  
-      if (this.triggerAudioController != null && !this.data.isEquipped && this.tags) {
-        this.triggerAudioController.components.trigger_audio_control.playAudioAtPosition(hitpoint, distance, this.tags);
-      }
-  
-      if (this.hasSynth) {
-        if (this.el.components.mod_synth != null && this.data.objectData.tonejsPatch1 != undefined && this.data.objectData.tonejsPatch1 != null) {
-          // this.el.components.mod_synth.trigger(distance);
-          if (this.data.objectData.tonejsPatch1 == "Metal") {
-            this.el.components.mod_synth.metalHitDistance(distance);
-          } else if (this.data.objectData.tonejsPatch1 == "AM Synth") {
-            this.el.components.mod_synth.amHitDistance(distance);
+      } 
+      
+      if (!this.isTarget) { //to do filter tags?
+        if (this.triggerAudioController != null && !this.data.isEquipped && this.tags) {
+          this.triggerAudioController.components.trigger_audio_control.playAudioAtPosition(hitpoint, distance, this.tags);
+        }
+    
+        if (this.hasSynth) {
+          if (this.el.components.mod_synth != null && this.data.objectData.tonejsPatch1 != undefined && this.data.objectData.tonejsPatch1 != null) {
+            // this.el.components.mod_synth.trigger(distance);
+            if (this.data.objectData.tonejsPatch1 == "Metal") {
+              this.el.components.mod_synth.metalHitDistance(distance);
+            } else if (this.data.objectData.tonejsPatch1 == "AM Synth") {
+              this.el.components.mod_synth.amHitDistance(distance);
+            }
+            
           }
-          
         }
       }
     }
