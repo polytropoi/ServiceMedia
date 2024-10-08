@@ -1406,10 +1406,12 @@ AFRAME.registerComponent('instanced_surface_meshes', {
               }
             }
 
-        this.el.classList.add('activeObjexRay');
-        if (this.data.tags.includes("grass")) {
+        
+        if (this.data.tags.includes("grass")) { //TODO active/inactive conf? hrm 
           console.log("tryna set grass shader!");
           this.el.setAttribute("wavy_shader", "");
+        } else {
+          this.el.classList.add('activeObjexRay');
         }
         this.initialized = true;
 
@@ -1503,7 +1505,7 @@ AFRAME.registerComponent('instanced_surface_meshes', {
             if (this.instanceId != this.intersection[0].instanceId || !this.isInitialized) {
               this.instanceId = this.intersection[ 0 ].instanceId;
               this.isInitialized = true;
-              console.log(this.data.tags + " " + this.instanceId);
+              // console.log(this.data.tags + " " + this.instanceId);
               // if (this.data.tags != undefined && this.data.tags.length) {  
                 // this.distance = window.playerPosition.distanceTo(this.intersection[0].point);
                 this.distance = this.raycaster.ray.origin.distanceTo( this.intersection[0].point );
@@ -1525,7 +1527,7 @@ AFRAME.registerComponent('instanced_surface_meshes', {
         this.intersection = null;
         
         this.hitID = hitID;
-        console.log("new hit " + hitID + " " + distance + " " + JSON.stringify(hitpoint) + " interaction:" + this.data.interaction + " eventData " + this.data.eventData.toLowerCase());
+        // console.log("new hit " + hitID + " " + distance + " " + JSON.stringify(hitpoint) + " interaction:" + this.data.interaction + " eventData " + this.data.eventData.toLowerCase());
         var triggerAudioController = document.getElementById("triggerAudio");
         if (triggerAudioController != null) {
           triggerAudioController.components.trigger_audio_control.playInstanceAudioAtPosition(this.instanceId, hitpoint, distance, this.data.tags);

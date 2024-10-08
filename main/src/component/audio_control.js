@@ -1766,7 +1766,7 @@ AFRAME.registerComponent('trigger_audio_control', { //trigger audio on designate
         if (triggerAudioHowl != null && (instanceID != this.instanceID) && tag != undefined && tag != null && tag != undefined && tag != 'undefined' && tag != "" && pos != null) {
             // this.modVolume(1);
 
-            console.log("tryna play instance trigger audio " + instanceID + " with this.id " + this.id);
+            // console.log("tryna play instance trigger audio " + instanceID + " with this.id " + this.id);
             this.instanceID = instanceID;
             this.audioGroupsEl = document.getElementById('audioGroupsEl');
             let audioID = null;
@@ -1783,7 +1783,7 @@ AFRAME.registerComponent('trigger_audio_control', { //trigger audio on designate
                     //     // audioID = this.audioGroupsController.returnRandomTriggerAudioID(); 
                     // }
                     //TODO - follow index sequence, use tags?
-                    console.log("tag "+ tags[i] + " tryna get audioID " + audioID);
+                    // console.log("tag "+ tags[i] + " tryna get audioID " + audioID);
                     this.audioItem = this.audioGroupsController.returnAudioItem(audioID);
 
                     if (this.audioItem != null) {

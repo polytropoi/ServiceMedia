@@ -362,7 +362,8 @@
 
 		// }
 		brownianMotion.init.call(this);
-		// this.el.classList.add('activeObjexRay');
+		
+		this.el.classList.add('activeObjexRay');
 		// this.raycaster = new THREE.Raycaster();
 		// this.intersection = null;
 		// this.hitpoint = null;

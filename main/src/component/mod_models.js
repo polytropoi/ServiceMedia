@@ -1344,7 +1344,7 @@ AFRAME.registerComponent('mod_model', {
           }
 
           // if (this.data.tags.includes("active") || this.data.tags.includes("moddable")) { //a way to turn off events for just models
-          if (!this.data.tags.includes("static")) { //a way to turn off events for just models
+          if (!this.data.tags.includes("static") && this.data.markerType != "navmesh" && this.data.markerType != "surface" && !this.data.eventData.includes("static")) { //a way to turn off events for just models
 
             this.el.addEventListener('mouseleave', (e) => { 
               e.preventDefault();
@@ -1368,7 +1368,7 @@ AFRAME.registerComponent('mod_model', {
             this.el.addEventListener('mousedown', (evt) => {
              
               if (this.timestamp != '' && this.data.allowMods && !this.data.tags.includes("static")) {
-                console.log("MOD_MODEL mousedown on markertype " + this.data.markerType +  " this.hasCallout " + this.hasCallout + " this.data.description " + this.data.description + " tags " + this.data.tags);
+                console.log(this.data.markerType + " MOD_MODEL mousedown on markertype " + this.data.markerType +  " this.hasCallout " + this.hasCallout + " this.data.description " + this.data.description + " tags " + this.data.tags);
                 if (keydown == "T") {
                   ToggleTransformControls(this.timestamp);
                 } else if (keydown == "Shift") {
@@ -1384,7 +1384,7 @@ AFRAME.registerComponent('mod_model', {
               
             
               if (evt.detail.intersection != null && !this.data.tags.includes("static")) {
-                console.log("MOD_MODEL mouseovewr model " + this.data.modelName + " " + this.hasLocationCallout + " " + this.data.markerType + " " + this.hasCallout + " " + evt.detail);
+                console.log(this.data.markerType + " MOD_MODEL mouseovewr model " + this.data.modelName + " " + this.hasLocationCallout + " " + this.data.markerType + " " + this.hasCallout + " " + evt.detail);
                 if (textData.length > 0) {
                   this.calloutString = textData[textIndex];
                 } else {
@@ -1526,8 +1526,8 @@ AFRAME.registerComponent('mod_model', {
               }
     
                 // console.log("tryna play audiotrigger " + JSON.stringify(this.data.eventData));
-              if (this.data.tags != undefined && this.data.tags != null && this.data.tags != "undefined") {
-                // console.log("tryna play audio with tags " + this.data.tags);
+              if (this.data.tags != undefined && this.data.tags != null && this.data.tags != "undefined" && !this.data.tags.includes("grass") && !this.data.tags.includes("static") && !this.data.eventData.includes("static")) {
+                console.log("tryna play audio with tags " + this.data.tags);
                 // if (this.triggerAudioController != null) {
                 //   this.triggerAudioController.components.trigger_audio_control.playAudio();
                 
@@ -2172,7 +2172,7 @@ AFRAME.registerComponent('mod_model', {
           } else {
             this.el.object3D.scale.set(0, 0, 0);
           }
-          if (this.triggerAudioController != null && !this.data.isEquipped && this.tags) {
+          if (this.triggerAudioController != null && !this.data.isEquipped && this.tags && !this.data.tags.includes("grass") && !this.data.tags.includes("static") && !this.data.eventData.includes("static")) {
             this.triggerAudioController.components.trigger_audio_control.playAudioAtPosition(hitpoint, distance, this.tags);
           }
       
@@ -2198,7 +2198,8 @@ AFRAME.registerComponent('mod_model', {
       } 
       
       if (!this.isTarget) { //to do filter tags?
-        if (this.triggerAudioController != null && !this.data.isEquipped && this.tags) {
+        if (this.triggerAudioController != null && !this.data.isEquipped && this.tags && !this.data.tags.includes("grass") && !this.data.tags.includes("static") && !this.data.eventData.includes("static")) {
+          console.log("tryna play audio with tags " + this.data.tags);
           this.triggerAudioController.components.trigger_audio_control.playAudioAtPosition(hitpoint, distance, this.tags);
         }
     

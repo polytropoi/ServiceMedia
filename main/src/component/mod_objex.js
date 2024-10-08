@@ -684,6 +684,7 @@ AFRAME.registerComponent('mod_object', {
       this.up = new THREE.Vector3(0, 1, 0);
       this.line = null;
       this.equipHolder = document.getElementById("equipPlaceholder");
+      // this.data.isEquippable = false;
       this.objectAudioController = null;
       this.hasBoneLook = false;
       this.lookBone = null;
@@ -3313,7 +3314,7 @@ AFRAME.registerComponent('mod_object', {
       for (var i = 0; i < 5; i += 1) {  
         let distance = parseInt(i) * 20;
         // this.pVec = new THREE.Vector3().copy.addVectors(this.tempVectorP, this.tempVectorR.multiplyScalar( distance ));
-        console.log("pushed " + distance + " " + JSON.stringify(this.pVec));
+        // console.log("pushed " + distance + " " + JSON.stringify(this.pVec));
         this.pVec = new THREE.Vector3().copy( this.tempVectorP ).addScaledVector( this.tempVectorR, distance ); //oik then
         this.points.push(this.pVec);
         // console.log("pushed " + distance + " " + JSON.stringify(this.pVec));
@@ -3604,7 +3605,7 @@ AFRAME.registerComponent('mod_object', {
           if(results.length > 0) {
             scatterCount++;
             let scale = this.returnRandomNumber(.5, 1.5);
-            console.log("gotsa scatterPosition for object " + this.data.objectData.objectID + " intersect: " + results.length + " " +results[0].object.name + "scatterCount " + scatterCount + " vs count " + count +  " scale " + this.scale);
+            
             testPosition.x = results[0].point.x.toFixed(2); //snap y of waypoint to navmesh y
             testPosition.y = results[0].point.y; //snap y of waypoint to navmesh y
             testPosition.z = results[0].point.z.toFixed(2); //snap y of waypoint to navmesh y
@@ -3612,6 +3613,8 @@ AFRAME.registerComponent('mod_object', {
             scatteredEl.setAttribute("position", testPosition);
             scatteredEl.setAttribute("gltf-model", "#" + this.data.modelID);
             let eventData = this.data.eventData.replace("scatter", ""); //prevent infinite recursion!
+            let equippable = false;
+            // if (this.data.locationData.tags && )
             let location = {};
             location.x = testPosition.x;
             location.y = yMod + testPosition.y;
@@ -3622,9 +3625,15 @@ AFRAME.registerComponent('mod_object', {
             location.xscale = this.data.xscale * scale;
             location.yscale = this.data.yscale * scale;
             location.zscale = this.data.zscale * scale;
+            location.tags = this.data.locationData.locationTags;
+            if (location.tags && location.tags.includes("equippable")) {
+              equippable = true;
+            }
+            console.log("gotsa scatterPosition for object " + this.data.objectData.objectID + " intersect: " + results.length + " " +results[0].object.name + 
+              "scatterCount " + scatterCount + " vs count " + count +  " scale " + this.scale + " equippable " + equippable + " locationData " + JSON.stringify(this.data.locationData));
             console.log("scattered scale " + scale + " ymod " + yMod + " test.y " + testPosition.y  + " location.y " + location.y + " location " + JSON.stringify(location));
             scatteredEl.setAttribute("mod_object", {eventData: eventData, markerType: this.data.markerType, xscale: location.xscale * scale, yscale: location.yscale * scale, zscale: location.zscale * scale, ypos: location.y, tags: this.data.tags, 
-                                                    description: this.data.description, locationData: location, objectData: this.data.objectData, isEquippable: this.data.isEquippable});
+                                                    description: this.data.description, locationData: location, objectData: this.data.objectData, isEquippable: equippable, tags: this.data.locationData.locationTags});
             scatteredEl.setAttribute("shadow", {cast: true, receive: true});
             scatteredEl.classList.add("envMap");
             scatteredEl.id = this.data.objectData._id + "_scattered_" + scatterCount;
