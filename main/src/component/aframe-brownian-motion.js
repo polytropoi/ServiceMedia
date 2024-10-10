@@ -364,6 +364,7 @@
 		brownianMotion.init.call(this);
 		
 		this.el.classList.add('activeObjexRay');
+		// this.el.setAttribute('obb-collider');
 		// this.raycaster = new THREE.Raycaster();
 		// this.intersection = null;
 		// this.hitpoint = null;

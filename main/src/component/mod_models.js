@@ -2198,8 +2198,8 @@ AFRAME.registerComponent('mod_model', {
       } 
       
       if (!this.isTarget) { //to do filter tags?
-        if (this.triggerAudioController != null && !this.data.isEquipped && this.tags && !this.data.tags.includes("grass") && !this.data.tags.includes("static") && !this.data.eventData.includes("static")) {
-          console.log("tryna play audio with tags " + this.data.tags);
+        if (this.triggerAudioController != null && !this.data.isEquipped && this.tags && this.tags.length && !this.data.tags.includes("grass") && !this.data.tags.includes("static") && !this.data.eventData.includes("static")) {
+          console.log("tryna play audio with tags " + this.tags);
           this.triggerAudioController.components.trigger_audio_control.playAudioAtPosition(hitpoint, distance, this.tags);
         }
     
