@@ -1016,7 +1016,7 @@ AFRAME.registerComponent('mod_object', {
                 this.triggerAudioController.components.trigger_audio_control.loopAndFollow(this.el.id, this.tags, false); //don't autoplay if hastriggeraction
               }
               this.triggerAudioController.components.trigger_audio_control.loopToggle(true);
-                // this.triggerAudioController.components.trigger_audio_control.loopAndFollow(this.el.id, this.tags, false); //don't autoplay if hastriggeraction
+                
             } 
           }
           window.isFiring = true;
@@ -1030,7 +1030,7 @@ AFRAME.registerComponent('mod_object', {
             console.log("equipped triggerAudio "+ this.tags);
             if (this.triggerAudioController != null) {
               this.triggerAudioController.components.trigger_audio_control.loopToggle(false);
-                // this.triggerAudioController.components.trigger_audio_control.loopAndFollow(this.el.id, this.tags, false); //don't autoplay if hastriggeraction
+                
             } 
           }
           window.isFiring = false;
@@ -2244,10 +2244,10 @@ AFRAME.registerComponent('mod_object', {
           this.raycaster_e = e.detail.el;
           // that.raycaster = this.raycaster;
           this.intersection = this.raycaster_e.components.raycaster.getIntersection(this.el, true);
-          if (this.intersection) {
+          if (this.intersection && e.detail.el.id != 'cameraRig') {
             this.hitpoint = this.intersection.point;
             that.hitpoint = this.hitpoint;
-            // console.log(that.data.objectData.name + " with tags " + this.tags);
+            console.log(that.data.objectData.name + " with tags " + this.tags + " hit el.id " + e.detail.el.id+ " intersect at " + JSON.stringify(this.intersection.point));
           }
       });
       this.el.addEventListener("raycaster-intersected-cleared", () => {
@@ -2633,18 +2633,7 @@ AFRAME.registerComponent('mod_object', {
             }
             if (this.hasShootAction) {
               console.log("shoot action " + JSON.stringify(this.shootAction));
-              // if (this.shootAction.sourceObjectMod.toLowerCase() == "persist") { //transfer to scene inventory
-              //   this.el.object3D.visible = false;
-              //   DropInventoryItem(this.data.objectData._id); //just drop for now...throw/shoot/swing next!
-              //   setTimeout(() => {
-              //     this.el.object3D.visible = true;
-              //   }, 3000);
-              // } else if (this.throwAction.sourceObjectMod.toLowerCase() == "remove") {
-              //   if (this.mouseDowntime <= 0) {
-              //     this.mouseDowntime = 1;
-              //   }
-              //   this.objexEl.components.mod_objex.shootObject(this.data.objectData._id, this.mouseDowntime, "5");
-              // }
+            
               if (this.triggerAudioController != null) {
                 this.triggerAudioController.components.trigger_audio_control.playAudioAtPosition(this.hitpoint, this.distance, ["shoot"], .5);//tagmangler needs an array, add vol mod 
               }
@@ -3359,6 +3348,14 @@ AFRAME.registerComponent('mod_object', {
       }
 
       this.followPath = true;
+      // this.el.setAttribute("raycaster", {"objects": ".target", "far": "5", "position": "0 -0.5 0", "rotation": "90 0 0"});
+      // this.equippedRaycaster = this.el.components.raycaster;
+      let brownianPathComponentEl = document.querySelector("[brownian_path]");
+      if (brownianPathComponentEl) {
+        let brownianPathComponent = brownianPathComponentEl.components.brownian_path;
+        brownianPathComponent.setRaycastOrigin(this.el.id);
+      }
+
     },
     applyForce: function () {
       if (this.camera == null) {
@@ -3499,7 +3496,7 @@ AFRAME.registerComponent('mod_object', {
         // if (this.lineEl) {
         //   // this.lineEl.components.mod_line.updateCurve(this.positionMe, this.directionMe);
         // }
-       
+      }
      
         if (this.equippedRaycaster != null) {
   
@@ -3509,9 +3506,10 @@ AFRAME.registerComponent('mod_object', {
             // if (this.arrow) { //show helper arrow, TODO toggle from dialogs.js
             //   this.el.sceneEl.object3D.remove(this.arrow);
             // }
-            // this.arrow = new THREE.ArrowHelper( this.directionMe, this.positionMe, 10, 0xff0000 );
-            // // this.arrow = new THREE.ArrowHelper( this.equippedRaycaster.components.raycaster.direction, this.equippedRaycaster.components.raycaster.origin, 10, 0xff0000 );
-            // this.el.sceneEl.object3D.add( this.arrow );
+            console.log("tryna show equippedRaycaster...");
+            this.arrow = new THREE.ArrowHelper( this.directionMe, this.positionMe, 10, 0xff0000 );
+            this.arrow = new THREE.ArrowHelper( this.equippedRaycaster.direction, this.equippedRaycaster.origin, 10, 0xff0000 );
+            this.el.sceneEl.object3D.add( this.arrow );
         } 
   
         // if (this.lineGeometry && this.lineObject && this.lineStart) { //for testing
@@ -3525,7 +3523,7 @@ AFRAME.registerComponent('mod_object', {
          
   
       
-      }
+      // }
     },
     drawRaycasterLine: function () {
   

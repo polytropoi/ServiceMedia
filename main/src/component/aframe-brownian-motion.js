@@ -164,7 +164,8 @@
 			this.positionOffset = new THREE.Vector3();
 			this.rotationOffset = new THREE.Vector3();
 			this.el.classList.add('activeObjexRay');
-			this.raycaster = new THREE.Raycaster();
+			// this.raycaster = new THREE.Raycaster();
+			this.raycaster = null;
 			this.intersection = null;
 			this.hitpoint = null;
 			let that = this;
@@ -349,7 +350,9 @@
 
 	brownianPath.init = function tick() {
 
-		
+		this.thirdPersonPlaceholderPosition = new THREE.Vector3();
+		this.thirdPersonPlaceholderDirection = new THREE.Vector3();
+	  this.thirdPersonPlaceholder = null; //hrm, should rename
 
 		this.instances = [];
 		this.updateInstances = this.updateInstances.bind(this);
@@ -369,7 +372,7 @@
 		// this.intersection = null;
 		// this.hitpoint = null;
 		// let that = this;
-		
+		this.raycaster = null;
 		
 	};
 
@@ -416,6 +419,59 @@
 			this.updateInstances();
 		}
 	};
+	brownianPath.rayhit = function (hitID, distance, hitpoint) {
+		if (this.hitID != hitID && this.data.tags) {
+		  
+		  this.intersection = null;
+		  
+		  this.hitID = hitID;
+		  // console.log("new hit " + hitID + " " + distance + " " + JSON.stringify(hitpoint) + " interaction:" + this.data.interaction + " eventData " + this.data.eventData.toLowerCase());
+		  var triggerAudioController = document.getElementById("triggerAudio");
+		  if (triggerAudioController != null) {
+			triggerAudioController.components.trigger_audio_control.playInstanceAudioAtPosition(this.instanceId, hitpoint, distance, this.data.tags);
+		  }
+		  if (this.data.tags && this.data.tags.toLowerCase().includes("kill")) {
+			this.particlesEl.setAttribute("position", hitpoint);
+			this.removeInstance(this.instanceId);
+		  }
+		}
+		if (this.matrixMeshComponent != null) {
+		  this.matrixMeshComponent.showRoomData(this.instanceId, distance, hitpoint);
+		  } else {
+			let matrixMeshEl = document.getElementById("matrix_meshes");
+			if (matrixMeshEl != null) {
+			  this.matrixMeshComponent = matrixMeshEl.components.matrix_meshes;
+			  if (this.matrixMeshComponent != null && this.intersection != null) {
+				this.matrixMeshComponent.selectRoomData(this.instanceId);
+			  }
+			}
+		  }    
+	  },
+	  brownianPath.instance_clicked = function (id) {
+		console.log("clicked instance: "+ id);  
+		if (id != null && id != this.lastClickedID && this.intersection != null && this.data.tags != 'undefined') {
+		  this.lastClickedID = id; //bc double triggering....ugh
+		  console.log(this.data.tags + " clicked id " + id);
+		  var triggerAudioController = document.getElementById("triggerAudio");
+			if (triggerAudioController != null) {
+			  triggerAudioController.components.trigger_audio_control.playAudioAtPosition(this.hitpoint, this.distance, this.data.tags);
+			}
+			// this.iMesh.position.set(id, 0, 0, -100);
+			if (this.useMatrix) {
+			  let matrixMeshEl = document.getElementById("matrix_meshes");
+			  if (matrixMeshEl != null) {
+				this.matrixMeshComponent = matrixMeshEl.components.matrix_meshes;
+				if (this.matrixMeshComponent != null && this.intersection != null) {
+				  this.matrixMeshComponent.selectRoomData(this.instanceId);
+				}
+			  }
+			}
+		}
+	  },
+	  brownianPath.setRaycastOrigin = function (elID) {
+		this.thirdPersonPlaceholder = document.getElementById(elID);
+		console.log("setting brownian racyaster " + elID);
+	  },
 	brownianPath.tick = function tick(time) {
 		if (!this.startTime) {
 			this.startTime = time;
@@ -433,34 +489,91 @@
 			ins.instanceMatrix.needsUpdate = true;
 		}
 
-		if (!this.raycaster || this.raycaster == null || this.raycaster == undefined) {
-            return;
-        } else {
-          this.raycaster.setFromCamera( mouse, AFRAME.scenes[0].camera );
-          this.intersection = this.raycaster.intersectObject( this.el.getObject3D('instances'));
-			// console.log("gotsa intersection: " + this.intersection.name);
-        }
-        // 
+		// if (!this.raycaster || this.raycaster == null || this.raycaster == undefined) {
+        //     return;
+        // } else {
+        // //   this.raycaster.setFromCamera( mouse, AFRAME.scenes[0].camera );
+        // //   this.intersection = this.raycaster.intersectObject( this.el.getObject3D('instances'));
+		// // 	console.log("gotsa brownian intersection: " + this.intersection.name);
+        // }
+        // // 
        
 
-        if ( this.intersection != null && this.intersection.length > 0 ) {
-          if (window.playerPosition != null && window.playerPosition != undefined && this.intersection != undefined && this.intersection[0].point != undefined && this.intersection[0].point != null ) {
-			// that.rayhit(evt.detail.intersection.object.name, window.playerPosition.distanceTo(this.intersection.point), this.intersection.point);
-			this.instanceId = this.intersection[ 0 ].instanceId;
-			// console.log("intersected with instance " + this.instanceId + " " + window.playerPosition.distanceTo(this.intersection[ 0 ].point) + " " + this.intersection[ 0 ].point);
-			if (this.matrixMeshComponent != null) {
-					this.matrixMeshComponent.showRoomData(this.instanceId, window.playerPosition.distanceTo(this.intersection[ 0 ].point), this.intersection[ 0 ].point);
-				}
-          }
+        // if ( this.intersection != null && this.intersection.length > 0 ) {
+        //   if (window.playerPosition != null && window.playerPosition != undefined && this.intersection != undefined && this.intersection[0].point != undefined && this.intersection[0].point != null ) {
+		// 	// that.rayhit(evt.detail.intersection.object.name, window.playerPosition.distanceTo(this.intersection.point), this.intersection.point);
+		// 	this.instanceId = this.intersection[ 0 ].instanceId;
+		// 	console.log("intersected with instance " + this.instanceId + " " + window.playerPosition.distanceTo(this.intersection[ 0 ].point) + " " + this.intersection[ 0 ].point);
+		// 	if (this.matrixMeshComponent != null) {
+		// 			this.matrixMeshComponent.showRoomData(this.instanceId, window.playerPosition.distanceTo(this.intersection[ 0 ].point), this.intersection[ 0 ].point);
+		// 		}
+        //   }
 
-        } else {
-          this.hitID = null;
-          this.instanceId = null;
-        }
+        // } else {
+        //   this.hitID = null;
+        //   this.instanceId = null;
+        // }
+/////////////
+		if (!this.raycaster || this.raycaster == null || this.raycaster == undefined) {
+			return;
+		} else {
+		// if (settings.sceneCameraMode === "Third Person" || this.data.tags.includes()) {
+		console.log("this.thirdPersonPlaceholder is "+ this.thirdPersonPlaceholder); 
+		if (this.thirdPersonPlaceholder) {
+			
+			this.thirdPersonPlaceholder.object3D.getWorldPosition(this.thirdPersonPlaceholderPosition);  //actually it's id "playCaster"
+			this.thirdPersonPlaceholder.object3D.getWorldDirection(this.thirdPersonPlaceholderDirection);
+			this.thirdPersonPlaceholderDirection.normalize();
+			this.thirdPersonPlaceholderDirection.negate();
+			console.log("setting thirrd person raycaster! from " + JSON.stringify(this.thirdPersonPlaceholderPosition) + " to " + JSON.stringify(this.thirdPersonPlaceholderDirection));
+			this.raycaster.set(this.thirdPersonPlaceholderPosition, this.thirdPersonPlaceholderDirection);
+			this.raycaster.far = 15;
+			// raycaster.far = 1.5;
+		
+			this.intersection = this.raycaster.intersectObject( this.el.getObject3D('instances') );
+
+			if (this.arrow) { //show helper arrow, TODO toggle from dialogs.js
+			this.el.sceneEl.object3D.remove(this.arrow);
+			}
+			this.arrow = new THREE.ArrowHelper( this.raycaster.ray.direction, this.raycaster.ray.origin, 10, 0xff0000 );
+			this.el.sceneEl.object3D.add( this.arrow );
+
+
+		} else { //first person use mouse for raycast
+			this.raycaster.setFromCamera( mouse, AFRAME.scenes[0].camera ); 
+			this.intersection = this.raycaster.intersectObject( this.el.getObject3D('instances') );
+		}
+		
+		}
+
+		if ( this.intersection != null && this.intersection.length > 0) {
+		// console.log("gotsa intersection!" + this.intersection[0].instanceId + " this.instanceId ");
+		// if (!this.isInitialized) {
+		//   this.instanceId = this.intersection[ 0 ].instanceId;
+		// }
+		if (this.intersection[0].point != undefined && this.intersection[0].point != null ) {
+			if (this.instanceId != this.intersection[0].instanceId || !this.isInitialized) {
+			this.instanceId = this.intersection[ 0 ].instanceId;
+			this.isInitialized = true;
+			// console.log(this.data.tags + " " + this.instanceId);
+			// if (this.data.tags != undefined && this.data.tags.length) {  
+				// this.distance = window.playerPosition.distanceTo(this.intersection[0].point);
+				this.distance = this.raycaster.ray.origin.distanceTo( this.intersection[0].point );
+				this.hitpoint = this.intersection[0].point;
+				this.rayhit(this.instanceId, this.distance, this.hitpoint); 
+			// }
+			}
+		}
+
+		} else {
+		this.hitID = null;
+		this.instanceId = null;
+		}
+/////////////
 	};
 
 	AFRAME.registerComponent('brownian-motion', brownianMotion);
-	AFRAME.registerComponent('brownian-path', brownianPath);
+	AFRAME.registerComponent('brownian_path', brownianPath);
 
 })();
 //# sourceMappingURL=aframe-brownian-motion.js.map

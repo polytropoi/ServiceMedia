@@ -2242,7 +2242,7 @@ landing_router.get('/:_id', function (req, res) {
                                                     if (locMdl.markerType == "brownian path" || locMdl.markerType == "brownian motion") {
                                                         if (locMdl.markerType == "brownian path") {
 
-                                                            brownian = "brownian-path=\x22lineEnd:100000;lineStep:100;count:100;object:#thing-to-clone;positionVariance:88 33 86;spaceVectorOffset:101.1,100,100.2,101.2,100,100.3;rotationFollowsAxis:x;speed:0.01;\x22";
+                                                            brownian = "brownian_path=\x22lineEnd:100000;lineStep:100;count:100;object:#thing-to-clone;positionVariance:88 33 86;spaceVectorOffset:101.1,100,100.2,101.2,100,100.3;rotationFollowsAxis:x;speed:0.01;\x22";
                                                             gltfsEntities = gltfsEntities + "<a-gltf-model shadow src=\x22#"+m_assetID+"\x22 id=\x22thing-to-clone\x22 visible=\x22true\x22></a-gltf-model>"+
                                                             "<a-entity "+brownian+
                                                             " shadow=\x22cast:true; receive:true\x22 "+skyboxEnvMap+" position=\x22"+locMdl.x+" "+locMdl.y+" "+zFix+"\x22 scale=\x22"+scale+

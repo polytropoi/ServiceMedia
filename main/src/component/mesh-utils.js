@@ -1185,7 +1185,8 @@ AFRAME.registerComponent('instanced_surface_meshes', {
         }
       });
 
-
+      this.thirdPersonPlaceholderPosition = new THREE.Vector3();
+      this.thirdPersonPlaceholderDirection = new THREE.Vector3();
     this.thirdPersonPlaceholder = document.getElementById("playCaster"); //hrm, should rename
     this.useMatrix = false;
     this.matrixMeshComponent = null;
@@ -1462,8 +1463,7 @@ AFRAME.registerComponent('instanced_surface_meshes', {
     tick: function(time, timeDelta) {
       // this.timeDelta = timeDelta;
       this.time = time;
-      this.thirdPersonPlaceholderPosition = new THREE.Vector3();
-      this.thirdPersonPlaceholderDirection = new THREE.Vector3();
+
       if (this.iMesh != null && this.data.tags != undefined  && this.data.tags != 'undefined') {
         // console.log(this.posRotReader );
         if (!this.raycaster || this.raycaster == null || this.raycaster == undefined || this.data.tags == undefined) {

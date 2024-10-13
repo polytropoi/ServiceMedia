@@ -33,7 +33,7 @@ html>
 		<a-gltf-model shadow src="#plane" id="thing-to-clone" visible="false"></a-gltf-model>
 		
 		<a-entity id="objects" position="0 0 -1" scale="0.5 0.5 0.5">
-			<a-entity position="0 1 0" brownian-path="lineEnd:100000;lineStep:100;count:30;object:#thing-to-clone;positionVariance:2 2 2;showLine:true;spaceVectorOffset:0.2,0.2,0.2,0.2,0.2,0.2;rotationFollowsAxis:x;speed:0.1;" shadow></a-entity>
+			<a-entity position="0 1 0" brownian_path="lineEnd:100000;lineStep:100;count:30;object:#thing-to-clone;positionVariance:2 2 2;showLine:true;spaceVectorOffset:0.2,0.2,0.2,0.2,0.2,0.2;rotationFollowsAxis:x;speed:0.1;" shadow></a-entity>
 			<a-plane id="shadow-catcher" material="shader:shadow" shadow="cast:false;" rotation="-90 0 0" width="2" height="2"></a-plane>
 		</a-entity>
 	</a-scene>
