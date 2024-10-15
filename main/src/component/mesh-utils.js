@@ -3420,28 +3420,30 @@ AFRAME.registerComponent('mod_tunnel', {
 
       if (picGroupMangler != null && picGroupMangler != undefined) {
         this.tileablePicData = picGroupMangler.components.picture_groups_control.returnTileableData();
-        let picIndex = Math.floor(Math.random()*this.tileablePicData.images.length);
-        this.texture = new THREE.TextureLoader().load( this.tileablePicData.images[picIndex].url );
-        this.texture.encoding = THREE.sRGBEncoding;
-        this.geometry = new THREE.BufferGeometry();    
-        this.vertArray = this.curve.getPoints(70);
-        this.geometry = new THREE.BufferGeometry().setFromPoints( this.curve.getPoints(70) );
+        if (this.tileablePicData && this.tileablePicData.images) {
+          let picIndex = Math.floor(Math.random()*this.tileablePicData.images.length);
+          this.texture = new THREE.TextureLoader().load( this.tileablePicData.images[picIndex].url );
+          this.texture.encoding = THREE.sRGBEncoding;
+          this.geometry = new THREE.BufferGeometry();    
+          this.vertArray = this.curve.getPoints(70);
+          this.geometry = new THREE.BufferGeometry().setFromPoints( this.curve.getPoints(70) );
 
-        this.splineMesh = new THREE.Line(this.geometry, new THREE.LineBasicMaterial()); //another line to mod the vertexes
-        this.tubeGeometry = new THREE.TubeGeometry(this.curve, 70, 10, 50, false);
-        this.tubeMaterial = new THREE.MeshStandardMaterial({
-          side: THREE.BackSide, // Since the camera will be inside the tube we need to reverse the faces
-          map: this.texture, 
-          transparent: true
-        });
-        // Repeat the pattern to prevent the texture being stretched
-        this.tubeMaterial.map.wrapS = THREE.RepeatWrapping;
-        this.tubeMaterial.map.wrapT = THREE.RepeatWrapping;
-        this.tubeMaterial.map.repeat.set(4, 2);
-        // Create a mesh based on tubeGeometry and tubeMaterial
-        this.tubeMesh = new THREE.Mesh(this.tubeGeometry, this.tubeMaterial);
-        this.el.sceneEl.object3D.add(this.tubeMesh);
-        this.loaded = true;
+          this.splineMesh = new THREE.Line(this.geometry, new THREE.LineBasicMaterial()); //another line to mod the vertexes
+          this.tubeGeometry = new THREE.TubeGeometry(this.curve, 70, 10, 50, false);
+          this.tubeMaterial = new THREE.MeshStandardMaterial({
+            side: THREE.BackSide, // Since the camera will be inside the tube we need to reverse the faces
+            map: this.texture, 
+            transparent: true
+          });
+          // Repeat the pattern to prevent the texture being stretched
+          this.tubeMaterial.map.wrapS = THREE.RepeatWrapping;
+          this.tubeMaterial.map.wrapT = THREE.RepeatWrapping;
+          this.tubeMaterial.map.repeat.set(4, 2);
+          // Create a mesh based on tubeGeometry and tubeMaterial
+          this.tubeMesh = new THREE.Mesh(this.tubeGeometry, this.tubeMaterial);
+          this.el.sceneEl.object3D.add(this.tubeMesh);
+          this.loaded = true;
+        }
       } else {
         console.log("no pic");
       }

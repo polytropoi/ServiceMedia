@@ -1020,12 +1020,13 @@ AFRAME.registerComponent('mod_model', {
                         this.triggerAudioController.components.trigger_audio_control.playAudio();
                       }
                     }
+                    if (this.data.tags && this.data.tags.includes("show callouts")) {
                       calloutEntity.setAttribute('visible', true);
                       let pos = evt.detail.intersection.point; //hitpoint on model
                       console.log("mousing a pic agt " + JSON.stringify(pos) + " title " + hpics[hpicsIndex].title);
                       calloutEntity.setAttribute("position", pos);
                       calloutEntity.setAttribute('scale', {x: this.distance * .25, y: this.distance * .25, z: this.distance * .25} );
-                    // }
+                      }
                   });
                   childEnt.addEventListener('mouseleave', (evt) => {
                     // console.log("tryna mouseexit");
