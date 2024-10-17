@@ -1402,6 +1402,7 @@ AFRAME.registerComponent('ambient_audio_control', { //ambient file will loop and
         this.distance = "";
         this.ambientChild = document.querySelector(".ambientChild");
         ambientPosition = this.el.object3D.position;
+        this.ambientAudioEl = document.getElementById("ambientAudio");
         ambientAudioHowl.pos(ambientPosition);
         var normalizedVolume = ((this.data.volume - -80) * 100) / (20 - -80) * .01;    
         ambientAudioHowl.fade(0, normalizedVolume, 5000);
@@ -1409,6 +1410,12 @@ AFRAME.registerComponent('ambient_audio_control', { //ambient file will loop and
         console.log(" ambient volume is " + normalizedVolume);
 
         // ambientAudioHowl.volume(normalizedVolume);
+        if (settings && settings.sceneTags && settings.sceneTags.includes("local ambient")) {
+            console.log("tryna setup local ambient sound...");
+            // if (ambientAudioEl) {
+            //     amb
+            // }
+        }
        
 
         if (this.ambientChild != null) {
@@ -1443,6 +1450,8 @@ AFRAME.registerComponent('ambient_audio_control', { //ambient file will loop and
     tick: function(time, deltaTime) {
         if (ambientAudioHowl != null && this.cam != null) { //initialized as a global, included explicitly in page code
             // ambientPosition = this.el.object3D.position; //for spatialization, it's moving based on animation
+
+
             this.distance = this.el.object3D.position.distanceTo(this.cam.object3D.position);
             // console.log("ambientDistance: " + this.distance);
         if (this.distance) {

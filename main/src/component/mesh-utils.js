@@ -3381,7 +3381,11 @@ AFRAME.registerComponent('mod_tunnel', {
     init: {default: false},
     tags: {default: ''},
     scrollDirection: {default: 'x'},
-    scrollSpeed: {default: .0001}
+    scrollSpeed: {default: .0001},
+    tunnelOrientation: {default: "horizontal"},
+    tunnelOriginX: {default: 0},
+    tunnelOriginY: {default: 0},
+    tunnelOriginZ: {default: 0}
   },
   init: function () {
       this.loaded = false;
@@ -3402,9 +3406,23 @@ AFRAME.registerComponent('mod_tunnel', {
       this.picModIndex = 0;
       this.texture = null;
       // Define points along Z axis
-      for (var i = 0; i < 5; i += 1) {
-        this.points.push(new THREE.Vector3(0, 0, -100 * (i / 4)));
+      // this.tunnelOrigin = new THREE.Vector3(this.data.tunnelOriginX);
+      if (this.data.tunnelOrientation == "horizontal") {
+        for (var i = 0; i < 5; i += 1) {
+          this.points.push(new THREE.Vector3(this.data.tunnelOriginX, this.data.tunnelOriginY, this.data.tunnelOriginZ + (-100 * (i / 4))));
+        }
       }
+      if (this.data.tunnelOrientation == "vertical") {
+        for (var i = 0; i < 5; i += 1) {
+          this.points.push(new THREE.Vector3(this.data.tunnelOriginX, this.data.tunnelOriginY + (-100 * (i / 4)), this.data.tunnelOriginZ));
+        }
+      }
+      if (this.data.tunnelOrientation == "sideways") {
+        for (var i = 0; i < 5; i += 1) {
+          this.points.push(new THREE.Vector3(this.data.tunnelOriginX + (-100 * (i / 4)), this.data.tunnelOriginY, this.data.tunnelOriginZ));
+        }
+      }
+
       this.curve = new THREE.CatmullRomCurve3(this.points);
       // this.c_points = this.curve.getPoints( 50 );
       // // // this.c_geometry = new THREE.BufferGeometry().setFromPoints( this.c_points );//won't work with fatlines...
@@ -3429,7 +3447,7 @@ AFRAME.registerComponent('mod_tunnel', {
           this.geometry = new THREE.BufferGeometry().setFromPoints( this.curve.getPoints(70) );
 
           this.splineMesh = new THREE.Line(this.geometry, new THREE.LineBasicMaterial()); //another line to mod the vertexes
-          this.tubeGeometry = new THREE.TubeGeometry(this.curve, 70, 10, 50, false);
+          this.tubeGeometry = new THREE.TubeGeometry(this.curve, 100, 10, 50, false);
           this.tubeMaterial = new THREE.MeshStandardMaterial({
             side: THREE.BackSide, // Since the camera will be inside the tube we need to reverse the faces
             map: this.texture, 
@@ -3438,7 +3456,9 @@ AFRAME.registerComponent('mod_tunnel', {
           // Repeat the pattern to prevent the texture being stretched
           this.tubeMaterial.map.wrapS = THREE.RepeatWrapping;
           this.tubeMaterial.map.wrapT = THREE.RepeatWrapping;
-          this.tubeMaterial.map.repeat.set(4, 2);
+          this.tubeMaterial.map.repeat.set(8, 4);
+          // this.tubeMaterial.opacity = 1;
+          // this.tubeMaterial.emission = 2.5;
           // Create a mesh based on tubeGeometry and tubeMaterial
           this.tubeMesh = new THREE.Mesh(this.tubeGeometry, this.tubeMaterial);
           this.el.sceneEl.object3D.add(this.tubeMesh);
@@ -3511,8 +3531,14 @@ AFRAME.registerComponent('mod_tunnel', {
         if (this.data.scrollDirection == 'x') {
           this.tubeMaterial.map.offset.x += this.speed;
         }
+        if (this.data.scrollDirection == '-x') {
+          this.tubeMaterial.map.offset.x -= this.speed;
+        }
         if (this.data.scrollDirection == 'y') {
           this.tubeMaterial.map.offset.y += this.speed;
+        }
+        if (this.data.scrollDirection == '-y') {
+          this.tubeMaterial.map.offset.y -= this.speed;
         }
 
       }

@@ -1274,8 +1274,22 @@ webxr_router.get('/:_id', function (req, res) {
                                 if (sceneResponse.sceneLocations[i].markerType == "tunnel") {
                                     let scrollDirection = 'x';
                                     let scrollSpeed = .001;
+                                    let tunnelOrigin = sceneResponse.sceneLocations[i].x + " " + sceneResponse.sceneLocations[i].y + " " + sceneResponse.sceneLocations[i].z;
+                                    let tunnelOrientation = "horizontal";
+                                    if (sceneResponse.sceneLocations[i].eulery && sceneResponse.sceneLocations[i].eulery.toString() == "90") {
+                                        tunnelOrientation = "vertical";
+                                    } 
+                                    if (sceneResponse.sceneLocations[i].eulerz && sceneResponse.sceneLocations[i].eulerz.toString() == "90") {
+                                        tunnelOrientation = "sideways";
+                                    } 
                                     if (sceneResponse.sceneLocations[i].eventData && sceneResponse.sceneLocations[i].eventData.toLowerCase().includes('scroll y')) {
                                         scrollDirection = 'y';
+                                    }
+                                    if (sceneResponse.sceneLocations[i].eventData && sceneResponse.sceneLocations[i].eventData.toLowerCase().includes('scroll -y')) {
+                                        scrollDirection = '-y';
+                                    }
+                                    if (sceneResponse.sceneLocations[i].eventData && sceneResponse.sceneLocations[i].eventData.toLowerCase().includes('scroll -x')) {
+                                        scrollDirection = '-x';
                                     }
                                     if (sceneResponse.sceneLocations[i].eventData && sceneResponse.sceneLocations[i].eventData.toLowerCase().includes('speed')) {
                                         speedSplit = sceneResponse.sceneLocations[i].eventData.toLowerCase().split('~');
@@ -1284,7 +1298,8 @@ webxr_router.get('/:_id', function (req, res) {
                                         }
                                         
                                     }
-                                    proceduralEntities = proceduralEntities + "<a-entity mod_tunnel=\x22init: true; scrollDirection: "+scrollDirection+"; scrollSpeed: "+scrollSpeed+"\x22></a-entity>";
+
+                                    proceduralEntities = proceduralEntities + "<a-entity mod_tunnel=\x22init: true; tunnelOrientation: "+tunnelOrientation+"; tunnelOriginZ: "+sceneResponse.sceneLocations[i].z+"; tunnelOriginY: "+sceneResponse.sceneLocations[i].y+"; tunnelOriginX: "+sceneResponse.sceneLocations[i].x+"; scrollDirection: "+scrollDirection+"; scrollSpeed: "+scrollSpeed+"\x22></a-entity>";
                                 }
                                 let scale = 1;
                                 if (sceneResponse.sceneLocations[i].markerObjScale && sceneResponse.sceneLocations[i].markerObjScale != undefined && sceneResponse.sceneLocations[i].markerObjScale != "" && sceneResponse.sceneLocations[i].markerObjScale != 0) {
@@ -3494,12 +3509,12 @@ webxr_router.get('/:_id', function (req, res) {
                                 "});" +
                             "ambientAudioHowl.load();</script>";
                             ambientAudioControl = "<script src=\x22../main/src/component/ambient-audio-control.js\x22></script>";
-                            let ambientPosAnim = "animation__yoyo=\x22property: position; to: -33 3 0; dur: 60000; dir: alternate; easing: easeInSine; loop: true;\x22 ";
+                            let ambientPosAnim = "animation__yoyo=\x22property: position; to: -5 3 0; dur: 60000; dir: alternate; easing: easeInSine; loop: true;\x22 ";
                             let ambientRotAnim = "animation__rot=\x22property:rotation; dur:60000; to: 0 360 0; loop: true; easing:linear;\x22 ";        
                             // posAnim = "animation__pos=\x22property: position; to: random-position; dur: 15000; loop: true;";  
                             ambientAudioEntity = "<a-entity "+ambientRotAnim+"><a-entity id=\x22ambientAudio\x22 ambient_audio_control=\x22oggurl: "+ambientOggUrl+"; mp3url: "+ambientMp3Url+";\x22 volume: "+sceneAmbientVolume+"; "+
                             // "geometry=\x22primitive: sphere; radius: .5\x22 "+ambientPosAnim+" position=\x2233 3 0\x22>" +
-                            ambientPosAnim+" position=\x2233 3 0\x22>" +
+                            ambientPosAnim+" position=\x223 3 0\x22>" +
                             "</a-entity></a-entity>";
                         // }
                     }

@@ -593,13 +593,15 @@ AFRAME.registerComponent('mod_model', {
                 picGroupArray = picGroupMangler.components.picture_groups_control.returnPictureData(); //it's an array of arrays
                 // console.log("pic group zero length is " + picGroupArray[0].images.length);
                 if (picGroupArray != null && picGroupArray.length > 0) {
-                  for (let x = 0; x < picGroupArray[0].images.length; x++) { 
-                    if (picGroupArray[0].images[x].orientation != undefined && picGroupArray[0].images[x].orientation != null && picGroupArray[0].images[x].orientation.toLowerCase() === "landscape") {
-                      hpics.push(picGroupArray[0].images[x]);
-                    } else if (picGroupArray[0].images[x].orientation != undefined && picGroupArray[0].images[x].orientation != null && picGroupArray[0].images[x].orientation.toLowerCase() === "portrait") {
-                      vpics.push(picGroupArray[0].images[x]);
-                    } else if (picGroupArray[0].images[x].orientation != undefined && picGroupArray[0].images[x].orientation != null && picGroupArray[0].images[x].orientation.toLowerCase() === "square") {
-                      spics.push(picGroupArray[0].images[x]);
+                  for (let p = 0; p < picGroupArray.length; p++) {
+                    for (let x = 0; x < picGroupArray[p].images.length; x++) { 
+                      if (picGroupArray[p].images[x].orientation != undefined && picGroupArray[p].images[x].orientation != null && picGroupArray[p].images[x].orientation.toLowerCase() === "landscape") {
+                        hpics.push(picGroupArray[p].images[x]);
+                      } else if (picGroupArray[p].images[x].orientation != undefined && picGroupArray[p].images[x].orientation != null && picGroupArray[p].images[x].orientation.toLowerCase() === "portrait") {
+                        vpics.push(picGroupArray[p].images[x]);
+                      } else if (picGroupArray[p].images[x].orientation != undefined && picGroupArray[p].images[x].orientation != null && picGroupArray[p].images[x].orientation.toLowerCase() === "square") {
+                        spics.push(picGroupArray[p].images[x]);
+                      }
                     }
                   }
                 }
@@ -973,6 +975,7 @@ AFRAME.registerComponent('mod_model', {
               } else if (this.meshChildren[i].name.includes("hpic")) {
                 let mesh = this.meshChildren[i]; //mesh, not object3d type
                 let child = this.el.object3D.getObjectByName(this.meshChildren[i].name, true); //object3d
+                // console.log("gotsa hpic mesh with "+ hpicsIndex + JSON.stringify(hpics));
                 if (hpicsIndex < hpics.length) {
                   let childEnt = document.createElement('a-entity');
                        
@@ -1036,7 +1039,7 @@ AFRAME.registerComponent('mod_model', {
                     childEnt.setAttribute('basic-link', {href: hpics[hpicsIndex].linkURL});
                   }
                     this.pic_href = hpics[hpicsIndex].url;
-                    // console.log("tryna load gallerypic " + this.meshChildren[i].name);
+                    console.log("tryna load gallerypic " + this.pic_href +  " for "+ this.meshChildren[i].name);
                     var loader = new THREE.TextureLoader();
                     // load a resource
                     loader.load(
