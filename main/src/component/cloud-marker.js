@@ -472,11 +472,12 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
       this.el.addEventListener('model-loaded', (evt) => { //load placeholder model first (which is an a-asset) before calling external
         evt.preventDefault();
         this.el.removeAttribute("animation-mixer");
- 
+        const obj = this.el.getObject3D('mesh');
+        this.el.object3D.visible = true;
         
         console.log(this.data.modelID + " model-loaded for CLOUDMARKER " + this.data.markerType);
         if (this.data.markerType != "object") {
-          const obj = this.el.getObject3D('mesh');
+
           if (this.data.modelID && this.data.modelID != '' & this.data.modelID != 'none') {
             this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"mesh", scaleFactor: this.data.scale});
             let clips = obj.animations;
