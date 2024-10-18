@@ -1382,6 +1382,23 @@ AFRAME.registerComponent('mod_model', {
                   SceneManglerModal('Location');
                 } 
               }  
+              if (this.data.markerType.toLowerCase() == "gate") {
+                if (this.data.eventData != null && this.data.eventData != "") {
+                  let url = "/webxr/" + this.data.eventData;
+                  window.location.href = url;
+                } else {
+                  let ascenesEl = document.getElementById("availableScenesControl");
+                  if (ascenesEl) {
+                    let asControl = ascenesEl.components.available_scenes_control;
+                    if (asControl) {
+                      let scene = asControl.returnRandomScene();
+                      let url = "/webxr/" + scene.sceneKey;
+                      window.location.href = url; 
+                      
+                    }
+                  }
+                }
+              }
             });
             this.el.addEventListener('mouseenter', (evt) =>  {
 

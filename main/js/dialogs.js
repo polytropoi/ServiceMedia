@@ -21,7 +21,7 @@ let colorInput_4 = null;
 
 
 window.addEventListener( 'keydown',  ( event ) => {
-  console.log("keydown code " + event.keyCode);
+  // console.log("keydown code " + event.keyCode);
   switch ( event.keyCode ) {
    
     case 81: // Q
@@ -105,7 +105,7 @@ window.addEventListener( 'keydown',  ( event ) => {
 
   window.addEventListener( 'keyup',  ( event ) => {
     keydown = "*";
-    console.log("keyup " + keydown);
+    // console.log("keyup " + keydown);
 
   });
 

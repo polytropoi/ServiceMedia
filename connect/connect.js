@@ -354,7 +354,7 @@ $(function() {
 
    document.body.addEventListener("obbcollisionstarted", function (e) {
       if (e.detail) {
-         // console.log(e.detail.withEl.id); 
+         console.log(e.detail.withEl.id); 
          if ((e.detail.withEl.id.toString() == "player") || (e.detail.withEl.components && (e.detail.withEl.components.cloud_marker || e.detail.withEl.components.local_marker))) {
             let index = intersections.indexOf(e.detail.withEl.id);
             if (index == -1) {

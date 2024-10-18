@@ -322,7 +322,8 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                   this.el.setAttribute("mod_physics", {body: "static", isTrigger: false, model:"collider", scaleFactor: this.data.scale});
                 } else if (this.data.markerType.toLowerCase() == "gate") {
                     this.el.setAttribute("material", {color: "orange", transparent: true, opacity: .5});
-                    this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"placeholder"});
+                    // this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"placeholder"});
+                    this.el.setAttribute("obb-collider", {size: this.data.xscale * 1.5 + " " + this.data.yscale * 1.5 + " " + this.data.zscale * 1.5});
                    
                 } else if (this.data.markerType.toLowerCase() == "portal") {
                   this.el.setAttribute("obb-collider", {size: this.data.xscale * 1.5 + " " + this.data.yscale * 1.5 + " " + this.data.zscale * 1.5});
@@ -1330,10 +1331,11 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
         
             } else if (this.data.markerType.toLowerCase() == "gate") {
                 this.el.setAttribute("material", {color: "orange", transparent: true, opacity: .5});
-                this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"placeholder"});
+                // this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"placeholder"});
+                this.el.setAttribute("obb-collider", {size: this.data.xscale * 1.5 + " " + this.data.yscale * 1.5 + " " + this.data.zscale * 1.5});
                 // this.el.setAttribute("color", "orange");
             } else if (this.data.markerType.toLowerCase() == "portal") {
-              this.el.setAttribute("obb-collider");
+              this.el.setAttribute("obb-collider", {size: this.data.xscale * 1.5 + " " + this.data.yscale * 1.5 + " " + this.data.zscale * 1.5});
             } else if (this.data.markerType.toLowerCase() == "light") {
               // if (!this.data.tags.includes("hide")) {
               //   this.radius = this.data.xscale * .05;
@@ -1385,6 +1387,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                 if (sceneModels[i]._id == modelID) {
                     this.el.setAttribute('gltf-model', sceneModels[i].url);
                     if (this.data.markerType.toLowerCase() == "gate") {
+                      this.el.setAttribute("obb-collider", {size: this.data.xscale * 1.5 + " " + this.data.yscale * 1.5 + " " + this.data.zscale * 1.5});
                       // this.el.setAttribute("material", {color: "orange", transparent: true, opacity: .5});
                       // this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"placeholder"});
                     }
@@ -1430,7 +1433,8 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                 console.log("tryna set gate gltf model on cloudmarker " + this.el.id);
                 this.el.setAttribute("gltf-model", "#gate2");
                 this.el.setAttribute("material", {color: "orange", transparent: true, opacity: .5});
-                this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"placeholder", scaleFactor: this.data.scale});
+                // this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"placeholder", scaleFactor: this.data.scale});
+                this.el.setAttribute("obb-collider", {size: this.data.xscale * 1.5 + " " + this.data.yscale * 1.5 + " " + this.data.zscale * 1.5});
                 // this.el.setAttribute("color", "orange");
             } else if (this.data.markerType.toLowerCase() == "link") {
               this.el.setAttribute("gltf-model", "#links");

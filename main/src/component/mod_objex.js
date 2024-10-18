@@ -1004,36 +1004,40 @@ AFRAME.registerComponent('mod_object', {
             // this.triggerAudioController.components.trigger_audio_control.loopToggle(true);
         } 
         window.addEventListener('mousedown', (e) => {
-          e.preventDefault();
-          //if mod_line
-          let modLine = this.el.components.mod_line;
-          if (modLine) {
-            modLine.toggleShowLine(true);
-            this.triggerAudioController = document.getElementById("triggerAudio");
-            console.log("equipped triggerAudio "+ this.tags);
-            if (this.triggerAudioController != null) {
-              if (!this.triggerAudioController.components.trigger_audio_control.hasLoopHowl()) {
-                this.triggerAudioController.components.trigger_audio_control.loopAndFollow(this.el.id, this.tags, false); //don't autoplay if hastriggeraction
-              }
-              this.triggerAudioController.components.trigger_audio_control.loopToggle(true);
-                
-            } 
+          if (!showDialogPanel) {
+            e.preventDefault();
+            //if mod_line
+            let modLine = this.el.components.mod_line;
+            if (modLine) {
+              modLine.toggleShowLine(true);
+              this.triggerAudioController = document.getElementById("triggerAudio");
+              console.log("equipped triggerAudio "+ this.tags);
+              if (this.triggerAudioController != null) {
+                if (!this.triggerAudioController.components.trigger_audio_control.hasLoopHowl()) {
+                  this.triggerAudioController.components.trigger_audio_control.loopAndFollow(this.el.id, this.tags, false); //don't autoplay if hastriggeraction
+                }
+                this.triggerAudioController.components.trigger_audio_control.loopToggle(true);
+                  
+              } 
+            }
+            window.isFiring = true;
           }
-          window.isFiring = true;
         });
         window.addEventListener('mouseup', (e) => {
-          e.preventDefault();
-          let modLine = this.el.components.mod_line;
-          if (modLine) {
-            modLine.toggleShowLine(false);
-            this.triggerAudioController = document.getElementById("triggerAudio");
-            console.log("equipped triggerAudio "+ this.tags);
-            if (this.triggerAudioController != null) {
-              this.triggerAudioController.components.trigger_audio_control.loopToggle(false);
-                
-            } 
+          if (!showDialogPanel) {
+            e.preventDefault();
+            let modLine = this.el.components.mod_line;
+            if (modLine) {
+              modLine.toggleShowLine(false);
+              this.triggerAudioController = document.getElementById("triggerAudio");
+              console.log("equipped triggerAudio "+ this.tags);
+              if (this.triggerAudioController != null) {
+                this.triggerAudioController.components.trigger_audio_control.loopToggle(false);
+                  
+              } 
+            }
+            window.isFiring = false;
           }
-          window.isFiring = false;
         }); 
         
       }
@@ -3506,10 +3510,10 @@ AFRAME.registerComponent('mod_object', {
             // if (this.arrow) { //show helper arrow, TODO toggle from dialogs.js
             //   this.el.sceneEl.object3D.remove(this.arrow);
             // }
-            console.log("tryna show equippedRaycaster...");
-            this.arrow = new THREE.ArrowHelper( this.directionMe, this.positionMe, 10, 0xff0000 );
-            this.arrow = new THREE.ArrowHelper( this.equippedRaycaster.direction, this.equippedRaycaster.origin, 10, 0xff0000 );
-            this.el.sceneEl.object3D.add( this.arrow );
+            // // console.log("tryna show equippedRaycaster...");
+            // this.arrow = new THREE.ArrowHelper( this.directionMe, this.positionMe, 10, 0xff0000 );
+            // this.arrow = new THREE.ArrowHelper( this.equippedRaycaster.direction, this.equippedRaycaster.origin, 10, 0xff0000 );
+            // this.el.sceneEl.object3D.add( this.arrow );
         } 
   
         // if (this.lineGeometry && this.lineObject && this.lineStart) { //for testing
