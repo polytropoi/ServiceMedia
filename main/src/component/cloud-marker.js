@@ -1534,9 +1534,9 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
               }
               if (this.data.tags.includes("hide") || (settings && settings.hideGizmos)) {
                 // if (this.data.markerType != "mailbox" && this.data.markerType != "light") {
-                  // this.el.object3D.visible = false;
+                  this.el.object3D.visible = false;
                 // }
-                this.el.removeAttribute("geometry");
+                // this.el.removeAttribute("geometry");
               } else {
                 this.el.object3D.visible = true;
               }    

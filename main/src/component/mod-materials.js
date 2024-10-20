@@ -765,7 +765,7 @@ AFRAME.registerComponent('mod-materials', {
                 }
               }
               // break;
-            } else if (this.mouseOverObject.includes("slider_background") && this.video.duration) {
+            } else if (this.mouseOverObject.includes("slider_background") && (this.video.duration && this.video.duration > 0)) {
 
                     // this.slider_begin.position.y/this.slider_end.position.y 
                     let nStart = new THREE.Vector3();
