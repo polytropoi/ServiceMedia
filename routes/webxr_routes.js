@@ -1763,7 +1763,7 @@ webxr_router.get('/:_id', function (req, res) {
                                             // "<a-entity id=\x22viewportPlaceholderFar\x22 visible=\x22false\x22 geometry=\x22primitive: plane; height: 0.01; width: .01\x22 position=\x220 0 -30\x22"+
                                             // "material=\x22opacity: 0\x22></a-entity>"+
                                         "</a-entity>"+
-
+                                        // ambientAudioEntity +
                                         handEntities +
                                         "</a-entity></a-entity>";
 
@@ -3509,12 +3509,12 @@ webxr_router.get('/:_id', function (req, res) {
                                 "});" +
                             "ambientAudioHowl.load();</script>";
                             ambientAudioControl = "<script src=\x22../main/src/component/ambient-audio-control.js\x22></script>";
-                            let ambientPosAnim = "animation__yoyo=\x22property: position; to: -5 3 0; dur: 60000; dir: alternate; easing: easeInSine; loop: true;\x22 ";
+                            let ambientPosAnim = "animation__yoyo=\x22property: position; to: -25 1 0; dur: 60000; dir: alternate; easing: easeInSine; loop: true;\x22 ";
                             let ambientRotAnim = "animation__rot=\x22property:rotation; dur:60000; to: 0 360 0; loop: true; easing:linear;\x22 ";        
                             // posAnim = "animation__pos=\x22property: position; to: random-position; dur: 15000; loop: true;";  
                             ambientAudioEntity = "<a-entity "+ambientRotAnim+"><a-entity id=\x22ambientAudio\x22 ambient_audio_control=\x22oggurl: "+ambientOggUrl+"; mp3url: "+ambientMp3Url+";\x22 volume: "+sceneAmbientVolume+"; "+
                             // "geometry=\x22primitive: sphere; radius: .5\x22 "+ambientPosAnim+" position=\x2233 3 0\x22>" +
-                            ambientPosAnim+" position=\x223 3 0\x22>" +
+                            ambientPosAnim+" position=\x2225 1 0\x22>" +
                             "</a-entity></a-entity>";
                         // }
                     }

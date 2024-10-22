@@ -1400,9 +1400,12 @@ AFRAME.registerComponent('ambient_audio_control', { //ambient file will loop and
         this.cam = document.querySelector("[camera]"); 
         this.camPosition = "";
         this.distance = "";
+        this.playerEl = document.getElementById("player");
+        // this.playerEl.appendChild(this.el);
         this.ambientChild = document.querySelector(".ambientChild");
         ambientPosition = this.el.object3D.position;
         this.ambientAudioEl = document.getElementById("ambientAudio");
+        // this.ambientAudioEl.position = this.playerEl.getAttribute("position");
         ambientAudioHowl.pos(ambientPosition);
         var normalizedVolume = ((this.data.volume - -80) * 100) / (20 - -80) * .01;    
         ambientAudioHowl.fade(0, normalizedVolume, 5000);
@@ -1417,6 +1420,7 @@ AFRAME.registerComponent('ambient_audio_control', { //ambient file will loop and
             // }
         }
        
+
 
         if (this.ambientChild != null) {
             // this.ambientChild.clone;
@@ -1626,7 +1630,7 @@ AFRAME.registerComponent('trigger_audio_control', { //trigger audio on designate
         
         this.audioGroupsEl = document.getElementById('audioGroupsEl');
         this.audioGroupsController = null;
-        // this.cam = document.querySelector("[camera]"); 
+        this.cam = document.querySelector("[camera]"); 
         // this.camPosition = "";
         // this.distance = "";
         // this.ambientChild = document.querySelector(".ambientChild");
@@ -1704,10 +1708,12 @@ AFRAME.registerComponent('trigger_audio_control', { //trigger audio on designate
 
     },
     playAudioAtPosition: function(pos, distance, tag, volmod) {
-        
-        if (triggerAudioHowl != null && tag != undefined && tag != null && tag != undefined && tag != 'undefined' && tag != "" && pos != null) {
+        console.log("tryna play trigger audio with tag " + tag + " at pos " + JSON.stringify(pos) + this.audioGroupsEl + this.isReady + triggerAudioHowl);
+        if (triggerAudioHowl != null && tag != undefined && tag != null && tag != undefined && tag != 'undefined' && tag != "") {
         // this.modVolume(1);
-        console.log("tryna play trigger audio with tag " + tag + " at pos " + JSON.stringify(pos) + this.audioGroupsEl + this.isReady);
+        if (!pos) {
+            pos = this.cam.getAttribute('position');
+        }
         this.audioGroupsEl = document.getElementById('audioGroupsEl');
         let audioID = null;
         let audioIDs = [];
