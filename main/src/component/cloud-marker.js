@@ -101,6 +101,17 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
         let primaryAudioEl = document.querySelector('#primaryAudio');
         if (primaryAudioEl != null) {
           this.primaryAudioMangler = document.getElementById("primaryAudio").components.primary_audio_control;
+          // this.primaryAudioMangler.data.use
+          if (!this.data.tags.includes("default")) { //otherwise use cloudmarker geometry
+            // let primaryAudioPlayer = document.getElementById("primaryAudioPlayer");
+            // if (primaryAudioPlayer) {
+            //   primaryAudioPlayer.setAttribute("visible", false); //
+            // }
+            this.primaryAudioMangler.data.useDefaultPlayer = false;
+            primaryAudioEl.setAttribute("visible", false);
+            document.querySelector("#primaryAudioText").setAttribute('visible', false);
+            document.querySelector("#primaryAudioTextBackground").setAttribute('visible', false);
+          }
         }
       }
       if (this.data.markerType == "player" ) {

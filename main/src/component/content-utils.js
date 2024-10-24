@@ -1742,18 +1742,18 @@ AFRAME.registerComponent('entity-callout', {
         calloutEntity.appendChild(calloutText);
         calloutText.setAttribute("position", '0 0 .3'); //offset the child on z toward camera, to prevent overlap on model
         calloutText.setAttribute('troika-text', {
-          baseline: "bottom",
+          baseline: "top",
           align: "center",
           font: "/fonts/web/" + this.font,
-          fontSize: .1,
+          fontSize: .05,
           anchor: "center",
           outlineColor: "black",
           outlineWidth: "2%",
           color: "white",
-          value: "Play/Pause"
+          value: this.data.calloutString
         });
         this.el.addEventListener('mouseenter', function (evt) {
-          console.log("tryna mouseover entity-callout");
+          console.log("tryna mouseover entity-callout ");
           calloutEntity.setAttribute('visible', true);
           let pos = evt.detail.intersection.point; //hitpoint on model
           // console.log(pos);

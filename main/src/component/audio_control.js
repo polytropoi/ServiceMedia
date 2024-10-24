@@ -310,7 +310,8 @@ AFRAME.registerComponent('primary_audio_player', {  //setup and controls for the
                 title: {default: ''},
                 volume: {default: 0},
                 targetattach: {default: false},
-                autoplay: {default: false}
+                autoplay: {default: false},
+                useDefaultPlayer: {default: true}
             },
             
             init: function () {
@@ -373,8 +374,11 @@ AFRAME.registerComponent('primary_audio_player', {  //setup and controls for the
                     // el.emit('primaryAudioToggle', {isPlaying : true}, true);
 
 
+                } 
+                if (!this.data.useDefaultPlayer) {
+                    document.querySelector("#primaryAudioText").setAttribute('visible', true);
                 }
-                document.querySelector("#primaryAudioText").setAttribute('visible', true);
+                
                 // document.querySelector("#primaryAudioText").setAttribute("look-at", "#player");
                 
                         // getJSON('/netradiodetails', function(err, data) { //deprecated for now, bad vuln
@@ -392,7 +396,9 @@ AFRAME.registerComponent('primary_audio_player', {  //setup and controls for the
                         //     }
                         // });
                 el.addEventListener('mouseenter', function () {
-                    document.querySelector("#primaryAudioText").setAttribute('visible', true);
+                    if (!this.data.useDefaultPlayer) {
+                        document.querySelector("#primaryAudioText").setAttribute('visible', true);
+                    }
                     // document.querySelector("#primaryAudioText").setAttribute("look-at", "#player");
                         // getJSON('/netradiodetails', function(err, data) { //deprecated for now, bad vuln
                         //     if (data != null) {
