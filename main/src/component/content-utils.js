@@ -1740,7 +1740,7 @@ AFRAME.registerComponent('entity-callout', {
         // calloutEntity.setAttribute("render-order", "hud");
         sceneEl.appendChild(calloutEntity);
         calloutEntity.appendChild(calloutText);
-        calloutText.setAttribute("position", '0 0 .3'); //offset the child on z toward camera, to prevent overlap on model
+        calloutText.setAttribute("position", '0 .1 .1'); //offset the child on z toward camera, to prevent overlap on model
         calloutText.setAttribute('troika-text', {
           baseline: "top",
           align: "center",

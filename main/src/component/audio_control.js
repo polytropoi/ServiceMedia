@@ -395,27 +395,29 @@ AFRAME.registerComponent('primary_audio_player', {  //setup and controls for the
                         //         }
                         //     }
                         // });
-                el.addEventListener('mouseenter', function () {
-                    if (!this.data.useDefaultPlayer) {
-                        document.querySelector("#primaryAudioText").setAttribute('visible', true);
-                    }
-                    // document.querySelector("#primaryAudioText").setAttribute("look-at", "#player");
-                        // getJSON('/netradiodetails', function(err, data) { //deprecated for now, bad vuln
-                        //     if (data != null) {
-                        //         if (err !== null) {
-                        //             console.log('Something went wrong: ' + data);
-                        //         } else {
-                        //             console.log('streamdata ' + data.title);
-                        //             document.querySelector("#primaryAudioText").setAttribute('text', {
-                        //                 // width: 4, 
-                        //                 align: "left",
-                        //                 value: "Stream: "+hostname+"\nPlaying: "+ data.title + "\n\nListeners: " + data.listeners + "\nBitrate: " + data.bitrate
-                        //             });
-                        //         }
-                        //     }
-                        // });
-                    // console.log('mousenter primary_audio_control');
-                });
+
+                // let that = this;
+                // el.addEventListener('mouseenter', () => {
+                //     if (!this.data.useDefaultPlayer) {
+                //         document.querySelector("#primaryAudioText").setAttribute('visible', true);
+                //     }
+                //     // document.querySelector("#primaryAudioText").setAttribute("look-at", "#player");
+                //         // getJSON('/netradiodetails', function(err, data) { //deprecated for now, bad vuln
+                //         //     if (data != null) {
+                //         //         if (err !== null) {
+                //         //             console.log('Something went wrong: ' + data);
+                //         //         } else {
+                //         //             console.log('streamdata ' + data.title);
+                //         //             document.querySelector("#primaryAudioText").setAttribute('text', {
+                //         //                 // width: 4, 
+                //         //                 align: "left",
+                //         //                 value: "Stream: "+hostname+"\nPlaying: "+ data.title + "\n\nListeners: " + data.listeners + "\nBitrate: " + data.bitrate
+                //         //             });
+                //         //         }
+                //         //     }
+                //         // });
+                //     // console.log('mousenter primary_audio_control');
+                // });
                 el.setAttribute('light', {
                     type: 'point',
                     distance: 30,
@@ -447,6 +449,14 @@ AFRAME.registerComponent('primary_audio_player', {  //setup and controls for the
                 // el.addEventListener('mouseleave', function () {
                 //     el.setAttribute('color', defaultColor);
                 // });
+            },
+            hideDefault: function () {
+               
+                this.data.useDefaultPlayer = false;
+                this.el.setAttribute("visible", false);
+                // document.querySelector("#primaryAudioText").setAttribute('visible', false);
+                document.querySelector("#primaryAudioTextBackground").setAttribute('visible', false);
+                document.querySelector("#primaryAudioText").setAttribute('visible', false);
             },
             // updateStatus: function () {
             //     if (primaryAudioHowl.isPlaying()) {
@@ -631,7 +641,8 @@ AFRAME.registerComponent('primary_audio_player', {  //setup and controls for the
         //   },
         timekeys: {default: ''},
         timeKeysIndex: {default: 0},
-        nextTimeKey: {default: 0}
+        nextTimeKey: {default: 0},
+        useDefaultPlayer: {default: false}
         // analyser: {default: 'selector'}
 
         },
@@ -793,6 +804,14 @@ AFRAME.registerComponent('primary_audio_player', {  //setup and controls for the
                 }
             }
 
+        },
+        hideDefault: function () {
+               
+            this.data.useDefaultPlayer = false;
+            this.el.setAttribute("visible", false);
+            // document.querySelector("#primaryAudioText").setAttribute('visible', false);
+            // document.querySelector("#primaryAudioTextBackground").setAttribute('visible', false);
+            // document.querySelector("#primaryAudioText").setAttribute('visible', false);
         },
         modVolume: function(newVolume) {
             // console.log("tryna mod primaryAUdioVolume to " + newVolume);

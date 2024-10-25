@@ -102,15 +102,14 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
         if (primaryAudioEl != null) {
           this.primaryAudioMangler = document.getElementById("primaryAudio").components.primary_audio_control;
           // this.primaryAudioMangler.data.use
-          if (!this.data.tags.includes("default")) { //otherwise use cloudmarker geometry
+          // if (!this.data.tags.includes("default")) { //otherwise use cloudmarker geometry
+          if (this.primaryAudioMangler && this.data.modelID != null && this.data.modelID.length > 0 && this.data.modelID != "none") { 
             // let primaryAudioPlayer = document.getElementById("primaryAudioPlayer");
             // if (primaryAudioPlayer) {
             //   primaryAudioPlayer.setAttribute("visible", false); //
             // }
-            this.primaryAudioMangler.data.useDefaultPlayer = false;
-            primaryAudioEl.setAttribute("visible", false);
-            document.querySelector("#primaryAudioText").setAttribute('visible', false);
-            document.querySelector("#primaryAudioTextBackground").setAttribute('visible', false);
+            this.primaryAudioMangler.hideDefault();
+          
           }
         }
       }
@@ -1348,7 +1347,11 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                 // this.el.setAttribute("color", "orange");
             } else if (this.data.markerType.toLowerCase() == "portal") {
               this.el.setAttribute("obb-collider", {size: this.data.xscale * 1.5 + " " + this.data.yscale * 1.5 + " " + this.data.zscale * 1.5});
-            } else if (this.data.markerType.toLowerCase() == "light") {
+            } else if (this.data.markerType.toLowerCase() == "audio") {
+              if (this.primaryAudioMangler) {
+                this.primaryAudioMangler.hideDefault();
+              }
+              
               // if (!this.data.tags.includes("hide")) {
               //   this.radius = this.data.xscale * .05;
               //   this.el.setAttribute("geometry", {"primitive": "sphere", "radius": this.radius});
