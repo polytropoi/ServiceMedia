@@ -479,6 +479,12 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
               if (this.data.markerType.toLowerCase().includes("picture")) {
                this.loadPicture();
               }
+              if (this.data.tags.includes("hide gizmo") || (settings && settings.hideGizmos)) {
+                if (this.data.markerType != "mailbox" && this.data.markerType != "light") {
+                  console.log(this.data.markerType + " hiding gizmos because");
+                  this.el.object3D.visible = false;
+                }
+              }
               //   console.log("localmarker tryna load media with mediaID " + this.data.mediaID);
                 
               //   if (this.data.mediaID && this.data.mediaID.includes("local_")) {
