@@ -12,7 +12,7 @@ AFRAME.registerComponent('mod_scene_inventory', {
         objexEl.components.mod_objex.addSceneInventoryObjects(this.data.jsonInventoryData);
       }
     });
-////////////////////////////////////////////  mod_objex: spins through data and spawn objects attached to locations with mod_object component below ////////////////////////////
+////////////////////////////////////////////  mod_objex: spins through data and spawn objects (with more properties and perhaps Actions, unlike other elements) attached to locations with mod_object component below ////////////////////////////
 ////////////////////////////////////////////  vs mod_model(s) written into response individually, for static and/or preloaded assets
 AFRAME.registerComponent('mod_objex', {
     schema: {
@@ -793,13 +793,14 @@ AFRAME.registerComponent('mod_object', {
           this.data.isEquippable = true;
         }
       }
+
       if (this.data.locationData && this.data.locationData.locationTags != undefined  && this.data.locationData.locationTags != 'undefined' && this.data.locationData.locationTags.length > 0) {
           if (this.data.locationData.locationTags.toLowerCase().includes("equippable")) {
             this.data.isEquippable = true;
           } else if (this.data.locationData.locationTags.toLowerCase().includes("equipped")) {
             this.data.isEquipped = true;
           } 
-          if ( this.data.locationData.locationTags.toLowerCase().includes("hide me")) { 
+          if ( this.data.locationData.locationTags.toLowerCase().includes("hide")) { 
               this.el.setAttribute("visible", false);
               this.el.classList.remove("activeObjexRay");
               this.el.dataset.isvisible = false;
