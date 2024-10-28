@@ -579,6 +579,7 @@ AFRAME.registerComponent('mod_object', {
       xscale: {type: 'number', default: 1}, //like the others...
       yscale: {type: 'number', default: 1},
       zscale: {type: 'number', default: 1},
+      damage: {type: 'number', default: 0},
     },
     init: function () {
       // console.log("mod_object data " + JSON.stringify(this.data.objectData.modelURL));
@@ -1738,7 +1739,7 @@ AFRAME.registerComponent('mod_object', {
           this.applyForce();
         }
       }); //end body-loaded listener
-
+      
       this.el.addEventListener("obbcollisionstarted", (e) => { //use instead of physics..
         console.log(this.data.objectData.name + " obb collision with" + e.detail.withEl.id + " vs " + this.lastCollidedWithID);
         if (e.detail.withEl.id != this.lastCollidedWithID) {
@@ -1751,6 +1752,7 @@ AFRAME.registerComponent('mod_object', {
             this.distance = window.playerPosition.distanceTo(this.hitpoint);
             console.log(this.data.objectData.name + " gotsa collision with " + targetModObjComponent.data.objectData.name + 
             " type " + targetModObjComponent.data.objectData.objtype + " hitpoints " + targetModObjComponent.data.objectData.hitpoints);
+
             if (this.data.objectData.name != targetModObjComponent.data.objectData.name) { //don't trigger yerself, but what if...?
 
               if (this.triggerAudioController != null) {
@@ -1763,16 +1765,22 @@ AFRAME.registerComponent('mod_object', {
                 this.triggerAudioController.components.trigger_audio_control.playAudioAtPosition(this.el.object3D.position, window.playerPosition.distanceTo(this.el.object3D.position), ["magic"]);
               }
               // console.log(this.data.objectData.name  + " hit by other object : " + JSON.stringify(targetModObjComponent.data.objectData));
-
-              if (targetModObjComponent.data.objectData.objtype == "Weapon" && this.data.objectData.quality.toLowerCase() != "indestructible") {
-                if (targetModObjComponent.data.objectData.operator == "Damage" && targetModObjComponent.data.objectData.hitpoints) {
-                 
+              let objectMass = 0;
+              if (this.data.objectData.physics == "Dynamic") { //calc some damage by "mass", even if not a weapon...
+                let oSplit = this.data.objectData.weight.split("-");
+                
+                objectMass = this.returnRandomNumber(parseFloat(oSplit[0]), parseFloat(oSplit[1]));
+                console.log("gotsa Dynamic physics object w/ objectMass " + objectMass + " " + this.currentDamage);
+              }
+              if ((targetModObjComponent.data.objectData.objtype == "Weapon" || objectMass != 0) && this.data.objectData.quality.toLowerCase() != "indestructible") {
+                if (objectMass != 0 || (targetModObjComponent.data.objectData.operator == "Damage" && targetModObjComponent.data.objectData.hitpoints)) {
+                  let damageHitPoints = this.data.objectData.hitpoints ? parseFloat(this.data.objectData.hitpoints) : 0; 
                   if (this.calloutEntity != null) {
                     
-                    this.currentDamage = this.currentDamage + parseFloat(targetModObjComponent.data.objectData.hitpoints);
-                    console.log("DAMAGE hitpoints " + targetModObjComponent.data.objectData.hitpoints + " distance " + this.distance + " damage " + this.currentDamage +  " of " + targetModObjComponent.data.objectData.hitpoints);
-                    if (this.currentDamage < this.data.objectData.hitpoints) {
-                      this.showCallout("Hit -" + targetModObjComponent.data.objectData.hitpoints + " : " + this.currentDamage + " / " +this.data.objectData.hitpoints, this.hitpoint, this.distance);
+                    targetModObjComponent.data.damage = parseFloat(targetModObjComponent.data.damage) + parseFloat(damageHitPoints) + parseFloat(objectMass);
+                    console.log("DAMAGE hitpoints " + damageHitPoints + " distance " + this.distance + " currentdamage " + this.currentDamage +  " of " + targetModObjComponent.data.objectData.hitpoints);
+                    if (parseFloat(targetModObjComponent.data.damage) < parseFloat(targetModObjComponent.data.objectData.hitpoints)) {
+                      this.showCallout("Hit ! " + targetModObjComponent.data.damage.toFixed(2) + " / " + targetModObjComponent.data.objectData.hitpoints, this.hitpoint, this.distance);
                     } else {
                       this.isDead = true;
                       // this.showCallout("I AM DEAD NOW!", this.hitpoint, this.distance);
