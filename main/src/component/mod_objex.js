@@ -1748,8 +1748,9 @@ AFRAME.registerComponent('mod_object', {
           let targetModObjComponent = e.detail.withEl.components.mod_object;
           if (targetModObjComponent) {
             // console.log(this.data.objectData.name +" collided with mod_object " +targetModObjComponent.data.objectData.name + " with objtype " + targetModObjComponent.data.objectData.objtype );
-            this.hitpoint = e.detail.withEl.object3D.position;
-            this.distance = window.playerPosition.distanceTo(this.hitpoint);
+            // this.hitpoint = e.detail.withEl.object3D.position;
+            let targetPosition = e.detail.withEl.object3D.position;
+            let targetDistance = window.playerPosition.distanceTo(targetPosition);
             console.log(this.data.objectData.name + " gotsa collision with " + targetModObjComponent.data.objectData.name + 
             " type " + targetModObjComponent.data.objectData.objtype + " hitpoints " + targetModObjComponent.data.objectData.hitpoints);
 
@@ -1757,126 +1758,130 @@ AFRAME.registerComponent('mod_object', {
 
               if (this.triggerAudioController != null) {
                 // console.log("tryna play trigger audio hit");
-                this.triggerAudioController.components.trigger_audio_control.playAudioAtPosition(this.hitpoint, this.distance, ["hit"]);
+                this.triggerAudioController.components.trigger_audio_control.playAudioAtPosition(targetPosition, targetDistance, ["hit"]);
               }
               // console.log("actions: " + JSON.stringify(mod_obj_component.data.objectData.actions));
               // var this.triggerAudioController = document.getElementById("triggerAudio");
-              if (this.triggerAudioController != null) {
-                this.triggerAudioController.components.trigger_audio_control.playAudioAtPosition(this.el.object3D.position, window.playerPosition.distanceTo(this.el.object3D.position), ["magic"]);
-              }
+              // if (this.triggerAudioController != null) {
+              //   this.triggerAudioController.components.trigger_audio_control.playAudioAtPosition(this.el.object3D.position, window.playerPosition.distanceTo(this.el.object3D.position), ["magic"]);
+              // }
               // console.log(this.data.objectData.name  + " hit by other object : " + JSON.stringify(targetModObjComponent.data.objectData));
               let objectMass = 0;
               if (this.data.objectData.physics == "Dynamic") { //calc some damage by "mass", even if not a weapon...
                 let oSplit = this.data.objectData.weight.split("-");
                 
                 objectMass = this.returnRandomNumber(parseFloat(oSplit[0]), parseFloat(oSplit[1]));
-                console.log("gotsa Dynamic physics object w/ objectMass " + objectMass + " " + this.currentDamage);
+                console.log("gotsa Dynamic physics object w/ objectMass " + objectMass );
               }
-              if ((targetModObjComponent.data.objectData.objtype == "Weapon" || objectMass != 0) && this.data.objectData.quality.toLowerCase() != "indestructible") {
-                if (objectMass != 0 || (targetModObjComponent.data.objectData.operator == "Damage" && targetModObjComponent.data.objectData.hitpoints)) {
+              if ((this.data.objectData.objtype == "Weapon" || objectMass != 0) && targetModObjComponent.data.objectData.quality.toLowerCase() != "indestructible") {//hrm...
+                if (objectMass != 0 || (this.data.objectData.operator == "Damage" && targetModObjComponent.data.objectData.hitpoints)) {
                   let damageHitPoints = this.data.objectData.hitpoints ? parseFloat(this.data.objectData.hitpoints) : 0; 
                   if (this.calloutEntity != null) {
                     
                     targetModObjComponent.data.damage = parseFloat(targetModObjComponent.data.damage) + parseFloat(damageHitPoints) + parseFloat(objectMass);
-                    console.log("DAMAGE hitpoints " + damageHitPoints + " distance " + this.distance + " currentdamage " + this.currentDamage +  " of " + targetModObjComponent.data.objectData.hitpoints);
-                    if (parseFloat(targetModObjComponent.data.damage) < parseFloat(targetModObjComponent.data.objectData.hitpoints)) {
-                      this.showCallout("Hit ! " + targetModObjComponent.data.damage.toFixed(2) + " / " + targetModObjComponent.data.objectData.hitpoints, this.hitpoint, this.distance);
+                    console.log("DAMAGE hitpoints " + damageHitPoints + " distance " + targetDistance + " currentdamage " + targetModObjComponent.data.damage +  " of " + targetModObjComponent.data.objectData.hitpoints);
+                    if (targetModObjComponent.data.damage < targetModObjComponent.data.objectData.hitpoints) {
+                      this.showCallout("Hit ! " + targetModObjComponent.data.damage.toFixed(2) + " / " + targetModObjComponent.data.objectData.hitpoints, targetPosition, targetDistance);
+                      console.log("gotsa damage hit " +targetModObjComponent.data.damage.toFixed(2) + " / " + targetModObjComponent.data.objectData.hitpoints)
                     } else {
                       this.isDead = true;
-                      // this.showCallout("I AM DEAD NOW!", this.hitpoint, this.distance);
+                      // this.showCallout("I AM DEAD NOW!", this.hitpoint, targetDistance);
+                      console.log("IAMDEAD!");
                       let greetingDialogEl = document.getElementById("sceneGreetingDialog");
                       if (greetingDialogEl) {
                         let dialogComponent = greetingDialogEl.components.scene_greeting_dialog;
                         if (dialogComponent) {
                             // console.log("tryna");
                             dialogComponent.setLocation();
-                            dialogComponent.ShowMessageAndHide("You destroyed a " + this.data.objectData.name + "!", 2000);
+                            dialogComponent.ShowMessageAndHide("You destroyed a " + targetModObjComponent.data.objectData.name + "!", 2000);
                         } else {
                             console.log("caint find no dangblurn dialog component!");
                         }
                       }
-                      if (this.killAction) {
+                      targetModObjComponent.killMe();
+                      // this.killAction = 
+                      // if (this.killAction) {
                       
-                        if (this.killAction.actionResult.toLowerCase() == "trigger fx") {
-                          if (!this.isTriggered) {
-                            this.isTriggered = true;
-                            let particleSpawner = document.getElementById('particleSpawner');
-                            if (particleSpawner != null) {
-                              var worldPosition = new THREE.Vector3();
-                              this.el.object3D.getWorldPosition(worldPosition);
-                              if (this.data.objectData.yPosFudge != null && this.data.objectData.yPosFudge != "") {
-                                worldPosition.y += this.data.objectData.yPosFudge;
-                              }
-                              console.log("triggering fx at " + JSON.stringify(worldPosition) + " plus" + this.data.objectData.yPosFudge);
-                              particleSpawner.components.particle_spawner.spawnParticles(worldPosition, this.data.objectData.particles, 5, null, this.data.objectData.yPosFudge, this.data.objectData.color1, this.data.objectData.triggerScale);
-                            }
-                          } else {
-                            console.log("already triggered - make it a toggle!");
-                          }
-                        }
-                        if (this.killAction.actionResult.toLowerCase() == "spawn") {
-                          if (!this.isTriggered) {
-                            this.isTriggered = true;
+                      //   if (this.killAction.actionResult.toLowerCase() == "trigger fx") {
+                      //     if (!this.isTriggered) {
+                      //       this.isTriggered = true;
+                      //       let particleSpawner = document.getElementById('particleSpawner');
+                      //       if (particleSpawner != null) {
+                      //         var worldPosition = new THREE.Vector3();
+                      //         this.el.object3D.getWorldPosition(worldPosition);
+                      //         if (this.data.objectData.yPosFudge != null && this.data.objectData.yPosFudge != "") {
+                      //           worldPosition.y += this.data.objectData.yPosFudge;
+                      //         }
+                      //         console.log("triggering fx at " + JSON.stringify(worldPosition) + " plus" + this.data.objectData.yPosFudge);
+                      //         particleSpawner.components.particle_spawner.spawnParticles(worldPosition, this.data.objectData.particles, 5, null, this.data.objectData.yPosFudge, this.data.objectData.color1, this.data.objectData.triggerScale);
+                      //       }
+                      //     } else {
+                      //       console.log("already triggered - make it a toggle!");
+                      //     }
+                      //   }
+                      //   if (this.killAction.actionResult.toLowerCase() == "spawn") {
+                      //     if (!this.isTriggered) {
+                      //       this.isTriggered = true;
 
-                              let objectData = this.objexEl.components.mod_objex.returnObjectData(this.killAction.objectID);
-                              if (objectData == null) {
-                                objectData = this.objexEl.components.mod_objex.returnObjectData(this.killAction.objectID);
-                              }
-                              if (objectData != null) {
-                                console.log("killed object spawning object with " + JSON.stringify(objectData));
-                                this.objEl = document.createElement("a-entity");
-                                this.locData = {};
-                                this.locData.x = this.el.object3D.position.x;
-                                this.locData.y = this.el.object3D.position.y + 1;
-                                this.locData.z = this.el.object3D.position.z;
-                                this.locData.timestamp = Date.now();
-                                this.objEl.setAttribute("mod_object", {'locationData': this.locData, 'objectData': objectData, 'isSpawned': false});
-                                this.objEl.id = "obj" + objectData._id + "_" + this.locData.timestamp;
-                                sceneEl.appendChild(this.objEl);
-                              } else {
-                                console.log("caint find object "+ this.killAction.objectID +", tryna fetch it..");
-                                FetchSceneInventoryObject(this.killAction.objectID);
-                                objectData = this.objexEl.components.mod_objex.returnObjectData(this.killAction.objectID);
+                      //         let objectData = this.objexEl.components.mod_objex.returnObjectData(this.killAction.objectID);
+                      //         if (objectData == null) {
+                      //           objectData = this.objexEl.components.mod_objex.returnObjectData(this.killAction.objectID);
+                      //         }
+                      //         if (objectData != null) {
+                      //           console.log("killed object spawning object with " + JSON.stringify(objectData));
+                      //           this.objEl = document.createElement("a-entity");
+                      //           this.locData = {};
+                      //           this.locData.x = this.el.object3D.position.x;
+                      //           this.locData.y = this.el.object3D.position.y + 1;
+                      //           this.locData.z = this.el.object3D.position.z;
+                      //           this.locData.timestamp = Date.now();
+                      //           this.objEl.setAttribute("mod_object", {'locationData': this.locData, 'objectData': objectData, 'isSpawned': false});
+                      //           this.objEl.id = "obj" + objectData._id + "_" + this.locData.timestamp;
+                      //           sceneEl.appendChild(this.objEl);
+                      //         } else {
+                      //           console.log("caint find object "+ this.killAction.objectID +", tryna fetch it..");
+                      //           FetchSceneInventoryObject(this.killAction.objectID);
+                      //           objectData = this.objexEl.components.mod_objex.returnObjectData(this.killAction.objectID);
                                
-                                console.log("killed object spawning object with " + JSON.stringify(objectData));
-                                this.objEl = document.createElement("a-entity");
-                                this.locData = {};
-                                this.locData.x = this.el.object3D.position.x;
-                                this.locData.y = this.el.object3D.position.y + 1;
-                                this.locData.z = this.el.object3D.position.z;
-                                this.locData.timestamp = Date.now();
-                                this.objEl.setAttribute("mod_object", {'locationData': this.locData, 'objectData': objectData, 'isSpawned': false});
-                                this.objEl.id = "obj" + objectData._id + "_" + this.locData.timestamp;
-                                sceneEl.appendChild(this.objEl);
-                              }
-                            }
-                        } else {
-                          console.log("already triggered - make it a toggle!");
-                        }
-                        //well, just do death particles everywhere for now...
-                          this.particlesEl = null;
-                          this.particlesEl = document.createElement("a-entity");
-                          // this.particlesEl.setAttribute("mod_particles", {"enabled": false});
-                          this.el.sceneEl.appendChild(this.particlesEl); //hrm...
-                          this.particlesEl.setAttribute("position", this.el.object3D.position);
-                          this.particlesEl.setAttribute('sprite-particles', {
-                            enable: true, 
-                            texture: '#smoke1', 
-                            color: settings.sceneColor3+".."+settings.sceneColor4, 
-                            blending: 'additive', 
-                            textureFrame: '6 5', 
-                            textureLoop: '1', 
-                            spawnRate: '1', 
-                            lifeTime: '3', 
-                            scale: '100,1000'});
-                          this.particlesEl.setAttribute('sprite-particles', {"duration": 3});
-                          // }
+                      //           console.log("killed object spawning object with " + JSON.stringify(objectData));
+                      //           this.objEl = document.createElement("a-entity");
+                      //           this.locData = {};
+                      //           this.locData.x = this.el.object3D.position.x;
+                      //           this.locData.y = this.el.object3D.position.y + 1;
+                      //           this.locData.z = this.el.object3D.position.z;
+                      //           this.locData.timestamp = Date.now();
+                      //           this.objEl.setAttribute("mod_object", {'locationData': this.locData, 'objectData': objectData, 'isSpawned': false});
+                      //           this.objEl.id = "obj" + objectData._id + "_" + this.locData.timestamp;
+                      //           sceneEl.appendChild(this.objEl);
+                      //         }
+                      //       }
+                      //   } else {
+                      //     console.log("already triggered - make it a toggle!");
+                      //   }
+                      //   //well, just do death particles everywhere for now...
+                      //     this.particlesEl = null;
+                      //     this.particlesEl = document.createElement("a-entity");
+                      //     // this.particlesEl.setAttribute("mod_particles", {"enabled": false});
+                      //     this.el.sceneEl.appendChild(this.particlesEl); //hrm...
+                      //     this.particlesEl.setAttribute("position", this.el.object3D.position);
+                      //     this.particlesEl.setAttribute('sprite-particles', {
+                      //       enable: true, 
+                      //       texture: '#smoke1', 
+                      //       color: settings.sceneColor3+".."+settings.sceneColor4, 
+                      //       blending: 'additive', 
+                      //       textureFrame: '6 5', 
+                      //       textureLoop: '1', 
+                      //       spawnRate: '1', 
+                      //       lifeTime: '3', 
+                      //       scale: '100,1000'});
+                      //     this.particlesEl.setAttribute('sprite-particles', {"duration": 3});
+                      //     // }
 
-                          this.el.classList.remove('activeObjexRay');
-                          this.el.removeAttribute('ammo-shape');
-                          this.el.removeAttribute('ammo-body');
-                          this.el.parentNode.removeChild(this.el); //actually kill it
-                      } //end kill action
+                      //     this.el.classList.remove('activeObjexRay');
+                      //     this.el.removeAttribute('ammo-shape');
+                      //     this.el.removeAttribute('ammo-body');
+                      //     this.el.parentNode.removeChild(this.el); //actually kill it
+                      // } //end kill action
 
 
                     } //end if is dead
@@ -2761,6 +2766,90 @@ AFRAME.registerComponent('mod_object', {
 
 
     }, //end init
+    killMe: function () {
+      if (this.killAction) {
+                      
+        if (this.killAction.actionResult.toLowerCase() == "trigger fx") {
+          if (!this.isTriggered) {
+            this.isTriggered = true;
+            let particleSpawner = document.getElementById('particleSpawner');
+            if (particleSpawner != null) {
+              var worldPosition = new THREE.Vector3();
+              this.el.object3D.getWorldPosition(worldPosition);
+              if (this.data.objectData.yPosFudge != null && this.data.objectData.yPosFudge != "") {
+                worldPosition.y += this.data.objectData.yPosFudge;
+              }
+              console.log("triggering fx at " + JSON.stringify(worldPosition) + " plus" + this.data.objectData.yPosFudge);
+              particleSpawner.components.particle_spawner.spawnParticles(worldPosition, this.data.objectData.particles, 5, null, this.data.objectData.yPosFudge, this.data.objectData.color1, this.data.objectData.triggerScale);
+            }
+          } else {
+            console.log("already triggered - make it a toggle!");
+          }
+        }
+        if (this.killAction.actionResult.toLowerCase() == "spawn") {
+          if (!this.isTriggered) {
+            this.isTriggered = true;
+
+              let objectData = this.objexEl.components.mod_objex.returnObjectData(this.killAction.objectID);
+              if (objectData == null) {
+                objectData = this.objexEl.components.mod_objex.returnObjectData(this.killAction.objectID);
+              }
+              if (objectData != null) {
+                console.log("killed object spawning object with " + JSON.stringify(objectData));
+                this.objEl = document.createElement("a-entity");
+                this.locData = {};
+                this.locData.x = this.el.object3D.position.x;
+                this.locData.y = this.el.object3D.position.y + 1;
+                this.locData.z = this.el.object3D.position.z;
+                this.locData.timestamp = Date.now();
+                this.objEl.setAttribute("mod_object", {'locationData': this.locData, 'objectData': objectData, 'isSpawned': false});
+                this.objEl.id = "obj" + objectData._id + "_" + this.locData.timestamp;
+                sceneEl.appendChild(this.objEl);
+              } else {
+                console.log("caint find object "+ this.killAction.objectID +", tryna fetch it..");
+                FetchSceneInventoryObject(this.killAction.objectID);
+                objectData = this.objexEl.components.mod_objex.returnObjectData(this.killAction.objectID);
+               
+                console.log("killed object spawning object with " + JSON.stringify(objectData));
+                this.objEl = document.createElement("a-entity");
+                this.locData = {};
+                this.locData.x = this.el.object3D.position.x;
+                this.locData.y = this.el.object3D.position.y + 1;
+                this.locData.z = this.el.object3D.position.z;
+                this.locData.timestamp = Date.now();
+                this.objEl.setAttribute("mod_object", {'locationData': this.locData, 'objectData': objectData, 'isSpawned': false});
+                this.objEl.id = "obj" + objectData._id + "_" + this.locData.timestamp;
+                sceneEl.appendChild(this.objEl);
+              }
+            }
+        } else {
+          console.log("already triggered - make it a toggle!");
+        }
+        //well, just do death particles everywhere for now...
+          this.particlesEl = null;
+          this.particlesEl = document.createElement("a-entity");
+          // this.particlesEl.setAttribute("mod_particles", {"enabled": false});
+          this.el.sceneEl.appendChild(this.particlesEl); //hrm...
+          this.particlesEl.setAttribute("position", this.el.object3D.position);
+          this.particlesEl.setAttribute('sprite-particles', {
+            enable: true, 
+            texture: '#smoke1', 
+            color: settings.sceneColor3+".."+settings.sceneColor4, 
+            blending: 'additive', 
+            textureFrame: '6 5', 
+            textureLoop: '1', 
+            spawnRate: '1', 
+            lifeTime: '3', 
+            scale: '100,1000'});
+          this.particlesEl.setAttribute('sprite-particles', {"duration": 3});
+          // }
+
+          this.el.classList.remove('activeObjexRay');
+          this.el.removeAttribute('ammo-shape');
+          this.el.removeAttribute('ammo-body');
+          this.el.parentNode.removeChild(this.el); //actually kill it
+      } //end kill action
+    },
     showCallout: function (calloutString, hitpoint, distance) {
       console.log("tryna show obj callout" + calloutString);
       let color = "white";
@@ -2851,13 +2940,13 @@ AFRAME.registerComponent('mod_object', {
                 if (!this.isNavAgent) {
                   this.calloutEntity.setAttribute("position", this.pos);
                 } else {
-                  let calloutpos = '0 1 1';
+                  let calloutpos = '0 5 .1';
                   // let scaleval = ' 1'
                   // if (this.data.objectData.yPosFudge) {
                   //   calloutpos = '0 ' + (parseFloat(this.data.objectData.yPosFudge) + 1) + ' 1';
                   // }
                   if (this.data.yscale) {
-                    calloutpos = '0 ' + (parseFloat(this.data.yscale) + 2) + ' ' + parseFloat(this.data.yscale) + 1.5;
+                    calloutpos = '0 ' + (parseFloat(this.data.yscale) + 2) + ' ' + (parseFloat(this.data.yscale));
                     
                     console.log('tryna fudge y '+ calloutpos);
                     this.calloutEntity.setAttribute("position", calloutpos);
