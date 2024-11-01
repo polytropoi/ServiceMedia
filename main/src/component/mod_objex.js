@@ -883,8 +883,8 @@ AFRAME.registerComponent('mod_object', {
           // // calloutEntity.setAttribute("render-order", "hud");
           // // if (this.isNavAgent || this.data.markerType == "Character") {
           //   this.el.appendChild(this.calloutEntity);
-          //   let y = this.data.objectData.yAxisFudge + 1;
-          //   this.calloutEntity.setAttribute("position", "0 "+y+" 1");
+          //   let y = this.data.objectData.yPosFudge + 1;
+          //   this.calloutEntity.setAttribute("position", "0 "+y+" .75");
           // // } 
           // // else {
           // //   this.el.sceneEl.appendChild(this.calloutEntity);
@@ -1777,11 +1777,11 @@ AFRAME.registerComponent('mod_object', {
                 if (objectMass != 0 || (this.data.objectData.operator == "Damage" && targetModObjComponent.data.objectData.hitpoints)) {
                   let damageHitPoints = this.data.objectData.hitpoints ? parseFloat(this.data.objectData.hitpoints) : 0; 
                   if (this.calloutEntity != null) {
-                    
-                    targetModObjComponent.data.damage = parseFloat(targetModObjComponent.data.damage) + parseFloat(damageHitPoints) + parseFloat(objectMass);
-                    console.log("DAMAGE hitpoints " + damageHitPoints + " distance " + targetDistance + " currentdamage " + targetModObjComponent.data.damage +  " of " + targetModObjComponent.data.objectData.hitpoints);
+                    let theDamage = parseFloat(damageHitPoints) + parseFloat(objectMass);
+                    targetModObjComponent.data.damage = parseFloat(targetModObjComponent.data.damage) + theDamage;
+                    console.log("DAMAGE hitpoints " + damageHitPoints.toFixed(2) + " distance " + targetDistance + " currentdamage " + targetModObjComponent.data.damage +  " of " + targetModObjComponent.data.objectData.hitpoints);
                     if (targetModObjComponent.data.damage < targetModObjComponent.data.objectData.hitpoints) {
-                      this.showCallout("Hit ! " + targetModObjComponent.data.damage.toFixed(2) + " / " + targetModObjComponent.data.objectData.hitpoints, targetPosition, targetDistance);
+                      targetModObjComponent.showCallout("Hit +"+ theDamage.toFixed(2) +" : "+ targetModObjComponent.data.damage.toFixed(2) + " / " + targetModObjComponent.data.objectData.hitpoints, targetPosition, targetDistance);
                       console.log("gotsa damage hit " +targetModObjComponent.data.damage.toFixed(2) + " / " + targetModObjComponent.data.objectData.hitpoints)
                     } else {
                       this.isDead = true;
@@ -2402,19 +2402,20 @@ AFRAME.registerComponent('mod_object', {
                 
                 this.calloutEntity.setAttribute('visible', true);
                 this.calloutEntity.setAttribute('scale', {x: this.distance * .25, y: this.distance * .25, z: this.distance * .25} );
-                if (!this.isNavAgent) {
-                  this.calloutEntity.setAttribute("position", this.pos);
-                } else {
-                  let y = '0 2 0';
-
-                  if (this.data.objectData.yPosFudge) {
-                    y = '0 ' + (parseFloat(this.data.objectData.yPosFudge) + 1) + ' 0';
-                  }
+                // if (!this.isNavAgent) {
+                //   this.calloutEntity.setAttribute("position", this.pos);
+                // } else {
+                  // let y = '0 2 1';
+                  let yScale = this.data.locationData.yscale ? this.data.locationData.yscale : 1;
+                  let yFudge = this.data.objectData.yPosFudge ? this.data.objectData.yPosFudge : 0;
+                  let y = ((yScale * 1.75) + parseFloat(yFudge)); // tweaky scale + fudgefactor
+                  console.log("tryna fudge y " + yScale + " + " + yFudge);
+                  this.calloutEntity.setAttribute("position", "0 "+y+" .75");
                   // console.log('tryna fudge y '+ y);
 
-                  this.calloutEntity.setAttribute('position', y);
+                  
                   // this.calloutEntity.setAttribute("position", "0 3 0");
-                }
+                // }
                
                 // let calloutString = theLabel;
                 this.calloutLabelSplit = calloutString.split("~");
@@ -2724,13 +2725,17 @@ AFRAME.registerComponent('mod_object', {
           this.calloutEntity.setAttribute('visible', false);
         
           // calloutEntity.setAttribute("render-order", "hud");
-          if (this.isNavAgent || this.data.markerType == "Character") {
+          // if (this.isNavAgent || this.data.markerType == "Character") {
             this.el.appendChild(this.calloutEntity);
-            let y = this.data.objectData.yAxisFudge + 1;
-            this.calloutEntity.setAttribute("position", "0 "+y+" 1");
-          } else {
-            this.el.sceneEl.appendChild(this.calloutEntity);
-          }
+            let yScale = this.data.locationData.yscale ? this.data.locationData.yscale : 1;
+            let yFudge = this.data.objectData.yPosFudge ? this.data.objectData.yPosFudge : 0;
+            let y = ((yScale * 1.75) + parseFloat(yFudge)); // tweaky scale + fudgefactor
+            console.log("tryna fudge y " + yScale + " + " + yFudge);
+            this.calloutEntity.setAttribute("position", "0 "+y+" .75");
+          // } 
+          // else {
+          //   this.el.sceneEl.appendChild(this.calloutEntity);
+          // }
   
   
           let font = "Acme.woff"; 
@@ -2738,9 +2743,9 @@ AFRAME.registerComponent('mod_object', {
             font = settings.sceneFontWeb2;
           }
           // this.calloutPanel.setAttribute("position", '0 0 1'); 
-          if (!this.isNavAgent) {
-            this.calloutText.setAttribute("position", '0 0 1.25'); //offset the child on z toward camera, to prevent overlap on model
-          }
+          // if (!this.isNavAgent) {
+          //   this.calloutText.setAttribute("position", '0 0 1.25'); //offset the child on z toward camera, to prevent overlap on model
+          // }
           this.calloutText.setAttribute('troika-text', {
             fontSize: .1,
             baseline: "bottom",
@@ -2937,21 +2942,37 @@ AFRAME.registerComponent('mod_object', {
                   this.calloutEntity.setAttribute('scale', {x: this.distance * .5, y: this.distance * .5, z: this.distance * .5} );
                 } 
                
-                if (!this.isNavAgent) {
-                  this.calloutEntity.setAttribute("position", this.pos);
-                } else {
-                  let calloutpos = '0 5 .1';
-                  // let scaleval = ' 1'
-                  // if (this.data.objectData.yPosFudge) {
-                  //   calloutpos = '0 ' + (parseFloat(this.data.objectData.yPosFudge) + 1) + ' 1';
-                  // }
-                  if (this.data.yscale) {
-                    calloutpos = '0 ' + (parseFloat(this.data.yscale) + 2) + ' ' + (parseFloat(this.data.yscale));
+                // if (!this.isNavAgent) {
+                //   this.calloutEntity.setAttribute("position", this.pos);
+                // } else {
+                  // let calloutpos = '0 5 .1';
+                  // // let scaleval = ' 1'
+                  // // if (this.data.objectData.yPosFudge) {
+                  // //   calloutpos = '0 ' + (parseFloat(this.data.objectData.yPosFudge) + 1) + ' 1';
+                  // // }
+                  // if (this.data.yscale) {
+                  //   calloutpos = '0 ' + (parseFloat(this.data.yscale) + 2) + ' ' + (parseFloat(this.data.yscale));
                     
-                    console.log('tryna fudge y '+ calloutpos);
-                    this.calloutEntity.setAttribute("position", calloutpos);
-                  } 
-                }
+                  //   console.log('tryna fudge y '+ calloutpos);
+                  //   this.calloutEntity.setAttribute("position", calloutpos);
+                  // } 
+                  // let y = '0 2 1';
+                  
+                  // if (this.data.objectData.yPosFudge) {
+                  //   let yScale = this.data.locationData.yscale ? this.data.locationData.yscale : 1;
+                  //   let yFudge = (parseFloat(this.data.objectData.yPosFudge) + yScale); //+ parseFloat(this.data.locationData.yscale));
+                  //   y = '0 ' + yFudge + ' .5';
+                    
+                  //   this.calloutEntity.setAttribute('position', y);
+                  // } else {
+                  //   this.calloutEntity.setAttribute('position', y);
+                  // }
+                  let yScale = this.data.locationData.yscale ? this.data.locationData.yscale : 1;
+                  let yFudge = this.data.objectData.yPosFudge ? this.data.objectData.yPosFudge : 0;
+                  let y = ((yScale * 1.75) + parseFloat(yFudge)); // tweaky scale + fudgefactor
+                  console.log("tryna fudge y " + yScale + " + " + yFudge);
+                  this.calloutEntity.setAttribute("position", "0 "+y+" .75");
+                // }
                
                 // let calloutString = theLabel;
                 this.calloutLabelSplit = calloutString.split("~");
@@ -3716,10 +3737,10 @@ AFRAME.registerComponent('mod_object', {
           let raycaster = new THREE.Raycaster();
           raycaster.set(new THREE.Vector3(testPosition.x, testPosition.y, testPosition.z), new THREE.Vector3(0, -1, 0));
           let results = raycaster.intersectObject(surface.getObject3D('mesh'), true);
-          
+          let scale = this.returnRandomNumber(.5, 1.5);
           if(results.length > 0) {
             scatterCount++;
-            let scale = this.returnRandomNumber(.5, 1.5);
+            scale = this.returnRandomNumber(.5, 1.5);
             
             testPosition.x = results[0].point.x.toFixed(2); //snap y of waypoint to navmesh y
             testPosition.y = results[0].point.y; //snap y of waypoint to navmesh y

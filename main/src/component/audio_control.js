@@ -1748,7 +1748,7 @@ AFRAME.registerComponent('trigger_audio_control', { //trigger audio on designate
             if (tag != null) {
                 let tags = tag.toString().split(',');
                 for (let i = 0; i < tags.length; i++) {
-                    console.log("looking fo rtag " + tags[i].trim());
+                    // console.log("looking fo rtag " + tags[i].trim());
                     audioID = this.audioGroupsController.returnTriggerAudioIDWithTag(tags[i].trim());
                     // } else {
                     //     // audioID = this.audioGroupsController.returnRandomTriggerAudioID(); 

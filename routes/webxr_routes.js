@@ -2884,7 +2884,7 @@ webxr_router.get('/:_id', function (req, res) {
                                             if (locMdl.eventData.toLowerCase().includes("navmesh")) { //use for pathfinding
                                                 
                                                
-                                                if (locMdl.eventData.toLowerCase().includes("simplenav")) { //also use simple-navmesh-constraint for player!  
+                                                if (locMdl.eventData.toLowerCase().includes("simplenav")) { //also use simple-navmesh-constraint for player!// nah, dep'd
                                                     useSimpleNavmesh = true;
                                                 }
                                                 console.log("GOTSA NAVMESH!! use simple " + useSimpleNavmesh);
@@ -2907,10 +2907,7 @@ webxr_router.get('/:_id', function (req, res) {
                                                 }
 
                                                 let modModel = "mod_model=\x22markerType: "+locMdl.markerType+"; modelName: "+locMdl.model+"; xscale:"+locMdl.xscale+"; yscale:"+locMdl.yscale+"; zscale:"+locMdl.zscale+"; xpos:"+locMdl.x+"; ypos:"+locMdl.y+"; zpos:"+locMdl.z+"; timestamp: "+locMdl.timestamp+"; tags: "+locMdl.locationTags+"; scale:"+locMdl.markerObjScale+"; name:"+locMdl.name+"; description:"+locMdl.description+"; eventData:"+locMdl.eventData+"; modelID:"+m_assetID+";\x22";
-                                                // let modMaterial = "";
-                                                if (locMdl.eventData.toLowerCase().includes("gallery")) {
-                                                    // modModel = "mod_model_photo_gallery";  maybe later
-                                                }
+                                                
 
                                                 //////////   DEFAULT not instanced, normal placement
                                                 if (!locMdl.eventData.toLowerCase().includes("instance")) {  //NOT "scatter" anymore, see mod_models
@@ -2919,19 +2916,7 @@ webxr_router.get('/:_id', function (req, res) {
                                                     let groundMod = "";
                                                     
                                                     if (locMdl.eventData.toLowerCase().includes('physics')){ //ammo for now // no add in mod_model (where model isloaded)
-                                                    // let isTrigger = false;
-                                                    
-                                                        if (locMdl.eventData.toLowerCase().includes('static')){ 
-                                                            // physicsMod = "ammo-body=\x22type: static\x22 ammo-shape=\x22type: box\x22";
-                                                            // physicsMod = "ammo-body=\x22type: static\x22 ammo-shape=\x22type: box\x22";
-                                                            // physicsMod = "mod_physics=\x22body: static; shape: box; model: "+locMdl.name+"\x22"
-                                                        }
-                                                        if (locMdl.eventData.toLowerCase().includes('dynamic')){
-                                                            // physicsMod = "ammo-body=\x22type: static\x22 ammo-shape=\x22type: box\x22";
-                                                            // physicsMod = "ammo-body=\x22type: static\x22 ammo-shape=\x22type: box\x22";
-                                                            // physicsMod = "mod_physics=\x22body: dynamic; shape: box; model: "+locMdl.name+"\x22"
-                                                            
-                                                        }
+                                                        //hrm, maybe 
                                                     }
                                                     if (locMdl.eventData.toLowerCase().includes("shader")) {
                                                         if (locMdl.eventData.toLowerCase().includes("noise")) {
@@ -2978,17 +2963,14 @@ webxr_router.get('/:_id', function (req, res) {
                                                     scale = locMdl.yscale != null ? locMdl.yscale : 1;
                                                     if (locMdl.eventData.toLowerCase().includes("everywhere")) {
                                                         
-                                                        if (locMdl.eventData.toLowerCase().includes('growpop')) {
+                                                        if (locMdl.tags.toLowerCase().includes('growpop')) { //tags not eventdata?
                                                             interaction = " interaction: growpop; ";
-                                                        } else if (locMdl.eventData.toLowerCase().includes('shrinkpop')) {
+                                                        } else if (locMdl.tags.toLowerCase().includes('shrinkpop')) {
                                                             interaction = " interaction: shrinkpop; ";
-                                                        } else if (locMdl.eventData.toLowerCase().includes('wiggle')) {
+                                                        } else if (locMdl.tags.toLowerCase().includes('wiggle')) {
                                                             interaction = " interaction: wiggle; ";
                                                         }
-                                                        // instancing = "instanced-mesh=\x22capacity:100; updateMode: auto;\x22 instanced_meshes_sphere_physics=\x22_id: "+locMdl.modelID+"; modelID: "+m_assetID+"; "+interaction+" tags: "+locMdl.locationTags+"\x22"; //scatter random sphere, e.g. in the sky..
-                                                        // console.log("instancing is " + instancing);
-                                                        // instancingEntity = "<a-sphere id=\x22ball-mesh\x22 radius=\x221\x22 color=\x22yellow\x22 instanced-mesh=\x22capacity: 100; updateMode: auto\x22></a-sphere>" +
-                                                        // "<a-entity id=\x22ball-recycler\x22 ball-recycler=\x22physics: ammo; ballCount: 10; width: 30; depth: 15; yKill: -30\x22 position=\x220 20 -25\x22></a-entity>";
+                                                    
                                                     }
                                                     
                                                     // console.log("locMdl is " + JSON.stringify(locMdl));

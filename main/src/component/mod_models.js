@@ -2186,7 +2186,9 @@ AFRAME.registerComponent('mod_model', {
           // this.particlesEl.setAttribute('sprite-particles', {"enable": false});
           this.particlesEl.setAttribute('sprite-particles', {"duration": .5});
           
-          
+          if (this.data.tags.includes("shrinkpop")) {
+            //scale down till gone...
+          }
           if (this.navAgentController) {
             this.navAgentController.updateAgentState("pause"); 
             this.navAgentController.randomStartPosition();
