@@ -616,23 +616,53 @@ AFRAME.registerComponent('mod_model', {
               if (vidGroupMangler != null) {
                 // picGroupMangler.components.picture_groups_control.attach(this.meshChildren);
                 vidGroupArray = vidGroupMangler.components.video_groups_data.returnVideoData(); //it's an array of arrays
-                console.log("vid group zero length is " + vidGroupArray[0].videos.length);
-                for (let x = 0; x < vidGroupArray[0].videos.length; x++) {
-                  if (vidGroupArray[0].videos[x].orientation != undefined && vidGroupArray[0].videos[x].orientation != null && vidGroupArray[0].videos[x].orientation.toLowerCase() === "landscape") {
-                    hvids.push(vidGroupArray[0].videos[x]);
-                  } else if (vidGroupArray[0].videos[x].orientation != undefined && vidGroupArray[0].videos[x].orientation != null && vidGroupArray[0].videos[x].orientation.toLowerCase() === "portrait") {
-                    vvids.push(vidGroupArray[0].videos[x]);
-                  } else if (vidGroupArray[0].videos[x].orientation != undefined && vidGroupArray[0].videos[x].orientation != null && vidGroupArray[0].videos[x].orientation.toLowerCase() === "square") {
-                    svids.push(vidGroupArray[0].videos[x]);
-                  } else if (vidGroupArray[0].videos[x].orientation != undefined && vidGroupArray[0].videos[x].orientation != null && vidGroupArray[0].videos[x].orientation.toLowerCase() === "equirectangular") {
-                    evids.push(vidGroupArray[0].videos[x]);
+                console.log("video data: " + JSON.stringify(vidGroupArray));
+                console.log("vidGroupArray.length is " + vidGroupArray.length + " videoGroup 0 length is " + vidGroupArray[0].videos.length);
+                let tagSplit = this.data.tags.split(",");
+                if (vidGroupArray.length > 1) { 
+                  for (let v = 0; v < vidGroupArray.length; v++) {
+                    for (let t = 0; t < tagSplit.length; t++) {
+                      console.log("checking for videogroup tags : "+ tagSplit);
+                      if (vidGroupArray[v].tags.length && vidGroupArray[v].tags.includes(tagSplit[t])) { //try to match this.el location tag w/ videoGroup tag...
+                        for (let x = 0; x < vidGroupArray[v].videos.length; x++) {
+                          if (vidGroupArray[v].videos[x].orientation != undefined && vidGroupArray[0].videos[x].orientation != null && vidGroupArray[0].videos[x].orientation.toLowerCase() === "landscape") {
+                            hvids.push(vidGroupArray[v].videos[x]);
+                          } else if (vidGroupArray[v].videos[x].orientation != undefined && vidGroupArray[0].videos[x].orientation != null && vidGroupArray[0].videos[x].orientation.toLowerCase() === "portrait") {
+                            vvids.push(vidGroupArray[v].videos[x]);
+                          } else if (vidGroupArray[v].videos[x].orientation != undefined && vidGroupArray[0].videos[x].orientation != null && vidGroupArray[0].videos[x].orientation.toLowerCase() === "square") {
+                            svids.push(vidGroupArray[0].videos[x]);
+                          } else if (vidGroupArray[v].videos[x].orientation != undefined && vidGroupArray[0].videos[x].orientation != null && vidGroupArray[0].videos[x].orientation.toLowerCase() === "equirectangular") {
+                            evids.push(vidGroupArray[v].videos[x]);
+                          }
+                        }
+                        
+                        // hvids = hvids.sort(() => Math.random() - 0.5);  //schweet
+                        // vvids = vvids.sort(() => Math.random() - 0.5);  
+                        // svids = svids.sort(() => Math.random() - 0.5);  
+                        // break;
+                      } else {
+                        console.log(tagSplit[t] + " tag match not found in " + vidGroupArray[v].tags);  
+                      }
+                    }
                   }
-  
+                  console.log("gotsa videoGroup tag match " + JSON.stringify(hvids));
+                } else { 
+                  for (let x = 0; x < vidGroupArray[0].videos.length; x++) {
+                    if (vidGroupArray[0].videos[x].orientation != undefined && vidGroupArray[0].videos[x].orientation != null && vidGroupArray[0].videos[x].orientation.toLowerCase() === "landscape") {
+                      hvids.push(vidGroupArray[0].videos[x]);
+                    } else if (vidGroupArray[0].videos[x].orientation != undefined && vidGroupArray[0].videos[x].orientation != null && vidGroupArray[0].videos[x].orientation.toLowerCase() === "portrait") {
+                      vvids.push(vidGroupArray[0].videos[x]);
+                    } else if (vidGroupArray[0].videos[x].orientation != undefined && vidGroupArray[0].videos[x].orientation != null && vidGroupArray[0].videos[x].orientation.toLowerCase() === "square") {
+                      svids.push(vidGroupArray[0].videos[x]);
+                    } else if (vidGroupArray[0].videos[x].orientation != undefined && vidGroupArray[0].videos[x].orientation != null && vidGroupArray[0].videos[x].orientation.toLowerCase() === "equirectangular") {
+                      evids.push(vidGroupArray[0].videos[x]);
+                    }
+    
+                  }
+                  hvids = hvids.sort(() => Math.random() - 0.5);  //schweet
+                  vvids = vvids.sort(() => Math.random() - 0.5);  
+                  svids = svids.sort(() => Math.random() - 0.5);  
                 }
-                hvids = hvids.sort(() => Math.random() - 0.5);  //schweet
-                vvids = vvids.sort(() => Math.random() - 0.5);  
-                svids = svids.sort(() => Math.random() - 0.5);  
-                
               } else {
                 console.log("caint fine no video_groups_control w/ tags " + this.data.tags );
                 if (this.data.tags.includes("webcam")) {
@@ -773,7 +803,7 @@ AFRAME.registerComponent('mod_model', {
                 
                 
               } else if ((this.meshChildren[i].name.toString().includes("hvid") || this.meshChildren[i].name.toString() == "hvid") && hvids.length > 0) {
-                console.log(this.meshChildren[i].name + " tryna map video data " + JSON.stringify(hvids));
+                console.log(this.meshChildren[i].name + " tryna map video data " + JSON.stringify(hvids[hvidsIndex]));
                 this.mesh = this.meshChildren[i]; //mesh, not object3d type
                 if (this.data.tags.includes("webcam")) {
                   this.child = this.el.object3D.getObjectByName(this.meshChildren[i].name, true); //object3d
@@ -797,11 +827,13 @@ AFRAME.registerComponent('mod_model', {
                   // hvidsIndex++;
                 } else { //streaming vids
                   this.child = this.el.object3D.getObjectByName(this.meshChildren[i].name, true); //object3d
+                  console.log("video index " + hvidsIndex + " : " + JSON.stringify(hvids[hvidsIndex]));
                   this.vid_href = hvids[hvidsIndex].url;
                   let vProps = {};
                   vProps.url = this.vid_href;
                   vProps.index = hvidsIndex;
                   vProps.id = hvids[hvidsIndex]._id;
+                  vProps.index = hvidsIndex;  
                   vProps.meshname = this.meshChildren[i].name;
                   vProps.videoTitle = hvids[hvidsIndex].title;
                   vProps.eventData = this.data.eventData;
@@ -809,9 +841,10 @@ AFRAME.registerComponent('mod_model', {
                   this.childEnt = document.createElement('a-entity'); 
                   this.el.appendChild(this.childEnt);
                   // this.clone = this.child.clone();
-                  this.childEnt.setObject3D("Object3D", this.child);
+                  this.childEnt.setObject3D("Object3D", this.child); //copy?
                   this.childEnt.setAttribute("vid_materials_embed", vProps);
-                  this.childEnt.id = "primary_video";
+                  this.childEnt.id = "primary_video_" + hvidsIndex; //no needs a class
+                  this.childEnt.classList.add("videoElement")
                   this.childEnt.classList.add("activeObjexRay");
                   // this.child.remove();
                   hvidsIndex++;
@@ -837,51 +870,7 @@ AFRAME.registerComponent('mod_model', {
                   this.childEnt.classList.add("activeObjexRay");
                   // this.child.remove();
                   svidsIndex++;
-                // }
-              // } else if ((this.meshChildren[i].name.includes("screen") || this.meshChildren[i].name.toString() == "screen") && hvids.length > 0) {
-              //   console.log(this.meshChildren[i].name + " tryna map video data " + JSON.stringify(hvids));
-              //   this.mesh = this.meshChildren[i]; //mesh, not object3d type
-              //   if (this.data.tags.includes("webcam")) {
-              //     this.child = this.el.object3D.getObjectByName(this.meshChildren[i].name, true); //object3d
-              //     // this.vid_href = hvids[hvidsIndex].url;
-              //     let vProps = {};
-              //     // vProps.url = this.vid_href;
-              //     // vProps.index = hvidsIndex;
-              //     // vProps.id = hvids[hvidsIndex]._id;
-              //     vProps.meshname = this.meshChildren[i].name;
-              //     vProps.videoTitle = "webcam";
-              //     vProps.eventData = this.data.eventData;
-                 
-              //     this.childEnt = document.createElement('a-entity'); 
-              //     this.el.appendChild(this.childEnt);
-              //     // this.clone = this.child.clone();
-              //     this.childEnt.setObject3D("Object3D", this.child);
-              //     this.childEnt.setAttribute("webcam_materials_embed", vProps);
-              //     this.childEnt.id = "webcam_video";
-              //     this.childEnt.classList.add("activeObjexRay");
-              //     // this.child.remove();
-              //     // hvidsIndex++;
-              //   } else { //streaming vids
-              //     this.child = this.el.object3D.getObjectByName(this.meshChildren[i].name, true); //object3d
-              //     this.vid_href = hvids[hvidsIndex].url;
-              //     let vProps = {};
-              //     vProps.url = this.vid_href;
-              //     vProps.index = hvidsIndex;
-              //     vProps.id = hvids[hvidsIndex]._id;
-              //     vProps.meshname = this.meshChildren[i].name;
-              //     vProps.videoTitle = hvids[hvidsIndex].title;
-              //     vProps.eventData = this.data.eventData;
-              //     vProps.tags = this.data.tags;
-              //     this.childEnt = document.createElement('a-entity'); 
-              //     this.el.appendChild(this.childEnt);
-              //     // this.clone = this.child.clone();
-              //     this.childEnt.setObject3D("Object3D", this.child);
-              //     this.childEnt.setAttribute("vid_materials_embed", vProps);
-              //     this.childEnt.id = "primary_video";
-              //     this.childEnt.classList.add("activeObjexRay");
-              //     // this.child.remove();
-              //     hvidsIndex++;
-              //   }
+  
               } else if (this.meshChildren[i].name.includes("spic")) {
                 let mesh = this.meshChildren[i]; //mesh, not object3d type
                 let child = this.el.object3D.getObjectByName(this.meshChildren[i].name, true); //object3d

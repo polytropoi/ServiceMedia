@@ -4196,11 +4196,12 @@ AFRAME.registerComponent('video_groups_data', {
     let vdata = [];
     vdata = JSON.parse(atob(theData));
     let vids = vdata[0].videos;
-    // console.log(JSON.stringify(vdata[0].videos));
+
     for (let i = 0; i < vids.length; i++) {
       // console.log("timekieys : " + JSON.stringify(vids[i].timekeys));
     } 
 
+    //uh, no....
     let vtk = localStorage.getItem(room +"_timeKeys");
     console.log("video timekeysData : " +vtk);
     if (vtk == null) {
@@ -4222,6 +4223,7 @@ AFRAME.registerComponent('video_groups_data', {
     SetVideoEventsData();
     },
     returnVideoData: function () {
+      // console.log("video data: " + JSON.stringify(this.data.jsonData));
       return this.data.jsonData;
     },
     returnCurrentVideo: function () {
@@ -5318,24 +5320,26 @@ AFRAME.registerComponent('scene_greeting_dialog', {  //if "greeting" scenetag + 
 
   },
   ShowMessageAndHide: function (text, time) {
-    this.startButtonBackgroundEl.setAttribute("visible", false);
-    this.startButtonTextEl.setAttribute("visible", false);
-    if (this.questEl) {
+    if (!this.startButtonBackgroundEl && this.startButtonTextEl) {
+      
+      this.startButtonBackgroundEl.setAttribute("visible", false);
+      this.startButtonTextEl.setAttribute("visible", false);
+      if (this.questEl) {
 
-      this.questEl.setAttribute("troika-text", {
-        fontSize: .2,
-        maxWidth: 5,
-        align: "center",
-        font: "/fonts/web/" + this.font2,
-        strokeWidth: '1%',
-        color: this.fillColor,
-        strokeColor: this.outlineColor,
-        value: text
-      });
-      this.hideMessage(time);
+        this.questEl.setAttribute("troika-text", {
+          fontSize: .2,
+          maxWidth: 5,
+          align: "center",
+          font: "/fonts/web/" + this.font2,
+          strokeWidth: '1%',
+          color: this.fillColor,
+          strokeColor: this.outlineColor,
+          value: text
+        });
+        this.hideMessage(time);
+      }
+
     }
-
-
   },
   hideMessage: function (time) {
     setTimeout(() => {

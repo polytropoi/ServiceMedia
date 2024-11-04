@@ -396,7 +396,7 @@ AFRAME.registerComponent('mod-materials', {
         url: {default: ''},
         url_webm: {default: ''},
         url_mov: {default: ''},
-        index: {default: ''},
+        index: {default: 0},
         meshname: {default: ''},
         id: {default: ''},
         flipY: {default: false},
@@ -404,7 +404,7 @@ AFRAME.registerComponent('mod-materials', {
         eventData: {default: ''}
       },
       init: function () {
-        console.log("tryna init video_mterialxs_embed video id is : " + this.data.id);
+        console.log("tryna init video_mterials_embed video id is : " + this.data.id + " index " + this.data.index);
         this.video = null;
         /// ------------- cubemaap fu
         this.textureArray = [];
@@ -416,14 +416,16 @@ AFRAME.registerComponent('mod-materials', {
         this.cmTexture.colorSpace = THREE.SRGBColorSpace;
         // let video = document.getElementById(this.data.id);
         // this.video = null;
+        // this.video = document.getElementById(this.data.id);
         this.video = document.getElementById(this.data.id);
 
-
+        this.streamIndex = 0;
         // primaryVideo = video;
         let m3u8 = '/hls/'+this.data.id;
 
         if (settings != undefined && settings.sceneVideoStreams != null && settings.sceneVideoStreams.length > 0) {
-          m3u8 = settings.sceneVideoStreams[0];
+          console.log("settings.sceneVideoStreams length is " + settings.sceneVideoStreams.length);
+          m3u8 = settings.sceneVideoStreams[Math.floor((Math.random()*settings.sceneVideoStreams.length))];
           this.data.videoTitle = settings.sceneTitle;
         }
         if (Hls != undefined && Hls.isSupported()) {
@@ -765,6 +767,9 @@ AFRAME.registerComponent('mod-materials', {
                 }
               }
               // break;
+            } else if (this.mouseOverObject.includes("next")) {
+              // this.switchVideo();
+              console.log("next button down!");
             } else if (this.mouseOverObject.includes("slider_background") && (this.video.duration && this.video.duration > 0)) {
 
                     // this.slider_begin.position.y/this.slider_end.position.y 
@@ -829,6 +834,34 @@ AFRAME.registerComponent('mod-materials', {
             console.log("this.video is undefined!");
           }
           });
+        },
+        switchVideo() {
+          let m3u8 = '/hls/'+this.data.id;
+          this.streamIndex = this.streamIndex++;
+          if (settings != undefined && settings.sceneVideoStreams != null && settings.sceneVideoStreams.length > 0) {
+            console.log("settings.sceneVideoStreams length is " + settings.sceneVideoStreams.length);
+            m3u8 = settings.sceneVideoStreams[this.streamIndex];
+            this.data.videoTitle = settings.sceneTitle;
+          }
+          if (Hls != undefined && Hls.isSupported()) {
+           
+              var hls = new Hls();
+              hls.attachMedia(this.video);
+              
+              hls.on(Hls.Events.MEDIA_ATTACHED, function () {
+                console.log('video and hls.js are now bound together !');
+                hls.loadSource(m3u8);
+                hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
+                  console.log(
+                    'manifest loaded, found ' + data.levels.length + ' quality level'
+                  );
+                });
+              });
+            // }
+          } else {
+            console.log("hls.js not supported (ios?), goiing native!");
+            this.video.src = m3u8;
+          }
         },
         randomTime () {
           let randomTimeValue = Math.random() * (this.video.duration - 1) + 1;
@@ -910,7 +943,7 @@ AFRAME.registerComponent('mod-materials', {
         },
         tick: function () {
 
-          if (this.video != undefined) {
+          if (this.video != null && this.video != undefined) {
             if (this.durationtimeformat = null) {
               this.durationtimeformat = fancyTimeFormat(this.video.duration)
             }

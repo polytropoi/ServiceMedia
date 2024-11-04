@@ -8348,7 +8348,7 @@ function showGroup() {
     console.log("groupID is " + groupID);
     axios.get('/usergroup/' + groupID)
     .then(function (response) {
-        console.log(JSON.stringify(response.data));
+        // console.log(JSON.stringify(response.data));
         $("#pageTitle").html(response.data.type + " Group " +response.data.name +" by " + username);
         // var arr = response.data;
         // var html = "<div class=\x22row\x22>";

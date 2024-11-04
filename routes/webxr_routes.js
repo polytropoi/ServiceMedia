@@ -3633,22 +3633,31 @@ webxr_router.get('/:_id', function (req, res) {
                 function (callback) {
                     console.log("videoGroups: " + sceneResponse.sceneVideoGroups);
                     if (sceneResponse.sceneVideoGroups != null && sceneResponse.sceneVideoGroups.length > 0) {
-                        vgID = sceneResponse.sceneVideoGroups[0];
-                        let oo_id = ObjectID(vgID);
-
-                        db.groups.find({"_id": oo_id}, function (err, groups) {
+                        // vgID = sceneResponse.sceneVideoGroups[0];
+                        // let oo_ids = ObjectID(vgID);
+                        //map objectids
+                        // db.groups.find({"_id": oo_id}, function (err, groups) {
+                        var objectIDs = sceneResponse.sceneVideoGroups.map(convertStringToObjectID);
+                        db.groups.find({_id: {$in : objectIDs}}, function (err, groups) {
+                        // db.groups.find({"_id": oo_id}, function (err, groups) {
                             if (err || !groups) {
                                 callback();
                             } else {
                             // console.log("gotsa group: "+ JSON.stringify(groups));
-                            async.each(groups, function (groupID, callbackz) { 
+                            async.each(groups, function (group, callbackz) { 
+                                console.log(JSON.stringify(group));
                                 let vidGroup = {};
-                                vidGroup._id = groups[0]._id;
-                                vidGroup.name = groups[0].name;
-                                vidGroup.userID = groups[0].userID;
-                                let ids = groups[0].items.map(convertStringToObjectID);
+                                // vidGroup._id = groups[0]._id;
+                                // vidGroup.name = groups[0].name;
+                                // vidGroup.userID = groups[0].userID;
+                                // let ids = groups[0].items.map(convertStringToObjectID);
+                                vidGroup._id = group._id;
+                                vidGroup.name = group.name;
+                                vidGroup.userID = group.userID;
+                                vidGroup.tags = group.tags;
+                                let ids = group.items.map(convertStringToObjectID);
                                 // let modImages =
-                                db.video_items.find({_id : {$in : ids}}, function (err, videos) { // get all the image records in group
+                                db.video_items.find({_id : {$in : ids}}, function (err, videos) { // get all the vids in group
                                     if (err || !videos) {
                                         callbackz();
                                     } else {
