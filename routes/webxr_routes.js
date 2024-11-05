@@ -3631,7 +3631,7 @@ webxr_router.get('/:_id', function (req, res) {
                     }
                 },
                 function (callback) {
-                    console.log("videoGroups: " + sceneResponse.sceneVideoGroups);
+                    // console.log("videoGroups: " + sceneResponse.sceneVideoGroups);
                     if (sceneResponse.sceneVideoGroups != null && sceneResponse.sceneVideoGroups.length > 0) {
                         // vgID = sceneResponse.sceneVideoGroups[0];
                         // let oo_ids = ObjectID(vgID);
@@ -3690,10 +3690,12 @@ webxr_router.get('/:_id', function (req, res) {
                                 } else {
                                     console.log('All vidGroups processed successfully');
                                     videoElements = ""; //jack in video elements, ios don't like them cooked up in script
-                                    for (let i = 0; i < requestedVideoGroups[0].videos.length; i++ ) {  //TODO spin first and second level array
-                                        // videoElements = videoElements + "<video style=\x22display: none;\x22 loop=\x22true\x22 preload=\x22metadata\x22 type=\x22video/mp4\x22 crossOrigin=\x22anonymous\x22 src=\x22"+requestedVideoGroups[0].videos[i].url+"\x22 playsinline webkit-playsinline id=\x22"+requestedVideoGroups[0].videos[i]._id+"\x22></a-video>";
-                                        videoElements = videoElements + "<video style=\x22display: none;\x22 loop=\x22true\x22 crossorigin=\x22use-credentials\x22 webkit-playsinline playsinline id=\x22"+requestedVideoGroups[0].videos[i]._id+"\x22></video>";
-                                       
+                                    for (let v = 0; v < requestedVideoGroups.length; v++) {
+                                        for (let i = 0; i < requestedVideoGroups[v].videos.length; i++ ) {  //TODO spin first and second level array
+                                            // videoElements = videoElements + "<video style=\x22display: none;\x22 loop=\x22true\x22 preload=\x22metadata\x22 type=\x22video/mp4\x22 crossOrigin=\x22anonymous\x22 src=\x22"+requestedVideoGroups[0].videos[i].url+"\x22 playsinline webkit-playsinline id=\x22"+requestedVideoGroups[0].videos[i]._id+"\x22></a-video>";
+                                            videoElements = videoElements + "<video style=\x22display: none;\x22 loop=\x22true\x22 crossorigin=\x22use-credentials\x22 webkit-playsinline playsinline id=\x22"+requestedVideoGroups[v].videos[i]._id+"\x22></video>";
+                                        
+                                        }
                                     }
 
                                     var buff = Buffer.from(JSON.stringify(requestedVideoGroups)).toString("base64");

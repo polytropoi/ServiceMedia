@@ -401,7 +401,10 @@ AFRAME.registerComponent('mod-materials', {
         id: {default: ''},
         flipY: {default: false},
         isSkybox: {default: false}, //i.e. 360 vid //erm, try above vid_sphere
-        eventData: {default: ''}
+        eventData: {default: ''},
+        vidGroupName: {default: ''},
+        vidGroupArray: {default: {}},
+        vGroupIDs: {default: []}
       },
       init: function () {
         console.log("tryna init video_mterials_embed video id is : " + this.data.id + " index " + this.data.index);
@@ -423,6 +426,9 @@ AFRAME.registerComponent('mod-materials', {
         // primaryVideo = video;
         let m3u8 = '/hls/'+this.data.id;
 
+        console.log("this.video is " + this.video.id + " m3u8 " + m3u8);
+
+        //settings.sceneVideoStreams is set serverside for external streams, e.g. from mux.com
         if (settings != undefined && settings.sceneVideoStreams != null && settings.sceneVideoStreams.length > 0) {
           console.log("settings.sceneVideoStreams length is " + settings.sceneVideoStreams.length);
           m3u8 = settings.sceneVideoStreams[Math.floor((Math.random()*settings.sceneVideoStreams.length))];
@@ -768,7 +774,7 @@ AFRAME.registerComponent('mod-materials', {
               }
               // break;
             } else if (this.mouseOverObject.includes("next")) {
-              // this.switchVideo();
+              this.switchVideo();
               console.log("next button down!");
             } else if (this.mouseOverObject.includes("slider_background") && (this.video.duration && this.video.duration > 0)) {
 
@@ -836,8 +842,22 @@ AFRAME.registerComponent('mod-materials', {
           });
         },
         switchVideo() {
+         
+            console.log("video data: index " + this.data.index + " id " + this.data.id + " "  + JSON.stringify(this.data.vidGroupArray));
+            if (this.data.vidGroupArray.length > this.data.index) {
+              this.data.index++;
+            } else {
+              this.data.index = 0;
+            }
+            this.data.id = this.data.vidGroupArray[this.data.index]._id;
+            console.log("next video data: index " + this.data.index + " id " + this.data.id);
+            
+           
+  
+
           let m3u8 = '/hls/'+this.data.id;
           this.streamIndex = this.streamIndex++;
+
           if (settings != undefined && settings.sceneVideoStreams != null && settings.sceneVideoStreams.length > 0) {
             console.log("settings.sceneVideoStreams length is " + settings.sceneVideoStreams.length);
             m3u8 = settings.sceneVideoStreams[this.streamIndex];

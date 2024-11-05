@@ -204,6 +204,7 @@ AFRAME.registerComponent('mod_model', {
       let vvidsIndex = 0;
 
       let colliders = [];
+      let vGroupIDs = [];
         // if (!this.isInitialized) {
 
           // console.log("mod_model " + this.data.modelName + " " + this.data.xscale + " " + this.data.yscale + " " + this.data.zscale + " pos " + this.data.xpos + this.data.ypos + this.data.zpos + " rot " + this.data.xrot + this.data.yrot + this.data.zrot);
@@ -425,6 +426,7 @@ AFRAME.registerComponent('mod_model', {
             let hasPicPositions = false;
             let hasVidPositions = false;
             let hasAudioPositions = false;
+            let vidGroupName = "";
             camera = AFRAME.scenes[0].camera; 
             mixer = new THREE.AnimationMixer( obj );
             clips = obj.animations;
@@ -618,34 +620,42 @@ AFRAME.registerComponent('mod_model', {
                 vidGroupArray = vidGroupMangler.components.video_groups_data.returnVideoData(); //it's an array of arrays
                 console.log("video data: " + JSON.stringify(vidGroupArray));
                 console.log("vidGroupArray.length is " + vidGroupArray.length + " videoGroup 0 length is " + vidGroupArray[0].videos.length);
-                let tagSplit = this.data.tags.split(",");
+                // let tagSplit = this.data.tags.split(",");
+
+
                 if (vidGroupArray.length > 1) { 
                   for (let v = 0; v < vidGroupArray.length; v++) {
-                    for (let t = 0; t < tagSplit.length; t++) {
-                      console.log("checking for videogroup tags : "+ tagSplit);
-                      if (vidGroupArray[v].tags.length && vidGroupArray[v].tags.includes(tagSplit[t])) { //try to match this.el location tag w/ videoGroup tag...
+                    // for (let t = 0; t < tagSplit.length; t++) {
+                      // console.log("checking for videogroup tags : "+ tagSplit);
+                      // if (vidGroupArray[v].tags.length && vidGroupArray[v].tags.includes(tagSplit[t])) { //try to match this.el location tag w/ videoGroup tag...
+                      console.log("checking for videogroup match " + this.data.tags + " vs " + vidGroupArray[v].name);
+                      if (this.data.tags.includes(vidGroupArray[v].name)) { //nm just match tags with group name..
+                        vidGroupName = vidGroupArray[v].name;
+                        
                         for (let x = 0; x < vidGroupArray[v].videos.length; x++) {
-                          if (vidGroupArray[v].videos[x].orientation != undefined && vidGroupArray[0].videos[x].orientation != null && vidGroupArray[0].videos[x].orientation.toLowerCase() === "landscape") {
+                          vGroupIDs.push(vidGroupArray[v]._id);
+                          if (vidGroupArray[v].videos[x].orientation != undefined && vidGroupArray[v].videos[x].orientation != null && vidGroupArray[v].videos[x].orientation.toLowerCase() === "landscape") {
                             hvids.push(vidGroupArray[v].videos[x]);
-                          } else if (vidGroupArray[v].videos[x].orientation != undefined && vidGroupArray[0].videos[x].orientation != null && vidGroupArray[0].videos[x].orientation.toLowerCase() === "portrait") {
+                          } else if (vidGroupArray[v].videos[x].orientation != undefined && vidGroupArray[v].videos[x].orientation != null && vidGroupArray[v].videos[x].orientation.toLowerCase() === "portrait") {
                             vvids.push(vidGroupArray[v].videos[x]);
-                          } else if (vidGroupArray[v].videos[x].orientation != undefined && vidGroupArray[0].videos[x].orientation != null && vidGroupArray[0].videos[x].orientation.toLowerCase() === "square") {
-                            svids.push(vidGroupArray[0].videos[x]);
-                          } else if (vidGroupArray[v].videos[x].orientation != undefined && vidGroupArray[0].videos[x].orientation != null && vidGroupArray[0].videos[x].orientation.toLowerCase() === "equirectangular") {
+                          } else if (vidGroupArray[v].videos[x].orientation != undefined && vidGroupArray[v].videos[x].orientation != null && vidGroupArray[v].videos[x].orientation.toLowerCase() === "square") {
+                            svids.push(vidGroupArray[v].videos[x]);
+                          } else if (vidGroupArray[v].videos[x].orientation != undefined && vidGroupArray[v].videos[x].orientation != null && vidGroupArray[v].videos[x].orientation.toLowerCase() === "equirectangular") {
                             evids.push(vidGroupArray[v].videos[x]);
                           }
                         }
-                        
-                        // hvids = hvids.sort(() => Math.random() - 0.5);  //schweet
-                        // vvids = vvids.sort(() => Math.random() - 0.5);  
-                        // svids = svids.sort(() => Math.random() - 0.5);  
-                        // break;
+                        if (this.data.tags.includes("shuffle")) {
+                          hvids = hvids.sort(() => Math.random() - 0.5);  //schweet
+                          vvids = vvids.sort(() => Math.random() - 0.5);  
+                          svids = svids.sort(() => Math.random() - 0.5);  
+                        }
+                        console.log("gotsa videoGroup tag match " + JSON.stringify(hvids));
                       } else {
-                        console.log(tagSplit[t] + " tag match not found in " + vidGroupArray[v].tags);  
+                        console.log(this.data.tags + " tag match not found in videoGroupArray names");  
                       }
-                    }
+                    // }
                   }
-                  console.log("gotsa videoGroup tag match " + JSON.stringify(hvids));
+                 
                 } else { 
                   for (let x = 0; x < vidGroupArray[0].videos.length; x++) {
                     if (vidGroupArray[0].videos[x].orientation != undefined && vidGroupArray[0].videos[x].orientation != null && vidGroupArray[0].videos[x].orientation.toLowerCase() === "landscape") {
@@ -838,6 +848,9 @@ AFRAME.registerComponent('mod_model', {
                   vProps.videoTitle = hvids[hvidsIndex].title;
                   vProps.eventData = this.data.eventData;
                   vProps.tags = this.data.tags;
+                  vProps.vidGroupName = vidGroupName;
+                  vProps.vidGroupArray = hvids;
+                  vProps.vGroupIDs = vGroupIDs;
                   this.childEnt = document.createElement('a-entity'); 
                   this.el.appendChild(this.childEnt);
                   // this.clone = this.child.clone();

@@ -5320,12 +5320,10 @@ AFRAME.registerComponent('scene_greeting_dialog', {  //if "greeting" scenetag + 
 
   },
   ShowMessageAndHide: function (text, time) {
-    if (!this.startButtonBackgroundEl && this.startButtonTextEl) {
-      
+    if (this.startButtonBackgroundEl && this.startButtonTextEl) {
       this.startButtonBackgroundEl.setAttribute("visible", false);
       this.startButtonTextEl.setAttribute("visible", false);
       if (this.questEl) {
-
         this.questEl.setAttribute("troika-text", {
           fontSize: .2,
           maxWidth: 5,
@@ -5338,7 +5336,6 @@ AFRAME.registerComponent('scene_greeting_dialog', {  //if "greeting" scenetag + 
         });
         this.hideMessage(time);
       }
-
     }
   },
   hideMessage: function (time) {

@@ -3118,7 +3118,7 @@ function LoopTimedEvent(keyType, duration, keydata, keytags) {
                   primaryAudioEl.components.primary_audio_control.randomTime();
                }
             } else if (timedEventsListenerMode != null && timedEventsListenerMode.toLowerCase() == 'primary video') {
-               var videoControllerEl = document.getElementById('primary_video');  
+               var videoControllerEl = document.getElementById('primary_video_0');  
                if (videoControllerEl != null) {
                   console.log("gotsa video embedVideo");
                   let videoController = videoControllerEl.components.vid_materials_embed;
@@ -3258,7 +3258,7 @@ function PlayTimedEvent(timeKey) {
             primaryAudioEl.components.primary_audio_control.randomTime();
          }
       } else if (timedEventsListenerMode != null && timedEventsListenerMode.toLowerCase() == 'primary video') {
-         var videoControllerEl = document.getElementById('primary_video');  
+         var videoControllerEl = document.getElementById('primary_video_0');  
          if (videoControllerEl != null) {
             console.log("gotsa video embedVideo");
             let videoController = videoControllerEl.components.vid_materials_embed;
@@ -3281,7 +3281,7 @@ function PlayTimedEvent(timeKey) {
          }
       } else if (timedEventsListenerMode != null && timedEventsListenerMode.toLowerCase() == 'primary video') {
          if (settings.sceneType == "Default" || settings.sceneType == "AFrame") {
-            var videoControllerEl = document.getElementById('primary_video');  
+            var videoControllerEl = document.getElementById('primary_video_0');  
             if (videoControllerEl != null) {
                console.log("gotsa video embedVideo");
                let videoController = videoControllerEl.components.vid_materials_embed;

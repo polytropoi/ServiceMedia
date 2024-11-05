@@ -1445,13 +1445,13 @@ function PlayPauseMedia () {
       }
       
     } else if (timedEventsListenerMode.toLowerCase() == "primary video") {
-      var videoControllerEl = document.getElementById('primary_video');  
+      var videoControllerEl = document.getElementById('primary_video_0');  
         if (videoControllerEl != null) {
           console.log("gotsa video embedVideo");
           let videoController = videoControllerEl.components.vid_materials_embed;
           if (videoController) {
-          console.log("gotsa primaryVideo " + videoController.current_player_state());
-          // if (videoController.current_player_state() != "playing" ) {
+            console.log("gotsa primaryVideo " + videoController.current_player_state());
+            // if (videoController.current_player_state() != "playing" ) {
             // playVideo();
             let isPlaying = videoController.togglePlayPauseVideo();
             if (isPlaying) {
@@ -1463,8 +1463,8 @@ function PlayPauseMedia () {
               PauseIntervals(true);
               return false;
             }
+          }
         }
-      }
 
     } else if (timedEventsListenerMode.toLowerCase() == "youtube") {
       if (youtubePlayer != null) {
