@@ -360,8 +360,11 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
                 console.log("localmarker with + " + this.data.scale + " rot " + this.data.xrot + this.data.yrot + this.data.zrot);
               
                 // this.el.object3D.scale.set(this.data.xscale, this.data.yscale, this.data.zscale);
-                this.el.object3D.position.set(this.data.xpos, this.data.ypos, this.data.zpos);
+                // this.el.object3D.position.set(this.data.xpos, this.data.ypos, this.data.zpos);
                 // this.el.object3D.rotation.set(THREE.MathUtils.degToRad(this.data.xrot), THREE.MathUtils.degToRad(this.data.xrot), THREE.MathUtils.degToRad(this.data.xrot));
+                this.el.object3D.scale.set(this.data.xscale, this.data.yscale, this.data.zscale);
+                this.el.object3D.position.set(this.data.xpos, this.data.ypos, this.data.zpos);
+
                 this.el.setAttribute("rotation", this.data.xrot + " " + this.data.yrot + " " +this.data.zrot);
                 if (this.data.markerType == "collider") {
                   this.el.setAttribute("mod_physics", {body: "static", isTrigger: false, model:"collider", scaleFactor: this.data.scale});
@@ -435,10 +438,14 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
             // e.preventDefault();  
             this.el.removeAttribute("animation-mixer");
           
-
+            this.el.object3D.scale.set(this.data.xscale, this.data.yscale, this.data.zscale);
+            this.el.object3D.position.set(this.data.xpos, this.data.ypos, this.data.zpos);
             // this.el.setAttribute("visible", true);
             const obj = this.el.getObject3D('mesh');
-          // Go over the submeshes and modify materials we want.
+
+          
+            // Go over the submeshes and modify materials we want.
+
           console.log("local_marker geo is loaded for markertype " + this.data.markerType + " obj "+ this.data.modelID);
               obj.traverse(node => {
                 if (node.isMesh && node.material) {
@@ -485,6 +492,9 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
                   this.el.object3D.visible = false;
                 }
               }
+
+              obj.scale.set(this.data.xscale, this.data.yscale, this.data.zscale);
+              obj.position.set(this.data.xpos, this.data.ypos, this.data.zpos);
               //   console.log("localmarker tryna load media with mediaID " + this.data.mediaID);
                 
               //   if (this.data.mediaID && this.data.mediaID.includes("local_")) {
@@ -598,34 +608,34 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
           this.clientX = evt.clientX;
           this.clientY = evt.clientY;
           // console.log("tryna mouseover placeholder");
-          that.calloutToggle = !that.calloutToggle;
+          this.calloutToggle = !this.calloutToggle;
           let pos = evt.detail.intersection.point; //hitpoint on model
-          that.hitPosition = pos;
+          this.hitPosition = pos;
           let name = evt.detail.intersection.object.name;
-          // that.distance = window.playerPosition.distanceTo(pos);
-          that.distance = evt.detail.intersection.distance;
-          that.rayhit(evt.detail.intersection.object.name, that.distance, evt.detail.intersection.point);
-          // that.targetMods()
-          that.selectedAxis = name;
+          // this.distance = window.playerPosition.distanceTo(pos);
+          this.distance = evt.detail.intersection.distance;
+          this.rayhit(evt.detail.intersection.object.name, this.distance, evt.detail.intersection.point);
+          // this.targetMods()
+          this.selectedAxis = name;
   
-          // let elPos = that.el.getAttribute('position');
+          // let elPos = this.el.getAttribute('position');
           // console.log(pos);
-          if (that.calloutEntity != null) {
+          if (this.calloutEntity != null) {
            
-            if (that.distance < 66) {
-            that.calloutEntity.setAttribute("position", pos);
-            that.calloutEntity.setAttribute('visible', true);
-            that.calloutEntity.setAttribute('scale', {x: that.distance * .25, y: that.distance * .25, z: that.distance * .25} );
-            // if (that.data.markerType == "poi" && !that.data.modelID) {
-            //   // that.el.setAttribute('scale', {x: that.distance * .25, y: that.distance * .25, z: that.distance * .25} );
+            if (this.distance < 300) {
+            this.calloutEntity.setAttribute("position", pos);
+            this.calloutEntity.setAttribute('visible', true);
+            this.calloutEntity.setAttribute('scale', {x: this.distance * .25, y: this.distance * .25, z: this.distance * .25} );
+            // if (this.data.markerType == "poi" && !this.data.modelID) {
+            //   // this.el.setAttribute('scale', {x: this.distance * .25, y: this.distance * .25, z: this.distance * .25} );
             // }
            
-            let theLabel = that.data.name != undefined ? that.data.name : "";
+            let theLabel = this.data.name != undefined ? this.data.name : "";
             let calloutString = theLabel;
-            // if (that.calloutToggle) {
-              console.log(that.el.id + " local_marker callout distance " + that.distance + " " + that.data.name );
+            // if (this.calloutToggle) {
+              console.log(this.el.id + " local_marker callout distance " + this.distance + " " + this.data.name );
             //   // calloutString = "x : " + elPos.x.toFixed(2) + "\n" +"y : " + elPos.y.toFixed(2) + "\n" +"z : " + elPos.z.toFixed(2);
-            //   calloutString = that.data.description != '' ? that.data.description : theLabel;
+            //   calloutString = this.data.description != '' ? this.data.description : theLabel;
             // }
             // this.calloutText.setAttribute('troika-text', {value: calloutString});
                   // this.calloutText.setAttribute('troika-text', {
@@ -638,7 +648,7 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
                   //   color: "white",
                   //   outlineColor: "black",
                   //   outlineWidth: "2%",
-                  //   value: that.data.name
+                  //   value: this.data.name
                   // });
             // if (this.data.tags.toLowerCase().includes("description")) {
             if (this.data.description && this.data.description != "") {
@@ -667,8 +677,8 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
         }
       });
   
-      this.el.addEventListener('mouseleave', function (evt) {
-        that.calloutEntity.setAttribute('visible', false);
+      this.el.addEventListener('mouseleave', (evt) => {
+        this.calloutEntity.setAttribute('visible', false);
         // if (that.selectedAxis != null && !that.selectedAxis.includes('handle')) {
         //   that.isSelected = false;
   
