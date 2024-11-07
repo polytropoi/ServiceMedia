@@ -486,7 +486,7 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
               if (this.data.markerType.toLowerCase().includes("picture")) {
                this.loadPicture();
               }
-              if (this.data.tags.includes("hide gizmo") || (settings && settings.hideGizmos)) {
+              if (this.data.tags.includes("hide gizmo") ||  this.data.tags.includes("highlight") || (settings && settings.hideGizmos)) {
                 if (this.data.markerType != "mailbox" && this.data.markerType != "light") {
                   console.log(this.data.markerType + " hiding gizmos because");
                   this.el.object3D.visible = false;
@@ -620,37 +620,25 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
   
           // let elPos = this.el.getAttribute('position');
           // console.log(pos);
-          if (this.calloutEntity != null) {
+          let hideCallout = false;
+          if (this.data.tags) {
+            if (this.data.tags.includes("hide callout")) {
+              hideCallout = true;
+            }
+          }
+          if (!hideCallout && this.calloutEntity != null && this.data.markerType != "light") { // umm...
            
-            if (this.distance < 300) {
+            // if (this.distance < 300) {
             this.calloutEntity.setAttribute("position", pos);
             this.calloutEntity.setAttribute('visible', true);
             this.calloutEntity.setAttribute('scale', {x: this.distance * .25, y: this.distance * .25, z: this.distance * .25} );
-            // if (this.data.markerType == "poi" && !this.data.modelID) {
-            //   // this.el.setAttribute('scale', {x: this.distance * .25, y: this.distance * .25, z: this.distance * .25} );
-            // }
+
            
             let theLabel = this.data.name != undefined ? this.data.name : "";
             let calloutString = theLabel;
             // if (this.calloutToggle) {
               console.log(this.el.id + " local_marker callout distance " + this.distance + " " + this.data.name );
-            //   // calloutString = "x : " + elPos.x.toFixed(2) + "\n" +"y : " + elPos.y.toFixed(2) + "\n" +"z : " + elPos.z.toFixed(2);
-            //   calloutString = this.data.description != '' ? this.data.description : theLabel;
-            // }
-            // this.calloutText.setAttribute('troika-text', {value: calloutString});
-                  // this.calloutText.setAttribute('troika-text', {
-                  //   // width: .5,
-                  //   baseline: "bottom",
-                  //   align: "left",
-                  //   fontSize: .1,
-                  //   font: "/fonts/web/"+ this.font2,
-                  //   anchor: "center",
-                  //   color: "white",
-                  //   outlineColor: "black",
-                  //   outlineWidth: "2%",
-                  //   value: this.data.name
-                  // });
-            // if (this.data.tags.toLowerCase().includes("description")) {
+
             if (this.data.description && this.data.description != "") {
               if (this.data.description.includes("~")) {
                 let cSplit = this.data.description.split("~");
@@ -672,17 +660,20 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
               this.calloutText.setAttribute("troika-text", {value: calloutString});
             }
 
-            }
+            // }
+            
+          }
+          if (this.data.tags.includes("highlight")) {
+            this.el.object3D.visible = true;
           }
         }
       });
   
       this.el.addEventListener('mouseleave', (evt) => {
         this.calloutEntity.setAttribute('visible', false);
-        // if (that.selectedAxis != null && !that.selectedAxis.includes('handle')) {
-        //   that.isSelected = false;
-  
-        // }
+        if (this.data.tags.includes("highlight")) {
+          this.el.object3D.visible = false;
+        }
       });
   
       this.el.addEventListener('mousedown', (evt) => {
@@ -1219,7 +1210,7 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
               } else {
 
               }
-              if (this.data.tags.includes("hide gizmo") || (settings && settings.hideGizmos)) {
+              if (this.data.tags.includes("hide gizmo") ||  (settings && settings.hideGizmos)) {
                 if (this.data.markerType != "mailbox" && this.data.markerType != "light") {
                   this.el.object3D.visible = false;
                 }
@@ -1301,7 +1292,7 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
                 this.el.setAttribute("gltf-model", "#gate2");
                 this.el.setAttribute("material", {color: "orange", transparent: true, opacity: .5});
                 // this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"placeholder", scaleFactor: this.data.scale});
-                this.el.setAttribute("obb-collider", {size: this.data.xscale * 1.5 + " " + this.data.yscale * 1.5 + " " + this.data.zscale * 1.5});
+                this.el.setAttribute("obb-collider", {"centerModel": false, "size": this.data.xscale * 3 + " " + this.data.yscale * 5 + " " + this.data.zscale * 3});
                 // this.el.setAttribute("color", "orange");
             } else if (this.data.markerType.toLowerCase() == "portal") {
               this.el.setAttribute("gltf-model", "#poi1");
@@ -1413,7 +1404,7 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
               // this.el.clight.position = xpos, ypos, zpos;
           }
           if (this.data.tags.includes("hide gizmo") || (settings && settings.hideGizmos)) {
-            if (this.data.markerType != "mailbox" && this.data.markerType != "light") {
+            if (this.data.markerType != "mailbox" && this.data.markerType != "light" && this.data.markerType != "gate") {
               this.el.object3D.visible = false;
             }
             
@@ -1470,33 +1461,38 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
       this.isSelected = false;
     },
     playerTriggerHit: function () { //might use AABB collider or physics
-      console.log("gotsa player trigger hit on local marker with type " + this.data.markerType.toLowerCase()); 
-      if (this.data.markerType == "trigger" && this.data.tags && this.data.tags.toLowerCase().includes("no enter")) {
+      console.log("gotsa player trigger hit on type " + this.data.markerType); 
+      if (this.data.tags.includes("click only") || (this.data.markerType == "trigger" && this.data.tags && this.data.tags.toLowerCase().includes("no enter") && this.data.tags.toLowerCase().includes("no collision"))) { //disable the player contact of trigger
         return;
       }
-      this.targetMods();
-        if (this.data.markerType.toLowerCase() == "spawntrigger") {
-  
-            let objexEl = document.getElementById('sceneObjects');    
-            objexEl.components.mod_objex.spawnObject(this.data.eventData);
+      var triggerAudioController = document.getElementById("triggerAudio");
+      if (triggerAudioController != null) {
+        if (window.playerPosition && this.el.object3D) {
+          triggerAudioController.components.trigger_audio_control.playAudioAtPosition(this.el.object3D.position, window.playerPosition.distanceTo(this.el.object3D.position), this.data.tags);
         }
-        if (this.data.markerType.toLowerCase() == "gate") {
-          if (this.data.eventData != null && this.data.eventData != "") {
-            let url = "/webxr/" + this.data.eventData;
-            window.location.href = url;
-          } else {
-            let ascenesEl = document.getElementById("availableScenesControl");
-            if (ascenesEl) {
-              let asControl = ascenesEl.components.available_scenes_control;
-              if (asControl) {
-                let scene = asControl.returnRandomScene();
-                let url = "/webxr/" + scene.sceneKey;
-                window.location.href = url; 
-                
-              }
+      }  
+
+      if (!this.data.tags.includes("click only")) { //portal needs playertriggerhit, not just mouseenter
+        this.targetMods();
+      }
+
+      if (this.data.markerType.toLowerCase() == "gate") {
+        if (this.data.eventData != null && this.data.eventData != "") {
+          let url = "/webxr/" + this.data.eventData;
+          window.location.href = url;
+        } else {
+          let ascenesEl = document.getElementById("availableScenesControl");
+          if (ascenesEl) {
+            let asControl = ascenesEl.components.available_scenes_control;
+            if (asControl) {
+              let scene = asControl.returnRandomScene();
+              let url = "/webxr/" + scene.sceneKey;
+              window.location.href = url; 
+              
             }
           }
         }
+      }
     },
     physicsTriggerHit: function (id) {  
       console.log("gotsa physics trigger hit on " + id); //maybe check the layer of colliding entity or something...

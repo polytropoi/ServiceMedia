@@ -295,7 +295,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                   
                 }
               
-                if (this.data.tags.includes("hide") || (settings && settings.hideGizmos)) {
+                if (this.data.tags.includes("hide") || this.data.tags.includes("highlight") || (settings && settings.hideGizmos)) {
                   if (this.data.markerType != "mailbox" && this.data.markerType != "light" && this.data.markerType != "gate") {
                     this.el.object3D.visible = false;
                   }
@@ -383,12 +383,12 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                 this.el.setAttribute("obb-collider", {size: this.data.xscale * 1.5 + " " + this.data.yscale * 1.5 + " " + this.data.zscale * 1.5});
               }
             }
-            // if (this.data.tags.includes("hide gizmo") || (settings && settings.hideGizmos)) {
-            //   if (this.data.markerType != "mailbox" && this.data.markerType != "light"  && this.data.markerType != "gate") {
-            //     console.log(this.data.markerType + " hiding gizmos because");
-            //     this.el.object3D.visible = false;
-            //   }
-            // }
+            if (this.data.tags.includes("hide gizmo") || this.data.tags.includes("highlight") || (settings && settings.hideGizmos)) {
+              if (this.data.markerType != "mailbox" && this.data.markerType != "light"  && this.data.markerType != "gate") {
+                console.log(this.data.markerType + " hiding gizmos because");
+                this.el.object3D.visible = false;
+              }
+            }
             if (this.data.markerType == "navmesh"  || this.data.markerType == "surface") {
               if (!this.data.tags.includes("show")) {
                 this.el.object3D.visible = false;
@@ -562,7 +562,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
           let pos = evt.detail.intersection.point; //hitpoint on model
           this.hitPosition = pos;
           // let name = evt.detail.intersection.object.name;
-        //   this.distance = window.playerPosition.distanceTo(pos);
+          //   this.distance = window.playerPosition.distanceTo(pos);
             this.distance = evt.detail.intersection.distance;
           this.rayhit(evt.detail.intersection.object.name, this.distance, evt.detail.intersection.point);
        
@@ -578,7 +578,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
           }
           if (!hideCallout && this.calloutEntity != null && this.data.markerType != "light") { // umm...
             console.log("tryna show the callout " + this.distance);
-            if (this.distance < 66) {
+            // if (this.distance < 300) {
             this.calloutEntity.setAttribute("position", pos);
             this.calloutEntity.setAttribute('visible', true);
             this.calloutEntity.setAttribute('scale', {x: this.distance * .25, y: this.distance * .25, z: this.distance * .25} );
@@ -605,16 +605,18 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
               this.calloutText.setAttribute("troika-text", {value: calloutString});
             }
 
+          // }
+          }
+          if (this.data.tags.includes("highlight")) {
+            this.el.object3D.visible = true;
           }
         }
-        }
       });
-      this.el.addEventListener('mouseleave', function (evt) {
-        // that.selectedAxis = null;
-        // if (that.selectedAxis != null) {
-        //   console.log(that.selectedAxis);
-        // }
-        that.calloutEntity.setAttribute('visible', false);
+      this.el.addEventListener('mouseleave', (evt) => {
+        this.calloutEntity.setAttribute('visible', false);
+        if (this.data.tags.includes("highlight")) {
+          this.el.object3D.visible = false;
+        }
       });
   
       this.el.addEventListener('mousedown', (evt) => { 
@@ -1576,7 +1578,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
             }
          
 
-          if (this.data.tags && this.data.tags.includes("hide gizmo") || (settings && settings.hideGizmos)) {
+          if (this.data.tags && this.data.tags.includes("hide gizmo") ||  this.data.tags.includes("highlight") || (settings && settings.hideGizmos)) {
             if (this.data.markerType != "mailbox" && this.data.markerType != "light"  && this.data.markerType != "gate") {
               console.log("tryna hide gizmo 2");
               this.el.object3D.visible = false;
@@ -1642,49 +1644,11 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
           triggerAudioController.components.trigger_audio_control.playAudioAtPosition(this.el.object3D.position, window.playerPosition.distanceTo(this.el.object3D.position), this.data.tags);
         }
       }  
-      // if (this.data.markerType.toLowerCase() == "spawntrigger" || //deprecated, will just use trigger + tags + datas
-      //   (this.data.markerType.toLowerCase() == "trigger" && (this.data.tags && this.data.tags.includes("spawn target"))) ) {  
-      //     console.log("gotsa spawn trigger !" + this.data.markerType + this.data.eventData); 
-        
-      //     if (this.data.targetElements) {
-      //       let targetEl = document.getElementById(this.data.targetElements[0]);
-      //       let cloudMarker = targetEl.components.cloud_marker;
-      //       if (cloudMarker) {
-      //         cloudMarker.loadObject();
-      //       }
-      //     }
-      // }
+
       if (!this.data.tags.includes("click only")) { //portal needs playertriggerhit, not just mouseenter
         this.targetMods();
       }
 
-      // if (this.data.tags && this.data.tags.length && this.data.tags.toLowerCase().includes("toggle")) {
-      //   console.log( "tryna toggle somethin..." + this.data.targetElements); 
-      //   if (this.data.targetElements != '') {
-      //     for (let i = 0; i < this.data.targetElements.length; i++) {
-      //       let targetEl = document.getElementById(this.data.targetElements[i].toString());
-      //       if (targetEl && !this.coolDown) {
-      //         // let isVisible = targetEl.dataset.isVisible;
-      //         // targetEl.dataset.isVisible = !targetEl.dataset.isVisible;
-      //         console.log( targetEl.id + " element isVisible : " + targetEl.dataset.isvisible); 
-      //         if (targetEl.dataset.isvisible == "no") {
-      //           this.coolDown = true;
-                
-      //           targetEl.setAttribute("visible", true)
-      //           targetEl.dataset.isvisible = "yes";
-      //           console.log("set to visible " + targetEl.dataset.isvisible);
-      //         } else {
-      //           this.cooldown = true;
-                
-      //           targetEl.setAttribute("visible", false);
-      //           targetEl.dataset.isvisible = "no";
-      //           console.log("set to visible " + targetEl.dataset.isvisible);
-      //         }
-      //         this.coolDownTimer();
-      //       }
-      //     }
-      //   }
-      // }
       if (this.data.markerType.toLowerCase() == "gate") {
         if (this.data.eventData != null && this.data.eventData != "") {
           let url = "/webxr/" + this.data.eventData;
