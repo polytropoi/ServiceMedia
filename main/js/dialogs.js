@@ -864,7 +864,7 @@ function ReturnOtherLocations (selected) {
   for (let i = 0; i < localData.locations.length; i++) {
     if (localData.locations[i].timestamp != selectedLocationTimestamp) {
       // locArray.push
-      console.log(localData.locations[i].timestamp + " vs " + selected + " " + selected.includes(localData.locations[i].timestamp.toString()) );
+      // console.log(localData.locations[i].timestamp + " vs " + selected + " " + selected.includes(localData.locations[i].timestamp.toString()) );
       if (selected.includes(localData.locations[i].timestamp.toString())) {
         locs = locs + "<option value=\x22"+localData.locations[i].timestamp+"\x22 selected>"+localData.locations[i].name+"</option>";
       } else {

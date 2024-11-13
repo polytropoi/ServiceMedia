@@ -117,8 +117,8 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
         this.el.classList.remove("activeObjexRay");
       }
   
-          console.log("CLOUDMARKER " + this.data.markerType + " " + this.data.modelID );
-          // this.el.removeAttribute("geometry");
+          console.log("CLOUDMARKER " + this.data.name + " " +this.data.markerType + " " + this.data.modelID );
+      this.el.removeAttribute("geometry");
           
       if ((!this.data.modelID || this.data.modelID == undefined || this.data.modelID == "" || this.data.modelID == "none") //if no model def'd
           && !this.data.modelID != "primitive_cube"
@@ -305,10 +305,10 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
           } else {
             if (this.data.modelID != "none") {
               if (this.data.modelID.toString().includes("primitive")) {   
-                console.log("CLOUDMARKER PRIMITIVE " + this.data.modelID);
+                // console.log("CLOUDMARKER PRIMITIVE " + this.data.modelID);
                 if (this.data.modelID.toString().includes("cube")) {
-                  console.log("CLOUDMARKER PRIMITIVE cube " + this.data.modelID + " " + this.data.xscale + this.data.yscale + this.data.zscale + " " + this.data.xrot + " " + this.data.xpos);
-                    this.el.setAttribute('geometry', {primitive: 'box', width: this.data.xscale, height: this.data.yscale, depth: this.data.zscale});
+                  console.log("CLOUDMARKER PRIMITIVE cube " + this.data.name + " " + this.data.xscale + " " +  this.data.yscale + " " +  this.data.zscale);
+                  this.el.setAttribute("geometry", {"primitive": "box", "width": this.data.xscale, "height": this.data.yscale, "depth": this.data.zscale});;
 
                 } else if (this.data.modelID.toString().includes("sphere")) {
                     this.el.setAttribute("geometry", {"primitive": "sphere", "radius": 1});
@@ -369,12 +369,14 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
               if (!this.data.zrot || this.data.zrot == NaN || this.data.zrot == undefined) {
                 this.data.zrot = 0;
               }
-              this.el.setAttribute("scale", this.data.xscale + " " + this.data.yscale + " " + this.data.zscale);
+              // this.el.setAttribute("scale", "1 1 1");
+
               if (!this.data.tags.includes("no pos")) {
                 this.el.object3D.position.set(this.data.xpos, this.data.ypos, this.data.zpos);
               }
               // this.el.object3D.rotation.set(THREE.MathUtils.degToRad(this.data.xrot), THREE.MathUtils.degToRad(this.data.xrot), THREE.MathUtils.degToRad(this.data.xrot));
               this.el.setAttribute("rotation", this.data.xrot + " " + this.data.yrot + " " +this.data.zrot);
+              this.el.object3D.scale.set(this.data.xscale, this.data.yscale, this.data.zscale);
              
             } else {
               if (this.data.markerType == "trigger" || this.data.markerType == "portal") {
@@ -385,7 +387,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
             }
             if (this.data.tags.includes("hide gizmo") || this.data.tags.includes("highlight") || (settings && settings.hideGizmos)) {
               if (this.data.markerType != "mailbox" && this.data.markerType != "light"  && this.data.markerType != "gate") {
-                console.log(this.data.markerType + " hiding gizmos because");
+                console.log(this.data.name + " hiding gizmos because");
                 this.el.object3D.visible = false;
               }
             }
@@ -496,7 +498,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
         const obj = this.el.getObject3D('mesh');
         this.el.object3D.visible = true;
         
-        console.log(this.data.modelID + " model-loaded for CLOUDMARKER " + this.data.markerType);
+        console.log(this.data.modelID + " model-loaded for CLOUDMARKER " + this.data.name + " type " + this.data.markerType);
         if (this.data.markerType != "object") {
 
           if (this.data.modelID && this.data.modelID != '' & this.data.modelID != 'none') {
@@ -1275,7 +1277,8 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
           }
         }
       }
-      this.el.setAttribute("scale", this.data.xscale + " " + this.data.yscale + " " + this.data.zscale);
+      // this.el.setAttribute("scale", this.data.xscale + " " + this.data.yscale + " " + this.data.zscale);
+      this.el.object3D.scale.set(this.data.xscale, this.data.yscale, this.data.zscale);
       // }
     },
     removeModel: function () {
@@ -1313,7 +1316,8 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
         //   this.data.modelID = "primitive_cube";
         // } 
         if (modelID != undefined && modelID != null & modelID != "none" && modelID != "") {  
-          this.el.setAttribute("scale", this.data.xscale + " " + this.data.yscale + " " + this.data.zscale);
+          // this.el.setAttribute("scale", this.data.xscale + " " + this.data.yscale + " " + this.data.zscale);
+
           if (modelID.toString().includes("primitive")) {
             this.el.removeAttribute("geometry");
             this.el.removeAttribute("gltf-model");
@@ -1394,7 +1398,8 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                 this.el.object3D.visible = false;
               }
             }
-            this.el.setAttribute("scale", this.data.xscale + " " + this.data.yscale + " " + this.data.zscale);
+            // this.el.setAttribute("scale", this.data.xscale + " " + this.data.yscale + " " + this.data.zscale);
+            // this.el.object3D.scale.set(this.data.xscale, this.data.yscale, this.data.zscale);
 
             if (this.data.tags && !this.data.tags.includes("no pos")) {
               this.el.object3D.position.set(this.data.xpos, this.data.ypos, this.data.zpos);
@@ -1593,7 +1598,8 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
         }
         this.updateMaterials();
 
-        this.el.setAttribute("scale", this.data.xscale + " " + this.data.yscale + " " + this.data.zscale);
+        // this.el.setAttribute("scale", this.data.xscale + " " + this.data.yscale + " " + this.data.zscale);
+        this.el.object3D.scale.set(this.data.xscale, this.data.yscale, this.data.zscale);
         if (this.data.tags && !this.data.tags.includes("no pos")) { //eg use layout
           this.el.object3D.position.set(this.data.xpos, this.data.ypos, this.data.zpos);
         }

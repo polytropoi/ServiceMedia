@@ -1011,10 +1011,21 @@ function GrabLocation(locationKey) {
 }
 
 function ToggleTransformControls (locationKey) {
+
+   const transformEls = document.getElementsByClassName("transformControls");
+   if (transformEls.length > 0) {
+      for (var i=0; i<transformEls.length; i++) {
+         let transform_controls_component = transformEls[i].components.transform_controls;
+         if (transform_controls_component) {
+            transform_controls_component.detachTransformControls();
+         } 
+      }
+   }
+
    this.transformEl = document.getElementById(locationKey);
    console.log("tryna transform a location " + locationKey);
 
-   // const transformEl = document.getElementsByClassName("transformControls")[0]; //there should be only one
+   
 
    if (transformEl) {
       console.log("gotsa transformEl for transform_control");
@@ -1276,7 +1287,7 @@ function GoToPrevious() {
             currentLocationIndex = poiLocations.length - 1;
          }
          
-         GoToLocation(poiLocations[currentLocationIndex].phID);
+         GoToLocation(poiLocations[currentLocationIndex].timestamp);
          let curveDriver = document.getElementById("cameraCurve");
          if (!curveDriver) {
             document.getElementById("footerText").innerHTML = poiLocations[currentLocationIndex].name;
