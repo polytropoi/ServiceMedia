@@ -657,7 +657,8 @@ AFRAME.registerComponent('primary_audio_player', {  //setup and controls for the
             var el = this.el;  
             var defaultColor = 'blue';
             this.primaryAudioText = document.querySelector("#primaryAudioText");
-            this.primaryAudioParent = document.querySelector(".primaryAudioParent");
+            // this.primaryAudioParent = document.querySelector(".primaryAudioParent");
+            this.primaryAudioParent = document.getElementById("primaryAudioParent");
             this.primaryAudioPlayerObject = document.getElementById("primaryAudioPlayer");
             this.primary_audio_player = this.primaryAudioPlayerObject.components.primary_audio_player;
             this.isPlaying = false;
@@ -727,7 +728,7 @@ AFRAME.registerComponent('primary_audio_player', {  //setup and controls for the
             this.primaryAudioHowl.fade(0, 1, 1000);
             this.primaryAudioHowl.pos(this.el.object3D.position.x, this.el.object3D.position.y, this.el.object3D.position.z);
 
-            if (data.targetattach) {
+            if (primaryAudioParent && data.targetattach) {
                 el.addEventListener('targetattach', function (event) {
                     console.log("hey gotsa attach to target message" + event.detail.targetEntity);
                     let audioElPosition = event.detail.targetEntity.getAttribute('position');

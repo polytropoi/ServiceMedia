@@ -1374,7 +1374,7 @@ AFRAME.registerComponent('mod_model', {
             this.el.addEventListener('mousedown', (evt) => {
              
               if (this.timestamp != '' && this.data.allowMods && !this.data.tags.includes("static")) {
-                console.log(this.data.markerType + " MOD_MODEL mousedown on markertype " + this.data.markerType +  " this.hasCallout " + this.hasCallout + " this.data.description " + this.data.description + " tags " + this.data.tags);
+                console.log(this.data.name + " MOD_MODEL mousedown on markertype " + this.data.markerType +  " this.hasCallout " + this.hasCallout + " this.data.description " + this.data.description + " tags " + this.data.tags);
                 if (keydown == "T") {
                   ToggleTransformControls(this.timestamp);
                 } else if (keydown == "Shift") {

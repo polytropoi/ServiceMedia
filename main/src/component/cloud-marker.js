@@ -117,15 +117,17 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
         this.el.classList.remove("activeObjexRay");
       }
   
-          console.log("CLOUDMARKER " + this.data.name + " " +this.data.markerType + " " + this.data.modelID );
-      this.el.removeAttribute("geometry");
+      console.log("CLOUDMARKER " + this.data.name + " " +this.data.markerType + " " + this.data.modelID );
+      this.el.removeAttribute("geometry"); //just in case?
           
-      if ((!this.data.modelID || this.data.modelID == undefined || this.data.modelID == "" || this.data.modelID == "none") //if no model def'd
-          && !this.data.modelID != "primitive_cube"
-          && !this.data.modelID != "primitive_sphere"
-          && !this.data.modelID != "primitive_cylinder") {
+      if ((!this.data.modelID || this.data.modelID == undefined || this.data.modelID == "" || this.data.modelID == "none")) {//if no model def'd
+          // && !this.data.modelID != "primitive_cube"
+          // && !this.data.modelID != "primitive_sphere"
+          // && !this.data.modelID != "primitive_cylinder") 
+          // {
             // console.log("CLOUDMARKER PLACEHOLDER GEO " + this.data.modelID);
             // console.log("CLOUDMARKER " + this.data.markerType + " " + this.data.modelID );
+            if ((this.data.tags && !this.data.tags.includes("hide gizmo")) || (settings && !settings.hideGizmos)) {
                 if (this.data.markerType.toLowerCase() == "player") {
                   // this.el.removeAttribute("geometry");
                   this.el.setAttribute('gltf-model', '#poi1');
@@ -141,12 +143,12 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                 } else if (this.data.markerType.toLowerCase() == "poi") {
                   this.el.setAttribute('gltf-model', '#poi1');
                 } else if (this.data.markerType.toLowerCase() == "waypoint") {
-                  if (settings && settings.hideGizmos) {
+                  // if (settings && settings.hideGizmos) {
 
-                  } else {
+                  // } else {
                     this.el.setAttribute('gltf-model', '#poi1');
                     this.el.classList.add("waypoint");
-                  }
+                  // }
                  
                 } else if (this.data.markerType.toLowerCase() == "curve point") {
                   this.el.setAttribute('gltf-model', '#poi1');
@@ -302,6 +304,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                 } else {
                   this.el.object3D.visible = true;
                 }
+              }
           } else {
             if (this.data.modelID != "none") {
               if (this.data.modelID.toString().includes("primitive")) {   
@@ -494,16 +497,18 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
   
       this.el.addEventListener('model-loaded', (evt) => { //load placeholder model first (which is an a-asset) before calling external
         evt.preventDefault();
-        this.el.removeAttribute("animation-mixer");
+        // this.el.removeAttribute("animation-mixer");
         const obj = this.el.getObject3D('mesh');
         this.el.object3D.visible = true;
         
-        console.log(this.data.modelID + " model-loaded for CLOUDMARKER " + this.data.name + " type " + this.data.markerType);
+        console.log(this.data.name + " " + this.data.modelID + " model-loaded for CLOUDMARKER " + this.data.name + " type " + this.data.markerType);
         if (this.data.markerType != "object") {
 
           if (this.data.modelID && this.data.modelID != '' & this.data.modelID != 'none') {
+            
             this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"mesh", scaleFactor: this.data.scale});
             let clips = obj.animations;
+            console.log(this.data.name + " animation-mixer tryna play clips x " + clips.length);
             if (clips != null && clips.length) { 
               this.el.setAttribute('animation-mixer', {
                 "clip": clips[Math.floor(Math.random()*clips.length)].name,
@@ -1289,7 +1294,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
         if (!modelID) {
           modelID = this.data.modelID;
         }
-        console.log("tryna load cloudmarker model " + modelID);
+        console.log(this.data.name + "tryna load cloudmarker model " + modelID);
         let transform_controls_component = this.el.components.transform_controls;
         if (transform_controls_component) {
             if (transform_controls_component.data.isAttached) {
@@ -1304,7 +1309,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
 
         this.el.removeAttribute("mod_object");
         this.el.removeAttribute("mod_particles");
-        this.el.removeAttribute("animation-mixer");
+
         this.el.removeAttribute("light");
         this.el.removeAttribute("material");
         // this.el.removeAttribute("obb-collider");
@@ -1315,6 +1320,15 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
         // if (this.data.markerType == "collider") {
         //   this.data.modelID = "primitive_cube";
         // } 
+        let clips = this.el.object3D.animations;
+        console.log(this.data.name + " tryna play animation-mixer x " + clips.length);
+        if (clips != null && clips.length) { 
+          this.el.removeAttribute("animation-mixer");
+          this.el.setAttribute('animation-mixer', {
+            "clip": clips[Math.floor(Math.random()*clips.length)].name,
+            "loop": "repeat",
+          });
+        }
         if (modelID != undefined && modelID != null & modelID != "none" && modelID != "") {  
           // this.el.setAttribute("scale", this.data.xscale + " " + this.data.yscale + " " + this.data.zscale);
 
@@ -1435,59 +1449,64 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
               }
             }
           } 
+         
           
         } else { //if "none"
             console.log("CLOUDMARKER type " + this.data.markerType+ " tryna set default model " + modelID);
-            if (this.data.markerType.toLowerCase() == "player") {
-              this.el.removeAttribute("geometry");
-              this.el.setAttribute('gltf-model', '#poi1');
-              this.el.setAttribute("material", {color: "lime", transparent: true, opacity: .5});
-            }
-            if (this.data.markerType.toLowerCase() == "placeholder") {
-                this.el.setAttribute("gltf-model", "#poi1");
-                this.el.setAttribute("material", {color: "yellow", transparent: true, opacity: .5});
-                
-            } else if (this.data.markerType.toLowerCase() == "poi") {
-                this.el.setAttribute("gltf-model", "#poi1");
-                this.el.setAttribute("material", {color: "purple", transparent: true, opacity: .5});
-                // this.el.setAttribute("color", "purple");
-            } else if (this.data.markerType.toLowerCase() == "waypoint") {
-              if (settings && !settings.hideGizmos) {
-                this.el.setAttribute("gltf-model", "#poi1");
-                this.el.setAttribute("material", {color: "green", transparent: true, opacity: .5});
+            if ((this.data.tags && !this.data.tags.includes("hide gizmo")) || (settings && !settings.hideGizmos)) {
+              if (this.data.markerType.toLowerCase() == "player") {
+                this.el.removeAttribute("geometry");
+                this.el.setAttribute('gltf-model', '#poi1');
+                this.el.setAttribute("material", {color: "lime", transparent: true, opacity: .5});
               }
-                // this.el.setAttribute("color", "purple");
-            } else if (this.data.markerType.toLowerCase() == "curve point") {
-              this.el.setAttribute("gltf-model", "#poi1");
-              this.el.setAttribute("material", {color: "blue", transparent: true, opacity: .5});
-            } else if (this.data.markerType.toLowerCase ==  "trigger") {
-              // this.el.setAttribute("gltf-model", "#poi1");
-              this.el.setAttribute("obb-collider", {size: '1 1 1'});
-              this.el.setAttribute("material", {color: "LightSalmon", transparent: true, opacity: .5});
-              // this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"placeholder", scaleFactor: this.data.scale});
-              
-            } else if (this.data.markerType.toLowerCase().includes("object")) {
+              if (this.data.markerType.toLowerCase() == "placeholder") {
+                  this.el.setAttribute("gltf-model", "#poi1");
+                  this.el.setAttribute("material", {color: "yellow", transparent: true, opacity: .5});
+                  
+              } else if (this.data.markerType.toLowerCase() == "poi") {
+                  this.el.setAttribute("gltf-model", "#poi1");
+                  this.el.setAttribute("material", {color: "purple", transparent: true, opacity: .5});
+                  // this.el.setAttribute("color", "purple");
+              } else if (this.data.markerType.toLowerCase() == "waypoint") {
+                // if (settings && !settings.hideGizmos) {
+                  this.el.setAttribute("gltf-model", "#poi1");
+                  this.el.setAttribute("material", {color: "green", transparent: true, opacity: .5});
+                // }
+                  // this.el.setAttribute("color", "purple");
+              } else if (this.data.markerType.toLowerCase() == "curve point") {
                 this.el.setAttribute("gltf-model", "#poi1");
-                this.el.setAttribute("material", {color: "salmon", transparent: true, opacity: .5});
-                                
-            } else if (this.data.markerType.toLowerCase() == "gate") {
-                console.log("tryna set gate gltf model on cloudmarker " + this.el.id);
-                this.el.setAttribute("gltf-model", "#gate2");
-                this.el.setAttribute("material", {color: "orange", transparent: true, opacity: .5});
+                this.el.setAttribute("material", {color: "blue", transparent: true, opacity: .5});
+              } else if (this.data.markerType.toLowerCase ==  "trigger") {
+                // this.el.setAttribute("gltf-model", "#poi1");
+                this.el.setAttribute("obb-collider", {size: '1 1 1'});
+                this.el.setAttribute("material", {color: "LightSalmon", transparent: true, opacity: .5});
                 // this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"placeholder", scaleFactor: this.data.scale});
-                this.el.setAttribute("obb-collider", {"centerModel": false, "size": this.data.xscale * 3 + " " + this.data.yscale * 5 + " " + this.data.zscale * 3});
-                // this.el.setAttribute("color", "orange");
-            } else if (this.data.markerType.toLowerCase() == "link") {
-              this.el.setAttribute("gltf-model", "#links");
-              this.el.setAttribute("material", {color: "aqua", transparent: true, opacity: .5});
-            } else if (this.data.markerType.toLowerCase() == "text") {
-              this.el.setAttribute("gltf-model", "#texticon");
-              this.el.setAttribute("material", {color: "black", transparent: true, opacity: .5});
-            
-            } else if (this.data.markerType.toLowerCase() == "portal") {
-                this.el.setAttribute("gltf-model", "#poi1");
+                
+              } else if (this.data.markerType.toLowerCase().includes("object")) {
+                  this.el.setAttribute("gltf-model", "#poi1");
+                  this.el.setAttribute("material", {color: "salmon", transparent: true, opacity: .5});
+                                  
+              } else if (this.data.markerType.toLowerCase() == "gate") {
+                  console.log("tryna set gate gltf model on cloudmarker " + this.el.id);
+                  this.el.setAttribute("gltf-model", "#gate2");
+                  this.el.setAttribute("material", {color: "orange", transparent: true, opacity: .5});
+                  // this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"placeholder", scaleFactor: this.data.scale});
+                  this.el.setAttribute("obb-collider", {"centerModel": false, "size": this.data.xscale * 3 + " " + this.data.yscale * 5 + " " + this.data.zscale * 3});
+                  // this.el.setAttribute("color", "orange");
+              } else if (this.data.markerType.toLowerCase() == "link") {
+                this.el.setAttribute("gltf-model", "#links");
                 this.el.setAttribute("material", {color: "aqua", transparent: true, opacity: .5});
-            } else if (this.data.markerType.toLowerCase() == "mailbox") {
+              } else if (this.data.markerType.toLowerCase() == "text") {
+                this.el.setAttribute("gltf-model", "#texticon");
+                this.el.setAttribute("material", {color: "black", transparent: true, opacity: .5});
+              
+              } else if (this.data.markerType.toLowerCase() == "portal") {
+                  this.el.setAttribute("gltf-model", "#poi1");
+                  this.el.setAttribute("material", {color: "aqua", transparent: true, opacity: .5});
+              }
+            } 
+            
+            if (this.data.markerType.toLowerCase() == "mailbox") {
                 this.el.setAttribute("gltf-model", "#mailbox");
             } else if (this.data.markerType == "3D text") {
                 console.log("tryna set 3D text!");
@@ -1623,13 +1642,14 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
         } else {
           this.el.object3D.visible = true;
         }
-        let clips = this.el.object3D.animations;
-        if (clips != null && clips.length) { 
-          this.el.setAttribute('animation-mixer', {
-            "clip": clips[Math.floor(Math.random()*clips.length)].name,
-            "loop": "repeat",
-          });
-        }
+        // let clips = this.el.object3D.animations;
+        // if (clips != null && clips.length) { 
+        //   console.log(this.data.name + " tryna play animation-mixer x " + clips.length);
+        //   this.el.setAttribute('animation-mixer', {
+        //     "clip": clips[Math.floor(Math.random()*clips.length)].name,
+        //     "loop": "repeat",
+        //   });
+        // }
 
     },
     deselect: function () {
@@ -1846,14 +1866,14 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
         distance = window.playerPosition.distanceTo(hitpoint);
         console.log("cloudmarker hit " + hitID + " " + distance + " " + JSON.stringify(hitpoint));
         if (this.data.tags && this.data.tags.length && !this.data.tags.toLowerCase().includes("no trigger")) {
-          console.log("gotsa audio trigger hit");
+          // console.log("gotsa audio trigger hit");
           var triggerAudioControllerEl = document.getElementById("triggerAudio");
           
           if (triggerAudioControllerEl != null) {
             // console.log("gotsa audio trigger controller el");
             let triggerAudioController = triggerAudioControllerEl.components.trigger_audio_control;
             if (triggerAudioController  != null) {
-              console.log("gotsa audio trigger controller " + distance);
+              // console.log("gotsa audio trigger controller " + distance);
               // let triggertags = this.data.tags != null && this.data.tags != "" ? this.data.tags : "click";
               triggerAudioController.playAudioAtPosition(hitpoint, distance, this.data.tags);
             }

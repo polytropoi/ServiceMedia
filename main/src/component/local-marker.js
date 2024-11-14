@@ -143,8 +143,9 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
             if (this.data.tags && this.data.tags.toLowerCase().includes("curve point") || this.data.markerType == "curve point") {
               this.el.classList.add("curvepoint");
             }
-            if ((!this.data.modelID || this.data.modelID == undefined || this.data.modelID == "" || this.data.modelID == "none") && !this.data.modelID.toString().includes("primitive")) {
-
+            if ((!this.data.modelID || this.data.modelID == undefined || this.data.modelID == "" || this.data.modelID == "none") 
+              && !this.data.modelID.toString().includes("primitive")
+              && (this.data.tags && !this.data.tags.includes("hide gizmo")) || (settings && settings.hideGizmos)) {
               if (this.data.markerType.toLowerCase() == "player") {
                 this.el.removeAttribute("geometry");
                 this.el.setAttribute('gltf-model', '#poi1');
