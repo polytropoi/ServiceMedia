@@ -497,7 +497,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
   
       this.el.addEventListener('model-loaded', (evt) => { //load placeholder model first (which is an a-asset) before calling external
         evt.preventDefault();
-        // this.el.removeAttribute("animation-mixer");
+        this.el.removeAttribute("animation-mixer"); 
         const obj = this.el.getObject3D('mesh');
         this.el.object3D.visible = true;
         
