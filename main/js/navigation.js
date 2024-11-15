@@ -262,9 +262,11 @@ AFRAME.registerComponent('screen-controls-thirdperson',
 			this.component = null;
 			this.jsContainer = document.getElementById('joystickContainer');
 			this.isMobile = AFRAME.utils.device.isMobile();
+			if (!this.isMobile) {
+				this.isMobile = isTouchDevice();
+			}
 		
-		
-			if (this.isMobile || isTouchDevice()) {  //passed in above//nm	
+			if (this.isMobile) {  //passed in above//nm	
 				if (this.jsContainer != null) {
 					this.jsContainer.style.visibility = 'visible';
 					this.component = this.el.components.extended_wasd_thirdperson;
@@ -327,9 +329,12 @@ AFRAME.registerComponent('screen-controls-firstperson',
 			this.component = null;
 			this.jsContainer = document.getElementById('joystickContainer');
 			this.isMobile = AFRAME.utils.device.isMobile();
+			if (!this.isMobile) {
+				this.isMobile = isTouchDevice();
+			}
 			// this.useMobile
 		
-			if (this.isMobile || isTouchDevice()) {  //passed in above//nm	s
+			if (this.isMobile) {  //passed in above//nm	s
 				if (this.jsContainer != null) {
 					this.jsContainer.style.visibility = 'visible';
 					this.component = this.el.components.extended_wasd_controls;
