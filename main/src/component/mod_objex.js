@@ -1243,7 +1243,7 @@ AFRAME.registerComponent('mod_object', {
             }
 
   
-            if (this.data.eventData.toLowerCase().includes("target") || this.data.tags.includes("target")) {
+            if (this.data.eventData.toLowerCase().includes("target") || (this.data.tags && this.data.tags.includes("target"))) {
               // this.el.id = "target_object";
               this.el.classList.add("target");
               this.el.classList.add("ar_target");

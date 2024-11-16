@@ -785,7 +785,7 @@ webxr_router.get('/:_id', function (req, res) {
                         }
                         if (sceneData.sceneTags[i].toLowerCase().includes("aframe master")) {
                             // aframeScriptVersion = "<script src=\x22https://cdn.jsdelivr.net/gh/aframevr/aframe@744e2b869e281f840cff7d9cb02e95750ce90920/dist/aframe-master.min.js\x22></script>"; //ref 20220715// nope!
-                            aframeScriptVersion = "<script src=\x22https://cdn.jsdelivr.net/gh/aframevr/aframe@4eb6fb31fa3937b9a65cf05051829e6345964e1e/dist/aframe-master.min.js\x22></script>"; //ref 20231103 (integrated hands!)
+                            aframeScriptVersion = "<script src=\x22https://cdn.jsdelivr.net/gh/aframevr/aframe@86d847fa80dcaa1c7306a93890000d5bb3183416/dist/aframe-master.min.js\x22></script>"; //ref 20231103 (integrated hands!)
                         }
                         if (sceneData.sceneTags[i].toLowerCase().includes("aframe ada")) {
                             aframeScriptVersion = "<script src=\x22https://a-cursor-test.glitch.me/aframe-master.js\x22></script>"; //mod by @adarosecannon
@@ -5314,7 +5314,7 @@ webxr_router.get('/:_id', function (req, res) {
                         instancingEntity +
                         arHitTest + 
                         
-                        arShadowPlane +
+                        // arShadowPlane +
                         // hemiLight +
                         // shadowLight +
                         // navmarsh +
@@ -5347,7 +5347,7 @@ webxr_router.get('/:_id', function (req, res) {
                         "<div class=\x22augpanel\x22><p></p></div>\n"+
                        
                         joystickContainer +
-                        screenOverlay + //socket picture
+                        // screenOverlay + //socket picture
                         canvasOverlay + //drop down side panel
                         audioSliders +
                         mapOverlay + 
