@@ -1243,9 +1243,10 @@ AFRAME.registerComponent('mod_object', {
             }
 
   
-            if (this.data.eventData.toLowerCase().includes("target")) {
+            if (this.data.eventData.toLowerCase().includes("target") || this.data.tags.includes("target")) {
               // this.el.id = "target_object";
-              this.el.classList.add("target_object");
+              this.el.classList.add("target");
+              this.el.classList.add("ar_target");
             }
             if (this.data.eventData.toLowerCase().includes("transparent")) {
               console.log("tryna set transparent");

@@ -367,6 +367,7 @@ AFRAME.registerComponent('mod_model', {
                 this.particlesEl = document.createElement("a-entity");
                 this.el.sceneEl.appendChild(this.particlesEl); //hrm...
                 this.el.classList.add("target");
+                this.el.classList.add("ar_target");
                 this.el.classList.remove("activeObjexRay");
             }
             // if (this.data.eventData.toLowerCase().includes("callout") && this.data.description && this.data.description != "") {
