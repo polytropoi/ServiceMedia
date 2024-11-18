@@ -133,12 +133,12 @@ $(function() {
    if (settings.sceneType == "Default" || settings.sceneType == "AFrame" || settings.sceneType == "default" || settings.sceneType == "aframe") {
       // window.sceneType == "aframe";
       if (settings.hideAvatars) {
-         player.setAttribute("player_mover", "init");
+         player.setAttribute("player_mover", "init", true);
          EmitSelfPosition();
       }
       posRotReader = document.getElementById("player").components.get_pos_rot; 
       if (player != null) {
-         player.setAttribute("player_mover", "init");
+         player.setAttribute("player_mover", "init", true);
       }
       let modelDataEl = document.getElementById('sceneModels');
       if (modelDataEl) {

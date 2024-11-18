@@ -1470,7 +1470,7 @@ webxr_router.get('/:_id', function (req, res) {
                                 "</div>";
                                 let movementControls = ""; //aframe extras, can constrain to navmesh 
                                 // wasd = "extended_wasd_controls=\x22flyEnabled: false; moveSpeed: 5; inputType: keyboard\x22";
-                                wasd = "extended_wasd_controls=\x22fly: false; moveSpeed: 5; inputType: keyboard\x22 simple-navmesh-constraint=\x22navmesh:#nav-mesh;fall:10; height:.1;\x22";
+                                wasd = "extended_wasd_controls=\x22flyEnabled: false; moveSpeed: 5; inputType: keyboard\x22 simple-navmesh-constraint=\x22navmesh:#nav-mesh;fall:10; height:.1;\x22";
                                 // joystickScript = "<script src=\x22../main/vendor/aframe/joystick.js\x22></script>";
                                 let physicsMod = "";
                                 // if (!useNavmesh && !useSimpleNavmesh) { //simplenavmesh uses raycast, no pathfinding but constraint works!
@@ -1479,7 +1479,7 @@ webxr_router.get('/:_id', function (req, res) {
                                 // } else {
                                 if (useSimpleNavmesh) {
                                     //simple navmesh can use 
-                                    wasd = "extended_wasd_controls=\x22fly: false; moveSpeed: 5; inputType: keyboard\x22 simple-navmesh-constraint=\x22navmesh:#nav-mesh;fall:10; height:.1;\x22";
+                                    wasd = "extended_wasd_controls=\x22flyEnabled: false; moveSpeed: 5; inputType: keyboard\x22 simple-navmesh-constraint=\x22navmesh:#nav-mesh;fall:10; height:.1;\x22";
                                     
                                 } 
                                 // else {
@@ -1498,7 +1498,7 @@ webxr_router.get('/:_id', function (req, res) {
                                  if (physicsScripts.length > 0 && useNavmesh && !useSuperHands && !useStarterKit) {
 
                                     // movementControls = "movement-controls=\x22constrainToNavMesh: true; control: keyboard, gamepad, touch; fly: false;\x22";
-                                    // movementControls = "extended_wasd_controls=\x22fly: false; moveSpeed: 5; inputType: keyboard\x22 simple-navmesh-constraint=\x22navmesh:#nav-mesh;fall:10; height:.1;\x22";
+                                    // movementControls = "extended_wasd_controls=\x22flyEnabled: false; moveSpeed: 5; inputType: keyboard\x22 simple-navmesh-constraint=\x22navmesh:#nav-mesh;fall:10; height:.1;\x22";
                                     // wasd = "";
                                     physicsMod = "geometry=\x22primitive: cylinder; height: 2; radius: 0.5;\x22 ammo-body=\x22type: kinematic;\x22 ammo-shape=\x22type: capsule\x22";
                                     // aframeExtrasScript = "<script src=\x22..//main/vendor/aframe/aframe-extras_20210520.js\x22></script>";
@@ -1562,12 +1562,12 @@ webxr_router.get('/:_id', function (req, res) {
                                 let blinkMod = "blink-controls=\x22cameraRig: #cameraRig\x22";
                                 if (useSimpleNavmesh || useNavmesh) {
                                     blinkMod = "blink-controls=\x22cameraRig: #cameraRig; collisionEntities: #nav-mesh;\x22"; //only one navmesh for now
-                                    wasd = "extended_wasd_controls=\x22fly: false; moveSpeed: "+sceneResponse.scenePlayer.playerSpeed+"; inputType: keyboard\x22 simple-navmesh-constraint=\x22navmesh:#nav-mesh;fall:10; height:"+sceneResponse.scenePlayer.playerHeight+"\x22";
+                                    wasd = "extended_wasd_controls=\x22flyEnabled: false; moveSpeed: "+sceneResponse.scenePlayer.playerSpeed+"; inputType: keyboard\x22 simple-navmesh-constraint=\x22navmesh:#nav-mesh;fall:10; height:"+sceneResponse.scenePlayer.playerHeight+"\x22";
                                 }
                                 
                                 // if (useSimpleNavmesh) { //this lives in navigation.js
                                 //     //simple navmesh can use 
-                                //     wasd = "extended_wasd_controls=\x22fly: false; moveSpeed: "+sceneResponse.scenePlayer.playerSpeed+"; inputType: keyboard\x22 simple-navmesh-constraint=\x22navmesh:#nav-mesh;fall:10; height:"+sceneResponse.scenePlayer.playerHeight+"\x22";
+                                //     wasd = "extended_wasd_controls=\x22flyEnabled: false; moveSpeed: "+sceneResponse.scenePlayer.playerSpeed+"; inputType: keyboard\x22 simple-navmesh-constraint=\x22navmesh:#nav-mesh;fall:10; height:"+sceneResponse.scenePlayer.playerHeight+"\x22";
                                 //     // wasd = "wasd-controls=\x22fly: true; acceleration: 35\x22 ";
                                     
                                 // } 
@@ -1740,9 +1740,9 @@ webxr_router.get('/:_id', function (req, res) {
                                         sceneResponse.scenePlayer = {};
                                         sceneResponse.scenePlayer.playerSpeed = 2;
                                     }
-                                    wasd = "extended_wasd_controls=\x22fly: false; moveSpeed: "+sceneResponse.scenePlayer.playerSpeed+"; inputType: keyboard\x22";
+                                    wasd = "extended_wasd_controls=\x22flyEnabled: false; moveSpeed: "+sceneResponse.scenePlayer.playerSpeed+"; inputType: keyboard\x22";
                                     if (useSimpleNavmesh || useNavmesh) {
-                                        wasd = "extended_wasd_controls=\x22fly: false; moveSpeed: "+sceneResponse.scenePlayer.playerSpeed+"; inputType: keyboard\x22 simple-navmesh-constraint=\x22navmesh:#nav-mesh;fall:10; height: 1.6\x22";
+                                        wasd = "extended_wasd_controls=\x22flyEnabled: false; moveSpeed: "+sceneResponse.scenePlayer.playerSpeed+"; inputType: keyboard\x22 simple-navmesh-constraint=\x22navmesh:#nav-mesh;fall:10; height: 1.6\x22";
                                     } 
                                     cameraRigEntity = "<a-entity id=\x22cameraRig\x22 initializer "+
                                         " id=\x22mouseCursor\x22 cursor=\x22rayOrigin: mouse\x22 raycaster=\x22objects: .activeObjexRay\x22>"+
@@ -4453,12 +4453,13 @@ webxr_router.get('/:_id', function (req, res) {
                     console.log("sceneWebType: "+ sceneResponse.sceneWebType);
                     if (sceneResponse.sceneWebType == undefined || sceneResponse.sceneWebType.toLowerCase() == "default" || sceneResponse.sceneWebType.toLowerCase() == "aframe") { 
                         // webxrFeatures = "webxr=\x22optionalFeatures: hit-test, local-floor\x22"; //otherwise hit-test breaks everythign!
+                        // webxrFeatures = "webxr=\x22requiredFeatures: hit-test,local-floor; optionalFeatures: dom-overlay,unbounded; overlayElement: #ar_overlay;\x22 ar-hit-test=\x22target: .ar_target\x22"; //otherwise hit-test breaks everythign!
                         webxrFeatures = "webxr=\x22requiredFeatures: hit-test,local-floor; optionalFeatures: dom-overlay,unbounded; overlayElement: #ar_overlay;\x22 ar-hit-test=\x22target: .ar_target\x22"; //otherwise hit-test breaks everythign!
                         
                         // arHitTest = "ar-hit-test-spawn=\x22mode: "+arMode+"\x22";
                         // arShadowPlane = "<a-plane show-in-ar-mode id="shadow-plane" material="shader:shadow" shadow="cast:false;" visible=\x22false\x22 height=\x2210\x22 width=\x2210\x22 rotation=\x22-90 0 0\x22 shadow=\x22receive:true\x22 ar-shadows=\x22opacity: 0.3\x22 static-body=\x22shape: none\x22 shape__main=\x22shape: box; halfExtents: 100 100 0.125; offset: 0 0 -0.125\x22>" +
-                        arShadowPlane = "<a-plane show-in-ar-mode visible=\x22false\x22 id=\x22shadow-plane\x22 material=\x22shader:shadow\x22 shadow=\x22cast:false;\x22 follow-shadow=\x22.activeObjexRay\x22 height=\x2233\x22 width=\x2233\x22 rotation=\x22-90 0 0\x22>" +
-                            "</a-plane>";
+                        // arShadowPlane = "<a-plane show-in-ar-mode visible=\x22false\x22 id=\x22shadow-plane\x22 material=\x22shader:shadow\x22 shadow=\x22cast:false;\x22 follow-shadow=\x22.activeObjexRay\x22 height=\x2233\x22 width=\x2233\x22 rotation=\x22-90 0 0\x22>" +
+                        //     "</a-plane>";
                         
                         // }
                         handsTemplate = "<template id=\x22hand-template\x22><a-entity><a-box scale=\x220.1 0.1 0.1\x22 visible=false></a-box></a-entity></template>";
@@ -5031,13 +5032,19 @@ webxr_router.get('/:_id', function (req, res) {
                         "<script async src=\x22https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js\x22></script>"+
 
                         "<script type=\x22importmap\x22> {\x22imports\x22: {" +
-                            // "\x22three\x22: \x22https://unpkg.com/three@0.158.0/build/three.module.js\x22,"+
+                            
                             // "\x22three\x22: \x22https://unpkg.com/three@0.164.0/build/three.module.js\x22,"+
                             // "\x22three/addons/\x22: \x22https://unpkg.com/browse/three@0.164.0/examples/jsm/\x22"+
-                            "\x22three\x22: \x22https://cdn.jsdelivr.net/npm/three@0.164.0/build/three.module.js\x22,"+
-                            "\x22three/addons/\x22: \x22https://cdn.jsdelivr.net/npm/three@0.164.0/examples/jsm/\x22"+
-                            // "\x22MeshSurfaceSampler\x22: \x22https://unpkg.com/browse/three@0.164.0/examples/jsm/math/MeshSurfaceSampler.js\x22,"+
-                            // "\x22TransformControls\x22: \x22https://unpkg.com/browse/three@0.164.0/examples/jsm/controls/TransformControls.js\x22"+
+
+                                                        
+                            "\x22three\x22: \x22https://unpkg.com/three@0.164.0/build/three.module.js\x22,"+
+                            "\x22three/addons/\x22: \x22https://unpkg.com/three@0.164.0/examples/jsm/\x22"+
+                            // https://unpkg.com/three@0.164.0/examples/jsm/controls/TransformControls.js
+                            // "\x22three\x22: \x22https://cdn.jsdelivr.net/npm/three@0.164.0/build/three.module.js\x22,"+
+                            // "\x22three/addons/\x22: \x22https://cdn.jsdelivr.net/npm/three@0.164.0/examples/jsm/\x22"+
+
+                            // "\x22MeshSurfaceSampler\x22: \x22https://unpkg.com/three@0.164.0/examples/jsm/math/MeshSurfaceSampler.js\x22,"+
+                            // "\x22TransformControls\x22: \x22https://unpkg.com/three@0.164.0/examples/jsm/controls/TransformControls.js\x22"+
                             "}"+
                         "}</script>"+
                         // "<script type=\x22module\x22>"+
@@ -5089,7 +5096,7 @@ webxr_router.get('/:_id', function (req, res) {
                         "<script src=\x22../main/src/component/cloud-marker.js\x22></script>"+
                         "<script src=\x22../main/src/component/local-marker.js\x22></script>"+
                         "<script src=\x22../main/src/component/mod-materials.js\x22></script>"+
-                        "<script src=\x22../main/src/component/xr-utils.js\x22></script>"+
+                        // "<script src=\x22../main/src/component/xr-utils.js\x22></script>"+
                         // "<script src=\x22../main/vendor/html2canvas/aframe-html-shader.min.js\x22></script>"+
                         primaryAudioScript +
                         ambientAudioScript +

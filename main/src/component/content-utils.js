@@ -2093,7 +2093,8 @@ AFRAME.registerComponent('model-callout', {
     schema: {
       // eltype: {default: "avatar"} // no, make it hands/nohands
       // journeyLengthData: {default: 0}
-      lookAtElID: {default: ''}
+      lookAtElID: {default: ''},
+      init: {default: false}
       
     },
     // let journeyLengthT = 0;
@@ -2421,8 +2422,8 @@ AFRAME.registerComponent('mod_dialog', { //there should only be one of these, un
   this.dialogPanel = document.getElementById("mod_dialog_panel");
   // this.el.classList.add("activeObjexRay");
   this.cameraPosition = new THREE.Vector3(); 
-  this.dialogText.setAttribute("overlay", "init");
-  this.dialogPanel.setAttribute("overlay", "init");
+  this.dialogText.setAttribute("overlay");
+  this.dialogPanel.setAttribute("overlay");
   this.yesbutton = null;
   this.nobutton = null;
   this.yesButtonMesh = null;
@@ -2477,7 +2478,7 @@ AFRAME.registerComponent('mod_dialog', { //there should only be one of these, un
     //   let name = evt.detail.intersection.object.name;
     //   console.log(name);
     // });
-    this.el.setAttribute("overlay", "init");
+    this.el.setAttribute("overlay");
 
   });
   

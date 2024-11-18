@@ -2,12 +2,14 @@
 // import {MeshSurfaceSampler} from '/three/examples/jsm/math/MeshSurfaceSampler.js'; 
 // import {TransformControls} from '/three/examples/jsm/controls/TransformControls.js';
 
+// import {MeshSurfaceSampler} from 'MeshSurfaceSampler'; 
+// import {TransformControls} from 'TransformControls';
 
 // import {MeshSurfaceSampler} from 'three/addons/math/MeshSurfaceSampler.js'; 
 // import {TransformControls} from 'three/addons/controls/TransformControls.js';
-// import * as THREE from 'three';
-import { TransformControls } from 'three/addons/controls/TransformControls.js';
-import { MeshSurfaceSampler } from 'three/addons/math/MeshSurfaceSampler.js';
+    // // import * as THREE from 'three';
+    import { TransformControls } from 'three/addons/controls/TransformControls.js';
+    import { MeshSurfaceSampler } from 'three/addons/math/MeshSurfaceSampler.js';
 // import { SVGLoader } from '/three/examples/jsm/loaders/SVGLoader.js'; // ref'd in import maps
 // import { Flow } from '/three/examples/jsm/modifiers/CurveModifier.js'; 
 // import { Line2 } from '/three/examples/jsm/lines/Line2.js'; //hrm..
@@ -2949,23 +2951,23 @@ AFRAME.registerComponent('world_transport_buttons', {
     this.previousButton.setAttribute("position", "-.5 -.85 0");
     this.previousButton.setAttribute("geometry", {"primitive": "plane", "height": .2, "width": .2});
     this.previousButton.setAttribute("material", {shader: "flat", src: "#p_button", transparent: true});
-    this.previousButton.setAttribute("overlay", "");
+    this.previousButton.setAttribute("overlay");
     this.flyButton.setAttribute("position", "-.25 -.85 0");
     this.flyButton.setAttribute("geometry", {"primitive": "plane", "height": .2, "width": .2});
     this.flyButton.setAttribute("material", {shader: "flat", src: "#fly_button", transparent: true});
-    this.flyButton.setAttribute("overlay", "");
+    this.flyButton.setAttribute("overlay");
     this.playButton.setAttribute("position", "0 -.85 0");
     this.playButton.setAttribute("geometry", {"primitive": "plane", "height": .225, "width": .225});
     this.playButton.setAttribute("material", {shader: "flat", src: "#play_button", transparent: true});
-    this.playButton.setAttribute("overlay", "");
+    this.playButton.setAttribute("overlay");
     this.camlockButton.setAttribute("position", ".25 -.85 0");
     this.camlockButton.setAttribute("geometry", {"primitive": "plane", "height": .2, "width": .2});
     this.camlockButton.setAttribute("material", {shader: "flat", src: "#camlock_button", transparent: true});
-    this.camlockButton.setAttribute("overlay", "");
+    this.camlockButton.setAttribute("overlay");
     this.nextButton.setAttribute("position", ".5 -.85 0");
     this.nextButton.setAttribute("geometry", {"primitive": "plane", "height": .2, "width": .2});
     this.nextButton.setAttribute("material", {shader: "flat", src: "#n_button", transparent: true});
-    this.nextButton.setAttribute("overlay", "");
+    this.nextButton.setAttribute("overlay");
     // this.previousButtonMaterial = new THREE.MeshBasicMaterial( { map: "#p_button", transparent: true } ); 
     this.worldButtons.appendChild(this.previousButton);
     this.worldButtons.appendChild(this.playButton);
