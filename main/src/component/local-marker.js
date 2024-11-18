@@ -136,7 +136,16 @@ AFRAME.registerComponent('local_marker', { //special items with local mods, not 
 
             if (this.data.markerType == "object" && this.data.objectID.length > 8) {
               this.loadObject(this.data.objectID); //off in the woods...
-            } 
+            }
+            if ((this.data.eventData && this.data.eventData.length && this.data.eventData.toLowerCase().includes("anchored")) || 
+            this.data.tags && this.data.tags.length && this.data.tags.toLowerCase().includes("anchored")) {
+              this.el.setAttribute("anchored");
+            }    
+            // if ((this.data.eventData && this.data.eventData.length && this.data.eventData.toLowerCase().includes("target")) || 
+            // this.data.tags && this.data.tags.length && this.data.tags.toLowerCase().includes("target")) {
+            // // this.isTarget = true;
+            // this.el.sceneEl.setAttribute("ar-hit-test", {"target": this.el.id});
+            // }
             if (this.data.tags && this.data.tags.includes("follow curve")) {
               this.el.setAttribute("mod_curve", {"origin": "location", "isClosed": true, "spreadFactor": 2})
             }

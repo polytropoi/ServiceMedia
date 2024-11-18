@@ -4454,7 +4454,7 @@ webxr_router.get('/:_id', function (req, res) {
                     if (sceneResponse.sceneWebType == undefined || sceneResponse.sceneWebType.toLowerCase() == "default" || sceneResponse.sceneWebType.toLowerCase() == "aframe") { 
                         // webxrFeatures = "webxr=\x22optionalFeatures: hit-test, local-floor\x22"; //otherwise hit-test breaks everythign!
                         // webxrFeatures = "webxr=\x22requiredFeatures: hit-test,local-floor; optionalFeatures: dom-overlay,unbounded; overlayElement: #ar_overlay;\x22 ar-hit-test=\x22target: .ar_target\x22"; //otherwise hit-test breaks everythign!
-                        webxrFeatures = "webxr=\x22requiredFeatures: hit-test,local-floor; optionalFeatures: dom-overlay,unbounded; overlayElement: #ar_overlay;\x22 ar-hit-test=\x22target: .ar_target\x22"; //otherwise hit-test breaks everythign!
+                        webxrFeatures = "webxr=\x22requiredFeatures: hit-test,local-floor; optionalFeatures: dom-overlay,unbounded; overlayElement: #ar_overlay;\x22 ar-hit-test=\x22target: #ar_target\x22"; //otherwise hit-test breaks everythign!
                         
                         // arHitTest = "ar-hit-test-spawn=\x22mode: "+arMode+"\x22";
                         // arShadowPlane = "<a-plane show-in-ar-mode id="shadow-plane" material="shader:shadow" shadow="cast:false;" visible=\x22false\x22 height=\x2210\x22 width=\x2210\x22 rotation=\x22-90 0 0\x22 shadow=\x22receive:true\x22 ar-shadows=\x22opacity: 0.3\x22 static-body=\x22shape: none\x22 shape__main=\x22shape: box; halfExtents: 100 100 0.125; offset: 0 0 -0.125\x22>" +

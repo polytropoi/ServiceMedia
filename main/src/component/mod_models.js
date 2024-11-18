@@ -78,10 +78,15 @@ AFRAME.registerComponent('mod_model', {
   
           // setShader(this.data.shader);
           this.setShader(); //at the bottom
+        }
+        if ((this.data.eventData && this.data.eventData.length && this.data.eventData.toLowerCase().includes("anchored")) || 
+        this.data.tags && this.data.tags.length && this.data.tags.toLowerCase().includes("anchored")) {
+          this.el.setAttribute("anchored");
         }      
         if ((this.data.eventData && this.data.eventData.length && this.data.eventData.toLowerCase().includes("target")) || 
-        this.data.tags && this.data.tags.length && this.data.tags.toLowerCase().includes("target")) {
+          this.data.tags && this.data.tags.length && this.data.tags.toLowerCase().includes("target")) {
           this.isTarget = true;
+          this.el.sceneEl.setAttribute("ar-hit-test", {"target": this.el.id});
         }
         // if (this.data.description && this.data.description.length > 1) {
         //   // console.log("model eventData " + JSON.stringify(this.data.eventData));

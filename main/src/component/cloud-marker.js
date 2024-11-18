@@ -72,6 +72,15 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
       if (this.data.allowMods) {
         this.el.classList.add("allowMods");
       }
+      if ((this.data.eventData && this.data.eventData.length && this.data.eventData.toLowerCase().includes("anchored")) || 
+      this.data.tags && this.data.tags.length && this.data.tags.toLowerCase().includes("anchored")) {
+        this.el.setAttribute("anchored");
+      }   
+      if ((this.data.eventData && this.data.eventData.length && this.data.eventData.toLowerCase().includes("target")) || 
+      this.data.tags && this.data.tags.length && this.data.tags.toLowerCase().includes("target")) {
+      // this.isTarget = true;
+      this.el.sceneEl.setAttribute("ar-hit-test", {"target": this.el.id});
+      }
       // if (this.data.markerType == "collider") {
       //   this.data.modelID = "primitive_cube";
       // } 
@@ -90,6 +99,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
         // if (this.data.)
         this.el.setAttribute("traffic_data_viz", {mode: "marker", type: type, size: size, source: source});
       }
+
       if ((this.data.tags && this.data.tags.toLowerCase().includes("follow curve")) || this.data.markerType == "follow curve" ) {
         console.log("tryna add mod_curve");
         this.el.setAttribute("mod_curve", {"origin": "location", "isClosed": true, "spreadFactor": 2})

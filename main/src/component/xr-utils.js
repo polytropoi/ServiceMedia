@@ -49,7 +49,7 @@
           dependencies: ["raycaster"],
           init() {
             const sceneEl = this.el;
-            let ar_overlayEl = document.getElementById("ar_overlay");
+            let ar_overlayEl = document.getElementById("ar_message");
             if (ar_overlayEl) {
               sceneEl.addEventListener('enter-vr', function () {
                 if (this.is('ar-mode')) {
