@@ -49,23 +49,26 @@
           dependencies: ["raycaster"],
           init() {
             const sceneEl = this.el;
-            let ar_overlayEl = document.getElementById("ar_message");
-            if (ar_overlayEl) {
+
               sceneEl.addEventListener('enter-vr', function () {
                 if (this.is('ar-mode')) {
-                  ar_overlayEl.textContent = '';
-                  this.addEventListener('ar-hit-test-start', function () {
-                    ar_overlayEl.innerHTML = `Scanning environment, finding surface.`
-                  }, { once: true });
-                  this.addEventListener('ar-hit-test-achieved', function () {
-                    ar_overlayEl.innerHTML = `Select the location to place objects by tapping on the screen or selecting with your controller.`
-                  }, { once: true });
-                  this.addEventListener('ar-hit-test-select', function () {
-                    ar_overlayEl.textContent = 'Object placed!';
-                  }, { once: true });
+                  this.xrSession.addEventListener("select", this.onselect.bind(this));
+                  let ar_overlayEl = document.getElementById("ar_overlay");
+                  if (ar_overlayEl) {
+                    ar_overlayEl.textContent = '';
+                    this.addEventListener('ar-hit-test-start', function () {
+                      ar_overlayEl.innerHTML = `Scanning environment, finding surface.`
+                    }, { once: true });
+                    this.addEventListener('ar-hit-test-achieved', function () {
+                      ar_overlayEl.innerHTML = `Select the location to place objects by tapping on the screen or selecting with your controller.`
+                    }, { once: true });
+                    this.addEventListener('ar-hit-test-select', function () {
+                      ar_overlayEl.textContent = 'Object placed!';
+                    }, { once: true });
+                  }
                 }
               });
-            }
+            // }
           },
           onselect(e) {
             const frame = e.frame;
