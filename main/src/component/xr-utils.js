@@ -49,9 +49,18 @@
           dependencies: ["raycaster"],
           init() {
             const sceneEl = this.el;
-            sceneEl.addEventListener("enter-vr", () => {
-              if (sceneEl.is("ar-mode")) {
-                sceneEl.xrSession.addEventListener("select", this.onselect.bind(this));
+            sceneEl.addEventListener('enter-vr', function () {
+              if (this.is('ar-mode')) {
+                message.textContent = '';
+                this.addEventListener('ar-hit-test-start', function () {
+                  message.innerHTML = `Scanning environment, finding surface.`
+                }, { once: true });
+                this.addEventListener('ar-hit-test-achieved', function () {
+                  message.innerHTML = `Select the location to place objects by tapping on the screen or selecting with your controller.`
+                }, { once: true });
+                this.addEventListener('ar-hit-test-select', function () {
+                  message.textContent = 'Object placed!';
+                }, { once: true });
               }
             });
           },

@@ -4458,8 +4458,8 @@ webxr_router.get('/:_id', function (req, res) {
                         
                         // arHitTest = "ar-hit-test-spawn=\x22mode: "+arMode+"\x22";
                         // arShadowPlane = "<a-plane show-in-ar-mode id="shadow-plane" material="shader:shadow" shadow="cast:false;" visible=\x22false\x22 height=\x2210\x22 width=\x2210\x22 rotation=\x22-90 0 0\x22 shadow=\x22receive:true\x22 ar-shadows=\x22opacity: 0.3\x22 static-body=\x22shape: none\x22 shape__main=\x22shape: box; halfExtents: 100 100 0.125; offset: 0 0 -0.125\x22>" +
-                        // arShadowPlane = "<a-plane show-in-ar-mode visible=\x22false\x22 id=\x22shadow-plane\x22 material=\x22shader:shadow\x22 shadow=\x22cast:false;\x22 follow-shadow=\x22.activeObjexRay\x22 height=\x2233\x22 width=\x2233\x22 rotation=\x22-90 0 0\x22>" +
-                        //     "</a-plane>";
+                        arShadowPlane = "<a-plane show-in-ar-mode visible=\x22false\x22 id=\x22shadow-plane\x22 material=\x22shader:shadow\x22 shadow=\x22cast:false;\x22 follow-shadow=\x22.activeObjexRay\x22 height=\x2233\x22 width=\x2233\x22 rotation=\x22-90 0 0\x22>" +
+                            "</a-plane>";
                         
                         // }
                         handsTemplate = "<template id=\x22hand-template\x22><a-entity><a-box scale=\x220.1 0.1 0.1\x22 visible=false></a-box></a-entity></template>";
@@ -4970,7 +4970,7 @@ webxr_router.get('/:_id', function (req, res) {
                         let aScene = "<a-scene "+sceneBackground+" "+physicsInsert+" "+pool_target+" "+pool_launcher+" gesture-detector " + aframeRenderSettings +
                         " reflection=\x22directionalLight:#real-light\x22 "+sceneShadows+" raycaster=\x22objects: .activeObjexRay a-sphere\x22 "+
                         "screen-controls shadow " + xrmode + " " + magicWindow + " " + obbDebug + " " +
-                        webxrFeatures + " loading-screen=\x22dotsColor: white; backgroundColor: black; enabled: false\x22 " + fogSettings + " "+networkedscene+" "+ARSceneArg+" listen-for-vr-mode " + defaultLights +">";
+                        webxrFeatures + " loading-screen=\x22dotsColor: white; backgroundColor: black; enabled: false\x22 " + fogSettings + " "+networkedscene+" "+ARSceneArg+" ar-cursor " + defaultLights +">";
 
                            // "screen-controls xr-mode-ui=\x22enterVREnabled: true; enterAREnabled: true; XRMode: ar,vr\x22 " + magicWindow +   
                         // " keyboard-shortcuts=\x22enterVR: false\x22" +  //add screen-controls from initializer                      
@@ -5096,7 +5096,7 @@ webxr_router.get('/:_id', function (req, res) {
                         "<script src=\x22../main/src/component/cloud-marker.js\x22></script>"+
                         "<script src=\x22../main/src/component/local-marker.js\x22></script>"+
                         "<script src=\x22../main/src/component/mod-materials.js\x22></script>"+
-                        // "<script src=\x22../main/src/component/xr-utils.js\x22></script>"+
+                        "<script src=\x22../main/src/component/xr-utils.js\x22></script>"+
                         // "<script src=\x22../main/vendor/html2canvas/aframe-html-shader.min.js\x22></script>"+
                         primaryAudioScript +
                         ambientAudioScript +
@@ -5162,7 +5162,7 @@ webxr_router.get('/:_id', function (req, res) {
                         "<script src=\x22../main/js/dialogs.js\x22></script>"+
 
                         "<div id=\x22ar_overlay\x22><span id=\x22ar_message\x22></span></div>"+                        
-                        threeDeeTextComponent +
+                        // threeDeeTextComponent +
                         aScene +
                         "<div id=\x22overlay\x22></div>"+
                         // skySettings +
@@ -5321,7 +5321,7 @@ webxr_router.get('/:_id', function (req, res) {
                         instancingEntity +
                         arHitTest + 
                         
-                        // arShadowPlane +
+                        arShadowPlane +
                         // hemiLight +
                         // shadowLight +
                         // navmarsh +
