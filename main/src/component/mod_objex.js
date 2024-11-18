@@ -825,7 +825,7 @@ AFRAME.registerComponent('mod_object', {
       if ((this.data.eventData && this.data.eventData.length && this.data.eventData.toLowerCase().includes("target")) || 
         this.data.tags && this.data.tags.length && this.data.tags.toLowerCase().includes("target")) {
         // this.isTarget = true;
-        this.el.sceneEl.setAttribute("ar-hit-test", {"target": this.el.id});
+        this.el.sceneEl.setAttribute("ar-hit-test", {"target": "[id=\x22"+ this.el.id + "\x22]"});
       }
       if (this.data.objectData.triggerScale == undefined || this.data.objectData.triggerScale == null || this.data.objectData.triggerScale == "" || this.data.objectData.triggerScale == 0) {
         this.data.objectData.triggerScale = 1;

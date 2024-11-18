@@ -79,7 +79,9 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
       if ((this.data.eventData && this.data.eventData.length && this.data.eventData.toLowerCase().includes("target")) || 
       this.data.tags && this.data.tags.length && this.data.tags.toLowerCase().includes("target")) {
       // this.isTarget = true;
-      this.el.sceneEl.setAttribute("ar-hit-test", {"target": this.el.id});
+      let theID = "[id=\x22"+ this.el.id + "\x22]";
+      console.log("theID is " + "[id=\x22"+ this.el.id + "\x22]");
+      this.el.sceneEl.setAttribute("ar-hit-test", {"target": "[id=\x22"+ this.el.id + "\x22]"});
       }
       // if (this.data.markerType == "collider") {
       //   this.data.modelID = "primitive_cube";
@@ -1497,7 +1499,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                   this.el.setAttribute("material", {color: "salmon", transparent: true, opacity: .5});
                                   
               } else if (this.data.markerType.toLowerCase() == "gate") {
-                  console.log("tryna set gate gltf model on cloudmarker " + this.el.id);
+                  console.log("tryna set gate gltf model on cloudmarker " + '[id='+ this.el.id + ']');
                   this.el.setAttribute("gltf-model", "#gate2");
                   this.el.setAttribute("material", {color: "orange", transparent: true, opacity: .5});
                   // this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"placeholder", scaleFactor: this.data.scale});
