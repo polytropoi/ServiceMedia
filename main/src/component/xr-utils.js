@@ -49,20 +49,23 @@
           dependencies: ["raycaster"],
           init() {
             const sceneEl = this.el;
-            sceneEl.addEventListener('enter-vr', function () {
-              if (this.is('ar-mode')) {
-                message.textContent = '';
-                this.addEventListener('ar-hit-test-start', function () {
-                  message.innerHTML = `Scanning environment, finding surface.`
-                }, { once: true });
-                this.addEventListener('ar-hit-test-achieved', function () {
-                  message.innerHTML = `Select the location to place objects by tapping on the screen or selecting with your controller.`
-                }, { once: true });
-                this.addEventListener('ar-hit-test-select', function () {
-                  message.textContent = 'Object placed!';
-                }, { once: true });
-              }
-            });
+            let ar_overlayEl = document.getElementById("ar_overlay");
+            if (ar_overlayEl) {
+              sceneEl.addEventListener('enter-vr', function () {
+                if (this.is('ar-mode')) {
+                  ar_overlayEl.textContent = '';
+                  this.addEventListener('ar-hit-test-start', function () {
+                    ar_overlayEl.innerHTML = `Scanning environment, finding surface.`
+                  }, { once: true });
+                  this.addEventListener('ar-hit-test-achieved', function () {
+                    ar_overlayEl.innerHTML = `Select the location to place objects by tapping on the screen or selecting with your controller.`
+                  }, { once: true });
+                  this.addEventListener('ar-hit-test-select', function () {
+                    ar_overlayEl.textContent = 'Object placed!';
+                  }, { once: true });
+                }
+              });
+            }
           },
           onselect(e) {
             const frame = e.frame;
@@ -95,6 +98,7 @@
                 
                 // Emit click on the element for events
                 const details = this.el.components.raycaster.getIntersection(el);
+                console.log("cursor hit details " + JSON.stringify(details));
                 el.emit('click', details);
                 
                 // Don't go to the next element

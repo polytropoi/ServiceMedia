@@ -532,15 +532,15 @@ AFRAME.registerComponent('get_pos_rot', { //ATTACHED TO PLAYER BELOW CAMERA RIG,
 
 });
 
-AFRAME.registerComponent('listen-for-vr-mode', { //attached to cam entity, update the scene listener to cam position every tick
-  init: function () {
-    document.querySelector('a-scene').addEventListener('enter-vr', function () { //no matter what
-      // console.log("ENTERED VR");
-      let player = document.getElementById("player");
-      player.setAttribute("look-controls", {'hmdEnabled': true});
-    });
-  }
-}); //end register
+// AFRAME.registerComponent('listen-for-vr-mode', { //attached to cam entity, update the scene listener to cam position every tick
+//   init: function () {
+//     document.querySelector('a-scene').addEventListener('enter-vr', function () { //no matter what
+//       // console.log("ENTERED VR");
+//       let player = document.getElementById("player");
+//       player.setAttribute("look-controls", {'hmdEnabled': true});
+//     });
+//   }
+// }); //end register
 
 
 AFRAME.registerComponent('basic-link', {
