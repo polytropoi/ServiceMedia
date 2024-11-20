@@ -5377,12 +5377,14 @@ window.addEventListener("DOMContentLoaded", function() {
   sceneEl.addEventListener("enter-vr", function() {
     if (this.is("ar-mode")) {
       // Entered AR
-      message.textContent = "";
+      console.log("entered AR mode!");
+      message.textContent = "entered AR mode";
 
       // Hit testing is available
       this.addEventListener(
         "ar-hit-test-start",
         function() {
+          console.log("scanning for hit-test");
           message.innerHTML = `Scanning environment, finding surface.`;
         },
         { once: true }

@@ -86,9 +86,13 @@ AFRAME.registerComponent('mod_model', {
         if ((this.data.eventData && this.data.eventData.length && this.data.eventData.toLowerCase().includes("target")) || 
           this.data.tags && this.data.tags.length && this.data.tags.toLowerCase().includes("target")) {
           this.isTarget = true;
-          let elID = "[id=\x22"+ this.el.id + "\x22]";
-          this.el.sceneEl.setAttribute("ar-hit-test", {"target": elID});
-          console.log("hit test target is " + elID);
+          let arTarget = document.getElementById("ar_target");
+          if (arTarget) {
+            arTarget.appendChild(this.el);
+          }
+          // let elID = "[id=\x22"+ this.el.id + "\x22]";
+          // this.el.sceneEl.setAttribute("ar-hit-test", {"target": elID});
+          // console.log("hit test target is " + elID);
         }
         // if (this.data.description && this.data.description.length > 1) {
         //   // console.log("model eventData " + JSON.stringify(this.data.eventData));
@@ -374,8 +378,12 @@ AFRAME.registerComponent('mod_model', {
                 this.particlesEl = document.createElement("a-entity");
                 this.el.sceneEl.appendChild(this.particlesEl); //hrm...
                 this.el.classList.add("target");
-                this.el.classList.add("ar_target");
-                this.el.classList.remove("activeObjexRay");
+                // this.el.classList.add("ar_target");
+                // this.el.classList.remove("activeObjexRay");
+                let arTarget = document.getElementById("ar_target");
+                if (arTarget) {
+                  arTarget.appendChild(this.el);
+                }
             }
             // if (this.data.eventData.toLowerCase().includes("callout") && this.data.description && this.data.description != "") {
             // if (this.data.eventData.toLowerCase().includes("callout")) {

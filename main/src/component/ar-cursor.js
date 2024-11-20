@@ -11,6 +11,7 @@
         sceneEl.addEventListener("enter-vr", () => {
           if (sceneEl.is("ar-mode")) {
             sceneEl.xrSession.addEventListener("select", this.onselect.bind(this));
+            console.log("ar-cursor binding select");
           }
         });
       },
@@ -38,13 +39,14 @@
             }
           });
           if (elVisible) {
-            
+
             // Cancel the ar-hit-test behaviours
             this.el.components['ar-hit-test'].hitTest = null;
             this.el.components['ar-hit-test'].bboxMesh.visible = false;
             
             // Emit click on the element for events
             const details = this.el.components.raycaster.getIntersection(el);
+            console.log("hit test details " + JSON.stringify(details));
             el.emit('click', details);
             
             // Don't go to the next element

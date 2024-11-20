@@ -86,10 +86,10 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
       // let theID = "[id=\x22"+ this.el.id + "\x22]";
       // console.log("theID is " + "[id=\x22"+ this.el.id + "\x22]");
       // this.el.sceneEl.setAttribute("ar-hit-test", {"target": "[id=\x22"+ this.el.id + "\x22]"});
-      let arTarget = document.getElementById("ar-target");
-      if (arTarget) {
-        arTarget.appendChild(this.el);
-      }
+        let arTarget = document.getElementById("ar_target");
+        if (arTarget) {
+          arTarget.appendChild(this.el);
+        }
       
       }
       // if (this.data.markerType == "collider") {
