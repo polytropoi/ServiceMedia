@@ -1354,7 +1354,7 @@ background-color: #000000;
       border-top: 5px solid #ffffff55;
       color: white;
 } */
-#ar_overlay {
+#ar_overlay_message {
   position: absolute;
   left: 0;
   bottom: 0;
