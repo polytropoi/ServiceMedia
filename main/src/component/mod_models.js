@@ -88,7 +88,7 @@ AFRAME.registerComponent('mod_model', {
           this.isTarget = true;
           let elID = "[id=\x22"+ this.el.id + "\x22]";
           this.el.sceneEl.setAttribute("ar-hit-test", {"target": elID});
-          console.log("hit test target is " + elID)
+          console.log("hit test target is " + elID);
         }
         // if (this.data.description && this.data.description.length > 1) {
         //   // console.log("model eventData " + JSON.stringify(this.data.eventData));

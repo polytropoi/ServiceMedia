@@ -130,7 +130,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
       }
   
       console.log("CLOUDMARKER " + this.data.name + " " +this.data.markerType + " " + this.data.modelID );
-      this.el.removeAttribute("geometry"); //just in case?
+      // this.el.removeAttribute("geometry"); //just in case?
           
       if ((!this.data.modelID || this.data.modelID == undefined || this.data.modelID == "" || this.data.modelID == "none")) {//if no model def'd
           // && !this.data.modelID != "primitive_cube"
@@ -138,8 +138,9 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
           // && !this.data.modelID != "primitive_cylinder") 
           // {
             // console.log("CLOUDMARKER PLACEHOLDER GEO " + this.data.modelID);
-            // console.log("CLOUDMARKER " + this.data.markerType + " " + this.data.modelID );
+            // // console.log("CLOUDMARKER " + this.data.markerType + " " + this.data.modelID );
             if ((this.data.tags && !this.data.tags.includes("hide gizmo")) || (settings && !settings.hideGizmos)) {
+            //   if (this.data.markerType != "mailbox" && this.data.markerType != "light"  && this.data.markerType != "gate") {
                 if (this.data.markerType.toLowerCase() == "player") {
                   // this.el.removeAttribute("geometry");
                   this.el.setAttribute('gltf-model', '#poi1');
@@ -202,121 +203,124 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                 } else if (this.data.markerType == "3D text") {
                   console.log("tryna set 3D text!");
                   this.el.setAttribute("text_geometry", {value: this.data.description, font: '#optimerBoldFont'});
-                } else if (this.data.markerType == "light") {
-                  console.log("tryna set a light!");
+                } 
+              }
+            if (this.data.markerType == "light") {
+              console.log("tryna set a light!");
 
-                  // let color = "yellow";
-                  // this.el.classList.remove("activeObjexRay"); //too much clutter, no need on a cloud light
-                  
-                  let color1 = "yellow";
-                  let color2 = "white";
-                  let intensity = 1.25;
-                  let duration = 1500;
-                  if (this.data.tags.includes("color"))  {
-                    if (this.data.eventData.includes("~")) {
-                      color1 = this.data.eventData.split("~")[0];
-                      color2 = this.data.eventData.split("~")[1];
-                    } else {
-                      color1 = this.data.eventData;
-                    }
-                  }
-                  if (!this.data.tags.includes("hide")) {
-                    this.radius = this.data.xscale * .05;
-                    this.el.setAttribute("geometry", {"primitive": "sphere", "radius": this.radius});
-                    this.el.setAttribute("material", {color: color1, wireframe: true});
-                  }  
-                  let lighttype = "point";
-                  let markerLightShadow = true;
-                  if (this.data.tags.includes("spot")) {
-                    lighttype = "spot";
-                    markerLightShadow = false;
-                  } 
-                  if (this.data.tags.includes("ambient")) {
-                    lighttype = "ambient";
-                    markerLightShadow = false;
-
-                  }
-                  if (settings && settings.sceneColor3) {
-                    color1 = settings.sceneColor3;
-                  }
-                  if (settings && settings.sceneColor4) {
-                    color2 = settings.sceneColor4;
-                  }
-                  if (this.data.tags && (this.data.tags.includes("this") || this.data.tags.includes("event"))) {
-                    color1 = this.data.eventData;
-                  }
-                  if (this.data.tags && (this.data.tags.includes("dim"))) {
-                    intensity = .5;
-                  }
-                  if (this.data.tags && (this.data.tags.includes("bright"))) {
-                    intensity = 2;
-                  }
-                  if (this.data.tags && (this.data.tags.includes("very bright"))) {
-                    intensity = 5;
-                  }
-                  if (this.data.tags && (this.data.tags.includes("slow"))) {
-                    duration = 5000;
-                  }
-                  if (this.data.tags && (this.data.tags.includes("fast"))) {
-                    duration = 500;
-                  }
-
-                  if (this.data.tags.includes("candle")) {
-                    this.el.setAttribute("mod_particles", {type: "candle", color: color1, scale: this.data.xscale, addLight: true});
-                  } else if (this.data.tags.includes("fire")) {
-                    this.el.setAttribute("mod_particles", {type: "fire", color: color1, scale: this.data.xscale, addLight: true, intensity: intensity});
-                  } else {
-                    let markerLightShadow = true;
-                    let lighttype = "point";
-                    if (this.data.tags.includes("spot")) {
-                      lighttype = "spot";
-                      markerLightShadow = false;
-                    } 
-                    if (this.data.tags.includes("ambient")) {
-                      lighttype = "ambient";
-                      markerLightShadow = false;
-                    }
-                    if (this.data.tags.includes("ambient")) {
-                      lighttype = "ambient";
-                      markerLightShadow = false;
-                    }
-                    if (this.data.tags.includes("color"))  {
-                      if (this.data.eventData.includes("~")) {
-                        color1 = this.data.eventData.split("~")[0];
-                        color2 = this.data.eventData.split("~")[1];
-                      } else {
-                        color1 = this.data.eventData;
-                      }
-                    }
-                    this.el.setAttribute("light", {type: lighttype, intensity: intensity, distance: this.data.xscale * 4, castShadow: markerLightShadow, decay: this.data.xscale / 2, color: color1});
-                    if (this.data.tags && this.data.tags.includes("anim")) {
-                      this.el.setAttribute("animation__color", {property: 'light.color', from: color1, to: color2, dur: duration, easing: 'easeInOutSine', loop: true, dir: 'alternate', autoplay: true});
-                    } 
-                    if (this.data.tags && this.data.tags.includes("anim") && this.data.tags.includes("intensity")) {
-    
-                      this.el.setAttribute("animation__intensity", {property: 'light.intensity', from: intensity - intensity/2, to: intensity + intensity/2, dur: duration, easing: 'easeInOutSine', loop: true, dir: 'alternate', autoplay: true});
-                    } 
-                          
-                  }
-                  if (this.data.tags.includes("flicker")) {
-                    this.el.setAttribute("mod_flicker", {type: "candle"});
-                  }
-                  if (this.data.tags.includes("hide gizmo") || (settings && settings.hideGizmos)) {
-                    this.el.removeAttribute("geometry");
-                  } else {
-                    this.el.object3D.visible = true;
-                  }
-                  
-                }
+              // let color = "yellow";
+              // this.el.classList.remove("activeObjexRay"); //too much clutter, no need on a cloud light
               
-                if (this.data.tags.includes("hide") || this.data.tags.includes("highlight") || (settings && settings.hideGizmos)) {
-                  if (this.data.markerType != "mailbox" && this.data.markerType != "light" && this.data.markerType != "gate") {
-                    this.el.object3D.visible = false;
-                  }
+              let color1 = "yellow";
+              let color2 = "white";
+              let intensity = 1.25;
+              let duration = 1500;
+              if (this.data.tags.includes("color"))  {
+                if (this.data.eventData.includes("~")) {
+                  color1 = this.data.eventData.split("~")[0];
+                  color2 = this.data.eventData.split("~")[1];
                 } else {
-                  this.el.object3D.visible = true;
+                  color1 = this.data.eventData;
                 }
               }
+              if (!this.data.tags.includes("hide")) {
+                this.radius = this.data.xscale * .05;
+                this.el.setAttribute("geometry", {"primitive": "sphere", "radius": this.radius});
+                this.el.setAttribute("material", {color: color1, wireframe: true});
+              }  
+              let lighttype = "point";
+              let markerLightShadow = true;
+              if (this.data.tags.includes("spot")) {
+                lighttype = "spot";
+                markerLightShadow = false;
+              } 
+              if (this.data.tags.includes("ambient")) {
+                lighttype = "ambient";
+                markerLightShadow = false;
+
+              }
+              if (settings && settings.sceneColor3) {
+                color1 = settings.sceneColor3;
+              }
+              if (settings && settings.sceneColor4) {
+                color2 = settings.sceneColor4;
+              }
+              if (this.data.tags && (this.data.tags.includes("this") || this.data.tags.includes("event"))) {
+                color1 = this.data.eventData;
+              }
+              if (this.data.tags && (this.data.tags.includes("dim"))) {
+                intensity = .5;
+              }
+              if (this.data.tags && (this.data.tags.includes("bright"))) {
+                intensity = 2;
+              }
+              if (this.data.tags && (this.data.tags.includes("very bright"))) {
+                intensity = 5;
+              }
+              if (this.data.tags && (this.data.tags.includes("slow"))) {
+                duration = 5000;
+              }
+              if (this.data.tags && (this.data.tags.includes("fast"))) {
+                duration = 500;
+              }
+
+              if (this.data.tags.includes("candle")) {
+                this.el.setAttribute("mod_particles", {type: "candle", color: color1, scale: this.data.xscale, addLight: true});
+              } else if (this.data.tags.includes("fire")) {
+                this.el.setAttribute("mod_particles", {type: "fire", color: color1, scale: this.data.xscale, addLight: true, intensity: intensity});
+              } else {
+                let markerLightShadow = true;
+                let lighttype = "point";
+                if (this.data.tags.includes("spot")) {
+                  lighttype = "spot";
+                  markerLightShadow = false;
+                } 
+                if (this.data.tags.includes("ambient")) {
+                  lighttype = "ambient";
+                  markerLightShadow = false;
+                }
+                if (this.data.tags.includes("ambient")) {
+                  lighttype = "ambient";
+                  markerLightShadow = false;
+                }
+                if (this.data.tags.includes("color"))  {
+                  if (this.data.eventData.includes("~")) {
+                    color1 = this.data.eventData.split("~")[0];
+                    color2 = this.data.eventData.split("~")[1];
+                  } else {
+                    color1 = this.data.eventData;
+                  }
+                }
+                this.el.setAttribute("light", {type: lighttype, intensity: intensity, distance: this.data.xscale * 4, castShadow: markerLightShadow, decay: this.data.xscale / 2, color: color1});
+                if (this.data.tags && this.data.tags.includes("anim")) {
+                  this.el.setAttribute("animation__color", {property: 'light.color', from: color1, to: color2, dur: duration, easing: 'easeInOutSine', loop: true, dir: 'alternate', autoplay: true});
+                } 
+                if (this.data.tags && this.data.tags.includes("anim") && this.data.tags.includes("intensity")) {
+
+                  this.el.setAttribute("animation__intensity", {property: 'light.intensity', from: intensity - intensity/2, to: intensity + intensity/2, dur: duration, easing: 'easeInOutSine', loop: true, dir: 'alternate', autoplay: true});
+                } 
+                      
+              }
+              if (this.data.tags.includes("flicker")) {
+                this.el.setAttribute("mod_flicker", {type: "candle"});
+              }
+              if (this.data.tags.includes("hide gizmo") || (settings && settings.hideGizmos)) {
+                this.el.removeAttribute("geometry");
+              } else {
+                this.el.object3D.visible = true;
+              }
+              
+            }
+          
+            if (this.data.tags.includes("hide") || this.data.tags.includes("highlight") || (settings && settings.hideGizmos)) {
+              if (this.data.markerType != "mailbox" && this.data.markerType != "light" && this.data.markerType != "gate") {
+                this.el.object3D.visible = false;
+              }
+            } else {
+              this.el.object3D.visible = true;
+            }
+            //   }
+            // }
           } else {
             if (this.data.modelID != "none") {
               if (this.data.modelID.toString().includes("primitive")) {   
@@ -1466,64 +1470,68 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
         } else { //if "none"
             console.log("CLOUDMARKER type " + this.data.markerType+ " tryna set default model " + modelID);
             if ((this.data.tags && !this.data.tags.includes("hide gizmo")) || (settings && !settings.hideGizmos)) {
-              if (this.data.markerType.toLowerCase() == "player") {
-                this.el.removeAttribute("geometry");
-                this.el.setAttribute('gltf-model', '#poi1');
-                this.el.setAttribute("material", {color: "lime", transparent: true, opacity: .5});
-              }
-              if (this.data.markerType.toLowerCase() == "placeholder") {
-                  this.el.setAttribute("gltf-model", "#poi1");
-                  this.el.setAttribute("material", {color: "yellow", transparent: true, opacity: .5});
+                // if (this.data.markerType != "mailbox" && this.data.markerType != "light"  && this.data.markerType != "gate") {
+                  if (this.data.markerType.toLowerCase() == "player") {
+                    this.el.removeAttribute("geometry");
+                    this.el.setAttribute('gltf-model', '#poi1');
+                    this.el.setAttribute("material", {color: "lime", transparent: true, opacity: .5});
+                  }
+                  if (this.data.markerType.toLowerCase() == "placeholder") {
+                      this.el.setAttribute("gltf-model", "#poi1");
+                      this.el.setAttribute("material", {color: "yellow", transparent: true, opacity: .5});
+                      
+                  } else if (this.data.markerType.toLowerCase() == "poi") {
+                      this.el.setAttribute("gltf-model", "#poi1");
+                      this.el.setAttribute("material", {color: "purple", transparent: true, opacity: .5});
+                      // this.el.setAttribute("color", "purple");
+                  } else if (this.data.markerType.toLowerCase() == "waypoint") {
+                    // if (settings && !settings.hideGizmos) {
+                      this.el.setAttribute("gltf-model", "#poi1");
+                      this.el.setAttribute("material", {color: "green", transparent: true, opacity: .5});
+                    // }
+                      // this.el.setAttribute("color", "purple");
+                  } else if (this.data.markerType.toLowerCase() == "curve point") {
+                    this.el.setAttribute("gltf-model", "#poi1");
+                    this.el.setAttribute("material", {color: "blue", transparent: true, opacity: .5});
+                  } else if (this.data.markerType.toLowerCase ==  "trigger") {
+                    // this.el.setAttribute("gltf-model", "#poi1");
+                    this.el.setAttribute("obb-collider", {size: '1 1 1'});
+                    this.el.setAttribute("material", {color: "LightSalmon", transparent: true, opacity: .5});
+                    // this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"placeholder", scaleFactor: this.data.scale});
+                    
+                  } else if (this.data.markerType.toLowerCase().includes("object")) {
+                      this.el.setAttribute("gltf-model", "#poi1");
+                      this.el.setAttribute("material", {color: "salmon", transparent: true, opacity: .5});
+                                      
+                  } else if (this.data.markerType.toLowerCase() == "gate") {
+                      console.log("tryna set gate gltf model on cloudmarker " + '[id='+ this.el.id + ']');
+                      this.el.setAttribute("gltf-model", "#gate2");
+                      this.el.setAttribute("material", {color: "orange", transparent: true, opacity: .5});
+                      // this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"placeholder", scaleFactor: this.data.scale});
+                      this.el.setAttribute("obb-collider", {"centerModel": false, "size": this.data.xscale * 3 + " " + this.data.yscale * 5 + " " + this.data.zscale * 3});
+                      // this.el.setAttribute("color", "orange");
+                  } else if (this.data.markerType.toLowerCase() == "link") {
+                    this.el.setAttribute("gltf-model", "#links");
+                    this.el.setAttribute("material", {color: "aqua", transparent: true, opacity: .5});
+                  } else if (this.data.markerType.toLowerCase() == "text") {
+                    this.el.setAttribute("gltf-model", "#texticon");
+                    this.el.setAttribute("material", {color: "black", transparent: true, opacity: .5});
                   
-              } else if (this.data.markerType.toLowerCase() == "poi") {
-                  this.el.setAttribute("gltf-model", "#poi1");
-                  this.el.setAttribute("material", {color: "purple", transparent: true, opacity: .5});
-                  // this.el.setAttribute("color", "purple");
-              } else if (this.data.markerType.toLowerCase() == "waypoint") {
-                // if (settings && !settings.hideGizmos) {
-                  this.el.setAttribute("gltf-model", "#poi1");
-                  this.el.setAttribute("material", {color: "green", transparent: true, opacity: .5});
-                // }
-                  // this.el.setAttribute("color", "purple");
-              } else if (this.data.markerType.toLowerCase() == "curve point") {
-                this.el.setAttribute("gltf-model", "#poi1");
-                this.el.setAttribute("material", {color: "blue", transparent: true, opacity: .5});
-              } else if (this.data.markerType.toLowerCase ==  "trigger") {
-                // this.el.setAttribute("gltf-model", "#poi1");
-                this.el.setAttribute("obb-collider", {size: '1 1 1'});
-                this.el.setAttribute("material", {color: "LightSalmon", transparent: true, opacity: .5});
-                // this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"placeholder", scaleFactor: this.data.scale});
-                
-              } else if (this.data.markerType.toLowerCase().includes("object")) {
-                  this.el.setAttribute("gltf-model", "#poi1");
-                  this.el.setAttribute("material", {color: "salmon", transparent: true, opacity: .5});
-                                  
-              } else if (this.data.markerType.toLowerCase() == "gate") {
-                  console.log("tryna set gate gltf model on cloudmarker " + '[id='+ this.el.id + ']');
-                  this.el.setAttribute("gltf-model", "#gate2");
-                  this.el.setAttribute("material", {color: "orange", transparent: true, opacity: .5});
-                  // this.el.setAttribute("mod_physics", {body: "kinematic", isTrigger: true, model:"placeholder", scaleFactor: this.data.scale});
-                  this.el.setAttribute("obb-collider", {"centerModel": false, "size": this.data.xscale * 3 + " " + this.data.yscale * 5 + " " + this.data.zscale * 3});
-                  // this.el.setAttribute("color", "orange");
-              } else if (this.data.markerType.toLowerCase() == "link") {
-                this.el.setAttribute("gltf-model", "#links");
-                this.el.setAttribute("material", {color: "aqua", transparent: true, opacity: .5});
-              } else if (this.data.markerType.toLowerCase() == "text") {
-                this.el.setAttribute("gltf-model", "#texticon");
-                this.el.setAttribute("material", {color: "black", transparent: true, opacity: .5});
-              
-              } else if (this.data.markerType.toLowerCase() == "portal") {
-                  this.el.setAttribute("gltf-model", "#poi1");
-                  this.el.setAttribute("material", {color: "aqua", transparent: true, opacity: .5});
+                  } else if (this.data.markerType.toLowerCase() == "portal") {
+                      this.el.setAttribute("gltf-model", "#poi1");
+                      this.el.setAttribute("material", {color: "aqua", transparent: true, opacity: .5});
+                  }
+                } 
               }
-            } 
-            
-            if (this.data.markerType.toLowerCase() == "mailbox") {
-                this.el.setAttribute("gltf-model", "#mailbox");
-            } else if (this.data.markerType == "3D text") {
-                console.log("tryna set 3D text!");
-                this.el.setAttribute("text-geometry", {value: this.data.description, font: '#optimerBoldFont'});
-            } else if (this.data.markerType == "light") {
+              
+              if (this.data.markerType.toLowerCase() == "mailbox") {
+                  this.el.setAttribute("gltf-model", "#mailbox");
+              } else if (this.data.markerType == "3D text") {
+                  console.log("tryna set 3D text!");
+                  this.el.setAttribute("text-geometry", {value: this.data.description, font: '#optimerBoldFont'});
+              } 
+            // }
+          if (this.data.markerType == "light") {
               console.log("tryna set a light!");
 
               // let color = "yellow";
@@ -1611,7 +1619,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
               } else {
                 this.el.object3D.visible = true;
               }    
-            }
+          }
          
 
           if (this.data.tags && this.data.tags.includes("hide gizmo") ||  this.data.tags.includes("highlight") || (settings && settings.hideGizmos)) {
@@ -1626,7 +1634,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
               this.el.object3D.visible = false;
             } 
           }
-        }
+        // }
         this.updateMaterials();
 
         // this.el.setAttribute("scale", this.data.xscale + " " + this.data.yscale + " " + this.data.zscale);
