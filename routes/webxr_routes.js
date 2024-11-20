@@ -4454,9 +4454,9 @@ webxr_router.get('/:_id', function (req, res) {
                     if (sceneResponse.sceneWebType == undefined || sceneResponse.sceneWebType.toLowerCase() == "default" || sceneResponse.sceneWebType.toLowerCase() == "aframe") { 
                         // webxrFeatures = "webxr=\x22optionalFeatures: hit-test, local-floor\x22"; //otherwise hit-test breaks everythign!
                         // webxrFeatures = "webxr=\x22requiredFeatures: hit-test,local-floor; optionalFeatures: dom-overlay,unbounded; overlayElement: #ar_overlay;\x22 ar-hit-test=\x22target: .ar_target\x22"; //otherwise hit-test breaks everythign!
-                        webxrFeatures = "webxr=\x22requiredFeatures: local-floor; optionalFeatures: hit-test,dom-overlay,unbounded; overlayElement: #ar_overlay;\x22 ar-hit-test=\x22target: #ar_target\x22"; //otherwise hit-test breaks everythign!
-                        
-                        // arHitTest = "ar-hit-test-spawn=\x22mode: "+arMode+"\x22";
+                        webxrFeatures = " webxr=\x22requiredFeatures: dom-overlay; optionalFeatures: hit-test; overlayElement: #ar_overlay;\x22 ar-hit-test=\x22enabled: true; target: #ar_target;\x22 "; //otherwise hit-test breaks everythign!
+                        // requiredFeatures: hit-test,local-floor; optionalFeatures: dom-overlay,unbounded; overlayElement: #ar_overlay;"
+                        // // arHitTest = "ar-hit-test-spawn=\x22mode: "+arMode+"\x22";
                         // arShadowPlane = "<a-plane show-in-ar-mode id="shadow-plane" material="shader:shadow" shadow="cast:false;" visible=\x22false\x22 height=\x2210\x22 width=\x2210\x22 rotation=\x22-90 0 0\x22 shadow=\x22receive:true\x22 ar-shadows=\x22opacity: 0.3\x22 static-body=\x22shape: none\x22 shape__main=\x22shape: box; halfExtents: 100 100 0.125; offset: 0 0 -0.125\x22>" +
                         // arShadowPlane = "<a-plane show-in-ar-mode visible=\x22false\x22 id=\x22shadow-plane\x22 material=\x22shader:shadow\x22 shadow=\x22cast:false;\x22 follow-shadow=\x22.activeObjexRay\x22 height=\x2233\x22 width=\x2233\x22 rotation=\x22-90 0 0\x22>" +
                         //     "</a-plane>";
@@ -4968,10 +4968,10 @@ webxr_router.get('/:_id', function (req, res) {
                         // "screen-controls shadow " + xrmode + " " + magicWindow + " " +  
                         // webxrFeatures + " loading-screen=\x22dotsColor: white; backgroundColor: black; enabled: false\x22 " + fogSettings + " "+networkedscene+" "+ARSceneArg+" listen-for-vr-mode " + defaultLights +">";
 
-                        let aScene = "<a-scene "+sceneBackground+" "+physicsInsert+" "+pool_target+" "+pool_launcher+" gesture-detector " + aframeRenderSettings +
+                        let aScene = "<a-scene "+webxrFeatures+" "+sceneBackground+" "+physicsInsert+" "+pool_target+" "+pool_launcher+" gesture-detector " + aframeRenderSettings +
                         " reflection=\x22directionalLight:#real-light\x22 "+sceneShadows+" raycaster=\x22objects: .activeObjexRay a-sphere\x22 "+
                         "screen-controls shadow " + xrmode + " " + magicWindow + " " + obbDebug + " " +
-                        webxrFeatures + " loading-screen=\x22dotsColor: white; backgroundColor: black; enabled: false\x22 " + fogSettings + " "+networkedscene+" "+ARSceneArg+" ar-cursor " + defaultLights +">";
+                        "loading-screen=\x22dotsColor: white; backgroundColor: black; enabled: false\x22 " + fogSettings + " "+networkedscene+" "+ARSceneArg+" ar-cursor " + defaultLights +">";
 
                            // "screen-controls xr-mode-ui=\x22enterVREnabled: true; enterAREnabled: true; XRMode: ar,vr\x22 " + magicWindow +   
                         // " keyboard-shortcuts=\x22enterVR: false\x22" +  //add screen-controls from initializer                      
