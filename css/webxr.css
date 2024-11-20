@@ -1337,14 +1337,14 @@ background-color: #000000;
  }
 
 
- #ar_overlay {
+ /* #ar_overlay {
   display: none;
-}
+} */
 /* Show the DOM Overlay element while active (:xr-overlay pseudoclass) */
-#ar_overlay:xr-overlay {
+/* #ar_overlay:xr-overlay {
   display: initial;
-}
-#ar_message {
+} */
+/* #ar_message {
   position: absolute;
       left: 0;
       bottom: 0;
@@ -1353,7 +1353,29 @@ background-color: #000000;
       background: #33333355;
       border-top: 5px solid #ffffff55;
       color: white;
+} */
+#ar_overlay {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  padding: 1em;
+  background: #33333355;
+  border-top: 5px solid #ffffff55;
+  color: white;
 }
+
+.a-dom-overlay button {
+  padding: 1em;
+  appearance: none;
+  background: #00000055;
+  border: 3px solid white;
+  border-radius: 1em;
+  margin: 1em 1em 0 0;
+  color: white;
+}
+
+
 #exit_ar {
   position: absolute;
   right: 40px;

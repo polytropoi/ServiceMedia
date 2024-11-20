@@ -51,18 +51,18 @@
             const sceneEl = this.el;
 
               sceneEl.addEventListener('enter-vr', function () {
-                if (this.is('ar-mode')) {
-                  this.xrSession.addEventListener("select", this.onselect.bind(this));
+                if (sceneEl.is('ar-mode')) {
+                  sceneEl.xrSession.addEventListener("select", this.onselect.bind(this));
                   let ar_overlayEl = document.getElementById("ar_overlay");
                   if (ar_overlayEl) {
                     ar_overlayEl.textContent = '';
-                    this.addEventListener('ar-hit-test-start', function () {
+                    sceneEl.addEventListener('ar-hit-test-start', function () {
                       ar_overlayEl.innerHTML = `Scanning environment, finding surface.`
                     }, { once: true });
-                    this.addEventListener('ar-hit-test-achieved', function () {
+                    sceneEl.addEventListener('ar-hit-test-achieved', function () {
                       ar_overlayEl.innerHTML = `Select the location to place objects by tapping on the screen or selecting with your controller.`
                     }, { once: true });
-                    this.addEventListener('ar-hit-test-select', function () {
+                    sceneEl.addEventListener('ar-hit-test-select', function () {
                       ar_overlayEl.textContent = 'Object placed!';
                     }, { once: true });
                   }
