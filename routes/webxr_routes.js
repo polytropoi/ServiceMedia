@@ -555,10 +555,10 @@ webxr_router.get('/:_id', function (req, res) {
     let logScripts = "";
     enviromentScript = ""; //for aframe env component
     
-    // let aframeScriptVersion = "<script src=\x22https://aframe.io/releases/1.3.0/aframe.min.js\x22></script>";
-    // let aframeScriptVersion = "<script src=\x22https://cdn.jsdelivr.net/npm/aframe@1.4.2/dist/aframe-master.min.js\x22></script>";
-    let aframeScriptVersion = "<script src=\x22https://aframe.io/releases/1.6.0/aframe.min.js\x22></script>";
-
+    // let aframeScript = "<script src=\x22https://aframe.io/releases/1.3.0/aframe.min.js\x22></script>";
+    // let aframeScript = "<script src=\x22https://cdn.jsdelivr.net/npm/aframe@1.4.2/dist/aframe-master.min.js\x22></script>";
+    let aframeScript = "<script src=\x22https://aframe.io/releases/1.6.0/aframe.min.js\x22></script>";
+    let threejsVersion = "164";
     let surfaceScatterScript = "";
     let locationData = "";
     let modelData = "";
@@ -781,14 +781,15 @@ webxr_router.get('/:_id', function (req, res) {
                             synthScripts = "<script src=\x22../main/src/synth/Tone.js\x22></script><script src=\x22../main/js/synth.js\x22></script>";
                         }
                         if (sceneData.sceneTags[i].toLowerCase().includes("aframe 1.2")) {
-                            aframeScriptVersion = "<script src=\x22https://aframe.io/releases/1.2.0/aframe.min.js\x22></script>";
+                            aframeScript = "<script src=\x22https://aframe.io/releases/1.2.0/aframe.min.js\x22></script>";
                         }
                         if (sceneData.sceneTags[i].toLowerCase().includes("aframe master")) {
-                            // aframeScriptVersion = "<script src=\x22https://cdn.jsdelivr.net/gh/aframevr/aframe@744e2b869e281f840cff7d9cb02e95750ce90920/dist/aframe-master.min.js\x22></script>"; //ref 20220715// nope!
-                            aframeScriptVersion = "<script src=\x22https://cdn.jsdelivr.net/gh/aframevr/aframe@86d847fa80dcaa1c7306a93890000d5bb3183416/dist/aframe-master.min.js\x22></script>"; //ref 20231103 (integrated hands!)
+                            // aframeScript = "<script src=\x22https://cdn.jsdelivr.net/gh/aframevr/aframe@744e2b869e281f840cff7d9cb02e95750ce90920/dist/aframe-master.min.js\x22></script>"; //ref 20220715// nope!
+                            aframeScript = "<script src=\x22https://cdn.jsdelivr.net/gh/aframevr/aframe@4ba8c7f1d49c7083b52f273c3c8185587656d7a0/dist/aframe-master.min.js\x22></script>"; //ref 20231103 (integrated hands!)
+                            threejsVersion = "170";
                         }
                         if (sceneData.sceneTags[i].toLowerCase().includes("aframe ada")) {
-                            aframeScriptVersion = "<script src=\x22https://a-cursor-test.glitch.me/aframe-master.js\x22></script>"; //mod by @adarosecannon
+                            aframeScript = "<script src=\x22https://a-cursor-test.glitch.me/aframe-master.js\x22></script>"; //mod by @adarosecannon
                         }
                         if (sceneData.sceneTags[i].toLowerCase().includes("starterkit")) {
 
@@ -4453,7 +4454,7 @@ webxr_router.get('/:_id', function (req, res) {
                     console.log("sceneWebType: "+ sceneResponse.sceneWebType);
                     if (sceneResponse.sceneWebType == undefined || sceneResponse.sceneWebType.toLowerCase() == "default" || sceneResponse.sceneWebType.toLowerCase() == "aframe") { 
                         // webxrFeatures = "webxr=\x22optionalFeatures: hit-test, local-floor\x22"; //otherwise hit-test breaks everythign!
-                        webxrFeatures = "webxr=\x22requiredFeatures: hit-test,local-floor; optionalFeatures: dom-overlay,unbounded; overlayElement: #ar_overlay;\x22 ar-hit-test=\x22target: #ar_target;\x22"; //otherwise hit-test breaks everythign!
+                        webxrFeatures = "webxr=\x22overlayElement: #ar_overlay;\x22 ar-hit-test=\x22target: #ar_target;\x22"; //otherwise hit-test breaks everythign!
                         // webxrFeatures = " webxr=\x22requiredFeatures: dom-overlay; optionalFeatures: hit-test; overlayElement: #ar_overlay;\x22 ar-hit-test=\x22enabled: true; target: #ar_target;\x22 "; //otherwise hit-test breaks everythign!
                         // requiredFeatures: hit-test,local-floor; optionalFeatures: dom-overlay,unbounded; overlayElement: #ar_overlay;"
                         // // arHitTest = "ar-hit-test-spawn=\x22mode: "+arMode+"\x22";
@@ -4644,7 +4645,7 @@ webxr_router.get('/:_id', function (req, res) {
                         "<div id=\x22token\x22 data-token=\x22"+token+"\x22></div>\n"+
                         settingsData +
                         sceneTimedEventsData +
-                        // aframeScriptVersion + 
+                        // aframeScript + 
                         // extraScripts + 
                         // contentUtils +
                         hlsScript +
@@ -4765,7 +4766,7 @@ webxr_router.get('/:_id', function (req, res) {
 
                         settingsData +
                         sceneTimedEventsData +
-                        aframeScriptVersion + 
+                        aframeScript + 
                         modObjex +
                         modModels +
                         extraScripts + 
@@ -5038,8 +5039,8 @@ webxr_router.get('/:_id', function (req, res) {
                             // "\x22three/addons/\x22: \x22https://unpkg.com/browse/three@0.164.0/examples/jsm/\x22"+
 
                                                         
-                            "\x22three\x22: \x22https://unpkg.com/three@0.164.0/build/three.module.js\x22,"+
-                            "\x22three/addons/\x22: \x22https://unpkg.com/three@0.164.0/examples/jsm/\x22"+
+                            "\x22three\x22: \x22https://unpkg.com/three@0."+threejsVersion+".0/build/three.module.js\x22,"+
+                            "\x22three/addons/\x22: \x22https://unpkg.com/three@0."+threejsVersion+".0/examples/jsm/\x22"+
                             // https://unpkg.com/three@0.164.0/examples/jsm/controls/TransformControls.js
                             // "\x22three\x22: \x22https://cdn.jsdelivr.net/npm/three@0.164.0/build/three.module.js\x22,"+
                             // "\x22three/addons/\x22: \x22https://cdn.jsdelivr.net/npm/three@0.164.0/examples/jsm/\x22"+
@@ -5062,7 +5063,7 @@ webxr_router.get('/:_id', function (req, res) {
                         "<script src=\x22/connect/connect.js\x22 defer=\x22defer\x22></script>" +
                         // "<script src=\x22/connect/files.js\x22 defer=\x22defer\x22></script>" +
                         
-                        aframeScriptVersion +
+                        aframeScript +
                         "<script src=\x22../main/src/component/aframe-troika-text.min.js\x22 defer=\x22defer\x22></script>"+
                         physicsScripts +
                         logScripts +

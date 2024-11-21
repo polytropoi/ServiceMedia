@@ -73,24 +73,30 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
         this.el.classList.add("allowMods");
       }
       if ((this.data.eventData && this.data.eventData.length && this.data.eventData.toLowerCase().includes("anchored")) || 
-      this.data.tags && this.data.tags.length && this.data.tags.toLowerCase().includes("anchored")) {
+        this.data.tags && this.data.tags.length && this.data.tags.toLowerCase().includes("anchored")) {
         this.el.setAttribute("anchored");
       }   
       if ((this.data.eventData && this.data.eventData.length && this.data.eventData.toLowerCase().includes("grabbable")) || 
-      this.data.tags && this.data.tags.length && this.data.tags.toLowerCase().includes("grabbable")) {
+        this.data.tags && this.data.tags.length && this.data.tags.toLowerCase().includes("grabbable")) {
         this.el.setAttribute("grabbable");
       }   
       if ((this.data.eventData && this.data.eventData.length && this.data.eventData.toLowerCase().includes("target")) || 
       this.data.tags && this.data.tags.length && this.data.tags.toLowerCase().includes("target")) {
-      // this.isTarget = true;
-      // let theID = "[id=\x22"+ this.el.id + "\x22]";
-      // console.log("theID is " + "[id=\x22"+ this.el.id + "\x22]");
-      // this.el.sceneEl.setAttribute("ar-hit-test", {"target": "[id=\x22"+ this.el.id + "\x22]"});
+        this.isTarget = true;
+        this.el.classList.add("target");
+
+      }
+      if ((this.data.eventData && this.data.eventData.length && this.data.eventData.toLowerCase().includes("ar_target")) || 
+        this.data.tags && this.data.tags.length && this.data.tags.toLowerCase().includes("ar_target")) {
+        // this.isTarget = true;
+        this.el.classList.add("ar_target");
         let arTarget = document.getElementById("ar_target");
         if (arTarget) {
           arTarget.appendChild(this.el);
         }
-      
+              // let theID = "[id=\x22"+ this.el.id + "\x22]";
+      // console.log("theID is " + "[id=\x22"+ this.el.id + "\x22]");
+      // this.el.sceneEl.setAttribute("ar-hit-test", {"target": "[id=\x22"+ this.el.id + "\x22]"});
       }
       // if (this.data.markerType == "collider") {
       //   this.data.modelID = "primitive_cube";

@@ -825,7 +825,11 @@ AFRAME.registerComponent('mod_object', {
       if ((this.data.eventData && this.data.eventData.length && this.data.eventData.toLowerCase().includes("target")) || 
         this.data.tags && this.data.tags.length && this.data.tags.toLowerCase().includes("target")) {
         // this.isTarget = true;
-        this.el.sceneEl.setAttribute("ar-hit-test", {"target": "[id=\x22"+ this.el.id + "\x22]"});
+        // this.el.sceneEl.setAttribute("ar-hit-test", {"target": "[id=\x22"+ this.el.id + "\x22]"});
+        let arTarget = document.getElementById("ar_target");
+        if (arTarget) {
+          arTarget.appendChild(this.el);
+        }
       }
       if (this.data.objectData.triggerScale == undefined || this.data.objectData.triggerScale == null || this.data.objectData.triggerScale == "" || this.data.objectData.triggerScale == 0) {
         this.data.objectData.triggerScale = 1;
@@ -1258,7 +1262,12 @@ AFRAME.registerComponent('mod_object', {
             if (this.data.eventData.toLowerCase().includes("target") || (this.data.tags && this.data.tags.includes("target"))) {
               // this.el.id = "target_object";
               this.el.classList.add("target");
-              // this.el.classList.add("ar_target");
+            
+            }
+            if (this.data.eventData.toLowerCase().includes("ar target") || (this.data.tags && this.data.tags.includes("ar target"))) {
+              // this.el.id = "target_object";
+              this.el.classList.add("ar_target");
+
               let arTarget = document.getElementById("ar_target");
               if (arTarget) {
                 arTarget.appendChild(this.el);
