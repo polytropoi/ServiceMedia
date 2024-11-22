@@ -1596,9 +1596,10 @@ app.post("/return_traffic_old", requiredAuthentication, function (req, res) {
     })
 });
 
-app.post("/return_traffic", requiredAuthentication, function (req, res) {    
+// app.post("/return_traffic", requiredAuthentication, function (req, res) {    
+app.post("/return_traffic", function (req, res) {    //umm, need to limit scope below if no auth?
     // let trafficDataMod = [];
-    console.log("return traffic data " + JSON.stringify(req.body));
+    // console.log("return traffic data " + JSON.stringify(req.body));
     let query = {};
     let startpoint = req.body.startpoint;
     let appdomain = req.body.appdomain != null ? req.body.appdomain.toString() : null;

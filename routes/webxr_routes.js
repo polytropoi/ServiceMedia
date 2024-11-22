@@ -785,7 +785,7 @@ webxr_router.get('/:_id', function (req, res) {
                         }
                         if (sceneData.sceneTags[i].toLowerCase().includes("aframe master")) {
                             // aframeScript = "<script src=\x22https://cdn.jsdelivr.net/gh/aframevr/aframe@744e2b869e281f840cff7d9cb02e95750ce90920/dist/aframe-master.min.js\x22></script>"; //ref 20220715// nope!
-                            aframeScript = "<script src=\x22https://cdn.jsdelivr.net/gh/aframevr/aframe@4ba8c7f1d49c7083b52f273c3c8185587656d7a0/dist/aframe-master.min.js\x22></script>"; //ref 20231103 (integrated hands!)
+                            aframeScript = "<script src=\x22https://cdn.jsdelivr.net/gh/aframevr/aframe@e3192da8b5ef5a1bba6efa7cd2bff6808b64bb18/dist/aframe-master.min.js\x22></script>"; //ref 20231103 (integrated hands!)
                             threejsVersion = "170";
                         }
                         if (sceneData.sceneTags[i].toLowerCase().includes("aframe ada")) {
@@ -4464,7 +4464,8 @@ webxr_router.get('/:_id', function (req, res) {
                         arElements = "<a-entity material=\x22shader:shadow; depthWrite:false; opacity:0.9;\x22 visible=\x22false\x22 geometry=\x22primitive:shadow-plane;\x22 shadow=\x22cast:false;receive:true;\x22"+
                                     "ar-shadow-helper=\x22target:#my-objects;light:#dirlight;\x22></a-entity>"+
                                     "<a-entity hide-on-hit-test-start shadow id=\x22ar_target\x22 scale=\x220.2 0.2 0.2\x22 position=\x220.2 0 -0.4\x22><a-box show-in-ar-mode visible=\x22false\x22></a-box></a-entity>"+
-                                    "<a-entity show-in-ar-mode visible=\x22false\x22 id=\x22reticleEntity\x22 gltf-model=\x22#reticle2\x22 scale=\x220.8 0.8 0.8\x22 ar-hit-test-spawn=\x22mode: "+arMode+"\x22></a-entity>\n";
+                                    // "<a-entity show-in-ar-mode visible=\x22false\x22 id=\x22reticleEntity\x22 gltf-model=\x22#reticle2\x22 scale=\x220.8 0.8 0.8\x22 ar-hit-test-spawn=\x22mode: "+arMode+"\x22></a-entity>\n";
+                                    "<a-entity show-in-ar-mode visible=\x22false\x22 id=\x22reticleEntity\x22 gltf-model=\x22#reticle2\x22 scale=\x220.8 0.8 0.8\x22></a-entity>\n";
                         // }
                         handsTemplate = "<template id=\x22hand-template\x22><a-entity><a-box scale=\x220.1 0.1 0.1\x22 visible=false></a-box></a-entity></template>";
                        

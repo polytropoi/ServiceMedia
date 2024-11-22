@@ -81,7 +81,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
         this.el.setAttribute("grabbable");
       }   
       if ((this.data.eventData && this.data.eventData.length && this.data.eventData.toLowerCase().includes("target")) || 
-      this.data.tags && this.data.tags.length && this.data.tags.toLowerCase().includes("target")) {
+        this.data.tags && this.data.tags.length && this.data.tags.toLowerCase().includes("target")) {
         this.isTarget = true;
         this.el.classList.add("target");
 
@@ -473,7 +473,8 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
         this.mousePos = new THREE.Vector2();
         this.distance = 0;
   
-        if (!this.data.tags.includes("hide callout") && !this.data.tags.includes("hide callout")) {
+        if (!this.data.tags.includes("hide callout") && !this.data.tags.includes("hide callout") &&
+            (settings && !settings.sceneTags.includes("aframe master"))) {
        
             if (settings && settings.sceneCameraMode == "Third Person") {
               this.calloutEntity.setAttribute("look-at", "#thirdPersonCamera");

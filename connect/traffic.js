@@ -36,6 +36,7 @@ function getTraffic(appdomain, days, id) { //arg if not domain_admin
         let tArr = response.data;
         let resp = {};
         ////////////////////////////////////////////////////////////date math for line chart
+        console.log("trafficData: " + JSON.stringify(tArr));
         let datetimeStart = new Date(tArr[0].timestamp).toISOString();
         console.log(datetimeStart);
         let dateStartSplit = datetimeStart.substring(0, 10).split("-");
