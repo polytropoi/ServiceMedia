@@ -4446,23 +4446,25 @@ webxr_router.get('/:_id', function (req, res) {
                     let aframeRenderSettings = "renderer=\x22antialias: auto; exposure: .1; colorManagement: true; sortTransparentObjects: true; maxCanvasWidth: 1920; maxCanvasHeight: 1920;\x22";
                     // let aframeRenderSettings = "renderer=\x22exposure: 2\x22";
                    
-                    if (arMode == "spawn") {
-                        arHitTest = "<a-entity show-in-ar-mode visible=\x22false\x22 id=\x22reticleEntity\x22 gltf-model=\x22#reticle2\x22 scale=\x220.8 0.8 0.8\x22 ar-hit-test-spawn=\x22mode: "+arMode+"\x22></a-entity>\n"; //for ar spawning...
-                    }
+                    // if (arMode == "spawn") {
+                    //     arHitTest = "<a-entity show-in-ar-mode visible=\x22false\x22 id=\x22reticleEntity\x22 gltf-model=\x22#reticle2\x22 scale=\x220.8 0.8 0.8\x22 ar-hit-test-spawn=\x22mode: "+arMode+"\x22></a-entity>\n"; //for ar spawning...
+                    // }
                     //scenetype filters below...
 
                     console.log("sceneWebType: "+ sceneResponse.sceneWebType);
                     if (sceneResponse.sceneWebType == undefined || sceneResponse.sceneWebType.toLowerCase() == "default" || sceneResponse.sceneWebType.toLowerCase() == "aframe") { 
                         // webxrFeatures = "webxr=\x22optionalFeatures: hit-test, local-floor\x22"; //otherwise hit-test breaks everythign!
-                        webxrFeatures = "webxr=\x22overlayElement: #ar_overlay;\x22 ar-hit-test=\x22target: #ar_target;\x22"; //otherwise hit-test breaks everythign!
+                        webxrFeatures = "webxr=\x22overlayElement: #ar_overlay; optionalFeatures: hit-test; \x22 ar-hit-test=\x22target: #ar_target; src: #reticle2\x22"; //otherwise hit-test breaks everythign!
                         // webxrFeatures = " webxr=\x22requiredFeatures: dom-overlay; optionalFeatures: hit-test; overlayElement: #ar_overlay;\x22 ar-hit-test=\x22enabled: true; target: #ar_target;\x22 "; //otherwise hit-test breaks everythign!
                         // requiredFeatures: hit-test,local-floor; optionalFeatures: dom-overlay,unbounded; overlayElement: #ar_overlay;"
                         // // arHitTest = "ar-hit-test-spawn=\x22mode: "+arMode+"\x22";
                         // arShadowPlane = "<a-plane show-in-ar-mode id="shadow-plane" material="shader:shadow" shadow="cast:false;" visible=\x22false\x22 height=\x2210\x22 width=\x2210\x22 rotation=\x22-90 0 0\x22 shadow=\x22receive:true\x22 ar-shadows=\x22opacity: 0.3\x22 static-body=\x22shape: none\x22 shape__main=\x22shape: box; halfExtents: 100 100 0.125; offset: 0 0 -0.125\x22>" +
                         // arShadowPlane = "<a-plane show-in-ar-mode visible=\x22false\x22 id=\x22shadow-plane\x22 material=\x22shader:shadow\x22 shadow=\x22cast:false;\x22 follow-shadow=\x22.activeObjexRay\x22 height=\x2233\x22 width=\x2233\x22 rotation=\x22-90 0 0\x22>" +
-                        //     "</a-plane>";
-                        arElements = "<a-entity material=\x22shader:shadow; depthWrite:false; opacity:0.9;\x22 visible=\x22false\x22 geometry=\x22primitive:shadow-plane;\x22 shadow=\x22cast:false;receive:true;\x22"+ 
-                                    "ar-shadow-helper=\x22target:#my-objects;light:#dirlight;\x22></a-entity><a-entity hide-on-hit-test-start shadow id=\x22ar_target\x22 scale=\x220.2 0.2 0.2\x22 position=\x220.2 0 -0.4\x22></a-entity>";
+                        //"</a-plane>";
+                        arElements = "<a-entity material=\x22shader:shadow; depthWrite:false; opacity:0.9;\x22 visible=\x22false\x22 geometry=\x22primitive:shadow-plane;\x22 shadow=\x22cast:false;receive:true;\x22"+
+                                    "ar-shadow-helper=\x22target:#my-objects;light:#dirlight;\x22></a-entity>"+
+                                    "<a-entity hide-on-hit-test-start shadow id=\x22ar_target\x22 scale=\x220.2 0.2 0.2\x22 position=\x220.2 0 -0.4\x22><a-box show-in-ar-mode visible=\x22false\x22></a-box></a-entity>"+
+                                    "<a-entity show-in-ar-mode visible=\x22false\x22 id=\x22reticleEntity\x22 gltf-model=\x22#reticle2\x22 scale=\x220.8 0.8 0.8\x22 ar-hit-test-spawn=\x22mode: "+arMode+"\x22></a-entity>\n";
                         // }
                         handsTemplate = "<template id=\x22hand-template\x22><a-entity><a-box scale=\x220.1 0.1 0.1\x22 visible=false></a-box></a-entity></template>";
                        
@@ -5323,7 +5325,7 @@ webxr_router.get('/:_id', function (req, res) {
 
                         audioVizEntity +
                         instancingEntity +
-                        arHitTest + 
+                        // arHitTest + 
                         
                         arElements +
                         // hemiLight +
