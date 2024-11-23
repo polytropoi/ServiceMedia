@@ -785,7 +785,7 @@ webxr_router.get('/:_id', function (req, res) {
                         }
                         if (sceneData.sceneTags[i].toLowerCase().includes("aframe master")) {
                             // aframeScript = "<script src=\x22https://cdn.jsdelivr.net/gh/aframevr/aframe@744e2b869e281f840cff7d9cb02e95750ce90920/dist/aframe-master.min.js\x22></script>"; //ref 20220715// nope!
-                            aframeScript = "<script src=\x22https://cdn.jsdelivr.net/gh/aframevr/aframe@e3192da8b5ef5a1bba6efa7cd2bff6808b64bb18/dist/aframe-master.min.js\x22></script>"; //ref 20231103 (integrated hands!)
+                            aframeScript = "<script src=\x22https://cdn.jsdelivr.net/gh/aframevr/aframe@f4a80d235cdbf9bee3bffca684c0f12985de145b/dist/aframe-master.min.js\x22></script>"; //ref 20231103 (integrated hands!)
                             threejsVersion = "170";
                         }
                         if (sceneData.sceneTags[i].toLowerCase().includes("aframe ada")) {
@@ -1296,6 +1296,8 @@ webxr_router.get('/:_id', function (req, res) {
                                         speedSplit = sceneResponse.sceneLocations[i].eventData.toLowerCase().split('~');
                                         if (speedSplit.length > 1) {
                                             scrollSpeed = speedSplit[1];
+                                        } else {
+                                            scrollSpeed = .001;
                                         }
                                         
                                     }
@@ -4788,7 +4790,10 @@ webxr_router.get('/:_id', function (req, res) {
                         "<script src=\x22../main/src/util/mindar/mindar-image-aframe.js\x22></script>"+
 
                         // primaryAudioScript +
-                        "<script src=\x22../main/src/component/aframe-troika-text.min.js\x22></script>"+
+                        // "<script src=\x22../main/src/component/aframe-troika-text.min.js\x22></script>"+
+                        "<script src=\x22https://unpkg.com/aframe-troika-text/dist/aframe-troika-text.min.js\x22></script>"+
+                        // <script src="https://unpkg.com/aframe-troika-text/dist/aframe-troika-text.min.js"></script>
+                        
                         "<script src=\x22../main/src/component/mod-materials.js\x22></script>"+
                         "</head>\n" +
                         "<body>\n" +

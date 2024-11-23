@@ -3407,6 +3407,7 @@ AFRAME.registerComponent('mod_tunnel', {
       this.speed = this.data.scrollSpeed;
       this.picModIndex = 0;
       this.texture = null;
+      console.log("mod_tunnel scrollspeed " + this.speed);
       // Define points along Z axis
       // this.tunnelOrigin = new THREE.Vector3(this.data.tunnelOriginX);
       if (this.data.tunnelOrientation == "horizontal") {
@@ -3465,9 +3466,10 @@ AFRAME.registerComponent('mod_tunnel', {
           this.tubeMesh = new THREE.Mesh(this.tubeGeometry, this.tubeMaterial);
           this.el.sceneEl.object3D.add(this.tubeMesh);
           this.loaded = true;
+          console.log("mod_tunnel loaded " + this.loaded);
         }
       } else {
-        console.log("no pic");
+        console.log("mod_tunnel no pic");
       }
     },
     randomTexture: function() {
@@ -3529,7 +3531,7 @@ AFRAME.registerComponent('mod_tunnel', {
     },
     tick: function () {
       if (this.loaded && this.tubeGeometry && this.tubeMaterial) {
-        // console.log("modding speernd " + this.speed);
+        console.log("modding speernd " + this.speed + " dir " + this.data.scrollDirection);
         if (this.data.scrollDirection == 'x') {
           this.tubeMaterial.map.offset.x += this.speed;
         }

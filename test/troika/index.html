@@ -1,0 +1,19 @@
+<html>
+    <head>
+        <title>My A-Frame Scene</title>
+        <script src="https://cdn.jsdelivr.net/gh/aframevr/aframe@f4a80d235cdbf9bee3bffca684c0f12985de145b/dist/aframe-master.min.js"></script>
+        <!-- <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script> -->
+
+        <script src="https://unpkg.com/aframe-troika-text/dist/aframe-troika-text.min.js"></script>
+      </head>
+      
+      <body>
+        <a-scene background="color:skyblue;">
+          <!-- As a component: -->
+          <a-entity troika-text="value: Hello world!" position="0 2 -2"></a-entity>
+          
+          <!-- As a primitive: -->
+          <a-troika-text value="Hello world!" position="0 1 -2"></a-troika-text>
+        </a-scene>
+      </body>
+      </html>
