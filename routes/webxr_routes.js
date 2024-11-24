@@ -4457,7 +4457,7 @@ webxr_router.get('/:_id', function (req, res) {
                     if (sceneResponse.sceneWebType == undefined || sceneResponse.sceneWebType.toLowerCase() == "default" || sceneResponse.sceneWebType.toLowerCase() == "aframe") { 
                         // webxrFeatures = "webxr=\x22optionalFeatures: hit-test, local-floor\x22"; //otherwise hit-test breaks everythign!
                         // webxrFeatures = "webxr=\x22overlayElement: #ar_overlay; optionalFeatures: hit-test; \x22 ar-hit-test=\x22target: #ar_target; src: #reticle2\x22"; //otherwise hit-test breaks everythign!
-                        webxrFeatures = "webxr=\x22overlayElement: #ar_overlay;\x22 ar-hit-test "; //otherwise hit-test breaks everythign!
+                        webxrFeatures = "webxr=\x22optionalFeatures: hit-test, local-floor, dom-overlay; overlayElement: #ar_overlay;\x22 "; //otherwise hit-test breaks everythign!
                         // webxrFeatures = " webxr=\x22requiredFeatures: dom-overlay; optionalFeatures: hit-test; overlayElement: #ar_overlay;\x22 ar-hit-test=\x22enabled: true; target: #ar_target;\x22 "; //otherwise hit-test breaks everythign!
                         // requiredFeatures: hit-test,local-floor; optionalFeatures: dom-overlay,unbounded; overlayElement: #ar_overlay;"
                         // // arHitTest = "ar-hit-test-spawn=\x22mode: "+arMode+"\x22";
@@ -4465,10 +4465,11 @@ webxr_router.get('/:_id', function (req, res) {
                         // arShadowPlane = "<a-plane show-in-ar-mode visible=\x22false\x22 id=\x22shadow-plane\x22 material=\x22shader:shadow\x22 shadow=\x22cast:false;\x22 follow-shadow=\x22.activeObjexRay\x22 height=\x2233\x22 width=\x2233\x22 rotation=\x22-90 0 0\x22>" +
                         //"</a-plane>";
                         arElements = "<a-entity material=\x22shader:shadow; depthWrite:false; opacity:0.9;\x22 visible=\x22false\x22 geometry=\x22primitive:shadow-plane;\x22 shadow=\x22cast:false;receive:true;\x22"+
-                                    "ar-shadow-helper=\x22target:#ar_target;light:#dirlight;\x22></a-entity>";
+                                    "ar-shadow-helper=\x22target:#ar_target;light:#dirlight;\x22></a-entity>"+
+                                    "<a-box show-in-ar-mode visible=\x22false\x22 scale=\x220.2 0.2 0.2\x22 id=\x22ar_target\x22></a-box>"
                                     // "<a-entity hide-on-hit-test-start shadow id=\x22ar_target\x22 scale=\x220.2 0.2 0.2\x22 position=\x220.2 0 -0.4\x22><a-box show-in-ar-mode visible=\x22false\x22></a-box></a-entity>";
                                     // "<a-entity show-in-ar-mode visible=\x22false\x22 id=\x22reticleEntity\x22 gltf-model=\x22#reticle2\x22 scale=\x220.8 0.8 0.8\x22 ar-hit-test-spawn=\x22mode: "+arMode+"\x22></a-entity>\n";
-                                    // "<a-entity show-in-ar-mode visible=\x22false\x22 id=\x22reticleEntity\x22 gltf-model=\x22#reticle2\x22 scale=\x220.8 0.8 0.8\x22></a-entity>\n";
+                                    "<a-entity show-in-ar-mode visible=\x22false\x22 id=\x22hitTester\x22 ar_hit_test_mod=\x22targetEl: #ar_target\x22 gltf-model=\x22#reticle\x22 scale=\x220.8 0.8 0.8\x22></a-entity>\n";
                         // }
                         handsTemplate = "<template id=\x22hand-template\x22><a-entity><a-box scale=\x220.1 0.1 0.1\x22 visible=false></a-box></a-entity></template>";
                        
@@ -4981,7 +4982,7 @@ webxr_router.get('/:_id', function (req, res) {
                         let aScene = "<a-scene "+webxrFeatures+" "+sceneBackground+" "+physicsInsert+" "+pool_target+" "+pool_launcher+" gesture-detector " + aframeRenderSettings +
                         " reflection=\x22directionalLight:#real-light\x22 "+sceneShadows+" raycaster=\x22objects: .activeObjexRay a-sphere\x22 "+
                         "screen-controls shadow " + xrmode + " " + magicWindow + " " + obbDebug + " " +
-                        "loading-screen=\x22dotsColor: white; backgroundColor: black; enabled: false\x22 " + fogSettings + " "+networkedscene+" "+ARSceneArg+" ar-cursor " + defaultLights +">";
+                        "loading-screen=\x22dotsColor: white; backgroundColor: black; enabled: false\x22 " + fogSettings + " "+networkedscene+" "+ARSceneArg+" " + defaultLights +">";
 
                            // "screen-controls xr-mode-ui=\x22enterVREnabled: true; enterAREnabled: true; XRMode: ar,vr\x22 " + magicWindow +   
                         // " keyboard-shortcuts=\x22enterVR: false\x22" +  //add screen-controls from initializer                      
@@ -5108,8 +5109,9 @@ webxr_router.get('/:_id', function (req, res) {
                         "<script src=\x22../main/src/component/local-marker.js\x22></script>"+
                         "<script src=\x22../main/src/component/mod-materials.js\x22></script>"+
                         // "<script src=\x22../main/src/component/xr-utils.js\x22></script>"+
-                        "<script src=\x22../main/src/component/ar-cursor.js\x22></script>"+
+                        // "<script src=\x22../main/src/component/ar-cursor.js\x22></script>"+
                         "<script src=\x22../main/src/component/ar-shadow-helper.js\x22></script>"+
+                        "<script src=\x22../main/src/component/ar_hit_test_mod.js\x22></script>"+
                         // "<script src=\x22../main/vendor/html2canvas/aframe-html-shader.min.js\x22></script>"+
                         primaryAudioScript +
                         ambientAudioScript +
@@ -5199,7 +5201,8 @@ webxr_router.get('/:_id', function (req, res) {
                         modelAssets +
                         externalAssets +
                         // "<a-asset-item id=\x22trigger1\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/trigger1.glb\x22></a-asset-item>\n"+
-
+                        "<a-asset-item id=\x22reticle\x22 src=\x22https://cdn.aframe.io/examples/ar/models/reticle/reticle.gltf\x22 response-type=\x22arraybuffer\x22 crossorigin=\x22anonymous\x22></a-asset-item>\n"+
+                  
 
                         "<a-asset-item id=\x22square1\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/square1.glb\x22></a-asset-item>\n"+
                         "<a-asset-item id=\x22rectangle1\x22 crossorigin=\x22anonymous\x22 src=\x22https://servicemedia.s3.amazonaws.com/assets/models/rectangle1.glb\x22></a-asset-item>\n"+

@@ -352,12 +352,7 @@
 
             if (this.el.sceneEl.is('ar-mode')) {
                 this.el.setAttribute('visible', true);
-                // webxrFeatures = "webxr=\x22requiredFeatures: hit-test, local-floor;\x22"; //otherwise hit-test breaks everythign!
-                // arHitTest = "ar-hit-test=\x22mode: "+arMode+"\x22";
-                // arShadowPlane = "<a-plane show-in-ar-mode visible=\x22false\x22 height=\x22200\x22 width=\x22200\x22 rotation=\x22-90 0 0\x22 repeat=\x22200 200\x22 shadow=\x22receive:true\x22 ar-shadows=\x22opacity: 0.3\x22 static-body=\x22shape: none\x22 shape__main=\x22shape: box; halfExtents: 100 100 0.125; offset: 0 0 -0.125\x22>" +
-                // "</a-plane>";
-                // document.querySelector('#reticleEntity').setAttribute('visible', true);
-
+            
             } else {
                 this.el.setAttribute('visible', false);
             }
