@@ -3460,7 +3460,7 @@ window.addEventListener("DOMContentLoaded", function() {
        message.textContent = "entered AR mode";
  
        // Hit testing is available
-       this.addEventListener(
+       sceneEl.addEventListener(
          "ar-hit-test-start",
          function() {
            console.log("scanning for hit-test");
@@ -3470,7 +3470,7 @@ window.addEventListener("DOMContentLoaded", function() {
        );
  
        // Has managed to start doing hit testing
-       this.addEventListener(
+       sceneEl.addEventListener(
          "ar-hit-test-achieved",
          function() {
            message.innerHTML = `Select the location to place<br />By tapping on the screen or selecting with your controller.`;
@@ -3479,11 +3479,11 @@ window.addEventListener("DOMContentLoaded", function() {
        );
  
        // User has placed an object
-       this.addEventListener(
+       sceneEl.addEventListener(
          "ar-hit-test-select",
          function() {
            // Object placed for the first time
-           message.textContent = "Well done!";
+           message.textContent = "hit-test location selected";
          },
          { once: true }
        );

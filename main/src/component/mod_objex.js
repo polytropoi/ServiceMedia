@@ -771,15 +771,16 @@ AFRAME.registerComponent('mod_object', {
         }
         // if (this.data.locationData && this.data.locationData.markerType) {
           console.log(this.data.objectData.name + " gots tags: " + this.tags + " markerType : "+ this.data.locationData.markerType);
-          for (let i = 0; i < this.tags.length; i++) {
-            console.log("adding class with tag " + this.tags[i]);
-            if (this.tags[i].includes(" ")) {
-              console.log("cain't put space in classname : " + this.tags[i]);
-            } else {
-              this.el.classList.add(this.tags[i]);
-            }
+
+          // for (let i = 0; i < this.tags.length; i++) {  //nm, bad idea?
+          //   console.log("adding class with tag " + this.tags[i]);
+          //   if (this.tags[i].includes(" ")) {
+          //     console.log("cain't put space in classname : " + this.tags[i]);
+          //   } else {
+          //     this.el.classList.add(this.tags[i]);
+          //   }
             
-          }
+          // }
         // }
       // } else {
       //   console.log("this.data.tags is not null " + this.tags);
@@ -807,6 +808,9 @@ AFRAME.registerComponent('mod_object', {
               this.el.dataset.isvisible = false;
               console.log("mod_object tryna hide myself set to visible " + this.el.dataset.isvisible);
           }
+          if ( this.data.locationData.locationTags.toLowerCase().includes("ar target") || this.data.locationData.locationTags.toLowerCase().includes("ar_target") || this.data.locationData.locationTags.toLowerCase().includes("artarget")) { 
+            this.el.classList.add("arTarget");
+          }
       } 
       if (this.data.tags && this.data.tags != undefined  && this.data.tags != 'undefined' && this.data.tags.length > 0) {
         if (this.data.tags.toLowerCase().includes("equippable")) {
@@ -827,15 +831,7 @@ AFRAME.registerComponent('mod_object', {
         this.isTarget = true;
         this.el.classList.add("target");
       }
-      if ((this.data.eventData && this.data.eventData.length && this.data.eventData.toLowerCase().includes("ar_target")) || 
-        this.data.tags && this.data.tags.length && this.data.tags.toLowerCase().includes("ar_target")) {
-        // this.isTarget = true;
-        this.el.classList.add("ar_target");
-        let arTarget = document.getElementById("ar_target");
-        if (arTarget) {
-          arTarget.appendChild(this.el);
-        }
-      }
+    
       if (this.data.objectData.triggerScale == undefined || this.data.objectData.triggerScale == null || this.data.objectData.triggerScale == "" || this.data.objectData.triggerScale == 0) {
         this.data.objectData.triggerScale = 1;
       } 
@@ -1269,15 +1265,7 @@ AFRAME.registerComponent('mod_object', {
               this.el.classList.add("target");
             
             }
-            if (this.data.eventData.toLowerCase().includes("ar target") || (this.data.tags && this.data.tags.includes("ar target"))) {
-              // this.el.id = "target_object";
-              this.el.classList.add("ar_target");
 
-              let arTarget = document.getElementById("ar_target");
-              if (arTarget) {
-                arTarget.appendChild(this.el);
-              }
-            }
             if (this.data.eventData.toLowerCase().includes("transparent")) {
               console.log("tryna set transparent");
               obj.visible = false;
@@ -1377,17 +1365,17 @@ AFRAME.registerComponent('mod_object', {
                         "clip": clips[0].name,
                         "loop": "repeat",
                       });
-                    }
-                    if (this.data.eventData.includes("loop_dance_anims")) {
+                    } else if (this.data.eventData.includes("loop_dance_anims")) {
                       theEl.setAttribute('animation-mixer', {
                         "loop": "repeat",
                       });
-                    }
-                    if (idleIndex != -1) {
-                      // theEl.setAttribute('animation-mixer', {
-                      //   "clip": clips[idleIndex].name,
-                      //   "loop": "repeat",
-                      // });
+                    } else {
+                      if (idleIndex != -1) {
+                        theEl.setAttribute('animation-mixer', {
+                          "clip": clips[idleIndex].name,
+                          "loop": "repeat",
+                        });
+                      }
                     }
                   }
                 }

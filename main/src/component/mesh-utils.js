@@ -3531,7 +3531,7 @@ AFRAME.registerComponent('mod_tunnel', {
     },
     tick: function () {
       if (this.loaded && this.tubeGeometry && this.tubeMaterial) {
-        console.log("modding speernd " + this.speed + " dir " + this.data.scrollDirection);
+        // console.log("modding speernd " + this.speed + " dir " + this.data.scrollDirection);
         if (this.data.scrollDirection == 'x') {
           this.tubeMaterial.map.offset.x += this.speed;
         }

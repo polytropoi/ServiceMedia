@@ -86,17 +86,8 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
         this.el.classList.add("target");
 
       }
-      if ((this.data.eventData && this.data.eventData.length && this.data.eventData.toLowerCase().includes("ar_target")) || 
-        this.data.tags && this.data.tags.length && this.data.tags.toLowerCase().includes("ar_target")) {
-        // this.isTarget = true;
-        this.el.classList.add("ar_target");
-        let arTarget = document.getElementById("ar_target");
-        if (arTarget) {
-          arTarget.appendChild(this.el);
-        }
-              // let theID = "[id=\x22"+ this.el.id + "\x22]";
-      // console.log("theID is " + "[id=\x22"+ this.el.id + "\x22]");
-      // this.el.sceneEl.setAttribute("ar-hit-test", {"target": "[id=\x22"+ this.el.id + "\x22]"});
+      if (this.data.tags && this.data.tags.length && (this.data.tags.toLowerCase().includes("ar target") || this.data.tags.toLowerCase().includes("artarget")) || this.data.tags.toLowerCase().includes("ar_target")) {
+        this.el.classList.add("arTarget");       
       }
       // if (this.data.markerType == "collider") {
       //   this.data.modelID = "primitive_cube";

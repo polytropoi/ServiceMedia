@@ -92,15 +92,9 @@ AFRAME.registerComponent('mod_model', {
           // this.el.sceneEl.setAttribute("ar-hit-test", {"target": elID});
           // console.log("hit test target is " + elID);
         }
-        if ((this.data.eventData && this.data.eventData.length && this.data.eventData.toLowerCase().includes("ar target")) || 
-        this.data.tags && this.data.tags.length && this.data.tags.toLowerCase().includes("ar target")) {
-          this.el.classList.add("ar_target");
-          let arTarget = document.getElementById("ar_target");
-          if (arTarget) {
-            arTarget.appendChild(this.el);
-          }
-       
-      }
+        if (this.data.tags && this.data.tags.length && (this.data.tags.toLowerCase().includes("ar target") || this.data.tags.toLowerCase().includes("artarget")) || this.data.tags.toLowerCase().includes("ar_target")) {
+          this.el.classList.add("arTarget");       
+        }
         // if (this.data.description && this.data.description.length > 1) {
         //   // console.log("model eventData " + JSON.stringify(this.data.eventData));
         //   if (this.data.description.includes("~")) {

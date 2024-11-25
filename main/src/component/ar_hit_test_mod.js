@@ -22,6 +22,16 @@ AFRAME.registerComponent('ar_hit_test_mod', {
         console.log("enter-vr");
         if (!self.el.sceneEl.is('ar-mode')) { return; }
         console.log("ar-mode");
+        // let arTargetEls = document.querySelectorAll(".ar_target");
+        let arTarget = document.getElementById("ar_target");
+        if (arTarget) {
+        // for (let i = 0; i < arTargetEls.length; i++) {     
+        //       arTarget.appendChild(arTargetEls[i]); //????
+        //   }
+          document.querySelectorAll('.arTarget').forEach(function(el) {
+              arTarget.appendChild(el);
+          });
+        }
         session = self.el.sceneEl.renderer.xr.getSession();
   
         self.originalPosition = targetEl.object3D.position.clone();
@@ -38,6 +48,8 @@ AFRAME.registerComponent('ar_hit_test_mod', {
               z: (position.z + 2)
             });
           }
+          console.log("hit test position selected " + JSON.stringify(position));
+          
 
         });
   
