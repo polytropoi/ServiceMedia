@@ -8,6 +8,8 @@ AFRAME.registerComponent('ar_hit_test_mod', {
       this.xrHitTestSource = null;
       this.viewerSpace = null;
       this.refSpace = null;
+
+
   
       this.el.sceneEl.renderer.xr.addEventListener(function () {
         self.viewerSpace = null;
@@ -19,6 +21,9 @@ AFRAME.registerComponent('ar_hit_test_mod', {
         var el = self.el;
         var targetEl = self.data.targetEl;
         var session;
+        var arTargetData = [];
+        let arTargetGroup = new THREE.Group();
+
         console.log("enter-vr");
         if (!self.el.sceneEl.is('ar-mode')) { return; }
         console.log("ar-mode");
@@ -30,8 +35,13 @@ AFRAME.registerComponent('ar_hit_test_mod', {
         //   }
           document.querySelectorAll('.arTarget').forEach(function(el) {
               arTarget.appendChild(el);
+              el.object3D.updateMatrixWorld();
+              // let targetEl = {};
+              // targetEl.position = el.getAttribute("position");
+              // targetEl.id = el.id;
+              // arTargetData.push(targetEl);
           });
-        }
+        // }
         session = self.el.sceneEl.renderer.xr.getSession();
   
         self.originalPosition = targetEl.object3D.position.clone();
@@ -40,6 +50,7 @@ AFRAME.registerComponent('ar_hit_test_mod', {
         session.addEventListener('select', function () {
           var position = el.getAttribute('position');
           targetEl.setAttribute('position', position);
+          let localPosition = new THREE.Vector3();
           var lightEl = document.getElementById('light'); //todo check for types
           if (lightEl) {
             document.getElementById('light').setAttribute('position', {
@@ -48,8 +59,13 @@ AFRAME.registerComponent('ar_hit_test_mod', {
               z: (position.z + 2)
             });
           }
-          console.log("hit test position selected " + JSON.stringify(position));
-          
+          // console.log("hit test position selected " + JSON.stringify(position));
+          // for (let i = 0; i < arTargetData.length; i++) {
+
+          //   el.object3D.worldToLocal(localPosition);
+          //   console.log("tryna set id " + arTargetData[i].id)
+          //   document.getElementById(arTargetData[i].id).setAttribute("position", localPosition);
+          // }
 
         });
   
