@@ -824,8 +824,13 @@ AFRAME.registerComponent('mod_object', {
       }   
       if ((this.data.eventData && this.data.eventData.length && this.data.eventData.toLowerCase().includes("target")) || 
         this.data.tags && this.data.tags.length && this.data.tags.toLowerCase().includes("target")) {
+        this.isTarget = true;
+        this.el.classList.add("target");
+      }
+      if ((this.data.eventData && this.data.eventData.length && this.data.eventData.toLowerCase().includes("ar_target")) || 
+        this.data.tags && this.data.tags.length && this.data.tags.toLowerCase().includes("ar_target")) {
         // this.isTarget = true;
-        // this.el.sceneEl.setAttribute("ar-hit-test", {"target": "[id=\x22"+ this.el.id + "\x22]"});
+        this.el.classList.add("ar_target");
         let arTarget = document.getElementById("ar_target");
         if (arTarget) {
           arTarget.appendChild(this.el);

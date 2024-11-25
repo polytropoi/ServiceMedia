@@ -30,11 +30,15 @@ AFRAME.registerComponent('ar_hit_test_mod', {
         session.addEventListener('select', function () {
           var position = el.getAttribute('position');
           targetEl.setAttribute('position', position);
-          document.getElementById('light').setAttribute('position', {
-            x: (position.x - 2),
-            y: (position.y + 4),
-            z: (position.z + 2)
-          });
+          var lightEl = document.getElementById('light'); //todo check for types
+          if (lightEl) {
+            document.getElementById('light').setAttribute('position', {
+              x: (position.x - 2),
+              y: (position.y + 4),
+              z: (position.z + 2)
+            });
+          }
+
         });
   
         session.requestReferenceSpace('viewer').then(function (space) {
