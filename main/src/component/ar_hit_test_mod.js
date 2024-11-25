@@ -41,7 +41,7 @@ AFRAME.registerComponent('ar_hit_test_mod', {
               // targetEl.id = el.id;
               // arTargetData.push(targetEl);
           });
-        // }
+        }
         session = self.el.sceneEl.renderer.xr.getSession();
   
         self.originalPosition = targetEl.object3D.position.clone();
