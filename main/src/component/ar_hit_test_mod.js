@@ -34,12 +34,12 @@ AFRAME.registerComponent('ar_hit_test_mod', {
         //       arTarget.appendChild(arTargetEls[i]); //????
         //   }
           document.querySelectorAll('.arTarget').forEach(function(el) {
-              arTarget.appendChild(el);
-              el.object3D.updateMatrixWorld();
+              // arTarget.appendChild(el);
+              // el.object3D.updateMatrixWorld();
               // let targetEl = {};
-              // targetEl.position = el.getAttribute("position");
-              // targetEl.id = el.id;
-              // arTargetData.push(targetEl);
+              targetEl.position = el.getAttribute("position");
+              targetEl.id = el.id;
+              arTargetData.push(targetEl);
           });
         }
         session = self.el.sceneEl.renderer.xr.getSession();
@@ -60,12 +60,18 @@ AFRAME.registerComponent('ar_hit_test_mod', {
             });
           }
           // console.log("hit test position selected " + JSON.stringify(position));
-          // for (let i = 0; i < arTargetData.length; i++) {
+          for (let i = 0; i < arTargetData.length; i++) {
 
-          //   el.object3D.worldToLocal(localPosition);
-          //   console.log("tryna set id " + arTargetData[i].id)
-          //   document.getElementById(arTargetData[i].id).setAttribute("position", localPosition);
-          // }
+            // el.object3D.worldToLocal(localPosition);
+            console.log("tryna set id " + arTargetData[i].id + " position " + position);
+            let arTargetEl = document.getElementById(arTargetData[i].id);
+            if (arTargetEl) {
+              arTargetEl.setAttribute("position", position);
+            } else {
+              console.log(arTargetData[i].id + " targetEl  not found!");
+            }
+             
+          }
 
         });
   
