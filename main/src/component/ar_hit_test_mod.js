@@ -54,7 +54,7 @@ AFRAME.registerComponent('ar_hit_test_mod', {
               z: (position.z + 2)
             });
           }
-
+          targetEl.object3D.updateMatrixWorld();
           // console.log("hit test position selected " + JSON.stringify(position));
           if (arTargetData.length) {
             targetEl.object3D.visible = false;
