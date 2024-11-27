@@ -109,7 +109,7 @@ AFRAME.registerComponent('ar_hit_test_mod', {
               //   }
               // }
               console.log("arTargetPosition " + position);
-              arTarget.setAttribute('position', position);
+              // arTarget.setAttribute('position', position);
 
             // } else {
             //   console.log(arTargetData[i].id + " targetEl  not found!");
