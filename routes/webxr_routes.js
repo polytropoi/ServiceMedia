@@ -566,6 +566,7 @@ webxr_router.get('/:_id', function (req, res) {
     let inventoryData = "";
     let joystickContainer  = "";
     let arImageTargets = [];
+    let arTargetElements = "";
     let sceneUnityWebDomain = "http://smxr.net";
     let activityPubScripts = "";
 
@@ -2183,15 +2184,27 @@ webxr_router.get('/:_id', function (req, res) {
                             const xrot = locationPlaceholders[i].eulerx != null ? locationPlaceholders[i].eulerx : rot;
                             const yrot = locationPlaceholders[i].eulery != null ? locationPlaceholders[i].eulery : rot;
                             const zrot = locationPlaceholders[i].eulerz != null ? locationPlaceholders[i].eulerz : rot;
-                            placeholderEntities = placeholderEntities + "<a-entity data-isvisible=\x22yes\x22 id=\x22"+locationPlaceholders[i].timestamp+"\x22 class=\x22activeObjexGrab activeObjexRay envMap "+
-                            "placeholders\x22 cloud_marker=\x22phID: "+locationPlaceholders[i].phID+"; xpos: "+locationPlaceholders[i].x+"; ypos: "+locationPlaceholders[i].y+"; zpos: "+locationPlaceholders[i].z+";" +
-                            
-                            "xrot: "+xrot+"; yrot: "+yrot+"; zrot: "+zrot+"; targetElements: "+locationPlaceholders[i].targetElements+"; " +
-                            "mediaID: "+locationPlaceholders[i].mediaID+"; mediaName: "+locationPlaceholders[i].mediaName+"; "+
-                            "xscale: "+xscale+"; yscale: "+yscale+"; zscale: "+zscale+"; objectID: "+locationPlaceholders[i].objectID+"; modelID: "+locationPlaceholders[i].modelID+"; model: "+
-                            locationPlaceholders[i].model+"; markerType: "+locationPlaceholders[i].markerType+";  tags: "+locationPlaceholders[i].locationTags+"; isNew: false; name: "+
-                            locationPlaceholders[i].name+"; description: "+locationPlaceholders[i].description+";eventData: "+locationPlaceholders[i].eventData+"; timestamp: "+locationPlaceholders[i].timestamp+";\x22 "+
-                            skyboxEnvMap+ " position=\x22"+locationPlaceholders[i].x+" "+locationPlaceholders[i].y+ " " +locationPlaceholders[i].z+"\x22 rotation=\x22"+locationPlaceholders[i].eulerx+" "+locationPlaceholders[i].eulery+ " " +locationPlaceholders[i].eulerz+"\x22></a-entity>";
+
+                            if (locationPlaceholders[i].tags && locationPlaceholders[i].tags.includes("ar target") ||  locationPlaceholders[i].tags.includes("artarget")) {
+                                arTargetElements = arTargetElements + "<a-entity data-isvisible=\x22yes\x22 id=\x22"+locationPlaceholders[i].timestamp+"\x22 class=\x22activeObjexGrab activeObjexRay envMap "+
+                                "placeholders\x22 cloud_marker=\x22phID: "+locationPlaceholders[i].phID+"; xpos: "+locationPlaceholders[i].x+"; ypos: "+locationPlaceholders[i].y+"; zpos: "+locationPlaceholders[i].z+";" +
+                                "xrot: "+xrot+"; yrot: "+yrot+"; zrot: "+zrot+"; targetElements: "+locationPlaceholders[i].targetElements+"; " +
+                                "mediaID: "+locationPlaceholders[i].mediaID+"; mediaName: "+locationPlaceholders[i].mediaName+"; "+
+                                "xscale: "+xscale+"; yscale: "+yscale+"; zscale: "+zscale+"; objectID: "+locationPlaceholders[i].objectID+"; modelID: "+locationPlaceholders[i].modelID+"; model: "+
+                                locationPlaceholders[i].model+"; markerType: "+locationPlaceholders[i].markerType+";  tags: "+locationPlaceholders[i].locationTags+"; isNew: false; name: "+
+                                locationPlaceholders[i].name+"; description: "+locationPlaceholders[i].description+";eventData: "+locationPlaceholders[i].eventData+"; timestamp: "+locationPlaceholders[i].timestamp+";\x22 "+
+                                skyboxEnvMap+ " position=\x22"+locationPlaceholders[i].x+" "+locationPlaceholders[i].y+ " " +locationPlaceholders[i].z+"\x22 rotation=\x22"+locationPlaceholders[i].eulerx+" "+locationPlaceholders[i].eulery+ " " +locationPlaceholders[i].eulerz+"\x22></a-entity>";
+                            } else {
+                                placeholderEntities = placeholderEntities + "<a-entity data-isvisible=\x22yes\x22 id=\x22"+locationPlaceholders[i].timestamp+"\x22 class=\x22activeObjexGrab activeObjexRay envMap "+
+                                "placeholders\x22 cloud_marker=\x22phID: "+locationPlaceholders[i].phID+"; xpos: "+locationPlaceholders[i].x+"; ypos: "+locationPlaceholders[i].y+"; zpos: "+locationPlaceholders[i].z+";" +
+                                "xrot: "+xrot+"; yrot: "+yrot+"; zrot: "+zrot+"; targetElements: "+locationPlaceholders[i].targetElements+"; " +
+                                "mediaID: "+locationPlaceholders[i].mediaID+"; mediaName: "+locationPlaceholders[i].mediaName+"; "+
+                                "xscale: "+xscale+"; yscale: "+yscale+"; zscale: "+zscale+"; objectID: "+locationPlaceholders[i].objectID+"; modelID: "+locationPlaceholders[i].modelID+"; model: "+
+                                locationPlaceholders[i].model+"; markerType: "+locationPlaceholders[i].markerType+";  tags: "+locationPlaceholders[i].locationTags+"; isNew: false; name: "+
+                                locationPlaceholders[i].name+"; description: "+locationPlaceholders[i].description+";eventData: "+locationPlaceholders[i].eventData+"; timestamp: "+locationPlaceholders[i].timestamp+";\x22 "+
+                                skyboxEnvMap+ " position=\x22"+locationPlaceholders[i].x+" "+locationPlaceholders[i].y+ " " +locationPlaceholders[i].z+"\x22 rotation=\x22"+locationPlaceholders[i].eulerx+" "+locationPlaceholders[i].eulery+ " " +locationPlaceholders[i].eulerz+"\x22></a-entity>";
+                            }
+
                         }
                         callback();
                     } else {
@@ -2918,7 +2931,7 @@ webxr_router.get('/:_id', function (req, res) {
                                                     let physicsMod = "";
                                                     let shape = 'hull';
                                                     let groundMod = "";
-                                                    
+                                                    console.log("locMdl " + JSON.stringify(locMdl));
                                                     if (locMdl.eventData.toLowerCase().includes('physics')){ //ammo for now // no add in mod_model (where model isloaded)
                                                         //hrm, maybe 
                                                     }
@@ -2952,11 +2965,21 @@ webxr_router.get('/:_id', function (req, res) {
                                                         }
                                                         
                                                     } else { //DEFAULT entity conf (doesn't use brownian)
-                                                        gltfsEntities = gltfsEntities + "<a-entity id=\x22"+id+"\x22 "+followCurve+" "+physicsMod+" "+modelParent+" "+scatterSurface+" "+modModel+" class=\x22envMap gltf "+entityType+" "+ambientChild+
-                                                        " activeObjexGrab activeObjexRay\x22 shadow=\x22cast:true; receive:true\x22 "+skyboxEnvMap+" gltf-model=\x22#" + m_assetID + "\x22 "+objAnim+" "+cannedAnim+
-                                                        // " position=\x22"+locMdl.x+" "+locMdl.y+" "+zFix+"\x22 scale=\x22"+scale+" "+scale+" "+scale+"\x22 rotation=\x22"+rotation+"\x22 >" + offsetPos+ "</a-entity>";  //rem rotation bc navmesh donutlike
-                                                        " position=\x22"+locMdl.x+" "+locMdl.y+" "+zFix+"\x22 scale=\x22"+scale+" "+scale+" "+scale+"\x22 data-scale=\x22"+scale+"\x22 rotation=\x22"+rotation+"\x22 >" + offsetPos+ "</a-entity>"; 
-                                                        gltfModel = modelURL;
+
+                                                        if (locMdl.locationTags && (locMdl.locationTags.includes("ar target") || locMdl.locationTags.includes("artarget"))) {
+                                                            console.log("gotsa ar target!")
+                                                            arTargetElements = arTargetElements + "<a-entity id=\x22"+id+"\x22 "+followCurve+" "+physicsMod+" "+modelParent+" "+scatterSurface+" "+modModel+" class=\x22envMap gltf "+entityType+" "+ambientChild+
+                                                            " activeObjexGrab activeObjexRay\x22 shadow=\x22cast:true; receive:true\x22 "+skyboxEnvMap+" gltf-model=\x22#" + m_assetID + "\x22 "+objAnim+" "+cannedAnim+
+                                                            // " position=\x22"+locMdl.x+" "+locMdl.y+" "+zFix+"\x22 scale=\x22"+scale+" "+scale+" "+scale+"\x22 rotation=\x22"+rotation+"\x22 >" + offsetPos+ "</a-entity>";  //rem rotation bc navmesh donutlike
+                                                            " position=\x22"+locMdl.x+" "+locMdl.y+" "+zFix+"\x22 scale=\x22"+scale+" "+scale+" "+scale+"\x22 data-scale=\x22"+scale+"\x22 rotation=\x22"+rotation+"\x22 >" + offsetPos+ "</a-entity>"; 
+                                                            gltfModel = modelURL;
+                                                        } else {
+                                                            gltfsEntities = gltfsEntities + "<a-entity id=\x22"+id+"\x22 "+followCurve+" "+physicsMod+" "+modelParent+" "+scatterSurface+" "+modModel+" class=\x22envMap gltf "+entityType+" "+ambientChild+
+                                                            " activeObjexGrab activeObjexRay\x22 shadow=\x22cast:true; receive:true\x22 "+skyboxEnvMap+" gltf-model=\x22#" + m_assetID + "\x22 "+objAnim+" "+cannedAnim+
+                                                            // " position=\x22"+locMdl.x+" "+locMdl.y+" "+zFix+"\x22 scale=\x22"+scale+" "+scale+" "+scale+"\x22 rotation=\x22"+rotation+"\x22 >" + offsetPos+ "</a-entity>";  //rem rotation bc navmesh donutlike
+                                                            " position=\x22"+locMdl.x+" "+locMdl.y+" "+zFix+"\x22 scale=\x22"+scale+" "+scale+" "+scale+"\x22 data-scale=\x22"+scale+"\x22 rotation=\x22"+rotation+"\x22 >" + offsetPos+ "</a-entity>"; 
+                                                            gltfModel = modelURL;
+                                                        }
                                                     }
 
                                                   //INSTANCING (cloned) placement instancing + surface scattering
@@ -4466,10 +4489,12 @@ webxr_router.get('/:_id', function (req, res) {
                         //"</a-plane>";
                         arElements = "<a-entity material=\x22shader:shadow; depthWrite:false; opacity:0.9;\x22 visible=\x22false\x22 geometry=\x22primitive:shadow-plane;\x22 shadow=\x22cast:false;receive:true;\x22"+
                                     "ar-shadow-helper=\x22target:#ar_target;light:#dirlight;\x22></a-entity>"+
-                                    "<a-box show-in-ar-mode visible=\x22false\x22 scale=\x220.2 0.2 0.2\x22 id=\x22ar_target\x22></a-box>"+
+                                    "<a-entity scale=\x221 1 1\x22 id=\x22ar_target\x22>" +
+                                    arTargetElements +
+                                    "</a-entity>"+
                                     // "<a-entity hide-on-hit-test-start shadow id=\x22ar_target\x22 scale=\x220.2 0.2 0.2\x22 position=\x220.2 0 -0.4\x22><a-box show-in-ar-mode visible=\x22false\x22></a-box></a-entity>";
                                     // "<a-entity show-in-ar-mode visible=\x22false\x22 id=\x22reticleEntity\x22 gltf-model=\x22#reticle2\x22 scale=\x220.8 0.8 0.8\x22 ar-hit-test-spawn=\x22mode: "+arMode+"\x22></a-entity>\n";
-                                    "<a-entity show-in-ar-mode visible=\x22false\x22 id=\x22hitTester\x22 ar_hit_test_mod=\x22targetEl: #ar_target\x22 gltf-model=\x22#reticle\x22 scale=\x220.8 0.8 0.8\x22></a-entity>\n";
+                                    "<a-entity show-in-ar-mode visible=\x22false\x22 id=\x22hitTester\x22 ar_hit_test_mod=\x22targetEl: #ar_target\x22 gltf-model=\x22#reticle\x22></a-entity>\n";
                         // }
                         handsTemplate = "<template id=\x22hand-template\x22><a-entity><a-box scale=\x220.1 0.1 0.1\x22 visible=false></a-box></a-entity></template>";
                        
