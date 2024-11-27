@@ -79,23 +79,23 @@ AFRAME.registerComponent('ar_hit_test_mod', {
                 arTargetPosition = targetEl.worldToLocal(parseFloat(localMarkerComponent.data.xpos, parseFloat(localMarkerComponent.data.ypos), parseFloat(localMarkerComponent.data.zpos)));
                 console.log("localmarker arTargetPosition " + JSON.stringify(arTargetPosition));
 
-                arTargetEl.setAttribute('position', position);
+                arTargetEl.setAttribute('position', arTargetPosition);
                 // arTargetEl.setAttribute('scale', {x: parseFloat(localMarkerComponent.data.xscale) * 0.2, 
                 //                                   y: parseFloat(localMarkerComponent.data.yscale) * 0.2, 
                 //                                   z: parseFloat(localMarkerComponent.data.zscale) * 0.2});
               } else {
                 let cloudMarkerComponent = arTargetEl.components.cloud_marker;
                 if (cloudMarkerComponent) {
-                  arTargetPosition.set(parseFloat(cloudMarkerComponent.data.xpos, parseFloat(cloudMarkerComponent.data.ypos), parseFloat(cloudMarkerComponent.data.zpos)));
+                  arTargetPosition = targetEl.worldToLocal(parseFloat(cloudMarkerComponent.data.xpos, parseFloat(cloudMarkerComponent.data.ypos), parseFloat(cloudMarkerComponent.data.zpos)));
                   console.log("cloudmarker arTargetPosition " + JSON.stringify(arTargetPosition));
-                  arTargetEl.setAttribute('position', position);
+                  arTargetEl.setAttribute('position', arTargetPosition);
                   // arTargetEl.setAttribute('scale', {x: parseFloat(cloudMarkerComponent.data.xscale) * 0.2, 
                   //                                   y: parseFloat(cloudMarkerComponent.data.yscale) * 0.2, 
                   //                                   z: parseFloat(cloudMarkerComponent.data.zscale) * 0.2});
                 } else {
                   let modModelComponent = arTargetEl.components.mod_model;
                   if (modModelComponent) {
-                    arTargetPosition.set(parseFloat(modModelComponent.data.xpos, parseFloat(modModelComponent.data.ypos), parseFloat(modModelComponent.data.zpos)));
+                    arTargetPosition = targetEl.worldToLocal(parseFloat(modModelComponent.data.xpos, parseFloat(modModelComponent.data.ypos), parseFloat(modModelComponent.data.zpos)));
                     console.log("modmodel arTargetPosition " + JSON.stringify(arTargetPosition));
                     arTargetEl.setAttribute('position', position);
                     // arTargetEl.setAttribute('scale', {x: parseFloat(modModelComponent.data.xscale) * 0.2, 
@@ -104,7 +104,7 @@ AFRAME.registerComponent('ar_hit_test_mod', {
                   } else {
                       let modObjectComponent = arTargetEl.components.mod_object;
                       if (modObjectComponent) {
-                        arTargetPosition.set(parseFloat(modObjectComponent.data.xpos, parseFloat(modObjectComponent.data.ypos), parseFloat(modObjectComponent.data.zpos)));
+                        arTargetPosition = targetEl.worldToLocal(parseFloat(modObjectComponent.data.xpos, parseFloat(modObjectComponent.data.ypos), parseFloat(modObjectComponent.data.zpos)));
                         console.log("modobject arTargetPosition " + JSON.stringify(arTargetPosition));
                         arTargetEl.setAttribute('position', position);
                         // arTargetEl.setAttribute('scale', {x: parseFloat(modObjectComponent.data.xscale) * 0.2, 
