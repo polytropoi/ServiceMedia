@@ -550,7 +550,8 @@ webxr_router.get('/:_id', function (req, res) {
     // let aframeExtrasScript =<script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.0.0/dist/components/sphere-collider.min.js"></script>
     // <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.0.0/dist/aframe-extras.controls.min.js"></script>
     // let aframeExtrasScript = "<script src=\x22https://cdn.jsdelivr.net/npm/aframe-extras@7.2.0/dist/aframe-extras.min.js\x22 defer=\x22defer\x22></script>";
-    let aframeExtrasScript = "<script src=\x22https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.4.0/dist/aframe-extras.min.js\x22 defer=\x22defer\x22></script>";
+    // let aframeExtrasScript = "<script src=\x22https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.4.0/dist/aframe-extras.min.js\x22 defer=\x22defer\x22></script>";
+    let aframeExtrasScript = "<script src=\x22https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.5.2/dist/aframe-extras.min.js\x22 defer=\x22defer\x22></script>";
     
     let logScripts = "";
     enviromentScript = ""; //for aframe env component
@@ -5201,7 +5202,7 @@ webxr_router.get('/:_id', function (req, res) {
                         geoScripts +
                         "<script src=\x22../main/js/dialogs.js\x22></script>"+
 
-                        "<div id=\x22ar_overlay\x22><div id=\x22ar_overlay_message\x22></div></div>"+                        
+                        "<div id=\x22ar_overlay\x22><div id=\x22ar_overlay_message\x22><button style=\x22float:right\x22 onclick=\x22toggleLockARTargets()\x22 type=\x22button\x22 class=\x22btn\x22>toggle lock</button></div></div>"+                        
                         // threeDeeTextComponent +
                         aScene +
                         "<div id=\x22overlay\x22></div>"+

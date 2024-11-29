@@ -8,8 +8,8 @@ AFRAME.registerComponent('ar_hit_test_mod', {
       this.xrHitTestSource = null;
       this.viewerSpace = null;
       this.refSpace = null;
-
-
+      this.lockTargets = false;
+      this.camera = null;
   
       this.el.sceneEl.renderer.xr.addEventListener(function () {
         self.viewerSpace = null;
@@ -17,7 +17,7 @@ AFRAME.registerComponent('ar_hit_test_mod', {
         self.xrHitTestSource = null;
       });
   
-      this.el.sceneEl.addEventListener('enter-vr', function () {
+      this.el.sceneEl.addEventListener('enter-vr', function (event) {
         var el = self.el;
         var targetEl = self.data.targetEl;
         var session;
@@ -26,16 +26,21 @@ AFRAME.registerComponent('ar_hit_test_mod', {
 
         console.log("enter-vr");
         if (!self.el.sceneEl.is('ar-mode')) { return; }
+
         console.log("ar-mode");
+        this.camera = self.el.sceneEl.renderer.xr.getCamera().cameras[0];
+
+        // const hits = this.raycaster.intersectObjects(this.scene.children)
+        // console.log("ar raycast hits")
         // let arTargetEls = document.querySelectorAll(".ar_target");
-        // let arTarget = document.getElementById("ar_target");
-        // if (arTarget) {       
-        //     document.querySelectorAll('.arTarget').forEach(function(el) { //els with "ar target" tag
-        //     targetEl.position = el.getAttribute("position");
-        //     targetEl.id = el.id;
-        //     arTargetData.push(targetEl);
-        //   });
-        // }
+        let arTarget = document.getElementById("ar_target"); //um, same as this.data.targetEl selector
+        if (arTarget) {       
+            document.querySelectorAll('.arTarget').forEach(function(el) { //els with "ar target" tag
+            targetEl.position = el.getAttribute("position");
+            targetEl.id = el.id;
+            arTargetData.push(targetEl);
+          });
+        }
 
         session = self.el.sceneEl.renderer.xr.getSession();
   
@@ -44,7 +49,15 @@ AFRAME.registerComponent('ar_hit_test_mod', {
   
         session.addEventListener('select', function () {
           var position = el.getAttribute('position');
-          targetEl.setAttribute('position', position);
+          var distance = position.distanceTo(this.camera.object3D.position);
+
+          if (!this.lockTargets) {
+            console.log("tryna set position " + JSON.stringify(position) + " distance " + JSON.stringify(distance));
+            targetEl.setAttribute('position', position);
+          } else {
+            // targetEl.setAttribute("anchored", {"persistent": true});
+          }
+
           let localPosition = new THREE.Vector3();
           var lightEl = document.getElementById('light'); //todo check for types
           if (lightEl) {
@@ -54,7 +67,17 @@ AFRAME.registerComponent('ar_hit_test_mod', {
               z: (position.z + 2)
             });
           }
-          // targetEl.object3D.updateMatrixWorld();
+
+
+          // targetEl.object3D.updateMatrixWorld();        this.raycaster.setFromCamera(screenPosition, this.camera)
+          if (this.camera) {
+            const screenPosition = new Vector2((event.clientX / window.innerWidth) * 2 - 1, -(event.clientY / window.innerHeight) * 2 + 1)
+            this.raycaster.setFromCamera(screenPosition, this.camera)
+            const hits = this.raycaster.intersectObjects(this.scene.children);
+            console.log("ar raycast hits" + JSON.stringify(hits));
+            
+          }
+          
           // console.log("hit test position selected " + JSON.stringify(position));
           // if (arTargetData.length) {
           //   targetEl.object3D.visible = false;
@@ -137,7 +160,17 @@ AFRAME.registerComponent('ar_hit_test_mod', {
         self.el.object3D.visible = false;
       });
     },
-  
+    toggleLockARTargets: function () {
+      this.lockTargets = !this.lockTargets;
+      if (lockTargets) {
+        console.log("locked");
+        var targetEl = this.data.targetEl;
+        targetEl.setAttribute("anchored", {"persistent": true});
+      } else {
+        console.log("unlocked");
+        targetEl.removeAttribute("anchored");
+      }
+    },
     tick: function () {
       var frame;
       var xrViewerPose;
@@ -190,3 +223,14 @@ AFRAME.registerComponent('ar_hit_test_mod', {
       });
     }
   });
+
+
+function toggleARLockTargets () {
+  let arTargetEl = document.getElementById("ar_target");
+  if (arTargetEl) {
+    let hitTestComponent = arTargetEl.components.ar_hit_test_mod;
+    if (hitTestComponent) {
+      hitTestComponent.toggleARLockTargets();
+    }
+  }
+}
