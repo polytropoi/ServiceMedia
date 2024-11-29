@@ -2185,7 +2185,7 @@ webxr_router.get('/:_id', function (req, res) {
                             const yrot = locationPlaceholders[i].eulery != null ? locationPlaceholders[i].eulery : rot;
                             const zrot = locationPlaceholders[i].eulerz != null ? locationPlaceholders[i].eulerz : rot;
 
-                            if (locationPlaceholders[i].tags && locationPlaceholders[i].tags.includes("ar target") ||  locationPlaceholders[i].tags.includes("artarget")) {
+                            if (locationPlaceholders[i].tags && (locationPlaceholders[i].tags.includes("ar target") ||  locationPlaceholders[i].tags.includes("artarget"))) {
                                 arTargetElements = arTargetElements + "<a-entity data-isvisible=\x22yes\x22 id=\x22"+locationPlaceholders[i].timestamp+"\x22 class=\x22activeObjexGrab activeObjexRay envMap "+
                                 "placeholders\x22 cloud_marker=\x22phID: "+locationPlaceholders[i].phID+"; xpos: "+locationPlaceholders[i].x+"; ypos: "+locationPlaceholders[i].y+"; zpos: "+locationPlaceholders[i].z+";" +
                                 "xrot: "+xrot+"; yrot: "+yrot+"; zrot: "+zrot+"; targetElements: "+locationPlaceholders[i].targetElements+"; " +
