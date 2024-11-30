@@ -50,11 +50,13 @@ AFRAME.registerComponent('ar_hit_test_mod', {
         
         session.addEventListener('select', function () {
           var position = el.getAttribute('position');
-          var distance = position.distanceTo(this.camera.position);
-
+          const zeroPos = new THREE.Vector3(0, 0, 0);
+          var distance = position.distanceTo(zeroPos);
+          var scaleMod = distance * 0.1;
           if (!this.lockTargets) {
             console.log("tryna set position " + JSON.stringify(position) + " distance " + JSON.stringify(distance));
             targetEl.setAttribute('position', position);
+            targetEl.setAttribute('scale', {'x': scaleMod, 'y': scaleMod, 'z': scaleMod});
           } else {
             // targetEl.setAttribute("anchored", {"persistent": true});
           }
