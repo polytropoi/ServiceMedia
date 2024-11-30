@@ -28,6 +28,10 @@ AFRAME.registerComponent('ar_hit_test_mod', {
         if (!self.el.sceneEl.is('ar-mode')) { return; }
 
         console.log("ar-mode");
+        let arOverlay = document.getElementById("ar_overlay");
+        if (arOverlay) {
+          arOverlay.style.visibility = visible;
+        }
 
 
         // const hits = this.raycaster.intersectObjects(this.scene.children)
@@ -163,7 +167,7 @@ AFRAME.registerComponent('ar_hit_test_mod', {
         self.el.object3D.visible = false;
       });
     },
-    toggleLockARTargets: function () {
+    toggleLockTargets: function () {
       this.lockTargets = !this.lockTargets;
       if (lockTargets) {
         console.log("locked");
@@ -228,12 +232,12 @@ AFRAME.registerComponent('ar_hit_test_mod', {
   });
 
 
-function toggleARLockTargets () {
+function ToggleLockARTargets () {
   let arTargetEl = document.getElementById("hitTester");
   if (arTargetEl) {
     let hitTestComponent = arTargetEl.components.ar_hit_test_mod;
     if (hitTestComponent) {
-      hitTestComponent.toggleARLockTargets();
+      hitTestComponent.toggleLockTargets();
     }
   }
 }
