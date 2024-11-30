@@ -59,7 +59,7 @@ AFRAME.registerComponent('ar_hit_test_mod', {
             // targetEl.setAttribute("anchored", {"persistent": true});
           }
 
-          let localPosition = new THREE.Vector3();
+          // let localPosition = new THREE.Vector3();
           var lightEl = document.getElementById('light'); //todo check for types
           if (lightEl) {
             document.getElementById('light').setAttribute('position', {
@@ -71,13 +71,13 @@ AFRAME.registerComponent('ar_hit_test_mod', {
 
 
           // targetEl.object3D.updateMatrixWorld();        this.raycaster.setFromCamera(screenPosition, this.camera)
-          if (this.camera) {
-            const screenPosition = new Vector2((event.clientX / window.innerWidth) * 2 - 1, -(event.clientY / window.innerHeight) * 2 + 1)
-            this.raycaster.setFromCamera(screenPosition, this.camera)
-            const hits = this.raycaster.intersectObjects(this.scene.children);
-            console.log("ar raycast hits" + JSON.stringify(hits));
+          // if (this.camera) {
+          //   const screenPosition = new Vector2((event.clientX / window.innerWidth) * 2 - 1, -(event.clientY / window.innerHeight) * 2 + 1)
+          //   this.raycaster.setFromCamera(screenPosition, this.camera)
+          //   const hits = this.raycaster.intersectObjects(this.scene.children);
+          //   console.log("ar raycast hits" + JSON.stringify(hits));
             
-          }
+          // }
           
           // console.log("hit test position selected " + JSON.stringify(position));
           // if (arTargetData.length) {
@@ -227,7 +227,7 @@ AFRAME.registerComponent('ar_hit_test_mod', {
 
 
 function toggleARLockTargets () {
-  let arTargetEl = document.getElementById("ar_target");
+  let arTargetEl = document.getElementById("hitTester");
   if (arTargetEl) {
     let hitTestComponent = arTargetEl.components.ar_hit_test_mod;
     if (hitTestComponent) {
