@@ -50,7 +50,7 @@ AFRAME.registerComponent('ar_hit_test_mod', {
         
         session.addEventListener('select', function () {
           var position = el.getAttribute('position');
-          // var distance = position.distanceTo(this.camera.position);
+          var distance = position.distanceTo(this.camera.position);
 
           if (!this.lockTargets) {
             console.log("tryna set position " + JSON.stringify(position) + " distance " + JSON.stringify(distance));
