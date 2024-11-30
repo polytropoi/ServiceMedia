@@ -30,7 +30,7 @@ AFRAME.registerComponent('ar_hit_test_mod', {
         console.log("ar-mode");
         let arOverlay = document.getElementById("ar_overlay");
         if (arOverlay) {
-          arOverlay.style.visibility = visible;
+          arOverlay.style.visibility = 'visible';
         }
 
 
