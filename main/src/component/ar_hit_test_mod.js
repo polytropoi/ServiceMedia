@@ -46,11 +46,11 @@ AFRAME.registerComponent('ar_hit_test_mod', {
   
         self.originalPosition = targetEl.object3D.position.clone();
         self.el.object3D.visible = true;
-        this.camera = self.el.sceneEl.renderer.xr.getCamera().cameras[0];
+        // this.camera = session.renderer.xr.getCamera().cameras[0];
         
         session.addEventListener('select', function () {
           var position = el.getAttribute('position');
-          var distance = position.distanceTo(this.camera.position);
+          // var distance = position.distanceTo(this.camera.position);
 
           if (!this.lockTargets) {
             console.log("tryna set position " + JSON.stringify(position) + " distance " + JSON.stringify(distance));
