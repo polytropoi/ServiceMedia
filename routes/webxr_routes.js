@@ -5202,7 +5202,7 @@ webxr_router.get('/:_id', function (req, res) {
                         geoScripts +
                         "<script src=\x22../main/js/dialogs.js\x22></script>"+
 
-                        "<div id=\x22ar_overlay\x22><div id=\x22ar_overlay_message\x22><button style=\x22float:right\x22 onclick=\x22toggleLockARTargets()\x22 type=\x22button\x22 class=\x22btn\x22>toggle lock</button></div></div>"+                        
+                        "<div id=\x22ar_overlay\x22><div id=\x22ar_overlay_message\x22></div><button id=\x22arLockButton\x22 style=\x22float:right\x22 onclick=\x22toggleLockARTargets()\x22 type=\x22button\x22 class=\x22btn\x22>toggle lock</button></div>"+                        
                         // threeDeeTextComponent +
                         aScene +
                         "<div id=\x22overlay\x22></div>"+

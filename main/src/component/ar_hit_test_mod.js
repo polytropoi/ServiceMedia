@@ -28,7 +28,7 @@ AFRAME.registerComponent('ar_hit_test_mod', {
         if (!self.el.sceneEl.is('ar-mode')) { return; }
 
         console.log("ar-mode");
-        this.camera = self.el.sceneEl.renderer.xr.getCamera().cameras[0];
+
 
         // const hits = this.raycaster.intersectObjects(this.scene.children)
         // console.log("ar raycast hits")
@@ -36,7 +36,7 @@ AFRAME.registerComponent('ar_hit_test_mod', {
         let arTarget = document.getElementById("ar_target"); //um, same as this.data.targetEl selector
         if (arTarget) {       
             document.querySelectorAll('.arTarget').forEach(function(el) { //els with "ar target" tag
-            targetEl.position = el.getAttribute("position");
+            // targetEl.position = el.getAttribute("position");
             targetEl.id = el.id;
             arTargetData.push(targetEl);
           });
@@ -46,10 +46,11 @@ AFRAME.registerComponent('ar_hit_test_mod', {
   
         self.originalPosition = targetEl.object3D.position.clone();
         self.el.object3D.visible = true;
-  
+        this.camera = self.el.sceneEl.renderer.xr.getCamera().cameras[0];
+        
         session.addEventListener('select', function () {
           var position = el.getAttribute('position');
-          var distance = position.distanceTo(this.camera.object3D.position);
+          var distance = position.distanceTo(this.camera.position);
 
           if (!this.lockTargets) {
             console.log("tryna set position " + JSON.stringify(position) + " distance " + JSON.stringify(distance));
