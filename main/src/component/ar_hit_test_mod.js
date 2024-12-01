@@ -50,11 +50,11 @@ AFRAME.registerComponent('ar_hit_test_mod', {
   
         self.originalPosition = targetEl.object3D.position.clone();
         self.el.object3D.visible = true;
-        // this.camera = session.renderer.xr.getCamera().cameras[0];
+        this.camera = session.renderer.xr.getCamera().cameras[0];
         
         session.addEventListener('select', function () {
           var position = el.getAttribute('position');
-          const zeroPos = new THREE.Vector3(0, 0, 0);
+          const zeroPos = new THREE.Vector3(0, 0, 0); //hrm, use camera or player? viewportHolder?
           var distance = position.distanceTo(zeroPos);
           var scaleMod = distance * 0.1;
           if (!this.lockTargets) {
@@ -63,6 +63,7 @@ AFRAME.registerComponent('ar_hit_test_mod', {
             targetEl.setAttribute('scale', {'x': scaleMod, 'y': scaleMod, 'z': scaleMod});
           } else {
             // targetEl.setAttribute("anchored", {"persistent": true});
+            console.log("select event with lockTargets");
           }
 
           // let localPosition = new THREE.Vector3();
@@ -77,13 +78,13 @@ AFRAME.registerComponent('ar_hit_test_mod', {
 
 
           // targetEl.object3D.updateMatrixWorld();        this.raycaster.setFromCamera(screenPosition, this.camera)
-          // if (this.camera) {
-          //   const screenPosition = new Vector2((event.clientX / window.innerWidth) * 2 - 1, -(event.clientY / window.innerHeight) * 2 + 1)
-          //   this.raycaster.setFromCamera(screenPosition, this.camera)
-          //   const hits = this.raycaster.intersectObjects(this.scene.children);
-          //   console.log("ar raycast hits" + JSON.stringify(hits));
+          if (this.camera) {
+            const screenPosition = new Vector2((event.clientX / window.innerWidth) * 2 - 1, -(event.clientY / window.innerHeight) * 2 + 1)
+            this.raycaster.setFromCamera(screenPosition, this.camera)
+            const hits = this.raycaster.intersectObjects(this.scene.children);
+            console.log("ar raycast hits" + JSON.stringify(hits));
             
-          // }
+          }
           
           // console.log("hit test position selected " + JSON.stringify(position));
           // if (arTargetData.length) {
@@ -169,13 +170,19 @@ AFRAME.registerComponent('ar_hit_test_mod', {
     },
     toggleLockTargets: function () {
       this.lockTargets = !this.lockTargets;
-      if (lockTargets) {
-        console.log("locked");
-        var targetEl = this.data.targetEl;
-        targetEl.setAttribute("anchored", {"persistent": true});
-      } else {
-        console.log("unlocked");
-        targetEl.removeAttribute("anchored");
+      var targetEl = this.data.targetEl;
+      if (targetEl) {
+        if (this.lockTargets) {
+          console.log("locked");
+          targetEl.setAttribute("anchored", {"persistent": true});
+          targetEl.object3D.visible = false;
+        } else {
+          console.log("unlocked");
+          targetEl.removeAttribute("anchored");
+          targetEl.object3D.visible = true;
+
+          //enable raycast here?
+        }
       }
     },
     tick: function () {
@@ -186,7 +193,7 @@ AFRAME.registerComponent('ar_hit_test_mod', {
       var inputMat;
       var position;
   
-      if (this.el.sceneEl.is('ar-mode')) {
+      if (this.el.sceneEl.is('ar-mode') && !this.lockTargets) {
         if (!this.viewerSpace) { return; }
         frame = this.el.sceneEl.frame;
         if (!frame) { return; }
