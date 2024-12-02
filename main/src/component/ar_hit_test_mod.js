@@ -50,7 +50,7 @@ AFRAME.registerComponent('ar_hit_test_mod', {
   
         self.originalPosition = targetEl.object3D.position.clone();
         self.el.object3D.visible = true;
-        this.camera = session.renderer.xr.getCamera().cameras[0];
+        // this.camera = session.renderer.xr.getCamera().cameras[0];
         
         session.addEventListener('select', function () {
           var position = el.getAttribute('position');
@@ -78,13 +78,13 @@ AFRAME.registerComponent('ar_hit_test_mod', {
 
 
           // targetEl.object3D.updateMatrixWorld();        this.raycaster.setFromCamera(screenPosition, this.camera)
-          if (this.camera) {
-            const screenPosition = new Vector2((event.clientX / window.innerWidth) * 2 - 1, -(event.clientY / window.innerHeight) * 2 + 1)
-            this.raycaster.setFromCamera(screenPosition, this.camera)
-            const hits = this.raycaster.intersectObjects(this.scene.children);
-            console.log("ar raycast hits" + JSON.stringify(hits));
+          // if (this.camera) {
+          //   const screenPosition = new Vector2((event.clientX / window.innerWidth) * 2 - 1, -(event.clientY / window.innerHeight) * 2 + 1)
+          //   this.raycaster.setFromCamera(screenPosition, this.camera)
+          //   const hits = this.raycaster.intersectObjects(this.scene.children);
+          //   console.log("ar raycast hits" + JSON.stringify(hits));
             
-          }
+          // }
           
           // console.log("hit test position selected " + JSON.stringify(position));
           // if (arTargetData.length) {

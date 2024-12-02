@@ -1128,7 +1128,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
         this.el.removeAttribute("gltf-model");
         this.el.removeAttribute('envMap');
         console.log("mediaID is " + mediaID);
-        if (mediaID != undefined && mediaID != null && mediaID.includes("local_")) {
+        if (mediaID != undefined && mediaID != null && mediaID.includes("local_")) { //local pics, stored in indexDB
           this.el.classList.add("hasLocalFile");
           mediaID = mediaID.substring(6);
           console.log("CLOUDMARKER SHOUDL HAVE MediaID " + mediaID + " from localFiles " + localData.localFiles[mediaID]);
