@@ -175,11 +175,11 @@ AFRAME.registerComponent('ar_hit_test_mod', {
         if (this.lockTargets) {
           console.log("locked");
           targetEl.setAttribute("anchored", {"persistent": true});
-          targetEl.object3D.visible = false;
+          this.el.object3D.visible = false;
         } else {
           console.log("unlocked");
           targetEl.removeAttribute("anchored");
-          targetEl.object3D.visible = true;
+          this.el.object3D.visible = true;
 
           //enable raycast here?
         }
