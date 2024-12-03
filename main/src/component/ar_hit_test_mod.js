@@ -36,14 +36,14 @@ AFRAME.registerComponent('ar_hit_test_mod', {
           arOverlay.style.visibility = 'visible';
         }
 
-        let arTarget = document.getElementById("ar_target"); //um, same as this.data.targetEl selector
-        if (arTarget) {       
-            document.querySelectorAll('.arTarget').forEach(function(el) { //els with "ar target" tag
-            // targetEl.position = el.getAttribute("position");
-            targetEl.id = el.id;
-            arTargetData.push(targetEl);
-          });
-        }
+        // let arTarget = document.getElementById("ar_target"); //um, same as this.data.targetEl selector
+        // if (arTarget) {       
+        //     document.querySelectorAll('.arTarget').forEach(function(el) { //els with "ar target" tag
+        //     // targetEl.position = el.getAttribute("position");
+        //     targetEl.id = el.id;
+        //     arTargetData.push(targetEl);
+        //   });
+        // }
 
         session = self.el.sceneEl.renderer.xr.getSession();
   
