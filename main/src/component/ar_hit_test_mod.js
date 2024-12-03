@@ -79,7 +79,7 @@ AFRAME.registerComponent('ar_hit_test_mod', {
                 if (elVisible) {
   
                   const details = this.el.components.raycaster.getIntersection(el);
-                  console.log("hit test details " + JSON.stringify(details));
+                  console.log("ray hit select " + JSON.stringify(details));
                   el.emit('click', details);
                   
                   break;
@@ -252,6 +252,7 @@ AFRAME.registerComponent('ar_hit_test_mod', {
           direction.set(0, 0, -1);
           direction.applyQuaternion(transform.orientation);
           this.el.setAttribute("raycaster", {
+            objects: ".activeObjexRay",
             origin: transform.position,
             direction
           });
@@ -268,7 +269,7 @@ AFRAME.registerComponent('ar_hit_test_mod', {
             if (elVisible) {
 
               const details = this.el.components.raycaster.getIntersection(el);
-              console.log("hit test details " + JSON.stringify(details));
+              // console.log("hit test details " + JSON.stringify(details));
               el.emit('mouseenter', details);
               
               // Don't go to the next element
