@@ -4495,7 +4495,7 @@ webxr_router.get('/:_id', function (req, res) {
                                     "</a-entity>"+
                                     // "<a-entity hide-on-hit-test-start shadow id=\x22ar_target\x22 scale=\x220.2 0.2 0.2\x22 position=\x220.2 0 -0.4\x22><a-box show-in-ar-mode visible=\x22false\x22></a-box></a-entity>";
                                     // "<a-entity show-in-ar-mode visible=\x22false\x22 id=\x22reticleEntity\x22 gltf-model=\x22#reticle2\x22 scale=\x220.8 0.8 0.8\x22 ar-hit-test-spawn=\x22mode: "+arMode+"\x22></a-entity>\n";
-                                    "<a-entity show-in-ar-mode visible=\x22false\x22 id=\x22hitTester\x22 ar_hit_test_mod=\x22targetEl: #ar_target\x22 gltf-model=\x22#reticle\x22></a-entity>\n";
+                                    "<a-entity show-in-ar-mode visible=\x22false\x22 id=\x22hitTester\x22 ar_hit_test_mod=\x22targetEl: #ar_target\x22 gltf-model=\x22#reticle2\x22></a-entity>\n";
                         // }
                         handsTemplate = "<template id=\x22hand-template\x22><a-entity><a-box scale=\x220.1 0.1 0.1\x22 visible=false></a-box></a-entity></template>";
                        

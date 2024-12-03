@@ -9,6 +9,8 @@ AFRAME.registerComponent('ar_hit_test_mod', {
       this.viewerSpace = null;
       this.refSpace = null;
       this.lockTargets = false;
+      this.arRaycasterEnabled = false;
+      this.direction = new THREE.Vector3();
       this.camera = null;
   
       this.el.sceneEl.renderer.xr.addEventListener(function () {
@@ -176,12 +178,13 @@ AFRAME.registerComponent('ar_hit_test_mod', {
           console.log("locked");
           targetEl.setAttribute("anchored", {"persistent": true});
           this.el.object3D.visible = false;
+          this.arRaycasterEnabled = true;
         } else {
           console.log("unlocked");
           targetEl.removeAttribute("anchored");
           this.el.object3D.visible = true;
-
           //enable raycast here?
+          this.arRaycasterEnabled = false;
         }
       }
     },
@@ -210,6 +213,50 @@ AFRAME.registerComponent('ar_hit_test_mod', {
             position = new THREE.Vector3();
             position.setFromMatrixPosition(inputMat);
             this.el.setAttribute('position', position);
+          }
+        }
+      } else {
+        if (this.el.sceneEl.is('ar-mode') && this.arRaycasterEnabled) {
+          // const frame = e.frame;
+          // const inputSource = e.inputSource;
+          // const referenceSpace = this.el.renderer.xr.getReferenceSpace();
+          // const pose = frame.getPose(inputSource.targetRaySpace, referenceSpace);
+          if (!this.viewerSpace) { return; }
+          frame = this.el.sceneEl.frame;
+          if (!frame) { return; }
+          xrViewerPose = frame.getViewerPose(this.refSpace);
+          const transform = xrViewerPose.transform;
+          
+          this.direction.set(0, 0, -1);
+          this.direction.applyQuaternion(transform.orientation);
+          this.el.setAttribute("raycaster", {
+            origin: transform.position,
+            direction
+          });
+          this.el.components.raycaster.checkIntersections();
+          const els = this.el.components.raycaster.intersectedEls;
+          for (const el of els) {
+            const obj = el.object3D;
+            let elVisible = obj.visible;
+            obj.traverseAncestors(parent => {
+              if (parent.visible === false ) {
+                elVisible = false
+              }
+            });
+            if (elVisible) {
+  
+              // Cancel the ar-hit-test behaviours
+              // this.el.components['ar-hit-test'].hitTest = null;
+              // this.el.components['ar-hit-test'].bboxMesh.visible = false;
+              
+              // Emit click on the element for events
+              const details = this.el.components.raycaster.getIntersection(el);
+              console.log("hit test details " + JSON.stringify(details));
+              el.emit('mouseenter', details);
+              
+              // Don't go to the next element
+              break;
+            }
           }
         }
       }
