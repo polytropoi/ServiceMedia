@@ -3090,22 +3090,26 @@ webxr_router.get('/:_id', function (req, res) {
                                     if (sceneResponse.sceneTags != null && (sceneResponse.sceneTags.includes('debug'))) {
                                         visible = true;
                                     }
-                                    // navmeshAsset = "<a-asset-item id=\x22" + m_assetID + "\x22 src=\x22"+ modelURL +"\x22></a-asset-item>";
-                                    // geometry=\x22primitive: plane; height: 40; width: 40;\x22        
-                                    navmeshEntity = "<a-entity id=\x22nav-mesh\x22 nav-mesh nav_mesh_controller=\x22useDefault: true;\x22 visible=\x22"+visible+"\x22></a-entity>"; //use big circle if no defined navmesh
+
+                                    if (locMdl.locationTags.includes("ar target") || locMdl.locationTags.includes("artarget")) {
+                                        arTargetElements = arTargetElements + "<a-entity id=\x22nav-mesh\x22 nav-mesh nav_mesh_controller=\x22useDefault: true;\x22 visible=\x22"+visible+"\x22></a-entity>"; //use big circle if no defined navmesh
+                                    } else {
+                                        navmeshEntity = "<a-entity id=\x22nav-mesh\x22 nav-mesh nav_mesh_controller=\x22useDefault: true;\x22 visible=\x22"+visible+"\x22></a-entity>"; //use big circle if no defined navmesh
+                                    }
                                 }
                                 if (locMdl.markerType == "surface") {
                                     let visible = false;
                                     if (sceneResponse.sceneTags != null && (sceneResponse.sceneTags.includes('debug'))) {
                                         visible = true;
                                     }
-                                    // navmeshAsset = "<a-asset-item id=\x22" + m_assetID + "\x22 src=\x22"+ modelURL +"\x22></a-asset-item>";        
-                                    // scatterSurface = "scatter-surface";
-                                    // id = 'scatterSurface';
-                                    // entityType = "surface";
-                                    // navmeshEntity = navmeshEntity + "<a-entity class=\x22surface\x22 id=\x22scatterSurface\x22 scatter-surface-default geometry=\x22primitive: plane; height: 50; width: 50;\x22 visible=\x22"+visible+"\x22 position=\x220 .01 0\x22 rotation=\x22-90 0 0\x22></a-entity>"; //use big circle if no defined navmesh
-                                    surfaceEntity = "<a-entity class=\x22surface\x22 id=\x22scatterSurface\x22 scatter-surface-default rotation=\x22-90 0 0\x22 visible=\x22"+visible+"\x22></a-entity>"; //use big circle if no defined navmesh
 
+                                    if (locMdl.tags.includes("ar target") || locMdl.tags.includes("artarget")) {
+                                        arTargetElements = arTargetElements + "<a-entity class=\x22surface\x22 id=\x22scatterSurface\x22 scatter-surface-default rotation=\x22-90 0 0\x22 visible=\x22"+visible+"\x22></a-entity>"; //use big circle if no defined navmesh
+                                    } else {
+                                        surfaceEntity = "<a-entity class=\x22surface\x22 id=\x22scatterSurface\x22 scatter-surface-default rotation=\x22-90 0 0\x22 visible=\x22"+visible+"\x22></a-entity>"; //use big circle if no defined navmesh
+                                    }
+                                    
+                                    arTargetElements
                                 }
                                 callbackz();
                             }

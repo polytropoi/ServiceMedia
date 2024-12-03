@@ -273,13 +273,7 @@ AFRAME.registerComponent('mod_model', {
             if (settings.usePhysicsType == "cannon") {
               console.log("tryna useSuperHands and set the ground static-body");
               this.el.setAttribute("static-body", {'shape': 'auto'});
-              // let testCubeEl = document.createElement("a-entity");
               
-              // testCubeEl.setAttribute('mixin', 'cube');
-              // testCubeEl.setAttribute('position', '1, 10, .5');
-              // testCubeEl.setAttribute('material', {'color': 'purple'});
-              // this.el.sceneEl.appendChild(testCubeEl);
-              // <a-entity class="cube" mixin="cube" position="1 5.265 -0.5" material="color: green"></a-entity>
             }
           } 
           if (this.data.markerType == "navmesh" 
@@ -1983,6 +1977,7 @@ AFRAME.registerComponent('mod_model', {
       console.log("TRYNA SCATTER MOD_MODEL with count " + count + " ypos " + this.data.ypos);
       let scatterCount = 0;
       // if (!this.isNavAgent) { //use waypoints for position below instead of raycasting if it's gonna nav
+      let arTargetEl = document.getElementById("ar_target");
         let interval = setInterval( () => {
         for (let i = 0; i < 100; i++) {
           let testPosition = new THREE.Vector3();
@@ -2014,7 +2009,12 @@ AFRAME.registerComponent('mod_model', {
               // scatteredEl.setAttribute("scale", {x: scale, y:scale, z: scale})
 
             // }
-            this.el.sceneEl.appendChild(scatteredEl);
+            if (this.data.tags && (this.data.tags.toLowerCase().includes("ar target") || this.data.tags.toLowerCase().includes("artarget"))) {
+              arTargetEl.appendChild(scatteredEl);
+            } else {
+              this.el.sceneEl.appendChild(scatteredEl);
+            }
+
             scatterCount++;
 
             if (scatterCount > count) {

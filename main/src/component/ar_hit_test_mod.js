@@ -24,7 +24,7 @@ AFRAME.registerComponent('ar_hit_test_mod', {
         var el = self.el;
         var targetEl = self.data.targetEl;
         var session;
-        var arTargetData = [];
+        // var arTargetData = [];
         // let arTargetGroup = new THREE.Group();
 
         console.log("enter-vr");
@@ -36,10 +36,6 @@ AFRAME.registerComponent('ar_hit_test_mod', {
           arOverlay.style.visibility = 'visible';
         }
 
-
-        // const hits = this.raycaster.intersectObjects(this.scene.children)
-        // console.log("ar raycast hits")
-        // let arTargetEls = document.querySelectorAll(".ar_target");
         let arTarget = document.getElementById("ar_target"); //um, same as this.data.targetEl selector
         if (arTarget) {       
             document.querySelectorAll('.arTarget').forEach(function(el) { //els with "ar target" tag
@@ -59,7 +55,7 @@ AFRAME.registerComponent('ar_hit_test_mod', {
           var position = el.getAttribute('position');
           const zeroPos = new THREE.Vector3(0, 0, 0); //hrm, use camera or player? viewportHolder?
           var distance = position.distanceTo(zeroPos);
-          var scaleMod = distance * 0.5;
+          var scaleMod = distance * 0.2;
           if (!self.lockTargets) {
             console.log("tryna set position " + JSON.stringify(position) + " distance " + JSON.stringify(distance));
             targetEl.setAttribute('position', position);
@@ -79,7 +75,7 @@ AFRAME.registerComponent('ar_hit_test_mod', {
                 });
                 if (elVisible) {
   
-                  const details = this.el.components.raycaster.getIntersection(el);
+                  const details = self.el.components.raycaster.getIntersection(el);
                   console.log("ray hit select " + JSON.stringify(details));
                   el.emit('click', details);
                   
@@ -98,79 +94,6 @@ AFRAME.registerComponent('ar_hit_test_mod', {
               z: (position.z + 2)
             });
           }
-
-
-          // targetEl.object3D.updateMatrixWorld();        this.raycaster.setFromCamera(screenPosition, this.camera)
-          // if (this.camera) {
-          //   const screenPosition = new Vector2((event.clientX / window.innerWidth) * 2 - 1, -(event.clientY / window.innerHeight) * 2 + 1)
-          //   this.raycaster.setFromCamera(screenPosition, this.camera)
-          //   const hits = this.raycaster.intersectObjects(this.scene.children);
-          //   console.log("ar raycast hits" + JSON.stringify(hits));
-            
-          // }
-          
-          // console.log("hit test position selected " + JSON.stringify(position));
-          // if (arTargetData.length) {
-          //   targetEl.object3D.visible = false;
-          // }
-          // for (let i = 0; i < arTargetData.length; i++) {
-          //   // el.object3D.worldToLocal(localPosition);
-          //   // console.log("tryna set id " + arTargetData[i].id + " position " + position);
-          //   let arTargetEl = document.getElementById(arTargetData[i].id);
-          //   if (arTargetEl) {
-          //     console.log("arTarget index" + i.toString() + "tryna set id " + arTargetData[i].id + " at position " + JSON.stringify(position));
-              
-              // let arTargetPosition = new THREE.Vector3(); //get position data from components if found
-             
-              // let localMarkerComponent = arTargetEl.components.local_marker;
-              // if (localMarkerComponent) {
-              //   arTargetPosition = targetEl.object3D.worldToLocal(parseFloat(localMarkerComponent.data.xpos, parseFloat(localMarkerComponent.data.ypos), parseFloat(localMarkerComponent.data.zpos)));
-              //   console.log("localmarker arTargetPosition " + JSON.stringify(arTargetPosition));
-
-              //   arTargetEl.setAttribute('position', arTargetPosition);
-              //   // arTargetEl.setAttribute('scale', {x: parseFloat(localMarkerComponent.data.xscale) * 0.2, 
-              //   //                                   y: parseFloat(localMarkerComponent.data.yscale) * 0.2, 
-              //   //                                   z: parseFloat(localMarkerComponent.data.zscale) * 0.2});
-              // } else {
-              //   let cloudMarkerComponent = arTargetEl.components.cloud_marker;
-              //   if (cloudMarkerComponent) {
-              //     arTargetPosition = targetEl.object3D.worldToLocal(parseFloat(cloudMarkerComponent.data.xpos, parseFloat(cloudMarkerComponent.data.ypos), parseFloat(cloudMarkerComponent.data.zpos)));
-              //     console.log("cloudmarker arTargetPosition " + JSON.stringify(arTargetPosition));
-              //     arTargetEl.setAttribute('position', arTargetPosition);
-              //     // arTargetEl.setAttribute('scale', {x: parseFloat(cloudMarkerComponent.data.xscale) * 0.2, 
-              //     //                                   y: parseFloat(cloudMarkerComponent.data.yscale) * 0.2, 
-              //     //                                   z: parseFloat(cloudMarkerComponent.data.zscale) * 0.2});
-              //   } else {
-              //     let modModelComponent = arTargetEl.components.mod_model;
-              //     if (modModelComponent) {
-              //       arTargetPosition = targetEl.object3D.worldToLocal(parseFloat(modModelComponent.data.xpos, parseFloat(modModelComponent.data.ypos), parseFloat(modModelComponent.data.zpos)));
-              //       console.log("modmodel arTargetPosition " + JSON.stringify(arTargetPosition));
-              //       arTargetEl.setAttribute('position', position);
-              //       // arTargetEl.setAttribute('scale', {x: parseFloat(modModelComponent.data.xscale) * 0.2, 
-              //       //                                   y: parseFloat(modModelComponent.data.yscale) * 0.2, 
-              //       //                                   z: parseFloat(modModelComponent.data.zscale) * 0.2});
-              //     } else {
-              //         let modObjectComponent = arTargetEl.components.mod_object;
-              //         if (modObjectComponent) {
-              //           arTargetPosition = targetEl.object3D.worldToLocal(parseFloat(modObjectComponent.data.xpos, parseFloat(modObjectComponent.data.ypos), parseFloat(modObjectComponent.data.zpos)));
-              //           console.log("modobject arTargetPosition " + JSON.stringify(arTargetPosition));
-              //           arTargetEl.setAttribute('position', position);
-              //           // arTargetEl.setAttribute('scale', {x: parseFloat(modObjectComponent.data.xscale) * 0.2, 
-              //           //                                   y: parseFloat(modObjectComponent.data.yscale) * 0.2, 
-              //           //                                   z: parseFloat(modObjectComponent.data.zscale) * 0.2});
-              //       }
-              //     }
-              //   }
-              // }
-              // console.log("arTargetPosition " + position);
-              // arTarget.setAttribute('position', position);
-
-            // } else {
-            //   console.log(arTargetData[i].id + " targetEl  not found!");
-            // }
-             
-          // }
-
         });
   
         session.requestReferenceSpace('viewer').then(function (space) {
@@ -239,10 +162,7 @@ AFRAME.registerComponent('ar_hit_test_mod', {
         }
       } else {
         if (this.el.sceneEl.is('ar-mode') && this.arRaycasterEnabled) {
-          // const frame = e.frame;
-          // const inputSource = e.inputSource;
-          // const referenceSpace = this.el.renderer.xr.getReferenceSpace();
-          // const pose = frame.getPose(inputSource.targetRaySpace, referenceSpace);
+
           if (!this.viewerSpace) { return; }
           frame = this.el.sceneEl.frame;
           if (!frame) { return; }
@@ -268,11 +188,9 @@ AFRAME.registerComponent('ar_hit_test_mod', {
               }
             });
             if (elVisible) {
-
               const details = this.el.components.raycaster.getIntersection(el);
               // console.log("hit test details " + JSON.stringify(details));
               el.emit('mouseenter', details);
-              
               // Don't go to the next element
               break;
             }
