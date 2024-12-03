@@ -1,5 +1,6 @@
 /* global AFRAME, THREE */
 AFRAME.registerComponent('ar_hit_test_mod', {
+    dependencies: ["raycaster"],
     schema: {targetEl: {type: 'selector'}},
   
     init: function () {
@@ -10,7 +11,7 @@ AFRAME.registerComponent('ar_hit_test_mod', {
       this.refSpace = null;
       this.lockTargets = false;
       this.arRaycasterEnabled = false;
-      this.direction = new THREE.Vector3();
+
       this.camera = null;
   
       this.el.sceneEl.renderer.xr.addEventListener(function () {
@@ -195,6 +196,7 @@ AFRAME.registerComponent('ar_hit_test_mod', {
       var pose;
       var inputMat;
       var position;
+      var direction;
   
       if (this.el.sceneEl.is('ar-mode') && !this.lockTargets) {
         if (!this.viewerSpace) { return; }
@@ -224,11 +226,12 @@ AFRAME.registerComponent('ar_hit_test_mod', {
           if (!this.viewerSpace) { return; }
           frame = this.el.sceneEl.frame;
           if (!frame) { return; }
+          direction = new THREE.Vector3();
           xrViewerPose = frame.getViewerPose(this.refSpace);
           const transform = xrViewerPose.transform;
           
-          this.direction.set(0, 0, -1);
-          this.direction.applyQuaternion(transform.orientation);
+          direction.set(0, 0, -1);
+          direction.applyQuaternion(transform.orientation);
           this.el.setAttribute("raycaster", {
             origin: transform.position,
             direction
