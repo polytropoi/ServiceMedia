@@ -59,15 +59,16 @@ AFRAME.registerComponent('ar_hit_test_mod', {
           var position = el.getAttribute('position');
           const zeroPos = new THREE.Vector3(0, 0, 0); //hrm, use camera or player? viewportHolder?
           var distance = position.distanceTo(zeroPos);
-          var scaleMod = distance * 0.1;
-          if (!this.lockTargets) {
+          var scaleMod = distance * 0.5;
+          if (!self.lockTargets) {
             console.log("tryna set position " + JSON.stringify(position) + " distance " + JSON.stringify(distance));
             targetEl.setAttribute('position', position);
             targetEl.setAttribute('scale', {'x': scaleMod, 'y': scaleMod, 'z': scaleMod});
           } else {
-            if (this.el.components.raycaster) {
-              this.el.components.raycaster.checkIntersections();
-              const els = this.el.components.raycaster.intersectedEls;
+            if (self.el.components.raycaster) {
+              console.log("gotsa ar raycaster!");
+              self.el.components.raycaster.checkIntersections();
+              const els = self.el.components.raycaster.intersectedEls;
               for (const el of els) {
                 const obj = el.object3D;
                 let elVisible = obj.visible;
@@ -161,7 +162,7 @@ AFRAME.registerComponent('ar_hit_test_mod', {
               //     }
               //   }
               // }
-              console.log("arTargetPosition " + position);
+              // console.log("arTargetPosition " + position);
               // arTarget.setAttribute('position', position);
 
             // } else {
