@@ -135,10 +135,12 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
         this.el.classList.remove("activeObjexRay");
       }
   
-      console.log("CLOUDMARKER " + this.data.name + " " +this.data.markerType + " " + this.data.modelID );
+      console.log("CLOUDMARKER " + this.data.name + " " +this.data.markerType + " " + this.data.modelID + " " + this.data.tags);
       // this.el.removeAttribute("geometry"); //just in case?
           
-      if ((!this.data.modelID || this.data.modelID == undefined || this.data.modelID == "" || this.data.modelID == "none")) {//if no model def'd
+      ////check model status........
+
+      if ((!this.data.modelID || this.data.modelID == undefined || this.data.modelID == "" || this.data.modelID == "none")) { //if no model def'd
           // && !this.data.modelID != "primitive_cube"
           // && !this.data.modelID != "primitive_sphere"
           // && !this.data.modelID != "primitive_cylinder") 
@@ -311,15 +313,16 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
                 this.el.setAttribute("mod_flicker", {type: "candle"});
               }
               if (this.data.tags.includes("hide gizmo") || (settings && settings.hideGizmos)) {
-                this.el.removeAttribute("geometry");
+                this.el.removeAttribute("geometry"); //this rems the sphere gizmo, not the light itself...
               } else {
                 this.el.object3D.visible = true;
               }
               
-            }
+            } //end if light
           
             if (this.data.tags.includes("hide") || this.data.tags.includes("highlight") || (settings && settings.hideGizmos)) {
-              if (this.data.markerType != "mailbox" && this.data.markerType != "light" && this.data.markerType != "gate") {
+              if (this.data.markerType != "mailbox" && this.data.markerType != "light") {
+              // if (this.data.markerType != "mailbox" && this.data.markerType != "light" && this.data.markerType != "gate") {
                 this.el.object3D.visible = false;
               }
             } else {
@@ -327,7 +330,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
             }
             //   }
             // }
-          } else {
+      } else {
             if (this.data.modelID != "none") {
               if (this.data.modelID.toString().includes("primitive")) {   
                 // console.log("CLOUDMARKER PRIMITIVE " + this.data.modelID);
@@ -411,7 +414,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
               }
             }
             if (this.data.tags.includes("hide gizmo") || this.data.tags.includes("highlight") || (settings && settings.hideGizmos)) {
-              if (this.data.markerType != "mailbox" && this.data.markerType != "light"  && this.data.markerType != "gate") {
+              if (this.data.markerType != "mailbox" && this.data.markerType != "light") {
                 console.log(this.data.name + " hiding gizmos because");
                 this.el.object3D.visible = false;
               }
@@ -522,7 +525,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
         evt.preventDefault();
         this.el.removeAttribute("animation-mixer"); 
         const obj = this.el.getObject3D('mesh');
-        this.el.object3D.visible = true;
+        // this.el.object3D.visible = true;
         
         console.log(this.data.name + " " + this.data.modelID + " model-loaded for CLOUDMARKER " + this.data.name + " type " + this.data.markerType);
         if (this.data.markerType != "object") {
@@ -725,7 +728,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
             if (this.dialogEl) {
               if (that.data.eventData && that.data.eventData.length > 2) {
                 let url = "/webxr/" + that.data.eventData;
-                this.dialogEl.components.mod_dialog.showPanel("Enter the gate ?", "href~"+ url, "gatePass", 5000 );
+                this.dialogEl.components.mod_dialog.showPanel("Enter " + this.data.name + " ?", "href~"+ url, "gatePass", 5000 );
               } else {
               let ascenesEl = document.getElementById("availableScenesControl");
               if (ascenesEl) {
@@ -1317,7 +1320,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
         if (!modelID) {
           modelID = this.data.modelID;
         }
-        console.log(this.data.name + "tryna load cloudmarker model " + modelID);
+        console.log(this.data.name + " tryna load cloudmarker model " + modelID + " tags " + this.data.tags);
         let transform_controls_component = this.el.components.transform_controls;
         if (transform_controls_component) {
             if (transform_controls_component.data.isAttached) {
@@ -1421,13 +1424,13 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
 
             }
             
-            // if (this.data.tags && this.data.tags.includes("hide gizmo") || (settings && settings.hideGizmos)) {
-            //   if (this.data.markerType != "mailbox" && this.data.markerType != "light") {
-            //     this.el.object3D.visible = false;
-            //   }
-            //   this.el.classList.remove("activeObjexRay");
-              
-            // }
+            if (this.data.tags && this.data.tags.includes("hide gizmo") || (settings && settings.hideGizmos)) {
+              if (this.data.markerType != "mailbox" && this.data.markerType != "light") {
+                this.el.object3D.visible = false;
+                this.el.setAttribute("visible", false);
+                console.log("hiding " + this.data.name + " because....");
+              }
+            }
             if (this.data.markerType == "navmesh" || this.data.markerType == "surface") {
               if (this.data.tags.includes("show")) {
                 this.el.object3D.visible = true;
@@ -1630,11 +1633,11 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
          
 
           if (this.data.tags && this.data.tags.includes("hide gizmo") ||  this.data.tags.includes("highlight") || (settings && settings.hideGizmos)) {
-            if (this.data.markerType != "mailbox" && this.data.markerType != "light"  && this.data.markerType != "gate") {
+            if (this.data.markerType != "mailbox" && this.data.markerType != "light") {
               console.log("tryna hide gizmo 2");
               this.el.object3D.visible = false;
             }
-            this.el.classList.remove("activeObjexRay");
+            // this.el.classList.remove("activeObjexRay");
           }
           if (this.data.markerType == "navmesh"  || this.data.markerType == "surface" ) {
             if (!this.data.tags.includes("show")) {

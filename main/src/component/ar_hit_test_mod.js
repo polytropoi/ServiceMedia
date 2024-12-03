@@ -65,8 +65,27 @@ AFRAME.registerComponent('ar_hit_test_mod', {
             targetEl.setAttribute('position', position);
             targetEl.setAttribute('scale', {'x': scaleMod, 'y': scaleMod, 'z': scaleMod});
           } else {
-            // targetEl.setAttribute("anchored", {"persistent": true});
-            console.log("select event with lockTargets");
+            if (this.el.components.raycaster) {
+              this.el.components.raycaster.checkIntersections();
+              const els = this.el.components.raycaster.intersectedEls;
+              for (const el of els) {
+                const obj = el.object3D;
+                let elVisible = obj.visible;
+                obj.traverseAncestors(parent => {
+                  if (parent.visible === false ) {
+                    elVisible = false
+                  }
+                });
+                if (elVisible) {
+  
+                  const details = this.el.components.raycaster.getIntersection(el);
+                  console.log("hit test details " + JSON.stringify(details));
+                  el.emit('click', details);
+                  
+                  break;
+                }
+              }
+            }
           }
 
           // let localPosition = new THREE.Vector3();
@@ -247,12 +266,7 @@ AFRAME.registerComponent('ar_hit_test_mod', {
               }
             });
             if (elVisible) {
-  
-              // Cancel the ar-hit-test behaviours
-              // this.el.components['ar-hit-test'].hitTest = null;
-              // this.el.components['ar-hit-test'].bboxMesh.visible = false;
-              
-              // Emit click on the element for events
+
               const details = this.el.components.raycaster.getIntersection(el);
               console.log("hit test details " + JSON.stringify(details));
               el.emit('mouseenter', details);
