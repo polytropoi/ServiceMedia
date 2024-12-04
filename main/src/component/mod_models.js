@@ -92,8 +92,8 @@ AFRAME.registerComponent('mod_model', {
           // this.el.sceneEl.setAttribute("ar-hit-test", {"target": elID});
           // console.log("hit test target is " + elID);
         }
-        if (this.data.tags && this.data.tags.length && (this.data.tags.toLowerCase().includes("ar target") || this.data.tags.toLowerCase().includes("artarget")) || this.data.tags.toLowerCase().includes("ar_target")) {
-          this.el.classList.add("arTarget");       
+        if (this.data.tags && this.data.tags.length && (this.data.tags.toLowerCase().includes("ar child") || this.data.tags.toLowerCase().includes("archild")) || this.data.tags.toLowerCase().includes("ar_child")) {
+          this.el.classList.add("arChild");       
         }
         // if (this.data.description && this.data.description.length > 1) {
         //   // console.log("model eventData " + JSON.stringify(this.data.eventData));
@@ -373,32 +373,13 @@ AFRAME.registerComponent('mod_model', {
                 this.particlesEl = document.createElement("a-entity");
                 this.el.sceneEl.appendChild(this.particlesEl); //hrm...
                 this.el.classList.add("target");
-                // this.el.classList.add("ar_target");
-                // this.el.classList.remove("activeObjexRay");
-                // let arTarget = document.getElementById("ar_target");
-                // if (arTarget) {
-                //   arTarget.appendChild(this.el);
-                // }
+
             }
-            // if (this.data.eventData.toLowerCase().includes("callout") && this.data.description && this.data.description != "") {
-            // if (this.data.eventData.toLowerCase().includes("callout")) {
-            //   // this.el.setAttribute("entity-callout", {'calloutString': this.data.description});
-            //   this.hasLocationCallout = true;
-            //   this.hasCallout = true;
-            // }
-            
+
   
             this.el.addEventListener('raycaster-intersected', e =>{  // raycaster-intersected
               this.raycaster = e.detail.el;
-              // that.raycaster = this.raycaster;
-              // this.intersection = this.raycaster.components.raycaster.getIntersection(this.el);
-              // if (this.intersection.point) {
-              //   // console.log("intersection " + JSON.stringify(this.intersection.point));
-              //   this.hitpoint.x = this.intersection.point.x.toFixed(2);
-              //   this.hitpoint.y = this.intersection.point.y.toFixed(2);
-              //   this.hitpoint.z = this.intersection.point.z.toFixed(2);
-              //   this.rayhit(this.hitpoint);
-              // }
+
               // console.log("raycaster "+ e.detail.el.id +" mod_model target hit " + this.el.id + " with tags " + this.data.tags);
               if (this.raycaster) {
                 this.intersection = this.raycaster.components.raycaster.getIntersection(this.el);
@@ -2009,7 +1990,8 @@ AFRAME.registerComponent('mod_model', {
               // scatteredEl.setAttribute("scale", {x: scale, y:scale, z: scale})
 
             // }
-            if (this.data.tags && (this.data.tags.toLowerCase().includes("ar target") || this.data.tags.toLowerCase().includes("artarget"))) {
+            if ((this.data.tags && (this.data.tags.toLowerCase().includes("ar child") || this.data.tags.toLowerCase().includes("archild"))) 
+              || settings && settings.useArTarget) {
               arTargetEl.appendChild(scatteredEl);
             } else {
               this.el.sceneEl.appendChild(scatteredEl);

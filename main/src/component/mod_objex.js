@@ -92,8 +92,8 @@ AFRAME.registerComponent('mod_objex', {
                       // objEl.id = "obj" + this.data.jsonLocationsData[i].objectID + "_" + this.data.jsonLocationsData[i].timestamp;
                       objEl.id = this.data.jsonLocationsData[i].timestamp; //only timestamp so locpickers can find it...other objtypes aren't allowMods, i.e. spawned at runtime
                       if (this.data.jsonLocationsData[i].locationTags && 
-                        (this.data.jsonLocationsData[i].locationTags.toLowerCase().includes("ar target") || 
-                        this.data.jsonLocationsData[i].locationTags.toLowerCase().includes("artarget"))) {                
+                        (this.data.jsonLocationsData[i].locationTags.toLowerCase().includes("ar child") || 
+                        this.data.jsonLocationsData[i].locationTags.toLowerCase().includes("archild"))) {                
                           let ar_target = document.getElementById("ar_target");
                           if (ar_target) {
                             ar_target.appendChild(objEl);
@@ -818,8 +818,8 @@ AFRAME.registerComponent('mod_object', {
               this.el.dataset.isvisible = false;
               console.log("mod_object tryna hide myself set to visible " + this.el.dataset.isvisible);
           }
-          if ( this.data.locationData.locationTags.toLowerCase().includes("ar target") || this.data.locationData.locationTags.toLowerCase().includes("ar_target") || this.data.locationData.locationTags.toLowerCase().includes("artarget")) { 
-            this.el.classList.add("arTarget");
+          if ( this.data.locationData.locationTags.toLowerCase().includes("ar child") || this.data.locationData.locationTags.toLowerCase().includes("ar_child") || this.data.locationData.locationTags.toLowerCase().includes("archild")) { 
+            this.el.classList.add("arChild");
           }
       } 
       if (this.data.tags && this.data.tags != undefined  && this.data.tags != 'undefined' && this.data.tags.length > 0) {

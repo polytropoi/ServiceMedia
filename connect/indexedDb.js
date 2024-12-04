@@ -119,7 +119,7 @@ function InitIDB() {
                      } else {//local-only elements, not saved to cloud yet
                         hasLocalData = true;
                         let localEl = document.createElement("a-entity");
-                        sceneEl.appendChild(localEl);
+                        
                       
                         if ( (cursor.value.locations[i].mediaID && cursor.value.locations[i].mediaID.includes("local_") || 
                              (cursor.value.locations[i].modelID && cursor.value.locations[i].modelID.includes("local_")))) {
@@ -130,6 +130,14 @@ function InitIDB() {
                         }
                         if (cursor.value.locations[i].markerType == "curve point") {
                            curveLocations.push(cursor.value.locations[i]);
+                        }
+                        if (cursor.value.locations[i].locationTags && cursor.value.locations[i].locationTags.includes("ar target")) {
+                           let arTargetEl = document.getElementById("ar_target");
+                           if (arTargetEl) {
+                              arTargetEl.appendChild(localEl);
+                           }
+                        } else {
+                           sceneEl.appendChild(localEl);
                         }
                         localEl.setAttribute("position", {x: cursor.value.locations[i].x, y: cursor.value.locations[i].y, z: cursor.value.locations[i].z });
                         localEl.setAttribute("rotation", {x: cursor.value.locations[i].eulerx, y: cursor.value.locations[i].eulery, z: cursor.value.locations[i].eulerz });

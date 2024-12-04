@@ -13,7 +13,7 @@ AFRAME.registerComponent('ar_hit_test_mod', {
       this.arRaycasterEnabled = false;
 
       this.camera = null;
-  
+      const messageEl = document.getElementById("ar_overlay_message");
       this.el.sceneEl.renderer.xr.addEventListener(function () {
         self.viewerSpace = null;
         self.refSpace = null;
@@ -28,9 +28,11 @@ AFRAME.registerComponent('ar_hit_test_mod', {
         // let arTargetGroup = new THREE.Group();
 
         console.log("enter-vr");
+        // messageEl.textContent = "entered immersive mode";
         if (!self.el.sceneEl.is('ar-mode')) { return; }
-
+        messageEl.textContent = "entered AR mode";
         console.log("ar-mode");
+
         let arOverlay = document.getElementById("ar_overlay");
         if (arOverlay) {
           arOverlay.style.visibility = 'visible';
@@ -38,7 +40,7 @@ AFRAME.registerComponent('ar_hit_test_mod', {
 
         // let arTarget = document.getElementById("ar_target"); //um, same as this.data.targetEl selector
         // if (arTarget) {       
-        //     document.querySelectorAll('.arTarget').forEach(function(el) { //els with "ar target" tag
+        //     document.querySelectorAll('.arChild').forEach(function(el) { //els with "ar target" tag
         //     // targetEl.position = el.getAttribute("position");
         //     targetEl.id = el.id;
         //     arTargetData.push(targetEl);
@@ -46,9 +48,10 @@ AFRAME.registerComponent('ar_hit_test_mod', {
         // }
 
         session = self.el.sceneEl.renderer.xr.getSession();
-  
+        
         self.originalPosition = targetEl.object3D.position.clone();
         self.el.object3D.visible = true;
+        messageEl.textContent = "scanning for surface....";
         // this.camera = session.renderer.xr.getCamera().cameras[0];
         
         session.addEventListener('select', function () {
@@ -58,6 +61,7 @@ AFRAME.registerComponent('ar_hit_test_mod', {
           var scaleMod = distance * 0.2;
           if (!self.lockTargets) {
             console.log("tryna set position " + JSON.stringify(position) + " distance " + JSON.stringify(distance));
+            messageEl.textContent = "surface found at position " + JSON.stringify(position);
             targetEl.setAttribute('position', position);
             targetEl.setAttribute('scale', {'x': scaleMod, 'y': scaleMod, 'z': scaleMod});
           } else {
@@ -76,7 +80,8 @@ AFRAME.registerComponent('ar_hit_test_mod', {
                 if (elVisible) {
   
                   const details = self.el.components.raycaster.getIntersection(el);
-                  console.log("ray hit select " + JSON.stringify(details));
+                  // console.log("ray hit select " + JSON.stringify(details));
+                  messageEl.textContent = "ray hit on object " + el.id;
                   el.emit('click', details);
                   
                   break;
@@ -107,6 +112,8 @@ AFRAME.registerComponent('ar_hit_test_mod', {
         session.requestReferenceSpace('local-floor').then(function (space) {
           self.refSpace = space;
         });
+
+
       });
   
       this.el.sceneEl.addEventListener('exit-vr', function () {
@@ -123,12 +130,14 @@ AFRAME.registerComponent('ar_hit_test_mod', {
           targetEl.setAttribute("anchored", {"persistent": true});
           this.el.object3D.visible = false;
           this.arRaycasterEnabled = true;
+          messageEl.textContent = "hit test disabled, raycaster enabled";
         } else {
           console.log("unlocked");
           targetEl.removeAttribute("anchored");
           this.el.object3D.visible = true;
           //enable raycast here?
           this.arRaycasterEnabled = false;
+          messageEl.textContent = "hit test enabled, raycaster disabled";
         }
       }
     },

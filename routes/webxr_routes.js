@@ -686,6 +686,11 @@ webxr_router.get('/:_id', function (req, res) {
                         if (sceneData.sceneTags[i].toLowerCase().includes("debug")) {   
                             debugMode = true;
                         }
+                        if (sceneData.sceneTags[i].toLowerCase().includes("ar parent") || sceneData.sceneTags[i].toLowerCase().includes("arparent")) {   
+                            sceneResponse.useArParent = true;
+                        } else {
+                            sceneResponse.useArParent = false;
+                        }
                         if (sceneData.sceneTags[i].toLowerCase().includes("webcam")) {
                             webcamAsset = "<video id=\x22webcam\x22 src=\x22''\x22 playsinline></video>";
                         }
@@ -2186,7 +2191,8 @@ webxr_router.get('/:_id', function (req, res) {
                             const yrot = locationPlaceholders[i].eulery != null ? locationPlaceholders[i].eulery : rot;
                             const zrot = locationPlaceholders[i].eulerz != null ? locationPlaceholders[i].eulerz : rot;
 
-                            if (locationPlaceholders[i].tags && (locationPlaceholders[i].tags.includes("ar target") ||  locationPlaceholders[i].tags.includes("artarget"))) {
+                            if ((locationPlaceholders[i].tags && (locationPlaceholders[i].tags.includes("ar child") ||  locationPlaceholders[i].tags.includes("archild")))
+                                || sceneResponse.useArParent) {
                                 arTargetElements = arTargetElements + "<a-entity data-isvisible=\x22yes\x22 id=\x22"+locationPlaceholders[i].timestamp+"\x22 class=\x22activeObjexGrab activeObjexRay envMap "+
                                 "placeholders\x22 cloud_marker=\x22phID: "+locationPlaceholders[i].phID+"; xpos: "+locationPlaceholders[i].x+"; ypos: "+locationPlaceholders[i].y+"; zpos: "+locationPlaceholders[i].z+";" +
                                 "xrot: "+xrot+"; yrot: "+yrot+"; zrot: "+zrot+"; targetElements: "+locationPlaceholders[i].targetElements+"; " +
@@ -2967,8 +2973,9 @@ webxr_router.get('/:_id', function (req, res) {
                                                         
                                                     } else { //DEFAULT entity conf (doesn't use brownian)
 
-                                                        if (locMdl.locationTags && (locMdl.locationTags.includes("ar target") || locMdl.locationTags.includes("artarget"))) {
-                                                            console.log("gotsa ar target!")
+                                                        if ((locMdl.locationTags && (locMdl.locationTags.includes("ar child") || locMdl.locationTags.includes("archild")))
+                                                            || sceneResponse.useArParent) {
+                                                            // console.log("gotsa ar target!")
                                                             arTargetElements = arTargetElements + "<a-entity id=\x22"+id+"\x22 "+followCurve+" "+physicsMod+" "+modelParent+" "+scatterSurface+" "+modModel+" class=\x22envMap gltf "+entityType+" "+ambientChild+
                                                             " activeObjexGrab activeObjexRay\x22 shadow=\x22cast:true; receive:true\x22 "+skyboxEnvMap+" gltf-model=\x22#" + m_assetID + "\x22 "+objAnim+" "+cannedAnim+
                                                             // " position=\x22"+locMdl.x+" "+locMdl.y+" "+zFix+"\x22 scale=\x22"+scale+" "+scale+" "+scale+"\x22 rotation=\x22"+rotation+"\x22 >" + offsetPos+ "</a-entity>";  //rem rotation bc navmesh donutlike
@@ -3091,7 +3098,8 @@ webxr_router.get('/:_id', function (req, res) {
                                         visible = true;
                                     }
 
-                                    if (locMdl.locationTags && (locMdl.locationTags.includes("ar target") || locMdl.locationTags.includes("artarget"))) {
+                                    if ((locMdl.locationTags && (locMdl.locationTags.includes("ar child") || locMdl.locationTags.includes("archild")))
+                                        || sceneResponse.useArParent) {
                                         arTargetElements = arTargetElements + "<a-entity id=\x22nav-mesh\x22 nav-mesh nav_mesh_controller=\x22useDefault: true;\x22 visible=\x22"+visible+"\x22></a-entity>"; //use big circle if no defined navmesh
                                     } else {
                                         navmeshEntity = "<a-entity id=\x22nav-mesh\x22 nav-mesh nav_mesh_controller=\x22useDefault: true;\x22 visible=\x22"+visible+"\x22></a-entity>"; //use big circle if no defined navmesh
@@ -3103,13 +3111,14 @@ webxr_router.get('/:_id', function (req, res) {
                                         visible = true;
                                     }
 
-                                    if (locMdl.locationTags && (locMdl.tags.includes("ar target") || locMdl.tags.includes("artarget"))) {
+                                    if ((locMdl.locationTags && (locMdl.tags.includes("ar child") || locMdl.tags.includes("archild"))) 
+                                        || sceneResponse.useArParent) {
                                         arTargetElements = arTargetElements + "<a-entity class=\x22surface\x22 id=\x22scatterSurface\x22 scatter-surface-default rotation=\x22-90 0 0\x22 visible=\x22"+visible+"\x22></a-entity>"; //use big circle if no defined navmesh
                                     } else {
                                         surfaceEntity = "<a-entity class=\x22surface\x22 id=\x22scatterSurface\x22 scatter-surface-default rotation=\x22-90 0 0\x22 visible=\x22"+visible+"\x22></a-entity>"; //use big circle if no defined navmesh
                                     }
                                     
-                                    arTargetElements
+                                   
                                 }
                                 callbackz();
                             }
@@ -4483,9 +4492,8 @@ webxr_router.get('/:_id', function (req, res) {
 
                     console.log("sceneWebType: "+ sceneResponse.sceneWebType);
                     if (sceneResponse.sceneWebType == undefined || sceneResponse.sceneWebType.toLowerCase() == "default" || sceneResponse.sceneWebType.toLowerCase() == "aframe") { 
-                        // webxrFeatures = "webxr=\x22optionalFeatures: hit-test, local-floor\x22"; //otherwise hit-test breaks everythign!
-                        // webxrFeatures = "webxr=\x22overlayElement: #ar_overlay; optionalFeatures: hit-test; \x22 ar-hit-test=\x22target: #ar_target; src: #reticle2\x22"; //otherwise hit-test breaks everythign!
-                        webxrFeatures = "webxr=\x22optionalFeatures: hit-test, local-floor, dom-overlay; overlayElement: #ar_overlay;\x22 "; //otherwise hit-test breaks everythign!
+                       
+                        webxrFeatures = "webxr=\x22optionalFeatures: hit-test, local-floor, dom-overlay; overlayElement: #ar_overlay;\x22 "; 
                         // webxrFeatures = " webxr=\x22requiredFeatures: dom-overlay; optionalFeatures: hit-test; overlayElement: #ar_overlay;\x22 ar-hit-test=\x22enabled: true; target: #ar_target;\x22 "; //otherwise hit-test breaks everythign!
                         // requiredFeatures: hit-test,local-floor; optionalFeatures: dom-overlay,unbounded; overlayElement: #ar_overlay;"
                         // // arHitTest = "ar-hit-test-spawn=\x22mode: "+arMode+"\x22";

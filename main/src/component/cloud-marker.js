@@ -86,8 +86,8 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
         this.el.classList.add("target");
 
       }
-      if (this.data.tags && this.data.tags.length && (this.data.tags.toLowerCase().includes("ar target") || this.data.tags.toLowerCase().includes("artarget")) || this.data.tags.toLowerCase().includes("ar_target")) {
-        this.el.classList.add("arTarget");       
+      if (this.data.tags && this.data.tags.length && (this.data.tags.toLowerCase().includes("ar child") || this.data.tags.toLowerCase().includes("archild")) || this.data.tags.toLowerCase().includes("ar_child")) {
+        this.el.classList.add("arChild");       
       }
       // if (this.data.markerType == "collider") {
       //   this.data.modelID = "primitive_cube";
