@@ -3091,7 +3091,7 @@ webxr_router.get('/:_id', function (req, res) {
                                         visible = true;
                                     }
 
-                                    if (locMdl.locationTags.includes("ar target") || locMdl.locationTags.includes("artarget")) {
+                                    if (locMdl.locationTags && (locMdl.locationTags.includes("ar target") || locMdl.locationTags.includes("artarget"))) {
                                         arTargetElements = arTargetElements + "<a-entity id=\x22nav-mesh\x22 nav-mesh nav_mesh_controller=\x22useDefault: true;\x22 visible=\x22"+visible+"\x22></a-entity>"; //use big circle if no defined navmesh
                                     } else {
                                         navmeshEntity = "<a-entity id=\x22nav-mesh\x22 nav-mesh nav_mesh_controller=\x22useDefault: true;\x22 visible=\x22"+visible+"\x22></a-entity>"; //use big circle if no defined navmesh
@@ -3103,7 +3103,7 @@ webxr_router.get('/:_id', function (req, res) {
                                         visible = true;
                                     }
 
-                                    if (locMdl.tags.includes("ar target") || locMdl.tags.includes("artarget")) {
+                                    if (locMdl.locationTags && (locMdl.tags.includes("ar target") || locMdl.tags.includes("artarget"))) {
                                         arTargetElements = arTargetElements + "<a-entity class=\x22surface\x22 id=\x22scatterSurface\x22 scatter-surface-default rotation=\x22-90 0 0\x22 visible=\x22"+visible+"\x22></a-entity>"; //use big circle if no defined navmesh
                                     } else {
                                         surfaceEntity = "<a-entity class=\x22surface\x22 id=\x22scatterSurface\x22 scatter-surface-default rotation=\x22-90 0 0\x22 visible=\x22"+visible+"\x22></a-entity>"; //use big circle if no defined navmesh
