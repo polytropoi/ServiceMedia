@@ -5215,7 +5215,7 @@ webxr_router.get('/:_id', function (req, res) {
                         geoScripts +
                         "<script src=\x22../main/js/dialogs.js\x22></script>"+
 
-                        "<div id=\x22ar_overlay\x22 style=\x22visibility: visible\x22><div id=\x22ar_overlay_message\x22></div>" +
+                        "<div id=\x22ar_overlay\x22 style=\x22visibility: hidden\x22><div id=\x22ar_overlay_message\x22></div>" +
                         "<div><button id=\x22arLockButton\x22 style=\x22float:right; margin: auto\x22 onclick=\x22ToggleLockElementsAR()\x22 type=\x22button\x22 class=\x22btn\x22>toggle lock</button></div><br><br><br>"+
                         "<div><button id=\x22arScaleDownButton\x22 style=\x22float:right; margin: auto\x22 onclick=\x22ScaleElementsAR('down')\x22 type=\x22button\x22 class=\x22btn\x22>scale -</button></div><br><br><br>"+            
                         "<div><button id=\x22arScaleUpButton\x22 style=\x22float:right; margin: auto\x22 onclick=\x22ScaleElementsAR('up')\x22 type=\x22button\x22 class=\x22btn\x22>scale +</button></div></div>"+                        

@@ -1,7 +1,10 @@
 /* global AFRAME, THREE */
 AFRAME.registerComponent('ar_hit_caster', {
     dependencies: ["raycaster"],
-    schema: {targetEl: {type: 'selector'}},
+    schema: {
+      targetEl: {type: 'selector'},
+      spawnables: {type: 'selector'},
+    },
   
     init: function () {
       var self = this;
@@ -55,6 +58,19 @@ AFRAME.registerComponent('ar_hit_caster', {
             messageEl.textContent = "surface found at position " + JSON.stringify(position);
             targetEl.setAttribute('position', position);
             targetEl.setAttribute('scale', {'x': scaleMod, 'y': scaleMod, 'z': scaleMod});
+
+
+            let spawnableEl = document.querySelector('.spawnable'); //el with "spawnable" tag
+            if (spawnableEl) {
+              spawnableEl.cloneNode(true);
+              spawnableEl.setAttribute('position', position);
+              spawnableEl.setAttribute('scale', {'x': scaleMod, 'y': scaleMod, 'z': scaleMod});
+              messageEl.textContent = "spawning object at position " + JSON.stringify(position);
+            }
+          
+          
+
+
           } else {
             if (self.el.components.raycaster) {
               console.log("gotsa ar raycaster!");

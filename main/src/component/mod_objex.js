@@ -894,6 +894,9 @@ AFRAME.registerComponent('mod_object', {
           if ( this.data.locationData.locationTags.toLowerCase().includes("ar child") || this.data.locationData.locationTags.toLowerCase().includes("ar_child") || this.data.locationData.locationTags.toLowerCase().includes("archild")) { 
             this.el.classList.add("arChild");
           }
+          if ( this.data.locationData.locationTags.toLowerCase().includes("spawnable")) { 
+            this.el.classList.add("spawnable");
+          }
       } 
       if (this.data.tags && this.data.tags != undefined  && this.data.tags != 'undefined' && this.data.tags.length > 0) {
         if (this.data.tags.toLowerCase().includes("equippable")) {
