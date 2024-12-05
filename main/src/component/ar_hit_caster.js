@@ -16,7 +16,7 @@ AFRAME.registerComponent('ar_hit_caster', {
       this.arRaycasterEnabled = false;
 
       this.camera = null;
-      const messageEl = document.getElementById("ar_overlay_message");
+      this.messageEl = document.getElementById("ar_overlay_message");
       this.el.sceneEl.renderer.xr.addEventListener(function () {
         self.viewerSpace = null;
         self.refSpace = null;
@@ -33,7 +33,7 @@ AFRAME.registerComponent('ar_hit_caster', {
         console.log("enter-vr");
         // messageEl.textContent = "entered immersive mode";
         if (!self.el.sceneEl.is('ar-mode')) { return; }
-        messageEl.textContent = "entered AR mode";
+        self.messageEl.textContent = "entered AR mode";
         console.log("ar-mode");
 
         let arOverlay = document.getElementById("ar_overlay");
@@ -45,17 +45,18 @@ AFRAME.registerComponent('ar_hit_caster', {
         
         self.originalPosition = targetEl.object3D.position.clone();
         self.el.object3D.visible = true;
-        messageEl.textContent = "scanning for surface....";
+        self.messageEl.textContent = "scanning for surface....";
         // this.camera = session.renderer.xr.getCamera().cameras[0];
         
         session.addEventListener('select', function () {
+
           var position = el.getAttribute('position');
           const zeroPos = new THREE.Vector3(0, 0, 0); //hrm, use camera or player? viewportHolder?
           var distance = position.distanceTo(zeroPos);
           var scaleMod = distance * 0.2;
           if (!self.lockTargets) {
             console.log("tryna set position " + JSON.stringify(position) + " distance " + JSON.stringify(distance));
-            messageEl.textContent = "surface found at position " + JSON.stringify(position);
+            self.messageEl.textContent = "surface found at position " + JSON.stringify(position);
             targetEl.setAttribute('position', position);
             targetEl.setAttribute('scale', {'x': scaleMod, 'y': scaleMod, 'z': scaleMod});
 
@@ -65,7 +66,7 @@ AFRAME.registerComponent('ar_hit_caster', {
               spawnableEl.cloneNode(true);
               spawnableEl.setAttribute('position', position);
               spawnableEl.setAttribute('scale', {'x': scaleMod, 'y': scaleMod, 'z': scaleMod});
-              messageEl.textContent = "spawning object at position " + JSON.stringify(position);
+              self.messageEl.textContent = "spawning object at position " + JSON.stringify(position);
             }
           
           
@@ -88,7 +89,7 @@ AFRAME.registerComponent('ar_hit_caster', {
   
                   const details = self.el.components.raycaster.getIntersection(el);
                   // console.log("ray hit select " + JSON.stringify(details));
-                  messageEl.textContent = "ray hit on object " + el.id;
+                  self.messageEl.textContent = "ray hit on object " + el.id;
                   el.emit('click', details);
                   
                   break;
@@ -149,14 +150,14 @@ AFRAME.registerComponent('ar_hit_caster', {
           targetEl.setAttribute("anchored", {"persistent": true});
           this.el.object3D.visible = false;
           this.arRaycasterEnabled = true;
-          messageEl.textContent = "hit test disabled, raycaster enabled";
+          this.messageEl.textContent = "hit test disabled, raycaster enabled";
         } else {
           console.log("unlocked");
           targetEl.removeAttribute("anchored");
           this.el.object3D.visible = true;
           //enable raycast here?
           this.arRaycasterEnabled = false;
-          messageEl.textContent = "hit test enabled, raycaster disabled";
+          this.messageEl.textContent = "hit test enabled, raycaster disabled";
         }
       }
     },
