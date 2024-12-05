@@ -91,15 +91,15 @@ AFRAME.registerComponent('mod_objex', {
                                                         });
                       // objEl.id = "obj" + this.data.jsonLocationsData[i].objectID + "_" + this.data.jsonLocationsData[i].timestamp;
                       objEl.id = this.data.jsonLocationsData[i].timestamp; //only timestamp so locpickers can find it...other objtypes aren't allowMods, i.e. spawned at runtime
-                      if (this.data.jsonLocationsData[i].locationTags && 
-                        (this.data.jsonLocationsData[i].locationTags.toLowerCase().includes("ar child") || 
-                        this.data.jsonLocationsData[i].locationTags.toLowerCase().includes("archild"))) {                
-                          let ar_target = document.getElementById("ar_target");
-                          if (ar_target) {
-                            ar_target.appendChild(objEl);
-                          }
+                      if (settings && settings.useArParent) {                
+                        let ar_target = document.getElementById("ar_target");
+                        if (ar_target) {
+                          ar_target.appendChild(objEl);
+                        } else {
+                          sceneEl.appendChild(objEl);
+                        }
                       } else {
-                        this.el.sceneEl.appendChild(objEl);
+                        sceneEl.appendChild(objEl);
                       }
                       
                     // }
@@ -111,6 +111,15 @@ AFRAME.registerComponent('mod_objex', {
         }
         let that = this;
       },
+      // useArParent: function () {
+      //   if (this.data.jsonLocationsData[i].locationTags && 
+      //     ((this.data.jsonLocationsData[i].locationTags.toLowerCase().includes("ar child") || 
+      //     this.data.jsonLocationsData[i].locationTags.toLowerCase().includes("archild"))) || (settings && settings.useArParent)) {                
+      //      return true;
+      //   } else {
+      //     return false;
+      //   }
+      // },
       updateModdedObjects: function () {
         console.log("tryna updateModdedObjects");
         if (localData.locations.length) {
@@ -203,7 +212,17 @@ AFRAME.registerComponent('mod_objex', {
               let objEl = document.createElement("a-entity");
               objEl.setAttribute("mod_object", {'eventData': null, 'locationData': locationData, 'objectData': this.objectData, 'timestamp': this.data.jsonLocationsData[j].timestamp, 'tags': this.data.jsonLocationsData[j].locationTags, 'isSpawned': true});
               objEl.id = elIDString;
-              sceneEl.appendChild(objEl);
+              if (settings && settings.useArParent) {                
+                let ar_target = document.getElementById("ar_target");
+                if (ar_target) {
+                  ar_target.appendChild(objEl);
+                } else {
+                  sceneEl.appendChild(objEl);
+                }
+              } else {
+                sceneEl.appendChild(objEl);
+              }
+
               if (this.triggerAudioController != null) {
                 let distance = window.playerPosition.distanceTo(locationData);
                 console.log(distance + " distance to spawn lo9c " + locationData);
@@ -235,7 +254,19 @@ AFRAME.registerComponent('mod_objex', {
               let objEl = document.createElement("a-entity");
               objEl.setAttribute("mod_object", {'eventData': null, 'locationData': locationData, 'objectData': this.objectData, 'timestamp': this.data.jsonLocationsData[j].timestamp, 'tags': this.data.jsonLocationsData[j].locationTags, 'isSpawned': true});
               objEl.id = elIDString;
-              sceneEl.appendChild(objEl);
+              if (settings && settings.useArParent) {                
+                let ar_target = document.getElementById("ar_target");
+                if (ar_target) {
+                  ar_target.appendChild(objEl);
+                } else {
+                  sceneEl.appendChild(objEl);
+                }
+              } else {
+                sceneEl.appendChild(objEl);
+              }
+              // sceneEl.appendChild(objEl);
+              
+              
               if (this.triggerAudioController != null) {
                 let distance = window.playerPosition.distanceTo(locationData);
                 console.log(distance + " distance to spawn lo9c " + locationData);
@@ -271,7 +302,19 @@ AFRAME.registerComponent('mod_objex', {
                 objEl.setAttribute("mod_object", {'eventData': null, 'locationData': locationData, 'objectData': this.data.jsonObjectData[j], 'inventoryData': this.sceneInventoryItems[i], 'fromSceneInventory': true, 'timestamp': timestamp, 'isSpawned': false});
                 // objEl.setAttribute("mod_object", {'locationData': locationData, 'objectData': this.data.jsonObjectData[j], 'inventoryData': this.sceneInventoryItems[i], 'timestamp': timestamp});
                 objEl.id = "obj" + this.data.jsonObjectData[j]._id + "_" + timestamp;
-                sceneEl.appendChild(objEl);
+
+                if (settings && settings.useArParent) {                
+                  let ar_target = document.getElementById("ar_target");
+                  if (ar_target) {
+                    ar_target.appendChild(objEl);
+                  } else {
+                    sceneEl.appendChild(objEl);
+                  }
+                } else {
+                  sceneEl.appendChild(objEl);
+                }
+
+                // sceneEl.appendChild(objEl);
                 } else {
                   console.log("well shoot, that one don't have a location " + JSON.stringify(this.sceneInventoryItems[i]));
                 }
@@ -443,7 +486,17 @@ AFRAME.registerComponent('mod_objex', {
         this.locData.timestamp = Date.now();
         this.objEl.setAttribute("mod_object", {'eventData': null, 'locationData': this.locData, 'objectData': this.objectData, 'isSpawned': true});
         this.objEl.id = "obj" + this.objectData._id + "_" + this.locData.timestamp;
-        sceneEl.appendChild(this.objEl);
+        if (settings && settings.useArParent) {                
+          let ar_target = document.getElementById("ar_target");
+          if (ar_target) {
+            ar_target.appendChild(this.objEl);
+          } else {
+            sceneEl.appendChild(this.objEl);
+          }
+        } else {
+          sceneEl.appendChild(this.objEl);
+        }
+        // sceneEl.appendChild(this.objEl);
         // this.objEl.components.mod_object.applyForce();
   
         // this.el.setAttribute('gltf-model', '#' + modelID.toString());
@@ -475,7 +528,17 @@ AFRAME.registerComponent('mod_objex', {
           // this.objEl.setAttribute("mod_object", {'eventData': null, 'locationData': this.locData, 'objectData': this.objectData, 'applyForceToNewObject': true, 'forceFactor': downtime, 'removeAfter': "5"});
           this.objEl.setAttribute("mod_object", {'eventData': null, 'locationData': this.locData, 'objectData': this.objectData, 'followPathNewObject': true, 'forceFactor': downtime, 'removeAfter': "5", 'isSpawned': true});
           this.objEl.id = "obj" + this.objectData._id + "_" + this.locData.timestamp;
-          sceneEl.append(this.objEl);
+          // sceneEl.append(this.objEl);
+          if (settings && settings.useArParent) {                
+            let ar_target = document.getElementById("ar_target");
+            if (ar_target) {
+              ar_target.appendChild(this.objEl);
+            } else {
+              sceneEl.appendChild(this.objEl);
+            }
+          } else {
+            sceneEl.appendChild(this.objEl);
+          }
         }
   
       },
@@ -494,7 +557,17 @@ AFRAME.registerComponent('mod_objex', {
         this.objEl.setAttribute("mod_object", {'eventData': null, 'locationData': this.locData, 'objectData': this.objectData, 'applyForceToNewObject': true, 'forceFactor': downtime, 'removeAfter': "5", 'isSpawned': true});
         this.objEl.id = "obj" + this.objectData._id + "_" + this.locData.timestamp;
   
-        sceneEl.appendChild(this.objEl);
+        // sceneEl.appendChild(this.objEl);
+        if (settings && settings.useArParent) {                
+          let ar_target = document.getElementById("ar_target");
+          if (ar_target) {
+            ar_target.appendChild(this.objEl);
+          } else {
+            sceneEl.appendChild(this.objEl);
+          }
+        } else {
+          sceneEl.appendChild(this.objEl);
+        }
         // this.el.setAttribute('gltf-model', '#' + modelID.toString());
       }
   });
@@ -1514,7 +1587,6 @@ AFRAME.registerComponent('mod_object', {
             }
   
             if (this.tags != null && this.tags.includes("thoughtbubble")) {
-            
               hasCallout = true;
             } 
             if (hasCallout) {
@@ -1533,11 +1605,11 @@ AFRAME.registerComponent('mod_object', {
               bubble.setAttribute("rotation", "0 0 0"); 
               bubble.setAttribute("scale", "2 2 2"); 
               bubble.setAttribute("visible", false);
-              if (eventData.includes("agent")) {
+              // if (eventData.includes("agent")) {
                 this.el.appendChild(bubble); //make it a child if
-              } else {
-                sceneEl.appendChild(bubble); //or else put at top
-              }
+              // } else {
+              //   sceneEl.appendChild(bubble); //or else put at top
+              // }
              
               
               let bubbleBackground = document.createElement("a-entity");
@@ -1961,7 +2033,17 @@ AFRAME.registerComponent('mod_object', {
                             this.locData.timestamp = Date.now();
                             this.objEl.setAttribute("mod_object", {'locationData': this.locData, 'objectData': objectData, 'isSpawned': false});
                             this.objEl.id = "obj" + objectData._id + "_" + this.locData.timestamp;
-                            sceneEl.appendChild(this.objEl);
+                            if (settings && settings.useArParent) {                
+                              let ar_target = document.getElementById("ar_target");
+                              if (ar_target) {
+                                ar_target.appendChild(this.objEl);
+                              } else {
+                                sceneEl.appendChild(this.objEl);
+                              }
+                            } else {
+                              sceneEl.appendChild(this.objEl);
+                            }
+                            // sceneEl.appendChild(this.objEl);
                           } else {
                             console.log("caint find object "+ targetModObjComponent.data.objectData.actions[i].objectID +", tryna fetch it..");
                             FetchSceneInventoryObject(targetModObjComponent.data.objectData.actions[i].objectID);
@@ -2004,7 +2086,17 @@ AFRAME.registerComponent('mod_object', {
                           this.locData.timestamp = Date.now();
                           this.objEl.setAttribute("mod_object", {'locationData': this.locData, 'objectData': objectData, 'isSpawned': false});
                           this.objEl.id = "obj" + objectData._id + "_" + this.locData.timestamp;
-                          sceneEl.appendChild(this.objEl);
+                          if (settings && settings.useArParent) {                
+                            let ar_target = document.getElementById("ar_target");
+                            if (ar_target) {
+                              ar_target.appendChild(this.objEl);
+                            } else {
+                              sceneEl.appendChild(this.objEl);
+                            }
+                          } else {
+                            sceneEl.appendChild(this.objEl);
+                          }
+                          // sceneEl.appendChild(this.objEl);
                         } else {
                           console.log("caint find object "+ targetModObjComponent.data.objectData.actions[i].objectID +", tryna fetch it..");
                           FetchSceneInventoryObject(targetModObjComponent.data.objectData.actions[i].objectID);
@@ -2838,7 +2930,17 @@ AFRAME.registerComponent('mod_object', {
                 this.locData.timestamp = Date.now();
                 this.objEl.setAttribute("mod_object", {'locationData': this.locData, 'objectData': objectData, 'isSpawned': false});
                 this.objEl.id = "obj" + objectData._id + "_" + this.locData.timestamp;
-                sceneEl.appendChild(this.objEl);
+                // sceneEl.appendChild(this.objEl);
+                if (settings && settings.useArParent) {                
+                  let ar_target = document.getElementById("ar_target");
+                  if (ar_target) {
+                    ar_target.appendChild(this.objEl);
+                  } else {
+                    sceneEl.appendChild(this.objEl);
+                  }
+                } else {
+                  sceneEl.appendChild(this.objEl);
+                }
               } else {
                 console.log("caint find object "+ this.killAction.objectID +", tryna fetch it..");
                 FetchSceneInventoryObject(this.killAction.objectID);
@@ -2853,7 +2955,17 @@ AFRAME.registerComponent('mod_object', {
                 this.locData.timestamp = Date.now();
                 this.objEl.setAttribute("mod_object", {'locationData': this.locData, 'objectData': objectData, 'isSpawned': false});
                 this.objEl.id = "obj" + objectData._id + "_" + this.locData.timestamp;
-                sceneEl.appendChild(this.objEl);
+                // sceneEl.appendChild(this.objEl);
+                if (settings && settings.useArParent) {                
+                  let ar_target = document.getElementById("ar_target");
+                  if (ar_target) {
+                    ar_target.appendChild(this.objEl);
+                  } else {
+                    sceneEl.appendChild(this.objEl);
+                  }
+                } else {
+                  sceneEl.appendChild(this.objEl);
+                }
               }
             }
         } else {
@@ -2863,7 +2975,17 @@ AFRAME.registerComponent('mod_object', {
           this.particlesEl = null;
           this.particlesEl = document.createElement("a-entity");
           // this.particlesEl.setAttribute("mod_particles", {"enabled": false});
-          this.el.sceneEl.appendChild(this.particlesEl); //hrm...
+          // this.el.sceneEl.appendChild(this.particlesEl); //hrm...
+          if (settings && settings.useArParent) {                
+            let ar_target = document.getElementById("ar_target");
+            if (ar_target) {
+              ar_target.appendChild(this.particlesEl);
+            } else {
+              this.el.sceneEl.appendChild(this.particlesEl);
+            }
+          } else {
+            this.el.sceneEl.appendChild(this.particlesEl);
+          }
           this.particlesEl.setAttribute("position", this.el.object3D.position);
           this.particlesEl.setAttribute('sprite-particles', {
             enable: true, 
@@ -3369,7 +3491,18 @@ AFRAME.registerComponent('mod_object', {
             }
           } else {
             this.particlesEl = document.createElement("a-entity");
-            this.el.sceneEl.appendChild(this.particlesEl); //hrm...
+            // this.el.sceneEl.appendChild(this.particlesEl); //hrm...
+            if (settings && settings.useArParent) {                
+              let ar_target = document.getElementById("ar_target");
+              if (ar_target) {
+                ar_target.appendChild(this.particlesEl);
+              } else {
+                this.el.sceneEl.appendChild(this.particlesEl);
+              }
+            } else {
+              this.el.sceneEl.appendChild(this.particlesEl);
+            }
+            
           }
         }
     
@@ -3434,7 +3567,19 @@ AFRAME.registerComponent('mod_object', {
       let objEl = document.createElement("a-entity");
       objEl.setAttribute("mod_object", {'locationData': this.data.locationData, 'objectData': objectData, 'isSpawned': true});
       objEl.id = "obj" + objectData._id + "_" + this.data.locationData.timestamp;
-      sceneEl.appendChild(objEl);
+
+      
+      // sceneEl.appendChild(objEl);
+      if (settings && settings.useArParent) {                
+        let ar_target = document.getElementById("ar_target");
+        if (ar_target) {
+          ar_target.appendChild(objEl);
+        } else {
+          sceneEl.appendChild(objEl);
+        }
+      } else {
+        sceneEl.appendChild(objEl);
+      }
       // this.el.setAttribute('gltf-model', '#' + modelID.toString());
     },
     randomLocation: function () {
@@ -3808,7 +3953,15 @@ AFRAME.registerComponent('mod_object', {
               // scatteredEl.setAttribute("scale", {x: scale, y:scale, z: scale})
 
             // }
-            this.el.sceneEl.appendChild(scatteredEl);
+            if (settings && settings.useArParent) {       
+              let ar_target = document.getElementById("ar_target");
+              if (ar_target) {
+                  ar_target.appendChild(scatteredEl);
+                }
+            } else {
+              this.el.sceneEl.appendChild(scatteredEl);
+            }
+            // this.el.sceneEl.appendChild(scatteredEl);
             
 
             if (scatterCount > count) {

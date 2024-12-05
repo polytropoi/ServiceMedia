@@ -92,7 +92,7 @@ AFRAME.registerComponent('mod_model', {
           // this.el.sceneEl.setAttribute("ar-hit-test", {"target": elID});
           // console.log("hit test target is " + elID);
         }
-        if (this.data.tags && this.data.tags.length && (this.data.tags.toLowerCase().includes("ar child") || this.data.tags.toLowerCase().includes("archild")) || this.data.tags.toLowerCase().includes("ar_child")) {
+        if ((settings && settings.useArParent) || (this.data.tags && this.data.tags.length && (this.data.tags.toLowerCase().includes("ar child") || this.data.tags.toLowerCase().includes("archild")) || this.data.tags.toLowerCase().includes("ar_child"))) {
           this.el.classList.add("arChild");       
         }
         // if (this.data.description && this.data.description.length > 1) {
@@ -1990,8 +1990,7 @@ AFRAME.registerComponent('mod_model', {
               // scatteredEl.setAttribute("scale", {x: scale, y:scale, z: scale})
 
             // }
-            if ((this.data.tags && (this.data.tags.toLowerCase().includes("ar child") || this.data.tags.toLowerCase().includes("archild"))) 
-              || settings && settings.useArTarget) {
+            if ((settings && settings.useArParent) || (this.data.tags && (this.data.tags.toLowerCase().includes("ar child") || this.data.tags.toLowerCase().includes("archild")))) {
               arTargetEl.appendChild(scatteredEl);
             } else {
               this.el.sceneEl.appendChild(scatteredEl);
