@@ -461,7 +461,7 @@
       //     console.log("arMode is " + this.data.mode);
 
       //     this.spawnObjects = document.querySelectorAll('.spawn');
-      //     // this.targetObject = document.querySelectorAll(".ar_target_object");
+      //     // this.targetObject = document.querySelectorAll(".ar_parent_object");
 
       //     this.el.sceneEl.renderer.xr.addEventListener('sessionend', (ev) => {
       //       this.viewerSpace = null;

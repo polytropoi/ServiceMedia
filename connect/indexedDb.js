@@ -131,10 +131,10 @@ function InitIDB() {
                         if (cursor.value.locations[i].markerType == "curve point") {
                            curveLocations.push(cursor.value.locations[i]);
                         }
-                        if (cursor.value.locations[i].locationTags && cursor.value.locations[i].locationTags.includes("ar target")) {
-                           let arTargetEl = document.getElementById("ar_target");
-                           if (arTargetEl) {
-                              arTargetEl.appendChild(localEl);
+                        if (cursor.value.locations[i].locationTags && cursor.value.locations[i].locationTags.includes("ar_parent")) {
+                           let ar_parentEl = document.getElementById("ar_parent");
+                           if (ar_parentEl) {
+                              ar_parentEl.appendChild(localEl);
                            }
                         } else {
                            sceneEl.appendChild(localEl);

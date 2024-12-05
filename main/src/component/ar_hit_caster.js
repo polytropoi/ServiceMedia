@@ -1,5 +1,5 @@
 /* global AFRAME, THREE */
-AFRAME.registerComponent('ar_hit_test_mod', {
+AFRAME.registerComponent('ar_hit_caster', {
     dependencies: ["raycaster"],
     schema: {targetEl: {type: 'selector'}},
   
@@ -37,15 +37,6 @@ AFRAME.registerComponent('ar_hit_test_mod', {
         if (arOverlay) {
           arOverlay.style.visibility = 'visible';
         }
-
-        // let arTarget = document.getElementById("ar_target"); //um, same as this.data.targetEl selector
-        // if (arTarget) {       
-        //     document.querySelectorAll('.arChild').forEach(function(el) { //els with "ar target" tag
-        //     // targetEl.position = el.getAttribute("position");
-        //     targetEl.id = el.id;
-        //     arTargetData.push(targetEl);
-        //   });
-        // }
 
         session = self.el.sceneEl.renderer.xr.getSession();
         
@@ -121,7 +112,19 @@ AFRAME.registerComponent('ar_hit_test_mod', {
         self.el.object3D.visible = false;
       });
     },
-    toggleLockTargets: function () {
+    scaleElements: function (dir) {
+      var targetEl = this.data.targetEl;
+      if (targetEl) {
+        let targetScale = targetEl.getAttribute("scale");
+        console.log("targetEl scale is " + JSON.stringify(targetScale));
+        if (dir == "up") {
+          targetEl.setAttribute("scale", {"x": targetScale.x * .1, "y": targetScale.x * .1, "z": targetScale.x * .1})
+        } else {
+          targetEl.setAttribute("scale", {"x": targetScale.x * -.1, "y": targetScale.x * -.1, "z": targetScale.x * -.1})
+        }
+      }
+    },
+    toggleLockElements: function () {
       this.lockTargets = !this.lockTargets;
       var targetEl = this.data.targetEl;
       if (targetEl) {
@@ -232,12 +235,20 @@ AFRAME.registerComponent('ar_hit_test_mod', {
   });
 
 
-function ToggleLockARTargets () {
-  let arTargetEl = document.getElementById("hitTester");
-  if (arTargetEl) {
-    let hitTestComponent = arTargetEl.components.ar_hit_test_mod;
-    if (hitTestComponent) {
-      hitTestComponent.toggleLockTargets();
+function ToggleLockElementsAR () {
+  let arHitCasterEl = document.getElementById("hitCaster");
+  if (arHitCasterEl) {
+    let hitCasterComponent = arHitCasterEl.components.ar_hit_caster;
+    if (hitCasterComponent) {
+      hitCasterComponent.toggleLockElements();
     }
+  }
+}
+
+function ScaleElementsAR (dir) {
+  let arHitCasterEl = document.getElementById("hitCaster");
+  let hitCasterComponent = arHitCasterEl.components.ar_hit_caster;
+  if (hitCasterComponent) {
+      hitCasterComponent.scaleElements(dir)
   }
 }

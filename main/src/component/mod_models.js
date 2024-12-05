@@ -1958,7 +1958,7 @@ AFRAME.registerComponent('mod_model', {
       console.log("TRYNA SCATTER MOD_MODEL with count " + count + " ypos " + this.data.ypos);
       let scatterCount = 0;
       // if (!this.isNavAgent) { //use waypoints for position below instead of raycasting if it's gonna nav
-      let arTargetEl = document.getElementById("ar_target");
+      let ar_parentEl = document.getElementById("ar_parent");
         let interval = setInterval( () => {
         for (let i = 0; i < 100; i++) {
           let testPosition = new THREE.Vector3();
@@ -1991,7 +1991,7 @@ AFRAME.registerComponent('mod_model', {
 
             // }
             if ((settings && settings.useArParent) || (this.data.tags && (this.data.tags.toLowerCase().includes("ar child") || this.data.tags.toLowerCase().includes("archild")))) {
-              arTargetEl.appendChild(scatteredEl);
+              ar_parentEl.appendChild(scatteredEl);
             } else {
               this.el.sceneEl.appendChild(scatteredEl);
             }

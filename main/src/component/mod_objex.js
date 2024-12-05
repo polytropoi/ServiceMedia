@@ -92,9 +92,9 @@ AFRAME.registerComponent('mod_objex', {
                       // objEl.id = "obj" + this.data.jsonLocationsData[i].objectID + "_" + this.data.jsonLocationsData[i].timestamp;
                       objEl.id = this.data.jsonLocationsData[i].timestamp; //only timestamp so locpickers can find it...other objtypes aren't allowMods, i.e. spawned at runtime
                       if (settings && settings.useArParent) {                
-                        let ar_target = document.getElementById("ar_target");
-                        if (ar_target) {
-                          ar_target.appendChild(objEl);
+                        let ar_parent = document.getElementById("ar_parent");
+                        if (ar_parent) {
+                          ar_parent.appendChild(objEl);
                         } else {
                           sceneEl.appendChild(objEl);
                         }
@@ -213,9 +213,9 @@ AFRAME.registerComponent('mod_objex', {
               objEl.setAttribute("mod_object", {'eventData': null, 'locationData': locationData, 'objectData': this.objectData, 'timestamp': this.data.jsonLocationsData[j].timestamp, 'tags': this.data.jsonLocationsData[j].locationTags, 'isSpawned': true});
               objEl.id = elIDString;
               if (settings && settings.useArParent) {                
-                let ar_target = document.getElementById("ar_target");
-                if (ar_target) {
-                  ar_target.appendChild(objEl);
+                let ar_parent = document.getElementById("ar_parent");
+                if (ar_parent) {
+                  ar_parent.appendChild(objEl);
                 } else {
                   sceneEl.appendChild(objEl);
                 }
@@ -255,9 +255,9 @@ AFRAME.registerComponent('mod_objex', {
               objEl.setAttribute("mod_object", {'eventData': null, 'locationData': locationData, 'objectData': this.objectData, 'timestamp': this.data.jsonLocationsData[j].timestamp, 'tags': this.data.jsonLocationsData[j].locationTags, 'isSpawned': true});
               objEl.id = elIDString;
               if (settings && settings.useArParent) {                
-                let ar_target = document.getElementById("ar_target");
-                if (ar_target) {
-                  ar_target.appendChild(objEl);
+                let ar_parent = document.getElementById("ar_parent");
+                if (ar_parent) {
+                  ar_parent.appendChild(objEl);
                 } else {
                   sceneEl.appendChild(objEl);
                 }
@@ -304,9 +304,9 @@ AFRAME.registerComponent('mod_objex', {
                 objEl.id = "obj" + this.data.jsonObjectData[j]._id + "_" + timestamp;
 
                 if (settings && settings.useArParent) {                
-                  let ar_target = document.getElementById("ar_target");
-                  if (ar_target) {
-                    ar_target.appendChild(objEl);
+                  let ar_parent = document.getElementById("ar_parent");
+                  if (ar_parent) {
+                    ar_parent.appendChild(objEl);
                   } else {
                     sceneEl.appendChild(objEl);
                   }
@@ -487,9 +487,9 @@ AFRAME.registerComponent('mod_objex', {
         this.objEl.setAttribute("mod_object", {'eventData': null, 'locationData': this.locData, 'objectData': this.objectData, 'isSpawned': true});
         this.objEl.id = "obj" + this.objectData._id + "_" + this.locData.timestamp;
         if (settings && settings.useArParent) {                
-          let ar_target = document.getElementById("ar_target");
-          if (ar_target) {
-            ar_target.appendChild(this.objEl);
+          let ar_parent = document.getElementById("ar_parent");
+          if (ar_parent) {
+            ar_parent.appendChild(this.objEl);
           } else {
             sceneEl.appendChild(this.objEl);
           }
@@ -530,9 +530,9 @@ AFRAME.registerComponent('mod_objex', {
           this.objEl.id = "obj" + this.objectData._id + "_" + this.locData.timestamp;
           // sceneEl.append(this.objEl);
           if (settings && settings.useArParent) {                
-            let ar_target = document.getElementById("ar_target");
-            if (ar_target) {
-              ar_target.appendChild(this.objEl);
+            let ar_parent = document.getElementById("ar_parent");
+            if (ar_parent) {
+              ar_parent.appendChild(this.objEl);
             } else {
               sceneEl.appendChild(this.objEl);
             }
@@ -559,9 +559,9 @@ AFRAME.registerComponent('mod_objex', {
   
         // sceneEl.appendChild(this.objEl);
         if (settings && settings.useArParent) {                
-          let ar_target = document.getElementById("ar_target");
-          if (ar_target) {
-            ar_target.appendChild(this.objEl);
+          let ar_parent = document.getElementById("ar_parent");
+          if (ar_parent) {
+            ar_parent.appendChild(this.objEl);
           } else {
             sceneEl.appendChild(this.objEl);
           }
@@ -2034,9 +2034,9 @@ AFRAME.registerComponent('mod_object', {
                             this.objEl.setAttribute("mod_object", {'locationData': this.locData, 'objectData': objectData, 'isSpawned': false});
                             this.objEl.id = "obj" + objectData._id + "_" + this.locData.timestamp;
                             if (settings && settings.useArParent) {                
-                              let ar_target = document.getElementById("ar_target");
-                              if (ar_target) {
-                                ar_target.appendChild(this.objEl);
+                              let ar_parent = document.getElementById("ar_parent");
+                              if (ar_parent) {
+                                ar_parent.appendChild(this.objEl);
                               } else {
                                 sceneEl.appendChild(this.objEl);
                               }
@@ -2087,9 +2087,9 @@ AFRAME.registerComponent('mod_object', {
                           this.objEl.setAttribute("mod_object", {'locationData': this.locData, 'objectData': objectData, 'isSpawned': false});
                           this.objEl.id = "obj" + objectData._id + "_" + this.locData.timestamp;
                           if (settings && settings.useArParent) {                
-                            let ar_target = document.getElementById("ar_target");
-                            if (ar_target) {
-                              ar_target.appendChild(this.objEl);
+                            let ar_parent = document.getElementById("ar_parent");
+                            if (ar_parent) {
+                              ar_parent.appendChild(this.objEl);
                             } else {
                               sceneEl.appendChild(this.objEl);
                             }
@@ -2932,9 +2932,9 @@ AFRAME.registerComponent('mod_object', {
                 this.objEl.id = "obj" + objectData._id + "_" + this.locData.timestamp;
                 // sceneEl.appendChild(this.objEl);
                 if (settings && settings.useArParent) {                
-                  let ar_target = document.getElementById("ar_target");
-                  if (ar_target) {
-                    ar_target.appendChild(this.objEl);
+                  let ar_parent = document.getElementById("ar_parent");
+                  if (ar_parent) {
+                    ar_parent.appendChild(this.objEl);
                   } else {
                     sceneEl.appendChild(this.objEl);
                   }
@@ -2957,9 +2957,9 @@ AFRAME.registerComponent('mod_object', {
                 this.objEl.id = "obj" + objectData._id + "_" + this.locData.timestamp;
                 // sceneEl.appendChild(this.objEl);
                 if (settings && settings.useArParent) {                
-                  let ar_target = document.getElementById("ar_target");
-                  if (ar_target) {
-                    ar_target.appendChild(this.objEl);
+                  let ar_parent = document.getElementById("ar_parent");
+                  if (ar_parent) {
+                    ar_parent.appendChild(this.objEl);
                   } else {
                     sceneEl.appendChild(this.objEl);
                   }
@@ -2977,9 +2977,9 @@ AFRAME.registerComponent('mod_object', {
           // this.particlesEl.setAttribute("mod_particles", {"enabled": false});
           // this.el.sceneEl.appendChild(this.particlesEl); //hrm...
           if (settings && settings.useArParent) {                
-            let ar_target = document.getElementById("ar_target");
-            if (ar_target) {
-              ar_target.appendChild(this.particlesEl);
+            let ar_parent = document.getElementById("ar_parent");
+            if (ar_parent) {
+              ar_parent.appendChild(this.particlesEl);
             } else {
               this.el.sceneEl.appendChild(this.particlesEl);
             }
@@ -3493,9 +3493,9 @@ AFRAME.registerComponent('mod_object', {
             this.particlesEl = document.createElement("a-entity");
             // this.el.sceneEl.appendChild(this.particlesEl); //hrm...
             if (settings && settings.useArParent) {                
-              let ar_target = document.getElementById("ar_target");
-              if (ar_target) {
-                ar_target.appendChild(this.particlesEl);
+              let ar_parent = document.getElementById("ar_parent");
+              if (ar_parent) {
+                ar_parent.appendChild(this.particlesEl);
               } else {
                 this.el.sceneEl.appendChild(this.particlesEl);
               }
@@ -3571,9 +3571,9 @@ AFRAME.registerComponent('mod_object', {
       
       // sceneEl.appendChild(objEl);
       if (settings && settings.useArParent) {                
-        let ar_target = document.getElementById("ar_target");
-        if (ar_target) {
-          ar_target.appendChild(objEl);
+        let ar_parent = document.getElementById("ar_parent");
+        if (ar_parent) {
+          ar_parent.appendChild(objEl);
         } else {
           sceneEl.appendChild(objEl);
         }
@@ -3954,9 +3954,9 @@ AFRAME.registerComponent('mod_object', {
 
             // }
             if (settings && settings.useArParent) {       
-              let ar_target = document.getElementById("ar_target");
-              if (ar_target) {
-                  ar_target.appendChild(scatteredEl);
+              let ar_parent = document.getElementById("ar_parent");
+              if (ar_parent) {
+                  ar_parent.appendChild(scatteredEl);
                 }
             } else {
               this.el.sceneEl.appendChild(scatteredEl);

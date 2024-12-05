@@ -567,7 +567,7 @@ webxr_router.get('/:_id', function (req, res) {
     let inventoryData = "";
     let joystickContainer  = "";
     let arImageTargets = [];
-    let arTargetElements = "";
+    let arChildElements = "";
     let useArParent = false;
     let sceneUnityWebDomain = "http://smxr.net";
     let activityPubScripts = "";
@@ -2194,7 +2194,7 @@ webxr_router.get('/:_id', function (req, res) {
 
                             if (useArParent || (locationPlaceholders[i].tags && (locationPlaceholders[i].tags.includes("ar child") ||  locationPlaceholders[i].tags.includes("archild")))) {
                                    
-                                arTargetElements = arTargetElements + "<a-entity data-isvisible=\x22yes\x22 id=\x22"+locationPlaceholders[i].timestamp+"\x22 class=\x22activeObjexGrab activeObjexRay envMap "+
+                                arChildElements = arChildElements + "<a-entity data-isvisible=\x22yes\x22 id=\x22"+locationPlaceholders[i].timestamp+"\x22 class=\x22activeObjexGrab activeObjexRay envMap "+
                                 "placeholders\x22 cloud_marker=\x22phID: "+locationPlaceholders[i].phID+"; xpos: "+locationPlaceholders[i].x+"; ypos: "+locationPlaceholders[i].y+"; zpos: "+locationPlaceholders[i].z+";" +
                                 "xrot: "+xrot+"; yrot: "+yrot+"; zrot: "+zrot+"; targetElements: "+locationPlaceholders[i].targetElements+"; " +
                                 "mediaID: "+locationPlaceholders[i].mediaID+"; mediaName: "+locationPlaceholders[i].mediaName+"; "+
@@ -2978,7 +2978,7 @@ webxr_router.get('/:_id', function (req, res) {
 
                                                         if (useArParent || (locMdl.locationTags && (locMdl.locationTags.includes("ar child") || locMdl.locationTags.includes("archild")))) {
                                                             console.log("GOTSA AR TARGET ELEMENT");
-                                                            arTargetElements = arTargetElements + "<a-entity id=\x22"+id+"\x22 "+followCurve+" "+physicsMod+" "+modelParent+" "+scatterSurface+" "+modModel+" class=\x22envMap gltf "+entityType+" "+ambientChild+
+                                                            arChildElements = arChildElements + "<a-entity id=\x22"+id+"\x22 "+followCurve+" "+physicsMod+" "+modelParent+" "+scatterSurface+" "+modModel+" class=\x22envMap gltf "+entityType+" "+ambientChild+
                                                             " activeObjexGrab activeObjexRay\x22 shadow=\x22cast:true; receive:true\x22 "+skyboxEnvMap+" gltf-model=\x22#" + m_assetID + "\x22 "+objAnim+" "+cannedAnim+
                                                             // " position=\x22"+locMdl.x+" "+locMdl.y+" "+zFix+"\x22 scale=\x22"+scale+" "+scale+" "+scale+"\x22 rotation=\x22"+rotation+"\x22 >" + offsetPos+ "</a-entity>";  //rem rotation bc navmesh donutlike
                                                             " position=\x22"+locMdl.x+" "+locMdl.y+" "+zFix+"\x22 scale=\x22"+scale+" "+scale+" "+scale+"\x22 data-scale=\x22"+scale+"\x22 rotation=\x22"+rotation+"\x22 >" + offsetPos+ "</a-entity>"; 
@@ -3101,7 +3101,7 @@ webxr_router.get('/:_id', function (req, res) {
                                     }
 
                                     if (useArParent || (locMdl.locationTags && (locMdl.locationTags.includes("ar child") || locMdl.locationTags.includes("archild")))) {
-                                        arTargetElements = arTargetElements + "<a-entity id=\x22nav-mesh\x22 nav-mesh nav_mesh_controller=\x22useDefault: true;\x22 visible=\x22"+visible+"\x22></a-entity>"; //use big circle if no defined navmesh
+                                        arChildElements = arChildElements + "<a-entity id=\x22nav-mesh\x22 nav-mesh nav_mesh_controller=\x22useDefault: true;\x22 visible=\x22"+visible+"\x22></a-entity>"; //use big circle if no defined navmesh
                                     } else {
                                         navmeshEntity = "<a-entity id=\x22nav-mesh\x22 nav-mesh nav_mesh_controller=\x22useDefault: true;\x22 visible=\x22"+visible+"\x22></a-entity>"; //use big circle if no defined navmesh
                                     }
@@ -3113,7 +3113,7 @@ webxr_router.get('/:_id', function (req, res) {
                                     }
 
                                     if (useArParent || (locMdl.locationTags && (locMdl.tags.includes("ar child") || locMdl.tags.includes("archild")))) {
-                                        arTargetElements = arTargetElements + "<a-entity class=\x22surface\x22 id=\x22scatterSurface\x22 scatter-surface-default rotation=\x22-90 0 0\x22 visible=\x22"+visible+"\x22></a-entity>"; //use big circle if no defined navmesh
+                                        arChildElements = arChildElements + "<a-entity class=\x22surface\x22 id=\x22scatterSurface\x22 scatter-surface-default rotation=\x22-90 0 0\x22 visible=\x22"+visible+"\x22></a-entity>"; //use big circle if no defined navmesh
                                     } else {
                                         surfaceEntity = "<a-entity class=\x22surface\x22 id=\x22scatterSurface\x22 scatter-surface-default rotation=\x22-90 0 0\x22 visible=\x22"+visible+"\x22></a-entity>"; //use big circle if no defined navmesh
                                     }
@@ -4495,20 +4495,20 @@ webxr_router.get('/:_id', function (req, res) {
                     if (sceneResponse.sceneWebType == undefined || sceneResponse.sceneWebType.toLowerCase() == "default" || sceneResponse.sceneWebType.toLowerCase() == "aframe") { 
                        
                         webxrFeatures = "webxr=\x22optionalFeatures: hit-test, local-floor, dom-overlay; overlayElement: #ar_overlay;\x22 "; 
-                        // webxrFeatures = " webxr=\x22requiredFeatures: dom-overlay; optionalFeatures: hit-test; overlayElement: #ar_overlay;\x22 ar-hit-test=\x22enabled: true; target: #ar_target;\x22 "; //otherwise hit-test breaks everythign!
+                        // webxrFeatures = " webxr=\x22requiredFeatures: dom-overlay; optionalFeatures: hit-test; overlayElement: #ar_overlay;\x22 ar-hit-test=\x22enabled: true; target: #ar_parent;\x22 "; //otherwise hit-test breaks everythign!
                         // requiredFeatures: hit-test,local-floor; optionalFeatures: dom-overlay,unbounded; overlayElement: #ar_overlay;"
                         // // arHitTest = "ar-hit-test-spawn=\x22mode: "+arMode+"\x22";
                         // arShadowPlane = "<a-plane show-in-ar-mode id="shadow-plane" material="shader:shadow" shadow="cast:false;" visible=\x22false\x22 height=\x2210\x22 width=\x2210\x22 rotation=\x22-90 0 0\x22 shadow=\x22receive:true\x22 ar-shadows=\x22opacity: 0.3\x22 static-body=\x22shape: none\x22 shape__main=\x22shape: box; halfExtents: 100 100 0.125; offset: 0 0 -0.125\x22>" +
                         // arShadowPlane = "<a-plane show-in-ar-mode visible=\x22false\x22 id=\x22shadow-plane\x22 material=\x22shader:shadow\x22 shadow=\x22cast:false;\x22 follow-shadow=\x22.activeObjexRay\x22 height=\x2233\x22 width=\x2233\x22 rotation=\x22-90 0 0\x22>" +
                         //"</a-plane>";
                         arElements = "<a-entity material=\x22shader:shadow; depthWrite:false; opacity:0.9;\x22 visible=\x22false\x22 geometry=\x22primitive:shadow-plane;\x22 shadow=\x22cast:false;receive:true;\x22"+
-                                    "ar-shadow-helper=\x22target:#ar_target;light:#dirlight;\x22></a-entity>"+
-                                    "<a-entity scale=\x221 1 1\x22 id=\x22ar_target\x22>" +
-                                    arTargetElements +
+                                    "ar-shadow-helper=\x22target:#ar_parent;light:#dirlight;\x22></a-entity>"+
+                                    "<a-entity scale=\x221 1 1\x22 id=\x22ar_parent\x22>" +
+                                    arChildElements +
                                     "</a-entity>"+
-                                    // "<a-entity hide-on-hit-test-start shadow id=\x22ar_target\x22 scale=\x220.2 0.2 0.2\x22 position=\x220.2 0 -0.4\x22><a-box show-in-ar-mode visible=\x22false\x22></a-box></a-entity>";
+                                    // "<a-entity hide-on-hit-test-start shadow id=\x22ar_parent\x22 scale=\x220.2 0.2 0.2\x22 position=\x220.2 0 -0.4\x22><a-box show-in-ar-mode visible=\x22false\x22></a-box></a-entity>";
                                     // "<a-entity show-in-ar-mode visible=\x22false\x22 id=\x22reticleEntity\x22 gltf-model=\x22#reticle2\x22 scale=\x220.8 0.8 0.8\x22 ar-hit-test-spawn=\x22mode: "+arMode+"\x22></a-entity>\n";
-                                    "<a-entity show-in-ar-mode visible=\x22false\x22 id=\x22hitTester\x22 ar_hit_test_mod=\x22targetEl: #ar_target\x22 gltf-model=\x22#reticle2\x22></a-entity>\n";
+                                    "<a-entity show-in-ar-mode visible=\x22false\x22 id=\x22hitCaster\x22 ar_hit_caster=\x22targetEl: #ar_parent\x22 gltf-model=\x22#reticle2\x22></a-entity>\n";
                         // }
                         handsTemplate = "<template id=\x22hand-template\x22><a-entity><a-box scale=\x220.1 0.1 0.1\x22 visible=false></a-box></a-entity></template>";
                        
@@ -5150,7 +5150,7 @@ webxr_router.get('/:_id', function (req, res) {
                         // "<script src=\x22../main/src/component/xr-utils.js\x22></script>"+
                         // "<script src=\x22../main/src/component/ar-cursor.js\x22></script>"+
                         "<script src=\x22../main/src/component/ar-shadow-helper.js\x22></script>"+
-                        "<script src=\x22../main/src/component/ar_hit_test_mod.js\x22></script>"+
+                        "<script src=\x22../main/src/component/ar_hit_caster.js\x22></script>"+
                         // "<script src=\x22../main/vendor/html2canvas/aframe-html-shader.min.js\x22></script>"+
                         primaryAudioScript +
                         ambientAudioScript +
@@ -5215,7 +5215,10 @@ webxr_router.get('/:_id', function (req, res) {
                         geoScripts +
                         "<script src=\x22../main/js/dialogs.js\x22></script>"+
 
-                        "<div id=\x22ar_overlay\x22 style=\x22visibility: hidden\x22><div id=\x22ar_overlay_message\x22></div><button id=\x22arLockButton\x22 style=\x22float:right\x22 onclick=\x22ToggleLockARTargets()\x22 type=\x22button\x22 class=\x22btn\x22>toggle lock</button></div>"+                        
+                        "<div id=\x22ar_overlay\x22 style=\x22visibility: visible\x22><div id=\x22ar_overlay_message\x22></div>" +
+                        "<div><button id=\x22arLockButton\x22 style=\x22float:right; margin: auto\x22 onclick=\x22ToggleLockElementsAR()\x22 type=\x22button\x22 class=\x22btn\x22>toggle lock</button></div><br><br><br>"+
+                        "<div><button id=\x22arScaleDownButton\x22 style=\x22float:right; margin: auto\x22 onclick=\x22ScaleElementsAR('down')\x22 type=\x22button\x22 class=\x22btn\x22>scale -</button></div><br><br><br>"+            
+                        "<div><button id=\x22arScaleUpButton\x22 style=\x22float:right; margin: auto\x22 onclick=\x22ScaleElementsAR('up')\x22 type=\x22button\x22 class=\x22btn\x22>scale +</button></div></div>"+                        
                         // threeDeeTextComponent +
                         aScene +
                         "<div id=\x22overlay\x22></div>"+
@@ -5426,8 +5429,8 @@ webxr_router.get('/:_id', function (req, res) {
                         //This plane is only visible in AR and follows the given target to provide it with shadows.
                             // "<a-light id=\x22dirlight\x22 auto-shadow-cam intensity=\x220.7\x22 light=\x22castShadow:true;type:directional\x22 position=\x2210 10 10\x22></a-light>"+ //ar light detection
                             // "<a-entity material=\x22shader:shadow; depthWrite:false; opacity:0.9;\x22 visible=\x22false\x22 geometry=\x22primitive:shadow-plane;\x22 shadow=\x22cast:false;receive:true;\x22" +
-                            // " ar-shadow-helper=\x22target:#ar_target_object;light:#dirlight;\x22></a-entity>"+
-                            // "<a-entity id=\x22ar_target_object\x22></a-entity>"+  //make ar objects the children of this?
+                            // " ar-shadow-helper=\x22target:#ar_parent_object;light:#dirlight;\x22></a-entity>"+
+                            // "<a-entity id=\x22ar_parent_object\x22></a-entity>"+  //make ar objects the children of this?
 
                         "<div id=\x22token\x22 data-token=\x22"+token+"\x22>\n"+
                         
