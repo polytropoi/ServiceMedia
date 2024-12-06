@@ -2109,7 +2109,7 @@ AFRAME.registerComponent('mod_object', {
                   // }
                 }
               }
-              if (this.data.objectData.eventtype && this.data.objectData.eventtype.toLowerCase() == "destroy self") {
+              if (this.data.objectData && this.data.objectData.eventtype && this.data.objectData.eventtype.toLowerCase() == "destroy self") {//!!
                 this.el.classList.remove('activeObjexRay');
                 this.el.removeAttribute('ammo-shape');
                 this.el.removeAttribute('ammo-body');
@@ -2122,7 +2122,6 @@ AFRAME.registerComponent('mod_object', {
             if (this.hasShootAction && e.detail.withEl.id != "player") {
               // console.log("tryna cleanup!")
               this.el.sceneEl.object3D.remove(this.line);
-              
               let trailComponent = this.el.components.trail;
               if (trailComponent) {
                 trailComponent.kill();
@@ -2377,10 +2376,6 @@ AFRAME.registerComponent('mod_object', {
       //         }
       //   });// end collidestart
      
- 
-  
-      
-  
   
       this.el.addEventListener('raycaster-intersected', e =>{  
           this.raycaster_e = e.detail.el;
