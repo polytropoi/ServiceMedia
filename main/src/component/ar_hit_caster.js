@@ -60,18 +60,148 @@ AFRAME.registerComponent('ar_hit_caster', {
             targetEl.setAttribute('position', position);
             targetEl.setAttribute('scale', {'x': scaleMod, 'y': scaleMod, 'z': scaleMod});
 
-
-            let spawnableEl = document.querySelector('.spawnable'); //el with "spawnable" tag
+            let spawnedEl = null;
+            let data = {};
+            let timestamp = Date.now();
+            let spawnableEl = document.querySelector('.spawnable'); //location with "spawnable" tag
             if (spawnableEl) {
-              let clone = spawnableEl.cloneNode(true);
-              
-              clone.setAttribute('position', position); //it's cloned as a child so...
-              clone.setAttribute('scale', {'x': scaleMod, 'y': scaleMod, 'z': scaleMod});
-              clone.id = "_" + Date.now();
-              self.el.sceneEl.appendChild(clone);
-              clone.setAttribute("anchored", {"persistent": true});
-              self.messageEl.textContent = "spawning object at position " + JSON.stringify(position);
-            }
+              let localMarker = spawnableEl.components.local_marker;
+              if (localMarker) {
+                data = localMarker.data;
+                spawnedEl = document.createElement("a-entity");
+                spawnedEl.setAttribute("local_marker", { timestamp: "_" + timestamp,
+                                                        name: data.name, 
+                                                        modelID: data.modelID, 
+                                                        objectID: data.objectID, 
+                                                        mediaID: data.mediaID, 
+                                                        tags: data.tags, 
+                                                        eventData: data.eventData, 
+                                                        markerType: data.markerType,
+                                                        description: data.description,
+                                                        xpos: data.xpos,
+                                                        ypos: data.ypos,
+                                                        zpos: data.zpos,
+                                                        xrot: data.xrot,
+                                                        yrot: data.yrot,
+                                                        zrot: data.zrot,
+                                                        xscale: data.xscale,
+                                                        yscale: data.yscale,
+                                                        zscale: data.zscale,
+                                                        targetElements: data.targetElements
+                                                      });
+                spawnedEl.id = "_" + timestamp;
+                spawnedEl.setAttribute('position', position); //?
+                spawnedEl.setAttribute('scale', {'x': scaleMod * .2, 'y': scaleMod  * .2, 'z': scaleMod * .2}); //because it's not a child of ar_parent
+               
+                self.el.sceneEl.appendChild(spawnedEl); //hrm, not child of ar parent?  worldToLocal?
+                spawnedEl.setAttribute("anchored", {"persistent": true});
+                self.messageEl.textContent = "spawning object at position " + JSON.stringify(position);
+
+              } else {
+                  let cloudMarker = spawnableEl.components.cloud_marker;
+                  if (cloudMarker) {
+                    data = cloudMarker.data;
+                    spawnedEl = document.createElement("a-entity");
+                    spawnedEl.setAttribute("cloud_marker", { timestamp: "_" + timestamp,
+                                                            name: data.name, 
+                                                            modelID: data.modelID, 
+                                                            objectID: data.objectID, 
+                                                            mediaID: data.mediaID, 
+                                                            tags: data.tags, 
+                                                            eventData: data.eventData, 
+                                                            markerType: data.markerType,
+                                                            description: data.description,
+                                                            xpos: data.xpos,
+                                                            ypos: data.ypos,
+                                                            zpos: data.zpos,
+                                                            xrot: data.xrot,
+                                                            yrot: data.yrot,
+                                                            zrot: data.zrot,
+                                                            xscale: data.xscale,
+                                                            yscale: data.yscale,
+                                                            zscale: data.zscale,
+                                                            targetElements: data.targetElements
+                                                          });
+                      spawnedEl.id = "_" + timestamp;
+                      spawnedEl.setAttribute('position', position); 
+                      spawnedEl.setAttribute('scale', {'x': scaleMod * .2, 'y': scaleMod  * .2, 'z': scaleMod * .2});
+
+                      self.el.sceneEl.appendChild(spawnedEl); //hrm, not child of ar parent?  worldToLocal?
+                      spawnedEl.setAttribute("anchored", {"persistent": true});
+                      self.messageEl.textContent = "spawning object at position " + JSON.stringify(position);
+                  } else {
+                    let modModel = spawnableEl.components.mod_model;  
+                    if (modModel) {
+                      data = modModel.data;
+                      spawnedEl = document.createElement("a-entity");
+                      spawnedEl.setAttribute("mod_model", { timestamp: "_" + timestamp,
+                                                            name: data.name, 
+                                                            modelID: data.modelID, 
+                                                            objectID: data.objectID, 
+                                                            mediaID: data.mediaID, 
+                                                            tags: data.tags, 
+                                                            eventData: data.eventData, 
+                                                            markerType: data.markerType,
+                                                            description: data.description,
+                                                            xpos: data.xpos,
+                                                            ypos: data.ypos,
+                                                            zpos: data.zpos,
+                                                            xrot: data.xrot,
+                                                            yrot: data.yrot,
+                                                            zrot: data.zrot,
+                                                            xscale: data.xscale,
+                                                            yscale: data.yscale,
+                                                            zscale: data.zscale,
+                                                            targetElements: data.targetElements
+                                                          });
+                        spawnedEl.id = "_" + timestamp;
+                        spawnedEl.setAttribute('position', position); 
+                        spawnedEl.setAttribute('scale', {'x': scaleMod * .2, 'y': scaleMod  * .2, 'z': scaleMod * .2});
+
+                        self.el.sceneEl.appendChild(spawnedEl); //hrm, not child of ar parent?  worldToLocal?
+                        spawnedEl.setAttribute("anchored", {"persistent": true});
+                        self.messageEl.textContent = "spawning object at position " + JSON.stringify(position);
+                    } else {
+                      let modObject = spawnableEl.components.mod_object;
+                      if (modObject) {
+                        data = modObject.data;
+                        spawnedEl = document.createElement("a-entity");
+                        spawnedEl.setAttribute("mod_object", { timestamp: "_" + timestamp,
+                                                              name: data.name, 
+                                                              modelID: data.modelID, 
+                                                              objectID: data.objectID, 
+                                                              mediaID: data.mediaID, 
+                                                              tags: data.tags, 
+                                                              eventData: data.eventData, 
+                                                              markerType: data.markerType,
+                                                              description: data.description,
+                                                              xpos: data.xpos,
+                                                              ypos: data.ypos,
+                                                              zpos: data.zpos,
+                                                              xrot: data.xrot,
+                                                              yrot: data.yrot,
+                                                              zrot: data.zrot,
+                                                              xscale: data.xscale,
+                                                              yscale: data.yscale,
+                                                              zscale: data.zscale,
+                                                              targetElements: data.targetElements
+                                                            });
+                          spawnedEl.id = "_" + timestamp;
+                          spawnedEl.setAttribute('position', position); 
+                          spawnedEl.setAttribute('scale', {'x': scaleMod * .2, 'y': scaleMod  * .2, 'z': scaleMod * .2});
+
+                          self.el.sceneEl.appendChild(spawnedEl); //hrm, not child of ar parent?  worldToLocal?
+                          spawnedEl.setAttribute("anchored", {"persistent": true});
+                          self.messageEl.textContent = "spawning object at position " + JSON.stringify(position);
+                      }
+                    }
+                  }
+                } 
+              }
+
+              // let clone = spawnableEl.cloneNode(true);
+
+            // }
           
           
 
