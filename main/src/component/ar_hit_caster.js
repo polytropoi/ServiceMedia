@@ -63,9 +63,9 @@ AFRAME.registerComponent('ar_hit_caster', {
 
             let spawnableEl = document.querySelector('.spawnable'); //el with "spawnable" tag
             if (spawnableEl) {
-              spawnableEl.cloneNode(true);
-              spawnableEl.setAttribute('position', position);
-              spawnableEl.setAttribute('scale', {'x': scaleMod, 'y': scaleMod, 'z': scaleMod});
+              let clone = spawnableEl.cloneNode(true);
+              clone.setAttribute('position', position); //it's cloned as a child so...
+              clone.setAttribute('scale', {'x': scaleMod, 'y': scaleMod, 'z': scaleMod});
               self.messageEl.textContent = "spawning object at position " + JSON.stringify(position);
             }
           
