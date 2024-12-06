@@ -68,7 +68,8 @@ AFRAME.registerComponent('ar_hit_caster', {
               clone.setAttribute('position', position); //it's cloned as a child so...
               clone.setAttribute('scale', {'x': scaleMod, 'y': scaleMod, 'z': scaleMod});
               clone.id = "_" + Date.now();
-              targetEl.appendChild(clone);
+              self.el.sceneEl.appendChild(clone);
+              clone.setAttribute("anchored", {"persistent": true});
               self.messageEl.textContent = "spawning object at position " + JSON.stringify(position);
             }
           
