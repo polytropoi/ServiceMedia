@@ -1886,7 +1886,7 @@ AFRAME.registerComponent('mod_object', {
                     console.log("DAMAGE hitpoints " + damageHitPoints.toFixed(2) + " distance " + targetDistance + " currentdamage " + targetModObjComponent.data.damage +  " of " + targetModObjComponent.data.objectData.hitpoints);
                     if (targetModObjComponent.data.damage < targetModObjComponent.data.objectData.hitpoints) {
                       targetModObjComponent.showCallout("Hit +"+ theDamage.toFixed(2) +" : "+ targetModObjComponent.data.damage.toFixed(2) + " / " + targetModObjComponent.data.objectData.hitpoints, targetPosition, targetDistance);
-                      console.log("gotsa damage hit " +targetModObjComponent.data.damage.toFixed(2) + " / " + targetModObjComponent.data.objectData.hitpoints)
+                      console.log("gotsa damage hit " +targetModObjComponent.data.damage.toFixed(2) + " / " + targetModObjComponent.data.objectData.hitpoints);
                     } else {
                       this.isDead = true;
                       // this.showCallout("I AM DEAD NOW!", this.hitpoint, targetDistance);
@@ -2109,7 +2109,7 @@ AFRAME.registerComponent('mod_object', {
                   // }
                 }
               }
-              if (this.data.objectData.eventtype.toLowerCase() == "destroy self") {
+              if (this.data.objectData.eventtype && this.data.objectData.eventtype.toLowerCase() == "destroy self") {
                 this.el.classList.remove('activeObjexRay');
                 this.el.removeAttribute('ammo-shape');
                 this.el.removeAttribute('ammo-body');

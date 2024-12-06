@@ -89,12 +89,10 @@ AFRAME.registerComponent('ar_hit_caster', {
                   }
                 });
                 if (elVisible) {
-  
                   const details = self.el.components.raycaster.getIntersection(el);
                   // console.log("ray hit select " + JSON.stringify(details));
                   self.messageEl.textContent = "ray hit on object " + el.id;
                   el.emit('click', details);
-                  
                   break;
                 }
               }
@@ -138,9 +136,9 @@ AFRAME.registerComponent('ar_hit_caster', {
         let targetScale = targetEl.getAttribute("scale");
         console.log("targetEl scale is " + JSON.stringify(targetScale));
         if (dir == "up") {
-          targetEl.setAttribute("scale", {"x": targetScale.x * .1, "y": targetScale.x * .1, "z": targetScale.x * .1})
+          targetEl.setAttribute("scale", {"x": targetScale.x + .1, "y": targetScale.x + .1, "z": targetScale.x + .1})
         } else {
-          targetEl.setAttribute("scale", {"x": targetScale.x * -.1, "y": targetScale.x * -.1, "z": targetScale.x * -.1})
+          targetEl.setAttribute("scale", {"x": targetScale.x - .1, "y": targetScale.x - .1, "z": targetScale.x - .1})
         }
       }
     },
