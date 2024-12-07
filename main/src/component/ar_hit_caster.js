@@ -60,15 +60,15 @@ AFRAME.registerComponent('ar_hit_caster', {
             targetEl.setAttribute('position', position);
             targetEl.setAttribute('scale', {'x': scaleMod, 'y': scaleMod, 'z': scaleMod});
 
-            let spawnedEl = null;
-            let data = {};
+            // let spawnedEl = null;
+            // let data = {};
             let timestamp = Date.now();
             let spawnableEl = document.querySelector('.spawnable'); //location with "spawnable" tag
             if (spawnableEl) {
               let localMarker = spawnableEl.components.local_marker;
               if (localMarker) {
-                data = localMarker.data;
-                spawnedEl = document.createElement("a-entity");
+                let data = localMarker.data;
+                let spawnedEl = document.createElement("a-entity");
                 spawnedEl.setAttribute("local_marker", { timestamp: "_" + timestamp,
                                                         name: data.name, 
                                                         modelID: data.modelID, 
@@ -100,8 +100,8 @@ AFRAME.registerComponent('ar_hit_caster', {
               } else {
                   let cloudMarker = spawnableEl.components.cloud_marker;
                   if (cloudMarker) {
-                    data = cloudMarker.data;
-                    spawnedEl = document.createElement("a-entity");
+                    let data = cloudMarker.data;
+                    let spawnedEl = document.createElement("a-entity");
                     spawnedEl.setAttribute("cloud_marker", { timestamp: "_" + timestamp,
                                                             name: data.name, 
                                                             modelID: data.modelID, 
@@ -132,8 +132,8 @@ AFRAME.registerComponent('ar_hit_caster', {
                   } else {
                     let modModel = spawnableEl.components.mod_model;  
                     if (modModel) {
-                      data = modModel.data;
-                      spawnedEl = document.createElement("a-entity");
+                      let data = modModel.data;
+                      let spawnedEl = document.createElement("a-entity");
                       spawnedEl.setAttribute("mod_model", { timestamp: "_" + timestamp,
                                                             name: data.name, 
                                                             modelID: data.modelID, 
@@ -164,8 +164,8 @@ AFRAME.registerComponent('ar_hit_caster', {
                     } else {
                       let modObject = spawnableEl.components.mod_object;
                       if (modObject) {
-                        data = modObject.data;
-                        spawnedEl = document.createElement("a-entity");
+                        let data = modObject.data;
+                        let spawnedEl = document.createElement("a-entity");
                         spawnedEl.setAttribute("mod_object", { timestamp: "_" + timestamp,
                                                               name: data.name, 
                                                               modelID: data.modelID, 
