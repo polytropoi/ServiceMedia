@@ -4483,7 +4483,7 @@ webxr_router.get('/:_id', function (req, res) {
                     let arElements = "";
                     let handsTemplate = "";
                     // let aframeRenderSettings = "renderer=\x22antialias: true; logarithmicDepthBuffer: true; colorManagement: true; sortObjects: true; physicallyCorrectLights: true; alpha: true; maxCanvasWidth: 1920; maxCanvasHeight: 1920;\x22";
-                    let aframeRenderSettings = "renderer=\x22antialias: auto; exposure: .1; colorManagement: true; sortTransparentObjects: true; maxCanvasWidth: 1920; maxCanvasHeight: 1920;\x22";
+                    let aframeRenderSettings = "renderer=\x22antialias: auto; exposure: .1; colorManagement: true; sortObjects: true; physicallyCorrectLights: true; sortTransparentObjects: false; maxCanvasWidth: 1920; maxCanvasHeight: 1920;\x22";
                     // let aframeRenderSettings = "renderer=\x22exposure: 2\x22";
                    
                     // if (arMode == "spawn") {
@@ -4493,8 +4493,15 @@ webxr_router.get('/:_id', function (req, res) {
 
                     console.log("sceneWebType: "+ sceneResponse.sceneWebType);
                     if (sceneResponse.sceneWebType == undefined || sceneResponse.sceneWebType.toLowerCase() == "default" || sceneResponse.sceneWebType.toLowerCase() == "aframe") { 
-                       
-                        webxrFeatures = "webxr=\x22optionalFeatures: hit-test, local-floor, dom-overlay; overlayElement: #ar_overlay;\x22 "; 
+                        let xrExtras = "";
+                        if (sceneResponse.sceneTags && sceneResponse.sceneTags.includes("xr room physics")) {
+                            meshUtilsScript = meshUtilsScript + "<script type=\x22module\x22 src=\x22../main/js/xr-room-physics.min.js\x22></script>";
+                            xrExtras = "xr-room-physics";
+                        }
+                        if (sceneResponse.sceneTags && sceneResponse.sceneTags.includes("real world meshing")) {
+                            xrExtras = "real-world-meshing";
+                        }
+                        webxrFeatures = "webxr=\x22optionalFeatures: hit-test, local-floor, dom-overlay; overlayElement: #ar_overlay;\x22 " + xrExtras + " "; 
                         // webxrFeatures = " webxr=\x22requiredFeatures: dom-overlay; optionalFeatures: hit-test; overlayElement: #ar_overlay;\x22 ar-hit-test=\x22enabled: true; target: #ar_parent;\x22 "; //otherwise hit-test breaks everythign!
                         // requiredFeatures: hit-test,local-floor; optionalFeatures: dom-overlay,unbounded; overlayElement: #ar_overlay;"
                         // // arHitTest = "ar-hit-test-spawn=\x22mode: "+arMode+"\x22";
