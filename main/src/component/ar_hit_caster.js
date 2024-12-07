@@ -70,6 +70,11 @@ AFRAME.registerComponent('ar_hit_caster', {
                 let data = localMarker.data;
                 console.log("spawnable data found " + JSON.stringify(data));
                 let spawnedEl = document.createElement("a-entity");
+                spawnedEl.id = "_" + timestamp;
+                sceneEl.appendChild(spawnedEl); //hrm, not child of ar parent?  worldToLocal?
+                spawnedEl.setAttribute('position', position); //?
+                spawnedEl.setAttribute('scale', {'x': scaleMod * .2, 'y': scaleMod  * .2, 'z': scaleMod * .2}); //because it's not a child of ar_parent
+                spawnedEl.setAttribute("anchored", {"persistent": true});
                 spawnedEl.setAttribute("local_marker", { timestamp: "_" + timestamp,
                                                         name: data.name, 
                                                         modelID: data.modelID, 
@@ -90,12 +95,7 @@ AFRAME.registerComponent('ar_hit_caster', {
                                                         zscale: data.zscale,
                                                         targetElements: data.targetElements
                                                       });
-                spawnedEl.id = "_" + timestamp;
-                spawnedEl.setAttribute('position', position); //?
-                spawnedEl.setAttribute('scale', {'x': scaleMod * .2, 'y': scaleMod  * .2, 'z': scaleMod * .2}); //because it's not a child of ar_parent
-               
-                sceneEl.appendChild(spawnedEl); //hrm, not child of ar parent?  worldToLocal?
-                spawnedEl.setAttribute("anchored", {"persistent": true});
+
                 self.messageEl.textContent = "spawning local marker at position " + JSON.stringify(position);
 
               } else {
@@ -105,6 +105,11 @@ AFRAME.registerComponent('ar_hit_caster', {
                     let data = cloudMarker.data;
                     console.log("spawnable data found " + JSON.stringify(data));
                     let spawnedEl = document.createElement("a-entity");
+                    spawnedEl.id = "_" + timestamp;
+
+                    sceneEl.appendChild(spawnedEl); //hrm, not child of ar parent?  worldToLocal?
+                    spawnedEl.setAttribute('position', position); 
+                    spawnedEl.setAttribute('scale', {'x': scaleMod * .2, 'y': scaleMod  * .2, 'z': scaleMod * .2});
                     spawnedEl.setAttribute("cloud_marker", { timestamp: "_" + timestamp,
                                                             name: data.name, 
                                                             modelID: data.modelID, 
@@ -125,11 +130,7 @@ AFRAME.registerComponent('ar_hit_caster', {
                                                             zscale: data.zscale,
                                                             targetElements: data.targetElements
                                                           });
-                      spawnedEl.id = "_" + timestamp;
-                      spawnedEl.setAttribute('position', position); 
-                      spawnedEl.setAttribute('scale', {'x': scaleMod * .2, 'y': scaleMod  * .2, 'z': scaleMod * .2});
 
-                      sceneEl.appendChild(spawnedEl); //hrm, not child of ar parent?  worldToLocal?
                       spawnedEl.setAttribute("anchored", {"persistent": true});
                       self.messageEl.textContent = "spawning marker at position " + JSON.stringify(position);
                   } else {
@@ -138,6 +139,12 @@ AFRAME.registerComponent('ar_hit_caster', {
                       let data = modModel.data;
                       console.log("spawnable data found " + JSON.stringify(data));
                       let spawnedEl = document.createElement("a-entity");
+                      spawnedEl.id = "_" + timestamp;
+                     
+                      sceneEl.appendChild(spawnedEl); 
+                      spawnedEl.setAttribute('position', position); 
+                      spawnedEl.setAttribute('scale', {'x': scaleMod * .2, 'y': scaleMod  * .2, 'z': scaleMod * .2});
+                      spawnedEl.setAttribute("anchored", {"persistent": true});
                       spawnedEl.setAttribute("mod_model", { timestamp: "_" + timestamp,
                                                             name: data.name, 
                                                             modelID: data.modelID, 
@@ -158,20 +165,20 @@ AFRAME.registerComponent('ar_hit_caster', {
                                                             zscale: data.zscale,
                                                             targetElements: data.targetElements
                                                           });
-                        spawnedEl.id = "_" + timestamp;
-                        spawnedEl.setAttribute('position', position); 
-                        spawnedEl.setAttribute('scale', {'x': scaleMod * .2, 'y': scaleMod  * .2, 'z': scaleMod * .2});
 
-                        sceneEl.appendChild(spawnedEl); 
-                        spawnedEl.setAttribute("anchored", {"persistent": true});
                         self.messageEl.textContent = "spawning model at position " + JSON.stringify(position);
                     } else {
                       let modObject = spawnableEl.components.mod_object;
                       if (modObject) {
                         console.log("spawnable data found " + JSON.stringify(data));
                         let data = modObject.data;
-                        
                         let spawnedEl = document.createElement("a-entity");
+                        spawnedEl.id = "_" + timestamp;
+
+                        sceneEl.appendChild(spawnedEl); 
+                        spawnedEl.setAttribute('position', position); 
+                        spawnedEl.setAttribute('scale', {'x': scaleMod * .2, 'y': scaleMod  * .2, 'z': scaleMod * .2});
+                        spawnedEl.setAttribute("anchored", {"persistent": true});
                         spawnedEl.setAttribute("mod_object", { timestamp: "_" + timestamp,
                                                               name: data.name, 
                                                               modelID: data.modelID, 
@@ -192,12 +199,7 @@ AFRAME.registerComponent('ar_hit_caster', {
                                                               zscale: data.zscale,
                                                               targetElements: data.targetElements
                                                             });
-                          spawnedEl.id = "_" + timestamp;
-                          spawnedEl.setAttribute('position', position); 
-                          spawnedEl.setAttribute('scale', {'x': scaleMod * .2, 'y': scaleMod  * .2, 'z': scaleMod * .2});
 
-                          sceneEl.appendChild(spawnedEl); 
-                          spawnedEl.setAttribute("anchored", {"persistent": true});
                           self.messageEl.textContent = "spawning object at position " + JSON.stringify(position);
                       }
                     }
