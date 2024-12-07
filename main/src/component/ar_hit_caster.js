@@ -33,6 +33,7 @@ AFRAME.registerComponent('ar_hit_caster', {
         console.log("enter-vr");
         // messageEl.textContent = "entered immersive mode";
         if (!self.el.sceneEl.is('ar-mode')) { return; }
+        session = self.el.sceneEl.renderer.xr.getSession();
         self.messageEl.textContent = "entered AR mode";
         console.log("ar-mode");
 
@@ -40,8 +41,6 @@ AFRAME.registerComponent('ar_hit_caster', {
         if (arOverlay) {
           arOverlay.style.visibility = 'visible';
         }
-
-        session = self.el.sceneEl.renderer.xr.getSession();
         
         self.originalPosition = targetEl.object3D.position.clone();
         self.el.object3D.visible = true;
@@ -163,7 +162,7 @@ AFRAME.registerComponent('ar_hit_caster', {
                         spawnedEl.setAttribute('position', position); 
                         spawnedEl.setAttribute('scale', {'x': scaleMod * .2, 'y': scaleMod  * .2, 'z': scaleMod * .2});
 
-                        sceneEl.appendChild(spawnedEl); //hrm, not child of ar parent?  worldToLocal?
+                        sceneEl.appendChild(spawnedEl); 
                         spawnedEl.setAttribute("anchored", {"persistent": true});
                         self.messageEl.textContent = "spawning model at position " + JSON.stringify(position);
                     } else {
@@ -197,7 +196,7 @@ AFRAME.registerComponent('ar_hit_caster', {
                           spawnedEl.setAttribute('position', position); 
                           spawnedEl.setAttribute('scale', {'x': scaleMod * .2, 'y': scaleMod  * .2, 'z': scaleMod * .2});
 
-                          sceneEl.appendChild(spawnedEl); //hrm, not child of ar parent?  worldToLocal?
+                          sceneEl.appendChild(spawnedEl); 
                           spawnedEl.setAttribute("anchored", {"persistent": true});
                           self.messageEl.textContent = "spawning object at position " + JSON.stringify(position);
                       }
@@ -205,14 +204,6 @@ AFRAME.registerComponent('ar_hit_caster', {
                   }
                 } 
               }
-
-              // let clone = spawnableEl.cloneNode(true);
-
-            // }
-          
-          
-
-
           } else {
             if (self.el.components.raycaster) {
               console.log("gotsa ar raycaster!");
@@ -274,9 +265,11 @@ AFRAME.registerComponent('ar_hit_caster', {
         let targetScale = targetEl.getAttribute("scale");
         console.log("targetEl scale is " + JSON.stringify(targetScale));
         if (dir == "up") {
-          targetEl.setAttribute("scale", {"x": targetScale.x + .1, "y": targetScale.x + .1, "z": targetScale.x + .1})
+          targetEl.setAttribute("scale", {"x": targetScale.x + .05, "y": targetScale.x + .05, "z": targetScale.x + .05})
         } else {
-          targetEl.setAttribute("scale", {"x": targetScale.x - .1, "y": targetScale.x - .1, "z": targetScale.x - .1})
+          if (targetScale.x > .1) {
+            targetEl.setAttribute("scale", {"x": targetScale.x - .05, "y": targetScale.x - .05, "z": targetScale.x - .05})
+          }
         }
       }
     },
