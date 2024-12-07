@@ -116,6 +116,9 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
       if (this.data.tags && this.data.tags.toLowerCase().includes("curve point") || this.data.markerType == "curve point") {
         this.el.classList.add("curvepoint");
       }
+      if (this.data.tags && this.data.tags.length && this.data.tags.toLowerCase().includes("spawnable")) {
+        this.el.classList.add("spawnable");
+      }
       if (this.data.markerType == "audio" ) {
         let primaryAudioEl = document.querySelector('#primaryAudio');
         if (primaryAudioEl != null) {

@@ -95,6 +95,9 @@ AFRAME.registerComponent('mod_model', {
         if ((settings && settings.useArParent) || (this.data.tags && this.data.tags.length && (this.data.tags.toLowerCase().includes("ar child") || this.data.tags.toLowerCase().includes("archild")) || this.data.tags.toLowerCase().includes("ar_child"))) {
           this.el.classList.add("arChild");       
         }
+        if (this.data.tags && this.data.tags.length && this.data.tags.toLowerCase().includes("spawnable")) {
+          this.el.classList.add("spawnable");
+        }
         // if (this.data.description && this.data.description.length > 1) {
         //   // console.log("model eventData " + JSON.stringify(this.data.eventData));
         //   if (this.data.description.includes("~")) {

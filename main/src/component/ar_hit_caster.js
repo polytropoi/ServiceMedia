@@ -95,7 +95,7 @@ AFRAME.registerComponent('ar_hit_caster', {
                
                 self.el.sceneEl.appendChild(spawnedEl); //hrm, not child of ar parent?  worldToLocal?
                 spawnedEl.setAttribute("anchored", {"persistent": true});
-                self.messageEl.textContent = "spawning object at position " + JSON.stringify(position);
+                self.messageEl.textContent = "spawning local marker at position " + JSON.stringify(position);
 
               } else {
                   let cloudMarker = spawnableEl.components.cloud_marker;
@@ -128,7 +128,7 @@ AFRAME.registerComponent('ar_hit_caster', {
 
                       self.el.sceneEl.appendChild(spawnedEl); //hrm, not child of ar parent?  worldToLocal?
                       spawnedEl.setAttribute("anchored", {"persistent": true});
-                      self.messageEl.textContent = "spawning object at position " + JSON.stringify(position);
+                      self.messageEl.textContent = "spawning marker at position " + JSON.stringify(position);
                   } else {
                     let modModel = spawnableEl.components.mod_model;  
                     if (modModel) {
@@ -160,7 +160,7 @@ AFRAME.registerComponent('ar_hit_caster', {
 
                         self.el.sceneEl.appendChild(spawnedEl); //hrm, not child of ar parent?  worldToLocal?
                         spawnedEl.setAttribute("anchored", {"persistent": true});
-                        self.messageEl.textContent = "spawning object at position " + JSON.stringify(position);
+                        self.messageEl.textContent = "spawning model at position " + JSON.stringify(position);
                     } else {
                       let modObject = spawnableEl.components.mod_object;
                       if (modObject) {
