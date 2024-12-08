@@ -5223,9 +5223,11 @@ webxr_router.get('/:_id', function (req, res) {
                         "<script src=\x22../main/js/dialogs.js\x22></script>"+
 
                         "<div id=\x22ar_overlay\x22 style=\x22visibility: hidden\x22><div id=\x22ar_overlay_message\x22></div>" +
-                        "<div><button id=\x22arLockButton\x22 style=\x22float:right; margin: auto\x22 onclick=\x22ToggleLockElementsAR()\x22 type=\x22button\x22 class=\x22btn\x22>toggle lock</button></div><br><br><br>"+
-                        "<div><button id=\x22arScaleDownButton\x22 style=\x22float:right; margin: auto\x22 onclick=\x22ScaleElementsAR('down')\x22 type=\x22button\x22 class=\x22btn\x22>scale -</button></div><br><br><br>"+            
-                        "<div><button id=\x22arScaleUpButton\x22 style=\x22float:right; margin: auto\x22 onclick=\x22ScaleElementsAR('up')\x22 type=\x22button\x22 class=\x22btn\x22>scale +</button></div></div>"+                        
+                        "<div><button id=\x22arLockButton\x22 style=\x22float:right; margin: auto\x22 onclick=\x22ToggleLockTargetElements()\x22 type=\x22button\x22 class=\x22btn\x22>toggle lock</button></div><br><br><br>"+
+                        "<div><button id=\x22arScaleDownButton\x22 style=\x22float:right; margin: auto\x22 onclick=\x22ScaleTargetElements('down')\x22 type=\x22button\x22 class=\x22btn\x22>scale -</button></div><br><br><br>"+            
+                        "<div><button id=\x22arScaleUpButton\x22 style=\x22float:right; margin: auto\x22 onclick=\x22ScaleTargetElements('up')\x22 type=\x22button\x22 class=\x22btn\x22>scale +</button></div><br><br><br>"+  
+                        "<div><button id=\x22arRotRightButton\x22 style=\x22float:right; margin: auto\x22 onclick=\x22RotateTargetElements('right')\x22 type=\x22button\x22 class=\x22btn\x22>rot ></button></div><br><br><br>"+            
+                        "<div><button id=\x22arRotLeftButton\x22 style=\x22float:right; margin: auto\x22 onclick=\x22RotateTargetElements('left')\x22 type=\x22button\x22 class=\x22btn\x22>rot <</button></div></div>"+                        
                         // threeDeeTextComponent +
                         aScene +
                         "<div id=\x22overlay\x22></div>"+

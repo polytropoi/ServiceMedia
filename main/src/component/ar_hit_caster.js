@@ -61,150 +61,151 @@ AFRAME.registerComponent('ar_hit_caster', {
 
             // let spawnedEl = null;
             // let data = {};
-            let timestamp = Date.now();
+
             let spawnableEl = document.querySelector('.spawnable'); //location with "spawnable" tag
             if (spawnableEl) {
-              var sceneEl = document.querySelector('a-scene');
-              let localMarker = spawnableEl.components.local_marker;
-              if (localMarker) {
-                let data = localMarker.data;
-                console.log("spawnable data found " + JSON.stringify(data));
-                let spawnedEl = document.createElement("a-entity");
-                spawnedEl.id = "_" + timestamp;
-                sceneEl.appendChild(spawnedEl); //hrm, not child of ar parent?  worldToLocal?
-                spawnedEl.setAttribute('position', position); //?
-                spawnedEl.setAttribute('scale', {'x': scaleMod * .2, 'y': scaleMod  * .2, 'z': scaleMod * .2}); //because it's not a child of ar_parent
-                spawnedEl.setAttribute("anchored", {"persistent": true});
-                spawnedEl.setAttribute("local_marker", { timestamp: "_" + timestamp,
-                                                        name: data.name, 
-                                                        modelID: data.modelID, 
-                                                        objectID: data.objectID, 
-                                                        mediaID: data.mediaID, 
-                                                        tags: data.tags, 
-                                                        eventData: data.eventData, 
-                                                        markerType: data.markerType,
-                                                        description: data.description,
-                                                        xpos: data.xpos,
-                                                        ypos: data.ypos,
-                                                        zpos: data.zpos,
-                                                        xrot: data.xrot,
-                                                        yrot: data.yrot,
-                                                        zrot: data.zrot,
-                                                        xscale: data.xscale,
-                                                        yscale: data.yscale,
-                                                        zscale: data.zscale,
-                                                        targetElements: data.targetElements
-                                                      });
+              self.spawnElement(position, spawnableEl);
+              // var sceneEl = document.querySelector('a-scene');
+              // let localMarker = spawnableEl.components.local_marker;
+              // if (localMarker) {
+              //   let data = localMarker.data;
+              //   console.log("spawnable data found " + JSON.stringify(data));
+              //   let spawnedEl = document.createElement("a-entity");
+              //   spawnedEl.id = "_" + timestamp;
+              //   sceneEl.appendChild(spawnedEl); //hrm, not child of ar parent?  worldToLocal?
+              //   spawnedEl.setAttribute('position', position); //?
+              //   spawnedEl.setAttribute('scale', {'x': scaleMod * .2, 'y': scaleMod  * .2, 'z': scaleMod * .2}); //because it's not a child of ar_parent
+              //   spawnedEl.setAttribute("anchored", {"persistent": true});
+              //   spawnedEl.setAttribute("local_marker", { timestamp: "_" + timestamp,
+              //                                           name: data.name, 
+              //                                           modelID: data.modelID, 
+              //                                           objectID: data.objectID, 
+              //                                           mediaID: data.mediaID, 
+              //                                           tags: data.tags, 
+              //                                           eventData: data.eventData, 
+              //                                           markerType: data.markerType,
+              //                                           description: data.description,
+              //                                           xpos: data.xpos,
+              //                                           ypos: data.ypos,
+              //                                           zpos: data.zpos,
+              //                                           xrot: data.xrot,
+              //                                           yrot: data.yrot,
+              //                                           zrot: data.zrot,
+              //                                           xscale: data.xscale,
+              //                                           yscale: data.yscale,
+              //                                           zscale: data.zscale,
+              //                                           targetElements: data.targetElements
+              //                                         });
 
-                self.messageEl.textContent = "spawning local marker at position " + JSON.stringify(position);
+              //   self.messageEl.textContent = "spawning local marker at position " + JSON.stringify(position);
 
-              } else {
+              // } else {
                 
-                  let cloudMarker = spawnableEl.components.cloud_marker;
-                  if (cloudMarker) {
-                    let data = cloudMarker.data;
-                    console.log("spawnable data found " + JSON.stringify(data));
-                    let spawnedEl = document.createElement("a-entity");
-                    spawnedEl.id = "_" + timestamp;
+              //     let cloudMarker = spawnableEl.components.cloud_marker;
+              //     if (cloudMarker) {
+              //       let data = cloudMarker.data;
+              //       console.log("spawnable data found " + JSON.stringify(data));
+              //       let spawnedEl = document.createElement("a-entity");
+              //       spawnedEl.id = "_" + timestamp;
 
-                    sceneEl.appendChild(spawnedEl); //hrm, not child of ar parent?  worldToLocal?
-                    spawnedEl.setAttribute('position', position); 
-                    spawnedEl.setAttribute('scale', {'x': scaleMod * .2, 'y': scaleMod  * .2, 'z': scaleMod * .2});
-                    spawnedEl.setAttribute("cloud_marker", { timestamp: "_" + timestamp,
-                                                            name: data.name, 
-                                                            modelID: data.modelID, 
-                                                            objectID: data.objectID, 
-                                                            mediaID: data.mediaID, 
-                                                            tags: data.tags, 
-                                                            eventData: data.eventData, 
-                                                            markerType: data.markerType,
-                                                            description: data.description,
-                                                            xpos: data.xpos,
-                                                            ypos: data.ypos,
-                                                            zpos: data.zpos,
-                                                            xrot: data.xrot,
-                                                            yrot: data.yrot,
-                                                            zrot: data.zrot,
-                                                            xscale: data.xscale,
-                                                            yscale: data.yscale,
-                                                            zscale: data.zscale,
-                                                            targetElements: data.targetElements
-                                                          });
+              //       sceneEl.appendChild(spawnedEl); //hrm, not child of ar parent?  worldToLocal?
+              //       spawnedEl.setAttribute('position', position); 
+              //       spawnedEl.setAttribute('scale', {'x': scaleMod * .2, 'y': scaleMod  * .2, 'z': scaleMod * .2});
+              //       spawnedEl.setAttribute("cloud_marker", { timestamp: "_" + timestamp,
+              //                                               name: data.name, 
+              //                                               modelID: data.modelID, 
+              //                                               objectID: data.objectID, 
+              //                                               mediaID: data.mediaID, 
+              //                                               tags: data.tags, 
+              //                                               eventData: data.eventData, 
+              //                                               markerType: data.markerType,
+              //                                               description: data.description,
+              //                                               xpos: data.xpos,
+              //                                               ypos: data.ypos,
+              //                                               zpos: data.zpos,
+              //                                               xrot: data.xrot,
+              //                                               yrot: data.yrot,
+              //                                               zrot: data.zrot,
+              //                                               xscale: data.xscale,
+              //                                               yscale: data.yscale,
+              //                                               zscale: data.zscale,
+              //                                               targetElements: data.targetElements
+              //                                             });
 
-                      spawnedEl.setAttribute("anchored", {"persistent": true});
-                      self.messageEl.textContent = "spawning marker at position " + JSON.stringify(position);
-                  } else {
-                    let modModel = spawnableEl.components.mod_model;  
-                    if (modModel) {
-                      let data = modModel.data;
-                      console.log("spawnable data found " + JSON.stringify(data));
-                      let spawnedEl = document.createElement("a-entity");
-                      spawnedEl.id = "_" + timestamp;
+              //         spawnedEl.setAttribute("anchored", {"persistent": true});
+              //         self.messageEl.textContent = "spawning marker at position " + JSON.stringify(position);
+              //     } else {
+              //       let modModel = spawnableEl.components.mod_model;  
+              //       if (modModel) {
+              //         let data = modModel.data;
+              //         console.log("spawnable data found " + JSON.stringify(data));
+              //         let spawnedEl = document.createElement("a-entity");
+              //         spawnedEl.id = "_" + timestamp;
                      
-                      sceneEl.appendChild(spawnedEl); 
-                      spawnedEl.setAttribute('position', position); 
-                      spawnedEl.setAttribute('scale', {'x': scaleMod * .2, 'y': scaleMod  * .2, 'z': scaleMod * .2});
-                      spawnedEl.setAttribute("anchored", {"persistent": true});
-                      spawnedEl.setAttribute("mod_model", { timestamp: "_" + timestamp,
-                                                            name: data.name, 
-                                                            modelID: data.modelID, 
-                                                            objectID: data.objectID, 
-                                                            mediaID: data.mediaID, 
-                                                            tags: data.tags, 
-                                                            eventData: data.eventData, 
-                                                            markerType: data.markerType,
-                                                            description: data.description,
-                                                            xpos: data.xpos,
-                                                            ypos: data.ypos,
-                                                            zpos: data.zpos,
-                                                            xrot: data.xrot,
-                                                            yrot: data.yrot,
-                                                            zrot: data.zrot,
-                                                            xscale: data.xscale,
-                                                            yscale: data.yscale,
-                                                            zscale: data.zscale,
-                                                            targetElements: data.targetElements
-                                                          });
+              //         sceneEl.appendChild(spawnedEl); 
+              //         spawnedEl.setAttribute('position', position); 
+              //         spawnedEl.setAttribute('scale', {'x': scaleMod * .2, 'y': scaleMod  * .2, 'z': scaleMod * .2});
+              //         spawnedEl.setAttribute("anchored", {"persistent": true});
+              //         spawnedEl.setAttribute("mod_model", { timestamp: "_" + timestamp,
+              //                                               name: data.name, 
+              //                                               modelID: data.modelID, 
+              //                                               objectID: data.objectID, 
+              //                                               mediaID: data.mediaID, 
+              //                                               tags: data.tags, 
+              //                                               eventData: data.eventData, 
+              //                                               markerType: data.markerType,
+              //                                               description: data.description,
+              //                                               xpos: data.xpos,
+              //                                               ypos: data.ypos,
+              //                                               zpos: data.zpos,
+              //                                               xrot: data.xrot,
+              //                                               yrot: data.yrot,
+              //                                               zrot: data.zrot,
+              //                                               xscale: data.xscale,
+              //                                               yscale: data.yscale,
+              //                                               zscale: data.zscale,
+              //                                               targetElements: data.targetElements
+              //                                             });
 
-                        self.messageEl.textContent = "spawning model at position " + JSON.stringify(position);
-                    } else {
-                      let modObject = spawnableEl.components.mod_object;
-                      if (modObject) {
-                        console.log("spawnable data found " + JSON.stringify(data));
-                        let data = modObject.data;
-                        let spawnedEl = document.createElement("a-entity");
-                        spawnedEl.id = "_" + timestamp;
+              //           self.messageEl.textContent = "spawning model at position " + JSON.stringify(position);
+              //       } else {
+              //         let modObject = spawnableEl.components.mod_object;
+              //         if (modObject) {
+              //           console.log("spawnable data found " + JSON.stringify(data));
+              //           let data = modObject.data;
+              //           let spawnedEl = document.createElement("a-entity");
+              //           spawnedEl.id = "_" + timestamp;
 
-                        sceneEl.appendChild(spawnedEl); 
-                        spawnedEl.setAttribute('position', position); 
-                        spawnedEl.setAttribute('scale', {'x': scaleMod * .2, 'y': scaleMod  * .2, 'z': scaleMod * .2});
-                        spawnedEl.setAttribute("anchored", {"persistent": true});
-                        spawnedEl.setAttribute("mod_object", { timestamp: "_" + timestamp,
-                                                              name: data.name, 
-                                                              modelID: data.modelID, 
-                                                              objectID: data.objectID, 
-                                                              mediaID: data.mediaID, 
-                                                              tags: data.tags, 
-                                                              eventData: data.eventData, 
-                                                              markerType: data.markerType,
-                                                              description: data.description,
-                                                              xpos: data.xpos,
-                                                              ypos: data.ypos,
-                                                              zpos: data.zpos,
-                                                              xrot: data.xrot,
-                                                              yrot: data.yrot,
-                                                              zrot: data.zrot,
-                                                              xscale: data.xscale,
-                                                              yscale: data.yscale,
-                                                              zscale: data.zscale,
-                                                              targetElements: data.targetElements
-                                                            });
+              //           sceneEl.appendChild(spawnedEl); 
+              //           spawnedEl.setAttribute('position', position); 
+              //           spawnedEl.setAttribute('scale', {'x': scaleMod * .2, 'y': scaleMod  * .2, 'z': scaleMod * .2});
+              //           spawnedEl.setAttribute("anchored", {"persistent": true});
+              //           spawnedEl.setAttribute("mod_object", { timestamp: "_" + timestamp,
+              //                                                 name: data.name, 
+              //                                                 modelID: data.modelID, 
+              //                                                 objectID: data.objectID, 
+              //                                                 mediaID: data.mediaID, 
+              //                                                 tags: data.tags, 
+              //                                                 eventData: data.eventData, 
+              //                                                 markerType: data.markerType,
+              //                                                 description: data.description,
+              //                                                 xpos: data.xpos,
+              //                                                 ypos: data.ypos,
+              //                                                 zpos: data.zpos,
+              //                                                 xrot: data.xrot,
+              //                                                 yrot: data.yrot,
+              //                                                 zrot: data.zrot,
+              //                                                 xscale: data.xscale,
+              //                                                 yscale: data.yscale,
+              //                                                 zscale: data.zscale,
+              //                                                 targetElements: data.targetElements
+              //                                               });
 
-                          self.messageEl.textContent = "spawning object at position " + JSON.stringify(position);
-                      }
-                    }
-                  }
-                } 
+              //             self.messageEl.textContent = "spawning object at position " + JSON.stringify(position);
+              //         }
+              //       }
+              //     }
+              //   } 
               }
           } else {
             if (self.el.components.raycaster) {
@@ -261,7 +262,152 @@ AFRAME.registerComponent('ar_hit_caster', {
         self.el.object3D.visible = false;
       });
     },
-    scaleElements: function (dir) {
+    spawnElement: function (position, spawnableEl) {
+      let timestamp = Date.now();
+      var sceneEl = document.querySelector('a-scene');
+      //check for component types...
+      let localMarker = spawnableEl.components.local_marker;
+      if (localMarker) {
+        let data = localMarker.data;
+        console.log("spawnable data found " + JSON.stringify(data));
+        let spawnedEl = document.createElement("a-entity");
+        spawnedEl.id = "_" + timestamp;
+        sceneEl.appendChild(spawnedEl); //hrm, not child of ar parent?  worldToLocal?
+        spawnedEl.setAttribute('position', position); //?
+        spawnedEl.setAttribute('scale', {'x': scaleMod * .2, 'y': scaleMod  * .2, 'z': scaleMod * .2}); //because it's not a child of ar_parent
+        spawnedEl.setAttribute("anchored", {"persistent": true});
+        spawnedEl.setAttribute("local_marker", { timestamp: "_" + timestamp,
+                                                name: data.name, 
+                                                modelID: data.modelID, 
+                                                objectID: data.objectID, 
+                                                mediaID: data.mediaID, 
+                                                tags: data.tags, 
+                                                eventData: data.eventData, 
+                                                markerType: data.markerType,
+                                                description: data.description,
+                                                xpos: data.xpos,
+                                                ypos: data.ypos,
+                                                zpos: data.zpos,
+                                                xrot: data.xrot,
+                                                yrot: data.yrot,
+                                                zrot: data.zrot,
+                                                xscale: data.xscale,
+                                                yscale: data.yscale,
+                                                zscale: data.zscale,
+                                                targetElements: data.targetElements
+                                              });
+
+        this.messageEl.textContent = "spawning local marker at position " + JSON.stringify(position);
+
+      } else {
+        
+          let cloudMarker = spawnableEl.components.cloud_marker;
+          if (cloudMarker) {
+            let data = cloudMarker.data;
+            console.log("spawnable data found " + JSON.stringify(data));
+            let spawnedEl = document.createElement("a-entity");
+            spawnedEl.id = "_" + timestamp;
+
+            sceneEl.appendChild(spawnedEl); 
+            spawnedEl.setAttribute('position', position); 
+            spawnedEl.setAttribute('scale', {'x': scaleMod * .2, 'y': scaleMod  * .2, 'z': scaleMod * .2});
+            spawnedEl.setAttribute("cloud_marker", { timestamp: "_" + timestamp,
+                                                    name: data.name, 
+                                                    modelID: data.modelID, 
+                                                    objectID: data.objectID, 
+                                                    mediaID: data.mediaID, 
+                                                    tags: data.tags, 
+                                                    eventData: data.eventData, 
+                                                    markerType: data.markerType,
+                                                    description: data.description,
+                                                    xpos: data.xpos,
+                                                    ypos: data.ypos,
+                                                    zpos: data.zpos,
+                                                    xrot: data.xrot,
+                                                    yrot: data.yrot,
+                                                    zrot: data.zrot,
+                                                    xscale: data.xscale,
+                                                    yscale: data.yscale,
+                                                    zscale: data.zscale,
+                                                    targetElements: data.targetElements
+                                                  });
+
+              spawnedEl.setAttribute("anchored", {"persistent": true});
+              this.messageEl.textContent = "spawning marker at position " + JSON.stringify(position);
+          } else {
+            let modModel = spawnableEl.components.mod_model;  
+            if (modModel) {
+              let data = modModel.data;
+              console.log("spawnable data found " + JSON.stringify(data));
+              let spawnedEl = document.createElement("a-entity");
+              spawnedEl.id = "_" + timestamp;
+             
+              sceneEl.appendChild(spawnedEl); 
+              spawnedEl.setAttribute('position', position); 
+              spawnedEl.setAttribute('scale', {'x': scaleMod * .2, 'y': scaleMod  * .2, 'z': scaleMod * .2});
+              spawnedEl.setAttribute("anchored", {"persistent": true});
+              spawnedEl.setAttribute("mod_model", { timestamp: "_" + timestamp,
+                                                    name: data.name, 
+                                                    modelID: data.modelID, 
+                                                    objectID: data.objectID, 
+                                                    mediaID: data.mediaID, 
+                                                    tags: data.tags, 
+                                                    eventData: data.eventData, 
+                                                    markerType: data.markerType,
+                                                    description: data.description,
+                                                    xpos: data.xpos,
+                                                    ypos: data.ypos,
+                                                    zpos: data.zpos,
+                                                    xrot: data.xrot,
+                                                    yrot: data.yrot,
+                                                    zrot: data.zrot,
+                                                    xscale: data.xscale,
+                                                    yscale: data.yscale,
+                                                    zscale: data.zscale,
+                                                    targetElements: data.targetElements
+                                                  });
+
+                this.messageEl.textContent = "spawning model at position " + JSON.stringify(position);
+            } else {
+              let modObject = spawnableEl.components.mod_object;
+              if (modObject) {
+                console.log("spawnable data found " + JSON.stringify(data));
+                let data = modObject.data;
+                let spawnedEl = document.createElement("a-entity");
+                spawnedEl.id = "_" + timestamp;
+
+                sceneEl.appendChild(spawnedEl); 
+                spawnedEl.setAttribute('position', position); 
+                spawnedEl.setAttribute('scale', {'x': scaleMod * .2, 'y': scaleMod  * .2, 'z': scaleMod * .2});
+                spawnedEl.setAttribute("anchored", {"persistent": true});
+                spawnedEl.setAttribute("mod_object", { timestamp: "_" + timestamp,
+                                                      name: data.name, 
+                                                      modelID: data.modelID, 
+                                                      objectID: data.objectID, 
+                                                      mediaID: data.mediaID, 
+                                                      tags: data.tags, 
+                                                      eventData: data.eventData, 
+                                                      markerType: data.markerType,
+                                                      description: data.description,
+                                                      xpos: data.xpos,
+                                                      ypos: data.ypos,
+                                                      zpos: data.zpos,
+                                                      xrot: data.xrot,
+                                                      yrot: data.yrot,
+                                                      zrot: data.zrot,
+                                                      xscale: data.xscale,
+                                                      yscale: data.yscale,
+                                                      zscale: data.zscale,
+                                                      targetElements: data.targetElements
+                                                    });
+
+                  this.messageEl.textContent = "spawning object at position " + JSON.stringify(position);
+              }
+            }
+          }
+        } 
+    },
+    scaleTargetElements: function (dir) {
       var targetEl = this.data.targetEl;
       if (targetEl) {
         let targetScale = targetEl.getAttribute("scale");
@@ -272,6 +418,20 @@ AFRAME.registerComponent('ar_hit_caster', {
           if (targetScale.x > .1) {
             targetEl.setAttribute("scale", {"x": targetScale.x - .05, "y": targetScale.x - .05, "z": targetScale.x - .05})
           }
+        }
+      }
+    },
+    rotateTargetElements: function (dir) {
+      var targetEl = this.data.targetEl;
+      if (targetEl) {
+        let targetRot = targetEl.getAttribute("rotation");
+        console.log("targetEl rot is " + JSON.stringify(targetRot));
+        if (dir == "right") {
+          targetEl.setAttribute("rotation", {"x": targetRot.x + 1, "y": targetRot.x + 1, "z": targetRot.x + 1})
+        } else {
+          // if (targetScale.x > .1) {
+            targetEl.setAttribute("rotation", {"x": targetRot.x - 1, "y": targetRot.x - 1, "z": targetRot.x - 1})
+          // }
         }
       }
     },
@@ -386,7 +546,7 @@ AFRAME.registerComponent('ar_hit_caster', {
   });
 
 
-function ToggleLockElementsAR () {
+function ToggleLockTargetElements () {
   let arHitCasterEl = document.getElementById("hitCaster");
   if (arHitCasterEl) {
     let hitCasterComponent = arHitCasterEl.components.ar_hit_caster;
@@ -396,10 +556,18 @@ function ToggleLockElementsAR () {
   }
 }
 
-function ScaleElementsAR (dir) {
+function ScaleTargetElements (dir) {
   let arHitCasterEl = document.getElementById("hitCaster");
   let hitCasterComponent = arHitCasterEl.components.ar_hit_caster;
   if (hitCasterComponent) {
-      hitCasterComponent.scaleElements(dir)
+      hitCasterComponent.scaleTargetElements(dir)
+  }
+}
+
+function RotateTargetElements (dir) {
+  let arHitCasterEl = document.getElementById("hitCaster");
+  let hitCasterComponent = arHitCasterEl.components.ar_hit_caster;
+  if (hitCasterComponent) {
+      hitCasterComponent.rotateTargetElements(dir)
   }
 }
