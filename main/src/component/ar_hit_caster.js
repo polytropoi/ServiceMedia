@@ -320,7 +320,7 @@ AFRAME.registerComponent('ar_hit_caster', {
             let spawnedEl = document.createElement("a-entity");
             spawnedEl.id = "_" + timestamp;
             
-            const index = getRandomInt(targets.length);
+            // const index = getRandomInt(targets.length);
             console.log("tryna clone a target with index " + index);
             var obj = spawnableEl.getObject3D('mesh');
 
