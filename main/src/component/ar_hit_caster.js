@@ -319,30 +319,44 @@ AFRAME.registerComponent('ar_hit_caster', {
             console.log("scalemod is " + scaleMod + " spawnable data found " + JSON.stringify(data));
             let spawnedEl = document.createElement("a-entity");
             spawnedEl.id = "_" + timestamp;
+            
+            const index = getRandomInt(targets.length);
+            console.log("tryna clone a target with index " + index);
+            var obj = spawnableEl.getObject3D('mesh');
 
-            targetEl.appendChild(spawnedEl); 
+            // var clone = targets[index].cloneNode(true);
+            // let clone = document.createElement('a-entity');
+            // let scaleFactor = Math.random();
+            spawnedEl.setObject3D('mesh', obj.clone()); 
+            spawnedEl.setAttribute('position', position);
+            spawnedEl.setAttribute('scale', {scaleFactor, scaleFactor, scaleFactor});
+            spawnedEl.classList.add("activeObjexRay");
+
+            sceneEl.appendChild(spawnedEl);
+
+            // targetEl.appendChild(spawnedEl); 
             spawnedEl.setAttribute('position', position); 
             spawnedEl.setAttribute('scale', {'x': scaleMod, 'y': scaleMod, 'z': scaleMod});
-            spawnedEl.setAttribute("cloud_marker", { 'timestamp': "_" + timestamp,
-                                                    'name': data.name, 
-                                                    'modelID': data.modelID, 
-                                                    'objectID': data.objectID, 
-                                                    'mediaID': data.mediaID, 
-                                                    'tags': data.tags, 
-                                                    'eventData': data.eventData, 
-                                                    'markerType': data.markerType,
-                                                    'description': data.description,
-                                                    'xpos': data.xpos,
-                                                    'ypos': data.ypos,
-                                                    'zpos': data.zpos,
-                                                    'xrot': data.xrot,
-                                                    'yrot': data.yrot,
-                                                    'zrot': data.zrot,
-                                                    'xscale': data.xscale,
-                                                    'yscale': data.yscale,
-                                                    'zscale': data.zscale,
-                                                    'targetElements': data.targetElements
-                                                  });
+            // spawnedEl.setAttribute("cloud_marker", { 'timestamp': "_" + timestamp,
+            //                                         'name': data.name, 
+            //                                         'modelID': data.modelID, 
+            //                                         'objectID': data.objectID, 
+            //                                         'mediaID': data.mediaID, 
+            //                                         'tags': data.tags, 
+            //                                         'eventData': data.eventData, 
+            //                                         'markerType': data.markerType,
+            //                                         'description': data.description,
+            //                                         'xpos': data.xpos,
+            //                                         'ypos': data.ypos,
+            //                                         'zpos': data.zpos,
+            //                                         'xrot': data.xrot,
+            //                                         'yrot': data.yrot,
+            //                                         'zrot': data.zrot,
+            //                                         'xscale': data.xscale,
+            //                                         'yscale': data.yscale,
+            //                                         'zscale': data.zscale,
+            //                                         'targetElements': data.targetElements
+            //                                       });
 
               spawnedEl.setAttribute("anchored", {"persistent": true});
               spawnedEl.setAttribute("visible", true);
