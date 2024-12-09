@@ -4410,6 +4410,17 @@ webxr_router.get('/:_id', function (req, res) {
                     settings.useArParent = useArParent;
                 
                     // settings.debug = settings.debugMode.length > 0;
+                    if (sceneResponse.sceneTags && sceneResponse.sceneTags.includes("xr room physics")) {
+                        settings.useXrRoomPhysics = true;
+                    } else {
+                        settings.useXrRoomPhysics = false;
+                    }
+                    if (sceneResponse.sceneTags && sceneResponse.sceneTags.includes("real world meshing")) {
+                        settings.useRealWorldMeshing = true;
+                    } else {
+                        settings.useRealWorldMeshing = false;
+                    } 
+
                     if (sceneResponse.sceneTags != null && sceneResponse.sceneTags.includes("no mods")) {
                         settings.allowMods = false;
                     }
@@ -4496,7 +4507,7 @@ webxr_router.get('/:_id', function (req, res) {
                         let xrExtras = "";
                         if (sceneResponse.sceneTags && sceneResponse.sceneTags.includes("xr room physics")) {
                             meshUtilsScript = meshUtilsScript + "<script type=\x22module\x22 src=\x22../main/js/xr-room-physics.min.js\x22></script>";
-                            xrExtras = "xr-room-physics";
+                            // xrExtras = "xr-room-physics";
                         }
                         if (sceneResponse.sceneTags && sceneResponse.sceneTags.includes("real world meshing")) {
                             xrExtras = "real-world-meshing";

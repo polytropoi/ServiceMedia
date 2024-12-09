@@ -33,6 +33,14 @@ AFRAME.registerComponent('ar_hit_caster', {
         console.log("enter-vr");
         // messageEl.textContent = "entered immersive mode";
         if (!self.el.sceneEl.is('ar-mode')) { return; }
+        if (AFRAME.utils.device.checkHeadsetConnected()) {
+          if (settings && settings.useXrRoomPhysics) {
+            sceneEl.setAttribute("xr-room-physics");
+          }
+          if (settings && settings.useRealWorldMeshing) {
+            sceneEl.setAttribute("xr-room-physics");
+          } 
+        }
         session = self.el.sceneEl.renderer.xr.getSession();
         self.messageEl.textContent = "entered AR mode";
         console.log("ar-mode");
