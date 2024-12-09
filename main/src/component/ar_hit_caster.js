@@ -61,7 +61,7 @@ AFRAME.registerComponent('ar_hit_caster', {
           const zeroPos = new THREE.Vector3(0, 0, 0); //hrm, use camera or player? viewportHolder?
           var distance = position.distanceTo(zeroPos);
 
-          var scaleMod = .1 + (distance * 0.2);
+          var scaleMod = .01 + (distance * 0.2);
           
           if (!self.lockTargets) {
             console.log("tryna set position " + JSON.stringify(position) + " distance " + JSON.stringify(distance));
@@ -72,9 +72,11 @@ AFRAME.registerComponent('ar_hit_caster', {
             // let spawnedEl = null;
             // let data = {};
 
-            let spawnableEl = document.querySelector('.spawnable'); //location with "spawnable" tag
-            if (spawnableEl) {
-              self.spawnElement(position, scaleMod, spawnableEl);
+            let spawnableEls = document.querySelector('.spawnable'); //location with "spawnable" tag
+            if (spawnableEls) {
+              const index = getRandomInt(spawnableEls.length);
+              const spawnableEl = spawnableEls[index];
+              self.spawnElement(position, scaleMod * .2, spawnableEl);
               // var sceneEl = document.querySelector('a-scene');
               // let localMarker = spawnableEl.components.local_marker;
               // if (localMarker) {
@@ -283,9 +285,14 @@ AFRAME.registerComponent('ar_hit_caster', {
         console.log("spawnable data found " + JSON.stringify(data));
         let spawnedEl = document.createElement("a-entity");
         spawnedEl.id = "_" + timestamp;
-        targetEl.appendChild(spawnedEl); //hrm, not child of ar parent?  worldToLocal?
+            
+        var obj = spawnableEl.getObject3D('mesh');
+        spawnedEl.setObject3D('mesh', obj.clone()); 
+        spawnedEl.object3D.scale.set(scaleMod,scaleMod,scaleMod);
+        spawnedEl.classList.add("activeObjexRay");
+        sceneEl.appendChild(spawnedEl);
         spawnedEl.setAttribute('position', position); //?
-        spawnedEl.setAttribute('scale', {'x': scaleMod, 'y': scaleMod, 'z': scaleMod}); //because it's not a child of ar_parent
+        // spawnedEl.setAttribute('scale', {'x': scaleMod, 'y': scaleMod, 'z': scaleMod}); //because it's not a child of ar_parent
         spawnedEl.setAttribute("anchored", {"persistent": true});
         spawnedEl.setAttribute("local_marker", { 'timestamp': "_" + timestamp,
                                                 'name': data.name, 
@@ -320,44 +327,35 @@ AFRAME.registerComponent('ar_hit_caster', {
             let spawnedEl = document.createElement("a-entity");
             spawnedEl.id = "_" + timestamp;
             
-            // const index = getRandomInt(targets.length);
-            // console.log("tryna clone a target with index " + index);
             var obj = spawnableEl.getObject3D('mesh');
-
-            // var clone = targets[index].cloneNode(true);
-            // let clone = document.createElement('a-entity');
-            // let scaleFactor = Math.random();
             spawnedEl.setObject3D('mesh', obj.clone()); 
             spawnedEl.object3D.scale.set(scaleMod,scaleMod,scaleMod);
-            spawnedEl.setAttribute('position', position);
-            // spawnedEl.setAttribute('scale', {'x': scaleMod, 'y': scaleMod, 'z': scaleMod});
             spawnedEl.classList.add("activeObjexRay");
-
             sceneEl.appendChild(spawnedEl);
+            spawnedEl.setAttribute('position', position); //?
 
-            // targetEl.appendChild(spawnedEl); 
             // spawnedEl.setAttribute('position', position); 
             // spawnedEl.setAttribute('scale', {'x': scaleMod, 'y': scaleMod, 'z': scaleMod});
-            // spawnedEl.setAttribute("cloud_marker", { 'timestamp': "_" + timestamp,
-            //                                         'name': data.name, 
-            //                                         'modelID': data.modelID, 
-            //                                         'objectID': data.objectID, 
-            //                                         'mediaID': data.mediaID, 
-            //                                         'tags': data.tags, 
-            //                                         'eventData': data.eventData, 
-            //                                         'markerType': data.markerType,
-            //                                         'description': data.description,
-            //                                         'xpos': data.xpos,
-            //                                         'ypos': data.ypos,
-            //                                         'zpos': data.zpos,
-            //                                         'xrot': data.xrot,
-            //                                         'yrot': data.yrot,
-            //                                         'zrot': data.zrot,
-            //                                         'xscale': data.xscale,
-            //                                         'yscale': data.yscale,
-            //                                         'zscale': data.zscale,
-            //                                         'targetElements': data.targetElements
-            //                                       });
+            spawnedEl.setAttribute("cloud_marker", { 'timestamp': "_" + timestamp,
+                                                    'name': data.name, 
+                                                    'modelID': data.modelID, 
+                                                    'objectID': data.objectID, 
+                                                    'mediaID': data.mediaID, 
+                                                    'tags': data.tags, 
+                                                    'eventData': data.eventData, 
+                                                    'markerType': data.markerType,
+                                                    'description': data.description,
+                                                    'xpos': data.xpos,
+                                                    'ypos': data.ypos,
+                                                    'zpos': data.zpos,
+                                                    'xrot': data.xrot,
+                                                    'yrot': data.yrot,
+                                                    'zrot': data.zrot,
+                                                    'xscale': data.xscale,
+                                                    'yscale': data.yscale,
+                                                    'zscale': data.zscale,
+                                                    'targetElements': data.targetElements
+                                                  });
 
               spawnedEl.setAttribute("anchored", {"persistent": true});
               spawnedEl.setAttribute("visible", true);
@@ -371,9 +369,13 @@ AFRAME.registerComponent('ar_hit_caster', {
               let spawnedEl = document.createElement("a-entity");
               spawnedEl.id = "_" + timestamp;
              
-              targetEl.appendChild(spawnedEl); 
-              spawnedEl.setAttribute('position', position); 
-              spawnedEl.setAttribute('scale', {'x': scaleMod, 'y': scaleMod, 'z': scaleMod});
+              var obj = spawnableEl.getObject3D('mesh');
+              spawnedEl.setObject3D('mesh', obj.clone()); 
+              spawnedEl.object3D.scale.set(scaleMod,scaleMod,scaleMod);
+              spawnedEl.classList.add("activeObjexRay");
+              sceneEl.appendChild(spawnedEl);
+              spawnedEl.setAttribute('position', position); //?
+
               spawnedEl.setAttribute("anchored", {"persistent": true});
               spawnedEl.setAttribute("mod_model", { 'timestamp': "_" + timestamp,
                                                     'name': data.name, 
@@ -405,10 +407,12 @@ AFRAME.registerComponent('ar_hit_caster', {
                 let data = modObject.data;
                 let spawnedEl = document.createElement("a-entity");
                 spawnedEl.id = "_" + timestamp;
-
-                targetEl.appendChild(spawnedEl); 
-                spawnedEl.setAttribute('position', position); 
-                spawnedEl.setAttribute('scale', {'x': scaleMod, 'y': scaleMod, 'z': scaleMod});
+                var obj = spawnableEl.getObject3D('mesh');
+                spawnedEl.setObject3D('mesh', obj.clone()); 
+                spawnedEl.object3D.scale.set(scaleMod,scaleMod,scaleMod);
+                spawnedEl.classList.add("activeObjexRay");
+                sceneEl.appendChild(spawnedEl);
+                spawnedEl.setAttribute('position', position); //?od, 'z': scaleMod});
                 spawnedEl.setAttribute("anchored", {"persistent": true});
                 spawnedEl.setAttribute("mod_object", { 'timestamp': "_" + timestamp,
                                                       'name': data.name, 
@@ -576,7 +580,9 @@ AFRAME.registerComponent('ar_hit_caster', {
     }
   });
 
-
+function getRandomInt(max) {
+  return Math.floor(Math.random() * max);
+}
 function ToggleLockTargetElements () {
   let arHitCasterEl = document.getElementById("hitCaster");
   if (arHitCasterEl) {
