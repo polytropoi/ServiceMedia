@@ -72,7 +72,7 @@ AFRAME.registerComponent('ar_hit_caster', {
 
             let spawnableEl = document.querySelector('.spawnable'); //location with "spawnable" tag
             if (spawnableEl) {
-              self.spawnElement(position, spawnableEl);
+              self.spawnElement(position, scaleMod, spawnableEl);
               // var sceneEl = document.querySelector('a-scene');
               // let localMarker = spawnableEl.components.local_marker;
               // if (localMarker) {
@@ -270,7 +270,7 @@ AFRAME.registerComponent('ar_hit_caster', {
         self.el.object3D.visible = false;
       });
     },
-    spawnElement: function (position, spawnableEl) {
+    spawnElement: function (position, scaleMod, spawnableEl) {
       let timestamp = Date.now();
       var sceneEl = document.querySelector('a-scene');
       //check for component types...
@@ -282,7 +282,7 @@ AFRAME.registerComponent('ar_hit_caster', {
         spawnedEl.id = "_" + timestamp;
         sceneEl.appendChild(spawnedEl); //hrm, not child of ar parent?  worldToLocal?
         spawnedEl.setAttribute('position', position); //?
-        spawnedEl.setAttribute('scale', {'x': scaleMod * .2, 'y': scaleMod  * .2, 'z': scaleMod * .2}); //because it's not a child of ar_parent
+        spawnedEl.setAttribute('scale', {'x': scaleMod, 'y': scaleMod, 'z': scaleMod}); //because it's not a child of ar_parent
         spawnedEl.setAttribute("anchored", {"persistent": true});
         spawnedEl.setAttribute("local_marker", { timestamp: "_" + timestamp,
                                                 name: data.name, 
@@ -318,7 +318,7 @@ AFRAME.registerComponent('ar_hit_caster', {
 
             sceneEl.appendChild(spawnedEl); 
             spawnedEl.setAttribute('position', position); 
-            spawnedEl.setAttribute('scale', {'x': scaleMod * .2, 'y': scaleMod  * .2, 'z': scaleMod * .2});
+            spawnedEl.setAttribute('scale', {'x': scaleMod, 'y': scaleMod, 'z': scaleMod});
             spawnedEl.setAttribute("cloud_marker", { timestamp: "_" + timestamp,
                                                     name: data.name, 
                                                     modelID: data.modelID, 
@@ -352,7 +352,7 @@ AFRAME.registerComponent('ar_hit_caster', {
              
               sceneEl.appendChild(spawnedEl); 
               spawnedEl.setAttribute('position', position); 
-              spawnedEl.setAttribute('scale', {'x': scaleMod * .2, 'y': scaleMod  * .2, 'z': scaleMod * .2});
+              spawnedEl.setAttribute('scale', {'x': scaleMod, 'y': scaleMod, 'z': scaleMod});
               spawnedEl.setAttribute("anchored", {"persistent": true});
               spawnedEl.setAttribute("mod_model", { timestamp: "_" + timestamp,
                                                     name: data.name, 
@@ -386,7 +386,7 @@ AFRAME.registerComponent('ar_hit_caster', {
 
                 sceneEl.appendChild(spawnedEl); 
                 spawnedEl.setAttribute('position', position); 
-                spawnedEl.setAttribute('scale', {'x': scaleMod * .2, 'y': scaleMod  * .2, 'z': scaleMod * .2});
+                spawnedEl.setAttribute('scale', {'x': scaleMod, 'y': scaleMod, 'z': scaleMod});
                 spawnedEl.setAttribute("anchored", {"persistent": true});
                 spawnedEl.setAttribute("mod_object", { timestamp: "_" + timestamp,
                                                       name: data.name, 
