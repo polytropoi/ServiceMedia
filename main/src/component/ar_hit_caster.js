@@ -328,15 +328,16 @@ AFRAME.registerComponent('ar_hit_caster', {
             // let clone = document.createElement('a-entity');
             // let scaleFactor = Math.random();
             spawnedEl.setObject3D('mesh', obj.clone()); 
+            spawnedEl.object3D.scale.set(scaleMod,scaleMod,scaleMod);
             spawnedEl.setAttribute('position', position);
-            spawnedEl.setAttribute('scale', {scaleMod, scaleMod, scaleMod});
+            // spawnedEl.setAttribute('scale', {'x': scaleMod, 'y': scaleMod, 'z': scaleMod});
             spawnedEl.classList.add("activeObjexRay");
 
             sceneEl.appendChild(spawnedEl);
 
             // targetEl.appendChild(spawnedEl); 
-            spawnedEl.setAttribute('position', position); 
-            spawnedEl.setAttribute('scale', {'x': scaleMod, 'y': scaleMod, 'z': scaleMod});
+            // spawnedEl.setAttribute('position', position); 
+            // spawnedEl.setAttribute('scale', {'x': scaleMod, 'y': scaleMod, 'z': scaleMod});
             // spawnedEl.setAttribute("cloud_marker", { 'timestamp': "_" + timestamp,
             //                                         'name': data.name, 
             //                                         'modelID': data.modelID, 
