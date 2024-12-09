@@ -284,27 +284,27 @@ AFRAME.registerComponent('ar_hit_caster', {
         spawnedEl.setAttribute('position', position); //?
         spawnedEl.setAttribute('scale', {'x': scaleMod, 'y': scaleMod, 'z': scaleMod}); //because it's not a child of ar_parent
         spawnedEl.setAttribute("anchored", {"persistent": true});
-        spawnedEl.setAttribute("local_marker", { timestamp: "_" + timestamp,
-                                                name: data.name, 
-                                                modelID: data.modelID, 
-                                                objectID: data.objectID, 
-                                                mediaID: data.mediaID, 
-                                                tags: data.tags, 
-                                                eventData: data.eventData, 
-                                                markerType: data.markerType,
-                                                description: data.description,
-                                                xpos: data.xpos,
-                                                ypos: data.ypos,
-                                                zpos: data.zpos,
-                                                xrot: data.xrot,
-                                                yrot: data.yrot,
-                                                zrot: data.zrot,
-                                                xscale: data.xscale,
-                                                yscale: data.yscale,
-                                                zscale: data.zscale,
-                                                targetElements: data.targetElements
+        spawnedEl.setAttribute("local_marker", { 'timestamp': "_" + timestamp,
+                                                'name': data.name, 
+                                                'modelID': data.modelID, 
+                                                'objectID': data.objectID, 
+                                                'mediaID': data.mediaID, 
+                                                'tags': data.tags, 
+                                                'eventData': data.eventData, 
+                                                'markerType': data.markerType,
+                                                'description': data.description,
+                                                'xpos': data.xpos,
+                                                'ypos': data.ypos,
+                                                'zpos': data.zpos,
+                                                'xrot': data.xrot,
+                                                'yrot': data.yrot,
+                                                'zrot': data.zrot,
+                                                'xscale': data.xscale,
+                                                'yscale': data.yscale,
+                                                'zscale': data.zscale,
+                                                'targetElements': data.targetElements
                                               });
-
+        spawnedEl.setAttribute("visible", true);
         this.messageEl.textContent = "spawning local marker at position " + JSON.stringify(position);
 
       } else {
@@ -312,35 +312,36 @@ AFRAME.registerComponent('ar_hit_caster', {
           let cloudMarker = spawnableEl.components.cloud_marker;
           if (cloudMarker) {
             let data = cloudMarker.data;
-            console.log("spawnable data found " + JSON.stringify(data));
+            console.log("scalemod is " + scaleMod + "spawnable data found " + JSON.stringify(data));
             let spawnedEl = document.createElement("a-entity");
             spawnedEl.id = "_" + timestamp;
 
             sceneEl.appendChild(spawnedEl); 
             spawnedEl.setAttribute('position', position); 
             spawnedEl.setAttribute('scale', {'x': scaleMod, 'y': scaleMod, 'z': scaleMod});
-            spawnedEl.setAttribute("cloud_marker", { timestamp: "_" + timestamp,
-                                                    name: data.name, 
-                                                    modelID: data.modelID, 
-                                                    objectID: data.objectID, 
-                                                    mediaID: data.mediaID, 
-                                                    tags: data.tags, 
-                                                    eventData: data.eventData, 
-                                                    markerType: data.markerType,
-                                                    description: data.description,
-                                                    xpos: data.xpos,
-                                                    ypos: data.ypos,
-                                                    zpos: data.zpos,
-                                                    xrot: data.xrot,
-                                                    yrot: data.yrot,
-                                                    zrot: data.zrot,
-                                                    xscale: data.xscale,
-                                                    yscale: data.yscale,
-                                                    zscale: data.zscale,
-                                                    targetElements: data.targetElements
+            spawnedEl.setAttribute("cloud_marker", { 'timestamp': "_" + timestamp,
+                                                    'name': data.name, 
+                                                    'modelID': data.modelID, 
+                                                    'objectID': data.objectID, 
+                                                    'mediaID': data.mediaID, 
+                                                    'tags': data.tags, 
+                                                    'eventData': data.eventData, 
+                                                    'markerType': data.markerType,
+                                                    'description': data.description,
+                                                    'xpos': data.xpos,
+                                                    'ypos': data.ypos,
+                                                    'zpos': data.zpos,
+                                                    'xrot': data.xrot,
+                                                    'yrot': data.yrot,
+                                                    'zrot': data.zrot,
+                                                    'xscale': data.xscale,
+                                                    'yscale': data.yscale,
+                                                    'zscale': data.zscale,
+                                                    'targetElements': data.targetElements
                                                   });
 
               spawnedEl.setAttribute("anchored", {"persistent": true});
+              spawnedEl.setAttribute("visible", true);
               this.messageEl.textContent = "spawning marker at position " + JSON.stringify(position);
           } else {
             let modModel = spawnableEl.components.mod_model;  
@@ -354,27 +355,27 @@ AFRAME.registerComponent('ar_hit_caster', {
               spawnedEl.setAttribute('position', position); 
               spawnedEl.setAttribute('scale', {'x': scaleMod, 'y': scaleMod, 'z': scaleMod});
               spawnedEl.setAttribute("anchored", {"persistent": true});
-              spawnedEl.setAttribute("mod_model", { timestamp: "_" + timestamp,
-                                                    name: data.name, 
-                                                    modelID: data.modelID, 
-                                                    objectID: data.objectID, 
-                                                    mediaID: data.mediaID, 
-                                                    tags: data.tags, 
-                                                    eventData: data.eventData, 
-                                                    markerType: data.markerType,
-                                                    description: data.description,
-                                                    xpos: data.xpos,
-                                                    ypos: data.ypos,
-                                                    zpos: data.zpos,
-                                                    xrot: data.xrot,
-                                                    yrot: data.yrot,
-                                                    zrot: data.zrot,
-                                                    xscale: data.xscale,
-                                                    yscale: data.yscale,
-                                                    zscale: data.zscale,
-                                                    targetElements: data.targetElements
+              spawnedEl.setAttribute("mod_model", { 'timestamp': "_" + timestamp,
+                                                    'name': data.name, 
+                                                    'modelID': data.modelID, 
+                                                    'objectID': data.objectID, 
+                                                    'mediaID': data.mediaID, 
+                                                    'tags': data.tags, 
+                                                    'eventData': data.eventData, 
+                                                    'markerType': data.markerType,
+                                                    'description': data.description,
+                                                    'xpos': data.xpos,
+                                                    'ypos': data.ypos,
+                                                    'zpos': data.zpos,
+                                                    'xrot': data.xrot,
+                                                    'yrot': data.yrot,
+                                                    'zrot': data.zrot,
+                                                    'xscale': data.xscale,
+                                                    'yscale': data.yscale,
+                                                    'zscale': data.zscale,
+                                                    'targetElements': data.targetElements
                                                   });
-
+                spawnedEl.setAttribute("visible", true);
                 this.messageEl.textContent = "spawning model at position " + JSON.stringify(position);
             } else {
               let modObject = spawnableEl.components.mod_object;
@@ -388,27 +389,27 @@ AFRAME.registerComponent('ar_hit_caster', {
                 spawnedEl.setAttribute('position', position); 
                 spawnedEl.setAttribute('scale', {'x': scaleMod, 'y': scaleMod, 'z': scaleMod});
                 spawnedEl.setAttribute("anchored", {"persistent": true});
-                spawnedEl.setAttribute("mod_object", { timestamp: "_" + timestamp,
-                                                      name: data.name, 
-                                                      modelID: data.modelID, 
-                                                      objectID: data.objectID, 
-                                                      mediaID: data.mediaID, 
-                                                      tags: data.tags, 
-                                                      eventData: data.eventData, 
-                                                      markerType: data.markerType,
-                                                      description: data.description,
-                                                      xpos: data.xpos,
-                                                      ypos: data.ypos,
-                                                      zpos: data.zpos,
-                                                      xrot: data.xrot,
-                                                      yrot: data.yrot,
-                                                      zrot: data.zrot,
-                                                      xscale: data.xscale,
-                                                      yscale: data.yscale,
-                                                      zscale: data.zscale,
-                                                      targetElements: data.targetElements
+                spawnedEl.setAttribute("mod_object", { 'timestamp': "_" + timestamp,
+                                                      'name': data.name, 
+                                                      'modelID': data.modelID, 
+                                                      'objectID': data.objectID, 
+                                                      'mediaID': data.mediaID, 
+                                                      'tags': data.tags, 
+                                                      'eventData': data.eventData, 
+                                                      'markerType': data.markerType,
+                                                      'description': data.description,
+                                                      'xpos': data.xpos,
+                                                      'ypos': data.ypos,
+                                                      'zpos': data.zpos,
+                                                      'xrot': data.xrot,
+                                                      'yrot': data.yrot,
+                                                      'zrot': data.zrot,
+                                                      'xscale': data.xscale,
+                                                      'yscale': data.yscale,
+                                                      'zscale': data.zscale,
+                                                      'targetElements': data.targetElements
                                                     });
-
+                  spawnedEl.setAttribute("visible", true);
                   this.messageEl.textContent = "spawning object at position " + JSON.stringify(position);
               }
             }

@@ -337,13 +337,14 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
       } else {
             if (this.data.modelID != "none") {
               if (this.data.modelID.toString().includes("primitive")) {   
-                // console.log("CLOUDMARKER PRIMITIVE " + this.data.modelID);
+                console.log("CLOUDMARKER PRIMITIVE " + this.data.modelID);
                 if (this.data.modelID.toString().includes("cube")) {
                   console.log("CLOUDMARKER PRIMITIVE cube " + this.data.name + " " + this.data.xscale + " " +  this.data.yscale + " " +  this.data.zscale);
                   this.el.setAttribute("geometry", {"primitive": "box", "width": this.data.xscale, "height": this.data.yscale, "depth": this.data.zscale});;
 
                 } else if (this.data.modelID.toString().includes("sphere")) {
                     this.el.setAttribute("geometry", {"primitive": "sphere", "radius": 1});
+                    console.log("CLOUDMARKER PRIMITIVE " + this.data.modelID + this.el.getAttribute("geometry"));
                 } else if (this.data.modelID.toString().includes("cylinder")) {
                     this.el.setAttribute("geometry", {"primitive": "cylinder", "height": 1, "radius": .5});
                 } else {
