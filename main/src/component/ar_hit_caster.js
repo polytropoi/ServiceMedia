@@ -60,7 +60,9 @@ AFRAME.registerComponent('ar_hit_caster', {
           var position = el.getAttribute('position');
           const zeroPos = new THREE.Vector3(0, 0, 0); //hrm, use camera or player? viewportHolder?
           var distance = position.distanceTo(zeroPos);
-          var scaleMod = distance * 0.2;
+
+          var scaleMod = .1 + (distance * 0.2);
+          
           if (!self.lockTargets) {
             console.log("tryna set position " + JSON.stringify(position) + " distance " + JSON.stringify(distance));
             self.messageEl.textContent = "surface found at position " + JSON.stringify(position);
@@ -305,6 +307,7 @@ AFRAME.registerComponent('ar_hit_caster', {
                                                 'targetElements': data.targetElements
                                               });
         spawnedEl.setAttribute("visible", true);
+        spawnedEl.object3D.visible = true;
         this.messageEl.textContent = "spawning local marker at position " + JSON.stringify(position);
 
       } else {
@@ -312,7 +315,7 @@ AFRAME.registerComponent('ar_hit_caster', {
           let cloudMarker = spawnableEl.components.cloud_marker;
           if (cloudMarker) {
             let data = cloudMarker.data;
-            console.log("scalemod is " + scaleMod + "spawnable data found " + JSON.stringify(data));
+            console.log("scalemod is " + scaleMod + " spawnable data found " + JSON.stringify(data));
             let spawnedEl = document.createElement("a-entity");
             spawnedEl.id = "_" + timestamp;
 
@@ -342,6 +345,7 @@ AFRAME.registerComponent('ar_hit_caster', {
 
               spawnedEl.setAttribute("anchored", {"persistent": true});
               spawnedEl.setAttribute("visible", true);
+              spawnedEl.object3D.visible = true;
               this.messageEl.textContent = "spawning marker at position " + JSON.stringify(position);
           } else {
             let modModel = spawnableEl.components.mod_model;  
@@ -376,6 +380,7 @@ AFRAME.registerComponent('ar_hit_caster', {
                                                     'targetElements': data.targetElements
                                                   });
                 spawnedEl.setAttribute("visible", true);
+                spawnedEl.object3D.visible = true;
                 this.messageEl.textContent = "spawning model at position " + JSON.stringify(position);
             } else {
               let modObject = spawnableEl.components.mod_object;
@@ -410,6 +415,7 @@ AFRAME.registerComponent('ar_hit_caster', {
                                                       'targetElements': data.targetElements
                                                     });
                   spawnedEl.setAttribute("visible", true);
+                  spawnedEl.object3D.visible = true;
                   this.messageEl.textContent = "spawning object at position " + JSON.stringify(position);
               }
             }
@@ -436,10 +442,10 @@ AFRAME.registerComponent('ar_hit_caster', {
         let targetRot = targetEl.getAttribute("rotation");
         console.log("targetEl rot is " + JSON.stringify(targetRot));
         if (dir == "right") {
-          targetEl.setAttribute("rotation", {"x": targetRot.x + 1, "y": targetRot.x + 1, "z": targetRot.x + 1})
+          targetEl.setAttribute("rotation", {"x": targetRot.z + 1, "y": targetRot.z + 1, "z": targetRot.z + 1})
         } else {
           // if (targetScale.x > .1) {
-            targetEl.setAttribute("rotation", {"x": targetRot.x - 1, "y": targetRot.x - 1, "z": targetRot.x - 1})
+            targetEl.setAttribute("rotation", {"x": targetRot.z - 1, "y": targetRot.z - 1, "z": targetRot.z - 1})
           // }
         }
       }
