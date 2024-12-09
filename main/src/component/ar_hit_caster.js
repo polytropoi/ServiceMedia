@@ -329,7 +329,7 @@ AFRAME.registerComponent('ar_hit_caster', {
             // let scaleFactor = Math.random();
             spawnedEl.setObject3D('mesh', obj.clone()); 
             spawnedEl.setAttribute('position', position);
-            spawnedEl.setAttribute('scale', {scaleFactor, scaleFactor, scaleFactor});
+            spawnedEl.setAttribute('scale', {scaleMod, scaleMod, scaleMod});
             spawnedEl.classList.add("activeObjexRay");
 
             sceneEl.appendChild(spawnedEl);
