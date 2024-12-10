@@ -478,7 +478,7 @@ AFRAME.registerComponent('ar_hit_caster', {
           this.arRaycasterEnabled = true;
           this.messageEl.textContent = "hit test disabled, raycaster enabled";
           if (unlockedButtonsEl) {
-            unlockedButtonsEl.style.visibility = 'hidden';
+            unlockedButtonsEl.style.visibility = 'visible';
           }
         } else {
           console.log("unlocked");
@@ -488,7 +488,7 @@ AFRAME.registerComponent('ar_hit_caster', {
           this.arRaycasterEnabled = false;
           this.messageEl.textContent = "hit test enabled, raycaster disabled";
           if (unlockedButtonsEl) {
-            unlockedButtonsEl.style.visibility = 'visible';
+            unlockedButtonsEl.style.visibility = 'hidden';
           }
         }
       }
