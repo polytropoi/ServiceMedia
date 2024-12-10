@@ -1308,9 +1308,9 @@ AFRAME.registerComponent('instanced_surface_meshes', {
           waterLevel = settings.sceneWaterLevel;
         }
 
-        if (settings && settings.useArParent) { 
-          this.data.scaleFactor = this.data.scaleFactor * .2
-        }
+        // if (settings && settings.useArParent) { 
+        //   this.data.scaleFactor = this.data.scaleFactor * .2
+        // }
         // console.log("tryna scatter!@ waterLeve " + waterLevel + " object with #meshes  "+ this.sampleGeos.length);
         var dummy = new THREE.Object3D();
         dummy.visible = false;
@@ -1340,6 +1340,10 @@ AFRAME.registerComponent('instanced_surface_meshes', {
               let position = new THREE.Vector3(0,-20,0);
               let normal = new THREE.Vector3();
               this.count = 0;
+              let sceneEl = document.querySelector('a-scene');
+              if (settings && settings.useArParent) {
+                sceneEl = document.getElementById("ar_parent");
+              }
               for (var i = 0; i < 100000; i++) {
                 if (this.count <= count) {
                 
@@ -1362,6 +1366,7 @@ AFRAME.registerComponent('instanced_surface_meshes', {
                     iMesh_1.frustumCulled = false; //too funky
                     iMesh_1.instanceMatrix.needsUpdate = true;
                     iMesh_1.userData = {"collide": true, "instanced": true, count: count};
+                    
                     sceneEl.object3D.add(iMesh_1);
                     this.iMesh = iMesh_1;
                     this.iMesh_1 = iMesh_1;
