@@ -61,7 +61,7 @@ AFRAME.registerComponent('ar_hit_caster', {
           const zeroPos = new THREE.Vector3(0, 0, 0); //hrm, use camera or player? viewportHolder?
           var distance = position.distanceTo(zeroPos);
 
-          var scaleMod = .01 + (distance * 0.2);
+          var scaleMod = .05 + (distance * 0.2);
           
           if (!self.lockTargets) {
             console.log("tryna set position " + JSON.stringify(position) + " distance " + JSON.stringify(distance));
@@ -76,7 +76,7 @@ AFRAME.registerComponent('ar_hit_caster', {
             if (spawnableEls) {
               const index = getRandomInt(spawnableEls.length);
               const spawnableEl = spawnableEls[index];
-              self.spawnElement(position, scaleMod * .2, spawnableEl);
+              self.spawnElement(position, scaleMod, spawnableEl);
               // var sceneEl = document.querySelector('a-scene');
               // let localMarker = spawnableEl.components.local_marker;
               // if (localMarker) {
@@ -317,13 +317,51 @@ AFRAME.registerComponent('ar_hit_caster', {
         spawnedEl.setAttribute("visible", true);
         spawnedEl.object3D.visible = true;
         this.messageEl.textContent = "spawning local marker at position " + JSON.stringify(position);
-
       } else {
-        
-          let cloudMarker = spawnableEl.components.cloud_marker;
-          if (cloudMarker) {
-            let data = cloudMarker.data;
-            console.log("scalemod is " + scaleMod + " spawnable data found " + JSON.stringify(data));
+        let cloudMarker = spawnableEl.components.cloud_marker;
+        if (cloudMarker) {
+          let data = cloudMarker.data;
+          console.log("scalemod is " + scaleMod + " spawnable data found " + JSON.stringify(data));
+          let spawnedEl = document.createElement("a-entity");
+          spawnedEl.id = "_" + timestamp;
+          
+          var obj = spawnableEl.getObject3D('mesh');
+          spawnedEl.setObject3D('mesh', obj.clone()); 
+          spawnedEl.object3D.scale.set(scaleMod,scaleMod,scaleMod);
+          spawnedEl.classList.add("activeObjexRay");
+          sceneEl.appendChild(spawnedEl);
+          spawnedEl.setAttribute('position', position); //?
+
+          // spawnedEl.setAttribute("cloud_marker", { 'timestamp': "_" + timestamp,
+          //                                         'name': data.name, 
+          //                                         'modelID': data.modelID, 
+          //                                         'objectID': data.objectID, 
+          //                                         'mediaID': data.mediaID, 
+          //                                         'tags': data.tags, 
+          //                                         'eventData': data.eventData, 
+          //                                         'markerType': data.markerType,
+          //                                         'description': data.description,
+          //                                         'xpos': data.xpos,
+          //                                         'ypos': data.ypos,
+          //                                         'zpos': data.zpos,
+          //                                         'xrot': data.xrot,
+          //                                         'yrot': data.yrot,
+          //                                         'zrot': data.zrot,
+          //                                         'xscale': data.xscale,
+          //                                         'yscale': data.yscale,
+          //                                         'zscale': data.zscale,
+          //                                         'targetElements': data.targetElements
+          //                                       });
+
+            spawnedEl.setAttribute("anchored", {"persistent": true});
+            spawnedEl.setAttribute("visible", true);
+            spawnedEl.object3D.visible = true;
+            this.messageEl.textContent = "spawning marker at position " + JSON.stringify(position);
+        } else {
+          let modModel = spawnableEl.components.mod_model;  
+          if (modModel) {
+            let data = modModel.data;
+            console.log("spawnable data found " + JSON.stringify(data));
             let spawnedEl = document.createElement("a-entity");
             spawnedEl.id = "_" + timestamp;
             
@@ -334,48 +372,45 @@ AFRAME.registerComponent('ar_hit_caster', {
             sceneEl.appendChild(spawnedEl);
             spawnedEl.setAttribute('position', position); //?
 
-            // spawnedEl.setAttribute("cloud_marker", { 'timestamp': "_" + timestamp,
-            //                                         'name': data.name, 
-            //                                         'modelID': data.modelID, 
-            //                                         'objectID': data.objectID, 
-            //                                         'mediaID': data.mediaID, 
-            //                                         'tags': data.tags, 
-            //                                         'eventData': data.eventData, 
-            //                                         'markerType': data.markerType,
-            //                                         'description': data.description,
-            //                                         'xpos': data.xpos,
-            //                                         'ypos': data.ypos,
-            //                                         'zpos': data.zpos,
-            //                                         'xrot': data.xrot,
-            //                                         'yrot': data.yrot,
-            //                                         'zrot': data.zrot,
-            //                                         'xscale': data.xscale,
-            //                                         'yscale': data.yscale,
-            //                                         'zscale': data.zscale,
-            //                                         'targetElements': data.targetElements
-            //                                       });
-
-              spawnedEl.setAttribute("anchored", {"persistent": true});
+            spawnedEl.setAttribute("anchored", {"persistent": true});
+            // spawnedEl.setAttribute("mod_model", { 'timestamp': "_" + timestamp,
+            //                                       'name': data.name, 
+            //                                       'modelID': data.modelID, 
+            //                                       'objectID': data.objectID, 
+            //                                       'mediaID': data.mediaID, 
+            //                                       'tags': data.tags, 
+            //                                       'eventData': data.eventData, 
+            //                                       'markerType': data.markerType,
+            //                                       'description': data.description,
+            //                                       'xpos': data.xpos,
+            //                                       'ypos': data.ypos,
+            //                                       'zpos': data.zpos,
+            //                                       'xrot': data.xrot,
+            //                                       'yrot': data.yrot,
+            //                                       'zrot': data.zrot,
+            //                                       'xscale': data.xscale,
+            //                                       'yscale': data.yscale,
+            //                                       'zscale': data.zscale,
+            //                                       'targetElements': data.targetElements
+            //                                     });
               spawnedEl.setAttribute("visible", true);
               spawnedEl.object3D.visible = true;
-              this.messageEl.textContent = "spawning marker at position " + JSON.stringify(position);
+              this.messageEl.textContent = "spawning model at position " + JSON.stringify(position);
           } else {
-            let modModel = spawnableEl.components.mod_model;  
-            if (modModel) {
-              let data = modModel.data;
+            let modObject = spawnableEl.components.mod_object;
+            if (modObject) {
               console.log("spawnable data found " + JSON.stringify(data));
+              let data = modObject.data;
               let spawnedEl = document.createElement("a-entity");
               spawnedEl.id = "_" + timestamp;
-             
               var obj = spawnableEl.getObject3D('mesh');
               spawnedEl.setObject3D('mesh', obj.clone()); 
               spawnedEl.object3D.scale.set(scaleMod,scaleMod,scaleMod);
               spawnedEl.classList.add("activeObjexRay");
               sceneEl.appendChild(spawnedEl);
-              spawnedEl.setAttribute('position', position); //?
-
+              spawnedEl.setAttribute('position', position); //?od, 'z': scaleMod});
               spawnedEl.setAttribute("anchored", {"persistent": true});
-              // spawnedEl.setAttribute("mod_model", { 'timestamp': "_" + timestamp,
+              // spawnedEl.setAttribute("mod_object", { 'timestamp': "_" + timestamp,
               //                                       'name': data.name, 
               //                                       'modelID': data.modelID, 
               //                                       'objectID': data.objectID, 
@@ -397,48 +432,11 @@ AFRAME.registerComponent('ar_hit_caster', {
               //                                     });
                 spawnedEl.setAttribute("visible", true);
                 spawnedEl.object3D.visible = true;
-                this.messageEl.textContent = "spawning model at position " + JSON.stringify(position);
-            } else {
-              let modObject = spawnableEl.components.mod_object;
-              if (modObject) {
-                console.log("spawnable data found " + JSON.stringify(data));
-                let data = modObject.data;
-                let spawnedEl = document.createElement("a-entity");
-                spawnedEl.id = "_" + timestamp;
-                var obj = spawnableEl.getObject3D('mesh');
-                spawnedEl.setObject3D('mesh', obj.clone()); 
-                spawnedEl.object3D.scale.set(scaleMod,scaleMod,scaleMod);
-                spawnedEl.classList.add("activeObjexRay");
-                sceneEl.appendChild(spawnedEl);
-                spawnedEl.setAttribute('position', position); //?od, 'z': scaleMod});
-                spawnedEl.setAttribute("anchored", {"persistent": true});
-                // spawnedEl.setAttribute("mod_object", { 'timestamp': "_" + timestamp,
-                //                                       'name': data.name, 
-                //                                       'modelID': data.modelID, 
-                //                                       'objectID': data.objectID, 
-                //                                       'mediaID': data.mediaID, 
-                //                                       'tags': data.tags, 
-                //                                       'eventData': data.eventData, 
-                //                                       'markerType': data.markerType,
-                //                                       'description': data.description,
-                //                                       'xpos': data.xpos,
-                //                                       'ypos': data.ypos,
-                //                                       'zpos': data.zpos,
-                //                                       'xrot': data.xrot,
-                //                                       'yrot': data.yrot,
-                //                                       'zrot': data.zrot,
-                //                                       'xscale': data.xscale,
-                //                                       'yscale': data.yscale,
-                //                                       'zscale': data.zscale,
-                //                                       'targetElements': data.targetElements
-                //                                     });
-                  spawnedEl.setAttribute("visible", true);
-                  spawnedEl.object3D.visible = true;
-                  this.messageEl.textContent = "spawning object at position " + JSON.stringify(position);
-              }
+                this.messageEl.textContent = "spawning object at position " + JSON.stringify(position);
             }
           }
-        } 
+        }
+      } 
     },
     scaleTargetElements: function (dir) {
       var targetEl = this.data.targetEl;
@@ -460,10 +458,10 @@ AFRAME.registerComponent('ar_hit_caster', {
         let targetRot = targetEl.getAttribute("rotation");
         console.log("targetEl rot is " + JSON.stringify(targetRot));
         if (dir == "right") {
-          targetEl.setAttribute("rotation", {"x": targetRot.z + 1, "y": targetRot.z + 1, "z": targetRot.z + 1})
+          targetEl.setAttribute("rotation", {"x": targetRot.x, "y": targetRot.y, "z": targetRot.z + 1})
         } else {
           // if (targetScale.x > .1) {
-            targetEl.setAttribute("rotation", {"x": targetRot.z - 1, "y": targetRot.z - 1, "z": targetRot.z - 1})
+            targetEl.setAttribute("rotation", {"x": targetRot.x, "y": targetRot.y, "z": targetRot.z - 1})
           // }
         }
       }
@@ -471,6 +469,7 @@ AFRAME.registerComponent('ar_hit_caster', {
     toggleLockElements: function () {
       this.lockTargets = !this.lockTargets;
       var targetEl = this.data.targetEl;
+      const unlockedButtonsEl = document.getElementById("unlockedButtons");
       if (targetEl) {
         if (this.lockTargets) {
           console.log("locked");
@@ -478,6 +477,9 @@ AFRAME.registerComponent('ar_hit_caster', {
           this.el.object3D.visible = false;
           this.arRaycasterEnabled = true;
           this.messageEl.textContent = "hit test disabled, raycaster enabled";
+          if (unlockedButtonsEl) {
+            unlockedButtonsEl.style.visibility = 'hidden';
+          }
         } else {
           console.log("unlocked");
           targetEl.removeAttribute("anchored");
@@ -485,6 +487,9 @@ AFRAME.registerComponent('ar_hit_caster', {
           //enable raycast here?
           this.arRaycasterEnabled = false;
           this.messageEl.textContent = "hit test enabled, raycaster disabled";
+          if (unlockedButtonsEl) {
+            unlockedButtonsEl.style.visibility = 'visible';
+          }
         }
       }
     },

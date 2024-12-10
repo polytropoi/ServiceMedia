@@ -539,6 +539,15 @@ background-color: #000000;
     font-size: 12px;
     padding: 5px 5px;
 }
+.arOverlayButton {
+  transition-duration: 0.4s;
+  background-color: #545454; /* Green */
+  color: white;
+  border-radius: 8px;
+  border-width: 0px;
+  font-size: 14px;
+  padding: 5px 5px;
+}
 .windows_yes {
     height: 32px;
     width: 32px;
