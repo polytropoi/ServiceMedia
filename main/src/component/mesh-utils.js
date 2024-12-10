@@ -1308,6 +1308,9 @@ AFRAME.registerComponent('instanced_surface_meshes', {
           waterLevel = settings.sceneWaterLevel;
         }
 
+        if (settings && settings.useArParent) { 
+          this.data.scaleFactor = this.data.scaleFactor * .2
+        }
         // console.log("tryna scatter!@ waterLeve " + waterLevel + " object with #meshes  "+ this.sampleGeos.length);
         var dummy = new THREE.Object3D();
         dummy.visible = false;
@@ -1775,10 +1778,19 @@ AFRAME.registerComponent('instanced_meshes_mod2', {
 });
 
 AFRAME.registerComponent('scatter-surface-default', { //cook one up on the fly if needed
+  schema: {
+    arChild: {default: false}
+  },
   init: function () {
     let that = this;
     console.log("TRYNA LOAD SCATTER SURFACE");
-    let surfaceGeometry = new THREE.BoxGeometry( 100, .1, 100 ).toNonIndexed();
+    
+    // let scale = 100;
+    // if (this.data.arChild) {
+    //   scale = 10;
+    // }
+
+    let surfaceGeometry = new THREE.BoxGeometry( scale, .1, scale ).toNonIndexed();
     // let surfaceGeometry = new THREE.PlaneGeometry( 66, 66 ).toNonIndexed();
     const surfaceMaterial = new THREE.MeshLambertMaterial( { opacity: .1, color: "aqua", wireframe: true } );
     const surface = new THREE.Mesh( surfaceGeometry, surfaceMaterial );

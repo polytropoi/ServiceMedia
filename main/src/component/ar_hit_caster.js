@@ -444,10 +444,10 @@ AFRAME.registerComponent('ar_hit_caster', {
         let targetScale = targetEl.getAttribute("scale");
         console.log("targetEl scale is " + JSON.stringify(targetScale));
         if (dir == "up") {
-          targetEl.setAttribute("scale", {"x": targetScale.x + .1, "y": targetScale.x + .1, "z": targetScale.x + .1})
+          targetEl.setAttribute("scale", {"x": targetScale.x + .05, "y": targetScale.x + .05, "z": targetScale.x + .05})
         } else {
           if (targetScale.x > .1) {
-            targetEl.setAttribute("scale", {"x": targetScale.x - .1, "y": targetScale.x - .1, "z": targetScale.x - .1})
+            targetEl.setAttribute("scale", {"x": targetScale.x - .05, "y": targetScale.x - .05, "z": targetScale.x - .05})
           }
         }
       }
