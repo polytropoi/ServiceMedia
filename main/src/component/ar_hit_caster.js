@@ -72,7 +72,7 @@ AFRAME.registerComponent('ar_hit_caster', {
             // let spawnedEl = null;
             // let data = {};
 
-            let spawnableEls = document.querySelector('.spawnable'); //location with "spawnable" tag
+            let spawnableEls = document.querySelectorAll('.spawnable'); //location with "spawnable" tag
             if (spawnableEls) {
               const index = getRandomInt(spawnableEls.length);
               const spawnableEl = spawnableEls[index];
