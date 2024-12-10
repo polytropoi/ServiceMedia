@@ -327,7 +327,7 @@ AFRAME.registerComponent('ar_hit_caster', {
           
           var obj = spawnableEl.getObject3D('mesh');
           spawnedEl.setObject3D('mesh', obj.clone()); 
-          spawnedEl.object3D.scale.set(scaleMod,scaleMod,scaleMod);
+          spawnedEl.object3D.scale.set(scaleMod * data.xscale,scaleMod * data.yscale,scaleMod * data.zscale);
           spawnedEl.classList.add("activeObjexRay");
           sceneEl.appendChild(spawnedEl);
           spawnedEl.setAttribute('position', position); //?
@@ -367,7 +367,7 @@ AFRAME.registerComponent('ar_hit_caster', {
             
             var obj = spawnableEl.getObject3D('mesh');
             spawnedEl.setObject3D('mesh', obj.clone()); 
-            spawnedEl.object3D.scale.set(scaleMod,scaleMod,scaleMod);
+            spawnedEl.object3D.scale.set(scaleMod * data.xscale,scaleMod * data.yscale,scaleMod * data.zscale);
             spawnedEl.classList.add("activeObjexRay");
             sceneEl.appendChild(spawnedEl);
             spawnedEl.setAttribute('position', position); //?
@@ -444,10 +444,10 @@ AFRAME.registerComponent('ar_hit_caster', {
         let targetScale = targetEl.getAttribute("scale");
         console.log("targetEl scale is " + JSON.stringify(targetScale));
         if (dir == "up") {
-          targetEl.setAttribute("scale", {"x": targetScale.x + .05, "y": targetScale.x + .05, "z": targetScale.x + .05})
+          targetEl.setAttribute("scale", {"x": targetScale.x + .1, "y": targetScale.x + .1, "z": targetScale.x + .1})
         } else {
           if (targetScale.x > .1) {
-            targetEl.setAttribute("scale", {"x": targetScale.x - .05, "y": targetScale.x - .05, "z": targetScale.x - .05})
+            targetEl.setAttribute("scale", {"x": targetScale.x - .1, "y": targetScale.x - .1, "z": targetScale.x - .1})
           }
         }
       }
@@ -458,10 +458,10 @@ AFRAME.registerComponent('ar_hit_caster', {
         let targetRot = targetEl.getAttribute("rotation");
         console.log("targetEl rot is " + JSON.stringify(targetRot));
         if (dir == "right") {
-          targetEl.setAttribute("rotation", {"x": targetRot.x, "y": targetRot.y, "z": targetRot.z + 1})
+          targetEl.setAttribute("rotation", {"x": targetRot.x, "y": targetRot.y + 10, "z": targetRot.z})
         } else {
           // if (targetScale.x > .1) {
-            targetEl.setAttribute("rotation", {"x": targetRot.x, "y": targetRot.y, "z": targetRot.z - 1})
+            targetEl.setAttribute("rotation", {"x": targetRot.x, "y": targetRot.y - 10, "z": targetRot.z})
           // }
         }
       }

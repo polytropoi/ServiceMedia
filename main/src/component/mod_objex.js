@@ -3903,9 +3903,15 @@ AFRAME.registerComponent('mod_object', {
         for (let i = 0; i < 100; i++) {
 
           let testPosition = new THREE.Vector3();
-          testPosition.x = this.returnRandomNumber(-100, 100);  
-          testPosition.y = 50;
-          testPosition.z = this.returnRandomNumber(-100, 100);
+          if (settings && settings.useArParent) {
+            testPosition.x = this.returnRandomNumber(-10, 10);  
+            testPosition.y = 5;
+            testPosition.z = this.returnRandomNumber(-10, 10);
+          } else {
+            testPosition.x = this.returnRandomNumber(-100, 100);  
+            testPosition.y = 50;
+            testPosition.z = this.returnRandomNumber(-100, 100);
+          }
           let raycaster = new THREE.Raycaster();
           raycaster.set(new THREE.Vector3(testPosition.x, testPosition.y, testPosition.z), new THREE.Vector3(0, -1, 0));
           let results = raycaster.intersectObject(surface.getObject3D('mesh'), true);
