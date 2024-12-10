@@ -334,28 +334,26 @@ AFRAME.registerComponent('ar_hit_caster', {
             sceneEl.appendChild(spawnedEl);
             spawnedEl.setAttribute('position', position); //?
 
-            // spawnedEl.setAttribute('position', position); 
-            // spawnedEl.setAttribute('scale', {'x': scaleMod, 'y': scaleMod, 'z': scaleMod});
-            spawnedEl.setAttribute("cloud_marker", { 'timestamp': "_" + timestamp,
-                                                    'name': data.name, 
-                                                    'modelID': data.modelID, 
-                                                    'objectID': data.objectID, 
-                                                    'mediaID': data.mediaID, 
-                                                    'tags': data.tags, 
-                                                    'eventData': data.eventData, 
-                                                    'markerType': data.markerType,
-                                                    'description': data.description,
-                                                    'xpos': data.xpos,
-                                                    'ypos': data.ypos,
-                                                    'zpos': data.zpos,
-                                                    'xrot': data.xrot,
-                                                    'yrot': data.yrot,
-                                                    'zrot': data.zrot,
-                                                    'xscale': data.xscale,
-                                                    'yscale': data.yscale,
-                                                    'zscale': data.zscale,
-                                                    'targetElements': data.targetElements
-                                                  });
+            // spawnedEl.setAttribute("cloud_marker", { 'timestamp': "_" + timestamp,
+            //                                         'name': data.name, 
+            //                                         'modelID': data.modelID, 
+            //                                         'objectID': data.objectID, 
+            //                                         'mediaID': data.mediaID, 
+            //                                         'tags': data.tags, 
+            //                                         'eventData': data.eventData, 
+            //                                         'markerType': data.markerType,
+            //                                         'description': data.description,
+            //                                         'xpos': data.xpos,
+            //                                         'ypos': data.ypos,
+            //                                         'zpos': data.zpos,
+            //                                         'xrot': data.xrot,
+            //                                         'yrot': data.yrot,
+            //                                         'zrot': data.zrot,
+            //                                         'xscale': data.xscale,
+            //                                         'yscale': data.yscale,
+            //                                         'zscale': data.zscale,
+            //                                         'targetElements': data.targetElements
+            //                                       });
 
               spawnedEl.setAttribute("anchored", {"persistent": true});
               spawnedEl.setAttribute("visible", true);
@@ -377,26 +375,26 @@ AFRAME.registerComponent('ar_hit_caster', {
               spawnedEl.setAttribute('position', position); //?
 
               spawnedEl.setAttribute("anchored", {"persistent": true});
-              spawnedEl.setAttribute("mod_model", { 'timestamp': "_" + timestamp,
-                                                    'name': data.name, 
-                                                    'modelID': data.modelID, 
-                                                    'objectID': data.objectID, 
-                                                    'mediaID': data.mediaID, 
-                                                    'tags': data.tags, 
-                                                    'eventData': data.eventData, 
-                                                    'markerType': data.markerType,
-                                                    'description': data.description,
-                                                    'xpos': data.xpos,
-                                                    'ypos': data.ypos,
-                                                    'zpos': data.zpos,
-                                                    'xrot': data.xrot,
-                                                    'yrot': data.yrot,
-                                                    'zrot': data.zrot,
-                                                    'xscale': data.xscale,
-                                                    'yscale': data.yscale,
-                                                    'zscale': data.zscale,
-                                                    'targetElements': data.targetElements
-                                                  });
+              // spawnedEl.setAttribute("mod_model", { 'timestamp': "_" + timestamp,
+              //                                       'name': data.name, 
+              //                                       'modelID': data.modelID, 
+              //                                       'objectID': data.objectID, 
+              //                                       'mediaID': data.mediaID, 
+              //                                       'tags': data.tags, 
+              //                                       'eventData': data.eventData, 
+              //                                       'markerType': data.markerType,
+              //                                       'description': data.description,
+              //                                       'xpos': data.xpos,
+              //                                       'ypos': data.ypos,
+              //                                       'zpos': data.zpos,
+              //                                       'xrot': data.xrot,
+              //                                       'yrot': data.yrot,
+              //                                       'zrot': data.zrot,
+              //                                       'xscale': data.xscale,
+              //                                       'yscale': data.yscale,
+              //                                       'zscale': data.zscale,
+              //                                       'targetElements': data.targetElements
+              //                                     });
                 spawnedEl.setAttribute("visible", true);
                 spawnedEl.object3D.visible = true;
                 this.messageEl.textContent = "spawning model at position " + JSON.stringify(position);
@@ -414,26 +412,26 @@ AFRAME.registerComponent('ar_hit_caster', {
                 sceneEl.appendChild(spawnedEl);
                 spawnedEl.setAttribute('position', position); //?od, 'z': scaleMod});
                 spawnedEl.setAttribute("anchored", {"persistent": true});
-                spawnedEl.setAttribute("mod_object", { 'timestamp': "_" + timestamp,
-                                                      'name': data.name, 
-                                                      'modelID': data.modelID, 
-                                                      'objectID': data.objectID, 
-                                                      'mediaID': data.mediaID, 
-                                                      'tags': data.tags, 
-                                                      'eventData': data.eventData, 
-                                                      'markerType': data.markerType,
-                                                      'description': data.description,
-                                                      'xpos': data.xpos,
-                                                      'ypos': data.ypos,
-                                                      'zpos': data.zpos,
-                                                      'xrot': data.xrot,
-                                                      'yrot': data.yrot,
-                                                      'zrot': data.zrot,
-                                                      'xscale': data.xscale,
-                                                      'yscale': data.yscale,
-                                                      'zscale': data.zscale,
-                                                      'targetElements': data.targetElements
-                                                    });
+                // spawnedEl.setAttribute("mod_object", { 'timestamp': "_" + timestamp,
+                //                                       'name': data.name, 
+                //                                       'modelID': data.modelID, 
+                //                                       'objectID': data.objectID, 
+                //                                       'mediaID': data.mediaID, 
+                //                                       'tags': data.tags, 
+                //                                       'eventData': data.eventData, 
+                //                                       'markerType': data.markerType,
+                //                                       'description': data.description,
+                //                                       'xpos': data.xpos,
+                //                                       'ypos': data.ypos,
+                //                                       'zpos': data.zpos,
+                //                                       'xrot': data.xrot,
+                //                                       'yrot': data.yrot,
+                //                                       'zrot': data.zrot,
+                //                                       'xscale': data.xscale,
+                //                                       'yscale': data.yscale,
+                //                                       'zscale': data.zscale,
+                //                                       'targetElements': data.targetElements
+                //                                     });
                   spawnedEl.setAttribute("visible", true);
                   spawnedEl.object3D.visible = true;
                   this.messageEl.textContent = "spawning object at position " + JSON.stringify(position);
