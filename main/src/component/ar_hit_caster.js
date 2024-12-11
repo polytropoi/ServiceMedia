@@ -35,10 +35,14 @@ AFRAME.registerComponent('ar_hit_caster', {
         if (!self.el.sceneEl.is('ar-mode')) { return; }
         if (AFRAME.utils.device.checkHeadsetConnected()) {
           if (settings && settings.useXrRoomPhysics) {
-            sceneEl.setAttribute("xr-room-physics");
+
+            sceneEl.setAttribute("webxr", {'requiredFeatures': 'plane-detection,local-floor'});
+            sceneEl.setAttribute("webxr", {'sortObjects': true});
+            sceneEl.setAttribute("xr-room-physics", {"debug": true});
+
           }
           if (settings && settings.useRealWorldMeshing) {
-            sceneEl.setAttribute("xr-room-physics");
+            sceneEl.setAttribute("real-world-meshing");
           } 
         }
         session = self.el.sceneEl.renderer.xr.getSession();
@@ -58,6 +62,7 @@ AFRAME.registerComponent('ar_hit_caster', {
         session.addEventListener('select', function () {
 
           var position = el.getAttribute('position');
+          var rotation = el.getAttribute('rotation');
           const zeroPos = new THREE.Vector3(0, 0, 0); //hrm, use camera or player? viewportHolder?
           var distance = position.distanceTo(zeroPos);
 
@@ -76,7 +81,7 @@ AFRAME.registerComponent('ar_hit_caster', {
             if (spawnableEls) {
               const index = getRandomInt(spawnableEls.length);
               const spawnableEl = spawnableEls[index];
-              self.spawnElement(position, scaleMod, spawnableEl);
+              self.spawnElement(position, rotation, scaleMod, spawnableEl);
               // var sceneEl = document.querySelector('a-scene');
               // let localMarker = spawnableEl.components.local_marker;
               // if (localMarker) {
@@ -274,7 +279,7 @@ AFRAME.registerComponent('ar_hit_caster', {
         self.el.object3D.visible = false;
       });
     },
-    spawnElement: function (position, scaleMod, spawnableEl) {
+    spawnElement: function (position, rotation, scaleMod, spawnableEl) {
       let timestamp = Date.now();
       var sceneEl = document.querySelector('a-scene');
       var targetEl = this.data.targetEl;
@@ -331,7 +336,7 @@ AFRAME.registerComponent('ar_hit_caster', {
           spawnedEl.classList.add("activeObjexRay");
           sceneEl.appendChild(spawnedEl);
           spawnedEl.setAttribute('position', position); //?
-
+          spawnedEl.setAttribute('rotation', rotation);
           // spawnedEl.setAttribute("cloud_marker", { 'timestamp': "_" + timestamp,
           //                                         'name': data.name, 
           //                                         'modelID': data.modelID, 
@@ -371,7 +376,7 @@ AFRAME.registerComponent('ar_hit_caster', {
             spawnedEl.classList.add("activeObjexRay");
             sceneEl.appendChild(spawnedEl);
             spawnedEl.setAttribute('position', position); //?
-
+            spawnedEl.setAttribute('rotation', rotation);
             spawnedEl.setAttribute("anchored", {"persistent": true});
             // spawnedEl.setAttribute("mod_model", { 'timestamp': "_" + timestamp,
             //                                       'name': data.name, 
@@ -517,8 +522,11 @@ AFRAME.registerComponent('ar_hit_caster', {
             inputMat.fromArray(pose.transform.matrix);
   
             position = new THREE.Vector3();
+            rotation = new THREE.Quaternion();
             position.setFromMatrixPosition(inputMat);
+            rotation.setRotationFromMatrix(inputMat);
             this.el.setAttribute('position', position);
+            this.el.setAttribute('rotation', rotation);
           }
         }
       } else {

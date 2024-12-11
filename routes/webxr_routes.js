@@ -4502,7 +4502,8 @@ webxr_router.get('/:_id', function (req, res) {
                     // }    
                     //scenetype filters below...
 
-                    console.log("sceneWebType: "+ sceneResponse.sceneWebType);
+                    console.log("sceneWebType: "+ sceneResponse.sceneWebType); 
+                    ////////DEFAULT/AFRAME Scene type:
                     if (sceneResponse.sceneWebType == undefined || sceneResponse.sceneWebType.toLowerCase() == "default" || sceneResponse.sceneWebType.toLowerCase() == "aframe") { 
                         let xrExtras = "";
                         if (sceneResponse.sceneTags && sceneResponse.sceneTags.includes("xr room physics")) {
