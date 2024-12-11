@@ -1790,10 +1790,10 @@ AFRAME.registerComponent('scatter-surface-default', { //cook one up on the fly i
     let that = this;
     console.log("TRYNA LOAD SCATTER SURFACE");
     
-    // let scale = 100;
-    // if (this.data.arChild) {
-    //   scale = 10;
-    // }
+    let scale = 100;
+    if (this.data.arChild) {
+      scale = 10;
+    }
 
     let surfaceGeometry = new THREE.BoxGeometry( scale, .1, scale ).toNonIndexed();
     // let surfaceGeometry = new THREE.PlaneGeometry( 66, 66 ).toNonIndexed();
