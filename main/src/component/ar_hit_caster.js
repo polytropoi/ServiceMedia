@@ -78,10 +78,13 @@ AFRAME.registerComponent('ar_hit_caster', {
             // let data = {};
 
             let spawnableEls = document.querySelectorAll('.spawnable'); //location with "spawnable" tag
-            if (spawnableEls) {
+            if (spawnableEls.length) {
               const index = getRandomInt(spawnableEls.length);
               const spawnableEl = spawnableEls[index];
-              self.spawnElement(position, rotation, scaleMod, spawnableEl);
+              if (spawnableEl) {
+                self.spawnElement(position, rotation, scaleMod, spawnableEl);
+              }
+             
               // var sceneEl = document.querySelector('a-scene');
               // let localMarker = spawnableEl.components.local_marker;
               // if (localMarker) {
@@ -578,12 +581,46 @@ AFRAME.registerComponent('ar_hit_caster', {
   AFRAME.registerComponent('left_controller_input',{ 
     init: function () {
       this.el.addEventListener('thumbstickmoved', this.logThumbstick);
+      this.el.addEventListener('xbuttondown', this.toggleX);
+      this.arHitCasterEl = document.getElementById("hitCaster");
+      this.hitCasterComponent = arHitCasterEl.components.ar_hit_caster;
+    },
+    toggleX: function () {
+      if (hitCasterComponent) {
+        console.log("x down"); 
+        hitCasterComponent.toggleLockElements();
+      }
     },
     logThumbstick: function (evt) {
-      if (evt.detail.y > 0.95) { console.log("DOWN"); }
-      if (evt.detail.y < -0.95) { console.log("UP"); }
-      if (evt.detail.x < -0.95) { console.log("LEFT"); }
-      if (evt.detail.x > 0.95) { console.log("RIGHT"); }
+      if (evt.detail.y > 0.95) { 
+        console.log("DOWN"); 
+        if (hitCasterComponent) {
+          hitCasterComponent.scaleTargetElements("up");
+        }
+
+      }
+      if (evt.detail.y < -0.95) { 
+        console.log("UP"); 
+        if (hitCasterComponent) {
+          hitCasterComponent.scaleTargetElements("down");
+        }
+
+      }
+      if (evt.detail.x < -0.95) { 
+        console.log("LEFT"); 
+        if (hitCasterComponent) {
+          hitCasterComponent.rotateTargetElements("left");
+        }
+
+      }
+      if (evt.detail.x > 0.95) { 
+        console.log("right"); 
+        if (hitCasterComponent) {
+          hitCasterComponent.rotateTargetElements("right");
+        }
+
+      }
+
     }
   });
 
