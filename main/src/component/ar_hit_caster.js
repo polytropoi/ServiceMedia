@@ -501,10 +501,13 @@ AFRAME.registerComponent('ar_hit_caster', {
     tick: function () {
       var frame;
       var xrViewerPose;
+      var xrHitPose;
       var hitTestResults;
       var pose;
       var inputMat;
       var position;
+      var normal;
+      var distance;
       var direction;
   
       if (this.el.sceneEl.is('ar-mode') && !this.lockTargets) {
@@ -512,22 +515,24 @@ AFRAME.registerComponent('ar_hit_caster', {
         frame = this.el.sceneEl.frame;
         if (!frame) { return; }
         xrViewerPose = frame.getViewerPose(this.refSpace);
-  
+        // getHitPose = frame.getHitPose
         if (this.xrHitTestSource && xrViewerPose) {
           hitTestResults = frame.getHitTestResults(this.xrHitTestSource);
           if (hitTestResults.length > 0) {
             pose = hitTestResults[0].getPose(this.refSpace);
-  
+            
             inputMat = new THREE.Matrix4();
             inputMat.fromArray(pose.transform.matrix);
   
             position = new THREE.Vector3();
-            rotation = new THREE.Quaternion();
+            // rotation = new THREE.Quaternion();
             position.setFromMatrixPosition(inputMat);
             // rotation.setFromMatrixRotation(inputMat);
-            rotation.setFromRotationMatrix(inputMat);
-            this.el.setAttribute('position', position);
-            this.el.setAttribute('rotation', rotation);
+            // rotation.setFromRotationMatrix(inputMat);
+            // this.el.setAttribute('position', position);
+            // this.el.setAttribute('rotation', pose.transform.orientation);
+            this.el.object3D.position.set(position);
+            this.el.object3D.rotation.set(pose.transform.orientation);
           }
         }
       } else {
