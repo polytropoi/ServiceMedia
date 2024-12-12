@@ -583,40 +583,44 @@ AFRAME.registerComponent('ar_hit_caster', {
       this.el.addEventListener('thumbstickmoved', this.logThumbstick);
       this.el.addEventListener('xbuttondown', this.toggleX);
       this.arHitCasterEl = document.getElementById("hitCaster");
-      this.hitCasterComponent = arHitCasterEl.components.ar_hit_caster;
+      this.hitCasterComponent = null;
+      if (this.arHitCasterEl) {
+        this.hitCasterComponent = arHitCasterEl.components.ar_hit_caster;
+      }
+     
     },
     toggleX: function () {
-      if (hitCasterComponent) {
+      if (this.hitCasterComponent) {
         console.log("x down"); 
-        hitCasterComponent.toggleLockElements();
+        this.hitCasterComponent.toggleLockElements();
       }
     },
     logThumbstick: function (evt) {
       if (evt.detail.y > 0.95) { 
         console.log("DOWN"); 
-        if (hitCasterComponent) {
-          hitCasterComponent.scaleTargetElements("up");
+        if (this.hitCasterComponent) {
+          this.hitCasterComponent.scaleTargetElements("up");
         }
 
       }
       if (evt.detail.y < -0.95) { 
         console.log("UP"); 
-        if (hitCasterComponent) {
-          hitCasterComponent.scaleTargetElements("down");
+        if (this.hitCasterComponent) {
+          this.hitCasterComponent.scaleTargetElements("down");
         }
 
       }
       if (evt.detail.x < -0.95) { 
         console.log("LEFT"); 
-        if (hitCasterComponent) {
-          hitCasterComponent.rotateTargetElements("left");
+        if (this.hitCasterComponent) {
+          this.hitCasterComponent.rotateTargetElements("left");
         }
 
       }
       if (evt.detail.x > 0.95) { 
         console.log("right"); 
-        if (hitCasterComponent) {
-          hitCasterComponent.rotateTargetElements("right");
+        if (this.hitCasterComponent) {
+          this.hitCasterComponent.rotateTargetElements("right");
         }
 
       }
