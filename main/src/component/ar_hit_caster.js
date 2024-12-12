@@ -36,8 +36,8 @@ AFRAME.registerComponent('ar_hit_caster', {
         if (AFRAME.utils.device.checkHeadsetConnected()) {
           if (settings && settings.useXrRoomPhysics) {
 
-            sceneEl.setAttribute("webxr", {'requiredFeatures': 'plane-detection,local-floor'});
-            sceneEl.setAttribute("webxr", {'sortObjects': true});
+            // sceneEl.setAttribute("webxr", {'requiredFeatures': 'plane-detection,local-floor'});
+            // sceneEl.setAttribute("webxr", {'sortObjects': true});
             sceneEl.setAttribute("xr-room-physics", {"debug": true});
 
           }
