@@ -82,7 +82,11 @@ AFRAME.registerComponent('mod_model', {
         if ((this.data.eventData && this.data.eventData.length && this.data.eventData.toLowerCase().includes("anchored")) || 
         this.data.tags && this.data.tags.length && this.data.tags.toLowerCase().includes("anchored")) {
           this.el.setAttribute("anchored");
-        }      
+        } 
+        if ((this.data.eventData && this.data.eventData.length && this.data.eventData.toLowerCase().includes("grabbable")) || 
+          this.data.tags && this.data.tags.length && this.data.tags.toLowerCase().includes("grabbable")) {
+          this.el.setAttribute("grabbable");
+        }        
         if ((this.data.eventData && this.data.eventData.length && this.data.eventData.toLowerCase().includes("target")) || 
           this.data.tags && this.data.tags.length && this.data.tags.toLowerCase().includes("target")) {
           this.isTarget = true;

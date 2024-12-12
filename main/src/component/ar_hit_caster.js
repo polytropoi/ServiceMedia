@@ -574,7 +574,19 @@ AFRAME.registerComponent('ar_hit_caster', {
       }
     }
   });
-  
+
+  AFRAME.registerComponent('left_controller_input',{ 
+    init: function () {
+      this.el.addEventListener('thumbstickmoved', this.logThumbstick);
+    },
+    logThumbstick: function (evt) {
+      if (evt.detail.y > 0.95) { console.log("DOWN"); }
+      if (evt.detail.y < -0.95) { console.log("UP"); }
+      if (evt.detail.x < -0.95) { console.log("LEFT"); }
+      if (evt.detail.x > 0.95) { console.log("RIGHT"); }
+    }
+  });
+
   AFRAME.registerComponent('show-in-ar-mode', {
     // Set this object invisible while in AR mode.
     init: function () {
