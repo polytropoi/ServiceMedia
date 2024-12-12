@@ -44,6 +44,12 @@ AFRAME.registerComponent('ar_hit_caster', {
           if (settings && settings.useRealWorldMeshing) {
             sceneEl.setAttribute("real-world-meshing");
           } 
+          const leftHandEl = document.getElementById("left-hand");
+          if (leftHandEl) {
+            leftHandEl.removeAttribute("blink-controls");
+            leftHandEl.setAttribute("left_controller_input");
+          }
+        
         }
         session = self.el.sceneEl.renderer.xr.getSession();
         self.messageEl.textContent = "entered AR mode";
