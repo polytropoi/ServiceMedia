@@ -524,7 +524,8 @@ AFRAME.registerComponent('ar_hit_caster', {
             position = new THREE.Vector3();
             rotation = new THREE.Quaternion();
             position.setFromMatrixPosition(inputMat);
-            rotation.setRotationFromMatrix(inputMat);
+            // rotation.setFromMatrixRotation(inputMat);
+            rotation.setFromRotationMatrix(inputMat);
             this.el.setAttribute('position', position);
             this.el.setAttribute('rotation', rotation);
           }
