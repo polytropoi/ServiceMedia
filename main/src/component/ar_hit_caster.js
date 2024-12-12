@@ -532,10 +532,10 @@ AFRAME.registerComponent('ar_hit_caster', {
             position.setFromMatrixPosition(inputMat);
             // rotation.setFromMatrixRotation(inputMat);
             // rotation.setFromRotationMatrix(inputMat);
-            // this.el.setAttribute('position', position);
+            this.el.setAttribute('position', position);
             // this.el.setAttribute('rotation', pose.transform.orientation);
-            this.el.object3D.position.set(position);
-            this.el.object3D.rotation.set(pose.transform.orientation);
+            // this.el.object3D.position.set(position);
+            // this.el.object3D.rotation.set(pose.transform.orientation);
           }
         }
       } else {
