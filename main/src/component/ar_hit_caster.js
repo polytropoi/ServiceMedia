@@ -47,7 +47,7 @@ AFRAME.registerComponent('ar_hit_caster', {
           const leftHandEl = document.getElementById("left-hand");
           if (leftHandEl) {
             leftHandEl.removeAttribute("blink-controls");
-            leftHandEl.setAttribute("left_controller_input");
+            // leftHandEl.setAttribute("left_controller_input");
           }
         
         }
