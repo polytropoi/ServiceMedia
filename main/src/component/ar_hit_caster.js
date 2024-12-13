@@ -595,9 +595,9 @@ AFRAME.registerComponent('ar_hit_caster', {
       }
      
     },
-    toggleX: function () { //lock elements = disable hit test/ar-parent positioning
+    toggleX: function (evt) { //lock elements = disable hit test/ar-parent positioning
       if (this.hitCasterComponent) {
-        console.log("x down"); 
+        console.log("x down " + evt.detail); 
         this.hitCasterComponent.toggleLockElements();
       }
     },
