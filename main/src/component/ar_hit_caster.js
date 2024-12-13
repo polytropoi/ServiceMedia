@@ -30,14 +30,14 @@ AFRAME.registerComponent('ar_hit_caster', {
         // var arTargetData = [];
         // let arTargetGroup = new THREE.Group();
 
-        console.log("enter-vr headset " + AFRAME.utils.device.checkHeadsetConnected());
+        console.log("enter-vr w/ headset " + AFRAME.utils.device.checkHeadsetConnected() + " ismobile " + AFRAME.utils.device.isMobile());
         // messageEl.textContent = "entered immersive mode";
         if (!self.el.sceneEl.is('ar-mode')) { return; }
 
-        if (AFRAME.utils.device.checkHeadsetConnected()) {
+        if (AFRAME.utils.device.checkHeadsetConnected() && !AFRAME.utils.device.isMobile()) {
           if (settings && settings.useXrRoomPhysics) {
             // sceneEl.setAttribute("xr-room-physics", {"debug": true});
-            sceneEl.setAttribute("xr-room-physics", {"debug": true});
+            sceneEl.setAttribute("xr-room-physics");
           }
           if (settings && settings.useRealWorldMeshing) {
             sceneEl.setAttribute("real-world-meshing");
