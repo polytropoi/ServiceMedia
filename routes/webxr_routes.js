@@ -1726,23 +1726,19 @@ webxr_router.get('/:_id', function (req, res) {
                                                 ammoHands = " ammo-body=\x22type: kinematic; emitCollisionEvents: true;\x22 ammo-shape=\x22type: sphere\x22 ";
                                                 hapticsHands = "haptics"
                                             }
-                                            handEntities = "<a-entity id=\x22left-hand\x22 hand-tracking-grab-controls=\x22hand: left\x22 hand-tracking-controls=\x22hand: left\x22 "+blinkMod+" oculus-touch-controls=\x22hand: left;\x22 left_controller_input>"+
+                                            handEntities = "<a-entity id=\x22left-hand\x22 "+blinkMod+" oculus-touch-controls=\x22hand: left;\x22 left_controller_input hand-controls=\x22hand: left; handModelStyle: lowPoly; color: #ffcccc\x22>"+
                                             // console + 
+                                            // hand-tracking-grab-controls=\x22hand: left\x22 hand-tracking-controls=\x22hand: left\x22
+                                            // hand-tracking-grab-controls=\x22hand: right;\x22
                                             // "<a-sphere color=\x22blue\x22 opacity=\x220.1\x22 radius=\x220.06\x22 "+ammoHands+" collision-listener-right></a-sphere></a-entity>" +
                                             "<a-sphere color=\x22blue\x22 opacity=\x220.1\x22 radius=\x220.06\x22 "+ammoHands+"></a-sphere></a-entity>" +
                                             // "<a-entity id=\x22right-hand\x22 hand-tracking-grab-controls=\x22hand: right\x22 oculus-touch-controls=\x22hand: right\x22 laser-controls=\x22hand: right;\x22 handModelStyle: lowPoly; color: #ffcccc\x22 raycaster=\x22objects: .activeObjexRay;\x22 grab "+hapticsHands+">"+
-                                            "<a-entity id=\x22right-hand\x22 oculus-touch-controls=\x22hand: right\x22 laser-controls=\x22hand: right;\x22 raycaster=\x22objects: .activeObjexRay;\x22 hand-tracking-controls=\x22hand: right\x22 hand-tracking-grab-controls=\x22hand: right;\x22 >"+
+                                            "<a-entity id=\x22right-hand\x22 laser-controls=\x22hand: right;\x22 raycaster=\x22objects: .activeObjexRay;\x22 oculus-touch-controls=\x22hand: right\x22 hand-controls=\x22hand: right;  handModelStyle: lowPoly; color: #ffcccc\x22  >"+
 
                                             "<a-sphere color=\x22orange\x22 opacity=\x220.1\x22 radius=\x220.06\x22 "+ammoHands+"></a-sphere>"+
                                             "</a-entity>";
                                     
-                                        // <a-entity id="right-hand" position="0.15 1.4 -0.4" oculus-touch-controls="hand: right;model:false" vive-controls="hand: right;model:false" vive-focus-controls="hand: right;model:false" windows-motion-controls="hand: right;model:false" haptics>
-                                        // <a-sphere color="blue" radius="0.06" ammo-body="type: kinematic; emitCollisionEvents: true;" ammo-shape="type: sphere" collision-listener-right></a-sphere>
-                                        // </a-entity>
-                                        
-                                        // <a-entity id="left-hand" position="-0.15 1.4 -0.4" oculus-touch-controls="hand: left;model:false" vive-controls="hand: left;model:false" vive-focus-controls="hand: left;model:false" windows-motion-controls="hand: left;model:false" haptics>
-                                        // <a-sphere color="orange" radius="0.06" ammo-body="type: kinematic; emitCollisionEvents: true;" ammo-shape="type: sphere" collision-listener-left></a-sphere>
-                                        // </a-entity>
+
                                     }
                                     
                                     //////////////////////////////////// FP cameraRig
