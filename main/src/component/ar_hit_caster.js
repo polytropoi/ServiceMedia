@@ -590,7 +590,7 @@ AFRAME.registerComponent('ar_hit_caster', {
       // var el = this.el;
       this.el.addEventListener('xbuttondown', (evt) => {
         console.log("x down " + evt.detail); 
-         this.el.toggleX();
+         this.toggleX();
       });
       this.arHitCasterEl = document.getElementById("hitCaster");
       this.hitCasterComponent = null;
