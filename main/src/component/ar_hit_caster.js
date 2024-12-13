@@ -587,10 +587,10 @@ AFRAME.registerComponent('ar_hit_caster', {
   AFRAME.registerComponent('left_controller_input',{ 
     init: function () {
       this.el.addEventListener('thumbstickmoved', this.logThumbstick);
-      var el = this.el;
-      el.addEventListener('xbuttondown', function (evt) {
+      // var el = this.el;
+      this.el.addEventListener('xbuttondown', (evt) => {
         console.log("x down " + evt.detail); 
-         el.toggleX();
+         this.el.toggleX();
       });
       this.arHitCasterEl = document.getElementById("hitCaster");
       this.hitCasterComponent = null;
@@ -601,7 +601,7 @@ AFRAME.registerComponent('ar_hit_caster', {
     },
     toggleX: function () { //lock elements = disable hit test/ar-parent positioning
       if (this.hitCasterComponent) {
-        
+        console.log("x down..");
         this.hitCasterComponent.toggleLockElements();
       }
     },
