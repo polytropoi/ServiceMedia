@@ -30,16 +30,14 @@ AFRAME.registerComponent('ar_hit_caster', {
         // var arTargetData = [];
         // let arTargetGroup = new THREE.Group();
 
-        console.log("enter-vr");
+        console.log("enter-vr headset " + AFRAME.utils.device.checkHeadsetConnected());
         // messageEl.textContent = "entered immersive mode";
         if (!self.el.sceneEl.is('ar-mode')) { return; }
+
         if (AFRAME.utils.device.checkHeadsetConnected()) {
           if (settings && settings.useXrRoomPhysics) {
-
-            // sceneEl.setAttribute("webxr", {'requiredFeatures': 'plane-detection,local-floor'});
-            // sceneEl.setAttribute("webxr", {'sortObjects': true});
+            // sceneEl.setAttribute("xr-room-physics", {"debug": true});
             sceneEl.setAttribute("xr-room-physics", {"debug": true});
-
           }
           if (settings && settings.useRealWorldMeshing) {
             sceneEl.setAttribute("real-world-meshing");
@@ -49,7 +47,6 @@ AFRAME.registerComponent('ar_hit_caster', {
             leftHandEl.removeAttribute("blink-controls");
             // leftHandEl.setAttribute("left_controller_input");
           }
-        
         }
         session = self.el.sceneEl.renderer.xr.getSession();
         self.messageEl.textContent = "entered AR mode";
@@ -583,6 +580,7 @@ AFRAME.registerComponent('ar_hit_caster', {
       }
     }
   });
+
 
   AFRAME.registerComponent('left_controller_input',{ 
     init: function () {
