@@ -464,30 +464,29 @@ AFRAME.registerComponent('ar_hit_caster', {
   AFRAME.registerComponent('left_controller_input',{ 
     init: function () {
       
-      this.el.setAttribute("x_button");
       this.el.addEventListener('thumbstickmoved', this.logThumbstick);
-      // var el = this.el;
+     
+    },
 
+    logThumbstick: function (evt) {
       this.arHitCasterEl = document.getElementById("hitCaster");
       this.hitCasterComponent = null;
       if (this.arHitCasterEl) {
         this.hitCasterComponent = this.arHitCasterEl.components.ar_hit_caster;
       }
-     
-    },
 
-    logThumbstick: function (evt) {
       if (evt.detail.y > 0.95) { 
-        console.log("DOWN"); 
+       
         if (this.hitCasterComponent) {
-          this.hitCasterComponent.scaleTargetElements("up");
+          console.log("DOWN"); 
+          this.hitCasterComponent.scaleTargetElements("down");
         }
 
       }
       if (evt.detail.y < -0.95) { 
         console.log("UP"); 
         if (this.hitCasterComponent) {
-          this.hitCasterComponent.scaleTargetElements("down");
+          this.hitCasterComponent.scaleTargetElements("up");
         }
 
       }
