@@ -36,8 +36,8 @@ AFRAME.registerComponent('ar_hit_caster', {
 
         if (AFRAME.utils.device.checkHeadsetConnected() && !AFRAME.utils.device.isMobile()) {
           if (settings && settings.useXrRoomPhysics) {
-            // sceneEl.setAttribute("xr-room-physics", {"debug": true});
-            sceneEl.setAttribute("xr-room-physics");
+            // sceneEl.setAttribute("xr_room_physics", {"debug": true});
+            sceneEl.setAttribute("xr_room_physics");
           }
           if (settings && settings.useRealWorldMeshing) {
             sceneEl.setAttribute("real-world-meshing");
@@ -318,7 +318,10 @@ AFRAME.registerComponent('ar_hit_caster', {
         } else {
           if (targetScale.x > .1) {
             targetEl.setAttribute("scale", {"x": targetScale.x - .05, "y": targetScale.x - .05, "z": targetScale.x - .05})
-          }
+          } else {
+            if (targetScale.x > .0001) {
+            targetEl.setAttribute("scale", {"x": targetScale.x - .005, "y": targetScale.x - .005, "z": targetScale.x - .005})
+          } 
         }
       }
     },
@@ -440,32 +443,49 @@ AFRAME.registerComponent('ar_hit_caster', {
     }
   });
 
-  AFRAME.registerComponent('x_button',{ 
+  AFRAME.registerComponent('left_controller_buttons', {
     init: function () {
       this.el.addEventListener('xbuttondown', (evt) => {
         console.log("x down " + evt.detail); 
          this.toggleX();
+      });
+      this.el.addEventListener('ybuttondown', (evt) => {
+        console.log("y down " + evt.detail); 
+
+         this.toggleY();
       });
       this.arHitCasterEl = document.getElementById("hitCaster");
       this.hitCasterComponent = null;
       if (this.arHitCasterEl) {
         this.hitCasterComponent = this.arHitCasterEl.components.ar_hit_caster;
       }
+      let sceneEl = this.el.sceneEl;
+      this.xrRoomPhysicsComponent = sceneEl.components.xr_room_physics;
+      this.debug = false;
     },
     toggleX: function () { //lock elements = disable hit test/ar-parent positioning
       if (this.hitCasterComponent) {
         console.log("x down..");
         this.hitCasterComponent.toggleLockElements();
       }
+    },
+    toggleY: function () { //toggle debug if xr-room
+      if (this.hitCasterComponent) {
+        console.log("y down..");
+        this.debug = !this.debug;
+        if (this.xrRoomPhysicsComponent) {
+          this.el.sceneEl.setAttribute('xr_room_physics', { debug: this.debug })
+        }
+      }
     }
+    
+    // }
   });
 
   
-  AFRAME.registerComponent('left_controller_input',{ 
+  AFRAME.registerComponent('left_controller_thumb',{ 
     init: function () {
-      
       this.el.addEventListener('thumbstickmoved', this.logThumbstick);
-     
     },
 
     logThumbstick: function (evt) {
@@ -474,14 +494,11 @@ AFRAME.registerComponent('ar_hit_caster', {
       if (this.arHitCasterEl) {
         this.hitCasterComponent = this.arHitCasterEl.components.ar_hit_caster;
       }
-
       if (evt.detail.y > 0.95) { 
-       
         if (this.hitCasterComponent) {
           console.log("DOWN"); 
           this.hitCasterComponent.scaleTargetElements("down");
         }
-
       }
       if (evt.detail.y < -0.95) { 
         console.log("UP"); 
@@ -502,9 +519,7 @@ AFRAME.registerComponent('ar_hit_caster', {
         if (this.hitCasterComponent) {
           this.hitCasterComponent.rotateTargetElements("right");
         }
-
       }
-
     }
   });
 

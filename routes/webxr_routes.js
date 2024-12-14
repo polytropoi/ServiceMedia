@@ -1726,7 +1726,7 @@ webxr_router.get('/:_id', function (req, res) {
                                                 ammoHands = " ammo-body=\x22type: kinematic; emitCollisionEvents: true;\x22 ammo-shape=\x22type: sphere\x22 ";
                                                 hapticsHands = "haptics"
                                             }
-                                            handEntities = "<a-entity id=\x22left-hand\x22 "+blinkMod+" oculus-touch-controls=\x22hand: left;\x22 left_controller_input x_button >"+
+                                            handEntities = "<a-entity id=\x22left-hand\x22 "+blinkMod+" oculus-touch-controls=\x22hand: left;\x22 left_controller_thumb left_controller_buttons>"+
                                             // console + 
                                             // hand-tracking-grab-controls=\x22hand: left\x22 hand-tracking-controls=\x22hand: left\x22
                                             // hand-tracking-grab-controls=\x22hand: right;\x22
