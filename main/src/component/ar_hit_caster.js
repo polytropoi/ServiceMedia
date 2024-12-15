@@ -319,9 +319,10 @@ AFRAME.registerComponent('ar_hit_caster', {
           if (targetScale.x > .1) {
             targetEl.setAttribute("scale", {"x": targetScale.x - .05, "y": targetScale.x - .05, "z": targetScale.x - .05})
           } else {
-            if (targetScale.x > .0001) {
-            targetEl.setAttribute("scale", {"x": targetScale.x - .005, "y": targetScale.x - .005, "z": targetScale.x - .005})
-          } 
+            if (targetScale.x > .0011) {
+              targetEl.setAttribute("scale", {"x": targetScale.x - .001, "y": targetScale.x - .001, "z": targetScale.x - .001})
+            } 
+          }
         }
       }
     },
