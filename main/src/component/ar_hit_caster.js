@@ -34,20 +34,7 @@ AFRAME.registerComponent('ar_hit_caster', {
         // messageEl.textContent = "entered immersive mode";
         if (!self.el.sceneEl.is('ar-mode')) { return; }
 
-        if (AFRAME.utils.device.checkHeadsetConnected() && !AFRAME.utils.device.isMobile()) {
-          if (settings && settings.useXrRoomPhysics) {
-            // sceneEl.setAttribute("xr_room_physics", {"debug": true});
-            sceneEl.setAttribute("xr_room_physics");
-          }
-          if (settings && settings.useRealWorldMeshing) {
-            sceneEl.setAttribute("real-world-meshing");
-          } 
-          const leftHandEl = document.getElementById("left-hand");
-          if (leftHandEl) {
-            leftHandEl.removeAttribute("blink-controls");
-            // leftHandEl.setAttribute("left_controller_input");
-          }
-        }
+
         session = self.el.sceneEl.renderer.xr.getSession();
         self.messageEl.textContent = "entered AR mode";
         console.log("ar-mode");
@@ -61,7 +48,21 @@ AFRAME.registerComponent('ar_hit_caster', {
         self.el.object3D.visible = true;
         self.messageEl.textContent = "scanning for surface....";
         // this.camera = session.renderer.xr.getCamera().cameras[0];
-        
+        if (AFRAME.utils.device.checkHeadsetConnected() && !AFRAME.utils.device.isMobile()) {
+          if (settings && settings.useXrRoomPhysics) {
+            // sceneEl.setAttribute("xr_room_physics", {"debug": true});
+            console.log("tryna set xr_room_physics");
+            sceneEl.setAttribute("xr_room_physics", {"debug": true});
+            
+          } else if (settings && settings.useRealWorldMeshing) {
+            sceneEl.setAttribute("real-world-meshing");
+          } 
+          const leftHandEl = document.getElementById("left-hand");
+          if (leftHandEl) {
+            leftHandEl.removeAttribute("blink-controls");
+            // leftHandEl.setAttribute("left_controller_input");
+          }
+        }
         session.addEventListener('select', function () {
 
           var position = el.getAttribute('position');
