@@ -64,27 +64,37 @@ AFRAME.registerComponent('ar_hit_caster', {
         if (arOverlay) {
           arOverlay.style.visibility = 'visible';
         }
-        
+        const leftHandEl = document.getElementById("left-hand");
+        if (leftHandEl) {
+          leftHandEl.removeAttribute("blink-controls");  //rem blink controls in AR
+
+        }
         self.originalPosition = targetEl.object3D.position.clone();
         self.el.object3D.visible = true;
         self.messageEl.textContent = "scanning for surface....";
         // this.camera = session.renderer.xr.getCamera().cameras[0];
       // if (AFRAME.utils.device.checkHeadsetConnected() && !AFRAME.utils.device.isMobile() && !isMobile() && !isTouchDevice()) { //make sure before loading the roomscale fu
-      if (AFRAME.utils.device.checkHeadsetConnected() && !AFRAME.utils.device.isMobile() && !isMobile()) { //isTouchDevice is true on Quest3! 
-          if (settings && settings.useXrRoomPhysics) {
+      if (settings && (settings.useXrRoomPhysics || settings.useRealWorldMeshing)) {
+          if (AFRAME.utils.device.checkHeadsetConnected() && !AFRAME.utils.device.isMobile() && !isMobile()) { //isTouchDevice is true on Quest3! 
             // sceneEl.setAttribute("xr_room_physics", {"debug": true});
-            console.log("tryna set xr_room_physics");
-            sceneEl.setAttribute("xr_room_physics", {"debug": true});
-            
-          } else if (settings && settings.useRealWorldMeshing) {
+            console.log("tryna set xr_room_physics"); //set on server, because...
+          if (settings && settings.useRealWorldMeshing) {
             sceneEl.setAttribute("real-world-meshing");
-          } 
-          const leftHandEl = document.getElementById("left-hand");
-          if (leftHandEl) {
-            leftHandEl.removeAttribute("blink-controls");  //rem blink controls in AR
-            // leftHandEl.setAttribute("left_controller_input");
+          }             
+        } else {
+          if (settings && (settings.useXrRoomPhysics || settings.useRealWorldMeshing)) {
+            self.messageEl.textContent = "Mixed Reality not supported on this device!";
+            console.log("Mixed Reality not supported on this device!");
+            sceneEl.removeAttribute("xr_room_physics");
           }
         }
+      } else { //just in case...
+        console.log("mixed reality not supported...");
+        sceneEl.removeAttribute("xr_room_physics");
+      }
+      
+
+
         session.addEventListener('select', function () {
 
           var position = el.getAttribute('position');
