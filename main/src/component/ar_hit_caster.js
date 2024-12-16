@@ -461,8 +461,6 @@ AFRAME.registerComponent('ar_hit_caster', {
       if (this.arHitCasterEl) {
         this.hitCasterComponent = this.arHitCasterEl.components.ar_hit_caster;
       }
-      let sceneEl = this.el.sceneEl;
-      this.xrRoomPhysicsComponent = sceneEl.components.xr_room_physics;
       this.debug = false;
     },
     toggleX: function () { //lock elements = disable hit test/ar-parent positioning
@@ -472,16 +470,16 @@ AFRAME.registerComponent('ar_hit_caster', {
       }
     },
     toggleY: function () { //toggle debug if xr-room
-      if (this.hitCasterComponent) {
-        console.log("y down..");
+      let sceneEl = this.el.sceneEl;
+      this.xrRoomPhysicsComponent = sceneEl.components.xr_room_physics;
+    // if (this.hitCasterComponent) {
+      console.log("y down..");
+
+      if (this.xrRoomPhysicsComponent) {
         this.debug = !this.debug;
-        if (this.xrRoomPhysicsComponent) {
-          this.el.sceneEl.setAttribute('xr_room_physics', { debug: this.debug })
-        }
+        this.el.sceneEl.setAttribute('xr_room_physics', { debug: this.debug })
       }
     }
-    
-    // }
   });
 
   
