@@ -69,7 +69,8 @@ AFRAME.registerComponent('ar_hit_caster', {
         self.el.object3D.visible = true;
         self.messageEl.textContent = "scanning for surface....";
         // this.camera = session.renderer.xr.getCamera().cameras[0];
-        if (AFRAME.utils.device.checkHeadsetConnected() && !AFRAME.utils.device.isMobile() && !isMobile() && !isTouchDevice()) { //make sure before loading the roomscale fu
+      // if (AFRAME.utils.device.checkHeadsetConnected() && !AFRAME.utils.device.isMobile() && !isMobile() && !isTouchDevice()) { //make sure before loading the roomscale fu
+      if (AFRAME.utils.device.checkHeadsetConnected() && !AFRAME.utils.device.isMobile() && !isMobile()) { //isTouchDevice is true on Quest3! 
           if (settings && settings.useXrRoomPhysics) {
             // sceneEl.setAttribute("xr_room_physics", {"debug": true});
             console.log("tryna set xr_room_physics");
