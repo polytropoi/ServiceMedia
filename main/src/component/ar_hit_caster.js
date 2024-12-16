@@ -1,4 +1,22 @@
 /* global AFRAME, THREE */
+
+function isMobile(){
+  if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)){
+        return true
+   }
+   else{
+        return false
+   }
+}
+function isTouchDevice(){
+  if(navigator.maxTouchPoints || 'ontouchstart' in document.documentElement){
+        return true
+   }
+   else{
+        return false
+   }
+}
+
 AFRAME.registerComponent('ar_hit_caster', {
     dependencies: ["raycaster"],
     schema: {
@@ -30,8 +48,11 @@ AFRAME.registerComponent('ar_hit_caster', {
         // var arTargetData = [];
         // let arTargetGroup = new THREE.Group();
 
-        console.log("enter-vr w/ headset " + AFRAME.utils.device.checkHeadsetConnected() + " ismobile " + AFRAME.utils.device.isMobile());
-        // messageEl.textContent = "entered immersive mode";
+        console.log("enter-vr w/ aframe checkHeadsetConnected " + AFRAME.utils.device.checkHeadsetConnected() + 
+        " aframe ismobile " + AFRAME.utils.device.isMobile() +
+        " isTouchDevice " + isTouchDevice() +
+        " userAgent isMobile " + isMobile());
+
         if (!self.el.sceneEl.is('ar-mode')) { return; }
 
 
@@ -48,7 +69,7 @@ AFRAME.registerComponent('ar_hit_caster', {
         self.el.object3D.visible = true;
         self.messageEl.textContent = "scanning for surface....";
         // this.camera = session.renderer.xr.getCamera().cameras[0];
-        if (AFRAME.utils.device.checkHeadsetConnected() && !AFRAME.utils.device.isMobile()) {
+        if (AFRAME.utils.device.checkHeadsetConnected() && !AFRAME.utils.device.isMobile() && !isMobile() && !isTouchDevice()) { //make sure before loading the roomscale fu
           if (settings && settings.useXrRoomPhysics) {
             // sceneEl.setAttribute("xr_room_physics", {"debug": true});
             console.log("tryna set xr_room_physics");
@@ -59,7 +80,7 @@ AFRAME.registerComponent('ar_hit_caster', {
           } 
           const leftHandEl = document.getElementById("left-hand");
           if (leftHandEl) {
-            leftHandEl.removeAttribute("blink-controls");
+            leftHandEl.removeAttribute("blink-controls");  //rem blink controls in AR
             // leftHandEl.setAttribute("left_controller_input");
           }
         }
@@ -320,9 +341,13 @@ AFRAME.registerComponent('ar_hit_caster', {
           if (targetScale.x > .1) {
             targetEl.setAttribute("scale", {"x": targetScale.x - .05, "y": targetScale.x - .05, "z": targetScale.x - .05})
           } else {
-            if (targetScale.x > .0011) {
+            if (targetScale.x > .001) {
               targetEl.setAttribute("scale", {"x": targetScale.x - .001, "y": targetScale.x - .001, "z": targetScale.x - .001})
-            } 
+            } else {
+              if (targetScale.x > .0001) {
+                targetEl.setAttribute("scale", {"x": targetScale.x - .0001, "y": targetScale.x - .0001, "z": targetScale.x - .0001})
+              }
+            }
           }
         }
       }
