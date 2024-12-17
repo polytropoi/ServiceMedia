@@ -78,6 +78,10 @@ AFRAME.registerComponent('ar_hit_caster', {
           if (AFRAME.utils.device.checkHeadsetConnected() && !AFRAME.utils.device.isMobile() && !isMobile()) { //isTouchDevice is true on Quest3! 
             // sceneEl.setAttribute("xr_room_physics", {"debug": true});
             console.log("tryna set xr_room_physics"); //set on server, because...
+            let rightHandEl = document.getElementById("right-hand");
+            if (rightHandEl) {
+              rightHandEl.setAttribute("controller_ball_blaster");
+            }
           if (settings && settings.useRealWorldMeshing) {
             sceneEl.setAttribute("real-world-meshing");
           }             

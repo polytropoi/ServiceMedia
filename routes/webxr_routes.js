@@ -4414,6 +4414,13 @@ webxr_router.get('/:_id', function (req, res) {
                     } else {
                         settings.useXrRoomPhysics = false;
                     }
+                    if (sceneResponse.sceneTags && sceneResponse.sceneTags.includes("right hand blaster")) {
+                        settings.useRightHandBlaster = true;
+                    }
+                    if (sceneResponse.sceneTags && sceneResponse.sceneTags.includes("left hand blaster")) {
+                        settings.useLeftHandBlaster = true;
+                    }
+
                     if (sceneResponse.sceneTags && sceneResponse.sceneTags.includes("real world meshing")) {
                         settings.useRealWorldMeshing = true;
                     } else {
@@ -4505,9 +4512,11 @@ webxr_router.get('/:_id', function (req, res) {
                     ////////DEFAULT/AFRAME Scene type:
                     if (sceneResponse.sceneWebType == undefined || sceneResponse.sceneWebType.toLowerCase() == "default" || sceneResponse.sceneWebType.toLowerCase() == "aframe") { 
                         let xrExtras = "";
+                        // let rightHandExtras = "";
                         if (sceneResponse.sceneTags && sceneResponse.sceneTags.includes("xr room physics")) {
-                            meshUtilsScript = meshUtilsScript + "<script type=\x22module\x22 src=\x22../main/js/xr-room-physics.min.js\x22></script>";
+                            meshUtilsScript = meshUtilsScript + "<script src=\x22../main/src/component/ball_blaster_mod.js\x22></script><script type=\x22module\x22 src=\x22../main/js/xr-room-physics.min.js\x22></script>";
                             xrExtras = "xr_room_physics";
+                            // rightHandExtras = "controller_ball_blaster";
                         } 
                         if (sceneResponse.sceneTags && sceneResponse.sceneTags.includes("real world meshing")) {
                             xrExtras = xrExtras + " real-world-meshing";
