@@ -4530,7 +4530,7 @@ webxr_router.get('/:_id', function (req, res) {
                     console.log("sceneWebType: "+ sceneResponse.sceneWebType); 
                     ////////DEFAULT/AFRAME Scene type:
                     if (sceneResponse.sceneWebType == undefined || sceneResponse.sceneWebType.toLowerCase() == "default" || sceneResponse.sceneWebType.toLowerCase() == "aframe") { 
-                        let xrmode =  "xr-mode-ui=\x22XRMode: xr\x22";
+                        // let xrmode =  "xr-mode-ui=\x22XRMode: xr\x22";
                         let xrExtras = "";
                         // let rightHandExtras = "";
                         if (sceneResponse.sceneTags && sceneResponse.sceneTags.includes("xr room physics")) {
@@ -4538,12 +4538,12 @@ webxr_router.get('/:_id', function (req, res) {
                             xrExtras = "xr_room_physics";
                             webxrFeatures = "webxr=\x22requiredFeatures: plane-detection,local-floor;\x22 " + xrExtras + " "; 
                             // rightHandExtras = "controller_ball_blaster";
-                            xrmode = "xr-mode-ui=\x22XRMode: ar\x22";
+                            // xrmode = "xr-mode-ui=\x22XRMode: ar\x22";
                         } else if (sceneResponse.sceneTags && sceneResponse.sceneTags.includes("real world meshing")) {
                            
                             xrExtras = " real-world-meshing=\x22meshesEnabled: true;\x22";
                             webxrFeatures = "" + xrExtras;
-                            xrmode = "xr-mode-ui=\x22XRMode: ar\x22";
+                            // xrmode = "xr-mode-ui=\x22XRMode: ar\x22";
                         } else {
                             webxrFeatures = "webxr=\x22optionalFeatures: hit-test, dom-overlay; overlayElement: #ar_overlay;\x22 " + xrExtras + " "; 
                             // xrmode = "xr";
