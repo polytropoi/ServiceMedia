@@ -1726,23 +1726,33 @@ webxr_router.get('/:_id', function (req, res) {
                                                 ammoHands = " ammo-body=\x22type: kinematic; emitCollisionEvents: true;\x22 ammo-shape=\x22type: sphere\x22 ";
                                                 hapticsHands = "haptics"
                                             }
-                                            if (sceneResponse.sceneTags != null && (sceneResponse.sceneTags.includes('hand controls') || sceneResponse.sceneTags.includes('hand controls'))) {
-                                                lookcontrols = "look-controls"; // because magicwinders enabled by default
+                                            // if (sceneResponse.sceneTags != null && (sceneResponse.sceneTags.includes('hand controls') || sceneResponse.sceneTags.includes('hand controls'))) {
+                                            //     lookcontrols = "look-controls"; // because magicwinders enabled by default
+                                            //     handEntities = "<a-entity id=\x22left-hand\x22 oculus-touch-controls=\x22hand: left;\x22></a-entity>" +
+                                            //                     "<a-sphere color=\x22blue\x22 opacity=\x220.1\x22 radius=\x220.06\x22 "+ammoHands+"></a-sphere></a-entity>" +
+                                            //                     "<a-entity id=\x22right-hand\x22 hand-controls=\x22hand: right\x22>" +
+                                            //                     "<a-sphere color=\x22orange\x22 opacity=\x220.1\x22 radius=\x220.06\x22 "+ammoHands+"></a-sphere>"+
+                                            //                     "<a-entity id=\x22rightHandEquip\x22 controller_ball_blaster rotation=\x22-80 0 0\x22 position=\x22-0.02 0 -0.01\x22></a-entity>" +
+                                            //                     "</a-entity>";
+                                            // } 
+                                            if (sceneResponse.sceneTags && sceneResponse.sceneTags.includes("xr room physics")) {
                                                 handEntities = "<a-entity id=\x22left-hand\x22 oculus-touch-controls=\x22hand: left;\x22></a-entity>" +
-                                                                "<a-sphere color=\x22blue\x22 opacity=\x220.1\x22 radius=\x220.06\x22 "+ammoHands+"></a-sphere></a-entity>" +
-                                                                "<a-entity id=\x22right-hand\x22 hand-controls=\x22hand: right\x22>" +
-                                                                "<a-sphere color=\x22orange\x22 opacity=\x220.1\x22 radius=\x220.06\x22 "+ammoHands+"></a-sphere>"+
-                                                                "<a-entity id=\x22rightHandEquip\x22 controller_ball_blaster rotation=\x22-80 0 0\x22 position=\x22-0.02 0 -0.01\x22></a-entity>" +
-                                                                "</a-entity>";
+                                                "<a-sphere color=\x22blue\x22 opacity=\x220.1\x22 radius=\x220.06\x22 "+ammoHands+"></a-sphere></a-entity>" +
+                                                "<a-entity id=\x22right-hand\x22 hand-controls=\x22hand: right\x22>" +
+                                                "<a-sphere color=\x22orange\x22 opacity=\x220.1\x22 radius=\x220.06\x22 "+ammoHands+"></a-sphere>"+
+                                                "<a-entity id=\x22rightHandEquip\x22 controller_ball_blaster rotation=\x22-80 0 0\x22 position=\x22-0.02 0 -0.01\x22></a-entity>" +
+                                                "</a-entity>";
+                                            } else if (sceneResponse.sceneTags && sceneResponse.sceneTags.includes("real world meshing")) {
+                                                handEntities = "<a-entity id=\x22left-hand\x22 hand-tracking-grab-controls=\x22hand: left;\x22></a-entity>" +
+                                                "<a-sphere color=\x22blue\x22 opacity=\x220.1\x22 radius=\x220.06\x22 "+ammoHands+"></a-sphere></a-entity>" +
+                                                "<a-entity id=\x22right-hand\x22 hand-tracking-grab-controls=\x22hand: right\x22>" +
+                                                "<a-sphere color=\x22orange\x22 opacity=\x220.1\x22 radius=\x220.06\x22 "+ammoHands+"></a-sphere>"+
+                                                // "<a-entity id=\x22rightHandEquip\x22 controller_ball_blaster rotation=\x22-80 0 0\x22 position=\x22-0.02 0 -0.01\x22></a-entity>" +
+                                                "</a-entity>";
+
                                             } else {
                                                 handEntities = "<a-entity id=\x22left-hand\x22 "+blinkMod+" oculus-touch-controls=\x22hand: left;\x22 left_controller_thumb left_controller_buttons>"+
-                                                // console + 
-                                                // hand-tracking-grab-controls=\x22hand: left\x22 hand-tracking-controls=\x22hand: left\x22
-                                                // hand-tracking-grab-controls=\x22hand: right;\x22
-
-                                                // hand-controls=\x22hand: right;  handModelStyle: lowPoly; color: #ffcccc\x22  
-                                                // hand-controls=\x22hand: left; handModelStyle: lowPoly; color: #ffcccc\x22
-                                                // "<a-sphere color=\x22blue\x22 opacity=\x220.1\x22 radius=\x220.06\x22 "+ammoHands+" collision-listener-right></a-sphere></a-entity>" +
+                                              
                                                 "<a-sphere color=\x22blue\x22 opacity=\x220.1\x22 radius=\x220.06\x22 "+ammoHands+"></a-sphere></a-entity>" +
                                                 // "<a-entity id=\x22right-hand\x22 hand-tracking-grab-controls=\x22hand: right\x22 oculus-touch-controls=\x22hand: right\x22 laser-controls=\x22hand: right;\x22 handModelStyle: lowPoly; color: #ffcccc\x22 raycaster=\x22objects: .activeObjexRay;\x22 grab "+hapticsHands+">"+
                                                 "<a-entity id=\x22right-hand\x22 laser-controls=\x22hand: right;\x22 raycaster=\x22objects: .activeObjexRay;\x22 oculus-touch-controls=\x22hand: right\x22 >"+
@@ -4520,18 +4530,24 @@ webxr_router.get('/:_id', function (req, res) {
                     console.log("sceneWebType: "+ sceneResponse.sceneWebType); 
                     ////////DEFAULT/AFRAME Scene type:
                     if (sceneResponse.sceneWebType == undefined || sceneResponse.sceneWebType.toLowerCase() == "default" || sceneResponse.sceneWebType.toLowerCase() == "aframe") { 
+                        let xrmode =  "xr-mode-ui=\x22XRMode: xr\x22";
                         let xrExtras = "";
                         // let rightHandExtras = "";
                         if (sceneResponse.sceneTags && sceneResponse.sceneTags.includes("xr room physics")) {
                             meshUtilsScript = meshUtilsScript + "<script src=\x22../main/src/component/ball_blaster_mod.js\x22></script><script type=\x22module\x22 src=\x22../main/js/xr-room-physics.min.js\x22></script>";
                             xrExtras = "xr_room_physics";
-                            // webxrFeatures = "webxr=\x22requiredFeatures: hit-test,local-floor; optionalFeatures: dom-overlay,unbounded; overlayElement: #ar_overlay;\x22 " + xrExtras + " "; 
+                            webxrFeatures = "webxr=\x22requiredFeatures: plane-detection,local-floor;\x22 " + xrExtras + " "; 
                             // rightHandExtras = "controller_ball_blaster";
-                        } 
-                        if (sceneResponse.sceneTags && sceneResponse.sceneTags.includes("real world meshing")) {
-                            xrExtras = " real-world-meshing";
+                            xrmode = "xr-mode-ui=\x22XRMode: ar\x22";
+                        } else if (sceneResponse.sceneTags && sceneResponse.sceneTags.includes("real world meshing")) {
+                           
+                            xrExtras = " real-world-meshing=\x22meshesEnabled: true;\x22";
+                            webxrFeatures = "" + xrExtras;
+                            xrmode = "xr-mode-ui=\x22XRMode: ar\x22";
+                        } else {
+                            webxrFeatures = "webxr=\x22optionalFeatures: hit-test, dom-overlay; overlayElement: #ar_overlay;\x22 " + xrExtras + " "; 
+                            // xrmode = "xr";
                         }
-                        webxrFeatures = "webxr=\x22optionalFeatures: hit-test, dom-overlay; overlayElement: #ar_overlay;\x22 " + xrExtras + " "; 
                         // webxrFeatures = " webxr=\x22requiredFeatures: dom-overlay; optionalFeatures: hit-test; overlayElement: #ar_overlay;\x22 ar-hit-test=\x22enabled: true; target: #ar_parent;\x22 "; //otherwise hit-test breaks everythign!
                         // requiredFeatures: hit-test,local-floor; optionalFeatures: dom-overlay,unbounded; overlayElement: #ar_overlay;"
                         // // arHitTest = "ar-hit-test-spawn=\x22mode: "+arMode+"\x22";
