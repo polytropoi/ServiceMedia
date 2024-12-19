@@ -53,7 +53,9 @@ AFRAME.registerComponent('ar_hit_caster', {
         " isTouchDevice " + isTouchDevice() +
         " userAgent isMobile " + isMobile());
 
-        if (!self.el.sceneEl.is('ar-mode')) { return; }
+        if (!self.el.sceneEl.is('ar-mode')) { 
+          return; 
+        }
         // targetEl.setAttribute('visible', false);
 
         session = self.el.sceneEl.renderer.xr.getSession();
@@ -107,9 +109,9 @@ AFRAME.registerComponent('ar_hit_caster', {
           var distance = position.distanceTo(zeroPos);
 
           var scaleMod = .02 + (distance * 0.2);
-          if ((position.x != 0) && (position.y != 0) && (position.z != 0)) {
-            targetEl.setAttribute('visible', true);
-          }
+          // if ((position.x != 0) && (position.y != 0) && (position.z != 0)) {
+          //   targetEl.setAttribute('visible', true);
+          // }
           if (!self.lockTargets) {
             console.log("tryna set position " + JSON.stringify(position) + " distance " + JSON.stringify(distance));
             self.messageEl.textContent = "surface found at position " + JSON.stringify(position);
