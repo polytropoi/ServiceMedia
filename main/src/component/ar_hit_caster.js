@@ -54,7 +54,7 @@ AFRAME.registerComponent('ar_hit_caster', {
         " userAgent isMobile " + isMobile());
 
         if (!self.el.sceneEl.is('ar-mode')) { return; }
-        targetEl.setAttribute('visible', false);
+        // targetEl.setAttribute('visible', false);
 
         session = self.el.sceneEl.renderer.xr.getSession();
         self.messageEl.textContent = "entered AR mode";
@@ -74,7 +74,7 @@ AFRAME.registerComponent('ar_hit_caster', {
         self.messageEl.textContent = "scanning for surface....";
         // this.camera = session.renderer.xr.getCamera().cameras[0];
       // if (AFRAME.utils.device.checkHeadsetConnected() && !AFRAME.utils.device.isMobile() && !isMobile() && !isTouchDevice()) { //make sure before loading the roomscale fu
-      if (settings && (settings.useXrRoomPhysics || settings.useRealWorldMeshing)) {
+        if (settings && (settings.useXrRoomPhysics || settings.useRealWorldMeshing)) {
           if (AFRAME.utils.device.checkHeadsetConnected() && !AFRAME.utils.device.isMobile() && !isMobile()) { //isTouchDevice is true on Quest3! 
             // sceneEl.setAttribute("xr_room_physics", {"debug": true});
             console.log("tryna set xr_room_physics"); //set on server, because...
