@@ -491,11 +491,12 @@ AFRAME.registerComponent('ar_hit_caster', {
 
   AFRAME.registerComponent('left_controller_buttons', {
     init: function () {
-      this.el.addEventListener('xbuttondown', (evt) => {
+      var el = this.el;
+      el.addEventListener('xbuttondown', (evt) => {
         console.log("x down " + evt.detail); 
          this.toggleX();
       });
-      this.el.addEventListener('ybuttondown', (evt) => {
+      el.addEventListener('ybuttondown', (evt) => {
         console.log("y down " + evt.detail); 
 
          this.toggleY();
@@ -588,6 +589,31 @@ AFRAME.registerComponent('ar_hit_caster', {
       });
     }
   });
+
+
+  /* global AFRAME */
+  AFRAME.registerComponent('anchor-grabbed-entity', {
+    init: function () {
+      this.el.addEventListener('grabstarted', this.deleteAnchor.bind(this));
+      this.el.addEventListener('grabended', this.updateAnchor.bind(this));
+    },
+
+    updateAnchor: function (evt) {
+      var grabbedEl = evt.detail.grabbedEl;
+      var anchoredComponent = grabbedEl.components.anchored;
+      if (anchoredComponent) {
+        anchoredComponent.createAnchor(grabbedEl.object3D.position, grabbedEl.object3D.quaternion);
+      }
+    },
+
+    deleteAnchor: function (evt) {
+      var grabbedEl = evt.detail.grabbedEl;
+      var anchoredComponent = grabbedEl.components.anchored;
+      if (anchoredComponent) {
+        anchoredComponent.deleteAnchor();
+      }
+    }
+  }); 
 
 function getRandomInt(max) {
   return Math.floor(Math.random() * max);
