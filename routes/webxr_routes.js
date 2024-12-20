@@ -572,6 +572,8 @@ webxr_router.get('/:_id', function (req, res) {
     let sceneUnityWebDomain = "http://smxr.net";
     let activityPubScripts = "";
 
+    let xrmode =  "xr-mode-ui=\x22XRMode: xr\x22";
+
 
     
     db.scenes.findOne({"short_id": reqstring}, function (err, sceneData) { 
@@ -4538,12 +4540,12 @@ webxr_router.get('/:_id', function (req, res) {
                             xrExtras = "xr_room_physics";
                             webxrFeatures = "webxr=\x22requiredFeatures: plane-detection,local-floor; optionalFeatures: hit-test; overlayElement: #ar_overlay;\x22 " + xrExtras + " "; 
                             // rightHandExtras = "controller_ball_blaster";
-                            // xrmode = "xr-mode-ui=\x22XRMode: ar\x22";
+                            xrmode = "xr-mode-ui=\x22XRMode: ar\x22";
                         } else if (sceneResponse.sceneTags && sceneResponse.sceneTags.includes("real world meshing")) {
                            
                             xrExtras = " real-world-meshing=\x22meshesEnabled: true;\x22";
                             webxrFeatures = "webxr " + xrExtras;
-                            
+                            xrmode = "xr-mode-ui=\x22XRMode: ar\x22";
                             // xrmode = "xr-mode-ui=\x22XRMode: ar\x22";
                         } else {
                             webxrFeatures = "webxr=\x22optionalFeatures: hit-test, dom-overlay; overlayElement: #ar_overlay;\x22 " + xrExtras + " "; 
@@ -5053,7 +5055,7 @@ webxr_router.get('/:_id', function (req, res) {
                             joystickContainer = "";
                             joystickScript = "";
                         }
-                        let xrmode =  "xr-mode-ui=\x22XRMode: xr\x22";
+
                         if (sceneResponse.sceneTags != null && (sceneResponse.sceneTags.includes('vrmode') || sceneResponse.sceneTags.includes('vr mode'))) {
                             xrmode =  "xr-mode-ui=\x22XRMode: vr\x22";
                         } 
