@@ -4538,14 +4538,14 @@ webxr_router.get('/:_id', function (req, res) {
                         if (sceneResponse.sceneTags && sceneResponse.sceneTags.includes("xr room physics")) {
                             meshUtilsScript = meshUtilsScript + "<script src=\x22../main/src/component/ball_blaster_mod.js\x22></script><script type=\x22module\x22 src=\x22../main/js/xr-room-physics.min.js\x22></script>";
                             xrExtras = "xr_room_physics";
-                            webxrFeatures = "webxr=\x22requiredFeatures: plane-detection,local-floor; optionalFeatures: hit-test; overlayElement: #ar_overlay;\x22 " + xrExtras + " "; 
+                            webxrFeatures = "webxr=\x22requiredFeatures: plane-detection,mesh-detection,local-floor; optionalFeatures: hit-test;\x22 " + xrExtras + " "; 
                             // rightHandExtras = "controller_ball_blaster";
                             xrmode = "xr-mode-ui=\x22XRMode: ar\x22";
                         } else if (sceneResponse.sceneTags && sceneResponse.sceneTags.includes("real world meshing")) {
                            
-                            xrExtras = " real-world-meshing=\x22meshesEnabled: true; planesEnabled: true;\x22";
-                            webxrFeatures = "webxr " + xrExtras;
-                            xrmode = "xr-mode-ui=\x22XRMode: xr\x22";
+                            xrExtras = " real-world-meshing=\x22meshesEnabled: true;\x22";
+                            webxrFeatures = " " + xrExtras;
+                            // xrmode = "xr-mode-ui=\x22XRMode: xr\x22";
                             // xrmode = "xr-mode-ui=\x22XRMode: ar\x22";
                         } else {
                             webxrFeatures = "webxr=\x22optionalFeatures: hit-test, dom-overlay; overlayElement: #ar_overlay;\x22 " + xrExtras + " "; 

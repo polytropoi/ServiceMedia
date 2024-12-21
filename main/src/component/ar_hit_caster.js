@@ -84,20 +84,22 @@ AFRAME.registerComponent('ar_hit_caster', {
             // if (rightHandEl) {
             //   rightHandEl.setAttribute("controller_ball_blaster");
             // }
-          if (settings && settings.useRealWorldMeshing) {
-            sceneEl.setAttribute("real-world-meshing");
-          }             
-        } else {
-          if (settings && (settings.useXrRoomPhysics || settings.useRealWorldMeshing)) {
-            self.messageEl.textContent = "Mixed Reality not supported on this device!";
-            console.log("Mixed Reality not supported on this device!");
-            sceneEl.removeAttribute("xr_room_physics");
+          // if (settings && settings.useRealWorldMeshing) {
+          //   sceneEl.setAttribute("real-world-meshing");
+          // }             
+          } else {
+            if (settings && (settings.useXrRoomPhysics || settings.useRealWorldMeshing)) {
+              self.messageEl.textContent = "Mixed Reality not supported on this device!";
+              console.log("Mixed Reality not supported on this device!");
+              sceneEl.removeAttribute("xr_room_physics");
+              sceneEl.removeAttribute("real-world-meshing");
+            }
           }
+        } else { //just in case...
+          console.log("mixed reality not supported...");
+          // sceneEl.removeAttribute("xr_room_physics");
+          // sceneEl.removeAttribute("real-world-meshing");
         }
-      } else { //just in case...
-        console.log("mixed reality not supported...");
-        sceneEl.removeAttribute("xr_room_physics");
-      }
       
 
 
