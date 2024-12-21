@@ -671,7 +671,7 @@ AFRAME.registerComponent('pinch_fu', {
       evt.target.setAttribute('animation', {
         property: 'scale',
         from: {x: 0, y: 0, z: 0},
-        to: {x: 0.0015, y: 0.0015, z: 0.0015},
+        to: {x: 0.15, y: 0.15, z: 0.15},
         dur: 200
       });
     };
@@ -697,14 +697,14 @@ AFRAME.registerComponent('pinch_fu', {
     // cupEl.addEventListener('loaded', animateScale);
 
     spawnedEl.setAttribute('geometry',  {'primitive': 'box', 'width': '1', 'height': '1'});
-    spawnedEl.setAttribute('light', {
-      type: 'point',
-      distance: 30,
-      intensity: 2.0
-    });
+    // spawnedEl.setAttribute('light', {
+    //   type: 'point',
+    //   distance: 30,
+    //   intensity: 2.0
+    // });
     spawnedEl.setAttribute('material', 'color', 'crimson');
     spawnedEl.setAttribute('grabbable', '');
-    spawnedEl.setAttribute('scale', '0.0015 0.0015 0.0015');
+    spawnedEl.setAttribute('scale', '0.15 0.15 0.15');
     spawnedEl.setAttribute('position', evt.detail.position);
     spawnedEl.addEventListener('loaded', animateScale);
 
