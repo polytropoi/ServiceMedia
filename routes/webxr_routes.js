@@ -1745,9 +1745,9 @@ webxr_router.get('/:_id', function (req, res) {
                                                 "<a-entity id=\x22rightHandEquip\x22 controller_ball_blaster rotation=\x22-80 0 0\x22 position=\x22-0.02 0 -0.01\x22></a-entity>" +
                                                 "</a-entity>";
                                             } else if (sceneResponse.sceneTags && sceneResponse.sceneTags.includes("real world meshing") || sceneResponse.sceneTags.includes("hand tracking")) {
-                                                handEntities = "<a-entity id=\x22left-hand\x22 hand-tracking-grab-controls=\x22hand: left; hoverEnabled: true;\x22 anchor-grabbed-entity></a-entity>" +
+                                                handEntities = "<a-entity id=\x22left-hand\x22 hand-tracking-grab-controls=\x22hand: left; hoverEnabled: true;\x22 anchor-grabbed-entity pinch_fu></a-entity>" +
                                                 "<a-sphere color=\x22blue\x22 opacity=\x220.1\x22 radius=\x220.06\x22 "+ammoHands+"></a-sphere></a-entity>" +
-                                                "<a-entity id=\x22right-hand\x22 hand-tracking-grab-controls=\x22hand: right; hoverEnabled: true;\x22 anchor-grabbed-entity>" +
+                                                "<a-entity id=\x22right-hand\x22 hand-tracking-grab-controls=\x22hand: right; hoverEnabled: true;\x22 anchor-grabbed-entity pinch_fu>" +
                                                 "<a-sphere color=\x22orange\x22 opacity=\x220.1\x22 radius=\x220.06\x22 "+ammoHands+"></a-sphere>"+
                                                 // "<a-entity id=\x22rightHandEquip\x22 controller_ball_blaster rotation=\x22-80 0 0\x22 position=\x22-0.02 0 -0.01\x22></a-entity>" +
                                                 "</a-entity>";
@@ -4546,7 +4546,7 @@ webxr_router.get('/:_id', function (req, res) {
                             xrExtras = " real-world-meshing=\x22meshesEnabled: true;\x22";
                             webxrFeatures = " " + xrExtras;
                             // xrmode = "xr-mode-ui=\x22XRMode: xr\x22";
-                            // xrmode = "xr-mode-ui=\x22XRMode: ar\x22";
+                            xrmode = "xr-mode-ui=\x22XRMode: ar\x22";
                         } else {
                             webxrFeatures = "webxr=\x22optionalFeatures: hit-test, dom-overlay; overlayElement: #ar_overlay;\x22 " + xrExtras + " "; 
                             // xrmode = "xr";
