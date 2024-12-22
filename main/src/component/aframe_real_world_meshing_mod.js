@@ -217,7 +217,7 @@ module.exports.Component = register('real_world_meshing_mod', {
     }
     geometry = this.initMeshGeometry(meshEntity.mesh);
     if (this.worldMaterial) {
-      mesh = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({color: Math.random() * 0xFFFFFF, side: THREE.DoubleSide}));
+      mesh = new THREE.Mesh(geometry, this.worldMaterial);
     } else {
       mesh = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({color: Math.random() * 0xFFFFFF, side: THREE.DoubleSide}));
     }
