@@ -4497,8 +4497,8 @@ webxr_router.get('/:_id', function (req, res) {
                             // rightHandExtras = "controller_ball_blaster";
                             xrmode = "xr-mode-ui=\x22XRMode: ar\x22";
                         } else if (sceneResponse.sceneTags && sceneResponse.sceneTags.includes("real world meshing")) {
-                           
-                            xrExtras = " real-world-meshing=\x22meshesEnabled: true;\x22";
+                            meshUtilsScript = meshUtilsScript + "<script src=\x22../main/src/component/aframe_real_world_meshing_mod.js\x22></script>";
+                            xrExtras = " real_world_meshing_mod=\x22meshesEnabled: true;\x22";
                             webxrFeatures = " " + xrExtras;
                             // xrmode = "xr-mode-ui=\x22XRMode: xr\x22";
                             xrmode = "xr-mode-ui=\x22XRMode: ar\x22";

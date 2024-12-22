@@ -3453,9 +3453,6 @@ AFRAME.registerComponent('mod_tunnel', {
       // const cmaterial = new THREE.MeshPhongMaterial( { color: 0x99ffff, wireframe: false } );
       // this.objectToCurve = new THREE.Mesh( cgeometry, cmaterial );
       let picGroupMangler = document.getElementById("pictureGroupsData");
-
-
-
       if (picGroupMangler != null && picGroupMangler != undefined) {
         this.tileablePicData = picGroupMangler.components.picture_groups_control.returnTileableData();
         if (this.tileablePicData && this.tileablePicData.images) {

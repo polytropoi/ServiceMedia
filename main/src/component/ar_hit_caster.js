@@ -111,6 +111,7 @@ AFRAME.registerComponent('ar_hit_caster', {
           var distance = position.distanceTo(zeroPos);
 
           var scaleMod = .02 + (distance * 0.2);
+
           // if ((position.x != 0) && (position.y != 0) && (position.z != 0)) {
           //   targetEl.setAttribute('visible', true);
           // }
@@ -244,7 +245,8 @@ AFRAME.registerComponent('ar_hit_caster', {
           spawnedEl.classList.add("activeObjexRay");
           sceneEl.appendChild(spawnedEl);
           spawnedEl.setAttribute('position', position); //?
-          spawnedEl.setAttribute('rotation', rotation);
+          const randomRot = getRandomInt(180);
+          spawnedEl.setAttribute('rotation', {'x': rotation.x, 'y': rotation.y, 'z': randomRot});
           // spawnedEl.setAttribute("cloud_marker", { 'timestamp': "_" + timestamp,
           //                                         'name': data.name, 
           //                                         'modelID': data.modelID, 
