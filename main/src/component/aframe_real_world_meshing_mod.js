@@ -1,6 +1,6 @@
 /* global XRPlane, XRMesh */
-var register = require('../../core/component').registerComponent;
-var THREE = require('../../lib/three');
+// var register = require('../../core/component').registerComponent;
+// var THREE = require('../../lib/three');
 
 /**
  * Real World Meshing.
@@ -9,7 +9,7 @@ var THREE = require('../../lib/three');
  * It requires a browser with support for the WebXR Mesh and Plane detection modules.
  *
  */
-module.exports.Component = register('real_world_meshing_mod', {
+AFRAME.registerComponent('real_world_meshing_mod', {
   schema: {
     filterLabels: {type: 'array'},
     meshesEnabled: {default: true},
@@ -51,7 +51,7 @@ module.exports.Component = register('real_world_meshing_mod', {
         // Repeat the pattern to prevent the texture being stretched
         this.worldMaterial.map.wrapS = THREE.RepeatWrapping;
         this.worldMaterial.map.wrapT = THREE.RepeatWrapping;
-        this.worldMaterial.map.repeat.set(8, 4);
+        this.worldMaterial.map.repeat.set(4, 4);
 
       }
     } 
