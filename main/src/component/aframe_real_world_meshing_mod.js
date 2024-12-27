@@ -44,9 +44,9 @@ AFRAME.registerComponent('real_world_meshing_mod', {
         this.texture.encoding = THREE.sRGBEncoding;
       
         this.worldMaterial = new THREE.MeshStandardMaterial({
-          // side: THREE.DoubleSide, // Since the camera will be inside the tube we need to reverse the faces
+          side: THREE.DoubleSide,
           map: this.texture, 
-          transparent: true
+          transparent: false
         });
         // Repeat the pattern to prevent the texture being stretched
         this.worldMaterial.map.wrapS = THREE.RepeatWrapping;
@@ -224,10 +224,14 @@ AFRAME.registerComponent('real_world_meshing_mod', {
     // mesh = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({color: Math.random() * 0xFFFFFF, side: THREE.DoubleSide}));
     el.setObject3D('mesh', mesh);
     if (meshEntity.mesh instanceof XRPlane && this.data.planeMixin) {
-      el.setAttribute('mixin', this.data.planeMixin);
+      // el.setAttribute('mixin', this.data.planeMixin);
+      // el.setAttribute('material')
+      el.object3D.material = this.worldMaterial;
     } else {
       if (this.data.meshMixin) {
-        el.setAttribute('mixin', this.data.meshMixin);
+        // el.setAttribute('mixin', this.data.meshMixin);
+        // el.object3D.material = this.worldMaterial;
+        el.object3D.material = this.worldMaterial;
       }
     }
     el.setAttribute('data-world-mesh', meshEntity.mesh.semanticLabel);
