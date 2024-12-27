@@ -693,6 +693,7 @@ AFRAME.registerComponent('pinch_fu', {
     // });
     spawnedEl.setAttribute('material', 'color', 'crimson');
     spawnedEl.setAttribute('grabbable', '');
+    spawnedEl.setAttribute('hand_tracking_pressable', '')
     spawnedEl.setAttribute('scale', '0.15 0.15 0.15');
     spawnedEl.setAttribute('position', evt.detail.position);
     spawnedEl.addEventListener('loaded', animateScale);
@@ -752,3 +753,120 @@ function RotateTargetElements (dir) {
       hitCasterComponent.rotateTargetElements(dir)
   }
 }
+
+/* global AFRAME, THREE */
+AFRAME.registerComponent('pressable', {
+  schema: {
+    pressDistance: { default: 0.06 }
+  },
+
+  init: function () {
+    this.worldPosition = new THREE.Vector3();
+    this.handEls = document.querySelectorAll('[hand-tracking-controls]');
+    this.pressed = false;
+  },
+
+  tick: function () {
+    var handEls = this.handEls;
+    var handEl;
+    var distance;
+    for (var i = 0; i < handEls.length; i++) {
+      handEl = handEls[i];
+      distance = this.calculateFingerDistance(handEl.components['hand-tracking-controls'].indexTipPosition);
+      if (distance < this.data.pressDistance) {
+        if (!this.pressed) { this.el.emit('pressedstarted'); }
+        this.pressed = true;
+        return;
+      }
+    }
+    if (this.pressed) { this.el.emit('pressedended'); }
+    this.pressed = false;
+  },
+
+  calculateFingerDistance: function (fingerPosition) {
+    var el = this.el;
+    var worldPosition = this.worldPosition;
+
+    worldPosition.copy(el.object3D.position);
+    el.object3D.parent.updateMatrixWorld();
+    el.object3D.parent.localToWorld(worldPosition);
+
+    return worldPosition.distanceTo(fingerPosition);
+  }
+});
+
+
+/* global AFRAME */
+AFRAME.registerComponent('hand_tracking_pressable', {
+  schema: {
+    label: {default: 'label'},
+    width: {default: 0.11},
+    toggable: {default: false}
+  },
+  init: function () {
+    var el = this.el;
+    var labelEl = this.labelEl = document.createElement('a-entity');
+
+    this.color = '#3a50c5';
+    el.setAttribute('geometry', {
+      primitive: 'box',
+      width: this.data.width,
+      height: 0.05,
+      depth: 0.04
+    });
+
+    el.setAttribute('material', {color: this.color});
+    el.setAttribute('pressable', '');
+
+    labelEl.setAttribute('position', '0 0 0.02');
+    labelEl.setAttribute('text', {
+      value: this.data.label,
+      color: 'white',
+      align: 'center'
+    });
+
+    labelEl.setAttribute('scale', '0.75 0.75 0.75');
+    this.el.appendChild(labelEl);
+
+    this.bindMethods();
+    this.el.addEventListener('stateadded', this.stateChanged);
+    this.el.addEventListener('stateremoved', this.stateChanged);
+    this.el.addEventListener('pressedstarted', this.onPressedStarted);
+    this.el.addEventListener('pressedended', this.onPressedEnded);
+  },
+
+  bindMethods: function () {
+    this.stateChanged = this.stateChanged.bind(this);
+    this.onPressedStarted = this.onPressedStarted.bind(this);
+    this.onPressedEnded = this.onPressedEnded.bind(this);
+  },
+
+  update: function (oldData) {
+    if (oldData.label !== this.data.label) {
+      this.labelEl.setAttribute('text', 'value', this.data.label);
+    }
+  },
+
+  stateChanged: function () {
+    var color = this.el.is('pressed') ? 'green' : this.color;
+    this.el.setAttribute('material', {color: color});
+  },
+
+  onPressedStarted: function () {
+    var el = this.el;
+    el.setAttribute('material', {color: 'green'});
+    el.emit('click');
+    if (this.data.togabble) {
+      if (el.is('pressed')) {
+        el.removeState('pressed');
+      } else {
+        el.addState('pressed');
+      }
+    }
+  },
+
+  onPressedEnded: function () {
+    if (this.el.is('pressed')) { return; }
+    this.el.setAttribute('material', {color: this.color});
+  }
+});
