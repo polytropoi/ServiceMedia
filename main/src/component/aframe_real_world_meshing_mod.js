@@ -44,14 +44,14 @@ AFRAME.registerComponent('real_world_meshing_mod', {
         this.texture.encoding = THREE.sRGBEncoding;
       
         this.worldMaterial = new THREE.MeshStandardMaterial({
-          side: THREE.DoubleSide, // Since the camera will be inside the tube we need to reverse the faces
+          // side: THREE.DoubleSide, // Since the camera will be inside the tube we need to reverse the faces
           map: this.texture, 
           transparent: true
         });
         // Repeat the pattern to prevent the texture being stretched
         this.worldMaterial.map.wrapS = THREE.RepeatWrapping;
         this.worldMaterial.map.wrapT = THREE.RepeatWrapping;
-        this.worldMaterial.map.repeat.set(4, 4);
+        this.worldMaterial.map.repeat.set(2, 2);
 
       }
     } 

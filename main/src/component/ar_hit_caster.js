@@ -32,7 +32,7 @@ AFRAME.registerComponent('ar_hit_caster', {
       this.refSpace = null;
       this.lockTargets = false;
       this.arRaycasterEnabled = false;
-
+      this.arHitTestEnabled = false;
       this.camera = null;
       this.messageEl = document.getElementById("ar_overlay_message");
       this.el.sceneEl.renderer.xr.addEventListener(function () {
@@ -40,6 +40,8 @@ AFRAME.registerComponent('ar_hit_caster', {
         self.refSpace = null;
         self.xrHitTestSource = null;
       });
+
+
   
       this.el.sceneEl.addEventListener('enter-vr', function (event) {
         var el = self.el;
@@ -78,33 +80,22 @@ AFRAME.registerComponent('ar_hit_caster', {
       // if (AFRAME.utils.device.checkHeadsetConnected() && !AFRAME.utils.device.isMobile() && !isMobile() && !isTouchDevice()) { //make sure before loading the roomscale fu
         if (settings && (settings.useXrRoomPhysics || settings.useRealWorldMeshing)) {
           if (AFRAME.utils.device.checkHeadsetConnected() && !AFRAME.utils.device.isMobile() && !isMobile()) { //isTouchDevice is true on Quest3! 
-            // sceneEl.setAttribute("xr_room_physics", {"debug": true});
-            console.log("tryna set xr_room_physics"); //set on server, because...
-            // let rightHandEl = document.getElementById("right-hand");
-            // if (rightHandEl) {
-            //   rightHandEl.setAttribute("controller_ball_blaster");
-            // }
-          // if (settings && settings.useRealWorldMeshing) {
-          //   sceneEl.setAttribute("real-world-meshing");
-          // }             
+            console.log("tryna do mixed!"); 
           } else {
-            if (settings && (settings.useXrRoomPhysics || settings.useRealWorldMeshing)) {
+            // if (settings && (settings.useXrRoomPhysics || settings.useRealWorldMeshing)) {
               self.messageEl.textContent = "Mixed Reality not supported on this device!";
               console.log("Mixed Reality not supported on this device!");
               sceneEl.removeAttribute("xr_room_physics");
               sceneEl.removeAttribute("real-world-meshing");
-            }
+            // }
           }
         } else { //just in case...
-          console.log("mixed reality not supported...");
-          // sceneEl.removeAttribute("xr_room_physics");
-          // sceneEl.removeAttribute("real-world-meshing");
+          console.log("tryna do hit test!");
+          this.arHitTestEnabled = true;
+         
         }
-      
-
 
         session.addEventListener('select', function () {
-
           var position = el.getAttribute('position');
           var rotation = el.getAttribute('rotation');
           const zeroPos = new THREE.Vector3(0, 0, 0); //hrm, use camera or player? viewportHolder?
@@ -115,24 +106,20 @@ AFRAME.registerComponent('ar_hit_caster', {
           // if ((position.x != 0) && (position.y != 0) && (position.z != 0)) {
           //   targetEl.setAttribute('visible', true);
           // }
-          if (!self.lockTargets) {
+          if (!self.lockTargets && self.arHitTestEnabled) {
             console.log("tryna set position " + JSON.stringify(position) + " distance " + JSON.stringify(distance));
             self.messageEl.textContent = "surface found at position " + JSON.stringify(position);
             targetEl.setAttribute('position', position);
             targetEl.setAttribute('scale', {'x': scaleMod, 'y': scaleMod, 'z': scaleMod});
 
-            // let spawnedEl = null;
-            // let data = {};
-
-            let spawnableEls = document.querySelectorAll('.spawnable'); //location with "spawnable" tag
+            let spawnableEls = document.querySelectorAll('.spawnable'); //location with "spawnable" tag - make into 
             if (spawnableEls.length) {
               const index = getRandomInt(spawnableEls.length);
               const spawnableEl = spawnableEls[index];
               if (spawnableEl) {
                 self.spawnElement(position, rotation, scaleMod, spawnableEl);
               }
-             
-              }
+            }
           } else {
             if (self.el.components.raycaster) { //don't need this one in vr, bc right hand laser?
               console.log("gotsa ar raycaster!");
@@ -383,35 +370,35 @@ AFRAME.registerComponent('ar_hit_caster', {
         if (dir == "right") {
           targetEl.setAttribute("rotation", {"x": targetRot.x, "y": targetRot.y + 10, "z": targetRot.z})
         } else {
-          // if (targetScale.x > .1) {
             targetEl.setAttribute("rotation", {"x": targetRot.x, "y": targetRot.y - 10, "z": targetRot.z})
-          // }
         }
       }
     },
     toggleLockElements: function () {
-      this.lockTargets = !this.lockTargets;
-      var targetEl = this.data.targetEl;
-      const unlockedButtonsEl = document.getElementById("unlockedButtons");
-      if (targetEl) {
-        if (this.lockTargets) {
-          console.log("locked");
-          targetEl.setAttribute("anchored", {"persistent": true});
-          this.el.object3D.visible = false;
-          this.arRaycasterEnabled = true;
-          this.messageEl.textContent = "hit test disabled, raycaster enabled";
-          if (unlockedButtonsEl) {
-            unlockedButtonsEl.style.visibility = 'visible';
-          }
-        } else {
-          console.log("unlocked");
-          targetEl.removeAttribute("anchored");
-          this.el.object3D.visible = true;
-          //enable raycast here?
-          this.arRaycasterEnabled = false;
-          this.messageEl.textContent = "hit test enabled, raycaster disabled";
-          if (unlockedButtonsEl) {
-            unlockedButtonsEl.style.visibility = 'hidden';
+      if (this.arHitTestEnabled) {
+        this.lockTargets = !this.lockTargets;
+        var targetEl = this.data.targetEl;
+        const unlockedButtonsEl = document.getElementById("unlockedButtons");
+        if (targetEl) {
+          if (this.lockTargets) {
+            console.log("locked");
+            targetEl.setAttribute("anchored", {"persistent": true});
+            this.el.object3D.visible = false;
+            this.arRaycasterEnabled = true;
+            this.messageEl.textContent = "hit test disabled, raycaster enabled";
+            if (unlockedButtonsEl) {
+              unlockedButtonsEl.style.visibility = 'visible';
+            }
+          } else {
+            console.log("unlocked");
+            targetEl.removeAttribute("anchored");
+            this.el.object3D.visible = true;
+            //enable raycast here?
+            this.arRaycasterEnabled = false;
+            this.messageEl.textContent = "hit test enabled, raycaster disabled";
+            if (unlockedButtonsEl) {
+              unlockedButtonsEl.style.visibility = 'hidden';
+            }
           }
         }
       }
@@ -428,7 +415,7 @@ AFRAME.registerComponent('ar_hit_caster', {
       var distance;
       var direction;
   
-      if (this.el.sceneEl.is('ar-mode') && !this.lockTargets) {
+      if (this.el.sceneEl.is('ar-mode') && !this.lockTargets && this.arHitTestEnabled) {
         if (!this.viewerSpace) { return; }
         frame = this.el.sceneEl.frame;
         if (!frame) { return; }
