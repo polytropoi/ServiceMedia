@@ -178,7 +178,7 @@ AFRAME.registerComponent('real_world_meshing_mod', {
     var geometry;
     var shape;
     var polygon;
-    el.object3D.material = this.worldMaterial;
+
     if (this.worldMaterial) {
       mesh.material = this.worldMaterial;
     }
