@@ -157,10 +157,12 @@ AFRAME.registerComponent('ar_hit_caster', {
   
         session.requestReferenceSpace('viewer').then(function (space) {
           self.viewerSpace = space;
-          session.requestHitTestSource({space: self.viewerSpace})
+          if (self.arHitTestEnabled) {
+            session.requestHitTestSource({space: self.viewerSpace})
               .then(function (hitTestSource) {
                 self.xrHitTestSource = hitTestSource;
               });
+          }
         });
   
         session.requestReferenceSpace('local-floor').then(function (space) {
