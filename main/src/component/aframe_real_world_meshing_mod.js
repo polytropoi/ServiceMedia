@@ -46,7 +46,7 @@ AFRAME.registerComponent('real_world_meshing_mod', {
         this.worldMaterial = new THREE.MeshStandardMaterial({
           side: THREE.DoubleSide,
           map: this.texture, 
-          transparent: false
+          transparent: true
         });
         // Repeat the pattern to prevent the texture being stretched
         this.worldMaterial.map.wrapS = THREE.RepeatWrapping;
@@ -178,7 +178,10 @@ AFRAME.registerComponent('real_world_meshing_mod', {
     var geometry;
     var shape;
     var polygon;
-
+    el.object3D.material = this.worldMaterial;
+    if (this.worldMaterial) {
+      mesh.material = this.worldMaterial;
+    }
     if (mesh instanceof XRPlane) {
       shape = new THREE.Shape();
       polygon = mesh.polygon;
@@ -226,13 +229,14 @@ AFRAME.registerComponent('real_world_meshing_mod', {
     if (meshEntity.mesh instanceof XRPlane && this.data.planeMixin) {
       // el.setAttribute('mixin', this.data.planeMixin);
       // el.setAttribute('material')
-      el.object3D.material = this.worldMaterial;
+      // el.object3D.material = this.worldMaterial;
+      // meshEntity.mesh.material = new THREE.MeshBasicMaterial({color: Math.random() * 0xFFFFFF, side: THREE.DoubleSide});
     } else {
-      if (this.data.meshMixin) {
+      // if (this.data.meshMixin) {
         // el.setAttribute('mixin', this.data.meshMixin);
         // el.object3D.material = this.worldMaterial;
-        el.object3D.material = this.worldMaterial;
-      }
+        // el.object3D.material = this.worldMaterial;
+      // }
     }
     el.setAttribute('data-world-mesh', meshEntity.mesh.semanticLabel);
   },
@@ -241,5 +245,7 @@ AFRAME.registerComponent('real_world_meshing_mod', {
     var entityMesh = entityEl.getObject3D('mesh');
     entityMesh.geometry.dispose();
     entityMesh.geometry = this.initMeshGeometry(mesh);
+
+
   }
 });
