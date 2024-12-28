@@ -629,6 +629,7 @@ AFRAME.registerComponent('pinch_fu', {
     el.addEventListener('obbcollisionstarted', this.onCollisionStarted);
     el.addEventListener('obbcollisionended', this.onCollisionEnded);
     this.enabled = true;
+    this.spawnedIndex = 0;
   },
 
   delaySpawn: function (evt) {
@@ -654,7 +655,7 @@ AFRAME.registerComponent('pinch_fu', {
   spawn: function (evt) {
     var auxEuler = this.auxEuler;
     var sceneEl = this.el.sceneEl;
-
+    this.spawnedIndex++;
     // var saucerEl = document.createElement('a-entity');
     var spawnedEl = document.createElement('a-entity');
     
@@ -662,7 +663,7 @@ AFRAME.registerComponent('pinch_fu', {
       evt.target.setAttribute('animation', {
         property: 'scale',
         from: {x: 0, y: 0, z: 0},
-        to: {x: 0.15, y: 0.15, z: 0.15},
+        to: {x: 1, y: 1, z: 1},
         dur: 200
       });
     };
@@ -695,7 +696,7 @@ AFRAME.registerComponent('pinch_fu', {
     // });
     spawnedEl.setAttribute('material', 'color', 'crimson');
     spawnedEl.setAttribute('grabbable', '');
-    spawnedEl.setAttribute('hand_tracking_pressable', '')
+    spawnedEl.setAttribute('hand_tracking_pressable', {'label': 'thing ' + spawnedIndex});
     spawnedEl.setAttribute('scale', '0.15 0.15 0.15');
     spawnedEl.setAttribute('position', evt.detail.position);
     spawnedEl.addEventListener('loaded', animateScale);
