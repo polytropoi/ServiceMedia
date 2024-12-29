@@ -4476,7 +4476,7 @@ webxr_router.get('/:_id', function (req, res) {
                     let arElements = "";
                     let handsTemplate = "";
                     // let aframeRenderSettings = "renderer=\x22antialias: true; logarithmicDepthBuffer: true; colorManagement: true; sortObjects: true; physicallyCorrectLights: true; alpha: true; maxCanvasWidth: 1920; maxCanvasHeight: 1920;\x22";
-                    let aframeRenderSettings = "renderer=\x22antialias: auto; exposure: .1; colorManagement: true; physicallyCorrectLights: true; sortTransparentObjects: false; maxCanvasWidth: 1920; maxCanvasHeight: 1920;\x22";
+                    let aframeRenderSettings = "renderer=\x22colorManagement: true; physicallyCorrectLights: true; sortObjects: true; maxCanvasWidth: 1920; maxCanvasHeight: 1920;\x22";
                     // let aframeRenderSettings = "renderer=\x22exposure: 2\x22";
                    
                     // if (arMode == "spawn") {
