@@ -658,7 +658,7 @@ AFRAME.registerComponent('pinch_fu', {
     this.spawnedIndex++;
     // var saucerEl = document.createElement('a-entity');
     var spawnedEl = document.createElement('a-entity');
-    
+    let timestamp = Date.now();
     var animateScale = function (evt) {
       evt.target.setAttribute('animation', {
         property: 'scale',
@@ -697,6 +697,7 @@ AFRAME.registerComponent('pinch_fu', {
     spawnedEl.setAttribute('material', 'color', 'crimson');
     spawnedEl.setAttribute('grabbable', '');
     spawnedEl.setAttribute('hand_tracking_pressable', {'label': 'thing ' + this.spawnedIndex});
+    spawnedEl.id = "spawned_" + timestamp;
     // spawnedEl.setAttribute('scale', '0.15 0.15 0.15');
     spawnedEl.setAttribute('position', evt.detail.position);
     spawnedEl.addEventListener('loaded', animateScale);
@@ -779,6 +780,7 @@ AFRAME.registerComponent('pressable', {
       if (distance < this.data.pressDistance) {
         if (!this.pressed) { this.el.emit('pressedstarted'); }
         this.pressed = true;
+        console.log(this.el.id + " pressable pressed with finger distance " + distance);
         return;
       }
     }
@@ -793,7 +795,7 @@ AFRAME.registerComponent('pressable', {
     worldPosition.copy(el.object3D.position);
     el.object3D.parent.updateMatrixWorld();
     el.object3D.parent.localToWorld(worldPosition);
-
+   
     return worldPosition.distanceTo(fingerPosition);
   }
 });
@@ -804,7 +806,7 @@ AFRAME.registerComponent('hand_tracking_pressable', {
   schema: {
     label: {default: 'label'},
     width: {default: 0.11},
-    toggable: {default: false}
+    toggable: {default: true}
   },
   init: function () {
     var el = this.el;
@@ -859,11 +861,22 @@ AFRAME.registerComponent('hand_tracking_pressable', {
     var el = this.el;
     el.setAttribute('material', {color: 'green'});
     el.emit('click');
+
     if (this.data.togabble) {
       if (el.is('pressed')) {
         el.removeState('pressed');
+        this.labelEl.setAttribute('text', {
+          value: this.data.label + " off",
+          color: 'white',
+          align: 'center'
+        });
       } else {
         el.addState('pressed');
+        this.labelEl.setAttribute('text', {
+          value: this.data.label + " on",
+          color: 'white',
+          align: 'center'
+        });
       }
     }
   },
