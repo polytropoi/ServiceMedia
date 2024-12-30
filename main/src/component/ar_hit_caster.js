@@ -688,7 +688,7 @@ AFRAME.registerComponent('pinch_fu', {
     // cupEl.setAttribute('position', evt.detail.position);
     // cupEl.addEventListener('loaded', animateScale);
 
-    spawnedEl.setAttribute('geometry',  {'primitive': 'box', 'width': '1', 'height': '1'});
+    spawnedEl.setAttribute('geometry',  {'primitive': 'box', 'width': '.15', 'height': '.15'});
     // spawnedEl.setAttribute('light', {
     //   type: 'point',
     //   distance: 30,
@@ -696,9 +696,9 @@ AFRAME.registerComponent('pinch_fu', {
     // });
     spawnedEl.setAttribute('material', 'color', 'crimson');
     spawnedEl.setAttribute('grabbable', {'hand': 'right'});
-    spawnedEl.setAttribute('hand_tracking_pressable', {'label': 'thing ' + this.spawnedIndex});
+    // spawnedEl.setAttribute('hand_tracking_pressable', {'label': 'thing ' + this.spawnedIndex});
     spawnedEl.id = "spawned_" + timestamp;
-    spawnedEl.setAttribute('scale', '0.15 0.15 0.15');
+    // spawnedEl.setAttribute('scale', '0.15 0.15 0.15');
     spawnedEl.setAttribute('position', evt.detail.position);
     spawnedEl.addEventListener('loaded', animateScale);
 

@@ -90,7 +90,7 @@ AFRAME.registerComponent('real_world_meshing_mod', {
       for (var mesh of detectedMeshes.values()) {
         // Ignore meshes that don't match the filterLabels.
         // if (filterLabels.length && filterLabels.indexOf(mesh.semanticLabel) === -1) { continue; }
-        if (!data.filtersEnabled || (data.filtersEnabled && filterLabels.length && (filterLabels.indexOf(mesh.semanticLabel) === -1))) { continue; }
+        // if (!data.filtersEnabled || (data.filtersEnabled && filterLabels.length && (filterLabels.indexOf(mesh.semanticLabel) === -1))) { continue; }
         for (i = 0; i < meshEntities.length; i++) {
           if (mesh === meshEntities[i].mesh) {
             present = true;
@@ -99,7 +99,7 @@ AFRAME.registerComponent('real_world_meshing_mod', {
               this.updateMeshGeometry(meshEntities[i].el, mesh);
             }
             meshEntities[i].lastChangedTime = mesh.lastChangedTime;
-            break;
+            // break;
           }
         }
         if (!present) { newMeshes.push(mesh); }
@@ -111,7 +111,7 @@ AFRAME.registerComponent('real_world_meshing_mod', {
       for (mesh of detectedPlanes.values()) {
         // Ignore meshes that don't match the filterLabels.
         // if (filterLabels.length && filterLabels.indexOf(mesh.semanticLabel) === -1) { continue; }
-        if (!data.filtersEnabled || (data.filtersEnabled && filterLabels.length && (filterLabels.indexOf(mesh.semanticLabel) === -1))) { continue; }
+        // if (!data.filtersEnabled || (data.filtersEnabled && filterLabels.length && (filterLabels.indexOf(mesh.semanticLabel) === -1))) { continue; }
         for (i = 0; i < meshEntities.length; i++) {
           if (mesh === meshEntities[i].mesh) {
             present = true;
@@ -120,7 +120,7 @@ AFRAME.registerComponent('real_world_meshing_mod', {
               this.updateMeshGeometry(meshEntities[i].el, mesh);
             }
             meshEntities[i].lastChangedTime = mesh.lastChangedTime;
-            break;
+            // break;
           }
         }
         if (!present) { newMeshes.push(mesh); }
