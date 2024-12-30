@@ -663,7 +663,7 @@ AFRAME.registerComponent('pinch_fu', {
       evt.target.setAttribute('animation', {
         property: 'scale',
         from: {x: 0, y: 0, z: 0},
-        to: {x: 1, y: 1, z: 1},
+        to: {x: .15, y: .15, z: .15},
         dur: 200
       });
     };
