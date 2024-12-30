@@ -688,7 +688,7 @@ AFRAME.registerComponent('pinch_fu', {
     // cupEl.setAttribute('position', evt.detail.position);
     // cupEl.addEventListener('loaded', animateScale);
 
-    spawnedEl.setAttribute('geometry',  {'primitive': 'box', 'width': '.15', 'height': '.15'});
+    spawnedEl.setAttribute('geometry',  {'primitive': 'box', 'width': '1', 'height': '1'});
     // spawnedEl.setAttribute('light', {
     //   type: 'point',
     //   distance: 30,
