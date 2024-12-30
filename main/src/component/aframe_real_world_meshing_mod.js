@@ -78,10 +78,11 @@ AFRAME.registerComponent('real_world_meshing_mod', {
     var filterLabels = this.data.filterLabels;
 
     frame = sceneEl.frame;
-    if (frame) {
-      detectedMeshes = frame.detectedMeshes;
-      detectedPlanes = frame.detectedPlanes;
-    }
+    if (!frame) {return;}
+
+    detectedMeshes = frame.detectedMeshes;
+    detectedPlanes = frame.detectedPlanes;
+    
     for (var i = 0; i < meshEntities.length; i++) {
       meshEntities[i].present = false;
     }
