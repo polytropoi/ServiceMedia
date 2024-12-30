@@ -11,11 +11,13 @@
  */
 AFRAME.registerComponent('real_world_meshing_mod', {
   schema: {
-    filterLabels: {type: 'array'},
-    meshesEnabled: {default: true},
+
+    planeMixin: {default: ''},
     meshMixin: {default: true},
+    meshesEnabled: {default: true},
     planesEnabled: {default: true},
-    planeMixin: {default: ''}
+    filterLabels: {type: 'array'},
+    filtersEnabled: {default: false}
   },
 
   sceneOnly: true,
@@ -76,9 +78,10 @@ AFRAME.registerComponent('real_world_meshing_mod', {
     var filterLabels = this.data.filterLabels;
 
     frame = sceneEl.frame;
-    detectedMeshes = frame.detectedMeshes;
-    detectedPlanes = frame.detectedPlanes;
-
+    if (frame) {
+      detectedMeshes = frame.detectedMeshes;
+      detectedPlanes = frame.detectedPlanes;
+    }
     for (var i = 0; i < meshEntities.length; i++) {
       meshEntities[i].present = false;
     }
@@ -86,7 +89,8 @@ AFRAME.registerComponent('real_world_meshing_mod', {
     if (data.meshesEnabled) {
       for (var mesh of detectedMeshes.values()) {
         // Ignore meshes that don't match the filterLabels.
-        if (filterLabels.length && filterLabels.indexOf(mesh.semanticLabel) === -1) { continue; }
+        // if (filterLabels.length && filterLabels.indexOf(mesh.semanticLabel) === -1) { continue; }
+        if (!data.filtersEnabled || (data.filtersEnabled && filterLabels.length && (filterLabels.indexOf(mesh.semanticLabel) === -1))) { continue; }
         for (i = 0; i < meshEntities.length; i++) {
           if (mesh === meshEntities[i].mesh) {
             present = true;
@@ -106,7 +110,8 @@ AFRAME.registerComponent('real_world_meshing_mod', {
     if (data.planesEnabled) {
       for (mesh of detectedPlanes.values()) {
         // Ignore meshes that don't match the filterLabels.
-        if (filterLabels.length && filterLabels.indexOf(mesh.semanticLabel) === -1) { continue; }
+        // if (filterLabels.length && filterLabels.indexOf(mesh.semanticLabel) === -1) { continue; }
+        if (!data.filtersEnabled || (data.filtersEnabled && filterLabels.length && (filterLabels.indexOf(mesh.semanticLabel) === -1))) { continue; }
         for (i = 0; i < meshEntities.length; i++) {
           if (mesh === meshEntities[i].mesh) {
             present = true;

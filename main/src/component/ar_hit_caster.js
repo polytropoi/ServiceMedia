@@ -705,27 +705,27 @@ AFRAME.registerComponent('pinch_fu', {
     sceneEl.appendChild(spawnedEl);
   },
 
-  onCollisionStarted: function (evt) {
-    console.log("start collision " + evt.detail.withEl.id);
-    var targetElementSelector = this.data.targetElementSelector;
-    var targetEl = targetElementSelector && this.el.sceneEl.querySelector(targetElementSelector);
-    if (targetEl === evt.detail.withEl) {
-      this.targetEl = targetEl;
-      return;
-    }
-    this.enabled = false;
-  },
+  // onCollisionStarted: function (evt) {
+  //   console.log("start collision " + evt.detail.withEl.id);
+  //   var targetElementSelector = this.data.targetElementSelector;
+  //   var targetEl = targetElementSelector && this.el.sceneEl.querySelector(targetElementSelector);
+  //   if (targetEl === evt.detail.withEl) {
+  //     this.targetEl = targetEl;
+  //     return;
+  //   }
+  //   this.enabled = false;
+  // },
 
-  onCollisionEnded: function (evt) {
-    console.log("end collision " + evt.detail.withEl.id);
-    var targetElementSelector = this.data.targetElementSelector;
-    var targetEl = targetElementSelector && this.el.sceneEl.querySelector(targetElementSelector);
-    if (targetEl === evt.detail.withEl) {
-      this.targetEl = undefined;
-      return;
-    }
-    this.enabled = true;
-  }
+  // onCollisionEnded: function (evt) {
+  //   console.log("end collision " + evt.detail.withEl.id);
+  //   var targetElementSelector = this.data.targetElementSelector;
+  //   var targetEl = targetElementSelector && this.el.sceneEl.querySelector(targetElementSelector);
+  //   if (targetEl === evt.detail.withEl) {
+  //     this.targetEl = undefined;
+  //     return;
+  //   }
+  //   this.enabled = true;
+  // }
 });
 
 ///////////////////////////////////// - global functions
@@ -813,12 +813,12 @@ AFRAME.registerComponent('hand_tracking_pressable', {
     var labelEl = this.labelEl = document.createElement('a-entity');
 
     this.color = '#3a50c5';
-    el.setAttribute('geometry', {
-      primitive: 'box',
-      width: this.data.width,
-      height: 0.05,
-      depth: 0.04
-    });
+    // el.setAttribute('geometry', {
+    //   primitive: 'box',
+    //   width: this.data.width,
+    //   height: 0.05,
+    //   depth: 0.04
+    // });
 
     el.setAttribute('material', {color: this.color});
     el.setAttribute('pressable', '');
