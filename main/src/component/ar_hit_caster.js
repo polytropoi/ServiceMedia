@@ -695,7 +695,7 @@ AFRAME.registerComponent('pinch_fu', {
     //   intensity: 2.0
     // });
     spawnedEl.setAttribute('material', 'color', 'crimson');
-    spawnedEl.setAttribute('grabbable', '');
+    spawnedEl.setAttribute('grabbable', {'hand': 'right'});
     spawnedEl.setAttribute('hand_tracking_pressable', {'label': 'thing ' + this.spawnedIndex});
     spawnedEl.id = "spawned_" + timestamp;
     // spawnedEl.setAttribute('scale', '0.15 0.15 0.15');
