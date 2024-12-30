@@ -622,12 +622,12 @@ AFRAME.registerComponent('pinch_fu', {
     var el = this.el;
     this.delaySpawn = this.delaySpawn.bind(this);
     this.cancelDelayedSpawn = this.cancelDelayedSpawn.bind(this);
-    this.onCollisionEnded = this.onCollisionEnded.bind(this);
-    this.onCollisionStarted = this.onCollisionStarted.bind(this);
+    // this.onCollisionEnded = this.onCollisionEnded.bind(this);
+    // this.onCollisionStarted = this.onCollisionStarted.bind(this);
     this.el.addEventListener('pinchstarted', this.delaySpawn);
     this.el.addEventListener('pinchended', this.cancelDelayedSpawn);
-    el.addEventListener('obbcollisionstarted', this.onCollisionStarted);
-    el.addEventListener('obbcollisionended', this.onCollisionEnded);
+    // el.addEventListener('obbcollisionstarted', this.onCollisionStarted);
+    // el.addEventListener('obbcollisionended', this.onCollisionEnded);
     this.enabled = true;
     this.spawnedIndex = 0;
   },
