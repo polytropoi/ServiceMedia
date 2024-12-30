@@ -698,7 +698,7 @@ AFRAME.registerComponent('pinch_fu', {
     spawnedEl.setAttribute('grabbable', {'hand': 'right'});
     spawnedEl.setAttribute('hand_tracking_pressable', {'label': 'thing ' + this.spawnedIndex});
     spawnedEl.id = "spawned_" + timestamp;
-    // spawnedEl.setAttribute('scale', '0.15 0.15 0.15');
+    spawnedEl.setAttribute('scale', '0.15 0.15 0.15');
     spawnedEl.setAttribute('position', evt.detail.position);
     spawnedEl.addEventListener('loaded', animateScale);
 
@@ -820,10 +820,10 @@ AFRAME.registerComponent('hand_tracking_pressable', {
     //   depth: 0.04
     // });
 
-    el.setAttribute('material', {color: this.color});
+    // el.setAttribute('material', {color: this.color});
     el.setAttribute('pressable', '');
 
-    labelEl.setAttribute('position', '0 0 0.02');
+    labelEl.setAttribute('position', '0 0 0.16');
     labelEl.setAttribute('text', {
       value: this.data.label,
       color: 'white',
