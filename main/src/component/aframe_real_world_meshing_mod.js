@@ -35,7 +35,7 @@ AFRAME.registerComponent('real_world_meshing_mod', {
     }
     this.meshEntities = [];
     this.initWorldMeshEntity = this.initWorldMeshEntity.bind(this);
-    this.worldMaterial = null;
+    this.worldMaterial = new THREE.MeshBasicMaterial({color: Math.random() * 0xFFFFFF, side: THREE.DoubleSide, transparent: true, opacity: .75});
 
     let picGroupMangler = document.getElementById("pictureGroupsData");
     if (picGroupMangler != null && picGroupMangler != undefined) {
@@ -48,7 +48,8 @@ AFRAME.registerComponent('real_world_meshing_mod', {
         this.worldMaterial = new THREE.MeshStandardMaterial({
           side: THREE.DoubleSide,
           map: this.texture, 
-          transparent: true
+          transparent: true,
+          opacity: .75
         });
         // Repeat the pattern to prevent the texture being stretched
         this.worldMaterial.map.wrapS = THREE.RepeatWrapping;
@@ -57,14 +58,18 @@ AFRAME.registerComponent('real_world_meshing_mod', {
 
       }
     } 
+
+    setTimeout(() => {
+        this.isReady = true;
+    }, 3000);
+
   },
 
   tick: function () {
-    if (!this.el.is('ar-mode')) { return; }
+    if (!this.el.is('ar-mode') && !this.worldMaterial && !this.isReady) { return; }
     this.detectMeshes();
     this.updateMeshes();
   },
-
   detectMeshes: function () {
     var data = this.data;
     var detectedMeshes;
@@ -90,14 +95,14 @@ AFRAME.registerComponent('real_world_meshing_mod', {
     if (data.meshesEnabled) {
       for (var mesh of detectedMeshes.values()) {
         // Ignore meshes that don't match the filterLabels.
-        // if (filterLabels.length && filterLabels.indexOf(mesh.semanticLabel) === -1) { continue; }
+        if (filterLabels.length && filterLabels.indexOf(mesh.semanticLabel) === -1) { continue; }
         // if (!data.filtersEnabled || (data.filtersEnabled && filterLabels.length && (filterLabels.indexOf(mesh.semanticLabel) === -1))) { continue; }
         for (i = 0; i < meshEntities.length; i++) {
           if (mesh === meshEntities[i].mesh) {
             present = true;
             meshEntities[i].present = true;
             if (meshEntities[i].lastChangedTime < mesh.lastChangedTime) {
-              this.updateMeshGeometry(meshEntities[i].el, mesh);
+              this.updateMeshGeometry(meshEntities[i].el, mesh);  
             }
             meshEntities[i].lastChangedTime = mesh.lastChangedTime;
             // break;
@@ -111,7 +116,7 @@ AFRAME.registerComponent('real_world_meshing_mod', {
     if (data.planesEnabled) {
       for (mesh of detectedPlanes.values()) {
         // Ignore meshes that don't match the filterLabels.
-        // if (filterLabels.length && filterLabels.indexOf(mesh.semanticLabel) === -1) { continue; }
+        if (filterLabels.length && filterLabels.indexOf(mesh.semanticLabel) === -1) { continue; }
         // if (!data.filtersEnabled || (data.filtersEnabled && filterLabels.length && (filterLabels.indexOf(mesh.semanticLabel) === -1))) { continue; }
         for (i = 0; i < meshEntities.length; i++) {
           if (mesh === meshEntities[i].mesh) {
@@ -185,9 +190,7 @@ AFRAME.registerComponent('real_world_meshing_mod', {
     var shape;
     var polygon;
 
-    if (this.worldMaterial) {
-      mesh.material = this.worldMaterial;
-    }
+
     if (mesh instanceof XRPlane) {
       shape = new THREE.Shape();
       polygon = mesh.polygon;
@@ -209,6 +212,29 @@ AFRAME.registerComponent('real_world_meshing_mod', {
       new THREE.BufferAttribute(mesh.vertices, 3)
     );
     geometry.setIndex(new THREE.BufferAttribute(mesh.indices, 1));
+    geometry.computeVertexNormals(); //ooo yeah
+    
+    //cylinder projection for UVs, from https://stackoverflow.com/questions/73522902/three-js-correctly-uv-map-texture-onto-custom-buffer-geometry-while-updating-thr
+    const templateMeshes = new THREE.Mesh(geometry, this.worldMaterial);
+    let bbox = new THREE.Box3().setFromObject(templateMeshes);
+    let size = new THREE.Vector3(); bbox.getSize(size);
+    let bMin = bbox.min;
+    let center = new THREE.Vector3(); bbox.getCenter(center);
+    let uvs = [];
+    const arr = geometry.attributes.position.array;
+    for (let t = 0; t < arr.length; t+=3)  
+    {
+        const x = arr[t]  
+        const y = arr[t+1]
+        const z = arr[t+2]
+        let U = (Math.atan2(y-center.y, x-center.x) / (Math.PI)) *0.5 + 0.5
+        let V = ((z - bMin.z) / size.z)
+        uvs.push(U,V)
+    }
+    geometry.setAttribute('uv', new THREE.BufferAttribute(new Float32Array(uvs), 2))
+
+    geometry.uvsNeedUpdate = true;
+
     return geometry;
   },
 
@@ -225,25 +251,15 @@ AFRAME.registerComponent('real_world_meshing_mod', {
       }
     }
     geometry = this.initMeshGeometry(meshEntity.mesh);
-    if (this.worldMaterial) {
+    if (meshEntity.mesh instanceof XRPlane) {
+      //add planeMixin
+      mesh = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({color: Math.random() * 0xFFFFFF, side: THREE.DoubleSide, transparent: true, opacity: .75}));
+    } else {
+      //add meshMixin
       mesh = new THREE.Mesh(geometry, this.worldMaterial);
-    } else {
-      mesh = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({color: Math.random() * 0xFFFFFF, side: THREE.DoubleSide}));
     }
-    // mesh = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({color: Math.random() * 0xFFFFFF, side: THREE.DoubleSide}));
     el.setObject3D('mesh', mesh);
-    if (meshEntity.mesh instanceof XRPlane && this.data.planeMixin) {
-      // el.setAttribute('mixin', this.data.planeMixin);
-      // el.setAttribute('material')
-      // el.object3D.material = this.worldMaterial;
-      // meshEntity.mesh.material = new THREE.MeshBasicMaterial({color: Math.random() * 0xFFFFFF, side: THREE.DoubleSide});
-    } else {
-      // if (this.data.meshMixin) {
-        // el.setAttribute('mixin', this.data.meshMixin);
-        // el.object3D.material = this.worldMaterial;
-        // el.object3D.material = this.worldMaterial;
-      // }
-    }
+
     el.setAttribute('data-world-mesh', meshEntity.mesh.semanticLabel);
   },
 
@@ -251,7 +267,10 @@ AFRAME.registerComponent('real_world_meshing_mod', {
     var entityMesh = entityEl.getObject3D('mesh');
     entityMesh.geometry.dispose();
     entityMesh.geometry = this.initMeshGeometry(mesh);
-
+    if (this.worldMaterial) {
+      entityMesh.material = this.worldMaterial;
+      // this.worldMaterial.needsUpdate = true;
+    }
 
   }
 });
