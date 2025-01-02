@@ -3706,8 +3706,10 @@ landing_router.get('/:_id', function (req, res) {
                         }
 
                         // platformButtons = "";
-                        let buttonLabel = sceneResponse.sceneWebType == "Video Landing" ? "Watch Video!" : "Enter WebXR Scene!"
-                        let platformButtons = "<a class=\x22mx-auto btn btn-xl btn-info \x22 href=\x22../webxr/"+ sceneResponse.short_id + "\x22>"+buttonLabel+"</a>";
+                        let buttonLabel = sceneResponse.sceneWebType == "Video Landing" ? "Watch Video" : "Enter WebXR Scene"
+
+                        let platformButtons = "<a class=\x22mx-auto btn btn-xl btn-primary \x22 href=\x22../webxr/"+ sceneResponse.short_id + "\x22>"+buttonLabel+"</a>"+
+                        "<a class=\x22mx-auto btn btn-xl btn-primary \x22 href=\x22https://www.oculus.com/open_url/?url=https://smxr.net/webxr/"+ sceneResponse.short_id + "\x22>Open on Quest</a>"
                         if (sceneResponse.sceneShareWithSubscribers) {
                             if (isGuest) {
                                 platformButtons = "";
@@ -3716,7 +3718,7 @@ landing_router.get('/:_id', function (req, res) {
                             //  "Subscribe or Login to access this scene - "
                         }
                         if (!sceneResponse.sceneShareWithSubscribers && sceneResponse.sceneWebGLOK) {
-                           platformButtons += "<a class=\x22mx-auto btn btn-xl btn-info \x22 href=\x22../unity/"+ sceneResponse.short_id + "\x22>Enter Unity Scene</a> ";
+                           platformButtons += "<a class=\x22mx-auto btn btn-xl btn-primary \x22 href=\x22../unity/"+ sceneResponse.short_id + "\x22>Enter Unity Scene</a> ";
                         }
                         var audioHtml = "";
                         let uid = "0000000000000";
