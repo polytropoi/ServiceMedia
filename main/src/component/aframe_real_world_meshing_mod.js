@@ -36,9 +36,11 @@ AFRAME.registerComponent('real_world_meshing_mod', {
     this.meshEntities = [];
     this.initWorldMeshEntity = this.initWorldMeshEntity.bind(this);
     this.worldMaterial = new THREE.MeshBasicMaterial({color: Math.random() * 0xFFFFFF, side: THREE.DoubleSide, transparent: true, opacity: .75});
-
+    this.wireframeMaterial = new THREE.MeshBasicMaterial({color: Math.random() * 0xFFFFFF, side: THREE.DoubleSide, wireframe: true});
+    // this.worldMaterials = {};
+    // this.planeMaterial
     let picGroupMangler = document.getElementById("pictureGroupsData");
-    if (picGroupMangler != null && picGroupMangler != undefined) {
+    if (picGroupMangler != null && picGroupMangler != undefined) { 
       this.tileablePicData = picGroupMangler.components.picture_groups_control.returnTileableData();
       if (this.tileablePicData && this.tileablePicData.images) {
         let picIndex = Math.floor(Math.random()*this.tileablePicData.images.length);
@@ -215,7 +217,7 @@ AFRAME.registerComponent('real_world_meshing_mod', {
     geometry.computeVertexNormals(); //ooo yeah
     
     //cylinder projection for UVs, from https://stackoverflow.com/questions/73522902/three-js-correctly-uv-map-texture-onto-custom-buffer-geometry-while-updating-thr
-    const templateMeshes = new THREE.Mesh(geometry, this.worldMaterial);
+    const templateMeshes = new THREE.Mesh(geometry, this.wireframeMaterial);
     let bbox = new THREE.Box3().setFromObject(templateMeshes);
     let size = new THREE.Vector3(); bbox.getSize(size);
     let bMin = bbox.min;
@@ -253,13 +255,14 @@ AFRAME.registerComponent('real_world_meshing_mod', {
     geometry = this.initMeshGeometry(meshEntity.mesh);
     if (meshEntity.mesh instanceof XRPlane) {
       //add planeMixin
-      mesh = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({color: Math.random() * 0xFFFFFF, side: THREE.DoubleSide, transparent: true, opacity: .75}));
+      // mesh = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({color: Math.random() * 0xFFFFFF, side: THREE.DoubleSide, transparent: true, opacity: .75}));
+      mesh = new THREE.Mesh(geometry, this.wireframeMaterial);
     } else {
       //add meshMixin
       mesh = new THREE.Mesh(geometry, this.worldMaterial);
     }
     el.setObject3D('mesh', mesh);
-
+    
     el.setAttribute('data-world-mesh', meshEntity.mesh.semanticLabel);
   },
 

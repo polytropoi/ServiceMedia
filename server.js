@@ -14311,7 +14311,7 @@ app.get('/publicscenes', function (req, res) { //deprecated, see available scene
             // let scenesPicked = [];
             let count = 0;
            
-            async.each(sampleScenes(scenes, 20),
+            async.each(sampleScenes(scenes, 30),
                 // 2nd param is the function that each item is passed to
 
                 function (scene, callback) {

@@ -119,6 +119,9 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
       if (this.data.tags && this.data.tags.length && this.data.tags.toLowerCase().includes("spawnable")) {
         this.el.classList.add("spawnable");
       }
+      if (this.data.tags && this.data.tags.length && this.data.tags.toLowerCase().includes("grid scene")) {
+        this.el.setAttribute("grid_effects", "");
+      }
       if (this.data.markerType == "audio" ) {
         let primaryAudioEl = document.querySelector('#primaryAudio');
         if (primaryAudioEl != null) {

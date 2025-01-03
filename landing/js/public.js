@@ -21,7 +21,7 @@ function generateSuccessHTMLOutput(response) {
   // console.log(JSON.stringify(arr));
   const shuffledArray = arr.sort((a, b) => 0.5 - Math.random());
   let count = 0;
-  let max = 15;
+  let max = 30;
     // var root = "servicemedia.net/webxr";
   var html = "";
      for(var i = 0; i < shuffledArray.length; i++) {
@@ -60,6 +60,7 @@ function generateSuccessHTMLOutput(response) {
                 "<div class=\x22btn-group\x22>"+
                   "<a href=\x22https://smxr.net/landing/" +  shuffledArray[i].sceneKey + "\x22 target=\x22_blank\x22 type=\x22button\x22 class=\x22btn btn-sm btn-outline-secondary\x22>Landing</a>"+
                   "<a href=\x22https://smxr.net/webxr/" +  shuffledArray[i].sceneKey + "\x22 target=\x22_blank\x22 type=\x22button\x22 class=\x22btn btn-sm btn-outline-secondary\x22>WebXR</a>"+
+                  "<a href=\x22https://www.oculus.com/open_url/?url=https://smxr.net/webxr/" +  shuffledArray[i].sceneKey + "\x22 target=\x22_blank\x22 type=\x22button\x22 class=\x22btn btn-sm btn-outline-secondary\x22>Quest ></a>"+
                   "<a href=\x22https://smxr.net/qrcode/" +  shuffledArray[i].sceneKey + "\x22 target=\x22_blank\x22 type=\x22button\x22 class=\x22btn btn-sm btn-outline-secondary\x22>QR Code</a>"+
                 "</div>"+
                 // "<small class=\x22text-body-secondary\x22>9 mins</small>"+
