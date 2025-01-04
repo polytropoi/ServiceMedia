@@ -1,7 +1,4 @@
-/* global XRPlane, XRMesh */
-// var register = require('../../core/component').registerComponent;
-// var THREE = require('../../lib/three');
-
+//modded from https://github.com/aframevr/aframe/blob/master/src/components/scene/real-world-meshing.js
 /**
  * Real World Meshing.
  *
@@ -37,26 +34,142 @@ AFRAME.registerComponent('real_world_meshing_mod', {
     this.initWorldMeshEntity = this.initWorldMeshEntity.bind(this);
     this.worldMaterial = new THREE.MeshBasicMaterial({color: Math.random() * 0xFFFFFF, side: THREE.DoubleSide, transparent: true, opacity: .75});
     this.wireframeMaterial = new THREE.MeshBasicMaterial({color: Math.random() * 0xFFFFFF, side: THREE.DoubleSide, wireframe: true});
+    this.wallMaterial = null;
+    this.floorMaterial = null;
+    this.ceilingMaterial = null;
+    this.tableMaterial = null;
+    this.doorMaterial = null;
+    this.storageMaterial = null;
+    this.wallArtMaterial = null;
     // this.worldMaterials = {};
     // this.planeMaterial
     let picGroupMangler = document.getElementById("pictureGroupsData");
     if (picGroupMangler != null && picGroupMangler != undefined) { 
       this.tileablePicData = picGroupMangler.components.picture_groups_control.returnTileableData();
       if (this.tileablePicData && this.tileablePicData.images) {
-        let picIndex = Math.floor(Math.random()*this.tileablePicData.images.length);
-        this.texture = new THREE.TextureLoader().load( this.tileablePicData.images[picIndex].url );
-        this.texture.encoding = THREE.sRGBEncoding;
+        for (let i = 0; i < this.tileablePicData.images.length; i++) {
+          if (this.tileablePicData.images.tags && this.tileablePicData.images.tags.includes("wall")) {
+            this.texture = new THREE.TextureLoader().load( this.tileablePicData.images[picIndex].url );
+            this.texture.encoding = THREE.sRGBEncoding;
+          
+            this.wallMaterial = new THREE.MeshStandardMaterial({
+              side: THREE.DoubleSide,
+              map: this.texture, 
+              transparent: true
+              // opacity: .75
+            });
+            this.wallMaterial.map.wrapS = THREE.RepeatWrapping;
+            this.wallMaterial.map.wrapT = THREE.RepeatWrapping;
+            this.wallMaterial.map.repeat.set(2, 2);
+          } else if (this.tileablePicData.images.tags && this.tileablePicData.images.tags.includes("floor")) {
+            this.texture = new THREE.TextureLoader().load( this.tileablePicData.images[i].url );
+            this.texture.encoding = THREE.sRGBEncoding;
+          
+            this.floorMaterial = new THREE.MeshStandardMaterial({
+              side: THREE.DoubleSide,
+              map: this.texture, 
+              transparent: true
+              // opacity: .75
+            });
+            this.floorMaterial.map.wrapS = THREE.RepeatWrapping;
+            this.floorMaterial.map.wrapT = THREE.RepeatWrapping;
+            this.floorMaterial.map.repeat.set(2, 2);
+          } else if (this.tileablePicData.images.tags && this.tileablePicData.images.tags.includes("ceiling")) {
+            this.texture = new THREE.TextureLoader().load( this.tileablePicData.images[i].url );
+            this.texture.encoding = THREE.sRGBEncoding;
+          
+            this.ceilingMaterial = new THREE.MeshStandardMaterial({
+              side: THREE.DoubleSide,
+              map: this.texture, 
+              transparent: true
+              // opacity: .75
+            });
+            this.ceilingMaterial.map.wrapS = THREE.RepeatWrapping;
+            this.ceilingMaterial.map.wrapT = THREE.RepeatWrapping;
+            this.ceilingMaterial.map.repeat.set(2, 2);
+          } else if (this.tileablePicData.images.tags && this.tileablePicData.images.tags.includes("door")) {
+            this.texture = new THREE.TextureLoader().load( this.tileablePicData.images[i].url );
+            this.texture.encoding = THREE.sRGBEncoding;
+          
+            this.doorMaterial = new THREE.MeshStandardMaterial({
+              side: THREE.DoubleSide,
+              map: this.texture, 
+              transparent: true
+              // opacity: .75
+            });
+            this.doorMaterial.map.wrapS = THREE.RepeatWrapping;
+            this.doorMaterial.map.wrapT = THREE.RepeatWrapping;
+            this.doorMaterial.map.repeat.set(2, 2);
+          } else if (this.tileablePicData.images.tags && this.tileablePicData.images.tags.includes("table")) {
+            this.texture = new THREE.TextureLoader().load( this.tileablePicData.images[i].url );
+            this.texture.encoding = THREE.sRGBEncoding;
+          
+            this.tableMaterial = new THREE.MeshStandardMaterial({
+              side: THREE.DoubleSide,
+              map: this.texture, 
+              transparent: true
+              // opacity: .75
+            });
+            this.tableMaterial.map.wrapS = THREE.RepeatWrapping;
+            this.tableMaterial.map.wrapT = THREE.RepeatWrapping;
+            this.tableMaterial.map.repeat.set(2, 2);
+          } else if (this.tileablePicData.images.tags && this.tileablePicData.images.tags.includes("storage")) {
+            this.texture = new THREE.TextureLoader().load( this.tileablePicData.images[i].url );
+            this.texture.encoding = THREE.sRGBEncoding;
+          
+            this.storageMaterial = new THREE.MeshStandardMaterial({
+              side: THREE.DoubleSide,
+              map: this.texture, 
+              transparent: true
+              // opacity: .75
+            });
+            this.wallMaterial.map.wrapS = THREE.RepeatWrapping;
+            this.wallMaterial.map.wrapT = THREE.RepeatWrapping;
+            this.wallMaterial.map.repeat.set(2, 2);
+          } else if (this.tileablePicData.images.tags && this.tileablePicData.images.tags.includes("wall art")) {
+            this.texture = new THREE.TextureLoader().load( this.tileablePicData.images[i].url );
+            this.texture.encoding = THREE.sRGBEncoding;
+          
+            this.wallArtMaterial = new THREE.MeshStandardMaterial({
+              side: THREE.DoubleSide,
+              map: this.texture, 
+              transparent: true
+              // opacity: .75
+            });
+            this.wallArtMaterial.map.wrapS = THREE.RepeatWrapping;
+            this.wallArtMaterial.map.wrapT = THREE.RepeatWrapping;
+            this.wallArtMaterial.map.repeat.set(2, 2);
+          } else {
+            let picIndex = Math.floor(Math.random()*this.tileablePicData.images.length);
+            this.texture = new THREE.TextureLoader().load( this.tileablePicData.images[picIndex].url );
+            this.texture.encoding = THREE.sRGBEncoding;
+          
+            this.worldMaterial = new THREE.MeshStandardMaterial({
+              side: THREE.DoubleSide,
+              map: this.texture, 
+              transparent: true
+
+            });
+            this.worldMaterial.map.wrapS = THREE.RepeatWrapping;
+            this.worldMaterial.map.wrapT = THREE.RepeatWrapping;
+            this.worldMaterial.map.repeat.set(2, 2);
+            // break;
+          }
+        }
+        // let picIndex = Math.floor(Math.random()*this.tileablePicData.images.length);
+        // this.texture = new THREE.TextureLoader().load( this.tileablePicData.images[picIndex].url );
+        // this.texture.encoding = THREE.sRGBEncoding;
       
-        this.worldMaterial = new THREE.MeshStandardMaterial({
-          side: THREE.DoubleSide,
-          map: this.texture, 
-          transparent: true,
-          opacity: .75
-        });
+        // this.worldMaterial = new THREE.MeshStandardMaterial({
+        //   side: THREE.DoubleSide,
+        //   map: this.texture, 
+        //   transparent: true,
+        //   opacity: .75
+        // });
         // Repeat the pattern to prevent the texture being stretched
-        this.worldMaterial.map.wrapS = THREE.RepeatWrapping;
-        this.worldMaterial.map.wrapT = THREE.RepeatWrapping;
-        this.worldMaterial.map.repeat.set(2, 2);
+        // this.worldMaterial.map.wrapS = THREE.RepeatWrapping;
+        // this.worldMaterial.map.wrapT = THREE.RepeatWrapping;
+        // this.worldMaterial.map.repeat.set(2, 2);
 
       }
     } 
@@ -256,13 +369,38 @@ AFRAME.registerComponent('real_world_meshing_mod', {
     if (meshEntity.mesh instanceof XRPlane) {
       //add planeMixin
       // mesh = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({color: Math.random() * 0xFFFFFF, side: THREE.DoubleSide, transparent: true, opacity: .75}));
-      mesh = new THREE.Mesh(geometry, this.wireframeMaterial);
+      // mesh = new THREE.Mesh(geometry, this.wireframeMaterial);
+      if (meshEntity.mesh.semanticLabel) {
+        console.log("xrplane semanticLabel is " + meshEntity.mesh.semanticLabel);
+        if (meshEntity.mesh.semanticLabel == "wall" && this.wallMaterial) {
+          mesh = new THREE.Mesh(geometry, this.wallMaterial);
+        } else if (meshEntity.mesh.semanticLabel == "floor" && this.floorMaterial) {
+          mesh = new THREE.Mesh(geometry, this.floorMaterial);
+        } else if (meshEntity.mesh.semanticLabel == "ceiling" && this.ceilingMaterial) {
+          mesh = new THREE.Mesh(geometry, this.ceilingMaterial);
+        } else if (meshEntity.mesh.semanticLabel == "table" && this.tableMaterial) {
+          mesh = new THREE.Mesh(geometry, this.tableMaterial);
+        } else if (meshEntity.mesh.semanticLabel == "door" && this.doorMaterial) {
+          mesh = new THREE.Mesh(geometry, this.doorMaterial);
+        } else if (meshEntity.mesh.semanticLabel == "storage" && this.storageMaterial) {
+          mesh = new THREE.Mesh(geometry, this.storageMaterial);
+        } else if (meshEntity.mesh.semanticLabel == "wall art" && this.wallArtMaterial) {
+          mesh = new THREE.Mesh(geometry, this.wallArtMaterial);
+        } else {
+          mesh = new THREE.Mesh(geometry, this.worldMaterial);
+        }
+      } else {
+        mesh = new THREE.Mesh(geometry, this.worldMaterial);
+      }
+     
+
     } else {
       //add meshMixin
-      mesh = new THREE.Mesh(geometry, this.worldMaterial);
+      // mesh = new THREE.Mesh(geometry, this.worldMaterial);
+      mesh = new THREE.Mesh(geometry, this.wireframeMaterial);
     }
     el.setObject3D('mesh', mesh);
-    
+
     el.setAttribute('data-world-mesh', meshEntity.mesh.semanticLabel);
   },
 
