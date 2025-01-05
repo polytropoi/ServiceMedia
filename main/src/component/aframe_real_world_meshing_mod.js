@@ -186,7 +186,7 @@ AFRAME.registerComponent('real_world_meshing_mod', {
   },
 
   tick: function () {
-    if (!this.el.is('ar-mode') && !this.worldMaterial && !this.isReady) { return; }
+    if (!this.el.is('ar-mode') && !this.isReady) { return; }
     this.detectMeshes();
     this.updateMeshes();
   },
@@ -213,6 +213,9 @@ AFRAME.registerComponent('real_world_meshing_mod', {
     }
 
     if (data.meshesEnabled) {
+      if (meshEntities[i].el.components['ammo-body']) {
+        meshEntities[i].el.components['ammo-body'].syncToPhysics();  //required for static colliders...
+      }
       for (var mesh of detectedMeshes.values()) {
         // Ignore meshes that don't match the filterLabels.
         if (filterLabels.length && filterLabels.indexOf(mesh.semanticLabel) === -1) { continue; }
@@ -268,15 +271,17 @@ AFRAME.registerComponent('real_world_meshing_mod', {
       var meshEntities = this.meshEntities;
       var referenceSpace = sceneEl.renderer.xr.getReferenceSpace();
       var meshSpace;
-      for (var i = 0; i < meshEntities.length; i++) {
-        meshSpace = meshEntities[i].mesh.meshSpace || meshEntities[i].mesh.planeSpace;
-        meshPose = frame.getPose(meshSpace, referenceSpace);
-        meshEl = meshEntities[i].el;
-        if (!meshEl.hasLoaded) { continue; }
-        auxMatrix.fromArray(meshPose.transform.matrix);
-        auxMatrix.decompose(meshEl.object3D.position, meshEl.object3D.quaternion, meshEl.object3D.scale);
-      }
-    };
+      if (frame) {
+        for (var i = 0; i < meshEntities.length; i++) {
+          meshSpace = meshEntities[i].mesh.meshSpace || meshEntities[i].mesh.planeSpace;
+          meshPose = frame.getPose(meshSpace, referenceSpace);
+          meshEl = meshEntities[i].el;
+          if (!meshEl.hasLoaded) { continue; }
+          auxMatrix.fromArray(meshPose.transform.matrix);
+          auxMatrix.decompose(meshEl.object3D.position, meshEl.object3D.quaternion, meshEl.object3D.scale);
+          }
+        }
+      };
   })(),
 
   deleteMeshes: function () {
@@ -397,20 +402,27 @@ AFRAME.registerComponent('real_world_meshing_mod', {
       } else {
         mesh = new THREE.Mesh(geometry, this.worldMaterial);
       }
-      
-
+      el.setObject3D('mesh', mesh);
+      if (this.usePhysicsType == "ammo") {
+        console.log("tryna set physics for " + meshEntity.mesh.semanticLabel);
+  
+        el.setAttribute('ammo-body', {'type': 'static'}); 
+        el.setAttribute('ammo-shape', {'type': 'hull', 'margin': .25, 'includeInvisible': true}); //these properties help collision accuracy
+      }
+      el.classList.add('activeObjexRay');
     } else {
       //add meshMixin
       // mesh = new THREE.Mesh(geometry, this.worldMaterial);
       mesh = new THREE.Mesh(geometry, this.wireframeMaterial);
+      el.setObject3D('mesh', mesh);
     }
-    el.setObject3D('mesh', mesh);
-    if (this.usePhysicsType == "ammo") {
-      console.log("tryna set physics for " + meshEntity.mesh.semanticLabel);
+    // el.setObject3D('mesh', mesh);
+    // if (this.usePhysicsType == "ammo") {
+    //   console.log("tryna set physics for " + meshEntity.mesh.semanticLabel);
 
-      el.setAttribute('ammo-body', {'type': 'static'}); 
-      el.setAttribute('ammo-shape', {'type': 'hull', 'margin': .25, 'includeInvisible': true}); //these properties help collision accuracy
-    }
+    //   el.setAttribute('ammo-body', {'type': 'static'}); 
+    //   el.setAttribute('ammo-shape', {'type': 'hull', 'margin': .25, 'includeInvisible': true}); //these properties help collision accuracy
+    // }
     el.setAttribute('data-world-mesh', meshEntity.mesh.semanticLabel);
   },
 

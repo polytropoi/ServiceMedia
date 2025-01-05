@@ -3456,6 +3456,7 @@ AFRAME.registerComponent('mod_tunnel', {
       if (picGroupMangler != null && picGroupMangler != undefined) {
         this.tileablePicData = picGroupMangler.components.picture_groups_control.returnTileableData();
         if (this.tileablePicData && this.tileablePicData.images) {
+          // console.log("tileable data " + JSON.stringify(this.tileablePicData.images[0]));
           let picIndex = Math.floor(Math.random()*this.tileablePicData.images.length);
           this.texture = new THREE.TextureLoader().load( this.tileablePicData.images[picIndex].url );
           this.texture.encoding = THREE.sRGBEncoding;

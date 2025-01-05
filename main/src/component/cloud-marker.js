@@ -14,7 +14,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
       model: {default: ''},
       mediaID: {default: ''},
       mediaName: {default: ''},
-      targetElements: {default: []}, //array -> csv
+      targetElements: {default: ''}, //array -> csv
       scale: {default: 1},
       
         // position: {default: ''},
@@ -1797,9 +1797,9 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
       // }
     },
     targetMods: function() {
-      console.log("chek targetElements " + this.data.targetElements);
-      if (this.data.targetElements != '' && this.data.targetElements != []) {
-
+      
+      if (this.data.targetElements && this.data.targetElements != '' && this.data.targetElements != []) {
+        console.log("chek targetElements " + this.data.targetElements);
         if (this.data.markerType == "portal") {
           console.log( "tryna show somethins..." + this.data.targetElements + " length"); 
           if (this.data.targetElements != '') {
