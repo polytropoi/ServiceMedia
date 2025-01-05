@@ -4520,6 +4520,9 @@ webxr_router.get('/:_id', function (req, res) {
                             webxrFeatures = "webxr=\x22optionalFeatures: hit-test, dom-overlay; overlayElement: #ar_overlay;\x22 " + xrExtras + " "; 
                             // xrmode = "xr";
                         }
+                        if (sceneResponse.sceneTags && sceneResponse.sceneTags.includes("hand controls") || sceneResponse.sceneTags.includes("hand controllers")) {
+                            meshUtilsScript = meshUtilsScript + "<script src=\x22../main/src/component/ball_blaster_mod.js\x22>";
+                        }
                         // webxrFeatures = " webxr=\x22requiredFeatures: dom-overlay; optionalFeatures: hit-test; overlayElement: #ar_overlay;\x22 ar-hit-test=\x22enabled: true; target: #ar_parent;\x22 "; //otherwise hit-test breaks everythign!
                         // requiredFeatures: hit-test,local-floor; optionalFeatures: dom-overlay,unbounded; overlayElement: #ar_overlay;"
                         // // arHitTest = "ar-hit-test-spawn=\x22mode: "+arMode+"\x22";
