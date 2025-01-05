@@ -44,7 +44,7 @@ AFRAME.registerComponent('real_world_meshing_mod', {
     this.wallArtMaterial = null;
     this.usePhysicsType = "none";
     if (settings && settings.usePhysicsType == "ammo") {
-      this.physicsEnabled = true;
+      this.usePhysicsType = "ammo";
     }
     // this.worldMaterials = {};
     // this.planeMaterial
@@ -454,15 +454,15 @@ AFRAME.registerComponent('real_world_meshing_mod', {
           }
           el.classList.add('activeObjexRay');
         } else {
-          mesh = new THREE.Mesh(geometry, this.worldMaterial);
-          el.setObject3D('mesh', mesh);
-          if (this.usePhysicsType == "ammo") {
-            console.log("tryna set physics for " + meshEntity.mesh.semanticLabel);
+          // mesh = new THREE.Mesh(geometry, this.worldMaterial);
+          // el.setObject3D('mesh', mesh);
+          // if (this.usePhysicsType == "ammo") {
+            console.log("no material/physics for " + meshEntity.mesh.semanticLabel);
       
-            el.setAttribute('ammo-body', {'type': 'static'}); 
-            el.setAttribute('ammo-shape', {'type': 'hull', 'margin': .25, 'includeInvisible': true}); //these properties help collision accuracy
-          }
-          el.classList.add('activeObjexRay');
+          //   el.setAttribute('ammo-body', {'type': 'static'}); 
+          //   el.setAttribute('ammo-shape', {'type': 'hull', 'margin': .25, 'includeInvisible': true}); //these properties help collision accuracy
+          // }
+          // el.classList.add('activeObjexRay');
         }
       } else {
         mesh = new THREE.Mesh(geometry, this.wireframeMaterial);
