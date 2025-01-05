@@ -1725,12 +1725,18 @@ webxr_router.get('/:_id', function (req, res) {
                                                 "</a-entity>";
 
                                             } else {
+
+                                                let rightHandEquip = "";
+                                                let leftHandEquip = "";
+                                                if (sceneResponse.sceneTags && sceneResponse.sceneTags.includes("blaster")) {
+                                                    rightHandEquip = " controller_ball_blaster rotation=\x22-80 0 0\x22 position=\x22-0.02 0 -0.01\x22"
+                                                }
                                                 handEntities = "<a-entity id=\x22left-hand\x22 "+blinkMod+" oculus-touch-controls=\x22hand: left;\x22 left_controller_thumb left_controller_buttons>"+
-                                              
+                                                
                                                 "<a-sphere color=\x22blue\x22 opacity=\x220.1\x22 radius=\x220.06\x22 "+ammoHands+"></a-sphere></a-entity>" +
                                                 // "<a-entity id=\x22right-hand\x22 hand-tracking-grab-controls=\x22hand: right\x22 oculus-touch-controls=\x22hand: right\x22 laser-controls=\x22hand: right;\x22 handModelStyle: lowPoly; color: #ffcccc\x22 raycaster=\x22objects: .activeObjexRay;\x22 grab "+hapticsHands+">"+
                                                 "<a-entity id=\x22right-hand\x22 laser-controls=\x22hand: right;\x22 raycaster=\x22objects: .activeObjexRay;\x22 oculus-touch-controls=\x22hand: right\x22 >"+
-
+                                                "<a-entity id=\x22right_hand_attach\x22 "+rightHandEquip+"></a-entity>" +
                                                 "<a-sphere color=\x22orange\x22 opacity=\x220.1\x22 radius=\x220.06\x22 "+ammoHands+"></a-sphere>"+
                                                 "</a-entity>";
                                     

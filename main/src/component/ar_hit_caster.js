@@ -47,6 +47,7 @@ AFRAME.registerComponent('ar_hit_caster', {
         var el = self.el;
         var targetEl = self.data.targetEl;
         var session;
+        // if (settings && settings.)
         // var arTargetData = [];
         // let arTargetGroup = new THREE.Group();
 
