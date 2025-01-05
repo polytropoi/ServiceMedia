@@ -213,14 +213,15 @@ AFRAME.registerComponent('real_world_meshing_mod', {
     }
 
     if (data.meshesEnabled) {
-      if (meshEntities[i].el.components['ammo-body']) {
-        meshEntities[i].el.components['ammo-body'].syncToPhysics();  //required for static colliders...
-      }
+
       for (var mesh of detectedMeshes.values()) {
         // Ignore meshes that don't match the filterLabels.
         if (filterLabels.length && filterLabels.indexOf(mesh.semanticLabel) === -1) { continue; }
         // if (!data.filtersEnabled || (data.filtersEnabled && filterLabels.length && (filterLabels.indexOf(mesh.semanticLabel) === -1))) { continue; }
         for (i = 0; i < meshEntities.length; i++) {
+          if (meshEntities[i].el.components['ammo-body']) {
+            meshEntities[i].el.components['ammo-body'].syncToPhysics();  //required for static colliders...
+          }
           if (mesh === meshEntities[i].mesh) {
             present = true;
             meshEntities[i].present = true;
