@@ -381,7 +381,7 @@ AFRAME.registerComponent('real_world_meshing_mod', {
       //add planeMixin
       // mesh = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({color: Math.random() * 0xFFFFFF, side: THREE.DoubleSide, transparent: true, opacity: .75}));
       // mesh = new THREE.Mesh(geometry, this.wireframeMaterial);
-      if (meshEntity.mesh.semanticLabel) {
+      // if (meshEntity.mesh.semanticLabel) {
         console.log("xrplane semanticLabel is " + meshEntity.mesh.semanticLabel);
         if (meshEntity.mesh.semanticLabel == "wall" && this.wallMaterial) {
           mesh = new THREE.Mesh(geometry, this.wallMaterial);
@@ -454,8 +454,8 @@ AFRAME.registerComponent('real_world_meshing_mod', {
           }
           el.classList.add('activeObjexRay');
         } else {
-          // mesh = new THREE.Mesh(geometry, this.worldMaterial);
-          // el.setObject3D('mesh', mesh);
+          mesh = new THREE.Mesh(geometry, this.wireframeMaterial);
+          el.setObject3D('mesh', mesh);
           // if (this.usePhysicsType == "ammo") {
             console.log("no material/physics for " + meshEntity.mesh.semanticLabel);
       
@@ -464,10 +464,10 @@ AFRAME.registerComponent('real_world_meshing_mod', {
           // }
           // el.classList.add('activeObjexRay');
         }
-      } else {
-        mesh = new THREE.Mesh(geometry, this.wireframeMaterial);
-        el.setObject3D('mesh', mesh);
-      }
+      // } else {
+      //   mesh = new THREE.Mesh(geometry, this.wireframeMaterial);
+      //   el.setObject3D('mesh', mesh);
+      // }
     } else { //i.e. world meshes
       mesh = new THREE.Mesh(geometry, this.wireframeMaterial);
       el.setObject3D('mesh', mesh);
