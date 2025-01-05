@@ -42,6 +42,7 @@ AFRAME.registerComponent('real_world_meshing_mod', {
     this.doorMaterial = null;
     this.storageMaterial = null;
     this.wallArtMaterial = null;
+    this.couchMaterial = null;
     this.usePhysicsType = "none";
     if (settings && settings.usePhysicsType == "ammo") {
       this.usePhysicsType = "ammo";
@@ -144,9 +145,21 @@ AFRAME.registerComponent('real_world_meshing_mod', {
             this.wallArtMaterial.map.wrapS = THREE.RepeatWrapping;
             this.wallArtMaterial.map.wrapT = THREE.RepeatWrapping;
             this.wallArtMaterial.map.repeat.set(2, 2);
-          } else {
-            let picIndex = Math.floor(Math.random()*this.tileablePicData.images.length);
-            this.texture = new THREE.TextureLoader().load( this.tileablePicData.images[picIndex].url );
+          } else if (this.tileablePicData.images[i].tags && this.tileablePicData.images[i].tags.includes("couch")) {
+            this.texture8 = new THREE.TextureLoader().load( this.tileablePicData.images[i].url );
+            this.texture8.encoding = THREE.sRGBEncoding;
+          
+            this.couchMaterial = new THREE.MeshStandardMaterial({
+              side: THREE.DoubleSide,
+              map: this.texture8, 
+              transparent: true
+              // opacity: .75
+            });
+            this.couchMaterial.map.wrapS = THREE.RepeatWrapping;
+            this.couchMaterial.map.wrapT = THREE.RepeatWrapping;
+            this.couchMaterial.map.repeat.set(2, 2);
+          } else if (this.tileablePicData.images[i].tags && this.tileablePicData.images[i].tags.includes("world")) {
+            this.texture = new THREE.TextureLoader().load( this.tileablePicData.images[i].url );
             this.texture.encoding = THREE.sRGBEncoding;
           
             this.worldMaterial = new THREE.MeshStandardMaterial({
@@ -158,8 +171,7 @@ AFRAME.registerComponent('real_world_meshing_mod', {
             this.worldMaterial.map.wrapS = THREE.RepeatWrapping;
             this.worldMaterial.map.wrapT = THREE.RepeatWrapping;
             this.worldMaterial.map.repeat.set(2, 2);
-            // break;
-          }
+          } 
         }
         // let picIndex = Math.floor(Math.random()*this.tileablePicData.images.length);
         // this.texture = new THREE.TextureLoader().load( this.tileablePicData.images[picIndex].url );
@@ -479,10 +491,10 @@ AFRAME.registerComponent('real_world_meshing_mod', {
     var entityMesh = entityEl.getObject3D('mesh');
     entityMesh.geometry.dispose();
     entityMesh.geometry = this.initMeshGeometry(mesh);
-    if (this.worldMaterial) {
-      entityMesh.material = this.worldMaterial;
-      // this.worldMaterial.needsUpdate = true;
-    }
+    // if (this.worldMaterial) {
+    //   entityMesh.material = this.worldMaterial;
+    //   // this.worldMaterial.needsUpdate = true;
+    // }
 
   }
 });
