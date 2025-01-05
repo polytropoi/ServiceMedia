@@ -54,12 +54,12 @@ AFRAME.registerComponent('real_world_meshing_mod', {
       if (this.tileablePicData && this.tileablePicData.images) {
         for (let i = 0; i < this.tileablePicData.images.length; i++) {
           if (this.tileablePicData.images[i].tags && this.tileablePicData.images[i].tags.includes("wall")) {
-            this.texture = new THREE.TextureLoader().load( this.tileablePicData.images[i].url );
-            this.texture.encoding = THREE.sRGBEncoding;
+            this.texture1 = new THREE.TextureLoader().load( this.tileablePicData.images[i].url );
+            this.texture1.encoding = THREE.sRGBEncoding;
           
             this.wallMaterial = new THREE.MeshStandardMaterial({
               side: THREE.DoubleSide,
-              map: this.texture, 
+              map: this.texture1, 
               transparent: true
               // opacity: .75
             });
@@ -67,12 +67,12 @@ AFRAME.registerComponent('real_world_meshing_mod', {
             this.wallMaterial.map.wrapT = THREE.RepeatWrapping;
             this.wallMaterial.map.repeat.set(2, 2);
           } else if (this.tileablePicData.images[i].tags && this.tileablePicData.images[i].tags.includes("floor")) {
-            this.texture = new THREE.TextureLoader().load( this.tileablePicData.images[i].url );
-            this.texture.encoding = THREE.sRGBEncoding;
+            this.texture2 = new THREE.TextureLoader().load( this.tileablePicData.images[i].url );
+            this.texture2.encoding = THREE.sRGBEncoding;
           
             this.floorMaterial = new THREE.MeshStandardMaterial({
               side: THREE.DoubleSide,
-              map: this.texture, 
+              map: this.texture2, 
               transparent: true
               // opacity: .75
             });
@@ -80,12 +80,12 @@ AFRAME.registerComponent('real_world_meshing_mod', {
             this.floorMaterial.map.wrapT = THREE.RepeatWrapping;
             this.floorMaterial.map.repeat.set(2, 2);
           } else if (this.tileablePicData.images[i].tags && this.tileablePicData.images[i].tags.includes("ceiling")) {
-            this.texture = new THREE.TextureLoader().load( this.tileablePicData.images[i].url );
-            this.texture.encoding = THREE.sRGBEncoding;
+            this.texture3 = new THREE.TextureLoader().load( this.tileablePicData.images[i].url );
+            this.texture3.encoding = THREE.sRGBEncoding;
           
             this.ceilingMaterial = new THREE.MeshStandardMaterial({
               side: THREE.DoubleSide,
-              map: this.texture, 
+              map: this.texture3, 
               transparent: true
               // opacity: .75
             });
@@ -93,12 +93,12 @@ AFRAME.registerComponent('real_world_meshing_mod', {
             this.ceilingMaterial.map.wrapT = THREE.RepeatWrapping;
             this.ceilingMaterial.map.repeat.set(2, 2);
           } else if (this.tileablePicData.images[i].tags && this.tileablePicData.images[i].tags.includes("door")) {
-            this.texture = new THREE.TextureLoader().load( this.tileablePicData.images[i].url );
-            this.texture.encoding = THREE.sRGBEncoding;
+            this.texture4 = new THREE.TextureLoader().load( this.tileablePicData.images[i].url );
+            this.texture4.encoding = THREE.sRGBEncoding;
           
             this.doorMaterial = new THREE.MeshStandardMaterial({
               side: THREE.DoubleSide,
-              map: this.texture, 
+              map: this.texture4, 
               transparent: true
               // opacity: .75
             });
@@ -106,12 +106,12 @@ AFRAME.registerComponent('real_world_meshing_mod', {
             this.doorMaterial.map.wrapT = THREE.RepeatWrapping;
             this.doorMaterial.map.repeat.set(2, 2);
           } else if (this.tileablePicData.images[i].tags && this.tileablePicData.images[i].tags.includes("table")) {
-            this.texture = new THREE.TextureLoader().load( this.tileablePicData.images[i].url );
-            this.texture.encoding = THREE.sRGBEncoding;
+            this.texture5 = new THREE.TextureLoader().load( this.tileablePicData.images[i].url );
+            this.texture5.encoding = THREE.sRGBEncoding;
           
             this.tableMaterial = new THREE.MeshStandardMaterial({
               side: THREE.DoubleSide,
-              map: this.texture, 
+              map: this.texture5, 
               transparent: true
               // opacity: .75
             });
@@ -119,12 +119,12 @@ AFRAME.registerComponent('real_world_meshing_mod', {
             this.tableMaterial.map.wrapT = THREE.RepeatWrapping;
             this.tableMaterial.map.repeat.set(2, 2);
           } else if (this.tileablePicData.images[i].tags && this.tileablePicData.images[i].tags.includes("storage")) {
-            this.texture = new THREE.TextureLoader().load( this.tileablePicData.images[i].url );
-            this.texture.encoding = THREE.sRGBEncoding;
+            this.texture6 = new THREE.TextureLoader().load( this.tileablePicData.images[i].url );
+            this.texture6.encoding = THREE.sRGBEncoding;
           
             this.storageMaterial = new THREE.MeshStandardMaterial({
               side: THREE.DoubleSide,
-              map: this.texture, 
+              map: this.texture6, 
               transparent: true
               // opacity: .75
             });
@@ -132,19 +132,19 @@ AFRAME.registerComponent('real_world_meshing_mod', {
             this.wallMaterial.map.wrapT = THREE.RepeatWrapping;
             this.wallMaterial.map.repeat.set(2, 2);
           } else if (this.tileablePicData.images[i].tags && this.tileablePicData.images[i].tags.includes("wall art")) {
-            this.texture = new THREE.TextureLoader().load( this.tileablePicData.images[i].url );
-            this.texture.encoding = THREE.sRGBEncoding;
+            this.texture7 = new THREE.TextureLoader().load( this.tileablePicData.images[i].url );
+            this.texture7.encoding = THREE.sRGBEncoding;
           
             this.wallArtMaterial = new THREE.MeshStandardMaterial({
               side: THREE.DoubleSide,
-              map: this.texture, 
+              map: this.texture7, 
               transparent: true
               // opacity: .75
             });
             this.wallArtMaterial.map.wrapS = THREE.RepeatWrapping;
             this.wallArtMaterial.map.wrapT = THREE.RepeatWrapping;
             this.wallArtMaterial.map.repeat.set(2, 2);
-          } else {[i]
+          } else {
             let picIndex = Math.floor(Math.random()*this.tileablePicData.images.length);
             this.texture = new THREE.TextureLoader().load( this.tileablePicData.images[picIndex].url );
             this.texture.encoding = THREE.sRGBEncoding;
@@ -181,7 +181,7 @@ AFRAME.registerComponent('real_world_meshing_mod', {
 
     setTimeout(() => {
         this.isReady = true;
-    }, 3000);
+    }, 5000);
 
   },
 
@@ -387,7 +387,7 @@ AFRAME.registerComponent('real_world_meshing_mod', {
           mesh = new THREE.Mesh(geometry, this.wallMaterial);
           el.setObject3D('mesh', mesh);
           if (this.usePhysicsType == "ammo") {
-            console.log("tryna set physics for " + meshEntity.mesh.semanticLabel);
+            console.log("tryna set Physics!!! for " + meshEntity.mesh.semanticLabel);
       
             el.setAttribute('ammo-body', {'type': 'static'}); 
             el.setAttribute('ammo-shape', {'type': 'hull', 'margin': .25, 'includeInvisible': true}); //these properties help collision accuracy
@@ -397,7 +397,7 @@ AFRAME.registerComponent('real_world_meshing_mod', {
           mesh = new THREE.Mesh(geometry, this.floorMaterial);
           el.setObject3D('mesh', mesh);
           if (this.usePhysicsType == "ammo") {
-            console.log("tryna set physics for " + meshEntity.mesh.semanticLabel);
+            console.log("tryna set Physics!!! for " + meshEntity.mesh.semanticLabel);
       
             el.setAttribute('ammo-body', {'type': 'static'}); 
             el.setAttribute('ammo-shape', {'type': 'hull', 'margin': .25, 'includeInvisible': true}); //these properties help collision accuracy
@@ -407,7 +407,7 @@ AFRAME.registerComponent('real_world_meshing_mod', {
           mesh = new THREE.Mesh(geometry, this.ceilingMaterial);
           el.setObject3D('mesh', mesh);
           if (this.usePhysicsType == "ammo") {
-            console.log("tryna set physics for " + meshEntity.mesh.semanticLabel);
+            console.log("tryna set Physics!!! for " + meshEntity.mesh.semanticLabel);
       
             el.setAttribute('ammo-body', {'type': 'static'}); 
             el.setAttribute('ammo-shape', {'type': 'hull', 'margin': .25, 'includeInvisible': true}); //these properties help collision accuracy
@@ -417,7 +417,7 @@ AFRAME.registerComponent('real_world_meshing_mod', {
           mesh = new THREE.Mesh(geometry, this.tableMaterial);
           el.setObject3D('mesh', mesh);
           if (this.usePhysicsType == "ammo") {
-            console.log("tryna set physics for " + meshEntity.mesh.semanticLabel);
+            console.log("tryna set Physics!!! for " + meshEntity.mesh.semanticLabel);
       
             el.setAttribute('ammo-body', {'type': 'static'}); 
             el.setAttribute('ammo-shape', {'type': 'hull', 'margin': .25, 'includeInvisible': true}); //these properties help collision accuracy
@@ -427,7 +427,7 @@ AFRAME.registerComponent('real_world_meshing_mod', {
           mesh = new THREE.Mesh(geometry, this.doorMaterial);
           el.setObject3D('mesh', mesh);
           if (this.usePhysicsType == "ammo") {
-            console.log("tryna set physics for " + meshEntity.mesh.semanticLabel);
+            console.log("tryna set Physics!!! for " + meshEntity.mesh.semanticLabel);
       
             el.setAttribute('ammo-body', {'type': 'static'}); 
             el.setAttribute('ammo-shape', {'type': 'hull', 'margin': .25, 'includeInvisible': true}); //these properties help collision accuracy
@@ -437,7 +437,7 @@ AFRAME.registerComponent('real_world_meshing_mod', {
           mesh = new THREE.Mesh(geometry, this.storageMaterial);
           el.setObject3D('mesh', mesh);
           if (this.usePhysicsType == "ammo") {
-            console.log("tryna set physics for " + meshEntity.mesh.semanticLabel);
+            console.log("tryna set Physics!!! for " + meshEntity.mesh.semanticLabel);
       
             el.setAttribute('ammo-body', {'type': 'static'}); 
             el.setAttribute('ammo-shape', {'type': 'hull', 'margin': .25, 'includeInvisible': true}); //these properties help collision accuracy
@@ -447,7 +447,7 @@ AFRAME.registerComponent('real_world_meshing_mod', {
           mesh = new THREE.Mesh(geometry, this.wallArtMaterial);
           el.setObject3D('mesh', mesh);
           if (this.usePhysicsType == "ammo") {
-            console.log("tryna set physics for " + meshEntity.mesh.semanticLabel);
+            console.log("tryna set Physics!!! for " + meshEntity.mesh.semanticLabel);
       
             el.setAttribute('ammo-body', {'type': 'static'}); 
             el.setAttribute('ammo-shape', {'type': 'hull', 'margin': .25, 'includeInvisible': true}); //these properties help collision accuracy
