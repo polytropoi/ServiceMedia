@@ -385,45 +385,92 @@ AFRAME.registerComponent('real_world_meshing_mod', {
         console.log("xrplane semanticLabel is " + meshEntity.mesh.semanticLabel);
         if (meshEntity.mesh.semanticLabel == "wall" && this.wallMaterial) {
           mesh = new THREE.Mesh(geometry, this.wallMaterial);
+          el.setObject3D('mesh', mesh);
+          if (this.usePhysicsType == "ammo") {
+            console.log("tryna set physics for " + meshEntity.mesh.semanticLabel);
+      
+            el.setAttribute('ammo-body', {'type': 'static'}); 
+            el.setAttribute('ammo-shape', {'type': 'hull', 'margin': .25, 'includeInvisible': true}); //these properties help collision accuracy
+          }
+          el.classList.add('activeObjexRay');
         } else if (meshEntity.mesh.semanticLabel == "floor" && this.floorMaterial) {
           mesh = new THREE.Mesh(geometry, this.floorMaterial);
+          el.setObject3D('mesh', mesh);
+          if (this.usePhysicsType == "ammo") {
+            console.log("tryna set physics for " + meshEntity.mesh.semanticLabel);
+      
+            el.setAttribute('ammo-body', {'type': 'static'}); 
+            el.setAttribute('ammo-shape', {'type': 'hull', 'margin': .25, 'includeInvisible': true}); //these properties help collision accuracy
+          }
+          el.classList.add('activeObjexRay');
         } else if (meshEntity.mesh.semanticLabel == "ceiling" && this.ceilingMaterial) {
           mesh = new THREE.Mesh(geometry, this.ceilingMaterial);
+          el.setObject3D('mesh', mesh);
+          if (this.usePhysicsType == "ammo") {
+            console.log("tryna set physics for " + meshEntity.mesh.semanticLabel);
+      
+            el.setAttribute('ammo-body', {'type': 'static'}); 
+            el.setAttribute('ammo-shape', {'type': 'hull', 'margin': .25, 'includeInvisible': true}); //these properties help collision accuracy
+          }
+          el.classList.add('activeObjexRay');
         } else if (meshEntity.mesh.semanticLabel == "table" && this.tableMaterial) {
           mesh = new THREE.Mesh(geometry, this.tableMaterial);
+          el.setObject3D('mesh', mesh);
+          if (this.usePhysicsType == "ammo") {
+            console.log("tryna set physics for " + meshEntity.mesh.semanticLabel);
+      
+            el.setAttribute('ammo-body', {'type': 'static'}); 
+            el.setAttribute('ammo-shape', {'type': 'hull', 'margin': .25, 'includeInvisible': true}); //these properties help collision accuracy
+          }
+          el.classList.add('activeObjexRay');
         } else if (meshEntity.mesh.semanticLabel == "door" && this.doorMaterial) {
           mesh = new THREE.Mesh(geometry, this.doorMaterial);
+          el.setObject3D('mesh', mesh);
+          if (this.usePhysicsType == "ammo") {
+            console.log("tryna set physics for " + meshEntity.mesh.semanticLabel);
+      
+            el.setAttribute('ammo-body', {'type': 'static'}); 
+            el.setAttribute('ammo-shape', {'type': 'hull', 'margin': .25, 'includeInvisible': true}); //these properties help collision accuracy
+          }
+          el.classList.add('activeObjexRay');
         } else if (meshEntity.mesh.semanticLabel == "storage" && this.storageMaterial) {
           mesh = new THREE.Mesh(geometry, this.storageMaterial);
+          el.setObject3D('mesh', mesh);
+          if (this.usePhysicsType == "ammo") {
+            console.log("tryna set physics for " + meshEntity.mesh.semanticLabel);
+      
+            el.setAttribute('ammo-body', {'type': 'static'}); 
+            el.setAttribute('ammo-shape', {'type': 'hull', 'margin': .25, 'includeInvisible': true}); //these properties help collision accuracy
+          }
+          el.classList.add('activeObjexRay');
         } else if (meshEntity.mesh.semanticLabel == "wall art" && this.wallArtMaterial) {
           mesh = new THREE.Mesh(geometry, this.wallArtMaterial);
+          el.setObject3D('mesh', mesh);
+          if (this.usePhysicsType == "ammo") {
+            console.log("tryna set physics for " + meshEntity.mesh.semanticLabel);
+      
+            el.setAttribute('ammo-body', {'type': 'static'}); 
+            el.setAttribute('ammo-shape', {'type': 'hull', 'margin': .25, 'includeInvisible': true}); //these properties help collision accuracy
+          }
+          el.classList.add('activeObjexRay');
         } else {
           mesh = new THREE.Mesh(geometry, this.worldMaterial);
+          el.setObject3D('mesh', mesh);
+          if (this.usePhysicsType == "ammo") {
+            console.log("tryna set physics for " + meshEntity.mesh.semanticLabel);
+      
+            el.setAttribute('ammo-body', {'type': 'static'}); 
+            el.setAttribute('ammo-shape', {'type': 'hull', 'margin': .25, 'includeInvisible': true}); //these properties help collision accuracy
+          }
+          el.classList.add('activeObjexRay');
         }
       } else {
         mesh = new THREE.Mesh(geometry, this.worldMaterial);
       }
-      el.setObject3D('mesh', mesh);
-      if (this.usePhysicsType == "ammo") {
-        console.log("tryna set physics for " + meshEntity.mesh.semanticLabel);
-  
-        el.setAttribute('ammo-body', {'type': 'static'}); 
-        el.setAttribute('ammo-shape', {'type': 'hull', 'margin': .25, 'includeInvisible': true}); //these properties help collision accuracy
-      }
-      el.classList.add('activeObjexRay');
-    } else {
-      //add meshMixin
-      // mesh = new THREE.Mesh(geometry, this.worldMaterial);
+    } else { //i.e. world meshes
       mesh = new THREE.Mesh(geometry, this.wireframeMaterial);
       el.setObject3D('mesh', mesh);
     }
-    // el.setObject3D('mesh', mesh);
-    // if (this.usePhysicsType == "ammo") {
-    //   console.log("tryna set physics for " + meshEntity.mesh.semanticLabel);
-
-    //   el.setAttribute('ammo-body', {'type': 'static'}); 
-    //   el.setAttribute('ammo-shape', {'type': 'hull', 'margin': .25, 'includeInvisible': true}); //these properties help collision accuracy
-    // }
     el.setAttribute('data-world-mesh', meshEntity.mesh.semanticLabel);
   },
 
