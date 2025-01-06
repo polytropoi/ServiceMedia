@@ -67,7 +67,8 @@ AFRAME.registerComponent('real_world_meshing_mod', {
             this.wallMaterial.map.wrapS = THREE.RepeatWrapping;
             this.wallMaterial.map.wrapT = THREE.RepeatWrapping;
             this.wallMaterial.map.repeat.set(2, 2);
-          } else if (this.tileablePicData.images[i].tags && this.tileablePicData.images[i].tags.includes("floor")) {
+          } 
+          if (this.tileablePicData.images[i].tags && this.tileablePicData.images[i].tags.includes("floor")) {
             this.texture2 = new THREE.TextureLoader().load( this.tileablePicData.images[i].url );
             this.texture2.encoding = THREE.sRGBEncoding;
           
@@ -80,7 +81,8 @@ AFRAME.registerComponent('real_world_meshing_mod', {
             this.floorMaterial.map.wrapS = THREE.RepeatWrapping;
             this.floorMaterial.map.wrapT = THREE.RepeatWrapping;
             this.floorMaterial.map.repeat.set(2, 2);
-          } else if (this.tileablePicData.images[i].tags && this.tileablePicData.images[i].tags.includes("ceiling")) {
+          } 
+          if (this.tileablePicData.images[i].tags && this.tileablePicData.images[i].tags.includes("ceiling")) {
             this.texture3 = new THREE.TextureLoader().load( this.tileablePicData.images[i].url );
             this.texture3.encoding = THREE.sRGBEncoding;
           
@@ -93,7 +95,8 @@ AFRAME.registerComponent('real_world_meshing_mod', {
             this.ceilingMaterial.map.wrapS = THREE.RepeatWrapping;
             this.ceilingMaterial.map.wrapT = THREE.RepeatWrapping;
             this.ceilingMaterial.map.repeat.set(2, 2);
-          } else if (this.tileablePicData.images[i].tags && this.tileablePicData.images[i].tags.includes("door")) {
+          } 
+          if (this.tileablePicData.images[i].tags && this.tileablePicData.images[i].tags.includes("door")) {
             this.texture4 = new THREE.TextureLoader().load( this.tileablePicData.images[i].url );
             this.texture4.encoding = THREE.sRGBEncoding;
           
@@ -106,7 +109,8 @@ AFRAME.registerComponent('real_world_meshing_mod', {
             this.doorMaterial.map.wrapS = THREE.RepeatWrapping;
             this.doorMaterial.map.wrapT = THREE.RepeatWrapping;
             this.doorMaterial.map.repeat.set(2, 2);
-          } else if (this.tileablePicData.images[i].tags && this.tileablePicData.images[i].tags.includes("table")) {
+          } 
+          if (this.tileablePicData.images[i].tags && this.tileablePicData.images[i].tags.includes("table")) {
             this.texture5 = new THREE.TextureLoader().load( this.tileablePicData.images[i].url );
             this.texture5.encoding = THREE.sRGBEncoding;
           
@@ -119,7 +123,8 @@ AFRAME.registerComponent('real_world_meshing_mod', {
             this.tableMaterial.map.wrapS = THREE.RepeatWrapping;
             this.tableMaterial.map.wrapT = THREE.RepeatWrapping;
             this.tableMaterial.map.repeat.set(2, 2);
-          } else if (this.tileablePicData.images[i].tags && this.tileablePicData.images[i].tags.includes("storage")) {
+          } 
+          if (this.tileablePicData.images[i].tags && this.tileablePicData.images[i].tags.includes("storage")) {
             this.texture6 = new THREE.TextureLoader().load( this.tileablePicData.images[i].url );
             this.texture6.encoding = THREE.sRGBEncoding;
           
@@ -132,7 +137,7 @@ AFRAME.registerComponent('real_world_meshing_mod', {
             this.wallMaterial.map.wrapS = THREE.RepeatWrapping;
             this.wallMaterial.map.wrapT = THREE.RepeatWrapping;
             this.wallMaterial.map.repeat.set(2, 2);
-          } else if (this.tileablePicData.images[i].tags && this.tileablePicData.images[i].tags.includes("wall art")) {
+          } if (this.tileablePicData.images[i].tags && this.tileablePicData.images[i].tags.includes("wall art")) {
             this.texture7 = new THREE.TextureLoader().load( this.tileablePicData.images[i].url );
             this.texture7.encoding = THREE.sRGBEncoding;
           
@@ -145,7 +150,8 @@ AFRAME.registerComponent('real_world_meshing_mod', {
             this.wallArtMaterial.map.wrapS = THREE.RepeatWrapping;
             this.wallArtMaterial.map.wrapT = THREE.RepeatWrapping;
             this.wallArtMaterial.map.repeat.set(2, 2);
-          } else if (this.tileablePicData.images[i].tags && this.tileablePicData.images[i].tags.includes("couch")) {
+          } 
+          if (this.tileablePicData.images[i].tags && this.tileablePicData.images[i].tags.includes("couch")) {
             this.texture8 = new THREE.TextureLoader().load( this.tileablePicData.images[i].url );
             this.texture8.encoding = THREE.sRGBEncoding;
           
@@ -158,7 +164,8 @@ AFRAME.registerComponent('real_world_meshing_mod', {
             this.couchMaterial.map.wrapS = THREE.RepeatWrapping;
             this.couchMaterial.map.wrapT = THREE.RepeatWrapping;
             this.couchMaterial.map.repeat.set(2, 2);
-          } else if (this.tileablePicData.images[i].tags && this.tileablePicData.images[i].tags.includes("world")) {
+          } 
+          if (this.tileablePicData.images[i].tags && this.tileablePicData.images[i].tags.includes("world")) {
             this.texture = new THREE.TextureLoader().load( this.tileablePicData.images[i].url );
             this.texture.encoding = THREE.sRGBEncoding;
           
@@ -481,7 +488,7 @@ AFRAME.registerComponent('real_world_meshing_mod', {
       //   el.setObject3D('mesh', mesh);
       // }
     } else { //i.e. world meshes
-      mesh = new THREE.Mesh(geometry, this.wireframeMaterial);
+      mesh = new THREE.Mesh(geometry, this.worldMaterial);
       el.setObject3D('mesh', mesh);
     }
     el.setAttribute('data-world-mesh', meshEntity.mesh.semanticLabel);
