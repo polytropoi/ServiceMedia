@@ -33,7 +33,7 @@ AFRAME.registerComponent('real_world_meshing_mod', {
     }
     this.meshEntities = [];
     this.initWorldMeshEntity = this.initWorldMeshEntity.bind(this);
-    this.worldMaterial = new THREE.MeshBasicMaterial({color: Math.random() * 0xFFFFFF, side: THREE.DoubleSide, transparent: true, opacity: .75});
+    this.worldMaterial = new THREE.MeshBasicMaterial({color: Math.random() * 0xFFFFFF, side: THREE.DoubleSide, transparent: true, opacity: .75, wireframe: true});
     this.wireframeMaterial = new THREE.MeshBasicMaterial({color: Math.random() * 0xFFFFFF, side: THREE.DoubleSide, wireframe: true});
     this.wallMaterial = null;
     this.floorMaterial = null;

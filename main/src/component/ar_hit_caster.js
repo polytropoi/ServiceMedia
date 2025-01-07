@@ -82,6 +82,8 @@ AFRAME.registerComponent('ar_hit_caster', {
         if (settings && (settings.useXrRoomPhysics || settings.useRealWorldMeshing)) {
           if (AFRAME.utils.device.checkHeadsetConnected() && !AFRAME.utils.device.isMobile() && !isMobile()) { //isTouchDevice is true on Quest3! 
             console.log("tryna do mixed!"); 
+            
+            this.arHitTestEnabled = true;
           } else {
             // if (settings && (settings.useXrRoomPhysics || settings.useRealWorldMeshing)) {
               self.messageEl.textContent = "Mixed Reality not supported on this device!";

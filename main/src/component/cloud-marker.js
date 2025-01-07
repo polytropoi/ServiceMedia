@@ -1798,7 +1798,7 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
     },
     targetMods: function() {
       
-      if (this.data.targetElements && this.data.targetElements != '' && this.data.targetElements != []) {
+      if (this.data.targetElements && this.data.targetElements != undefined && this.data.targetElements != '' && this.data.targetElements != []) {
         console.log("chek targetElements " + this.data.targetElements);
         if (this.data.markerType == "portal") {
           console.log( "tryna show somethins..." + this.data.targetElements + " length"); 
