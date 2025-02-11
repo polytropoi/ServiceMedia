@@ -1706,7 +1706,7 @@ webxr_router.get('/:_id', function (req, res) {
                                             //                     "<a-sphere color=\x22blue\x22 opacity=\x220.1\x22 radius=\x220.06\x22 "+ammoHands+"></a-sphere></a-entity>" +
                                             //                     "<a-entity id=\x22right-hand\x22 hand-controls=\x22hand: right\x22>" +
                                             //                     "<a-sphere color=\x22orange\x22 opacity=\x220.1\x22 radius=\x220.06\x22 "+ammoHands+"></a-sphere>"+
-                                            //                     "<a-entity id=\x22rightHandEquip\x22 controller_ball_blaster rotation=\x22-80 0 0\x22 position=\x22-0.02 0 -0.01\x22></a-entity>" +
+                                            //                     "<a-entity id=\x22rightHandEquip\x22 equip_controller rotation=\x22-80 0 0\x22 position=\x22-0.02 0 -0.01\x22></a-entity>" +
                                             //                     "</a-entity>";
                                             // } 
                                             if (sceneResponse.sceneTags && sceneResponse.sceneTags.includes("hand controls")  || sceneResponse.sceneTags.includes("hand controllers")) {
@@ -1714,9 +1714,9 @@ webxr_router.get('/:_id', function (req, res) {
                                                 "<a-sphere color=\x22blue\x22 opacity=\x220.1\x22 radius=\x220.06\x22 "+ammoHands+"></a-sphere></a-entity>" +
                                                 "<a-entity id=\x22right-hand\x22 hand-controls=\x22hand: right\x22>" +
                                                 "<a-sphere color=\x22orange\x22 opacity=\x220.1\x22 radius=\x220.06\x22 "+ammoHands+"></a-sphere>"+
-                                                "<a-entity id=\x22rightHandEquip\x22 controller_ball_blaster rotation=\x22-80 0 0\x22 position=\x22-0.02 0 -0.01\x22></a-entity>" +
+                                                "<a-entity id=\x22rightHandEquip\x22 equip_controller rotation=\x22-80 0 0\x22 position=\x22-0.02 0 -0.01\x22></a-entity>" +
                                                 "</a-entity>";
-                                            } else if (sceneResponse.sceneTags && sceneResponse.sceneTags.includes("hand tracking")) {
+                                            } else if (sceneResponse.sceneTags && sceneResponse.sceneTags.includes("hand tracking")) { 
                                                 handEntities = "<a-entity id=\x22left-hand\x22 hand-tracking-controls=\x22hand: left; hoverEnabled: true;\x22 pinch_fu>" +
                                                 "<a-sphere color=\x22blue\x22 opacity=\x221\x22 radius=\x220.05\x22 "+ammoHands+"></a-sphere>"+
                                                 "</a-entity>" +
@@ -1729,7 +1729,7 @@ webxr_router.get('/:_id', function (req, res) {
                                                 let rightHandEquip = "";
                                                 let leftHandEquip = "";
                                                 if (sceneResponse.sceneTags && sceneResponse.sceneTags.includes("blaster")) {
-                                                    rightHandEquip = " controller_ball_blaster rotation=\x22-80 0 0\x22 position=\x22-0.02 0 -0.01\x22"
+                                                    rightHandEquip = " equip_controller rotation=\x22-80 0 0\x22 position=\x22-0.02 0 -0.01\x22"
                                                 }
                                                 handEntities = "<a-entity id=\x22left-hand\x22 "+blinkMod+" oculus-touch-controls=\x22hand: left;\x22 left_controller_thumb left_controller_buttons>"+
                                                 
@@ -4490,7 +4490,7 @@ webxr_router.get('/:_id', function (req, res) {
                     let arElements = "";
                     let handsTemplate = "";
                     // let aframeRenderSettings = "renderer=\x22antialias: true; logarithmicDepthBuffer: true; colorManagement: true; sortObjects: true; physicallyCorrectLights: true; alpha: true; maxCanvasWidth: 1920; maxCanvasHeight: 1920;\x22";
-                    let aframeRenderSettings = "renderer=\x22colorManagement: true; physicallyCorrectLights: true; sortObjects: true; maxCanvasWidth: 1920; maxCanvasHeight: 1920;\x22";
+                    let aframeRenderSettings = "renderer=\x22colorManagement: true; physicallyCorrectLights: true; exposure: .2; sortObjects: true; maxCanvasWidth: 1920; maxCanvasHeight: 1920;\x22";
                     // let aframeRenderSettings = "renderer=\x22exposure: 2\x22";
                    
                     // if (arMode == "spawn") {
@@ -4508,7 +4508,7 @@ webxr_router.get('/:_id', function (req, res) {
                             meshUtilsScript = meshUtilsScript + "<script src=\x22../main/src/component/ball_blaster_mod.js\x22></script><script type=\x22module\x22 src=\x22../main/js/xr-room-physics.min.js\x22></script>";
                             xrExtras = "xr_room_physics";
                             webxrFeatures = "webxr=\x22requiredFeatures: plane-detection,mesh-detection,local-floor; optionalFeatures: hit-test;\x22 " + xrExtras + " "; 
-                            // rightHandExtras = "controller_ball_blaster";
+                            // rightHandExtras = "equip_controller";
                             xrmode = "xr-mode-ui=\x22XRMode: ar\x22";
                         } else if (sceneResponse.sceneTags && sceneResponse.sceneTags.includes("real world meshing")) {
                             meshUtilsScript = meshUtilsScript + "<script src=\x22../main/src/component/aframe_real_world_meshing_mod.js\x22></script>";
@@ -4521,7 +4521,7 @@ webxr_router.get('/:_id', function (req, res) {
                             // xrmode = "xr";
                         }
                         if (sceneResponse.sceneTags && sceneResponse.sceneTags.includes("hand controls") || sceneResponse.sceneTags.includes("hand controllers")) {
-                            meshUtilsScript = meshUtilsScript + "<script src=\x22../main/src/component/ball_blaster_mod.js\x22>";
+                            meshUtilsScript = meshUtilsScript + "<script src=\x22../main/src/component/hand_equip.js\x22>";
                         }
                         // webxrFeatures = " webxr=\x22requiredFeatures: dom-overlay; optionalFeatures: hit-test; overlayElement: #ar_overlay;\x22 ar-hit-test=\x22enabled: true; target: #ar_parent;\x22 "; //otherwise hit-test breaks everythign!
                         // requiredFeatures: hit-test,local-floor; optionalFeatures: dom-overlay,unbounded; overlayElement: #ar_overlay;"

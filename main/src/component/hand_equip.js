@@ -1,10 +1,12 @@
+// https://github.com/diarmidmackenzie/aframe-components/blob/main/components/ball-blaster/index.js
+/* global AFRAME, THREE, Ammo */
 (function () {
 
-  impulseVector = new THREE.Vector3()
-  zeroVector = new THREE.Vector3(0, 0, 0)
-  vel = new THREE.Vector3()
+  let impulseVector = new THREE.Vector3();
+  let zeroVector = new THREE.Vector3(0, 0, 0);
+  let vel = new THREE.Vector3();
 
-  AFRAME.registerComponent('ball_blaster', {
+  AFRAME.registerComponent('ball-blaster', {
 
     schema: {
       // velocity of balls in m/s
@@ -27,7 +29,7 @@
         this.kinematicBodyHTML = `ammo-body='type: kinematic'; ammo-shape`
         // Ammo requires manual fit of shape when working with 'a-sphere'
         // (?? due to component initialization order).
-        this.ballPhysicsHTML = `ammo-body='type: dynamic';
+        this.ballPhysicsHTML = `ammo-body='type: dynamic; gravity: 0 0 0; linearDamping: .1; angularDamping: .1; emitCollisionEvents: true;';
                                 ammo-shape='type: sphere; fit: manual; sphereRadius: ${this.data.radius}'`
       }
       else if (this.el.sceneEl.getAttribute('physx')) {
@@ -44,7 +46,7 @@
   
       const handleHTML = `
       <a-cylinder
-        id = 'ball_blaster-handle'
+        id = 'ball-blaster-handle'
         color=${this.data.blasterColor}
         height=0.15
         radius=0.02
@@ -54,7 +56,7 @@
 
       const barrelHTML = `
       <a-cylinder
-        id = 'ball_blaster-barrel'
+        id = 'ball-blaster-barrel'
         rotation='90 0 0'
         position='0 0.07 -0.2'
         color=${this.data.blasterColor}
@@ -107,10 +109,10 @@
     remove() {
       this.removeListeners()
 
-      const barrel = this.el.querySelector('#ball_blaster-barrel')
+      const barrel = this.el.querySelector('#ball-blaster-barrel')
       this.el.removeChild(barrel)
 
-      const handle = this.el.querySelector('#ball_blaster-handle')
+      const handle = this.el.querySelector('#ball-blaster-handle')
       this.el.removeChild(handle)
     },
 
@@ -147,12 +149,12 @@
     shootBall() {
   
       const id = THREE.MathUtils.generateUUID()
-  
+      let color = new THREE.Color(Math.random() * "0xFFFFFF");
       const ballHTML = `
       <a-sphere
         id = ${id}
         radius = ${this.data.radius}
-        color = ${this.data.ballColor}
+        color = ${color}
         position = '0 0.05 -0.7'
         shadow = 'cast: true'
         ${this.ballPhysicsHTML}>
@@ -161,9 +163,11 @@
       this.el.insertAdjacentHTML('beforeend', ballHTML)
   
       const ball = document.getElementById(id)
+      
   
       ball.addEventListener('loaded', () => {
   
+        
         const i = impulseVector
         ball.object3D.getWorldDirection(i)
         i.multiplyScalar(-this.data.velocity)
@@ -172,6 +176,7 @@
           const impulse = new Ammo.btVector3(i.x, i.y, i.z);
           ball.body.applyCentralImpulse(impulse);
           Ammo.destroy(impulse);
+          
         }
         else if (this.driver === "physx") {
 
@@ -194,6 +199,9 @@
           i.multiplyScalar(5)
           body.applyImpulse(i, zeroVector)
         }
+        
+        this.el.setAttribute("mod_el", {"physicsType": "dynamic"});
+        this.el.setAttribute("mod_synth", "");
       })
     },
 
@@ -217,7 +225,7 @@
 
             const body = ball.components['physx-body'].rigidBody
             if (body) {
-              v = body.getLinearVelocity()
+              let v = body.getLinearVelocity()
               vel.set(v.x, v.y, v.z)
               const speed = vel.length()
               // tick may occur before impulse has been applied.
@@ -240,9 +248,9 @@
 })()
 
 
-AFRAME.registerComponent('controller_ball_blaster', {
+AFRAME.registerComponent('equip_controller', {
 
-  // matches schema of ball_blaster
+  // matches schema of ball-blaster
   schema: {
     velocity: {default: 20},  
     radius: {default: 0.05}, 
@@ -251,35 +259,41 @@ AFRAME.registerComponent('controller_ball_blaster', {
     debug: {default: false}
   },
   
-  init() {
-
+  init: function () {
+    console.log("tryna equip blaster!");
     this.refresh = this.refresh.bind(this)
     this.el.sceneEl.addEventListener('controllerconnected', this.refresh)
     this.el.sceneEl.addEventListener('controllerdisconnected', this.refresh)
 
   },
+  equip: function () {
+     this.el.setAttribute('ball-blaster', this.data);
+  },
+  dequip: function () {
+    this.el.removeAttribute('ball-blaster');
+  },
+  update: function () {
 
-  update() {
-
-    if (this.el.hasAttribute('ball_blaster')) {
-      this.el.setAttribute('ball_blaster', this.data)
+    if (this.el.hasAttribute('ball-blaster')) {
+      this.el.setAttribute('ball-blaster', this.data);
     }
   },
 
-  refresh() {
+  refresh: function () {
 
     const parentController = this.el.closest('[tracked-controls]')
 
+    console.log("blaster says parentController " + parentController.id)
     // On exit from VR, hand-controls doesn't remove the tracked-controls component.
     // Arguably that's a bug, but we can work around it.
     // It does set the controller object to not be visible, so we
     // can use that to determine that the controller has gone away and 
-    // we should remove the ball_blaster component.
-    if (parentController && parentController.object3D.visible) {
-      this.el.setAttribute('ball_blaster', this.data)
+    // we should remove the ball-blaster component.
+    if (parentController) {
+      this.el.setAttribute('ball-blaster', this.data)
     }
     else {
-      this.el.removeAttribute('ball_blaster')
+      this.el.removeAttribute('ball-blaster')
     }
   }
 })

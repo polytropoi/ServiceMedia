@@ -5221,3 +5221,237 @@ AFRAME.registerComponent('model_viewer', {
     this.el.setAttribute('position', {x: 0, y: .5, z: -1})
   },
 });
+////////////////////////////////////////  grabbable widgets, slider and knob (tbd)
+
+AFRAME.registerComponent('slider', {
+  schema: {
+    width: { default: 0.5 },
+    controls: {default: 'volume'}
+  },
+
+  init: function () {
+    var trackEl = this.trackEl = document.createElement('a-entity');
+    this.localPosition = new THREE.Vector3();
+    this.onPinchedMoved = this.onPinchedMoved.bind(this);
+
+    this.modSynth = null;
+    trackEl.setAttribute('geometry', {
+      primitive: 'box',
+      height: 0.03,
+      width: this.data.width,
+      depth: 0.01
+    });
+
+    trackEl.setAttribute('material', {
+      color: 'white'
+    });
+
+    this.el.appendChild(trackEl);
+
+    var pickerEl = this.pickerEl = document.createElement('a-entity');
+
+    pickerEl.setAttribute('geometry', {
+      primitive: 'cylinder',
+      radius: 0.02,
+      height: 0.05
+    });
+    pickerEl.classList.add("target");
+    pickerEl.id = "slider_" + Date.now();
+    pickerEl.setAttribute('material', {
+      color: '#3a50c5'
+    });
+
+    pickerEl.setAttribute('pinchable', {
+      pinchDistance: 0.05
+    });
+
+
+    // pickerEl.setAttribute('pinchable', {
+    //   pinchDistance: 0.05
+    // });
+    pickerEl.classList.add("grabbable");
+    pickerEl.setAttribute('rotation', {
+      x: 90, y: 0, z: 0
+    });
+    
+    pickerEl.setAttribute("mod_el", {"eltype": "slider"});
+    // pickerEl.setAttribute('color-change', '');
+
+    this.el.appendChild(pickerEl);
+
+    pickerEl.addEventListener('pinchedmoved', this.onPinchedMoved);
+    
+    if (this.data.controls == "volume") {
+      let modSynthEl = document.getElementById("mod_synth");
+      if (modSynthEl) {
+        this.modSynth = modSynthEl.components.mod_synth;
+        
+      }
+      
+    }
+  },
+
+  onPinchedMoved: function (evt) {
+     evt.stopPropagation();
+    var el = this.el;
+    var evtDetail = this.evtDetail;
+    var halfWidth = this.data.width / 2;
+    var localPosition = this.localPosition;
+    localPosition.copy(evt.detail.position);
+    el.object3D.updateMatrixWorld();
+    el.object3D.worldToLocal(localPosition);
+    if (localPosition.x < -halfWidth || localPosition.x > halfWidth) { return; }
+    this.pickerEl.object3D.position.x = localPosition.x;
+    // evtDetail.value = (this.pickerEl.object3D.position.x + halfWidth) / this.data.width;
+    // this.el.emit('sliderchanged', evtDetail);
+    let value = (this.pickerEl.object3D.position.x + halfWidth) / this.data.width;
+    console.log("value "+ value);
+    if (this.modSynth) {
+          this.modSynth.volMod(value);
+      }
+    
+  },
+    mouseMoved: function (position) {
+      console.log("mouseMoved " + JSON.stringify(position));
+    var el = this.el;
+    var evtDetail = this.evtDetail;
+    var halfWidth = this.data.width / 2;
+    var localPosition = this.localPosition;
+    localPosition.copy(position);
+    el.object3D.updateMatrixWorld();
+    el.object3D.worldToLocal(localPosition);
+    if (localPosition.x < -halfWidth || localPosition.x > halfWidth) { return; }
+    this.pickerEl.object3D.position.x = localPosition.x;
+    let value = (this.pickerEl.object3D.position.x + halfWidth) / this.data.width;
+    console.log("value "+ value);
+    // this.el.emit('sliderchanged', evtDetail);
+       if (this.modSynth) {
+          this.modSynth.volMod(value);
+      }
+  },
+    grabbedMoved: function (position) {
+
+    var el = this.el;
+    // var evtDetail = this.evtDetail;
+    var halfWidth = this.data.width / 2;
+    var localPosition = this.localPosition;
+    localPosition.copy(position);
+    el.object3D.updateMatrixWorld();
+    el.object3D.worldToLocal(localPosition);
+              console.log("grabbedMoved " + JSON.stringify(localPosition));
+    if (localPosition.x < -halfWidth || localPosition.x > halfWidth) { return; }
+    this.pickerEl.object3D.position.x = localPosition.x;
+    let value = (this.pickerEl.object3D.position.x + halfWidth) / this.data.width;
+    console.log("value "+ value);
+       if (this.modSynth) {
+          this.modSynth.volMod(value);
+      }
+    // this.el.emit('sliderchanged', evtDetail);
+  }
+});
+
+/* global AFRAME, THREE */
+AFRAME.registerComponent('knob', {
+  schema: {
+    width: { default: 0.5 }
+  },
+
+  init: function () {
+    var trackEl = this.trackEl = document.createElement('a-entity');
+    this.localPosition = new THREE.Vector3();
+    this.onPinchedMoved = this.onPinchedMoved.bind(this);
+
+    trackEl.setAttribute('geometry', {
+      primitive: 'box',
+      height: 0.03,
+      width: this.data.width,
+      depth: 0.01
+    });
+
+    trackEl.setAttribute('material', {
+      color: 'white'
+    });
+
+    this.el.appendChild(trackEl);
+
+    var pickerEl = this.pickerEl = document.createElement('a-entity');
+
+    pickerEl.setAttribute('geometry', {
+      primitive: 'cylinder',
+      radius: 0.02,
+      height: 0.05
+    });
+    pickerEl.classList.add("target");
+    pickerEl.id = "slider_" + Date.now();
+    pickerEl.setAttribute('material', {
+      color: '#3a50c5'
+    });
+
+    pickerEl.setAttribute('pinchable', {
+      pinchDistance: 0.05
+    });
+
+
+    // pickerEl.setAttribute('pinchable', {
+    //   pinchDistance: 0.05
+    // });
+    pickerEl.classList.add("grabbable");
+    pickerEl.setAttribute('rotation', {
+      x: 90, y: 0, z: 0
+    });
+    
+    pickerEl.setAttribute("mod_el", {"eltype": "slider"});
+    // pickerEl.setAttribute('color-change', '');
+
+    this.el.appendChild(pickerEl);
+
+    pickerEl.addEventListener('pinchedmoved', this.onPinchedMoved);
+  },
+
+  onPinchedMoved: function (evt) {
+     evt.stopPropagation();
+    var el = this.el;
+    var evtDetail = this.evtDetail;
+    var halfWidth = this.data.width / 2;
+    var localPosition = this.localPosition;
+    localPosition.copy(evt.detail.position);
+    el.object3D.updateMatrixWorld();
+    el.object3D.worldToLocal(localPosition);
+    if (localPosition.x < -halfWidth || localPosition.x > halfWidth) { return; }
+    this.pickerEl.object3D.position.x = localPosition.x;
+    evtDetail.value = (this.pickerEl.object3D.position.x + halfWidth) / this.data.width;
+    this.el.emit('sliderchanged', evtDetail);
+  },
+    mouseMoved: function (position) {
+      console.log("mouseMoved " + JSON.stringify(position));
+    var el = this.el;
+    var evtDetail = this.evtDetail;
+    var halfWidth = this.data.width / 2;
+    var localPosition = this.localPosition;
+    localPosition.copy(position);
+    el.object3D.updateMatrixWorld();
+    el.object3D.worldToLocal(localPosition);
+    if (localPosition.x < -halfWidth || localPosition.x > halfWidth) { return; }
+    this.pickerEl.object3D.position.x = localPosition.x;
+    let value = (this.pickerEl.object3D.position.x + halfWidth) / this.data.width;
+    console.log("value "+ value);
+    // this.el.emit('sliderchanged', evtDetail);
+  },
+    grabbedMoved: function (position) {
+
+    var el = this.el;
+    // var evtDetail = this.evtDetail;
+    var halfWidth = this.data.width / 2;
+    var localPosition = this.localPosition;
+    localPosition.copy(position);
+    el.object3D.updateMatrixWorld();
+    el.object3D.worldToLocal(localPosition);
+              console.log("grabbedMoved " + JSON.stringify(localPosition));
+    if (localPosition.x < -halfWidth || localPosition.x > halfWidth) { return; }
+    this.pickerEl.object3D.position.x = localPosition.x;
+    let value = (this.pickerEl.object3D.position.x + halfWidth) / this.data.width;
+    console.log("value "+ value);
+    // this.el.emit('sliderchanged', evtDetail);
+  }
+});
+
