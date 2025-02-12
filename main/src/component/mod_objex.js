@@ -3447,11 +3447,11 @@ AFRAME.registerComponent('mod_object', {
         if (this.hasSynth) {
           if (this.el.components.mod_synth != null && this.data.objectData.tonejsPatch1 != undefined && this.data.objectData.tonejsPatch1 != null) {
             // this.el.components.mod_synth.trigger(distance);
-            if (this.data.objectData.tonejsPatch1 == "Metal") {
-              this.el.components.mod_synth.metalHitDistance(distance);
-            } else if (this.data.objectData.tonejsPatch1 == "AM Synth") {
+            // if (this.data.objectData.tonejsPatch1 == "Metal") {
+            //   this.el.components.mod_synth.metalHitDistance(distance);
+            // } else if (this.data.objectData.tonejsPatch1 == "AM Synth") {
               this.el.components.mod_synth.amHitDistance(distance);
-            }
+            // }
             
           }
         }

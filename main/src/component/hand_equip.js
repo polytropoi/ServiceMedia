@@ -283,7 +283,7 @@ AFRAME.registerComponent('equip_controller', {
 
     const parentController = this.el.closest('[tracked-controls]')
 
-    console.log("blaster says parentController " + parentController.id)
+    console.log("equip_controller says closest tracked controls parent is " + parentController);
     // On exit from VR, hand-controls doesn't remove the tracked-controls component.
     // Arguably that's a bug, but we can work around it.
     // It does set the controller object to not be visible, so we
