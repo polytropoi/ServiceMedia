@@ -266,6 +266,14 @@ $(function() {
          });
       }
    }
+   if (settings.sceneTags && settings.sceneTags.includes("keys")) { //synth keys
+
+   }
+
+   // if (settings.sceneTags && settings.sceneTags.includes("keys")) {
+
+   // }
+
 
    if (settings.sceneTags && settings.sceneTags.includes("webcam")) {
       navigator.mediaDevices.getUserMedia({audio: false, video: true})

@@ -2171,8 +2171,8 @@ webxr_router.get('/:_id', function (req, res) {
                             //use the "cloud_marker" component for certain markertypes () TODO rename it to mod_location // nope
                             let scale = 1;
                             let rot = 0;
-                            if (locationPlaceholders[i].markerObjScale && locationPlaceholders[i].markerObjScale != 0 && locationPlaceholders[i].markerObjScale != "") {
-                                scale = locationPlaceholders[i].markerObjScale;
+                            if (locationPlaceholders[i].markerObjScale && locationPlaceholders[i].markerObjScale != 0 && locationPlaceholders[i].markerObjScale != "") { //deprecated, using non-u scaling now..
+                                scale = locationPlaceholders[i].markerObjScale; 
                             }
                             const xscale = locationPlaceholders[i].xscale != null ? locationPlaceholders[i].xscale : scale;
                             const yscale = locationPlaceholders[i].yscale != null ? locationPlaceholders[i].yscale : scale;

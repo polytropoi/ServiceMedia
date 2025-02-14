@@ -472,6 +472,8 @@ AFRAME.registerComponent('real_world_meshing_mod', {
             el.setAttribute('ammo-shape', {'type': 'hull', 'margin': .25, 'includeInvisible': true}); //these properties help collision accuracy
           }
           el.classList.add('activeObjexRay');
+          el.classList.add('wall art');
+          // el.setAttribute("mod_el");
         } else {
           mesh = new THREE.Mesh(geometry, this.wireframeMaterial);
           el.setObject3D('mesh', mesh);
