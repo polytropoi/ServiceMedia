@@ -830,15 +830,15 @@ webxr_router.get('/:_id', function (req, res) {
                 // TODO - backstretch include var!
                 // "<script src=\x22/main/js/jquery.backstretch.min.js\x22></script>"; 
                 if (avatarName == undefined || avatarName == null || avatarName == "guest") { //cook up a guest name if not logged in
-                    array1 = [];
-                    array2 = [];
-                    array3 = [];
-                    index1 = -1;
-                    index2 = -1;
-                    index3 = -1;
-                    name1 = "";
-                    name2 = "";
-                    name3 = "";
+                    let array1 = [];
+                    let array2 = [];
+                    let array3 = [];
+                    let index1 = -1;
+                    let index2 = -1;
+                    let index3 = -1;
+                    let name1 = "";
+                    let name2 = "";
+                    let name3 = "";
                     min = 0;
                     db.lexicons.findOne({name: "nameArrays"}, function (err, items) {
                     if (err || !items) {
